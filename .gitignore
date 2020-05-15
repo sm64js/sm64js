@@ -1,0 +1,4 @@
+dist
+*lock.json
+node_modules
+.vs*

@@ -53,28 +53,7 @@ export class WebGL {
                 x: 0, y: 0, width: 0, height: 0
             },
             shader_program: null,
-            textures: [
-                {
-                    next: null,
-                    texture_addr: 0,
-                    fmt: 0,
-                    siz: 0,
-                    texture_id: 0,
-                    cms: 0,
-                    cmt: 0,
-                    linear_filter: false
-                },
-                {
-                    next: null,
-                    texture_addr: 0,
-                    fmt: 0,
-                    siz: 0,
-                    texture_id: 0,
-                    cms: 0,
-                    cmt: 0,
-                    linear_filter: false
-                }
-            ]
+            textures: [ null, null ]
         }
         this.shader_program_pool = []
 
@@ -97,6 +76,7 @@ export class WebGL {
         this.gl.depthFunc(this.gl.LEQUAL);
         this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
+        /// create opengl shaders
         precomp_shaders.forEach(shader_id => {
             this.gfx_lookup_or_create_shader_program(shader_id)
         })
@@ -396,6 +376,7 @@ export class WebGL {
             shaderProgram = this.create_and_load_new_shader(shader_id)
             this.rendering_state.shader_program = shaderProgram
         }
+        return shaderProgram
     }
 
     lookup_shader(shader_id) {
@@ -408,10 +389,6 @@ export class WebGL {
                 this.gl.disableVertexAttribArray(attrib_index)
             })
         }
-    }
-
-    static printAbc() {
-        console.log("abcdefg");
     }
 
 }

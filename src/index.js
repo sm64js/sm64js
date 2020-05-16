@@ -1,21 +1,18 @@
 // JavaScript source code
+import { WebGL } from "./graphics/WebGL"
 
-import { printAbc } from "./module1"
+const pool = Array(0x165000 / 8 / 4 * 4).fill(0)
+let gfx
 
-console.log("meow")
-printAbc()
+function main_func() {
 
-const canvas = document.querySelector("#gameCanvas");
-// Initialize the GL context
-const gl = canvas.getContext("webgl");
+    //main_pool_init(pool, start/end);
 
-// Only continue if WebGL is available and working
-if (gl === null) {
-    alert("Unable to initialize WebGL. Your browser or machine may not support it.");
+    gfx = new WebGL(document.querySelector('#gameCanvas')) ///gfx_init
+    
+
 }
 
-// Set clear color to black, fully opaque
-gl.clearColor(1.0, 0.0, 0.0, 1.0);
-// Clear the color buffer with specified clear color
-gl.clear(gl.COLOR_BUFFER_BIT);
+console.log("Main Function! Starting Application!")
+main_func()
 

@@ -19,8 +19,6 @@ export class Game {
         // point levelCommandAddr to the entry point into the level script data.
         this.levelCommandAddr = level_script_entry[0]
 
-        this.levelCommandAddr.command()
-
         //play_music(SEQ_PLAYER_SFX, SEQUENCE_ARGS(0, SEQ_SOUND_PLAYER), 0);
         //set_sound_mode(save_file_get_sound_mode());
 
@@ -30,5 +28,25 @@ export class Game {
 
     main_loop_one_iteration() {
 
+        ///Read Data from Controllers
+
+        // Audio game loop Tick
+
+        this.config_gfx_pool()
+
+        // process controller inputs
+
+        this.levelCommandAddr = window.levelCommands.level_script_execute(this.levelCommandAddr)
+
+        this.display_and_vsync()
+
+    }
+
+    config_gfx_pool() {
+        /// some stuff with gfx pools tasks, display lists
+    }
+
+    display_and_vsync() {
+        /// TODO
     }
 }

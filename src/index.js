@@ -31,11 +31,12 @@ function main_func() {
 
     initialized_game = true
 
-    //while (true) { produce_one_frame() }
+    const n_frames = 3
+    for (let i = 0; i < n_frames; i++) { produce_one_frame() }
     
 
 }
 
-console.log("Main Function! Starting Application!")
+console.log("Starting Application!")
 main_func()
 

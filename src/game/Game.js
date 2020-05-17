@@ -18,7 +18,8 @@ export class Game {
         //set_vblank_handler(2, &gGameVblankHandler, &gGameVblankQueue, (OSMesg) 1);
 
         // point levelCommandAddr to the entry point into the level script data.
-        this.levelCommandAddr = level_script_entry[0]
+        // this.levelScript = { script: level_script_entry, index: 0 } //levelCommandAddr
+        LevelCommandsInstance.start_new_script(level_script_entry)
 
         //play_music(SEQ_PLAYER_SFX, SEQUENCE_ARGS(0, SEQ_SOUND_PLAYER), 0);
         //set_sound_mode(save_file_get_sound_mode());
@@ -37,7 +38,7 @@ export class Game {
 
         // process controller inputs
 
-        this.levelCommandAddr = LevelCommandsInstance.level_script_execute(this.levelCommandAddr)
+        LevelCommandsInstance.level_script_execute()
 
         this.display_and_vsync()
 

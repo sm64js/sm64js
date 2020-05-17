@@ -2,19 +2,16 @@ const SCRIPT_RUNNING = 1
 const SCRIPT_PAUSED = 0
 const SCRIPT_PAUSED2 = -1
 
-export class LevelCommands {
+class LevelCommands {
 
     constructor() {
-        console.log("creating a LevelCommands Class")
-        this.init_level = this.init_level.bind(this)
         this.sScriptStatus = SCRIPT_PAUSED
         this.sCurrentCmd = null
+        this.init_level = this.init_level.bind(this)
     }
 
     init_level(args) {
-        console.log("init level")
         this.sScriptStatus = SCRIPT_PAUSED
-        console.log("meow: " + this.sScriptStatus)
     }
 
     sleep(args) {
@@ -38,13 +35,11 @@ export class LevelCommands {
         this.sCurrentCmd = cmd
 
         console.log()
-        //while (this.sScriptStatus == SCRIPT_RUNNING) {
-        console.log("running script command: " + cmd.command.name)
-            //this.init_level()
+        while (this.sScriptStatus == SCRIPT_RUNNING) {
+            console.log("running script command: " + cmd.command.name)
             cmd.command(cmd.args)
-        //}
+        }
 
-        console.log("here: " + this.sScriptStatus)
 
         //render_game()
         //end_master_display_list()
@@ -54,8 +49,4 @@ export class LevelCommands {
 
 }
 
-/*const LevelCommandsInstance = new LevelCommands()
-
-export function getLevelCommandsInstance() {
-    return LevelCommandsInstance
-}*/
+export const LevelCommandsInstance = new LevelCommands()

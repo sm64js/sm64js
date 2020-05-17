@@ -1,4 +1,5 @@
 import { level_script_entry } from "../levels/main_entry/entry"
+import { LevelCommandsInstance } from "../engine/level_script"
 
 export class Game {
     constructor() {
@@ -36,7 +37,7 @@ export class Game {
 
         // process controller inputs
 
-        this.levelCommandAddr = window.levelCommands.level_script_execute(this.levelCommandAddr)
+        this.levelCommandAddr = LevelCommandsInstance.level_script_execute(this.levelCommandAddr)
 
         this.display_and_vsync()
 

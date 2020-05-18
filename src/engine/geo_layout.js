@@ -2,7 +2,8 @@ import {
     init_graph_node_root,
     init_graph_node_master_list,
     register_scene_graph_node,
-    init_graph_node_ortho
+    init_graph_node_ortho,
+    init_graph_node_background
 } from "./graph_node"
 
 class GeoLayout {
@@ -36,6 +37,11 @@ class GeoLayout {
         this.sCurrentLayout.index++
     }
 
+    close_node(args) {
+        this.gCurGraphNodeIndex--
+        this.sCurrentLayout.index++
+    }
+
     node_master_list(args) { //zbuffer?
 
         const graphNode = init_graph_node_master_list(null, null, args[0])
@@ -58,6 +64,8 @@ class GeoLayout {
     node_background(args) {
 
         const graphNode = init_graph_node_background(null, null, args[0], null, 0)
+
+        register_scene_graph_node(this, graphNode)
 
         this.sCurrentLayout.index++
     }
@@ -89,6 +97,7 @@ class GeoLayout {
         }
 
         console.log("finshed processing geo layout")
+        console.log(this.gCurRootGraphNode)
         return this.gCurRootGraphNode
 
     }

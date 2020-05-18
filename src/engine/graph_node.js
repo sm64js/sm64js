@@ -27,8 +27,9 @@ const GRAPH_NODE_TYPE_BILLBOARD    =           0x01A
 const GRAPH_NODE_TYPE_DISPLAY_LIST  =          0x01B
 const GRAPH_NODE_TYPE_SCALE      =             0x01C
 const GRAPH_NODE_TYPE_SHADOW    =              0x028
-const GRAPH_NODE_TYPE_OBJECT_PARENT  =         0x029
-const GRAPH_NODE_TYPE_CULLING_RADIUS = 0x02F
+const GRAPH_NODE_TYPE_OBJECT_PARENT =          0x029
+const GRAPH_NODE_TYPE_BACKGROUND =             0x02C | GRAPH_NODE_TYPE_FUNCTIONAL
+const GRAPH_NODE_TYPE_CULLING_RADIUS =         0x02F
 
 const GFX_NUM_MASTER_LISTS = 8
 
@@ -45,10 +46,13 @@ const geo_add_child = (parent, childNode) => {
             childNode.next = childNode
         } else {  /// first child != null or children is not empty
             const parentLastChild = parent.children[parent.children.length - 1]
+            const parentLastChild2 = parentFirstChild.prev
+            if (parentLastChild !== parentLastChild2) throw "error 2 last child methods don't match"
             childNode.prev = parentLastChild
             childNode.next = parentFirstChild
             parentFirstChild.prev = childNode
             parentLastChild.next = childNode
+            parent.children.push(childNode)
         }
     }
 
@@ -59,8 +63,8 @@ const geo_add_child = (parent, childNode) => {
 const init_scene_graph_node_links = (graphNode, type) => {
     graphNode.node.type = type
     graphNode.node.flags = GRAPH_RENDER_ACTIVE
-    graphNode.node.prev = graphNode
-    graphNode.node.next = graphNode
+    graphNode.node.prev = graphNode.node
+    graphNode.node.next = graphNode.node
     graphNode.node.parent = null
     graphNode.node.children = []
     graphNode.node.wrapper = graphNode
@@ -81,6 +85,20 @@ export const init_graph_node_root = (pool, graphNode, areaIndex, x, y, width, he
 }
 
 export const init_graph_node_background = (pool, graphNode, background, backgroundFunc, zero) => {
+
+    graphNode = {
+        node: {},
+        background,
+        zero
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_BACKGROUND)
+
+    //if (backgroundFunc) {
+    //    backgroundFunc(.....)
+    //}
+
+    return graphNode
 
 }
 

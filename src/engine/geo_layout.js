@@ -3,7 +3,8 @@ import {
     init_graph_node_master_list,
     register_scene_graph_node,
     init_graph_node_ortho,
-    init_graph_node_background
+    init_graph_node_background,
+    init_graph_node_perspective
 } from "./graph_node"
 
 class GeoLayout {
@@ -59,6 +60,19 @@ class GeoLayout {
         register_scene_graph_node(this, graphNode)
 
         this.sCurrentLayout.index++
+    }
+
+    node_perspective(args) {
+
+      if (args[3]) { //optional 4th function argument
+
+      }
+
+      const graphNode = init_graph_node_perspective(null, null, args[0], args[1], args[2], null, 0)
+
+      register_scene_graph_node(this, graphNode)
+
+      this.sCurrentLayout.index++
     }
 
     node_background(args) {

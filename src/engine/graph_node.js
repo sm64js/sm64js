@@ -15,6 +15,7 @@ const GRAPH_NODE_TYPE_400    =                 0x400
 // The discriminant for different types of geo nodes
 const GRAPH_NODE_TYPE_ROOT   =                 0x001
 const GRAPH_NODE_TYPE_ORTHO_PROJECTION  =      0x002
+const GRAPH_NODE_TYPE_PERSPECTIVE     =        0x003 | GRAPH_NODE_TYPE_FUNCTIONAL
 const GRAPH_NODE_TYPE_MASTER_LIST   =          0x004
 const GRAPH_NODE_TYPE_START    =               0x00A
 const GRAPH_NODE_TYPE_LEVEL_OF_DETAIL  =       0x00B
@@ -82,6 +83,26 @@ export const init_graph_node_root = (pool, graphNode, areaIndex, x, y, width, he
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_ROOT)
 
     return graphNode
+}
+
+export const init_graph_node_perspective = (pool, graphNode, fov, near, far, nodeFunc, unused) => {
+
+  graphNode = {
+    node: {},
+    fov,
+    near,
+    far,
+    unused
+  }
+
+  init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_PERSPECTIVE)
+
+  // if (nodeFunc) {
+  //   nodeFunc(....)
+  // }
+
+  return graphNode
+
 }
 
 export const init_graph_node_background = (pool, graphNode, background, backgroundFunc, zero) => {

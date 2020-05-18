@@ -1,4 +1,4 @@
-import { GeoLayoutCommandsInstance } from "./geo_layout"
+import { GeoLayoutInstance } from "./geo_layout"
 
 const SCRIPT_RUNNING = 1
 const SCRIPT_PAUSED = 0
@@ -11,6 +11,7 @@ class LevelCommands {
         this.sDelayFrames = 0
         this.sCurrentScript = {}
         this.sRegister = null
+        this.gAreas = Array(8).fill({})
 /*        this.sCurrentCmd = null
         this.sScriptIndex = 0*/
     }
@@ -49,12 +50,18 @@ class LevelCommands {
     }
 
     begin_area(args) {
+        console.log("begin area")
 
         const areaIndex = args[0]
         const geoLayout = args[1]
 
         if (areaIndex < 8) {
-            GeoLayoutCommandsInstance.process_geo_layout(geoLayout)
+            const screnArea = GeoLayoutInstance.process_geo_layout(geoLayout)
+
+            this.sCurrAreaIndex = areaIndex
+            screnArea.areaIndex = areaIndex
+            this.gAreas[areaIndex].geometryLayoutData = screnArea
+            
         }
 
         this.sCurrentScript.index++

@@ -5,7 +5,7 @@ let gfx, game
 
 let initialized_game = false
 
-function produce_one_frame() {
+const produce_one_frame = () => {
     start_frame()
     game.main_loop_one_iteration()
 
@@ -14,14 +14,14 @@ function produce_one_frame() {
     end_frame()
 }
 
-function start_frame() {
+const start_frame = () => {
     /// handle input
     /// handle dimensions
 }
 
-function end_frame() {}
+const end_frame = () => {}
 
-function main_func() {
+const main_func = () => {
 
     //main_pool_init(pool, start/end);
 

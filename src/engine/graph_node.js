@@ -30,13 +30,16 @@ const GRAPH_NODE_TYPE_SHADOW    =              0x028
 const GRAPH_NODE_TYPE_OBJECT_PARENT  =         0x029
 const GRAPH_NODE_TYPE_CULLING_RADIUS = 0x02F
 
+const GFX_NUM_MASTER_LISTS = 8
+
 const geo_add_child = (parent, childNode) => {
 
     if (childNode) {
         childNode.parent = parent
+
         const parentFirstChild = parent.children[0]
 
-        if (!parent.children || !parentFirstChild) {  /// first child == null
+        if (!parentFirstChild) {  /// first child == null
             parent.children = [childNode]
             childNode.prev = childNode
             childNode.next = childNode
@@ -54,12 +57,13 @@ const geo_add_child = (parent, childNode) => {
 }
 
 const init_scene_graph_node_links = (graphNode, type) => {
-    graphNode.type = type
-    graphNode.flags = GRAPH_RENDER_ACTIVE
-    graphNode.prev = graphNode
-    graphNode.next = graphNode
-    graphNode.parent = null
-    graphNode.children = null
+    graphNode.node.type = type
+    graphNode.node.flags = GRAPH_RENDER_ACTIVE
+    graphNode.node.prev = graphNode
+    graphNode.node.next = graphNode
+    graphNode.node.parent = null
+    graphNode.node.children = []
+    graphNode.node.wrapper = graphNode
 }
 
 export const init_graph_node_root = (pool, graphNode, areaIndex, x, y, width, height) => {
@@ -71,9 +75,39 @@ export const init_graph_node_root = (pool, graphNode, areaIndex, x, y, width, he
         views: null,
         numViews: 0
     }
-    init_scene_graph_node_links(graphNode.node, GRAPH_NODE_TYPE_ROOT)
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_ROOT)
 
     return graphNode
+}
+
+export const init_graph_node_background = (pool, graphNode, background, backgroundFunc, zero) => {
+
+}
+
+export const init_graph_node_ortho = (pool, graphNode, scale) => {
+    graphNode = {
+        node: {},
+        scale
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_ORTHO_PROJECTION)
+
+    return graphNode
+}
+
+export const init_graph_node_master_list = (pool, graphNode, on) => {
+
+    graphNode = {
+        node: {},
+        listHeads: Array(GFX_NUM_MASTER_LISTS),
+        listTails: Array(GFX_NUM_MASTER_LISTS)
+    }
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_MASTER_LIST)
+
+    if (on) graphNode.node.flags |= GRAPH_RENDER_Z_BUFFER
+
+    return graphNode
+
 }
 
 export const register_scene_graph_node = (g, graphNode) => {
@@ -86,7 +120,7 @@ export const register_scene_graph_node = (g, graphNode) => {
             if (g.gCurGraphNodeList[g.gCurGraphNodeIndex - 1].type == GRAPH_NODE_TYPE_OBJECT_PARENT) {
                 g.gCurGraphNodeList[g.gCurGraphNodeIndex - 1].sharedChild = graphNode
             } else {
-                geo_add_child(g.gCurGraphNodeList[g.gCurGraphNodeIndex - 1], graphNode)
+                geo_add_child(g.gCurGraphNodeList[g.gCurGraphNodeIndex - 1].node, graphNode.node)
             }
         }
     }

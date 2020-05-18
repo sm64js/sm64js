@@ -12,17 +12,15 @@ class LevelCommands {
         this.sCurrentScript = {}
         this.sRegister = null
         this.gAreas = Array(8).fill({})
-/*        this.sCurrentCmd = null
-        this.sScriptIndex = 0*/
     }
 
     init_level(args) {
-        console.log("init level")
+        //console.log("init level")
         this.sCurrentScript.index++
     }
 
     sleep(args) {
-        console.log("sleep")
+        //console.log("sleep")
         this.sScriptStatus = SCRIPT_PAUSED
 
         if (this.sDelayFrames == 0) {
@@ -34,23 +32,23 @@ class LevelCommands {
     }
 
     blackout(args) {
-        console.log("blackout")
+        //console.log("blackout")
         this.sCurrentScript.index++
     }
 
     set_register(args) {
-        console.log("set register")
+        //console.log("set register")
         this.sRegister = args[0]
         this.sCurrentScript.index++
     }
 
     alloc_level_pool(args) {
-        console.log("alloc level pool")
+        //console.log("alloc level pool")
         this.sCurrentScript.index++
     }
 
     begin_area(args) {
-        console.log("begin area")
+        //console.log("begin area")
 
         const areaIndex = args[0]
         const geoLayout = args[1]
@@ -68,8 +66,7 @@ class LevelCommands {
     }
 
     execute(args) {
-        console.log("execute")
-        console.log(args[3])
+        //console.log("execute")
         this.start_new_script(args[3])
     }
 
@@ -80,8 +77,6 @@ class LevelCommands {
 
     level_script_execute() {
         this.sScriptStatus = SCRIPT_RUNNING
-        //this.sCurrentCmd = script.script[script.index]
-        //this.sScriptIndex = script.index
 
         console.log("new frame")
         while (this.sScriptStatus == SCRIPT_RUNNING) {
@@ -93,8 +88,6 @@ class LevelCommands {
         //render_game()
         //end_master_display_list()
 
-        //return this.sCurrentCmd
-        //script.index = this.sScriptIndex
     }
 
 }

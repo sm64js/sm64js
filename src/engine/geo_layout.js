@@ -1,4 +1,9 @@
-import { init_graph_node_root, register_scene_graph_node } from  "./graph_node"
+import {
+    init_graph_node_root,
+    init_graph_node_master_list,
+    register_scene_graph_node,
+    init_graph_node_ortho
+} from "./graph_node"
 
 class GeoLayout {
     constructor() {
@@ -6,7 +11,6 @@ class GeoLayout {
     }
 
     node_screen_area(args) {  /// node_root
-        console.log("node screen area")
 
         const x = args[1], y = args[2], width = args[3], height = args[4]
         let i = 0
@@ -15,18 +19,48 @@ class GeoLayout {
 
         const graphNode = init_graph_node_root(null, null, 0, x, y, width, height)
 
-        //this.gGeoViews = null
-        //graphNode.views = this.gGeoViews
+        //this.gGeoViews = []
 
         graphNode.numViews = this.gGeoNumViews
 
         this.gGeoViews = Array(this.gGeoNumViews).fill(null)
+        graphNode.views = this.gGeoViews
 
-        register_scene_graph_node(this, graphNode.node)
+        register_scene_graph_node(this, graphNode)
 
         this.sCurrentLayout.index++
     }
 
+    open_node(args) {
+        this.gCurGraphNodeList.push(this.gCurGraphNodeList[this.gCurGraphNodeIndex++])
+        this.sCurrentLayout.index++
+    }
+
+    node_master_list(args) { //zbuffer?
+
+        const graphNode = init_graph_node_master_list(null, null, args[0])
+
+        register_scene_graph_node(this, graphNode)
+
+        this.sCurrentLayout.index++
+    }
+
+    node_ortho(args) {
+        const scale = args[0] / 100.0
+
+        const graphNode = init_graph_node_ortho(null, null, scale)
+
+        register_scene_graph_node(this, graphNode)
+
+        this.sCurrentLayout.index++
+    }
+
+    node_background(args) {
+
+        const graphNode = init_graph_node_background(null, null, args[0], null, 0)
+
+        this.sCurrentLayout.index++
+    }
 
     process_geo_layout(geoLayout) {
         this.sCurrentLayout.layout = geoLayout
@@ -54,7 +88,8 @@ class GeoLayout {
             cmd.command.call(this, cmd.args)
         }
 
-        return {}
+        console.log("finshed processing geo layout")
+        return this.gCurRootGraphNode
 
     }
 }

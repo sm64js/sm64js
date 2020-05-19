@@ -1,5 +1,5 @@
 import { level_script_entry } from "../levels/main_entry/entry"
-import { LevelCommandsInstance } from "../engine/level_script"
+import { LevelCommandsInstance } from "../engine/LevelCommands"
 
 export class Game {
     constructor() {

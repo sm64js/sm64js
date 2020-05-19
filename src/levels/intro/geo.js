@@ -1,4 +1,4 @@
-import { GeoLayoutInstance } from "../../engine/geo_layout"
+import { GeoLayoutInstance } from "../../engine/GeoLayout"
 import { geo_title_screen, geo_fade_transition } from "./gfx"
 
 const canvas = document.querySelector('#gameCanvas')

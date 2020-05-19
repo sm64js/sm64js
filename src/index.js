@@ -31,7 +31,7 @@ const main_func = () => {
 
     initialized_game = true
 
-    const n_frames = 3
+    const n_frames = 93 //78
     for (let i = 0; i < n_frames; i++) { produce_one_frame() }
     
 

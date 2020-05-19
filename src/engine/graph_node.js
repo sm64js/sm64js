@@ -1,47 +1,47 @@
 
-const GRAPH_RENDER_ACTIVE = (1 << 0)
-const GRAPH_RENDER_CHILDREN_FIRST = (1 << 1)
-const GRAPH_RENDER_BILLBOARD = (1 << 2)
-const GRAPH_RENDER_Z_BUFFER = (1 << 3)
-const GRAPH_RENDER_INVISIBLE = (1 << 4)
-const GRAPH_RENDER_HAS_ANIMATION = (1 << 5)
+export const GRAPH_RENDER_ACTIVE = (1 << 0)
+export const GRAPH_RENDER_CHILDREN_FIRST = (1 << 1)
+export const GRAPH_RENDER_BILLBOARD = (1 << 2)
+export const GRAPH_RENDER_Z_BUFFER = (1 << 3)
+export const GRAPH_RENDER_INVISIBLE = (1 << 4)
+export const GRAPH_RENDER_HAS_ANIMATION = (1 << 5)
 
 // Whether the node type has a function pointer of type GraphNodeFunc
-const GRAPH_NODE_TYPE_FUNCTIONAL =             0x100
+export const GRAPH_NODE_TYPE_FUNCTIONAL =             0x100
 
 // Type used for Bowser and an unused geo function in obj_behaviors.c
-const GRAPH_NODE_TYPE_400    =                 0x400
+export const GRAPH_NODE_TYPE_400    =                 0x400
 
 // The discriminant for different types of geo nodes
-const GRAPH_NODE_TYPE_ROOT   =                 0x001
-const GRAPH_NODE_TYPE_ORTHO_PROJECTION  =      0x002
-const GRAPH_NODE_TYPE_PERSPECTIVE     =        0x003 | GRAPH_NODE_TYPE_FUNCTIONAL
-const GRAPH_NODE_TYPE_MASTER_LIST   =          0x004
-const GRAPH_NODE_TYPE_START    =               0x00A
-const GRAPH_NODE_TYPE_LEVEL_OF_DETAIL = 0x00B
-const GRAPH_NODE_TYPE_CAMERA   =               0x014 | GRAPH_NODE_TYPE_FUNCTIONAL
-const GRAPH_NODE_TYPE_TRANSLATION_ROTATION =   0x015
-const GRAPH_NODE_TYPE_TRANSLATION =            0x016
-const GRAPH_NODE_TYPE_ROTATION  =              0x017
-const GRAPH_NODE_TYPE_OBJECT   =               0x018
-const GRAPH_NODE_TYPE_ANIMATED_PART  =         0x019
-const GRAPH_NODE_TYPE_BILLBOARD    =           0x01A
-const GRAPH_NODE_TYPE_DISPLAY_LIST  =          0x01B
-const GRAPH_NODE_TYPE_SCALE      =             0x01C
-const GRAPH_NODE_TYPE_SHADOW    =              0x028
-const GRAPH_NODE_TYPE_OBJECT_PARENT     =      0x029
-const GRAPH_NODE_TYPE_GENERATED_LIST =         0x02A | GRAPH_NODE_TYPE_FUNCTIONAL
-const GRAPH_NODE_TYPE_BACKGROUND =             0x02C | GRAPH_NODE_TYPE_FUNCTIONAL
-const GRAPH_NODE_TYPE_CULLING_RADIUS =         0x02F
+export const GRAPH_NODE_TYPE_ROOT   =                 0x001
+export const GRAPH_NODE_TYPE_ORTHO_PROJECTION  =      0x002
+export const GRAPH_NODE_TYPE_PERSPECTIVE     =        0x003 | GRAPH_NODE_TYPE_FUNCTIONAL
+export const GRAPH_NODE_TYPE_MASTER_LIST   =          0x004
+export const GRAPH_NODE_TYPE_START    =               0x00A
+export const GRAPH_NODE_TYPE_LEVEL_OF_DETAIL = 0x00B
+export const GRAPH_NODE_TYPE_CAMERA   =               0x014 | GRAPH_NODE_TYPE_FUNCTIONAL
+export const GRAPH_NODE_TYPE_TRANSLATION_ROTATION =   0x015
+export const GRAPH_NODE_TYPE_TRANSLATION =            0x016
+export const GRAPH_NODE_TYPE_ROTATION  =              0x017
+export const GRAPH_NODE_TYPE_OBJECT   =               0x018
+export const GRAPH_NODE_TYPE_ANIMATED_PART  =         0x019
+export const GRAPH_NODE_TYPE_BILLBOARD    =           0x01A
+export const GRAPH_NODE_TYPE_DISPLAY_LIST  =          0x01B
+export const GRAPH_NODE_TYPE_SCALE      =             0x01C
+export const GRAPH_NODE_TYPE_SHADOW    =              0x028
+export const GRAPH_NODE_TYPE_OBJECT_PARENT     =      0x029
+export const GRAPH_NODE_TYPE_GENERATED_LIST =         0x02A | GRAPH_NODE_TYPE_FUNCTIONAL
+export const GRAPH_NODE_TYPE_BACKGROUND =             0x02C | GRAPH_NODE_TYPE_FUNCTIONAL
+export const GRAPH_NODE_TYPE_CULLING_RADIUS =         0x02F
 
-const GFX_NUM_MASTER_LISTS = 8
+export const GFX_NUM_MASTER_LISTS = 8
 
-const GEO_CONTEXT_CREATE        =   0 // called when node is created from a geo command
-const GEO_CONTEXT_RENDER        =   1 // called from rendering_graph_node.c
-const GEO_CONTEXT_AREA_UNLOAD   =   2 // called when unloading an area
-const GEO_CONTEXT_AREA_LOAD     =   3 // called when loading an area
-const GEO_CONTEXT_AREA_INIT     =   4 // called when initializing the 8 areas
-const GEO_CONTEXT_HELD_OBJ      =   5 // called when processing a GraphNodeHeldObj
+export const GEO_CONTEXT_CREATE        =   0 // called when node is created from a geo command
+export const GEO_CONTEXT_RENDER        =   1 // called from rendering_graph_node.c
+export const GEO_CONTEXT_AREA_UNLOAD   =   2 // called when unloading an area
+export const GEO_CONTEXT_AREA_LOAD     =   3 // called when loading an area
+export const GEO_CONTEXT_AREA_INIT     =   4 // called when initializing the 8 areas
+export const GEO_CONTEXT_HELD_OBJ      =   5 // called when processing a GraphNodeHeldObj
 
 const geo_add_child = (parent, childNode) => {
 

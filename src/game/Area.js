@@ -1,3 +1,4 @@
+import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 
 export const WARP_TRANSITION_FADE_FROM_COLOR   = 0x00
 export const WARP_TRANSITION_FADE_INTO_COLOR   = 0x01
@@ -30,6 +31,12 @@ class Area {
 
     play_transition() {
 
+    }
+
+    render_game() {
+        if (this.gCurrentArea) {
+            GeoRenderer.geo_process_root(this.gCurrentArea.geometryLayoutData, null, null, null)
+        }
     }
 
 }

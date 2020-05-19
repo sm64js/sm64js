@@ -1,13 +1,13 @@
 import { WebGL } from "./graphics/WebGL"
-import { Game } from "./game/Game"
+import { GameInstance as Game } from "./game/Game"
 
-let gfx, game
+let gfx
 
 let initialized_game = false
 
 const produce_one_frame = () => {
     start_frame()
-    game.main_loop_one_iteration()
+    Game.main_loop_one_iteration()
 
     /// Audio
 
@@ -26,8 +26,6 @@ const main_func = () => {
     //main_pool_init(pool, start/end);
 
     gfx = new WebGL(document.querySelector('#gameCanvas')) ///gfx_init
-
-    game = new Game()
 
     initialized_game = true
 

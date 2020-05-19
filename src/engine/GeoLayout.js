@@ -1,13 +1,4 @@
-import {
-    init_graph_node_root,
-    init_graph_node_master_list,
-    register_scene_graph_node,
-    init_graph_node_ortho,
-    init_graph_node_background,
-    init_graph_node_perspective,
-    init_graph_node_camera,
-    init_graph_node_generated
-} from "./graph_node"
+import * as GraphNode from "./graph_node"
 
 const copy3argsToObject = (pos, argIndex, args) => {
     for (let i = argIndex; i < argIndex + 3; i++) {
@@ -30,7 +21,7 @@ class GeoLayout {
 
         this.gGeoNumViews = args[0] + 2
 
-        const graphNode = init_graph_node_root(null, null, 0, x, y, width, height)
+        const graphNode = GraphNode.init_graph_node_root(null, null, 0, x, y, width, height)
 
         //this.gGeoViews = []
 
@@ -39,7 +30,7 @@ class GeoLayout {
         this.gGeoViews = Array(this.gGeoNumViews).fill(null)
         graphNode.views = this.gGeoViews
 
-        register_scene_graph_node(this, graphNode)
+        GraphNode.register_scene_graph_node(this, graphNode)
 
         this.sCurrentLayout.index++
     }
@@ -56,9 +47,9 @@ class GeoLayout {
 
     node_master_list(args) { //zbuffer?
 
-        const graphNode = init_graph_node_master_list(null, null, args[0])
+        const graphNode = GraphNode.init_graph_node_master_list(null, null, args[0])
 
-        register_scene_graph_node(this, graphNode)
+        GraphNode.register_scene_graph_node(this, graphNode)
 
         this.sCurrentLayout.index++
     }
@@ -66,9 +57,9 @@ class GeoLayout {
     node_ortho(args) {
         const scale = args[0] / 100.0
 
-        const graphNode = init_graph_node_ortho(null, null, scale)
+        const graphNode = GraphNode.init_graph_node_ortho(null, null, scale)
 
-        register_scene_graph_node(this, graphNode)
+        GraphNode.register_scene_graph_node(this, graphNode)
 
         this.sCurrentLayout.index++
     }
@@ -79,9 +70,9 @@ class GeoLayout {
 
       }
 
-      const graphNode = init_graph_node_perspective(null, null, args[0], args[1], args[2], null, 0)
+      const graphNode = GraphNode.init_graph_node_perspective(null, null, args[0], args[1], args[2], null, 0)
 
-      register_scene_graph_node(this, graphNode)
+      GraphNode.register_scene_graph_node(this, graphNode)
 
       this.sCurrentLayout.index++
     }
@@ -96,9 +87,9 @@ class GeoLayout {
         argIndex += copy3argsToObject(pos, argIndex, args)
         argIndex += copy3argsToObject(focus, argIndex, args)
 
-        const graphNode = init_graph_node_camera(null, null, pos, focus, func, cameraType)
+        const graphNode = GraphNode.init_graph_node_camera(null, null, pos, focus, func, cameraType)
 
-        register_scene_graph_node(this, graphNode)
+        GraphNode.register_scene_graph_node(this, graphNode)
 
         this.gGeoViews[0] = graphNode
 
@@ -108,18 +99,18 @@ class GeoLayout {
     node_generated(args) {
         const theFunc = args[1], param = args[0]
 
-        const graphNode = init_graph_node_generated(null, null, theFunc, param)
+        const graphNode = GraphNode.init_graph_node_generated(null, null, theFunc, param)
 
-        register_scene_graph_node(this, graphNode)
+        GraphNode.register_scene_graph_node(this, graphNode)
 
         this.sCurrentLayout.index++
     }
 
     node_background(args) {
 
-        const graphNode = init_graph_node_background(null, null, args[0], null, 0)
+        const graphNode = GraphNode.init_graph_node_background(null, null, args[0], null, 0)
 
-        register_scene_graph_node(this, graphNode)
+        GraphNode.register_scene_graph_node(this, graphNode)
 
         this.sCurrentLayout.index++
     }

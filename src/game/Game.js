@@ -1,9 +1,9 @@
 import { level_script_entry } from "../levels/main_entry/entry"
-import { LevelCommandsInstance } from "../engine/LevelCommands"
+import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
 
-export class Game {
+class Game {
     constructor() {
-        this.levelCommandAddr = null
+        this.gDisplayList = []
         this.main_loop_init() /// thread5_game_loop_init
     }
 
@@ -19,7 +19,7 @@ export class Game {
 
         // point levelCommandAddr to the entry point into the level script data.
         // this.levelScript = { script: level_script_entry, index: 0 } //levelCommandAddr
-        LevelCommandsInstance.start_new_script(level_script_entry)
+        LevelCommands.start_new_script(level_script_entry)
 
         //play_music(SEQ_PLAYER_SFX, SEQUENCE_ARGS(0, SEQ_SOUND_PLAYER), 0);
         //set_sound_mode(save_file_get_sound_mode());
@@ -38,7 +38,7 @@ export class Game {
 
         // process controller inputs
 
-        LevelCommandsInstance.level_script_execute()
+        LevelCommands.level_script_execute()
 
         this.display_and_vsync()
 
@@ -52,3 +52,5 @@ export class Game {
         /// TODO
     }
 }
+
+export const GameInstance = new Game()

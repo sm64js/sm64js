@@ -1,5 +1,5 @@
-import { GeoLayoutInstance } from "./GeoLayout"
-import { AreaInstance } from "../game/Area"
+import { GeoLayoutInstance as GeoLayout } from "./GeoLayout"
+import { AreaInstance as Area } from "../game/Area"
 
 const SCRIPT_RUNNING = 1
 const SCRIPT_PAUSED = 0
@@ -53,7 +53,7 @@ class LevelCommands {
 
     load_area(args) {
         const areaIndex = args[0]
-        AreaInstance.load_area(areaIndex)
+        Area.load_area(areaIndex)
         this.sCurrentScript.index++
     }
 
@@ -64,11 +64,11 @@ class LevelCommands {
         const geoLayout = args[1]
 
         if (areaIndex < 8) {
-            const screnArea = GeoLayoutInstance.process_geo_layout(geoLayout)
+            const screnArea = GeoLayout.process_geo_layout(geoLayout)
 
             this.sCurrAreaIndex = areaIndex
             screnArea.areaIndex = areaIndex
-            AreaInstance.gAreas[areaIndex].geometryLayoutData = screnArea
+            Area.gAreas[areaIndex].geometryLayoutData = screnArea
             
         }
 
@@ -77,8 +77,8 @@ class LevelCommands {
 
     transition(args) {
 
-        if (AreaInstance.gCurrentArea) {
-            AreaInstance.play_transition(args[0], args[1], args[2], args[3], args[4])
+        if (Area.gCurrentArea) {
+            Area.play_transition(args[0], args[1], args[2], args[3], args[4])
         }
 
         this.sCurrentScript.index++
@@ -87,10 +87,6 @@ class LevelCommands {
     execute(args) {
         //console.log("execute")
         this.start_new_script(args[3])
-    }
-
-    render_game() {
-
     }
 
     start_new_script(level_script) {
@@ -108,7 +104,7 @@ class LevelCommands {
             cmd.command.call(this, cmd.args)
         }
 
-        this.render_game()
+        Area.render_game()
         //end_master_display_list()
 
     }

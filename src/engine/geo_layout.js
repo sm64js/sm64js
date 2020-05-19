@@ -4,13 +4,24 @@ import {
     register_scene_graph_node,
     init_graph_node_ortho,
     init_graph_node_background,
-    init_graph_node_perspective
+    init_graph_node_perspective,
+    init_graph_node_camera,
+    init_graph_node_generated
 } from "./graph_node"
+
+const copy3argsToObject = (pos, argIndex, args) => {
+    for (let i = argIndex; i < argIndex + 3; i++) {
+        pos.push(args[i])
+    }
+    return 3
+}
 
 class GeoLayout {
     constructor() {
         this.sCurrentLayout = {}
     }
+
+
 
     node_screen_area(args) {  /// node_root
 
@@ -75,12 +86,49 @@ class GeoLayout {
       this.sCurrentLayout.index++
     }
 
+    node_camera(args) {
+
+        const cameraType = args[0]
+        const func = args[7]
+        let argIndex = 1
+        const pos = [], focus = []
+
+        argIndex += copy3argsToObject(pos, argIndex, args)
+        argIndex += copy3argsToObject(focus, argIndex, args)
+
+        const graphNode = init_graph_node_camera(null, null, pos, focus, func, cameraType)
+
+        register_scene_graph_node(this, graphNode)
+
+        this.gGeoViews[0] = graphNode
+
+        this.sCurrentLayout.index++
+    }
+
+    node_generated(args) {
+        const theFunc = args[1], param = args[0]
+
+        const graphNode = init_graph_node_generated(null, null, theFunc, param)
+
+        register_scene_graph_node(this, graphNode)
+
+        this.sCurrentLayout.index++
+    }
+
     node_background(args) {
 
         const graphNode = init_graph_node_background(null, null, args[0], null, 0)
 
         register_scene_graph_node(this, graphNode)
 
+        this.sCurrentLayout.index++
+    }
+
+    node_end(args) {
+        this.gGeoLayoutStackIndex = this.gGeoLayoutReturnIndex
+        this.gGeoLayoutReturnIndex = this.gGeoLayoutStack[--this.gGeoLayoutStackIndex] /// ??
+        this.gCurGraphNodeIndex = this.gGeoLayoutStack[this.gGeoLayoutStackIndex] // ?
+        this.gGeoLayoutCommand = this.gGeoLayoutStack[--this.gGeoLayoutStackIndex]
         this.sCurrentLayout.index++
     }
 

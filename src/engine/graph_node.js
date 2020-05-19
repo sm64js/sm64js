@@ -18,7 +18,8 @@ const GRAPH_NODE_TYPE_ORTHO_PROJECTION  =      0x002
 const GRAPH_NODE_TYPE_PERSPECTIVE     =        0x003 | GRAPH_NODE_TYPE_FUNCTIONAL
 const GRAPH_NODE_TYPE_MASTER_LIST   =          0x004
 const GRAPH_NODE_TYPE_START    =               0x00A
-const GRAPH_NODE_TYPE_LEVEL_OF_DETAIL  =       0x00B
+const GRAPH_NODE_TYPE_LEVEL_OF_DETAIL = 0x00B
+const GRAPH_NODE_TYPE_CAMERA   =               0x014 | GRAPH_NODE_TYPE_FUNCTIONAL
 const GRAPH_NODE_TYPE_TRANSLATION_ROTATION =   0x015
 const GRAPH_NODE_TYPE_TRANSLATION =            0x016
 const GRAPH_NODE_TYPE_ROTATION  =              0x017
@@ -28,11 +29,19 @@ const GRAPH_NODE_TYPE_BILLBOARD    =           0x01A
 const GRAPH_NODE_TYPE_DISPLAY_LIST  =          0x01B
 const GRAPH_NODE_TYPE_SCALE      =             0x01C
 const GRAPH_NODE_TYPE_SHADOW    =              0x028
-const GRAPH_NODE_TYPE_OBJECT_PARENT =          0x029
+const GRAPH_NODE_TYPE_OBJECT_PARENT     =      0x029
+const GRAPH_NODE_TYPE_GENERATED_LIST =         0x02A | GRAPH_NODE_TYPE_FUNCTIONAL
 const GRAPH_NODE_TYPE_BACKGROUND =             0x02C | GRAPH_NODE_TYPE_FUNCTIONAL
 const GRAPH_NODE_TYPE_CULLING_RADIUS =         0x02F
 
 const GFX_NUM_MASTER_LISTS = 8
+
+const GEO_CONTEXT_CREATE        =   0 // called when node is created from a geo command
+const GEO_CONTEXT_RENDER        =   1 // called from rendering_graph_node.c
+const GEO_CONTEXT_AREA_UNLOAD   =   2 // called when unloading an area
+const GEO_CONTEXT_AREA_LOAD     =   3 // called when loading an area
+const GEO_CONTEXT_AREA_INIT     =   4 // called when initializing the 8 areas
+const GEO_CONTEXT_HELD_OBJ      =   5 // called when processing a GraphNodeHeldObj
 
 const geo_add_child = (parent, childNode) => {
 
@@ -102,6 +111,44 @@ export const init_graph_node_perspective = (pool, graphNode, fov, near, far, nod
   // }
 
   return graphNode
+
+}
+
+export const init_graph_node_generated = (pool, graphNode, gfxFunc, param) => {
+
+    graphNode = {
+        node: {},
+        param,
+        func: gfxFunc
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_GENERATED_LIST)
+
+    if (gfxFunc) {
+        gfxFunc(GEO_CONTEXT_CREATE,  graphNode.node, null)
+    }
+
+    return graphNode
+}
+
+export const init_graph_node_camera = (pool, graphNode, pos, focus, func, mode) => {
+
+    graphNode = {
+        node: {},
+        roll: 0,
+        rollScreen: 0,
+        config: { mode: 0 },
+        pos,
+        focus
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_CAMERA)
+
+    // if (func) {
+    //   func(....)
+    // }
+
+    return graphNode
 
 }
 

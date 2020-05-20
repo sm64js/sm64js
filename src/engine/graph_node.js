@@ -186,7 +186,6 @@ export const init_graph_node_master_list = (pool, graphNode, on) => {
     graphNode = {
         node: {},
         listHeads: Array(GFX_NUM_MASTER_LISTS),
-        listTails: Array(GFX_NUM_MASTER_LISTS)
     }
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_MASTER_LIST)
 

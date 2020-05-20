@@ -155,3 +155,11 @@ export const guPerspective = (m, perspNorm, fovy, aspect, near, far, scale) => {
         }
     }
 }
+
+export const guScale = (m, x, y, z) => {
+    mtxf_identity(m)
+    m[0][0] = x
+    m[1][1] = y
+    m[2][2] = z
+    m[3][3] = 1.0
+}

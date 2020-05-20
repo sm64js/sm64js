@@ -50,8 +50,22 @@ export const G_MTX_PROJECTION    = 1
 export const G_MTX_MUL           = 0	/* concat or load */
 export const G_MTX_LOAD          = 2
 export const G_MTX_NOPUSH        = 0	/* push or not */
-export const G_MTX_PUSH          = 4
+export const G_MTX_PUSH = 4
 
+export const G_CC_MODULATERGB = {
+    rgb: [7, 7, 7, 4],
+    alpha: [1, 15, 4, 7]
+}
+
+export const G_CC_SHADE = {
+    rgb: [7, 7, 7, 4],
+    alpha: [15, 15, 31, 4]
+}
+
+export const G_CC_DECALFADE = {
+    rgb: [7, 7, 7, 5],
+    alpha: [15, 15, 31, 1]
+}
 
 export const gSPMatrix = (displaylist, matrix, parameters) => {
     displaylist.push({
@@ -71,6 +85,15 @@ export const gSPSetGeometryMode = (displaylist, mode) => {
     })
 }
 
+export const gsSPClearGeometryMode = (mode) => {
+    return {
+        words: {
+            w0: G_CLEARGEOMETRYMODE,
+            w1: mode
+        }
+    }
+}
+
 export const gSPDisplayList = (displaylist, childDisplayList) => {
     displaylist.push({
         words: {
@@ -78,4 +101,13 @@ export const gSPDisplayList = (displaylist, childDisplayList) => {
             w1: childDisplayList
         }
     })
+}
+
+export const gsDPSetCombineMode = (mode) => {
+    return {
+        words: {
+            w0: G_SETCOMBINE,
+            w1: mode
+        }
+    }
 }

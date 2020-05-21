@@ -43,6 +43,44 @@ export const G_LOD = 11
 export const G_TEXTURE_GEN_LINEAR = 12
 export const G_CLIPPING = 13
 
+export const  G_ON	= 1
+export const  G_OFF =	0
+
+export const 	G_TEXTURE_IMAGE_FRAC =	2
+export const 	G_TEXTURE_SCALE_FRAC =	16
+export const 	G_SCALE_FRAC	=	8
+export const 	G_ROTATE_FRAC	=	16
+
+
+/*
+ * G_SETIMG fmt: set image formats
+ */
+export const G_IM_FMT_RGBA = 0
+export const G_IM_FMT_YUV	=  1
+export const G_IM_FMT_CI	= 2
+export const G_IM_FMT_IA =	3
+export const G_IM_FMT_I	=  4
+
+/*
+ * G_SETIMG siz: set image pixel size
+ */
+export const G_IM_SIZ_4b	= 0
+export const G_IM_SIZ_8b	= 1
+export const G_IM_SIZ_16b	= 2
+export const G_IM_SIZ_32b	= 3
+export const G_IM_SIZ_DD	= 5
+
+
+export const G_TX_LOADTILE	= 7
+export const G_TX_RENDERTILE	= 0
+
+export const G_TX_NOMIRROR	= 0
+export const G_TX_WRAP	= 0
+export const G_TX_MIRROR	= 0x1
+export const G_TX_CLAMP	= 0x2
+export const G_TX_NOMASK	= 0
+export const G_TX_NOLOD	= 0
+
 
 /// G_MTX parameter flags
 export const G_MTX_MODELVIEW     = 0	/* matrix types */
@@ -110,4 +148,31 @@ export const gsDPSetCombineMode = (mode) => {
             w1: mode
         }
     }
+}
+
+export const gsDPSetTile = (fmt, siz, line, tmem, tile, palette, cmt, maskt, shiftt, cms, masks, shifts) => {
+  return {
+    words: {
+      w0: G_SETTILE,
+      w1: { fmt, siz, line, tmem, tile, palette, cmt, cms }
+    }
+  }
+}
+
+export const gsSPTexture = (s, t, level, tile, on) => {
+  return {
+    words: {
+      w0: G_TEXTURE,
+      w1: { s, t }
+    }
+  }
+}
+
+export const gsDPSetTileSize = (t, uls, ult, lrs, lrt) => {
+  return {
+    words: {
+      w0: G_SETTILESIZE,
+      w1: { t, uls, ult, lrs, lrt }
+    }
+  }
 }

@@ -141,6 +141,15 @@ export const gSPDisplayList = (displaylist, childDisplayList) => {
     })
 }
 
+export const gsSPDisplayList = (childDisplayList) => {
+    return {
+        words: {
+            w0: G_DL,
+            w1: childDisplayList
+        }
+    }
+}
+
 export const gsDPSetCombineMode = (mode) => {
     return {
         words: {

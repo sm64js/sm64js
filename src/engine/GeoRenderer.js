@@ -21,10 +21,11 @@ class GeoRenderer {
         }
 
         for (let i = 0; i < GraphNode.GFX_NUM_MASTER_LISTS; i++) {
-            if (node.wrapper.listHeads[i]) {
-                for (displayNode of node.wrapper.listHeads[i]) {
+            if (node.wrapper.listHeads[i].length > 0) {
+                for (const displayNode of node.wrapper.listHeads[i]) {
                     Gbi.gSPMatrix(Game.gDisplayList, displayNode.transform, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
-                    Gbi.gSPDisplayList(Game.gDisplayListHead, displayNode.displayList)
+                    Gbi.gSPDisplayList(Game.gDisplayList, displayNode.displayList)
+
                 }
             }
 
@@ -34,8 +35,8 @@ class GeoRenderer {
     geo_process_master_list(node) {
 
         if (!this.gCurGraphNodeMasterList && node.children[0]) {
-            this.gCurGraphNodeMasterList = [ node ]
-            node.wrapper.listHeads.fill(null)
+            this.gCurGraphNodeMasterList = node
+            node.wrapper.listHeads.fill([])
             this.geo_process_node_and_siblings(node.children)
             this.geo_process_master_list_sub(node)
             this.gCurGraphNodeMasterList = null
@@ -119,6 +120,21 @@ class GeoRenderer {
             }
         }
         
+    }
+
+    geo_append_display_list(displayList, layer) {
+
+        if (this.gCurGraphNodeMasterList) {
+            const listNode = {
+                transform: this.gMatStack[this.gMatStackIndex],
+                displayList
+            }
+
+            //console.log(this.gCurGraphNodeMasterList)
+
+            this.gCurGraphNodeMasterList.wrapper.listHeads[layer].push(listNode)
+        }
+
     }
 
     geo_process_node_and_siblings(children) {

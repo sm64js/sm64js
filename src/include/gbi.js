@@ -28,6 +28,7 @@ export const G_FILLRECT = 25
 export const G_SETSCISSOR = 26
 export const G_SETZIMG = 27
 export const G_SETCIMG = 28
+export const G_RDPLOADSYNC = 29
 
 export const G_ZBUFFER = 1
 export const G_SHADE = 2
@@ -123,13 +124,12 @@ export const gSPSetGeometryMode = (displaylist, mode) => {
     })
 }
 
-export const gsSPClearGeometryMode = (mode) => {
-    return {
+export const gSPEndDisplayList = (displaylist) => {
+    displaylist.push({
         words: {
-            w0: G_CLEARGEOMETRYMODE,
-            w1: mode
+            w0: G_ENDDL
         }
-    }
+    })
 }
 
 export const gSPDisplayList = (displaylist, childDisplayList) => {
@@ -146,6 +146,32 @@ export const gsSPDisplayList = (childDisplayList) => {
         words: {
             w0: G_DL,
             w1: childDisplayList
+        }
+    }
+}
+
+export const gsSPEndDisplayList = () => {
+    return {
+        words: {
+            w0: G_ENDDL
+        }
+    }
+}
+
+export const gsSPClearGeometryMode = (mode) => {
+    return {
+        words: {
+            w0: G_CLEARGEOMETRYMODE,
+            w1: mode
+        }
+    }
+}
+
+export const gsSPSetGeometryMode = (mode) => {
+    return {
+        words: {
+            w0: G_SETGEOMETRYMODE,
+            w1: mode
         }
     }
 }
@@ -184,4 +210,62 @@ export const gsDPSetTileSize = (t, uls, ult, lrs, lrt) => {
       w1: { t, uls, ult, lrs, lrt }
     }
   }
+}
+
+export const gsDPSetTextureImage = (format, size, width, imageData) => {
+    return {
+        words: {
+            w0: G_SETTIMG,
+            w1: { format, size, width, imageData }
+        }
+    }
+}
+
+export const gsDPLoadSync = () => {
+    return {
+        words: {
+            w0: G_RDPLOADSYNC
+        }
+    }
+}
+
+export const gsDPLoadBlock = (tile, uls, ult, lrs) => { ///dxt skipped
+    return {
+        words: {
+            w0: G_LOADBLOCK,
+            w1: { tile, uls, ult, lrs }
+        }
+    }
+}
+
+export const gsSPVertex = (vertices, num_vertices, dest_index) => {
+    return {
+        words: {
+            w0: G_VTX,
+            w1: { vertices, dest_index }
+        }
+    }
+}
+
+export const gsSP1Triangle = (v0, v1, v2, flag) => {
+    return {
+        words: {
+            w0: G_TRI1,
+            w1: { v0, v1, v2, flag }
+        }
+    }
+}
+
+export const gsSP2Triangles = (v00, v01, v02, flag0, v10, v11, v12, flag1) => {
+    return [{
+        words: {
+            w0: G_TRI1,
+            w1: { v0: v00, v1: v01, v2: v02, flag: flag0 }
+        }
+    }, {
+        words: {
+            w0: G_TRI1,
+            w1: { v0: v10, v1: v11, v2: v12, flag: flag1 }
+        }
+    }]
 }

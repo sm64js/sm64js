@@ -78,7 +78,8 @@ export const geo_title_screen = (param, graphNode, unused) => {
         MathUtil.guScale(scaleMat, scaleX, scaleY, scaleZ)
         Gbi.gSPMatrix(displayList, scaleMat, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_MUL | Gbi.G_MTX_PUSH)
         Gbi.gSPDisplayList(displayList, LevelData.intro_seg7_dl_0700B3A0)
-        console.log(displayList)
+        Gbi.gSPEndDisplayList(displayList)
+        gTitleZoomCounter++
     }
     return displayList
 }

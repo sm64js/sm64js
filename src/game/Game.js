@@ -1,10 +1,14 @@
 import { level_script_entry } from "../levels/main_entry/entry"
 import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
+import * as Gbi from "../include/gbi"
 
 class Game {
     constructor() {
-        this.gDisplayList = []
         this.main_loop_init() /// thread5_game_loop_init
+    }
+
+    attachInterfaceToGfxProcessor(func) {
+        this.send_display_list = func
     }
 
     main_loop_init() {
@@ -44,12 +48,22 @@ class Game {
 
     }
 
+    create_task_structure() {
+        ////Seems may not be necessary for JS, not creating a task, just sending DisplayList
+    }
+
+    end_master_display_list() {
+        Gbi.gSPEndDisplayList(this.gDisplayList)
+        this.create_task_structure()
+    }
+
     config_gfx_pool() {
-        /// some stuff with gfx pools tasks, display lists
+        /// some stuff with gfx pools tasks, display lists, probably not necessary for JS
+        this.gDisplayList = []
     }
 
     display_and_vsync() {
-        /// TODO
+        this.send_display_list(this.gDisplayList)
     }
 }
 

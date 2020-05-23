@@ -45,7 +45,6 @@ const intro_seg7_table_0700C880 = [
 
 export const geo_title_screen = (param, graphNode, unused) => {
     console.log("running gfx function - geo title screen")
-    console.log("need to verify gTitleZoomCounter")
     const displayList = []
 
     const scaleMat = new Array(4).fill(0).map(() => new Array(4).fill(0))

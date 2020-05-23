@@ -1,35 +1,31 @@
-import { WebGL } from "./graphics/WebGL"
 import { GameInstance as Game } from "./game/Game"
-
-let gfx
+import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
 
 let initialized_game = false
 
+const send_display_list = (gfx_list) => {
+    if (!initialized_game) return
+    GFX.run(gfx_list)
+}
+
 const produce_one_frame = () => {
-    start_frame()
+    GFX.start_frame()
     Game.main_loop_one_iteration()
 
     /// Audio
 
-    end_frame()
+    GFX.end_frame()
 }
-
-const start_frame = () => {
-    /// handle input
-    /// handle dimensions
-}
-
-const end_frame = () => {}
 
 const main_func = () => {
 
-    //main_pool_init(pool, start/end);
+    /// WebGL class and n64GfxProcessor class are initialized with their constructor when they are imported
 
-    gfx = new WebGL(document.querySelector('#gameCanvas')) ///gfx_init
+    Game.attachInterfaceToGfxProcessor(send_display_list)
 
     initialized_game = true
 
-    const n_frames = 93 //78
+    const n_frames = 6 //78
     for (let i = 0; i < n_frames; i++) { produce_one_frame() }
     
 

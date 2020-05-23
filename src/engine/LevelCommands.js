@@ -1,5 +1,7 @@
 import { GeoLayoutInstance as GeoLayout } from "./GeoLayout"
 import { AreaInstance as Area } from "../game/Area"
+import { GameInstance as Game } from "../game/Game"
+
 
 const SCRIPT_RUNNING = 1
 const SCRIPT_PAUSED = 0
@@ -105,7 +107,7 @@ class LevelCommands {
         }
 
         Area.render_game()
-        //end_master_display_list()
+        Game.end_master_display_list()
 
     }
 

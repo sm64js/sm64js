@@ -11,32 +11,6 @@ const SHADER_TEXEL0 = 5
 const SHADER_TEXEL0A = 6
 const SHADER_TEXEL1 = 7
 
-const precomp_shaders = [
-    0x01200200,
-    0x00000045,
-    0x00000200,
-    0x01200a00,
-    0x00000a00,
-    0x01a00045,
-    0x00000551,
-    0x01045045,
-    0x05a00a00,
-    0x01200045,
-    0x05045045,
-    0x01045a00,
-    0x01a00a00,
-    0x0000038d,
-    0x01081081,
-    0x0120038d,
-    0x03200045,
-    0x03200a00,
-    0x01a00a6f,
-    0x01141045,
-    0x07a00a00,
-    0x05200200,
-    0x03200200
-]
-
 export class WebGL {
 
     constructor(canvas) {
@@ -66,7 +40,7 @@ export class WebGL {
         }
 
         // Set clear color to black, fully opaque
-        this.gl.clearColor(1.0, 0.0, 0.0, 1.0)
+        this.gl.clearColor(0.0, 0.0, 0.0, 1.0)
         // Clear the color buffer with specified clear color
         this.gl.clear(this.gl.COLOR_BUFFER_BIT)
 
@@ -75,12 +49,6 @@ export class WebGL {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer)
         this.gl.depthFunc(this.gl.LEQUAL);
         this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
-
-        /// create opengl shaders
-        precomp_shaders.forEach(shader_id => {
-            this.gfx_lookup_or_create_shader_program(shader_id)
-        })
-
     }
 
     shader_item_to_str(item, with_alpha, only_alpha, inputs_have_alpha, hint_single_element) {
@@ -391,4 +359,14 @@ export class WebGL {
         }
     }
 
+    start_frame() {
+        this.gl.disable(this.gl.SCISSOR_TEST)
+        this.gl.depthMask(true)
+        this.gl.clearColor(0.0, 0.0, 0.0, 1.0)
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
+        this.gl.enable(this.gl.SCISSOR_TEST)
+    }
+
 }
+
+export const WebGLInstance = new WebGL(document.querySelector('#gameCanvas'))

@@ -1,6 +1,7 @@
 import * as MathUtil from "../../engine/math_util"
 import * as Gbi from "../../include/gbi"
 import * as LevelData from "./leveldata"
+import * as cGFX from "../../common_gfx/segment2"
 
 let gTitleZoomCounter = 0
 let gTitleFadeCounter = 0
@@ -90,7 +91,23 @@ export const geo_fade_transition = (param, graphNode, unused) => {
     if (param != 1) {
         gTitleFadeCounter = 0
     } else if (param == 1) {
-        throw "geo fade transition screen not implemented"
+        Gbi.gSPDisplayList(displayList, cGFX.dl_proj_mtx_fullscreen)
+        Gbi.gDPSetEnvColor(displayList, 255, 255, 255, gTitleFadeCounter)
+        if (gTitleFadeCounter == 255) {
+            graphNode.flags = (graphNode.flags & 0xFF) | 0x100
+            //Gbi.gDPSetRenderMode(displayList, Gbi.G_RM_AA_OPA_SURF, Gbi.G_RM_AA_OPA_SURF2);
+        } else {
+            graphNode.flags = (graphNode.flags & 0xFF) | 0x500
+            //Gbi.gDPSetRenderMode(displayList, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
+        }
+        Gbi.gSPDisplayList(displayList, LevelData.intro_seg7_dl_0700C6A0)
+        Gbi.gSPEndDisplayList(displayList)
+        if (gTitleZoomCounter >= 0x13) {
+            gTitleFadeCounter += 0x1a
+            if (gTitleFadeCounter >= 0x100) {
+                gTitleFadeCounter = 0xFF
+            }
+        }
     }
     return displayList
 }

@@ -44,6 +44,22 @@ class GeoRenderer {
 
     }
 
+    geo_process_ortho_projection(node) {
+        if (node.children[0]) {
+            const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
+            const left = (this.gCurGraphNodeRoot.wrapper.x - this.gCurGraphNodeRoot.wrapper.width) / 2.0 * node.wrapper.scale
+            const right = (this.gCurGraphNodeRoot.wrapper.x + this.gCurGraphNodeRoot.wrapper.width) / 2.0 * node.wrapper.scale
+            const top = (this.gCurGraphNodeRoot.wrapper.y - this.gCurGraphNodeRoot.wrapper.height) / 2.0 * node.wrapper.scale
+            const bottom = (this.gCurGraphNodeRoot.wrapper.y + this.gCurGraphNodeRoot.wrapper.height) / 2.0 * node.wrapper.scale
+
+            MathUtil.guOrtho(mtx, left, right, bottom, top, -2.0, 2.0, 1.0)
+            //Gbi.gSPPerspNormalize(Game.gDisplayList, 0xFFFF)
+            Gbi.gSPMatrix(Game.gDisplayList, mtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+
+            this.geo_process_node_and_siblings(node.children)
+        }
+    }
+
     geo_process_perspective(node) {
         //if (node.wrapper.func) {
         //    node.wrapper.func()
@@ -95,13 +111,16 @@ class GeoRenderer {
 
     geo_process_background(node) {
 
-        //if (node.wrapper.func) {
-        //    node.wrapper.func()
-        //    if (list != 0) geo_append_display_list(...)
-        //} else {
+        let list = []
+        if (node.wrapper.func) {
+            list = [] //node.wrapper.func()
+        }
 
-        if (this.gCurGraphNodeMasterList) {
-            ////.....
+        if (list.length > 0) {
+            this.geo_append_display_list(list, node.flags >> 8)
+        } else if (this.gCurGraphNodeMasterList) {
+            const gfx = []
+            ////..... add backfround fill gfx commands
         }
 
         if (node.children[0]) {
@@ -115,7 +134,7 @@ class GeoRenderer {
             console.log("processing function from generated_list\n")
 
             const list = node.wrapper.func(GraphNode.GEO_CONTEXT_RENDER, node, this.gMatStack[this.gMatStackIndex])
-            if (list) {
+            if (list.length > 0) {
                 this.geo_append_display_list(list, node.flags >> 8)
             }
         }
@@ -130,9 +149,8 @@ class GeoRenderer {
                 displayList
             }
 
-            //console.log(this.gCurGraphNodeMasterList)
-
             this.gCurGraphNodeMasterList.wrapper.listHeads[layer].push(listNode)
+            
         }
 
     }
@@ -141,6 +159,9 @@ class GeoRenderer {
 
         for (const child of children) {
             switch (child.type) {
+
+                case GraphNode.GRAPH_NODE_TYPE_ORTHO_PROJECTION:
+                    this.geo_process_ortho_projection(child); break
 
                 case GraphNode.GRAPH_NODE_TYPE_PERSPECTIVE:
                     this.geo_process_perspective(child); break
@@ -168,13 +189,9 @@ class GeoRenderer {
         console.log("processing root")
         if (root.node.flags & GraphNode.GRAPH_RENDER_ACTIVE) {
 
-            ///this.gDisplayListHeap = alloc_only_pool_init(...)
-            //const initialMatrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
-
             MathUtil.mtxf_identity(this.gMatStack[this.gMatStackIndex])
-            // MathUtil.mtxf_to_mtx(initialMatrix, this.gMatStack[this.gMatStackIndex])
 
-            this.gCurGraphNodeRoot = root
+            this.gCurGraphNodeRoot = root.node
 
             if (root.node.children[0]) { ///atleast one child
                 console.log("processing children")

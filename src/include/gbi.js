@@ -45,7 +45,13 @@ export const G_TEXTURE_GEN_LINEAR = 12
 export const G_CLIPPING = 13
 
 export const  G_ON	= 1
-export const  G_OFF =	0
+export const G_OFF = 0
+
+
+/* flags to inhibit pushing of the display list (on branch) */
+export const G_DL_PUSH	=	0x00
+export const G_DL_NOPUSH	=	0x01
+
 
 export const 	G_TEXTURE_IMAGE_FRAC =	2
 export const 	G_TEXTURE_SCALE_FRAC =	16
@@ -69,7 +75,27 @@ export const G_IM_SIZ_4b	= 0
 export const G_IM_SIZ_8b	= 1
 export const G_IM_SIZ_16b	= 2
 export const G_IM_SIZ_32b	= 3
-export const G_IM_SIZ_DD	= 5
+export const G_IM_SIZ_DD = 5
+
+export const G_IM_SIZ_INCR_TABLE = {
+    G_IM_SIZ_16b: 0
+}
+export const G_IM_SIZ_SHIFT_TABLE = {
+    G_IM_SIZ_16b: 0
+}
+
+export const G_IM_SIZ_LOAD_BLOCK_TABLE = {
+    G_IM_SIZ_16b: G_IM_SIZ_16b
+}
+export const G_IM_SIZ_BYTES_TABLE = {
+    G_IM_SIZ_16b: G_IM_SIZ_16b
+}
+
+export const G_IM_SIZ_LINE_BYTES_TABLE = {
+    G_IM_SIZ_16b: G_IM_SIZ_16b
+}
+
+
 
 
 export const G_TX_LOADTILE	= 7
@@ -106,6 +132,15 @@ export const G_CC_DECALFADE = {
     alpha: [15, 15, 31, 1]
 }
 
+export const gDPSetEnvColor = (displaylist, r, g, b, a) => {
+    displaylist.push({
+        words: {
+            w0: G_SETENVCOLOR,
+            w1: { r, g, b, a }
+        }
+    })
+}
+
 export const gSPMatrix = (displaylist, matrix, parameters) => {
     displaylist.push({
         words: {
@@ -136,7 +171,7 @@ export const gSPDisplayList = (displaylist, childDisplayList) => {
     displaylist.push({
         words: {
             w0: G_DL,
-            w1: childDisplayList
+            w1: { childDisplayList, branch: G_DL_PUSH }
         }
     })
 }
@@ -145,7 +180,7 @@ export const gsSPDisplayList = (childDisplayList) => {
     return {
         words: {
             w0: G_DL,
-            w1: childDisplayList
+            w1: { childDisplayList, branch: G_DL_PUSH }
         }
     }
 }
@@ -181,6 +216,24 @@ export const gsDPSetCombineMode = (mode) => {
         words: {
             w0: G_SETCOMBINE,
             w1: mode
+        }
+    }
+}
+
+export const gsSPMatrix = (matrix, parameters) => {
+    return {
+        words: {
+            w0: G_MTX,
+            w1: { matrix, parameters }
+        }
+    }
+}
+
+export const gsDPSetEnvColor = (r, g, b, a) => {
+    return {
+        words: {
+            w0: G_SETENVCOLOR,
+            w1: { r, g, b, a }
         }
     }
 }
@@ -268,4 +321,16 @@ export const gsSP2Triangles = (v00, v01, v02, flag0, v10, v11, v12, flag1) => {
             w1: { v0: v10, v1: v11, v2: v12, flag: flag1 }
         }
     }]
+}
+
+export const gsDPLoadTextureBlock = (timg, fmt, siz, width, height, pal, cms, cmt, masks, maskt, shifts, shiftt) => {
+    return [
+        gsDPSetTextureImage(fmt, siz, 1, timg),
+        gsDPSetTile(fmt, G_IM_SIZ_LOAD_BLOCK_TABLE[siz], 0, 0, G_TX_LOADTILE, 0, cmt, maskt, shiftt, cms, masks, shifts),
+        gsDPLoadBlock(G_TX_LOADTILE, 0, 0, (((width) * (height) + G_IM_SIZ_INCR_TABLE[siz]) >> G_IM_SIZ_SHIFT_TABLE[siz]) - 1),
+        gsDPSetTile(fmt, siz,
+            ((((width) * G_IM_SIZ_LINE_BYTES_TABLE[siz]) + 7) >> 3),
+            0, G_TX_RENDERTILE, pal, cmt, maskt, shiftt, cms, masks, shifts),
+        gsDPSetTileSize(G_TX_RENDERTILE, 0, 0, ((width) - 1) << G_TEXTURE_IMAGE_FRAC, ((height) - 1) << G_TEXTURE_IMAGE_FRAC)
+    ]
 }

@@ -23,6 +23,7 @@ export const mtxf_rotate_xy = (mtx, angle) => {
     mtx[1][1] = mtx[0][0]
 }
 
+
 export const mtxf_mul = (dest, a, b) => {
 
     let entry0, entry1, entry2
@@ -162,4 +163,20 @@ export const guScale = (m, x, y, z) => {
     m[1][1] = y
     m[2][2] = z
     m[3][3] = 1.0
+}
+
+export const guOrtho = (m, left, right, bottom, top, near, far, scale) => {
+    mtxf_identity(m)
+    m[0][0] = 2 / (right - left)
+    m[1][1] = 2 / (top - bottom)
+    m[2][2] = -2 / (far - near)
+    m[3][0] = -(right + left) / (right - left)
+    m[3][1] = -(top + bottom) / (top - bottom)
+    m[3][2] = -(far + near) / (far - near)
+    m[3][3] = 1
+    for (let row = 0; row < 4; row++) {
+        for (let col = 0; col < 4; col++) {
+            m[row][col] *= scale
+        }
+    }
 }

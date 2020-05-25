@@ -311,6 +311,7 @@ export class WebGL {
     }
 
     load_shader(new_prg) {
+        console.log("loading new shader")
         this.gl.useProgram(new_prg.opengl_program)
         this.vertex_array_set_attribs(new_prg)
     }

@@ -452,7 +452,18 @@ export class n64GfxProcessor {
                     this.import_texture(i)
                     this.rdp.textures_changed[i] = false
                 }
-                throw "more implementation needed here"
+                const linear_filter = (this.rdp.other_mode_h & (3 << Gbi.G_MDSFT_TEXTFILT)) != Gbi.G_TF_POINT
+                if (linear_filter != this.rendering_state.textures[i].linear_filter ||
+                    this.rdp.texture_tile.cms != this.rendering_state.textures[i].cms ||
+                    this.rdp.texture_tile.cmt != this.rendering_state.textures[i].cmt) {
+
+                    this.flush()
+                    WebGL.set_sampler_parameters(i, linear_filter, this.rdp.texture_tile.cms, this.rdp.texture_tile.cmt)
+                    this.rendering_state.textures[i].linear_filter = linear_filter
+                    this.rendering_state.textures[i].cms = this.rdp.texture_tile.cms
+                    this.rendering_state.textures[i].cmt = this.rdp.texture_tile.cmt
+
+                }
             }
         }
 
@@ -467,7 +478,16 @@ export class n64GfxProcessor {
             this.buf_vbo.push(v_arr[i].w)
 
             if (use_texture) {
-                throw "more implementation needed here"
+                let u = (v_arr[i].u - this.rdp.texture_tile.uls * 8) / 32.0
+                let v = (v_arr[i].v - this.rdp.texture_tile.ult * 8) / 32.0
+                if ((this.rdp.other_mode_h & (3 << Gbi.G_MDSFT_TEXTFILT)) != Gbi.G_TF_POINT) {
+                    // Linear filter adds 0.5f to the coordinates
+                    u += 0.5
+                    v += 0.5
+                }
+
+                this.buf_vbo.push(u / tex_width)
+                this.buf_vbo.push(v /tex_height)
             }
 
             if (use_fog) {

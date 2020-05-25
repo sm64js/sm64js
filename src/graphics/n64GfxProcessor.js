@@ -31,6 +31,8 @@ const MAX_BUFFERED = 256
 const MAX_LIGHTS = 2
 const MAX_VERTICES = 64
 
+let opCount = 0
+
 export class n64GfxProcessor {
     constructor() {
 
@@ -70,8 +72,8 @@ export class n64GfxProcessor {
         //RDP
         this.rdp = {
             palette: [],
-            texture_to_load: { textureData: null, tile_number: 0 },
-            loaded_texture: [{ textureData: null }, { textureData: null }],
+            texture_to_load: { textureData: null, tile_number: 0, size: 0, id: 0 },
+            loaded_texture: [{ textureData: null, size_bytes: 0, id: 0 }, { textureData: null, size_bytes: 0, id: 0 }],
             texture_tile: { fmt: 0, siz: 0, cms: 0, cmt: 0, uls: 0, ult: 0, lrs: 0, lrt: 0, line_size: 0 },
             textures_changed: [false, false],
             other_mode_l: 0, other_mode_h: 0,
@@ -102,6 +104,12 @@ export class n64GfxProcessor {
             },
             shader_program: null,
             textures: [null, null]
+        }
+
+        this.gfx_texture_cache = {
+            hashmap: {},
+            pool: [],
+            pool_pos: 0
         }
 
         /// create opengl shaders
@@ -170,13 +178,13 @@ export class n64GfxProcessor {
     }
 
     scale_5_8(val) {
-        return ((val) * 0xFF) / 0x1F
+        return Math.floor(((val) * 0xFF) / 0x1F)
     }
 
     dp_set_fill_color(color) {
-        this.rdp.fill_color.r = parseInt(this.scale_5_8(color >> 11))
-        this.rdp.fill_color.g = parseInt(this.scale_5_8((color >> 6) & 0x1f))
-        this.rdp.fill_color.b = parseInt(this.scale_5_8((color >> 1) & 0x1f))
+        this.rdp.fill_color.r = this.scale_5_8(color >> 11)
+        this.rdp.fill_color.g = this.scale_5_8((color >> 6) & 0x1f)
+        this.rdp.fill_color.b = this.scale_5_8((color >> 1) & 0x1f)
         this.rdp.fill_color.a = (color & 1) * 255
     }
 
@@ -292,6 +300,71 @@ export class n64GfxProcessor {
         return new_combiner
     }
 
+    import_texture_rgba16(tile) {
+
+        const rgba32_buf = []
+        for (let i = 0; i < this.rdp.loaded_texture[tile].size_bytes / 2; i++) {
+            const col16 = (this.rdp.loaded_texture[tile].textureData[2 * i] << 8) | this.rdp.loaded_texture[tile].textureData[2 * i + 1]
+
+            const a = col16 & 1
+            const r = col16 >> 11
+            const g = (col16 >> 6) & 0x1
+            const b = (col16 >> 1) & 0x1
+
+            rgba32_buf.push(this.scale_5_8(r))
+            rgba32_buf.push(this.scale_5_8(g))
+            rgba32_buf.push(this.scale_5_8(b))
+            rgba32_buf.push(a ? 255 : 0)
+        }
+
+        const width = this.rdp.loaded_texture[tile].size_bytes / 2
+        const height = this.rdp.loaded_texture[tile].size_bytes / this.rdp.texture_tile.line_size_bytes
+
+        WebGL.upload_texture(rgba32_buf, width, height)
+
+    }
+
+    import_texture(tile) {
+        const fmt = this.rdp.texture_tile.fmt
+        const siz = this.rdp.texture_tile.siz
+
+        if (this.texture_cache_lookup(tile, this.rdp.loaded_texture[tile].textureData, fmt, siz, this.rdp.loaded_texture[tile].id)) return
+
+        if (fmt == Gbi.G_IM_FMT_RGBA) {
+            if (siz == Gbi.G_IM_SIZ_16b) {
+                this.import_texture_rgba16(tile)
+            } else {
+                throw "unimplemented texture size"
+            }
+        } else {
+            throw "unimplemented texture format"
+        }
+
+
+    }
+
+    texture_cache_lookup(tile, textureData, fmt, siz, id) {
+        const hash = id
+        let node = this.gfx_texture_cache.hashmap[hash]
+        while (node != undefined) {
+            throw "more implementation needed in texture cache lookup"
+        }
+        if (this.gfx_texture_cache.pool.length >= 512) {
+            /// pool hits limit
+            throw "more implementation needed in texture cache lookup"
+        }
+        node = {}
+        this.gfx_texture_cache.pool.push(node)
+        if (node.texture_object == undefined) {
+            node.texture_object = WebGL.new_texture()
+        }
+        WebGL.select_texture(tile, node.texture_object)
+        WebGL.set_sampler_parameters(tile, false, 0, 0)
+        Object.assign(node, { cmd: 0, cmt: 0, linear_filter: false, next: null, id, textureData, fmt, siz })
+        this.rendering_state.textures[tile] = node
+        return false
+    }
+
     sp_tri1(vtx1_idx, vtx2_idx, vtx3_idx) {
         const v1 = this.rsp.loaded_vertices[vtx1_idx]
         const v2 = this.rsp.loaded_vertices[vtx2_idx]
@@ -376,7 +449,7 @@ export class n64GfxProcessor {
             if (used_textures[i]) {
                 if (this.rdp.textures_changed[i]) {
                     this.flush()
-                    throw "import_texture(i)"
+                    this.import_texture(i)
                     this.rdp.textures_changed[i] = false
                 }
                 throw "more implementation needed here"
@@ -502,7 +575,7 @@ export class n64GfxProcessor {
     dp_fill_rectangle(ulx, uly, lrx, lry) {
 
         if (this.rdp.color_image_address == this.rdp.z_buf_address) {
-            //return 
+            return 
         }
 
         const mode = this.rdp.other_mode_h & (3 << Gbi.G_MDSFT_CYCLETYPE)
@@ -525,25 +598,159 @@ export class n64GfxProcessor {
 
     }
 
+    sp_texture(s, t) {
+        this.rsp.texture_scaling_factor = { s, t }
+    }
+
+    dp_set_tile(fmt, siz, line, tmem, tile, palette, cmt, cms) {
+        if (siz == Gbi.G_IM_SIZ_32b) throw "unsupported tile size JS"
+
+        if (tile == Gbi.G_TX_RENDERTILE) {
+            if (palette != 0) throw "unsupported palette"
+            Object.assign(this.rdp.texture_tile, { fmt, siz, cms, cmt, line_size: line * 8 })
+            this.rdp.textures_changed = [ true, true ]
+        }
+
+        if (tile == Gbi.G_TX_LOADTILE) {
+            this.rdp.texture_to_load.tile_number = parseInt(tmem / 256)
+        }
+    }
+
+    dp_set_tile_size(tile, uls, ult, lrs, lrt) {
+        if (tile == Gbi.G_TX_RENDERTILE) {
+            Object.assign(this.rdp.texture_tile, { uls, ult, lrs, lrt })
+            this.rdp.textures_changed = [ true, true ]
+        }
+    }
+
+    dp_set_texture_image(size, imageData, id) {
+        Object.assign(this.rdp.texture_to_load, { size, id, textureData: imageData })
+    }
+
+    dp_load_block(tile, uls, ult, lrs) {
+        if (tile == 1) return
+        if (tile != Gbi.G_TX_LOADTILE) throw "unsupported"
+        if (uls != 0) throw "unsupported"
+        if (ult != 0) throw "unsupported"
+
+        let word_size_shift
+        switch (this.rdp.texture_to_load.size) {
+            case Gbi.G_IM_SIZ_4b:
+                throw "need to verify correct size for this case"
+                break
+            case Gbi.G_IM_SIZ_8b:
+                word_size_shift = 0
+                break
+            case Gbi.G_IM_SIZ_16b:
+                word_size_shift = 1
+                break
+            case Gbi.G_IM_SIZ_32b:
+                word_size_shift = 2
+                break
+        }
+        const size_bytes = (lrs + 1) << word_size_shift
+        this.rdp.loaded_texture[this.rdp.texture_to_load.tile_number].size_bytes = size_bytes
+        if (size_bytes > 4096) throw "bug: too big texture"
+        this.rdp.loaded_texture[this.rdp.texture_to_load.tile_number].textureData = this.rdp.texture_to_load.textureData
+        this.rdp.loaded_texture[this.rdp.texture_to_load.tile_number].id = this.rdp.texture_to_load.id
+        this.rdp.textures_changed[this.rdp.texture_to_load.tile_number] = true
+    }
+
+    sp_vertex(dest_index, vertices) {
+        for (let i = 0; i < vertices.length; i++, dest_index++) {
+            const v = vertices[i]
+            const d = this.rsp.loaded_vertices[dest_index]
+
+            const x = v.pos[0] * this.rsp.MP_matrix[0][0] + v.pos[1] * this.rsp.MP_matrix[1][0] + v.pos[2] * this.rsp.MP_matrix[2][0] + this.rsp.MP_matrix[3][0]
+            const y = v.pos[0] * this.rsp.MP_matrix[0][1] + v.pos[1] * this.rsp.MP_matrix[1][1] + v.pos[2] * this.rsp.MP_matrix[2][1] + this.rsp.MP_matrix[3][1]
+            const z = v.pos[0] * this.rsp.MP_matrix[0][2] + v.pos[1] * this.rsp.MP_matrix[1][2] + v.pos[2] * this.rsp.MP_matrix[2][2] + this.rsp.MP_matrix[3][2]
+            const w = v.pos[0] * this.rsp.MP_matrix[0][3] + v.pos[1] * this.rsp.MP_matrix[1][3] + v.pos[2] * this.rsp.MP_matrix[2][3] + this.rsp.MP_matrix[3][3]
+
+            /// x = adjust x for aspect ratio (x)
+            const U = v.tc[0] * this.rsp.texture_scaling_factor.s >> 16
+            const V = v.tc[1] * this.rsp.texture_scaling_factor.t >> 16
+
+            if (this.rsp.geometry_mode & Gbi.G_LIGHTING) {
+                throw "more implementation needed here"
+            } else {
+                Object.assign(d.color, { r: v.color[0], g: v.color[1], b: v.color[2] })
+            }
+
+            d.u = U; d.v = V
+
+            d.clip_rej = 0
+            if (x < -w) d.clip_rej |= 1
+            if (x > w) d.clip_rej |= 2
+            if (y < -w) d.clip_rej |= 4
+            if (y > w) d.clip_rej |= 8
+            if (z < -w) d.clip_rej |= 16
+            if (z > w) d.clip_rej |= 32
+
+            Object.assign(d, { x, y, z, w })
+
+            if (this.rsp.geometry_mode & Gbi.G_FOG) {
+                throw "more implementation needed here"
+            } else {
+                d.color.a = v.color[3]
+            }
+
+        }
+    }
+
     run_dl(commands) {
+
+        console.log("G_DL")
 
         for (const command of commands) {
             const opcode = command.words.w0
             const args = command.words.w1
 
+            opCount++
+            command.opCount = opCount
             console.log(command)
+
+            if (opCount >= 27) {
+                throw "reached opcount max"
+            }
 
             switch (opcode) {
                 case Gbi.G_ENDDL: /// not necessary for JS
+                    console.log("G_ENDDL")
                     break
                 case Gbi.G_MTX:
                     this.sp_matrix(args.parameters, args.matrix)
+                    break
+                case Gbi.G_VTX:
+                    this.sp_vertex(args.dest_index, args.vertices)
+                    break
+                case Gbi.G_TRI1:
+                    this.sp_tri1(args.v0, args.v1, args.v2)
                     break
                 case Gbi.G_SETGEOMETRYMODE:
                     this.sp_geometry_mode(0, args.mode)
                     break
                 case Gbi.G_CLEARGEOMETRYMODE:
                     this.sp_geometry_mode(args.mode, 0)
+                    break
+                case Gbi.G_SETCOMBINE:
+                    const rgb = this.color_comb(args.mode.rgb[0], args.mode.rgb[1], args.mode.rgb[2], args.mode.rgb[3])
+                    const alpha = this.color_comb(args.mode.alpha[0], args.mode.alpha[1], args.mode.alpha[2], args.mode.alpha[3])
+                    this.dp_set_combine_mode(rgb, alpha)
+                    break
+                case Gbi.G_SETTIMG:
+                    this.dp_set_texture_image(args.size, args.imageData, args.id)
+                    break
+                case Gbi.G_SETTILE:
+                    this.dp_set_tile(args.fmt, args.siz, args.line, args.tmem, args.tile, args.palette, args.cmt, args.cms)
+                    break
+                case Gbi.G_SETTILESIZE:
+                    this.dp_set_tile_size(args.t, args.uls, args.ult, args.lrs, args.lrt)
+                    break
+                case Gbi.G_TEXTURE:
+                    this.sp_texture(args.s, args.t)
+                    break
+                case Gbi.G_LOADBLOCK:
+                    this.dp_load_block(args.tile, args.uls, args.ult, args.lrs)
                     break
                 case Gbi.G_SETFILLCOLOR:
                     this.dp_set_fill_color(args.color)

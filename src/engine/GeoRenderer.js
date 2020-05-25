@@ -32,7 +32,7 @@ class GeoRenderer {
         }
 
         if (enableZBuffer) {
-            Gbi.gsSPClearGeometryMode(Game.gDisplayList, Gbi.G_ZBUFFER)
+            Gbi.gSPClearGeometryMode(Game.gDisplayList, Gbi.G_ZBUFFER)
         }
     }
 
@@ -177,20 +177,20 @@ class GeoRenderer {
                 case GraphNode.GRAPH_NODE_TYPE_ORTHO_PROJECTION:
                     this.geo_process_ortho_projection(child); break
 
-                //case GraphNode.GRAPH_NODE_TYPE_PERSPECTIVE:
-                //    this.geo_process_perspective(child); break
+                case GraphNode.GRAPH_NODE_TYPE_PERSPECTIVE:
+                    this.geo_process_perspective(child); break
 
                 case GraphNode.GRAPH_NODE_TYPE_MASTER_LIST:
                     this.geo_process_master_list(child); break
 
-                //case GraphNode.GRAPH_NODE_TYPE_CAMERA:
-                //    this.geo_process_camera(child); break
+                case GraphNode.GRAPH_NODE_TYPE_CAMERA:
+                    this.geo_process_camera(child); break
 
                 case GraphNode.GRAPH_NODE_TYPE_BACKGROUND:
                     this.geo_process_background(child); break
 
-                //case GraphNode.GRAPH_NODE_TYPE_GENERATED_LIST:
-                //    this.geo_process_generated_list(child); break
+                case GraphNode.GRAPH_NODE_TYPE_GENERATED_LIST:
+                    this.geo_process_generated_list(child); break
 
                 default: break
 

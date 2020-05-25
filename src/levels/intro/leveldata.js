@@ -2596,10 +2596,9 @@ export const intro_seg7_vertex_0700B420 = [
     { pos: [ 96, 58, -1 ], flag: 0, tc: [ 0, 0 ], color: [ 0xff, 0xff, 0xff, 0xff ] }
 ]
 
-
 export const intro_seg7_dl_07008EA0 = [
     Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, intro_seg7_texture_070086A0),
-    Gbi.gsDPLoadSync(),
+    //Gbi.gsDPLoadSync(),
     Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
     Gbi.gsSPVertex(intro_seg7_vertex_07000000, 16, 0),
     ...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),

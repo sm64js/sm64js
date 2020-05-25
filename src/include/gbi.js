@@ -278,8 +278,6 @@ export const G_IM_SIZ_LINE_BYTES_TABLE = {
 }
 
 
-
-
 export const G_TX_LOADTILE	= 7
 export const G_TX_RENDERTILE	= 0
 
@@ -300,19 +298,22 @@ export const G_MTX_NOPUSH        = 0	/* push or not */
 export const G_MTX_PUSH = 4
 
 export const G_CC_MODULATERGB = {
-    rgb: [7, 7, 7, 4],
-    alpha: [1, 15, 4, 7]
+    alpha: [7, 7, 7, 4],
+    rgb: [1, 15, 4, 7]
 }
 
 export const G_CC_SHADE = {
-    rgb: [7, 7, 7, 4],
-    alpha: [15, 15, 31, 4]
+    alpha: [7, 7, 7, 4],
+    rgb: [15, 15, 31, 4]
 }
 
 export const G_CC_DECALFADE = {
-    rgb: [7, 7, 7, 5],
-    alpha: [15, 15, 31, 1]
+    alpha: [7, 7, 7, 5],
+    rgb: [15, 15, 31, 1]
 }
+
+
+let textureImageId = 0
 
 export const gDPSetEnvColor = (displaylist, r, g, b, a) => {
     displaylist.push({
@@ -354,6 +355,15 @@ export const gSPSetGeometryMode = (displaylist, mode) => {
     displaylist.push({
         words: {
             w0: G_SETGEOMETRYMODE,
+            w1: { mode }
+        }
+    })
+}
+
+export const gSPClearGeometryMode = (displaylist, mode) => {
+    displaylist.push({
+        words: {
+            w0: G_CLEARGEOMETRYMODE,
             w1: { mode }
         }
     })
@@ -469,7 +479,7 @@ export const gsDPSetTextureImage = (format, size, width, imageData) => {
     return {
         words: {
             w0: G_SETTIMG,
-            w1: { format, size, width, imageData }
+            w1: { format, size, width, imageData, id: textureImageId++ }
         }
     }
 }

@@ -1,3 +1,5 @@
+import { G_TX_CLAMP, G_TX_MIRROR } from "../include/gbi"
+
 const SHADER_OPT_ALPHA = (1 << 24)
 const SHADER_OPT_FOG = (1 << 25)
 const SHADER_OPT_TEXTURE_EDGE = (1 << 26)
@@ -370,6 +372,35 @@ export class WebGL {
         used_textures[0] = prg.used_textures[0]
         used_textures[1] = prg.used_textures[1]
         return prg.num_inputs
+    }
+
+    cm_to_opengl(val) {
+        if (val & G_TX_CLAMP) {
+            return this.gl.CLAMP_TO_EDGE
+        }
+        return (val & G_TX_MIRROR) ? this.gl.MIRRORED_REPEAT : this.gl.REPEAT
+    }
+
+    set_sampler_parameters(tile, linear_filter, cms, cmt) {
+        this.gl.activeTexture(this.gl.TEXTURE0 + tile)
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, linear_filter ? this.gl.LINEAR : this.gl.NEAREST)
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, linear_filter ? this.gl.LINEAR : this.gl.NEAREST)
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.cm_to_opengl(cms))
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.cm_to_opengl(cmt))
+
+    }
+
+    new_texture() {
+        return this.gl.createTexture()
+    }
+
+    select_texture(tile, texture_object) {
+        this.gl.activeTexture(this.gl.TEXTURE0 + tile)
+        this.gl.bindTexture(this.gl.TEXTURE_2D, texture_object)
+    }
+
+    upload_texture(rgba32_buf, width, height) {
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, width, height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, new Uint8Array(rgba32_buf))
     }
 
     draw_triangles(buf_vbo, buf_vbo_num_tris) {

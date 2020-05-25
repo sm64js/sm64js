@@ -35,8 +35,7 @@ export class n64GfxProcessor {
     constructor() {
 
         //buffer
-        this.buf_vbo = new Array(MAX_BUFFERED * 26 * 3).fill(0.0) // 3 vertices in a triangle and 26 floats per vtx
-        this.buf_vbo_len = 0
+        this.buf_vbo = [] //new Array(MAX_BUFFERED * 26 * 3).fill(0.0) // 3 vertices in a triangle and 26 floats per vtx
         this.buf_vbo_num_tris = 0
 
         //RSP
@@ -218,6 +217,7 @@ export class n64GfxProcessor {
     }
 
     lookup_or_create_shader_program(shader_id) {
+
         let prg = WebGL.lookup_shader(shader_id)
         if (prg == undefined) {
             WebGL.unload_shader(this.rendering_state.shader_program)
@@ -359,7 +359,7 @@ export class n64GfxProcessor {
         if (prg != this.rendering_state.shader_program) {
             this.flush()
             WebGL.unload_shader(this.rendering_state.shader_program)
-            WebGL.lookup_shader(prg)
+            WebGL.load_shader(prg)
             this.rendering_state.shader_program = prg
         }
 
@@ -388,10 +388,10 @@ export class n64GfxProcessor {
         const tex_height = (this.rdp.texture_tile.lrt - this.rdp.texture_tile.ult + 4) / 4
 
         for (let i = 0; i < 3; i++) {
-            this.buf_vbo[this.buf_vbo_len++] = v_arr[i].x
-            this.buf_vbo[this.buf_vbo_len++] = v_arr[i].y
-            this.buf_vbo[this.buf_vbo_len++] = v_arr[i].z
-            this.buf_vbo[this.buf_vbo_len++] = v_arr[i].w
+            this.buf_vbo.push(v_arr[i].x)
+            this.buf_vbo.push(v_arr[i].y)
+            this.buf_vbo.push(v_arr[i].z)
+            this.buf_vbo.push(v_arr[i].w)
 
             if (use_texture) {
                 throw "more implementation needed here"
@@ -418,15 +418,15 @@ export class n64GfxProcessor {
                             color = { r: 0, g: 0, b: 0, a: 0 }
                     }
                     if (k == 0) { // not the alpha channel?
-                        this.buf_vbo[this.buf_vbo_len++] = color.r / 255.0
-                        this.buf_vbo[this.buf_vbo_len++] = color.g / 255.0
-                        this.buf_vbo[this.buf_vbo_len++] = color.b / 255.0
+                        this.buf_vbo.push(color.r / 255.0)
+                        this.buf_vbo.push(color.g / 255.0)
+                        this.buf_vbo.push(color.b / 255.0)
                     } else { /// here is use_alpha is true
                         if (use_fog && color == v_arr[i].color) {
                             // Shade alpha is 100% for fog
-                            this.buf_vbo[this.buf_vbo_len] = 1.0
+                            this.buf_vbo.push(1.0)
                         } else {
-                            this.buf_vbo[this.buf_vbo_len] = color.a / 255.0
+                            this.buf_vbo.push(color.a / 255.0)
                         }
                     }
                 }
@@ -507,7 +507,7 @@ export class n64GfxProcessor {
 
         const mode = this.rdp.other_mode_h & (3 << Gbi.G_MDSFT_CYCLETYPE)
 
-        if (mode == Gbi.G_CYC_COPY || mode == Gbi.G_CYC_FILL) {
+        if (mode == Gbi.G_CYC_COPY || mode == Gbi.G_CYC_FILL || true) { ///TODO_OTHERMODE
             // Per documentation one extra pixel is added in this modes to each edge
             lrx += 1 
             lry += 1 
@@ -526,7 +526,7 @@ export class n64GfxProcessor {
     }
 
     run_dl(commands) {
-        /// Here We Go
+
         for (const command of commands) {
             const opcode = command.words.w0
             const args = command.words.w1
@@ -560,9 +560,9 @@ export class n64GfxProcessor {
     }
 
     flush() {
-        if (this.buf_vbo_len > 0) {
-            WebGL.draw_triangles(this.buf_vbo, this.buf_vbo_len, this.buf_vbo_num_tris)
-            this.buf_vbo_len = 0
+        if (this.buf_vbo.length > 0) {
+            WebGL.draw_triangles(this.buf_vbo, this.buf_vbo_num_tris)
+            this.buf_vbo = []
             this.buf_vbo_num_tris = 0
         }
     }

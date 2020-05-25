@@ -32,8 +32,8 @@ export class WebGL {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT)
 
         //gfx_opengl_init
-        const buffer = this.gl.createBuffer()
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer)
+        this.buffer = this.gl.createBuffer()
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffer)
         this.gl.depthFunc(this.gl.LEQUAL);
         this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
     }
@@ -370,6 +370,12 @@ export class WebGL {
         used_textures[0] = prg.used_textures[0]
         used_textures[1] = prg.used_textures[1]
         return prg.num_inputs
+    }
+
+    draw_triangles(buf_vbo, buf_vbo_num_tris) {
+        console.log(`Flushing ${buf_vbo_num_tris} tris`)
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(buf_vbo), this.gl.STREAM_DRAW)
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, 3 * buf_vbo_num_tris)
     }
 
     start_frame() {

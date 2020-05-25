@@ -200,7 +200,7 @@ class GeoRenderer {
     }
 
     geo_process_root(root, b, c, clearColor) {
-        console.log("processing root")
+        console.log("processing root node to render")
         if (root.node.flags & GraphNode.GRAPH_RENDER_ACTIVE) {
 
             MathUtil.mtxf_identity(this.gMatStack[this.gMatStackIndex])
@@ -208,7 +208,7 @@ class GeoRenderer {
             this.gCurGraphNodeRoot = root.node
 
             if (root.node.children[0]) { ///atleast one child
-                console.log("processing children")
+                //console.log("processing children")
                 this.geo_process_node_and_siblings(root.node.children)
             }
 

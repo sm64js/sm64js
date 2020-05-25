@@ -145,7 +145,7 @@ class GeoLayout {
 
         while (this.sCurrentLayout.index < geoLayout.length) {
             const cmd = this.sCurrentLayout.layout[this.sCurrentLayout.index]
-            console.log("processing layout command: " + cmd.command.name)
+            //console.log("processing layout command: " + cmd.command.name)
             cmd.command.call(this, cmd.args)
         }
 

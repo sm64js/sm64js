@@ -102,7 +102,7 @@ class LevelCommands {
         console.log("new frame")
         while (this.sScriptStatus == SCRIPT_RUNNING) {
             const cmd = this.sCurrentScript.commands[this.sCurrentScript.index]
-            console.log("running script command: " + cmd.command.name)
+            //console.log("running script command: " + cmd.command.name)
             cmd.command.call(this, cmd.args)
         }
 

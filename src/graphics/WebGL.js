@@ -336,12 +336,12 @@ export class WebGL {
         }
     }
 
+    set_use_alpha(use_alpha) {
+        use_alpha ? this.gl.enable(this.gl.BLEND) : this.gl.disable(this.gl.BLEND)
+    }
+
     set_depth_test(depth_test) {
-        if (depth_test) {
-            this.gl.enable(this.gl.DEPTH_TEST)
-        } else {
-            this.gl.disable(this.gl.DEPTH_TEST)
-        }
+        depth_test ? this.gl.enable(this.gl.DEPTH_TEST) : this.gl.disable(this.gl.DEPTH_TEST)
     }
 
     set_depth_mask(z_upd) {
@@ -364,6 +364,12 @@ export class WebGL {
 
     set_scissor(data) {
         this.gl.scissor(data.x, data.y, data.width, data.height)
+    }
+
+    shader_get_info(prg, used_textures) {
+        used_textures[0] = prg.used_textures[0]
+        used_textures[1] = prg.used_textures[1]
+        return prg.num_inputs
     }
 
     start_frame() {

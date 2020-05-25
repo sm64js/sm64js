@@ -296,6 +296,7 @@ export class n64GfxProcessor {
         const v1 = this.rsp.loaded_vertices[vtx1_idx]
         const v2 = this.rsp.loaded_vertices[vtx2_idx]
         const v3 = this.rsp.loaded_vertices[vtx3_idx]
+        const v_arr = [ v1, v2, v3 ]
 
         if (v1.clip_rej & v2.clip_rej & v3.clip_rej) return
 
@@ -353,6 +354,89 @@ export class n64GfxProcessor {
         if (!use_alpha) cc_id &= ~0xfff000
 
         const comb = this.lookup_or_create_color_combiner(cc_id)
+        const prg = comb.prg
+
+        if (prg != this.rendering_state.shader_program) {
+            this.flush()
+            WebGL.unload_shader(this.rendering_state.shader_program)
+            WebGL.lookup_shader(prg)
+            this.rendering_state.shader_program = prg
+        }
+
+        if (use_alpha != this.rendering_state.alpha_blend) {
+            this.flush()
+            WebGL.set_use_alpha(use_alpha)
+            this.rendering_state.alpha_blend = use_alpha
+        }
+
+        const used_textures = [false, false]
+        const num_inputs = WebGL.shader_get_info(prg, used_textures)
+
+        for (let i = 0; i < 2; i++) {
+            if (used_textures[i]) {
+                if (this.rdp.textures_changed[i]) {
+                    this.flush()
+                    throw "import_texture(i)"
+                    this.rdp.textures_changed[i] = false
+                }
+                throw "more implementation needed here"
+            }
+        }
+
+        const use_texture = used_textures[0] || used_textures[1]
+        const tex_width = (this.rdp.texture_tile.lrs - this.rdp.texture_tile.uls + 4) / 4
+        const tex_height = (this.rdp.texture_tile.lrt - this.rdp.texture_tile.ult + 4) / 4
+
+        for (let i = 0; i < 3; i++) {
+            this.buf_vbo[this.buf_vbo_len++] = v_arr[i].x
+            this.buf_vbo[this.buf_vbo_len++] = v_arr[i].y
+            this.buf_vbo[this.buf_vbo_len++] = v_arr[i].z
+            this.buf_vbo[this.buf_vbo_len++] = v_arr[i].w
+
+            if (use_texture) {
+                throw "more implementation needed here"
+            }
+
+            if (use_fog) {
+                throw "more implementation needed here"
+            }
+
+            for (let j = 0; j < num_inputs; j++) {
+                let color = {}
+                for (let k = 0; k < 1 + (use_alpha ? 1 : 0); k++) {
+                    switch (comb.shader_input_mapping[k][j]) {
+                        case Gbi.CC_PRIM: color = this.rdp.prim_color; break
+                        case Gbi.CC_SHADE: color = v_arr[i].color; break
+                        case Gbi.CC_ENV: color = this.rdp.env_color; break
+                        case Gbi.CC_LOD:
+                            const distance_frac = (v1.w - 3000.0) / 3000.0
+                            if (distance_frac < 0.0) distance_frac = 0.0
+                            if (distance_frac > 1.0) distance_frac = 1.0
+                            color.r = color.g = color.b = color.a = distance_frac * 255.0
+                            break
+                        default:
+                            color = { r: 0, g: 0, b: 0, a: 0 }
+                    }
+                    if (k == 0) { // not the alpha channel?
+                        this.buf_vbo[this.buf_vbo_len++] = color.r / 255.0
+                        this.buf_vbo[this.buf_vbo_len++] = color.g / 255.0
+                        this.buf_vbo[this.buf_vbo_len++] = color.b / 255.0
+                    } else { /// here is use_alpha is true
+                        if (use_fog && color == v_arr[i].color) {
+                            // Shade alpha is 100% for fog
+                            this.buf_vbo[this.buf_vbo_len] = 1.0
+                        } else {
+                            this.buf_vbo[this.buf_vbo_len] = color.a / 255.0
+                        }
+                    }
+                }
+            }
+
+        }
+
+        if (++this.buf_vbo_num_tris == MAX_BUFFERED) {
+            this.flush()
+        }
 
     }
 

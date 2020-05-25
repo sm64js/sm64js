@@ -21,7 +21,7 @@ class GeoRenderer {
         }
 
         for (let i = 0; i < GraphNode.GFX_NUM_MASTER_LISTS; i++) {
-            if (node.wrapper.listHeads[i].length > 0) {
+            if (node.wrapper.listHeads[i]) {
                 for (const displayNode of node.wrapper.listHeads[i]) {
                     Gbi.gSPMatrix(Game.gDisplayList, displayNode.transform, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
                     Gbi.gSPDisplayList(Game.gDisplayList, displayNode.displayList)
@@ -30,13 +30,17 @@ class GeoRenderer {
             }
 
         }
+
+        if (enableZBuffer) {
+            Gbi.gsSPClearGeometryMode(Game.gDisplayList, Gbi.G_ZBUFFER)
+        }
     }
 
     geo_process_master_list(node) {
 
         if (!this.gCurGraphNodeMasterList && node.children[0]) {
             this.gCurGraphNodeMasterList = node
-            node.wrapper.listHeads.fill([])
+            node.wrapper.listHeads.fill(null)
             this.geo_process_node_and_siblings(node.children)
             this.geo_process_master_list_sub(node)
             this.gCurGraphNodeMasterList = null
@@ -121,6 +125,11 @@ class GeoRenderer {
         } else if (this.gCurGraphNodeMasterList) {
             const gfx = []
             ////..... add backfround fill gfx commands
+            Gbi.gDPSetFillColor(gfx, node.wrapper.background)
+            Gbi.gDPFillRectangle(gfx, 0, 0, canvas.width - 1, canvas.height - 1)
+            Gbi.gSPEndDisplayList(gfx)
+
+            this.geo_append_display_list(gfx, 0)
         }
 
         if (node.children[0]) {
@@ -149,7 +158,12 @@ class GeoRenderer {
                 displayList
             }
 
-            this.gCurGraphNodeMasterList.wrapper.listHeads[layer].push(listNode)
+            if (this.gCurGraphNodeMasterList.wrapper.listHeads[layer]) {
+                this.gCurGraphNodeMasterList.wrapper.listHeads[layer].push(listNode)
+            } else {
+                this.gCurGraphNodeMasterList.wrapper.listHeads[layer] = [ listNode ]
+            }
+            
             
         }
 
@@ -163,20 +177,20 @@ class GeoRenderer {
                 case GraphNode.GRAPH_NODE_TYPE_ORTHO_PROJECTION:
                     this.geo_process_ortho_projection(child); break
 
-                case GraphNode.GRAPH_NODE_TYPE_PERSPECTIVE:
-                    this.geo_process_perspective(child); break
+                //case GraphNode.GRAPH_NODE_TYPE_PERSPECTIVE:
+                //    this.geo_process_perspective(child); break
 
                 case GraphNode.GRAPH_NODE_TYPE_MASTER_LIST:
                     this.geo_process_master_list(child); break
 
-                case GraphNode.GRAPH_NODE_TYPE_CAMERA:
-                    this.geo_process_camera(child); break
+                //case GraphNode.GRAPH_NODE_TYPE_CAMERA:
+                //    this.geo_process_camera(child); break
 
                 case GraphNode.GRAPH_NODE_TYPE_BACKGROUND:
                     this.geo_process_background(child); break
 
-                case GraphNode.GRAPH_NODE_TYPE_GENERATED_LIST:
-                    this.geo_process_generated_list(child); break
+                //case GraphNode.GRAPH_NODE_TYPE_GENERATED_LIST:
+                //    this.geo_process_generated_list(child); break
 
                 default: break
 

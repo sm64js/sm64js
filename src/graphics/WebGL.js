@@ -337,7 +337,7 @@ export class WebGL {
         }
     }
 
-    gfx_lookup_or_create_shader_program(shader_id) {
+    lookup_or_create_shader_program(shader_id) {
         let shaderProgram = this.lookup_shader(shader_id)
         if (!shaderProgram) {
             this.unload_shader(this.rendering_state.shader_program)
@@ -357,6 +357,36 @@ export class WebGL {
                 this.gl.disableVertexAttribArray(attrib_index)
             })
         }
+    }
+
+    set_depth_test(depth_test) {
+        if (depth_test) {
+            this.gl.enable(this.gl.DEPTH_TEST)
+        } else {
+            this.gl.disable(this.gl.DEPTH_TEST)
+        }
+    }
+
+    set_depth_mask(z_upd) {
+        this.gl.depthMask(z_upd)
+    }
+
+    set_zmode_decal(zmode_decal) {
+        if (zmode_decal) {
+            this.gl.polygonOffset(-2, -2)
+            this.gl.enable(this.gl.POLYGON_OFFSET_FILL)
+        } else {
+            this.gl.polygonOffset(0, 0)
+            this.gl.disable(this.gl.POLYGON_OFFSET_FILL)
+        }
+    }
+
+    set_viewport(data) {
+        this.gl.viewport(data.x, data.y, data.width, data.height)
+    }
+
+    set_scissor(data) {
+        this.gl.scissor(data.x, data.y, data.width, data.height)
     }
 
     start_frame() {

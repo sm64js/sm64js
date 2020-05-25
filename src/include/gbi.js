@@ -32,17 +32,17 @@ export const G_RDPLOADSYNC = 29
 
 export const G_ZBUFFER = 1
 export const G_SHADE = 2
-export const G_TEXTURE_ENABLE = 3
-export const G_SHADING_SMOOTH = 4
-export const G_CULL_FRONT = 5
-export const G_CULL_BACK = 6
-export const G_CULL_BOTH = 7
-export const G_FOG = 8
-export const G_LIGHTING = 9
-export const G_TEXTURE_GEN = 10
-export const G_LOD = 11
-export const G_TEXTURE_GEN_LINEAR = 12
-export const G_CLIPPING = 13
+export const G_TEXTURE_ENABLE = 4
+export const G_SHADING_SMOOTH = 8
+/*export const G_CULL_FRONT = 16
+export const G_CULL_BACK = 32*/
+export const G_FOG = 16
+export const G_LIGHTING = 32
+export const G_TEXTURE_GEN = 64
+//export const G_LOD = 11
+export const G_TEXTURE_GEN_LINEAR = 128
+export const G_CLIPPING = 256
+export const G_CULL_BOTH = 512
 
 export const  G_ON	= 1
 export const G_OFF = 0
@@ -56,7 +56,164 @@ export const G_DL_NOPUSH	=	0x01
 export const 	G_TEXTURE_IMAGE_FRAC =	2
 export const 	G_TEXTURE_SCALE_FRAC =	16
 export const 	G_SCALE_FRAC	=	8
-export const 	G_ROTATE_FRAC	=	16
+export const G_ROTATE_FRAC = 16
+
+
+
+/*
+ * G_SETOTHERMODE_L sft: shift count
+ */
+export const G_MDSFT_ALPHACOMPARE	=	0
+export const G_MDSFT_ZSRCSEL		=	2
+export const G_MDSFT_RENDERMODE		=   3
+export const G_MDSFT_BLENDER		=	16
+
+/*
+ * G_SETOTHERMODE_H sft: shift count
+ */
+export const G_MDSFT_BLENDMASK		=0	/* unsupported */
+export const G_MDSFT_ALPHADITHER	=	4
+export const G_MDSFT_RGBDITHER		=6
+
+export const G_MDSFT_COMBKEY		=	8
+export const G_MDSFT_TEXTCONV		= 9
+export const G_MDSFT_TEXTFILT		= 12
+export const G_MDSFT_TEXTLUT		=	14
+export const G_MDSFT_TEXTLOD		=	16
+export const G_MDSFT_TEXTDETAIL		=17
+export const G_MDSFT_TEXTPERSP		=19
+export const G_MDSFT_CYCLETYPE		=20
+export const G_MDSFT_COLORDITHER	=	22	/* unsupported in HW 2.0 */
+export const G_MDSFT_PIPELINE		=23
+
+
+/* G_SETOTHERMODE_H gPipelineMode */
+export const G_PM_1PRIMITIVE =  1 << G_MDSFT_PIPELINE
+export const G_PM_NPRIMITIVE =  0 << G_MDSFT_PIPELINE
+
+/* G_SETOTHERMODE_H gSetCycleType */
+export const G_CYC_1CYCLE =  0 << G_MDSFT_CYCLETYPE
+export const G_CYC_2CYCLE =  1 << G_MDSFT_CYCLETYPE
+export const G_CYC_COPY =  2 << G_MDSFT_CYCLETYPE
+export const G_CYC_FILL = 3 << G_MDSFT_CYCLETYPE
+
+/* G_SETOTHERMODE_H gSetTexturePersp */
+export const G_TP_NONE  =  (0 << G_MDSFT_TEXTPERSP)
+export const G_TP_PERSP  =  (1 << G_MDSFT_TEXTPERSP)
+
+/* G_SETOTHERMODE_H gSetTextureDetail */
+export const G_TD_CLAMP  =  (0 << G_MDSFT_TEXTDETAIL)
+export const G_TD_SHARPEN  =  (1 << G_MDSFT_TEXTDETAIL)
+export const G_TD_DETAIL  =  (2 << G_MDSFT_TEXTDETAIL)
+
+/* G_SETOTHERMODE_H gSetTextureLOD */
+export const G_TL_TILE  =  (0 << G_MDSFT_TEXTLOD)
+export const G_TL_LOD  =  (1 << G_MDSFT_TEXTLOD)
+
+/* G_SETOTHERMODE_H gSetTextureLUT */
+export const G_TT_NONE  =  (0 << G_MDSFT_TEXTLUT)
+export const G_TT_RGBA16  =  (2 << G_MDSFT_TEXTLUT)
+export const G_TT_IA16  =  (3 << G_MDSFT_TEXTLUT)
+
+/* G_SETOTHERMODE_H gSetTextureFilter */
+export const G_TF_POINT  =  (0 << G_MDSFT_TEXTFILT)
+export const G_TF_AVERAGE  =  (3 << G_MDSFT_TEXTFILT)
+export const G_TF_BILERP  =  (2 << G_MDSFT_TEXTFILT)
+
+/* G_SETOTHERMODE_H gSetTextureConvert */
+export const G_TC_CONV  =  (0 << G_MDSFT_TEXTCONV)
+export const G_TC_FILTCONV  =  (5 << G_MDSFT_TEXTCONV)
+export const G_TC_FILT  =  (6 << G_MDSFT_TEXTCONV)
+
+/* G_SETOTHERMODE_H gSetCombineKey */
+export const G_CK_NONE  =  (0 << G_MDSFT_COMBKEY)
+export const G_CK_KEY  =  (1 << G_MDSFT_COMBKEY)
+
+/* G_SETOTHERMODE_H gSetColorDither */
+export const	G_CD_MAGICSQ  =  (0 << G_MDSFT_RGBDITHER)
+export const	G_CD_BAYER  =  (1 << G_MDSFT_RGBDITHER)
+export const G_CD_NOISE = (2 << G_MDSFT_RGBDITHER)
+
+/* G_SETOTHERMODE_H gSetAlphaDither */
+export const G_AD_PATTERN = (0 << G_MDSFT_ALPHADITHER)
+export const G_AD_NOTPATTERN = (1 << G_MDSFT_ALPHADITHER)
+export const G_AD_NOISE = (2 << G_MDSFT_ALPHADITHER)
+export const G_AD_DISABLE = (3 << G_MDSFT_ALPHADITHER)
+
+/* G_SETOTHERMODE_L gSetAlphaCompare */
+export const G_AC_NONE = (0 << G_MDSFT_ALPHACOMPARE)
+export const G_AC_THRESHOLD = (1 << G_MDSFT_ALPHACOMPARE)
+export const G_AC_DITHER = (3 << G_MDSFT_ALPHACOMPARE)
+
+/* G_SETOTHERMODE_L gSetDepthSource */
+export const G_ZS_PIXEL = (0 << G_MDSFT_ZSRCSEL)
+export const G_ZS_PRIM = (1 << G_MDSFT_ZSRCSEL)
+
+/* G_SETOTHERMODE_L gSetRenderMode */
+export const AA_EN	=	0x8
+export const Z_CMP	=	0x10
+export const Z_UPD	=	0x20
+export const IM_RD	=	0x40
+export const CLR_ON_CVG	= 0x80
+export const CVG_DST_CLAMP =	0
+export const CVG_DST_WRAP =	0x100
+export const CVG_DST_FULL =	0x200
+export const CVG_DST_SAVE	= 0x300
+export const ZMODE_OPA	= 0
+export const ZMODE_INTER =	0x400
+export const ZMODE_XLU	= 0x800
+export const ZMODE_DEC	= 0xc00
+export const CVG_X_ALPHA	= 0x1000
+export const ALPHA_CVG_SEL = 	0x2000
+export const FORCE_BL	= 0x4000
+export const TEX_EDGE	= 0x0000 /* used to be 0x8000 */
+
+export const CC_0 = 0
+export const CC_TEXEL0 = 1
+export const CC_TEXEL1 = 2
+export const CC_PRIM = 3
+export const CC_SHADE = 4
+export const CC_ENV = 5
+export const CC_TEXEL0A = 6
+export const CC_LOD = 7
+
+/*
+ * G_SETCOMBINE: color combine modes
+ */
+/* Color combiner constants: */
+export const G_CCMUX_COMBINED        = 0
+export const G_CCMUX_TEXEL0          = 1
+export const G_CCMUX_TEXEL1          = 2
+export const G_CCMUX_PRIMITIVE       = 3
+export const G_CCMUX_SHADE           = 4
+export const G_CCMUX_ENVIRONMENT     = 5
+export const G_CCMUX_CENTER         =  6
+export const G_CCMUX_SCALE          =  6
+export const G_CCMUX_COMBINED_ALPHA =  7
+export const G_CCMUX_TEXEL0_ALPHA   =  8
+export const G_CCMUX_TEXEL1_ALPHA   =  9
+export const G_CCMUX_PRIMITIVE_ALPHA = 10
+export const G_CCMUX_SHADE_ALPHA     = 11
+export const G_CCMUX_ENV_ALPHA       = 12
+export const G_CCMUX_LOD_FRACTION    = 13
+export const G_CCMUX_PRIM_LOD_FRAC   = 14
+export const G_CCMUX_NOISE           = 7
+export const G_CCMUX_K4              = 7
+export const G_CCMUX_K5              = 15
+export const G_CCMUX_1               = 6
+export const G_CCMUX_0               = 31
+
+/* Alpha combiner constants: */
+export const G_ACMUX_COMBINED	    = 0
+export const G_ACMUX_TEXEL0		   =  1
+export const G_ACMUX_TEXEL1		    = 2
+export const G_ACMUX_PRIMITIVE	    = 3
+export const G_ACMUX_SHADE		    = 4
+export const G_ACMUX_ENVIRONMENT	=     5
+export const G_ACMUX_LOD_FRACTION	= 0
+export const G_ACMUX_PRIM_LOD_FRAC	= 6
+export const G_ACMUX_1		       =  6
+export const G_ACMUX_0		       =  7
 
 
 /*
@@ -141,6 +298,24 @@ export const gDPSetEnvColor = (displaylist, r, g, b, a) => {
     })
 }
 
+export const gDPSetFillColor = (displaylist, color) => {
+    displaylist.push({
+        words: {
+            w0: G_SETFILLCOLOR,
+            w1: { color }
+        }
+    })
+}
+
+export const gDPFillRectangle = (displaylist, ulx, uly, lrx, lry) => {
+    displaylist.push({
+        words: {
+            w0: G_FILLRECT,
+            w1: { ulx, uly, lrx, lry }
+        }
+    })
+}
+
 export const gSPMatrix = (displaylist, matrix, parameters) => {
     displaylist.push({
         words: {
@@ -154,7 +329,7 @@ export const gSPSetGeometryMode = (displaylist, mode) => {
     displaylist.push({
         words: {
             w0: G_SETGEOMETRYMODE,
-            w1: mode
+            w1: { mode }
         }
     })
 }
@@ -197,7 +372,7 @@ export const gsSPClearGeometryMode = (mode) => {
     return {
         words: {
             w0: G_CLEARGEOMETRYMODE,
-            w1: mode
+            w1: { mode }
         }
     }
 }
@@ -206,7 +381,7 @@ export const gsSPSetGeometryMode = (mode) => {
     return {
         words: {
             w0: G_SETGEOMETRYMODE,
-            w1: mode
+            w1: { mode }
         }
     }
 }
@@ -215,7 +390,7 @@ export const gsDPSetCombineMode = (mode) => {
     return {
         words: {
             w0: G_SETCOMBINE,
-            w1: mode
+            w1: { mode }
         }
     }
 }

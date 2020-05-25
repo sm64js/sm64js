@@ -15,20 +15,7 @@ export class WebGL {
 
     constructor(canvas) {
         this.canvas = canvas
-        this.rendering_state = {
-            depth_test: false,
-            depth_mask: false,
-            decal_mode: false,
-            alpha_blend: false,
-            viewport: {
-                x: 0, y: 0, width: 0, height: 0
-            },
-            scissor: {
-                x: 0, y: 0, width: 0, height: 0
-            },
-            shader_program: null,
-            textures: [ null, null ]
-        }
+
         this.shader_program_pool = []
 
         // Initialize the GL context
@@ -335,16 +322,6 @@ export class WebGL {
             this.gl.vertexAttribPointer(prg.attrib_locations[i], prg.attrib_sizes[i], this.gl.FLOAT, false, num_floats * 4, pos * 4)
             pos += prg.attrib_sizes[i]
         }
-    }
-
-    lookup_or_create_shader_program(shader_id) {
-        let shaderProgram = this.lookup_shader(shader_id)
-        if (!shaderProgram) {
-            this.unload_shader(this.rendering_state.shader_program)
-            shaderProgram = this.create_and_load_new_shader(shader_id)
-            this.rendering_state.shader_program = shaderProgram
-        }
-        return shaderProgram
     }
 
     lookup_shader(shader_id) {

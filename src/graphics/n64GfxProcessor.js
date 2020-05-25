@@ -88,6 +88,8 @@ export class n64GfxProcessor {
             color_image_address: null
         }
 
+        this.color_combiner_pool = []
+
         this.rendering_state = {
             depth_test: false,
             depth_mask: false,
@@ -105,7 +107,7 @@ export class n64GfxProcessor {
 
         /// create opengl shaders
         precomp_shaders.forEach(shader_id => {
-            WebGL.lookup_or_create_shader_program(shader_id)
+            this.lookup_or_create_shader_program(shader_id)
         })
     }
 
@@ -215,6 +217,81 @@ export class n64GfxProcessor {
         return vp1.x == vp2.x && vp1.y == vp2.y && vp1.width == vp2.width && vp1.height == vp2.height
     }
 
+    lookup_or_create_shader_program(shader_id) {
+        let prg = WebGL.lookup_shader(shader_id)
+        if (prg == undefined) {
+            WebGL.unload_shader(this.rendering_state.shader_program)
+            prg = WebGL.create_and_load_new_shader(shader_id)
+            this.rendering_state.shader_program = prg
+        }
+
+        return prg
+    }
+
+    generate_cc(cc_id) {
+        const c = new Array(2).fill(0).map(() => new Array(4).fill(0))
+        let shader_id = (cc_id >> 24) << 24
+        const shader_input_mapping = new Array(2).fill(0).map(() => new Array(4).fill(0))
+
+        for (let i = 0; i < 4; i++) {
+            c[0][i] = (cc_id >> (i * 3)) & 7
+            c[1][i] = (cc_id >> (12 + i * 3)) & 7
+        }
+
+        for (let i = 0; i < 2; i++) {
+            if (c[i][0] == c[i][1] || c[i][2] == Gbi.CC_0) {
+                c[i][0] = c[i][1] = c[i][2] = 0
+            }
+
+            const input_number = new Array(8).fill(0)
+            let next_input_number = Gbi.SHADER_INPUT_1
+            for (let j = 0; j < 4; j++) {
+                let val = 0
+                switch (c[i][j]) {
+                    case Gbi.CC_0: break
+                    case Gbi.CC_TEXEL0: val = Gbi.SHADER_TEXEL0; break
+                    case Gbi.CC_TEXEL1: val = Gbi.SHADER_TEXEL1; break
+                    case Gbi.CC_TEXEL0A: val = Gbi.SHADER_TEXEL0A; break
+                    case Gbi.CC_PRIM:
+                    case Gbi.CC_SHADE:
+                    case Gbi.CC_ENV:
+                    case Gbi.CC_LOD:
+                        if (input_number[c[i][j]] == 0) {
+                            shader_input_mapping[i][next_input_number - 1] = c[i][j]
+                            input_number[c[i][j]] = next_input_number++
+                        }
+                        val = input_number[c[i][j]]
+                        break
+                }
+                shader_id |= val << (i * 12 + j * 3)
+            }
+        }
+
+        return {
+            cc_id,
+            shader_input_mapping,
+            prg: this.lookup_or_create_shader_program(shader_id)
+        }
+
+    }
+
+    lookup_or_create_color_combiner(cc_id) {
+        if (this.prev_combiner != undefined && this.prev_combiner.cc_id == cc_id) {
+            return this.prev_combiner
+        }
+
+        const other_combiner = this.color_combiner_pool.find(x => x.cc_id == cc_id)
+        if (other_combiner) {
+            this.prev_combiner = other_combiner
+            return other_combiner
+        }
+        this.flush()
+        const new_combiner = this.generate_cc(cc_id)
+        this.color_combiner_pool.push(new_combiner)
+        this.prev_combiner = new_combiner
+        return new_combiner
+    }
+
     sp_tri1(vtx1_idx, vtx2_idx, vtx3_idx) {
         const v1 = this.rsp.loaded_vertices[vtx1_idx]
         const v2 = this.rsp.loaded_vertices[vtx2_idx]
@@ -261,7 +338,21 @@ export class n64GfxProcessor {
             this.rdp.viewport_or_scissor_changed = false
         }
 
+        let cc_id = this.rdp.combine_mode
 
+        let use_alpha = (this.rdp.other_mode_l & (Gbi.G_BL_A_MEM << 18)) == 0
+        const use_fog = (this.rdp.other_mode_l >> 30) == Gbi.G_BL_CLR_FOG
+        const texture_edge = (this.rdp.other_mode_l & Gbi.CVG_X_ALPHA) == Gbi.CVG_X_ALPHA
+
+        if (texture_edge) use_alpha = true
+
+        if (use_alpha) cc_id |= Gbi.SHADER_OPT_ALPHA
+        if (use_fog) cc_id |= Gbi.SHADER_OPT_FOG
+        if (texture_edge) cc_id |= Gbi.SHADER_OPT_TEXTURE_EDGE
+
+        if (!use_alpha) cc_id &= ~0xfff000
+
+        const comb = this.lookup_or_create_color_combiner(cc_id)
 
     }
 

@@ -168,6 +168,18 @@ export const ALPHA_CVG_SEL = 	0x2000
 export const FORCE_BL	= 0x4000
 export const TEX_EDGE	= 0x0000 /* used to be 0x8000 */
 
+export const G_BL_CLR_IN	=  0
+export const G_BL_CLR_MEM	=  1
+export const G_BL_CLR_BL	=  2
+export const G_BL_CLR_FOG	=  3
+export const G_BL_1MA	=  0
+export const G_BL_A_MEM	=  1
+export const G_BL_A_IN	=  0
+export const G_BL_A_FOG	=  1
+export const G_BL_A_SHADE	=  2
+export const G_BL_1		=  2
+export const G_BL_0		=  3
+
 export const CC_0 = 0
 export const CC_TEXEL0 = 1
 export const CC_TEXEL1 = 2
@@ -176,6 +188,19 @@ export const CC_SHADE = 4
 export const CC_ENV = 5
 export const CC_TEXEL0A = 6
 export const CC_LOD = 7
+
+export const SHADER_0 = 0
+export const SHADER_INPUT_1 = 1
+export const SHADER_INPUT_2 = 2
+export const SHADER_INPUT_3 = 3
+export const SHADER_INPUT_4 = 4
+export const SHADER_TEXEL0 = 5
+export const SHADER_TEXEL0A = 6
+export const SHADER_TEXEL1 = 7
+
+export const SHADER_OPT_ALPHA = (1 << 24)
+export const SHADER_OPT_FOG = (1 << 25)
+export const SHADER_OPT_TEXTURE_EDGE = (1 << 26)
 
 /*
  * G_SETCOMBINE: color combine modes

@@ -2,6 +2,7 @@ import { GameInstance as Game } from "./game/Game"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
 
 let initialized_game = false
+let n_frames = 0 //78
 
 const send_display_list = (gfx_list) => {
     if (!initialized_game) return
@@ -9,6 +10,10 @@ const send_display_list = (gfx_list) => {
 }
 
 const produce_one_frame = () => {
+
+    if (n_frames > 91) { throw "Hit max frames" }
+    n_frames++
+
     GFX.start_frame()
     Game.main_loop_one_iteration()
 
@@ -25,8 +30,7 @@ const main_func = () => {
 
     initialized_game = true
 
-    const n_frames = 80 //78
-    for (let i = 0; i < n_frames; i++) { produce_one_frame() }
+    setInterval(produce_one_frame, 33)
     
     console.log("reached max frames - end program")
 }

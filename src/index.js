@@ -25,7 +25,7 @@ const main_func = () => {
 
     initialized_game = true
 
-    const n_frames = 75 //78
+    const n_frames = 80 //78
     for (let i = 0; i < n_frames; i++) { produce_one_frame() }
     
     console.log("reached max frames - end program")

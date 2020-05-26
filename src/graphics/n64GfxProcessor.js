@@ -74,7 +74,7 @@ export class n64GfxProcessor {
             palette: [],
             texture_to_load: { textureData: null, tile_number: 0, size: 0, id: 0 },
             loaded_texture: [{ textureData: null, size_bytes: 0, id: 0 }, { textureData: null, size_bytes: 0, id: 0 }],
-            texture_tile: { fmt: 0, siz: 0, cms: 0, cmt: 0, uls: 0, ult: 0, lrs: 0, lrt: 0, line_size: 0 },
+            texture_tile: { fmt: 0, siz: 0, cms: 0, cmt: 0, uls: 0, ult: 0, lrs: 0, lrt: 0, line_size_bytes: 0 },
             textures_changed: [false, false],
             other_mode_l: 0, other_mode_h: 0,
             combine_mode: 0,
@@ -122,23 +122,44 @@ export class n64GfxProcessor {
     end_frame() { }
 
     sp_reset() {
-        this.rsp.modelview_matrix_stack_size = 1
+        this.rsp.modelview_matrix_stack_size = 1        
         this.rsp.current_num_lights = 2
         this.rsp.lights_changed = true
+        this.MP_matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        this.MP_matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
     }
 
     matrix_mul(res, a, b) {
+        const temp = new Array(4).fill(0).map(() => new Array(4).fill(0))
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 4; j++) {
-                res[i][j] = a[i][0] * b[0][j] +
+                temp[i][j] = a[i][0] * b[0][j] +
                             a[i][1] * b[1][j] +
                             a[i][2] * b[2][j] +
                             a[i][3] * b[3][j]
             }
         }
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                res[i][j] = temp[i][j]
+            }
+        }
     }
 
-    sp_matrix(parameters, matrix) {
+    cloneMatrix4x4(src){
+        const dst = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                dst[i][j] = src[i][j]
+            }
+        }
+        return dst
+    }
+
+    sp_matrix(parameters, og_matrix) {
+
+        const matrix = this.cloneMatrix4x4(og_matrix)
+
         if (parameters & Gbi.G_MTX_PROJECTION) {
             if (parameters & Gbi.G_MTX_LOAD) {
                 this.rsp.P_matrix = matrix
@@ -156,7 +177,8 @@ export class n64GfxProcessor {
                 this.matrix_mul(
                     this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1],
                     matrix,
-                    this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1]
+                    this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1],
+                    
                 )
             }
             this.rsp.lights_changed = true
@@ -164,7 +186,7 @@ export class n64GfxProcessor {
         this.matrix_mul(
             this.rsp.MP_matrix,
             this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1],
-            this.rsp.P_matrix
+            this.rsp.P_matrix,
         )
     }
 
@@ -680,6 +702,9 @@ export class n64GfxProcessor {
     }
 
     sp_vertex(dest_index, vertices) {
+
+        //console.log(JSON.stringify(this.rsp.MP_matrix))
+
         for (let i = 0; i < vertices.length; i++, dest_index++) {
             const v = vertices[i]
             const d = this.rsp.loaded_vertices[dest_index]
@@ -774,9 +799,9 @@ export class n64GfxProcessor {
                 case Gbi.G_SETFILLCOLOR:
                     this.dp_set_fill_color(args.color)
                     break
-/*                case Gbi.G_SETENVCOLOR:
+                case Gbi.G_SETENVCOLOR:
                     this.dp_set_env_color(args.r, args.g, args.g, args.a)
-                    break*/
+                    break
                 case Gbi.G_FILLRECT:
                     this.dp_fill_rectangle(args.ulx, args.uly, args.lrx, args.lry)
                     break

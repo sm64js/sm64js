@@ -10,8 +10,8 @@ export const matrix_identity = [
 ]
 
 export const matrix_fullscreen = [
-    [2.0 / canvas.width, 0.0, 0.0, 0.0],
-    [0.0, 2.0 / canvas.height, 0.0, 0.0],
+    [4.0 / canvas.width, 0.0, 0.0, 0.0],
+    [0.0, 4.0 / canvas.height, 0.0, 0.0],
     [0.0, 0.0, -1.0, 0.0],
     [-1.0, -1.0, -1.0, 1.0]
 ]

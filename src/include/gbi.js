@@ -260,21 +260,21 @@ export const G_IM_SIZ_32b	= 3
 export const G_IM_SIZ_DD = 5
 
 export const G_IM_SIZ_INCR_TABLE = {
-    G_IM_SIZ_16b: 0
+    2: 0
 }
 export const G_IM_SIZ_SHIFT_TABLE = {
-    G_IM_SIZ_16b: 0
+    2: 0
 }
 
 export const G_IM_SIZ_LOAD_BLOCK_TABLE = {
-    G_IM_SIZ_16b: G_IM_SIZ_16b
+    2: G_IM_SIZ_16b
 }
 export const G_IM_SIZ_BYTES_TABLE = {
-    G_IM_SIZ_16b: G_IM_SIZ_16b
+    2: G_IM_SIZ_16b
 }
 
 export const G_IM_SIZ_LINE_BYTES_TABLE = {
-    G_IM_SIZ_16b: G_IM_SIZ_16b
+    2: G_IM_SIZ_16b
 }
 
 

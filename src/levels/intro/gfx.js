@@ -85,7 +85,7 @@ export const geo_title_screen = (param, graphNode, unused) => {
 }
 
 export const geo_fade_transition = (param, graphNode, unused) => {
-    console.log("running gfx function - geo fade transition")
+    console.log("running gfx function - geo fade transition  " + gTitleFadeCounter)
     const displayList = []
     if (param != 1) {
         gTitleFadeCounter = 0

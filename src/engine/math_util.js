@@ -4,6 +4,7 @@ export const mtxf_identity = (mtx) => {
             i == j ? mtx[i][j] = 1 : mtx[i][j] = 0
         }
     }
+    return mtx
 } 
 
 export const mtxf_to_mtx = (dest, src) => {

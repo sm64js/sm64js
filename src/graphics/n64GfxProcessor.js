@@ -106,11 +106,7 @@ export class n64GfxProcessor {
             textures: [null, null]
         }
 
-        this.gfx_texture_cache = {
-            hashmap: {},
-            pool: [],
-            pool_pos: 0
-        }
+        this.gfx_texture_cache = { pool: [] }
 
         /// create opengl shaders
         precomp_shaders.forEach(shader_id => {
@@ -308,8 +304,8 @@ export class n64GfxProcessor {
 
             const a = col16 & 1
             const r = col16 >> 11
-            const g = (col16 >> 6) & 0x1
-            const b = (col16 >> 1) & 0x1
+            const g = (col16 >> 6) & 0x1f
+            const b = (col16 >> 1) & 0x1f
 
             rgba32_buf.push(this.scale_5_8(r))
             rgba32_buf.push(this.scale_5_8(g))
@@ -317,7 +313,7 @@ export class n64GfxProcessor {
             rgba32_buf.push(a ? 255 : 0)
         }
 
-        const width = this.rdp.loaded_texture[tile].size_bytes / 2
+        const width = this.rdp.texture_tile.line_size_bytes / 2
         const height = this.rdp.loaded_texture[tile].size_bytes / this.rdp.texture_tile.line_size_bytes
 
         WebGL.upload_texture(rgba32_buf, width, height)
@@ -344,10 +340,13 @@ export class n64GfxProcessor {
     }
 
     texture_cache_lookup(tile, textureData, fmt, siz, id) {
-        const hash = id
-        let node = this.gfx_texture_cache.hashmap[hash]
-        while (node != undefined) {
-            throw "more implementation needed in texture cache lookup"
+        //const hash = id
+        //let node = this.gfx_texture_cache.hashmap[hash]
+        let node = this.gfx_texture_cache.pool.find(x => x.id == id && x.fmt == fmt && x.siz == siz)
+        if (node != undefined) {
+            WebGL.select_texture(tile, node.texture_object)
+            this.rendering_state.textures[tile] = node
+            return true
         }
         if (this.gfx_texture_cache.pool.length >= 512) {
             /// pool hits limit
@@ -360,7 +359,7 @@ export class n64GfxProcessor {
         }
         WebGL.select_texture(tile, node.texture_object)
         WebGL.set_sampler_parameters(tile, false, 0, 0)
-        Object.assign(node, { cmd: 0, cmt: 0, linear_filter: false, next: null, id, textureData, fmt, siz })
+        Object.assign(node, { cms: 0, cmt: 0, linear_filter: false, id, textureData, fmt, siz, meow: true })
         this.rendering_state.textures[tile] = node
         return false
     }
@@ -487,11 +486,11 @@ export class n64GfxProcessor {
                 }
 
                 this.buf_vbo.push(u / tex_width)
-                this.buf_vbo.push(v /tex_height)
+                this.buf_vbo.push(v / tex_height)
             }
 
             if (use_fog) {
-                throw "more implementation needed here"
+                throw "more fog implementation needed here"
             }
 
             for (let j = 0; j < num_inputs; j++) {
@@ -592,6 +591,10 @@ export class n64GfxProcessor {
 
     } 
 
+    dp_set_env_color(r, g, b, a) {
+        this.rdp.env_color = { r, g, b, a }
+    }
+
     dp_fill_rectangle(ulx, uly, lrx, lry) {
 
         if (this.rdp.color_image_address == this.rdp.z_buf_address) {
@@ -627,7 +630,7 @@ export class n64GfxProcessor {
 
         if (tile == Gbi.G_TX_RENDERTILE) {
             if (palette != 0) throw "unsupported palette"
-            Object.assign(this.rdp.texture_tile, { fmt, siz, cms, cmt, line_size: line * 8 })
+            Object.assign(this.rdp.texture_tile, { fmt, siz, cms, cmt, line_size_bytes: line * 8 })
             this.rdp.textures_changed = [ true, true ]
         }
 
@@ -719,7 +722,7 @@ export class n64GfxProcessor {
 
     run_dl(commands) {
 
-        console.log("G_DL")
+        //console.log("G_DL")
 
         for (const command of commands) {
             const opcode = command.words.w0
@@ -727,15 +730,11 @@ export class n64GfxProcessor {
 
             opCount++
             command.opCount = opCount
-            console.log(command)
-
-            if (opCount >= 27) {
-                throw "reached opcount max"
-            }
+            //console.log(command)
 
             switch (opcode) {
                 case Gbi.G_ENDDL: /// not necessary for JS
-                    console.log("G_ENDDL")
+                    //console.log("G_ENDDL")
                     break
                 case Gbi.G_MTX:
                     this.sp_matrix(args.parameters, args.matrix)
@@ -775,12 +774,17 @@ export class n64GfxProcessor {
                 case Gbi.G_SETFILLCOLOR:
                     this.dp_set_fill_color(args.color)
                     break
+/*                case Gbi.G_SETENVCOLOR:
+                    this.dp_set_env_color(args.r, args.g, args.g, args.a)
+                    break*/
                 case Gbi.G_FILLRECT:
                     this.dp_fill_rectangle(args.ulx, args.uly, args.lrx, args.lry)
                     break
                 case Gbi.G_DL:
                     this.run_dl(args.childDisplayList)
                     break
+                default:
+                    throw "unimplemented gfx opcode: " + opcode
             }
 
         }
@@ -800,6 +804,10 @@ export class n64GfxProcessor {
         WebGL.start_frame()
         this.run_dl(commands)
         this.flush()
+
+/*        if (opCount >= 1213) {
+            throw "reached opcount max"
+        }*/
     }
 }
 

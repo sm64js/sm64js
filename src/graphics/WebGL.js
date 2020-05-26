@@ -255,6 +255,7 @@ export class WebGL {
         }
         fs_buf += "}\n"
 
+
         const vertex_shader = this.createShader(this.gl, vs_buf, this.gl.VERTEX_SHADER)
         const fragment_shader = this.createShader(this.gl, fs_buf, this.gl.FRAGMENT_SHADER)
 
@@ -311,7 +312,7 @@ export class WebGL {
     }
 
     load_shader(new_prg) {
-        console.log("loading new shader")
+        //console.log("loading new shader: " + new_prg.shader_id)
         this.gl.useProgram(new_prg.opengl_program)
         this.vertex_array_set_attribs(new_prg)
     }
@@ -405,7 +406,7 @@ export class WebGL {
     }
 
     draw_triangles(buf_vbo, buf_vbo_num_tris) {
-        console.log(`Flushing ${buf_vbo_num_tris} tris`)
+        console.log(`Flushing ${buf_vbo_num_tris} tris, total buf length ${buf_vbo.length}`)
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(buf_vbo), this.gl.STREAM_DRAW)
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 3 * buf_vbo_num_tris)
     }

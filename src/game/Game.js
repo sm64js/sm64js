@@ -63,6 +63,7 @@ class Game {
     }
 
     display_and_vsync() {
+        /// modulate frame rate
         this.send_display_list(this.gDisplayList)
     }
 }

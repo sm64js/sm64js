@@ -2602,6 +2602,13 @@ export const intro_seg7_dl_07008EA0 = [
     Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
     Gbi.gsSPVertex(intro_seg7_vertex_07000000, 16, 0),
     ...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
+    ...Gbi.gsSP2Triangles(3, 6, 7, 0x0, 5, 2, 3, 0x0),
+    ...Gbi.gsSP2Triangles(3, 7, 4, 0x0, 2, 1, 3, 0x0),
+    ...Gbi.gsSP2Triangles(7, 8, 4, 0x0, 9, 10, 11, 0x0),
+    ...Gbi.gsSP2Triangles(9, 12, 10, 0x0, 13, 14, 0, 0x0),
+    ...Gbi.gsSP2Triangles(15, 13, 0, 0x0, 0, 2, 15, 0x0),
+    Gbi.gsSPVertex(intro_seg7_vertex_07000100, 15, 0),
+    ...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
     ...Gbi.gsSP2Triangles(4, 5, 6, 0x0, 7, 4, 6, 0x0),
     ...Gbi.gsSP2Triangles(8, 9, 4, 0x0, 4, 10, 5, 0x0),
     ...Gbi.gsSP2Triangles(7, 8, 4, 0x0, 11, 8, 12, 0x0),
@@ -2887,7 +2894,7 @@ export const intro_seg7_dl_07008EA0 = [
 
 export const intro_seg7_dl_07009E38 = [
     Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, intro_seg7_texture_07007EA0),
-    Gbi.gsDPLoadSync(),
+    //Gbi.gsDPLoadSync(),
     Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
     Gbi.gsSPVertex(intro_seg7_vertex_07003500, 15, 0),
     ...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 2, 3, 4, 0x0),

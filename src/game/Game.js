@@ -22,13 +22,10 @@ class Game {
         //set_vblank_handler(2, &gGameVblankHandler, &gGameVblankQueue, (OSMesg) 1);
 
         // point levelCommandAddr to the entry point into the level script data.
-        // this.levelScript = { script: level_script_entry, index: 0 } //levelCommandAddr
         LevelCommands.start_new_script(level_script_entry)
 
         //play_music(SEQ_PLAYER_SFX, SEQUENCE_ARGS(0, SEQ_SOUND_PLAYER), 0);
         //set_sound_mode(save_file_get_sound_mode());
-
-        //gGlobalTimer++;
 
     }
 
@@ -63,7 +60,6 @@ class Game {
     }
 
     display_and_vsync() {
-        /// modulate frame rate
         this.send_display_list(this.gDisplayList)
     }
 }

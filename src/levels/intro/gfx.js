@@ -44,7 +44,6 @@ const intro_seg7_table_0700C880 = [
 ]
 
 export const geo_title_screen = (param, graphNode, unused) => {
-    console.log("running gfx function - geo title screen")
     const displayList = []
 
     const scaleMat = new Array(4).fill(0).map(() => new Array(4).fill(0))
@@ -85,7 +84,6 @@ export const geo_title_screen = (param, graphNode, unused) => {
 }
 
 export const geo_fade_transition = (param, graphNode, unused) => {
-    console.log("running gfx function - geo fade transition  " + gTitleFadeCounter)
     const displayList = []
     if (param != 1) {
         gTitleFadeCounter = 0

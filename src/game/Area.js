@@ -33,6 +33,32 @@ class Area {
 
     }
 
+    clear_areas() {
+        this.gCurrentArea = null
+
+        this.gAreas.forEach((areaData, i) => {
+            Object.assign(areaData, {
+                index: i,
+                flags: 0,
+                terrainType: 0,
+                geometryLayoutData: null,
+                terrainData: null,
+                surfaceRooms: null,
+                macroObjects: null,
+                warpNodes: null,
+                paintingWarpNodes: null,
+                instantWarps: null,
+                objectSpawnInfos: null,
+                camera: null,
+                unused28: null,
+                whirlpools: [ null, null ],
+                dialog: [null, null],
+                musicParam: 0,
+                musicParam2: 0
+            })
+        })
+    }
+
     render_game() {
         if (this.gCurrentArea) {
             GeoRenderer.geo_process_root(this.gCurrentArea.geometryLayoutData, null, null, null)

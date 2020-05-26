@@ -18,6 +18,7 @@ class LevelCommands {
 
     init_level(args) {
         //console.log("init level")
+        Area.clear_areas()
         this.sCurrentScript.index++
     }
 
@@ -59,6 +60,12 @@ class LevelCommands {
         this.sCurrentScript.index++
     }
 
+    unload_area(args) {
+        Area.clear_areas()
+        //clear_area_graph_nodes -- call all node functions with init and clear command
+        this.sCurrentScript.index++
+    }
+
     begin_area(args) {
         //console.log("begin area")
 
@@ -88,7 +95,7 @@ class LevelCommands {
 
     execute(args) {
         //console.log("execute")
-        this.start_new_script(args[3])
+        this.start_new_script(args[0])
     }
 
     start_new_script(level_script) {
@@ -99,7 +106,6 @@ class LevelCommands {
     level_script_execute() {
         this.sScriptStatus = SCRIPT_RUNNING
 
-        console.log("new frame")
         while (this.sScriptStatus == SCRIPT_RUNNING) {
             const cmd = this.sCurrentScript.commands[this.sCurrentScript.index]
             //console.log("running script command: " + cmd.command.name)

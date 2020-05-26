@@ -703,8 +703,6 @@ export class n64GfxProcessor {
 
     sp_vertex(dest_index, vertices) {
 
-        //console.log(JSON.stringify(this.rsp.MP_matrix))
-
         for (let i = 0; i < vertices.length; i++, dest_index++) {
             const v = vertices[i]
             const d = this.rsp.loaded_vertices[dest_index]

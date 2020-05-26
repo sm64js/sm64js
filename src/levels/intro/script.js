@@ -11,10 +11,11 @@ export let level_intro_entry_1 = [
     { command: LevelCommands.sleep, args: [75] },
     { command: LevelCommands.transition, args: [WARP_TRANSITION_FADE_INTO_COLOR, 16, 0, 0, 0] },
     { command: LevelCommands.sleep, args: [16] },
-    { command: LevelCommands.unload_area, args: [1] }
+    { command: LevelCommands.unload_area, args: [1] },
+    { command: LevelCommands.sleep, args: [2] },
 ]
 
 // repeat forever
 level_intro_entry_1.push(
-    { command: LevelCommands.execute, args: [/*seg*/ 0x14, /*script*/ null, /*scriptEnd*/ null, /*entry*/ level_intro_entry_1] }
+    { command: LevelCommands.execute, args: [level_intro_entry_1] }
 )

@@ -13,7 +13,7 @@ export const intro_geo_0002D0 = [
     { command: GeoLayout.open_node },
     { command: GeoLayout.node_ortho, args: [100] },
     { command: GeoLayout.open_node },
-    { command: GeoLayout.node_background, args: [0x0F01] },
+    { command: GeoLayout.node_background, args: [0x0001] },
     { command: GeoLayout.close_node },
     { command: GeoLayout.close_node },
     { command: GeoLayout.node_master_list, args: [1] },

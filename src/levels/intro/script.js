@@ -2,6 +2,13 @@ import { LevelCommandsInstance as LevelCommands } from "../../engine/LevelComman
 import { intro_geo_0002D0 } from "./geo"
 import { WARP_TRANSITION_FADE_INTO_COLOR } from "../../game/Area"
 
+export let level_intro_entry_2 = [
+    { command: LevelCommands.init_level },
+    { command: LevelCommands.blackout, args: [true] },
+    { command: LevelCommands.load_mario_head, args: [LevelCommands.REGULAR_FACE] },
+    { command: LevelCommands.sleep, args: [160000000] },
+]
+
 export let level_intro_entry_1 = [
     { command: LevelCommands.init_level },
     { command: LevelCommands.alloc_level_pool },
@@ -13,9 +20,6 @@ export let level_intro_entry_1 = [
     { command: LevelCommands.sleep, args: [16] },
     { command: LevelCommands.unload_area, args: [1] },
     { command: LevelCommands.sleep, args: [2] },
+    { command: LevelCommands.execute, args: [level_intro_entry_2] }
 ]
 
-// repeat forever
-level_intro_entry_1.push(
-    { command: LevelCommands.execute, args: [level_intro_entry_1] }
-)

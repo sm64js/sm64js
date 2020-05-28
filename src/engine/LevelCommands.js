@@ -1,7 +1,7 @@
 import { GeoLayoutInstance as GeoLayout } from "./GeoLayout"
 import { AreaInstance as Area } from "../game/Area"
 import { GameInstance as Game } from "../game/Game"
-
+import { GoddardRendererInstance as GoddardRenderer } from "../goddard/GoddardRenderer"
 
 const SCRIPT_RUNNING = 1
 const SCRIPT_PAUSED = 0
@@ -14,11 +14,22 @@ class LevelCommands {
         this.sDelayFrames = 0
         this.sCurrentScript = {}
         this.sRegister = null
+
+        this.REGULAR_FACE = 0x0002
+        this.DIZZY_FACE   = 0x0003
     }
 
     init_level(args) {
         //console.log("init level")
+        if (this.gObjParentGraphNode) {
+            throw "more implementation needed in init level"
+        }
         Area.clear_areas()
+        this.sCurrentScript.index++
+    }
+
+    load_mario_head(args) {
+        GoddardRenderer.gdm_setup()
         this.sCurrentScript.index++
     }
 
@@ -94,7 +105,6 @@ class LevelCommands {
     }
 
     execute(args) {
-        //console.log("execute")
         this.start_new_script(args[0])
     }
 
@@ -108,7 +118,7 @@ class LevelCommands {
 
         while (this.sScriptStatus == SCRIPT_RUNNING) {
             const cmd = this.sCurrentScript.commands[this.sCurrentScript.index]
-            //console.log("running script command: " + cmd.command.name)
+            console.log("running script command: " + cmd.command.name)
             cmd.command.call(this, cmd.args)
         }
 

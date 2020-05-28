@@ -48,11 +48,8 @@ export class n64GfxProcessor {
             P_matrix: new Array(4).fill(0).map(() => new Array(4).fill(0)),
             current_lights: new Array(MAX_LIGHTS + 1).fill(0).map(() => ({
                 col: [0, 0, 0],
-                pad1: 0,
                 colc: [0, 0, 0],
-                pad2: 0,
                 dir: [0, 0, 0],
-                pad3: 0
             })),
             current_lights_coeffs: new Array(MAX_LIGHTS).fill(0).map(() => new Array(3).fill(0.0)),
             current_lookat_coeffs: new Array(2).fill(0).map(() => new Array(3).fill(0.0)),
@@ -122,7 +119,7 @@ export class n64GfxProcessor {
     end_frame() { }
 
     sp_reset() {
-        this.rsp.modelview_matrix_stack_size = 1        
+        this.rsp.modelview_matrix_stack_size = 1
         this.rsp.current_num_lights = 2
         this.rsp.lights_changed = true
         this.MP_matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
@@ -178,7 +175,7 @@ export class n64GfxProcessor {
                     this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1],
                     matrix,
                     this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1],
-                    
+
                 )
             }
             this.rsp.lights_changed = true
@@ -611,7 +608,7 @@ export class n64GfxProcessor {
             this.rdp.other_mode_h = saved_other_mode_h
         }
 
-    } 
+    }
 
     dp_set_env_color(r, g, b, a) {
         this.rdp.env_color = { r, g, b, a }
@@ -620,15 +617,15 @@ export class n64GfxProcessor {
     dp_fill_rectangle(ulx, uly, lrx, lry) {
 
         if (this.rdp.color_image_address == this.rdp.z_buf_address) {
-            return 
+            return
         }
 
         const mode = this.rdp.other_mode_h & (3 << Gbi.G_MDSFT_CYCLETYPE)
 
         if (mode == Gbi.G_CYC_COPY || mode == Gbi.G_CYC_FILL || true) { ///TODO_OTHERMODE
             // Per documentation one extra pixel is added in this modes to each edge
-            lrx += 1 
-            lry += 1 
+            lrx += 1
+            lry += 1
         }
 
         for (let i = MAX_VERTICES; i < MAX_VERTICES + 4; i++) {

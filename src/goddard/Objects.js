@@ -4,8 +4,7 @@ import { DrawInstance as Draw } from "./Draw"
 class Objects {
     constructor() {
         this.sGdViewInfo = {
-            count: 0,
-            pad: new Array(0x14).fill(0)
+            count: 0
         }
 
         this.get_obj_name_str = {
@@ -30,7 +29,7 @@ class Objects {
             OBJ_TYPE_ZONES: "zones",
         }
     }
-            
+
     null_obj_lists() {
         this.D_801B9E44 = 0
         this.gGdObjCount = 0
@@ -39,14 +38,14 @@ class Objects {
         this.gGdCameraCount = 0
         this.sGdViewInfo.count = 0
 
-        this.gGdCameraList = []
-        this.D_801B9E50 = []
-        this.gGdBoneList = []
-        this.gGdJointList = []
-        this.gGdGroupList = []
-        this.D_801B9E80 = []
-        this.gGdObjectList = []
-        this.gGdViewsGroup = []
+        // this.gGdCameraList = null
+        // this.D_801B9E50 = null
+        // this.gGdBoneList = null
+        // this.gGdJointList = null
+        // this.gGdGroupList = null
+        // this.D_801B9E80 = null
+        // this.gGdObjectList = null
+        // this.gGdViewsGroup = null
     }
 
     make_object(objType) {
@@ -124,13 +123,12 @@ class Objects {
         const newObj = {}
 
         this.gGdObjCount++
-        this.objListOld = this.gGdObjectList
+        this.objListOldHead = this.gGdObjectList
         this.gGdObjectList = newObj
 
-        newObj.prev = null
-        if (this.objListOld.length > 0) {
-            newObj.next = this.objListOld[this.objListOld.length - 1]
-            this.objListOld[this.objListOld.length - 1].prev = newObj
+        if (this.objListOld) {
+            newObj.next = this.objListOldHead
+            this.objListOld.prev = newObj
         }
         newObj.number = this.gGdObjCount
         newObj.type = objType
@@ -143,18 +141,66 @@ class Objects {
 
     make_group(count) {
         const newGroup = this.make_object(GDTypes.OBJ_TYPE_GROUPS)
-        newGroup.id = this.gGdGroupCount++
+        newGroup.id = ++this.gGdGroupCount
         newGroup.objCount = 0
-        newGroup.link1C = null; newGroup.link20 = null
+
+        const oldGroupListHead = this.gGdGroupList
+        this.gGdGroupList = newGroup
+
+        if (oldGroupListHead) {
+          newGroup.next = oldGroupListHead
+          oldGroupListHead.prev = newGroup
+        }
+
+        if (count == 0) return newGroup
+
+        throw "more implementation needed, objects.js make_group"
     }
 
     make_view(name, flags, a2, ulx, uly, lrx, lry, parts) {
 
-        const newView = this.make_object(GDTypes.OBJ_TYPE_VIEWS)
-
-        if (this.gGdViewsGroup.length == 0) {
-            this.gGdViewsGroup.push(this.make_group(0))
+        const newView_GdObj = this.make_object(GDTypes.OBJ_TYPE_VIEWS)
+        const newView = {
+          header: newView_GdObj,
+          colourBufs: new Array(2)
         }
+
+        if (this.gGdViewsGroup == null) {
+            this.gGdViewsGroup = this.make_group(0)
+        }
+
+        this.addto_group(this.gGdViewsGroup, newView.header)
+
+        //left off
+
+    }
+
+    make_link_to_obj(head, a1) {
+      const newLink = { prev: null, next: null, obj: null }
+
+      if (head) {
+        head.next = newLink
+      }
+
+      newLink.prev = head
+      newLink.obj = a1
+
+      return newLink
+
+    }
+
+    addto_group(group, obj) {
+
+      if (group.link1C == null) {
+        group.link1C = this.make_link_to_obj(null, obj)
+        group.link20 = group.link1C
+      } else {
+        group.link20 = this.make_link_to_obj(group.link20, obj)
+      }
+
+      group.groupObjTypes |= obj.type
+      group.objCount++
+
     }
 }
 

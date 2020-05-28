@@ -33,8 +33,6 @@ class GoddardRenderer {
             id: 0,
             number: 0,
 
-            pad: new Array(4).fill(0)
-
         }
 
         if (verts == 0) verts = 1

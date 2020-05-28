@@ -6,7 +6,7 @@ class Draw {
     nop_obj_draw() { }
 
     draw_group() {
-
+      
     }
 }
 

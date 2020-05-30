@@ -1,5 +1,6 @@
 import { ObjectsInstance as Objects } from "./Objects"
 import { DynlistProcInstance as Dynlist } from "./DynlistProc"
+import { dynlist_mario_master } from "./dynlists/dynlist_mario_master"
 import * as GDTypes from "./gd_types"
 
 class ShapeHelper {
@@ -19,9 +20,13 @@ class ShapeHelper {
 
     load_mario_head(aniFn) {
         Dynlist.d_copystr_to_idbuf("l")
+
         Dynlist.dynid_is_int(true)
-        const sp23 = Dynlist.d_makeobj(Dynlist.D_ANIMATOR, 1001)
+        const sp28 = Dynlist.d_makeobj(Dynlist.D_ANIMATOR, 1001)
+        sp28.fn48 = aniFn
         Dynlist.dynid_is_int(false)
+
+        this.gMarioFaceGrp = DynList.load_dynlist(dynlist_mario_master)
 
     }
 

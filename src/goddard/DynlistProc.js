@@ -5,6 +5,7 @@ class DynlistProc {
     constructor() {
         this.sDynIdBuf = ""
         this.sUnnamedObjCount = 0
+        this.sLoadedDynObjs = 0
 
         this.D_CAR_DYNAMICS = 0
         this.D_NET = 1
@@ -27,6 +28,54 @@ class DynlistProc {
         this.D_GROUP = 18
     }
 
+    get_dynobj_info(id) {
+      let buf = ""
+      if (this.sLoadedDynObjs == 0) return
+
+      if (this.sGdDynObjIdIsInt) {
+        buf = `N${id}`
+      } else {
+        buf = id.toString()
+      }
+
+      buf += this.sDynNetIdBuf
+      return this.sLoadedDynObjs.find(x => x.name == buf)
+    }
+
+    add_to_dynobj_list(newobj, id) {
+      let idbuf = ""
+
+      if (this.sGdDynObjList == null) {
+        this.sGdDynObjList = {}
+      }
+
+      if (this.sGdDynObjIdIsInt) {
+        idbuf = `N${id}`
+        id = null
+      } else {
+        idbuf = `U${this.sLoadedDynObjs + 1}`
+      }
+
+      if (id) {
+        if (this.get_dynobj_info(id)) throw "fail object with same id exists"
+        this.sGdDynObjList[this.sLoadedDynObjs].name = id.toString()
+      } else {
+        this.sGdDynObjList[this.sLoadedDynObjs].name = idbuf
+      }
+
+      this.sGdDynObjList[this.sLoadedDynObjs].name += this.sDynIdBuf
+
+      if (this.sGdDynObjList[this.sLoadedDynObjs].name.length > DYNOBJ_NAME_SIZE - 1)
+        throw "error dyn list obj name too long"
+
+      this.sGdDynObjList[this.sLoadedDynObjs].num = this.sLoadedDynObjs
+      this.sDynListCurInfo = this.sGdDynObjList[this.sLoadedDynObjs]
+      this.sGdDynObjList[this.sLoadedDynObjs++].obj = newObj
+
+      if (this.sLoadedDynObjs >= DYNOBJ_LIST_SIZE) throw "too many dynlist objects"
+      this.sDynListCurObj = newObj
+    }
+
     d_makeobj(type, id) {
 
         let dobj
@@ -38,6 +87,9 @@ class DynlistProc {
             default:
                 throw "unimplemented d_makeobj"
         }
+
+        this.add_to_dynobj_list(dobj, id)
+        return dobj
     }
 
     d_copystr_to_idbuf(str) { ///"1"
@@ -53,7 +105,7 @@ class DynlistProc {
     }
 
     dynid_is_int(isIntBool) {
-        this.sGdDynObjIdIsInst = isIntBool
+        this.sGdDynObjIdIsInt = isIntBool
     }
 
 }

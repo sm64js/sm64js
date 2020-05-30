@@ -25,7 +25,7 @@ class Objects {
             OBJ_TYPE_GADGETS: "gadgets",
             16384: "views",
             OBJ_TYPE_LABELS: "labels",
-            OBJ_TYPE_ANIMATORS: "animators",
+            0x00010000: "animators",
             OBJ_TYPE_VALPTRS: "valptrs",
             OBJ_TYPE_ZONES: "zones",
         }
@@ -50,7 +50,17 @@ class Objects {
     }
 
     make_animator() {
-        throw "todo"
+      const newAnim_GdObj = this.make_object(GDTypes.OBJ_TYPE_ANIMATORS)
+      const newAnim = {
+        header: newAnim_GdObj,
+      }
+
+      newAnim.unk24 = 1.0
+      newAnim.unk28 = 1.0
+
+      newAnim.unk4C = 0
+
+      return newAnim
     }
 
     make_object(objType) {
@@ -109,9 +119,9 @@ class Objects {
             //case GDTypes.OBJ_TYPE_LABELS:
             //    objDrawFn = Draw.draw_label
             //    break
-            //case GDTypes.OBJ_TYPE_ANIMATORS:
-            //    objDrawFn = Draw.nop_obj_draw
-            //    break
+            case GDTypes.OBJ_TYPE_ANIMATORS:
+               objDrawFn = Draw.nop_obj_draw
+               break
             //case GDTypes.OBJ_TYPE_VALPTRS:
             //    objDrawFn = Draw.nop_obj_draw
             //    break

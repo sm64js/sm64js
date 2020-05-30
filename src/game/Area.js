@@ -62,6 +62,8 @@ class Area {
     render_game() {
         if (this.gCurrentArea) {
             GeoRenderer.geo_process_root(this.gCurrentArea.geometryLayoutData, null, null, null)
+        } else {
+            console.log("GeoArea is NULL")
         }
     }
 

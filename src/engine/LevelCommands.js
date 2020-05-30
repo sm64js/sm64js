@@ -30,6 +30,7 @@ class LevelCommands {
 
     load_mario_head(args) {
         GoddardRenderer.gdm_setup()
+        GoddardRenderer.gdm_maketestdl(args[0])
         this.sCurrentScript.index++
     }
 

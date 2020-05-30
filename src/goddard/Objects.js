@@ -1,5 +1,6 @@
 import * as GDTypes from "./gd_types"
 import { DrawInstance as Draw } from "./Draw"
+import { GoddardRendererInstance as Renderer } from "./GoddardRenderer"
 
 class Objects {
     constructor() {
@@ -12,7 +13,7 @@ class Objects {
             OBJ_TYPE_BONES: "bones",
             1: "groups",
             OBJ_TYPE_PARTICLES: "particles",
-            OBJ_TYPE_SHAPES: "shapes",
+            16: "shapes",
             OBJ_TYPE_NETS: "nets",
             OBJ_TYPE_PLANES: "planes",
             OBJ_TYPE_VERTICES: "vertices",
@@ -48,6 +49,10 @@ class Objects {
         // this.gGdViewsGroup = null
     }
 
+    make_animator() {
+        throw "todo"
+    }
+
     make_object(objType) {
 
         let objDrawFn = null
@@ -65,9 +70,9 @@ class Objects {
             //case GDTypes.OBJ_TYPE_PARTICLES:
             //    objDrawFn = Draw.draw_particle
             //    break
-            //case GDTypes.OBJ_TYPE_SHAPES:
-            //    objDrawFn = Draw.nop_obj_draw
-            //    break
+            case GDTypes.OBJ_TYPE_SHAPES:
+                objDrawFn = Draw.nop_obj_draw
+                break
             //case GDTypes.OBJ_TYPE_UNK200000:
             //    objDrawFn = Draw.nop_obj_draw
             //    break
@@ -171,8 +176,35 @@ class Objects {
 
         this.addto_group(this.gGdViewsGroup, newView.header)
 
-        //left off
+        newView.flags = flags | GDTypes.VIEW_UPDATE | GDTypes.VIEW_LIGHT
+        newView.id = this.sGdViewInfo.count++
 
+        newView.components = parts
+        if (newView.components) {
+            throw "more implementation newView components"
+        }
+
+        Object.assign(newView, {
+            unk78: 0,
+            unk38: a2,
+            clipping: { x: 30.0, y: 5000.0, z: 45.0 },
+            upperLeft: { x: ulx, y: uly },
+            lowerRight: { x: lrx, y: lry },
+            unk48: 1.0,
+            unk4C: 1.0,
+            colour: { r: newView.id * 0.1, g: 0.06, b: 1.0 },
+            proc: null,
+            unk9C: 0
+        })
+
+        if (name) {
+            Renderer.setup_view_buffers(name, newView)
+        }
+
+        newView.namePtr = name
+        newView.lights = null
+
+        return newView
     }
 
     make_link_to_obj(head, a1) {

@@ -801,7 +801,12 @@ export class n64GfxProcessor {
                     this.dp_fill_rectangle(args.ulx, args.uly, args.lrx, args.lry)
                     break
                 case Gbi.G_DL:
-                    this.run_dl(args.childDisplayList)
+                    if (args.branch == 0) {
+                        this.run_dl(args.childDisplayList)
+                    } else {
+                        this.run_dl(args.childDisplayList)
+                        return
+                    }
                     break
                 default:
                     throw "unimplemented gfx opcode: " + opcode

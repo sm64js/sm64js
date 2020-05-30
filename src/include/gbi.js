@@ -377,6 +377,15 @@ export const gSPEndDisplayList = (displaylist) => {
     })
 }
 
+export const gSPBranchList = (displaylist, childDisplayList) => {
+    displaylist.push({
+        words: {
+            w0: G_DL,
+            w1: { childDisplayList, branch: G_DL_NOPUSH }
+        }
+    })
+}
+
 export const gSPDisplayList = (displaylist, childDisplayList) => {
     displaylist.push({
         words: {
@@ -394,6 +403,16 @@ export const gsSPDisplayList = (childDisplayList) => {
         }
     }
 }
+
+export const gsSPBranchList = (childDisplayList) => {
+    return {
+        words: {
+            w0: G_DL,
+            w1: { childDisplayList, branch: G_DL_NOPUSH }
+        }
+    }
+}
+
 
 export const gsSPEndDisplayList = () => {
     return {

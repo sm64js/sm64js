@@ -1,6 +1,7 @@
 import { ObjectsInstance as Objects } from "./Objects"
 import { DynlistProcInstance as Dynlist } from "./DynlistProc"
 import { dynlist_mario_master } from "./dynlists/dynlist_mario_master"
+import { dynlist_unused } from "./dynlists/dynlist_unused"
 import * as GDTypes from "./gd_types"
 
 class ShapeHelper {
@@ -26,7 +27,7 @@ class ShapeHelper {
         sp28.fn48 = aniFn
         Dynlist.dynid_is_int(false)
 
-        this.gMarioFaceGrp = DynList.load_dynlist(dynlist_mario_master)
+        this.gMarioFaceGrp = Dynlist.proc_dynlist(dynlist_mario_master)
 
     }
 
@@ -67,6 +68,9 @@ class ShapeHelper {
 
     load_shapes2() {
         this.func_80197280()
+        this.sCubeShape = this.make_shape(0, "cube")
+        this.D_801A82E4 = Dynlist.proc_dynlist(dynlist_unused)
+        throw "todo loadShapes2"
     }
 }
 

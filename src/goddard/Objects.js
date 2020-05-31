@@ -16,9 +16,9 @@ class Objects {
             16: "shapes",
             OBJ_TYPE_NETS: "nets",
             OBJ_TYPE_PLANES: "planes",
-            OBJ_TYPE_VERTICES: "vertices",
+            256: "vertices",
             OBJ_TYPE_CAMERAS: "cameras",
-            OBJ_TYPE_FACES: "faces",
+            128: "faces",
             OBJ_TYPE_MATERIALS: "materials",
             OBJ_TYPE_LIGHTS: "lights",
             OBJ_TYPE_WEIGHTS: "weights",
@@ -50,17 +50,35 @@ class Objects {
     }
 
     make_animator() {
-      const newAnim_GdObj = this.make_object(GDTypes.OBJ_TYPE_ANIMATORS)
-      const newAnim = {
-        header: newAnim_GdObj,
-      }
 
-      newAnim.unk24 = 1.0
-      newAnim.unk28 = 1.0
+        return {
+            header: this.make_object(GDTypes.OBJ_TYPE_ANIMATORS),
+            unk24: 1.0,
+            unk28: 1.0,
+            unk4C: 0
+        }
+    }
 
-      newAnim.unk4C = 0
+    make_vertex(x, y, z) {
+        return {
+            header: this.make_object(GDTypes.OBJ_TYPE_VERTICES),
+            id: 0xD1D4,
+            scaleFactor: 1.0,
+            alpha: 1.0,
+            normal: { x: 0.0, y: 1.0, z: 0.0 },
+            pos: { x, y, z },
+            initPos: { x, y, z }
+        }
+    }
 
-      return newAnim
+    make_face_with_colour(r, g, b) {
+        return {
+            header: this.make_object(GDTypes.OBJ_TYPE_FACES),
+            colour: { r, g, b },
+            vtxCount: 0,
+            vertices: [],
+            mtlId: -1
+        }
     }
 
     make_object(objType) {
@@ -92,15 +110,15 @@ class Objects {
             //case GDTypes.OBJ_TYPE_PLANES:
             //    objDrawFn = Draw.draw_plane
             //    break
-            //case GDTypes.OBJ_TYPE_VERTICES:
-            //    objDrawFn = Draw.nop_obj_draw
-            //    break
+            case GDTypes.OBJ_TYPE_VERTICES:
+                objDrawFn = Draw.nop_obj_draw
+                break
             //case GDTypes.OBJ_TYPE_CAMERAS:
             //    objDrawFn = Draw.draw_camera
             //    break
-            //case GDTypes.OBJ_TYPE_FACES:
-            //  objDrawFn = Draw.draw_face
-            //    break
+            case GDTypes.OBJ_TYPE_FACES:
+                objDrawFn = Draw.draw_face
+                break
             //case GDTypes.OBJ_TYPE_MATERIALS:
             //  objDrawFn = Draw.draw_material
             //    break
@@ -155,9 +173,11 @@ class Objects {
     }
 
     make_group(count) {
-        const newGroup = this.make_object(GDTypes.OBJ_TYPE_GROUPS)
-        newGroup.id = ++this.gGdGroupCount
-        newGroup.objCount = 0
+        const newGroup = {
+            header: this.make_object(GDTypes.OBJ_TYPE_GROUPS),
+            objCount: 0,
+            id: ++this.gGdGroupCount
+        }
 
         const oldGroupListHead = this.gGdGroupList
         this.gGdGroupList = newGroup

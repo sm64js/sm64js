@@ -87,11 +87,38 @@ class ShapeHelper {
 
     }
 
+    scale_obj_position(obj) {
+        if (obj.type == GDTypes.OBJ_TYPE_GROUPS) return
+
+        Dynlist.set_cur_dynobj(obj.obj)
+        let pos = {}
+        Dynlist.d_get_rel_pos(pos)
+
+        pos.x *= this.sVertexScaleFactor.x
+        pos.y *= this.sVertexScaleFactor.y
+        pos.z *= this.sVertexScaleFactor.z
+
+        Dynlist.d_set_rel_pos({ x: pos.x, y: pos.y, z: pos.z })
+        Dynlist.d_set_init_pos({ x: pos.x, y: pos.y, z: pos.z })
+
+    }
+
+    scale_verts_in_shape(shape, x, y, z) {
+        this.sVertexScaleFactor = { x, y, z }
+
+        if (shape.vtxGroup) {
+            Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_ALL, this.scale_obj_position, shape.vtxGroup)
+        }
+    }
+
     load_shapes2() {
         this.func_80197280()
-        this.sCubeShape = this.make_shape(0, "cube")
-        this.D_801A82E4 = Dynlist.proc_dynlist(dynlist_unused)
-        throw "todo loadShapes2"
+        //this.sCubeShape = this.make_shape(0, "cube")
+        const D_801A82E4 = Dynlist.proc_dynlist(dynlist_unused)
+        this.scale_verts_in_shape(D_801A82E4, 200.0, 200.0, 200.0)
+
+        //const D_801A82E8 = Dynlist.proc_dynlist(dynlist_test_cube)
+        //more here todo
     }
 }
 

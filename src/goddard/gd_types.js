@@ -37,3 +37,5 @@ export const OBJ_TYPE_VALPTRS = 0x00020000
 export const OBJ_TYPE_LIGHTS = 0x00080000
 export const OBJ_TYPE_ZONES = 0x00100000
 export const OBJ_TYPE_UNK200000 = 0x00200000
+
+export const OBJ_TYPE_ALL = 0x00FFFFFF

@@ -1,5 +1,6 @@
 import * as GDTypes from "./gd_types"
 import { DrawInstance as Draw } from "./Draw"
+import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import { GoddardRendererInstance as Renderer } from "./GoddardRenderer"
 
 class Objects {
@@ -201,6 +202,8 @@ class Objects {
           colourBufs: new Array(2)
         }
 
+        newView.header.obj = newView
+
         if (this.gGdViewsGroup == null) {
             this.gGdViewsGroup = this.make_group(0)
         }
@@ -254,16 +257,52 @@ class Objects {
 
     addto_group(group, obj) {
 
-      if (group.link1C == null) {
-        group.link1C = this.make_link_to_obj(null, obj)
-        group.link20 = group.link1C
-      } else {
-        group.link20 = this.make_link_to_obj(group.link20, obj)
-      }
+        if (group.link1C == null) {
+            group.link1C = this.make_link_to_obj(null, obj)
+            group.link20 = group.link1C
+        } else {
+            group.link20 = this.make_link_to_obj(group.link20, obj)
+        }
 
-      group.groupObjTypes |= obj.type
-      group.objCount++
+        group.groupObjTypes |= obj.type
+        group.objCount++
 
+    }
+
+    apply_to_obj_types_in_group(types, fn, group) {
+        let fnAppliedCount = 0
+
+        if (group == null) return
+
+
+        if (group.linkType & 1) { //compressed data
+            return fnAppliedCount
+        }
+
+        if (!((group.groupObjTypes & GDTypes.OBJ_TYPE_GROUPS) | (group.groupObjTypes & types))) {
+            return fnAppliedCount
+        }
+
+        let curLink = group.link1C
+        let linkedObj, linkedObjType
+
+        while (curLink) {
+            linkedObj = curLink.obj
+            linkedObjType = linkedObj.type
+
+            if (linkedObjType == GDTypes.OBJ_TYPE_GROUPS) {
+                fnAppliedCount += this.apply_to_obj_types_in_group(types, fn, linkedObj.obj)
+            }
+
+            if (linkedObjType & types) {
+                fn.call(Shapes, linkedObj)
+                fnAppliedCount++
+            }
+
+            curLink = curLink.next
+        }
+
+        return fnAppliedCount
     }
 }
 

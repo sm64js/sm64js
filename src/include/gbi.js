@@ -467,6 +467,15 @@ export const gsDPSetEnvColor = (r, g, b, a) => {
     }
 }
 
+export const gsDPSetPrimColor = (m, l, r, g, b, a) => {
+    return {
+        words: {
+            w0: G_SETPRIMCOLOR,
+            w1: { m, l, r, g, b, a }
+        }
+    }
+}
+
 export const gsDPSetTile = (fmt, siz, line, tmem, tile, palette, cmt, maskt, shiftt, cms, masks, shifts) => {
   return {
     words: {

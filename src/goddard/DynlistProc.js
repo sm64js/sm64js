@@ -90,6 +90,29 @@ class DynlistProc {
                 default: throw "proc_dynlist(): unkown command"
             }
         })
+
+        return this.sDynListCurObj
+    }
+
+    set_cur_dynobj(obj) {
+        this.sDynListCurObj = obj
+        this.sDynListCurInfo = null
+    }
+
+    d_get_rel_pos(dst) {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- get rel pos"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_VERTICES:
+                dst.x = this.sDynListCurObj.pos.x
+                dst.y = this.sDynListCurObj.pos.y
+                dst.z = this.sDynListCurObj.pos.z
+                break
+            default:
+                throw "Object does not support function - get rel pos"
+        }
     }
 
     get_dynobj_info(id) {
@@ -138,7 +161,7 @@ class DynlistProc {
 
         this.sGdDynObjList[this.sLoadedDynObjs].num = this.sLoadedDynObjs
         this.sDynListCurInfo = this.sGdDynObjList[this.sLoadedDynObjs]
-        this.sGdDynObjList[this.sLoadedDynObjs++].obj = newObj
+        this.sGdDynObjList[this.sLoadedDynObjs++].obj = newObj.header
 
         if (this.sLoadedDynObjs >= DYNOBJ_LIST_SIZE) throw "too many dynlist objects"
         this.sDynListCurObj = newObj
@@ -346,6 +369,7 @@ class DynlistProc {
                 throw "unimplemented d_makeobj"
         }
 
+        dobj.header.obj = dobj
         this.add_to_dynobj_list(dobj, id)
         return dobj
     }

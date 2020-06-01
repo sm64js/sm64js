@@ -58,6 +58,11 @@ export const dynlist_unused = [  /// actually is used
     Macros.SetParamPtr(Dynlist.PARM_PTR_OBJ_VTX, 2),
     Macros.SetParamPtr(Dynlist.PARM_PTR_OBJ_VTX, 1),
     Macros.EndGroup("spotpg"),
+    Macros.UseObj("spotpg"),
+    Macros.MapVertices("spotvg"),
+    Macros.MakeDynObj(Dynlist.D_SHAPE, "spot_sh"),
+    Macros.SetNodeGroup("spotvg"),
+    Macros.SetPlaneGroup("spotpg"),
     Macros.SetParamF(1, 0.1),
     Macros.StopList()
 ]

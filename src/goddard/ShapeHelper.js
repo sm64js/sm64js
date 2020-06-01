@@ -2,6 +2,7 @@ import { ObjectsInstance as Objects } from "./Objects"
 import { DynlistProcInstance as Dynlist } from "./DynlistProc"
 import { dynlist_mario_master } from "./dynlists/dynlist_mario_master"
 import { dynlist_unused } from "./dynlists/dynlist_unused"
+import * as GDMath from "./gd_math"
 import * as GDTypes from "./gd_types"
 
 class ShapeHelper {
@@ -31,9 +32,29 @@ class ShapeHelper {
 
     }
 
+    calc_face_normal(face) {
+        const sp18 = 1000.0
+
+        if (face.vtxCount > 2) {
+            const sp28 = face.vertices[0], sp24 = face.vertices[1], sp20 = face.vertices[2]
+            const sp50 = { x: sp28.pos.x, y: sp28.pos.y, z: sp28.pos.z } 
+            const sp44 = { x: sp24.pos.x, y: sp24.pos.y, z: sp24.pos.z } 
+            const sp38 = { x: sp20.pos.x, y: sp20.pos.y, z: sp20.pos.z } 
+
+            const sp2c = {
+                x: (((sp44.y - sp50.y) * (sp38.z - sp44.z)) - ((sp44.z - sp50.z) * (sp38.y - sp44.y))) * sp18,
+                y: (((sp44.z - sp50.z) * (sp38.x - sp44.x)) - ((sp44.x - sp50.x) * (sp38.z - sp44.z))) * sp18,
+                z: (((sp44.x - sp50.x) * (sp38.y - sp44.y)) - ((sp44.y - sp50.y) * (sp38.x - sp44.x))) * sp18
+            }
+
+            GDMath.gd_normalize_vec3f(sp2c)
+            face.normal = sp2c
+        }
+    }
+
     make_shape(flag, name) {
 
-        const newShape = Objects.make_object(GDTypes.OBJ_TYPE_SHAPES)
+        const newShape = { header: Objects.make_object(GDTypes.OBJ_TYPE_SHAPES) }
 
         if (name) {
             newShape.name = name

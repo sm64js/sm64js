@@ -38,3 +38,19 @@ export const SetMaterial = (w1, w2) => {
 export const SetParamPtr = (w2, w1) => {
     return { cmd: 45, args: { w1, w2 } }
 }
+
+export const UseObj = (w1) => {
+    return { cmd: 30, args: { w1 } }
+}
+
+export const MapVertices = (w1) => {
+    return { cmd: 38, args: { w1 } }
+}
+
+export const SetNodeGroup = (w1) => {
+    return { cmd: 21, args: { w1 } }
+}
+
+export const SetPlaneGroup = (w1) => {
+    return { cmd: 23, args: { w1 } }
+}

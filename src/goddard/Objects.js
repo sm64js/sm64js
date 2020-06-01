@@ -176,6 +176,7 @@ class Objects {
         const newGroup = {
             header: this.make_object(GDTypes.OBJ_TYPE_GROUPS),
             objCount: 0,
+            linkType: 0,
             id: ++this.gGdGroupCount
         }
 

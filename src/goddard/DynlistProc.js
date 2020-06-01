@@ -1,5 +1,7 @@
 import { ObjectsInstance as Objects } from "./Objects"
-import { OBJ_TYPE_GROUPS, OBJ_TYPE_VERTICES, OBJ_TYPE_FACES } from "./gd_types"
+import { DrawInstance as Draw } from "./Draw"
+import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
+import * as GDTypes from "./gd_types"
 
 const DYNOBJ_NAME_SIZE = 8
 const DYNOBJ_LIST_SIZE = 3000
@@ -60,8 +62,20 @@ class DynlistProc {
                 case 17:
                     this.d_end_group(entry.args)
                     break
+                case 21:
+                    this.d_set_nodegroup(entry.args.w1)
+                    break
+                case 23:
+                    this.d_set_planegroup(entry.args.w1)
+                    break
+                case 30:
+                    this.d_use_obj(entry.args.w1)
+                    break
                 case 36:
                     this.d_set_material(entry.args.w1, entry.args.w2)
+                    break
+                case 38:
+                    this.d_map_vertices(entry.args.w1)
                     break
                 case 44:
                     this.d_set_parm_f(entry.args.w2, entry.args.vec.x)
@@ -130,13 +144,87 @@ class DynlistProc {
         this.sDynListCurObj = newObj
     }
 
+    chk_shapegen(shape) {
+        const shapeMtls = shape.mtlGroup
+        const shapeFaces = shape.faceGroup
+        const shapeVtx = shape.vtxGroup
+
+        if (shapeVtx && shapeFaces) {
+            if ((shapeVtx.linkType & 1) && (shapeFaces.linkType & 1)) {
+                throw "more implementation needed in chk shapegen"
+
+            }
+        }
+
+        if (shapeMtls) {
+            throw "more implementation needed in chk shapegen mtls"
+        }
+    }
+
+    d_set_planegroup(id) {
+        const info = this.get_dynobj_info(id)
+        if (info == null) throw "dEndGroup(\"%s\"): Undefined group"
+
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- set plane group"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_SHAPES:
+                this.sDynListCurObj.faceGroup = info.obj
+                this.chk_shapegen(this.sDynListCurObj)
+                break
+            default:
+                throw "object does not support this function - set node group"
+        }
+    }
+
+    d_set_nodegroup(id) {
+        const info = this.get_dynobj_info(id)
+        if (info == null) throw "dEndGroup(\"%s\"): Undefined group"
+
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- set node group"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_SHAPES:
+                this.sDynListCurObj.vtxGroup = info.obj
+                this.chk_shapegen(this.sDynListCurObj)
+                break
+            default:
+                throw "object does not support this function - set node group"
+        }
+    }
+
+    d_use_obj(id) {
+        const info = this.get_dynobj_info(id)
+        if (info == null) throw "dEndGroup(\"%s\"): Undefined group"
+
+        this.sDynListCurObj = info.obj
+        this.sDynListCurInfo = info
+
+        return info.obj
+    }
+
+    d_map_vertices(id) {
+        const info = this.get_dynobj_info(id)
+        if (info == null) throw "dEndGroup(\"%s\"): Undefined group"
+
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- map vertices"
+        }
+
+        Draw.map_vertices(this.sDynListCurObj, info.obj)
+    }
+
     d_set_parm_ptr(param, ptr) {
         if (this.sDynListCurObj == null) {
             throw "proc_dynlist(): No current object -- set param ptr"
         }
 
         switch (this.sDynListCurObj.header.type) {
-            case OBJ_TYPE_FACES:
+            case GDTypes.OBJ_TYPE_FACES:
                 if (param == this.PARM_PTR_OBJ_VTX) {
                     if (this.sDynListCurObj.vtxCount > 3) throw "too many points"
                     this.sDynListCurObj.vertices[this.sDynListCurObj.vtxCount++] = ptr
@@ -152,7 +240,7 @@ class DynlistProc {
             throw "proc_dynlist(): No current object -- set material"
         }
 
-        if (this.sDynListCurObj.header.type == OBJ_TYPE_FACES) {
+        if (this.sDynListCurObj.header.type == GDTypes.OBJ_TYPE_FACES) {
             this.sDynListCurObj.mtlId = mtlId
         } else throw "Obj does not support set material"
     }
@@ -163,7 +251,12 @@ class DynlistProc {
         }
 
         switch (this.sDynListCurObj.header.type) {
-            case OBJ_TYPE_VERTICES:
+            case GDTypes.OBJ_TYPE_SHAPES:
+                if (param == this.PARM_F_ALPHA) {
+                    this.sDynListCurObj.unk58 = val
+                } else throw "this object only supports alpha"
+                break
+            case GDTypes.OBJ_TYPE_VERTICES:
                 if (param == this.PARM_F_ALPHA) {
                     this.sDynListCurObj.alpha = val
                 } else throw "this object only supports alpha"
@@ -181,7 +274,7 @@ class DynlistProc {
         const dynobj = this.sDynListCurObj
 
         switch (this.sDynListCurObj.header.type) {
-            case OBJ_TYPE_VERTICES:
+            case GDTypes.OBJ_TYPE_VERTICES:
                 dynobj.pos = pos
                 break
             default:
@@ -198,7 +291,7 @@ class DynlistProc {
         const dynobj = this.sDynListCurObj
 
         switch (this.sDynListCurObj.header.type) {
-            case OBJ_TYPE_VERTICES:
+            case GDTypes.OBJ_TYPE_VERTICES:
                 this.d_set_rel_pos(pos)
                 dynobj.initPos = pos
                 break
@@ -223,7 +316,7 @@ class DynlistProc {
 
         const dynGrp = info.obj
         for (let i = info.num + 1; i < this.sLoadedDynObjs; i++) {
-            if (this.sGdDynObjList[i].obj.type != OBJ_TYPE_GROUPS) {
+            if (this.sGdDynObjList[i].obj.type != GDTypes.OBJ_TYPE_GROUPS) {
                 Objects.addto_group(dynGrp, this.sGdDynObjList[i].obj)
             }
         }
@@ -231,7 +324,7 @@ class DynlistProc {
 
     d_makeobj(type, id) {
 
-        let dobj, dgroup
+        let dobj
 
         switch (type) {
             case this.D_ANIMATOR:
@@ -239,13 +332,15 @@ class DynlistProc {
                 break
             case this.D_GROUP:
                 dobj = Objects.make_group(0)
-                dgroup = dobj
                 break
             case this.D_VERTEX:
                 dobj = Objects.make_vertex(0.0, 0.0, 0.0)
                 break
             case this.D_FACE:
                 dobj = Objects.make_face_with_colour(1.0, 1.0, 1.0)
+                break
+            case this.D_SHAPE:
+                dobj = Shapes.make_shape(0, id)
                 break
             default:
                 throw "unimplemented d_makeobj"

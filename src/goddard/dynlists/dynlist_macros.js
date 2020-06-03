@@ -54,3 +54,27 @@ export const SetNodeGroup = (w1) => {
 export const SetPlaneGroup = (w1) => {
     return { cmd: 23, args: { w1 } }
 }
+
+export const JumpToList = (list) => {
+    return { cmd: 12, args: { list } }
+}
+
+export const LinkWithPtr = (w1) => {
+    return { cmd: 29, args: { w1 } }
+}
+
+export const SetId = (id) => {
+    return { cmd: 35, args: { id } }
+}
+
+export const SetAmbient = (r, g, b) => {
+    return { cmd: 33, args: { vec: { r, g, b } } }
+}
+
+export const SetDiffuse = (r, g, b) => {
+    return { cmd: 34, args: { vec: { r, g, b } } }
+}
+
+export const SetMaterialGroup = (w1) => {
+    return { cmd: 20, args:  { w1 } }
+}

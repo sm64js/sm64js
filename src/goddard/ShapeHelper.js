@@ -32,6 +32,15 @@ class ShapeHelper {
 
     }
 
+    add_3_vtx_to_face(face, vtx1, vtx2, vtx3) {
+        face.vertices[0] = vtx1
+        face.vertices[1] = vtx2
+        face.vertices[2] = vtx3
+
+        face.vtxCount = 3
+        this.calc_face_normal(face)
+    }
+
     calc_face_normal(face) {
         const sp18 = 1000.0
 
@@ -49,6 +58,18 @@ class ShapeHelper {
 
             GDMath.gd_normalize_vec3f(sp2c)
             face.normal = sp2c
+        }
+    }
+
+    make_vertex(x, y, z) {
+        return {
+            header: Objects.make_object(GDTypes.OBJ_TYPE_VERTICES),
+            id: 0xD1D4,
+            pos: { x, y, z },
+            initPos: { x, y, z },
+            scaleFactor: 1.0,
+            alpha: 1.0,
+            normal: { x: 0.0, y: 1.0, z: 0.0 }
         }
     }
 

@@ -76,6 +76,26 @@ class Draw {
         }
 
     }
+
+    map_face_materials(faces, mtls) {
+
+        let linkFaces = faces.link1C
+        while (linkFaces) {
+            const face = linkFaces.obj.obj
+            let linkMtls = mtls.link1C
+            let mtl
+            while (linkMtls) {
+                mtl = linkMtls.obj.obj
+                if (mtl.id == face.mtlId) break
+                linkMtls = linkMtls.next
+            }
+
+            if (linkMtls) face.mtl = mtl 
+
+            linkFaces = linkFaces.next
+        }
+
+    }
 }
 
 export const DrawInstance = new Draw()

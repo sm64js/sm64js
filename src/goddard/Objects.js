@@ -1,5 +1,6 @@
 import * as GDTypes from "./gd_types"
 import { DrawInstance as Draw } from "./Draw"
+import { DynlistProcInstance as Dynlist } from "./DynlistProc"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import { GoddardRendererInstance as Renderer } from "./GoddardRenderer"
 
@@ -20,7 +21,7 @@ class Objects {
             256: "vertices",
             OBJ_TYPE_CAMERAS: "cameras",
             128: "faces",
-            OBJ_TYPE_MATERIALS: "materials",
+            2048: "materials",
             OBJ_TYPE_LIGHTS: "lights",
             OBJ_TYPE_WEIGHTS: "weights",
             OBJ_TYPE_GADGETS: "gadgets",
@@ -48,6 +49,29 @@ class Objects {
         // this.D_801B9E80 = null
         // this.gGdObjectList = null
         // this.gGdViewsGroup = null
+    }
+
+    make_link_to_obj(head, a1) {
+        const newLink = {}
+
+        if (head) {
+            head.next = newLink
+        }
+
+        newLink.prev = head
+        newLink.obj = a1
+
+        return newLink
+    }
+
+    make_material(a0, name, id) {
+        return {
+            header: this.make_object(GDTypes.OBJ_TYPE_MATERIALS),
+            name: name ? name : "NoName",
+            id,
+            gddlNumber: 0,
+            type: 16
+        }
     }
 
     make_animator() {
@@ -120,9 +144,9 @@ class Objects {
             case GDTypes.OBJ_TYPE_FACES:
                 objDrawFn = Draw.draw_face
                 break
-            //case GDTypes.OBJ_TYPE_MATERIALS:
-            //  objDrawFn = Draw.draw_material
-            //    break
+            case GDTypes.OBJ_TYPE_MATERIALS:
+                objDrawFn = Draw.draw_material
+                break
             //case GDTypes.OBJ_TYPE_LIGHTS:
             //    objDrawFn = Draw.draw_light
             //    break
@@ -154,23 +178,42 @@ class Objects {
         const objNameStr = this.get_obj_name_str[objType]
         if (objNameStr == undefined) throw "add this name"
 
-        const newObj = {}
+        const newObjHeader = {}
 
         this.gGdObjCount++
         this.objListOldHead = this.gGdObjectList
-        this.gGdObjectList = newObj
+        this.gGdObjectList = newObjHeader
 
-        if (this.objListOld) {
-            newObj.next = this.objListOldHead
-            this.objListOld.prev = newObj
+        if (this.objListOldHead) {
+            newObjHeader.next = this.objListOldHead
+            this.objListOldHead.prev = newObjHeader
         }
-        newObj.number = this.gGdObjCount
-        newObj.type = objType
-        newObj.objDrawFn = objDrawFn
-        newObj.drawFlags = 0
+        newObjHeader.number = this.gGdObjCount
+        newObjHeader.type = objType
+        newObjHeader.objDrawFn = objDrawFn
+        newObjHeader.drawFlags = 0
 
-        return newObj
+        return newObjHeader
 
+    }
+
+    make_group_of_type(type, fromObjHeader, toObjHeader) {
+        const newGroup = this.make_group(0)
+        newGroup.header.obj = newGroup
+        let curObjHeader = fromObjHeader
+
+        while (curObjHeader) {
+
+            if (curObjHeader.type & type) {
+                this.addto_group(newGroup, curObjHeader)
+            }
+
+            if (curObjHeader == toObjHeader) break
+
+            curObjHeader = curObjHeader.prev
+        }
+
+        return newGroup
     }
 
     make_group(count) {
@@ -206,6 +249,7 @@ class Objects {
 
         if (this.gGdViewsGroup == null) {
             this.gGdViewsGroup = this.make_group(0)
+            this.gGdViewsGroup.header.obj = this.gGdViewsGroup
         }
 
         this.addto_group(this.gGdViewsGroup, newView.header)
@@ -241,30 +285,16 @@ class Objects {
         return newView
     }
 
-    make_link_to_obj(head, a1) {
-      const newLink = { prev: null, next: null, obj: null }
-
-      if (head) {
-        head.next = newLink
-      }
-
-      newLink.prev = head
-      newLink.obj = a1
-
-      return newLink
-
-    }
-
-    addto_group(group, obj) {
+    addto_group(group, objheader) {
 
         if (group.link1C == null) {
-            group.link1C = this.make_link_to_obj(null, obj)
+            group.link1C = this.make_link_to_obj(null, objheader)
             group.link20 = group.link1C
         } else {
-            group.link20 = this.make_link_to_obj(group.link20, obj)
+            group.link20 = this.make_link_to_obj(group.link20, objheader)
         }
 
-        group.groupObjTypes |= obj.type
+        group.groupObjTypes |= objheader.type
         group.objCount++
 
     }

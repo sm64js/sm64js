@@ -438,6 +438,7 @@ class GoddardRenderer {
                     this.sMarioSceneGrp = this.gMarioFaceGrp
                     //this.gd_setup_cursor() TODO
                 }
+                this.sMarioSceneGrp = make_view_withgrp("mscene", this.sMarioSceneGrp)
                 break
             default:
                 throw "unimplemented mario head"

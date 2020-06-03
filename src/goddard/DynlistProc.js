@@ -2,9 +2,12 @@ import { ObjectsInstance as Objects } from "./Objects"
 import { DrawInstance as Draw } from "./Draw"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import * as GDTypes from "./gd_types"
+import * as GDMath from "./gd_math"
 
 const DYNOBJ_NAME_SIZE = 8
 const DYNOBJ_LIST_SIZE = 3000
+
+const VTX_BUF_SIZE = 3000
 
 class DynlistProc {
 
@@ -53,6 +56,9 @@ class DynlistProc {
                 case 0:
                     this.dynid_is_int(entry.args)
                     break
+                case 12:
+                    this.proc_dynlist(entry.args.list)
+                    break
                 case 15:
                     this.d_makeobj(entry.args.w2, entry.args.w1)
                     break
@@ -62,14 +68,29 @@ class DynlistProc {
                 case 17:
                     this.d_end_group(entry.args)
                     break
+                case 20:
+                    this.d_set_matgroup(entry.args.w1)
+                    break
                 case 21:
                     this.d_set_nodegroup(entry.args.w1)
                     break
                 case 23:
                     this.d_set_planegroup(entry.args.w1)
                     break
+                case 29:
+                    this.d_link_with_ptr(entry.args.w1)
+                    break
                 case 30:
                     this.d_use_obj(entry.args.w1)
+                    break
+                case 33:
+                    this.d_set_ambient(entry.args.vec)
+                    break
+                case 34:
+                    this.d_set_diffuse(entry.args.vec)
+                    break
+                case 35:
+                    this.d_set_id(entry.args.id)
                     break
                 case 36:
                     this.d_set_material(entry.args.w1, entry.args.w2)
@@ -161,10 +182,29 @@ class DynlistProc {
 
         this.sGdDynObjList[this.sLoadedDynObjs].num = this.sLoadedDynObjs
         this.sDynListCurInfo = this.sGdDynObjList[this.sLoadedDynObjs]
-        this.sGdDynObjList[this.sLoadedDynObjs++].obj = newObj.header
+        this.sGdDynObjList[this.sLoadedDynObjs++].obj = newObj
 
         if (this.sLoadedDynObjs >= DYNOBJ_LIST_SIZE) throw "too many dynlist objects"
         this.sDynListCurObj = newObj
+    }
+
+
+
+    d_link_with_ptr(ptr) {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- d_link_with_ptr"
+        }
+
+        const dynobj = this.sDynListCurObj
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_GROUPS:
+                const link = Objects.make_link_to_obj(null, ptr)
+                dynobj.link1C = link
+                break
+            default:
+                throw "object does not support this function d_link_with_ptr"
+        }
     }
 
     chk_shapegen(shape) {
@@ -173,15 +213,91 @@ class DynlistProc {
         const shapeVtx = shape.vtxGroup
 
         if (shapeVtx && shapeFaces) {
-            if ((shapeVtx.linkType & 1) && (shapeFaces.linkType & 1)) {
-                throw "more implementation needed in chk shapegen"
 
+            if ((shapeVtx.linkType & 1) && (shapeFaces.linkType & 1)) {
+                const vtxdata = shapeVtx.link1C.obj
+                const facedata = shapeFaces.link1C.obj
+
+                if (facedata.type != 1) throw "unsupported poly type"
+
+                if (vtxdata.type != 1) throw "unsupported vertex type"
+
+                if (vtxdata.count >= VTX_BUF_SIZE) throw "shapegen() too many vertices"
+
+                const vtxbuf = []
+                let oldObjHead = Objects.gGdObjectList
+
+                vtxdata.data.forEach(vertex => {
+                    const vtx = Shapes.make_vertex(vertex[0], vertex[1], vertex[2])
+                    vtx.normal = { x: 0.0, y: 0.0, z: 0.0 }
+                    vtxbuf.push(vtx)
+                })
+
+                const madeVtx = Objects.make_group_of_type(GDTypes.OBJ_TYPE_VERTICES, oldObjHead, null)
+
+                oldObjHead = Objects.gGdObjectList
+
+                for (let i = 0; i < facedata.data.length; i++) {
+                    const face = Objects.make_face_with_colour(1.0, 1.0, 1.0)
+                    face.header.obj = face
+                    face.mtlId = facedata.data[i][0]
+                    Shapes.add_3_vtx_to_face(face, vtxbuf[facedata.data[i][1]], vtxbuf[facedata.data[i][2]], vtxbuf[facedata.data[i][3]])
+
+                    vtxbuf[facedata.data[i][1]].normal.x += face.normal.x
+                    vtxbuf[facedata.data[i][1]].normal.y += face.normal.y
+                    vtxbuf[facedata.data[i][1]].normal.z += face.normal.z
+
+                    vtxbuf[facedata.data[i][2]].normal.x += face.normal.x
+                    vtxbuf[facedata.data[i][2]].normal.y += face.normal.y
+                    vtxbuf[facedata.data[i][2]].normal.z += face.normal.z
+
+                    vtxbuf[facedata.data[i][3]].normal.x += face.normal.x
+                    vtxbuf[facedata.data[i][3]].normal.y += face.normal.y
+                    vtxbuf[facedata.data[i][3]].normal.z += face.normal.z
+
+                }
+
+                if (shape.flag & 0x10) {
+                    vtxbuf.forEach(vertex => {
+                        vertex.normal.x += vertex.pos.x
+                        vertex.normal.y += vertex.pos.y
+                        vertex.normal.z += vertex.pos.z
+                        GDMath.gd_normalize_vec3f(vertex.normal)
+                    })
+                } else {
+                    vtxbuf.forEach(vertex => {
+                        GDMath.gd_normalize_vec3f(vertex.normal)
+                    })
+                }
+
+                const madeFaces = Objects.make_group_of_type(GDTypes.OBJ_TYPE_FACES, oldObjHead, null)
+
+                shape.faceGroup = madeFaces
+                shape.vtxGroup = madeVtx
             }
         }
 
         if (shapeMtls) {
-            throw "more implementation needed in chk shapegen mtls"
+            if (shape.faceGroup) {
+                Draw.map_face_materials(shape.faceGroup, shapeMtls)
+            } else {
+                throw "chk_shapegen() please set face group before mats"
+            }
         }
+    }
+
+    d_set_matgroup(id) {
+        const info = this.get_dynobj_info(id)
+        if (info == null) throw "dEndGroup(\"%s\"): Undefined group"
+
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- set material group"
+        }
+
+        if (this.sDynListCurObj.header.type == GDTypes.OBJ_TYPE_SHAPES) {
+            this.sDynListCurObj.mtlGroup = info.obj
+            this.chk_shapegen(this.sDynListCurObj)
+        } else throw "object does not support this function - set material group"
     }
 
     d_set_planegroup(id) {
@@ -218,6 +334,47 @@ class DynlistProc {
             default:
                 throw "object does not support this function - set node group"
         }
+    }
+
+    d_set_ambient(colour) {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- set ambient"
+        }
+        if (this.sDynListCurObj.header.type == GDTypes.OBJ_TYPE_MATERIALS) {
+            this.sDynListCurObj.Ka = colour
+        } else throw "object does not support this function - set ambient"
+    }
+
+    d_set_diffuse(colour) {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- set diffuse"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_MATERIALS:
+                this.sDynListCurObj.Kd = colour
+                break
+            case GDTypes.OBJ_TYPE_LIGHTS:
+                this.sDynListCurObj.diffuse = colour
+                break
+            default:
+                throw "Object does not support this function - set diffuse"
+        }
+    }
+
+    d_set_id(id) {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- set id"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_MATERIALS:
+                this.sDynListCurObj.id = id
+                break
+            default:
+                throw "Object does not support this function - set id"
+        }
+
     }
 
     d_use_obj(id) {
@@ -340,7 +497,7 @@ class DynlistProc {
         const dynGrp = info.obj
         for (let i = info.num + 1; i < this.sLoadedDynObjs; i++) {
             if (this.sGdDynObjList[i].obj.type != GDTypes.OBJ_TYPE_GROUPS) {
-                Objects.addto_group(dynGrp, this.sGdDynObjList[i].obj)
+                Objects.addto_group(dynGrp, this.sGdDynObjList[i].obj.header)
             }
         }
     }
@@ -364,6 +521,13 @@ class DynlistProc {
                 break
             case this.D_SHAPE:
                 dobj = Shapes.make_shape(0, id)
+                break
+            case this.D_DATA_GRP:
+                this.d_makeobj(this.D_GROUP, id)
+                this.sDynListCurObj.linkType = 1
+                return
+            case this.D_MATERIAL:
+                dobj = Objects.make_material(0, null, 0)
                 break
             default:
                 throw "unimplemented d_makeobj"

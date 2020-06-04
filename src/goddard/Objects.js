@@ -1,6 +1,5 @@
 import * as GDTypes from "./gd_types"
 import { DrawInstance as Draw } from "./Draw"
-import { DynlistProcInstance as Dynlist } from "./DynlistProc"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import { GoddardRendererInstance as Renderer } from "./GoddardRenderer"
 

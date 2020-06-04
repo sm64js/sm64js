@@ -78,3 +78,11 @@ export const SetDiffuse = (r, g, b) => {
 export const SetMaterialGroup = (w1) => {
     return { cmd: 20, args:  { w1 } }
 }
+
+export const SetFlag = (w2) => {
+    return { cmd: 8, args: { w2 } }
+}
+
+export const SetShapePtrPtr = (w1) => {
+    return { cmd: 24, args: { w1 } }
+}

@@ -2,18 +2,20 @@ import { ObjectsInstance as Objects } from "./Objects"
 import { DynlistProcInstance as Dynlist } from "./DynlistProc"
 import { dynlist_mario_master } from "./dynlists/dynlist_mario_master"
 import { dynlist_unused } from "./dynlists/dynlist_unused"
+import { DrawInstance as Draw } from "./Draw"
 import * as GDMath from "./gd_math"
 import * as GDTypes from "./gd_types"
+import { ShapeHelperGlobalsInstance as ShapesGlobals } from "./ShapeHelperGlobals"
 
 class ShapeHelper {
     constructor() {
-
+        this.gShape = ShapesGlobals.gShape
     }
 
     func_80197280() {
         this.sGdShapeCount = 0
         this.sGdShapeListHead = null
-        this.gGdLightGroup = Objects.make_group(0)
+        Draw.gGdLightGroup = Objects.make_group(0)
     }
 
     animate_mario_head_normal() {

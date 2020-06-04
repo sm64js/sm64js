@@ -39,3 +39,7 @@ export const OBJ_TYPE_ZONES = 0x00100000
 export const OBJ_TYPE_UNK200000 = 0x00200000
 
 export const OBJ_TYPE_ALL = 0x00FFFFFF
+
+export const LIGHT_UNK02 = 0x02 // old type of light?
+export const LIGHT_NEW_UNCOUNTED = 0x10
+export const LIGHT_UNK20 = 0x20 // new, actually used type of light? used for phong shading?

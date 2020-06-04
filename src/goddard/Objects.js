@@ -21,7 +21,7 @@ class Objects {
             OBJ_TYPE_CAMERAS: "cameras",
             128: "faces",
             2048: "materials",
-            OBJ_TYPE_LIGHTS: "lights",
+            0x80000: "lights",
             OBJ_TYPE_WEIGHTS: "weights",
             OBJ_TYPE_GADGETS: "gadgets",
             16384: "views",
@@ -80,6 +80,20 @@ class Objects {
             unk24: 1.0,
             unk28: 1.0,
             unk4C: 0
+        }
+    }
+
+    make_light(flags, name, id) {
+        return {
+            header: this.make_object(GDTypes.OBJ_TYPE_LIGHTS),
+            name: name ? name : "NoName",
+            id,
+            unk30: 1.0,
+            unk4C: 0,
+            flags: flags | GDTypes.LIGHT_NEW_UNCOUNTED,
+            unk98: 0,
+            unk40: 0,
+            unk68: { x: 0, y: 0, z: 0}
         }
     }
 
@@ -146,9 +160,9 @@ class Objects {
             case GDTypes.OBJ_TYPE_MATERIALS:
                 objDrawFn = Draw.draw_material
                 break
-            //case GDTypes.OBJ_TYPE_LIGHTS:
-            //    objDrawFn = Draw.draw_light
-            //    break
+            case GDTypes.OBJ_TYPE_LIGHTS:
+                objDrawFn = Draw.draw_light
+                break
             //case GDTypes.OBJ_TYPE_WEIGHTS:
             //  objDrawFn = Draw.nop_obj_draw
             //    break

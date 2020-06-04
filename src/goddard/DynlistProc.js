@@ -56,6 +56,9 @@ class DynlistProc {
                 case 0:
                     this.dynid_is_int(entry.args)
                     break
+                case 8:
+                    this.d_set_flags(entry.args.w2)
+                    break
                 case 12:
                     this.proc_dynlist(entry.args.list)
                     break
@@ -76,6 +79,9 @@ class DynlistProc {
                     break
                 case 23:
                     this.d_set_planegroup(entry.args.w1)
+                    break
+                case 24:
+                    this.d_set_shapeptrptr(entry.args.w1)
                     break
                 case 29:
                     this.d_link_with_ptr(entry.args.w1)
@@ -286,6 +292,26 @@ class DynlistProc {
         }
     }
 
+    d_set_flags(flags) {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- set flags"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_LIGHTS:
+                this.sDynListCurObj.flags |= flags
+                break
+            default:
+                throw "object does not support this function - set flags"
+
+        }
+    }
+
+    d_set_shapeptrptr(shpPtrPtr) {
+        console.log(shpPtrPtr.target)
+        throw "d_set_shapeptrptr"
+    }
+
     d_set_matgroup(id) {
         const info = this.get_dynobj_info(id)
         if (info == null) throw "dEndGroup(\"%s\"): Undefined group"
@@ -369,6 +395,9 @@ class DynlistProc {
 
         switch (this.sDynListCurObj.header.type) {
             case GDTypes.OBJ_TYPE_MATERIALS:
+                this.sDynListCurObj.id = id
+                break
+            case GDTypes.OBJ_TYPE_LIGHTS:
                 this.sDynListCurObj.id = id
                 break
             default:
@@ -528,6 +557,10 @@ class DynlistProc {
                 return
             case this.D_MATERIAL:
                 dobj = Objects.make_material(0, null, 0)
+                break
+            case this.D_LIGHT:
+                dobj = Objects.make_light(0, null, 0)
+                Objects.addto_group(Draw.gGdLightGroup, dobj)
                 break
             default:
                 throw "unimplemented d_makeobj"

@@ -4,7 +4,6 @@ import * as GDTypes from "./gd_types"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import * as Gbi from "../include/gbi"
 
-
 const MAX_GD_DLS = 1000
 
 const gd_texture_red_star_0 = [
@@ -283,29 +282,29 @@ class GoddardRenderer {
     }
 
     setup_stars() {
-        this.gShapeRedStar = Shapes.make_shape(0, "redstar")
-        this.gShapeRedStar.gdDls[0] = this.new_gddl_from(null)
-        this.gShapeRedStar.gdDls[1] = this.gShapeRedStar.gdDls[0]
-        this.sGdDLArray[this.gShapeRedStar.gdDls[0]].dlptr = gd_red_star_dl_array
-        this.sGdDLArray[this.gShapeRedStar.gdDls[1]].dlptr = gd_red_star_dl_array
+        Shapes.gShape.redStarPtr.target = Shapes.make_shape(0, "redstar")
+        Shapes.gShape.redStarPtr.target.gdDls[0] = this.new_gddl_from(null)
+        Shapes.gShape.redStarPtr.target.gdDls[1] = Shapes.gShape.redStarPtr.target.gdDls[0]
+        this.sGdDLArray[Shapes.gShape.redStarPtr.target.gdDls[0]].dlptr = gd_red_star_dl_array
+        this.sGdDLArray[Shapes.gShape.redStarPtr.target.gdDls[1]].dlptr = gd_red_star_dl_array
 
-        this.gShapeSilverStar = Shapes.make_shape(0, "silverstar")
-        this.gShapeSilverStar.gdDls[0] = this.new_gddl_from(null)
-        this.gShapeSilverStar.gdDls[1] = this.gShapeSilverStar.gdDls[0]
-        this.sGdDLArray[this.gShapeSilverStar.gdDls[0]].dlptr = gd_silver_star_dl_array
-        this.sGdDLArray[this.gShapeSilverStar.gdDls[1]].dlptr = gd_silver_star_dl_array
+        Shapes.gShape.silverStarPtr.target = Shapes.make_shape(0, "silverstar")
+        Shapes.gShape.silverStarPtr.target.gdDls[0] = this.new_gddl_from(null)
+        Shapes.gShape.silverStarPtr.target.gdDls[1] = Shapes.gShape.silverStarPtr.target.gdDls[0]
+        this.sGdDLArray[Shapes.gShape.silverStarPtr.target.gdDls[0]].dlptr = gd_silver_star_dl_array
+        this.sGdDLArray[Shapes.gShape.silverStarPtr.target.gdDls[1]].dlptr = gd_silver_star_dl_array
 
-        this.gShapeRedSpark = Shapes.make_shape(0, "sspark")
-        this.gShapeRedSpark.gdDls[0] = this.new_gddl_from(null)
-        this.gShapeRedSpark.gdDls[1] = this.gShapeRedSpark.gdDls[0]
-        this.sGdDLArray[this.gShapeRedSpark.gdDls[0]].dlptr = gd_red_sparkle_dl_array
-        this.sGdDLArray[this.gShapeRedSpark.gdDls[1]].dlptr = gd_red_sparkle_dl_array
+        Shapes.gShape.redSparkPtr.target = Shapes.make_shape(0, "sspark")
+        Shapes.gShape.redSparkPtr.target.gdDls[0] = this.new_gddl_from(null)
+        Shapes.gShape.redSparkPtr.target.gdDls[1] = Shapes.gShape.redSparkPtr.target.gdDls[0]
+        this.sGdDLArray[Shapes.gShape.redSparkPtr.target.gdDls[0]].dlptr = gd_red_sparkle_dl_array
+        this.sGdDLArray[Shapes.gShape.redSparkPtr.target.gdDls[1]].dlptr = gd_red_sparkle_dl_array
 
-        this.gShapeSilverSpark = Shapes.make_shape(0, "rspark")
-        this.gShapeSilverSpark.gdDls[0] = this.new_gddl_from(null)
-        this.gShapeSilverSpark.gdDls[1] = this.gShapeSilverSpark.gdDls[0]
-        this.sGdDLArray[this.gShapeSilverSpark.gdDls[0]].dlptr = gd_silver_sparkle_dl_array
-        this.sGdDLArray[this.gShapeSilverSpark.gdDls[1]].dlptr = gd_silver_sparkle_dl_array
+        Shapes.gShape.silverSparkPtr.target = Shapes.make_shape(0, "rspark")
+        Shapes.gShape.silverSparkPtr.target.gdDls[0] = this.new_gddl_from(null)
+        Shapes.gShape.silverSparkPtr.target.gdDls[1] = Shapes.gShape.silverSparkPtr.target.gdDls[0]
+        this.sGdDLArray[Shapes.gShape.silverSparkPtr.target.gdDls[0]].dlptr = gd_silver_sparkle_dl_array
+        this.sGdDLArray[Shapes.gShape.silverSparkPtr.target.gdDls[1]].dlptr = gd_silver_sparkle_dl_array
     }
 
     new_gddl_from(dl) {

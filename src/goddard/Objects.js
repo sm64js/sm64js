@@ -50,6 +50,17 @@ class Objects {
         // this.gGdViewsGroup = null
     }
 
+    group_contains_obj(group, objheader) {
+        let objLink = group.link1C
+
+        while (objLink) {
+            if (objLink.obj.number == objheader.number) return true
+            objLink = objLink.next
+        }
+
+        return false
+    }
+
     make_link_to_obj(head, a1) {
         const newLink = {}
 

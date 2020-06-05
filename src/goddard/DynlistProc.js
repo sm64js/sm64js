@@ -59,7 +59,7 @@ class DynlistProc {
                 case 0:
                     this.dynid_is_int(entry.args)
                     break
-                case 5: 
+                case 5:
                     this.d_set_scale(entry.args.vec)
                     break
                 case 6:
@@ -163,6 +163,22 @@ class DynlistProc {
                 break
             default:
                 throw "Object does not support function - get rel pos"
+        }
+    }
+
+    d_get_world_pos(dst) {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- get world pos"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_NETS:
+                dst.x = this.sDynListCurObj.unk14.x
+                dst.y = this.sDynListCurObj.unk14.y
+                dst.z = this.sDynListCurObj.unk14.z
+                break
+            default:
+                throw "Object does not support function - get world pos"
         }
     }
 
@@ -616,7 +632,7 @@ class DynlistProc {
                 this.d_set_rel_pos(pos)
                 dynobj.initPos = pos
                 break
-            default: 
+            default:
                 throw "Object type doesn't support set init pos"
         }
     }
@@ -626,7 +642,67 @@ class DynlistProc {
         this.d_set_init_pos(pos)
     }
 
+    push_dynobj_stash() {
+        this.sStashedDynObjInfo = this.sDynListCurInfo
+        this.sStashedDynObj = this.sDynListCurObj
+    }
+
+    pop_dynobj_stash() {
+        this.sDynListCurObj = this.sStashedDynObj
+        this.sDynListCurInfo = this.sStashedDynObjInfo
+    }
+
     d_attach_to(flag, objheader) {
+
+        this.push_dynobj_stash()
+
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- d_attach to"
+        }
+
+        let attgrp
+        switch (objheader.type) {
+            case GDTypes.OBJ_TYPE_NETS:
+                attgrp = objheader.obj.unk1D4
+                if (attgrp == null) {
+                    attgrp = Objects.make_group(0)
+                    attgrp.header.obj = attgrp
+                    objheader.obj.unk1D4 = attgrp
+                }
+                break
+            default:
+                throw "Object type doesn't support attach to"
+
+        }
+
+        if (Objects.group_contains_obj(attgrp, this.sDynListCurObj.header)) return
+
+        Objects.addto_group(attgrp, this.sDynListCurObj)
+
+        let dynobjPos = {}, objPos = {}
+        if (flag & 9) {
+            this.d_get_world_pos(dynobjPos)
+            this.set_cur_dynobj(objheader.obj)
+            this.d_get_world_pos(objPos)
+
+            dynobjPos.x -= objPos.x
+            dynobjPos.y -= objPos.y
+            dynobjPos.z -= objPos.z
+        }
+
+        this.pop_dynobj_stash()
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_NETS:
+                this.sDynListCurObj.unk1E4 = flag
+                this.sDynListCurObj.unk1E8 = objheader
+                break
+            default:
+                throw "Object type doesn't support attach to"
+        }
+
+        if (flag & 9) {
+            this.d_set_att_offset(dynobjPos)
+        }
 
     }
 

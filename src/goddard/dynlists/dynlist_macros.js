@@ -86,3 +86,32 @@ export const SetFlag = (w2) => {
 export const SetShapePtrPtr = (w1) => {
     return { cmd: 24, args: { w1 } }
 }
+
+export const SetShapePtr = (w1) => {
+    return { cmd: 25, args: { w1 } }
+}
+
+export const SetType = (w2) => {
+    return { cmd: 19, args: { w2 } }
+}
+
+export const SetScale = (x, y, z) => {
+    return { cmd: 5, args: { vec: { x, y, z } } }
+}
+
+export const SetRotation = (x, y, z) => {
+    return { cmd: 6, args: { vec: { x, y, z } } }
+}
+
+export const SetAttachOffset = (x, y, z) => {
+    return { cmd: 41, args: { vec: { x, y, z } } }
+
+}
+
+export const MakeNetWithSubGroup = (w2, w1) => {
+    return { cmd: 46, args: { w1, w2 } }
+}
+
+export const AttachTo = (w2, w1) => {
+    return { cmd: 40, args: { w1, w2 } }
+}

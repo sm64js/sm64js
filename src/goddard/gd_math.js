@@ -17,3 +17,13 @@ export const gd_normalize_vec3f = (vec) => {
 
     return true
 }
+
+export const gd_set_identity_mat4 = (mtx) => {
+    for (let i = 0; i < mtx.length; i++) {
+        for (let j = 0; j < mtx[i].length; j++) {
+            i == j ? mtx[i][j] = 1 : mtx[i][j] = 0
+        }
+    }
+    return mtx
+} 
+

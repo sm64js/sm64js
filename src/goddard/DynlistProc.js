@@ -1,8 +1,10 @@
 import { ObjectsInstance as Objects } from "./Objects"
 import { DrawInstance as Draw } from "./Draw"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
+import { NetsInstance as Nets } from "./Nets"
 import * as GDTypes from "./gd_types"
 import * as GDMath from "./gd_math"
+import { SetShapePtrPtr } from "./dynlists/dynlist_macros"
 
 const DYNOBJ_NAME_SIZE = 8
 const DYNOBJ_LIST_SIZE = 3000
@@ -15,6 +17,7 @@ class DynlistProc {
         this.sDynIdBuf = ""
         this.sUnnamedObjCount = 0
         this.sLoadedDynObjs = 0
+        this.sDynNetCount = 0
 
         this.PARM_F_ALPHA = 1
         this.PARM_F_RANGE_LEFT = 2
@@ -42,7 +45,7 @@ class DynlistProc {
         this.D_GROUP = 18
 
         this.PARM_PTR_OBJ_VTX = 1
-        this.PARM_PTR_CHAR  = 5
+        this.PARM_PTR_CHAR = 5
     }
 
     proc_dynlist(dylist) {
@@ -55,6 +58,12 @@ class DynlistProc {
                 case 0xD1D4: break /// startList case
                 case 0:
                     this.dynid_is_int(entry.args)
+                    break
+                case 5: 
+                    this.d_set_scale(entry.args.vec)
+                    break
+                case 6:
+                    this.d_set_rotation(entry.args.vec)
                     break
                 case 8:
                     this.d_set_flags(entry.args.w2)
@@ -71,6 +80,9 @@ class DynlistProc {
                 case 17:
                     this.d_end_group(entry.args)
                     break
+                case 19:
+                    this.d_set_type(entry.args.w2)
+                    break
                 case 20:
                     this.d_set_matgroup(entry.args.w1)
                     break
@@ -82,6 +94,9 @@ class DynlistProc {
                     break
                 case 24:
                     this.d_set_shapeptrptr(entry.args.w1)
+                    break
+                case 25:
+                    this.d_set_shapeptr(entry.args.w1)
                     break
                 case 29:
                     this.d_link_with_ptr(entry.args.w1)
@@ -104,11 +119,20 @@ class DynlistProc {
                 case 38:
                     this.d_map_vertices(entry.args.w1)
                     break
+                case 40:
+                    this.d_attachto_dynid(entry.args.w2, entry.args.w1)
+                    break
+                case 41:
+                    this.d_set_att_offset(entry.args.vec)
+                    break
                 case 44:
                     this.d_set_parm_f(entry.args.w2, entry.args.vec.x)
                     break
                 case 45:
                     this.d_set_parm_ptr(entry.args.w2, entry.args.w1)
+                    break
+                case 46:
+                    this.d_add_net_with_subgroup(entry.args.w2, entry.args.w1)
                     break
                 case 49:
                     this.d_make_vertex(entry.args.vec)
@@ -147,12 +171,15 @@ class DynlistProc {
         if (this.sLoadedDynObjs == 0) return
 
         if (this.sGdDynObjIdIsInt) {
-        buf = `N${id}`
+            buf = `N${id}`
         } else {
-        buf = id.toString()
+            buf = id.toString()
         }
 
         buf += this.sDynIdBuf
+
+        //console.log("finding obj with buf:  " + buf)
+
         return this.sGdDynObjList.find(x => x.name == buf)
     }
 
@@ -301,15 +328,58 @@ class DynlistProc {
             case GDTypes.OBJ_TYPE_LIGHTS:
                 this.sDynListCurObj.flags |= flags
                 break
+            case GDTypes.OBJ_TYPE_NETS:
+                this.sDynListCurObj.unk34 |= flags
+                break
             default:
                 throw "object does not support this function - set flags"
 
         }
     }
 
+    d_set_type(type) {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- set type"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_NETS:
+                this.sDynListCurObj.netType = type
+                break
+            default:
+                throw "object does not support this function - set type"
+
+        }
+    }
+
     d_set_shapeptrptr(shpPtrPtr) {
-        console.log(shpPtrPtr.target)
-        throw "d_set_shapeptrptr"
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- set shape ptr ptr"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_LIGHTS:
+                this.sDynListCurObj.unk9C = shpPtrPtr
+                break
+            default:
+                throw "object does not support this function - set shape ptr ptr"
+        }
+    }
+
+    d_set_shapeptr(id) {
+
+        if (id == null) return
+
+        const info = this.get_dynobj_info(id)
+        if (info == null) throw "dEndGroup(\"%s\"): Undefined group"
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_NETS:
+                this.sDynListCurObj.unk1A8 = info.obj
+                break
+            default:
+                throw "object does not support this function - set shape ptr"
+        }
     }
 
     d_set_matgroup(id) {
@@ -386,6 +456,48 @@ class DynlistProc {
             default:
                 throw "Object does not support this function - set diffuse"
         }
+    }
+
+    d_set_att_offset(off) {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- set attach offset"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_NETS:
+                this.sDynListCurObj.unk1D8 = { ...off }
+                this.sDynListCurObj.unk20 = { ...off }
+                break
+            default:
+                throw "Object does not support this function - set attach offset"
+        }
+    }
+
+    d_set_scale(vec) {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- set scale"
+        }
+
+        //push_dynobj_stash() TODO
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_NETS:
+                this.sDynListCurObj.unk1AC = vec
+                break
+            default:
+                throw "Object does not support this function - set scale"
+        }
+        //pop_dynobj_stash() TODO
+
+    }
+
+    d_set_rotation(vec) {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- set id"
+        }
+
+        if (this.sDynListCurObj.header.type == GDTypes.OBJ_TYPE_NETS) {
+            this.sDynListCurObj.unk68 = vec
+        } else throw "Object does not support this function - set rotation"
     }
 
     d_set_id(id) {
@@ -514,6 +626,23 @@ class DynlistProc {
         this.d_set_init_pos(pos)
     }
 
+    d_attach_to(flag, objheader) {
+
+    }
+
+    d_attachto_dynid(flag, id) {
+        if (id == null) return
+
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- d_attachto_dynid"
+        }
+
+        const info = this.get_dynobj_info(id)
+        if (info == null) throw "dEndGroup(\"%s\"): Undefined group"
+
+        this.d_attach_to(flag, info.obj.header)
+    }
+
     d_start_group(id) {
         this.d_makeobj(this.D_GROUP, id)
     }
@@ -529,6 +658,27 @@ class DynlistProc {
                 Objects.addto_group(dynGrp, this.sGdDynObjList[i].obj.header)
             }
         }
+    }
+
+    d_set_obj_draw_flag(flag) {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- d_set_obj_draw_flag"
+        }
+
+        this.sDynListCurObj.drawFlags |= flag
+    }
+
+    d_add_net_with_subgroup(a0, id) {
+        this.d_makeobj(this.D_NET, id)
+        this.d_set_obj_draw_flag(GDTypes.OBJ_NOT_DRAWABLE)
+        this.sDynNetIdBuf = `c${++this.sDynNetCount}`
+        this.d_set_type(4)
+        this.sBackBuf = this.sDynIdBuf
+        this.d_copystr_to_idbuf(this.sDynNetIdBuf)
+        this.d_start_group(id)
+        this.sDynIdBuf = this.sBackBuf
+        this.d_use_obj(id)
+        this.sParentNetInfo = this.sDynListCurInfo
     }
 
     d_makeobj(type, id) {
@@ -562,6 +712,9 @@ class DynlistProc {
                 dobj = Objects.make_light(0, null, 0)
                 Objects.addto_group(Draw.gGdLightGroup, dobj)
                 break
+            case this.D_NET:
+                dobj = Nets.make_net(0, null, null, null, null)
+                break
             default:
                 throw "unimplemented d_makeobj"
         }
@@ -579,7 +732,7 @@ class DynlistProc {
                 this.sDynIdBuf = str
             }
         } else {
-            this.sDynIdBuf[0] = '\0'
+            this.sDynIdBuf = ""
         }
     }
 

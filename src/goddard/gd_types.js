@@ -43,3 +43,9 @@ export const OBJ_TYPE_ALL = 0x00FFFFFF
 export const LIGHT_UNK02 = 0x02 // old type of light?
 export const LIGHT_NEW_UNCOUNTED = 0x10
 export const LIGHT_UNK20 = 0x20 // new, actually used type of light? used for phong shading?
+
+export const OBJ_DRAW_UNK01 = 0x01
+export const OBJ_NOT_DRAWABLE = 0x02 ///< This `GdObj` shouldn't be drawn when updating a scene
+export const OBJ_PICKED = 0x04 ///< This `GdObj` is held by the cursor
+export const OBJ_IS_GRABBALE = 0x08 ///< This `GdObj` can be grabbed/picked by the cursor
+export const OBJ_USE_ENV_COLOUR = 0x10

@@ -15,7 +15,7 @@ class Objects {
             1: "groups",
             OBJ_TYPE_PARTICLES: "particles",
             16: "shapes",
-            OBJ_TYPE_NETS: "nets",
+            32: "nets",
             OBJ_TYPE_PLANES: "planes",
             256: "vertices",
             OBJ_TYPE_CAMERAS: "cameras",
@@ -142,9 +142,9 @@ class Objects {
             //case GDTypes.OBJ_TYPE_UNK200000:
             //    objDrawFn = Draw.nop_obj_draw
             //    break
-            //case GDTypes.OBJ_TYPE_NETS:
-            //    objDrawFn = Draw.draw_net
-            //    break
+            case GDTypes.OBJ_TYPE_NETS:
+                objDrawFn = Draw.draw_net
+                break
             //case GDTypes.OBJ_TYPE_PLANES:
             //    objDrawFn = Draw.draw_plane
             //    break

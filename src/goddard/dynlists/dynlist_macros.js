@@ -115,3 +115,19 @@ export const MakeNetWithSubGroup = (w2, w1) => {
 export const AttachTo = (w2, w1) => {
     return { cmd: 40, args: { w1, w2 } }
 }
+
+export const SetSkinShape = (w1) => {
+    return { cmd: 22, args: { w1 } }
+}
+
+export const AttachNetToJoint = (w2, w1) => {
+    return { cmd: 47, args: { w2, w1 } }
+}
+
+export const SetSkinWeight = (w2, x) => {
+    return { cmd: 32, args: { w2, vec: { x } } }
+}
+
+export const EndNetSubGroup = (w1) => {
+    return { cmd: 48, args: { w1 } }
+}

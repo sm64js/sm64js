@@ -10,7 +10,7 @@ class Objects {
         }
 
         this.get_obj_name_str = {
-            OBJ_TYPE_JOINTS: "joints",
+            4: "joints",
             OBJ_TYPE_BONES: "bones",
             1: "groups",
             OBJ_TYPE_PARTICLES: "particles",
@@ -22,7 +22,7 @@ class Objects {
             128: "faces",
             2048: "materials",
             0x80000: "lights",
-            OBJ_TYPE_WEIGHTS: "weights",
+            4096: "weights",
             OBJ_TYPE_GADGETS: "gadgets",
             16384: "views",
             OBJ_TYPE_LABELS: "labels",
@@ -84,6 +84,15 @@ class Objects {
         }
     }
 
+    make_weight(a0, id, vtx, weight) {
+        return {
+            header: this.make_object(GDTypes.OBJ_TYPE_WEIGHTS),
+            id,
+            unk38: weight,
+            unk3C: vtx
+        }
+    }
+
     make_animator() {
 
         return {
@@ -135,9 +144,9 @@ class Objects {
         let objDrawFn = null
 
         switch (objType) {
-            //case GDTypes.OBJ_TYPE_JOINTS:
-            //    objDrawFn = Draw.draw_joint
-            //    break
+            case GDTypes.OBJ_TYPE_JOINTS:
+                objDrawFn = Draw.draw_joint
+                break
             //case GDTypes.OBJ_TYPE_BONES:
             //    objDrawFn = Draw.draw_bone
             //    break
@@ -174,9 +183,9 @@ class Objects {
             case GDTypes.OBJ_TYPE_LIGHTS:
                 objDrawFn = Draw.draw_light
                 break
-            //case GDTypes.OBJ_TYPE_WEIGHTS:
-            //  objDrawFn = Draw.nop_obj_draw
-            //    break
+            case GDTypes.OBJ_TYPE_WEIGHTS:
+                objDrawFn = Draw.nop_obj_draw
+                break
             //case GDTypes.OBJ_TYPE_GADGETS:
             //   objDrawFn = Draw.draw_gadget
             //    break

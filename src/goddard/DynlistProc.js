@@ -401,6 +401,9 @@ class DynlistProc {
             case GDTypes.OBJ_TYPE_NETS:
                 this.sDynListCurObj.unk34 |= flags
                 break
+            case GDTypes.OBJ_TYPE_CAMERAS:
+                this.sDynListCurObj.unk2C |= flags
+                break
             default:
                 throw "object does not support this function - set flags"
 
@@ -715,8 +718,31 @@ class DynlistProc {
             case GDTypes.OBJ_TYPE_VERTICES:
                 dynobj.pos = pos
                 break
+            case GDTypes.OBJ_TYPE_CAMERAS:
+                this.sDynListCurObj.unk40 = pos
+                this.sDynListCurObj.positions[0] = pos
+                this.sDynListCurObj.positions[1] = { x: pos.x * 1.5, y: pos.y * 1.5, z: pos.z * 1.5 }
+                this.sDynListCurObj.positions[2] = { x: pos.x * 2.0, y: pos.y * 2.0, z: pos.z * 2.0 }
+                this.sDynListCurObj.zoomLevels = 2
+                break
             default:
                 throw "Object type doesn't support set rel pos"
+        }
+
+    }
+
+    d_set_world_pos(pos) {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- set world pos"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+
+            case GDTypes.OBJ_TYPE_CAMERAS:
+                this.sDynListCurObj.unk14 = pos
+                break
+            default:
+                throw "Object type doesn't support set world pos"
         }
 
     }
@@ -855,7 +881,7 @@ class DynlistProc {
 
         const dynGrp = info.obj
         for (let i = info.num + 1; i < this.sLoadedDynObjs; i++) {
-            if (this.sGdDynObjList[i].obj.type != GDTypes.OBJ_TYPE_GROUPS) {
+            if (this.sGdDynObjList[i].obj.header.type != GDTypes.OBJ_TYPE_GROUPS) {
                 Objects.addto_group(dynGrp, this.sGdDynObjList[i].obj.header)
             }
         }
@@ -928,6 +954,9 @@ class DynlistProc {
                 break
             case this.D_NET:
                 dobj = Nets.make_net(0, null, null, null, null)
+                break
+            case this.D_CAMERA:
+                dobj = Objects.make_camera(0, null)
                 break
             default:
                 throw "unimplemented d_makeobj"

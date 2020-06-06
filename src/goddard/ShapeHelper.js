@@ -32,6 +32,18 @@ class ShapeHelper {
 
         this.gMarioFaceGrp = Dynlist.proc_dynlist(dynlist_mario_master)
 
+        const sp2C = Dynlist.d_makeobj(Dynlist.D_CAMERA, null)
+        Dynlist.d_set_rel_pos({ x: 0.0, y: 200.0, z: 2000.0 })
+        Dynlist.d_set_world_pos({ x: 0.0, y: 200.0, z: 2000.0 })
+        Dynlist.d_set_flags(4)
+        sp2C.unk34 = { x: 0.0, y: 200.0, z: 0.0 }
+
+        Objects.addto_group(this.gMarioFaceGrp, sp2C.header)
+        Objects.addto_group(this.gMarioFaceGrp, sp28.header)
+
+
+        throw "not finished in load mario head - shape helper"
+
     }
 
     add_3_vtx_to_face(face, vtx1, vtx2, vtx3) {

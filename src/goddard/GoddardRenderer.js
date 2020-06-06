@@ -429,6 +429,10 @@ class GoddardRenderer {
         }
     }
 
+    make_view_withgrp(name, grp) {
+
+    }
+
     gdm_maketestdl(id) {
         switch (id) {
             case 2: // Regular face
@@ -437,7 +441,8 @@ class GoddardRenderer {
                     this.sMarioSceneGrp = this.gMarioFaceGrp
                     //this.gd_setup_cursor() TODO
                 }
-                this.sMarioSceneGrp = make_view_withgrp("mscene", this.sMarioSceneGrp)
+                console.log(this.sMarioSceneGrp)
+                this.sMSceneView = this.make_view_withgrp("mscene", this.sMarioSceneGrp)
                 break
             default:
                 throw "unimplemented mario head"

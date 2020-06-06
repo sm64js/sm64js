@@ -2,12 +2,16 @@ import * as GDTypes from "./gd_types"
 import { DrawInstance as Draw } from "./Draw"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import { GoddardRendererInstance as Renderer } from "./GoddardRenderer"
+import { gd_set_identity_mat4 } from "./gd_math"
 
 class Objects {
     constructor() {
         this.sGdViewInfo = {
             count: 0
         }
+
+        this.gGdCameraCount = 0
+        this.gGdCameraList = null
 
         this.get_obj_name_str = {
             4: "joints",
@@ -18,7 +22,7 @@ class Objects {
             32: "nets",
             OBJ_TYPE_PLANES: "planes",
             256: "vertices",
-            OBJ_TYPE_CAMERAS: "cameras",
+            512: "cameras",
             128: "faces",
             2048: "materials",
             0x80000: "lights",
@@ -139,6 +143,44 @@ class Objects {
         }
     }
 
+    make_camera(a0, a1) {
+
+        this.gGdCameraCount++
+
+        const newCam = {
+            header: this.make_object(GDTypes.OBJ_TYPE_CAMERAS),
+            id: this.gGdCameraCount,
+            unk2C: a1 | 0x10,
+            unk30: a1,
+            unk180: { x: 1.0, y: 0.1, z: 1.0 },
+            unk124: { x: 4.0, y: 4.0, z: 4.0 },
+            unk178: 0.0,
+            unk17C: 0.25,
+            zoom: 0,
+            zoomLevels: -1,
+            unkA4: 0.0,
+            unk34: { x: 0.0, y: 0.0, z: 0.0 },
+            unk14: { x: 0.0, y: 0.0, z: 0.0 },
+            unk64: new Array(4).fill(0).map(() => new Array(4).fill(0)),
+            unkA8: new Array(4).fill(0).map(() => new Array(4).fill(0)),
+            positions: new Array(4)
+        }
+
+        const oldCameraHead = this.gGdCameraList
+        this.gGdCameraList = newCam
+
+        if (oldCameraHead) {
+            newCam.next = oldCameraHead
+            oldCameraHead.prev = newCam
+        }
+
+        gd_set_identity_mat4(newCam.unk64)
+        gd_set_identity_mat4(newCam.unkA8)
+
+        return newCam
+
+    }
+
     make_object(objType) {
 
         let objDrawFn = null
@@ -171,9 +213,9 @@ class Objects {
             case GDTypes.OBJ_TYPE_VERTICES:
                 objDrawFn = Draw.nop_obj_draw
                 break
-            //case GDTypes.OBJ_TYPE_CAMERAS:
-            //    objDrawFn = Draw.draw_camera
-            //    break
+            case GDTypes.OBJ_TYPE_CAMERAS:
+                objDrawFn = Draw.draw_camera
+                break
             case GDTypes.OBJ_TYPE_FACES:
                 objDrawFn = Draw.draw_face
                 break

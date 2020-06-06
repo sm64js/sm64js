@@ -3,6 +3,10 @@ import { DynlistProcInstance as Dynlist } from "../DynlistProc"
 import { dynlist_mario_face } from "./dynlist_mario_face"
 import { dynlist_mario_eye_right, dynlist_mario_eye_left } from "./dynlist_mario_eyes"
 import { dynlist_mario_eyebrow_right, dynlist_mario_eyebrow_left, dynlist_mario_mustache } from "./dynlist_mario_eyebrows_mustache"
+import { anim_mario_mustache_right } from "./anim_mario_mustache_right"
+import { anim_mario_mustache_left } from "./anim_mario_mustache_left"
+import { anim_mario_lips_1, anim_mario_lips_2 } from "./anim_mario_lips"
+import { anim_mario_eyebrows_equalizer, anim_mario_eyebrows_1, anim_mario_eyebrows_2, anim_mario_eyebrows_3, anim_mario_eyebrows_4, anim_mario_eyebrows_5, anim_mario_eye_left, anim_mario_eye_right, anim_mario_hat, anim_mario_lips_3, anim_mario_lips_4, anim_mario_ear_left, anim_mario_ear_right, anim_mario_nose, anim_mario_lips_5, anim_mario_lips_6, anim_mario_eyelid_left, anim_mario_eyelid_right, anim_mario_intro, anim_silver_star, anim_red_star } from "./anim_group_1"
 import { ShapeHelperGlobalsInstance as ShapesGlobals } from "../ShapeHelperGlobals"
 
 
@@ -879,4 +883,185 @@ export const dynlist_mario_master = [
     Macros.SetRotation(0.0, 0.0, 0.0),
     Macros.SetAttachOffset(292.7, 0.0, 0.0),
     Macros.EndNetSubGroup(0x9),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0x7), // mustache right
+    Macros.LinkWithPtr(anim_mario_mustache_right),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0x8),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0x7),
+    Macros.LinkWith(0x6),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0x10), // mustache left
+    Macros.LinkWithPtr(anim_mario_mustache_left),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0x11),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0x10),
+    Macros.LinkWith(0xF),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0x20), // lips
+    Macros.LinkWithPtr(anim_mario_lips_1),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0x21),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0x20),
+    Macros.LinkWith(0x1F),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0x29), // lips
+    Macros.LinkWithPtr(anim_mario_lips_2),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0x2A),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0x29),
+    Macros.LinkWith(0x28),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0x32), // eyebrows
+    Macros.LinkWithPtr(anim_mario_eyebrows_1),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0x33),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0x32),
+    Macros.LinkWith(0x31),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0x3F), // eyebrows equalizer
+    Macros.LinkWithPtr(anim_mario_eyebrows_equalizer),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0x40),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0x3F),
+    Macros.LinkWith(0x3E),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0x42), // eyebrows
+    Macros.LinkWithPtr(anim_mario_eyebrows_2),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0x43),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0x42),
+    Macros.LinkWith(0x41),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0x48), // eyebrows
+    Macros.LinkWithPtr(anim_mario_eyebrows_3),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0x49),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0x48),
+    Macros.LinkWith(0x47),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0x4B), // eyebrows
+    Macros.LinkWithPtr(anim_mario_eyebrows_4),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0x4C),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0x4B),
+    Macros.LinkWith(0x4A),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0x54), // eyebrows
+    Macros.LinkWithPtr(anim_mario_eyebrows_5),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0x55),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0x54),
+    Macros.LinkWith(0x53),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0x6B), // left eye
+    Macros.LinkWithPtr(anim_mario_eye_left),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0x6C),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0x6B),
+    Macros.LinkWith(0x6A),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0x7B), // right eye
+    Macros.LinkWithPtr(anim_mario_eye_right),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0x7C),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0x7B),
+    Macros.LinkWith(0x7A),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0x84), // hat
+    Macros.LinkWithPtr(anim_mario_hat),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0x85),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0x84),
+    Macros.LinkWith(0x83),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0x96), // upper lip left
+    Macros.LinkWithPtr(anim_mario_lips_3),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0x97),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0x96),
+    Macros.LinkWith(0x95),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0x9F), // upper lip right
+    Macros.LinkWithPtr(anim_mario_lips_4),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0xA0),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0x9F),
+    Macros.LinkWith(0x9E),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0xA8), // left ear
+    Macros.LinkWithPtr(anim_mario_ear_left),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0xA9),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0xA8),
+    Macros.LinkWith(0xA7),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0xB1), // right ear
+    Macros.LinkWithPtr(anim_mario_ear_right),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0xB2),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0xB1),
+    Macros.LinkWith(0xB0),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0xBA), // nose
+    Macros.LinkWithPtr(anim_mario_nose),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0xBB),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0xBA),
+    Macros.LinkWith(0xB9),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0xC3), // lip
+    Macros.LinkWithPtr(anim_mario_lips_5),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0xC4),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0xC3),
+    Macros.LinkWith(0xC2),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0xC6), // lip
+    Macros.LinkWithPtr(anim_mario_lips_6),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0xC7),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0xC6),
+    Macros.LinkWith(0xC5),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0xCF), // left eyelid
+    Macros.LinkWithPtr(anim_mario_eyelid_left),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0xD0),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0xCF),
+    Macros.LinkWith(0xCE),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0xD8), // right eyelid
+    Macros.LinkWithPtr(anim_mario_eyelid_right),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0xD9),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0xD8),
+    Macros.LinkWith(0xD7),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0xE2), // intro
+    Macros.LinkWithPtr(anim_mario_intro),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0xE3),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0xE2),
+    Macros.LinkWith(0xDD),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0xE5), // silver star
+    Macros.LinkWithPtr(anim_silver_star),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0xE6),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0xE5),
+    Macros.LinkWith(0xE4),
+
+    Macros.MakeDynObj(Dynlist.D_DATA_GRP, 0xE8), // red star
+    Macros.LinkWithPtr(anim_red_star),
+    Macros.MakeDynObj(Dynlist.D_ANIMATOR, 0xE9),
+    Macros.AttachTo(0x0, 0x3E9),
+    Macros.SetNodeGroup(0xE8),
+    Macros.LinkWith(0xE7),
+
+    Macros.EndGroup(0x1),
+    Macros.UseObj(0x1),
+    Macros.UseIntId(false),
+    Macros.StopList(),
+
 ]

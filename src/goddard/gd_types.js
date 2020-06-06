@@ -49,3 +49,17 @@ export const OBJ_NOT_DRAWABLE = 0x02 ///< This `GdObj` shouldn't be drawn when u
 export const OBJ_PICKED = 0x04 ///< This `GdObj` is held by the cursor
 export const OBJ_IS_GRABBALE = 0x08 ///< This `GdObj` can be grabbed/picked by the cursor
 export const OBJ_USE_ENV_COLOUR = 0x10
+
+export const GD_ANIM_EMPTY = 0  // Listed types are how the data are arranged in memory; maybe not be exact type
+export const GD_ANIM_MATRIX = 1  // f32[4][4]
+export const GD_ANIM_TRI_F_2 = 2  // f32[3][3]
+export const GD_ANIM_9H = 3  // s16[9]
+export const GD_ANIM_TRI_F_4 = 4  // f32[3][3]
+export const GD_ANIM_STUB = 5
+export const GD_ANIM_3H_SCALED = 6  // s16[3]
+export const GD_ANIM_3H = 7  // s16[3]
+export const GD_ANIM_6H_SCALED = 8  // s16[6]
+export const GD_ANIM_MTX_VEC = 9  // {f32 mtx[4][4]; f32 vec[3];}
+export const GD_ANIM_CAMERA = 11  // s16[6]
+
+export const END_ANIMDATA_INFO_ARR = { type: GD_ANIM_EMPTY }

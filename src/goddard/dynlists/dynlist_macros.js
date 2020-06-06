@@ -131,3 +131,7 @@ export const SetSkinWeight = (w2, x) => {
 export const EndNetSubGroup = (w1) => {
     return { cmd: 48, args: { w1 } }
 }
+
+export const LinkWith = (w1) => {
+    return { cmd: 28, args: { w1 } }
+}

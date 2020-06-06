@@ -102,6 +102,9 @@ class DynlistProc {
                 case 25:
                     this.d_set_shapeptr(entry.args.w1)
                     break
+                case 28:
+                    this.d_link_with(entry.args.w1)
+                    break
                 case 29:
                     this.d_link_with_ptr(entry.args.w1)
                     break
@@ -255,6 +258,23 @@ class DynlistProc {
         this.sDynListCurObj = newObj
     }
 
+    d_link_with(id) {
+
+        const origInfo = this.sDynListCurInfo
+
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- link with"
+        }
+
+        if (id == null) return
+
+        const info = this.get_dynobj_info(id)
+        if (info == null) throw "dEndGroup(\"%s\"): Undefined group"
+
+        this.d_link_with_ptr(info.obj)
+        this.set_cur_dynobj(origInfo.obj)
+        this.sDynListCurInfo = origInfo
+    }
 
 
     d_link_with_ptr(ptr) {
@@ -268,6 +288,13 @@ class DynlistProc {
             case GDTypes.OBJ_TYPE_GROUPS:
                 const link = Objects.make_link_to_obj(null, ptr)
                 dynobj.link1C = link
+                break
+            case GDTypes.OBJ_TYPE_ANIMATORS:
+                if (this.sDynListCurObj.unk14 == null) {
+                    this.sDynListCurObj.unk14 = Objects.make_group(0)
+                    this.sDynListCurObj.unk14.header.obj = this.sDynListCurObj.unk14
+                }
+                Objects.addto_group(this.sDynListCurObj.unk14, ptr)
                 break
             default:
                 throw "object does not support this function d_link_with_ptr"
@@ -493,6 +520,10 @@ class DynlistProc {
             case GDTypes.OBJ_TYPE_NETS:
                 this.sDynListCurObj.unk1C8 = info.obj
                 this.sDynListCurObj.unk1D0 = info.obj
+                break
+            case GDTypes.OBJ_TYPE_ANIMATORS:
+                this.sDynListCurObj.animdata = info.obj
+                //alloc_animdata(this.sDynListCurObj) /// probably not needed for JS
                 break
             default:
                 throw "object does not support this function - set node group"
@@ -748,8 +779,16 @@ class DynlistProc {
                     objheader.obj.unk1D4 = attgrp
                 }
                 break
+            case GDTypes.OBJ_TYPE_ANIMATORS:
+                attgrp = objheader.obj.unk30
+                if (attgrp == null) {
+                    attgrp = Objects.make_group(0)
+                    attgrp.header.obj = attgrp
+                    objheader.obj.unk30 = attgrp
+                }
+                break
             default:
-                throw "Object type doesn't support attach to"
+                throw "Object type doesn't support attach to - part 1"
 
         }
 
@@ -778,8 +817,12 @@ class DynlistProc {
                 this.sDynListCurObj.unk1FC = flag
                 this.sDynListCurObj.unk20C = objheader
                 break
+            case GDTypes.OBJ_TYPE_ANIMATORS:
+                this.sDynListCurObj.unk34 = flag
+                this.sDynListCurObj.unk44 = objheader
+                break
             default:
-                throw "Object type doesn't support attach to"
+                throw "Object type doesn't support attach to - part 2"
         }
 
         if (flag & 9) {

@@ -17,7 +17,7 @@ class Objects {
             4: "joints",
             OBJ_TYPE_BONES: "bones",
             1: "groups",
-            OBJ_TYPE_PARTICLES: "particles",
+            8: "particles",
             16: "shapes",
             32: "nets",
             OBJ_TYPE_PLANES: "planes",
@@ -74,6 +74,20 @@ class Objects {
 
         newLink.prev = head
         newLink.obj = a1
+
+        return newLink
+    }
+
+    make_vtx_link(prevlink, data) {
+        const newLink = {}
+
+        if (prevlink) {
+            prevlink.next = newLink
+        }
+
+        newLink.prev = prevlink
+        newLink.next = null
+        newLink.data = data
 
         return newLink
     }
@@ -195,9 +209,9 @@ class Objects {
             case GDTypes.OBJ_TYPE_GROUPS:
                 objDrawFn = Draw.draw_group
                 break
-            //case GDTypes.OBJ_TYPE_PARTICLES:
-            //    objDrawFn = Draw.draw_particle
-            //    break
+            case GDTypes.OBJ_TYPE_PARTICLES:
+                objDrawFn = Draw.draw_particle
+                break
             case GDTypes.OBJ_TYPE_SHAPES:
                 objDrawFn = Draw.nop_obj_draw
                 break
@@ -291,7 +305,19 @@ class Objects {
         return newGroup
     }
 
-    make_group(count) {
+    sprint_obj_id(objheader) {
+        switch (objheader.type) {
+            case GDTypes.OBJ_TYPE_JOINTS:
+                return `j${objheader.obj.id} `
+            case GDTypes.OBJ_TYPE_NETS:
+                return `net(no id) `
+            default:
+                console.log(objheader.type)
+                throw "need to add default type -  Objects - sprint_obj_id"  
+        }
+    }
+
+    make_group(count, args) {
         const newGroup = {
             header: this.make_object(GDTypes.OBJ_TYPE_GROUPS),
             objCount: 0,
@@ -308,6 +334,28 @@ class Objects {
         }
 
         if (count == 0) return newGroup
+
+        let curObj
+
+        args.forEach(vargObj => {
+            if (vargObj == null || vargObj.header == null) {
+                throw "something not right in Objects:: make_group"
+            }
+            curObj = vargObj.header
+            newGroup.groupObjTypes |= curObj.type
+            this.addto_group(newGroup, vargObj.header)
+        })
+
+        let idStrBuf = ""
+
+        let curLink = newGroup.link1C
+        while (curLink) {
+            curObj = curLink.obj
+            idStrBuf = this.sprint_obj_id(curObj)
+            curLink = curLink.next
+        }
+
+        return newGroup
 
         throw "more implementation needed, objects.js make_group"
     }
@@ -330,6 +378,7 @@ class Objects {
         this.addto_group(this.gGdViewsGroup, newView.header)
 
         newView.flags = flags | GDTypes.VIEW_UPDATE | GDTypes.VIEW_LIGHT
+
         newView.id = this.sGdViewInfo.count++
 
         newView.components = parts
@@ -374,7 +423,24 @@ class Objects {
 
     }
 
-    apply_to_obj_types_in_group(types, fn, group) {
+    addto_groupfirst(group, objheader) {
+
+        if (group.link1C == null) {
+            group.link1C = this.make_link_to_obj(null, objheader)
+            group.link20 = group.link1C
+        } else {
+            let newLink = this.make_link_to_obj(null, objheader)
+            group.link1C.prev = newLink
+            newLink.newLink = group.link1C
+            group.link1C = newLink
+        }
+
+        group.groupObjTypes |= objheader.type
+        group.objCount++
+
+    }
+
+    apply_to_obj_types_in_group(types, fn, group, callingClassObject) {
         let fnAppliedCount = 0
 
         if (group == null) return
@@ -400,7 +466,7 @@ class Objects {
             }
 
             if (linkedObjType & types) {
-                fn.call(Shapes, linkedObj)
+                fn.call(callingClassObject, linkedObj)
                 fnAppliedCount++
             }
 

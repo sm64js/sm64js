@@ -5,7 +5,6 @@ import { NetsInstance as Nets } from "./Nets"
 import { JointsInstance as Joints } from "./Joints"
 import * as GDTypes from "./gd_types"
 import * as GDMath from "./gd_math"
-import { SetShapePtrPtr } from "./dynlists/dynlist_macros"
 
 const DYNOBJ_NAME_SIZE = 8
 const DYNOBJ_LIST_SIZE = 3000

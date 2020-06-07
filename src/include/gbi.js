@@ -34,8 +34,8 @@ export const G_ZBUFFER = 1
 export const G_SHADE = 2
 export const G_TEXTURE_ENABLE = 4
 export const G_SHADING_SMOOTH = 8
-/*export const G_CULL_FRONT = 16
-export const G_CULL_BACK = 32*/
+export const G_CULL_FRONT = 16
+export const G_CULL_BACK = 32
 export const G_FOG = 16
 export const G_LIGHTING = 32
 export const G_TEXTURE_GEN = 64
@@ -286,8 +286,22 @@ export const G_TX_WRAP	= 0
 export const G_TX_MIRROR	= 0x1
 export const G_TX_CLAMP	= 0x2
 export const G_TX_NOMASK	= 0
-export const G_TX_NOLOD	= 0
+export const G_TX_NOLOD = 0
 
+
+//G_MOVEWORD types
+export const G_MW_MATRIX = 0x00 /* NOTE: also used by movemem */
+export const G_MW_NUMLIGHT = 0x02
+export const G_MW_CLIP = 0x04
+export const G_MW_SEGMENT = 0x06
+export const G_MW_FOG = 0x08
+export const G_MW_LIGHTCOL = 0x0a
+export const G_MW_POINTS = 0x0c
+export const G_MW_PERSPNORM = 0x0e
+
+//G_MOVEMEM types
+export const G_MV_VIEWPORT = 1
+export const G_MV_L = 2
 
 /// G_MTX parameter flags
 export const G_MTX_MODELVIEW     = 0	/* matrix types */
@@ -314,6 +328,25 @@ export const G_CC_DECALFADE = {
 
 
 let textureImageId = 0
+
+
+export const gSPLight = (displaylist, lightData, index) => {
+    displaylist.push({
+        words: {
+            w0: G_MOVEMEM,
+            w1: { type: G_MV_L, lightData, index }
+        }
+    })
+}
+
+export const gSPNumLights = (displaylist, num) => {
+    displaylist.push({
+        words: {
+            w0: G_MOVEWORD,
+            w1: { type: G_MW_NUMLIGHT, data: num + 1 } //includes 1 ambient light
+        }
+    })
+}
 
 export const gDPSetEnvColor = (displaylist, r, g, b, a) => {
     displaylist.push({
@@ -342,6 +375,25 @@ export const gDPFillRectangle = (displaylist, ulx, uly, lrx, lry) => {
     })
 }
 
+
+export const gSPTexture = (displaylist, s, t, level, tile, on) => {
+    displaylist.push({
+        words: {
+            w0: G_TEXTURE,
+            w1: { s, t }
+        }
+    })
+}
+
+export const gDPSetCombineMode = (displaylist, mode) => {
+    displaylist.push({
+        words: {
+            w0: G_SETCOMBINE,
+            w1: { mode }
+        }
+    })
+}
+
 export const gSPMatrix = (displaylist, matrix, parameters) => {
     displaylist.push({
         words: {
@@ -350,6 +402,25 @@ export const gSPMatrix = (displaylist, matrix, parameters) => {
         }
     })
 }
+
+export const gSPVertex = (displaylist, vertices, num_vertices, dest_index) => {
+    displaylist.push({
+        words: {
+            w0: G_VTX,
+            w1: { vertices, dest_index }
+        }
+    })
+}
+
+export const gSP1Triangle = (displaylist, v0, v1, v2, flag) => {
+    displaylist.push({
+        words: {
+            w0: G_TRI1,
+            w1: { v0, v1, v2, flag }
+        }
+    })
+}
+
 
 export const gSPSetGeometryMode = (displaylist, mode) => {
     displaylist.push({

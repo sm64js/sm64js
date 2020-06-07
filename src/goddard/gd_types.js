@@ -13,7 +13,7 @@ export const VIEW_1_CYCLE = 0x020000
 export const VIEW_MOVEMENT = 0x040000
 export const VIEW_DRAW = 0x080000
 export const VIEW_WAS_UPDATED = 0x100000
-export const VIEW_LIGHT = 0x20000
+export const VIEW_LIGHT = 0x200000
 
 export const OBJ_TYPE_GROUPS = 0x00000001
 export const OBJ_TYPE_BONES = 0x00000002
@@ -63,3 +63,23 @@ export const GD_ANIM_MTX_VEC = 9  // {f32 mtx[4][4]; f32 vec[3];}
 export const GD_ANIM_CAMERA = 11  // s16[6]
 
 export const END_ANIMDATA_INFO_ARR = { type: GD_ANIM_EMPTY }
+
+export const GD_MTL_STUB_DL = 0x01
+export const GD_MTL_BREAK = 0x04
+export const GD_MTL_SHINE_DL = 0x10
+export const GD_MTL_TEX_OFF = 0x20
+export const GD_MTL_LIGHTS = 0x40 // uses default case
+
+
+export const GD_PROP_OVERLAY = 4
+export const GD_PROP_LIGHTING = 11
+export const GD_PROP_AMB_COLOUR = 12
+export const GD_PROP_DIFUSE_COLOUR = 13
+export const GD_PROP_LIGHT_DIR = 15
+export const GD_PROP_CULLING = 16
+export const GD_PROP_STUB17 = 17
+export const GD_PROP_STUB18 = 18
+export const GD_PROP_STUB19 = 19
+export const GD_PROP_STUB20 = 20
+export const GD_PROP_STUB21 = 21
+export const GD_PROP_ZBUF_FN = 22

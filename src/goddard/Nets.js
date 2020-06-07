@@ -1,6 +1,8 @@
-import { OBJ_TYPE_NETS } from "./gd_types"
+import { OBJ_TYPE_NETS, OBJ_TYPE_JOINTS } from "./gd_types"
 import { ObjectsInstance as Objects } from "./Objects"
 import { gd_set_identity_mat4 } from "./gd_math"
+import { JointsInstance as Joints } from "./Joints"
+
 
 class Nets {
     constructor() {
@@ -53,6 +55,7 @@ class Nets {
         const grp = net.unk1C8
 
         if (grp) {
+            //Objects.apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, Joints.func_80191604, grp, Joints)
             throw "more implementation needed in reset net"
         }
 

@@ -1,19 +1,134 @@
 import * as GDTypes from "./gd_types"
+import { ObjectsInstance as Objects } from "./Objects"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
+import { GoddardRendererInstance as Renderer } from "./GoddardRenderer"
+import { GoddardMainInstance as Main } from "./GoddardMain"
 
 class Draw {
     constructor() {
-
+        this.sUpdateViewState = {
+            unreadCounter: 0,
+            mtlDlNum: 0,
+            shapesDrawn: 0
+        }
     }
 
     nop_obj_draw() { }
 
-    draw_group() {
-        throw "unimplemented draw group"
+    apply_obj_draw_fn(objheader) {
+        if (objheader == null) {
+            throw "apply_obj_draw_fn - obj is null"
+        }
+        if (objheader.drawFlags & GDTypes.OBJ_NOT_DRAWABLE) return
+
+        objheader.objDrawFn.call(this, objheader.obj)
     }
 
-    draw_face() {
-        throw "unimplemented draw face"
+    draw_group(grp) {
+        if (grp == null) {
+            throw "draw group - group is null"
+        }
+
+        Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_ALL, this.apply_obj_draw_fn, grp, this)
+
+    }
+
+    draw_face(face) {
+
+        if (!this.sUseSelectedColor && face.mtlId >= 0) {
+            if (face.mtl) {
+                let i = face.mtl.gddlNumber
+                if (i != 0) {
+                    if (i != this.sUpdateViewState.mtlDlNum) {
+                        Renderer.func_801A0070()
+                        Renderer.branch_cur_dl_to_num(i)
+                        this.sUpdateViewState.mtlDlNum = i
+                    }
+                }
+            }
+        }
+
+        Renderer.check_tri_display(face.vtxCount)
+
+        if (!Main.gGdUseVtxNormal) {
+            throw "draw face - Not using Vtx Normal"
+        }
+
+        face.vertices.forEach(vtx => {
+            if (Main.gGdUseVtxNormal) {
+                Renderer.set_Vtx_norm_buf_2(vtx.normal)
+            }
+
+            const gbiVtx = Renderer.make_Vtx_if_new(vtx.pos.x, vtx.pos.y, vtx.pos.z, vtx.alpha)
+
+            if (gbiVtx) {
+                vtx.gbiVerts = Objects.make_vtx_link(vtx.gbiVerts, gbiVtx)
+            }
+        })
+
+        Renderer.func_8019FEF0()
+
+    }
+
+    draw_shape_faces(shape) {
+        this.sUpdateViewState.mtlDlNum = 0
+        this.sUpdateViewState.unreadCounter = 0
+
+        this.sUnreadShapeFlag = shape.flag & 1
+
+        Renderer.func_801A02B8(shape.unk58)
+
+        if (shape.gdDls[Renderer.gGdFrameBuf] != 0) {
+            throw "more implementation in draw_shape_faces"
+        } else if (shape.faceGroup) {
+            Renderer.func_801A0038()
+            this.draw_group(shape.faceGroup)
+            Renderer.func_801A0070()
+
+        } 
+
+    }
+
+    setup_lights() {
+        Renderer.sNumLights = 2
+        Renderer.gd_setproperty(GDTypes.GD_PROP_AMB_COLOUR, 0.5, 0.5, 0.5)
+        Renderer.gd_setproperty(GDTypes.GD_PROP_CULLING, 1.0, 0.0, 0.0)
+    }
+
+    create_mtl_gddl_if_empty(mtl) {
+        if (mtl.obj.gddlNumber == 0) {
+            mtl.obj.gddlNumber = Renderer.create_mtl_gddl(mtl.obj.type)
+        }
+    }
+
+    create_shape_mtl_gddls(shape) {
+        if (shape.mtlGroup) {
+            Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_MATERIALS, this.create_mtl_gddl_if_empty, shape.mtlGroup, this)
+        }
+    }
+
+    create_shape_gddl(shapeheader) {
+        const shape = shapeheader.obj
+        this.create_shape_mtl_gddls(shape)
+        const shapedl = Renderer.gd_startdisplist(7)
+
+        if (shapedl == 0) return -1
+
+        this.setup_lights()
+        this.sUseSelectedColor = false
+
+        if (shape.unk3C == 0) this.draw_shape_faces(shape)
+
+        Renderer.gd_enddlsplist_parent()
+
+        shape.gdDls[0] = shapedl
+        shape.gdDls[1] = shapedl
+
+        ///debug printing here
+    }
+
+    create_gddl_for_shapes(grp) {
+        Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_SHAPES, this.create_shape_gddl, grp, this)
     }
 
     find_thisface_verts(face, verts) {

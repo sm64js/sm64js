@@ -254,9 +254,256 @@ class GoddardRenderer {
         this.sDynDlSet1 = [null, null]
         this.sMHeadMainDls = [null, null]
         this.D_801BD7C8 = new Array(3).fill(0).map(() => new Array(2).fill(0))
-        this.sGdDLArray = new Array(1000)
+        this.sGdDLArray = new Array(1000).fill(0).map(() => [])
+        this.sVtxCvrtNormBuf = new Array(3).fill(0)
+        this.sVtxCvrtTCBuf = new Array(2).fill(0)
+        this.D_801BAF30 = new Array(13).fill(0).map(() => new Array(8).fill(0))
     }
 
+    create_light_template_object() {
+        return {
+            ambient: { col: [ 0, 0, 0 ] },
+            lights4: new Array(4).fill(0).map(() => { return { col: [0, 0, 0], dir: [0, 0, 0] } }),
+        }
+    }
+
+    create_vertex_template_object() {
+        return {
+            ob: [0.0, 0.0, 0.0],
+            flag: 0,
+            tc: [0, 0],
+            color: [0, 0, 0],
+            normal: {
+                ob: [0.0, 0.0, 0.0],
+                flag: 0,
+                tc: [0, 0],
+                n: [0, 0, 0],
+                a: 0
+            }
+        }
+    }
+
+    reset_dlnum_indices(num) {
+        this.sCurrentGdDl = this.sGdDLArray[num]
+        if (this.sCurrentGdDl.vtx.length != 0 || this.sCurrentGdDl.gfx.length != 0 || this.sCurrentGdDl.mtx.length != 0 || this.sCurrentGdDl.light.length != 0 || this.sCurrentGdDl.vp.length != 0) {
+            throw "Should I empty these arrays?"
+        }
+/*        this.sCurrentGdDl.curVtxIdx = 0
+        this.sCurrentGdDl.curMtxIdx = 0
+        this.sCurrentGdDl.curLightIdx = 0
+        this.sCurrentGdDl.curGfxIdx = 0
+        this.sCurrentGdDl.curVpIdx = 0*/
+    }
+
+    branch_cur_dl_to_num(dlNum) {
+        Gbi.gSPDisplayList(this.sCurrentGdDl.gfx, this.sGdDLArray[dlNum].gfx)
+    }
+
+    check_tri_display(vtxcount) {
+        this.D_801A86C0 = this.sCurrentGdDl.vtx.length
+        this.D_801BB0B4 = 0
+        if (vtxcount != 3) throw "cant display no tris"
+
+    }
+
+    make_Vtx_if_new(x, y, z, alpha) {
+        for (let i = this.D_801BB0CC; i < this.D_801BB0CC + this.D_801BB0BC; i++) {
+            if (this.sCurrentGdDl.vtx[i].normal.ob[0] == x) {
+                if (this.sCurrentGdDl.vtx[i].normal.ob[1] == y) {
+                    if (this.sCurrentGdDl.vtx[i].normal.ob[2] == z) {
+                        this.D_801BAF30[this.D_801BB0C4][this.D_801BB0B4++] = i
+                        return
+                    }
+                }
+            }
+        }
+
+        //console.log("making vertex " + this.D_801BB0C4 + `  ${x}, ${y}, ${z}`)
+
+        this.D_801BB0BC++
+        this.D_801BAF30[this.D_801BB0C4][this.D_801BB0B4++] = this.sCurrentGdDl.vtx.length;
+
+        const newVertex = this.create_vertex_template_object()
+        newVertex.normal.ob[0] = x
+        newVertex.normal.ob[1] = y
+        newVertex.normal.ob[2] = z
+        newVertex.normal.flag = 0
+        newVertex.normal.tc[0] = this.sVtxCvrtTCBuf[0]
+        newVertex.normal.tc[1] = this.sVtxCvrtTCBuf[1]
+        newVertex.normal.n[0] = this.sVtxCvrtNormBuf[0]
+        newVertex.normal.n[1] = this.sVtxCvrtNormBuf[1]
+        newVertex.normal.n[2] = this.sVtxCvrtNormBuf[2]
+        newVertex.normal.a = parseInt(alpha * 255.0)
+
+
+        this.sCurrentGdDl.vtx.push(newVertex)
+        return newVertex
+    }
+
+    set_Vtx_norm_buf_2(norm) {
+        this.sVtxCvrtNormBuf[0] = norm.x * 127.0
+        this.sVtxCvrtNormBuf[1] = norm.y * 127.0
+        this.sVtxCvrtNormBuf[2] = norm.z * 127.0
+    }
+
+    gddl_is_loading_shine_dl(dlLoad) {
+        if (dlLoad) {
+            Gbi.gSPDisplayList(this.sCurrentGdDl.gfx, gd_dl_mario_face_shine)
+        } else {
+            Gbi.gSPTexture(this.sCurrentGdDl.gfx, 0x8000, 0x8000, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF)
+            Gbi.gsDPSetCombineMode(this.sCurrentGdDl.gfx, Gbi.G_CC_SHADE)
+        }
+    }
+
+    func_801A0070() {
+        if (this.D_801BB0BC != 0) {
+            const vertices = this.sCurrentGdDl.vtx.slice(this.D_801BB0CC, this.D_801BB0CC + this.D_801BB0BC)
+            if (vertices.length != this.D_801BB0BC) throw "gd render - sending vertices something is wrong"
+            Gbi.gSPVertex(this.sCurrentGdDl.gfx, vertices, vertices.length, 0)
+            for (let i = 0; i < this.D_801BB0C4; i++) {
+                Gbi.gSP1Triangle(this.sCurrentGdDl.gfx, this.D_801BAF30[i][0] - this.D_801BB0CC, this.D_801BAF30[i][1] - this.D_801BB0CC,
+                    this.D_801BAF30[i][2] - this.D_801BB0CC, 0)
+            }
+        }
+        this.func_801A0038()
+    }
+
+    func_801A0038() {
+        this.D_801BB0BC = 0
+        this.D_801BB0C4 = 0
+        this.D_801BB0CC = this.sCurrentGdDl.vtx.length
+    }
+
+    func_8019FEF0() {
+        this.D_801BB0C4++
+        if (this.D_801BB0BC >= 12) {
+            this.func_801A0070()
+            this.func_801A0038()
+        }
+        this.D_801BB018 = 0
+    }
+
+    func_801A1A00() {
+
+        if ((this.sActiveView.flags & GDTypes.VIEW_ALLOC_ZBUF) != 0) {
+            if (this.D_801BB184 != 0xff) {
+                //rendermode TODO
+            } else {
+                //rendermode TODO
+            }
+        } else {
+            if (this.D_801BB184 != 0xff) {
+                //rendermode TODO
+            } else {
+                //rendermode TODO
+            }
+        }
+    }
+
+    func_801A02B8(arg0) {
+        this.D_801BB184 = arg0 * 255.0
+        this.func_801A1A00()
+    }
+
+    func_801A086C(id, colour, material) {
+
+        let numLights = this.sNumLights
+        const scaledColours = new Array(3).fill(0)
+        const lightDir = new Array(3).fill(0)
+
+        if (id > 0) {
+            this.reset_dlnum_indices(id)
+        }
+
+        switch (material) {
+            case GDTypes.GD_MTL_TEX_OFF:
+                //gddl_is_loading_stub_dl(false) // does nothing
+                //gddl_is_loading_stub_dl(false) // does nothing
+                //gddl_is_loading_stub_dl(false) // does nothing
+                //gddl_is_loading_stub_dl(false) // does nothing
+                this.gddl_is_loading_shine_dl(false)
+                this.gddl_is_loading_shine_dl(false)
+                this.gddl_is_loading_shine_dl(false)
+                this.gddl_is_loading_shine_dl(false)
+                numLights = 2
+                break
+            default: throw "not implemented material type"
+        }
+
+        Gbi.gSPNumLights(this.sCurrentGdDl.gfx, numLights)
+
+        scaledColours[0] = colour.r * this.sAmbScaleColour.r * 255.0
+        scaledColours[1] = colour.g * this.sAmbScaleColour.g * 255.0
+        scaledColours[2] = colour.b * this.sAmbScaleColour.b * 255.0
+
+        const newLight = this.create_light_template_object()
+        newLight.ambient.col[0] = scaledColours[0]
+        newLight.ambient.col[1] = scaledColours[1]
+        newLight.ambient.col[2] = scaledColours[2]
+
+        for (let i = 0; i < numLights; i++) {
+            scaledColours[0] = colour.r * this.sLightScaleColours[i].r * 255.0
+            scaledColours[1] = colour.g * this.sLightScaleColours[i].g * 255.0
+            scaledColours[2] = colour.b * this.sLightScaleColours[i].b * 255.0
+
+            newLight.lights4[i].col[0] = scaledColours[0]
+            newLight.lights4[i].col[1] = scaledColours[1]
+            newLight.lights4[i].col[2] = scaledColours[2]
+
+            lightDir[0] = this.sLightDirections[i].x
+            lightDir[1] = this.sLightDirections[i].y
+            lightDir[2] = this.sLightDirections[i].z
+
+            newLight.lights4[i].dir[0] = lightDir[0]
+            newLight.lights4[i].dir[1] = lightDir[1]
+            newLight.lights4[i].dir[2] = lightDir[2]
+
+            Gbi.gSPLight(this.sCurrentGdDl.gfx, newLight.lights4[i], i)
+        }
+        //ambient light added last
+        Gbi.gSPLight(this.sCurrentGdDl.gfx, newLight.ambient, numLights) 
+
+        this.sCurrentGdDl.light.push(newLight)
+        Gbi.gSPEndDisplayList(this.sCurrentGdDl.gfx)
+
+        return 0
+    }
+
+    gd_enddlsplist_parent() {
+        Gbi.gSPEndDisplayList(this.sCurrentGdDl.gfx)
+/*        if (sCurrentGdDl -> parent != NULL) {
+            sCurrentGdDl -> parent -> curVtxIdx = (sCurrentGdDl -> parent -> curVtxIdx + sCurrentGdDl -> curVtxIdx)
+            sCurrentGdDl -> parent -> curMtxIdx = (sCurrentGdDl -> parent -> curMtxIdx + sCurrentGdDl -> curMtxIdx)
+            sCurrentGdDl -> parent -> curLightIdx =
+            (sCurrentGdDl -> parent -> curLightIdx + sCurrentGdDl -> curLightIdx)
+            sCurrentGdDl -> parent -> curGfxIdx = (sCurrentGdDl -> parent -> curGfxIdx + sCurrentGdDl -> curGfxIdx)
+            sCurrentGdDl -> parent -> curVpIdx = (sCurrentGdDl -> parent -> curVpIdx + sCurrentGdDl -> curVpIdx)
+        }
+        curDlIdx = sCurrentGdDl -> curGfxIdx;*/
+    }
+
+    create_mtl_gddl(mtlType) {
+        const blue = { r: 0.0, g: 0.0, b: 1.0 }
+        const dlnum = this.gd_startdisplist(7)
+        this.func_801A086C(dlnum, blue, GDTypes.GD_MTL_TEX_OFF)
+
+        return dlnum
+    }
+
+    gd_startdisplist(memarea) {
+        this.D_801BB018 = 0
+        this.D_801BB01C = 1
+
+        switch (memarea) {
+            case 7:
+                this.sCurrentGdDl = this.create_child_gdl(0, this.sStaticDl)
+                break
+            default: throw "unknown case in gd renderer gd_startdisplist"
+        }
+        //gDPPipeSync(next_gfx())
+
+        return this.sCurrentGdDl.number
+    }
 
     setup_view_buffers(name, view) {
 
@@ -320,38 +567,14 @@ class GoddardRenderer {
             id,
             number: this.sGdDlCount++,
             parent: null,
-            vtx: [],
-
-            mtx: [],
-
-            light: [],
-
-            gfx: [],
-
             dlptr: null,
-
-            vp: [],
-
-            number: 0,
-
+            vtx: [],
+            mtx: [],
+            light: [],
+            gfx: [],
+            vp: []
         }
         this.sGdDLArray[dl.number] = dl
-
-
-        if (verts == 0) verts = 1
-        dl.vtx = new Array(verts)
-
-        if (mtxs == 0) mtxs = 1
-        dl.mtx = new Array(mtxs)
-
-        if (lights == 0) lights = 1
-        dl.light = new Array(lights)
-
-        if (gfxs == 0) gfxs = 1
-        dl.gfx = new Array(gfxs)
-
-        if (vps == 0) vps = 1
-        dl.vp = new Array(vps)
 
         return dl
 
@@ -370,7 +593,36 @@ class GoddardRenderer {
         }
         this.sGdDLArray[newDl.number] = newDl
 
+        //this.cpy_remaining_gddl(newDl, srcDL)
+
         return newDl
+    }
+
+/*    cpy_remaining_gddl(dst, src) {
+        dst.vtx = src.vtx.splice(src.curVtxIdx)
+        dst.mtx = src.vtx.splice(src.curMtxIdx)
+        dst.light = src.vtx.splice(src.curLightIdx)
+        dst.gfx = src.vtx.splice(src.curGfxIdx)
+        dst.vp = src.vtx.splice(src.curVpIdx)
+    }*/
+
+    gd_setproperty(prop, f1, f2, f3) {
+
+        switch (prop) {
+            case GDTypes.GD_PROP_AMB_COLOUR:
+                this.sAmbScaleColour = { r: f1, g: f2, b: f3 }
+                break
+            case GDTypes.GD_PROP_CULLING:
+                if (f1 == 1.0) {
+                    Gbi.gSPSetGeometryMode(this.sCurrentGdDl.gfx, Gbi.G_CULL_BACK)
+                } else {
+                    Gbi.gSPClearGeometryMode(this.sCurrentGdDl.gfx, Gbi.G_CULL_BACK)
+                }
+                break
+            default:
+                throw "unkown property type in gd renderer set property"
+        }
+
     }
 
     gd_init() {
@@ -415,6 +667,7 @@ class GoddardRenderer {
         this.sScreenView2.colour = { r: 0.0, g: 0.0, b: 0.0 }
         this.sScreenView2.parent = this.sScreenView2
         this.sScreenView2.flags &= ~GDTypes.VIEW_UPDATE
+        this.sActiveView = this.sScreenView2
 
         this.gGdCtrl = {
             unk88: 1.0,

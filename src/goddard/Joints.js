@@ -1,6 +1,7 @@
 import { OBJ_TYPE_JOINTS } from "./gd_types"
 import { ObjectsInstance as Objects } from "./Objects"
 import { gd_set_identity_mat4 } from "./gd_math"
+import * as GDTypes from "./gd_types"
 
 class Joints {
     constructor() {
@@ -31,6 +32,27 @@ class Joints {
         Objects.addto_group(j.unk1F4, w.header)
 
         return true
+    }
+
+    Proc8018E520(self) {
+        throw "Joints - Proc8018E520"
+    }
+
+    make_joint_withshape(shape, flags, x, y, z) {
+        const j = this.make_joint(0, x, y, z)
+        Object.assign(j, {
+            unk20: shape,
+            unk1CC: 5,
+            unk1BC: j.unk1BC | flags,
+            unk1C8: 9,
+            unk1D0: null,
+            fn2C: this.Proc8018E520
+        })
+
+        j.header.drawFlags = j.header.drawFlags | GDTypes.OBJ_IS_GRABBALE | GDTypes.OBJ_NOT_DRAWABLE
+        j.header.obj = j
+
+        return j
     }
 
     make_joint(flags, x, y, z) {

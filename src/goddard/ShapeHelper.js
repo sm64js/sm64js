@@ -1,8 +1,11 @@
 import { ObjectsInstance as Objects } from "./Objects"
+import { JointsInstance as Joints } from "./Joints"
+import { NetsInstance as Nets } from "./Nets"
 import { DynlistProcInstance as Dynlist } from "./DynlistProc"
 import { dynlist_mario_master } from "./dynlists/dynlist_mario_master"
 import { dynlist_unused } from "./dynlists/dynlist_unused"
 import { DrawInstance as Draw } from "./Draw"
+import * as Particles from "./Particles"
 import * as GDMath from "./gd_math"
 import * as GDTypes from "./gd_types"
 import { ShapeHelperGlobalsInstance as ShapesGlobals } from "./ShapeHelperGlobals"
@@ -41,9 +44,117 @@ class ShapeHelper {
         Objects.addto_group(this.gMarioFaceGrp, sp2C.header)
         Objects.addto_group(this.gMarioFaceGrp, sp28.header)
 
+        Dynlist.d_copystr_to_idbuf(null)
+        let sp24 = Particles.make_particle(0, 1, 0.0, 0.0, 0.0)
+        sp24.header.obj = sp24
+        Object.assign(sp24, {
+            unk60: 3, unk64: 3,
+            unkBC: sp2C.header,
+            unk1C: this.gShape.silverSparkPtr.target
+        })
+        Objects.addto_group(Draw.gGdLightGroup, sp24.header)
 
-        throw "not finished in load mario head - shape helper"
+        sp24 = Particles.make_particle(0, 1, 0.0, 0.0, 0.0)
+        Object.assign(sp24, {
+            unk60: 3, unk64: 2,
+            unkBC: Dynlist.d_use_obj("N228l"),
+            unk1C: this.gShape.silverSparkPtr.target
+        })
+        Objects.addto_group(Draw.gGdLightGroup, sp24.header)
 
+        sp24 = Particles.make_particle(0, 2, 0.0, 0.0, 0.0)
+        Object.assign(sp24, {
+            unk60: 3, unk64: 2,
+            unkBC: Dynlist.d_use_obj("N223l"),
+            unk1C: this.gShape.redSparkPtr.target
+        })
+        Objects.addto_group(Draw.gGdLightGroup, sp24.header)
+
+        let sp3C = Dynlist.d_use_obj("N1000l")
+        Draw.create_gddl_for_shapes(sp3C)
+        const sp38 = Objects.gGdObjectList
+
+        let sp30, sp34
+
+        sp30 = Joints.make_joint_withshape(null, 0, -500.0, 0.0, -150.0)
+        sp34 = Dynlist.d_use_obj("N167l")
+        sp30.unk1F8 = Objects.make_group(1, [sp34])
+        sp30.unk1F8.header.obj = sp30.unk1F8
+
+        sp30 = Joints.make_joint_withshape(null, 0, 500.0, 0.0, -150.0)
+        sp34 = Dynlist.d_use_obj("N176l")
+        sp30.unk1F8 = Objects.make_group(1, [sp34])
+        sp30.unk1F8.header.obj = sp30.unk1F8
+
+        sp30 = Joints.make_joint_withshape(null, 0, 0.0, 700.0, 300.0)
+        sp34 = Dynlist.d_use_obj("N131l")
+        sp30.unk1F8 = Objects.make_group(1, [sp34])
+        sp30.unk1F8.header.obj = sp30.unk1F8
+
+        sp34 = Dynlist.d_use_obj("N206l")
+        Objects.addto_group(sp30.unk1F8, sp34)
+
+        sp34 = Dynlist.d_use_obj("N215l")
+        Objects.addto_group(sp30.unk1F8, sp34)
+
+        sp34 = Dynlist.d_use_obj("N31l")
+        Objects.addto_group(sp30.unk1F8, sp34)
+
+        sp34 = Dynlist.d_use_obj("N65l")
+        Objects.addto_group(sp30.unk1F8, sp34)
+
+        sp30 = Joints.make_joint_withshape(null, 0, 0.0, 0.0, 600.0)
+        sp34 = Dynlist.d_use_obj("N185l")
+        sp30.unk1F8 = Objects.make_group(1, [sp34])
+        sp30.unk1F8.header.obj = sp30.unk1F8
+
+        sp30 = Joints.make_joint_withshape(null, 0, 0.0, -300.0, 300.0)
+        sp34 = Dynlist.d_use_obj("N194l")
+        sp30.unk1F8 = Objects.make_group(1, [sp34])
+        sp30.unk1F8.header.obj = sp30.unk1F8
+
+        sp30 = Joints.make_joint_withshape(null, 0, 250.0, -150.0, 300.0)
+        sp34 = Dynlist.d_use_obj("N158l")
+        sp30.unk1F8 = Objects.make_group(1, [sp34])
+        sp30.unk1F8.header.obj = sp30.unk1F8
+
+        sp34 = Dynlist.d_use_obj("N15l")
+        Objects.addto_group(sp30.unk1F8, sp34)
+
+        sp30 = Joints.make_joint_withshape(null, 0, -250.0, -150.0, 300.0)
+        sp34 = Dynlist.d_use_obj("N149l")
+        sp30.unk1F8 = Objects.make_group(1, [sp34])
+        sp30.unk1F8.header.obj = sp30.unk1F8
+
+        sp34 = Dynlist.d_use_obj("N6l")
+        Objects.addto_group(sp30.unk1F8, sp34)
+
+        sp30 = Joints.make_joint_withshape(null, 0, 100.0, 200.0, 400.0)
+        sp34 = Dynlist.d_use_obj("N112l")
+        sp30.unk1F8 = Objects.make_group(1, [sp34])
+        sp30.unk1F8.header.obj = sp30.unk1F8
+
+        sp30.fn2C = Joints.Proc8018E520
+        sp30.unk1D0 = sp28
+        sp30.header.drawFlags &= ~GDTypes.OBJ_IS_GRABBALE
+
+        sp30 = Joints.make_joint_withshape(null, 0, -100.0, 200.0, 400.0)
+        sp34 = Dynlist.d_use_obj("N96l")
+        sp30.unk1F8 = Objects.make_group(1, [sp34])
+        sp30.unk1F8.header.obj = sp30.unk1F8
+
+        sp30.fn2C = Joints.Proc8018E520
+        sp30.unk1D0 = sp28
+        sp30.header.drawFlags &= ~GDTypes.OBJ_IS_GRABBALE
+
+        let sp48 = Objects.make_group_of_type(GDTypes.OBJ_TYPE_JOINTS, sp38, null)
+        let sp54 = Nets.make_net(0, null, sp48, null, null)
+        sp54.header.obj = sp54
+        sp54.netType = 3
+        Objects.addto_group(this.gMarioFaceGrp, sp48.header)
+        Objects.addto_groupfirst(this.gMarioFaceGrp, sp54.header)
+
+        return 0
     }
 
     add_3_vtx_to_face(face, vtx1, vtx2, vtx3) {
@@ -122,10 +233,10 @@ class ShapeHelper {
 
     }
 
-    scale_obj_position(obj) {
-        if (obj.type == GDTypes.OBJ_TYPE_GROUPS) return
+    scale_obj_position(objheader) {
+        if (objheader.type == GDTypes.OBJ_TYPE_GROUPS) return
 
-        Dynlist.set_cur_dynobj(obj.obj)
+        Dynlist.set_cur_dynobj(objheader.obj)
         let pos = {}
         Dynlist.d_get_rel_pos(pos)
 
@@ -142,7 +253,7 @@ class ShapeHelper {
         this.sVertexScaleFactor = { x, y, z }
 
         if (shape.vtxGroup) {
-            Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_ALL, this.scale_obj_position, shape.vtxGroup)
+            Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_ALL, this.scale_obj_position, shape.vtxGroup, this)
         }
     }
 

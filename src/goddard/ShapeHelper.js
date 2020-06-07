@@ -233,10 +233,10 @@ class ShapeHelper {
 
     }
 
-    scale_obj_position(objheader) {
-        if (objheader.type == GDTypes.OBJ_TYPE_GROUPS) return
+    scale_obj_position(obj) {
+        if (obj.header.type == GDTypes.OBJ_TYPE_GROUPS) return
 
-        Dynlist.set_cur_dynobj(objheader.obj)
+        Dynlist.set_cur_dynobj(obj)
         let pos = {}
         Dynlist.d_get_rel_pos(pos)
 

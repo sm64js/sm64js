@@ -15,13 +15,13 @@ class Draw {
 
     nop_obj_draw() { }
 
-    apply_obj_draw_fn(objheader) {
-        if (objheader == null) {
+    apply_obj_draw_fn(obj) {
+        if (obj.header == null) {
             throw "apply_obj_draw_fn - obj is null"
         }
-        if (objheader.drawFlags & GDTypes.OBJ_NOT_DRAWABLE) return
+        if (obj.header.drawFlags & GDTypes.OBJ_NOT_DRAWABLE) return
 
-        objheader.objDrawFn.call(this, objheader.obj)
+        obj.header.objDrawFn.call(this, obj)
     }
 
     draw_group(grp) {
@@ -96,8 +96,8 @@ class Draw {
     }
 
     create_mtl_gddl_if_empty(mtl) {
-        if (mtl.obj.gddlNumber == 0) {
-            mtl.obj.gddlNumber = Renderer.create_mtl_gddl(mtl.obj.type)
+        if (mtl.gddlNumber == 0) {
+            mtl.gddlNumber = Renderer.create_mtl_gddl(mtl.type)
         }
     }
 
@@ -107,8 +107,7 @@ class Draw {
         }
     }
 
-    create_shape_gddl(shapeheader) {
-        const shape = shapeheader.obj
+    create_shape_gddl(shape) {
         this.create_shape_mtl_gddls(shape)
         const shapedl = Renderer.gd_startdisplist(7)
 

@@ -1,8 +1,11 @@
 import * as GDTypes from "./gd_types"
 import { DrawInstance as Draw } from "./Draw"
+import { NetsInstance as Nets } from "./Nets"
+import { DynlistProcInstance as Dynlist } from "./DynlistProc"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import { GoddardRendererInstance as Renderer } from "./GoddardRenderer"
-import { gd_set_identity_mat4 } from "./gd_math"
+import { gd_set_identity_mat4, gd_copy_mat4f, gd_scale_mat4f_by_vec3f } from "./gd_math"
+
 
 class Objects {
     constructor() {
@@ -12,6 +15,11 @@ class Objects {
 
         this.gGdCameraCount = 0
         this.gGdCameraList = null
+
+        this.gGdCounter = {
+            ctr0: 0,
+            ctr1: 0
+        }
 
         this.get_obj_name_str = {
             4: "joints",
@@ -346,18 +354,21 @@ class Objects {
             this.addto_group(newGroup, vargObj.header)
         })
 
-        let idStrBuf = ""
+        //let idStrBuf = ""
 
         let curLink = newGroup.link1C
         while (curLink) {
             curObj = curLink.obj
-            idStrBuf = this.sprint_obj_id(curObj)
+            //idStrBuf = this.sprint_obj_id(curObj)  not needed - just for debug
             curLink = curLink.next
         }
 
         return newGroup
+    }
 
-        throw "more implementation needed, objects.js make_group"
+    reset_nets_and_gadgets(group) {
+        Nets.func_80193848(group)
+        //Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_GADGETS, OldMenu.reset_gadget, group, OldMenu)
     }
 
     make_view(name, flags, a2, ulx, uly, lrx, lry, parts) {
@@ -383,7 +394,7 @@ class Objects {
 
         newView.components = parts
         if (newView.components) {
-            throw "more implementation newView components"
+            this.reset_nets_and_gadgets(parts)
         }
 
         Object.assign(newView, {
@@ -466,7 +477,7 @@ class Objects {
             }
 
             if (linkedObjType & types) {
-                fn.call(callingClassObject, linkedObj)
+                fn.call(callingClassObject, linkedObj.obj)
                 fnAppliedCount++
             }
 
@@ -474,6 +485,38 @@ class Objects {
         }
 
         return fnAppliedCount
+    }
+
+    func_8017F054(a0_objheader, a1_objheader) {
+
+        const sp1C = { x: 0.0, y: 0.0, z: 0.0 }
+
+        if (a1_objheader) {
+            throw "more implementation needed in Objects: func_8017F054"
+        } else {
+            Dynlist.set_cur_dynobj(a0_objheader.obj)
+            const sp48 = Dynlist.d_get_matrix_ptr()
+            const sp4C = Dynlist.d_get_idn_mtx_ptr()
+            const sp44 = Dynlist.d_get_rot_mtx_ptr()
+
+            Dynlist.d_get_scale(sp1C)
+            gd_set_identity_mat4(sp48)
+            gd_copy_mat4f(sp4C, sp44)
+            gd_scale_mat4f_by_vec3f(sp44, sp1C)
+        }
+
+        Dynlist.set_cur_dynobj(a0_objheader.obj)
+        const curGroup = Dynlist.d_get_att_objgroup()
+
+        if (curGroup) {
+            let curLink = curGroup.link1C
+            while (curLink) {
+                throw "verify headers are being passed to this function"
+                this.func_8017F054(curLink.obj, a0_objheader)
+                curLink = curLink.next
+            }
+        }
+
     }
 }
 

@@ -165,6 +165,76 @@ class DynlistProc {
         this.sDynListCurInfo = null
     }
 
+    d_get_matrix_ptr() {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- get matrix ptr"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_NETS:
+                return this.sDynListCurObj.mat128
+                break
+            default:
+                throw "Object does not support function - get matrix ptr"
+        }
+    }
+
+    d_get_idn_mtx_ptr() {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- get idn matrix ptr"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_NETS:
+                return this.sDynListCurObj.matE8
+                break
+            default:
+                throw "Object does not support function - get idn matrix ptr"
+        }
+    }
+
+    d_get_rot_mtx_ptr() {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- get rot matrix ptr"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_NETS:
+                return this.sDynListCurObj.mat168
+                break
+            default:
+                throw "Object does not support function - get rot matrix ptr"
+        }
+    }
+
+    d_get_scale(dst) {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- get scale"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_NETS:
+                dst = { ...this.sDynListCurObj.unk1AC }
+                break
+            default:
+                throw "Object does not support function - get scale"
+        }
+    }
+
+    d_get_att_objgroup() {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- get att objgroup"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_NETS:
+                return this.sDynListCurObj.unk1D4
+            default:
+                throw "Object does not support function - get att objgroup"
+        }
+
+    }
+
     d_get_rel_pos(dst) {
         if (this.sDynListCurObj == null) {
             throw "proc_dynlist(): No current object -- get rel pos"

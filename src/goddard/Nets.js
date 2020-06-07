@@ -1,4 +1,4 @@
-import { OBJ_TYPE_NETS, OBJ_TYPE_JOINTS } from "./gd_types"
+import { OBJ_TYPE_NETS, OBJ_TYPE_JOINTS, OBJ_TYPE_BONES } from "./gd_types"
 import { ObjectsInstance as Objects } from "./Objects"
 import { gd_set_identity_mat4 } from "./gd_math"
 import { JointsInstance as Joints } from "./Joints"
@@ -34,7 +34,36 @@ class Nets {
         return net
     }
 
+    Unknown80192294(net) {
+        if (net.unk1E8 == null) {
+            Objects.func_8017F054(net.header, null)
+        }
+    }
+
+    Unknown801922FC(net) {
+
+        this.gGdSkinNet = net
+
+        if (net.netType == 4) {
+            throw "more implementation needed in Nets - Unknown801922FC"
+        }
+    }
+
+    Unknown8019373C(net) {
+        if (net.netType == 2) {
+            throw "more implementation needed in Nets - Unknown8019373C"
+        }
+    }
+
+    func_80193848(group) {
+        Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.reset_net, group, this)
+        Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.Unknown80192294, group, this)
+        Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.Unknown801922FC, group, this)
+        Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.Unknown8019373C, group, this)
+    }
+
     reset_net(net) {
+
         net.unk14 = { ...net.unk20 }
         net.unk50 = { x: 0.0, y: 0.0, z: 0.0 }
         net.unkA4 = { x: 0.0, y: 0.0, z: 0.0 }
@@ -55,10 +84,11 @@ class Nets {
         const grp = net.unk1C8
 
         if (grp) {
-            //Objects.apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, Joints.func_80191604, grp, Joints)
-            throw "more implementation needed in reset net"
+            Objects.apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, Joints.func_80191604, grp, Joints)
+            Objects.apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, Joints.Unknown80191220, grp, Joints)
+            //Objects.apply_to_obj_types_in_group(OBJ_TYPE_BONES, , grp, )
+            //Objects.apply_to_obj_types_in_group(OBJ_TYPE_BONES, , grp, )
         }
-
 
     }
 }

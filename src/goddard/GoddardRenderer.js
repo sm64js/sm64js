@@ -2,6 +2,7 @@ import * as MathUtil from "../engine/math_util"
 import { ObjectsInstance as Objects } from "./Objects"
 import * as GDTypes from "./gd_types"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
+import { DrawInstance as Draw } from "./Draw"
 import * as Gbi from "../include/gbi"
 
 const MAX_GD_DLS = 1000
@@ -684,6 +685,15 @@ class GoddardRenderer {
 
     make_view_withgrp(name, grp) {
 
+        const view = Objects.make_view(name, (GDTypes.VIEW_DRAW | GDTypes.VIEW_ALLOC_ZBUF | GDTypes.VIEW_MOVEMENT), 1, 0, 0, 320, 240, grp)
+        view.header.obj = view
+
+        const viewgrp = Objects.make_group(2, [grp, view])
+        viewgrp.header.obj = viewgrp
+
+        view.lights = Draw.gGdLightGroup
+
+        return view
     }
 
     gdm_maketestdl(id) {
@@ -691,10 +701,9 @@ class GoddardRenderer {
             case 2: // Regular face
                 if (this.sMarioSceneGrp == null) {
                     Shapes.load_mario_head(Shapes.animate_mario_head_normal)
-                    this.sMarioSceneGrp = this.gMarioFaceGrp
+                    this.sMarioSceneGrp = Shapes.gMarioFaceGrp
                     //this.gd_setup_cursor() TODO
                 }
-                console.log(this.sMarioSceneGrp)
                 this.sMSceneView = this.make_view_withgrp("mscene", this.sMarioSceneGrp)
                 break
             default:

@@ -1,6 +1,6 @@
 import { OBJ_TYPE_NETS, OBJ_TYPE_JOINTS, OBJ_TYPE_BONES } from "./gd_types"
 import { ObjectsInstance as Objects } from "./Objects"
-import { gd_set_identity_mat4 } from "./gd_math"
+import { gd_set_identity_mat4, gd_rot_mat_about_vec, gd_add_vec3f_to_mat4f_offset, gd_copy_mat4f } from "./gd_math"
 import { JointsInstance as Joints } from "./Joints"
 
 
@@ -69,7 +69,7 @@ class Nets {
         net.unkA4 = { x: 0.0, y: 0.0, z: 0.0 }
         net.unk68 = { x: 0.0, y: 0.0, z: 0.0 }
 
-        //this.func_80191F10(net) TODO
+        //this.func_80191F10(net) TODO - may not be necessary?
         this.gGdSkinNet = net
         this.D_801BAAF4 = 0
 
@@ -77,9 +77,9 @@ class Nets {
         net.matE8 = new Array(4).fill(0).map(() => new Array(4).fill(0))
         gd_set_identity_mat4(net.mat168)
         gd_set_identity_mat4(net.matE8)
-        //gd_rot_mat_about_vec(net.matE8, net.unk68) TODO FIX EYES
-        //gd_add_vec3f_to_mat4f_offset(net.matE8, net.unk14)
-        //gd_copy_mat4f(net.matE8, net.mat128)
+        gd_rot_mat_about_vec(net.matE8, net.unk68) 
+        gd_add_vec3f_to_mat4f_offset(net.matE8, net.unk14)
+        gd_copy_mat4f(net.matE8, net.mat128)
 
         const grp = net.unk1C8
 

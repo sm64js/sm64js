@@ -2,6 +2,9 @@ import * as MathUtil from "../../engine/math_util"
 import * as Gbi from "../../include/gbi"
 import * as LevelData from "./leveldata"
 import * as cGFX from "../../common_gfx/segment2"
+import * as TitleScreenBG from "./title_screen_bg"
+
+const canvas = document.querySelector('#gameCanvas')
 
 let gTitleZoomCounter = 0
 let gTitleFadeCounter = 0
@@ -9,6 +12,9 @@ let gTitleFadeCounter = 0
 const INTRO_STEPS_ZOOM_IN = 20
 const INTRO_STEPS_HOLD_1 = 75
 const INTRO_STEPS_ZOOM_OUT = 91
+
+const INTRO_BACKGROUND_SUPER_MARIO = 0
+const INTRO_BACKGROUND_GAME_OVER = 1
 
 const intro_seg7_table_0700C790 = [
     0.016000, 0.052000, 0.002500, 0.148300,
@@ -107,4 +113,67 @@ export const geo_fade_transition = (param, graphNode, unused) => {
         }
     }
     return displayList
+}
+
+const introBackgroundIndexTable= [
+    INTRO_BACKGROUND_SUPER_MARIO, INTRO_BACKGROUND_SUPER_MARIO, INTRO_BACKGROUND_SUPER_MARIO,
+    INTRO_BACKGROUND_SUPER_MARIO, INTRO_BACKGROUND_SUPER_MARIO, INTRO_BACKGROUND_SUPER_MARIO,
+    INTRO_BACKGROUND_SUPER_MARIO, INTRO_BACKGROUND_SUPER_MARIO, INTRO_BACKGROUND_SUPER_MARIO,
+    INTRO_BACKGROUND_SUPER_MARIO, INTRO_BACKGROUND_SUPER_MARIO, INTRO_BACKGROUND_SUPER_MARIO,
+]
+
+
+const introBackgroundTables = [ introBackgroundIndexTable ]
+
+const introBackgroundDlRows = [
+    TitleScreenBG.title_screen_bg_dl_0A000130, TitleScreenBG.title_screen_bg_dl_0A000148,
+    TitleScreenBG.title_screen_bg_dl_0A000160, TitleScreenBG.title_screen_bg_dl_0A000178
+]
+
+const intro_backdrop_one_image = (index, backgroundTable) => {
+    const aspect = canvas.width / canvas.height
+    const num_tiles_h = parseInt(((aspect * canvas.height) + 159) / 160)
+
+    const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
+
+    const vIntroBgTable = TitleScreenBG.mario_title_texture_table
+    const displayList = []
+
+    MathUtil.guTranslate(mtx, 
+        ((index % num_tiles_h) * 80), // x
+        Math.floor(index / num_tiles_h) * 80, // y
+        0.0) // z
+
+    Gbi.gSPMatrix(displayList, mtx, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_PUSH)
+    Gbi.gSPDisplayList(displayList, TitleScreenBG.title_screen_bg_dl_0A000118)
+    for (let j = 0; j < 4; ++j) {
+        Gbi.gDPLoadTextureBlock(displayList, vIntroBgTable[j], Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 80, 20, 0, Gbi.G_TX_CLAMP, Gbi.G_TX_CLAMP, 7, 6, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD)   
+        Gbi.gSPDisplayList(displayList, introBackgroundDlRows[j])
+    }
+    //Gbi.gSPPopMatrix(displayList, Gbi.G_MTX_MODELVIEW) TODO
+    Gbi.gSPEndDisplayList(displayList)
+    return displayList
+}
+
+export const geo_intro_backdrop = (param, graphNode, unused) => {
+    if (param == 0) {
+        // "geo intro backdrop init - do nothing"
+    } else {
+        const index = graphNode.unk18 & 0xff
+        const backgroundTable = introBackgroundTables[index]
+        const displayList = []
+        const aspect = canvas.width / canvas.height
+        const num_tiles_h = parseInt(((aspect * canvas.height) + 159) / 160)
+
+        graphNode.flags = (graphNode.flags & 0xFF) | 0x100
+        Gbi.gSPDisplayList(displayList, cGFX.dl_proj_mtx_fullscreen)
+        Gbi.gSPDisplayList(displayList, TitleScreenBG.title_screen_bg_dl_0A000100)
+        for (let i = 0; i < num_tiles_h * 3; ++i) {
+            Gbi.gSPDisplayList(displayList, intro_backdrop_one_image(i, backgroundTable))
+        }
+        Gbi.gSPDisplayList(displayList, TitleScreenBG.title_screen_bg_dl_0A000190)
+        Gbi.gSPEndDisplayList(displayList)
+
+        return displayList
+    }
 }

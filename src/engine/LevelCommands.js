@@ -97,12 +97,22 @@ class LevelCommands {
         this.sCurrentScript.index++
     }
 
+    end_area(args) {
+        this.sCurrAreaIndex = -1
+        this.sCurrentScript.index++
+    }
+
     transition(args) {
 
         if (Area.gCurrentArea) {
             Area.play_transition(args[0], args[1], args[2], args[3], args[4])
         }
 
+        this.sCurrentScript.index++
+    }
+
+    cleardemoptr(args) {
+        Game.gCurrDemoInput = null
         this.sCurrentScript.index++
     }
 

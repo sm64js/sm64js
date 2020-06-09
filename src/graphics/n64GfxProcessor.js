@@ -771,7 +771,6 @@ export class n64GfxProcessor {
 
             opCount++
             command.opCount = opCount
-            //console.log(command)
 
             switch (opcode) {
                 case Gbi.G_ENDDL: /// not necessary for JS

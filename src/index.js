@@ -9,7 +9,7 @@ const send_display_list = (gfx_list) => {
 
 const produce_one_frame = () => {
 
-    if (n_frames > 95) { throw "Hit max frames" }
+    if (n_frames > 97) { throw "Hit max frames" }
     console.log("new frame: " + n_frames)
     n_frames++
 
@@ -26,7 +26,7 @@ const main_func = () => {
     /// WebGL class and n64GfxProcessor class are initialized with their constructor when they are imported
     Game.attachInterfaceToGfxProcessor(send_display_list)
      
-    setInterval(produce_one_frame, 3) //36 seems good
+    setInterval(produce_one_frame, 36) //36 seems good
     
 }
 

@@ -294,6 +294,8 @@ export const G_RM_AA_ZB_TEX_EDGE_NOOP2 = 0x443078
 export const G_RM_AA_ZB_OPA_INTER_NOOP2 = 0x442478
 export const G_RM_AA_XLU_SURF_SURF2 = 0x5041c8
 export const G_RM_AA_ZB_XLU_SURF_SURF2 = 0x5049d8
+export const G_RM_AA_OPA_SURF_SURF2 = 0x552048
+export const G_RM_AA_ZB_OPA_SURF_SURF2 = 0x552078
 
 
 //G_MOVEWORD types
@@ -335,6 +337,11 @@ export const G_CC_DECALFADE = {
 
 export const G_CC_DECALRGBA = {
     alpha: [7, 7, 7, 1],
+    rgb: [15, 15, 31, 1]
+}
+
+export const G_CC_DECALRGB = {
+    alpha: [7, 7, 7, 4],
     rgb: [15, 15, 31, 1]
 }
 
@@ -503,6 +510,18 @@ export const gSPDisplayList = (displaylist, childDisplayList) => {
             w1: { childDisplayList, branch: G_DL_PUSH }
         }
     })
+}
+
+export const gDPLoadTextureBlock = (displaylist, timg, fmt, siz, width, height, pal, cms, cmt, masks, maskt, shifts, shiftt) => {
+    displaylist.push(
+        gsDPSetTextureImage(fmt, siz, 1, timg),
+        gsDPSetTile(fmt, G_IM_SIZ_LOAD_BLOCK_TABLE[siz], 0, 0, G_TX_LOADTILE, 0, cmt, maskt, shiftt, cms, masks, shifts),
+        gsDPLoadBlock(G_TX_LOADTILE, 0, 0, (((width) * (height) + G_IM_SIZ_INCR_TABLE[siz]) >> G_IM_SIZ_SHIFT_TABLE[siz]) - 1),
+        gsDPSetTile(fmt, siz,
+            ((((width) * G_IM_SIZ_LINE_BYTES_TABLE[siz]) + 7) >> 3),
+            0, G_TX_RENDERTILE, pal, cmt, maskt, shiftt, cms, masks, shifts),
+        gsDPSetTileSize(G_TX_RENDERTILE, 0, 0, ((width) - 1) << G_TEXTURE_IMAGE_FRAC, ((height) - 1) << G_TEXTURE_IMAGE_FRAC)
+    )
 }
 
 export const gsSPDisplayList = (childDisplayList) => {

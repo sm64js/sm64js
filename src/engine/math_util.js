@@ -158,6 +158,13 @@ export const guPerspective = (m, perspNorm, fovy, aspect, near, far, scale) => {
     }
 }
 
+export const guTranslate = (m, x, y, z) => {
+    mtxf_identity(m)
+    m[3][0] = x
+    m[3][1] = y
+    m[3][2] = z
+}
+
 export const guScale = (m, x, y, z) => {
     mtxf_identity(m)
     m[0][0] = x

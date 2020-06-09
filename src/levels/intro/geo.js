@@ -1,5 +1,5 @@
 import { GeoLayoutInstance as GeoLayout } from "../../engine/GeoLayout"
-import { geo_title_screen, geo_fade_transition } from "./gfx"
+import { geo_title_screen, geo_fade_transition, geo_intro_backdrop } from "./gfx"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -33,6 +33,24 @@ export const intro_geo_0002D0 = [
     { command: GeoLayout.open_node },
     { command: GeoLayout.node_generated, args: [ 0, geo_fade_transition ] },
     { command: GeoLayout.close_node },
+    { command: GeoLayout.close_node },
+    { command: GeoLayout.node_end }
+]
+
+export const intro_geo_00035C = [
+    {
+        command: GeoLayout.node_screen_area,
+        args: [0, canvas.width / 2, canvas.height / 2, canvas.width / 2, canvas.height / 2]
+    },
+    { command: GeoLayout.open_node },
+    { command: GeoLayout.node_master_list, args: [0] },
+    { command: GeoLayout.open_node },
+    { command: GeoLayout.node_ortho, args: [100] },
+    { command: GeoLayout.open_node },
+    { command: GeoLayout.node_generated, args: [0, geo_intro_backdrop] },
+    { command: GeoLayout.close_node },
+    { command: GeoLayout.close_node },
+    { command: GeoLayout.node_master_list, args: [1] },
     { command: GeoLayout.close_node },
     { command: GeoLayout.node_end }
 ]

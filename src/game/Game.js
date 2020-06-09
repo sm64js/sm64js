@@ -59,6 +59,25 @@ class Game {
         this.gDisplayList = []
     }
 
+    rsp_init() {
+        Gbi.gSPClearGeometryMode(this.gDisplayList, Gbi.G_SHADE | Gbi.G_SHADING_SMOOTH | Gbi.G_CULL_BOTH | Gbi.G_FOG | Gbi.G_LIGHTING | Gbi.G_TEXTURE_GEN | Gbi.G_TEXTURE_GEN_LINEAR | Gbi.G_LOD)
+        Gbi.gSPSetGeometryMode(this.gDisplayList, Gbi.G_SHADE | Gbi.G_SHADING_SMOOTH | Gbi.G_CULL_BACK | Gbi.G_LIGHTING)
+        Gbi.gSPNumLights(this.gDisplayList, 1)
+        Gbi.gSPTexture(this.gDisplayList, 0, 0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF)
+    }
+
+    rdp_init() {
+        Gbi.gDPSetCombineMode(this.gDisplayList, Gbi.G_CC_SHADE)
+        Gbi.gDPSetTextureFilter(this.gDisplayList, Gbi.G_TF_BILERP)
+        Gbi.gDPSetRenderMode(this.gDisplayList, Gbi.G_RM_OPA_SURF_SURF2);
+        Gbi.gDPSetCycleType(this.gDisplayList, Gbi.G_CYC_FILL)
+    }
+
+    init_render_image() {
+        this.rsp_init()
+        this.rdp_init()
+    }
+
     display_and_vsync() {
         this.send_display_list(this.gDisplayList)
     }

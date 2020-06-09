@@ -73,7 +73,11 @@ export class n64GfxProcessor {
             loaded_texture: [{ textureData: null, size_bytes: 0, id: 0 }, { textureData: null, size_bytes: 0, id: 0 }],
             texture_tile: { fmt: 0, siz: 0, cms: 0, cmt: 0, uls: 0, ult: 0, lrs: 0, lrt: 0, line_size_bytes: 0 },
             textures_changed: [false, false],
-            other_mode_l: 0, other_mode_h: 0,
+            other_mode_l: 0,  /// TODO other_mode_l
+            other_mode_h: {
+                12: 0, //Gbi.G_MDSFT_TEXTFILT
+                20: 0 //GBI.G_MDSFT_CYCLETYPE
+            },
             combine_mode: 0,
             env_color: { r: 0, g: 0, b: 0, a: 0 },
             prim_color: { r: 0, g: 0, b: 0, a: 0 },
@@ -470,7 +474,7 @@ export class n64GfxProcessor {
                     this.import_texture(i)
                     this.rdp.textures_changed[i] = false
                 }
-                const linear_filter = (this.rdp.other_mode_h & (3 << Gbi.G_MDSFT_TEXTFILT)) != Gbi.G_TF_POINT
+                const linear_filter = this.rdp.other_mode_h[Gbi.G_MDSFT_TEXTFILT] != 0
                 if (linear_filter != this.rendering_state.textures[i].linear_filter ||
                     this.rdp.texture_tile.cms != this.rendering_state.textures[i].cms ||
                     this.rdp.texture_tile.cmt != this.rendering_state.textures[i].cmt) {
@@ -498,7 +502,7 @@ export class n64GfxProcessor {
             if (use_texture) {
                 let u = (v_arr[i].u - this.rdp.texture_tile.uls * 8) / 32.0
                 let v = (v_arr[i].v - this.rdp.texture_tile.ult * 8) / 32.0
-                if ((this.rdp.other_mode_h & (3 << Gbi.G_MDSFT_TEXTFILT)) != Gbi.G_TF_POINT) {
+                if (this.rdp.other_mode_h[Gbi.G_MDSFT_TEXTFILT] != Gbi.G_TF_POINT) {
                     // Linear filter adds 0.5f to the coordinates
                     u += 0.5
                     v += 0.5
@@ -552,11 +556,11 @@ export class n64GfxProcessor {
     }
 
     draw_rectangle(ulx, uly, lrx, lry) {
-        const saved_other_mode_h = this.rdp.other_mode_h
-        const cycle_type = (this.rdp.other_mode_h & (3 << Gbi.G_MDSFT_CYCLETYPE))
+        const saved_other_mode_h = { ...this.rdp.other_mode_h }
+        const cycle_type = this.rdp.other_mode_h[Gbi.G_MDSFT_CYCLETYPE]
 
         if (cycle_type == Gbi.G_CYC_COPY) {
-            this.rdp.other_mode_h = (this.rdp.other_mode_h & ~(3 << Gbi.G_MDSFT_TEXTFILT)) | Gbi.G_TF_POINT
+            this.rdp.other_mode_h[Gbi.G_MDSFT_TEXTFILT] = Gbi.G_TF_POINT
         }
 
         ulx = (ulx / (WebGL.canvas.width / 2.0)) - 1.0
@@ -605,7 +609,7 @@ export class n64GfxProcessor {
         this.rdp.viewport_or_scissor_changed = true
 
         if (cycle_type == Gbi.G_CYC_COPY) {
-            this.rdp.other_mode_h = saved_other_mode_h
+            this.rdp.other_mode_h = { ...saved_other_mode_h }
         }
 
     }
@@ -620,9 +624,9 @@ export class n64GfxProcessor {
             return
         }
 
-        const mode = this.rdp.other_mode_h & (3 << Gbi.G_MDSFT_CYCLETYPE)
+        const mode = this.rdp.other_mode_h[Gbi.G_MDSFT_CYCLETYPE]
 
-        if (mode == Gbi.G_CYC_COPY || mode == Gbi.G_CYC_FILL || true) { ///TODO_OTHERMODE
+        if (mode == Gbi.G_CYC_COPY || mode == Gbi.G_CYC_FILL) {
             // Per documentation one extra pixel is added in this modes to each edge
             lrx += 1
             lry += 1
@@ -642,6 +646,14 @@ export class n64GfxProcessor {
 
     sp_texture(s, t) {
         this.rsp.texture_scaling_factor = { s, t }
+    }
+
+    sp_set_other_mode_h(category, newmode) {
+        this.rdp.other_mode_h[category] = newmode
+    }
+
+    sp_set_other_mode_l(newmode) {
+        this.rdp.other_mode_l = (this.rdp.other_mode_l & 0x7) | newmode
     }
 
     dp_set_tile(fmt, siz, line, tmem, tile, palette, cmt, cms) {
@@ -667,6 +679,15 @@ export class n64GfxProcessor {
 
     dp_set_texture_image(size, imageData, id) {
         Object.assign(this.rdp.texture_to_load, { size, id, textureData: imageData })
+    }
+
+    sp_moveword(type, data) {
+
+        if (type == Gbi.G_MW_NUMLIGHT) {
+            this.rsp.current_num_lights = data
+            this.rsp.lights_changed = true
+        } else throw " moveword fog not implemented "
+
     }
 
     dp_load_block(tile, uls, ult, lrs) {
@@ -765,11 +786,20 @@ export class n64GfxProcessor {
                 case Gbi.G_TRI1:
                     this.sp_tri1(args.v0, args.v1, args.v2)
                     break
+                case Gbi.G_MOVEWORD:
+                    this.sp_moveword(args.type, args.data)
+                    break
                 case Gbi.G_SETGEOMETRYMODE:
                     this.sp_geometry_mode(0, args.mode)
                     break
                 case Gbi.G_CLEARGEOMETRYMODE:
                     this.sp_geometry_mode(args.mode, 0)
+                    break
+                case Gbi.G_SETOTHERMODE_H:
+                    this.sp_set_other_mode_h(args.category, args.newmode)
+                    break
+                case Gbi.G_SETOTHERMODE_L:
+                    this.sp_set_other_mode_l(args.mode)
                     break
                 case Gbi.G_SETCOMBINE:
                     const rgb = this.color_comb(args.mode.rgb[0], args.mode.rgb[1], args.mode.rgb[2], args.mode.rgb[3])

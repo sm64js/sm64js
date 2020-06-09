@@ -1,6 +1,7 @@
 import { GeoLayoutInstance as GeoLayout } from "./GeoLayout"
 import { AreaInstance as Area } from "../game/Area"
 import { GameInstance as Game } from "../game/Game"
+import * as Gbi from "../include/gbi"
 import { GoddardRendererInstance as GoddardRenderer } from "../goddard/GoddardRenderer"
 
 const SCRIPT_RUNNING = 1
@@ -123,6 +124,7 @@ class LevelCommands {
             cmd.command.call(this, cmd.args)
         }
 
+        Game.init_render_image()
         Area.render_game()
         Game.end_master_display_list()
 

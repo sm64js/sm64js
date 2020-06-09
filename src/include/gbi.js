@@ -39,10 +39,10 @@ export const G_CULL_BACK = 32
 export const G_FOG = 16
 export const G_LIGHTING = 32
 export const G_TEXTURE_GEN = 64
-//export const G_LOD = 11
 export const G_TEXTURE_GEN_LINEAR = 128
 export const G_CLIPPING = 256
 export const G_CULL_BOTH = 512
+export const G_LOD = 1024
 
 export const  G_ON	= 1
 export const G_OFF = 0
@@ -56,7 +56,7 @@ export const G_DL_NOPUSH	=	0x01
 export const 	G_TEXTURE_IMAGE_FRAC =	2
 export const 	G_TEXTURE_SCALE_FRAC =	16
 export const 	G_SCALE_FRAC	=	8
-export const G_ROTATE_FRAC = 16
+export const    G_ROTATE_FRAC = 16
 
 
 
@@ -88,57 +88,57 @@ export const G_MDSFT_PIPELINE		=23
 
 
 /* G_SETOTHERMODE_H gPipelineMode */
-export const G_PM_1PRIMITIVE =  1 << G_MDSFT_PIPELINE
-export const G_PM_NPRIMITIVE =  0 << G_MDSFT_PIPELINE
+export const G_PM_1PRIMITIVE =  1
+export const G_PM_NPRIMITIVE =  0
 
 /* G_SETOTHERMODE_H gSetCycleType */
-export const G_CYC_1CYCLE =  0 << G_MDSFT_CYCLETYPE
-export const G_CYC_2CYCLE =  1 << G_MDSFT_CYCLETYPE
-export const G_CYC_COPY =  2 << G_MDSFT_CYCLETYPE
-export const G_CYC_FILL = 3 << G_MDSFT_CYCLETYPE
+export const G_CYC_1CYCLE =  0
+export const G_CYC_2CYCLE =  1
+export const G_CYC_COPY =  2
+export const G_CYC_FILL = 3
 
 /* G_SETOTHERMODE_H gSetTexturePersp */
-export const G_TP_NONE  =  (0 << G_MDSFT_TEXTPERSP)
-export const G_TP_PERSP  =  (1 << G_MDSFT_TEXTPERSP)
+export const G_TP_NONE  =  0
+export const G_TP_PERSP  =  1
 
 /* G_SETOTHERMODE_H gSetTextureDetail */
-export const G_TD_CLAMP  =  (0 << G_MDSFT_TEXTDETAIL)
-export const G_TD_SHARPEN  =  (1 << G_MDSFT_TEXTDETAIL)
-export const G_TD_DETAIL  =  (2 << G_MDSFT_TEXTDETAIL)
+export const G_TD_CLAMP  =  0
+export const G_TD_SHARPEN  =  1
+export const G_TD_DETAIL  =  2
 
 /* G_SETOTHERMODE_H gSetTextureLOD */
-export const G_TL_TILE  =  (0 << G_MDSFT_TEXTLOD)
-export const G_TL_LOD  =  (1 << G_MDSFT_TEXTLOD)
+export const G_TL_TILE  =  0
+export const G_TL_LOD  =  1
 
 /* G_SETOTHERMODE_H gSetTextureLUT */
-export const G_TT_NONE  =  (0 << G_MDSFT_TEXTLUT)
-export const G_TT_RGBA16  =  (2 << G_MDSFT_TEXTLUT)
-export const G_TT_IA16  =  (3 << G_MDSFT_TEXTLUT)
+export const G_TT_NONE  =  0
+export const G_TT_RGBA16  =  2
+export const G_TT_IA16  =  3
 
 /* G_SETOTHERMODE_H gSetTextureFilter */
-export const G_TF_POINT  =  (0 << G_MDSFT_TEXTFILT)
-export const G_TF_AVERAGE  =  (3 << G_MDSFT_TEXTFILT)
-export const G_TF_BILERP  =  (2 << G_MDSFT_TEXTFILT)
+export const G_TF_POINT  =  0
+export const G_TF_AVERAGE  =  3
+export const G_TF_BILERP  =  2
 
 /* G_SETOTHERMODE_H gSetTextureConvert */
-export const G_TC_CONV  =  (0 << G_MDSFT_TEXTCONV)
-export const G_TC_FILTCONV  =  (5 << G_MDSFT_TEXTCONV)
-export const G_TC_FILT  =  (6 << G_MDSFT_TEXTCONV)
+export const G_TC_CONV  =  0
+export const G_TC_FILTCONV  =  5
+export const G_TC_FILT  =  6
 
 /* G_SETOTHERMODE_H gSetCombineKey */
-export const G_CK_NONE  =  (0 << G_MDSFT_COMBKEY)
-export const G_CK_KEY  =  (1 << G_MDSFT_COMBKEY)
+export const G_CK_NONE  =  0
+export const G_CK_KEY  =  1
 
 /* G_SETOTHERMODE_H gSetColorDither */
-export const	G_CD_MAGICSQ  =  (0 << G_MDSFT_RGBDITHER)
-export const	G_CD_BAYER  =  (1 << G_MDSFT_RGBDITHER)
-export const G_CD_NOISE = (2 << G_MDSFT_RGBDITHER)
+export const	G_CD_MAGICSQ  =  0
+export const	G_CD_BAYER  =  1
+export const G_CD_NOISE = 2
 
 /* G_SETOTHERMODE_H gSetAlphaDither */
-export const G_AD_PATTERN = (0 << G_MDSFT_ALPHADITHER)
-export const G_AD_NOTPATTERN = (1 << G_MDSFT_ALPHADITHER)
-export const G_AD_NOISE = (2 << G_MDSFT_ALPHADITHER)
-export const G_AD_DISABLE = (3 << G_MDSFT_ALPHADITHER)
+export const G_AD_PATTERN = 0
+export const G_AD_NOTPATTERN = 1
+export const G_AD_NOISE = 2
+export const G_AD_DISABLE = 3
 
 /* G_SETOTHERMODE_L gSetAlphaCompare */
 export const G_AC_NONE = (0 << G_MDSFT_ALPHACOMPARE)
@@ -288,6 +288,13 @@ export const G_TX_CLAMP	= 0x2
 export const G_TX_NOMASK	= 0
 export const G_TX_NOLOD = 0
 
+//// Render Modes
+export const G_RM_OPA_SURF_SURF2 = 0xf0a4000
+export const G_RM_AA_ZB_TEX_EDGE_NOOP2 = 0x443078
+export const G_RM_AA_ZB_OPA_INTER_NOOP2 = 0x442478
+export const G_RM_AA_XLU_SURF_SURF2 = 0x5041c8
+export const G_RM_AA_ZB_XLU_SURF_SURF2 = 0x5049d8
+
 
 //G_MOVEWORD types
 export const G_MW_MATRIX = 0x00 /* NOTE: also used by movemem */
@@ -323,6 +330,11 @@ export const G_CC_SHADE = {
 
 export const G_CC_DECALFADE = {
     alpha: [7, 7, 7, 5],
+    rgb: [15, 15, 31, 1]
+}
+
+export const G_CC_DECALRGBA = {
+    alpha: [7, 7, 7, 1],
     rgb: [15, 15, 31, 1]
 }
 
@@ -399,6 +411,33 @@ export const gSPMatrix = (displaylist, matrix, parameters) => {
         words: {
             w0: G_MTX,
             w1: { matrix, parameters }
+        }
+    })
+}
+
+export const gDPSetRenderMode = (displaylist, mode) => {
+    displaylist.push({
+        words: {
+            w0: G_SETOTHERMODE_L,
+            w1: { mode }
+        }
+    })
+}
+
+export const gDPSetTextureFilter = (displaylist, newmode) => {
+    displaylist.push({
+        words: {
+            w0: G_SETOTHERMODE_H,
+            w1: { category: G_MDSFT_TEXTFILT, newmode }
+        }
+    })
+}
+
+export const gDPSetCycleType = (displaylist, newmode) => {
+    displaylist.push({
+        words: {
+            w0: G_SETOTHERMODE_H,
+            w1: { category: G_MDSFT_CYCLETYPE, newmode }
         }
     })
 }
@@ -489,6 +528,33 @@ export const gsSPEndDisplayList = () => {
     return {
         words: {
             w0: G_ENDDL
+        }
+    }
+}
+
+export const gsDPSetRenderMode = (mode) => {
+    return {
+        words: {
+            w0: G_SETOTHERMODE_L,
+            w1: { mode }
+        }
+    }
+}
+
+export const gsDPSetTextureFilter = (newmode) => {
+    return {
+        words: {
+            w0: G_SETOTHERMODE_H,
+            w1: { category: G_MDSFT_TEXTFILT, newmode }
+        }
+    }
+}
+
+export const gsDPSetCycleType = (newmode) => {
+    return {
+        words: {
+            w0: G_SETOTHERMODE_H,
+            w1: { category: G_MDSFT_CYCLETYPE, newmode }
         }
     }
 }

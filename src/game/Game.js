@@ -79,6 +79,10 @@ class Game {
     }
 
     display_and_vsync() {
+        if (this.D_8032C6A0_vsyncFunc) {
+            this.D_8032C6A0_vsyncFunc.call(this.D_8032C6A0_classObject)
+            this.D_8032C6A0_vsyncFunc = null
+        }
         this.send_display_list(this.gDisplayList)
     }
 }

@@ -158,6 +158,7 @@ const intro_backdrop_one_image = (index, backgroundTable) => {
 export const geo_intro_backdrop = (param, graphNode, unused) => {
     if (param == 0) {
         // "geo intro backdrop init - do nothing"
+        return []
     } else {
         const index = graphNode.unk18 & 0xff
         const backgroundTable = introBackgroundTables[index]

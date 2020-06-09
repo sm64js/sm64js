@@ -1,5 +1,6 @@
 import { GeoLayoutInstance as GeoLayout } from "../../engine/GeoLayout"
 import { geo_title_screen, geo_fade_transition, geo_intro_backdrop } from "./gfx"
+import { MarioMiscInstance as MarioMisc } from "../../game/MarioMisc"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -51,6 +52,12 @@ export const intro_geo_00035C = [
     { command: GeoLayout.close_node },
     { command: GeoLayout.close_node },
     { command: GeoLayout.node_master_list, args: [1] },
+    { command: GeoLayout.open_node },
+    { command: GeoLayout.node_perspective, args: [45, 128, 16384] },
+    { command: GeoLayout.open_node },
+    { command: GeoLayout.node_generated, args: [2, MarioMisc.geo_draw_mario_head_goddard] },
+    { command: GeoLayout.close_node },
+    { command: GeoLayout.close_node },
     { command: GeoLayout.close_node },
     { command: GeoLayout.node_end }
 ]

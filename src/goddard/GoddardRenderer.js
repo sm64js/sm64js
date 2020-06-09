@@ -842,6 +842,39 @@ class GoddardRenderer {
         return view
     }
 
+    gd_vblank() {
+        /// only thing that seems to be necessary is reset_cur_dl_indices
+        console.log(this)
+        throw "vblank"
+    }
+
+    update_view_and_dl(view) {
+        throw "update_view_and_dl"
+    }
+
+    gdm_gettestdl(id) {
+        let gddl
+        const vec = { x: 0.0, y: 0.0, z: 0.0 }
+
+        switch (id) {
+            case 2:
+            case 3:
+                this.update_view_and_dl(this.sMSceneView)
+                Gbi.gSPEndDisplayList(this.sCurrentGdDl.gfx)
+                gddl = this.sMHeadMainDls[this.gGdFrameBuf]
+                break
+            default:
+                throw "gdm_gettestdl no case for id"
+            
+        }
+
+        if (gddl == null) {
+            throw "no display list in gd renderer"
+        }
+
+        return gddl.gfx
+    }
+
     gdm_maketestdl(id) {
         switch (id) {
             case 2: // Regular face

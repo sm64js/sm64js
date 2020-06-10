@@ -15,6 +15,35 @@ class Draw {
 
     nop_obj_draw() { }
 
+    set_view_update_camera(cam) {
+        if (this.gViewUpdateCamera) return
+        this.gViewUpdateCamera = cam
+    }
+
+    update_view(view) {
+        this.sUpdateViewState.shapesDrawn = 0
+        this.sUpdateViewState.unused18 = 0
+
+        this.gViewUpdateCamera = null
+        if (view.components) {
+            Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_CAMERAS, this.set_view_update_camera, view.components, this)
+            view.activeCam = this.gViewUpdateCamera
+
+            if (view.activeCam) {
+                this.gViewUpdateCamera.unk18C = view
+            }
+        }
+
+        if (view.flags & GDTypes.VIEW_MOVEMENT) {
+            Objects.proc_view_movement(view)
+            this.gViewUpdateCamera = view.activeCam
+        }
+
+        this.sUpdateViewState.view = view
+
+
+    }
+
     apply_obj_draw_fn(obj) {
         if (obj.header == null) {
             throw "apply_obj_draw_fn - obj is null"

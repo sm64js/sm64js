@@ -174,6 +174,9 @@ class DynlistProc {
             case GDTypes.OBJ_TYPE_NETS:
                 return this.sDynListCurObj.mat128
                 break
+            case GDTypes.OBJ_TYPE_JOINTS:
+                return this.sDynListCurObj.matE8
+                break
             default:
                 throw "Object does not support function - get matrix ptr"
         }
@@ -187,6 +190,9 @@ class DynlistProc {
         switch (this.sDynListCurObj.header.type) {
             case GDTypes.OBJ_TYPE_NETS:
                 return this.sDynListCurObj.matE8
+                break
+            case GDTypes.OBJ_TYPE_JOINTS:
+                return this.sDynListCurObj.mat168
                 break
             default:
                 throw "Object does not support function - get idn matrix ptr"
@@ -202,6 +208,9 @@ class DynlistProc {
             case GDTypes.OBJ_TYPE_NETS:
                 return this.sDynListCurObj.mat168
                 break
+            case GDTypes.OBJ_TYPE_JOINTS:
+                return this.sDynListCurObj.mat128
+                break
             default:
                 throw "Object does not support function - get rot matrix ptr"
         }
@@ -216,6 +225,9 @@ class DynlistProc {
             case GDTypes.OBJ_TYPE_NETS:
                 dst = { ...this.sDynListCurObj.unk1AC }
                 break
+            case GDTypes.OBJ_TYPE_JOINTS:
+                dst = { ...this.sDynListCurObj.unk9C }
+                break
             default:
                 throw "Object does not support function - get scale"
         }
@@ -229,6 +241,8 @@ class DynlistProc {
         switch (this.sDynListCurObj.header.type) {
             case GDTypes.OBJ_TYPE_NETS:
                 return this.sDynListCurObj.unk1D4
+            case GDTypes.OBJ_TYPE_JOINTS:
+                return this.sDynListCurObj.unk1F8
             default:
                 throw "Object does not support function - get att objgroup"
         }
@@ -401,6 +415,7 @@ class DynlistProc {
 
                 vtxdata.data.forEach(vertex => {
                     const vtx = Shapes.make_vertex(vertex[0], vertex[1], vertex[2])
+                    vtx.header.obj = vtx
                     vtx.normal = { x: 0.0, y: 0.0, z: 0.0 }
                     vtxbuf.push(vtx)
                 })
@@ -1002,7 +1017,7 @@ class DynlistProc {
                 dobj = Objects.make_group(0)
                 break
             case this.D_VERTEX:
-                dobj = Objects.make_vertex(0.0, 0.0, 0.0)
+                dobj = Shapes.make_vertex(0.0, 0.0, 0.0)
                 break
             case this.D_FACE:
                 dobj = Objects.make_face_with_colour(1.0, 1.0, 1.0)

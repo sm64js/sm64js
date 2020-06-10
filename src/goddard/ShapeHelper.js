@@ -21,8 +21,81 @@ class ShapeHelper {
         Draw.gGdLightGroup = Objects.make_group(0)
     }
 
-    animate_mario_head_normal() {
-        throw "mario head animate"
+    animate_mario_head_normal(self) {
+
+        const aBtnPressed = false
+        let state = 0
+
+        switch (self.unk4C) {
+            case 0:
+                self.unk28 = 1.0
+                self.unk20 = 0
+                state = 2
+                self.unk50 = 5
+                break
+            case 2:
+                if (aBtnPressed) {
+                    state = 5
+                }
+
+                self.unk28 += 1.0
+
+                if (self.unk28 == 810.0) {
+                    self.unk28 = 750.0
+                    self.unk50 -= 1
+                    if (self.unk50 == 0) {
+                        state = 3
+                    }
+                }
+                break
+            case 3:
+                self.unk28 += 1.0
+
+                if (self.unk28 == 820.0) {
+                    self.unk28 = 69.0
+                    state = 4
+                }
+                break
+            case 4:
+                self.unk28 += 1.0
+
+                if (self.unk28 == 660.0) {
+                    self.unk28 = 661.0
+                    state = 2
+                    self.unk50 = 5
+                }
+                break
+            case 5:
+                if (self.unk28 == 660.0) {
+                    state = 7
+                } else if (self.unk28 > 660.0) {
+                    self.unk28 -= 1.0
+                } else if (self.unk28 < 660.0) {
+                    self.unk28 += 1.0
+                }
+
+                self.unk54 = 150
+                break
+            case 7:
+                if (aBtnPressed) {
+                    self.unk54 = 300
+                } else {
+                    self.unk54--
+                    if (self.unk54 == 0) {
+                        state = 6
+                    }
+                }
+                self.unk28 = 660.0
+                break
+            case 6:
+                state = 2
+                self.unk50 = 5
+                break
+        }
+
+        if (state != 0) {
+            self.unk4C = state
+        }
     }
 
     load_mario_head(aniFn) {

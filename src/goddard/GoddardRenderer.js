@@ -430,6 +430,14 @@ class GoddardRenderer {
         }
     }
 
+    reset_cur_dl_indices() {
+        this.sMHeadMainDls[this.gGdFrameBuf].gfx = []
+        this.sCurrentGdDl = this.sDynDlSet1[this.gGdFrameBuf]
+        if (this.sCurrentGdDl.vtx.length != 0 || this.sCurrentGdDl.gfx.length != 0 || this.sCurrentGdDl.mtx.length != 0 || this.sCurrentGdDl.light.length != 0 || this.sCurrentGdDl.vp.length != 0) {
+            throw "Should I empty these arrays?"
+        }
+    }
+
     reset_dlnum_indices(num) {
         this.sCurrentGdDl = this.sGdDLArray[num]
         if (this.sCurrentGdDl.vtx.length != 0 || this.sCurrentGdDl.gfx.length != 0 || this.sCurrentGdDl.mtx.length != 0 || this.sCurrentGdDl.light.length != 0 || this.sCurrentGdDl.vp.length != 0) {
@@ -844,12 +852,12 @@ class GoddardRenderer {
 
     gd_vblank() {
         /// only thing that seems to be necessary is reset_cur_dl_indices
-        console.log(this)
-        throw "vblank"
+        this.reset_cur_dl_indices()
     }
 
     update_view_and_dl(view) {
-        throw "update_view_and_dl"
+        const prevFlags = view.flags
+        Draw.update_view(view)
     }
 
     gdm_gettestdl(id) {

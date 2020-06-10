@@ -1,6 +1,7 @@
 class GoddardMain {
     constructor() {
         this.gGdUseVtxNormal = true
+        this.gGdMoveScene = true
     }
 }
 

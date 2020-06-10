@@ -4,7 +4,8 @@ import { NetsInstance as Nets } from "./Nets"
 import { DynlistProcInstance as Dynlist } from "./DynlistProc"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import { GoddardRendererInstance as Renderer } from "./GoddardRenderer"
-import { gd_set_identity_mat4, gd_copy_mat4f, gd_scale_mat4f_by_vec3f } from "./gd_math"
+import { GoddardMainInstance as Main } from "./GoddardMain"
+import { gd_set_identity_mat4, gd_copy_mat4f, gd_scale_mat4f_by_vec3f, gd_mult_mat4f } from "./gd_math"
 
 
 class Objects {
@@ -41,6 +42,51 @@ class Objects {
             0x00010000: "animators",
             OBJ_TYPE_VALPTRS: "valptrs",
             OBJ_TYPE_ZONES: "zones",
+        }
+    }
+
+    move_animator(animObj) {
+
+        if (animObj.fn48) {
+            animObj.fn48(animObj)
+        }
+
+        if (animObj.unk14 == null) return
+
+        const animData = animObj.animdata.link1C.obj
+
+        if (animObj.unk44) {
+            //animObj.unk28 = 
+        }
+
+
+    }
+
+    move_animators(group) {
+        this.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_ANIMATORS, this.move_animator, group, this)
+    }
+
+    move_group_members() {
+        if (Main.gGdMoveScene) {
+            ///reset gadgets seems to do nothing
+            //// move lights seems to do nothing
+            /// move particles TODO
+            this.move_animators(this.sCurrentMoveGrp)
+        }
+    }
+
+    proc_view_movement(view) {
+        this.sCurrentMoveCamera = view.activeCam
+        this.sCurrentMoveView = view
+
+        this.sCurrentMoveGrp = view.components
+        if (this.sCurrentMoveGrp) {
+            this.move_group_members()
+        }
+
+        this.sCurrentMoveGrp = view.lights
+        if (this.sCurrentMoveGrp) {
+            this.move_group_members()
         }
     }
 
@@ -143,7 +189,7 @@ class Objects {
         }
     }
 
-    make_vertex(x, y, z) {
+/*    make_vertex(x, y, z) {
         return {
             header: this.make_object(GDTypes.OBJ_TYPE_VERTICES),
             id: 0xD1D4,
@@ -153,7 +199,7 @@ class Objects {
             pos: { x, y, z },
             initPos: { x, y, z }
         }
-    }
+    }*/
 
     make_face_with_colour(r, g, b) {
         return {
@@ -442,7 +488,7 @@ class Objects {
         } else {
             let newLink = this.make_link_to_obj(null, objheader)
             group.link1C.prev = newLink
-            newLink.newLink = group.link1C
+            newLink.next = group.link1C
             group.link1C = newLink
         }
 
@@ -456,7 +502,6 @@ class Objects {
 
         if (group == null) return
 
-
         if (group.linkType & 1) { //compressed data
             return fnAppliedCount
         }
@@ -468,7 +513,7 @@ class Objects {
         let curLink = group.link1C
         let linkedObj, linkedObjType
 
-        while (curLink) {
+        while (curLink && curLink.obj && curLink.obj.obj) {
             linkedObj = curLink.obj
             linkedObjType = linkedObj.type
 
@@ -492,7 +537,21 @@ class Objects {
         const sp1C = { x: 0.0, y: 0.0, z: 0.0 }
 
         if (a1_objheader) {
-            throw "more implementation needed in Objects: func_8017F054"
+            Dynlist.set_cur_dynobj(a1_objheader.obj)
+            const sp50 = Dynlist.d_get_matrix_ptr()
+            const sp44 = Dynlist.d_get_rot_mtx_ptr()
+
+            Dynlist.set_cur_dynobj(a0_objheader.obj)
+            const sp4C = Dynlist.d_get_idn_mtx_ptr()
+            const sp40 = Dynlist.d_get_rot_mtx_ptr()
+
+            Dynlist.d_get_scale(sp1C)
+            const sp48 = Dynlist.d_get_matrix_ptr()
+
+            gd_mult_mat4f(sp4C, sp50, sp48)
+            gd_mult_mat4f(sp4C, sp44, sp40)
+            gd_scale_mat4f_by_vec3f(sp40, sp1C)
+
         } else {
             Dynlist.set_cur_dynobj(a0_objheader.obj)
             const sp48 = Dynlist.d_get_matrix_ptr()
@@ -511,7 +570,6 @@ class Objects {
         if (curGroup) {
             let curLink = curGroup.link1C
             while (curLink) {
-                throw "verify headers are being passed to this function"
                 this.func_8017F054(curLink.obj, a0_objheader)
                 curLink = curLink.next
             }

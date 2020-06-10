@@ -1,4 +1,4 @@
-import { OBJ_TYPE_NETS, OBJ_TYPE_JOINTS, OBJ_TYPE_BONES } from "./gd_types"
+import { OBJ_TYPE_NETS, OBJ_TYPE_JOINTS, OBJ_TYPE_BONES, OBJ_TYPE_WEIGHTS, OBJ_TYPE_VERTICES } from "./gd_types"
 import { ObjectsInstance as Objects } from "./Objects"
 import { gd_set_identity_mat4, gd_rot_mat_about_vec, gd_add_vec3f_to_mat4f_offset, gd_copy_mat4f } from "./gd_math"
 import { JointsInstance as Joints } from "./Joints"
@@ -7,6 +7,7 @@ import { JointsInstance as Joints } from "./Joints"
 class Nets {
     constructor() {
         this.sNetCount = 0
+        this.D_801B9EA8 = new Array(4).fill(0).map(() => new Array(4).fill(0))
     }
 
     make_net(a0, shapedata, a2, a3, a4) {
@@ -40,18 +41,64 @@ class Nets {
         }
     }
 
+    Unknown801819D0(vtx) {
+        throw "more implementaion needed in Nets/Skin - Unknown801819D0"
+        if (Joints.sTargetWeightID++ == this.sSkinNetCurWeight.id) {
+            throw "more implementaion needed in Nets/Skin - Unknown801819D0"
+        }
+    }
+
+    reset_weight(weight) {
+        this.sSkinNetCurWeight = weight
+        Joints.sTargetWeightID = 0
+        const skinGroup = this.gGdSkinNet.skinGrp
+        if (skinGroup) {
+            Objects.apply_to_obj_types_in_group(OBJ_TYPE_VERTICES, this.Unknown801819D0, skinGroup, this)
+        } else {
+            throw "shouldn't be here skin net has no skingroup"
+        }
+
+        if (weight.unk3C == null) {
+            throw "shouldn't be here skin vertex id not found"
+        }
+    }
+
+    Unknown80181B88(joint) {
+        //gd_inverse_mat4f(joint.matE8, D_801B9EA8) TODO implement inverse matrix
+        this.D_801B9EE8 = joint
+        const group = joint.unk1F4
+        if (group) {
+            Objects.apply_to_obj_types_in_group(OBJ_TYPE_WEIGHTS, this.reset_weight, group, this)
+        }
+    }
+
     Unknown801922FC(net) {
 
         this.gGdSkinNet = net
 
         if (net.netType == 4) {
-            throw "more implementation needed in Nets - Unknown801922FC"
+            if (net.unk1A8) {
+                throw "more implementation needed in Nets - Unknown801922FC"
+            }
+            const group = net.unk1C8
+            if (group) {
+                Objects.apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, this.Unknown80181B88, group, this)
+            }
         }
     }
 
     Unknown8019373C(net) {
         if (net.netType == 2) {
-            throw "more implementation needed in Nets - Unknown8019373C"
+            if (net.unk1A8) {
+                net.unk1A8.unk24 = Objects.make_group(0)
+                net.unk1A8.unk24.header.obj = net.unk1A8.unk24
+                for (let link = net.unk1A8.vtxGroup.link1C; link != null; link = link.next) {
+                    const vtx = link.obj.obj
+                    if (vtx.scaleFactor != 1.0) {
+                        Objects.addto_group(net.unk1A8.unk24, vtx.header)
+                    }
+                }
+            }
         }
     }
 

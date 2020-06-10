@@ -5,7 +5,7 @@ import { DynlistProcInstance as Dynlist } from "./DynlistProc"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import { GoddardRendererInstance as Renderer } from "./GoddardRenderer"
 import { GoddardMainInstance as Main } from "./GoddardMain"
-import { gd_set_identity_mat4, gd_copy_mat4f, gd_scale_mat4f_by_vec3f, gd_mult_mat4f } from "./gd_math"
+import { gd_set_identity_mat4, gd_copy_mat4f, gd_scale_mat4f_by_vec3f, gd_mult_mat4f, gd_rot_mat_about_vec, gd_add_vec3f_to_mat4f_offset } from "./gd_math"
 
 
 class Objects {
@@ -45,7 +45,35 @@ class Objects {
         }
     }
 
+    func_8017F424(a0, a1, a2) {
+
+        const sp40 = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        gd_set_identity_mat4(sp40)
+
+        const sp1C = { p0: {}, p1: {}, p2: {}}
+
+        if (a2 != 0.0) {
+            sp1C.p1.x = a0.p1.x + (a1.p1.x - a0.p1.x) * a2
+            sp1C.p1.y = a0.p1.y + (a1.p1.y - a0.p1.y) * a2
+            sp1C.p1.z = a0.p1.z + (a1.p1.z - a0.p1.z) * a2
+            sp1C.p2.x = a0.p2.x + (a1.p2.x - a0.p2.x) * a2
+            sp1C.p2.y = a0.p2.y + (a1.p2.y - a0.p2.y) * a2
+            sp1C.p2.z = a0.p2.z + (a1.p2.z - a0.p2.z) * a2
+
+            gd_scale_mat4f_by_vec3f(sp40, a0.p0)
+            gd_rot_mat_about_vec(sp40, sp1C.p1)
+            gd_add_vec3f_to_mat4f_offset(sp40, sp1C.p2)
+        } else {
+            Dynlist.d_set_scale(a0.p0)
+            gd_rot_mat_about_vec(sp40, a0.p1)
+            gd_add_vec3f_to_mat4f_offset(sp40, a0.p2)
+        }
+        Dynlist.d_set_idn_mtx(sp40)
+    }
+
     move_animator(animObj) {
+
+        const scale = 0.1
 
         if (animObj.fn48) {
             animObj.fn48(animObj)
@@ -56,9 +84,85 @@ class Objects {
         const animData = animObj.animdata.link1C.obj
 
         if (animObj.unk44) {
-            //animObj.unk28 = 
+            animObj.unk28 = animObj.unk44.obj.unk28 / animObj.unk44.obj.unk24
         }
 
+        if (animData[0].type == 0) return
+
+        if (animObj.unk28 > animData[0].data.length) {
+            animObj.unk28 = 1.0
+        } else if (animObj.unk28 < 0.0) {
+            animObj.unk28 = animData[0].data.length
+        }
+
+        let sp38 = animObj.unk28
+        const sp30 = animObj.unk28 - sp38
+        let sp34 = sp38 + 1
+
+        if (sp34 > animData[0].data.length) {
+            sp34 = 1
+        }
+
+        sp38--
+        sp34--
+
+        let tri1 = { p0: {}, p1: {}, p2: {} }
+        let tri2 = { p0: {}, p1: {}, p2: {} }
+
+        let link = animObj.unk14.link1C
+        while (link) {
+            const linkedObj = link.obj
+            Dynlist.set_cur_dynobj(linkedObj)
+            switch (animData[0].type) {
+                case GDTypes.GD_ANIM_3H_SCALED:
+                    const vec3hArr = animData[0].data
+
+                    Dynlist.d_get_scale(tri1.p0)
+                    tri2.p0 = { ...tri1.p0 }
+
+                    Dynlist.d_get_init_pos(tri1.p2)
+                    tri2.p2 = { ...tri1.p2 }
+
+                    tri1.p1.x = vec3hArr[sp38][0] * scale
+                    tri1.p1.y = vec3hArr[sp38][1] * scale
+                    tri1.p1.z = vec3hArr[sp38][2] * scale
+
+                    tri2.p1.x = vec3hArr[sp34][0] * scale
+                    tri2.p1.y = vec3hArr[sp34][1] * scale
+                    tri2.p1.z = vec3hArr[sp34][2] * scale
+
+                    this.func_8017F424(tri1, tri2, sp30)
+                    break
+                case GDTypes.GD_ANIM_6H_SCALED:
+                    const planeHArr = animData[0].data
+
+                    Dynlist.d_get_scale(tri1.p0)
+                    tri2.p0 = { ...tri1.p0 }
+
+                    tri1.p1.x = planeHArr[sp38][0] * scale
+                    tri1.p1.y = planeHArr[sp38][1] * scale
+                    tri1.p1.z = planeHArr[sp38][2] * scale
+
+                    tri2.p1.x = planeHArr[sp34][0] * scale
+                    tri2.p1.y = planeHArr[sp34][1] * scale
+                    tri2.p1.z = planeHArr[sp34][2] * scale
+
+                    tri1.p2.x = planeHArr[sp38][3]
+                    tri1.p2.y = planeHArr[sp38][4]
+                    tri1.p2.z = planeHArr[sp38][5]
+
+                    tri2.p2.x = planeHArr[sp34][3]
+                    tri2.p2.y = planeHArr[sp34][4]
+                    tri2.p2.z = planeHArr[sp34][5]
+
+                    this.func_8017F424(tri1, tri2, sp30)
+                    break
+                default:
+                    console.log(animData[0])
+                    throw "unimplemented animation data type"
+            }
+            link = link.next
+        }
 
     }
 

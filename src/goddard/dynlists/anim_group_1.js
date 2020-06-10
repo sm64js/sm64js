@@ -2080,8 +2080,8 @@ const animdata_mario_lips_3_2 = [
 ]
 
 export const anim_mario_lips_3 = [
-    { types: GDTypes.GD_ANIM_3H_SCALED, data: animdata_mario_lips_3_1 },
-    { types: GDTypes.GD_ANIM_3H_SCALED, data: animdata_mario_lips_3_2 },
+    { type: GDTypes.GD_ANIM_3H_SCALED, data: animdata_mario_lips_3_1 },
+    { type: GDTypes.GD_ANIM_3H_SCALED, data: animdata_mario_lips_3_2 },
     GDTypes.END_ANIMDATA_INFO_ARR,
 ]
 

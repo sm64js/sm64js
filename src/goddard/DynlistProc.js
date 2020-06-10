@@ -223,12 +223,16 @@ class DynlistProc {
 
         switch (this.sDynListCurObj.header.type) {
             case GDTypes.OBJ_TYPE_NETS:
-                dst = { ...this.sDynListCurObj.unk1AC }
+                Object.assign(dst, this.sDynListCurObj.unk1AC)
                 break
             case GDTypes.OBJ_TYPE_JOINTS:
-                dst = { ...this.sDynListCurObj.unk9C }
+                Object.assign(dst, this.sDynListCurObj.unk9C)
+                break
+            case GDTypes.OBJ_TYPE_LIGHTS:
+                Object.assign(dst, { x: 0.0, y: 0.0, z: 0.0 })
                 break
             default:
+                console.log(this.sDynListCurObj)
                 throw "Object does not support function - get scale"
         }
     }
@@ -247,6 +251,29 @@ class DynlistProc {
                 throw "Object does not support function - get att objgroup"
         }
 
+    }
+
+    d_get_init_pos(dst) {
+
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- get init pos"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+
+            case GDTypes.OBJ_TYPE_JOINTS:
+                Object.assign(dst, this.sDynListCurObj.unk54)
+                break
+            case GDTypes.OBJ_TYPE_NETS:
+                throw "nets"
+                break
+            case GDTypes.OBJ_TYPE_VERTICES:
+                throw "vertices"
+                break
+            default:
+                throw "Object does not support function - get init pos"
+
+        }
     }
 
     d_get_rel_pos(dst) {
@@ -675,11 +702,32 @@ class DynlistProc {
             case GDTypes.OBJ_TYPE_JOINTS:
                 this.sDynListCurObj.unk9C = vec
                 break
+            case GDTypes.OBJ_TYPE_LIGHTS: break
             default:
                 throw "Object does not support this function - set scale"
         }
         this.pop_dynobj_stash() 
 
+    }
+
+    d_set_idn_mtx(src) {
+        if (this.sDynListCurObj == null) {
+            throw "proc_dynlist(): No current object -- set idn mtx"
+        }
+
+        switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_JOINTS:
+                GDMath.gd_copy_mat4f(src, this.sDynListCurObj.mat168)
+                break
+            case GDTypes.OBJ_TYPE_NETS:
+                GDMath.gd_copy_mat4f(src, this.sDynListCurObj.matE8)
+                break
+            case GDTypes.OBJ_TYPE_LIGHTS:
+                this.sDynListCurObj.positions = { x: src[3][0], y: src[3][1], z: src[3][2] }
+                break
+            default:
+                throw "Object does not support this function - set idn mtx"
+        }
     }
 
     d_set_rotation(vec) {

@@ -371,7 +371,7 @@ export class n64GfxProcessor {
             this.rendering_state.textures[tile] = node
             return true
         }
-        if (this.gfx_texture_cache.pool.length >= 512) {
+        if (this.gfx_texture_cache.pool.length >= 1024) {
             /// pool hits limit
             throw "more implementation needed in texture cache lookup"
         }

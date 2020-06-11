@@ -176,6 +176,10 @@ class Objects {
             //// move lights seems to do nothing
             /// move particles TODO
             this.move_animators(this.sCurrentMoveGrp)
+
+            Nets.move_nets(this.sCurrentMoveGrp)
+
+            //this.move_cameras_in_grp() TODO
         }
     }
 

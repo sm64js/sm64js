@@ -3,6 +3,12 @@ import { ObjectsInstance as Objects } from "./Objects"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import { GoddardRendererInstance as Renderer } from "./GoddardRenderer"
 import { GoddardMainInstance as Main } from "./GoddardMain"
+import { G_MTX_PROJECTION, G_MTX_MUL, G_MTX_PUSH } from "../include/gbi"
+import { gd_create_rot_matrix } from "./gd_math"
+
+
+const RENDER_SCENE = 26 ///< render the primitives to screen
+const FIND_PICKS = 27    ///< only check position of primitives relative to cursor click
 
 class Draw {
     constructor() {
@@ -14,6 +20,29 @@ class Draw {
     }
 
     nop_obj_draw() { }
+
+    drawscene(process, interactables, lightgrp) {
+        this.sUnreadShapeFlag = 0
+        this.sUpdateViewState.unreadCounter = 0
+
+        Renderer.set_gd_mtx_parameters(G_MTX_PROJECTION | G_MTX_MUL | G_MTX_PUSH)
+        if (this.sUpdateViewState.view.unk38 == 1) {
+            Renderer.gd_create_perspective_matrix(
+                this.sUpdateViewState.view.clipping.z,
+                this.sUpdateViewState.view.lowerRight.x / this.sUpdateViewState.view.lowerRight.y,
+                this.sUpdateViewState.view.clipping.x,
+                this.sUpdateViewState.view.clipping.y
+            )
+        } else {
+            throw "not implemented this"
+        }
+
+        if (this.gViewUpdateCamera) {
+            this.draw_camera(this.gViewUpdateCamera)
+        } else {
+            throw "not implemented this"
+        }
+    }
 
     set_view_update_camera(cam) {
         if (this.gViewUpdateCamera) return
@@ -40,7 +69,16 @@ class Draw {
         }
 
         this.sUpdateViewState.view = view
+        Renderer.set_active_view(view)
+        view.gdDlNum = Renderer.gd_startdisplist(8)
+        //Renderer.start_view_dl(this.sUpdateViewState.view) TODO
+        //gd_shading(9) TODO
 
+        if (view.components) {
+            this.drawscene(RENDER_SCENE, this.sUpdateViewState.view.components, this.sUpdateViewState.view.lights)
+        }
+
+        Renderer.gd_enddlsplist_parent()
 
     }
 

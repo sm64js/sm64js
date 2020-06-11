@@ -158,6 +158,43 @@ export const guPerspective = (m, perspNorm, fovy, aspect, near, far, scale) => {
     }
 }
 
+export const guNormalize = (x, y, z) => {
+    const tmp = 1.0 / Math.sqrt((x * x) + (y * y) + (z * z))
+    x = x * tmp
+    y = y * tmp
+    z = z * tmp
+}
+
+export const guRotate = (m, a, x, y, z) => {
+    const degreesToRadians = Math.PI / 180
+
+    guNormalize(x, y, z)
+
+    a *= degreesToRadians
+
+    let sin_a = Math.sin(a)
+    let cos_a = Math.cos(a)
+
+    let sp2c = x * y * (1 - cos_a)
+    let sp28 = y * z * (1 - cos_a)
+    let sp24 = z * x * (1 - cos_a)
+
+    mtxf_identity(m)
+    let xx = x * x
+    m[0][0] = (1 - xx) * cos_a + xx
+    m[2][1] = sp28 - x * sin_a
+    m[1][2] = sp28 + x * sin_a
+    let yy = y * y
+    m[1][1] = (1 - yy) * cos_a + yy
+    m[2][0] = sp24 + y * sin_a
+    m[0][2] = sp24 - y * sin_a
+    let zz = z * z
+    m[2][2] = (1 - zz) * cos_a + zz
+    m[1][0] = sp2c - z * sin_a
+    m[0][1] = sp2c + z * sin_a;
+}
+
+
 export const guTranslate = (m, x, y, z) => {
     mtxf_identity(m)
     m[3][0] = x

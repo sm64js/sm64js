@@ -10,6 +10,11 @@ class Nets {
         this.D_801B9EA8 = new Array(4).fill(0).map(() => new Array(4).fill(0))
     }
 
+    move_nets(group) {
+        Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.Unknown80192294, group, this)
+        ///Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.move_net, group, this) TODO
+    }
+
     make_net(a0, shapedata, a2, a3, a4) {
 
         const net = {

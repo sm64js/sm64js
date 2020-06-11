@@ -405,6 +405,7 @@ class GoddardRenderer {
         this.sVtxCvrtNormBuf = new Array(3).fill(0)
         this.sVtxCvrtTCBuf = new Array(2).fill(0)
         this.D_801BAF30 = new Array(13).fill(0).map(() => new Array(8).fill(0))
+        this.sGdPerspTimer = 1.0
     }
 
     create_light_template_object() {
@@ -433,16 +434,21 @@ class GoddardRenderer {
     reset_cur_dl_indices() {
         this.sMHeadMainDls[this.gGdFrameBuf].gfx = []
         this.sCurrentGdDl = this.sDynDlSet1[this.gGdFrameBuf]
-        if (this.sCurrentGdDl.vtx.length != 0 || this.sCurrentGdDl.gfx.length != 0 || this.sCurrentGdDl.mtx.length != 0 || this.sCurrentGdDl.light.length != 0 || this.sCurrentGdDl.vp.length != 0) {
-            throw "Should I empty these arrays?"
-        }
+        this.sCurrentGdDl.gfx = []
+        this.sCurrentGdDl.vtx = []
+        this.sCurrentGdDl.mtx = []
+        this.sCurrentGdDl.vp = []
+        this.sCurrentGdDl.light = []
     }
 
     reset_dlnum_indices(num) {
         this.sCurrentGdDl = this.sGdDLArray[num]
-        if (this.sCurrentGdDl.vtx.length != 0 || this.sCurrentGdDl.gfx.length != 0 || this.sCurrentGdDl.mtx.length != 0 || this.sCurrentGdDl.light.length != 0 || this.sCurrentGdDl.vp.length != 0) {
-            throw "Should I empty these arrays?"
-        }
+        this.sCurrentGdDl.gfx = []
+        this.sCurrentGdDl.vtx = []
+        this.sCurrentGdDl.mtx = []
+        this.sCurrentGdDl.vp = []
+        this.sCurrentGdDl.light = []
+
 /*        this.sCurrentGdDl.curVtxIdx = 0
         this.sCurrentGdDl.curMtxIdx = 0
         this.sCurrentGdDl.curLightIdx = 0
@@ -624,6 +630,14 @@ class GoddardRenderer {
         return 0
     }
 
+    cpy_remaining_gddl(child, parent) {
+        parent.gfx.push(...child.gfx)
+        parent.mtx.push(...child.mtx)
+        parent.light.push(...child.light)
+        parent.vtx.push(...child.vtx)
+        parent.vp.push(...child.vp)
+    }
+
     gd_enddlsplist_parent() {
         Gbi.gSPEndDisplayList(this.sCurrentGdDl.gfx)
 /*        if (sCurrentGdDl -> parent != NULL) {
@@ -653,6 +667,14 @@ class GoddardRenderer {
             case 7:
                 this.sCurrentGdDl = this.create_child_gdl(0, this.sStaticDl)
                 break
+            case 8:
+                if (this.sActiveView.id > 2) {
+                    throw "gd_startdisplist(): Too many views to display"
+                }
+
+                this.sCurrentGdDl = this.D_801BD7C8[this.sActiveView.id][this.gGdFrameBuf]
+                this.cpy_remaining_gddl(this.sCurrentGdDl, this.sCurrentGdDl.parent)
+                break
             default: throw "unknown case in gd renderer gd_startdisplist"
         }
         //gDPPipeSync(next_gfx())
@@ -674,13 +696,21 @@ class GoddardRenderer {
             view.parent = this.sScreenView2
         }
 
-        view.gdGlNum = 0
+        view.gdDlNum = 0
         view.unk74 = 0
 
         if (view.flags & GDTypes.VIEW_DEFAULT_PARENT) {
             throw "more implementation D_801A86E0"
             view.parent = D_801A86E0
         }
+    }
+
+    set_active_view(v) {
+        this.sActiveView = v
+    }
+
+    start_view_dl(view) {
+        throw "start_view_dl not implemented"
     }
 
     setup_stars() {
@@ -850,14 +880,62 @@ class GoddardRenderer {
         return view
     }
 
+    func_801A3324(x, y, z) {
+        this.D_801BD768 = { x, y, z }
+        this.D_801BD758 = { x, y, z }
+    }
+
+    gd_create_perspective_matrix(fovy, aspect, near, far) {
+        this.sGdPerspTimer += 0.1
+        let newMtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        const perspNorm = { value: 0 }
+        MathUtil.guPerspective(newMtx, perspNorm, fovy, aspect, near, far, 1.0)
+
+        //gSPPerspNormalize() /// not needed
+
+        const perspecMtx = newMtx
+        Gbi.gSPMatrix(this.sCurrentGdDl.gfx, perspecMtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+        this.sCurrentGdDl.mtx.push(newMtx)
+
+        newMtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        MathUtil.guRotate(newMtx, 0.0, 0.0, 0.0, 1.0)
+        const rotMtx = newMtx
+        Gbi.gSPMatrix(this.sCurrentGdDl.gfx, rotMtx, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+        this.sCurrentGdDl.mtx.push(newMtx)
+        this.func_801A3324(0.0, 0.0, 0.0)
+    }
+
+    set_gd_mtx_parameters(params) {
+        if (params == Gbi.G_MTX_PROJECTION | Gbi.G_MTX_MUL | Gbi.G_MTX_PUSH) {
+            this.sMtxParamType = Gbi.G_MTX_PROJECTION
+        } else if (params == Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_PUSH) {
+            this.sMtxParamType = Gbi.G_MTX_MODELVIEW
+        } else {
+            throw "set_gd_mtx_parameters"
+        }
+    }
+
     gd_vblank() {
         /// only thing that seems to be necessary is reset_cur_dl_indices
         this.reset_cur_dl_indices()
     }
 
+    func_801A4848(linkDl) {
+        const saveCurDl = this.sCurrentGdDl
+        this.sCurrentGdDl - this.sMHeadMainDls[this.gGdFrameBuf]
+        this.branch_cur_dl_to_num(linkDl)
+        this.sCurrentGdDl = saveCurDl
+    }
+
     update_view_and_dl(view) {
         const prevFlags = view.flags
         Draw.update_view(view)
+        if (prevFlags & GDTypes.VIEW_UPDATE) {
+            this.sCurrentGdDl = this.sMHeadMainDls[this.gGdFrameBuf]
+            if (view.gdDlNum != 0) {
+                this.func_801A4848(view.gdDlNum)
+            }
+        }
     }
 
     gdm_gettestdl(id) {
@@ -868,8 +946,9 @@ class GoddardRenderer {
             case 2:
             case 3:
                 this.update_view_and_dl(this.sMSceneView)
+                this.sCurrentGdDl = this.sMHeadMainDls[this.gGdFrameBuf]
                 Gbi.gSPEndDisplayList(this.sCurrentGdDl.gfx)
-                gddl = this.sMHeadMainDls[this.gGdFrameBuf]
+                gddl = this.sCurrentGdDl
                 break
             default:
                 throw "gdm_gettestdl no case for id"
@@ -879,7 +958,6 @@ class GoddardRenderer {
         if (gddl == null) {
             throw "no display list in gd renderer"
         }
-
         return gddl.gfx
     }
 

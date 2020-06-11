@@ -5,6 +5,84 @@ const GD_Z_AXIS = 2
 
 const DEG_PER_RAD = 180.0 / Math.PI
 
+
+export const gd_mat4f_lookat = (mtx, xFrom, yFrom, zFrom, xTo, yTo, zTo, zColY, yColY, xColY) => {
+
+    const d = { x: 0.0, y: 0.0, z: 0.0 }
+    const colX = { x: 0.0, y: 0.0, z: 0.0 }
+    const norm = { x: 0.0, y: 0.0, z: 0.0 }
+
+    // No reason to do this? mtx is set lower.
+    gd_set_identity_mat4(mtx)
+
+    d.z = xTo - xFrom
+    d.y = yTo - yFrom
+    d.x = zTo - zFrom
+
+    let invLength = Math.abs(d.z) + Math.abs(d.y) + Math.abs(d.x)
+
+    // Scales 'd' if smaller than 10 or larger than 10,000 to be
+    // of a magnitude of 10,000.
+    if (invLength > 10000.0 || invLength < 10.0) {
+        norm.x = d.z
+        norm.y = d.y
+        norm.z = d.x
+        gd_normalize_vec3f(norm)
+        norm.x *= 10000.0
+        norm.y *= 10000.0
+        norm.z *= 10000.0
+
+        d.z = norm.x
+        d.y = norm.y
+        d.x = norm.z
+    }
+
+    invLength = -1.0 / Math.sqrt(Math.pow(d.z, 2) + Math.pow(d.y, 2) + Math.pow(d.x, 2))
+    d.z *= invLength
+    d.y *= invLength
+    d.x *= invLength
+
+    colX.z = yColY * d.x - xColY * d.y
+    colX.y = xColY * d.z - zColY * d.x
+    colX.x = zColY * d.y - yColY * d.z
+
+    invLength = 1.0 / Math.sqrt(Math.pow(colX.z, 2) + Math.pow(colX.y, 2) + Math.pow(colX.x, 2))
+
+    colX.z *= invLength
+    colX.y *= invLength
+    colX.x *= invLength
+
+    zColY = d.y * colX.x - d.x * colX.y
+    yColY = d.x * colX.z - d.z * colX.x
+    xColY = d.z * colX.y - d.y * colX.z
+
+    invLength = 1.0 / Math.sqrt(Math.pow(zColY, 2) + Math.pow(yColY, 2) + Math.pow(xColY, 2))
+
+    zColY *= invLength
+    yColY *= invLength
+    xColY *= invLength
+
+    mtx[0][0] = colX.z
+    mtx[1][0] = colX.y
+    mtx[2][0] = colX.x
+    mtx[3][0] = -(xFrom * colX.z + yFrom * colX.y + zFrom * colX.x)
+
+    mtx[0][1] = zColY
+    mtx[1][1] = yColY
+    mtx[2][1] = xColY
+    mtx[3][1] = -(xFrom * zColY + yFrom * yColY + zFrom * xColY)
+
+    mtx[0][2] = d.z
+    mtx[1][2] = d.y
+    mtx[2][2] = d.x
+    mtx[3][2] = -(xFrom * d.z + yFrom * d.y + zFrom * d.x)
+
+    mtx[0][3] = 0.0
+    mtx[1][3] = 0.0
+    mtx[2][3] = 0.0
+    mtx[3][3] = 1.0
+}
+
 export const gd_normalize_vec3f = (vec) => {
     let mag = Math.pow(vec.x, 2) + Math.pow(vec.y, 2) + Math.pow(vec.z, 2)
     if (mag == 0.0) return false

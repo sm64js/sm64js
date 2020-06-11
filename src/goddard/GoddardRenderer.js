@@ -4,6 +4,7 @@ import * as GDTypes from "./gd_types"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import { DrawInstance as Draw } from "./Draw"
 import * as Gbi from "../include/gbi"
+import { gd_mat4f_lookat } from "./gd_math"
 
 const MAX_GD_DLS = 1000
 
@@ -878,6 +879,16 @@ class GoddardRenderer {
         view.lights = Draw.gGdLightGroup
 
         return view
+    }
+
+    func_8019F318(cam, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+        arg7 *= Math.PI / 180.0
+        gd_mat4f_lookat(cam.unkE8, arg1, arg2, arg3, arg4, arg5, arg6, Math.sin(arg7), Math.cos(arg7), 0.0)
+
+        const newMtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        MathUtil.mtxf_to_mtx(newMtx, cam.unkE8)
+        Gbi.gSPMatrix(this.sCurrentGdDl.gfx, newMtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_MUL | Gbi.G_MTX_NOPUSH)
+        this.sCurrentGdDl.mtx.push(newMtx)
     }
 
     func_801A3324(x, y, z) {

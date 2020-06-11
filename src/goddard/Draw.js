@@ -3,7 +3,7 @@ import { ObjectsInstance as Objects } from "./Objects"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import { GoddardRendererInstance as Renderer } from "./GoddardRenderer"
 import { GoddardMainInstance as Main } from "./GoddardMain"
-import { G_MTX_PROJECTION, G_MTX_MUL, G_MTX_PUSH } from "../include/gbi"
+import { G_MTX_PROJECTION, G_MTX_MUL, G_MTX_PUSH, G_MTX_MODELVIEW, G_MTX_LOAD } from "../include/gbi"
 import { gd_create_rot_matrix } from "./gd_math"
 
 
@@ -42,6 +42,30 @@ class Draw {
         } else {
             throw "not implemented this"
         }
+
+        Renderer.set_gd_mtx_parameters(G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_PUSH)
+
+        this.sSceneProcessType = process
+
+        this.sNumActiveLights = 1
+
+        if (this.sSceneProcessType == FIND_PICKS) {
+            throw "not implemented find picks yet"
+        } else {
+            Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_NETS, this.apply_obj_draw_fn, interactables, this)
+        }
+    }
+
+    draw_camera(cam) {
+        let sp44 = { x: 0.0, y: 0.0, z: 0.0 }
+
+        if (cam.unk30) {
+            throw "not implemented - draw camera"
+        } else {
+            sp44 = { ...cam.unk34 }
+        }
+
+        Renderer.func_8019F318(cam, cam.unk14.x, cam.unk14.y, cam.unk14.z, sp44.x, sp44.y, sp44.z, cam.unkA4)
     }
 
     set_view_update_camera(cam) {
@@ -80,6 +104,26 @@ class Draw {
 
         Renderer.gd_enddlsplist_parent()
 
+    }
+
+    draw_net(net) {
+        let netColor
+        if (this.sSceneProcessType == FIND_PICKS) return
+
+        if (net.header.drawFlags & GDTypes.OBJ_USE_ENV_COLOUR) {
+            netColor = 8
+        } else {
+            netColor = net.unk40
+        }
+
+        if (net.unk1A8) {
+            this.draw_shape(net.unk1A8, 0x10, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, netColor, net.mat168)
+        }
+
+        if (net.unk1C8) {
+            this.draw_group(net.unk1C8)
+        }
     }
 
     apply_obj_draw_fn(obj) {

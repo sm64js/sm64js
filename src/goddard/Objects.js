@@ -339,6 +339,7 @@ class Objects {
             unk14: { x: 0.0, y: 0.0, z: 0.0 },
             unk64: new Array(4).fill(0).map(() => new Array(4).fill(0)),
             unkA8: new Array(4).fill(0).map(() => new Array(4).fill(0)),
+            unkE8: new Array(4).fill(0).map(() => new Array(4).fill(0)),
             positions: new Array(4)
         }
 

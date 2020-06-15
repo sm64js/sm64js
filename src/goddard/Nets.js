@@ -11,8 +11,8 @@ class Nets {
     }
 
     move_nets(group) {
-        //Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.Unknown80192294, group, this)
-        ///Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.move_net, group, this) TODO
+        Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.Unknown80192294, group, this)
+        //Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.move_net, group, this) TODO
     }
 
     make_net(a0, shapedata, a2, a3, a4) {
@@ -110,7 +110,7 @@ class Nets {
     }
 
     myEval(net) {
-        console.log(`header next type: ${net.header.next.type}, mat168[3][0]: ${net.matE8[2][1]}, mat168[3][1]: ${net.matE8[2][2]}, mat168[3][2]: ${net.matE8[2][3]}, netType: ${net.netType}, `)
+        console.log(`header next type: ${net.header.next.type}, mat168[3][0]: ${net.mat168[2][1]}, mat168[3][1]: ${net.mat168[2][2]}, mat168[3][2]: ${net.mat168[2][3]}, netType: ${net.netType}, `)
         //console.log(net.matE8)
         if (isNaN(net.matE8[1][1])) throw "no no in eval"
 /*        if (net.unk1D4) {
@@ -123,11 +123,10 @@ class Nets {
 
     func_80193848(group) {
         Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.reset_net, group, this)
-        Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.myEval, group, this)
-        throw "stop after eval finished"
         Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.Unknown80192294, group, this)
         Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.Unknown801922FC, group, this)
         Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.Unknown8019373C, group, this)
+        //Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.myEval, group, this)
     }
 
     reset_net(net) {

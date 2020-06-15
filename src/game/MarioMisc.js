@@ -17,7 +17,6 @@ class MarioMisc {
             Game.D_8032C6A0_classObject = GoddardRenderer
             //throw "geo_draw_mario_head_goddard"
         }
-        console.log("mario head gfx length: " + gfx.length)
         return gfx 
     }
 }

@@ -140,7 +140,7 @@ class GeoRenderer {
 
     geo_process_generated_list(node) {
         if (node.wrapper.func) {
-            console.log("processing function from generated_list\n")
+            //console.log("processing function from generated_list")
 
             const list = node.wrapper.func(GraphNode.GEO_CONTEXT_RENDER, node, this.gMatStack[this.gMatStackIndex])
             if (list.length > 0) {
@@ -200,7 +200,7 @@ class GeoRenderer {
     }
 
     geo_process_root(root, b, c, clearColor) {
-        console.log("processing root node to render")
+        //console.log("processing root node to render")
         if (root.node.flags & GraphNode.GRAPH_RENDER_ACTIVE) {
 
             MathUtil.mtxf_identity(this.gMatStack[this.gMatStackIndex])

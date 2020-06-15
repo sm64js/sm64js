@@ -3,6 +3,7 @@ import { ObjectsInstance as Objects } from "./Objects"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import { GoddardRendererInstance as Renderer } from "./GoddardRenderer"
 import { GoddardMainInstance as Main } from "./GoddardMain"
+import { NetsInstance as Nets } from "./Nets"
 import { G_MTX_PROJECTION, G_MTX_MUL, G_MTX_PUSH, G_MTX_MODELVIEW, G_MTX_LOAD } from "../include/gbi"
 import { gd_create_rot_matrix } from "./gd_math"
 
@@ -106,20 +107,83 @@ class Draw {
 
     }
 
+    update_shaders(shape, offset) {
+        Renderer.stash_current_gddl()
+        this.sLightPositionOffset = { ...offset }
+        this.sPhongLight = null
+        if (this.gGdLightGroup) {
+            // Skip for now... TODO
+            //Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_LIGHTS, this.Proc8017A980, this.gGdLightGroup, this)
+        }
+        if (shape.mtlGroup) {
+            // Skip for now ... TODO
+            //Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_MATERIALS, this.apply_obj_draw_fn, shape.mtlGroup, this)
+        }
+        Renderer.pop_gddl_stash()
+    }
+
     draw_shape(shape, flag, c, d, e, f, g, h, i, j, k, l, m, n, colorIdx, rotMtx) {
 
-        console.log(shape)
-        console.log(flag)
+        this.sUpdateViewState.shapesDrawn++
 
-        console.log(g)
-        console.log(k)
-        console.log(m)
+        if (shape == null) return
 
-        console.log(colorIdx)
+        let sp1C = { x: 0.0, y: 0.0, z: 0.0 }
 
-        console.log(rotMtx)
+        if (flag & 2) {
+            Renderer.translate_load_mtx_gddl(f, g, h)
+            sp1C.x += f
+            sp1C.y += g
+            sp1C.z += h
+        }
 
-        throw "draw first shape"
+        if ((flag & 0x10) && rotMtx) {
+            Renderer.add_mat4_load_to_dl(rotMtx)
+            sp1C.x += rotMtx[3][0]
+            sp1C.y += rotMtx[3][1]
+            sp1C.z += rotMtx[3][2]
+        }
+
+        if (flag & 8) {
+            if (m != 0.0) Renderer.func_8019F2C4(m, 121)
+            if (l != 0.0) Renderer.func_8019F2C4(l, 120)
+            if (n != 0.0) Renderer.func_8019F2C4(n, 122)
+        }
+
+        if (colorIdx != 0) {
+            throw "more implementation needed in draw shape"
+        } else {
+            this.sUseSelectedColor = false
+            this.sUseSelectedColor = null
+        }
+
+        if (this.sNumActiveLights != 0 && shape.mtlGroup) {
+            if (rotMtx) {
+                sp1C = { x: rotMtx[3][0], y: rotMtx[3][1], z: rotMtx[3][2] }
+            } else {
+                sp1C = { x: 0.0, y: 0.0, z: 0.0 }
+            }
+            //this.update_shaders(shape, sp1C) Skip for now TODO
+        }
+
+        if (flag & 4) {
+            Renderer.translate_load_mtx_gddl(i, j, k)
+        }
+
+        if (flag & 1) {
+            Renderer.func_8019F258(c, d, e)
+        }
+
+        this.draw_shape_faces(shape)
+        this.sUseSelectedColor = false
+
+    }
+
+    draw_joint(joint) {
+        const boneShape = joint.unk20
+        if (boneShape == null) return
+
+        throw "more implementation needed in draw joint"
     }
 
     draw_net(net) {
@@ -147,8 +211,14 @@ class Draw {
         if (obj.header == null) {
             throw "apply_obj_draw_fn - obj is null"
         }
+
+        /// TODO fix Joints being sent here with 0 drawflags, causing draw
+        if (obj.header.type == 4) return
+
         if (obj.header.drawFlags & GDTypes.OBJ_NOT_DRAWABLE) return
 
+        //TODO remove this skipper
+        if (obj.header.objDrawFn == null) { console.log("skipping undefined draw function  type: " + obj.header.type); return }
         obj.header.objDrawFn.call(this, obj)
     }
 
@@ -207,7 +277,7 @@ class Draw {
         Renderer.func_801A02B8(shape.unk58)
 
         if (shape.gdDls[Renderer.gGdFrameBuf] != 0) {
-            throw "more implementation in draw_shape_faces"
+            Renderer.func_8019BD0C(shape.gdDls[Renderer.gGdFrameBuf], shape.gdDls[2])
         } else if (shape.faceGroup) {
             Renderer.func_801A0038()
             this.draw_group(shape.faceGroup)

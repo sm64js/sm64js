@@ -4,7 +4,7 @@ import * as GDTypes from "./gd_types"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import { DrawInstance as Draw } from "./Draw"
 import * as Gbi from "../include/gbi"
-import { gd_mat4f_lookat } from "./gd_math"
+import { gd_mat4f_lookat, gd_copy_mat4f } from "./gd_math"
 
 const MAX_GD_DLS = 1000
 
@@ -418,18 +418,26 @@ class GoddardRenderer {
 
     create_vertex_template_object() {
         return {
-            ob: [0.0, 0.0, 0.0],
+            pos: [0.0, 0.0, 0.0],
             flag: 0,
             tc: [0, 0],
             color: [0, 0, 0],
             normal: {
-                ob: [0.0, 0.0, 0.0],
+                pos: [0.0, 0.0, 0.0],
                 flag: 0,
                 tc: [0, 0],
                 n: [0, 0, 0],
                 a: 0
             }
         }
+    }
+
+    stash_current_gddl() {
+        this.sGdDlStash = this.sCurrentGdDl
+    }
+
+    pop_gddl_stash() {
+        this.sCurrentGdDl = this.sGdDlStash
     }
 
     reset_cur_dl_indices() {
@@ -470,9 +478,9 @@ class GoddardRenderer {
 
     make_Vtx_if_new(x, y, z, alpha) {
         for (let i = this.D_801BB0CC; i < this.D_801BB0CC + this.D_801BB0BC; i++) {
-            if (this.sCurrentGdDl.vtx[i].normal.ob[0] == x) {
-                if (this.sCurrentGdDl.vtx[i].normal.ob[1] == y) {
-                    if (this.sCurrentGdDl.vtx[i].normal.ob[2] == z) {
+            if (this.sCurrentGdDl.vtx[i].normal.pos[0] == x) {
+                if (this.sCurrentGdDl.vtx[i].normal.pos[1] == y) {
+                    if (this.sCurrentGdDl.vtx[i].normal.pos[2] == z) {
                         this.D_801BAF30[this.D_801BB0C4][this.D_801BB0B4++] = i
                         return
                     }
@@ -486,9 +494,9 @@ class GoddardRenderer {
         this.D_801BAF30[this.D_801BB0C4][this.D_801BB0B4++] = this.sCurrentGdDl.vtx.length;
 
         const newVertex = this.create_vertex_template_object()
-        newVertex.normal.ob[0] = x
-        newVertex.normal.ob[1] = y
-        newVertex.normal.ob[2] = z
+        newVertex.normal.pos[0] = x
+        newVertex.normal.pos[1] = y
+        newVertex.normal.pos[2] = z
         newVertex.normal.flag = 0
         newVertex.normal.tc[0] = this.sVtxCvrtTCBuf[0]
         newVertex.normal.tc[1] = this.sVtxCvrtTCBuf[1]
@@ -515,6 +523,17 @@ class GoddardRenderer {
             Gbi.gSPTexture(this.sCurrentGdDl.gfx, 0x8000, 0x8000, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF)
             Gbi.gsDPSetCombineMode(this.sCurrentGdDl.gfx, Gbi.G_CC_SHADE)
         }
+    }
+
+    func_8019BD0C(dlNum, gfxIdx) {
+        let dl
+        if (gfxIdx != 0) {
+            dl = this.sGdDLArray[dlNum].dlptr[gfxIdx - 1]
+        } else {
+            dl = this.sGdDLArray[dlNum].gfx
+        }
+
+        Gbi.gSPDisplayList(this.sCurrentGdDl.gfx, dl)
     }
 
     func_801A0070() {
@@ -933,9 +952,16 @@ class GoddardRenderer {
 
     func_801A4848(linkDl) {
         const saveCurDl = this.sCurrentGdDl
-        this.sCurrentGdDl - this.sMHeadMainDls[this.gGdFrameBuf]
+        this.sCurrentGdDl = this.sMHeadMainDls[this.gGdFrameBuf]
         this.branch_cur_dl_to_num(linkDl)
         this.sCurrentGdDl = saveCurDl
+    }
+
+    add_mat4_load_to_dl(mtx) {
+        const newMtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        gd_copy_mat4f(mtx, newMtx)
+        Gbi.gSPMatrix(this.sCurrentGdDl.gfx, newMtx, this.sMtxParamType | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+        this.sCurrentGdDl.mtx.push(newMtx)
     }
 
     update_view_and_dl(view) {
@@ -969,6 +995,7 @@ class GoddardRenderer {
         if (gddl == null) {
             throw "no display list in gd renderer"
         }
+
         return gddl.gfx
     }
 

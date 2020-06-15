@@ -1082,7 +1082,7 @@ class DynlistProc {
                 break
             case this.D_LIGHT:
                 dobj = Objects.make_light(0, null, 0)
-                Objects.addto_group(Draw.gGdLightGroup, dobj)
+                Objects.addto_group(Draw.gGdLightGroup, dobj.header)
                 break
             case this.D_NET:
                 dobj = Nets.make_net(0, null, null, null, null)

@@ -387,6 +387,14 @@ export class n64GfxProcessor {
         return false
     }
 
+    sp_movemem(type, lightData, index) {
+        if (type == Gbi.G_MV_L) { // load lightData
+            this.rsp.current_lights[index] = lightData
+        } else {
+            throw "unimplemented gfx movemem"
+        }
+    }
+
     sp_tri1(vtx1_idx, vtx2_idx, vtx3_idx) {
         const v1 = this.rsp.loaded_vertices[vtx1_idx]
         const v2 = this.rsp.loaded_vertices[vtx2_idx]
@@ -770,11 +778,13 @@ export class n64GfxProcessor {
             const args = command.words.w1
 
             opCount++
-            command.opCount = opCount
 
             switch (opcode) {
                 case Gbi.G_ENDDL: /// not necessary for JS
                     //console.log("G_ENDDL")
+                    break
+                case Gbi.G_MOVEMEM:
+                    this.sp_movemem(args.type, args.lightData, args.index)
                     break
                 case Gbi.G_MTX:
                     this.sp_matrix(args.parameters, args.matrix)
@@ -838,6 +848,7 @@ export class n64GfxProcessor {
                     }
                     break
                 default:
+                    console.log(command)
                     throw "unimplemented gfx opcode: " + opcode
             }
 

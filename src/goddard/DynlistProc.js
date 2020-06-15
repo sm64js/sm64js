@@ -736,9 +736,9 @@ class DynlistProc {
         }
 
         if (this.sDynListCurObj.header.type == GDTypes.OBJ_TYPE_NETS) {
-            this.sDynListCurObj.unk68 = vec
+            this.sDynListCurObj.unk68 = { ...vec }
         } else if (this.sDynListCurObj.header.type == GDTypes.OBJ_TYPE_JOINTS) {
-            this.sDynListCurObj.unk6C = vec
+            this.sDynListCurObj.unk6C = { ...vec }
         } else throw "Object does not support this function - set rotation"
     }
 

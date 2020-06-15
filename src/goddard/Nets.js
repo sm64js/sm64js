@@ -11,7 +11,7 @@ class Nets {
     }
 
     move_nets(group) {
-        Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.Unknown80192294, group, this)
+        //Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.Unknown80192294, group, this)
         ///Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.move_net, group, this) TODO
     }
 
@@ -22,6 +22,7 @@ class Nets {
             unk20: { x: 0.0, y: 0.0, z: 0.0 },
             unk38: ++this.sNetCount,
             unk1AC: { x: 1.0, y: 1.0, z: 1.0 },
+            unk68: { x: 0.0, y: 0.0, z: 0.0 },
             unk1A8: shapedata,
             unk1C8: a2,
             unk1CC: a3,
@@ -41,6 +42,7 @@ class Nets {
     }
 
     Unknown80192294(net) {
+
         if (net.unk1E8 == null) {
             Objects.func_8017F054(net.header, null)
         }
@@ -107,8 +109,22 @@ class Nets {
         }
     }
 
+    myEval(net) {
+        console.log(`header next type: ${net.header.next.type}, mat168[3][0]: ${net.matE8[2][1]}, mat168[3][1]: ${net.matE8[2][2]}, mat168[3][2]: ${net.matE8[2][3]}, netType: ${net.netType}, `)
+        //console.log(net.matE8)
+        if (isNaN(net.matE8[1][1])) throw "no no in eval"
+/*        if (net.unk1D4) {
+            console.log("attached group with more nets!")
+            Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS | OBJ_TYPE_JOINTS, this.myEval, net.unk1D4, this)
+            console.log("attached group with more nets end!")
+
+        }*/
+    }
+
     func_80193848(group) {
         Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.reset_net, group, this)
+        Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.myEval, group, this)
+        throw "stop after eval finished"
         Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.Unknown80192294, group, this)
         Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.Unknown801922FC, group, this)
         Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.Unknown8019373C, group, this)
@@ -119,7 +135,6 @@ class Nets {
         net.unk14 = { ...net.unk20 }
         net.unk50 = { x: 0.0, y: 0.0, z: 0.0 }
         net.unkA4 = { x: 0.0, y: 0.0, z: 0.0 }
-        net.unk68 = { x: 0.0, y: 0.0, z: 0.0 }
 
         //this.func_80191F10(net) TODO - may not be necessary?
         this.gGdSkinNet = net

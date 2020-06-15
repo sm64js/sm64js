@@ -117,7 +117,7 @@ export const gd_scale_mat4f_by_vec3f = (mtx, vec) => {
 
 export const gd_create_rot_matrix = (mtx, vec, s, c) => {
 
-    const rev = { z: vec.x, y: vec.y, z: vec.x }
+    const rev = { z: vec.x, y: vec.y, x: vec.z }
 
     const oneMinusCos = 1.0 - c
 
@@ -148,6 +148,7 @@ export const gd_create_rot_mat_angular = (mtx, vec, ang) => {
     let c = Math.cos(ang / (DEG_PER_RAD / 2.0))
 
     gd_create_rot_matrix(mtx, vec, s, c)
+
 }
 
 export const mtxf_mul = (dest, a, b) => {
@@ -190,8 +191,32 @@ export const mtxf_mul = (dest, a, b) => {
     dest[3][3] = 1
 }
 
+export const mat4_dot_prod = (a, b, res, row, col) => {
+    res[row][col] = a[row][0] * b[0][col] + a[row][1] * b[1][col] +
+                    a[row][2] * b[2][col] + a[row][3] * b[3][col]
+}
+
 export const gd_mult_mat4f = (mA, mB, dst) => {
-    mtxf_mul(dst, mA, mB)
+    const result = new Array(4).fill(0).map(() => new Array(4).fill(0))
+
+    mat4_dot_prod(mA, mB, result, 0, 0)
+    mat4_dot_prod(mA, mB, result, 0, 1)
+    mat4_dot_prod(mA, mB, result, 0, 2)
+    mat4_dot_prod(mA, mB, result, 0, 3)
+    mat4_dot_prod(mA, mB, result, 1, 0)
+    mat4_dot_prod(mA, mB, result, 1, 1)
+    mat4_dot_prod(mA, mB, result, 1, 2)
+    mat4_dot_prod(mA, mB, result, 1, 3)
+    mat4_dot_prod(mA, mB, result, 2, 0)
+    mat4_dot_prod(mA, mB, result, 2, 1)
+    mat4_dot_prod(mA, mB, result, 2, 2)
+    mat4_dot_prod(mA, mB, result, 2, 3)
+    mat4_dot_prod(mA, mB, result, 3, 0)
+    mat4_dot_prod(mA, mB, result, 3, 1)
+    mat4_dot_prod(mA, mB, result, 3, 2)
+    mat4_dot_prod(mA, mB, result, 3, 3)
+
+    gd_copy_mat4f(result, dst)
 }
 
 export const gd_mat4f_mult_vec3f = (vec, mtx) => {
@@ -224,9 +249,9 @@ export const gd_absrot_mat4 = (mtx, axisnum, ang) => {
         default:
             throw "uhhh.... should not be here"
     }
-
     gd_create_rot_mat_angular(rMat, rot, ang / 2.0)
     gd_mult_mat4f(mtx, rMat, mtx)
+
 }
 
 export const gd_rot_mat_about_vec = (mtx, vec) => {

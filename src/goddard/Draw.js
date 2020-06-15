@@ -106,6 +106,22 @@ class Draw {
 
     }
 
+    draw_shape(shape, flag, c, d, e, f, g, h, i, j, k, l, m, n, colorIdx, rotMtx) {
+
+        console.log(shape)
+        console.log(flag)
+
+        console.log(g)
+        console.log(k)
+        console.log(m)
+
+        console.log(colorIdx)
+
+        console.log(rotMtx)
+
+        throw "draw first shape"
+    }
+
     draw_net(net) {
         let netColor
         if (this.sSceneProcessType == FIND_PICKS) return
@@ -115,6 +131,7 @@ class Draw {
         } else {
             netColor = net.unk40
         }
+
 
         if (net.unk1A8) {
             this.draw_shape(net.unk1A8, 0x10, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,

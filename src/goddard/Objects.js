@@ -547,6 +547,7 @@ class Objects {
 
         newView.id = this.sGdViewInfo.count++
 
+
         newView.components = parts
         if (newView.components) {
             this.reset_nets_and_gadgets(parts)
@@ -646,6 +647,7 @@ class Objects {
         const sp1C = { x: 0.0, y: 0.0, z: 0.0 }
 
         if (a1_objheader) {
+
             Dynlist.set_cur_dynobj(a1_objheader.obj)
             const sp50 = Dynlist.d_get_matrix_ptr()
             const sp44 = Dynlist.d_get_rot_mtx_ptr()
@@ -654,24 +656,32 @@ class Objects {
             const sp4C = Dynlist.d_get_idn_mtx_ptr()
             const sp40 = Dynlist.d_get_rot_mtx_ptr()
 
+
             Dynlist.d_get_scale(sp1C)
             const sp48 = Dynlist.d_get_matrix_ptr()
 
             gd_mult_mat4f(sp4C, sp50, sp48)
+            console.log(`stage sp4C mat168[3][0] ${sp4C[2][3]}, mat168[3][1] ${sp4C[2][1]}, mat168[3][2] ${sp4C[2][2]},`)
+            console.log(`stage sp44 mat168[3][0] ${sp44[2][3]}, mat168[3][1] ${sp44[2][1]}, mat168[3][2] ${sp44[2][2]},`)
             gd_mult_mat4f(sp4C, sp44, sp40)
+            console.log(`stage result mat168[3][0] ${sp40[3][0]}, mat168[3][1] ${sp40[3][1]}, mat168[3][2] ${sp40[3][2]},`)
             gd_scale_mat4f_by_vec3f(sp40, sp1C)
+
 
         } else {
             Dynlist.set_cur_dynobj(a0_objheader.obj)
             const sp48 = Dynlist.d_get_matrix_ptr()
             const sp4C = Dynlist.d_get_idn_mtx_ptr()
             const sp44 = Dynlist.d_get_rot_mtx_ptr()
+            console.log(`bottom 1 mat168[3][0] ${sp4C[2][3]}, mat168[3][1] ${sp4C[2][1]}, mat168[3][2] ${sp4C[2][2]},`)
 
             Dynlist.d_get_scale(sp1C)
             gd_set_identity_mat4(sp48)
             gd_copy_mat4f(sp4C, sp44)
             gd_scale_mat4f_by_vec3f(sp44, sp1C)
+            console.log(`bottom 2 mat168[3][0] ${sp44[2][3]}, mat168[3][1] ${sp44[2][1]}, mat168[3][2] ${sp44[2][2]},`)
         }
+        console.log("")
 
         Dynlist.set_cur_dynobj(a0_objheader.obj)
         const curGroup = Dynlist.d_get_att_objgroup()

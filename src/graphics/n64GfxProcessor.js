@@ -373,7 +373,8 @@ export class n64GfxProcessor {
         }
         if (this.gfx_texture_cache.pool.length >= 1024) {
             /// pool hits limit
-            throw "more implementation needed in texture cache lookup"
+            this.gfx_texture_cache.pool = []
+            return this.texture_cache_lookup(tile, textureData, fmt, siz, id)
         }
         node = {}
         this.gfx_texture_cache.pool.push(node)

@@ -48,7 +48,7 @@ export const intro_geo_00035C = [
     { command: GeoLayout.open_node },
     { command: GeoLayout.node_ortho, args: [100] },
     { command: GeoLayout.open_node },
-    //{ command: GeoLayout.node_generated, args: [0, geo_intro_backdrop] },
+    { command: GeoLayout.node_generated, args: [0, geo_intro_backdrop] },
     { command: GeoLayout.close_node },
     { command: GeoLayout.close_node },
     { command: GeoLayout.node_master_list, args: [1] },

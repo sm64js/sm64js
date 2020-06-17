@@ -729,6 +729,25 @@ export class n64GfxProcessor {
         this.rdp.textures_changed[this.rdp.texture_to_load.tile_number] = true
     }
 
+    normalize_vector(v) {
+        const s = Math.sqrt(Math.pow(v[0], 2) + Math.pow(v[1], 2) + Math.pow(v[2], 2))
+        v[0] /= s
+        v[1] /= s
+        v[2] /= s
+    }
+
+    transposed_matrix_mul(res, a, b) {
+        res[0] = a[0] * b[0][0] + a[1] * b[0][1] + a[2] * b[0][2]
+        res[1] = a[0] * b[1][0] + a[1] * b[1][1] + a[2] * b[1][2]
+        res[2] = a[0] * b[2][0] + a[1] * b[2][1] + a[2] * b[2][2]
+    }
+
+    calculate_normal_dir(light, coeffs) {
+        const light_dir = light.dir.map(x => x / 127.0)
+        this.transposed_matrix_mul(coeffs, light_dir, this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1])
+        this.normalize_vector(coeffs)
+    }
+
     sp_vertex(dest_index, vertices) {
 
         for (let i = 0; i < vertices.length; i++, dest_index++) {
@@ -746,7 +765,45 @@ export class n64GfxProcessor {
             const V = v.tc[1] * this.rsp.texture_scaling_factor.t >> 16
 
             if (this.rsp.geometry_mode & Gbi.G_LIGHTING) {
-                //throw "more implementation needed here q"
+                if (this.rsp.lights_changed) {
+                    for (let i = 0; i < this.rsp.current_num_lights - 1; i++) {
+                        this.calculate_normal_dir(this.rsp.current_lights[i], this.rsp.current_lights_coeffs[i])
+                    }
+                    const lookat_x = { dir: [127, 0, 0] }
+                    const lookat_y = { dir: [0, 127, 0] }
+                    this.calculate_normal_dir(lookat_x, this.rsp.current_lookat_coeffs[0])
+                    this.calculate_normal_dir(lookat_y, this.rsp.current_lookat_coeffs[1])
+                    this.rsp.lights_changed = false
+                }
+
+                /// the ambient light?
+                let r = this.rsp.current_lights[this.rsp.current_num_lights - 1].col[0]
+                let g = this.rsp.current_lights[this.rsp.current_num_lights - 1].col[1]
+                let b = this.rsp.current_lights[this.rsp.current_num_lights - 1].col[2]
+
+                for (let i = 0; i < this.rsp.current_num_lights - 1; i++) {
+                    let intensity = 0
+                    intensity += v.color[0] * this.rsp.current_lights_coeffs[i][0]
+                    intensity += v.color[1] * this.rsp.current_lights_coeffs[i][1]
+                    intensity += v.color[2] * this.rsp.current_lights_coeffs[i][2]
+                    intensity /= 127.0
+                    if (intensity > 0) {
+                        r += intensity * this.rsp.current_lights[i].col[0]
+                        g += intensity * this.rsp.current_lights[i].col[1]
+                        b += intensity * this.rsp.current_lights[i].col[2]
+                    }
+                }
+
+                d.color = {
+                    r: r > 255 ? 255 : r,
+                    g: g > 255 ? 255 : g,
+                    b: b > 255 ? 255 : b
+                }
+
+                if (this.rsp.geometry_mode & Gbi.G_TEXTURE_GEN) {
+                    throw "more implementation needed here q"
+                }
+
             } else {
                 Object.assign(d.color, { r: v.color[0], g: v.color[1], b: v.color[2] })
             }

@@ -98,10 +98,10 @@ export const geo_fade_transition = (param, graphNode, unused) => {
         Gbi.gDPSetEnvColor(displayList, 255, 255, 255, gTitleFadeCounter)
         if (gTitleFadeCounter == 255) {
             graphNode.flags = (graphNode.flags & 0xFF) | 0x100
-            //Gbi.gDPSetRenderMode(displayList, Gbi.G_RM_AA_OPA_SURF, Gbi.G_RM_AA_OPA_SURF2);
+            Gbi.gDPSetRenderMode(displayList, Gbi.G_RM_AA_OPA_SURF_SURF2);
         } else {
             graphNode.flags = (graphNode.flags & 0xFF) | 0x500
-            //Gbi.gDPSetRenderMode(displayList, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
+            Gbi.gDPSetRenderMode(displayList, Gbi.G_RM_AA_XLU_SURF_SURF2);
         }
         Gbi.gSPDisplayList(displayList, LevelData.intro_seg7_dl_0700C6A0)
         Gbi.gSPEndDisplayList(displayList)

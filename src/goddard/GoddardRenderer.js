@@ -422,13 +422,13 @@ class GoddardRenderer {
             flag: 0,
             tc: [0, 0],
             color: [0, 0, 0],
-            normal: {
+/*            normal: {
                 pos: [0.0, 0.0, 0.0],
                 flag: 0,
                 tc: [0, 0],
                 n: [0, 0, 0],
                 a: 0
-            }
+            }*/
         }
     }
 
@@ -478,9 +478,9 @@ class GoddardRenderer {
 
     make_Vtx_if_new(x, y, z, alpha) {
         for (let i = this.D_801BB0CC; i < this.D_801BB0CC + this.D_801BB0BC; i++) {
-            if (this.sCurrentGdDl.vtx[i].normal.pos[0] == x) {
-                if (this.sCurrentGdDl.vtx[i].normal.pos[1] == y) {
-                    if (this.sCurrentGdDl.vtx[i].normal.pos[2] == z) {
+            if (this.sCurrentGdDl.vtx[i].pos[0] == x) {
+                if (this.sCurrentGdDl.vtx[i].pos[1] == y) {
+                    if (this.sCurrentGdDl.vtx[i].pos[2] == z) {
                         this.D_801BAF30[this.D_801BB0C4][this.D_801BB0B4++] = i
                         return
                     }
@@ -494,17 +494,16 @@ class GoddardRenderer {
         this.D_801BAF30[this.D_801BB0C4][this.D_801BB0B4++] = this.sCurrentGdDl.vtx.length;
 
         const newVertex = this.create_vertex_template_object()
-        newVertex.normal.pos[0] = x
-        newVertex.normal.pos[1] = y
-        newVertex.normal.pos[2] = z
-        newVertex.normal.flag = 0
-        newVertex.normal.tc[0] = this.sVtxCvrtTCBuf[0]
-        newVertex.normal.tc[1] = this.sVtxCvrtTCBuf[1]
-        newVertex.normal.n[0] = this.sVtxCvrtNormBuf[0]
-        newVertex.normal.n[1] = this.sVtxCvrtNormBuf[1]
-        newVertex.normal.n[2] = this.sVtxCvrtNormBuf[2]
-        newVertex.normal.a = parseInt(alpha * 255.0)
-
+        newVertex.pos[0] = x
+        newVertex.pos[1] = y
+        newVertex.pos[2] = z
+        newVertex.flag = 0
+        newVertex.tc[0] = this.sVtxCvrtTCBuf[0]
+        newVertex.tc[1] = this.sVtxCvrtTCBuf[1]
+        newVertex.color[0] = this.sVtxCvrtNormBuf[0]
+        newVertex.color[1] = this.sVtxCvrtNormBuf[1]
+        newVertex.color[2] = this.sVtxCvrtNormBuf[2]
+        newVertex.color[3] = parseInt(alpha * 255.0)
 
         this.sCurrentGdDl.vtx.push(newVertex)
         return newVertex
@@ -651,11 +650,18 @@ class GoddardRenderer {
     }
 
     cpy_remaining_gddl(child, parent) {
-        parent.gfx.push(...child.gfx)
+
+/*        parent.gfx.push(...child.gfx)
         parent.mtx.push(...child.mtx)
         parent.light.push(...child.light)
         parent.vtx.push(...child.vtx)
-        parent.vp.push(...child.vp)
+        parent.vp.push(...child.vp)*/
+        child.gfx = []
+        child.mtx = []
+        child.light = []
+        child.vtx = []
+        child.vp = []
+
     }
 
     gd_enddlsplist_parent() {
@@ -698,7 +704,6 @@ class GoddardRenderer {
             default: throw "unknown case in gd renderer gd_startdisplist"
         }
         //gDPPipeSync(next_gfx())
-
         return this.sCurrentGdDl.number
     }
 
@@ -920,7 +925,6 @@ class GoddardRenderer {
         let newMtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const perspNorm = { value: 0 }
         MathUtil.guPerspective(newMtx, perspNorm, fovy, aspect, near, far, 1.0)
-
         //gSPPerspNormalize() /// not needed
 
         const perspecMtx = newMtx
@@ -936,9 +940,9 @@ class GoddardRenderer {
     }
 
     set_gd_mtx_parameters(params) {
-        if (params == Gbi.G_MTX_PROJECTION | Gbi.G_MTX_MUL | Gbi.G_MTX_PUSH) {
+        if (params == (Gbi.G_MTX_PROJECTION | Gbi.G_MTX_MUL | Gbi.G_MTX_PUSH)) {
             this.sMtxParamType = Gbi.G_MTX_PROJECTION
-        } else if (params == Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_PUSH) {
+        } else if (params == (Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_PUSH)) {
             this.sMtxParamType = Gbi.G_MTX_MODELVIEW
         } else {
             throw "set_gd_mtx_parameters"
@@ -951,10 +955,11 @@ class GoddardRenderer {
     }
 
     func_801A4848(linkDl) {
-        const saveCurDl = this.sCurrentGdDl
+
+        const saveCurDl = { target: this.sCurrentGdDl }
         this.sCurrentGdDl = this.sMHeadMainDls[this.gGdFrameBuf]
         this.branch_cur_dl_to_num(linkDl)
-        this.sCurrentGdDl = saveCurDl
+        this.sCurrentGdDl = saveCurDl.target
     }
 
     add_mat4_load_to_dl(mtx) {
@@ -965,8 +970,10 @@ class GoddardRenderer {
     }
 
     update_view_and_dl(view) {
+
         const prevFlags = view.flags
         Draw.update_view(view)
+
         if (prevFlags & GDTypes.VIEW_UPDATE) {
             this.sCurrentGdDl = this.sMHeadMainDls[this.gGdFrameBuf]
             if (view.gdDlNum != 0) {

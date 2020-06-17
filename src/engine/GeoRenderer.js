@@ -99,7 +99,6 @@ class GeoRenderer {
         MathUtil.mtxf_rotate_xy(rollMtx, node.wrapper.rollScreen)
 
         Gbi.gSPMatrix(Game.gDisplayList, rollMtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_MUL | Gbi.G_MTX_NOPUSH)
-
         MathUtil.mtxf_lookat(cameraTransform, node.wrapper.pos, node.wrapper.focus, node.wrapper.roll)
         MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], cameraTransform, this.gMatStack[this.gMatStackIndex])
         this.gMatStackIndex++

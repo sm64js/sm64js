@@ -126,8 +126,6 @@ export class n64GfxProcessor {
         this.rsp.modelview_matrix_stack_size = 1
         this.rsp.current_num_lights = 2
         this.rsp.lights_changed = true
-        this.MP_matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
-        this.MP_matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
     }
 
     matrix_mul(res, a, b) {
@@ -158,10 +156,10 @@ export class n64GfxProcessor {
     }
 
     sp_matrix(parameters, og_matrix) {
-
         const matrix = this.cloneMatrix4x4(og_matrix)
 
         if (parameters & Gbi.G_MTX_PROJECTION) {
+
             if (parameters & Gbi.G_MTX_LOAD) {
                 this.rsp.P_matrix = matrix
             } else {
@@ -170,7 +168,7 @@ export class n64GfxProcessor {
         } else { // G_MTX_MODELVIEW
             if ((parameters & Gbi.G_MTX_PUSH) && this.rsp.modelview_matrix_stack_size < 11) {
                 this.rsp.modelview_matrix_stack_size++
-                this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1] = this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 2]
+                this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1] = this.cloneMatrix4x4(this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 2])
             }
             if (parameters & Gbi.G_MTX_LOAD) {
                 this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1] = matrix
@@ -184,11 +182,13 @@ export class n64GfxProcessor {
             }
             this.rsp.lights_changed = true
         }
+
         this.matrix_mul(
             this.rsp.MP_matrix,
             this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1],
             this.rsp.P_matrix,
         )
+
     }
 
     sp_geometry_mode(clear, set) {
@@ -396,6 +396,7 @@ export class n64GfxProcessor {
     }
 
     sp_tri1(vtx1_idx, vtx2_idx, vtx3_idx) {
+        
         const v1 = this.rsp.loaded_vertices[vtx1_idx]
         const v2 = this.rsp.loaded_vertices[vtx2_idx]
         const v3 = this.rsp.loaded_vertices[vtx3_idx]
@@ -730,6 +731,7 @@ export class n64GfxProcessor {
     sp_vertex(dest_index, vertices) {
 
         for (let i = 0; i < vertices.length; i++, dest_index++) {
+
             const v = vertices[i]
             const d = this.rsp.loaded_vertices[dest_index]
 
@@ -743,7 +745,7 @@ export class n64GfxProcessor {
             const V = v.tc[1] * this.rsp.texture_scaling_factor.t >> 16
 
             if (this.rsp.geometry_mode & Gbi.G_LIGHTING) {
-                throw "more implementation needed here"
+                //throw "more implementation needed here q"
             } else {
                 Object.assign(d.color, { r: v.color[0], g: v.color[1], b: v.color[2] })
             }
@@ -770,7 +772,6 @@ export class n64GfxProcessor {
     }
 
     run_dl(commands) {
-
         //console.log("G_DL")
 
         for (const command of commands) {
@@ -870,9 +871,6 @@ export class n64GfxProcessor {
         this.run_dl(commands)
         this.flush()
 
-/*        if (opCount >= 1213) {
-            throw "reached opcount max"
-        }*/
     }
 }
 

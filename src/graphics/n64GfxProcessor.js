@@ -924,6 +924,7 @@ export class n64GfxProcessor {
     }
 
     run(commands) {
+        window.totalTriangles = 0
         this.sp_reset()
 
         WebGL.start_frame()

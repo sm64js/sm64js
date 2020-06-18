@@ -1,4 +1,6 @@
 
+//export const someobject = { somelist: [] }
+
 /// graphics opcodes
 export const G_MTX = 1
 export const G_POPMTX = 2

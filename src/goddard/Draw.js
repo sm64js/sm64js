@@ -107,6 +107,26 @@ class Draw {
 
     }
 
+    draw_material(mtl) {
+
+        let mtlType = mtl.type
+
+        if (mtlType == GDTypes.GD_MTL_SHINE_DL) {
+            if (this.sPhongLight && this.sPhongLight.unk30 > 0.0) {
+                throw "more implementation needed in draw material"
+            } else {
+                mtlType = GDTypes.GD_MTL_BREAK
+            }
+        }
+
+        if (!this.sUseSelectedColor) {
+            Renderer.func_801A086C(mtl.gddlNumber, mtl.Kd, mtlType)
+        } else {
+            Renderer.func_801A086C(mtl.gddlNumber, this.sSelectedColour, GDTypes.GD_MTL_LIGHTS)
+        }
+
+    }
+
     update_shaders(shape, offset) {
         Renderer.stash_current_gddl()
         this.sLightPositionOffset = { ...offset }
@@ -116,8 +136,8 @@ class Draw {
             //Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_LIGHTS, this.Proc8017A980, this.gGdLightGroup, this)
         }
         if (shape.mtlGroup) {
-            // Skip for now ... TODO
-            //Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_MATERIALS, this.apply_obj_draw_fn, shape.mtlGroup, this)
+            // Skip for now ... TODO not workign for some reason
+            Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_MATERIALS, this.apply_obj_draw_fn, shape.mtlGroup, this)
         }
         Renderer.pop_gddl_stash()
     }
@@ -154,7 +174,7 @@ class Draw {
             throw "more implementation needed in draw shape"
         } else {
             this.sUseSelectedColor = false
-            this.sUseSelectedColor = null
+            this.sSelectedColour = null
         }
 
         if (this.sNumActiveLights != 0 && shape.mtlGroup) {
@@ -163,7 +183,7 @@ class Draw {
             } else {
                 sp1C = { x: 0.0, y: 0.0, z: 0.0 }
             }
-            //this.update_shaders(shape, sp1C) Skip for now TODO
+            this.update_shaders(shape, sp1C)
         }
 
         if (flag & 4) {
@@ -308,7 +328,6 @@ class Draw {
     create_shape_gddl(shape) {
         this.create_shape_mtl_gddls(shape)
         const shapedl = Renderer.gd_startdisplist(7)
-
         if (shapedl == 0) return -1
 
         this.setup_lights()

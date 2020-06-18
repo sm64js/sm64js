@@ -383,7 +383,7 @@ export class n64GfxProcessor {
         }
         WebGL.select_texture(tile, node.texture_object)
         WebGL.set_sampler_parameters(tile, false, 0, 0)
-        Object.assign(node, { cms: 0, cmt: 0, linear_filter: false, id, textureData, fmt, siz, meow: true })
+        Object.assign(node, { cms: 0, cmt: 0, linear_filter: false, id, textureData, fmt, siz })
         this.rendering_state.textures[tile] = node
         return false
     }
@@ -769,6 +769,7 @@ export class n64GfxProcessor {
                     for (let i = 0; i < this.rsp.current_num_lights - 1; i++) {
                         this.calculate_normal_dir(this.rsp.current_lights[i], this.rsp.current_lights_coeffs[i])
                     }
+                    //console.log({ ...this.rsp.current_lights[0].col })
                     const lookat_x = { dir: [127, 0, 0] }
                     const lookat_y = { dir: [0, 127, 0] }
                     this.calculate_normal_dir(lookat_x, this.rsp.current_lookat_coeffs[0])

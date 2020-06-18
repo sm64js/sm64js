@@ -407,12 +407,13 @@ class GoddardRenderer {
         this.sVtxCvrtTCBuf = new Array(2).fill(0)
         this.D_801BAF30 = new Array(13).fill(0).map(() => new Array(8).fill(0))
         this.sGdPerspTimer = 1.0
+        this.jsId = 0
     }
 
     create_light_template_object() {
         return {
             ambient: { col: [ 0, 0, 0 ] },
-            lights4: new Array(4).fill(0).map(() => { return { col: [0, 0, 0], dir: [0, 0, 0] } }),
+            lights4: new Array(4).fill(0).map(() => { return { col: [0, 0, 0],  dir: [0, 0, 0] } })
         }
     }
 
@@ -441,22 +442,22 @@ class GoddardRenderer {
     }
 
     reset_cur_dl_indices() {
-        this.sMHeadMainDls[this.gGdFrameBuf].gfx = []
+        this.sMHeadMainDls[this.gGdFrameBuf].gfx.length = 0
         this.sCurrentGdDl = this.sDynDlSet1[this.gGdFrameBuf]
-        this.sCurrentGdDl.gfx = []
-        this.sCurrentGdDl.vtx = []
-        this.sCurrentGdDl.mtx = []
-        this.sCurrentGdDl.vp = []
-        this.sCurrentGdDl.light = []
+        this.sCurrentGdDl.gfx.length = 0
+        this.sCurrentGdDl.vtx.length = 0
+        this.sCurrentGdDl.mtx.length = 0
+        this.sCurrentGdDl.vp.length = 0
+        this.sCurrentGdDl.light.length = 0
     }
 
     reset_dlnum_indices(num) {
         this.sCurrentGdDl = this.sGdDLArray[num]
-        this.sCurrentGdDl.gfx = []
-        this.sCurrentGdDl.vtx = []
-        this.sCurrentGdDl.mtx = []
-        this.sCurrentGdDl.vp = []
-        this.sCurrentGdDl.light = []
+        this.sCurrentGdDl.gfx.length = 0
+        this.sCurrentGdDl.vtx.length = 0
+        this.sCurrentGdDl.mtx.length = 0
+        this.sCurrentGdDl.vp.length = 0
+        this.sCurrentGdDl.light.length = 0
 
 /*        this.sCurrentGdDl.curVtxIdx = 0
         this.sCurrentGdDl.curMtxIdx = 0
@@ -466,6 +467,7 @@ class GoddardRenderer {
     }
 
     branch_cur_dl_to_num(dlNum) {
+/*        console.log(`current num: ${this.sCurrentGdDl.number} length: ${this.sCurrentGdDl.gfx.length}   linking to new: dlnum ${this.sGdDLArray[dlNum].number} at index: ${dlNum},  and  length ${this.sGdDLArray[dlNum].gfx.length}`)*/
         Gbi.gSPDisplayList(this.sCurrentGdDl.gfx, this.sGdDLArray[dlNum].gfx)
     }
 
@@ -487,8 +489,6 @@ class GoddardRenderer {
                 }
             }
         }
-
-        //console.log("making vertex " + this.D_801BB0C4 + `  ${x}, ${y}, ${z}`)
 
         this.D_801BB0BC++
         this.D_801BAF30[this.D_801BB0C4][this.D_801BB0B4++] = this.sCurrentGdDl.vtx.length;
@@ -607,6 +607,7 @@ class GoddardRenderer {
                 this.gddl_is_loading_shine_dl(false)
                 numLights = 2
                 break
+            case GDTypes.GD_MTL_BREAK: break
             default: throw "not implemented material type"
         }
 
@@ -639,7 +640,9 @@ class GoddardRenderer {
             newLight.lights4[i].dir[2] = lightDir[2]
 
             Gbi.gSPLight(this.sCurrentGdDl.gfx, newLight.lights4[i], i)
+
         }
+
         //ambient light added last
         Gbi.gSPLight(this.sCurrentGdDl.gfx, newLight.ambient, numLights) 
 
@@ -656,11 +659,11 @@ class GoddardRenderer {
         parent.light.push(...child.light)
         parent.vtx.push(...child.vtx)
         parent.vp.push(...child.vp)*/
-        child.gfx = []
-        child.mtx = []
-        child.light = []
-        child.vtx = []
-        child.vp = []
+        child.gfx.length = 0
+        child.mtx.length = 0
+        child.light.length = 0
+        child.vtx.length = 0
+        child.vp.length = 0
 
     }
 
@@ -983,6 +986,7 @@ class GoddardRenderer {
     }
 
     gdm_gettestdl(id) {
+
         let gddl
         const vec = { x: 0.0, y: 0.0, z: 0.0 }
 

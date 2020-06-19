@@ -262,20 +262,25 @@ export const G_IM_SIZ_32b	= 3
 export const G_IM_SIZ_DD = 5
 
 export const G_IM_SIZ_INCR_TABLE = {
+    1: 1,
     2: 0
 }
 export const G_IM_SIZ_SHIFT_TABLE = {
+    1: 1,
     2: 0
 }
 
 export const G_IM_SIZ_LOAD_BLOCK_TABLE = {
+    1: G_IM_SIZ_16b,
     2: G_IM_SIZ_16b
 }
 export const G_IM_SIZ_BYTES_TABLE = {
+    1: G_IM_SIZ_8b,
     2: G_IM_SIZ_16b
 }
 
 export const G_IM_SIZ_LINE_BYTES_TABLE = {
+    1: G_IM_SIZ_8b,
     2: G_IM_SIZ_16b
 }
 
@@ -347,9 +352,10 @@ export const G_CC_DECALRGB = {
     rgb: [15, 15, 31, 1]
 }
 
-
-let textureImageId = 0
-
+export const G_CC_HILITERGBA = {
+    alpha: [3, 4, 1, 4],
+    rgb: [3, 4, 1, 4]
+}
 
 export const gSPLight = (displaylist, lightData, index) => {
     displaylist.push({
@@ -415,6 +421,24 @@ export const gDPSetCombineMode = (displaylist, mode) => {
     })
 }
 
+export const gDPSetTileSize = (displaylist, t, uls, ult, lrs, lrt) => {
+    displaylist.push({
+        words: {
+            w0: G_SETTILESIZE,
+            w1: { t, uls, ult, lrs, lrt }
+        }
+    })
+}
+
+export const gDPSetHilite1Tile = (displaylist, tile, hilite, width, height) => {
+    gDPSetTileSize(displaylist, tile,
+        hilite.x1 & 0xfff,
+        hilite.y1 & 0xfff,
+        (((width - 1) * 4) + hilite.x1) & 0xfff,
+        (((height - 1) * 4) + hilite.y1) & 0xfff
+    )
+}
+
 export const gSPMatrix = (displaylist, matrix, parameters) => {
     displaylist.push({
         words: {
@@ -465,6 +489,15 @@ export const gSP1Triangle = (displaylist, v0, v1, v2, flag) => {
         words: {
             w0: G_TRI1,
             w1: { v0, v1, v2, flag }
+        }
+    })
+}
+
+export const gDPSetPrimColor = (displaylist, m, l, r, g, b, a) => {
+    displaylist.push({
+        words: {
+            w0: G_SETPRIMCOLOR,
+            w1: { m, l, r, g, b, a }
         }
     })
 }
@@ -665,7 +698,7 @@ export const gsDPSetTextureImage = (format, size, width, imageData) => {
     return {
         words: {
             w0: G_SETTIMG,
-            w1: { format, size, width, imageData, id: textureImageId++ }
+            w1: { format, size, width, imageData }
         }
     }
 }
@@ -721,7 +754,7 @@ export const gsSP2Triangles = (v00, v01, v02, flag0, v10, v11, v12, flag1) => {
 
 export const gsDPLoadTextureBlock = (timg, fmt, siz, width, height, pal, cms, cmt, masks, maskt, shifts, shiftt) => {
     return [
-        gsDPSetTextureImage(fmt, siz, 1, timg),
+        gsDPSetTextureImage(fmt, G_IM_SIZ_LOAD_BLOCK_TABLE[siz], 1, timg),
         gsDPSetTile(fmt, G_IM_SIZ_LOAD_BLOCK_TABLE[siz], 0, 0, G_TX_LOADTILE, 0, cmt, maskt, shiftt, cms, masks, shifts),
         gsDPLoadBlock(G_TX_LOADTILE, 0, 0, (((width) * (height) + G_IM_SIZ_INCR_TABLE[siz]) >> G_IM_SIZ_SHIFT_TABLE[siz]) - 1),
         gsDPSetTile(fmt, siz,

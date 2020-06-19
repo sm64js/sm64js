@@ -723,7 +723,7 @@ class DynlistProc {
                 GDMath.gd_copy_mat4f(src, this.sDynListCurObj.matE8)
                 break
             case GDTypes.OBJ_TYPE_LIGHTS:
-                this.sDynListCurObj.positions = { x: src[3][0], y: src[3][1], z: src[3][2] }
+                this.sDynListCurObj.position = { x: src[3][0], y: src[3][1], z: src[3][2] }
                 break
             default:
                 throw "Object does not support this function - set idn mtx"

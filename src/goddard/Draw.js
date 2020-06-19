@@ -5,7 +5,7 @@ import { GoddardRendererInstance as Renderer } from "./GoddardRenderer"
 import { GoddardMainInstance as Main } from "./GoddardMain"
 import { NetsInstance as Nets } from "./Nets"
 import { G_MTX_PROJECTION, G_MTX_MUL, G_MTX_PUSH, G_MTX_MODELVIEW, G_MTX_LOAD } from "../include/gbi"
-import { gd_create_rot_matrix } from "./gd_math"
+import { gd_create_rot_matrix, gd_normalize_vec3f } from "./gd_math"
 
 
 const RENDER_SCENE = 26 ///< render the primitives to screen
@@ -18,6 +18,9 @@ class Draw {
             mtlDlNum: 0,
             shapesDrawn: 0
         }
+
+        this.sLightPositionCache = new Array(8).fill(0).map(() => { return { x: 0, y: 0, z: 0 } })
+        this.sPhongLightPosition = { x: 0, y: 0, z: 0 }
     }
 
     nop_obj_draw() { }
@@ -113,7 +116,9 @@ class Draw {
 
         if (mtlType == GDTypes.GD_MTL_SHINE_DL) {
             if (this.sPhongLight && this.sPhongLight.unk30 > 0.0) {
-                throw "more implementation needed in draw material"
+                if (this.gViewUpdateCamera) {
+                    Renderer.func_801A0478(mtl.gddlNumber, this.gViewUpdateCamera, this.sPhongLight.position, this.sLightPositionOffset, this.sPhongLightPosition, this.sPhongLight.colour)
+                } else throw "should not be here - draw material"
             } else {
                 mtlType = GDTypes.GD_MTL_BREAK
             }
@@ -127,16 +132,51 @@ class Draw {
 
     }
 
+    Proc8017A980(light) {
+
+        light.colour = {
+            r: light.diffuse.r * light.unk30,
+            g: light.diffuse.g * light.unk30,
+            b: light.diffuse.b * light.unk30
+        }
+
+        this.sLightPositionCache[light.id].x = light.position.x - this.sLightPositionOffset.x
+        this.sLightPositionCache[light.id].y = light.position.y - this.sLightPositionOffset.y
+        this.sLightPositionCache[light.id].z = light.position.z - this.sLightPositionOffset.z
+
+        gd_normalize_vec3f(this.sLightPositionCache[light.id])
+
+        if (light.flags & GDTypes.LIGHT_UNK20) {
+            this.sPhongLightPosition.x = this.sLightPositionCache[light.id].x
+            this.sPhongLightPosition.y = this.sLightPositionCache[light.id].y
+            this.sPhongLightPosition.z = this.sLightPositionCache[light.id].z
+            this.sPhongLight = light
+        }
+
+        let sp24 = light.unk30
+        if (light.flags & GDTypes.LIGHT_UNK02) {
+            throw "more implementation needed in Draw - Proc8017A980"
+/*            console.log(light.unk80)
+            let sp20 = - gd_dot_vec3f(this.sLightPositionCache[light.id], light.unk80)*/
+        }
+        Renderer.set_light_id(light.id)
+        Renderer.gd_setproperty(GDTypes.GD_PROP_DIFUSE_COLOUR, light.diffuse.r * sp24, light.diffuse.g * sp24, light.diffuse.b * sp24)
+        Renderer.gd_setproperty(GDTypes.GD_PROP_LIGHT_DIR,
+            this.sLightPositionCache[light.id].x,
+            this.sLightPositionCache[light.id].y,
+            this.sLightPositionCache[light.id].z,
+        )
+        Renderer.gd_setproperty(GDTypes.GD_PROP_LIGHTING, 2.0, 0.0, 0.0)
+    }
+
     update_shaders(shape, offset) {
         Renderer.stash_current_gddl()
         this.sLightPositionOffset = { ...offset }
         this.sPhongLight = null
         if (this.gGdLightGroup) {
-            // Skip for now... TODO
-            //Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_LIGHTS, this.Proc8017A980, this.gGdLightGroup, this)
+            Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_LIGHTS, this.Proc8017A980, this.gGdLightGroup, this)
         }
         if (shape.mtlGroup) {
-            // Skip for now ... TODO not workign for some reason
             Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_MATERIALS, this.apply_obj_draw_fn, shape.mtlGroup, this)
         }
         Renderer.pop_gddl_stash()

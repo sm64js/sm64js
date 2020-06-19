@@ -36,6 +36,8 @@ let opCount = 0
 export class n64GfxProcessor {
     constructor() {
 
+        this.random = 0
+
         //buffer
         this.buf_vbo = [] //new Array(MAX_BUFFERED * 26 * 3).fill(0.0) // 3 vertices in a triangle and 26 floats per vtx
         this.buf_vbo_num_tris = 0
@@ -69,8 +71,8 @@ export class n64GfxProcessor {
         //RDP
         this.rdp = {
             palette: [],
-            texture_to_load: { textureData: null, tile_number: 0, size: 0, id: 0 },
-            loaded_texture: [{ textureData: null, size_bytes: 0, id: 0 }, { textureData: null, size_bytes: 0, id: 0 }],
+            texture_to_load: { textureData: null, tile_number: 0, size: 0 },
+            loaded_texture: [{ textureData: null, size_bytes: 0 }, { textureData: null, size_bytes: 0 }],
             texture_tile: { fmt: 0, siz: 0, cms: 0, cmt: 0, uls: 0, ult: 0, lrs: 0, lrt: 0, line_size_bytes: 0 },
             textures_changed: [false, false],
             other_mode_l: 0,  /// TODO other_mode_l
@@ -196,9 +198,8 @@ export class n64GfxProcessor {
         this.rsp.geometry_mode |= set
     }
 
-    scale_5_8(val) {
-        return Math.floor(((val) * 0xFF) / 0x1F)
-    }
+    scale_5_8(val) { return Math.floor((val * 0xFF) / 0x1F) }
+    scale_4_8(val) { return Math.floor(val * 0x11) }
 
     dp_set_fill_color(color) {
         this.rdp.fill_color.r = this.scale_5_8(color >> 11)
@@ -319,6 +320,29 @@ export class n64GfxProcessor {
         return new_combiner
     }
 
+    import_texture_ia8(tile) {
+        const rgba32_buf = []
+
+        for (let i = 0; i < this.rdp.loaded_texture[tile].size_bytes; i++) {
+            const intensity = this.rdp.loaded_texture[tile].textureData[i] >> 4
+            const alpha = this.rdp.loaded_texture[tile].textureData[i] & 0xf
+
+            this.random++
+
+            let meow = (this.random % 10) * 50
+
+            rgba32_buf.push(this.scale_4_8(intensity))
+            rgba32_buf.push(this.scale_4_8(intensity))
+            rgba32_buf.push(this.scale_4_8(intensity))
+            rgba32_buf.push(this.scale_4_8(alpha))
+        }
+
+        const width = this.rdp.texture_tile.line_size_bytes
+        const height = this.rdp.loaded_texture[tile].size_bytes / this.rdp.texture_tile.line_size_bytes
+
+        WebGL.upload_texture(rgba32_buf, width, height)
+    }
+
     import_texture_rgba16(tile) {
 
         const rgba32_buf = []
@@ -347,11 +371,17 @@ export class n64GfxProcessor {
         const fmt = this.rdp.texture_tile.fmt
         const siz = this.rdp.texture_tile.siz
 
-        if (this.texture_cache_lookup(tile, this.rdp.loaded_texture[tile].textureData, fmt, siz, this.rdp.loaded_texture[tile].id)) return
+        if (this.texture_cache_lookup(tile, this.rdp.loaded_texture[tile].textureData, fmt, siz)) return
 
         if (fmt == Gbi.G_IM_FMT_RGBA) {
             if (siz == Gbi.G_IM_SIZ_16b) {
                 this.import_texture_rgba16(tile)
+            } else {
+                throw "unimplemented texture size"
+            }
+        } else if (fmt == Gbi.G_IM_FMT_IA) {
+            if (siz == Gbi.G_IM_SIZ_8b) {
+                this.import_texture_ia8(tile)
             } else {
                 throw "unimplemented texture size"
             }
@@ -362,19 +392,13 @@ export class n64GfxProcessor {
 
     }
 
-    texture_cache_lookup(tile, textureData, fmt, siz, id) {
-        //const hash = id
-        //let node = this.gfx_texture_cache.hashmap[hash]
-        let node = this.gfx_texture_cache.pool.find(x => x.id == id && x.fmt == fmt && x.siz == siz)
-        if (node != undefined) {
+    texture_cache_lookup(tile, textureData, fmt, siz) {
+
+        let node = this.gfx_texture_cache.pool.find(x => x.textureData == textureData)
+        if (node) {
             WebGL.select_texture(tile, node.texture_object)
             this.rendering_state.textures[tile] = node
             return true
-        }
-        if (this.gfx_texture_cache.pool.length >= 1024) {
-            /// pool hits limit
-            this.gfx_texture_cache.pool = []
-            return this.texture_cache_lookup(tile, textureData, fmt, siz, id)
         }
         node = {}
         this.gfx_texture_cache.pool.push(node)
@@ -383,7 +407,7 @@ export class n64GfxProcessor {
         }
         WebGL.select_texture(tile, node.texture_object)
         WebGL.set_sampler_parameters(tile, false, 0, 0)
-        Object.assign(node, { cms: 0, cmt: 0, linear_filter: false, id, textureData, fmt, siz })
+        Object.assign(node, { cms: 0, cmt: 0, linear_filter: false, textureData })
         this.rendering_state.textures[tile] = node
         return false
     }
@@ -628,6 +652,10 @@ export class n64GfxProcessor {
         this.rdp.env_color = { r, g, b, a }
     }
 
+    dp_set_prim_color(r, g, b, a) {
+        this.rdp.prim_color = { r, g, b, a }
+    }
+
     dp_fill_rectangle(ulx, uly, lrx, lry) {
 
         if (this.rdp.color_image_address == this.rdp.z_buf_address) {
@@ -687,8 +715,8 @@ export class n64GfxProcessor {
         }
     }
 
-    dp_set_texture_image(size, imageData, id) {
-        Object.assign(this.rdp.texture_to_load, { size, id, textureData: imageData })
+    dp_set_texture_image(size, imageData) {
+        Object.assign(this.rdp.texture_to_load, { size, textureData: imageData })
     }
 
     sp_moveword(type, data) {
@@ -725,7 +753,6 @@ export class n64GfxProcessor {
         this.rdp.loaded_texture[this.rdp.texture_to_load.tile_number].size_bytes = size_bytes
         if (size_bytes > 4096) throw "bug: too big texture"
         this.rdp.loaded_texture[this.rdp.texture_to_load.tile_number].textureData = this.rdp.texture_to_load.textureData
-        this.rdp.loaded_texture[this.rdp.texture_to_load.tile_number].id = this.rdp.texture_to_load.id
         this.rdp.textures_changed[this.rdp.texture_to_load.tile_number] = true
     }
 
@@ -761,8 +788,8 @@ export class n64GfxProcessor {
             const w = v.pos[0] * this.rsp.MP_matrix[0][3] + v.pos[1] * this.rsp.MP_matrix[1][3] + v.pos[2] * this.rsp.MP_matrix[2][3] + this.rsp.MP_matrix[3][3]
 
             /// x = adjust x for aspect ratio (x)
-            const U = v.tc[0] * this.rsp.texture_scaling_factor.s >> 16
-            const V = v.tc[1] * this.rsp.texture_scaling_factor.t >> 16
+            let U = v.tc[0] * this.rsp.texture_scaling_factor.s >> 16
+            let V = v.tc[1] * this.rsp.texture_scaling_factor.t >> 16
 
             if (this.rsp.geometry_mode & Gbi.G_LIGHTING) {
                 if (this.rsp.lights_changed) {
@@ -802,7 +829,16 @@ export class n64GfxProcessor {
                 }
 
                 if (this.rsp.geometry_mode & Gbi.G_TEXTURE_GEN) {
-                    throw "more implementation needed here q"
+                    let dotx = 0, doty = 0
+                    dotx += v.color[0] * this.rsp.current_lookat_coeffs[0][0]
+                    dotx += v.color[1] * this.rsp.current_lookat_coeffs[0][1]
+                    dotx += v.color[2] * this.rsp.current_lookat_coeffs[0][2]
+                    doty += v.color[0] * this.rsp.current_lookat_coeffs[1][0]
+                    doty += v.color[1] * this.rsp.current_lookat_coeffs[1][1]
+                    doty += v.color[2] * this.rsp.current_lookat_coeffs[1][2]
+
+                    U = (dotx / 127.0 + 1.0) / 4.0 * this.rsp.texture_scaling_factor.s
+                    V = (doty / 127.0 + 1.0) / 4.0 * this.rsp.texture_scaling_factor.t
                 }
 
             } else {
@@ -876,7 +912,7 @@ export class n64GfxProcessor {
                     this.dp_set_combine_mode(rgb, alpha)
                     break
                 case Gbi.G_SETTIMG:
-                    this.dp_set_texture_image(args.size, args.imageData, args.id)
+                    this.dp_set_texture_image(args.size, args.imageData)
                     break
                 case Gbi.G_SETTILE:
                     this.dp_set_tile(args.fmt, args.siz, args.line, args.tmem, args.tile, args.palette, args.cmt, args.cms)
@@ -895,6 +931,9 @@ export class n64GfxProcessor {
                     break
                 case Gbi.G_SETENVCOLOR:
                     this.dp_set_env_color(args.r, args.g, args.g, args.a)
+                    break
+                case Gbi.G_SETPRIMCOLOR:
+                    this.dp_set_prim_color(args.r, args.g, args.g, args.a)
                     break
                 case Gbi.G_FILLRECT:
                     this.dp_fill_rectangle(args.ulx, args.uly, args.lrx, args.lry)

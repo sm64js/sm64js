@@ -4,7 +4,7 @@ const GD_Y_AXIS = 1
 const GD_Z_AXIS = 2
 
 const DEG_PER_RAD = 180.0 / Math.PI
-
+const RAD_PER_DEG = Math.PI / 180.0
 
 export const gd_mat4f_lookat = (mtx, xFrom, yFrom, zFrom, xTo, yTo, zTo, zColY, yColY, xColY) => {
 
@@ -113,6 +113,63 @@ export const gd_scale_mat4f_by_vec3f = (mtx, vec) => {
     mtx[2][0] *= vec.z
     mtx[2][1] *= vec.z
     mtx[2][2] *= vec.z
+}
+
+export const gd_create_origin_lookat = (mtx, vec, roll) => {
+    const unit = { ...vec }
+
+    gd_normalize_vec3f(unit)
+    const hMag = Math.sqrt(Math.pow(unit.x, 2) + Math.pow(unit.z, 2))
+
+    roll *= RAD_PER_DEG
+
+    const s = Math.sin(roll)
+    const c = Math.cos(roll)
+
+    gd_set_identity_mat4(mtx)
+
+    if (hMag != 0.0) {
+        const invertedHMag = 1.0 / hMag
+        mtx[0][0] = ((-unit.z * c) - (s * unit.y * unit.x)) * invertedHMag
+        mtx[1][0] = ((unit.z * s) - (c * unit.y * unit.x)) * invertedHMag
+        mtx[2][0] = -unit.x
+        mtx[3][0] = 0.0
+
+        mtx[0][1] = s * hMag
+        mtx[1][1] = c * hMag
+        mtx[2][1] = -unit.y
+        mtx[3][1] = 0.0
+
+        mtx[0][2] = ((c * unit.x) - (s * unit.y * unit.z)) * invertedHMag
+        mtx[1][2] = ((-s * unit.x) - (c * unit.y * unit.z)) * invertedHMag
+        mtx[2][2] = -unit.z
+        mtx[3][2] = 0.0
+
+        mtx[0][3] = 0.0
+        mtx[1][3] = 0.0
+        mtx[2][3] = 0.0
+        mtx[3][3] = 1.0
+    } else {
+        mtx[0][0] = 0.0
+        mtx[1][0] = 1.0
+        mtx[2][0] = 0.0
+        mtx[3][0] = 0.0
+
+        mtx[0][1] = 0.0
+        mtx[1][1] = 0.0
+        mtx[2][1] = 1.0
+        mtx[3][1] = 0.0
+
+        mtx[0][2] = 1.0
+        mtx[1][2] = 0.0
+        mtx[2][2] = 0.0
+        mtx[3][2] = 0.0
+
+        mtx[0][3] = 0.0
+        mtx[1][3] = 0.0
+        mtx[2][3] = 0.0
+        mtx[3][3] = 1.0
+    }
 }
 
 export const gd_create_rot_matrix = (mtx, vec, s, c) => {
@@ -270,6 +327,20 @@ export const gd_add_vec3f_to_mat4f_offset = (mtx, vec) => {
     mtx[3][0] += vec.x
     mtx[3][1] += vec.y
     mtx[3][2] += vec.z
+}
+
+export const gd_rotate_and_translate_vec3f = (vec, mtx) => {
+
+    const out = {}
+
+    out.x = mtx[0][0] * vec.x + mtx[1][0] * vec.y + mtx[2][0] * vec.z
+    out.y = mtx[0][1] * vec.x + mtx[1][1] * vec.y + mtx[2][1] * vec.z
+    out.z = mtx[0][2] * vec.x + mtx[1][2] * vec.y + mtx[2][2] * vec.z
+    out.x += mtx[3][0]
+    out.y += mtx[3][1]
+    out.z += mtx[3][2]
+
+    Object.assign(vec, out)
 }
 
 export const gd_copy_mat4f = (src, dst) => {

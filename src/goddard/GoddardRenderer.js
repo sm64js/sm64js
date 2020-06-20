@@ -119,6 +119,54 @@ const gd_texture_mario_face_shine = [
 
 ]
 
+const gd_vertex_sparkle = [
+    { pos: [-32, 0, 0], flag: 0, tc: [0, 1984], color: [0x00, 0x00, 0x7F, 0x00] },
+    { pos: [32, 0, 0], flag: 0, tc: [1984, 1984], color: [0x00, 0x00, 0x7F, 0x00] },
+    { pos: [32, 64, 0], flag: 0, tc: [1984, 0], color: [0x00, 0x00, 0x7F, 0x00] },
+    { pos: [-32, 64, 0], flag: 0, tc: [0, 0], color: [0x00, 0x00, 0x7F, 0x00] }
+]
+
+const gd_vertex_star = [
+    { pos: [-64, 0, 0], flag: 0, tc: [0, 992], color: [0x00, 0x00, 0x7F] },
+    { pos: [64, 0, 0], flag: 0, tc: [992, 992], color: [0x00, 0x00, 0x7F] },
+    { pos: [64, 128, 0], flag: 0, tc: [992, 0], color: [0x00, 0x00, 0x7F] },
+    { pos: [-64, 128, 0], flag: 0, tc: [0, 0], color: [0x00, 0x00, 0x7F] }
+]
+
+const gd_dl_star = [
+    Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALRGBA),
+    Gbi.gsSPClearGeometryMode(Gbi.G_TEXTURE_GEN | Gbi.G_TEXTURE_GEN_LINEAR),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_TEX_EDGE_NOOP2),
+    Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+    Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+    Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+    Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+    Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+    Gbi.gsSPVertex(gd_vertex_star, 4, 0),
+    ...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
+    Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+    Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_INTER_NOOP2),
+    Gbi.gsSPEndDisplayList(),
+]
+
+const gd_dl_sparkle = [
+    Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALRGBA),
+    Gbi.gsSPClearGeometryMode(Gbi.G_TEXTURE_GEN | Gbi.G_TEXTURE_GEN_LINEAR),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_TEX_EDGE_NOOP2),
+    Gbi.gsSPTexture(0x8000, 0x8000, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+    Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+    Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+    Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+    Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+    Gbi.gsSPVertex(gd_vertex_sparkle, 4, 0),
+    ...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
+    Gbi.gsSPTexture(0x0001, 0x0001, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+    Gbi.gsDPSetCombineMode(Gbi.G_CCMUX_SHADE),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_INTER_NOOP2),
+    Gbi.gsSPEndDisplayList()
+]
+
 const gd_dl_red_star_0 = [
     Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, gd_texture_red_star_0),
     Gbi.gsSPBranchList(gd_dl_star)
@@ -209,53 +257,6 @@ const gd_dl_sparkle_white_color = [
     Gbi.gsSPEndDisplayList(),
 ]
 
-const gd_vertex_sparkle = [
-    { pos: [-32, 0, 0 ], flag: 0, tc: [ 0, 1984], color: [ 0x00, 0x00, 0x7F, 0x00] },
-    { pos: [32, 0, 0 ], flag: 0, tc: [ 1984, 1984], color: [ 0x00, 0x00, 0x7F, 0x00] },
-    { pos: [32, 64, 0 ], flag: 0, tc: [ 1984, 0], color: [ 0x00, 0x00, 0x7F, 0x00] },
-    { pos: [-32, 64, 0 ], flag: 0, tc: [ 0, 0], color: [ 0x00, 0x00, 0x7F, 0x00] }
-]
-
-const gd_vertex_star = [
-    { pos: [ -64, 0, 0 ], flag: 0, tc: [ 0, 992 ], color: [ 0x00, 0x00, 0x7F] },
-    { pos: [ 64, 0, 0 ], flag: 0, tc: [ 992, 992 ], color: [ 0x00, 0x00, 0x7F] },
-    { pos: [ 64, 128, 0 ], flag: 0, tc: [ 992, 0 ], color: [ 0x00, 0x00, 0x7F] },
-    { pos: [ -64, 128, 0 ], flag: 0, tc: [ 0, 0 ], color: [ 0x00, 0x00, 0x7F] }
-]
-
-const gd_dl_star = [
-    Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALRGBA),
-    Gbi.gsSPClearGeometryMode(Gbi.G_TEXTURE_GEN | Gbi.G_TEXTURE_GEN_LINEAR),
-    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_TEX_EDGE_NOOP2),
-    Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-    Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-    Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-    Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-    Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-    Gbi.gsSPVertex(gd_vertex_star, 4, 0),
-    Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
-    Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-    Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_INTER_NOOP2),
-    Gbi.gsSPEndDisplayList(),
-]
-
-const gd_dl_sparkle = [
-    Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALRGBA), 
-    Gbi.gsSPClearGeometryMode(Gbi.G_TEXTURE_GEN | Gbi.G_TEXTURE_GEN_LINEAR),
-    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_TEX_EDGE_NOOP2), 
-    Gbi.gsSPTexture(0x8000, 0x8000, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-    Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-    Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-    Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-    Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-    Gbi.gsSPVertex(gd_vertex_sparkle, 4, 0),
-    Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
-    Gbi.gsSPTexture(0x0001, 0x0001, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-    Gbi.gsDPSetCombineMode(Gbi.G_CCMUX_SHADE),
-    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_INTER_NOOP2),
-    Gbi.gsSPEndDisplayList()
-]
 
 const gd_dl_red_sparkle_0 = [
     Gbi.gsSPDisplayList(gd_dl_sparkle_red_color),
@@ -1043,6 +1044,13 @@ class GoddardRenderer {
     add_mat4_load_to_dl(mtx) {
         const newMtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
         gd_copy_mat4f(mtx, newMtx)
+        Gbi.gSPMatrix(this.sCurrentGdDl.gfx, newMtx, this.sMtxParamType | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+        this.sCurrentGdDl.mtx.push(newMtx)
+    }
+
+    translate_load_mtx_gddl(x, y, z) {
+        const newMtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        MathUtil.guTranslate(newMtx, x, y, z)
         Gbi.gSPMatrix(this.sCurrentGdDl.gfx, newMtx, this.sMtxParamType | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
         this.sCurrentGdDl.mtx.push(newMtx)
     }

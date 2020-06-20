@@ -862,9 +862,9 @@ export class n64GfxProcessor {
     }
 
     run_dl(commands) {
-        //console.log("G_DL")
 
         for (const command of commands) {
+
             const opcode = command.words.w0
             const args = command.words.w1
 
@@ -872,7 +872,6 @@ export class n64GfxProcessor {
 
             switch (opcode) {
                 case Gbi.G_ENDDL: /// not necessary for JS
-                    //console.log("G_ENDDL")
                     break
                 case Gbi.G_MOVEMEM:
                     this.sp_movemem(args.type, args.lightData, args.index)

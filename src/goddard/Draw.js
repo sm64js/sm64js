@@ -1,11 +1,12 @@
 import * as GDTypes from "./gd_types"
+import * as Gbi from "../include/gbi"
 import { ObjectsInstance as Objects } from "./Objects"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import { GoddardRendererInstance as Renderer } from "./GoddardRenderer"
 import { GoddardMainInstance as Main } from "./GoddardMain"
 import { NetsInstance as Nets } from "./Nets"
 import { G_MTX_PROJECTION, G_MTX_MUL, G_MTX_PUSH, G_MTX_MODELVIEW, G_MTX_LOAD } from "../include/gbi"
-import { gd_create_rot_matrix, gd_normalize_vec3f } from "./gd_math"
+import { gd_create_rot_matrix, gd_normalize_vec3f, gd_set_identity_mat4, gd_rotate_and_translate_vec3f } from "./gd_math"
 
 
 const RENDER_SCENE = 26 ///< render the primitives to screen
@@ -19,6 +20,7 @@ class Draw {
             shapesDrawn: 0
         }
 
+        this.sLightDlCounter = 1
         this.sLightPositionCache = new Array(8).fill(0).map(() => { return { x: 0, y: 0, z: 0 } })
         this.sPhongLightPosition = { x: 0, y: 0, z: 0 }
     }
@@ -41,6 +43,12 @@ class Draw {
             throw "not implemented this"
         }
 
+        if (lightgrp) {
+            Renderer.set_gd_mtx_parameters(Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_PUSH)
+            Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_LIGHTS, this.apply_obj_draw_fn, lightgrp, this)
+            Renderer.set_gd_mtx_parameters(Gbi.G_MTX_PROJECTION | Gbi.G_MTX_MUL | Gbi.G_MTX_PUSH)
+        }
+
         if (this.gViewUpdateCamera) {
             this.draw_camera(this.gViewUpdateCamera)
         } else {
@@ -58,6 +66,32 @@ class Draw {
         } else {
             Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_NETS, this.apply_obj_draw_fn, interactables, this)
         }
+    }
+
+    draw_light(light) {
+
+        let shape
+
+        if (this.sSceneProcessType == FIND_PICKS) return
+
+        this.sLightColours = { ...light.colour }
+
+        if (light.flags & GDTypes.LIGHT_UNK02) {
+            const sp54 = new Array(4).fill(0).map(() => new Array(4).fill(0))
+            gd_set_identity_mat4(sp54)
+            const sp94 = { x: -light.unk80.x, y: -light.unk80.y, z: -light.unk80.z }
+            gd_create_origin_lookat(sp54, sp94, 0.0)
+            shape = Shapes.D_801A82E4
+        } else {
+            shape = light.unk9C.target
+            if (++this.sLightDlCounter >= 17) {
+                this.sLightDlCounter = 1
+            }
+            shape.gdDls[2] = this.sLightDlCounter
+        }
+
+        this.draw_shape_2d(shape, 2, 1.0, 1.0, 1.0, light.position.x, light.position.y, light.position.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, 0)
+
     }
 
     draw_camera(cam) {
@@ -235,6 +269,21 @@ class Draw {
         this.draw_shape_faces(shape)
         this.sUseSelectedColor = false
 
+    }
+
+    draw_shape_2d(shape, flag, c, d, e, f, g, h, i, j, k, l, m, n, color, p) {
+        this.sUpdateViewState.shapesDrawn++
+
+        if (shape == null) return
+
+        if (flag & 2) {
+            const sp1C = { x: f, y: g, z: h }
+            if (this.gViewUpdateCamera) {
+                gd_rotate_and_translate_vec3f(sp1C, this.gViewUpdateCamera.unkE8)
+            }
+            Renderer.translate_load_mtx_gddl(sp1C.x, sp1C.y, sp1C.z)
+        }
+        this.draw_shape_faces(shape)
     }
 
     draw_joint(joint) {

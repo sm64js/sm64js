@@ -333,8 +333,8 @@ class ShapeHelper {
     load_shapes2() {
         this.func_80197280()
         //this.sCubeShape = this.make_shape(0, "cube")
-        const D_801A82E4 = Dynlist.proc_dynlist(dynlist_unused)
-        this.scale_verts_in_shape(D_801A82E4, 200.0, 200.0, 200.0)
+        this.D_801A82E4 = Dynlist.proc_dynlist(dynlist_unused)
+        this.scale_verts_in_shape(this.D_801A82E4, 200.0, 200.0, 200.0)
 
         //const D_801A82E8 = Dynlist.proc_dynlist(dynlist_test_cube)
         //more here todo

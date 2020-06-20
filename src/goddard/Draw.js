@@ -143,9 +143,7 @@ class Draw {
         this.sLightPositionCache[light.id].x = light.position.x - this.sLightPositionOffset.x
         this.sLightPositionCache[light.id].y = light.position.y - this.sLightPositionOffset.y
         this.sLightPositionCache[light.id].z = light.position.z - this.sLightPositionOffset.z
-
         gd_normalize_vec3f(this.sLightPositionCache[light.id])
-
         if (light.flags & GDTypes.LIGHT_UNK20) {
             this.sPhongLightPosition.x = this.sLightPositionCache[light.id].x
             this.sPhongLightPosition.y = this.sLightPositionCache[light.id].y

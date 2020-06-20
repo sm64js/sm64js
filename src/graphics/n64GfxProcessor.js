@@ -327,10 +327,6 @@ export class n64GfxProcessor {
             const intensity = this.rdp.loaded_texture[tile].textureData[i] >> 4
             const alpha = this.rdp.loaded_texture[tile].textureData[i] & 0xf
 
-            this.random++
-
-            let meow = (this.random % 10) * 50
-
             rgba32_buf.push(this.scale_4_8(intensity))
             rgba32_buf.push(this.scale_4_8(intensity))
             rgba32_buf.push(this.scale_4_8(intensity))
@@ -371,7 +367,7 @@ export class n64GfxProcessor {
         const fmt = this.rdp.texture_tile.fmt
         const siz = this.rdp.texture_tile.siz
 
-        if (this.texture_cache_lookup(tile, this.rdp.loaded_texture[tile].textureData, fmt, siz)) return
+        if (this.texture_cache_lookup(tile, this.rdp.loaded_texture[tile].textureData)) return
 
         if (fmt == Gbi.G_IM_FMT_RGBA) {
             if (siz == Gbi.G_IM_SIZ_16b) {
@@ -392,7 +388,7 @@ export class n64GfxProcessor {
 
     }
 
-    texture_cache_lookup(tile, textureData, fmt, siz) {
+    texture_cache_lookup(tile, textureData) {
 
         let node = this.gfx_texture_cache.pool.find(x => x.textureData == textureData)
         if (node) {
@@ -402,9 +398,7 @@ export class n64GfxProcessor {
         }
         node = {}
         this.gfx_texture_cache.pool.push(node)
-        if (node.texture_object == undefined) {
-            node.texture_object = WebGL.new_texture()
-        }
+        node.texture_object = WebGL.new_texture()
         WebGL.select_texture(tile, node.texture_object)
         WebGL.set_sampler_parameters(tile, false, 0, 0)
         Object.assign(node, { cms: 0, cmt: 0, linear_filter: false, textureData })
@@ -526,6 +520,7 @@ export class n64GfxProcessor {
         const use_texture = used_textures[0] || used_textures[1]
         const tex_width = (this.rdp.texture_tile.lrs - this.rdp.texture_tile.uls + 4) / 4
         const tex_height = (this.rdp.texture_tile.lrt - this.rdp.texture_tile.ult + 4) / 4
+
 
         for (let i = 0; i < 3; i++) {
             this.buf_vbo.push(v_arr[i].x)

@@ -560,9 +560,18 @@ class GoddardRenderer {
             x: cam.unkE8[2][2] + arg4.z
         }
 
-        const sp3C = Math.sqrt(Math.pow(sp40.x) + Math.pow(sp40.y) + Math.pow(sp40.z))
+        let sp3C = Math.sqrt(Math.pow(sp40.x, 2) + Math.pow(sp40.y, 2) + Math.pow(sp40.z, 2))
+
         if (sp3C > 0.1) {
-            throw "more implementation needed in goddard renderer - func_801A0478"
+            sp3C = 1.0 / sp3C
+
+            sp40.x *= sp3C
+            sp40.y *= sp3C
+            sp40.z *= sp3C
+
+            hilite.x1 = (((sp40.z * cam.unkE8[0][0]) + (sp40.y * cam.unkE8[1][0]) + (sp40.x * cam.unkE8[2][0])) * sp38 * 2.0) + (sp38 * 4.0)
+            hilite.y1 = (((sp40.z * cam.unkE8[0][1]) + (sp40.y * cam.unkE8[1][1]) + (sp40.x * cam.unkE8[2][1])) * sp38 * 2.0) + (sp38 * 4.0)
+
         } else {
             hilite.x1 = sp38 * 2.0
             hilite.y1 = sp34 * 2.0

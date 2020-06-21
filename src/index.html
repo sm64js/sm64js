@@ -9,30 +9,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-    <script>
-        window.addEventListener("load", function () {
-            var elements = document.getElementsByClassName("rainbowText")
-            for (let i = 0; i < elements.length; i++) {
-                generateRainbowText(elements[i])
-            }
-        })
-
-        const letterColors = ["blue", "red", "green", "yellow"]
-
-        function generateRainbowText(element) {
-            var text = element.innerText
-            element.innerHTML = ""
-            for (let i = 0; i < text.length; i++) {
-                let charElem = document.createElement("span")
-                charElem.style.color = letterColors[i % 4]
-                charElem.innerHTML = text[i]
-                element.appendChild(charElem)
-            }
-        }
-
-
-        const changeFrameSpeed = (newspeed) => { window.frameSpeed = 1000 / newspeed }
-    </script>
 </head>
 
 <body class="text-center">
@@ -69,7 +45,7 @@
             </div>
             <div class="row" style="justify-content:center;">
                 <h5 style="padding-right:10px"> Adjust Game Speed: </h5>
-                <input id="slider" type="range" style="width:300px" min="1" max="300" value="30" class="slider" id="myRange" onchange="changeFrameSpeed(this.value)">
+                <input id="slider" type="range" style="width:300px" min="1" max="300" value="30">
                 <h5 id="fps" style="padding-left:10px"> 30 fps </h5>
             </div>
             <canvas id="gameCanvas" width="640" height="480"></canvas>

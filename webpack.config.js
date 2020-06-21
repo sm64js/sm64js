@@ -9,6 +9,11 @@ module.exports = {
                 use: ['babel-loader']
             },
             {
+                test: /\.css$/,
+                exclude: /node_modules/,
+                use: ["style-loader", "css-loader"]
+            },
+            {
                 test: /\.html$/,
                 use: ["html-loader"]
             }

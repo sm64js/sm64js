@@ -3,12 +3,55 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title></title>
+    <title>sm64js</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script>
+        const changeFrameSpeed = (newspeed) => { window.frameSpeed = 1000 / newspeed }
+    </script>
 </head>
-<body>
-    <canvas id="gameCanvas" width="640" height="480"></canvas>
-    <h2 id="numTriangles"> Total Triangles this frame: </h2>
-    <h2 id="timing"> Frame Time: </h2>
+
+<body class="text-center">
+
+    <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+        <header class="masthead mb-auto">
+            <div class="inner">
+                <h3 class="masthead-brand">Super Mario 64 JS</h3>
+                <nav class="nav nav-masthead justify-content-center">
+                    <a class="nav-link active" href="#">Home</a>
+                    <a class="nav-link" href="#">Source Code</a>
+                    <a class="nav-link" href="#">Contribute</a>
+                </nav>
+            </div>
+        </header>
+
+        <main role="main" class="inner cover">
+            <h1 class="cover-heading">Super Mario 64 - Javascript Port</h1>
+            <p class="lead">
+                Super Mario 64 Decomp - <a href="https://github.com/n64decomp/sm64">Github</a>
+                <br />
+                Super Mario 64 PC Port - <a href="https://github.com/sm64-port/sm64-port">Github</a>
+                <br />
+                N64 Fast 3D Renderer - <a href="https://github.com/Emill/n64-fast3d-engine">Github</a>
+                <br />
+                My Super Mario 64 JS Port - <a href="https://gitlab.com/mattsasa/sm64js">Gitlab</a>
+
+
+            </p>
+            <canvas id="gameCanvas" width="640" height="480"></canvas>
+            <h4 id="numTriangles"> Total Triangles this frame: </h4>
+            <h4 id="timing"> Frame Time: </h4>
+            <div class="row" style="justify-content:center">
+                <h5 style="padding-right:10px"> Adjust Game Speed: </h5>
+                <input type="range" min="1" max="100" value="30" class="slider" id="myRange" onchange="changeFrameSpeed(this.value)">
+                <h5 id="fps" style="padding-left:10px"> 30 fps </h5>
+            </div>
+        </main>
+
+    </div>
 
 </body>
 </html>

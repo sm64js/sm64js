@@ -6,6 +6,8 @@
     "name": ""
   },
   "dependencies": {
+    "css-loader": "^3.6.0",
+    "style-loader": "^1.2.1",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.11.0"
@@ -26,5 +28,12 @@
     "html-loader": "^1.1.0",
     "html-webpack-plugin": "^4.3.0",
     "webpack-node-externals": "^1.7.2"
-  }
+  },
+  "browserslist": [
+    "last 3 and_chr versions",
+    "last 3 chrome versions",
+    "last 3 opera versions",
+    "last 3 ios_saf versions",
+    "last 3 safari versions"
+  ]
 }

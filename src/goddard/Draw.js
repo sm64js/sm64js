@@ -45,7 +45,7 @@ class Draw {
 
         if (lightgrp) {
             Renderer.set_gd_mtx_parameters(Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_PUSH)
-            Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_LIGHTS, this.apply_obj_draw_fn, lightgrp, this)
+            Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_LIGHTS | GDTypes.OBJ_TYPE_PARTICLES, this.apply_obj_draw_fn, lightgrp, this)
             Renderer.set_gd_mtx_parameters(Gbi.G_MTX_PROJECTION | Gbi.G_MTX_MUL | Gbi.G_MTX_PUSH)
         }
 
@@ -92,6 +92,30 @@ class Draw {
 
         this.draw_shape_2d(shape, 2, 1.0, 1.0, 1.0, light.position.x, light.position.y, light.position.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, 0)
 
+    }
+
+    draw_particle(ptc) {
+
+        if (ptc.unk5C > 0) {
+            const white = { r: 255.0, g: 255.0, b: 255.0 }
+            const black = { r: 0.0, g: 0.0, b: 0.0 }
+            const sp58 = ptc.unk5C / 10.0
+            this.sLightColours.r = (white.r - black.r) * sp58 + black.r
+            this.sLightColours.g = (white.g - black.g) * sp58 + black.g
+            this.sLightColours.b = (white.b - black.b) * sp58 + black.b
+        } else {
+            this.sLightColours.r = 0.0
+            this.sLightColours.g = 0.0
+            this.sLightColours.b = 0.0
+        }
+
+        if (ptc.unk5C > 0) {
+            ptc.unk1C.gdDls[2] = ptc.unk5C
+            this.draw_shape_2d(ptc.unk1C, 2, 1.0, 1.0, 1.0, ptc.unk20.x, ptc.unk20.y, ptc.unk20.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, 0)
+        }
+        if (ptc.unk60 == 3) {
+            if (ptc.unk6C) this.draw_group(ptc.unk6C)
+        }
     }
 
     draw_camera(cam) {
@@ -389,7 +413,6 @@ class Draw {
             Renderer.func_801A0038()
             this.draw_group(shape.faceGroup)
             Renderer.func_801A0070()
-
         } 
 
     }

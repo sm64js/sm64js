@@ -298,6 +298,16 @@ class DynlistProc {
         }
 
         switch (this.sDynListCurObj.header.type) {
+            case GDTypes.OBJ_TYPE_VERTICES:
+                dst.x = this.sDynListCurObj.pos.x
+                dst.y = this.sDynListCurObj.pos.y
+                dst.z = this.sDynListCurObj.pos.z
+                break
+            case GDTypes.OBJ_TYPE_LIGHTS:
+                dst.x = this.sDynListCurObj.position.x
+                dst.y = this.sDynListCurObj.position.y
+                dst.z = this.sDynListCurObj.position.z
+                break
             case GDTypes.OBJ_TYPE_JOINTS:
                 dst.x = this.sDynListCurObj.unk14.x
                 dst.y = this.sDynListCurObj.unk14.y
@@ -308,8 +318,18 @@ class DynlistProc {
                 dst.y = this.sDynListCurObj.unk14.y
                 dst.z = this.sDynListCurObj.unk14.z
                 break
+            case GDTypes.OBJ_TYPE_PARTICLES:
+                dst.x = this.sDynListCurObj.unk20.x
+                dst.y = this.sDynListCurObj.unk20.y
+                dst.z = this.sDynListCurObj.unk20.z
+                break
+            case GDTypes.OBJ_TYPE_CAMERAS:
+                dst.x = this.sDynListCurObj.unk14.x
+                dst.y = this.sDynListCurObj.unk14.y
+                dst.z = this.sDynListCurObj.unk14.z
+                break
             default:
-                throw "Object does not support function - get world pos"
+                throw "Object does not support function - get world pos - " + this.sDynListCurObj.header.type
         }
     }
 

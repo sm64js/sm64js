@@ -1,6 +1,7 @@
 import * as GDTypes from "./gd_types"
 import { DrawInstance as Draw } from "./Draw"
 import { NetsInstance as Nets } from "./Nets"
+import * as Particles from "./Particles"
 import { DynlistProcInstance as Dynlist } from "./DynlistProc"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
 import { GoddardRendererInstance as Renderer } from "./GoddardRenderer"
@@ -69,6 +70,11 @@ class Objects {
             gd_add_vec3f_to_mat4f_offset(sp40, a0.p2)
         }
         Dynlist.d_set_idn_mtx(sp40)
+    }
+
+    move_particles_in_grp(group) {
+        Nets.gGdSkinNet = null
+        this.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_PARTICLES, Particles.move_particle, group, null)
     }
 
     move_animator(animObj) {
@@ -174,7 +180,7 @@ class Objects {
         if (Main.gGdMoveScene) {
             ///reset gadgets seems to do nothing
             //// move lights seems to do nothing
-            /// move particles TODO
+            this.move_particles_in_grp(this.sCurrentMoveGrp)
             this.move_animators(this.sCurrentMoveGrp)
 
             Nets.move_nets(this.sCurrentMoveGrp)

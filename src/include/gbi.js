@@ -332,6 +332,11 @@ export const G_CC_MODULATERGB = {
     rgb: [1, 15, 4, 7]
 }
 
+export const G_CC_MODULATERGBA_PRIM = {
+    alpha: [1, 7, 3, 7],
+    rgb: [1, 15, 3, 7]
+}
+
 export const G_CC_SHADE = {
     alpha: [7, 7, 7, 4],
     rgb: [15, 15, 31, 4]

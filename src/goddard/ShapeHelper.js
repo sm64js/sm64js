@@ -128,17 +128,19 @@ class ShapeHelper {
         Objects.addto_group(Draw.gGdLightGroup, sp24.header)
 
         sp24 = Particles.make_particle(0, 1, 0.0, 0.0, 0.0)
+        sp24.header.obj = sp24
         Object.assign(sp24, {
             unk60: 3, unk64: 2,
-            unkBC: Dynlist.d_use_obj("N228l"),
+            unkBC: Dynlist.d_use_obj("N228l").header,
             unk1C: this.gShape.silverSparkPtr.target
         })
         Objects.addto_group(Draw.gGdLightGroup, sp24.header)
 
         sp24 = Particles.make_particle(0, 2, 0.0, 0.0, 0.0)
+        sp24.header.obj = sp24
         Object.assign(sp24, {
             unk60: 3, unk64: 2,
-            unkBC: Dynlist.d_use_obj("N223l"),
+            unkBC: Dynlist.d_use_obj("N231l").header,
             unk1C: this.gShape.redSparkPtr.target
         })
         Objects.addto_group(Draw.gGdLightGroup, sp24.header)

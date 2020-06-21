@@ -151,7 +151,7 @@ const gd_dl_star = [
 ]
 
 const gd_dl_sparkle = [
-    Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALRGBA),
+    Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGBA_PRIM),
     Gbi.gsSPClearGeometryMode(Gbi.G_TEXTURE_GEN | Gbi.G_TEXTURE_GEN_LINEAR),
     Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_TEX_EDGE_NOOP2),
     Gbi.gsSPTexture(0x8000, 0x8000, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
@@ -162,7 +162,7 @@ const gd_dl_sparkle = [
     Gbi.gsSPVertex(gd_vertex_sparkle, 4, 0),
     ...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
     Gbi.gsSPTexture(0x0001, 0x0001, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-    Gbi.gsDPSetCombineMode(Gbi.G_CCMUX_SHADE),
+    Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
     Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_INTER_NOOP2),
     Gbi.gsSPEndDisplayList()
 ]

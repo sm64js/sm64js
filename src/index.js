@@ -48,7 +48,7 @@ const main_func = () => {
     /// WebGL class and n64GfxProcessor class are initialized with their constructor when they are imported
     Game.attachInterfaceToGfxProcessor(send_display_list)
      
-    setInterval(produce_one_frame, 33) //36 seems good
+    setInterval(produce_one_frame, 30) //36 seems good
     
 }
 

@@ -115,6 +115,10 @@ export const gd_scale_mat4f_by_vec3f = (mtx, vec) => {
     mtx[2][2] *= vec.z
 }
 
+export const gd_vec3f_magnitude = (vec) => {
+    return Math.sqrt(Math.pow(vec.x, 2) + Math.pow(vec.y, 2) + Math.pow(vec.z, 2))
+}
+
 export const gd_create_origin_lookat = (mtx, vec, roll) => {
     const unit = { ...vec }
 

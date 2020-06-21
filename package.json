@@ -14,7 +14,7 @@
   },
   "scripts": {
     "build": "webpack --mode production",
-    "start": "webpack-dev-server  --mode development"
+    "start": "webpack-dev-server --host 0.0.0.0 --disable-host-check  --mode development"
   },
   "babel": {
     "presets": [

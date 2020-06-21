@@ -10,6 +10,27 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script>
+        window.addEventListener("load", function () {
+            var elements = document.getElementsByClassName("rainbowText")
+            for (let i = 0; i < elements.length; i++) {
+                generateRainbowText(elements[i])
+            }
+        })
+
+        const letterColors = ["blue", "red", "green", "yellow"]
+
+        function generateRainbowText(element) {
+            var text = element.innerText
+            element.innerHTML = ""
+            for (let i = 0; i < text.length; i++) {
+                let charElem = document.createElement("span")
+                charElem.style.color = letterColors[i % 4]
+                charElem.innerHTML = text[i]
+                element.appendChild(charElem)
+            }
+        }
+
+
         const changeFrameSpeed = (newspeed) => { window.frameSpeed = 1000 / newspeed }
     </script>
 </head>
@@ -17,9 +38,9 @@
 <body class="text-center">
 
     <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
-        <header class="masthead mb-auto">
+        <header class="masthead">
             <div class="inner">
-                <h3 class="masthead-brand">Super Mario 64 JS</h3>
+                <h3 class="masthead-brand rainbowText">Super Mario 64 JS</h3>
                 <nav class="nav nav-masthead justify-content-center">
                     <a class="nav-link active" href="#">Home</a>
                     <a class="nav-link" href="#">Source Code</a>
@@ -29,26 +50,40 @@
         </header>
 
         <main role="main" class="inner cover">
-            <h1 class="cover-heading">Super Mario 64 - Javascript Port</h1>
+            <h1 class="cover-heading rainbowText">Super Mario 64 - Javascript Port</h1>
+            <h5 id="numTriangles"> Total triangles rendered this frame: </h5>
+            <div class="row">
+                <div class="col-5" style="text-align:left">
+                    <h5>Total Frame Time (Avg): </h5>
+                    <h5>Game Logic (Avg): </h5>
+                    <h5>Rendering/WebGL (Avg):</h5>
+                </div>
+                <div class="col-1">
+                    <h5 id="timing-total"></h5>
+                    <h5 id="timing-game"></h5>
+                    <h5 id="timing-render"></h5>
+                </div>
+                <div class="col-6" style="text-align:right">
+                    <h5 id="maxFps"></h5>
+                </div>
+            </div>
+            <div class="row" style="justify-content:center;">
+                <h5 style="padding-right:10px"> Adjust Game Speed: </h5>
+                <input id="slider" type="range" style="width:300px" min="1" max="300" value="30" class="slider" id="myRange" onchange="changeFrameSpeed(this.value)">
+                <h5 id="fps" style="padding-left:10px"> 30 fps </h5>
+            </div>
+            <canvas id="gameCanvas" width="640" height="480"></canvas>
+            <h3>Credits:</h3>
             <p class="lead">
                 Super Mario 64 Decomp - <a href="https://github.com/n64decomp/sm64">Github</a>
                 <br />
                 Super Mario 64 PC Port - <a href="https://github.com/sm64-port/sm64-port">Github</a>
                 <br />
                 N64 Fast 3D Renderer - <a href="https://github.com/Emill/n64-fast3d-engine">Github</a>
-                <br />
-                My Super Mario 64 JS Port - <a href="https://gitlab.com/mattsasa/sm64js">Gitlab</a>
-
-
+<!--                <br />
+                My Super Mario 64 JS Port - <a href="https://gitlab.com/mattsasa/sm64js">Gitlab</a>-->
             </p>
-            <canvas id="gameCanvas" width="640" height="480"></canvas>
-            <h4 id="numTriangles"> Total Triangles this frame: </h4>
-            <h4 id="timing"> Frame Time: </h4>
-            <div class="row" style="justify-content:center">
-                <h5 style="padding-right:10px"> Adjust Game Speed: </h5>
-                <input type="range" min="1" max="100" value="30" class="slider" id="myRange" onchange="changeFrameSpeed(this.value)">
-                <h5 id="fps" style="padding-left:10px"> 30 fps </h5>
-            </div>
+
         </main>
 
     </div>

@@ -2,22 +2,49 @@ import "./template.css"
 import { GameInstance as Game } from "./game/Game"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
 
-let max_frame_time = 0
-let game_time = 0
-let render_time = 0
-let total_frame_time = 0
 window.frameSpeed = 33
 
 let start_render = 0
+
+const createRingBuffer = (length) => {
+    let pointer = 0
+    const buffer = []
+
+    return {
+        push: (item) => {
+            buffer[pointer] = item
+            pointer = (pointer + 1) % length
+            return item
+        },
+        getAvg: () => {
+            return buffer.reduce((a, b) => a + b, 0) / length
+        }
+    }
+}
+
+const totalFrameTimeBuffer = createRingBuffer(10)
+const renderFrameTimeBuffer = createRingBuffer(10)
+const gameLogicFrameTimeBuffer = createRingBuffer(10)
 
 const timeout = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+const setStatsUpdate = setInterval(() => {
+    const totalFrameTimeAvg = totalFrameTimeBuffer.getAvg().toFixed(2)
+    const renderFrameTimeAvg = renderFrameTimeBuffer.getAvg().toFixed(2)
+    const gameLogicFrametimeAvg = gameLogicFrameTimeBuffer.getAvg().toFixed(2)
+    const maxFps = (1000 / totalFrameTimeAvg).toFixed(2)
+    document.getElementById("maxFps").innerHTML = `Effective Max Fps: ${maxFps}`
+    document.getElementById("timing-total").innerHTML = `${totalFrameTimeAvg}ms`
+    document.getElementById("timing-game").innerHTML = `${gameLogicFrametimeAvg}ms`
+    document.getElementById("timing-render").innerHTML = `${renderFrameTimeAvg}ms`
+
+}, 333)
+
 const webpage_update = () => {
     document.getElementById("numTriangles").innerHTML = `Total Triangles this frame: ${window.totalTriangles}`
     document.getElementById("fps").innerHTML = `${ parseInt(1000 / window.frameSpeed)  } fps`
-    document.getElementById("timing").innerHTML = `Total Frame Time: ${total_frame_time.toFixed(2)}ms  <br> Game Logic: ${game_time.toFixed(2)}ms <br> Rendering/WebGL: ${render_time.toFixed(2)}ms`
 }
 
 let n_frames = 0
@@ -54,13 +81,13 @@ const main_func = async () => {
         produce_one_frame()
 
         /// Webpage
-        game_time = start_render - start
-        render_time = performance.now() - start_render
-        total_frame_time = performance.now() - start
-        if (total_frame_time > max_frame_time) max_frame_time = total_frame_time
+        const totalFrameTime = performance.now() - start
+        gameLogicFrameTimeBuffer.push(start_render - start)
+        renderFrameTimeBuffer.push(performance.now() - start_render)
+        totalFrameTimeBuffer.push(performance.now() - start)
         webpage_update()
 
-        await timeout(window.frameSpeed - total_frame_time)
+        await timeout(window.frameSpeed - totalFrameTime)
     }
     
 }

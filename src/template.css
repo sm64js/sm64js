@@ -6,17 +6,8 @@
 a,
 a:focus,
 a:hover {
-    color: #fff;
-}
-
-/* Custom default button */
-.btn-secondary,
-.btn-secondary:hover,
-.btn-secondary:focus {
-    color: #333;
-    text-shadow: none; /* Prevent inheritance from `body` */
-    background-color: #fff;
-    border: .05rem solid #fff;
+    font-weight: 400;
+    color: #f6fb7b;
 }
 
 
@@ -27,7 +18,7 @@ a:hover {
 html,
 body {
     height: 100%;
-    background-color: #333;
+    background-color: #000000;
 }
 
 body {
@@ -54,9 +45,24 @@ body {
     margin-bottom: 2rem;
 }
 
-.masthead-brand {
-    margin-bottom: 0;
+/*.slider {
+    -webkit-appearance: none;
+    border-radius: 10px;
+    border-color: transparent;
+    height: 10px;
+    margin-top: 10px;
+    background-color: white;
 }
+
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border-radius: 60px;
+    width: 60px;*/ /* Set a specific slider handle width */
+    /*height: 60px;*/ /* Slider handle height */
+    /*background: #0094ff;*/ /* Green background */
+/*}*/
+
 
 .nav-masthead .nav-link {
     padding: .25rem 0;
@@ -96,17 +102,4 @@ body {
  */
 .cover {
     padding: 0 1.5rem;
-}
-
-    .cover .btn-lg {
-        padding: .75rem 1.25rem;
-        font-weight: 700;
-    }
-
-
-/*
- * Footer
- */
-.mastfoot {
-    color: rgba(255, 255, 255, .5);
 }

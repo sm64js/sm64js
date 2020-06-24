@@ -24,7 +24,7 @@ const func_80182A08 = (ptc, b) => {
     if (ptc.unk6C) {
         let link = ptc.unk6C.link1C
         while (link) {
-            let sp20 = link.obj.obj
+            let sp20 = link.obj
             if (sp20.unk5C <= 0) {
                 sp20.unk20.x = ptc.unk20.x
                 sp20.unk20.y = ptc.unk20.y

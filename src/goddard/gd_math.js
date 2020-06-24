@@ -1,3 +1,4 @@
+import { inv } from "mathjs"
 
 const GD_X_AXIS = 0 
 const GD_Y_AXIS = 1
@@ -81,6 +82,10 @@ export const gd_mat4f_lookat = (mtx, xFrom, yFrom, zFrom, xTo, yTo, zTo, zColY, 
     mtx[1][3] = 0.0
     mtx[2][3] = 0.0
     mtx[3][3] = 1.0
+}
+
+export const gd_inverse_mat4f = (src, dst) => {
+    gd_copy_mat4f(inv(src), dst)
 }
 
 export const gd_normalize_vec3f = (vec) => {

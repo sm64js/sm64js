@@ -23,6 +23,8 @@ class Objects {
             ctr1: 0
         }
 
+        this.D_801B9DC8 = new Array(4).fill(0).map(() => new Array(4).fill(0))
+
         this.get_obj_name_str = {
             4: "joints",
             OBJ_TYPE_BONES: "bones",
@@ -182,7 +184,6 @@ class Objects {
             //// move lights seems to do nothing
             this.move_particles_in_grp(this.sCurrentMoveGrp)
             this.move_animators(this.sCurrentMoveGrp)
-
             Nets.move_nets(this.sCurrentMoveGrp)
 
             //this.move_cameras_in_grp() TODO
@@ -233,7 +234,7 @@ class Objects {
         return false
     }
 
-    make_link_to_obj(head, a1) {
+    make_link_to_obj(head, a1_header) {
         const newLink = {}
 
         if (head) {
@@ -241,7 +242,8 @@ class Objects {
         }
 
         newLink.prev = head
-        newLink.obj = a1
+        if (a1_header.obj == undefined) throw "error trying to add link to undefined object"
+        newLink.obj = a1_header.obj
 
         return newLink
     }
@@ -421,8 +423,8 @@ class Objects {
             //    objDrawFn = Draw.draw_label
             //    break
             case GDTypes.OBJ_TYPE_ANIMATORS:
-               objDrawFn = Draw.nop_obj_draw
-               break
+                objDrawFn = Draw.nop_obj_draw
+                break
             //case GDTypes.OBJ_TYPE_VALPTRS:
             //    objDrawFn = Draw.nop_obj_draw
             //    break
@@ -584,6 +586,8 @@ class Objects {
 
     addto_group(group, objheader) {
 
+        if (objheader.obj == undefined) throw "error trying to add undefined object to group"
+
         if (group.link1C == null) {
             group.link1C = this.make_link_to_obj(null, objheader)
             group.link20 = group.link1C
@@ -629,19 +633,18 @@ class Objects {
         let curLink = group.link1C
         let linkedObj, linkedObjType
 
-        while (curLink && curLink.obj && curLink.obj.obj) {
+        while (curLink) {
             linkedObj = curLink.obj
-            linkedObjType = linkedObj.type
+            linkedObjType = linkedObj.header.type
 
             if (linkedObjType == GDTypes.OBJ_TYPE_GROUPS) {
-                fnAppliedCount += this.apply_to_obj_types_in_group(types, fn, linkedObj.obj)
+                fnAppliedCount += this.apply_to_obj_types_in_group(types, fn, linkedObj)
             }
 
             if (linkedObjType & types) {
-                fn.call(callingClassObject, linkedObj.obj)
+                fn.call(callingClassObject, linkedObj)
                 fnAppliedCount++
             }
-
             curLink = curLink.next
         }
 
@@ -690,7 +693,7 @@ class Objects {
         if (curGroup) {
             let curLink = curGroup.link1C
             while (curLink) {
-                this.func_8017F054(curLink.obj, a0_objheader)
+                this.func_8017F054(curLink.obj.header, a0_objheader)
                 curLink = curLink.next
             }
         }

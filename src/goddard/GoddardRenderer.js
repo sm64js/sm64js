@@ -2,6 +2,7 @@ import * as MathUtil from "../engine/math_util"
 import { ObjectsInstance as Objects } from "./Objects"
 import * as GDTypes from "./gd_types"
 import { ShapeHelperInstance as Shapes } from "./ShapeHelper"
+import { NetsInstance as Nets } from "./Nets"
 import { DrawInstance as Draw } from "./Draw"
 import * as Gbi from "../include/gbi"
 import { gd_mat4f_lookat, gd_copy_mat4f } from "./gd_math"
@@ -1030,6 +1031,7 @@ class GoddardRenderer {
 
     gd_vblank() {
         /// only thing that seems to be necessary is reset_cur_dl_indices
+        Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_NETS, Nets.convert_net_verts, this.sMarioSceneGrp, Nets)
         this.reset_cur_dl_indices()
     }
 

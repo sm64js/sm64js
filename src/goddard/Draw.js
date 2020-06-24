@@ -64,7 +64,7 @@ class Draw {
         if (this.sSceneProcessType == FIND_PICKS) {
             throw "not implemented find picks yet"
         } else {
-            Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_NETS, this.apply_obj_draw_fn, interactables, this)
+            Objects.apply_to_obj_types_in_group(GDTypes.OBJ_TYPE_NETS | GDTypes.OBJ_TYPE_PARTICLES, this.apply_obj_draw_fn, interactables, this)
         }
     }
 
@@ -148,6 +148,7 @@ class Draw {
                 this.gViewUpdateCamera.unk18C = view
             }
         }
+
 
         if (view.flags & GDTypes.VIEW_MOVEMENT) {
             Objects.proc_view_movement(view)
@@ -461,17 +462,17 @@ class Draw {
         for (let i = 0; i < face.vertices.length; i++) {
             let link = verts.link1C
             let linkVtxIdx = 0
-            while (link && link.obj) {
-                if (link.obj.type == GDTypes.OBJ_TYPE_VERTICES || link.obj.type == GDTypes.OBJ_TYPE_PARTICLES) {
+            while (link) {
+                if (link.obj.header.type == GDTypes.OBJ_TYPE_VERTICES || link.obj.header.type == GDTypes.OBJ_TYPE_PARTICLES) {
                     if (linkVtxIdx++ == face.vertices[i]) break
                 }
                 link = link.next
             }
 
-            if (link == null || link.obj == null) {
+            if (link == null) {
                 throw "fatal Vertex not found"
             }
-            face.vertices[i] = link.obj.obj
+            face.vertices[i] = link.obj
         }
         Shapes.calc_face_normal(face)
     }
@@ -482,11 +483,11 @@ class Draw {
         let faceLink = facegrp.link1C
         while (faceLink && faceLink.obj) {
             const curFace = faceLink.obj
-            curFace.obj.vertices.forEach(vertex => {
+            curFace.vertices.forEach(vertex => {
                 if (vertex == vtx) {
-                    vtx.normal.x += curFace.obj.normal.x
-                    vtx.normal.y += curFace.obj.normal.y
-                    vtx.normal.z += curFace.obj.normal.z
+                    vtx.normal.x += curFace.normal.x
+                    vtx.normal.y += curFace.normal.y
+                    vtx.normal.z += curFace.normal.z
                     facesAdded++
                 }
             })
@@ -505,28 +506,27 @@ class Draw {
         let faceLink = facegrp.link1C
         while (faceLink) {
             curFace = faceLink.obj
-            this.find_thisface_verts(curFace.obj, vtxgrp)
+            this.find_thisface_verts(curFace, vtxgrp)
             faceLink = faceLink.next
         }
 
         let vtxLink = vtxgrp.link1C
         while (vtxLink) {
             vtx = vtxLink.obj
-            this.calc_vtx_normal(vtx.obj, facegrp)
+            this.calc_vtx_normal(vtx, facegrp)
             vtxLink = vtxLink.next
         }
 
     }
 
     map_face_materials(faces, mtls) {
-
         let linkFaces = faces.link1C
         while (linkFaces) {
-            const face = linkFaces.obj.obj
+            const face = linkFaces.obj
             let linkMtls = mtls.link1C
             let mtl
             while (linkMtls) {
-                mtl = linkMtls.obj.obj
+                mtl = linkMtls.obj
                 if (mtl.id == face.mtlId) break
                 linkMtls = linkMtls.next
             }

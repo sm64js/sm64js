@@ -416,7 +416,7 @@ class DynlistProc {
 
         switch (this.sDynListCurObj.header.type) {
             case GDTypes.OBJ_TYPE_GROUPS:
-                const link = Objects.make_link_to_obj(null, ptr)
+                const link = Objects.make_link_to_obj(null, { obj: ptr })
                 dynobj.link1C = link
                 break
             case GDTypes.OBJ_TYPE_ANIMATORS:
@@ -424,7 +424,7 @@ class DynlistProc {
                     this.sDynListCurObj.unk14 = Objects.make_group(0)
                     this.sDynListCurObj.unk14.header.obj = this.sDynListCurObj.unk14
                 }
-                Objects.addto_group(this.sDynListCurObj.unk14, ptr)
+                Objects.addto_group(this.sDynListCurObj.unk14, { obj: ptr })
                 break
             default:
                 throw "object does not support this function d_link_with_ptr"
@@ -1102,6 +1102,7 @@ class DynlistProc {
                 break
             case this.D_LIGHT:
                 dobj = Objects.make_light(0, null, 0)
+                dobj.header.obj = dobj
                 Objects.addto_group(Draw.gGdLightGroup, dobj.header)
                 break
             case this.D_NET:
@@ -1114,8 +1115,10 @@ class DynlistProc {
                 throw "unimplemented d_makeobj"
         }
 
+
         dobj.header.obj = dobj
         this.add_to_dynobj_list(dobj, id)
+
         return dobj
     }
 

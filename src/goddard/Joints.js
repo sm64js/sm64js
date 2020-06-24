@@ -1,7 +1,7 @@
-import { OBJ_TYPE_JOINTS } from "./gd_types"
+import { OBJ_TYPE_JOINTS, OBJ_TYPE_WEIGHTS } from "./gd_types"
 import { ObjectsInstance as Objects } from "./Objects"
 import { NetsInstance as Nets } from "./Nets"
-import { gd_set_identity_mat4, gd_scale_mat4f_by_vec3f, gd_rot_mat_about_vec, gd_add_vec3f_to_mat4f_offset, gd_copy_mat4f, gd_mat4f_mult_vec3f } from "./gd_math"
+import { gd_set_identity_mat4, gd_scale_mat4f_by_vec3f, gd_rot_mat_about_vec, gd_add_vec3f_to_mat4f_offset, gd_copy_mat4f, gd_mat4f_mult_vec3f, gd_rotate_and_translate_vec3f } from "./gd_math"
 import * as GDTypes from "./gd_types"
 
 class Joints {
@@ -21,6 +21,31 @@ class Joints {
         j.mat128[3][0] = x
         j.mat128[3][1] = y
         j.mat128[3][2] = z
+    }
+
+    Unknown801913C0(joint) { /// is also func_80181894
+
+        const weightGroup = joint.unk1F4
+        if (weightGroup) {
+            for (let link = weightGroup.link1C; link != null; link = link.next) {
+                const curWeight = link.obj
+
+                if (curWeight.unk38 > 0.0) {
+
+                    const stackVec = { ...curWeight.vec20 }
+
+                    gd_rotate_and_translate_vec3f(stackVec, joint.matE8)
+
+                    const connectedVtx = curWeight.unk3C
+                    const scaleFactor = curWeight.unk38
+
+                    connectedVtx.pos.x += stackVec.x * scaleFactor
+                    connectedVtx.pos.y += stackVec.y * scaleFactor
+                    connectedVtx.pos.z += stackVec.z * scaleFactor
+
+                }
+            }
+        }
     }
 
     Unknown80191220(j) {
@@ -68,8 +93,8 @@ class Joints {
         }
 
         const w = Objects.make_weight(0, id, vtx, weight)
+        w.header.obj = w
         Objects.addto_group(j.unk1F4, w.header)
-
         return true
     }
 

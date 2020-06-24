@@ -167,16 +167,16 @@ class ShapeHelper {
         sp30.unk1F8.header.obj = sp30.unk1F8
 
         sp34 = Dynlist.d_use_obj("N206l")
-        Objects.addto_group(sp30.unk1F8, sp34)
+        Objects.addto_group(sp30.unk1F8, sp34.header)
 
         sp34 = Dynlist.d_use_obj("N215l")
-        Objects.addto_group(sp30.unk1F8, sp34)
+        Objects.addto_group(sp30.unk1F8, sp34.header)
 
         sp34 = Dynlist.d_use_obj("N31l")
-        Objects.addto_group(sp30.unk1F8, sp34)
+        Objects.addto_group(sp30.unk1F8, sp34.header)
 
         sp34 = Dynlist.d_use_obj("N65l")
-        Objects.addto_group(sp30.unk1F8, sp34)
+        Objects.addto_group(sp30.unk1F8, sp34.header)
 
         sp30 = Joints.make_joint_withshape(null, 0, 0.0, 0.0, 600.0)
         sp34 = Dynlist.d_use_obj("N185l")
@@ -194,7 +194,7 @@ class ShapeHelper {
         sp30.unk1F8.header.obj = sp30.unk1F8
 
         sp34 = Dynlist.d_use_obj("N15l")
-        Objects.addto_group(sp30.unk1F8, sp34)
+        Objects.addto_group(sp30.unk1F8, sp34.header)
 
         sp30 = Joints.make_joint_withshape(null, 0, -250.0, -150.0, 300.0)
         sp34 = Dynlist.d_use_obj("N149l")
@@ -202,7 +202,7 @@ class ShapeHelper {
         sp30.unk1F8.header.obj = sp30.unk1F8
 
         sp34 = Dynlist.d_use_obj("N6l")
-        Objects.addto_group(sp30.unk1F8, sp34)
+        Objects.addto_group(sp30.unk1F8, sp34.header)
 
         sp30 = Joints.make_joint_withshape(null, 0, 100.0, 200.0, 400.0)
         sp34 = Dynlist.d_use_obj("N112l")

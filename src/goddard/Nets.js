@@ -1,6 +1,6 @@
 import { OBJ_TYPE_NETS, OBJ_TYPE_JOINTS, OBJ_TYPE_BONES, OBJ_TYPE_WEIGHTS, OBJ_TYPE_VERTICES } from "./gd_types"
 import { ObjectsInstance as Objects } from "./Objects"
-import { gd_set_identity_mat4, gd_rot_mat_about_vec, gd_add_vec3f_to_mat4f_offset, gd_copy_mat4f } from "./gd_math"
+import { gd_set_identity_mat4, gd_rot_mat_about_vec, gd_add_vec3f_to_mat4f_offset, gd_copy_mat4f, gd_rotate_and_translate_vec3f, gd_inverse_mat4f } from "./gd_math"
 import { JointsInstance as Joints } from "./Joints"
 
 
@@ -10,9 +10,50 @@ class Nets {
         this.D_801B9EA8 = new Array(4).fill(0).map(() => new Array(4).fill(0))
     }
 
+    move_net(net) {
+        this.gGdSkinNet = net
+
+        switch (net.netType) {
+            case 1: break
+            case 7: break
+            case 4:
+                this.move_bonesnet(net)
+                break
+            case 2:
+                this.move_skin(net)
+                break
+            case 3: break
+            case 5: break
+            case 6: break
+            default: throw "move net unknown case"
+        }
+    }
+
+    move_skin(net) {
+        if (net.unk1A8) {
+            this.func_80181760(net.unk1A8.unk24)
+        }
+    }
+
+    func_80181760(a0) {
+        for (let link = a0.link1C; link != null; link = link.next) {
+            const vtx = link.obj
+            vtx.pos.x = vtx.initPos.x * vtx.scaleFactor
+            vtx.pos.y = vtx.initPos.y * vtx.scaleFactor
+            vtx.pos.z = vtx.initPos.z * vtx.scaleFactor
+        }
+    }
+
+    move_bonesnet(net) {
+        gd_set_identity_mat4(Objects.D_801B9DC8)
+        if (net.unk1C8) {
+            Objects.apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, Joints.Unknown801913C0, net.unk1C8, Joints)
+        }
+    }
+
     move_nets(group) {
         Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.Unknown80192294, group, this)
-        //Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.move_net, group, this) TODO
+        Objects.apply_to_obj_types_in_group(OBJ_TYPE_NETS, this.move_net, group, this)
     }
 
     make_net(a0, shapedata, a2, a3, a4) {
@@ -42,16 +83,40 @@ class Nets {
     }
 
     Unknown80192294(net) {
-
         if (net.unk1E8 == null) {
             Objects.func_8017F054(net.header, null)
         }
     }
 
     Unknown801819D0(vtx) {
-        throw "more implementaion needed in Nets/Skin - Unknown801819D0"
         if (Joints.sTargetWeightID++ == this.sSkinNetCurWeight.id) {
-            throw "more implementaion needed in Nets/Skin - Unknown801819D0"
+            this.sSkinNetCurWeight.unk3C = vtx
+            const localVec = { ...vtx.pos }
+
+            gd_rotate_and_translate_vec3f(localVec, this.D_801B9EA8)
+            this.sSkinNetCurWeight.vec20 = { ...localVec }
+
+            vtx.scaleFactor -= this.sSkinNetCurWeight.unk38
+        }
+    }
+
+    convert_gd_verts_to_Vtx(grp) {
+        for (let link = grp.link1C; link != null; link = link.next) {
+            const vtxPos = link.obj.pos
+            for (let vtxlink = link.obj.gbiVerts; vtxlink != null; vtxlink = vtxlink.prev) {
+                vtxlink.data.pos[0] = vtxPos.x
+                vtxlink.data.pos[1] = vtxPos.y
+                vtxlink.data.pos[2] = vtxPos.z
+            }
+
+        }
+    }
+
+    convert_net_verts(net) {
+        if (net.netType == 2) {
+            if (net.unk1A8) {
+                this.convert_gd_verts_to_Vtx(net.unk1A8.unk24)
+            }
         }
     }
 
@@ -71,8 +136,7 @@ class Nets {
     }
 
     Unknown80181B88(joint) {
-        //gd_inverse_mat4f(joint.matE8, D_801B9EA8) TODO implement inverse matrix
-        this.D_801B9EE8 = joint
+        gd_inverse_mat4f(joint.matE8, this.D_801B9EA8) 
         const group = joint.unk1F4
         if (group) {
             Objects.apply_to_obj_types_in_group(OBJ_TYPE_WEIGHTS, this.reset_weight, group, this)
@@ -100,7 +164,7 @@ class Nets {
                 net.unk1A8.unk24 = Objects.make_group(0)
                 net.unk1A8.unk24.header.obj = net.unk1A8.unk24
                 for (let link = net.unk1A8.vtxGroup.link1C; link != null; link = link.next) {
-                    const vtx = link.obj.obj
+                    const vtx = link.obj
                     if (vtx.scaleFactor != 1.0) {
                         Objects.addto_group(net.unk1A8.unk24, vtx.header)
                     }
@@ -135,7 +199,6 @@ class Nets {
         net.unk50 = { x: 0.0, y: 0.0, z: 0.0 }
         net.unkA4 = { x: 0.0, y: 0.0, z: 0.0 }
 
-        //this.func_80191F10(net) TODO - may not be necessary?
         this.gGdSkinNet = net
         this.D_801BAAF4 = 0
 

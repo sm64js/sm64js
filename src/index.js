@@ -109,7 +109,7 @@ const webpage_update = () => {
 
 document.addEventListener('change', (event) => {
     frameSpeed = 1000 / event.target.value
-    document.getElementById("fps").innerHTML = `${parseInt(1000 / frameSpeed)} fps`
+    document.getElementById("fps").innerHTML = `${event.target.value} fps`
 })
 //////////////
 

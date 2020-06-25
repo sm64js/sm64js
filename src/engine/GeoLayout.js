@@ -141,7 +141,7 @@ class GeoLayout {
 
         this.gGeoLayoutStack = [0, 0]
 
-        console.log("proccesing geo layout")
+        //console.log("proccesing geo layout")
 
         while (this.sCurrentLayout.index < geoLayout.length) {
             const cmd = this.sCurrentLayout.layout[this.sCurrentLayout.index]
@@ -149,8 +149,8 @@ class GeoLayout {
             cmd.command.call(this, cmd.args)
         }
 
-        console.log("finshed processing geo layout")
-        console.log(this.gCurRootGraphNode)
+        //console.log("finshed processing geo layout")
+        //console.log(this.gCurRootGraphNode)
         return this.gCurRootGraphNode
 
     }

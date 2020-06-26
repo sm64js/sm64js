@@ -1,5 +1,4 @@
 ﻿<!DOCTYPE html>
-
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
@@ -49,15 +48,27 @@
                 <h6 id="fps" style="padding-left:10px"> 30 fps </h6>
             </div>
             <canvas id="gameCanvas" width="640" height="480"></canvas>
+            <a name="What"></a>
             <h4>What is this?</h4>
-            <p>This is the start of my project of porting a <a href="https://github.com/n64decomp/sm64">decompilation</a> of original Nintendo game, Super Mario 64, to native Javascript (No Emulation) (No Web Assembly). This project also required creating Javascript WebGL port of <a href="https://github.com/Emill/n64-fast3d-engine">N64 Fast 3D Renderer</a> originally implemented with OpenGL in C</p>
+            <p>This is the start of my project of porting a <a href="https://github.com/n64decomp/sm64">decompilation</a> of original Nintendo game, Super Mario 64, to native Javascript (No Emulation) (No Web Assembly). This project also required creating a Javascript WebGL port of <a href="https://github.com/Emill/n64-fast3d-engine">N64 Fast 3D Renderer</a> originally implemented with OpenGL in C.  So far I have only ported what you are seeing here, it's been a lot of work. Next, I plan to work on castle grounds level.</p>
             <a name="Purpose"></a>
             <h4>What is the purpose of this port?</h4>
-            <ul>
-                <li>Coffee</li>
-                <li>Tea</li>
-                <li>Milk</li>
+            <ul style="display:inline-block;vertical-align:middle;text-align:left">
+                <li>
+                    <b>Extensibility:</b> More access to more developers to add custom content
+                    <ul style="padding-left:40px">
+                        <li>Rapid Prototyping</li>
+                        <li>More friendly to importing other software modules/packages</li>
+                        <li>More friendly to protyping multiplayer custom games/mods</li>
+                    </ul>
+                </li>
+                <li><b>Portablity:</b> Sm64 projects can run on any device with a web broswer anywhere without needing to download or install anything</li>
+                <li>Opportunity to refactor / rewrite with modern coding style and cleanup</li>
             </ul>
+            <a name="WASM"></a>
+            <h4>What's wrong with Web Assembly / Emscripten</h4>
+            <p>Nothing. However, I believe access to this game's source code in a higher level programming language opens it up to a wider pool of potentially capable developers / modders. And seems to me like a natural next step following in the amazing work done by the decomp team and pc port.</p>
+            <a name="Credits"></a>
             <h4>Credits:</h4>
             <h6>Super Mario 64 Decomp - <a href="https://github.com/n64decomp/sm64">Github</a></h6>
             <p>Team that decompiled the original Super Mario 64 ROMs into C source code</p>
@@ -76,7 +87,7 @@
                 <br />
                 Discord: snuffysasa#2779
                 <br />
-                I am on the SM64 Port Discord Server: https://discord.gg/3Y6U3M
+                I am on the SM64 Port Discord Server: <a href="https://discord.gg/3Y6U3M"> https://discord.gg/3Y6U3M </a>
             </p>
 
 

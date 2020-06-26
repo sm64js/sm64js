@@ -59,7 +59,7 @@ window.addEventListener("load", function () {
     }
 })
 
-const letterColors = ["blue", "red", "#00ff00", "yellow"]
+const letterColors = ["#3e51fa", "#fa3e3e", "#00ff00", "yellow"]
 
 function generateRainbowText(element) {
     var text = element.innerText

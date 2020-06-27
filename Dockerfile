@@ -13,5 +13,3 @@ COPY . ./
 RUN npm run build
 
 CMD ["npm", "run", "serveProduction"]
-
-EXPOSE 80

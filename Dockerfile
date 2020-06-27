@@ -7,10 +7,8 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 COPY extractTools/ ./extractTools/
-RUN cd extractTools/
-RUN gcc -I . -DMIO0_STANDALONE libmio0.c -o mio0
+RUN gcc -I extractTools -DMIO0_STANDALONE extractTools/libmio0.c -o extractTools/mio0
 RUN gcc -I . -DN64GRAPHICS_STANDALONE n64graphics.c utils.c -o n64graphics
-RUN cd ..
 
 COPY package.json ./
 RUN npm install

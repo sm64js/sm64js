@@ -1,5 +1,7 @@
 FROM node:13-alpine
 
+RUN apk update && apk add gcc
+
 RUN mkdir -p /usr/src/app
 
 WORKDIR /usr/src/app

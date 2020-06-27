@@ -153,9 +153,9 @@ def main():
             sys.exit(1)
 
     # Make sure tools exist
-    subprocess.check_call(
-        ["make", "-s", "-C", "tools/", "n64graphics", "skyconv", "mio0", "aifc_decode"]
-    )
+    # subprocess.check_call(
+    #     ["make", "-s", "-C", "tools/", "n64graphics", "skyconv", "mio0", "aifc_decode"]
+    # )
 
     # Go through the assets in roughly alphabetical order (but assets in the same
     # mio0 file still go together).
@@ -196,7 +196,7 @@ def main():
         if mio0 is not None:
             image = subprocess.run(
                 [
-                    "./tools/mio0",
+                    "./mio0",
                     "-d",
                     "-o",
                     str(mio0),
@@ -217,7 +217,7 @@ def main():
                 with tempfile.NamedTemporaryFile(prefix="asset", delete=False) as png_file:
                     png_file.write(input)
                     png_file.flush()
-                    if asset.startswith("textures/skyboxes/") or asset.startswith("levels/ending/cake"):
+                    if False:
                         if asset.startswith("textures/skyboxes/"):
                             imagetype = "sky"
                         else:
@@ -239,7 +239,7 @@ def main():
                         fmt = asset.split(".")[-2]
                         subprocess.run(
                             [
-                                "./tools/n64graphics",
+                                "./n64graphics",
                                 "-e",
                                 png_file.name,
                                 "-g",
@@ -255,7 +255,7 @@ def main():
                         )
                         subprocess.run(
                             [
-                                "./tools/n64graphics",
+                                "./n64graphics",
                                 "-i",
                                 asset[:-4],
                                 "-g",

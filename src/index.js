@@ -56,6 +56,22 @@ let last_frame_start = 0
 
 //////////////////// Some more website stuff
 
+$('#romUpload').submit(
+    (e) =>  {
+        e.preventDefault()
+        $.ajax({
+            url: '/romUpload',
+            type: 'POST',
+            data: new FormData(e.target),
+            processData: false,
+            contentType: false,
+            success: (result) => {
+                console.log(result)
+            }
+        })
+    }
+)
+
 window.addEventListener("load", function () {
     var elements = document.getElementsByClassName("rainbowText")
     for (let i = 0; i < elements.length; i++) {

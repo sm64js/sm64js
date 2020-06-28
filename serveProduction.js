@@ -43,11 +43,20 @@ app.post("/romUpload", async (req, res) => {
 		}
 		await pythonExtract(uid)
 		await hexDumpExtract(uid)
-		fs.rmdirSync('extractTools/' + uid, { recursive: true })
-		return res.json({
-		    success: true,
-		    message: "Some success message",
-		    data: "some data if there's any"
+
+		const extractedData = {}
+
+		const assets = JSON.parse(fs.readFileSync('extractTools/assets.json'))
+		Object.keys(assets).forEach((assetname) => {
+			let filepath = assetname
+			if (filepath == '@comment') return
+			filepath = `extractTools/${uid}/${filepath}`
+			filepath = filepath.substring(0, filepath.length - 4) + ".js"
+			const filedata = fs.readFileSync(filepath, "utf8")
+			extractedData[assetname] = filedata
 		})
+
+		fs.rmdirSync('extractTools/' + uid, { recursive: true })
+		return res.send(extractedData)
 	})
 })

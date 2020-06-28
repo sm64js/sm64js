@@ -3,3 +3,6 @@ dist
 node_modules
 .vs*
 .DS_Store
+extractTools/.assets-local.txt
+extractTools/n64graphics
+extractTools/mio0

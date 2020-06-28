@@ -69,17 +69,17 @@ def main():
         local_asset_file = None
         local_version = -1
 
-    langs = sys.argv[1:]
+    langs = ['us']
     if langs == ["--clean"]:
         clean_assets(local_asset_file)
         sys.exit(0)
 
     all_langs = ["jp", "us", "eu", "sh"]
-    if not langs or not all(a in all_langs for a in langs):
-        langs_str = " ".join("[" + lang + "]" for lang in all_langs)
-        print("Usage: " + sys.argv[0] + " " + langs_str)
-        print("For each version, baserom.<version>.z64 must exist")
-        sys.exit(1)
+    # if not langs or not all(a in all_langs for a in langs):
+    #     langs_str = " ".join("[" + lang + "]" for lang in all_langs)
+    #     print("Usage: " + sys.argv[0] + " " + langs_str)
+    #     print("For each version, baserom.<version>.z64 must exist")
+    #     sys.exit(1)
 
     asset_map = read_asset_map()
     all_assets = []
@@ -129,10 +129,12 @@ def main():
                 todo[(lang, mio0)].append((asset, pos, size, meta))
                 break
 
+    new_dir = sys.argv[2]
+
     # Load ROMs
     roms = {}
     for lang in langs:
-        fname = "baserom." + lang + ".z64"
+        fname = new_dir + "/baserom." + lang + ".z64"
         try:
             with open(fname, "rb") as f:
                 roms[lang] = f.read()
@@ -159,6 +161,7 @@ def main():
 
     # Go through the assets in roughly alphabetical order (but assets in the same
     # mio0 file still go together).
+
     keys = sorted(list(todo.keys()), key=lambda k: todo[k][0][0])
     # Import new assets
     for key in keys:
@@ -200,7 +203,7 @@ def main():
                     "-d",
                     "-o",
                     str(mio0),
-                    "baserom." + lang + ".z64",
+                    new_dir + "/baserom." + lang + ".z64",
                     "-",
                 ],
                 check=True,
@@ -212,7 +215,7 @@ def main():
         for (asset, pos, size, meta) in assets:
             # print("extracting", asset)
             input = image[pos : pos + size]
-            os.makedirs(os.path.dirname(asset), exist_ok=True)
+            os.makedirs(os.path.dirname(new_dir + "/" + asset), exist_ok=True)
             if asset.endswith(".png"):
                 with tempfile.NamedTemporaryFile(prefix="asset", delete=False) as png_file:
                     png_file.write(input)
@@ -235,7 +238,7 @@ def main():
                         )
                     else:
                         w, h = meta
-                        print(asset)
+                        print(new_dir + "/" + asset)
                         fmt = asset.split(".")[-2]
                         subprocess.run(
                             [
@@ -243,7 +246,7 @@ def main():
                                 "-e",
                                 png_file.name,
                                 "-g",
-                                asset,
+                                new_dir + "/" + asset,
                                 "-f",
                                 fmt,
                                 "-w",
@@ -257,15 +260,15 @@ def main():
                             [
                                 "./n64graphics",
                                 "-i",
-                                asset[:-4],
+                                new_dir + "/" + asset[:-4],
                                 "-g",
-                                asset,
+                                new_dir + "/" + asset,
                                 "-f",
                                 fmt
                             ],
                             check=False,
                         )
-                        print(asset[:-4])
+                        # print(asset[:-4])
             else:
                 with open(asset, "wb") as f:
                     f.write(input)

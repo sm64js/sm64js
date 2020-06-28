@@ -47,6 +47,15 @@
                 <input id="slider" type="range" style="width:300px" min="1" max="60" value="30">
                 <h6 id="fps" style="padding-left:10px"> 30 fps </h6>
             </div>
+
+            <form class="form-group" action="/romUpload" method="post" enctype="multipart/form-data">
+              <div class="row" style="justify-content:center;">
+                  <div class="col"><input class="form-control-file" type="file" name="filetoupload"></div>
+                  <div class="col"><input class="btn btn-primary btn-sm" type="submit" value="Submit"></div>
+              </div>
+            </form>
+
+            <button id="start" type="button" class="btn btn-primary" >Start Game</button>
             <canvas id="gameCanvas" width="640" height="480"></canvas>
             <a name="What"></a>
             <h4>What is this?</h4>

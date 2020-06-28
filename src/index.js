@@ -49,6 +49,10 @@ const main_func = () => {
 
 }
 
+let frameSpeed = 33.3
+
+let start_render = 0
+let last_frame_start = 0
 
 //////////////////// Some more website stuff
 
@@ -107,18 +111,16 @@ const webpage_update = () => {
     document.getElementById("numTriangles").innerHTML = `Total Triangles this frame: ${window.totalTriangles}`
 }
 
-document.addEventListener('change', (event) => {
+document.getElementById("slider").addEventListener('change', (event) => {
     frameSpeed = 1000 / event.target.value
     document.getElementById("fps").innerHTML = `${event.target.value} fps`
+})
+
+document.getElementById("start").addEventListener('click', () => {
+    /// Start
+    console.log("Starting Game!")
+    main_func()
 })
 //////////////
 
 
-let frameSpeed = 33.3
-
-let start_render = 0
-let last_frame_start = 0
-
-/// Start
-console.log("Starting Application!")
-main_func()

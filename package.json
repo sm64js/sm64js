@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "css-loader": "^3.6.0",
+    "express-fileupload": "^1.1.7-alpha.3",
     "mathjs": "^7.0.1",
     "mini-css-extract-plugin": "^0.9.0",
     "style-loader": "^1.2.1",

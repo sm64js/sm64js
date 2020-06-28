@@ -43,7 +43,11 @@ app.post("/romUpload", async (req, res) => {
 		}
 		await pythonExtract(uid)
 		await hexDumpExtract(uid)
-		// fs.rmdirSync('extractTools/' + uid, { recursive: true })
-		return res.send('Complete')
+		fs.rmdirSync('extractTools/' + uid, { recursive: true })
+		return res.json({
+		    success: true,
+		    message: "Some success message",
+		    data: "some data if there's any"
+		})
 	})
 })

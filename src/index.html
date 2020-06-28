@@ -27,11 +27,13 @@
         <main role="main" class="inner cover">
             <h1 class="cover-heading rainbowText">Super Mario 64 - Javascript Port</h1>
 
-            <h4>Upload US SM64 ROM File</h4>
+            <h4 style="color:#fa3e3e">Upload US SM64 ROM File</h4>
             <form id="romUpload" class="form-group" enctype="multipart/form-data" method="post">
                     <input class="btn btn-secondary btn-sm" type="file" name="filetoupload">
                     <input class="btn btn-primary btn-sm" type="submit">
             </form>
+            <h6 id="uploadMessage">Please upload a rom before you can play</h6>
+            <button id="startbutton" type="button" class="btn btn-success" disabled>Start Game</button>
 
             <h6 id="numTriangles"> Total triangles rendered this frame: </h6>
             <div class="row">
@@ -54,8 +56,6 @@
                 <input id="slider" type="range" style="width:300px" min="1" max="60" value="30">
                 <h6 id="fps" style="padding-left:10px"> 30 fps </h6>
             </div>
-
-            <button id="startbutton" type="button" class="btn btn-success" disabled>Start Game</button>
             <canvas id="gameCanvas" width="640" height="480"></canvas>
             <a name="What"></a>
             <h4>What is this?</h4>

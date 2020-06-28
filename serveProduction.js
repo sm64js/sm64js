@@ -41,22 +41,27 @@ app.post("/romUpload", async (req, res) => {
 			fs.rmdirSync('extractTools/' + uid, { recursive: true })
 			return res.send('Fail')
 		}
-		await pythonExtract(uid)
-		await hexDumpExtract(uid)
 
-		const extractedData = {}
+        try {
+            await pythonExtract(uid)
+            await hexDumpExtract(uid)
+            const extractedData = {}
+            const assets = JSON.parse(fs.readFileSync('extractTools/assets.json'))
+            Object.keys(assets).forEach((assetname) => {
+                let filepath = assetname
+                if (filepath == '@comment') return
+                filepath = `extractTools/${uid}/${filepath}`
+                filepath = filepath.substring(0, filepath.length - 4) + ".js"
+                const filedata = fs.readFileSync(filepath, "utf8")
+                extractedData[assetname] = filedata
+            })
+            fs.rmdirSync('extractTools/' + uid, { recursive: true })
+            return res.send(extractedData)
+        } catch {
+            fs.rmdirSync('extractTools/' + uid, { recursive: true })
+            return res.send('Fail')
+        }
 
-		const assets = JSON.parse(fs.readFileSync('extractTools/assets.json'))
-		Object.keys(assets).forEach((assetname) => {
-			let filepath = assetname
-			if (filepath == '@comment') return
-			filepath = `extractTools/${uid}/${filepath}`
-			filepath = filepath.substring(0, filepath.length - 4) + ".js"
-			const filedata = fs.readFileSync(filepath, "utf8")
-			extractedData[assetname] = filedata
-		})
 
-		fs.rmdirSync('extractTools/' + uid, { recursive: true })
-		return res.send(extractedData)
 	})
 })

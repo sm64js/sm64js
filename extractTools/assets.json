@@ -20,7 +20,6 @@
 "textures/intro_raw/sparkle_2.rgba16.png": [32,32,2048,{"jp":[2494984],"us":[2502792],"eu":[2371592],"sh":[2348360]}],
 "textures/intro_raw/sparkle_3.rgba16.png": [32,32,2048,{"jp":[2497032],"us":[2504840],"eu":[2373640],"sh":[2350408]}],
 "textures/intro_raw/sparkle_4.rgba16.png": [32,32,2048,{"jp":[2499080],"us":[2506888],"eu":[2375688],"sh":[2352456]}],
-"textures/intro_raw/sparkle_5.rgba16.png": [32,32,2048,{"jp":[2501128],"us":[2508936],"eu":[2377736],"sh":[2354504]}],
 "textures/intro_raw/white_star_0.rgba16.png": [32,32,2048,{"jp":[2473736],"us":[2481544],"eu":[2350344],"sh":[2327112]}],
 "textures/intro_raw/white_star_1.rgba16.png": [32,32,2048,{"jp":[2475784],"us":[2483592],"eu":[2352392],"sh":[2329160]}],
 "textures/intro_raw/white_star_2.rgba16.png": [32,32,2048,{"jp":[2477832],"us":[2485640],"eu":[2354440],"sh":[2331208]}],

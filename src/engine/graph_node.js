@@ -80,6 +80,12 @@ const init_scene_graph_node_links = (graphNode, type) => {
     graphNode.node.wrapper = graphNode
 }
 
+export const init_graph_node_start = (pool, graphNode) => {
+    graphNode = { node: {} }
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_START)
+}
+
+
 export const init_graph_node_root = (pool, graphNode, areaIndex, x, y, width, height) => {
 
     graphNode = {

@@ -12,8 +12,6 @@ class GeoLayout {
         this.sCurrentLayout = {}
     }
 
-
-
     node_screen_area(args) {  /// node_root
 
         const x = args[1], y = args[2], width = args[3], height = args[4]

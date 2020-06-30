@@ -17,6 +17,15 @@ class Area {
         this.gCurrentArea = null
         this.gAreas = Array(8).fill({ index: 0 })
         this.gCurAreaIndex = 0
+        this.gCurrLevelNum = 0
+
+        this.gMarioSpawnInfo = {
+            startPos: [0, 0, 0],
+            startAngle: [0, 0, 0],
+            areaIndex: 0, activeAreaIndex: 0,
+            behaviorArg: 0, behaviorScript: null,
+            unk18: null, next: null
+        }
 
     }
 

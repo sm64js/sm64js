@@ -64,15 +64,15 @@ class GeoLayout {
 
     node_perspective(args) {
 
-      if (args[3]) { //optional 4th function argument
+        if (args[3]) { //optional 4th function argument
 
-      }
+        }
 
-      const graphNode = GraphNode.init_graph_node_perspective(null, null, args[0], args[1], args[2], null, 0)
+        const graphNode = GraphNode.init_graph_node_perspective(null, null, args[0], args[1], args[2], args[3], 0)
 
-      GraphNode.register_scene_graph_node(this, graphNode)
+        GraphNode.register_scene_graph_node(this, graphNode)
 
-      this.sCurrentLayout.index++
+        this.sCurrentLayout.index++
     }
 
     node_camera(args) {

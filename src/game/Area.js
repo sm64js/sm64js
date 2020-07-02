@@ -44,6 +44,7 @@ class Area {
 
     clear_areas() {
         this.gCurrentArea = null
+        this.gMarioSpawnInfo.areaIndex = -1
 
         this.gAreas.forEach((areaData, i) => {
             Object.assign(areaData, {

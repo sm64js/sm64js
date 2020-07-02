@@ -46,9 +46,23 @@ class LevelCommands {
     init_level(args) {
         //console.log("init level")
         init_graph_node_start(null, GeoLayout.gObjParentGraphNode)
-        ObjectListProcessor.clear_objects()
+        //ObjectListProcessor.clear_objects()
         Area.clear_areas()
         this.sCurrentScript.index++
+    }
+
+    init_mario(args) {
+
+        Object.assign(Area.gMarioSpawnInfo, {
+            startPos: { x: 0, y: 0, z: 0 },
+            startAngle: { x: 0, y: 0, z: 0 },
+            areaIndex: 0,
+            behaviorArg: args[1],
+            behaviorScript: args[2]
+        })
+
+        this.sCurrentScript.index++
+
     }
 
     load_mario_head(args) {

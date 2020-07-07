@@ -1,4 +1,5 @@
 import { CameraInstance } from "../game/Camera"
+import { G_CC_DECALRGB } from "../include/gbi"
 
 export const GRAPH_RENDER_ACTIVE = (1 << 0)
 export const GRAPH_RENDER_CHILDREN_FIRST = (1 << 1)
@@ -160,6 +161,19 @@ export const init_graph_node_camera = (pool, graphNode, pos, focus, func, mode) 
 
     return graphNode
 
+}
+
+export const init_graph_node_display_list = (drawingLayer, displayList) => {
+    const graphNode = {
+        node: {},
+        displayList
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_DISPLAY_LIST)
+
+    graphNode.node.flags = drawingLayer << 8 | graphNode.node.flags & 0xFF
+
+    return graphNode
 }
 
 export const init_graph_node_background = (pool, graphNode, background, backgroundFunc, zero) => {

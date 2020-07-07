@@ -3,7 +3,11 @@ import { GEO_CONTEXT_RENDER, GEO_CONTEXT_CREATE } from "../engine/graph_node"
 
 const CAM_MODE_MARIO_ACTIVE           = 0x01
 const CAM_MODE_LAKITU_WAS_ZOOMED_OUT  = 0x02
-const CAM_MODE_MARIO_SELECTED         = 0x04
+const CAM_MODE_MARIO_SELECTED = 0x04
+
+const DOOR_DEFAULT         = 0
+const DOOR_LEAVING_SPECIAL = 1
+const DOOR_ENTER_LOBBY     = 2
 
 class Camera {
     constructor() {
@@ -27,15 +31,22 @@ class Camera {
     }
 
     create_camera(graphNode) {
-        console.log(graphNode)
 
         const mode = graphNode.config.mode
 
-        const c = {
-            /// fillout camera
+        graphNode.config.camera = {
+            mode,
+            defMode: mode,
+            cutscene: 0,
+            doorStatus: DOOR_DEFAULT,
+            areaCenX: graphNode.focus[0],
+            areaCenY: graphNode.focus[1],
+            areaCenZ: graphNode.focus[2],
+            yaw: 0,
+            pos: [...graphNode.pos],
+            focus: [...graphNode.focus]
         }
 
-        throw "more here in create camera"
     }
 
     geo_camera_main(callContext, graphNode) {

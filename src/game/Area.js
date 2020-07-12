@@ -16,7 +16,7 @@ class Area {
     constructor() {
 
         this.gCurrentArea = null
-        this.gAreas = Array(8).fill({ index: 0 })
+        this.gAreas = Array(8).fill(0).map(() => { return { index: 0 } })
         this.gCurAreaIndex = 0
         this.gCurrLevelNum = 0
 
@@ -37,7 +37,7 @@ class Area {
             this.gCurAreaIndex = this.gCurrentArea.index
 
             if (this.gCurrentArea.terrainData) {
-                SurfaceLoad.load_area_terrain(index, this.gCurrentArea.terrainData, this.gCurrentArea.surfaceRooms, this.gCurrentArea.macroObjects)
+                SurfaceLoad.load_area_terrain(index, this.gCurrentArea.terrainData, null, null)
             }
         }
 

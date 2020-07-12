@@ -65,6 +65,17 @@ class LevelCommands {
 
     }
 
+    set_mario_pos(args) {
+
+        Object.assign(Area.gMarioSpawnInfo, {
+            areaIndex: args[0],
+            startPos: [ args[2], args[3], args[4] ],
+            startAngle: [0, args[1] * 0x8000 / 180, 0 ]
+        })
+
+        this.sCurrentScript.index++
+    }
+
     load_mario_head(args) {
         GoddardRenderer.gdm_setup()
         GoddardRenderer.gdm_maketestdl(args[0])
@@ -173,6 +184,13 @@ class LevelCommands {
             Area.gAreas[areaIndex].geometryLayoutData = screnArea
             
         }
+
+        this.sCurrentScript.index++
+    }
+
+    terrain(args) {
+        if (this.sCurrAreaIndex != -1)
+            Area.gAreas[this.sCurrAreaIndex].terrainData = args[0]
 
         this.sCurrentScript.index++
     }

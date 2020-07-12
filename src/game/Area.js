@@ -1,4 +1,5 @@
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
+import { SurfaceLoadInstance as SurfaceLoad } from "./SurfaceLoad"
 
 export const WARP_TRANSITION_FADE_FROM_COLOR   = 0x00
 export const WARP_TRANSITION_FADE_INTO_COLOR   = 0x01
@@ -34,8 +35,20 @@ class Area {
         if (!this.gCurrentArea && this.gAreas[index]) {
             this.gCurrentArea = this.gAreas[index]
             this.gCurAreaIndex = this.gCurrentArea.index
+
+            if (this.gCurrentArea.terrainData) {
+                SurfaceLoad.load_area_terrain(index, this.gCurrentArea.terrainData, this.gCurrentArea.surfaceRooms, this.gCurrentArea.macroObjects)
+            }
         }
 
+    }
+
+    load_mario_area() {
+        this.load_area(this.gMarioSpawnInfo.areaIndex)
+
+        if (this.gCurrentArea.index == this.gMarioSpawnInfo.areaIndex) {
+            throw "finish load mario area"
+        }
     }
 
     play_transition() {

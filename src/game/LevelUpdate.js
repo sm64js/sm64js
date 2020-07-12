@@ -3,6 +3,17 @@ import { COURSE_NONE } from "../levels/course_defines"
 import { MarioInstance as Mario } from "./Mario"
 import { CameraInstance as Camera } from "./Camera"
 
+const PLAY_MODE_NORMAL  =  0
+const PLAY_MODE_PAUSED  =  2
+const PLAY_MODE_CHANGE_AREA  =  3
+const PLAY_MODE_CHANGE_LEVEL  =  4
+const PLAY_MODE_FRAME_ADVANCE = 5
+
+const WARP_TYPE_NOT_WARPING = 0
+const WARP_TYPE_CHANGE_LEVEL = 1
+const WARP_TYPE_CHANGE_AREA = 2
+const WARP_TYPE_SAME_AREA = 3
+
 class LevelUpdate {
     constructor() {
         this.gMarioState = {
@@ -18,6 +29,10 @@ class LevelUpdate {
             forwardVel: 0, slideVelX: 0, slideVelY: 0,
             ///// And a ton more
         }
+
+        this.sWarpDest = {
+            type: 0, levelNum: 0, areaIdx: 0, nodeId: 0, arg: 0
+        }
     }
 
     lvl_init_from_save_file(arg0, levelNum) {
@@ -30,6 +45,36 @@ class LevelUpdate {
         Camera.select_mario_cam_mode()
 
         return levelNum
+    }
+
+    lvl_init_or_update(initOrUpdate) {
+        return initOrUpdate ? this.update_level() : this.init_level()
+    }
+
+    init_level() {
+
+        this.set_play_mode(PLAY_MODE_NORMAL)
+
+        if (this.sWarpDest.type != WARP_TYPE_NOT_WARPING) {
+            throw "init_level - not warping"
+        } else {
+            if (Area.gMarioSpawnInfo.areaIndex >= 0) {
+                Area.load_mario_area()
+                throw "load"
+            }
+        }
+
+        throw "init"
+        return 1
+    }
+
+    update_level() {
+        throw "update"
+    }
+
+    set_play_mode(playMode) {
+        this.sCurrPlayMode = playMode
+        this.D_80339ECA = 0
     }
 }
 

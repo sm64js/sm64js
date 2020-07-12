@@ -1,5 +1,6 @@
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import { SurfaceLoadInstance as SurfaceLoad } from "./SurfaceLoad"
+import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 
 export const WARP_TRANSITION_FADE_FROM_COLOR   = 0x00
 export const WARP_TRANSITION_FADE_INTO_COLOR   = 0x01
@@ -47,6 +48,8 @@ class Area {
         this.load_area(this.gMarioSpawnInfo.areaIndex)
 
         if (this.gCurrentArea.index == this.gMarioSpawnInfo.areaIndex) {
+            this.gCurrentArea.flags |= 0x01
+            ObjectListProc.spawn_objects_from_info(0, this.gMarioSpawnInfo)
             throw "finish load mario area"
         }
     }

@@ -25,6 +25,19 @@ import {
     gd_texture_sparkle_4
  } from "./goddard/GoddardRenderer"
 
+import { 
+    outside_09002000, 
+    outside_09003800, 
+    outside_09004000, 
+    outside_09004800, 
+    outside_09006800, 
+    outside_09008000, 
+    outside_09009000, 
+    outside_09009800,
+    outside_0900B000,
+    outside_0900B400
+ } from "./levels/castle_grounds/areas/1/2/model.inc"
+
 const processExtractedResults = (data) => {
     const msgElement = document.getElementById('uploadMessage')
     if (data == 'Fail') {
@@ -62,6 +75,18 @@ const processExtractedResults = (data) => {
     title_texture_0A000E40.push( ...data['textures/title_screen_bg/title_screen_bg.00E40.rgba16.png'].split(','))
     title_texture_0A001AC0.push( ...data['textures/title_screen_bg/title_screen_bg.01AC0.rgba16.png'].split(','))
     title_texture_0A002740.push( ...data['textures/title_screen_bg/title_screen_bg.02740.rgba16.png'].split(','))
+
+    outside_09002000.push( ...data['textures/outside/castle_grounds_textures.02000.rgba16.png'].split(',') )
+    outside_09003800.push( ...data['textures/outside/castle_grounds_textures.03800.rgba16.png'].split(',') )
+    outside_09004000.push( ...data['textures/outside/castle_grounds_textures.04000.rgba16.png'].split(',') )
+    outside_09004800.push( ...data['textures/outside/castle_grounds_textures.04800.rgba16.png'].split(',') )
+    outside_09006800.push( ...data['textures/outside/castle_grounds_textures.06800.rgba16.png'].split(',') )
+    outside_09008000.push( ...data['textures/outside/castle_grounds_textures.08000.rgba16.png'].split(',') )
+    outside_09009000.push( ...data['textures/outside/castle_grounds_textures.09000.rgba16.png'].split(',') )
+    outside_09009800.push( ...data['textures/outside/castle_grounds_textures.09800.rgba16.png'].split(',') )
+    outside_0900B000.push( ...data['textures/outside/castle_grounds_textures.0B000.rgba16.png'].split(',') )
+    outside_0900B400.push( ...data['textures/outside/castle_grounds_textures.0B400.rgba16.png'].split(',') )
+
     msgElement.innerHTML = "Rom Texture Extraction Success - You may now start the game"
     msgElement.style = "color:#00ff00"
     document.getElementById("startbutton").disabled = false

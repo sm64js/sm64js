@@ -49,18 +49,32 @@ class Camera {
 
     }
 
+    update_graph_node_camera(graphNode) {
+        graphNode.pos[0] = -1328.0
+        graphNode.pos[1] = 1385.0
+        graphNode.pos[2] = 6064.0
+    
+        graphNode.focus[0] = -1328.0
+        graphNode.focus[1] = 260.0
+        graphNode.focus[2] = 4664.0
+    }
+
     geo_camera_main(callContext, graphNode) {
+
         switch (callContext) {
             case GEO_CONTEXT_CREATE:
                 this.create_camera(graphNode)
                 break
             case GEO_CONTEXT_RENDER:
-                throw "geo_camera_main - render - implementation needed"
+                this.update_graph_node_camera(graphNode)
                 break
         }
     }
 
     geo_camera_fov(callContext, graphNode) {
+
+        return
+
         const marioState = LevelUpdate.gMarioState
         const fovFunc = this.sFOVState.fovFunc
 

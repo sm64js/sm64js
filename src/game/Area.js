@@ -49,8 +49,7 @@ class Area {
 
         if (this.gCurrentArea.index == this.gMarioSpawnInfo.areaIndex) {
             this.gCurrentArea.flags |= 0x01
-            ObjectListProc.spawn_objects_from_info(0, this.gMarioSpawnInfo)
-            throw "finish load mario area"
+            // ObjectListProc.spawn_objects_from_info(0, this.gMarioSpawnInfo)
         }
     }
 

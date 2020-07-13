@@ -126,6 +126,19 @@ class LevelCommands {
         this.sCurrentScript.index++
     }
 
+    call_loop(args) {
+        const func = args[1]
+        const funcClass = args[2]
+        this.sRegister = func.call(funcClass, args[0], this.sRegister)
+        
+        if (this.sRegister == 0) {
+            this.sScriptStatus = SCRIPT_PAUSED
+        } else {
+            this.sScriptStatus = SCRIPT_RUNNING
+            this.sCurrentScript.index++
+        }
+    }
+
     alloc_level_pool(args) {
         //console.log("alloc level pool")
         this.sCurrentScript.index++
@@ -184,7 +197,6 @@ class LevelCommands {
             Area.gAreas[areaIndex].geometryLayoutData = screnArea
             
         }
-
         this.sCurrentScript.index++
     }
 

@@ -60,16 +60,34 @@ class LevelUpdate {
         } else {
             if (Area.gMarioSpawnInfo.areaIndex >= 0) {
                 Area.load_mario_area()
-                throw "load"
+                // init_mario()
+            }
+
+            if (Area.gCurrentArea) {
+                // reset_camera()
             }
         }
-
-        throw "init"
+        
         return 1
     }
 
+    play_mode_normal() {
+
+        //lots more here
+
+        return 0
+    }
+
     update_level() {
-        throw "update"
+        let changeLevel
+
+        switch (this.sCurrPlayMode) {
+            case PLAY_MODE_NORMAL:
+                changeLevel = this.play_mode_normal()
+                break
+        }
+
+        return changeLevel
     }
 
     set_play_mode(playMode) {

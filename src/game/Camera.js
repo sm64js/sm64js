@@ -42,21 +42,24 @@ class Camera {
             areaCenX: graphNode.focus[0],
             areaCenY: graphNode.focus[1],
             areaCenZ: graphNode.focus[2],
-            yaw: 0,
-            pos: [...graphNode.pos],
-            focus: [...graphNode.focus]
+            // yaw: 0,
+            // pos: [...graphNode.pos],
+            // focus: [...graphNode.focus]
         }
+
+        Object.assign(graphNode, {
+            pos: [-1328.0, 9000, -15000],
+            focus: [0, 260, 0],
+            myDemoAngle: 0,
+            myDemoRadius: 10000
+        })
 
     }
 
     update_graph_node_camera(graphNode) {
-        graphNode.pos[0] = -1328.0
-        graphNode.pos[1] = 1385.0
-        graphNode.pos[2] = 6064.0
-    
-        graphNode.focus[0] = -1328.0
-        graphNode.focus[1] = 260.0
-        graphNode.focus[2] = 4664.0
+        graphNode.myDemoAngle += 0.02
+        graphNode.pos[0] = Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius
+        graphNode.pos[2] = Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius
     }
 
     geo_camera_main(callContext, graphNode) {

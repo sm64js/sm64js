@@ -20,7 +20,7 @@ export let level_intro_entry_2 = [
     { command: LevelCommands.load_area, args: [1] },
     /// Set Menu Music
     /// Transition WARP_TRANSITION_FADE_FROM_STAR
-    { command: LevelCommands.sleep, args: [160000000] },
+    { command: LevelCommands.sleep, args: [1000] },
     { command: LevelCommands.unload_area, args: [1] },
     { command: LevelCommands.set_register, args: [LEVEL_CASTLE_GROUNDS] },
     { command: LevelCommands.execute, args: [level_main_scripts_entry] }
@@ -43,7 +43,6 @@ export let level_intro_entry_1 = [
     { command: LevelCommands.sleep, args: [16] },
     { command: LevelCommands.unload_area, args: [1] },
     { command: LevelCommands.sleep, args: [2] },
-    { command: LevelCommands.set_register, args: [LEVEL_CASTLE_GROUNDS] },
-    { command: LevelCommands.execute, args: [level_main_scripts_entry] }
+    { command: LevelCommands.execute, args: [level_intro_entry_2] }
 ]
 

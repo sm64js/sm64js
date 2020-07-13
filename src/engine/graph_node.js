@@ -1,3 +1,5 @@
+import { CameraInstance } from "../game/Camera"
+import { G_CC_DECALRGB } from "../include/gbi"
 
 export const GRAPH_RENDER_ACTIVE = (1 << 0)
 export const GRAPH_RENDER_CHILDREN_FIRST = (1 << 1)
@@ -80,6 +82,12 @@ const init_scene_graph_node_links = (graphNode, type) => {
     graphNode.node.wrapper = graphNode
 }
 
+export const init_graph_node_start = (pool, graphNode) => {
+    graphNode = { node: {} }
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_START)
+}
+
+
 export const init_graph_node_root = (pool, graphNode, areaIndex, x, y, width, height) => {
 
     graphNode = {
@@ -96,19 +104,20 @@ export const init_graph_node_root = (pool, graphNode, areaIndex, x, y, width, he
 
 export const init_graph_node_perspective = (pool, graphNode, fov, near, far, nodeFunc, unused) => {
 
-  graphNode = {
-    node: {},
-    fov,
-    near,
-    far,
-    unused
-  }
+    graphNode = {
+        node: {},
+        fov,
+        near,
+        far,
+        fnNode: { func: nodeFunc }
+    }
 
-  init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_PERSPECTIVE)
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_PERSPECTIVE)
 
-  // if (nodeFunc) {
-  //   nodeFunc(....)
-  // }
+    if (nodeFunc) {
+        if (nodeFunc != CameraInstance.geo_camera_fov) throw "check to make sure the function apart of the Camera Class"
+        nodeFunc.call(CameraInstance, GEO_CONTEXT_CREATE, graphNode)
+    }
 
   return graphNode
 
@@ -139,17 +148,32 @@ export const init_graph_node_camera = (pool, graphNode, pos, focus, func, mode) 
         rollScreen: 0,
         config: { mode: 0 },
         pos,
-        focus
+        focus,
+        fnNode: { func }
     }
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_CAMERA)
 
-    // if (func) {
-    //   func(....)
-    // }
+    if (func) {
+        if (func != CameraInstance.geo_camera_main) throw "check to make sure the function apart of the Camera Class"
+        func.call(CameraInstance, GEO_CONTEXT_CREATE, graphNode)
+    }
 
     return graphNode
 
+}
+
+export const init_graph_node_display_list = (drawingLayer, displayList) => {
+    const graphNode = {
+        node: {},
+        displayList
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_DISPLAY_LIST)
+
+    graphNode.node.flags = drawingLayer << 8 | graphNode.node.flags & 0xFF
+
+    return graphNode
 }
 
 export const init_graph_node_background = (pool, graphNode, background, backgroundFunc, zero) => {

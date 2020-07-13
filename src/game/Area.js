@@ -1,4 +1,6 @@
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
+import { SurfaceLoadInstance as SurfaceLoad } from "./SurfaceLoad"
+import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 
 export const WARP_TRANSITION_FADE_FROM_COLOR   = 0x00
 export const WARP_TRANSITION_FADE_INTO_COLOR   = 0x01
@@ -15,8 +17,17 @@ class Area {
     constructor() {
 
         this.gCurrentArea = null
-        this.gAreas = Array(8).fill({ index: 0 })
+        this.gAreas = Array(8).fill(0).map(() => { return { index: 0 } })
         this.gCurAreaIndex = 0
+        this.gCurrLevelNum = 0
+
+        this.gMarioSpawnInfo = {
+            startPos: [0, 0, 0],
+            startAngle: [0, 0, 0],
+            areaIndex: 0, activeAreaIndex: 0,
+            behaviorArg: 0, behaviorScript: null,
+            unk18: null, next: null
+        }
 
     }
 
@@ -25,8 +36,21 @@ class Area {
         if (!this.gCurrentArea && this.gAreas[index]) {
             this.gCurrentArea = this.gAreas[index]
             this.gCurAreaIndex = this.gCurrentArea.index
+
+            if (this.gCurrentArea.terrainData) {
+                SurfaceLoad.load_area_terrain(index, this.gCurrentArea.terrainData, null, null)
+            }
         }
 
+    }
+
+    load_mario_area() {
+        this.load_area(this.gMarioSpawnInfo.areaIndex)
+
+        if (this.gCurrentArea.index == this.gMarioSpawnInfo.areaIndex) {
+            this.gCurrentArea.flags |= 0x01
+            // ObjectListProc.spawn_objects_from_info(0, this.gMarioSpawnInfo)
+        }
     }
 
     play_transition() {
@@ -35,6 +59,7 @@ class Area {
 
     clear_areas() {
         this.gCurrentArea = null
+        this.gMarioSpawnInfo.areaIndex = -1
 
         this.gAreas.forEach((areaData, i) => {
             Object.assign(areaData, {

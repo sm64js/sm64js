@@ -362,6 +362,18 @@ export const G_CC_HILITERGBA = {
     rgb: [3, 4, 1, 4]
 }
 
+export const gdSPDefLights1 = (ar, ag, ab, r1, g1, b1, x1, y1, z1) => {
+    return {
+        a: { col: [ar, ag, ab ] },
+        l: [
+            {
+                col: [ r1, g1, b1 ],
+                dir: [ x1, y1, z1 ]
+            }
+        ]
+    }
+}
+
 export const gSPLight = (displaylist, lightData, index) => {
     displaylist.push({
         words: {
@@ -614,6 +626,15 @@ export const gsDPSetCycleType = (newmode) => {
         words: {
             w0: G_SETOTHERMODE_H,
             w1: { category: G_MDSFT_CYCLETYPE, newmode }
+        }
+    }
+}
+
+export const gsSPLight = (lightData, index) => {
+    return {
+        words: {
+            w0: G_MOVEMEM,
+            w1: { type: G_MV_L, lightData, index }
         }
     }
 }

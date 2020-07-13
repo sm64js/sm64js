@@ -2,6 +2,7 @@ import * as GraphNode from "./graph_node"
 import * as MathUtil from "./math_util"
 import { GameInstance as Game } from "../game/Game"
 import * as Gbi from "../include/gbi"
+import { CameraInstance as Camera, CameraInstance } from "../game/Camera"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -65,9 +66,12 @@ class GeoRenderer {
     }
 
     geo_process_perspective(node) {
-        //if (node.wrapper.func) {
-        //    node.wrapper.func()
-        //}
+                
+        if (node.wrapper.fnNode.func) {
+            if (node.wrapper.fnNode.func != Camera.geo_camera_fov)
+                throw "geo process perspective "
+           node.wrapper.fnNode.func.call(Camera, GraphNode.GEO_CONTEXT_RENDER, node.wrapper)
+        }
 
         if (node.children[0]) {
             const aspect = canvas.width / canvas.height
@@ -88,9 +92,11 @@ class GeoRenderer {
 
     geo_process_camera(node) {
 
-        //if (node.wrapper.func) {
-        //    node.wrapper.func()
-        //}
+        if (node.wrapper.fnNode.func) {
+            if (node.wrapper.fnNode.func != Camera.geo_camera_main)
+                throw "geo process perspective "
+           node.wrapper.fnNode.func.call(Camera, GraphNode.GEO_CONTEXT_RENDER, node.wrapper)
+        }
 
         const rollMtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const cameraTransform = new Array(4).fill(0).map(() => new Array(4).fill(0))
@@ -149,6 +155,16 @@ class GeoRenderer {
         
     }
 
+    geo_process_display_list(node) {
+        if (node.wrapper.displayList) {
+            this.geo_append_display_list(node.wrapper.displayList, node.flags >> 8)
+        }
+
+        if (node.children[0]) {
+            this.geo_process_node_and_siblings(node.children)
+        }
+    }
+
     geo_append_display_list(displayList, layer) {
 
         if (this.gCurGraphNodeMasterList) {
@@ -191,7 +207,10 @@ class GeoRenderer {
                 case GraphNode.GRAPH_NODE_TYPE_GENERATED_LIST:
                     this.geo_process_generated_list(child); break
 
-                default: break
+                case GraphNode.GRAPH_NODE_TYPE_DISPLAY_LIST:
+                    this.geo_process_display_list(child); break
+
+                default: throw "unimplemented geo node: " + child.type
 
             }
         }
@@ -207,7 +226,6 @@ class GeoRenderer {
             this.gCurGraphNodeRoot = root.node
 
             if (root.node.children[0]) { ///atleast one child
-                //console.log("processing children")
                 this.geo_process_node_and_siblings(root.node.children)
             }
 

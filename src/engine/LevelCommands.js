@@ -3,6 +3,9 @@ import { AreaInstance as Area } from "../game/Area"
 import { GameInstance as Game } from "../game/Game"
 import * as Gbi from "../include/gbi"
 import { GoddardRendererInstance as GoddardRenderer } from "../goddard/GoddardRenderer"
+import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
+import { init_graph_node_start } from "./graph_node"
+import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
 
 const SCRIPT_RUNNING = 1
 const SCRIPT_PAUSED = 0
@@ -17,15 +20,59 @@ class LevelCommands {
         this.sRegister = null
 
         this.REGULAR_FACE = 0x0002
-        this.DIZZY_FACE   = 0x0003
+        this.DIZZY_FACE = 0x0003
+
+        this.OP_AND  = 0
+        this.OP_NAND = 1
+        this.OP_EQ   = 2
+        this.OP_NEQ  = 3
+        this.OP_LT   = 4
+        this.OP_LEQ  = 5
+        this.OP_GT   = 6
+        this.OP_GEQ  = 7
+
+        this.OP_SET   =  0
+        this.OP_GET   =  1
+
+        this.VAR_CURR_SAVE_FILE_NUM  =  0
+        this.VAR_CURR_COURSE_NUM     =  1
+        this.VAR_CURR_ACT_NUM        =  2
+        this.VAR_CURR_LEVEL_NUM      =  3
+        this.VAR_CURR_AREA_INDEX     =  4
+
+        this.sStackTop = []
     }
 
     init_level(args) {
         //console.log("init level")
-        if (this.gObjParentGraphNode) {
-            throw "more implementation needed in init level"
-        }
+        init_graph_node_start(null, GeoLayout.gObjParentGraphNode)
+        //ObjectListProcessor.clear_objects()
         Area.clear_areas()
+        this.sCurrentScript.index++
+    }
+
+    init_mario(args) {
+
+        Object.assign(Area.gMarioSpawnInfo, {
+            startPos: { x: 0, y: 0, z: 0 },
+            startAngle: { x: 0, y: 0, z: 0 },
+            areaIndex: 0,
+            behaviorArg: args[1],
+            behaviorScript: args[2]
+        })
+
+        this.sCurrentScript.index++
+
+    }
+
+    set_mario_pos(args) {
+
+        Object.assign(Area.gMarioSpawnInfo, {
+            areaIndex: args[0],
+            startPos: [ args[2], args[3], args[4] ],
+            startAngle: [0, args[1] * 0x8000 / 180, 0 ]
+        })
+
         this.sCurrentScript.index++
     }
 
@@ -58,12 +105,69 @@ class LevelCommands {
         this.sCurrentScript.index++
     }
 
+    eval_script_op(op, arg) {
+        switch (op) {
+            case 0: return this.sRegister & arg
+            case 1: return !(this.sRegister & arg)
+            case 2: return this.sRegister == arg
+            case 3: return this.sRegister != arg
+            case 4: return this.sRegister < arg
+            case 5: return this.sRegister <= arg
+            case 6: return this.sRegister > arg
+            case 7: return this.sRegister >= arg
+        }
+
+    }
+
+    call(args) {
+        const func = args[1]
+        const funcClass = args[2]
+        this.sRegister = func.call(funcClass, args[0], this.sRegister)
+        this.sCurrentScript.index++
+    }
+
+    call_loop(args) {
+        const func = args[1]
+        const funcClass = args[2]
+        this.sRegister = func.call(funcClass, args[0], this.sRegister)
+        
+        if (this.sRegister == 0) {
+            this.sScriptStatus = SCRIPT_PAUSED
+        } else {
+            this.sScriptStatus = SCRIPT_RUNNING
+            this.sCurrentScript.index++
+        }
+    }
+
     alloc_level_pool(args) {
         //console.log("alloc level pool")
         this.sCurrentScript.index++
     }
 
     free_level_pool(args) {
+        this.sCurrentScript.index++
+    }
+
+    get_or_set(args) {
+        if (args[0] == 0) { // SET
+            switch (args[1]) {
+                case 0: Area.gCurrSaveFileNum = this.sRegister; break
+                case 1: Area.gCurrCourseNum = this.sRegister; break
+                case 2: Area.gCurrActNum = this.sRegister; break
+                case 3: Area.gCurrLevelNum = this.sRegister; break
+                case 4: Area.gCurAreaIndex = this.sRegister; break
+                case 5: LevelUpdate.gPressedStart = this.sRegister; break
+            }
+        } else {  // GET
+            switch (args[1]) {
+                case 0: this.sRegister = Area.gCurrSaveFileNum; break
+                case 1: this.sRegister = Area.gCurrCourseNum; break
+                case 2: this.sRegister = Area.gCurrActNum; break
+                case 3: this.sRegister = Area.gCurrLevelNum; break
+                case 4: this.sRegister = Area.gCurAreaIndex; break
+                case 5: this.sRegister = LevelUpdate.gPressedStart; break
+            }
+        }
         this.sCurrentScript.index++
     }
 
@@ -93,6 +197,12 @@ class LevelCommands {
             Area.gAreas[areaIndex].geometryLayoutData = screnArea
             
         }
+        this.sCurrentScript.index++
+    }
+
+    terrain(args) {
+        if (this.sCurrAreaIndex != -1)
+            Area.gAreas[this.sCurrAreaIndex].terrainData = args[0]
 
         this.sCurrentScript.index++
     }
@@ -120,6 +230,19 @@ class LevelCommands {
         this.start_new_script(args[0])
     }
 
+    jump_link(args) {
+        this.sStackTop.push({ script: this.sCurrentScript.commands, index: this.sCurrentScript.index++ })
+        this.start_new_script(args[0])
+    }
+
+    jump_if(args) {
+        if (this.eval_script_op(args[0], args[1]) != 0) {
+            this.start_new_script(args[2])
+        } else {
+            this.sCurrentScript.index++
+        }
+    }
+
     start_new_script(level_script) {
         this.sCurrentScript.commands = level_script
         this.sCurrentScript.index = 0
@@ -130,7 +253,7 @@ class LevelCommands {
 
         while (this.sScriptStatus == SCRIPT_RUNNING) {
             const cmd = this.sCurrentScript.commands[this.sCurrentScript.index]
-            //console.log("running script command: " + cmd.command.name)
+            console.log("running script command: " + cmd.command.name)
             cmd.command.call(this, cmd.args)
         }
 

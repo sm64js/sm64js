@@ -10,9 +10,17 @@ const copy3argsToObject = (pos, argIndex, args) => {
 class GeoLayout {
     constructor() {
         this.sCurrentLayout = {}
+
+        // Layers
+        this.LAYER_FORCE             = 0
+        this.LAYER_OPAQUE            = 1
+        this.LAYER_OPAQUE_DECAL      = 2
+        this.LAYER_OPAQUE_INTER      = 3
+        this.LAYER_ALPHA             = 4
+        this.LAYER_TRANSPARENT       = 5
+        this.LAYER_TRANSPARENT_DECAL = 6
+        this.LAYER_TRANSPARENT_INTER = 7
     }
-
-
 
     node_screen_area(args) {  /// node_root
 
@@ -54,6 +62,17 @@ class GeoLayout {
         this.sCurrentLayout.index++
     }
 
+    display_list(args) {
+        const drawingLayer = args[0]
+        const displaylist = args[1]
+
+        const graphNode = GraphNode.init_graph_node_display_list(drawingLayer, displaylist)
+
+        GraphNode.register_scene_graph_node(this, graphNode)
+
+        this.sCurrentLayout.index++
+    }
+
     node_ortho(args) {
         const scale = args[0] / 100.0
 
@@ -66,15 +85,14 @@ class GeoLayout {
 
     node_perspective(args) {
 
-      if (args[3]) { //optional 4th function argument
+        if (args[3]) { //optional 4th function argument
 
-      }
+        }
+        const graphNode = GraphNode.init_graph_node_perspective(null, null, args[0], args[1], args[2], args[3], 0)
 
-      const graphNode = GraphNode.init_graph_node_perspective(null, null, args[0], args[1], args[2], null, 0)
+        GraphNode.register_scene_graph_node(this, graphNode)
 
-      GraphNode.register_scene_graph_node(this, graphNode)
-
-      this.sCurrentLayout.index++
+        this.sCurrentLayout.index++
     }
 
     node_camera(args) {
@@ -141,7 +159,7 @@ class GeoLayout {
 
         this.gGeoLayoutStack = [0, 0]
 
-        //console.log("proccesing geo layout")
+        console.log("proccesing geo layout")
 
         while (this.sCurrentLayout.index < geoLayout.length) {
             const cmd = this.sCurrentLayout.layout[this.sCurrentLayout.index]
@@ -149,7 +167,7 @@ class GeoLayout {
             cmd.command.call(this, cmd.args)
         }
 
-        //console.log("finshed processing geo layout")
+        console.log("finshed processing geo layout")
         //console.log(this.gCurRootGraphNode)
         return this.gCurRootGraphNode
 

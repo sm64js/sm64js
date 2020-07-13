@@ -21,6 +21,9 @@ export let level_intro_entry_2 = [
     /// Set Menu Music
     /// Transition WARP_TRANSITION_FADE_FROM_STAR
     { command: LevelCommands.sleep, args: [160000000] },
+    { command: LevelCommands.unload_area, args: [1] },
+    { command: LevelCommands.set_register, args: [LEVEL_CASTLE_GROUNDS] },
+    { command: LevelCommands.execute, args: [level_main_scripts_entry] }
     /// Call Loop
     /// Jump If
     /// Jump IF

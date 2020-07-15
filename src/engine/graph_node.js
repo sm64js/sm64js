@@ -1,5 +1,6 @@
 import { CameraInstance } from "../game/Camera"
 import { G_CC_DECALRGB } from "../include/gbi"
+import { GeoLayoutInstance as GeoLayout, GeoLayoutInstance } from "./GeoLayout"
 
 export const GRAPH_RENDER_ACTIVE = (1 << 0)
 export const GRAPH_RENDER_CHILDREN_FIRST = (1 << 1)
@@ -45,6 +46,41 @@ export const GEO_CONTEXT_AREA_LOAD     =   3 // called when loading an area
 export const GEO_CONTEXT_AREA_INIT     =   4 // called when initializing the 8 areas
 export const GEO_CONTEXT_HELD_OBJ      =   5 // called when processing a GraphNodeHeldObj
 
+
+const init_graph_node_object = (graphNode, sharedChild, pos, angle, scale) => {
+    graphNode = {
+        node: { },
+        pos: [...pos],
+        angle: [...angle],
+        scale: [...scale],
+        sharedChild,
+        unk38: {
+            animID: 0,
+            animFrame: 0,
+            animFrameAccelAssist: 0,
+            animAccel: 0x10000,
+            animTimer: 0
+        }
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_OBJECT)
+    graphNode.node.flags |= GRAPH_RENDER_HAS_ANIMATION
+
+    return graphNode
+
+}
+
+export const geo_reset_object_node = (graphNode) =>  {
+    const zeroVec = [0, 0, 0]
+    const oneVec = [1, 1, 1]
+
+    graphNode = init_graph_node_object(graphNode, 0, zeroVec, zeroVec, oneVec)
+    
+    geo_add_child(GeoLayout.gObjParentGraphNode.node, graphNode.node)
+    graphNode.node.flags &= ~GRAPH_RENDER_ACTIVE
+    return graphNode
+}
+
 const geo_add_child = (parent, childNode) => {
 
     if (childNode) {
@@ -85,6 +121,8 @@ const init_scene_graph_node_links = (graphNode, type) => {
 export const init_graph_node_start = (pool, graphNode) => {
     graphNode = { node: {} }
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_START)
+
+    return graphNode
 }
 
 
@@ -138,6 +176,19 @@ export const init_graph_node_generated = (pool, graphNode, gfxFunc, param) => {
     }
 
     return graphNode
+}
+
+export const init_graph_node_object_parent = (sharedChild) => {
+
+    const graphNode = {
+        node: {},
+        sharedChild: sharedChild.node
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_OBJECT_PARENT)
+
+    return graphNode
+
 }
 
 export const init_graph_node_camera = (pool, graphNode, pos, focus, func, mode) => {

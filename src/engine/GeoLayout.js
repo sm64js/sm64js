@@ -73,6 +73,15 @@ class GeoLayout {
         this.sCurrentLayout.index++
     }
 
+    node_object_parent(args) {
+
+        const graphNode = GraphNode.init_graph_node_object_parent(this.gObjParentGraphNode)
+
+        GraphNode.register_scene_graph_node(this, graphNode)
+
+        this.sCurrentLayout.index++
+    }
+
     node_ortho(args) {
         const scale = args[0] / 100.0
 

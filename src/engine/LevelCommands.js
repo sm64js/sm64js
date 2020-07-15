@@ -45,8 +45,8 @@ class LevelCommands {
 
     init_level(args) {
         //console.log("init level")
-        init_graph_node_start(null, GeoLayout.gObjParentGraphNode)
-        //ObjectListProcessor.clear_objects()
+        GeoLayout.gObjParentGraphNode = init_graph_node_start(null, GeoLayout.gObjParentGraphNode)
+        ObjectListProcessor.clear_objects()
         Area.clear_areas()
         this.sCurrentScript.index++
     }

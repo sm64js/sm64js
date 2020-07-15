@@ -20,6 +20,7 @@ export const castle_grounds_geo_00073C = [
     },
     { command: GeoLayout.open_node },
     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, castle_grounds_seg7_dl_070095F0] },
+    { command: GeoLayout.node_object_parent },
     { command: GeoLayout.close_node },
     { command: GeoLayout.close_node },
     { command: GeoLayout.close_node },

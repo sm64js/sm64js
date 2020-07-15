@@ -155,6 +155,21 @@ class GeoRenderer {
         
     }
 
+    geo_process_object_parent(node) {
+        if (node.wrapper.sharedChild) {
+
+            node.wrapper.sharedChild.parent = node //temparaily assigining itself as parent
+            if (node.wrapper.sharedChild.children[0]) this.geo_process_node_and_siblings(node.wrapper.sharedChild.children)
+            else throw "objectParent sharedChild has no children"
+            node.wrapper.sharedChild.parent = null
+        }
+
+        if (node.children[0]) {
+            throw "in practice object parent should not have real children"
+            this.geo_process_node_and_siblings(node.children)
+        }
+    }
+
     geo_process_display_list(node) {
         if (node.wrapper.displayList) {
             this.geo_append_display_list(node.wrapper.displayList, node.flags >> 8)
@@ -187,6 +202,14 @@ class GeoRenderer {
     geo_process_node_and_siblings(children) {
 
         for (const child of children) {
+
+            if (!(child.flags & GraphNode.GRAPH_RENDER_ACTIVE)) {
+                if (child.type == GraphNode.GRAPH_NODE_TYPE_OBJECT) {
+                    child.wrapper.throwMatrix = null
+                }
+                continue
+            }
+
             switch (child.type) {
 
                 case GraphNode.GRAPH_NODE_TYPE_ORTHO_PROJECTION:
@@ -209,6 +232,9 @@ class GeoRenderer {
 
                 case GraphNode.GRAPH_NODE_TYPE_DISPLAY_LIST:
                     this.geo_process_display_list(child); break
+
+                case GraphNode.GRAPH_NODE_TYPE_OBJECT_PARENT:
+                    this.geo_process_object_parent(child); break
 
                 default: throw "unimplemented geo node: " + child.type
 

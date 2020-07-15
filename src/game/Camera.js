@@ -48,8 +48,8 @@ class Camera {
         }
 
         Object.assign(graphNode, {
-            pos: [-1328.0, 9000, -15000],
-            focus: [0, 260, 0],
+            pos: [-1328.0, 1385.0, 6064.0],
+            focus: [-1328.0, 260, 4664.0],
             myDemoAngle: 0,
             myDemoRadius: 10000
         })
@@ -57,9 +57,9 @@ class Camera {
     }
 
     update_graph_node_camera(graphNode) {
-        graphNode.myDemoAngle += 0.02
-        graphNode.pos[0] = Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius
-        graphNode.pos[2] = Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius
+        // graphNode.myDemoAngle += 0.02
+        // graphNode.pos[0] = Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius
+        // graphNode.pos[2] = Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius
     }
 
     geo_camera_main(callContext, graphNode) {

@@ -8,6 +8,7 @@ export const GRAPH_RENDER_BILLBOARD = (1 << 2)
 export const GRAPH_RENDER_Z_BUFFER = (1 << 3)
 export const GRAPH_RENDER_INVISIBLE = (1 << 4)
 export const GRAPH_RENDER_HAS_ANIMATION = (1 << 5)
+export const GRAPH_RENDER_CYLBOARD      = (1 << 6)
 
 // Whether the node type has a function pointer of type GraphNodeFunc
 export const GRAPH_NODE_TYPE_FUNCTIONAL =             0x100
@@ -70,6 +71,25 @@ const init_graph_node_object = (graphNode, sharedChild, pos, angle, scale) => {
 
 }
 
+export const geo_obj_init_spawninfo = (graphNode, spawn) => {
+
+    graphNode.scale = [1,1,1]
+    graphNode.angle = [ ...spawn.startAngle ]
+    graphNode.pos = [ ...spawn.startPos ]
+
+    graphNode.unk18 = spawn.areaIndex
+    graphNode.unk19 = spawn.activeAreaIndex
+    graphNode.sharedChild = spawn.unk18
+    graphNode.unk4C = spawn
+    graphNode.throwMatrix = null
+    graphNode.unk38 = { curAnim: 0 }
+
+    graphNode.node.flags |= GRAPH_RENDER_ACTIVE
+    graphNode.node.flags &= ~GRAPH_RENDER_INVISIBLE
+    graphNode.node.flags |= GRAPH_RENDER_HAS_ANIMATION
+    graphNode.node.flags &= ~GRAPH_RENDER_BILLBOARD
+} 
+
 export const geo_reset_object_node = (graphNode) =>  {
     const zeroVec = [0, 0, 0]
     const oneVec = [1, 1, 1]
@@ -81,7 +101,33 @@ export const geo_reset_object_node = (graphNode) =>  {
     return graphNode
 }
 
-const geo_add_child = (parent, childNode) => {
+export const geo_make_first_child = (newFirstChild) => {
+    const parent = newFirstChild.parent
+    let firstChild = parent.children[0]
+
+    let numRotations = parent.children.length - parent.children.indexOf(newFirstChild)
+    
+    if (firstChild != newFirstChild) {
+        if (firstChild.prev != newFirstChild) {
+            newFirstChild.prev.next = newFirstChild.next
+            newFirstChild.next.prev = newFirstChild.prev
+            const lastSibling = firstChild.prev
+            newFirstChild.prev = lastSibling
+            newFirstChild.next = firstChild
+            firstChild.prev = newFirstChild
+            lastSibling.next = newFirstChild
+        }
+        //rotate children n times
+        for (let i = 0; i < numRotations; i++) {
+            parent.children.unshift(parent.children.pop())
+        }
+        // parent.children[0] = newFirstChild
+    }
+
+    return parent
+}
+
+export const geo_add_child = (parent, childNode) => {
 
     if (childNode) {
         childNode.parent = parent
@@ -191,6 +237,21 @@ export const init_graph_node_object_parent = (sharedChild) => {
 
 }
 
+export const init_graph_node_animated_part = (drawingLayer, displayList, translation) => {
+    const graphNode = {
+        node: {},
+        translation: [ ...translation ],
+        displayList
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_ANIMATED_PART)
+
+    graphNode.node.flags = (drawingLayer << 8) | (graphNode.node.flags & 0xFF)
+
+    return graphNode
+
+}
+
 export const init_graph_node_camera = (pool, graphNode, pos, focus, func, mode) => {
 
     graphNode = {
@@ -243,6 +304,20 @@ export const init_graph_node_background = (pool, graphNode, background, backgrou
 
     return graphNode
 
+}
+
+export const init_graph_node_scale = (drawingLayer, displayList, scale) => {
+    const graphNode = {
+        node: {},
+        scale,
+        displayList
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_SCALE)
+
+    graphNode.node.flags = (drawingLayer << 8) | (graphNode.node.flags & 0xFF)
+
+    return graphNode
 }
 
 export const init_graph_node_ortho = (pool, graphNode, scale) => {

@@ -58,11 +58,21 @@ class LevelCommands {
             startAngle: { x: 0, y: 0, z: 0 },
             areaIndex: 0,
             behaviorArg: args[1],
-            behaviorScript: args[2]
+            behaviorScript: args[2],
+            unk18: Area.gLoadedGraphNodes[args[0]]
         })
 
         this.sCurrentScript.index++
 
+    }
+
+    load_model_from_geo(args) {
+
+        if (args[0] < 256) {
+            Area.gLoadedGraphNodes[args[0]] = GeoLayout.process_geo_layout(args[1]).node
+        } else throw "invalid gLoadedGraphNodes index - load model from geo"
+
+        this.sCurrentScript.index++
     }
 
     set_mario_pos(args) {
@@ -70,7 +80,7 @@ class LevelCommands {
         Object.assign(Area.gMarioSpawnInfo, {
             areaIndex: args[0],
             startPos: [ args[2], args[3], args[4] ],
-            startAngle: [0, args[1] * 0x8000 / 180, 0 ]
+            startAngle: [0, parseInt(args[1] * 0x8000 / 180), 0 ]
         })
 
         this.sCurrentScript.index++

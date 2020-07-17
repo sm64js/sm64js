@@ -73,13 +73,27 @@ class GeoLayout {
         this.sCurrentLayout.index++
     }
 
-    node_object_parent(args) {
+    node_render_object_parent(args) {
 
         const graphNode = GraphNode.init_graph_node_object_parent(this.gObjParentGraphNode)
 
         GraphNode.register_scene_graph_node(this, graphNode)
 
         this.sCurrentLayout.index++
+    }
+
+    node_animated_part(args) {
+
+        const drawingLayer = args[0]
+        const translation = [ args[1], args[2], args[3] ]
+        const displayList = args[4]
+
+        const graphNode = GraphNode.init_graph_node_animated_part(drawingLayer, displayList, translation)
+
+        GraphNode.register_scene_graph_node(this, graphNode)
+
+        this.sCurrentLayout.index++
+
     }
 
     node_ortho(args) {
@@ -140,6 +154,34 @@ class GeoLayout {
         GraphNode.register_scene_graph_node(this, graphNode)
 
         this.sCurrentLayout.index++
+    }
+
+    node_scale(args) {
+        let drawingLayer = 0
+        const params = args[0]
+        const scale = args[1] / 65536.0
+
+        let displaylist
+
+        if (params & 0x80) {
+            throw "more implementation needed in geo scale"
+        }
+
+        const graphNode = GraphNode.init_graph_node_scale(drawingLayer, displaylist, scale)
+
+        GraphNode.register_scene_graph_node(this, graphNode)
+
+        this.sCurrentLayout.index++
+    }
+
+    node_start(args) {
+
+        const graphNode = GraphNode.init_graph_node_start()
+
+        GraphNode.register_scene_graph_node(this, graphNode)
+
+        this.sCurrentLayout.index++
+
     }
 
     node_end(args) {

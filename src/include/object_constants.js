@@ -1,5 +1,9 @@
 export const RESPAWN_INFO_DONT_RESPAWN = 0xFF
 
+export const RESPAWN_INFO_TYPE_NULL = 0
+export const RESPAWN_INFO_TYPE_32   = 1
+export const RESPAWN_INFO_TYPE_16   = 2
+
 export const ACTIVE_FLAG_ACTIVE                 =  (1 <<  0) // 0x0001
 export const ACTIVE_FLAG_FAR_AWAY               =  (1 <<  1) // 0x0002
 export const ACTIVE_FLAG_UNK2                   =  (1 <<  2) // 0x0004

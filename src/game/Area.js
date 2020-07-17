@@ -20,6 +20,7 @@ class Area {
         this.gAreas = Array(8).fill(0).map(() => { return { index: 0 } })
         this.gCurAreaIndex = 0
         this.gCurrLevelNum = 0
+        this.gLoadedGraphNodes = new Array(256)
 
         this.gMarioSpawnInfo = {
             startPos: [0, 0, 0],

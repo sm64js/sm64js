@@ -249,7 +249,7 @@ const mario_butt_dl = [
 ]
 
 export const mario_butt = [
-    Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALFADE), //G_CC_SHADEFADE
+    Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA), //G_CC_SHADEFADEA
     Gbi.gsSPLight(mario_blue_lights_group.l[0], 1),
     Gbi.gsSPLight(mario_blue_lights_group.a, 2, true),
     Gbi.gsSPDisplayList(mario_butt_dl),

@@ -9,4 +9,4 @@ function hexdumpDirectory() {
 
 export -f hexdumpDirectory
 
-find textures levels -type d -exec bash -c 'hexdumpDirectory "$0"' {} \;
+find textures actors levels -type d -exec bash -c 'hexdumpDirectory "$0"' {} \;

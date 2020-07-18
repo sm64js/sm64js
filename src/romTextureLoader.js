@@ -22,8 +22,7 @@ import {
     gd_texture_sparkle_1,
     gd_texture_sparkle_2,
     gd_texture_sparkle_3,
-    gd_texture_sparkle_4
- } from "./goddard/GoddardRenderer"
+    gd_texture_sparkle_4 } from "./goddard/GoddardRenderer"
 
 import { 
     outside_09002000, 
@@ -35,8 +34,15 @@ import {
     outside_09009000, 
     outside_09009800,
     outside_0900B000,
-    outside_0900B400
- } from "./levels/castle_grounds/areas/1/2/model.inc"
+    outside_0900B400 } from "./levels/castle_grounds/areas/1/2/model.inc"
+
+import { 
+    mario_texture_yellow_button, 
+    mario_texture_eyes_front, 
+    mario_texture_hair_sideburn, 
+    mario_texture_mustache, 
+    mario_texture_m_logo } from "./actors/mario/model.inc"
+
 
 const processExtractedResults = (data) => {
     const msgElement = document.getElementById('uploadMessage')
@@ -86,6 +92,12 @@ const processExtractedResults = (data) => {
     outside_09009800.push( ...data['textures/outside/castle_grounds_textures.09800.rgba16.png'].split(',') )
     outside_0900B000.push( ...data['textures/outside/castle_grounds_textures.0B000.rgba16.png'].split(',') )
     outside_0900B400.push( ...data['textures/outside/castle_grounds_textures.0B400.rgba16.png'].split(',') )
+
+    mario_texture_yellow_button.push ( ...data['actors/mario/mario_overalls_button.rgba16.png'].split(','))
+    mario_texture_m_logo.push ( ...data['actors/mario/mario_logo.rgba16.png'].split(','))
+    mario_texture_mustache.push ( ...data["actors/mario/mario_mustache.rgba16.png"].split(','))
+    mario_texture_hair_sideburn.push ( ...data["actors/mario/mario_sideburn.rgba16.png"].split(','))
+    mario_texture_eyes_front.push ( ...data["actors/mario/mario_eyes_center.rgba16.png"].split(','))
 
     msgElement.innerHTML = "Rom Texture Extraction Success - You may now start the game"
     msgElement.style = "color:#00ff00"

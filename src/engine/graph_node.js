@@ -320,6 +320,21 @@ export const init_graph_node_scale = (drawingLayer, displayList, scale) => {
     return graphNode
 }
 
+export const init_graph_node_rotation = (drawingLayer, displayList, rotation) => {
+    const graphNode = {
+        node: {},
+        displayList,
+        rotation
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_ROTATION)
+
+    graphNode.node.flags = (drawingLayer << 8) | (graphNode.node.flags & 0xFF)
+
+    return graphNode
+
+}
+
 export const init_graph_node_ortho = (pool, graphNode, scale) => {
     graphNode = {
         node: {},

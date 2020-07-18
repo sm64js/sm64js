@@ -186,6 +186,21 @@ class GeoRenderer {
 
     }
 
+    geo_process_rotation(node) {
+        const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        MathUtil.mtxf_rotate_zxy_and_translate(mtxf, [0, 0, 0], node.wrapper.rotation)
+        MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
+        this.gMatStackIndex++
+        if (node.wrapper.displayList) {
+            this.geo_append_display_list(node.wrapper.displayList, node.flags >> 8)
+        }
+
+        if (node.children[0]) {
+            this.geo_process_node_and_siblings(node.children)
+        }
+        this.gMatStackIndex--
+    }
+
     geo_process_animated_part(node) {
 
         const matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
@@ -349,6 +364,9 @@ class GeoRenderer {
 
                 case GraphNode.GRAPH_NODE_TYPE_ANIMATED_PART:
                     this.geo_process_animated_part(child); break
+
+                case GraphNode.GRAPH_NODE_TYPE_ROTATION:
+                    this.geo_process_rotation(child); break
 
                 default: throw "unimplemented geo node: " + child.type
 

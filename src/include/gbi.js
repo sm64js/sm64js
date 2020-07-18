@@ -347,6 +347,11 @@ export const G_CC_SHADEFADEA = {
     rgb: [15, 15, 31, 4]
 }
 
+export const G_CC_BLENDRGBFADEA = {
+    alpha: [7, 7, 7, 5],
+    rgb: [1, 4, 8, 4]
+}
+
 export const G_CC_DECALFADE = {
     alpha: [7, 7, 7, 5],
     rgb: [15, 15, 31, 1]

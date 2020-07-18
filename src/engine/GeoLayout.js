@@ -10,6 +10,7 @@ const copy3argsToObject = (pos, argIndex, args) => {
 class GeoLayout {
     constructor() {
         this.sCurrentLayout = {}
+        this.gGeoLayoutStack = []
 
         // Layers
         this.LAYER_FORCE             = 0
@@ -20,6 +21,19 @@ class GeoLayout {
         this.LAYER_TRANSPARENT       = 5
         this.LAYER_TRANSPARENT_DECAL = 6
         this.LAYER_TRANSPARENT_INTER = 7
+    }
+
+    branch(args) {
+        if (args[0] == 1) {
+            this.sCurrentLayout.index++
+            this.gGeoLayoutStack.push(this.sCurrentLayout)
+        }
+
+        this.sCurrentLayout = { index: 0, layout: args[1] }
+    }
+    
+    return(args) {
+        this.sCurrentLayout = this.gGeoLayoutStack.pop()
     }
 
     node_screen_area(args) {  /// node_root
@@ -73,13 +87,27 @@ class GeoLayout {
         this.sCurrentLayout.index++
     }
 
-    node_object_parent(args) {
+    node_render_object_parent(args) {
 
         const graphNode = GraphNode.init_graph_node_object_parent(this.gObjParentGraphNode)
 
         GraphNode.register_scene_graph_node(this, graphNode)
 
         this.sCurrentLayout.index++
+    }
+
+    node_animated_part(args) {
+
+        const drawingLayer = args[0]
+        const translation = [ args[1], args[2], args[3] ]
+        const displayList = args[4]
+
+        const graphNode = GraphNode.init_graph_node_animated_part(drawingLayer, displayList, translation)
+
+        GraphNode.register_scene_graph_node(this, graphNode)
+
+        this.sCurrentLayout.index++
+
     }
 
     node_ortho(args) {
@@ -140,6 +168,52 @@ class GeoLayout {
         GraphNode.register_scene_graph_node(this, graphNode)
 
         this.sCurrentLayout.index++
+    }
+
+    node_scale(args) {
+        let drawingLayer = 0
+        const params = args[0]
+        const scale = args[1] / 65536.0
+
+        let displaylist
+
+        if (params & 0x80) {
+            throw "more implementation needed in geo scale"
+        }
+
+        const graphNode = GraphNode.init_graph_node_scale(drawingLayer, displaylist, scale)
+
+        GraphNode.register_scene_graph_node(this, graphNode)
+
+        this.sCurrentLayout.index++
+    }
+
+    node_rotation(args) {
+        let drawingLayer = 0
+        const params = args[0]
+        const sp2c = [ args[1], args[2], args[3] ]
+        let displayList
+
+        if (params & 0x80) {
+            throw "unimplemented feature in node rotation"
+        }
+
+        const graphNode = GraphNode.init_graph_node_rotation(drawingLayer, displayList, sp2c)
+
+        GraphNode.register_scene_graph_node(this, graphNode)
+
+        this.sCurrentLayout.index++
+
+    }
+
+    node_start(args) {
+
+        const graphNode = GraphNode.init_graph_node_start()
+
+        GraphNode.register_scene_graph_node(this, graphNode)
+
+        this.sCurrentLayout.index++
+
     }
 
     node_end(args) {

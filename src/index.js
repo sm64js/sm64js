@@ -26,6 +26,8 @@ const produce_one_frame = () => {
 
 const runGameWithMetrics = () => {
 
+    if (window.kill) throw "stopping game execution"
+
     requestAnimationFrame(runGameWithMetrics)
 
     const elapsed = performance.now() - last_frame_start

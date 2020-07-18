@@ -1,7 +1,8 @@
 import { PlatformDisplacementInstance as PlatformDisplacement } from "./PlatformDisplacement"
-import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED } from "../include/object_constants"
+import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32 } from "../include/object_constants"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import * as GraphNode from "../engine/graph_node"
+import { GeoLayoutInstance } from "../engine/GeoLayout"
 
 
 class ObjectListProcessor {
@@ -126,6 +127,35 @@ class ObjectListProcessor {
             if ((spawnInfo.behaviorArg & (RESPAWN_INFO_DONT_RESPAWN << 8)) != (RESPAWN_INFO_DONT_RESPAWN << 8)) {
 
                 const object = Spawn.create_object(script)
+
+                object.oBehParams = spawnInfo.behaviorArg
+
+                object.oBehParams2ndByte = ((spawnInfo.behaviorArg) >> 16) & 0xFF
+
+                object.behavior = script
+
+                // Record death/collection in the SpawnInfo
+                object.respawnInfoType = RESPAWN_INFO_TYPE_32
+                object.respawnInfo = spawnInfo.behaviorArg
+
+                if (spawnInfo.behaviorArg & 0x01) {
+                    this.gMarioObject = object
+                    GraphNode.geo_make_first_child(object.header.gfx.node)
+                }
+
+                GraphNode.geo_obj_init_spawninfo(object.header.gfx, spawnInfo)
+
+                object.oPosX = spawnInfo.startPos[0]
+                object.oPosY = spawnInfo.startPos[1]
+                object.oPosZ = spawnInfo.startPos[2]
+    
+                object.oFaceAnglePitch = spawnInfo.startAngle[0]
+                object.oFaceAngleYaw = spawnInfo.startAngle[1]
+                object.oFaceAngleRoll = spawnInfo.startAngle[2]
+    
+                object.oMoveAnglePitch = spawnInfo.startAngle[0]
+                object.oMoveAngleYaw = spawnInfo.startAngle[1]
+                object.oMoveAngleRoll = spawnInfo.startAngle[2]
                 
             }
 

@@ -12,6 +12,19 @@ class GeoRenderer {
 
         this.gMatStack = new Array(32).fill(0).map(() => new Array(4).fill(0).map(() => new Array(4).fill(0)))
         this.gMatStackIndex = 0
+
+        this.ANIM_TYPE_NONE                  = 0
+
+        // Not all parts have full animation: to save space, some animations only
+        // have xz, y, or no translation at all. All animations have rotations though
+        this.ANIM_TYPE_TRANSLATION           = 1
+        this.ANIM_TYPE_VERTICAL_TRANSLATION  = 2
+        this.ANIM_TYPE_LATERAL_TRANSLATION   = 3
+        this.ANIM_TYPE_NO_TRANSLATION        = 4
+
+        // Every animation includes rotation, after processing any of the above
+        // translation types the type is set to this
+        this.ANIM_TYPE_ROTATION              = 5
     }
 
     geo_process_master_list_sub(node) {
@@ -155,6 +168,113 @@ class GeoRenderer {
         
     }
 
+    geo_process_scale(node) {
+
+        const scaleVec = [ node.wrapper.scale, node.wrapper.scale, node.wrapper.scale ]
+        MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex], scaleVec)
+        this.gMatStackIndex++
+
+        if (node.wrapper.displayList) {
+            throw "more implementation needed in geo process scale"
+        }
+
+        if (node.children[0]) {
+            this.geo_process_node_and_siblings(node.children)
+        }
+
+        this.gMatStackIndex--
+
+    }
+
+    geo_process_rotation(node) {
+        const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        MathUtil.mtxf_rotate_zxy_and_translate(mtxf, [0, 0, 0], node.wrapper.rotation)
+        MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
+        this.gMatStackIndex++
+        if (node.wrapper.displayList) {
+            this.geo_append_display_list(node.wrapper.displayList, node.flags >> 8)
+        }
+
+        if (node.children[0]) {
+            this.geo_process_node_and_siblings(node.children)
+        }
+        this.gMatStackIndex--
+    }
+
+    geo_process_animated_part(node) {
+
+        const matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        const rotation = [ 0, 0, 0 ]
+        const translation = [ ...node.wrapper.translation ]
+
+        MathUtil.mtxf_rotate_xyz_and_translate(matrix, translation, rotation)
+        MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], matrix, this.gMatStack[this.gMatStackIndex])
+        this.gMatStackIndex++
+        
+        if (node.wrapper.displayList) {
+            this.geo_append_display_list(node.wrapper.displayList, node.flags >> 8)
+        }
+
+        if (node.children[0]) {
+            this.geo_process_node_and_siblings(node.children)
+        }
+
+        this.gMatStackIndex--
+
+    }
+
+    geo_process_object(node) {
+
+        const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        const object = node.wrapper.wrapperObjectNode.wrapperObject
+
+        if (object.header.gfx.unk18 == this.gCurGraphNodeRoot.wrapper.areaIndex) {
+
+            if (object.header.gfx.throwMatrix || object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_BILLBOARD ||
+                object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_CYLBOARD) 
+                throw "more implementation needed in geo process object"
+
+            MathUtil.mtxf_rotate_zxy_and_translate(mtxf, object.header.gfx.pos, object.header.gfx.angle)
+            MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
+
+            MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex + 1],
+                object.header.gfx.scale)
+
+            object.header.gfx.throwMatrix = this.gMatStack[++this.gMatStackIndex]
+            object.header.gfx.cameraToObject = [ 
+                this.gMatStack[this.gMatStackIndex][3][0],
+                this.gMatStack[this.gMatStackIndex][3][1],
+                this.gMatStack[this.gMatStackIndex][3][2]
+            ]
+
+            // TODO: needed for animating Mario
+            // if (node->header.gfx.unk38.curAnim != NULL) {
+            //     geo_set_animation_globals(&node->header.gfx.unk38, hasAnimation);
+            // }
+
+            if (true) { // TODO: object in view
+                if (object.header.gfx.sharedChild) {
+                    this.gCurGraphNodeObject = node.wrapper
+                    object.header.gfx.sharedChild.parent = object.header.gfx.node
+                    this.geo_process_node_and_siblings(object.header.gfx.sharedChild.children)
+                    object.header.gfx.sharedChild.parent = null
+                    this.gCurGraphNodeObject = null
+                }
+
+                if (object.header.gfx.node.children[0]) {
+                    throw "process object has children that need to be processed"
+                }
+
+            }
+
+            this.gMatStackIndex--
+            this.gCurAnimType = this.ANIM_TYPE_NONE
+            object.header.gfx.throwMatrix = null
+
+        }
+
+    }
+
     geo_process_object_parent(node) {
         if (node.wrapper.sharedChild) {
 
@@ -235,6 +355,18 @@ class GeoRenderer {
 
                 case GraphNode.GRAPH_NODE_TYPE_OBJECT_PARENT:
                     this.geo_process_object_parent(child); break
+
+                case GraphNode.GRAPH_NODE_TYPE_OBJECT:
+                    this.geo_process_object(child); break
+
+                case GraphNode.GRAPH_NODE_TYPE_SCALE:
+                    this.geo_process_scale(child); break
+
+                case GraphNode.GRAPH_NODE_TYPE_ANIMATED_PART:
+                    this.geo_process_animated_part(child); break
+
+                case GraphNode.GRAPH_NODE_TYPE_ROTATION:
+                    this.geo_process_rotation(child); break
 
                 default: throw "unimplemented geo node: " + child.type
 

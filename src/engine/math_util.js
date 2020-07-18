@@ -16,6 +16,68 @@ export const mtxf_to_mtx = (dest, src) => {
     }
 }
 
+export const mtxf_rotate_xyz_and_translate = (dest, b, c) => {
+    const sx = Math.sin(c[0] / 0x8000 * Math.PI)
+    const cx = Math.cos(c[0] / 0x8000 * Math.PI)
+
+    const sy = Math.sin(c[1] / 0x8000 * Math.PI)
+    const cy = Math.cos(c[1] / 0x8000 * Math.PI)
+
+    const sz = Math.sin(c[2] / 0x8000 * Math.PI)
+    const cz = Math.cos(c[2] / 0x8000 * Math.PI)
+
+    dest[0][0] = cy * cz
+    dest[0][1] = cy * sz
+    dest[0][2] = -sy
+    dest[0][3] = 0
+
+    dest[1][0] = sx * sy * cz - cx * sz
+    dest[1][1] = sx * sy * sz + cx * cz
+    dest[1][2] = sx * cy
+    dest[1][3] = 0
+
+    dest[2][0] = cx * sy * cz + sx * sz
+    dest[2][1] = cx * sy * sz - sx * cz
+    dest[2][2] = cx * cy
+    dest[2][3] = 0
+
+    dest[3][0] = b[0]
+    dest[3][1] = b[1]
+    dest[3][2] = b[2]
+    dest[3][3] = 1
+}
+
+export const mtxf_rotate_zxy_and_translate = (dest, translate, rotate) => {
+    const sx = Math.sin(rotate[0] / 0x8000 * Math.PI)
+    const cx = Math.cos(rotate[0] / 0x8000 * Math.PI)
+
+    const sy = Math.sin(rotate[1] / 0x8000 * Math.PI)
+    const cy = Math.cos(rotate[1] / 0x8000 * Math.PI)
+
+    const sz = Math.sin(rotate[2] / 0x8000 * Math.PI)
+    const cz = Math.cos(rotate[2] / 0x8000 * Math.PI)
+
+    dest[0][0] = cy * cz + sx * sy * sz
+    dest[1][0] = -cy * sz + sx * sy * cz
+    dest[2][0] = cx * sy
+    dest[3][0] = translate[0]
+
+    dest[0][1] = cx * sz
+    dest[1][1] = cx * cz
+    dest[2][1] = -sx
+    dest[3][1] = translate[1]
+
+    dest[0][2] = -sy * cz + sx * cy * sz
+    dest[1][2] = sy * sz + sx * cy * cz
+    dest[2][2] = cx * cy
+    dest[3][2] = translate[2]
+
+    dest[0][3] = 0.0
+    dest[1][3] = 0.0
+    dest[2][3] = 0.0
+    dest[3][3] = 1.0
+}
+
 export const mtxf_rotate_xy = (mtx, angle) => {
     mtxf_identity(mtx)
     mtx[0][0] = Math.cos(angle)
@@ -24,6 +86,14 @@ export const mtxf_rotate_xy = (mtx, angle) => {
     mtx[1][1] = mtx[0][0]
 }
 
+export const mtxf_scale_vec3f = (dest, mtx, s) => {
+    for (let i = 0; i < 4; i++) {
+        dest[0][i] = mtx[0][i] * s[0]
+        dest[1][i] = mtx[1][i] * s[1]
+        dest[2][i] = mtx[2][i] * s[2]
+        dest[3][i] = mtx[3][i]
+    }
+}
 
 export const mtxf_mul = (dest, a, b) => {
 

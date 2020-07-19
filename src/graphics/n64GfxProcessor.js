@@ -775,6 +775,11 @@ export class n64GfxProcessor {
         for (let i = 0; i < vertices.length; i++, dest_index++) {
 
             const v = vertices[i]
+            const normal = [
+                v.color[0] > 127 ? v.color[0] - 256 : v.color[0],
+                v.color[1] > 127 ? v.color[1] - 256 : v.color[1],
+                v.color[2] > 127 ? v.color[2] - 256 : v.color[2]
+            ]
             const d = this.rsp.loaded_vertices[dest_index]
 
             const x = v.pos[0] * this.rsp.MP_matrix[0][0] + v.pos[1] * this.rsp.MP_matrix[1][0] + v.pos[2] * this.rsp.MP_matrix[2][0] + this.rsp.MP_matrix[3][0]
@@ -787,11 +792,11 @@ export class n64GfxProcessor {
             let V = v.tc[1] * this.rsp.texture_scaling_factor.t >> 16
 
             if (this.rsp.geometry_mode & Gbi.G_LIGHTING) {
+
                 if (this.rsp.lights_changed) {
                     for (let i = 0; i < this.rsp.current_num_lights - 1; i++) {
                         this.calculate_normal_dir(this.rsp.current_lights[i], this.rsp.current_lights_coeffs[i])
                     }
-                    //console.log({ ...this.rsp.current_lights[0].col })
                     const lookat_x = { dir: [127, 0, 0] }
                     const lookat_y = { dir: [0, 127, 0] }
                     this.calculate_normal_dir(lookat_x, this.rsp.current_lookat_coeffs[0])
@@ -806,9 +811,9 @@ export class n64GfxProcessor {
 
                 for (let i = 0; i < this.rsp.current_num_lights - 1; i++) {
                     let intensity = 0
-                    intensity += v.color[0] * this.rsp.current_lights_coeffs[i][0]
-                    intensity += v.color[1] * this.rsp.current_lights_coeffs[i][1]
-                    intensity += v.color[2] * this.rsp.current_lights_coeffs[i][2]
+                    intensity += normal[0] * this.rsp.current_lights_coeffs[i][0]
+                    intensity += normal[1] * this.rsp.current_lights_coeffs[i][1]
+                    intensity += normal[2] * this.rsp.current_lights_coeffs[i][2]
                     intensity /= 127.0
                     if (intensity > 0) {
                         r += intensity * this.rsp.current_lights[i].col[0]
@@ -825,12 +830,12 @@ export class n64GfxProcessor {
 
                 if (this.rsp.geometry_mode & Gbi.G_TEXTURE_GEN) {
                     let dotx = 0, doty = 0
-                    dotx += v.color[0] * this.rsp.current_lookat_coeffs[0][0]
-                    dotx += v.color[1] * this.rsp.current_lookat_coeffs[0][1]
-                    dotx += v.color[2] * this.rsp.current_lookat_coeffs[0][2]
-                    doty += v.color[0] * this.rsp.current_lookat_coeffs[1][0]
-                    doty += v.color[1] * this.rsp.current_lookat_coeffs[1][1]
-                    doty += v.color[2] * this.rsp.current_lookat_coeffs[1][2]
+                    dotx += normal[0] * this.rsp.current_lookat_coeffs[0][0]
+                    dotx += normal[1] * this.rsp.current_lookat_coeffs[0][1]
+                    dotx += normal[2] * this.rsp.current_lookat_coeffs[0][2]
+                    doty += normal[0] * this.rsp.current_lookat_coeffs[1][0]
+                    doty += normal[1] * this.rsp.current_lookat_coeffs[1][1]
+                    doty += normal[2] * this.rsp.current_lookat_coeffs[1][2]
 
                     U = (dotx / 127.0 + 1.0) / 4.0 * this.rsp.texture_scaling_factor.s
                     V = (doty / 127.0 + 1.0) / 4.0 * this.rsp.texture_scaling_factor.t

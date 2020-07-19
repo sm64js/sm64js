@@ -5,4 +5,4 @@ node_modules
 .DS_Store
 extractTools/mio0
 extractTools/n64graphics
-
+extractTools/.assets-local.txt

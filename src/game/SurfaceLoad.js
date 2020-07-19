@@ -1,11 +1,12 @@
 import * as Surfaces from "../include/surface_terrains"
 
-const SPATIAL_PARTITION_FLOORS = 0
-const SPATIAL_PARTITION_CEILS = 1
-const SPATIAL_PARTITION_WALLS = 2
-
 class SurfaceLoad {
     constructor() {
+
+        this.SPATIAL_PARTITION_FLOORS = 0
+        this.SPATIAL_PARTITION_CEILS = 1
+        this.SPATIAL_PARTITION_WALLS = 2
+
         this.gStaticSurfacePartition = new Array(16).fill(0).map(() => new Array(16).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
         this.gDynamicSurfacePartition = new Array(16).fill(0).map(() => new Array(16).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
 
@@ -71,8 +72,8 @@ class SurfaceLoad {
 
         return {
             vertex1: [x1, y1, z1],
-            vertex2: [y1, y2, y3],
-            vertex3: [z1, z2, z3],
+            vertex2: [x2, y2, z2],
+            vertex3: [x3, y3, z3],
             normal: { x: nx, y: ny, z: nz },
             originOffset: -(nx * x1 + ny * y1 + nz * z1),
             lowerY: minY - 5,
@@ -125,13 +126,13 @@ class SurfaceLoad {
         let listIndex, sortDir, list
 
         if (surface.normal.y > 0.01) {
-            listIndex = SPATIAL_PARTITION_FLOORS
+            listIndex = this.SPATIAL_PARTITION_FLOORS
             sortDir = 1 // highest to lowest, then insertion order
         } else if (surface.normal.y < -0.01) {
-            listIndex = SPATIAL_PARTITION_CEILS
+            listIndex = this.SPATIAL_PARTITION_CEILS
             sortDir = -1 // lowest to highest, then insertion order
         } else {
-            listIndex = SPATIAL_PARTITION_WALLS
+            listIndex = this.SPATIAL_PARTITION_WALLS
             sortDir = 0 // insertion order
 
             if (surface.normal.x < -0.707 || surface.normal.x > 0.707) {

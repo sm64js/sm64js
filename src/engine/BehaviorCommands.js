@@ -1,11 +1,52 @@
+import { ObjectListProcessorInstance as ObjListProc } from "../game/ObjectListProcessor"
+
 class BehaviorCommands {
 
     constructor() {
-
+        this.BHV_PROC_CONTINUE = 0
+        this.BHV_PROC_BREAK    = 1
     }
 
-    begin() {
-        throw "begin bhv"
+    cur_obj_update() {
+        this.bhvScript = ObjListProc.gCurrentObject.bhvScript
+
+        let bhvProcResult = this.BHV_PROC_CONTINUE
+
+        while (bhvProcResult == this.BHV_PROC_CONTINUE) {
+            const bhvFunc = this.bhvScript.commands[this.bhvScript.index]
+            bhvProcResult = bhvFunc.command.call(this, bhvFunc.args)
+        }
+    }
+
+    call_native(args) {
+        if (args.func != ObjListProc.bhv_mario_update) throw "check this - only support one function so far"
+        args.func.call(ObjListProc)
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    set_hitbox(args) {
+        ObjListProc.gCurrentObject.hitboxRadius = args.radius
+        ObjListProc.gCurrentObject.hitboxHeight = args.height
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    begin_loop(args) {
+        this.bhvScript.index++
+        ObjListProc.gCurrentObject.bhvStack.push(this.bhvScript.index)
+        return this.BHV_PROC_CONTINUE
+    }
+
+    end_loop(args) {
+        this.bhvScript.index = ObjListProc.gCurrentObject.bhvStack[ObjListProc.gCurrentObject.bhvStack.length - 1]
+        return this.BHV_PROC_BREAK
+    }
+
+    begin(args) {
+        ObjListProc.gCurrentObject.bhvStack = []
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
     }
 
 

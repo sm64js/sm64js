@@ -54,6 +54,11 @@ class Area {
         }
     }
 
+    area_update_objects() {
+        GeoRenderer.gAreaUpdateCounter++
+        ObjectListProc.update_objects(0)
+    }
+
     play_transition() {
         /// TODO
     }

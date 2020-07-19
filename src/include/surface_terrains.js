@@ -3,6 +3,9 @@ export const TERRAIN_LOAD_CONTINUE = 0x0041
 export const TERRAIN_LOAD_END = 0x0042
 export const TERRAIN_LOAD_OBJECTS = 0x0043
 
+export const LEVEL_BOUNDARY_MAX = 0x2000
+export const CELL_SIZE          = 0x400
+
 // Surface Types
 export const SURFACE_DEFAULT        = 0x0000 // Environment default
 export const SURFACE_BURNING        = 0x0001 // Lava / Frostbite (in SL), but is used mostly for Lava
@@ -30,13 +33,39 @@ export const SURFACE_QUICKSAND                    = 0x0026 // Moving quicksand (
 export const SURFACE_MOVING_QUICKSAND             = 0x0027 // Moving quicksand (flowing, depth of 60 units)
 export const SURFACE_HORIZONTAL_WIND              = 0x002C // Horizontal wind, has parameters
 export const SURFACE_INSTANT_MOVING_QUICKSAND     = 0x002D // Quicksand (lethal, flowing)
+export const SURFACE_CAMERA_BOUNDARY              = 0x0072 // Intangible Area, only used to restrict camera movement
+
+export const SURFACE_HARD_SLIPPERY                 = 0x0035 // Hard and slippery (Always has fall damage)
+export const SURFACE_HARD_VERY_SLIPPERY            = 0x0036 // Hard and very slippery (Always has fall damage)
+export const SURFACE_HARD_NOT_SLIPPERY             = 0x0037 // Hard and Non-slippery (Always has fall damage)
+export const SURFACE_NOISE_VERY_SLIPPERY_73        = 0x0073 // Very slippery floor with noise, unused
+export const SURFACE_NOISE_VERY_SLIPPERY_74        = 0x0074 // Very slippery floor with noise, unused
+export const SURFACE_NOISE_VERY_SLIPPERY           = 0x0075 // Very slippery floor with noise, used in CCM
+
+export const SURFACE_CLASS_DEFAULT                 = 0x0000
+export const SURFACE_CLASS_VERY_SLIPPERY           = 0x0013
+export const SURFACE_CLASS_SLIPPERY                = 0x0014
+export const SURFACE_CLASS_NOT_SLIPPERY            = 0x0015
+
+export const SURFACE_ICE                           = 0x002E // Slippery Ice, in snow levels and THI's water floor
 
 export const SURFACE_NO_CAM_COL_VERY_SLIPPERY     = 0x0078 // Surface with no cam collision flag, very slippery with noise (THI)
 export const SURFACE_NO_CAM_COL_SLIPPERY          = 0x0079 // Surface with no cam collision flag, slippery with noise (CCM, PSS and TTM slides)
 export const SURFACE_SWITCH                       = 0x007A // Surface with no cam collision flag, non-slippery with noise, used by switches and Dorrie
 
+export const SURFACE_FLAG_DYNAMIC          = (1 << 0)
 export const SURFACE_FLAG_NO_CAM_COLLISION = (1 << 1)
 export const SURFACE_FLAG_X_PROJECTION     = (1 << 3)
+
+// Terrain types defined by the level script command terrain_type (cmd_31)
+export const TERRAIN_GRASS  = 0x0000
+export const TERRAIN_STONE  = 0x0001
+export const TERRAIN_SNOW   = 0x0002
+export const TERRAIN_SAND   = 0x0003
+export const TERRAIN_SPOOKY = 0x0004
+export const TERRAIN_WATER  = 0x0005
+export const TERRAIN_SLIDE  = 0x0006
+export const TERRAIN_MASK   = 0x0007
 
 export const COL_INIT = () => { return TERRAIN_LOAD_VERTICES }
 export const COL_END = () => { return TERRAIN_LOAD_END }

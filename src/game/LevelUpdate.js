@@ -60,7 +60,7 @@ class LevelUpdate {
         } else {
             if (Area.gMarioSpawnInfo.areaIndex >= 0) {
                 Area.load_mario_area()
-                // init_mario()
+                Mario.init_mario()
             }
 
             if (Area.gCurrentArea) {
@@ -74,6 +74,7 @@ class LevelUpdate {
     play_mode_normal() {
 
         //lots more here
+        Area.area_update_objects()
 
         return 0
     }

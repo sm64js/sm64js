@@ -12,6 +12,7 @@ class GeoRenderer {
 
         this.gMatStack = new Array(32).fill(0).map(() => new Array(4).fill(0).map(() => new Array(4).fill(0)))
         this.gMatStackIndex = 0
+        this.gAreaUpdateCounter = 0
 
         this.ANIM_TYPE_NONE                  = 0
 

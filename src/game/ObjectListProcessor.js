@@ -3,6 +3,9 @@ import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import * as GraphNode from "../engine/graph_node"
 import { GeoLayoutInstance } from "../engine/GeoLayout"
+import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands"
+import { MarioInstance as Mario } from "./Mario"
+import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 
 
 class ObjectListProcessor {
@@ -36,7 +39,22 @@ class ObjectListProcessor {
                               //      gets exhausted.
         this.NUM_OBJ_LISTS = 13
 
+        this.sObjectListUpdateOrder = [ 
+            this.OBJ_LIST_SPAWNER,
+            this.OBJ_LIST_SURFACE,
+            this.OBJ_LIST_POLELIKE,
+            this.OBJ_LIST_PLAYER,
+            this.OBJ_LIST_PUSHABLE,
+            this.OBJ_LIST_GENACTOR,
+            this.OBJ_LIST_DESTRUCTIVE,
+            this.OBJ_LIST_LEVEL,
+            this.OBJ_LIST_DEFAULT,
+            this.OBJ_LIST_UNIMPORTANT,
+        ]
+
+        this.gObjectCounter = 0
         this.gCCMEnteredSlide = 0
+        this.gCheckingSurfaceCollisionsForCamera = 0
         this.gObjectLists = new Array(16).fill(0).map(() => { 
 
             const newObjectNode = { //ObjectNode
@@ -106,6 +124,63 @@ class ObjectListProcessor {
 
             return newObject
 
+        })
+    }
+
+    update_objects() {
+        this.update_non_terrain_objects()
+    }
+
+    update_non_terrain_objects() {
+        this.sObjectListUpdateOrder.slice(2).forEach(listIndex => {
+            this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[listIndex])
+        })
+    }
+
+    update_objects_in_list(objList) {
+
+        const firstObj = objList.next
+        return this.update_objects_starting_at(objList, firstObj)
+    }
+
+    update_objects_starting_at(objList, firstObj) {
+        let count = 0
+        while(objList != firstObj) {
+            this.gCurrentObject = firstObj.wrapperObject
+            this.gCurrentObject.header.gfx.node.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION
+            Behavior.cur_obj_update()
+            firstObj = firstObj.next
+            count++
+        }
+        return count
+    }
+
+    bhv_mario_update() {
+        Mario.execute_mario_action()
+        this.copy_mario_state_to_object()
+    }
+
+    copy_mario_state_to_object() {
+        Object.assign(this.gCurrentObject, {
+            oVelX: LevelUpdate.gMarioState.vel[0],
+            oVelY: LevelUpdate.gMarioState.vel[1],
+            oVelZ: LevelUpdate.gMarioState.vel[2],
+        
+            oPosX: LevelUpdate.gMarioState.pos[0],
+            oPosY: LevelUpdate.gMarioState.pos[1],
+            oPosZ: LevelUpdate.gMarioState.pos[2],
+        
+            oMoveAnglePitch: this.gCurrentObject.header.gfx.angle[0],
+            oMoveAngleYaw: this.gCurrentObject.header.gfx.angle[1],
+            oMoveAngleRoll: this.gCurrentObject.header.gfx.angle[2],
+        
+            oFaceAnglePitch: this.gCurrentObject.header.gfx.angle[0],
+            oFaceAngleYaw: this.gCurrentObject.header.gfx.angle[1],
+            oFaceAngleRoll: this.gCurrentObject.header.gfx.angle[2],
+        
+            oAngleVelPitch: LevelUpdate.gMarioState.angleVel[0],
+            oAngleVelYaw: LevelUpdate.gMarioState.angleVel[1],
+            oAngleVelRoll: LevelUpdate.gMarioState.angleVel[2],
         })
     }
 

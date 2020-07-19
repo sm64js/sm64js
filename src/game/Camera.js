@@ -11,6 +11,12 @@ const DOOR_ENTER_LOBBY     = 2
 
 class Camera {
     constructor() {
+
+        this.CAM_MOVE_C_UP_MODE   = 0x2000
+
+
+        this.gCameraMovementFlags = 0
+
         this.gPlayerCameraState = {
             action: 0,
             pos: [0, 0, 0],

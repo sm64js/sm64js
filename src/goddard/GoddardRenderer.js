@@ -635,12 +635,12 @@ class GoddardRenderer {
             newLight.lights4[i].dir[1] = lightDir[1]
             newLight.lights4[i].dir[2] = lightDir[2]
 
-            Gbi.gSPLight(this.sCurrentGdDl.gfx, newLight.lights4[i], i)
+            Gbi.gSPLight(this.sCurrentGdDl.gfx, newLight.lights4[i], i + 1)
 
         }
 
         //ambient light added last
-        Gbi.gSPLight(this.sCurrentGdDl.gfx, newLight.ambient, numLights)
+        Gbi.gSPLight(this.sCurrentGdDl.gfx, newLight.ambient, numLights + 1) 
 
         this.sCurrentGdDl.light.push(newLight)
         Gbi.gSPEndDisplayList(this.sCurrentGdDl.gfx)

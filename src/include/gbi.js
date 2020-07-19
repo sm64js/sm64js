@@ -388,7 +388,8 @@ export const gSPLight = (displaylist, lightData, index) => {
     displaylist.push({
         words: {
             w0: G_MOVEMEM,
-            w1: { type: G_MV_L, lightData, index }
+            w1: { type: G_MV_L, lightData, index: index - 1 }
+            // the `index - 1` I don't like and isn't needed, but it makes matching with decomp code easier
         }
     })
 }
@@ -644,7 +645,8 @@ export const gsSPLight = (lightData, index) => {
     return {
         words: {
             w0: G_MOVEMEM,
-            w1: { type: G_MV_L, lightData, index }
+            w1: { type: G_MV_L, lightData, index: index - 1 }
+            // the `index - 1` I don't like and isn't needed, but it makes matching with decomp code easier
         }
     }
 }

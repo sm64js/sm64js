@@ -170,6 +170,16 @@ class GeoLayout {
         this.sCurrentLayout.index++
     }
 
+    node_switch_case(args) {
+
+        const graphNode = GraphNode.init_graph_node_switch_case(args[0], 0, args[1], args[2])
+
+        GraphNode.register_scene_graph_node(this, graphNode)
+
+        this.sCurrentLayout.index++
+
+    }
+
     node_scale(args) {
         let drawingLayer = 0
         const params = args[0]

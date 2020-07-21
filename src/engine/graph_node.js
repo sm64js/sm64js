@@ -39,6 +39,7 @@ export const GRAPH_NODE_TYPE_OBJECT_PARENT     =      0x029
 export const GRAPH_NODE_TYPE_GENERATED_LIST =         0x02A | GRAPH_NODE_TYPE_FUNCTIONAL
 export const GRAPH_NODE_TYPE_BACKGROUND =             0x02C | GRAPH_NODE_TYPE_FUNCTIONAL
 export const GRAPH_NODE_TYPE_CULLING_RADIUS =         0x02F
+export const GRAPH_NODE_TYPE_SWITCH_CASE         =    0x00C | GRAPH_NODE_TYPE_FUNCTIONAL
 
 export const GFX_NUM_MASTER_LISTS = 8
 
@@ -252,6 +253,22 @@ export const init_graph_node_root = (pool, graphNode, areaIndex, x, y, width, he
         numViews: 0
     }
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_ROOT)
+
+    return graphNode
+}
+
+export const init_graph_node_switch_case = (numCases, selectedCase, nodeFunc, funcClass) => {
+    const graphNode = {
+        node: {},
+        numCases, selectedCase,
+        fnNode: { func: nodeFunc }
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_SWITCH_CASE)
+
+    if (nodeFunc) {
+        nodeFunc.call(funcClass, GEO_CONTEXT_CREATE, graphNode)
+    }
 
     return graphNode
 }

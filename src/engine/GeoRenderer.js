@@ -2,7 +2,8 @@ import * as GraphNode from "./graph_node"
 import * as MathUtil from "./math_util"
 import { GameInstance as Game } from "../game/Game"
 import * as Gbi from "../include/gbi"
-import { CameraInstance as Camera, CameraInstance } from "../game/Camera"
+import { CameraInstance as Camera } from "../game/Camera"
+import { MarioInstance as Mario } from "../game/Mario"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -202,11 +203,48 @@ class GeoRenderer {
         this.gMatStackIndex--
     }
 
+    read_next_anim_value() {
+        const index = GraphNode.retrieve_animation_index(this.gCurrAnimFrame, this.gCurrAnimAttribute)
+        const value = this.gCurAnimData[index]
+        return value > 32767 ? value - 65536 : value
+    }
+
     geo_process_animated_part(node) {
 
         const matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const rotation = [ 0, 0, 0 ]
         const translation = [ ...node.wrapper.translation ]
+        if (this.gCurAnimType == Mario.ANIM_TYPE_TRANSLATION) {
+            translation[0] += this.read_next_anim_value() + this.gCurAnimTranslationMultiplier
+            translation[1] += this.read_next_anim_value() + this.gCurAnimTranslationMultiplier
+            translation[2] += this.read_next_anim_value() * this.gCurAnimTranslationMultiplier
+            this.gCurAnimType = Mario.ANIM_TYPE_ROTATION
+        } else {
+            if (this.gCurAnimType == Mario.ANIM_TYPE_LATERAL_TRANSLATION) {
+                translation[0] += tthis.read_next_anim_value() + this.gCurAnimTranslationMultiplier
+                this.gCurrAnimAttribute.indexToIndices += 2
+                translation[2] += tthis.read_next_anim_value() + this.gCurAnimTranslationMultiplier
+                this.gCurAnimType = Mario.ANIM_TYPE_ROTATION
+            } else {
+                if (this.gCurAnimType == Mario.ANIM_TYPE_VERTICAL_TRANSLATION) {
+                    this.gCurrAnimAttribute.indexToIndices += 2
+                    translation[1] += ththis.read_next_anim_value() + this.gCurAnimTranslationMultiplier
+                    this.gCurrAnimAttribute.indexToIndices += 2
+                    this.gCurAnimType = Mario.ANIM_TYPE_ROTATION
+                } else if (this.gCurAnimType == Mario.ANIM_TYPE_NO_TRANSLATION) {
+                    this.gCurrAnimAttribute.indexToIndices += 6
+                    this.gCurAnimType = Mario.ANIM_TYPE_ROTATION
+                } 
+            }
+        }
+
+        if (this.gCurAnimType == Mario.ANIM_TYPE_ROTATION) {
+            rotation[0] = this.read_next_anim_value()
+            rotation[1] = this.read_next_anim_value()
+            rotation[2] = this.read_next_anim_value()
+        }
+
+        // console.log(translation)
 
         MathUtil.mtxf_rotate_xyz_and_translate(matrix, translation, rotation)
         MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], matrix, this.gMatStack[this.gMatStackIndex])
@@ -224,10 +262,42 @@ class GeoRenderer {
 
     }
 
+    geo_set_animation_globals(node, hasAnimation) {
+        const anim = node.curAnim
+
+        if (hasAnimation) {
+            node.animFrame = GraphNode.geo_update_animation_frame(node, node.animFrameAccelAssist)
+        } else { throw "why are you here if you don't have an animation?" }
+        node.animTimer = this.gAreaUpdateCounter
+        if (anim.flags & Mario.ANIM_FLAG_HOR_TRANS) {
+            this.gCurAnimType = Mario.ANIM_TYPE_VERTICAL_TRANSLATION
+        } else if (anim.flags & Mario.ANIM_FLAG_VERT_TRANS) {
+            this.gCurAnimType = Mario.ANIM_TYPE_LATERAL_TRANSLATION
+        } else if (anim.flags & Mario.ANIM_FLAG_6) {
+            this.gCurAnimType = Mario.ANIM_TYPE_NO_TRANSLATION
+        } else {
+            this.gCurAnimType = Mario.ANIM_TYPE_TRANSLATION
+        }
+
+        this.gCurrAnimFrame = node.animFrame
+        this.gCurAnimEnabled = (anim.flags & Mario.ANIM_FLAG_5) == 0
+        this.gCurrAnimAttribute = { indexToIndices: 0, indices: anim.indices }
+        this.gCurAnimData = anim.values
+
+        if (anim.unk02 == 0) {
+            this.gCurAnimTranslationMultiplier = 1.0
+        } else {
+            this.gCurAnimTranslationMultiplier =  node.animYTrans / anim.unk02
+        }
+
+    }
+
     geo_process_object(node) {
 
         const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const object = node.wrapper.wrapperObjectNode.wrapperObject
+
+        const hasAnimation = (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_HAS_ANIMATION) != 0
 
         if (object.header.gfx.unk18 == this.gCurGraphNodeRoot.wrapper.areaIndex) {
 
@@ -248,10 +318,9 @@ class GeoRenderer {
                 this.gMatStack[this.gMatStackIndex][3][2]
             ]
 
-            // TODO: needed for animating Mario
-            // if (node->header.gfx.unk38.curAnim != NULL) {
-            //     geo_set_animation_globals(&node->header.gfx.unk38, hasAnimation);
-            // }
+            if (object.header.gfx.unk38.curAnim) {
+                this.geo_set_animation_globals(object.header.gfx.unk38, hasAnimation)
+            }
 
             if (true) { // TODO: object in view
                 if (object.header.gfx.sharedChild) {

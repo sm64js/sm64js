@@ -186,6 +186,7 @@ class ObjectListProcessor {
 
     spawn_objects_from_info(spawnInfo) {
 
+
         this.gTimeStopState = 0
 
         this.gWDWWaterLevelChanging = false;

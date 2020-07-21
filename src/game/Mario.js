@@ -7,9 +7,38 @@ import { GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import * as SurfaceTerrains from "../include/surface_terrains"
 import { atan2s } from "../engine/math_util"
+import { mario_execute_stationary_action } from "./MarioActionsStationary"
+import { gMarioAnimData } from "../actors/mario/marioAnimData"
 
 class Mario {
     constructor() {
+
+        this.ANIM_FLAG_NOLOOP          =  (1 << 0) // 0x01
+        this.ANIM_FLAG_FORWARD         =  (1 << 1) // 0x02
+        this.ANIM_FLAG_2               =  (1 << 2) // 0x04
+        this.ANIM_FLAG_HOR_TRANS       =  (1 << 3) // 0x08
+        this.ANIM_FLAG_VERT_TRANS      =  (1 << 4) // 0x10
+        this.ANIM_FLAG_5               =  (1 << 5) // 0x20
+        this.ANIM_FLAG_6               =  (1 << 6) // 0x40
+        this.ANIM_FLAG_7               =  (1 << 7) // 0x80
+
+        // after processing an object, the type is reset to this
+        this.ANIM_TYPE_NONE                 = 0
+
+        // Not all parts have full animation: to save space, some animations only
+        // have xz, y, or no translation at all. All animations have rotations though
+        this.ANIM_TYPE_TRANSLATION          = 1
+        this.ANIM_TYPE_VERTICAL_TRANSLATION = 2
+        this.ANIM_TYPE_LATERAL_TRANSLATION  = 3
+        this.ANIM_TYPE_NO_TRANSLATION       = 4
+
+        // Every animation includes rotation, after processing any of the above
+        // translation types the type is set to this
+        this.ANIM_TYPE_ROTATION             = 5
+
+        this.MARIO_ANIM_IDLE_HEAD_LEFT = 0xC3
+        this.MARIO_ANIM_IDLE_HEAD_RIGHT = 0xC4
+        this.MARIO_ANIM_IDLE_HEAD_CENTER = 0xC5
 
         this.MARIO_NORMAL_CAP          =  0x00000001
         this.MARIO_VANISH_CAP          =  0x00000002
@@ -105,9 +134,46 @@ class Mario {
         Object.assign(LevelUpdate.gMarioState.marioObj.header.gfx, {
             pos: [ ...LevelUpdate.gMarioState.pos ],
             angle: [ 0, LevelUpdate.gMarioState.faceAngle[1], 0 ],
-            unk38: { ...LevelUpdate.gMarioState.marioObj.header.gfx.unk38, animID: -1 }
+            unk38: { 
+                ...LevelUpdate.gMarioState.marioObj.header.gfx.unk38, 
+                animID: -1,
+                animID: 0,
+                animFrame: 0,
+                animFrameAccelAssist: 0,
+                animAccel: 0x10000,
+                animTimer: 0
+            }
         })
 
+
+    }
+
+    set_mario_animation(m, targetAnimID) {
+        const o = m.marioObj
+        m.animation.targetAnim = m.animation.animList[targetAnimID]
+
+        if (o.header.gfx.unk38.animID != targetAnimID) {
+            o.header.gfx.unk38.animID = targetAnimID
+            o.header.gfx.unk38.curAnim = m.animation.targetAnim
+            o.header.gfx.unk38.animAccel = 0
+            o.header.gfx.unk38.animYTrans = m.unkB0
+    
+            if (m.animation.targetAnim.flags & this.ANIM_FLAG_2) {
+                o.header.gfx.unk38.animFrame = m.animation.targetAnim.unk04
+            } else {
+                if (m.animation.targetAnim.flags & this.ANIM_FLAG_FORWARD) {
+                    o.header.gfx.unk38.animFrame = m.animation.targetAnim.unk04 + 1
+                } else {
+                    o.header.gfx.unk38.animFrame = m.animation.targetAnim.unk04 - 1
+                }
+            }
+        }
+        
+    }
+
+    is_anim_at_end(m) {
+        const o = m.marioObj
+        return (o.header.gfx.unk38.animFrame + 1) == o.header.gfx.unk38.curAnim.unk08
     }
 
     execute_mario_action() {
@@ -115,6 +181,10 @@ class Mario {
             LevelUpdate.gMarioState.marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
 
             this.update_mario_inputs(LevelUpdate.gMarioState)
+
+            mario_execute_stationary_action(LevelUpdate.gMarioState)
+
+            LevelUpdate.gMarioState.marioObj.oInteractStatus = 0
         }
     }
 
@@ -274,7 +344,7 @@ class Mario {
             statusForCamera: Camera.gPlayerCameraState,
             marioBodyState: MarioMisc.gBodyState,
             controller: null,
-            animation: null,
+            animation: { animList: gMarioAnimData, targetAnim: null },
             numCoins: 0, numStars: 0, numKeys: 0,
             numLives: 4, health: 0x880,
             unkB8: 0, unkB0: 0xBD

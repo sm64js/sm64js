@@ -11,6 +11,12 @@ const DOOR_ENTER_LOBBY     = 2
 
 class Camera {
     constructor() {
+
+        this.CAM_MOVE_C_UP_MODE   = 0x2000
+
+
+        this.gCameraMovementFlags = 0
+
         this.gPlayerCameraState = {
             action: 0,
             pos: [0, 0, 0],
@@ -64,7 +70,7 @@ class Camera {
             graphNode.pos[0] = Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius
             graphNode.pos[2] = Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius
         } else if (graphNode.myCounter == 500) {
-            graphNode.pos = [-1328.0, 800.0, 6064.0]
+            graphNode.pos = [-1328.0,600.0, 6064.0]
             graphNode.focus = [-1328.0, 260, 4664.0]
             graphNode.myDemoRadius = 800
         } else {

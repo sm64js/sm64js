@@ -1,6 +1,8 @@
 import { CameraInstance } from "../game/Camera"
 import { G_CC_DECALRGB } from "../include/gbi"
-import { GeoLayoutInstance as GeoLayout, GeoLayoutInstance } from "./GeoLayout"
+import { GeoLayoutInstance as GeoLayout } from "./GeoLayout"
+import { GeoRendererInstance as GeoRenderer } from "./GeoRenderer"
+import { MarioInstance as Mario } from "../game/Mario"
 
 export const GRAPH_RENDER_ACTIVE = (1 << 0)
 export const GRAPH_RENDER_CHILDREN_FIRST = (1 << 1)
@@ -152,6 +154,74 @@ export const geo_add_child = (parent, childNode) => {
 
     return childNode
 
+}
+
+const getTopBits = (number) => { return number >>> 16 }
+
+export const retrieve_animation_index = (curFrame, attributes) => {
+
+    let result
+
+    if (curFrame < attributes.indices[attributes.indexToIndices]) {
+        result = attributes.indices[attributes.indexToIndices + 1] + curFrame
+    } else {
+        result = attributes.indices[attributes.indexToIndices + 1] + attributes.indices[attributes.indexToIndices] - 1
+    }
+
+    attributes.indexToIndices += 2
+
+    return result
+}
+
+export const geo_update_animation_frame = (obj, accelAssist) => {
+
+    const anim = obj.curAnim
+
+    if (obj.animTimer == GeoRenderer.gAreaUpdateCounter || anim.flags & Mario.ANIM_FLAG_2) {
+        if (accelAssist) {
+            throw "animation has accel assist?"
+        }
+
+        return obj.animFrame
+    }
+
+    let result
+
+    if (anim.flags & Mario.ANIM_FLAG_FORWARD) {
+        if (obj.animAccel) {
+            result = obj.animFrameAccelAssist - obj.animAccel
+        } else {
+            result = (obj.animFrame - 1) << 16
+        }
+
+        if (getTopBits(result) < anim.unk06) {
+            if (anim.flags & Mario.ANIM_FLAG_NOLOOP) {
+                getTopBits(result, anim.unk06)
+            } else {
+                getTopBits(result, anim.unk08 - 1)
+            }
+        }
+    } else {
+        if (obj.animAccel != 0) {
+            result = obj.animFrameAccelAssist + obj.animAccel
+        } else {
+            result = (obj.animFrame + 1) << 16
+        }
+
+        if (getTopBits(result) >= anim.unk08) {
+            if (anim.flags & Mario.ANIM_FLAG_NOLOOP) {
+                getTopBits(result, anim.unk08 - 1)
+            } else {
+                getTopBits(result, anim.unk06)
+            }
+        }
+    }
+
+    if (accelAssist) {
+        throw "anim has accel assist?"
+    }
+
+    return getTopBits(result)
 }
 
 const init_scene_graph_node_links = (graphNode, type) => {

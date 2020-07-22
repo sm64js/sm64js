@@ -7,7 +7,16 @@ import {
     mario_cap_on_eyes_closed,
     mario_left_arm,
     mario_left_forearm_shared_dl,
-    mario_left_hand_closed
+    mario_left_hand_closed,
+    mario_right_arm,
+    mario_right_forearm_shared_dl,
+    mario_right_hand_closed,
+    mario_left_thigh,
+    mario_left_leg_shared_dl,
+    mario_left_foot,
+    mario_right_thigh,
+    mario_right_leg_shared_dl,
+    mario_right_foot
  } from "./model.inc"
 import { MarioMiscInstance as MarioMisc } from "../../game/MarioMisc"
 
@@ -53,8 +62,38 @@ export const mario_geo = [
                                 { command: Geo.close_node },
                             { command: Geo.close_node },
                         { command: Geo.close_node },    /// close mario left arm
+                        { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 68, -10, -79, null] },  /// open mario left arm
+                        { command: Geo.open_node },
+                            { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, mario_right_arm] },
+                            { command: Geo.open_node },
+                                { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 65, 0, 0, mario_right_forearm_shared_dl] },
+                                { command: Geo.open_node },
+                                    { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 60, 0, 0, mario_right_hand_closed] },
+                                { command: Geo.close_node },
+                            { command: Geo.close_node },
+                        { command: Geo.close_node },    /// close mario left arm
                     { command: Geo.close_node },
                 { command: Geo.close_node },
+                { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 13, -8, 42, null] },  /// open left leg stuff
+                { command: Geo.open_node }, 
+                    { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, mario_left_thigh] }, 
+                    { command: Geo.open_node },
+                        { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 89, 0, 0, mario_left_leg_shared_dl] }, 
+                        { command: Geo.open_node },
+                            { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 67, 0, 0, mario_left_foot] }, 
+                        { command: Geo.close_node },
+                    { command: Geo.close_node },
+                { command: Geo.close_node },  /// end left leg stuff
+                { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 13, -8, -42, null] },  /// open right leg stuff
+                { command: Geo.open_node }, 
+                    { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, mario_right_thigh] }, 
+                    { command: Geo.open_node },
+                        { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 89, 0, 0, mario_right_leg_shared_dl] }, 
+                        { command: Geo.open_node },
+                            { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 67, 0, 0, mario_right_foot] }, 
+                        { command: Geo.close_node },
+                    { command: Geo.close_node },
+                { command: Geo.close_node },  /// end right leg stuff
             { command: Geo.close_node },
         { command: Geo.close_node },
     { command: Geo.close_node },

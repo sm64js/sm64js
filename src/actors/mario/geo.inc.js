@@ -1,5 +1,11 @@
 import { GeoLayoutInstance as Geo } from "../../engine/GeoLayout"
-import { mario_butt, mario_torso, mario_cap_on_eyes_front } from "./model.inc"
+import { 
+    mario_butt, 
+    mario_torso, 
+    mario_cap_on_eyes_front,
+    mario_cap_on_eyes_half_closed,
+    mario_cap_on_eyes_closed
+ } from "./model.inc"
 import { MarioMiscInstance as MarioMisc } from "../../game/MarioMisc"
 
 const mario_geo_face_and_wings = [
@@ -7,6 +13,8 @@ const mario_geo_face_and_wings = [
     { command: Geo.node_switch_case, args: [0, MarioMisc.geo_switch_mario_eyes, MarioMisc] },
     { command: Geo.open_node },
         { command: Geo.display_list, args: [ Geo.LAYER_OPAQUE, mario_cap_on_eyes_front ]},
+        { command: Geo.display_list, args: [ Geo.LAYER_OPAQUE, mario_cap_on_eyes_half_closed ]}, 
+        { command: Geo.display_list, args: [ Geo.LAYER_OPAQUE, mario_cap_on_eyes_closed ]}, 
     { command: Geo.close_node },
     { command: Geo.return }
 ]

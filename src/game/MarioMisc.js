@@ -25,8 +25,7 @@ class MarioMisc {
         return gfx 
     }
 
-    geo_switch_mario_eyes(callContext, node) {
-        const switchCase = node.wrapper
+    geo_switch_mario_eyes(callContext, switchCase) {
 
         let marioBlinkAnimation = [ 1, 2, 1, 0, 1, 2, 1 ]
 

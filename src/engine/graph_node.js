@@ -261,7 +261,7 @@ export const init_graph_node_switch_case = (numCases, selectedCase, nodeFunc, fu
     const graphNode = {
         node: {},
         numCases, selectedCase,
-        fnNode: { func: nodeFunc }
+        fnNode: { func: nodeFunc, funcClass }
     }
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_SWITCH_CASE)

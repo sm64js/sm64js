@@ -4,7 +4,10 @@ import {
     mario_torso, 
     mario_cap_on_eyes_front,
     mario_cap_on_eyes_half_closed,
-    mario_cap_on_eyes_closed
+    mario_cap_on_eyes_closed,
+    mario_left_arm,
+    mario_left_forearm_shared_dl,
+    mario_left_hand_closed
  } from "./model.inc"
 import { MarioMiscInstance as MarioMisc } from "../../game/MarioMisc"
 
@@ -40,6 +43,16 @@ export const mario_geo = [
                         { command: Geo.open_node },
                             { command: Geo.branch, args: [ 1, mario_geo_face_and_wings ]},
                         { command: Geo.close_node },
+                        { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 67, -10, 79, null] },  /// open mario left arm
+                        { command: Geo.open_node },
+                            { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, mario_left_arm] },
+                            { command: Geo.open_node },
+                                { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 65, 0, 0, mario_left_forearm_shared_dl] },
+                                { command: Geo.open_node },
+                                    { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 60, 0, 0, mario_left_hand_closed] },
+                                { command: Geo.close_node },
+                            { command: Geo.close_node },
+                        { command: Geo.close_node },    /// close mario left arm
                     { command: Geo.close_node },
                 { command: Geo.close_node },
             { command: Geo.close_node },

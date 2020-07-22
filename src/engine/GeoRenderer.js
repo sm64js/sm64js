@@ -214,6 +214,7 @@ class GeoRenderer {
         const matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const rotation = [ 0, 0, 0 ]
         const translation = [ ...node.wrapper.translation ]
+
         if (this.gCurAnimType == Mario.ANIM_TYPE_TRANSLATION) {
             translation[0] += this.read_next_anim_value() + this.gCurAnimTranslationMultiplier
             translation[1] += this.read_next_anim_value() + this.gCurAnimTranslationMultiplier
@@ -243,8 +244,6 @@ class GeoRenderer {
             rotation[1] = this.read_next_anim_value()
             rotation[2] = this.read_next_anim_value()
         }
-
-        // console.log(translation)
 
         MathUtil.mtxf_rotate_xyz_and_translate(matrix, translation, rotation)
         MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], matrix, this.gMatStack[this.gMatStackIndex])
@@ -372,9 +371,12 @@ class GeoRenderer {
 
     geo_append_display_list(displayList, layer) {
 
+        const gMatStackCopy = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        MathUtil.mtxf_to_mtx(gMatStackCopy, this.gMatStack[this.gMatStackIndex])
+
         if (this.gCurGraphNodeMasterList) {
             const listNode = {
-                transform: this.gMatStack[this.gMatStackIndex],
+                transform: gMatStackCopy,
                 displayList
             }
 

@@ -41,7 +41,9 @@ import {
     mario_texture_eyes_front, 
     mario_texture_hair_sideburn, 
     mario_texture_mustache, 
-    mario_texture_m_logo } from "./actors/mario/model.inc"
+    mario_texture_m_logo,
+    mario_texture_eyes_half_closed,
+    mario_texture_eyes_closed } from "./actors/mario/model.inc"
 
 
 const processExtractedResults = (data) => {
@@ -98,6 +100,8 @@ const processExtractedResults = (data) => {
     mario_texture_mustache.push ( ...data["actors/mario/mario_mustache.rgba16.png"].split(','))
     mario_texture_hair_sideburn.push ( ...data["actors/mario/mario_sideburn.rgba16.png"].split(','))
     mario_texture_eyes_front.push ( ...data["actors/mario/mario_eyes_center.rgba16.png"].split(','))
+    mario_texture_eyes_half_closed.push ( ...data["actors/mario/mario_eyes_half_closed.rgba16.png"].split(','))
+    mario_texture_eyes_closed.push ( ...data["actors/mario/mario_eyes_closed.rgba16.png"].split(','))
 
     msgElement.innerHTML = "Rom Texture Extraction Success - You may now start the game"
     msgElement.style = "color:#00ff00"

@@ -214,6 +214,7 @@ class GeoRenderer {
         const matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const rotation = [ 0, 0, 0 ]
         const translation = [ ...node.wrapper.translation ]
+
         if (this.gCurAnimType == Mario.ANIM_TYPE_TRANSLATION) {
             translation[0] += this.read_next_anim_value() + this.gCurAnimTranslationMultiplier
             translation[1] += this.read_next_anim_value() + this.gCurAnimTranslationMultiplier
@@ -243,8 +244,6 @@ class GeoRenderer {
             rotation[1] = this.read_next_anim_value()
             rotation[2] = this.read_next_anim_value()
         }
-
-        // console.log(translation)
 
         MathUtil.mtxf_rotate_xyz_and_translate(matrix, translation, rotation)
         MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], matrix, this.gMatStack[this.gMatStackIndex])
@@ -372,9 +371,12 @@ class GeoRenderer {
 
     geo_append_display_list(displayList, layer) {
 
+        const gMatStackCopy = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        MathUtil.mtxf_to_mtx(gMatStackCopy, this.gMatStack[this.gMatStackIndex])
+
         if (this.gCurGraphNodeMasterList) {
             const listNode = {
-                transform: this.gMatStack[this.gMatStackIndex],
+                transform: gMatStackCopy,
                 displayList
             }
 
@@ -384,9 +386,68 @@ class GeoRenderer {
                 this.gCurGraphNodeMasterList.wrapper.listHeads[layer] = [ listNode ]
             }
             
-            
         }
 
+    }
+
+    geo_process_switch_case(node) {
+
+        const fnNode = node.wrapper.fnNode
+
+        if (fnNode.func) {
+           fnNode.func.call(fnNode.funcClass, GraphNode.GEO_CONTEXT_RENDER, node.wrapper, this.gMatStack[this.gMatStackIndex])
+        }
+
+        this.geo_process_single_node(node.children[node.wrapper.selectedCase])
+
+    }
+
+    geo_process_single_node(node) {
+
+        switch (node.type) {
+
+            case GraphNode.GRAPH_NODE_TYPE_ORTHO_PROJECTION:
+                this.geo_process_ortho_projection(node); break
+
+            case GraphNode.GRAPH_NODE_TYPE_PERSPECTIVE:
+                this.geo_process_perspective(node); break
+
+            case GraphNode.GRAPH_NODE_TYPE_MASTER_LIST:
+                this.geo_process_master_list(node); break
+
+            case GraphNode.GRAPH_NODE_TYPE_CAMERA:
+                this.geo_process_camera(node); break
+
+            case GraphNode.GRAPH_NODE_TYPE_BACKGROUND:
+                this.geo_process_background(node); break
+
+            case GraphNode.GRAPH_NODE_TYPE_GENERATED_LIST:
+                this.geo_process_generated_list(node); break
+
+            case GraphNode.GRAPH_NODE_TYPE_DISPLAY_LIST:
+                this.geo_process_display_list(node); break
+
+            case GraphNode.GRAPH_NODE_TYPE_OBJECT_PARENT:
+                this.geo_process_object_parent(node); break
+
+            case GraphNode.GRAPH_NODE_TYPE_OBJECT:
+                this.geo_process_object(node); break
+
+            case GraphNode.GRAPH_NODE_TYPE_SCALE:
+                this.geo_process_scale(node); break
+
+            case GraphNode.GRAPH_NODE_TYPE_ANIMATED_PART:
+                this.geo_process_animated_part(node); break
+
+            case GraphNode.GRAPH_NODE_TYPE_ROTATION:
+                this.geo_process_rotation(node); break
+
+            case GraphNode.GRAPH_NODE_TYPE_SWITCH_CASE:
+                this.geo_process_switch_case(node); break
+
+            default: throw "unimplemented geo node: " + node.type
+
+        }
     }
 
     geo_process_node_and_siblings(children) {
@@ -399,48 +460,8 @@ class GeoRenderer {
                 }
                 continue
             }
+            this.geo_process_single_node(child)
 
-            switch (child.type) {
-
-                case GraphNode.GRAPH_NODE_TYPE_ORTHO_PROJECTION:
-                    this.geo_process_ortho_projection(child); break
-
-                case GraphNode.GRAPH_NODE_TYPE_PERSPECTIVE:
-                    this.geo_process_perspective(child); break
-
-                case GraphNode.GRAPH_NODE_TYPE_MASTER_LIST:
-                    this.geo_process_master_list(child); break
-
-                case GraphNode.GRAPH_NODE_TYPE_CAMERA:
-                    this.geo_process_camera(child); break
-
-                case GraphNode.GRAPH_NODE_TYPE_BACKGROUND:
-                    this.geo_process_background(child); break
-
-                case GraphNode.GRAPH_NODE_TYPE_GENERATED_LIST:
-                    this.geo_process_generated_list(child); break
-
-                case GraphNode.GRAPH_NODE_TYPE_DISPLAY_LIST:
-                    this.geo_process_display_list(child); break
-
-                case GraphNode.GRAPH_NODE_TYPE_OBJECT_PARENT:
-                    this.geo_process_object_parent(child); break
-
-                case GraphNode.GRAPH_NODE_TYPE_OBJECT:
-                    this.geo_process_object(child); break
-
-                case GraphNode.GRAPH_NODE_TYPE_SCALE:
-                    this.geo_process_scale(child); break
-
-                case GraphNode.GRAPH_NODE_TYPE_ANIMATED_PART:
-                    this.geo_process_animated_part(child); break
-
-                case GraphNode.GRAPH_NODE_TYPE_ROTATION:
-                    this.geo_process_rotation(child); break
-
-                default: throw "unimplemented geo node: " + child.type
-
-            }
         }
 
     }

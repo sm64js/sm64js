@@ -1,5 +1,7 @@
 import { GoddardRendererInstance as GoddardRenderer } from "../goddard/GoddardRenderer"
 import { GameInstance as Game } from "./Game"
+import { GEO_CONTEXT_RENDER, GEO_CONTEXT_CREATE } from "../engine/graph_node"
+import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 
 class MarioMisc {
     constructor() {
@@ -14,15 +16,31 @@ class MarioMisc {
     geo_draw_mario_head_goddard(callContext, node, c) {
         let gfx = []
         const asGenerated = node.wrapper
-        if (callContext == 0) { // Create
-            //console.log("geo_draw_mario_head_goddard init - do nothing")
-        } else if (callContext == 1) { // Render
+        if (callContext == GEO_CONTEXT_CREATE) { // Create
+        } else if (callContext == GEO_CONTEXT_RENDER) { // Render
             gfx = GoddardRenderer.gdm_gettestdl(asGenerated.param)
             Game.D_8032C6A0_vsyncFunc = GoddardRenderer.gd_vblank
             Game.D_8032C6A0_classObject = GoddardRenderer
-            //throw "geo_draw_mario_head_goddard"
         }
         return gfx 
+    }
+
+    geo_switch_mario_eyes(callContext, switchCase) {
+
+        let marioBlinkAnimation = [ 1, 2, 1, 0, 1, 2, 1 ]
+
+        if (callContext == GEO_CONTEXT_RENDER) {
+            if (this.gBodyState.eyeState == 0) {
+                let blinkFrame = ((switchCase.numCases * 32 + GeoRenderer.gAreaUpdateCounter) >> 1) & 0x1F
+                if (blinkFrame < 7) {
+                    switchCase.selectedCase = marioBlinkAnimation[blinkFrame]
+                } else {
+                    switchCase.selectedCase = 0
+                }
+            } else {
+                throw "never here - geo_switch_mario_eyes"
+            }
+        }
     }
 }
 

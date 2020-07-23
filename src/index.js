@@ -75,8 +75,8 @@ const playerInputUpdate = () => {
 
     let stickX = 0, stickY = 0
 
-    if (window.keyboardButtons.a) stickX += 1
-    if (window.keyboardButtons.d) stickX -= 1
+    if (window.keyboardButtons.d) stickX += 1
+    if (window.keyboardButtons.a) stickX -= 1
 
     if (window.keyboardButtons.w) stickY += 1
     if (window.keyboardButtons.s) stickY -= 1

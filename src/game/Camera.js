@@ -48,7 +48,7 @@ class Camera {
             areaCenX: graphNode.focus[0],
             areaCenY: graphNode.focus[1],
             areaCenZ: graphNode.focus[2],
-            // yaw: 0,
+            yaw: 0,
             // pos: [...graphNode.pos],
             // focus: [...graphNode.focus]
         }

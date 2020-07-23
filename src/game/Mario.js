@@ -188,6 +188,20 @@ class Mario {
         }
     }
 
+    update_mario_joystick_inputs(m) {
+        const mag = window.playerInput.stickMag
+
+        m.intendedMag = mag / 2.0
+
+        if (m.intendedMag > 0.0) {
+            m.intendedYaw = atan2s(-window.playerInput.stickY, window.playerInput.stickX) + m.area.camera.yaw
+            m.input |= this.INPUT_NONZERO_ANALOG
+        } else {
+            m.intendedYaw = m.faceAngle[1]
+        }
+
+    }
+
     update_mario_geometry_inputs(m) {
         if (!m.floor) {
             m.pos = [ ...m.marioObj.header.gfx.pos ]
@@ -309,6 +323,7 @@ class Mario {
         m.collidedObjInteractTypes = m.marioObj.collidedObjInteractTypes
         m.flags &= 0xFFFFFF
 
+        this.update_mario_joystick_inputs(m)
         this.update_mario_geometry_inputs(m)
 
         if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) { 

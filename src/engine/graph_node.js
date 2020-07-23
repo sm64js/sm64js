@@ -345,7 +345,7 @@ export const init_graph_node_camera = (pool, graphNode, pos, focus, func, mode) 
         node: {},
         roll: 0,
         rollScreen: 0,
-        config: { mode: 0 },
+        config: { mode: 0, camera: null },
         pos,
         focus,
         fnNode: { func }

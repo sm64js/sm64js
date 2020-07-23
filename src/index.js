@@ -73,7 +73,20 @@ Keydrown.D.up(() => { window.keyboardButtons.d = false })
 const playerInputUpdate = () => {
     Keydrown.tick()
 
+    let stickX = 0, stickY = 0
 
+    if (window.keyboardButtons.a) stickX += 1
+    if (window.keyboardButtons.d) stickX -= 1
+
+    if (window.keyboardButtons.w) stickY += 1
+    if (window.keyboardButtons.s) stickY -= 1
+
+    const mag = Math.sqrt((stickX * stickX) + (stickY * stickY))
+    const ratio = mag > 0 ? (64 / mag) : 0
+    stickX *= ratio
+    stickY *= ratio
+
+    window.playerInput = { stickX, stickY, stickMag: mag * ratio }
 }
 
 //////////////////// Some more website stuff

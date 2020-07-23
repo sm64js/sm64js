@@ -1,4 +1,5 @@
 import "./template.css"
+import * as Keydrown from "./keydrown.min.js"
 import { GameInstance as Game } from "./game/Game"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
 
@@ -31,6 +32,9 @@ const runGameWithMetrics = () => {
 
     const elapsed = performance.now() - last_frame_start
     if (elapsed > frameSpeed) {
+
+        playerInputUpdate()
+
         const start_frame = performance.now()
         last_frame_start = start_frame - (elapsed % frameSpeed)
         produce_one_frame()
@@ -51,6 +55,26 @@ const main_func = () => {
 
 }
 
+
+/////// Keyboard / Gamepad Input ////////
+
+window.keyboardButtons = { w: false, a: false, s: false, d: false }
+
+Keydrown.W.down(() => { window.keyboardButtons.w = true })
+Keydrown.A.down(() => { window.keyboardButtons.a = true })
+Keydrown.S.down(() => { window.keyboardButtons.s = true })
+Keydrown.D.down(() => { window.keyboardButtons.d = true })
+
+Keydrown.W.up(() => { window.keyboardButtons.w = false })
+Keydrown.A.up(() => { window.keyboardButtons.a = false })
+Keydrown.S.up(() => { window.keyboardButtons.s = false })
+Keydrown.D.up(() => { window.keyboardButtons.d = false })
+
+const playerInputUpdate = () => {
+    Keydrown.tick()
+
+
+}
 
 //////////////////// Some more website stuff
 

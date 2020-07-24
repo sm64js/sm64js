@@ -296,13 +296,19 @@ export const guOrtho = (m, left, right, bottom, top, near, far, scale) => {
     }
 }
 
+/*const customAtan = (angle) => {
+    return (Math.atan(angle) + (Math.PI / 2)) * 2607.594
+}
+*/
 /**
  * Compute the angle from (0, 0) to (x, y) as a s16. Given that terrain is in
  * the xz-plane, this is commonly called with (z, x) to get a yaw angle.
  */
 export const atan2s = (y, x) => {
 
-    let ret
+    return parseInt(Math.atan2(x, y) * 10430.5)
+
+/*    let ret
 
     if (x >= 0) {
         if (y >= 0) {
@@ -339,5 +345,5 @@ export const atan2s = (y, x) => {
 
     if (isNaN(ret)) return 0
 
-    return ret > 32767 ? ret - 65536 : ret
+    return ret > 32767 ? ret - 65536 : ret*/
 }

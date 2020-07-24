@@ -57,7 +57,7 @@ class Camera {
             pos: [-1328.0, 1000.0, 6064.0],
             focus: [-1328.0, 260, 4664.0],
             myDemoAngle: 0,
-            myDemoRadius: 800
+            myDemoRadius: 1000
         })
 
     }

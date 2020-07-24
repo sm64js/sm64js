@@ -7,14 +7,14 @@ class SurfaceCollision {
 
     }
 
-    find_floor(marioState) {
+    find_floor(xPos, yPos, zPos, floorWrapper) {
         let height = -11000.0
 
-        const x = parseInt(marioState.pos[0])
-        const y = parseInt(marioState.pos[1])
-        const z = parseInt(marioState.pos[2])
+        const x = parseInt(xPos)
+        const y = parseInt(yPos)
+        const z = parseInt(zPos)
 
-        marioState.floor = null
+        floorWrapper.floor = null
 
         if (x <= -LEVEL_BOUNDARY_MAX || x >= LEVEL_BOUNDARY_MAX) { 
             return height
@@ -29,7 +29,7 @@ class SurfaceCollision {
 
         const surfaceList = SurfaceLoad.gStaticSurfacePartition[cellZ][cellX][SurfaceLoad.SPATIAL_PARTITION_FLOORS].next
         const heightWrapper = { height: 0 }
-        marioState.floor = this.find_floor_from_list(surfaceList, x, y, z, heightWrapper)
+        floorWrapper.floor = this.find_floor_from_list(surfaceList, x, y, z, heightWrapper)
 
         return heightWrapper.height
 

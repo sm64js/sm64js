@@ -1,6 +1,22 @@
-import { MarioInstance as Mario } from "./Mario";
+import { MarioInstance as Mario } from "./Mario"
+
+const check_common_idle_cancels = (m) => {
+
+    if (m.input & Mario.INPUT_NONZERO_ANALOG) {
+
+        m.faceAngle[1] = m.intendedYaw
+
+        return Mario.set_mario_action(m, Mario.ACT_WALKING, 0)
+    }
+
+    return 0
+}
 
 const act_idle = (m) => {
+
+    if (check_common_idle_cancels(m)) {
+        return 1
+    }
 
     if (m.actionArg & 1) {
         throw "action arg mario stand against wall"
@@ -27,5 +43,6 @@ export const mario_execute_stationary_action = (m) => {
 
     switch (m.action) {
         case Mario.ACT_IDLE: return act_idle(m)
+        default: throw "unkown action stationary"
     }
 }

@@ -40,6 +40,8 @@ class Mario {
         this.MARIO_ANIM_IDLE_HEAD_LEFT = 0xC3
         this.MARIO_ANIM_IDLE_HEAD_RIGHT = 0xC4
         this.MARIO_ANIM_IDLE_HEAD_CENTER = 0xC5
+        this.MARIO_ANIM_WALKING = 0x48
+        this.MARIO_ANIM_RUNNING = 0x72
 
         this.MARIO_NORMAL_CAP          =  0x00000001
         this.MARIO_VANISH_CAP          =  0x00000002
@@ -265,7 +267,37 @@ class Mario {
                 }
             }
         }
+
+        return o.header.gfx.unk38.animFrame
         
+    }
+
+    set_mario_anim_with_accel(m, targetAnimID, accel) {
+        const o = m.marioObj
+        m.animation.targetAnim = m.animation.animList[targetAnimID]
+
+        if (o.header.gfx.unk38.animID != targetAnimID) {
+            o.header.gfx.unk38.animID = targetAnimID
+            o.header.gfx.unk38.curAnim = m.animation.targetAnim
+            o.header.gfx.unk38.animYTrans = m.unkB0
+
+            if (m.animation.targetAnim.flags & this.ANIM_FLAG_2) {
+                o.header.gfx.unk38.animFrameAccelAssist = (m.animation.targetAnim << 0x10)
+            } else {
+                if (m.animation.targetAnim.flags & this.ANIM_FLAG_FORWARD) {
+                    o.header.gfx.unk38.animFrameAccelAssist = (m.animation.targetAnim << 0x10) + accel
+                } else {
+                    o.header.gfx.unk38.animFrameAccelAssist = (m.animation.targetAnim << 0x10) - accel
+                }
+            }
+
+            o.header.gfx.unk38.animFrame = (o.header.gfx.unk38.animFrameAccelAssist >> 0x10)
+        }
+
+        o.header.gfx.unk38.animAccel = accel
+
+        return o.header.gfx.unk38.animFrame
+
     }
 
     is_anim_at_end(m) {

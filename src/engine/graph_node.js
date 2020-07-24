@@ -159,6 +159,8 @@ export const geo_add_child = (parent, childNode) => {
 
 const getTopBits = (number) => { return number >>> 16 }
 
+const setTopBits = (number32, number16) => { return (number16 << 16) | (number32 & 0xFFFF) }
+
 export const retrieve_animation_index = (curFrame, attributes) => {
 
     let result
@@ -176,51 +178,52 @@ export const retrieve_animation_index = (curFrame, attributes) => {
 
 export const geo_update_animation_frame = (obj, accelAssist) => {
 
+    if (obj.animFrameAccelAssist != accelAssist) throw "geo update animation frame, params should match"
+
     const anim = obj.curAnim
 
     if (obj.animTimer == GeoRenderer.gAreaUpdateCounter || anim.flags & Mario.ANIM_FLAG_2) {
-        if (accelAssist) {
-            throw "animation has accel assist?"
-        }
+/*        if (accelAssist) {
+            accelAssist = obj.animFrameAccelAssist
+        }*/
 
         return obj.animFrame
     }
+
 
     let result
 
     if (anim.flags & Mario.ANIM_FLAG_FORWARD) {
         if (obj.animAccel) {
-            result = obj.animFrameAccelAssist - obj.animAccel
+            result = parseInt(obj.animFrameAccelAssist - obj.animAccel)
         } else {
-            result = (obj.animFrame - 1) << 16
+            result = parseInt((obj.animFrame - 1) << 16)
         }
 
         if (getTopBits(result) < anim.unk06) {
             if (anim.flags & Mario.ANIM_FLAG_NOLOOP) {
-                getTopBits(result, anim.unk06)
+                result = setTopBits(result, anim.unk06)
             } else {
-                getTopBits(result, anim.unk08 - 1)
+                result = setTopBits(result, anim.unk08 - 1)
             }
         }
     } else {
         if (obj.animAccel != 0) {
-            result = obj.animFrameAccelAssist + obj.animAccel
+            result = parseInt(obj.animFrameAccelAssist + obj.animAccel)
         } else {
             result = (obj.animFrame + 1) << 16
         }
 
         if (getTopBits(result) >= anim.unk08) {
             if (anim.flags & Mario.ANIM_FLAG_NOLOOP) {
-                getTopBits(result, anim.unk08 - 1)
+                result = setTopBits(result, anim.unk08 - 1)
             } else {
-                getTopBits(result, anim.unk06)
+                result = setTopBits(result, anim.unk06)
             }
         }
     }
 
-    if (accelAssist) {
-        throw "anim has accel assist?"
-    }
+    obj.animFrameAccelAssist = result
 
     return getTopBits(result)
 }

@@ -48,35 +48,39 @@ class Camera {
             areaCenX: graphNode.focus[0],
             areaCenY: graphNode.focus[1],
             areaCenZ: graphNode.focus[2],
-            // yaw: 0,
+            yaw: 0,
             // pos: [...graphNode.pos],
             // focus: [...graphNode.focus]
         }
 
         Object.assign(graphNode, {
-            pos: [-1328.0, 9000, -15000],
-            focus: [0, 260, 0],
+            pos: [-1328.0, 1500.0, 6064.0],
+            focus: [-1328.0, 260, 4664.0],
             myDemoAngle: 0,
-            myDemoRadius: 10000,
+            myDemoRadius: 1500,
             myCounter: 0
         })
 
     }
 
     update_graph_node_camera(graphNode) {
-        graphNode.myDemoAngle += 0.02
-        graphNode.myCounter++
-        if (graphNode.myCounter < 500) {
-            graphNode.pos[0] = Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius
-            graphNode.pos[2] = Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius
-        } else if (graphNode.myCounter == 500) {
-            graphNode.pos = [-1328.0,600.0, 6064.0]
-            graphNode.focus = [-1328.0, 260, 4664.0]
-            graphNode.myDemoRadius = 800
-        } else {
-            graphNode.pos[0] = (Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius) - 1328.0
-            graphNode.pos[2] = (Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius) + 4664.0
-        }
+        // graphNode.myDemoAngle += 0.02
+        graphNode.pos[0] = (Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius) - 1328.0
+        graphNode.pos[2] = (Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius) + 4664.0
+
+        // Demo show off code
+        // graphNode.myCounter++
+        // if (graphNode.myCounter < 500) {
+        //     graphNode.pos[0] = Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius
+        //     graphNode.pos[2] = Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius
+        // } else if (graphNode.myCounter == 500) {
+        //     graphNode.pos = [-1328.0,600.0, 6064.0]
+        //     graphNode.focus = [-1328.0, 260, 4664.0]
+        //     graphNode.myDemoRadius = 800
+        // } else {
+        //     graphNode.pos[0] = (Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius) - 1328.0
+        //     graphNode.pos[2] = (Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius) + 4664.0
+        // }
     }
 
     geo_camera_main(callContext, graphNode) {

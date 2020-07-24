@@ -9,6 +9,7 @@ import * as SurfaceTerrains from "../include/surface_terrains"
 import { atan2s } from "../engine/math_util"
 import { mario_execute_stationary_action } from "./MarioActionsStationary"
 import { gMarioAnimData } from "../actors/mario/marioAnimData"
+import { mario_execute_moving_action } from "./MarioActionsMoving"
 
 class Mario {
     constructor() {
@@ -39,6 +40,8 @@ class Mario {
         this.MARIO_ANIM_IDLE_HEAD_LEFT = 0xC3
         this.MARIO_ANIM_IDLE_HEAD_RIGHT = 0xC4
         this.MARIO_ANIM_IDLE_HEAD_CENTER = 0xC5
+        this.MARIO_ANIM_WALKING = 0x48
+        this.MARIO_ANIM_RUNNING = 0x72
 
         this.MARIO_NORMAL_CAP          =  0x00000001
         this.MARIO_VANISH_CAP          =  0x00000002
@@ -58,10 +61,42 @@ class Mario {
         this.MARIO_TRIPPING            =  0x00400000
         this.MARIO_UNKNOWN_25          =  0x02000000
         this.MARIO_UNKNOWN_30          =  0x40000000
-        this.MARIO_UNKNOWN_31          =  0x80000000
+        this.MARIO_UNKNOWN_31 = 0x80000000
 
-        this.ACT_IDLE                    = 0x0C400201 
-        this.ACT_FLAG_ALLOW_FIRST_PERSON = (1 << 26)
+        this.ACT_GROUP_MASK            = 0x000001C0
+        this.ACT_GROUP_STATIONARY      = (0 << 6)
+        this.ACT_GROUP_MOVING          = (1 << 6)
+        this.ACT_GROUP_AIRBORNE        = (2 << 6)
+        this.ACT_GROUP_SUBMERGED       = (3 << 6)
+        this.ACT_GROUP_CUTSCENE        = (4 << 6)
+        this.ACT_GROUP_AUTOMATIC       = (5 << 6)
+        this.ACT_GROUP_OBJECT          = (6 << 6)
+
+        this.ACT_IDLE = 0x0C400201 
+        this.ACT_WALKING = 0x04000440
+
+        this.ACT_FLAG_STATIONARY                  = (1 << 9)
+        this.ACT_FLAG_MOVING                      = (1 << 10)
+        this.ACT_FLAG_AIR                         = (1 << 11)
+        this.ACT_FLAG_INTANGIBLE                  = (1 << 12)
+        this.ACT_FLAG_SWIMMING                    = (1 << 13)
+        this.ACT_FLAG_METAL_WATER                 = (1 << 14)
+        this.ACT_FLAG_SHORT_HITBOX                = (1 << 15)
+        this.ACT_FLAG_RIDING_SHELL                = (1 << 16)
+        this.ACT_FLAG_INVULNERABLE                = (1 << 17)
+        this.ACT_FLAG_BUTT_OR_STOMACH_SLIDE       = (1 << 18)
+        this.ACT_FLAG_DIVING                      = (1 << 19)
+        this.ACT_FLAG_ON_POLE                     = (1 << 20)
+        this.ACT_FLAG_HANGING                     = (1 << 21)
+        this.ACT_FLAG_IDLE                        = (1 << 22)
+        this.ACT_FLAG_ATTACKING                   = (1 << 23)
+        this.ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION  = (1 << 24)
+        this.ACT_FLAG_CONTROL_JUMP_HEIGHT         = (1 << 25)
+        this.ACT_FLAG_ALLOW_FIRST_PERSON          = (1 << 26)
+        this.ACT_FLAG_PAUSE_EXIT                  = (1 << 27)
+        this.ACT_FLAG_SWIMMING_OR_FLYING          = (1 << 28)
+        this.ACT_FLAG_WATER_OR_TEXT               = (1 << 29)
+        this.ACT_FLAG_THROWING                    = (1 << 31)
 
         this.INPUT_NONZERO_ANALOG         = 0x0001
         this.INPUT_A_PRESSED              = 0x0002
@@ -78,7 +113,34 @@ class Mario {
         this.INPUT_UNKNOWN_12             = 0x1000
         this.INPUT_B_PRESSED              = 0x2000
         this.INPUT_Z_DOWN                 = 0x4000
-        this.INPUT_Z_PRESSED              = 0x8000
+        this.INPUT_Z_PRESSED = 0x8000
+
+        this.GROUND_STEP_LEFT_GROUND              = 0
+        this.GROUND_STEP_NONE                     = 1
+        this.GROUND_STEP_HIT_WALL                 = 2
+        this.GROUND_STEP_HIT_WALL_STOP_QSTEPS     = 2
+        this.GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS = 3
+
+        this.PARTICLE_DUST                 /* 0x00000001 */ = (1 << 0)
+        this.PARTICLE_VERTICAL_STAR        /* 0x00000002 */ = (1 << 1)
+        this.PARTICLE_2                    /* 0x00000004 */ = (1 << 2)
+        this.PARTICLE_SPARKLES             /* 0x00000008 */ = (1 << 3)
+        this.PARTICLE_HORIZONTAL_STAR      /* 0x00000010 */ = (1 << 4)
+        this.PARTICLE_BUBBLE               /* 0x00000020 */ = (1 << 5)
+        this.PARTICLE_WATER_SPLASH         /* 0x00000040 */ = (1 << 6)
+        this.PARTICLE_IDLE_WATER_WAVE      /* 0x00000080 */ = (1 << 7)
+        this.PARTICLE_SHALLOW_WATER_WAVE   /* 0x00000100 */ = (1 << 8)
+        this.PARTICLE_PLUNGE_BUBBLE        /* 0x00000200 */ = (1 << 9)
+        this.PARTICLE_WAVE_TRAIL           /* 0x00000400 */ = (1 << 10)
+        this.PARTICLE_FIRE                 /* 0x00000800 */ = (1 << 11)
+        this.PARTICLE_SHALLOW_WATER_SPLASH /* 0x00001000 */ = (1 << 12)
+        this.PARTICLE_LEAF                 /* 0x00002000 */ = (1 << 13)
+        this.PARTICLE_SNOW                 /* 0x00004000 */ = (1 << 14)
+        this.PARTICLE_DIRT                 /* 0x00008000 */ = (1 << 15)
+        this.PARTICLE_MIST_CIRCLE          /* 0x00010000 */ = (1 << 16)
+        this.PARTICLE_BREATH               /* 0x00020000 */ = (1 << 17)
+        this.PARTICLE_TRIANGLE             /* 0x00040000 */ = (1 << 18)
+        this.PARTICLE_19                   /* 0x00080000 */ = (1 << 19)
 
         this.INT_STATUS_HOOT_GRABBED_BY_MARIO = (1 <<  0) /* 0x00000001 */
         this.INT_STATUS_MARIO_UNK1            = (1 <<  1) /* 0x00000002 */
@@ -148,6 +210,43 @@ class Mario {
 
     }
 
+    set_mario_action(m, action, actionArg) {
+        switch (action & this.ACT_GROUP_MASK) {
+            case this.ACT_GROUP_MOVING:
+                action = this.set_mario_action_moving(m, action, actionArg); break
+        }
+
+        m.flags &= ~(this.MARIO_ACTION_SOUND_PLAYED | this.MARIO_MARIO_SOUND_PLAYED)
+
+        m.prevAction = m.action
+        m.action = action
+        m.actionArg = actionArg
+        m.actionState = 0
+        m.actionTimer = 0
+
+        return 1
+    }
+
+    set_mario_action_moving(m, action, actionArg) {
+        const floorClass = this.mario_get_floor_class(m)
+        const forwardVel = m.forwardVel
+        const mag = Math.min(m.intendedMag, 8.0)
+
+        switch (action) {
+            case this.ACT_WALKING:
+                if (floorClass != this.SURFACE_CLASS_VERY_SLIPPERY) {
+                    if (0.0 <= forwardVel && forwardVel < mag) {
+                        m.forwardVel = mag
+                    }
+                }
+
+                m.marioObj.oMarioWalkingPitch = 0
+                break
+        }
+
+        return action
+    }
+
     set_mario_animation(m, targetAnimID) {
         const o = m.marioObj
         m.animation.targetAnim = m.animation.animList[targetAnimID]
@@ -168,7 +267,37 @@ class Mario {
                 }
             }
         }
+
+        return o.header.gfx.unk38.animFrame
         
+    }
+
+    set_mario_anim_with_accel(m, targetAnimID, accel) {
+        const o = m.marioObj
+        m.animation.targetAnim = m.animation.animList[targetAnimID]
+
+        if (o.header.gfx.unk38.animID != targetAnimID) {
+            o.header.gfx.unk38.animID = targetAnimID
+            o.header.gfx.unk38.curAnim = m.animation.targetAnim
+            o.header.gfx.unk38.animYTrans = m.unkB0
+
+            if (m.animation.targetAnim.flags & this.ANIM_FLAG_2) {
+                o.header.gfx.unk38.animFrameAccelAssist = (m.animation.targetAnim << 0x10)
+            } else {
+                if (m.animation.targetAnim.flags & this.ANIM_FLAG_FORWARD) {
+                    o.header.gfx.unk38.animFrameAccelAssist = (m.animation.targetAnim << 0x10) + accel
+                } else {
+                    o.header.gfx.unk38.animFrameAccelAssist = (m.animation.targetAnim << 0x10) - accel
+                }
+            }
+
+            o.header.gfx.unk38.animFrame = (o.header.gfx.unk38.animFrameAccelAssist >> 0x10)
+        }
+
+        o.header.gfx.unk38.animAccel = accel
+
+        return o.header.gfx.unk38.animFrame
+
     }
 
     is_anim_at_end(m) {
@@ -179,19 +308,45 @@ class Mario {
     execute_mario_action() {
         if (LevelUpdate.gMarioState.action) {
             LevelUpdate.gMarioState.marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
-
             this.update_mario_inputs(LevelUpdate.gMarioState)
 
-            mario_execute_stationary_action(LevelUpdate.gMarioState)
+            let inLoop = 1
+
+            while (inLoop) {
+                switch (LevelUpdate.gMarioState.action & this.ACT_GROUP_MASK) {
+                    case this.ACT_GROUP_STATIONARY:
+                        inLoop = mario_execute_stationary_action(LevelUpdate.gMarioState); break
+
+                    case this.ACT_GROUP_MOVING:
+                        inLoop = mario_execute_moving_action(LevelUpdate.gMarioState); break
+
+                    default: throw "unkown action group"
+                }
+            }
+
 
             LevelUpdate.gMarioState.marioObj.oInteractStatus = 0
         }
     }
 
+    update_mario_joystick_inputs(m) {
+        const mag = window.playerInput.stickMag
+
+        m.intendedMag = mag / 2.0
+
+        if (m.intendedMag > 0.0) {
+            m.intendedYaw = atan2s(-window.playerInput.stickY, window.playerInput.stickX) + m.area.camera.yaw
+            m.input |= this.INPUT_NONZERO_ANALOG
+        } else {
+            m.intendedYaw = m.faceAngle[1]
+        }
+
+    }
+
     update_mario_geometry_inputs(m) {
         if (!m.floor) {
             m.pos = [ ...m.marioObj.header.gfx.pos ]
-            m.floorHeight = SurfaceCollision.find_floor(m)
+            m.floorHeight = SurfaceCollision.find_floor(m.pos[0], m.pos[1], m.pos[2], m)
         }
 
         m.ceilHeight = 20000.0 //vec3f_find_ceil(&m->pos[0], m->floorHeight, &m->ceil);
@@ -309,6 +464,7 @@ class Mario {
         m.collidedObjInteractTypes = m.marioObj.collidedObjInteractTypes
         m.flags &= 0xFFFFFF
 
+        this.update_mario_joystick_inputs(m)
         this.update_mario_geometry_inputs(m)
 
         if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) { 

@@ -205,6 +205,12 @@ class LevelCommands {
             this.sCurrAreaIndex = areaIndex
             screnArea.areaIndex = areaIndex
             Area.gAreas[areaIndex].geometryLayoutData = screnArea
+
+            if (screnArea.views[0]) {
+                Area.gAreas[areaIndex].camera = screnArea.views[0].config.camera
+            } else {
+                Area.gAreas[areaIndex].camera = null
+            }
             
         }
         this.sCurrentScript.index++

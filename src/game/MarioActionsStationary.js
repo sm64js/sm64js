@@ -1,4 +1,5 @@
 import { MarioInstance as Mario } from "./Mario"
+import { stationary_ground_step } from "./MarioStep"
 
 const check_common_idle_cancels = (m) => {
 
@@ -34,8 +35,20 @@ const act_idle = (m) => {
         }
     }
 
-    // stationary_ground_step(m) seems like probably not needed until want to make him walk
+    stationary_ground_step(m)
 
+    return 0
+}
+
+const stopping_step = (m, animId, action) => {
+    stationary_ground_step(m)
+    Mario.set_mario_animation(m, animId)
+    if (Mario.is_anim_at_end(m)) Mario.set_mario_action(m, action, 0)
+}
+
+const act_braking_stop = (m) => {
+
+    stopping_step(m, Mario.MARIO_ANIM_STOP_SKID, Mario.ACT_IDLE)
     return 0
 }
 
@@ -43,6 +56,7 @@ export const mario_execute_stationary_action = (m) => {
 
     switch (m.action) {
         case Mario.ACT_IDLE: return act_idle(m)
-        default: throw "unkown action stationary"
+        case Mario.ACT_BRAKING_STOP: return act_braking_stop(m)
+        default: throw "unkown action stationary--"
     }
 }

@@ -64,8 +64,10 @@ class Camera {
 
     update_graph_node_camera(graphNode) {
         // graphNode.myDemoAngle += 0.02
-        graphNode.pos[0] = (Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius) - 1328.0
-        graphNode.pos[2] = (Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius) + 4664.0
+        graphNode.pos[0] = (Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius) + LevelUpdate.gMarioState.pos[0]
+        graphNode.pos[2] = (Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius) + LevelUpdate.gMarioState.pos[2]
+
+        graphNode.focus = [ ...LevelUpdate.gMarioState.pos ]
     }
 
     geo_camera_main(callContext, graphNode) {

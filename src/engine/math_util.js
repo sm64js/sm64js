@@ -1,3 +1,19 @@
+export const approach_number = (current, target, inc, dec) => {
+    if (current < target) {
+        current += inc
+        if (current > target) {
+            current = target
+        }
+    } else {
+        current -= dec
+        if (current < target) {
+            current = target
+        }
+    }
+    return current
+}
+
+
 export const mtxf_identity = (mtx) => {
     for (let i = 0; i < mtx.length; i++) {
         for (let j = 0; j < mtx[i].length; j++) {

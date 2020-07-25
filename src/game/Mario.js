@@ -42,6 +42,10 @@ class Mario {
         this.MARIO_ANIM_IDLE_HEAD_CENTER = 0xC5
         this.MARIO_ANIM_WALKING = 0x48
         this.MARIO_ANIM_RUNNING = 0x72
+        this.MARIO_ANIM_SKID_ON_GROUND = 0x0F
+        this.MARIO_ANIM_STOP_SKID = 0x10
+        this.MARIO_ANIM_TURNING_PART1 = 0xBC
+        this.MARIO_ANIM_TURNING_PART2 = 0xBD
 
         this.MARIO_NORMAL_CAP          =  0x00000001
         this.MARIO_VANISH_CAP          =  0x00000002
@@ -74,6 +78,11 @@ class Mario {
 
         this.ACT_IDLE = 0x0C400201 
         this.ACT_WALKING = 0x04000440
+        this.ACT_DECELERATING = 0x0400044A 
+        this.ACT_BRAKING      = 0x04000445 
+        this.ACT_BRAKING_STOP = 0x0C00023D
+        this.ACT_TURNING_AROUND          =   0x00000443 
+        this.ACT_FINISH_TURNING_AROUND   =   0x00000444 
 
         this.ACT_FLAG_STATIONARY                  = (1 << 9)
         this.ACT_FLAG_MOVING                      = (1 << 10)
@@ -210,7 +219,26 @@ class Mario {
 
     }
 
+    set_forward_vel(m, forwardVel) {
+        m.forwardVel = forwardVel
+
+        m.slideVelX = m.forwardVel * Math.sin(m.faceAngle[1] / 0x8000 * Math.PI)
+        m.slideVelZ = m.forwardVel * Math.cos(m.faceAngle[1] / 0x8000 * Math.PI)
+
+        m.vel[0] = m.slideVelX
+        m.vel[2] = m.slideVelZ
+    }
+
+    check_common_action_exits(m) {
+        if (m.input & this.INPUT_NONZERO_ANALOG) {
+            return this.set_mario_action(m, this.ACT_WALKING, 0)
+        }
+
+        return 0
+    }
+
     set_mario_action(m, action, actionArg) {
+
         switch (action & this.ACT_GROUP_MASK) {
             case this.ACT_GROUP_MOVING:
                 action = this.set_mario_action_moving(m, action, actionArg); break
@@ -250,6 +278,8 @@ class Mario {
     set_mario_animation(m, targetAnimID) {
         const o = m.marioObj
         m.animation.targetAnim = m.animation.animList[targetAnimID]
+
+        if (m.animation.targetAnim == undefined) throw "cant find animation"
 
         if (o.header.gfx.unk38.animID != targetAnimID) {
             o.header.gfx.unk38.animID = targetAnimID

@@ -33,3 +33,15 @@ export const perform_ground_step = (m) => {
 
     return stepResult
 }
+
+export const stationary_ground_step = (m) => {
+
+    Mario.set_forward_vel(m, 0.0)
+
+    m.pos[1] = m.floorHeight
+
+    m.marioObj.header.gfx.pos = [...m.pos]
+    m.marioObj.header.gfx.angle = [0, m.faceAngle[1], 0]
+
+    return 0
+}

@@ -6,13 +6,35 @@
 ## What is this?
 This is a work in progress port of the decompilation of the original Nintendo game, Super Mario 64, to native Javascript (No Emulation) (No Web Assembly). This project also required creating a Javascript WebGL port of N64 Fast 3D Renderer originally implemented with OpenGL in C.
 
-## Basic Instructions - TODO
-Use yarn or npm to install modules
+## Build instructions - Windows, Mac, or Linux
 
-npm run start or yarn start to launch dev server
-npm run build or yarn build to build production code
+### First install Docker
+* Windows - [Install Instructions](https://docs.docker.com/docker-for-windows/install-windows-home/)
+* Mac - [Install Instructions](https://docs.docker.com/docker-for-mac/install/)
+* Linux - [Install Instructions](https://docs.docker.com/engine/install/#server)
 
-node serveProduction.js - tool to simply serve the front end code
+### Run these commands
+```bash
+# Create and start lightweight docker container with NodeJs
+docker run --name mySm64JsServer -dp 80:80 node:13-alpine tail -f /dev/null
+# Connect to the docker container's shell
+docker exec -it mySm64JsServer /bin/sh
+
+# Install additional prerequisites
+apk update && apk add gcc libc-dev python3 bash git
+# Clone the source code
+git clone https://github.com/sm64js/sm64js.git && cd sm64js
+# Compile ROM extraction tools written in C
+gcc -I extractTools -DMIO0_STANDALONE extractTools/libmio0.c -o extractTools/mio0
+gcc -I extractTools -DN64GRAPHICS_STANDALONE extractTools/n64graphics.c extractTools/utils.c -o extractTools/n64graphics
+# Install node packages
+npm install
+# Compile and package javascript, css, html components
+npm run build
+# Start the web server
+npm run serveProduction
+```
+You should now be able to access the website with the game from a web browser by typing "localhost" into the address bar
 
 
 ### Related Projects

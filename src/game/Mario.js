@@ -383,6 +383,8 @@ const update_mario_joystick_inputs = (m, playerInput) => {
         m.intendedYaw = m.faceAngle[1]
     }
 
+    m.intendedYaw = m.intendedYaw > 32767 ? m.intendedYaw - 65536 : m.intendedYaw
+    m.intendedYaw = m.intendedYaw < -32768 ? m.intendedYaw + 65536 : m.intendedYaw
 }
 
 const update_mario_geometry_inputs = (m) => {

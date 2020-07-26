@@ -1,6 +1,6 @@
 import "./template.css"
-import * as Keydrown from "./keydrown.min.js"
 import { GameInstance as Game } from "./game/Game"
+import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
 
 const send_display_list = (gfx_list) => {
@@ -33,7 +33,7 @@ const runGameWithMetrics = () => {
     const elapsed = performance.now() - last_frame_start
     if (elapsed > frameSpeed) {
 
-        playerInputUpdate()
+        playerInputUpdate() /// Keyboard buttons / joystick process to game input commands
 
         const start_frame = performance.now()
         last_frame_start = start_frame - (elapsed % frameSpeed)
@@ -56,38 +56,6 @@ const main_func = () => {
 }
 
 
-/////// Keyboard / Gamepad Input ////////
-
-window.keyboardButtons = { w: false, a: false, s: false, d: false }
-
-Keydrown.W.down(() => { window.keyboardButtons.w = true })
-Keydrown.A.down(() => { window.keyboardButtons.a = true })
-Keydrown.S.down(() => { window.keyboardButtons.s = true })
-Keydrown.D.down(() => { window.keyboardButtons.d = true })
-
-Keydrown.W.up(() => { window.keyboardButtons.w = false })
-Keydrown.A.up(() => { window.keyboardButtons.a = false })
-Keydrown.S.up(() => { window.keyboardButtons.s = false })
-Keydrown.D.up(() => { window.keyboardButtons.d = false })
-
-const playerInputUpdate = () => {
-    Keydrown.tick()
-
-    let stickX = 0, stickY = 0
-
-    if (window.keyboardButtons.d) stickX += 1
-    if (window.keyboardButtons.a) stickX -= 1
-
-    if (window.keyboardButtons.w) stickY += 1
-    if (window.keyboardButtons.s) stickY -= 1
-
-    const mag = Math.sqrt((stickX * stickX) + (stickY * stickY))
-    const ratio = mag > 0 ? (64 / mag) : 0
-    stickX *= ratio
-    stickY *= ratio
-
-    window.playerInput = { stickX, stickY, stickMag: mag * ratio }
-}
 
 //////////////////// Some more website stuff
 

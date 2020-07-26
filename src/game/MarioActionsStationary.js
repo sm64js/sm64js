@@ -1,4 +1,4 @@
-import { MarioInstance as Mario } from "./Mario"
+import * as Mario from "./Mario"
 import { stationary_ground_step } from "./MarioStep"
 
 const check_common_idle_cancels = (m) => {

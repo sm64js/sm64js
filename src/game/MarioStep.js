@@ -1,5 +1,5 @@
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
-import { MarioInstance as Mario } from "./Mario"
+import * as Mario from "./Mario"
 
 const perform_ground_quarter_step = (m, nextPos) => {
 

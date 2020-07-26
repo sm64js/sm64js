@@ -2,7 +2,7 @@ import { CameraInstance } from "../game/Camera"
 import { G_CC_DECALRGB } from "../include/gbi"
 import { GeoLayoutInstance as GeoLayout } from "./GeoLayout"
 import { GeoRendererInstance as GeoRenderer } from "./GeoRenderer"
-import { MarioInstance as Mario } from "../game/Mario"
+import * as Mario from "../game/Mario"
 
 export const GRAPH_RENDER_ACTIVE = (1 << 0)
 export const GRAPH_RENDER_CHILDREN_FIRST = (1 << 1)

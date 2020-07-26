@@ -1,4 +1,4 @@
-import { MarioInstance as Mario } from "./Mario"
+import * as Mario from "./Mario"
 import { SURFACE_SLOW } from "../include/surface_terrains"
 import { perform_ground_step } from "./MarioStep"
 import { approach_number } from "../engine/math_util"

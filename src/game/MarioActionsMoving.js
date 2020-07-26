@@ -125,7 +125,9 @@ const begin_braking_action = (m) => {
 }
 
 const analog_stick_held_back = (m) => {
-    let intendedDYaw = parseInt(m.intendedYaw) - parseInt(m.faceAngle[1])
+    let intendedDYaw = m.intendedYaw - m.faceAngle[1]
+    intendedDYaw = intendedDYaw > 32767 ? intendedDYaw - 65536 : intendedDYaw
+    intendedDYaw = intendedDYaw < -32768 ? intendedDYaw + 65536 : intendedDYaw
     return intendedDYaw < -0x471C || intendedDYaw > 0x471C
 }
 

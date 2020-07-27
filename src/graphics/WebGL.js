@@ -259,11 +259,6 @@ export class WebGL {
         const vertex_shader = this.createShader(this.gl, vs_buf, this.gl.VERTEX_SHADER)
         const fragment_shader = this.createShader(this.gl, fs_buf, this.gl.FRAGMENT_SHADER)
 
-/*        if (shader_id == 1361) {
-            console.log(vs_buf)
-            console.log(fs_buf)
-        }*/
-
         const shader_program = this.gl.createProgram()
         this.gl.attachShader(shader_program, vertex_shader)
         this.gl.attachShader(shader_program, fragment_shader)

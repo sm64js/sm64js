@@ -10,12 +10,14 @@ window.addEventListener("keydown", (e) => {
     }
 }, false)
 
-const keyboardButtons = { w: false, a: false, s: false, d: false, up: false, down: false, left: false, right: false }
+const keyboardButtons = { w: false, a: false, s: false, d: false, up: false, down: false, left: false, right: false, space: false }
 
 Keydrown.W.down(() => { keyboardButtons.w = true })
 Keydrown.A.down(() => { keyboardButtons.a = true })
 Keydrown.S.down(() => { keyboardButtons.s = true })
 Keydrown.D.down(() => { keyboardButtons.d = true })
+
+Keydrown.SPACE.down(() => { keyboardButtons.space = true })
 
 Keydrown.UP.down(() => { keyboardButtons.up = true })
 Keydrown.DOWN.down(() => { keyboardButtons.down = true })
@@ -26,6 +28,8 @@ Keydrown.W.up(() => { keyboardButtons.w = false })
 Keydrown.A.up(() => { keyboardButtons.a = false })
 Keydrown.S.up(() => { keyboardButtons.s = false })
 Keydrown.D.up(() => { keyboardButtons.d = false })
+
+Keydrown.SPACE.up(() => { keyboardButtons.space = false })
 
 Keydrown.UP.up(() => { keyboardButtons.up = false })
 Keydrown.DOWN.up(() => { keyboardButtons.down = false })
@@ -48,7 +52,12 @@ export const playerInputUpdate = () => {
     stickX *= ratio
     stickY *= ratio
 
-    window.playerInput = { stickX, stickY, stickMag: mag * ratio }
+    window.playerInput = {
+        stickX, stickY,
+        stickMag: mag * ratio,
+        buttonPressedA: keyboardButtons.space && !window.playerInput.buttonDownA,
+        buttonDownA: keyboardButtons.space
+    }
 
     //// Repeat for other player
     stickX = 0, stickY = 0

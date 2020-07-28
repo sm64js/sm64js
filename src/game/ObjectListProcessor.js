@@ -90,41 +90,6 @@ class ObjectListProcessor {
             return newObjectNode
         })
 
-/*        this.gObjectPool = new Array(this.OBJECT_POOL_CAPACITY).fill(0).map(() => {
-
-            const newObject = {
-                activeFlags: 0,
-                header: {  //ObjectNode
-                    next: null, prev: null,
-                    gfx: {  //GraphObjectNode
-                        node: { //GraphNode
-                            type: null,
-                            flags: null,
-                            prev: null,
-                            next: null,
-                            children: null,
-                            wrapper: null,
-                        }, 
-                        sharedChild: { //GraphNode
-                            type: null,
-                            flags: null,
-                            prev: null,
-                            next: null,
-                            children: null
-                        },
-                        wrapperObjectNode: null
-                    },
-                    wrapperObject: null
-                }
-            }
-
-            newObject.header.wrapperObject = newObject
-            newObject.header.gfx.wrapperObjectNode = newObject.header
-            newObject.header.gfx.node.wrapper = newObject.header.gfx
-
-            return newObject
-
-        })*/
     }
 
     update_objects() {
@@ -254,12 +219,6 @@ class ObjectListProcessor {
     clear_objects() {
 
         Spawn.clear_object_lists()
-
-/*        for (let i = 0; i < this.OBJECT_POOL_CAPACITY; i++) {
-            this.gObjectPool[i].activeFlags = ACTIVE_FLAGS_DEACTIVATED
-            this.gObjectPool[i].header.gfx = GraphNode.geo_reset_object_node(this.gObjectPool[i].header.gfx)
-            this.gObjectPool[i].header.gfx.wrapperObjectNode = this.gObjectPool[i].header
-        }*/
 
     }
 }

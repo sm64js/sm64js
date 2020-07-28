@@ -350,17 +350,7 @@ class GeoRenderer {
             node.wrapper.sharedChild.parent = node //temparaily assigining itself as parent
             if (node.wrapper.sharedChild.children[0]) {
 
-/*                node.wrapper.sharedChild.children[0].prev = null
-                node.wrapper.sharedChild.children[0].next = null
-                node.wrapper.sharedChild.children[0].parent = null
-
-                node.wrapper.sharedChild.children[0].wrapper.wrapperObjectNode.wrapperObject.parentObj = null
-                node.wrapper.sharedChild.children[0].wrapper.sharedChild.next = null
-                node.wrapper.sharedChild.children[0].wrapper.sharedChild.prev = null
-                node.wrapper.sharedChild.children[0].wrapper.sharedChild.wrapper.node = null*/
-
-                this.geo_process_single_node(node.wrapper.sharedChild.children[0])
-                this.geo_process_single_node(node.wrapper.sharedChild.children[1])
+                this.geo_process_node_and_siblings(node.wrapper.sharedChild.children)
 
             }
             else throw "objectParent sharedChild has no children"

@@ -16,7 +16,7 @@ const WARP_TYPE_SAME_AREA = 3
 
 class LevelUpdate {
     constructor() {
-        this.gMarioState = new Array(2).fill(0).map(() => {
+        this.gMarioState = new Array(1).fill(0).map(() => {
             return {
                 unk00: 0, input: 0, flags: 0, particleFlags: 0, action: 0,
                 prevAction: 0, terrainsoundAddend: 0, actionState: 0, actionTimer: 0,

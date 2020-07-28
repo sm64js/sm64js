@@ -51,9 +51,9 @@ class Area {
         if (this.gCurrentArea.index == this.gMarioSpawnInfo.areaIndex) {
             this.gCurrentArea.flags |= 0x01
             ObjectListProc.spawn_objects_from_info(this.gMarioSpawnInfo)
-            const marioCloneSpawnInfo = this.gMarioSpawnInfo
+/*            const marioCloneSpawnInfo = this.gMarioSpawnInfo
             marioCloneSpawnInfo.startPos[0] -= 500
-            ObjectListProc.spawn_objects_from_info(marioCloneSpawnInfo)
+            ObjectListProc.spawn_objects_from_info(marioCloneSpawnInfo)*/
         }
     }
 

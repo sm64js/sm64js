@@ -3,6 +3,10 @@ import { stationary_ground_step } from "./MarioStep"
 
 const check_common_idle_cancels = (m) => {
 
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        return Mario.set_jumping_action(m, Mario.ACT_JUMP, 0)
+    }
+
     if (m.input & Mario.INPUT_NONZERO_ANALOG) {
 
         m.faceAngle[1] = m.intendedYaw

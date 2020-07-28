@@ -10,6 +10,7 @@ import { atan2s } from "../engine/math_util"
 import { mario_execute_stationary_action } from "./MarioActionsStationary"
 import { gMarioAnimData } from "../actors/mario/marioAnimData"
 import { mario_execute_moving_action } from "./MarioActionsMoving"
+import { mario_execute_airborne_action } from "./MarioActionsAirborne"
 
 
 ////// Mario Constants
@@ -45,6 +46,7 @@ export const MARIO_ANIM_SKID_ON_GROUND = 0x0F
 export const MARIO_ANIM_STOP_SKID = 0x10
 export const MARIO_ANIM_TURNING_PART1 = 0xBC
 export const MARIO_ANIM_TURNING_PART2 = 0xBD
+export const MARIO_ANIM_SINGLE_JUMP = 0x4D
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -83,6 +85,12 @@ export const ACT_BRAKING_STOP = 0x0C00023D
 export const ACT_TURNING_AROUND = 0x00000443
 export const ACT_FINISH_TURNING_AROUND = 0x00000444
 export const ACT_CRAWLING = 0x04008448
+export const ACT_JUMP = 0x03000880
+export const ACT_JUMP_LAND = 0x04000470
+
+export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
+export const AIR_STEP_CHECK_HANG = 0x00000002
+
 
 export const ACT_FLAG_STATIONARY = (1 << 9)
 export const ACT_FLAG_MOVING = (1 << 10)
@@ -169,8 +177,6 @@ export const INT_STATUS_STOP_RIDING = (1 << 22) /* 0x00400000 */
 export const INT_STATUS_TOUCHED_BOB_OMB = (1 << 23) /* 0x00800000 */
 
 
-
-
 export const init_marios = () => {
 
     if (LevelUpdate.gMarioState.length != ObjectListProcessor.gMarioObject.length)
@@ -240,6 +246,10 @@ export const set_forward_vel = (m, forwardVel) => {
     m.vel[2] = m.slideVelZ
 }
 
+export const set_mario_y_vel_based_on_fspeed = (m, initialVelY, multiplier) => {
+    m.vel[1] = initialVelY + (m.forwardVel * multiplier)
+}
+
 export const check_common_action_exits = (m) => {
     if (m.input & INPUT_NONZERO_ANALOG) {
         return set_mario_action(m, ACT_WALKING, 0)
@@ -248,11 +258,18 @@ export const check_common_action_exits = (m) => {
     return 0
 }
 
+export const set_jumping_action = (m, action, actionArg) => {
+    set_mario_action(m, action, actionArg)
+    return 1
+}
+
 export const set_mario_action = (m, action, actionArg) => {
 
     switch (action & ACT_GROUP_MASK) {
         case ACT_GROUP_MOVING:
             action = set_mario_action_moving(m, action, actionArg); break
+        case ACT_GROUP_AIRBORNE:
+            action = set_mario_action_airborne(m, action, actionArg); break
     }
 
     m.flags &= ~(MARIO_ACTION_SOUND_PLAYED | MARIO_MARIO_SOUND_PLAYED)
@@ -264,6 +281,21 @@ export const set_mario_action = (m, action, actionArg) => {
     m.actionTimer = 0
 
     return 1
+}
+
+export const set_mario_action_airborne = (m, action, actionArg) => {
+    switch (action) {
+        case ACT_JUMP:
+            m.marioObj.header.gfx.unk38.animID = -1
+            set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
+            m.forwardVel *= 0.8
+            break
+    }
+
+    m.peakHeight = m.pos[1]
+    m.flags |= MARIO_UNKNOWN_08
+
+    return action
 }
 
 export const set_mario_action_moving = (m, action, actionArg) => {
@@ -361,6 +393,9 @@ export const execute_mario_action = (marioIndex) => {
                 case ACT_GROUP_MOVING:
                     inLoop = mario_execute_moving_action(LevelUpdate.gMarioState[marioIndex]); break
 
+                case ACT_GROUP_AIRBORNE:
+                    inLoop = mario_execute_airborne_action(LevelUpdate.gMarioState[marioIndex]); break
+
                 default: throw "unkown action group"
             }
         }
@@ -368,6 +403,11 @@ export const execute_mario_action = (marioIndex) => {
 
         LevelUpdate.gMarioState[marioIndex].marioObj.oInteractStatus = 0
     }
+}
+
+const update_mario_button_inputs = (m, playerInput) => {
+    if (playerInput.buttonPressedA) m.input |= INPUT_A_PRESSED
+    if (playerInput.buttonDownA) m.input |= INPUT_A_DOWN
 }
 
 const update_mario_joystick_inputs = (m, playerInput) => {
@@ -508,7 +548,10 @@ const update_mario_inputs = (m) => {
     m.collidedObjInteractTypes = m.marioObj.collidedObjInteractTypes
     m.flags &= 0xFFFFFF
 
-    if (m.marioObj.OG) update_mario_joystick_inputs(m, window.playerInput)
+    if (m.marioObj.OG) {
+        update_mario_joystick_inputs(m, window.playerInput)
+        update_mario_button_inputs(m, window.playerInput)
+    }
     else update_mario_joystick_inputs(m, window.playerInput2)
 
     update_mario_geometry_inputs(m)

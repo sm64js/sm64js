@@ -1,7 +1,12 @@
-import { MarioInstance as Mario } from "./Mario"
+import * as Mario from "./Mario"
 import { stationary_ground_step } from "./MarioStep"
+import { StartGroup } from "../goddard/dynlists/dynlist_macros"
 
 const check_common_idle_cancels = (m) => {
+
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        return Mario.set_jumping_action(m, Mario.ACT_JUMP, 0)
+    }
 
     if (m.input & Mario.INPUT_NONZERO_ANALOG) {
 
@@ -52,11 +57,26 @@ const act_braking_stop = (m) => {
     return 0
 }
 
+
+const landing_step = (m, arg1, action) => {
+    stationary_ground_step(m)
+    Mario.set_mario_animation(m, arg1)
+    if (Mario.is_anim_at_end(m)) return Mario.set_mario_action(m, action, 0)
+    return 0
+}
+
+const act_jump_land_stop = (m) => {
+
+    landing_step(m, Mario.MARIO_ANIM_LAND_FROM_SINGLE_JUMP, Mario.ACT_IDLE)
+    return 0
+}
+
 export const mario_execute_stationary_action = (m) => {
 
     switch (m.action) {
         case Mario.ACT_IDLE: return act_idle(m)
         case Mario.ACT_BRAKING_STOP: return act_braking_stop(m)
-        default: throw "unkown action stationary--"
+        case Mario.ACT_JUMP_LAND_STOP: return act_jump_land_stop(m)
+        default: throw "unkown action stationary"
     }
 }

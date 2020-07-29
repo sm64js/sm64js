@@ -3,7 +3,7 @@ import * as MathUtil from "./math_util"
 import { GameInstance as Game } from "../game/Game"
 import * as Gbi from "../include/gbi"
 import { CameraInstance as Camera } from "../game/Camera"
-import { MarioInstance as Mario } from "../game/Mario"
+import * as Mario from "../game/Mario"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -348,7 +348,11 @@ class GeoRenderer {
         if (node.wrapper.sharedChild) {
 
             node.wrapper.sharedChild.parent = node //temparaily assigining itself as parent
-            if (node.wrapper.sharedChild.children[0]) this.geo_process_node_and_siblings(node.wrapper.sharedChild.children)
+            if (node.wrapper.sharedChild.children[0]) {
+
+                this.geo_process_node_and_siblings(node.wrapper.sharedChild.children)
+
+            }
             else throw "objectParent sharedChild has no children"
             node.wrapper.sharedChild.parent = null
         }

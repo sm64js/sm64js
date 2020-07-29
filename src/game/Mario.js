@@ -46,6 +46,7 @@ export const MARIO_ANIM_SKID_ON_GROUND = 0x0F
 export const MARIO_ANIM_STOP_SKID = 0x10
 export const MARIO_ANIM_TURNING_PART1 = 0xBC
 export const MARIO_ANIM_TURNING_PART2 = 0xBD
+export const MARIO_ANIM_LAND_FROM_SINGLE_JUMP = 0x4E
 export const MARIO_ANIM_SINGLE_JUMP = 0x4D
 
 export const MARIO_NORMAL_CAP = 0x00000001
@@ -87,9 +88,19 @@ export const ACT_FINISH_TURNING_AROUND = 0x00000444
 export const ACT_CRAWLING = 0x04008448
 export const ACT_JUMP = 0x03000880
 export const ACT_JUMP_LAND = 0x04000470
+export const ACT_FREEFALL       = 0x0100088C
+export const ACT_DOUBLE_JUMP    = 0x03000881
+export const ACT_JUMP_LAND_STOP = 0x0C000230
+export const ACT_BEGIN_SLIDING = 0x00000050
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
+export const AIR_STEP_NONE            =  0
+export const AIR_STEP_LANDED          =  1
+export const AIR_STEP_HIT_WALL        =  2
+export const AIR_STEP_GRABBED_LEDGE   =  3
+export const AIR_STEP_GRABBED_CEILING =  4
+export const AIR_STEP_HIT_LAVA_WALL   =  6
 
 
 export const ACT_FLAG_STATIONARY = (1 << 9)
@@ -175,6 +186,17 @@ export const INT_STATUS_TRAP_TURN = (1 << 20) /* 0x00100000 */
 export const INT_STATUS_HIT_MINE = (1 << 21) /* 0x00200000 */
 export const INT_STATUS_STOP_RIDING = (1 << 22) /* 0x00400000 */
 export const INT_STATUS_TOUCHED_BOB_OMB = (1 << 23) /* 0x00800000 */
+
+
+export const sJumpLandAction = {
+    numFrames: 4,
+    unk02: 5,
+    verySteepAction: ACT_FREEFALL,
+    endAction: ACT_JUMP_LAND_STOP,
+    aPressedAction: ACT_DOUBLE_JUMP,
+    offFloorAction: ACT_FREEFALL,
+    slideAction: ACT_BEGIN_SLIDING
+}
 
 
 export const init_marios = () => {
@@ -492,6 +514,36 @@ export const mario_floor_is_slippery = (m) => {
             break
     }
     
+    return m.floor.normal.y <= normY
+}
+
+export const mario_floor_is_slope = (m) => {
+    let normY
+
+    if ((m.area.terrainType & SurfaceTerrains.TERRAIN_MASK) == SurfaceTerrains.TERRAIN_SLIDE
+        && m.floor.normal.y < 0.9998477 //~cos(1 deg)
+    ) {
+        return true
+    }
+
+    switch (mario_get_floor_class(m)) {
+        case SurfaceTerrains.SURFACE_VERY_SLIPPERY:
+            normY = 0.9961947 //~cos(10 deg)
+            break
+
+        case SurfaceTerrains.SURFACE_SLIPPERY:
+            normY = 0.9848077 //~cos(20 deg)
+            break
+
+        default:
+            normY = 0.9659258 //~cos(38 deg)
+            break
+
+        case SurfaceTerrains.SURFACE_NOT_SLIPPERY:
+            normY = 0.9396926
+            break
+    }
+
     return m.floor.normal.y <= normY
 }
 

@@ -1,7 +1,22 @@
 import * as Mario from "./Mario"
+import { perform_air_step } from "./MarioStep"
+
 
 export const common_air_action_step = (m, landAction, animation, stepArg) => {
-    throw "common air action step"
+    ///TODO add this, this moves mario slightly while in air by joystick
+    //update_air_without_turn(m)
+
+    const stepResult = perform_air_step(m, stepArg)
+
+    switch (stepResult) {
+        case Mario.AIR_STEP_NONE:
+            Mario.set_mario_animation(m, animation); break
+        case Mario.AIR_STEP_LANDED:
+            Mario.set_mario_action(m, landAction, 0); break
+        default: throw "unkown air step result in common_air_action_step"
+    }
+
+    return stepResult
 }
 
 export const act_jump = (m) => {

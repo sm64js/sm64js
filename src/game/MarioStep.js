@@ -76,7 +76,7 @@ const perform_ground_quarter_step = (m, nextPos) => {
     const floorWrapper = {}
     const floorHeight = SurfaceCollision.find_floor(nextPos[0], nextPos[1], nextPos[2], floorWrapper)
 
-    m.pos = [ ...nextPos ]
+    m.pos = [ nextPos[0], floorHeight, nextPos[2] ]
     m.floor = floorWrapper.floor
     m.floorHeight = floorHeight
 

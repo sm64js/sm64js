@@ -92,6 +92,7 @@ export const ACT_FREEFALL       = 0x0100088C
 export const ACT_DOUBLE_JUMP    = 0x03000881
 export const ACT_JUMP_LAND_STOP = 0x0C000230
 export const ACT_BEGIN_SLIDING = 0x00000050
+export const ACT_LONG_JUMP = 0x03000888
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -282,6 +283,16 @@ export const check_common_action_exits = (m) => {
 
 export const set_jumping_action = (m, action, actionArg) => {
     set_mario_action(m, action, actionArg)
+    return 1
+}
+
+export const set_jump_from_landing = (m) => {
+    switch (m.prevAction) {
+        default: set_mario_action(m, ACT_JUMP, 0)
+    }
+
+    m.doubleJumpTimer = 0
+
     return 1
 }
 

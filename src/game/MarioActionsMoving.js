@@ -134,6 +134,10 @@ const analog_stick_held_back = (m) => {
 
 const act_walking = (m) => {
 
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        return Mario.set_jump_from_landing(m)
+    }
+
     if (m.input & Mario.INPUT_UNKNOWN_5) {
         return begin_braking_action(m)
     }

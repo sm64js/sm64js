@@ -65,7 +65,17 @@ const landing_step = (m, arg1, action) => {
     return 0
 }
 
+const check_common_landing_cancels = (m, action) => {
+
+    if (m.input & (Mario.INPUT_NONZERO_ANALOG | Mario.INPUT_A_PRESSED | Mario.INPUT_OFF_FLOOR | Mario.INPUT_ABOVE_SLIDE)) {
+        return Mario.check_common_action_exits(m)
+    }
+
+    return 0
+}
+
 const act_jump_land_stop = (m) => {
+    if (check_common_landing_cancels(m, 0)) return 1
 
     landing_step(m, Mario.MARIO_ANIM_LAND_FROM_SINGLE_JUMP, Mario.ACT_IDLE)
     return 0

@@ -6,6 +6,8 @@
 "levels/intro/2_copyright.rgba16.png": [128,16,4096,{"jp":[2524448,46240],"us":[2532256,46240]}],
 "levels/intro/3_tm.rgba16.png": [16,16,512,{"jp":[2524448,50336],"us":[2532256,50336]}],
 
+"levels/castle_grounds/0.rgba16.png": [32,64,4096,{"jp":[4492416,0],"us":[4500416,0],"eu":[4374016,0],"sh":[4348384,0]}],
+
 "textures/intro_raw/mario_face_shine.ia8.png": [32,32,1024,{"jp":[2503888],"us":[2511696],"eu":[2380496],"sh":[2357264]}],
 "textures/intro_raw/red_star_0.rgba16.png": [32,32,2048,{"jp":[2457352],"us":[2465160],"eu":[2333960],"sh":[2310728]}],
 "textures/intro_raw/red_star_1.rgba16.png": [32,32,2048,{"jp":[2459400],"us":[2467208],"eu":[2336008],"sh":[2312776]}],

@@ -1,24 +1,17 @@
 import * as Gbi from "../../../../../include/gbi"
 
-export const outside_0900B000 = []
-
-export const outside_09004000 = []
-
-export const outside_09008000 = []
-
-export const outside_09009000 = []
-
-export const outside_09009800 = []
-
-export const outside_0900B400 = []
-
-export const outside_09003800 = []
-
-export const outside_09002000 = []
-
-export const outside_09004800 = []
-
-export const outside_09006800 = []
+import {
+    outside_0900B000,
+    outside_09004000,
+    outside_09008000,
+    outside_09009000,
+    outside_09009800,
+    outside_0900B400,
+    outside_09002000,
+    outside_09004800,
+    outside_09006800,
+    outside_09003800
+} from "../../../../../textures/outside"
 
 const castle_grounds_seg7_lights_07006ED8 = Gbi.gdSPDefLights1(0x66, 0x66, 0x66, 0xff, 0xff, 0xff, 0x28, 0x28, 0x28)
 

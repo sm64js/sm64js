@@ -80,10 +80,10 @@ class Camera {
         //     graphNode.pos[2] = (Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius) + 4664.0
         // }
         
-        graphNode.pos[0] = (Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius) + LevelUpdate.gMarioState.pos[0]
-        graphNode.pos[2] = (Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius) + LevelUpdate.gMarioState.pos[2]
+        graphNode.pos[0] = (Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius) + LevelUpdate.gMarioState[0].pos[0]
+        graphNode.pos[2] = (Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius) + LevelUpdate.gMarioState[0].pos[2]
 
-        graphNode.focus = [ ...LevelUpdate.gMarioState.pos ]
+        graphNode.focus = [ ...LevelUpdate.gMarioState[0].pos ]
     }
 
     geo_camera_main(callContext, graphNode) {
@@ -102,7 +102,7 @@ class Camera {
 
         return
 
-        const marioState = LevelUpdate.gMarioState
+        const marioState = LevelUpdate.gMarioState[0]
         const fovFunc = this.sFOVState.fovFunc
 
         if (callContext == GEO_CONTEXT_RENDER) {

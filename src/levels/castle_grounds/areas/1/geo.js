@@ -1,6 +1,8 @@
 import { GeoLayoutInstance as GeoLayout } from "../../../../engine/GeoLayout"
 import { CameraInstance as Camera } from "../../../../game/Camera"
 import { castle_grounds_seg7_dl_070095F0 } from "./2/model.inc"
+import { castle_grounds_seg7_dl_07006D70 } from "./1/model.inc"
+import { castle_grounds_seg7_dl_0700A860 } from "./4/model.inc"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -19,7 +21,9 @@ export const castle_grounds_geo_00073C = [
         args: [16, 0, 1500, 2500, 0, 1500, -12000, Camera.geo_camera_main]
     },
     { command: GeoLayout.open_node },
+    { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, castle_grounds_seg7_dl_07006D70] },
     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, castle_grounds_seg7_dl_070095F0] },
+    { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, castle_grounds_seg7_dl_0700A860] },
     { command: GeoLayout.node_render_object_parent },
     { command: GeoLayout.close_node },
     { command: GeoLayout.close_node },

@@ -4,7 +4,7 @@ import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import * as GraphNode from "../engine/graph_node"
 import { GeoLayoutInstance } from "../engine/GeoLayout"
 import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands"
-import { MarioInstance as Mario } from "./Mario"
+import * as Mario from "./Mario"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 
 
@@ -90,41 +90,6 @@ class ObjectListProcessor {
             return newObjectNode
         })
 
-        this.gObjectPool = new Array(this.OBJECT_POOL_CAPACITY).fill(0).map(() => {
-
-            const newObject = {
-                activeFlags: 0,
-                header: {  //ObjectNode
-                    next: null, prev: null,
-                    gfx: {  //GraphObjectNode
-                        node: { //GraphNode
-                            type: null,
-                            flags: null,
-                            prev: null,
-                            next: null,
-                            children: null,
-                            wrapper: null,
-                        }, 
-                        sharedChild: { //GraphNode
-                            type: null,
-                            flags: null,
-                            prev: null,
-                            next: null,
-                            children: null
-                        },
-                        wrapperObjectNode: null
-                    },
-                    wrapperObject: null
-                }
-            }
-
-            newObject.header.wrapperObject = newObject
-            newObject.header.gfx.wrapperObjectNode = newObject.header
-            newObject.header.gfx.node.wrapper = newObject.header.gfx
-
-            return newObject
-
-        })
     }
 
     update_objects() {
@@ -145,7 +110,7 @@ class ObjectListProcessor {
 
     update_objects_starting_at(objList, firstObj) {
         let count = 0
-        while(objList != firstObj) {
+        while (objList != firstObj) {
             this.gCurrentObject = firstObj.wrapperObject
             this.gCurrentObject.header.gfx.node.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION
             Behavior.cur_obj_update()
@@ -156,19 +121,23 @@ class ObjectListProcessor {
     }
 
     bhv_mario_update() {
-        Mario.execute_mario_action()
-        this.copy_mario_state_to_object()
+
+        const marioIndex = this.gCurrentObject.OG ? 0 : 1
+
+        Mario.execute_mario_action(marioIndex)
+        this.copy_mario_state_to_object(marioIndex)
+        
     }
 
-    copy_mario_state_to_object() {
+    copy_mario_state_to_object(marioIndex) {
         Object.assign(this.gCurrentObject, {
-            oVelX: LevelUpdate.gMarioState.vel[0],
-            oVelY: LevelUpdate.gMarioState.vel[1],
-            oVelZ: LevelUpdate.gMarioState.vel[2],
+            oVelX: LevelUpdate.gMarioState[marioIndex].vel[0],
+            oVelY: LevelUpdate.gMarioState[marioIndex].vel[1],
+            oVelZ: LevelUpdate.gMarioState[marioIndex].vel[2],
         
-            oPosX: LevelUpdate.gMarioState.pos[0],
-            oPosY: LevelUpdate.gMarioState.pos[1],
-            oPosZ: LevelUpdate.gMarioState.pos[2],
+            oPosX: LevelUpdate.gMarioState[marioIndex].pos[0],
+            oPosY: LevelUpdate.gMarioState[marioIndex].pos[1],
+            oPosZ: LevelUpdate.gMarioState[marioIndex].pos[2],
         
             oMoveAnglePitch: this.gCurrentObject.header.gfx.angle[0],
             oMoveAngleYaw: this.gCurrentObject.header.gfx.angle[1],
@@ -178,9 +147,9 @@ class ObjectListProcessor {
             oFaceAngleYaw: this.gCurrentObject.header.gfx.angle[1],
             oFaceAngleRoll: this.gCurrentObject.header.gfx.angle[2],
         
-            oAngleVelPitch: LevelUpdate.gMarioState.angleVel[0],
-            oAngleVelYaw: LevelUpdate.gMarioState.angleVel[1],
-            oAngleVelRoll: LevelUpdate.gMarioState.angleVel[2],
+            oAngleVelPitch: LevelUpdate.gMarioState[marioIndex].angleVel[0],
+            oAngleVelYaw: LevelUpdate.gMarioState[marioIndex].angleVel[1],
+            oAngleVelRoll: LevelUpdate.gMarioState[marioIndex].angleVel[2],
         })
     }
 
@@ -214,9 +183,16 @@ class ObjectListProcessor {
                 object.respawnInfoType = RESPAWN_INFO_TYPE_32
                 object.respawnInfo = spawnInfo.behaviorArg
 
-                if (spawnInfo.behaviorArg & 0x01) {
-                    this.gMarioObject = object
-                    GraphNode.geo_make_first_child(object.header.gfx.node)
+
+                if (spawnInfo.behaviorArg & 0x01) { // Is mario
+                    if (this.gMarioObject) { //2nd Mario
+                        object.OG = false
+                        this.gMarioObject.push(object)
+                    } else {  ///OG Mario
+                        object.OG = true
+                        this.gMarioObject = [object]
+                        GraphNode.geo_make_first_child(object.header.gfx.node)
+                    }
                 }
 
                 GraphNode.geo_obj_init_spawninfo(object.header.gfx, spawnInfo)
@@ -243,12 +219,6 @@ class ObjectListProcessor {
     clear_objects() {
 
         Spawn.clear_object_lists()
-
-        for (let i = 0; i < this.OBJECT_POOL_CAPACITY; i++) {
-            this.gObjectPool[i].activeFlags = ACTIVE_FLAGS_DEACTIVATED
-            this.gObjectPool[i].header.gfx = GraphNode.geo_reset_object_node(this.gObjectPool[i].header.gfx)
-            this.gObjectPool[i].header.gfx.wrapperObjectNode = this.gObjectPool[i].header
-        }
 
     }
 }

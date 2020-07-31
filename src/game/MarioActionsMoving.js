@@ -1,7 +1,8 @@
-import { MarioInstance as Mario } from "./Mario"
+import * as Mario from "./Mario"
 import { SURFACE_SLOW } from "../include/surface_terrains"
 import { perform_ground_step } from "./MarioStep"
 import { approach_number } from "../engine/math_util"
+
 
 const apply_slope_accel = (m) => {
     m.slideYaw = m.faceAngle[1]
@@ -132,6 +133,10 @@ const analog_stick_held_back = (m) => {
 }
 
 const act_walking = (m) => {
+
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        return Mario.set_jump_from_landing(m)
+    }
 
     if (m.input & Mario.INPUT_UNKNOWN_5) {
         return begin_braking_action(m)
@@ -272,6 +277,66 @@ const act_finish_turning_around = (m) => {
     return 0
 }
 
+const common_landing_cancels = (m, landingAction, setAPressAction) => {
+    if (++m.actionTimer >= landingAction.numFrames) {
+        return Mario.set_mario_action(m, landingAction.endAction, 0)
+    }
+
+    if (m.input & Mario.INPUT_A_PRESSED) return true
+
+    return false
+}
+
+const apply_landing_accel = (m, frictionFactor) => {
+    let stopped = false
+
+    apply_slope_accel(m)
+
+    if (!Mario.mario_floor_is_slope(m)) {
+        m.forwardVel *= frictionFactor
+        if (m.forwardVel * m.forwardVel < 1.0) {
+            Mario.set_forward_vel(m, 0.0)
+            stopped = true
+        }
+    }
+
+    return stopped
+}
+
+const common_landing_action = (m, animation, airAction) => {
+
+    if (m.input & Mario.INPUT_NONZERO_ANALOG) {
+        apply_landing_accel(m, 0.98)
+    } else if (m.forwardVel >= 16.0) {
+        apply_slope_decel(m, 2.0)
+    } else {
+        m.vel[1] = 0.0
+    }
+
+    const stepResult = perform_ground_step(m)
+    switch (stepResult) {
+        case Mario.GROUND_STEP_LEFT_GROUND:
+            Mario.set_mario_action(m, airAction, 0); break
+        case Mario.GROUND_STEP_HIT_WALL:
+            throw "not implemented step result - hit wall  - common_landing_action"
+            break
+    }
+
+    if (m.forwardVel > 16.0) m.particleFlags |= Mario.PARTICLE_DUST
+
+    Mario.set_mario_animation(m, animation)
+
+    return stepResult
+
+}
+
+const act_jump_land = (m) => {
+    if (common_landing_cancels(m, Mario.sJumpLandAction, Mario.set_jumping_action)) return 1
+
+    common_landing_action(m, Mario.MARIO_ANIM_LAND_FROM_SINGLE_JUMP, Mario.ACT_FREEFALL)
+    return 0
+}
+
 export const mario_execute_moving_action = (m) => {
 
     switch (m.action) {
@@ -280,6 +345,7 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_BRAKING: return act_braking(m)
         case Mario.ACT_TURNING_AROUND: return act_turning_around(m)
         case Mario.ACT_FINISH_TURNING_AROUND: return act_finish_turning_around(m)
-        default: throw "unkown action moving"
+        case Mario.ACT_JUMP_LAND: return act_jump_land(m)
+        default: throw "unknown action moving"
     }
 }

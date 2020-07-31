@@ -1,5 +1,75 @@
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
-import { MarioInstance as Mario } from "./Mario"
+import * as Mario from "./Mario"
+
+const should_strengthen_gravity_for_jump_ascent = (m) => {
+    if (!(m.input & Mario.INPUT_A_DOWN) && m.vel[1] > 20.0) return true
+
+    return false
+}
+
+const apply_gravity = (m) => {
+    if (should_strengthen_gravity_for_jump_ascent(m)) {
+        m.vel[1] /= 4.0
+    } else {
+        m.vel[1] -= 4.0
+        if (m.vel[1] < -75.0) m.vel[1] = -75.0
+    }
+}
+
+const perform_air_quarter_step = (m, intendedPos, stepArg) => {
+    const nextPos = [...intendedPos]
+
+    const floorWrapper = {}
+    const floorHeight = SurfaceCollision.find_floor(nextPos[0], nextPos[1], nextPos[2], floorWrapper)
+
+    if (floorWrapper.floor == null) {
+        throw "Can't find floor"
+    }
+
+    if (nextPos[1] <= floorHeight) {
+        m.pos[0] = nextPos[0]
+        m.pos[2] = nextPos[2]
+        m.floor = floorWrapper.floor
+        m.floorHeight = floorHeight
+
+        m.pos[1] = floorHeight
+        return Mario.AIR_STEP_LANDED
+    }
+
+    m.pos = [...nextPos]
+    m.floorHeight = floorHeight
+    m.floor = floorWrapper.floor
+
+    return Mario.AIR_STEP_NONE
+}
+
+export const perform_air_step = (m, stepArg) => {
+
+    let stepResult = Mario.AIR_STEP_NONE
+
+    for (let i = 0; i < 4; i++) {
+        const intendedPos = [
+            m.pos[0] + m.vel[0] / 4.0,
+            m.pos[1] + m.vel[1] / 4.0,
+            m.pos[2] + m.vel[2] / 4.0,
+        ]
+
+        const quarterStepResult = perform_air_quarter_step(m, intendedPos, stepArg)
+
+        if (quarterStepResult != Mario.AIR_STEP_NONE) stepResult = quarterStepResult
+
+        if (quarterStepResult == Mario.AIR_STEP_LANDED) break
+    }
+
+    if (m.vel[1] >= 0.0) m.peakHeight = m.pos[1]
+
+    apply_gravity(m)
+
+    m.marioObj.header.gfx.pos = [...m.pos]
+    m.marioObj.header.gfx.angle = [0, m.faceAngle[1], 0]
+
+    return stepResult
+}
 
 const perform_ground_quarter_step = (m, nextPos) => {
 

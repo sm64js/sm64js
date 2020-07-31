@@ -248,13 +248,11 @@ class GeoLayout {
         this.gGeoLayoutStackIndex = 2
         this.gGeoLayoutReturnIndex = 2 // stack index is often copied here?
 
-        //this.gGraphNodePool = {}
-
         this.gGeoLayoutStack = [0, 0]
 
         //console.log("proccesing geo layout")
 
-        while (this.sCurrentLayout.index < geoLayout.length) {
+        while (this.sCurrentLayout.index < this.sCurrentLayout.layout.length) {
             const cmd = this.sCurrentLayout.layout[this.sCurrentLayout.index]
             //console.log("processing layout command: " + cmd.command.name)
             cmd.command.call(this, cmd.args)

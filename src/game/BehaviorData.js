@@ -27,6 +27,8 @@ const OBJ_LIST_UNIMPORTANT = 12 // (12) unimportant objects. objects that will n
 //      gets exhausted.
 const NUM_OBJ_LISTS = 13
 
+export const OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE  = (1 << 0) // 0x00000001
+
 export const bhvMario = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PLAYER } },
     { command: BhvCmds.set_hitbox, args: { radius: 37, height: 160 } },
@@ -37,4 +39,9 @@ export const bhvMario = [
 
 export const bhvTree = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE } },
+    { command: BhvCmds.or_int, args: { offset: 0x01, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.set_hitbox, args: { radius: 80, height: 500 } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: () => { } } },
+    { command: BhvCmds.end_loop },
 ]

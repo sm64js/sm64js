@@ -1,4 +1,6 @@
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
+import { AreaInstance as Area } from "./Area"
+import { geo_obj_init } from "../engine/graph_node"
 
 const spawn_object_at_origin = (parent, model, behavior) => {
 
@@ -8,7 +10,7 @@ const spawn_object_at_origin = (parent, model, behavior) => {
     obj.header.gfx.unk18 = parent.header.gfx.unk18
     obj.header.gfx.unk19 = parent.header.gfx.unk18
 
-    geo_obj_init()
+    geo_obj_init(obj.header.gfx, Area.gLoadedGraphNodes[model], [0,0,0], [0,0,0])
 
     return obj
 
@@ -22,9 +24,12 @@ export const spawn_object_abs_with_rot = (parent, model, behavior, x, y, z, rx, 
 }
 
 export const obj_set_pos = (obj, x, y, z) => {
+
     obj.oPosX = x
     obj.oPosY = y
     obj.oPosZ = z
+
+    obj.header.gfx.pos = [ x, y, z]
 }
 
 export const obj_set_angle = (obj, pitch, yaw, roll) => {

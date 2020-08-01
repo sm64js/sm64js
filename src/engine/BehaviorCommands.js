@@ -19,8 +19,19 @@ class BehaviorCommands {
     }
 
     call_native(args) {
-        if (args.func != ObjListProc.bhv_mario_update) throw "check this - only support one function so far"
+        if (args.func != ObjListProc.bhv_mario_update) return //throw "check this - only support one function so far"
         args.func.call(ObjListProc)
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    or_int(args) {
+        const objectOffset = args.offset
+        let value = args.value
+
+        value &= 0xFFFF
+        ObjListProc.gCurrentObject.rawData[objectOffset] |= value
+
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }

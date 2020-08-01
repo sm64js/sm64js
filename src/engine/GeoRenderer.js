@@ -293,6 +293,8 @@ class GeoRenderer {
 
     geo_process_object(node) {
 
+        //console.log(node)
+
         const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const object = node.wrapper.wrapperObjectNode.wrapperObject
 

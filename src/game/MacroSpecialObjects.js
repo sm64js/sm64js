@@ -48,7 +48,5 @@ export const spawn_special_objects = (areaIndex, specialObjList, dataIndex) => {
 
     }
 
-    console.log(numOfSpecialObjects)
-    throw "spawn special"
     return dataIndex
 }

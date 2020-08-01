@@ -93,6 +93,24 @@ export const geo_obj_init_spawninfo = (graphNode, spawn) => {
     graphNode.node.flags &= ~GRAPH_RENDER_BILLBOARD
 } 
 
+export const geo_obj_init = (graphNode, sharedChild, pos, angle) => {
+
+    Object.assign(graphNode, {
+        pos: [...pos],
+        angle: [...angle],
+        scale: [1.0, 1.0, 1.0],
+        sharedChild,
+        throwMatrix: null,
+        unk38: { curAnim: null }
+    })
+
+    graphNode.node.flags |= GRAPH_RENDER_ACTIVE
+    graphNode.node.flags &= ~GRAPH_RENDER_INVISIBLE
+    graphNode.node.flags |= GRAPH_RENDER_HAS_ANIMATION
+    graphNode.node.flags &= ~GRAPH_RENDER_BILLBOARD
+
+}
+
 export const geo_reset_object_node = (graphNode) =>  {
     const zeroVec = [0, 0, 0]
     const oneVec = [1, 1, 1]

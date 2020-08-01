@@ -44,7 +44,7 @@ class SpawnObject {
 
         nextObj.gfx.wrapperObjectNode = nextObj
         nextObj.gfx.node.wrapper = nextObj.gfx
-        const newObject = { header: nextObj, activeFlags: 0 }
+        const newObject = { header: nextObj, activeFlags: 0, rawData: new Array(50).fill(0) }
         nextObj.wrapperObject = newObject
 
         nextObj.prev = destList.prev
@@ -102,7 +102,7 @@ class SpawnObject {
     }
 
     snap_object_to_floor(obj) {
-        obj.oFloorHeight = this.SurfaceCollisionInstance.find_floor(obj.oPosX, obj.oPosY, obj.oPosZ, {})
+        obj.oFloorHeight = this.SurfaceCollision.find_floor(obj.oPosX, obj.oPosY, obj.oPosZ, {})
 
         if (obj.oFloorHeight + 2.0 > obj.oPosY && obj.oPosY > obj.oFloorHeight - 10.0) {
             obj.oPosY = obj.oFloorHeight

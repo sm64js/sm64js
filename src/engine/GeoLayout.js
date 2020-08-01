@@ -180,6 +180,13 @@ class GeoLayout {
 
     }
 
+    node_culling_radius(args) {
+
+        const graphNode = GraphNode.init_graph_node_culling_radius(args[0])
+        GraphNode.register_scene_graph_node(this, graphNode)
+        this.sCurrentLayout.index++
+    }
+
     node_scale(args) {
         let drawingLayer = 0
         const params = args[0]

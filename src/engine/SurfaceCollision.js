@@ -1,10 +1,12 @@
 import { LEVEL_BOUNDARY_MAX, CELL_SIZE, SURFACE_FLAG_NO_CAM_COLLISION, SURFACE_CAMERA_BOUNDARY } from "../include/surface_terrains"
 import { SurfaceLoadInstance as SurfaceLoad } from "../game/SurfaceLoad"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
+import { SpawnObjectInstance as Spawn } from "../game/SpawnObject"
+
 
 class SurfaceCollision {
     constructor() {
-
+        Spawn.SurfaceCollisionInstance = this
     }
 
     find_floor(xPos, yPos, zPos, floorWrapper) {

@@ -1,4 +1,5 @@
 import * as Surfaces from "../include/surface_terrains"
+import { spawn_special_objects } from "./MacroSpecialObjects"
 
 class SurfaceLoad {
     constructor() {
@@ -231,6 +232,10 @@ class SurfaceLoad {
                 dataIndex = newIdx.dataIndex
                 vertexDataIndex = newIdx.vertexDataIndex
             }
+            else if (terrainLoadType == Surfaces.TERRAIN_LOAD_OBJECTS) {
+                dataIndex = spawn_special_objects(index, data, dataIndex)
+            }
+            else if (terrainLoadType == Surfaces.TERRAIN_LOAD_ENVIRONMENT) throw "load env regions"
             else if (terrainLoadType == Surfaces.TERRAIN_LOAD_CONTINUE) continue
             else if (terrainLoadType == Surfaces.TERRAIN_LOAD_END) break
             else if (terrainLoadType > 0x65) { //TERRAIN_LOAD_IS_SURFACE_TYPE_HIGH

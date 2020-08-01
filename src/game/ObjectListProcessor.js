@@ -8,6 +8,7 @@ import * as Mario from "./Mario"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 
 
+
 class ObjectListProcessor {
     constructor() {
 

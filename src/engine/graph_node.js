@@ -260,6 +260,14 @@ export const init_graph_node_root = (pool, graphNode, areaIndex, x, y, width, he
     return graphNode
 }
 
+export const init_graph_node_culling_radius = (radius) => {
+    const graphNode = { node: {}, radius }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_CULLING_RADIUS)
+
+    return graphNode
+}
+
 export const init_graph_node_switch_case = (numCases, selectedCase, nodeFunc, funcClass) => {
     const graphNode = {
         node: {},

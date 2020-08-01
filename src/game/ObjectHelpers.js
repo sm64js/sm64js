@@ -1,6 +1,7 @@
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { AreaInstance as Area } from "./Area"
 import { geo_obj_init } from "../engine/graph_node"
+import { oPosX, oPosY, oPosZ } from "../include/object_constants"
 
 const spawn_object_at_origin = (parent, model, behavior) => {
 
@@ -25,11 +26,9 @@ export const spawn_object_abs_with_rot = (parent, model, behavior, x, y, z, rx, 
 
 export const obj_set_pos = (obj, x, y, z) => {
 
-    obj.oPosX = x
-    obj.oPosY = y
-    obj.oPosZ = z
-
-    obj.header.gfx.pos = [ x, y, z]
+    obj.rawData[oPosX] = x
+    obj.rawData[oPosY] = y
+    obj.rawData[oPosZ] = z
 }
 
 export const obj_set_angle = (obj, pitch, yaw, roll) => {

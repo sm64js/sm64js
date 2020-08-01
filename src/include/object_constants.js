@@ -32,4 +32,15 @@ export const OBJ_MOVE_HIT_EDGE  = (1 << 10) // 0x0400
 export const OBJ_MOVE_ABOVE_LAVA  = (1 << 11) // 0x0800
 export const OBJ_MOVE_LEAVING_WATER  = (1 << 12) // 0x1000
 export const OBJ_MOVE_13  = (1 << 13) // 0x2000
-export const OBJ_MOVE_ABOVE_DEATH_BARRIER  = (1 << 14) // 0x4000
+export const OBJ_MOVE_ABOVE_DEATH_BARRIER = (1 << 14) // 0x4000
+
+export const OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE = (1 << 0) // 0x00000001
+
+export const oFlags = 1
+export const oPosX = 6
+export const oPosY = 7
+export const oPosZ = 8
+export const oFaceAnglePitch = 0x12
+export const oFaceAngleYaw = 0x13
+export const oFaceAngleRoll = 0x14
+export const oGraphYOffset = 0x15

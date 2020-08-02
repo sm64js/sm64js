@@ -19,7 +19,7 @@ const renderModeTable = [
         Gbi.G_RM_AA_XLU_SURF_SURF2
     ],
     [
-        null,
+        Gbi.G_RM_ZB_OPA_SURF_SURF2,
         Gbi.G_RM_AA_ZB_OPA_SURF_SURF2,
         null,
         Gbi.G_RM_AA_ZB_OPA_INTER_NOOP2,

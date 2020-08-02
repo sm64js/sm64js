@@ -300,6 +300,7 @@ export const G_RM_OPA_SURF_SURF2 = 0xf0a4000
 export const G_RM_AA_OPA_SURF_SURF2 = 0x552048
 export const G_RM_AA_XLU_SURF_SURF2 = 0x5041c8
 
+export const G_RM_ZB_OPA_SURF_SURF2 = 0x552230
 export const G_RM_AA_ZB_TEX_EDGE_NOOP2 = 0x443078
 export const G_RM_AA_ZB_OPA_INTER_NOOP2 = 0x442478
 export const G_RM_AA_ZB_XLU_SURF_SURF2 = 0x5049d8

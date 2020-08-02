@@ -1,6 +1,7 @@
 import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_texture_0700B4A0, intro_seg7_texture_0700C4A0 } from "./levels/intro/leveldata"
 import { castle_grounds_seg7_texture_07000000 } from "./levels/castle_grounds/areas/1/4/model.inc.js"
 import { title_texture_0A0001C0, title_texture_0A000E40, title_texture_0A001AC0, title_texture_0A002740 } from "./levels/intro/title_screen_bg"
+import { tree_seg3_texture_0302DE28, tree_seg3_texture_0302EE28, tree_seg3_texture_0302FF60, tree_seg3_texture_03031048, tree_seg3_texture_03032218 } from "./actors/tree/model.inc"
 import {
     gd_texture_mario_face_shine,
     gd_texture_red_star_0,
@@ -119,7 +120,13 @@ const processExtractedResults = (data) => {
     mario_texture_hair_sideburn.push ( ...data["actors/mario/mario_sideburn.rgba16.png"].split(','))
     mario_texture_eyes_front.push ( ...data["actors/mario/mario_eyes_center.rgba16.png"].split(','))
     mario_texture_eyes_half_closed.push ( ...data["actors/mario/mario_eyes_half_closed.rgba16.png"].split(','))
-    mario_texture_eyes_closed.push ( ...data["actors/mario/mario_eyes_closed.rgba16.png"].split(','))
+    mario_texture_eyes_closed.push(...data["actors/mario/mario_eyes_closed.rgba16.png"].split(','))
+
+    tree_seg3_texture_0302DE28.push(...data["actors/tree/tree_left_side.rgba16.inc.c"].split(','))
+    tree_seg3_texture_0302EE28.push(...data["actors/tree/tree_right_side.rgba16.inc.c"].split(','))
+    tree_seg3_texture_0302FF60.push(...data["actors/tree/pine_tree.rgba16.inc.c"].split(','))
+    tree_seg3_texture_03031048.push(...data["actors/tree/snowy_pine_tree.rgba16.inc.c"].split(','))
+    tree_seg3_texture_03032218.push(...data["actors/tree/palm_tree.rgba16.inc.c"].split(','))
 
     msgElement.innerHTML = "Rom Texture Extraction Success - You may now start the game"
     msgElement.style = "color:#00ff00"

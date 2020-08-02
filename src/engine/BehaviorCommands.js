@@ -1,4 +1,5 @@
 import { ObjectListProcessorInstance as ObjListProc } from "../game/ObjectListProcessor"
+import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll } from "../include/object_constants"
 
 class BehaviorCommands {
 
@@ -8,6 +9,9 @@ class BehaviorCommands {
     }
 
     cur_obj_update() {
+
+        let objFlags = ObjListProc.gCurrentObject.rawData[oFlags]
+
         this.bhvScript = ObjListProc.gCurrentObject.bhvScript
 
         let bhvProcResult = this.BHV_PROC_CONTINUE
@@ -16,11 +20,39 @@ class BehaviorCommands {
             const bhvFunc = this.bhvScript.commands[this.bhvScript.index]
             bhvProcResult = bhvFunc.command.call(this, bhvFunc.args)
         }
+
+        objFlags = ObjListProc.gCurrentObject.rawData[oFlags]
+
+        if (objFlags & OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE) {
+            this.obj_update_gfx_pos_and_angle(ObjListProc.gCurrentObject)
+        }
+    }
+
+    obj_update_gfx_pos_and_angle(obj) {
+        obj.header.gfx.pos[0] = obj.rawData[oPosX]
+        obj.header.gfx.pos[1] = obj.rawData[oPosY] + obj.rawData[oGraphYOffset]
+        obj.header.gfx.pos[2] = obj.rawData[oPosZ]
+
+        obj.header.gfx.angle[0] = obj.rawData[oFaceAnglePitch] & 0xFFFF
+        obj.header.gfx.angle[1] = obj.rawData[oFaceAngleYaw] & 0xFFFF
+        obj.header.gfx.angle[2] = obj.rawData[oFaceAngleRoll] & 0xFFFF
+
     }
 
     call_native(args) {
-        if (args.func != ObjListProc.bhv_mario_update) throw "check this - only support one function so far"
+        if (args.func != ObjListProc.bhv_mario_update) return //throw "check this - only support one function so far"
         args.func.call(ObjListProc)
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    or_int(args) {
+        const objectOffset = args.offset
+        let value = args.value
+
+        value &= 0xFFFF
+        ObjListProc.gCurrentObject.rawData[objectOffset] |= value
+
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }

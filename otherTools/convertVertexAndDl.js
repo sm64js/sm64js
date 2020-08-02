@@ -1,5 +1,5 @@
 const fs = require('fs')
-const input = require('os').homedir() + '/Programming/sm64pc/levels/castle_grounds/areas/1/4/model.inc.c'
+const input = require('os').homedir() + '/Programming/sm64pc/actors/tree/model.inc.c'
 let inputStr = fs.readFileSync(input, 'utf8')
 inputStr = inputStr.replace(/\r/g, "")
 
@@ -44,7 +44,7 @@ while (lines.length > 0) {
         })
         outputStr += `)\n\n`
     } else {
-        console.log(section[0])
+        console.log("Could not parse: " + section[0])
     }
 }
 

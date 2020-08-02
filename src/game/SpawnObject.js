@@ -2,8 +2,9 @@ import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProce
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { geo_add_child, GRAPH_RENDER_INVISIBLE, GRAPH_NODE_TYPE_OBJECT } from "../engine/graph_node"
 import { GeoLayoutInstance } from "../engine/GeoLayout"
-import { ACTIVE_FLAG_ACTIVE, ACTIVE_FLAG_UNK8, RESPAWN_INFO_TYPE_NULL, ACTIVE_FLAG_UNIMPORTANT } from "../include/object_constants"
+import { ACTIVE_FLAG_ACTIVE, ACTIVE_FLAG_UNK8, RESPAWN_INFO_TYPE_NULL, ACTIVE_FLAG_UNIMPORTANT, OBJ_MOVE_ON_GROUND } from "../include/object_constants"
 import { mtxf_identity } from "../engine/math_util"
+//import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 
 class SpawnObject {
     constructor() {
@@ -43,7 +44,7 @@ class SpawnObject {
 
         nextObj.gfx.wrapperObjectNode = nextObj
         nextObj.gfx.node.wrapper = nextObj.gfx
-        const newObject = { header: nextObj, activeFlags: 0 }
+        const newObject = { header: nextObj, activeFlags: 0, rawData: new Array(50).fill(0) }
         nextObj.wrapperObject = newObject
 
         nextObj.prev = destList.prev
@@ -100,8 +101,16 @@ class SpawnObject {
         return obj
     }
 
+    snap_object_to_floor(obj) {
+        obj.oFloorHeight = this.SurfaceCollision.find_floor(obj.oPosX, obj.oPosY, obj.oPosZ, {})
+
+        if (obj.oFloorHeight + 2.0 > obj.oPosY && obj.oPosY > obj.oFloorHeight - 10.0) {
+            obj.oPosY = obj.oFloorHeight
+            obj.oMoveFlags |= OBJ_MOVE_ON_GROUND
+        }
+    }
+
     create_object(bhvScript) {
-        //current working spot
 
         let objListIndex
 
@@ -124,7 +133,7 @@ class SpawnObject {
         if (objListIndex == ObjectListProc.OBJ_LIST_POLELIKE || 
             objListIndex == ObjectListProc.OBJ_LIST_GENACTOR ||
             objListIndex == ObjectListProc.OBJ_LIST_PUSHABLE) {
-                throw "supposed to snap object to floor here?"
+                this.snap_object_to_floor(obj)
             }
 
         return obj

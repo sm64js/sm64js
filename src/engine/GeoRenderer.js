@@ -7,6 +7,29 @@ import * as Mario from "../game/Mario"
 
 const canvas = document.querySelector('#gameCanvas')
 
+const renderModeTable = [
+    [
+        Gbi.G_RM_OPA_SURF_SURF2,
+        Gbi.G_RM_AA_OPA_SURF_SURF2,
+        Gbi.G_RM_AA_OPA_SURF_SURF2,
+        Gbi.G_RM_AA_OPA_SURF_SURF2,
+        null,
+        Gbi.G_RM_AA_XLU_SURF_SURF2,
+        Gbi.G_RM_AA_XLU_SURF_SURF2,
+        Gbi.G_RM_AA_XLU_SURF_SURF2
+    ],
+    [
+        null,
+        Gbi.G_RM_AA_ZB_OPA_SURF_SURF2,
+        null,
+        Gbi.G_RM_AA_ZB_OPA_INTER_NOOP2,
+        Gbi.G_RM_AA_ZB_TEX_EDGE_NOOP2,
+        Gbi.G_RM_AA_ZB_XLU_SURF_SURF2,
+        null,
+        null
+    ]
+]
+
 class GeoRenderer {
 
     constructor() {
@@ -31,6 +54,7 @@ class GeoRenderer {
 
     geo_process_master_list_sub(node) {
         const enableZBuffer = (node.flags & GraphNode.GRAPH_RENDER_Z_BUFFER) != 0
+        const modeList = enableZBuffer ? renderModeTable[1] : renderModeTable[0]
 
         if (enableZBuffer) {
             Gbi.gSPSetGeometryMode(Game.gDisplayList, Gbi.G_ZBUFFER)
@@ -38,6 +62,8 @@ class GeoRenderer {
 
         for (let i = 0; i < GraphNode.GFX_NUM_MASTER_LISTS; i++) {
             if (node.wrapper.listHeads[i]) {
+                if (modeList[i] == null) throw "need to add render mode"
+                Gbi.gDPSetRenderMode(Game.gDisplayList, modeList[i])
                 for (const displayNode of node.wrapper.listHeads[i]) {
                     Gbi.gSPMatrix(Game.gDisplayList, displayNode.transform, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
                     Gbi.gSPDisplayList(Game.gDisplayList, displayNode.displayList)
@@ -292,6 +318,8 @@ class GeoRenderer {
     }
 
     geo_process_object(node) {
+
+        //console.log(node)
 
         const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const object = node.wrapper.wrapperObjectNode.wrapperObject

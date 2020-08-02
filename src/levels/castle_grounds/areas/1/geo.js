@@ -23,7 +23,7 @@ export const castle_grounds_geo_00073C = [
     { command: GeoLayout.open_node },
     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, castle_grounds_seg7_dl_07006D70] },
     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, castle_grounds_seg7_dl_070095F0] },
-    { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, castle_grounds_seg7_dl_0700A860] },
+    { command: GeoLayout.display_list, args: [GeoLayout.LAYER_ALPHA, castle_grounds_seg7_dl_0700A860] },
     { command: GeoLayout.node_render_object_parent },
     { command: GeoLayout.close_node },
     { command: GeoLayout.close_node },

@@ -17,3 +17,30 @@ export const ACTIVE_FLAG_UNK9                   =  (1 <<  9) // 0x0200
 export const ACTIVE_FLAG_UNK10                  =  (1 << 10) // 0x0400
 
 export const ACTIVE_FLAGS_DEACTIVATED = 0
+
+export const OBJ_MOVE_LANDED  = (1 << 0) // 0x0001
+export const OBJ_MOVE_ON_GROUND  = (1 << 1) // 0x0002  // mutually exclusive to OBJ_MOVE_LANDED
+export const OBJ_MOVE_LEFT_GROUND  = (1 << 2) // 0x0004
+export const OBJ_MOVE_ENTERED_WATER  = (1 << 3) // 0x0008
+export const OBJ_MOVE_AT_WATER_SURFACE  = (1 << 4) // 0x0010
+export const OBJ_MOVE_UNDERWATER_OFF_GROUND  = (1 << 5) // 0x0020
+export const OBJ_MOVE_UNDERWATER_ON_GROUND  = (1 << 6) // 0x0040
+export const OBJ_MOVE_IN_AIR  = (1 << 7) // 0x0080
+export const OBJ_MOVE_8  = (1 << 8) // 0x0100
+export const OBJ_MOVE_HIT_WALL  = (1 << 9) // 0x0200
+export const OBJ_MOVE_HIT_EDGE  = (1 << 10) // 0x0400
+export const OBJ_MOVE_ABOVE_LAVA  = (1 << 11) // 0x0800
+export const OBJ_MOVE_LEAVING_WATER  = (1 << 12) // 0x1000
+export const OBJ_MOVE_13  = (1 << 13) // 0x2000
+export const OBJ_MOVE_ABOVE_DEATH_BARRIER = (1 << 14) // 0x4000
+
+export const OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE = (1 << 0) // 0x00000001
+
+export const oFlags = 1
+export const oPosX = 6
+export const oPosY = 7
+export const oPosZ = 8
+export const oFaceAnglePitch = 0x12
+export const oFaceAngleYaw = 0x13
+export const oFaceAngleRoll = 0x14
+export const oGraphYOffset = 0x15

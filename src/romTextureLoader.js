@@ -122,11 +122,11 @@ const processExtractedResults = (data) => {
     mario_texture_eyes_half_closed.push ( ...data["actors/mario/mario_eyes_half_closed.rgba16.png"].split(','))
     mario_texture_eyes_closed.push(...data["actors/mario/mario_eyes_closed.rgba16.png"].split(','))
 
-    tree_seg3_texture_0302DE28.push(...data["actors/tree/tree_left_side.rgba16.inc.c"].split(','))
-    tree_seg3_texture_0302EE28.push(...data["actors/tree/tree_right_side.rgba16.inc.c"].split(','))
-    tree_seg3_texture_0302FF60.push(...data["actors/tree/pine_tree.rgba16.inc.c"].split(','))
-    tree_seg3_texture_03031048.push(...data["actors/tree/snowy_pine_tree.rgba16.inc.c"].split(','))
-    tree_seg3_texture_03032218.push(...data["actors/tree/palm_tree.rgba16.inc.c"].split(','))
+    tree_seg3_texture_0302DE28.push(...data["actors/tree/tree_left_side.rgba16.png"].split(','))
+    tree_seg3_texture_0302EE28.push(...data["actors/tree/tree_right_side.rgba16.png"].split(','))
+    tree_seg3_texture_0302FF60.push(...data["actors/tree/pine_tree.rgba16.png"].split(','))
+    tree_seg3_texture_03031048.push(...data["actors/tree/snowy_pine_tree.rgba16.png"].split(','))
+    tree_seg3_texture_03032218.push(...data["actors/tree/palm_tree.rgba16.png"].split(','))
 
     msgElement.innerHTML = "Rom Texture Extraction Success - You may now start the game"
     msgElement.style = "color:#00ff00"

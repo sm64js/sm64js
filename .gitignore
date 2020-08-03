@@ -6,3 +6,5 @@ node_modules
 extractTools/.assets-local.txt
 extractTools/n64graphics
 extractTools/mio0
+extractTools/n64graphics.exe
+extractTools/mio0.exe

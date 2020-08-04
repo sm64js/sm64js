@@ -11,6 +11,7 @@ import { mario_execute_stationary_action } from "./MarioActionsStationary"
 import { gMarioAnimData } from "../actors/mario/marioAnimData"
 import { mario_execute_moving_action } from "./MarioActionsMoving"
 import { mario_execute_airborne_action } from "./MarioActionsAirborne"
+import { mario_execute_object_action } from "./MarioActionsObject"
 
 
 ////// Mario Constants
@@ -57,6 +58,11 @@ export const MARIO_ANIM_DOUBLE_JUMP_FALL = 0x4C
 export const MARIO_ANIM_DOUBLE_JUMP_RISE = 0x50
 export const MARIO_ANIM_TRIPLE_JUMP_LAND = 0xC0
 export const MARIO_ANIM_TRIPLE_JUMP = 0xC1
+export const MARIO_ANIM_GROUND_KICK = 0x66
+export const MARIO_ANIM_FIRST_PUNCH = 0x67
+export const MARIO_ANIM_SECOND_PUNCH = 0x68
+export const MARIO_ANIM_FIRST_PUNCH_FAST = 0x69
+export const MARIO_ANIM_SECOND_PUNCH_FAST = 0x6A
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -112,6 +118,7 @@ export const ACT_DOUBLE_JUMP_LAND_STOP = 0x0C000231
 export const ACT_TRIPLE_JUMP = 0x01000882
 export const ACT_TRIPLE_JUMP_LAND = 0x04000478
 export const ACT_TRIPLE_JUMP_LAND_STOP = 0x0800023A
+export const ACT_PUNCHING = 0x00800380
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -501,6 +508,11 @@ export const is_anim_at_end = (m) => {
     return (o.header.gfx.unk38.animFrame + 1) == o.header.gfx.unk38.curAnim.unk08
 }
 
+export const is_anim_past_end = (m) => {
+    const o = m.marioObj
+    return o.header.gfx.unk38.animFrame >= (o.header.gfx.unk38.curAnim.unk08 - 2)
+}
+
 export const execute_mario_action = (marioIndex) => {
     if (LevelUpdate.gMarioState[marioIndex].action) {
         LevelUpdate.gMarioState[marioIndex].marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
@@ -518,6 +530,9 @@ export const execute_mario_action = (marioIndex) => {
 
                 case ACT_GROUP_AIRBORNE:
                     inLoop = mario_execute_airborne_action(LevelUpdate.gMarioState[marioIndex]); break
+
+                case ACT_GROUP_OBJECT:
+                    inLoop = mario_execute_object_action(LevelUpdate.gMarioState[marioIndex]); break
 
                 default: throw "unkown action group"
             }

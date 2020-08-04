@@ -80,12 +80,22 @@ export const act_side_flip = (m) => {
     return 0
 }
 
+export const act_double_jump = (m) => {
+
+    let animation = (m.vel[1] >= 0.0) ? Mario.MARIO_ANIM_DOUBLE_JUMP_RISE : Mario.MARIO_ANIM_DOUBLE_JUMP_FALL
+
+    common_air_action_step(m, Mario.ACT_DOUBLE_JUMP_LAND, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB | Mario.AIR_STEP_CHECK_HANG)
+
+    return 0
+}
+
 export const mario_execute_airborne_action = (m) => {
 
     switch (m.action) {
         case Mario.ACT_JUMP: return act_jump(m)
         case Mario.ACT_FREEFALL: return act_freefall(m)
         case Mario.ACT_SIDE_FLIP: return act_side_flip(m)
+        case Mario.ACT_DOUBLE_JUMP: return act_double_jump(m)
         default: throw "unkown action airborne"
     }
 }

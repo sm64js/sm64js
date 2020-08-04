@@ -52,6 +52,9 @@ export const MARIO_ANIM_GENERAL_FALL = 0x56
 export const MARIO_ANIM_GENERAL_LAND = 0x57
 export const MARIO_ANIM_SLIDEFLIP_LAND = 0xBE
 export const MARIO_ANIM_SLIDEFLIP = 0xBF
+export const MARIO_ANIM_LAND_FROM_DOUBLE_JUMP = 0x4B
+export const MARIO_ANIM_DOUBLE_JUMP_FALL = 0x4C
+export const MARIO_ANIM_DOUBLE_JUMP_RISE = 0x50
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -102,6 +105,8 @@ export const ACT_LONG_JUMP = 0x03000888
 export const ACT_SIDE_FLIP = 0x01000887
 export const ACT_SIDE_FLIP_LAND = 0x04000473
 export const ACT_SIDE_FLIP_LAND_STOP = 0x0C000233
+export const ACT_DOUBLE_JUMP_LAND = 0x04000472
+export const ACT_DOUBLE_JUMP_LAND_STOP = 0x0C000231
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -228,6 +233,16 @@ export const sSideFlipLandAction = {
     slideAction: ACT_BEGIN_SLIDING
 }
 
+export const sDoubleJumpLandAction = {
+    numFrames: 4,
+    unk02: 5,
+    verySteepAction: ACT_FREEFALL,
+    endAction: ACT_DOUBLE_JUMP_LAND_STOP,
+    aPressedAction: ACT_JUMP,
+    offFloorAction: ACT_FREEFALL,
+    slideAction: ACT_BEGIN_SLIDING
+}
+
 
 export const init_marios = () => {
 
@@ -303,6 +318,11 @@ export const set_mario_y_vel_based_on_fspeed = (m, initialVelY, multiplier) => {
 }
 
 export const check_common_action_exits = (m) => {
+
+    if (m.input & INPUT_A_PRESSED) {
+        return set_mario_action(m, ACT_JUMP, 0)
+    }
+
     if (m.input & INPUT_NONZERO_ANALOG) {
         return set_mario_action(m, ACT_WALKING, 0)
     }
@@ -316,9 +336,18 @@ export const set_jumping_action = (m, action, actionArg) => {
 }
 
 export const set_jump_from_landing = (m) => {
-    switch (m.prevAction) {
-        default: set_mario_action(m, ACT_JUMP, 0)
+
+    if (m.doubleJumpTimer == 0) {
+        set_mario_action(m, ACT_JUMP, 0)
+    } else {
+        switch (m.prevAction) {
+            case ACT_JUMP_LAND: set_mario_action(m, ACT_DOUBLE_JUMP, 0); break
+            case ACT_FREEFALL_LAND: set_mario_action(m, ACT_DOUBLE_JUMP, 0); break
+            case ACT_SIDE_FLIP_LAND_STOP: set_mario_action(m, ACT_DOUBLE_JUMP, 0); break
+            default: set_mario_action(m, ACT_JUMP, 0)
+        }
     }
+
 
     m.doubleJumpTimer = 0
 
@@ -356,6 +385,10 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
             set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
             m.forwardVel = 8.0
             m.faceAngle[1] = m.intendedYaw
+            break
+        case ACT_DOUBLE_JUMP:
+            set_mario_y_vel_based_on_fspeed(m, 52.0, 0.25)
+            m.forwardVel *= 0.8
             break
     }
 

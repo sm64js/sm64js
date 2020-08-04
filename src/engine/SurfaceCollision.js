@@ -138,7 +138,6 @@ class SurfaceCollision {
             //  this can lead to wall interaction being missed. Typically unreferenced walls
             //  come from only using one wall, however.
             if (data.numWalls < 4) {
-                //data.walls[data.numWalls++] = surf
                 data.walls.push(surf)
                 data.numWalls++
             }

@@ -88,6 +88,16 @@ const act_freefall_land_stop = (m) => {
     return 0
 }
 
+const act_side_flip_land_stop = (m) => {
+    if (check_common_landing_cancels(m, 0)) return 1
+
+    landing_step(m, Mario.MARIO_ANIM_SLIDEFLIP_LAND, Mario.ACT_IDLE)
+    m.marioObj.header.gfx.angle[1] += 0x8000
+
+    return 0
+
+}
+
 export const mario_execute_stationary_action = (m) => {
 
     switch (m.action) {
@@ -95,6 +105,7 @@ export const mario_execute_stationary_action = (m) => {
         case Mario.ACT_BRAKING_STOP: return act_braking_stop(m)
         case Mario.ACT_JUMP_LAND_STOP: return act_jump_land_stop(m)
         case Mario.ACT_FREEFALL_LAND_STOP: return act_freefall_land_stop(m)
+        case Mario.ACT_SIDE_FLIP_LAND_STOP: return act_side_flip_land_stop(m)
         default: throw "unkown action stationary"
     }
 }

@@ -2,7 +2,9 @@ import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceC
 import * as Mario from "./Mario"
 
 const should_strengthen_gravity_for_jump_ascent = (m) => {
-    if (!(m.input & Mario.INPUT_A_DOWN) && m.vel[1] > 20.0) return true
+    if (!(m.input & Mario.INPUT_A_DOWN) && m.vel[1] > 20.0) {
+        return (m.action & Mario.ACT_FLAG_CONTROL_JUMP_HEIGHT) != 0
+    }
 
     return false
 }

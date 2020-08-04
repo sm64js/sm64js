@@ -303,6 +303,10 @@ const common_landing_cancels = (m, landingAction, setAPressAction) => {
         return setAPressAction(m, landingAction.aPressedAction, 0)
     }
 
+    if (m.input & Mario.INPUT_OFF_FLOOR) {
+        return Mario.set_mario_action(m, landingAction.offFloorAction, 0)
+    }
+
     return false
 }
 

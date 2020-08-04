@@ -53,6 +53,10 @@ const stopping_step = (m, animId, action) => {
 
 const act_braking_stop = (m) => {
 
+    if (m.input & Mario.INPUT_OFF_FLOOR) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
     stopping_step(m, Mario.MARIO_ANIM_STOP_SKID, Mario.ACT_IDLE)
     return 0
 }

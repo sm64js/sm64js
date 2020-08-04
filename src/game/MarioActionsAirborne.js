@@ -35,7 +35,7 @@ const update_air_without_turn = (m) => {
 
 }
 
-export const common_air_action_step = (m, landAction, animation, stepArg) => {
+const common_air_action_step = (m, landAction, animation, stepArg) => {
     ///TODO add this, this moves mario slightly while in air by joystick
     update_air_without_turn(m)
 
@@ -52,14 +52,14 @@ export const common_air_action_step = (m, landAction, animation, stepArg) => {
     return stepResult
 }
 
-export const act_jump = (m) => {
+const act_jump = (m) => {
     common_air_action_step(m, Mario.ACT_JUMP_LAND, Mario.MARIO_ANIM_SINGLE_JUMP,
         Mario.AIR_STEP_CHECK_LEDGE_GRAB | Mario.AIR_STEP_CHECK_HANG)
 
     return 0
 }
 
-export const act_freefall = (m) => {
+const act_freefall = (m) => {
     let animation
 
     switch (m.actionArg) {
@@ -71,7 +71,7 @@ export const act_freefall = (m) => {
     return 0
 }
 
-export const act_side_flip = (m) => {
+const act_side_flip = (m) => {
 
     if (common_air_action_step(m, Mario.ACT_SIDE_FLIP_LAND, Mario.MARIO_ANIM_SLIDEFLIP, Mario.AIR_STEP_CHECK_LEDGE_GRAB) != Mario.AIR_STEP_GRABBED_LEDGE) {
         m.marioObj.header.gfx.angle[1] += 0x8000
@@ -80,12 +80,17 @@ export const act_side_flip = (m) => {
     return 0
 }
 
-export const act_double_jump = (m) => {
+const act_double_jump = (m) => {
 
     let animation = (m.vel[1] >= 0.0) ? Mario.MARIO_ANIM_DOUBLE_JUMP_RISE : Mario.MARIO_ANIM_DOUBLE_JUMP_FALL
 
     common_air_action_step(m, Mario.ACT_DOUBLE_JUMP_LAND, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB | Mario.AIR_STEP_CHECK_HANG)
 
+    return 0
+}
+
+const act_triple_jump = (m) => {
+    common_air_action_step(m, Mario.ACT_TRIPLE_JUMP_LAND, Mario.MARIO_ANIM_TRIPLE_JUMP, 0)
     return 0
 }
 
@@ -96,6 +101,7 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_FREEFALL: return act_freefall(m)
         case Mario.ACT_SIDE_FLIP: return act_side_flip(m)
         case Mario.ACT_DOUBLE_JUMP: return act_double_jump(m)
+        case Mario.ACT_TRIPLE_JUMP: return act_triple_jump(m)
         default: throw "unkown action airborne"
     }
 }

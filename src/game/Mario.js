@@ -531,6 +531,7 @@ export const execute_mario_action = (marioIndex) => {
 const update_mario_button_inputs = (m, playerInput) => {
     if (playerInput.buttonPressedA) m.input |= INPUT_A_PRESSED
     if (playerInput.buttonDownA) m.input |= INPUT_A_DOWN
+    if (playerInput.buttonPressedB) m.input |= INPUT_B_PRESSED
 }
 
 const update_mario_joystick_inputs = (m, playerInput) => {

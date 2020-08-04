@@ -202,6 +202,11 @@ const update_decelerating_speed = (m) => {
 const act_decelerating = (m) => {
 
     if (!(m.input & Mario.INPUT_FIRST_PERSON)) {
+
+        if (m.input & Mario.INPUT_A_PRESSED) {
+            return Mario.set_jump_from_landing(m)
+        }
+
         if (m.input & Mario.INPUT_NONZERO_ANALOG) {
             return Mario.set_mario_action(m, Mario.ACT_WALKING, 0)
         }
@@ -287,11 +292,16 @@ const act_finish_turning_around = (m) => {
 }
 
 const common_landing_cancels = (m, landingAction, setAPressAction) => {
+
+    m.doubleJumpTimer = landingAction.unk02
+
     if (++m.actionTimer >= landingAction.numFrames) {
         return Mario.set_mario_action(m, landingAction.endAction, 0)
     }
 
-    if (m.input & Mario.INPUT_A_PRESSED) return true
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        return setAPressAction(m, landingAction.aPressedAction, 0)
+    }
 
     return false
 }
@@ -346,20 +356,28 @@ const act_jump_land = (m) => {
     return 0
 }
 
-export const act_freefall_land = (m) => {
+const act_freefall_land = (m) => {
     if (common_landing_cancels(m, Mario.sFreefallLandAction, Mario.set_jumping_action)) return 1
 
     common_landing_action(m, Mario.MARIO_ANIM_GENERAL_LAND, Mario.ACT_FREEFALL)
     return 0
 }
 
-export const act_side_flip_land = (m) => {
+const act_side_flip_land = (m) => {
     if (common_landing_cancels(m, Mario.sSideFlipLandAction, Mario.set_jumping_action)) return 1
 
     if (common_landing_action(m, Mario.MARIO_ANIM_SLIDEFLIP_LAND, Mario.ACT_FREEFALL) != Mario.GROUND_STEP_HIT_WALL) {
         m.marioObj.header.gfx.angle[1] += 0x8000
     }
 
+    return 0
+}
+
+const act_double_jump_land = (m) => {
+    if (common_landing_cancels(m, Mario.sDoubleJumpLandAction, Mario.set_jumping_action)) return 1
+    /// set_triple_jump_action
+
+    common_landing_action(m, Mario.MARIO_ANIM_LAND_FROM_DOUBLE_JUMP, Mario.ACT_FREEFALL)
     return 0
 }
 
@@ -374,6 +392,7 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_JUMP_LAND: return act_jump_land(m)
         case Mario.ACT_FREEFALL_LAND: return act_freefall_land(m)
         case Mario.ACT_SIDE_FLIP_LAND: return act_side_flip_land(m)
+        case Mario.ACT_DOUBLE_JUMP_LAND: return act_double_jump_land(m)
         default: throw "unknown action moving"
     }
 }

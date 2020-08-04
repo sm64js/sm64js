@@ -59,10 +59,23 @@ export const act_jump = (m) => {
     return 0
 }
 
+export const act_freefall = (m) => {
+    let animation
+
+    switch (m.actionArg) {
+        case 0: animation = Mario.MARIO_ANIM_GENERAL_FALL; break
+        default: throw "act freefall unknown action arg"
+    }
+
+    common_air_action_step(m, Mario.ACT_FREEFALL_LAND, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
+    return 0
+}
+
 export const mario_execute_airborne_action = (m) => {
 
     switch (m.action) {
         case Mario.ACT_JUMP: return act_jump(m)
+        case Mario.ACT_FREEFALL: return act_freefall(m)
         default: throw "unkown action airborne"
     }
 }

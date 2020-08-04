@@ -19,11 +19,13 @@ const apply_gravity = (m) => {
 const perform_air_quarter_step = (m, intendedPos, stepArg) => {
     const nextPos = [...intendedPos]
 
+    const upperWall = Mario.resolve_and_return_wall_collisions(nextPos, 150.0, 50.0)
+
     const floorWrapper = {}
     const floorHeight = SurfaceCollision.find_floor(nextPos[0], nextPos[1], nextPos[2], floorWrapper)
 
     if (floorWrapper.floor == null) {
-        throw "Can't find floor"
+        throw "Can't find floor - air quarter step"
     }
 
     if (nextPos[1] <= floorHeight) {

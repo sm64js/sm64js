@@ -73,8 +73,21 @@ export const perform_air_step = (m, stepArg) => {
 
 const perform_ground_quarter_step = (m, nextPos) => {
 
+    const upperWall = Mario.resolve_and_return_wall_collisions(nextPos, 60.0, 50.0)
+
     const floorWrapper = {}
     const floorHeight = SurfaceCollision.find_floor(nextPos[0], nextPos[1], nextPos[2], floorWrapper)
+
+    m.wall = upperWall
+
+    if (floorWrapper.floor == null) throw "no floor - ground quarter steps"
+
+    if (nextPos[1] > floorHeight + 100.0) {
+        m.pos = [...nextPos]
+        m.floor = floorWrapper.floor
+        m.floorHeight = floorHeight
+        return Mario.GROUND_STEP_LEFT_GROUND
+    }
 
     m.pos = [ nextPos[0], floorHeight, nextPos[2] ]
     m.floor = floorWrapper.floor
@@ -96,6 +109,7 @@ export const perform_ground_step = (m) => {
         ]
 
         stepResult = perform_ground_quarter_step(m, intendedPos)
+        if (stepResult == Mario.GROUND_STEP_LEFT_GROUND || stepResult == Mario.GROUND_STEP_HIT_WALL_STOP_QSTEPS) break
     }
 
     m.marioObj.header.gfx.pos = [...m.pos]

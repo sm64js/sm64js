@@ -1,5 +1,5 @@
 import { PlatformDisplacementInstance as PlatformDisplacement } from "./PlatformDisplacement"
-import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32 } from "../include/object_constants"
+import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll } from "../include/object_constants"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import * as GraphNode from "../engine/graph_node"
 import { GeoLayoutInstance } from "../engine/GeoLayout"
@@ -131,27 +131,26 @@ class ObjectListProcessor {
     }
 
     copy_mario_state_to_object(marioIndex) {
-        Object.assign(this.gCurrentObject, {
-            oVelX: LevelUpdate.gMarioState[marioIndex].vel[0],
-            oVelY: LevelUpdate.gMarioState[marioIndex].vel[1],
-            oVelZ: LevelUpdate.gMarioState[marioIndex].vel[2],
-        
-            oPosX: LevelUpdate.gMarioState[marioIndex].pos[0],
-            oPosY: LevelUpdate.gMarioState[marioIndex].pos[1],
-            oPosZ: LevelUpdate.gMarioState[marioIndex].pos[2],
-        
-            oMoveAnglePitch: this.gCurrentObject.header.gfx.angle[0],
-            oMoveAngleYaw: this.gCurrentObject.header.gfx.angle[1],
-            oMoveAngleRoll: this.gCurrentObject.header.gfx.angle[2],
-        
-            oFaceAnglePitch: this.gCurrentObject.header.gfx.angle[0],
-            oFaceAngleYaw: this.gCurrentObject.header.gfx.angle[1],
-            oFaceAngleRoll: this.gCurrentObject.header.gfx.angle[2],
-        
-            oAngleVelPitch: LevelUpdate.gMarioState[marioIndex].angleVel[0],
-            oAngleVelYaw: LevelUpdate.gMarioState[marioIndex].angleVel[1],
-            oAngleVelRoll: LevelUpdate.gMarioState[marioIndex].angleVel[2],
-        })
+
+        this.gCurrentObject.rawData[oPosX] = LevelUpdate.gMarioState[marioIndex].pos[0]
+        this.gCurrentObject.rawData[oPosY] = LevelUpdate.gMarioState[marioIndex].pos[1]
+        this.gCurrentObject.rawData[oPosZ] = LevelUpdate.gMarioState[marioIndex].pos[2]
+
+        this.gCurrentObject.rawData[oFaceAnglePitch] = this.gCurrentObject.header.gfx.angle[0]
+        this.gCurrentObject.rawData[oFaceAngleYaw] = this.gCurrentObject.header.gfx.angle[1]
+        this.gCurrentObject.rawData[oFaceAngleRoll] = this.gCurrentObject.header.gfx.angle[2]
+
+        this.gCurrentObject.rawData[oMoveAnglePitch] = this.gCurrentObject.header.gfx.angle[0]
+        this.gCurrentObject.rawData[oMoveAngleYaw] = this.gCurrentObject.header.gfx.angle[1]
+        this.gCurrentObject.rawData[oMoveAngleRoll] = this.gCurrentObject.header.gfx.angle[2]
+
+        this.gCurrentObject.rawData[oVelX] = LevelUpdate.gMarioState[marioIndex].vel[0]
+        this.gCurrentObject.rawData[oVelY] = LevelUpdate.gMarioState[marioIndex].vel[1]
+        this.gCurrentObject.rawData[oVelZ] = LevelUpdate.gMarioState[marioIndex].vel[2]
+
+        this.gCurrentObject.rawData[oAngleVelPitch] = LevelUpdate.gMarioState[marioIndex].angleVel[0]
+        this.gCurrentObject.rawData[oAngleVelYaw] = LevelUpdate.gMarioState[marioIndex].angleVel[1]
+        this.gCurrentObject.rawData[oAngleVelRoll] = LevelUpdate.gMarioState[marioIndex].angleVel[2]
     }
 
     spawn_objects_from_info(spawnInfo) {
@@ -198,17 +197,17 @@ class ObjectListProcessor {
 
                 GraphNode.geo_obj_init_spawninfo(object.header.gfx, spawnInfo)
 
-                object.oPosX = spawnInfo.startPos[0]
-                object.oPosY = spawnInfo.startPos[1]
-                object.oPosZ = spawnInfo.startPos[2]
+                object.rawData[oPosX] = spawnInfo.startPos[0]
+                object.rawData[oPosY] = spawnInfo.startPos[1]
+                object.rawData[oPosZ] = spawnInfo.startPos[2]
     
-                object.oFaceAnglePitch = spawnInfo.startAngle[0]
-                object.oFaceAngleYaw = spawnInfo.startAngle[1]
-                object.oFaceAngleRoll = spawnInfo.startAngle[2]
+                object.rawData[oFaceAnglePitch] = spawnInfo.startAngle[0]
+                object.rawData[oFaceAngleYaw] = spawnInfo.startAngle[1]
+                object.rawData[oFaceAngleRoll] = spawnInfo.startAngle[2]
     
-                object.oMoveAnglePitch = spawnInfo.startAngle[0]
-                object.oMoveAngleYaw = spawnInfo.startAngle[1]
-                object.oMoveAngleRoll = spawnInfo.startAngle[2]
+                object.rawData[oMoveAnglePitch] = spawnInfo.startAngle[0]
+                object.rawData[oMoveAngleYaw] = spawnInfo.startAngle[1]
+                object.rawData[oMoveAngleRoll] = spawnInfo.startAngle[2]
                 
             }
 

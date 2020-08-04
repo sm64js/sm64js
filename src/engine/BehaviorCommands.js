@@ -1,5 +1,5 @@
 import { ObjectListProcessorInstance as ObjListProc } from "../game/ObjectListProcessor"
-import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll } from "../include/object_constants"
+import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction } from "../include/object_constants"
 
 class BehaviorCommands {
 
@@ -21,6 +21,16 @@ class BehaviorCommands {
             bhvProcResult = bhvFunc.command.call(this, bhvFunc.args)
         }
 
+        if (ObjListProc.gCurrentObject.rawData[oTimer] < 0x3FFFFFFF) {
+            ObjListProc.gCurrentObject.rawData[oTimer]++
+        }
+
+        if (ObjListProc.gCurrentObject.rawData[oAction] != ObjListProc.gCurrentObject.rawData[oPrevAction]) {
+            ObjListProc.gCurrentObject.rawData[oTimer] = 0
+            ObjListProc.gCurrentObject.rawData[oSubAction] = 0
+            ObjListProc.gCurrentObject.rawData[oPrevAction] = ObjListProc.gCurrentObject.rawData[oAction]
+        }
+
         objFlags = ObjListProc.gCurrentObject.rawData[oFlags]
 
         if (objFlags & OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE) {
@@ -40,8 +50,7 @@ class BehaviorCommands {
     }
 
     call_native(args) {
-        if (args.func != ObjListProc.bhv_mario_update) return //throw "check this - only support one function so far"
-        args.func.call(ObjListProc)
+        args.func.call(args.funcClass)
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }

@@ -40,7 +40,29 @@ export const oFlags = 1
 export const oPosX = 6
 export const oPosY = 7
 export const oPosZ = 8
+
+export const oMoveAnglePitch = 0x0F
+export const oMoveAngleYaw = 0x10
+export const oMoveAngleRoll = 0x11
+
 export const oFaceAnglePitch = 0x12
 export const oFaceAngleYaw = 0x13
 export const oFaceAngleRoll = 0x14
+
+export const oVelX = 0x09
+export const oVelY = 0x0A
+export const oVelZ = 0x0B
+
+export const oAngleVelPitch = 0x23
+export const oAngleVelYaw = 0x24
+export const oAngleVelRoll = 0x25
+
 export const oGraphYOffset = 0x15
+
+export const oAction = 0x31
+export const oSubAction = 0x32
+
+export const oTimer = 0x33
+
+export const oPrevAction = 0x41
+

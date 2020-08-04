@@ -156,6 +156,10 @@ const act_walking = (m) => {
             anim_and_audio_for_walk(m)
             if (m.intendedMag - m.forwardVel > 16.0) m.particleFlags |= Mario.PARTICLE_DUST
             break
+        case Mario.GROUND_STEP_LEFT_GROUND:
+            Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_GENERAL_FALL)
+            break
         default: throw "unkown ground step in act_walking"
     }
 
@@ -337,6 +341,13 @@ const act_jump_land = (m) => {
     return 0
 }
 
+export const act_freefall_land = (m) => {
+    if (common_landing_cancels(m, Mario.sFreefallLandAction, Mario.set_jumping_action)) return 1
+
+    common_landing_action(m, Mario.MARIO_ANIM_GENERAL_LAND, Mario.ACT_FREEFALL)
+    return 0
+}
+
 export const mario_execute_moving_action = (m) => {
 
     switch (m.action) {
@@ -346,6 +357,7 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_TURNING_AROUND: return act_turning_around(m)
         case Mario.ACT_FINISH_TURNING_AROUND: return act_finish_turning_around(m)
         case Mario.ACT_JUMP_LAND: return act_jump_land(m)
+        case Mario.ACT_FREEFALL_LAND: return act_freefall_land(m)
         default: throw "unknown action moving"
     }
 }

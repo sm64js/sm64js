@@ -2,6 +2,8 @@ import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { AreaInstance as Area } from "./Area"
 import { geo_obj_init } from "../engine/graph_node"
 import { oPosX, oPosY, oPosZ } from "../include/object_constants"
+import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
+import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 
 const spawn_object_at_origin = (parent, model, behavior) => {
 
@@ -39,5 +41,17 @@ export const obj_set_angle = (obj, pitch, yaw, roll) => {
     obj.oMoveAnglePitch = pitch
     obj.oMoveAngleYaw = yaw
     obj.oMoveAngleRoll = roll
+}
+
+export const cur_obj_push_mario_away = (radius) => {
+    const o = ObjectListProc.gCurrentObject
+    const marioRelX = ObjectListProc.gMarioObject[0].rawData[oPosX] - o.rawData[oPosX]
+    const marioRelZ = ObjectListProc.gMarioObject[0].rawData[oPosZ] - o.rawData[oPosZ]
+    const marioDist = Math.sqrt(Math.pow(marioRelX, 2) + Math.pow(marioRelZ, 2))
+
+    if (marioDist < radius) {
+        LevelUpdate.gMarioState[0].pos[0] += (radius - marioDist) / radius * marioRelX
+        LevelUpdate.gMarioState[0].pos[2] += (radius - marioDist) / radius * marioRelZ
+    }
 }
 

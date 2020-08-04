@@ -48,6 +48,9 @@ export const MARIO_ANIM_TURNING_PART1 = 0xBC
 export const MARIO_ANIM_TURNING_PART2 = 0xBD
 export const MARIO_ANIM_LAND_FROM_SINGLE_JUMP = 0x4E
 export const MARIO_ANIM_SINGLE_JUMP = 0x4D
+export const MARIO_ANIM_GENERAL_FALL = 0x56
+export const MARIO_ANIM_GENERAL_LAND = 0x57
+
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -88,7 +91,9 @@ export const ACT_FINISH_TURNING_AROUND = 0x00000444
 export const ACT_CRAWLING = 0x04008448
 export const ACT_JUMP = 0x03000880
 export const ACT_JUMP_LAND = 0x04000470
-export const ACT_FREEFALL       = 0x0100088C
+export const ACT_FREEFALL = 0x0100088C
+export const ACT_FREEFALL_LAND = 0x04000471
+export const ACT_FREEFALL_LAND_STOP = 0x0C000232
 export const ACT_DOUBLE_JUMP    = 0x03000881
 export const ACT_JUMP_LAND_STOP = 0x0C000230
 export const ACT_BEGIN_SLIDING = 0x00000050
@@ -194,6 +199,16 @@ export const sJumpLandAction = {
     unk02: 5,
     verySteepAction: ACT_FREEFALL,
     endAction: ACT_JUMP_LAND_STOP,
+    aPressedAction: ACT_DOUBLE_JUMP,
+    offFloorAction: ACT_FREEFALL,
+    slideAction: ACT_BEGIN_SLIDING
+}
+
+export const sFreefallLandAction = {
+    numFrames: 4,
+    unk02: 5,
+    verySteepAction: ACT_FREEFALL,
+    endAction: ACT_FREEFALL_LAND_STOP,
     aPressedAction: ACT_DOUBLE_JUMP,
     offFloorAction: ACT_FREEFALL,
     slideAction: ACT_BEGIN_SLIDING
@@ -603,6 +618,26 @@ export const mario_get_floor_class = (m) => {
     }
     
     return floorClass
+}
+
+export const resolve_and_return_wall_collisions = (pos, offset, radius) => {
+    const collisionData = {
+        radius,
+        offsetY: offset,
+        x: pos[0], y: pos[1], z: pos[2]
+    }
+
+    let wall
+
+    if (SurfaceCollision.find_wall_collisions(collisionData)) {
+        wall = collisionData.walls[collisionData.numWalls - 1]
+    }
+
+    pos[0] = collisionData.x
+    pos[1] = collisionData.y
+    pos[2] = collisionData.z
+
+    return wall
 }
 
 const update_mario_inputs = (m) => {

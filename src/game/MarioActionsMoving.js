@@ -230,6 +230,11 @@ const begin_walking_action = (m, forwardVel, action, actionArg) => {
 }
 
 const act_turning_around = (m) => {
+
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        return Mario.set_jumping_action(m, Mario.ACT_SIDE_FLIP, 0)
+    }
+
     if (m.input & Mario.INPUT_UNKNOWN_5) {
         return Mario.set_mario_action(m, Mario.ACT_BRAKING, 0)
     }
@@ -348,6 +353,16 @@ export const act_freefall_land = (m) => {
     return 0
 }
 
+export const act_side_flip_land = (m) => {
+    if (common_landing_cancels(m, Mario.sSideFlipLandAction, Mario.set_jumping_action)) return 1
+
+    if (common_landing_action(m, Mario.MARIO_ANIM_SLIDEFLIP_LAND, Mario.ACT_FREEFALL) != Mario.GROUND_STEP_HIT_WALL) {
+        m.marioObj.header.gfx.angle[1] += 0x8000
+    }
+
+    return 0
+}
+
 export const mario_execute_moving_action = (m) => {
 
     switch (m.action) {
@@ -358,6 +373,7 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_FINISH_TURNING_AROUND: return act_finish_turning_around(m)
         case Mario.ACT_JUMP_LAND: return act_jump_land(m)
         case Mario.ACT_FREEFALL_LAND: return act_freefall_land(m)
+        case Mario.ACT_SIDE_FLIP_LAND: return act_side_flip_land(m)
         default: throw "unknown action moving"
     }
 }

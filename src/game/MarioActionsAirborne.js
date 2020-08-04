@@ -71,11 +71,21 @@ export const act_freefall = (m) => {
     return 0
 }
 
+export const act_side_flip = (m) => {
+
+    if (common_air_action_step(m, Mario.ACT_SIDE_FLIP_LAND, Mario.MARIO_ANIM_SLIDEFLIP, Mario.AIR_STEP_CHECK_LEDGE_GRAB) != Mario.AIR_STEP_GRABBED_LEDGE) {
+        m.marioObj.header.gfx.angle[1] += 0x8000
+    }
+
+    return 0
+}
+
 export const mario_execute_airborne_action = (m) => {
 
     switch (m.action) {
         case Mario.ACT_JUMP: return act_jump(m)
         case Mario.ACT_FREEFALL: return act_freefall(m)
+        case Mario.ACT_SIDE_FLIP: return act_side_flip(m)
         default: throw "unkown action airborne"
     }
 }

@@ -50,7 +50,8 @@ export const MARIO_ANIM_LAND_FROM_SINGLE_JUMP = 0x4E
 export const MARIO_ANIM_SINGLE_JUMP = 0x4D
 export const MARIO_ANIM_GENERAL_FALL = 0x56
 export const MARIO_ANIM_GENERAL_LAND = 0x57
-
+export const MARIO_ANIM_SLIDEFLIP_LAND = 0xBE
+export const MARIO_ANIM_SLIDEFLIP = 0xBF
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -98,6 +99,9 @@ export const ACT_DOUBLE_JUMP    = 0x03000881
 export const ACT_JUMP_LAND_STOP = 0x0C000230
 export const ACT_BEGIN_SLIDING = 0x00000050
 export const ACT_LONG_JUMP = 0x03000888
+export const ACT_SIDE_FLIP = 0x01000887
+export const ACT_SIDE_FLIP_LAND = 0x04000473
+export const ACT_SIDE_FLIP_LAND_STOP = 0x0C000233
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -209,6 +213,16 @@ export const sFreefallLandAction = {
     unk02: 5,
     verySteepAction: ACT_FREEFALL,
     endAction: ACT_FREEFALL_LAND_STOP,
+    aPressedAction: ACT_DOUBLE_JUMP,
+    offFloorAction: ACT_FREEFALL,
+    slideAction: ACT_BEGIN_SLIDING
+}
+
+export const sSideFlipLandAction = {
+    numFrames: 4,
+    unk02: 5,
+    verySteepAction: ACT_FREEFALL,
+    endAction: ACT_SIDE_FLIP_LAND_STOP,
     aPressedAction: ACT_DOUBLE_JUMP,
     offFloorAction: ACT_FREEFALL,
     slideAction: ACT_BEGIN_SLIDING
@@ -337,6 +351,11 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
             m.marioObj.header.gfx.unk38.animID = -1
             set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
             m.forwardVel *= 0.8
+            break
+        case ACT_SIDE_FLIP:
+            set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
+            m.forwardVel = 8.0
+            m.faceAngle[1] = m.intendedYaw
             break
     }
 

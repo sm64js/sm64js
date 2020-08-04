@@ -1,6 +1,7 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
 import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } from "../include/object_constants"
+import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
 const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -33,7 +34,7 @@ export const bhvMario = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PLAYER } },
     { command: BhvCmds.set_hitbox, args: { radius: 37, height: 160 } },
     { command: BhvCmds.begin_loop },
-        { command: BhvCmds.call_native, args: { func: ObjectListProcessor.bhv_mario_update } },
+        { command: BhvCmds.call_native, args: { func: ObjectListProcessor.bhv_mario_update, funcClass: ObjectListProcessor } },
     { command: BhvCmds.end_loop },
 ]
 
@@ -42,6 +43,6 @@ export const bhvTree = [
     { command: BhvCmds.or_int, args: { offset: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.set_hitbox, args: { radius: 80, height: 500 } },
     { command: BhvCmds.begin_loop },
-        { command: BhvCmds.call_native, args: { func: () => { } } },
+        { command: BhvCmds.call_native, args: { func: bhv_pole_base_loop } },
     { command: BhvCmds.end_loop },
 ]

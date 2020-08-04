@@ -279,6 +279,10 @@ const act_turning_around = (m) => {
 
 const act_finish_turning_around = (m) => {
 
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        return Mario.set_jumping_action(m, Mario.ACT_SIDE_FLIP, 0)
+    }
+
     update_walking_speed(m)
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_TURNING_PART2)
 

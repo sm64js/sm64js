@@ -8,11 +8,19 @@ const check_common_idle_cancels = (m) => {
         return Mario.set_jumping_action(m, Mario.ACT_JUMP, 0)
     }
 
+    if (m.input & Mario.INPUT_OFF_FLOOR) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
     if (m.input & Mario.INPUT_NONZERO_ANALOG) {
 
         m.faceAngle[1] = m.intendedYaw
 
         return Mario.set_mario_action(m, Mario.ACT_WALKING, 0)
+    }
+
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_PUNCHING, 0)
     }
 
     return 0
@@ -57,6 +65,10 @@ const act_braking_stop = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
     }
 
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_PUNCHING, 0)
+    }
+
     stopping_step(m, Mario.MARIO_ANIM_STOP_SKID, Mario.ACT_IDLE)
     return 0
 }
@@ -81,6 +93,10 @@ const check_common_landing_cancels = (m, action) => {
 
     if (m.input & (Mario.INPUT_NONZERO_ANALOG | Mario.INPUT_A_PRESSED | Mario.INPUT_OFF_FLOOR | Mario.INPUT_ABOVE_SLIDE)) {
         return Mario.check_common_action_exits(m)
+    }
+
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_PUNCHING, 0)
     }
 
     return 0

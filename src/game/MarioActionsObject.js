@@ -1,0 +1,130 @@
+import * as Mario from "./Mario"
+import { perform_ground_step } from "./MarioStep"
+
+const sPunchingForwardVelocities = [0, 1, 1, 2, 3, 5, 7, 10]
+
+const mario_update_punch_sequence = (m) => {
+    let endAction
+
+    if (m.action & Mario.ACT_FLAG_MOVING) {
+        endAction = Mario.ACT_WALKING
+    } else {
+        endAction = Mario.ACT_IDLE
+    }
+
+    switch (m.actionArg) {
+        case 0: /// play sound - no break
+        case 1:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_FIRST_PUNCH)
+            if (Mario.is_anim_past_end(m)) {
+                m.actionArg = 2
+            } else {
+                m.actionArg = 1
+            }
+
+            if (m.marioObj.header.gfx.unk38.animFrame >= 2) {
+                //if (mario_check_object_grab(m)) {
+                //    return 1
+                //}
+
+                m.flags |= Mario.MARIO_PUNCHING
+            }
+
+            if (m.actionArg == 2) {
+                m.marioBodyState.punchState = (0 << 6) | 4
+            }
+            break
+        case 2:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_FIRST_PUNCH_FAST)
+
+            if (m.marioObj.header.gfx.unk38.animFrame <= 0) {
+                m.flags |= Mario.MARIO_PUNCHING
+            }
+
+            if (m.input & Mario.INPUT_B_PRESSED) {
+                m.actionArg = 3
+            }
+
+            if (Mario.is_anim_at_end(m)) {
+                Mario.set_mario_action(m, endAction, 0)
+            }
+            break
+
+        case 3: ///play sound - no break
+        case 4:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_SECOND_PUNCH)
+            if (Mario.is_anim_past_end(m)) {
+                m.actionArg = 5
+            } else { m.actionArg = 4 }
+
+            if (m.marioObj.header.gfx.unk38.animFrame > 0) {
+                m.flags |= Mario.MARIO_PUNCHING
+            }
+
+            if (m.actionArg == 5) {
+                m.marioBodyState.punchState = (1 << 6) | 4
+            }
+            break
+
+        case 5:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_SECOND_PUNCH_FAST)
+            if (m.marioObj.header.gfx.unk38.animFrame <= 0) {
+                m.flags |= Mario.MARIO_PUNCHING
+            }
+
+            if (m.input & Mario.INPUT_B_PRESSED) {
+                m.actionArg = 6
+            }
+
+            if (Mario.is_anim_at_end(m)) {
+                Mario.set_mario_action(m, endAction, 0)
+            }
+            break
+
+        case 6:
+            //play_mario_action_sound(m, SOUND_MARIO_PUNCH_HOO, 1)
+            const animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_GROUND_KICK)
+            if (animFrame == 0) {
+                m.marioBodyState.punchState = (2 << 6) | 6
+            }
+
+            if (animFrame >= 0 && animFrame < 8) {
+                m.flags |= Mario.MARIO_KICKING
+            }
+
+            if (Mario.is_anim_at_end(m)) {
+                Mario.set_mario_action(m, endAction, 0)
+            }
+            break
+
+        default: throw "unimplemented mario punch sequence case - breakdance?"
+    }
+
+    return 0
+}
+
+const act_punching = (m) => {
+
+    if (m.input & (Mario.INPUT_NONZERO_ANALOG | Mario.INPUT_A_PRESSED | Mario.INPUT_OFF_FLOOR | Mario.INPUT_ABOVE_SLIDE)) {
+        return Mario.check_common_action_exits(m)
+    }
+
+    m.actionState = 1
+    if (m.actionArg == 0) { m.actionTimer = 7 }
+
+    Mario.set_forward_vel(m, sPunchingForwardVelocities[m.actionTimer])
+    if (m.actionTimer > 0) { m.actionTimer-- }
+
+    mario_update_punch_sequence(m)
+    perform_ground_step(m)
+    return 0
+
+}
+
+export const mario_execute_object_action = (m) => {
+
+    switch (m.action) {
+        case Mario.ACT_PUNCHING: return act_punching(m)
+        default: throw "unknown action object"
+    }
+}

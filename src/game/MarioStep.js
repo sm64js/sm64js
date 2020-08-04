@@ -73,8 +73,14 @@ export const perform_air_step = (m, stepArg) => {
 
 const perform_ground_quarter_step = (m, nextPos) => {
 
+    const upperWall = Mario.resolve_and_return_wall_collisions(nextPos, 60.0, 50.0)
+
     const floorWrapper = {}
     const floorHeight = SurfaceCollision.find_floor(nextPos[0], nextPos[1], nextPos[2], floorWrapper)
+
+    m.wall = upperWall
+
+    if (floorWrapper.floor == null) throw "no floor - ground quarter steps"
 
     if (nextPos[1] > floorHeight + 100.0) {
         m.pos = [...nextPos]

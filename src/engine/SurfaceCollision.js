@@ -1,4 +1,4 @@
-import { LEVEL_BOUNDARY_MAX, CELL_SIZE, SURFACE_FLAG_NO_CAM_COLLISION, SURFACE_CAMERA_BOUNDARY } from "../include/surface_terrains"
+import { LEVEL_BOUNDARY_MAX, CELL_SIZE, SURFACE_FLAG_NO_CAM_COLLISION, SURFACE_CAMERA_BOUNDARY, SURFACE_FLAG_X_PROJECTION } from "../include/surface_terrains"
 import { SurfaceLoadInstance as SurfaceLoad } from "../game/SurfaceLoad"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
 import { SpawnObjectInstance as Spawn } from "../game/SpawnObject"
@@ -7,6 +7,33 @@ import { SpawnObjectInstance as Spawn } from "../game/SpawnObject"
 class SurfaceCollision {
     constructor() {
         Spawn.SurfaceCollision = this
+    }
+
+    find_wall_collisions(colData) {
+
+        let numCollisions = 0
+
+        const x = parseInt(colData.x)
+        const z = parseInt(colData.z)
+
+        colData.numWalls = 0
+
+        if (x <= -LEVEL_BOUNDARY_MAX || x >= LEVEL_BOUNDARY_MAX) {
+            return numCollisions
+        }
+        if (z <= -LEVEL_BOUNDARY_MAX || z >= LEVEL_BOUNDARY_MAX) {
+            return numCollisions
+        }
+
+        // World (level) consists of a 16x16 grid. Find where the collision is on
+        // the grid (round toward -inf)
+        const cellX = parseInt((x + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0xF
+        const cellZ = parseInt((z + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0xF
+
+        const node = SurfaceLoad.gStaticSurfacePartition[cellZ][cellX][SurfaceLoad.SPATIAL_PARTITION_WALLS].next
+        numCollisions += this.find_wall_collisions_from_list(node, colData)
+
+        return numCollisions
     }
 
     find_floor(xPos, yPos, zPos, floorWrapper) {
@@ -35,6 +62,91 @@ class SurfaceCollision {
 
         return heightWrapper.height
 
+    }
+
+    find_wall_collisions_from_list(surfaceNode, data) {
+
+        let radius = data.radius
+        let numCols = 0
+        const x = data.x, y = data.y + data.offsetY, z = data.z
+        data.walls = []
+
+        if (radius > 200.0) radius = 200.0
+
+        while (surfaceNode) {
+            const surf = surfaceNode.surface
+            surfaceNode = surfaceNode.next
+
+            // Exclude a large number of walls immediately to optimize.
+            if (y < surf.lowerY || y > surf.upperY) continue
+
+            const offset = surf.normal.x * x + surf.normal.y * y + surf.normal.z * z + surf.originOffset
+
+            if (offset < -radius || offset > radius) continue
+
+            const px = x, pz = z
+
+            if (surf.flags & SURFACE_FLAG_X_PROJECTION) {
+                const w1 = -surf.vertex1[2]; const w2 = -surf.vertex2[2]; const w3 = -surf.vertex3[2]
+                const y1 = surf.vertex1[1]; const y2 = surf.vertex2[1]; const y3 = surf.vertex3[1]
+
+                if (surf.normal.x > 0.0) {
+                    if ((y1 - y) * (w2 - w1) - (w1 - -pz) * (y2 - y1) > 0.0) continue 
+                    if ((y2 - y) * (w3 - w2) - (w2 - -pz) * (y3 - y2) > 0.0) continue 
+                    if ((y3 - y) * (w1 - w3) - (w3 - -pz) * (y1 - y3) > 0.0) continue 
+                } else {
+                    if ((y1 - y) * (w2 - w1) - (w1 - -pz) * (y2 - y1) < 0.0) continue 
+                    if ((y2 - y) * (w3 - w2) - (w2 - -pz) * (y3 - y2) < 0.0) continue 
+                    if ((y3 - y) * (w1 - w3) - (w3 - -pz) * (y1 - y3) < 0.0) continue 
+                }
+
+            } else {
+                const w1 = surf.vertex1[0]; const w2 = surf.vertex2[0]; const w3 = surf.vertex3[0]
+                const y1 = surf.vertex1[1]; const y2 = surf.vertex2[1]; const y3 = surf.vertex3[1]
+
+                if (surf.normal.z > 0.0) {
+                    if ((y1 - y) * (w2 - w1) - (w1 - px) * (y2 - y1) > 0.0) continue 
+                    if ((y2 - y) * (w3 - w2) - (w2 - px) * (y3 - y2) > 0.0) continue 
+                    if ((y3 - y) * (w1 - w3) - (w3 - px) * (y1 - y3) > 0.0) continue 
+                } else {
+                    if ((y1 - y) * (w2 - w1) - (w1 - px) * (y2 - y1) < 0.0) continue 
+                    if ((y2 - y) * (w3 - w2) - (w2 - px) * (y3 - y2) < 0.0) continue 
+                    if ((y3 - y) * (w1 - w3) - (w3 - px) * (y1 - y3) < 0.0) continue 
+                }
+
+            }
+
+
+            // Determine if we are checking for the camera or not.
+            if (ObjectListProcessor.gCheckingSurfaceCollisionsForCamera != 0) {
+                throw "find floor from list check to see if seem right"
+                if (surf.flags & SURFACE_FLAG_NO_CAM_COLLISION) continue 
+            }
+            // If we are not checking for the camera, ignore camera only floors.
+            else {
+                if (surf.type == SURFACE_CAMERA_BOUNDARY) continue 
+
+                //// More Vanish Cap Stuff -- walk through walls
+            }
+
+            //! (Wall Overlaps) Because this doesn't update the x and z local variables,
+            //  multiple walls can push mario more than is required.
+            data.x += surf.normal.x * (radius - offset)
+            data.z += surf.normal.z * (radius - offset)
+
+            //! (Unreferenced Walls) Since this only returns the first four walls,
+            //  this can lead to wall interaction being missed. Typically unreferenced walls
+            //  come from only using one wall, however.
+            if (data.numWalls < 4) {
+                //data.walls[data.numWalls++] = surf
+                data.walls.push(surf)
+                data.numWalls++
+            }
+
+            numCols++
+        }
+
+        return numCols
     }
 
     find_floor_from_list(surfaceNode, x, y, z, pheightWrapper) {

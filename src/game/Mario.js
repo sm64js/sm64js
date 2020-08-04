@@ -620,6 +620,26 @@ export const mario_get_floor_class = (m) => {
     return floorClass
 }
 
+export const resolve_and_return_wall_collisions = (pos, offset, radius) => {
+    const collisionData = {
+        radius,
+        offsetY: offset,
+        x: pos[0], y: pos[1], z: pos[2]
+    }
+
+    let wall
+
+    if (SurfaceCollision.find_wall_collisions(collisionData)) {
+        wall = collisionData.walls[collisionData.numWalls - 1]
+    }
+
+    pos[0] = collisionData.x
+    pos[1] = collisionData.y
+    pos[2] = collisionData.z
+
+    return wall
+}
+
 const update_mario_inputs = (m) => {
     m.particleFlags = 0
     m.input = 0

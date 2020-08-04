@@ -111,6 +111,13 @@ const act_double_jump_land_stop = (m) => {
     return 0
 }
 
+const act_triple_jump_land_stop = (m) => {
+    if (check_common_landing_cancels(m, Mario.ACT_JUMP)) return 1
+
+    landing_step(m, Mario.MARIO_ANIM_TRIPLE_JUMP_LAND, Mario.ACT_IDLE)
+    return 0
+}
+
 export const mario_execute_stationary_action = (m) => {
 
     switch (m.action) {
@@ -120,6 +127,7 @@ export const mario_execute_stationary_action = (m) => {
         case Mario.ACT_FREEFALL_LAND_STOP: return act_freefall_land_stop(m)
         case Mario.ACT_SIDE_FLIP_LAND_STOP: return act_side_flip_land_stop(m)
         case Mario.ACT_DOUBLE_JUMP_LAND_STOP: return act_double_jump_land_stop(m)
+        case Mario.ACT_TRIPLE_JUMP_LAND_STOP: return act_triple_jump_land_stop(m)
         default: throw "unkown action stationary"
     }
 }

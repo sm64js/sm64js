@@ -37,6 +37,9 @@ export const OBJ_MOVE_ABOVE_DEATH_BARRIER = (1 << 14) // 0x4000
 export const OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE = (1 << 0) // 0x00000001
 
 export const oFlags = 1
+
+export const oIntangibleTimer = 5
+
 export const oPosX = 6
 export const oPosY = 7
 export const oPosZ = 8
@@ -49,13 +52,32 @@ export const oFaceAnglePitch = 0x12
 export const oFaceAngleYaw = 0x13
 export const oFaceAngleRoll = 0x14
 
+export const oFloorHeight = 0x18
+
 export const oVelX = 0x09
 export const oVelY = 0x0A
 export const oVelZ = 0x0B
 
+export const oMarioWalkingPitch = 0x22
 export const oAngleVelPitch = 0x23
 export const oAngleVelYaw = 0x24
 export const oAngleVelRoll = 0x25
+
+export const oInteractType = 0x2A
+
+export const oBehParams2ndByte = 0x2F
+
+export const oDistanceToMario = 0x35
+
+export const oDamageOrCoinValue  = 0x3E
+export const oHealth             = 0x3F
+export const oBehParams = 0x40
+export const oPrevAction         = 0x41
+export const oInteractionSubtype = 0x42
+export const oCollisionDistance  = 0x43
+export const oNumLootCoins       = 0x44
+export const oDrawingDistance    = 0x45
+export const oRoom               = 0x46
 
 export const oGraphYOffset = 0x15
 
@@ -63,6 +85,4 @@ export const oAction = 0x31
 export const oSubAction = 0x32
 
 export const oTimer = 0x33
-
-export const oPrevAction = 0x41
 

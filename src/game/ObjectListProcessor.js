@@ -1,11 +1,11 @@
 import { PlatformDisplacementInstance as PlatformDisplacement } from "./PlatformDisplacement"
-import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll } from "../include/object_constants"
+import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte } from "../include/object_constants"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import * as GraphNode from "../engine/graph_node"
-import { GeoLayoutInstance } from "../engine/GeoLayout"
 import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands"
 import * as Mario from "./Mario"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
+import { detect_object_collisions } from "./ObjectCollisions"
 
 
 
@@ -56,9 +56,14 @@ class ObjectListProcessor {
         this.gObjectCounter = 0
         this.gCCMEnteredSlide = 0
         this.gCheckingSurfaceCollisionsForCamera = 0
-        this.gObjectLists = new Array(16).fill(0).map(() => { 
+        this.gObjectLists = new Array(13).fill(0).map(() => { 
 
-            const newObjectNode = { //ObjectNode
+            const blankObj = { header: {} }
+            blankObj.header.prev = blankObj
+            blankObj.header.next = blankObj
+            return blankObj
+
+/*            const newObjectNode = { //ObjectNode
                 next: null, prev: null,
                 gfx: { //GraphObjectNode
                     node: { //GraphNode
@@ -88,12 +93,13 @@ class ObjectListProcessor {
 
             newObjectNode.wrapperObject = newObject
 
-            return newObjectNode
+            return newObjectNode*/
         })
 
     }
 
     update_objects() {
+        detect_object_collisions()
         this.update_non_terrain_objects()
     }
 
@@ -173,9 +179,9 @@ class ObjectListProcessor {
 
                 const object = Spawn.create_object(script)
 
-                object.oBehParams = spawnInfo.behaviorArg
+                object.rawData[oBehParams] = spawnInfo.behaviorArg
 
-                object.oBehParams2ndByte = ((spawnInfo.behaviorArg) >> 16) & 0xFF
+                object.rawData[oBehParams2ndByte] = ((spawnInfo.behaviorArg) >> 16) & 0xFF
 
                 object.behavior = script
 

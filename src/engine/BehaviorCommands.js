@@ -55,8 +55,14 @@ class BehaviorCommands {
         return this.BHV_PROC_CONTINUE
     }
 
+    set_int(args) {
+        ObjListProc.gCurrentObject.rawData[args.field] = args.value
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
     or_int(args) {
-        const objectOffset = args.offset
+        const objectOffset = args.field
         let value = args.value
 
         value &= 0xFFFF

@@ -12,6 +12,7 @@ import { gMarioAnimData } from "../actors/mario/marioAnimData"
 import { mario_execute_moving_action } from "./MarioActionsMoving"
 import { mario_execute_airborne_action } from "./MarioActionsAirborne"
 import { mario_execute_object_action } from "./MarioActionsObject"
+import { oMarioWalkingPitch } from "../include/object_constants"
 
 
 ////// Mario Constants
@@ -213,7 +214,6 @@ export const INT_STATUS_TRAP_TURN = (1 << 20) /* 0x00100000 */
 export const INT_STATUS_HIT_MINE = (1 << 21) /* 0x00200000 */
 export const INT_STATUS_STOP_RIDING = (1 << 22) /* 0x00400000 */
 export const INT_STATUS_TOUCHED_BOB_OMB = (1 << 23) /* 0x00800000 */
-
 
 export const sJumpLandAction = {
     numFrames: 4,
@@ -441,7 +441,7 @@ export const set_mario_action_moving = (m, action, actionArg) => {
                 }
             }
 
-            m.marioObj.oMarioWalkingPitch = 0
+            m.marioObj.rawData[oMarioWalkingPitch] = 0
             break
     }
 

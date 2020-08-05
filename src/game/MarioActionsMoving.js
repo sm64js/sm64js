@@ -2,6 +2,7 @@ import * as Mario from "./Mario"
 import { SURFACE_SLOW } from "../include/surface_terrains"
 import { perform_ground_step } from "./MarioStep"
 import { approach_number } from "../engine/math_util"
+import { oMarioWalkingPitch } from "../include/object_constants"
 
 
 const apply_slope_accel = (m) => {
@@ -111,8 +112,8 @@ const anim_and_audio_for_walk = (m) => {
 
         }
 
-        marioObj.oMarioWalkingPitch = targetPitch
-        marioObj.header.gfx.angle[0] = marioObj.oMarioWalkingPitch
+        marioObj.rawData[oMarioWalkingPitch] = targetPitch
+        marioObj.header.gfx.angle[0] = marioObj.rawData[oMarioWalkingPitch]
     }
 
 }

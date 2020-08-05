@@ -1,7 +1,7 @@
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { AreaInstance as Area } from "./Area"
 import { geo_obj_init } from "../engine/graph_node"
-import { oPosX, oPosY, oPosZ } from "../include/object_constants"
+import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw } from "../include/object_constants"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 
@@ -34,13 +34,14 @@ export const obj_set_pos = (obj, x, y, z) => {
 }
 
 export const obj_set_angle = (obj, pitch, yaw, roll) => {
-    obj.oFaceAnglePitch = pitch
-    obj.oFaceAngleYaw = yaw
-    obj.oFaceAngleRoll = roll
 
-    obj.oMoveAnglePitch = pitch
-    obj.oMoveAngleYaw = yaw
-    obj.oMoveAngleRoll = roll
+    obj.rawData[oFaceAnglePitch] = pitch
+    obj.rawData[oFaceAngleYaw] = yaw
+    obj.rawData[oFaceAngleRoll] = roll
+
+    obj.rawData[oMoveAnglePitch] = pitch
+    obj.rawData[oMoveAngleYaw] = yaw
+    obj.rawData[oMoveAngleRoll] = roll
 }
 
 export const cur_obj_push_mario_away = (radius) => {

@@ -3,6 +3,7 @@ import { special_bubble_tree } from "../include/surface_terrains"
 import { MODEL_BOB_BUBBLY_TREE } from "../include/model_ids"
 import { bhvTree } from "./BehaviorData"
 import { spawn_object_abs_with_rot } from "./ObjectHelpers"
+import { oBehParams } from "../include/object_constants"
 
 const SPTYPE_NO_YROT_OR_PARAMS  = 0 // object is 8-bytes long, no y-rotation or any behavior params
 const SPTYPE_YROT_NO_PARAMS     = 1 // object is 10-bytes long, has y-rotation but no params
@@ -22,7 +23,7 @@ const spawn_macro_abs_yrot_2params = (model, behavior, x, y, z, ry, params) => {
     if (behavior) {
         const newObj = spawn_object_abs_with_rot(ObjectListProc.gMacroObjectDefaultParent,
             model, behavior, x, y, z, 0, convert_rotation(ry), 0)
-        newObj.oBehParams = params << 16
+        newObj.rawData[oBehParams] = params << 16
     } else throw "no behavior - no point in this object existing?"
 }
 

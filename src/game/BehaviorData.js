@@ -1,7 +1,7 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
 import { oFlags, oInteractType, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer } from "../include/object_constants"
-import * as Interact from "./Interact"
+import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario

@@ -2,13 +2,15 @@ import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProce
 import { oIntangibleTimer, oPosY, oPosX, oPosZ, oInteractType } from "../include/object_constants"
 
 const clear_object_collision = (startNode) => {
-    let sp4 = startNode.header.next
+    let sp4 = startNode.next
 
     while (sp4 != startNode) {
-        sp4.numCollidedObjs = 0
-        sp4.collidedObjInteractTypes = 0
-        if (sp4.rawData[oIntangibleTimer] > 0) sp4.rawData[oIntangibleTimer]--
-        sp4 = sp4.header.next
+        const obj = sp4.wrapperObject
+        obj.collidedObjs = []
+        obj.numCollidedObjs = 0 // possibly not necessary
+        obj.collidedObjInteractTypes = 0
+        if (obj.rawData[oIntangibleTimer] > 0) obj.rawData[oIntangibleTimer]--
+        sp4 = sp4.next
     }
 }
 

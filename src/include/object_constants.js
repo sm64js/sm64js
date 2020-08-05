@@ -64,6 +64,7 @@ export const oAngleVelYaw = 0x24
 export const oAngleVelRoll = 0x25
 
 export const oInteractType = 0x2A
+export const oInteractStatus = 0x2B
 
 export const oBehParams2ndByte = 0x2F
 

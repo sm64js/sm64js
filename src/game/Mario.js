@@ -12,6 +12,9 @@ import { gMarioAnimData } from "../actors/mario/marioAnimData"
 import { mario_execute_moving_action } from "./MarioActionsMoving"
 import { mario_execute_airborne_action } from "./MarioActionsAirborne"
 import { mario_execute_object_action } from "./MarioActionsObject"
+import { oMarioWalkingPitch, oInteractStatus } from "../include/object_constants"
+import * as Interact from "./Interaction"
+import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
 
 
 ////// Mario Constants
@@ -63,6 +66,15 @@ export const MARIO_ANIM_FIRST_PUNCH = 0x67
 export const MARIO_ANIM_SECOND_PUNCH = 0x68
 export const MARIO_ANIM_FIRST_PUNCH_FAST = 0x69
 export const MARIO_ANIM_SECOND_PUNCH_FAST = 0x6A
+export const MARIO_ANIM_CLIMB_UP_POLE = 0x05
+export const MARIO_ANIM_GRAB_POLE_SHORT = 0x06
+export const MARIO_ANIM_GRAB_POLE_SWING_PART1 = 0x07
+export const MARIO_ANIM_GRAB_POLE_SWING_PART2 = 0x08
+export const MARIO_ANIM_HANDSTAND_IDLE = 0x09
+export const MARIO_ANIM_HANDSTAND_JUMP = 0x0A
+export const MARIO_ANIM_START_HANDSTAND = 0x0B
+export const MARIO_ANIM_RETURN_FROM_HANDSTAND = 0x0C
+export const MARIO_ANIM_IDLE_ON_POLE = 0x0D
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -83,6 +95,8 @@ export const MARIO_TRIPPING = 0x00400000
 export const MARIO_UNKNOWN_25 = 0x02000000
 export const MARIO_UNKNOWN_30 = 0x40000000
 export const MARIO_UNKNOWN_31 = 0x80000000
+
+export const ACT_ID_MASK = 0x000001FF
 
 export const ACT_GROUP_MASK = 0x000001C0
 export const ACT_GROUP_STATIONARY = (0 << 6)
@@ -119,6 +133,13 @@ export const ACT_TRIPLE_JUMP = 0x01000882
 export const ACT_TRIPLE_JUMP_LAND = 0x04000478
 export const ACT_TRIPLE_JUMP_LAND_STOP = 0x0800023A
 export const ACT_PUNCHING = 0x00800380
+export const ACT_GRAB_POLE_SLOW = 0x00100341
+export const ACT_GRAB_POLE_FAST = 0x00100342 
+export const ACT_HOLDING_POLE = 0x08100340
+export const ACT_CLIMBING_POLE            =  0x00100343 
+export const ACT_TOP_OF_POLE_TRANSITION   =  0x00100344 
+export const ACT_TOP_OF_POLE              =  0x00100345 
+export const ACT_START_HANGING            =  0x08200348
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -196,24 +217,6 @@ export const PARTICLE_MIST_CIRCLE          /* 0x00010000 */ = (1 << 16)
 export const PARTICLE_BREATH               /* 0x00020000 */ = (1 << 17)
 export const PARTICLE_TRIANGLE             /* 0x00040000 */ = (1 << 18)
 export const PARTICLE_19                   /* 0x00080000 */ = (1 << 19)
-
-export const INT_STATUS_HOOT_GRABBED_BY_MARIO = (1 << 0) /* 0x00000001 */
-export const INT_STATUS_MARIO_UNK1 = (1 << 1) /* 0x00000002 */
-export const INT_STATUS_MARIO_UNK2 = (1 << 2) /* 0x00000004 */
-export const INT_STATUS_MARIO_DROP_OBJECT = (1 << 3) /* 0x00000008 */
-export const INT_STATUS_MARIO_UNK4 = (1 << 4) /* 0x00000010 */
-export const INT_STATUS_MARIO_UNK5 = (1 << 5) /* 0x00000020 */
-export const INT_STATUS_MARIO_UNK6 = (1 << 6) /* 0x00000040 */
-export const INT_STATUS_MARIO_UNK7 = (1 << 7) /* 0x00000080 */
-export const INT_STATUS_GRABBED_MARIO = (1 << 11) /* 0x00000800 */
-export const INT_STATUS_ATTACKED_MARIO = (1 << 13) /* 0x00002000 */
-export const INT_STATUS_WAS_ATTACKED = (1 << 14) /* 0x00004000 */
-export const INT_STATUS_INTERACTED = (1 << 15) /* 0x00008000 */
-export const INT_STATUS_TRAP_TURN = (1 << 20) /* 0x00100000 */
-export const INT_STATUS_HIT_MINE = (1 << 21) /* 0x00200000 */
-export const INT_STATUS_STOP_RIDING = (1 << 22) /* 0x00400000 */
-export const INT_STATUS_TOUCHED_BOB_OMB = (1 << 23) /* 0x00800000 */
-
 
 export const sJumpLandAction = {
     numFrames: 4,
@@ -441,7 +444,7 @@ export const set_mario_action_moving = (m, action, actionArg) => {
                 }
             }
 
-            m.marioObj.oMarioWalkingPitch = 0
+            m.marioObj.rawData[oMarioWalkingPitch] = 0
             break
     }
 
@@ -517,6 +520,7 @@ export const execute_mario_action = (marioIndex) => {
     if (LevelUpdate.gMarioState[marioIndex].action) {
         LevelUpdate.gMarioState[marioIndex].marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
         update_mario_inputs(LevelUpdate.gMarioState[marioIndex])
+        Interact.mario_process_interactions(LevelUpdate.gMarioState[marioIndex])
 
         let inLoop = 1
 
@@ -534,12 +538,15 @@ export const execute_mario_action = (marioIndex) => {
                 case ACT_GROUP_OBJECT:
                     inLoop = mario_execute_object_action(LevelUpdate.gMarioState[marioIndex]); break
 
+                case ACT_GROUP_AUTOMATIC:
+                    inLoop = mario_execute_automatic_action(LevelUpdate.gMarioState[marioIndex]); break
+
                 default: throw "unkown action group"
             }
         }
 
 
-        LevelUpdate.gMarioState[marioIndex].marioObj.oInteractStatus = 0
+        LevelUpdate.gMarioState[marioIndex].marioObj.rawData[oInteractStatus] = 0
     }
 }
 
@@ -561,6 +568,8 @@ const update_mario_joystick_inputs = (m, playerInput) => {
     } else {
         m.intendedYaw = m.faceAngle[1]
     }
+
+    m.controller = { stickX: playerInput.stickX, stickY: playerInput.stickY }
 
     m.intendedYaw = m.intendedYaw > 32767 ? m.intendedYaw - 65536 : m.intendedYaw
     m.intendedYaw = m.intendedYaw < -32768 ? m.intendedYaw + 65536 : m.intendedYaw
@@ -756,10 +765,10 @@ const update_mario_inputs = (m) => {
     if (!(m.input & (INPUT_NONZERO_ANALOG | INPUT_A_PRESSED))) {
         m.input |= INPUT_UNKNOWN_5;
     }
-    
-    if (m.marioObj.oInteractStatus
-        & (INT_STATUS_HOOT_GRABBED_BY_MARIO | INT_STATUS_MARIO_UNK1 | INT_STATUS_MARIO_UNK4)) {
-        m.input |= INPUT_UNKNOWN_10;
+
+    if (m.marioObj.rawData[oInteractStatus]
+        & (Interact.INT_STATUS_HOOT_GRABBED_BY_MARIO | Interact.INT_STATUS_MARIO_UNK1 | Interact.INT_STATUS_MARIO_UNK4)) {
+        m.input |= INPUT_UNKNOWN_10
     }
 
     if (m.wallKickTimer > 0) {

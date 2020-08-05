@@ -1,6 +1,7 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
-import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } from "../include/object_constants"
+import { oFlags, oInteractType, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer } from "../include/object_constants"
+import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -29,9 +30,9 @@ const OBJ_LIST_UNIMPORTANT = 12 // (12) unimportant objects. objects that will n
 //      gets exhausted.
 const NUM_OBJ_LISTS = 13
 
-
 export const bhvMario = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PLAYER } },
+    { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.set_hitbox, args: { radius: 37, height: 160 } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: ObjectListProcessor.bhv_mario_update, funcClass: ObjectListProcessor } },
@@ -40,8 +41,10 @@ export const bhvMario = [
 
 export const bhvTree = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE } },
-    { command: BhvCmds.or_int, args: { offset: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.set_int, args: { field: oInteractType, value: Interact.INTERACT_POLE } },
     { command: BhvCmds.set_hitbox, args: { radius: 80, height: 500 } },
+    { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_pole_base_loop } },
     { command: BhvCmds.end_loop },

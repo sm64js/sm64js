@@ -134,11 +134,11 @@ export const ACT_TRIPLE_JUMP_LAND = 0x04000478
 export const ACT_TRIPLE_JUMP_LAND_STOP = 0x0800023A
 export const ACT_PUNCHING = 0x00800380
 export const ACT_GRAB_POLE_SLOW = 0x00100341
-export const ACT_GRAB_POLE_FAST = 0x00100342 
+export const ACT_GRAB_POLE_FAST = 0x00100342
 export const ACT_HOLDING_POLE = 0x08100340
-export const ACT_CLIMBING_POLE            =  0x00100343 
-export const ACT_TOP_OF_POLE_TRANSITION   =  0x00100344 
-export const ACT_TOP_OF_POLE              =  0x00100345 
+export const ACT_CLIMBING_POLE            =  0x00100343
+export const ACT_TOP_OF_POLE_TRANSITION   =  0x00100344
+export const ACT_TOP_OF_POLE              =  0x00100345
 export const ACT_START_HANGING            =  0x08200348
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
@@ -462,7 +462,7 @@ export const set_mario_animation = (m, targetAnimID) => {
         o.header.gfx.unk38.curAnim = m.animation.targetAnim
         o.header.gfx.unk38.animAccel = 0
         o.header.gfx.unk38.animYTrans = m.unkB0
-    
+
         if (m.animation.targetAnim.flags & ANIM_FLAG_2) {
             o.header.gfx.unk38.animFrame = m.animation.targetAnim.unk04
         } else {
@@ -475,7 +475,7 @@ export const set_mario_animation = (m, targetAnimID) => {
     }
 
     return o.header.gfx.unk38.animFrame
-        
+
 }
 
 export const set_mario_anim_with_accel = (m, targetAnimID, accel) => {
@@ -554,6 +554,7 @@ const update_mario_button_inputs = (m, playerInput) => {
     if (playerInput.buttonPressedA) m.input |= INPUT_A_PRESSED
     if (playerInput.buttonDownA) m.input |= INPUT_A_DOWN
     if (playerInput.buttonPressedB) m.input |= INPUT_B_PRESSED
+    if (playerInput.buttonPressedZ) m.input |=  INPUT_Z_PRESSED
 }
 
 const update_mario_joystick_inputs = (m, playerInput) => {
@@ -615,31 +616,31 @@ const update_mario_geometry_inputs = (m) => {
 
 export const mario_floor_is_slippery = (m) => {
     let normY
-        
+
     if ((m.area.terrainType & SurfaceTerrains.TERRAIN_MASK) == SurfaceTerrains.TERRAIN_SLIDE
         && m.floor.normal.y < 0.9998477 //~cos(1 deg)
     ) {
         return true
     }
-    
+
     switch (mario_get_floor_class(m)) {
         case SurfaceTerrains.SURFACE_VERY_SLIPPERY:
             normY = 0.9848077 //~cos(10 deg)
             break
-    
+
         case SurfaceTerrains.SURFACE_SLIPPERY:
             normY = 0.9396926 //~cos(20 deg)
             break
-    
+
         default:
             normY = 0.7880108 //~cos(38 deg)
             break
-    
+
         case SurfaceTerrains.SURFACE_NOT_SLIPPERY:
             normY = 0.0
             break
     }
-    
+
     return m.floor.normal.y <= normY
 }
 
@@ -684,7 +685,7 @@ export const mario_get_floor_class = (m) => {
     } else {
         floorClass = SurfaceTerrains.SURFACE_CLASS_DEFAULT
     }
-    
+
     if (m.floor) {
         switch (m.floor.type) {
             case SurfaceTerrains.SURFACE_NOT_SLIPPERY:
@@ -692,14 +693,14 @@ export const mario_get_floor_class = (m) => {
             case SurfaceTerrains.SURFACE_SWITCH:
                 floorClass = SurfaceTerrains.SURFACE_CLASS_NOT_SLIPPERY
                 break
-    
+
             case SurfaceTerrains.SURFACE_SLIPPERY:
             case SurfaceTerrains.SURFACE_NOISE_SLIPPERY:
             case SurfaceTerrains.SURFACE_HARD_SLIPPERY:
             case SurfaceTerrains.SURFACE_NO_CAM_COL_SLIPPERY:
                 floorClass = SurfaceTerrains.SURFACE_CLASS_SLIPPERY
                 break
-    
+
             case SurfaceTerrains.SURFACE_VERY_SLIPPERY:
             case SurfaceTerrains.SURFACE_ICE:
             case SurfaceTerrains.SURFACE_HARD_VERY_SLIPPERY:
@@ -711,12 +712,12 @@ export const mario_get_floor_class = (m) => {
                 break
         }
     }
-    
+
     // Crawling allows Mario to not slide on certain steeper surfaces.
     if (m.action == ACT_CRAWLING && m.floor.normal.y > 0.5 && floorClass == SurfaceTerrains.SURFACE_CLASS_DEFAULT) {
         floorClass = SurfaceTerrains.SURFACE_CLASS_NOT_SLIPPERY
     }
-    
+
     return floorClass
 }
 
@@ -754,14 +755,14 @@ const update_mario_inputs = (m) => {
 
     update_mario_geometry_inputs(m)
 
-    if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) { 
+    if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) {
         if (m.action & ACT_FLAG_ALLOW_FIRST_PERSON) {
             m.input |= INPUT_FIRST_PERSON;
         } else {
             Camera.gCameraMovementFlags &= ~Camera.CAM_MOVE_C_UP_MODE;
         }
     }
-    
+
     if (!(m.input & (INPUT_NONZERO_ANALOG | INPUT_A_PRESSED))) {
         m.input |= INPUT_UNKNOWN_5;
     }
@@ -774,7 +775,7 @@ const update_mario_inputs = (m) => {
     if (m.wallKickTimer > 0) {
         m.wallKickTimer--
     }
-    
+
     if (m.doubleJumpTimer > 0) {
         m.doubleJumpTimer--
     }

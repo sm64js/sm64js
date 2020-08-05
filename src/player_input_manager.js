@@ -10,7 +10,7 @@ window.addEventListener("keydown", (e) => {
     }
 }, false)
 
-const keyboardButtons = { w: false, a: false, s: false, d: false, up: false, down: false, left: false, right: false, space: false, b: false }
+const keyboardButtons = { w: false, a: false, s: false, d: false, up: false, down: false, left: false, right: false, space: false, enter: false, b: false, z: false }
 
 Keydrown.W.down(() => { keyboardButtons.w = true })
 Keydrown.A.down(() => { keyboardButtons.a = true })
@@ -19,6 +19,8 @@ Keydrown.D.down(() => { keyboardButtons.d = true })
 
 Keydrown.SPACE.down(() => { keyboardButtons.space = true })
 Keydrown.B.down(() => { keyboardButtons.b = true })
+Keydrown.Z.down(() => { keyboardButtons.z = true })
+
 
 Keydrown.UP.down(() => { keyboardButtons.up = true })
 Keydrown.DOWN.down(() => { keyboardButtons.down = true })
@@ -32,6 +34,7 @@ Keydrown.D.up(() => { keyboardButtons.d = false })
 
 Keydrown.SPACE.up(() => { keyboardButtons.space = false })
 Keydrown.B.up(() => { keyboardButtons.b = false })
+Keydrown.Z.up(() => { keyboardButtons.z = false })
 
 Keydrown.UP.up(() => { keyboardButtons.up = false })
 Keydrown.DOWN.up(() => { keyboardButtons.down = false })
@@ -60,7 +63,9 @@ export const playerInputUpdate = () => {
         buttonPressedA: keyboardButtons.space && !window.playerInput.buttonDownA,
         buttonDownA: keyboardButtons.space,
         buttonPressedB: keyboardButtons.b && !window.playerInput.buttonDownB,
-        buttonDownB: keyboardButtons.b
+        buttonDownB: keyboardButtons.b,
+        buttonPressedZ: keyboardButtons.z && !window.playerInput.buttonDownZ,
+        buttonDownZ: keyboardButtons.z
     }
 
     //// Repeat for other player

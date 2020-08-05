@@ -60,6 +60,9 @@ export const INT_STATUS_HIT_MINE = (1 << 21) /* 0x00200000 */
 export const INT_STATUS_STOP_RIDING = (1 << 22) /* 0x00400000 */
 export const INT_STATUS_TOUCHED_BOB_OMB = (1 << 23) /* 0x00800000 */
 
+const reset_mario_pitch = (m) => {
+    /// TODO: WATER JUMP || SHOT FROM CANNON || ACT_FLYING
+}
 
 const interact_pole = (m, o) => {
     const actionId = m.action & Mario.ACT_ID_MASK
@@ -81,10 +84,11 @@ const interact_pole = (m, o) => {
                 return Mario.set_mario_action(m, Mario.ACT_GRAB_POLE_SLOW, 0)
             }
 
-            throw "need to finish implementing mario grab pole at fast speed"
             marioObj.rawData[oMarioPoleYawVel] = parseInt((m.forwardVel * 0x100) + 0x1000)
 
-            console.log("interact pole")
+            reset_mario_pitch(m) /// TODO: WATER JUMP || SHOT FROM CANNON || ACT_FLYING
+            return Mario.set_mario_action(m, Mario.ACT_GRAB_POLE_FAST, 0)
+
         }
     }
 

@@ -14,6 +14,7 @@ import { mario_execute_airborne_action } from "./MarioActionsAirborne"
 import { mario_execute_object_action } from "./MarioActionsObject"
 import { oMarioWalkingPitch, oInteractStatus } from "../include/object_constants"
 import * as Interact from "./Interaction"
+import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
 
 
 ////// Mario Constants
@@ -65,6 +66,15 @@ export const MARIO_ANIM_FIRST_PUNCH = 0x67
 export const MARIO_ANIM_SECOND_PUNCH = 0x68
 export const MARIO_ANIM_FIRST_PUNCH_FAST = 0x69
 export const MARIO_ANIM_SECOND_PUNCH_FAST = 0x6A
+export const MARIO_ANIM_CLIMB_UP_POLE = 0x05
+export const MARIO_ANIM_GRAB_POLE_SHORT = 0x06
+export const MARIO_ANIM_GRAB_POLE_SWING_PART1 = 0x07
+export const MARIO_ANIM_GRAB_POLE_SWING_PART2 = 0x08
+export const MARIO_ANIM_HANDSTAND_IDLE = 0x09
+export const MARIO_ANIM_HANDSTAND_JUMP = 0x0A
+export const MARIO_ANIM_START_HANDSTAND = 0x0B
+export const MARIO_ANIM_RETURN_FROM_HANDSTAND = 0x0C
+export const MARIO_ANIM_IDLE_ON_POLE = 0x0D
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -125,6 +135,11 @@ export const ACT_TRIPLE_JUMP_LAND_STOP = 0x0800023A
 export const ACT_PUNCHING = 0x00800380
 export const ACT_GRAB_POLE_SLOW = 0x00100341
 export const ACT_GRAB_POLE_FAST = 0x00100342 
+export const ACT_HOLDING_POLE = 0x08100340
+export const ACT_CLIMBING_POLE            =  0x00100343 
+export const ACT_TOP_OF_POLE_TRANSITION   =  0x00100344 
+export const ACT_TOP_OF_POLE              =  0x00100345 
+export const ACT_START_HANGING            =  0x08200348
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -523,6 +538,9 @@ export const execute_mario_action = (marioIndex) => {
                 case ACT_GROUP_OBJECT:
                     inLoop = mario_execute_object_action(LevelUpdate.gMarioState[marioIndex]); break
 
+                case ACT_GROUP_AUTOMATIC:
+                    inLoop = mario_execute_automatic_action(LevelUpdate.gMarioState[marioIndex]); break
+
                 default: throw "unkown action group"
             }
         }
@@ -550,6 +568,8 @@ const update_mario_joystick_inputs = (m, playerInput) => {
     } else {
         m.intendedYaw = m.faceAngle[1]
     }
+
+    m.controller = { stickX: playerInput.stickX, stickY: playerInput.stickY }
 
     m.intendedYaw = m.intendedYaw > 32767 ? m.intendedYaw - 65536 : m.intendedYaw
     m.intendedYaw = m.intendedYaw < -32768 ? m.intendedYaw + 65536 : m.intendedYaw

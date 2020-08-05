@@ -86,6 +86,8 @@ export const MARIO_UNKNOWN_25 = 0x02000000
 export const MARIO_UNKNOWN_30 = 0x40000000
 export const MARIO_UNKNOWN_31 = 0x80000000
 
+export const ACT_ID_MASK = 0x000001FF
+
 export const ACT_GROUP_MASK = 0x000001C0
 export const ACT_GROUP_STATIONARY = (0 << 6)
 export const ACT_GROUP_MOVING = (1 << 6)
@@ -121,6 +123,8 @@ export const ACT_TRIPLE_JUMP = 0x01000882
 export const ACT_TRIPLE_JUMP_LAND = 0x04000478
 export const ACT_TRIPLE_JUMP_LAND_STOP = 0x0800023A
 export const ACT_PUNCHING = 0x00800380
+export const ACT_GRAB_POLE_SLOW = 0x00100341
+export const ACT_GRAB_POLE_FAST = 0x00100342 
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002

@@ -58,6 +58,15 @@ export const oVelX = 0x09
 export const oVelY = 0x0A
 export const oVelZ = 0x0B
 
+export const oMarioParticleFlags    = 0x1B
+export const oMarioPoleUnk108       = 0x20
+export const oMarioReadingSignDYaw  = 0x20
+export const oMarioPoleYawVel       = 0x21
+export const oMarioCannonObjectYaw  = 0x21
+export const oMarioTornadoYawVel    = 0x21
+export const oMarioReadingSignDPosX = 0x21
+export const oMarioPolePos          = 0x22
+
 export const oMarioWalkingPitch = 0x22
 export const oAngleVelPitch = 0x23
 export const oAngleVelYaw = 0x24

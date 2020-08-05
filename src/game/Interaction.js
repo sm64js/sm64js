@@ -1,5 +1,5 @@
 import * as Mario from "./Mario"
-import { oInteractType, oInteractStatus } from "../include/object_constants"
+import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY } from "../include/object_constants"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
 export const INTERACT_GRABBABLE      /* 0x00000002 */ = (1 << 1)
@@ -62,7 +62,33 @@ export const INT_STATUS_TOUCHED_BOB_OMB = (1 << 23) /* 0x00800000 */
 
 
 const interact_pole = (m, o) => {
-    console.log("interacting with a pole")
+    const actionId = m.action & Mario.ACT_ID_MASK
+    if (actionId >= 0x80 && actionId < 0x0A0) {
+        if (!(m.prevAction & Mario.ACT_FLAG_ON_POLE) || m.usedObj != o) {
+            const lowSpeed = m.forwardVel <= 10.0
+            const marioObj = m.marioObj
+
+            m.interactObj = o
+            m.usedObj = o
+            m.vel[1] = 0.0
+            m.forwardVel = 0.0
+
+            marioObj.rawData[oMarioPoleUnk108] = 0
+            marioObj.rawData[oMarioPoleYawVel] = 0
+            marioObj.rawData[oMarioPolePos] = m.pos[1] - o.rawData[oPosY]
+
+            if (lowSpeed) {
+                return Mario.set_mario_action(m, Mario.ACT_GRAB_POLE_SLOW, 0)
+            }
+
+            throw "need to finish implementing mario grab pole at fast speed"
+            marioObj.rawData[oMarioPoleYawVel] = parseInt((m.forwardVel * 0x100) + 0x1000)
+
+            console.log("interact pole")
+        }
+    }
+
+    return 0
 }
 
 const sInteractionHandlers = [

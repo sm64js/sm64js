@@ -302,6 +302,7 @@ export const G_RM_AA_XLU_SURF_SURF2 = 0x5041c8
 
 export const G_RM_AA_ZB_TEX_EDGE_NOOP2 = 0x443078
 export const G_RM_AA_ZB_OPA_INTER_NOOP2 = 0x442478
+export const G_RM_AA_ZB_XLU_DECAL_DECAL2 = 0x504dd8
 export const G_RM_AA_ZB_XLU_SURF_SURF2 = 0x5049d8
 export const G_RM_AA_ZB_OPA_SURF_SURF2 = 0x552078
 
@@ -337,6 +338,12 @@ export const G_CC_MODULATERGBA = {
     alpha: [1, 7, 4, 7],
     rgb: [1, 15, 4, 7]
 }
+
+export const G_CC_MODULATEIA = {
+    alpha: [1, 7, 4, 7],
+    rgb: [1, 15, 4, 7]
+}
+
 
 export const G_CC_MODULATERGBA_PRIM = {
     alpha: [1, 7, 3, 7],

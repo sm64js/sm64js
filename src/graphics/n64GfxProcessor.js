@@ -339,6 +339,25 @@ export class n64GfxProcessor {
         WebGL.upload_texture(rgba32_buf, width, height)
     }
 
+    import_texture_ia16(tile) {
+        const rgba32_buf = []
+
+        for (let i = 0; i < this.rdp.loaded_texture[tile].size_bytes / 2; i++) {
+            const intensity = this.rdp.loaded_texture[tile].textureData[2 * i] >> 4
+            const alpha = this.rdp.loaded_texture[tile].textureData[2* i + 1]
+
+            rgba32_buf.push(intensity)
+            rgba32_buf.push(intensity)
+            rgba32_buf.push(intensity)
+            rgba32_buf.push(alpha)
+        }
+
+        const width = this.rdp.texture_tile.line_size_bytes / 2
+        const height = this.rdp.loaded_texture[tile].size_bytes / this.rdp.texture_tile.line_size_bytes
+
+        WebGL.upload_texture(rgba32_buf, width, height)
+    }
+
     import_texture_rgba16(tile) {
 
         const rgba32_buf = []
@@ -379,7 +398,7 @@ export class n64GfxProcessor {
             if (siz == Gbi.G_IM_SIZ_8b) {
                 this.import_texture_ia8(tile)
             } else {
-                throw "unimplemented texture size"
+                this.import_texture_ia16(tile)
             }
         } else {
             throw "unimplemented texture format"

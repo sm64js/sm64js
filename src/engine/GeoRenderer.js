@@ -4,6 +4,7 @@ import { GameInstance as Game } from "../game/Game"
 import * as Gbi from "../include/gbi"
 import { CameraInstance as Camera } from "../game/Camera"
 import * as Mario from "../game/Mario"
+import { create_shadow_below_xyz } from "../game/Shadow"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -248,14 +249,14 @@ class GeoRenderer {
             this.gCurAnimType = Mario.ANIM_TYPE_ROTATION
         } else {
             if (this.gCurAnimType == Mario.ANIM_TYPE_LATERAL_TRANSLATION) {
-                translation[0] += tthis.read_next_anim_value() + this.gCurAnimTranslationMultiplier
+                translation[0] += this.read_next_anim_value() + this.gCurAnimTranslationMultiplier
                 this.gCurrAnimAttribute.indexToIndices += 2
-                translation[2] += tthis.read_next_anim_value() + this.gCurAnimTranslationMultiplier
+                translation[2] += this.read_next_anim_value() + this.gCurAnimTranslationMultiplier
                 this.gCurAnimType = Mario.ANIM_TYPE_ROTATION
             } else {
                 if (this.gCurAnimType == Mario.ANIM_TYPE_VERTICAL_TRANSLATION) {
                     this.gCurrAnimAttribute.indexToIndices += 2
-                    translation[1] += ththis.read_next_anim_value() + this.gCurAnimTranslationMultiplier
+                    translation[1] += this.read_next_anim_value() + this.gCurAnimTranslationMultiplier
                     this.gCurrAnimAttribute.indexToIndices += 2
                     this.gCurAnimType = Mario.ANIM_TYPE_ROTATION
                 } else if (this.gCurAnimType == Mario.ANIM_TYPE_NO_TRANSLATION) {
@@ -353,7 +354,7 @@ class GeoRenderer {
                 if (object.header.gfx.sharedChild) {
                     this.gCurGraphNodeObject = node.wrapper
                     object.header.gfx.sharedChild.parent = object.header.gfx.node
-                    this.geo_process_node_and_siblings(object.header.gfx.sharedChild.children)
+                    this.geo_process_single_node(object.header.gfx.sharedChild)
                     object.header.gfx.sharedChild.parent = null
                     this.gCurGraphNodeObject = null
                 }
@@ -422,6 +423,58 @@ class GeoRenderer {
 
     }
 
+    geo_process_shadow(node) {
+
+        let shadowPos, shadowScale
+
+        if (this.gCurGraphNodeCamera && this.gCurGraphNodeObject) {
+            if (this.gCurGraphNodeHeldObject) {
+                throw "shadow for held objects"
+            } else {
+                shadowPos = [...this.gCurGraphNodeObject.pos]
+                shadowScale = node.wrapper.shadowScale * this.gCurGraphNodeObject.scale[0]
+            }
+
+            let objScale = 1.0
+
+            if (this.gCurAnimEnabled) {
+                if (this.gCurAnimType == this.ANIM_TYPE_TRANSLATION || this.gCurAnimType == this.ANIM_TYPE_LATERAL_TRANSLATION) {
+                    const geo = node.children[0]
+                    if (geo && geo.type == GraphNode.GRAPH_NODE_TYPE_SCALE) {
+                        objScale = geo.wrapper.scale
+                    }
+                    const animOffset = new Array(3)
+                    animOffset[0] = this.read_next_anim_value() * this.gCurAnimTranslationMultiplier * objScale
+                    animOffset[1] = 0.0
+                    this.gCurrAnimAttribute.indexToIndices += 2
+                    animOffset[2] = this.read_next_anim_value() * this.gCurAnimTranslationMultiplier * objScale
+                    this.gCurrAnimAttribute.indexToIndices -= 6
+
+                    const sinAng = Math.sin(this.gCurGraphNodeObject.angle[1] / 0x8000 * Math.PI)
+                    const cosAng = Math.cos(this.gCurGraphNodeObject.angle[1] / 0x8000 * Math.PI)
+
+                    shadowPos[0] += animOffset[0] * cosAng + animOffset[2] * sinAng
+                    shadowPos[2] += -animOffset[0] * sinAng + animOffset[2] * cosAng
+
+                }
+            }
+            const shadowList = create_shadow_below_xyz(shadowPos[0], shadowPos[1], shadowPos[2], shadowScale, node.wrapper.shadowSolidity, node.wrapper.shadowType)
+
+            if (shadowList) {
+                const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
+                this.gMatStackIndex++
+                MathUtil.mtxf_translate(mtxf, shadowPos)
+                MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex], mtxf, this.gCurGraphNodeCamera.wrapper.matrixPtr)
+                this.geo_append_display_list(shadowList, 6)
+                this.gMatStackIndex--
+            }
+        }
+
+        if (node.children[0]) {
+            this.geo_process_node_and_siblings(node.children)
+        }
+    }
+
     geo_process_switch_case(node) {
 
         const fnNode = node.wrapper.fnNode
@@ -477,8 +530,15 @@ class GeoRenderer {
             case GraphNode.GRAPH_NODE_TYPE_SWITCH_CASE:
                 this.geo_process_switch_case(node); break
 
-            default: throw "unimplemented geo node: " + node.type
+            case GraphNode.GRAPH_NODE_TYPE_SHADOW:
+                this.geo_process_shadow(node); break
 
+            default:
+                /// remove this check once all types have been added
+                if (node.type != GraphNode.GRAPH_NODE_TYPE_CULLING_RADIUS) throw "unimplemented type in geo renderer"
+                if (node.children[0]) {
+                    this.geo_process_node_and_siblings(node.children)
+                }
         }
     }
 

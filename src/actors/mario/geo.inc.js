@@ -33,6 +33,7 @@ import {
     mario_medium_poly_right_foot
  } from "./model.inc"
 import { MarioMiscInstance as MarioMisc } from "../../game/MarioMisc"
+import { SHADOW_CIRCLE_PLAYER } from "../../game/Shadow"
 
 const mario_geo_face_and_wings = [
     { command: Geo.node_rotation, args: [ 0x00, 0, 0, 0] },
@@ -169,7 +170,7 @@ const mario_geo_body = [
 ]
 
 export const mario_geo = [
-    { command: Geo.node_start },
+    { command: Geo.node_shadow, args: [SHADOW_CIRCLE_PLAYER, 0xB4, 100] },
     { command: Geo.open_node },
         { command: Geo.node_scale, args: [0x00, 16384] },
         { command: Geo.open_node },

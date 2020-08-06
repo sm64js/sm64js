@@ -422,6 +422,20 @@ export const init_graph_node_background = (pool, graphNode, background, backgrou
 
 }
 
+export const init_graph_node_shadow = (shadowScale, shadowSolidity, shadowType) => {
+
+    const graphNode = {
+        node: {},
+        shadowType,
+        shadowScale,
+        shadowSolidity
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_SHADOW)
+
+    return graphNode
+}
+
 export const init_graph_node_scale = (drawingLayer, displayList, scale) => {
     const graphNode = {
         node: {},

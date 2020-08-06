@@ -21,7 +21,14 @@ export const mtxf_identity = (mtx) => {
         }
     }
     return mtx
-} 
+}
+
+export const mtxf_translate = (dest, b) => {
+    mtxf_identity(dest)
+    dest[3][0] = b[0]
+    dest[3][1] = b[1]
+    dest[3][2] = b[2]
+}
 
 export const mtxf_to_mtx = (dest, src) => {
     /// just a regular copy in js

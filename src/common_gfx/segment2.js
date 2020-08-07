@@ -2,6 +2,8 @@ import * as Gbi from "../include/gbi"
 
 const canvas = document.querySelector('#gameCanvas')
 
+export const texture_shadow_quarter_circle = []
+
 export const matrix_identity = [
     [1.0, 0.0, 0.0, 0.0],
     [0.0, 1.0, 0.0, 0.0],
@@ -23,3 +25,39 @@ export const dl_proj_mtx_fullscreen = [
     Gbi.gsSPMatrix(matrix_identity, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH),
     Gbi.gsSPEndDisplayList()
 ]
+
+export const dl_shadow_begin = [
+	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATEIA, Gbi.G_CC_MODULATEIA),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsSPEndDisplayList()
+]
+
+export const dl_shadow_circle = [
+	Gbi.gsSPDisplayList(dl_shadow_begin),
+	...Gbi.gsDPLoadTextureBlock(texture_shadow_quarter_circle, Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_8b, 16, 16, 0,
+		Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, 4, 4, Gbi.G_TX_NOLOD,
+		Gbi.G_TX_NOLOD),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_shadow_9_verts = [
+	...Gbi.gsSP2Triangles(0, 3, 4, 0x0, 0, 4, 1, 0x0),
+	...Gbi.gsSP2Triangles(1, 4, 2, 0x0, 2, 4, 5, 0x0),
+	...Gbi.gsSP2Triangles(3, 6, 4, 0x0, 4, 6, 7, 0x0),
+	...Gbi.gsSP2Triangles(4, 7, 8, 0x0, 4, 8, 5, 0x0),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_shadow_4_verts = [
+	...Gbi.gsSP2Triangles(0, 2, 1, 0x0, 1, 2, 3, 0x0),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_shadow_end = [
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+	Gbi.gsSPEndDisplayList(),
+]
+

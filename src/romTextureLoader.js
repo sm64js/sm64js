@@ -2,6 +2,8 @@ import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_te
 import { castle_grounds_seg7_texture_07000000 } from "./levels/castle_grounds/areas/1/4/model.inc.js"
 import { title_texture_0A0001C0, title_texture_0A000E40, title_texture_0A001AC0, title_texture_0A002740 } from "./levels/intro/title_screen_bg"
 import { tree_seg3_texture_0302DE28, tree_seg3_texture_0302EE28, tree_seg3_texture_0302FF60, tree_seg3_texture_03031048, tree_seg3_texture_03032218 } from "./actors/tree/model.inc"
+import { texture_shadow_quarter_circle } from "./common_gfx/segment2"
+
 import {
     gd_texture_mario_face_shine,
     gd_texture_red_star_0,
@@ -43,7 +45,7 @@ import {
     outside_0900A000,
     outside_0900B000,
     outside_0900B400,
-
+    outside_0900BC00,
 } from "./textures/outside"
 
 import { 
@@ -53,7 +55,8 @@ import {
     mario_texture_mustache, 
     mario_texture_m_logo,
     mario_texture_eyes_half_closed,
-    mario_texture_eyes_closed } from "./actors/mario/model.inc"
+    mario_texture_eyes_closed
+} from "./actors/mario/model.inc"
 
 
 const processExtractedResults = (data) => {
@@ -112,7 +115,8 @@ const processExtractedResults = (data) => {
     outside_09009800.push(...data['textures/outside/castle_grounds_textures.09800.rgba16.png'].split(','))
     outside_0900A000.push(...data['textures/outside/castle_grounds_textures.0A000.rgba16.png'].split(','))
     outside_0900B000.push( ...data['textures/outside/castle_grounds_textures.0B000.rgba16.png'].split(','))
-    outside_0900B400.push( ...data['textures/outside/castle_grounds_textures.0B400.rgba16.png'].split(','))
+    outside_0900B400.push(...data['textures/outside/castle_grounds_textures.0B400.rgba16.png'].split(','))
+    outside_0900BC00.push(...data['textures/outside/castle_grounds_textures.0BC00.ia16.png'].split(','))
 
     mario_texture_yellow_button.push ( ...data['actors/mario/mario_overalls_button.rgba16.png'].split(','))
     mario_texture_m_logo.push ( ...data['actors/mario/mario_logo.rgba16.png'].split(','))
@@ -127,6 +131,8 @@ const processExtractedResults = (data) => {
     tree_seg3_texture_0302FF60.push(...data["actors/tree/pine_tree.rgba16.png"].split(','))
     tree_seg3_texture_03031048.push(...data["actors/tree/snowy_pine_tree.rgba16.png"].split(','))
     tree_seg3_texture_03032218.push(...data["actors/tree/palm_tree.rgba16.png"].split(','))
+
+    texture_shadow_quarter_circle.push(...data["textures/segment2/shadow_quarter_circle.ia8.png"].split(','))
 
     msgElement.innerHTML = "Rom Texture Extraction Success - You may now start the game"
     msgElement.style = "color:#00ff00"

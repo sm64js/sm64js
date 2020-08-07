@@ -3,7 +3,7 @@ import { AreaInstance as Area } from "./Area"
 import { MarioMiscInstance as MarioMisc } from "./MarioMisc"
 import { CameraInstance as Camera } from "./Camera"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
-import { GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
+import { GRAPH_RENDER_INVISIBLE, geo_update_animation_frame, retrieve_animation_index } from "../engine/graph_node"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import * as SurfaceTerrains from "../include/surface_terrains"
 import { atan2s } from "../engine/math_util"
@@ -15,7 +15,7 @@ import { mario_execute_object_action } from "./MarioActionsObject"
 import { oMarioWalkingPitch, oInteractStatus } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
-
+import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 
 ////// Mario Constants
 export const ANIM_FLAG_NOLOOP = (1 << 0) // 0x01
@@ -75,6 +75,7 @@ export const MARIO_ANIM_HANDSTAND_JUMP = 0x0A
 export const MARIO_ANIM_START_HANDSTAND = 0x0B
 export const MARIO_ANIM_RETURN_FROM_HANDSTAND = 0x0C
 export const MARIO_ANIM_IDLE_ON_POLE = 0x0D
+export const MARIO_ANIM_SLIDEJUMP = 0xCB
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -139,7 +140,9 @@ export const ACT_HOLDING_POLE = 0x08100340
 export const ACT_CLIMBING_POLE            =  0x00100343
 export const ACT_TOP_OF_POLE_TRANSITION   =  0x00100344
 export const ACT_TOP_OF_POLE              =  0x00100345
-export const ACT_START_HANGING            =  0x08200348
+export const ACT_START_HANGING = 0x08200348
+export const ACT_WALL_KICK_AIR = 0x03000886
+export const ACT_TOP_OF_POLE_JUMP = 0x0300088D
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -342,6 +345,39 @@ export const set_mario_y_vel_based_on_fspeed = (m, initialVelY, multiplier) => {
     m.vel[1] = initialVelY + (m.forwardVel * multiplier)
 }
 
+const read_next_anim_value = (curFrame, attribute, values) => {
+    const index = retrieve_animation_index(curFrame, attribute)
+    const value = values[index]
+    return value > 32767 ? value - 65536 : value
+}
+
+export const find_mario_anim_flags_and_translation = (obj, yaw, translation) => {
+    const curAnim = obj.header.gfx.unk38.curAnim
+    const animFrame = geo_update_animation_frame(obj.header.gfx.unk38, null)
+    const animValues = curAnim.values
+
+    const attribute = { indexToIndices: 0, indices: curAnim.indices }
+
+    const s = Math.sin(yaw / 0x8000 * Math.PI)
+    const c = Math.cos(yaw / 0x8000 * Math.PI)
+
+    const dx = read_next_anim_value(animFrame, attribute, animValues) / 4.0
+    translation[1] = read_next_anim_value(animFrame, attribute, animValues) / 4.0
+    const dz = read_next_anim_value(animFrame, attribute, animValues) / 4.0
+
+    translation[0] = (dx * c) + (dz * s)
+    translation[2] = (-dx * s) + (dz * c)
+
+    return curAnim.flags
+
+}
+
+export const return_mario_anim_y_translation = (m) => {
+    const translation = new Array(3)
+    find_mario_anim_flags_and_translation(m.marioObj, 0, translation)
+    return translation[1]
+}
+
 export const check_common_action_exits = (m) => {
 
     if (m.input & INPUT_A_PRESSED) {
@@ -422,6 +458,12 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
         case ACT_TRIPLE_JUMP:
             set_mario_y_vel_based_on_fspeed(m, 69.0, 0.0)
             m.forwardVel *= 0.8
+            break
+        case ACT_WALL_KICK_AIR:
+        case ACT_TOP_OF_POLE_JUMP:
+            set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
+            if (m.forwardVel < 24.0) m.forwardVel = 24.0
+            m.wallKickTimer = 0
             break
     }
 

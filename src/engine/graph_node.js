@@ -196,8 +196,6 @@ export const retrieve_animation_index = (curFrame, attributes) => {
 
 export const geo_update_animation_frame = (obj, accelAssist) => {
 
-    if (obj.animFrameAccelAssist != accelAssist) throw "geo update animation frame, params should match"
-
     const anim = obj.curAnim
 
     if (obj.animTimer == GeoRenderer.gAreaUpdateCounter || anim.flags & Mario.ANIM_FLAG_2) {

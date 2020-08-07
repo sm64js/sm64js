@@ -9,6 +9,20 @@ class SurfaceCollision {
         Spawn.SurfaceCollision = this
     }
 
+    find_floor_height_and_data(xPos, yPos, zPos, floorGeo) {
+        const floorWrapper = {}
+        const floorHeight = this.find_floor(xPos, yPos, zPos, floorWrapper)
+
+        if (floorWrapper.floor) {
+            floorGeo.normalX = floorWrapper.floor.normal.x
+            floorGeo.normalY = floorWrapper.floor.normal.y
+            floorGeo.normalZ = floorWrapper.floor.normal.z
+            floorGeo.originOffset = floorWrapper.floor.originOffset
+        }
+
+        return floorHeight
+    }
+
     find_wall_collisions(colData) {
 
         let numCollisions = 0

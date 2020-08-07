@@ -99,6 +99,12 @@ const act_grab_pole_fast = (m) => {
 const act_holding_pole = (m) => {
     const marioObj = m.marioObj
 
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        //add_tree_leaf_particles(m) TODO
+        m.faceAngle[1] += 0x8000
+        return Mario.set_mario_action(m, Mario.ACT_WALL_KICK_AIR, 0)
+    }
+
     if (m.controller.stickY > 16.0) {
         const poleTop = m.usedObj.hitboxHeight - 100.0
 
@@ -106,9 +112,9 @@ const act_holding_pole = (m) => {
             return Mario.set_mario_action(m, Mario.ACT_CLIMBING_POLE, 0)
         }
 
-/*        if (m.controller.stickY > 50.0) {
-            throw "top pole transition"
-        }*/
+        if (m.controller.stickY > 50.0) {
+            return Mario.set_mario_action(m, Mario.ACT_TOP_OF_POLE_TRANSITION, 0)
+        }
 
     } else if (m.controller.stickY < -16.0) {
         marioObj.rawData[oMarioPoleYawVel] -= parseInt(m.controller.stickY * 2)
@@ -136,6 +142,12 @@ const act_climbing_pole = (m) => {
     const marioObj = m.marioObj
     const cameraAngle = m.area.camera.yaw
 
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        //add_tree_leaf_particles(m) TODO
+        m.faceAngle[1] += 0x8000
+        return Mario.set_mario_action(m, Mario.ACT_WALL_KICK_AIR, 0)
+    }
+
     if (m.controller.stickY < 8.0) {
         return Mario.set_mario_action(m, Mario.ACT_HOLDING_POLE, 0)
     }
@@ -153,6 +165,43 @@ const act_climbing_pole = (m) => {
     return 0
 }
 
+const act_top_of_pole_transition = (m) => {
+    const marioObj = m.marioObj
+
+    marioObj.rawData[oMarioPoleYawVel] = 0
+    if (m.actionArg == 0) {
+        Mario.set_mario_animation(m, Mario.MARIO_ANIM_START_HANDSTAND)
+        if (Mario.is_anim_at_end(m)) {
+            return Mario.set_mario_action(m, Mario.ACT_TOP_OF_POLE, 0)
+        }
+    } else {
+        Mario.set_mario_animation(m, Mario.MARIO_ANIM_RETURN_FROM_HANDSTAND)
+        if (m.marioObj.header.gfx.unk38.animFrame == 0) {
+            return Mario.set_mario_action(m, Mario.ACT_HOLDING_POLE, 0)
+        }
+    }
+
+    set_pole_position(m, Mario.return_mario_anim_y_translation(m))
+    return 0
+}
+
+const act_top_of_pole = (m) => {
+
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_TOP_OF_POLE_JUMP, 0)
+    }
+
+    if (m.controller.stickY < -16.0) {
+        return Mario.set_mario_action(m, Mario.ACT_TOP_OF_POLE_TRANSITION, 1)
+    }
+
+    m.faceAngle[1] -= parseInt(m.controller.stickX * 16.0)
+
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_HANDSTAND_IDLE)
+    set_pole_position(m, Mario.return_mario_anim_y_translation(m))
+    return 0
+}
+
 export const mario_execute_automatic_action = (m) => {
 
     switch (m.action) {
@@ -160,6 +209,8 @@ export const mario_execute_automatic_action = (m) => {
         case Mario.ACT_GRAB_POLE_SLOW: return act_grab_pole_slow(m)
         case Mario.ACT_HOLDING_POLE: return act_holding_pole(m)
         case Mario.ACT_CLIMBING_POLE: return act_climbing_pole(m)
+        case Mario.ACT_TOP_OF_POLE_TRANSITION: return act_top_of_pole_transition(m)
+        case Mario.ACT_TOP_OF_POLE: return act_top_of_pole(m)
         default: throw "unknown action automatic"
     }
 }

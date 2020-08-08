@@ -166,6 +166,10 @@ const act_crouching = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_STOP_CROUCHING, 0);
     }
 
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_PUNCHING, 9)
+    }
+
     stationary_ground_step(m)
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_CROUCHING)
     return 0

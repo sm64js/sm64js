@@ -76,6 +76,12 @@ export const MARIO_ANIM_START_HANDSTAND = 0x0B
 export const MARIO_ANIM_RETURN_FROM_HANDSTAND = 0x0C
 export const MARIO_ANIM_IDLE_ON_POLE = 0x0D
 export const MARIO_ANIM_SLIDEJUMP = 0xCB
+export const MARIO_ANIM_STOP_CROUCHING = 0x96
+export const MARIO_ANIM_START_CROUCHING = 0x97
+export const MARIO_ANIM_CROUCHING = 0x98
+export const MARIO_ANIM_CRAWLING = 0x99
+export const MARIO_ANIM_STOP_CRAWLING = 0x9A
+export const MARIO_ANIM_START_CRAWLING = 0x9B
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -143,6 +149,11 @@ export const ACT_TOP_OF_POLE              =  0x00100345
 export const ACT_START_HANGING = 0x08200348
 export const ACT_WALL_KICK_AIR = 0x03000886
 export const ACT_TOP_OF_POLE_JUMP = 0x0300088D
+export const ACT_CROUCHING                =  0x0C008220 // (0x020 | ACT_FLAG_STATIONARY | ACT_FLAG_SHORT_HITBOX | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
+export const ACT_START_CROUCHING          =  0x0C008221 // (0x021 | ACT_FLAG_STATIONARY | ACT_FLAG_SHORT_HITBOX | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
+export const ACT_STOP_CROUCHING           =  0x0C008222 // (0x022 | ACT_FLAG_STATIONARY | ACT_FLAG_SHORT_HITBOX | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
+export const ACT_START_CRAWLING           =  0x0C008223 // (0x023 | ACT_FLAG_STATIONARY | ACT_FLAG_SHORT_HITBOX | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
+export const ACT_STOP_CRAWLING            =  0x0C008224 
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -597,6 +608,7 @@ const update_mario_button_inputs = (m, playerInput) => {
     if (playerInput.buttonDownA) m.input |= INPUT_A_DOWN
     if (playerInput.buttonPressedB) m.input |= INPUT_B_PRESSED
     if (playerInput.buttonPressedZ) m.input |=  INPUT_Z_PRESSED
+    if (playerInput.buttonDownZ) m.input |=  INPUT_Z_DOWN
 }
 
 const update_mario_joystick_inputs = (m, playerInput) => {

@@ -403,6 +403,23 @@ const set_triple_jump_action = (m) => {
     else return Mario.set_mario_action(m, Mario.ACT_JUMP, 0)
 }
 
+const act_backflip_land = (m) => {
+    if (!(m.input & Mario.INPUT_Z_DOWN)) {
+        m.input &= ~Mario.INPUT_A_PRESSED
+    }
+
+    if (common_landing_cancels(m, Mario.sBackflipLandAction, Mario.set_jumping_action)) {
+        return 1
+    }
+
+    if (!(m.input & Mario.INPUT_NONZERO_ANALOG)) {
+        //play_sound_if_no_flag(m, SOUND_MARIO_HAHA, MARIO_MARIO_SOUND_PLAYED);
+    }
+
+    common_landing_action(m, Mario.MARIO_ANIM_TRIPLE_JUMP_LAND, Mario.ACT_FREEFALL)
+    return 0
+}
+
 export const mario_execute_moving_action = (m) => {
 
     switch (m.action) {
@@ -416,6 +433,7 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_SIDE_FLIP_LAND: return act_side_flip_land(m)
         case Mario.ACT_DOUBLE_JUMP_LAND: return act_double_jump_land(m)
         case Mario.ACT_TRIPLE_JUMP_LAND: return act_triple_jump_land(m)
+        case Mario.ACT_BACKFLIP_LAND: return act_backflip_land(m)
         default: throw "unknown action moving"
     }
 }

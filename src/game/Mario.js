@@ -76,6 +76,13 @@ export const MARIO_ANIM_START_HANDSTAND = 0x0B
 export const MARIO_ANIM_RETURN_FROM_HANDSTAND = 0x0C
 export const MARIO_ANIM_IDLE_ON_POLE = 0x0D
 export const MARIO_ANIM_SLIDEJUMP = 0xCB
+export const MARIO_ANIM_STOP_CROUCHING = 0x96
+export const MARIO_ANIM_START_CROUCHING = 0x97
+export const MARIO_ANIM_CROUCHING = 0x98
+export const MARIO_ANIM_CRAWLING = 0x99
+export const MARIO_ANIM_STOP_CRAWLING = 0x9A
+export const MARIO_ANIM_START_CRAWLING = 0x9B
+export const MARIO_ANIM_BACKFLIP = 0x04
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -143,6 +150,15 @@ export const ACT_TOP_OF_POLE              =  0x00100345
 export const ACT_START_HANGING = 0x08200348
 export const ACT_WALL_KICK_AIR = 0x03000886
 export const ACT_TOP_OF_POLE_JUMP = 0x0300088D
+export const ACT_CROUCHING                =  0x0C008220 // (0x020 | ACT_FLAG_STATIONARY | ACT_FLAG_SHORT_HITBOX | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
+export const ACT_START_CROUCHING          =  0x0C008221 // (0x021 | ACT_FLAG_STATIONARY | ACT_FLAG_SHORT_HITBOX | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
+export const ACT_STOP_CROUCHING           =  0x0C008222 // (0x022 | ACT_FLAG_STATIONARY | ACT_FLAG_SHORT_HITBOX | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
+export const ACT_START_CRAWLING           =  0x0C008223 // (0x023 | ACT_FLAG_STATIONARY | ACT_FLAG_SHORT_HITBOX | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
+export const ACT_STOP_CRAWLING            =  0x0C008224 
+export const ACT_BACKFLIP                 =  0x01000883
+export const ACT_BACKFLIP_LAND            =  0x0400047A 
+export const ACT_BACKFLIP_LAND_STOP       =  0x0800022F
+
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -152,7 +168,6 @@ export const AIR_STEP_HIT_WALL        =  2
 export const AIR_STEP_GRABBED_LEDGE   =  3
 export const AIR_STEP_GRABBED_CEILING =  4
 export const AIR_STEP_HIT_LAVA_WALL   =  6
-
 
 export const ACT_FLAG_STATIONARY = (1 << 9)
 export const ACT_FLAG_MOVING = (1 << 10)
@@ -271,6 +286,15 @@ export const sTripleJumpLandAction = {
     slideAction: ACT_BEGIN_SLIDING
 }
 
+export const sBackflipLandAction = {
+    numFrames: 4,
+    unk02: 0,
+    verySteepAction: ACT_FREEFALL,
+    endAction: ACT_BACKFLIP_LAND_STOP,
+    aPressedAction: ACT_BACKFLIP,
+    offFloorAction: ACT_FREEFALL,
+    slideAction: ACT_BEGIN_SLIDING
+}
 
 export const init_marios = () => {
 
@@ -465,6 +489,11 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
             if (m.forwardVel < 24.0) m.forwardVel = 24.0
             m.wallKickTimer = 0
             break
+        case ACT_BACKFLIP:
+            m.marioObj.header.gfx.unk38.animID = -1
+            m.forwardVel = -16.0
+            set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
+            break
     }
 
     m.peakHeight = m.pos[1]
@@ -597,6 +626,7 @@ const update_mario_button_inputs = (m, playerInput) => {
     if (playerInput.buttonDownA) m.input |= INPUT_A_DOWN
     if (playerInput.buttonPressedB) m.input |= INPUT_B_PRESSED
     if (playerInput.buttonPressedZ) m.input |=  INPUT_Z_PRESSED
+    if (playerInput.buttonDownZ) m.input |=  INPUT_Z_DOWN
 }
 
 const update_mario_joystick_inputs = (m, playerInput) => {

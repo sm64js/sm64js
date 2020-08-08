@@ -105,6 +105,11 @@ const act_top_of_pole_jump = (m) => {
     return 0
 }
 
+const act_backflip = (m) => {
+    common_air_action_step(m, Mario.ACT_BACKFLIP_LAND, Mario.MARIO_ANIM_BACKFLIP, 0)
+    return 0
+}
+
 export const mario_execute_airborne_action = (m) => {
 
     switch (m.action) {
@@ -115,6 +120,7 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_TRIPLE_JUMP: return act_triple_jump(m)
         case Mario.ACT_WALL_KICK_AIR: return act_wall_kick_air(m)
         case Mario.ACT_TOP_OF_POLE_JUMP: return act_top_of_pole_jump(m)
+        case Mario.ACT_BACKFLIP: return act_backflip(m)
         default: throw "unkown action airborne"
     }
 }

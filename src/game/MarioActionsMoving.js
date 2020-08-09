@@ -1,9 +1,8 @@
 import * as Mario from "./Mario"
-import { SURFACE_SLOW } from "../include/surface_terrains"
+import { SURFACE_SLOW, SURFACE_CLASS_VERY_SLIPPERY, SURFACE_CLASS_SLIPPERY, SURFACE_CLASS_NOT_SLIPPERY } from "../include/surface_terrains"
 import { perform_ground_step } from "./MarioStep"
-import { approach_number } from "../engine/math_util"
+import { approach_number, atan2s } from "../engine/math_util"
 import { oMarioWalkingPitch } from "../include/object_constants"
-
 
 const apply_slope_accel = (m) => {
     m.slideYaw = m.faceAngle[1]
@@ -147,6 +146,9 @@ const act_walking = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_TURNING_AROUND, 0)
     }
 
+    if (m.input & Mario.INPUT_Z_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_CROUCH_SLIDE, 0);
+    }
 
     m.actionState = 0
 
@@ -420,6 +422,203 @@ const act_backflip_land = (m) => {
     return 0
 }
 
+const update_sliding_angle = (m, accel, lossFactor) => {
+    let newFacingDYaw
+
+    const floor = m.floor
+    const slopeAngle = atan2s(floor.normal.z, floor.normal.x)
+    const steepness = Math.sqrt(floor.normal.x * floor.normal.x + floor.normal.z * floor.normal.z)
+
+    m.slideVelX += accel * steepness * Math.sin(slopeAngle / 0x8000 * Math.PI)
+    m.slideVelZ += accel * steepness * Math.cos(slopeAngle / 0x8000 * Math.PI)
+
+    m.slideVelX *= lossFactor;
+    m.slideVelZ *= lossFactor;
+
+    m.slideYaw = atan2s(m.slideVelZ, m.slideVelX)
+
+    const facingDYaw = m.faceAngle[1] - m.slideYaw
+    newFacingDYaw = facingDYaw
+
+    //! -0x4000 not handled - can slide down a slope while facing perpendicular to it
+    if (newFacingDYaw > 0 && newFacingDYaw <= 0x4000) {
+        if ((newFacingDYaw -= 0x200) < 0) {
+            newFacingDYaw = 0
+        }
+    } else if (newFacingDYaw > -0x4000 && newFacingDYaw < 0) {
+        if ((newFacingDYaw += 0x200) > 0) {
+            newFacingDYaw = 0
+        }
+    } else if (newFacingDYaw > 0x4000 && newFacingDYaw < 0x8000) {
+        if ((newFacingDYaw += 0x200) > 0x8000) {
+            newFacingDYaw = 0x8000
+        }
+    } else if (newFacingDYaw > -0x8000 && newFacingDYaw < -0x4000) {
+        if ((newFacingDYaw -= 0x200) < -0x8000) {
+            newFacingDYaw = -0x8000
+        }
+    }
+
+    m.faceAngle[1] = m.slideYaw + newFacingDYaw
+
+    m.vel[0] = m.slideVelX
+    m.vel[1] = 0.0
+    m.vel[2] = m.slideVelZ
+
+    //! Speed is capped a frame late (butt slide HSG)
+    m.forwardVel = Math.sqrt(m.slideVelX * m.slideVelX + m.slideVelZ * m.slideVelZ)
+    if (m.forwardVel > 100.0) {
+        m.slideVelX = m.slideVelX * 100.0 / m.forwardVel
+        m.slideVelZ = m.slideVelZ * 100.0 / m.forwardVel
+    }
+
+    if (newFacingDYaw < -0x4000 || newFacingDYaw > 0x4000) {
+        m.forwardVel *= -1.0
+    }
+
+}
+
+const update_sliding = (m, stopSpeed) => {
+    let stopped = 0
+    let accel, lossFactor
+
+    const intendedDYaw = m.intendedYaw - m.slideYaw
+    let forward = Math.cos(intendedDYaw / 0x8000 * Math.PI)
+    let sideward = Math.sin(intendedDYaw / 0x8000 * Math.PI)
+
+    //! 10k glitch
+    if (forward < 0.0 && m.forwardVel >= 0.0) {
+        forward *= 0.5 + 0.5 * m.forwardVel / 100.0
+    }
+
+    switch (Mario.mario_get_floor_class(m)) {
+        case SURFACE_CLASS_VERY_SLIPPERY:
+            accel = 10.0
+            lossFactor = m.intendedMag / 32.0 * forward * 0.02 + 0.98
+            break;
+
+        case SURFACE_CLASS_SLIPPERY:
+            accel = 8.0
+            lossFactor = m.intendedMag / 32.0 * forward * 0.02 + 0.96
+            break;
+
+        default:
+            accel = 7.0
+            lossFactor = m.intendedMag / 32.0 * forward * 0.02 + 0.92
+            break;
+
+        case SURFACE_CLASS_NOT_SLIPPERY:
+            accel = 5.0
+            lossFactor = m.intendedMag / 32.0 * forward * 0.02 + 0.92
+            break;
+    }
+
+    const oldSpeed = Math.sqrt(m.slideVelX * m.slideVelX + m.slideVelZ * m.slideVelZ)
+
+    //! This is attempting to use trig derivatives to rotate mario's speed.
+    // It is slightly off/asymmetric since it uses the new X speed, but the old
+    // Z speed.
+    m.slideVelX += m.slideVelZ * (m.intendedMag / 32.0) * sideward * 0.05
+    m.slideVelZ -= m.slideVelX * (m.intendedMag / 32.0) * sideward * 0.05
+
+    const newSpeed = Math.sqrt(m.slideVelX * m.slideVelX + m.slideVelZ * m.slideVelZ)
+
+    if (oldSpeed > 0.0 && newSpeed > 0.0) {
+        m.slideVelX = m.slideVelX * oldSpeed / newSpeed
+        m.slideVelZ = m.slideVelZ * oldSpeed / newSpeed
+    }
+
+    update_sliding_angle(m, accel, lossFactor)
+
+    if (!Mario.mario_floor_is_slope(m) && m.forwardVel * m.forwardVel < stopSpeed * stopSpeed) {
+        Mario.set_forward_vel(m, 0.0)
+        stopped = 1
+    }
+    return stopped
+
+}
+
+const align_with_floor = (m) => {
+    m.pos[1] = m.floorHeight
+}
+
+const common_slide_action = (m, stopAction, airAction, animation) => {
+    const val14 = [ ...m.pos ]
+
+    switch (perform_ground_step(m)) {
+        case Mario.GROUND_STEP_LEFT_GROUND:
+            Mario.set_mario_action(m, airAction, 0)
+            if (m.forwardVel < -50.0 || 50.0 < m.forwardVel) {
+                //play_sound(SOUND_MARIO_HOOHOO, m->marioObj->header.gfx.cameraToObject)
+            }
+            break
+        case Mario.GROUND_STEP_NONE:
+            Mario.set_mario_animation(m, animation)
+            align_with_floor(m)
+            m.particleFlags |= Mario.PARTICLE_DUST
+            break
+        default: throw "common slide action default case"
+    }
+}
+
+const common_slide_action_with_jump = (m, stopAction, jumpAction, airAction, animation) => {
+    if (m.actionTimer == 5) {
+        if (m.input & Mario.INPUT_A_PRESSED) {
+            return Mario.set_jumping_action(m, jumpAction, 0)
+        }
+    } else {
+        m.actionTimer++
+    }
+
+    if (update_sliding(m, 4.0)) {
+        return Mario.set_mario_action(m, stopAction, 0);
+    }
+
+    common_slide_action(m, stopAction, airAction, animation)
+    return 0
+
+}
+
+
+const act_crouch_slide = (m) => {
+
+    if (m.actionTimer < 30) {
+        m.actionTimer++
+        if (m.input & Mario.INPUT_A_PRESSED) {
+            if (m.forwardVel > 10.0) {
+                return Mario.set_jumping_action(m, Mario.ACT_LONG_JUMP, 0)
+            }
+        }
+    }
+
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        return Mario.set_jumping_action(m, Mario.ACT_JUMP, 0);
+    }
+
+    return common_slide_action_with_jump(m, Mario.ACT_CROUCHING, Mario.ACT_JUMP, Mario.ACT_FREEFALL,
+        Mario.MARIO_ANIM_START_CROUCHING)
+}
+
+const act_long_jump_land = (m) => {
+    if (!(m.input & Mario.INPUT_Z_DOWN)) {
+        m.input &= ~Mario.INPUT_A_PRESSED
+    }
+
+    if (common_landing_cancels(m, Mario.sLongJumpLandAction, Mario.set_jumping_action)) {
+        return 1
+    }
+
+    if (!(m.input & Mario.INPUT_NONZERO_ANALOG)) {
+        //play_sound_if_no_flag(m, SOUND_MARIO_UH2_2, MARIO_MARIO_SOUND_PLAYED);
+    }
+
+    common_landing_action(m,
+                          !m.marioObj.oMarioLongJumpIsSlow ? Mario.MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP
+                                                             : Mario.MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP,
+                          Mario.ACT_FREEFALL)
+    return 0
+}
+
 export const mario_execute_moving_action = (m) => {
 
     switch (m.action) {
@@ -434,6 +633,8 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_DOUBLE_JUMP_LAND: return act_double_jump_land(m)
         case Mario.ACT_TRIPLE_JUMP_LAND: return act_triple_jump_land(m)
         case Mario.ACT_BACKFLIP_LAND: return act_backflip_land(m)
+        case Mario.ACT_CROUCH_SLIDE: return act_crouch_slide(m)
+        case Mario.ACT_LONG_JUMP_LAND: return act_long_jump_land(m)
         default: throw "unknown action moving"
     }
 }

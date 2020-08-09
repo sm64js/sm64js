@@ -166,6 +166,10 @@ const act_crouching = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_STOP_CROUCHING, 0);
     }
 
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_PUNCHING, 9)
+    }
+
     stationary_ground_step(m)
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_CROUCHING)
     return 0
@@ -198,6 +202,19 @@ const act_backflip_land_stop = (m) => {
     return 0
 }
 
+const act_long_jump_land_stop = (m) => {
+    m.input &= -0x2001
+    if (check_common_landing_cancels(m, Mario.ACT_JUMP)) {
+        return 1
+    }
+
+    landing_step(m,
+                  !m.marioObj.oMarioLongJumpIsSlow ? Mario.MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP
+                                                     : Mario.MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP,
+                  Mario.ACT_CROUCHING)
+    return 0
+}
+
 export const mario_execute_stationary_action = (m) => {
 
     switch (m.action) {
@@ -212,6 +229,7 @@ export const mario_execute_stationary_action = (m) => {
         case Mario.ACT_CROUCHING: return act_crouching(m)
         case Mario.ACT_STOP_CROUCHING: return act_stop_crouching(m)
         case Mario.ACT_BACKFLIP_LAND_STOP: return act_backflip_land_stop(m)
+        case Mario.ACT_LONG_JUMP_LAND_STOP: return act_long_jump_land_stop(m)
         default: throw "unkown action stationary"
     }
 }

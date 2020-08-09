@@ -4,13 +4,17 @@ import { perform_ground_step } from "./MarioStep"
 const sPunchingForwardVelocities = [0, 1, 1, 2, 3, 5, 7, 10]
 
 const mario_update_punch_sequence = (m) => {
-    let endAction
+    let endAction, crouchEndAction
 
     if (m.action & Mario.ACT_FLAG_MOVING) {
         endAction = Mario.ACT_WALKING
+        crouchEndAction = Mario.ACT_CROUCH_SLIDE
     } else {
         endAction = Mario.ACT_IDLE
+        crouchEndAction = Mario.ACT_CROUCHING
     }
+
+    let animFrame
 
     switch (m.actionArg) {
         case 0: /// play sound - no break
@@ -83,7 +87,7 @@ const mario_update_punch_sequence = (m) => {
 
         case 6:
             //play_mario_action_sound(m, SOUND_MARIO_PUNCH_HOO, 1)
-            const animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_GROUND_KICK)
+            animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_GROUND_KICK)
             if (animFrame == 0) {
                 m.marioBodyState.punchState = (2 << 6) | 6
             }
@@ -94,6 +98,19 @@ const mario_update_punch_sequence = (m) => {
 
             if (Mario.is_anim_at_end(m)) {
                 Mario.set_mario_action(m, endAction, 0)
+            }
+            break
+
+        case 9:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_BREAKDANCE)
+            animFrame = m.marioObj.header.gfx.unk38.animFrame
+
+            if (animFrame >= 2 && animFrame < 8) {
+                m.flags |= Mario.MARIO_TRIPPING
+            }
+
+            if (Mario.is_anim_at_end(m)) {
+                Mario.set_mario_action(m, crouchEndAction, 0)
             }
             break
 

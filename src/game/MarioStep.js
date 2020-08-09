@@ -10,7 +10,13 @@ const should_strengthen_gravity_for_jump_ascent = (m) => {
 }
 
 const apply_gravity = (m) => {
-    if (should_strengthen_gravity_for_jump_ascent(m)) {
+    if (m.action == Mario.ACT_LONG_JUMP || m.action == Mario.ACT_SLIDE_KICK || m.action == Mario.ACT_BBH_ENTER_SPIN) {
+        m.vel[1] -= 2.0
+        if (m.vel[1] < -75.0) {
+            m.vel[1] = -75.0
+        }
+    }
+    else if (should_strengthen_gravity_for_jump_ascent(m)) {
         m.vel[1] /= 4.0
     } else {
         m.vel[1] -= 4.0

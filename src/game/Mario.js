@@ -84,6 +84,10 @@ export const MARIO_ANIM_STOP_CRAWLING = 0x9A
 export const MARIO_ANIM_START_CRAWLING = 0x9B
 export const MARIO_ANIM_BACKFLIP = 0x04
 export const MARIO_ANIM_BREAKDANCE = 0x71
+export const MARIO_ANIM_FAST_LONGJUMP = 0x13
+export const MARIO_ANIM_SLOW_LONGJUMP = 0x14
+export const MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP = 0x11
+export const MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP = 0x12
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -160,6 +164,10 @@ export const ACT_BACKFLIP                 =  0x01000883
 export const ACT_BACKFLIP_LAND            =  0x0400047A 
 export const ACT_BACKFLIP_LAND_STOP       =  0x0800022F
 export const ACT_CROUCH_SLIDE             =  0x04808459 
+export const ACT_LONG_JUMP_LAND           = 0x00000479
+export const ACT_LONG_JUMP_LAND_STOP      =  0x0800023B 
+export const ACT_BBH_ENTER_SPIN           =  0x00001535
+export const ACT_SLIDE_KICK               =  0x018008AA
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -293,6 +301,16 @@ export const sBackflipLandAction = {
     verySteepAction: ACT_FREEFALL,
     endAction: ACT_BACKFLIP_LAND_STOP,
     aPressedAction: ACT_BACKFLIP,
+    offFloorAction: ACT_FREEFALL,
+    slideAction: ACT_BEGIN_SLIDING
+}
+
+export const sLongJumpLandAction = {
+    numFrames: 6,
+    unk02: 5,
+    verySteepAction: ACT_FREEFALL,
+    endAction: ACT_LONG_JUMP_LAND_STOP,
+    aPressedAction: ACT_LONG_JUMP,
     offFloorAction: ACT_FREEFALL,
     slideAction: ACT_BEGIN_SLIDING
 }
@@ -494,6 +512,17 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
             m.marioObj.header.gfx.unk38.animID = -1
             m.forwardVel = -16.0
             set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
+            break
+        case ACT_LONG_JUMP:
+            m.marioObj.header.gfx.unk38.animID = -1
+            set_mario_y_vel_based_on_fspeed(m, 30.0, 0.0)
+            m.marioObj.oMarioLongJumpIsSlow = m.forwardVel > 16.0 ? false : true
+ 
+            //! (BLJ's) This properly handles long jumps from getting forward speed with
+            //  too much velocity, but misses backwards longs allowing high negative speeds.
+            if ((m.forwardVel *= 1.5) > 48.0) {
+                m.forwardVel = 48.0
+            }
             break
     }
 

@@ -110,6 +110,21 @@ const act_backflip = (m) => {
     return 0
 }
 
+const act_long_jump = (m) => {
+    let animation
+    if (!m.marioObj.oMarioLongJumpIsSlow) {
+        animation = Mario.MARIO_ANIM_FAST_LONGJUMP
+    } else {
+        animation = Mario.MARIO_ANIM_SLOW_LONGJUMP
+    }
+
+    //play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_YAHOO);
+
+    common_air_action_step(m, Mario.ACT_LONG_JUMP_LAND, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
+
+    return 0
+}
+
 export const mario_execute_airborne_action = (m) => {
 
     switch (m.action) {
@@ -121,6 +136,7 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_WALL_KICK_AIR: return act_wall_kick_air(m)
         case Mario.ACT_TOP_OF_POLE_JUMP: return act_top_of_pole_jump(m)
         case Mario.ACT_BACKFLIP: return act_backflip(m)
+        case Mario.ACT_LONG_JUMP: return act_long_jump(m)
         default: throw "unkown action airborne"
     }
 }

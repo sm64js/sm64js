@@ -1,5 +1,5 @@
 import * as Mario from "./Mario"
-import { perform_ground_step } from "./MarioStep"
+import { perform_ground_step, stationary_ground_step } from "./MarioStep"
 
 const sPunchingForwardVelocities = [0, 1, 1, 2, 3, 5, 7, 10]
 
@@ -138,10 +138,32 @@ const act_punching = (m) => {
 
 }
 
+const animated_stationary_ground_step = (m, animation, endAction) => {
+    stationary_ground_step(m)
+    Mario.set_mario_animation(m, animation)
+    if (Mario.is_anim_at_end(m)) {
+        Mario.set_mario_action(m, endAction, 0)
+    }
+}
+
+const act_stomach_slide_stop = (m) => {
+    if (m.input & Mario.INPUT_OFF_FLOOR) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
+    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
+        return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
+    }
+
+    animated_stationary_ground_step(m, Mario.MARIO_ANIM_SLOW_LAND_FROM_DIVE, Mario.ACT_IDLE)
+    return 0
+}
+
 export const mario_execute_object_action = (m) => {
 
     switch (m.action) {
         case Mario.ACT_PUNCHING: return act_punching(m)
+        case Mario.ACT_STOMACH_SLIDE_STOP: return act_stomach_slide_stop(m)
         default: throw "unknown action object"
     }
 }

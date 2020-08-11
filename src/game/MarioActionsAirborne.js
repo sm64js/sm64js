@@ -52,7 +52,18 @@ const common_air_action_step = (m, landAction, animation, stepArg) => {
     return stepResult
 }
 
+const check_kick_or_dive_in_air = (m) => {
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, m.forwardVel > 28.0 ? Mario.ACT_DIVE : Mario.ACT_JUMP_KICK, 0)
+    }
+    return 0
+}
+
 const act_jump = (m) => {
+
+    if (check_kick_or_dive_in_air(m)) return 1
+
+    //play sound
     common_air_action_step(m, Mario.ACT_JUMP_LAND, Mario.MARIO_ANIM_SINGLE_JUMP,
         Mario.AIR_STEP_CHECK_LEDGE_GRAB | Mario.AIR_STEP_CHECK_HANG)
 
@@ -61,6 +72,10 @@ const act_jump = (m) => {
 
 const act_freefall = (m) => {
     let animation
+
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
+    }
 
     switch (m.actionArg) {
         case 0: animation = Mario.MARIO_ANIM_GENERAL_FALL; break
@@ -73,6 +88,10 @@ const act_freefall = (m) => {
 
 const act_side_flip = (m) => {
 
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
+    }
+
     if (common_air_action_step(m, Mario.ACT_SIDE_FLIP_LAND, Mario.MARIO_ANIM_SLIDEFLIP, Mario.AIR_STEP_CHECK_LEDGE_GRAB) != Mario.AIR_STEP_GRABBED_LEDGE) {
         m.marioObj.header.gfx.angle[1] += 0x8000
     }
@@ -84,12 +103,19 @@ const act_double_jump = (m) => {
 
     let animation = (m.vel[1] >= 0.0) ? Mario.MARIO_ANIM_DOUBLE_JUMP_RISE : Mario.MARIO_ANIM_DOUBLE_JUMP_FALL
 
+    if (check_kick_or_dive_in_air(m)) return 1
+
     common_air_action_step(m, Mario.ACT_DOUBLE_JUMP_LAND, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB | Mario.AIR_STEP_CHECK_HANG)
 
     return 0
 }
 
 const act_triple_jump = (m) => {
+
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
+    }
+
     common_air_action_step(m, Mario.ACT_TRIPLE_JUMP_LAND, Mario.MARIO_ANIM_TRIPLE_JUMP, 0)
     return 0
 }
@@ -125,6 +151,33 @@ const act_long_jump = (m) => {
     return 0
 }
 
+const act_dive = (m) => {
+    //play sounds
+
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_DIVE)
+
+    update_air_without_turn(m)
+
+    switch (perform_air_step(m, 0)) {
+        case Mario.AIR_STEP_NONE:
+            if (m.vel[1] < 0.0 && m.faceAngle[0] > -0x2AAA) {
+                m.faceAngle[0] -= 0x200
+                if (m.faceAngle[0] < -0x2AAA) {
+                    m.faceAngle[0] = -0x2AAA
+                }
+            }
+            m.marioObj.header.gfx.angle[0] = -m.faceAngle[0]
+            break
+        case Mario.AIR_STEP_LANDED:
+            Mario.set_mario_action(m, Mario.ACT_DIVE_SLIDE)
+            m.faceAngle[0] = 0
+            break
+        default: throw "unimplemented air step case in act dive"
+    }
+
+    return 0
+}
+
 export const mario_execute_airborne_action = (m) => {
 
     switch (m.action) {
@@ -137,6 +190,7 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_TOP_OF_POLE_JUMP: return act_top_of_pole_jump(m)
         case Mario.ACT_BACKFLIP: return act_backflip(m)
         case Mario.ACT_LONG_JUMP: return act_long_jump(m)
+        case Mario.ACT_DIVE: return act_dive(m)
         default: throw "unkown action airborne"
     }
 }

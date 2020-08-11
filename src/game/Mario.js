@@ -88,6 +88,14 @@ export const MARIO_ANIM_FAST_LONGJUMP = 0x13
 export const MARIO_ANIM_SLOW_LONGJUMP = 0x14
 export const MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP = 0x11
 export const MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP = 0x12
+export const MARIO_ANIM_DIVE = 0x88
+export const MARIO_ANIM_SLIDE_DIVE = 0x89
+export const MARIO_ANIM_SLOW_LAND_FROM_DIVE = 0x5A
+export const MARIO_ANIM_AIRBORNE_ON_STOMACH = 0x15
+export const MARIO_ANIM_LAND_ON_STOMACH = 0x2C
+export const MARIO_ANIM_STOP_SLIDE = 0x8F
+export const MARIO_ANIM_FALL_FROM_SLIDE = 0x90
+export const MARIO_ANIM_SLIDE = 0x91
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -167,7 +175,12 @@ export const ACT_CROUCH_SLIDE             =  0x04808459
 export const ACT_LONG_JUMP_LAND           = 0x00000479
 export const ACT_LONG_JUMP_LAND_STOP      =  0x0800023B 
 export const ACT_BBH_ENTER_SPIN           =  0x00001535
-export const ACT_SLIDE_KICK               =  0x018008AA
+export const ACT_SLIDE_KICK = 0x018008AA
+export const ACT_DIVE = 0x0188088A
+export const ACT_JUMP_KICK = 0x018008AC
+export const ACT_STOMACH_SLIDE_STOP = 0x00000386
+export const ACT_STOMACH_SLIDE = 0x008C0453
+export const ACT_DIVE_SLIDE = 0x00880456
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -523,6 +536,16 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
             if ((m.forwardVel *= 1.5) > 48.0) {
                 m.forwardVel = 48.0
             }
+            break
+        case ACT_JUMP_KICK:
+            m.vel[1] = 20.0
+            break
+        case ACT_DIVE:
+            let forwardVel = m.forwardVel + 15.0
+            if (forwardVel > 48.0) {
+                forwardVel = 48.0
+            }
+            set_forward_vel(m, forwardVel)
             break
     }
 

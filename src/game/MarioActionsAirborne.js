@@ -122,6 +122,10 @@ const act_triple_jump = (m) => {
 
 const act_wall_kick_air = (m) => {
 
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
+    }
+
     common_air_action_step(m, Mario.ACT_JUMP_LAND, Mario.MARIO_ANIM_SLIDEJUMP, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
     return 0
 }

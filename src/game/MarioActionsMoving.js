@@ -619,6 +619,20 @@ const act_long_jump_land = (m) => {
     return 0
 }
 
+const act_dive_slide = (m) => {
+    // TODO forward and backward rollout
+
+    //play sound
+
+    if (update_sliding(m, 8.0) && Mario.is_anim_at_end(m)) {
+        Mario.set_forward_vel(m, 0.0)
+        Mario.set_mario_action(m, Mario.ACT_STOMACH_SLIDE_STOP, 0)
+    }
+
+    common_slide_action(m, Mario.ACT_STOMACH_SLIDE_STOP, Mario.ACT_FREEFALL, Mario.MARIO_ANIM_DIVE)
+    return 0
+}
+
 export const mario_execute_moving_action = (m) => {
 
     switch (m.action) {
@@ -635,6 +649,7 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_BACKFLIP_LAND: return act_backflip_land(m)
         case Mario.ACT_CROUCH_SLIDE: return act_crouch_slide(m)
         case Mario.ACT_LONG_JUMP_LAND: return act_long_jump_land(m)
+        case Mario.ACT_DIVE_SLIDE: return act_dive_slide(m)
         default: throw "unknown action moving"
     }
 }

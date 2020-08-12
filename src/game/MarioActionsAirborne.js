@@ -1,5 +1,5 @@
 import * as Mario from "./Mario"
-import { perform_air_step } from "./MarioStep"
+import { perform_air_step, mario_bonk_reflection } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
 
 const update_air_without_turn = (m) => {
@@ -36,6 +36,7 @@ const update_air_without_turn = (m) => {
 }
 
 const common_air_action_step = (m, landAction, animation, stepArg) => {
+
     ///TODO add this, this moves mario slightly while in air by joystick
     update_air_without_turn(m)
 
@@ -46,6 +47,21 @@ const common_air_action_step = (m, landAction, animation, stepArg) => {
             Mario.set_mario_animation(m, animation); break
         case Mario.AIR_STEP_LANDED:
             Mario.set_mario_action(m, landAction, 0); break
+        case Mario.AIR_STEP_HIT_WALL:
+            Mario.set_mario_animation(m, animation)
+            if (m.forwardVel > 16.0) {
+                mario_bonk_reflection(m, false)
+                m.faceAngle[1] += 0x8000
+
+                if (m.wall) {
+                    Mario.set_mario_action(m, Mario.ACT_AIR_HIT_WALL, 0)
+                } else {
+                    throw "unkown case - hit wall - common air action step"
+                }
+            } else {
+                Mario.set_forward_vel(m, 0.0)
+            }
+            break
         default: throw "unkown air step result in common_air_action_step"
     }
 
@@ -388,6 +404,36 @@ const act_ground_pound = (m) => {
 
 }
 
+const act_air_hit_wall = (m) => {
+    if (++(m.actionTimer) <= 3) { // 2
+        if (m.input & Mario.INPUT_A_PRESSED) {
+            m.vel[1] = 52.0
+            m.faceAngle[1] += 0x8000
+            return Mario.set_mario_action(m, Mario.ACT_WALL_KICK_AIR, 0)
+        }
+    } else if (m.forwardVel >= 38.0) {
+        m.wallKickTimer = 5
+        if (m.vel[1] > 0.0) {
+            m.vel[1] = 0.0
+        }
+
+        m.particleFlags |= Mario.PARTICLE_VERTICAL_STAR
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0) // ACT_BACKWARD_AIR_KB
+    } else {
+        m.wallKickTimer = 5
+        if (m.vel[1] > 0.0) {
+            m.vel[1] = 0.0
+        }
+
+        if (m.forwardVel > 8.0) {
+            Mario.set_forward_vel(m, -8.0)
+        }
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0) //ACT_SOFTBONK
+    }
+
+    return 0
+}
+
 export const mario_execute_airborne_action = (m) => {
 
     switch (m.action) {
@@ -406,6 +452,7 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_BACKWARD_ROLLOUT: return act_backward_rollout(m)
         case Mario.ACT_SLIDE_KICK: return act_slide_kick(m)
         case Mario.ACT_GROUND_POUND: return act_ground_pound(m)
+        case Mario.ACT_AIR_HIT_WALL: return act_air_hit_wall(m)
         default: throw "unkown action airborne"
     }
 }

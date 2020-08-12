@@ -1,5 +1,6 @@
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import * as Mario from "./Mario"
+import { atan2s } from "../engine/math_util"
 
 const should_strengthen_gravity_for_jump_ascent = (m) => {
     if (!(m.input & Mario.INPUT_A_DOWN) && m.vel[1] > 20.0) {
@@ -24,13 +25,33 @@ const apply_gravity = (m) => {
     }
 }
 
+export const mario_bonk_reflection = (m, negateSpeed) => {
+    if (m.wall) {
+        const wallAngle = atan2s(m.wall.normal.z, m.wall.normal.x)
+        let angleDiff = m.faceAngle[1] - wallAngle
+        angleDiff = angleDiff > 32767 ? angleDiff - 65536 : angleDiff
+        angleDiff = angleDiff < -32768 ? angleDiff + 65536 : angleDiff
+        m.faceAngle[1] = wallAngle - angleDiff
+        //play sound
+    } else {
+        //play sound
+    }
+
+    if (negateSpeed) Mario.set_forward_vel(m, -m.forwardVel)
+    else m.faceAngle[1] += 0x8000
+}
+
 const perform_air_quarter_step = (m, intendedPos, stepArg) => {
+
     const nextPos = [...intendedPos]
 
     const upperWall = Mario.resolve_and_return_wall_collisions(nextPos, 150.0, 50.0)
+    const lowerWall = Mario.resolve_and_return_wall_collisions(nextPos, 30.0, 50.0)
 
     const floorWrapper = {}
     const floorHeight = SurfaceCollision.find_floor(nextPos[0], nextPos[1], nextPos[2], floorWrapper)
+
+    m.wall = null
 
     if (floorWrapper.floor == null) {
         throw "Can't find floor - air quarter step"
@@ -50,10 +71,22 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
     m.floorHeight = floorHeight
     m.floor = floorWrapper.floor
 
+    if (upperWall || lowerWall) {
+        m.wall = upperWall ? upperWall : lowerWall
+
+        const wallDYaw = atan2s(m.wall.normal.z, m.wall.normal.x) - m.faceAngle[1]
+
+        if (wallDYaw < -0x6000 || wallDYaw > 0x6000) {
+            m.flags |= Mario.MARIO_UNKNOWN_30
+            return Mario.AIR_STEP_HIT_WALL
+        }
+    }
+
     return Mario.AIR_STEP_NONE
 }
 
 export const perform_air_step = (m, stepArg) => {
+
 
     let stepResult = Mario.AIR_STEP_NONE
 

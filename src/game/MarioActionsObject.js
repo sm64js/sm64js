@@ -3,7 +3,7 @@ import { perform_ground_step, stationary_ground_step } from "./MarioStep"
 
 const sPunchingForwardVelocities = [0, 1, 1, 2, 3, 5, 7, 10]
 
-const mario_update_punch_sequence = (m) => {
+export const mario_update_punch_sequence = (m) => {
     let endAction, crouchEndAction
 
     if (m.action & Mario.ACT_FLAG_MOVING) {

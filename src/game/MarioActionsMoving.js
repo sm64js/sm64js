@@ -1,8 +1,9 @@
 import * as Mario from "./Mario"
-import { SURFACE_SLOW, SURFACE_CLASS_VERY_SLIPPERY, SURFACE_CLASS_SLIPPERY, SURFACE_CLASS_NOT_SLIPPERY } from "../include/surface_terrains"
+import { SURFACE_SLOW, SURFACE_CLASS_VERY_SLIPPERY, SURFACE_CLASS_SLIPPERY, SURFACE_CLASS_NOT_SLIPPERY, TERRAIN_MASK, TERRAIN_SLIDE } from "../include/surface_terrains"
 import { perform_ground_step } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
 import { oMarioWalkingPitch } from "../include/object_constants"
+import { mario_update_punch_sequence } from "./MarioActionsObject"
 
 const apply_slope_accel = (m) => {
     m.slideYaw = m.faceAngle[1]
@@ -49,8 +50,12 @@ const update_walking_speed = (m) => {
 
     if (m.forwardVel > 48.0) m.forwardVel = 48.0
 
-    m.faceAngle[1] = m.intendedYaw //cheat super responsive controls
-    ///m.faceAngle[1] = approach_number(parseInt(m.intendedYaw - m.faceAngle[1]), 0, 0x800, 0x800)
+    //m.faceAngle[1] = m.intendedYaw //cheat super responsive controls
+
+    let number16 = parseInt(m.intendedYaw - m.faceAngle[1])
+    number16 = number16 > 32767 ? number16 - 65536 : number16
+    number16 = number16 < -32768 ? number16 + 65536 : number16
+    m.faceAngle[1] = m.intendedYaw - approach_number(number16, 0, 0x800, 0x800)
 
     apply_slope_accel(m)
 
@@ -72,7 +77,17 @@ const anim_and_audio_for_walk = (m) => {
                 if (val04 > 8.0) {
                     m.actionTimer = 2
                 } else {
-                    throw "didn't finish this case in anim_and_audio_for_walk"
+                    let val14 = parseInt(val04 / 4.0 * 0x10000)
+                    if (val14 < 0x1000) {
+                        val14 = 0x1000
+                    }
+                    Mario.set_mario_anim_with_accel(m, Mario.MARIO_ANIM_START_TIPTOE, val14)
+                    //play step sound
+                    if (Mario.is_anim_past_frame(m, 23)) {
+                        m.actionTimer = 2
+                    }
+
+                    val0C = 0
                 }
                 break
 
@@ -80,8 +95,14 @@ const anim_and_audio_for_walk = (m) => {
                 if (val04 > 8.0) {
                     m.actionTimer = 2
                 } else {
-                    /// this should be tip toe and should not be in here
-                    throw "didn't finish this case in anim_and_audio_for_walk"
+                    let val14 = parseInt(val04 / 4.0 * 0x10000)
+                    if (val14 < 0x1000) {
+                        val14 = 0x1000
+                    }
+                    Mario.set_mario_anim_with_accel(m, Mario.MARIO_ANIM_TIPTOE, val14)
+                    //play step sound
+
+                    val0C = 0
 
                 }
                 break
@@ -134,8 +155,16 @@ const analog_stick_held_back = (m) => {
 
 const act_walking = (m) => {
 
+/*    if (should_begin_sliding(m)) {
+        return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
+    }*/
+
     if (m.input & Mario.INPUT_A_PRESSED) {
         return Mario.set_jump_from_landing(m)
+    }
+
+    if (check_ground_dive_or_punch(m)) {
+        return 1
     }
 
     if (m.input & Mario.INPUT_UNKNOWN_5) {
@@ -540,6 +569,7 @@ const update_sliding = (m, stopSpeed) => {
 
 const align_with_floor = (m) => {
     m.pos[1] = m.floorHeight
+    // Todo other stuff here
 }
 
 const common_slide_action = (m, stopAction, airAction, animation) => {
@@ -591,6 +621,14 @@ const act_crouch_slide = (m) => {
         }
     }
 
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        if (m.forwardVel >= 10.0) {
+            return Mario.set_mario_action(m, Mario.ACT_SLIDE_KICK, 0)
+        } else {
+            return Mario.set_mario_action(m, Mario.ACT_MOVE_PUNCHING, 0x0009)
+        }
+    }
+
     if (m.input & Mario.INPUT_A_PRESSED) {
         return Mario.set_jumping_action(m, Mario.ACT_JUMP, 0);
     }
@@ -620,7 +658,9 @@ const act_long_jump_land = (m) => {
 }
 
 const act_dive_slide = (m) => {
-    // TODO forward and backward rollout
+    if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & (Mario.INPUT_A_PRESSED | Mario.INPUT_B_PRESSED))) {
+        return Mario.set_mario_action(m, m.forwardVel > 0.0 ? Mario.ACT_FORWARD_ROLLOUT : Mario.ACT_BACKWARD_ROLLOUT, 0)
+    }
 
     //play sound
 
@@ -630,6 +670,130 @@ const act_dive_slide = (m) => {
     }
 
     common_slide_action(m, Mario.ACT_STOMACH_SLIDE_STOP, Mario.ACT_FREEFALL, Mario.MARIO_ANIM_DIVE)
+    return 0
+}
+
+const should_begin_sliding = (m) => {
+    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
+        const slideLevel = (m.area.terrainType & TERRAIN_MASK) == TERRAIN_SLIDE
+        const movingBackward = m.forwardVel <= -1.0
+
+        if (slideLevel || movingBackward) { /// TODO mario facing downhill
+            return 1
+        }
+    }
+
+    return 0
+}
+
+const check_ground_dive_or_punch = (m) => {
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        if (m.forwardVel >= 29.0 && m.controller.stickMag > 48.0) {
+            m.vel[1] = 20.0
+            return Mario.set_mario_action(m, Mario.ACT_DIVE, 1)
+        }
+
+        return Mario.set_mario_action(m, Mario.ACT_MOVE_PUNCHING, 0)
+    }
+
+    return 0
+}
+
+const act_crawling = (m) => {
+/*    if (should_begin_sliding(m)) {
+        return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
+    }*/
+
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        return Mario.set_jumping_action(m, Mario.ACT_JUMP, 0)
+    }
+
+    if (check_ground_dive_or_punch(m)) {
+        return 1
+    }
+
+    if (m.input & Mario.INPUT_UNKNOWN_5) {
+        return Mario.set_mario_action(m, Mario.ACT_STOP_CRAWLING, 0)
+    }
+
+    if (!(m.input & Mario.INPUT_Z_DOWN)) {
+        return Mario.set_mario_action(m, Mario.ACT_STOP_CRAWLING, 0)
+    }
+
+    m.intendedMag *= 0.1
+
+    update_walking_speed(m)
+
+    switch (perform_ground_step(m)) {
+        case Mario.GROUND_STEP_LEFT_GROUND:
+            Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+            break
+        case Mario.GROUND_STEP_NONE:
+            align_with_floor(m)
+            break
+        default: throw "unimplemented case in act_crawling"
+    }
+
+    const val04 = parseInt(m.intendedMag * 2.0 * 0x10000)
+    Mario.set_mario_anim_with_accel(m, Mario.MARIO_ANIM_CRAWLING, val04)
+    //play step sound
+    return 0
+}
+
+const act_move_punching = (m) => {
+    /*    if (should_begin_sliding(m)) {
+        return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
+    }*/
+
+    if (m.actionState == 0 && (m.input & Mario.INPUT_A_DOWN)) {
+        return Mario.set_mario_action(m, Mario.ACT_JUMP_KICK, 0)
+    }
+
+    m.actionState = 1
+
+    mario_update_punch_sequence(m)
+
+    if (m.forwardVel >= 0.0) {
+        apply_slope_decel(m, 0.5)
+    } else {
+        if ((m.forwardVel += 8.0) >= 0.0) {
+            m.forwardVel = 0.0
+        }
+        apply_slope_accel(m)
+    }
+
+    switch (perform_ground_step(m)) {
+        case Mario.GROUND_STEP_LEFT_GROUND:
+            Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+            break
+        case Mario.GROUND_STEP_NONE:
+            m.particleFlags |= Mario.PARTICLE_DUST
+            break
+    }
+
+    return 0
+}
+
+const act_slide_kick_slide = (m) => {
+    if (m.input & Mario.INPUT_A_PRESSED) {
+       return Mario.set_jumping_action(m, Mario.ACT_FORWARD_ROLLOUT, 0)
+    }
+
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_SLIDE_KICK)
+    if (Mario.is_anim_at_end(m) && m.forwardVel < 1.0) {
+        return Mario.set_mario_action(m, Mario.ACT_SLIDE_KICK_SLIDE_STOP, 0)
+    }
+
+    update_sliding(m, 1.0)
+
+    switch (perform_ground_step(m)) {
+        case Mario.GROUND_STEP_LEFT_GROUND:
+            Mario.set_mario_action(m, Mario.ACT_FREEFALL, 2)
+            break
+    }
+
+    //play sound
+    m.particleFlags |= Mario.PARTICLE_DUST
     return 0
 }
 
@@ -650,6 +814,9 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_CROUCH_SLIDE: return act_crouch_slide(m)
         case Mario.ACT_LONG_JUMP_LAND: return act_long_jump_land(m)
         case Mario.ACT_DIVE_SLIDE: return act_dive_slide(m)
+        case Mario.ACT_CRAWLING: return act_crawling(m)
+        case Mario.ACT_MOVE_PUNCHING: return act_move_punching(m)
+        case Mario.ACT_SLIDE_KICK_SLIDE: return act_slide_kick_slide(m)
         default: throw "unknown action moving"
     }
 }

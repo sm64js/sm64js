@@ -96,6 +96,18 @@ export const MARIO_ANIM_LAND_ON_STOMACH = 0x2C
 export const MARIO_ANIM_STOP_SLIDE = 0x8F
 export const MARIO_ANIM_FALL_FROM_SLIDE = 0x90
 export const MARIO_ANIM_SLIDE = 0x91
+export const MARIO_ANIM_AIR_KICK = 0x4F
+export const MARIO_ANIM_FORWARD_SPINNING = 0x6F
+export const MARIO_ANIM_BACKWARD_SPINNING = 0x70
+export const MARIO_ANIM_START_TIPTOE = 0xCA
+export const MARIO_ANIM_TIPTOE = 0x92
+export const MARIO_ANIM_SLIDE_KICK = 0x8C
+export const MARIO_ANIM_CROUCH_FROM_SLIDE_KICK = 0x8D
+export const MARIO_ANIM_FALL_FROM_SLIDE_KICK = 0x53
+export const MARIO_ANIM_GROUND_POUND_LANDING = 0x3A
+export const MARIO_ANIM_TRIPLE_JUMP_GROUND_POUND = 0x3B
+export const MARIO_ANIM_START_GROUND_POUND = 0x3C
+export const MARIO_ANIM_GROUND_POUND = 0x3D
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -181,6 +193,14 @@ export const ACT_JUMP_KICK = 0x018008AC
 export const ACT_STOMACH_SLIDE_STOP = 0x00000386
 export const ACT_STOMACH_SLIDE = 0x008C0453
 export const ACT_DIVE_SLIDE = 0x00880456
+export const ACT_FORWARD_ROLLOUT = 0x010008A6
+export const ACT_BACKWARD_ROLLOUT = 0x010008AD
+export const ACT_MOVE_PUNCHING = 0x00800457 
+export const ACT_SLIDE_KICK_SLIDE = 0x0080045A
+export const ACT_SLIDE_KICK_SLIDE_STOP = 0x08000225
+export const ACT_GROUND_POUND = 0x008008A9
+export const ACT_GROUND_POUND_LAND = 0x0080023C
+export const ACT_BUTT_SLIDE_STOP = 0x0C00023E
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -440,11 +460,21 @@ export const check_common_action_exits = (m) => {
         return set_mario_action(m, ACT_JUMP, 0)
     }
 
+    if (m.input & INPUT_OFF_FLOOR) {
+        return set_mario_action(m, ACT_FREEFALL, 0)
+    }
+
     if (m.input & INPUT_NONZERO_ANALOG) {
         return set_mario_action(m, ACT_WALKING, 0)
     }
 
     return 0
+}
+
+
+export const drop_and_set_mario_action = (m, action, actionArg) => {
+    //drop item
+    return set_mario_action(m, action, actionArg)
 }
 
 export const set_jumping_action = (m, action, actionArg) => {
@@ -547,6 +577,12 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
             }
             set_forward_vel(m, forwardVel)
             break
+        case ACT_SLIDE_KICK:
+            m.vel[1] = 12.0
+            if (m.forwardVel < 32.0) {
+                m.forwardVel = 32.0
+            }
+            break
     }
 
     m.peakHeight = m.pos[1]
@@ -640,6 +676,33 @@ export const is_anim_past_end = (m) => {
     return o.header.gfx.unk38.animFrame >= (o.header.gfx.unk38.curAnim.unk08 - 2)
 }
 
+export const is_anim_past_frame = (m, animFrame) => {
+    let isPastFrame
+    const acceleratedFrame = animFrame << 0x10
+    const animInfo = m.marioObj.header.gfx.unk38
+    const curAnim = animInfo.curAnim
+
+    if (animInfo.animAccel) {
+        if (curAnim.flags & ANIM_FLAG_FORWARD) {
+            isPastFrame =
+                (animInfo.animFrameAccelAssist > acceleratedFrame)
+                && (acceleratedFrame >= (animInfo.animFrameAccelAssist - animInfo.animAccel))
+        } else {
+            isPastFrame =
+                (animInfo.animFrameAccelAssist < acceleratedFrame)
+                && (acceleratedFrame <= (animInfo.animFrameAccelAssist + animInfo.animAccel))
+        }
+    } else {
+        if (curAnim.flags & ANIM_FLAG_FORWARD) {
+            isPastFrame = (animInfo.animFrame == (animFrame + 1))
+        } else {
+            isPastFrame = ((animInfo.animFrame + 1) == animFrame)
+        }
+    }
+
+    return isPastFrame
+}
+
 export const execute_mario_action = (marioIndex) => {
     if (LevelUpdate.gMarioState[marioIndex].action) {
         LevelUpdate.gMarioState[marioIndex].marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
@@ -695,7 +758,7 @@ const update_mario_joystick_inputs = (m, playerInput) => {
         m.intendedYaw = m.faceAngle[1]
     }
 
-    m.controller = { stickX: playerInput.stickX, stickY: playerInput.stickY }
+    m.controller = { stickX: playerInput.stickX, stickY: playerInput.stickY, stickMag: playerInput.stickMag }
 
     m.intendedYaw = m.intendedYaw > 32767 ? m.intendedYaw - 65536 : m.intendedYaw
     m.intendedYaw = m.intendedYaw < -32768 ? m.intendedYaw + 65536 : m.intendedYaw

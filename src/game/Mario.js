@@ -99,6 +99,8 @@ export const MARIO_ANIM_SLIDE = 0x91
 export const MARIO_ANIM_AIR_KICK = 0x4F
 export const MARIO_ANIM_FORWARD_SPINNING = 0x6F
 export const MARIO_ANIM_BACKWARD_SPINNING = 0x70
+export const MARIO_ANIM_START_TIPTOE = 0xCA
+export const MARIO_ANIM_TIPTOE = 0x92
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -643,6 +645,33 @@ export const is_anim_at_end = (m) => {
 export const is_anim_past_end = (m) => {
     const o = m.marioObj
     return o.header.gfx.unk38.animFrame >= (o.header.gfx.unk38.curAnim.unk08 - 2)
+}
+
+export const is_anim_past_frame = (m, animFrame) => {
+    let isPastFrame
+    const acceleratedFrame = animFrame << 0x10
+    const animInfo = m.marioObj.header.gfx.unk38
+    const curAnim = animInfo.curAnim
+
+    if (animInfo.animAccel) {
+        if (curAnim.flags & ANIM_FLAG_FORWARD) {
+            isPastFrame =
+                (animInfo.animFrameAccelAssist > acceleratedFrame)
+                && (acceleratedFrame >= (animInfo.animFrameAccelAssist - animInfo.animAccel))
+        } else {
+            isPastFrame =
+                (animInfo.animFrameAccelAssist < acceleratedFrame)
+                && (acceleratedFrame <= (animInfo.animFrameAccelAssist + animInfo.animAccel))
+        }
+    } else {
+        if (curAnim.flags & ANIM_FLAG_FORWARD) {
+            isPastFrame = (animInfo.animFrame == (animFrame + 1))
+        } else {
+            isPastFrame = ((animInfo.animFrame + 1) == animFrame)
+        }
+    }
+
+    return isPastFrame
 }
 
 export const execute_mario_action = (marioIndex) => {

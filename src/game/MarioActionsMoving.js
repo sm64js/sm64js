@@ -75,7 +75,17 @@ const anim_and_audio_for_walk = (m) => {
                 if (val04 > 8.0) {
                     m.actionTimer = 2
                 } else {
-                    throw "didn't finish this case in anim_and_audio_for_walk"
+                    let val14 = parseInt(val04 / 4.0 * 0x10000)
+                    if (val14 < 0x1000) {
+                        val14 = 0x1000
+                    }
+                    Mario.set_mario_anim_with_accel(m, Mario.MARIO_ANIM_START_TIPTOE, val14)
+                    //play step sound
+                    if (Mario.is_anim_past_frame(m, 23)) {
+                        m.actionTimer = 2
+                    }
+
+                    val0C = 0
                 }
                 break
 
@@ -83,8 +93,14 @@ const anim_and_audio_for_walk = (m) => {
                 if (val04 > 8.0) {
                     m.actionTimer = 2
                 } else {
-                    /// this should be tip toe and should not be in here
-                    throw "didn't finish this case in anim_and_audio_for_walk"
+                    let val14 = parseInt(val04 / 4.0 * 0x10000)
+                    if (val14 < 0x1000) {
+                        val14 = 0x1000
+                    }
+                    Mario.set_mario_anim_with_accel(m, Mario.MARIO_ANIM_TIPTOE, val14)
+                    //play step sound
+
+                    val0C = 0
 
                 }
                 break

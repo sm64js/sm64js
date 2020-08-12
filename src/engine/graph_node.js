@@ -175,7 +175,10 @@ export const geo_add_child = (parent, childNode) => {
 
 }
 
-const getTopBits = (number) => { return number >>> 16 }
+const getTopBits = (number) => {
+    number = number >>> 16
+    return number > 32767 ? number - 65536 : number
+}
 
 const setTopBits = (number32, number16) => { return (number16 << 16) | (number32 & 0xFFFF) }
 
@@ -210,10 +213,11 @@ export const geo_update_animation_frame = (obj, accelAssist) => {
     let result
 
     if (anim.flags & Mario.ANIM_FLAG_FORWARD) {
+
         if (obj.animAccel) {
             result = parseInt(obj.animFrameAccelAssist - obj.animAccel)
         } else {
-            result = parseInt((obj.animFrame - 1) << 16)
+            result = (obj.animFrame - 1) << 16
         }
 
         if (getTopBits(result) < anim.unk06) {

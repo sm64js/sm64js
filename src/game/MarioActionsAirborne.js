@@ -267,7 +267,7 @@ const act_backward_rollout = (m) => {
         default: throw "unimplemented case in act_forward_rollout"
     }
 
-    if (m.actionState == 1 && Mario.is_anim_past_end(m)) {
+    if (m.actionState == 1 && m.marioObj.header.gfx.unk38.animFrame == 2) {
         m.actionState = 2
     }
 

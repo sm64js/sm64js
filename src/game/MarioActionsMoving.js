@@ -49,8 +49,11 @@ const update_walking_speed = (m) => {
 
     if (m.forwardVel > 48.0) m.forwardVel = 48.0
 
-    m.faceAngle[1] = m.intendedYaw //cheat super responsive controls
-    ///m.faceAngle[1] = approach_number(parseInt(m.intendedYaw - m.faceAngle[1]), 0, 0x800, 0x800)
+    //m.faceAngle[1] = m.intendedYaw //cheat super responsive controls
+
+    let number16 = parseInt(m.intendedYaw - m.faceAngle[1])
+    number16 = number16 > 32767 ? number16 - 65536 : number16
+    m.faceAngle[1] = m.intendedYaw - approach_number(number16, 0, 0x800, 0x800)
 
     apply_slope_accel(m)
 

@@ -96,6 +96,7 @@ export const MARIO_ANIM_LAND_ON_STOMACH = 0x2C
 export const MARIO_ANIM_STOP_SLIDE = 0x8F
 export const MARIO_ANIM_FALL_FROM_SLIDE = 0x90
 export const MARIO_ANIM_SLIDE = 0x91
+export const MARIO_ANIM_AIR_KICK = 0x4F
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002

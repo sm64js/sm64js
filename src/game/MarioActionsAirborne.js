@@ -178,6 +178,34 @@ const act_dive = (m) => {
     return 0
 }
 
+const act_jump_kick = (m) => {
+
+    if (m.actionState == 0) {
+        //play sound
+        m.marioObj.header.gfx.unk38.animID = -1
+        Mario.set_mario_animation(m, Mario.MARIO_ANIM_AIR_KICK)
+        m.actionState = 1
+    }
+
+    const animFrame = m.marioObj.header.gfx.unk38.animFrame
+    if (animFrame == 0) {
+        m.marioBodyState.punchState = (2 << 6) | 6
+    }
+    if (animFrame >= 0 && animFrame < 8) {
+        m.flags |= Mario.MARIO_KICKING
+    }
+
+    update_air_without_turn(m)
+
+    switch (perform_air_step(m, 0)) {
+        case Mario.AIR_STEP_LANDED:
+            Mario.set_mario_action(m, Mario.ACT_FREEFALL_LAND, 0)
+            break
+    }
+
+    return 0
+}
+
 export const mario_execute_airborne_action = (m) => {
 
     switch (m.action) {
@@ -191,6 +219,7 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_BACKFLIP: return act_backflip(m)
         case Mario.ACT_LONG_JUMP: return act_long_jump(m)
         case Mario.ACT_DIVE: return act_dive(m)
+        case Mario.ACT_JUMP_KICK: return act_jump_kick(m)
         default: throw "unkown action airborne"
     }
 }

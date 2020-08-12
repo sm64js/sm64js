@@ -1,6 +1,6 @@
 import * as Mario from "./Mario"
 import { perform_air_step } from "./MarioStep"
-import { approach_number } from "../engine/math_util"
+import { approach_number, atan2s } from "../engine/math_util"
 
 const update_air_without_turn = (m) => {
     let sidewaysSpeed = 0.0
@@ -79,6 +79,7 @@ const act_freefall = (m) => {
 
     switch (m.actionArg) {
         case 0: animation = Mario.MARIO_ANIM_GENERAL_FALL; break
+        case 2: animation = Mario.MARIO_ANIM_FALL_FROM_SLIDE_KICK; break
         default: throw "act freefall unknown action arg"
     }
 
@@ -274,6 +275,43 @@ const act_backward_rollout = (m) => {
     return 0
 }
 
+const act_slide_kick = (m) => {
+    if (m.actionState == 0 && m.actionTimer == 0) {
+        //play sound
+        Mario.set_mario_animation(m, Mario.MARIO_ANIM_SLIDE_KICK)
+    }
+
+    if (++(m.actionTimer) > 30 && m.pos[1] - m.floorHeight > 500.0) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 2)
+    }
+
+    update_air_without_turn(m)
+
+    switch (perform_air_step(m)) {
+        case Mario.AIR_STEP_NONE:
+            if (m.actionState == 0) {
+                m.marioObj.header.gfx.angle[0] = atan2s(m.forwardVel, -m.vel[1])
+                if (m.marioObj.header.gfx.angle[0] > 0x1800) {
+                    m.marioObj.header.gfx.angle[0] = 0x1800
+                }
+            }
+            break
+        case Mario.AIR_STEP_LANDED:
+            if (m.actionState == 0 && m.vel[1] < 0.0) {
+                m.vel[1] = -m.vel[1] / 2.0
+                m.actionState = 1
+                m.actionTimer = 0
+            } else {
+                Mario.set_mario_action(m, Mario.ACT_SLIDE_KICK_SLIDE, 0)
+            }
+            //play landing sound
+            break
+        default: throw "unimplemented case in act slide kick"
+    }
+
+    return 0
+}
+
 export const mario_execute_airborne_action = (m) => {
 
     switch (m.action) {
@@ -290,6 +328,7 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_JUMP_KICK: return act_jump_kick(m)
         case Mario.ACT_FORWARD_ROLLOUT: return act_forward_rollout(m)
         case Mario.ACT_BACKWARD_ROLLOUT: return act_backward_rollout(m)
+        case Mario.ACT_SLIDE_KICK: return act_slide_kick(m)
         default: throw "unkown action airborne"
     }
 }

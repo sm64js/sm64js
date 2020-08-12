@@ -101,6 +101,9 @@ export const MARIO_ANIM_FORWARD_SPINNING = 0x6F
 export const MARIO_ANIM_BACKWARD_SPINNING = 0x70
 export const MARIO_ANIM_START_TIPTOE = 0xCA
 export const MARIO_ANIM_TIPTOE = 0x92
+export const MARIO_ANIM_SLIDE_KICK = 0x8C
+export const MARIO_ANIM_CROUCH_FROM_SLIDE_KICK = 0x8D
+export const MARIO_ANIM_FALL_FROM_SLIDE_KICK = 0x53
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -190,6 +193,7 @@ export const ACT_FORWARD_ROLLOUT = 0x010008A6
 export const ACT_BACKWARD_ROLLOUT = 0x010008AD
 export const ACT_MOVE_PUNCHING = 0x00800457 
 export const ACT_SLIDE_KICK_SLIDE = 0x0080045A
+export const ACT_SLIDE_KICK_SLIDE_STOP = 0x08000225
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -456,6 +460,12 @@ export const check_common_action_exits = (m) => {
     return 0
 }
 
+
+export const drop_and_set_mario_action = (m, action, actionArg) => {
+    //drop item
+    return set_mario_action(m, action, actionArg)
+}
+
 export const set_jumping_action = (m, action, actionArg) => {
     set_mario_action(m, action, actionArg)
     return 1
@@ -555,6 +565,12 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
                 forwardVel = 48.0
             }
             set_forward_vel(m, forwardVel)
+            break
+        case ACT_SLIDE_KICK:
+            m.vel[1] = 12.0
+            if (m.forwardVel < 32.0) {
+                m.forwardVel = 32.0
+            }
             break
     }
 

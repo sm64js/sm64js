@@ -293,6 +293,35 @@ const act_slide_kick_slide_stop = (m) => {
     return 0
 }
 
+const act_ground_pound_land = (m) => {
+    m.actionState = 1
+
+    if (m.input & Mario.INPUT_OFF_FLOOR) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
+    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
+        return Mario.set_mario_action(m, Mario.ACT_CROUCH_SLIDE, 0) /// TODO act butt slide
+    }
+
+    landing_step(m, Mario.MARIO_ANIM_GROUND_POUND_LANDING, Mario.ACT_BUTT_SLIDE_STOP)
+    return 0
+}
+
+const act_butt_slide_stop = (m) => {
+    if (m.input & (Mario.INPUT_NONZERO_ANALOG | Mario.INPUT_A_PRESSED | Mario.INPUT_OFF_FLOOR | Mario.INPUT_ABOVE_SLIDE)) {
+        return Mario.check_common_action_exits(m)
+    }
+
+    stopping_step(m, Mario.MARIO_ANIM_STOP_SLIDE, Mario.ACT_IDLE)
+
+    if (m.marioObj.header.gfx.unk38.animFrame == 6) {
+        //play landing sound
+    }
+
+    return 0
+}
+
 export const mario_execute_stationary_action = (m) => {
 
     switch (m.action) {
@@ -311,6 +340,8 @@ export const mario_execute_stationary_action = (m) => {
         case Mario.ACT_START_CRAWLING: return act_start_crawling(m)
         case Mario.ACT_STOP_CRAWLING: return act_stop_crawling(m)
         case Mario.ACT_SLIDE_KICK_SLIDE_STOP: return act_slide_kick_slide_stop(m)
+        case Mario.ACT_GROUND_POUND_LAND: return act_ground_pound_land(m)
+        case Mario.ACT_BUTT_SLIDE_STOP: return act_butt_slide_stop(m)
         default: throw "unkown action stationary"
     }
 }

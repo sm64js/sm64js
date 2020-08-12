@@ -63,6 +63,10 @@ const act_jump = (m) => {
 
     if (check_kick_or_dive_in_air(m)) return 1
 
+    if (m.input & Mario.INPUT_Z_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
+    }
+
     //play sound
     common_air_action_step(m, Mario.ACT_JUMP_LAND, Mario.MARIO_ANIM_SINGLE_JUMP,
         Mario.AIR_STEP_CHECK_LEDGE_GRAB | Mario.AIR_STEP_CHECK_HANG)
@@ -75,6 +79,10 @@ const act_freefall = (m) => {
 
     if (m.input & Mario.INPUT_B_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
+    }
+
+    if (m.input & Mario.INPUT_Z_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
     }
 
     switch (m.actionArg) {
@@ -93,6 +101,10 @@ const act_side_flip = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
 
+    if (m.input & Mario.INPUT_Z_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
+    }
+
     if (common_air_action_step(m, Mario.ACT_SIDE_FLIP_LAND, Mario.MARIO_ANIM_SLIDEFLIP, Mario.AIR_STEP_CHECK_LEDGE_GRAB) != Mario.AIR_STEP_GRABBED_LEDGE) {
         m.marioObj.header.gfx.angle[1] += 0x8000
     }
@@ -106,6 +118,10 @@ const act_double_jump = (m) => {
 
     if (check_kick_or_dive_in_air(m)) return 1
 
+    if (m.input & Mario.INPUT_Z_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
+    }
+
     common_air_action_step(m, Mario.ACT_DOUBLE_JUMP_LAND, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB | Mario.AIR_STEP_CHECK_HANG)
 
     return 0
@@ -117,11 +133,23 @@ const act_triple_jump = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
 
+    if (m.input & Mario.INPUT_Z_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
+    }
+
     common_air_action_step(m, Mario.ACT_TRIPLE_JUMP_LAND, Mario.MARIO_ANIM_TRIPLE_JUMP, 0)
     return 0
 }
 
 const act_wall_kick_air = (m) => {
+
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
+    }
+
+    if (m.input & Mario.INPUT_Z_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
+    }
 
     common_air_action_step(m, Mario.ACT_JUMP_LAND, Mario.MARIO_ANIM_SLIDEJUMP, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
     return 0
@@ -133,6 +161,10 @@ const act_top_of_pole_jump = (m) => {
 }
 
 const act_backflip = (m) => {
+    if (m.input & Mario.INPUT_Z_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
+    }
+
     common_air_action_step(m, Mario.ACT_BACKFLIP_LAND, Mario.MARIO_ANIM_BACKFLIP, 0)
     return 0
 }
@@ -312,6 +344,50 @@ const act_slide_kick = (m) => {
     return 0
 }
 
+const act_ground_pound = (m) => {
+
+    //play sound
+
+    if (m.actionState == 0) {
+        if (m.actionTimer < 10) {
+            const yOffset = 20 - (2 * m.actionTimer)
+            if (m.pos[1] + yOffset + 160.0 < m.ceilHeight) {
+                m.pos[1] += yOffset
+                m.peakHeight = m.pos[1]
+                m.marioObj.header.gfx.pos = [...m.pos]
+            }
+        }
+
+        m.vel[1] = -50.0
+
+        Mario.set_forward_vel(m, 0.0)
+
+        Mario.set_mario_animation(m, m.actionArg == 0 ? Mario.MARIO_ANIM_START_GROUND_POUND : Mario.MARIO_ANIM_TRIPLE_JUMP_GROUND_POUND)
+
+        if (m.actionTimer == 0) {
+            //play sound
+        }
+
+        m.actionTimer++
+        if (m.actionTimer >= m.marioObj.header.gfx.unk38.curAnim.unk08 + 4) {
+            //play sound
+            m.actionState = 1
+        }
+    } else {
+        Mario.set_mario_animation(m, Mario.MARIO_ANIM_GROUND_POUND)
+
+        const stepResult = perform_air_step(m, 0)
+        if (stepResult == Mario.AIR_STEP_LANDED) {
+            //play heave landed sound
+            m.particleFlags |= Mario.PARTICLE_MIST_CIRCLE | Mario.PARTICLE_HORIZONTAL_STAR
+            Mario.set_mario_action(m, Mario.ACT_GROUND_POUND_LAND, 0)
+        }
+    }
+
+    return 0
+
+}
+
 export const mario_execute_airborne_action = (m) => {
 
     switch (m.action) {
@@ -329,6 +405,7 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_FORWARD_ROLLOUT: return act_forward_rollout(m)
         case Mario.ACT_BACKWARD_ROLLOUT: return act_backward_rollout(m)
         case Mario.ACT_SLIDE_KICK: return act_slide_kick(m)
+        case Mario.ACT_GROUND_POUND: return act_ground_pound(m)
         default: throw "unkown action airborne"
     }
 }

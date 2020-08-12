@@ -104,6 +104,10 @@ export const MARIO_ANIM_TIPTOE = 0x92
 export const MARIO_ANIM_SLIDE_KICK = 0x8C
 export const MARIO_ANIM_CROUCH_FROM_SLIDE_KICK = 0x8D
 export const MARIO_ANIM_FALL_FROM_SLIDE_KICK = 0x53
+export const MARIO_ANIM_GROUND_POUND_LANDING = 0x3A
+export const MARIO_ANIM_TRIPLE_JUMP_GROUND_POUND = 0x3B
+export const MARIO_ANIM_START_GROUND_POUND = 0x3C
+export const MARIO_ANIM_GROUND_POUND = 0x3D
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -194,6 +198,9 @@ export const ACT_BACKWARD_ROLLOUT = 0x010008AD
 export const ACT_MOVE_PUNCHING = 0x00800457 
 export const ACT_SLIDE_KICK_SLIDE = 0x0080045A
 export const ACT_SLIDE_KICK_SLIDE_STOP = 0x08000225
+export const ACT_GROUND_POUND = 0x008008A9
+export const ACT_GROUND_POUND_LAND = 0x0080023C
+export const ACT_BUTT_SLIDE_STOP = 0x0C00023E
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -451,6 +458,10 @@ export const check_common_action_exits = (m) => {
 
     if (m.input & INPUT_A_PRESSED) {
         return set_mario_action(m, ACT_JUMP, 0)
+    }
+
+    if (m.input & INPUT_OFF_FLOOR) {
+        return set_mario_action(m, ACT_FREEFALL, 0)
     }
 
     if (m.input & INPUT_NONZERO_ANALOG) {

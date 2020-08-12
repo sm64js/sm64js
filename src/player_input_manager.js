@@ -45,9 +45,18 @@ Keydrown.RIGHT.up(() => { keyboardButtons.right = false })
 
 export const playerInputUpdate = () => {
     Keydrown.tick()
-
-    let stickX = 0, stickY = 0
-
+    let stickX = 0, stickY = 0, gamepad, contA, contB, contStart, contZ
+    if (navigator.getGamepads) {
+        gamepad = navigator.getGamepads()[0];
+    }
+    if (gamepad) {
+        stickX = gamepad.axes[0];
+        stickY = gamepad.axes[1] * -1;
+        contA = gamepad.buttons[0].touched
+        contB = gamepad.buttons[2].touched
+        contStart = gamepad.buttons[9].touched
+        contZ = gamepad.buttons[6].touched
+    }
     if (keyboardButtons.d) stickX += 1
     if (keyboardButtons.a) stickX -= 1
 
@@ -62,14 +71,14 @@ export const playerInputUpdate = () => {
     window.playerInput = {
         stickX, stickY,
         stickMag: mag * ratio,
-        buttonPressedA: keyboardButtons.space && !window.playerInput.buttonDownA,
-        buttonDownA: keyboardButtons.space,
-        buttonPressedStart: keyboardButtons.enter && !window.playerInput.buttonDownStart,
-        buttonDownStart: keyboardButtons.enter,
-        buttonPressedB: keyboardButtons.b && !window.playerInput.buttonDownB,
-        buttonDownB: keyboardButtons.b,
-        buttonPressedZ: keyboardButtons.z && !window.playerInput.buttonDownZ,
-        buttonDownZ: keyboardButtons.z
+        buttonPressedA: (contA || keyboardButtons.space) && !window.playerInput.buttonDownA,
+        buttonDownA: contA || keyboardButtons.space,
+        buttonPressedStart: (contStart || keyboardButtons.enter) && !window.playerInput.buttonDownStart,
+        buttonDownStart: contStart || keyboardButtons.enter,
+        buttonPressedB: (contB || keyboardButtons.b) && !window.playerInput.buttonDownB,
+        buttonDownB: contB || keyboardButtons.b,
+        buttonPressedZ: (contZ || keyboardButtons.z) && !window.playerInput.buttonDownZ,
+        buttonDownZ: contZ || keyboardButtons.z
     }
 
     //// Repeat for other player

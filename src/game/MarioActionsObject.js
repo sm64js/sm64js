@@ -126,6 +126,10 @@ const act_punching = (m) => {
         return Mario.check_common_action_exits(m)
     }
 
+    if (m.actionState == 0 && (m.input & Mario.INPUT_A_DOWN)) {
+        return Mario.set_mario_action(m, Mario.ACT_JUMP_KICK, 0)
+    }
+
     m.actionState = 1
     if (m.actionArg == 0) { m.actionTimer = 7 }
 

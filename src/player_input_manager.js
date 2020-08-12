@@ -12,6 +12,8 @@ window.addEventListener("keydown", (e) => {
 
 const keyboardButtons = { w: false, a: false, s: false, d: false, up: false, down: false, left: false, right: false, space: false, enter: false, b: false, z: false }
 
+const controllerButtons = { a: false, b: false, start: false, z: false }
+
 Keydrown.W.down(() => { keyboardButtons.w = true })
 Keydrown.A.down(() => { keyboardButtons.a = true })
 Keydrown.S.down(() => { keyboardButtons.s = true })
@@ -45,35 +47,54 @@ Keydrown.RIGHT.up(() => { keyboardButtons.right = false })
 
 export const playerInputUpdate = () => {
     Keydrown.tick()
+    let stickX = 0, stickY = 0, gamepad
+    if (navigator.getGamepads) {
+        gamepad = navigator.getGamepads()[0];
+    }
+    if (gamepad) {
+        stickX = gamepad.axes[0]
+        stickY = gamepad.axes[1] * -1
+        controllerButtons.a = gamepad.buttons[0].touched
+        controllerButtons.b = gamepad.buttons[2].touched
+        controllerButtons.start = gamepad.buttons[9].touched
+        controllerButtons.z = gamepad.buttons[6].touched
+    }
 
-    let stickX = 0, stickY = 0
+    if (stickX < 0.08 && stickX > -0.08) stickX = 0.0
+    if (stickY < 0.08 && stickY > -0.08) stickY = 0.0
 
-    if (keyboardButtons.d) stickX += 1
-    if (keyboardButtons.a) stickX -= 1
+    if (stickX == 0 && stickY == 0) {
+        if (keyboardButtons.d) stickX += 1
+        if (keyboardButtons.a) stickX -= 1
 
-    if (keyboardButtons.w) stickY += 1
-    if (keyboardButtons.s) stickY -= 1
+        if (keyboardButtons.w) stickY += 1
+        if (keyboardButtons.s) stickY -= 1
+    }
+
+    stickX = Math.round(stickX * 64)
+    stickY = Math.round(stickY * 64)
 
     let mag = Math.sqrt((stickX * stickX) + (stickY * stickY))
-    let ratio = mag > 0 ? (64 / mag) : 0
-    stickX *= ratio
-    stickY *= ratio
+
+    let buttonDownA = controllerButtons.a || keyboardButtons.space
+    let buttonDownB = controllerButtons.b || keyboardButtons.b
+    let buttonDownStart = controllerButtons.start || keyboardButtons.enter
+    let buttonDownZ = controllerButtons.z || keyboardButtons.z
 
     window.playerInput = {
         stickX, stickY,
-        stickMag: mag * ratio,
-        buttonPressedA: keyboardButtons.space && !window.playerInput.buttonDownA,
-        buttonDownA: keyboardButtons.space,
-        buttonPressedStart: keyboardButtons.enter && !window.playerInput.buttonDownStart,
-        buttonDownStart: keyboardButtons.enter,
-        buttonPressedB: keyboardButtons.b && !window.playerInput.buttonDownB,
-        buttonDownB: keyboardButtons.b,
-        buttonPressedZ: keyboardButtons.z && !window.playerInput.buttonDownZ,
-        buttonDownZ: keyboardButtons.z
+        stickMag: mag,
+
+        buttonPressedA: buttonDownA && !window.playerInput.buttonDownA,
+        buttonPressedStart: buttonDownStart && !window.playerInput.buttonDownStart,
+        buttonPressedB: buttonDownB && !window.playerInput.buttonDownB,
+        buttonPressedZ: buttonDownZ && !window.playerInput.buttonDownZ,
+
+        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart
     }
 
     //// Repeat for other player
-    stickX = 0, stickY = 0
+/*    stickX = 0, stickY = 0
 
     if (keyboardButtons.right) stickX += 1
     if (keyboardButtons.left) stickX -= 1
@@ -86,6 +107,6 @@ export const playerInputUpdate = () => {
     stickX *= ratio
     stickY *= ratio
 
-    window.playerInput2 = { stickX, stickY, stickMag: mag * ratio }
+    window.playerInput2 = { stickX, stickY, stickMag: mag * ratio }*/
 
 }

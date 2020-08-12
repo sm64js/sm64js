@@ -54,7 +54,7 @@ const common_air_action_step = (m, landAction, animation, stepArg) => {
 
 const check_kick_or_dive_in_air = (m) => {
     if (m.input & Mario.INPUT_B_PRESSED) {
-        return Mario.set_mario_action(m, m.forwardVel > 28.0 ? Mario.ACT_DIVE : Mario.ACT_DIVE, 0)
+        return Mario.set_mario_action(m, m.forwardVel > 28.0 ? Mario.ACT_DIVE : Mario.ACT_JUMP_KICK, 0)
     }
     return 0
 }

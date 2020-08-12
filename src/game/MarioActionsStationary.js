@@ -162,8 +162,20 @@ const act_crouching = (m) => {
         return Mario.set_jumping_action(m, Mario.ACT_BACKFLIP, 0)
     }
 
+    if (m.input & Mario.INPUT_OFF_FLOOR) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
+    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
+        return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
+    }
+
     if (!(m.input & Mario.INPUT_Z_DOWN)) {
-        return Mario.set_mario_action(m, Mario.ACT_STOP_CROUCHING, 0);
+        return Mario.set_mario_action(m, Mario.ACT_STOP_CROUCHING, 0)
+    }
+
+    if (m.input & Mario.INPUT_NONZERO_ANALOG) {
+        return Mario.set_mario_action(m, Mario.ACT_START_CRAWLING, 0)
     }
 
     if (m.input & Mario.INPUT_B_PRESSED) {
@@ -215,6 +227,42 @@ const act_long_jump_land_stop = (m) => {
     return 0
 }
 
+const act_start_crawling = (m) => {
+    if (m.input & Mario.INPUT_OFF_FLOOR) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
+    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
+        return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
+    }
+
+    stationary_ground_step(m)
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_START_CRAWLING)
+    if (Mario.is_anim_past_end(m)) {
+        Mario.set_mario_action(m, Mario.ACT_CRAWLING, 0)
+    }
+    return 0
+}
+
+const act_stop_crawling = (m) => {
+
+    if (m.input & Mario.INPUT_OFF_FLOOR) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
+    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
+        return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
+    }
+
+    stationary_ground_step(m)
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_STOP_CRAWLING)
+    if (Mario.is_anim_past_end(m)) {
+        Mario.set_mario_action(m, Mario.ACT_CROUCHING, 0)
+    }
+    return 0
+
+}
+
 export const mario_execute_stationary_action = (m) => {
 
     switch (m.action) {
@@ -230,6 +278,8 @@ export const mario_execute_stationary_action = (m) => {
         case Mario.ACT_STOP_CROUCHING: return act_stop_crouching(m)
         case Mario.ACT_BACKFLIP_LAND_STOP: return act_backflip_land_stop(m)
         case Mario.ACT_LONG_JUMP_LAND_STOP: return act_long_jump_land_stop(m)
+        case Mario.ACT_START_CRAWLING: return act_start_crawling(m)
+        case Mario.ACT_STOP_CRAWLING: return act_stop_crawling(m)
         default: throw "unkown action stationary"
     }
 }

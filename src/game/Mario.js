@@ -188,6 +188,8 @@ export const ACT_STOMACH_SLIDE = 0x008C0453
 export const ACT_DIVE_SLIDE = 0x00880456
 export const ACT_FORWARD_ROLLOUT = 0x010008A6
 export const ACT_BACKWARD_ROLLOUT = 0x010008AD
+export const ACT_MOVE_PUNCHING = 0x00800457 
+export const ACT_SLIDE_KICK_SLIDE = 0x0080045A
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -729,7 +731,7 @@ const update_mario_joystick_inputs = (m, playerInput) => {
         m.intendedYaw = m.faceAngle[1]
     }
 
-    m.controller = { stickX: playerInput.stickX, stickY: playerInput.stickY }
+    m.controller = { stickX: playerInput.stickX, stickY: playerInput.stickY, stickMag: playerInput.stickMag }
 
     m.intendedYaw = m.intendedYaw > 32767 ? m.intendedYaw - 65536 : m.intendedYaw
     m.intendedYaw = m.intendedYaw < -32768 ? m.intendedYaw + 65536 : m.intendedYaw

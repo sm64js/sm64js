@@ -443,7 +443,26 @@ export class n64GfxProcessor {
         if (v1.clip_rej & v2.clip_rej & v3.clip_rej) return
 
         if ((this.rsp.geometry_mode & Gbi.G_CULL_BOTH) != 0) {
-            throw "not implemented section in sp_tri1"
+            const dx1 = v1.x / (v1.w) - v2.x / (v2.w)
+            const dy1 = v1.y / (v1.w) - v2.y / (v2.w)
+            const dx2 = v3.x / (v3.w) - v2.x / (v2.w)
+            const dy2 = v3.y / (v3.w) - v2.y / (v2.w)
+            let cross = (dx1 * dy2) - (dy1 * dx2)
+
+            if ((v1.w < 0) ^ (v2.w < 0) ^ (v3.w < 0)) {
+                // If one vertex lies behind the eye, negating cross will give the correct result.
+                // If all vertices lie behind the eye, the triangle will be rejected anyway.
+                cross = -cross
+            }
+
+            switch (this.rsp.geometry_mode & Gbi.G_CULL_BOTH) {
+                case Gbi.G_CULL_FRONT:
+                    if (cross <= 0) return
+                    break
+                case Gbi.G_CULL_BACK:
+                    if (cross >= 0) return
+                    break
+            }
         }
 
         const depth_test = (this.rsp.geometry_mode & Gbi.G_ZBUFFER) == Gbi.G_ZBUFFER

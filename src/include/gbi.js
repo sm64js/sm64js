@@ -43,7 +43,7 @@ export const G_LIGHTING = 32
 export const G_TEXTURE_GEN = 64
 export const G_TEXTURE_GEN_LINEAR = 128
 export const G_CLIPPING = 256
-export const G_CULL_BOTH = 512
+export const G_CULL_BOTH = 48
 export const G_LOD = 1024
 
 export const  G_ON	= 1

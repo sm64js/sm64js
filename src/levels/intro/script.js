@@ -1,8 +1,8 @@
 import { LevelCommandsInstance as LevelCommands } from "../../engine/LevelCommands"
 import { intro_geo_0002D0, intro_geo_00035C } from "./geo"
 import { WARP_TRANSITION_FADE_INTO_COLOR } from "../../game/Area"
-import { LEVEL_CASTLE_GROUNDS } from "../level_defines"
 import { level_main_scripts_entry } from "../scripts"
+import { LEVEL_CASTLE_GROUNDS } from "../level_defines_constants"
 
 export let level_intro_entry_2 = [
     { command: LevelCommands.init_level },

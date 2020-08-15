@@ -202,6 +202,7 @@ export const ACT_GROUND_POUND = 0x008008A9
 export const ACT_GROUND_POUND_LAND = 0x0080023C
 export const ACT_BUTT_SLIDE_STOP = 0x0C00023E
 export const ACT_AIR_HIT_WALL = 0x000008A7
+export const ACT_RIDING_HOOT = 0x000004A8
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -733,6 +734,7 @@ export const execute_mario_action = (marioIndex) => {
             }
         }
 
+        update_mario_info_for_cam(LevelUpdate.gMarioState[marioIndex])
 
         LevelUpdate.gMarioState[marioIndex].marioObj.rawData[oInteractStatus] = 0
     }
@@ -967,6 +969,17 @@ const update_mario_inputs = (m) => {
 
     if (m.doubleJumpTimer > 0) {
         m.doubleJumpTimer--
+    }
+}
+
+const update_mario_info_for_cam = (m) => {
+    m.marioBodyState.action = m.action
+    m.statusForCamera.action = m.action
+
+    m.statusForCamera.faceAngle = [...m.faceAngle]
+
+    if ((m.flags & MARIO_UNKNOWN_25) == 0) {
+        m.statusForCamera.pos = [...m.pos]
     }
 }
 

@@ -13,6 +13,22 @@ export const approach_number = (current, target, inc, dec) => {
     return current
 }
 
+export const vec3f_get_dist_and_angle = (from, to, output) => {
+    const x = to[0] - from[0]
+    const y = to[1] - from[1]
+    const z = to[2] - from[2]
+
+    output.dist = Math.sqrt(x * x + y * y + z * z)
+    output.pitch = atan2s(Math.sqrt(x * x + z * z), y)
+    output.yaw = atan2s(z, x)
+}
+
+export const vec3f_set_dist_and_angle = (from, to, dist, pitch, yaw) => {
+    to[0] = from[0] + dist * Math.cos(pitch / 0x8000 * Math.PI) * Math.sin(yaw / 0x8000 * Math.PI)
+    to[1] = from[1] + dist * Math.sin(pitch / 0x8000 * Math.PI)
+    to[2] = from[2] + dist * Math.cos(pitch / 0x8000 * Math.PI) * Math.cos(yaw / 0x8000 * Math.PI)
+}
+
 
 export const mtxf_identity = (mtx) => {
     for (let i = 0; i < mtx.length; i++) {

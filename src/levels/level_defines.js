@@ -1,7 +1,6 @@
 import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
 import { level_castle_grounds_entry } from "./castle_grounds/script"
-
-export const LEVEL_CASTLE_GROUNDS = 16
+import { LEVEL_CASTLE_GROUNDS } from "./level_defines_constants"
 
 export const level_defines_list = [
     {

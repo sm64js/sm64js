@@ -320,8 +320,6 @@ class GeoRenderer {
 
     geo_process_object(node) {
 
-        //console.log(node)
-
         const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const object = node.wrapper.wrapperObjectNode.wrapperObject
 
@@ -329,15 +327,17 @@ class GeoRenderer {
 
         if (object.header.gfx.unk18 == this.gCurGraphNodeRoot.wrapper.areaIndex) {
 
-            if (object.header.gfx.throwMatrix || object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_BILLBOARD ||
-                object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_CYLBOARD) 
+            if (object.header.gfx.throwMatrix || object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_BILLBOARD) 
                 throw "more implementation needed in geo process object"
 
-            MathUtil.mtxf_rotate_zxy_and_translate(mtxf, object.header.gfx.pos, object.header.gfx.angle)
-            MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
+            if (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_CYLBOARD) {
+                MathUtil.mtxf_cylboard(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex], object.header.gfx.pos, this.gCurGraphNodeCamera.wrapper.roll)
+            } else {
+                MathUtil.mtxf_rotate_zxy_and_translate(mtxf, object.header.gfx.pos, object.header.gfx.angle)
+                MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
+            }
 
-            MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex + 1],
-                object.header.gfx.scale)
+            MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex + 1], object.header.gfx.scale)
 
             object.header.gfx.throwMatrix = this.gMatStack[++this.gMatStackIndex]
             object.header.gfx.cameraToObject = [ 

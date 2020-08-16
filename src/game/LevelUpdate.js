@@ -66,7 +66,7 @@ class LevelUpdate {
             }
 
             if (Area.gCurrentArea) {
-                // reset_camera()
+                Camera.reset_camera(Area.gCurrentArea.camera)
             }
         }
         
@@ -77,6 +77,10 @@ class LevelUpdate {
 
         //lots more here
         Area.area_update_objects()
+
+        if (Area.gCurrentArea) {
+            Camera.update_camera(Area.gCurrentArea.camera)
+        }
 
         return 0
     }

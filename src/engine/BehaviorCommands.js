@@ -1,5 +1,6 @@
 import { ObjectListProcessorInstance as ObjListProc } from "../game/ObjectListProcessor"
 import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction } from "../include/object_constants"
+import { GRAPH_RENDER_CYLBOARD } from "./graph_node"
 
 class BehaviorCommands {
 
@@ -68,6 +69,12 @@ class BehaviorCommands {
         value &= 0xFFFF
         ObjListProc.gCurrentObject.rawData[objectOffset] |= value
 
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    cyclboard(args) {
+        ObjListProc.gCurrentObject.header.gfx.node.flags |= GRAPH_RENDER_CYLBOARD
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }

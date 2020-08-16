@@ -77,10 +77,14 @@ class LevelCommands {
 
     set_mario_pos(args) {
 
+        let yaw = parseInt(args[1] * 0x8000 / 180)
+        yaw = yaw > 32767 ? yaw - 65536 : yaw
+        yaw = yaw < -32768 ? yaw + 65536 : yaw
+
         Object.assign(Area.gMarioSpawnInfo, {
             areaIndex: args[0],
             startPos: [ args[2], args[3], args[4] ],
-            startAngle: [0, parseInt(args[1] * 0x8000 / 180), 0 ]
+            startAngle: [0, yaw, 0 ]
         })
 
         this.sCurrentScript.index++

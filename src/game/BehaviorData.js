@@ -41,6 +41,7 @@ export const bhvMario = [
 
 export const bhvTree = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE } },
+    { command: BhvCmds.cyclboard },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.set_int, args: { field: oInteractType, value: Interact.INTERACT_POLE } },
     { command: BhvCmds.set_hitbox, args: { radius: 80, height: 500 } },

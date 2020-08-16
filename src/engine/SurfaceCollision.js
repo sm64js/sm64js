@@ -133,7 +133,6 @@ class SurfaceCollision {
 
             // Determine if we are checking for the camera or not.
             if (ObjectListProcessor.gCheckingSurfaceCollisionsForCamera != 0) {
-                throw "find floor from list check to see if seem right"
                 if (surf.flags & SURFACE_FLAG_NO_CAM_COLLISION) continue 
             }
             // If we are not checking for the camera, ignore camera only floors.
@@ -186,7 +185,6 @@ class SurfaceCollision {
 
             // Determine if we are checking for the camera or not.
             if (ObjectListProcessor.gCheckingSurfaceCollisionsForCamera != 0) {
-                throw "find floor from list check to see if seem right"
                 if (surf.flags & SURFACE_FLAG_NO_CAM_COLLISION) { continue }
             }
             // If we are not checking for the camera, ignore camera only floors.

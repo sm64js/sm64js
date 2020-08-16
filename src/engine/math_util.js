@@ -29,6 +29,12 @@ export const vec3f_set_dist_and_angle = (from, to, dist, pitch, yaw) => {
     to[2] = from[2] + dist * Math.cos(pitch / 0x8000 * Math.PI) * Math.cos(yaw / 0x8000 * Math.PI)
 }
 
+export const vec3f_add = (dest, a) => {
+    dest[0] += a[0]
+    dest[1] += a[1]
+    dest[2] += a[2]
+}
+
 
 export const mtxf_identity = (mtx) => {
     for (let i = 0; i < mtx.length; i++) {
@@ -53,6 +59,28 @@ export const mtxf_to_mtx = (dest, src) => {
             dest[i][j] = src[i][j]
         }
     }
+}
+
+export const mtxf_cylboard = (dest, mtx, position, angle) => {
+    dest[0][0] = Math.cos(angle / 0x8000 * Math.PI)
+    dest[0][1] = Math.sin(angle / 0x8000 * Math.PI)
+    dest[0][2] = 0
+    dest[0][3] = 0
+
+    dest[1][0] = mtx[1][0]
+    dest[1][1] = mtx[1][1]
+    dest[1][2] = mtx[1][2]
+    dest[1][3] = 0
+
+    dest[2][0] = 0
+    dest[2][1] = 0
+    dest[2][2] = 1
+    dest[2][3] = 0
+
+    dest[3][0] = mtx[0][0] * position[0] + mtx[1][0] * position[1] + mtx[2][0] * position[2] + mtx[3][0]
+    dest[3][1] = mtx[0][1] * position[0] + mtx[1][1] * position[1] + mtx[2][1] * position[2] + mtx[3][1]
+    dest[3][2] = mtx[0][2] * position[0] + mtx[1][2] * position[1] + mtx[2][2] * position[2] + mtx[3][2]
+    dest[3][3] = 1
 }
 
 export const mtxf_rotate_xyz_and_translate = (dest, b, c) => {

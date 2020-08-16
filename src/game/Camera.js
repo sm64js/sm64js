@@ -6,7 +6,7 @@ import { LEVEL_CASTLE_GROUNDS } from "../levels/level_defines_constants"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { atan2s } from "../engine/math_util"
 import * as MathUtil from "../engine/math_util"
-import { ACT_FLAG_METAL_WATER, ACT_FLAG_ON_POLE, ACT_FLAG_HANGING, ACT_RIDING_HOOT } from "./Mario"
+import { ACT_FLAG_METAL_WATER, ACT_FLAG_ON_POLE, ACT_FLAG_HANGING, ACT_RIDING_HOOT, ACT_LONG_JUMP, ACT_TOP_OF_POLE, ACT_SLEEPING, ACT_START_SLEEPING } from "./Mario"
 import { oPosY } from "../include/object_constants"
 import { SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 
@@ -132,16 +132,37 @@ class Camera {
             posHSpeed: 0, posVSpeed: 0,
             keyDanceRoll: 0
         }
+
+        this.sOldPosition = [0, 0, 0]
+        this.sOldFocus = [0, 0, 0]
     }
 
     select_mario_cam_mode() {
         this.sSelectionFlags = CAM_MODE_MARIO_SELECTED
     }
 
+    clamp_pitch(from, to, maxPitch, minPitch) {
+        let outOfRange = 0
+
+        const output = {}
+        MathUtil.vec3f_get_dist_and_angle(from, to, output)
+        if (output.pitch > maxPitch) {
+            output.pitch = maxPitch
+            outOfRange++
+        }
+        if (output.pitch < minPitch) {
+            output.pitch = minPitch
+            outOfRange++
+        }
+
+        MathUtil.vec3f_set_dist_and_angle(from, to, output.dist, output.pitch, output.yaw)
+        return outOfRange
+    }
+
     calc_abs_dist(a, b) {
-        const distX = b[0] = a[0]
-        const distY = b[1] = a[1]
-        const distZ = b[2] = a[2]
+        const distX = b[0] - a[0]
+        const distY = b[1] - a[1]
+        const distZ = b[2] - a[2]
         return Math.sqrt(distX * distX + distY * distY + distZ * distZ)
     }
 
@@ -154,6 +175,14 @@ class Camera {
         const dx = to[0] - from[0]
         const dz = to[2] - from[2]
         return atan2s(dz, dx)
+    }
+
+    rotate_in_xz(dst, src, yaw) {
+        const tempVec = [...src]
+
+        dst[0] = tempVec[2] * Math.sin(yaw / 0x8000 * Math.PI) + tempVec[0] * Math.cos(yaw / 0x8000 * Math.PI)
+        dst[1] = tempVec[1]
+        dst[2] = tempVec[2] * Math.cos(yaw / 0x8000 * Math.PI) - tempVec[0] * Math.sin(yaw / 0x8000 * Math.PI)
     }
 
     offset_rotated(dst, from, to, rotation) {
@@ -191,7 +220,7 @@ class Camera {
         ObjectListProc.gCheckingSurfaceCollisionsForCamera = tempCheckingSurfaceCollisionsForCamera
     }
 
-    approach_f32_asymptotic_bool(currentWrapper, target, multiplier) {
+    approach_asymptotic_bool(currentWrapper, target, multiplier) {
         if (multiplier > 1) {
             multiplier = 1
         }
@@ -203,7 +232,33 @@ class Camera {
         }
     }
 
-    camera_approach_s16_symmetric_bool(currentWrapper, target, increment) {
+    set_or_approach_symmetric(currentWrapper, target, increment) {
+        if (this.sStatusFlags & CAM_FLAG_SMOOTH_MOVEMENT) {
+            this.camera_approach_symmetric_bool(currentWrapper, target, increment)
+        } else {
+            currentWrapper.current = target
+        }
+        if (currentWrapper.current == target) {
+            return false
+        } else {
+            return true
+        }
+    }
+
+    set_or_approach_asymptotic(currentWrapper, goal, scale) {
+        if (this.sStatusFlags & CAM_FLAG_SMOOTH_MOVEMENT) {
+            this.approach_asymptotic_bool(currentWrapper, goal, scale)
+        } else {
+            currentWrapper.current = goal
+        }
+        if (currentWrapper.current == goal) {
+            return false
+        } else {
+            return true
+        }
+    }
+
+    camera_approach_symmetric_bool(currentWrapper, target, increment) {
         let dist = target - currentWrapper.current
 
         if (increment < 0) {
@@ -232,10 +287,26 @@ class Camera {
         }
     }
 
+    set_or_approach_vec3_asymptotic(dst, goal, xMul, yMul, zMul) {
+        let wrapper = { current: dst[0] }
+        this.set_or_approach_asymptotic(wrapper, goal[0], xMul)
+        dst[0] = wrapper.current
+        wrapper.current = dst[1]
+        this.set_or_approach_asymptotic(wrapper, goal[1], yMul)
+        dst[1] = wrapper.current
+        wrapper.current = dst[2]
+        this.set_or_approach_asymptotic(wrapper, goal[2], zMul)
+        dst[2] = wrapper.current
+    }
+
     scale_along_line(dst, from, to, scale) {
-        dst[0] = (to[0] - from[0]) * scale + from[0]
-        dst[1] = (to[1] - from[1]) * scale + from[1]
-        dst[2] = (to[2] - from[2]) * scale + from[2]
+        const tempVec =  new Array(3)
+
+        tempVec[0] = (to[0] - from[0]) * scale + from[0]
+        tempVec[1] = (to[1] - from[1]) * scale + from[1]
+        tempVec[2] = (to[2] - from[2]) * scale + from[2]
+
+        dst = [...tempVec]
     }
 
     approach_camera_height(c, goal, inc) {
@@ -441,7 +512,7 @@ class Camera {
 
         ObjectListProc.gCheckingSurfaceCollisionsForCamera = false
 
-        this.update_lakitu(c) //TODO OBVI
+        this.update_lakitu(c) 
 
         this.gLakituState.lastFrameAction = this.gPlayerCameraState.action
     }
@@ -492,6 +563,49 @@ class Camera {
         if (focOffWrapper.focOff < -focBound) {
             focOffWrapper.focOff = -focBound
         }
+    }
+
+    pan_ahead_of_player(c) {
+
+        const pan = [0,0,0]
+
+        // Get distance and angle from camera to mario.
+        const output = {}
+        MathUtil.vec3f_get_dist_and_angle(c.pos, this.gPlayerCameraState.pos, output)
+        const dist = output.dist
+        let yaw = output.yaw
+
+        // The camera will pan ahead up to about 30% of the camera's distance to mario.
+        pan[2] = Math.sin(0xC00 / 0x8000 * Math.PI) * dist
+
+        this.rotate_in_xz(pan, pan, this.gPlayerCameraState.faceAngle[1])
+        // rotate in the opposite direction
+        yaw = -yaw
+        this.rotate_in_xz(pan, pan, yaw)
+        // Only pan left or right
+        pan[2] = 0
+
+        // If mario is long jumping, or on a flag pole (but not at the top), then pan in the opposite direction
+        if (this.gPlayerCameraState.action == ACT_LONG_JUMP ||
+            (this.gPlayerCameraState.action != ACT_TOP_OF_POLE && (this.gPlayerCameraState.action & ACT_FLAG_ON_POLE))) {
+            pan[0] = -pan[0]
+        }
+
+        // Slowly make the actual pan, sPanDistance, approach the calculated pan
+        // If mario is sleeping, then don't pan
+        const wrapper = {}
+        if (this.sStatusFlags & CAM_FLAG_SLEEPING) {
+            this.approach_asymptotic_bool(wrapper, 0, 0.025)
+        } else {
+            this.approach_asymptotic_bool(wrapper, pan[0], 0.025)
+        }
+        this.sPanDistance = wrapper.current
+
+        // Now apply the pan. It's a dir vector to the left or right, rotated by the camera's yaw to mario
+        pan[0] = this.sPanDistance
+        yaw = -yaw
+        this.rotate_in_xz(pan, pan, yaw)
+        MathUtil.vec3f_add(c.focus, pan)
     }
 
     update_default_camera(c) {
@@ -579,8 +693,8 @@ class Camera {
                 yawVel = 0
             }
             if (yawVel != 0) {
-                const yawWrapper = { current: yaw }
-                this.camera_approach_s16_symmetric_bool(yawWrapper, yawGoal, yawVel)
+                const yawWrapper = { current: parseInt(yaw) }
+                this.camera_approach_symmetric_bool(yawWrapper, parseInt(yawGoal), parseInt(yawVel))
                 yaw = yawWrapper.current
             }
         }
@@ -588,7 +702,7 @@ class Camera {
         // Only zoom out if not obstructed by walls and lakitu hasn't collided with any
         if (avoidStatus == 0 && !(this.sStatusFlags & CAM_FLAG_COLLIDED_WITH_WALL)) {
             const distWrapper = { current: dist }
-            this.approach_f32_asymptotic_bool(distWrapper, zoomDist - 100, 0.05)
+            this.approach_asymptotic_bool(distWrapper, zoomDist - 100, 0.05)
             dist = distWrapper.current
         }
 
@@ -666,7 +780,7 @@ class Camera {
         ///Poison Gas
 
 
-        if (this.gPlayerCameraState.action & ACT_FLAG_HANGING || this.gPlayerCameraState.action & ACT_RIDING_HOOT) {
+        if (this.gPlayerCameraState.action & ACT_FLAG_HANGING || this.gPlayerCameraState.action == ACT_RIDING_HOOT) {
             throw "hanging or riding"
         }
 
@@ -725,6 +839,114 @@ class Camera {
         this.mode_default_camera(c)
     }
 
+    next_lakitu_state(newPos, newFoc, curPos, curFoc, oldPos, oldFoc, yaw) {
+        newPos = [...curPos]
+        newFoc = [...curFoc]
+
+        if (this.sStatusFlags & CAM_FLAG_START_TRANSITION) {
+            throw "CAM_FLAG_START_TRANSITION"
+        }
+
+        // Transition from the last mode to the current one
+        if (this.sModeTransition.framesLeft > 0) {
+            throw "Transition from the last mode to the current one"
+        } else {
+            this.sModeTransition.posDist = 0
+            this.sModeTransition.posPitch = 0
+            this.sModeTransition.posYaw = 0
+            this.sStatusFlags &= ~CAM_FLAG_TRANSITION_OUT_OF_C_UP
+        }
+
+        this.sModeTransition.marioPos = [...this.gPlayerCameraState.pos]
+        return yaw
+    }
+
+    update_lakitu(c) {
+
+        let newPos = [0,0,0], newFoc = [0,0,0]
+
+        if (this.gCameraMovementFlags & CAM_MOVE_PAUSE_SCREEN) { }
+        else {
+            const newYaw = this.next_lakitu_state(newPos, newFoc, c.pos, c.focus, this.sOldPosition, this.sOldFocus, c.nextYaw)
+            let wrapper = { current: parseInt(c.yaw) }
+            this.set_or_approach_symmetric(wrapper, parseInt(newYaw), parseInt(this.sYawSpeed))
+            c.yaw = wrapper.current
+            this.sStatusFlags &= ~CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
+
+            // Update old state
+            this.sOldPosition = [...newPos]
+            this.sOldFocus = [...newFoc]
+
+            this.gLakituState.yaw = c.yaw
+            this.gLakituState.nextYaw = c.nextYaw
+            this.gLakituState.goalPos = [...c.pos]
+            this.gLakituState.goalFocus = [...c.focus]
+
+            // Simulate lakitu flying to the new position and turning towards the new focus
+            this.set_or_approach_vec3_asymptotic(this.gLakituState.curPos, newPos,
+                                                 this.gLakituState.posHSpeed, this.gLakituState.posVSpeed,
+                                                 this.gLakituState.posHSpeed)
+            this.set_or_approach_vec3_asymptotic(this.gLakituState.curFocus, newFoc,
+                                                 this.gLakituState.focHSpeed, this.gLakituState.focVSpeed,
+                                                 this.gLakituState.focHSpeed)
+
+
+            // Adjust lakitu's speed back to normal --- so gross
+            wrapper = { current: this.gLakituState.focHSpeed }
+            this.set_or_approach_asymptotic(wrapper, 0.8, 0.05)
+            this.gLakituState.focHSpeed = wrapper.current
+            wrapper.current = this.gLakituState.focVSpeed
+            this.set_or_approach_asymptotic(wrapper, 0.3, 0.05)
+            this.gLakituState.focVSpeed = wrapper.current
+            wrapper.current = this.gLakituState.posHSpeed
+            this.set_or_approach_asymptotic(wrapper, 0.3, 0.05)
+            this.gLakituState.posHSpeed = wrapper.current
+            wrapper.current = this.gLakituState.posVSpeed
+            this.set_or_approach_asymptotic(wrapper, 0.3, 0.05)
+            this.gLakituState.posVSpeed = wrapper.current
+
+            // Turn on smooth movement when it hasn't been blocked for 2 frames
+            if (this.sStatusFlags & CAM_FLAG_BLOCK_SMOOTH_MOVEMENT) {
+                this.sStatusFlags &= ~CAM_FLAG_BLOCK_SMOOTH_MOVEMENT
+            } else {
+                this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
+            }
+
+            this.gLakituState.pos = [...this.gLakituState.curPos]
+            this.gLakituState.focus = [...this.gLakituState.curFocus]
+
+            const output = {}
+            MathUtil.vec3f_get_dist_and_angle(this.gLakituState.pos, this.gLakituState.focus, output)
+            this.gLakituState.focusDistance = output.dist
+            this.gLakituState.oldPitch = output.pitch
+            this.gLakituState.oldYaw = output.yaw
+
+            this.gLakituState.roll = 0
+
+            this.gLakituState.roll += this.gLakituState.keyDanceRoll
+
+            if (c.mode != CAMERA_MODE_C_UP && c.cutscene == 0) {
+                ObjectListProc.gCheckingSurfaceCollisionsForCamera = true
+                let distToFloor = SurfaceCollision.find_floor(this.gLakituState.pos[0], this.gLakituState.pos[1] + 20, this.gLakituState.pos[2], {})
+                if (distToFloor != -11000) {
+                    distToFloor += 100
+                    if (this.gLakituState.pos[1] < (distToFloor)) {
+                        this.gLakituState.pos[1] = distToFloor
+                    } else {
+                        ObjectListProc.gCheckingSurfaceCollisionsForCamera = false
+                    }
+                }
+            }
+
+            this.sModeTransition.marioPos = [...this.gPlayerCameraState.pos]
+        }
+
+        this.clamp_pitch(this.gLakituState.pos, this.gLakituState.focus, 0x3E00, -0x3E00)
+        this.gLakituState.mode = c.mode
+        this.gLakituState.defMode = c.defMode
+
+    }
+
     update_graph_node_camera(graphNode) {
         // graphNode.myDemoAngle += 0.02
 /*        graphNode.pos[0] = (Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius) + LevelUpdate.gMarioState[0].pos[0]
@@ -757,13 +979,27 @@ class Camera {
 
         if (callContext == GEO_CONTEXT_RENDER) {
             switch (fovFunc) {
-                default: throw "default switch case - geo camera fov"
+                case CAM_FOV_DEFAULT:
+                    this.fov_default(marioState)
+                    break
+                default: throw "default switch case - geo camera fov - " + fovFunc
             }
         }
 
         graphNode.fov = this.sFOVState.fov
 
         ///this.shake_camera_fov(graphNode)
+    }
+
+    fov_default(m) {
+        this.sStatusFlags &= ~CAM_FLAG_SLEEPING
+
+        if ((m.action == ACT_SLEEPING) || (m.action == ACT_START_SLEEPING)) {
+            throw "sleeping"
+        } else {
+            const wrapper = {}
+            this.camera_approach_symmetric_bool(wrapper, 45, (45 - this.sFOVState.fov) / 30)
+        }
     }
 }
 

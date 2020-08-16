@@ -12,7 +12,7 @@ import { gMarioAnimData } from "../actors/mario/marioAnimData"
 import { mario_execute_moving_action } from "./MarioActionsMoving"
 import { mario_execute_airborne_action } from "./MarioActionsAirborne"
 import { mario_execute_object_action } from "./MarioActionsObject"
-import { oMarioWalkingPitch, oInteractStatus } from "../include/object_constants"
+import { oMarioWalkingPitch, oInteractStatus, oPosX, oPosY, oPosZ, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
@@ -378,21 +378,17 @@ export const init_marios = () => {
             vel: [0, 0, 0],
             action: ACT_IDLE
         })
+
+        const marioRawData = LevelUpdate.gMarioState[index].marioObj.rawData
+        marioRawData[oPosX] = LevelUpdate.gMarioState[index].pos[0]
+        marioRawData[oPosY] = LevelUpdate.gMarioState[index].pos[1]
+        marioRawData[oPosZ] = LevelUpdate.gMarioState[index].pos[2]
+        marioRawData[oMoveAnglePitch] = LevelUpdate.gMarioState[index].faceAngle[0]
+        marioRawData[oMoveAngleYaw] = LevelUpdate.gMarioState[index].faceAngle[1]
+        marioRawData[oMoveAngleRoll] = LevelUpdate.gMarioState[index].faceAngle[2]
     })
 
-
-    ////Redundant
-    /*        Object.assign(LevelUpdate.gMarioState.marioObj, {
-        oPosX: LevelUpdate.gMarioState.pos[0],
-        oPosY: LevelUpdate.gMarioState.pos[1],
-        oPosZ: LevelUpdate.gMarioState.pos[2],
-        oMoveAnglePitch: LevelUpdate.gMarioState.faceAngle[0],
-        oMoveAngleYaw: LevelUpdate.gMarioState.faceAngle[1],
-        oMoveAngleRoll: LevelUpdate.gMarioState.faceAngle[2]
-    })*/
-
-
-    LevelUpdate.gMarioState.forEach((marioState, index) => {
+    LevelUpdate.gMarioState.forEach((marioState) => {
         Object.assign(marioState.marioObj.header.gfx, {
             //// Also Redundant
             //pos: [ ...LevelUpdate.gMarioState.pos ],

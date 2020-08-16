@@ -515,6 +515,7 @@ class Camera {
         this.update_lakitu(c) 
 
         this.gLakituState.lastFrameAction = this.gPlayerCameraState.action
+
     }
 
     calc_hor_dist(a, b) {
@@ -593,12 +594,13 @@ class Camera {
 
         // Slowly make the actual pan, sPanDistance, approach the calculated pan
         // If mario is sleeping, then don't pan
-        const wrapper = {}
+        const wrapper = { current: this.sPanDistance }
         if (this.sStatusFlags & CAM_FLAG_SLEEPING) {
             this.approach_asymptotic_bool(wrapper, 0, 0.025)
         } else {
             this.approach_asymptotic_bool(wrapper, pan[0], 0.025)
         }
+
         this.sPanDistance = wrapper.current
 
         // Now apply the pan. It's a dir vector to the left or right, rotated by the camera's yaw to mario
@@ -609,6 +611,7 @@ class Camera {
     }
 
     update_default_camera(c) {
+
 
         let nextYawVel
         let yawVel = 0
@@ -670,6 +673,7 @@ class Camera {
         const focHeight = focHeightWrapper.focOff
         const cPos = [...c.pos]
         let avoidStatus = 0
+
 
         if (avoidStatus == 3) {
             throw "implement this"
@@ -818,12 +822,12 @@ class Camera {
             }
         }
 
+
         if (ceilHeight != 20000) {
             throw "there is a ceiling in update camera"
         }
 
         /// if Level area == AREA_WDW_TOWN
-
         return yaw
 
     }
@@ -840,8 +844,13 @@ class Camera {
     }
 
     next_lakitu_state(newPos, newFoc, curPos, curFoc, oldPos, oldFoc, yaw) {
-        newPos = [...curPos]
-        newFoc = [...curFoc]
+        newPos[0] = curPos[0]
+        newPos[1] = curPos[1]
+        newPos[2] = curPos[2]
+
+        newFoc[0] = curFoc[0]
+        newFoc[1] = curFoc[1]
+        newFoc[2] = curFoc[2]
 
         if (this.sStatusFlags & CAM_FLAG_START_TRANSITION) {
             throw "CAM_FLAG_START_TRANSITION"
@@ -868,6 +877,7 @@ class Camera {
         if (this.gCameraMovementFlags & CAM_MOVE_PAUSE_SCREEN) { }
         else {
             const newYaw = this.next_lakitu_state(newPos, newFoc, c.pos, c.focus, this.sOldPosition, this.sOldFocus, c.nextYaw)
+
             let wrapper = { current: parseInt(c.yaw) }
             this.set_or_approach_symmetric(wrapper, parseInt(newYaw), parseInt(this.sYawSpeed))
             c.yaw = wrapper.current
@@ -944,7 +954,6 @@ class Camera {
         this.clamp_pitch(this.gLakituState.pos, this.gLakituState.focus, 0x3E00, -0x3E00)
         this.gLakituState.mode = c.mode
         this.gLakituState.defMode = c.defMode
-
     }
 
     update_graph_node_camera(graphNode) {

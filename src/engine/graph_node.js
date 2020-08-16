@@ -411,14 +411,15 @@ export const init_graph_node_background = (pool, graphNode, background, backgrou
     graphNode = {
         node: {},
         background,
+        backgroundFunc,
         zero
     }
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_BACKGROUND)
 
-    //if (backgroundFunc) {
-    //    backgroundFunc(.....)
-    //}
+    if (backgroundFunc) {
+        backgroundFunc(GEO_CONTEXT_CREATE, graphNode)
+    }
 
     return graphNode
 

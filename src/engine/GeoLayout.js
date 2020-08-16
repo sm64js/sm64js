@@ -21,6 +21,18 @@ class GeoLayout {
         this.LAYER_TRANSPARENT       = 5
         this.LAYER_TRANSPARENT_DECAL = 6
         this.LAYER_TRANSPARENT_INTER = 7
+
+        // sky background params
+        this.BACKGROUND_OCEAN_SKY       = 0
+        this.BACKGROUND_FLAMING_SKY     = 1
+        this.BACKGROUND_UNDERWATER_CITY = 2
+        this.BACKGROUND_BELOW_CLOUDS    = 3
+        this.BACKGROUND_SNOW_MOUNTAINS  = 4
+        this.BACKGROUND_DESERT          = 5
+        this.BACKGROUND_HAUNTED         = 6
+        this.BACKGROUND_GREEN_SKY       = 7
+        this.BACKGROUND_ABOVE_CLOUDS    = 8
+        this.BACKGROUND_PURPLE_SKY      = 9
     }
 
     branch(args) {
@@ -163,7 +175,7 @@ class GeoLayout {
 
     node_background(args) {
 
-        const graphNode = GraphNode.init_graph_node_background(null, null, args[0], null, 0)
+        const graphNode = GraphNode.init_graph_node_background(null, null, args[0], args[1], 0)
 
         GraphNode.register_scene_graph_node(this, graphNode)
 

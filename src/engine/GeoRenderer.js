@@ -163,8 +163,8 @@ class GeoRenderer {
     geo_process_background(node) {
 
         let list = []
-        if (node.wrapper.func) {
-            list = [] //node.wrapper.func()
+        if (node.wrapper.backgroundFunc) {
+            list = node.wrapper.backgroundFunc(GraphNode.GEO_CONTEXT_RENDER, node.wrapper)
         }
 
         if (list.length > 0) {

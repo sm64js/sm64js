@@ -9,19 +9,22 @@ const { promisify } = require('util')
 const { spawn } = require('child_process')
 const port = 80
 
-const deleteFile = promisify(fs.unlink)
 const mkdir = promisify(fs.mkdir)
 
 const pythonExtract = (dir) => {
   return new Promise((resolve, reject) => {
-	  const pythonProcess = spawn('python3', ['extract_assets.py', 'us', dir], { cwd: 'extractTools/' })
+      const pythonProcess = spawn('python3', ['extract_assets.py', 'us', dir], { cwd: 'extractTools/' })
+      //pythonProcess.stdout.on('data', (data) => { console.log(data.toString()) })
+      //pythonProcess.stderr.on('data', (data) => { console.log(data.toString()) })
 	  pythonProcess.stderr.on('close', () => { resolve() })
   })
 }
 
 const hexDumpExtract = (dir) => {
   return new Promise((resolve, reject) => {
-	  const hexDumpProcess = spawn('bash', ['../hexdumpTextures.sh'], { cwd: 'extractTools/' + dir })
+      const hexDumpProcess = spawn('bash', ['../hexdumpTextures.sh'], { cwd: 'extractTools/' + dir })
+      //hexDumpProcess.stdout.on('data', (data) => { console.log(data.toString()) })
+      //hexDumpProcess.stderr.on('data', (data) => { console.log(data.toString()) })
 	  hexDumpProcess.stderr.on('close', () => { resolve() })
   })
 }
@@ -53,10 +56,27 @@ const extractJsonFromRomFile = async (dir) => {
             Object.keys(assets).forEach((assetname) => {
                 let filepath = assetname
                 if (filepath == '@comment') return
-                filepath = `extractTools/${dir}/${filepath}`
-                filepath = filepath.substring(0, filepath.length - 4) + ".js"
-                const filedata = fs.readFileSync(filepath, "utf8")
-                extractedData[assetname] = filedata
+                if (filepath.indexOf("skyboxes") != -1) { /// skybox
+                    filepath = `extractTools/${dir}/${filepath}`
+                    filepath = filepath.slice(0, filepath.length - 4) + "_skybox.c"
+                    let filedata = fs.readFileSync(filepath, "utf8")
+                    filedata = filedata.replace(/\r/g, "")
+                    let lines = filedata.split("\n")
+                    lines = lines.filter(line => (line.length != 0) && (line[0] != '/'))
+                    while (lines.length > 0) {
+                        let section = lines.splice(0, 2)
+                        if (section[0].slice(0, 24) == 'ALIGNED8 static const u8') {
+                            const textureName = section[0].slice(25, section[0].length - 6)
+                            const textureData = section[1].slice(0, section[1].indexOf('}'))
+                            extractedData[textureName] = textureData
+                        }
+                    }
+                } else {  /// not skybox
+                    filepath = `extractTools/${dir}/${filepath}`
+                    filepath = filepath.substring(0, filepath.length - 4) + ".js"
+                    const filedata = fs.readFileSync(filepath, "utf8")
+                    extractedData[assetname] = filedata
+                }
             })
             fs.rmdirSync('extractTools/' + dir, { recursive: true })
             resolve(extractedData)

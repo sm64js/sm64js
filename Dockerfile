@@ -9,6 +9,7 @@ WORKDIR /usr/src/app
 COPY extractTools/ ./extractTools/
 RUN gcc -I extractTools -DMIO0_STANDALONE extractTools/libmio0.c -o extractTools/mio0
 RUN gcc -I extractTools -DN64GRAPHICS_STANDALONE extractTools/n64graphics.c extractTools/utils.c -o extractTools/n64graphics
+RUN gcc -I extractTools extractTools/skyconv.c extractTools/n64graphics.c extractTools/utils.c -o extractTools/skyconv
 
 COPY package.json ./
 RUN npm install

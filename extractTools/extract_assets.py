@@ -3,7 +3,6 @@ import sys
 import os
 import json
 
-
 def read_asset_map():
     with open("assets.json") as f:
         ret = json.load(f)
@@ -213,32 +212,40 @@ def main():
             image = roms[lang]
 
         for (asset, pos, size, meta) in assets:
-            # print("extracting", asset)
+            print("extracting", asset)
             input = image[pos : pos + size]
             os.makedirs(os.path.dirname(new_dir + "/" + asset), exist_ok=True)
             if asset.endswith(".png"):
                 with tempfile.NamedTemporaryFile(prefix="asset", delete=False) as png_file:
                     png_file.write(input)
                     png_file.flush()
-                    if False:
-                        if asset.startswith("textures/skyboxes/"):
-                            imagetype = "sky"
-                        else:
-                            imagetype =  "cake" + ("-eu" if "eu" in asset else "")
+                    if asset.startswith("textures/skyboxes/"):
+                        imagetype = "sky"
                         subprocess.run(
                             [
-                                "./tools/skyconv",
+                                "./skyconv",
                                 "--type",
                                 imagetype,
                                 "--combine",
                                 png_file.name,
-                                asset,
+                                new_dir + "/" + asset,
+                            ],
+                            check=True,
+                        )
+                        subprocess.run(
+                            [
+                                "./skyconv",
+                                "--type",
+                                imagetype,
+                                "--split",
+                                new_dir + "/" + asset,
+                                new_dir + "/textures/skyboxes",
                             ],
                             check=True,
                         )
                     else:
                         w, h = meta
-                        print(new_dir + "/" + asset)
+                        # print(new_dir + "/" + asset)
                         fmt = asset.split(".")[-2]
                         subprocess.run(
                             [

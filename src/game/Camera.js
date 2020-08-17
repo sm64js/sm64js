@@ -672,10 +672,10 @@ class Camera {
         let posHeight = posHeightWrapper.posOff
         const focHeight = focHeightWrapper.focOff
         const cPos = [...c.pos]
-        let avoidStatus = 0
+        let avoidStatus = 0 //rotate_camera_around_walls(c, cPos, &avoidYaw, 0x600) TODO
 
 
-        if (avoidStatus == 3) {
+        if (avoidStatus == 3) { //TODO
             throw "implement this"
         } else {
             if (LevelUpdate.gMarioState[0].forwardVel == 0) {

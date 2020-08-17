@@ -163,17 +163,18 @@ class GeoRenderer {
     geo_process_background(node) {
 
         let list = []
-        if (node.wrapper.func) {
-            list = [] //node.wrapper.func()
+        if (node.wrapper.backgroundFunc) {
+            list = node.wrapper.backgroundFunc(GraphNode.GEO_CONTEXT_RENDER, node.wrapper)
         }
 
         if (list.length > 0) {
             this.geo_append_display_list(list, node.flags >> 8)
         } else if (this.gCurGraphNodeMasterList) {
             const gfx = []
-            ////..... add backfround fill gfx commands
-            Gbi.gDPSetFillColor(gfx, node.wrapper.background)
+            Gbi.gDPSetCycleType(gfx, Gbi.G_CYC_FILL)
+            Gbi.gDPSetFillColor(gfx, node.wrapper.background) 
             Gbi.gDPFillRectangle(gfx, 0, 0, canvas.width - 1, canvas.height - 1)
+            Gbi.gDPSetCycleType(gfx, Gbi.G_CYC_1CYCLE)
             Gbi.gSPEndDisplayList(gfx)
 
             this.geo_append_display_list(gfx, 0)

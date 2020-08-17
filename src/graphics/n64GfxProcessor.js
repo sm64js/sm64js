@@ -425,9 +425,29 @@ export class n64GfxProcessor {
         return false
     }
 
-    sp_movemem(type, lightData, index) {
+    calc_and_set_viewport(viewport) {
+        let width = 2.0 * viewport.vscale[0] / 4.0
+        let height = 2.0 * viewport.vscale[1] / 4.0
+        let x = (viewport.vtrans[0] / 4.0) - width / 2.0
+        let y = 240 - ((viewport.vtrans[1] / 4.0) + height / 2.0)
+
+        width *= 2.0
+        height *= 2.0
+        x *= 2.0
+        y *= 2.0
+
+        Object.assign(this.rdp.viewport, {
+            x, y, width, height
+        })
+
+        this.rdp.viewport_or_scissor_changed = true
+    }
+
+    sp_movemem(type, data, index) {
         if (type == Gbi.G_MV_L) { // load lightData
-            this.rsp.current_lights[index] = lightData
+            this.rsp.current_lights[index] = data
+        } else if (type == Gbi.G_MV_VIEWPORT) {
+            this.calc_and_set_viewport(data)
         } else {
             throw "unimplemented gfx movemem"
         }
@@ -490,12 +510,12 @@ export class n64GfxProcessor {
             if (!this.viewportsEqual(this.rdp.viewport, this.rendering_state.viewport)) {
                 this.flush()
                 WebGL.set_viewport(this.rdp.viewport)
-                this.rendering_state.viewport = this.rdp.viewport
+                this.rendering_state.viewport = { ...this.rdp.viewport }
             }
             if (!this.viewportsEqual(this.rdp.scissor, this.rendering_state.scissor)) {
                 this.flush()
                 WebGL.set_scissor(this.rdp.scissor)
-                this.rendering_state.scissor = this.rdp.scissor
+                this.rendering_state.scissor = { ...this.rdp.scissor }
             }
             this.rdp.viewport_or_scissor_changed = false
         }
@@ -691,9 +711,9 @@ export class n64GfxProcessor {
 
     dp_fill_rectangle(ulx, uly, lrx, lry) {
 
-        if (this.rdp.color_image_address == this.rdp.z_buf_address) {
+/*        if (this.rdp.color_image_address == this.rdp.z_buf_address) {
             return
-        }
+        }*/
 
         const mode = this.rdp.other_mode_h[Gbi.G_MDSFT_CYCLETYPE]
 
@@ -917,7 +937,7 @@ export class n64GfxProcessor {
                 case Gbi.G_ENDDL: /// not necessary for JS
                     break
                 case Gbi.G_MOVEMEM:
-                    this.sp_movemem(args.type, args.lightData, args.index)
+                    this.sp_movemem(args.type, args.data, args.index)
                     break
                 case Gbi.G_MTX:
                     this.sp_matrix(args.parameters, args.matrix)

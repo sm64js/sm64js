@@ -402,7 +402,7 @@ export const gSPLight = (displaylist, lightData, index) => {
     displaylist.push({
         words: {
             w0: G_MOVEMEM,
-            w1: { type: G_MV_L, lightData, index: index - 1 }
+            w1: { type: G_MV_L, data: lightData, index: index - 1 }
             // the `index - 1` I don't like and isn't needed, but it makes matching with decomp code easier
         }
     })
@@ -535,6 +535,15 @@ export const gSP1Triangle = (displaylist, v0, v1, v2, flag) => {
     })
 }
 
+export const gSPViewport = (displaylist, viewportData) => {
+    displaylist.push({
+        words: {
+            w0: G_MOVEMEM,
+            w1: { type: G_MV_VIEWPORT, data: viewportData }
+        }
+    })
+}
+
 export const gDPSetPrimColor = (displaylist, m, l, r, g, b, a) => {
     displaylist.push({
         words: {
@@ -587,6 +596,23 @@ export const gSPDisplayList = (displaylist, childDisplayList) => {
             w1: { childDisplayList, branch: G_DL_PUSH }
         }
     })
+}
+
+/*export const gDPSetTextureImage = (displaylist, format, size, width, imageData) => {
+    displaylist.push({
+        words: {
+            w0: G_SETTIMG,
+            w1: { format, size, width, imageData }
+        }
+    })
+}*/
+
+export const gDPLoadBlockTexture = (displaylist, width, height, format, image) => {
+    displaylist.push(
+        gsDPSetTextureImage(format, G_IM_SIZ_16b, 1, image),
+        gsDPSetTile(format, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
+        gsDPLoadBlock(G_TX_LOADTILE, 0, 0, (width * height) - 1)
+    )
 }
 
 export const gDPLoadTextureBlock = (displaylist, timg, fmt, siz, width, height, pal, cms, cmt, masks, maskt, shifts, shiftt) => {
@@ -659,7 +685,7 @@ export const gsSPLight = (lightData, index) => {
     return {
         words: {
             w0: G_MOVEMEM,
-            w1: { type: G_MV_L, lightData, index: index - 1 }
+            w1: { type: G_MV_L, data: lightData, index: index - 1 }
             // the `index - 1` I don't like and isn't needed, but it makes matching with decomp code easier
         }
     }

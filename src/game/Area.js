@@ -1,6 +1,8 @@
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import { SurfaceLoadInstance as SurfaceLoad } from "./SurfaceLoad"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
+import { GameInstance as Game } from "./Game"
+import { gSPViewport } from "../include/gbi"
 
 export const WARP_TRANSITION_FADE_FROM_COLOR   = 0x00
 export const WARP_TRANSITION_FADE_INTO_COLOR   = 0x01
@@ -10,7 +12,12 @@ export const WARP_TRANSITION_FADE_FROM_CIRCLE  = 0x0A
 export const WARP_TRANSITION_FADE_INTO_CIRCLE  = 0x0B
 export const WARP_TRANSITION_FADE_INTO_MARIO   = 0x11
 export const WARP_TRANSITION_FADE_FROM_BOWSER  = 0x12
-export const WARP_TRANSITION_FADE_INTO_BOWSER  = 0x13
+export const WARP_TRANSITION_FADE_INTO_BOWSER = 0x13
+
+const D_8032CF00 = {  /// default view port?
+    vscale: [640, 480, 511, 0],
+    vtrans: [640, 480, 511, 0]
+}
 
 class Area {
 
@@ -96,6 +103,8 @@ class Area {
     render_game() {
         if (this.gCurrentArea) {
             GeoRenderer.geo_process_root(this.gCurrentArea.geometryLayoutData, null, null, null)
+
+            gSPViewport(Game.gDisplayList, D_8032CF00)
         }
     }
 

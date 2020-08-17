@@ -4,6 +4,7 @@ import { castle_grounds_seg7_dl_070095F0 } from "./2/model.inc"
 import { castle_grounds_seg7_dl_07006D70 } from "./1/model.inc"
 import { castle_grounds_seg7_dl_0700A860 } from "./4/model.inc"
 import { castle_grounds_seg7_dl_0700B1D0 } from "./5/model.inc"
+import { geo_skybox_main } from "../../../../game/LevelGeo"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -13,6 +14,13 @@ export const castle_grounds_geo_00073C = [
         args: [10, canvas.width / 2, canvas.height / 2, canvas.width / 2, canvas.height / 2]
     },
     { command: GeoLayout.open_node },
+    { command: GeoLayout.node_master_list, args: [0] },
+    { command: GeoLayout.open_node },
+    { command: GeoLayout.node_ortho, args: [100] },
+    { command: GeoLayout.open_node },
+    { command: GeoLayout.node_background, args: [GeoLayout.BACKGROUND_OCEAN_SKY, geo_skybox_main] },
+    { command: GeoLayout.close_node },
+    { command: GeoLayout.close_node },
     { command: GeoLayout.node_master_list, args: [1] },
     { command: GeoLayout.open_node },
     { command: GeoLayout.node_perspective, args: [45, 100, 20000, Camera.geo_camera_fov] },

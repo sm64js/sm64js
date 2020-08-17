@@ -5,6 +5,7 @@ import { castle_grounds_seg7_dl_07006D70 } from "./1/model.inc"
 import { castle_grounds_seg7_dl_0700A860 } from "./4/model.inc"
 import { castle_grounds_seg7_dl_0700B1D0 } from "./5/model.inc"
 import { castle_grounds_seg7_dl_0700BA20 } from "./6/model.inc"
+import { castle_grounds_seg7_dl_0700C430 } from "./10/model.inc"
 import { geo_skybox_main } from "../../../../game/LevelGeo"
 
 const canvas = document.querySelector('#gameCanvas')
@@ -36,6 +37,7 @@ export const castle_grounds_geo_00073C = [
     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_ALPHA, castle_grounds_seg7_dl_0700A860] },
     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_TRANSPARENT_DECAL, castle_grounds_seg7_dl_0700B1D0] },
     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_ALPHA, castle_grounds_seg7_dl_0700BA20] },
+    { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE_DECAL, castle_grounds_seg7_dl_0700C430] },
     { command: GeoLayout.node_render_object_parent },
     { command: GeoLayout.close_node },
     { command: GeoLayout.close_node },

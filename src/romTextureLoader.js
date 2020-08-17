@@ -57,7 +57,7 @@ import {
     mario_texture_eyes_half_closed,
     mario_texture_eyes_closed
 } from "./actors/mario/model.inc"
-
+import { water_skybox_ptrlist } from "./textures/skyboxes/water_skybox"
 
 const processExtractedResults = (data) => {
     const msgElement = document.getElementById('uploadMessage')
@@ -133,6 +133,74 @@ const processExtractedResults = (data) => {
     tree_seg3_texture_03032218.push(...data["actors/tree/palm_tree.rgba16.png"].split(','))
 
     texture_shadow_quarter_circle.push(...data["textures/segment2/shadow_quarter_circle.ia8.png"].split(','))
+
+    water_skybox_ptrlist[0x00].push(...data["water_skybox_texture_00000"].split(','))
+    water_skybox_ptrlist[0x01].push(...data["water_skybox_texture_00001"].split(','))
+    water_skybox_ptrlist[0x01].push(...data["water_skybox_texture_00002"].split(','))
+    water_skybox_ptrlist[0x03].push(...data["water_skybox_texture_00003"].split(','))
+    water_skybox_ptrlist[0x04].push(...data["water_skybox_texture_00004"].split(','))
+    water_skybox_ptrlist[0x05].push(...data["water_skybox_texture_00005"].split(','))
+    water_skybox_ptrlist[0x06].push(...data["water_skybox_texture_00006"].split(','))
+    water_skybox_ptrlist[0x07].push(...data["water_skybox_texture_00007"].split(','))
+    water_skybox_ptrlist[0x08].push(...data["water_skybox_texture_00008"].split(','))
+    water_skybox_ptrlist[0x09].push(...data["water_skybox_texture_00009"].split(','))
+    water_skybox_ptrlist[0x0A].push(...data["water_skybox_texture_0000A"].split(','))
+    water_skybox_ptrlist[0x0B].push(...data["water_skybox_texture_0000B"].split(','))
+    water_skybox_ptrlist[0x0C].push(...data["water_skybox_texture_0000C"].split(','))
+    water_skybox_ptrlist[0x0D].push(...data["water_skybox_texture_0000D"].split(','))
+    water_skybox_ptrlist[0x0E].push(...data["water_skybox_texture_0000E"].split(','))
+    water_skybox_ptrlist[0x0F].push(...data["water_skybox_texture_0000F"].split(','))
+
+    water_skybox_ptrlist[0x10].push(...data["water_skybox_texture_00010"].split(','))
+    water_skybox_ptrlist[0x11].push(...data["water_skybox_texture_00011"].split(','))
+    water_skybox_ptrlist[0x11].push(...data["water_skybox_texture_00012"].split(','))
+    water_skybox_ptrlist[0x13].push(...data["water_skybox_texture_00013"].split(','))
+    water_skybox_ptrlist[0x14].push(...data["water_skybox_texture_00014"].split(','))
+    water_skybox_ptrlist[0x15].push(...data["water_skybox_texture_00015"].split(','))
+    water_skybox_ptrlist[0x16].push(...data["water_skybox_texture_00016"].split(','))
+    water_skybox_ptrlist[0x17].push(...data["water_skybox_texture_00017"].split(','))
+    water_skybox_ptrlist[0x18].push(...data["water_skybox_texture_00018"].split(','))
+    water_skybox_ptrlist[0x19].push(...data["water_skybox_texture_00019"].split(','))
+    water_skybox_ptrlist[0x1A].push(...data["water_skybox_texture_0001A"].split(','))
+    water_skybox_ptrlist[0x1B].push(...data["water_skybox_texture_0001B"].split(','))
+    water_skybox_ptrlist[0x1C].push(...data["water_skybox_texture_0001C"].split(','))
+    water_skybox_ptrlist[0x1D].push(...data["water_skybox_texture_0001D"].split(','))
+    water_skybox_ptrlist[0x1E].push(...data["water_skybox_texture_0001E"].split(','))
+    water_skybox_ptrlist[0x1F].push(...data["water_skybox_texture_0001F"].split(','))
+
+    water_skybox_ptrlist[0x20].push(...data["water_skybox_texture_00020"].split(','))
+    water_skybox_ptrlist[0x21].push(...data["water_skybox_texture_00021"].split(','))
+    water_skybox_ptrlist[0x21].push(...data["water_skybox_texture_00022"].split(','))
+    water_skybox_ptrlist[0x23].push(...data["water_skybox_texture_00023"].split(','))
+    water_skybox_ptrlist[0x24].push(...data["water_skybox_texture_00024"].split(','))
+    water_skybox_ptrlist[0x25].push(...data["water_skybox_texture_00025"].split(','))
+    water_skybox_ptrlist[0x26].push(...data["water_skybox_texture_00026"].split(','))
+    water_skybox_ptrlist[0x27].push(...data["water_skybox_texture_00027"].split(','))
+    water_skybox_ptrlist[0x28].push(...data["water_skybox_texture_00028"].split(','))
+    water_skybox_ptrlist[0x29].push(...data["water_skybox_texture_00029"].split(','))
+    water_skybox_ptrlist[0x2A].push(...data["water_skybox_texture_0002A"].split(','))
+    water_skybox_ptrlist[0x2B].push(...data["water_skybox_texture_0002B"].split(','))
+    water_skybox_ptrlist[0x2C].push(...data["water_skybox_texture_0002C"].split(','))
+    water_skybox_ptrlist[0x2D].push(...data["water_skybox_texture_0002D"].split(','))
+    water_skybox_ptrlist[0x2E].push(...data["water_skybox_texture_0002E"].split(','))
+    water_skybox_ptrlist[0x2F].push(...data["water_skybox_texture_0002F"].split(','))
+
+    water_skybox_ptrlist[0x30].push(...data["water_skybox_texture_00030"].split(','))
+    water_skybox_ptrlist[0x31].push(...data["water_skybox_texture_00031"].split(','))
+    water_skybox_ptrlist[0x31].push(...data["water_skybox_texture_00032"].split(','))
+    water_skybox_ptrlist[0x33].push(...data["water_skybox_texture_00033"].split(','))
+    water_skybox_ptrlist[0x34].push(...data["water_skybox_texture_00034"].split(','))
+    water_skybox_ptrlist[0x35].push(...data["water_skybox_texture_00035"].split(','))
+    water_skybox_ptrlist[0x36].push(...data["water_skybox_texture_00036"].split(','))
+    water_skybox_ptrlist[0x37].push(...data["water_skybox_texture_00037"].split(','))
+    water_skybox_ptrlist[0x38].push(...data["water_skybox_texture_00038"].split(','))
+    water_skybox_ptrlist[0x39].push(...data["water_skybox_texture_00039"].split(','))
+    water_skybox_ptrlist[0x3A].push(...data["water_skybox_texture_0003A"].split(','))
+    water_skybox_ptrlist[0x3B].push(...data["water_skybox_texture_0003B"].split(','))
+    water_skybox_ptrlist[0x3C].push(...data["water_skybox_texture_0003C"].split(','))
+    water_skybox_ptrlist[0x3D].push(...data["water_skybox_texture_0003D"].split(','))
+    water_skybox_ptrlist[0x3E].push(...data["water_skybox_texture_0003E"].split(','))
+    water_skybox_ptrlist[0x3F].push(...data["water_skybox_texture_0003F"].split(','))
 
     msgElement.innerHTML = "Rom Texture Extraction Success - You may now start the game"
     msgElement.style = "color:#00ff00"

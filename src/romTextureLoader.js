@@ -201,6 +201,7 @@ const loadDataIntoGame = (data) => {
     SkyboxWater.water_skybox_texture_0003E.push(...data["water_skybox_texture_0003E"].split(','))
     SkyboxWater.water_skybox_texture_0003F.push(...data["water_skybox_texture_0003F"].split(','))
 
+    const msgElement = document.getElementById('uploadMessage')
     msgElement.innerHTML = "Rom Texture Extraction Success - You may now start the game"
     msgElement.style = "color:#00ff00"
     document.getElementById("startbutton").disabled = false
@@ -208,7 +209,6 @@ const loadDataIntoGame = (data) => {
 }
 
 const processExtractedResults = (data) => {
-    const msgElement = document.getElementById('uploadMessage')
     if (data == 'Fail') {
         msgElement.innerHTML = "Rom Extraction Fail"
         msgElement.style = "color:red"

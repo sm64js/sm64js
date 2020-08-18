@@ -1,4 +1,4 @@
-import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_texture_0700B4A0, intro_seg7_texture_0700C4A0 } from "./levels/intro/leveldata"
+﻿import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_texture_0700B4A0, intro_seg7_texture_0700C4A0 } from "./levels/intro/leveldata"
 import { castle_grounds_seg7_texture_07000000, castle_grounds_seg7_texture_07001000, castle_grounds_seg7_texture_07002000 } from "./levels/castle_grounds/texture.inc.js"
 import { title_texture_0A0001C0, title_texture_0A000E40, title_texture_0A001AC0, title_texture_0A002740 } from "./levels/intro/title_screen_bg"
 import { tree_seg3_texture_0302DE28, tree_seg3_texture_0302EE28, tree_seg3_texture_0302FF60, tree_seg3_texture_03031048, tree_seg3_texture_03032218 } from "./actors/tree/model.inc"
@@ -59,6 +59,9 @@ import {
     mario_texture_eyes_half_closed,
     mario_texture_eyes_closed
 } from "./actors/mario/model.inc"
+
+
+const msgElement = document.getElementById('uploadMessage')
 
 const loadDataIntoGame = (data) => {
 
@@ -201,8 +204,7 @@ const loadDataIntoGame = (data) => {
     SkyboxWater.water_skybox_texture_0003E.push(...data["water_skybox_texture_0003E"].split(','))
     SkyboxWater.water_skybox_texture_0003F.push(...data["water_skybox_texture_0003F"].split(','))
 
-    const msgElement = document.getElementById('uploadMessage')
-    msgElement.innerHTML = "Rom Texture Extraction Success - You may now start the game"
+    msgElement.innerHTML = "Rom Asset Extraction Success - You may now start the game"
     msgElement.style = "color:#00ff00"
     document.getElementById("startbutton").disabled = false
     window.loadedGameAssets = true
@@ -210,7 +212,7 @@ const loadDataIntoGame = (data) => {
 
 const processExtractedResults = (data) => {
     if (data == 'Fail') {
-        msgElement.innerHTML = "Rom Extraction Fail"
+        msgElement.innerHTML = "Rom Asset Extraction Fail"
         msgElement.style = "color:red"
     } else {  /// Success
         loadDataIntoGame(data)
@@ -226,6 +228,8 @@ if (localStorage['sm64jsAssets']) {
 
 const url = new URL(window.location.href)
 if (url.searchParams.get("romExternal") && !window.loadedGameAssets) {
+    msgElement.innerHTML = "Transfering ROM Data..."
+    msgElement.style = "color:yellow"
     $.ajax({
         url: '/romTransfer',
         type: 'GET',
@@ -239,6 +243,8 @@ $('#romUpload').submit(
     (e) =>  {
         e.preventDefault()
         if (window.loadedGameAssets) return
+        msgElement.innerHTML = "Please wait for ROM to be uploaded and game assets to be sent back to your device..."
+        msgElement.style = "color:yellow"
         $.ajax({
             url: '/romUpload',
             type: 'POST',

@@ -1,4 +1,4 @@
-import "./template.css"
+﻿import "./template.css"
 import "./romTextureLoader.js"
 import * as Keydrown from "./keydrown.min.js"
 import { GameInstance as Game } from "./game/Game"
@@ -123,9 +123,18 @@ document.getElementById("slider").addEventListener('change', (event) => {
 })
 
 document.getElementById("startbutton").addEventListener('click', () => {
-    /// Start
-    console.log("Starting Game!")
-    main_func()
+    if (window.gameStarted) {  /// Refresh page (Reset Game)
+        location.reload()
+    } else { /// Start Game
+        console.log("Starting Game!")
+        window.gameStarted = true
+
+        document.getElementById("startbutton").classList.remove('btn-success')
+        document.getElementById("startbutton").classList.add('btn-light')
+        document.getElementById("startbutton").innerHTML = "🔄 Reset Game"
+
+        main_func()
+    }
 })
 //////////////
 

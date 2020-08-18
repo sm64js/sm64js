@@ -60,8 +60,9 @@ import {
     mario_texture_eyes_closed
 } from "./actors/mario/model.inc"
 
-
+const url = new URL(window.location.href)
 const msgElement = document.getElementById('uploadMessage')
+let loadedGameAssets = false
 
 const loadDataIntoGame = (data) => {
 
@@ -207,7 +208,8 @@ const loadDataIntoGame = (data) => {
     msgElement.innerHTML = "Rom Asset Extraction Success - You may now start the game"
     msgElement.style = "color:#00ff00"
     document.getElementById("startbutton").disabled = false
-    window.loadedGameAssets = true
+    loadedGameAssets = true
+
 }
 
 const processExtractedResults = (data) => {
@@ -221,28 +223,33 @@ const processExtractedResults = (data) => {
 
 }
 
-if (localStorage['sm64jsAssets']) {
-    const data = JSON.parse(localStorage['sm64jsAssets'])
-    loadDataIntoGame(data)
+export const checkForRom = () => {   /// happens one time when the page is loaded
+    if (localStorage['sm64jsAssets']) {
+        const data = JSON.parse(localStorage['sm64jsAssets'])
+        loadDataIntoGame(data)
+    }
+
+    if (url.searchParams.get("romExternal") && !loadedGameAssets) {
+        msgElement.innerHTML = "Transfering ROM Data..."
+        msgElement.style = "color:yellow"
+        $.ajax({
+            url: '/romTransfer',
+            type: 'GET',
+            dataType: 'json',
+            data: { romExternal: url.searchParams.get("romExternal") },
+            success: (extractedData) => { processExtractedResults(extractedData) }
+        })
+    }
+
+    return loadedGameAssets
 }
 
-const url = new URL(window.location.href)
-if (url.searchParams.get("romExternal") && !window.loadedGameAssets) {
-    msgElement.innerHTML = "Transfering ROM Data..."
-    msgElement.style = "color:yellow"
-    $.ajax({
-        url: '/romTransfer',
-        type: 'GET',
-        dataType: 'json',
-        data: { romExternal: url.searchParams.get("romExternal")},
-        success: (extractedData) => { processExtractedResults(extractedData) }
-    })
-}
+
 
 $('#romUpload').submit(
     (e) =>  {
         e.preventDefault()
-        if (window.loadedGameAssets) return
+        if (loadedGameAssets) return
         msgElement.innerHTML = "Please wait for ROM to be uploaded and game assets to be sent back to your device..."
         msgElement.style = "color:yellow"
         $.ajax({

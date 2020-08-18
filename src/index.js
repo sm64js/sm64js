@@ -1,6 +1,5 @@
 ﻿import "./template.css"
-import "./romTextureLoader.js"
-import * as Keydrown from "./keydrown.min.js"
+import { checkForRom } from "./romTextureLoader.js"
 import { GameInstance as Game } from "./game/Game"
 import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
@@ -122,20 +121,25 @@ document.getElementById("slider").addEventListener('change', (event) => {
     document.getElementById("fps").innerHTML = `${event.target.value} fps`
 })
 
+
+///// Start Game
+
+let gameStarted = false
+
 document.getElementById("startbutton").addEventListener('click', () => {
-    if (window.gameStarted) {  /// Refresh page (Reset Game)
-        location.reload()
-    } else { /// Start Game
-        console.log("Starting Game!")
-        window.gameStarted = true
-
-        document.getElementById("startbutton").classList.remove('btn-success')
-        document.getElementById("startbutton").classList.add('btn-light')
-        document.getElementById("startbutton").innerHTML = "🔄 Reset Game"
-
-        main_func()
-    }
+    if (gameStarted) window.location.search += '&autostart=1' /// Refresh page (Reset Game)
+    else startGame()
 })
-//////////////
 
+const startGame = () => {
+    console.log("Starting Game!")
+    gameStarted = true
 
+    document.getElementById("startbutton").classList.remove('btn-success')
+    document.getElementById("startbutton").classList.add('btn-light')
+    document.getElementById("startbutton").innerHTML = "🔄 Reset Game"
+
+    main_func()
+}
+
+if (checkForRom() && url.searchParams.get("autostart")) startGame()

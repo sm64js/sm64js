@@ -119,8 +119,8 @@ const processExtractedResults = (data) => {
     outside_0900A000.push(...data['textures/outside/castle_grounds_textures.0A000.rgba16.png'].split(','))
     outside_0900B000.push( ...data['textures/outside/castle_grounds_textures.0B000.rgba16.png'].split(','))
     outside_0900B400.push(...data['textures/outside/castle_grounds_textures.0B400.rgba16.png'].split(','))
+    outside_0900A800.push(...data['textures/outside/castle_grounds_textures.0A800.rgba16.png'].split(','))
     outside_0900BC00.push(...data['textures/outside/castle_grounds_textures.0BC00.ia16.png'].split(','))
-    outside_0900A800.push(...data['textures/outside/castle_grounds_textures.0A800.ia16.png'].split(','))
 
     mario_texture_yellow_button.push ( ...data['actors/mario/mario_overalls_button.rgba16.png'].split(','))
     mario_texture_m_logo.push ( ...data['actors/mario/mario_logo.rgba16.png'].split(','))

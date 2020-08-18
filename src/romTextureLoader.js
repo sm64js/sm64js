@@ -1,5 +1,5 @@
 import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_texture_0700B4A0, intro_seg7_texture_0700C4A0 } from "./levels/intro/leveldata"
-import { castle_grounds_seg7_texture_07000000 } from "./levels/castle_grounds/areas/1/4/model.inc.js"
+import { castle_grounds_seg7_texture_07000000, castle_grounds_seg7_texture_07001000, castle_grounds_seg7_texture_07002000 } from "./levels/castle_grounds/texture.inc.js"
 import { title_texture_0A0001C0, title_texture_0A000E40, title_texture_0A001AC0, title_texture_0A002740 } from "./levels/intro/title_screen_bg"
 import { tree_seg3_texture_0302DE28, tree_seg3_texture_0302EE28, tree_seg3_texture_0302FF60, tree_seg3_texture_03031048, tree_seg3_texture_03032218 } from "./actors/tree/model.inc"
 import { texture_shadow_quarter_circle } from "./common_gfx/segment2"
@@ -47,6 +47,7 @@ import {
     outside_0900B000,
     outside_0900B400,
     outside_0900BC00,
+    outside_0900A800,
 } from "./textures/outside"
 
 import { 
@@ -72,6 +73,8 @@ const processExtractedResults = (data) => {
     intro_seg7_texture_0700C4A0.push(...data['levels/intro/3_tm.rgba16.png'].split(','))
 
     castle_grounds_seg7_texture_07000000.push(...data['levels/castle_grounds/0.rgba16.png'].split(','))
+    castle_grounds_seg7_texture_07001000.push(...data['levels/castle_grounds/1.rgba16.png'].split(','))
+    castle_grounds_seg7_texture_07002000.push(...data['levels/castle_grounds/2.rgba16.png'].split(','))
 
     gd_texture_mario_face_shine.push( ...data['textures/intro_raw/mario_face_shine.ia8.png'].split(','))
     gd_texture_red_star_0.push( ...data['textures/intro_raw/red_star_0.rgba16.png'].split(','))
@@ -117,6 +120,7 @@ const processExtractedResults = (data) => {
     outside_0900B000.push( ...data['textures/outside/castle_grounds_textures.0B000.rgba16.png'].split(','))
     outside_0900B400.push(...data['textures/outside/castle_grounds_textures.0B400.rgba16.png'].split(','))
     outside_0900BC00.push(...data['textures/outside/castle_grounds_textures.0BC00.ia16.png'].split(','))
+    outside_0900A800.push(...data['textures/outside/castle_grounds_textures.0A800.ia16.png'].split(','))
 
     mario_texture_yellow_button.push ( ...data['actors/mario/mario_overalls_button.rgba16.png'].split(','))
     mario_texture_m_logo.push ( ...data['actors/mario/mario_logo.rgba16.png'].split(','))

@@ -1,6 +1,5 @@
 import * as Gbi from "../../../../../include/gbi"
-
-export const castle_grounds_seg7_texture_07000000 = []
+import { castle_grounds_seg7_texture_07000000 } from "../../../texture.inc"
 
 const castle_grounds_seg7_vertex_0700A328 = [
 	{ pos: [-4817, 405, -1601], flag: 0, tc: [18906, 2012], color: [255, 255, 255, 255] },

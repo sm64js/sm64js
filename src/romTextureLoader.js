@@ -140,7 +140,7 @@ const processExtractedResults = (data) => {
 
     SkyboxWater.water_skybox_texture_00000.push(...data["water_skybox_texture_00000"].split(','))
     SkyboxWater.water_skybox_texture_00001.push(...data["water_skybox_texture_00001"].split(','))
-    SkyboxWater.water_skybox_texture_00001.push(...data["water_skybox_texture_00002"].split(','))
+    SkyboxWater.water_skybox_texture_00002.push(...data["water_skybox_texture_00002"].split(','))
     SkyboxWater.water_skybox_texture_00003.push(...data["water_skybox_texture_00003"].split(','))
     SkyboxWater.water_skybox_texture_00004.push(...data["water_skybox_texture_00004"].split(','))
     SkyboxWater.water_skybox_texture_00005.push(...data["water_skybox_texture_00005"].split(','))
@@ -157,7 +157,7 @@ const processExtractedResults = (data) => {
 
     SkyboxWater.water_skybox_texture_00010.push(...data["water_skybox_texture_00010"].split(','))
     SkyboxWater.water_skybox_texture_00011.push(...data["water_skybox_texture_00011"].split(','))
-    SkyboxWater.water_skybox_texture_00011.push(...data["water_skybox_texture_00012"].split(','))
+    SkyboxWater.water_skybox_texture_00012.push(...data["water_skybox_texture_00012"].split(','))
     SkyboxWater.water_skybox_texture_00013.push(...data["water_skybox_texture_00013"].split(','))
     SkyboxWater.water_skybox_texture_00014.push(...data["water_skybox_texture_00014"].split(','))
     SkyboxWater.water_skybox_texture_00015.push(...data["water_skybox_texture_00015"].split(','))
@@ -174,7 +174,7 @@ const processExtractedResults = (data) => {
 
     SkyboxWater.water_skybox_texture_00020.push(...data["water_skybox_texture_00020"].split(','))
     SkyboxWater.water_skybox_texture_00021.push(...data["water_skybox_texture_00021"].split(','))
-    SkyboxWater.water_skybox_texture_00021.push(...data["water_skybox_texture_00022"].split(','))
+    SkyboxWater.water_skybox_texture_00022.push(...data["water_skybox_texture_00022"].split(','))
     SkyboxWater.water_skybox_texture_00023.push(...data["water_skybox_texture_00023"].split(','))
     SkyboxWater.water_skybox_texture_00024.push(...data["water_skybox_texture_00024"].split(','))
     SkyboxWater.water_skybox_texture_00025.push(...data["water_skybox_texture_00025"].split(','))
@@ -191,7 +191,7 @@ const processExtractedResults = (data) => {
 
     SkyboxWater.water_skybox_texture_00030.push(...data["water_skybox_texture_00030"].split(','))
     SkyboxWater.water_skybox_texture_00031.push(...data["water_skybox_texture_00031"].split(','))
-    SkyboxWater.water_skybox_texture_00031.push(...data["water_skybox_texture_00032"].split(','))
+    SkyboxWater.water_skybox_texture_00032.push(...data["water_skybox_texture_00032"].split(','))
     SkyboxWater.water_skybox_texture_00033.push(...data["water_skybox_texture_00033"].split(','))
     SkyboxWater.water_skybox_texture_00034.push(...data["water_skybox_texture_00034"].split(','))
     SkyboxWater.water_skybox_texture_00035.push(...data["water_skybox_texture_00035"].split(','))

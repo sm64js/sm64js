@@ -22,7 +22,7 @@ const renderModeTable = [
     [
         null,
         Gbi.G_RM_AA_ZB_OPA_SURF_SURF2,
-        null,
+        Gbi.G_RM_AA_ZB_OPA_DECAL_DECAL2,
         Gbi.G_RM_AA_ZB_OPA_INTER_NOOP2,
         Gbi.G_RM_AA_ZB_TEX_EDGE_NOOP2,
         Gbi.G_RM_AA_ZB_XLU_SURF_SURF2,
@@ -63,7 +63,7 @@ class GeoRenderer {
 
         for (let i = 0; i < GraphNode.GFX_NUM_MASTER_LISTS; i++) {
             if (node.wrapper.listHeads[i]) {
-                if (modeList[i] == null) throw "need to add render mode"
+                if (modeList[i] == null) throw "need to add render mode - i: " + i
                 Gbi.gDPSetRenderMode(Game.gDisplayList, modeList[i])
                 for (const displayNode of node.wrapper.listHeads[i]) {
                     Gbi.gSPMatrix(Game.gDisplayList, displayNode.transform, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)

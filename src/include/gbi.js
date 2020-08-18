@@ -305,7 +305,7 @@ export const G_RM_AA_ZB_OPA_INTER_NOOP2 = 0x442478
 export const G_RM_AA_ZB_XLU_DECAL_DECAL2 = 0x504dd8
 export const G_RM_AA_ZB_XLU_SURF_SURF2 = 0x5049d8
 export const G_RM_AA_ZB_OPA_SURF_SURF2 = 0x552078
-
+export const G_RM_AA_ZB_OPA_DECAL_DECAL2 = 0x552d58
 
 //G_MOVEWORD types
 export const G_MW_MATRIX = 0x00 /* NOTE: also used by movemem */

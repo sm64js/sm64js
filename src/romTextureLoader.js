@@ -63,6 +63,7 @@ import {
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('uploadMessage')
 let loadedGameAssets = false
+const textureVersion = 1
 
 const loadDataIntoGame = (data) => {
 
@@ -218,6 +219,7 @@ const processExtractedResults = (data) => {
         msgElement.style = "color:red"
     } else {  /// Success
         loadDataIntoGame(data)
+        data.textureVersion = textureVersion
         localStorage['sm64jsAssets'] = JSON.stringify(data)
     }
 
@@ -226,7 +228,7 @@ const processExtractedResults = (data) => {
 export const checkForRom = () => {   /// happens one time when the page is loaded
     if (localStorage['sm64jsAssets']) {
         const data = JSON.parse(localStorage['sm64jsAssets'])
-        loadDataIntoGame(data)
+        if (data.textureVersion == textureVersion) loadDataIntoGame(data)
     }
 
     if (url.searchParams.get("romExternal") && !loadedGameAssets) {

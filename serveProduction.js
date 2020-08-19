@@ -20,15 +20,6 @@ const pythonExtract = (dir) => {
   })
 }
 
-const hexDumpExtract = (dir) => {
-  return new Promise((resolve, reject) => {
-      const hexDumpProcess = spawn('bash', ['../hexdumpTextures.sh'], { cwd: 'extractTools/' + dir })
-      //hexDumpProcess.stdout.on('data', (data) => { console.log(data.toString()) })
-      //hexDumpProcess.stderr.on('data', (data) => { console.log(data.toString()) })
-	  hexDumpProcess.stderr.on('close', () => { resolve() })
-  })
-}
-
 const fileDownload = (file, url) => {
     return new Promise((resolve, reject) => {
         try {
@@ -49,7 +40,6 @@ const extractJsonFromRomFile = async (dir) => {
     return new Promise(async (resolve, reject) => {
         try {
             await pythonExtract(dir)
-            await hexDumpExtract(dir)
 
             const extractedData = {}
             const assets = JSON.parse(fs.readFileSync('extractTools/assets.json'))
@@ -68,13 +58,13 @@ const extractJsonFromRomFile = async (dir) => {
                         if (section[0].slice(0, 24) == 'ALIGNED8 static const u8') {
                             const textureName = section[0].slice(25, section[0].length - 6)
                             const textureData = section[1].slice(0, section[1].indexOf('}'))
-                            extractedData[textureName] = textureData
+                            extractedData[textureName] = Buffer.from(textureData.split(','))
                         }
                     }
                 } else {  /// not skybox
                     filepath = `extractTools/${dir}/${filepath}`
-                    filepath = filepath.substring(0, filepath.length - 4) + ".js"
-                    const filedata = fs.readFileSync(filepath, "utf8")
+                    filepath = filepath.substring(0, filepath.length - 4)
+                    const filedata = fs.readFileSync(filepath)
                     extractedData[assetname] = filedata
                 }
             })

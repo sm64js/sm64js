@@ -70,6 +70,7 @@ export const TERRAIN_SLIDE  = 0x0006
 export const TERRAIN_MASK = 0x0007
 
 export const special_bubble_tree = 121
+export const special_level_geo_03 = 101
 
 export const COL_INIT = () => { return TERRAIN_LOAD_VERTICES }
 export const COL_END = () => { return TERRAIN_LOAD_END }
@@ -81,5 +82,8 @@ export const COL_TRI = (v1, v2, v3) => { return [v1, v2, v3] }
 export const COL_TRI_SPECIAL = (v1, v2, v3, param) => { return [v1, v2, v3, param] }
 export const COL_SPECIAL_INIT = (num) => { return [TERRAIN_LOAD_OBJECTS, num] }
 export const SPECIAL_OBJECT = (preset, posX, posY, posZ) => { return [preset, posX, posY, posZ] }
+export const SPECIAL_OBJECT_WITH_YAW = (preset, posX, posY, posZ, yaw) => {
+    return [preset, posX, posY, posZ, yaw]
+}
 
 

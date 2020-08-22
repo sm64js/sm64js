@@ -92,6 +92,10 @@ class BehaviorCommands {
         return this.BHV_PROC_CONTINUE
     }
 
+    break(args) {
+        return this.BHV_PROC_BREAK
+    }
+
     end_loop(args) {
         this.bhvScript.index = ObjListProc.gCurrentObject.bhvStack[ObjListProc.gCurrentObject.bhvStack.length - 1]
         return this.BHV_PROC_BREAK

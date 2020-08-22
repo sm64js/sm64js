@@ -50,3 +50,9 @@ export const bhvTree = [
         { command: BhvCmds.call_native, args: { func: bhv_pole_base_loop } },
     { command: BhvCmds.end_loop },
 ]
+
+export const bhvStaticObject = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.break },
+]

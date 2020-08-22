@@ -21,7 +21,9 @@ import {
     SURFACE_NO_CAM_COLLISION,
 
     SPECIAL_OBJECT,
-    special_bubble_tree
+    SPECIAL_OBJECT_WITH_YAW,
+    special_bubble_tree,
+    special_level_geo_03
 } from "../../../../include/surface_terrains"
 
 export const castle_grounds_seg7_collision_level = [
@@ -1407,8 +1409,8 @@ export const castle_grounds_seg7_collision_level = [
     ...COL_TRI(469, 473, 489),
     ...COL_TRI(472, 473, 469),
     COL_TRI_STOP(),
-    ...COL_SPECIAL_INIT(26),
-    //SPECIAL_OBJECT_WITH_YAW(*//*preset*//* special_level_geo_03,     *//*pos*//*     0, 2867, -3924, *//*yaw*//* 0),
+    ...COL_SPECIAL_INIT(27),
+    ...SPECIAL_OBJECT_WITH_YAW(special_level_geo_03, 0, 2867, -3924, /*yaw*/ 0 ),
     ...SPECIAL_OBJECT(special_bubble_tree, -1333, 711, 1881),
     ...SPECIAL_OBJECT(special_bubble_tree, -6220, 468, 3458),
     ...SPECIAL_OBJECT(special_bubble_tree, -5069, 350, 3221),

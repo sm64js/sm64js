@@ -58,7 +58,7 @@ const atan2_deg = (a, b) => {
 }
 
 const correct_shadow_solidity_for_animations = (isLuigi, initialSolidity, shadow) => {
-    if (!ObjectListProc.gCurrentObject.OG) throw "not implemented multiple mario shadow"
+    if (ObjectListProc.gMarioObject.length > 1) throw "not implemented multiple mario shadow"
     const player = ObjectListProc.gMarioObject[0]
     const animFrame = player.header.gfx.unk38.animFrame
     switch (player.header.gfx.unk38.animID) {

@@ -54,7 +54,17 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
     m.wall = null
 
     if (floorWrapper.floor == null) {
-        throw "Can't find floor - air quarter step"
+
+        if (nextPos[1] <= m.floorHeight) {
+            m.pos[1] = m.floorHeight
+            return Mario.AIR_STEP_LANDED
+        }
+
+        m.pos[1] = nextPos[1]
+        m.faceAngle[1] += 0x8000
+        if (m.faceAngle[1] > 32767) m.faceAngle[1] -= 65536
+        Mario.set_forward_vel(m, 1.5 * m.forwardVel)
+        return Mario.AIR_STEP_HIT_WALL
     }
 
     if (nextPos[1] <= floorHeight) {
@@ -123,7 +133,12 @@ const perform_ground_quarter_step = (m, nextPos) => {
 
     m.wall = upperWall
 
-    if (floorWrapper.floor == null) throw "no floor - ground quarter steps"
+    if (floorWrapper.floor == null) {
+        m.faceAngle[1] += 0x8000
+        if (m.faceAngle[1] > 32767) m.faceAngle[1] -= 65536
+        Mario.set_forward_vel(m, 1.5 * m.forwardVel)
+        return Mario.GROUND_STEP_HIT_WALL_STOP_QSTEPS
+    }
 
     if (nextPos[1] > floorHeight + 100.0) {
         m.pos = [...nextPos]
@@ -157,6 +172,8 @@ export const perform_ground_step = (m) => {
 
     m.marioObj.header.gfx.pos = [...m.pos]
     m.marioObj.header.gfx.angle = [0, m.faceAngle[1], 0]
+
+    if (stepResult == Mario.GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS) stepResult = Mario.GROUND_STEP_HIT_WALL
 
     return stepResult
 }

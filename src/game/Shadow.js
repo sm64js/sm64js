@@ -269,7 +269,7 @@ export const create_shadow_below_xyz = (xPos, yPos, zPos, shadowScale, shadowSol
 
     if (floorWrapper.floor) {
         sSurfaceTypeBelowShadow = floorWrapper.floor.type
-    } else throw "no floor for shadow"
+    }
 
     switch (shadowType) {
         case SHADOW_CIRCLE_PLAYER:

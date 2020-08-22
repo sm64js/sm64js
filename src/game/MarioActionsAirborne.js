@@ -56,7 +56,7 @@ const common_air_action_step = (m, landAction, animation, stepArg) => {
                 if (m.wall) {
                     Mario.set_mario_action(m, Mario.ACT_AIR_HIT_WALL, 0)
                 } else {
-                    throw "unkown case - hit wall - common air action step"
+                    if (m.vel[1] > 0) m.vel[1] = 0
                 }
             } else {
                 Mario.set_forward_vel(m, 0.0)
@@ -221,6 +221,10 @@ const act_dive = (m) => {
             Mario.set_mario_action(m, Mario.ACT_DIVE_SLIDE)
             m.faceAngle[0] = 0
             break
+        case Mario.AIR_STEP_HIT_WALL:
+            m.faceAngle[0] = 0
+            if (m.vel[1] > 0.0) m.vel = 0.0
+            break
         default: throw "unimplemented air step case in act dive"
     }
 
@@ -250,6 +254,9 @@ const act_jump_kick = (m) => {
         case Mario.AIR_STEP_LANDED:
             Mario.set_mario_action(m, Mario.ACT_FREEFALL_LAND, 0)
             break
+        case Mario.AIR_STEP_HIT_WALL:
+            Mario.set_forward_vel(m, 0)
+            break
     }
 
     return 0
@@ -278,6 +285,9 @@ const act_forward_rollout = (m) => {
         case Mario.AIR_STEP_LANDED:
             Mario.set_mario_action(m, Mario.ACT_FREEFALL_LAND_STOP, 0)
             //play landing sound
+            break
+        case Mario.AIR_STEP_HIT_WALL:
+            Mario.set_forward_vel(m, 0)
             break
         default: throw "unimplemented case in act_forward_rollout"
     }
@@ -312,6 +322,9 @@ const act_backward_rollout = (m) => {
         case Mario.AIR_STEP_LANDED:
             Mario.set_mario_action(m, Mario.ACT_FREEFALL_LAND_STOP, 0)
             //play landing sound
+            break
+        case Mario.AIR_STEP_HIT_WALL:
+            Mario.set_forward_vel(m, 0)
             break
         default: throw "unimplemented case in act_forward_rollout"
     }
@@ -353,6 +366,10 @@ const act_slide_kick = (m) => {
                 Mario.set_mario_action(m, Mario.ACT_SLIDE_KICK_SLIDE, 0)
             }
             //play landing sound
+            break
+        case Mario.AIR_STEP_HIT_WALL:
+            if (m.vel[1] > 0) m.vel[1] = 0
+            m.particleFlags |= Mario.PARTICLE_VERTICAL_STAR
             break
         default: throw "unimplemented case in act slide kick"
     }

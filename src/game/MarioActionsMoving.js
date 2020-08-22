@@ -192,6 +192,8 @@ const act_walking = (m) => {
             Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
             Mario.set_mario_animation(m, Mario.MARIO_ANIM_GENERAL_FALL)
             break
+        case Mario.GROUND_STEP_HIT_WALL:
+            break
         default: throw "unkown ground step in act_walking"
     }
 
@@ -209,9 +211,18 @@ const act_braking = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_BRAKING_STOP, 0)
     }
 
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_MOVE_PUNCHING, 0)
+    }
+
     switch (perform_ground_step(m)) {
+        case Mario.GROUND_STEP_LEFT_GROUND:
+            Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+            break
         case Mario.GROUND_STEP_NONE:
             m.particleFlags |= Mario.PARTICLE_DUST
+            break
+        case Mario.GROUND_STEP_HIT_WALL:
             break
     }
 
@@ -239,8 +250,16 @@ const act_decelerating = (m) => {
             return Mario.set_jump_from_landing(m)
         }
 
+        if (check_ground_dive_or_punch(m)) {
+            return 1
+        }
+
         if (m.input & Mario.INPUT_NONZERO_ANALOG) {
             return Mario.set_mario_action(m, Mario.ACT_WALKING, 0)
+        }
+
+        if (m.input & Mario.INPUT_Z_PRESSED) {
+            return Mario.set_mario_action(m, Mario.ACT_CROUCH_SLIDE, 0)
         }
     }
 
@@ -249,6 +268,12 @@ const act_decelerating = (m) => {
     }
 
     switch (perform_ground_step(m)) {
+        case Mario.GROUND_STEP_LEFT_GROUND:
+            Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+            break
+        case Mario.GROUND_STEP_HIT_WALL:
+            Mario.set_forward_vel(m, 0)
+            break
         // nothing here yet
     }
 
@@ -377,7 +402,6 @@ const common_landing_action = (m, animation, airAction) => {
         case Mario.GROUND_STEP_LEFT_GROUND:
             Mario.set_mario_action(m, airAction, 0); break
         case Mario.GROUND_STEP_HIT_WALL:
-            throw "not implemented step result - hit wall  - common_landing_action"
             break
     }
 
@@ -587,6 +611,9 @@ const common_slide_action = (m, stopAction, airAction, animation) => {
             align_with_floor(m)
             m.particleFlags |= Mario.PARTICLE_DUST
             break
+        case Mario.GROUND_STEP_HIT_WALL:
+            align_with_floor(m)
+            break
         default: throw "common slide action default case"
     }
 }
@@ -728,6 +755,10 @@ const act_crawling = (m) => {
         case Mario.GROUND_STEP_LEFT_GROUND:
             Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
             break
+        case Mario.GROUND_STEP_HIT_WALL:
+            if (m.forwardVel > 10) {
+                Mario.set_forward_vel(m, 10)
+            }
         case Mario.GROUND_STEP_NONE:
             align_with_floor(m)
             break
@@ -789,6 +820,8 @@ const act_slide_kick_slide = (m) => {
     switch (perform_ground_step(m)) {
         case Mario.GROUND_STEP_LEFT_GROUND:
             Mario.set_mario_action(m, Mario.ACT_FREEFALL, 2)
+            break
+        case Mario.GROUND_STEP_HIT_WALL:
             break
     }
 

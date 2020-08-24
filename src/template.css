@@ -37,6 +37,9 @@ body {
     max-width: 54em;
 }
 
+.popover {
+    max-width: 1000px;
+}
 
 /*
  * Header

@@ -10,43 +10,165 @@ window.addEventListener("keydown", (e) => {
     }
 }, false)
 
-const keyboardButtons = { w: false, a: false, s: false, d: false, up: false, down: false, left: false, right: false, space: false, enter: false, b: false, z: false }
+const keyboardButtons = {}
 
 const controllerButtons = { a: false, b: false, start: false, z: false }
 
+const allKeyboardButtons = [
+    'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm',
+    'backspace', 'tab', 'space', 'shift', 'enter', 'up', 'down', 'left', 'right'
+]
+
+Keydrown.Q.down(() => { keyboardButtons.q = true })
 Keydrown.W.down(() => { keyboardButtons.w = true })
+Keydrown.E.down(() => { keyboardButtons.e = true })
+Keydrown.R.down(() => { keyboardButtons.r = true })
+Keydrown.T.down(() => { keyboardButtons.t = true })
+Keydrown.Y.down(() => { keyboardButtons.y = true })
+Keydrown.U.down(() => { keyboardButtons.u = true })
+Keydrown.I.down(() => { keyboardButtons.i = true })
+Keydrown.O.down(() => { keyboardButtons.o = true })
+Keydrown.P.down(() => { keyboardButtons.p = true })
+
 Keydrown.A.down(() => { keyboardButtons.a = true })
 Keydrown.S.down(() => { keyboardButtons.s = true })
 Keydrown.D.down(() => { keyboardButtons.d = true })
+Keydrown.F.down(() => { keyboardButtons.f = true })
+Keydrown.G.down(() => { keyboardButtons.g = true })
+Keydrown.H.down(() => { keyboardButtons.h = true })
+Keydrown.J.down(() => { keyboardButtons.j = true })
+Keydrown.K.down(() => { keyboardButtons.k = true })
+Keydrown.L.down(() => { keyboardButtons.l = true })
 
+Keydrown.Z.down(() => { keyboardButtons.z = true })
+Keydrown.X.down(() => { keyboardButtons.x = true })
+Keydrown.C.down(() => { keyboardButtons.c = true })
+Keydrown.V.down(() => { keyboardButtons.v = true })
+Keydrown.B.down(() => { keyboardButtons.b = true })
+Keydrown.N.down(() => { keyboardButtons.n = true })
+Keydrown.M.down(() => { keyboardButtons.m = true })
+
+Keydrown.BACKSPACE.down(() => { keyboardButtons.backspace = true })
+Keydrown.TAB.down(() => { keyboardButtons.tab = true })
+Keydrown.SHIFT.down(() => { keyboardButtons.shift = true })
 Keydrown.SPACE.down(() => { keyboardButtons.space = true })
 Keydrown.ENTER.down(() => { keyboardButtons.enter = true })
-Keydrown.B.down(() => { keyboardButtons.b = true })
-Keydrown.Z.down(() => { keyboardButtons.z = true })
-
-
 Keydrown.UP.down(() => { keyboardButtons.up = true })
 Keydrown.DOWN.down(() => { keyboardButtons.down = true })
 Keydrown.LEFT.down(() => { keyboardButtons.left = true })
 Keydrown.RIGHT.down(() => { keyboardButtons.right = true })
 
+///////////
+
+Keydrown.Q.up(() => { keyboardButtons.q = false })
 Keydrown.W.up(() => { keyboardButtons.w = false })
+Keydrown.E.up(() => { keyboardButtons.e = false })
+Keydrown.R.up(() => { keyboardButtons.r = false })
+Keydrown.T.up(() => { keyboardButtons.t = false })
+Keydrown.Y.up(() => { keyboardButtons.y = false })
+Keydrown.U.up(() => { keyboardButtons.u = false })
+Keydrown.I.up(() => { keyboardButtons.i = false })
+Keydrown.O.up(() => { keyboardButtons.o = false })
+Keydrown.P.up(() => { keyboardButtons.p = false })
+
 Keydrown.A.up(() => { keyboardButtons.a = false })
 Keydrown.S.up(() => { keyboardButtons.s = false })
 Keydrown.D.up(() => { keyboardButtons.d = false })
+Keydrown.F.up(() => { keyboardButtons.f = false })
+Keydrown.G.up(() => { keyboardButtons.g = false })
+Keydrown.H.up(() => { keyboardButtons.h = false })
+Keydrown.J.up(() => { keyboardButtons.j = false })
+Keydrown.K.up(() => { keyboardButtons.k = false })
+Keydrown.L.up(() => { keyboardButtons.l = false })
 
+Keydrown.Z.up(() => { keyboardButtons.z = false })
+Keydrown.X.up(() => { keyboardButtons.x = false })
+Keydrown.C.up(() => { keyboardButtons.c = false })
+Keydrown.V.up(() => { keyboardButtons.v = false })
+Keydrown.B.up(() => { keyboardButtons.b = false })
+Keydrown.N.up(() => { keyboardButtons.n = false })
+Keydrown.M.up(() => { keyboardButtons.m = false })
+
+Keydrown.BACKSPACE.up(() => { keyboardButtons.backspace = false })
+Keydrown.TAB.up(() => { keyboardButtons.tab = false })
+Keydrown.SHIFT.up(() => { keyboardButtons.shift = false })
 Keydrown.SPACE.up(() => { keyboardButtons.space = false })
 Keydrown.ENTER.up(() => { keyboardButtons.enter = false })
-Keydrown.B.up(() => { keyboardButtons.b = false })
-Keydrown.Z.up(() => { keyboardButtons.z = false })
-
 Keydrown.UP.up(() => { keyboardButtons.up = false })
 Keydrown.DOWN.up(() => { keyboardButtons.down = false })
 Keydrown.LEFT.up(() => { keyboardButtons.left = false })
 Keydrown.RIGHT.up(() => { keyboardButtons.right = false })
 
+const keyboardButtonMapping = {
+    a: 'space',
+    b: 'b',
+    start: 'enter',
+    z: 'z',
+    up: 'up',
+    down: 'down',
+    left: 'left',
+    right: 'right'
+}
+const defaultKeyboardButtonMapping = { ...keyboardButtonMapping }
+
+if (localStorage['sm64jsControls']) {
+    Object.assign(keyboardButtonMapping, JSON.parse(localStorage['sm64jsControls']))
+}
+
+$('[data-toggle="popover"]').popover({
+    container: "body",
+    content: function () {
+        return $('#controlsPopover').clone()
+    },
+})
+
+$('[data-toggle="popover"]').on('shown.bs.popover', () => {
+    /// set default values
+    Array.from(document.getElementsByTagName("select")).forEach(selectElem => {
+        if (selectElem.hasAttribute("buttonSelector")) {
+            selectElem.value = keyboardButtonMapping[selectElem.name]
+        }
+    })
+})
+
+window.updateButtonMapping = (chosenKey, gameButton) => {
+    keyboardButtonMapping[gameButton] = chosenKey
+}
+
+window.saveControls = () => {
+    localStorage['sm64jsControls'] = JSON.stringify(keyboardButtonMapping)
+}
+
+window.loadDefaultControls = () => {
+    Object.assign(keyboardButtonMapping, defaultKeyboardButtonMapping)
+    /// set default values
+    Array.from(document.getElementsByTagName("select")).forEach(selectElem => {
+        if (selectElem.hasAttribute("buttonSelector")) {
+            selectElem.value = keyboardButtonMapping[selectElem.name]
+        }
+    })
+}
+
+Array.from(document.getElementsByTagName("select")).forEach(selectElem => {
+    if (selectElem.hasAttribute("buttonSelector")) {
+        allKeyboardButtons.forEach(key => {
+            const option = document.createElement("option")
+            option.value = key
+            option.text = key
+            selectElem.add(option)
+        })
+    }
+})
+
 export const playerInputUpdate = () => {
     Keydrown.tick()
+
+    const keyboardFinal = {}
+
+    Object.entries(keyboardButtonMapping).forEach(([key, value]) => {
+        keyboardFinal[key] = Boolean(keyboardButtons[value])
+    })
+
     let stickX = 0, stickY = 0, gamepad
     if (navigator.getGamepads) {
         gamepad = navigator.getGamepads()[0];
@@ -64,11 +186,11 @@ export const playerInputUpdate = () => {
     if (stickY < 0.08 && stickY > -0.08) stickY = 0.0
 
     if (stickX == 0 && stickY == 0) {
-        if (keyboardButtons.d) stickX += 1
-        if (keyboardButtons.a) stickX -= 1
+        if (keyboardFinal.right) stickX += 1
+        if (keyboardFinal.left) stickX -= 1
 
-        if (keyboardButtons.w) stickY += 1
-        if (keyboardButtons.s) stickY -= 1
+        if (keyboardFinal.up) stickY += 1
+        if (keyboardFinal.down) stickY -= 1
     }
 
     stickX = Math.round(stickX * 64)
@@ -76,10 +198,10 @@ export const playerInputUpdate = () => {
 
     let mag = Math.sqrt((stickX * stickX) + (stickY * stickY))
 
-    let buttonDownA = controllerButtons.a || keyboardButtons.space
-    let buttonDownB = controllerButtons.b || keyboardButtons.b
-    let buttonDownStart = controllerButtons.start || keyboardButtons.enter
-    let buttonDownZ = controllerButtons.z || keyboardButtons.z
+    let buttonDownA = controllerButtons.a || keyboardFinal.a
+    let buttonDownB = controllerButtons.b || keyboardFinal.b
+    let buttonDownStart = controllerButtons.start || keyboardFinal.start
+    let buttonDownZ = controllerButtons.z || keyboardFinal.z
 
     window.playerInput = {
         stickX, stickY,

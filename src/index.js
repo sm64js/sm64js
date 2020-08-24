@@ -64,6 +64,13 @@ let last_frame_start = 0
 
 //////////////////// Some more website stuff
 
+$('[data-toggle="popover"]').popover({
+    container: "body",
+    content: function () {
+        return $('#controlsPopover').clone()
+    },
+})
+
 const url = new URL(window.location.href)
 
 const letterColors = ["#3e51fa", "#fa3e3e", "#00ff00", "yellow"]

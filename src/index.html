@@ -12,67 +12,12 @@
 
 <body class="text-center">
 
-    <div hidden>
-        <div id="controlsPopover">
-            <div class="row">
-                <form class="form-inline">
-                    <div class="form-group mx-sm-3 mb-2">
-                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Start:</label>
-                        <select class="form-control" buttonSelector name="start" onchange="window.updateButtonMapping(this.value, this.name)"></select>
-                    </div>
-                    <div class="form-group mx-sm-3 mb-2">
-                        <label class="col-sm-2 col-form-label" style="padding-right:30px">A:</label>
-                        <select class="form-control" buttonSelector name="a" onchange="window.updateButtonMapping(this.value, this.name)"></select>
-                    </div>
-                    <div class="form-group mx-sm-3 mb-2">
-                        <label class="col-sm-2 col-form-label" style="padding-right:30px">B:</label>
-                        <select class="form-control" buttonSelector name="b" onchange="window.updateButtonMapping(this.value, this.name)"></select>
-                    </div>
-                    <div class="form-group mx-sm-3 mb-2">
-                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Z:</label>
-                        <select class="form-control" buttonSelector name="z" onchange="window.updateButtonMapping(this.value, this.name)"></select>
-                    </div>
-                </form>
-            </div>
-
-            <div class="row">
-                <form class="form-inline">
-                    <div class="form-group mx-sm-3 mb-2">
-                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Up:</label>
-                        <select class="form-control" buttonSelector name="up" onchange="window.updateButtonMapping(this.value, this.name)"></select>
-                    </div>
-                    <div class="form-group mx-sm-3 mb-2">
-                        <label class="col-sm-2 col-form-label" style="padding-right:40px">Down:</label>
-                        <select class="form-control" buttonSelector name="down" onchange="window.updateButtonMapping(this.value, this.name)"></select>
-                    </div>
-                    <div class="form-group ">
-                        <!-- mx-sm-3 mb-2 -->
-                        <label class="col-sm-2 col-form-label" style="padding-right:20px">Left:</label>
-                        <select class="form-control" buttonSelector name="left" onchange="window.updateButtonMapping(this.value, this.name)"></select>
-                    </div>
-                    <div class="form-group mx-sm-3 mb-2">
-                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Right:</label>
-                        <select class="form-control" buttonSelector name="right" onchange="window.updateButtonMapping(this.value, this.name)"></select>
-                    </div>
-                </form>
-            </div>
-
-            <div class="row" style="justify-content:center;">
-                <button class="btn btn-sm btn-success" style="margin-right:30px" onclick="window.saveControls()">Save Controls</button>
-                <button class="btn btn-sm btn-secondary" onclick="window.loadDefaultControls()">Load Default Controls</button>
-            </div>
-
-
-        </div>
-    </div>
-
-
     <div class="cover-container d-flex h-100 mx-auto flex-column">
         <header class="masthead">
             <div class="inner">
                 <h3 class="masthead-brand rainbowText">Super Mario 64 JS</h3>
                 <nav class="nav nav-masthead justify-content-center">
-                    <a class="nav-link active" href="#">Home</a>
+                    <a class="nav-link" href="#What">About</a>
                     <a class="nav-link" href="https://github.com/sm64js/sm64js">Source Code</a>
                     <a class="nav-link" href="#Contact">Contact</a>
                 </nav>
@@ -82,14 +27,44 @@
         <main role="main" class="inner cover">
             <h1 class="cover-heading rainbowText">Super Mario 64 - Javascript Port</h1>
 
-            <h4 style="color:#fa3e3e">Upload US SM64 ROM File</h4>
             <form id="romUpload" class="form-group" enctype="multipart/form-data" method="post">
+                <h4 style="color:#fa3e3e">Upload US SM64 ROM File</h4>
                 <input class="btn btn-secondary btn-sm" type="file" name="filetoupload">
                 <input class="btn btn-primary btn-sm" type="submit">
             </form>
             <h6 id="uploadMessage">This project uses the textures and other game assets from the original game. Due to copyright issues, I cannot host those assets on this site. Please upload a sm64 ROM to extract those assets before you can play.</h6>
-            <button id="startbutton" type="button" class="btn btn-success" disabled>Start Game</button>
-            <br /><br />
+            <div class="row" style="justify-content:center">
+                <button id="startbutton" type="button" class="btn btn-success" disabled>Start Game</button>
+                <a href="https://github.com/sm64js/sm64js/issues" style="margin-left:30px" type="button" class="btn btn-warning">Submit Bug</a>
+            </div>
+            <div class="row" style="justify-content:center;">
+                <h6> <b>Gamepad is supported and recommended!</b> </h6>
+            </div>
+            <div class="row" style="justify-content:center">
+                <button type="button"
+                        class="btn btn-sm btn-primary"
+                        data-html="true"
+                        data-container="body"
+                        data-toggle="keyboardControlsToggle"
+                        data-placement="bottom">
+                    Customize Keyboard Controls
+                </button>
+                <button type="button"
+                        style="margin-left:50px"
+                        class="btn btn-sm btn-primary"
+                        data-html="true"
+                        data-container="body"
+                        data-toggle="gamepadControlsToggle"
+                        data-placement="bottom">
+                    Customize Gamepad Controls
+                </button>
+            </div>
+
+            <br />
+            <canvas id="gameCanvas" width="640" height="480"></canvas>
+            <br />
+            <br />
+
             <h6 id="numTriangles"> Total triangles rendered this frame: </h6>
             <div class="row">
                 <div class="col-5" style="text-align:left">
@@ -111,20 +86,7 @@
                 <input id="slider" type="range" style="width:300px" min="1" max="60" value="30">
                 <h6 id="fps" style="padding-left:10px"> 30 fps </h6>
             </div>
-            <div class="row" style="justify-content:center;">
-                <button type="button"
-                        class="btn btn-sm btn-primary"
-                        data-html="true"
-                        data-container="body"
-                        data-toggle="popover"
-                        data-placement="bottom">
-                    Customize Controls
-                </button>
-            </div>
-            <div class="row" style="justify-content:center;">
-                <h6> <b>Gamepad is supported and recommended!</b> </h6>
-            </div>
-            <canvas id="gameCanvas" width="640" height="480"></canvas>
+
             <br />
             <br />
 
@@ -185,6 +147,94 @@
             <br />
 
         </main>
+
+    </div>
+
+
+
+    <div hidden>
+        <div class="container" id="keyboardControlsWindow">
+            <div class="row">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Start:</label>
+                        <select class="form-control" keyboardButton name="start" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">A:</label>
+                        <select class="form-control" keyboardButton name="a" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">B:</label>
+                        <select class="form-control" keyboardButton name="b" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Z:</label>
+                        <select class="form-control" keyboardButton name="z" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Up:</label>
+                        <select class="form-control" keyboardButton name="up" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:40px">Down:</label>
+                        <select class="form-control" keyboardButton name="down" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group ">
+                        <!-- mx-sm-3 mb-2 -->
+                        <label class="col-sm-2 col-form-label" style="padding-right:20px">Left:</label>
+                        <select class="form-control" keyboardButton name="left" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Right:</label>
+                        <select class="form-control" keyboardButton name="right" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row" style="justify-content:center;">
+                <button class="btn btn-sm btn-success" style="margin-right:30px" onclick="window.saveControls()">Save Controls</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.loadDefaultControls()">Load Default Controls</button>
+            </div>
+        </div>
+
+        <div class="container" id="gamepadControlsWindow">
+            <div class="row" style="justify-content:center">
+                <h6 style="text-align:center" class="gamepadMessage"> Gamepad is detected</h6>
+            </div>
+
+            <div class="row">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Start:</label>
+                        <select class="form-control" gamepadButton name="start" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">A:</label>
+                        <select class="form-control" gamepadButton name="a" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">B:</label>
+                        <select class="form-control" gamepadButton name="b" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Z:</label>
+                        <select class="form-control" gamepadButton name="z" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row" style="justify-content:center;">
+                <button class="btn btn-sm btn-success" style="margin-right:30px" onclick="window.saveControls()">Save Controls</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.loadDefaultControls()">Load Default Controls</button>
+            </div>
+        </div>
+
 
     </div>
 

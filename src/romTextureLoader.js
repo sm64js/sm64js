@@ -206,6 +206,7 @@ const loadDataIntoGame = (data) => {
     SkyboxWater.water_skybox_texture_0003E.push(...data["water_skybox_texture_0003E"].data)
     SkyboxWater.water_skybox_texture_0003F.push(...data["water_skybox_texture_0003F"].data)
 
+    document.getElementById('romUpload').hidden = true
     msgElement.innerHTML = "Rom Asset Extraction Success - You may now start the game"
     msgElement.style = "color:#00ff00"
     document.getElementById("startbutton").disabled = false

@@ -250,9 +250,21 @@ export const checkForRom = () => {   /// happens one time when the page is loade
 
 
 $('#romUpload').submit(
-    (e) =>  {
+    (e) => {
         e.preventDefault()
-        if (loadedGameAssets) return
+        const romFile = document.getElementById('romFile').files[0]
+        const reader = new FileReader()
+        reader.readAsArrayBuffer(romFile)
+        reader.onload = (evt) => {
+            const romBufferData = evt.target.result
+            const dataAtOffset = romBufferData.slice(2532256)
+            console.log(String.fromCharCode(new Int8Array(dataAtOffset)[0]))
+            console.log(String.fromCharCode(new Int8Array(dataAtOffset)[1]))
+            console.log(String.fromCharCode(new Int8Array(dataAtOffset)[2]))
+            console.log(String.fromCharCode(new Int8Array(dataAtOffset)[3]))
+
+        }
+/*        if (loadedGameAssets) return
         msgElement.innerHTML = "Please wait for ROM to be uploaded and game assets to be sent back to your device..."
         msgElement.style = "color:yellow"
         $.ajax({
@@ -262,6 +274,6 @@ $('#romUpload').submit(
             processData: false,
             contentType: false,
             success: (extractedData) => { processExtractedResults(extractedData) }
-        })
+        })*/
     }
 )

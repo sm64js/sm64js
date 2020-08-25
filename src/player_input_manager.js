@@ -116,6 +116,8 @@ const gamepadButtonMapping = { //works for xbox
     b: 2,
     start: 9,
     z: 6,
+    stickX: 0,
+    stickY: 1
 }
 
 const defaultGamepadButtonMapping = { ...gamepadButtonMapping }
@@ -168,6 +170,7 @@ $('[data-toggle="gamepadControlsToggle"]').on('shown.bs.popover', () => {
 
         const gamepad = navigator.getGamepads()[0]
         const numButtons = gamepad.buttons.length
+        const numAxes = gamepad.axes.length
 
         Array.from(messages).forEach(msg => {
             msg.innerHTML = `
@@ -180,25 +183,29 @@ $('[data-toggle="gamepadControlsToggle"]').on('shown.bs.popover', () => {
             `
         })
 
-        ///Fillout the select options
+        ///Fillout the select options and set default value
         Array.from(document.getElementsByTagName("select")).forEach(selectElem => {
-            if (selectElem.hasAttribute("gamepadButton")) {
-                for (let i = 0; i < navigator.getGamepads()[0].buttons.length; i++) {
-                    const option = document.createElement("option")
-                    option.value = i
-                    option.text = i
-                    selectElem.add(option)
+            if (selectElem.options.length == 0) { /// insert options
+                if (selectElem.hasAttribute("gamepadButton")) {
+                    for (let i = 0; i < navigator.getGamepads()[0].buttons.length; i++) {
+                        const option = document.createElement("option")
+                        option.value = i
+                        option.text = i
+                        selectElem.add(option)
+                    }
+                }
+                if (selectElem.hasAttribute("gamepadAxes")) {
+                    for (let i = 0; i < navigator.getGamepads()[0].axes.length; i++) {
+                        const option = document.createElement("option")
+                        option.value = i
+                        option.text = i
+                        selectElem.add(option)
+                    }
                 }
             }
+            selectElem.value = gamepadButtonMapping[selectElem.name]
         })
-
-        /// set default values
-        Array.from(document.getElementsByTagName("select")).forEach(selectElem => {
-            if (selectElem.hasAttribute("gamepadButton")) {
-                selectElem.value = gamepadButtonMapping[selectElem.name]
-            }
-        })
-    } else {
+    } else {  /// no gamepad detected
         Array.from(messages).forEach(msg => {
             msg.innerHTML = `No Gamepad Detected Yet`
         })
@@ -233,6 +240,9 @@ window.loadDefaultControls = () => {
         if (selectElem.hasAttribute("gamepadButton")) {
             selectElem.value = gamepadButtonMapping[selectElem.name]
         }
+        if (selectElem.hasAttribute("gamepadAxes")) {
+            selectElem.value = gamepadButtonMapping[selectElem.name]
+        }
     })
 }
 
@@ -250,14 +260,13 @@ export const playerInputUpdate = () => {
         gamepad = navigator.getGamepads()[0]
     }
     if (gamepad) {
-        stickX = gamepad.axes[0]
-        stickY = gamepad.axes[1] * -1
+        stickX = gamepad.axes[gamepadButtonMapping['stickX']]
+        stickY = gamepad.axes[gamepadButtonMapping['stickY']] * -1
         Object.assign(gamepadFinal, {
             a: gamepad.buttons[gamepadButtonMapping['a']].touched,
             b: gamepad.buttons[gamepadButtonMapping['b']].touched,
             start: gamepad.buttons[gamepadButtonMapping['start']].touched,
             z: gamepad.buttons[gamepadButtonMapping['z']].touched,
-
         })
     }
 

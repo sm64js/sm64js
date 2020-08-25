@@ -248,6 +248,19 @@ export const checkForRom = () => {   /// happens one time when the page is loade
 }
 
 
+const bufferToUint32Be = (buffer) => {
+    const arr = []
+    if (buffer.length % 4 != 0) throw "error - should be divisble by 4"
+    for (let i = 0; i < buffer.length; i += 4) {
+        arr.push(buffer[i + 3] + (buffer[i + 2] << 8) + (buffer[i + 1] << 16) + (buffer[i] << 24))
+    }
+    return arr
+}
+
+const getBit = (buf, bit) => {
+    return buf[Math.floor(bit / 8) + 16] & (1 << (7 - ((bit) % 8)))
+}
+
 
 $('#romUpload').submit(
     (e) => {
@@ -258,10 +271,44 @@ $('#romUpload').submit(
         reader.onload = (evt) => {
             const romBufferData = evt.target.result
             const dataAtOffset = romBufferData.slice(2532256)
-            console.log(String.fromCharCode(new Int8Array(dataAtOffset)[0]))
-            console.log(String.fromCharCode(new Int8Array(dataAtOffset)[1]))
-            console.log(String.fromCharCode(new Int8Array(dataAtOffset)[2]))
-            console.log(String.fromCharCode(new Int8Array(dataAtOffset)[3]))
+
+            const firstfour = dataAtOffset.slice(0, 4)
+            if (new TextDecoder().decode(new Uint8Array(firstfour)) == "MIO")
+                throw "header not valid"
+
+            const headerData = bufferToUint32Be(new Uint8Array(dataAtOffset.slice(4, 16)))
+            const headerObject = {
+                dest_size: headerData[0],
+                comp_offset: headerData[1],
+                uncomp_offset: headerData[2]
+            }
+
+            let bit_idx = 0, comp_idx = 0, uncomp_idx = 0
+
+            const wholeData = new Uint8Array(dataAtOffset)
+            const decoded_bytes = []
+
+            while (decoded_bytes.length < headerObject.dest_size) {
+                if (getBit(wholeData, bit_idx)) {
+                    // 1 - pull uncompressed data
+                    decoded_bytes.push(wholeData[headerObject.uncomp_offset + uncomp_idx])
+                    uncomp_idx++
+                } else {
+                    // 0 - read compressed data
+                    const x = headerObject.comp_offset + comp_idx
+                    const vals = wholeData.slice(x, x + 2)
+                    comp_idx += 2
+                    const length = ((vals[0] & 0xF0) >> 4) + 3
+                    const idx = ((vals[0] & 0x0F) << 8) + vals[1] + 1
+                    for (let i = 0; i < length; i++) {
+                        decoded_bytes.push(decoded_bytes[decoded_bytes.length - idx])
+                    }
+                }
+                bit_idx++
+            }
+
+            //console.log(decoded_bytes)
+            console.log(decoded_bytes.slice(50336, 50848)) //levels/intro/3_tm.rgba16.png
 
         }
 /*        if (loadedGameAssets) return

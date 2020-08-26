@@ -17,4 +17,4 @@ COPY . ./
 
 RUN npm run build
 
-CMD ["npm", "run", "serveProduction"]
+CMD ["npm", "run", "serve"]

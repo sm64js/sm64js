@@ -62,9 +62,9 @@ import {
 } from "./actors/mario/model.inc"
 
 const url = new URL(window.location.href)
-const msgElement = document.getElementById('uploadMessage')
+const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 2
+const textureVersion = 3
 
 const loadDataIntoGame = (data) => {
 
@@ -140,7 +140,7 @@ const loadDataIntoGame = (data) => {
 
     texture_shadow_quarter_circle.push(...data["textures/segment2/shadow_quarter_circle.ia8.png"].data)
 
-    /*SkyboxWater.water_skybox_texture_00000.push(...data["water_skybox_texture_00000"].data)
+    SkyboxWater.water_skybox_texture_00000.push(...data["water_skybox_texture_00000"].data)
     SkyboxWater.water_skybox_texture_00001.push(...data["water_skybox_texture_00001"].data)
     SkyboxWater.water_skybox_texture_00002.push(...data["water_skybox_texture_00002"].data)
     SkyboxWater.water_skybox_texture_00003.push(...data["water_skybox_texture_00003"].data)
@@ -206,9 +206,9 @@ const loadDataIntoGame = (data) => {
     SkyboxWater.water_skybox_texture_0003C.push(...data["water_skybox_texture_0003C"].data)
     SkyboxWater.water_skybox_texture_0003D.push(...data["water_skybox_texture_0003D"].data)
     SkyboxWater.water_skybox_texture_0003E.push(...data["water_skybox_texture_0003E"].data)
-    SkyboxWater.water_skybox_texture_0003F.push(...data["water_skybox_texture_0003F"].data)*/
+    SkyboxWater.water_skybox_texture_0003F.push(...data["water_skybox_texture_0003F"].data)
 
-    document.getElementById('romUpload').hidden = true
+    document.getElementById('romSelect').hidden = true
     msgElement.innerHTML = "Rom Asset Extraction Success - You may now start the game"
     msgElement.style = "color:#00ff00"
     document.getElementById("startbutton").disabled = false
@@ -221,9 +221,10 @@ const processExtractedResults = (data) => {
         msgElement.innerHTML = "Rom Asset Extraction Fail"
         msgElement.style = "color:red"
     } else {  /// Success
-        loadDataIntoGame(data)
         data.textureVersion = textureVersion
-        localStorage['sm64jsAssets'] = JSON.stringify(data)
+        const stringified = JSON.stringify(data)
+        loadDataIntoGame(JSON.parse(stringified))
+        localStorage['sm64jsAssets'] = stringified
     }
 
 }
@@ -263,101 +264,120 @@ const getBit = (buf, bit) => {
     return buf[Math.floor(bit / 8) + 16] & (1 << (7 - ((bit) % 8)))
 }
 
-$('#romUpload').submit(
+const mio0_decode = (dataSlice) => {
+    const firstfour = dataSlice.slice(0, 4)
+    if (new TextDecoder().decode(new Uint8Array(firstfour)) == "MIO")
+        throw "header not valid"
+
+    const headerData = bufferToUint32Be(new Uint8Array(dataSlice.slice(4, 16)))
+    const headerObject = {
+        dest_size: headerData[0],
+        comp_offset: headerData[1],
+        uncomp_offset: headerData[2]
+    }
+
+    let bit_idx = 0, comp_idx = 0, uncomp_idx = 0
+
+    const wholeData = new Uint8Array(dataSlice)
+    const decoded_bytes = []
+
+    while (decoded_bytes.length < headerObject.dest_size) {
+        if (getBit(wholeData, bit_idx)) {
+            // 1 - pull uncompressed data
+            decoded_bytes.push(wholeData[headerObject.uncomp_offset + uncomp_idx])
+            uncomp_idx++
+        } else {
+            // 0 - read compressed data
+            const x = headerObject.comp_offset + comp_idx
+            const vals = wholeData.slice(x, x + 2)
+            comp_idx += 2
+            const length = ((vals[0] & 0xF0) >> 4) + 3
+            const idx = ((vals[0] & 0x0F) << 8) + vals[1] + 1
+            for (let i = 0; i < length; i++) {
+                decoded_bytes.push(decoded_bytes[decoded_bytes.length - idx])
+            }
+        }
+        bit_idx++
+    }
+
+    return decoded_bytes
+}
+
+const extractAssetsFromRom = (romBufferData) => {
+    const extractedData = {}
+
+    ///// process assets by type
+    const assetsMio0 = {}, assetsBasic = []
+    Object.entries(assets).forEach(([key, value]) => { 
+        if (key == '@comment') return
+        if (value[3] == undefined) { /// skybox
+            const mio0 = value[1]['us'][0]
+            if (assetsMio0[mio0] == undefined) assetsMio0[mio0] = []
+            assetsMio0[mio0].push({  /// needs Mio decode
+                name: key,
+                size: value[0],
+                offset: value[1]['us'][1],
+                skybox: true
+            })
+        } else if (value[3]['us'].length == 2) {
+            const mio0 = value[3]['us'][0]
+            if (assetsMio0[mio0] == undefined) assetsMio0[mio0] = []
+            assetsMio0[mio0].push({  /// needs Mio decode
+                name: key,
+                size: value[2],
+                offset: value[3]['us'][1]
+            })
+        } else if (value[3]['us'].length == 1) { /// Basic
+            assetsBasic.push({
+                name: key,
+                size: value[2],
+                offset: value[3]['us'][0]
+            })
+        } else throw "unknown asset type"
+
+    })
+
+
+    ////// process basic assets
+    assetsBasic.forEach(asset => {
+        extractedData[asset.name] = Buffer.from(romBufferData.slice(asset.offset, asset.offset + asset.size))
+    })
+
+    /////// process Mio0 assets
+    Object.entries(assetsMio0).forEach(([mio0, assetSublist]) => {
+
+        const decoded_bytes = mio0_decode(romBufferData.slice(mio0))
+        assetSublist.forEach(asset => {
+            if (asset.skybox) {  /// skybox
+                const textureNamePrefix = /\/(\w*).png/.exec(asset.name)[1] + "_skybox_texture_"
+                const numTiles = Math.floor(asset.size / 2048)
+                for (let i = 0; i < numTiles; i++) {
+                    let hextileString = i.toString(16).toUpperCase()
+                    while (hextileString.length < 5) hextileString = '0' + hextileString
+                    const finalTexureName = textureNamePrefix + hextileString
+                    extractedData[finalTexureName] = Buffer.from(decoded_bytes.slice(i * 2048, (i + 1) * 2048))
+                }
+            } else { // not skybox
+                extractedData[asset.name] = Buffer.from(decoded_bytes.slice(asset.offset, asset.offset + asset.size))
+            }
+        })
+
+    })
+
+    processExtractedResults(extractedData)
+}
+
+$('#romSelect').submit(
     (e) => {
         e.preventDefault()
         if (loadedGameAssets) return
         const romFile = document.getElementById('romFile').files[0]
         const reader = new FileReader()
         reader.readAsArrayBuffer(romFile)
-        reader.onload = (evt) => {
-            const romBufferData = evt.target.result
-            const newData = {}
+        reader.onload = (evt) => { extractAssetsFromRom(evt.target.result) }
+    }
+)
 
-            ///// process assets by type
-            const assetsMio0 = {}, assetsBasic = []
-
-            Object.entries(assets).forEach(([key, value]) => {
-                if (key == '@comment') return
-                if (value[3] == undefined) return
-                if (value[3]['us'].length == 2) {
-                    const mio0 = value[3]['us'][0]
-                    if (assetsMio0[mio0] == undefined) assetsMio0[mio0] = []
-                    assetsMio0[mio0].push({
-                        name: key,
-                        size: value[2],
-                        offset: value[3]['us'][1]
-                    })
-                } else if (value[3]['us'].length == 1) {
-                    assetsBasic.push({
-                        name: key,
-                        size: value[2],
-                        offset: value[3]['us'][0]
-                    })
-                } else throw "unknown asset type"
-
-
-            })
-
-
-            ////// process basic assets
-            assetsBasic.forEach(value => {
-                newData[value.name] = {
-                    data: Buffer.from(romBufferData.slice(value.offset, value.offset + value.size))
-                }
-            })
-
-            /////// process Mio0 assets
-            Object.entries(assetsMio0).forEach(([mio0, values]) => {
-                const dataAtOffset = romBufferData.slice(mio0)
-
-                const firstfour = dataAtOffset.slice(0, 4)
-                if (new TextDecoder().decode(new Uint8Array(firstfour)) == "MIO")
-                    throw "header not valid"
-
-                const headerData = bufferToUint32Be(new Uint8Array(dataAtOffset.slice(4, 16)))
-                const headerObject = {
-                    dest_size: headerData[0],
-                    comp_offset: headerData[1],
-                    uncomp_offset: headerData[2]
-                }
-
-                let bit_idx = 0, comp_idx = 0, uncomp_idx = 0
-
-                const wholeData = new Uint8Array(dataAtOffset)
-                const decoded_bytes = []
-
-                while (decoded_bytes.length < headerObject.dest_size) {
-                    if (getBit(wholeData, bit_idx)) {
-                        // 1 - pull uncompressed data
-                        decoded_bytes.push(wholeData[headerObject.uncomp_offset + uncomp_idx])
-                        uncomp_idx++
-                    } else {
-                        // 0 - read compressed data
-                        const x = headerObject.comp_offset + comp_idx
-                        const vals = wholeData.slice(x, x + 2)
-                        comp_idx += 2
-                        const length = ((vals[0] & 0xF0) >> 4) + 3
-                        const idx = ((vals[0] & 0x0F) << 8) + vals[1] + 1
-                        for (let i = 0; i < length; i++) {
-                            decoded_bytes.push(decoded_bytes[decoded_bytes.length - idx])
-                        }
-                    }
-                    bit_idx++
-                }
-
-                values.forEach(value => {
-                    newData[value.name] = {
-                        data: Buffer.from(decoded_bytes.slice(value.offset, value.offset + value.size))
-                    }
-                })
-
-
-            })
-
-            loadDataIntoGame(newData)
-
-        }
 /*        msgElement.innerHTML = "Please wait for ROM to be uploaded and game assets to be sent back to your device..."
         msgElement.style = "color:yellow"
         $.ajax({
@@ -371,5 +391,3 @@ $('#romUpload').submit(
                 processExtractedResults(extractedData)
             }
         })*/
-    }
-)

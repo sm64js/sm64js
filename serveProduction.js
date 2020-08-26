@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const fileUpload = require('express-fileupload')
+//const fileUpload = require('express-fileupload')
 const http = require('http')
 const server = http.Server(app)
 const fs = require('fs')
@@ -79,7 +79,7 @@ const extractJsonFromRomFile = async (dir) => {
 }
 
 app.use(express.static(__dirname + '/dist'))
-app.use(fileUpload())
+//app.use(fileUpload())
 server.listen(port, () => { console.log('Serving Files') })
 
 app.get("/romTransfer", async (req, res) => {
@@ -94,18 +94,18 @@ app.get("/romTransfer", async (req, res) => {
 
 })
 
-app.post("/romUpload", async (req, res) => {
-	const uid = uuidv4()
-	await mkdir('extractTools/' + uid)
-
-	req.files.filetoupload.mv('extractTools/' + uid + '/baserom.us.z64', async (err) => {
-		if (err) {
-			console.log(err)
-			fs.rmdirSync('extractTools/' + uid, { recursive: true })
-			return res.send('Fail')
-		}
-
-        res.send(await extractJsonFromRomFile(uid))
-
-	})
-})
+// app.post("/romUpload", async (req, res) => {
+// 	const uid = uuidv4()
+// 	await mkdir('extractTools/' + uid)
+//
+// 	req.files.filetoupload.mv('extractTools/' + uid + '/baserom.us.z64', async (err) => {
+// 		if (err) {
+// 			console.log(err)
+// 			fs.rmdirSync('extractTools/' + uid, { recursive: true })
+// 			return res.send('Fail')
+// 		}
+//
+//         res.send(await extractJsonFromRomFile(uid))
+//
+// 	})
+// })

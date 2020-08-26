@@ -21,7 +21,7 @@ docker run --name mySm64JsServer -dp 80:80 node:13-alpine tail -f /dev/null
 docker exec -it mySm64JsServer /bin/sh
 
 # Install additional prerequisites
-apk update && apk add python3 git
+apk update && apk add git
 # Clone the source code
 git clone https://github.com/sm64js/sm64js.git && cd sm64js
 

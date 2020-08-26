@@ -12,7 +12,7 @@ const send_display_list = (gfx_list) => {
 let n_frames = 0
 const produce_one_frame = () => {
 
-    if (n_frames > 100000) { throw "Hit max frames" }
+    //if (n_frames > 100000) { throw "Hit max frames" }
     //console.log("new frame: " + n_frames)
     n_frames++
 

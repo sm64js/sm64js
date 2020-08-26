@@ -27,12 +27,12 @@
         <main role="main" class="inner cover">
             <h1 class="cover-heading rainbowText">Super Mario 64 - Javascript Port</h1>
 
-            <form id="romUpload" class="form-group" enctype="multipart/form-data" method="post">
-                <h4 style="color:#fa3e3e">Upload US SM64 ROM File</h4>
-                <input class="btn btn-secondary btn-sm" type="file" name="filetoupload">
+            <form id="romSelect" class="form-group" enctype="multipart/form-data" method="post">
+                <h4 style="color:#fa3e3e">Select US SM64 ROM File from your computer</h4>
+                <input id="romFile" class="btn btn-secondary btn-sm" type="file">
                 <input class="btn btn-primary btn-sm" type="submit">
             </form>
-            <h6 id="uploadMessage">This project uses the textures and other game assets from the original game. Due to copyright issues, I cannot host those assets on this site. Please upload a sm64 ROM to extract those assets before you can play.</h6>
+            <h6 id="romMessage">This project uses the textures and other game assets from the original game. Due to copyright issues, I cannot host those assets on this site. Please select a sm64 ROM to extract those assets before you can play.</h6>
             <div class="row" style="justify-content:center">
                 <button id="startbutton" type="button" class="btn btn-success" disabled>Start Game</button>
                 <a href="https://github.com/sm64js/sm64js/issues" style="margin-left:30px" type="button" class="btn btn-warning">Submit Bug</a>

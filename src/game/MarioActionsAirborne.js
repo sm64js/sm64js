@@ -223,7 +223,7 @@ const act_dive = (m) => {
             break
         case Mario.AIR_STEP_HIT_WALL:
             m.faceAngle[0] = 0
-            if (m.vel[1] > 0.0) m.vel = 0.0
+            if (m.vel[1] > 0.0) m.vel[1] = 0.0
             break
         default: throw "unimplemented air step case in act dive"
     }

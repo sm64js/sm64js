@@ -25,12 +25,8 @@ apk update && apk add git
 # Clone the source code
 git clone https://github.com/sm64js/sm64js.git && cd sm64js
 
-# Install node packages
-npm install
-# Compile and package javascript, css, html components
-npm run build
-# Start the web server
-npm run serveProduction
+# Install node packages, build, and serve
+npm run quickstart
 ```
 You should now be able to access the website with the game from a web browser by typing "localhost" into the address bar
 

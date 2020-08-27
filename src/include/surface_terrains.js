@@ -85,5 +85,9 @@ export const SPECIAL_OBJECT = (preset, posX, posY, posZ) => { return [preset, po
 export const SPECIAL_OBJECT_WITH_YAW = (preset, posX, posY, posZ, yaw) => {
     return [preset, posX, posY, posZ, yaw]
 }
+export const COL_WATER_BOX_INIT = (num) => { return [TERRAIN_LOAD_ENVIRONMENT, num] }
+export const COL_WATER_BOX = (id, x1, z1, x2, z2, y) => {
+    return [id, x1, z1, x2, z2, y]
+}
 
 

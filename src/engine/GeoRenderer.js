@@ -27,7 +27,7 @@ const renderModeTable = [
         Gbi.G_RM_AA_ZB_TEX_EDGE_NOOP2,
         Gbi.G_RM_AA_ZB_XLU_SURF_SURF2,
         Gbi.G_RM_AA_ZB_XLU_DECAL_DECAL2,
-        null
+        Gbi.G_RM_AA_ZB_XLU_INTER_INTER2
     ]
 ]
 

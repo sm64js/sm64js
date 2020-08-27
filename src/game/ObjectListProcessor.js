@@ -53,6 +53,8 @@ class ObjectListProcessor {
             this.OBJ_LIST_UNIMPORTANT,
         ]
 
+        this.gEnvironmentLevels = new Array(20)
+
         this.gObjectCounter = 0
         this.gCCMEnteredSlide = 0
         this.gCheckingSurfaceCollisionsForCamera = 0

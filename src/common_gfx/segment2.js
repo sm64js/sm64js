@@ -113,3 +113,7 @@ export const dl_waterbox_end = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
+export const texture_waterbox_water = []
+export const texture_waterbox_lava = []
+
+

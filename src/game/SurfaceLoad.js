@@ -1,5 +1,6 @@
 import * as Surfaces from "../include/surface_terrains"
 import { spawn_special_objects } from "./MacroSpecialObjects"
+import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 
 class SurfaceLoad {
     constructor() {
@@ -212,7 +213,32 @@ class SurfaceLoad {
         return dataIndex
     }
 
+    load_environmental_regions(dataIndex) {
+
+        ObjectListProc.gEnvironmentRegionsIndex = dataIndex
+        ObjectListProc.gEnvironmentRegions = this.gTerrainData.slice(dataIndex)
+        const numRegions = this.gTerrainData[dataIndex++]
+
+        for (let i = 0; i < numRegions; i++) {
+            let loX, loZ, hiX, hiZ
+            dataIndex++
+            loX = this.gTerrainData[dataIndex++]
+            hiX = this.gTerrainData[dataIndex++]
+            loZ = this.gTerrainData[dataIndex++]
+            hiZ = this.gTerrainData[dataIndex++]
+
+            let height = loX = this.gTerrainData[dataIndex++]
+
+            ObjectListProc.gEnvironmentLevels[i] = height
+
+        }
+
+        return dataIndex
+    }
+
     load_area_terrain(index, data, surfaceRooms, macroObjects) {
+
+        this.gTerrainData = data  /// TODO refactor our function args to data, because we are storing it as a class variable
 
         let dataIndex = 0
         let vertexDataIndex = 0
@@ -235,7 +261,9 @@ class SurfaceLoad {
             else if (terrainLoadType == Surfaces.TERRAIN_LOAD_OBJECTS) {
                 dataIndex = spawn_special_objects(index, data, dataIndex)
             }
-            else if (terrainLoadType == Surfaces.TERRAIN_LOAD_ENVIRONMENT) throw "load env regions"
+            else if (terrainLoadType == Surfaces.TERRAIN_LOAD_ENVIRONMENT) {
+                dataIndex = this.load_environmental_regions(dataIndex)
+            }
             else if (terrainLoadType == Surfaces.TERRAIN_LOAD_CONTINUE) continue
             else if (terrainLoadType == Surfaces.TERRAIN_LOAD_END) break
             else if (terrainLoadType > 0x65) { //TERRAIN_LOAD_IS_SURFACE_TYPE_HIGH

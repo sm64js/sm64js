@@ -131,7 +131,7 @@ const movtex_gen_from_quad = (y, quad) => {
         if (textureId == TEXTURE_MIST) {
             throw "texture mist"
         } else { // any rgba16 texture
-            Gbi.gDPLoadBlockTexture(gfx, 32, 32, Gbi.G_IM_FMT_RGBA, gMovtexIdToTexture[4])
+            Gbi.gDPLoadBlockTexture(gfx, 32, 32, Gbi.G_IM_FMT_RGBA, gMovtexIdToTexture[textureId])
         }
         gMovetexLastTextureId = textureId
     }

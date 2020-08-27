@@ -9,7 +9,7 @@ const castle_grounds_movtex_moat_water_data = [
     ...MOV_TEX_4_BOX_TRIS(8253, -58),
     ...MOV_TEX_4_BOX_TRIS(8253, -7222),
     ...MOV_TEX_ROT(ROTATE_COUNTER_CLOCKWISE),
-    ...MOV_TEX_ALPHA(0xC6),
+    ...MOV_TEX_ALPHA(0x96),
     ...MOV_TEX_DEFINE(TEXTURE_WATER),
     ...MOV_TEX_END()
 ]
@@ -23,7 +23,7 @@ const castle_grounds_movtex_lake_water_data = [
     ...MOV_TEX_4_BOX_TRIS(8230, 8137),
     ...MOV_TEX_4_BOX_TRIS(8230, -58),
     ...MOV_TEX_ROT(ROTATE_CLOCKWISE),
-    ...MOV_TEX_ALPHA(0xC6),
+    ...MOV_TEX_ALPHA(0x96),
     ...MOV_TEX_DEFINE(TEXTURE_WATER),
     ...MOV_TEX_END(),
 ]

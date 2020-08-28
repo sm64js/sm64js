@@ -1,6 +1,6 @@
 import { LevelCommandsInstance as LevelCommands } from "../../engine/LevelCommands"
 import { intro_geo_0002D0, intro_geo_00035C } from "./geo"
-import { WARP_TRANSITION_FADE_INTO_COLOR } from "../../game/Area"
+import { WARP_TRANSITION_FADE_INTO_COLOR, WARP_TRANSITION_FADE_FROM_STAR } from "../../game/Area"
 import { level_main_scripts_entry } from "../scripts"
 import { lvl_intro_update } from "../../menu/level_select_menu"
 import { LEVEL_CASTLE_GROUNDS } from "../level_defines_constants"
@@ -20,7 +20,7 @@ export let level_intro_entry_2 = [
     /// Jump IF
     { command: LevelCommands.load_area, args: [1] },
     /// Set Menu Music
-    /// Transition WARP_TRANSITION_FADE_FROM_STAR
+    { command: LevelCommands.transition, args: [WARP_TRANSITION_FADE_FROM_STAR, 20, 0, 0, 0] },
     { command: LevelCommands.sleep, args: [20] },
     { command: LevelCommands.call_loop, args: [ 1, lvl_intro_update, null ] },
     { command: LevelCommands.unload_area, args: [1] },
@@ -40,7 +40,7 @@ export let level_intro_entry_1 = [
     // Call lvl intro update with var 0 - play sound its a me mario
     { command: LevelCommands.load_area, args: [1] },
     { command: LevelCommands.sleep, args: [75] },
-    { command: LevelCommands.transition, args: [WARP_TRANSITION_FADE_INTO_COLOR, 16, 0, 0, 0] }, /// implement this
+    { command: LevelCommands.transition, args: [WARP_TRANSITION_FADE_INTO_COLOR, 16, 0, 0, 0] }, 
     { command: LevelCommands.sleep, args: [16] },
     { command: LevelCommands.unload_area, args: [1] },
     { command: LevelCommands.sleep, args: [2] },

@@ -2,7 +2,7 @@ import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceC
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import * as Mario from "./Mario"
 import { atan2s } from "../engine/math_util"
-import { make_vertex } from "./GeoMisc"
+import { make_vertex, round_float } from "./GeoMisc"
 import * as Gbi from "../include/gbi"
 import { dl_shadow_circle, dl_shadow_9_verts, dl_shadow_end } from "../common_gfx/segment2"
 
@@ -167,14 +167,6 @@ const calculate_vertex_xyz = (index, s, posVtx, shadowVertexType) => {
         }
     }
 
-}
-
-const round_float = (num) => {
-    if (num >= 0.0) {
-        return parseInt(num + 0.5)
-    } else {
-        return parseInt(num - 0.5)
-    }
 }
 
 const get_texture_coords_9_vertices = (vertexNum, textures) => {

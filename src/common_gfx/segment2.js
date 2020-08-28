@@ -26,6 +26,21 @@ export const dl_proj_mtx_fullscreen = [
     Gbi.gsSPEndDisplayList()
 ]
 
+export const dl_transition_draw_filled_region = [
+	...Gbi.gsSP2Triangles( 0,  4,  1, 0x0,  1,  4,  5, 0x0),
+	...Gbi.gsSP2Triangles( 1,  5,  2, 0x0,  2,  5,  6, 0x0),
+	...Gbi.gsSP2Triangles( 2,  6,  7, 0x0,  2,  7,  3, 0x0),
+	...Gbi.gsSP2Triangles( 3,  4,  0, 0x0,  3,  7,  4, 0x0),
+	Gbi.gsSPEndDisplayList()
+]
+
+export const dl_screen_transition_end = [
+	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+	Gbi.gsDPSetRenderMode(Gbi.G_RM_OPA_SURF_SURF2),
+	Gbi.gsSPEndDisplayList(),
+]
+
 export const dl_shadow_begin = [
 	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATEIA, Gbi.G_CC_MODULATEIA),
@@ -116,4 +131,5 @@ export const dl_waterbox_end = [
 export const texture_waterbox_water = []
 export const texture_waterbox_lava = []
 
+export const texture_transition_star_half = []
 

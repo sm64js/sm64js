@@ -1,4 +1,4 @@
-import { AreaInstance as Area } from "./Area"
+import { AreaInstance as Area, WARP_TRANSITION_FADE_FROM_STAR, WARP_TRANSITION_FADE_FROM_COLOR } from "./Area"
 import { COURSE_NONE } from "../levels/course_defines"
 import * as Mario from "./Mario"
 import { CameraInstance as Camera } from "./Camera"
@@ -55,6 +55,8 @@ class LevelUpdate {
 
     init_level() {
 
+        let val4 = 0
+
         this.set_play_mode(PLAY_MODE_NORMAL)
 
         if (this.sWarpDest.type != WARP_TYPE_NOT_WARPING) {
@@ -68,6 +70,13 @@ class LevelUpdate {
             if (Area.gCurrentArea) {
                 Camera.reset_camera(Area.gCurrentArea.camera)
             }
+
+            if (val4 != 0) {
+                Area.play_transition(WARP_TRANSITION_FADE_FROM_COLOR, 0x5A, 0xFF, 0xFF, 0xFF)
+            } else {
+                Area.play_transition(WARP_TRANSITION_FADE_FROM_STAR, 0x10, 0xFF, 0xFF, 0xFF)
+            }
+
         }
         
         return 1

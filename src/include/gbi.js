@@ -1,6 +1,4 @@
 
-//export const someobject = { somelist: [] }
-
 /// graphics opcodes
 export const G_MTX = 1
 export const G_POPMTX = 2
@@ -46,7 +44,7 @@ export const G_CLIPPING = 256
 export const G_CULL_BOTH = 48
 export const G_LOD = 1024
 
-export const  G_ON	= 1
+export const G_ON	= 1
 export const G_OFF = 0
 
 
@@ -55,10 +53,10 @@ export const G_DL_PUSH	=	0x00
 export const G_DL_NOPUSH	=	0x01
 
 
-export const 	G_TEXTURE_IMAGE_FRAC =	2
-export const 	G_TEXTURE_SCALE_FRAC =	16
-export const 	G_SCALE_FRAC	=	8
-export const    G_ROTATE_FRAC = 16
+export const G_TEXTURE_IMAGE_FRAC =	2
+export const G_TEXTURE_SCALE_FRAC =	16
+export const G_SCALE_FRAC	=	8
+export const G_ROTATE_FRAC = 16
 
 
 
@@ -73,20 +71,20 @@ export const G_MDSFT_BLENDER		=	16
 /*
  * G_SETOTHERMODE_H sft: shift count
  */
-export const G_MDSFT_BLENDMASK		=0	/* unsupported */
+export const G_MDSFT_BLENDMASK		= 0	/* unsupported */
 export const G_MDSFT_ALPHADITHER	=	4
-export const G_MDSFT_RGBDITHER		=6
+export const G_MDSFT_RGBDITHER		= 6
 
 export const G_MDSFT_COMBKEY		=	8
 export const G_MDSFT_TEXTCONV		= 9
 export const G_MDSFT_TEXTFILT		= 12
 export const G_MDSFT_TEXTLUT		=	14
 export const G_MDSFT_TEXTLOD		=	16
-export const G_MDSFT_TEXTDETAIL		=17
-export const G_MDSFT_TEXTPERSP		=19
-export const G_MDSFT_CYCLETYPE		=20
+export const G_MDSFT_TEXTDETAIL		= 17
+export const G_MDSFT_TEXTPERSP		= 19
+export const G_MDSFT_CYCLETYPE		= 20
 export const G_MDSFT_COLORDITHER	=	22	/* unsupported in HW 2.0 */
-export const G_MDSFT_PIPELINE		=23
+export const G_MDSFT_PIPELINE		= 23
 
 
 /* G_SETOTHERMODE_H gPipelineMode */
@@ -236,7 +234,7 @@ export const G_ACMUX_TEXEL0		   =  1
 export const G_ACMUX_TEXEL1		    = 2
 export const G_ACMUX_PRIMITIVE	    = 3
 export const G_ACMUX_SHADE		    = 4
-export const G_ACMUX_ENVIRONMENT	=     5
+export const G_ACMUX_ENVIRONMENT	= 5
 export const G_ACMUX_LOD_FRACTION	= 0
 export const G_ACMUX_PRIM_LOD_FRAC	= 6
 export const G_ACMUX_1		       =  6
@@ -346,6 +344,10 @@ export const G_CC_MODULATEIA = {
     rgb: [1, 15, 4, 7]
 }
 
+export const G_CC_MODULATEIDECALA = {
+    alpha: [7, 7, 7, 1],
+    rgb: [1, 15, 4, 7]
+}
 
 export const G_CC_MODULATERGBA_PRIM = {
     alpha: [1, 7, 3, 7],
@@ -618,7 +620,7 @@ export const gDPLoadBlockTexture = (displaylist, width, height, format, image) =
 
 export const gDPLoadTextureBlock = (displaylist, timg, fmt, siz, width, height, pal, cms, cmt, masks, maskt, shifts, shiftt) => {
     displaylist.push(
-        gsDPSetTextureImage(fmt, siz, 1, timg),
+        gsDPSetTextureImage(fmt, G_IM_SIZ_LOAD_BLOCK_TABLE[siz], 1, timg),
         gsDPSetTile(fmt, G_IM_SIZ_LOAD_BLOCK_TABLE[siz], 0, 0, G_TX_LOADTILE, 0, cmt, maskt, shiftt, cms, masks, shifts),
         gsDPLoadBlock(G_TX_LOADTILE, 0, 0, (((width) * (height) + G_IM_SIZ_INCR_TABLE[siz]) >> G_IM_SIZ_SHIFT_TABLE[siz]) - 1),
         gsDPSetTile(fmt, siz,

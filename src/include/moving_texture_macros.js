@@ -20,3 +20,5 @@ export const MOV_TEX_ROT = (rot) => { return [rot] }
 export const MOV_TEX_ALPHA = (alpha) => { return [alpha] }
 export const MOV_TEX_DEFINE = (text) => { return [text] }
 export const MOV_TEX_END = () => { return [0] }
+export const MOV_TEX_SPD = (speed) => { return [speed] }
+export const MOV_TEX_TRIS = (x, y, z, param1, param2) => { return [x, y, z, param1, param2] }

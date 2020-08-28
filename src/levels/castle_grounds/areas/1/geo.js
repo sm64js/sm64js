@@ -8,7 +8,7 @@ import { castle_grounds_seg7_dl_0700BA20 } from "./6/model.inc"
 import { castle_grounds_seg7_dl_0700C210 } from "./9/model.inc"
 import { castle_grounds_seg7_dl_0700C430 } from "./10/model.inc"
 import { geo_skybox_main } from "../../../../game/LevelGeo"
-import { geo_movtex_draw_water_regions } from "../../../../game/MovingTexture"
+import { geo_movtex_draw_water_regions, geo_movtex_draw_nocolor } from "../../../../game/MovingTexture"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -41,6 +41,7 @@ export const castle_grounds_geo_00073C = [
     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_ALPHA, castle_grounds_seg7_dl_0700BA20] },
     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE_DECAL, castle_grounds_seg7_dl_0700C430] },
     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, castle_grounds_seg7_dl_0700C210] },
+    { command: GeoLayout.node_generated, args: [0x1601, geo_movtex_draw_nocolor] },
     { command: GeoLayout.node_generated, args: [0x1601, geo_movtex_draw_water_regions] },
     { command: GeoLayout.node_render_object_parent },
     { command: GeoLayout.close_node },

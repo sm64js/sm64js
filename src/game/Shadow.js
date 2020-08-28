@@ -171,7 +171,7 @@ const calculate_vertex_xyz = (index, s, posVtx, shadowVertexType) => {
 
 const get_texture_coords_9_vertices = (vertexNum, textures) => {
     textures.X = vertexNum % 3 * 15 - 15
-    textures.Y = vertexNum / 3 * 15 - 15
+    textures.Y = Math.floor(vertexNum / 3) * 15 - 15
 }
 
 const make_shadow_vertex_at_xyz = (vertices, index, relX, relY, relZ, alpha, shadowVertexType) => {

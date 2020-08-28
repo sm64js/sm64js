@@ -43,7 +43,7 @@ export const dl_screen_transition_end = [
 
 export const dl_shadow_begin = [
 	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATEIA, Gbi.G_CC_MODULATEIA),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATEIA),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
 	Gbi.gsSPEndDisplayList()
 ]

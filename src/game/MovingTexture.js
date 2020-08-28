@@ -94,25 +94,25 @@ const movtex_make_quad_vertex = (verts, index, x, y, z, rot, rotOffset, scale, a
 }
 
 const movtex_gen_from_quad = (y, quad) => {
-    let rot = quad[0]
-    const rotspeed = quad[1]
-    const scale = quad[2]
-    const x1 = quad[3]
-    const z1 = quad[4]
-    const x2 = quad[5]
-    const z2 = quad[6]
-    const x3 = quad[7]
-    const z3 = quad[8]
-    const x4 = quad[9]
-    const z4 = quad[10]
-    const rotDir = quad[11]
-    const alpha = quad[12]
-    const textureId = quad[13]
+    let rot = quad.get(0)
+    const rotspeed = quad.get(1)
+    const scale = quad.get(2)
+    const x1 = quad.get(3)
+    const z1 = quad.get(4)
+    const x2 = quad.get(5)
+    const z2 = quad.get(6)
+    const x3 = quad.get(7)
+    const z3 = quad.get(8)
+    const x4 = quad.get(9)
+    const z4 = quad.get(10)
+    const rotDir = quad.get(11)
+    const alpha = quad.get(12)
+    const textureId = quad.get(13)
 
     const verts = [], gfx = []
 
-    if (gMovtexCounter != gMovtexCounterPrev) quad[0] += rotspeed
-    rot = quad[0]
+    if (gMovtexCounter != gMovtexCounterPrev) quad.set(0, rot + rotspeed)
+    rot = quad.get(0) // access again after increment
 
     if (rotDir == ROTATE_CLOCKWISE) {
         movtex_make_quad_vertex(verts, 0, x1, y, z1, rot, 0, scale, alpha)
@@ -142,13 +142,27 @@ const movtex_gen_from_quad = (y, quad) => {
     return gfx
 }
 
+const make_subarray = (array, from, to) => {
+    return {
+        get: (i) => {
+            return array[i + from]
+        },
+        set: (i, newValue) => {
+            array[i + from] = newValue
+        },
+        length: to - from
+    }
+}
+
 const movtex_gen_from_quad_array = (y, quadArr) => {
     const gfx = []
 
     let numLists = quadArr[0]
 
     for (let i = 0; i < numLists; i++) {
-        const subList = movtex_gen_from_quad(y, quadArr.slice(i * 14 + 1, (i+1) * 14 + 1))
+        /// take a slice out of quadArr without making a copy
+        const subarr = make_subarray(quadArr, i * 14 + 1, (i + 1) * 14 + 1)
+        const subList = movtex_gen_from_quad(y, subarr)
         if (subList) Gbi.gSPDisplayList(gfx, subList)
     }
 

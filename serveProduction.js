@@ -7,6 +7,7 @@ const fs = require('fs')
 const { v4: uuidv4 } = require('uuid')
 const { promisify } = require('util')
 const { spawn } = require('child_process')
+const io = require('socket.io')(server)
 const port = 80
 
 const mkdir = promisify(fs.mkdir)
@@ -109,3 +110,29 @@ app.get("/romTransfer", async (req, res) => {
 //
 // 	})
 // })
+
+const connectedSockets = {}
+
+io.on('connection', (socket) => {
+    //connectedSockets[socket.id] = {}
+    console.log("connection")
+
+    socket.on('marioData', (marioData) => {
+        socket.emit('allMarios', connectedSockets)
+
+        //Validate data
+        for (let i = 0; i < 3; i++) {
+            if (isNaN(marioData.pos[i])) return
+            if (isNaN(marioData.angle[i])) return
+        }
+        if (isNaN(marioData.animFrame)) return
+        if (isNaN(marioData.animID)) return
+
+        /// Data is Valid
+        connectedSockets[socket.id] = marioData
+    })
+
+    socket.on('disconnect', () => {
+        delete connectedSockets[socket.id]
+    })
+})

@@ -705,6 +705,7 @@ export const is_anim_past_frame = (m, animFrame) => {
 
 export const execute_mario_action = (marioIndex) => {
     if (LevelUpdate.gMarioState[marioIndex].action) {
+
         LevelUpdate.gMarioState[marioIndex].marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
         update_mario_inputs(LevelUpdate.gMarioState[marioIndex])
         Interact.mario_process_interactions(LevelUpdate.gMarioState[marioIndex])
@@ -936,12 +937,8 @@ const update_mario_inputs = (m) => {
     m.collidedObjInteractTypes = m.marioObj.collidedObjInteractTypes
     m.flags &= 0xFFFFFF
 
-    if (m.marioObj.OG) {
-        update_mario_joystick_inputs(m, window.playerInput)
-        update_mario_button_inputs(m, window.playerInput)
-    }
-    else update_mario_joystick_inputs(m, window.playerInput2)
-
+    update_mario_joystick_inputs(m, window.playerInput)
+    update_mario_button_inputs(m, window.playerInput)
     update_mario_geometry_inputs(m)
 
     if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) {

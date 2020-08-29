@@ -5,6 +5,7 @@ import * as Gbi from "../include/gbi"
 import { CameraInstance as Camera } from "../game/Camera"
 import * as Mario from "../game/Mario"
 import { create_shadow_below_xyz } from "../game/Shadow"
+import { gMarioAnimData } from "../actors/mario/marioAnimData"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -319,6 +320,39 @@ class GeoRenderer {
 
     }
 
+    geo_process_extra_mario(pos, angle, animFrame, animID, sharedChild) {
+
+        const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
+
+        MathUtil.mtxf_rotate_zxy_and_translate(mtxf, pos, angle)
+        MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
+
+        MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex + 1], [1, 1, 1])
+
+        this.gMatStackIndex++
+
+        const animList = gMarioAnimData
+        this.gCurrAnimFrame = animFrame
+        this.gCurAnimType = this.ANIM_TYPE_TRANSLATION
+        this.gCurAnimData = animList[animID].values
+        this.gCurrAnimAttribute = {
+            indexToIndices: 0,
+            indices: animList[animID].indices
+        }
+
+        this.gCurGraphNodeObject = {
+            pos, angle, scale: [1, 1, 1]
+        }
+        //marioOG.header.gfx.sharedChild.parent = marioOG.header.gfx.node
+        this.geo_process_single_node(sharedChild)
+        //marioOG.header.gfx.sharedChild.parent = null
+        this.gCurGraphNodeObject = null
+
+        this.gMatStackIndex--
+        this.gCurAnimType = this.ANIM_TYPE_NONE
+
+    }
+
     geo_process_object(node) {
 
         const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
@@ -355,6 +389,7 @@ class GeoRenderer {
                 if (object.header.gfx.sharedChild) {
                     this.gCurGraphNodeObject = node.wrapper
                     object.header.gfx.sharedChild.parent = object.header.gfx.node
+
                     this.geo_process_single_node(object.header.gfx.sharedChild)
                     object.header.gfx.sharedChild.parent = null
                     this.gCurGraphNodeObject = null
@@ -369,6 +404,27 @@ class GeoRenderer {
             this.gMatStackIndex--
             this.gCurAnimType = this.ANIM_TYPE_NONE
             object.header.gfx.throwMatrix = null
+
+        }
+
+        if (object.OG) {  /// original Mario
+
+            const gfx = object.header.gfx
+            window.socket.emit('marioData', {
+                pos: gfx.pos.map((x) => parseInt(x)),
+                angle: gfx.angle.map((x) => parseInt(x)),
+                animFrame: gfx.unk38.animFrame,
+                animID: gfx.unk38.animID
+            })
+
+            if (window.extraMarios) {
+                Object.entries(window.extraMarios).forEach(([id, marioData]) => {
+                    if (id != window.socket.id) {
+                        this.geo_process_extra_mario(marioData.pos, marioData.angle, marioData.animFrame, marioData.animID, gfx.sharedChild)
+                    }
+                })
+            }
+
 
         }
 

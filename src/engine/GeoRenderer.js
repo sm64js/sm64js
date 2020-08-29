@@ -320,7 +320,9 @@ class GeoRenderer {
 
     }
 
-    geo_process_extra_mario(pos, angle, animFrame, animID, sharedChild) {
+    geo_process_extra_mario(marioData, sharedChild) {
+
+        const { pos, angle, animFrame, animID, skinID } = marioData
 
         const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
 
@@ -330,6 +332,9 @@ class GeoRenderer {
         MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex + 1], [1, 1, 1])
 
         this.gMatStackIndex++
+
+        //// sending my own custom gfx opcode to set skin id
+        this.geo_append_display_list([Gbi.gsDPSetSkinColor(skinID)], 1) 
 
         const animList = gMarioAnimData
         this.gCurrAnimFrame = animFrame
@@ -387,9 +392,13 @@ class GeoRenderer {
 
             if (true) { // TODO: object in view
                 if (object.header.gfx.sharedChild) {
+
+                    if (object.OG) { //// sending my own custom gfx opcode to set skin id
+                        this.geo_append_display_list([Gbi.gsDPSetSkinColor(window.mySkin)], 1) 
+                    }
+
                     this.gCurGraphNodeObject = node.wrapper
                     object.header.gfx.sharedChild.parent = object.header.gfx.node
-
                     this.geo_process_single_node(object.header.gfx.sharedChild)
                     object.header.gfx.sharedChild.parent = null
                     this.gCurGraphNodeObject = null
@@ -414,17 +423,17 @@ class GeoRenderer {
                 pos: gfx.pos.map((x) => parseInt(x)),
                 angle: gfx.angle.map((x) => parseInt(x)),
                 animFrame: gfx.unk38.animFrame,
-                animID: gfx.unk38.animID
+                animID: gfx.unk38.animID,
+                skinID: window.mySkin
             })
 
             if (window.extraMarios) {
                 Object.entries(window.extraMarios).forEach(([id, marioData]) => {
                     if (id != window.socket.id) {
-                        this.geo_process_extra_mario(marioData.pos, marioData.angle, marioData.animFrame, marioData.animID, gfx.sharedChild)
+                        this.geo_process_extra_mario(marioData, gfx.sharedChild)
                     }
                 })
             }
-
 
         }
 
@@ -616,7 +625,7 @@ class GeoRenderer {
     }
 
     geo_process_root(root, b, c, clearColor) {
-        //console.log("processing root node to render")
+        //console.log("processing geo root node")
         if (root.node.flags & GraphNode.GRAPH_RENDER_ACTIVE) {
 
             MathUtil.mtxf_identity(this.gMatStack[this.gMatStackIndex])
@@ -629,6 +638,7 @@ class GeoRenderer {
 
             this.gCurGraphNodeRoot = null
         }
+        //console.log("end geo root node")
     }
 }
 

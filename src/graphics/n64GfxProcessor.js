@@ -924,6 +924,8 @@ export class n64GfxProcessor {
         }
     }
 
+    custom_set_skin_color(skinID) { window.currentMarioSkinID = skinID }
+
     run_dl(commands) {
 
         for (const command of commands) {
@@ -995,11 +997,15 @@ export class n64GfxProcessor {
                 case Gbi.G_FILLRECT:
                     this.dp_fill_rectangle(args.ulx, args.uly, args.lrx, args.lry)
                     break
+                case Gbi.G_SETSKINCOLOR:
+                    this.custom_set_skin_color(args.skinID)
+                    break
                 case Gbi.G_DL:
+                    const displayList = args.childDisplayList.call ? args.childDisplayList() : args.childDisplayList
                     if (args.branch == 0) {
-                        this.run_dl(args.childDisplayList)
+                        this.run_dl(displayList)
                     } else {
-                        this.run_dl(args.childDisplayList)
+                        this.run_dl(displayList)
                         return
                     }
                     break

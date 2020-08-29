@@ -7,6 +7,7 @@ import io from 'socket.io-client'
 
 window.socket = io('localhost:80')
 window.socket.on('allMarios', (marioData) => { window.extraMarios = marioData })
+window.mySkin = 0
 
 const send_display_list = (gfx_list) => {
     start_render = performance.now()

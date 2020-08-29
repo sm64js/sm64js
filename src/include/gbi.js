@@ -30,6 +30,9 @@ export const G_SETZIMG = 27
 export const G_SETCIMG = 28
 export const G_RDPLOADSYNC = 29
 
+/// Custom Opcodes
+export const G_SETSKINCOLOR = 30
+
 export const G_ZBUFFER = 1
 export const G_SHADE = 2
 export const G_TEXTURE_ENABLE = 4
@@ -438,6 +441,15 @@ export const gDPSetFillColor = (displaylist, color) => {
     })
 }
 
+export const gDPSetSkinColor = (displaylist, skinID) => {
+    displaylist.push({
+        words: {
+            w0: G_SETSKINCOLOR,
+            w1: { skinID }
+        }
+    })
+}
+
 export const gDPFillRectangle = (displaylist, ulx, uly, lrx, lry) => {
     displaylist.push({
         words: {
@@ -555,7 +567,6 @@ export const gDPSetPrimColor = (displaylist, m, l, r, g, b, a) => {
         }
     })
 }
-
 
 export const gSPSetGeometryMode = (displaylist, mode) => {
     displaylist.push({
@@ -744,6 +755,15 @@ export const gsDPSetPrimColor = (m, l, r, g, b, a) => {
         words: {
             w0: G_SETPRIMCOLOR,
             w1: { m, l, r, g, b, a }
+        }
+    }
+}
+
+export const gsDPSetSkinColor = (skinID) => {
+    return {
+        words: {
+            w0: G_SETSKINCOLOR,
+            w1: { skinID }
         }
     }
 }

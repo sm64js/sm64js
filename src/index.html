@@ -41,112 +41,132 @@
                 <h6> <b>Gamepad is supported and recommended!</b> </h6>
             </div>
             <div class="row" style="justify-content:center">
-                <button type="button"
-                        class="btn btn-sm btn-primary"
-                        data-html="true"
-                        data-container="body"
-                        data-toggle="keyboardControlsToggle"
-                        data-placement="bottom">
-                    Customize Keyboard Controls
-                </button>
-                <button type="button"
-                        style="margin-left:50px"
-                        class="btn btn-sm btn-primary"
-                        data-html="true"
-                        data-container="body"
-                        data-toggle="gamepadControlsToggle"
-                        data-placement="bottom">
-                    Customize Gamepad Controls
-                </button>
-            </div>
-
-            <br />
-            <canvas id="gameCanvas" width="640" height="480"></canvas>
-            <br />
-            <br />
-
-            <h6 id="numTriangles"> Total triangles rendered this frame: </h6>
-            <div class="row">
-                <div class="col-5" style="text-align:left">
-                    <h6>Total Frame Time (Avg): </h6>
-                    <h6>Game Logic (Avg): </h6>
-                    <h6>Rendering/WebGL (Avg):</h6>
+                <div class="col-4" style="justify-content:center">
+                    <button type="button"
+                            class="btn btn-sm btn-primary"
+                            data-html="true"
+                            data-container="body"
+                            data-toggle="keyboardControlsToggle"
+                            data-placement="bottom">
+                        Customize Keyboard Controls
+                    </button>
                 </div>
-                <div class="col-1">
-                    <h6 id="timing-total"></h6>
-                    <h6 id="timing-game"></h6>
-                    <h6 id="timing-render"></h6>
+                <div class="col-sm-2 col-form-label" style="justify-content:center">
+                    <label>Select Skin :</label>
                 </div>
-                <div class="col-6" style="text-align:right">
-                    <h6 id="maxFps"></h6>
+                <div class="col-sm-2" style="justify-content:center">
+                    <select class="form-control" onchange="window.mySkin = this.value">
+                        <option>0</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                    </select>
                 </div>
-            </div>
-            <div class="row" style="justify-content:center;">
-                <h6 style="padding-right:10px"> Adjust Game Speed: </h6>
-                <input id="slider" type="range" style="width:300px" min="1" max="60" value="30">
-                <h6 id="fps" style="padding-left:10px"> 30 fps </h6>
-            </div>
+                    <div class="col-4" style="justify-content:center">
+                        <button type="button"
+                                class="btn btn-sm btn-primary"
+                                data-html="true"
+                                data-container="body"
+                                data-toggle="gamepadControlsToggle"
+                                data-placement="bottom">
+                            Customize Gamepad Controls
+                        </button>
+                    </div>
+                </div>
 
-            <br />
-            <br />
-
-            <a name="What"></a>
-            <h4>What is this?</h4>
-            <p>
-                This is the start of my project of porting a <a href="https://github.com/n64decomp/sm64">decompilation</a> of original Nintendo game, Super Mario 64, to native Javascript (No Emulation) (No Web Assembly).
-                This project also required creating a Javascript WebGL port of <a href="https://github.com/Emill/n64-fast3d-engine">N64 Fast 3D Renderer</a> originally implemented with OpenGL in C.
-                So far I have ported most of the Goddard intro screen and most of the Castle Grounds intro level. As I make more progress, I will update this website.
-            </p>
-            <br />
-
-            <a name="Purpose"></a>
-            <h4>What is the purpose of this port?</h4>
-            <ul style="display:inline-block;vertical-align:middle;text-align:left">
-                <li>
-                    <b>Extensibility:</b> More access to more developers to add custom content
-                    <ul style="padding-left:40px">
-                        <li>Rapid Prototyping</li>
-                        <li>More friendly to importing other software modules/packages</li>
-                        <li>More friendly to prototyping multiplayer custom games/mods</li>
-                    </ul>
-                </li>
-                <li><b>Portablity:</b> Sm64 projects can run on any device with a web browser anywhere without needing to download or install anything</li>
-                <li>Opportunity to refactor / rewrite with modern coding style and cleanup</li>
-            </ul>
-            <br />
-            <br />
-
-            <a name="WASM"></a>
-            <h4>What's wrong with Web Assembly / Emscripten</h4>
-            <p>Nothing. However, I believe access to this game's source code in a higher level programming language opens it up to a wider pool of potentially capable developers / modders. And seems to me like a natural next step following in the amazing work done by the decomp team and pc port.</p>
-            <br />
-
-            <a name="Credits"></a>
-            <h4>Credits:</h4>
-            <h6>Super Mario 64 Decomp - <a href="https://github.com/n64decomp/sm64">Github</a></h6>
-            <p>Team that decompiled the original Super Mario 64 ROMs into C source code</p>
-            <h6>Super Mario 64 PC Port - <a href="https://github.com/sm64-port/sm64-port">Github</a></h6>
-            <p>Team that ported the decompiled project to PC</p>
-            <h6>N64 Fast 3D Renderer - <a href="https://github.com/Emill/n64-fast3d-engine">Github</a></h6>
-            <p>
-                OpenGL Implementation of a 3D renderer for the Nintendo 64's graphics
                 <br />
-                (I had to reimplement this in Javascript and WebGL)
-            </p>
-            <br />
-
-            <a name="Contact"></a>
-            <h4>Contact</h4>
-            <p>
-                Questions? Suggestions? Want to help with this project? =)
+                <canvas id="gameCanvas" width="640" height="480"></canvas>
                 <br />
-                Discord: snuffysasa#2779
                 <br />
-                I am on the SM64 Port Discord Server: <a href="https://discord.gg/3Y6U3M"> https://discord.gg/3Y6U3M </a>
-            </p>
-            <br />
 
-        </main>
+                <h6 id="numTriangles"> Total triangles rendered this frame: </h6>
+                <div class="row">
+                    <div class="col-5" style="text-align:left">
+                        <h6>Total Frame Time (Avg): </h6>
+                        <h6>Game Logic (Avg): </h6>
+                        <h6>Rendering/WebGL (Avg):</h6>
+                    </div>
+                    <div class="col-1">
+                        <h6 id="timing-total"></h6>
+                        <h6 id="timing-game"></h6>
+                        <h6 id="timing-render"></h6>
+                    </div>
+                    <div class="col-6" style="text-align:right">
+                        <h6 id="maxFps"></h6>
+                    </div>
+                </div>
+                <div class="row" style="justify-content:center;">
+                    <h6 style="padding-right:10px"> Adjust Game Speed: </h6>
+                    <input id="slider" type="range" style="width:300px" min="1" max="60" value="30">
+                    <h6 id="fps" style="padding-left:10px"> 30 fps </h6>
+                </div>
+
+                <br />
+                <br />
+
+                <a name="What"></a>
+                <h4>What is this?</h4>
+                <p>
+                    This is the start of my project of porting a <a href="https://github.com/n64decomp/sm64">decompilation</a> of original Nintendo game, Super Mario 64, to native Javascript (No Emulation) (No Web Assembly).
+                    This project also required creating a Javascript WebGL port of <a href="https://github.com/Emill/n64-fast3d-engine">N64 Fast 3D Renderer</a> originally implemented with OpenGL in C.
+                    So far I have ported most of the Goddard intro screen and most of the Castle Grounds intro level. As I make more progress, I will update this website.
+                </p>
+                <br />
+
+                <a name="Purpose"></a>
+                <h4>What is the purpose of this port?</h4>
+                <ul style="display:inline-block;vertical-align:middle;text-align:left">
+                    <li>
+                        <b>Extensibility:</b> More access to more developers to add custom content
+                        <ul style="padding-left:40px">
+                            <li>Rapid Prototyping</li>
+                            <li>More friendly to importing other software modules/packages</li>
+                            <li>More friendly to prototyping multiplayer custom games/mods</li>
+                        </ul>
+                    </li>
+                    <li><b>Portablity:</b> Sm64 projects can run on any device with a web browser anywhere without needing to download or install anything</li>
+                    <li>Opportunity to refactor / rewrite with modern coding style and cleanup</li>
+                </ul>
+                <br />
+                <br />
+
+                <a name="WASM"></a>
+                <h4>What's wrong with Web Assembly / Emscripten</h4>
+                <p>Nothing. However, I believe access to this game's source code in a higher level programming language opens it up to a wider pool of potentially capable developers / modders. And seems to me like a natural next step following in the amazing work done by the decomp team and pc port.</p>
+                <br />
+
+                <a name="Credits"></a>
+                <h4>Credits:</h4>
+                <h6>Super Mario 64 Decomp - <a href="https://github.com/n64decomp/sm64">Github</a></h6>
+                <p>Team that decompiled the original Super Mario 64 ROMs into C source code</p>
+                <h6>Super Mario 64 PC Port - <a href="https://github.com/sm64-port/sm64-port">Github</a></h6>
+                <p>Team that ported the decompiled project to PC</p>
+                <h6>N64 Fast 3D Renderer - <a href="https://github.com/Emill/n64-fast3d-engine">Github</a></h6>
+                <p>
+                    OpenGL Implementation of a 3D renderer for the Nintendo 64's graphics
+                    <br />
+                    (I had to reimplement this in Javascript and WebGL)
+                </p>
+                <br />
+
+                <a name="Contact"></a>
+                <h4>Contact</h4>
+                <p>
+                    Questions? Suggestions? Want to help with this project? =)
+                    <br />
+                    Discord: snuffysasa#2779
+                    <br />
+                    I am on the SM64 Port Discord Server: <a href="https://discord.gg/3Y6U3M"> https://discord.gg/3Y6U3M </a>
+                </p>
+                <br />
+
+</main>
 
     </div>
 

@@ -913,6 +913,17 @@ export class n64GfxProcessor {
             if (z < -w) d.clip_rej |= 16
             if (z > w) d.clip_rej |= 32
 
+            if (v.special) {
+                //console.log("mario shadow", x, y, z, w)
+                let myX = x / w
+                let myY = y / w
+                const pixelX = (myX * 0.5 + 0.5) * WebGL.canvas.width
+                const pixelY = (myY * -0.5 + 0.5) * WebGL.canvas.height
+                console.log(pixelX, pixelY)
+                window.pixelX = pixelX
+                window.pixelY = pixelY
+            }
+
             Object.assign(d, { x, y, z, w })
 
             if (this.rsp.geometry_mode & Gbi.G_FOG) {
@@ -1029,9 +1040,26 @@ export class n64GfxProcessor {
         window.totalTriangles = 0
         this.sp_reset()
 
+        console.log("start render frame")
+
         WebGL.start_frame()
         this.run_dl(commands)
         this.flush()
+
+        const canvas = document.querySelector('#textCanvas')
+        var context = canvas.getContext('2d')
+        var centerX = canvas.width / 2
+        var centerY = canvas.height / 2
+        var radius = 10
+
+        context.clearRect(0, 0, canvas.width, canvas.height)
+        context.beginPath()
+        context.arc(window.pixelX, window.pixelY, radius, 0, 2 * Math.PI, false)
+        context.fillStyle = 'red'
+        context.fill()
+        context.lineWidth = 0
+        context.strokeStyle = '#003300'
+        context.stroke()
 
     }
 }

@@ -250,6 +250,7 @@ const create_shadow_player = (xPos, yPos, zPos, shadowScale, solidity, isLuigi) 
     for (let i = 0; i < 9; i++) {
         make_shadow_vertex(verts, i, shadow, SHADOW_WITH_9_VERTS)
     }
+    verts[0].special = true
     add_shadow_to_display_list(displayList, verts, SHADOW_WITH_9_VERTS, SHADOW_SHAPE_CIRCLE)
     return displayList
 }

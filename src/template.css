@@ -10,6 +10,18 @@ a:hover {
     color: #f6fb7b;
 }
 
+.canvasContainer {
+    position: relative;
+    overflow: hidden;
+}
+
+#textCanvas {
+    background-color: transparent; /* needed because webgl-tutoraisl.css sets canvas bg color to white */
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 10;
+}
 
 /*
  * Base structure

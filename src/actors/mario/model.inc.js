@@ -14,8 +14,6 @@ export const mario_texture_hair_sideburn = []
 
 export const mario_texture_mustache = []
 
-window.currentMarioSkinID = 0
-
 // 0x04000000 # solid color blue - butt, left thigh, right thigh - all poly types
 const mario_overalls_lights_group = [
 	Gbi.gdSPDefLights1(
@@ -362,11 +360,11 @@ export const mario_butt_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_butt = () => {
+export const mario_butt = (skinID) => {
 	return [
 		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].a, 2),
+		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
 		Gbi.gsSPDisplayList(mario_butt_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -464,10 +462,10 @@ export const mario_left_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_left_arm = () => {
+export const mario_left_arm = (skinID) => {
 	return [
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].l[0], 1),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].a, 2),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
 		Gbi.gsSPDisplayList(mario_left_arm_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -714,10 +712,10 @@ export const mario_right_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_right_arm = () => {
+export const mario_right_arm = (skinID) => {
 	return [
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].l[0], 1),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].a, 2),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
 		Gbi.gsSPDisplayList(mario_right_arm_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -922,11 +920,11 @@ export const mario_left_thigh_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_left_thigh = () => {
+export const mario_left_thigh = (skinID) => {
 	return [
 		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].a, 2),
+		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
 		Gbi.gsSPDisplayList(mario_left_thigh_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -1095,10 +1093,10 @@ export const mario_right_thigh_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_right_thigh = () => {
+export const mario_right_thigh = (skinID) => {
 	return [
-		Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].a, 2),
+		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
 		Gbi.gsSPDisplayList(mario_right_thigh_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -1491,11 +1489,11 @@ export const mario_tshirt_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_torso_dl = () => {
+export const mario_torso_dl = (skinID) => {
 	return [
 		Gbi.gsSPDisplayList(mario_pants_overalls_shared_dl),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].l[0], 1),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].a, 2),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
 		Gbi.gsSPDisplayList(mario_tshirt_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -1947,11 +1945,11 @@ export const mario_face_back_hair_cap_on_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_face_cap_on_dl = () => {
+export const mario_face_cap_on_dl = (skinID) => {
 	return [
 		Gbi.gsSPDisplayList(mario_face_part_cap_on_dl),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].l[0], 1),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].a, 2),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
 		Gbi.gsSPDisplayList(mario_face_cap_dl),
 		Gbi.gsSPLight(mario_brown2_lights_group.l[0], 1),
 		Gbi.gsSPLight(mario_brown2_lights_group.a, 2),
@@ -2615,1631 +2613,1631 @@ export const mario_metal_cap_off_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-const mario_medium_poly_butt_dl_vertex_group1 = [
-	{ pos: [0, 78, 37], flag: 0, tc: [0, 0], color: [199, 111, 20, 0] },
-	{ pos: [44, 80, 46], flag: 0, tc: [0, 0], color: [54, 104, 46, 0] },
-	{ pos: [43, 80, -45], flag: 0, tc: [0, 0], color: [44, 112, 219, 0] },
-	{ pos: [-6, -84, 50], flag: 0, tc: [0, 0], color: [213, 144, 38, 0] },
-	{ pos: [41, -86, -45], flag: 0, tc: [0, 0], color: [53, 144, 231, 0] },
-	{ pos: [41, -86, 45], flag: 0, tc: [0, 0], color: [68, 155, 31, 0] },
-	{ pos: [-33, -45, -31], flag: 0, tc: [0, 0], color: [135, 233, 227, 0] },
-	{ pos: [-33, -45, 31], flag: 0, tc: [0, 0], color: [134, 229, 21, 0] },
-	{ pos: [-32, 43, -22], flag: 0, tc: [0, 0], color: [139, 45, 240, 0] },
-	{ pos: [-2, 41, 95], flag: 0, tc: [0, 0], color: [186, 59, 87, 0] },
-	{ pos: [-5, -45, 97], flag: 0, tc: [0, 0], color: [199, 222, 107, 0] },
-	{ pos: [44, 36, 95], flag: 0, tc: [0, 0], color: [61, 34, 105, 0] },
-	{ pos: [-5, -45, -97], flag: 0, tc: [0, 0], color: [199, 221, 149, 0] },
-	{ pos: [-2, 41, -95], flag: 0, tc: [0, 0], color: [186, 59, 170, 0] },
-	{ pos: [44, 35, -96], flag: 0, tc: [0, 0], color: [60, 34, 150, 0] },
-	{ pos: [-6, -84, -50], flag: 0, tc: [0, 0], color: [193, 154, 217, 0] },
-]
-
-const mario_medium_poly_butt_dl_vertex_group2 = [
-	{ pos: [-2, 41, 95], flag: 0, tc: [0, 0], color: [186, 59, 87, 0] },
-	{ pos: [0, 78, 37], flag: 0, tc: [0, 0], color: [199, 111, 20, 0] },
-	{ pos: [-32, 43, 22], flag: 0, tc: [0, 0], color: [140, 44, 24, 0] },
-	{ pos: [0, 78, -37], flag: 0, tc: [0, 0], color: [197, 108, 226, 0] },
-	{ pos: [-2, 41, -95], flag: 0, tc: [0, 0], color: [186, 59, 170, 0] },
-	{ pos: [-32, 43, -22], flag: 0, tc: [0, 0], color: [139, 45, 240, 0] },
-	{ pos: [-33, -45, 31], flag: 0, tc: [0, 0], color: [134, 229, 21, 0] },
-	{ pos: [-33, -45, -31], flag: 0, tc: [0, 0], color: [135, 233, 227, 0] },
-	{ pos: [-6, -84, -50], flag: 0, tc: [0, 0], color: [193, 154, 217, 0] },
-	{ pos: [43, -48, -97], flag: 0, tc: [0, 0], color: [59, 193, 164, 0] },
-	{ pos: [41, -86, -45], flag: 0, tc: [0, 0], color: [53, 144, 231, 0] },
-	{ pos: [-6, -84, 50], flag: 0, tc: [0, 0], color: [213, 144, 38, 0] },
-	{ pos: [41, -86, 45], flag: 0, tc: [0, 0], color: [68, 155, 31, 0] },
-	{ pos: [43, -48, 97], flag: 0, tc: [0, 0], color: [59, 194, 92, 0] },
-	{ pos: [44, 36, 95], flag: 0, tc: [0, 0], color: [61, 34, 105, 0] },
-	{ pos: [44, 80, 46], flag: 0, tc: [0, 0], color: [54, 104, 46, 0] },
-]
-
-const mario_medium_poly_butt_dl_vertex_group3 = [
-	{ pos: [-2, 41, -95], flag: 0, tc: [0, 0], color: [186, 59, 170, 0] },
-	{ pos: [43, 80, -45], flag: 0, tc: [0, 0], color: [44, 112, 219, 0] },
-	{ pos: [44, 35, -96], flag: 0, tc: [0, 0], color: [60, 34, 150, 0] },
-	{ pos: [0, 78, -37], flag: 0, tc: [0, 0], color: [197, 108, 226, 0] },
-	{ pos: [44, 80, 46], flag: 0, tc: [0, 0], color: [54, 104, 46, 0] },
-	{ pos: [0, 78, 37], flag: 0, tc: [0, 0], color: [199, 111, 20, 0] },
-	{ pos: [-2, 41, 95], flag: 0, tc: [0, 0], color: [186, 59, 87, 0] },
-	{ pos: [-32, 43, -22], flag: 0, tc: [0, 0], color: [139, 45, 240, 0] },
-	{ pos: [43, -48, 97], flag: 0, tc: [0, 0], color: [59, 194, 92, 0] },
-	{ pos: [-5, -45, 97], flag: 0, tc: [0, 0], color: [199, 222, 107, 0] },
-	{ pos: [-6, -84, 50], flag: 0, tc: [0, 0], color: [213, 144, 38, 0] },
-	{ pos: [-6, -84, -50], flag: 0, tc: [0, 0], color: [193, 154, 217, 0] },
-	{ pos: [-5, -45, -97], flag: 0, tc: [0, 0], color: [199, 221, 149, 0] },
-	{ pos: [43, -48, -97], flag: 0, tc: [0, 0], color: [59, 193, 164, 0] },
-	{ pos: [-33, -45, 31], flag: 0, tc: [0, 0], color: [134, 229, 21, 0] },
-	{ pos: [-33, -45, -31], flag: 0, tc: [0, 0], color: [135, 233, 227, 0] },
-]
-
-const mario_medium_poly_butt_dl_vertex_group4 = [
-	{ pos: [-5, -45, 97], flag: 0, tc: [0, 0], color: [199, 222, 107, 0] },
-	{ pos: [43, -48, 97], flag: 0, tc: [0, 0], color: [59, 194, 92, 0] },
-	{ pos: [44, 36, 95], flag: 0, tc: [0, 0], color: [61, 34, 105, 0] },
-	{ pos: [-33, -45, 31], flag: 0, tc: [0, 0], color: [134, 229, 21, 0] },
-	{ pos: [-32, 43, 22], flag: 0, tc: [0, 0], color: [140, 44, 24, 0] },
-	{ pos: [-32, 43, -22], flag: 0, tc: [0, 0], color: [139, 45, 240, 0] },
-	{ pos: [-6, -84, 50], flag: 0, tc: [0, 0], color: [213, 144, 38, 0] },
-	{ pos: [-6, -84, -50], flag: 0, tc: [0, 0], color: [193, 154, 217, 0] },
-	{ pos: [41, -86, -45], flag: 0, tc: [0, 0], color: [53, 144, 231, 0] },
-	{ pos: [43, 80, -45], flag: 0, tc: [0, 0], color: [44, 112, 219, 0] },
-	{ pos: [0, 78, -37], flag: 0, tc: [0, 0], color: [197, 108, 226, 0] },
-	{ pos: [0, 78, 37], flag: 0, tc: [0, 0], color: [199, 111, 20, 0] },
-	{ pos: [85, -5, 0], flag: 0, tc: [0, 0], color: [127, 254, 0, 0] },
-	{ pos: [44, 35, -96], flag: 0, tc: [0, 0], color: [60, 34, 150, 0] },
-	{ pos: [43, -48, -97], flag: 0, tc: [0, 0], color: [59, 193, 164, 0] },
-	{ pos: [41, -86, 45], flag: 0, tc: [0, 0], color: [68, 155, 31, 0] },
-]
-
-const mario_medium_poly_butt_dl_vertex_group5 = [
-	{ pos: [44, 36, 95], flag: 0, tc: [0, 0], color: [61, 34, 105, 0] },
-	{ pos: [85, -5, 0], flag: 0, tc: [0, 0], color: [127, 254, 0, 0] },
-	{ pos: [44, 80, 46], flag: 0, tc: [0, 0], color: [54, 104, 46, 0] },
-	{ pos: [43, 80, -45], flag: 0, tc: [0, 0], color: [44, 112, 219, 0] },
-]
-
-export const mario_medium_poly_butt_dl = [
-	Gbi.gsSPVertex(mario_medium_poly_butt_dl_vertex_group1, 16, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
-	...Gbi.gsSP2Triangles(6, 7, 8, 0x0, 9, 10, 11, 0x0),
-	...Gbi.gsSP2Triangles(12, 13, 14, 0x0, 12, 15, 6, 0x0),
-	Gbi.gsSP1Triangle(3, 10, 7, 0x0),
-	Gbi.gsSPVertex(mario_medium_poly_butt_dl_vertex_group2, 16, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
-	...Gbi.gsSP2Triangles(0, 2, 6, 0x0, 7, 5, 4, 0x0),
-	...Gbi.gsSP2Triangles(7, 8, 6, 0x0, 9, 10, 8, 0x0),
-	...Gbi.gsSP2Triangles(11, 12, 13, 0x0, 2, 1, 5, 0x0),
-	Gbi.gsSP1Triangle(14, 15, 0, 0x0),
-	Gbi.gsSPVertex(mario_medium_poly_butt_dl_vertex_group3, 16, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 3, 1, 0x0),
-	...Gbi.gsSP2Triangles(4, 5, 6, 0x0, 5, 3, 7, 0x0),
-	...Gbi.gsSP2Triangles(8, 9, 10, 0x0, 11, 12, 13, 0x0),
-	...Gbi.gsSP2Triangles(11, 10, 14, 0x0, 0, 12, 15, 0x0),
-	...Gbi.gsSP2Triangles(14, 9, 6, 0x0, 2, 13, 12, 0x0),
-	Gbi.gsSPVertex(mario_medium_poly_butt_dl_vertex_group4, 16, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
-	...Gbi.gsSP2Triangles(6, 7, 8, 0x0, 9, 10, 11, 0x0),
-	...Gbi.gsSP2Triangles(9, 12, 13, 0x0, 13, 12, 14, 0x0),
-	...Gbi.gsSP2Triangles(14, 12, 8, 0x0, 8, 12, 15, 0x0),
-	...Gbi.gsSP2Triangles(15, 12, 1, 0x0, 1, 12, 2, 0x0),
-	Gbi.gsSPVertex(mario_medium_poly_butt_dl_vertex_group5, 4, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 2, 1, 3, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_medium_poly_butt = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-	Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].l[0], 1),
-	Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_butt_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-
-const mario_medium_poly_left_arm_shared_dl_vertex = [
-	{ pos: [-6, -32, -22], flag: 0, tc: [0, 0], color: [8, 132, 24, 0] },
-	{ pos: [60, -27, -18], flag: 0, tc: [0, 0], color: [61, 197, 163, 0] },
-	{ pos: [60, -18, 26], flag: 0, tc: [0, 0], color: [92, 190, 54, 0] },
-	{ pos: [-6, -32, -22], flag: 0, tc: [0, 0], color: [7, 245, 130, 0] },
-	{ pos: [-7, 21, -27], flag: 0, tc: [0, 0], color: [7, 245, 130, 0] },
-	{ pos: [59, 16, -22], flag: 0, tc: [0, 0], color: [91, 79, 218, 0] },
-	{ pos: [-7, 20, 18], flag: 0, tc: [0, 0], color: [12, 115, 50, 0] },
-	{ pos: [59, 14, 14], flag: 0, tc: [0, 0], color: [56, 75, 85, 0] },
-	{ pos: [-6, -21, 33], flag: 0, tc: [0, 0], color: [11, 42, 119, 0] },
-	{ pos: [-7, 21, -27], flag: 0, tc: [0, 0], color: [10, 126, 4, 0] },
-	{ pos: [-6, -21, 33], flag: 0, tc: [0, 0], color: [8, 132, 24, 0] },
-	{ pos: [-7, 21, -27], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
-	{ pos: [-6, -32, -22], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
-	{ pos: [-6, -21, 33], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
-	{ pos: [-7, 20, 18], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
-]
-
-export const mario_medium_poly_left_arm_shared_dl = [
-	Gbi.gsSPVertex(mario_medium_poly_left_arm_shared_dl_vertex, 15, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 1, 0x0),
-	...Gbi.gsSP2Triangles(4, 5, 1, 0x0, 6, 7, 5, 0x0),
-	...Gbi.gsSP2Triangles(8, 2, 7, 0x0, 6, 8, 7, 0x0),
-	...Gbi.gsSP2Triangles(9, 6, 5, 0x0, 10, 0, 2, 0x0),
-	...Gbi.gsSP2Triangles(5, 2, 1, 0x0, 11, 12, 13, 0x0),
-	...Gbi.gsSP2Triangles(13, 14, 11, 0x0, 5, 7, 2, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_medium_poly_left_arm = [
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].l[0], 1),
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_left_arm_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_medium_poly_left_forearm_shared_dl_vertex = [
-	{ pos: [-9, -29, -18], flag: 0, tc: [0, 0], color: [5, 132, 25, 0] },
-	{ pos: [53, -26, -17], flag: 0, tc: [0, 0], color: [89, 208, 181, 0] },
-	{ pos: [53, -17, 24], flag: 0, tc: [0, 0], color: [61, 171, 71, 0] },
-	{ pos: [-9, -29, -18], flag: 0, tc: [0, 0], color: [4, 243, 130, 0] },
-	{ pos: [-9, 16, -24], flag: 0, tc: [0, 0], color: [4, 244, 130, 0] },
-	{ pos: [53, 13, -21], flag: 0, tc: [0, 0], color: [59, 100, 206, 0] },
-	{ pos: [-9, 15, 15], flag: 0, tc: [0, 0], color: [7, 117, 48, 0] },
-	{ pos: [53, 13, 12], flag: 0, tc: [0, 0], color: [82, 65, 71, 0] },
-	{ pos: [-9, -19, 28], flag: 0, tc: [0, 0], color: [7, 44, 118, 0] },
-	{ pos: [-9, 16, -24], flag: 0, tc: [0, 0], color: [6, 126, 2, 0] },
-	{ pos: [-9, -19, 28], flag: 0, tc: [0, 0], color: [5, 132, 26, 0] },
-	{ pos: [-9, 16, -24], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
-	{ pos: [-9, -29, -18], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
-	{ pos: [-9, -19, 28], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
-	{ pos: [-9, 15, 15], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
-]
-
-export const mario_medium_poly_left_forearm_shared_dl = [
-	Gbi.gsSPVertex(mario_medium_poly_left_forearm_shared_dl_vertex, 15, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 1, 0x0),
-	...Gbi.gsSP2Triangles(4, 5, 1, 0x0, 6, 7, 5, 0x0),
-	...Gbi.gsSP2Triangles(8, 2, 7, 0x0, 6, 8, 7, 0x0),
-	...Gbi.gsSP2Triangles(9, 6, 5, 0x0, 10, 0, 2, 0x0),
-	...Gbi.gsSP2Triangles(1, 7, 2, 0x0, 1, 5, 7, 0x0),
-	...Gbi.gsSP2Triangles(11, 12, 13, 0x0, 13, 14, 11, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_medium_poly_left_hand_closed_shared_dl_vertex_group1 = [
-	{ pos: [31, 10, 40], flag: 0, tc: [0, 0], color: [216, 237, 118, 0] },
-	{ pos: [12, 1, 26], flag: 0, tc: [0, 0], color: [241, 247, 125, 0] },
-	{ pos: [27, -32, -3], flag: 0, tc: [0, 0], color: [6, 130, 11, 0] },
-	{ pos: [11, 2, -28], flag: 0, tc: [0, 0], color: [202, 246, 142, 0] },
-	{ pos: [44, -22, -46], flag: 0, tc: [0, 0], color: [222, 185, 157, 0] },
-	{ pos: [18, 37, -31], flag: 0, tc: [0, 0], color: [199, 40, 151, 0] },
-	{ pos: [-2, 36, -2], flag: 0, tc: [0, 0], color: [176, 97, 3, 0] },
-	{ pos: [-5, -5, 34], flag: 0, tc: [0, 0], color: [47, 19, 116, 0] },
-	{ pos: [-6, -5, -32], flag: 0, tc: [0, 0], color: [28, 14, 134, 0] },
-	{ pos: [81, 32, 40], flag: 0, tc: [0, 0], color: [72, 31, 99, 0] },
-	{ pos: [55, 84, 9], flag: 0, tc: [0, 0], color: [20, 116, 44, 0] },
-	{ pos: [102, -23, 6], flag: 0, tc: [0, 0], color: [100, 196, 49, 0] },
-	{ pos: [95, 43, -12], flag: 0, tc: [0, 0], color: [110, 54, 224, 0] },
-	{ pos: [54, 58, -32], flag: 0, tc: [0, 0], color: [2, 78, 157, 0] },
-	{ pos: [84, -10, -41], flag: 0, tc: [0, 0], color: [57, 226, 147, 0] },
-	{ pos: [53, -42, 9], flag: 0, tc: [0, 0], color: [4, 131, 15, 0] },
-]
-
-const mario_medium_poly_left_hand_closed_shared_dl_vertex_group2 = [
-	{ pos: [31, 10, 40], flag: 0, tc: [0, 0], color: [216, 237, 118, 0] },
-	{ pos: [55, 84, 9], flag: 0, tc: [0, 0], color: [20, 116, 44, 0] },
-	{ pos: [7, 62, 10], flag: 0, tc: [0, 0], color: [167, 90, 0, 0] },
-	{ pos: [27, -32, -3], flag: 0, tc: [0, 0], color: [6, 130, 11, 0] },
-	{ pos: [14, -51, -2], flag: 0, tc: [0, 0], color: [55, 213, 151, 0] },
-	{ pos: [-6, -5, -32], flag: 0, tc: [0, 0], color: [28, 14, 134, 0] },
-	{ pos: [-26, 40, -1], flag: 0, tc: [0, 0], color: [5, 72, 152, 0] },
-	{ pos: [-2, 36, -2], flag: 0, tc: [0, 0], color: [176, 97, 3, 0] },
-	{ pos: [-26, 40, -1], flag: 0, tc: [0, 0], color: [17, 80, 96, 0] },
-	{ pos: [-5, -5, 34], flag: 0, tc: [0, 0], color: [47, 19, 116, 0] },
-	{ pos: [14, -51, -2], flag: 0, tc: [0, 0], color: [73, 213, 94, 0] },
-	{ pos: [18, 37, -31], flag: 0, tc: [0, 0], color: [199, 40, 151, 0] },
-	{ pos: [44, -22, -46], flag: 0, tc: [0, 0], color: [222, 185, 157, 0] },
-	{ pos: [53, -42, 9], flag: 0, tc: [0, 0], color: [4, 131, 15, 0] },
-	{ pos: [54, 58, -32], flag: 0, tc: [0, 0], color: [2, 78, 157, 0] },
-]
-
-const mario_medium_poly_left_hand_closed_shared_dl_vertex_group3 = [
-	{ pos: [54, 58, -32], flag: 0, tc: [0, 0], color: [2, 78, 157, 0] },
-	{ pos: [95, 43, -12], flag: 0, tc: [0, 0], color: [110, 54, 224, 0] },
-	{ pos: [84, -10, -41], flag: 0, tc: [0, 0], color: [57, 226, 147, 0] },
-	{ pos: [7, 62, 10], flag: 0, tc: [0, 0], color: [167, 90, 0, 0] },
-	{ pos: [55, 84, 9], flag: 0, tc: [0, 0], color: [20, 116, 44, 0] },
-	{ pos: [53, -42, 9], flag: 0, tc: [0, 0], color: [4, 131, 15, 0] },
-	{ pos: [102, -23, 6], flag: 0, tc: [0, 0], color: [100, 196, 49, 0] },
-	{ pos: [18, 37, -31], flag: 0, tc: [0, 0], color: [199, 40, 151, 0] },
-	{ pos: [44, -22, -46], flag: 0, tc: [0, 0], color: [222, 185, 157, 0] },
-	{ pos: [11, 2, -28], flag: 0, tc: [0, 0], color: [202, 246, 142, 0] },
-	{ pos: [-5, -5, 34], flag: 0, tc: [0, 0], color: [140, 206, 1, 0] },
-	{ pos: [-6, -5, -32], flag: 0, tc: [0, 0], color: [140, 206, 1, 0] },
-	{ pos: [14, -51, -2], flag: 0, tc: [0, 0], color: [140, 206, 1, 0] },
-	{ pos: [-26, 40, -1], flag: 0, tc: [0, 0], color: [140, 206, 1, 0] },
-]
-
-export const mario_medium_poly_left_hand_closed_shared_dl = [
-	Gbi.gsSPVertex(mario_medium_poly_left_hand_closed_shared_dl_vertex_group1, 16, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 2, 3, 4, 0x0),
-	...Gbi.gsSP2Triangles(5, 3, 6, 0x0, 6, 1, 0, 0x0),
-	...Gbi.gsSP2Triangles(2, 1, 7, 0x0, 7, 1, 6, 0x0),
-	...Gbi.gsSP2Triangles(6, 3, 8, 0x0, 3, 2, 8, 0x0),
-	...Gbi.gsSP2Triangles(0, 9, 10, 0x0, 11, 9, 0, 0x0),
-	...Gbi.gsSP2Triangles(10, 12, 13, 0x0, 14, 12, 11, 0x0),
-	...Gbi.gsSP2Triangles(11, 12, 9, 0x0, 9, 12, 10, 0x0),
-	Gbi.gsSP1Triangle(15, 11, 0, 0x0),
-	Gbi.gsSPVertex(mario_medium_poly_left_hand_closed_shared_dl_vertex_group2, 15, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
-	...Gbi.gsSP2Triangles(5, 6, 7, 0x0, 7, 8, 9, 0x0),
-	...Gbi.gsSP2Triangles(9, 10, 3, 0x0, 7, 0, 2, 0x0),
-	...Gbi.gsSP2Triangles(7, 2, 11, 0x0, 3, 12, 13, 0x0),
-	...Gbi.gsSP2Triangles(3, 13, 0, 0x0, 11, 2, 14, 0x0),
-	Gbi.gsSPVertex(mario_medium_poly_left_hand_closed_shared_dl_vertex_group3, 14, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 0, 0x0),
-	...Gbi.gsSP2Triangles(5, 2, 6, 0x0, 7, 8, 9, 0x0),
-	...Gbi.gsSP2Triangles(7, 2, 8, 0x0, 7, 0, 2, 0x0),
-	...Gbi.gsSP2Triangles(5, 8, 2, 0x0, 10, 11, 12, 0x0),
-	Gbi.gsSP1Triangle(10, 13, 11, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_medium_poly_left_hand_closed = [
-	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_white_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_left_hand_closed_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_medium_poly_right_arm_shared_dl_vertex = [
-	{ pos: [60, -28, 22], flag: 0, tc: [0, 0], color: [59, 199, 96, 0] },
-	{ pos: [60, -19, -19], flag: 0, tc: [0, 0], color: [90, 188, 199, 0] },
-	{ pos: [60, 14, 24], flag: 0, tc: [0, 0], color: [91, 79, 38, 0] },
-	{ pos: [-7, -31, 24], flag: 0, tc: [0, 0], color: [4, 132, 230, 0] },
-	{ pos: [-7, -20, -27], flag: 0, tc: [0, 0], color: [4, 132, 230, 0] },
-	{ pos: [-8, 21, -15], flag: 0, tc: [0, 0], color: [17, 115, 206, 0] },
-	{ pos: [-8, 22, 27], flag: 0, tc: [0, 0], color: [14, 126, 253, 0] },
-	{ pos: [60, 13, -9], flag: 0, tc: [0, 0], color: [60, 70, 170, 0] },
-	{ pos: [-7, -20, -27], flag: 0, tc: [0, 0], color: [14, 35, 136, 0] },
-	{ pos: [-8, 22, 27], flag: 0, tc: [0, 0], color: [3, 250, 126, 0] },
-	{ pos: [-7, -31, 24], flag: 0, tc: [0, 0], color: [3, 250, 126, 0] },
-	{ pos: [-7, -20, -27], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
-	{ pos: [-7, -31, 24], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
-	{ pos: [-8, 22, 27], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
-	{ pos: [-8, 21, -15], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
-]
-
-export const mario_medium_poly_right_arm_shared_dl = [
-	Gbi.gsSPVertex(mario_medium_poly_right_arm_shared_dl_vertex, 15, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 1, 3, 4, 0x0),
-	...Gbi.gsSP2Triangles(2, 5, 6, 0x0, 7, 8, 5, 0x0),
-	...Gbi.gsSP2Triangles(7, 1, 8, 0x0, 2, 7, 5, 0x0),
-	...Gbi.gsSP2Triangles(0, 2, 9, 0x0, 0, 9, 10, 0x0),
-	...Gbi.gsSP2Triangles(1, 0, 3, 0x0, 11, 12, 13, 0x0),
-	...Gbi.gsSP2Triangles(13, 14, 11, 0x0, 1, 7, 2, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_medium_poly_right_arm = [
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].l[0], 1),
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_right_arm_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_medium_poly_right_forearm_shared_dl_vertex = [
-	{ pos: [-5, -18, -24], flag: 0, tc: [0, 0], color: [129, 254, 3, 0] },
-	{ pos: [-3, -29, 21], flag: 0, tc: [0, 0], color: [129, 254, 3, 0] },
-	{ pos: [-4, 17, 26], flag: 0, tc: [0, 0], color: [129, 254, 3, 0] },
-	{ pos: [52, 13, -10], flag: 0, tc: [0, 0], color: [81, 64, 183, 0] },
-	{ pos: [53, 13, 22], flag: 0, tc: [0, 0], color: [61, 99, 49, 0] },
-	{ pos: [53, -26, 19], flag: 0, tc: [0, 0], color: [91, 208, 73, 0] },
-	{ pos: [52, -17, -21], flag: 0, tc: [0, 0], color: [58, 172, 182, 0] },
-	{ pos: [-3, -29, 21], flag: 0, tc: [0, 0], color: [4, 133, 228, 0] },
-	{ pos: [-5, -18, -24], flag: 0, tc: [0, 0], color: [3, 133, 227, 0] },
-	{ pos: [-5, 17, -12], flag: 0, tc: [0, 0], color: [9, 117, 209, 0] },
-	{ pos: [-4, 17, 26], flag: 0, tc: [0, 0], color: [8, 126, 0, 0] },
-	{ pos: [-5, -18, -24], flag: 0, tc: [0, 0], color: [6, 42, 137, 0] },
-	{ pos: [-4, 17, 26], flag: 0, tc: [0, 0], color: [6, 245, 126, 0] },
-	{ pos: [-3, -29, 21], flag: 0, tc: [0, 0], color: [6, 244, 126, 0] },
-	{ pos: [-5, 17, -12], flag: 0, tc: [0, 0], color: [129, 254, 3, 0] },
-]
-
-export const mario_medium_poly_right_forearm_shared_dl = [
-	Gbi.gsSPVertex(mario_medium_poly_right_forearm_shared_dl_vertex, 15, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
-	...Gbi.gsSP2Triangles(6, 3, 5, 0x0, 6, 7, 8, 0x0),
-	...Gbi.gsSP2Triangles(4, 9, 10, 0x0, 3, 11, 9, 0x0),
-	...Gbi.gsSP2Triangles(3, 6, 11, 0x0, 4, 3, 9, 0x0),
-	...Gbi.gsSP2Triangles(5, 4, 12, 0x0, 5, 12, 13, 0x0),
-	...Gbi.gsSP2Triangles(6, 5, 7, 0x0, 2, 14, 0, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_medium_poly_right_hand_closed_dl_vertex_group1 = [
-	{ pos: [-7, -4, 36], flag: 0, tc: [0, 0], color: [140, 205, 253, 0] },
-	{ pos: [-26, 40, 0], flag: 0, tc: [0, 0], color: [140, 205, 253, 0] },
-	{ pos: [-4, -7, -34], flag: 0, tc: [0, 0], color: [140, 205, 253, 0] },
-	{ pos: [14, -51, 7], flag: 0, tc: [0, 0], color: [140, 205, 253, 0] },
-	{ pos: [81, -8, 49], flag: 0, tc: [0, 0], color: [54, 230, 111, 0] },
-	{ pos: [42, -20, 54], flag: 0, tc: [0, 0], color: [217, 187, 98, 0] },
-	{ pos: [54, -42, -4], flag: 0, tc: [0, 0], color: [4, 130, 246, 0] },
-	{ pos: [52, 59, 37], flag: 0, tc: [0, 0], color: [255, 85, 94, 0] },
-	{ pos: [16, 38, 35], flag: 0, tc: [0, 0], color: [193, 45, 99, 0] },
-	{ pos: [10, 3, 33], flag: 0, tc: [0, 0], color: [195, 250, 110, 0] },
-	{ pos: [102, -23, 0], flag: 0, tc: [0, 0], color: [101, 193, 215, 0] },
-	{ pos: [55, 84, -8], flag: 0, tc: [0, 0], color: [21, 115, 209, 0] },
-	{ pos: [7, 62, -11], flag: 0, tc: [0, 0], color: [167, 90, 249, 0] },
-	{ pos: [94, 43, 18], flag: 0, tc: [0, 0], color: [109, 56, 33, 0] },
-	{ pos: [32, 8, -40], flag: 0, tc: [0, 0], color: [218, 232, 138, 0] },
-	{ pos: [26, -32, 8], flag: 0, tc: [0, 0], color: [8, 130, 250, 0] },
-]
-
-const mario_medium_poly_right_hand_closed_dl_vertex_group2 = [
-	{ pos: [16, 38, 35], flag: 0, tc: [0, 0], color: [193, 45, 99, 0] },
-	{ pos: [7, 62, -11], flag: 0, tc: [0, 0], color: [167, 90, 249, 0] },
-	{ pos: [-3, 37, 3], flag: 0, tc: [0, 0], color: [176, 98, 247, 0] },
-	{ pos: [32, 8, -40], flag: 0, tc: [0, 0], color: [218, 232, 138, 0] },
-	{ pos: [26, -32, 8], flag: 0, tc: [0, 0], color: [8, 130, 250, 0] },
-	{ pos: [14, -51, 7], flag: 0, tc: [0, 0], color: [79, 208, 170, 0] },
-	{ pos: [-4, -7, -34], flag: 0, tc: [0, 0], color: [55, 16, 143, 0] },
-	{ pos: [-26, 40, 0], flag: 0, tc: [0, 0], color: [21, 81, 161, 0] },
-	{ pos: [-26, 40, 0], flag: 0, tc: [0, 0], color: [2, 79, 98, 0] },
-	{ pos: [-7, -4, 36], flag: 0, tc: [0, 0], color: [25, 19, 122, 0] },
-	{ pos: [14, -51, 7], flag: 0, tc: [0, 0], color: [54, 215, 107, 0] },
-	{ pos: [55, 84, -8], flag: 0, tc: [0, 0], color: [21, 115, 209, 0] },
-	{ pos: [102, -23, 0], flag: 0, tc: [0, 0], color: [101, 193, 215, 0] },
-	{ pos: [54, -42, -4], flag: 0, tc: [0, 0], color: [4, 130, 246, 0] },
-	{ pos: [94, 43, 18], flag: 0, tc: [0, 0], color: [109, 56, 33, 0] },
-	{ pos: [83, 30, -39], flag: 0, tc: [0, 0], color: [78, 28, 161, 0] },
-]
-
-const mario_medium_poly_right_hand_closed_dl_vertex_group3 = [
-	{ pos: [102, -23, 0], flag: 0, tc: [0, 0], color: [101, 193, 215, 0] },
-	{ pos: [94, 43, 18], flag: 0, tc: [0, 0], color: [109, 56, 33, 0] },
-	{ pos: [81, -8, 49], flag: 0, tc: [0, 0], color: [54, 230, 111, 0] },
-	{ pos: [52, 59, 37], flag: 0, tc: [0, 0], color: [255, 85, 94, 0] },
-	{ pos: [55, 84, -8], flag: 0, tc: [0, 0], color: [21, 115, 209, 0] },
-	{ pos: [32, 8, -40], flag: 0, tc: [0, 0], color: [218, 232, 138, 0] },
-	{ pos: [83, 30, -39], flag: 0, tc: [0, 0], color: [78, 28, 161, 0] },
-	{ pos: [-7, -4, 36], flag: 0, tc: [0, 0], color: [25, 19, 122, 0] },
-	{ pos: [26, -32, 8], flag: 0, tc: [0, 0], color: [8, 130, 250, 0] },
-	{ pos: [10, 3, 33], flag: 0, tc: [0, 0], color: [195, 250, 110, 0] },
-	{ pos: [-3, 37, 3], flag: 0, tc: [0, 0], color: [176, 98, 247, 0] },
-	{ pos: [13, 0, -26], flag: 0, tc: [0, 0], color: [245, 242, 131, 0] },
-	{ pos: [-4, -7, -34], flag: 0, tc: [0, 0], color: [55, 16, 143, 0] },
-	{ pos: [16, 38, 35], flag: 0, tc: [0, 0], color: [193, 45, 99, 0] },
-	{ pos: [42, -20, 54], flag: 0, tc: [0, 0], color: [217, 187, 98, 0] },
-]
-
-export const mario_medium_poly_right_hand_closed_dl = [
-	Gbi.gsSPVertex(mario_medium_poly_right_hand_closed_dl_vertex_group1, 16, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 2, 0x0),
-	...Gbi.gsSP2Triangles(4, 5, 6, 0x0, 4, 7, 8, 0x0),
-	...Gbi.gsSP2Triangles(5, 4, 8, 0x0, 9, 5, 8, 0x0),
-	...Gbi.gsSP2Triangles(10, 4, 6, 0x0, 7, 11, 12, 0x0),
-	...Gbi.gsSP2Triangles(4, 13, 7, 0x0, 7, 12, 8, 0x0),
-	...Gbi.gsSP2Triangles(14, 6, 15, 0x0, 6, 5, 15, 0x0),
-	Gbi.gsSPVertex(mario_medium_poly_right_hand_closed_dl_vertex_group2, 16, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 1, 3, 2, 0x0),
-	...Gbi.gsSP2Triangles(4, 5, 6, 0x0, 6, 7, 2, 0x0),
-	...Gbi.gsSP2Triangles(2, 8, 9, 0x0, 9, 10, 4, 0x0),
-	...Gbi.gsSP2Triangles(1, 11, 3, 0x0, 3, 12, 13, 0x0),
-	...Gbi.gsSP2Triangles(11, 14, 15, 0x0, 15, 14, 12, 0x0),
-	Gbi.gsSPVertex(mario_medium_poly_right_hand_closed_dl_vertex_group3, 15, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 1, 4, 0x0),
-	...Gbi.gsSP2Triangles(5, 6, 0, 0x0, 4, 6, 5, 0x0),
-	...Gbi.gsSP2Triangles(7, 8, 9, 0x0, 7, 9, 10, 0x0),
-	...Gbi.gsSP2Triangles(10, 11, 12, 0x0, 12, 11, 8, 0x0),
-	...Gbi.gsSP2Triangles(5, 11, 10, 0x0, 10, 9, 13, 0x0),
-	...Gbi.gsSP2Triangles(14, 9, 8, 0x0, 8, 11, 5, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_medium_poly_right_hand_closed = [
-	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_white_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_right_hand_closed_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_metal_medium_poly_right_hand_closed = [
-	Gbi.gsSPDisplayList(mario_medium_poly_right_hand_closed_dl),
-	Gbi.gsSPClearGeometryMode(Gbi.G_TEXTURE_GEN),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_medium_poly_left_thigh_dl_vertex = [
-	{ pos: [18, -12, 58], flag: 0, tc: [0, 0], color: [19, 221, 120, 0] },
-	{ pos: [22, -52, 8], flag: 0, tc: [0, 0], color: [28, 133, 1, 0] },
-	{ pos: [99, -35, 8], flag: 0, tc: [0, 0], color: [62, 146, 1, 0] },
-	{ pos: [14, 51, 38], flag: 0, tc: [0, 0], color: [8, 117, 48, 0] },
-	{ pos: [92, 47, 33], flag: 0, tc: [0, 0], color: [54, 75, 86, 0] },
-	{ pos: [14, 50, -23], flag: 0, tc: [0, 0], color: [10, 101, 181, 0] },
-	{ pos: [92, 47, -16], flag: 0, tc: [0, 0], color: [71, 85, 197, 0] },
-	{ pos: [19, -13, -42], flag: 0, tc: [0, 0], color: [21, 219, 137, 0] },
-	{ pos: [96, -3, -31], flag: 0, tc: [0, 0], color: [104, 241, 186, 0] },
-	{ pos: [96, -3, 48], flag: 0, tc: [0, 0], color: [113, 248, 56, 0] },
-	{ pos: [19, -13, -42], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
-	{ pos: [22, -52, 8], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
-	{ pos: [18, -12, 58], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
-	{ pos: [14, 51, 38], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
-	{ pos: [14, 50, -23], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
-]
-
-export const mario_medium_poly_left_thigh_dl = [
-	Gbi.gsSPVertex(mario_medium_poly_left_thigh_dl_vertex, 15, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 4, 0x0),
-	...Gbi.gsSP2Triangles(5, 3, 6, 0x0, 7, 5, 6, 0x0),
-	...Gbi.gsSP2Triangles(1, 7, 2, 0x0, 7, 8, 2, 0x0),
-	...Gbi.gsSP2Triangles(6, 8, 7, 0x0, 3, 4, 6, 0x0),
-	...Gbi.gsSP2Triangles(0, 9, 4, 0x0, 2, 9, 0, 0x0),
-	...Gbi.gsSP2Triangles(9, 2, 8, 0x0, 10, 11, 12, 0x0),
-	...Gbi.gsSP2Triangles(12, 13, 10, 0x0, 13, 14, 10, 0x0),
-	...Gbi.gsSP2Triangles(8, 6, 9, 0x0, 6, 4, 9, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_medium_poly_left_thigh = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-	Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].l[0], 1),
-	Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_left_thigh_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-/*export const mario_metal_medium_poly_left_thigh = [
-	Gbi.gsSPSetGeometryMode(Gbi.G_TEXTURE_GEN),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALFADE),
-	Gbi.gsDPLoadTextureBlock(mario_texture_metal, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 64, 32, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_white_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_left_thigh_dl),
-	Gbi.gsSPEndDisplayList(),
-]*/
-
-const mario_medium_poly_left_leg_shared_dl_vertex = [
-	{ pos: [5, -35, 9], flag: 0, tc: [0, 0], color: [202, 142, 0, 0] },
-	{ pos: [65, -44, 10], flag: 0, tc: [0, 0], color: [238, 131, 1, 0] },
-	{ pos: [66, -9, 54], flag: 0, tc: [0, 0], color: [242, 220, 120, 0] },
-	{ pos: [9, 46, 33], flag: 0, tc: [0, 0], color: [213, 97, 69, 0] },
-	{ pos: [69, 47, 37], flag: 0, tc: [0, 0], color: [249, 102, 75, 0] },
-	{ pos: [70, 47, -18], flag: 0, tc: [0, 0], color: [251, 116, 207, 0] },
-	{ pos: [10, 46, -16], flag: 0, tc: [0, 0], color: [175, 64, 183, 0] },
-	{ pos: [67, -9, -36], flag: 0, tc: [0, 0], color: [244, 218, 136, 0] },
-	{ pos: [7, -4, -31], flag: 0, tc: [0, 0], color: [155, 238, 182, 0] },
-	{ pos: [7, -4, 49], flag: 0, tc: [0, 0], color: [143, 245, 55, 0] },
-	{ pos: [66, -9, 54], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
-	{ pos: [65, -44, 10], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
-	{ pos: [67, -9, -36], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
-	{ pos: [70, 47, -18], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
-	{ pos: [69, 47, 37], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
-]
-
-export const mario_medium_poly_left_leg_shared_dl = [
-	Gbi.gsSPVertex(mario_medium_poly_left_leg_shared_dl_vertex, 15, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 2, 4, 0x0),
-	...Gbi.gsSP2Triangles(3, 4, 5, 0x0, 6, 5, 7, 0x0),
-	...Gbi.gsSP2Triangles(0, 7, 1, 0x0, 0, 8, 7, 0x0),
-	...Gbi.gsSP2Triangles(7, 8, 6, 0x0, 5, 6, 3, 0x0),
-	...Gbi.gsSP2Triangles(3, 9, 2, 0x0, 2, 9, 0, 0x0),
-	...Gbi.gsSP2Triangles(10, 11, 12, 0x0, 8, 0, 9, 0x0),
-	...Gbi.gsSP2Triangles(9, 6, 8, 0x0, 9, 3, 6, 0x0),
-	...Gbi.gsSP2Triangles(12, 13, 10, 0x0, 13, 14, 10, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_medium_poly_left_foot_shared_dl_vertex_group1 = [
-	{ pos: [108, 10, 36], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
-	{ pos: [108, 9, -20], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
-	{ pos: [75, 21, -41], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
-	{ pos: [76, 22, 61], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
-	{ pos: [-14, 55, -27], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
-	{ pos: [-13, 55, 49], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
-	{ pos: [-41, 65, 9], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
-	{ pos: [41, -18, 54], flag: 0, tc: [0, 0], color: [4, 180, 101, 0] },
-	{ pos: [76, 22, 61], flag: 0, tc: [0, 0], color: [18, 221, 120, 0] },
-	{ pos: [-13, 55, 49], flag: 0, tc: [0, 0], color: [206, 7, 116, 0] },
-	{ pos: [42, -11, -33], flag: 0, tc: [0, 0], color: [255, 184, 152, 0] },
-	{ pos: [-37, 12, -16], flag: 0, tc: [0, 0], color: [161, 207, 189, 0] },
-	{ pos: [-14, 55, -27], flag: 0, tc: [0, 0], color: [204, 2, 141, 0] },
-	{ pos: [-36, 13, 39], flag: 0, tc: [0, 0], color: [160, 208, 66, 0] },
-	{ pos: [75, 21, -41], flag: 0, tc: [0, 0], color: [9, 218, 136, 0] },
-	{ pos: [108, 9, -20], flag: 0, tc: [0, 0], color: [68, 173, 190, 0] },
-]
-
-const mario_medium_poly_left_foot_shared_dl_vertex_group2 = [
-	{ pos: [78, -30, 7], flag: 0, tc: [0, 0], color: [52, 141, 251, 0] },
-	{ pos: [108, 9, -20], flag: 0, tc: [0, 0], color: [68, 173, 190, 0] },
-	{ pos: [108, 10, 36], flag: 0, tc: [0, 0], color: [76, 175, 60, 0] },
-	{ pos: [42, -11, -33], flag: 0, tc: [0, 0], color: [255, 184, 152, 0] },
-	{ pos: [76, 22, 61], flag: 0, tc: [0, 0], color: [18, 221, 120, 0] },
-	{ pos: [41, -18, 54], flag: 0, tc: [0, 0], color: [4, 180, 101, 0] },
-	{ pos: [-36, 13, 39], flag: 0, tc: [0, 0], color: [160, 208, 66, 0] },
-	{ pos: [-13, 55, 49], flag: 0, tc: [0, 0], color: [206, 7, 116, 0] },
-	{ pos: [-41, 65, 9], flag: 0, tc: [0, 0], color: [131, 21, 0, 0] },
-	{ pos: [-14, 55, -27], flag: 0, tc: [0, 0], color: [204, 2, 141, 0] },
-	{ pos: [-37, 12, -16], flag: 0, tc: [0, 0], color: [161, 207, 189, 0] },
-	{ pos: [25, -34, 11], flag: 0, tc: [0, 0], color: [221, 135, 251, 0] },
-]
-
-export const mario_medium_poly_left_foot_shared_dl = [
-	Gbi.gsSPVertex(mario_medium_poly_left_foot_shared_dl_vertex_group1, 16, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 2, 0x0),
-	...Gbi.gsSP2Triangles(3, 2, 4, 0x0, 5, 3, 4, 0x0),
-	...Gbi.gsSP2Triangles(6, 5, 4, 0x0, 7, 8, 9, 0x0),
-	...Gbi.gsSP2Triangles(10, 11, 12, 0x0, 13, 7, 9, 0x0),
-	...Gbi.gsSP2Triangles(10, 12, 14, 0x0, 10, 14, 15, 0x0),
-	Gbi.gsSPVertex(mario_medium_poly_left_foot_shared_dl_vertex_group2, 12, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 1, 0, 3, 0x0),
-	...Gbi.gsSP2Triangles(2, 4, 5, 0x0, 5, 0, 2, 0x0),
-	...Gbi.gsSP2Triangles(6, 7, 8, 0x0, 8, 9, 10, 0x0),
-	...Gbi.gsSP2Triangles(11, 3, 0, 0x0, 10, 3, 11, 0x0),
-	...Gbi.gsSP2Triangles(0, 5, 11, 0x0, 11, 5, 6, 0x0),
-	...Gbi.gsSP2Triangles(11, 6, 10, 0x0, 6, 8, 10, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_medium_poly_left_foot = [
-	Gbi.gsSPLight(mario_brown1_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_brown1_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_left_foot_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_medium_poly_right_thigh_shared_dl_vertex = [
-	{ pos: [18, -11, -58], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
-	{ pos: [23, -52, -9], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
-	{ pos: [20, -14, 41], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
-	{ pos: [97, -3, 30], flag: 0, tc: [0, 0], color: [105, 241, 69, 0] },
-	{ pos: [99, -33, -10], flag: 0, tc: [0, 0], color: [64, 147, 252, 0] },
-	{ pos: [95, -1, -49], flag: 0, tc: [0, 0], color: [113, 251, 199, 0] },
-	{ pos: [18, -11, -58], flag: 0, tc: [0, 0], color: [18, 224, 135, 0] },
-	{ pos: [91, 49, -33], flag: 0, tc: [0, 0], color: [52, 78, 171, 0] },
-	{ pos: [92, 48, 16], flag: 0, tc: [0, 0], color: [71, 85, 61, 0] },
-	{ pos: [13, 52, -37], flag: 0, tc: [0, 0], color: [6, 118, 211, 0] },
-	{ pos: [20, -14, 41], flag: 0, tc: [0, 0], color: [22, 217, 118, 0] },
-	{ pos: [23, -52, -9], flag: 0, tc: [0, 0], color: [29, 133, 253, 0] },
-	{ pos: [14, 50, 24], flag: 0, tc: [0, 0], color: [10, 99, 77, 0] },
-	{ pos: [13, 52, -37], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
-	{ pos: [14, 50, 24], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
-]
-
-export const mario_medium_poly_right_thigh_shared_dl = [
-	Gbi.gsSPVertex(mario_medium_poly_right_thigh_shared_dl_vertex, 15, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
-	...Gbi.gsSP2Triangles(6, 5, 4, 0x0, 7, 5, 6, 0x0),
-	...Gbi.gsSP2Triangles(8, 7, 9, 0x0, 10, 3, 8, 0x0),
-	...Gbi.gsSP2Triangles(4, 3, 10, 0x0, 4, 10, 11, 0x0),
-	...Gbi.gsSP2Triangles(8, 12, 10, 0x0, 8, 9, 12, 0x0),
-	...Gbi.gsSP2Triangles(7, 6, 9, 0x0, 4, 11, 6, 0x0),
-	...Gbi.gsSP2Triangles(5, 8, 3, 0x0, 5, 7, 8, 0x0),
-	...Gbi.gsSP2Triangles(2, 13, 0, 0x0, 2, 14, 13, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_medium_poly_right_thigh = [
-	Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].l[0], 1),
-	Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_right_thigh_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_medium_poly_right_leg_shared_dl_vertex = [
-	{ pos: [6, -1, -50], flag: 0, tc: [0, 0], color: [142, 247, 202, 0] },
-	{ pos: [5, -34, -11], flag: 0, tc: [0, 0], color: [201, 142, 254, 0] },
-	{ pos: [7, -4, 30], flag: 0, tc: [0, 0], color: [155, 237, 74, 0] },
-	{ pos: [67, -9, 34], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
-	{ pos: [64, -43, -12], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
-	{ pos: [66, -7, -56], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
-	{ pos: [66, -7, -56], flag: 0, tc: [0, 0], color: [241, 222, 135, 0] },
-	{ pos: [10, 48, -33], flag: 0, tc: [0, 0], color: [214, 99, 190, 0] },
-	{ pos: [10, 46, 16], flag: 0, tc: [0, 0], color: [177, 63, 75, 0] },
-	{ pos: [71, 47, 18], flag: 0, tc: [0, 0], color: [253, 115, 51, 0] },
-	{ pos: [67, -9, 34], flag: 0, tc: [0, 0], color: [244, 216, 119, 0] },
-	{ pos: [64, -43, -12], flag: 0, tc: [0, 0], color: [236, 131, 253, 0] },
-	{ pos: [70, 49, -37], flag: 0, tc: [0, 0], color: [250, 103, 184, 0] },
-	{ pos: [71, 47, 18], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
-	{ pos: [70, 49, -37], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
-]
-
-export const mario_medium_poly_right_leg_shared_dl = [
-	Gbi.gsSPVertex(mario_medium_poly_right_leg_shared_dl_vertex, 15, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
-	...Gbi.gsSP2Triangles(1, 0, 6, 0x0, 6, 0, 7, 0x0),
-	...Gbi.gsSP2Triangles(7, 8, 9, 0x0, 8, 2, 10, 0x0),
-	...Gbi.gsSP2Triangles(10, 2, 1, 0x0, 11, 10, 1, 0x0),
-	...Gbi.gsSP2Triangles(10, 9, 8, 0x0, 9, 12, 7, 0x0),
-	...Gbi.gsSP2Triangles(12, 6, 7, 0x0, 6, 11, 1, 0x0),
-	...Gbi.gsSP2Triangles(5, 13, 3, 0x0, 5, 14, 13, 0x0),
-	...Gbi.gsSP2Triangles(2, 8, 0, 0x0, 8, 7, 0, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_medium_poly_right_foot_dl_vertex_group1 = [
-	{ pos: [-38, 12, 14], flag: 0, tc: [0, 0], color: [161, 207, 67, 0] },
-	{ pos: [-43, 65, -12], flag: 0, tc: [0, 0], color: [131, 19, 255, 0] },
-	{ pos: [-36, 12, -41], flag: 0, tc: [0, 0], color: [161, 206, 190, 0] },
-	{ pos: [25, -34, -11], flag: 0, tc: [0, 0], color: [223, 134, 7, 0] },
-	{ pos: [41, -18, -55], flag: 0, tc: [0, 0], color: [7, 179, 156, 0] },
-	{ pos: [79, -29, -7], flag: 0, tc: [0, 0], color: [54, 142, 8, 0] },
-	{ pos: [42, -10, 32], flag: 0, tc: [0, 0], color: [255, 186, 105, 0] },
-	{ pos: [-15, 55, 24], flag: 0, tc: [0, 0], color: [203, 4, 115, 0] },
-	{ pos: [-14, 54, -51], flag: 0, tc: [0, 0], color: [207, 4, 140, 0] },
-	{ pos: [108, 11, -36], flag: 0, tc: [0, 0], color: [78, 176, 198, 0] },
-	{ pos: [76, 23, -62], flag: 0, tc: [0, 0], color: [20, 219, 137, 0] },
-	{ pos: [107, 12, 20], flag: 0, tc: [0, 0], color: [69, 175, 68, 0] },
-	{ pos: [74, 24, 40], flag: 0, tc: [0, 0], color: [8, 220, 121, 0] },
-	{ pos: [-15, 55, 24], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
-	{ pos: [-14, 54, -51], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
-	{ pos: [-43, 65, -12], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
-]
-
-const mario_medium_poly_right_foot_dl_vertex_group2 = [
-	{ pos: [-15, 55, 24], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
-	{ pos: [76, 23, -62], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
-	{ pos: [-14, 54, -51], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
-	{ pos: [74, 24, 40], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
-	{ pos: [108, 11, -36], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
-	{ pos: [107, 12, 20], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
-]
-
-export const mario_medium_poly_right_foot_dl = [
-	Gbi.gsSPVertex(mario_medium_poly_right_foot_dl_vertex_group1, 16, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
-	...Gbi.gsSP2Triangles(2, 4, 3, 0x0, 3, 4, 5, 0x0),
-	...Gbi.gsSP2Triangles(3, 6, 0, 0x0, 5, 6, 3, 0x0),
-	...Gbi.gsSP2Triangles(0, 7, 1, 0x0, 1, 8, 2, 0x0),
-	...Gbi.gsSP2Triangles(9, 5, 4, 0x0, 4, 10, 9, 0x0),
-	...Gbi.gsSP2Triangles(6, 5, 11, 0x0, 9, 11, 5, 0x0),
-	...Gbi.gsSP2Triangles(11, 12, 6, 0x0, 12, 7, 6, 0x0),
-	...Gbi.gsSP2Triangles(8, 4, 2, 0x0, 7, 0, 6, 0x0),
-	...Gbi.gsSP2Triangles(8, 10, 4, 0x0, 13, 14, 15, 0x0),
-	Gbi.gsSPVertex(mario_medium_poly_right_foot_dl_vertex_group2, 6, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 3, 1, 0x0),
-	...Gbi.gsSP2Triangles(3, 4, 1, 0x0, 3, 5, 4, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_medium_poly_right_foot = [
-	Gbi.gsSPLight(mario_brown1_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_brown1_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_right_foot_dl),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsDPSetEnvColor(255, 255, 255, 255),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_metal_medium_poly_right_foot = [
-	Gbi.gsSPDisplayList(mario_medium_poly_right_foot_dl),
-	Gbi.gsSPClearGeometryMode(Gbi.G_TEXTURE_GEN),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetEnvColor(255, 255, 255, 255),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_seg4_vertex_04016148 = [
-	{ pos: [75, 24, -60], flag: 0, tc: [-74, -930], color: [96, 39, 184, 255] },
-	{ pos: [36, 47, -76], flag: 0, tc: [-174, 168], color: [46, 54, 152, 255] },
-	{ pos: [44, 78, -35], flag: 0, tc: [988, 92], color: [69, 101, 226, 255] },
-	{ pos: [-26, 49, -87], flag: 0, tc: [-538, 1590], color: [196, 41, 153, 255] },
-	{ pos: [1, 87, -53], flag: 0, tc: [638, 1164], color: [14, 116, 209, 255] },
-	{ pos: [1, 87, 54], flag: 0, tc: [2522, 702], color: [17, 116, 47, 255] },
-	{ pos: [1, 87, 54], flag: 0, tc: [272, 1122], color: [17, 116, 47, 255] },
-	{ pos: [44, 78, 37], flag: 0, tc: [-92, 108], color: [71, 95, 42, 255] },
-	{ pos: [44, 78, -35], flag: 0, tc: [-1398, -128], color: [69, 101, 226, 255] },
-	{ pos: [-26, 49, 88], flag: 0, tc: [1514, 1490], color: [196, 41, 103, 255] },
-	{ pos: [36, 47, 77], flag: 0, tc: [1110, 130], color: [47, 55, 104, 255] },
-	{ pos: [75, 24, 60], flag: 0, tc: [968, -926], color: [98, 39, 70, 255] },
-]
-
-const mario_seg4_vertex_04016208 = [
-	{ pos: [82, 37, 28], flag: 0, tc: [0, 0], color: [113, 54, 14, 255] },
-	{ pos: [82, 37, -28], flag: 0, tc: [0, 0], color: [113, 53, 234, 255] },
-	{ pos: [44, 78, -35], flag: 0, tc: [0, 0], color: [69, 101, 226, 255] },
-	{ pos: [44, 78, 37], flag: 0, tc: [0, 0], color: [71, 95, 42, 255] },
-	{ pos: [95, -39, -25], flag: 0, tc: [0, 0], color: [121, 230, 232, 255] },
-	{ pos: [95, -39, 25], flag: 0, tc: [0, 0], color: [117, 219, 29, 255] },
-	{ pos: [54, -68, 0], flag: 0, tc: [0, 0], color: [45, 138, 0, 255] },
-	{ pos: [56, -4, 79], flag: 0, tc: [0, 0], color: [57, 4, 113, 255] },
-	{ pos: [75, 24, 60], flag: 0, tc: [0, 0], color: [98, 39, 70, 255] },
-	{ pos: [36, 47, 77], flag: 0, tc: [0, 0], color: [47, 55, 104, 255] },
-	{ pos: [9, 0, 94], flag: 0, tc: [0, 0], color: [14, 3, 126, 255] },
-	{ pos: [22, -41, 87], flag: 0, tc: [0, 0], color: [31, 201, 109, 255] },
-	{ pos: [83, -29, 58], flag: 0, tc: [0, 0], color: [84, 200, 76, 255] },
-	{ pos: [83, -29, -58], flag: 0, tc: [0, 0], color: [82, 201, 178, 255] },
-	{ pos: [40, -66, -47], flag: 0, tc: [0, 0], color: [29, 145, 203, 255] },
-	{ pos: [22, -41, -86], flag: 0, tc: [0, 0], color: [30, 202, 146, 255] },
-]
-
-const mario_seg4_vertex_04016308 = [
-	{ pos: [36, 47, -76], flag: 0, tc: [0, 0], color: [46, 54, 152, 255] },
-	{ pos: [75, 24, -60], flag: 0, tc: [0, 0], color: [96, 39, 184, 255] },
-	{ pos: [56, -4, -77], flag: 0, tc: [0, 0], color: [56, 4, 143, 255] },
-	{ pos: [9, 0, -93], flag: 0, tc: [0, 0], color: [14, 3, 130, 255] },
-	{ pos: [83, -29, -58], flag: 0, tc: [0, 0], color: [82, 201, 178, 255] },
-	{ pos: [22, -41, -86], flag: 0, tc: [0, 0], color: [30, 202, 146, 255] },
-	{ pos: [22, -41, 87], flag: 0, tc: [0, 0], color: [31, 201, 109, 255] },
-	{ pos: [40, -66, 48], flag: 0, tc: [0, 0], color: [29, 145, 53, 255] },
-	{ pos: [83, -29, 58], flag: 0, tc: [0, 0], color: [84, 200, 76, 255] },
-]
-
-const mario_seg4_vertex_04016398 = [
-	{ pos: [83, -29, -58], flag: 0, tc: [0, 0], color: [82, 201, 178, 255] },
-	{ pos: [95, -39, -25], flag: 0, tc: [0, 0], color: [121, 230, 232, 255] },
-	{ pos: [54, -68, 0], flag: 0, tc: [0, 0], color: [45, 138, 0, 255] },
-	{ pos: [75, 24, -60], flag: 0, tc: [0, 0], color: [96, 39, 184, 255] },
-	{ pos: [82, 37, -28], flag: 0, tc: [0, 0], color: [113, 53, 234, 255] },
-	{ pos: [40, -66, -47], flag: 0, tc: [0, 0], color: [29, 145, 203, 255] },
-	{ pos: [44, 78, -35], flag: 0, tc: [0, 0], color: [69, 101, 226, 255] },
-	{ pos: [75, 24, 60], flag: 0, tc: [0, 0], color: [98, 39, 70, 255] },
-	{ pos: [82, 37, 28], flag: 0, tc: [0, 0], color: [113, 54, 14, 255] },
-	{ pos: [44, 78, 37], flag: 0, tc: [0, 0], color: [71, 95, 42, 255] },
-	{ pos: [83, -29, 58], flag: 0, tc: [0, 0], color: [84, 200, 76, 255] },
-	{ pos: [95, -39, 25], flag: 0, tc: [0, 0], color: [117, 219, 29, 255] },
-	{ pos: [40, -66, 48], flag: 0, tc: [0, 0], color: [29, 145, 53, 255] },
-	{ pos: [1, 87, -53], flag: 0, tc: [0, 0], color: [14, 116, 209, 255] },
-	{ pos: [-30, 88, 42], flag: 0, tc: [0, 0], color: [211, 114, 31, 255] },
-	{ pos: [1, 87, 54], flag: 0, tc: [0, 0], color: [17, 116, 47, 255] },
-]
-
-const mario_seg4_vertex_04016498 = [
-	{ pos: [1, 87, -53], flag: 0, tc: [0, 0], color: [14, 116, 209, 255] },
-	{ pos: [-30, 88, -41], flag: 0, tc: [0, 0], color: [199, 106, 218, 255] },
-	{ pos: [-30, 88, 42], flag: 0, tc: [0, 0], color: [211, 114, 31, 255] },
-	{ pos: [-26, 49, -87], flag: 0, tc: [0, 0], color: [196, 41, 153, 255] },
-	{ pos: [-71, 56, 0], flag: 0, tc: [0, 0], color: [137, 43, 0, 255] },
-	{ pos: [-26, 49, 88], flag: 0, tc: [0, 0], color: [196, 41, 103, 255] },
-	{ pos: [1, 87, 54], flag: 0, tc: [0, 0], color: [17, 116, 47, 255] },
-	{ pos: [-59, -44, 0], flag: 0, tc: [0, 0], color: [136, 216, 0, 255] },
-	{ pos: [-26, -72, -38], flag: 0, tc: [0, 0], color: [218, 139, 229, 255] },
-	{ pos: [-26, -72, 39], flag: 0, tc: [0, 0], color: [218, 139, 27, 255] },
-	{ pos: [-26, -41, 85], flag: 0, tc: [0, 0], color: [204, 194, 97, 255] },
-	{ pos: [-26, -41, -84], flag: 0, tc: [0, 0], color: [204, 194, 159, 255] },
-	{ pos: [40, -66, 48], flag: 0, tc: [0, 0], color: [29, 145, 53, 255] },
-	{ pos: [22, -41, 87], flag: 0, tc: [0, 0], color: [31, 201, 109, 255] },
-	{ pos: [9, 0, 94], flag: 0, tc: [0, 0], color: [14, 3, 126, 255] },
-	{ pos: [54, -68, 0], flag: 0, tc: [0, 0], color: [45, 138, 0, 255] },
-]
-
-const mario_seg4_vertex_04016598 = [
-	{ pos: [-26, 49, 88], flag: 0, tc: [0, 0], color: [196, 41, 103, 255] },
-	{ pos: [9, 0, 94], flag: 0, tc: [0, 0], color: [14, 3, 126, 255] },
-	{ pos: [36, 47, 77], flag: 0, tc: [0, 0], color: [47, 55, 104, 255] },
-	{ pos: [9, 0, -93], flag: 0, tc: [0, 0], color: [14, 3, 130, 255] },
-	{ pos: [-26, 49, -87], flag: 0, tc: [0, 0], color: [196, 41, 153, 255] },
-	{ pos: [36, 47, -76], flag: 0, tc: [0, 0], color: [46, 54, 152, 255] },
-	{ pos: [-26, -41, -84], flag: 0, tc: [0, 0], color: [204, 194, 159, 255] },
-	{ pos: [22, -41, -86], flag: 0, tc: [0, 0], color: [30, 202, 146, 255] },
-	{ pos: [40, -66, -47], flag: 0, tc: [0, 0], color: [29, 145, 203, 255] },
-	{ pos: [-26, -72, -38], flag: 0, tc: [0, 0], color: [218, 139, 229, 255] },
-	{ pos: [54, -68, 0], flag: 0, tc: [0, 0], color: [45, 138, 0, 255] },
-	{ pos: [-26, -72, 39], flag: 0, tc: [0, 0], color: [218, 139, 27, 255] },
-	{ pos: [40, -66, 48], flag: 0, tc: [0, 0], color: [29, 145, 53, 255] },
-]
-
-export const mario_medium_poly_yellow_button_dl = [
-	Gbi.gsSPVertex(mario_seg4_vertex_04016148, 12, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 1, 0x0),
-	...Gbi.gsSP2Triangles(2, 1, 4, 0x0, 4, 5, 2, 0x0),
-	...Gbi.gsSP2Triangles(6, 7, 8, 0x0, 9, 10, 6, 0x0),
-	...Gbi.gsSP2Triangles(6, 10, 7, 0x0, 7, 10, 11, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_medium_poly_pants_overalls_shared_dl = [
-	Gbi.gsSPVertex(mario_seg4_vertex_04016398, 16, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 1, 0, 3, 0x0),
-	...Gbi.gsSP2Triangles(3, 4, 1, 0x0, 2, 5, 0, 0x0),
-	...Gbi.gsSP2Triangles(4, 3, 6, 0x0, 7, 8, 9, 0x0),
-	...Gbi.gsSP2Triangles(7, 10, 11, 0x0, 8, 7, 11, 0x0),
-	...Gbi.gsSP2Triangles(11, 10, 2, 0x0, 10, 12, 2, 0x0),
-	Gbi.gsSP1Triangle(13, 14, 15, 0x0),
-	Gbi.gsSPVertex(mario_seg4_vertex_04016498, 16, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 1, 0, 0x0),
-	...Gbi.gsSP2Triangles(4, 2, 1, 0x0, 1, 3, 4, 0x0),
-	...Gbi.gsSP2Triangles(5, 2, 4, 0x0, 6, 2, 5, 0x0),
-	...Gbi.gsSP2Triangles(4, 3, 7, 0x0, 8, 9, 7, 0x0),
-	...Gbi.gsSP2Triangles(5, 4, 7, 0x0, 9, 10, 7, 0x0),
-	...Gbi.gsSP2Triangles(11, 8, 7, 0x0, 3, 11, 7, 0x0),
-	...Gbi.gsSP2Triangles(7, 10, 5, 0x0, 10, 9, 12, 0x0),
-	...Gbi.gsSP2Triangles(10, 13, 14, 0x0, 12, 13, 10, 0x0),
-	...Gbi.gsSP2Triangles(5, 10, 14, 0x0, 9, 8, 15, 0x0),
-	Gbi.gsSPVertex(mario_seg4_vertex_04016598, 13, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
-	...Gbi.gsSP2Triangles(6, 4, 3, 0x0, 6, 3, 7, 0x0),
-	...Gbi.gsSP2Triangles(8, 9, 6, 0x0, 6, 7, 8, 0x0),
-	...Gbi.gsSP2Triangles(9, 8, 10, 0x0, 11, 10, 12, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_medium_poly_tshirt_shared_dl = [
-	Gbi.gsSPVertex(mario_seg4_vertex_04016208, 16, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 2, 3, 0, 0x0),
-	...Gbi.gsSP2Triangles(1, 0, 4, 0x0, 0, 5, 4, 0x0),
-	...Gbi.gsSP2Triangles(6, 4, 5, 0x0, 7, 8, 9, 0x0),
-	...Gbi.gsSP2Triangles(9, 10, 7, 0x0, 7, 10, 11, 0x0),
-	...Gbi.gsSP2Triangles(7, 12, 8, 0x0, 11, 12, 7, 0x0),
-	Gbi.gsSP1Triangle(13, 14, 15, 0x0),
-	Gbi.gsSPVertex(mario_seg4_vertex_04016308, 9, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 2, 3, 0, 0x0),
-	...Gbi.gsSP2Triangles(1, 4, 2, 0x0, 2, 4, 5, 0x0),
-	...Gbi.gsSP2Triangles(5, 3, 2, 0x0, 6, 7, 8, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_medium_poly_torso_dl = [
-	Gbi.gsSPDisplayList(mario_medium_poly_pants_overalls_shared_dl),
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].l[0], 1),
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_tshirt_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_medium_poly_torso = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_yellow_button),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPDisplayList(mario_medium_poly_yellow_button_dl),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-	Gbi.gsSPDisplayList(mario_medium_poly_torso_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_metal_medium_poly_torso = [
-	Gbi.gsSPDisplayList(mario_medium_poly_yellow_button_dl),
-	Gbi.gsSPDisplayList(mario_medium_poly_pants_overalls_shared_dl),
-	Gbi.gsSPDisplayList(mario_medium_poly_tshirt_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_low_poly_butt_dl_vertex = [
-	{ pos: [-37, -37, 0], flag: 0, tc: [0, 0], color: [130, 245, 0, 0] },
-	{ pos: [-2, 52, 92], flag: 0, tc: [0, 0], color: [177, 60, 78, 0] },
-	{ pos: [-35, 55, 0], flag: 0, tc: [0, 0], color: [151, 69, 0, 0] },
-	{ pos: [-7, -86, 85], flag: 0, tc: [0, 0], color: [191, 196, 90, 0] },
-	{ pos: [49, 46, 96], flag: 0, tc: [0, 0], color: [75, 29, 97, 0] },
-	{ pos: [-7, -86, -85], flag: 0, tc: [0, 0], color: [207, 170, 178, 0] },
-	{ pos: [-2, 52, -92], flag: 0, tc: [0, 0], color: [176, 59, 178, 0] },
-	{ pos: [48, 44, -98], flag: 0, tc: [0, 0], color: [41, 34, 142, 0] },
-	{ pos: [46, -71, -89], flag: 0, tc: [0, 0], color: [115, 217, 221, 0] },
-	{ pos: [46, -71, 89], flag: 0, tc: [0, 0], color: [68, 161, 47, 0] },
-	{ pos: [49, 96, 0], flag: 0, tc: [0, 0], color: [43, 119, 0, 0] },
-]
-
-export const mario_low_poly_butt_dl = [
-	Gbi.gsSPVertex(mario_low_poly_butt_dl_vertex, 11, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 1, 3, 4, 0x0),
-	...Gbi.gsSP2Triangles(5, 6, 7, 0x0, 0, 2, 6, 0x0),
-	...Gbi.gsSP2Triangles(6, 5, 0, 0x0, 0, 3, 1, 0x0),
-	...Gbi.gsSP2Triangles(7, 8, 5, 0x0, 3, 9, 4, 0x0),
-	...Gbi.gsSP2Triangles(8, 7, 10, 0x0, 4, 9, 8, 0x0),
-	...Gbi.gsSP2Triangles(5, 9, 3, 0x0, 3, 0, 5, 0x0),
-	...Gbi.gsSP2Triangles(5, 8, 9, 0x0, 10, 7, 6, 0x0),
-	...Gbi.gsSP2Triangles(10, 4, 8, 0x0, 2, 1, 10, 0x0),
-	...Gbi.gsSP2Triangles(6, 2, 10, 0x0, 1, 4, 10, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_butt = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-	Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].l[0], 1),
-	Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_butt_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-/*export const mario_metal_low_poly_butt = [
-	Gbi.gsSPSetGeometryMode(Gbi.G_TEXTURE_GEN),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALFADE),
-	Gbi.gsDPLoadTextureBlock(mario_texture_metal, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 64, 32, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_white_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_butt_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-*/
-const mario_low_poly_left_arm_shared_dl_vertex = [
-	{ pos: [-6, 28, 10], flag: 0, tc: [0, 0], color: [9, 101, 181, 0] },
-	{ pos: [72, 21, 8], flag: 0, tc: [0, 0], color: [68, 77, 72, 0] },
-	{ pos: [71, -11, -34], flag: 0, tc: [0, 0], color: [63, 87, 190, 0] },
-	{ pos: [-8, -30, 31], flag: 0, tc: [0, 0], color: [9, 38, 120, 0] },
-	{ pos: [71, -30, 23], flag: 0, tc: [0, 0], color: [94, 21, 81, 0] },
-	{ pos: [-6, 28, 10], flag: 0, tc: [0, 0], color: [7, 41, 119, 0] },
-	{ pos: [-8, -7, -41], flag: 0, tc: [0, 0], color: [11, 103, 184, 0] },
-	{ pos: [-8, -30, 31], flag: 0, tc: [0, 0], color: [164, 173, 229, 0] },
-	{ pos: [-6, 28, 10], flag: 0, tc: [0, 0], color: [129, 2, 0, 0] },
-	{ pos: [-8, -7, -41], flag: 0, tc: [0, 0], color: [164, 173, 229, 0] },
-	{ pos: [71, -11, -34], flag: 0, tc: [0, 0], color: [253, 136, 217, 0] },
-	{ pos: [71, -30, 23], flag: 0, tc: [0, 0], color: [253, 136, 217, 0] },
-]
-
-export const mario_low_poly_left_arm_shared_dl = [
-	Gbi.gsSPVertex(mario_low_poly_left_arm_shared_dl_vertex, 12, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 1, 0x0),
-	...Gbi.gsSP2Triangles(5, 3, 1, 0x0, 6, 0, 2, 0x0),
-	...Gbi.gsSP2Triangles(7, 8, 9, 0x0, 2, 1, 4, 0x0),
-	...Gbi.gsSP2Triangles(7, 9, 10, 0x0, 7, 10, 11, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_left_arm = [
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].l[0], 1),
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_left_arm_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_low_poly_left_forearm_shared_dl_vertex = [
-	{ pos: [-5, 20, 6], flag: 0, tc: [0, 0], color: [5, 98, 176, 0] },
-	{ pos: [67, 16, 5], flag: 0, tc: [0, 0], color: [67, 75, 76, 0] },
-	{ pos: [67, -14, -31], flag: 0, tc: [0, 0], color: [60, 85, 186, 0] },
-	{ pos: [-5, -30, 21], flag: 0, tc: [0, 0], color: [5, 32, 122, 0] },
-	{ pos: [67, -30, 17], flag: 0, tc: [0, 0], color: [92, 20, 84, 0] },
-	{ pos: [-5, 20, 6], flag: 0, tc: [0, 0], color: [4, 34, 122, 0] },
-	{ pos: [-5, -12, -35], flag: 0, tc: [0, 0], color: [7, 99, 178, 0] },
-	{ pos: [-5, -30, 21], flag: 0, tc: [0, 0], color: [165, 173, 229, 0] },
-	{ pos: [-5, 20, 6], flag: 0, tc: [0, 0], color: [129, 1, 0, 0] },
-	{ pos: [-5, -12, -35], flag: 0, tc: [0, 0], color: [165, 173, 229, 0] },
-	{ pos: [67, -30, 17], flag: 0, tc: [0, 0], color: [254, 136, 217, 0] },
-	{ pos: [67, -14, -31], flag: 0, tc: [0, 0], color: [254, 136, 217, 0] },
-]
-
-export const mario_low_poly_left_forearm_shared_dl = [
-	Gbi.gsSPVertex(mario_low_poly_left_forearm_shared_dl_vertex, 12, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 1, 0x0),
-	...Gbi.gsSP2Triangles(5, 3, 1, 0x0, 6, 0, 2, 0x0),
-	...Gbi.gsSP2Triangles(7, 8, 9, 0x0, 2, 1, 4, 0x0),
-	...Gbi.gsSP2Triangles(10, 7, 9, 0x0, 10, 9, 11, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_low_poly_left_hand_closed_shared_dl_vertex = [
-	{ pos: [-6, 34, -25], flag: 0, tc: [0, 0], color: [160, 19, 176, 0] },
-	{ pos: [-9, 39, 24], flag: 0, tc: [0, 0], color: [179, 67, 74, 0] },
-	{ pos: [91, 80, -34], flag: 0, tc: [0, 0], color: [19, 124, 238, 0] },
-	{ pos: [90, 35, 33], flag: 0, tc: [0, 0], color: [65, 20, 107, 0] },
-	{ pos: [20, -34, 21], flag: 0, tc: [0, 0], color: [212, 154, 60, 0] },
-	{ pos: [122, 4, -45], flag: 0, tc: [0, 0], color: [99, 187, 37, 0] },
-	{ pos: [122, 4, -45], flag: 0, tc: [0, 0], color: [242, 21, 132, 0] },
-	{ pos: [20, -31, -44], flag: 0, tc: [0, 0], color: [203, 174, 177, 0] },
-]
-
-export const mario_low_poly_left_hand_closed_shared_dl = [
-	Gbi.gsSPVertex(mario_low_poly_left_hand_closed_shared_dl_vertex, 8, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 1, 3, 2, 0x0),
-	...Gbi.gsSP2Triangles(4, 5, 3, 0x0, 0, 6, 7, 0x0),
-	...Gbi.gsSP2Triangles(0, 2, 6, 0x0, 4, 7, 5, 0x0),
-	...Gbi.gsSP2Triangles(3, 1, 4, 0x0, 2, 3, 5, 0x0),
-	...Gbi.gsSP2Triangles(0, 7, 4, 0x0, 4, 1, 0, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_left_hand_closed = [
-	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_white_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_left_hand_closed_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_low_poly_right_arm_shared_dl_vertex = [
-	{ pos: [65, 30, 23], flag: 0, tc: [0, 0], color: [94, 235, 81, 0] },
-	{ pos: [66, -21, 8], flag: 0, tc: [0, 0], color: [69, 179, 73, 0] },
-	{ pos: [65, 11, -34], flag: 0, tc: [0, 0], color: [64, 169, 191, 0] },
-	{ pos: [-10, 7, -41], flag: 0, tc: [0, 0], color: [164, 82, 229, 0] },
-	{ pos: [-9, -28, 10], flag: 0, tc: [0, 0], color: [129, 254, 0, 0] },
-	{ pos: [-10, 30, 30], flag: 0, tc: [0, 0], color: [164, 82, 229, 0] },
-	{ pos: [-9, -28, 10], flag: 0, tc: [0, 0], color: [9, 154, 182, 0] },
-	{ pos: [-10, 7, -41], flag: 0, tc: [0, 0], color: [12, 153, 184, 0] },
-	{ pos: [-10, 30, 30], flag: 0, tc: [0, 0], color: [10, 219, 120, 0] },
-	{ pos: [-9, -28, 10], flag: 0, tc: [0, 0], color: [7, 216, 120, 0] },
-	{ pos: [65, 30, 23], flag: 0, tc: [0, 0], color: [252, 120, 217, 0] },
-	{ pos: [65, 11, -34], flag: 0, tc: [0, 0], color: [252, 120, 217, 0] },
-]
-
-export const mario_low_poly_right_arm_shared_dl = [
-	Gbi.gsSPVertex(mario_low_poly_right_arm_shared_dl_vertex, 12, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
-	...Gbi.gsSP2Triangles(2, 6, 7, 0x0, 1, 8, 9, 0x0),
-	...Gbi.gsSP2Triangles(1, 0, 8, 0x0, 2, 1, 6, 0x0),
-	...Gbi.gsSP2Triangles(5, 10, 11, 0x0, 5, 11, 3, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_right_arm = [
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].l[0], 1),
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_right_arm_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_low_poly_right_forearm_shared_dl_vertex = [
-	{ pos: [-13, 12, -35], flag: 0, tc: [0, 0], color: [165, 83, 229, 0] },
-	{ pos: [-13, -20, 6], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
-	{ pos: [-13, 30, 21], flag: 0, tc: [0, 0], color: [165, 83, 229, 0] },
-	{ pos: [54, 14, -31], flag: 0, tc: [0, 0], color: [61, 170, 186, 0] },
-	{ pos: [-13, -20, 6], flag: 0, tc: [0, 0], color: [5, 158, 177, 0] },
-	{ pos: [-13, 12, -35], flag: 0, tc: [0, 0], color: [7, 156, 179, 0] },
-	{ pos: [55, -16, 5], flag: 0, tc: [0, 0], color: [67, 181, 76, 0] },
-	{ pos: [-13, 30, 21], flag: 0, tc: [0, 0], color: [5, 224, 122, 0] },
-	{ pos: [-13, -20, 6], flag: 0, tc: [0, 0], color: [4, 222, 122, 0] },
-	{ pos: [54, 30, 17], flag: 0, tc: [0, 0], color: [92, 237, 84, 0] },
-	{ pos: [54, 30, 17], flag: 0, tc: [0, 0], color: [254, 120, 216, 0] },
-	{ pos: [54, 14, -31], flag: 0, tc: [0, 0], color: [254, 120, 216, 0] },
-]
-
-export const mario_low_poly_right_forearm_shared_dl = [
-	Gbi.gsSPVertex(mario_low_poly_right_forearm_shared_dl_vertex, 12, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
-	...Gbi.gsSP2Triangles(6, 7, 8, 0x0, 6, 9, 7, 0x0),
-	...Gbi.gsSP2Triangles(3, 6, 4, 0x0, 2, 10, 11, 0x0),
-	...Gbi.gsSP2Triangles(2, 11, 0, 0x0, 9, 6, 3, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_low_poly_right_hand_closed_dl_vertex = [
-	{ pos: [85, -38, -32], flag: 0, tc: [0, 0], color: [61, 227, 150, 0] },
-	{ pos: [-15, -35, -22], flag: 0, tc: [0, 0], color: [153, 220, 193, 0] },
-	{ pos: [17, 37, -22], flag: 0, tc: [0, 0], color: [254, 105, 185, 0] },
-	{ pos: [116, -10, 36], flag: 0, tc: [0, 0], color: [102, 71, 22, 0] },
-	{ pos: [82, -85, 44], flag: 0, tc: [0, 0], color: [19, 138, 216, 0] },
-	{ pos: [-15, -35, 43], flag: 0, tc: [0, 0], color: [157, 236, 76, 0] },
-	{ pos: [82, -85, 44], flag: 0, tc: [0, 0], color: [2, 21, 125, 0] },
-	{ pos: [14, 30, 26], flag: 0, tc: [0, 0], color: [202, 80, 81, 0] },
-]
-
-export const mario_low_poly_right_hand_closed_dl = [
-	Gbi.gsSPVertex(mario_low_poly_right_hand_closed_dl_vertex, 8, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
-	...Gbi.gsSP2Triangles(4, 0, 3, 0x0, 4, 5, 1, 0x0),
-	...Gbi.gsSP2Triangles(6, 3, 7, 0x0, 5, 6, 7, 0x0),
-	...Gbi.gsSP2Triangles(0, 4, 1, 0x0, 3, 2, 7, 0x0),
-	...Gbi.gsSP2Triangles(1, 5, 7, 0x0, 7, 2, 1, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_right_hand_closed = [
-	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_white_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_right_hand_closed_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_metal_low_poly_right_hand_closed = [
-	Gbi.gsSPDisplayList(mario_low_poly_right_hand_closed_dl),
-	Gbi.gsSPClearGeometryMode(Gbi.G_TEXTURE_GEN),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_low_poly_left_thigh_dl_vertex = [
-	{ pos: [10, 51, 45], flag: 0, tc: [0, 0], color: [8, 115, 52, 0] },
-	{ pos: [17, -44, 58], flag: 0, tc: [0, 0], color: [10, 17, 125, 0] },
-	{ pos: [94, 48, 38], flag: 0, tc: [0, 0], color: [56, 64, 93, 0] },
-	{ pos: [11, 51, -27], flag: 0, tc: [0, 0], color: [11, 94, 173, 0] },
-	{ pos: [95, 48, -19], flag: 0, tc: [0, 0], color: [74, 79, 191, 0] },
-	{ pos: [18, -45, -38], flag: 0, tc: [0, 0], color: [12, 15, 131, 0] },
-	{ pos: [101, -28, -28], flag: 0, tc: [0, 0], color: [91, 202, 188, 0] },
-	{ pos: [100, -28, 48], flag: 0, tc: [0, 0], color: [99, 189, 41, 0] },
-	{ pos: [17, -44, 58], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
-	{ pos: [10, 51, 45], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
-	{ pos: [18, -45, -38], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
-	{ pos: [11, 51, -27], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
-	{ pos: [18, -45, -38], flag: 0, tc: [0, 0], color: [24, 132, 1, 0] },
-	{ pos: [17, -44, 58], flag: 0, tc: [0, 0], color: [24, 132, 1, 0] },
-]
-
-export const mario_low_poly_left_thigh_dl = [
-	Gbi.gsSPVertex(mario_low_poly_left_thigh_dl_vertex, 14, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 4, 0x0),
-	...Gbi.gsSP2Triangles(5, 3, 4, 0x0, 4, 6, 5, 0x0),
-	...Gbi.gsSP2Triangles(0, 2, 4, 0x0, 1, 7, 2, 0x0),
-	...Gbi.gsSP2Triangles(8, 9, 10, 0x0, 9, 11, 10, 0x0),
-	...Gbi.gsSP2Triangles(6, 4, 7, 0x0, 4, 2, 7, 0x0),
-	...Gbi.gsSP2Triangles(12, 7, 13, 0x0, 12, 6, 7, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_left_thigh = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-	Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].l[0], 1),
-	Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_left_thigh_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-/*export const mario_metal_low_poly_left_thigh = [
-	Gbi.gsSPSetGeometryMode(Gbi.G_TEXTURE_GEN),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALFADE),
-	Gbi.gsDPLoadTextureBlock(mario_texture_metal, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 64, 32, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_white_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_left_thigh_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-*/
-const mario_low_poly_left_leg_shared_dl_vertex = [
-	{ pos: [7, 47, 38], flag: 0, tc: [0, 0], color: [207, 89, 75, 0] },
-	{ pos: [70, -39, 53], flag: 0, tc: [0, 0], color: [248, 16, 125, 0] },
-	{ pos: [75, 52, 42], flag: 0, tc: [0, 0], color: [244, 94, 83, 0] },
-	{ pos: [75, 52, -23], flag: 0, tc: [0, 0], color: [245, 114, 202, 0] },
-	{ pos: [7, 47, -20], flag: 0, tc: [0, 0], color: [171, 52, 178, 0] },
-	{ pos: [71, -39, -34], flag: 0, tc: [0, 0], color: [250, 15, 131, 0] },
-	{ pos: [3, -29, -29], flag: 0, tc: [0, 0], color: [187, 164, 205, 0] },
-	{ pos: [2, -29, 48], flag: 0, tc: [0, 0], color: [146, 219, 49, 0] },
-	{ pos: [71, -39, -34], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
-	{ pos: [75, 52, -23], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
-	{ pos: [70, -39, 53], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
-	{ pos: [75, 52, 42], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
-	{ pos: [71, -39, -34], flag: 0, tc: [0, 0], color: [237, 131, 0, 0] },
-	{ pos: [70, -39, 53], flag: 0, tc: [0, 0], color: [237, 131, 0, 0] },
-]
-
-export const mario_low_poly_left_leg_shared_dl = [
-	Gbi.gsSPVertex(mario_low_poly_left_leg_shared_dl_vertex, 14, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
-	...Gbi.gsSP2Triangles(4, 3, 5, 0x0, 5, 6, 4, 0x0),
-	...Gbi.gsSP2Triangles(3, 4, 0, 0x0, 0, 7, 1, 0x0),
-	...Gbi.gsSP2Triangles(7, 4, 6, 0x0, 7, 0, 4, 0x0),
-	...Gbi.gsSP2Triangles(8, 9, 10, 0x0, 9, 11, 10, 0x0),
-	...Gbi.gsSP2Triangles(6, 12, 13, 0x0, 13, 7, 6, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_low_poly_left_foot_shared_dl_vertex = [
-	{ pos: [110, 11, 56], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
-	{ pos: [109, 10, -33], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
-	{ pos: [-50, 69, -36], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
-	{ pos: [-49, 70, 63], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
-	{ pos: [74, -39, 51], flag: 0, tc: [0, 0], color: [19, 176, 96, 0] },
-	{ pos: [110, 11, 56], flag: 0, tc: [0, 0], color: [91, 187, 54, 0] },
-	{ pos: [-49, 70, 63], flag: 0, tc: [0, 0], color: [0, 244, 126, 0] },
-	{ pos: [73, -40, -25], flag: 0, tc: [0, 0], color: [24, 150, 192, 0] },
-	{ pos: [-56, 20, -30], flag: 0, tc: [0, 0], color: [164, 197, 194, 0] },
-	{ pos: [-50, 69, -36], flag: 0, tc: [0, 0], color: [254, 240, 131, 0] },
-	{ pos: [-54, 20, 58], flag: 0, tc: [0, 0], color: [153, 194, 38, 0] },
-	{ pos: [109, 10, -33], flag: 0, tc: [0, 0], color: [68, 194, 170, 0] },
-	{ pos: [-50, 69, -36], flag: 0, tc: [0, 0], color: [130, 14, 1, 0] },
-	{ pos: [-49, 70, 63], flag: 0, tc: [0, 0], color: [130, 14, 1, 0] },
-]
-
-export const mario_low_poly_left_foot_shared_dl = [
-	Gbi.gsSPVertex(mario_low_poly_left_foot_shared_dl_vertex, 14, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 2, 0x0),
-	...Gbi.gsSP2Triangles(4, 5, 6, 0x0, 7, 8, 9, 0x0),
-	...Gbi.gsSP2Triangles(10, 4, 6, 0x0, 7, 9, 11, 0x0),
-	...Gbi.gsSP2Triangles(12, 10, 13, 0x0, 7, 10, 8, 0x0),
-	...Gbi.gsSP2Triangles(7, 11, 5, 0x0, 5, 4, 7, 0x0),
-	...Gbi.gsSP2Triangles(7, 4, 10, 0x0, 12, 8, 10, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_left_foot = [
-	Gbi.gsSPLight(mario_brown1_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_brown1_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_left_foot_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_low_poly_right_thigh_shared_dl_vertex = [
-	{ pos: [102, -25, -48], flag: 0, tc: [0, 0], color: [100, 191, 213, 0] },
-	{ pos: [103, -27, 25], flag: 0, tc: [0, 0], color: [92, 201, 66, 0] },
-	{ pos: [25, -45, 35], flag: 0, tc: [0, 0], color: [27, 133, 253, 0] },
-	{ pos: [24, -42, -56], flag: 0, tc: [0, 0], color: [27, 133, 253, 0] },
-	{ pos: [95, 50, -36], flag: 0, tc: [0, 0], color: [55, 66, 163, 0] },
-	{ pos: [96, 49, 18], flag: 0, tc: [0, 0], color: [74, 78, 65, 0] },
-	{ pos: [25, -45, 35], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
-	{ pos: [17, 51, 27], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
-	{ pos: [15, 53, -42], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
-	{ pos: [24, -42, -56], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
-	{ pos: [24, -42, -56], flag: 0, tc: [0, 0], color: [9, 19, 131, 0] },
-	{ pos: [15, 53, -42], flag: 0, tc: [0, 0], color: [7, 116, 206, 0] },
-	{ pos: [25, -45, 35], flag: 0, tc: [0, 0], color: [13, 12, 125, 0] },
-	{ pos: [17, 51, 27], flag: 0, tc: [0, 0], color: [11, 92, 85, 0] },
-]
-
-export const mario_low_poly_right_thigh_shared_dl = [
-	Gbi.gsSPVertex(mario_low_poly_right_thigh_shared_dl_vertex, 14, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 2, 0x0),
-	...Gbi.gsSP2Triangles(0, 4, 5, 0x0, 0, 5, 1, 0x0),
-	...Gbi.gsSP2Triangles(6, 7, 8, 0x0, 6, 8, 9, 0x0),
-	...Gbi.gsSP2Triangles(4, 0, 10, 0x0, 5, 4, 11, 0x0),
-	...Gbi.gsSP2Triangles(12, 1, 5, 0x0, 5, 13, 12, 0x0),
-	...Gbi.gsSP2Triangles(5, 11, 13, 0x0, 4, 10, 11, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_right_thigh = [
-	Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].l[0], 1),
-	Gbi.gsSPLight(mario_overalls_lights_group[window.currentMarioSkinID].a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_right_thigh_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_low_poly_right_leg_shared_dl_vertex = [
-	{ pos: [2, -29, 27], flag: 0, tc: [0, 0], color: [186, 163, 49, 0] },
-	{ pos: [1, -26, -50], flag: 0, tc: [0, 0], color: [145, 221, 207, 0] },
-	{ pos: [68, -37, -56], flag: 0, tc: [0, 0], color: [236, 131, 253, 0] },
-	{ pos: [70, -40, 30], flag: 0, tc: [0, 0], color: [236, 131, 253, 0] },
-	{ pos: [68, -37, -56], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
-	{ pos: [74, 54, -43], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
-	{ pos: [75, 52, 21], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
-	{ pos: [70, -40, 30], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
-	{ pos: [6, 47, 19], flag: 0, tc: [0, 0], color: [173, 51, 80, 0] },
-	{ pos: [6, 49, -38], flag: 0, tc: [0, 0], color: [207, 91, 183, 0] },
-	{ pos: [68, -37, -56], flag: 0, tc: [0, 0], color: [248, 19, 131, 0] },
-	{ pos: [75, 52, 21], flag: 0, tc: [0, 0], color: [247, 113, 56, 0] },
-	{ pos: [70, -40, 30], flag: 0, tc: [0, 0], color: [251, 12, 126, 0] },
-	{ pos: [74, 54, -43], flag: 0, tc: [0, 0], color: [244, 96, 175, 0] },
-]
-
-export const mario_low_poly_right_leg_shared_dl = [
-	Gbi.gsSPVertex(mario_low_poly_right_leg_shared_dl_vertex, 14, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 2, 3, 0, 0x0),
-	...Gbi.gsSP2Triangles(4, 5, 6, 0x0, 4, 6, 7, 0x0),
-	...Gbi.gsSP2Triangles(8, 9, 1, 0x0, 0, 8, 1, 0x0),
-	...Gbi.gsSP2Triangles(10, 1, 9, 0x0, 9, 8, 11, 0x0),
-	...Gbi.gsSP2Triangles(8, 0, 12, 0x0, 12, 11, 8, 0x0),
-	...Gbi.gsSP2Triangles(11, 13, 9, 0x0, 13, 10, 9, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_low_poly_right_foot_dl_vertex = [
-	{ pos: [-55, 19, -59], flag: 0, tc: [0, 0], color: [154, 192, 218, 0] },
-	{ pos: [-57, 20, 28], flag: 0, tc: [0, 0], color: [164, 197, 62, 0] },
-	{ pos: [-52, 69, 34], flag: 0, tc: [0, 0], color: [130, 12, 253, 0] },
-	{ pos: [73, -38, -50], flag: 0, tc: [0, 0], color: [21, 174, 162, 0] },
-	{ pos: [71, -37, 25], flag: 0, tc: [0, 0], color: [25, 152, 66, 0] },
-	{ pos: [108, 12, -55], flag: 0, tc: [0, 0], color: [92, 188, 204, 0] },
-	{ pos: [106, 13, 33], flag: 0, tc: [0, 0], color: [68, 197, 88, 0] },
-	{ pos: [-50, 68, -65], flag: 0, tc: [0, 0], color: [130, 12, 253, 0] },
-	{ pos: [-52, 69, 34], flag: 0, tc: [0, 0], color: [253, 242, 126, 0] },
-	{ pos: [-50, 68, -65], flag: 0, tc: [0, 0], color: [2, 242, 130, 0] },
-	{ pos: [-52, 69, 34], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
-	{ pos: [108, 12, -55], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
-	{ pos: [-50, 68, -65], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
-	{ pos: [106, 13, 33], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
-]
-
-export const mario_low_poly_right_foot_dl = [
-	Gbi.gsSPVertex(mario_low_poly_right_foot_dl_vertex, 14, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 3, 4, 0x0),
-	...Gbi.gsSP2Triangles(4, 3, 5, 0x0, 5, 6, 4, 0x0),
-	...Gbi.gsSP2Triangles(1, 0, 4, 0x0, 7, 0, 2, 0x0),
-	...Gbi.gsSP2Triangles(6, 8, 4, 0x0, 9, 3, 0, 0x0),
-	...Gbi.gsSP2Triangles(8, 1, 4, 0x0, 9, 5, 3, 0x0),
-	...Gbi.gsSP2Triangles(10, 11, 12, 0x0, 10, 13, 11, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_right_foot = [
-	Gbi.gsSPLight(mario_brown1_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_brown1_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_right_foot_dl),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsDPSetEnvColor(255, 255, 255, 255),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_metal_low_poly_right_foot = [
-	Gbi.gsSPDisplayList(mario_low_poly_right_foot_dl),
-	Gbi.gsSPClearGeometryMode(Gbi.G_TEXTURE_GEN),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetEnvColor(255, 255, 255, 255),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_seg4_vertex_04017B58 = [
-	{ pos: [-28, 41, -88], flag: 0, tc: [-396, 1646], color: [183, 49, 165, 255] },
-	{ pos: [0, 98, 0], flag: 0, tc: [1968, 722], color: [240, 125, 0, 255] },
-	{ pos: [35, 64, -82], flag: 0, tc: [-390, 132], color: [41, 75, 163, 255] },
-	{ pos: [39, 90, 0], flag: 0, tc: [1698, -280], color: [74, 103, 0, 255] },
-	{ pos: [-28, 41, 89], flag: 0, tc: [1610, 1512], color: [209, 55, 103, 255] },
-	{ pos: [35, 64, 83], flag: 0, tc: [1070, -68], color: [41, 75, 93, 255] },
-	{ pos: [0, 98, 0], flag: 0, tc: [-1064, 968], color: [240, 125, 0, 255] },
-	{ pos: [39, 90, 0], flag: 0, tc: [-1146, -124], color: [74, 103, 0, 255] },
-]
-
-const mario_seg4_vertex_04017BD8 = [
-	{ pos: [-28, -71, 81], flag: 0, tc: [0, 0], color: [154, 189, 32, 255] },
-	{ pos: [-28, 41, -88], flag: 0, tc: [0, 0], color: [183, 49, 165, 255] },
-	{ pos: [-28, -71, -80], flag: 0, tc: [0, 0], color: [183, 181, 186, 255] },
-	{ pos: [39, -79, -73], flag: 0, tc: [0, 0], color: [39, 179, 164, 255] },
-	{ pos: [-28, 41, 89], flag: 0, tc: [0, 0], color: [209, 55, 103, 255] },
-	{ pos: [-28, 89, 0], flag: 0, tc: [0, 0], color: [151, 70, 0, 255] },
-	{ pos: [39, -79, 74], flag: 0, tc: [0, 0], color: [55, 186, 89, 255] },
-	{ pos: [35, 64, 83], flag: 0, tc: [0, 0], color: [41, 75, 93, 255] },
-	{ pos: [0, 98, 0], flag: 0, tc: [0, 0], color: [240, 125, 0, 255] },
-	{ pos: [35, 64, -82], flag: 0, tc: [0, 0], color: [41, 75, 163, 255] },
-	{ pos: [89, -45, -42], flag: 0, tc: [0, 0], color: [112, 208, 223, 255] },
-	{ pos: [89, -45, 43], flag: 0, tc: [0, 0], color: [117, 228, 40, 255] },
-	{ pos: [74, 26, -59], flag: 0, tc: [0, 0], color: [97, 37, 185, 255] },
-	{ pos: [39, 90, 0], flag: 0, tc: [0, 0], color: [74, 103, 0, 255] },
-	{ pos: [74, 26, 60], flag: 0, tc: [0, 0], color: [97, 37, 71, 255] },
-]
-
-const mario_seg4_vertex_04017CC8 = [
-	{ pos: [74, 26, 60], flag: 0, tc: [0, 0], color: [97, 37, 71, 255] },
-	{ pos: [87, 42, 0], flag: 0, tc: [0, 0], color: [118, 45, 0, 255] },
-	{ pos: [39, 90, 0], flag: 0, tc: [0, 0], color: [74, 103, 0, 255] },
-	{ pos: [39, -79, -73], flag: 0, tc: [0, 0], color: [39, 179, 164, 255] },
-	{ pos: [35, 64, -82], flag: 0, tc: [0, 0], color: [41, 75, 163, 255] },
-	{ pos: [74, 26, -59], flag: 0, tc: [0, 0], color: [97, 37, 185, 255] },
-	{ pos: [89, -45, -42], flag: 0, tc: [0, 0], color: [112, 208, 223, 255] },
-	{ pos: [39, -79, 74], flag: 0, tc: [0, 0], color: [55, 186, 89, 255] },
-	{ pos: [89, -45, 43], flag: 0, tc: [0, 0], color: [117, 228, 40, 255] },
-	{ pos: [35, 64, 83], flag: 0, tc: [0, 0], color: [41, 75, 93, 255] },
-]
-
-export const mario_low_poly_yellow_button_dl = [
-	Gbi.gsSPVertex(mario_seg4_vertex_04017B58, 8, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 2, 1, 0x0),
-	...Gbi.gsSP2Triangles(4, 5, 6, 0x0, 6, 5, 7, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_pants_overalls_shared_dl = [
-	Gbi.gsSPVertex(mario_seg4_vertex_04017BD8, 15, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 2, 3, 0, 0x0),
-	...Gbi.gsSP2Triangles(0, 4, 5, 0x0, 3, 6, 0, 0x0),
-	...Gbi.gsSP2Triangles(4, 0, 6, 0x0, 0, 5, 1, 0x0),
-	...Gbi.gsSP2Triangles(7, 4, 6, 0x0, 5, 4, 8, 0x0),
-	...Gbi.gsSP2Triangles(8, 1, 5, 0x0, 3, 1, 9, 0x0),
-	...Gbi.gsSP2Triangles(3, 2, 1, 0x0, 6, 3, 10, 0x0),
-	...Gbi.gsSP2Triangles(10, 11, 6, 0x0, 12, 9, 13, 0x0),
-	Gbi.gsSP1Triangle(13, 7, 14, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_tshirt_shared_dl = [
-	Gbi.gsSPVertex(mario_seg4_vertex_04017CC8, 10, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
-	...Gbi.gsSP2Triangles(5, 6, 3, 0x0, 2, 1, 5, 0x0),
-	...Gbi.gsSP2Triangles(6, 5, 1, 0x0, 7, 8, 0, 0x0),
-	...Gbi.gsSP2Triangles(7, 0, 9, 0x0, 8, 6, 1, 0x0),
-	Gbi.gsSP1Triangle(1, 0, 8, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_torso_dl = [
-	Gbi.gsSPDisplayList(mario_low_poly_pants_overalls_shared_dl),
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].l[0], 1),
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_tshirt_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_torso = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_yellow_button),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPDisplayList(mario_low_poly_yellow_button_dl),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-	Gbi.gsSPDisplayList(mario_low_poly_torso_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_metal_low_poly_torso = [
-	Gbi.gsSPDisplayList(mario_low_poly_yellow_button_dl),
-	Gbi.gsSPDisplayList(mario_low_poly_pants_overalls_shared_dl),
-	Gbi.gsSPDisplayList(mario_low_poly_tshirt_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-const mario_low_poly_mario_m_logo_dl_vertex = [
-	{ pos: [272, 48, 53], flag: 0, tc: [904, 0], color: [66, 81, 71, 255] },
-	{ pos: [174, 79, -9], flag: 0, tc: [452, 816], color: [81, 97, 250, 255] },
-	{ pos: [146, 27, 92], flag: 0, tc: [1238, 962], color: [3, 58, 112, 255] },
-	{ pos: [272, 48, -52], flag: 0, tc: [-2, 0], color: [98, 39, 186, 255] },
-	{ pos: [146, 27, -91], flag: 0, tc: [-334, 962], color: [3, 57, 143, 255] },
-]
-
-const mario_low_poly_eyes_cap_on_dl_vertex = [
-	{ pos: [146, 27, 92], flag: 0, tc: [1316, 212], color: [3, 58, 112, 255] },
-	{ pos: [168, 79, 0], flag: 0, tc: [458, 68], color: [217, 120, 0, 255] },
-	{ pos: [88, 101, 33], flag: 0, tc: [762, 990], color: [56, 85, 75, 255] },
-	{ pos: [88, 101, -32], flag: 0, tc: [154, 990], color: [30, 93, 177, 255] },
-	{ pos: [146, 27, -91], flag: 0, tc: [-398, 212], color: [3, 57, 143, 255] },
-]
-
-const mario_low_poly_mustache_cap_on_dl_vertex = [
-	{ pos: [88, 101, -32], flag: 0, tc: [398, 214], color: [30, 93, 177, 255] },
-	{ pos: [146, 27, -91], flag: 0, tc: [1408, -550], color: [3, 57, 143, 255] },
-	{ pos: [34, 39, -98], flag: 0, tc: [1306, 732], color: [205, 64, 160, 255] },
-	{ pos: [44, 113, 0], flag: 0, tc: [10, 800], color: [156, 77, 0, 255] },
-	{ pos: [-5, 58, 0], flag: 0, tc: [300, 1456], color: [136, 40, 0, 255] },
-	{ pos: [88, 101, 33], flag: 0, tc: [294, 258], color: [56, 85, 75, 255] },
-	{ pos: [44, 113, 0], flag: 0, tc: [34, 840], color: [156, 77, 0, 255] },
-	{ pos: [34, 39, 99], flag: 0, tc: [1314, 634], color: [205, 64, 96, 255] },
-	{ pos: [146, 27, 92], flag: 0, tc: [1132, -556], color: [3, 58, 112, 255] },
-	{ pos: [-5, 58, 0], flag: 0, tc: [470, 1412], color: [136, 40, 0, 255] },
-]
-
-const mario_low_poly_face_cap_dl_vertex = [
-	{ pos: [272, 48, -52], flag: 0, tc: [0, 0], color: [98, 39, 186, 255] },
-	{ pos: [272, 48, 53], flag: 0, tc: [0, 0], color: [66, 81, 71, 255] },
-	{ pos: [149, -87, 138], flag: 0, tc: [0, 0], color: [67, 182, 77, 255] },
-	{ pos: [146, 27, -91], flag: 0, tc: [0, 0], color: [3, 57, 143, 255] },
-	{ pos: [149, -87, -137], flag: 0, tc: [0, 0], color: [51, 194, 159, 255] },
-	{ pos: [146, 27, 92], flag: 0, tc: [0, 0], color: [3, 58, 112, 255] },
-	{ pos: [58, -114, 81], flag: 0, tc: [0, 0], color: [186, 173, 64, 255] },
-	{ pos: [98, -165, 0], flag: 0, tc: [0, 0], color: [253, 130, 0, 255] },
-	{ pos: [58, -114, -80], flag: 0, tc: [0, 0], color: [188, 184, 178, 255] },
-	{ pos: [168, 79, 0], flag: 0, tc: [0, 0], color: [217, 120, 0, 255] },
-	{ pos: [175, 154, 0], flag: 0, tc: [0, 0], color: [225, 108, 198, 255] },
-	{ pos: [174, 79, -9], flag: 0, tc: [0, 0], color: [81, 97, 250, 255] },
-]
-
-const mario_low_poly_face_part_cap_on_dl_vertex = [
-	{ pos: [94, 146, 33], flag: 0, tc: [0, 0], color: [255, 68, 107, 255] },
-	{ pos: [50, 153, 0], flag: 0, tc: [0, 0], color: [173, 95, 0, 255] },
-	{ pos: [44, 113, 0], flag: 0, tc: [0, 0], color: [156, 77, 0, 255] },
-	{ pos: [88, 101, 33], flag: 0, tc: [0, 0], color: [56, 85, 75, 255] },
-	{ pos: [94, 146, -32], flag: 0, tc: [0, 0], color: [59, 53, 158, 255] },
-	{ pos: [88, 101, -32], flag: 0, tc: [0, 0], color: [30, 93, 177, 255] },
-	{ pos: [34, 39, 99], flag: 0, tc: [0, 0], color: [205, 64, 96, 255] },
-	{ pos: [-5, 58, 0], flag: 0, tc: [0, 0], color: [136, 40, 0, 255] },
-	{ pos: [7, -85, 79], flag: 0, tc: [0, 0], color: [170, 220, 84, 255] },
-	{ pos: [146, 27, 92], flag: 0, tc: [0, 0], color: [3, 58, 112, 255] },
-	{ pos: [7, -85, -78], flag: 0, tc: [0, 0], color: [169, 199, 185, 255] },
-	{ pos: [34, 39, -98], flag: 0, tc: [0, 0], color: [205, 64, 160, 255] },
-	{ pos: [146, 27, -91], flag: 0, tc: [0, 0], color: [3, 57, 143, 255] },
-]
-
-const mario_low_poly_face_back_hair_cap_on_dl_vertex = [
-	{ pos: [58, -114, 81], flag: 0, tc: [0, 0], color: [186, 173, 64, 255] },
-	{ pos: [7, -85, 79], flag: 0, tc: [0, 0], color: [170, 220, 84, 255] },
-	{ pos: [7, -85, -78], flag: 0, tc: [0, 0], color: [169, 199, 185, 255] },
-	{ pos: [58, -114, -80], flag: 0, tc: [0, 0], color: [188, 184, 178, 255] },
-	{ pos: [146, 27, 92], flag: 0, tc: [0, 0], color: [3, 58, 112, 255] },
-	{ pos: [146, 27, -91], flag: 0, tc: [0, 0], color: [3, 57, 143, 255] },
-]
-
-export const mario_low_poly_mario_m_logo_dl = [
-	Gbi.gsSPVertex(mario_low_poly_mario_m_logo_dl_vertex, 5, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 1, 0x0),
-	Gbi.gsSP1Triangle(3, 1, 0, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_eyes_cap_on_dl = [
-	Gbi.gsSPVertex(mario_low_poly_eyes_cap_on_dl_vertex, 5, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 1, 4, 0x0),
-	Gbi.gsSP1Triangle(3, 2, 1, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_mustache_cap_on_dl = [
-	Gbi.gsSPVertex(mario_low_poly_mustache_cap_on_dl_vertex, 10, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 2, 3, 0, 0x0),
-	...Gbi.gsSP2Triangles(2, 4, 3, 0x0, 5, 6, 7, 0x0),
-	...Gbi.gsSP2Triangles(7, 8, 5, 0x0, 6, 9, 7, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_face_part_cap_on_dl = [
-	Gbi.gsSPVertex(mario_low_poly_face_part_cap_on_dl_vertex, 13, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 2, 0x0),
-	...Gbi.gsSP2Triangles(2, 1, 4, 0x0, 2, 4, 5, 0x0),
-	...Gbi.gsSP2Triangles(4, 1, 0, 0x0, 4, 0, 3, 0x0),
-	...Gbi.gsSP2Triangles(5, 4, 3, 0x0, 6, 7, 8, 0x0),
-	...Gbi.gsSP2Triangles(9, 6, 8, 0x0, 8, 7, 10, 0x0),
-	...Gbi.gsSP2Triangles(10, 7, 11, 0x0, 10, 11, 12, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_face_cap_dl = [
-	Gbi.gsSPVertex(mario_low_poly_face_cap_dl_vertex, 12, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 4, 0x0),
-	...Gbi.gsSP2Triangles(4, 0, 2, 0x0, 2, 1, 5, 0x0),
-	...Gbi.gsSP2Triangles(6, 2, 5, 0x0, 6, 7, 2, 0x0),
-	...Gbi.gsSP2Triangles(7, 4, 2, 0x0, 3, 4, 8, 0x0),
-	...Gbi.gsSP2Triangles(4, 7, 8, 0x0, 9, 10, 3, 0x0),
-	...Gbi.gsSP2Triangles(10, 11, 3, 0x0, 8, 7, 6, 0x0),
-	...Gbi.gsSP2Triangles(10, 5, 11, 0x0, 10, 9, 5, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_face_back_hair_cap_on_dl = [
-	Gbi.gsSPVertex(mario_low_poly_face_back_hair_cap_on_dl_vertex, 6, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
-	...Gbi.gsSP2Triangles(4, 1, 0, 0x0, 3, 2, 5, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_face_cap_on_dl = [
-	Gbi.gsSPDisplayList(mario_low_poly_face_part_cap_on_dl),
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].l[0], 1),
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[window.currentMarioSkinID].a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_face_cap_dl),
-	Gbi.gsSPLight(mario_brown2_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_brown2_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_face_back_hair_cap_on_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_cap_on_eyes_front = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_front),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_on_dl),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-	Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_cap_on_eyes_half_closed = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_half_closed),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_on_dl),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-	Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const mario_low_poly_cap_on_eyes_closed = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_closed),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_on_dl),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-	Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
-	Gbi.gsSPEndDisplayList(),
-]
+// const mario_medium_poly_butt_dl_vertex_group1 = [
+// 	{ pos: [0, 78, 37], flag: 0, tc: [0, 0], color: [199, 111, 20, 0] },
+// 	{ pos: [44, 80, 46], flag: 0, tc: [0, 0], color: [54, 104, 46, 0] },
+// 	{ pos: [43, 80, -45], flag: 0, tc: [0, 0], color: [44, 112, 219, 0] },
+// 	{ pos: [-6, -84, 50], flag: 0, tc: [0, 0], color: [213, 144, 38, 0] },
+// 	{ pos: [41, -86, -45], flag: 0, tc: [0, 0], color: [53, 144, 231, 0] },
+// 	{ pos: [41, -86, 45], flag: 0, tc: [0, 0], color: [68, 155, 31, 0] },
+// 	{ pos: [-33, -45, -31], flag: 0, tc: [0, 0], color: [135, 233, 227, 0] },
+// 	{ pos: [-33, -45, 31], flag: 0, tc: [0, 0], color: [134, 229, 21, 0] },
+// 	{ pos: [-32, 43, -22], flag: 0, tc: [0, 0], color: [139, 45, 240, 0] },
+// 	{ pos: [-2, 41, 95], flag: 0, tc: [0, 0], color: [186, 59, 87, 0] },
+// 	{ pos: [-5, -45, 97], flag: 0, tc: [0, 0], color: [199, 222, 107, 0] },
+// 	{ pos: [44, 36, 95], flag: 0, tc: [0, 0], color: [61, 34, 105, 0] },
+// 	{ pos: [-5, -45, -97], flag: 0, tc: [0, 0], color: [199, 221, 149, 0] },
+// 	{ pos: [-2, 41, -95], flag: 0, tc: [0, 0], color: [186, 59, 170, 0] },
+// 	{ pos: [44, 35, -96], flag: 0, tc: [0, 0], color: [60, 34, 150, 0] },
+// 	{ pos: [-6, -84, -50], flag: 0, tc: [0, 0], color: [193, 154, 217, 0] },
+// ]
+
+// const mario_medium_poly_butt_dl_vertex_group2 = [
+// 	{ pos: [-2, 41, 95], flag: 0, tc: [0, 0], color: [186, 59, 87, 0] },
+// 	{ pos: [0, 78, 37], flag: 0, tc: [0, 0], color: [199, 111, 20, 0] },
+// 	{ pos: [-32, 43, 22], flag: 0, tc: [0, 0], color: [140, 44, 24, 0] },
+// 	{ pos: [0, 78, -37], flag: 0, tc: [0, 0], color: [197, 108, 226, 0] },
+// 	{ pos: [-2, 41, -95], flag: 0, tc: [0, 0], color: [186, 59, 170, 0] },
+// 	{ pos: [-32, 43, -22], flag: 0, tc: [0, 0], color: [139, 45, 240, 0] },
+// 	{ pos: [-33, -45, 31], flag: 0, tc: [0, 0], color: [134, 229, 21, 0] },
+// 	{ pos: [-33, -45, -31], flag: 0, tc: [0, 0], color: [135, 233, 227, 0] },
+// 	{ pos: [-6, -84, -50], flag: 0, tc: [0, 0], color: [193, 154, 217, 0] },
+// 	{ pos: [43, -48, -97], flag: 0, tc: [0, 0], color: [59, 193, 164, 0] },
+// 	{ pos: [41, -86, -45], flag: 0, tc: [0, 0], color: [53, 144, 231, 0] },
+// 	{ pos: [-6, -84, 50], flag: 0, tc: [0, 0], color: [213, 144, 38, 0] },
+// 	{ pos: [41, -86, 45], flag: 0, tc: [0, 0], color: [68, 155, 31, 0] },
+// 	{ pos: [43, -48, 97], flag: 0, tc: [0, 0], color: [59, 194, 92, 0] },
+// 	{ pos: [44, 36, 95], flag: 0, tc: [0, 0], color: [61, 34, 105, 0] },
+// 	{ pos: [44, 80, 46], flag: 0, tc: [0, 0], color: [54, 104, 46, 0] },
+// ]
+
+// const mario_medium_poly_butt_dl_vertex_group3 = [
+// 	{ pos: [-2, 41, -95], flag: 0, tc: [0, 0], color: [186, 59, 170, 0] },
+// 	{ pos: [43, 80, -45], flag: 0, tc: [0, 0], color: [44, 112, 219, 0] },
+// 	{ pos: [44, 35, -96], flag: 0, tc: [0, 0], color: [60, 34, 150, 0] },
+// 	{ pos: [0, 78, -37], flag: 0, tc: [0, 0], color: [197, 108, 226, 0] },
+// 	{ pos: [44, 80, 46], flag: 0, tc: [0, 0], color: [54, 104, 46, 0] },
+// 	{ pos: [0, 78, 37], flag: 0, tc: [0, 0], color: [199, 111, 20, 0] },
+// 	{ pos: [-2, 41, 95], flag: 0, tc: [0, 0], color: [186, 59, 87, 0] },
+// 	{ pos: [-32, 43, -22], flag: 0, tc: [0, 0], color: [139, 45, 240, 0] },
+// 	{ pos: [43, -48, 97], flag: 0, tc: [0, 0], color: [59, 194, 92, 0] },
+// 	{ pos: [-5, -45, 97], flag: 0, tc: [0, 0], color: [199, 222, 107, 0] },
+// 	{ pos: [-6, -84, 50], flag: 0, tc: [0, 0], color: [213, 144, 38, 0] },
+// 	{ pos: [-6, -84, -50], flag: 0, tc: [0, 0], color: [193, 154, 217, 0] },
+// 	{ pos: [-5, -45, -97], flag: 0, tc: [0, 0], color: [199, 221, 149, 0] },
+// 	{ pos: [43, -48, -97], flag: 0, tc: [0, 0], color: [59, 193, 164, 0] },
+// 	{ pos: [-33, -45, 31], flag: 0, tc: [0, 0], color: [134, 229, 21, 0] },
+// 	{ pos: [-33, -45, -31], flag: 0, tc: [0, 0], color: [135, 233, 227, 0] },
+// ]
+
+// const mario_medium_poly_butt_dl_vertex_group4 = [
+// 	{ pos: [-5, -45, 97], flag: 0, tc: [0, 0], color: [199, 222, 107, 0] },
+// 	{ pos: [43, -48, 97], flag: 0, tc: [0, 0], color: [59, 194, 92, 0] },
+// 	{ pos: [44, 36, 95], flag: 0, tc: [0, 0], color: [61, 34, 105, 0] },
+// 	{ pos: [-33, -45, 31], flag: 0, tc: [0, 0], color: [134, 229, 21, 0] },
+// 	{ pos: [-32, 43, 22], flag: 0, tc: [0, 0], color: [140, 44, 24, 0] },
+// 	{ pos: [-32, 43, -22], flag: 0, tc: [0, 0], color: [139, 45, 240, 0] },
+// 	{ pos: [-6, -84, 50], flag: 0, tc: [0, 0], color: [213, 144, 38, 0] },
+// 	{ pos: [-6, -84, -50], flag: 0, tc: [0, 0], color: [193, 154, 217, 0] },
+// 	{ pos: [41, -86, -45], flag: 0, tc: [0, 0], color: [53, 144, 231, 0] },
+// 	{ pos: [43, 80, -45], flag: 0, tc: [0, 0], color: [44, 112, 219, 0] },
+// 	{ pos: [0, 78, -37], flag: 0, tc: [0, 0], color: [197, 108, 226, 0] },
+// 	{ pos: [0, 78, 37], flag: 0, tc: [0, 0], color: [199, 111, 20, 0] },
+// 	{ pos: [85, -5, 0], flag: 0, tc: [0, 0], color: [127, 254, 0, 0] },
+// 	{ pos: [44, 35, -96], flag: 0, tc: [0, 0], color: [60, 34, 150, 0] },
+// 	{ pos: [43, -48, -97], flag: 0, tc: [0, 0], color: [59, 193, 164, 0] },
+// 	{ pos: [41, -86, 45], flag: 0, tc: [0, 0], color: [68, 155, 31, 0] },
+// ]
+
+// const mario_medium_poly_butt_dl_vertex_group5 = [
+// 	{ pos: [44, 36, 95], flag: 0, tc: [0, 0], color: [61, 34, 105, 0] },
+// 	{ pos: [85, -5, 0], flag: 0, tc: [0, 0], color: [127, 254, 0, 0] },
+// 	{ pos: [44, 80, 46], flag: 0, tc: [0, 0], color: [54, 104, 46, 0] },
+// 	{ pos: [43, 80, -45], flag: 0, tc: [0, 0], color: [44, 112, 219, 0] },
+// ]
+
+// export const mario_medium_poly_butt_dl = [
+// 	Gbi.gsSPVertex(mario_medium_poly_butt_dl_vertex_group1, 16, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 7, 8, 0x0, 9, 10, 11, 0x0),
+// 	...Gbi.gsSP2Triangles(12, 13, 14, 0x0, 12, 15, 6, 0x0),
+// 	Gbi.gsSP1Triangle(3, 10, 7, 0x0),
+// 	Gbi.gsSPVertex(mario_medium_poly_butt_dl_vertex_group2, 16, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(0, 2, 6, 0x0, 7, 5, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 8, 6, 0x0, 9, 10, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(11, 12, 13, 0x0, 2, 1, 5, 0x0),
+// 	Gbi.gsSP1Triangle(14, 15, 0, 0x0),
+// 	Gbi.gsSPVertex(mario_medium_poly_butt_dl_vertex_group3, 16, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 3, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 5, 6, 0x0, 5, 3, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 9, 10, 0x0, 11, 12, 13, 0x0),
+// 	...Gbi.gsSP2Triangles(11, 10, 14, 0x0, 0, 12, 15, 0x0),
+// 	...Gbi.gsSP2Triangles(14, 9, 6, 0x0, 2, 13, 12, 0x0),
+// 	Gbi.gsSPVertex(mario_medium_poly_butt_dl_vertex_group4, 16, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 7, 8, 0x0, 9, 10, 11, 0x0),
+// 	...Gbi.gsSP2Triangles(9, 12, 13, 0x0, 13, 12, 14, 0x0),
+// 	...Gbi.gsSP2Triangles(14, 12, 8, 0x0, 8, 12, 15, 0x0),
+// 	...Gbi.gsSP2Triangles(15, 12, 1, 0x0, 1, 12, 2, 0x0),
+// 	Gbi.gsSPVertex(mario_medium_poly_butt_dl_vertex_group5, 4, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 2, 1, 3, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_medium_poly_butt = [
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+// 	Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
+// 	Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+// 	Gbi.gsSPDisplayList(mario_medium_poly_butt_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+
+// const mario_medium_poly_left_arm_shared_dl_vertex = [
+// 	{ pos: [-6, -32, -22], flag: 0, tc: [0, 0], color: [8, 132, 24, 0] },
+// 	{ pos: [60, -27, -18], flag: 0, tc: [0, 0], color: [61, 197, 163, 0] },
+// 	{ pos: [60, -18, 26], flag: 0, tc: [0, 0], color: [92, 190, 54, 0] },
+// 	{ pos: [-6, -32, -22], flag: 0, tc: [0, 0], color: [7, 245, 130, 0] },
+// 	{ pos: [-7, 21, -27], flag: 0, tc: [0, 0], color: [7, 245, 130, 0] },
+// 	{ pos: [59, 16, -22], flag: 0, tc: [0, 0], color: [91, 79, 218, 0] },
+// 	{ pos: [-7, 20, 18], flag: 0, tc: [0, 0], color: [12, 115, 50, 0] },
+// 	{ pos: [59, 14, 14], flag: 0, tc: [0, 0], color: [56, 75, 85, 0] },
+// 	{ pos: [-6, -21, 33], flag: 0, tc: [0, 0], color: [11, 42, 119, 0] },
+// 	{ pos: [-7, 21, -27], flag: 0, tc: [0, 0], color: [10, 126, 4, 0] },
+// 	{ pos: [-6, -21, 33], flag: 0, tc: [0, 0], color: [8, 132, 24, 0] },
+// 	{ pos: [-7, 21, -27], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
+// 	{ pos: [-6, -32, -22], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
+// 	{ pos: [-6, -21, 33], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
+// 	{ pos: [-7, 20, 18], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
+// ]
+
+// export const mario_medium_poly_left_arm_shared_dl = [
+// 	Gbi.gsSPVertex(mario_medium_poly_left_arm_shared_dl_vertex, 15, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 5, 1, 0x0, 6, 7, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 2, 7, 0x0, 6, 8, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(9, 6, 5, 0x0, 10, 0, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 2, 1, 0x0, 11, 12, 13, 0x0),
+// 	...Gbi.gsSP2Triangles(13, 14, 11, 0x0, 5, 7, 2, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_medium_poly_left_arm = [
+// 	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
+// 	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+// 	Gbi.gsSPDisplayList(mario_medium_poly_left_arm_shared_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_medium_poly_left_forearm_shared_dl_vertex = [
+// 	{ pos: [-9, -29, -18], flag: 0, tc: [0, 0], color: [5, 132, 25, 0] },
+// 	{ pos: [53, -26, -17], flag: 0, tc: [0, 0], color: [89, 208, 181, 0] },
+// 	{ pos: [53, -17, 24], flag: 0, tc: [0, 0], color: [61, 171, 71, 0] },
+// 	{ pos: [-9, -29, -18], flag: 0, tc: [0, 0], color: [4, 243, 130, 0] },
+// 	{ pos: [-9, 16, -24], flag: 0, tc: [0, 0], color: [4, 244, 130, 0] },
+// 	{ pos: [53, 13, -21], flag: 0, tc: [0, 0], color: [59, 100, 206, 0] },
+// 	{ pos: [-9, 15, 15], flag: 0, tc: [0, 0], color: [7, 117, 48, 0] },
+// 	{ pos: [53, 13, 12], flag: 0, tc: [0, 0], color: [82, 65, 71, 0] },
+// 	{ pos: [-9, -19, 28], flag: 0, tc: [0, 0], color: [7, 44, 118, 0] },
+// 	{ pos: [-9, 16, -24], flag: 0, tc: [0, 0], color: [6, 126, 2, 0] },
+// 	{ pos: [-9, -19, 28], flag: 0, tc: [0, 0], color: [5, 132, 26, 0] },
+// 	{ pos: [-9, 16, -24], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
+// 	{ pos: [-9, -29, -18], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
+// 	{ pos: [-9, -19, 28], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
+// 	{ pos: [-9, 15, 15], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
+// ]
+
+// export const mario_medium_poly_left_forearm_shared_dl = [
+// 	Gbi.gsSPVertex(mario_medium_poly_left_forearm_shared_dl_vertex, 15, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 5, 1, 0x0, 6, 7, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 2, 7, 0x0, 6, 8, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(9, 6, 5, 0x0, 10, 0, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(1, 7, 2, 0x0, 1, 5, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(11, 12, 13, 0x0, 13, 14, 11, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_medium_poly_left_hand_closed_shared_dl_vertex_group1 = [
+// 	{ pos: [31, 10, 40], flag: 0, tc: [0, 0], color: [216, 237, 118, 0] },
+// 	{ pos: [12, 1, 26], flag: 0, tc: [0, 0], color: [241, 247, 125, 0] },
+// 	{ pos: [27, -32, -3], flag: 0, tc: [0, 0], color: [6, 130, 11, 0] },
+// 	{ pos: [11, 2, -28], flag: 0, tc: [0, 0], color: [202, 246, 142, 0] },
+// 	{ pos: [44, -22, -46], flag: 0, tc: [0, 0], color: [222, 185, 157, 0] },
+// 	{ pos: [18, 37, -31], flag: 0, tc: [0, 0], color: [199, 40, 151, 0] },
+// 	{ pos: [-2, 36, -2], flag: 0, tc: [0, 0], color: [176, 97, 3, 0] },
+// 	{ pos: [-5, -5, 34], flag: 0, tc: [0, 0], color: [47, 19, 116, 0] },
+// 	{ pos: [-6, -5, -32], flag: 0, tc: [0, 0], color: [28, 14, 134, 0] },
+// 	{ pos: [81, 32, 40], flag: 0, tc: [0, 0], color: [72, 31, 99, 0] },
+// 	{ pos: [55, 84, 9], flag: 0, tc: [0, 0], color: [20, 116, 44, 0] },
+// 	{ pos: [102, -23, 6], flag: 0, tc: [0, 0], color: [100, 196, 49, 0] },
+// 	{ pos: [95, 43, -12], flag: 0, tc: [0, 0], color: [110, 54, 224, 0] },
+// 	{ pos: [54, 58, -32], flag: 0, tc: [0, 0], color: [2, 78, 157, 0] },
+// 	{ pos: [84, -10, -41], flag: 0, tc: [0, 0], color: [57, 226, 147, 0] },
+// 	{ pos: [53, -42, 9], flag: 0, tc: [0, 0], color: [4, 131, 15, 0] },
+// ]
+
+// const mario_medium_poly_left_hand_closed_shared_dl_vertex_group2 = [
+// 	{ pos: [31, 10, 40], flag: 0, tc: [0, 0], color: [216, 237, 118, 0] },
+// 	{ pos: [55, 84, 9], flag: 0, tc: [0, 0], color: [20, 116, 44, 0] },
+// 	{ pos: [7, 62, 10], flag: 0, tc: [0, 0], color: [167, 90, 0, 0] },
+// 	{ pos: [27, -32, -3], flag: 0, tc: [0, 0], color: [6, 130, 11, 0] },
+// 	{ pos: [14, -51, -2], flag: 0, tc: [0, 0], color: [55, 213, 151, 0] },
+// 	{ pos: [-6, -5, -32], flag: 0, tc: [0, 0], color: [28, 14, 134, 0] },
+// 	{ pos: [-26, 40, -1], flag: 0, tc: [0, 0], color: [5, 72, 152, 0] },
+// 	{ pos: [-2, 36, -2], flag: 0, tc: [0, 0], color: [176, 97, 3, 0] },
+// 	{ pos: [-26, 40, -1], flag: 0, tc: [0, 0], color: [17, 80, 96, 0] },
+// 	{ pos: [-5, -5, 34], flag: 0, tc: [0, 0], color: [47, 19, 116, 0] },
+// 	{ pos: [14, -51, -2], flag: 0, tc: [0, 0], color: [73, 213, 94, 0] },
+// 	{ pos: [18, 37, -31], flag: 0, tc: [0, 0], color: [199, 40, 151, 0] },
+// 	{ pos: [44, -22, -46], flag: 0, tc: [0, 0], color: [222, 185, 157, 0] },
+// 	{ pos: [53, -42, 9], flag: 0, tc: [0, 0], color: [4, 131, 15, 0] },
+// 	{ pos: [54, 58, -32], flag: 0, tc: [0, 0], color: [2, 78, 157, 0] },
+// ]
+
+// const mario_medium_poly_left_hand_closed_shared_dl_vertex_group3 = [
+// 	{ pos: [54, 58, -32], flag: 0, tc: [0, 0], color: [2, 78, 157, 0] },
+// 	{ pos: [95, 43, -12], flag: 0, tc: [0, 0], color: [110, 54, 224, 0] },
+// 	{ pos: [84, -10, -41], flag: 0, tc: [0, 0], color: [57, 226, 147, 0] },
+// 	{ pos: [7, 62, 10], flag: 0, tc: [0, 0], color: [167, 90, 0, 0] },
+// 	{ pos: [55, 84, 9], flag: 0, tc: [0, 0], color: [20, 116, 44, 0] },
+// 	{ pos: [53, -42, 9], flag: 0, tc: [0, 0], color: [4, 131, 15, 0] },
+// 	{ pos: [102, -23, 6], flag: 0, tc: [0, 0], color: [100, 196, 49, 0] },
+// 	{ pos: [18, 37, -31], flag: 0, tc: [0, 0], color: [199, 40, 151, 0] },
+// 	{ pos: [44, -22, -46], flag: 0, tc: [0, 0], color: [222, 185, 157, 0] },
+// 	{ pos: [11, 2, -28], flag: 0, tc: [0, 0], color: [202, 246, 142, 0] },
+// 	{ pos: [-5, -5, 34], flag: 0, tc: [0, 0], color: [140, 206, 1, 0] },
+// 	{ pos: [-6, -5, -32], flag: 0, tc: [0, 0], color: [140, 206, 1, 0] },
+// 	{ pos: [14, -51, -2], flag: 0, tc: [0, 0], color: [140, 206, 1, 0] },
+// 	{ pos: [-26, 40, -1], flag: 0, tc: [0, 0], color: [140, 206, 1, 0] },
+// ]
+
+// export const mario_medium_poly_left_hand_closed_shared_dl = [
+// 	Gbi.gsSPVertex(mario_medium_poly_left_hand_closed_shared_dl_vertex_group1, 16, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 2, 3, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 3, 6, 0x0, 6, 1, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(2, 1, 7, 0x0, 7, 1, 6, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 3, 8, 0x0, 3, 2, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(0, 9, 10, 0x0, 11, 9, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 12, 13, 0x0, 14, 12, 11, 0x0),
+// 	...Gbi.gsSP2Triangles(11, 12, 9, 0x0, 9, 12, 10, 0x0),
+// 	Gbi.gsSP1Triangle(15, 11, 0, 0x0),
+// 	Gbi.gsSPVertex(mario_medium_poly_left_hand_closed_shared_dl_vertex_group2, 15, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 6, 7, 0x0, 7, 8, 9, 0x0),
+// 	...Gbi.gsSP2Triangles(9, 10, 3, 0x0, 7, 0, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 2, 11, 0x0, 3, 12, 13, 0x0),
+// 	...Gbi.gsSP2Triangles(3, 13, 0, 0x0, 11, 2, 14, 0x0),
+// 	Gbi.gsSPVertex(mario_medium_poly_left_hand_closed_shared_dl_vertex_group3, 14, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 2, 6, 0x0, 7, 8, 9, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 2, 8, 0x0, 7, 0, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 8, 2, 0x0, 10, 11, 12, 0x0),
+// 	Gbi.gsSP1Triangle(10, 13, 11, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_medium_poly_left_hand_closed = [
+// 	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_medium_poly_left_hand_closed_shared_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_medium_poly_right_arm_shared_dl_vertex = [
+// 	{ pos: [60, -28, 22], flag: 0, tc: [0, 0], color: [59, 199, 96, 0] },
+// 	{ pos: [60, -19, -19], flag: 0, tc: [0, 0], color: [90, 188, 199, 0] },
+// 	{ pos: [60, 14, 24], flag: 0, tc: [0, 0], color: [91, 79, 38, 0] },
+// 	{ pos: [-7, -31, 24], flag: 0, tc: [0, 0], color: [4, 132, 230, 0] },
+// 	{ pos: [-7, -20, -27], flag: 0, tc: [0, 0], color: [4, 132, 230, 0] },
+// 	{ pos: [-8, 21, -15], flag: 0, tc: [0, 0], color: [17, 115, 206, 0] },
+// 	{ pos: [-8, 22, 27], flag: 0, tc: [0, 0], color: [14, 126, 253, 0] },
+// 	{ pos: [60, 13, -9], flag: 0, tc: [0, 0], color: [60, 70, 170, 0] },
+// 	{ pos: [-7, -20, -27], flag: 0, tc: [0, 0], color: [14, 35, 136, 0] },
+// 	{ pos: [-8, 22, 27], flag: 0, tc: [0, 0], color: [3, 250, 126, 0] },
+// 	{ pos: [-7, -31, 24], flag: 0, tc: [0, 0], color: [3, 250, 126, 0] },
+// 	{ pos: [-7, -20, -27], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
+// 	{ pos: [-7, -31, 24], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
+// 	{ pos: [-8, 22, 27], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
+// 	{ pos: [-8, 21, -15], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
+// ]
+
+// export const mario_medium_poly_right_arm_shared_dl = [
+// 	Gbi.gsSPVertex(mario_medium_poly_right_arm_shared_dl_vertex, 15, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 1, 3, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(2, 5, 6, 0x0, 7, 8, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 1, 8, 0x0, 2, 7, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(0, 2, 9, 0x0, 0, 9, 10, 0x0),
+// 	...Gbi.gsSP2Triangles(1, 0, 3, 0x0, 11, 12, 13, 0x0),
+// 	...Gbi.gsSP2Triangles(13, 14, 11, 0x0, 1, 7, 2, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_medium_poly_right_arm = [
+// 	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
+// 	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+// 	Gbi.gsSPDisplayList(mario_medium_poly_right_arm_shared_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_medium_poly_right_forearm_shared_dl_vertex = [
+// 	{ pos: [-5, -18, -24], flag: 0, tc: [0, 0], color: [129, 254, 3, 0] },
+// 	{ pos: [-3, -29, 21], flag: 0, tc: [0, 0], color: [129, 254, 3, 0] },
+// 	{ pos: [-4, 17, 26], flag: 0, tc: [0, 0], color: [129, 254, 3, 0] },
+// 	{ pos: [52, 13, -10], flag: 0, tc: [0, 0], color: [81, 64, 183, 0] },
+// 	{ pos: [53, 13, 22], flag: 0, tc: [0, 0], color: [61, 99, 49, 0] },
+// 	{ pos: [53, -26, 19], flag: 0, tc: [0, 0], color: [91, 208, 73, 0] },
+// 	{ pos: [52, -17, -21], flag: 0, tc: [0, 0], color: [58, 172, 182, 0] },
+// 	{ pos: [-3, -29, 21], flag: 0, tc: [0, 0], color: [4, 133, 228, 0] },
+// 	{ pos: [-5, -18, -24], flag: 0, tc: [0, 0], color: [3, 133, 227, 0] },
+// 	{ pos: [-5, 17, -12], flag: 0, tc: [0, 0], color: [9, 117, 209, 0] },
+// 	{ pos: [-4, 17, 26], flag: 0, tc: [0, 0], color: [8, 126, 0, 0] },
+// 	{ pos: [-5, -18, -24], flag: 0, tc: [0, 0], color: [6, 42, 137, 0] },
+// 	{ pos: [-4, 17, 26], flag: 0, tc: [0, 0], color: [6, 245, 126, 0] },
+// 	{ pos: [-3, -29, 21], flag: 0, tc: [0, 0], color: [6, 244, 126, 0] },
+// 	{ pos: [-5, 17, -12], flag: 0, tc: [0, 0], color: [129, 254, 3, 0] },
+// ]
+
+// export const mario_medium_poly_right_forearm_shared_dl = [
+// 	Gbi.gsSPVertex(mario_medium_poly_right_forearm_shared_dl_vertex, 15, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 3, 5, 0x0, 6, 7, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 9, 10, 0x0, 3, 11, 9, 0x0),
+// 	...Gbi.gsSP2Triangles(3, 6, 11, 0x0, 4, 3, 9, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 4, 12, 0x0, 5, 12, 13, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 5, 7, 0x0, 2, 14, 0, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_medium_poly_right_hand_closed_dl_vertex_group1 = [
+// 	{ pos: [-7, -4, 36], flag: 0, tc: [0, 0], color: [140, 205, 253, 0] },
+// 	{ pos: [-26, 40, 0], flag: 0, tc: [0, 0], color: [140, 205, 253, 0] },
+// 	{ pos: [-4, -7, -34], flag: 0, tc: [0, 0], color: [140, 205, 253, 0] },
+// 	{ pos: [14, -51, 7], flag: 0, tc: [0, 0], color: [140, 205, 253, 0] },
+// 	{ pos: [81, -8, 49], flag: 0, tc: [0, 0], color: [54, 230, 111, 0] },
+// 	{ pos: [42, -20, 54], flag: 0, tc: [0, 0], color: [217, 187, 98, 0] },
+// 	{ pos: [54, -42, -4], flag: 0, tc: [0, 0], color: [4, 130, 246, 0] },
+// 	{ pos: [52, 59, 37], flag: 0, tc: [0, 0], color: [255, 85, 94, 0] },
+// 	{ pos: [16, 38, 35], flag: 0, tc: [0, 0], color: [193, 45, 99, 0] },
+// 	{ pos: [10, 3, 33], flag: 0, tc: [0, 0], color: [195, 250, 110, 0] },
+// 	{ pos: [102, -23, 0], flag: 0, tc: [0, 0], color: [101, 193, 215, 0] },
+// 	{ pos: [55, 84, -8], flag: 0, tc: [0, 0], color: [21, 115, 209, 0] },
+// 	{ pos: [7, 62, -11], flag: 0, tc: [0, 0], color: [167, 90, 249, 0] },
+// 	{ pos: [94, 43, 18], flag: 0, tc: [0, 0], color: [109, 56, 33, 0] },
+// 	{ pos: [32, 8, -40], flag: 0, tc: [0, 0], color: [218, 232, 138, 0] },
+// 	{ pos: [26, -32, 8], flag: 0, tc: [0, 0], color: [8, 130, 250, 0] },
+// ]
+
+// const mario_medium_poly_right_hand_closed_dl_vertex_group2 = [
+// 	{ pos: [16, 38, 35], flag: 0, tc: [0, 0], color: [193, 45, 99, 0] },
+// 	{ pos: [7, 62, -11], flag: 0, tc: [0, 0], color: [167, 90, 249, 0] },
+// 	{ pos: [-3, 37, 3], flag: 0, tc: [0, 0], color: [176, 98, 247, 0] },
+// 	{ pos: [32, 8, -40], flag: 0, tc: [0, 0], color: [218, 232, 138, 0] },
+// 	{ pos: [26, -32, 8], flag: 0, tc: [0, 0], color: [8, 130, 250, 0] },
+// 	{ pos: [14, -51, 7], flag: 0, tc: [0, 0], color: [79, 208, 170, 0] },
+// 	{ pos: [-4, -7, -34], flag: 0, tc: [0, 0], color: [55, 16, 143, 0] },
+// 	{ pos: [-26, 40, 0], flag: 0, tc: [0, 0], color: [21, 81, 161, 0] },
+// 	{ pos: [-26, 40, 0], flag: 0, tc: [0, 0], color: [2, 79, 98, 0] },
+// 	{ pos: [-7, -4, 36], flag: 0, tc: [0, 0], color: [25, 19, 122, 0] },
+// 	{ pos: [14, -51, 7], flag: 0, tc: [0, 0], color: [54, 215, 107, 0] },
+// 	{ pos: [55, 84, -8], flag: 0, tc: [0, 0], color: [21, 115, 209, 0] },
+// 	{ pos: [102, -23, 0], flag: 0, tc: [0, 0], color: [101, 193, 215, 0] },
+// 	{ pos: [54, -42, -4], flag: 0, tc: [0, 0], color: [4, 130, 246, 0] },
+// 	{ pos: [94, 43, 18], flag: 0, tc: [0, 0], color: [109, 56, 33, 0] },
+// 	{ pos: [83, 30, -39], flag: 0, tc: [0, 0], color: [78, 28, 161, 0] },
+// ]
+
+// const mario_medium_poly_right_hand_closed_dl_vertex_group3 = [
+// 	{ pos: [102, -23, 0], flag: 0, tc: [0, 0], color: [101, 193, 215, 0] },
+// 	{ pos: [94, 43, 18], flag: 0, tc: [0, 0], color: [109, 56, 33, 0] },
+// 	{ pos: [81, -8, 49], flag: 0, tc: [0, 0], color: [54, 230, 111, 0] },
+// 	{ pos: [52, 59, 37], flag: 0, tc: [0, 0], color: [255, 85, 94, 0] },
+// 	{ pos: [55, 84, -8], flag: 0, tc: [0, 0], color: [21, 115, 209, 0] },
+// 	{ pos: [32, 8, -40], flag: 0, tc: [0, 0], color: [218, 232, 138, 0] },
+// 	{ pos: [83, 30, -39], flag: 0, tc: [0, 0], color: [78, 28, 161, 0] },
+// 	{ pos: [-7, -4, 36], flag: 0, tc: [0, 0], color: [25, 19, 122, 0] },
+// 	{ pos: [26, -32, 8], flag: 0, tc: [0, 0], color: [8, 130, 250, 0] },
+// 	{ pos: [10, 3, 33], flag: 0, tc: [0, 0], color: [195, 250, 110, 0] },
+// 	{ pos: [-3, 37, 3], flag: 0, tc: [0, 0], color: [176, 98, 247, 0] },
+// 	{ pos: [13, 0, -26], flag: 0, tc: [0, 0], color: [245, 242, 131, 0] },
+// 	{ pos: [-4, -7, -34], flag: 0, tc: [0, 0], color: [55, 16, 143, 0] },
+// 	{ pos: [16, 38, 35], flag: 0, tc: [0, 0], color: [193, 45, 99, 0] },
+// 	{ pos: [42, -20, 54], flag: 0, tc: [0, 0], color: [217, 187, 98, 0] },
+// ]
+
+// export const mario_medium_poly_right_hand_closed_dl = [
+// 	Gbi.gsSPVertex(mario_medium_poly_right_hand_closed_dl_vertex_group1, 16, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 5, 6, 0x0, 4, 7, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 4, 8, 0x0, 9, 5, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 4, 6, 0x0, 7, 11, 12, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 13, 7, 0x0, 7, 12, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(14, 6, 15, 0x0, 6, 5, 15, 0x0),
+// 	Gbi.gsSPVertex(mario_medium_poly_right_hand_closed_dl_vertex_group2, 16, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 1, 3, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 5, 6, 0x0, 6, 7, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(2, 8, 9, 0x0, 9, 10, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(1, 11, 3, 0x0, 3, 12, 13, 0x0),
+// 	...Gbi.gsSP2Triangles(11, 14, 15, 0x0, 15, 14, 12, 0x0),
+// 	Gbi.gsSPVertex(mario_medium_poly_right_hand_closed_dl_vertex_group3, 15, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 1, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 6, 0, 0x0, 4, 6, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 8, 9, 0x0, 7, 9, 10, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 11, 12, 0x0, 12, 11, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 11, 10, 0x0, 10, 9, 13, 0x0),
+// 	...Gbi.gsSP2Triangles(14, 9, 8, 0x0, 8, 11, 5, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_medium_poly_right_hand_closed = [
+// 	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_medium_poly_right_hand_closed_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_metal_medium_poly_right_hand_closed = [
+// 	Gbi.gsSPDisplayList(mario_medium_poly_right_hand_closed_dl),
+// 	Gbi.gsSPClearGeometryMode(Gbi.G_TEXTURE_GEN),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+// 	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_medium_poly_left_thigh_dl_vertex = [
+// 	{ pos: [18, -12, 58], flag: 0, tc: [0, 0], color: [19, 221, 120, 0] },
+// 	{ pos: [22, -52, 8], flag: 0, tc: [0, 0], color: [28, 133, 1, 0] },
+// 	{ pos: [99, -35, 8], flag: 0, tc: [0, 0], color: [62, 146, 1, 0] },
+// 	{ pos: [14, 51, 38], flag: 0, tc: [0, 0], color: [8, 117, 48, 0] },
+// 	{ pos: [92, 47, 33], flag: 0, tc: [0, 0], color: [54, 75, 86, 0] },
+// 	{ pos: [14, 50, -23], flag: 0, tc: [0, 0], color: [10, 101, 181, 0] },
+// 	{ pos: [92, 47, -16], flag: 0, tc: [0, 0], color: [71, 85, 197, 0] },
+// 	{ pos: [19, -13, -42], flag: 0, tc: [0, 0], color: [21, 219, 137, 0] },
+// 	{ pos: [96, -3, -31], flag: 0, tc: [0, 0], color: [104, 241, 186, 0] },
+// 	{ pos: [96, -3, 48], flag: 0, tc: [0, 0], color: [113, 248, 56, 0] },
+// 	{ pos: [19, -13, -42], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
+// 	{ pos: [22, -52, 8], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
+// 	{ pos: [18, -12, 58], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
+// 	{ pos: [14, 51, 38], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
+// 	{ pos: [14, 50, -23], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
+// ]
+
+// export const mario_medium_poly_left_thigh_dl = [
+// 	Gbi.gsSPVertex(mario_medium_poly_left_thigh_dl_vertex, 15, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 3, 6, 0x0, 7, 5, 6, 0x0),
+// 	...Gbi.gsSP2Triangles(1, 7, 2, 0x0, 7, 8, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 8, 7, 0x0, 3, 4, 6, 0x0),
+// 	...Gbi.gsSP2Triangles(0, 9, 4, 0x0, 2, 9, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(9, 2, 8, 0x0, 10, 11, 12, 0x0),
+// 	...Gbi.gsSP2Triangles(12, 13, 10, 0x0, 13, 14, 10, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 6, 9, 0x0, 6, 4, 9, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_medium_poly_left_thigh = [
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+// 	Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
+// 	Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+// 	Gbi.gsSPDisplayList(mario_medium_poly_left_thigh_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// /*export const mario_metal_medium_poly_left_thigh = [
+// 	Gbi.gsSPSetGeometryMode(Gbi.G_TEXTURE_GEN),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALFADE),
+// 	Gbi.gsDPLoadTextureBlock(mario_texture_metal, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 64, 32, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
+// 	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+// 	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_medium_poly_left_thigh_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]*/
+
+// const mario_medium_poly_left_leg_shared_dl_vertex = [
+// 	{ pos: [5, -35, 9], flag: 0, tc: [0, 0], color: [202, 142, 0, 0] },
+// 	{ pos: [65, -44, 10], flag: 0, tc: [0, 0], color: [238, 131, 1, 0] },
+// 	{ pos: [66, -9, 54], flag: 0, tc: [0, 0], color: [242, 220, 120, 0] },
+// 	{ pos: [9, 46, 33], flag: 0, tc: [0, 0], color: [213, 97, 69, 0] },
+// 	{ pos: [69, 47, 37], flag: 0, tc: [0, 0], color: [249, 102, 75, 0] },
+// 	{ pos: [70, 47, -18], flag: 0, tc: [0, 0], color: [251, 116, 207, 0] },
+// 	{ pos: [10, 46, -16], flag: 0, tc: [0, 0], color: [175, 64, 183, 0] },
+// 	{ pos: [67, -9, -36], flag: 0, tc: [0, 0], color: [244, 218, 136, 0] },
+// 	{ pos: [7, -4, -31], flag: 0, tc: [0, 0], color: [155, 238, 182, 0] },
+// 	{ pos: [7, -4, 49], flag: 0, tc: [0, 0], color: [143, 245, 55, 0] },
+// 	{ pos: [66, -9, 54], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
+// 	{ pos: [65, -44, 10], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
+// 	{ pos: [67, -9, -36], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
+// 	{ pos: [70, 47, -18], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
+// 	{ pos: [69, 47, 37], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
+// ]
+
+// export const mario_medium_poly_left_leg_shared_dl = [
+// 	Gbi.gsSPVertex(mario_medium_poly_left_leg_shared_dl_vertex, 15, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 2, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(3, 4, 5, 0x0, 6, 5, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(0, 7, 1, 0x0, 0, 8, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 8, 6, 0x0, 5, 6, 3, 0x0),
+// 	...Gbi.gsSP2Triangles(3, 9, 2, 0x0, 2, 9, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 11, 12, 0x0, 8, 0, 9, 0x0),
+// 	...Gbi.gsSP2Triangles(9, 6, 8, 0x0, 9, 3, 6, 0x0),
+// 	...Gbi.gsSP2Triangles(12, 13, 10, 0x0, 13, 14, 10, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_medium_poly_left_foot_shared_dl_vertex_group1 = [
+// 	{ pos: [108, 10, 36], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
+// 	{ pos: [108, 9, -20], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
+// 	{ pos: [75, 21, -41], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
+// 	{ pos: [76, 22, 61], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
+// 	{ pos: [-14, 55, -27], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
+// 	{ pos: [-13, 55, 49], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
+// 	{ pos: [-41, 65, 9], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
+// 	{ pos: [41, -18, 54], flag: 0, tc: [0, 0], color: [4, 180, 101, 0] },
+// 	{ pos: [76, 22, 61], flag: 0, tc: [0, 0], color: [18, 221, 120, 0] },
+// 	{ pos: [-13, 55, 49], flag: 0, tc: [0, 0], color: [206, 7, 116, 0] },
+// 	{ pos: [42, -11, -33], flag: 0, tc: [0, 0], color: [255, 184, 152, 0] },
+// 	{ pos: [-37, 12, -16], flag: 0, tc: [0, 0], color: [161, 207, 189, 0] },
+// 	{ pos: [-14, 55, -27], flag: 0, tc: [0, 0], color: [204, 2, 141, 0] },
+// 	{ pos: [-36, 13, 39], flag: 0, tc: [0, 0], color: [160, 208, 66, 0] },
+// 	{ pos: [75, 21, -41], flag: 0, tc: [0, 0], color: [9, 218, 136, 0] },
+// 	{ pos: [108, 9, -20], flag: 0, tc: [0, 0], color: [68, 173, 190, 0] },
+// ]
+
+// const mario_medium_poly_left_foot_shared_dl_vertex_group2 = [
+// 	{ pos: [78, -30, 7], flag: 0, tc: [0, 0], color: [52, 141, 251, 0] },
+// 	{ pos: [108, 9, -20], flag: 0, tc: [0, 0], color: [68, 173, 190, 0] },
+// 	{ pos: [108, 10, 36], flag: 0, tc: [0, 0], color: [76, 175, 60, 0] },
+// 	{ pos: [42, -11, -33], flag: 0, tc: [0, 0], color: [255, 184, 152, 0] },
+// 	{ pos: [76, 22, 61], flag: 0, tc: [0, 0], color: [18, 221, 120, 0] },
+// 	{ pos: [41, -18, 54], flag: 0, tc: [0, 0], color: [4, 180, 101, 0] },
+// 	{ pos: [-36, 13, 39], flag: 0, tc: [0, 0], color: [160, 208, 66, 0] },
+// 	{ pos: [-13, 55, 49], flag: 0, tc: [0, 0], color: [206, 7, 116, 0] },
+// 	{ pos: [-41, 65, 9], flag: 0, tc: [0, 0], color: [131, 21, 0, 0] },
+// 	{ pos: [-14, 55, -27], flag: 0, tc: [0, 0], color: [204, 2, 141, 0] },
+// 	{ pos: [-37, 12, -16], flag: 0, tc: [0, 0], color: [161, 207, 189, 0] },
+// 	{ pos: [25, -34, 11], flag: 0, tc: [0, 0], color: [221, 135, 251, 0] },
+// ]
+
+// export const mario_medium_poly_left_foot_shared_dl = [
+// 	Gbi.gsSPVertex(mario_medium_poly_left_foot_shared_dl_vertex_group1, 16, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(3, 2, 4, 0x0, 5, 3, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 5, 4, 0x0, 7, 8, 9, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 11, 12, 0x0, 13, 7, 9, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 12, 14, 0x0, 10, 14, 15, 0x0),
+// 	Gbi.gsSPVertex(mario_medium_poly_left_foot_shared_dl_vertex_group2, 12, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 1, 0, 3, 0x0),
+// 	...Gbi.gsSP2Triangles(2, 4, 5, 0x0, 5, 0, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 7, 8, 0x0, 8, 9, 10, 0x0),
+// 	...Gbi.gsSP2Triangles(11, 3, 0, 0x0, 10, 3, 11, 0x0),
+// 	...Gbi.gsSP2Triangles(0, 5, 11, 0x0, 11, 5, 6, 0x0),
+// 	...Gbi.gsSP2Triangles(11, 6, 10, 0x0, 6, 8, 10, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_medium_poly_left_foot = [
+// 	Gbi.gsSPLight(mario_brown1_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_brown1_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_medium_poly_left_foot_shared_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_medium_poly_right_thigh_shared_dl_vertex = [
+// 	{ pos: [18, -11, -58], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
+// 	{ pos: [23, -52, -9], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
+// 	{ pos: [20, -14, 41], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
+// 	{ pos: [97, -3, 30], flag: 0, tc: [0, 0], color: [105, 241, 69, 0] },
+// 	{ pos: [99, -33, -10], flag: 0, tc: [0, 0], color: [64, 147, 252, 0] },
+// 	{ pos: [95, -1, -49], flag: 0, tc: [0, 0], color: [113, 251, 199, 0] },
+// 	{ pos: [18, -11, -58], flag: 0, tc: [0, 0], color: [18, 224, 135, 0] },
+// 	{ pos: [91, 49, -33], flag: 0, tc: [0, 0], color: [52, 78, 171, 0] },
+// 	{ pos: [92, 48, 16], flag: 0, tc: [0, 0], color: [71, 85, 61, 0] },
+// 	{ pos: [13, 52, -37], flag: 0, tc: [0, 0], color: [6, 118, 211, 0] },
+// 	{ pos: [20, -14, 41], flag: 0, tc: [0, 0], color: [22, 217, 118, 0] },
+// 	{ pos: [23, -52, -9], flag: 0, tc: [0, 0], color: [29, 133, 253, 0] },
+// 	{ pos: [14, 50, 24], flag: 0, tc: [0, 0], color: [10, 99, 77, 0] },
+// 	{ pos: [13, 52, -37], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
+// 	{ pos: [14, 50, 24], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
+// ]
+
+// export const mario_medium_poly_right_thigh_shared_dl = [
+// 	Gbi.gsSPVertex(mario_medium_poly_right_thigh_shared_dl_vertex, 15, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 5, 4, 0x0, 7, 5, 6, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 7, 9, 0x0, 10, 3, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 3, 10, 0x0, 4, 10, 11, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 12, 10, 0x0, 8, 9, 12, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 6, 9, 0x0, 4, 11, 6, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 8, 3, 0x0, 5, 7, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(2, 13, 0, 0x0, 2, 14, 13, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_medium_poly_right_thigh = [
+// 	Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
+// 	Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+// 	Gbi.gsSPDisplayList(mario_medium_poly_right_thigh_shared_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_medium_poly_right_leg_shared_dl_vertex = [
+// 	{ pos: [6, -1, -50], flag: 0, tc: [0, 0], color: [142, 247, 202, 0] },
+// 	{ pos: [5, -34, -11], flag: 0, tc: [0, 0], color: [201, 142, 254, 0] },
+// 	{ pos: [7, -4, 30], flag: 0, tc: [0, 0], color: [155, 237, 74, 0] },
+// 	{ pos: [67, -9, 34], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
+// 	{ pos: [64, -43, -12], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
+// 	{ pos: [66, -7, -56], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
+// 	{ pos: [66, -7, -56], flag: 0, tc: [0, 0], color: [241, 222, 135, 0] },
+// 	{ pos: [10, 48, -33], flag: 0, tc: [0, 0], color: [214, 99, 190, 0] },
+// 	{ pos: [10, 46, 16], flag: 0, tc: [0, 0], color: [177, 63, 75, 0] },
+// 	{ pos: [71, 47, 18], flag: 0, tc: [0, 0], color: [253, 115, 51, 0] },
+// 	{ pos: [67, -9, 34], flag: 0, tc: [0, 0], color: [244, 216, 119, 0] },
+// 	{ pos: [64, -43, -12], flag: 0, tc: [0, 0], color: [236, 131, 253, 0] },
+// 	{ pos: [70, 49, -37], flag: 0, tc: [0, 0], color: [250, 103, 184, 0] },
+// 	{ pos: [71, 47, 18], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
+// 	{ pos: [70, 49, -37], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
+// ]
+
+// export const mario_medium_poly_right_leg_shared_dl = [
+// 	Gbi.gsSPVertex(mario_medium_poly_right_leg_shared_dl_vertex, 15, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(1, 0, 6, 0x0, 6, 0, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 8, 9, 0x0, 8, 2, 10, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 2, 1, 0x0, 11, 10, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 9, 8, 0x0, 9, 12, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(12, 6, 7, 0x0, 6, 11, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 13, 3, 0x0, 5, 14, 13, 0x0),
+// 	...Gbi.gsSP2Triangles(2, 8, 0, 0x0, 8, 7, 0, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_medium_poly_right_foot_dl_vertex_group1 = [
+// 	{ pos: [-38, 12, 14], flag: 0, tc: [0, 0], color: [161, 207, 67, 0] },
+// 	{ pos: [-43, 65, -12], flag: 0, tc: [0, 0], color: [131, 19, 255, 0] },
+// 	{ pos: [-36, 12, -41], flag: 0, tc: [0, 0], color: [161, 206, 190, 0] },
+// 	{ pos: [25, -34, -11], flag: 0, tc: [0, 0], color: [223, 134, 7, 0] },
+// 	{ pos: [41, -18, -55], flag: 0, tc: [0, 0], color: [7, 179, 156, 0] },
+// 	{ pos: [79, -29, -7], flag: 0, tc: [0, 0], color: [54, 142, 8, 0] },
+// 	{ pos: [42, -10, 32], flag: 0, tc: [0, 0], color: [255, 186, 105, 0] },
+// 	{ pos: [-15, 55, 24], flag: 0, tc: [0, 0], color: [203, 4, 115, 0] },
+// 	{ pos: [-14, 54, -51], flag: 0, tc: [0, 0], color: [207, 4, 140, 0] },
+// 	{ pos: [108, 11, -36], flag: 0, tc: [0, 0], color: [78, 176, 198, 0] },
+// 	{ pos: [76, 23, -62], flag: 0, tc: [0, 0], color: [20, 219, 137, 0] },
+// 	{ pos: [107, 12, 20], flag: 0, tc: [0, 0], color: [69, 175, 68, 0] },
+// 	{ pos: [74, 24, 40], flag: 0, tc: [0, 0], color: [8, 220, 121, 0] },
+// 	{ pos: [-15, 55, 24], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
+// 	{ pos: [-14, 54, -51], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
+// 	{ pos: [-43, 65, -12], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
+// ]
+
+// const mario_medium_poly_right_foot_dl_vertex_group2 = [
+// 	{ pos: [-15, 55, 24], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
+// 	{ pos: [76, 23, -62], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
+// 	{ pos: [-14, 54, -51], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
+// 	{ pos: [74, 24, 40], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
+// 	{ pos: [108, 11, -36], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
+// 	{ pos: [107, 12, 20], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
+// ]
+
+// export const mario_medium_poly_right_foot_dl = [
+// 	Gbi.gsSPVertex(mario_medium_poly_right_foot_dl_vertex_group1, 16, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
+// 	...Gbi.gsSP2Triangles(2, 4, 3, 0x0, 3, 4, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(3, 6, 0, 0x0, 5, 6, 3, 0x0),
+// 	...Gbi.gsSP2Triangles(0, 7, 1, 0x0, 1, 8, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(9, 5, 4, 0x0, 4, 10, 9, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 5, 11, 0x0, 9, 11, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(11, 12, 6, 0x0, 12, 7, 6, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 4, 2, 0x0, 7, 0, 6, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 10, 4, 0x0, 13, 14, 15, 0x0),
+// 	Gbi.gsSPVertex(mario_medium_poly_right_foot_dl_vertex_group2, 6, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 3, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(3, 4, 1, 0x0, 3, 5, 4, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_medium_poly_right_foot = [
+// 	Gbi.gsSPLight(mario_brown1_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_brown1_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_medium_poly_right_foot_dl),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+// 	Gbi.gsDPSetEnvColor(255, 255, 255, 255),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_metal_medium_poly_right_foot = [
+// 	Gbi.gsSPDisplayList(mario_medium_poly_right_foot_dl),
+// 	Gbi.gsSPClearGeometryMode(Gbi.G_TEXTURE_GEN),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+// 	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+// 	Gbi.gsDPSetEnvColor(255, 255, 255, 255),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_seg4_vertex_04016148 = [
+// 	{ pos: [75, 24, -60], flag: 0, tc: [-74, -930], color: [96, 39, 184, 255] },
+// 	{ pos: [36, 47, -76], flag: 0, tc: [-174, 168], color: [46, 54, 152, 255] },
+// 	{ pos: [44, 78, -35], flag: 0, tc: [988, 92], color: [69, 101, 226, 255] },
+// 	{ pos: [-26, 49, -87], flag: 0, tc: [-538, 1590], color: [196, 41, 153, 255] },
+// 	{ pos: [1, 87, -53], flag: 0, tc: [638, 1164], color: [14, 116, 209, 255] },
+// 	{ pos: [1, 87, 54], flag: 0, tc: [2522, 702], color: [17, 116, 47, 255] },
+// 	{ pos: [1, 87, 54], flag: 0, tc: [272, 1122], color: [17, 116, 47, 255] },
+// 	{ pos: [44, 78, 37], flag: 0, tc: [-92, 108], color: [71, 95, 42, 255] },
+// 	{ pos: [44, 78, -35], flag: 0, tc: [-1398, -128], color: [69, 101, 226, 255] },
+// 	{ pos: [-26, 49, 88], flag: 0, tc: [1514, 1490], color: [196, 41, 103, 255] },
+// 	{ pos: [36, 47, 77], flag: 0, tc: [1110, 130], color: [47, 55, 104, 255] },
+// 	{ pos: [75, 24, 60], flag: 0, tc: [968, -926], color: [98, 39, 70, 255] },
+// ]
+
+// const mario_seg4_vertex_04016208 = [
+// 	{ pos: [82, 37, 28], flag: 0, tc: [0, 0], color: [113, 54, 14, 255] },
+// 	{ pos: [82, 37, -28], flag: 0, tc: [0, 0], color: [113, 53, 234, 255] },
+// 	{ pos: [44, 78, -35], flag: 0, tc: [0, 0], color: [69, 101, 226, 255] },
+// 	{ pos: [44, 78, 37], flag: 0, tc: [0, 0], color: [71, 95, 42, 255] },
+// 	{ pos: [95, -39, -25], flag: 0, tc: [0, 0], color: [121, 230, 232, 255] },
+// 	{ pos: [95, -39, 25], flag: 0, tc: [0, 0], color: [117, 219, 29, 255] },
+// 	{ pos: [54, -68, 0], flag: 0, tc: [0, 0], color: [45, 138, 0, 255] },
+// 	{ pos: [56, -4, 79], flag: 0, tc: [0, 0], color: [57, 4, 113, 255] },
+// 	{ pos: [75, 24, 60], flag: 0, tc: [0, 0], color: [98, 39, 70, 255] },
+// 	{ pos: [36, 47, 77], flag: 0, tc: [0, 0], color: [47, 55, 104, 255] },
+// 	{ pos: [9, 0, 94], flag: 0, tc: [0, 0], color: [14, 3, 126, 255] },
+// 	{ pos: [22, -41, 87], flag: 0, tc: [0, 0], color: [31, 201, 109, 255] },
+// 	{ pos: [83, -29, 58], flag: 0, tc: [0, 0], color: [84, 200, 76, 255] },
+// 	{ pos: [83, -29, -58], flag: 0, tc: [0, 0], color: [82, 201, 178, 255] },
+// 	{ pos: [40, -66, -47], flag: 0, tc: [0, 0], color: [29, 145, 203, 255] },
+// 	{ pos: [22, -41, -86], flag: 0, tc: [0, 0], color: [30, 202, 146, 255] },
+// ]
+
+// const mario_seg4_vertex_04016308 = [
+// 	{ pos: [36, 47, -76], flag: 0, tc: [0, 0], color: [46, 54, 152, 255] },
+// 	{ pos: [75, 24, -60], flag: 0, tc: [0, 0], color: [96, 39, 184, 255] },
+// 	{ pos: [56, -4, -77], flag: 0, tc: [0, 0], color: [56, 4, 143, 255] },
+// 	{ pos: [9, 0, -93], flag: 0, tc: [0, 0], color: [14, 3, 130, 255] },
+// 	{ pos: [83, -29, -58], flag: 0, tc: [0, 0], color: [82, 201, 178, 255] },
+// 	{ pos: [22, -41, -86], flag: 0, tc: [0, 0], color: [30, 202, 146, 255] },
+// 	{ pos: [22, -41, 87], flag: 0, tc: [0, 0], color: [31, 201, 109, 255] },
+// 	{ pos: [40, -66, 48], flag: 0, tc: [0, 0], color: [29, 145, 53, 255] },
+// 	{ pos: [83, -29, 58], flag: 0, tc: [0, 0], color: [84, 200, 76, 255] },
+// ]
+
+// const mario_seg4_vertex_04016398 = [
+// 	{ pos: [83, -29, -58], flag: 0, tc: [0, 0], color: [82, 201, 178, 255] },
+// 	{ pos: [95, -39, -25], flag: 0, tc: [0, 0], color: [121, 230, 232, 255] },
+// 	{ pos: [54, -68, 0], flag: 0, tc: [0, 0], color: [45, 138, 0, 255] },
+// 	{ pos: [75, 24, -60], flag: 0, tc: [0, 0], color: [96, 39, 184, 255] },
+// 	{ pos: [82, 37, -28], flag: 0, tc: [0, 0], color: [113, 53, 234, 255] },
+// 	{ pos: [40, -66, -47], flag: 0, tc: [0, 0], color: [29, 145, 203, 255] },
+// 	{ pos: [44, 78, -35], flag: 0, tc: [0, 0], color: [69, 101, 226, 255] },
+// 	{ pos: [75, 24, 60], flag: 0, tc: [0, 0], color: [98, 39, 70, 255] },
+// 	{ pos: [82, 37, 28], flag: 0, tc: [0, 0], color: [113, 54, 14, 255] },
+// 	{ pos: [44, 78, 37], flag: 0, tc: [0, 0], color: [71, 95, 42, 255] },
+// 	{ pos: [83, -29, 58], flag: 0, tc: [0, 0], color: [84, 200, 76, 255] },
+// 	{ pos: [95, -39, 25], flag: 0, tc: [0, 0], color: [117, 219, 29, 255] },
+// 	{ pos: [40, -66, 48], flag: 0, tc: [0, 0], color: [29, 145, 53, 255] },
+// 	{ pos: [1, 87, -53], flag: 0, tc: [0, 0], color: [14, 116, 209, 255] },
+// 	{ pos: [-30, 88, 42], flag: 0, tc: [0, 0], color: [211, 114, 31, 255] },
+// 	{ pos: [1, 87, 54], flag: 0, tc: [0, 0], color: [17, 116, 47, 255] },
+// ]
+
+// const mario_seg4_vertex_04016498 = [
+// 	{ pos: [1, 87, -53], flag: 0, tc: [0, 0], color: [14, 116, 209, 255] },
+// 	{ pos: [-30, 88, -41], flag: 0, tc: [0, 0], color: [199, 106, 218, 255] },
+// 	{ pos: [-30, 88, 42], flag: 0, tc: [0, 0], color: [211, 114, 31, 255] },
+// 	{ pos: [-26, 49, -87], flag: 0, tc: [0, 0], color: [196, 41, 153, 255] },
+// 	{ pos: [-71, 56, 0], flag: 0, tc: [0, 0], color: [137, 43, 0, 255] },
+// 	{ pos: [-26, 49, 88], flag: 0, tc: [0, 0], color: [196, 41, 103, 255] },
+// 	{ pos: [1, 87, 54], flag: 0, tc: [0, 0], color: [17, 116, 47, 255] },
+// 	{ pos: [-59, -44, 0], flag: 0, tc: [0, 0], color: [136, 216, 0, 255] },
+// 	{ pos: [-26, -72, -38], flag: 0, tc: [0, 0], color: [218, 139, 229, 255] },
+// 	{ pos: [-26, -72, 39], flag: 0, tc: [0, 0], color: [218, 139, 27, 255] },
+// 	{ pos: [-26, -41, 85], flag: 0, tc: [0, 0], color: [204, 194, 97, 255] },
+// 	{ pos: [-26, -41, -84], flag: 0, tc: [0, 0], color: [204, 194, 159, 255] },
+// 	{ pos: [40, -66, 48], flag: 0, tc: [0, 0], color: [29, 145, 53, 255] },
+// 	{ pos: [22, -41, 87], flag: 0, tc: [0, 0], color: [31, 201, 109, 255] },
+// 	{ pos: [9, 0, 94], flag: 0, tc: [0, 0], color: [14, 3, 126, 255] },
+// 	{ pos: [54, -68, 0], flag: 0, tc: [0, 0], color: [45, 138, 0, 255] },
+// ]
+
+// const mario_seg4_vertex_04016598 = [
+// 	{ pos: [-26, 49, 88], flag: 0, tc: [0, 0], color: [196, 41, 103, 255] },
+// 	{ pos: [9, 0, 94], flag: 0, tc: [0, 0], color: [14, 3, 126, 255] },
+// 	{ pos: [36, 47, 77], flag: 0, tc: [0, 0], color: [47, 55, 104, 255] },
+// 	{ pos: [9, 0, -93], flag: 0, tc: [0, 0], color: [14, 3, 130, 255] },
+// 	{ pos: [-26, 49, -87], flag: 0, tc: [0, 0], color: [196, 41, 153, 255] },
+// 	{ pos: [36, 47, -76], flag: 0, tc: [0, 0], color: [46, 54, 152, 255] },
+// 	{ pos: [-26, -41, -84], flag: 0, tc: [0, 0], color: [204, 194, 159, 255] },
+// 	{ pos: [22, -41, -86], flag: 0, tc: [0, 0], color: [30, 202, 146, 255] },
+// 	{ pos: [40, -66, -47], flag: 0, tc: [0, 0], color: [29, 145, 203, 255] },
+// 	{ pos: [-26, -72, -38], flag: 0, tc: [0, 0], color: [218, 139, 229, 255] },
+// 	{ pos: [54, -68, 0], flag: 0, tc: [0, 0], color: [45, 138, 0, 255] },
+// 	{ pos: [-26, -72, 39], flag: 0, tc: [0, 0], color: [218, 139, 27, 255] },
+// 	{ pos: [40, -66, 48], flag: 0, tc: [0, 0], color: [29, 145, 53, 255] },
+// ]
+
+// export const mario_medium_poly_yellow_button_dl = [
+// 	Gbi.gsSPVertex(mario_seg4_vertex_04016148, 12, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(2, 1, 4, 0x0, 4, 5, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 7, 8, 0x0, 9, 10, 6, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 10, 7, 0x0, 7, 10, 11, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_medium_poly_pants_overalls_shared_dl = [
+// 	Gbi.gsSPVertex(mario_seg4_vertex_04016398, 16, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 1, 0, 3, 0x0),
+// 	...Gbi.gsSP2Triangles(3, 4, 1, 0x0, 2, 5, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 3, 6, 0x0, 7, 8, 9, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 10, 11, 0x0, 8, 7, 11, 0x0),
+// 	...Gbi.gsSP2Triangles(11, 10, 2, 0x0, 10, 12, 2, 0x0),
+// 	Gbi.gsSP1Triangle(13, 14, 15, 0x0),
+// 	Gbi.gsSPVertex(mario_seg4_vertex_04016498, 16, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 1, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 2, 1, 0x0, 1, 3, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 2, 4, 0x0, 6, 2, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 3, 7, 0x0, 8, 9, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 4, 7, 0x0, 9, 10, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(11, 8, 7, 0x0, 3, 11, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 10, 5, 0x0, 10, 9, 12, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 13, 14, 0x0, 12, 13, 10, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 10, 14, 0x0, 9, 8, 15, 0x0),
+// 	Gbi.gsSPVertex(mario_seg4_vertex_04016598, 13, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 4, 3, 0x0, 6, 3, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 9, 6, 0x0, 6, 7, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(9, 8, 10, 0x0, 11, 10, 12, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_medium_poly_tshirt_shared_dl = [
+// 	Gbi.gsSPVertex(mario_seg4_vertex_04016208, 16, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 2, 3, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(1, 0, 4, 0x0, 0, 5, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 4, 5, 0x0, 7, 8, 9, 0x0),
+// 	...Gbi.gsSP2Triangles(9, 10, 7, 0x0, 7, 10, 11, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 12, 8, 0x0, 11, 12, 7, 0x0),
+// 	Gbi.gsSP1Triangle(13, 14, 15, 0x0),
+// 	Gbi.gsSPVertex(mario_seg4_vertex_04016308, 9, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 2, 3, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(1, 4, 2, 0x0, 2, 4, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 3, 2, 0x0, 6, 7, 8, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_medium_poly_torso_dl = [
+// 	Gbi.gsSPDisplayList(mario_medium_poly_pants_overalls_shared_dl),
+// 	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
+// 	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+// 	Gbi.gsSPDisplayList(mario_medium_poly_tshirt_shared_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_medium_poly_torso = [
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+// 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_yellow_button),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPDisplayList(mario_medium_poly_yellow_button_dl),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+// 	Gbi.gsSPDisplayList(mario_medium_poly_torso_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_metal_medium_poly_torso = [
+// 	Gbi.gsSPDisplayList(mario_medium_poly_yellow_button_dl),
+// 	Gbi.gsSPDisplayList(mario_medium_poly_pants_overalls_shared_dl),
+// 	Gbi.gsSPDisplayList(mario_medium_poly_tshirt_shared_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_low_poly_butt_dl_vertex = [
+// 	{ pos: [-37, -37, 0], flag: 0, tc: [0, 0], color: [130, 245, 0, 0] },
+// 	{ pos: [-2, 52, 92], flag: 0, tc: [0, 0], color: [177, 60, 78, 0] },
+// 	{ pos: [-35, 55, 0], flag: 0, tc: [0, 0], color: [151, 69, 0, 0] },
+// 	{ pos: [-7, -86, 85], flag: 0, tc: [0, 0], color: [191, 196, 90, 0] },
+// 	{ pos: [49, 46, 96], flag: 0, tc: [0, 0], color: [75, 29, 97, 0] },
+// 	{ pos: [-7, -86, -85], flag: 0, tc: [0, 0], color: [207, 170, 178, 0] },
+// 	{ pos: [-2, 52, -92], flag: 0, tc: [0, 0], color: [176, 59, 178, 0] },
+// 	{ pos: [48, 44, -98], flag: 0, tc: [0, 0], color: [41, 34, 142, 0] },
+// 	{ pos: [46, -71, -89], flag: 0, tc: [0, 0], color: [115, 217, 221, 0] },
+// 	{ pos: [46, -71, 89], flag: 0, tc: [0, 0], color: [68, 161, 47, 0] },
+// 	{ pos: [49, 96, 0], flag: 0, tc: [0, 0], color: [43, 119, 0, 0] },
+// ]
+
+// export const mario_low_poly_butt_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_butt_dl_vertex, 11, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 1, 3, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 6, 7, 0x0, 0, 2, 6, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 5, 0, 0x0, 0, 3, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 8, 5, 0x0, 3, 9, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 7, 10, 0x0, 4, 9, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 9, 3, 0x0, 3, 0, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 8, 9, 0x0, 10, 7, 6, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 4, 8, 0x0, 2, 1, 10, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 2, 10, 0x0, 1, 4, 10, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_butt = [
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+// 	Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
+// 	Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_butt_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// /*export const mario_metal_low_poly_butt = [
+// 	Gbi.gsSPSetGeometryMode(Gbi.G_TEXTURE_GEN),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALFADE),
+// 	Gbi.gsDPLoadTextureBlock(mario_texture_metal, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 64, 32, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
+// 	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+// 	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_butt_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+// */
+// const mario_low_poly_left_arm_shared_dl_vertex = [
+// 	{ pos: [-6, 28, 10], flag: 0, tc: [0, 0], color: [9, 101, 181, 0] },
+// 	{ pos: [72, 21, 8], flag: 0, tc: [0, 0], color: [68, 77, 72, 0] },
+// 	{ pos: [71, -11, -34], flag: 0, tc: [0, 0], color: [63, 87, 190, 0] },
+// 	{ pos: [-8, -30, 31], flag: 0, tc: [0, 0], color: [9, 38, 120, 0] },
+// 	{ pos: [71, -30, 23], flag: 0, tc: [0, 0], color: [94, 21, 81, 0] },
+// 	{ pos: [-6, 28, 10], flag: 0, tc: [0, 0], color: [7, 41, 119, 0] },
+// 	{ pos: [-8, -7, -41], flag: 0, tc: [0, 0], color: [11, 103, 184, 0] },
+// 	{ pos: [-8, -30, 31], flag: 0, tc: [0, 0], color: [164, 173, 229, 0] },
+// 	{ pos: [-6, 28, 10], flag: 0, tc: [0, 0], color: [129, 2, 0, 0] },
+// 	{ pos: [-8, -7, -41], flag: 0, tc: [0, 0], color: [164, 173, 229, 0] },
+// 	{ pos: [71, -11, -34], flag: 0, tc: [0, 0], color: [253, 136, 217, 0] },
+// 	{ pos: [71, -30, 23], flag: 0, tc: [0, 0], color: [253, 136, 217, 0] },
+// ]
+
+// export const mario_low_poly_left_arm_shared_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_left_arm_shared_dl_vertex, 12, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 3, 1, 0x0, 6, 0, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 8, 9, 0x0, 2, 1, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 9, 10, 0x0, 7, 10, 11, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_left_arm = [
+// 	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
+// 	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_left_arm_shared_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_low_poly_left_forearm_shared_dl_vertex = [
+// 	{ pos: [-5, 20, 6], flag: 0, tc: [0, 0], color: [5, 98, 176, 0] },
+// 	{ pos: [67, 16, 5], flag: 0, tc: [0, 0], color: [67, 75, 76, 0] },
+// 	{ pos: [67, -14, -31], flag: 0, tc: [0, 0], color: [60, 85, 186, 0] },
+// 	{ pos: [-5, -30, 21], flag: 0, tc: [0, 0], color: [5, 32, 122, 0] },
+// 	{ pos: [67, -30, 17], flag: 0, tc: [0, 0], color: [92, 20, 84, 0] },
+// 	{ pos: [-5, 20, 6], flag: 0, tc: [0, 0], color: [4, 34, 122, 0] },
+// 	{ pos: [-5, -12, -35], flag: 0, tc: [0, 0], color: [7, 99, 178, 0] },
+// 	{ pos: [-5, -30, 21], flag: 0, tc: [0, 0], color: [165, 173, 229, 0] },
+// 	{ pos: [-5, 20, 6], flag: 0, tc: [0, 0], color: [129, 1, 0, 0] },
+// 	{ pos: [-5, -12, -35], flag: 0, tc: [0, 0], color: [165, 173, 229, 0] },
+// 	{ pos: [67, -30, 17], flag: 0, tc: [0, 0], color: [254, 136, 217, 0] },
+// 	{ pos: [67, -14, -31], flag: 0, tc: [0, 0], color: [254, 136, 217, 0] },
+// ]
+
+// export const mario_low_poly_left_forearm_shared_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_left_forearm_shared_dl_vertex, 12, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 3, 1, 0x0, 6, 0, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 8, 9, 0x0, 2, 1, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 7, 9, 0x0, 10, 9, 11, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_low_poly_left_hand_closed_shared_dl_vertex = [
+// 	{ pos: [-6, 34, -25], flag: 0, tc: [0, 0], color: [160, 19, 176, 0] },
+// 	{ pos: [-9, 39, 24], flag: 0, tc: [0, 0], color: [179, 67, 74, 0] },
+// 	{ pos: [91, 80, -34], flag: 0, tc: [0, 0], color: [19, 124, 238, 0] },
+// 	{ pos: [90, 35, 33], flag: 0, tc: [0, 0], color: [65, 20, 107, 0] },
+// 	{ pos: [20, -34, 21], flag: 0, tc: [0, 0], color: [212, 154, 60, 0] },
+// 	{ pos: [122, 4, -45], flag: 0, tc: [0, 0], color: [99, 187, 37, 0] },
+// 	{ pos: [122, 4, -45], flag: 0, tc: [0, 0], color: [242, 21, 132, 0] },
+// 	{ pos: [20, -31, -44], flag: 0, tc: [0, 0], color: [203, 174, 177, 0] },
+// ]
+
+// export const mario_low_poly_left_hand_closed_shared_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_left_hand_closed_shared_dl_vertex, 8, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 1, 3, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 5, 3, 0x0, 0, 6, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(0, 2, 6, 0x0, 4, 7, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(3, 1, 4, 0x0, 2, 3, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(0, 7, 4, 0x0, 4, 1, 0, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_left_hand_closed = [
+// 	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_left_hand_closed_shared_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_low_poly_right_arm_shared_dl_vertex = [
+// 	{ pos: [65, 30, 23], flag: 0, tc: [0, 0], color: [94, 235, 81, 0] },
+// 	{ pos: [66, -21, 8], flag: 0, tc: [0, 0], color: [69, 179, 73, 0] },
+// 	{ pos: [65, 11, -34], flag: 0, tc: [0, 0], color: [64, 169, 191, 0] },
+// 	{ pos: [-10, 7, -41], flag: 0, tc: [0, 0], color: [164, 82, 229, 0] },
+// 	{ pos: [-9, -28, 10], flag: 0, tc: [0, 0], color: [129, 254, 0, 0] },
+// 	{ pos: [-10, 30, 30], flag: 0, tc: [0, 0], color: [164, 82, 229, 0] },
+// 	{ pos: [-9, -28, 10], flag: 0, tc: [0, 0], color: [9, 154, 182, 0] },
+// 	{ pos: [-10, 7, -41], flag: 0, tc: [0, 0], color: [12, 153, 184, 0] },
+// 	{ pos: [-10, 30, 30], flag: 0, tc: [0, 0], color: [10, 219, 120, 0] },
+// 	{ pos: [-9, -28, 10], flag: 0, tc: [0, 0], color: [7, 216, 120, 0] },
+// 	{ pos: [65, 30, 23], flag: 0, tc: [0, 0], color: [252, 120, 217, 0] },
+// 	{ pos: [65, 11, -34], flag: 0, tc: [0, 0], color: [252, 120, 217, 0] },
+// ]
+
+// export const mario_low_poly_right_arm_shared_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_right_arm_shared_dl_vertex, 12, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(2, 6, 7, 0x0, 1, 8, 9, 0x0),
+// 	...Gbi.gsSP2Triangles(1, 0, 8, 0x0, 2, 1, 6, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 10, 11, 0x0, 5, 11, 3, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_right_arm = [
+// 	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
+// 	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_right_arm_shared_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_low_poly_right_forearm_shared_dl_vertex = [
+// 	{ pos: [-13, 12, -35], flag: 0, tc: [0, 0], color: [165, 83, 229, 0] },
+// 	{ pos: [-13, -20, 6], flag: 0, tc: [0, 0], color: [129, 255, 0, 0] },
+// 	{ pos: [-13, 30, 21], flag: 0, tc: [0, 0], color: [165, 83, 229, 0] },
+// 	{ pos: [54, 14, -31], flag: 0, tc: [0, 0], color: [61, 170, 186, 0] },
+// 	{ pos: [-13, -20, 6], flag: 0, tc: [0, 0], color: [5, 158, 177, 0] },
+// 	{ pos: [-13, 12, -35], flag: 0, tc: [0, 0], color: [7, 156, 179, 0] },
+// 	{ pos: [55, -16, 5], flag: 0, tc: [0, 0], color: [67, 181, 76, 0] },
+// 	{ pos: [-13, 30, 21], flag: 0, tc: [0, 0], color: [5, 224, 122, 0] },
+// 	{ pos: [-13, -20, 6], flag: 0, tc: [0, 0], color: [4, 222, 122, 0] },
+// 	{ pos: [54, 30, 17], flag: 0, tc: [0, 0], color: [92, 237, 84, 0] },
+// 	{ pos: [54, 30, 17], flag: 0, tc: [0, 0], color: [254, 120, 216, 0] },
+// 	{ pos: [54, 14, -31], flag: 0, tc: [0, 0], color: [254, 120, 216, 0] },
+// ]
+
+// export const mario_low_poly_right_forearm_shared_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_right_forearm_shared_dl_vertex, 12, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 7, 8, 0x0, 6, 9, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(3, 6, 4, 0x0, 2, 10, 11, 0x0),
+// 	...Gbi.gsSP2Triangles(2, 11, 0, 0x0, 9, 6, 3, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_low_poly_right_hand_closed_dl_vertex = [
+// 	{ pos: [85, -38, -32], flag: 0, tc: [0, 0], color: [61, 227, 150, 0] },
+// 	{ pos: [-15, -35, -22], flag: 0, tc: [0, 0], color: [153, 220, 193, 0] },
+// 	{ pos: [17, 37, -22], flag: 0, tc: [0, 0], color: [254, 105, 185, 0] },
+// 	{ pos: [116, -10, 36], flag: 0, tc: [0, 0], color: [102, 71, 22, 0] },
+// 	{ pos: [82, -85, 44], flag: 0, tc: [0, 0], color: [19, 138, 216, 0] },
+// 	{ pos: [-15, -35, 43], flag: 0, tc: [0, 0], color: [157, 236, 76, 0] },
+// 	{ pos: [82, -85, 44], flag: 0, tc: [0, 0], color: [2, 21, 125, 0] },
+// 	{ pos: [14, 30, 26], flag: 0, tc: [0, 0], color: [202, 80, 81, 0] },
+// ]
+
+// export const mario_low_poly_right_hand_closed_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_right_hand_closed_dl_vertex, 8, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 0, 3, 0x0, 4, 5, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 3, 7, 0x0, 5, 6, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(0, 4, 1, 0x0, 3, 2, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(1, 5, 7, 0x0, 7, 2, 1, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_right_hand_closed = [
+// 	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_right_hand_closed_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_metal_low_poly_right_hand_closed = [
+// 	Gbi.gsSPDisplayList(mario_low_poly_right_hand_closed_dl),
+// 	Gbi.gsSPClearGeometryMode(Gbi.G_TEXTURE_GEN),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+// 	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_low_poly_left_thigh_dl_vertex = [
+// 	{ pos: [10, 51, 45], flag: 0, tc: [0, 0], color: [8, 115, 52, 0] },
+// 	{ pos: [17, -44, 58], flag: 0, tc: [0, 0], color: [10, 17, 125, 0] },
+// 	{ pos: [94, 48, 38], flag: 0, tc: [0, 0], color: [56, 64, 93, 0] },
+// 	{ pos: [11, 51, -27], flag: 0, tc: [0, 0], color: [11, 94, 173, 0] },
+// 	{ pos: [95, 48, -19], flag: 0, tc: [0, 0], color: [74, 79, 191, 0] },
+// 	{ pos: [18, -45, -38], flag: 0, tc: [0, 0], color: [12, 15, 131, 0] },
+// 	{ pos: [101, -28, -28], flag: 0, tc: [0, 0], color: [91, 202, 188, 0] },
+// 	{ pos: [100, -28, 48], flag: 0, tc: [0, 0], color: [99, 189, 41, 0] },
+// 	{ pos: [17, -44, 58], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
+// 	{ pos: [10, 51, 45], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
+// 	{ pos: [18, -45, -38], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
+// 	{ pos: [11, 51, -27], flag: 0, tc: [0, 0], color: [130, 247, 255, 0] },
+// 	{ pos: [18, -45, -38], flag: 0, tc: [0, 0], color: [24, 132, 1, 0] },
+// 	{ pos: [17, -44, 58], flag: 0, tc: [0, 0], color: [24, 132, 1, 0] },
+// ]
+
+// export const mario_low_poly_left_thigh_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_left_thigh_dl_vertex, 14, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 3, 4, 0x0, 4, 6, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(0, 2, 4, 0x0, 1, 7, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 9, 10, 0x0, 9, 11, 10, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 4, 7, 0x0, 4, 2, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(12, 7, 13, 0x0, 12, 6, 7, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_left_thigh = [
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+// 	Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
+// 	Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_left_thigh_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// /*export const mario_metal_low_poly_left_thigh = [
+// 	Gbi.gsSPSetGeometryMode(Gbi.G_TEXTURE_GEN),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALFADE),
+// 	Gbi.gsDPLoadTextureBlock(mario_texture_metal, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 64, 32, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
+// 	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+// 	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_left_thigh_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+// */
+// const mario_low_poly_left_leg_shared_dl_vertex = [
+// 	{ pos: [7, 47, 38], flag: 0, tc: [0, 0], color: [207, 89, 75, 0] },
+// 	{ pos: [70, -39, 53], flag: 0, tc: [0, 0], color: [248, 16, 125, 0] },
+// 	{ pos: [75, 52, 42], flag: 0, tc: [0, 0], color: [244, 94, 83, 0] },
+// 	{ pos: [75, 52, -23], flag: 0, tc: [0, 0], color: [245, 114, 202, 0] },
+// 	{ pos: [7, 47, -20], flag: 0, tc: [0, 0], color: [171, 52, 178, 0] },
+// 	{ pos: [71, -39, -34], flag: 0, tc: [0, 0], color: [250, 15, 131, 0] },
+// 	{ pos: [3, -29, -29], flag: 0, tc: [0, 0], color: [187, 164, 205, 0] },
+// 	{ pos: [2, -29, 48], flag: 0, tc: [0, 0], color: [146, 219, 49, 0] },
+// 	{ pos: [71, -39, -34], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
+// 	{ pos: [75, 52, -23], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
+// 	{ pos: [70, -39, 53], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
+// 	{ pos: [75, 52, 42], flag: 0, tc: [0, 0], color: [126, 250, 1, 0] },
+// 	{ pos: [71, -39, -34], flag: 0, tc: [0, 0], color: [237, 131, 0, 0] },
+// 	{ pos: [70, -39, 53], flag: 0, tc: [0, 0], color: [237, 131, 0, 0] },
+// ]
+
+// export const mario_low_poly_left_leg_shared_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_left_leg_shared_dl_vertex, 14, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 3, 5, 0x0, 5, 6, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(3, 4, 0, 0x0, 0, 7, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 4, 6, 0x0, 7, 0, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 9, 10, 0x0, 9, 11, 10, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 12, 13, 0x0, 13, 7, 6, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_low_poly_left_foot_shared_dl_vertex = [
+// 	{ pos: [110, 11, 56], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
+// 	{ pos: [109, 10, -33], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
+// 	{ pos: [-50, 69, -36], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
+// 	{ pos: [-49, 70, 63], flag: 0, tc: [0, 0], color: [43, 119, 255, 0] },
+// 	{ pos: [74, -39, 51], flag: 0, tc: [0, 0], color: [19, 176, 96, 0] },
+// 	{ pos: [110, 11, 56], flag: 0, tc: [0, 0], color: [91, 187, 54, 0] },
+// 	{ pos: [-49, 70, 63], flag: 0, tc: [0, 0], color: [0, 244, 126, 0] },
+// 	{ pos: [73, -40, -25], flag: 0, tc: [0, 0], color: [24, 150, 192, 0] },
+// 	{ pos: [-56, 20, -30], flag: 0, tc: [0, 0], color: [164, 197, 194, 0] },
+// 	{ pos: [-50, 69, -36], flag: 0, tc: [0, 0], color: [254, 240, 131, 0] },
+// 	{ pos: [-54, 20, 58], flag: 0, tc: [0, 0], color: [153, 194, 38, 0] },
+// 	{ pos: [109, 10, -33], flag: 0, tc: [0, 0], color: [68, 194, 170, 0] },
+// 	{ pos: [-50, 69, -36], flag: 0, tc: [0, 0], color: [130, 14, 1, 0] },
+// 	{ pos: [-49, 70, 63], flag: 0, tc: [0, 0], color: [130, 14, 1, 0] },
+// ]
+
+// export const mario_low_poly_left_foot_shared_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_left_foot_shared_dl_vertex, 14, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 5, 6, 0x0, 7, 8, 9, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 4, 6, 0x0, 7, 9, 11, 0x0),
+// 	...Gbi.gsSP2Triangles(12, 10, 13, 0x0, 7, 10, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 11, 5, 0x0, 5, 4, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 4, 10, 0x0, 12, 8, 10, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_left_foot = [
+// 	Gbi.gsSPLight(mario_brown1_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_brown1_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_left_foot_shared_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_low_poly_right_thigh_shared_dl_vertex = [
+// 	{ pos: [102, -25, -48], flag: 0, tc: [0, 0], color: [100, 191, 213, 0] },
+// 	{ pos: [103, -27, 25], flag: 0, tc: [0, 0], color: [92, 201, 66, 0] },
+// 	{ pos: [25, -45, 35], flag: 0, tc: [0, 0], color: [27, 133, 253, 0] },
+// 	{ pos: [24, -42, -56], flag: 0, tc: [0, 0], color: [27, 133, 253, 0] },
+// 	{ pos: [95, 50, -36], flag: 0, tc: [0, 0], color: [55, 66, 163, 0] },
+// 	{ pos: [96, 49, 18], flag: 0, tc: [0, 0], color: [74, 78, 65, 0] },
+// 	{ pos: [25, -45, 35], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
+// 	{ pos: [17, 51, 27], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
+// 	{ pos: [15, 53, -42], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
+// 	{ pos: [24, -42, -56], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
+// 	{ pos: [24, -42, -56], flag: 0, tc: [0, 0], color: [9, 19, 131, 0] },
+// 	{ pos: [15, 53, -42], flag: 0, tc: [0, 0], color: [7, 116, 206, 0] },
+// 	{ pos: [25, -45, 35], flag: 0, tc: [0, 0], color: [13, 12, 125, 0] },
+// 	{ pos: [17, 51, 27], flag: 0, tc: [0, 0], color: [11, 92, 85, 0] },
+// ]
+
+// export const mario_low_poly_right_thigh_shared_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_right_thigh_shared_dl_vertex, 14, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(0, 4, 5, 0x0, 0, 5, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 7, 8, 0x0, 6, 8, 9, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 0, 10, 0x0, 5, 4, 11, 0x0),
+// 	...Gbi.gsSP2Triangles(12, 1, 5, 0x0, 5, 13, 12, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 11, 13, 0x0, 4, 10, 11, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_right_thigh = [
+// 	Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
+// 	Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_right_thigh_shared_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_low_poly_right_leg_shared_dl_vertex = [
+// 	{ pos: [2, -29, 27], flag: 0, tc: [0, 0], color: [186, 163, 49, 0] },
+// 	{ pos: [1, -26, -50], flag: 0, tc: [0, 0], color: [145, 221, 207, 0] },
+// 	{ pos: [68, -37, -56], flag: 0, tc: [0, 0], color: [236, 131, 253, 0] },
+// 	{ pos: [70, -40, 30], flag: 0, tc: [0, 0], color: [236, 131, 253, 0] },
+// 	{ pos: [68, -37, -56], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
+// 	{ pos: [74, 54, -43], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
+// 	{ pos: [75, 52, 21], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
+// 	{ pos: [70, -40, 30], flag: 0, tc: [0, 0], color: [126, 249, 254, 0] },
+// 	{ pos: [6, 47, 19], flag: 0, tc: [0, 0], color: [173, 51, 80, 0] },
+// 	{ pos: [6, 49, -38], flag: 0, tc: [0, 0], color: [207, 91, 183, 0] },
+// 	{ pos: [68, -37, -56], flag: 0, tc: [0, 0], color: [248, 19, 131, 0] },
+// 	{ pos: [75, 52, 21], flag: 0, tc: [0, 0], color: [247, 113, 56, 0] },
+// 	{ pos: [70, -40, 30], flag: 0, tc: [0, 0], color: [251, 12, 126, 0] },
+// 	{ pos: [74, 54, -43], flag: 0, tc: [0, 0], color: [244, 96, 175, 0] },
+// ]
+
+// export const mario_low_poly_right_leg_shared_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_right_leg_shared_dl_vertex, 14, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 2, 3, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 5, 6, 0x0, 4, 6, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 9, 1, 0x0, 0, 8, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 1, 9, 0x0, 9, 8, 11, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 0, 12, 0x0, 12, 11, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(11, 13, 9, 0x0, 13, 10, 9, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_low_poly_right_foot_dl_vertex = [
+// 	{ pos: [-55, 19, -59], flag: 0, tc: [0, 0], color: [154, 192, 218, 0] },
+// 	{ pos: [-57, 20, 28], flag: 0, tc: [0, 0], color: [164, 197, 62, 0] },
+// 	{ pos: [-52, 69, 34], flag: 0, tc: [0, 0], color: [130, 12, 253, 0] },
+// 	{ pos: [73, -38, -50], flag: 0, tc: [0, 0], color: [21, 174, 162, 0] },
+// 	{ pos: [71, -37, 25], flag: 0, tc: [0, 0], color: [25, 152, 66, 0] },
+// 	{ pos: [108, 12, -55], flag: 0, tc: [0, 0], color: [92, 188, 204, 0] },
+// 	{ pos: [106, 13, 33], flag: 0, tc: [0, 0], color: [68, 197, 88, 0] },
+// 	{ pos: [-50, 68, -65], flag: 0, tc: [0, 0], color: [130, 12, 253, 0] },
+// 	{ pos: [-52, 69, 34], flag: 0, tc: [0, 0], color: [253, 242, 126, 0] },
+// 	{ pos: [-50, 68, -65], flag: 0, tc: [0, 0], color: [2, 242, 130, 0] },
+// 	{ pos: [-52, 69, 34], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
+// 	{ pos: [108, 12, -55], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
+// 	{ pos: [-50, 68, -65], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
+// 	{ pos: [106, 13, 33], flag: 0, tc: [0, 0], color: [41, 119, 0, 0] },
+// ]
+
+// export const mario_low_poly_right_foot_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_right_foot_dl_vertex, 14, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 3, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 3, 5, 0x0, 5, 6, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(1, 0, 4, 0x0, 7, 0, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 8, 4, 0x0, 9, 3, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 1, 4, 0x0, 9, 5, 3, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 11, 12, 0x0, 10, 13, 11, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_right_foot = [
+// 	Gbi.gsSPLight(mario_brown1_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_brown1_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_right_foot_dl),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+// 	Gbi.gsDPSetEnvColor(255, 255, 255, 255),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_metal_low_poly_right_foot = [
+// 	Gbi.gsSPDisplayList(mario_low_poly_right_foot_dl),
+// 	Gbi.gsSPClearGeometryMode(Gbi.G_TEXTURE_GEN),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+// 	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+// 	Gbi.gsDPSetEnvColor(255, 255, 255, 255),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_seg4_vertex_04017B58 = [
+// 	{ pos: [-28, 41, -88], flag: 0, tc: [-396, 1646], color: [183, 49, 165, 255] },
+// 	{ pos: [0, 98, 0], flag: 0, tc: [1968, 722], color: [240, 125, 0, 255] },
+// 	{ pos: [35, 64, -82], flag: 0, tc: [-390, 132], color: [41, 75, 163, 255] },
+// 	{ pos: [39, 90, 0], flag: 0, tc: [1698, -280], color: [74, 103, 0, 255] },
+// 	{ pos: [-28, 41, 89], flag: 0, tc: [1610, 1512], color: [209, 55, 103, 255] },
+// 	{ pos: [35, 64, 83], flag: 0, tc: [1070, -68], color: [41, 75, 93, 255] },
+// 	{ pos: [0, 98, 0], flag: 0, tc: [-1064, 968], color: [240, 125, 0, 255] },
+// 	{ pos: [39, 90, 0], flag: 0, tc: [-1146, -124], color: [74, 103, 0, 255] },
+// ]
+
+// const mario_seg4_vertex_04017BD8 = [
+// 	{ pos: [-28, -71, 81], flag: 0, tc: [0, 0], color: [154, 189, 32, 255] },
+// 	{ pos: [-28, 41, -88], flag: 0, tc: [0, 0], color: [183, 49, 165, 255] },
+// 	{ pos: [-28, -71, -80], flag: 0, tc: [0, 0], color: [183, 181, 186, 255] },
+// 	{ pos: [39, -79, -73], flag: 0, tc: [0, 0], color: [39, 179, 164, 255] },
+// 	{ pos: [-28, 41, 89], flag: 0, tc: [0, 0], color: [209, 55, 103, 255] },
+// 	{ pos: [-28, 89, 0], flag: 0, tc: [0, 0], color: [151, 70, 0, 255] },
+// 	{ pos: [39, -79, 74], flag: 0, tc: [0, 0], color: [55, 186, 89, 255] },
+// 	{ pos: [35, 64, 83], flag: 0, tc: [0, 0], color: [41, 75, 93, 255] },
+// 	{ pos: [0, 98, 0], flag: 0, tc: [0, 0], color: [240, 125, 0, 255] },
+// 	{ pos: [35, 64, -82], flag: 0, tc: [0, 0], color: [41, 75, 163, 255] },
+// 	{ pos: [89, -45, -42], flag: 0, tc: [0, 0], color: [112, 208, 223, 255] },
+// 	{ pos: [89, -45, 43], flag: 0, tc: [0, 0], color: [117, 228, 40, 255] },
+// 	{ pos: [74, 26, -59], flag: 0, tc: [0, 0], color: [97, 37, 185, 255] },
+// 	{ pos: [39, 90, 0], flag: 0, tc: [0, 0], color: [74, 103, 0, 255] },
+// 	{ pos: [74, 26, 60], flag: 0, tc: [0, 0], color: [97, 37, 71, 255] },
+// ]
+
+// const mario_seg4_vertex_04017CC8 = [
+// 	{ pos: [74, 26, 60], flag: 0, tc: [0, 0], color: [97, 37, 71, 255] },
+// 	{ pos: [87, 42, 0], flag: 0, tc: [0, 0], color: [118, 45, 0, 255] },
+// 	{ pos: [39, 90, 0], flag: 0, tc: [0, 0], color: [74, 103, 0, 255] },
+// 	{ pos: [39, -79, -73], flag: 0, tc: [0, 0], color: [39, 179, 164, 255] },
+// 	{ pos: [35, 64, -82], flag: 0, tc: [0, 0], color: [41, 75, 163, 255] },
+// 	{ pos: [74, 26, -59], flag: 0, tc: [0, 0], color: [97, 37, 185, 255] },
+// 	{ pos: [89, -45, -42], flag: 0, tc: [0, 0], color: [112, 208, 223, 255] },
+// 	{ pos: [39, -79, 74], flag: 0, tc: [0, 0], color: [55, 186, 89, 255] },
+// 	{ pos: [89, -45, 43], flag: 0, tc: [0, 0], color: [117, 228, 40, 255] },
+// 	{ pos: [35, 64, 83], flag: 0, tc: [0, 0], color: [41, 75, 93, 255] },
+// ]
+
+// export const mario_low_poly_yellow_button_dl = [
+// 	Gbi.gsSPVertex(mario_seg4_vertex_04017B58, 8, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 2, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 5, 6, 0x0, 6, 5, 7, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_pants_overalls_shared_dl = [
+// 	Gbi.gsSPVertex(mario_seg4_vertex_04017BD8, 15, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 2, 3, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(0, 4, 5, 0x0, 3, 6, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 0, 6, 0x0, 0, 5, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 4, 6, 0x0, 5, 4, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 1, 5, 0x0, 3, 1, 9, 0x0),
+// 	...Gbi.gsSP2Triangles(3, 2, 1, 0x0, 6, 3, 10, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 11, 6, 0x0, 12, 9, 13, 0x0),
+// 	Gbi.gsSP1Triangle(13, 7, 14, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_tshirt_shared_dl = [
+// 	Gbi.gsSPVertex(mario_seg4_vertex_04017CC8, 10, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 6, 3, 0x0, 2, 1, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 5, 1, 0x0, 7, 8, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 0, 9, 0x0, 8, 6, 1, 0x0),
+// 	Gbi.gsSP1Triangle(1, 0, 8, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_torso_dl = [
+// 	Gbi.gsSPDisplayList(mario_low_poly_pants_overalls_shared_dl),
+// 	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
+// 	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_tshirt_shared_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_torso = [
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+// 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_yellow_button),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPDisplayList(mario_low_poly_yellow_button_dl),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+// 	Gbi.gsSPDisplayList(mario_low_poly_torso_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_metal_low_poly_torso = [
+// 	Gbi.gsSPDisplayList(mario_low_poly_yellow_button_dl),
+// 	Gbi.gsSPDisplayList(mario_low_poly_pants_overalls_shared_dl),
+// 	Gbi.gsSPDisplayList(mario_low_poly_tshirt_shared_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// const mario_low_poly_mario_m_logo_dl_vertex = [
+// 	{ pos: [272, 48, 53], flag: 0, tc: [904, 0], color: [66, 81, 71, 255] },
+// 	{ pos: [174, 79, -9], flag: 0, tc: [452, 816], color: [81, 97, 250, 255] },
+// 	{ pos: [146, 27, 92], flag: 0, tc: [1238, 962], color: [3, 58, 112, 255] },
+// 	{ pos: [272, 48, -52], flag: 0, tc: [-2, 0], color: [98, 39, 186, 255] },
+// 	{ pos: [146, 27, -91], flag: 0, tc: [-334, 962], color: [3, 57, 143, 255] },
+// ]
+
+// const mario_low_poly_eyes_cap_on_dl_vertex = [
+// 	{ pos: [146, 27, 92], flag: 0, tc: [1316, 212], color: [3, 58, 112, 255] },
+// 	{ pos: [168, 79, 0], flag: 0, tc: [458, 68], color: [217, 120, 0, 255] },
+// 	{ pos: [88, 101, 33], flag: 0, tc: [762, 990], color: [56, 85, 75, 255] },
+// 	{ pos: [88, 101, -32], flag: 0, tc: [154, 990], color: [30, 93, 177, 255] },
+// 	{ pos: [146, 27, -91], flag: 0, tc: [-398, 212], color: [3, 57, 143, 255] },
+// ]
+
+// const mario_low_poly_mustache_cap_on_dl_vertex = [
+// 	{ pos: [88, 101, -32], flag: 0, tc: [398, 214], color: [30, 93, 177, 255] },
+// 	{ pos: [146, 27, -91], flag: 0, tc: [1408, -550], color: [3, 57, 143, 255] },
+// 	{ pos: [34, 39, -98], flag: 0, tc: [1306, 732], color: [205, 64, 160, 255] },
+// 	{ pos: [44, 113, 0], flag: 0, tc: [10, 800], color: [156, 77, 0, 255] },
+// 	{ pos: [-5, 58, 0], flag: 0, tc: [300, 1456], color: [136, 40, 0, 255] },
+// 	{ pos: [88, 101, 33], flag: 0, tc: [294, 258], color: [56, 85, 75, 255] },
+// 	{ pos: [44, 113, 0], flag: 0, tc: [34, 840], color: [156, 77, 0, 255] },
+// 	{ pos: [34, 39, 99], flag: 0, tc: [1314, 634], color: [205, 64, 96, 255] },
+// 	{ pos: [146, 27, 92], flag: 0, tc: [1132, -556], color: [3, 58, 112, 255] },
+// 	{ pos: [-5, 58, 0], flag: 0, tc: [470, 1412], color: [136, 40, 0, 255] },
+// ]
+
+// const mario_low_poly_face_cap_dl_vertex = [
+// 	{ pos: [272, 48, -52], flag: 0, tc: [0, 0], color: [98, 39, 186, 255] },
+// 	{ pos: [272, 48, 53], flag: 0, tc: [0, 0], color: [66, 81, 71, 255] },
+// 	{ pos: [149, -87, 138], flag: 0, tc: [0, 0], color: [67, 182, 77, 255] },
+// 	{ pos: [146, 27, -91], flag: 0, tc: [0, 0], color: [3, 57, 143, 255] },
+// 	{ pos: [149, -87, -137], flag: 0, tc: [0, 0], color: [51, 194, 159, 255] },
+// 	{ pos: [146, 27, 92], flag: 0, tc: [0, 0], color: [3, 58, 112, 255] },
+// 	{ pos: [58, -114, 81], flag: 0, tc: [0, 0], color: [186, 173, 64, 255] },
+// 	{ pos: [98, -165, 0], flag: 0, tc: [0, 0], color: [253, 130, 0, 255] },
+// 	{ pos: [58, -114, -80], flag: 0, tc: [0, 0], color: [188, 184, 178, 255] },
+// 	{ pos: [168, 79, 0], flag: 0, tc: [0, 0], color: [217, 120, 0, 255] },
+// 	{ pos: [175, 154, 0], flag: 0, tc: [0, 0], color: [225, 108, 198, 255] },
+// 	{ pos: [174, 79, -9], flag: 0, tc: [0, 0], color: [81, 97, 250, 255] },
+// ]
+
+// const mario_low_poly_face_part_cap_on_dl_vertex = [
+// 	{ pos: [94, 146, 33], flag: 0, tc: [0, 0], color: [255, 68, 107, 255] },
+// 	{ pos: [50, 153, 0], flag: 0, tc: [0, 0], color: [173, 95, 0, 255] },
+// 	{ pos: [44, 113, 0], flag: 0, tc: [0, 0], color: [156, 77, 0, 255] },
+// 	{ pos: [88, 101, 33], flag: 0, tc: [0, 0], color: [56, 85, 75, 255] },
+// 	{ pos: [94, 146, -32], flag: 0, tc: [0, 0], color: [59, 53, 158, 255] },
+// 	{ pos: [88, 101, -32], flag: 0, tc: [0, 0], color: [30, 93, 177, 255] },
+// 	{ pos: [34, 39, 99], flag: 0, tc: [0, 0], color: [205, 64, 96, 255] },
+// 	{ pos: [-5, 58, 0], flag: 0, tc: [0, 0], color: [136, 40, 0, 255] },
+// 	{ pos: [7, -85, 79], flag: 0, tc: [0, 0], color: [170, 220, 84, 255] },
+// 	{ pos: [146, 27, 92], flag: 0, tc: [0, 0], color: [3, 58, 112, 255] },
+// 	{ pos: [7, -85, -78], flag: 0, tc: [0, 0], color: [169, 199, 185, 255] },
+// 	{ pos: [34, 39, -98], flag: 0, tc: [0, 0], color: [205, 64, 160, 255] },
+// 	{ pos: [146, 27, -91], flag: 0, tc: [0, 0], color: [3, 57, 143, 255] },
+// ]
+
+// const mario_low_poly_face_back_hair_cap_on_dl_vertex = [
+// 	{ pos: [58, -114, 81], flag: 0, tc: [0, 0], color: [186, 173, 64, 255] },
+// 	{ pos: [7, -85, 79], flag: 0, tc: [0, 0], color: [170, 220, 84, 255] },
+// 	{ pos: [7, -85, -78], flag: 0, tc: [0, 0], color: [169, 199, 185, 255] },
+// 	{ pos: [58, -114, -80], flag: 0, tc: [0, 0], color: [188, 184, 178, 255] },
+// 	{ pos: [146, 27, 92], flag: 0, tc: [0, 0], color: [3, 58, 112, 255] },
+// 	{ pos: [146, 27, -91], flag: 0, tc: [0, 0], color: [3, 57, 143, 255] },
+// ]
+
+// export const mario_low_poly_mario_m_logo_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_mario_m_logo_dl_vertex, 5, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 1, 0x0),
+// 	Gbi.gsSP1Triangle(3, 1, 0, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_eyes_cap_on_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_eyes_cap_on_dl_vertex, 5, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 1, 4, 0x0),
+// 	Gbi.gsSP1Triangle(3, 2, 1, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_mustache_cap_on_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_mustache_cap_on_dl_vertex, 10, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 2, 3, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(2, 4, 3, 0x0, 5, 6, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 8, 5, 0x0, 6, 9, 7, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_face_part_cap_on_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_face_part_cap_on_dl_vertex, 13, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(2, 1, 4, 0x0, 2, 4, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 1, 0, 0x0, 4, 0, 3, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 4, 3, 0x0, 6, 7, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(9, 6, 8, 0x0, 8, 7, 10, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 7, 11, 0x0, 10, 11, 12, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_face_cap_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_face_cap_dl_vertex, 12, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 0, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 0, 2, 0x0, 2, 1, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 2, 5, 0x0, 6, 7, 2, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 4, 2, 0x0, 3, 4, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 7, 8, 0x0, 9, 10, 3, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 11, 3, 0x0, 8, 7, 6, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 5, 11, 0x0, 10, 9, 5, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_face_back_hair_cap_on_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_face_back_hair_cap_on_dl_vertex, 6, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 1, 0, 0x0, 3, 2, 5, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_face_cap_on_dl = [
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_part_cap_on_dl),
+// 	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
+// 	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_dl),
+// 	Gbi.gsSPLight(mario_brown2_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_brown2_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_back_hair_cap_on_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_cap_on_eyes_front = [
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+// 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_front),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_on_dl),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_cap_on_eyes_half_closed = [
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+// 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_half_closed),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_on_dl),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
+
+// export const mario_low_poly_cap_on_eyes_closed = [
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+// 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_closed),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_on_dl),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
 
 /*export const mario_low_poly_cap_on_eyes_right = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
@@ -4356,181 +4354,181 @@ export const mario_low_poly_cap_on_eyes_up = [
 	Gbi.gsSPEndDisplayList(),
 ]*/
 
-export const mario_metal_low_poly_cap_on = [
-	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
-	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
-	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_on_dl),
-	Gbi.gsSPDisplayList(mario_low_poly_face_part_cap_on_dl),
-	Gbi.gsSPDisplayList(mario_low_poly_face_cap_dl),
-	Gbi.gsSPDisplayList(mario_low_poly_face_back_hair_cap_on_dl),
-	Gbi.gsSPEndDisplayList(),
-]
+// export const mario_metal_low_poly_cap_on = [
+// 	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
+// 	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
+// 	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_on_dl),
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_part_cap_on_dl),
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_dl),
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_back_hair_cap_on_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
 
-const mario_low_poly_mario_eyes_cap_off_dl_vertex = [
-	{ pos: [146, 27, 92], flag: 0, tc: [1316, 212], color: [22, 37, 119, 255] },
-	{ pos: [168, 79, 0], flag: 0, tc: [458, 68], color: [39, 120, 0, 255] },
-	{ pos: [88, 101, 33], flag: 0, tc: [762, 990], color: [56, 85, 75, 255] },
-	{ pos: [88, 101, -32], flag: 0, tc: [154, 990], color: [30, 93, 177, 255] },
-	{ pos: [146, 27, -91], flag: 0, tc: [-398, 212], color: [20, 38, 137, 255] },
-]
+// const mario_low_poly_mario_eyes_cap_off_dl_vertex = [
+// 	{ pos: [146, 27, 92], flag: 0, tc: [1316, 212], color: [22, 37, 119, 255] },
+// 	{ pos: [168, 79, 0], flag: 0, tc: [458, 68], color: [39, 120, 0, 255] },
+// 	{ pos: [88, 101, 33], flag: 0, tc: [762, 990], color: [56, 85, 75, 255] },
+// 	{ pos: [88, 101, -32], flag: 0, tc: [154, 990], color: [30, 93, 177, 255] },
+// 	{ pos: [146, 27, -91], flag: 0, tc: [-398, 212], color: [20, 38, 137, 255] },
+// ]
 
-const mario_low_poly_mustache_cap_off_dl_vertex = [
-	{ pos: [34, 39, -98], flag: 0, tc: [1306, 732], color: [205, 64, 160, 255] },
-	{ pos: [44, 113, 0], flag: 0, tc: [10, 800], color: [156, 77, 0, 255] },
-	{ pos: [88, 101, -32], flag: 0, tc: [398, 214], color: [30, 93, 177, 255] },
-	{ pos: [-5, 58, 0], flag: 0, tc: [300, 1456], color: [136, 40, 0, 255] },
-	{ pos: [146, 27, -91], flag: 0, tc: [1408, -550], color: [20, 38, 137, 255] },
-	{ pos: [88, 101, 33], flag: 0, tc: [294, 258], color: [56, 85, 75, 255] },
-	{ pos: [44, 113, 0], flag: 0, tc: [34, 840], color: [156, 77, 0, 255] },
-	{ pos: [34, 39, 99], flag: 0, tc: [1314, 634], color: [205, 64, 96, 255] },
-	{ pos: [-5, 58, 0], flag: 0, tc: [470, 1412], color: [136, 40, 0, 255] },
-	{ pos: [146, 27, 92], flag: 0, tc: [1132, -556], color: [22, 37, 119, 255] },
-]
+// const mario_low_poly_mustache_cap_off_dl_vertex = [
+// 	{ pos: [34, 39, -98], flag: 0, tc: [1306, 732], color: [205, 64, 160, 255] },
+// 	{ pos: [44, 113, 0], flag: 0, tc: [10, 800], color: [156, 77, 0, 255] },
+// 	{ pos: [88, 101, -32], flag: 0, tc: [398, 214], color: [30, 93, 177, 255] },
+// 	{ pos: [-5, 58, 0], flag: 0, tc: [300, 1456], color: [136, 40, 0, 255] },
+// 	{ pos: [146, 27, -91], flag: 0, tc: [1408, -550], color: [20, 38, 137, 255] },
+// 	{ pos: [88, 101, 33], flag: 0, tc: [294, 258], color: [56, 85, 75, 255] },
+// 	{ pos: [44, 113, 0], flag: 0, tc: [34, 840], color: [156, 77, 0, 255] },
+// 	{ pos: [34, 39, 99], flag: 0, tc: [1314, 634], color: [205, 64, 96, 255] },
+// 	{ pos: [-5, 58, 0], flag: 0, tc: [470, 1412], color: [136, 40, 0, 255] },
+// 	{ pos: [146, 27, 92], flag: 0, tc: [1132, -556], color: [22, 37, 119, 255] },
+// ]
 
-const mario_low_poly_face_part_cap_off_dl_vertex = [
-	{ pos: [44, 113, 0], flag: 0, tc: [0, 0], color: [156, 77, 0, 255] },
-	{ pos: [94, 146, -32], flag: 0, tc: [0, 0], color: [59, 53, 158, 255] },
-	{ pos: [88, 101, -32], flag: 0, tc: [0, 0], color: [30, 93, 177, 255] },
-	{ pos: [50, 153, 0], flag: 0, tc: [0, 0], color: [173, 95, 0, 255] },
-	{ pos: [88, 101, 33], flag: 0, tc: [0, 0], color: [56, 85, 75, 255] },
-	{ pos: [94, 146, 33], flag: 0, tc: [0, 0], color: [255, 68, 107, 255] },
-	{ pos: [146, 27, 92], flag: 0, tc: [0, 0], color: [22, 37, 119, 255] },
-	{ pos: [34, 39, 99], flag: 0, tc: [0, 0], color: [205, 64, 96, 255] },
-	{ pos: [7, -85, 79], flag: 0, tc: [0, 0], color: [170, 220, 84, 255] },
-	{ pos: [-5, 58, 0], flag: 0, tc: [0, 0], color: [136, 40, 0, 255] },
-	{ pos: [7, -85, -78], flag: 0, tc: [0, 0], color: [169, 199, 185, 255] },
-	{ pos: [34, 39, -98], flag: 0, tc: [0, 0], color: [205, 64, 160, 255] },
-	{ pos: [146, 27, -91], flag: 0, tc: [0, 0], color: [20, 38, 137, 255] },
-]
+// const mario_low_poly_face_part_cap_off_dl_vertex = [
+// 	{ pos: [44, 113, 0], flag: 0, tc: [0, 0], color: [156, 77, 0, 255] },
+// 	{ pos: [94, 146, -32], flag: 0, tc: [0, 0], color: [59, 53, 158, 255] },
+// 	{ pos: [88, 101, -32], flag: 0, tc: [0, 0], color: [30, 93, 177, 255] },
+// 	{ pos: [50, 153, 0], flag: 0, tc: [0, 0], color: [173, 95, 0, 255] },
+// 	{ pos: [88, 101, 33], flag: 0, tc: [0, 0], color: [56, 85, 75, 255] },
+// 	{ pos: [94, 146, 33], flag: 0, tc: [0, 0], color: [255, 68, 107, 255] },
+// 	{ pos: [146, 27, 92], flag: 0, tc: [0, 0], color: [22, 37, 119, 255] },
+// 	{ pos: [34, 39, 99], flag: 0, tc: [0, 0], color: [205, 64, 96, 255] },
+// 	{ pos: [7, -85, 79], flag: 0, tc: [0, 0], color: [170, 220, 84, 255] },
+// 	{ pos: [-5, 58, 0], flag: 0, tc: [0, 0], color: [136, 40, 0, 255] },
+// 	{ pos: [7, -85, -78], flag: 0, tc: [0, 0], color: [169, 199, 185, 255] },
+// 	{ pos: [34, 39, -98], flag: 0, tc: [0, 0], color: [205, 64, 160, 255] },
+// 	{ pos: [146, 27, -91], flag: 0, tc: [0, 0], color: [20, 38, 137, 255] },
+// ]
 
-const mario_low_poly_face_hair_cap_off_dl_vertex = [
-	{ pos: [58, -114, 81], flag: 0, tc: [0, 0], color: [211, 155, 61, 255] },
-	{ pos: [7, -85, 79], flag: 0, tc: [0, 0], color: [170, 220, 84, 255] },
-	{ pos: [7, -85, -78], flag: 0, tc: [0, 0], color: [169, 199, 185, 255] },
-	{ pos: [146, 27, 92], flag: 0, tc: [0, 0], color: [22, 37, 119, 255] },
-	{ pos: [167, -121, 77], flag: 0, tc: [0, 0], color: [60, 173, 74, 255] },
-	{ pos: [58, -114, -80], flag: 0, tc: [0, 0], color: [216, 163, 181, 255] },
-	{ pos: [90, -136, 0], flag: 0, tc: [0, 0], color: [240, 131, 0, 255] },
-	{ pos: [146, 27, -91], flag: 0, tc: [0, 0], color: [20, 38, 137, 255] },
-	{ pos: [167, -121, -81], flag: 0, tc: [0, 0], color: [58, 173, 181, 255] },
-	{ pos: [218, 48, -52], flag: 0, tc: [0, 0], color: [95, 59, 198, 255] },
-	{ pos: [168, 79, 0], flag: 0, tc: [0, 0], color: [39, 120, 0, 255] },
-	{ pos: [192, -28, -80], flag: 0, tc: [0, 0], color: [85, 247, 163, 255] },
-	{ pos: [223, -38, -1], flag: 0, tc: [0, 0], color: [123, 226, 0, 255] },
-	{ pos: [218, 48, 53], flag: 0, tc: [0, 0], color: [96, 57, 58, 255] },
-	{ pos: [192, -28, 78], flag: 0, tc: [0, 0], color: [86, 244, 92, 255] },
-]
+// const mario_low_poly_face_hair_cap_off_dl_vertex = [
+// 	{ pos: [58, -114, 81], flag: 0, tc: [0, 0], color: [211, 155, 61, 255] },
+// 	{ pos: [7, -85, 79], flag: 0, tc: [0, 0], color: [170, 220, 84, 255] },
+// 	{ pos: [7, -85, -78], flag: 0, tc: [0, 0], color: [169, 199, 185, 255] },
+// 	{ pos: [146, 27, 92], flag: 0, tc: [0, 0], color: [22, 37, 119, 255] },
+// 	{ pos: [167, -121, 77], flag: 0, tc: [0, 0], color: [60, 173, 74, 255] },
+// 	{ pos: [58, -114, -80], flag: 0, tc: [0, 0], color: [216, 163, 181, 255] },
+// 	{ pos: [90, -136, 0], flag: 0, tc: [0, 0], color: [240, 131, 0, 255] },
+// 	{ pos: [146, 27, -91], flag: 0, tc: [0, 0], color: [20, 38, 137, 255] },
+// 	{ pos: [167, -121, -81], flag: 0, tc: [0, 0], color: [58, 173, 181, 255] },
+// 	{ pos: [218, 48, -52], flag: 0, tc: [0, 0], color: [95, 59, 198, 255] },
+// 	{ pos: [168, 79, 0], flag: 0, tc: [0, 0], color: [39, 120, 0, 255] },
+// 	{ pos: [192, -28, -80], flag: 0, tc: [0, 0], color: [85, 247, 163, 255] },
+// 	{ pos: [223, -38, -1], flag: 0, tc: [0, 0], color: [123, 226, 0, 255] },
+// 	{ pos: [218, 48, 53], flag: 0, tc: [0, 0], color: [96, 57, 58, 255] },
+// 	{ pos: [192, -28, 78], flag: 0, tc: [0, 0], color: [86, 244, 92, 255] },
+// ]
 
-export const mario_low_poly_mario_eyes_cap_off_dl = [
-	Gbi.gsSPVertex(mario_low_poly_mario_eyes_cap_off_dl_vertex, 5, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 1, 4, 0x0),
-	Gbi.gsSP1Triangle(3, 2, 1, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// export const mario_low_poly_mario_eyes_cap_off_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_mario_eyes_cap_off_dl_vertex, 5, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 1, 4, 0x0),
+// 	Gbi.gsSP1Triangle(3, 2, 1, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
 
-export const mario_low_poly_mustache_cap_off_dl = [
-	Gbi.gsSPVertex(mario_low_poly_mustache_cap_off_dl_vertex, 10, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 3, 1, 0x0),
-	...Gbi.gsSP2Triangles(2, 4, 0, 0x0, 5, 6, 7, 0x0),
-	...Gbi.gsSP2Triangles(6, 8, 7, 0x0, 7, 9, 5, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// export const mario_low_poly_mustache_cap_off_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_mustache_cap_off_dl_vertex, 10, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 3, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(2, 4, 0, 0x0, 5, 6, 7, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 8, 7, 0x0, 7, 9, 5, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
 
-export const mario_low_poly_face_part_cap_off_dl = [
-	Gbi.gsSPVertex(mario_low_poly_face_part_cap_off_dl_vertex, 13, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 3, 1, 0x0),
-	...Gbi.gsSP2Triangles(4, 5, 0, 0x0, 5, 3, 0, 0x0),
-	...Gbi.gsSP2Triangles(1, 3, 5, 0x0, 2, 1, 4, 0x0),
-	...Gbi.gsSP2Triangles(1, 5, 4, 0x0, 6, 7, 8, 0x0),
-	...Gbi.gsSP2Triangles(7, 9, 8, 0x0, 8, 9, 10, 0x0),
-	...Gbi.gsSP2Triangles(10, 9, 11, 0x0, 10, 11, 12, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// export const mario_low_poly_face_part_cap_off_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_face_part_cap_off_dl_vertex, 13, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 3, 1, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 5, 0, 0x0, 5, 3, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(1, 3, 5, 0x0, 2, 1, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(1, 5, 4, 0x0, 6, 7, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 9, 8, 0x0, 8, 9, 10, 0x0),
+// 	...Gbi.gsSP2Triangles(10, 9, 11, 0x0, 10, 11, 12, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
 
-export const mario_low_poly_face_hair_cap_off_dl = [
-	Gbi.gsSPVertex(mario_low_poly_face_hair_cap_off_dl_vertex, 15, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 1, 0, 0x0),
-	...Gbi.gsSP2Triangles(0, 4, 3, 0x0, 0, 2, 5, 0x0),
-	...Gbi.gsSP2Triangles(5, 6, 0, 0x0, 0, 6, 4, 0x0),
-	...Gbi.gsSP2Triangles(5, 2, 7, 0x0, 7, 8, 5, 0x0),
-	...Gbi.gsSP2Triangles(8, 6, 5, 0x0, 9, 7, 10, 0x0),
-	...Gbi.gsSP2Triangles(7, 9, 11, 0x0, 7, 11, 8, 0x0),
-	...Gbi.gsSP2Triangles(6, 8, 4, 0x0, 8, 11, 12, 0x0),
-	...Gbi.gsSP2Triangles(4, 8, 12, 0x0, 11, 9, 12, 0x0),
-	...Gbi.gsSP2Triangles(13, 14, 12, 0x0, 14, 4, 12, 0x0),
-	...Gbi.gsSP2Triangles(4, 14, 3, 0x0, 13, 10, 3, 0x0),
-	...Gbi.gsSP2Triangles(14, 13, 3, 0x0, 9, 10, 13, 0x0),
-	Gbi.gsSP1Triangle(9, 13, 12, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// export const mario_low_poly_face_hair_cap_off_dl = [
+// 	Gbi.gsSPVertex(mario_low_poly_face_hair_cap_off_dl_vertex, 15, 0),
+// 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 1, 0, 0x0),
+// 	...Gbi.gsSP2Triangles(0, 4, 3, 0x0, 0, 2, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 6, 0, 0x0, 0, 6, 4, 0x0),
+// 	...Gbi.gsSP2Triangles(5, 2, 7, 0x0, 7, 8, 5, 0x0),
+// 	...Gbi.gsSP2Triangles(8, 6, 5, 0x0, 9, 7, 10, 0x0),
+// 	...Gbi.gsSP2Triangles(7, 9, 11, 0x0, 7, 11, 8, 0x0),
+// 	...Gbi.gsSP2Triangles(6, 8, 4, 0x0, 8, 11, 12, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 8, 12, 0x0, 11, 9, 12, 0x0),
+// 	...Gbi.gsSP2Triangles(13, 14, 12, 0x0, 14, 4, 12, 0x0),
+// 	...Gbi.gsSP2Triangles(4, 14, 3, 0x0, 13, 10, 3, 0x0),
+// 	...Gbi.gsSP2Triangles(14, 13, 3, 0x0, 9, 10, 13, 0x0),
+// 	Gbi.gsSP1Triangle(9, 13, 12, 0x0),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
 
-export const mario_low_poly_face_cap_off_dl = [
-	Gbi.gsSPDisplayList(mario_low_poly_face_part_cap_off_dl),
-	Gbi.gsSPLight(mario_brown2_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_brown2_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_face_hair_cap_off_dl),
-	Gbi.gsSPEndDisplayList(),
-]
+// export const mario_low_poly_face_cap_off_dl = [
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_part_cap_off_dl),
+// 	Gbi.gsSPLight(mario_brown2_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_brown2_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_hair_cap_off_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
 
-export const mario_low_poly_cap_off_eyes_front = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_front),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_off_dl),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
-	Gbi.gsSPEndDisplayList(),
-]
+// export const mario_low_poly_cap_off_eyes_front = [
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+// 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_front),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_off_dl),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
 
-export const mario_low_poly_cap_off_eyes_half_closed = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_half_closed),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_off_dl),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
-	Gbi.gsSPEndDisplayList(),
-]
+// export const mario_low_poly_cap_off_eyes_half_closed = [
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+// 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_half_closed),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_off_dl),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
 
-export const mario_low_poly_cap_off_eyes_closed = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_closed),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_off_dl),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
-	Gbi.gsSPEndDisplayList(),
-]
+// export const mario_low_poly_cap_off_eyes_closed = [
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+// 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+// 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_closed),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+// 	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+// 	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
+// 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+// 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+// 	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_off_dl),
+// 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+// 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
 
 /*export const mario_low_poly_cap_off_eyes_right = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
@@ -4632,13 +4630,13 @@ export const mario_low_poly_cap_off_eyes_dead = [
 	Gbi.gsSPEndDisplayList(),
 ]
 */
-export const mario_metal_low_poly_cap_off = [
-	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
-	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_off_dl),
-	Gbi.gsSPDisplayList(mario_low_poly_face_part_cap_off_dl),
-	Gbi.gsSPDisplayList(mario_low_poly_face_hair_cap_off_dl),
-	Gbi.gsSPEndDisplayList(),
-]
+// export const mario_metal_low_poly_cap_off = [
+// 	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
+// 	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_off_dl),
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_part_cap_off_dl),
+// 	Gbi.gsSPDisplayList(mario_low_poly_face_hair_cap_off_dl),
+// 	Gbi.gsSPEndDisplayList(),
+// ]
 
 const mario_left_hand_open_shared_dl_vertex_group1 = [
 	{ pos: [121, 73, -21], flag: 0, tc: [0, 0], color: [71, 96, 43, 0] },

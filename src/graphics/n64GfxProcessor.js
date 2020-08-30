@@ -92,6 +92,11 @@ export class n64GfxProcessor {
             color_image_address: null
         }
 
+        this.customData = {
+            playerName: "",
+            skinID: 0
+        }
+
         this.color_combiner_pool = []
 
         this.rendering_state = {
@@ -913,25 +918,31 @@ export class n64GfxProcessor {
             if (z < -w) d.clip_rej |= 16
             if (z > w) d.clip_rej |= 32
 
-            if (v.special) {
+            if (v.special && w < 2000 && !d.clip_rej) {
 
                 const canvas = document.querySelector('#textCanvas')
         
                 var context = canvas.getContext('2d')
-                var radius = 10
+                var radius = 3
 
                 let myX = x / w
                 let myY = y / w
                 const pixelX = (myX *  0.5 + 0.5) * WebGL.canvas.width
                 const pixelY = (myY * -0.5 + 0.5) * WebGL.canvas.height
+
+                context.globalAlpha = 0.8
+                context.font = "bold 14px verdana, sans-serif"
+                context.textAlign = "center"
+                context.fillStyle = "#9400D3"
+                context.fillText(this.customData.playerName, pixelX, pixelY - 15)
         
-                context.beginPath()
-                context.arc(pixelX, pixelY, radius, 0, 2 * Math.PI, false)
-                context.fillStyle = 'red'
-                context.fill()
-                context.lineWidth = 0
-                context.strokeStyle = '#003300'
-                context.stroke()
+                // context.beginPath()
+                // context.arc(pixelX, pixelY, radius, 0, 2 * Math.PI, false)
+                // context.fillStyle = v.special
+                // context.fill()
+                // context.lineWidth = 0
+                // context.strokeStyle = '#003300'
+                // context.stroke()
 
             }
 
@@ -946,7 +957,11 @@ export class n64GfxProcessor {
         }
     }
 
-    custom_set_skin_color(skinID) { window.currentMarioSkinID = skinID }
+    custom_set_player_data(skinID, playerName) { 
+        window.currentMarioSkinID = skinID
+        this.customData.skinID = skinID
+        this.customData.playerName = playerName
+    }
 
     run_dl(commands) {
 
@@ -1019,11 +1034,11 @@ export class n64GfxProcessor {
                 case Gbi.G_FILLRECT:
                     this.dp_fill_rectangle(args.ulx, args.uly, args.lrx, args.lry)
                     break
-                case Gbi.G_SETSKINCOLOR:
-                    this.custom_set_skin_color(args.skinID)
+                case Gbi.G_SETPLAYERDATA:
+                    this.custom_set_player_data(args.skinID, args.playerName)
                     break
                 case Gbi.G_DL:
-                    const displayList = args.childDisplayList.call ? args.childDisplayList() : args.childDisplayList
+                    const displayList = args.childDisplayList.call ? args.childDisplayList(this.customData.skinID) : args.childDisplayList
                     if (args.branch == 0) {
                         this.run_dl(displayList)
                     } else {

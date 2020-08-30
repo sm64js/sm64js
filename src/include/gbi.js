@@ -31,7 +31,7 @@ export const G_SETCIMG = 28
 export const G_RDPLOADSYNC = 29
 
 /// Custom Opcodes
-export const G_SETSKINCOLOR = 30
+export const G_SETPLAYERDATA = 30
 
 export const G_ZBUFFER = 1
 export const G_SHADE = 2
@@ -441,11 +441,11 @@ export const gDPSetFillColor = (displaylist, color) => {
     })
 }
 
-export const gDPSetSkinColor = (displaylist, skinID) => {
+export const gSetPlayerData = (displaylist, skinID, playerName) => {
     displaylist.push({
         words: {
-            w0: G_SETSKINCOLOR,
-            w1: { skinID }
+            w0: G_SETPLAYERDATA,
+            w1: { skinID, playerName }
         }
     })
 }
@@ -759,11 +759,11 @@ export const gsDPSetPrimColor = (m, l, r, g, b, a) => {
     }
 }
 
-export const gsDPSetSkinColor = (skinID) => {
+export const gsSetPlayerData = (skinID, playerName) => {
     return {
         words: {
-            w0: G_SETSKINCOLOR,
-            w1: { skinID }
+            w0: G_SETPLAYERDATA,
+            w1: { skinID, playerName }
         }
     }
 }

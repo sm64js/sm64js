@@ -51,10 +51,23 @@
                         Customize Keyboard Controls
                     </button>
                 </div>
-                <div class="col-sm-2 col-form-label" style="justify-content:center">
-                    <label>Select Skin :</label>
+                <div class="col-4" style="justify-content:center">
+                    <button type="button"
+                            class="btn btn-sm btn-primary"
+                            data-html="true"
+                            data-container="body"
+                            data-toggle="gamepadControlsToggle"
+                            data-placement="bottom">
+                        Customize Gamepad Controls
+                    </button>
                 </div>
-                <div class="col-sm-2" style="justify-content:center">
+            </div>
+
+            <div class="row" style="justify-content:center; margin-top: 10px;">
+                <div class="col-sm-4 col-form-label" style="justify-content:center">
+                    <label>Select Skin ID and type name :</label>
+                </div>
+                <div class="col-sm-2" style="justify-content:center; ">
                     <select class="form-control" onchange="window.mySkin = this.value">
                         <option>0</option>
                         <option>1</option>
@@ -68,15 +81,8 @@
                         <option>9</option>
                     </select>
                 </div>
-                <div class="col-4" style="justify-content:center">
-                    <button type="button"
-                            class="btn btn-sm btn-primary"
-                            data-html="true"
-                            data-container="body"
-                            data-toggle="gamepadControlsToggle"
-                            data-placement="bottom">
-                        Customize Gamepad Controls
-                    </button>
+                <div class="col-sm-3 " style="justify-content:center">
+                    <input type="text" class="form-control" placeholder="enter name" onchange="window.myName = this.value">
                 </div>
             </div>
 

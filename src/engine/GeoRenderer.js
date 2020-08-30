@@ -322,7 +322,7 @@ class GeoRenderer {
 
     geo_process_extra_mario(marioData, sharedChild) {
 
-        const { pos, angle, animFrame, animID, skinID } = marioData
+        const { pos, angle, animFrame, animID, skinID, playerName } = marioData
 
         const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
 
@@ -333,8 +333,8 @@ class GeoRenderer {
 
         this.gMatStackIndex++
 
-        //// sending my own custom gfx opcode to set skin id
-        this.geo_append_display_list([Gbi.gsDPSetSkinColor(skinID)], 1) 
+        //// sending my own custom gfx opcode to set skin id and playerName
+        this.geo_append_display_list([Gbi.gsSetPlayerData(skinID, playerName)], 1) 
 
         const animList = gMarioAnimData
         this.gCurrAnimFrame = animFrame
@@ -394,7 +394,7 @@ class GeoRenderer {
                 if (object.header.gfx.sharedChild) {
 
                     if (object.OG) { //// sending my own custom gfx opcode to set skin id
-                        this.geo_append_display_list([Gbi.gsDPSetSkinColor(window.mySkin)], 1) 
+                        this.geo_append_display_list([Gbi.gsSetPlayerData(window.mySkin, "")], 1) 
                     }
 
                     this.gCurGraphNodeObject = node.wrapper
@@ -424,7 +424,8 @@ class GeoRenderer {
                 angle: gfx.angle.map((x) => parseInt(x)),
                 animFrame: gfx.unk38.animFrame,
                 animID: gfx.unk38.animID,
-                skinID: window.mySkin
+                skinID: window.mySkin,
+                playerName: window.myName.substring(0, 12)
             })
 
             if (window.extraMarios) {

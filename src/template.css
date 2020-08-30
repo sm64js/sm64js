@@ -18,8 +18,10 @@ a:hover {
 #textCanvas {
     background-color: transparent; /* needed because webgl-tutoraisl.css sets canvas bg color to white */
     position: absolute;
+    margin: auto;
     left: 0px;
     top: 0px;
+    right: 0px;
     z-index: 10;
 }
 

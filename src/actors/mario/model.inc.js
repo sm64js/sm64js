@@ -2725,13 +2725,15 @@ export const mario_medium_poly_butt_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_butt = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-	Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
-	Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_butt_dl),
-	Gbi.gsSPEndDisplayList(),
-]
+export const mario_medium_poly_butt = (skinID) => {
+	return [
+		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+		Gbi.gsSPDisplayList(mario_medium_poly_butt_dl),
+		Gbi.gsSPEndDisplayList(),
+	]
+}
 
 
 const mario_medium_poly_left_arm_shared_dl_vertex = [
@@ -2763,12 +2765,14 @@ export const mario_medium_poly_left_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_left_arm = [
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_left_arm_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
+export const mario_medium_poly_left_arm = (skinID) => {
+	return [
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+		Gbi.gsSPDisplayList(mario_medium_poly_left_arm_shared_dl),
+		Gbi.gsSPEndDisplayList(),
+	]
+}
 
 const mario_medium_poly_left_forearm_shared_dl_vertex = [
 	{ pos: [-9, -29, -18], flag: 0, tc: [0, 0], color: [5, 132, 25, 0] },
@@ -2914,12 +2918,14 @@ export const mario_medium_poly_right_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_right_arm = [
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_right_arm_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
+export const mario_medium_poly_right_arm = (skinID) => {
+	return [
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+		Gbi.gsSPDisplayList(mario_medium_poly_right_arm_shared_dl),
+		Gbi.gsSPEndDisplayList(),
+	]
+}
 
 const mario_medium_poly_right_forearm_shared_dl_vertex = [
 	{ pos: [-5, -18, -24], flag: 0, tc: [0, 0], color: [129, 254, 3, 0] },
@@ -3076,13 +3082,15 @@ export const mario_medium_poly_left_thigh_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_left_thigh = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-	Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
-	Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_left_thigh_dl),
-	Gbi.gsSPEndDisplayList(),
-]
+export const mario_medium_poly_left_thigh = (skinID) => {
+	return [
+		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+		Gbi.gsSPDisplayList(mario_medium_poly_left_thigh_dl),
+		Gbi.gsSPEndDisplayList(),
+	]
+}
 
 /*export const mario_metal_medium_poly_left_thigh = [
 	Gbi.gsSPSetGeometryMode(Gbi.G_TEXTURE_GEN),
@@ -3215,12 +3223,14 @@ export const mario_medium_poly_right_thigh_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_right_thigh = [
-	Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
-	Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_right_thigh_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
+export const mario_medium_poly_right_thigh = (skinID) => {
+	return [
+		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+		Gbi.gsSPDisplayList(mario_medium_poly_right_thigh_shared_dl),
+		Gbi.gsSPEndDisplayList(),
+	]
+}
 
 const mario_medium_poly_right_leg_shared_dl_vertex = [
 	{ pos: [6, -1, -50], flag: 0, tc: [0, 0], color: [142, 247, 202, 0] },
@@ -3466,13 +3476,15 @@ export const mario_medium_poly_tshirt_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_torso_dl = [
-	Gbi.gsSPDisplayList(mario_medium_poly_pants_overalls_shared_dl),
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
-	Gbi.gsSPDisplayList(mario_medium_poly_tshirt_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
+export const mario_medium_poly_torso_dl = (skinID) => {
+	return [
+		Gbi.gsSPDisplayList(mario_medium_poly_pants_overalls_shared_dl),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+		Gbi.gsSPDisplayList(mario_medium_poly_tshirt_shared_dl),
+		Gbi.gsSPEndDisplayList(),
+	]
+}
 
 export const mario_medium_poly_torso = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
@@ -3495,7 +3507,7 @@ export const mario_metal_medium_poly_torso = [
 	Gbi.gsSPDisplayList(mario_medium_poly_tshirt_shared_dl),
 	Gbi.gsSPEndDisplayList(),
 ]
-
+/*
 const mario_low_poly_butt_dl_vertex = [
 	{ pos: [-37, -37, 0], flag: 0, tc: [0, 0], color: [130, 245, 0, 0] },
 	{ pos: [-2, 52, 92], flag: 0, tc: [0, 0], color: [177, 60, 78, 0] },
@@ -3524,13 +3536,15 @@ export const mario_low_poly_butt_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_butt = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-	Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
-	Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_butt_dl),
-	Gbi.gsSPEndDisplayList(),
-]
+export const mario_low_poly_butt = (skinID) => {
+	return [
+		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+		Gbi.gsSPDisplayList(mario_low_poly_butt_dl),
+		Gbi.gsSPEndDisplayList(),
+	]
+}
 
 export const mario_metal_low_poly_butt = [
 	Gbi.gsSPSetGeometryMode(Gbi.G_TEXTURE_GEN),
@@ -3567,12 +3581,14 @@ export const mario_low_poly_left_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_left_arm = [
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
-	Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
-	Gbi.gsSPDisplayList(mario_low_poly_left_arm_shared_dl),
-	Gbi.gsSPEndDisplayList(),
-]
+export const mario_low_poly_left_arm = (skinID) => {
+	return [
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+		Gbi.gsSPDisplayList(mario_low_poly_left_arm_shared_dl),
+		Gbi.gsSPEndDisplayList(),
+	]
+}
 
 const mario_low_poly_left_forearm_shared_dl_vertex = [
 	{ pos: [-5, 20, 6], flag: 0, tc: [0, 0], color: [5, 98, 176, 0] },
@@ -4329,7 +4345,7 @@ export const mario_low_poly_cap_on_eyes_down = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
 	Gbi.gsSPEndDisplayList(),
-]
+]*/
 
 /*export const mario_low_poly_cap_on_eyes_dead = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),

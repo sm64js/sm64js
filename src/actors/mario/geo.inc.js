@@ -174,7 +174,7 @@ export const mario_geo = [
     { command: Geo.open_node },
         { command: Geo.node_scale, args: [0x00, 16384] },
         { command: Geo.open_node },
-            { command: Geo.branch, args: [ 1, mario_geo_body ] },
+            { command: Geo.branch, args: [ 1, mario_geo_medium_poly_body ] },
         { command: Geo.close_node },
     { command: Geo.close_node },
     { command: Geo.node_end }

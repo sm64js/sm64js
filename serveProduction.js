@@ -2,12 +2,13 @@ const express = require('express')
 const app = express()
 //const fileUpload = require('express-fileupload')
 const http = require('http')
-const server = http.Server(app)
+const server = http.createServer(app)
 const fs = require('fs')
 const { v4: uuidv4 } = require('uuid')
 const { promisify } = require('util')
 const { spawn } = require('child_process')
-const io = require('socket.io')(server)
+//const io = require('socket.io')(server)
+const { WebSocket } = require('@clusterws/cws');
 const port = 80
 
 const mkdir = promisify(fs.mkdir)
@@ -79,11 +80,9 @@ const extractJsonFromRomFile = async (dir) => {
     })
 }
 
-app.use(express.static(__dirname + '/dist'))
-//app.use(fileUpload())
-server.listen(port, () => { console.log('Serving Files') })
-
 app.get("/romTransfer", async (req, res) => {
+
+    console.log("rom transfer")
 
     const uid = uuidv4()
     await mkdir('extractTools/' + uid)
@@ -111,9 +110,14 @@ app.get("/romTransfer", async (req, res) => {
 // 	})
 // })
 
+
+
+
+//// Sockets
+
 const connectedSockets = {}
 
-io.on('connection', (socket) => {
+/*io.on('connection', (socket) => {
     //connectedSockets[socket.id] = {}
     console.log("connection")
 
@@ -135,4 +139,49 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         delete connectedSockets[socket.id]
     })
+})*/
+
+
+const wss = new WebSocket.Server({ server }, () => {
+    console.log("ws Server is up")
 })
+
+wss.on('connection', (socket, req) => {
+    console.log("there is a ws connection")
+    socket.id = uuidv4()
+    socket.send(JSON.stringify({ type: "id", data: socket.id }))
+
+
+    socket.onmessage = (marioDataStr) => {
+        const marioData = JSON.parse(marioDataStr)
+        socket.send(JSON.stringify({ type: "allMarios", data: connectedSockets }))
+
+        //Validate data
+        for (let i = 0; i < 3; i++) {
+            if (isNaN(marioData.pos[i])) return
+            if (isNaN(marioData.angle[i])) return
+        }
+        if (isNaN(marioData.animFrame)) return
+        if (isNaN(marioData.animID)) return
+
+        /// Data is Valid
+        connectedSockets[socket.id] = marioData
+    }
+
+    socket.onclose = () => {
+        console.log("disconnect")
+        delete connectedSockets[socket.id]
+    }
+})
+
+app.use(express.static(__dirname + '/dist'))
+//app.use(fileUpload())
+
+server.listen(port, () => { console.log('starting server for ws') })
+
+/*server.on('upgrade', (request, socket, head) => {
+    wss.handleUpgrade(request, socket, head, socket => {
+        wss.emit('connection', socket, request)
+    })
+})*/
+

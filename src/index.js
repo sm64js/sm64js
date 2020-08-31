@@ -3,10 +3,17 @@ import { checkForRom } from "./romTextureLoader.js"
 import { GameInstance as Game } from "./game/Game"
 import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
-import io from 'socket.io-client'
+//import io from 'socket.io-client'
 
-window.socket = io('localhost:80')
-window.socket.on('allMarios', (marioData) => { window.extraMarios = marioData })
+const mySocket = new WebSocket('ws://73.164.101.37')
+mySocket.onopen = () => {
+    window.socket = mySocket
+    window.socket.onmessage = (msgStr) => {
+        const msg = JSON.parse(msgStr.data)
+        if (msg.type == "allMarios") window.extraMarios = msg.data
+        if (msg.type == "id") window.socket.id = msg.data
+    }
+}
 window.mySkin = 0
 window.myName = ""
 
@@ -131,10 +138,10 @@ const webpage_update = () => {
     document.getElementById("numTriangles").innerHTML = `Total Triangles this frame: ${window.totalTriangles}`
 }
 
-document.getElementById("slider").addEventListener('change', (event) => {
+/*document.getElementById("slider").addEventListener('change', (event) => {
     frameSpeed = 1000 / event.target.value
     document.getElementById("fps").innerHTML = `${event.target.value} fps`
-})
+})*/
 
 
 ///// Start Game

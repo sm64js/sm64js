@@ -850,6 +850,14 @@ export class n64GfxProcessor {
             const z = v.pos[0] * this.rsp.MP_matrix[0][2] + v.pos[1] * this.rsp.MP_matrix[1][2] + v.pos[2] * this.rsp.MP_matrix[2][2] + this.rsp.MP_matrix[3][2]
             const w = v.pos[0] * this.rsp.MP_matrix[0][3] + v.pos[1] * this.rsp.MP_matrix[1][3] + v.pos[2] * this.rsp.MP_matrix[2][3] + this.rsp.MP_matrix[3][3]
 
+            d.clip_rej = 0
+            if (x < -w) d.clip_rej |= 1
+            if (x > w) d.clip_rej |= 2
+            if (y < -w) d.clip_rej |= 4
+            if (y > w) d.clip_rej |= 8
+            if (z < -w) d.clip_rej |= 16
+            if (z > w) d.clip_rej |= 32
+
             /// x = adjust x for aspect ratio (x)
             let U = v.tc[0] * this.rsp.texture_scaling_factor.s >> 16
             let V = v.tc[1] * this.rsp.texture_scaling_factor.t >> 16
@@ -909,14 +917,6 @@ export class n64GfxProcessor {
             }
 
             d.u = U; d.v = V
-
-            d.clip_rej = 0
-            if (x < -w) d.clip_rej |= 1
-            if (x > w) d.clip_rej |= 2
-            if (y < -w) d.clip_rej |= 4
-            if (y > w) d.clip_rej |= 8
-            if (z < -w) d.clip_rej |= 16
-            if (z > w) d.clip_rej |= 32
 
             if (v.special && w < 2000 && !d.clip_rej) {
 

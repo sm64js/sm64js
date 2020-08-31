@@ -419,21 +419,23 @@ class GeoRenderer {
         if (object.OG) {  /// original Mario
 
             const gfx = object.header.gfx
-            window.socket.emit('marioData', {
-                pos: gfx.pos.map((x) => parseInt(x)),
-                angle: gfx.angle.map((x) => parseInt(x)),
-                animFrame: gfx.unk38.animFrame,
-                animID: gfx.unk38.animID,
-                skinID: window.mySkin,
-                playerName: window.myName.substring(0, 12)
-            })
+            if (window.socket) {
+                window.socket.send(JSON.stringify({
+                    pos: gfx.pos.map((x) => parseInt(x)),
+                    angle: gfx.angle.map((x) => parseInt(x)),
+                    animFrame: gfx.unk38.animFrame,
+                    animID: gfx.unk38.animID,
+                    skinID: window.mySkin,
+                    playerName: window.myName.substring(0, 12)
+                }))
 
-            if (window.extraMarios) {
-                Object.entries(window.extraMarios).forEach(([id, marioData]) => {
-                    if (id != window.socket.id) {
-                        this.geo_process_extra_mario(marioData, gfx.sharedChild)
-                    }
-                })
+                if (window.extraMarios) {
+                    Object.entries(window.extraMarios).forEach(([id, marioData]) => {
+                        if (id != window.socket.id) {
+                            this.geo_process_extra_mario(marioData, gfx.sharedChild)
+                        }
+                    })
+                }
             }
 
         }

@@ -157,7 +157,7 @@ wss.on('connection', (socket, req) => {
 app.use(express.static(__dirname + '/dist'))
 //app.use(fileUpload())
 
-server.listen(port, () => { console.log('starting server for ws') })
+server.listen(port, () => { console.log('Starting Server') })
 
 /*server.on('upgrade', (request, socket, head) => {
     wss.handleUpgrade(request, socket, head, socket => {

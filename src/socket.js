@@ -1,6 +1,12 @@
 const url = new URL(window.location.href)
-url.protocol = url.protocol.replace('http', 'ws')
-url.port = 80
+if (url.protocol == "http:") {
+    url.protocol = url.protocol.replace('http', 'ws')
+    url.port = 80
+} else {
+    url.protocol = url.protocol.replace('https', 'wss')
+    url.port = 443
+}
+
 
 const socket = new WebSocket(url.href)
 

@@ -393,8 +393,8 @@ class GeoRenderer {
             if (true) { // TODO: object in view
                 if (object.header.gfx.sharedChild) {
 
-                    if (object.OG) { //// sending my own custom gfx opcode to set skin id
-                        this.geo_append_display_list([Gbi.gsSetPlayerData(window.mySkin, "")], 1) 
+                    if (object.marioIndex == 0) { //// sending my own custom gfx opcode to set skin id
+                        this.geo_append_display_list([Gbi.gsSetPlayerData(window.myMario.skinID, "")], 1) 
                     }
 
                     this.gCurGraphNodeObject = node.wrapper
@@ -416,28 +416,22 @@ class GeoRenderer {
 
         }
 
-        if (object.OG) {  /// original Mario
+        if (object.marioIndex == 0) {  /// original Mario
 
             const gfx = object.header.gfx
-            if (window.socket) {
-                window.socket.send(JSON.stringify({
-                    pos: gfx.pos.map((x) => parseInt(x)),
-                    angle: gfx.angle.map((x) => parseInt(x)),
-                    animFrame: gfx.unk38.animFrame,
-                    animID: gfx.unk38.animID,
-                    skinID: window.mySkin,
-                    playerName: window.myName.substring(0, 12)
-                }))
+            Object.assign(window.myMario, {
+                pos: gfx.pos.map((x) => parseInt(x)),
+                angle: gfx.angle.map((x) => parseInt(x)),
+                animFrame: gfx.unk38.animFrame,
+                animID: gfx.unk38.animID,
+            })
 
-                if (window.extraMarios) {
-                    Object.entries(window.extraMarios).forEach(([id, marioData]) => {
-                        if (id != window.socket.id) {
-                            this.geo_process_extra_mario(marioData, gfx.sharedChild)
-                        }
-                    })
-                }
+            if (window.extraMarios) {
+                window.extraMarios.forEach((marioData) => {
+                    this.geo_process_extra_mario(marioData, gfx.sharedChild)
+                })
             }
-
+            
         }
 
     }

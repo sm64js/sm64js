@@ -55,6 +55,7 @@ class ObjectListProcessor {
 
         this.gEnvironmentLevels = new Array(20)
 
+        this.totalMarios = 0
         this.gObjectCounter = 0
         this.gCCMEnteredSlide = 0
         this.gCheckingSurfaceCollisionsForCamera = 0
@@ -131,10 +132,8 @@ class ObjectListProcessor {
 
     bhv_mario_update() {
 
-        const marioIndex = this.gCurrentObject.OG ? 0 : 1
-
-        Mario.execute_mario_action(marioIndex)
-        this.copy_mario_state_to_object(marioIndex)
+        Mario.execute_mario_action(this.gCurrentObject.marioIndex)
+        this.copy_mario_state_to_object(this.gCurrentObject.marioIndex)
         
     }
 
@@ -192,12 +191,12 @@ class ObjectListProcessor {
                 object.respawnInfo = spawnInfo.behaviorArg
 
 
+                object.marioIndex = this.totalMarios++
+
                 if (spawnInfo.behaviorArg & 0x01) { // Is mario
                     if (this.gMarioObject) { //2nd Mario
-                        object.OG = false
                         this.gMarioObject.push(object)
                     } else {  ///OG Mario
-                        object.OG = true
                         this.gMarioObject = [object]
                         GraphNode.geo_make_first_child(object.header.gfx.node)
                     }

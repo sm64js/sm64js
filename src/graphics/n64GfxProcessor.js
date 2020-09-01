@@ -33,6 +33,9 @@ const MAX_VERTICES = 64
 
 let opCount = 0
 
+const canvas2d = document.querySelector('#textCanvas')
+const context2d = canvas2d.getContext('2d')
+
 export class n64GfxProcessor {
     constructor() {
 
@@ -918,32 +921,8 @@ export class n64GfxProcessor {
 
             d.u = U; d.v = V
 
-            if (v.special && w < 2000 && !d.clip_rej) {
-
-                const canvas = document.querySelector('#textCanvas')
-        
-                var context = canvas.getContext('2d')
-                var radius = 3
-
-                let myX = x / w
-                let myY = y / w
-                const pixelX = (myX *  0.5 + 0.5) * WebGL.canvas.width
-                const pixelY = (myY * -0.5 + 0.5) * WebGL.canvas.height
-
-                context.globalAlpha = 0.8
-                context.font = "bold 14px verdana, sans-serif"
-                context.textAlign = "center"
-                context.fillStyle = "#9400D3"
-                context.fillText(this.customData.playerName, pixelX, pixelY - 15)
-        
-                // context.beginPath()
-                // context.arc(pixelX, pixelY, radius, 0, 2 * Math.PI, false)
-                // context.fillStyle = v.special
-                // context.fill()
-                // context.lineWidth = 0
-                // context.strokeStyle = '#003300'
-                // context.stroke()
-
+            if (v.special == "nameplate" && w < 2000 && !d.clip_rej) {
+                this.custom_draw_nameplate(x, y, w)
             }
 
             Object.assign(d, { x, y, z, w })
@@ -957,8 +936,21 @@ export class n64GfxProcessor {
         }
     }
 
+    custom_draw_nameplate(x, y, w) {
+        
+        const radius = 3
+
+        const pixelX = ((x / w) * 0.5 + 0.5) * canvas2d.width
+        const pixelY = ((y / w) * -0.5 + 0.5) * canvas2d.height
+
+        context2d.globalAlpha = 0.8
+        context2d.font = "bold 14px verdana, sans-serif"
+        context2d.textAlign = "center"
+        context2d.fillStyle = "#9400D3"
+        context2d.fillText(this.customData.playerName, pixelX, pixelY)
+    }
+
     custom_set_player_data(skinID, playerName) { 
-        window.currentMarioSkinID = skinID
         this.customData.skinID = skinID
         this.customData.playerName = playerName
     }

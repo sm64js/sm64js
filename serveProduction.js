@@ -7,7 +7,6 @@ const fs = require('fs')
 const { v4: uuidv4 } = require('uuid')
 const { promisify } = require('util')
 const { spawn } = require('child_process')
-//const io = require('socket.io')(server)
 const { WebSocket } = require('@clusterws/cws');
 const port = 80
 
@@ -112,64 +111,45 @@ app.get("/romTransfer", async (req, res) => {
 
 
 
-
 //// Sockets
 
 const connectedSockets = {}
 
-/*io.on('connection', (socket) => {
-    //connectedSockets[socket.id] = {}
-    console.log("connection")
-
-    socket.on('marioData', (marioData) => {
-        socket.emit('allMarios', connectedSockets)
-
-        //Validate data
-        for (let i = 0; i < 3; i++) {
-            if (isNaN(marioData.pos[i])) return
-            if (isNaN(marioData.angle[i])) return
-        }
-        if (isNaN(marioData.animFrame)) return
-        if (isNaN(marioData.animID)) return
-
-        /// Data is Valid
-        connectedSockets[socket.id] = marioData
-    })
-
-    socket.on('disconnect', () => {
-        delete connectedSockets[socket.id]
-    })
-})*/
-
-
-const wss = new WebSocket.Server({ server }, () => {
-    console.log("ws Server is up")
-})
+const wss = new WebSocket.Server({ server }, () => {})
 
 wss.on('connection', (socket, req) => {
-    console.log("there is a ws connection")
     socket.id = uuidv4()
     socket.send(JSON.stringify({ type: "id", data: socket.id }))
 
+    let mariodataTimeout
 
     socket.onmessage = (marioDataStr) => {
         const marioData = JSON.parse(marioDataStr)
-        socket.send(JSON.stringify({ type: "allMarios", data: connectedSockets }))
 
-        //Validate data
+        const filteredMarios = Object.entries(connectedSockets).filter(([id, data]) => {
+            return id != socket.id && data.valid > 10
+        }).map(([id]) => { return connectedSockets[id] })
+        socket.send(JSON.stringify({ type: "allMarios", data: filteredMarios }))
+
+        //Pretty strict validation
         for (let i = 0; i < 3; i++) {
             if (isNaN(marioData.pos[i])) return
             if (isNaN(marioData.angle[i])) return
         }
         if (isNaN(marioData.animFrame)) return
-        if (isNaN(marioData.animID)) return
+        if (isNaN(marioData.animID) || 0 > marioData.animID) return
+        if (isNaN(marioData.skinID) || 0 > marioData.skinID || marioData.skinID > 9) return
+        marioData.playerName = String(marioData.playerName).substring(0, 14)
 
         /// Data is Valid
+        marioData.valid = connectedSockets[socket.id] ? ++connectedSockets[socket.id].valid : 0 
         connectedSockets[socket.id] = marioData
+        clearTimeout(mariodataTimeout)
+        mariodataTimeout = setTimeout(() => { connectedSockets[socket.id].valid = 0 }, 500)
     }
 
     socket.onclose = () => {
-        console.log("disconnect")
+        clearTimeout(mariodataTimeout)
         delete connectedSockets[socket.id]
     }
 })

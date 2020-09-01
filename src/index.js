@@ -1,21 +1,9 @@
 ﻿import "./template.css"
+import "./socket.js"
 import { checkForRom } from "./romTextureLoader.js"
 import { GameInstance as Game } from "./game/Game"
 import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
-//import io from 'socket.io-client'
-
-const mySocket = new WebSocket('ws://73.164.101.37')
-mySocket.onopen = () => {
-    window.socket = mySocket
-    window.socket.onmessage = (msgStr) => {
-        const msg = JSON.parse(msgStr.data)
-        if (msg.type == "allMarios") window.extraMarios = msg.data
-        if (msg.type == "id") window.socket.id = msg.data
-    }
-}
-window.mySkin = 0
-window.myName = ""
 
 const send_display_list = (gfx_list) => {
     start_render = performance.now()

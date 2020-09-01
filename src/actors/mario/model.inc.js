@@ -370,6 +370,10 @@ export const mario_butt = (skinID) => {
 	]
 }
 
+export const mario_nameplate = [
+	Gbi.gsSPVertex([{ pos: [0, 600, 0], flag: 0, tc: [0, 0], color: [0, 0, 0, 0], special: "nameplate" }], 1, 0)
+]
+
 const mario_left_arm_shared_dl_vertex_group1 = [
 	{ pos: [7, 27, 20], flag: 0, tc: [0, 0], color: [218, 97, 71, 0] },
 	{ pos: [59, 20, 15], flag: 0, tc: [0, 0], color: [68, 74, 76, 0] },
@@ -1627,7 +1631,7 @@ const mario_face_cap_dl_vertex_group3 = [
 	{ pos: [164, -89, -74], flag: 0, tc: [0, 0], color: [81, 169, 213, 255] },
 	{ pos: [271, 0, -41], flag: 0, tc: [0, 0], color: [110, 207, 220, 255] },
 	{ pos: [164, -89, 75], flag: 0, tc: [0, 0], color: [78, 166, 43, 255] },
-	{ pos: [271, 0, 42], flag: 0, tc: [0, 0], color: [113, 220, 43, 255], special: "topOfHat" },
+	{ pos: [271, 0, 42], flag: 0, tc: [0, 0], color: [113, 220, 43, 255] },
 	{ pos: [252, 62, -69], flag: 0, tc: [0, 0], color: [57, 74, 171, 255] },
 	{ pos: [272, 85, 0], flag: 0, tc: [0, 0], color: [95, 84, 0, 255] },
 	{ pos: [182, 155, 0], flag: 0, tc: [0, 0], color: [237, 125, 0, 255] },

@@ -68,7 +68,7 @@
                     <label>Select Skin ID and type name :</label>
                 </div>
                 <div class="col-sm-2" style="justify-content:center; ">
-                    <select class="form-control" onchange="window.mySkin = this.value">
+                    <select class="form-control" onchange="window.myMario.skinID = parseInt(this.value)">
                         <option>0</option>
                         <option>1</option>
                         <option>2</option>
@@ -82,7 +82,8 @@
                     </select>
                 </div>
                 <div class="col-sm-3 " style="justify-content:center">
-                    <input type="text" class="form-control" placeholder="enter name" onchange="window.myName = this.value">
+                    <input type="text" class="form-control" placeholder="enter name" 
+                           onchange="window.myMario.playerName = this.value.substring(0,14)">
                 </div>
             </div>
 

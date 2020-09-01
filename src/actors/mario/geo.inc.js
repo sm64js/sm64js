@@ -1,5 +1,6 @@
 import { GeoLayoutInstance as Geo } from "../../engine/GeoLayout"
 import { 
+    mario_nameplate,
     mario_butt, 
     mario_torso, 
     mario_cap_on_eyes_front,
@@ -174,7 +175,8 @@ export const mario_geo = [
     { command: Geo.open_node },
         { command: Geo.node_scale, args: [0x00, 16384] },
         { command: Geo.open_node },
-            { command: Geo.branch, args: [ 1, mario_geo_medium_poly_body ] },
+            { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, mario_nameplate] },
+            { command: Geo.branch, args: [ 1, mario_geo_body ] },
         { command: Geo.close_node },
     { command: Geo.close_node },
     { command: Geo.node_end }

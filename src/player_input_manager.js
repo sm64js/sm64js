@@ -169,9 +169,11 @@ $('[data-toggle="keyboardControlsToggle"]').on('shown.bs.popover', () => {
 $('[data-toggle="gamepadControlsToggle"]').on('shown.bs.popover', () => {
     const messages = document.getElementsByClassName('gamepadMessage')
 
-    if (navigator.getGamepads && navigator.getGamepads()[0]) {
+    const gamepadIndex = window.switchGamepad ? 1 : 0
 
-        const gamepad = navigator.getGamepads()[0]
+    if (navigator.getGamepads && navigator.getGamepads()[gamepadIndex]) {
+
+        const gamepad = navigator.getGamepads()[gamepadIndex]
         const numButtons = gamepad.buttons.length
 
         Array.from(messages).forEach(msg => {
@@ -189,7 +191,7 @@ $('[data-toggle="gamepadControlsToggle"]').on('shown.bs.popover', () => {
         Array.from(document.getElementsByTagName("select")).forEach(selectElem => {
             if (selectElem.options.length == 0) { /// insert options
                 if (selectElem.hasAttribute("gamepadButton")) {
-                    for (let i = 0; i < navigator.getGamepads()[0].buttons.length; i++) {
+                    for (let i = 0; i < navigator.getGamepads()[gamepadIndex].buttons.length; i++) {
                         const option = document.createElement("option")
                         option.value = i
                         option.text = i
@@ -197,7 +199,7 @@ $('[data-toggle="gamepadControlsToggle"]').on('shown.bs.popover', () => {
                     }
                 }
                 if (selectElem.hasAttribute("gamepadAxes")) {
-                    for (let i = 0; i < navigator.getGamepads()[0].axes.length; i++) {
+                    for (let i = 0; i < navigator.getGamepads()[gamepadIndex].axes.length; i++) {
                         const option = document.createElement("option")
                         option.value = i
                         option.text = i
@@ -261,9 +263,11 @@ export const playerInputUpdate = () => {
         keyboardFinal[key] = Boolean(keyboardButtons[value])
     })
 
+    const gamepadIndex = window.switchGamepad ? 1 : 0
+
     let stickX = 0, stickY = 0, gamepad
     if (navigator.getGamepads) {
-        gamepad = navigator.getGamepads()[0]
+        gamepad = navigator.getGamepads()[gamepadIndex]
     }
     if (gamepad) {
         stickX = gamepad.axes[gamepadButtonMapping['stickX']]

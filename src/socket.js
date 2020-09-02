@@ -1,3 +1,22 @@
+import { MarioMsg, MarioListMsg } from "../proto/mario_pb"
+
+const message = new MarioListMsg()
+
+const inputBytes = new Uint8Array([
+    10, 31, 10, 8, 74, 111, 104, 110, 32, 68, 111, 101,
+    16, 25, 24, 6, 32, 2, 42, 6, 180, 1, 159, 1,
+    208, 15, 50, 5, 136, 14, 191, 12, 0, 10, 35, 10,
+    13, 83, 110, 117, 102, 102, 121, 32, 76, 105, 110, 100,
+    101, 114, 16, 62, 24, 32, 32, 12, 42, 5, 72, 227,
+    7, 250, 2, 50, 5, 150, 8, 239, 13, 32
+])
+
+const decodedMarioList = MarioListMsg.deserializeBinary(inputBytes).getMarioList()
+
+console.log(decodedMarioList[0].getAngleList())
+console.log(decodedMarioList[1].getAngleList())
+
+
 const url = new URL(window.location.href)
 if (url.protocol == "http:") {
     url.protocol = url.protocol.replace('http', 'ws')

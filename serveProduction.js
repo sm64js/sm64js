@@ -7,10 +7,37 @@ const fs = require('fs')
 const { v4: uuidv4 } = require('uuid')
 const { promisify } = require('util')
 const { spawn } = require('child_process')
-const { WebSocket } = require('@clusterws/cws');
+const { WebSocket } = require('@clusterws/cws')
 const port = 80
 
 const mkdir = promisify(fs.mkdir)
+
+const { MarioMsg, MarioListMsg } = require("./proto/mario_pb")
+const message = new MarioMsg()
+const message2 = new MarioMsg()
+
+message.setPlayername("John Doe") 
+message.setSkinid(25)
+message.setAnimid(6) 
+message.setAnimframe(2)
+message.setAngleList([900, -800, 0])
+message.setPosList([90, -80, 1000])
+
+message2.setPlayername("Snuffy Linder")
+message2.setSkinid(62)
+message2.setAnimid(32)
+message2.setAnimframe(12)
+message2.setAngleList([523, -888, 16])
+message2.setPosList([36, -498, 189])
+
+const mariolistmsg = new MarioListMsg()
+//mariolistmsg.setMarioList([message, message2])
+mariolistmsg.addMario(message)
+mariolistmsg.addMario(message2)
+
+const bytes = mariolistmsg.serializeBinary()
+
+console.log(bytes)
 
 const pythonExtract = (dir) => {
   return new Promise((resolve, reject) => {

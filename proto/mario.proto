@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+message MarioListMsg {
+	repeated MarioMsg mario = 1;
+}
+
+message MarioMsg {
+  string playerName = 1;
+  int32 skinID = 2;
+  int32 animID = 3;
+  int32 animFrame = 4;
+  repeated sint32 pos = 5;
+  repeated sint32 angle = 6;
+}

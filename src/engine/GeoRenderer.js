@@ -319,6 +319,37 @@ class GeoRenderer {
 
     }
 
+    obj_is_in_view(node, matrix) {
+        if (node.node.flags & GraphNode.GRAPH_RENDER_INVISIBLE) return false
+
+        const geo = node.sharedChild
+        const halfFov = (this.gCurGraphNodeCamFrustum.wrapper.fov / 2.0 + 1.0) * 32768.0 / 180.0 + 0.5
+
+        const hScreenEdge = -matrix[3][2] * Math.sin(halfFov / 0x8000 * Math.PI) / Math.cos(halfFov / 0x8000 * Math.PI)
+
+        let cullingRadius
+        if (geo != undefined && geo.type == GraphNode.GRAPH_NODE_TYPE_CULLING_RADIUS) {
+            cullingRadius = geo.wrapper.radius
+        } else {
+            cullingRadius = 300
+        }
+
+        // Don't render if the object is close to or behind the camera
+        if (matrix[3][2] > -100.0 + cullingRadius) { return false }
+
+        //! This makes the HOLP not update when the camera is far away, and it
+        //  makes PU travel safe when the camera is locked on the main map.
+        //  If Mario were rendered with a depth over 65536 it would cause overflow
+        //  when converting the transformation matrix to a fixed point matrix.
+        if (matrix[3][2] < -20000.0 - cullingRadius) { return false }
+
+        // Check whether the object is horizontally in view
+        if (matrix[3][0] > hScreenEdge + cullingRadius) { return false }
+        if (matrix[3][0] < -hScreenEdge - cullingRadius) { return false }
+
+        return true
+    }
+
     geo_process_object(node) {
 
         const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
@@ -351,8 +382,9 @@ class GeoRenderer {
                 this.geo_set_animation_globals(object.header.gfx.unk38, hasAnimation)
             }
 
-            if (true) { // TODO: object in view
+            if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) { 
                 if (object.header.gfx.sharedChild) {
+
                     this.gCurGraphNodeObject = node.wrapper
                     object.header.gfx.sharedChild.parent = object.header.gfx.node
                     this.geo_process_single_node(object.header.gfx.sharedChild)
@@ -375,6 +407,7 @@ class GeoRenderer {
     }
 
     geo_process_object_parent(node) {
+
         if (node.wrapper.sharedChild) {
 
             node.wrapper.sharedChild.parent = node //temparaily assigining itself as parent

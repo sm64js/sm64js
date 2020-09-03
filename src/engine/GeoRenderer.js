@@ -320,42 +320,35 @@ class GeoRenderer {
 
     }
 
-    geo_process_extra_mario(marioData, sharedChild) {
+    obj_is_in_view(node, matrix) {
+        if (node.node.flags & GraphNode.GRAPH_RENDER_INVISIBLE) return false
 
-        const { pos, angle, animFrame, animID, skinID, playerName } = marioData
+        const geo = node.sharedChild
+        const halfFov = (this.gCurGraphNodeCamFrustum.wrapper.fov / 2.0 + 1.0) * 32768.0 / 180.0 + 0.5
 
-        const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        const hScreenEdge = -matrix[3][2] * Math.sin(halfFov / 0x8000 * Math.PI) / Math.cos(halfFov / 0x8000 * Math.PI)
 
-        MathUtil.mtxf_rotate_zxy_and_translate(mtxf, pos, angle)
-        MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
-
-        MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex + 1], [1, 1, 1])
-
-        this.gMatStackIndex++
-
-        //// sending my own custom gfx opcode to set skin id and playerName
-        this.geo_append_display_list([Gbi.gsSetPlayerData(skinID, playerName)], 1) 
-
-        const animList = gMarioAnimData
-        this.gCurrAnimFrame = animFrame
-        this.gCurAnimType = this.ANIM_TYPE_TRANSLATION
-        this.gCurAnimData = animList[animID].values
-        this.gCurrAnimAttribute = {
-            indexToIndices: 0,
-            indices: animList[animID].indices
+        let cullingRadius
+        if (geo != undefined && geo.type == GraphNode.GRAPH_NODE_TYPE_CULLING_RADIUS) {
+            cullingRadius = geo.wrapper.radius
+        } else {
+            cullingRadius = 300
         }
 
-        this.gCurGraphNodeObject = {
-            pos, angle, scale: [1, 1, 1]
-        }
-        //marioOG.header.gfx.sharedChild.parent = marioOG.header.gfx.node
-        this.geo_process_single_node(sharedChild)
-        //marioOG.header.gfx.sharedChild.parent = null
-        this.gCurGraphNodeObject = null
+        // Don't render if the object is close to or behind the camera
+        if (matrix[3][2] > -100.0 + cullingRadius) { return false }
 
-        this.gMatStackIndex--
-        this.gCurAnimType = this.ANIM_TYPE_NONE
+        //! This makes the HOLP not update when the camera is far away, and it
+        //  makes PU travel safe when the camera is locked on the main map.
+        //  If Mario were rendered with a depth over 65536 it would cause overflow
+        //  when converting the transformation matrix to a fixed point matrix.
+        if (matrix[3][2] < -20000.0 - cullingRadius) { return false }
 
+        // Check whether the object is horizontally in view
+        if (matrix[3][0] > hScreenEdge + cullingRadius) { return false }
+        if (matrix[3][0] < -hScreenEdge - cullingRadius) { return false }
+
+        return true
     }
 
     geo_process_object(node) {
@@ -390,10 +383,11 @@ class GeoRenderer {
                 this.geo_set_animation_globals(object.header.gfx.unk38, hasAnimation)
             }
 
-            if (true) { // TODO: object in view
+            if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) { 
                 if (object.header.gfx.sharedChild) {
 
-                    if (object.marioIndex == 0) { //// sending my own custom gfx opcode to set skin id
+                    if (object.marioIndex == 0) {
+                        //// sending my own custom gfx opcode to set skin id
                         this.geo_append_display_list([Gbi.gsSetPlayerData(window.myMario.skinID, "")], 1) 
                     }
 
@@ -428,7 +422,7 @@ class GeoRenderer {
 
             if (window.extraMarios) {
                 window.extraMarios.forEach((marioData) => {
-                    this.geo_process_extra_mario(marioData, gfx.sharedChild)
+                    this.geo_process_extra_mario(marioData, gfx)
                 })
             }
             
@@ -436,7 +430,48 @@ class GeoRenderer {
 
     }
 
+
+    geo_process_extra_mario(marioData, gfx) {
+
+        const { pos, angle, animFrame, animID, skinID, playerName } = marioData
+
+        const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
+
+        MathUtil.mtxf_rotate_zxy_and_translate(mtxf, pos, angle)
+        MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
+
+        MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex + 1], [1, 1, 1])
+
+        this.gMatStackIndex++
+
+        if (this.obj_is_in_view(gfx, this.gMatStack[this.gMatStackIndex])) {
+
+            //// sending my own custom gfx opcode to set skin id and playerName
+            this.geo_append_display_list([Gbi.gsSetPlayerData(skinID, playerName)], 1)
+
+            const animList = gMarioAnimData
+            this.gCurrAnimFrame = animFrame
+            this.gCurAnimType = this.ANIM_TYPE_TRANSLATION
+            this.gCurAnimData = animList[animID].values
+            this.gCurrAnimAttribute = {
+                indexToIndices: 0,
+                indices: animList[animID].indices
+            }
+
+            this.gCurGraphNodeObject = {
+                pos, angle, scale: [1, 1, 1]
+            }
+            this.geo_process_single_node(gfx.sharedChild)
+            this.gCurGraphNodeObject = null
+        }
+
+        this.gMatStackIndex--
+        this.gCurAnimType = this.ANIM_TYPE_NONE
+
+    }
+
     geo_process_object_parent(node) {
+
         if (node.wrapper.sharedChild) {
 
             node.wrapper.sharedChild.parent = node //temparaily assigining itself as parent

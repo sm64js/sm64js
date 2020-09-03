@@ -7,8 +7,9 @@ const fs = require('fs')
 const { v4: uuidv4 } = require('uuid')
 const { promisify } = require('util')
 const { spawn } = require('child_process')
-const { WebSocket } = require('@clusterws/cws')
+const uWebSocket = require('uWebSockets.js')
 const port = 80
+const ws_port = 3000
 
 const mkdir = promisify(fs.mkdir)
 
@@ -37,7 +38,7 @@ mariolistmsg.addMario(message2)
 
 const bytes = mariolistmsg.serializeBinary()
 
-console.log(bytes)
+//console.log(bytes)
 
 const pythonExtract = (dir) => {
   return new Promise((resolve, reject) => {
@@ -120,6 +121,7 @@ app.get("/romTransfer", async (req, res) => {
 
 })
 
+// app.use(fileUpload())
 // app.post("/romUpload", async (req, res) => {
 // 	const uid = uuidv4()
 // 	await mkdir('extractTools/' + uid)
@@ -137,22 +139,20 @@ app.get("/romTransfer", async (req, res) => {
 // })
 
 
+/// start express server
+app.use(express.static(__dirname + '/dist'))
+server.listen(port, () => { console.log('Starting Server') })
+
 
 //// Sockets
-
 const connectedSockets = {}
-
-const wss = new WebSocket.Server({ server }, () => {})
-
-wss.on('connection', (socket, req) => {
-    socket.id = uuidv4()
-    socket.send(JSON.stringify({ type: "id", data: socket.id }))
-
-    let mariodataTimeout
-
-    socket.onmessage = (marioDataStr) => {
-        const marioData = JSON.parse(marioDataStr)
-
+uWebSocket.App({}).ws('/*', {
+    open: (socket) => {
+        socket.id = uuidv4()
+        socket.send(JSON.stringify({ type: "id", data: socket.id }))
+    },
+    message: (socket, message) => {
+        const marioData = JSON.parse(Buffer.from(message).toString())
         const filteredMarios = Object.entries(connectedSockets).filter(([id, data]) => {
             return id != socket.id && data.valid > 10
         }).map(([id]) => { return connectedSockets[id] })
@@ -169,26 +169,13 @@ wss.on('connection', (socket, req) => {
         marioData.playerName = String(marioData.playerName).substring(0, 14)
 
         /// Data is Valid
-        marioData.valid = connectedSockets[socket.id] ? ++connectedSockets[socket.id].valid : 0 
+        marioData.valid = connectedSockets[socket.id] ? ++connectedSockets[socket.id].valid : 0
         connectedSockets[socket.id] = marioData
-        clearTimeout(mariodataTimeout)
-        mariodataTimeout = setTimeout(() => { connectedSockets[socket.id].valid = 0 }, 500)
-    }
-
-    socket.onclose = () => {
-        clearTimeout(mariodataTimeout)
+        clearTimeout(socket.mariodataTimeout)
+        socket.mariodataTimeout = setTimeout(() => { connectedSockets[socket.id].valid = 0 }, 500)
+    },
+    close: (socket) => {
+        clearTimeout(socket.mariodataTimeout)
         delete connectedSockets[socket.id]
     }
-})
-
-app.use(express.static(__dirname + '/dist'))
-//app.use(fileUpload())
-
-server.listen(port, () => { console.log('Starting Server') })
-
-/*server.on('upgrade', (request, socket, head) => {
-    wss.handleUpgrade(request, socket, head, socket => {
-        wss.emit('connection', socket, request)
-    })
-})*/
-
+}).listen(ws_port, () => { console.log('Starting WebSocker Server') })

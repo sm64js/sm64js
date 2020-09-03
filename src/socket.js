@@ -18,14 +18,8 @@ console.log(decodedMarioList[1].getAngleList())
 
 
 const url = new URL(window.location.href)
-if (url.protocol == "http:") {
-    url.protocol = url.protocol.replace('http', 'ws')
-    url.port = 80
-} else {
-    url.protocol = url.protocol.replace('https', 'wss')
-    url.port = 443
-}
-
+url.protocol = url.protocol.replace('http', 'ws')
+url.port = 3000
 
 const socket = new WebSocket(url.href)
 

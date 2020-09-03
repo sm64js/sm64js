@@ -31,7 +31,7 @@ const sendMarioData = () => {
 }
 
 const initSendInterval = () => {
-    const sendDataInterval = setInterval(() => { sendMarioData() }, 33.3)
+    const sendDataInterval = setInterval(() => { sendMarioData() }, 15)
     socket.onclose = () => { clearInterval(sendDataInterval) }
 }
 

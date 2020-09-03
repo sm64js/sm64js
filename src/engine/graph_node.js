@@ -288,6 +288,14 @@ export const init_graph_node_culling_radius = (radius) => {
     return graphNode
 }
 
+export const init_graph_node_render_range = (minDistance, maxDistance) => {
+    const graphNode = { node: {}, minDistance, maxDistance }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_LEVEL_OF_DETAIL)
+
+    return graphNode
+}
+
 export const init_graph_node_switch_case = (numCases, selectedCase, nodeFunc, funcClass) => {
     const graphNode = {
         node: {},

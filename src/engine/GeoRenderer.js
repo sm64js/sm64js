@@ -403,7 +403,6 @@ class GeoRenderer {
             object.header.gfx.throwMatrix = null
 
         }
-
     }
 
     geo_process_object_parent(node) {
@@ -455,6 +454,17 @@ class GeoRenderer {
             
         }
 
+    }
+
+    geo_process_level_of_detail(node) {
+        const mtx = this.gMatStack[this.gMatStackIndex]
+        const distanceFromCam = -mtx[3][2]
+
+        if (node.wrapper.minDistance <= distanceFromCam && distanceFromCam < node.wrapper.maxDistance) {
+            if (node.children[0]) {
+                this.geo_process_node_and_siblings(node.children)
+            }
+        }
     }
 
     geo_process_shadow(node) {
@@ -567,9 +577,12 @@ class GeoRenderer {
             case GraphNode.GRAPH_NODE_TYPE_SHADOW:
                 this.geo_process_shadow(node); break
 
+            case GraphNode.GRAPH_NODE_TYPE_LEVEL_OF_DETAIL:
+                this.geo_process_level_of_detail(node); break
+
             default:
                 /// remove this check once all types have been added
-                if (node.type != GraphNode.GRAPH_NODE_TYPE_CULLING_RADIUS) throw "unimplemented type in geo renderer"
+                if (node.type != GraphNode.GRAPH_NODE_TYPE_CULLING_RADIUS && node.type != GraphNode.GRAPH_NODE_TYPE_START) throw "unimplemented type in geo renderer "
                 if (node.children[0]) {
                     this.geo_process_node_and_siblings(node.children)
                 }

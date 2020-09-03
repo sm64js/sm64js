@@ -199,6 +199,12 @@ class GeoLayout {
         this.sCurrentLayout.index++
     }
 
+    node_render_range(args) {
+        const graphNode = GraphNode.init_graph_node_render_range(args[0], args[1])
+        GraphNode.register_scene_graph_node(this, graphNode)
+        this.sCurrentLayout.index++
+    }
+
     node_shadow(args) {
         const shadowType = args[0]
         const shadowSolidity = args[1]

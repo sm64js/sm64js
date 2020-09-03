@@ -8,37 +8,11 @@ const { v4: uuidv4 } = require('uuid')
 const { promisify } = require('util')
 const { spawn } = require('child_process')
 const uWebSocket = require('uWebSockets.js')
+const { MarioMsg, MarioListMsg } = require("./proto/mario_pb")
 const port = 80
 const ws_port = 3000
 
 const mkdir = promisify(fs.mkdir)
-
-const { MarioMsg, MarioListMsg } = require("./proto/mario_pb")
-const message = new MarioMsg()
-const message2 = new MarioMsg()
-
-message.setPlayername("John Doe") 
-message.setSkinid(25)
-message.setAnimid(6) 
-message.setAnimframe(2)
-message.setAngleList([900, -800, 0])
-message.setPosList([90, -80, 1000])
-
-message2.setPlayername("Snuffy Linder")
-message2.setSkinid(62)
-message2.setAnimid(32)
-message2.setAnimframe(12)
-message2.setAngleList([523, -888, 16])
-message2.setPosList([36, -498, 189])
-
-const mariolistmsg = new MarioListMsg()
-//mariolistmsg.setMarioList([message, message2])
-mariolistmsg.addMario(message)
-mariolistmsg.addMario(message2)
-
-const bytes = mariolistmsg.serializeBinary()
-
-//console.log(bytes)
 
 const pythonExtract = (dir) => {
   return new Promise((resolve, reject) => {
@@ -146,31 +120,31 @@ server.listen(port, () => { console.log('Starting Server') })
 
 //// Sockets
 const connectedSockets = {}
-uWebSocket.App({}).ws('/*', {
-    open: (socket) => {
-        socket.id = uuidv4()
-        socket.send(JSON.stringify({ type: "id", data: socket.id }))
-    },
-    message: (socket, message) => {
-        const marioData = JSON.parse(Buffer.from(message).toString())
+const wss = uWebSocket.App({}).ws('/*', {
+    open: (socket) => { socket.id = uuidv4() },
+    message: (socket, bytes) => {
+        const decodedMario = MarioMsg.deserializeBinary(bytes)
         const filteredMarios = Object.entries(connectedSockets).filter(([id, data]) => {
             return id != socket.id && data.valid > 10
-        }).map(([id]) => { return connectedSockets[id] })
-        socket.send(JSON.stringify({ type: "allMarios", data: filteredMarios }))
+        }).map(([id]) => { return connectedSockets[id].protomsg })
+
+        const mariolistmsg = new MarioListMsg()
+        mariolistmsg.setMarioList(filteredMarios)
+        socket.send(mariolistmsg.serializeBinary(), true)
 
         //Pretty strict validation
         for (let i = 0; i < 3; i++) {
-            if (isNaN(marioData.pos[i])) return
-            if (isNaN(marioData.angle[i])) return
+            if (isNaN(decodedMario.getPosList()[i])) return
+            if (isNaN(decodedMario.getAngleList()[i])) return
         }
-        if (isNaN(marioData.animFrame)) return
-        if (isNaN(marioData.animID) || 0 > marioData.animID) return
-        if (isNaN(marioData.skinID) || 0 > marioData.skinID || marioData.skinID > 9) return
-        marioData.playerName = String(marioData.playerName).substring(0, 14)
+        if (isNaN(decodedMario.getAnimframe())) return
+        if (isNaN(decodedMario.getAnimid()) || 0 > decodedMario.getAnimid()) return
+        if (isNaN(decodedMario.getSkinid()) || 0 > decodedMario.getSkinid() || decodedMario.getSkinid() > 9) return
+        decodedMario.setPlayername(String(decodedMario.getPlayername()).substring(0, 14))
 
         /// Data is Valid
-        marioData.valid = connectedSockets[socket.id] ? ++connectedSockets[socket.id].valid : 0
-        connectedSockets[socket.id] = marioData
+        const valid = connectedSockets[socket.id] ? ++connectedSockets[socket.id].valid : 0
+        connectedSockets[socket.id] = { valid, protomsg: decodedMario }
         clearTimeout(socket.mariodataTimeout)
         socket.mariodataTimeout = setTimeout(() => { connectedSockets[socket.id].valid = 0 }, 500)
     },

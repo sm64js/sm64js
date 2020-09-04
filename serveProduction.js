@@ -7,10 +7,9 @@ const fs = require('fs')
 const { v4: uuidv4 } = require('uuid')
 const { promisify } = require('util')
 const { spawn } = require('child_process')
-const uWebSocket = require('uWebSockets.js')
+const { App } = require('@sifrr/server')
 const { MarioMsg, MarioListMsg } = require("./proto/mario_pb")
 const port = 80
-const ws_port = 3000
 
 const mkdir = promisify(fs.mkdir)
 
@@ -114,13 +113,13 @@ app.get("/romTransfer", async (req, res) => {
 
 
 /// start express server
-app.use(express.static(__dirname + '/dist'))
-server.listen(port, () => { console.log('Starting Server') })
+/*app.use(express.static(__dirname + '/dist'))
+server.listen(port, () => { console.log('Starting Server') })*/
 
 
 //// Sockets
 const connectedSockets = {}
-const wss = uWebSocket.App({}).ws('/*', {
+new App({}).ws('/*', {
     open: (socket) => { socket.id = uuidv4() },
     message: (socket, bytes) => {
         const decodedMario = MarioMsg.deserializeBinary(bytes)
@@ -152,4 +151,4 @@ const wss = uWebSocket.App({}).ws('/*', {
         clearTimeout(socket.mariodataTimeout)
         delete connectedSockets[socket.id]
     }
-}).listen(ws_port, () => { console.log('Starting WebSocker Server') })
+}).file('/', "dist/index.html").folder('/', "dist").listen(port, () => { console.log('Starting') })

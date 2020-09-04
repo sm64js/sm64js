@@ -2,7 +2,6 @@ import { MarioMsg, MarioListMsg } from "../proto/mario_pb"
 
 const url = new URL(window.location.href)
 url.protocol = url.protocol.replace('http', 'ws')
-url.port = 3000
 
 const socket = new WebSocket(url.href)
 

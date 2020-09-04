@@ -1,5 +1,5 @@
 import { LevelCommandsInstance as LevelCommands } from "../../engine/LevelCommands"
-import { bhvMario } from "../../game/BehaviorData"
+import { bhvMario, bhvExtraMario } from "../../game/BehaviorData"
 import { castle_grounds_geo_00073C } from "./areas/1/geo"
 import { castle_grounds_seg7_collision_level } from "./areas/1/collision.inc"
 import { LevelUpdateInstance as LevelUpdate } from "../../game/LevelUpdate"
@@ -7,6 +7,7 @@ import { bubbly_tree_geo } from "../../actors/tree/geo.inc"
 import { MODEL_BOB_BUBBLY_TREE, MODEL_LEVEL_GEOMETRY_03 } from "../../include/model_ids"
 import { castle_grounds_geo_0006F4 } from "./areas/1/3/geo.inc"
 
+window.bhvExtraMario = bhvExtraMario
 
 export const level_castle_grounds_entry = [
     { command: LevelCommands.init_level },

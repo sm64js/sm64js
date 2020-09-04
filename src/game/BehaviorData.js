@@ -3,6 +3,7 @@ import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectList
 import { oFlags, oInteractType, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
+import { bhv_extra_mario_base_loop } from "./behaviors/extra_mario.inc"
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
 const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -36,6 +37,15 @@ export const bhvMario = [
     { command: BhvCmds.set_hitbox, args: { radius: 37, height: 160 } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: ObjectListProcessor.bhv_mario_update, funcClass: ObjectListProcessor } },
+    { command: BhvCmds.end_loop },
+]
+
+export const bhvExtraMario = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PLAYER } },
+    { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
+    { command: BhvCmds.set_hitbox, args: { radius: 37, height: 160 } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_extra_mario_base_loop } },
     { command: BhvCmds.end_loop },
 ]
 

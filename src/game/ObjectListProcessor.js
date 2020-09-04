@@ -8,7 +8,6 @@ import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { detect_object_collisions } from "./ObjectCollisions"
 
 
-
 class ObjectListProcessor {
     constructor() {
 
@@ -60,43 +59,10 @@ class ObjectListProcessor {
         this.gCCMEnteredSlide = 0
         this.gCheckingSurfaceCollisionsForCamera = 0
         this.gObjectLists = new Array(13).fill(0).map(() => { 
-
             const blankObj = { header: {} }
             blankObj.header.prev = blankObj
             blankObj.header.next = blankObj
             return blankObj
-
-/*            const newObjectNode = { //ObjectNode
-                next: null, prev: null,
-                gfx: { //GraphObjectNode
-                    node: { //GraphNode
-                        type: null,
-                        flags: null,
-                        prev: null,
-                        next: null,
-                        children: null,
-                        wrapper: null
-                    }, 
-                    sharedChild: { //GraphNode
-                        type: null,
-                        flags: null,
-                        prev: null,
-                        next: null,
-                        children: null
-                    },
-                    wrapperObjectNode: null
-                },
-                wrapperObject: null
-            }
-
-            newObjectNode.gfx.wrapperObjectNode = newObjectNode
-            newObjectNode.gfx.node.wrapper = newObjectNode.gfx
-
-            const newObject = { header: newObjectNode, activeFlags: 0 }
-
-            newObjectNode.wrapperObject = newObject
-
-            return newObjectNode*/
         })
 
     }
@@ -109,6 +75,20 @@ class ObjectListProcessor {
     update_non_terrain_objects() {
         this.sObjectListUpdateOrder.slice(2).forEach(listIndex => {
             this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[listIndex])
+        })
+
+        ///Update Other Mario Behaviors
+        window.extraMarios.forEach(extraMario => {
+            this.gCurrentObject = {
+                bhvScript: { commands: window.bhvExtraMario, index: 4 },
+                rawData: [...window.marioObject.rawData],
+                bhvStack: [4]
+            }
+            this.gCurrentObject.rawData[oPosX] = extraMario.pos[0]
+            this.gCurrentObject.rawData[oPosY] = extraMario.pos[1]
+            this.gCurrentObject.rawData[oPosZ] = extraMario.pos[2]
+
+            Behavior.cur_obj_update()
         })
     }
 
@@ -132,6 +112,8 @@ class ObjectListProcessor {
 
     bhv_mario_update() {
 
+        //console.log(this.gCurrentObject)
+        window.marioObject = this.gCurrentObject
         Mario.execute_mario_action(this.gCurrentObject.marioIndex)
         this.copy_mario_state_to_object(this.gCurrentObject.marioIndex)
         

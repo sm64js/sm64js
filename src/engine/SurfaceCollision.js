@@ -71,7 +71,7 @@ class SurfaceCollision {
         const cellZ = parseInt((z + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0xF
 
         const surfaceList = SurfaceLoad.gStaticSurfacePartition[cellZ][cellX][SurfaceLoad.SPATIAL_PARTITION_FLOORS].next
-        const heightWrapper = { height: 0 }
+        const heightWrapper = { height }
         floorWrapper.floor = this.find_floor_from_list(surfaceList, x, y, z, heightWrapper)
 
         return heightWrapper.height

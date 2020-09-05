@@ -1,5 +1,6 @@
 import * as Mario from "./Mario"
 import { perform_ground_step, stationary_ground_step } from "./MarioStep"
+import { processKick } from "../socket"
 
 const sPunchingForwardVelocities = [0, 1, 1, 2, 3, 5, 7, 10]
 
@@ -89,6 +90,7 @@ export const mario_update_punch_sequence = (m) => {
             //play_mario_action_sound(m, SOUND_MARIO_PUNCH_HOO, 1)
             animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_GROUND_KICK)
             if (animFrame == 0) {
+                processKick(m.pos, m.faceAngle[1])
                 m.marioBodyState.punchState = (2 << 6) | 6
             }
 

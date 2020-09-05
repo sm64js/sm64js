@@ -6,6 +6,7 @@ import { CameraInstance as Camera } from "../game/Camera"
 import * as Mario from "../game/Mario"
 import { create_shadow_below_xyz } from "../game/Shadow"
 import { gMarioAnimData } from "../actors/mario/marioAnimData"
+import { getExtraMarios } from "../socket"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -420,8 +421,10 @@ class GeoRenderer {
                 animID: gfx.unk38.animID,
             })
 
-            if (window.extraMarios) {
-                window.extraMarios.forEach((marioData) => {
+            const extraMarios = getExtraMarios()
+
+            if (extraMarios) {
+                extraMarios.forEach((marioData) => {
                     this.geo_process_extra_mario(marioData, gfx)
                     marioData.animFrame++
                 })

@@ -15,7 +15,7 @@ import { mario_execute_object_action } from "./MarioActionsObject"
 import { oMarioWalkingPitch, oInteractStatus, oPosX, oPosY, oPosZ, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
-import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
+import { gameData as socketGameData } from "../socket"
 
 ////// Mario Constants
 export const ANIM_FLAG_NOLOOP = (1 << 0) // 0x01
@@ -41,6 +41,8 @@ export const ANIM_TYPE_NO_TRANSLATION = 4
 // translation types the type is set to this
 export const ANIM_TYPE_ROTATION = 5
 
+export const MARIO_ANIM_BACKWARD_AIR_KB = 0x02
+export const MARIO_ANIM_AIR_FORWARD_KB = 0x2D 
 export const MARIO_ANIM_IDLE_HEAD_LEFT = 0xC3
 export const MARIO_ANIM_IDLE_HEAD_RIGHT = 0xC4
 export const MARIO_ANIM_IDLE_HEAD_CENTER = 0xC5
@@ -205,6 +207,7 @@ export const ACT_AIR_HIT_WALL = 0x000008A7
 export const ACT_RIDING_HOOT = 0x000004A8
 export const ACT_SLEEPING = 0x0C000203
 export const ACT_START_SLEEPING = 0x0C400202
+export const ACT_THROWN_BACKWARD = 0x010208BE
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -379,13 +382,13 @@ export const init_marios = () => {
             action: ACT_IDLE
         })
 
-        const marioRawData = LevelUpdate.gMarioState[index].marioObj.rawData
+/*        const marioRawData = LevelUpdate.gMarioState[index].marioObj.rawData
         marioRawData[oPosX] = LevelUpdate.gMarioState[index].pos[0]
         marioRawData[oPosY] = LevelUpdate.gMarioState[index].pos[1]
         marioRawData[oPosZ] = LevelUpdate.gMarioState[index].pos[2]
         marioRawData[oMoveAnglePitch] = LevelUpdate.gMarioState[index].faceAngle[0]
         marioRawData[oMoveAngleYaw] = LevelUpdate.gMarioState[index].faceAngle[1]
-        marioRawData[oMoveAngleRoll] = LevelUpdate.gMarioState[index].faceAngle[2]
+        marioRawData[oMoveAngleRoll] = LevelUpdate.gMarioState[index].faceAngle[2]*/
     })
 
     LevelUpdate.gMarioState.forEach((marioState) => {
@@ -404,6 +407,8 @@ export const init_marios = () => {
             }
         })
     })
+
+    socketGameData.marioState = LevelUpdate.gMarioState[0]
 
 }
 

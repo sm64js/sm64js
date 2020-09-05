@@ -1,9 +1,9 @@
-﻿import "./template.css"
-import "./socket.js"
-import { checkForRom } from "./romTextureLoader.js"
+﻿import { checkForRom } from "./romTextureLoader.js"
 import { GameInstance as Game } from "./game/Game"
 import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
+import "./template.css"
+import "./socket.js"
 
 const send_display_list = (gfx_list) => {
     start_render = performance.now()

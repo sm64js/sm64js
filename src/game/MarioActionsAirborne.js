@@ -35,7 +35,7 @@ const update_air_without_turn = (m) => {
 
 }
 
-const common_air_action_step = (m, landAction, animation, stepArg) => {
+const common_air_action_step = (m, landAction, animation, stepArg, temp) => {
 
     ///TODO add this, this moves mario slightly while in air by joystick
     update_air_without_turn(m)
@@ -46,6 +46,7 @@ const common_air_action_step = (m, landAction, animation, stepArg) => {
         case Mario.AIR_STEP_NONE:
             Mario.set_mario_animation(m, animation); break
         case Mario.AIR_STEP_LANDED:
+            if (temp) m.faceAngle[1] += 0x8000
             Mario.set_mario_action(m, landAction, 0); break
         case Mario.AIR_STEP_HIT_WALL:
             Mario.set_mario_animation(m, animation)
@@ -451,6 +452,21 @@ const act_air_hit_wall = (m) => {
     return 0
 }
 
+const act_thrown_backward = (m) => {
+
+    const landAction = Mario.ACT_FREEFALL_LAND
+
+    ///play sound
+
+    const animation = Mario.MARIO_ANIM_BACKWARD_AIR_KB
+    //// temporary should be common_air_knockback_step
+    common_air_action_step(m, landAction, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB, 1)
+    m.marioObj.header.gfx.angle = [0, m.faceAngle[1] + 0x8000, 0]
+
+    m.forwardVel *= 0.98
+    return 0
+}
+
 export const mario_execute_airborne_action = (m) => {
 
     switch (m.action) {
@@ -470,6 +486,7 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_SLIDE_KICK: return act_slide_kick(m)
         case Mario.ACT_GROUND_POUND: return act_ground_pound(m)
         case Mario.ACT_AIR_HIT_WALL: return act_air_hit_wall(m)
+        case Mario.ACT_THROWN_BACKWARD: return act_thrown_backward(m)
         default: throw "unkown action airborne"
     }
 }

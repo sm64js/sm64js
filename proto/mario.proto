@@ -9,6 +9,7 @@ message MarioMsg {
   int32 skinID = 2;
   int32 animID = 3;
   int32 animFrame = 4;
-  repeated sint32 pos = 5;
-  repeated sint32 angle = 6;
+  uint32 socketID = 5;
+  repeated sint32 pos = 6;
+  repeated sint32 angle = 7;
 }

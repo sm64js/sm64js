@@ -1,4 +1,4 @@
-// source: proto/mario.proto
+// source: Programming/sm64js/proto/mario.proto
 /**
  * @fileoverview
  * @enhanceable
@@ -222,7 +222,7 @@ proto.MarioListMsg.prototype.clearMarioList = function() {
  * @private {!Array<number>}
  * @const
  */
-proto.MarioMsg.repeatedFields_ = [5,6];
+proto.MarioMsg.repeatedFields_ = [6,7];
 
 
 
@@ -259,8 +259,9 @@ proto.MarioMsg.toObject = function(includeInstance, msg) {
     skinid: jspb.Message.getFieldWithDefault(msg, 2, 0),
     animid: jspb.Message.getFieldWithDefault(msg, 3, 0),
     animframe: jspb.Message.getFieldWithDefault(msg, 4, 0),
-    posList: (f = jspb.Message.getRepeatedField(msg, 5)) == null ? undefined : f,
-    angleList: (f = jspb.Message.getRepeatedField(msg, 6)) == null ? undefined : f
+    socketid: jspb.Message.getFieldWithDefault(msg, 5, 0),
+    posList: (f = jspb.Message.getRepeatedField(msg, 6)) == null ? undefined : f,
+    angleList: (f = jspb.Message.getRepeatedField(msg, 7)) == null ? undefined : f
   };
 
   if (includeInstance) {
@@ -314,10 +315,14 @@ proto.MarioMsg.deserializeBinaryFromReader = function(msg, reader) {
       msg.setAnimframe(value);
       break;
     case 5:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setSocketid(value);
+      break;
+    case 6:
       var value = /** @type {!Array<number>} */ (reader.readPackedSint32());
       msg.setPosList(value);
       break;
-    case 6:
+    case 7:
       var value = /** @type {!Array<number>} */ (reader.readPackedSint32());
       msg.setAngleList(value);
       break;
@@ -378,17 +383,24 @@ proto.MarioMsg.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getSocketid();
+  if (f !== 0) {
+    writer.writeUint32(
+      5,
+      f
+    );
+  }
   f = message.getPosList();
   if (f.length > 0) {
     writer.writePackedSint32(
-      5,
+      6,
       f
     );
   }
   f = message.getAngleList();
   if (f.length > 0) {
     writer.writePackedSint32(
-      6,
+      7,
       f
     );
   }
@@ -468,11 +480,29 @@ proto.MarioMsg.prototype.setAnimframe = function(value) {
 
 
 /**
- * repeated sint32 pos = 5;
+ * optional uint32 socketID = 5;
+ * @return {number}
+ */
+proto.MarioMsg.prototype.getSocketid = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.MarioMsg} returns this
+ */
+proto.MarioMsg.prototype.setSocketid = function(value) {
+  return jspb.Message.setProto3IntField(this, 5, value);
+};
+
+
+/**
+ * repeated sint32 pos = 6;
  * @return {!Array<number>}
  */
 proto.MarioMsg.prototype.getPosList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 5));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 6));
 };
 
 
@@ -481,7 +511,7 @@ proto.MarioMsg.prototype.getPosList = function() {
  * @return {!proto.MarioMsg} returns this
  */
 proto.MarioMsg.prototype.setPosList = function(value) {
-  return jspb.Message.setField(this, 5, value || []);
+  return jspb.Message.setField(this, 6, value || []);
 };
 
 
@@ -491,7 +521,7 @@ proto.MarioMsg.prototype.setPosList = function(value) {
  * @return {!proto.MarioMsg} returns this
  */
 proto.MarioMsg.prototype.addPos = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 5, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 6, value, opt_index);
 };
 
 
@@ -505,11 +535,11 @@ proto.MarioMsg.prototype.clearPosList = function() {
 
 
 /**
- * repeated sint32 angle = 6;
+ * repeated sint32 angle = 7;
  * @return {!Array<number>}
  */
 proto.MarioMsg.prototype.getAngleList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 6));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 7));
 };
 
 
@@ -518,7 +548,7 @@ proto.MarioMsg.prototype.getAngleList = function() {
  * @return {!proto.MarioMsg} returns this
  */
 proto.MarioMsg.prototype.setAngleList = function(value) {
-  return jspb.Message.setField(this, 6, value || []);
+  return jspb.Message.setField(this, 7, value || []);
 };
 
 
@@ -528,7 +558,7 @@ proto.MarioMsg.prototype.setAngleList = function(value) {
  * @return {!proto.MarioMsg} returns this
  */
 proto.MarioMsg.prototype.addAngle = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 6, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 7, value, opt_index);
 };
 
 

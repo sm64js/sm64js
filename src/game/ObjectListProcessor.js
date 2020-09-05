@@ -6,6 +6,7 @@ import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands
 import * as Mario from "./Mario"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { detect_object_collisions } from "./ObjectCollisions"
+import { getExtraMarios } from "../socket"
 
 
 class ObjectListProcessor {
@@ -65,6 +66,7 @@ class ObjectListProcessor {
             return blankObj
         })
 
+
     }
 
     update_objects() {
@@ -78,10 +80,10 @@ class ObjectListProcessor {
         })
 
         ///Update Other Mario Behaviors
-        window.extraMarios.forEach(extraMario => {
+        getExtraMarios().forEach(extraMario => {
             this.gCurrentObject = {
                 bhvScript: { commands: window.bhvExtraMario, index: 4 },
-                rawData: [...window.marioObject.rawData],
+                rawData: [...this.marioPlayerObj.rawData],
                 bhvStack: [4]
             }
             this.gCurrentObject.rawData[oPosX] = extraMario.pos[0]
@@ -112,8 +114,7 @@ class ObjectListProcessor {
 
     bhv_mario_update() {
 
-        //console.log(this.gCurrentObject)
-        window.marioObject = this.gCurrentObject
+        this.marioPlayerObj = this.gCurrentObject
         Mario.execute_mario_action(this.gCurrentObject.marioIndex)
         this.copy_mario_state_to_object(this.gCurrentObject.marioIndex)
         

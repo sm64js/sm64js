@@ -421,14 +421,10 @@ class GeoRenderer {
                 animID: gfx.unk38.animID,
             })
 
-            const extraMarios = getExtraMarios()
 
-            if (extraMarios) {
-                extraMarios.forEach((marioData) => {
-                    this.geo_process_extra_mario(marioData, gfx)
-                    marioData.animFrame++
-                })
-            }
+            getExtraMarios().forEach((marioData) => {
+                this.geo_process_extra_mario(marioData, gfx)
+            })
             
         }
 

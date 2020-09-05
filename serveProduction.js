@@ -3,7 +3,7 @@ const { MarioMsg, MarioListMsg } = require("./proto/mario_pb")
 const port = 80
 
 //// Sockets
-const connectedSockets = {}
+const allSockets = {}
 
 let currentId = 0
 const generateID = () => {
@@ -18,57 +18,80 @@ const sendDataWithOpcode = (bytes, opcode, socket) => {
     socket.send(newbytes, true)
 }
 
+const broadcastDataWithOpcode = (bytes, opcode) => {
+    const newbytes = new Uint8Array(bytes.length + 1)
+    newbytes.set([opcode], 0)
+    newbytes.set(bytes, 1)
+    Object.values(allSockets).forEach(s => { s.socket.send(newbytes, true) })
+}
+
+
 const processPlayerData = (socket, bytes) => {
-    try {
-        const decodedMario = MarioMsg.deserializeBinary(bytes)
-        const filteredMarios = Object.entries(connectedSockets).filter(([id, data]) => {
-            return id != socket.id && data.valid > 10
-        }).map(([id]) => { return connectedSockets[id].protomsg })
+    const decodedMario = MarioMsg.deserializeBinary(bytes)
+    const filteredMarios = Object.entries(allSockets).filter(([id, data]) => {
+        return id != socket.id && data.valid > 10
+    }).map(([id]) => { return allSockets[id].protomsg })
 
-        const mariolistmsg = new MarioListMsg()
-        mariolistmsg.setMarioList(filteredMarios)
-        //socket.send(mariolistmsg.serializeBinary(), true)
-        sendDataWithOpcode(mariolistmsg.serializeBinary(), 0, socket)
+    const mariolistmsg = new MarioListMsg()
+    mariolistmsg.setMarioList(filteredMarios)
+    //socket.send(mariolistmsg.serializeBinary(), true)
+    sendDataWithOpcode(mariolistmsg.serializeBinary(), 0, socket)
 
-        //Pretty strict validation
-        for (let i = 0; i < 3; i++) {
-            if (isNaN(decodedMario.getPosList()[i])) return
-            if (isNaN(decodedMario.getAngleList()[i])) return
-        }
-        if (isNaN(decodedMario.getAnimframe())) return
-        if (isNaN(decodedMario.getAnimid()) || 0 > decodedMario.getAnimid()) return
-        if (isNaN(decodedMario.getSkinid()) || 0 > decodedMario.getSkinid() || decodedMario.getSkinid() > 9) return
-        decodedMario.setPlayername(String(decodedMario.getPlayername()).substring(0, 14))
-        decodedMario.setSocketid(socket.id)
+    //Pretty strict validation
+    for (let i = 0; i < 3; i++) {
+        if (isNaN(decodedMario.getPosList()[i])) return
+        if (isNaN(decodedMario.getAngleList()[i])) return
+    }
+    if (isNaN(decodedMario.getAnimframe())) return
+    if (isNaN(decodedMario.getAnimid()) || 0 > decodedMario.getAnimid()) return
+    if (isNaN(decodedMario.getSkinid()) || 0 > decodedMario.getSkinid() || decodedMario.getSkinid() > 9) return
+    decodedMario.setPlayername(String(decodedMario.getPlayername()).substring(0, 14))
+    decodedMario.setSocketid(socket.id)
 
-        /// Data is Valid
-        const valid = connectedSockets[socket.id] ? ++connectedSockets[socket.id].valid : 0
-        connectedSockets[socket.id] = { valid, protomsg: decodedMario, socket }
-        clearTimeout(socket.mariodataTimeout)
-        socket.mariodataTimeout = setTimeout(() => { connectedSockets[socket.id].valid = 0 }, 500)
-    } catch (err) { console.log(err) }
+    /// Data is Valid
+    //const valid = allSockets[socket.id] ? ++allSockets[socket.id].valid : 0
+    //allSockets[socket.id] = { valid, protomsg: decodedMario }
+    allSockets[socket.id].protomsg = decodedMario
+    allSockets[socket.id].valid++
+    clearTimeout(socket.mariodataTimeout)
+    socket.mariodataTimeout = setTimeout(() => { allSockets[socket.id].valid = 0 }, 500)
 }
 
 
 const processKickAttack = (bytes) => {
     const kickMsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
     const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify({ angle: kickMsg.angle }))
-    sendDataWithOpcode(responseMsg, 2, connectedSockets[kickMsg.id].socket)
+    sendDataWithOpcode(responseMsg, 2, allSockets[kickMsg.id].socket)
+}
+
+const processChat = (socket, bytes) => {
+    const chatmsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
+    chatmsg.socketID = socket.id
+    const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify(chatmsg))
+    broadcastDataWithOpcode(responseMsg, 1)
 }
 
 const server = new App({}).ws('/*', {
-    open: (socket) => { socket.id = generateID() },
+    open: (socket) => {
+        socket.id = generateID()
+        allSockets[socket.id] = { valid: 0, socket }
+        const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify({ id: socketID }))
+        sendDataWithOpcode(responseMsg, 3, socket)
+    },
     message: (socket, bytes) => {
-        const opcode = Buffer.from(bytes)[0]
-        switch (opcode) {
-            case 0: processPlayerData(socket, bytes.slice(1)); break
-            case 2: processKickAttack(bytes.slice(1)); break
-            default: console.log("unknown opcode: " + opcode)
-        }
+        try {
+            const opcode = Buffer.from(bytes)[0]
+            switch (opcode) {
+                case 0: processPlayerData(socket, bytes.slice(1)); break
+                case 1: processChat(socket, bytes.slice(1)); break
+                case 2: processKickAttack(bytes.slice(1)); break
+                default: console.log("unknown opcode: " + opcode)
+            }
+        } catch (err) { console.log(err) }
     },
     close: (socket) => {
         clearTimeout(socket.mariodataTimeout)
-        delete connectedSockets[socket.id]
+        delete allSockets[socket.id]
     }
 })
 

@@ -1,11 +1,23 @@
 import * as Keydrown from "./keydrown.min.js"
+import { sendChat } from "./socket.js"
 
 /////// Keyboard / Gamepad Input ////////
 
+let textboxfocus = false
+
+
 //// Prevent scrolling for arrow keys
 window.addEventListener("keydown", (e) => {
+    textboxfocus = $("#chatbox").is(':focus') || $("#playerNameInput").is(':focus')
+
+    if ($("#chatbox").is(':focus') && e.keyCode == 13) {
+        sendChat(document.getElementById('chatbox').value)
+        document.getElementById('chatbox').value = ""
+    }
+
     // space and arrow keys
-    if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+    if (textboxfocus) return
+    if ([32, 37, 38, 39, 40].includes(e.keyCode) > -1) {
         e.preventDefault()
     }
 }, false)
@@ -249,12 +261,13 @@ window.loadDefaultControls = () => {
 }
 
 export const playerInputUpdate = () => {
+
     Keydrown.tick()
 
     const keyboardFinal = {}, gamepadFinal = {}
 
     Object.entries(keyboardButtonMapping).forEach(([key, value]) => {
-        keyboardFinal[key] = Boolean(keyboardButtons[value])
+        keyboardFinal[key] = Boolean(keyboardButtons[value]) && !textboxfocus
     })
 
     const gamepadIndex = window.switchGamepad ? 1 : 0

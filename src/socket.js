@@ -8,6 +8,7 @@ if (url.port == 8080) url.port = 80
 const socket = new WebSocket(url.href)
 
 window.myMario = {
+    me: true,
     pos: [0, 0, 0],
     angle: [0, 0, 0],
     animFrame: 0, animID: -1,
@@ -16,7 +17,8 @@ window.myMario = {
 }
 
 export const serverData = {
-    extraMarios: []
+    extraMarios: [],
+    extraPlayersByID: {}
 }
 
 export const gameData = {}
@@ -40,6 +42,22 @@ const recvMarioData = (mariolistmsg) => {
             playerName: mario.getPlayername()
         }
     })
+    serverData.extraMarios.forEach(marioData => {
+        if (serverData.extraPlayersByID[marioData.socketID] == undefined)
+            serverData.extraPlayersByID[marioData.socketID] = {}
+        Object.assign(serverData.extraPlayersByID[marioData.socketID], { marioData })
+    })
+}
+
+const recvMyID = (msg) => {
+    serverData.extraPlayersByID[msg.id] = { marioData: window.myMario }
+    window.myMario.socketID = msg.id
+}
+
+const recvChat = (chatmsg) => {
+    if (serverData.extraPlayersByID[chatmsg.socketID] == undefined)
+        serverData.extraPlayersByID[chatmsg.socketID] = {}
+    Object.assign(serverData.extraPlayersByID[chatmsg.socketID], { chatData: { msg: chatmsg.msg, timer: 70 } })
 }
 
 const recvKick = (kickData) => {
@@ -78,13 +96,30 @@ socket.onopen = () => {
         if (msgBytes.length == 0) return
         switch (opcode) {
             case 0: recvMarioData(MarioListMsg.deserializeBinary(msgBytes).getMarioList()); break
+            case 1: recvChat(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             case 2: recvKick(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
+            case 3: recvMyID(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             default: throw "unknown websocket opcode"
         }
     }
 }
 
+export const main_loop_one_iteration = () => {
+
+    serverData.extraMarios.forEach((marioData) => {
+        marioData.animFrame++
+    })
+
+    Object.values(serverData.extraPlayersByID).forEach(data => {
+        if (data.chatData.timer > 0) data.chatData.timer--
+    })
+}
+
 export const getExtraMarios = () => { return serverData.extraMarios } 
+
+export const sendChat = (msg) => {
+    sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify({ msg })), 1)
+}
 
 export const processKick = (myMarioPos, myMarioAngle) => {
     const angleRadians = myMarioAngle / 0x8000 * Math.PI

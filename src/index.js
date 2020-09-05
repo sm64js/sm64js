@@ -2,8 +2,9 @@
 import { GameInstance as Game } from "./game/Game"
 import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
+import  * as Socket from "./socket.js"
 import "./template.css"
-import "./socket.js"
+
 
 const send_display_list = (gfx_list) => {
     start_render = performance.now()
@@ -18,6 +19,7 @@ const produce_one_frame = () => {
     n_frames++
 
     GFX.start_frame()
+    Socket.main_loop_one_iteration()
     Game.main_loop_one_iteration()
 
     /// Audio TODO

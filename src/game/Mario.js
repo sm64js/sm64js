@@ -756,7 +756,7 @@ const update_mario_joystick_inputs = (m, playerInput) => {
 
     const mag = playerInput.stickMag
 
-    m.intendedMag = mag / 2.0
+    m.intendedMag = mag / 2.0 
 
     if (m.intendedMag > 0.0) {
         m.intendedYaw = atan2s(-playerInput.stickY, playerInput.stickX) + m.area.camera.yaw

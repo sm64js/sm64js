@@ -41,6 +41,18 @@ export const mario_bonk_reflection = (m, negateSpeed) => {
     else m.faceAngle[1] += 0x8000
 }
 
+export const stop_and_set_height_to_floor = (m) => {
+    const marioObj = m.marioObj
+
+    Mario.set_forward_vel(m, 0.0)
+    m.vel[1] = 0.0
+
+    m.pos[1] = m.floorHeight
+
+    marioObj.header.gfx.pos = [...m.pos]
+    marioObj.header.gfx.angle = [ 0, m.faceAngle[1], 0 ]
+}
+
 const perform_air_quarter_step = (m, intendedPos, stepArg) => {
 
     const nextPos = [...intendedPos]

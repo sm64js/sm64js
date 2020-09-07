@@ -60,6 +60,8 @@ export const INT_STATUS_HIT_MINE = (1 << 21) /* 0x00200000 */
 export const INT_STATUS_STOP_RIDING = (1 << 22) /* 0x00400000 */
 export const INT_STATUS_TOUCHED_BOB_OMB = (1 << 23) /* 0x00800000 */
 
+let sDelayInvincTimer = false
+
 const reset_mario_pitch = (m) => {
     /// TODO: WATER JUMP || SHOT FROM CANNON || ACT_FLYING
 }
@@ -139,7 +141,6 @@ const mario_get_collided_object = (m, interactType) => {
 
 export const mario_process_interactions = (m) => {
 
-
     if (!(m.action & Mario.ACT_FLAG_INTANGIBLE) && m.collidedObjInteractTypes != 0) {
 
         for (let i = 0; i < 31; i++) {
@@ -156,6 +157,10 @@ export const mario_process_interactions = (m) => {
 
             }
         }
+    }
+
+    if (m.invincTimer > 0 && !sDelayInvincTimer) {
+        m.invincTimer -= 1
     }
 
     m.flags &= ~Mario.MARIO_PUNCHING & ~Mario.MARIO_KICKING & ~Mario.MARIO_TRIPPING

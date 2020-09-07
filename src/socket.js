@@ -68,6 +68,15 @@ const recvKick = (kickData) => {
     Mario.set_mario_action(m, Mario.ACT_THROWN_BACKWARD, 0)
 }
 
+const recvKnockUp = () => {
+    const m = gameData.marioState
+    if (m.invincTimer == 0) {
+        m.invincTimer = 30
+        m.vel[1] = 70
+        Mario.set_mario_action(m, Mario.ACT_KNOCKED_UP, 0)
+    }
+}
+
 const sendMarioData = () => {
     const mariomsg = new MarioMsg()
     mariomsg.setPlayername(window.myMario.playerName)
@@ -97,6 +106,7 @@ socket.onopen = () => {
             case 1: recvChat(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             case 2: recvKick(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             case 3: recvMyID(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
+            case 4: recvKnockUp(); break
             default: throw "unknown websocket opcode"
         }
     }
@@ -146,4 +156,21 @@ export const processKick = (myMarioPos, myMarioAngle) => {
             sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify(kickMsg)), 2)
         }
     })
+}
+
+export const processDiveAttack = (mypos, speed) => {
+    if (speed > 25) {
+
+        serverData.extraMarios.forEach(marioData => {
+            const distance = Math.sqrt(
+                Math.pow(marioData.pos[0] - mypos[0], 2) +
+                Math.pow(marioData.pos[1] - mypos[1], 2) +
+                Math.pow(marioData.pos[2] - mypos[2], 2)
+            )
+            if (distance < 150) { ///trigger hit
+                const diveHitMsg = { id: marioData.socketID }
+                sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify(diveHitMsg)), 4)
+            }
+        })
+    }
 }

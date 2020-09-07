@@ -16,6 +16,7 @@ import { oMarioWalkingPitch, oInteractStatus, oPosX, oPosY, oPosZ, oMoveAnglePit
 import * as Interact from "./Interaction"
 import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
 import { gameData as socketGameData } from "../socket"
+import { mario_execute_cutscene_action } from "./MarioActionsCutscene"
 
 ////// Mario Constants
 export const ANIM_FLAG_NOLOOP = (1 << 0) // 0x01
@@ -110,6 +111,7 @@ export const MARIO_ANIM_GROUND_POUND_LANDING = 0x3A
 export const MARIO_ANIM_TRIPLE_JUMP_GROUND_POUND = 0x3B
 export const MARIO_ANIM_START_GROUND_POUND = 0x3C
 export const MARIO_ANIM_GROUND_POUND = 0x3D
+export const MARIO_ANIM_BOTTOM_STUCK_IN_GROUND = 0x3E
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -208,6 +210,10 @@ export const ACT_RIDING_HOOT = 0x000004A8
 export const ACT_SLEEPING = 0x0C000203
 export const ACT_START_SLEEPING = 0x0C400202
 export const ACT_THROWN_BACKWARD = 0x010208BE
+export const ACT_BUTT_STUCK_IN_GROUND = 0x0002033B
+
+
+export const ACT_KNOCKED_UP = 0x010208BF
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -643,6 +649,21 @@ export const set_mario_animation = (m, targetAnimID) => {
 
 }
 
+export const set_anim_to_frame = (m, animFrame) => {
+    const animInfo = m.marioObj.header.gfx.unk38
+    const curAnim = animInfo.curAnim
+
+    if (animInfo.animAccel) {
+        throw "implement set anim to frame with accel"
+    } else {
+        if (curAnim.flags & ANIM_FLAG_FORWARD) {
+            animInfo.animFrame = animFrame + 1
+        } else {
+            animInfo.animFrame = animFrame - 1
+        }
+    }
+}
+
 export const set_mario_anim_with_accel = (m, targetAnimID, accel) => {
     const o = m.marioObj
     m.animation.targetAnim = m.animation.animList[targetAnimID]
@@ -733,6 +754,9 @@ export const execute_mario_action = (marioIndex) => {
 
                 case ACT_GROUP_AUTOMATIC:
                     inLoop = mario_execute_automatic_action(LevelUpdate.gMarioState[marioIndex]); break
+
+                case ACT_GROUP_CUTSCENE:
+                    inLoop = mario_execute_cutscene_action(LevelUpdate.gMarioState[marioIndex]); break
 
                 default: throw "unkown action group"
             }

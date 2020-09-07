@@ -61,6 +61,12 @@ const processKickAttack = (bytes) => {
     sendDataWithOpcode(responseMsg, 2, allSockets[kickMsg.id].socket)
 }
 
+const processDiveAttack = (bytes) => {
+    const kickMsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
+    const responseMsg = new TextEncoder("utf-8").encode("")
+    sendDataWithOpcode(responseMsg, 4, allSockets[kickMsg.id].socket)
+}
+
 const processChat = (socket, bytes) => {
     const chatmsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
     chatmsg.socketID = socket.id
@@ -82,6 +88,7 @@ const server = new App({}).ws('/*', {
                 case 0: processPlayerData(socket, bytes.slice(1)); break
                 case 1: processChat(socket, bytes.slice(1)); break
                 case 2: processKickAttack(bytes.slice(1)); break
+                case 4: processDiveAttack(bytes.slice(1)); break
                 default: console.log("unknown opcode: " + opcode)
             }
         } catch (err) { console.log(err) }

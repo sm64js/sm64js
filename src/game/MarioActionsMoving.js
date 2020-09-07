@@ -4,6 +4,7 @@ import { perform_ground_step } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
 import { oMarioWalkingPitch } from "../include/object_constants"
 import { mario_update_punch_sequence } from "./MarioActionsObject"
+import { processDiveAttack } from "../socket"
 
 const apply_slope_accel = (m) => {
     m.slideYaw = m.faceAngle[1]
@@ -685,6 +686,7 @@ const act_long_jump_land = (m) => {
 }
 
 const act_dive_slide = (m) => {
+
     if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & (Mario.INPUT_A_PRESSED | Mario.INPUT_B_PRESSED))) {
         return Mario.set_mario_action(m, m.forwardVel > 0.0 ? Mario.ACT_FORWARD_ROLLOUT : Mario.ACT_BACKWARD_ROLLOUT, 0)
     }
@@ -697,6 +699,7 @@ const act_dive_slide = (m) => {
     }
 
     common_slide_action(m, Mario.ACT_STOMACH_SLIDE_STOP, Mario.ACT_FREEFALL, Mario.MARIO_ANIM_DIVE)
+    processDiveAttack(m.pos, m.forwardVel)
     return 0
 }
 

@@ -1,6 +1,7 @@
 import * as Mario from "./Mario"
 import { perform_air_step, mario_bonk_reflection } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
+import { processDiveAttack } from "../socket"
 
 const update_air_without_turn = (m) => {
     let sidewaysSpeed = 0.0
@@ -202,6 +203,7 @@ const act_long_jump = (m) => {
 }
 
 const act_dive = (m) => {
+
     //play sounds
 
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_DIVE)
@@ -228,6 +230,8 @@ const act_dive = (m) => {
             break
         default: throw "unimplemented air step case in act dive"
     }
+
+    processDiveAttack(m.pos, m.forwardVel)
 
     return 0
 }
@@ -467,6 +471,16 @@ const act_thrown_backward = (m) => {
     return 0
 }
 
+const act_knocked_up = (m) => {
+
+    const landAction = Mario.ACT_BUTT_STUCK_IN_GROUND
+    const animation = Mario.MARIO_ANIM_BACKWARD_AIR_KB
+    common_air_action_step(m, landAction, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB, 1)
+    m.forwardVel = 0
+    return 0
+
+}
+
 export const mario_execute_airborne_action = (m) => {
 
     switch (m.action) {
@@ -487,6 +501,7 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_GROUND_POUND: return act_ground_pound(m)
         case Mario.ACT_AIR_HIT_WALL: return act_air_hit_wall(m)
         case Mario.ACT_THROWN_BACKWARD: return act_thrown_backward(m)
+        case Mario.ACT_KNOCKED_UP: return act_knocked_up(m)
         default: throw "unkown action airborne"
     }
 }

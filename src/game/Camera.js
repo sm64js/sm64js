@@ -260,6 +260,8 @@ class Camera {
 
     camera_approach_symmetric_bool(currentWrapper, target, increment) {
         let dist = target - currentWrapper.current
+        if (dist < -32768) dist += 65536
+        if (dist > 32767) dist -= 65536
 
         if (increment < 0) {
             increment = -1 * increment
@@ -615,7 +617,9 @@ class Camera {
 
         let nextYawVel
         let yawVel = 0
-        const yawGoal = this.gPlayerCameraState.faceAngle[1] + (180 * 0x10000 / 360)
+        let yawGoal = parseInt(this.gPlayerCameraState.faceAngle[1] + (180 * 0x10000 / 360))
+        if (yawGoal > 32767) yawGoal -= 65536
+
         let closeToMario = 0
         let ceilHeight = 20000
 
@@ -698,7 +702,7 @@ class Camera {
             }
             if (yawVel != 0) {
                 const yawWrapper = { current: parseInt(yaw) }
-                this.camera_approach_symmetric_bool(yawWrapper, parseInt(yawGoal), parseInt(yawVel))
+                this.camera_approach_symmetric_bool(yawWrapper, yawGoal, parseInt(yawVel))
                 yaw = yawWrapper.current
             }
         }

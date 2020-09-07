@@ -111,6 +111,17 @@ export const geo_obj_init = (graphNode, sharedChild, pos, angle) => {
 
 }
 
+export const geo_obj_init_animation = (graphNode, anim) => {
+
+    if (graphNode.unk38.curAnim != anim) {
+        graphNode.unk38.curAnim = anim
+        graphNode.unk38.animFrame = anim.unk04 + ((anim.flags & Mario.ANIM_FLAG_FORWARD) ? 1 : -1)
+        graphNode.unk38.animAccel = 0
+        graphNode.unk38.animYTrans = 0
+    }
+
+}
+
 export const geo_reset_object_node = (graphNode) =>  {
     const zeroVec = [0, 0, 0]
     const oneVec = [1, 1, 1]

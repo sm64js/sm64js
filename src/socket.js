@@ -57,7 +57,7 @@ const recvMyID = (msg) => {
 const recvChat = (chatmsg) => {
     if (serverData.extraPlayersByID[chatmsg.socketID] == undefined)
         serverData.extraPlayersByID[chatmsg.socketID] = {}
-    Object.assign(serverData.extraPlayersByID[chatmsg.socketID], { chatData: { msg: chatmsg.msg, timer: 70 } })
+    Object.assign(serverData.extraPlayersByID[chatmsg.socketID], { chatData: { msg: chatmsg.msg, timer: 80 } })
 }
 
 const recvKick = (kickData) => {
@@ -66,7 +66,6 @@ const recvKick = (kickData) => {
     m.vel[1] = 50
     m.faceAngle[1] = kickData.angle
     Mario.set_mario_action(m, Mario.ACT_THROWN_BACKWARD, 0)
-
 }
 
 const sendMarioData = () => {
@@ -93,7 +92,6 @@ socket.onopen = () => {
         const bytes = new Uint8Array(await message.data.arrayBuffer())
         const opcode = bytes[0]
         const msgBytes = bytes.slice(1)
-        if (msgBytes.length == 0) return
         switch (opcode) {
             case 0: recvMarioData(MarioListMsg.deserializeBinary(msgBytes).getMarioList()); break
             case 1: recvChat(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
@@ -111,11 +109,25 @@ export const main_loop_one_iteration = () => {
     })
 
     Object.values(serverData.extraPlayersByID).forEach(data => {
-        if (data.chatData.timer > 0) data.chatData.timer--
+        if (data.chatData && data.chatData.timer > 0) data.chatData.timer--
     })
 }
 
-export const getExtraMarios = () => { return serverData.extraMarios } 
+export const getExtraMarios = () => {
+    return serverData.extraMarios
+} 
+
+export const getExtraRenderData = (socketID) => {
+
+    if (socketID == undefined) return { skinID: window.myMario.skinID }
+
+    const data = serverData.extraPlayersByID[socketID]
+    return {
+        chat: (data.chatData && data.chatData.timer > 0) ? data.chatData.msg : null,
+        skinID: data.marioData.skinID,
+        playerName: data.marioData.me ? null : data.marioData.playerName
+    }
+}
 
 export const sendChat = (msg) => {
     sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify({ msg })), 1)

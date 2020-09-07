@@ -71,6 +71,7 @@ export const oMarioWalkingPitch = 0x22
 export const oAngleVelPitch = 0x23
 export const oAngleVelYaw = 0x24
 export const oAngleVelRoll = 0x25
+export const oAnimations = 0x26
 
 export const oInteractType = 0x2A
 export const oInteractStatus = 0x2B

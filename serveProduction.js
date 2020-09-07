@@ -34,7 +34,6 @@ const processPlayerData = (socket, bytes) => {
 
     const mariolistmsg = new MarioListMsg()
     mariolistmsg.setMarioList(filteredMarios)
-    //socket.send(mariolistmsg.serializeBinary(), true)
     sendDataWithOpcode(mariolistmsg.serializeBinary(), 0, socket)
 
     //Pretty strict validation
@@ -49,8 +48,6 @@ const processPlayerData = (socket, bytes) => {
     decodedMario.setSocketid(socket.id)
 
     /// Data is Valid
-    //const valid = allSockets[socket.id] ? ++allSockets[socket.id].valid : 0
-    //allSockets[socket.id] = { valid, protomsg: decodedMario }
     allSockets[socket.id].protomsg = decodedMario
     allSockets[socket.id].valid++
     clearTimeout(socket.mariodataTimeout)
@@ -75,7 +72,7 @@ const server = new App({}).ws('/*', {
     open: (socket) => {
         socket.id = generateID()
         allSockets[socket.id] = { valid: 0, socket }
-        const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify({ id: socketID }))
+        const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify({ id: socket.id }))
         sendDataWithOpcode(responseMsg, 3, socket)
     },
     message: (socket, bytes) => {

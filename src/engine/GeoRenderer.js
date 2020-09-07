@@ -389,7 +389,7 @@ class GeoRenderer {
 
                     if (object.marioIndex == 0) {
                         //// sending my own custom gfx opcode to set skin id
-                        this.geo_append_display_list([Gbi.gsSetPlayerData(window.myMario.skinID, "")], 1) 
+                        this.geo_append_display_list([Gbi.gsSetPlayerData(window.myMario.socketID)], 1) 
                     }
 
                     this.gCurGraphNodeObject = node.wrapper
@@ -433,7 +433,7 @@ class GeoRenderer {
 
     geo_process_extra_mario(marioData, gfx) {
 
-        const { pos, angle, animFrame, animID, skinID, playerName } = marioData
+        const { pos, angle, animFrame, animID, socketID } = marioData
 
         const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
 
@@ -447,7 +447,7 @@ class GeoRenderer {
         if (this.obj_is_in_view(gfx, this.gMatStack[this.gMatStackIndex])) {
 
             //// sending my own custom gfx opcode to set skin id and playerName
-            this.geo_append_display_list([Gbi.gsSetPlayerData(skinID, playerName)], 1)
+            this.geo_append_display_list([Gbi.gsSetPlayerData(socketID)], 1)
 
             const animList = gMarioAnimData
             this.gCurrAnimFrame = animFrame

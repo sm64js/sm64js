@@ -59,6 +59,10 @@ class Area {
             if (this.gCurrentArea.terrainData) {
                 SurfaceLoad.load_area_terrain(index, this.gCurrentArea.terrainData, null, null)
             }
+
+            if (this.gCurrentArea.objectSpawnInfos) {
+                ObjectListProc.spawn_objects_from_info(this.gCurrentArea.objectSpawnInfos)
+            }
         }
 
     }

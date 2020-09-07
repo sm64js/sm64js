@@ -54,4 +54,9 @@ export const MODEL_LEVEL_GEOMETRY_12               = 0x12
 export const MODEL_LEVEL_GEOMETRY_13               = 0x13
 export const MODEL_LEVEL_GEOMETRY_14               = 0x14
 export const MODEL_LEVEL_GEOMETRY_15               = 0x15
-export const MODEL_LEVEL_GEOMETRY_16               = 0x16
+export const MODEL_LEVEL_GEOMETRY_16 = 0x16
+
+// castle grounds
+export const MODEL_CASTLE_GROUNDS_VCUTM_GRILL       =   0x36
+export const MODEL_CASTLE_GROUNDS_FLAG              =   0x37
+export const MODEL_CASTLE_GROUNDS_CANNON_GRILL      =   0x38

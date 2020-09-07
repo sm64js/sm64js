@@ -13,6 +13,11 @@ window.addEventListener("keydown", (e) => {
     if ($("#chatbox").is(':focus') && e.keyCode == 13) {
         sendChat(document.getElementById('chatbox').value)
         document.getElementById('chatbox').value = ""
+        document.getElementById('chatbox').blur()
+    }
+
+    if ($("#playerNameInput").is(':focus') && e.keyCode == 13) {
+        document.getElementById('playerNameInput').blur()
     }
 
     // space and arrow keys

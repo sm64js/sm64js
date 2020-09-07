@@ -1,5 +1,6 @@
 import { WebGLInstance as WebGL } from "./WebGL"
 import * as Gbi from "../include/gbi"
+import { getExtraRenderData } from "../socket"
 
 const precomp_shaders = [
     0x01200200,
@@ -97,7 +98,8 @@ export class n64GfxProcessor {
 
         this.customData = {
             playerName: "",
-            skinID: 0
+            skinID: 0,
+            chat: ""
         }
 
         this.color_combiner_pool = []
@@ -490,6 +492,7 @@ export class n64GfxProcessor {
                 case Gbi.G_CULL_BACK:
                     if (cross >= 0) return
                     break
+                case Gbi.G_CULL_BOTH: return
             }
         }
 
@@ -922,7 +925,7 @@ export class n64GfxProcessor {
             d.u = U; d.v = V
 
             if (v.special == "nameplate" && w < 2000 && !d.clip_rej) {
-                this.custom_draw_nameplate(x, y, w)
+                this.custom_draw_text(x, y, w)
             }
 
             Object.assign(d, { x, y, z, w })
@@ -936,23 +939,42 @@ export class n64GfxProcessor {
         }
     }
 
-    custom_draw_nameplate(x, y, w) {
-        
-        const radius = 3
-
+    custom_draw_text(x, y, w) {
         const pixelX = ((x / w) * 0.5 + 0.5) * canvas2d.width
         const pixelY = ((y / w) * -0.5 + 0.5) * canvas2d.height
 
-        context2d.globalAlpha = 0.8
-        context2d.font = "bold 14px verdana, sans-serif"
-        context2d.textAlign = "center"
-        context2d.fillStyle = "#9400D3"
-        context2d.fillText(this.customData.playerName, pixelX, pixelY)
+        if (this.customData.playerName) {
+            context2d.globalAlpha = 0.8
+            context2d.font = "bold 14px verdana, sans-serif"
+            context2d.textAlign = "center"
+            context2d.fillStyle = "#9400D3"
+            context2d.fillText(this.customData.playerName, pixelX, pixelY)
+        }
+
+        if (this.customData.chat) {
+            context2d.font = "bold 16px verdana, sans-serif"
+            const width = context2d.measureText(this.customData.chat).width
+
+            context2d.fillStyle = "#FFFFFF"
+            context2d.globalAlpha = 0.8
+            context2d.rect(pixelX - (width/2) - 5, pixelY - 50, width + 10, 30)
+            context2d.fill()
+            context2d.globalCompositeOperation = 'source-over'
+            
+
+            context2d.globalAlpha = 1.0
+            context2d.font = "bold 16px verdana, sans-serif"
+            context2d.textAlign = "center"
+            context2d.fillStyle = "#000000"
+            context2d.fillText(this.customData.chat, pixelX, pixelY - 30)
+            context2d.globalCompositeOperation = 'destination-over'
+        }
+        
+
     }
 
-    custom_set_player_data(skinID, playerName) { 
-        this.customData.skinID = skinID
-        this.customData.playerName = playerName
+    custom_set_player_data(socketID) { 
+        this.customData = getExtraRenderData(socketID)
     }
 
     run_dl(commands) {
@@ -1027,7 +1049,7 @@ export class n64GfxProcessor {
                     this.dp_fill_rectangle(args.ulx, args.uly, args.lrx, args.lry)
                     break
                 case Gbi.G_SETPLAYERDATA:
-                    this.custom_set_player_data(args.skinID, args.playerName)
+                    this.custom_set_player_data(args.socketID)
                     break
                 case Gbi.G_DL:
                     const displayList = args.childDisplayList.call ? args.childDisplayList(this.customData.skinID) : args.childDisplayList
@@ -1058,11 +1080,8 @@ export class n64GfxProcessor {
         window.totalTriangles = 0
         this.sp_reset()
 
-        const canvas = document.querySelector('#textCanvas')
-        const context = canvas.getContext('2d')
-        context.clearRect(0, 0, canvas.width, canvas.height)
-
         WebGL.start_frame()
+        canvas2d.width = canvas2d.width
         this.run_dl(commands)
         this.flush()
 

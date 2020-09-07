@@ -1,9 +1,11 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
-import { oFlags, oInteractType, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer } from "../include/object_constants"
+import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 import { bhv_extra_mario_base_loop } from "./behaviors/extra_mario.inc"
+import { bhv_castle_flag_init } from "./behaviors/bhv_castle_flag_init.inc"
+import { castle_grounds_seg7_anims_flags } from "../levels/castle_grounds/areas/1/11/anim.inc"
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
 const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -65,4 +67,14 @@ export const bhvStaticObject = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.break },
+]
+
+export const bhvCastleFlagWaving = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.load_animations, args: { field: oAnimations, anims: castle_grounds_seg7_anims_flags } },
+    { command: BhvCmds.animate, args: { animIndex: 0 } },
+    { command: BhvCmds.call_native, args: { func: bhv_castle_flag_init } },
+    { command: BhvCmds.begin_loop },
+    { command: BhvCmds.end_loop },
 ]

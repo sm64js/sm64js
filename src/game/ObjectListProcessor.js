@@ -173,10 +173,8 @@ class ObjectListProcessor {
                 object.respawnInfoType = RESPAWN_INFO_TYPE_32
                 object.respawnInfo = spawnInfo.behaviorArg
 
-
-                object.marioIndex = this.totalMarios++
-
                 if (spawnInfo.behaviorArg & 0x01) { // Is mario
+                    object.marioIndex = this.totalMarios++
                     if (this.gMarioObject) { //2nd Mario
                         this.gMarioObject.push(object)
                     } else {  ///OG Mario

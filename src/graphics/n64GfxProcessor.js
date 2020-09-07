@@ -1,6 +1,5 @@
 import { WebGLInstance as WebGL } from "./WebGL"
 import * as Gbi from "../include/gbi"
-import { getExtraRenderData } from "../socket"
 
 const precomp_shaders = [
     0x01200200,
@@ -1026,7 +1025,6 @@ export class n64GfxProcessor {
         this.sp_reset()
 
         WebGL.start_frame()
-        canvas2d.width = canvas2d.width
         this.run_dl(commands)
         this.flush()
 

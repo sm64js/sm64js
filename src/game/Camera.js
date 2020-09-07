@@ -1010,7 +1010,7 @@ class Camera {
         if ((m.action == ACT_SLEEPING) || (m.action == ACT_START_SLEEPING)) {
             throw "sleeping"
         } else {
-            const wrapper = {}
+            const wrapper = { current: this.sFOVState.fov }
             this.camera_approach_symmetric_bool(wrapper, 45, (45 - this.sFOVState.fov) / 30)
         }
     }

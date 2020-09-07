@@ -383,8 +383,8 @@ class GeoRenderer {
             }
 
             if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) { 
-                if (object.header.gfx.sharedChild) {
 
+                if (object.header.gfx.sharedChild) {
                     this.gCurGraphNodeObject = node.wrapper
                     object.header.gfx.sharedChild.parent = object.header.gfx.node
                     this.geo_process_single_node(object.header.gfx.sharedChild)
@@ -403,6 +403,7 @@ class GeoRenderer {
             object.header.gfx.throwMatrix = null
 
         }
+
     }
 
     geo_process_object_parent(node) {

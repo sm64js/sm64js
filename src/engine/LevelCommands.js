@@ -220,6 +220,30 @@ class LevelCommands {
         this.sCurrentScript.index++
     }
 
+    place_object(args) {
+
+        const val7 = 1 << (Area.gCurrActNum - 1)
+
+        if (this.sCurrAreaIndex != -1 && (args[0] & val7 || args[0] == 0x1F)) {
+            const model = args[1]
+            const spawnInfo = {
+                startPos: [ args[2], args[3], args[4] ],
+                startAngle: [args[5] * 0x8000 / 180, args[6] * 0x8000 / 180, args[7] * 0x8000 / 180],
+                areaIndex: this.sCurrAreaIndex,
+                activeAreaIndex: this.sCurrAreaIndex,
+                behaviorArg: args[8],
+                behaviorScript: args[9],
+                unk18: Area.gLoadedGraphNodes[model],
+                next: Area.gAreas[this.sCurrAreaIndex].objectSpawnInfos
+            }
+
+            Area.gAreas[this.sCurrAreaIndex].objectSpawnInfos = spawnInfo
+
+        }
+
+        this.sCurrentScript.index++
+    }
+
     terrain(args) {
         if (this.sCurrAreaIndex != -1)
             Area.gAreas[this.sCurrAreaIndex].terrainData = args[0]
@@ -251,7 +275,7 @@ class LevelCommands {
     }
 
     jump_link(args) {
-        this.sStackTop.push({ script: this.sCurrentScript.commands, index: this.sCurrentScript.index++ })
+        this.sStackTop.push({ commands: this.sCurrentScript.commands, index: ++this.sCurrentScript.index })
         this.start_new_script(args[0])
     }
 
@@ -261,6 +285,10 @@ class LevelCommands {
         } else {
             this.sCurrentScript.index++
         }
+    }
+
+    return(args) {
+        this.sCurrentScript = this.sStackTop.pop()
     }
 
     start_new_script(level_script) {

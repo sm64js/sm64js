@@ -65,37 +65,6 @@ class ObjectListProcessor {
             blankObj.header.next = blankObj
             return blankObj
 
-/*            const newObjectNode = { //ObjectNode
-                next: null, prev: null,
-                gfx: { //GraphObjectNode
-                    node: { //GraphNode
-                        type: null,
-                        flags: null,
-                        prev: null,
-                        next: null,
-                        children: null,
-                        wrapper: null
-                    }, 
-                    sharedChild: { //GraphNode
-                        type: null,
-                        flags: null,
-                        prev: null,
-                        next: null,
-                        children: null
-                    },
-                    wrapperObjectNode: null
-                },
-                wrapperObject: null
-            }
-
-            newObjectNode.gfx.wrapperObjectNode = newObjectNode
-            newObjectNode.gfx.node.wrapper = newObjectNode.gfx
-
-            const newObject = { header: newObjectNode, activeFlags: 0 }
-
-            newObjectNode.wrapperObject = newObject
-
-            return newObjectNode*/
         })
 
     }
@@ -191,8 +160,8 @@ class ObjectListProcessor {
                 object.respawnInfoType = RESPAWN_INFO_TYPE_32
                 object.respawnInfo = spawnInfo.behaviorArg
 
-
                 if (spawnInfo.behaviorArg & 0x01) { // Is mario
+                    object.marioIndex = this.totalMarios++
                     if (this.gMarioObject) { //2nd Mario
                         object.OG = false
                         this.gMarioObject.push(object)

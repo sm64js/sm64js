@@ -1,13 +1,17 @@
 const express = require('express')
 const app = express()
-//const fileUpload = require('express-fileupload')
 const http = require('http')
 const server = http.Server(app)
+const port = 80
+
+app.use(express.static(__dirname + '/dist'))
+server.listen(port, () => { console.log('Serving Files') })
+
+////// Necessary for server side rom extraction
 const fs = require('fs')
 const { v4: uuidv4 } = require('uuid')
 const { promisify } = require('util')
 const { spawn } = require('child_process')
-const port = 80
 
 const mkdir = promisify(fs.mkdir)
 
@@ -78,10 +82,6 @@ const extractJsonFromRomFile = async (dir) => {
     })
 }
 
-app.use(express.static(__dirname + '/dist'))
-//app.use(fileUpload())
-server.listen(port, () => { console.log('Serving Files') })
-
 app.get("/romTransfer", async (req, res) => {
 
     const uid = uuidv4()
@@ -93,19 +93,3 @@ app.get("/romTransfer", async (req, res) => {
     res.send(await extractJsonFromRomFile(uid))
 
 })
-
-// app.post("/romUpload", async (req, res) => {
-// 	const uid = uuidv4()
-// 	await mkdir('extractTools/' + uid)
-//
-// 	req.files.filetoupload.mv('extractTools/' + uid + '/baserom.us.z64', async (err) => {
-// 		if (err) {
-// 			console.log(err)
-// 			fs.rmdirSync('extractTools/' + uid, { recursive: true })
-// 			return res.send('Fail')
-// 		}
-//
-//         res.send(await extractJsonFromRomFile(uid))
-//
-// 	})
-// })

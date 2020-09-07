@@ -30,21 +30,25 @@ export const G_SETZIMG = 27
 export const G_SETCIMG = 28
 export const G_RDPLOADSYNC = 29
 
-export const G_ZBUFFER = 1
-export const G_SHADE = 2
-export const G_TEXTURE_ENABLE = 4
-export const G_SHADING_SMOOTH = 8
-export const G_CULL_FRONT = 16
-export const G_CULL_BACK = 32
-export const G_FOG = 16
-export const G_LIGHTING = 32
-export const G_TEXTURE_GEN = 64
-export const G_TEXTURE_GEN_LINEAR = 128
-export const G_CLIPPING = 256
-export const G_CULL_BOTH = 48
-export const G_LOD = 1024
 
-export const G_ON	= 1
+/// Custom Opcodes
+export const G_SETPLAYERDATA = 30
+
+export const G_ZBUFFER = 0x00000001
+export const G_SHADE = 0x00000004
+export const G_TEXTURE_ENABLE = 0x00000002
+export const G_SHADING_SMOOTH = 0x00000200
+export const G_CULL_FRONT = 0x00001000
+export const G_CULL_BACK = 0x00002000
+export const G_FOG = 0x00010000
+export const G_LIGHTING = 0x00020000
+export const G_TEXTURE_GEN = 0x00040000
+export const G_TEXTURE_GEN_LINEAR = 0x00080000
+export const G_CLIPPING = 0x00000000
+export const G_CULL_BOTH = 0x00003000
+export const G_LOD = 0x00100000
+
+export const G_ON  = 1
 export const G_OFF = 0
 
 

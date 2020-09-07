@@ -1,6 +1,6 @@
 import { ObjectListProcessorInstance as ObjListProc } from "../game/ObjectListProcessor"
-import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction } from "../include/object_constants"
-import { GRAPH_RENDER_CYLBOARD } from "./graph_node"
+import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction, oAnimations } from "../include/object_constants"
+import { GRAPH_RENDER_CYLBOARD, geo_obj_init_animation } from "./graph_node"
 
 class BehaviorCommands {
 
@@ -68,6 +68,22 @@ class BehaviorCommands {
 
         value &= 0xFFFF
         ObjListProc.gCurrentObject.rawData[objectOffset] |= value
+
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    load_animations(args) {
+        ObjListProc.gCurrentObject.rawData[args.field] = args.anims
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    animate(args) {
+        const animIndex = args.animIndex
+        const animations = ObjListProc.gCurrentObject.rawData[oAnimations]
+
+        geo_obj_init_animation(ObjListProc.gCurrentObject.header.gfx, animations[animIndex])
 
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE

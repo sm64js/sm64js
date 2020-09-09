@@ -1,5 +1,6 @@
 const { App } = require('@sifrr/server')
 const { MarioMsg, MarioListMsg } = require("./proto/mario_pb")
+const ws_port = 5001
 const port = 80
 
 //// Sockets
@@ -74,7 +75,7 @@ const processChat = (socket, bytes) => {
     broadcastDataWithOpcode(responseMsg, 1)
 }
 
-const server = new App({}).ws('/*', {
+new App({}).ws('/*', {
     open: (socket) => {
         socket.id = generateID()
         allSockets[socket.id] = { valid: 0, socket }
@@ -97,14 +98,16 @@ const server = new App({}).ws('/*', {
         clearTimeout(socket.mariodataTimeout)
         delete allSockets[socket.id]
     }
-})
-
-server.file('/', "dist/index.html").folder('/', "dist")
-
-server.listen(port, () => { console.log('Starting') })
+}).listen(ws_port, () => { console.log('Starting websocker server') })
 
 
+const express = require('express')
+const app = express()
+const http = require('http')
+const server = http.Server(app)
 
+app.use(express.static(__dirname + '/dist'))
+server.listen(port, () => { console.log('Serving Files with express server') })
 
 
 

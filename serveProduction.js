@@ -111,16 +111,14 @@ server.listen(port, () => { console.log('Serving Files with express server') })
 
 
 
-/////// necessary for server rom extraction
+/////// necessary for server side rom extraction
 
-/*
 const { promisify } = require('util')
 const { spawn } = require('child_process')
 const { v4: uuidv4 } = require('uuid')
-const http = require('http')
 const fs = require('fs')
 
-server.get('/romTransfer', async (req, res) => {
+app.get('/romTransfer', async (req, res) => {
     console.log("rom transfer")
 
     const uid = uuidv4()
@@ -129,7 +127,7 @@ server.get('/romTransfer', async (req, res) => {
     const file = fs.createWriteStream('extractTools/' + uid + '/baserom.us.z64')
     await fileDownload(file, 'http://' + req.query.romExternal)
 
-    res.send(await extractJsonFromRomFile(uid))
+    return res.send(await extractJsonFromRomFile(uid))
 })
 
 const mkdir = promisify(fs.mkdir)
@@ -149,7 +147,7 @@ const fileDownload = (file, url) => {
             http.get(url, (response) => {
                 const stream = response.pipe(file)
                 stream.on('error', () => { reject('Fail') })
-                stream.on('finish', () => { resolve() })
+                stream.on('finish', () => { resolve('Success') })
             })
         } catch {
             console.log("HTTP GET Error")
@@ -199,4 +197,4 @@ const extractJsonFromRomFile = async (dir) => {
             resolve('Fail')
         }
     })
-}*/
+}

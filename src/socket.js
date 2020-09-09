@@ -5,7 +5,7 @@ const url = new URL(window.location.href)
 
 let websocketServerPath = "" 
 
-if (url.protocol == "https") {
+if (url.protocol == "https:") {
     url.protocol = url.protocol.replace('https', 'wss')
     websocketServerPath =  url.href + "websocket/"
 } else {

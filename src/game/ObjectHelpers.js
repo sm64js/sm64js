@@ -51,8 +51,19 @@ export const cur_obj_push_mario_away = (radius) => {
     const marioDist = Math.sqrt(Math.pow(marioRelX, 2) + Math.pow(marioRelZ, 2))
 
     if (marioDist < radius) {
-        LevelUpdate.gMarioState[0].pos[0] += (radius - marioDist) / radius * marioRelX
-        LevelUpdate.gMarioState[0].pos[2] += (radius - marioDist) / radius * marioRelZ
+        const newPos = [
+            LevelUpdate.gMarioState[0].pos[0] + (radius - marioDist) / radius * marioRelX,
+            LevelUpdate.gMarioState[0].pos[1],
+            LevelUpdate.gMarioState[0].pos[2] + (radius - marioDist) / radius * marioRelZ
+        ]
+        const floorWrapper = {}
+        let height = ObjectListProc.SurfaceCollision.find_floor(newPos[0], newPos[1], newPos[2], floorWrapper)
+
+        if (floorWrapper.floor == null || height == -11000) return
+
+        LevelUpdate.gMarioState[0].pos[0] = newPos[0]
+        LevelUpdate.gMarioState[0].pos[1] = height
+        LevelUpdate.gMarioState[0].pos[2] = newPos[2]
     }
 }
 

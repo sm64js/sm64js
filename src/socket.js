@@ -2,10 +2,19 @@ import { MarioMsg, MarioListMsg } from "../proto/mario_pb"
 import * as Mario from "./game/Mario"
 
 const url = new URL(window.location.href)
-url.protocol = url.protocol.replace('http', 'ws')
-if (url.port == 8080) url.port = 80
 
-const socket = new WebSocket(url.href)
+let websocketServerPath = "" 
+
+if (url.protocol == "https") {
+    url.protocol = url.protocol.replace('https', 'wss')
+    websocketServerPath =  url.href + "websocket/"
+} else {
+    url.protocol = url.protocol.replace('http', 'ws')
+    url.port = 5001
+    websocketServerPath = url.href
+}
+
+const socket = new WebSocket(websocketServerPath)
 
 window.myMario = {
     me: true,

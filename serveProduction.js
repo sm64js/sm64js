@@ -32,7 +32,7 @@ const broadcastDataWithOpcode = (bytes, opcode) => {
 const sendMainUpdate = (socket) => {
     const filteredMarios = Object.entries(allSockets).filter(([id, data]) => {
         return id != socket.id && data.valid != 0
-    }).map(([id]) => { return allSockets[id].protomsg })
+    }).map(([id]) => { return allSockets[id].decodedMario })
 
     const mariolistmsg = new MarioListMsg()
     mariolistmsg.setMarioList(filteredMarios)
@@ -55,7 +55,7 @@ const processPlayerData = (socket, bytes) => {
     decodedMario.setSocketid(socket.id)
 
     /// Data is Valid
-    allSockets[socket.id].protomsg = decodedMario
+    allSockets[socket.id].decodedMario = decodedMario
     allSockets[socket.id].valid = 30
 }
 
@@ -80,6 +80,12 @@ const processChat = (socket, bytes) => {
         chatmsg.msg = chatmsg.msg.replace(regEx, "*****")
     })
     chatmsg.socketID = socket.id
+
+    const decodedMario = Object.values(allSockets).find(data => data.socket.id == socket.id).decodedMario
+
+    if (decodedMario == undefined) return
+    chatmsg.sender = decodedMario.getPlayername()
+    
     const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify(chatmsg))
     broadcastDataWithOpcode(responseMsg, 1)
 }

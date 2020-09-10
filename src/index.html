@@ -82,8 +82,8 @@
                     </select>
                 </div>
                 <div class="col-sm-3 " style="justify-content:center">
-                     <input id="playerNameInput" type="text" class="form-control" placeholder="enter name"
-                               onchange="window.myMario.playerName = this.value.substring(0,14)">
+                    <input id="playerNameInput" type="text" class="form-control" placeholder="enter name"
+                           onchange="window.myMario.playerName = this.value.substring(0,14)">
                 </div>
             </div>
 
@@ -94,8 +94,11 @@
                 <canvas id="textCanvas" width="640" height="480"></canvas>
             </div>
 
-            <div class="row">
-                 <input id="chatbox" type="text" autocomplete="off" class="form-control" placeholder="Chat box">
+            <div class="row" style="justify-content:center">
+                <div id="chatlog"></div>
+            </div>
+            <div class="row" style="justify-content:center;">
+                <input id="chatbox" type="text" autocomplete="off" class="form-control" placeholder="Chat box">
             </div>
 
             <br />
@@ -118,10 +121,10 @@
                 </div>
             </div>
             <!--            <div class="row" style="justify-content:center;">   removing this feature for now
-                    <h6 style="padding-right:10px"> Adjust Game Speed: </h6>
-                    <input id="slider" type="range" style="width:300px" min="1" max="60" value="30">
-                    <h6 id="fps" style="padding-left:10px"> 30 fps </h6>
-                </div>-->
+        <h6 style="padding-right:10px"> Adjust Game Speed: </h6>
+        <input id="slider" type="range" style="width:300px" min="1" max="60" value="30">
+        <h6 id="fps" style="padding-left:10px"> 30 fps </h6>
+    </div>-->
 
             <br />
             <br />

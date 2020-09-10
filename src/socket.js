@@ -68,6 +68,9 @@ const recvChat = (chatmsg) => {
     if (serverData.extraPlayersByID[chatmsg.socketID] == undefined)
         serverData.extraPlayersByID[chatmsg.socketID] = {}
     Object.assign(serverData.extraPlayersByID[chatmsg.socketID], { chatData: { msg: chatmsg.msg, timer: 80 } })
+    const chatlog = document.getElementById("chatlog")
+    chatlog.innerHTML += '<strong>' + chatmsg.sender + '</strong>: ' + chatmsg.msg + '<br/>'
+    chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 }
 
 const recvKick = (kickData) => {

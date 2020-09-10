@@ -19,8 +19,8 @@ const produce_one_frame = () => {
     n_frames++
 
     GFX.start_frame()
-    Socket.main_loop_one_iteration()
     Game.main_loop_one_iteration()
+    Socket.main_loop_one_iteration()
 
     /// Audio TODO
 

@@ -29,13 +29,6 @@ const broadcastDataWithOpcode = (bytes, opcode) => {
 
 const processPlayerData = (socket, bytes) => {
     const decodedMario = MarioMsg.deserializeBinary(bytes)
-    const filteredMarios = Object.entries(allSockets).filter(([id, data]) => {
-        return id != socket.id && data.valid > 10
-    }).map(([id]) => { return allSockets[id].protomsg })
-
-    const mariolistmsg = new MarioListMsg()
-    mariolistmsg.setMarioList(filteredMarios)
-    sendDataWithOpcode(mariolistmsg.serializeBinary(), 0, socket)
 
     //Pretty strict validation
     for (let i = 0; i < 3; i++) {
@@ -50,9 +43,7 @@ const processPlayerData = (socket, bytes) => {
 
     /// Data is Valid
     allSockets[socket.id].protomsg = decodedMario
-    allSockets[socket.id].valid++
-    clearTimeout(socket.mariodataTimeout)
-    socket.mariodataTimeout = setTimeout(() => { allSockets[socket.id].valid = 0 }, 500)
+    allSockets[socket.id].valid = 30
 }
 
 
@@ -95,11 +86,31 @@ new App({}).ws('/*', {
         } catch (err) { console.log(err) }
     },
     close: (socket) => {
-        clearTimeout(socket.mariodataTimeout)
         delete allSockets[socket.id]
     }
 }).listen(ws_port, () => { console.log('Starting websocker server') })
 
+
+const game_loop = setInterval(() => {
+    Object.values(allSockets).forEach(data => {
+        if (data.valid > 0) data.valid--
+    })
+
+    Object.keys(allSockets).forEach(socketID => {
+        const socket = allSockets[socketID].socket
+
+        const filteredMarios = Object.entries(allSockets).filter(([id, data]) => {
+            return id != socket.id && data.valid != 0
+        }).map(([id]) => { return allSockets[id].protomsg })
+
+        const mariolistmsg = new MarioListMsg()
+        mariolistmsg.setMarioList(filteredMarios)
+        sendDataWithOpcode(mariolistmsg.serializeBinary(), 0, socket)
+    })
+
+}, 15)
+
+//// Express Static serving
 
 const express = require('express')
 const app = express()
@@ -108,7 +119,6 @@ const server = http.Server(app)
 
 app.use(express.static(__dirname + '/dist'))
 server.listen(port, () => { console.log('Serving Files with express server') })
-
 
 
 /////// necessary for server side rom extraction

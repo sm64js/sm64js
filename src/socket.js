@@ -27,7 +27,8 @@ window.myMario = {
 
 export const serverData = {
     extraMarios: [],
-    extraPlayersByID: {}
+    extraPlayersByID: {},
+    socketOpen: false
 }
 
 export const gameData = {}
@@ -97,14 +98,9 @@ const sendMarioData = () => {
     sendDataWithOpcode(mariomsg.serializeBinary(), 0)
 }
 
-const initSendInterval = () => {
-    const sendDataInterval = setInterval(() => { sendMarioData() }, 15)
-    socket.onclose = () => { clearInterval(sendDataInterval) }
-}
-
 socket.onopen = () => {
 
-    initSendInterval()
+    serverData.socketOpen = true
 
     socket.onmessage = async (message) => {
         const bytes = new Uint8Array(await message.data.arrayBuffer())
@@ -119,13 +115,13 @@ socket.onopen = () => {
             default: throw "unknown websocket opcode"
         }
     }
+
+    socket.onclose = () => { serverData.socketOpen = false }
 }
 
 export const main_loop_one_iteration = () => {
 
-    serverData.extraMarios.forEach((marioData) => {
-        marioData.animFrame++
-    })
+    if (serverData.socketOpen) sendMarioData()
 
     Object.values(serverData.extraPlayersByID).forEach(data => {
         if (data.chatData && data.chatData.timer > 0) data.chatData.timer--

@@ -1,7 +1,10 @@
 const { App } = require('@sifrr/server')
 const { MarioMsg, MarioListMsg } = require("./proto/mario_pb")
+const fs = require('fs')
 const ws_port = 5001
 const port = 80
+
+const badwords = fs.readFileSync('otherTools/profanity_filter.txt').toString().split('\n')
 
 //// Sockets
 const allSockets = {}
@@ -71,6 +74,11 @@ const processDiveAttack = (bytes) => {
 
 const processChat = (socket, bytes) => {
     const chatmsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
+    badwords.forEach(word => {
+        const searchMask = word.slice(0, word.length - 1)
+        const regEx = new RegExp(searchMask, "ig");
+        chatmsg.msg = chatmsg.msg.replace(regEx, "*****")
+    })
     chatmsg.socketID = socket.id
     const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify(chatmsg))
     broadcastDataWithOpcode(responseMsg, 1)
@@ -125,7 +133,6 @@ server.listen(port, () => { console.log('Serving Files with express server') })
 const { promisify } = require('util')
 const { spawn } = require('child_process')
 const { v4: uuidv4 } = require('uuid')
-const fs = require('fs')
 
 app.get('/romTransfer', async (req, res) => {
     console.log("rom transfer")

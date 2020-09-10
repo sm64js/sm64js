@@ -75,7 +75,7 @@ const processDiveAttack = (bytes) => {
 const processChat = (socket, bytes) => {
     const chatmsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
     badwords.forEach(word => {
-        const searchMask = word.slice(0, word.length - 1)
+        const searchMask = word.slice(0, word.length)
         const regEx = new RegExp(searchMask, "ig");
         chatmsg.msg = chatmsg.msg.replace(regEx, "*****")
     })

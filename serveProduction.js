@@ -26,6 +26,16 @@ const broadcastDataWithOpcode = (bytes, opcode) => {
     Object.values(allSockets).forEach(s => { s.socket.send(newbytes, true) })
 }
 
+const sendMainUpdate = (socket) => {
+    const filteredMarios = Object.entries(allSockets).filter(([id, data]) => {
+        return id != socket.id && data.valid != 0
+    }).map(([id]) => { return allSockets[id].protomsg })
+
+    const mariolistmsg = new MarioListMsg()
+    mariolistmsg.setMarioList(filteredMarios)
+    sendDataWithOpcode(mariolistmsg.serializeBinary(), 0, socket)
+}
+
 
 const processPlayerData = (socket, bytes) => {
     const decodedMario = MarioMsg.deserializeBinary(bytes)
@@ -66,6 +76,14 @@ const processChat = (socket, bytes) => {
     broadcastDataWithOpcode(responseMsg, 1)
 }
 
+const game_loop = setInterval(() => {
+    Object.values(allSockets).forEach(data => {
+        sendMainUpdate(data.socket)
+        if (data.valid > 0) data.valid--
+    })
+
+}, 15)
+
 new App({}).ws('/*', {
     open: (socket) => {
         socket.id = generateID()
@@ -90,25 +108,6 @@ new App({}).ws('/*', {
     }
 }).listen(ws_port, () => { console.log('Starting websocker server') })
 
-
-const game_loop = setInterval(() => {
-    Object.values(allSockets).forEach(data => {
-        if (data.valid > 0) data.valid--
-    })
-
-    Object.keys(allSockets).forEach(socketID => {
-        const socket = allSockets[socketID].socket
-
-        const filteredMarios = Object.entries(allSockets).filter(([id, data]) => {
-            return id != socket.id && data.valid != 0
-        }).map(([id]) => { return allSockets[id].protomsg })
-
-        const mariolistmsg = new MarioListMsg()
-        mariolistmsg.setMarioList(filteredMarios)
-        sendDataWithOpcode(mariolistmsg.serializeBinary(), 0, socket)
-    })
-
-}, 15)
 
 //// Express Static serving
 

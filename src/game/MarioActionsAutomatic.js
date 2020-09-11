@@ -313,8 +313,8 @@ const act_ledge_grab = (m) => {
 
 const climb_up_ledge = (m) => {
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_IDLE_HEAD_LEFT)
-    m.pos[0] += 14.0 * Math.sin(m.faceAngle[1])
-    m.pos[2] += 14.0 * Math.cos(m.faceAngle[1])
+    m.pos[0] += 14.0 * Math.sin(m.faceAngle[1] / 0x8000 * Math.PI)
+    m.pos[2] += 14.0 * Math.cos(m.faceAngle[1] / 0x8000 * Math.PI)
     m.marioObj.header.gfx.pos = [...m.pos]
 }
 

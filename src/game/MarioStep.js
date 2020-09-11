@@ -69,11 +69,11 @@ const check_ledge_grab = (m, wall, intendedPos, nextPos) => {
         return 0;
     }
 
-    m.pos = [...ledgePos]
+    m.pos = [...ledgePos];
     m.floor = ledgeFloor;
     m.floorHeight = m.pos[1];
 
-    m.floorAngle = atan2s(ledgeFloor.normalz, ledgeFloor.normal.x); // undefined?
+    m.floorAngle = atan2s(ledgeFloor.normal.z, ledgeFloor.normal.x);
 
     m.faceAngle[0] = 0;
     m.faceAngle[1] = atan2s(wall.normal.z, wall.normal.x) + 0x8000;

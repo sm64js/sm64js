@@ -42,8 +42,6 @@ export const ANIM_TYPE_NO_TRANSLATION = 4
 // translation types the type is set to this
 export const ANIM_TYPE_ROTATION = 5
 
-export const MARIO_ANIM_BACKWARD_AIR_KB = 0x02
-export const MARIO_ANIM_AIR_FORWARD_KB = 0x2D 
 export const MARIO_ANIM_IDLE_HEAD_LEFT = 0xC3
 export const MARIO_ANIM_IDLE_HEAD_RIGHT = 0xC4
 export const MARIO_ANIM_IDLE_HEAD_CENTER = 0xC5

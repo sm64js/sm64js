@@ -1,5 +1,4 @@
 import { GoddardRendererInstance as GoddardRenderer } from "../goddard/GoddardRenderer"
-import * as Mario from "./Mario"
 import { GameInstance as Game } from "./Game"
 import { GEO_CONTEXT_RENDER, GEO_CONTEXT_CREATE } from "../engine/graph_node"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
@@ -13,7 +12,6 @@ class MarioMisc {
             torsoAngle: [0, 0, 0], headAngle: [0, 0, 0],
             heldObjLastPosition: [0, 0, 0]
         }
-        // this.geo_mario_tilt_torso = this.geo_mario_tilt_torso.bind(this);
     }
 
     geo_draw_mario_head_goddard(callContext, node) {

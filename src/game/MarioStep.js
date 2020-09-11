@@ -236,19 +236,6 @@ export const perform_ground_step = (m) => {
     return stepResult
 }
 
-export const stop_and_set_height_to_floor = (m) => {
-    const marioObj = m.marioObj;
-
-    Mario.set_forward_vel(m, 0.0);
-    m.vel[1] = 0.0;
-
-    //! This is responsible for some downwarps.
-    m.pos[1] = m.floorHeight;
-
-    m.marioObj.header.gfx.pos = [...m.pos]
-    m.marioObj.header.gfx.angle = [0, m.faceAngle[1], 0]
-}
-
 export const stationary_ground_step = (m) => {
 
     Mario.set_forward_vel(m, 0.0)

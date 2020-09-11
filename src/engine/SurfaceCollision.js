@@ -50,19 +50,6 @@ class SurfaceCollision {
         return numCollisions
     }
 
-    find_floor_height_relative_polar(m, angleFromMario, distFromMario) {
-        // struct Surface *floor;
-        const floor = {};
-        let floorY;
-
-        const y = Math.sin(m.faceAngle[1] + angleFromMario) * distFromMario;
-        const x = Math.cos(m.faceAngle[1] + angleFromMario) * distFromMario;
-
-        floorY = this.find_floor(m.pos[0] + y, m.pos[1] + 100.0, m.pos[2] + x, floor);
-
-        return floorY;
-    }
-
     find_floor(xPos, yPos, zPos, floorWrapper) {
         let height = -11000.0
 

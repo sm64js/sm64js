@@ -1,5 +1,6 @@
 import * as Mario from "./Mario"
 import { SURFACE_SLOW, SURFACE_CLASS_VERY_SLIPPERY, SURFACE_CLASS_SLIPPERY, SURFACE_CLASS_NOT_SLIPPERY, TERRAIN_MASK, TERRAIN_SLIDE } from "../include/surface_terrains"
+import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { perform_ground_step } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
 import { oMarioWalkingPitch } from "../include/object_constants"
@@ -153,8 +154,44 @@ const analog_stick_held_back = (m) => {
     return intendedDYaw < -0x471C || intendedDYaw > 0x471C
 }
 
-const act_walking = (m) => {
+const tilt_body_walking = (m, startYaw) => {
+    const val0C = m.marioBodyState;
+    const marioObj = m.marioObj; // unused
+    const animID = m.marioObj.header.gfx.unk38.animID;
+    let dYaw, val02, val00;
 
+    if (animID == Mario.MARIO_ANIM_WALKING || animID == Mario.MARIO_ANIM_RUNNING) {
+        dYaw = m.faceAngle[1] - startYaw;
+        //! (Speed Crash) These casts can cause a crash if (dYaw * forwardVel / 12) or
+        //! (forwardVel * 170) exceed or equal 2^31.
+        val02 = -(dYaw * m.forwardVel / 12.0);
+        val00 = (m.forwardVel * 170.0);
+
+        if (val02 > 0x1555) {
+            val02 = 0x1555;
+        }
+        if (val02 < -0x1555) {
+            val02 = -0x1555;
+        }
+
+        if (val00 > 0x1555) {
+            val00 = 0x1555;
+        }
+        if (val00 < 0) {
+            val00 = 0;
+        }
+
+        val0C.torsoAngle[2] = approach_number(val0C.torsoAngle[2], val02, 0x400, 0x400);
+        val0C.torsoAngle[0] = approach_number(val0C.torsoAngle[0], val00, 0x400, 0x400);
+        ;
+    } else {
+        val0C.torsoAngle[2] = 0;
+        val0C.torsoAngle[0] = 0;
+    }
+}
+
+const act_walking = (m) => {
+    const startYaw = m.faceAngle[1];
 /*    if (should_begin_sliding(m)) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
     }*/
@@ -197,7 +234,9 @@ const act_walking = (m) => {
         default: throw "unkown ground step in act_walking"
     }
 
-    return 0
+    check_ledge_climb_down(m);
+    tilt_body_walking(m, startYaw);
+    return false
 }
 
 const act_braking = (m) => {
@@ -289,6 +328,45 @@ const begin_walking_action = (m, forwardVel, action, actionArg) => {
     m.faceAngle[1] = m.intendedYaw
     Mario.set_forward_vel(m, forwardVel)
     return Mario.set_mario_action(m, action, actionArg)
+}
+
+const check_ledge_climb_down = (m) => {
+    const wallCols = {};
+    const floor = {};
+    let floorHeight;
+    let wall = {};
+    let wallAngle;
+    let wallDYaw;
+
+    if (m.forwardVel < 10.0) {
+        wallCols.x = m.pos[0];
+        wallCols.y = m.pos[1];
+        wallCols.z = m.pos[2];
+        wallCols.radius = 10.0;
+        wallCols.offsetY = -10.0;
+
+        if (SurfaceCollision.find_wall_collisions(wallCols) != 0) {
+            floorHeight = SurfaceCollision.find_floor(wallCols.x, wallCols.y, wallCols.z, floor);
+            if (floor != null) {
+                if (wallCols.y - floorHeight > 160.0) {
+                    wall = wallCols.walls[wallCols.numWalls - 1];
+                    wallAngle = atan2s(wall.normal.z, wall.normal.x);
+                    wallDYaw = wallAngle - m.faceAngle[1];
+
+                    if (wallDYaw > -0x4000 && wallDYaw < 0x4000) {
+                        m.pos[0] = wallCols.x - 20.0 * wall.normal.x;
+                        m.pos[2] = wallCols.z - 20.0 * wall.normal.z;
+
+                        m.faceAngle[0] = 0;
+                        m.faceAngle[1] = wallAngle + 0x8000;
+
+                        Mario.set_mario_action(m, Mario.ACT_LEDGE_CLIMB_DOWN, 0);
+                        Mario.set_mario_animation(m, Mario.MARIO_ANIM_CLIMB_DOWN_LEDGE);
+                    }
+                }
+            }
+        }
+    }
 }
 
 const act_turning_around = (m) => {

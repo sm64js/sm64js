@@ -42,6 +42,7 @@ export const ANIM_TYPE_NO_TRANSLATION = 4
 export const ANIM_TYPE_ROTATION = 5
 
 export const MARIO_ANIM_IDLE_HEAD_LEFT = 0xC3
+export const MARIO_ANIM_BACKWARD_AIR_KB = 0x02
 export const MARIO_ANIM_IDLE_HEAD_RIGHT = 0xC4
 export const MARIO_ANIM_IDLE_HEAD_CENTER = 0xC5
 export const MARIO_ANIM_WALKING = 0x48
@@ -89,6 +90,10 @@ export const MARIO_ANIM_SLOW_LONGJUMP = 0x14
 export const MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP = 0x11
 export const MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP = 0x12
 export const MARIO_ANIM_DIVE = 0x88
+export const MARIO_ANIM_IDLE_ON_LEDGE = 0x33
+export const MARIO_ANIM_CLIMB_DOWN_LEDGE = 0x1C
+export const MARIO_ANIM_FAST_LEDGE_GRAB = 0x34
+export const MARIO_ANIM_SLOW_LEDGE_GRAB = 0x00
 export const MARIO_ANIM_SLIDE_DIVE = 0x89
 export const MARIO_ANIM_SLOW_LAND_FROM_DIVE = 0x5A
 export const MARIO_ANIM_AIRBORNE_ON_STOMACH = 0x15
@@ -108,6 +113,10 @@ export const MARIO_ANIM_GROUND_POUND_LANDING = 0x3A
 export const MARIO_ANIM_TRIPLE_JUMP_GROUND_POUND = 0x3B
 export const MARIO_ANIM_START_GROUND_POUND = 0x3C
 export const MARIO_ANIM_GROUND_POUND = 0x3D
+export const MARIO_ANIM_MOVE_ON_WIRE_NET_RIGHT = 0x5C
+export const MARIO_ANIM_MOVE_ON_WIRE_NET_LEFT = 0x5D
+export const MARIO_ANIM_HANDSTAND_LEFT = 0xC6
+export const MARIO_ANIM_HANDSTAND_RIGHT = 0xC7
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -154,6 +163,7 @@ export const ACT_FREEFALL = 0x0100088C
 export const ACT_FREEFALL_LAND = 0x04000471
 export const ACT_FREEFALL_LAND_STOP = 0x0C000232
 export const ACT_DOUBLE_JUMP    = 0x03000881
+export const ACT_HARD_BACKWARD_GROUND_KB    = 0x00020460
 export const ACT_JUMP_LAND_STOP = 0x0C000230
 export const ACT_BEGIN_SLIDING = 0x00000050
 export const ACT_LONG_JUMP = 0x03000888
@@ -170,6 +180,14 @@ export const ACT_GRAB_POLE_SLOW = 0x00100341
 export const ACT_GRAB_POLE_FAST = 0x00100342
 export const ACT_HOLDING_POLE = 0x08100340
 export const ACT_CLIMBING_POLE            =  0x00100343
+export const ACT_LEDGE_CLIMB_DOWN         =  0x0000054E
+export const ACT_LEDGE_CLIMB_SLOW_1       =  0x0000054C
+export const ACT_LEDGE_GRAB               =  0x0800034B
+export const ACT_LEDGE_CLIMB_FAST         = 0x0000054F
+export const ACT_SOFT_BONK                = 0x010208B6
+export const ACT_LEDGE_CLIMB_SLOW_2       = 0x0000054D
+export const ACT_HANG_MOVING              = 0x0020054A
+export const ACT_HANGING                  = 0x00200349
 export const ACT_TOP_OF_POLE_TRANSITION   =  0x00100344
 export const ACT_TOP_OF_POLE              =  0x00100345
 export const ACT_START_HANGING = 0x08200348
@@ -201,10 +219,13 @@ export const ACT_SLIDE_KICK_SLIDE_STOP = 0x08000225
 export const ACT_GROUND_POUND = 0x008008A9
 export const ACT_GROUND_POUND_LAND = 0x0080023C
 export const ACT_BUTT_SLIDE_STOP = 0x0C00023E
+export const ACT_BUTT_SLIDE = 0x00840452
+export const ACT_HOLD_BUTT_SLIDE = 0x00840454
 export const ACT_AIR_HIT_WALL = 0x000008A7
 export const ACT_RIDING_HOOT = 0x000004A8
 export const ACT_SLEEPING = 0x0C000203
 export const ACT_START_SLEEPING = 0x0C400202
+export const ACT_RIDING_SHELL_GROUND = 0x20810446
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -775,6 +796,7 @@ const update_mario_geometry_inputs = (m) => {
     m.waterLevel = -20000.0 //find_water_level(m->pos[0], m->pos[2]);
 
     if (m.floor) {
+        if (!m.floor.normal) m.floor.normal = {z: 0, x: 0};
         m.floorAngle = atan2s(m.floor.normal.z, m.floor.normal.x)
 
         if ((m.pos[1] > m.waterLevel - 40) && mario_floor_is_slippery(m)) {

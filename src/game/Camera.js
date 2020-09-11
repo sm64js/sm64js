@@ -203,7 +203,7 @@ class Camera {
         ObjectListProc.gCheckingSurfaceCollisionsForCamera = true
 
         if (SurfaceCollision.find_floor(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 10.0, this.gPlayerCameraState.pos[2], surf) != -11000) {
-            pg.currFloorType = surf.floor.type
+            pg.currFloorType = surf.floor?.type ?? 0
         } else {
             pg.currFloorType = 0
         }

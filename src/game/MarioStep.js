@@ -53,6 +53,39 @@ export const stop_and_set_height_to_floor = (m) => {
     marioObj.header.gfx.angle = [ 0, m.faceAngle[1], 0 ]
 }
 
+
+const check_ledge_grab = (m, wall, intendedPos, nextPos) => {
+    const ledgeFloor = {}
+    const ledgePos = new Array(3)
+
+    if (m.vel[1] > 0) {  return 0 }
+
+    const displacementX = nextPos[0] - intendedPos[0]
+    const displacementZ = nextPos[2] - intendedPos[2]
+
+    // Only ledge grab if the wall displaced mario in the opposite direction of
+    // his velocity.
+    if (displacementX * m.vel[0] + displacementZ * m.vel[2] > 0.0) { return 0 }
+
+    //! Since the search for floors starts at y + 160, we will sometimes grab
+    // a higher ledge than expected (glitchy ledge grab)
+    ledgePos[0] = nextPos[0] - wall.normal.x * 60.0
+    ledgePos[2] = nextPos[2] - wall.normal.z * 60.0
+    ledgePos[1] = SurfaceCollision.find_floor(ledgePos[0], nextPos[1] + 160.0, ledgePos[2], ledgeFloor)
+
+    if (ledgePos[1] - nextPos[1] <= 100.0) { return 0 }
+
+    m.pos = [...ledgePos]
+    m.floor = ledgeFloor.floor
+    m.floorHeight = m.pos[1]
+
+    m.floorAngle = atan2s(ledgeFloor.floor.normalz, ledgeFloor.floor.normal.x)
+
+    m.faceAngle[0] = 0
+    m.faceAngle[1] = atan2s(wall.normal.z, wall.normal.x) + 0x8000
+    return 1
+}
+
 const perform_air_quarter_step = (m, intendedPos, stepArg) => {
 
     const nextPos = [...intendedPos]
@@ -89,6 +122,19 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
         return Mario.AIR_STEP_LANDED
     }
 
+    //! When the wall is not completely vertical or there is a slight wall
+    // misalignment, you can activate these conditions in unexpected situations
+    if ((stepArg & Mario.AIR_STEP_CHECK_LEDGE_GRAB) && upperWall == null && lowerWall != null) {
+        if (check_ledge_grab(m, lowerWall, intendedPos, nextPos)) {
+            return Mario.AIR_STEP_GRABBED_LEDGE
+        }
+
+        m.pos = [...nextPos]
+        m.floor = floorWrapper.floor
+        m.floorHeight = floorHeight
+        return Mario.AIR_STEP_NONE
+    }
+
     m.pos = [...nextPos]
     m.floorHeight = floorHeight
     m.floor = floorWrapper.floor
@@ -123,7 +169,7 @@ export const perform_air_step = (m, stepArg) => {
 
         if (quarterStepResult != Mario.AIR_STEP_NONE) stepResult = quarterStepResult
 
-        if (quarterStepResult == Mario.AIR_STEP_LANDED) break
+        if (quarterStepResult == Mario.AIR_STEP_LANDED || quarterStepResult == Mario.AIR_STEP_GRABBED_LEDGE) break
     }
 
     if (m.vel[1] >= 0.0) m.peakHeight = m.pos[1]

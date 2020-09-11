@@ -344,18 +344,18 @@ export const init_graph_node_perspective = (pool, graphNode, fov, near, far, nod
 
 }
 
-export const init_graph_node_generated = (pool, graphNode, gfxFunc, param) => {
+export const init_graph_node_generated = (pool, graphNode, gfxFunc, param, funcClass) => {
 
     graphNode = {
         node: {},
         param,
-        func: gfxFunc
+        fnNode: { func: gfxFunc, funcClass }
     }
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_GENERATED_LIST)
 
     if (gfxFunc) {
-        gfxFunc(GEO_CONTEXT_CREATE,  graphNode.node, null)
+        gfxFunc.call(funcClass, GEO_CONTEXT_CREATE, graphNode.node)
     }
 
     return graphNode

@@ -1,7 +1,8 @@
 import * as Mario from "./Mario"
-import { oMarioPolePos, oPosX, oPosY, oPosZ, oMoveAnglePitch, oMoveAngleRoll, oMarioPoleYawVel } from "../include/object_constants"
+import { oMarioPolePos, oPosX, oPosY, oPosZ, oMoveAnglePitch, oMoveAngleRoll, oMarioPoleYawVel, oInteractStatus } from "../include/object_constants"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { approach_number } from "../engine/math_util"
+import { stop_and_set_height_to_floor } from "./MarioStep"
 
 const POLE_NONE = 0
 const POLE_TOUCHED_FLOOR = 1
@@ -10,6 +11,16 @@ const POLE_FELL_OFF = 2
 const HANG_NONE = 0
 const HANG_HIT_CEIL_OR_OOB = 1
 const HANG_LEFT_CEIL = 2
+
+const update_hang_stationary = (m) => {
+    m.forwardVel = 0.0
+    m.slideVelX = 0.0
+    m.slideVelZ = 0.0
+
+    m.pos[1] = m.ceilHeight - 160.0
+    m.vel = [0, 0, 0]
+    m.marioObj.header.gfx.pos = [...m.pos]
+}
 
 const set_pole_position = (m, offsetY) => {
     let result = POLE_NONE
@@ -165,6 +176,229 @@ const act_climbing_pole = (m) => {
     return 0
 }
 
+const act_hanging = (m) => {
+    if (m.input & Mario.INPUT_NONZERO_ANALOG) {
+        return Mario.set_mario_action(m, Mario.ACT_HANG_MOVING, m.actionArg)
+    }
+
+    if (!(m.input & Mario.INPUT_A_DOWN)) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
+    if (m.input & Mario.INPUT_Z_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
+    }
+
+    if (m.ceil.type != SURFACE_HANGABLE) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
+    if (m.actionArg & 1) {
+        Mario.set_mario_animation(m, Mario.MARIO_ANIM_HANDSTAND_LEFT)
+    } else {
+        Mario.set_mario_animation(m, Mario.MARIO_ANIM_HANDSTAND_RIGHT)
+    }
+
+    update_hang_stationary(m)
+
+    return 0
+}
+
+const act_hang_moving = (m) => {
+    if (!(m.input & Mario.INPUT_A_DOWN)) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
+    if (m.input & Mario.INPUT_Z_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
+    }
+
+    if (m.ceil.type != SURFACE_HANGABLE) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
+    if (m.actionArg & 1) {
+        Mario.set_mario_animation(m, Mario.MARIO_ANIM_MOVE_ON_WIRE_NET_RIGHT)
+    } else {
+        Mario.set_mario_animation(m, Mario.MARIO_ANIM_MOVE_ON_WIRE_NET_LEFT)
+    }
+
+    // if (m.marioObj.header.gfx.unk38.animFrame == 12) {
+    //     play_sound(SOUND_ACTION_HANGING_STEP, m.marioObj.header.gfx.cameraToObject)
+    //     queue_rumble_data(5, 30)
+    // }
+
+    if (Mario.is_anim_past_end(m)) {
+        m.actionArg ^= 1
+        if (m.input & Mario.INPUT_UNKNOWN_5) {
+            return Mario.set_mario_action(m, Mario.ACT_HANGING, m.actionArg)
+        }
+    }
+
+    if (update_hang_moving(m) == HANG_LEFT_CEIL) {
+        Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
+    return 0
+}
+
+const let_go_of_ledge = (m) => {
+
+    m.vel[1] = 0.0
+    m.forwardVel = -8.0
+    m.pos[0] -= 60.0 * Math.sin(m.faceAngle[1] / 0x8000 * Math.PI)
+    m.pos[2] -= 60.0 * Math.cos(m.faceAngle[1] / 0x8000 * Math.PI)
+
+    const floorHeight = SurfaceCollision.find_floor(m.pos[0], m.pos[1], m.pos[2], {})
+    if (floorHeight < m.pos[1] - 100.0) {
+        m.pos[1] -= 100.0
+    } else {
+        m.pos[1] = floorHeight
+    }
+
+    return Mario.set_mario_action(m, Mario.ACT_SOFT_BONK, 0)
+}
+
+const act_ledge_grab = (m) => {
+    const intendedDYaw = m.intendedYaw - m.faceAngle[1]
+    const hasSpaceForMario = (m.ceilHeight - m.floorHeight >= 160.0)
+
+    if (m.actionTimer < 10) {
+        m.actionTimer++
+    }
+
+    if (m.floor.normal.y < 0.9063078) {
+        return let_go_of_ledge(m)
+    }
+
+    if (m.input & (Mario.INPUT_Z_PRESSED | Mario.INPUT_OFF_FLOOR)) {
+        return let_go_of_ledge(m)
+    }
+
+    if ((m.input & Mario.INPUT_A_PRESSED) && hasSpaceForMario) {
+        return Mario.set_mario_action(m, Mario.ACT_LEDGE_CLIMB_FAST, 0)
+    }
+
+    if (m.input & Mario.INPUT_UNKNOWN_10) {
+        if (m.marioObj.rawData[oInteractStatus] & Interact.INT_STATUS_MARIO_UNK1) {
+            m.hurtCounter += (m.flags & Mario.MARIO_CAP_ON_HEAD) ? 12 : 18
+        }
+        return let_go_of_ledge(m)
+    }
+    if (m.actionTimer == 10 && (m.input & Mario.INPUT_NONZERO_ANALOG)) {
+        if (intendedDYaw >= -0x4000 && intendedDYaw <= 0x4000) {
+            if (hasSpaceForMario) {
+                return Mario.set_mario_action(m, Mario.ACT_LEDGE_CLIMB_SLOW_1, 0)
+            }
+        } else {
+            return let_go_of_ledge(m)
+        }
+    }
+
+    const heightAboveFloor = m.pos[1] - Mario.find_floor_height_relative_polar(m, -0x8000, 30.0)
+    if (hasSpaceForMario && heightAboveFloor < 100.0) {
+        return Mario.set_mario_action(m, Mario.ACT_LEDGE_CLIMB_FAST, 0)
+    }
+
+    // if (m.actionArg == 0) {
+    //     play_sound_if_no_flag(m, SOUND_MARIO_WHOA, MARIO_MARIO_SOUND_PLAYED)
+    // }
+
+    stop_and_set_height_to_floor(m)
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_IDLE_ON_LEDGE)
+
+    return 0
+}
+
+
+const climb_up_ledge = (m) => {
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_IDLE_HEAD_LEFT)
+    m.pos[0] += 14.0 * Math.sin(m.faceAngle[1])
+    m.pos[2] += 14.0 * Math.cos(m.faceAngle[1])
+    m.marioObj.header.gfx.pos = [...m.pos]
+}
+
+const update_ledge_climb = (m, animation, endAction) => {
+    stop_and_set_height_to_floor(m)
+
+    Mario.set_mario_animation(m, animation)
+    if (Mario.is_anim_at_end(m)) {
+        Mario.set_mario_action(m, endAction, 0)
+        if (endAction == Mario.ACT_IDLE) {
+            climb_up_ledge(m)
+        }
+    }
+}
+
+const update_ledge_climb_camera = (m) => {
+    let sp4
+
+    if (m.actionTimer < 14) {
+        sp4 = m.actionTimer
+    } else {
+        sp4 = 14.0
+    }
+    m.statusForCamera.pos[0] = m.pos[0] + sp4 * Math.sin(m.faceAngle[1] / 0x8000 * Math.PI)
+    m.statusForCamera.pos[2] = m.pos[2] + sp4 * Math.cos(m.faceAngle[1] / 0x8000 * Math.PI)
+    m.statusForCamera.pos[1] = m.pos[1]
+    m.actionTimer++
+    m.flags |= Mario.MARIO_UNKNOWN_25
+}
+
+const act_ledge_climb_down = (m) => {
+    if (m.input & Mario.INPUT_OFF_FLOOR) {
+        return let_go_of_ledge(m)
+    }
+
+    // play_sound_if_no_flag(m, SOUND_MARIO_WHOA, MARIO_MARIO_SOUND_PLAYED)
+
+    update_ledge_climb(m, Mario.MARIO_ANIM_CLIMB_DOWN_LEDGE, Mario.ACT_LEDGE_GRAB)
+    m.actionArg = 1
+
+    return 0
+}
+
+const act_ledge_climb_slow = (m) => {
+    if (m.input & Mario.INPUT_OFF_FLOOR) {
+        return let_go_of_ledge(m)
+    }
+
+    if (m.actionTimer >= 28 && (m.input & (Mario.INPUT_NONZERO_ANALOG | Mario.INPUT_A_PRESSED | Mario.INPUT_OFF_FLOOR | Mario.INPUT_ABOVE_SLIDE))) {
+        climb_up_ledge(m)
+        return Mario.check_common_action_exits(m)
+    }
+
+    // if (m.actionTimer == 10) {
+    //     play_sound_if_no_flag(m, SOUND_MARIO_EEUH, MARIO_MARIO_SOUND_PLAYED)
+    // }
+
+    update_ledge_climb(m, Mario.MARIO_ANIM_SLOW_LEDGE_GRAB, Mario.ACT_IDLE)
+
+    update_ledge_climb_camera(m)
+    if (m.marioObj.header.gfx.unk38.animFrame == 17) {
+        m.action = Mario.ACT_LEDGE_CLIMB_SLOW_2
+    }
+
+    return 0
+}
+
+const act_ledge_climb_fast = (m) => {
+    if (m.input & Mario.INPUT_OFF_FLOOR) {
+        return let_go_of_ledge(m)
+    }
+
+    // // play_sound_if_no_flag(m, SOUND_MARIO_UH2, MARIO_MARIO_SOUND_PLAYED)
+
+    update_ledge_climb(m, Mario.MARIO_ANIM_FAST_LEDGE_GRAB, Mario.ACT_IDLE)
+
+    // if (m->marioObj->header.gfx.unk38.animFrame == 8) {
+    //     play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+    // }
+    update_ledge_climb_camera(m)
+
+    return 0
+}
+
 const act_top_of_pole_transition = (m) => {
     const marioObj = m.marioObj
 
@@ -211,6 +445,13 @@ export const mario_execute_automatic_action = (m) => {
         case Mario.ACT_CLIMBING_POLE: return act_climbing_pole(m)
         case Mario.ACT_TOP_OF_POLE_TRANSITION: return act_top_of_pole_transition(m)
         case Mario.ACT_TOP_OF_POLE: return act_top_of_pole(m)
+        case Mario.ACT_LEDGE_CLIMB_SLOW_1: return act_ledge_climb_slow(m)
+        case Mario.ACT_LEDGE_CLIMB_SLOW_2: return act_ledge_climb_slow(m)
+        case Mario.ACT_LEDGE_GRAB: return act_ledge_grab(m)
+        case Mario.ACT_LEDGE_CLIMB_DOWN: return act_ledge_climb_down(m)
+        case Mario.ACT_LEDGE_CLIMB_FAST: return act_ledge_climb_fast(m)
+        case Mario.ACT_HANGING: return act_hanging(m)
+        case Mario.ACT_HANG_MOVING: return act_hang_moving(m)
         default: throw "unknown action automatic"
     }
 }

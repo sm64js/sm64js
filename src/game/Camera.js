@@ -204,6 +204,7 @@ class Camera {
 
         if (SurfaceCollision.find_floor(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 10.0, this.gPlayerCameraState.pos[2], surf) != -11000) {
             pg.currFloorType = surf.floor.type
+            if (isNaN(surf.floor.type)) throw "error in find_mario_floor_and_ceil: " + surf.floor.type
         } else {
             pg.currFloorType = 0
         }

@@ -44,6 +44,16 @@ export const ANIM_TYPE_ROTATION = 5
 export const MARIO_ANIM_IDLE_HEAD_LEFT = 0xC3
 export const MARIO_ANIM_IDLE_HEAD_RIGHT = 0xC4
 export const MARIO_ANIM_IDLE_HEAD_CENTER = 0xC5
+export const MARIO_ANIM_BACKWARD_AIR_KB = 0x02
+export const MARIO_ANIM_IDLE_ON_LEDGE = 0x33
+export const MARIO_ANIM_CLIMB_DOWN_LEDGE = 0x1C
+export const MARIO_ANIM_FAST_LEDGE_GRAB = 0x34
+export const MARIO_ANIM_SLOW_LEDGE_GRAB = 0x00
+export const MARIO_ANIM_MOVE_ON_WIRE_NET_RIGHT = 0x5C
+export const MARIO_ANIM_MOVE_ON_WIRE_NET_LEFT = 0x5D
+export const MARIO_ANIM_HANDSTAND_LEFT = 0xC6
+export const MARIO_ANIM_HANDSTAND_RIGHT = 0xC7
+export const ACT_HARD_BACKWARD_GROUND_KB = 0x00020460
 export const MARIO_ANIM_WALKING = 0x48
 export const MARIO_ANIM_RUNNING = 0x72
 export const MARIO_ANIM_SKID_ON_GROUND = 0x0F
@@ -205,6 +215,17 @@ export const ACT_AIR_HIT_WALL = 0x000008A7
 export const ACT_RIDING_HOOT = 0x000004A8
 export const ACT_SLEEPING = 0x0C000203
 export const ACT_START_SLEEPING = 0x0C400202
+export const ACT_LEDGE_CLIMB_DOWN = 0x0000054E
+export const ACT_LEDGE_CLIMB_SLOW_1 = 0x0000054C
+export const ACT_LEDGE_GRAB = 0x0800034B
+export const ACT_LEDGE_CLIMB_FAST = 0x0000054F
+export const ACT_SOFT_BONK = 0x010208B6
+export const ACT_LEDGE_CLIMB_SLOW_2 = 0x0000054D
+export const ACT_HANG_MOVING = 0x0020054A
+export const ACT_HANGING = 0x00200349
+export const ACT_BUTT_SLIDE = 0x00840452
+export const ACT_HOLD_BUTT_SLIDE = 0x00840454
+export const ACT_RIDING_SHELL_GROUND = 0x20810446
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -775,6 +796,7 @@ const update_mario_geometry_inputs = (m) => {
     m.waterLevel = -20000.0 //find_water_level(m->pos[0], m->pos[2]);
 
     if (m.floor) {
+        if (!m.floor.normal) throw "normal missing"
         m.floorAngle = atan2s(m.floor.normal.z, m.floor.normal.x)
 
         if ((m.pos[1] > m.waterLevel - 40) && mario_floor_is_slippery(m)) {
@@ -908,6 +930,14 @@ export const mario_get_floor_class = (m) => {
     }
 
     return floorClass
+}
+
+export const find_floor_height_relative_polar = (m, angleFromMario, distFromMario) => {
+
+    const y = Math.sin((m.faceAngle[1] + angleFromMario) / 0x8000 * Math.PI) * distFromMario
+    const x = Math.cos((m.faceAngle[1] + angleFromMario) / 0x8000 * Math.PI) * distFromMario
+
+    return SurfaceCollision.find_floor(m.pos[0] + y, m.pos[1] + 100.0, m.pos[2] + x, {})
 }
 
 export const resolve_and_return_wall_collisions = (pos, offset, radius) => {

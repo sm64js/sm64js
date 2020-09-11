@@ -2,6 +2,7 @@ import { GoddardRendererInstance as GoddardRenderer } from "../goddard/GoddardRe
 import { GameInstance as Game } from "./Game"
 import { GEO_CONTEXT_RENDER, GEO_CONTEXT_CREATE } from "../engine/graph_node"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
+import * as Mario from "./Mario"
 
 class MarioMisc {
     constructor() {
@@ -13,7 +14,8 @@ class MarioMisc {
         }
     }
 
-    geo_draw_mario_head_goddard(callContext, node, c) {
+    geo_draw_mario_head_goddard(callContext, node) {
+
         let gfx = []
         const asGenerated = node.wrapper
         if (callContext == GEO_CONTEXT_CREATE) { // Create
@@ -23,6 +25,25 @@ class MarioMisc {
             Game.D_8032C6A0_classObject = GoddardRenderer
         }
         return gfx 
+    }
+
+    geo_mario_tilt_torso(callContext, node) {
+
+        const asGenerated = node.wrapper
+        const action = this.gBodyState.action
+
+        if (callContext == GEO_CONTEXT_RENDER) {
+            const rotNode = node.next
+
+            if (![Mario.ACT_WALKING, Mario.ACT_BUTT_SLIDE, Mario.ACT_HOLD_BUTT_SLIDE, Mario.ACT_RIDING_SHELL_GROUND].includes(action)) {
+                this.gBodyState.torsoAngle = [0,0,0]
+            }
+            rotNode.wrapper.rotation[0] = this.gBodyState.torsoAngle[1]
+            rotNode.wrapper.rotation[1] = this.gBodyState.torsoAngle[2]
+            rotNode.wrapper.rotation[2] = this.gBodyState.torsoAngle[0]
+        }
+        return []
+
     }
 
     geo_switch_mario_eyes(callContext, switchCase) {

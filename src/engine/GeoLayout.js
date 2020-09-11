@@ -164,9 +164,9 @@ class GeoLayout {
     }
 
     node_generated(args) {
-        const theFunc = args[1], param = args[0]
+        const theFunc = args[1], param = args[0], funcClass = args[2]
 
-        const graphNode = GraphNode.init_graph_node_generated(null, null, theFunc, param)
+        const graphNode = GraphNode.init_graph_node_generated(null, null, theFunc, param, funcClass)
 
         GraphNode.register_scene_graph_node(this, graphNode)
 

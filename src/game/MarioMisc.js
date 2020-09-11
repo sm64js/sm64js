@@ -3,6 +3,7 @@ import * as Mario from "./Mario"
 import { GameInstance as Game } from "./Game"
 import { GEO_CONTEXT_RENDER, GEO_CONTEXT_CREATE } from "../engine/graph_node"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
+import * as Mario from "./Mario"
 
 class MarioMisc {
     constructor() {
@@ -15,7 +16,8 @@ class MarioMisc {
         // this.geo_mario_tilt_torso = this.geo_mario_tilt_torso.bind(this);
     }
 
-    geo_draw_mario_head_goddard(callContext, node, c) {
+    geo_draw_mario_head_goddard(callContext, node) {
+
         let gfx = []
         const asGenerated = node.wrapper
         if (callContext == GEO_CONTEXT_CREATE) { // Create
@@ -27,23 +29,23 @@ class MarioMisc {
         return gfx 
     }
 
-    geo_mario_tilt_torso(callContext, node, c) {
-        // const asGenerated =  node;
-        // const bodyState = this.gBodyState;
-        // const action = bodyState.action;
-    
-        // if (callContext == GEO_CONTEXT_RENDER) {
-        //     const rotNode = node.next;
-    
-        //     if (action != Mario.ACT_BUTT_SLIDE && action != Mario.ACT_HOLD_BUTT_SLIDE && action != Mario.ACT_WALKING
-        //         && action != Mario.ACT_RIDING_SHELL_GROUND) {
-        //             bodyState.torsoAngle = [0,0,0];
-        //     }
-        //     rotNode.rotation[0] = bodyState.torsoAngle[1];
-        //     rotNode.rotation[1] = bodyState.torsoAngle[2];
-        //     rotNode.rotation[2] = bodyState.torsoAngle[0];
-        // }
-        return null;
+    geo_mario_tilt_torso(callContext, node) {
+
+        const asGenerated = node.wrapper
+        const action = this.gBodyState.action
+
+        if (callContext == GEO_CONTEXT_RENDER) {
+            const rotNode = node.next
+
+            if (![Mario.ACT_WALKING, Mario.ACT_BUTT_SLIDE, Mario.ACT_HOLD_BUTT_SLIDE, Mario.ACT_RIDING_SHELL_GROUND].includes(action)) {
+                this.gBodyState.torsoAngle = [0,0,0]
+            }
+            rotNode.wrapper.rotation[0] = this.gBodyState.torsoAngle[1]
+            rotNode.wrapper.rotation[1] = this.gBodyState.torsoAngle[2]
+            rotNode.wrapper.rotation[2] = this.gBodyState.torsoAngle[0]
+        }
+        return []
+
     }
 
     geo_switch_mario_eyes(callContext, switchCase) {

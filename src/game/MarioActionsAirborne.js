@@ -63,13 +63,69 @@ const common_air_action_step = (m, landAction, animation, stepArg) => {
             }
             break
         case Mario.AIR_STEP_GRABBED_LEDGE:
-            Mario.set_mario_animation(m, Mario.MARIO_ANIM_IDLE_ON_LEDGE);
-            Mario.drop_and_set_mario_action(m, Mario.ACT_LEDGE_GRAB, 0);
-            break;
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_IDLE_ON_LEDGE)
+            Mario.drop_and_set_mario_action(m, Mario.ACT_LEDGE_GRAB, 0)
+            break
         default: throw "unkown air step result in common_air_action_step"
     }
 
     return stepResult
+}
+
+const common_air_knockback_step = (m, landAction, hardFallAction, animation, speed) => {
+
+    Mario.set_forward_vel(m, speed)
+
+    let stepResult = perform_air_step(m, 0)
+    switch (stepResult) {
+        case Mario.AIR_STEP_NONE:
+            Mario.set_mario_animation(m, animation)
+            break
+
+        case Mario.AIR_STEP_LANDED:
+            // if (m.action == ACT_SOFT_BONK) {
+            //     queue_rumble_data(5, 80);
+            // }
+            // if (!check_fall_damage_or_get_stuck(m, hardFallAction)) {
+            Mario.set_mario_action(m, landAction, m.actionArg)
+            // }
+            break
+
+        case Mario.AIR_STEP_HIT_WALL:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_BACKWARD_AIR_KB)
+            mario_bonk_reflection(m, false)
+
+            if (m.vel[1] > 0.0) {
+                m.vel[1] = 0.0
+            }
+
+            Mario.set_forward_vel(m, -speed)
+            break
+
+        // case AIR_STEP_HIT_LAVA_WALL:
+        //     lava_boost_on_wall(m);
+        //     break;
+    }
+
+    return stepResult
+}
+
+const check_wall_kick = (m) => {
+    if ((m.input & Mario.INPUT_A_PRESSED) && m.wallKickTimer != 0 && m.prevAction == Mario.ACT_AIR_HIT_WALL) {
+        m.faceAngle[1] += 0x8000
+        return Mario.set_mario_action(m, Mario.ACT_WALL_KICK_AIR, 0)
+    }
+
+    return 0
+}
+
+const act_soft_bonk = (m) => {
+    if (check_wall_kick(m)) { return 1 }
+
+    // play_sound_if_no_flag(m, SOUND_MARIO_UH, MARIO_MARIO_SOUND_PLAYED);
+
+    common_air_knockback_step(m, Mario.ACT_FREEFALL_LAND, Mario.ACT_HARD_BACKWARD_GROUND_KB, 0x0056, m.forwardVel)
+    return false
 }
 
 const check_kick_or_dive_in_air = (m) => {

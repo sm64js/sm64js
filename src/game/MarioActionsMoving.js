@@ -5,6 +5,7 @@ import { perform_ground_step } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
 import { oMarioWalkingPitch } from "../include/object_constants"
 import { mario_update_punch_sequence } from "./MarioActionsObject"
+import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 
 const apply_slope_accel = (m) => {
     m.slideYaw = m.faceAngle[1]
@@ -139,6 +140,77 @@ const anim_and_audio_for_walk = (m) => {
 
 }
 
+const tilt_body_walking = (m, startYaw) => {
+    const val0C = m.marioBodyState
+    const animID = m.marioObj.header.gfx.unk38.animID
+    let dYaw, val02, val00
+
+    if (animID == Mario.MARIO_ANIM_WALKING || animID == Mario.MARIO_ANIM_RUNNING) {
+        dYaw = m.faceAngle[1] - startYaw
+        //! (Speed Crash) These casts can cause a crash if (dYaw * forwardVel / 12) or
+        //! (forwardVel * 170) exceed or equal 2^31.
+        val02 = -(dYaw * m.forwardVel / 12.0)
+        val00 = (m.forwardVel * 170.0)
+
+        if (val02 > 0x1555) {
+            val02 = 0x1555
+        }
+        if (val02 < -0x1555) {
+            val02 = -0x1555
+        }
+
+        if (val00 > 0x1555) {
+            val00 = 0x1555
+        }
+        if (val00 < 0) {
+            val00 = 0
+        }
+
+        val0C.torsoAngle[2] = approach_number(val0C.torsoAngle[2], val02, 0x400, 0x400)
+        val0C.torsoAngle[0] = approach_number(val0C.torsoAngle[0], val00, 0x400, 0x400)
+        
+    } else {
+        val0C.torsoAngle[2] = 0
+        val0C.torsoAngle[0] = 0
+    }
+}
+
+const check_ledge_climb_down = (m) => {
+
+    if (m.forwardVel < 10.0) {
+        const wallCols = {
+            x: m.pos[0],
+            y: m.pos[1],
+            z: m.pos[2],
+            radius: 10.0,
+            offsetY: -10.0
+        }
+
+        if (SurfaceCollision.find_wall_collisions(wallCols) != 0) {
+            const floorWrapper = {}
+            const floorHeight = SurfaceCollision.find_floor(wallCols.x, wallCols.y, wallCols.z, floorWrapper)
+            if (floorWrapper.floor != null) {
+                if (wallCols.y - floorHeight > 160.0) {
+                    const wall = wallCols.walls[wallCols.numWalls - 1]
+                    const wallAngle = atan2s(wall.normal.z, wall.normal.x)
+                    const wallDYaw = wallAngle - m.faceAngle[1]
+
+                    if (wallDYaw > -0x4000 && wallDYaw < 0x4000) {
+                        m.pos[0] = wallCols.x - 20.0 * wall.normal.x
+                        m.pos[2] = wallCols.z - 20.0 * wall.normal.z
+
+                        m.faceAngle[0] = 0
+                        m.faceAngle[1] = wallAngle + 0x8000
+
+                        Mario.set_mario_action(m, Mario.ACT_LEDGE_CLIMB_DOWN, 0)
+                        Mario.set_mario_animation(m, Mario.MARIO_ANIM_CLIMB_DOWN_LEDGE)
+                    }
+                }
+            }
+        }
+    }
+}
+
 const begin_braking_action = (m) => {
     if (m.forwardVel >= 16.0 && m.floor.normal.y >= 0.17364818) {
         return Mario.set_mario_action(m, Mario.ACT_BRAKING, 0)
@@ -190,8 +262,8 @@ const tilt_body_walking = (m, startYaw) => {
     }
 }
 
-const act_walking = (m) => {
-    const startYaw = m.faceAngle[1];
+    const startYaw = m.faceAngle[1]
+
 /*    if (should_begin_sliding(m)) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
     }*/
@@ -213,7 +285,7 @@ const act_walking = (m) => {
     }
 
     if (m.input & Mario.INPUT_Z_PRESSED) {
-        return Mario.set_mario_action(m, Mario.ACT_CROUCH_SLIDE, 0);
+        return Mario.set_mario_action(m, Mario.ACT_CROUCH_SLIDE, 0)
     }
 
     m.actionState = 0
@@ -234,9 +306,9 @@ const act_walking = (m) => {
         default: throw "unkown ground step in act_walking"
     }
 
-    check_ledge_climb_down(m);
-    tilt_body_walking(m, startYaw);
-    return false
+    check_ledge_climb_down(m)
+    tilt_body_walking(m, startYaw)
+    return 0
 }
 
 const act_braking = (m) => {
@@ -303,7 +375,7 @@ const act_decelerating = (m) => {
     }
 
     if (update_decelerating_speed(m)) {
-        return Mario.set_mario_action(m, Mario.ACT_IDLE, 0);
+        return Mario.set_mario_action(m, Mario.ACT_IDLE, 0)
     }
 
     switch (perform_ground_step(m)) {
@@ -546,7 +618,7 @@ const act_backflip_land = (m) => {
     }
 
     if (!(m.input & Mario.INPUT_NONZERO_ANALOG)) {
-        //play_sound_if_no_flag(m, SOUND_MARIO_HAHA, MARIO_MARIO_SOUND_PLAYED);
+        //play_sound_if_no_flag(m, SOUND_MARIO_HAHA, MARIO_MARIO_SOUND_PLAYED)
     }
 
     common_landing_action(m, Mario.MARIO_ANIM_TRIPLE_JUMP_LAND, Mario.ACT_FREEFALL)
@@ -563,8 +635,8 @@ const update_sliding_angle = (m, accel, lossFactor) => {
     m.slideVelX += accel * steepness * Math.sin(slopeAngle / 0x8000 * Math.PI)
     m.slideVelZ += accel * steepness * Math.cos(slopeAngle / 0x8000 * Math.PI)
 
-    m.slideVelX *= lossFactor;
-    m.slideVelZ *= lossFactor;
+    m.slideVelX *= lossFactor
+    m.slideVelZ *= lossFactor
 
     m.slideYaw = atan2s(m.slideVelZ, m.slideVelX)
 
@@ -626,22 +698,22 @@ const update_sliding = (m, stopSpeed) => {
         case SURFACE_CLASS_VERY_SLIPPERY:
             accel = 10.0
             lossFactor = m.intendedMag / 32.0 * forward * 0.02 + 0.98
-            break;
+            break
 
         case SURFACE_CLASS_SLIPPERY:
             accel = 8.0
             lossFactor = m.intendedMag / 32.0 * forward * 0.02 + 0.96
-            break;
+            break
 
         default:
             accel = 7.0
             lossFactor = m.intendedMag / 32.0 * forward * 0.02 + 0.92
-            break;
+            break
 
         case SURFACE_CLASS_NOT_SLIPPERY:
             accel = 5.0
             lossFactor = m.intendedMag / 32.0 * forward * 0.02 + 0.92
-            break;
+            break
     }
 
     const oldSpeed = Math.sqrt(m.slideVelX * m.slideVelX + m.slideVelZ * m.slideVelZ)
@@ -706,7 +778,7 @@ const common_slide_action_with_jump = (m, stopAction, jumpAction, airAction, ani
     }
 
     if (update_sliding(m, 4.0)) {
-        return Mario.set_mario_action(m, stopAction, 0);
+        return Mario.set_mario_action(m, stopAction, 0)
     }
 
     common_slide_action(m, stopAction, airAction, animation)
@@ -735,7 +807,7 @@ const act_crouch_slide = (m) => {
     }
 
     if (m.input & Mario.INPUT_A_PRESSED) {
-        return Mario.set_jumping_action(m, Mario.ACT_JUMP, 0);
+        return Mario.set_jumping_action(m, Mario.ACT_JUMP, 0)
     }
 
     return common_slide_action_with_jump(m, Mario.ACT_CROUCHING, Mario.ACT_JUMP, Mario.ACT_FREEFALL,

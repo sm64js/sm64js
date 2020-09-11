@@ -187,10 +187,12 @@ class GeoRenderer {
     }
 
     geo_process_generated_list(node) {
-        if (node.wrapper.func) {
+        if (node.wrapper.fnNode.func) {
             //console.log("processing function from generated_list")
 
-            const list = node.wrapper.func(GraphNode.GEO_CONTEXT_RENDER, node, this.gMatStack[this.gMatStackIndex])
+            const fnNode = node.wrapper.fnNode
+
+            const list = fnNode.func.call(fnNode.funcClass, GraphNode.GEO_CONTEXT_RENDER, node, this.gMatStack[this.gMatStackIndex])
             if (list.length > 0) {
                 this.geo_append_display_list(list, node.flags >> 8)
             }

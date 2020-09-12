@@ -73,7 +73,9 @@ const check_ledge_grab = (m, wall, intendedPos, nextPos) => {
     ledgePos[2] = nextPos[2] - wall.normal.z * 60.0
     ledgePos[1] = SurfaceCollision.find_floor(ledgePos[0], nextPos[1] + 160.0, ledgePos[2], ledgeFloor)
 
-    if (ledgePos[1] - nextPos[1] <= 100.0) { return 0 }
+    if (ledgeFloor.floor == null) return 0
+
+    if (ledgePos[1] - nextPos[1] <= 100.0) return 0
 
     m.pos = [...ledgePos]
     m.floor = ledgeFloor.floor

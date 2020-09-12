@@ -57,6 +57,14 @@ const common_air_action_step = (m, landAction, animation, stepArg) => {
                     Mario.set_mario_action(m, Mario.ACT_AIR_HIT_WALL, 0)
                 } else {
                     if (m.vel[1] > 0) m.vel[1] = 0
+
+                    if (m.forwardVel >= 38.0) {
+                        m.particleFlags |= Mario.PARTICLE_VERTICAL_STAR
+                        Mario.set_mario_action(m, Mario.ACT_SOFT_BONK) /// todo backward air knockback
+                    } else {
+                        if (m.forwardVel > 8.0) Mario.set_forward_vel(m, -8.0)
+                        return Mario.set_mario_action(m, Mario.ACT_SOFT_BONK, 0)
+                    }
                 }
             } else {
                 Mario.set_forward_vel(m, 0.0)
@@ -282,14 +290,37 @@ const act_dive = (m) => {
             m.faceAngle[0] = 0
             break
         case Mario.AIR_STEP_HIT_WALL:
+            mario_bonk_reflection(m, true)
             m.faceAngle[0] = 0
             if (m.vel[1] > 0.0) m.vel[1] = 0.0
+            m.particleFlags |= Mario.PARTICLE_VERTICAL_STAR
+            Mario.drop_and_set_mario_action(m, Mario.ACT_BACKWARD_AIR_KB, 0)
             break
         default: throw "unimplemented air step case in act dive"
     }
 
     return 0
 }
+
+
+export const act_backward_air_kb = (m) => {
+    if (check_wall_kick(m)) { return 1 }
+
+    //play_knockback_sound(m);
+
+    common_air_knockback_step(m, Mario.ACT_BACKWARD_GROUND_KB, Mario.ACT_HARD_BACKWARD_GROUND_KB, 0x0002, -16.0)
+    return 0
+}
+
+export const act_forward_air_kb = (m) => {
+    if (check_wall_kick(m)) { return 1 }
+
+    //play_knockback_sound(m);
+
+    common_air_knockback_step(m, Mario.ACT_FORWARD_GROUND_KB, Mario.ACT_HARD_FORWARD_GROUND_KB, 0x0002, -16.0)
+    return 0
+}
+
 
 const act_jump_kick = (m) => {
 
@@ -430,6 +461,7 @@ const act_slide_kick = (m) => {
         case Mario.AIR_STEP_HIT_WALL:
             if (m.vel[1] > 0) m.vel[1] = 0
             m.particleFlags |= Mario.PARTICLE_VERTICAL_STAR
+            Mario.set_mario_action(m, Mario.ACT_BACKWARD_AIR_KB, 0)
             break
         default: throw "unimplemented case in act slide kick"
     }
@@ -474,6 +506,11 @@ const act_ground_pound = (m) => {
             //play heave landed sound
             m.particleFlags |= Mario.PARTICLE_MIST_CIRCLE | Mario.PARTICLE_HORIZONTAL_STAR
             Mario.set_mario_action(m, Mario.ACT_GROUND_POUND_LAND, 0)
+        } else if (stepResult == Mario.AIR_STEP_HIT_WALL) {
+            if (m.vel[1] > 0.0) m.vel[1] = 0.0
+
+            m.particleFlags |= Mario.PARTICLE_VERTICAL_STAR
+            Mario.set_mario_action(m, Mario.ACT_BACKWARD_AIR_KB, 0)
         }
     }
 
@@ -495,7 +532,7 @@ const act_air_hit_wall = (m) => {
         }
 
         m.particleFlags |= Mario.PARTICLE_VERTICAL_STAR
-        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0) // ACT_BACKWARD_AIR_KB
+        return Mario.set_mario_action(m, Mario.ACT_BACKWARD_AIR_KB, 0) 
     } else {
         m.wallKickTimer = 5
         if (m.vel[1] > 0.0) {
@@ -505,7 +542,7 @@ const act_air_hit_wall = (m) => {
         if (m.forwardVel > 8.0) {
             Mario.set_forward_vel(m, -8.0)
         }
-        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0) //ACT_SOFTBONK
+        return Mario.set_mario_action(m, Mario.ACT_SOFT_BONK, 0)
     }
 
     return 0
@@ -531,6 +568,8 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_SLIDE_KICK: return act_slide_kick(m)
         case Mario.ACT_GROUND_POUND: return act_ground_pound(m)
         case Mario.ACT_AIR_HIT_WALL: return act_air_hit_wall(m)
+        case Mario.ACT_BACKWARD_AIR_KB: return act_backward_air_kb(m)
+        case Mario.ACT_FORWARD_AIR_KB: return act_forward_air_kb(m)
         default: throw "unkown action airborne"
     }
 }

@@ -906,6 +906,59 @@ const act_slide_kick_slide = (m) => {
     return 0
 }
 
+const common_ground_knockback_action = (m, animation, arg2, arg3, arg4) => {
+/*    if (arg3) {
+        play_mario_heavy_landing_sound_once(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND);
+    }*/
+
+/*    if (arg4 > 0) {
+        play_sound_if_no_flag(m, SOUND_MARIO_ATTACKED, MARIO_MARIO_SOUND_PLAYED);
+    } else {
+        play_sound_if_no_flag(m, SOUND_MARIO_OOOF2, MARIO_MARIO_SOUND_PLAYED);
+    }*/
+
+    if (m.forwardVel > 32.0) {
+        m.forwardVel = 32.0
+    }
+    if (m.forwardVel < -32.0) {
+        m.forwardVel = -32.0
+    }
+
+    const val04 = Mario.set_mario_animation(m, animation)
+    if (val04 < arg2) {
+        apply_landing_accel(m, 0.9)
+    } else if (m .forwardVel >= 0.0) {
+        Mario.set_forward_vel(m, 0.1)
+    } else {
+        Mario.set_forward_vel(m, -0.1)
+    }
+
+    if (perform_ground_step(m) == Mario.GROUND_STEP_LEFT_GROUND) {
+        if (m.forwardVel >= 0.0) {
+            set_mario_action(m, Mario.ACT_FORWARD_AIR_KB, arg4)
+        } else {
+            set_mario_action(m, Mario.ACT_BACKWARD_AIR_KB, arg4)
+        }
+    } else if (Mario.is_anim_at_end(m)) {
+        if (m.health < 0x100) {
+            //set_mario_action(m, ACT_STANDING_DEATH, 0)
+        } else {
+            if (arg4 > 0) {
+                m.invincTimer = 30
+            }
+            Mario.set_mario_action(m, Mario.ACT_IDLE, 0)
+        }
+    }
+
+    return val04
+
+}
+
+export const act_backward_ground_kb = (m) => {
+    common_ground_knockback_action(m, Mario.MARIO_ANIM_BACKWARD_KB, 0x16, true, m.actionArg)
+    return 0
+}
+
 export const mario_execute_moving_action = (m) => {
 
     switch (m.action) {
@@ -926,6 +979,7 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_CRAWLING: return act_crawling(m)
         case Mario.ACT_MOVE_PUNCHING: return act_move_punching(m)
         case Mario.ACT_SLIDE_KICK_SLIDE: return act_slide_kick_slide(m)
+        case Mario.ACT_BACKWARD_GROUND_KB: return act_backward_ground_kb(m)
         default: throw "unknown action moving"
     }
 }

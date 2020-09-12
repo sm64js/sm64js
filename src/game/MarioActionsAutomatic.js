@@ -260,7 +260,10 @@ const let_go_of_ledge = (m) => {
 }
 
 const act_ledge_grab = (m) => {
-    const intendedDYaw = m.intendedYaw - m.faceAngle[1]
+    let intendedDYaw = m.intendedYaw - m.faceAngle[1]
+    if (intendedDYaw > 32767) intendedDYaw -= 65536
+    if (intendedDYaw < -32768) intendedDYaw += 65536
+
     const hasSpaceForMario = (m.ceilHeight - m.floorHeight >= 160.0)
 
     if (m.actionTimer < 10) {

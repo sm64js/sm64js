@@ -60,7 +60,7 @@ const common_air_action_step = (m, landAction, animation, stepArg) => {
 
                     if (m.forwardVel >= 38.0) {
                         m.particleFlags |= Mario.PARTICLE_VERTICAL_STAR
-                        Mario.set_mario_action(m, Mario.ACT_SOFT_BONK) /// todo backward air knockback
+                        Mario.set_mario_action(m, Mario.ACT_BACKWARD_AIR_KB)
                     } else {
                         if (m.forwardVel > 8.0) Mario.set_forward_vel(m, -8.0)
                         return Mario.set_mario_action(m, Mario.ACT_SOFT_BONK, 0)

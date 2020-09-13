@@ -542,7 +542,7 @@ const act_ground_pound = (m) => {
 }
 
 const act_air_hit_wall = (m) => {
-    if (++(m.actionTimer) <= 3) { // 2
+    if (++(m.actionTimer) <= 2) { // 2
         if (m.input & Mario.INPUT_A_PRESSED) {
             m.vel[1] = 52.0
             m.faceAngle[1] += 0x8000

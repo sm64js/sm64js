@@ -36,7 +36,7 @@ const update_air_without_turn = (m) => {
 
 }
 
-const common_air_action_step = (m, landAction, animation, stepArg, temp) => {
+const common_air_action_step = (m, landAction, animation, stepArg) => {
 
     ///TODO add this, this moves mario slightly while in air by joystick
     update_air_without_turn(m)
@@ -47,7 +47,6 @@ const common_air_action_step = (m, landAction, animation, stepArg, temp) => {
         case Mario.AIR_STEP_NONE:
             Mario.set_mario_animation(m, animation); break
         case Mario.AIR_STEP_LANDED:
-            if (temp) m.faceAngle[1] += 0x8000
             Mario.set_mario_action(m, landAction, 0); break
         case Mario.AIR_STEP_HIT_WALL:
             Mario.set_mario_animation(m, animation)
@@ -487,6 +486,7 @@ const act_slide_kick = (m) => {
         default: throw "unimplemented case in act slide kick"
     }
 
+    processDiveAttack(m.pos, m.forwardVel)
     return 0
 }
 
@@ -579,8 +579,8 @@ const act_thrown_backward = (m) => {
 
     const animation = Mario.MARIO_ANIM_BACKWARD_AIR_KB
     //// temporary should be common_air_knockback_step
-    common_air_action_step(m, landAction, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB, 1)
-    m.marioObj.header.gfx.angle = [0, m.faceAngle[1] + 0x8000, 0]
+    common_air_action_step(m, landAction, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
+    m.marioObj.header.gfx.angle = [0, m.faceAngle[1], 0]
 
     m.forwardVel *= 0.98
     return 0
@@ -590,8 +590,8 @@ const act_knocked_up = (m) => {
 
     const landAction = Mario.ACT_BUTT_STUCK_IN_GROUND
     const animation = Mario.MARIO_ANIM_BACKWARD_AIR_KB
-    common_air_action_step(m, landAction, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB, 1)
-    m.forwardVel = 0
+
+    common_air_knockback_step(m, landAction, landAction, animation, 0)
     return 0
 
 }

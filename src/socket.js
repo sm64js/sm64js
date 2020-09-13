@@ -6,12 +6,9 @@ const url = new URL(window.location.href)
 let websocketServerPath = "" 
 
 if (url.protocol == "https:") {
-    url.protocol = url.protocol.replace('https', 'wss')
-    websocketServerPath =  url.href + "websocket/"
+    websocketServerPath = `wss://${url.hostname}/websocket/`
 } else {
-    url.protocol = url.protocol.replace('http', 'ws')
-    url.port = 5001
-    websocketServerPath = url.href
+    websocketServerPath = `ws://${url.hostname}:5001`
 }
 
 const socket = new WebSocket(websocketServerPath)
@@ -75,17 +72,17 @@ const recvChat = (chatmsg) => {
 
 const recvKick = (kickData) => {
     const m = gameData.marioState
-    m.forwardVel = 50
+    m.forwardVel = -50
     m.vel[1] = 50
-    m.faceAngle[1] = kickData.angle
+    m.faceAngle[1] = kickData.angle + 0x8000
     Mario.set_mario_action(m, Mario.ACT_THROWN_BACKWARD, 0)
 }
 
-const recvKnockUp = () => {
+const recvKnockUp = (data) => {
     const m = gameData.marioState
     if (m.invincTimer == 0) {
         m.invincTimer = 30
-        m.vel[1] = 70
+        m.vel[1] = data.upwardForce
         Mario.set_mario_action(m, Mario.ACT_KNOCKED_UP, 0)
     }
 }
@@ -114,7 +111,7 @@ socket.onopen = () => {
             case 1: recvChat(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             case 2: recvKick(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             case 3: recvMyID(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
-            case 4: recvKnockUp(); break
+            case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             default: throw "unknown websocket opcode"
         }
     }
@@ -166,19 +163,35 @@ export const processKick = (myMarioPos, myMarioAngle) => {
     })
 }
 
-export const processDiveAttack = (mypos, speed) => {
-    if (speed > 25) {
+export const processDiveAttack = (myMarioPos, diveSpeed) => {
+    if (diveSpeed > 25) {
 
-        serverData.extraMarios.forEach(marioData => {
+        serverData.extraMarios.forEach(extraMario => {
             const distance = Math.sqrt(
-                Math.pow(marioData.pos[0] - mypos[0], 2) +
-                Math.pow(marioData.pos[1] - mypos[1], 2) +
-                Math.pow(marioData.pos[2] - mypos[2], 2)
+                Math.pow(extraMario.pos[0] - myMarioPos[0], 2) +
+                Math.pow(extraMario.pos[1] - myMarioPos[1], 2) +
+                Math.pow(extraMario.pos[2] - myMarioPos[2], 2)
             )
             if (distance < 150) { ///trigger hit
-                const diveHitMsg = { id: marioData.socketID }
+                const diveHitMsg = { id: extraMario.socketID, upwardForce: 70 }
                 sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify(diveHitMsg)), 4)
             }
         })
     }
+}
+
+export const processBreakdanceTrip = (myMarioPos) => {
+
+    serverData.extraMarios.forEach(extraMario => {
+        const distance = Math.sqrt(
+            Math.pow(extraMario.pos[0] - myMarioPos[0], 2) +
+            Math.pow(extraMario.pos[1] - myMarioPos[1], 2) +
+            Math.pow(extraMario.pos[2] - myMarioPos[2], 2)
+        )
+        if (distance < 150) { ///trigger hit
+            const tripMsg = { id: extraMario.socketID, upwardForce: 15 }
+            sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify(tripMsg)), 4)
+        }
+    })
+
 }

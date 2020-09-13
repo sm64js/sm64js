@@ -67,9 +67,9 @@ const processKickAttack = (bytes) => {
 }
 
 const processDiveAttack = (bytes) => {
-    const kickMsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
-    const responseMsg = new TextEncoder("utf-8").encode("")
-    sendDataWithOpcode(responseMsg, 4, allSockets[kickMsg.id].socket)
+    const attackMsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
+    const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify(attackMsg))
+    sendDataWithOpcode(responseMsg, 4, allSockets[attackMsg.id].socket)
 }
 
 const processChat = (socket, bytes) => {

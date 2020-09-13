@@ -1,6 +1,7 @@
 import * as Mario from "./Mario"
 import { perform_ground_step, stationary_ground_step } from "./MarioStep"
 import { processKick } from "../socket"
+import { processBreakdanceTrip } from "../socket"
 
 const sPunchingForwardVelocities = [0, 1, 1, 2, 3, 5, 7, 10]
 
@@ -104,7 +105,8 @@ export const mario_update_punch_sequence = (m) => {
             break
 
         case 9:
-            Mario.set_mario_animation(m, Mario.MARIO_ANIM_BREAKDANCE)
+            animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_BREAKDANCE)
+            if (animFrame == 0) processBreakdanceTrip(m.pos)
             animFrame = m.marioObj.header.gfx.unk38.animFrame
 
             if (animFrame >= 2 && animFrame < 8) {

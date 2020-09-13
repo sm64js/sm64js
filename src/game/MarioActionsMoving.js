@@ -914,6 +914,7 @@ const act_slide_kick_slide = (m) => {
 
     //play sound
     m.particleFlags |= Mario.PARTICLE_DUST
+    processDiveAttack(m.pos, m.forwardVel)
     return 0
 }
 

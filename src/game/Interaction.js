@@ -142,7 +142,7 @@ const determine_knockback_action = (m) => {
 
     const angleToObject = mario_obj_angle_to_object(m, m.interactObj)
 
-    const facingDYaw = angleToObject - m.faceAngle[1]
+    let facingDYaw = angleToObject - m.faceAngle[1]
     facingDYaw = facingDYaw > 32767 ? facingDYaw - 65536 : facingDYaw
     facingDYaw = facingDYaw < -32768 ? facingDYaw + 65536 : facingDYaw
 

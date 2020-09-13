@@ -1,5 +1,6 @@
 import * as Mario from "./Mario"
-import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY } from "../include/object_constants"
+import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
+import { atan2s } from "../engine/math_util"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
 export const INTERACT_GRABBABLE      /* 0x00000002 */ = (1 << 1)
@@ -34,6 +35,37 @@ export const INTERACT_SHOCK          /* 0x20000000 */ = (1 << 29)
 export const INTERACT_IGLOO_BARRIER  /* 0x40000000 */ = (1 << 30)
 export const INTERACT_UNKNOWN_31     /* 0x80000000 */ = (1 << 31)
 
+// INTERACT_WARP
+export const INT_SUBTYPE_FADING_WARP = 0x00000001
+
+// Damaging interactions
+export const INT_SUBTYPE_DELAY_INVINCIBILITY = 0x00000002
+export const INT_SUBTYPE_BIG_KNOCKBACK = 0x00000008 /* Used by Bowser, sets Mario's forward velocity to 40 on hit */
+
+// INTERACT_GRABBABLE
+export const INT_SUBTYPE_GRABS_MARIO = 0x00000004 /* Also makes the object heavy */
+export const INT_SUBTYPE_HOLDABLE_NPC = 0x00000010 /* Allows the object to be gently dropped, and sets vertical speed to 0 when dropped with no forwards velocity */
+export const INT_SUBTYPE_DROP_IMMEDIATELY = 0x00000040 /* This gets set by grabbable NPCs that talk to Mario to make him drop them after the dialog is finished */
+export const INT_SUBTYPE_KICKABLE = 0x00000100
+export const INT_SUBTYPE_NOT_GRABBABLE = 0x00000200 /* Used by Heavy-Ho to allow it to throw Mario, without Mario being able to pick it up */
+
+// INTERACT_DOOR
+export const INT_SUBTYPE_STAR_DOOR = 0x00000020
+
+//INTERACT_BOUNCE_TOP
+export const INT_SUBTYPE_TWIRL_BOUNCE = 0x00000080
+
+// INTERACT_STAR_OR_KEY 
+export const INT_SUBTYPE_NO_EXIT = 0x00000400
+export const INT_SUBTYPE_GRAND_STAR = 0x00000800
+
+// INTERACT_TEXT
+export const INT_SUBTYPE_SIGN = 0x00001000
+export const INT_SUBTYPE_NPC = 0x00004000
+
+// INTERACT_CLAM_OR_BUBBA
+export const INT_SUBTYPE_EATS_MARIO = 0x00002000
+
 export const INT_GROUND_POUND_OR_TWIRL  = (1 << 0) // 0x01
 export const INT_PUNCH  = (1 << 1) // 0x02
 export const INT_KICK  = (1 << 2) // 0x04
@@ -59,6 +91,10 @@ export const INT_STATUS_TRAP_TURN = (1 << 20) /* 0x00100000 */
 export const INT_STATUS_HIT_MINE = (1 << 21) /* 0x00200000 */
 export const INT_STATUS_STOP_RIDING = (1 << 22) /* 0x00400000 */
 export const INT_STATUS_TOUCHED_BOB_OMB = (1 << 23) /* 0x00800000 */
+
+
+let sDelayInvincTimer = false
+let sInvulnerable = false
 
 const reset_mario_pitch = (m) => {
     /// TODO: WATER JUMP || SHOT FROM CANNON || ACT_FLYING
@@ -93,6 +129,91 @@ const interact_pole = (m, o) => {
     }
 
     return 0
+}
+
+const mario_obj_angle_to_object = (m, o) => {
+    const dx = o.rawData[oPosX] - m.pos[0]
+    const dz = o.rawData[oPosZ] - m.pos[2]
+
+    return atan2s(dz, dx)
+}
+
+const determine_knockback_action = (m) => {
+
+    const angleToObject = mario_obj_angle_to_object(m, m.interactObj)
+
+    const facingDYaw = angleToObject - m.faceAngle[1]
+    facingDYaw = facingDYaw > 32767 ? facingDYaw - 65536 : facingDYaw
+    facingDYaw = facingDYaw < -32768 ? facingDYaw + 65536 : facingDYaw
+
+    const remainingHealth = m.health - 0x40 * m.hurtCounter
+
+    let terrainIndex = 0, strengthIndex = 0
+
+    if (m.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
+        terrainIndex = 2
+    } else if (m.action & (Mario.ACT_FLAG_AIR | Mario.ACT_FLAG_ON_POLE | Mario.ACT_FLAG_HANGING)) {
+        terrainIndex = 1
+    }
+
+    if (remainingHealth < 0x100) {
+        strengthIndex = 2
+        throw "not implemented yet"
+    } else if (m.interactObj.rawData[oDamageOrCoinValue] >= 4) {
+        strengthIndex = 2
+    } else if (m.interactObj.rawData[oDamageOrCoinValue] >= 2) {
+        strengthIndex = 1
+    }
+
+    m.faceAngle[1] = angleToObject
+
+    if (terrainIndex == 2) {
+        if (m.forwardVel < 28) Mario.set_forward_vel(m, 28)
+
+        if (m.pos[1] >= m.interactObj.rawData[oPosY]) {
+            if (m.vel[1] < 20.0) m.vel[1] = 20.0
+        } else {
+            if (m.vel[1] > 0.0) m.vel[1] = 0.0
+        }
+    } else {
+        if (m.forwardVel < 16) Mario.set_forward_vel(m, 16)
+    }
+
+
+    let bonkAction
+    if (-0x4000 <= facingDYaw && facingDYaw <= 0x4000) {
+        m.forwardVel *= -1.0
+        bonkAction = Mario.sBackwardKnockbackActions[terrainIndex][strengthIndex]
+    } else {
+        m.faceAngle[1] += 0x8000
+        bonkAction = Mario.sForwardKnockbackActions[terrainIndex][strengthIndex]
+    }
+
+    return bonkAction
+
+}
+
+export const take_damage_and_knock_back = (m, o) => {
+
+    if (!sInvulnerable && !(m.flags & Mario.MARIO_VANISH_CAP)
+        && !(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+
+        o.rawData[oInteractStatus] = INT_STATUS_INTERACTED | INT_STATUS_ATTACKED_MARIO
+        m.interactObj = o
+
+        let damage = 0 /// todo
+
+        if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_BIG_KNOCKBACK) m.forwardVel = 40.0
+
+        if (o.rawData[oDamageOrCoinValue] > 0); //play sound
+
+        //update mario sound and camera
+        return Mario.drop_and_set_mario_action(m, determins(m, o.rawData[oDamageOrCoinValue]), damage)
+
+    }
+
+    return 0
+
 }
 
 const sInteractionHandlers = [
@@ -157,6 +278,11 @@ export const mario_process_interactions = (m) => {
             }
         }
     }
+
+    if (m.invincTimer > 0 && !sDelayInvincTimer) {
+        m.invincTimer -= 1
+    }
+
 
     m.flags &= ~Mario.MARIO_PUNCHING & ~Mario.MARIO_KICKING & ~Mario.MARIO_TRIPPING
 

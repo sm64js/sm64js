@@ -972,7 +972,7 @@ export const act_backward_ground_kb = (m) => {
 }
 
 export const act_soft_forward_ground_kb = (m) => {
-    common_ground_knockback_action(m, MARIO_ANIM_SOFT_FRONT_KB, 0x64, false, m.actionArg)
+    common_ground_knockback_action(m, Mario.MARIO_ANIM_SOFT_FRONT_KB, 0x64, false, m.actionArg)
     return 0
 }
 

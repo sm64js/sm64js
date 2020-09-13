@@ -42,6 +42,7 @@ export const ANIM_TYPE_NO_TRANSLATION = 4
 // translation types the type is set to this
 export const ANIM_TYPE_ROTATION = 5
 
+export const MARIO_ANIM_FALL_OVER_BACKWARDS = 0x01
 export const MARIO_ANIM_IDLE_HEAD_LEFT = 0xC3
 export const MARIO_ANIM_IDLE_HEAD_RIGHT = 0xC4
 export const MARIO_ANIM_IDLE_HEAD_CENTER = 0xC5
@@ -54,7 +55,6 @@ export const MARIO_ANIM_MOVE_ON_WIRE_NET_RIGHT = 0x5C
 export const MARIO_ANIM_MOVE_ON_WIRE_NET_LEFT = 0x5D
 export const MARIO_ANIM_HANDSTAND_LEFT = 0xC6
 export const MARIO_ANIM_HANDSTAND_RIGHT = 0xC7
-export const MARIO_ANIM_BACKWARD_KB = 0x7B
 export const MARIO_ANIM_WALKING = 0x48
 export const MARIO_ANIM_RUNNING = 0x72
 export const MARIO_ANIM_SKID_ON_GROUND = 0x0F
@@ -122,6 +122,8 @@ export const MARIO_ANIM_GROUND_POUND = 0x3D
 export const MARIO_ANIM_BOTTOM_STUCK_IN_GROUND = 0x3E
 export const MARIO_ANIM_SOFT_BACK_KB = 0x74
 export const MARIO_ANIM_SOFT_FRONT_KB = 0x75
+export const MARIO_ANIM_BACKWARD_KB = 0x7B
+export const MARIO_ANIM_FORWARD_KB = 0x7C
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002

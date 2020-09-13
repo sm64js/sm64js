@@ -15,8 +15,8 @@ import { mario_execute_object_action } from "./MarioActionsObject"
 import { oMarioWalkingPitch, oInteractStatus, oPosX, oPosY, oPosZ, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
-import { gameData as socketGameData } from "../socket"
 import { mario_execute_cutscene_action } from "./MarioActionsCutscene"
+import { gameData as socketGameData } from "../socket"
 
 ////// Mario Constants
 export const ANIM_FLAG_NOLOOP = (1 << 0) // 0x01
@@ -231,12 +231,17 @@ export const ACT_HANGING = 0x00200349
 export const ACT_BUTT_SLIDE = 0x00840452
 export const ACT_HOLD_BUTT_SLIDE = 0x00840454
 export const ACT_RIDING_SHELL_GROUND = 0x20810446
-export const ACT_BACKWARD_AIR_KB = 0x010208B0
-export const ACT_FORWARD_AIR_KB = 0x010208B1
-export const ACT_HARD_BACKWARD_GROUND_KB = 0x00020460
-export const ACT_HARD_FORWARD_GROUND_KB  = 0x00020461 
-export const ACT_BACKWARD_GROUND_KB      = 0x00020462 
-export const ACT_FORWARD_GROUND_KB       = 0x00020463 
+
+export const ACT_HARD_BACKWARD_GROUND_KB  =  0x00020460 
+export const ACT_HARD_FORWARD_GROUND_KB   =  0x00020461 
+export const ACT_BACKWARD_GROUND_KB       =  0x00020462 
+export const ACT_FORWARD_GROUND_KB        =  0x00020463 
+export const ACT_SOFT_BACKWARD_GROUND_KB  =  0x00020464 
+export const ACT_SOFT_FORWARD_GROUND_KB = 0x00020465 
+export const ACT_BACKWARD_AIR_KB       =  0x010208B0 
+export const ACT_FORWARD_AIR_KB        =  0x010208B1 
+export const ACT_HARD_FORWARD_AIR_KB   =  0x010208B2 
+export const ACT_HARD_BACKWARD_AIR_KB  =  0x010208B3
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -383,6 +388,16 @@ export const sLongJumpLandAction = {
     offFloorAction: ACT_FREEFALL,
     slideAction: ACT_BEGIN_SLIDING
 }
+
+export const sForwardKnockbackActions = [
+    [ACT_SOFT_FORWARD_GROUND_KB, ACT_FORWARD_GROUND_KB, ACT_HARD_FORWARD_GROUND_KB],
+    [ACT_FORWARD_AIR_KB, ACT_FORWARD_AIR_KB, ACT_HARD_FORWARD_AIR_KB]
+]
+
+export const sBackwardKnockbackActions = [
+    [ACT_SOFT_BACKWARD_GROUND_KB, ACT_BACKWARD_GROUND_KB, ACT_HARD_BACKWARD_GROUND_KB],
+    [ACT_BACKWARD_AIR_KB, ACT_BACKWARD_AIR_KB, ACT_HARD_BACKWARD_AIR_KB]
+]
 
 export const init_marios = () => {
 

@@ -58,13 +58,13 @@ const common_air_action_step = (m, landAction, animation, stepArg) => {
                 } else {
                     if (m.vel[1] > 0) m.vel[1] = 0
 
-                    if (m.forwardVel >= 38.0) {
+/*                    if (m.forwardVel >= 38.0) {
                         m.particleFlags |= Mario.PARTICLE_VERTICAL_STAR
                         Mario.set_mario_action(m, Mario.ACT_BACKWARD_AIR_KB)
                     } else {
                         if (m.forwardVel > 8.0) Mario.set_forward_vel(m, -8.0)
                         return Mario.set_mario_action(m, Mario.ACT_SOFT_BONK, 0)
-                    }
+                    }*/
                 }
             } else {
                 Mario.set_forward_vel(m, 0.0)

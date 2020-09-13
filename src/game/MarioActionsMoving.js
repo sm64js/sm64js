@@ -962,6 +962,11 @@ const common_ground_knockback_action = (m, animation, arg2, arg3, arg4) => {
 
 }
 
+export const act_forward_ground_kb = (m) => {
+    common_ground_knockback_action(m, Mario.MARIO_ANIM_FORWARD_KB, 0x14, true, m.actionArg)
+    return 0
+}
+
 export const act_backward_ground_kb = (m) => {
     common_ground_knockback_action(m, Mario.MARIO_ANIM_BACKWARD_KB, 0x16, true, m.actionArg)
     return 0
@@ -971,6 +976,22 @@ export const act_soft_forward_ground_kb = (m) => {
     common_ground_knockback_action(m, Mario.MARIO_ANIM_SOFT_FRONT_KB, 0x64, false, m.actionArg)
     return 0
 }
+
+export const act_soft_backward_ground_kb = (m) => {
+    common_ground_knockback_action(m, Mario.MARIO_ANIM_SOFT_BACK_KB, 0x64, false, m.actionArg)
+    return 0
+}
+
+export const act_hard_backward_ground_kb = (m) => {
+    const val04 = common_ground_knockback_action(m, Mario.MARIO_ANIM_FALL_OVER_BACKWARDS, 0x2B, true, m.actionArg)
+    return 0
+}
+
+export const act_hard_backward_ground_kb = (m) => {
+    const val04 = common_ground_knockback_action(m, Mario.MARIO_ANIM_LAND_ON_STOMACH, 0x15, true, m.actionArg)
+    return 0
+}
+
 
 export const mario_execute_moving_action = (m) => {
 
@@ -993,7 +1014,10 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_MOVE_PUNCHING: return act_move_punching(m)
         case Mario.ACT_SLIDE_KICK_SLIDE: return act_slide_kick_slide(m)
         case Mario.ACT_BACKWARD_GROUND_KB: return act_backward_ground_kb(m)
+        case Mario.ACT_FORWARD_GROUND_KB: return act_forward_ground_kb(m)
         case Mario.ACT_SOFT_FORWARD_GROUND_KB: return act_soft_forward_ground_kb(m)
+        case Mario.ACT_SOFT_BACKWARD_GROUND_KB: return act_soft_backward_ground_kb(m)
+        case Mario.ACT_HARD_BACKWARD_GROUND_KB: return act_hard_backward_ground_kb(m)
         default: throw "unknown action moving: " + m.action.toString(16)
     }
 }

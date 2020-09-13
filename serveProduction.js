@@ -40,7 +40,7 @@ const sendMainUpdate = (socket) => {
 }
 
 
-const processPlayerData = (socket, bytes) => {
+const processPlayerData = (socketID, bytes) => {
     const decodedMario = MarioMsg.deserializeBinary(bytes)
 
     //Pretty strict validation
@@ -52,36 +52,37 @@ const processPlayerData = (socket, bytes) => {
     if (isNaN(decodedMario.getAnimid()) || 0 > decodedMario.getAnimid()) return
     if (isNaN(decodedMario.getSkinid()) || 0 > decodedMario.getSkinid() || decodedMario.getSkinid() > 9) return
     decodedMario.setPlayername(String(decodedMario.getPlayername()).substring(0, 14))
-    decodedMario.setSocketid(socket.id)
+    decodedMario.setSocketid(socketID)
 
     /// Data is Valid
-    allSockets[socket.id].decodedMario = decodedMario
-    allSockets[socket.id].valid = 30
+    allSockets[socketID].decodedMario = decodedMario
+    allSockets[socketID].valid = 30
 }
 
 
-const processKickAttack = (bytes) => {
-    const kickMsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
-    const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify({ angle: kickMsg.angle }))
-    sendDataWithOpcode(responseMsg, 2, allSockets[kickMsg.id].socket)
+const processBasicAttack = (socketID, bytes) => {
+    const attackMsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
+    attackMsg.attackerID = socketID
+    const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify(attackMsg))
+    sendDataWithOpcode(responseMsg, 2, allSockets[attackMsg.id].socket)
 }
 
-const processDiveAttack = (bytes) => {
+const processKnockUp = (bytes) => {
     const attackMsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
     const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify(attackMsg))
     sendDataWithOpcode(responseMsg, 4, allSockets[attackMsg.id].socket)
 }
 
-const processChat = (socket, bytes) => {
+const processChat = (socketID, bytes) => {
     const chatmsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
 /*    badwords.forEach(word => {
         const searchMask = word.slice(0, word.length)
         const regEx = new RegExp(searchMask, "ig");
         chatmsg.msg = chatmsg.msg.replace(regEx, "*****")
     })*/
-    chatmsg.socketID = socket.id
+    chatmsg.socketID = socketID
 
-    const decodedMario = Object.values(allSockets).find(data => data.socket.id == socket.id).decodedMario
+    const decodedMario = Object.values(allSockets).find(data => data.socket.id == socketID).decodedMario
 
     if (decodedMario == undefined) return
     chatmsg.sender = decodedMario.getPlayername()
@@ -109,10 +110,10 @@ new App({}).ws('/*', {
         try {
             const opcode = Buffer.from(bytes)[0]
             switch (opcode) {
-                case 0: processPlayerData(socket, bytes.slice(1)); break
-                case 1: processChat(socket, bytes.slice(1)); break
-                case 2: processKickAttack(bytes.slice(1)); break
-                case 4: processDiveAttack(bytes.slice(1)); break
+                case 0: processPlayerData(socket.id, bytes.slice(1)); break
+                case 1: processChat(socket.id, bytes.slice(1)); break
+                case 2: processBasicAttack(socket.id, bytes.slice(1)); break
+                case 4: processKnockUp(bytes.slice(1)); break
                 default: console.log("unknown opcode: " + opcode)
             }
         } catch (err) { console.log(err) }

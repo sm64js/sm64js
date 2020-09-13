@@ -33,7 +33,7 @@ export const INTERACT_BBH_ENTRANCE   /* 0x08000000 */ = (1 << 27)
 export const INTERACT_SNUFIT_BULLET  /* 0x10000000 */ = (1 << 28)
 export const INTERACT_SHOCK          /* 0x20000000 */ = (1 << 29)
 export const INTERACT_IGLOO_BARRIER  /* 0x40000000 */ = (1 << 30)
-export const INTERACT_UNKNOWN_31     /* 0x80000000 */ = (1 << 31)
+export const INTERACT_PLAYER     /* 0x80000000 */ = (1 << 31)
 
 // INTERACT_WARP
 export const INT_SUBTYPE_FADING_WARP = 0x00000001
@@ -141,7 +141,7 @@ const determine_knockback_action = (m) => {
 
     const angleToObject = mario_obj_angle_to_object(m, m.interactObj)
 
-    const facingDYaw = angleToObject - m.faceAngle[1]
+    let facingDYaw = angleToObject - m.faceAngle[1]
     facingDYaw = facingDYaw > 32767 ? facingDYaw - 65536 : facingDYaw
     facingDYaw = facingDYaw < -32768 ? facingDYaw + 65536 : facingDYaw
 
@@ -188,6 +188,18 @@ const determine_knockback_action = (m) => {
         bonkAction = Mario.sForwardKnockbackActions[terrainIndex][strengthIndex]
     }
 
+    if ((m.interactObj.rawData[oInteractType] & INTERACT_PLAYER) && terrainIndex != 2) {
+        const scaler = m.interactObj.rawData[oDamageOrCoinValue]
+        if (scaler > 2) {
+            scaler = 1
+        }
+        const mag = scaler * 25
+        m.forwardVel = mag
+        m.vel[0] = mag * Math.sin(angleToObject / 0x8000 * Math.PI)
+        m.vel[1] = (mag < 0) ? -mag : mag
+        m.vel[2] = mag * Math.cos(angleToObject / 0x8000 * Math.PI)
+    }
+
     return bonkAction
 
 }
@@ -207,7 +219,7 @@ export const take_damage_and_knock_back = (m, o) => {
         if (o.rawData[oDamageOrCoinValue] > 0); //play sound
 
         //update mario sound and camera
-        return Mario.drop_and_set_mario_action(m, determins(m, o.rawData[oDamageOrCoinValue]), damage)
+        return Mario.drop_and_set_mario_action(m, determine_knockback_action(m), damage)
 
     }
 

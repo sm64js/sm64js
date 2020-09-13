@@ -1,5 +1,7 @@
 import { MarioMsg, MarioListMsg } from "../proto/mario_pb"
 import * as Mario from "./game/Mario"
+import { take_damage_and_knock_back, INTERACT_PLAYER } from "./game/Interaction"
+import { oDamageOrCoinValue, oInteractType, oPosX, oPosZ, oPosY } from "./include/object_constants"
 
 const url = new URL(window.location.href)
 
@@ -70,12 +72,24 @@ const recvChat = (chatmsg) => {
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 }
 
-const recvKick = (kickData) => {
+const recvBasicAttack = (attackData) => {
     const m = gameData.marioState
-    m.forwardVel = -50
-    m.vel[1] = 50
-    m.faceAngle[1] = kickData.angle + 0x8000
-    Mario.set_mario_action(m, Mario.ACT_THROWN_BACKWARD, 0)
+    const attackerMarioData = serverData.extraPlayersByID[attackData.attackerID].marioData
+    //const knockbackMultiplier = attackData.knockbackMultiplier
+    const attackerMarioObj = {
+        rawData: new Array(0x50).fill(0)
+    }
+    attackerMarioObj.rawData[oDamageOrCoinValue] = attackData.attackType
+    attackerMarioObj.rawData[oInteractType] |= INTERACT_PLAYER
+    attackerMarioObj.rawData[oPosX] = attackerMarioData.pos[0]
+    attackerMarioObj.rawData[oPosY] = attackerMarioData.pos[1]
+    attackerMarioObj.rawData[oPosZ] = attackerMarioData.pos[2]
+    //m.forwardVel = -50
+    //m.vel[1] = 50
+    //m.faceAngle[1] = kickData.angle + 0x8000
+    //Mario.set_mario_action(m, Mario.ACT_THROWN_BACKWARD, 0)
+
+    take_damage_and_knock_back(m, attackerMarioObj)
 }
 
 const recvKnockUp = (data) => {
@@ -109,7 +123,7 @@ socket.onopen = () => {
         switch (opcode) {
             case 0: recvMarioData(MarioListMsg.deserializeBinary(msgBytes).getMarioList()); break
             case 1: recvChat(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
-            case 2: recvKick(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
+            case 2: recvBasicAttack(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             case 3: recvMyID(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             default: throw "unknown websocket opcode"
@@ -148,7 +162,7 @@ export const sendChat = (msg) => {
     sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify({ msg })), 1)
 }
 
-export const processKick = (myMarioPos, myMarioAngle) => {
+export const processAttack = (myMarioPos, myMarioAngle) => {
     const angleRadians = myMarioAngle / 0x8000 * Math.PI
     const x = myMarioPos[0] + Math.sin(angleRadians) * 80
     const z = myMarioPos[2] + Math.cos(angleRadians) * 80
@@ -157,8 +171,8 @@ export const processKick = (myMarioPos, myMarioAngle) => {
         const distance = Math.sqrt(Math.pow(marioData.pos[0] - x, 2) + Math.pow(marioData.pos[2] - z, 2))
         const directDistance = Math.sqrt(Math.pow(marioData.pos[0] - myMarioPos[0], 2) + Math.pow(marioData.pos[2] - myMarioPos[2], 2))
         if (directDistance > 25 && distance < 100) { ///trigger hit
-            const kickMsg = { id: marioData.socketID, angle: myMarioAngle }
-            sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify(kickMsg)), 2)
+            const attackMsg = { id: marioData.socketID, attackType: 1 }
+            sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify(attackMsg)), 2)
         }
     })
 }

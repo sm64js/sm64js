@@ -566,7 +566,9 @@ const update_sliding_angle = (m, accel, lossFactor) => {
 
     m.slideYaw = atan2s(m.slideVelZ, m.slideVelX)
 
-    const facingDYaw = m.faceAngle[1] - m.slideYaw
+    let facingDYaw = m.faceAngle[1] - m.slideYaw
+    facingDYaw = facingDYaw > 32767 ? facingDYaw - 65536 : facingDYaw
+    facingDYaw = facingDYaw < -32768 ? facingDYaw + 65536 : facingDYaw
     newFacingDYaw = facingDYaw
 
     //! -0x4000 not handled - can slide down a slope while facing perpendicular to it
@@ -587,6 +589,9 @@ const update_sliding_angle = (m, accel, lossFactor) => {
             newFacingDYaw = -0x8000
         }
     }
+
+    newFacingDYaw = newFacingDYaw > 32767 ? newFacingDYaw - 65536 : newFacingDYaw
+    newFacingDYaw = newFacingDYaw < -32768 ? newFacingDYaw + 65536 : newFacingDYaw
 
     m.faceAngle[1] = m.slideYaw + newFacingDYaw
 
@@ -611,7 +616,9 @@ const update_sliding = (m, stopSpeed) => {
     let stopped = 0
     let accel, lossFactor
 
-    const intendedDYaw = m.intendedYaw - m.slideYaw
+    let intendedDYaw = m.intendedYaw - m.slideYaw
+    intendedDYaw = intendedDYaw > 32767 ? intendedDYaw - 65536 : intendedDYaw
+    intendedDYaw = intendedDYaw < -32768 ? intendedDYaw + 65536 : intendedDYaw
     let forward = Math.cos(intendedDYaw / 0x8000 * Math.PI)
     let sideward = Math.sin(intendedDYaw / 0x8000 * Math.PI)
 
@@ -761,6 +768,7 @@ const act_long_jump_land = (m) => {
 }
 
 const act_dive_slide = (m) => {
+
     if ((m.input & (Mario.INPUT_A_PRESSED | Mario.INPUT_B_PRESSED))) {
         return Mario.set_mario_action(m, m.forwardVel > 0.0 ? Mario.ACT_FORWARD_ROLLOUT : Mario.ACT_BACKWARD_ROLLOUT, 0)
     }

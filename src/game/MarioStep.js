@@ -196,6 +196,7 @@ const perform_ground_quarter_step = (m, nextPos) => {
     if (floorWrapper.floor == null) {
         m.faceAngle[1] += 0x8000
         if (m.faceAngle[1] > 32767) m.faceAngle[1] -= 65536
+        if (m.faceAngle[1] < -32768) m.faceAngle[1] += 65536
         Mario.set_forward_vel(m, 1.5 * m.forwardVel)
         return Mario.GROUND_STEP_HIT_WALL_STOP_QSTEPS
     }

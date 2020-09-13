@@ -991,7 +991,7 @@ export const act_hard_backward_ground_kb = (m) => {
     return 0
 }
 
-export const act_hard_backward_ground_kb = (m) => {
+export const act_hard_forward_ground_kb = (m) => {
     const val04 = common_ground_knockback_action(m, Mario.MARIO_ANIM_LAND_ON_STOMACH, 0x15, true, m.actionArg)
     return 0
 }
@@ -1022,6 +1022,7 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_SOFT_FORWARD_GROUND_KB: return act_soft_forward_ground_kb(m)
         case Mario.ACT_SOFT_BACKWARD_GROUND_KB: return act_soft_backward_ground_kb(m)
         case Mario.ACT_HARD_BACKWARD_GROUND_KB: return act_hard_backward_ground_kb(m)
+        case Mario.ACT_HARD_FORWARD_GROUND_KB: return act_hard_forward_ground_kb(m)
         default: throw "unknown action moving: " + m.action.toString(16)
     }
 }

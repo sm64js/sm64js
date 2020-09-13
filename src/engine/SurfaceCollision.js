@@ -7,6 +7,7 @@ import { SpawnObjectInstance as Spawn } from "../game/SpawnObject"
 class SurfaceCollision {
     constructor() {
         Spawn.SurfaceCollision = this
+        ObjectListProcessor.SurfaceCollision = this
     }
 
     find_floor_height_and_data(xPos, yPos, zPos, floorGeo) {

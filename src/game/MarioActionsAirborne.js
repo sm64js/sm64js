@@ -325,10 +325,23 @@ export const act_forward_air_kb = (m) => {
 
     //play_knockback_sound(m);
 
-    common_air_knockback_step(m, Mario.ACT_FORWARD_GROUND_KB, Mario.ACT_HARD_FORWARD_GROUND_KB, 0x0002, -16.0)
+    common_air_knockback_step(m, Mario.ACT_FORWARD_GROUND_KB, Mario.ACT_HARD_FORWARD_GROUND_KB, 0x0002, 16.0)
     return 0
 }
 
+export const act_hard_backward_air_kb = (m) => {
+    //play_knockback_sound(m);
+
+    common_air_knockback_step(m, Mario.ACT_HARD_BACKWARD_GROUND_KB, Mario.ACT_HARD_BACKWARD_GROUND_KB, 0x0002, -16.0)
+    return 0
+}
+
+export const act_hard_forward_air_kb = (m) => {
+    //play_knockback_sound(m);
+
+    common_air_knockback_step(m, Mario.ACT_HARD_FORWARD_GROUND_KB, Mario.ACT_HARD_FORWARD_GROUND_KB, 0x002D, 16.0)
+    return 0
+}
 
 const act_jump_kick = (m) => {
 
@@ -588,6 +601,8 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_AIR_HIT_WALL: return act_air_hit_wall(m)
         case Mario.ACT_BACKWARD_AIR_KB: return act_backward_air_kb(m)
         case Mario.ACT_FORWARD_AIR_KB: return act_forward_air_kb(m)
+        case Mario.ACT_HARD_BACKWARD_AIR_KB: return act_hard_backward_air_kb(m)
+        case Mario.ACT_HARD_FORWARD_AIR_KB: return act_hard_forward_air_kb(m)
         default: throw "unkown action airborne"
     }
 }

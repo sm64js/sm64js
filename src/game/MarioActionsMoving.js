@@ -967,6 +967,11 @@ export const act_backward_ground_kb = (m) => {
     return 0
 }
 
+export const act_soft_forward_ground_kb = (m) => {
+    common_ground_knockback_action(m, MARIO_ANIM_SOFT_FRONT_KB, 0x64, false, m.actionArg)
+    return 0
+}
+
 export const mario_execute_moving_action = (m) => {
 
     switch (m.action) {
@@ -988,6 +993,7 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_MOVE_PUNCHING: return act_move_punching(m)
         case Mario.ACT_SLIDE_KICK_SLIDE: return act_slide_kick_slide(m)
         case Mario.ACT_BACKWARD_GROUND_KB: return act_backward_ground_kb(m)
-        default: throw "unknown action moving"
+        case Mario.ACT_SOFT_FORWARD_GROUND_KB: return act_soft_forward_ground_kb(m)
+        default: throw "unknown action moving: " + m.action.toString(16)
     }
 }

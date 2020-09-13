@@ -190,14 +190,14 @@ const determine_knockback_action = (m) => {
 
     if ((m.interactObj.rawData[oInteractType] & INTERACT_PLAYER) && terrainIndex != 2) {
         const scaler = m.interactObj.rawData[oDamageOrCoinValue]
-        if (scaler > 2) {
-            scaler = 1
-        }
+        console.log(scaler)
+        //if (scaler > 2) { scaler = 1 }
         const mag = scaler * 25
-        m.forwardVel = mag
-        m.vel[0] = mag * Math.sin(angleToObject / 0x8000 * Math.PI)
-        m.vel[1] = (mag < 0) ? -mag : mag
-        m.vel[2] = mag * Math.cos(angleToObject / 0x8000 * Math.PI)
+        m.forwardVel = (m.forwardVel < 0) ? -mag : mag
+        //m.vel[0] = mag * Math.sin(angleToObject / 0x8000 * Math.PI)
+        m.vel[1] = (m.forwardVel < 0) ? -m.forwardVel : m.forwardVel
+        m.vel[1] *= 0.7
+        //m.vel[2] = mag * Math.cos(angleToObject / 0x8000 * Math.PI)
     }
 
     return bonkAction

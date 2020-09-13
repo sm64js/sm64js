@@ -21,7 +21,8 @@ export const mario_update_punch_sequence = (m) => {
     switch (m.actionArg) {
         case 0: /// play sound - no break
         case 1:
-            Mario.set_mario_animation(m, Mario.MARIO_ANIM_FIRST_PUNCH)
+            animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_FIRST_PUNCH)
+            if (animFrame == 0) processAttack(m.pos, m.faceAngle[1], 1)
             if (Mario.is_anim_past_end(m)) {
                 m.actionArg = 2
             } else {
@@ -41,8 +42,8 @@ export const mario_update_punch_sequence = (m) => {
             }
             break
         case 2:
-            Mario.set_mario_animation(m, Mario.MARIO_ANIM_FIRST_PUNCH_FAST)
-
+            animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_FIRST_PUNCH_FAST)
+            if (animFrame == 0) processAttack(m.pos, m.faceAngle[1], 1)
             if (m.marioObj.header.gfx.unk38.animFrame <= 0) {
                 m.flags |= Mario.MARIO_PUNCHING
             }
@@ -58,7 +59,8 @@ export const mario_update_punch_sequence = (m) => {
 
         case 3: ///play sound - no break
         case 4:
-            Mario.set_mario_animation(m, Mario.MARIO_ANIM_SECOND_PUNCH)
+            animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_SECOND_PUNCH)
+            if (animFrame == 0) processAttack(m.pos, m.faceAngle[1], 2)
             if (Mario.is_anim_past_end(m)) {
                 m.actionArg = 5
             } else { m.actionArg = 4 }
@@ -73,7 +75,8 @@ export const mario_update_punch_sequence = (m) => {
             break
 
         case 5:
-            Mario.set_mario_animation(m, Mario.MARIO_ANIM_SECOND_PUNCH_FAST)
+            animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_SECOND_PUNCH_FAST)
+            if (animFrame == 0) processAttack(m.pos, m.faceAngle[1], 2)
             if (m.marioObj.header.gfx.unk38.animFrame <= 0) {
                 m.flags |= Mario.MARIO_PUNCHING
             }
@@ -91,7 +94,7 @@ export const mario_update_punch_sequence = (m) => {
             //play_mario_action_sound(m, SOUND_MARIO_PUNCH_HOO, 1)
             animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_GROUND_KICK)
             if (animFrame == 0) {
-                processAttack(m.pos, m.faceAngle[1])
+                processAttack(m.pos, m.faceAngle[1], 4)
                 m.marioBodyState.punchState = (2 << 6) | 6
             }
 

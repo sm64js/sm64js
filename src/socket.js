@@ -79,7 +79,7 @@ const recvBasicAttack = (attackData) => {
     const attackerMarioObj = {
         rawData: new Array(0x50).fill(0)
     }
-    attackerMarioObj.rawData[oDamageOrCoinValue] = attackData.attackType
+    attackerMarioObj.rawData[oDamageOrCoinValue] = attackData.attackTier
     attackerMarioObj.rawData[oInteractType] |= INTERACT_PLAYER
     attackerMarioObj.rawData[oPosX] = attackerMarioData.pos[0]
     attackerMarioObj.rawData[oPosY] = attackerMarioData.pos[1]
@@ -89,6 +89,7 @@ const recvBasicAttack = (attackData) => {
     //m.faceAngle[1] = kickData.angle + 0x8000
     //Mario.set_mario_action(m, Mario.ACT_THROWN_BACKWARD, 0)
 
+    if (attackData.forceAir) Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
     take_damage_and_knock_back(m, attackerMarioObj)
 }
 
@@ -162,7 +163,7 @@ export const sendChat = (msg) => {
     sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify({ msg })), 1)
 }
 
-export const processAttack = (myMarioPos, myMarioAngle) => {
+export const processAttack = (myMarioPos, myMarioAngle, attackTier, forceAir) => {
     const angleRadians = myMarioAngle / 0x8000 * Math.PI
     const x = myMarioPos[0] + Math.sin(angleRadians) * 80
     const z = myMarioPos[2] + Math.cos(angleRadians) * 80
@@ -171,7 +172,7 @@ export const processAttack = (myMarioPos, myMarioAngle) => {
         const distance = Math.sqrt(Math.pow(marioData.pos[0] - x, 2) + Math.pow(marioData.pos[2] - z, 2))
         const directDistance = Math.sqrt(Math.pow(marioData.pos[0] - myMarioPos[0], 2) + Math.pow(marioData.pos[2] - myMarioPos[2], 2))
         if (directDistance > 25 && distance < 100) { ///trigger hit
-            const attackMsg = { id: marioData.socketID, attackType: 1 }
+            const attackMsg = { id: marioData.socketID, attackTier, forceAir }
             sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify(attackMsg)), 2)
         }
     })

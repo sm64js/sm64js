@@ -1,7 +1,7 @@
 import * as Mario from "./Mario"
 import { perform_air_step, mario_bonk_reflection } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
-import { processDiveAttack } from "../socket"
+import { processDiveAttack, processAttack } from "../socket"
 
 const update_air_without_turn = (m) => {
     let sidewaysSpeed = 0.0
@@ -338,6 +338,7 @@ const act_jump_kick = (m) => {
 
     if (m.actionState == 0) {
         //play sound
+        processAttack(m.pos, m.faceAngle[1], 4, true)
         m.marioObj.header.gfx.unk38.animID = -1
         Mario.set_mario_animation(m, Mario.MARIO_ANIM_AIR_KICK)
         m.actionState = 1

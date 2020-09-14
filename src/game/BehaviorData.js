@@ -51,6 +51,8 @@ export const bhvExtraMario = [
     { command: BhvCmds.end_loop },
 ]
 
+window.bhvExtraMario = bhvExtraMario
+
 export const bhvTree = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE } },
     { command: BhvCmds.cyclboard },

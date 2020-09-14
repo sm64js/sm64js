@@ -8,8 +8,6 @@ import { LevelUpdateInstance as LevelUpdate } from "../../game/LevelUpdate"
 import { bubbly_tree_geo } from "../../actors/tree/geo.inc"
 import { MODEL_BOB_BUBBLY_TREE, MODEL_LEVEL_GEOMETRY_03, MODEL_CASTLE_GROUNDS_FLAG } from "../../include/model_ids"
 
-window.bhvExtraMario = bhvExtraMario
-
 export const script_func_local_3 = [
     { command: LevelCommands.place_object, args: [/*acts?*/ 0x1F, /*model*/ MODEL_CASTLE_GROUNDS_FLAG, /*pos*/ -3213, 3348, -3011, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving] },
     { command: LevelCommands.place_object, args: [/*acts?*/ 0x1F, /*model*/ MODEL_CASTLE_GROUNDS_FLAG, /*pos*/  3213, 3348, -3011, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving] },

@@ -27,7 +27,6 @@ window.myMario = {
 export const serverData = {
     extraMarios: [],
     extraPlayersByID: {},
-    socketOpen: false
 }
 
 export const gameData = {}
@@ -115,8 +114,6 @@ const sendMarioData = () => {
 
 socket.onopen = () => {
 
-    serverData.socketOpen = true
-
     socket.onmessage = async (message) => {
         const bytes = new Uint8Array(await message.data.arrayBuffer())
         const opcode = bytes[0]
@@ -131,12 +128,11 @@ socket.onopen = () => {
         }
     }
 
-    socket.onclose = () => { serverData.socketOpen = false }
+    socket.onclose = () => { }
 }
 
 export const main_loop_one_iteration = () => {
-
-    if (serverData.socketOpen) sendMarioData()
+    if (socket.readyState == 1) sendMarioData()
 
     Object.values(serverData.extraPlayersByID).forEach(data => {
         if (data.chatData && data.chatData.timer > 0) data.chatData.timer--

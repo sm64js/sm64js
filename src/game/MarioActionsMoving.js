@@ -943,9 +943,9 @@ const common_ground_knockback_action = (m, animation, arg2, arg3, arg4) => {
 
     if (perform_ground_step(m) == Mario.GROUND_STEP_LEFT_GROUND) {
         if (m.forwardVel >= 0.0) {
-            set_mario_action(m, Mario.ACT_FORWARD_AIR_KB, arg4)
+            Mario.set_mario_action(m, Mario.ACT_FORWARD_AIR_KB, arg4)
         } else {
-            set_mario_action(m, Mario.ACT_BACKWARD_AIR_KB, arg4)
+            Mario.set_mario_action(m, Mario.ACT_BACKWARD_AIR_KB, arg4)
         }
     } else if (Mario.is_anim_at_end(m)) {
         if (m.health < 0x100) {

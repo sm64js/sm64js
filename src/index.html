@@ -65,23 +65,23 @@
             <br />
             <br />
 
-            <h6 id="numTriangles"> Total triangles rendered this frame: </h6>
+            <h6 hidden id="numTriangles"> Total triangles rendered this frame: </h6>
             <div class="row">
                 <div class="col-5" style="text-align:left">
                     <h6>Total Frame Time (Avg): </h6>
-                    <h6>Game Logic (Avg): </h6>
-                    <h6>Rendering/WebGL (Avg):</h6>
+                    <h6 hidden>Game Logic (Avg): </h6>
+                    <h6 hidden>Rendering/WebGL (Avg):</h6>
                 </div>
                 <div class="col-1">
                     <h6 id="timing-total"></h6>
-                    <h6 id="timing-game"></h6>
-                    <h6 id="timing-render"></h6>
+                    <h6 hidden id="timing-game"></h6>
+                    <h6 hidden id="timing-render"></h6>
                 </div>
                 <div class="col-6" style="text-align:right">
                     <h6 id="maxFps"></h6>
                 </div>
             </div>
-            <div class="row" style="justify-content:center;">
+            <div hidden class="row" style="justify-content:center;">
                 <h6 style="padding-right:10px"> Adjust Game Speed: </h6>
                 <input id="slider" type="range" style="width:300px" min="1" max="60" value="30">
                 <h6 id="fps" style="padding-left:10px"> 30 fps </h6>

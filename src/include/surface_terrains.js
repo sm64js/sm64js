@@ -34,7 +34,8 @@ export const SURFACE_SHALLOW_MOVING_QUICKSAND     = 0x0025 // Moving quicksand (
 export const SURFACE_QUICKSAND                    = 0x0026 // Moving quicksand (60 units)
 export const SURFACE_MOVING_QUICKSAND             = 0x0027 // Moving quicksand (flowing, depth of 60 units)
 export const SURFACE_HORIZONTAL_WIND              = 0x002C // Horizontal wind, has parameters
-export const SURFACE_INSTANT_MOVING_QUICKSAND     = 0x002D // Quicksand (lethal, flowing)
+export const SURFACE_INSTANT_MOVING_QUICKSAND = 0x002D // Quicksand (lethal, flowing)
+export const SURFACE_CAMERA_ROTATE_LEFT           = 0x0070
 export const SURFACE_CAMERA_BOUNDARY              = 0x0072 // Intangible Area, only used to restrict camera movement
 
 export const SURFACE_HARD_SLIPPERY                 = 0x0035 // Hard and slippery (Always has fall damage)
@@ -42,7 +43,8 @@ export const SURFACE_HARD_VERY_SLIPPERY            = 0x0036 // Hard and very sli
 export const SURFACE_HARD_NOT_SLIPPERY             = 0x0037 // Hard and Non-slippery (Always has fall damage)
 export const SURFACE_NOISE_VERY_SLIPPERY_73        = 0x0073 // Very slippery floor with noise, unused
 export const SURFACE_NOISE_VERY_SLIPPERY_74        = 0x0074 // Very slippery floor with noise, unused
-export const SURFACE_NOISE_VERY_SLIPPERY           = 0x0075 // Very slippery floor with noise, used in CCM
+export const SURFACE_NOISE_VERY_SLIPPERY = 0x0075 // Very slippery floor with noise, used in CCM
+export const SURFACE_BOSS_FIGHT_CAMERA = 0x0065
 
 export const SURFACE_CLASS_DEFAULT                 = 0x0000
 export const SURFACE_CLASS_VERY_SLIPPERY           = 0x0013

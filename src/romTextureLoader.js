@@ -61,10 +61,34 @@ import {
     mario_texture_eyes_closed
 } from "./actors/mario/model.inc"
 
+import {
+    generic_09005800,
+    generic_09006000,
+    generic_09009800,
+    generic_09009000,
+    generic_0900A000,
+    generic_09001800,
+    generic_09002000,
+    generic_09003000,
+    generic_09003800,
+    generic_09004800,
+    generic_09005000,
+    generic_09008800,
+    generic_0900B000
+} from "./textures/generic"
+
+import {
+    bob_seg7_texture_07000000,
+    bob_seg7_texture_07000800,
+    bob_seg7_texture_07001000,
+    bob_seg7_texture_07001800,
+    bob_seg7_texture_07002000
+} from "./levels/bob/textures.inc"
+
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 5
+const textureVersion = 6
 
 const loadDataIntoGame = (data) => {
 
@@ -123,6 +147,26 @@ const loadDataIntoGame = (data) => {
     outside_0900B400.push(...data['textures/outside/castle_grounds_textures.0B400.rgba16.png'].data)
     outside_0900A800.push(...data['textures/outside/castle_grounds_textures.0A800.rgba16.png'].data)
     outside_0900BC00.push(...data['textures/outside/castle_grounds_textures.0BC00.ia16.png'].data)
+
+    generic_09001800.push(...data["textures/generic/bob_textures.01800.rgba16.png"].data)
+    generic_09002000.push(...data["textures/generic/bob_textures.02000.rgba16.png"].data)
+    generic_09003000.push(...data["textures/generic/bob_textures.03000.rgba16.png"].data)
+    generic_09003800.push(...data["textures/generic/bob_textures.03800.rgba16.png"].data)
+    generic_09004800.push(...data["textures/generic/bob_textures.04800.rgba16.png"].data)
+    generic_09005000.push(...data["textures/generic/bob_textures.05000.rgba16.png"].data)
+    generic_09005800.push(...data["textures/generic/bob_textures.05800.rgba16.png"].data)
+    generic_09006000.push(...data["textures/generic/bob_textures.06000.rgba16.png"].data)
+    generic_09008800.push(...data["textures/generic/bob_textures.08800.rgba16.png"].data)
+    generic_09009000.push(...data["textures/generic/bob_textures.09000.rgba16.png"].data)
+    generic_09009800.push(...data["textures/generic/bob_textures.09800.rgba16.png"].data)
+    generic_0900A000.push(...data["textures/generic/bob_textures.0A000.rgba16.png"].data)
+    generic_0900B000.push(...data["textures/generic/bob_textures.0B000.ia16.png"].data)
+
+    bob_seg7_texture_07000000.push(...data["levels/bob/0.rgba16.png"].data)
+    bob_seg7_texture_07000800.push(...data["levels/bob/1.rgba16.png"].data)
+    bob_seg7_texture_07001000.push(...data["levels/bob/2.rgba16.png"].data)
+    bob_seg7_texture_07001800.push(...data["levels/bob/3.rgba16.png"].data)
+    bob_seg7_texture_07002000.push(...data["levels/bob/4.rgba16.png"].data)
 
     mario_texture_yellow_button.push(...data['actors/mario/mario_overalls_button.rgba16.png'].data)
     mario_texture_m_logo.push(...data['actors/mario/mario_logo.rgba16.png'].data)

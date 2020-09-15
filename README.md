@@ -1,10 +1,12 @@
 # sm64js
 
-## Project Website
-[sm64js.com](https://sm64js.com)
+### Links
+[Main Website: sm64js.com](https://sm64js.com)
+
+[Discord Server](https://discord.gg/7UaDnJt)
 
 ## What is this?
-This is a work in progress port of the decompilation of the original Nintendo game, Super Mario 64, to native Javascript (No Emulation) (No Web Assembly). This project also required creating a Javascript WebGL port of N64 Fast 3D Renderer originally implemented with OpenGL in C.
+This is an ongoing work-in-progress port of the decompilation of original Nintendo game, Super Mario 64, to native Javascript (No Emulation) (No Web Assembly). This project required creating a Javascript WebGL port of N64 Fast 3D Renderer originally implemented with OpenGL in C.  This project also includes the development of online mass multiplayer versions of sm64js and other custom multiplayer game modes.
 
 ## Build instructions - Windows, Mac, or Linux
 

@@ -793,7 +793,7 @@ class Camera {
 
 
         if (this.gPlayerCameraState.action & ACT_FLAG_HANGING || this.gPlayerCameraState.action == ACT_RIDING_HOOT) {
-            throw "hanging or riding"
+            /// TODO hanging or riding
         }
 
         if (this.gPlayerCameraState.action & ACT_FLAG_ON_POLE) {

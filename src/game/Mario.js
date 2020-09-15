@@ -106,6 +106,7 @@ export const MARIO_ANIM_STOP_SLIDE = 0x8F
 export const MARIO_ANIM_FALL_FROM_SLIDE = 0x90
 export const MARIO_ANIM_SLIDE = 0x91
 export const MARIO_ANIM_AIR_KICK = 0x4F
+export const MARIO_ANIM_HANG_ON_CEILING = 0x35
 export const MARIO_ANIM_FORWARD_SPINNING = 0x6F
 export const MARIO_ANIM_BACKWARD_SPINNING = 0x70
 export const MARIO_ANIM_START_TIPTOE = 0xCA
@@ -811,12 +812,15 @@ const update_mario_joystick_inputs = (m, playerInput) => {
 }
 
 const update_mario_geometry_inputs = (m) => {
+
+    m.floorHeight = SurfaceCollision.find_floor(m.pos[0], m.pos[1], m.pos[2], m)
+
     if (!m.floor) {
         m.pos = [ ...m.marioObj.header.gfx.pos ]
         m.floorHeight = SurfaceCollision.find_floor(m.pos[0], m.pos[1], m.pos[2], m)
     }
 
-    m.ceilHeight = 20000.0 //vec3f_find_ceil(&m->pos[0], m->floorHeight, &m->ceil);
+    m.ceilHeight = vec3_find_ceil(m.pos, m.floorHeight, m)
     m.waterLevel = -20000.0 //find_water_level(m->pos[0], m->pos[2]);
 
     if (m.floor) {
@@ -954,6 +958,11 @@ export const mario_get_floor_class = (m) => {
     }
 
     return floorClass
+}
+
+export const vec3_find_ceil = (pos, height, ceil) => {
+
+    return SurfaceCollision.find_ceil(pos[0], height + 80.0, pos[2], ceil)
 }
 
 export const find_floor_height_relative_polar = (m, angleFromMario, distFromMario) => {

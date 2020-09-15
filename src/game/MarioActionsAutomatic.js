@@ -3,6 +3,7 @@ import { oMarioPolePos, oPosX, oPosY, oPosZ, oMoveAnglePitch, oMoveAngleRoll, oM
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { approach_number } from "../engine/math_util"
 import { stop_and_set_height_to_floor } from "./MarioStep"
+import { SURFACE_HANGABLE } from "../include/surface_terrains"
 
 const POLE_NONE = 0
 const POLE_TOUCHED_FLOOR = 1
@@ -20,6 +21,78 @@ const update_hang_stationary = (m) => {
     m.pos[1] = m.ceilHeight - 160.0
     m.vel = [0, 0, 0]
     m.marioObj.header.gfx.pos = [...m.pos]
+}
+
+const update_hang_moving = (m) => {
+
+    const maxSpeed = 4.0
+
+    m.forwardVel += 1.0
+    if (m.forwardVel > maxSpeed) {
+        m.forwardVel = maxSpeed
+    }
+
+    m.faceAngle[1] = m.intendedYaw - approach_number((m.intendedYaw - m.faceAngle[1]), 0, 0x800, 0x800)
+
+    m.slideYaw = m.faceAngle[1]
+    m.slideVelX = m.forwardVel * Math.sin(m.faceAngle[1] / 0x8000 * Math.PI)
+    m.slideVelZ = m.forwardVel * Math.cos(m.faceAngle[1] / 0x8000 * Math.PI)
+
+    m.vel[0] = m.slideVelX
+    m.vel[1] = 0.0
+    m.vel[2] = m.slideVelZ
+
+    const nextPos = [
+        m.pos[0] - m.ceil.normal.y * m.vel[0],
+        m.pos[1],
+        m.pos[2] - m.ceil.normal.y * m.vel[2]
+    ]
+    
+    const stepResult = perform_hanging_step(m, nextPos)
+
+    m.marioObj.header.gfx.pos = [...m.pos]
+    m.marioObj.header.gfx.angle = [0, m.faceAngle[1], 0]
+
+    return stepResult
+}
+
+const perform_hanging_step = (m, nextPos) => {
+
+    m.wall = Mario.resolve_and_return_wall_collisions(nextPos, 50.0, 50.0)
+    const floorWrapper = {}, ceilWrapper = {}
+    const floorHeight = SurfaceCollision.find_floor(nextPos[0], nextPos[1], nextPos[2], floorWrapper)
+    const ceilHeight = Mario.vec3_find_ceil(nextPos, floorHeight, ceilWrapper)
+
+    if (floorWrapper.floor == null) {
+        return HANG_HIT_CEIL_OR_OOB
+    }
+    if (ceilWrapper.ceil == null) {
+        return HANG_LEFT_CEIL
+    }
+    if (ceilHeight - floorHeight <= 160.0) {
+        return HANG_HIT_CEIL_OR_OOB
+    }
+    if (ceilWrapper.ceil.type != SURFACE_HANGABLE) {
+        return HANG_LEFT_CEIL
+    }
+
+    const ceilOffset = ceilHeight - (nextPos[1] + 160.0)
+    if (ceilOffset < -30.0) {
+        return HANG_HIT_CEIL_OR_OOB
+    }
+    if (ceilOffset > 30.0) {
+        return HANG_LEFT_CEIL
+    }
+
+    nextPos[1] = m.ceilHeight - 160.0
+    m.pos = [...nextPos]
+
+    m.floor = floorWrapper.floor
+    m.floorHeight = floorHeight
+    m.ceil = ceilWrapper.ceil
+    m.ceilHeight = ceilHeight
+
+    return HANG_NONE
 }
 
 const set_pole_position = (m, offsetY) => {
@@ -174,6 +247,38 @@ const act_climbing_pole = (m) => {
     }
 
     return 0
+}
+
+const act_start_hanging = (m) => {
+    m.actionTimer++
+
+    if ((m.input & Mario.INPUT_NONZERO_ANALOG) && m.actionTimer >= 31) {
+        return Mario.set_mario_action(m, Mario.ACT_HANGING, 0)
+    }
+
+    if (!(m.input & Mario.INPUT_A_DOWN)) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
+    if (m.input & Mario.INPUT_Z_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
+    }
+
+    //! Crash if mario's referenced ceiling is NULL (same for other hanging actions)
+    if (m.ceil.type != SURFACE_HANGABLE) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_HANG_ON_CEILING)
+    //play sound if no flag
+    update_hang_stationary(m)
+
+    if (Mario.is_anim_at_end(m)) {
+        Mario.set_mario_action(m, Mario.ACT_HANGING, 0)
+    }
+
+    return 0
+
 }
 
 const act_hanging = (m) => {
@@ -453,6 +558,7 @@ export const mario_execute_automatic_action = (m) => {
         case Mario.ACT_LEDGE_GRAB: return act_ledge_grab(m)
         case Mario.ACT_LEDGE_CLIMB_DOWN: return act_ledge_climb_down(m)
         case Mario.ACT_LEDGE_CLIMB_FAST: return act_ledge_climb_fast(m)
+        case Mario.ACT_START_HANGING: return act_start_hanging(m)
         case Mario.ACT_HANGING: return act_hanging(m)
         case Mario.ACT_HANG_MOVING: return act_hang_moving(m)
         default: throw "unknown action automatic"

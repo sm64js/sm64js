@@ -75,6 +75,10 @@ const common_air_action_step = (m, landAction, animation, stepArg) => {
             Mario.set_mario_animation(m, Mario.MARIO_ANIM_IDLE_ON_LEDGE)
             Mario.drop_and_set_mario_action(m, Mario.ACT_LEDGE_GRAB, 0)
             break
+        case Mario.AIR_STEP_GRABBED_CEILING:
+            Mario.set_mario_action(m, Mario.ACT_START_HANGING, 0)
+            break
+
         default: throw "unkown air step result in common_air_action_step"
     }
 

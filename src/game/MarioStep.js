@@ -1,6 +1,8 @@
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import * as Mario from "./Mario"
 import { atan2s } from "../engine/math_util"
+import { ceil } from "mathjs"
+import { SURFACE_HANGABLE } from "../include/surface_terrains"
 
 const should_strengthen_gravity_for_jump_ascent = (m) => {
     if (!(m.input & Mario.INPUT_A_DOWN) && m.vel[1] > 20.0) {
@@ -97,6 +99,8 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
 
     const floorWrapper = {}
     const floorHeight = SurfaceCollision.find_floor(nextPos[0], nextPos[1], nextPos[2], floorWrapper)
+    const ceilWrapper = {}
+    const ceilHeight = Mario.vec3_find_ceil(nextPos, floorHeight, ceilWrapper)
 
     m.wall = null
 
@@ -115,13 +119,35 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
     }
 
     if (nextPos[1] <= floorHeight) {
-        m.pos[0] = nextPos[0]
-        m.pos[2] = nextPos[2]
-        m.floor = floorWrapper.floor
-        m.floorHeight = floorHeight
+        if (ceilHeight - floorHeight > 160) {
+            m.pos[0] = nextPos[0]
+            m.pos[2] = nextPos[2]
+            m.floor = floorWrapper.floor
+            m.floorHeight = floorHeight
+        }
 
         m.pos[1] = floorHeight
         return Mario.AIR_STEP_LANDED
+    }
+
+    if (nextPos[1] + 160 > ceilHeight) {
+        if (m.vel[1] > 0) {
+            m.vel[1] = 0
+
+            if ((stepArg & Mario.AIR_STEP_CHECK_HANG) && m.ceil && m.ceil.type == SURFACE_HANGABLE) {
+                return Mario.AIR_STEP_GRABBED_CEILING
+            }
+
+            return Mario.AIR_STEP_NONE
+        }
+
+        if (nextPos[1] <= m.floorHeight) {
+            m.pos[1] = m.floorHeight
+            return Mario.AIR_STEP_LANDED
+        }
+
+        m.pos[1] = nextPos[1]
+        return Mario.AIR_STEP_HIT_WALL
     }
 
     //! When the wall is not completely vertical or there is a slight wall
@@ -171,7 +197,8 @@ export const perform_air_step = (m, stepArg) => {
 
         if (quarterStepResult != Mario.AIR_STEP_NONE) stepResult = quarterStepResult
 
-        if (quarterStepResult == Mario.AIR_STEP_LANDED || quarterStepResult == Mario.AIR_STEP_GRABBED_LEDGE) break
+        if ([Mario.AIR_STEP_LANDED, Mario.AIR_STEP_GRABBED_LEDGE, Mario.AIR_STEP_GRABBED_CEILING, Mario.AIR_STEP_HIT_LAVA_WALL].includes(quarterStepResult)) { break }
+
     }
 
     if (m.vel[1] >= 0.0) m.peakHeight = m.pos[1]
@@ -190,6 +217,8 @@ const perform_ground_quarter_step = (m, nextPos) => {
 
     const floorWrapper = {}
     const floorHeight = SurfaceCollision.find_floor(nextPos[0], nextPos[1], nextPos[2], floorWrapper)
+    const ceilWrapper = {}
+    const ceilHeight = Mario.vec3_find_ceil(nextPos, floorHeight, ceilWrapper)
 
     m.wall = upperWall
 
@@ -202,11 +231,16 @@ const perform_ground_quarter_step = (m, nextPos) => {
     }
 
     if (nextPos[1] > floorHeight + 100.0) {
+
+        if (nextPos[1] + 160 > ceilHeight) return Mario.GROUND_STEP_HIT_WALL_STOP_QSTEPS
+
         m.pos = [...nextPos]
         m.floor = floorWrapper.floor
         m.floorHeight = floorHeight
         return Mario.GROUND_STEP_LEFT_GROUND
     }
+
+    if (floorHeight + 160 >= ceilHeight) return Mario.GROUND_STEP_HIT_WALL_STOP_QSTEPS
 
     m.pos = [ nextPos[0], floorHeight, nextPos[2] ]
     m.floor = floorWrapper.floor

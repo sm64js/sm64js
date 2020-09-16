@@ -271,6 +271,14 @@ window.loadDefaultControls = () => {
     })
 }
 
+const applyDeadzone = (number, threshold) => {
+    let percentage = (Math.abs(number) - threshold) / (1 - threshold)
+
+    if (percentage < 0) percentage = 0
+
+    return percentage * (number > 0 ? 1 : -1)
+}
+
 export const playerInputUpdate = () => {
 
     Keydrown.tick()
@@ -298,8 +306,8 @@ export const playerInputUpdate = () => {
         })
     }
 
-    if (stickX < deadzone && stickX > -deadzone) stickX = 0.0
-    if (stickY < deadzone && stickY > -deadzone) stickY = 0.0
+    stickX = applyDeadzone(stickX, deadzone)
+    stickY = applyDeadzone(stickY, deadzone)
 
     if (stickX == 0 && stickY == 0) {
         if (keyboardFinal.right) stickX += 1

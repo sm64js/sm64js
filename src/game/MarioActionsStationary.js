@@ -77,6 +77,11 @@ const act_braking_stop = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_PUNCHING, 0)
     }
 
+    if (!(m.input & Mario.INPUT_FIRST_PERSON)
+        && m.input & (Mario.INPUT_NONZERO_ANALOG | Mario.INPUT_A_PRESSED | Mario.INPUT_OFF_FLOOR | Mario.INPUT_ABOVE_SLIDE)) {
+        return Mario.check_common_action_exits(m)
+    }
+
     stopping_step(m, Mario.MARIO_ANIM_STOP_SKID, Mario.ACT_IDLE)
     return 0
 }

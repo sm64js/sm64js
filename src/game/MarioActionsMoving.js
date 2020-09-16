@@ -388,6 +388,10 @@ const act_turning_around = (m) => {
 
     switch (perform_ground_step(m)) {
 
+        case Mario.GROUND_STEP_LEFT_GROUND:
+            Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+            break
+
         case Mario.GROUND_STEP_NONE:
             m.particleFlags |= Mario.PARTICLE_DUST
             break

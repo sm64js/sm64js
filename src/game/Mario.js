@@ -125,6 +125,7 @@ export const MARIO_ANIM_SOFT_BACK_KB = 0x74
 export const MARIO_ANIM_SOFT_FRONT_KB = 0x75
 export const MARIO_ANIM_BACKWARD_KB = 0x7B
 export const MARIO_ANIM_FORWARD_KB = 0x7C
+export const MARIO_ANIM_START_WALLKICK = 0xCC
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002

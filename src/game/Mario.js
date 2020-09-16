@@ -812,28 +812,31 @@ export const execute_mario_action = (marioIndex) => {
     }
 }
 
-const update_mario_button_inputs = (m, playerInput) => {
-    if (playerInput.buttonPressedA) m.input |= INPUT_A_PRESSED
-    if (playerInput.buttonDownA) m.input |= INPUT_A_DOWN
-    if (playerInput.buttonPressedB) m.input |= INPUT_B_PRESSED
-    if (playerInput.buttonPressedZ) m.input |=  INPUT_Z_PRESSED
-    if (playerInput.buttonDownZ) m.input |=  INPUT_Z_DOWN
+const update_mario_button_inputs = (m) => {
+
+    if (m.controller == null) return
+
+    if (m.controller.buttonPressedA) m.input |= INPUT_A_PRESSED
+    if (m.controller.buttonDownA) m.input |= INPUT_A_DOWN
+    if (m.controller.buttonPressedB) m.input |= INPUT_B_PRESSED
+    if (m.controller.buttonPressedZ) m.input |=  INPUT_Z_PRESSED
+    if (m.controller.buttonDownZ) m.input |=  INPUT_Z_DOWN
 }
 
-const update_mario_joystick_inputs = (m, playerInput) => {
+const update_mario_joystick_inputs = (m) => {
 
-    const mag = playerInput.stickMag
+    if (m.controller == null) return
+
+    const mag = m.controller.stickMag
 
     m.intendedMag = mag / 2.0 
 
     if (m.intendedMag > 0.0) {
-        m.intendedYaw = atan2s(-playerInput.stickY, playerInput.stickX) + m.area.camera.yaw
+        m.intendedYaw = atan2s(-m.controller.stickY, m.controller.stickX) + m.area.camera.yaw
         m.input |= INPUT_NONZERO_ANALOG
     } else {
         m.intendedYaw = m.faceAngle[1]
     }
-
-    m.controller = { stickX: playerInput.stickX, stickY: playerInput.stickY, stickMag: playerInput.stickMag }
 
     m.intendedYaw = m.intendedYaw > 32767 ? m.intendedYaw - 65536 : m.intendedYaw
     m.intendedYaw = m.intendedYaw < -32768 ? m.intendedYaw + 65536 : m.intendedYaw
@@ -1027,8 +1030,8 @@ const update_mario_inputs = (m) => {
     m.collidedObjInteractTypes = m.marioObj.collidedObjInteractTypes
     m.flags &= 0xFFFFFF
 
-    update_mario_joystick_inputs(m, window.playerInput)
-    update_mario_button_inputs(m, window.playerInput)
+    update_mario_joystick_inputs(m)
+    update_mario_button_inputs(m)
     update_mario_geometry_inputs(m)
 
     if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) {

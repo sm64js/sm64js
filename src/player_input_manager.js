@@ -1,5 +1,6 @@
 import * as Keydrown from "./keydrown.min.js"
 import { sendChat } from "./socket.js"
+import { LevelUpdateInstance as LevelUpdate } from "./game/LevelUpdate.js"
 
 /////// Keyboard / Gamepad Input ////////
 
@@ -329,6 +330,8 @@ export const playerInputUpdate = () => {
 
         buttonDownA, buttonDownB, buttonDownZ, buttonDownStart
     }
+
+    LevelUpdate.gMarioState[0].controller = window.playerInput
 
     //// Repeat for other player
 /*    stickX = 0, stickY = 0

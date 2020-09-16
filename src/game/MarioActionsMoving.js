@@ -98,7 +98,7 @@ const anim_and_audio_for_walk = (m) => {
                 if (val04 > 8.0) {
                     m.actionTimer = 2
                 } else {
-                    let val14 = parseInt(val04 / 4.0 * 0x10000)
+                    let val14 = parseInt(val04 * 0x10000)
                     if (val14 < 0x1000) {
                         val14 = 0x1000
                     }

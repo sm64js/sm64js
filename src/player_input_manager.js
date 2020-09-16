@@ -236,7 +236,7 @@ $('[data-toggle="gamepadControlsToggle"]').on('shown.bs.popover', () => {
 })
 
 
-window.updateDeadZone = (data) => { deadzone = data }
+window.updateDeadZone = (data) => { deadzone = parseFloat(data) }
 
 window.updateKeyboardMapping = (chosenKey, gameButton) => {
     keyboardButtonMapping[gameButton] = chosenKey
@@ -298,8 +298,8 @@ export const playerInputUpdate = () => {
         })
     }
 
-    if (stickX < deadzone && stickX > deadzone) stickX = 0.0
-    if (stickY < deadzone && stickY > deadzone) stickY = 0.0
+    if (stickX < deadzone && stickX > -deadzone) stickX = 0.0
+    if (stickY < deadzone && stickY > -deadzone) stickY = 0.0
 
     if (stickX == 0 && stickY == 0) {
         if (keyboardFinal.right) stickX += 1

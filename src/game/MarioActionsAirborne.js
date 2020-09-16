@@ -141,7 +141,7 @@ const act_soft_bonk = (m) => {
     // play_sound_if_no_flag(m, SOUND_MARIO_UH, MARIO_MARIO_SOUND_PLAYED);
 
     common_air_knockback_step(m, Mario.ACT_FREEFALL_LAND, Mario.ACT_HARD_BACKWARD_GROUND_KB, 0x0056, m.forwardVel)
-    return false
+    return 0
 }
 
 const check_kick_or_dive_in_air = (m) => {
@@ -580,7 +580,9 @@ const act_air_hit_wall = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_SOFT_BONK, 0)
     }
 
-    return 0
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_START_WALLKICK)
+
+    return 1  /// Nintendo glitch
 }
 
 export const mario_execute_airborne_action = (m) => {

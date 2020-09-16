@@ -123,6 +123,8 @@ const gamepadButtonMapping = { //works for xbox
 
 const defaultGamepadButtonMapping = { ...gamepadButtonMapping }
 
+let deadzone = 0.08
+
 
 if (localStorage['sm64jsControls']) {
     Object.assign(keyboardButtonMapping, JSON.parse(localStorage['sm64jsControls']).keybaord)
@@ -171,7 +173,6 @@ $('[data-toggle="gamepadControlsToggle"]').on('shown.bs.popover', () => {
 
         const gamepad = navigator.getGamepads()[0]
         const numButtons = gamepad.buttons.length
-        const numAxes = gamepad.axes.length
 
         Array.from(messages).forEach(msg => {
             msg.innerHTML = `
@@ -213,6 +214,10 @@ $('[data-toggle="gamepadControlsToggle"]').on('shown.bs.popover', () => {
     }
 
 })
+
+window.updateDeadZone = (data) => {
+    console.log(data)
+}
 
 window.updateKeyboardMapping = (chosenKey, gameButton) => {
     keyboardButtonMapping[gameButton] = chosenKey
@@ -271,8 +276,8 @@ export const playerInputUpdate = () => {
         })
     }
 
-    if (stickX < 0.08 && stickX > -0.08) stickX = 0.0
-    if (stickY < 0.08 && stickY > -0.08) stickY = 0.0
+    if (stickX < deadzone && stickX > -deadzone) stickX = 0.0
+    if (stickY < deadzone && stickY > -deadzone) stickY = 0.0
 
     if (stickX == 0 && stickY == 0) {
         if (keyboardFinal.right) stickX += 1

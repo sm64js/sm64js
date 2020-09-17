@@ -3,6 +3,17 @@ import * as Mario from "./game/Mario"
 import { take_damage_and_knock_back, INTERACT_PLAYER } from "./game/Interaction"
 import { oDamageOrCoinValue, oInteractType, oPosX, oPosZ, oPosY } from "./include/object_constants"
 
+const myArrayBuffer = () => {
+    return new Promise((resolve) => {
+        let fr = new FileReader()
+        fr.onload = () => { resolve(fr.result) }
+        fr.readAsArrayBuffer(this)
+    })
+}
+
+File.prototype.arrayBuffer = File.prototype.arrayBuffer || myArrayBuffer
+Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
+
 const url = new URL(window.location.href)
 
 let websocketServerPath = "" 

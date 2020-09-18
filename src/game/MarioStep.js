@@ -170,7 +170,9 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
     if (upperWall || lowerWall) {
         m.wall = upperWall ? upperWall : lowerWall
 
-        const wallDYaw = atan2s(m.wall.normal.z, m.wall.normal.x) - m.faceAngle[1]
+        let wallDYaw = atan2s(m.wall.normal.z, m.wall.normal.x) - m.faceAngle[1]
+        if (wallDYaw > 32767) wallDYaw -= 65536
+        if (wallDYaw < -32768) wallDYaw += 65536
 
         if (wallDYaw < -0x6000 || wallDYaw > 0x6000) {
             m.flags |= Mario.MARIO_UNKNOWN_30

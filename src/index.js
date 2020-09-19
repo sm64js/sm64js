@@ -10,41 +10,53 @@ const send_display_list = (gfx_list) => {
 }
 
 let n_frames = 0
+let target_time = 0
+let frameSpeed = 0.03
+let start_render = 0
+
 const produce_one_frame = () => {
+
+    const start_frame = performance.now()
 
     //if (n_frames > 100000) { throw "Hit max frames" }
     //console.log("new frame: " + n_frames)
     n_frames++
 
+    playerInputUpdate() /// Keyboard buttons / joystick process to game input commands
     GFX.start_frame()
     Game.main_loop_one_iteration()
 
     /// Audio TODO
 
-    GFX.end_frame()
-
+    const finished_frame = performance.now()
+    webpage_update()
+    gameLogicFrameTimeBuffer.push(start_render - start_frame)
+    renderFrameTimeBuffer.push(finished_frame - start_render)
+    totalFrameTimeBuffer.push(finished_frame - start_frame)
 }
 
-const runGameWithMetrics = () => {
+//// implementation from Emil <3
+const on_anim_frame = (time) => {
+
+    time *= frameSpeed
+
+    if (time >= target_time + 10.0) {
+        // We are lagging 10 frames behind, probably due to coming back after inactivity,
+        // so reset, with a small margin to avoid potential jitter later.
+        target_time = time - 0.010
+    }
+
+    for (let i = 0; i < 2; i++) {
+        // If refresh rate is 15 Hz or something we might need to generate two frames
+        if (time >= target_time) {
+            produce_one_frame()
+            target_time = target_time + 1.0
+        }
+    }
 
     if (window.kill) throw "stopping game execution"
+    requestAnimationFrame(on_anim_frame)
 
-    requestAnimationFrame(runGameWithMetrics)
-
-    const elapsed = performance.now() - last_frame_start
-    if (elapsed > frameSpeed) {
-
-        playerInputUpdate() /// Keyboard buttons / joystick process to game input commands
-
-        const start_frame = performance.now()
-        last_frame_start = start_frame - (elapsed % frameSpeed)
-        produce_one_frame()
-        const finished_frame = performance.now()
-        webpage_update()
-        gameLogicFrameTimeBuffer.push(start_render - start_frame)
-        renderFrameTimeBuffer.push(finished_frame - start_render)
-        totalFrameTimeBuffer.push(finished_frame - start_frame)
-    }
 }
 
 const main_func = () => {
@@ -52,14 +64,9 @@ const main_func = () => {
     /// WebGL class and n64GfxProcessor class are initialized with their constructor when they are imported
     Game.attachInterfaceToGfxProcessor(send_display_list)
 
-    runGameWithMetrics()
+    on_anim_frame()
 
 }
-
-let frameSpeed = 33.3
-
-let start_render = 0
-let last_frame_start = 0
 
 
 //////////////////// Some more website stuff

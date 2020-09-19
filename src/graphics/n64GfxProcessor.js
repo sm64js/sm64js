@@ -122,8 +122,6 @@ export class n64GfxProcessor {
         /// handle dimensions
     }
 
-    end_frame() { }
-
     sp_reset() {
         this.rsp.modelview_matrix_stack_size = 1
         this.rsp.current_num_lights = 2

@@ -1079,7 +1079,6 @@ export const init_mario_from_save_file = () => {
             spawnInfo: Area.gMarioSpawnInfo,
             statusForCamera: Camera.gPlayerCameraState,
             marioBodyState: MarioMisc.gBodyState,
-            controller: null,
             animation: { animList: gMarioAnimData, targetAnim: null },
             numCoins: 0, numStars: 0, numKeys: 0,
             numLives: 4, health: 0x880,

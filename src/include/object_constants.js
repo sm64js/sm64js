@@ -36,13 +36,13 @@ export const OBJ_MOVE_ABOVE_DEATH_BARRIER = (1 << 14) // 0x4000
 
 export const OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE = (1 << 0) // 0x00000001
 
-export const oFlags = 1
+export const oFlags = 0x01
 
-export const oIntangibleTimer = 5
+export const oIntangibleTimer = 0x05
 
-export const oPosX = 6
-export const oPosY = 7
-export const oPosZ = 8
+export const oPosX = 0x06
+export const oPosY = 0x07
+export const oPosZ = 0x08
 
 export const oMoveAnglePitch = 0x0F
 export const oMoveAngleYaw = 0x10

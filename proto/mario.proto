@@ -5,11 +5,34 @@ message MarioListMsg {
 }
 
 message MarioMsg {
-  string playerName = 1;
-  int32 skinID = 2;
-  int32 animID = 3;
-  int32 animFrame = 4;
-  uint32 socketID = 5;
-  repeated sint32 pos = 6;
-  repeated sint32 angle = 7;
+	ControllerMsg controller = 1;
+	string playerName = 2;
+	int32 skinID = 3;
+	uint32 action = 4;
+	uint32 prevAction = 5;
+	uint32 actionState = 6;
+	uint32 actionTimer = 7;
+	uint32 actionArg = 8;
+	sint32 invincTimer = 9;
+	uint32 framesSinceA = 10;
+	uint32 framesSinceB = 11;
+	uint32 wallKickTimer = 12;
+	uint32 doubleJumpTimer = 13;
+	repeated sint32 faceAngle = 14;
+	repeated sint32 angleVel = 15;
+	sint32 slideYaw = 16;
+	repeated float pos = 17;
+	repeated float vel = 18;
+	float forwardVel = 19;
+	float slideVelX = 20;
+	float slideVelY = 21;
+	repeated sint32 rawData = 22;
+}
+
+message ControllerMsg {
+	float stickX = 1;
+	float stickY = 2;
+	float stickMag = 3;
+	uint32 buttonDown = 4;
+	uint32 buttonPressed = 5;
 }

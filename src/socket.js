@@ -2,6 +2,7 @@ import { MarioMsg, MarioListMsg } from "../proto/mario_pb"
 import * as Mario from "./game/Mario"
 import { take_damage_and_knock_back, INTERACT_PLAYER } from "./game/Interaction"
 import { oDamageOrCoinValue, oInteractType, oPosX, oPosZ, oPosY } from "./include/object_constants"
+import { createMarioProtoMsg } from "./game/MultiMarioManager"
 
 const myArrayBuffer = () => {
     return new Promise((resolve) => {
@@ -144,6 +145,7 @@ socket.onopen = () => {
 
 export const main_loop_one_iteration = () => {
     if (socket.readyState == 1) sendMarioData()
+    createMarioProtoMsg()
 
     Object.values(serverData.extraPlayersByID).forEach(data => {
         if (data.chatData && data.chatData.timer > 0) data.chatData.timer--

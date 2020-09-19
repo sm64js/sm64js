@@ -183,6 +183,12 @@ const act_grab_pole_fast = (m) => {
 const act_holding_pole = (m) => {
     const marioObj = m.marioObj
 
+    if (m.input & Mario.INPUT_Z_PRESSED) {
+        //add_tree_leaf_particles(m) TODO
+        m.forwardVel = -2
+        return Mario.set_mario_action(m, Mario.ACT_SOFT_BONK, 0)
+    }
+
     if (m.input & Mario.INPUT_A_PRESSED) {
         //add_tree_leaf_particles(m) TODO
         m.faceAngle[1] += 0x8000

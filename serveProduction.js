@@ -61,13 +61,19 @@ const processPlayerData = (socketID, bytes) => {
 
 
 const processBasicAttack = (socketID, bytes) => {
+
+    if (allSocket[socketID].valid == 0) return
+
     const attackMsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
     attackMsg.attackerID = socketID
     const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify(attackMsg))
     sendDataWithOpcode(responseMsg, 2, allSockets[attackMsg.id].socket)
 }
 
-const processKnockUp = (bytes) => {
+const processKnockUp = (socketID, bytes) => {
+
+    if (allSocket[socketID].valid == 0) return
+
     const attackMsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
     const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify(attackMsg))
     sendDataWithOpcode(responseMsg, 4, allSockets[attackMsg.id].socket)
@@ -113,7 +119,7 @@ new App({}).ws('/*', {
                 case 0: processPlayerData(socket.id, bytes.slice(1)); break
                 case 1: processChat(socket.id, bytes.slice(1)); break
                 case 2: processBasicAttack(socket.id, bytes.slice(1)); break
-                case 4: processKnockUp(bytes.slice(1)); break
+                case 4: processKnockUp(socket.id, bytes.slice(1)); break
                 default: console.log("unknown opcode: " + opcode)
             }
         } catch (err) { console.log(err) }

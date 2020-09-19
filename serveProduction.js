@@ -62,7 +62,7 @@ const processPlayerData = (socketID, bytes) => {
 
 const processBasicAttack = (socketID, bytes) => {
 
-    if (allSocket[socketID].valid == 0) return
+    if (allSockets[socketID].valid == 0) return
 
     const attackMsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
     attackMsg.attackerID = socketID
@@ -72,7 +72,7 @@ const processBasicAttack = (socketID, bytes) => {
 
 const processKnockUp = (socketID, bytes) => {
 
-    if (allSocket[socketID].valid == 0) return
+    if (allSockets[socketID].valid == 0) return
 
     const attackMsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
     const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify(attackMsg))

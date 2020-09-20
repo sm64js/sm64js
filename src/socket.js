@@ -142,7 +142,21 @@ socket.onopen = () => {
     socket.onclose = () => { }
 }
 
-export const main_loop_one_iteration = () => {
+const updateConnectedMsg = () => {
+    const elem = document.getElementById("connectedMsg")
+    if (socket.readyState == 1) {
+        elem.innerHTML = "Connected To Server"
+        elem.style.color = "lawngreen"
+    } else {
+        elem.innerHTML = "Not connected to server - try refreshing - or server is down"
+        elem.style.color = "red"
+    }
+}
+
+export const main_loop_one_iteration = (frame) => {
+
+    updateConnectedMsg()
+
     if (socket.readyState == 1) sendMarioData()
 
     Object.values(serverData.extraPlayersByID).forEach(data => {

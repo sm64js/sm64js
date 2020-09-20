@@ -16,14 +16,11 @@ message MarioMsg {
 	uint32 doubleJumpTimer = 13;
 	repeated sint32 faceAngle = 14;
 	repeated sint32 angleVel = 15;
-	sint32 slideYaw = 16;
-	repeated float pos = 17;
-	repeated float vel = 18;
-	float forwardVel = 19;
-	float slideVelX = 20;
-	float slideVelY = 21;
-	repeated sint32 rawData = 22;
-	int32 socketID = 23;
+	repeated float pos = 16;
+	repeated float vel = 17;
+	float forwardVel = 18;
+	repeated sint32 rawData = 19;
+	int32 socketID = 20;
 }
 
 message ControllerMsg {

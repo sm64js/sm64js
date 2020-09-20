@@ -4,17 +4,6 @@ import { take_damage_and_knock_back, INTERACT_PLAYER } from "./game/Interaction"
 import { oDamageOrCoinValue, oInteractType, oPosX, oPosZ, oPosY } from "./include/object_constants"
 import * as Multi from "./game/MultiMarioManager"
 
-const myArrayBuffer = () => {
-    return new Promise((resolve) => {
-        let fr = new FileReader()
-        fr.onload = () => { resolve(fr.result) }
-        fr.readAsArrayBuffer(this)
-    })
-}
-
-File.prototype.arrayBuffer = File.prototype.arrayBuffer || myArrayBuffer
-Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
-
 const url = new URL(window.location.href)
 
 let websocketServerPath = "" 
@@ -26,6 +15,8 @@ if (url.protocol == "https:") {
 }
 
 const socket = new WebSocket(websocketServerPath)
+
+if (Blob.prototype.arrayBuffer == undefined) socket.close()
 
 window.myMario = {
     skinID: 0,
@@ -147,8 +138,8 @@ const multiplayerReady = () => {
     return socket.readyState == 1 && gameData.marioState && networkData.mySocketID != null
 }
 
-export const send_controller_update = () => {
-    if (multiplayerReady()) {
+export const send_controller_update = (frame) => {
+    if (multiplayerReady() && frame % 2 == 0) {
         sendDataWithOpcode(Multi.createControllerProtoMsg().serializeBinary(), 3)
     }
 }

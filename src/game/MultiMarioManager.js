@@ -3,25 +3,8 @@ import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "../socket"
 
 const rawDataMap = {
-    0: RAW.oIntangibleTimer,
-    1: RAW.oPosX,
-    2: RAW.oPosY,
-    3: RAW.oPosZ,
-    4: RAW.oMoveAnglePitch,
-    5: RAW.oMoveAngleYaw,
-    6: RAW.oMoveAngleRoll,
-    7: RAW.oFaceAnglePitch,
-    8: RAW.oFaceAngleYaw,
-    9: RAW.oFaceAngleRoll,
-    10: RAW.oFloorHeight,
-    11: RAW.oVelX,
-    12: RAW.oVelY,
-    13: RAW.oVelZ,
-    14: RAW.oMarioPoleYawVel,
-    15: RAW.oMarioPolePos,
-    16: RAW.oInteractStatus,
-    17: RAW.oDamageOrCoinValue,
-    18: RAW.oHealth
+    0: RAW.oMarioPoleYawVel,
+    1: RAW.oMarioPolePos,
 }
 
 const getMarioRawDataSubset = (fullRawData) => {
@@ -63,9 +46,6 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     m.wallKickTimer = update.wallkicktimer
     m.doubleJumpTimer = update.doublejumptimer
     m.angleVel = update.anglevelList
-    m.slideYaw = update.slideyaw
-    m.slideVelX = update.slidevelx
-    m.slideVelY = update.slidevely
     m.forwardVel = update.forwardvel
     m.vel = update.velList
     m.pos = update.posList
@@ -101,12 +81,9 @@ export const createMarioProtoMsg = () => {
     mariomsg.setDoublejumptimer(m.doubleJumpTimer)
     mariomsg.setFaceangleList(m.faceAngle)
     mariomsg.setAnglevelList(m.angleVel)
-    mariomsg.setSlideyaw(m.slideYaw)
     mariomsg.setPosList(m.pos)
     mariomsg.setVelList(m.vel)
     mariomsg.setForwardvel(m.forwardVel)
-    mariomsg.setSlidevelx(m.slideVelX)
-    mariomsg.setSlidevely(m.slideVelY)
 
     mariomsg.setRawdataList(getMarioRawDataSubset(m.marioObj.rawData))
     mariomsg.setSocketid(networkData.mySocketID)

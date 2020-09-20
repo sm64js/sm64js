@@ -84,7 +84,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<number>}
  * @const
  */
-proto.MarioMsg.repeatedFields_ = [14,15,17,18,22];
+proto.MarioMsg.repeatedFields_ = [14,15,16,17,19];
 
 
 
@@ -132,14 +132,11 @@ proto.MarioMsg.toObject = function(includeInstance, msg) {
     doublejumptimer: jspb.Message.getFieldWithDefault(msg, 13, 0),
     faceangleList: (f = jspb.Message.getRepeatedField(msg, 14)) == null ? undefined : f,
     anglevelList: (f = jspb.Message.getRepeatedField(msg, 15)) == null ? undefined : f,
-    slideyaw: jspb.Message.getFieldWithDefault(msg, 16, 0),
-    posList: (f = jspb.Message.getRepeatedFloatingPointField(msg, 17)) == null ? undefined : f,
-    velList: (f = jspb.Message.getRepeatedFloatingPointField(msg, 18)) == null ? undefined : f,
-    forwardvel: jspb.Message.getFloatingPointFieldWithDefault(msg, 19, 0.0),
-    slidevelx: jspb.Message.getFloatingPointFieldWithDefault(msg, 20, 0.0),
-    slidevely: jspb.Message.getFloatingPointFieldWithDefault(msg, 21, 0.0),
-    rawdataList: (f = jspb.Message.getRepeatedField(msg, 22)) == null ? undefined : f,
-    socketid: jspb.Message.getFieldWithDefault(msg, 23, 0)
+    posList: (f = jspb.Message.getRepeatedFloatingPointField(msg, 16)) == null ? undefined : f,
+    velList: (f = jspb.Message.getRepeatedFloatingPointField(msg, 17)) == null ? undefined : f,
+    forwardvel: jspb.Message.getFloatingPointFieldWithDefault(msg, 18, 0.0),
+    rawdataList: (f = jspb.Message.getRepeatedField(msg, 19)) == null ? undefined : f,
+    socketid: jspb.Message.getFieldWithDefault(msg, 20, 0)
   };
 
   if (includeInstance) {
@@ -238,34 +235,22 @@ proto.MarioMsg.deserializeBinaryFromReader = function(msg, reader) {
       msg.setAnglevelList(value);
       break;
     case 16:
-      var value = /** @type {number} */ (reader.readSint32());
-      msg.setSlideyaw(value);
-      break;
-    case 17:
       var value = /** @type {!Array<number>} */ (reader.readPackedFloat());
       msg.setPosList(value);
       break;
-    case 18:
+    case 17:
       var value = /** @type {!Array<number>} */ (reader.readPackedFloat());
       msg.setVelList(value);
       break;
-    case 19:
+    case 18:
       var value = /** @type {number} */ (reader.readFloat());
       msg.setForwardvel(value);
       break;
-    case 20:
-      var value = /** @type {number} */ (reader.readFloat());
-      msg.setSlidevelx(value);
-      break;
-    case 21:
-      var value = /** @type {number} */ (reader.readFloat());
-      msg.setSlidevely(value);
-      break;
-    case 22:
+    case 19:
       var value = /** @type {!Array<number>} */ (reader.readPackedSint32());
       msg.setRawdataList(value);
       break;
-    case 23:
+    case 20:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setSocketid(value);
       break;
@@ -404,59 +389,38 @@ proto.MarioMsg.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getSlideyaw();
-  if (f !== 0) {
-    writer.writeSint32(
-      16,
-      f
-    );
-  }
   f = message.getPosList();
   if (f.length > 0) {
     writer.writePackedFloat(
-      17,
+      16,
       f
     );
   }
   f = message.getVelList();
   if (f.length > 0) {
     writer.writePackedFloat(
-      18,
+      17,
       f
     );
   }
   f = message.getForwardvel();
   if (f !== 0.0) {
     writer.writeFloat(
-      19,
-      f
-    );
-  }
-  f = message.getSlidevelx();
-  if (f !== 0.0) {
-    writer.writeFloat(
-      20,
-      f
-    );
-  }
-  f = message.getSlidevely();
-  if (f !== 0.0) {
-    writer.writeFloat(
-      21,
+      18,
       f
     );
   }
   f = message.getRawdataList();
   if (f.length > 0) {
     writer.writePackedSint32(
-      22,
+      19,
       f
     );
   }
   f = message.getSocketid();
   if (f !== 0) {
     writer.writeInt32(
-      23,
+      20,
       f
     );
   }
@@ -791,29 +755,11 @@ proto.MarioMsg.prototype.clearAnglevelList = function() {
 
 
 /**
- * optional sint32 slideYaw = 16;
- * @return {number}
- */
-proto.MarioMsg.prototype.getSlideyaw = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 16, 0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.MarioMsg} returns this
- */
-proto.MarioMsg.prototype.setSlideyaw = function(value) {
-  return jspb.Message.setProto3IntField(this, 16, value);
-};
-
-
-/**
- * repeated float pos = 17;
+ * repeated float pos = 16;
  * @return {!Array<number>}
  */
 proto.MarioMsg.prototype.getPosList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedFloatingPointField(this, 17));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedFloatingPointField(this, 16));
 };
 
 
@@ -822,7 +768,7 @@ proto.MarioMsg.prototype.getPosList = function() {
  * @return {!proto.MarioMsg} returns this
  */
 proto.MarioMsg.prototype.setPosList = function(value) {
-  return jspb.Message.setField(this, 17, value || []);
+  return jspb.Message.setField(this, 16, value || []);
 };
 
 
@@ -832,7 +778,7 @@ proto.MarioMsg.prototype.setPosList = function(value) {
  * @return {!proto.MarioMsg} returns this
  */
 proto.MarioMsg.prototype.addPos = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 17, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 16, value, opt_index);
 };
 
 
@@ -846,11 +792,11 @@ proto.MarioMsg.prototype.clearPosList = function() {
 
 
 /**
- * repeated float vel = 18;
+ * repeated float vel = 17;
  * @return {!Array<number>}
  */
 proto.MarioMsg.prototype.getVelList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedFloatingPointField(this, 18));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedFloatingPointField(this, 17));
 };
 
 
@@ -859,7 +805,7 @@ proto.MarioMsg.prototype.getVelList = function() {
  * @return {!proto.MarioMsg} returns this
  */
 proto.MarioMsg.prototype.setVelList = function(value) {
-  return jspb.Message.setField(this, 18, value || []);
+  return jspb.Message.setField(this, 17, value || []);
 };
 
 
@@ -869,7 +815,7 @@ proto.MarioMsg.prototype.setVelList = function(value) {
  * @return {!proto.MarioMsg} returns this
  */
 proto.MarioMsg.prototype.addVel = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 18, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 17, value, opt_index);
 };
 
 
@@ -883,11 +829,11 @@ proto.MarioMsg.prototype.clearVelList = function() {
 
 
 /**
- * optional float forwardVel = 19;
+ * optional float forwardVel = 18;
  * @return {number}
  */
 proto.MarioMsg.prototype.getForwardvel = function() {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 19, 0.0));
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 18, 0.0));
 };
 
 
@@ -896,52 +842,16 @@ proto.MarioMsg.prototype.getForwardvel = function() {
  * @return {!proto.MarioMsg} returns this
  */
 proto.MarioMsg.prototype.setForwardvel = function(value) {
-  return jspb.Message.setProto3FloatField(this, 19, value);
+  return jspb.Message.setProto3FloatField(this, 18, value);
 };
 
 
 /**
- * optional float slideVelX = 20;
- * @return {number}
- */
-proto.MarioMsg.prototype.getSlidevelx = function() {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 20, 0.0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.MarioMsg} returns this
- */
-proto.MarioMsg.prototype.setSlidevelx = function(value) {
-  return jspb.Message.setProto3FloatField(this, 20, value);
-};
-
-
-/**
- * optional float slideVelY = 21;
- * @return {number}
- */
-proto.MarioMsg.prototype.getSlidevely = function() {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 21, 0.0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.MarioMsg} returns this
- */
-proto.MarioMsg.prototype.setSlidevely = function(value) {
-  return jspb.Message.setProto3FloatField(this, 21, value);
-};
-
-
-/**
- * repeated sint32 rawData = 22;
+ * repeated sint32 rawData = 19;
  * @return {!Array<number>}
  */
 proto.MarioMsg.prototype.getRawdataList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 22));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 19));
 };
 
 
@@ -950,7 +860,7 @@ proto.MarioMsg.prototype.getRawdataList = function() {
  * @return {!proto.MarioMsg} returns this
  */
 proto.MarioMsg.prototype.setRawdataList = function(value) {
-  return jspb.Message.setField(this, 22, value || []);
+  return jspb.Message.setField(this, 19, value || []);
 };
 
 
@@ -960,7 +870,7 @@ proto.MarioMsg.prototype.setRawdataList = function(value) {
  * @return {!proto.MarioMsg} returns this
  */
 proto.MarioMsg.prototype.addRawdata = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 22, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 19, value, opt_index);
 };
 
 
@@ -974,11 +884,11 @@ proto.MarioMsg.prototype.clearRawdataList = function() {
 
 
 /**
- * optional int32 socketID = 23;
+ * optional int32 socketID = 20;
  * @return {number}
  */
 proto.MarioMsg.prototype.getSocketid = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 23, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 20, 0));
 };
 
 
@@ -987,7 +897,7 @@ proto.MarioMsg.prototype.getSocketid = function() {
  * @return {!proto.MarioMsg} returns this
  */
 proto.MarioMsg.prototype.setSocketid = function(value) {
-  return jspb.Message.setProto3IntField(this, 23, value);
+  return jspb.Message.setProto3IntField(this, 20, value);
 };
 
 

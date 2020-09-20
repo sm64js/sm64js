@@ -159,6 +159,8 @@ const startGame = () => {
     document.getElementById("startbutton").classList.add('btn-light')
     document.getElementById("startbutton").innerHTML = "🔄 Reset Game"
 
+    document.getElementById("connectedMsg").hidden = false
+
     main_func()
 }
 

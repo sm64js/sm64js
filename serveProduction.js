@@ -61,7 +61,7 @@ const processPlayerData = (socketID, bytes) => {
 
     /// Data is Valid
     allSockets[socketID].decodedMario = decodedMario
-    allSockets[socketID].valid = 30
+    allSockets[socketID].valid = 60
 
     //publish
     broadcastDataWithOpcode(bytes, 0, socketID)
@@ -116,6 +116,7 @@ const game_loop = setInterval(() => {
     sendMainUpdate()
     Object.values(allSockets).forEach(data => {
         if (data.valid > 0) data.valid--
+        else if (data.decodedMario) data.socket.end()
     })
 
 }, 30)

@@ -1,8 +1,8 @@
-import { MarioMsg, MarioListMsg } from "../proto/mario_pb"
+import { ControllerMsg, MarioListMsg } from "../proto/mario_pb"
 import * as Mario from "./game/Mario"
 import { take_damage_and_knock_back, INTERACT_PLAYER } from "./game/Interaction"
 import { oDamageOrCoinValue, oInteractType, oPosX, oPosZ, oPosY } from "./include/object_constants"
-import { createMarioProtoMsg } from "./game/MultiMarioManager"
+import * as Multi from "./game/MultiMarioManager"
 
 const myArrayBuffer = () => {
     return new Promise((resolve) => {
@@ -28,17 +28,14 @@ if (url.protocol == "https:") {
 const socket = new WebSocket(websocketServerPath)
 
 window.myMario = {
-    me: true,
-    pos: [0, 0, 0],
-    angle: [0, 0, 0],
-    animFrame: 0, animID: -1,
     skinID: 0,
     playerName: "Unnamed Player"
 }
 
-export const serverData = {
-    extraMarios: [],
-    extraPlayersByID: {},
+export const networkData = {
+    //extraMarios: [],
+    remotePlayers: {},
+    mySocketID: -1,
 }
 
 export const gameData = {}
@@ -50,7 +47,7 @@ const sendDataWithOpcode = (bytes, opcode) => {
     socket.send(newbytes)
 }
 
-const recvMarioData = (mariolistmsg) => {
+/*const recvMarioData = (mariolistmsg) => {
     serverData.extraMarios = mariolistmsg.map((mario) => {
         return {
             pos: mario.getPosList(),
@@ -63,21 +60,22 @@ const recvMarioData = (mariolistmsg) => {
         }
     })
     serverData.extraMarios.forEach(marioData => {
-        if (serverData.extraPlayersByID[marioData.socketID] == undefined)
-            serverData.extraPlayersByID[marioData.socketID] = {}
-        Object.assign(serverData.extraPlayersByID[marioData.socketID], { marioData })
+        if (serverData.remotePlayersByID[marioData.socketID] == undefined)
+            serverData.remotePlayersByID[marioData.socketID] = {}
+        Object.assign(serverData.remotePlayersByID[marioData.socketID], { marioData })
     })
-}
+}*/
 
 const recvMyID = (msg) => {
-    serverData.extraPlayersByID[msg.id] = { marioData: window.myMario }
-    window.myMario.socketID = msg.id
+    networkData.mySocketID = msg.id
+/*    serverData.remotePlayersByID[msg.id] = { marioData: window.myMario }
+    window.myMario.socketID = msg.id*/
 }
 
 const recvChat = (chatmsg) => {
-    if (serverData.extraPlayersByID[chatmsg.socketID] == undefined)
-        serverData.extraPlayersByID[chatmsg.socketID] = {}
-    Object.assign(serverData.extraPlayersByID[chatmsg.socketID], { chatData: { msg: chatmsg.msg, timer: 80 } })
+    if (serverData.remotePlayersByID[chatmsg.socketID] == undefined)
+        serverData.remotePlayersByID[chatmsg.socketID] = {}
+    Object.assign(serverData.remotePlayersByID[chatmsg.socketID], { chatData: { msg: chatmsg.msg, timer: 80 } })
     const chatlog = document.getElementById("chatlog")
     chatlog.innerHTML += '<strong>' + chatmsg.sender + '</strong>: ' + chatmsg.msg + '<br/>'
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
@@ -85,7 +83,7 @@ const recvChat = (chatmsg) => {
 
 const recvBasicAttack = (attackData) => {
     const m = gameData.marioState
-    const attackerMarioData = serverData.extraPlayersByID[attackData.attackerID].marioData
+    const attackerMarioData = serverData.remotePlayersByID[attackData.attackerID].marioData
     //const knockbackMultiplier = attackData.knockbackMultiplier
     const attackerMarioObj = {
         rawData: new Array(0x50).fill(0)
@@ -113,7 +111,7 @@ const recvKnockUp = (data) => {
     }
 }
 
-const sendMarioData = () => {
+/*const sendMarioData = () => {
     const mariomsg = new MarioMsg()
     mariomsg.setPlayername(window.myMario.playerName)
     mariomsg.setSkinid(window.myMario.skinID)
@@ -122,7 +120,7 @@ const sendMarioData = () => {
     mariomsg.setAngleList(window.myMario.angle)
     mariomsg.setPosList(window.myMario.pos)
     sendDataWithOpcode(mariomsg.serializeBinary(), 0)
-}
+}*/
 
 socket.onopen = () => {
 
@@ -131,11 +129,13 @@ socket.onopen = () => {
         const opcode = bytes[0]
         const msgBytes = bytes.slice(1)
         switch (opcode) {
-            case 0: recvMarioData(MarioListMsg.deserializeBinary(msgBytes).getMarioList()); break
+            case 0: if (multiplayerReady()) Multi.recvMarioData(msgBytes); break
             case 1: recvChat(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             case 2: recvBasicAttack(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
-            case 3: recvMyID(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
+            case 3: if (multiplayerReady()) Multi.recvControllerUpdate(msgBytes); break
             case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
+            case 8: Multi.recvValidSockets(msgBytes); break
+            case 9: recvMyID(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             default: throw "unknown websocket opcode"
         }
     }
@@ -143,11 +143,22 @@ socket.onopen = () => {
     socket.onclose = () => { }
 }
 
-export const main_loop_one_iteration = () => {
-    if (socket.readyState == 1) sendMarioData()
-    createMarioProtoMsg()
+const multiplayerReady = () => {
+    return socket.readyState == 1 && gameData.marioState && networkData.mySocketID != null
+}
 
-    Object.values(serverData.extraPlayersByID).forEach(data => {
+export const send_controller_update = () => {
+    if (multiplayerReady()) {
+        sendDataWithOpcode(Multi.createControllerProtoMsg().serializeBinary(), 3)
+    }
+}
+
+export const post_main_loop_one_iteration = (frame) => {
+    if (multiplayerReady() && frame % 5 == 0) {
+        sendDataWithOpcode(Multi.createMarioProtoMsg(), 0)
+    }
+
+    Object.values(networkData.remotePlayers).forEach(data => {
         if (data.chatData && data.chatData.timer > 0) data.chatData.timer--
     })
 }
@@ -158,9 +169,11 @@ export const getExtraMarios = () => {
 
 export const getExtraRenderData = (socketID) => {
 
+    return { skinID: 0 }
+
     if (socketID == undefined) return { skinID: window.myMario.skinID }
 
-    const data = serverData.extraPlayersByID[socketID]
+    const data = serverData.remotePlayersByID[socketID]
     return {
         chat: (data.chatData && data.chatData.timer > 0) ? data.chatData.msg : null,
         skinID: data.marioData.skinID,
@@ -169,11 +182,11 @@ export const getExtraRenderData = (socketID) => {
 }
 
 export const sendChat = (msg) => {
-    sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify({ msg })), 1)
+    //sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify({ msg })), 1)
 }
 
 export const processAttack = (myMarioPos, myMarioAngle, attackTier, forceAir) => {
-    const angleRadians = myMarioAngle / 0x8000 * Math.PI
+/*    const angleRadians = myMarioAngle / 0x8000 * Math.PI
     const x = myMarioPos[0] + Math.sin(angleRadians) * 80
     const z = myMarioPos[2] + Math.cos(angleRadians) * 80
 
@@ -184,11 +197,11 @@ export const processAttack = (myMarioPos, myMarioAngle, attackTier, forceAir) =>
             const attackMsg = { id: marioData.socketID, attackTier, forceAir }
             sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify(attackMsg)), 2)
         }
-    })
+    })*/
 }
 
 export const processDiveAttack = (myMarioPos, diveSpeed) => {
-    if (diveSpeed > 25) {
+/*    if (diveSpeed > 25) {
 
         serverData.extraMarios.forEach(extraMario => {
             const distance = Math.sqrt(
@@ -201,12 +214,12 @@ export const processDiveAttack = (myMarioPos, diveSpeed) => {
                 sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify(diveHitMsg)), 4)
             }
         })
-    }
+    }*/
 }
 
 export const processBreakdanceTrip = (myMarioPos) => {
 
-    serverData.extraMarios.forEach(extraMario => {
+/*    serverData.extraMarios.forEach(extraMario => {
         const distance = Math.sqrt(
             Math.pow(extraMario.pos[0] - myMarioPos[0], 2) +
             Math.pow(extraMario.pos[1] - myMarioPos[1], 2) +
@@ -216,6 +229,6 @@ export const processBreakdanceTrip = (myMarioPos) => {
             const tripMsg = { id: extraMario.socketID, upwardForce: 15 }
             sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify(tripMsg)), 4)
         }
-    })
+    })*/
 
 }

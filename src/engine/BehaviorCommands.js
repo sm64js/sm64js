@@ -40,6 +40,7 @@ class BehaviorCommands {
     }
 
     obj_update_gfx_pos_and_angle(obj) {
+
         obj.header.gfx.pos[0] = obj.rawData[oPosX]
         obj.header.gfx.pos[1] = obj.rawData[oPosY] + obj.rawData[oGraphYOffset]
         obj.header.gfx.pos[2] = obj.rawData[oPosZ]

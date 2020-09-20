@@ -5,8 +5,8 @@ import * as Gbi from "../include/gbi"
 import { CameraInstance as Camera } from "../game/Camera"
 import * as Mario from "../game/Mario"
 import { create_shadow_below_xyz } from "../game/Shadow"
-import { gMarioAnimData } from "../actors/mario/marioAnimData"
-import { getExtraMarios } from "../socket"
+import { getExtraMarios, networkData } from "../socket"
+import { MarioMiscInstance as MarioMisc } from "../game/MarioMisc"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -294,6 +294,7 @@ class GeoRenderer {
     }
 
     geo_set_animation_globals(node, hasAnimation) {
+
         const anim = node.curAnim
 
         if (hasAnimation) {
@@ -389,9 +390,10 @@ class GeoRenderer {
             if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) { 
                 if (object.header.gfx.sharedChild) {
 
-                    if (object.marioIndex == 0) {
+                    if (object.localMario) {
+                        MarioMisc.gBodyState = object.marioState.marioBodyState
                         //// sending my own custom gfx opcode to set skin id
-                        this.geo_append_display_list([Gbi.gsSetPlayerData(window.myMario.socketID)], 1) 
+                        this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.mySocketID)], 1) 
                     }
 
                     this.gCurGraphNodeObject = node.wrapper
@@ -413,29 +415,19 @@ class GeoRenderer {
 
         }
 
-        if (object.marioIndex == 0) {  /// original Mario
-
-            const gfx = object.header.gfx
-            Object.assign(window.myMario, {
-                pos: gfx.pos.map((x) => parseInt(x)),
-                angle: gfx.angle.map((x) => parseInt(x)),
-                animFrame: gfx.unk38.animFrame,
-                animID: gfx.unk38.animID,
+        if (object.localMario) {  /// original Mario
+            Object.entries(networkData.remotePlayers).forEach(([id, data]) => {
+                const marioObj = data.marioState.marioObj
+                this.geo_process_extra_mario(marioObj)
             })
-
-
-            getExtraMarios().forEach((marioData) => {
-                this.geo_process_extra_mario(marioData, gfx)
-            })
-            
         }
 
     }
 
 
-    geo_process_extra_mario(marioData, gfx) {
+    geo_process_extra_mario(object) {
 
-        const { pos, angle, animFrame, animID, socketID } = marioData
+        const { pos, angle } = object.header.gfx
 
         const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
 
@@ -446,24 +438,16 @@ class GeoRenderer {
 
         this.gMatStackIndex++
 
-        if (this.obj_is_in_view(gfx, this.gMatStack[this.gMatStackIndex])) {
+        this.geo_set_animation_globals(object.header.gfx.unk38, true)
+
+        if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) {
 
             //// sending my own custom gfx opcode to set skin id and playerName
-            this.geo_append_display_list([Gbi.gsSetPlayerData(socketID)], 1)
+            this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.mySocketID)], 1)
 
-            const animList = gMarioAnimData
-            this.gCurrAnimFrame = animFrame
-            this.gCurAnimType = this.ANIM_TYPE_TRANSLATION
-            this.gCurAnimData = animList[animID].values
-            this.gCurrAnimAttribute = {
-                indexToIndices: 0,
-                indices: animList[animID].indices
-            }
-
-            this.gCurGraphNodeObject = {
-                pos, angle, scale: [1, 1, 1]
-            }
-            this.geo_process_single_node(gfx.sharedChild)
+            this.gCurGraphNodeObject = object.header.gfx
+            MarioMisc.gBodyState = object.marioState.marioBodyState
+            this.geo_process_single_node(object.header.gfx.sharedChild)
             this.gCurGraphNodeObject = null
         }
 
@@ -539,6 +523,7 @@ class GeoRenderer {
         let shadowPos, shadowScale
 
         if (this.gCurGraphNodeCamera && this.gCurGraphNodeObject) {
+
             if (this.gCurGraphNodeHeldObject) {
                 throw "shadow for held objects"
             } else {

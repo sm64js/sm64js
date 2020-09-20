@@ -46,26 +46,26 @@ export const obj_set_angle = (obj, pitch, yaw, roll) => {
 
 export const cur_obj_push_mario_away = (radius) => {
     const o = ObjectListProc.gCurrentObject
-    const marioRelX = ObjectListProc.gMarioObject[0].rawData[oPosX] - o.rawData[oPosX]
-    const marioRelZ = ObjectListProc.gMarioObject[0].rawData[oPosZ] - o.rawData[oPosZ]
+    const marioRelX = ObjectListProc.gMarioObject.rawData[oPosX] - o.rawData[oPosX]
+    const marioRelZ = ObjectListProc.gMarioObject.rawData[oPosZ] - o.rawData[oPosZ]
     const marioDist = Math.sqrt(Math.pow(marioRelX, 2) + Math.pow(marioRelZ, 2))
 
     if (marioDist < radius) {
         const newPos = [
-            LevelUpdate.gMarioState[0].pos[0] + (radius - marioDist) / radius * marioRelX,
-            LevelUpdate.gMarioState[0].pos[1],
-            LevelUpdate.gMarioState[0].pos[2] + (radius - marioDist) / radius * marioRelZ
+            LevelUpdate.gMarioState.pos[0] + (radius - marioDist) / radius * marioRelX,
+            LevelUpdate.gMarioState.pos[1],
+            LevelUpdate.gMarioState.pos[2] + (radius - marioDist) / radius * marioRelZ
         ]
         const floorWrapper = {}
         const floorHeight = ObjectListProc.SurfaceCollision.find_floor(newPos[0], newPos[1], newPos[2], floorWrapper)
 
         if (floorWrapper.floor == null || floorHeight == -11000) return
 
-        LevelUpdate.gMarioState[0].pos[0] = newPos[0]
-        LevelUpdate.gMarioState[0].pos[1] = floorHeight
-        LevelUpdate.gMarioState[0].pos[2] = newPos[2]
-        LevelUpdate.gMarioState[0].floor = floorWrapper.floor
-        LevelUpdate.gMarioState[0].floorHeight = floorHeight
+        LevelUpdate.gMarioState.pos[0] = newPos[0]
+        LevelUpdate.gMarioState.pos[1] = floorHeight
+        LevelUpdate.gMarioState.pos[2] = newPos[2]
+        LevelUpdate.gMarioState.floor = floorWrapper.floor
+        LevelUpdate.gMarioState.floorHeight = floorHeight
     }
 }
 

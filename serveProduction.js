@@ -1,5 +1,5 @@
 const { App } = require('@sifrr/server')
-const { MarioMsg, MarioListMsg } = require("./proto/mario_pb")
+const { MarioMsg, MarioListMsg, ValidSocketsMsg } = require("./proto/mario_pb")
 const fs = require('fs')
 const ws_port = 5001
 const port = 80
@@ -16,47 +16,62 @@ const generateID = () => {
 }
 
 const sendDataWithOpcode = (bytes, opcode, socket) => {
+    if (bytes.length == undefined) bytes = Buffer.from(bytes)
     const newbytes = new Uint8Array(bytes.length + 1)
     newbytes.set([opcode], 0)
     newbytes.set(bytes, 1)
     socket.send(newbytes, true)
 }
 
-const broadcastDataWithOpcode = (bytes, opcode) => {
+const broadcastDataWithOpcode = (bytes, opcode, ignoreSocket) => {
+    if (bytes.length == undefined) bytes = Buffer.from(bytes)
     const newbytes = new Uint8Array(bytes.length + 1)
     newbytes.set([opcode], 0)
     newbytes.set(bytes, 1)
-    Object.values(allSockets).forEach(s => { s.socket.send(newbytes, true) })
+    Object.values(allSockets).forEach(s => {
+        if (ignoreSocket && s.socket.id == ignoreSocket) return
+        s.socket.send(newbytes, true)
+    })
 }
 
-const sendMainUpdate = (socket) => {
-    const filteredMarios = Object.entries(allSockets).filter(([id, data]) => {
-        return id != socket.id && data.valid != 0
-    }).map(([id]) => { return allSockets[id].decodedMario })
+const sendMainUpdate = () => {
 
-    const mariolistmsg = new MarioListMsg()
-    mariolistmsg.setMarioList(filteredMarios)
-    sendDataWithOpcode(mariolistmsg.serializeBinary(), 0, socket)
+    const validSockets = Object.values(allSockets).filter(data => data.valid > 0).map(data => data.socket.id)
+
+    const validsocketsmsg = new ValidSocketsMsg()
+    validsocketsmsg.setValidsocketsList(validSockets)
+    broadcastDataWithOpcode(validsocketsmsg.serializeBinary(), 8)
 }
 
 
 const processPlayerData = (socketID, bytes) => {
     const decodedMario = MarioMsg.deserializeBinary(bytes)
 
-    //Pretty strict validation
-    for (let i = 0; i < 3; i++) {
+    //Pretty strict validation  -- ignoring validation for now
+/*    for (let i = 0; i < 3; i++) {
         if (isNaN(decodedMario.getPosList()[i])) return
         if (isNaN(decodedMario.getAngleList()[i])) return
     }
     if (isNaN(decodedMario.getAnimframe())) return
     if (isNaN(decodedMario.getAnimid()) || 0 > decodedMario.getAnimid()) return
     if (isNaN(decodedMario.getSkinid()) || 0 > decodedMario.getSkinid() || decodedMario.getSkinid() > 9) return
-    decodedMario.setPlayername(String(decodedMario.getPlayername()).substring(0, 14))
-    decodedMario.setSocketid(socketID)
+    decodedMario.setPlayername(String(decodedMario.getPlayername()).substring(0, 14)) */
+
+    ///decodedMario.setSocketid(socketID) no longer needed
 
     /// Data is Valid
     allSockets[socketID].decodedMario = decodedMario
     allSockets[socketID].valid = 30
+
+    //publish
+    broadcastDataWithOpcode(bytes, 0, socketID)
+}
+
+const processControllerUpdate = (socketID, bytes) => {
+
+    /// do some validation here probably
+
+    broadcastDataWithOpcode(bytes, 3, socketID)
 }
 
 
@@ -98,19 +113,19 @@ const processChat = (socketID, bytes) => {
 }
 
 const game_loop = setInterval(() => {
+    sendMainUpdate()
     Object.values(allSockets).forEach(data => {
-        sendMainUpdate(data.socket)
         if (data.valid > 0) data.valid--
     })
 
-}, 15)
+}, 30)
 
 new App({}).ws('/*', {
     open: (socket) => {
         socket.id = generateID()
         allSockets[socket.id] = { valid: 0, socket }
         const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify({ id: socket.id }))
-        sendDataWithOpcode(responseMsg, 3, socket)
+        sendDataWithOpcode(responseMsg, 9, socket)
     },
     message: (socket, bytes) => {
         try {
@@ -119,6 +134,7 @@ new App({}).ws('/*', {
                 case 0: processPlayerData(socket.id, bytes.slice(1)); break
                 case 1: processChat(socket.id, bytes.slice(1)); break
                 case 2: processBasicAttack(socket.id, bytes.slice(1)); break
+                case 3: processControllerUpdate(socket.id, bytes.slice(1)); break
                 case 4: processKnockUp(socket.id, bytes.slice(1)); break
                 default: console.log("unknown opcode: " + opcode)
             }

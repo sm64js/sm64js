@@ -1,9 +1,5 @@
 syntax = "proto3";
 
-message MarioListMsg {
-	repeated MarioMsg mario = 1;
-}
-
 message MarioMsg {
 	ControllerMsg controller = 1;
 	string playerName = 2;
@@ -27,6 +23,7 @@ message MarioMsg {
 	float slideVelX = 20;
 	float slideVelY = 21;
 	repeated sint32 rawData = 22;
+	int32 socketID = 23;
 }
 
 message ControllerMsg {
@@ -35,4 +32,10 @@ message ControllerMsg {
 	float stickMag = 3;
 	uint32 buttonDown = 4;
 	uint32 buttonPressed = 5;
+	sint32 cameraYaw = 6;
+	int32 socketID = 7;
+}
+
+message ValidSocketsMsg {
+	repeated int32 validSockets = 1;
 }

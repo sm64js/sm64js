@@ -38,6 +38,7 @@ class MarioMisc {
             if (![Mario.ACT_WALKING, Mario.ACT_BUTT_SLIDE, Mario.ACT_HOLD_BUTT_SLIDE, Mario.ACT_RIDING_SHELL_GROUND].includes(action)) {
                 this.gBodyState.torsoAngle = [0,0,0]
             }
+
             rotNode.wrapper.rotation[0] = this.gBodyState.torsoAngle[1]
             rotNode.wrapper.rotation[1] = this.gBodyState.torsoAngle[2]
             rotNode.wrapper.rotation[2] = this.gBodyState.torsoAngle[0]

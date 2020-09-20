@@ -407,58 +407,41 @@ export const sBackwardKnockbackActions = [
 
 export const init_marios = () => {
 
-    if (LevelUpdate.gMarioState.length != ObjectListProcessor.gMarioObject.length)
-        throw "Error incorrect number of Marios -- init marios"
-
-    LevelUpdate.gMarioState.forEach((marioState, index) => {
-        Object.assign(marioState, {
-            actionTimer: 0,
-            framesSinceA: 0xFF,
-            framesSinceB: 0xFF,
-            invincTimer: 0,
-            flags: MARIO_CAP_ON_HEAD | MARIO_NORMAL_CAP,
-            forwardVel: 0.0,
-            squishTimer: 0,
-            hurtCounter: 0,
-            healCounter: 0,
-            capTimer: 0,
-            quicksandDepth: 0.0,
-            area: Area.gCurrentArea,
-            marioObj: ObjectListProcessor.gMarioObject[index],
-            faceAngle: [...ObjectListProcessor.gMarioObject[index].header.gfx.angle], //[ ...Area.gMarioSpawnInfo.startAngle ],
-            angleVel: [0, 0, 0],
-            pos: [...ObjectListProcessor.gMarioObject[index].header.gfx.pos],///[ ...Area.gMarioSpawnInfo.startPos ],
-            vel: [0, 0, 0],
-            action: ACT_IDLE
-        })
-
-/*        const marioRawData = LevelUpdate.gMarioState[index].marioObj.rawData
-        marioRawData[oPosX] = LevelUpdate.gMarioState[index].pos[0]
-        marioRawData[oPosY] = LevelUpdate.gMarioState[index].pos[1]
-        marioRawData[oPosZ] = LevelUpdate.gMarioState[index].pos[2]
-        marioRawData[oMoveAnglePitch] = LevelUpdate.gMarioState[index].faceAngle[0]
-        marioRawData[oMoveAngleYaw] = LevelUpdate.gMarioState[index].faceAngle[1]
-        marioRawData[oMoveAngleRoll] = LevelUpdate.gMarioState[index].faceAngle[2]*/
+    Object.assign(LevelUpdate.gMarioState, {
+        actionTimer: 0,
+        framesSinceA: 0xFF,
+        framesSinceB: 0xFF,
+        invincTimer: 0,
+        flags: MARIO_CAP_ON_HEAD | MARIO_NORMAL_CAP,
+        forwardVel: 0.0,
+        squishTimer: 0,
+        hurtCounter: 0,
+        healCounter: 0,
+        capTimer: 0,
+        quicksandDepth: 0.0,
+        area: Area.gCurrentArea,
+        marioObj: ObjectListProcessor.gMarioObject,
+        faceAngle: [ ...Area.gMarioSpawnInfo.startAngle ],
+        angleVel: [0, 0, 0],
+        pos: [ ...Area.gMarioSpawnInfo.startPos ],
+        vel: [0, 0, 0],
+        action: ACT_IDLE,
+        controller: { stickX: 0, stickY: 0, stickMag: 0 }
     })
 
-    LevelUpdate.gMarioState.forEach((marioState) => {
-        Object.assign(marioState.marioObj.header.gfx, {
-            //// Also Redundant
-            //pos: [ ...LevelUpdate.gMarioState.pos ],
-            //angle: [ 0, LevelUpdate.gMarioState.faceAngle[1], 0 ],
-            unk38: {
-                ...marioState.marioObj.header.gfx.unk38,
-                animID: -1,
-                animID: 0,
-                animFrame: 0,
-                animFrameAccelAssist: 0,
-                animAccel: 0x10000,
-                animTimer: 0
-            }
-        })
+    Object.assign(LevelUpdate.gMarioState.marioObj.header.gfx, {
+        unk38: {
+            ...LevelUpdate.gMarioState.marioObj.header.gfx.unk38,
+            animID: 0,
+            animFrame: 0,
+            animFrameAccelAssist: 0,
+            animAccel: 0x10000,
+            animTimer: 0
+        }
     })
 
-    socketGameData.marioState = LevelUpdate.gMarioState[0]
+    LevelUpdate.gMarioState.marioObj.marioState = LevelUpdate.gMarioState
+    socketGameData.marioState = LevelUpdate.gMarioState
 
 }
 
@@ -667,8 +650,9 @@ export const set_mario_action_moving = (m, action, actionArg) => {
 }
 
 export const set_mario_animation = (m, targetAnimID) => {
+
     const o = m.marioObj
-    m.animation.targetAnim = m.animation.animList[targetAnimID]
+    m.animation.targetAnim = gMarioAnimData[targetAnimID]
 
     if (m.animation.targetAnim == undefined) throw "cant find animation"
 
@@ -709,8 +693,9 @@ export const set_anim_to_frame = (m, animFrame) => {
 }
 
 export const set_mario_anim_with_accel = (m, targetAnimID, accel) => {
+
     const o = m.marioObj
-    m.animation.targetAnim = m.animation.animList[targetAnimID]
+    m.animation.targetAnim = gMarioAnimData[targetAnimID]
 
     if (o.header.gfx.unk38.animID != targetAnimID) {
         o.header.gfx.unk38.animID = targetAnimID
@@ -773,42 +758,42 @@ export const is_anim_past_frame = (m, animFrame) => {
     return isPastFrame
 }
 
-export const execute_mario_action = (marioIndex) => {
-    if (LevelUpdate.gMarioState[marioIndex].action) {
+export const execute_mario_action = (m) => {
+    if (m.action) {
 
-        LevelUpdate.gMarioState[marioIndex].marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
-        update_mario_inputs(LevelUpdate.gMarioState[marioIndex])
-        Interact.mario_process_interactions(LevelUpdate.gMarioState[marioIndex])
+        m.marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+        update_mario_inputs(m)
+        Interact.mario_process_interactions(m)
 
         let inLoop = 1
 
         while (inLoop) {
-            switch (LevelUpdate.gMarioState[marioIndex].action & ACT_GROUP_MASK) {
+            switch (m.action & ACT_GROUP_MASK) {
                 case ACT_GROUP_STATIONARY:
-                    inLoop = mario_execute_stationary_action(LevelUpdate.gMarioState[marioIndex]); break
+                    inLoop = mario_execute_stationary_action(m); break
 
                 case ACT_GROUP_MOVING:
-                    inLoop = mario_execute_moving_action(LevelUpdate.gMarioState[marioIndex]); break
+                    inLoop = mario_execute_moving_action(m); break
 
                 case ACT_GROUP_AIRBORNE:
-                    inLoop = mario_execute_airborne_action(LevelUpdate.gMarioState[marioIndex]); break
+                    inLoop = mario_execute_airborne_action(m); break
 
                 case ACT_GROUP_OBJECT:
-                    inLoop = mario_execute_object_action(LevelUpdate.gMarioState[marioIndex]); break
+                    inLoop = mario_execute_object_action(m); break
 
                 case ACT_GROUP_AUTOMATIC:
-                    inLoop = mario_execute_automatic_action(LevelUpdate.gMarioState[marioIndex]); break
+                    inLoop = mario_execute_automatic_action(m); break
 
                 case ACT_GROUP_CUTSCENE:
-                    inLoop = mario_execute_cutscene_action(LevelUpdate.gMarioState[marioIndex]); break
+                    inLoop = mario_execute_cutscene_action(m); break
 
                 default: throw "unkown action group"
             }
         }
 
-        update_mario_info_for_cam(LevelUpdate.gMarioState[marioIndex])
+        update_mario_info_for_cam(m)
 
-        LevelUpdate.gMarioState[marioIndex].marioObj.rawData[oInteractStatus] = 0
+        m.marioObj.rawData[oInteractStatus] = 0
     }
 }
 
@@ -832,7 +817,11 @@ const update_mario_joystick_inputs = (m) => {
     m.intendedMag = mag / 2.0 
 
     if (m.intendedMag > 0.0) {
-        m.intendedYaw = atan2s(-m.controller.stickY, m.controller.stickX) + m.area.camera.yaw
+        if (m.marioObj.remoteMario) {
+            m.intendedYaw = atan2s(-m.controller.stickY, m.controller.stickX) + m.controller.cameraYaw
+        } else if (m.marioObj.localMario) {
+            m.intendedYaw = atan2s(-m.controller.stickY, m.controller.stickX) + m.area.camera.yaw
+        } else throw "mario state must either be local or remote"
         m.input |= INPUT_NONZERO_ANALOG
     } else {
         m.intendedYaw = m.faceAngle[1]
@@ -1073,18 +1062,15 @@ const update_mario_info_for_cam = (m) => {
 
 export const init_mario_from_save_file = () => {
 
-    LevelUpdate.gMarioState.forEach(marioState => {
-        Object.assign(marioState, {
-            unk00: 0, flags: 0, action: 0,
-            spawnInfo: Area.gMarioSpawnInfo,
-            statusForCamera: Camera.gPlayerCameraState,
-            marioBodyState: MarioMisc.gBodyState,
-            animation: { animList: gMarioAnimData, targetAnim: null },
-            numCoins: 0, numStars: 0, numKeys: 0,
-            numLives: 4, health: 0x880,
-            unkB8: 0, unkB0: 0xBD
-        })
+    Object.assign(LevelUpdate.gMarioState, {
+        unk00: 0, flags: 0, action: 0,
+        spawnInfo: Area.gMarioSpawnInfo,
+        statusForCamera: Camera.gPlayerCameraState,
+        marioBodyState: MarioMisc.gBodyState,
+        animation: { targetAnim: null },
+        numCoins: 0, numStars: 0, numKeys: 0,
+        numLives: 4, health: 0x880,
+        unkB8: 0, unkB0: 0xBD
     })
-
 
 }

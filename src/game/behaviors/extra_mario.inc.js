@@ -7,10 +7,10 @@ import { ACT_GROUP_STATIONARY, ACT_GROUP_MASK } from "../Mario"
 export const bhv_extra_mario_base_loop = () => {
     const o = ObjectListProc.gCurrentObject
     o.hitboxHeight = 160
-    if (o.rawData[oPosY] - 10.0 < ObjectListProc.gMarioObject[0].rawData[oPosY] &&
-        ObjectListProc.gMarioObject[0].rawData[oPosY] < o.rawData[oPosY] + o.hitboxHeight + 30.0) {
+    if (o.rawData[oPosY] - 10.0 < ObjectListProc.gMarioObject.rawData[oPosY] &&
+        ObjectListProc.gMarioObject.rawData[oPosY] < o.rawData[oPosY] + o.hitboxHeight + 30.0) {
         if (o.rawData[oTimer] > 10) {
-            if ((LevelUpdate.gMarioState[0].action & ACT_GROUP_MASK) == ACT_GROUP_STATIONARY) {
+            if ((LevelUpdate.gMarioState.action & ACT_GROUP_MASK) == ACT_GROUP_STATIONARY) {
                 cur_obj_push_mario_away(100.0)
             }
         }

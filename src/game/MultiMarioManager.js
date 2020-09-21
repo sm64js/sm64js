@@ -147,6 +147,7 @@ const initNewRemoteMarioState = (marioProto) => {
             hitboxDownOffset: 0,
             hitboxHeight: 160,
             hitboxRadius: 37,
+            collidedObjs: [],
             rawData: expandRawDataSubset(marioProto.getRawdataList())
         },
         faceAngle: marioProto.getFaceangleList(),
@@ -239,7 +240,7 @@ export const recvMarioData = (mariolistbytes) => {
         networkData.remotePlayers[id] = { marioState: initNewRemoteMarioState(marioProto) }
         applyController(marioProto.getController())
     } else {
-        updateRemoteMarioState(id, marioProto)
+        //updateRemoteMarioState(id, marioProto)
     }
 
 }

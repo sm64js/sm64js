@@ -23,7 +23,6 @@ window.myMario = {
 }
 
 export const networkData = {
-    //extraMarios: [],
     remotePlayers: {},
     mySocketID: -1,
 }
@@ -37,29 +36,9 @@ const sendDataWithOpcode = (bytes, opcode) => {
     socket.send(newbytes)
 }
 
-/*const recvMarioData = (mariolistmsg) => {
-    serverData.extraMarios = mariolistmsg.map((mario) => {
-        return {
-            pos: mario.getPosList(),
-            angle: mario.getAngleList(),
-            animFrame: mario.getAnimframe(),
-            animID: mario.getAnimid(),
-            socketID: mario.getSocketid(),
-            skinID: mario.getSkinid(),
-            playerName: mario.getPlayername()
-        }
-    })
-    serverData.extraMarios.forEach(marioData => {
-        if (serverData.remotePlayersByID[marioData.socketID] == undefined)
-            serverData.remotePlayersByID[marioData.socketID] = {}
-        Object.assign(serverData.remotePlayersByID[marioData.socketID], { marioData })
-    })
-}*/
 
 const recvMyID = (msg) => {
     networkData.mySocketID = msg.id
-/*    serverData.remotePlayersByID[msg.id] = { marioData: window.myMario }
-    window.myMario.socketID = msg.id*/
 }
 
 const recvChat = (chatmsg) => {
@@ -101,16 +80,6 @@ const recvKnockUp = (data) => {
     }
 }
 
-/*const sendMarioData = () => {
-    const mariomsg = new MarioMsg()
-    mariomsg.setPlayername(window.myMario.playerName)
-    mariomsg.setSkinid(window.myMario.skinID)
-    mariomsg.setAnimid(window.myMario.animID)
-    mariomsg.setAnimframe(window.myMario.animFrame)
-    mariomsg.setAngleList(window.myMario.angle)
-    mariomsg.setPosList(window.myMario.pos)
-    sendDataWithOpcode(mariomsg.serializeBinary(), 0)
-}*/
 
 socket.onopen = () => {
 
@@ -137,12 +106,6 @@ const multiplayerReady = () => {
     return socket.readyState == 1 && gameData.marioState && networkData.mySocketID != null
 }
 
-export const send_controller_update = (frame) => {
-    if (multiplayerReady() && frame % 2 == 0) {
-        sendDataWithOpcode(Multi.createControllerProtoMsg().serializeBinary(), 3)
-    }
-}
-
 const updateConnectedMsg = () => {
     const elem = document.getElementById("connectedMsg")
     if (socket.readyState == 1) {
@@ -151,6 +114,12 @@ const updateConnectedMsg = () => {
     } else {
         elem.innerHTML = "Not connected to server - try refreshing - or server is down"
         elem.style.color = "red"
+    }
+}
+
+export const send_controller_update = (frame) => {
+    if (multiplayerReady() && frame % 1 == 0) {
+        sendDataWithOpcode(Multi.createControllerProtoMsg().serializeBinary(), 3)
     }
 }
 

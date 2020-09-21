@@ -73,6 +73,14 @@ class ObjectListProcessor {
     }
 
     update_objects() {
+
+        Object.values(networkData.remotePlayers).forEach(remotePlayer => {
+            if (remotePlayer.marioUpdate) {
+                copyMarioUpdateToState(remotePlayer)
+                this.copy_mario_state_to_object(remotePlayer.marioState)
+            }
+        })
+
         detect_object_collisions()
         this.update_non_terrain_objects()
     }
@@ -121,10 +129,6 @@ class ObjectListProcessor {
         this.copy_mario_state_to_object(LevelUpdate.gMarioState)
 
         Object.values(networkData.remotePlayers).forEach(remotePlayer => {
-            if (remotePlayer.marioUpdate) {
-                copyMarioUpdateToState(remotePlayer)
-                this.copy_mario_state_to_object(remotePlayer.marioState)
-            }
             Mario.execute_mario_action(remotePlayer.marioState)
             this.copy_mario_state_to_object(remotePlayer.marioState)
         })

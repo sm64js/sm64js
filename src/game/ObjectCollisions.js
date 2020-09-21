@@ -1,5 +1,6 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { oIntangibleTimer, oPosY, oPosX, oPosZ, oInteractType } from "../include/object_constants"
+import { networkData } from "../socket"
 
 const clear_object_collision = (startNode) => {
     let sp4 = startNode.next
@@ -64,18 +65,23 @@ const check_collision_in_list = (a, bStart) => {
 
 const check_player_object_collision = () => {
     const playerObjectList = ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PLAYER]
-    let mario1Object = playerObjectList.next.wrapperObject
+    let localMarioObj = playerObjectList.next.wrapperObject
 
-    //while (sp18 != sp1C) {
-        ///check_collision_in_list(sp18, sp18.header.next) only for players collide with players
-           check_collision_in_list(mario1Object, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE])
-/*        check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_LEVEL])
-        check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR])
-        check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE])
-        check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE])
-        check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE])*/
-        //sp18 = sp18.next
-    //}
+    if (!localMarioObj.localMario) throw "error: this is not right - check_player_object_collision"
+    
+    //check_collision_in_list(sp18, sp18.header.next) ///only for players collide with players
+    check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE])
+    //check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_LEVEL])
+    //check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR])
+    //check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE])
+    //check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE])
+    //check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE])
+
+    Object.values(networkData.remotePlayers).forEach(remotePlayer => {
+        const remoteMarioObj = remotePlayer.marioState.marioObj
+        check_collision_in_list(remoteMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE])
+    })
+
 }
 
 export const detect_object_collisions = () => {
@@ -86,5 +92,11 @@ export const detect_object_collisions = () => {
     clear_object_collision(ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_LEVEL])
     clear_object_collision(ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE])
     clear_object_collision(ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE])
+    Object.values(networkData.remotePlayers).forEach(remotePlayer => {
+        const remoteMarioObj = remotePlayer.marioState.marioObj
+        const dummyStartNode = { next: remoteMarioObj.header }
+        remoteMarioObj.header.next = dummyStartNode
+        clear_object_collision(dummyStartNode)
+    })
     check_player_object_collision()
 }

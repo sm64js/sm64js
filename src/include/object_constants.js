@@ -37,7 +37,7 @@ export const OBJ_MOVE_ABOVE_DEATH_BARRIER = (1 << 14) // 0x4000
 export const OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE = (1 << 0) // 0x00000001
 
 export const oFlags = 0x01
-
+export const oSyncID = 0x04
 export const oIntangibleTimer = 0x05
 
 export const oPosX = 0x06

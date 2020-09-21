@@ -53,6 +53,10 @@ export const copyMarioUpdateToState = (remotePlayer) => {
 
     m.marioObj.rawData = expandRawDataSubset(update.rawdataList)
 
+    if (update.usedobjid >= 1000 && update.usedobjid <= 2000) {
+        m.usedObj = gameData.spawnObjectsBySyncID[update.usedobjid - 1000]
+    }
+
     remotePlayer.marioUpdate = null
 
 }
@@ -84,6 +88,8 @@ export const createMarioProtoMsg = () => {
     mariomsg.setPosList(m.pos)
     mariomsg.setVelList(m.vel)
     mariomsg.setForwardvel(m.forwardVel)
+
+    if (m.usedObj) mariomsg.setUsedobjid(m.usedObj.rawData[RAW.oSyncID])
 
     mariomsg.setRawdataList(getMarioRawDataSubset(m.marioObj.rawData))
     mariomsg.setSocketid(networkData.mySocketID)

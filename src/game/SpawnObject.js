@@ -2,13 +2,13 @@ import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProce
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { geo_add_child, GRAPH_RENDER_INVISIBLE, GRAPH_NODE_TYPE_OBJECT } from "../engine/graph_node"
 import { GeoLayoutInstance } from "../engine/GeoLayout"
-import { ACTIVE_FLAG_ACTIVE, ACTIVE_FLAG_UNK8, RESPAWN_INFO_TYPE_NULL, ACTIVE_FLAG_UNIMPORTANT, OBJ_MOVE_ON_GROUND, oIntangibleTimer, oDamageOrCoinValue, oHealth, oCollisionDistance, oDrawingDistance, oDistanceToMario, oRoom, oFloorHeight, oPosX, oPosY, oPosZ } from "../include/object_constants"
+import { ACTIVE_FLAG_ACTIVE, ACTIVE_FLAG_UNK8, RESPAWN_INFO_TYPE_NULL, ACTIVE_FLAG_UNIMPORTANT, OBJ_MOVE_ON_GROUND, oIntangibleTimer, oDamageOrCoinValue, oHealth, oCollisionDistance, oDrawingDistance, oDistanceToMario, oRoom, oFloorHeight, oPosX, oPosY, oPosZ, oSyncID } from "../include/object_constants"
 import { mtxf_identity } from "../engine/math_util"
 //import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 
 class SpawnObject {
     constructor() {
-
+        this.spawnSyncIDCount = 1000 /// reserving syncIDs 1000 to 2000 for objects spawned in this class
     }
 
     clear_object_lists() {
@@ -135,7 +135,12 @@ class SpawnObject {
             objListIndex == ObjectListProc.OBJ_LIST_GENACTOR ||
             objListIndex == ObjectListProc.OBJ_LIST_PUSHABLE) {
                 this.snap_object_to_floor(obj)
-            }
+        }
+
+        ObjectListProc.spawnObjectsBySyncID.push(obj)
+        obj.rawData[oSyncID] = this.spawnSyncIDCount++
+
+        if (this.spawnSyncIDCount > 2000) throw "Error - used more than 1000 spawn SyncIDs in SpawnObject"
 
         return obj
     }

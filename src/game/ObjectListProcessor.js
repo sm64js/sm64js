@@ -6,7 +6,7 @@ import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands
 import * as Mario from "./Mario"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { detect_object_collisions } from "./ObjectCollisions"
-import { networkData } from "../socket"
+import { networkData, gameData as socketGameData } from "../socket"
 import { copyMarioUpdateToState } from "./MultiMarioManager"
 
 
@@ -67,6 +67,8 @@ class ObjectListProcessor {
             return blankObj
         })
 
+        this.spawnObjectsBySyncID = []
+        socketGameData.spawnObjectsBySyncID = this.spawnObjectsBySyncID
 
     }
 

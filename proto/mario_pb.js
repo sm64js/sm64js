@@ -136,7 +136,8 @@ proto.MarioMsg.toObject = function(includeInstance, msg) {
     velList: (f = jspb.Message.getRepeatedFloatingPointField(msg, 17)) == null ? undefined : f,
     forwardvel: jspb.Message.getFloatingPointFieldWithDefault(msg, 18, 0.0),
     rawdataList: (f = jspb.Message.getRepeatedField(msg, 19)) == null ? undefined : f,
-    socketid: jspb.Message.getFieldWithDefault(msg, 20, 0)
+    usedobjid: jspb.Message.getFieldWithDefault(msg, 20, 0),
+    socketid: jspb.Message.getFieldWithDefault(msg, 21, 0)
   };
 
   if (includeInstance) {
@@ -183,7 +184,7 @@ proto.MarioMsg.deserializeBinaryFromReader = function(msg, reader) {
       msg.setPlayername(value);
       break;
     case 3:
-      var value = /** @type {number} */ (reader.readInt32());
+      var value = /** @type {number} */ (reader.readUint32());
       msg.setSkinid(value);
       break;
     case 4:
@@ -251,7 +252,11 @@ proto.MarioMsg.deserializeBinaryFromReader = function(msg, reader) {
       msg.setRawdataList(value);
       break;
     case 20:
-      var value = /** @type {number} */ (reader.readInt32());
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setUsedobjid(value);
+      break;
+    case 21:
+      var value = /** @type {number} */ (reader.readUint32());
       msg.setSocketid(value);
       break;
     default:
@@ -300,7 +305,7 @@ proto.MarioMsg.serializeBinaryToWriter = function(message, writer) {
   }
   f = message.getSkinid();
   if (f !== 0) {
-    writer.writeInt32(
+    writer.writeUint32(
       3,
       f
     );
@@ -417,10 +422,17 @@ proto.MarioMsg.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getUsedobjid();
+  if (f !== 0) {
+    writer.writeUint32(
+      20,
+      f
+    );
+  }
   f = message.getSocketid();
   if (f !== 0) {
-    writer.writeInt32(
-      20,
+    writer.writeUint32(
+      21,
       f
     );
   }
@@ -483,7 +495,7 @@ proto.MarioMsg.prototype.setPlayername = function(value) {
 
 
 /**
- * optional int32 skinID = 3;
+ * optional uint32 skinID = 3;
  * @return {number}
  */
 proto.MarioMsg.prototype.getSkinid = function() {
@@ -884,10 +896,10 @@ proto.MarioMsg.prototype.clearRawdataList = function() {
 
 
 /**
- * optional int32 socketID = 20;
+ * optional uint32 usedObjID = 20;
  * @return {number}
  */
-proto.MarioMsg.prototype.getSocketid = function() {
+proto.MarioMsg.prototype.getUsedobjid = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 20, 0));
 };
 
@@ -896,8 +908,26 @@ proto.MarioMsg.prototype.getSocketid = function() {
  * @param {number} value
  * @return {!proto.MarioMsg} returns this
  */
-proto.MarioMsg.prototype.setSocketid = function(value) {
+proto.MarioMsg.prototype.setUsedobjid = function(value) {
   return jspb.Message.setProto3IntField(this, 20, value);
+};
+
+
+/**
+ * optional uint32 socketID = 21;
+ * @return {number}
+ */
+proto.MarioMsg.prototype.getSocketid = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 21, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.MarioMsg} returns this
+ */
+proto.MarioMsg.prototype.setSocketid = function(value) {
+  return jspb.Message.setProto3IntField(this, 21, value);
 };
 
 
@@ -1001,7 +1031,7 @@ proto.ControllerMsg.deserializeBinaryFromReader = function(msg, reader) {
       msg.setCamerayaw(value);
       break;
     case 7:
-      var value = /** @type {number} */ (reader.readInt32());
+      var value = /** @type {number} */ (reader.readUint32());
       msg.setSocketid(value);
       break;
     default:
@@ -1077,7 +1107,7 @@ proto.ControllerMsg.serializeBinaryToWriter = function(message, writer) {
   }
   f = message.getSocketid();
   if (f !== 0) {
-    writer.writeInt32(
+    writer.writeUint32(
       7,
       f
     );
@@ -1194,7 +1224,7 @@ proto.ControllerMsg.prototype.setCamerayaw = function(value) {
 
 
 /**
- * optional int32 socketID = 7;
+ * optional uint32 socketID = 7;
  * @return {number}
  */
 proto.ControllerMsg.prototype.getSocketid = function() {
@@ -1288,7 +1318,7 @@ proto.ValidSocketsMsg.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {!Array<number>} */ (reader.readPackedInt32());
+      var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
       msg.setValidsocketsList(value);
       break;
     default:
@@ -1322,7 +1352,7 @@ proto.ValidSocketsMsg.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getValidsocketsList();
   if (f.length > 0) {
-    writer.writePackedInt32(
+    writer.writePackedUint32(
       1,
       f
     );
@@ -1331,7 +1361,7 @@ proto.ValidSocketsMsg.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * repeated int32 validSockets = 1;
+ * repeated uint32 validSockets = 1;
  * @return {!Array<number>}
  */
 proto.ValidSocketsMsg.prototype.getValidsocketsList = function() {

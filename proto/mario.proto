@@ -3,7 +3,7 @@ syntax = "proto3";
 message MarioMsg {
 	ControllerMsg controller = 1;
 	string playerName = 2;
-	int32 skinID = 3;
+	uint32 skinID = 3;
 	uint32 action = 4;
 	uint32 prevAction = 5;
 	uint32 actionState = 6;
@@ -20,7 +20,8 @@ message MarioMsg {
 	repeated float vel = 17;
 	float forwardVel = 18;
 	repeated sint32 rawData = 19;
-	int32 socketID = 20;
+	uint32 usedObjID = 20;
+	uint32 socketID = 21;
 }
 
 message ControllerMsg {
@@ -30,9 +31,9 @@ message ControllerMsg {
 	uint32 buttonDown = 4;
 	uint32 buttonPressed = 5;
 	sint32 cameraYaw = 6;
-	int32 socketID = 7;
+	uint32 socketID = 7;
 }
 
 message ValidSocketsMsg {
-	repeated int32 validSockets = 1;
+	repeated uint32 validSockets = 1;
 }

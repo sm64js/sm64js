@@ -1,4 +1,3 @@
-import { ControllerMsg, MarioListMsg } from "../proto/mario_pb"
 import * as Mario from "./game/Mario"
 import { take_damage_and_knock_back, INTERACT_PLAYER } from "./game/Interaction"
 import { oDamageOrCoinValue, oInteractType, oPosX, oPosZ, oPosY } from "./include/object_constants"

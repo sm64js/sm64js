@@ -50,6 +50,9 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     m.vel = update.velList
     m.pos = update.posList
     m.faceAngle = update.faceangleList
+    m.socketID = update.socketid
+    m.skinID = update.skinid
+    m.playerName = update.playername
 
     m.marioObj.rawData = expandRawDataSubset(update.rawdataList)
 
@@ -60,7 +63,6 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     remotePlayer.marioUpdate = null
 
 }
-
 
 export const createMarioProtoMsg = () => {
 
@@ -93,6 +95,8 @@ export const createMarioProtoMsg = () => {
 
     mariomsg.setRawdataList(getMarioRawDataSubset(m.marioObj.rawData))
     mariomsg.setSocketid(networkData.mySocketID)
+    mariomsg.setSkinid(window.myMario.skinID)
+    mariomsg.setPlayername(window.myMario.playerName)
 
     return mariomsg.serializeBinary()
 }
@@ -102,6 +106,11 @@ const initNewRemoteMarioState = (marioProto) => {
     const m = gameData.marioState
 
     const newMarioState = {
+
+        socketID: marioProto.getSocketid(),
+        skinID: marioProto.getSkinid(),
+        playerName: marioProto.getPlayername(),
+
         actionTimer: marioProto.getActiontimer(),
         actionState: marioProto.getActionstate(),
         framesSinceA: 0xFF,
@@ -240,7 +249,7 @@ export const recvMarioData = (mariolistbytes) => {
         networkData.remotePlayers[id] = { marioState: initNewRemoteMarioState(marioProto) }
         applyController(marioProto.getController())
     } else {
-        //updateRemoteMarioState(id, marioProto)
+        updateRemoteMarioState(id, marioProto)
     }
 
 }

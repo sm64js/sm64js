@@ -443,7 +443,7 @@ class GeoRenderer {
         if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) {
 
             //// sending my own custom gfx opcode to set skin id and playerName
-            this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.mySocketID)], 1)
+            this.geo_append_display_list([Gbi.gsSetPlayerData(object.marioState.socketID)], 1)
 
             this.gCurGraphNodeObject = object.header.gfx
             MarioMisc.gBodyState = object.marioState.marioBodyState

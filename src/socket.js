@@ -142,16 +142,14 @@ export const getExtraMarios = () => {
 
 export const getExtraRenderData = (socketID) => {
 
-    return { skinID: 0 }
+    if (socketID == networkData.mySocketID) return { skinID: window.myMario.skinID }
 
-    if (socketID == undefined) return { skinID: window.myMario.skinID }
-
-    const data = serverData.remotePlayersByID[socketID]
+    const remotePlayer = networkData.remotePlayers[socketID].marioState
     return {
-        chat: (data.chatData && data.chatData.timer > 0) ? data.chatData.msg : null,
-        skinID: data.marioData.skinID,
-        playerName: data.marioData.me ? null : data.marioData.playerName
+        skinID: remotePlayer.skinID,
+        playerName: remotePlayer.playerName
     }
+
 }
 
 export const sendChat = (msg) => {

@@ -3,7 +3,6 @@ import { AreaInstance as Area } from "./Area"
 import { geo_obj_init } from "../engine/graph_node"
 import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw } from "../include/object_constants"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
-import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 
 const spawn_object_at_origin = (parent, model, behavior) => {
 
@@ -44,28 +43,28 @@ export const obj_set_angle = (obj, pitch, yaw, roll) => {
     obj.rawData[oMoveAngleRoll] = roll
 }
 
-export const cur_obj_push_mario_away = (radius) => {
+export const cur_obj_push_mario_away = (radius, m) => {
     const o = ObjectListProc.gCurrentObject
-    const marioRelX = ObjectListProc.gMarioObject.rawData[oPosX] - o.rawData[oPosX]
-    const marioRelZ = ObjectListProc.gMarioObject.rawData[oPosZ] - o.rawData[oPosZ]
+    const marioRelX = m.marioObj.rawData[oPosX] - o.rawData[oPosX]
+    const marioRelZ = m.marioObj.rawData[oPosZ] - o.rawData[oPosZ]
     const marioDist = Math.sqrt(Math.pow(marioRelX, 2) + Math.pow(marioRelZ, 2))
 
     if (marioDist < radius) {
         const newPos = [
-            LevelUpdate.gMarioState.pos[0] + (radius - marioDist) / radius * marioRelX,
-            LevelUpdate.gMarioState.pos[1],
-            LevelUpdate.gMarioState.pos[2] + (radius - marioDist) / radius * marioRelZ
+            m.pos[0] + (radius - marioDist) / radius * marioRelX,
+            m.pos[1],
+            m.pos[2] + (radius - marioDist) / radius * marioRelZ
         ]
         const floorWrapper = {}
         const floorHeight = ObjectListProc.SurfaceCollision.find_floor(newPos[0], newPos[1], newPos[2], floorWrapper)
 
         if (floorWrapper.floor == null || floorHeight == -11000) return
 
-        LevelUpdate.gMarioState.pos[0] = newPos[0]
-        LevelUpdate.gMarioState.pos[1] = floorHeight
-        LevelUpdate.gMarioState.pos[2] = newPos[2]
-        LevelUpdate.gMarioState.floor = floorWrapper.floor
-        LevelUpdate.gMarioState.floorHeight = floorHeight
+        m.pos[0] = newPos[0]
+        m.pos[1] = floorHeight
+        m.pos[2] = newPos[2]
+        m.floor = floorWrapper.floor
+        m.floorHeight = floorHeight
     }
 }
 

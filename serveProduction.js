@@ -4,8 +4,7 @@ const util = require('util')
 const zlib = require('zlib')
 const deflate = util.promisify(zlib.deflate)
 const geckos = require('@geckos.io/server').default()
-const geckos_port = 5001
-const port = 80
+const port = 9208
 
 const badwords = fs.readFileSync('otherTools/profanity_filter.txt').toString().split('\n')
 
@@ -156,7 +155,6 @@ setInterval(() => {
     })
 }, 15000)
 
-geckos.listen(geckos_port)
 geckos.onConnection(channel => {
 
     channel.my_id = generateID()
@@ -192,15 +190,17 @@ geckos.onConnection(channel => {
 })
 
 
-//// Express Static serving
 
+
+//// Express Static serving
 const express = require('express')
 const app = express()
 const http = require('http')
 const server = http.Server(app)
-
 app.use(express.static(__dirname + '/dist'))
-server.listen(port, () => { console.log('Serving Files with express server') })
+
+geckos.addServer(server)
+server.listen(port, () => { console.log(' Listening to combined servers at ' + port) })
 
 
 /////// necessary for server side rom extraction

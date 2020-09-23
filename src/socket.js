@@ -1,9 +1,13 @@
+import geckos from '@geckos.io/client'
 import * as Mario from "./game/Mario"
 import { take_damage_and_knock_back, INTERACT_PLAYER } from "./game/Interaction"
 import { oDamageOrCoinValue, oInteractType, oPosX, oPosZ, oPosY } from "./include/object_constants"
 import * as Multi from "./game/MultiMarioManager"
 
 const url = new URL(window.location.href)
+const channel = geckos({ port: 5001 }) 
+
+console.log(channel)
 
 let websocketServerPath = "" 
 
@@ -13,9 +17,9 @@ if (url.protocol == "https:") {
     websocketServerPath = `ws://${url.hostname}:5001`
 }
 
-const socket = new WebSocket(websocketServerPath)
+//const socket = new WebSocket(websocketServerPath)
 
-if (Blob.prototype.arrayBuffer == undefined) socket.close()
+if (Blob.prototype.arrayBuffer == undefined) channel.close()
 
 window.myMario = {
     skinID: 0,
@@ -33,7 +37,7 @@ const sendDataWithOpcode = (bytes, opcode) => {
     const newbytes = new Uint8Array(bytes.length + 1)
     newbytes.set([opcode], 0)
     newbytes.set(bytes, 1)
-    socket.send(newbytes)
+    channel.raw.emit(newbytes)
 }
 
 
@@ -81,9 +85,15 @@ const recvKnockUp = (data) => {
 }
 
 
-socket.onopen = () => {
+channel.onConnect = (error) => {
 
-    socket.onmessage = async (message) => {
+    console.log(error)
+
+    console.log("Connected!")
+
+    channel.readyState = 1
+
+    channel.onRaw = async (message) => {
         const start = performance.now()
         const bytes = new Uint8Array(await message.data.arrayBuffer())
         const end = performance.now() - start
@@ -103,16 +113,16 @@ socket.onopen = () => {
         //if (end > 100) console.log("Opcode: " + opcode + "  time: " + end +"ms  size: " + bytes.length)
     }
 
-    socket.onclose = () => { }
+    channel.onDisconnect = () => { channel.readyState = 0 }
 }
 
 const multiplayerReady = () => {
-    return socket.readyState == 1 && gameData.marioState && networkData.mySocketID != null
+    return channel.readyState == 1 && gameData.marioState && networkData.mySocketID != null
 }
 
 const updateConnectedMsg = () => {
     const elem = document.getElementById("connectedMsg")
-    if (socket.readyState == 1) {
+    if (channel.readyState == 1) {
         elem.innerHTML = "Connected To Server"
         elem.style.color = "lawngreen"
     } else {

@@ -1,5 +1,13 @@
 syntax = "proto3";
 
+message MarioListMsg {
+	repeated MarioMsg mario = 1;
+}
+
+message ControllerListMsg {
+	repeated ControllerMsg controller = 1;
+}
+
 message MarioMsg {
 	ControllerMsg controller = 1;
 	string playerName = 2;

@@ -1,4 +1,5 @@
-import { MarioMsg, ControllerMsg, ValidSocketsMsg } from "../../proto/mario_pb"
+import { MarioMsg, MarioListMsg, ControllerListMsg, ControllerMsg, ValidSocketsMsg } from "../../proto/mario_pb"
+import zlib from "zlib"
 import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "../socket"
 
@@ -225,8 +226,14 @@ const applyController = (controllerProto) => {
 }
 
 export const recvControllerUpdate = (controllerbytes) => {
-    const controllerProto = ControllerMsg.deserializeBinary(controllerbytes)
-    applyController(controllerProto)
+    zlib.inflate(controllerbytes, (err, buffer) => {
+        if (!err) {
+            const controllerListProto = ControllerListMsg.deserializeBinary(buffer).getControllerList()
+            controllerListProto.forEach(proto => {
+                applyController(proto)
+            })
+        }
+    })
 }
 
 export const recvValidSockets = (validsocketsbytes) => {
@@ -242,14 +249,23 @@ export const recvValidSockets = (validsocketsbytes) => {
 
 export const recvMarioData = (mariolistbytes) => {
 
-    const marioProto = MarioMsg.deserializeBinary(mariolistbytes)
-    const id = marioProto.getSocketid()
+    zlib.inflate(mariolistbytes, (err, buffer) => {
+        if (!err) {
+            const marioListProto = MarioListMsg.deserializeBinary(buffer).getMarioList()
+            marioListProto.forEach(marioProto => {
+                const id = marioProto.getSocketid()
 
-    if (networkData.remotePlayers[id] == undefined) {
-        networkData.remotePlayers[id] = { marioState: initNewRemoteMarioState(marioProto) }
-        applyController(marioProto.getController())
-    } else {
-        updateRemoteMarioState(id, marioProto)
-    }
+                if (id == networkData.mySocketID) return
+
+                if (networkData.remotePlayers[id] == undefined) {
+                    networkData.remotePlayers[id] = { marioState: initNewRemoteMarioState(marioProto) }
+                    applyController(marioProto.getController())
+                } else {
+                    updateRemoteMarioState(id, marioProto)
+                }
+            })
+        }
+    })
+
 
 }

@@ -6,6 +6,8 @@
     "name": ""
   },
   "dependencies": {
+    "@geckos.io/client": "^1.7.0",
+    "@geckos.io/server": "^1.7.0",
     "@sifrr/server": "0.0.6",
     "css-loader": "^3.6.0",
     "google-protobuf": "^3.13.0",

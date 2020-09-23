@@ -84,7 +84,9 @@ const recvKnockUp = (data) => {
 socket.onopen = () => {
 
     socket.onmessage = async (message) => {
+        const start = performance.now()
         const bytes = new Uint8Array(await message.data.arrayBuffer())
+        const end = performance.now() - start
         const opcode = bytes[0]
         const msgBytes = bytes.slice(1)
         switch (opcode) {
@@ -95,8 +97,10 @@ socket.onopen = () => {
             case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             case 8: Multi.recvValidSockets(msgBytes); break
             case 9: recvMyID(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
+            case 99: sendDataWithOpcode(new Uint8Array(), 99); break
             default: throw "unknown websocket opcode"
         }
+        //if (end > 100) console.log("Opcode: " + opcode + "  time: " + end +"ms  size: " + bytes.length)
     }
 
     socket.onclose = () => { }
@@ -118,16 +122,16 @@ const updateConnectedMsg = () => {
 }
 
 export const send_controller_update = (frame) => {
-    if (multiplayerReady() && frame % 1 == 0) {
+/*    if (multiplayerReady() && frame % 1 == 0) {
         sendDataWithOpcode(Multi.createControllerProtoMsg().serializeBinary(), 3)
-    }
+    }*/
 }
 
 export const post_main_loop_one_iteration = (frame) => {
 
     updateConnectedMsg()
 
-    if (multiplayerReady() && frame % 5 == 0) {
+    if (multiplayerReady() && frame % 1 == 0) {
         sendDataWithOpcode(Multi.createMarioProtoMsg(), 0)
     }
 

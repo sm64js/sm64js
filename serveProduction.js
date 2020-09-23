@@ -1,6 +1,9 @@
 const { App } = require('@sifrr/server')
-const { MarioMsg, MarioListMsg, ValidSocketsMsg } = require("./proto/mario_pb")
+const { MarioMsg, MarioListMsg, ControllerListMsg, ControllerMsg, ValidSocketsMsg } = require("./proto/mario_pb")
 const fs = require('fs')
+const util = require('util')
+const zlib = require('zlib')
+const deflate = util.promisify(zlib.deflate)
 const ws_port = 5001
 const port = 80
 
@@ -34,7 +37,7 @@ const broadcastDataWithOpcode = (bytes, opcode, ignoreSocket) => {
     })
 }
 
-const sendMainUpdate = () => {
+const sendValidUpdate = () => {
 
     const validSockets = Object.values(allSockets).filter(data => data.valid > 0).map(data => data.socket.id)
 
@@ -64,14 +67,15 @@ const processPlayerData = (socketID, bytes) => {
     allSockets[socketID].valid = 60
 
     //publish
-    broadcastDataWithOpcode(bytes, 0, socketID)
+    //broadcastDataWithOpcode(bytes, 0, socketID)
 }
 
 const processControllerUpdate = (socketID, bytes) => {
+    const decodedController = ControllerMsg.deserializeBinary(bytes)
 
     /// do some validation here probably
-
-    broadcastDataWithOpcode(bytes, 3, socketID)
+    allSockets[socketID].decodedController = decodedController
+    //broadcastDataWithOpcode(bytes, 3, socketID)
 }
 
 
@@ -112,14 +116,44 @@ const processChat = (socketID, bytes) => {
     broadcastDataWithOpcode(responseMsg, 1)
 }
 
-const game_loop = setInterval(() => {
-    sendMainUpdate()
+/// Every frame - 30 times per second
+setInterval(async () => {
     Object.values(allSockets).forEach(data => {
         if (data.valid > 0) data.valid--
         else if (data.decodedMario) data.socket.end()
     })
 
-}, 30)
+    const mariolist = Object.values(allSockets).filter(data => data.decodedMario).map(data => data.decodedMario)
+    const mariolistproto = new MarioListMsg()
+    mariolistproto.setMarioList(mariolist)
+    const bytes = mariolistproto.serializeBinary()
+    const compressedMsg = await deflate(bytes)
+    broadcastDataWithOpcode(compressedMsg, 0)
+
+}, 33)
+
+/// Every other frame - 16 times per second
+setInterval(async () => {
+/*    const controllerlist = Object.values(allSockets).filter(data => data.decodedController).map(data => data.decodedController)
+    const controllerlistproto = new ControllerListMsg()
+    controllerlistproto.setControllerList(controllerlist)
+    const bytes = controllerlistproto.serializeBinary()
+    const compressedMsg = await deflate(bytes)
+    broadcastDataWithOpcode(compressedMsg, 3)*/
+
+}, 66)
+
+
+/// Every 33 frames / once per second
+setInterval(() => { sendValidUpdate() }, 1000)
+
+/// Every 15 seconds
+setInterval(() => {
+    Object.values(allSockets).forEach(data => {
+        data.socket.ping = process.hrtime()
+        sendDataWithOpcode(new Uint8Array(), 99, data.socket)
+    })
+}, 15000)
 
 new App({}).ws('/*', {
     open: (socket) => {
@@ -130,15 +164,22 @@ new App({}).ws('/*', {
     },
     message: (socket, bytes) => {
         try {
+            //const hrstart = process.hrtime()
             const opcode = Buffer.from(bytes)[0]
             switch (opcode) {
-                case 0: processPlayerData(socket.id, bytes.slice(1)); break
-                case 1: processChat(socket.id, bytes.slice(1)); break
-                case 2: processBasicAttack(socket.id, bytes.slice(1)); break
+                case 0: processPlayerData(socket.id, bytes.slice(1)); break             
+                case 1: processChat(socket.id, bytes.slice(1)); break                    
+                case 2: processBasicAttack(socket.id, bytes.slice(1)); break             
                 case 3: processControllerUpdate(socket.id, bytes.slice(1)); break
                 case 4: processKnockUp(socket.id, bytes.slice(1)); break
+                case 99: 
+                    const hrend = process.hrtime(socket.ping)
+                    console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
+                    break
                 default: console.log("unknown opcode: " + opcode)
             }
+            //const hrend = process.hrtime(hrstart)
+            //console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
         } catch (err) { console.log(err) }
     },
     close: (socket) => {

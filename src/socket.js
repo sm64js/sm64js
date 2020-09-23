@@ -5,21 +5,16 @@ import { oDamageOrCoinValue, oInteractType, oPosX, oPosZ, oPosY } from "./includ
 import * as Multi from "./game/MultiMarioManager"
 
 const url = new URL(window.location.href)
-const channel = geckos({ port: 5001 }) 
 
-console.log(channel)
-
-let websocketServerPath = "" 
-
+let websocketServerPath = ""
 if (url.protocol == "https:") {
     websocketServerPath = `wss://${url.hostname}/websocket/`
 } else {
     websocketServerPath = `ws://${url.hostname}:5001`
 }
 
-//const socket = new WebSocket(websocketServerPath)
+const channel = geckos({ port: 5001 })
 
-if (Blob.prototype.arrayBuffer == undefined) channel.close()
 
 window.myMario = {
     skinID: 0,
@@ -41,9 +36,7 @@ const sendDataWithOpcode = (bytes, opcode) => {
 }
 
 
-const recvMyID = (msg) => {
-    networkData.mySocketID = msg.id
-}
+const recvMyID = (msg) => { networkData.mySocketID = msg.id }
 
 const recvChat = (chatmsg) => {
     if (serverData.remotePlayersByID[chatmsg.socketID] == undefined)
@@ -85,18 +78,13 @@ const recvKnockUp = (data) => {
 }
 
 
-channel.onConnect = (error) => {
-
-    console.log(error)
-
-    console.log("Connected!")
+channel.onConnect(() => {
 
     channel.readyState = 1
 
-    channel.onRaw = async (message) => {
+    channel.onRaw((message) => {
         const start = performance.now()
-        const bytes = new Uint8Array(await message.data.arrayBuffer())
-        const end = performance.now() - start
+        const bytes = new Uint8Array(message)
         const opcode = bytes[0]
         const msgBytes = bytes.slice(1)
         switch (opcode) {
@@ -107,17 +95,18 @@ channel.onConnect = (error) => {
             case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             case 8: Multi.recvValidSockets(msgBytes); break
             case 9: recvMyID(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
-            case 99: sendDataWithOpcode(new Uint8Array(), 99); break
+            case 99: sendDataWithOpcode(new Uint8Array(), 99); break  ///ping pong
             default: throw "unknown websocket opcode"
         }
+        const end = performance.now() - start
         //if (end > 100) console.log("Opcode: " + opcode + "  time: " + end +"ms  size: " + bytes.length)
-    }
+    })
 
-    channel.onDisconnect = () => { channel.readyState = 0 }
-}
+    channel.onDisconnect(() => { channel.readyState = 0 })
+})
 
 const multiplayerReady = () => {
-    return channel.readyState == 1 && gameData.marioState && networkData.mySocketID != null
+    return channel.readyState == 1 && gameData.marioState && networkData.mySocketID != -1
 }
 
 const updateConnectedMsg = () => {
@@ -150,9 +139,6 @@ export const post_main_loop_one_iteration = (frame) => {
     })
 }
 
-export const getExtraMarios = () => {
-    return serverData.extraMarios
-} 
 
 export const getExtraRenderData = (socketID) => {
 

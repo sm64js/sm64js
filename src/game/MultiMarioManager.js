@@ -244,7 +244,7 @@ export const recvValidSockets = (validsocketsbytes) => {
             delete networkData.remotePlayers[socketID]
         }
     })
-    
+
 }
 
 export const recvMarioData = (mariolistbytes) => {

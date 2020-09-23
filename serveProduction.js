@@ -1,12 +1,10 @@
-//const { App } = require('@sifrr/server')
 const { MarioMsg, MarioListMsg, ControllerListMsg, ControllerMsg, ValidSocketsMsg } = require("./proto/mario_pb")
 const fs = require('fs')
 const util = require('util')
 const zlib = require('zlib')
 const deflate = util.promisify(zlib.deflate)
-const { iceServers } = require('@geckos.io/server')
-const geckos = require('@geckos.io/server').default({ iceServers: [] })
-const ws_port = 5001
+const geckos = require('@geckos.io/server').default()
+const geckos_port = 5001
 const port = 80
 
 const badwords = fs.readFileSync('otherTools/profanity_filter.txt').toString().split('\n')
@@ -38,15 +36,11 @@ const broadcastDataWithOpcode = (bytes, opcode, channel) => {
     if (channel) channel.raw.broadcast.emit(newbytes)
     else geckos.raw.emit(newbytes)
 
-/*    Object.values(allSockets).forEach(s => {
-        if (ignoreSocket && s.socket.id == ignoreSocket) return
-        s.socket.send(newbytes, true)
-    })*/
 }
 
 const sendValidUpdate = () => {
 
-    const validSockets = Object.values(allSockets).filter(data => data.valid > 0).map(data => data.channel.id)
+    const validSockets = Object.values(allSockets).filter(data => data.valid > 0).map(data => data.channel.my_id)
 
     const validsocketsmsg = new ValidSocketsMsg()
     validsocketsmsg.setValidsocketsList(validSockets)
@@ -93,7 +87,7 @@ const processBasicAttack = (socketID, bytes) => {
     const attackMsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
     attackMsg.attackerID = socketID
     const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify(attackMsg))
-    sendDataWithOpcode(responseMsg, 2, allSockets[attackMsg.id].channel)
+    sendDataWithOpcode(responseMsg, 2, allSockets[attackMsg.my_id].channel)
 }
 
 const processKnockUp = (socketID, bytes) => {
@@ -102,7 +96,7 @@ const processKnockUp = (socketID, bytes) => {
 
     const attackMsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
     const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify(attackMsg))
-    sendDataWithOpcode(responseMsg, 4, allSockets[attackMsg.id].channel)
+    sendDataWithOpcode(responseMsg, 4, allSockets[attackMsg.my_id].channel)
 }
 
 const processChat = (socketID, bytes) => {
@@ -114,11 +108,11 @@ const processChat = (socketID, bytes) => {
     })*/
     chatmsg.socketID = socketID
 
-    const decodedMario = Object.values(allSockets).find(data => data.socket.id == socketID).decodedMario
+    const decodedMario = Object.values(allSockets).find(data => data.socket.my_id == socketID).decodedMario
 
     if (decodedMario == undefined) return
     chatmsg.sender = decodedMario.getPlayername()
-    
+
     const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify(chatmsg))
     broadcastDataWithOpcode(responseMsg, 1)
 }
@@ -162,14 +156,12 @@ setInterval(() => {
     })
 }, 15000)
 
-geckos.listen(ws_port)
+geckos.listen(geckos_port)
 geckos.onConnection(channel => {
 
-    console.log("Connected!")
-
-    channel.id = generateID()
-    allSockets[channel.id] = { valid: 0, channel }
-    const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify({ id: channel.id }))
+    channel.my_id = generateID()
+    allSockets[channel.my_id] = { valid: 0, channel }
+    const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify({ id: channel.my_id }))
     sendDataWithOpcode(responseMsg, 9, channel)
 
     channel.onRaw(bytes => {
@@ -177,14 +169,14 @@ geckos.onConnection(channel => {
             //const hrstart = process.hrtime()
             const opcode = Buffer.from(bytes)[0]
             switch (opcode) {
-                case 0: processPlayerData(channel.id, bytes.slice(1)); break
-                case 1: processChat(channel.id, bytes.slice(1)); break
-                case 2: processBasicAttack(channel.id, bytes.slice(1)); break
-                case 3: processControllerUpdate(channel.id, bytes.slice(1)); break
-                case 4: processKnockUp(channel.id, bytes.slice(1)); break
-                case 99:
+                case 0: processPlayerData(channel.my_id, bytes.slice(1)); break
+                case 1: processChat(channel.my_id, bytes.slice(1)); break
+                case 2: processBasicAttack(channel.my_id, bytes.slice(1)); break
+                case 3: processControllerUpdate(channel.my_id, bytes.slice(1)); break
+                case 4: processKnockUp(channel.my_id, bytes.slice(1)); break
+                case 99:  ///ping pong
                     const hrend = process.hrtime(channel.ping)
-                    console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
+                    console.info('Latency: %ds %dms', hrend[0], hrend[1] / 1000000)
                     break
                 default: console.log("unknown opcode: " + opcode)
             }
@@ -195,42 +187,9 @@ geckos.onConnection(channel => {
 
 
     channel.onDisconnect(() => {
-        console.log(`${channel.id} got disconnected`)
-        delete allSockets[channel.id]
+        delete allSockets[channel.my_id]
     })
 })
-
-/*new App({}).ws('/*', {
-    open: (socket) => {
-        socket.id = generateID()
-        allSockets[socket.id] = { valid: 0, socket }
-        const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify({ id: socket.id }))
-        sendDataWithOpcode(responseMsg, 9, socket)
-    },
-    message: (socket, bytes) => {
-        try {
-            //const hrstart = process.hrtime()
-            const opcode = Buffer.from(bytes)[0]
-            switch (opcode) {
-                case 0: processPlayerData(socket.id, bytes.slice(1)); break             
-                case 1: processChat(socket.id, bytes.slice(1)); break                    
-                case 2: processBasicAttack(socket.id, bytes.slice(1)); break             
-                case 3: processControllerUpdate(socket.id, bytes.slice(1)); break
-                case 4: processKnockUp(socket.id, bytes.slice(1)); break
-                case 99: 
-                    const hrend = process.hrtime(socket.ping)
-                    console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
-                    break
-                default: console.log("unknown opcode: " + opcode)
-            }
-            //const hrend = process.hrtime(hrstart)
-            //console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
-        } catch (err) { console.log(err) }
-    },
-    close: (socket) => {
-        delete allSockets[socket.id]
-    }
-}).listen(ws_port, () => { console.log('Starting websocker server') })*/
 
 
 //// Express Static serving

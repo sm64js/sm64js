@@ -67,7 +67,7 @@ const processPlayerData = (socketID, bytes) => {
     allSockets[socketID].valid = 60
 
     //publish
-    //broadcastDataWithOpcode(bytes, 0, socketID)
+    broadcastDataWithOpcode(bytes, 0, allSockets[socketID].channel)
 }
 
 const processControllerUpdate = (socketID, bytes) => {
@@ -123,12 +123,12 @@ setInterval(async () => {
         else if (data.decodedMario) data.channel.close()
     })
 
-    const mariolist = Object.values(allSockets).filter(data => data.decodedMario).map(data => data.decodedMario)
+/*    const mariolist = Object.values(allSockets).filter(data => data.decodedMario).map(data => data.decodedMario)
     const mariolistproto = new MarioListMsg()
     mariolistproto.setMarioList(mariolist)
     const bytes = mariolistproto.serializeBinary()
     const compressedMsg = await deflate(bytes)
-    broadcastDataWithOpcode(compressedMsg, 0)
+    broadcastDataWithOpcode(compressedMsg, 0)*/
 
 }, 33)
 

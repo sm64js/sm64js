@@ -95,7 +95,7 @@ channel.onConnect(() => {
             case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             case 8: Multi.recvValidSockets(msgBytes); break
             case 9: recvMyID(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
-            case 99: sendDataWithOpcode(new Uint8Array(), 99); break  ///ping pong
+            case 99: sendDataWithOpcode(message, 99); break  ///ping pong
             default: throw "unknown websocket opcode"
         }
         const end = performance.now() - start

@@ -150,8 +150,8 @@ setInterval(() => { sendValidUpdate() }, 1000)
 /// Every 15 seconds
 setInterval(() => {
     Object.values(allSockets).forEach(data => {
-        data.channel.ping = process.hrtime()
-        sendDataWithOpcode(new Uint8Array(), 99, data.channel)
+        const msg = new TextEncoder("utf-8").encode(JSON.stringify({ time: process.hrtime() }))
+        sendDataWithOpcode(msg, 99, data.channel)
     })
 }, 15000)
 
@@ -173,7 +173,8 @@ geckos.onConnection(channel => {
                 case 3: processControllerUpdate(channel.my_id, bytes.slice(1)); break
                 case 4: processKnockUp(channel.my_id, bytes.slice(1)); break
                 case 99:  ///ping pong
-                    const hrend = process.hrtime(channel.ping)
+                    const time = JSON.parse(new TextDecoder("utf-8").decode(bytes)).time
+                    const hrend = process.hrtime(time)
                     console.info('Latency: %ds %dms', hrend[0], hrend[1] / 1000000)
                     break
                 default: console.log("unknown opcode: " + opcode)

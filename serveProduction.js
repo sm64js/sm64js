@@ -173,7 +173,7 @@ geckos.onConnection(channel => {
                 case 3: processControllerUpdate(channel.my_id, bytes.slice(1)); break
                 case 4: processKnockUp(channel.my_id, bytes.slice(1)); break
                 case 99:  ///ping pong
-                    const time = JSON.parse(new TextDecoder("utf-8").decode(bytes)).time
+                    const time = JSON.parse(new TextDecoder("utf-8").decode(bytes.slice(1))).time
                     const hrend = process.hrtime(time)
                     console.info('Latency: %ds %dms', hrend[0], hrend[1] / 1000000)
                     break

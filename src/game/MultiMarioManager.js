@@ -239,6 +239,8 @@ export const recvControllerUpdate = (controllerbytes) => {
 export const recvValidSockets = (validsocketsbytes) => {
     const validsockets = ValidSocketsMsg.deserializeBinary(validsocketsbytes).getValidsocketsList()
 
+    networkData.numOnline = validsockets.length
+
     Object.keys(networkData.remotePlayers).forEach(socketID => {
         if (!validsockets.includes(parseInt(socketID))) {
             delete networkData.remotePlayers[socketID]

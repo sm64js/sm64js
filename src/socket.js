@@ -29,6 +29,7 @@ export const networkData = {
 export const gameData = {}
 
 const sendDataWithOpcode = (bytes, opcode) => {
+    if (bytes.length == undefined) bytes = Buffer.from(bytes)
     const newbytes = new Uint8Array(bytes.length + 1)
     newbytes.set([opcode], 0)
     newbytes.set(bytes, 1)
@@ -95,7 +96,7 @@ channel.onConnect(() => {
             case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             case 8: Multi.recvValidSockets(msgBytes); break
             case 9: recvMyID(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
-            case 99: sendDataWithOpcode(message, 99); break  ///ping pong
+            case 99: channel.raw.emit(message); break  ///ping pong
             default: throw "unknown websocket opcode"
         }
         const end = performance.now() - start
@@ -111,8 +112,9 @@ const multiplayerReady = () => {
 
 const updateConnectedMsg = () => {
     const elem = document.getElementById("connectedMsg")
+    const numPlayers = networkData.numOnline ? networkData.numOnline : "?"
     if (channel.readyState == 1) {
-        elem.innerHTML = "Connected To Server"
+        elem.innerHTML = "Connected To Server  -  " + (numPlayers).toString() + " Players Online" 
         elem.style.color = "lawngreen"
     } else {
         elem.innerHTML = "Not connected to server - try refreshing - or server is down"
@@ -128,7 +130,7 @@ export const send_controller_update = (frame) => {
 
 export const post_main_loop_one_iteration = (frame) => {
 
-    updateConnectedMsg()
+    if (frame % 30 == 0) updateConnectedMsg()
 
     if (multiplayerReady() && frame % 1 == 0) {
         sendDataWithOpcode(Multi.createMarioProtoMsg(), 0)

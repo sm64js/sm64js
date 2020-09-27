@@ -36,10 +36,11 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     const m = remotePlayer.marioState
     const update = remotePlayer.marioUpdate
 
+    m.actionState = (m.action != update.action) ? 0 : update.actionstate
+    m.actionTimer = (m.action != update.action) ? 0 : update.actiontimer
+
     m.action = update.action
     m.prevAction = update.prevaction
-    m.actionState = update.actionstate
-    m.actionTimer = update.actiontimer
     m.actionArg = update.actionarg
     m.invincTimer = update.invincTimer
     m.framesSinceA = update.framessincea

@@ -117,6 +117,7 @@ const processChat = (socketID, bytes) => {
 }
 
 /// Every frame - 30 times per second
+let marioListCounter = 0
 setInterval(async () => {
     Object.values(allSockets).forEach(data => {
         if (data.valid > 0) data.valid--
@@ -126,9 +127,11 @@ setInterval(async () => {
     const mariolist = Object.values(allSockets).filter(data => data.decodedMario).map(data => data.decodedMario)
     const mariolistproto = new MarioListMsg()
     mariolistproto.setMarioList(mariolist)
+    mariolistproto.setMessagecount(marioListCounter)
     const bytes = mariolistproto.serializeBinary()
     const compressedMsg = await deflate(bytes)
     broadcastDataWithOpcode(compressedMsg, 0)
+    marioListCounter++
 
 }, 33)
 

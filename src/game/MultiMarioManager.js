@@ -249,25 +249,30 @@ export const recvValidSockets = (validsocketsbytes) => {
 
 }
 
+
+let lastMessageProcessed = -1
 export const recvMarioData = (mariolistbytes) => {
 
     zlib.inflate(mariolistbytes, (err, buffer) => {
         if (!err) {
-            const marioListProto = MarioListMsg.deserializeBinary(buffer).getMarioList()
-            marioListProto.forEach(marioProto => {
-                const id = marioProto.getSocketid()
+            const marioListProto = MarioListMsg.deserializeBinary(buffer)
+            const messageCount = marioListProto.getMessagecount()
+            if (messageCount > lastMessageProcessed) {
+                lastMessageProcessed = messageCount
+                const marioList = marioListProto.getMarioList()
+                marioList.forEach(marioProto => {
+                    const id = marioProto.getSocketid()
+                    if (id == networkData.mySocketID) return
 
-                if (id == networkData.mySocketID) return
-
-                if (networkData.remotePlayers[id] == undefined) {
-                    networkData.remotePlayers[id] = { marioState: initNewRemoteMarioState(marioProto) }
-                    applyController(marioProto.getController())
-                } else {
-                    updateRemoteMarioState(id, marioProto)
-                }
-            })
+                    if (networkData.remotePlayers[id] == undefined) {
+                        networkData.remotePlayers[id] = { marioState: initNewRemoteMarioState(marioProto) }
+                        applyController(marioProto.getController())
+                    } else {
+                        updateRemoteMarioState(id, marioProto)
+                    }
+                })
+            }
         }
     })
-
 
 }

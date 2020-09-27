@@ -1,4 +1,4 @@
-// source: sm64js/proto/mario.proto
+// source: proto/mario.proto
 /**
  * @fileoverview
  * @enhanceable
@@ -128,7 +128,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<number>}
  * @const
  */
-proto.MarioListMsg.repeatedFields_ = [1];
+proto.MarioListMsg.repeatedFields_ = [2];
 
 
 
@@ -161,6 +161,7 @@ proto.MarioListMsg.prototype.toObject = function(opt_includeInstance) {
  */
 proto.MarioListMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
+    messagecount: jspb.Message.getFieldWithDefault(msg, 1, 0),
     marioList: jspb.Message.toObjectList(msg.getMarioList(),
     proto.MarioMsg.toObject, includeInstance)
   };
@@ -200,6 +201,10 @@ proto.MarioListMsg.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setMessagecount(value);
+      break;
+    case 2:
       var value = new proto.MarioMsg;
       reader.readMessage(value,proto.MarioMsg.deserializeBinaryFromReader);
       msg.addMario(value);
@@ -233,10 +238,17 @@ proto.MarioListMsg.prototype.serializeBinary = function() {
  */
 proto.MarioListMsg.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getMessagecount();
+  if (f !== 0) {
+    writer.writeUint32(
+      1,
+      f
+    );
+  }
   f = message.getMarioList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
-      1,
+      2,
       f,
       proto.MarioMsg.serializeBinaryToWriter
     );
@@ -245,12 +257,30 @@ proto.MarioListMsg.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * repeated MarioMsg mario = 1;
+ * optional uint32 messageCount = 1;
+ * @return {number}
+ */
+proto.MarioListMsg.prototype.getMessagecount = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.MarioListMsg} returns this
+ */
+proto.MarioListMsg.prototype.setMessagecount = function(value) {
+  return jspb.Message.setProto3IntField(this, 1, value);
+};
+
+
+/**
+ * repeated MarioMsg mario = 2;
  * @return {!Array<!proto.MarioMsg>}
  */
 proto.MarioListMsg.prototype.getMarioList = function() {
   return /** @type{!Array<!proto.MarioMsg>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.MarioMsg, 1));
+    jspb.Message.getRepeatedWrapperField(this, proto.MarioMsg, 2));
 };
 
 
@@ -259,7 +289,7 @@ proto.MarioListMsg.prototype.getMarioList = function() {
  * @return {!proto.MarioListMsg} returns this
 */
 proto.MarioListMsg.prototype.setMarioList = function(value) {
-  return jspb.Message.setRepeatedWrapperField(this, 1, value);
+  return jspb.Message.setRepeatedWrapperField(this, 2, value);
 };
 
 
@@ -269,7 +299,7 @@ proto.MarioListMsg.prototype.setMarioList = function(value) {
  * @return {!proto.MarioMsg}
  */
 proto.MarioListMsg.prototype.addMario = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 1, opt_value, proto.MarioMsg, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 2, opt_value, proto.MarioMsg, opt_index);
 };
 
 

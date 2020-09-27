@@ -249,12 +249,12 @@ export const recvValidSockets = (validsocketsbytes) => {
 
 }
 
-export const recvMarioData = (bytes1) => {
+export const recvMarioData = (mariolistbytes) => {
 
-    //zlib.inflate(mariolistbytes, (err, buffer) => {
-        //if (!err) {
-    const marioProto = MarioMsg.deserializeBinary(bytes1)
-            //marioListProto.forEach(marioProto => {
+    zlib.inflate(mariolistbytes, (err, buffer) => {
+        if (!err) {
+            const marioListProto = MarioListMsg.deserializeBinary(buffer).getMarioList()
+            marioListProto.forEach(marioProto => {
                 const id = marioProto.getSocketid()
 
                 if (id == networkData.mySocketID) return
@@ -265,9 +265,9 @@ export const recvMarioData = (bytes1) => {
                 } else {
                     updateRemoteMarioState(id, marioProto)
                 }
-            //})
-        //}
-    //})
+            })
+        }
+    })
 
 
 }

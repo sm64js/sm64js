@@ -1,6 +1,7 @@
 import * as Keydrown from "./keydrown.min.js"
 
 /////// Keyboard / Gamepad Input ////////
+window.playerInput = {}
 
 //// Prevent scrolling for arrow keys
 window.addEventListener("keydown", (e) => {
@@ -216,6 +217,8 @@ $('[data-toggle="gamepadControlsToggle"]').on('shown.bs.popover', () => {
 
 })
 
+window.switchGamepadFunc = () => { window.switchGamepad = true }
+
 window.updateDeadZone = (data) => { deadzone = data }
 
 window.updateKeyboardMapping = (chosenKey, gameButton) => {
@@ -260,6 +263,7 @@ const applyDeadzone = (number, threshold) => {
 }
 
 export const playerInputUpdate = () => {
+
     Keydrown.tick()
 
     const keyboardFinal = {}, gamepadFinal = {}

@@ -152,39 +152,43 @@ setInterval(() => { sendValidUpdate() }, 1000)
 
 /// Every 15 seconds
 setInterval(() => {
+
+    /// ping to measure latency
     Object.values(allSockets).forEach(data => {
         const msg = new TextEncoder("utf-8").encode(JSON.stringify({ time: process.hrtime() }))
         sendDataWithOpcode(msg, 99, data.channel)
     })
 }, 15000)
 
+const measureAndPrintLatency = (msgBytes) => {
+    const time = JSON.parse(new TextDecoder("utf-8").decode(msgBytes)).time
+    const hrend = process.hrtime(time)
+    console.info('Latency: %ds %dms', hrend[0], hrend[1] / 1000000)
+}
+
 geckos.onConnection(channel => {
 
     channel.my_id = generateID()
     allSockets[channel.my_id] = { valid: 0, channel }
-    const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify({ id: channel.my_id }))
-    sendDataWithOpcode(responseMsg, 9, channel)
+    channel.emit('id', { id: channel.my_id }, { reliable: true })
 
     channel.onRaw(bytes => {
         try {
-            //const hrstart = process.hrtime()
             const opcode = Buffer.from(bytes)[0]
             switch (opcode) {
                 case 0: processPlayerData(channel.my_id, bytes.slice(1)); break
-                case 1: processChat(channel.my_id, bytes.slice(1)); break
-                case 2: processBasicAttack(channel.my_id, bytes.slice(1)); break
-                case 3: processControllerUpdate(channel.my_id, bytes.slice(1)); break
-                case 4: processKnockUp(channel.my_id, bytes.slice(1)); break
-                case 99:  ///ping pong
-                    const time = JSON.parse(new TextDecoder("utf-8").decode(bytes.slice(1))).time
-                    const hrend = process.hrtime(time)
-                    console.info('Latency: %ds %dms', hrend[0], hrend[1] / 1000000)
-                    break
+                //case 1: processChat(channel.my_id, bytes.slice(1)); break
+                //case 2: processBasicAttack(channel.my_id, bytes.slice(1)); break
+                //case 3: processControllerUpdate(channel.my_id, bytes.slice(1)); break
+                //case 4: processKnockUp(channel.my_id, bytes.slice(1)); break
+                case 99: measureAndPrintLatency(bytes.slice(1)); break
                 default: console.log("unknown opcode: " + opcode)
             }
-            //const hrend = process.hrtime(hrstart)
-            //console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
         } catch (err) { console.log(err) }
+    })
+
+    channel.on('chat', msg => {
+        console.log(msg)
     })
 
 

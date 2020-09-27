@@ -90,18 +90,19 @@ channel.onConnect(() => {
         const msgBytes = bytes.slice(1)
         switch (opcode) {
             case 0: if (multiplayerReady()) Multi.recvMarioData(msgBytes); break
-            case 1: recvChat(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
-            case 2: recvBasicAttack(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
-            case 3: if (multiplayerReady()) Multi.recvControllerUpdate(msgBytes); break
-            case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
+            //case 1: recvChat(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
+            //case 2: recvBasicAttack(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
+            //case 3: if (multiplayerReady()) Multi.recvControllerUpdate(msgBytes); break
+            //case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             case 8: Multi.recvValidSockets(msgBytes); break
-            case 9: recvMyID(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             case 99: channel.raw.emit(message); break  ///ping pong
             default: throw "unknown websocket opcode"
         }
         const end = performance.now() - start
         //if (end > 100) console.log("Opcode: " + opcode + "  time: " + end +"ms  size: " + bytes.length)
     })
+
+    channel.on('id', msg => { networkData.mySocketID = msg.id })
 
     channel.onDisconnect(() => { channel.readyState = 0 })
 })
@@ -155,6 +156,7 @@ export const getExtraRenderData = (socketID) => {
 }
 
 export const sendChat = (msg) => {
+    channel.emit('chat', msg, { reliable: true })
     //sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify({ msg })), 1)
 }
 

@@ -3,6 +3,7 @@ import { sendChat } from "./socket.js"
 import { gameData } from "./socket.js"
 
 /////// Keyboard / Gamepad Input ////////
+window.playerInput = {}
 
 let textboxfocus = false
 
@@ -237,6 +238,7 @@ $('[data-toggle="gamepadControlsToggle"]').on('shown.bs.popover', () => {
 
 
 window.updateDeadZone = (data) => { deadzone = parseFloat(data) }
+window.switchGamepadFunc = () => { window.switchGamepad = true }
 
 window.updateKeyboardMapping = (chosenKey, gameButton) => {
     keyboardButtonMapping[gameButton] = chosenKey

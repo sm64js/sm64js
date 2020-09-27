@@ -40,12 +40,22 @@ const sendDataWithOpcode = (bytes, opcode) => {
 const recvMyID = (msg) => { networkData.mySocketID = msg.id }
 
 const recvChat = (chatmsg) => {
-    if (serverData.remotePlayersByID[chatmsg.socketID] == undefined)
-        serverData.remotePlayersByID[chatmsg.socketID] = {}
-    Object.assign(serverData.remotePlayersByID[chatmsg.socketID], { chatData: { msg: chatmsg.msg, timer: 80 } })
+
+    if (chatmsg.channel_id != networkData.mySocketID &&
+        networkData.remotePlayers[chatmsg.channel_id] == undefined) return
+
     const chatlog = document.getElementById("chatlog")
     chatlog.innerHTML += '<strong>' + chatmsg.sender + '</strong>: ' + chatmsg.msg + '<br/>'
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
+
+    let someobject
+    if (chatmsg.channel_id == networkData.mySocketID)
+        someobject = window.myMario
+    else
+        someobject = networkData.remotePlayers[chatmsg.channel_id]
+
+    Object.assign(someobject, { chatData: { msg: chatmsg.msg, timer: 80 } })
+
 }
 
 const recvBasicAttack = (attackData) => {
@@ -103,6 +113,7 @@ channel.onConnect(() => {
     })
 
     channel.on('id', msg => { networkData.mySocketID = msg.id })
+    channel.on('chat', msg => { recvChat(msg) })
 
     channel.onDisconnect(() => { channel.readyState = 0 })
 })
@@ -137,20 +148,34 @@ export const post_main_loop_one_iteration = (frame) => {
         sendDataWithOpcode(Multi.createMarioProtoMsg(), 0)
     }
 
-    Object.values(networkData.remotePlayers).forEach(data => {
-        if (data.chatData && data.chatData.timer > 0) data.chatData.timer--
-    })
+    decrementChat()
 }
 
 
+const decrementChat = () => {
+    Object.values(networkData.remotePlayers).forEach(data => {
+        if (data.chatData && data.chatData.timer > 0) data.chatData.timer--
+    })
+
+    const myChat = window.myMario.chatData
+    if (myChat && myChat.timer > 0) myChat.timer--
+}
+
 export const getExtraRenderData = (socketID) => {
 
-    if (socketID == networkData.mySocketID) return { skinID: window.myMario.skinID }
+    const myChat = window.myMario.chatData
 
-    const remotePlayer = networkData.remotePlayers[socketID].marioState
+    if (socketID == networkData.mySocketID) return {
+        skinID: window.myMario.skinID,
+        chat: (myChat && myChat.timer > 0) ? myChat.msg : null
+    }
+
+    const remoteMario = networkData.remotePlayers[socketID].marioState
+    const remoteChat = networkData.remotePlayers[socketID].chatData
     return {
-        skinID: remotePlayer.skinID,
-        playerName: remotePlayer.playerName
+        skinID: remoteMario.skinID,
+        playerName: remoteMario.playerName,
+        chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null
     }
 
 }

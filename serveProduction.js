@@ -47,7 +47,7 @@ const sendValidUpdate = () => {
 }
 
 
-const processPlayerData = (socketID, bytes) => {
+const processPlayerData = (channel_id, bytes) => {
     const decodedMario = MarioMsg.deserializeBinary(bytes)
 
     //Pretty strict validation  -- ignoring validation for now
@@ -63,8 +63,8 @@ const processPlayerData = (socketID, bytes) => {
     ///decodedMario.setSocketid(socketID) no longer needed
 
     /// Data is Valid
-    allSockets[socketID].decodedMario = decodedMario
-    allSockets[socketID].valid = 60
+    allSockets[channel_id].decodedMario = decodedMario
+    allSockets[channel_id].valid = 60
 
     //publish
     //broadcastDataWithOpcode(bytes, 0, allSockets[socketID].channel)
@@ -98,22 +98,20 @@ const processKnockUp = (socketID, bytes) => {
     sendDataWithOpcode(responseMsg, 4, allSockets[attackMsg.my_id].channel)
 }
 
-const processChat = (socketID, bytes) => {
-    const chatmsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
+const processChat = (channel_id, msg) => {
 /*    badwords.forEach(word => {
         const searchMask = word.slice(0, word.length)
         const regEx = new RegExp(searchMask, "ig");
-        chatmsg.msg = chatmsg.msg.replace(regEx, "*****")
+        msg = msg.replace(regEx, "*****")
     })*/
-    chatmsg.socketID = socketID
 
-    const decodedMario = Object.values(allSockets).find(data => data.socket.my_id == socketID).decodedMario
+    const decodedMario = Object.values(allSockets).find(data => data.channel.my_id == channel_id).decodedMario
 
     if (decodedMario == undefined) return
-    chatmsg.sender = decodedMario.getPlayername()
 
-    const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify(chatmsg))
-    broadcastDataWithOpcode(responseMsg, 1)
+    const chatmsg = { channel_id, msg, sender: decodedMario.getPlayername() }
+
+    geckos.emit('chat', chatmsg, { reliable: true })
 }
 
 /// Every frame - 30 times per second
@@ -187,10 +185,7 @@ geckos.onConnection(channel => {
         } catch (err) { console.log(err) }
     })
 
-    channel.on('chat', msg => {
-        console.log(msg)
-    })
-
+    channel.on('chat', msg => { processChat(channel.my_id, msg) })
 
     channel.onDisconnect(() => {
         delete allSockets[channel.my_id]

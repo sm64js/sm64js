@@ -3,7 +3,9 @@ const fs = require('fs')
 const util = require('util')
 const zlib = require('zlib')
 const deflate = util.promisify(zlib.deflate)
+const { iceServers } = require('@geckos.io/server')
 const geckos = require('@geckos.io/server').default({
+    iceServers,
     portRange: {
         min: 1,
         max: 200

@@ -3,7 +3,12 @@ const fs = require('fs')
 const util = require('util')
 const zlib = require('zlib')
 const deflate = util.promisify(zlib.deflate)
-const geckos = require('@geckos.io/server').default()
+const geckos = require('@geckos.io/server').default({
+    portRange: {
+        min: 1,
+        max: 200
+    }
+})
 const port = 9208
 
 const badwords = fs.readFileSync('otherTools/profanity_filter.txt').toString().split('\n')

@@ -4,14 +4,14 @@ import { take_damage_and_knock_back, INTERACT_PLAYER } from "./game/Interaction"
 import { oDamageOrCoinValue, oInteractType, oPosX, oPosZ, oPosY } from "./include/object_constants"
 import * as Multi from "./game/MultiMarioManager"
 
-const url = new URL(window.location.href)
+/*const url = new URL(window.location.href)
 
 let websocketServerPath = ""
 if (url.protocol == "https:") {
     websocketServerPath = `wss://${url.hostname}/websocket/`
 } else {
     websocketServerPath = `ws://${url.hostname}:5001`
-}
+}*/
 
 const channel = geckos()
 

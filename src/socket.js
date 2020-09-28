@@ -89,7 +89,12 @@ const recvKnockUp = (data) => {
 }
 
 
-channel.onConnect(() => {
+channel.onConnect((err) => {
+
+    if (err) {
+        console.log(err)
+        return
+    }
 
     channel.readyState = 1
 

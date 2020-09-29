@@ -1,5 +1,5 @@
 import { ObjectListProcessorInstance as ObjListProc } from "../game/ObjectListProcessor"
-import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction, oAnimations } from "../include/object_constants"
+import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction, oAnimations, oInteractType } from "../include/object_constants"
 import { GRAPH_RENDER_CYLBOARD, geo_obj_init_animation } from "./graph_node"
 
 class BehaviorCommands {
@@ -58,6 +58,12 @@ class BehaviorCommands {
 
     set_int(args) {
         ObjListProc.gCurrentObject.rawData[args.field] = args.value
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    set_interact_type(args) {
+        ObjListProc.gCurrentObject.rawData[oInteractType] = args.type
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }

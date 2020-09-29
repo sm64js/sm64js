@@ -1,6 +1,7 @@
 import * as Mario from "./Mario"
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
-import { atan2s } from "../engine/math_util"
+import { atan2s, vec3f_dif, vec3f_length } from "../engine/math_util"
+import { networkData } from "../socket"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
 export const INTERACT_GRABBABLE      /* 0x00000002 */ = (1 << 1)
@@ -100,8 +101,232 @@ const reset_mario_pitch = (m) => {
     /// TODO: WATER JUMP || SHOT FROM CANNON || ACT_FLYING
 }
 
+
+const determine_interaction = (m, o) => {
+    let interaction = 0
+    const action = m.action
+
+    let dYawToObject = mario_obj_angle_to_object(m, o) - m.faceAngle[1]
+    dYawToObject = dYawToObject > 32767 ? dYawToObject - 65536 : dYawToObject
+    dYawToObject = dYawToObject < -32768 ? dYawToObject + 65536 : dYawToObject
+
+    // hack: make water punch actually do something
+    if (m.action == Mario.ACT_WATER_PUNCH && o.rawData[oInteractType] & INTERACT_PLAYER) {
+        if (-0x2AAA <= dYawToObject && dYawToObject <= 0x2AAA) {
+            return INT_PUNCH
+        }
+    }
+
+    if (action & Mario.ACT_FLAG_ATTACKING) {
+        if (action == Mario.ACT_PUNCHING || action == Mario.ACT_MOVE_PUNCHING || action == Mario.ACT_JUMP_KICK) {
+
+            if (m.flags & Mario.MARIO_PUNCHING) {
+                // 120 degrees total, or 60 each way
+                if (-0x2AAA <= dYawToObject && dYawToObject <= 0x2AAA) {
+                    interaction = INT_PUNCH
+                }
+            }
+            if (m.flags & Mario.MARIO_KICKING) {
+                // 120 degrees total, or 60 each way
+                if (-0x2AAA <= dYawToObject && dYawToObject <= 0x2AAA) {
+                    interaction = INT_KICK
+                }
+            }
+            if (m.flags & Mario.MARIO_TRIPPING) {
+                // 180 degrees total, or 90 each way
+                if (-0x4000 <= dYawToObject && dYawToObject <= 0x4000) {
+                    interaction = INT_TRIP
+                }
+            }
+        } else if (action == Mario.ACT_GROUND_POUND || action == Mario.ACT_TWIRLING) {
+            if (m.vel[1] < 0.0) {
+                interaction = INT_GROUND_POUND_OR_TWIRL
+            }
+        } else if (action == Mario.ACT_GROUND_POUND_LAND || action == Mario.ACT_TWIRL_LAND) {
+            // Neither ground pounding nor twirling change Mario's vertical speed on landing.,
+            // so the speed check is nearly always true (perhaps not if you land while going upwards?)
+            // Additionally, actionState it set on each first thing in their action, so this is
+            // only true prior to the very first frame (i.e. active 1 frame prior to it run).
+            if (m.vel[1] < 0.0 && m.actionState == 0) {
+                interaction = INT_GROUND_POUND_OR_TWIRL;
+            }
+        } else if (action == Mario.ACT_SLIDE_KICK || action == Mario.ACT_SLIDE_KICK_SLIDE) {
+            interaction = INT_SLIDE_KICK
+        } else if (action & Mario.ACT_FLAG_RIDING_SHELL) {
+            interaction = INT_FAST_ATTACK_OR_SHELL
+        } else if (m.forwardVel <= -26.0 || 26.0 <= m.forwardVel) {
+            interaction = INT_FAST_ATTACK_OR_SHELL
+        }
+    }
+
+    // Prior to this, the interaction type could be overwritten. This requires, however,
+    // that the interaction not be set prior. This specifically overrides turning a ground
+    // pound into just a bounce.
+    if (interaction == 0 && (action & Mario.ACT_FLAG_AIR)) {
+        if (m.vel[1] < 0.0) {
+            if (m.pos[1] > o.rawData[oPosY]) {
+                interaction = INT_HIT_FROM_ABOVE
+            }
+        } else {
+            if (m.pos[1] < o.rawData[oPosY]) {
+                interaction = INT_HIT_FROM_BELOW
+            }
+        }
+    }
+
+    return interaction
+}
+
+const determine_player_damage_value = (interaction) => {
+    if (interaction & INT_GROUND_POUND_OR_TWIRL) { return 3 }
+    if (interaction & INT_KICK) { return 2 }
+    return 1
+}
+
+const bounce_off_object = (m, o, velY) => {
+    m.pos[1] = o.rawData[oPosY] + o.hitboxHeight
+    m.vel[1] = velY
+
+    m.flags &= ~Mario.MARIO_UNKNOWN_08
+
+    //play_sound(SOUND_ACTION_BOUNCE_OFF_OBJECT, m->marioObj->header.gfx.cameraToObject);
+}
+
+const player_is_sliding = (m) => {
+    if (m.action & (Mario.ACT_FLAG_BUTT_OR_STOMACH_SLIDE | Mario.ACT_FLAG_DIVING)) {
+        return true
+    }
+
+    switch (m.action) {
+        case Mario.ACT_CROUCH_SLIDE:
+        case Mario.ACT_SLIDE_KICK_SLIDE:
+        case Mario.ACT_BUTT_SLIDE_AIR:
+        case Mario.ACT_HOLD_BUTT_SLIDE_AIR:
+            return true
+    }
+    return false
+}
+
+
+const bounce_back_from_attack = (m, interaction) => {
+    if (interaction & (INT_PUNCH | INT_KICK | INT_TRIP)) {
+        if (m.action == Mario.ACT_PUNCHING) {
+            m.action = Mario.ACT_MOVE_PUNCHING
+        }
+
+        if (m.action & Mario.ACT_FLAG_AIR) {
+            Mario.set_forward_vel(m, -16.0)
+        } else {
+            Mario.set_forward_vel(m, -48.0)
+        }
+
+        //if (m.marioObj.localMario) { set_camera_shake_from_hit(SHAKE_ATTACK); }
+        m.particleFlags |= Mario.PARTICLE_TRIANGLE
+    }
+
+    // if (interaction & (INT_PUNCH | INT_KICK | INT_TRIP | INT_FAST_ATTACK_OR_SHELL)) {
+    //     play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
+    // }
+}
+
+const resolve_player_collision = (m, m2) => {
+        // move player outside of other player
+        const extentY = m.marioObj.hitboxHeight
+        const radius = m.marioObj.hitboxRadius * 2.0
+    
+        const localTorso = m.marioBodyState.torsoPos
+        const remoteTorso = m2.marioBodyState.torsoPos
+
+        let marioRelY = localTorso[1] - remoteTorso[1]
+        if (marioRelY < 0) { marioRelY = -marioRelY }
+        if (marioRelY >= extentY) return false
+
+        const marioRelX = localTorso[0] - remoteTorso[0]
+        const marioRelZ = localTorso[2] - remoteTorso[2]
+        const marioDist = Math.sqrt(Math.pow(marioRelX, 2) + Math.pow(marioRelZ, 2))
+
+        if (marioDist >= radius) return false
+
+        /// Add the bounce part
+        const interaction = determine_interaction(m, m2.marioObj)
+        if (interaction & INT_HIT_FROM_ABOVE) {
+            if (m2.marioObj.localMario) {
+                m2.squishTimer = Math.max(m2.squishTimer, 4)
+            }
+            bounce_off_object(m, m2.marioObj, 60.0)
+            // queue_rumble_data_mario(m, 5, 80);
+            // don't do further interactions if we've hopped on top
+            return true
+        }
+
+        m.pos[0] += (radius - marioDist) / radius * marioRelX
+        m.pos[2] += (radius - marioDist) / radius * marioRelZ
+        m.marioBodyState.torsoPos[0] += (radius - marioDist) / radius * marioRelX
+        m.marioBodyState.torsoPos[2] += (radius - marioDist) / radius * marioRelZ
+        return false
+}
+
 const interact_player = (m, o) => {
-    console.log("interact player")
+    if (!networkData.playerInteractions) return false
+
+    const m2 = o.marioState
+
+    if (resolve_player_collision(m, m2)) return false
+
+    const interaction = determine_interaction(m, o)
+
+    // attacked
+    let isInCutscene = ((m.action & Mario.ACT_GROUP_MASK) == Mario.ACT_GROUP_CUTSCENE) || ((m2.action & Mario.ACT_GROUP_MASK) == Mario.ACT_GROUP_CUTSCENE)
+    isInCutscene = isInCutscene || (m.action == Mario.ACT_IN_CANNON) || (m2.action == Mario.ACT_IN_CANNON)
+    const isInvulnerable = (m2.action & Mario.ACT_FLAG_INVULNERABLE) || m2.invincTimer != 0 || m2.hurtCounter != 0 || isInCutscene
+    const isIgnoredAttack = (m.action == Mario.ACT_JUMP || m.action == Mario.ACT_DOUBLE_JUMP)
+
+    if ((interaction & INT_ANY_ATTACK) && !(interaction & INT_HIT_FROM_ABOVE) && !isInvulnerable && !isIgnoredAttack) {
+
+        // determine if slide attack should be ignored
+        if ((interaction & INT_ATTACK_SLIDE) && player_is_sliding(m2)) {
+            // determine the difference in velocities
+            const velDiff = [0,0,0]
+            vec3f_dif(velDiff, m.vel, m2.vel)
+
+            if (vec3f_length(velDiff) < 40) {
+                // the difference vectors are not different enough, do not attack
+                return false
+            }
+            if (vec3f_length(m2.vel) > vec3f_length(m.vel)) {
+                // the one being attacked is going faster, do not attack
+                return false
+            }
+        }
+
+        // determine if ground pound should be ignored
+        if (m.action == Mario.ACT_GROUND_POUND) {
+            // not moving down yet?
+            if (m.actionState == 0) return false
+            m2.squishTimer = Math.max(m2.squishTimer, 20)
+        }
+
+        if (m2.marioObj.localMario) {
+            m2.interactObj = m.marioObj
+            if (interaction & INT_KICK) {
+                // if (m2.action == Mario.ACT_FIRST_PERSON) {
+                //     // without this branch, the player will be stuck in first person
+                //     raise_background_noise(2)
+                //     set_camera_mode(m2.area->camera, -1, 1)
+                //     m2.input &= ~INPUT_FIRST_PERSON
+                // }
+                set_mario_action(m2, Mario.ACT_FREEFALL, 0)
+            }
+            m.marioObj.rawData[oDamageOrCoinValue] = determine_player_damage_value(interaction)
+        }
+        m2.invincTimer = Math.max(m2.invincTimer, 3)
+        take_damage_and_knock_back(m2, m.marioObj)
+        bounce_back_from_attack(m, interaction)
+        return false
+    }
+
+    return false
+
 }
 
 const interact_pole = (m, o) => {

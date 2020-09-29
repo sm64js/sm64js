@@ -22,6 +22,7 @@ window.myMario = {
 }
 
 export const networkData = {
+    playerInteractions: true,
     remotePlayers: {},
     mySocketID: -1,
 }

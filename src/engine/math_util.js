@@ -35,6 +35,15 @@ export const vec3f_add = (dest, a) => {
     dest[2] += a[2]
 }
 
+export const vec3f_dif = (dest, a, b) => {
+    dest[0] = a[0] - b[0]
+    dest[1] = a[1] - b[1]
+    dest[2] = a[2] - b[2]
+}
+
+export const vec3f_length = (a) => {
+    return Math.sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2])
+}
 
 export const mtxf_identity = (mtx) => {
     for (let i = 0; i < mtx.length; i++) {

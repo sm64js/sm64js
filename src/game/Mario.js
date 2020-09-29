@@ -237,6 +237,12 @@ export const ACT_HANGING = 0x00200349
 export const ACT_BUTT_SLIDE = 0x00840452
 export const ACT_HOLD_BUTT_SLIDE = 0x00840454
 export const ACT_RIDING_SHELL_GROUND = 0x20810446
+export const ACT_WATER_PUNCH = 0x300024E1
+export const ACT_TWIRL_LAND = 0x18800238
+export const ACT_TWIRLING = 0x108008A4
+export const ACT_IN_CANNON               = 0x00001371
+export const ACT_BUTT_SLIDE_AIR          = 0x0300088E
+export const ACT_HOLD_BUTT_SLIDE_AIR     = 0x010008A2
 
 export const ACT_HARD_BACKWARD_GROUND_KB  =  0x00020460 
 export const ACT_HARD_FORWARD_GROUND_KB   =  0x00020461 

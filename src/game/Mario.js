@@ -750,9 +750,23 @@ export const is_anim_past_frame = (m, animFrame) => {
     return isPastFrame
 }
 
+const mario_reset_bodystate = (m) => {
+    const bodyState = m.marioBodyState
+
+    bodyState.capState = 1
+    bodyState.eyeState = 0
+    bodyState.handState = 0
+    bodyState.modelState = 0
+    bodyState.wingFlutter = false
+
+    m.flags &= ~MARIO_METAL_SHOCK
+}
+
 export const execute_mario_action = (marioIndex) => {
     if (LevelUpdate.gMarioState[marioIndex].action) {
+
         LevelUpdate.gMarioState[marioIndex].marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+        mario_reset_bodystate(LevelUpdate.gMarioState[marioIndex])
         update_mario_inputs(LevelUpdate.gMarioState[marioIndex])
         Interact.mario_process_interactions(LevelUpdate.gMarioState[marioIndex])
 

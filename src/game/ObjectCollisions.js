@@ -1,6 +1,7 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { oIntangibleTimer, oPosY, oPosX, oPosZ, oInteractType } from "../include/object_constants"
 import { networkData } from "../socket"
+import { INTERACT_PLAYER } from "./Interaction"
 
 const clear_object_collision = (startNode) => {
     let sp4 = startNode.next
@@ -16,12 +17,16 @@ const clear_object_collision = (startNode) => {
 }
 
 const detect_object_hitbox_overlap = (a, b) => {
+
     const sp3C = a.rawData[oPosY] - a.hitboxDownOffset
     const sp38 = b.rawData[oPosY] - b.hitboxDownOffset
     const dx = a.rawData[oPosX] - b.rawData[oPosX]
     const dz = a.rawData[oPosZ] - b.rawData[oPosZ]
     const collisionRadius = a.hitboxRadius + b.hitboxRadius
     const distance = Math.sqrt(dx * dx + dz * dz)
+
+    /// do not check for player intertion here
+    if (b.rawData[oInteractType] == INTERACT_PLAYER) throw "should not be interacting with players here"
 
     if (collisionRadius > distance) {
         let sp20 = a.hitboxHeight + sp3C
@@ -44,6 +49,51 @@ const detect_object_hitbox_overlap = (a, b) => {
         return 1
 
     }
+}
+
+
+const detect_player_hitbox_overlap = (local, remote) => {
+
+    const a = local.marioState.marioObj
+    const b = remote.marioState.marioObj
+
+    if (a.rawData[oIntangibleTimer] != 0) return
+    if (b.rawData[oIntangibleTimer] != 0) return
+
+    const aTorso = local.marioState.marioBodyState.torsoPos
+    const bTorso = remote.marioState.marioBodyState.torsoPos
+
+    const sp3C = aTorso[1] - a.hitboxDownOffset
+    const sp38 = bTorso[1] - b.hitboxDownOffset
+    const dx = aTorso[0] - bTorso[0]
+    const dz = aTorso[2] - bTorso[2]
+    const collisionRadius = (a.hitboxRadius + b.hitboxRadius) * 1.25
+    const distance = Math.sqrt(dx * dx + dz * dz)
+
+    /// do not check for player inter
+
+    if (collisionRadius > distance) {
+        let sp20 = a.hitboxHeight + sp3C
+        let sp1C = b.hitboxHeight + sp38
+
+        if (sp3C > sp1C) return 0
+        if (sp20 < sp38) return 0
+        if (a.numCollidedObjs >= 4) return 0
+        if (b.numCollidedObjs >= 4) return 0
+
+        a.collidedObjs.push(b)
+        b.collidedObjs.push(a)
+
+        a.numCollidedObjs++ //possibly unnecessary
+        b.numCollidedObjs++ //possibly unnecessary
+
+        a.collidedObjInteractTypes |= b.rawData[oInteractType]
+        b.collidedObjInteractTypes |= a.rawData[oInteractType]
+
+        return 1
+
+    }
+
 }
 
 const check_collision_in_list = (a, bStart) => {
@@ -79,6 +129,7 @@ const check_player_object_collision = () => {
 
     Object.values(networkData.remotePlayers).forEach(remotePlayer => {
         const remoteMarioObj = remotePlayer.marioState.marioObj
+        detect_player_hitbox_overlap(localMarioObj, remotePlayer)
         check_collision_in_list(remoteMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE])
     })
 

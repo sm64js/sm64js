@@ -3,13 +3,14 @@ import { GameInstance as Game } from "./Game"
 import { GEO_CONTEXT_RENDER, GEO_CONTEXT_CREATE } from "../engine/graph_node"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import * as Mario from "./Mario"
+import { get_pos_from_transform_mtx } from "../engine/math_util"
 
 class MarioMisc {
     constructor() {
         this.gBodyState = {
             action: 0, capState: 0, eyeState: 0, handState: 0,
             wingFlutter: 0, modelState: 0, grabPos: 0, punchState: 0,
-            torsoAngle: [0, 0, 0], headAngle: [0, 0, 0],
+            torsoAngle: [0, 0, 0], headAngle: [0, 0, 0], torsoPos: [0,0,0],
             heldObjLastPosition: [0, 0, 0]
         }
     }
@@ -27,7 +28,7 @@ class MarioMisc {
         return gfx 
     }
 
-    geo_mario_tilt_torso(callContext, node) {
+    geo_mario_tilt_torso(callContext, node, mtx) {
 
         const asGenerated = node.wrapper
         const action = this.gBodyState.action
@@ -42,6 +43,12 @@ class MarioMisc {
             rotNode.wrapper.rotation[0] = this.gBodyState.torsoAngle[1]
             rotNode.wrapper.rotation[1] = this.gBodyState.torsoAngle[2]
             rotNode.wrapper.rotation[2] = this.gBodyState.torsoAngle[0]
+
+            const curTransform = mtx
+            const cameraMtx = GeoRenderer.gCurGraphNodeCamera.wrapper.matrixPtr
+
+            ///update torso position
+            if (curTransform && cameraMtx) get_pos_from_transform_mtx(this.gBodyState.torsoPos, curTransform, cameraMtx)
         }
         return []
 

@@ -5,10 +5,9 @@ const zlib = require('zlib')
 const deflate = util.promisify(zlib.deflate)
 const { iceServers } = require('@geckos.io/server')
 const geckos = require('@geckos.io/server').default({
-    iceServers,
     portRange: {
-        min: 1,
-        max: 200
+        min: 10000,
+        max: 10200
     }
 })
 const port = 9208

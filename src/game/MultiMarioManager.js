@@ -2,10 +2,12 @@ import { MarioMsg, MarioListMsg, ControllerListMsg, ControllerMsg, ValidSocketsM
 import zlib from "zlib"
 import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "../socket"
+import { INTERACT_PLAYER } from "./Interaction"
 
 const rawDataMap = {
     0: RAW.oMarioPoleYawVel,
     1: RAW.oMarioPolePos,
+    2: RAW.oIntangibleTimer
 }
 
 const getMarioRawDataSubset = (fullRawData) => {
@@ -14,8 +16,8 @@ const getMarioRawDataSubset = (fullRawData) => {
     })
 }
 
-const expandRawDataSubset = (subset) => {
-    const rawData = new Array(0x50).fill(0)
+const expandRawDataSubset = (subset, currentRawData) => {
+    const rawData = currentRawData ? currentRawData : new Array(0x50).fill(0)
     Object.entries(rawDataMap).forEach(([subsetIndex, rawDataIndex]) => {
         rawData[rawDataIndex] = subset[subsetIndex]
     })
@@ -56,7 +58,7 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     m.skinID = update.skinid
     m.playerName = update.playername
 
-    m.marioObj.rawData = expandRawDataSubset(update.rawdataList)
+    m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
 
     if (update.usedobjid >= 1000 && update.usedobjid <= 2000) {
         m.usedObj = gameData.spawnObjectsBySyncID[update.usedobjid - 1000]
@@ -132,7 +134,7 @@ const initNewRemoteMarioState = (marioProto) => {
         marioBodyState: {
             action: 0, capState: 0, eyeState: 0, grabPos: 0,
             handState: 0, headAngle: [0, 0, 0], modelState: 0, punchState: 0,
-            torsoAngle: [0,0,0]
+            torsoAngle: [0,0,0], torsoPos: [0,0,0]
         },
         marioObj: {
             header: {
@@ -167,6 +169,8 @@ const initNewRemoteMarioState = (marioProto) => {
         vel: marioProto.getVelList(),
         action: marioProto.getAction()
     }
+
+    newMarioState.marioObj.rawData[RAW.oInteractType] = INTERACT_PLAYER
 
     newMarioState.marioObj.marioState = newMarioState
     newMarioState.marioObj.header.wrapperObject = newMarioState.marioObj

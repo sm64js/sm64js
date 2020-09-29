@@ -145,6 +145,16 @@ export const mtxf_rotate_zxy_and_translate = (dest, translate, rotate) => {
     dest[3][3] = 1.0
 }
 
+export const get_pos_from_transform_mtx = (dest, objMtx, camMtx) => {
+    const camX = camMtx[3][0] * camMtx[0][0] + camMtx[3][1] * camMtx[0][1] + camMtx[3][2] * camMtx[0][2]
+    const camY = camMtx[3][0] * camMtx[1][0] + camMtx[3][1] * camMtx[1][1] + camMtx[3][2] * camMtx[1][2]
+    const camZ = camMtx[3][0] * camMtx[2][0] + camMtx[3][1] * camMtx[2][1] + camMtx[3][2] * camMtx[2][2]
+
+    dest[0] = objMtx[3][0] * camMtx[0][0] + objMtx[3][1] * camMtx[0][1] + objMtx[3][2] * camMtx[0][2] - camX
+    dest[1] = objMtx[3][0] * camMtx[1][0] + objMtx[3][1] * camMtx[1][1] + objMtx[3][2] * camMtx[1][2] - camY
+    dest[2] = objMtx[3][0] * camMtx[2][0] + objMtx[3][1] * camMtx[2][1] + objMtx[3][2] * camMtx[2][2] - camZ
+}
+
 export const mtxf_rotate_xy = (mtx, angle) => {
     mtxf_identity(mtx)
     mtx[0][0] = Math.cos(angle)

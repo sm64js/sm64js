@@ -10,7 +10,6 @@ export const INTERACT_COIN           /* 0x00000010 */ = (1 << 4)
 export const INTERACT_CAP            /* 0x00000020 */ = (1 << 5)
 export const INTERACT_POLE           /* 0x00000040 */ = (1 << 6)
 export const INTERACT_KOOPA          /* 0x00000080 */ = (1 << 7)
-export const INTERACT_UNKNOWN_08     /* 0x00000100 */ = (1 << 8)
 export const INTERACT_BREAKABLE      /* 0x00000200 */ = (1 << 9)
 export const INTERACT_STRONG_WIND    /* 0x00000400 */ = (1 << 10)
 export const INTERACT_WARP_DOOR      /* 0x00000800 */ = (1 << 11)
@@ -33,7 +32,9 @@ export const INTERACT_BBH_ENTRANCE   /* 0x08000000 */ = (1 << 27)
 export const INTERACT_SNUFIT_BULLET  /* 0x10000000 */ = (1 << 28)
 export const INTERACT_SHOCK          /* 0x20000000 */ = (1 << 29)
 export const INTERACT_IGLOO_BARRIER  /* 0x40000000 */ = (1 << 30)
-export const INTERACT_PLAYER     /* 0x80000000 */ = (1 << 31)
+export const INTERACT_PLAYER     /* 0x80000000 */ = (1 << 8)  // formerly 31
+export const INTERACT_UNKNOWN_08     /* 0x00000100 */ = (1 << 31) // formerly 8
+
 
 // INTERACT_WARP
 export const INT_SUBTYPE_FADING_WARP = 0x00000001

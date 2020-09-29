@@ -100,6 +100,10 @@ const reset_mario_pitch = (m) => {
     /// TODO: WATER JUMP || SHOT FROM CANNON || ACT_FLYING
 }
 
+const interact_player = (m, o) => {
+    console.log("interact player")
+}
+
 const interact_pole = (m, o) => {
     const actionId = m.action & Mario.ACT_ID_MASK
     if (actionId >= 0x80 && actionId < 0x0A0) {
@@ -259,6 +263,7 @@ const sInteractionHandlers = [
     { interactType: INTERACT_CAP, handler: null },
     { interactType: INTERACT_GRABBABLE, handler: null },
     { interactType: INTERACT_TEXT, handler: null },
+    { interactType: INTERACT_PLAYER, handler: interact_player }
 ]
 
 const mario_get_collided_object = (m, interactType) => {
@@ -271,9 +276,10 @@ const mario_get_collided_object = (m, interactType) => {
 
 export const mario_process_interactions = (m) => {
 
+
     if (!(m.action & Mario.ACT_FLAG_INTANGIBLE) && m.collidedObjInteractTypes != 0) {
 
-        for (let i = 0; i < 31; i++) {
+        for (let i = 0; i < 32; i++) {
             const { interactType, handler } = sInteractionHandlers[i]
             if (m.collidedObjInteractTypes & interactType) {
                 if (!handler) throw "need to implement interact handler for type: " + interactType

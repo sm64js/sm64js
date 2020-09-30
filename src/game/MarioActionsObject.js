@@ -22,19 +22,18 @@ export const mario_update_punch_sequence = (m) => {
         case 0: /// play sound - no break
         case 1:
             animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_FIRST_PUNCH)
-            if (animFrame == 0) processAttack(m.pos, m.faceAngle[1], 1)
             if (Mario.is_anim_past_end(m)) {
                 m.actionArg = 2
             } else {
                 m.actionArg = 1
             }
 
+            m.flags |= Mario.MARIO_PUNCHING
+
             if (m.marioObj.header.gfx.unk38.animFrame >= 2) {
                 //if (mario_check_object_grab(m)) {
                 //    return 1
                 //}
-
-                m.flags |= Mario.MARIO_PUNCHING
             }
 
             if (m.actionArg == 2) {

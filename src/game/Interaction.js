@@ -77,6 +77,14 @@ export const INT_FAST_ATTACK_OR_SHELL  = (1 << 5) // 0x20
 export const INT_HIT_FROM_ABOVE  = (1 << 6) // 0x40
 export const INT_HIT_FROM_BELOW = (1 << 7) // 0x80
 
+export const INT_ATTACK_NOT_FROM_BELOW = INT_GROUND_POUND_OR_TWIRL | INT_PUNCH | INT_KICK | INT_TRIP | INT_SLIDE_KICK | INT_FAST_ATTACK_OR_SHELL | INT_HIT_FROM_ABOVE
+
+export const INT_ANY_ATTACK = INT_GROUND_POUND_OR_TWIRL | INT_PUNCH | INT_KICK | INT_TRIP | INT_SLIDE_KICK | INT_FAST_ATTACK_OR_SHELL | INT_HIT_FROM_ABOVE | INT_HIT_FROM_BELOW
+
+export const INT_ATTACK_NOT_WEAK_FROM_ABOVE = INT_GROUND_POUND_OR_TWIRL | INT_PUNCH | INT_KICK | INT_TRIP | INT_HIT_FROM_BELOW
+
+export const INT_ATTACK_SLIDE = INT_SLIDE_KICK | INT_FAST_ATTACK_OR_SHELL
+
 export const INT_STATUS_HOOT_GRABBED_BY_MARIO = (1 << 0) /* 0x00000001 */
 export const INT_STATUS_MARIO_UNK1 = (1 << 1) /* 0x00000002 */
 export const INT_STATUS_MARIO_UNK2 = (1 << 2) /* 0x00000004 */
@@ -305,7 +313,6 @@ const interact_player = (m, o) => {
             if (m.actionState == 0) return false
             m2.squishTimer = Math.max(m2.squishTimer, 20)
         }
-
         if (m2.marioObj.localMario) {
             m2.interactObj = m.marioObj
             if (interaction & INT_KICK) {
@@ -315,7 +322,7 @@ const interact_player = (m, o) => {
                 //     set_camera_mode(m2.area->camera, -1, 1)
                 //     m2.input &= ~INPUT_FIRST_PERSON
                 // }
-                set_mario_action(m2, Mario.ACT_FREEFALL, 0)
+                Mario.set_mario_action(m2, Mario.ACT_FREEFALL, 0)
             }
             m.marioObj.rawData[oDamageOrCoinValue] = determine_player_damage_value(interaction)
         }
@@ -421,7 +428,7 @@ const determine_knockback_action = (m) => {
     if ((m.interactObj.rawData[oInteractType] & INTERACT_PLAYER) && terrainIndex != 2) {
         const scaler = m.interactObj.rawData[oDamageOrCoinValue]
         //if (scaler > 2) { scaler = 1 }
-        const mag = scaler * 25
+        const mag = scaler * 35
         m.forwardVel = (m.forwardVel < 0) ? -mag : mag
         //m.vel[0] = mag * Math.sin(angleToObject / 0x8000 * Math.PI)
         m.vel[1] = (m.forwardVel < 0) ? -m.forwardVel : m.forwardVel

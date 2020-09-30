@@ -13,7 +13,7 @@ if (url.protocol == "https:") {
     websocketServerPath = `ws://${url.hostname}:5001`
 }*/
 
-const channel = geckos()
+const channel = geckos({ port: 9300 })
 
 
 window.myMario = {

@@ -4,13 +4,14 @@ const util = require('util')
 const zlib = require('zlib')
 const deflate = util.promisify(zlib.deflate)
 const { iceServers } = require('@geckos.io/server')
+const port = 9300
 const geckos = require('@geckos.io/server').default({
     portRange: {
         min: 10000,
         max: 10200
     }
 })
-const port = 9208
+
 
 const badwords = fs.readFileSync('otherTools/profanity_filter.txt').toString().split('\n')
 

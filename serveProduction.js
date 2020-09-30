@@ -70,7 +70,7 @@ const processPlayerData = (channel_id, bytes) => {
 
     /// Data is Valid
     allSockets[channel_id].decodedMario = decodedMario
-    allSockets[channel_id].valid = 60
+    allSockets[channel_id].valid = 2000
 
     //publish
     //broadcastDataWithOpcode(bytes, 0, allSockets[socketID].channel)
@@ -125,7 +125,7 @@ let marioListCounter = 0
 setInterval(async () => {
     Object.values(allSockets).forEach(data => {
         if (data.valid > 0) data.valid--
-        //else if (data.decodedMario) data.channel.close()
+        else if (data.decodedMario) data.channel.close()
     })
 
 }, 33)

@@ -26,7 +26,7 @@ module.exports = {
         extensions: ['*', '.js']
     },
     devServer: {
-        port: 8080
+        port: 9300
     },
     plugins: [
         new HtmlWebPackPlugin({

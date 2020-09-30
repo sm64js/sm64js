@@ -126,7 +126,7 @@ let marioListCounter = 0
 setInterval(async () => {
     Object.values(allSockets).forEach(data => {
         if (data.valid > 0) data.valid--
-        else if (data.decodedMario) data.channel.close()
+        //else if (data.decodedMario) data.channel.close()
     })
 
 }, 33)

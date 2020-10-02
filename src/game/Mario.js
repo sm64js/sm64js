@@ -888,7 +888,7 @@ const update_mario_geometry_inputs = (m) => {
         }
 
     } else {
-        //throw "no floor"
+        throw "no floor"
     }
 }
 

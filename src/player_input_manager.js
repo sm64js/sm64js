@@ -35,7 +35,7 @@ if (navigator.getGamepads) navigator.getGamepads()
 
 const allKeyboardButtons = [
     'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm',
-    'backspace', 'tab', 'space', 'shift', 'enter', 'up', 'down', 'left', 'right'
+    'backspace', 'tab', 'space', 'shift', 'enter', 'up', 'down', 'left', 'right', 'ctrl'
 ]
 
 Keydrown.Q.down(() => { keyboardButtons.q = true })
@@ -76,6 +76,8 @@ Keydrown.UP.down(() => { keyboardButtons.up = true })
 Keydrown.DOWN.down(() => { keyboardButtons.down = true })
 Keydrown.LEFT.down(() => { keyboardButtons.left = true })
 Keydrown.RIGHT.down(() => { keyboardButtons.right = true })
+Keydrown.CTRL.down(() => { keyboardButtons.ctrl = true })
+
 
 ///////////
 
@@ -117,6 +119,7 @@ Keydrown.UP.up(() => { keyboardButtons.up = false })
 Keydrown.DOWN.up(() => { keyboardButtons.down = false })
 Keydrown.LEFT.up(() => { keyboardButtons.left = false })
 Keydrown.RIGHT.up(() => { keyboardButtons.right = false })
+Keydrown.CTRL.up(() => { keyboardButtons.ctrl = false })
 
 const keyboardButtonMapping = {
     a: 'space',

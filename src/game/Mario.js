@@ -852,6 +852,9 @@ const update_mario_joystick_inputs = (m) => {
 
 const update_mario_geometry_inputs = (m) => {
 
+    m.old_floor = m.floor
+    m.old_height = m.floorHeight
+
     m.floorHeight = SurfaceCollision.find_floor(m.pos[0], m.pos[1], m.pos[2], m)
 
     if (!m.floor) {
@@ -861,6 +864,11 @@ const update_mario_geometry_inputs = (m) => {
 
     m.ceilHeight = vec3_find_ceil(m.pos, m.floorHeight, m)
     m.waterLevel = -20000.0 //find_water_level(m->pos[0], m->pos[2]);
+
+    if (!m.floor) { /// still no floor - short term fix?
+        m.floor = m.old_floor
+        m.floorHeight = m.old_height
+    }
 
     if (m.floor) {
         if (!m.floor.normal) throw "normal missing"

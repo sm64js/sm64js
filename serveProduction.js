@@ -71,7 +71,7 @@ const processPlayerData = (channel_id, bytes) => {
 
     /// Data is Valid
     allSockets[channel_id].decodedMario = decodedMario
-    allSockets[channel_id].valid = 2000
+    allSockets[channel_id].valid = 30
 
     //publish
     //broadcastDataWithOpcode(bytes, 0, allSockets[socketID].channel)

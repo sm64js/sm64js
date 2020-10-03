@@ -108,7 +108,7 @@ const processKnockUp = (socketID, bytes) => {
 const processSkin = (channel_id, msg) => {
     if (allSockets[channel_id].valid == 0) return
 
-    const skinMsg = { channel_id, msg }
+    const skinMsg = { channel_id, skinData: msg }
     allSockets[channel_id].channel.broadcast.emit('skin', skinMsg)
 }
 
@@ -180,7 +180,7 @@ const measureAndPrintLatency = (msgBytes) => {
 
 geckos.onConnection(channel => {
 
-    console.log("channel connecteds")
+    console.log("channel connected")
 
     channel.my_id = generateID()
     allSockets[channel.my_id] = { valid: 0, channel }
@@ -191,7 +191,6 @@ geckos.onConnection(channel => {
             const opcode = Buffer.from(bytes)[0]
             switch (opcode) {
                 case 0: processPlayerData(channel.my_id, bytes.slice(1)); break
-                case 1: processSkin(channel.my_id, bytes.slice(1)); break
                 //case 2: processBasicAttack(channel.my_id, bytes.slice(1)); break
                 //case 3: processControllerUpdate(channel.my_id, bytes.slice(1)); break
                 //case 4: processKnockUp(channel.my_id, bytes.slice(1)); break

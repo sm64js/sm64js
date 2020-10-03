@@ -12,25 +12,24 @@ message ControllerListMsg {
 message MarioMsg {
 	ControllerMsg controller = 1;
 	string playerName = 2;
-	uint32 skinID = 3;
-	uint32 action = 4;
-	uint32 prevAction = 5;
-	uint32 actionState = 6;
-	uint32 actionTimer = 7;
-	uint32 actionArg = 8;
-	sint32 invincTimer = 9;
-	uint32 framesSinceA = 10;
-	uint32 framesSinceB = 11;
-	uint32 wallKickTimer = 12;
-	uint32 doubleJumpTimer = 13;
-	repeated sint32 faceAngle = 14;
-	repeated sint32 angleVel = 15;
-	repeated float pos = 16;
-	repeated float vel = 17;
-	float forwardVel = 18;
-	repeated sint32 rawData = 19;
-	uint32 usedObjID = 20;
-	uint32 socketID = 21;
+	uint32 action = 3;
+	uint32 prevAction = 4;
+	uint32 actionState = 5;
+	uint32 actionTimer = 6;
+	uint32 actionArg = 7;
+	sint32 invincTimer = 8;
+	uint32 framesSinceA = 9;
+	uint32 framesSinceB = 10;
+	uint32 wallKickTimer = 11;
+	uint32 doubleJumpTimer = 12;
+	repeated sint32 faceAngle = 13;
+	repeated sint32 angleVel = 14;
+	repeated float pos = 15;
+	repeated float vel = 16;
+	float forwardVel = 17;
+	repeated sint32 rawData = 18;
+	uint32 usedObjID = 19;
+	uint32 socketID = 20;
 }
 
 message ControllerMsg {

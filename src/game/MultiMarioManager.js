@@ -55,7 +55,6 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     m.pos = update.posList
     m.faceAngle = update.faceangleList
     m.socketID = update.socketid
-    m.skinID = update.skinid
     m.playerName = update.playername
 
     m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
@@ -77,7 +76,6 @@ export const createMarioProtoMsg = () => {
     mariomsg.setController(createControllerProtoMsg())
 
     mariomsg.setPlayername(window.myMario.playerName)
-    mariomsg.setSkinid(window.myMario.skinID)
 
     mariomsg.setAction(m.action)
     mariomsg.setPrevaction(m.prevAction)
@@ -99,7 +97,6 @@ export const createMarioProtoMsg = () => {
 
     mariomsg.setRawdataList(getMarioRawDataSubset(m.marioObj.rawData))
     mariomsg.setSocketid(networkData.mySocketID)
-    mariomsg.setSkinid(window.myMario.skinID)
     mariomsg.setPlayername(window.myMario.playerName)
 
     return mariomsg.serializeBinary()
@@ -112,7 +109,6 @@ const initNewRemoteMarioState = (marioProto) => {
     const newMarioState = {
 
         socketID: marioProto.getSocketid(),
-        skinID: marioProto.getSkinid(),
         playerName: marioProto.getPlayername(),
 
         actionTimer: marioProto.getActiontimer(),
@@ -270,7 +266,13 @@ export const recvMarioData = (mariolistbytes) => {
                     if (id == networkData.mySocketID) return
 
                     if (networkData.remotePlayers[id] == undefined) {
-                        networkData.remotePlayers[id] = { marioState: initNewRemoteMarioState(marioProto) }
+                        networkData.remotePlayers[id] = { 
+                            marioState: initNewRemoteMarioState(marioProto),
+                            skinData: {
+                                overalls: [0x00, 0x00, 0x7f, 0x00, 0x00, 0xff],
+                                hatShirt: [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00],
+                            }
+                        }
                         applyController(marioProto.getController())
                     } else {
                         updateRemoteMarioState(id, marioProto)

@@ -3,6 +3,7 @@ import * as Mario from "./game/Mario"
 import { take_damage_and_knock_back, INTERACT_PLAYER } from "./game/Interaction"
 import { oDamageOrCoinValue, oInteractType, oPosX, oPosZ, oPosY } from "./include/object_constants"
 import * as Multi from "./game/MultiMarioManager"
+import * as Cosmetics from "./cosmetics"
 
 /*const url = new URL(window.location.href)
 
@@ -15,43 +16,10 @@ if (url.protocol == "https:") {
 
 const channel = geckos({ port: 9301 })
 
-const overallsPresets = [
-    [0x00, 0x00, 0x7f, 0x00, 0x00, 0xff, 0x28, 0x28, 0x28],
-    [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x28, 0x28, 0x28],
-    [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x28, 0x28, 0x28],
-    [0x7f, 0x00, 0x7f, 0xff, 0x00, 0xff, 0x28, 0x28, 0x28],
-    [0x7f, 0x7f, 0x7f, 0xff, 0xff, 0xff, 0x28, 0x28, 0x28],
-    [0x7f, 0x60, 0x3c, 0xfe, 0xc1, 0x79, 0x28, 0x28, 0x28],
-    [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00, 0x28, 0x28, 0x28],
-    [0x7f, 0x00, 0x7f, 0xff, 0x00, 0xff, 0x28, 0x28, 0x28],
-    [0x39, 0x0e, 0x07, 0x72, 0x1c, 0x0e, 0x28, 0x28, 0x28],
-    [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00, 0x28, 0x28, 0x28]
-]
-
-const hatShirtPresets = [
-    [ 0x7f, 0x00, 0x00, 0xff, 0x00, 0x00, 0x28, 0x28, 0x28 ],
-    [ 0x7f, 0x7f, 0x00, 0xff, 0xff, 0x00, 0x28, 0x28, 0x28 ],
-    [ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x28, 0x28, 0x28 ],
-    [ 0x7f, 0x7f, 0x00, 0xff, 0xff, 0x00, 0x28, 0x28, 0x28 ],
-    [ 0x7f, 0x7f, 0x7f, 0xff, 0xff, 0xff, 0x28, 0x28, 0x28 ],
-    [ 0x39, 0x0e, 0x07, 0x72, 0x1c, 0x0e, 0x28, 0x28, 0x28 ],
-    [ 0x00, 0x00, 0x7f, 0x00, 0x00, 0xff, 0x28, 0x28, 0x28 ],
-    [ 0x00, 0x7f, 0x7f, 0x00, 0xff, 0xff, 0x28, 0x28, 0x28 ],
-    [ 0x00, 0x7f, 0x00, 0x00, 0xff, 0x00, 0x28, 0x28, 0x28 ],
-    [ 0x7f, 0x7f, 0x00, 0xff, 0xff, 0x00, 0x28, 0x28, 0x28 ]
-]
-
-
 window.myMario = {
-    skinID: 0,
     playerName: "Unnamed Player",
-    mario_overalls_lights: [0x00, 0x00, 0x7f, 0x00, 0x00, 0xff],
-    mario_hat_shirt_lights: [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00],
-}
-
-window.updateSkinID = (skinID) => {
-    window.myMario.mario_overalls_lights = overallsPresets[skinID]
-    window.myMario.mario_hat_shirt_lights = hatShirtPresets[skinID]
+    overalls: [0x00, 0x00, 0x7f, 0x00, 0x00, 0xff],
+    hatShirt: [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00],
 }
 
 export const networkData = {
@@ -127,10 +95,7 @@ channel.onConnect((err) => {
 
     console.log("onConnect")
 
-    if (err) {
-        console.log(err)
-        return
-    }
+    if (err) { console.log(err); return }
 
     channel.readyState = 1
 
@@ -154,12 +119,7 @@ channel.onConnect((err) => {
 
     channel.on('id', msg => { networkData.mySocketID = msg.id })
     channel.on('chat', msg => { recvChat(msg) })
-    channel.on('skin', msg => {
-        if (msg.channel_id != networkData.mySocketID &&
-            networkData.remotePlayers[msg.channel_id] == undefined) return
-
-        networkData.remotePlayers[msg.channel_id].skinData = msg.msg
-    })
+    channel.on('skin', msg => { Cosmetics.recvSkinData(msg) })
 
     channel.onDisconnect(() => { channel.readyState = 0 })
 })
@@ -191,7 +151,7 @@ export const post_main_loop_one_iteration = (frame) => {
     if (frame % 30 == 0) updateConnectedMsg()
 
     if (frame % 150 == 0) { //every 5 seconds
-        channel.emit('skin', { hatShirt: window.myMario.mario_hat_shirt_lights, overalls: window.myMario.mario_overalls_lights })
+        channel.emit('skin', { hatShirt: window.myMario.hatShirt, overalls: window.myMario.overalls })
     }
 
     if (multiplayerReady() && frame % 1 == 0) {
@@ -216,27 +176,19 @@ export const getExtraRenderData = (socketID) => {
     const myChat = window.myMario.chatData
 
     if (socketID == networkData.mySocketID) return {
-        mario_overalls_lights: [...window.myMario.mario_overalls_lights, 0x28, 0x28, 0x28 ],
-        mario_hat_shirt_lights: [...window.myMario.mario_hat_shirt_lights, 0x28, 0x28, 0x28],
+        mario_overalls_lights: window.myMario.overalls,
+        mario_hat_shirt_lights: window.myMario.hatShirt,
         chat: (myChat && myChat.timer > 0) ? myChat.msg : null
     }
 
     const remoteMario = networkData.remotePlayers[socketID].marioState
     const remoteChat = networkData.remotePlayers[socketID].chatData
-
-    let overalls, hatShirt
-
-    if (networkData.remotePlayers[socketID].skinData) {
-        overalls = networkData.remotePlayers[socketID].skinData.overalls
-        hatShirt = networkData.remotePlayers[socketID].skinData.hatShirt
-    } else {
-        overalls = window.myMario.mario_overalls_lights
-        hatShirt = window.myMario.mario_hat_shirt_lights
-    }
+    const overalls = networkData.remotePlayers[socketID].skinData.overalls
+    const hatShirt = networkData.remotePlayers[socketID].skinData.hatShirt
 
     return {
-        mario_overalls_lights: [...overalls, 0x28, 0x28, 0x28],
-        mario_hat_shirt_lights: [...hatShirt, 0x28, 0x28, 0x28],
+        mario_overalls_lights: overalls,
+        mario_hat_shirt_lights: hatShirt,
         playerName: remoteMario.playerName,
         chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null
     }
@@ -245,7 +197,6 @@ export const getExtraRenderData = (socketID) => {
 
 export const sendChat = (msg) => {
     channel.emit('chat', msg, { reliable: true })
-    //sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify({ msg })), 1)
 }
 
 export const processAttack = (myMarioPos, myMarioAngle, attackTier, forceAir) => {

@@ -3,6 +3,7 @@ import { GameInstance as Game } from "./game/Game"
 import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
 import  * as Socket from "./socket.js"
+import "./cosmetics"
 import "./template.css"
 
 

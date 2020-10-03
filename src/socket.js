@@ -151,6 +151,8 @@ export const post_main_loop_one_iteration = (frame) => {
     if (frame % 30 == 0) updateConnectedMsg()
 
     if (frame % 150 == 0) { //every 5 seconds
+        if (window.myMario.hatShirt.length != 6) return
+        if (window.myMario.overalls.length != 6) return
         channel.emit('skin', { hatShirt: window.myMario.hatShirt, overalls: window.myMario.overalls })
     }
 

@@ -1050,7 +1050,7 @@ export class n64GfxProcessor {
                     this.custom_set_player_data(args.socketID)
                     break
                 case Gbi.G_DL:
-                    const displayList = args.childDisplayList.call ? args.childDisplayList(this.customData.skinID) : args.childDisplayList
+                    const displayList = args.childDisplayList.call ? args.childDisplayList(this.customData) : args.childDisplayList
                     if (args.branch == 0) {
                         this.run_dl(displayList)
                     } else {
@@ -1059,7 +1059,6 @@ export class n64GfxProcessor {
                     }
                     break
                 default:
-                    console.log(command)
                     throw "unimplemented gfx opcode: " + opcode
             }
 

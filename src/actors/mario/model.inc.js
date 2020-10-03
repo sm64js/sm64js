@@ -15,7 +15,7 @@ export const mario_texture_hair_sideburn = []
 export const mario_texture_mustache = []
 
 // 0x04000000 # solid color blue - butt, left thigh, right thigh - all poly types
-const mario_overalls_lights_group = [
+/*const mario_overalls_lights_group = [
 	Gbi.gdSPDefLights1(
 		0x00, 0x00, 0x7f,
 		0x00, 0x00, 0xff, 0x28, 0x28, 0x28
@@ -57,9 +57,13 @@ const mario_overalls_lights_group = [
 		0xff, 0x00, 0x00, 0x28, 0x28, 0x28
 	),
 ]
+*/
+const mario_overalls_lights_group = (customData) => {
+	return Gbi.gdSPDefLights1(...customData.mario_overalls_lights)
+}
 
 // 0x04000018 # solid color red - left & right arm, torso (tshirt part), caps - all poly types
-const mario_hat_shirt_lights_group = [
+/*const mario_hat_shirt_lights_group = [
 	Gbi.gdSPDefLights1(
 		0x7f, 0x00, 0x00,
 		0xff, 0x00, 0x00, 0x28, 0x28, 0x28
@@ -101,6 +105,10 @@ const mario_hat_shirt_lights_group = [
 		0xff, 0xff, 0x00, 0x28, 0x28, 0x28
 	),
 ]
+*/
+const mario_hat_shirt_lights_group = (customData) => {
+	return Gbi.gdSPDefLights1(...customData.mario_hat_shirt_lights)
+}
 
 // 0x04000030 # solid color white - metal butt & left thigh - normal left & right hand closed & open (with cap too) and all wings - all poly types
 const mario_white_lights_group = Gbi.gdSPDefLights1(
@@ -360,11 +368,11 @@ export const mario_butt_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_butt = (skinID) => {
+export const mario_butt = (customData) => {
 	return [
 		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_butt_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -466,10 +474,10 @@ export const mario_left_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_left_arm = (skinID) => {
+export const mario_left_arm = (customData) => {
 	return [
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_left_arm_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -716,10 +724,10 @@ export const mario_right_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_right_arm = (skinID) => {
+export const mario_right_arm = (customData) => {
 	return [
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_right_arm_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -924,11 +932,11 @@ export const mario_left_thigh_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_left_thigh = (skinID) => {
+export const mario_left_thigh = (customData) => {
 	return [
 		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_left_thigh_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -1097,10 +1105,10 @@ export const mario_right_thigh_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_right_thigh = (skinID) => {
+export const mario_right_thigh = (customData) => {
 	return [
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_right_thigh_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -1493,11 +1501,11 @@ export const mario_tshirt_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_torso_dl = (skinID) => {
+export const mario_torso_dl = (customData) => {
 	return [
 		Gbi.gsSPDisplayList(mario_pants_overalls_shared_dl),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_tshirt_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -1949,11 +1957,11 @@ export const mario_face_back_hair_cap_on_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_face_cap_on_dl = (skinID) => {
+export const mario_face_cap_on_dl = (customData) => {
 	return [
 		Gbi.gsSPDisplayList(mario_face_part_cap_on_dl),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_face_cap_dl),
 		Gbi.gsSPLight(mario_brown2_lights_group.l[0], 1),
 		Gbi.gsSPLight(mario_brown2_lights_group.a, 2),
@@ -2729,11 +2737,11 @@ export const mario_medium_poly_butt_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_butt = (skinID) => {
+export const mario_medium_poly_butt = (customData) => {
 	return [
 		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_medium_poly_butt_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -2769,10 +2777,10 @@ export const mario_medium_poly_left_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_left_arm = (skinID) => {
+export const mario_medium_poly_left_arm = (customData) => {
 	return [
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_medium_poly_left_arm_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -2922,10 +2930,10 @@ export const mario_medium_poly_right_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_right_arm = (skinID) => {
+export const mario_medium_poly_right_arm = (customData) => {
 	return [
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_medium_poly_right_arm_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -3086,11 +3094,11 @@ export const mario_medium_poly_left_thigh_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_left_thigh = (skinID) => {
+export const mario_medium_poly_left_thigh = (customData) => {
 	return [
 		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_medium_poly_left_thigh_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -3227,10 +3235,10 @@ export const mario_medium_poly_right_thigh_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_right_thigh = (skinID) => {
+export const mario_medium_poly_right_thigh = (customData) => {
 	return [
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_medium_poly_right_thigh_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -3480,11 +3488,11 @@ export const mario_medium_poly_tshirt_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_torso_dl = (skinID) => {
+export const mario_medium_poly_torso_dl = (customData) => {
 	return [
 		Gbi.gsSPDisplayList(mario_medium_poly_pants_overalls_shared_dl),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_medium_poly_tshirt_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -3540,11 +3548,11 @@ export const mario_low_poly_butt_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_butt = (skinID) => {
+export const mario_low_poly_butt = (customData) => {
 	return [
 		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_low_poly_butt_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -3585,10 +3593,10 @@ export const mario_low_poly_left_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_left_arm = (skinID) => {
+export const mario_low_poly_left_arm = (customData) => {
 	return [
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_low_poly_left_arm_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -3670,10 +3678,10 @@ export const mario_low_poly_right_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_right_arm = (skinID) => {
+export const mario_low_poly_right_arm = (customData) => {
 	return [
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_low_poly_right_arm_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -3767,11 +3775,11 @@ export const mario_low_poly_left_thigh_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_left_thigh = (skinID) => {
+export const mario_low_poly_left_thigh = (customData) => {
 	return [
 		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_low_poly_left_thigh_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -3880,10 +3888,10 @@ export const mario_low_poly_right_thigh_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_right_thigh = (skinID) => {
+export const mario_low_poly_right_thigh = (customData) => {
 	return [
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_low_poly_right_thigh_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -4035,11 +4043,11 @@ export const mario_low_poly_tshirt_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_torso_dl = (skinID) => {
+export const mario_low_poly_torso_dl = (customData) => {
 	return [
 		Gbi.gsSPDisplayList(mario_low_poly_pants_overalls_shared_dl),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_low_poly_tshirt_shared_dl),
 		Gbi.gsSPEndDisplayList(),
 	]
@@ -4189,11 +4197,11 @@ export const mario_low_poly_face_back_hair_cap_on_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_face_cap_on_dl = (skinID) => {
+export const mario_low_poly_face_cap_on_dl = (customData) => {
 	return [
 		Gbi.gsSPDisplayList(mario_low_poly_face_part_cap_on_dl),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].l[0], 1),
-		Gbi.gsSPLight(mario_hat_shirt_lights_group[skinID].a, 2),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_hat_shirt_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_low_poly_face_cap_dl),
 		Gbi.gsSPLight(mario_brown2_lights_group.l[0], 1),
 		Gbi.gsSPLight(mario_brown2_lights_group.a, 2),

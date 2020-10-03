@@ -4,7 +4,7 @@ const util = require('util')
 const zlib = require('zlib')
 const deflate = util.promisify(zlib.deflate)
 const { iceServers } = require('@geckos.io/server')
-const port = 9208
+const port = 9301
 const geckos = require('@geckos.io/server').default({
     portRange: {
         min: 10000,
@@ -105,6 +105,13 @@ const processKnockUp = (socketID, bytes) => {
     sendDataWithOpcode(responseMsg, 4, allSockets[attackMsg.my_id].channel)
 }
 
+const processSkin = (channel_id, msg) => {
+    if (allSockets[channel_id].valid == 0) return
+
+    const skinMsg = { channel_id, msg }
+    allSockets[channel_id].channel.broadcast.emit('skin', skinMsg)
+}
+
 const processChat = (channel_id, msg) => {
 /*    badwords.forEach(word => {
         const searchMask = word.slice(0, word.length)
@@ -184,7 +191,7 @@ geckos.onConnection(channel => {
             const opcode = Buffer.from(bytes)[0]
             switch (opcode) {
                 case 0: processPlayerData(channel.my_id, bytes.slice(1)); break
-                //case 1: processChat(channel.my_id, bytes.slice(1)); break
+                case 1: processSkin(channel.my_id, bytes.slice(1)); break
                 //case 2: processBasicAttack(channel.my_id, bytes.slice(1)); break
                 //case 3: processControllerUpdate(channel.my_id, bytes.slice(1)); break
                 //case 4: processKnockUp(channel.my_id, bytes.slice(1)); break
@@ -195,6 +202,7 @@ geckos.onConnection(channel => {
     })
 
     channel.on('chat', msg => { processChat(channel.my_id, msg) })
+    channel.on('skin', msg => { processSkin(channel.my_id, msg) })
 
     channel.onDisconnect(() => {
         delete allSockets[channel.my_id]

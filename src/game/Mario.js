@@ -193,6 +193,7 @@ export const ACT_TOP_OF_POLE              =  0x00100345
 export const ACT_START_HANGING = 0x08200348
 export const ACT_WALL_KICK_AIR = 0x03000886
 export const ACT_TOP_OF_POLE_JUMP = 0x0300088D
+export const ACT_BUTT_SLIDE_AIR = 0x0300088E
 export const ACT_CROUCHING                =  0x0C008220 
 export const ACT_START_CROUCHING          =  0x0C008221 
 export const ACT_STOP_CROUCHING           =  0x0C008222 
@@ -511,6 +512,9 @@ export const check_common_action_exits = (m) => {
     if (m.input & INPUT_NONZERO_ANALOG) {
         return set_mario_action(m, ACT_WALKING, 0)
     }
+    if (m.input & INPUT_ABOVE_SLIDE) {
+        return set_mario_action(m, ACT_BEGIN_SLIDING, 0);
+    }
 
     return 0
 }
@@ -650,6 +654,13 @@ export const set_mario_action_moving = (m, action, actionArg) => {
 
             m.marioObj.rawData[oMarioWalkingPitch] = 0
             break
+        case ACT_BEGIN_SLIDING:
+            if (mario_facing_downhill(m, false)) {
+                action = ACT_BUTT_SLIDE;
+            } else {
+                action = ACT_STOMACH_SLIDE;
+            }
+            break;
     }
 
     return action
@@ -1010,6 +1021,22 @@ export const mario_get_floor_class = (m) => {
 export const vec3_find_ceil = (pos, height, ceil) => {
 
     return SurfaceCollision.find_ceil(pos[0], height + 80.0, pos[2], ceil)
+}
+
+export const mario_facing_downhill = (m, turnYaw) => {
+    let faceAngleYaw = m.faceAngle[1];
+
+    // This is never used in practice, as turnYaw is
+    // always passed as zero.
+    if (turnYaw && m.forwardVel < 0.0) {
+        faceAngleYaw += 0x8000;
+    }
+
+    faceAngleYaw = m.floorAngle - faceAngleYaw;
+    faceAngleYaw = faceAngleYaw > 32767 ? faceAngleYaw - 65536 : faceAngleYaw;
+    faceAngleYaw = faceAngleYaw < -32768 ? faceAngleYaw + 65536 : faceAngleYaw;
+
+    return (-0x4000 < faceAngleYaw) && (faceAngleYaw < 0x4000);
 }
 
 export const find_floor_height_relative_polar = (m, angleFromMario, distFromMario) => {

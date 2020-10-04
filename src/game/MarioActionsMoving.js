@@ -1,5 +1,6 @@
 import * as Mario from "./Mario"
 import { SURFACE_SLOW, SURFACE_CLASS_VERY_SLIPPERY, SURFACE_CLASS_SLIPPERY, SURFACE_CLASS_NOT_SLIPPERY, TERRAIN_MASK, TERRAIN_SLIDE } from "../include/surface_terrains"
+import * as SurfaceTerrains from "../include/surface_terrains"
 import { perform_ground_step } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
 import { oMarioWalkingPitch } from "../include/object_constants"
@@ -8,6 +9,43 @@ import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceC
 
 
 const apply_slope_accel = (m) => {
+    let slopeAccel;
+    let floorDYaw = m.floorAngle - m.faceAngle[1];
+    floorDYaw = floorDYaw > 32767 ? floorDYaw - 65536 : floorDYaw;
+    floorDYaw = floorDYaw < -32768 ? floorDYaw + 65536 : floorDYaw;
+
+    const floor = m.floor;
+    const steepness = Math.sqrt(floor.normal.x * floor.normal.x + floor.normal.z * floor.normal.z);
+
+    if (Mario.mario_floor_is_slope(m)) {
+        let slopeClass = 0;
+
+        if (m.action != Mario.ACT_SOFT_BACKWARD_GROUND_KB && m.action != Mario.ACT_SOFT_FORWARD_GROUND_KB) {
+            slopeClass = Mario.mario_get_floor_class(m);
+        }
+
+        switch (slopeClass) {
+            case SurfaceTerrains.SURFACE_CLASS_VERY_SLIPPERY:
+                slopeAccel = 5.3;
+                break;
+            case SurfaceTerrains.SURFACE_CLASS_SLIPPERY:
+                slopeAccel = 2.7;
+                break;
+            default:
+                slopeAccel = 1.7;
+                break;
+            case SurfaceTerrains.SURFACE_CLASS_NOT_SLIPPERY:
+                slopeAccel = 0.0;
+                break;
+        }
+
+        if (floorDYaw > -0x4000 && floorDYaw < 0x4000) {
+            m.forwardVel += slopeAccel * steepness;
+        } else {
+            m.forwardVel -= slopeAccel * steepness;
+        }
+    }
+
     m.slideYaw = m.faceAngle[1]
 
     m.slideVelX = m.forwardVel * Math.sin(m.faceAngle[1] / 0x8000 * Math.PI)
@@ -230,9 +268,9 @@ const act_walking = (m) => {
 
     const startYaw = m.faceAngle[1]
 
-/*    if (should_begin_sliding(m)) {
+    if (should_begin_sliding(m)) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
-    }*/
+    }
 
     if (m.input & Mario.INPUT_A_PRESSED) {
         return Mario.set_jump_from_landing(m)
@@ -322,6 +360,9 @@ const update_decelerating_speed = (m) => {
 const act_decelerating = (m) => {
 
     if (!(m.input & Mario.INPUT_FIRST_PERSON)) {
+        if (should_begin_sliding(m)) {
+            return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0);
+        }
 
         if (m.input & Mario.INPUT_A_PRESSED) {
             return Mario.set_jump_from_landing(m)
@@ -436,6 +477,10 @@ const act_finish_turning_around = (m) => {
 const common_landing_cancels = (m, landingAction, setAPressAction) => {
 
     m.doubleJumpTimer = landingAction.unk02
+
+    if (should_begin_sliding(m)) {
+        return Mario.set_mario_action(m, landingAction.slideAction, 0);
+    }
 
     if (++m.actionTimer >= landingAction.numFrames) {
         return Mario.set_mario_action(m, landingAction.endAction, 0)
@@ -724,6 +769,45 @@ const common_slide_action_with_jump = (m, stopAction, jumpAction, airAction, ani
 
 }
 
+const tilt_body_butt_slide = (m) => {
+    let intendedDYaw = m.intendedYaw - m.faceAngle[1];
+    if (intendedDYaw > 32767) intendedDYaw -= 65536;
+    if (intendedDYaw < -32768) intendedDYaw += 65536;
+    m.marioBodyState.torsoAngle[0] = 5461.3335 * m.intendedMag / 32.0 * Math.cos(intendedDYaw / 0x8000 * Math.PI);
+    m.marioBodyState.torsoAngle[2] = -(5461.3335 * m.intendedMag / 32.0 * Math.sin(intendedDYaw / 0x8000 * Math.PI));
+}
+
+const stomach_slide_action = (m, stopAction, airAction, animation) => {
+    if (m.actionTimer == 5) {
+        if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & (Mario.INPUT_A_PRESSED | Mario.INPUT_B_PRESSED))) {
+            // queue_rumble_data(5, 80);
+            return Mario.drop_and_set_mario_action(
+                m, m.forwardVel >= 0.0 ? Mario.ACT_FORWARD_ROLLOUT : Mario.ACT_BACKWARD_ROLLOUT, 0);
+        }
+    } else {
+        m.actionTimer++;
+    }
+
+    if (update_sliding(m, 4.0)) {
+        return Mario.set_mario_action(m, stopAction, 0);
+    }
+
+    common_slide_action(m, stopAction, airAction, animation);
+    return false;
+}
+
+const act_butt_slide = (m) => {
+    const cancel = common_slide_action_with_jump(m, Mario.ACT_BUTT_SLIDE_STOP, Mario.ACT_JUMP, Mario.ACT_BUTT_SLIDE_AIR,
+        Mario.MARIO_ANIM_SLIDE);
+    tilt_body_butt_slide(m);
+    return cancel;
+}
+
+const act_stomach_slide = (m) => {
+    const cancel = stomach_slide_action(m, Mario.ACT_STOMACH_SLIDE_STOP, Mario.ACT_FREEFALL, Mario.MARIO_ANIM_SLIDE_DIVE);
+    return cancel;
+}
+
 
 const act_crouch_slide = (m) => {
 
@@ -794,7 +878,7 @@ const should_begin_sliding = (m) => {
         const slideLevel = (m.area.terrainType & TERRAIN_MASK) == TERRAIN_SLIDE
         const movingBackward = m.forwardVel <= -1.0
 
-        if (slideLevel || movingBackward) { /// TODO mario facing downhill
+        if (slideLevel || movingBackward || Mario.mario_facing_downhill(m, false)) {
             return 1
         }
     }
@@ -816,9 +900,9 @@ const check_ground_dive_or_punch = (m) => {
 }
 
 const act_crawling = (m) => {
-/*    if (should_begin_sliding(m)) {
+    if (should_begin_sliding(m)) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
-    }*/
+    }
 
     if (m.input & Mario.INPUT_A_PRESSED) {
         return Mario.set_jumping_action(m, Mario.ACT_JUMP, 0)
@@ -861,9 +945,9 @@ const act_crawling = (m) => {
 }
 
 const act_move_punching = (m) => {
-    /*    if (should_begin_sliding(m)) {
+        if (should_begin_sliding(m)) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
-    }*/
+    }
 
     if (m.actionState == 0 && (m.input & Mario.INPUT_A_DOWN)) {
         return Mario.set_mario_action(m, Mario.ACT_JUMP_KICK, 0)
@@ -1008,6 +1092,8 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_FINISH_TURNING_AROUND: return act_finish_turning_around(m)
         case Mario.ACT_JUMP_LAND: return act_jump_land(m)
         case Mario.ACT_FREEFALL_LAND: return act_freefall_land(m)
+        case Mario.ACT_BUTT_SLIDE: return act_butt_slide(m)
+        case Mario.ACT_STOMACH_SLIDE: return act_stomach_slide(m)
         case Mario.ACT_SIDE_FLIP_LAND: return act_side_flip_land(m)
         case Mario.ACT_DOUBLE_JUMP_LAND: return act_double_jump_land(m)
         case Mario.ACT_TRIPLE_JUMP_LAND: return act_triple_jump_land(m)

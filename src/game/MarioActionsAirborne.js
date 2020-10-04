@@ -35,6 +35,41 @@ const update_air_without_turn = (m) => {
 
 }
 
+const act_butt_slide_air = (m) => {
+    if (++(m.actionTimer) > 30 && m.pos[1] - m.floorHeight > 500.0) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 1);
+    }
+
+    update_air_with_turn(m);
+
+    switch (perform_air_step(m, 0)) {
+        case Mario.AIR_STEP_LANDED:
+            if (m.actionState == 0 && m.vel[1] < 0.0 && m.floor.normal.y >= 0.9848077) {
+                m.vel[1] = -m.vel[1] / 2.0;
+                m.actionState = 1;
+            } else {
+                Mario.set_mario_action(m, Mario.ACT_BUTT_SLIDE, 0);
+            }
+            // play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
+            break;
+
+        case Mario.AIR_STEP_HIT_WALL:
+            if (m.vel[1] > 0.0) {
+                m.vel[1] = 0.0;
+            }
+            m.particleFlags |= Mario.PARTICLE_VERTICAL_STAR;
+            Mario.set_mario_action(m, Mario.ACT_BACKWARD_AIR_KB, 0);
+            break;
+
+        // case AIR_STEP_HIT_LAVA_WALL:
+        //     lava_boost_on_wall(m);
+        //     break;
+    }
+
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_SLIDE);
+    return false;
+}
+
 const common_air_action_step = (m, landAction, animation, stepArg) => {
 
     ///TODO add this, this moves mario slightly while in air by joystick
@@ -600,6 +635,7 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_LONG_JUMP: return act_long_jump(m)
         case Mario.ACT_DIVE: return act_dive(m)
         case Mario.ACT_JUMP_KICK: return act_jump_kick(m)
+        case Mario.ACT_BUTT_SLIDE_AIR: return act_butt_slide_air(m)
         case Mario.ACT_FORWARD_ROLLOUT: return act_forward_rollout(m)
         case Mario.ACT_BACKWARD_ROLLOUT: return act_backward_rollout(m)
         case Mario.ACT_SLIDE_KICK: return act_slide_kick(m)

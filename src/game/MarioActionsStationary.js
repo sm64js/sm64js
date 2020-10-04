@@ -12,9 +12,9 @@ const check_common_idle_cancels = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
     }
 
-/*    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
+    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
-    }*/
+    }
 
     if (m.input & Mario.INPUT_NONZERO_ANALOG) {
 
@@ -161,9 +161,9 @@ const act_start_crouching = (m) => {
         return Mario.set_jumping_action(m, Mario.ACT_BACKFLIP, 0)
     }
 
-/*    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
+    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
-    }*/
+    }
 
     stationary_ground_step(m)
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_START_CROUCHING)
@@ -183,9 +183,9 @@ const act_crouching = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
     }
 
-/*    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
+    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
-    }*/
+    }
 
     if (!(m.input & Mario.INPUT_Z_DOWN)) {
         return Mario.set_mario_action(m, Mario.ACT_STOP_CROUCHING, 0)
@@ -214,9 +214,9 @@ const act_stop_crouching = (m) => {
         return Mario.set_jumping_action(m, Mario.ACT_BACKFLIP, 0)
     }
 
-/*    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
+    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
-    }*/
+    }
 
     stationary_ground_step(m);
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_STOP_CROUCHING)
@@ -257,9 +257,9 @@ const act_start_crawling = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
     }
 
-/*    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
+    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
-    }*/
+    }
 
     stationary_ground_step(m)
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_START_CRAWLING)
@@ -275,9 +275,9 @@ const act_stop_crawling = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
     }
 
-/*    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
+    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
-    }*/
+    }
 
     stationary_ground_step(m)
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_STOP_CRAWLING)

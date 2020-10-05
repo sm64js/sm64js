@@ -35,6 +35,36 @@ const update_air_without_turn = (m) => {
 
 }
 
+const update_air_with_turn = (m) => {
+    let dragThreshold, intendedDYaw, intendedMag;
+
+    // if (!check_horizontal_wind(m)) {
+        dragThreshold = m.action == Mario.ACT_LONG_JUMP ? 48.0 : 32.0;
+        m.forwardVel = approach_number(m.forwardVel, 0.0, 0.35, 0.35);
+
+        if (m.input & Mario.INPUT_NONZERO_ANALOG) {
+            intendedDYaw = m.intendedYaw - m.faceAngle[1];
+            if (intendedDYaw > 32767) intendedDYaw -= 65536
+            if (intendedDYaw < -32768) intendedDYaw += 65536
+            intendedMag = m.intendedMag / 32.0;
+
+            m.forwardVel += 1.5 * Math.cos(intendedDYaw / 0x8000 * Math.PI) * intendedMag;
+            m.faceAngle[1] += 512.0 * Math.sin(intendedDYaw / 0x8000 * Math.PI) * intendedMag;
+        }
+
+        //! Uncapped air speed. Net positive when moving forward.
+        if (m.forwardVel > dragThreshold) {
+            m.forwardVel -= 1.0;
+        }
+        if (m.forwardVel < -16.0) {
+            m.forwardVel += 2.0;
+        }
+
+        m.vel[0] = m.slideVelX = m.forwardVel * Math.sin(m.faceAngle[1] / 0x8000 * Math.PI);
+        m.vel[2] = m.slideVelZ = m.forwardVel * Math.cos(m.faceAngle[1] / 0x8000 * Math.PI);
+    // }
+}
+
 const act_butt_slide_air = (m) => {
     if (++(m.actionTimer) > 30 && m.pos[1] - m.floorHeight > 500.0) {
         return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 1);

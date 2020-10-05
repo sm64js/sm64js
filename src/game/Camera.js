@@ -495,7 +495,7 @@ class Camera {
             currentState |= L_CBUTTONS;
             currentState &= ~R_CBUTTONS;
         }
-        if (!(window.playerInput.buttonPressedCl)) {
+        if (!(window.playerInput.buttonDownCl)) {
             currentState &= ~L_CBUTTONS;
         }
     
@@ -503,7 +503,7 @@ class Camera {
             currentState |= R_CBUTTONS;
             currentState &= ~L_CBUTTONS;
         }
-        if (!(window.playerInput.buttonPressedCr)) {
+        if (!(window.playerInput.buttonDownCr)) {
             currentState &= ~R_CBUTTONS;
         }
 
@@ -511,14 +511,14 @@ class Camera {
             currentState |= U_CBUTTONS;
             currentState &= ~D_CBUTTONS;
         }
-        if (!(window.playerInput.buttonPressedCu)) {
+        if (!(window.playerInput.buttonDownCu)) {
             currentState &= ~U_CBUTTONS;
         }
         if (window.playerInput.buttonPressedCd) {
             currentState |= D_CBUTTONS;
             currentState &= ~U_CBUTTONS;
         }
-        if (!(window.playerInput.buttonPressedCd)) {
+        if (!(window.playerInput.buttonDownCd)) {
             currentState &= ~D_CBUTTONS;
         }
     

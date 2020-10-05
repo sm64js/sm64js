@@ -291,6 +291,8 @@ export const playerInputUpdate = () => {
             z: gamepad.buttons[gamepadButtonMapping['z']].touched,
             cr: gamepad.axes[2] && gamepad.axes[2] > 0.5,
             cl: gamepad.axes[2] && gamepad.axes[2] < -0.5,
+            cu: gamepad.axes[3] && gamepad.axes[3] < -0.5,
+            cd: gamepad.axes[3] && gamepad.axes[3] > 0.5,
         })
     }
 
@@ -316,6 +318,8 @@ export const playerInputUpdate = () => {
     let buttonDownZ = gamepadFinal.z || keyboardFinal.z
     let buttonDownCl = gamepadFinal.cl
     let buttonDownCr = gamepadFinal.cr
+    let buttonDownCu = gamepadFinal.cu
+    let buttonDownCd = gamepadFinal.cd
 
     window.playerInput = {
         stickX, stickY,
@@ -327,8 +331,10 @@ export const playerInputUpdate = () => {
         buttonPressedZ: buttonDownZ && !window.playerInput.buttonDownZ,
         buttonPressedCl: buttonDownCl && !window.playerInput.buttonDownCl,
         buttonPressedCr: buttonDownCr && !window.playerInput.buttonDownCr,
+        buttonPressedCu: buttonDownCu && !window.playerInput.buttonDownCu,
+        buttonPressedCd: buttonDownCd && !window.playerInput.buttonDownCd,
 
-        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr
+        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd
     }
 
     //// Repeat for other player

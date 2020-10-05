@@ -74,6 +74,8 @@ const CAM_FLAG_BEHIND_MARIO_POST_DOOR = 0x8000
 
 const L_CBUTTONS =	0x0002
 const R_CBUTTONS =	0x0001
+const D_CBUTTONS =	0x0004
+const U_CBUTTONS =	0x0008
 
 
 const DOOR_DEFAULT         = 0
@@ -504,22 +506,21 @@ class Camera {
         if (!(window.playerInput.buttonPressedCr)) {
             currentState &= ~R_CBUTTONS;
         }
-    
-        // if (buttonsPressed & U_CBUTTONS) {
-        //     currentState |= U_CBUTTONS;
-        //     currentState &= ~D_CBUTTONS;
-        // }
-        // if (!(buttonsDown & U_CBUTTONS)) {
-        //     currentState &= ~U_CBUTTONS;
-        // }
-    
-        // if (buttonsPressed & D_CBUTTONS) {
-        //     currentState |= D_CBUTTONS;
-        //     currentState &= ~U_CBUTTONS;
-        // }
-        // if (!(buttonsDown & D_CBUTTONS)) {
-        //     currentState &= ~D_CBUTTONS;
-        // }
+
+        if (window.playerInput.buttonPressedCu) {
+            currentState |= U_CBUTTONS;
+            currentState &= ~D_CBUTTONS;
+        }
+        if (!(window.playerInput.buttonPressedCu)) {
+            currentState &= ~U_CBUTTONS;
+        }
+        if (window.playerInput.buttonPressedCd) {
+            currentState |= D_CBUTTONS;
+            currentState &= ~U_CBUTTONS;
+        }
+        if (!(window.playerInput.buttonPressedCd)) {
+            currentState &= ~D_CBUTTONS;
+        }
     
         return currentState;
     }
@@ -669,31 +670,31 @@ class Camera {
         let cSideYaw;
     
         // Zoom in
-        // if (gPlayer1Controller.buttonPressed & U_CBUTTONS) {
-        //     if (c.mode != CAMERA_MODE_FIXED && (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT)) {
-        //         // gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT;
-        //         play_sound_cbutton_up();
-        //     } else {
-        //         set_mode_c_up(c);
-        //         if (sZeroZoomDist > gCameraZoomDist) {
-        //             sZoomAmount = -gCameraZoomDist;
-        //         } else {
-        //             sZoomAmount = gCameraZoomDist;
-        //         }
-        //     }
-        // }
+        if (window.playerInput.buttonPressedCu) {
+            if (c.mode != CAMERA_MODE_FIXED && (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT)) {
+                this.gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT;
+                // play_sound_cbutton_up();
+            } else {
+                // set_mode_c_up(c);
+                // if (sZeroZoomDist > gCameraZoomDist) {
+                //     sZoomAmount = -gCameraZoomDist;
+                // } else {
+                //     sZoomAmount = gCameraZoomDist;
+                // }
+            }
+        }
         if (c.mode != CAMERA_MODE_FIXED) {
             // Zoom out
-            // if (gPlayer1Controller.buttonPressed & D_CBUTTONS) {
-            //     if (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
-            //         gCameraMovementFlags |= CAM_MOVE_ALREADY_ZOOMED_OUT;
-            //         sZoomAmount = gCameraZoomDist + 400;
-            //     } else {
-            //         gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT;
-            //         sZoomAmount = gCameraZoomDist + 400;
-            //         play_sound_cbutton_down();
-            //     }
-            // }
+            if (window.playerInput.buttonPressedCd) {
+                if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
+                    this.gCameraMovementFlags |= CAM_MOVE_ALREADY_ZOOMED_OUT;
+                    this.sZoomAmount = this.gCameraZoomDist + 400;
+                } else {
+                    this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT;
+                    this.sZoomAmount = this.gCameraZoomDist + 400;
+                    // play_sound_cbutton_down();
+                }
+            }
     
             // Rotate left or right
             cSideYaw = 0x1000;
@@ -788,7 +789,21 @@ class Camera {
                     dist = zoomDist
                 }
             }
-        } else throw "not implemented zoom amount"
+        } else {
+            if ((this.sZoomAmount -= 30) < 0) {
+                this.sZoomAmount = 0;
+            }
+            if (dist > zoomDist) {
+                if ((dist -= 30) < zoomDist) {
+                    dist = zoomDist;
+                }
+            }
+            if (dist < zoomDist) {
+                if ((dist += 30) > zoomDist) {
+                    dist = zoomDist;
+                }
+            }
+        }
 
         if (this.sCSideButtonYaw.val == 0) {
             if (c.mode == CAMERA_MODE_FREE_ROAM) {

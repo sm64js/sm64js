@@ -371,7 +371,7 @@ class Camera {
         this.sZeroZoomDist = 0
 
         this.sBehindMarioSoundTimer = 0
-        this.sCSideButtonYaw = { val: 0 }
+        this.sCSideButtonYaw = 0
         this.s8DirModeBaseYaw = 0
         this.s8DirModeYawOffset = 0
         c.doorStatus = DOOR_DEFAULT
@@ -706,7 +706,7 @@ class Camera {
                     // if (sCSideButtonYaw == 0) {
                     //     play_sound_cbutton_side();
                     // }
-                    this.sCSideButtonYaw.val = -cSideYaw;
+                    this.sCSideButtonYaw = -cSideYaw;
                 }
             }
             if (window.playerInput.buttonPressedCl) {
@@ -717,37 +717,9 @@ class Camera {
                     // if (sCSideButtonYaw == 0) {
                     //     play_sound_cbutton_side();
                     // }
-                    this.sCSideButtonYaw.val = cSideYaw;
+                    this.sCSideButtonYaw = cSideYaw;
                 }
             }
-        }
-    }
-
-    camera_approach_s16_symmetric_bool(current, target, increment) {
-        let dist = target - current.val;
-    
-        if (increment < 0) {
-            increment = -1 * increment;
-        }
-        if (dist > 0) {
-            dist -= increment;
-            if (dist >= 0) {
-                current.val = target - dist;
-            } else {
-                current.val = target;
-            }
-        } else {
-            dist += increment;
-            if (dist <= 0) {
-                current.val = target - dist;
-            } else {
-                current.val = target;
-            }
-        }
-        if (current.val == target) {
-            return false;
-        } else {
-            return true;
         }
     }
 
@@ -805,7 +777,7 @@ class Camera {
             }
         }
 
-        if (this.sCSideButtonYaw.val == 0) {
+        if (this.sCSideButtonYaw == 0) {
             if (c.mode == CAMERA_MODE_FREE_ROAM) {
                 nextYawVel = 0xC0
             } else {
@@ -815,13 +787,15 @@ class Camera {
                 nextYawVel = 0x20
             }
         } else {
-            if (this.sCSideButtonYaw.val < 0) {
+            if (this.sCSideButtonYaw < 0) {
                 yaw += 0x200;
             }
-            if (this.sCSideButtonYaw.val > 0) {
+            if (this.sCSideButtonYaw > 0) {
                 yaw -= 0x200;
             }
-            this.camera_approach_s16_symmetric_bool(this.sCSideButtonYaw, 0, 0x100);
+            const wrapper = { current: this.sCSideButtonYaw }
+            this.camera_approach_symmetric_bool(wrapper, 0, 0x100);
+            this.sCSideButtonYaw = wrapper.current
             nextYawVel = 0;
         }
 
@@ -834,7 +808,7 @@ class Camera {
             // Turn rapidly if very close to mario
             c.pos[0] += (250 - xzDist) * Math.sin(yaw / 0x8000 * Math.PI)
             c.pos[2] += (250 - xzDist) * Math.cos(yaw / 0x8000 * Math.PI)
-            if (this.sCSideButtonYaw.val == 0) {
+            if (this.sCSideButtonYaw == 0) {
                 nextYawVel = 0x1000
                 this.sYawSpeed = 0
                 MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, distPitchYaw)

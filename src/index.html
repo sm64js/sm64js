@@ -94,8 +94,7 @@
                     </select>
                 </div>
                 <div class="col-sm-3 " style="justify-content:center">
-                    <input id="playerNameInput" type="text" class="form-control" placeholder="enter name"
-                           onchange="window.myMario.playerName = this.value.substring(0,14)">
+                    <input id="playerNameInput" type="text" class="form-control" minlength="3" maxlength="14" placeholder="enter name" onchange="window.updatePlayerName(this.value)">
                 </div>
             </div>
 

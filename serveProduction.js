@@ -57,16 +57,10 @@ const processPlayerData = (channel_id, bytes) => {
     const decodedMario = MarioMsg.deserializeBinary(bytes)
 
     //Pretty strict validation  -- ignoring validation for now
-/*    for (let i = 0; i < 3; i++) {
-        if (isNaN(decodedMario.getPosList()[i])) return
-        if (isNaN(decodedMario.getAngleList()[i])) return
-    }
-    if (isNaN(decodedMario.getAnimframe())) return
-    if (isNaN(decodedMario.getAnimid()) || 0 > decodedMario.getAnimid()) return
-    if (isNaN(decodedMario.getSkinid()) || 0 > decodedMario.getSkinid() || decodedMario.getSkinid() > 9) return
-    decodedMario.setPlayername(String(decodedMario.getPlayername()).substring(0, 14)) */
+    if (decodedMario.getChannelid() != decodedMario.getController().getChannelid()) return
+    if (decodedMario.getPlayername().length < 3 || decodedMario.getPlayername().length > 14) return
 
-    ///decodedMario.setChannelid(channel_id) no longer needed
+    if (allChannels[channel_id] == undefined) return
 
     /// Data is Valid
     allChannels[channel_id].decodedMario = decodedMario
@@ -84,12 +78,47 @@ const processControllerUpdate = (channel_id, bytes) => {
     //broadcastDataWithOpcode(bytes, 3, channel_id)
 }
 
+const validSkins = (skinData) => {
+    if (skinData.overalls.length != 6) return false
+    if (skinData.hat.length != 6) return false
+    if (skinData.shirt.length != 6) return false
+    if (skinData.gloves.length != 6) return false
+    if (skinData.boots.length != 6) return false
+    if (skinData.skin.length != 6) return false
+    if (skinData.hair.length != 6) return false
+
+
+    for (let i = 0; i < 6; i++) {
+        let number = skinData.overalls[i]
+        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
+        number = skinData.hat[i]
+        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
+        number = skinData.shirt[i]
+        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
+        number = skinData.gloves[i]
+        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
+        number = skinData.boots[i]
+        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
+        number = skinData.skin[i]
+        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
+        number = skinData.hair[i]
+        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
+    }
+
+    return true
+
+}
+
 
 const processSkin = (channel_id, msg) => {
     if (allChannels[channel_id].valid == 0) return
 
+    if (!validSkins(msg)) return
+
     const skinMsg = { channel_id, skinData: msg }
     allChannels[channel_id].channel.broadcast.emit('skin', skinMsg)
+
+
 }
 
 const processChat = (channel_id, msg) => {

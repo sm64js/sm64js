@@ -1,6 +1,6 @@
 import { WebGLInstance as WebGL } from "./WebGL"
 import * as Gbi from "../include/gbi"
-import { getExtraRenderData } from "../socket"
+import { getExtraRenderData } from "../cosmetics"
 
 const precomp_shaders = [
     0x01200200,

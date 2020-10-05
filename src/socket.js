@@ -9,8 +9,7 @@ const channel = geckos({ port: 9301 })
 
 window.myMario = {
     playerName: "Unnamed Player",
-    overalls: [0x00, 0x00, 0x7f, 0x00, 0x00, 0xff],
-    hatShirt: [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00],
+    skinData: Cosmetics.defaultSkinData
 }
 
 export const networkData = {
@@ -108,7 +107,9 @@ export const post_main_loop_one_iteration = (frame) => {
     if (frame % 30 == 0) updateConnectedMsg()
 
     if (frame % 150 == 0) { //every 5 seconds
-        channel.emit('skin', { hatShirt: window.myMario.hatShirt, overalls: window.myMario.overalls })
+        if (Cosmetics.validSkins()) {
+            channel.emit('skin', window.myMario.skinData)
+        }
     }
 
     if (multiplayerReady() && frame % 1 == 0) {
@@ -126,30 +127,6 @@ const decrementChat = () => {
 
     const myChat = window.myMario.chatData
     if (myChat && myChat.timer > 0) myChat.timer--
-}
-
-export const getExtraRenderData = (channel_id) => {
-
-    const myChat = window.myMario.chatData
-
-    if (channel_id == networkData.myChannelID) return {
-        mario_overalls_lights: window.myMario.overalls,
-        mario_hat_shirt_lights: window.myMario.hatShirt,
-        chat: (myChat && myChat.timer > 0) ? myChat.msg : null
-    }
-
-    const remoteMario = networkData.remotePlayers[channel_id].marioState
-    const remoteChat = networkData.remotePlayers[channel_id].chatData
-    const overalls = networkData.remotePlayers[channel_id].skinData.overalls
-    const hatShirt = networkData.remotePlayers[channel_id].skinData.hatShirt
-
-    return {
-        mario_overalls_lights: overalls,
-        mario_hat_shirt_lights: hatShirt,
-        playerName: remoteMario.playerName,
-        chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null
-    }
-
 }
 
 export const sendChat = (msg) => {

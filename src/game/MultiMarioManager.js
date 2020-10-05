@@ -2,6 +2,7 @@ import { MarioMsg, MarioListMsg, ControllerListMsg, ControllerMsg, ValidPlayersM
 import zlib from "zlib"
 import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "../socket"
+import { defaultSkinData } from "../cosmetics"
 import { INTERACT_PLAYER } from "./Interaction"
 
 const rawDataMap = {
@@ -243,11 +244,10 @@ export const recvValidPlayers = (validplayerbytes) => {
     networkData.numOnline = validplayers.length
 
     Object.keys(networkData.remotePlayers).forEach(channel_id => {
-        if (!validplayers.includes(channel_id)) {
+        if (!validplayers.includes(parseInt(channel_id))) {
             delete networkData.remotePlayers[channel_id]
         }
     })
-
 }
 
 
@@ -268,10 +268,7 @@ export const recvMarioData = (mariolistbytes) => {
                     if (networkData.remotePlayers[id] == undefined) {
                         networkData.remotePlayers[id] = { 
                             marioState: initNewRemoteMarioState(marioProto),
-                            skinData: {
-                                overalls: [0x00, 0x00, 0x7f, 0x00, 0x00, 0xff],
-                                hatShirt: [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00],
-                            }
+                            skinData: defaultSkinData
                         }
                         applyController(marioProto.getController())
                     } else {

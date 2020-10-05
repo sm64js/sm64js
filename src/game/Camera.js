@@ -12,6 +12,10 @@ import { SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 
 const CAM_FOV_DEFAULT = 2
 
+const CAM_ANGLE_MARIO = 1
+const CAM_ANGLE_LAKITU = 2
+
+
 const CAM_MODE_MARIO_ACTIVE          =  0x01
 const CAM_MODE_LAKITU_WAS_ZOOMED_OUT =  0x02
 const CAM_MODE_MARIO_SELECTED        =  0x04
@@ -67,6 +71,11 @@ const CAM_FLAG_BLOCK_AREA_PROCESSING  = 0x1000
 const CAM_FLAG_UNUSED_13              = 0x2000
 const CAM_FLAG_UNUSED_CUTSCENE_ACTIVE = 0x4000
 const CAM_FLAG_BEHIND_MARIO_POST_DOOR = 0x8000
+
+const L_CBUTTONS =	0x0002
+const R_CBUTTONS =	0x0001
+const D_CBUTTONS =	0x0004
+const U_CBUTTONS =	0x0008
 
 
 const DOOR_DEFAULT         = 0
@@ -362,7 +371,7 @@ class Camera {
         this.sZeroZoomDist = 0
 
         this.sBehindMarioSoundTimer = 0
-        this.sCSideButtonYaw = 0
+        this.sCSideButtonYaw = { val: 0 }
         this.s8DirModeBaseYaw = 0
         this.s8DirModeYawOffset = 0
         c.doorStatus = DOOR_DEFAULT
@@ -478,6 +487,44 @@ class Camera {
         c.nextYaw = this.gLakituState.yaw
     }
 
+    find_c_buttons_pressed(currentState) {
+        // buttonsPressed &= CBUTTON_MASK;
+        // buttonsDown &= CBUTTON_MASK;
+    
+        if (window.playerInput.buttonPressedCl) {
+            currentState |= L_CBUTTONS;
+            currentState &= ~R_CBUTTONS;
+        }
+        if (!(window.playerInput.buttonDownCl)) {
+            currentState &= ~L_CBUTTONS;
+        }
+    
+        if (window.playerInput.buttonPressedCr) {
+            currentState |= R_CBUTTONS;
+            currentState &= ~L_CBUTTONS;
+        }
+        if (!(window.playerInput.buttonDownCr)) {
+            currentState &= ~R_CBUTTONS;
+        }
+
+        if (window.playerInput.buttonPressedCu) {
+            currentState |= U_CBUTTONS;
+            currentState &= ~D_CBUTTONS;
+        }
+        if (!(window.playerInput.buttonDownCu)) {
+            currentState &= ~U_CBUTTONS;
+        }
+        if (window.playerInput.buttonPressedCd) {
+            currentState |= D_CBUTTONS;
+            currentState &= ~U_CBUTTONS;
+        }
+        if (!(window.playerInput.buttonDownCd)) {
+            currentState &= ~D_CBUTTONS;
+        }
+    
+        return currentState;
+    }
+
     update_camera(c) {
 
         this.gCamera = c
@@ -506,6 +553,8 @@ class Camera {
         c.nextYaw = this.gLakituState.nextYaw
         c.mode = this.gLakituState.mode
         c.defMode = this.gLakituState.defMode
+
+        c.sCButtonsPressed = this.find_c_buttons_pressed(c.sCButtonsPressed);
 
         this.sYawSpeed = 0x400
 
@@ -616,6 +665,92 @@ class Camera {
         MathUtil.vec3f_add(c.focus, pan)
     }
 
+
+    handle_c_button_movement(c) {
+        let cSideYaw;
+    
+        // Zoom in
+        if (window.playerInput.buttonPressedCu) {
+            if (c.mode != CAMERA_MODE_FIXED && (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT)) {
+                this.gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT;
+                // play_sound_cbutton_up();
+            } else {
+                // set_mode_c_up(c);
+                // if (sZeroZoomDist > gCameraZoomDist) {
+                //     sZoomAmount = -gCameraZoomDist;
+                // } else {
+                //     sZoomAmount = gCameraZoomDist;
+                // }
+            }
+        }
+        if (c.mode != CAMERA_MODE_FIXED) {
+            // Zoom out
+            if (window.playerInput.buttonPressedCd) {
+                if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
+                    this.gCameraMovementFlags |= CAM_MOVE_ALREADY_ZOOMED_OUT;
+                    this.sZoomAmount = this.gCameraZoomDist + 400;
+                } else {
+                    this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT;
+                    this.sZoomAmount = this.gCameraZoomDist + 400;
+                    // play_sound_cbutton_down();
+                }
+            }
+    
+            // Rotate left or right
+            cSideYaw = 0x1000;
+            if (window.playerInput.buttonPressedCr) {
+                if (this.gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT) {
+                    this.gCameraMovementFlags &= ~CAM_MOVE_ROTATE_LEFT;
+                } else {
+                    this.gCameraMovementFlags |= CAM_MOVE_ROTATE_RIGHT;
+                    // if (sCSideButtonYaw == 0) {
+                    //     play_sound_cbutton_side();
+                    // }
+                    this.sCSideButtonYaw.val = -cSideYaw;
+                }
+            }
+            if (window.playerInput.buttonPressedCl) {
+                if (this.gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT) {
+                    this.gCameraMovementFlags &= ~CAM_MOVE_ROTATE_RIGHT;
+                } else {
+                    this.gCameraMovementFlags |= CAM_MOVE_ROTATE_LEFT;
+                    // if (sCSideButtonYaw == 0) {
+                    //     play_sound_cbutton_side();
+                    // }
+                    this.sCSideButtonYaw.val = cSideYaw;
+                }
+            }
+        }
+    }
+
+    camera_approach_s16_symmetric_bool(current, target, increment) {
+        let dist = target - current.val;
+    
+        if (increment < 0) {
+            increment = -1 * increment;
+        }
+        if (dist > 0) {
+            dist -= increment;
+            if (dist >= 0) {
+                current.val = target - dist;
+            } else {
+                current.val = target;
+            }
+        } else {
+            dist += increment;
+            if (dist <= 0) {
+                current.val = target - dist;
+            } else {
+                current.val = target;
+            }
+        }
+        if (current.val == target) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     update_default_camera(c) {
 
 
@@ -631,8 +766,22 @@ class Camera {
         MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, distPitchYaw)
         let { dist, pitch, yaw } = distPitchYaw
 
-        const zoomDist = this.gCameraZoomDist
+        let zoomDist = this.gCameraZoomDist
 
+        this.handle_c_button_movement(c);
+
+        // If C-Down is active, determine what distance the camera should be from mario
+        if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
+            //! In Mario mode, the camera is zoomed out further than in lakitu mode (1400 vs 1200)
+            // if (set_cam_angle(0) == CAM_ANGLE_MARIO) {
+            //     zoomDist = gCameraZoomDist + 1050;
+            // } else {
+                zoomDist = this.gCameraZoomDist + 400;
+            // }
+        } else {
+            zoomDist = this.gCameraZoomDist;
+        }
+        
         if (this.sZoomAmount == 0.0) {
             if (dist > zoomDist) {
                 dist -= 50
@@ -640,9 +789,23 @@ class Camera {
                     dist = zoomDist
                 }
             }
-        } else throw "not implemented zoom amount"
+        } else {
+            if ((this.sZoomAmount -= 30) < 0) {
+                this.sZoomAmount = 0;
+            }
+            if (dist > zoomDist) {
+                if ((dist -= 30) < zoomDist) {
+                    dist = zoomDist;
+                }
+            }
+            if (dist < zoomDist) {
+                if ((dist += 30) > zoomDist) {
+                    dist = zoomDist;
+                }
+            }
+        }
 
-        if (this.sCSideButtonYaw == 0) {
+        if (this.sCSideButtonYaw.val == 0) {
             if (c.mode == CAMERA_MODE_FREE_ROAM) {
                 nextYawVel = 0xC0
             } else {
@@ -651,6 +814,15 @@ class Camera {
             if ((window.playerInput.stickX != 0 || window.playerInput.stickY != 0) != 0) {
                 nextYawVel = 0x20
             }
+        } else {
+            if (this.sCSideButtonYaw.val < 0) {
+                yaw += 0x200;
+            }
+            if (this.sCSideButtonYaw.val > 0) {
+                yaw -= 0x200;
+            }
+            this.camera_approach_s16_symmetric_bool(this.sCSideButtonYaw, 0, 0x100);
+            nextYawVel = 0;
         }
 
         this.sYawSpeed = 0x400
@@ -662,7 +834,7 @@ class Camera {
             // Turn rapidly if very close to mario
             c.pos[0] += (250 - xzDist) * Math.sin(yaw / 0x8000 * Math.PI)
             c.pos[2] += (250 - xzDist) * Math.cos(yaw / 0x8000 * Math.PI)
-            if (this.sCSideButtonYaw == 0) {
+            if (this.sCSideButtonYaw.val == 0) {
                 nextYawVel = 0x1000
                 this.sYawSpeed = 0
                 MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, distPitchYaw)

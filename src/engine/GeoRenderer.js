@@ -5,7 +5,7 @@ import * as Gbi from "../include/gbi"
 import { CameraInstance as Camera } from "../game/Camera"
 import * as Mario from "../game/Mario"
 import { create_shadow_below_xyz } from "../game/Shadow"
-import { getExtraMarios, networkData } from "../socket"
+import { networkData } from "../socket"
 import { MarioMiscInstance as MarioMisc } from "../game/MarioMisc"
 
 const canvas = document.querySelector('#gameCanvas')
@@ -393,7 +393,7 @@ class GeoRenderer {
                     if (object.localMario) {
                         MarioMisc.gBodyState = object.marioState.marioBodyState
                         //// sending my own custom gfx opcode to set skin id
-                        this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.mySocketID)], 1) 
+                        this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.myChannelID)], 1) 
                     }
 
                     this.gCurGraphNodeObject = node.wrapper
@@ -443,7 +443,7 @@ class GeoRenderer {
         if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) {
 
             //// sending my own custom gfx opcode to set skin id and playerName
-            this.geo_append_display_list([Gbi.gsSetPlayerData(object.marioState.socketID)], 1)
+            this.geo_append_display_list([Gbi.gsSetPlayerData(object.marioState.channel_id)], 1)
 
             this.gCurGraphNodeObject = object.header.gfx
             MarioMisc.gBodyState = object.marioState.marioBodyState

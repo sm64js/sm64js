@@ -759,11 +759,11 @@ export const gsDPSetPrimColor = (m, l, r, g, b, a) => {
     }
 }
 
-export const gsSetPlayerData = (socketID) => {
+export const gsSetPlayerData = (channel_id) => {
     return {
         words: {
             w0: G_SETPLAYERDATA,
-            w1: { socketID }
+            w1: { channel_id }
         }
     }
 }

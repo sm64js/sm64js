@@ -29,7 +29,7 @@ message MarioMsg {
 	float forwardVel = 17;
 	repeated sint32 rawData = 18;
 	uint32 usedObjID = 19;
-	uint32 socketID = 20;
+	uint32 channelID = 20;
 }
 
 message ControllerMsg {
@@ -39,9 +39,9 @@ message ControllerMsg {
 	uint32 buttonDown = 4;
 	uint32 buttonPressed = 5;
 	sint32 cameraYaw = 6;
-	uint32 socketID = 7;
+	uint32 channelID = 7;
 }
 
-message ValidSocketsMsg {
-	repeated uint32 validSockets = 1;
+message ValidPlayersMsg {
+	repeated uint32 validPlayers = 1;
 }

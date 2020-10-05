@@ -1,4 +1,4 @@
-const { MarioMsg, MarioListMsg, ControllerListMsg, ControllerMsg, ValidSocketsMsg } = require("./proto/mario_pb")
+const { MarioMsg, MarioListMsg, ControllerMsg, ValidPlayersMsg } = require("./proto/mario_pb")
 const fs = require('fs')
 const util = require('util')
 const zlib = require('zlib')
@@ -15,8 +15,7 @@ const geckos = require('@geckos.io/server').default({
 
 const badwords = fs.readFileSync('otherTools/profanity_filter.txt').toString().split('\n')
 
-//// Sockets
-const allSockets = {}
+const allChannels = {}
 
 let currentId = 0
 const generateID = () => {
@@ -46,11 +45,11 @@ const broadcastDataWithOpcode = (bytes, opcode, channel) => {
 
 const sendValidUpdate = () => {
 
-    const validSockets = Object.values(allSockets).filter(data => data.valid > 0).map(data => data.channel.my_id)
+    const validPlayers = Object.values(allChannels).filter(data => data.valid > 0).map(data => data.channel.my_id)
 
-    const validsocketsmsg = new ValidSocketsMsg()
-    validsocketsmsg.setValidsocketsList(validSockets)
-    broadcastDataWithOpcode(validsocketsmsg.serializeBinary(), 8)
+    const validplayersmsg = new ValidPlayersMsg()
+    validplayersmsg.setValidplayersList(validPlayers)
+    broadcastDataWithOpcode(validplayersmsg.serializeBinary(), 8)
 }
 
 
@@ -67,49 +66,30 @@ const processPlayerData = (channel_id, bytes) => {
     if (isNaN(decodedMario.getSkinid()) || 0 > decodedMario.getSkinid() || decodedMario.getSkinid() > 9) return
     decodedMario.setPlayername(String(decodedMario.getPlayername()).substring(0, 14)) */
 
-    ///decodedMario.setSocketid(socketID) no longer needed
+    ///decodedMario.setChannelid(channel_id) no longer needed
 
     /// Data is Valid
-    allSockets[channel_id].decodedMario = decodedMario
-    allSockets[channel_id].valid = 30
+    allChannels[channel_id].decodedMario = decodedMario
+    allChannels[channel_id].valid = 30
 
     //publish
-    //broadcastDataWithOpcode(bytes, 0, allSockets[socketID].channel)
+    //broadcastDataWithOpcode(bytes, 0, allChannels[channel_id].channel)
 }
 
-const processControllerUpdate = (socketID, bytes) => {
+const processControllerUpdate = (channel_id, bytes) => {
     const decodedController = ControllerMsg.deserializeBinary(bytes)
 
     /// do some validation here probably
-    allSockets[socketID].decodedController = decodedController
-    //broadcastDataWithOpcode(bytes, 3, socketID)
+    allChannels[channel_id].decodedController = decodedController
+    //broadcastDataWithOpcode(bytes, 3, channel_id)
 }
 
-
-const processBasicAttack = (socketID, bytes) => {
-
-    if (allSockets[socketID].valid == 0) return
-
-    const attackMsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
-    attackMsg.attackerID = socketID
-    const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify(attackMsg))
-    sendDataWithOpcode(responseMsg, 2, allSockets[attackMsg.my_id].channel)
-}
-
-const processKnockUp = (socketID, bytes) => {
-
-    if (allSockets[socketID].valid == 0) return
-
-    const attackMsg = JSON.parse(new TextDecoder("utf-8").decode(bytes))
-    const responseMsg = new TextEncoder("utf-8").encode(JSON.stringify(attackMsg))
-    sendDataWithOpcode(responseMsg, 4, allSockets[attackMsg.my_id].channel)
-}
 
 const processSkin = (channel_id, msg) => {
-    if (allSockets[channel_id].valid == 0) return
+    if (allChannels[channel_id].valid == 0) return
 
     const skinMsg = { channel_id, skinData: msg }
-    allSockets[channel_id].channel.broadcast.emit('skin', skinMsg)
+    allChannels[channel_id].channel.broadcast.emit('skin', skinMsg)
 }
 
 const processChat = (channel_id, msg) => {
@@ -119,7 +99,7 @@ const processChat = (channel_id, msg) => {
         msg = msg.replace(regEx, "*****")
     })*/
 
-    const decodedMario = Object.values(allSockets).find(data => data.channel.my_id == channel_id).decodedMario
+    const decodedMario = Object.values(allChannels).find(data => data.channel.my_id == channel_id).decodedMario
 
     if (decodedMario == undefined) return
 
@@ -131,7 +111,7 @@ const processChat = (channel_id, msg) => {
 /// Every frame - 30 times per second
 let marioListCounter = 0
 setInterval(async () => {
-    Object.values(allSockets).forEach(data => {
+    Object.values(allChannels).forEach(data => {
         if (data.valid > 0) data.valid--
         else if (data.decodedMario) data.channel.close()
     })
@@ -140,14 +120,14 @@ setInterval(async () => {
 
 /// Every other frame - 16 times per second
 setInterval(async () => {
-/*    const controllerlist = Object.values(allSockets).filter(data => data.decodedController).map(data => data.decodedController)
+/*    const controllerlist = Object.values(allChannels).filter(data => data.decodedController).map(data => data.decodedController)
     const controllerlistproto = new ControllerListMsg()
     controllerlistproto.setControllerList(controllerlist)
     const bytes = controllerlistproto.serializeBinary()
     const compressedMsg = await deflate(bytes)
     broadcastDataWithOpcode(compressedMsg, 3)*/
 
-    const mariolist = Object.values(allSockets).filter(data => data.decodedMario).map(data => data.decodedMario)
+    const mariolist = Object.values(allChannels).filter(data => data.decodedMario).map(data => data.decodedMario)
     const mariolistproto = new MarioListMsg()
     mariolistproto.setMarioList(mariolist)
     mariolistproto.setMessagecount(marioListCounter)
@@ -166,7 +146,7 @@ setInterval(() => { sendValidUpdate() }, 1000)
 setInterval(() => {
 
     /// ping to measure latency
-    Object.values(allSockets).forEach(data => {
+    Object.values(allChannels).forEach(data => {
         const msg = new TextEncoder("utf-8").encode(JSON.stringify({ time: process.hrtime() }))
         sendDataWithOpcode(msg, 99, data.channel)
     })
@@ -183,7 +163,7 @@ geckos.onConnection(channel => {
     console.log("channel connected")
 
     channel.my_id = generateID()
-    allSockets[channel.my_id] = { valid: 0, channel }
+    allChannels[channel.my_id] = { valid: 0, channel }
     channel.emit('id', { id: channel.my_id }, { reliable: true })
 
     channel.onRaw(bytes => {
@@ -204,7 +184,7 @@ geckos.onConnection(channel => {
     channel.on('skin', msg => { processSkin(channel.my_id, msg) })
 
     channel.onDisconnect(() => {
-        delete allSockets[channel.my_id]
+        delete allChannels[channel.my_id]
     })
 })
 

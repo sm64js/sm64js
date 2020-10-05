@@ -971,8 +971,8 @@ export class n64GfxProcessor {
 
     }
 
-    custom_set_player_data(socketID) { 
-        this.customData = getExtraRenderData(socketID)
+    custom_set_player_data(channel_id) { 
+        this.customData = getExtraRenderData(channel_id)
     }
 
     run_dl(commands) {
@@ -1047,7 +1047,7 @@ export class n64GfxProcessor {
                     this.dp_fill_rectangle(args.ulx, args.uly, args.lrx, args.lry)
                     break
                 case Gbi.G_SETPLAYERDATA:
-                    this.custom_set_player_data(args.socketID)
+                    this.custom_set_player_data(args.channel_id)
                     break
                 case Gbi.G_DL:
                     const displayList = args.childDisplayList.call ? args.childDisplayList(this.customData) : args.childDisplayList

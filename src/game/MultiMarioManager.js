@@ -1,4 +1,4 @@
-import { MarioMsg, MarioListMsg, ControllerListMsg, ControllerMsg, ValidSocketsMsg } from "../../proto/mario_pb"
+import { MarioMsg, MarioListMsg, ControllerListMsg, ControllerMsg, ValidPlayersMsg } from "../../proto/mario_pb"
 import zlib from "zlib"
 import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "../socket"
@@ -54,7 +54,7 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     m.vel = update.velList
     m.pos = update.posList
     m.faceAngle = update.faceangleList
-    m.socketID = update.socketid
+    m.channel_id = update.channelid
     m.playerName = update.playername
 
     m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
@@ -96,7 +96,7 @@ export const createMarioProtoMsg = () => {
     if (m.usedObj) mariomsg.setUsedobjid(m.usedObj.rawData[RAW.oSyncID])
 
     mariomsg.setRawdataList(getMarioRawDataSubset(m.marioObj.rawData))
-    mariomsg.setSocketid(networkData.mySocketID)
+    mariomsg.setChannelid(networkData.myChannelID)
     mariomsg.setPlayername(window.myMario.playerName)
 
     return mariomsg.serializeBinary()
@@ -108,7 +108,7 @@ const initNewRemoteMarioState = (marioProto) => {
 
     const newMarioState = {
 
-        socketID: marioProto.getSocketid(),
+        channel_id: marioProto.getChannelid(),
         playerName: marioProto.getPlayername(),
 
         actionTimer: marioProto.getActiontimer(),
@@ -199,13 +199,13 @@ export const createControllerProtoMsg = () => {
 
     controllermsg.setCamerayaw(m.area.camera.yaw)
 
-    controllermsg.setSocketid(networkData.mySocketID)
+    controllermsg.setChannelid(networkData.myChannelID)
 
     return controllermsg
 }
 
 const applyController = (controllerProto) => {
-    const id = controllerProto.getSocketid()
+    const id = controllerProto.getChannelid()
     if (networkData.remotePlayers[id] == undefined) return
     const m = networkData.remotePlayers[id].marioState
     const buttonDown = controllerProto.getButtondown()
@@ -237,14 +237,14 @@ export const recvControllerUpdate = (controllerbytes) => {
     })
 }
 
-export const recvValidSockets = (validsocketsbytes) => {
-    const validsockets = ValidSocketsMsg.deserializeBinary(validsocketsbytes).getValidsocketsList()
+export const recvValidPlayers = (validplayerbytes) => {
+    const validplayers = ValidPlayersMsg.deserializeBinary(validplayerbytes).getValidplayersList()
 
-    networkData.numOnline = validsockets.length
+    networkData.numOnline = validplayers.length
 
-    Object.keys(networkData.remotePlayers).forEach(socketID => {
-        if (!validsockets.includes(parseInt(socketID))) {
-            delete networkData.remotePlayers[socketID]
+    Object.keys(networkData.remotePlayers).forEach(channel_id => {
+        if (!validplayers.includes(channel_id)) {
+            delete networkData.remotePlayers[channel_id]
         }
     })
 
@@ -262,8 +262,8 @@ export const recvMarioData = (mariolistbytes) => {
                 lastMessageProcessed = messageCount
                 const marioList = marioListProto.getMarioList()
                 marioList.forEach(marioProto => {
-                    const id = marioProto.getSocketid()
-                    if (id == networkData.mySocketID) return
+                    const id = marioProto.getChannelid()
+                    if (id == networkData.myChannelID) return
 
                     if (networkData.remotePlayers[id] == undefined) {
                         networkData.remotePlayers[id] = { 

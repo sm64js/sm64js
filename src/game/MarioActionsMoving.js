@@ -5,7 +5,6 @@ import { approach_number, atan2s } from "../engine/math_util"
 import { oMarioWalkingPitch } from "../include/object_constants"
 import { mario_update_punch_sequence } from "./MarioActionsObject"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
-import { processDiveAttack } from "../socket"
 
 
 const apply_slope_accel = (m) => {
@@ -787,7 +786,6 @@ const act_dive_slide = (m) => {
     }
 
     common_slide_action(m, Mario.ACT_STOMACH_SLIDE_STOP, Mario.ACT_FREEFALL, Mario.MARIO_ANIM_DIVE)
-    processDiveAttack(m.pos, m.forwardVel)
     return 0
 }
 
@@ -918,7 +916,6 @@ const act_slide_kick_slide = (m) => {
 
     //play sound
     m.particleFlags |= Mario.PARTICLE_DUST
-    processDiveAttack(m.pos, m.forwardVel)
     return 0
 }
 

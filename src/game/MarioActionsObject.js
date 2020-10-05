@@ -1,7 +1,5 @@
 import * as Mario from "./Mario"
 import { perform_ground_step, stationary_ground_step } from "./MarioStep"
-import { processAttack } from "../socket"
-import { processBreakdanceTrip } from "../socket"
 
 const sPunchingForwardVelocities = [0, 1, 1, 2, 3, 5, 7, 10]
 
@@ -42,7 +40,6 @@ export const mario_update_punch_sequence = (m) => {
             break
         case 2:
             animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_FIRST_PUNCH_FAST)
-            if (animFrame == 0) processAttack(m.pos, m.faceAngle[1], 1)
             if (m.marioObj.header.gfx.unk38.animFrame <= 0) {
                 m.flags |= Mario.MARIO_PUNCHING
             }
@@ -59,7 +56,6 @@ export const mario_update_punch_sequence = (m) => {
         case 3: ///play sound - no break
         case 4:
             animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_SECOND_PUNCH)
-            if (animFrame == 0) processAttack(m.pos, m.faceAngle[1], 2)
             if (Mario.is_anim_past_end(m)) {
                 m.actionArg = 5
             } else { m.actionArg = 4 }
@@ -75,7 +71,6 @@ export const mario_update_punch_sequence = (m) => {
 
         case 5:
             animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_SECOND_PUNCH_FAST)
-            if (animFrame == 0) processAttack(m.pos, m.faceAngle[1], 2)
             if (m.marioObj.header.gfx.unk38.animFrame <= 0) {
                 m.flags |= Mario.MARIO_PUNCHING
             }
@@ -93,7 +88,6 @@ export const mario_update_punch_sequence = (m) => {
             //play_mario_action_sound(m, SOUND_MARIO_PUNCH_HOO, 1)
             animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_GROUND_KICK)
             if (animFrame == 0) {
-                processAttack(m.pos, m.faceAngle[1], 4)
                 m.marioBodyState.punchState = (2 << 6) | 6
             }
 
@@ -108,7 +102,6 @@ export const mario_update_punch_sequence = (m) => {
 
         case 9:
             animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_BREAKDANCE)
-            if (animFrame == 0) processBreakdanceTrip(m.pos)
             animFrame = m.marioObj.header.gfx.unk38.animFrame
 
             if (animFrame >= 2 && animFrame < 8) {

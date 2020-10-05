@@ -5,15 +5,6 @@ import { oDamageOrCoinValue, oInteractType, oPosX, oPosZ, oPosY } from "./includ
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
 
-/*const url = new URL(window.location.href)
-
-let websocketServerPath = ""
-if (url.protocol == "https:") {
-    websocketServerPath = `wss://${url.hostname}/websocket/`
-} else {
-    websocketServerPath = `ws://${url.hostname}:5001`
-}*/
-
 const channel = geckos({ port: 9301 })
 
 window.myMario = {
@@ -25,7 +16,7 @@ window.myMario = {
 export const networkData = {
     playerInteractions: true,
     remotePlayers: {},
-    mySocketID: -1,
+    myChannelID: -1,
 }
 
 export const gameData = {}
@@ -38,12 +29,9 @@ const sendDataWithOpcode = (bytes, opcode) => {
     channel.raw.emit(newbytes)
 }
 
-
-const recvMyID = (msg) => { networkData.mySocketID = msg.id }
-
 const recvChat = (chatmsg) => {
 
-    if (chatmsg.channel_id != networkData.mySocketID &&
+    if (chatmsg.channel_id != networkData.myChannelID &&
         networkData.remotePlayers[chatmsg.channel_id] == undefined) return
 
     const chatlog = document.getElementById("chatlog")
@@ -51,7 +39,7 @@ const recvChat = (chatmsg) => {
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 
     let someobject
-    if (chatmsg.channel_id == networkData.mySocketID)
+    if (chatmsg.channel_id == networkData.myChannelID)
         someobject = window.myMario
     else
         someobject = networkData.remotePlayers[chatmsg.channel_id]
@@ -59,37 +47,6 @@ const recvChat = (chatmsg) => {
     Object.assign(someobject, { chatData: { msg: chatmsg.msg, timer: 80 } })
 
 }
-
-const recvBasicAttack = (attackData) => {
-    const m = gameData.marioState
-    const attackerMarioData = serverData.remotePlayersByID[attackData.attackerID].marioData
-    //const knockbackMultiplier = attackData.knockbackMultiplier
-    const attackerMarioObj = {
-        rawData: new Array(0x50).fill(0)
-    }
-    attackerMarioObj.rawData[oDamageOrCoinValue] = attackData.attackTier
-    attackerMarioObj.rawData[oInteractType] |= INTERACT_PLAYER
-    attackerMarioObj.rawData[oPosX] = attackerMarioData.pos[0]
-    attackerMarioObj.rawData[oPosY] = attackerMarioData.pos[1]
-    attackerMarioObj.rawData[oPosZ] = attackerMarioData.pos[2]
-    //m.forwardVel = -50
-    //m.vel[1] = 50
-    //m.faceAngle[1] = kickData.angle + 0x8000
-    //Mario.set_mario_action(m, Mario.ACT_THROWN_BACKWARD, 0)
-
-    if (attackData.forceAir) Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
-    take_damage_and_knock_back(m, attackerMarioObj)
-}
-
-const recvKnockUp = (data) => {
-    const m = gameData.marioState
-    if (m.invincTimer == 0) {
-        m.invincTimer = 30
-        m.vel[1] = data.upwardForce
-        Mario.set_mario_action(m, Mario.ACT_KNOCKED_UP, 0)
-    }
-}
-
 
 channel.onConnect((err) => {
 
@@ -109,15 +66,15 @@ channel.onConnect((err) => {
             //case 2: recvBasicAttack(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             //case 3: if (multiplayerReady()) Multi.recvControllerUpdate(msgBytes); break
             //case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
-            case 8: Multi.recvValidSockets(msgBytes); break
+            case 8: Multi.recvValidPlayers(msgBytes); break
             case 99: channel.raw.emit(message); break  ///ping pong
-            default: throw "unknown websocket opcode"
+            default: throw "unknown opcode"
         }
         const end = performance.now() - start
         //if (end > 100) console.log("Opcode: " + opcode + "  time: " + end +"ms  size: " + bytes.length)
     })
 
-    channel.on('id', msg => { networkData.mySocketID = msg.id })
+    channel.on('id', msg => { networkData.myChannelID = msg.id })
     channel.on('chat', msg => { recvChat(msg) })
     channel.on('skin', msg => { Cosmetics.recvSkinData(msg) })
 
@@ -125,7 +82,7 @@ channel.onConnect((err) => {
 })
 
 const multiplayerReady = () => {
-    return channel.readyState == 1 && gameData.marioState && networkData.mySocketID != -1
+    return channel.readyState == 1 && gameData.marioState && networkData.myChannelID != -1
 }
 
 const updateConnectedMsg = () => {
@@ -151,8 +108,6 @@ export const post_main_loop_one_iteration = (frame) => {
     if (frame % 30 == 0) updateConnectedMsg()
 
     if (frame % 150 == 0) { //every 5 seconds
-        if (window.myMario.hatShirt.length != 6) return
-        if (window.myMario.overalls.length != 6) return
         channel.emit('skin', { hatShirt: window.myMario.hatShirt, overalls: window.myMario.overalls })
     }
 
@@ -173,20 +128,20 @@ const decrementChat = () => {
     if (myChat && myChat.timer > 0) myChat.timer--
 }
 
-export const getExtraRenderData = (socketID) => {
+export const getExtraRenderData = (channel_id) => {
 
     const myChat = window.myMario.chatData
 
-    if (socketID == networkData.mySocketID) return {
+    if (channel_id == networkData.myChannelID) return {
         mario_overalls_lights: window.myMario.overalls,
         mario_hat_shirt_lights: window.myMario.hatShirt,
         chat: (myChat && myChat.timer > 0) ? myChat.msg : null
     }
 
-    const remoteMario = networkData.remotePlayers[socketID].marioState
-    const remoteChat = networkData.remotePlayers[socketID].chatData
-    const overalls = networkData.remotePlayers[socketID].skinData.overalls
-    const hatShirt = networkData.remotePlayers[socketID].skinData.hatShirt
+    const remoteMario = networkData.remotePlayers[channel_id].marioState
+    const remoteChat = networkData.remotePlayers[channel_id].chatData
+    const overalls = networkData.remotePlayers[channel_id].skinData.overalls
+    const hatShirt = networkData.remotePlayers[channel_id].skinData.hatShirt
 
     return {
         mario_overalls_lights: overalls,
@@ -199,52 +154,4 @@ export const getExtraRenderData = (socketID) => {
 
 export const sendChat = (msg) => {
     channel.emit('chat', msg, { reliable: true })
-}
-
-export const processAttack = (myMarioPos, myMarioAngle, attackTier, forceAir) => {
-/*    const angleRadians = myMarioAngle / 0x8000 * Math.PI
-    const x = myMarioPos[0] + Math.sin(angleRadians) * 80
-    const z = myMarioPos[2] + Math.cos(angleRadians) * 80
-
-    serverData.extraMarios.forEach(marioData => {
-        const distance = Math.sqrt(Math.pow(marioData.pos[0] - x, 2) + Math.pow(marioData.pos[2] - z, 2))
-        const directDistance = Math.sqrt(Math.pow(marioData.pos[0] - myMarioPos[0], 2) + Math.pow(marioData.pos[2] - myMarioPos[2], 2))
-        if (directDistance > 25 && distance < 100) { ///trigger hit
-            const attackMsg = { id: marioData.socketID, attackTier, forceAir }
-            sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify(attackMsg)), 2)
-        }
-    })*/
-}
-
-export const processDiveAttack = (myMarioPos, diveSpeed) => {
-/*    if (diveSpeed > 25) {
-
-        serverData.extraMarios.forEach(extraMario => {
-            const distance = Math.sqrt(
-                Math.pow(extraMario.pos[0] - myMarioPos[0], 2) +
-                Math.pow(extraMario.pos[1] - myMarioPos[1], 2) +
-                Math.pow(extraMario.pos[2] - myMarioPos[2], 2)
-            )
-            if (distance < 150) { ///trigger hit
-                const diveHitMsg = { id: extraMario.socketID, upwardForce: 70 }
-                sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify(diveHitMsg)), 4)
-            }
-        })
-    }*/
-}
-
-export const processBreakdanceTrip = (myMarioPos) => {
-
-/*    serverData.extraMarios.forEach(extraMario => {
-        const distance = Math.sqrt(
-            Math.pow(extraMario.pos[0] - myMarioPos[0], 2) +
-            Math.pow(extraMario.pos[1] - myMarioPos[1], 2) +
-            Math.pow(extraMario.pos[2] - myMarioPos[2], 2)
-        )
-        if (distance < 150) { ///trigger hit
-            const tripMsg = { id: extraMario.socketID, upwardForce: 15 }
-            sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify(tripMsg)), 4)
-        }
-    })*/
-
 }

@@ -123,6 +123,10 @@ export const MARIO_ANIM_SOFT_FRONT_KB = 0x75
 export const MARIO_ANIM_BACKWARD_KB = 0x7B
 export const MARIO_ANIM_FORWARD_KB = 0x7C
 export const MARIO_ANIM_START_WALLKICK = 0xCC
+export const MARIO_ANIM_STAND_AGAINST_WALL = 0x7E
+export const MARIO_ANIM_PUSHING = 0x6C
+export const MARIO_ANIM_SIDESTEP_LEFT = 0x7F
+export const MARIO_ANIM_SIDESTEP_RIGHT = 0x80
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -159,6 +163,7 @@ export const ACT_IDLE = 0x0C400201
 export const ACT_WALKING = 0x04000440
 export const ACT_DECELERATING = 0x0400044A
 export const ACT_BRAKING = 0x04000445
+export const ACT_STANDING_AGAINST_WALL = 0x0C400209
 export const ACT_BRAKING_STOP = 0x0C00023D
 export const ACT_TURNING_AROUND = 0x00000443
 export const ACT_FINISH_TURNING_AROUND = 0x00000444
@@ -214,6 +219,8 @@ export const ACT_BACKWARD_ROLLOUT = 0x010008AD
 export const ACT_MOVE_PUNCHING = 0x00800457 
 export const ACT_SLIDE_KICK_SLIDE = 0x0080045A
 export const ACT_SLIDE_KICK_SLIDE_STOP = 0x08000225
+export const ACT_SHOCKWAVE_BOUNCE = 0x00020226
+export const ACT_FIRST_PERSON = 0x0C000227
 export const ACT_GROUND_POUND = 0x008008A9
 export const ACT_GROUND_POUND_LAND = 0x0080023C
 export const ACT_BUTT_SLIDE_STOP = 0x0C00023E
@@ -1013,6 +1020,32 @@ export const find_floor_height_relative_polar = (m, angleFromMario, distFromMari
     const x = Math.cos((m.faceAngle[1] + angleFromMario) / 0x8000 * Math.PI) * distFromMario
 
     return SurfaceCollision.find_floor(m.pos[0] + y, m.pos[1] + 100.0, m.pos[2] + x, {})
+}
+
+export const find_floor_slope = (m, yawOffset) => {
+    const floor = {};
+    let forwardFloorY, backwardFloorY
+    let forwardYDelta, backwardYDelta;
+    let result;
+
+    let x = Math.sin((m.faceAngle[1] + yawOffset) / 0x8000 * Math.PI) * 5.0;
+    let z = Math.cos((m.faceAngle[1] + yawOffset) / 0x8000 * Math.PI) * 5.0;
+
+    forwardFloorY = SurfaceCollision.find_floor(m.pos[0] + x, m.pos[1] + 100.0, m.pos[2] + z, floor);
+    backwardFloorY = SurfaceCollision.find_floor(m.pos[0] - x, m.pos[1] + 100.0, m.pos[2] - z, floor);
+
+    //! If Mario is near OOB, these floorY's can sometimes be -11000.
+    //  This will cause these to be off and give improper slopes.
+    forwardYDelta = forwardFloorY - m.pos[1];
+    backwardYDelta = m.pos[1] - backwardFloorY;
+
+    if (forwardYDelta * forwardYDelta < backwardYDelta * backwardYDelta) {
+        result = atan2s(5.0, forwardYDelta);
+    } else {
+        result = atan2s(5.0, backwardYDelta);
+    }
+
+    return result;
 }
 
 export const resolve_and_return_wall_collisions = (pos, offset, radius) => {

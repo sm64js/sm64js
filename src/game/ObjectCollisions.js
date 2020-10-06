@@ -67,7 +67,7 @@ const detect_player_hitbox_overlap = (local, remote) => {
     const sp38 = bTorso[1] - b.hitboxDownOffset
     const dx = aTorso[0] - bTorso[0]
     const dz = aTorso[2] - bTorso[2]
-    const collisionRadius = (a.hitboxRadius + b.hitboxRadius) * 1.25
+    const collisionRadius = (a.hitboxRadius + b.hitboxRadius) * 1.5
     const distance = Math.sqrt(dx * dx + dz * dz)
 
     /// do not check for player inter

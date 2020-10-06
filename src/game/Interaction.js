@@ -33,8 +33,8 @@ export const INTERACT_BBH_ENTRANCE   /* 0x08000000 */ = (1 << 27)
 export const INTERACT_SNUFIT_BULLET  /* 0x10000000 */ = (1 << 28)
 export const INTERACT_SHOCK          /* 0x20000000 */ = (1 << 29)
 export const INTERACT_IGLOO_BARRIER  /* 0x40000000 */ = (1 << 30)
-export const INTERACT_PLAYER     /* 0x80000000 */ = (1 << 8)  // formerly 31
-export const INTERACT_UNKNOWN_08     /* 0x00000100 */ = (1 << 31) // formerly 8
+export const INTERACT_PLAYER     /* 0x80000000 */ = (1 << 8)  // formerly 1 << 31
+export const INTERACT_UNKNOWN_08     /* 0x00000100 */ = (1 << 31) // formerly 1 << 8
 
 
 // INTERACT_WARP
@@ -275,6 +275,7 @@ const resolve_player_collision = (m, m2) => {
 }
 
 const interact_player = (m, o) => {
+
     if (!networkData.playerInteractions) return false
 
     const m2 = o.marioState
@@ -313,8 +314,9 @@ const interact_player = (m, o) => {
             if (m.actionState == 0) return false
             m2.squishTimer = Math.max(m2.squishTimer, 20)
         }
+
+        m2.interactObj = m.marioObj
         if (m2.marioObj.localMario) {
-            m2.interactObj = m.marioObj
             if (interaction & INT_KICK) {
                 // if (m2.action == Mario.ACT_FIRST_PERSON) {
                 //     // without this branch, the player will be stuck in first person
@@ -325,6 +327,8 @@ const interact_player = (m, o) => {
                 Mario.set_mario_action(m2, Mario.ACT_FREEFALL, 0)
             }
             m.marioObj.rawData[oDamageOrCoinValue] = determine_player_damage_value(interaction)
+        } else {  /// remote mario
+            m2.interactObj.rawData[oDamageOrCoinValue] = determine_player_damage_value(interaction)
         }
         m2.invincTimer = Math.max(m2.invincTimer, 3)
         take_damage_and_knock_back(m2, m.marioObj)
@@ -435,6 +439,7 @@ const determine_knockback_action = (m) => {
         m.vel[1] *= 0.7
         //m.vel[2] = mag * Math.cos(angleToObject / 0x8000 * Math.PI)
     }
+
 
     return bonkAction
 

@@ -40,9 +40,9 @@ export const mario_update_punch_sequence = (m) => {
             break
         case 2:
             animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_FIRST_PUNCH_FAST)
-            if (m.marioObj.header.gfx.unk38.animFrame <= 0) {
+            //if (m.marioObj.header.gfx.unk38.animFrame <= 0) {
                 m.flags |= Mario.MARIO_PUNCHING
-            }
+            //}
 
             if (m.input & Mario.INPUT_B_PRESSED) {
                 m.actionArg = 3

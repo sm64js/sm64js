@@ -253,6 +253,11 @@ const check_ledge_climb_down = (m) => {
 }
 
 const begin_braking_action = (m) => {
+    if (m.actionState == 1) {
+        m.faceAngle[1] = m.actionArg;
+        return Mario.set_mario_action(m, Mario.ACT_STANDING_AGAINST_WALL, 0);
+    }
+
     if (m.forwardVel >= 16.0 && m.floor.normal.y >= 0.17364818) {
         return Mario.set_mario_action(m, Mario.ACT_BRAKING, 0)
     }
@@ -268,7 +273,7 @@ const analog_stick_held_back = (m) => {
 }
 
 const act_walking = (m) => {
-
+    let startPos;
     const startYaw = m.faceAngle[1]
 
     if (should_begin_sliding(m)) {
@@ -297,6 +302,7 @@ const act_walking = (m) => {
 
     m.actionState = 0
 
+    startPos = [...m.pos];
     update_walking_speed(m)
 
     switch (perform_ground_step(m)) {
@@ -309,6 +315,8 @@ const act_walking = (m) => {
             Mario.set_mario_animation(m, Mario.MARIO_ANIM_GENERAL_FALL)
             break
         case Mario.GROUND_STEP_HIT_WALL:
+            push_or_sidle_wall(m, startPos);
+            m.actionTimer = 0;
             break
         default: throw "unkown ground step in act_walking"
     }
@@ -797,6 +805,47 @@ const stomach_slide_action = (m, stopAction, airAction, animation) => {
 
     common_slide_action(m, stopAction, airAction, animation);
     return false;
+}
+
+const push_or_sidle_wall = (m, startPos) => {
+    let wallAngle;
+    let dWallAngle;
+    let dx = m.pos[0] - startPos[0];
+    let dz = m.pos[2] - startPos[2];
+    let movedDistance = Math.sqrt(dx * dx + dz * dz);
+    //! (Speed Crash) If a wall is after moving 16384 distance, this crashes.
+    let val04 = (movedDistance * 2.0 * 0x10000);
+
+    if (m.forwardVel > 6.0) {
+        Mario.set_forward_vel(m, 6.0);
+    }
+
+    if (m.wall != null) {
+        wallAngle = atan2s(m.wall.normal.z, m.wall.normal.x);
+        dWallAngle = wallAngle - m.faceAngle[1];
+    }
+
+    if (m.wall == null || dWallAngle <= -0x71C8 || dWallAngle >= 0x71C8) {
+        m.flags |= Mario.MARIO_UNKNOWN_31;
+        Mario.set_mario_animation(m, Mario.MARIO_ANIM_PUSHING);
+        // play_step_sound(m, 6, 18);
+    } else {
+        if (dWallAngle < 0) {
+            Mario.set_mario_anim_with_accel(m, Mario.MARIO_ANIM_SIDESTEP_RIGHT, val04);
+        } else {
+            Mario.set_mario_anim_with_accel(m, Mario.MARIO_ANIM_SIDESTEP_LEFT, val04);
+        }
+
+        if (m.marioObj.header.gfx.unk38.animFrame < 20) {
+            // play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.header.gfx.cameraToObject);
+            m.particleFlags |= Mario.PARTICLE_DUST;
+        }
+
+        m.actionState = 1;
+        m.actionArg = wallAngle + 0x8000;
+        m.marioObj.header.gfx.angle[1] = wallAngle + 0x8000;
+        m.marioObj.header.gfx.angle[2] = Mario.find_floor_slope(m, 0x4000);
+    }
 }
 
 const act_butt_slide = (m) => {

@@ -9,7 +9,9 @@ import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceC
 
 
 const apply_slope_accel = (m) => {
-    let slopeAccel;
+
+/////////////////////////// Hack disabling walk/run acceleration for slopes
+/*    let slopeAccel;
     let floorDYaw = m.floorAngle - m.faceAngle[1];
     floorDYaw = floorDYaw > 32767 ? floorDYaw - 65536 : floorDYaw;
     floorDYaw = floorDYaw < -32768 ? floorDYaw + 65536 : floorDYaw;
@@ -44,7 +46,8 @@ const apply_slope_accel = (m) => {
         } else {
             m.forwardVel -= slopeAccel * steepness;
         }
-    }
+    }*/
+/////////////////////////// End Hack disabling walk/run acceleration for slopes
 
     m.slideYaw = m.faceAngle[1]
 
@@ -874,6 +877,9 @@ const act_dive_slide = (m) => {
 }
 
 const should_begin_sliding = (m) => {
+
+    return 0 /// hack disable sliding on slopes
+
     if (m.input & Mario.INPUT_ABOVE_SLIDE) {
         const slideLevel = (m.area.terrainType & TERRAIN_MASK) == TERRAIN_SLIDE
         const movingBackward = m.forwardVel <= -1.0

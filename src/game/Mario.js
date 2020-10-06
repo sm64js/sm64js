@@ -193,7 +193,6 @@ export const ACT_TOP_OF_POLE              =  0x00100345
 export const ACT_START_HANGING = 0x08200348
 export const ACT_WALL_KICK_AIR = 0x03000886
 export const ACT_TOP_OF_POLE_JUMP = 0x0300088D
-export const ACT_BUTT_SLIDE_AIR = 0x0300088E
 export const ACT_CROUCHING                =  0x0C008220 
 export const ACT_START_CROUCHING          =  0x0C008221 
 export const ACT_STOP_CROUCHING           =  0x0C008222 

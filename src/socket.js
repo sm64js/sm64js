@@ -7,6 +7,12 @@ import * as Cosmetics from "./cosmetics"
 
 const channel = geckos({ port: 9301 })
 
+function sanitizeChat(string) {
+    string = string.replace(/</g, "");
+    string = string.replace(/>/g, "");
+    return string;
+}
+
 window.myMario = {
     playerName: "Unnamed Player",
     skinData: Cosmetics.defaultSkinData
@@ -34,7 +40,7 @@ const recvChat = (chatmsg) => {
         networkData.remotePlayers[chatmsg.channel_id] == undefined) return
 
     const chatlog = document.getElementById("chatlog")
-    chatlog.innerHTML += '<strong>' + chatmsg.sender + '</strong>: ' + chatmsg.msg + '<br/>'
+    chatlog.innerHTML += '<strong>' + sanitizeChat(chatmsg.sender) + '</strong>: ' + sanitizeChat(chatmsg.msg) + '<br/>'
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 
     let someobject

@@ -130,6 +130,7 @@ export class n64GfxProcessor {
             dstCanvas.hidden = false
             WebGL.canvas.hidden = true
             if (window.fullWindowMode) {
+                window.scrollTo(0, 0)
                 dstCanvas.width = window.innerWidth
                 dstCanvas.height = window.innerHeight
                 document.body.style.overflowY = "hidden"

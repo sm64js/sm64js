@@ -1,13 +1,10 @@
 import geckos from '@geckos.io/client'
-import * as Mario from "./game/Mario"
-import { take_damage_and_knock_back, INTERACT_PLAYER } from "./game/Interaction"
-import { oDamageOrCoinValue, oInteractType, oPosX, oPosZ, oPosY } from "./include/object_constants"
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
 
 const channel = geckos({ port: 9301 })
 
-function sanitizeChat(string, isMessage) {
+const sanitizeChat = (string, isMessage) => {
     string = string.replace(/</g, "");
     string = string.replace(/>/g, "");
     if(isMessage = true) {

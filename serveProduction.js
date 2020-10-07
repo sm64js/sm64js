@@ -121,6 +121,13 @@ const processSkin = (channel_id, msg) => {
 
 }
 
+const sanitizeChat = (string) => {
+    string = string.substring(0, 200)
+    string = string.replace(/</g, "")
+    string = string.replace(/>/g, "")
+    return string
+}
+
 const processChat = (channel_id, msg) => {
 /*    badwords.forEach(word => {
         const searchMask = word.slice(0, word.length)
@@ -132,7 +139,7 @@ const processChat = (channel_id, msg) => {
 
     if (decodedMario == undefined) return
 
-    const chatmsg = { channel_id, msg, sender: decodedMario.getPlayername() }
+    const chatmsg = { channel_id, msg: sanitizeChat(msg), sender: decodedMario.getPlayername() }
 
     geckos.emit('chat', chatmsg, { reliable: true })
 }

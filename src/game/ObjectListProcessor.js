@@ -8,6 +8,7 @@ import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { detect_object_collisions } from "./ObjectCollisions"
 import { networkData, gameData as socketGameData } from "../socket"
 import { copyMarioUpdateToState } from "./MultiMarioManager"
+import { vec3f_dif, vec3f_length } from "../engine/math_util"
 
 
 class ObjectListProcessor {
@@ -128,6 +129,11 @@ class ObjectListProcessor {
     }
 
     bhv_mario_update() {
+
+        const torsoDiff = [0, 0, 0]
+        vec3f_dif(torsoDiff, LevelUpdate.gMarioState.pos, LevelUpdate.gMarioState.marioBodyState.torsoPos)
+        if (vec3f_length(torsoDiff) > 300)
+            LevelUpdate.gMarioState.marioBodyState.torsoPos = [ ...LevelUpdate.gMarioState.pos ]
 
         Mario.execute_mario_action(LevelUpdate.gMarioState)
         this.copy_mario_state_to_object(LevelUpdate.gMarioState)

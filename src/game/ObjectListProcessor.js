@@ -76,8 +76,12 @@ class ObjectListProcessor {
 
         Object.values(networkData.remotePlayers).forEach(remotePlayer => {
             if (remotePlayer.marioUpdate) {
-                copyMarioUpdateToState(remotePlayer)
-                this.copy_mario_state_to_object(remotePlayer.marioState)
+                if (remotePlayer.marioState.ignoreUpdates > 0) {
+                    remotePlayer.marioState.ignoreUpdates--
+                } else {
+                    copyMarioUpdateToState(remotePlayer)
+                    this.copy_mario_state_to_object(remotePlayer.marioState)
+                }
             }
         })
 

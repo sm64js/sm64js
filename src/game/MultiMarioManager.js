@@ -164,7 +164,8 @@ const initNewRemoteMarioState = (marioProto) => {
         angleVel: marioProto.getAnglevelList(),
         pos: marioProto.getPosList(),
         vel: marioProto.getVelList(),
-        action: marioProto.getAction()
+        action: marioProto.getAction(),
+        ignoreUpdates: 0
     }
 
     newMarioState.marioObj.rawData[RAW.oInteractType] = INTERACT_PLAYER

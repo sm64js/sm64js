@@ -152,6 +152,15 @@ setInterval(async () => {
         else if (data.decodedMario) data.channel.close()
     })
 
+    const mariolist = Object.values(allChannels).filter(data => data.decodedMario).map(data => data.decodedMario)
+    const mariolistproto = new MarioListMsg()
+    mariolistproto.setMarioList(mariolist)
+    mariolistproto.setMessagecount(marioListCounter)
+    const bytes = mariolistproto.serializeBinary()
+    const compressedMsg = await deflate(bytes)
+    broadcastDataWithOpcode(compressedMsg, 0)
+    marioListCounter++
+
 }, 33)
 
 /// Every other frame - 16 times per second
@@ -162,15 +171,6 @@ setInterval(async () => {
     const bytes = controllerlistproto.serializeBinary()
     const compressedMsg = await deflate(bytes)
     broadcastDataWithOpcode(compressedMsg, 3)*/
-
-    const mariolist = Object.values(allChannels).filter(data => data.decodedMario).map(data => data.decodedMario)
-    const mariolistproto = new MarioListMsg()
-    mariolistproto.setMarioList(mariolist)
-    mariolistproto.setMessagecount(marioListCounter)
-    const bytes = mariolistproto.serializeBinary()
-    const compressedMsg = await deflate(bytes)
-    broadcastDataWithOpcode(compressedMsg, 0)
-    marioListCounter++
 
 }, 66)
 

@@ -73,6 +73,7 @@ const detect_player_hitbox_overlap = (local, remote) => {
     /// do not check for player inter
 
     if (collisionRadius > distance) {
+
         let sp20 = a.hitboxHeight + sp3C
         let sp1C = b.hitboxHeight + sp38
 

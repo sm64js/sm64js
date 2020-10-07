@@ -1,7 +1,7 @@
 import * as Mario from "./Mario"
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
 import { atan2s, vec3f_dif, vec3f_length } from "../engine/math_util"
-import { networkData } from "../socket"
+import { networkData, sendPlayerInteraction } from "../socket"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
 export const INTERACT_GRABBABLE      /* 0x00000002 */ = (1 << 1)
@@ -170,7 +170,8 @@ const determine_interaction = (m, o) => {
     // Prior to this, the interaction type could be overwritten. This requires, however,
     // that the interaction not be set prior. This specifically overrides turning a ground
     // pound into just a bounce.
-    if (interaction == 0 && (action & Mario.ACT_FLAG_AIR)) {
+
+/*    if (interaction == 0 && (action & Mario.ACT_FLAG_AIR)) {
         if (m.vel[1] < 0.0) {
             if (m.pos[1] > o.rawData[oPosY]) {
                 interaction = INT_HIT_FROM_ABOVE
@@ -180,7 +181,7 @@ const determine_interaction = (m, o) => {
                 interaction = INT_HIT_FROM_BELOW
             }
         }
-    }
+    }*/
 
     return interaction
 }
@@ -317,22 +318,26 @@ const interact_player = (m, o) => {
 
         m2.interactObj = m.marioObj
         if (m2.marioObj.localMario) {
-            if (interaction & INT_KICK) {
-                // if (m2.action == Mario.ACT_FIRST_PERSON) {
-                //     // without this branch, the player will be stuck in first person
-                //     raise_background_noise(2)
-                //     set_camera_mode(m2.area->camera, -1, 1)
-                //     m2.input &= ~INPUT_FIRST_PERSON
-                // }
-                Mario.set_mario_action(m2, Mario.ACT_FREEFALL, 0)
-            }
             m.marioObj.rawData[oDamageOrCoinValue] = determine_player_damage_value(interaction)
         } else {  /// remote mario
             m2.interactObj.rawData[oDamageOrCoinValue] = determine_player_damage_value(interaction)
         }
         m2.invincTimer = Math.max(m2.invincTimer, 3)
+        if (interaction & INT_KICK) {
+            // if (m2.action == Mario.ACT_FIRST_PERSON) {
+            //     // without this branch, the player will be stuck in first person
+            //     raise_background_noise(2)
+            //     set_camera_mode(m2.area->camera, -1, 1)
+            //     m2.input &= ~INPUT_FIRST_PERSON
+            // }
+            Mario.set_mario_action(m2, Mario.ACT_FREEFALL, 0)
+        }
+        if (m.marioObj.localMario) {
+            m2.ignoreUpdates = 20
+            sendPlayerInteraction(m2.channel_id, interaction)  /// unused
+        }
         take_damage_and_knock_back(m2, m.marioObj)
-        bounce_back_from_attack(m, interaction)
+        //bounce_back_from_attack(m, interaction)  //temp disable to fix glitch
         return false
     }
 

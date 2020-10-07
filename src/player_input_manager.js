@@ -78,6 +78,7 @@ Keydrown.LEFT.down(() => { keyboardButtons.left = true })
 Keydrown.RIGHT.down(() => { keyboardButtons.right = true })
 Keydrown.CTRL.down(() => { keyboardButtons.ctrl = true })
 
+Keydrown.ESC.down(() => { window.fullWindowMode = false })
 
 ///////////
 

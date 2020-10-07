@@ -132,6 +132,29 @@ export class n64GfxProcessor {
         /// handle dimensions
     }
 
+    end_frame() {
+        const dstCanvas = document.getElementById("fullCanvas")
+
+        if (window.fullWindowMode || document.fullscreenElement) {
+            const dstCtx = dstCanvas.getContext("2d")
+            dstCanvas.hidden = false
+            WebGL.canvas.hidden = true
+            canvas2d.hidden = true
+            if (window.fullWindowMode) {
+                dstCanvas.width = window.innerWidth
+                dstCanvas.height = window.innerHeight
+                document.body.style.overflowY = "hidden"
+            }
+            dstCtx.drawImage(WebGL.canvas, 0, 0, dstCanvas.width, dstCanvas.height)
+            dstCtx.drawImage(canvas2d, 0, 0, dstCanvas.width, dstCanvas.height)
+        } else {  /// normal mode
+            WebGL.canvas.hidden = false
+            dstCanvas.hidden = true
+            canvas2d.hidden = false
+            document.body.style.overflowY = "scroll"
+        }
+    }
+
     sp_reset() {
         this.rsp.modelview_matrix_stack_size = 1
         this.rsp.current_num_lights = 2

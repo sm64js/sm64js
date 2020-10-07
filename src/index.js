@@ -30,6 +30,7 @@ const produce_one_frame = () => {
     GFX.start_frame()
     Game.main_loop_one_iteration()
     Socket.post_main_loop_one_iteration(n_frames)
+    GFX.end_frame()
 
     /// Audio TODO
 
@@ -142,6 +143,10 @@ const webpage_update = () => {
     document.getElementById("fps").innerHTML = `${event.target.value} fps`
 })*/
 
+window.enterFullScreenMode = () => {
+    const dstCanvas = document.getElementById('fullCanvas')
+    dstCanvas.requestFullscreen()
+}
 
 ///// Start Game
 

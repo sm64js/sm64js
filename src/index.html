@@ -22,6 +22,7 @@
 </head>
 
 <body class="text-center">
+    <canvas hidden id="fullCanvas" width="640" height="480"></canvas>
 
     <div class="cover-container d-flex h-100 mx-auto flex-column">
         <header class="masthead">
@@ -52,8 +53,9 @@
             <div class="row" style="justify-content:center;">
                 <h6> <b>Gamepad is supported and recommended!</b> </h6>
             </div>
+
             <div class="row" style="justify-content:center">
-                <div class="col-4" style="justify-content:center">
+                <div class="col-3">
                     <button type="button"
                             class="btn btn-sm btn-primary"
                             data-html="true"
@@ -63,7 +65,7 @@
                         Customize Keyboard Controls
                     </button>
                 </div>
-                <div class="col-4" style="justify-content:center">
+                <div class="col-3">
                     <button type="button"
                             class="btn btn-sm btn-primary"
                             data-html="true"
@@ -73,7 +75,23 @@
                         Customize Gamepad Controls
                     </button>
                 </div>
+                <div class="col-3">
+                    <button type="button"
+                            class="btn btn-sm btn-primary"
+                            onclick="window.enterFullScreenMode()">
+                        Full Screen Mode
+                    </button>
+                </div>
+                <div class="col-3">
+                    <button type="button"
+                            class="btn btn-sm btn-primary"
+                            onclick="window.fullWindowMode = true">
+                        Full Window Mode
+                    </button>
+                </div>
+
             </div>
+
 
             <div class="row" style="justify-content:center; margin-top: 10px;">
                 <div class="col-sm-4 col-form-label" style="justify-content:center">
@@ -97,7 +115,6 @@
                     <input id="playerNameInput" type="text" class="form-control" minlength="3" maxlength="14" placeholder="enter name" onchange="window.updatePlayerName(this.value)">
                 </div>
             </div>
-
             <br />
 
             <div class="canvasContainer">

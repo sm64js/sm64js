@@ -117,6 +117,9 @@ export const post_main_loop_one_iteration = (frame) => {
         if (Cosmetics.validSkins()) {
             channel.emit('skin', window.myMario.skinData)
         }
+        if (window.myMario.playerName = "") {
+            window.myMario.playerName = "Unnamed Player";
+        }
     }
 
     if (multiplayerReady() && frame % 1 == 0) {

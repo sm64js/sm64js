@@ -2,6 +2,7 @@ import * as Mario from "./Mario"
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
 import { atan2s, vec3f_dif, vec3f_length } from "../engine/math_util"
 import { networkData, sendPlayerInteraction } from "../socket"
+import { sins, coss } from "../utils"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
 export const INTERACT_GRABBABLE      /* 0x00000002 */ = (1 << 1)
@@ -473,6 +474,31 @@ export const take_damage_and_knock_back = (m, o) => {
 
 }
 
+const check_kick_or_punch_wall = (m) => {
+    if (m.flags & (Mario.MARIO_PUNCHING | Mario.MARIO_KICKING | Mario.MARIO_TRIPPING)) {
+        const detector = [0,0,0];
+        detector[0] = m.pos[0] + 50.0 * sins(m.faceAngle[1]);
+        detector[2] = m.pos[2] + 50.0 * coss(m.faceAngle[1]);
+        detector[1] = m.pos[1];
+
+        if (Mario.resolve_and_return_wall_collisions(detector, 80.0, 5.0) != null) {
+            if (m.action != Mario.ACT_MOVE_PUNCHING || m.forwardVel >= 0.0) {
+                if (m.action == Mario.ACT_PUNCHING) {
+                    m.action = Mario.ACT_MOVE_PUNCHING;
+                }
+
+                Mario.set_forward_vel(m, -48.0);
+                // play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
+                m.particleFlags |= Mario.PARTICLE_TRIANGLE;
+            } else if (m.action & Mario.ACT_FLAG_AIR) {
+                Mario.set_forward_vel(m, -16.0);
+                // play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
+                m.particleFlags |= Mario.PARTICLE_TRIANGLE;
+            }
+        }
+    }
+}
+
 const sInteractionHandlers = [
     { interactType: INTERACT_COIN, handler: null },
     { interactType: INTERACT_WATER_RING, handler: null },
@@ -540,6 +566,8 @@ export const mario_process_interactions = (m) => {
     if (m.invincTimer > 0 && !sDelayInvincTimer) {
         m.invincTimer -= 1
     }
+
+    check_kick_or_punch_wall(m);
 
 
     m.flags &= ~Mario.MARIO_PUNCHING & ~Mario.MARIO_KICKING & ~Mario.MARIO_TRIPPING

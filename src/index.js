@@ -25,7 +25,7 @@ const produce_one_frame = () => {
     playerInputUpdate() /// Keyboard buttons / joystick process to game input commands
     GFX.start_frame()
     Game.main_loop_one_iteration()
-
+    GFX.end_frame()
     /// Audio TODO
 
     const finished_frame = performance.now()
@@ -137,6 +137,10 @@ document.getElementById("slider").addEventListener('change', (event) => {
     document.getElementById("fps").innerHTML = `${event.target.value} fps`
 })
 
+window.enterFullScreenMode = () => {
+    const dstCanvas = document.getElementById('fullCanvas')
+    dstCanvas.requestFullscreen()
+}
 
 ///// Start Game
 

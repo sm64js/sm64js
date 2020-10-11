@@ -2,7 +2,7 @@ import geckos from '@geckos.io/client'
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
 
-const channel = geckos({ port: 9301 })
+const channel = geckos({ port: 9208 })
 
 const sanitizeChat = (string, isMessage) => {
     string = string.replace(/</g, "");

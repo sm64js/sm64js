@@ -115,7 +115,8 @@ class LevelCommands {
 
     set_register(args) {
         //console.log("set register")
-        this.sRegister = args[0]
+        const new_value = args[0].call ? args[0]() : args[0]
+        this.sRegister = new_value
         this.sCurrentScript.index++
     }
 
@@ -271,7 +272,8 @@ class LevelCommands {
     }
 
     execute(args) {
-        this.start_new_script(args[0])
+        const new_script = args[0].call ? args[0]() : args[0]
+        this.start_new_script(new_script)
     }
 
     jump_link(args) {

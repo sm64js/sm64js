@@ -92,7 +92,6 @@
 
             </div>
 
-
             <div class="row" style="justify-content:center; margin-top: 10px;">
                 <div class="col-sm-4 col-form-label" style="justify-content:center">
                     <label>Select Skin ID and type name :</label>
@@ -115,6 +114,19 @@
                     <input id="playerNameInput" type="text" class="form-control" minlength="3" maxlength="14" placeholder="enter name" onchange="window.updatePlayerName(this.value)">
                 </div>
             </div>
+            <div hidden class="row" style="justify-content:center; padding-top:5px">
+                <div class="col-3">
+                    <h5 style="color:skyblue;padding-top:2px"> Select Map: </h5>
+                </div>
+                <div class="col-3">
+                    <select id="mapSelect" class="form-control form-control-sm">
+                        <option>Castle Grounds</option>
+                        <option>Bob-omb Battlefield</option>
+                    </select>
+                </div>
+
+            </div>
+
             <br />
 
             <div class="canvasContainer">

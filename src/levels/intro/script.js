@@ -5,33 +5,46 @@ import { level_main_scripts_entry } from "../scripts"
 import { lvl_intro_update } from "../../menu/level_select_menu"
 import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB } from "../level_defines_constants"
 
-export let level_intro_entry_2 = [
-    { command: LevelCommands.init_level },
-    { command: LevelCommands.blackout, args: [true] },
-    { command: LevelCommands.load_mario_head, args: [LevelCommands.REGULAR_FACE] },
-    { command: LevelCommands.alloc_level_pool },
-    { command: LevelCommands.begin_area, args: [1, intro_geo_00035C] },
-    { command: LevelCommands.end_area },
-    { command: LevelCommands.free_level_pool },
-    { command: LevelCommands.sleep, args: [2] },
-    { command: LevelCommands.blackout, args: [false] },
-    { command: LevelCommands.cleardemoptr },
-    /// Get Set script variable 
-    /// Jump IF
-    { command: LevelCommands.load_area, args: [1] },
-    /// Set Menu Music
-    { command: LevelCommands.transition, args: [WARP_TRANSITION_FADE_FROM_STAR, 20, 0, 0, 0] },
-    { command: LevelCommands.sleep, args: [20] },
-    { command: LevelCommands.call_loop, args: [ 1, lvl_intro_update, null ] },
-    { command: LevelCommands.unload_area, args: [1] },
-    { command: LevelCommands.set_register, args: [LEVEL_BOB] },
-    { command: LevelCommands.execute, args: [level_main_scripts_entry] }
-    /// Jump If
-    /// Jump IF
-    /// JUMP
-]
+const getSelectedLevel = () => {
+    const mapSelect = document.getElementById("mapSelect").value
 
-export let level_intro_entry_1 = [
+    switch (mapSelect) {
+        case "Castle Grounds": return LEVEL_CASTLE_GROUNDS
+        case "Bob-omb Battlefield": return LEVEL_BOB
+    }
+
+    return LEVEL_CASTLE_GROUNDS
+}
+
+const level_intro_entry_2 = () => {
+    return [
+        { command: LevelCommands.init_level },
+        { command: LevelCommands.blackout, args: [true] },
+        { command: LevelCommands.load_mario_head, args: [LevelCommands.REGULAR_FACE] },
+        { command: LevelCommands.alloc_level_pool },
+        { command: LevelCommands.begin_area, args: [1, intro_geo_00035C] },
+        { command: LevelCommands.end_area },
+        { command: LevelCommands.free_level_pool },
+        { command: LevelCommands.sleep, args: [2] },
+        { command: LevelCommands.blackout, args: [false] },
+        { command: LevelCommands.cleardemoptr },
+        /// Get Set script variable 
+        /// Jump IF
+        { command: LevelCommands.load_area, args: [1] },
+        /// Set Menu Music
+        { command: LevelCommands.transition, args: [WARP_TRANSITION_FADE_FROM_STAR, 20, 0, 0, 0] },
+        { command: LevelCommands.sleep, args: [20] },
+        { command: LevelCommands.call_loop, args: [1, lvl_intro_update, null] },
+        { command: LevelCommands.unload_area, args: [1] },
+        { command: LevelCommands.set_register, args: [LEVEL_BOB] },
+        { command: LevelCommands.execute, args: [level_main_scripts_entry] }
+        /// Jump If
+        /// Jump IF
+        /// JUMP
+    ]
+}
+
+export const level_intro_entry_1 = [
     { command: LevelCommands.init_level },
     { command: LevelCommands.alloc_level_pool },
     { command: LevelCommands.begin_area, args: [1, intro_geo_0002D0] },

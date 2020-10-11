@@ -172,7 +172,7 @@ const determine_interaction = (m, o) => {
     // that the interaction not be set prior. This specifically overrides turning a ground
     // pound into just a bounce.
 
-/*    if (interaction == 0 && (action & Mario.ACT_FLAG_AIR)) {
+    if (interaction == 0 && (action & Mario.ACT_FLAG_AIR)) {
         if (m.vel[1] < 0.0) {
             if (m.pos[1] > o.rawData[oPosY]) {
                 interaction = INT_HIT_FROM_ABOVE
@@ -182,7 +182,7 @@ const determine_interaction = (m, o) => {
                 interaction = INT_HIT_FROM_BELOW
             }
         }
-    }*/
+    }
 
     return interaction
 }
@@ -292,7 +292,7 @@ const interact_player = (m, o) => {
     const isInvulnerable = (m2.action & Mario.ACT_FLAG_INVULNERABLE) || m2.invincTimer != 0 || m2.hurtCounter != 0 || isInCutscene
     const isIgnoredAttack = (m.action == Mario.ACT_JUMP || m.action == Mario.ACT_DOUBLE_JUMP)
 
-    if ((interaction & INT_ANY_ATTACK) && !(interaction & INT_HIT_FROM_ABOVE) && !isInvulnerable && !isIgnoredAttack) {
+    if ((interaction & INT_ANY_ATTACK) && !(interaction & INT_HIT_FROM_ABOVE) && !(interaction & INT_HIT_FROM_BELOW) && !isInvulnerable && !isIgnoredAttack) {
 
         // determine if slide attack should be ignored
         if ((interaction & INT_ATTACK_SLIDE) && player_is_sliding(m2)) {
@@ -331,6 +331,7 @@ const interact_player = (m, o) => {
             //     set_camera_mode(m2.area->camera, -1, 1)
             //     m2.input &= ~INPUT_FIRST_PERSON
             // }
+            // m.invincTimer = 10 /// one solution that fixes attacking mario knockback on jump kick
             Mario.set_mario_action(m2, Mario.ACT_FREEFALL, 0)
         }
         if (m.marioObj.localMario) {

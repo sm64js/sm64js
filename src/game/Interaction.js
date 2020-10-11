@@ -166,6 +166,7 @@ const determine_interaction = (m, o) => {
         } else if (m.forwardVel <= -26.0 || 26.0 <= m.forwardVel) {
             interaction = INT_FAST_ATTACK_OR_SHELL
         }
+
     }
 
     // Prior to this, the interaction type could be overwritten. This requires, however,
@@ -188,7 +189,7 @@ const determine_interaction = (m, o) => {
 }
 
 const determine_player_damage_value = (interaction) => {
-    if (interaction & INT_GROUND_POUND_OR_TWIRL) { return 3 }
+    if (interaction & INT_GROUND_POUND_OR_TWIRL || interaction & INT_FAST_ATTACK_OR_SHELL || interaction & INT_SLIDE_KICK) { return 3 }
     if (interaction & INT_KICK) { return 2 }
     return 1
 }
@@ -335,7 +336,7 @@ const interact_player = (m, o) => {
             Mario.set_mario_action(m2, Mario.ACT_FREEFALL, 0)
         }
         if (m.marioObj.localMario) {
-            m2.ignoreUpdates = 20
+            m2.ignoreUpdates = 40
             sendPlayerInteraction(m2.channel_id, interaction)  /// unused
         }
         take_damage_and_knock_back(m2, m.marioObj)

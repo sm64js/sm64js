@@ -49,7 +49,7 @@ const update_air_with_turn = (m) => {
             intendedMag = m.intendedMag / 32.0;
 
             m.forwardVel += 1.5 * Math.cos(intendedDYaw / 0x8000 * Math.PI) * intendedMag;
-            m.faceAngle[1] += 512.0 * Math.sin(intendedDYaw / 0x8000 * Math.PI) * intendedMag;
+            m.faceAngle[1] += Math.floor(512.0 * Math.sin(intendedDYaw / 0x8000 * Math.PI) * intendedMag)
         }
 
         //! Uncapped air speed. Net positive when moving forward.

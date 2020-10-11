@@ -1,17 +1,16 @@
 import * as Mario from "./Mario"
 import { SURFACE_SLOW, SURFACE_CLASS_VERY_SLIPPERY, SURFACE_CLASS_SLIPPERY, SURFACE_CLASS_NOT_SLIPPERY, TERRAIN_MASK, TERRAIN_SLIDE } from "../include/surface_terrains"
 import * as SurfaceTerrains from "../include/surface_terrains"
-import { perform_ground_step } from "./MarioStep"
+import { mario_bonk_reflection, perform_ground_step } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
 import { oMarioWalkingPitch } from "../include/object_constants"
 import { mario_update_punch_sequence } from "./MarioActionsObject"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
+import { int16 }  from '../utils';
 
 const apply_slope_accel = (m) => {
     let slopeAccel;
-    let floorDYaw = m.floorAngle - m.faceAngle[1];
-    floorDYaw = floorDYaw > 32767 ? floorDYaw - 65536 : floorDYaw;
-    floorDYaw = floorDYaw < -32768 ? floorDYaw + 65536 : floorDYaw;
+    let floorDYaw = int16(m.floorAngle - m.faceAngle[1]);
 
     const floor = m.floor;
     const steepness = Math.sqrt(floor.normal.x * floor.normal.x + floor.normal.z * floor.normal.z);
@@ -249,6 +248,11 @@ const check_ledge_climb_down = (m) => {
 }
 
 const begin_braking_action = (m) => {
+    if (m.actionState == 1) {
+        m.faceAngle[1] = m.actionArg;
+        return Mario.set_mario_action(m, Mario.ACT_STANDING_AGAINST_WALL, 0);
+    }
+
     if (m.forwardVel >= 16.0 && m.floor.normal.y >= 0.17364818) {
         return Mario.set_mario_action(m, Mario.ACT_BRAKING, 0)
     }
@@ -257,14 +261,12 @@ const begin_braking_action = (m) => {
 }
 
 const analog_stick_held_back = (m) => {
-    let intendedDYaw = m.intendedYaw - m.faceAngle[1]
-    intendedDYaw = intendedDYaw > 32767 ? intendedDYaw - 65536 : intendedDYaw
-    intendedDYaw = intendedDYaw < -32768 ? intendedDYaw + 65536 : intendedDYaw
+    let intendedDYaw = int16(m.intendedYaw - m.faceAngle[1]);
     return intendedDYaw < -0x471C || intendedDYaw > 0x471C
 }
 
 const act_walking = (m) => {
-
+    let startPos;
     const startYaw = m.faceAngle[1]
 
     if (should_begin_sliding(m)) {
@@ -293,6 +295,7 @@ const act_walking = (m) => {
 
     m.actionState = 0
 
+    startPos = [...m.pos];
     update_walking_speed(m)
 
     switch (perform_ground_step(m)) {
@@ -305,6 +308,8 @@ const act_walking = (m) => {
             Mario.set_mario_animation(m, Mario.MARIO_ANIM_GENERAL_FALL)
             break
         case Mario.GROUND_STEP_HIT_WALL:
+            push_or_sidle_wall(m, startPos);
+            m.actionTimer = 0;
             break
         default: throw "unkown ground step in act_walking"
     }
@@ -312,6 +317,16 @@ const act_walking = (m) => {
     check_ledge_climb_down(m)
     tilt_body_walking(m, startYaw)
     return 0
+}
+
+const slide_bonk = (m, fastAction, slowAction) => {
+    if (m.forwardVel > 16.0) {
+        mario_bonk_reflection(m, true);
+        Mario.drop_and_set_mario_action(m, fastAction, 0);
+    } else {
+        Mario.set_forward_vel(m, 0.0);
+        Mario.set_mario_action(m, slowAction, 0);
+    }
 }
 
 const act_braking = (m) => {
@@ -337,6 +352,7 @@ const act_braking = (m) => {
             m.particleFlags |= Mario.PARTICLE_DUST
             break
         case Mario.GROUND_STEP_HIT_WALL:
+            slide_bonk(m, Mario.ACT_BACKWARD_GROUND_KB, Mario.ACT_BRAKING_STOP);
             break
     }
 
@@ -615,9 +631,7 @@ const update_sliding_angle = (m, accel, lossFactor) => {
 
     m.slideYaw = atan2s(m.slideVelZ, m.slideVelX)
 
-    let facingDYaw = m.faceAngle[1] - m.slideYaw
-    facingDYaw = facingDYaw > 32767 ? facingDYaw - 65536 : facingDYaw
-    facingDYaw = facingDYaw < -32768 ? facingDYaw + 65536 : facingDYaw
+    let facingDYaw = int16(m.faceAngle[1] - m.slideYaw);
     newFacingDYaw = facingDYaw
 
     //! -0x4000 not handled - can slide down a slope while facing perpendicular to it
@@ -638,9 +652,6 @@ const update_sliding_angle = (m, accel, lossFactor) => {
             newFacingDYaw = -0x8000
         }
     }
-
-    newFacingDYaw = newFacingDYaw > 32767 ? newFacingDYaw - 65536 : newFacingDYaw
-    newFacingDYaw = newFacingDYaw < -32768 ? newFacingDYaw + 65536 : newFacingDYaw
 
     m.faceAngle[1] = m.slideYaw + newFacingDYaw
 
@@ -793,6 +804,47 @@ const stomach_slide_action = (m, stopAction, airAction, animation) => {
 
     common_slide_action(m, stopAction, airAction, animation);
     return false;
+}
+
+const push_or_sidle_wall = (m, startPos) => {
+    let wallAngle;
+    let dWallAngle;
+    let dx = m.pos[0] - startPos[0];
+    let dz = m.pos[2] - startPos[2];
+    let movedDistance = Math.sqrt(dx * dx + dz * dz);
+    //! (Speed Crash) If a wall is after moving 16384 distance, this crashes.
+    let val04 = (movedDistance * 2.0 * 0x10000);
+
+    if (m.forwardVel > 6.0) {
+        Mario.set_forward_vel(m, 6.0);
+    }
+
+    if (m.wall != null) {
+        wallAngle = atan2s(m.wall.normal.z, m.wall.normal.x);
+        dWallAngle = int16(wallAngle - m.faceAngle[1]);
+    }
+
+    if (m.wall == null || dWallAngle <= -0x71C8 || dWallAngle >= 0x71C8) {
+        m.flags |= Mario.MARIO_UNKNOWN_31;
+        Mario.set_mario_animation(m, Mario.MARIO_ANIM_PUSHING);
+        // play_step_sound(m, 6, 18);
+    } else {
+        if (dWallAngle < 0) {
+            Mario.set_mario_anim_with_accel(m, Mario.MARIO_ANIM_SIDESTEP_RIGHT, val04);
+        } else {
+            Mario.set_mario_anim_with_accel(m, Mario.MARIO_ANIM_SIDESTEP_LEFT, val04);
+        }
+
+        if (m.marioObj.header.gfx.unk38.animFrame < 20) {
+            // play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.header.gfx.cameraToObject);
+            m.particleFlags |= Mario.PARTICLE_DUST;
+        }
+
+        m.actionState = 1;
+        m.actionArg = int16(wallAngle + 0x8000);
+        m.marioObj.header.gfx.angle[1] = int16(wallAngle + 0x8000);
+        m.marioObj.header.gfx.angle[2] = Mario.find_floor_slope(m, 0x4000);
+    }
 }
 
 const act_butt_slide = (m) => {

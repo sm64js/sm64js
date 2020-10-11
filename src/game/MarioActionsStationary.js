@@ -41,7 +41,7 @@ const act_idle = (m) => {
     }
 
     if (m.actionArg & 1) {
-        throw "action arg mario stand against wall"
+        Mario.set_mario_animation(m, Mario.MARIO_ANIM_STAND_AGAINST_WALL);
     } else {
         switch (m.actionState) {
             case 0: Mario.set_mario_animation(m, Mario.MARIO_ANIM_IDLE_HEAD_LEFT); break
@@ -120,6 +120,28 @@ const act_jump_land_stop = (m) => {
 
     landing_step(m, Mario.MARIO_ANIM_LAND_FROM_SINGLE_JUMP, Mario.ACT_IDLE)
     return 0
+}
+
+const act_standing_against_wall = (m) => {
+    if (m.input & Mario.INPUT_UNKNOWN_10) {
+        return set_mario_action(m, Mario.ACT_SHOCKWAVE_BOUNCE, 0);
+    }
+
+    if (m.input & (Mario.INPUT_NONZERO_ANALOG | Mario.INPUT_A_PRESSED | Mario.INPUT_OFF_FLOOR | Mario.INPUT_ABOVE_SLIDE)) {
+        return Mario.check_common_action_exits(m);
+    }
+
+    if (m.input & Mario.INPUT_FIRST_PERSON) {
+        return Mario.set_mario_action(m, Mario.ACT_FIRST_PERSON, 0);
+    }
+
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_PUNCHING, 0);
+    }
+
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_STAND_AGAINST_WALL);
+    stationary_ground_step(m);
+    return 0;
 }
 
 const act_freefall_land_stop = (m) => {
@@ -333,6 +355,7 @@ export const mario_execute_stationary_action = (m) => {
         case Mario.ACT_IDLE: return act_idle(m)
         case Mario.ACT_BRAKING_STOP: return act_braking_stop(m)
         case Mario.ACT_JUMP_LAND_STOP: return act_jump_land_stop(m)
+        case Mario.ACT_STANDING_AGAINST_WALL: return act_standing_against_wall(m)
         case Mario.ACT_FREEFALL_LAND_STOP: return act_freefall_land_stop(m)
         case Mario.ACT_SIDE_FLIP_LAND_STOP: return act_side_flip_land_stop(m)
         case Mario.ACT_DOUBLE_JUMP_LAND_STOP: return act_double_jump_land_stop(m)

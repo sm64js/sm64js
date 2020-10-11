@@ -241,6 +241,19 @@ const perform_ground_quarter_step = (m, nextPos) => {
     m.floor = floorWrapper.floor
     m.floorHeight = floorHeight
 
+    if (upperWall != null) {
+        let wallDYaw = atan2s(upperWall.normal.z, upperWall.normal.x) - m.faceAngle[1];
+
+        if (wallDYaw >= 0x2AAA && wallDYaw <= 0x5555) {
+            return Mario.GROUND_STEP_NONE;
+        }
+        if (wallDYaw <= -0x2AAA && wallDYaw >= -0x5555) {
+            return Mario.GROUND_STEP_NONE;
+        }
+
+        return Mario.GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS;
+    }
+
     return Mario.GROUND_STEP_NONE
 
 }

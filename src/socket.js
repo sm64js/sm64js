@@ -56,8 +56,6 @@ const recvChat = (chatmsg) => {
 
 channel.onConnect((err) => {
 
-    console.log("onConnect")
-
     if (err) { console.log(err); return }
 
     channel.readyState = 1
@@ -88,13 +86,13 @@ channel.onConnect((err) => {
 })
 
 const multiplayerReady = () => {
-    return channel.readyState == 1 && gameData.marioState && networkData.myChannelID != -1
+    return channel && channel.readyState == 1 && gameData.marioState && networkData.myChannelID != -1
 }
 
 const updateConnectedMsg = () => {
     const elem = document.getElementById("connectedMsg")
     const numPlayers = networkData.numOnline ? networkData.numOnline : "?"
-    if (channel.readyState == 1) {
+    if (channel && channel.readyState == 1) {
         elem.innerHTML = "Connected To Server  -  " + (numPlayers).toString() + " Players Online" 
         elem.style.color = "lawngreen"
     } else {

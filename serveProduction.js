@@ -195,8 +195,6 @@ const measureAndPrintLatency = (msgBytes) => {
 
 geckos.onConnection(channel => {
 
-    console.log("channel connected")
-
     channel.my_id = generateID()
     allChannels[channel.my_id] = { valid: 0, channel }
     channel.emit('id', { id: channel.my_id }, { reliable: true })

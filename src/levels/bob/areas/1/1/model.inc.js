@@ -548,12 +548,10 @@ export const bob_seg7_dl_070042B8 = [
 
 export const bob_seg7_dl_07004390 = [
 	Gbi.gsDPSetCycleType(Gbi.G_CYC_2CYCLE),
-	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF_SURF2),
-/*	Gbi.gsDPSetRenderMode(Gbi.G_RM_FOG_SHADE_A, Gbi.G_RM_AA_ZB_OPA_SURF2),
-	Gbi.gsDPSetDepthSource(Gbi.G_ZS_PIXEL),*/  ///TODO
-/*	Gbi.gsDPSetFogColor(160, 160, 160, 255),
-	Gbi.gsSPFogPosition(980, 1000),*/ ///TODO
-	//Gbi.gsSPSetGeometryMode(Gbi.G_FOG), TODO
+	Gbi.gsDPSetRenderMode(Gbi.G_RM_FOG_SHADE_A_AA_ZB_OPA_SURF2),
+	Gbi.gsDPSetFogColor(160, 160, 160, 255),
+	Gbi.gsSPFogPosition(980, 1000),
+	Gbi.gsSPSetGeometryMode(Gbi.G_FOG),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGB),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
@@ -569,8 +567,7 @@ export const bob_seg7_dl_07004390 = [
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
 	Gbi.gsDPSetCycleType(Gbi.G_CYC_1CYCLE),
 	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF_SURF2),
-	//Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF, Gbi.G_RM_NOOP2), TODO
-	//Gbi.gsSPClearGeometryMode(Gbi.G_FOG), TODO
+	Gbi.gsSPClearGeometryMode(Gbi.G_FOG),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
 	Gbi.gsSPEndDisplayList(),
 ]

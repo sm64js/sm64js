@@ -310,6 +310,9 @@ export const G_RM_AA_ZB_XLU_SURF_SURF2 = 0x5049d8
 export const G_RM_AA_ZB_OPA_SURF_SURF2 = 0x552078
 export const G_RM_AA_ZB_OPA_DECAL_DECAL2 = 0x552d58
 export const G_RM_AA_ZB_XLU_INTER_INTER2 = 0x5045d8
+export const G_RM_FOG_SHADE_A_AA_ZB_OPA_SURF2 = 0xc8112078
+export const G_RM_FOG_SHADE_A_AA_ZB_TEX_EDGE2 = 0xc8113078
+
 
 //G_MOVEWORD types
 export const G_MW_MATRIX = 0x00 /* NOTE: also used by movemem */
@@ -420,6 +423,45 @@ export const gSPNumLights = (displaylist, num) => {
         words: {
             w0: G_MOVEWORD,
             w1: { type: G_MW_NUMLIGHT, data: num + 1 } //includes 1 ambient light
+        }
+    })
+}
+
+export const gSPFogFactor = (displaylist, f_mul, f_offset) => {
+    displaylist.push({
+        words: {
+            w0: G_MOVEWORD,
+            w1: {
+                type: G_MW_FOG,
+                data: {
+                    mul: f_mul,
+                    offset: f_offset
+                }
+            }
+        }
+    })
+}
+
+export const gSPFogPosition = (displaylist, min, max) => {
+    displaylist.push({
+        words: {
+            w0: G_MOVEWORD,
+            w1: {
+                type: G_MW_FOG,
+                data: {
+                    mul: (128000 / ((max) - (min))),
+                    offset: ((500 - (min)) * 256 / ((max) - (min)))
+                }
+            }
+        }
+    })
+}
+
+export const gDPSetFogColor = (displaylist, r, g, b, a) => {
+    displaylist.push({
+        words: {
+            w0: G_SETFOGCOLOR,
+            w1: { r, g, b, a }
         }
     })
 }
@@ -698,6 +740,36 @@ export const gsSPLight = (lightData, index) => {
     }
 }
 
+export const gsSPFogFactor = (f_mul, f_offset) => {
+    return {
+        words: {
+            w0: G_MOVEWORD,
+            w1: {
+                type: G_MW_FOG,
+                data: {
+                    mul: f_mul,
+                    offset: f_offset
+                }
+            }
+        }
+    }
+}
+
+export const gsSPFogPosition = (min, max) => {
+    return {
+        words: {
+            w0: G_MOVEWORD,
+            w1: {
+                type: G_MW_FOG,
+                data: {
+                    mul: (128000 / ((max) - (min))),
+                    offset: ((500 - (min)) * 256 / ((max) - (min)))
+                }
+            }
+        }
+    }
+}
+
 export const gsSPClearGeometryMode = (mode) => {
     return {
         words: {
@@ -730,6 +802,15 @@ export const gsSPMatrix = (matrix, parameters) => {
         words: {
             w0: G_MTX,
             w1: { matrix, parameters }
+        }
+    }
+}
+
+export const gsDPSetFogColor = (r, g, b, a) => {
+    return {
+        words: {
+            w0: G_SETFOGCOLOR,
+            w1: { r, g, b, a }
         }
     }
 }

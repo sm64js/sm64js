@@ -75,7 +75,7 @@ export class n64GfxProcessor {
             loaded_texture: [{ textureData: null, size_bytes: 0 }, { textureData: null, size_bytes: 0 }],
             texture_tile: { fmt: 0, siz: 0, cms: 0, cmt: 0, uls: 0, ult: 0, lrs: 0, lrt: 0, line_size_bytes: 0 },
             textures_changed: [false, false],
-            other_mode_l: 0,  /// TODO other_mode_l
+            other_mode_l: 0, 
             other_mode_h: {
                 12: 0, //Gbi.G_MDSFT_TEXTFILT
                 20: 0 //GBI.G_MDSFT_CYCLETYPE
@@ -543,7 +543,7 @@ export class n64GfxProcessor {
         let cc_id = this.rdp.combine_mode
 
         let use_alpha = (this.rdp.other_mode_l & (Gbi.G_BL_A_MEM << 18)) == 0
-        const use_fog = (this.rdp.other_mode_l >> 30) == Gbi.G_BL_CLR_FOG
+        const use_fog = (this.rdp.other_mode_l >>> 30) == Gbi.G_BL_CLR_FOG
         const texture_edge = (this.rdp.other_mode_l & Gbi.CVG_X_ALPHA) == Gbi.CVG_X_ALPHA
 
         if (texture_edge) use_alpha = true
@@ -620,7 +620,10 @@ export class n64GfxProcessor {
             }
 
             if (use_fog) {
-                throw "more fog implementation needed here"
+                this.buf_vbo.push(this.rdp.fog_color.r / 255.0)
+                this.buf_vbo.push(this.rdp.fog_color.g / 255.0)
+                this.buf_vbo.push(this.rdp.fog_color.b / 255.0)
+                this.buf_vbo.push(v_arr[i].color.a / 255.0)
             }
 
             for (let j = 0; j < num_inputs; j++) {
@@ -792,12 +795,25 @@ export class n64GfxProcessor {
         Object.assign(this.rdp.texture_to_load, { size, textureData: imageData })
     }
 
+    dp_set_fog_color(r, g, b, a) {
+        this.rdp.fog_color = { r, g, b, a }
+    }
+
     sp_moveword(type, data) {
 
         if (type == Gbi.G_MW_NUMLIGHT) {
             this.rsp.current_num_lights = data
             this.rsp.lights_changed = true
-        } else throw " moveword fog not implemented "
+            return
+        }
+
+        if (type == Gbi.G_MW_FOG) {
+            this.rsp.fog_mul = data.mul
+            this.rsp.fog_offset = data.offset
+            return
+        } 
+
+        throw " moveword type not implemented "
 
     }
 
@@ -936,7 +952,15 @@ export class n64GfxProcessor {
             Object.assign(d, { x, y, z, w })
 
             if (this.rsp.geometry_mode & Gbi.G_FOG) {
-                throw "more implementation needed here"
+                if (w == 0) w == 0.001 // To avoid division by zero
+
+                let winv = 1.0 / w
+                if (winv < 0.0) winv = 32767.0
+
+                let fog_z = z * winv * this.rsp.fog_mul + this.rsp.fog_offset
+                if (fog_z < 0) fog_z = 0
+                if (fog_z > 255) fog_z = 255
+                d.color.a = fog_z
             } else {
                 d.color.a = v.color[3]
             }
@@ -976,6 +1000,9 @@ export class n64GfxProcessor {
                     break
                 case Gbi.G_CLEARGEOMETRYMODE:
                     this.sp_geometry_mode(args.mode, 0)
+                    break
+                case Gbi.G_SETFOGCOLOR:
+                    this.dp_set_fog_color(args.r, args.g, args.g, args.a)
                     break
                 case Gbi.G_SETOTHERMODE_H:
                     this.sp_set_other_mode_h(args.category, args.newmode)

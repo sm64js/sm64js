@@ -3,6 +3,12 @@ import * as Mario from "./game/Mario"
 import { take_damage_and_knock_back, INTERACT_PLAYER } from "./game/Interaction"
 import { oDamageOrCoinValue, oInteractType, oPosX, oPosZ, oPosY } from "./include/object_constants"
 
+function sanitizeChat(string) {
+    string = string.replace(/</g, "");
+    string = string.replace(/>/g, "");
+    return string
+}
+
 const myArrayBuffer = () => {
     return new Promise((resolve) => {
         let fr = new FileReader()
@@ -78,7 +84,7 @@ const recvChat = (chatmsg) => {
         serverData.extraPlayersByID[chatmsg.socketID] = {}
     Object.assign(serverData.extraPlayersByID[chatmsg.socketID], { chatData: { msg: chatmsg.msg, timer: 80 } })
     const chatlog = document.getElementById("chatlog")
-    chatlog.innerHTML += '<strong>' + chatmsg.sender + '</strong>: ' + chatmsg.msg + '<br/>'
+    chatlog.innerHTML += '<strong>' + sanitizeChat(chatmsg.sender) + '</strong>: ' + sanitizeChat(chatmsg.msg) + '<br/>'
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 }
 

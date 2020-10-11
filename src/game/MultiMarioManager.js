@@ -44,7 +44,7 @@ export const copyMarioUpdateToState = (remotePlayer) => {
 
     m.action = update.action
     m.prevAction = update.prevaction
-    m.actionArg = update.actionarg
+    m.actionArg = update.actionarg > 32767 ? update.actionarg - 65536 : update.actionarg
     m.invincTimer = update.invinctimer
     m.framesSinceA = update.framessincea
     m.framesSinceB = update.framessinceb
@@ -82,7 +82,7 @@ export const createMarioProtoMsg = () => {
     mariomsg.setPrevaction(m.prevAction)
     mariomsg.setActionstate(m.actionState)
     mariomsg.setActiontimer(m.actionTimer)
-    mariomsg.setActionarg(m.actionArg)
+    mariomsg.setActionarg(m.actionArg < 0 ? 65536 - m.actionArg : m.actionArg)
     mariomsg.setInvinctimer(m.invincTimer)
     mariomsg.setFramessincea(m.framesSinceA)
     mariomsg.setFramessinceb(m.framesSinceB)

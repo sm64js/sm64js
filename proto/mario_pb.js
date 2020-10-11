@@ -1,4 +1,4 @@
-// source: sm64js/proto/mario.proto
+// source: proto/mario.proto
 /**
  * @fileoverview
  * @enhanceable

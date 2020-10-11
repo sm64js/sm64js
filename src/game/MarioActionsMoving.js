@@ -845,7 +845,7 @@ const push_or_sidle_wall = (m, startPos) => {
         }
 
         m.actionState = 1;
-        m.actionArg = int16(wallAngle + 0x8000);
+        m.actionArg = int16(wallAngle + 0x8000)
         m.marioObj.header.gfx.angle[1] = int16(wallAngle + 0x8000);
         m.marioObj.header.gfx.angle[2] = Mario.find_floor_slope(m, 0x4000);
     }

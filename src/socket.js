@@ -2,7 +2,10 @@ import geckos from '@geckos.io/client'
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
 
-const channel = geckos({ port: 443 })
+const url = new URL(window.location.href)
+const port = url.protocol == "https:" ? 443 : 9208
+
+const channel = geckos({ port })
 
 const sanitizeChat = (string, isMessage) => {
     string = string.replace(/</g, "");
@@ -112,7 +115,7 @@ export const post_main_loop_one_iteration = (frame) => {
     if (frame % 30 == 0) updateConnectedMsg()
 
     if (frame % 150 == 0) { //every 5 seconds
-        if (Cosmetics.validSkins()) {
+        if (multiplayerReady() && Cosmetics.validSkins()) {
             channel.emit('skin', window.myMario.skinData)
         }
     }

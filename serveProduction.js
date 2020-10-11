@@ -7,7 +7,7 @@ const port = 9208
 const geckos = require('@geckos.io/server').default({
     portRange: {
         min: 10000,
-        max: 10200
+        max: 12000
     }
 })
 

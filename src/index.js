@@ -154,6 +154,7 @@ document.getElementById("startbutton").addEventListener('click', () => {
 const startGame = () => {
     console.log("Starting Game!")
     gameStarted = true
+    window.cheats = {}
 
     document.getElementById("startbutton").classList.remove('btn-success')
     document.getElementById("startbutton").classList.add('btn-light')

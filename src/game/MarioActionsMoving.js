@@ -9,38 +9,41 @@ import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceC
 import { int16 }  from '../utils';
 
 const apply_slope_accel = (m) => {
-    let slopeAccel;
-    let floorDYaw = int16(m.floorAngle - m.faceAngle[1]);
 
-    const floor = m.floor;
-    const steepness = Math.sqrt(floor.normal.x * floor.normal.x + floor.normal.z * floor.normal.z);
+    if (!window.cheats.disableSlopePhysics) {
+        let slopeAccel
+        let floorDYaw = int16(m.floorAngle - m.faceAngle[1])
 
-    if (Mario.mario_floor_is_slope(m)) {
-        let slopeClass = 0;
+        const floor = m.floor
+        const steepness = Math.sqrt(floor.normal.x * floor.normal.x + floor.normal.z * floor.normal.z)
 
-        if (m.action != Mario.ACT_SOFT_BACKWARD_GROUND_KB && m.action != Mario.ACT_SOFT_FORWARD_GROUND_KB) {
-            slopeClass = Mario.mario_get_floor_class(m);
-        }
+        if (Mario.mario_floor_is_slope(m)) {
+            let slopeClass = 0
 
-        switch (slopeClass) {
-            case SurfaceTerrains.SURFACE_CLASS_VERY_SLIPPERY:
-                slopeAccel = 5.3;
-                break;
-            case SurfaceTerrains.SURFACE_CLASS_SLIPPERY:
-                slopeAccel = 2.7;
-                break;
-            default:
-                slopeAccel = 1.7;
-                break;
-            case SurfaceTerrains.SURFACE_CLASS_NOT_SLIPPERY:
-                slopeAccel = 0.0;
-                break;
-        }
+            if (m.action != Mario.ACT_SOFT_BACKWARD_GROUND_KB && m.action != Mario.ACT_SOFT_FORWARD_GROUND_KB) {
+                slopeClass = Mario.mario_get_floor_class(m)
+            }
 
-        if (floorDYaw > -0x4000 && floorDYaw < 0x4000) {
-            m.forwardVel += slopeAccel * steepness;
-        } else {
-            m.forwardVel -= slopeAccel * steepness;
+            switch (slopeClass) {
+                case SurfaceTerrains.SURFACE_CLASS_VERY_SLIPPERY:
+                    slopeAccel = 5.3
+                    break
+                case SurfaceTerrains.SURFACE_CLASS_SLIPPERY:
+                    slopeAccel = 2.7
+                    break
+                default:
+                    slopeAccel = 1.7
+                    break
+                case SurfaceTerrains.SURFACE_CLASS_NOT_SLIPPERY:
+                    slopeAccel = 0.0
+                    break
+            }
+
+            if (floorDYaw > -0x4000 && floorDYaw < 0x4000) {
+                m.forwardVel += slopeAccel * steepness
+            } else {
+                m.forwardVel -= slopeAccel * steepness
+            }
         }
     }
 
@@ -925,6 +928,9 @@ const act_dive_slide = (m) => {
 }
 
 const should_begin_sliding = (m) => {
+
+    if (window.cheats.disableSlopePhysics) return
+
     if (m.input & Mario.INPUT_ABOVE_SLIDE) {
         const slideLevel = (m.area.terrainType & TERRAIN_MASK) == TERRAIN_SLIDE
         const movingBackward = m.forwardVel <= -1.0

@@ -6,6 +6,7 @@ import { bob_seg7_dl_0700DD18 } from "./5/model.inc"
 import { bob_seg7_dl_07009D80 } from "./2/model.inc"
 import { bob_seg7_dl_0700A920 } from "./4/model.inc"
 import { bob_seg7_dl_0700A470 } from "./3/model.inc"
+import { bob_seg7_dl_0700E338 } from "./6/model.inc"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -36,6 +37,7 @@ export const bob_geo_000488 = [
                     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_TRANSPARENT_DECAL, bob_seg7_dl_0700A470] },
                     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_ALPHA, bob_seg7_dl_0700A920] },
                     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, bob_seg7_dl_0700DD18] },
+                    { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, bob_seg7_dl_0700E338] },
                     { command: GeoLayout.node_render_object_parent },
                 { command: GeoLayout.close_node },
             { command: GeoLayout.close_node },

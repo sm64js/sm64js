@@ -47,8 +47,6 @@ window.updatePlayerName = (name) => {
     if (name.length < 3) {
         document.getElementById("playerNameInput").style.borderColor = "red"
         document.getElementById("playerNameInput").style.borderWidth = "3px"
-    } else if (name = "") {
-    name = "Unnamed Player"
     } else {
         document.getElementById("playerNameInput").style.borderColor = "blue"
         document.getElementById("playerNameInput").style.borderWidth = "1px"

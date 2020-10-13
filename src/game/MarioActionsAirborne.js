@@ -244,6 +244,7 @@ const act_freefall = (m) => {
 
     switch (m.actionArg) {
         case 0: animation = Mario.MARIO_ANIM_GENERAL_FALL; break
+        case 1: animation = Mario.MARIO_ANIM_FALL_FROM_SLIDE; break
         case 2: animation = Mario.MARIO_ANIM_FALL_FROM_SLIDE_KICK; break
         default: throw "act freefall unknown action arg"
     }

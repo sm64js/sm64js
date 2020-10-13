@@ -38,9 +38,13 @@ export const SURFACE_INSTANT_MOVING_QUICKSAND = 0x002D // Quicksand (lethal, flo
 export const SURFACE_CAMERA_ROTATE_LEFT           = 0x0070
 export const SURFACE_CAMERA_BOUNDARY              = 0x0072 // Intangible Area, only used to restrict camera movement
 
+export const SURFACE_HARD                          = 0x0030
+
 export const SURFACE_HARD_SLIPPERY                 = 0x0035 // Hard and slippery (Always has fall damage)
 export const SURFACE_HARD_VERY_SLIPPERY            = 0x0036 // Hard and very slippery (Always has fall damage)
-export const SURFACE_HARD_NOT_SLIPPERY             = 0x0037 // Hard and Non-slippery (Always has fall damage)
+export const SURFACE_HARD_NOT_SLIPPERY = 0x0037 // Hard and Non-slippery (Always has fall damage)
+export const SURFACE_VERTICAL_WIND                 = 0x0038
+
 export const SURFACE_NOISE_VERY_SLIPPERY_73        = 0x0073 // Very slippery floor with noise, unused
 export const SURFACE_NOISE_VERY_SLIPPERY_74        = 0x0074 // Very slippery floor with noise, unused
 export const SURFACE_NOISE_VERY_SLIPPERY = 0x0075 // Very slippery floor with noise, used in CCM
@@ -74,10 +78,10 @@ export const TERRAIN_MASK = 0x0007
 export const special_bubble_tree = 121
 export const special_level_geo_03 = 101
 
-export const COL_INIT = () => { return TERRAIN_LOAD_VERTICES }
-export const COL_END = () => { return TERRAIN_LOAD_END }
-export const COL_TRI_STOP = () => { return TERRAIN_LOAD_CONTINUE }
-export const COL_VERTEX_INIT = (vtxNum) => { return vtxNum }
+export const COL_INIT = () => { return [TERRAIN_LOAD_VERTICES] }
+export const COL_END = () => { return [TERRAIN_LOAD_END] }
+export const COL_TRI_STOP = () => { return [TERRAIN_LOAD_CONTINUE] }
+export const COL_VERTEX_INIT = (vtxNum) => { return [vtxNum] }
 export const COL_VERTEX = (x, y, z) => { return [x, y, z] }
 export const COL_TRI_INIT = (surfType, triNum) => { return [surfType, triNum] }
 export const COL_TRI = (v1, v2, v3) => { return [v1, v2, v3] }

@@ -85,10 +85,31 @@ import {
     bob_seg7_texture_07002000
 } from "./levels/bob/textures.inc"
 
+import {
+    snow_09000000,
+    snow_09000800,
+    snow_09001000,
+    snow_09002000,
+    snow_09002800,
+    snow_09003000,
+    snow_09003800,
+    snow_09004000,
+    snow_09004800,
+    snow_09005000,
+    snow_09005800,
+    snow_09006000,
+    snow_09006800,
+    snow_09007000,
+    snow_09008000,
+    snow_09008800,
+    snow_09009000,
+    snow_09009800
+} from "./textures/snow"
+
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 6
+const textureVersion = 7
 
 const loadDataIntoGame = (data) => {
 
@@ -167,6 +188,25 @@ const loadDataIntoGame = (data) => {
     bob_seg7_texture_07001000.push(...data["levels/bob/2.rgba16.png"].data)
     bob_seg7_texture_07001800.push(...data["levels/bob/3.rgba16.png"].data)
     bob_seg7_texture_07002000.push(...data["levels/bob/4.rgba16.png"].data)
+
+    snow_09000000.push(...data["textures/snow/ccm_textures.00000.rgba16.png"].data)
+    snow_09000800.push(...data["textures/snow/ccm_textures.00800.rgba16.png"].data)
+    snow_09001000.push(...data["textures/snow/ccm_textures.01000.rgba16.png"].data)
+    snow_09002000.push(...data["textures/snow/ccm_textures.02000.rgba16.png"].data)
+    snow_09002800.push(...data["textures/snow/ccm_textures.02800.rgba16.png"].data)
+    snow_09003000.push(...data["textures/snow/ccm_textures.03000.rgba16.png"].data)
+    snow_09003800.push(...data["textures/snow/ccm_textures.03800.rgba16.png"].data)
+    snow_09004000.push(...data["textures/snow/ccm_textures.04000.rgba16.png"].data)
+    snow_09004800.push(...data["textures/snow/ccm_textures.04800.rgba16.png"].data)
+    snow_09005000.push(...data["textures/snow/ccm_textures.05000.rgba16.png"].data)
+    snow_09005800.push(...data["textures/snow/ccm_textures.05800.rgba16.png"].data)
+    snow_09006000.push(...data["textures/snow/ccm_textures.06000.rgba16.png"].data)
+    snow_09006800.push(...data["textures/snow/ccm_textures.06800.rgba16.png"].data)
+    snow_09007000.push(...data["textures/snow/ccm_textures.07000.rgba16.png"].data)
+    snow_09008000.push(...data["textures/snow/ccm_textures.08000.rgba16.png"].data)
+    snow_09008800.push(...data["textures/snow/ccm_textures.08800.rgba16.png"].data)
+    snow_09009000.push(...data["textures/snow/ccm_textures.09000.ia16.png"].data)
+    snow_09009800.push(...data["textures/snow/ccm_textures.09800.ia16.png"].data)
 
     mario_texture_yellow_button.push(...data['actors/mario/mario_overalls_button.rgba16.png'].data)
     mario_texture_m_logo.push(...data['actors/mario/mario_logo.rgba16.png'].data)

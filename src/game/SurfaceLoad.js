@@ -63,7 +63,7 @@ class SurfaceLoad {
 
         // Checking to make sure no DIV/0
         if (mag < 0.0001) {
-            throw "divide by 0 - read_surface_data"
+            return null
         }
         mag = 1.0 / mag
         nx *= mag

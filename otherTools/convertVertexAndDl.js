@@ -1,5 +1,5 @@
 const fs = require('fs')
-const input = require('os').homedir() + '/Programming/sm64pc/levels/bob/areas/1/6/model.inc.c'
+const input = require('os').homedir() + '/Programming/sm64pc/levels/ccm/areas/1/1/model.inc.c'
 let inputStr = fs.readFileSync(input, 'utf8')
 inputStr = inputStr.replace(/\r/g, "")
 

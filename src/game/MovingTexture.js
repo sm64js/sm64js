@@ -117,6 +117,8 @@ const get_quad_collection_from_id = (id) => {
     switch (id) {
         case CASTLE_GROUNDS_MOVTEX_WATER:
             return castle_grounds_movtex_water
+        case CCM_MOVTEX_PENGUIN_PUDDLE_WATER:
+            return castle_grounds_movtex_water //// TODO
         default: throw "unknown case - get quad collection from id"
     }
 }

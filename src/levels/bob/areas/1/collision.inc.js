@@ -25,8 +25,8 @@ import {
 } from "../../../../include/surface_terrains"
 
 export const bob_seg7_collision_level = [
-    COL_INIT(),
-    COL_VERTEX_INIT(0x23A),
+    ...COL_INIT(),
+    ...COL_VERTEX_INIT(0x23A),
     ...COL_VERTEX(-3538, 944, -4176),
     ...COL_VERTEX(-3460, 944, -4212),
     ...COL_VERTEX(-3477, 941, -4251),
@@ -1668,7 +1668,7 @@ export const bob_seg7_collision_level = [
     ...COL_TRI(54, 260, 259),
     ...COL_TRI(54, 261, 260),
     ...COL_TRI(260, 124, 259),
-    COL_TRI_STOP(),
+    ...COL_TRI_STOP(),
     ...COL_SPECIAL_INIT(17),
     ...SPECIAL_OBJECT(/*preset*/ special_bubble_tree, /*pos*/ -5792, 1024, -4654),
     ...SPECIAL_OBJECT(/*preset*/ special_bubble_tree, /*pos*/ -1509, 144, 5094),
@@ -1687,5 +1687,5 @@ export const bob_seg7_collision_level = [
     ...SPECIAL_OBJECT(/*preset*/ special_bubble_tree, /*pos*/  6799, 2008, -5587),
     ...SPECIAL_OBJECT(/*preset*/ special_bubble_tree, /*pos*/  2911, 768, 5917),
     ...SPECIAL_OBJECT(/*preset*/ special_bubble_tree, /*pos*/  4208, 927, 3772),
-    COL_END(),
+    ...COL_END(),
 ]

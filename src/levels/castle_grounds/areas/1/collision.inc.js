@@ -29,8 +29,8 @@ import {
 } from "../../../../include/surface_terrains"
 
 export const castle_grounds_seg7_collision_level = [
-    COL_INIT(),
-    COL_VERTEX_INIT(0x1EA),
+    ...COL_INIT(),
+    ...COL_VERTEX_INIT(0x1EA),
     ...COL_VERTEX(- 4671, -511, -2545),
     ...COL_VERTEX(-4686, -511, -3151),
     ...COL_VERTEX(-4700, 543, -3663),
@@ -1410,7 +1410,7 @@ export const castle_grounds_seg7_collision_level = [
     ...COL_TRI(473, 472, 489),
     ...COL_TRI(469, 473, 489),
     ...COL_TRI(472, 473, 469),
-    COL_TRI_STOP(),
+    ...COL_TRI_STOP(),
     ...COL_SPECIAL_INIT(27),
     ...SPECIAL_OBJECT_WITH_YAW(special_level_geo_03, 0, 2867, -3924, /*yaw*/ 0 ),
     ...SPECIAL_OBJECT(special_bubble_tree, -1333, 711, 1881),
@@ -1445,5 +1445,5 @@ export const castle_grounds_seg7_collision_level = [
     ...COL_WATER_BOX_INIT(2),
     ...COL_WATER_BOX(0, -7129, -7222, 8253, -58, -81),
     ...COL_WATER_BOX(1, 1024, -58, 8230, 8137, -81),
-    COL_END(),
+    ...COL_END(),
 ]

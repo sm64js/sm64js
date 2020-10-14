@@ -43,6 +43,36 @@ window.updateSkinID = (skinID) => {
     window.myMario.skinData.shirt = hatShirtPresets[skinID]
 }
 
+$('[data-toggle="skinCustomizerToggle"]').popover({
+    container: "body",
+    content: function () {
+        return $('#skinCustomizerWindow').clone()
+    },
+})
+
+$('[data-toggle="skinCustomizerToggle"]').on('shown.bs.popover', () => {
+    /// set default values
+})
+
+const hexRGB = (a) => {
+    console.log(a)
+    e = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(a)
+    console.log(e)
+    return e ? { r: parseInt(e[1], 16), g: parseInt(e[2], 16), b: parseInt(e[3], 16) } : null
+}
+
+window.customSkinUpdate = () => {
+    skinType = document.getElementById("skinTypes").value
+    window.myMario.skinData[skinType] = [
+        hexRGB(document.getElementById("value1").value).r,
+        hexRGB(document.getElementById("value1").value).g,
+        hexRGB(document.getElementById("value1").value).b,
+        hexRGB(document.getElementById("value2").value).r,
+        hexRGB(document.getElementById("value2").value).g,
+        hexRGB(document.getElementById("value2").value).b
+    ]
+}
+
 window.updatePlayerName = (name) => {
     if (name.length < 3) {
         document.getElementById("playerNameInput").style.borderColor = "red"

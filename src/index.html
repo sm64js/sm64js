@@ -75,6 +75,21 @@
                         Customize Gamepad Controls
                     </button>
                 </div>
+
+                <div class="col-3">
+                    <button type="button"
+                            class="btn btn-sm btn-primary"
+                            data-html="true"
+                            data-container="body"
+                            data-toggle="skinCustomizerToggle"
+                            data-placement="bottom">
+                        Manually Customize Character/Skin
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="row" style="justify-content:center; padding-top:3px">
                 <div class="col-3">
                     <button type="button"
                             class="btn btn-sm btn-primary"
@@ -89,7 +104,6 @@
                         Full Window Mode
                     </button>
                 </div>
-
             </div>
 
             <div class="row" style="justify-content:center; margin-top: 10px;">
@@ -234,6 +248,24 @@
 
 
     <div hidden>
+
+        <div class="container" id="skinCustomizerWindow">
+            <select id="skinTypes">
+                <option value="overalls">Overalls</option>
+                <option value="hat">Hat</option>
+                <option value="shirt">Shirt</option>
+                <option value="gloves">Gloves</option>
+                <option value="boots">Boots</option>
+                <option value="skin">Skin</option>
+                <option value="hair">Hair</option>
+            </select>
+            <br />
+
+            <br />
+            Colours - <input onchange="window.customSkinUpdate()" type="color" id="value1"><br />
+            Diffuse - <input onchange="window.customSkinUpdate()" type="color" id="value2">
+        </div>
+
         <div class="container" id="keyboardControlsWindow">
             <div class="row">
                 <form class="form-inline">

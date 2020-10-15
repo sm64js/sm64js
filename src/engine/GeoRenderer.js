@@ -5,8 +5,15 @@ import * as Gbi from "../include/gbi"
 import { CameraInstance as Camera } from "../game/Camera"
 import * as Mario from "../game/Mario"
 import { create_shadow_below_xyz } from "../game/Shadow"
+import { gSPViewport } from "../include/gbi"
 
 const canvas = document.querySelector('#gameCanvas')
+
+export function interpolate_vectors(res, a, b) {
+    res[0] = (a[0] + b[0]) / 2.0;
+    res[1] = (a[1] + b[1]) / 2.0;
+    res[2] = (a[2] + b[2]) / 2.0;
+}
 
 const renderModeTable = [
     [
@@ -36,6 +43,10 @@ class GeoRenderer {
     constructor() {
 
         this.gMatStack = new Array(32).fill(0).map(() => new Array(4).fill(0).map(() => new Array(4).fill(0)))
+        this.gMatStackInterpolated = new Array(32).fill(0).map(() => new Array(4).fill(0).map(() => new Array(4).fill(0)))
+        this.gMatStackInterpolatedFixed = new Array(32).fill(0).map(() => new Array(4).fill(0).map(() => new Array(4).fill(0)))
+        this.gMtxTbl = new Array(6400).fill(0).map(() => ({pos: [], mtx: [], displayList: []}))
+        this.gMtxTblSize = 0;
         this.gMatStackIndex = 0
         this.gAreaUpdateCounter = 0
 
@@ -53,6 +64,33 @@ class GeoRenderer {
         this.ANIM_TYPE_ROTATION              = 5
     }
 
+    mtx_patch_interpolated() {
+        
+            if (this.sPerspectiveMtx != null) {
+                Gbi.gSPMatrix2(Game.gDisplayList, this.sPerspectivePos, this.sPerspectiveMtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH);
+                // Gbi.gSPMatrix(Game.gDisplayList, this.sPerspectiveMtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH);
+            }
+        
+            for (let i = 0; i < this.gMtxTblSize; i++) {
+                let pos = this.gMtxTbl[i].pos;
+                Gbi.gSPMatrix(pos, this.gMtxTbl[i].mtx,
+                          Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH);
+                Gbi.gSPDisplayList(pos, this.gMtxTbl[i].displayList);
+            }
+        
+            if (this.sViewportPos != null) {
+                // let saved = gDisplayListHead;
+                // gDisplayListHead = sViewportPos;
+                // make_viewport_clip_rect(&sPrevViewport);
+                Gbi.gSPViewport2(Game.gDisplayList, Game.gDisplayList.length - 1, sPrevViewport);
+                // gDisplayListHead = saved;
+            }
+        
+            this.gMtxTblSize = 0;
+            this.sPerspectivePos = null;
+            this.sViewportPos = null;
+    }
+
     geo_process_master_list_sub(node) {
         const enableZBuffer = (node.flags & GraphNode.GRAPH_RENDER_Z_BUFFER) != 0
         const modeList = enableZBuffer ? renderModeTable[1] : renderModeTable[0]
@@ -66,8 +104,15 @@ class GeoRenderer {
                 if (modeList[i] == null) throw "need to add render mode - i: " + i
                 Gbi.gDPSetRenderMode(Game.gDisplayList, modeList[i])
                 for (const displayNode of node.wrapper.listHeads[i]) {
+                    // if (this.gMtxTblSize < 6400) {
+                    //     this.gMtxTbl[this.gMtxTblSize].pos = [];
+                    //     this.gMtxTbl[this.gMtxTblSize].mtx = displayNode.transform;
+                    //     this.gMtxTbl[this.gMtxTblSize++].displayList = displayNode.displayList;
+                    // }
+                    // Gbi.gSPMatrix(Game.gDisplayList, displayNode.transformInterpolated, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+                    // Gbi.gSPDisplayList(Game.gDisplayList, displayNode.displayListInterpolated)
                     Gbi.gSPMatrix(Game.gDisplayList, displayNode.transform, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
-                    Gbi.gSPDisplayList(Game.gDisplayList, displayNode.displayList)
+                    Gbi.gSPDisplayList(Game.gDisplayList, displayNode.displayListInterpolated)
 
                 }
             }
@@ -118,13 +163,25 @@ class GeoRenderer {
         if (node.children[0]) {
             const aspect = canvas.width / canvas.height
             const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
+            const mtxInterpolated = new Array(4).fill(0).map(() => new Array(4).fill(0))
             const perspNorm = {}
 
             MathUtil.guPerspective(mtx, perspNorm,
                 node.wrapper.fov, aspect, node.wrapper.near, node.wrapper.far, 1.0)
-
-            //Gbi.gSPPerspNormalize(Game.gDisplayList, perspNorm.value)
-            Gbi.gSPMatrix(Game.gDisplayList, mtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+            if (window.gGlobalTimer == node.prevTimestamp + 1) {
+                const fovInterpolated = (node.wrapper.prevFov + node.wrapper.fov) / 2.0;
+                MathUtil.guPerspective(mtxInterpolated, perspNorm,
+                    fovInterpolated, aspect, node.wrapper.near, node.wrapper.far, 1.0)
+                this.sPerspectivePos = Game.gDisplayList[Game.gDisplayList.length-1]
+                this.sPerspectiveMtx = mtx;
+                Gbi.gSPMatrix(Game.gDisplayList, mtxInterpolated, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+            } else {
+                //Gbi.gSPPerspNormalize(Game.gDisplayList, perspNorm.value)
+                Gbi.gSPMatrix(Game.gDisplayList, mtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+            }
+            // Gbi.gSPMatrix(Game.gDisplayList, mtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+            node.wrapper.prevFov = node.wrapper.fov;
+            node.prevTimestamp = window.gGlobalTimer;
 
             this.gCurGraphNodeCamFrustum = node
             this.geo_process_node_and_siblings(node.children)
@@ -143,16 +200,49 @@ class GeoRenderer {
         const rollMtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const cameraTransform = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        const mtxInterpolated = new Array(4).fill(0).map(() => new Array(4).fill(0))
 
         MathUtil.mtxf_rotate_xy(rollMtx, node.wrapper.rollScreen)
 
         Gbi.gSPMatrix(Game.gDisplayList, rollMtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_MUL | Gbi.G_MTX_NOPUSH)
         MathUtil.mtxf_lookat(cameraTransform, node.wrapper.pos, node.wrapper.focus, node.wrapper.roll)
         MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], cameraTransform, this.gMatStack[this.gMatStackIndex])
+
+        let posInterpolated = [0,0,0]
+        let focusInterpolated = [0,0,0]
+
+        if (window.gGlobalTimer == node.prevTimestamp + 1) {
+            interpolate_vectors(posInterpolated, node.wrapper.prevPos, node.wrapper.pos);
+            interpolate_vectors(focusInterpolated, node.wrapper.prevFocus, node.wrapper.focus);
+            let magnitude = 0;
+            for (let i = 0; i < 3; i++) {
+                let diff = node.wrapper.pos[i] - node.wrapper.prevPos[i];
+                magnitude += diff * diff;
+            }
+            if (magnitude > 500000) {
+                // Observed ~479000 in BBH when toggling R camera
+                // Can get over 3 million in VCUTM though...
+                posInterpolated = [...node.wrapper.pos]
+                focusInterpolated = [...node.wrapper.focus]
+            }
+        } else {
+            posInterpolated = [...node.wrapper.pos]
+            focusInterpolated = [...node.wrapper.focus]
+        }
+        node.wrapper.prevPos = [...node.wrapper.pos]
+        node.wrapper.prevFocus = [...node.wrapper.focus]
+        node.prevTimestamp = window.gGlobalTimer;
+        MathUtil.mtxf_lookat(cameraTransform, posInterpolated, focusInterpolated, node.wrapper.roll);
+        MathUtil.mtxf_mul(this.gMatStackInterpolated[this.gMatStackIndex + 1], cameraTransform, this.gMatStackInterpolated[this.gMatStackIndex]);
+            
+
         this.gMatStackIndex++
+        // MathUtil.mtxf_to_mtx(mtxInterpolated, this.gMatStackInterpolated[this.gMatStackIndex]);
+        this.gMatStackInterpolatedFixed[this.gMatStackIndex] = mtxInterpolated;
         if (node.children[0]) {
             this.gCurGraphNodeCamera = node
             node.wrapper.matrixPtr = this.gMatStack[this.gMatStackIndex]
+            // node.matrixPtrInterpolated = this.gMatStackInterpolated[this.gMatStackIndex];
             this.geo_process_node_and_siblings(node.children)
             this.gCurGraphNodeCamera = null
         }
@@ -163,12 +253,37 @@ class GeoRenderer {
     geo_process_background(node) {
 
         let list = []
+        let listInterpolated = []
         if (node.wrapper.backgroundFunc) {
+            let posCopy = [0,0,0];
+            let focusCopy = [0,0,0];
+            let posInterpolated = [0,0,0];
+            let focusInterpolated = [0,0,0];
+
+            if (window.gGlobalTimer == node.prevCameraTimestamp + 1) {
+                interpolate_vectors(posInterpolated, node.prevCameraPos, Camera.gLakituState.pos);
+                interpolate_vectors(focusInterpolated, node.prevCameraFocus, Camera.gLakituState.focus);
+            } else {
+                posInterpolated = [...Camera.gLakituState.pos]
+                focusInterpolated = [...Camera.gLakituState.focus]
+            }
+            node.prevCameraPos = [...Camera.gLakituState.pos]
+            node.prevCameraFocus = [...Camera.gLakituState.focus]
+            node.prevCameraTimestamp = window.gGlobalTimer;
             list = node.wrapper.backgroundFunc(GraphNode.GEO_CONTEXT_RENDER, node.wrapper)
+            posCopy = [...Camera.gLakituState.pos]
+            focusCopy = [...Camera.gLakituState.focus]
+            Camera.gLakituState.pos = [...posInterpolated]
+            Camera.gLakituState.focus = [...focusInterpolated]
+            listInterpolated = node.wrapper.backgroundFunc(GraphNode.GEO_CONTEXT_RENDER, node.wrapper);
+            Camera.gLakituState.pos = [...posCopy]
+            Camera.gLakituState.focus = [...focusCopy]
+
         }
 
         if (list.length > 0) {
-            this.geo_append_display_list(list, node.flags >> 8)
+            // this.geo_append_display_list(list, node.flags >> 8)
+            this.geo_append_display_list2(list, listInterpolated, node.flags >> 8)
         } else if (this.gCurGraphNodeMasterList) {
             const gfx = []
             Gbi.gDPSetCycleType(gfx, Gbi.G_CYC_FILL)
@@ -440,12 +555,20 @@ class GeoRenderer {
 
     geo_append_display_list(displayList, layer) {
 
+        this.geo_append_display_list2(displayList, displayList, layer)
+
+    }
+
+    geo_append_display_list2(displayList, displayListInterpolated, layer) {
+
         const gMatStackCopy = new Array(4).fill(0).map(() => new Array(4).fill(0))
         MathUtil.mtxf_to_mtx(gMatStackCopy, this.gMatStack[this.gMatStackIndex])
 
         if (this.gCurGraphNodeMasterList) {
             const listNode = {
                 transform: gMatStackCopy,
+                transformInterpolated: this.gMatStackInterpolatedFixed[this.gMatStackIndex],
+                displayListInterpolated: displayListInterpolated,
                 displayList
             }
 

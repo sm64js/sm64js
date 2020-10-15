@@ -538,6 +538,14 @@ export const gSPMatrix = (displaylist, matrix, parameters) => {
         }
     })
 }
+export const gSPMatrix2 = (displaylist, index, matrix, parameters) => {
+    displaylist[index] = {
+        words: {
+            w0: G_MTX,
+            w1: { matrix, parameters }
+        }
+    }
+}
 
 export const gDPSetRenderMode = (displaylist, mode) => {
     displaylist.push({
@@ -591,6 +599,14 @@ export const gSPViewport = (displaylist, viewportData) => {
             w1: { type: G_MV_VIEWPORT, data: viewportData }
         }
     })
+}
+export const gSPViewport2 = (displaylist, i, viewportData) => {
+    displaylist[i] = {
+        words: {
+            w0: G_MOVEMEM,
+            w1: { type: G_MV_VIEWPORT, data: viewportData }
+        }
+    }
 }
 
 export const gDPSetPrimColor = (displaylist, m, l, r, g, b, a) => {

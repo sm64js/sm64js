@@ -3,6 +3,7 @@ import { checkForRom } from "./romTextureLoader.js"
 import { GameInstance as Game } from "./game/Game"
 import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
+import { GeoRendererInstance as GeoRenderer } from "./engine/GeoRenderer"
 
 const send_display_list = (gfx_list) => {
     start_render = performance.now()
@@ -13,6 +14,10 @@ let n_frames = 0
 let target_time = 0
 let frameSpeed = 0.03
 let start_render = 0
+
+const patch_interpolations = () => {
+    GeoRenderer.mtx_patch_interpolated();
+}
 
 const produce_one_frame = () => {
 
@@ -28,8 +33,14 @@ const produce_one_frame = () => {
     GFX.end_frame()
     /// Audio TODO
 
+    // webpage_update()
+    
+    GFX.start_frame()
+    patch_interpolations()
+    // Game.main_loop_one_iteration()
+    GFX.end_frame()
     const finished_frame = performance.now()
-    webpage_update()
+
     gameLogicFrameTimeBuffer.push(start_render - start_frame)
     renderFrameTimeBuffer.push(finished_frame - start_render)
     totalFrameTimeBuffer.push(finished_frame - start_frame)

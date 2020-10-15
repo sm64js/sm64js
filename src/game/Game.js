@@ -5,6 +5,7 @@ import * as Gbi from "../include/gbi"
 class Game {
     constructor() {
         this.main_loop_init() /// thread5_game_loop_init
+        window.gGlobalTimer = 0;
     }
 
     attachInterfaceToGfxProcessor(func) {
@@ -26,6 +27,7 @@ class Game {
 
         //play_music(SEQ_PLAYER_SFX, SEQUENCE_ARGS(0, SEQ_SOUND_PLAYER), 0);
         //set_sound_mode(save_file_get_sound_mode());
+        window.gGlobalTimer++;
 
     }
 
@@ -84,6 +86,7 @@ class Game {
             this.D_8032C6A0_vsyncFunc.call(this.D_8032C6A0_classObject)
             this.D_8032C6A0_vsyncFunc = null
         }
+        window.gGlobalTimer++;
     }
 }
 

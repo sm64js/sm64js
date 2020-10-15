@@ -71,6 +71,16 @@ const set_transition_color_fade_alpha = (fadeType, fadeTimer, transTime) => {
     }
 }
 
+// patch_screen_transition_interpolated(void) {
+// 	if (sScreenTransitionVerticesPos[0] != NULL) {
+// 		gSPVertex(sScreenTransitionVerticesPos[0], VIRTUAL_TO_PHYSICAL(sScreenTransitionVertices), 8, 0);
+// 		gSPVertex(sScreenTransitionVerticesPos[1], VIRTUAL_TO_PHYSICAL(sScreenTransitionVertices), 4, 0);
+// 		sScreenTransitionVerticesPos[0] = NULL;
+// 		sScreenTransitionVerticesPos[1] = NULL;
+// 		sScreenTransitionVertices = NULL;
+// 	}
+// }
+
 const render_fade_transition_into_color = (fadeTimer, transTime, transData) => {
 
 	const alpha = set_transition_color_fade_alpha(0, fadeTimer, transTime)

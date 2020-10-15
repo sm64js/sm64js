@@ -146,6 +146,10 @@ class Camera {
         this.sOldFocus = [0, 0, 0]
     }
 
+    skip_camera_interpolation() {
+        this.gLakituState.skipCameraInterpolationTimestamp = window.gGlobalTimer;
+    }
+
     select_mario_cam_mode() {
         this.sSelectionFlags = CAM_MODE_MARIO_SELECTED
     }

@@ -3,24 +3,35 @@ import { checkForRom } from "./romTextureLoader.js"
 import { GameInstance as Game } from "./game/Game"
 import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
+import { GeoRendererInstance as GeoRenderer } from "./engine/GeoRenderer"
 
 const send_display_list = (gfx_list) => { GFX.run(gfx_list) }
 
 let n_frames = 0
 let target_time = 0
-let frameSpeed = 0.03
+let frameSpeed = 0.06
+
+const patch_interpolations = () => { 
+    GeoRenderer.mtx_patch_interpolated()
+}
 
 const produce_one_frame = () => {
 
-    const start_frame = performance.now()
+    if (n_frames % 2 == 0) { // even frames
+        const start_frame = performance.now()
 
-    playerInputUpdate() /// Keyboard buttons / joystick process to game input commands
-    GFX.start_frame()
-    Game.main_loop_one_iteration()
-    /// Audio TODO
+        playerInputUpdate() /// Keyboard buttons / joystick process to game input commands
+        GFX.start_frame()
+        Game.main_loop_one_iteration()
+        /// Audio TODO
 
-    const finished_frame = performance.now()
-    totalFrameTimeBuffer.push(finished_frame - start_frame)
+        const finished_frame = performance.now()
+        totalFrameTimeBuffer.push(finished_frame - start_frame)
+    } else { // odd frames
+        GFX.start_frame()
+        patch_interpolations()
+        send_display_list(Game.gDisplayList)
+    }
 
     //if (n_frames > 100000) { throw "Hit max frames" }
     //console.log("new frame: " + n_frames)

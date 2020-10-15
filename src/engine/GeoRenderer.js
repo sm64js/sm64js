@@ -5,6 +5,7 @@ import * as Gbi from "../include/gbi"
 import { CameraInstance as Camera } from "../game/Camera"
 import * as Mario from "../game/Mario"
 import { create_shadow_below_xyz } from "../game/Shadow"
+import { int16 } from "../utils"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -36,6 +37,10 @@ class GeoRenderer {
     constructor() {
 
         this.gMatStack = new Array(32).fill(0).map(() => new Array(4).fill(0).map(() => new Array(4).fill(0)))
+        this.gMatStackInterpolated = new Array(32).fill(0).map(() => new Array(4).fill(0).map(() => new Array(4).fill(0)))
+        this.gMtxTbl = []
+        this.sPerspectivePos = []
+        this.sPerspectiveMtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
         this.gMatStackIndex = 0
         this.gAreaUpdateCounter = 0
 
@@ -53,6 +58,55 @@ class GeoRenderer {
         this.ANIM_TYPE_ROTATION              = 5
     }
 
+    interpolate_vectors(res, a, b) {
+        res[0] = (a[0] + b[0]) / 2.0
+        res[1] = (a[1] + b[1]) / 2.0
+        res[2] = (a[2] + b[2]) / 2.0
+    }
+
+    interpolate_angle(a, b) {
+        const absDiff = Math.abs(b - a)
+        if (absDiff >= 0x4000 && absDiff <= 0xC000) { return b }
+        if (absDiff <= 0x8000) { return (a + b) / 2 }
+        else { return (a + b) / 2 + 0x8000 }
+    }
+
+    interpolate_angles(res, a, b) {
+        res[0] = this.interpolate_angle(a[0], b[0])
+        res[1] = this.interpolate_angle(a[1], b[1])
+        res[2] = this.interpolate_angle(a[2], b[2])
+    }
+
+    interpolate_matrix(result, a, b) {
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                result[i][j] = (a[i][j] + b[i][j]) / 2.0
+            }
+        }
+    }
+
+    mtx_patch_interpolated() {
+        
+        if (this.sPerspectivePos != null) {
+            const gfx = []
+            Gbi.gSPMatrix(gfx, this.sPerspectiveMtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+            Game.gDisplayList[this.sPerspectivePos] = gfx[0]
+        }
+
+        this.gMtxTbl.forEach(object => {
+            const pos = object.pos
+            const gfx = []
+            Gbi.gSPMatrix(gfx, object.mtx, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+            Gbi.gSPDisplayList(gfx, object.displayList)
+            Game.gDisplayList[pos] = gfx[0]
+            Game.gDisplayList[pos + 1] = gfx[1]
+        })
+
+        this.gMtxTbl = []
+        this.sPerspectivePos = null
+        this.sViewportPos = null
+    }
+
     geo_process_master_list_sub(node) {
         const enableZBuffer = (node.flags & GraphNode.GRAPH_RENDER_Z_BUFFER) != 0
         const modeList = enableZBuffer ? renderModeTable[1] : renderModeTable[0]
@@ -66,8 +120,13 @@ class GeoRenderer {
                 if (modeList[i] == null) throw "need to add render mode - i: " + i
                 Gbi.gDPSetRenderMode(Game.gDisplayList, modeList[i])
                 for (const displayNode of node.wrapper.listHeads[i]) {
-                    Gbi.gSPMatrix(Game.gDisplayList, displayNode.transform, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
-                    Gbi.gSPDisplayList(Game.gDisplayList, displayNode.displayList)
+                    const object = {}
+                    object.pos = Game.gDisplayList.length /// index of the mtx
+                    object.mtx = displayNode.transform
+                    object.displayList = displayNode.displayList
+                    this.gMtxTbl.push(object)
+                    Gbi.gSPMatrix(Game.gDisplayList, displayNode.transformInterpolated, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+                    Gbi.gSPDisplayList(Game.gDisplayList, displayNode.displayListInterpolated)
 
                 }
             }
@@ -100,7 +159,6 @@ class GeoRenderer {
             const bottom = (this.gCurGraphNodeRoot.wrapper.y + this.gCurGraphNodeRoot.wrapper.height) / 2.0 * node.wrapper.scale
 
             MathUtil.guOrtho(mtx, left, right, bottom, top, -2.0, 2.0, 1.0)
-            //Gbi.gSPPerspNormalize(Game.gDisplayList, 0xFFFF)
             Gbi.gSPMatrix(Game.gDisplayList, mtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
 
             this.geo_process_node_and_siblings(node.children)
@@ -118,13 +176,22 @@ class GeoRenderer {
         if (node.children[0]) {
             const aspect = canvas.width / canvas.height
             const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
+            const mtxInterpolated = new Array(4).fill(0).map(() => new Array(4).fill(0))
             const perspNorm = {}
 
-            MathUtil.guPerspective(mtx, perspNorm,
-                node.wrapper.fov, aspect, node.wrapper.near, node.wrapper.far, 1.0)
-
-            //Gbi.gSPPerspNormalize(Game.gDisplayList, perspNorm.value)
-            Gbi.gSPMatrix(Game.gDisplayList, mtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+            MathUtil.guPerspective(mtx, perspNorm, node.wrapper.fov, aspect, node.wrapper.near, node.wrapper.far, 1.0)
+            if (window.gGlobalTimer == node.wrapper.prevTimestamp + 1) {
+                const fovInterpolated = (node.wrapper.prevFov + node.wrapper.fov) / 2.0;
+                MathUtil.guPerspective(mtxInterpolated, perspNorm,
+                    fovInterpolated, aspect, node.wrapper.near, node.wrapper.far, 1.0)
+                Gbi.gSPMatrix(Game.gDisplayList, mtxInterpolated, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+                this.sPerspectivePos = Game.gDisplayList.length - 1
+                this.sPerspectiveMtx = mtx
+            } else {
+                Gbi.gSPMatrix(Game.gDisplayList, mtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
+            }
+            node.wrapper.prevFov = node.wrapper.fov;
+            node.wrapper.prevTimestamp = window.gGlobalTimer;
 
             this.gCurGraphNodeCamFrustum = node
             this.geo_process_node_and_siblings(node.children)
@@ -142,17 +209,35 @@ class GeoRenderer {
 
         const rollMtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const cameraTransform = new Array(4).fill(0).map(() => new Array(4).fill(0))
-        const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
 
         MathUtil.mtxf_rotate_xy(rollMtx, node.wrapper.rollScreen)
 
         Gbi.gSPMatrix(Game.gDisplayList, rollMtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_MUL | Gbi.G_MTX_NOPUSH)
         MathUtil.mtxf_lookat(cameraTransform, node.wrapper.pos, node.wrapper.focus, node.wrapper.roll)
         MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], cameraTransform, this.gMatStack[this.gMatStackIndex])
+
+        let posInterpolated = [0,0,0]
+        let focusInterpolated = [0,0,0]
+
+        if (window.gGlobalTimer == node.wrapper.prevTimestamp + 1) {
+            this.interpolate_vectors(posInterpolated, node.wrapper.prevPos, node.wrapper.pos)
+            this.interpolate_vectors(focusInterpolated, node.wrapper.prevFocus, node.wrapper.focus)
+        } else {
+            posInterpolated = [...node.wrapper.pos]
+            focusInterpolated = [...node.wrapper.focus]
+        }
+        node.wrapper.prevPos = [...node.wrapper.pos]
+        node.wrapper.prevFocus = [...node.wrapper.focus]
+        node.wrapper.prevTimestamp = window.gGlobalTimer
+        MathUtil.mtxf_lookat(cameraTransform, posInterpolated, focusInterpolated, node.wrapper.roll)
+        MathUtil.mtxf_mul(this.gMatStackInterpolated[this.gMatStackIndex + 1], cameraTransform, this.gMatStackInterpolated[this.gMatStackIndex])
+            
+
         this.gMatStackIndex++
         if (node.children[0]) {
             this.gCurGraphNodeCamera = node
             node.wrapper.matrixPtr = this.gMatStack[this.gMatStackIndex]
+            node.wrapper.matrixPtrInterpolated = this.gMatStackInterpolated[this.gMatStackIndex]
             this.geo_process_node_and_siblings(node.children)
             this.gCurGraphNodeCamera = null
         }
@@ -163,12 +248,40 @@ class GeoRenderer {
     geo_process_background(node) {
 
         let list = []
+        let listInterpolated = []
         if (node.wrapper.backgroundFunc) {
+            let posCopy = [0,0,0]
+            let focusCopy = [0,0,0]
+            let posInterpolated = [0,0,0]
+            let focusInterpolated = [0,0,0]
+
+            if (window.gGlobalTimer == node.wrapper.prevCameraTimestamp + 1) {
+                this.interpolate_vectors(posInterpolated, node.wrapper.prevCameraPos, Camera.gLakituState.pos);
+                this.interpolate_vectors(focusInterpolated, node.wrapper.prevCameraFocus, Camera.gLakituState.focus);
+            } else {
+                posInterpolated = [...Camera.gLakituState.pos]
+                focusInterpolated = [...Camera.gLakituState.focus]
+            }
+            node.wrapper.prevCameraPos = [...Camera.gLakituState.pos]
+            node.wrapper.prevCameraFocus = [...Camera.gLakituState.focus]
+            node.wrapper.prevCameraTimestamp = window.gGlobalTimer;
+
             list = node.wrapper.backgroundFunc(GraphNode.GEO_CONTEXT_RENDER, node.wrapper)
+
+            posCopy = [...Camera.gLakituState.pos]
+            focusCopy = [...Camera.gLakituState.focus]
+            Camera.gLakituState.pos = [...posInterpolated]
+            Camera.gLakituState.focus = [...focusInterpolated]
+
+            listInterpolated = node.wrapper.backgroundFunc(GraphNode.GEO_CONTEXT_RENDER, node.wrapper)
+
+            Camera.gLakituState.pos = [...posCopy]
+            Camera.gLakituState.focus = [...focusCopy]
+
         }
 
         if (list.length > 0) {
-            this.geo_append_display_list(list, node.flags >> 8)
+            this.geo_append_display_list2(list, listInterpolated, node.flags >> 8)
         } else if (this.gCurGraphNodeMasterList) {
             const gfx = []
             Gbi.gDPSetCycleType(gfx, Gbi.G_CYC_FILL)
@@ -203,6 +316,7 @@ class GeoRenderer {
 
         const scaleVec = [ node.wrapper.scale, node.wrapper.scale, node.wrapper.scale ]
         MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex], scaleVec)
+        MathUtil.mtxf_scale_vec3f(this.gMatStackInterpolated[this.gMatStackIndex + 1], this.gMatStackInterpolated[this.gMatStackIndex], scaleVec)
         this.gMatStackIndex++
 
         if (node.wrapper.displayList) {
@@ -218,9 +332,19 @@ class GeoRenderer {
     }
 
     geo_process_rotation(node) {
-        const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
-        MathUtil.mtxf_rotate_zxy_and_translate(mtxf, [0, 0, 0], node.wrapper.rotation)
-        MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
+        const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        const rotationInterpolated = [ 0, 0, 0 ]
+        MathUtil.mtxf_rotate_zxy_and_translate(mtx, [0, 0, 0], node.wrapper.rotation)
+        MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtx, this.gMatStack[this.gMatStackIndex])
+
+        if (window.gGlobalTimer == node.wrapper.prevTimestamp + 1) {
+            this.interpolate_angles(rotationInterpolated, node.wrapper.prevRotation, node.wrapper.rotation)
+            MathUtil.mtxf_rotate_zxy_and_translate(mtx, [0, 0, 0], rotationInterpolated)
+        }
+        node.wrapper.prevRotation = [...node.wrapper.rotation]
+        node.wrapper.prevTimestamp = window.gGlobalTimer
+        MathUtil.mtxf_mul(this.gMatStackInterpolated[this.gMatStackIndex + 1], mtx, this.gMatStackInterpolated[this.gMatStackIndex])
+
         this.gMatStackIndex++
         if (node.wrapper.displayList) {
             this.geo_append_display_list(node.wrapper.displayList, node.flags >> 8)
@@ -232,50 +356,69 @@ class GeoRenderer {
         this.gMatStackIndex--
     }
 
-    read_next_anim_value() {
-        const index = GraphNode.retrieve_animation_index(this.gCurrAnimFrame, this.gCurrAnimAttribute)
+    read_next_anim_value(animFrame, animAttribute) {
+        const index = GraphNode.retrieve_animation_index(animFrame, animAttribute)
         const value = this.gCurAnimData[index]
-        return value > 32767 ? value - 65536 : value
+        return int16(value)
+    }
+
+    anim_process(translation, rotation, typeWrapper, animFrame, animAttribute) {
+        if (typeWrapper.type == Mario.ANIM_TYPE_TRANSLATION) {
+            translation[0] += this.read_next_anim_value(animFrame, animAttribute) * this.gCurAnimTranslationMultiplier
+            translation[1] += this.read_next_anim_value(animFrame, animAttribute) * this.gCurAnimTranslationMultiplier
+            translation[2] += this.read_next_anim_value(animFrame, animAttribute) * this.gCurAnimTranslationMultiplier
+            typeWrapper.type = Mario.ANIM_TYPE_ROTATION
+        } else {
+            if (typeWrapper.type == Mario.ANIM_TYPE_LATERAL_TRANSLATION) {
+                translation[0] += this.read_next_anim_value(animFrame, animAttribute) * this.gCurAnimTranslationMultiplier
+                animAttribute.indexToIndices += 2
+                translation[2] += this.read_next_anim_value(animFrame, animAttribute) * this.gCurAnimTranslationMultiplier
+                typeWrapper.type = Mario.ANIM_TYPE_ROTATION
+            } else {
+                if (typeWrapper.type == Mario.ANIM_TYPE_VERTICAL_TRANSLATION) {
+                    animAttribute.indexToIndices += 2
+                    translation[1] += this.read_next_anim_value(animFrame, animAttribute) * this.gCurAnimTranslationMultiplier
+                    animAttribute.indexToIndices += 2
+                    typeWrapper.type = Mario.ANIM_TYPE_ROTATION
+                } else if (typeWrapper.type == Mario.ANIM_TYPE_NO_TRANSLATION) {
+                    animAttribute.indexToIndices += 6
+                    typeWrapper.type = Mario.ANIM_TYPE_ROTATION
+                }
+            }
+        }
+
+        if (typeWrapper.type == Mario.ANIM_TYPE_ROTATION) {
+            rotation[0] = this.read_next_anim_value(animFrame, animAttribute)
+            rotation[1] = this.read_next_anim_value(animFrame, animAttribute)
+            rotation[2] = this.read_next_anim_value(animFrame, animAttribute)
+        }
     }
 
     geo_process_animated_part(node) {
 
         const matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
-        const rotation = [ 0, 0, 0 ]
-        const translation = [ ...node.wrapper.translation ]
+        const mtxInterpolated = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        const rotation = [0, 0, 0], rotationInterpolated = [0, 0, 0]
+        const translation = [...node.wrapper.translation]
+        const translationInterpolated = [...node.wrapper.translation]
 
-        if (this.gCurAnimType == Mario.ANIM_TYPE_TRANSLATION) {
-            translation[0] += this.read_next_anim_value() + this.gCurAnimTranslationMultiplier
-            translation[1] += this.read_next_anim_value() + this.gCurAnimTranslationMultiplier
-            translation[2] += this.read_next_anim_value() * this.gCurAnimTranslationMultiplier
-            this.gCurAnimType = Mario.ANIM_TYPE_ROTATION
-        } else {
-            if (this.gCurAnimType == Mario.ANIM_TYPE_LATERAL_TRANSLATION) {
-                translation[0] += this.read_next_anim_value() + this.gCurAnimTranslationMultiplier
-                this.gCurrAnimAttribute.indexToIndices += 2
-                translation[2] += this.read_next_anim_value() + this.gCurAnimTranslationMultiplier
-                this.gCurAnimType = Mario.ANIM_TYPE_ROTATION
-            } else {
-                if (this.gCurAnimType == Mario.ANIM_TYPE_VERTICAL_TRANSLATION) {
-                    this.gCurrAnimAttribute.indexToIndices += 2
-                    translation[1] += this.read_next_anim_value() + this.gCurAnimTranslationMultiplier
-                    this.gCurrAnimAttribute.indexToIndices += 2
-                    this.gCurAnimType = Mario.ANIM_TYPE_ROTATION
-                } else if (this.gCurAnimType == Mario.ANIM_TYPE_NO_TRANSLATION) {
-                    this.gCurrAnimAttribute.indexToIndices += 6
-                    this.gCurAnimType = Mario.ANIM_TYPE_ROTATION
-                } 
-            }
-        }
+        const animTypeWrapper = { type: this.gCurAnimType }
+        const animAttribute = { ...this.gCurrAnimAttribute }
 
-        if (this.gCurAnimType == Mario.ANIM_TYPE_ROTATION) {
-            rotation[0] = this.read_next_anim_value()
-            rotation[1] = this.read_next_anim_value()
-            rotation[2] = this.read_next_anim_value()
-        }
+        this.anim_process(translationInterpolated, rotationInterpolated, animTypeWrapper, this.gPrevAnimFrame, animAttribute)
+        animTypeWrapper.type = this.gCurAnimType
+        this.anim_process(translation, rotation, animTypeWrapper, this.gCurrAnimFrame, this.gCurrAnimAttribute)
+        this.gCurAnimType = animTypeWrapper.type
+
+        this.interpolate_vectors(translationInterpolated, translationInterpolated, translation)
+        this.interpolate_angles(rotationInterpolated, rotationInterpolated, rotation)
 
         MathUtil.mtxf_rotate_xyz_and_translate(matrix, translation, rotation)
         MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], matrix, this.gMatStack[this.gMatStackIndex])
+
+        MathUtil.mtxf_rotate_xyz_and_translate(mtxInterpolated, translationInterpolated, rotationInterpolated)
+        MathUtil.mtxf_mul(this.gMatStackInterpolated[this.gMatStackIndex + 1], mtxInterpolated, this.gMatStackInterpolated[this.gMatStackIndex])
+
         this.gMatStackIndex++
         
         if (node.wrapper.displayList) {
@@ -308,6 +451,18 @@ class GeoRenderer {
         }
 
         this.gCurrAnimFrame = node.animFrame
+
+        if (node.prevAnimPtr == anim && node.prevAnimID == node.animID && window.gGlobalTimer == node.prevAnimFrameTimestamp + 1) {
+            this.gPrevAnimFrame = node.prevAnimFrame
+        } else {
+            this.gPrevAnimFrame = node.animFrame
+        }
+
+        node.prevAnimPtr = anim
+        node.prevAnimID = node.animID
+        node.prevAnimFrame = node.animFrame
+        node.prevAnimFrameTimestamp = window.gGlobalTimer
+
         this.gCurAnimEnabled = (anim.flags & Mario.ANIM_FLAG_5) == 0
         this.gCurrAnimAttribute = { indexToIndices: 0, indices: anim.indices }
         this.gCurAnimData = anim.values
@@ -360,21 +515,83 @@ class GeoRenderer {
 
         if (object.header.gfx.unk18 == this.gCurGraphNodeRoot.wrapper.areaIndex) {
 
-            if (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_BILLBOARD) 
-                throw "more implementation needed in geo process object"
+            let posInterpolated = new Array(3)
+            let angleInterpolated = new Array(3)
+            let scaleInterpolated = new Array(3)
 
-            if (object.header.gfx.throwMatrix != null) {
+            if (object.header.gfx.throwMatrix) {
                 MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], object.header.gfx.throwMatrix, this.gMatStack[this.gMatStackIndex])
+
+                if (window.gGlobalTimer == object.header.gfx.prevThrowMatrixTimestamp + 1) {
+                    this.interpolate_matrix(mtxf, object.header.gfx.throwMatrix, object.header.gfx.prevThrowMatrix)
+                    MathUtil.mtxf_mul(this.gMatStackInterpolated[this.gMatStackIndex + 1], mtxf, this.gMatStackInterpolated[this.gMatStackIndex])
+                } else {
+                    MathUtil.mtxf_mul(this.gMatStackInterpolated[this.gMatStackIndex + 1], object.header.gfx.throwMatrix, this.gMatStackInterpolated[this.gMatStackIndex])
+                }
+                object.header.gfx.prevThrowMatrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
+                MathUtil.mtxf_to_mtx(object.header.gfx.prevThrowMatrix, object.header.gfx.throwMatrix)
+                object.header.gfx.prevThrowMatrixTimestamp = window.gGlobalTimer
+
             } else if (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_CYLBOARD) {
+                
+                if (window.gGlobalTimer == object.header.gfx.prevTimestamp + 1) {
+                    this.interpolate_vectors(posInterpolated, object.header.gfx.prevPos, object.header.gfx.pos)
+                } else {
+                    posInterpolated = [...object.header.gfx.pos]
+                }
+                object.header.gfx.prevPos = [...object.header.gfx.pos]
+                object.header.gfx.prevTimestamp = window.gGlobalTimer
+
                 MathUtil.mtxf_cylboard(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex], object.header.gfx.pos, this.gCurGraphNodeCamera.wrapper.roll)
+                MathUtil.mtxf_cylboard(this.gMatStackInterpolated[this.gMatStackIndex + 1], this.gMatStackInterpolated[this.gMatStackIndex], posInterpolated, this.gCurGraphNodeCamera.wrapper.roll)
+            } else if (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_BILLBOARD) { 
+
+                if (window.gGlobalTimer == object.header.gfx.prevTimestamp + 1) {
+                    this.interpolate_vectors(posInterpolated, object.header.gfx.prevPos, object.header.gfx.pos)
+                } else {
+                    posInterpolated = [...object.header.gfx.pos]
+                }
+                object.header.gfx.prevPos = [...object.header.gfx.pos]
+                object.header.gfx.prevTimestamp = window.gGlobalTimer
+
+                MathUtil.mtxf_billboard(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex], object.header.gfx.pos, this.gCurGraphNodeCamera.wrapper.roll)
+                MathUtil.mtxf_billboard(this.gMatStackInterpolated[this.gMatStackIndex + 1], this.gMatStackInterpolated[this.gMatStackIndex], posInterpolated, this.gCurGraphNodeCamera.wrapper.roll)
+            
             } else {
+                if (window.gGlobalTimer == object.header.gfx.prevTimestamp + 1) {
+                    this.interpolate_vectors(posInterpolated, object.header.gfx.prevPos, object.header.gfx.pos)
+                    this.interpolate_angles(angleInterpolated, object.header.gfx.prevAngle, object.header.gfx.angle)
+                } else {
+                    posInterpolated = [...object.header.gfx.pos]
+                    angleInterpolated = [...object.header.gfx.angle]
+                }
+                object.header.gfx.prevPos = [...object.header.gfx.pos]
+                object.header.gfx.prevAngle = [...object.header.gfx.angle]
+                object.header.gfx.prevTimestamp = window.gGlobalTimer
+
                 MathUtil.mtxf_rotate_zxy_and_translate(mtxf, object.header.gfx.pos, object.header.gfx.angle)
                 MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
+
+                MathUtil.mtxf_rotate_zxy_and_translate(mtxf, posInterpolated, angleInterpolated)
+                MathUtil.mtxf_mul(this.gMatStackInterpolated[this.gMatStackIndex + 1], mtxf, this.gMatStackInterpolated[this.gMatStackIndex])
+
             }
 
+            if (window.gGlobalTimer == object.header.gfx.prevScaleTimestamp + 1) {
+                this.interpolate_vectors(scaleInterpolated, object.header.gfx.prevScale, object.header.gfx.scale)
+            } else {
+                scaleInterpolated = [...object.header.gfx.scale]
+            }
+
+            object.header.gfx.prevScale = [...object.header.gfx.scale]
+            object.header.gfx.prevScaleTimestamp = window.gGlobalTimer
+
             MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex + 1], object.header.gfx.scale)
+            MathUtil.mtxf_scale_vec3f(this.gMatStackInterpolated[this.gMatStackIndex + 1], this.gMatStackInterpolated[this.gMatStackIndex + 1], scaleInterpolated)
 
             object.header.gfx.throwMatrix = this.gMatStack[++this.gMatStackIndex]
+            object.header.gfx.throwMatrixInterpolated = this.gMatStackInterpolated[this.gMatStackIndex]
+
             object.header.gfx.cameraToObject = [ 
                 this.gMatStack[this.gMatStackIndex][3][0],
                 this.gMatStack[this.gMatStackIndex][3][1],
@@ -385,7 +602,7 @@ class GeoRenderer {
                 this.geo_set_animation_globals(object.header.gfx.unk38, hasAnimation)
             }
 
-            if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) { 
+            if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) {
 
                 if (object.header.gfx.sharedChild) {
                     this.gCurGraphNodeObject = node.wrapper
@@ -399,11 +616,16 @@ class GeoRenderer {
                     throw "process object has children that need to be processed"
                 }
 
+            } else {
+                object.header.gfx.prevThrowMatrixTimestamp = 0
+                object.header.gfx.prevTimestamp = 0
+                object.header.gfx.prevScaleTimestamp = 0
             }
 
             this.gMatStackIndex--
             this.gCurAnimType = this.ANIM_TYPE_NONE
             object.header.gfx.throwMatrix = null
+            object.header.gfx.throwMatrixInterpolated = null
 
         }
 
@@ -441,13 +663,23 @@ class GeoRenderer {
 
     geo_append_display_list(displayList, layer) {
 
+        this.geo_append_display_list2(displayList, displayList, layer)
+
+    }
+
+    geo_append_display_list2(displayList, displayListInterpolated, layer) {
+
         const gMatStackCopy = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        const gMatStackCopyInterpolated = new Array(4).fill(0).map(() => new Array(4).fill(0))
         MathUtil.mtxf_to_mtx(gMatStackCopy, this.gMatStack[this.gMatStackIndex])
+        MathUtil.mtxf_to_mtx(gMatStackCopyInterpolated, this.gMatStackInterpolated[this.gMatStackIndex])
 
         if (this.gCurGraphNodeMasterList) {
             const listNode = {
                 transform: gMatStackCopy,
-                displayList
+                transformInterpolated: gMatStackCopyInterpolated,
+                displayList,
+                displayListInterpolated: displayListInterpolated
             }
 
             if (this.gCurGraphNodeMasterList.wrapper.listHeads[layer]) {
@@ -471,15 +703,41 @@ class GeoRenderer {
         }
     }
 
+    geo_process_billboard(node) {
+
+        this.gMatStackIndex++
+        const translation = [...node.wrapper.translation]
+        MathUtil.mtxf_billboard(this.gMatStack[this.gMatStackIndex], this.gMatStack[this.gMatStackIndex - 1], translation, this.gCurGraphNodeCamera.wrapper.roll)
+        MathUtil.mtxf_billboard(this.gMatStackInterpolated[this.gMatStackIndex], this.gMatStackInterpolated[this.gMatStackIndex - 1], translation, this.gCurGraphNodeCamera.wrapper.roll)
+
+        if (this.gCurGraphNodeHeldObject) {
+            throw "billboard for held objects"
+        } else {
+            MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex], this.gMatStack[this.gMatStackIndex], this.gCurGraphNodeObject.scale)
+            MathUtil.mtxf_scale_vec3f(this.gMatStackInterpolated[this.gMatStackIndex], this.gMatStackInterpolated[this.gMatStackIndex], this.gCurGraphNodeObject.scale)
+        }
+
+        if (node.wrapper.displayList) {
+            this.geo_append_display_list(node.wrapper.displayList, node.flags >> 8)
+        }
+
+        if (node.children[0]) {
+            this.geo_process_node_and_siblings(node.children)
+        }
+        this.gMatStackIndex--
+
+    }
+
     geo_process_shadow(node) {
 
-        let shadowPos, shadowScale
+        let shadowPos, shadowPosInterpolated, shadowScale
 
         if (this.gCurGraphNodeCamera && this.gCurGraphNodeObject) {
             if (this.gCurGraphNodeHeldObject) {
                 throw "shadow for held objects"
             } else {
                 shadowPos = [...this.gCurGraphNodeObject.pos]
+                shadowPosInterpolated = [...this.gCurGraphNodeObject.pos]
                 shadowScale = node.wrapper.shadowScale * this.gCurGraphNodeObject.scale[0]
             }
 
@@ -492,10 +750,10 @@ class GeoRenderer {
                         objScale = geo.wrapper.scale
                     }
                     const animOffset = new Array(3)
-                    animOffset[0] = this.read_next_anim_value() * this.gCurAnimTranslationMultiplier * objScale
+                    animOffset[0] = this.read_next_anim_value(this.gCurrAnimFrame, this.gCurrAnimAttribute) * this.gCurAnimTranslationMultiplier * objScale
                     animOffset[1] = 0.0
                     this.gCurrAnimAttribute.indexToIndices += 2
-                    animOffset[2] = this.read_next_anim_value() * this.gCurAnimTranslationMultiplier * objScale
+                    animOffset[2] = this.read_next_anim_value(this.gCurrAnimFrame, this.gCurrAnimAttribute) * this.gCurAnimTranslationMultiplier * objScale
                     this.gCurrAnimAttribute.indexToIndices -= 6
 
                     const sinAng = Math.sin(this.gCurGraphNodeObject.angle[1] / 0x8000 * Math.PI)
@@ -506,14 +764,36 @@ class GeoRenderer {
 
                 }
             }
+
+            if (this.gCurGraphNodeHeldObject) {
+                throw "more implementation needed, GeoRenderer process shadow while holding an object"
+            } else {
+                if (window.gGlobalTimer == this.gCurGraphNodeObject.prevShadowPosTimestamp + 1) {
+                    this.interpolate_vectors(shadowPosInterpolated, this.gCurGraphNodeObject.prevShadowPos, shadowPos)
+                } else {
+                    shadowPosInterpolated = [...shadowPos]
+                }
+                this.gCurGraphNodeObject.prevShadowPos = [...shadowPos]
+                this.gCurGraphNodeObject.prevShadowPosTimestamp = window.gGlobalTimer
+            }
+
+            const shadowListInterpolated = create_shadow_below_xyz(shadowPosInterpolated[0], shadowPosInterpolated[1], shadowPosInterpolated[2], shadowScale, node.wrapper.shadowSolidity, node.wrapper.shadowType)
+
             const shadowList = create_shadow_below_xyz(shadowPos[0], shadowPos[1], shadowPos[2], shadowScale, node.wrapper.shadowSolidity, node.wrapper.shadowType)
 
-            if (shadowList) {
+            if (shadowList && shadowListInterpolated) {
                 const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
+                const mtxfInterpolated = new Array(4).fill(0).map(() => new Array(4).fill(0))
                 this.gMatStackIndex++
+
                 MathUtil.mtxf_translate(mtxf, shadowPos)
                 MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex], mtxf, this.gCurGraphNodeCamera.wrapper.matrixPtr)
-                this.geo_append_display_list(shadowList, 6)
+
+                MathUtil.mtxf_translate(mtxfInterpolated, shadowPosInterpolated)
+                MathUtil.mtxf_mul(this.gMatStackInterpolated[this.gMatStackIndex], mtxfInterpolated, this.gCurGraphNodeCamera.wrapper.matrixPtrInterpolated)
+
+                this.geo_append_display_list2(shadowList, shadowListInterpolated, 6)
+
                 this.gMatStackIndex--
             }
         }
@@ -584,6 +864,9 @@ class GeoRenderer {
             case GraphNode.GRAPH_NODE_TYPE_LEVEL_OF_DETAIL:
                 this.geo_process_level_of_detail(node); break
 
+            case GraphNode.GRAPH_NODE_TYPE_BILLBOARD:
+                this.geo_process_billboard(node); break
+
             default:
                 /// remove this check once all types have been added
                 if (node.type != GraphNode.GRAPH_NODE_TYPE_CULLING_RADIUS && node.type != GraphNode.GRAPH_NODE_TYPE_START) throw "unimplemented type in geo renderer "
@@ -614,6 +897,7 @@ class GeoRenderer {
         if (root.node.flags & GraphNode.GRAPH_RENDER_ACTIVE) {
 
             MathUtil.mtxf_identity(this.gMatStack[this.gMatStackIndex])
+            MathUtil.mtxf_identity(this.gMatStackInterpolated[this.gMatStackIndex])
 
             this.gCurGraphNodeRoot = root.node
 

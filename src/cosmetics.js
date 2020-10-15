@@ -1,7 +1,7 @@
 import { networkData } from "./socket"
 import Cookies from "js-cookie"
 
-const defaultSkinData = () => {
+export const defaultSkinData = () => {
     return {
         overalls: [0x00, 0x00, 0x7f, 0x00, 0x00, 0xff],
         hat: [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00],

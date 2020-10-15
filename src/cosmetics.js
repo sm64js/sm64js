@@ -1,13 +1,16 @@
 import { networkData } from "./socket"
+import Cookies from "js-cookie"
 
-export const defaultSkinData = {
-    overalls: [0x00, 0x00, 0x7f, 0x00, 0x00, 0xff],
-    hat: [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00],
-    shirt: [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00],
-    gloves: [0x7f, 0x7f, 0x7f, 0xff, 0xff, 0xff],
-    boots: [0x39, 0x0e, 0x07, 0x72, 0x1c, 0x0e],
-    skin: [0x7f, 0x60, 0x3c, 0xfe, 0xc1, 0x79],
-    hair: [0x39, 0x03, 0x00, 0x73, 0x06, 0x00]
+const defaultSkinData = () => {
+    return {
+        overalls: [0x00, 0x00, 0x7f, 0x00, 0x00, 0xff],
+        hat: [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00],
+        shirt: [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00],
+        gloves: [0x7f, 0x7f, 0x7f, 0xff, 0xff, 0xff],
+        boots: [0x39, 0x0e, 0x07, 0x72, 0x1c, 0x0e],
+        skin: [0x7f, 0x60, 0x3c, 0xfe, 0xc1, 0x79],
+        hair: [0x39, 0x03, 0x00, 0x73, 0x06, 0x00]
+    }
 }
 
 
@@ -38,40 +41,63 @@ const hatShirtPresets = [
 ]
 
 window.updateSkinID = (skinID) => {
+    window.myMario.skinData = defaultSkinData()
     window.myMario.skinData.overalls = overallsPresets[skinID]
     window.myMario.skinData.hat = hatShirtPresets[skinID]
     window.myMario.skinData.shirt = hatShirtPresets[skinID]
 }
 
+const skinCustomizerHtml = $('#skinCustomizerWindow').detach()
+
+window.setSkinSliderValues = () => {
+    /// set default values
+    let skinType = document.getElementById("skinTypes").value
+    for (let i = 0; i < 6; i++) {
+        document.getElementById("skinSliderRangeDisplay" + i).innerHTML = window.myMario.skinData[skinType][i]
+        const slider = document.getElementById("skinSliderValue" + i)
+        slider.value = window.myMario.skinData[skinType][i]
+        const percent = (slider.value / 255) * 100
+        const color = getComputedStyle(slider).borderColor
+        slider.style.background = 'linear-gradient(to right, ' + color + ' 0%, ' + color + ' ' + percent + '%, #fff ' + percent + '%, white 100%)'
+    }
+}
+
 $('[data-toggle="skinCustomizerToggle"]').popover({
     container: "body",
-    content: function () {
-        return $('#skinCustomizerWindow').clone()
-    },
+    html: true,
+    sanitize: false,
+    content: skinCustomizerHtml,
 })
 
-$('[data-toggle="skinCustomizerToggle"]').on('shown.bs.popover', () => {
-    /// set default values
+$('[data-toggle="skinCustomizerToggle"]').on('shown.bs.popover', () => { window.setSkinSliderValues() })
+
+window.customSkinUpdate = (slider) => {
+    const color = getComputedStyle(slider).borderColor
+
+    const percent = (slider.value / 255) * 100
+    slider.style.background = 'linear-gradient(to right, ' + color + ' 0%, ' + color + ' ' + percent + '%, #fff ' + percent + '%, white 100%)'
+
+    const index = slider.id.slice(-1)
+    document.getElementById("skinSliderRangeDisplay" + index).innerHTML = slider.value
+
+    let skinType = document.getElementById("skinTypes").value
+    window.myMario.skinData[skinType][index] = parseInt(document.getElementById("skinSliderValue" + index).value)
+
+    Cookies.set('skinData-' + skinType, JSON.stringify(window.myMario.skinData[skinType]))    
+}
+
+const storedPlayerName = Cookies.get('playername')
+window.myMario = {
+    playerName: storedPlayerName ? storedPlayerName : "Unnamed Player",
+    skinData: defaultSkinData()
+}
+document.getElementById('playerNameInput').value = window.myMario.playerName
+
+Object.keys(window.myMario.skinData).forEach((skinType) => {
+    const cookieData = Cookies.get('skinData-' + skinType)
+    if (cookieData) window.myMario.skinData[skinType] = JSON.parse(cookieData)
 })
 
-const hexRGB = (a) => {
-    console.log(a)
-    e = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(a)
-    console.log(e)
-    return e ? { r: parseInt(e[1], 16), g: parseInt(e[2], 16), b: parseInt(e[3], 16) } : null
-}
-
-window.customSkinUpdate = () => {
-    skinType = document.getElementById("skinTypes").value
-    window.myMario.skinData[skinType] = [
-        hexRGB(document.getElementById("value1").value).r,
-        hexRGB(document.getElementById("value1").value).g,
-        hexRGB(document.getElementById("value1").value).b,
-        hexRGB(document.getElementById("value2").value).r,
-        hexRGB(document.getElementById("value2").value).g,
-        hexRGB(document.getElementById("value2").value).b
-    ]
-}
 
 window.updatePlayerName = (name) => {
     if (name.length < 3) {
@@ -80,7 +106,8 @@ window.updatePlayerName = (name) => {
     } else {
         document.getElementById("playerNameInput").style.borderColor = "blue"
         document.getElementById("playerNameInput").style.borderWidth = "1px"
-        window.myMario.playerName = name.substring(0, 14)
+        window.myMario.playerName = name
+        Cookies.set('playername', name)
     }
 }
 

@@ -17,11 +17,6 @@ const sanitizeChat = (string, isMessage) => {
     return string;
 }
 
-window.myMario = {
-    playerName: "Unnamed Player",
-    skinData: Cosmetics.defaultSkinData
-}
-
 export const networkData = {
     playerInteractions: true,
     remotePlayers: {},

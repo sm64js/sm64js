@@ -89,7 +89,7 @@
 
             </div>
 
-            <div class="row" style="justify-content:center; padding-top:3px">
+            <div class="row" style="justify-content:center; padding-top:5px">
                 <div class="col-3">
                     <button type="button"
                             class="btn btn-sm btn-primary"
@@ -250,20 +250,93 @@
     <div hidden>
 
         <div class="container" id="skinCustomizerWindow">
-            <select id="skinTypes">
-                <option value="overalls">Overalls</option>
-                <option value="hat">Hat</option>
-                <option value="shirt">Shirt</option>
-                <option value="gloves">Gloves</option>
-                <option value="boots">Boots</option>
-                <option value="skin">Skin</option>
-                <option value="hair">Hair</option>
-            </select>
-            <br />
+            <div class="row" style="justify-content:center">
+                <select id="skinTypes" class="form-control" style="width:320px" onchange="window.setSkinSliderValues()">
+                    <option value="overalls">Overalls</option>
+                    <option value="hat">Hat</option>
+                    <option value="shirt">Shirt</option>
+                    <option value="gloves">Gloves</option>
+                    <option value="boots">Boots</option>
+                    <option value="skin">Skin</option>
+                    <option value="hair">Hair</option>
+                </select>
+            </div>
 
             <br />
-            Colours - <input onchange="window.customSkinUpdate()" type="color" id="value1"><br />
-            Diffuse - <input onchange="window.customSkinUpdate()" type="color" id="value2">
+
+            <div class="row redtext" style="width:330px">
+                <div class="col-5" style="text-align:right">
+                    Ambient Red
+                </div>
+                <div class="col-5" style="justify-content:center">
+                    <input class="redslider" oninput="window.customSkinUpdate(this)" type="range" id="skinSliderValue0" min="0" max="255">
+                </div>
+                <div class="col-2" style="text-align:left">
+                    <label id="skinSliderRangeDisplay0">0</label>
+                </div>
+            </div>
+
+            <div class="row redtext" style="width:330px">
+                <div class="col-5" style="text-align:right">
+                    Red
+                </div>
+                <div class="col-5" style="justify-content:center">
+                    <input class="redslider" oninput="window.customSkinUpdate(this)" type="range" id="skinSliderValue3" min="0" max="255">
+                </div>
+                <div class="col-2" style="text-align:left">
+                    <label id="skinSliderRangeDisplay3">0</label>
+                </div>
+            </div>
+
+            <div class="row greentext" style="width:330px">
+                <div class="col-5" style="text-align:right">
+                    Ambient Green
+                </div>
+                <div class="col-5" style="justify-content:center">
+                    <input class="greenslider" oninput="window.customSkinUpdate(this)" type="range" id="skinSliderValue1" min="0" max="255">
+                </div>
+                <div class="col-2" style="text-align:left">
+                    <label id="skinSliderRangeDisplay1">0</label>
+                </div>
+            </div>
+
+            <div class="row greentext" style="width:330px">
+                <div class="col-5" style="text-align:right">
+                    Green
+                </div>
+                <div class="col-5" style="justify-content:center">
+                    <input class="greenslider" oninput="window.customSkinUpdate(this)" type="range" id="skinSliderValue4" min="0" max="255">
+                </div>
+                <div class="col-2" style="text-align:left">
+                    <label id="skinSliderRangeDisplay4">0</label>
+                </div>
+            </div>
+
+            <div class="row bluetext" style="width:330px">
+                <div class="col-5" style="text-align:right">
+                    Ambient Blue
+                </div>
+                <div class="col-5" style="justify-content:center">
+                    <input class="blueslider" oninput="window.customSkinUpdate(this)" type="range" id="skinSliderValue2" min="0" max="255">
+                </div>
+                <div class="col-2" style="text-align:left">
+                    <label id="skinSliderRangeDisplay2">0</label>
+                </div>
+            </div>
+
+            <div class="row bluetext" style="width:330px">
+                <div class="col-5" style="text-align:right">
+                    Blue
+                </div>
+                <div class="col-5" style="justify-content:center">
+                    <input class="blueslider" oninput="window.customSkinUpdate(this)" type="range" id="skinSliderValue5" min="0" max="255">
+                </div>
+                <div class="col-2" style="text-align:left">
+                    <label id="skinSliderRangeDisplay5">0</label>
+                </div>
+            </div>
+
+            <br />
         </div>
 
         <div class="container" id="keyboardControlsWindow">
@@ -318,7 +391,19 @@
 
         <div class="container" id="gamepadControlsWindow">
             <div class="row" style="justify-content:center">
-                <h6 style="text-align:center" class="gamepadMessage"> Gamepad is detected</h6>
+                <h6 style="text-align:center" id="noGamepadMessage">No Gamepad Detected Yet</h6>
+                <div hidden id="gamepadMessageDiv">
+                    <h6 id="gamepadMessage">
+                        
+                    </h6>
+                    <h6 style="text-align:center" id="gamepadMessage">
+                        Is your gamepad not working correctly?
+                        <br />
+                        Contact me so I can support more gamepads. Discord: snuffysasa#2779 /
+                        <a href="https://github.com/sm64js/sm64js/issues" style="color:blue;font-weight:bold">Github</a>
+                    </h6>
+                </div>
+
             </div>
 
             <div class="row">
@@ -360,11 +445,11 @@
                     </div>
                 </form>
 
-                <div class="mx-sm-3 mb-2">
+<!--                <div class="mx-sm-3 mb-2">
                     <button class="btn btn-sm btn-secondary" onclick="window.switchGamepadFunc()">
                         Multiple Gamepads?
                     </button>
-                </div>
+                </div>-->
             </div>
 
             <div class="row" style="justify-content:center;">

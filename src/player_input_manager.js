@@ -1,4 +1,5 @@
 import * as Keydrown from "./keydrown.min.js"
+import Cookies from "js-cookie"
 import { sendChat } from "./socket.js"
 import { gameData } from "./socket.js"
 
@@ -148,9 +149,9 @@ const defaultGamepadButtonMapping = { ...gamepadButtonMapping }
 
 let deadzone = 0.08
 
-if (localStorage['sm64jsControls']) {
-    Object.assign(keyboardButtonMapping, JSON.parse(localStorage['sm64jsControls']).keybaord)
-    Object.assign(gamepadButtonMapping, JSON.parse(localStorage['sm64jsControls']).gamepad)
+if (Cookies.get('controls')) {
+    Object.assign(keyboardButtonMapping, JSON.parse(Cookies.get('controls')).keyboard)
+    Object.assign(gamepadButtonMapping, JSON.parse(Cookies.get('controls')).gamepad)
 }
 
 /// Fillout the select options - Keyboard only - gamepad does this on load popover
@@ -163,101 +164,89 @@ Array.from(document.getElementsByTagName("select")).forEach(selectElem => {
             selectElem.add(option)
         })
     }
+
+    if (selectElem.hasAttribute("keyboardButton")) {
+        selectElem.value = keyboardButtonMapping[selectElem.name]
+    }
 })
+
+const keyboardControlsHtml = $('#keyboardControlsWindow').detach()
+const gamepadControlsHtml = $('#gamepadControlsWindow').detach()
 
 $('[data-toggle="keyboardControlsToggle"]').popover({
     container: "body",
-    content: function () {
-        return $('#keyboardControlsWindow').clone()
-    },
+    content: keyboardControlsHtml
 })
 
 $('[data-toggle="gamepadControlsToggle"]').popover({
     container: "body",
-    content: function () {
-        return $('#gamepadControlsWindow').clone()
-    },
+    content: gamepadControlsHtml
 })
 
-$('[data-toggle="keyboardControlsToggle"]').on('shown.bs.popover', () => {
-    /// set default values
-    Array.from(document.getElementsByTagName("select")).forEach(selectElem => {
-        if (selectElem.hasAttribute("keyboardButton")) {
-            selectElem.value = keyboardButtonMapping[selectElem.name]
-        }
-    })
-})
+let gamepadIndex
 
-$('[data-toggle="gamepadControlsToggle"]').on('shown.bs.popover', () => {
-    const messages = document.getElementsByClassName('gamepadMessage')
+window.addEventListener("gamepadconnected", function (e) {
 
-    const gamepadIndex = window.switchGamepad ? 1 : 0
+    const gamepad = e.gamepad
 
-    if (navigator.getGamepads && navigator.getGamepads()[gamepadIndex]) {
+    gamepadIndex = gamepad.index
 
-        const gamepad = navigator.getGamepads()[gamepadIndex]
-        const numButtons = gamepad.buttons.length
-        const numAxes = gamepad.axes.length
+    console.log(gamepadIndex)
 
-        Array.from(messages).forEach(msg => {
-            msg.innerHTML = `
-                Detected Gamepad: ${gamepad.id.slice(0, 9)} with ${numButtons} Buttons. 
-                <br/>  
-                Is your gamepad not working correctly? 
-                <br/>
-                Contact me so I can support more gamepads. Discord: snuffysasa#2779 / 
-                <a href="https://github.com/sm64js/sm64js/issues" style="color:black" >Github</a>
-            `
-        })
+    const numButtons = gamepad.buttons.length
+    const numAxes = gamepad.axes.length
 
-        ///Fillout the select options and set default value
-        Array.from(document.getElementsByTagName("select")).forEach(selectElem => {
-            if (selectElem.options.length == 0) { /// insert options
-                if (selectElem.hasAttribute("gamepadButton")) {
-                    for (let i = 0; i < navigator.getGamepads()[gamepadIndex].buttons.length; i++) {
-                        const option = document.createElement("option")
-                        option.value = i
-                        option.text = i
-                        selectElem.add(option)
-                    }
-                }
-                if (selectElem.hasAttribute("gamepadAxes")) {
-                    for (let i = 0; i < navigator.getGamepads()[gamepadIndex].axes.length; i++) {
-                        const option = document.createElement("option")
-                        option.value = i
-                        option.text = i
-                        selectElem.add(option)
-                    }
+    $('[data-toggle="gamepadControlsToggle"]').popover('show')
+
+    document.getElementById('noGamepadMessage').hidden = true
+    document.getElementById('gamepadMessageDiv').hidden = false
+    document.getElementById('gamepadMessage').innerHTML = `Detected Gamepad: "${gamepad.id.slice(0, 30)}" with ${numButtons} Buttons`
+
+    ///Fillout the select options and set default value
+    const controlsWindowDiv = document.getElementById('gamepadControlsWindow')
+    controlsWindowDiv.querySelectorAll("select").forEach(selectElem => {
+        if (selectElem.options.length == 0) { /// insert options
+            if (selectElem.hasAttribute("gamepadButton")) {
+                for (let i = 0; i < numButtons; i++) {
+                    const option = document.createElement("option")
+                    option.value = i
+                    option.text = i
+                    selectElem.add(option)
                 }
             }
-            selectElem.value = gamepadButtonMapping[selectElem.name]
-        })
-    } else {  /// no gamepad detected
-        Array.from(messages).forEach(msg => {
-            msg.innerHTML = `No Gamepad Detected Yet`
-        })
-    }
+            if (selectElem.hasAttribute("gamepadAxes")) {
+                for (let i = 0; i < numAxes; i++) {
+                    const option = document.createElement("option")
+                    option.value = i
+                    option.text = i
+                    selectElem.add(option)
+                }
+            }
+        }
+        selectElem.value = gamepadButtonMapping[selectElem.name]
+    })
 
+    $('[data-toggle="gamepadControlsToggle"]').popover('hide')
+    
 })
 
 
 window.updateDeadZone = (data) => { deadzone = parseFloat(data) }
-window.switchGamepadFunc = () => { window.switchGamepad = true }
 
 window.updateKeyboardMapping = (chosenKey, gameButton) => {
     keyboardButtonMapping[gameButton] = chosenKey
 }
 
 window.updateGamepadMapping = (chosenKey, gameButton) => {
-    gamepadButtonMapping[gameButton] = chosenKey
+    gamepadButtonMapping[gameButton] = parseInt(chosenKey)
 }
 
 
 window.saveControls = () => {
-    localStorage['sm64jsControls'] = JSON.stringify({
-        keybaord: keyboardButtonMapping,
+    Cookies.set('controls', JSON.stringify({
+        keyboard: keyboardButtonMapping,
         gamepad: gamepadButtonMapping
-    })
+    }))
 }
 
 window.loadDefaultControls = () => {
@@ -294,8 +283,6 @@ export const playerInputUpdate = () => {
     Object.entries(keyboardButtonMapping).forEach(([key, value]) => {
         keyboardFinal[key] = Boolean(keyboardButtons[value]) && !textboxfocus
     })
-
-    const gamepadIndex = window.switchGamepad ? 1 : 0
 
     let stickX = 0, stickY = 0, gamepad
     if (navigator.getGamepads) {
@@ -358,21 +345,5 @@ export const playerInputUpdate = () => {
     }
     
     if (gameData.marioState) gameData.marioState.controller = window.playerInput
-
-    //// Repeat for other player
-/*    stickX = 0, stickY = 0
-
-    if (keyboardButtons.right) stickX += 1
-    if (keyboardButtons.left) stickX -= 1
-
-    if (keyboardButtons.up) stickY += 1
-    if (keyboardButtons.down) stickY -= 1
-
-    mag = Math.sqrt((stickX * stickX) + (stickY * stickY))
-    ratio = mag > 0 ? (64 / mag) : 0
-    stickX *= ratio
-    stickY *= ratio
-
-    window.playerInput2 = { stickX, stickY, stickMag: mag * ratio }*/
 
 }

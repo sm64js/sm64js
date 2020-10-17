@@ -21,6 +21,7 @@ export const networkData = {
     playerInteractions: true,
     remotePlayers: {},
     myChannelID: -1,
+    lastSentSkinData: {}
 }
 
 export const gameData = {}
@@ -111,7 +112,10 @@ export const post_main_loop_one_iteration = (frame) => {
 
     if (frame % 150 == 0) { //every 5 seconds
         if (multiplayerReady() && Cosmetics.validSkins()) {
-            channel.emit('skin', window.myMario.skinData)
+            if (JSON.stringify(window.myMario.skinData) != networkData.lastSentSkinData) {
+                networkData.lastSentSkinData = JSON.stringify(window.myMario.skinData)
+                channel.emit('skin', window.myMario.skinData)
+            }
         }
     }
 

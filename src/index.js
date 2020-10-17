@@ -147,7 +147,7 @@ window.enterFullScreenMode = () => {
 let gameStarted = false
 
 document.getElementById("startbutton").addEventListener('click', () => {
-    if (gameStarted) window.location.search += '&autostart=1' /// Refresh page (Reset Game)
+    if (gameStarted) window.location.search = '&autostart=1' /// Refresh page (Reset Game)
     else startGame()
 })
 

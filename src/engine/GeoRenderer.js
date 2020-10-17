@@ -416,9 +416,14 @@ class GeoRenderer {
         }
 
         if (object.localMario) {  /// original Mario
-            Object.entries(networkData.remotePlayers).forEach(([id, data]) => {
-                const marioObj = data.marioState.marioObj
-                this.geo_process_extra_mario(marioObj)
+            Object.values(networkData.remotePlayers).forEach(data => {
+                if (data.skipRender > 0) data.skipRender--
+                if (data.crashCount > 0 || data.skipRender > 0) return
+                try {
+                    this.geo_process_extra_mario(data.marioState.marioObj)
+                } catch {
+                    data.skipRender = 30
+                }
             })
         }
 

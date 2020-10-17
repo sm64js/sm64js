@@ -154,7 +154,7 @@ if (Cookies.get('controls')) {
     Object.assign(gamepadButtonMapping, JSON.parse(Cookies.get('controls')).gamepad)
 }
 
-/// Fillout the select options - Keyboard only - gamepad does this on load popover
+/// Fillout the select options - Keyboard only - gamepad does this on gamepad connect
 Array.from(document.getElementsByTagName("select")).forEach(selectElem => {
     if (selectElem.hasAttribute("keyboardButton")) {
         allKeyboardButtons.forEach(key => {
@@ -190,8 +190,6 @@ window.addEventListener("gamepadconnected", function (e) {
     const gamepad = e.gamepad
 
     gamepadIndex = gamepad.index
-
-    console.log(gamepadIndex)
 
     const numButtons = gamepad.buttons.length
     const numAxes = gamepad.axes.length

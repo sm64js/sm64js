@@ -913,7 +913,7 @@ const act_long_jump_land = (m) => {
 
 const act_dive_slide = (m) => {
 
-    if ((m.input & (Mario.INPUT_A_PRESSED | Mario.INPUT_B_PRESSED))) {
+    if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & (Mario.INPUT_A_PRESSED | Mario.INPUT_B_PRESSED))) {
         return Mario.set_mario_action(m, m.forwardVel > 0.0 ? Mario.ACT_FORWARD_ROLLOUT : Mario.ACT_BACKWARD_ROLLOUT, 0)
     }
 

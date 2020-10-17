@@ -269,7 +269,9 @@ export const recvMarioData = (mariolistbytes) => {
                     if (networkData.remotePlayers[id] == undefined) {
                         networkData.remotePlayers[id] = { 
                             marioState: initNewRemoteMarioState(marioProto),
-                            skinData: defaultSkinData()
+                            skinData: defaultSkinData(),
+                            crashCount: 0,
+                            skipRender: 0
                         }
                         applyController(marioProto.getController())
                     } else {

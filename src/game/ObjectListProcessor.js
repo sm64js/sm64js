@@ -139,8 +139,13 @@ class ObjectListProcessor {
         this.copy_mario_state_to_object(LevelUpdate.gMarioState)
 
         Object.values(networkData.remotePlayers).forEach(remotePlayer => {
-            Mario.execute_mario_action(remotePlayer.marioState)
-            this.copy_mario_state_to_object(remotePlayer.marioState)
+            try { /// surpress bugs for now
+                Mario.execute_mario_action(remotePlayer.marioState)
+                this.copy_mario_state_to_object(remotePlayer.marioState)
+                remotePlayer.crashCount = 0
+            } catch {
+                remotePlayer.crashCount++
+            }  
         })
         
     }

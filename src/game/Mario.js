@@ -12,11 +12,12 @@ import { gMarioAnimData } from "../actors/mario/marioAnimData"
 import { mario_execute_moving_action } from "./MarioActionsMoving"
 import { mario_execute_airborne_action } from "./MarioActionsAirborne"
 import { mario_execute_object_action } from "./MarioActionsObject"
-import { oMarioWalkingPitch, oInteractStatus, oPosX, oPosY, oPosZ, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw } from "../include/object_constants"
+import { oMarioWalkingPitch, oInteractStatus, oPosX, oPosY, oPosZ, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oMarioSteepJumpYaw } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
 import { mario_execute_cutscene_action } from "./MarioActionsCutscene"
 import { gameData as socketGameData } from "../socket"
+import { int16, sins, coss } from "../utils"
 
 ////// Mario Constants
 export const ANIM_FLAG_NOLOOP = (1 << 0) // 0x01
@@ -249,7 +250,8 @@ export const ACT_TWIRL_LAND = 0x18800238
 export const ACT_TWIRLING = 0x108008A4
 export const ACT_IN_CANNON               = 0x00001371
 export const ACT_BUTT_SLIDE_AIR          = 0x0300088E
-export const ACT_HOLD_BUTT_SLIDE_AIR     = 0x010008A2
+export const ACT_HOLD_BUTT_SLIDE_AIR = 0x010008A2
+export const ACT_STEEP_JUMP = 0x03000885
 
 export const ACT_HARD_BACKWARD_GROUND_KB  =  0x00020460 
 export const ACT_HARD_FORWARD_GROUND_KB   =  0x00020461 
@@ -532,26 +534,55 @@ export const drop_and_set_mario_action = (m, action, actionArg) => {
 }
 
 export const set_jumping_action = (m, action, actionArg) => {
-    set_mario_action(m, action, actionArg)
+
+    if (mario_floor_is_steep(m)) {
+        set_steep_jump_action(m)
+    } else {
+        set_mario_action(m, action, actionArg)
+    }
+
     return 1
+}
+
+const set_steep_jump_action = (m) => {
+    m.marioObj.rawData[oMarioSteepJumpYaw] = m.faceAngle[1]
+
+    if (m.forwardVel > 0.0) {
+
+        const angleTemp = int16(m.floorAngle + 0x8000)
+        const faceAngleTemp = int16(m.faceAngle[1] - angleTemp)
+
+        const y = sins(faceAngleTemp) * m.forwardVel
+        const x = coss(faceAngleTemp) * m.forwardVel * 0.75
+
+        m.forwardVel = Math.sqrt(y * y + x * x)
+        m.faceAngle[1] = atan2s(x, y) + angleTemp
+    }
+
+    drop_and_set_mario_action(m, ACT_STEEP_JUMP, 0)
 }
 
 export const set_jump_from_landing = (m) => {
 
-    if (m.doubleJumpTimer == 0) {
-        set_mario_action(m, ACT_JUMP, 0)
+    if (mario_floor_is_steep(m)) {
+        set_steep_jump_action(m)
     } else {
-        switch (m.prevAction) {
-            case ACT_JUMP_LAND: set_mario_action(m, ACT_DOUBLE_JUMP, 0); break
-            case ACT_FREEFALL_LAND: set_mario_action(m, ACT_DOUBLE_JUMP, 0); break
-            case ACT_SIDE_FLIP_LAND_STOP: set_mario_action(m, ACT_DOUBLE_JUMP, 0); break
-            case ACT_DOUBLE_JUMP_LAND:
-                if (m.forwardVel > 20.0) set_mario_action(m, ACT_TRIPLE_JUMP, 0)
-                else set_mario_action(m, ACT_JUMP, 0)
-                break
-            default: set_mario_action(m, ACT_JUMP, 0)
+        if (m.doubleJumpTimer == 0) {
+            set_mario_action(m, ACT_JUMP, 0)
+        } else {
+            switch (m.prevAction) {
+                case ACT_JUMP_LAND: set_mario_action(m, ACT_DOUBLE_JUMP, 0); break
+                case ACT_FREEFALL_LAND: set_mario_action(m, ACT_DOUBLE_JUMP, 0); break
+                case ACT_SIDE_FLIP_LAND_STOP: set_mario_action(m, ACT_DOUBLE_JUMP, 0); break
+                case ACT_DOUBLE_JUMP_LAND:
+                    if (m.forwardVel > 20.0) set_mario_action(m, ACT_TRIPLE_JUMP, 0)
+                    else set_mario_action(m, ACT_JUMP, 0)
+                    break
+                default: set_mario_action(m, ACT_JUMP, 0)
+            }
         }
-    }
+
+    } 
 
 
     m.doubleJumpTimer = 0
@@ -590,6 +621,11 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
             set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
             m.forwardVel = 8.0
             m.faceAngle[1] = m.intendedYaw
+            break
+        case ACT_STEEP_JUMP:
+            m.marioObj.header.gfx.unk38.animID = -1
+            set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
+            m.faceAngle[0] = -0x2000
             break
         case ACT_DOUBLE_JUMP:
             set_mario_y_vel_based_on_fspeed(m, 52.0, 0.25)
@@ -975,6 +1011,37 @@ export const mario_floor_is_slope = (m) => {
     }
 
     return m.floor.normal.y <= normY
+}
+
+export const mario_floor_is_steep = (m) => {
+    let normY
+
+    let result = false
+
+    if (!mario_facing_downhill(m, false)) {
+        switch (mario_get_floor_class(m)) {
+            case SurfaceTerrains.SURFACE_VERY_SLIPPERY:
+                normY = 0.9659258 //~cos(15 deg)
+                break
+
+            case SurfaceTerrains.SURFACE_SLIPPERY:
+                normY = 0.9396926 //~cos(20 deg)
+                break
+
+            default:
+                normY = 0.8660254 //~cos(30 deg)
+                break
+
+            case SurfaceTerrains.SURFACE_NOT_SLIPPERY:
+                normY = 0.8660254 //~cos(30 deg)
+                break
+        }
+
+        result = m.floor.normal.y <= normY
+
+    }
+
+    return result
 }
 
 export const mario_get_floor_class = (m) => {

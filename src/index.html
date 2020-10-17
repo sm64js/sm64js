@@ -249,7 +249,18 @@
 
         <div class="container" id="gamepadControlsWindow">
             <div class="row" style="justify-content:center">
-                <h6 style="text-align:center" class="gamepadMessage"> Gamepad is detected</h6>
+                <h6 style="text-align:center" id="noGamepadMessage">No Gamepad Detected Yet</h6>
+                <div hidden id="gamepadMessageDiv">
+                    <h6 id="gamepadMessage">
+                    </h6>
+                    <h6 style="text-align:center" id="gamepadMessage">
+                        Is your gamepad not working correctly?
+                        <br />
+                        Contact me so I can support more gamepads. Discord: snuffysasa#2779 /
+                        <a href="https://github.com/sm64js/sm64js/issues" style="color:blue;font-weight:bold">Github</a>
+                    </h6>
+                </div>
+
             </div>
 
             <div class="row">
@@ -291,11 +302,11 @@
                     </div>
                 </form>
 
-                <div class="mx-sm-3 mb-2">
-                    <button class="btn btn-sm btn-secondary" onclick="window.switchGamepadFunc()">
-                        Multiple Gamepads?
-                    </button>
-                </div>
+                <!--                <div class="mx-sm-3 mb-2">
+                                <button class="btn btn-sm btn-secondary" onclick="window.switchGamepadFunc()">
+                                    Multiple Gamepads?
+                                </button>
+                            </div>-->
             </div>
 
             <div class="row" style="justify-content:center;">

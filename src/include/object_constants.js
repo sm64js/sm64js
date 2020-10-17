@@ -65,6 +65,7 @@ export const oMarioPoleYawVel       = 0x21
 export const oMarioCannonObjectYaw  = 0x21
 export const oMarioTornadoYawVel    = 0x21
 export const oMarioReadingSignDPosX = 0x21
+export const oMarioSteepJumpYaw     = 0x22
 export const oMarioPolePos          = 0x22
 
 export const oMarioWalkingPitch = 0x22

@@ -1,6 +1,7 @@
 import * as Mario from "./Mario"
 import { perform_air_step, mario_bonk_reflection } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
+import { oMarioSteepJumpYaw } from "../include/object_constants"
 
 const update_air_without_turn = (m) => {
     let sidewaysSpeed = 0.0
@@ -651,10 +652,62 @@ const act_air_hit_wall = (m) => {
     return 1  /// Nintendo glitch
 }
 
+const act_thrown_backward = (m) => {
+
+    const landAction = Mario.ACT_FREEFALL_LAND
+
+    ///play sound
+
+    const animation = Mario.MARIO_ANIM_BACKWARD_AIR_KB
+    //// temporary should be common_air_knockback_step
+    common_air_action_step(m, landAction, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
+    m.marioObj.header.gfx.angle = [0, m.faceAngle[1], 0]
+
+    m.forwardVel *= 0.98
+    return 0
+}
+
+const act_knocked_up = (m) => {
+
+    const landAction = Mario.ACT_BUTT_STUCK_IN_GROUND
+    const animation = Mario.MARIO_ANIM_BACKWARD_AIR_KB
+
+    common_air_knockback_step(m, landAction, landAction, animation, 0)
+    return 0
+
+}
+
+const act_steep_jump = (m) => {
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
+    }
+
+    //play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0);
+    Mario.set_forward_vel(m, 0.98 * m.forwardVel)
+
+    switch (perform_air_step(m, 0)) {
+        case Mario.AIR_STEP_LANDED:
+            //if (!check_fall_damage_or_get_stuck(m, ACT_HARD_BACKWARD_GROUND_KB)) {
+                m.faceAngle[0] = 0
+                Mario.set_mario_action(m, m.forwardVel < 0.0 ? Mario.ACT_BEGIN_SLIDING : Mario.ACT_JUMP_LAND, 0)
+            //}
+            break
+
+        case Mario.AIR_STEP_HIT_WALL:
+            Mario.set_forward_vel(m, 0.0)
+            break
+    }
+
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_SINGLE_JUMP)
+    m.marioObj.header.gfx.angle[1] = m.marioObj.rawData[oMarioSteepJumpYaw]
+    return 0
+}
+
 export const mario_execute_airborne_action = (m) => {
 
     switch (m.action) {
         case Mario.ACT_JUMP: return act_jump(m)
+        case Mario.ACT_STEEP_JUMP: return act_steep_jump(m)
         case Mario.ACT_SOFT_BONK: return act_soft_bonk(m)
         case Mario.ACT_FREEFALL: return act_freefall(m)
         case Mario.ACT_SIDE_FLIP: return act_side_flip(m)

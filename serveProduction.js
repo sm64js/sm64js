@@ -190,7 +190,7 @@ setInterval(() => {
 const measureAndPrintLatency = (msgBytes) => {
     const time = JSON.parse(new TextDecoder("utf-8").decode(msgBytes)).time
     const hrend = process.hrtime(time)
-    console.info('Latency: %ds %dms', hrend[0], hrend[1] / 1000000)
+    //console.info('Latency: %ds %dms', hrend[0], hrend[1] / 1000000)
 }
 
 geckos.onConnection(channel => {

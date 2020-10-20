@@ -49,7 +49,7 @@ const recvChat = (chatmsg) => {
     else
         someobject = networkData.remotePlayers[chatmsg.channel_id]
 
-    Object.assign(someobject, { chatData: { msg: chatmsg.msg, timer: 80 } })
+    Object.assign(someobject, { chatData: { msg: chatmsg.msg, timer: 150 } })
 
 }
 

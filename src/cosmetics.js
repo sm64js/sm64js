@@ -1,5 +1,4 @@
 import { networkData } from "./socket"
-import Cookies from "js-cookie"
 
 export const defaultSkinData = () => {
     return {
@@ -72,21 +71,35 @@ $('[data-toggle="skinCustomizerToggle"]').popover({
 $('[data-toggle="skinCustomizerToggle"]').on('shown.bs.popover', () => { window.setSkinSliderValues() })
 
 window.customSkinUpdate = (slider) => {
-    const color = getComputedStyle(slider).borderColor
+    let color = getComputedStyle(slider).borderColor
 
-    const percent = (slider.value / 255) * 100
+    let percent = (slider.value / 255) * 100
     slider.style.background = 'linear-gradient(to right, ' + color + ' 0%, ' + color + ' ' + percent + '%, #fff ' + percent + '%, white 100%)'
 
-    const index = slider.id.slice(-1)
+    let index = slider.id.slice(-1)
     document.getElementById("skinSliderRangeDisplay" + index).innerHTML = slider.value
 
     let skinType = document.getElementById("skinTypes").value
-    window.myMario.skinData[skinType][index] = parseInt(document.getElementById("skinSliderValue" + index).value)
+    let newValue = parseInt(document.getElementById("skinSliderValue" + index).value)
+    window.myMario.skinData[skinType][index] = newValue
 
-    Cookies.set('skinData-' + skinType, JSON.stringify(window.myMario.skinData[skinType]))    
+    if (index > 2) {
+        index -= 3
+        newValue = parseInt(newValue / 2)
+        slider = document.getElementById("skinSliderValue" + index)
+        slider.value = newValue
+        color = getComputedStyle(slider).borderColor
+        percent = (slider.value / 255) * 100
+        slider.style.background = 'linear-gradient(to right, ' + color + ' 0%, ' + color + ' ' + percent + '%, #fff ' + percent + '%, white 100%)'
+
+        document.getElementById("skinSliderRangeDisplay" + index).innerHTML = slider.value
+        window.myMario.skinData[skinType][index] = newValue
+    }
+
+    localStorage[`skinData-${skinType}`] = JSON.stringify(window.myMario.skinData[skinType])
 }
 
-const storedPlayerName = Cookies.get('playername')
+const storedPlayerName = localStorage['playername']
 window.myMario = {
     playerName: storedPlayerName ? storedPlayerName : "Unnamed Player",
     skinData: defaultSkinData()
@@ -94,8 +107,8 @@ window.myMario = {
 document.getElementById('playerNameInput').value = window.myMario.playerName
 
 Object.keys(window.myMario.skinData).forEach((skinType) => {
-    const cookieData = Cookies.get('skinData-' + skinType)
-    if (cookieData) window.myMario.skinData[skinType] = JSON.parse(cookieData)
+    const skinData = localStorage[`skinData-${skinType}`]
+    if (skinData) window.myMario.skinData[skinType] = JSON.parse(skinData)
 })
 
 
@@ -107,7 +120,7 @@ window.updatePlayerName = (name) => {
         document.getElementById("playerNameInput").style.borderColor = "blue"
         document.getElementById("playerNameInput").style.borderWidth = "1px"
         window.myMario.playerName = name
-        Cookies.set('playername', name)
+        localStorage['playername'] = name
     }
 }
 

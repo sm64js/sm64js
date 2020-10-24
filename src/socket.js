@@ -95,7 +95,7 @@ const updateConnectedMsg = () => {
         elem.innerHTML = "Connected To Server  -  " + (numPlayers).toString() + " Players Online" 
         elem.style.color = "lawngreen"
     } else {
-        elem.innerHTML = "Not connected to server - try refreshing - or server is down"
+        elem.innerHTML = "Not connected to server - Refresh the page"
         elem.style.color = "red"
     }
 }

@@ -16,6 +16,7 @@ const geckos = require('@geckos.io/server').default({
 const badwords = fs.readFileSync('otherTools/profanity_filter.txt').toString().split('\n')
 
 const allChannels = {}
+const stats = {}
 
 let currentId = 0
 const generateID = () => {
@@ -158,6 +159,7 @@ setInterval(async () => {
     mariolistproto.setMessagecount(marioListCounter)
     const bytes = mariolistproto.serializeBinary()
     const compressedMsg = await deflate(bytes)
+    stats.marioListSize = compressedMsg.length
     broadcastDataWithOpcode(compressedMsg, 0)
     marioListCounter++
 
@@ -252,6 +254,13 @@ app.get('/romTransfer', async (req, res) => {
     await fileDownload(file, 'http://' + req.query.romExternal)
 
     return res.send(await extractJsonFromRomFile(uid))
+})
+
+app.get('/stats', (req, res) => {
+    return res.send({
+        marioListSize: stats.marioListSize,
+        numPlayers: Object.keys(allChannels).length
+    })
 })
 
 const mkdir = promisify(fs.mkdir)

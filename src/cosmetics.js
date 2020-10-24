@@ -69,7 +69,28 @@ $('[data-toggle="skinCustomizerToggle"]').popover({
 })
 
 $('[data-toggle="skinCustomizerToggle"]').on('shown.bs.popover', () => { window.setSkinSliderValues() })
-
+window.createSkinCode = (skinData) => {
+    var skinCode = skinData;
+    skinCode = skinCode.split(/,|\[|\]/);
+    if (skinCode[48] != "\"hair\":") { // sanity checker
+    	console.warn("Invalid skin data!");
+    } else {
+        skinCode = skinCode[1] + "-" + skinCode[2] + "-" + skinCode[3] + "-" + skinCode[4] + "-" + skinCode[5] + "-" + skinCode[6] + "h" + skinCode[9] + "-" + skinCode[10] + "-" + skinCode[11] + "-" + skinCode[12] + "-" + skinCode[13] + "-" + skinCode[14] + "s" + skinCode[17] + "-" + skinCode[18] + "-" + skinCode[19] + "-" + skinCode[20] + "-" + skinCode[21] + "-" + skinCode[22] + "g" + skinCode[25] + "-" + skinCode[26] + "-" + skinCode[27] + "-" + skinCode[28] + "-" + skinCode[29] + "-" + skinCode[30] + "b" + skinCode[33] + "-" + skinCode[34] + "-" + skinCode[35] + "-" + skinCode[36] + "-" + skinCode[37] + "-" + skinCode[38] + "r" + skinCode[41] + "-" + skinCode[42] + "-" + skinCode[43] + "-" + skinCode[44] + "-" + skinCode[45] + "-" + skinCode[46] + "m" + skinCode[49] + "-" + skinCode[50] + "-" + skinCode[51] + "-" + skinCode[52] + "-" + skinCode[53] + "-" + skinCode[54]; 
+    }
+    document.getElementById("skinCode").value = skinCode;
+    window.setSkinSliderValues()
+}
+window.updateSkinCode = (skinCode) => {
+    var s = skinCode.split(/h|g|b|r|m|s|-/);
+    console.log(s);
+    window.myMario.skinData.overalls = [ parseInt(s[0]), parseInt(s[1]), parseInt(s[2]), parseInt(s[3]), parseInt(s[4]), parseInt(s[5]) ];
+    window.myMario.skinData.hat = [ parseInt(s[6]), parseInt(s[7]), parseInt(s[8]), parseInt(s[9]), parseInt(s[10]), parseInt(s[11]) ];
+    window.myMario.skinData.shirt = [ parseInt(s[12]), parseInt(s[13]), parseInt(s[14]), parseInt(s[15]), parseInt(s[16]), parseInt(s[17]) ];
+    window.myMario.skinData.gloves  = [ parseInt(s[18]), parseInt(s[19]), parseInt(s[20]), parseInt(s[21]), parseInt(s[22]), parseInt(s[23]) ];
+    window.myMario.skinData.boots = [ parseInt(s[24]), parseInt(s[25]), parseInt(s[26]), parseInt(s[27]), parseInt(s[28]), parseInt(s[29]) ];
+    window.myMario.skinData.skin = [ parseInt(s[30]), parseInt(s[31]), parseInt(s[32]), parseInt(s[33]), parseInt(s[34]), parseInt(s[35]) ];
+    window.myMario.skinData.hair = [ parseInt(s[36]), parseInt(s[37]), parseInt(s[38]), parseInt(s[39]), parseInt(s[40]), parseInt(s[41]) ];
+}
 window.customSkinUpdate = (slider) => {
     let color = getComputedStyle(slider).borderColor
 

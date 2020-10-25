@@ -216,7 +216,7 @@ geckos.onConnection(channel => {
         } catch (err) { console.log(err) }
     })
 
-    channel.on('chat', msg => { processChat(channel.my_id, msg) })
+    //channel.on('chat', msg => { processChat(channel.my_id, msg) })
     channel.on('skin', msg => { processSkin(channel.my_id, msg) })
 
     channel.onDisconnect(() => {

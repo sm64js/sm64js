@@ -18,7 +18,7 @@ This is an ongoing work-in-progress port of the decompilation of original Ninten
 ### Run these commands
 ```bash
 # Create and start lightweight docker container with NodeJs
-docker run --name mySm64JsServer -dp 80:80 node:13-alpine tail -f /dev/null
+docker run --name mySm64JsServer -dp 80:80 node:13 tail -f /dev/null
 # Connect to the docker container's shell
 docker exec -it mySm64JsServer /bin/sh
 

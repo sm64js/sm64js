@@ -1,5 +1,6 @@
 const { MarioMsg, MarioListMsg, ControllerMsg, ValidPlayersMsg } = require("./proto/mario_pb")
 const fs = require('fs')
+const http = require('http')
 const util = require('util')
 const zlib = require('zlib')
 const deflate = util.promisify(zlib.deflate)
@@ -133,21 +134,39 @@ const processChat = (channel_id, msg) => {
 
     if (allChannels[channel_id].chatCooldown > 0) return
 
-    badwords.forEach(word => {
-        const searchMask = word.slice(0, word.length)
-        const regEx = new RegExp(searchMask, "ig");
-        msg = msg.replace(regEx, "*****")
-    })
-
     const decodedMario = Object.values(allChannels).find(data => data.channel.my_id == channel_id).decodedMario
-
     if (decodedMario == undefined) return
 
-    const chatmsg = { channel_id, msg: sanitizeChat(msg), sender: decodedMario.getPlayername() }
+    const request = "http://www.purgomalum.com/service/json?text=" + sanitizeChat(msg)
 
-    allChannels[channel_id].chatCooldown = 5 // seconds
+    http.get(request, res => {
+        const { statusCode } = res
 
-    geckos.emit('chat', chatmsg)
+        if (statusCode != 200) {
+            console.error(`Profanity API did not return successful status code`)
+            return
+        }
+
+        res.setEncoding('utf8')
+        let rawData = ''
+        res.on('data', (chunk) => { rawData += chunk })
+        res.on('end', () => {
+            try {
+                const parsedData = JSON.parse(rawData)
+                const chatmsg = { channel_id, msg: parsedData.result, sender: decodedMario.getPlayername() }
+
+                allChannels[channel_id].chatCooldown = 3 // seconds
+
+                geckos.emit('chat', chatmsg)
+            } catch (e) {
+                console.error(`Got error with profanity api: ${e.message}`)
+            }
+        })
+    }).on('error', (e) => {
+        console.error(`Got error with profanity api: ${e.message}`)
+    })
+
+
 }
 
 const sendSkinsToChannel = (channel) => {
@@ -269,7 +288,6 @@ geckos.onConnection(channel => {
 //// Express Static serving
 const express = require('express')
 const app = express()
-const http = require('http')
 const server = http.Server(app)
 app.use(express.static(__dirname + '/dist'))
 

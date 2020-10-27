@@ -392,6 +392,19 @@ const mio0_decode = (dataSlice) => {
 }
 
 const extractAssetsFromRom = (romBufferData) => {
+
+    const first_bytes = Buffer.from(romBufferData.slice(0, 4))
+    
+    if (first_bytes[0] != 0x80 ||
+        first_bytes[1] != 0x37 ||
+        first_bytes[2] != 0x12 ||
+        first_bytes[3] != 0x40 ) {
+
+        msgElement.innerHTML = "Rom Asset Extraction Fail - Must be a US '.z64' ROM file"
+        msgElement.style = "color:red"
+        return
+    }
+
     const extractedData = {}
 
     ///// process assets by type

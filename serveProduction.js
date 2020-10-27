@@ -13,10 +13,7 @@ const geckos = require('@geckos.io/server').default({
     iceServers
 })
 
-const badwords = {}
-fs.readFileSync('otherTools/profanity_filter.txt').toString().split('\n').forEach(word => {
-    badwords[word] = 1
-})
+const badwords = fs.readFileSync('otherTools/profanity_filter.txt').toString().split('\n')
 
 const allChannels = {}
 const stats = {}

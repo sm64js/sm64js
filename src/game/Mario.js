@@ -925,7 +925,7 @@ const update_mario_geometry_inputs = (m) => {
         }
 
     } else {
-        throw "no floor"
+        m.input |= INPUT_OFF_FLOOR;
     }
 }
 

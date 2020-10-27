@@ -84,7 +84,37 @@ import {
     bob_seg7_texture_07001800,
     bob_seg7_texture_07002000
 } from "./levels/bob/textures.inc"
-
+import {
+    wf_seg7_texture_07000000,
+    wf_seg7_texture_07000800,
+    wf_seg7_texture_07001000,
+    wf_seg7_texture_07001800,
+    wf_seg7_texture_07002000,
+    wf_seg7_texture_07002800
+} from "./levels/wf/textures.inc"
+import {
+    mountain_09000000,
+    mountain_09000800,
+    mountain_09001800,
+    mountain_09002800,
+    mountain_09003000,
+    mountain_09003800,
+    mountain_09004000,
+    mountain_09004800,
+    mountain_09005000,
+    mountain_09005800,
+    mountain_09006800,
+    mountain_09007000,
+    mountain_09007800,
+    mountain_09008000,
+    mountain_09008800,
+    mountain_09009800,
+    mountain_0900A000,
+    mountain_0900A800,
+    mountain_0900B000,
+    mountain_0900B800,
+    mountain_0900C000,
+} from "./textures/mountain.js"
 import {
     snow_09000000,
     snow_09000800,
@@ -105,11 +135,35 @@ import {
     snow_09009000,
     snow_09009800
 } from "./textures/snow"
+import {
+    grass_09000000,
+    grass_09000800,
+    grass_09001000,
+    grass_09002000,
+    grass_09002800,
+    grass_09003000,
+    grass_09003800,
+    grass_09004000,
+    grass_09004800,
+    grass_09005000,
+    grass_09005800,
+    grass_09006000,
+    grass_09006800,
+    grass_09007000,
+    grass_09008000,
+    grass_09008800,
+    grass_09009000,
+    grass_09009800,
+    grass_0900A000,
+    grass_0900A800,
+    grass_0900B000,
+    grass_0900B800
+} from "./textures/grass"
 
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 7
+const textureVersion = 9
 
 const loadDataIntoGame = (data) => {
 
@@ -144,6 +198,28 @@ const loadDataIntoGame = (data) => {
     gd_texture_sparkle_2.push(...data['textures/intro_raw/sparkle_2.rgba16.png'].data)
     gd_texture_sparkle_3.push(...data['textures/intro_raw/sparkle_3.rgba16.png'].data)
     gd_texture_sparkle_4.push(...data['textures/intro_raw/sparkle_4.rgba16.png'].data)
+
+    mountain_09000000.push(...data['textures/mountain/ttm_textures.00000.rgba16.png'].data)
+    mountain_09000800.push(...data['textures/mountain/ttm_textures.00800.rgba16.png'].data)
+    mountain_09001800.push(...data['textures/mountain/ttm_textures.01800.rgba16.png'].data)
+    mountain_09002800.push(...data['textures/mountain/ttm_textures.02800.rgba16.png'].data)
+    mountain_09003000.push(...data['textures/mountain/ttm_textures.03000.rgba16.png'].data)
+    mountain_09003800.push(...data['textures/mountain/ttm_textures.03800.rgba16.png'].data)
+    mountain_09004000.push(...data['textures/mountain/ttm_textures.04000.rgba16.png'].data)
+    mountain_09004800.push(...data['textures/mountain/ttm_textures.04800.rgba16.png'].data)
+    mountain_09005000.push(...data['textures/mountain/ttm_textures.05000.rgba16.png'].data)
+    mountain_09005800.push(...data['textures/mountain/ttm_textures.05800.rgba16.png'].data)
+    mountain_09006800.push(...data['textures/mountain/ttm_textures.06800.rgba16.png'].data)
+    mountain_09007000.push(...data['textures/mountain/ttm_textures.07000.rgba16.png'].data)
+    mountain_09007800.push(...data['textures/mountain/ttm_textures.07800.rgba16.png'].data)
+    mountain_09008000.push(...data['textures/mountain/ttm_textures.08000.rgba16.png'].data)
+    mountain_09008800.push(...data['textures/mountain/ttm_textures.08800.rgba16.png'].data)
+    mountain_09009800.push(...data['textures/mountain/ttm_textures.09800.rgba16.png'].data)
+    mountain_0900A000.push(...data['textures/mountain/ttm_textures.0A000.rgba16.png'].data)
+    mountain_0900A800.push(...data['textures/mountain/ttm_textures.0A800.rgba16.png'].data)
+    mountain_0900B000.push(...data['textures/mountain/ttm_textures.0B000.rgba16.png'].data)
+    mountain_0900B800.push(...data['textures/mountain/ttm_textures.0B800.rgba16.png'].data)
+    mountain_0900C000.push(...data['textures/mountain/ttm_textures.0C000.rgba16.png'].data)
 
     title_texture_0A0001C0.push(...data['textures/title_screen_bg/title_screen_bg.001C0.rgba16.png'].data)
     title_texture_0A000E40.push(...data['textures/title_screen_bg/title_screen_bg.00E40.rgba16.png'].data)
@@ -188,6 +264,13 @@ const loadDataIntoGame = (data) => {
     bob_seg7_texture_07001000.push(...data["levels/bob/2.rgba16.png"].data)
     bob_seg7_texture_07001800.push(...data["levels/bob/3.rgba16.png"].data)
     bob_seg7_texture_07002000.push(...data["levels/bob/4.rgba16.png"].data)
+
+    wf_seg7_texture_07000000.push(...data["levels/wf/0.rgba16.png"].data)
+    wf_seg7_texture_07000800.push(...data["levels/wf/1.rgba16.png"].data)
+    wf_seg7_texture_07001000.push(...data["levels/wf/2.rgba16.png"].data)
+    wf_seg7_texture_07001800.push(...data["levels/wf/3.rgba16.png"].data)
+    wf_seg7_texture_07002000.push(...data["levels/wf/4.rgba16.png"].data)
+    // wf_seg7_texture_07002800.push(...data["levels/wf/5.rgba16.png"].data)
 
     snow_09000000.push(...data["textures/snow/ccm_textures.00000.rgba16.png"].data)
     snow_09000800.push(...data["textures/snow/ccm_textures.00800.rgba16.png"].data)

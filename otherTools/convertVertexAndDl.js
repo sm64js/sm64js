@@ -1,5 +1,6 @@
 const fs = require('fs')
-const input = require('os').homedir() + '/Programming/sm64pc/levels/ccm/areas/1/1/model.inc.c'
+let num = "7"
+const input = require('os').homedir() + '/sm64ex/levels/pss/areas/1/' + num + '/model.inc.c'
 let inputStr = fs.readFileSync(input, 'utf8')
 inputStr = inputStr.replace(/\r/g, "")
 
@@ -73,4 +74,4 @@ outputStr = outputStr.replace(/ G_/g, " Gbi.G_")
 outputStr = outputStr.replace(/\(G_/g, "(Gbi.G_")
 outputStr = outputStr.replace(/\.l/g, ".l[0]")
 
-fs.writeFileSync(__dirname + "/vertexDlData.js", outputStr)
+fs.writeFileSync(__dirname + "/" + num + "model.inc.js", outputStr)

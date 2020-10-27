@@ -143,7 +143,9 @@ class ObjectListProcessor {
                 Mario.execute_mario_action(remotePlayer.marioState)
                 this.copy_mario_state_to_object(remotePlayer.marioState)
                 remotePlayer.crashCount = 0
-            } catch {
+            } catch (error) {
+                console.log("unknown error in 'execute_mario_action' - please report this issue to sm64js devs")
+                console.log(error)
                 remotePlayer.crashCount++
             }  
         })

@@ -297,6 +297,8 @@ class GeoRenderer {
 
         const anim = node.curAnim
 
+        if (anim == 0) throw "node.curAnim is 0 should be object"
+
         if (hasAnimation) {
             node.animFrame = GraphNode.geo_update_animation_frame(node, node.animFrameAccelAssist)
         } else { throw "why are you here if you don't have an animation?" }
@@ -416,15 +418,27 @@ class GeoRenderer {
         }
 
         if (object.localMario) {  /// original Mario
-            Object.values(networkData.remotePlayers).forEach(data => {
+            const saveMatStackIndex = this.gMatStackIndex
+            const remotePlayerList = Object.values(networkData.remotePlayers)
+            for (let i = 0; i < remotePlayerList.length; i++) {
+                const data = remotePlayerList[i]
                 if (data.skipRender > 0) data.skipRender--
                 if (data.crashCount > 0 || data.skipRender > 0) return
+
+                if (data.marioState.marioObj.header.gfx.unk38.curAnim == 0) {
+                    console.log("remote mario not initialized yet or not initialized properly, skipping rendering")
+                    continue
+                }
+
                 try {
                     this.geo_process_extra_mario(data.marioState.marioObj)
-                } catch {
+                } catch (error) {
+                    console.log("unknown error in 'geo_process_extra_mario' - please report this issue to sm64js devs")
+                    console.log(error)
                     data.skipRender = 30
                 }
-            })
+                this.gMatStackIndex = saveMatStackIndex /// force every iteration to leave gMatStackIndex unchanged
+            }
         }
 
     }
@@ -443,7 +457,14 @@ class GeoRenderer {
 
         this.gMatStackIndex++
 
-        this.geo_set_animation_globals(object.header.gfx.unk38, true)
+        try {
+            this.geo_set_animation_globals(object.header.gfx.unk38, true)
+        } catch (error) {
+            console.log("known error in animation globals where curAnim is set to 0")
+            console.log(error)
+            this.gMatStackIndex--
+            return
+        }
 
         if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) {
 

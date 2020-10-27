@@ -13,7 +13,10 @@ const geckos = require('@geckos.io/server').default({
     iceServers
 })
 
-const badwords = fs.readFileSync('otherTools/profanity_filter.txt').toString().split('\n')
+const badwords = {}
+fs.readFileSync('otherTools/profanity_filter.txt').toString().split('\n').forEach(word => {
+    badwords[word] = 1
+})
 
 const allChannels = {}
 const stats = {}
@@ -116,10 +119,10 @@ const processSkin = (channel_id, msg) => {
 
     if (!validSkins(msg)) return
 
-    const skinMsg = { channel_id, skinData: msg }
-    allChannels[channel_id].channel.broadcast.emit('skin', skinMsg)
-
-
+    //const skinMsg = { channel_id, skinData: msg }
+    allChannels[channel_id].skinData = msg
+    allChannels[channel_id].skinData.updated = true
+    //allChannels[channel_id].channel.broadcast.emit('skin', skinMsg)
 }
 
 const sanitizeChat = (string) => {
@@ -130,11 +133,14 @@ const sanitizeChat = (string) => {
 }
 
 const processChat = (channel_id, msg) => {
-/*    badwords.forEach(word => {
+
+    if (allChannels[channel_id].chatCooldown > 0) return
+
+    badwords.forEach(word => {
         const searchMask = word.slice(0, word.length)
         const regEx = new RegExp(searchMask, "ig");
         msg = msg.replace(regEx, "*****")
-    })*/
+    })
 
     const decodedMario = Object.values(allChannels).find(data => data.channel.my_id == channel_id).decodedMario
 
@@ -142,8 +148,32 @@ const processChat = (channel_id, msg) => {
 
     const chatmsg = { channel_id, msg: sanitizeChat(msg), sender: decodedMario.getPlayername() }
 
-    geckos.emit('chat', chatmsg, { reliable: true })
+    allChannels[channel_id].chatCooldown = 5 // seconds
+
+    geckos.emit('chat', chatmsg)
 }
+
+const sendSkinsToChannel = (channel) => {
+    /// Send Skins
+    Object.entries(allChannels).forEach(([channel_id, data]) => {
+        if (data.skinData) {
+            const skinMsg = { channel_id, skinData: data.skinData }
+            channel.emit('skin', skinMsg)
+        }
+    })
+}
+
+const sendSkinsIfUpdated = () => {
+    /// Send Skins
+    Object.entries(allChannels).forEach(([channel_id, data]) => {
+        if (data.skinData) {
+            const skinMsg = { channel_id, skinData: data.skinData }
+            allChannels[channel_id].channel.broadcast.emit('skin', skinMsg)
+            data.skinData.updated = false
+        }
+    })
+}
+
 
 /// Every frame - 30 times per second
 let marioListCounter = 0
@@ -178,17 +208,27 @@ setInterval(async () => {
 
 
 /// Every 33 frames / once per second
-setInterval(() => { sendValidUpdate() }, 1000)
+setInterval(() => {
+    sendValidUpdate()
 
-/// Every 15 seconds
+    //chat cooldown
+    Object.values(allChannels).forEach(data => {
+        if (data.chatCooldown > 0) data.chatCooldown--
+    })
+}, 1000)
+
+/// Every 10 seconds
 setInterval(() => {
 
     /// ping to measure latency
-    Object.values(allChannels).forEach(data => {
+/*    Object.values(allChannels).forEach(data => {
         const msg = new TextEncoder("utf-8").encode(JSON.stringify({ time: process.hrtime() }))
         sendDataWithOpcode(msg, 99, data.channel)
-    })
-}, 15000)
+    })*/
+
+    sendSkinsIfUpdated()
+
+}, 10000)
 
 const measureAndPrintLatency = (msgBytes) => {
     const time = JSON.parse(new TextDecoder("utf-8").decode(msgBytes)).time
@@ -199,8 +239,10 @@ const measureAndPrintLatency = (msgBytes) => {
 geckos.onConnection(channel => {
 
     channel.my_id = generateID()
-    allChannels[channel.my_id] = { valid: 0, channel }
+    allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }
     channel.emit('id', { id: channel.my_id }, { reliable: true })
+
+    sendSkinsToChannel(channel)
 
     channel.onRaw(bytes => {
         try {
@@ -216,7 +258,7 @@ geckos.onConnection(channel => {
         } catch (err) { console.log(err) }
     })
 
-    //channel.on('chat', msg => { processChat(channel.my_id, msg) })
+    channel.on('chat', msg => { processChat(channel.my_id, msg) })
     channel.on('skin', msg => { processSkin(channel.my_id, msg) })
 
     channel.onDisconnect(() => {

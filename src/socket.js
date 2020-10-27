@@ -137,7 +137,7 @@ const decrementChat = () => {
 }
 
 export const sendChat = (msg) => {
-    channel.emit('chat', msg, { reliable: true })
+    channel.emit('chat', msg)
 }
 
 export const sendPlayerInteraction = (channel_id, interaction) => {

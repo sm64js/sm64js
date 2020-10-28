@@ -427,14 +427,14 @@ class GeoRenderer {
                 if (data.crashCount > 0 || data.skipRender > 0) return
 
                 if (data.marioState.marioObj.header.gfx.unk38.curAnim == 0) {
-                    console.log("remote mario not initialized yet or not initialized properly, skipping rendering")
+                    console.log("remote mario not initialized yet or not initialized properly, skipping rendering -- playerName: " + data.marioState.playerName)
                     continue
                 }
 
                 try {
                     this.geo_process_extra_mario(data.marioState.marioObj)
                 } catch (error) {
-                    console.log("unknown error in 'geo_process_extra_mario' - please report this issue to sm64js devs")
+                    console.log("unknown error in 'geo_process_extra_mario' - please report this issue to sm64js devs -- playerName: " + data.marioState.playerName)
                     console.log(error)
                     data.skipRender = 30
                 }

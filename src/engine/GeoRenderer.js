@@ -394,6 +394,7 @@ class GeoRenderer {
 
                     if (object.localMario) {
                         MarioMisc.gBodyState = object.marioState.marioBodyState
+                        MarioMisc.customCapState = window.myMario.skinData.customCapState
                         //// sending my own custom gfx opcode to set skin id
                         this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.myChannelID)], 1) 
                     }
@@ -469,10 +470,12 @@ class GeoRenderer {
         if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) {
 
             //// sending my own custom gfx opcode to set skin id and playerName
-            this.geo_append_display_list([Gbi.gsSetPlayerData(object.marioState.channel_id)], 1)
+            const remote_channel_id = object.marioState.channel_id
+            this.geo_append_display_list([Gbi.gsSetPlayerData(remote_channel_id)], 1)
 
             this.gCurGraphNodeObject = object.header.gfx
             MarioMisc.gBodyState = object.marioState.marioBodyState
+            MarioMisc.customCapState = networkData.remotePlayers[remote_channel_id].skinData.customCapState
             this.geo_process_single_node(object.header.gfx.sharedChild)
             this.gCurGraphNodeObject = null
         }

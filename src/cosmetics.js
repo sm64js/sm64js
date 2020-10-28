@@ -8,7 +8,8 @@ export const defaultSkinData = () => {
         gloves: [0x7f, 0x7f, 0x7f, 0xff, 0xff, 0xff],
         boots: [0x39, 0x0e, 0x07, 0x72, 0x1c, 0x0e],
         skin: [0x7f, 0x60, 0x3c, 0xfe, 0xc1, 0x79],
-        hair: [0x39, 0x03, 0x00, 0x73, 0x06, 0x00]
+        hair: [0x39, 0x03, 0x00, 0x73, 0x06, 0x00],
+        customCapState: 0
     }
 }
 
@@ -156,6 +157,8 @@ export const validSkins = () => {
         number = window.myMario.skinData.hair[i]
         if (number < 0 || number > 255 || !Number.isInteger(number)) return false
     }
+
+    if (window.myMario.skinData.customCapState != 0 && window.myMario.skinData.customCapState != 1) return false
 
     return true
 

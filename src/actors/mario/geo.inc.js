@@ -6,6 +6,9 @@ import {
     mario_cap_on_eyes_front,
     mario_cap_on_eyes_half_closed,
     mario_cap_on_eyes_closed,
+    mario_cap_off_eyes_front,
+    mario_cap_off_eyes_half_closed,
+    mario_cap_off_eyes_closed,
     mario_left_arm,
     mario_left_forearm_shared_dl,
     mario_left_hand_closed,
@@ -49,28 +52,52 @@ import {
     mario_low_poly_cap_on_eyes_front,
     mario_low_poly_cap_on_eyes_half_closed,
     mario_low_poly_cap_on_eyes_closed,
+    mario_low_poly_cap_off_eyes_front,
+    mario_low_poly_cap_off_eyes_half_closed,
+    mario_low_poly_cap_off_eyes_closed,
  } from "./model.inc"
 import { MarioMiscInstance as MarioMisc } from "../../game/MarioMisc"
 import { SHADOW_CIRCLE_PLAYER } from "../../game/Shadow"
 
 const mario_geo_face_and_wings = [
-    { command: Geo.node_rotation, args: [ 0x00, 0, 0, 0] },
+    { command: Geo.node_rotation, args: [0x00, 0, 0, 0] },
+    { command: Geo.open_node },
+    { command: Geo.node_switch_case, args: [0, MarioMisc.geo_switch_mario_cap_on_off, MarioMisc] },
+    { command: Geo.open_node },
     { command: Geo.node_switch_case, args: [0, MarioMisc.geo_switch_mario_eyes, MarioMisc] },
     { command: Geo.open_node },
-        { command: Geo.display_list, args: [ Geo.LAYER_OPAQUE, mario_cap_on_eyes_front ]},
-        { command: Geo.display_list, args: [ Geo.LAYER_OPAQUE, mario_cap_on_eyes_half_closed ]}, 
-        { command: Geo.display_list, args: [ Geo.LAYER_OPAQUE, mario_cap_on_eyes_closed ]}, 
+    { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, mario_cap_on_eyes_front] },
+    { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, mario_cap_on_eyes_half_closed] },
+    { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, mario_cap_on_eyes_closed] },
+    { command: Geo.close_node },
+    { command: Geo.node_switch_case, args: [0, MarioMisc.geo_switch_mario_eyes, MarioMisc] },
+    { command: Geo.open_node },
+    { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, mario_cap_off_eyes_front] },
+    { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, mario_cap_off_eyes_half_closed] },
+    { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, mario_cap_off_eyes_closed] },
+    { command: Geo.close_node },
+    { command: Geo.close_node },
     { command: Geo.close_node },
     { command: Geo.return }
 ]
-
 const mario_geo_low_poly_face_and_wings = [
     { command: Geo.node_rotation, args: [0x00, 0, 0, 0] },
+    { command: Geo.open_node },
+    { command: Geo.node_switch_case, args: [0, MarioMisc.geo_switch_mario_cap_on_off, MarioMisc] },
+    { command: Geo.open_node },
     { command: Geo.node_switch_case, args: [0, MarioMisc.geo_switch_mario_eyes, MarioMisc] },
     { command: Geo.open_node },
     { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, mario_low_poly_cap_on_eyes_front] },
     { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, mario_low_poly_cap_on_eyes_half_closed] },
     { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, mario_low_poly_cap_on_eyes_closed] },
+    { command: Geo.close_node },
+    { command: Geo.node_switch_case, args: [0, MarioMisc.geo_switch_mario_eyes, MarioMisc] },
+    { command: Geo.open_node },
+    { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, mario_low_poly_cap_off_eyes_front] },
+    { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, mario_low_poly_cap_off_eyes_half_closed] },
+    { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, mario_low_poly_cap_off_eyes_closed] },
+    { command: Geo.close_node },
+    { command: Geo.close_node },
     { command: Geo.close_node },
     { command: Geo.return }
 ]

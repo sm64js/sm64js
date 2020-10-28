@@ -13,6 +13,7 @@ class MarioMisc {
             torsoAngle: [0, 0, 0], headAngle: [0, 0, 0], torsoPos: [0,0,0],
             heldObjLastPosition: [0, 0, 0]
         }
+        this.customCapState = 0
     }
 
     geo_draw_mario_head_goddard(callContext, node) {
@@ -70,6 +71,10 @@ class MarioMisc {
                 throw "never here - geo_switch_mario_eyes"
             }
         }
+    }
+
+    geo_switch_mario_cap_on_off(callContext, switchCase) {
+        switchCase.selectedCase = this.customCapState
     }
 }
 

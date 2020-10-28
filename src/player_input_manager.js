@@ -10,7 +10,7 @@ let textboxfocus = false
 
 //// Prevent scrolling for arrow keys
 window.addEventListener("keydown", (e) => {
-    textboxfocus = $("#chatbox").is(':focus') || $("#playerNameInput").is(':focus')
+    textboxfocus = $("#chatbox").is(':focus') || $("#playerNameInput").is(':focus') || $("#ccPasteArea").is(':focus');
 
     if ($("#chatbox").is(':focus') && e.keyCode == 13) {
         sendChat(document.getElementById('chatbox').value)

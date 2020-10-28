@@ -84,6 +84,17 @@
                     </button>
                 </div>
 
+                <div class="col-3">
+                    <button type="button"
+                            class="btn btn-sm btn-primary"
+                            data-html="true"
+                            data-container="body"
+                            data-toggle="colorCodePasteWindowToggle"
+                            data-placement="bottom">
+                        Paste Color Code
+                    </button>
+                </div>
+
             </div>
 
             <div class="row" style="justify-content:center; padding-top:10px">
@@ -318,7 +329,6 @@
 
 
     <div hidden>
-
         <div class="container" id="skinCustomizerWindow">
             <div class="row" style="justify-content:center">
                 <select id="skinTypes" class="form-control" style="width:320px" onchange="window.setSkinSliderValues()">
@@ -413,6 +423,21 @@
                         onclick="window.myMario.skinData.customCapState = window.myMario.skinData.customCapState == 1 ? 0 : 1"
                 >Toggle Hat</button>
             </div>
+
+            
+        </div>
+
+        <div class="container" id="colorCodePasteWindow">
+            <div class="row">
+                <textarea class="form-control" id="ccPasteArea" placeholder="Enter your Color Code here..." rows="6"></textarea>
+            </div>
+            <br>
+                <div class="row" style="justify-content:center">
+                    <button class="btn btn-sm btn-primary" style="justify-content:center;" 
+                            onclick="window.myMario.skinData = window.parseColorCode($(`#ccPasteArea`).val())">
+                            Import Color Code
+                        </button>
+                </div>
         </div>
 
         <div class="container" id="keyboardControlsWindow">

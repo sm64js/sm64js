@@ -15,38 +15,40 @@ export const mario_texture_hair_sideburn = []
 export const mario_texture_mustache = []
 
 // 0x04000000 # solid color blue - butt, left thigh, right thigh - all poly types
-const mario_overalls_lights_group = (customData) => {
-	return Gbi.gdSPDefLights1(...customData.mario_overalls_lights, 0x28, 0x28, 0x28)
-}
+const mario_blue_lights_group = Gbi.gdSPDefLights1(
+	0x00, 0x00, 0x7f,
+	0x00, 0x00, 0xff, 0x28, 0x28, 0x28
+)
 
 // 0x04000018 # solid color red - left & right arm, torso (tshirt part), caps - all poly types
-const mario_hat_lights_group = (customData) => {
-	return Gbi.gdSPDefLights1(...customData.mario_hat_lights, 0x28, 0x28, 0x28)
-}
-
-const mario_shirt_lights_group = (customData) => {
-	return Gbi.gdSPDefLights1(...customData.mario_shirt_lights, 0x28, 0x28, 0x28)
-}
+const mario_red_lights_group = Gbi.gdSPDefLights1(
+	0x7f, 0x00, 0x00,
+	0xff, 0x00, 0x00, 0x28, 0x28, 0x28
+)
 
 // 0x04000030 # solid color white - metal butt & left thigh - normal left & right hand closed & open (with cap too) and all wings - all poly types
-const mario_white_lights_group = (customData) => {
-	return Gbi.gdSPDefLights1(...customData.mario_gloves_lights, 0x28, 0x28, 0x28)
-}
+const mario_white_lights_group = Gbi.gdSPDefLights1(
+	0x7f, 0x7f, 0x7f,
+	0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+)
 
 // 0x04000048 # solid color brown 1 - foot - all poly types
-const mario_brown1_lights_group = (customData) => {
-	return Gbi.gdSPDefLights1(...customData.mario_boots_lights, 0x28, 0x28, 0x28)
-}
+const mario_brown1_lights_group = Gbi.gdSPDefLights1(
+	0x39, 0x0e, 0x07,
+	0x72, 0x1c, 0x0e, 0x28, 0x28, 0x28
+)
 
 // 0x04000060 # solid color beige skin - face (cap on and off dls) - all poly types
-const mario_beige_lights_group = (customData) => {
-	return Gbi.gdSPDefLights1(...customData.mario_skin_lights, 0x28, 0x28, 0x28)
-}
+const mario_beige_lights_group = Gbi.gdSPDefLights1(
+	0x7f, 0x60, 0x3c,
+	0xfe, 0xc1, 0x79, 0x28, 0x28, 0x28
+)
 
 // 0x04000078  # solid color brown 2 - hair - all poly types
-const mario_brown2_lights_group = (customData) => {
-	return Gbi.gdSPDefLights1(...customData.mario_hair_lights, 0x28, 0x28, 0x28)
-}
+const mario_brown2_lights_group = Gbi.gdSPDefLights1(
+	0x39, 0x03, 0x00,
+	0x73, 0x06, 0x00, 0x28, 0x28, 0x28
+)
 
 
 const mario_butt_dl_vertex_group1 = [
@@ -282,19 +284,24 @@ export const mario_butt_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_butt = (customData) => {
-	return [
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_butt_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
-
-export const mario_nameplate = [
-	Gbi.gsSPVertex([{ pos: [0, 600, 0], flag: 0, tc: [0, 0], color: [0, 0, 0, 0], special: "nameplate" }], 1, 0)
+export const mario_butt = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPLight(mario_blue_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_blue_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_butt_dl),
+	Gbi.gsSPEndDisplayList(),
 ]
+
+/*export const mario_metal_butt = [
+	Gbi.gsSPSetGeometryMode(Gbi.G_TEXTURE_GEN),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALFADE),
+	Gbi.gsDPLoadTextureBlock(mario_texture_metal, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 64, 32, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_butt_dl),
+	Gbi.gsSPEndDisplayList(),
+]*/
 
 const mario_left_arm_shared_dl_vertex_group1 = [
 	{ pos: [7, 27, 20], flag: 0, tc: [0, 0], color: [218, 97, 71, 0] },
@@ -388,14 +395,12 @@ export const mario_left_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_left_arm = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_left_arm_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_left_arm = [
+	Gbi.gsSPLight(mario_red_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_red_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_left_arm_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_left_forearm_shared_dl_vertex = [
 	{ pos: [-2, 19, 16], flag: 0, tc: [0, 0], color: [219, 97, 72, 0] },
@@ -534,15 +539,12 @@ export const mario_left_hand_closed_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_left_hand_closed = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_left_hand_closed_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
-
+export const mario_left_hand_closed = [
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_left_hand_closed_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_right_arm_shared_dl_vertex_group1 = [
 	{ pos: [57, -14, -22], flag: 0, tc: [0, 0], color: [51, 207, 151, 0] },
@@ -640,14 +642,12 @@ export const mario_right_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_right_arm = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_right_arm_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_right_arm = [
+	Gbi.gsSPLight(mario_red_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_red_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_right_arm_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_right_forearm_shared_dl_vertex = [
 	{ pos: [47, -15, -19], flag: 0, tc: [0, 0], color: [65, 207, 159, 0] },
@@ -772,15 +772,12 @@ export const mario_right_hand_closed_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_right_hand_closed = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_right_hand_closed_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
-
+export const mario_right_hand_closed = [
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_right_hand_closed_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 export const mario_metal_right_hand_closed = [
 	Gbi.gsSPDisplayList(mario_right_hand_closed_dl),
@@ -789,7 +786,6 @@ export const mario_metal_right_hand_closed = [
 	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
 	Gbi.gsSPEndDisplayList(),
 ]
-
 
 const mario_left_thigh_dl_vertex_group1 = [
 	{ pos: [1, -44, 8], flag: 0, tc: [0, 0], color: [171, 162, 0, 0] },
@@ -850,23 +846,21 @@ export const mario_left_thigh_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_left_thigh = (customData) => {
-	return [
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_left_thigh_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_left_thigh = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPLight(mario_blue_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_blue_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_left_thigh_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 /*export const mario_metal_left_thigh = [
 	Gbi.gsSPSetGeometryMode(Gbi.G_TEXTURE_GEN),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALFADE),
 	Gbi.gsDPLoadTextureBlock(mario_texture_metal, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 64, 32, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
 	Gbi.gsSPDisplayList(mario_left_thigh_dl),
 	Gbi.gsSPEndDisplayList(),
 ]*/
@@ -957,15 +951,12 @@ export const mario_left_foot_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_left_foot = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_brown1_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_brown1_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_left_foot_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
-
+export const mario_left_foot = [
+	Gbi.gsSPLight(mario_brown1_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_brown1_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_left_foot_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_right_thigh_shared_dl_vertex_group1 = [
 	{ pos: [98, -35, -10], flag: 0, tc: [0, 0], color: [71, 151, 252, 0] },
@@ -1025,14 +1016,12 @@ export const mario_right_thigh_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_right_thigh = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_right_thigh_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_right_thigh = [
+	Gbi.gsSPLight(mario_blue_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_blue_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_right_thigh_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_right_leg_shared_dl_vertex_group1 = [
 	{ pos: [63, -45, -12], flag: 0, tc: [0, 0], color: [242, 155, 74, 0] },
@@ -1136,16 +1125,23 @@ export const mario_right_foot_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_right_foot = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_brown1_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_brown1_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_right_foot_dl),
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-		Gbi.gsDPSetEnvColor(255, 255, 255, 255),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_right_foot = [
+	Gbi.gsSPLight(mario_brown1_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_brown1_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_right_foot_dl),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+	Gbi.gsDPSetEnvColor(255, 255, 255, 255),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const mario_metal_right_foot = [
+	Gbi.gsSPDisplayList(mario_right_foot_dl),
+	Gbi.gsSPClearGeometryMode(Gbi.G_TEXTURE_GEN),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetEnvColor(255, 255, 255, 255),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_yellow_button_dl_vertex = [
 	{ pos: [9, 89, 41], flag: 0, tc: [180, 962], color: [20, 120, 35, 255] },
@@ -1421,17 +1417,13 @@ export const mario_tshirt_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_torso_dl = (customData) => {
-	return [
-		Gbi.gsSPDisplayList(mario_pants_overalls_shared_dl),
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_tshirt_shared_dl),
-		Gbi.gsSPLight(mario_hat_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_hat_lights_group(customData).a, 2),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_torso_dl = [
+	Gbi.gsSPDisplayList(mario_pants_overalls_shared_dl),
+	Gbi.gsSPLight(mario_red_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_red_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_tshirt_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 export const mario_torso = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
@@ -1448,6 +1440,12 @@ export const mario_torso = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
+export const mario_metal_torso_shared_dl = [
+	Gbi.gsSPDisplayList(mario_yellow_button_dl),
+	Gbi.gsSPDisplayList(mario_pants_overalls_shared_dl),
+	Gbi.gsSPDisplayList(mario_tshirt_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_m_logo_dl_vertex = [
 	{ pos: [195, 93, 32], flag: 0, tc: [744, 732], color: [81, 84, 48, 255] },
@@ -1879,104 +1877,225 @@ export const mario_face_back_hair_cap_on_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_face_cap_on_dl = (customData) => {
-	return [
-		Gbi.gsSPDisplayList(mario_face_part_cap_on_dl),
-		Gbi.gsSPLight(mario_hat_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_hat_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_face_cap_dl),
-		Gbi.gsSPLight(mario_brown2_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_brown2_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_face_back_hair_cap_on_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_face_cap_on_dl = [
+	Gbi.gsSPDisplayList(mario_face_part_cap_on_dl),
+	Gbi.gsSPLight(mario_red_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_red_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_face_cap_dl),
+	Gbi.gsSPLight(mario_brown2_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_brown2_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_face_back_hair_cap_on_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
-export const mario_cap_on_eyes_front = (customData) => {
-	return [
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-		Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_m_logo_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_front),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_eyes_cap_on_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_hair_sideburn_cap_on_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_mustache_cap_on_dl),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPDisplayList(mario_face_cap_on_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_cap_on_eyes_front = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_m_logo_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_front),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_on_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_on_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
+export const mario_cap_on_eyes_half_closed = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_m_logo_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_half_closed),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_on_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_on_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
-export const mario_cap_on_eyes_half_closed = (customData) => {
-	return [
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-		Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_m_logo_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_half_closed),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_eyes_cap_on_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_hair_sideburn_cap_on_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_mustache_cap_on_dl),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPDisplayList(mario_face_cap_on_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_cap_on_eyes_closed = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_m_logo_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_closed),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_on_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_on_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
-export const mario_cap_on_eyes_closed = (customData) => {
-	return [
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-		Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_m_logo_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_closed),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_eyes_cap_on_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_hair_sideburn_cap_on_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_mustache_cap_on_dl),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPDisplayList(mario_face_cap_on_dl),
-		Gbi.gsSPEndDisplayList()
-	]
-}
+/*export const mario_cap_on_eyes_right = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_m_logo_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_right),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_on_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_on_dl),
+	Gbi.gsSPEndDisplayList(),
+]*/
 
+/*export const mario_cap_on_eyes_left = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_m_logo_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_left),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_on_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_on_dl),
+	Gbi.gsSPEndDisplayList(),
+]*/
+
+/*export const mario_cap_on_eyes_up = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_m_logo_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_up),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_on_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_on_dl),
+	Gbi.gsSPEndDisplayList(),
+]*/
+
+/*export const mario_cap_on_eyes_down = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_m_logo_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_down),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_on_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_on_dl),
+	Gbi.gsSPEndDisplayList(),
+]*/
+
+/*export const mario_cap_on_eyes_dead = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_m_logo_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_dead),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_on_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_on_dl),
+	Gbi.gsSPEndDisplayList(),
+]
+*/
 export const mario_metal_cap_on_shared_dl = [
 	Gbi.gsSPDisplayList(mario_m_logo_dl),
 	Gbi.gsSPDisplayList(mario_eyes_cap_on_dl),
@@ -2467,90 +2586,197 @@ export const mario_face_hair_cap_off_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_face_cap_off_dl = (customData) => {
-	return [
-		Gbi.gsSPDisplayList(mario_face_part_cap_off_dl),
-		Gbi.gsSPLight(mario_brown2_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_brown2_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_face_hair_cap_off_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_face_cap_off_dl = [
+	Gbi.gsSPDisplayList(mario_face_part_cap_off_dl),
+	Gbi.gsSPLight(mario_brown2_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_brown2_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_face_hair_cap_off_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
-export const mario_cap_off_eyes_front = (customData) => {
-	return [
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-		Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_front),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_eyes_cap_off_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_mustache_cap_off_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_hair_sideburn_cap_off_dl),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPDisplayList(mario_face_cap_off_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_cap_off_eyes_front = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_front),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_off_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_off_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
-export const mario_cap_off_eyes_half_closed = (customData) => {
-	return [
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-		Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_half_closed),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_eyes_cap_off_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_mustache_cap_off_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_hair_sideburn_cap_off_dl),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPDisplayList(mario_face_cap_off_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_cap_off_eyes_half_closed = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_half_closed),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_off_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_off_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
-export const mario_cap_off_eyes_closed = (customData) => {
-	return [
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-		Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_closed),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_eyes_cap_off_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_mustache_cap_off_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_hair_sideburn_cap_off_dl),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPDisplayList(mario_face_cap_off_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_cap_off_eyes_closed = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_closed),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_off_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_off_dl),
+	Gbi.gsSPEndDisplayList(),
+]
+
+/*export const mario_cap_off_eyes_right = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_right),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_off_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_off_dl),
+	Gbi.gsSPEndDisplayList(),
+]*/
+
+/*export const mario_cap_off_eyes_left = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_left),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_off_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_off_dl),
+	Gbi.gsSPEndDisplayList(),
+]*/
+
+/*export const mario_cap_off_eyes_up = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_up),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_off_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_off_dl),
+	Gbi.gsSPEndDisplayList(),
+]
+*/
+/*export const mario_cap_off_eyes_down = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_down),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_off_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_off_dl),
+	Gbi.gsSPEndDisplayList(),
+]
+*/
+/*export const mario_cap_off_eyes_dead = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_dead),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_eyes_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_mustache_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_hair_sideburn),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_hair_sideburn_cap_off_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_face_cap_off_dl),
+	Gbi.gsSPEndDisplayList(),
+]*/
 
 export const mario_metal_cap_off_shared_dl = [
 	Gbi.gsSPDisplayList(mario_eyes_cap_off_dl),
@@ -2673,16 +2899,24 @@ export const mario_medium_poly_butt_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_butt = (customData) => {
-	return [
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_medium_poly_butt_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_medium_poly_butt = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPLight(mario_blue_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_blue_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_medium_poly_butt_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
+/*export const mario_metal_medium_poly_butt = [
+	Gbi.gsSPSetGeometryMode(Gbi.G_TEXTURE_GEN),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALFADE),
+	Gbi.gsDPLoadTextureBlock(mario_texture_metal, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 64, 32, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_medium_poly_butt_dl),
+	Gbi.gsSPEndDisplayList(),
+]*/
 
 const mario_medium_poly_left_arm_shared_dl_vertex = [
 	{ pos: [-6, -32, -22], flag: 0, tc: [0, 0], color: [8, 132, 24, 0] },
@@ -2713,14 +2947,12 @@ export const mario_medium_poly_left_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_left_arm = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_medium_poly_left_arm_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_medium_poly_left_arm = [
+	Gbi.gsSPLight(mario_red_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_red_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_medium_poly_left_arm_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_medium_poly_left_forearm_shared_dl_vertex = [
 	{ pos: [-9, -29, -18], flag: 0, tc: [0, 0], color: [5, 132, 25, 0] },
@@ -2830,15 +3062,12 @@ export const mario_medium_poly_left_hand_closed_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-
-export const mario_medium_poly_left_hand_closed = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_medium_poly_left_hand_closed_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_medium_poly_left_hand_closed = [
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_medium_poly_left_hand_closed_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_medium_poly_right_arm_shared_dl_vertex = [
 	{ pos: [60, -28, 22], flag: 0, tc: [0, 0], color: [59, 199, 96, 0] },
@@ -2869,14 +3098,12 @@ export const mario_medium_poly_right_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_right_arm = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_medium_poly_right_arm_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_medium_poly_right_arm = [
+	Gbi.gsSPLight(mario_red_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_red_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_medium_poly_right_arm_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_medium_poly_right_forearm_shared_dl_vertex = [
 	{ pos: [-5, -18, -24], flag: 0, tc: [0, 0], color: [129, 254, 3, 0] },
@@ -2987,14 +3214,12 @@ export const mario_medium_poly_right_hand_closed_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_right_hand_closed = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_medium_poly_right_hand_closed_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_medium_poly_right_hand_closed = [
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_medium_poly_right_hand_closed_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 export const mario_metal_medium_poly_right_hand_closed = [
 	Gbi.gsSPDisplayList(mario_medium_poly_right_hand_closed_dl),
@@ -3035,23 +3260,21 @@ export const mario_medium_poly_left_thigh_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_left_thigh = (customData) => {
-	return [
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_medium_poly_left_thigh_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_medium_poly_left_thigh = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPLight(mario_blue_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_blue_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_medium_poly_left_thigh_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 /*export const mario_metal_medium_poly_left_thigh = [
 	Gbi.gsSPSetGeometryMode(Gbi.G_TEXTURE_GEN),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALFADE),
 	Gbi.gsDPLoadTextureBlock(mario_texture_metal, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 64, 32, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
 	Gbi.gsSPDisplayList(mario_medium_poly_left_thigh_dl),
 	Gbi.gsSPEndDisplayList(),
 ]*/
@@ -3138,14 +3361,12 @@ export const mario_medium_poly_left_foot_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_left_foot = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_brown1_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_brown1_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_medium_poly_left_foot_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_medium_poly_left_foot = [
+	Gbi.gsSPLight(mario_brown1_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_brown1_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_medium_poly_left_foot_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_medium_poly_right_thigh_shared_dl_vertex = [
 	{ pos: [18, -11, -58], flag: 0, tc: [0, 0], color: [130, 245, 2, 0] },
@@ -3178,14 +3399,12 @@ export const mario_medium_poly_right_thigh_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_right_thigh = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_medium_poly_right_thigh_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_medium_poly_right_thigh = [
+	Gbi.gsSPLight(mario_blue_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_blue_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_medium_poly_right_thigh_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_medium_poly_right_leg_shared_dl_vertex = [
 	{ pos: [6, -1, -50], flag: 0, tc: [0, 0], color: [142, 247, 202, 0] },
@@ -3263,16 +3482,14 @@ export const mario_medium_poly_right_foot_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_right_foot = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_brown1_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_brown1_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_medium_poly_right_foot_dl),
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-		Gbi.gsDPSetEnvColor(255, 255, 255, 255),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_medium_poly_right_foot = [
+	Gbi.gsSPLight(mario_brown1_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_brown1_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_medium_poly_right_foot_dl),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+	Gbi.gsDPSetEnvColor(255, 255, 255, 255),
+	Gbi.gsSPEndDisplayList(),
+]
 
 export const mario_metal_medium_poly_right_foot = [
 	Gbi.gsSPDisplayList(mario_medium_poly_right_foot_dl),
@@ -3433,15 +3650,13 @@ export const mario_medium_poly_tshirt_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_medium_poly_torso_dl = (customData) => {
-	return [
-		Gbi.gsSPDisplayList(mario_medium_poly_pants_overalls_shared_dl),
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_medium_poly_tshirt_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_medium_poly_torso_dl = [
+	Gbi.gsSPDisplayList(mario_medium_poly_pants_overalls_shared_dl),
+	Gbi.gsSPLight(mario_red_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_red_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_medium_poly_tshirt_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 export const mario_medium_poly_torso = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
@@ -3493,23 +3708,21 @@ export const mario_low_poly_butt_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_butt = (customData) => {
-	return [
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_low_poly_butt_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_low_poly_butt = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPLight(mario_blue_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_blue_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_butt_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 /*export const mario_metal_low_poly_butt = [
 	Gbi.gsSPSetGeometryMode(Gbi.G_TEXTURE_GEN),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALFADE),
 	Gbi.gsDPLoadTextureBlock(mario_texture_metal, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 64, 32, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
 	Gbi.gsSPDisplayList(mario_low_poly_butt_dl),
 	Gbi.gsSPEndDisplayList(),
 ]
@@ -3538,14 +3751,12 @@ export const mario_low_poly_left_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_left_arm = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_low_poly_left_arm_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_low_poly_left_arm = [
+	Gbi.gsSPLight(mario_red_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_red_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_left_arm_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_low_poly_left_forearm_shared_dl_vertex = [
 	{ pos: [-5, 20, 6], flag: 0, tc: [0, 0], color: [5, 98, 176, 0] },
@@ -3592,15 +3803,12 @@ export const mario_low_poly_left_hand_closed_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_left_hand_closed = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_low_poly_left_hand_closed_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
-
+export const mario_low_poly_left_hand_closed = [
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_left_hand_closed_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_low_poly_right_arm_shared_dl_vertex = [
 	{ pos: [65, 30, 23], flag: 0, tc: [0, 0], color: [94, 235, 81, 0] },
@@ -3626,14 +3834,13 @@ export const mario_low_poly_right_arm_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_right_arm = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_low_poly_right_arm_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_low_poly_right_arm = [
+	Gbi.gsSPLight(mario_red_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_red_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_right_arm_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
+
 
 const mario_low_poly_right_forearm_shared_dl_vertex = [
 	{ pos: [-13, 12, -35], flag: 0, tc: [0, 0], color: [165, 83, 229, 0] },
@@ -3680,15 +3887,12 @@ export const mario_low_poly_right_hand_closed_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_right_hand_closed = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_low_poly_right_hand_closed_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
-
+export const mario_low_poly_right_hand_closed = [
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_right_hand_closed_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 export const mario_metal_low_poly_right_hand_closed = [
 	Gbi.gsSPDisplayList(mario_low_poly_right_hand_closed_dl),
@@ -3726,15 +3930,13 @@ export const mario_low_poly_left_thigh_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_left_thigh = (customData) => {
-	return [
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_low_poly_left_thigh_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_low_poly_left_thigh = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPLight(mario_blue_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_blue_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_left_thigh_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 
 /*export const mario_metal_low_poly_left_thigh = [
@@ -3742,11 +3944,12 @@ export const mario_low_poly_left_thigh = (customData) => {
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALFADE),
 	Gbi.gsDPLoadTextureBlock(mario_texture_metal, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 64, 32, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
 	Gbi.gsSPDisplayList(mario_low_poly_left_thigh_dl),
 	Gbi.gsSPEndDisplayList(),
-]*/
+]
+*/
 
 const mario_low_poly_left_leg_shared_dl_vertex = [
 	{ pos: [7, 47, 38], flag: 0, tc: [0, 0], color: [207, 89, 75, 0] },
@@ -3804,14 +4007,12 @@ export const mario_low_poly_left_foot_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_left_foot = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_brown1_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_brown1_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_low_poly_left_foot_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_low_poly_left_foot = [
+	Gbi.gsSPLight(mario_brown1_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_brown1_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_left_foot_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_low_poly_right_thigh_shared_dl_vertex = [
 	{ pos: [102, -25, -48], flag: 0, tc: [0, 0], color: [100, 191, 213, 0] },
@@ -3841,14 +4042,13 @@ export const mario_low_poly_right_thigh_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_right_thigh = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_overalls_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_low_poly_right_thigh_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_low_poly_right_thigh = [
+	Gbi.gsSPLight(mario_blue_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_blue_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_right_thigh_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
+
 
 const mario_low_poly_right_leg_shared_dl_vertex = [
 	{ pos: [2, -29, 27], flag: 0, tc: [0, 0], color: [186, 163, 49, 0] },
@@ -3906,16 +4106,14 @@ export const mario_low_poly_right_foot_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_right_foot = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_brown1_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_brown1_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_low_poly_right_foot_dl),
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-		Gbi.gsDPSetEnvColor(255, 255, 255, 255),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_low_poly_right_foot = [
+	Gbi.gsSPLight(mario_brown1_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_brown1_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_right_foot_dl),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+	Gbi.gsDPSetEnvColor(255, 255, 255, 255),
+	Gbi.gsSPEndDisplayList(),
+]
 
 export const mario_metal_low_poly_right_foot = [
 	Gbi.gsSPDisplayList(mario_low_poly_right_foot_dl),
@@ -3998,15 +4196,13 @@ export const mario_low_poly_tshirt_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_torso_dl = (customData) => {
-	return [
-		Gbi.gsSPDisplayList(mario_low_poly_pants_overalls_shared_dl),
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_shirt_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_low_poly_tshirt_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_low_poly_torso_dl = [
+	Gbi.gsSPDisplayList(mario_low_poly_pants_overalls_shared_dl),
+	Gbi.gsSPLight(mario_red_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_red_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_tshirt_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 
 export const mario_low_poly_torso = [
@@ -4152,95 +4348,19 @@ export const mario_low_poly_face_back_hair_cap_on_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_face_cap_on_dl = (customData) => {
-	return [
-		Gbi.gsSPDisplayList(mario_low_poly_face_part_cap_on_dl),
-		Gbi.gsSPLight(mario_hat_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_hat_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_low_poly_face_cap_dl),
-		Gbi.gsSPLight(mario_brown2_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_brown2_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_low_poly_face_back_hair_cap_on_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_low_poly_face_cap_on_dl = [
+	Gbi.gsSPDisplayList(mario_low_poly_face_part_cap_on_dl),
+	Gbi.gsSPLight(mario_red_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_red_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_face_cap_dl),
+	Gbi.gsSPLight(mario_brown2_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_brown2_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_face_back_hair_cap_on_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
-export const mario_low_poly_cap_on_eyes_front = (customData) => {
-	return [
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-		Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_front),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_on_dl),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
 
-export const mario_low_poly_cap_on_eyes_half_closed = (customData) => {
-	return [
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-		Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_half_closed),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_on_dl),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
-
-export const mario_low_poly_cap_on_eyes_closed = (customData) => {
-	return [
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-		Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_closed),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
-		Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
-		Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-		Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_on_dl),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
-		Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
-
-/* const mario_low_poly_cap_on_eyes_right = [
+export const mario_low_poly_cap_on_eyes_front = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
@@ -4249,10 +4369,10 @@ export const mario_low_poly_cap_on_eyes_closed = (customData) => {
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
 	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_front),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
 	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
@@ -4263,7 +4383,76 @@ export const mario_low_poly_cap_on_eyes_closed = (customData) => {
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_low_poly_cap_on_eyes_left = [
+export const mario_low_poly_cap_on_eyes_half_closed = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_half_closed),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_on_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const mario_low_poly_cap_on_eyes_closed = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_closed),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_on_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
+	Gbi.gsSPEndDisplayList(),
+]
+
+/*export const mario_low_poly_cap_on_eyes_right = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_m_logo),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_right),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_on_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
+	Gbi.gsSPEndDisplayList(),
+]*/
+
+/*export const mario_low_poly_cap_on_eyes_left = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
@@ -4274,8 +4463,8 @@ export const mario_low_poly_cap_on_eyes_left = [
 	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_left),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
 	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
@@ -4284,9 +4473,9 @@ export const mario_low_poly_cap_on_eyes_left = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
 	Gbi.gsSPEndDisplayList(),
-]
+]*/
 
-export const mario_low_poly_cap_on_eyes_up = [
+/*export const mario_low_poly_cap_on_eyes_up = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
@@ -4297,8 +4486,8 @@ export const mario_low_poly_cap_on_eyes_up = [
 	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_up),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
 	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
@@ -4307,9 +4496,9 @@ export const mario_low_poly_cap_on_eyes_up = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
 	Gbi.gsSPEndDisplayList(),
-]
+]*/
 
-export const mario_low_poly_cap_on_eyes_down = [
+/*export const mario_low_poly_cap_on_eyes_down = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
@@ -4320,8 +4509,8 @@ export const mario_low_poly_cap_on_eyes_down = [
 	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_down),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
 	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
@@ -4331,8 +4520,8 @@ export const mario_low_poly_cap_on_eyes_down = [
 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
 	Gbi.gsSPEndDisplayList(),
 ]
-
-export const mario_low_poly_cap_on_eyes_dead = [
+*/
+/*export const mario_low_poly_cap_on_eyes_dead = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
@@ -4343,8 +4532,8 @@ export const mario_low_poly_cap_on_eyes_dead = [
 	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_dead),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
 	Gbi.gsSPDisplayList(mario_low_poly_eyes_cap_on_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
@@ -4353,7 +4542,7 @@ export const mario_low_poly_cap_on_eyes_dead = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_on_dl),
 	Gbi.gsSPEndDisplayList(),
-]
+]*/
 
 export const mario_metal_low_poly_cap_on = [
 	Gbi.gsSPDisplayList(mario_low_poly_mario_m_logo_dl),
@@ -4393,145 +4582,145 @@ const mario_low_poly_face_part_cap_off_dl_vertex = [
 	{ pos: [50, 153, 0], flag: 0, tc: [0, 0], color: [173, 95, 0, 255] },
 	{ pos: [88, 101, 33], flag: 0, tc: [0, 0], color: [56, 85, 75, 255] },
 	{ pos: [94, 146, 33], flag: 0, tc: [0, 0], color: [255, 68, 107, 255] },
- 	{ pos: [146, 27, 92], flag: 0, tc: [0, 0], color: [22, 37, 119, 255] },
- 	{ pos: [34, 39, 99], flag: 0, tc: [0, 0], color: [205, 64, 96, 255] },
- 	{ pos: [7, -85, 79], flag: 0, tc: [0, 0], color: [170, 220, 84, 255] },
- 	{ pos: [-5, 58, 0], flag: 0, tc: [0, 0], color: [136, 40, 0, 255] },
- 	{ pos: [7, -85, -78], flag: 0, tc: [0, 0], color: [169, 199, 185, 255] },
- 	{ pos: [34, 39, -98], flag: 0, tc: [0, 0], color: [205, 64, 160, 255] },
- 	{ pos: [146, 27, -91], flag: 0, tc: [0, 0], color: [20, 38, 137, 255] },
+	{ pos: [146, 27, 92], flag: 0, tc: [0, 0], color: [22, 37, 119, 255] },
+	{ pos: [34, 39, 99], flag: 0, tc: [0, 0], color: [205, 64, 96, 255] },
+	{ pos: [7, -85, 79], flag: 0, tc: [0, 0], color: [170, 220, 84, 255] },
+	{ pos: [-5, 58, 0], flag: 0, tc: [0, 0], color: [136, 40, 0, 255] },
+	{ pos: [7, -85, -78], flag: 0, tc: [0, 0], color: [169, 199, 185, 255] },
+	{ pos: [34, 39, -98], flag: 0, tc: [0, 0], color: [205, 64, 160, 255] },
+	{ pos: [146, 27, -91], flag: 0, tc: [0, 0], color: [20, 38, 137, 255] },
 ]
 
 const mario_low_poly_face_hair_cap_off_dl_vertex = [
- 	{ pos: [58, -114, 81], flag: 0, tc: [0, 0], color: [211, 155, 61, 255] },
- 	{ pos: [7, -85, 79], flag: 0, tc: [0, 0], color: [170, 220, 84, 255] },
- 	{ pos: [7, -85, -78], flag: 0, tc: [0, 0], color: [169, 199, 185, 255] },
- 	{ pos: [146, 27, 92], flag: 0, tc: [0, 0], color: [22, 37, 119, 255] },
- 	{ pos: [167, -121, 77], flag: 0, tc: [0, 0], color: [60, 173, 74, 255] },
- 	{ pos: [58, -114, -80], flag: 0, tc: [0, 0], color: [216, 163, 181, 255] },
- 	{ pos: [90, -136, 0], flag: 0, tc: [0, 0], color: [240, 131, 0, 255] },
- 	{ pos: [146, 27, -91], flag: 0, tc: [0, 0], color: [20, 38, 137, 255] },
- 	{ pos: [167, -121, -81], flag: 0, tc: [0, 0], color: [58, 173, 181, 255] },
- 	{ pos: [218, 48, -52], flag: 0, tc: [0, 0], color: [95, 59, 198, 255] },
- 	{ pos: [168, 79, 0], flag: 0, tc: [0, 0], color: [39, 120, 0, 255] },
- 	{ pos: [192, -28, -80], flag: 0, tc: [0, 0], color: [85, 247, 163, 255] },
- 	{ pos: [223, -38, -1], flag: 0, tc: [0, 0], color: [123, 226, 0, 255] },
- 	{ pos: [218, 48, 53], flag: 0, tc: [0, 0], color: [96, 57, 58, 255] },
- 	{ pos: [192, -28, 78], flag: 0, tc: [0, 0], color: [86, 244, 92, 255] },
- ]
+	{ pos: [58, -114, 81], flag: 0, tc: [0, 0], color: [211, 155, 61, 255] },
+	{ pos: [7, -85, 79], flag: 0, tc: [0, 0], color: [170, 220, 84, 255] },
+	{ pos: [7, -85, -78], flag: 0, tc: [0, 0], color: [169, 199, 185, 255] },
+	{ pos: [146, 27, 92], flag: 0, tc: [0, 0], color: [22, 37, 119, 255] },
+	{ pos: [167, -121, 77], flag: 0, tc: [0, 0], color: [60, 173, 74, 255] },
+	{ pos: [58, -114, -80], flag: 0, tc: [0, 0], color: [216, 163, 181, 255] },
+	{ pos: [90, -136, 0], flag: 0, tc: [0, 0], color: [240, 131, 0, 255] },
+	{ pos: [146, 27, -91], flag: 0, tc: [0, 0], color: [20, 38, 137, 255] },
+	{ pos: [167, -121, -81], flag: 0, tc: [0, 0], color: [58, 173, 181, 255] },
+	{ pos: [218, 48, -52], flag: 0, tc: [0, 0], color: [95, 59, 198, 255] },
+	{ pos: [168, 79, 0], flag: 0, tc: [0, 0], color: [39, 120, 0, 255] },
+	{ pos: [192, -28, -80], flag: 0, tc: [0, 0], color: [85, 247, 163, 255] },
+	{ pos: [223, -38, -1], flag: 0, tc: [0, 0], color: [123, 226, 0, 255] },
+	{ pos: [218, 48, 53], flag: 0, tc: [0, 0], color: [96, 57, 58, 255] },
+	{ pos: [192, -28, 78], flag: 0, tc: [0, 0], color: [86, 244, 92, 255] },
+]
 
 export const mario_low_poly_mario_eyes_cap_off_dl = [
- 	Gbi.gsSPVertex(mario_low_poly_mario_eyes_cap_off_dl_vertex, 5, 0),
- 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 1, 4, 0x0),
- 	Gbi.gsSP1Triangle(3, 2, 1, 0x0),
- 	Gbi.gsSPEndDisplayList(),
- ]
-
- export const mario_low_poly_mustache_cap_off_dl = [
- 	Gbi.gsSPVertex(mario_low_poly_mustache_cap_off_dl_vertex, 10, 0),
- 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 3, 1, 0x0),
- 	...Gbi.gsSP2Triangles(2, 4, 0, 0x0, 5, 6, 7, 0x0),
- 	...Gbi.gsSP2Triangles(6, 8, 7, 0x0, 7, 9, 5, 0x0),
- 	Gbi.gsSPEndDisplayList(),
+	Gbi.gsSPVertex(mario_low_poly_mario_eyes_cap_off_dl_vertex, 5, 0),
+	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 1, 4, 0x0),
+	Gbi.gsSP1Triangle(3, 2, 1, 0x0),
+	Gbi.gsSPEndDisplayList(),
 ]
 
- export const mario_low_poly_face_part_cap_off_dl = [
- 	Gbi.gsSPVertex(mario_low_poly_face_part_cap_off_dl_vertex, 13, 0),
- 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 3, 1, 0x0),
- 	...Gbi.gsSP2Triangles(4, 5, 0, 0x0, 5, 3, 0, 0x0),
- 	...Gbi.gsSP2Triangles(1, 3, 5, 0x0, 2, 1, 4, 0x0),
- 	...Gbi.gsSP2Triangles(1, 5, 4, 0x0, 6, 7, 8, 0x0),
- 	...Gbi.gsSP2Triangles(7, 9, 8, 0x0, 8, 9, 10, 0x0),
- 	...Gbi.gsSP2Triangles(10, 9, 11, 0x0, 10, 11, 12, 0x0),
- 	Gbi.gsSPEndDisplayList(),
+export const mario_low_poly_mustache_cap_off_dl = [
+	Gbi.gsSPVertex(mario_low_poly_mustache_cap_off_dl_vertex, 10, 0),
+	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 3, 1, 0x0),
+	...Gbi.gsSP2Triangles(2, 4, 0, 0x0, 5, 6, 7, 0x0),
+	...Gbi.gsSP2Triangles(6, 8, 7, 0x0, 7, 9, 5, 0x0),
+	Gbi.gsSPEndDisplayList(),
 ]
 
- export const mario_low_poly_face_hair_cap_off_dl = [
- 	Gbi.gsSPVertex(mario_low_poly_face_hair_cap_off_dl_vertex, 15, 0),
- 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 1, 0, 0x0),
- 	...Gbi.gsSP2Triangles(0, 4, 3, 0x0, 0, 2, 5, 0x0),
+export const mario_low_poly_face_part_cap_off_dl = [
+	Gbi.gsSPVertex(mario_low_poly_face_part_cap_off_dl_vertex, 13, 0),
+	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 3, 1, 0x0),
+	...Gbi.gsSP2Triangles(4, 5, 0, 0x0, 5, 3, 0, 0x0),
+	...Gbi.gsSP2Triangles(1, 3, 5, 0x0, 2, 1, 4, 0x0),
+	...Gbi.gsSP2Triangles(1, 5, 4, 0x0, 6, 7, 8, 0x0),
+	...Gbi.gsSP2Triangles(7, 9, 8, 0x0, 8, 9, 10, 0x0),
+	...Gbi.gsSP2Triangles(10, 9, 11, 0x0, 10, 11, 12, 0x0),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const mario_low_poly_face_hair_cap_off_dl = [
+	Gbi.gsSPVertex(mario_low_poly_face_hair_cap_off_dl_vertex, 15, 0),
+	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 1, 0, 0x0),
+	...Gbi.gsSP2Triangles(0, 4, 3, 0x0, 0, 2, 5, 0x0),
 	...Gbi.gsSP2Triangles(5, 6, 0, 0x0, 0, 6, 4, 0x0),
 	...Gbi.gsSP2Triangles(5, 2, 7, 0x0, 7, 8, 5, 0x0),
- 	...Gbi.gsSP2Triangles(8, 6, 5, 0x0, 9, 7, 10, 0x0),
- 	...Gbi.gsSP2Triangles(7, 9, 11, 0x0, 7, 11, 8, 0x0),
+	...Gbi.gsSP2Triangles(8, 6, 5, 0x0, 9, 7, 10, 0x0),
+	...Gbi.gsSP2Triangles(7, 9, 11, 0x0, 7, 11, 8, 0x0),
 	...Gbi.gsSP2Triangles(6, 8, 4, 0x0, 8, 11, 12, 0x0),
- 	...Gbi.gsSP2Triangles(4, 8, 12, 0x0, 11, 9, 12, 0x0),
- 	...Gbi.gsSP2Triangles(13, 14, 12, 0x0, 14, 4, 12, 0x0),
- 	...Gbi.gsSP2Triangles(4, 14, 3, 0x0, 13, 10, 3, 0x0),
+	...Gbi.gsSP2Triangles(4, 8, 12, 0x0, 11, 9, 12, 0x0),
+	...Gbi.gsSP2Triangles(13, 14, 12, 0x0, 14, 4, 12, 0x0),
+	...Gbi.gsSP2Triangles(4, 14, 3, 0x0, 13, 10, 3, 0x0),
 	...Gbi.gsSP2Triangles(14, 13, 3, 0x0, 9, 10, 13, 0x0),
- 	Gbi.gsSP1Triangle(9, 13, 12, 0x0),
+	Gbi.gsSP1Triangle(9, 13, 12, 0x0),
 	Gbi.gsSPEndDisplayList(),
- ]
+]
 
- export const mario_low_poly_face_cap_off_dl = [
- 	Gbi.gsSPDisplayList(mario_low_poly_face_part_cap_off_dl),
- 	Gbi.gsSPLight(mario_brown2_lights_group(customData).l[0], 1),
- 	Gbi.gsSPLight(mario_brown2_lights_group(customData).a, 2),
- 	Gbi.gsSPDisplayList(mario_low_poly_face_hair_cap_off_dl),
- 	Gbi.gsSPEndDisplayList(),
- ]
-// TODO get these next 3 working
- export const mario_low_poly_cap_off_eyes_front = [
- 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
- 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
- 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
- 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
- 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
- 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_front),
- 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
- 	Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
- 	Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
- 	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
- 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
- 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
- 	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_off_dl),
- 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
- 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
- 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
- 	Gbi.gsSPEndDisplayList(),
- ]
+export const mario_low_poly_face_cap_off_dl = [
+	Gbi.gsSPDisplayList(mario_low_poly_face_part_cap_off_dl),
+	Gbi.gsSPLight(mario_brown2_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_brown2_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_face_hair_cap_off_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
- export const mario_low_poly_cap_off_eyes_half_closed = [
- 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
- 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
- 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
- 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
- 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+export const mario_low_poly_cap_off_eyes_front = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_front),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_off_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const mario_low_poly_cap_off_eyes_half_closed = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_half_closed),
- 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
- 	Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
- 	Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
- 	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
- 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
- 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
- 	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_off_dl),
- 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
- 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
- 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
- 	Gbi.gsSPEndDisplayList(),
- ]
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_off_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
- export const mario_low_poly_cap_off_eyes_closed = [
- 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
- 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
- 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
- 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
- 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
- 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_closed),
- 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
- 	Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
- 	Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
- 	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
- 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
- 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
- 	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_off_dl),
- 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
- 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
- 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
- 	Gbi.gsSPEndDisplayList(),
- ]
+export const mario_low_poly_cap_off_eyes_closed = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_closed),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_off_dl),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
-export const mario_low_poly_cap_off_eyes_right = [
+/*export const mario_low_poly_cap_off_eyes_right = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
@@ -4539,8 +4728,8 @@ export const mario_low_poly_cap_off_eyes_right = [
 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_right),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
 	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
@@ -4550,8 +4739,8 @@ export const mario_low_poly_cap_off_eyes_right = [
 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
 	Gbi.gsSPEndDisplayList(),
 ]
-
-export const mario_low_poly_cap_off_eyes_left = [
+*/
+/*export const mario_low_poly_cap_off_eyes_left = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
@@ -4559,8 +4748,8 @@ export const mario_low_poly_cap_off_eyes_left = [
 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_left),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
 	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
@@ -4570,8 +4759,8 @@ export const mario_low_poly_cap_off_eyes_left = [
 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
 	Gbi.gsSPEndDisplayList(),
 ]
-
-export const mario_low_poly_cap_off_eyes_up = [
+*/
+/*export const mario_low_poly_cap_off_eyes_up = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
@@ -4579,8 +4768,8 @@ export const mario_low_poly_cap_off_eyes_up = [
 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_up),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
 	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
@@ -4590,8 +4779,8 @@ export const mario_low_poly_cap_off_eyes_up = [
 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
 	Gbi.gsSPEndDisplayList(),
 ]
-
-export const mario_low_poly_cap_off_eyes_down = [
+*/
+/*export const mario_low_poly_cap_off_eyes_down = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
@@ -4599,8 +4788,8 @@ export const mario_low_poly_cap_off_eyes_down = [
 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_down),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
 	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
@@ -4619,8 +4808,8 @@ export const mario_low_poly_cap_off_eyes_dead = [
 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_eyes_dead),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_beige_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_beige_lights_group.a, 2),
 	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_mustache),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
@@ -4630,15 +4819,15 @@ export const mario_low_poly_cap_off_eyes_dead = [
 	Gbi.gsSPDisplayList(mario_low_poly_face_cap_off_dl),
 	Gbi.gsSPEndDisplayList(),
 ]
-
+*/
 export const mario_metal_low_poly_cap_off = [
- 	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
+	Gbi.gsSPDisplayList(mario_low_poly_mario_eyes_cap_off_dl),
 	Gbi.gsSPDisplayList(mario_low_poly_mustache_cap_off_dl),
 	Gbi.gsSPDisplayList(mario_low_poly_face_part_cap_off_dl),
-	 	Gbi.gsSPDisplayList(mario_low_poly_face_hair_cap_off_dl),
+	Gbi.gsSPDisplayList(mario_low_poly_face_hair_cap_off_dl),
 	Gbi.gsSPEndDisplayList(),
- ]
-*/
+]
+
 const mario_left_hand_open_shared_dl_vertex_group1 = [
 	{ pos: [121, 73, -21], flag: 0, tc: [0, 0], color: [71, 96, 43, 0] },
 	{ pos: [70, 89, -20], flag: 0, tc: [0, 0], color: [236, 124, 246, 0] },
@@ -4783,14 +4972,12 @@ export const mario_left_hand_open_shared_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_left_hand_open = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_left_hand_open_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_left_hand_open = [
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_left_hand_open_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_right_hand_open_dl_vertex_group1 = [
 	{ pos: [81, 37, -28], flag: 0, tc: [0, 0], color: [24, 32, 136, 0] },
@@ -4936,14 +5123,12 @@ export const mario_right_hand_open_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_right_hand_open = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_right_hand_open_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
+export const mario_right_hand_open = [
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_right_hand_open_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 export const mario_metal_right_hand_open = [
 	Gbi.gsSPDisplayList(mario_right_hand_open_dl),
@@ -5171,19 +5356,16 @@ export const mario_right_hand_cap_bottom_dl = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const mario_right_hand_cap_dl = (customData) => {
-	return [
-		Gbi.gsSPDisplayList(mario_right_hand_cap_top_dl),
-		Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_right_hand_cap_hand_position_dl),
-		Gbi.gsSPLight(mario_brown2_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_brown2_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_right_hand_cap_bottom_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
-
+export const mario_right_hand_cap_dl = [
+	Gbi.gsSPDisplayList(mario_right_hand_cap_top_dl),
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_right_hand_cap_hand_position_dl),
+	Gbi.gsSPLight(mario_brown2_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_brown2_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_right_hand_cap_bottom_dl),
+	Gbi.gsSPEndDisplayList(),
+]
 
 const mario_right_hand_cap_wings_half_1_dl_vertex = [
 	{ pos: [368, 146, 7], flag: 0, tc: [990, 0], color: [190, 101, 218, 255] },
@@ -5222,21 +5404,18 @@ export const mario_right_hand_cap_wings_half_2_dl = [
 	...Gbi.gsSP2Triangles(4, 5, 6, 0x0, 7, 4, 6, 0x0),
 	Gbi.gsSPEndDisplayList(),
 ]
-/*
-export const mario_right_hand_cap_wings_intial_dl = (customData) => {
-	return [
-		/// TODO Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGBFADEA),
-		Gbi.gsSPClearGeometryMode(Gbi.G_CULL_BACK | Gbi.G_SHADING_SMOOTH),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-		Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-		Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
-		Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 6, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-		Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (64 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
-*/
+
+export const mario_right_hand_cap_wings_intial_dl = [
+	/// TODO Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGBFADEA),
+	Gbi.gsSPClearGeometryMode(Gbi.G_CULL_BACK | Gbi.G_SHADING_SMOOTH),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 6, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (64 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsSPEndDisplayList(),
+]
 
 export const mario_right_hand_cap_wings_end_dl = [
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
@@ -5258,8 +5437,8 @@ export const mario_right_hand_cap = [
 	Gbi.gsSPDisplayList(mario_right_hand_cap_dl),
 	Gbi.gsSPEndDisplayList(),
 ]
-/*
-export const mario_right_hand_cap_wings = [
+
+/*export const mario_right_hand_cap_wings = [
 	Gbi.gsSPDisplayList(mario_right_hand_cap_wings_intial_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_wings_half_1),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 64 - 1),
@@ -5281,8 +5460,8 @@ export const mario_metal_right_hand_cap_shared_dl = [
 	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
 	Gbi.gsSPEndDisplayList(),
 ]
-/*
-export const mario_metal_right_hand_cap_shared_dl_wings = [
+
+/*export const mario_metal_right_hand_cap_shared_dl_wings = [
 	Gbi.gsSPDisplayList(mario_right_hand_cap_wings_intial_dl),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_metal_wings_half_1),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 64 - 1),
@@ -5292,8 +5471,8 @@ export const mario_metal_right_hand_cap_shared_dl_wings = [
 	Gbi.gsSPDisplayList(mario_right_hand_cap_wings_half_2_dl),
 	Gbi.gsSPDisplayList(mario_right_hand_cap_wings_end_dl),
 	Gbi.gsSPEndDisplayList(),
-]
-*/
+]*/
+
 const mario_right_hand_peace_shared_dl_vertex_group1 = [
 	{ pos: [-21, 9, 33], flag: 0, tc: [0, 0], color: [138, 225, 31, 0] },
 	{ pos: [-25, 24, 0], flag: 0, tc: [0, 0], color: [132, 248, 234, 0] },
@@ -5535,16 +5714,14 @@ export const mario_right_hand_peace_shared_dl = [
 	Gbi.gsSP1Triangle(0, 1, 2, 0x0),
 	Gbi.gsSPEndDisplayList(),
 ]
-/*
-export const mario_right_hand_peace = (customData) => {
-	return [
-		Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-		Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
-		Gbi.gsSPDisplayList(mario_right_hand_peace_shared_dl),
-		Gbi.gsSPEndDisplayList(),
-	]
-}
-*/
+
+export const mario_right_hand_peace = [
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
+	Gbi.gsSPDisplayList(mario_right_hand_peace_shared_dl),
+	Gbi.gsSPEndDisplayList(),
+]
+
 const mario_cap_unused_m_logo_dl_vertex = [
 	{ pos: [33, 35, 118], flag: 0, tc: [728, 758], color: [48, 38, 110, 255] },
 	{ pos: [96, 22, 45], flag: 0, tc: [1240, 876], color: [72, 164, 49, 255] },
@@ -5554,7 +5731,7 @@ const mario_cap_unused_m_logo_dl_vertex = [
 	{ pos: [-70, 101, 113], flag: 0, tc: [-106, 158], color: [171, 22, 91, 255] },
 	{ pos: [-95, 22, 46], flag: 0, tc: [-302, 890], color: [168, 185, 56, 255] },
 ]
-/*
+
 const mario_cap_unused_base_top_dl_vertex_group1 = [
 	{ pos: [-66, 2, 139], flag: 0, tc: [0, 0], color: [176, 187, 69, 255] },
 	{ pos: [0, 0, 163], flag: 0, tc: [0, 0], color: [0, 186, 105, 255] },
@@ -5609,7 +5786,7 @@ const mario_cap_unused_base_top_dl_vertex_group3 = [
 	{ pos: [86, 1, -60], flag: 0, tc: [0, 0], color: [32, 134, 254, 255] },
 	{ pos: [-86, 1, -60], flag: 0, tc: [0, 0], color: [206, 140, 246, 255] },
 ]
-*/
+
 const mario_cap_unused_base_bottom_dl_vertex = [
 	{ pos: [86, 1, -60], flag: 0, tc: [0, 0], color: [32, 134, 254, 255] },
 	{ pos: [-86, 1, -60], flag: 0, tc: [0, 0], color: [206, 140, 246, 255] },
@@ -5629,7 +5806,7 @@ export const mario_cap_unused_m_logo_dl = [
 	Gbi.gsSP1Triangle(5, 6, 4, 0x0),
 	Gbi.gsSPEndDisplayList(),
 ]
-/*
+
 export const mario_cap_unused_base_top_dl = [
 	Gbi.gsSPVertex(mario_cap_unused_base_top_dl_vertex_group1, 16, 0),
 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 1, 0x0),
@@ -5656,7 +5833,7 @@ export const mario_cap_unused_base_top_dl = [
 	...Gbi.gsSP2Triangles(11, 8, 13, 0x0, 14, 12, 9, 0x0),
 	Gbi.gsSPEndDisplayList(),
 ]
-*/
+
 export const mario_cap_unused_base_bottom_dl = [
 	Gbi.gsSPVertex(mario_cap_unused_base_bottom_dl_vertex, 9, 0),
 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 3, 4, 5, 0x0),
@@ -5665,16 +5842,15 @@ export const mario_cap_unused_base_bottom_dl = [
 	Gbi.gsSP1Triangle(2, 8, 0, 0x0),
 	Gbi.gsSPEndDisplayList(),
 ]
-/*
 
 export const mario_cap_unused_base_dl = [
 	Gbi.gsSPDisplayList(mario_cap_unused_base_top_dl),
-	Gbi.gsSPLight(mario_brown2_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_brown2_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_brown2_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_brown2_lights_group.a, 2),
 	Gbi.gsSPDisplayList(mario_cap_unused_base_bottom_dl),
 	Gbi.gsSPEndDisplayList(),
 ]
-*/
+
 const mario_wings_half_1_unused_dl_vertex = [
 	{ pos: [199, 247, -55], flag: 0, tc: [990, 0], color: [89, 237, 88, 255] },
 	{ pos: [131, 274, 20], flag: 0, tc: [0, 0], color: [89, 237, 88, 255] },
@@ -5714,7 +5890,7 @@ export const mario_wings_half_2_unused_dl = [
 	...Gbi.gsSP2Triangles(4, 5, 6, 0x0, 5, 7, 6, 0x0),
 	Gbi.gsSPEndDisplayList(),
 ]
-/*
+
 export const mario_cap_wings_unused_intial_dl = [
 	/// TODO Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGBA),
 	Gbi.gsSPClearGeometryMode(Gbi.G_CULL_BACK | Gbi.G_SHADING_SMOOTH),
@@ -5722,10 +5898,10 @@ export const mario_cap_wings_unused_intial_dl = [
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 6, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (64 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
 	Gbi.gsSPEndDisplayList(),
-]*/
+]
 
 
 const mario_wings_half_1_dl_vertex = [
@@ -5753,6 +5929,7 @@ export const mario_wings_half_2_dl = [
 	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 3, 1, 0x0),
 	Gbi.gsSPEndDisplayList(),
 ]
+
 /*export const mario_cap_wings = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALRGBA),
 	Gbi.gsSPClearGeometryMode(Gbi.G_CULL_BACK | Gbi.G_SHADING_SMOOTH),
@@ -5760,8 +5937,8 @@ export const mario_wings_half_2_dl = [
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 6, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (64 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_wings_half_1),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 64 - 1),
 	Gbi.gsSPDisplayList(mario_wings_half_1_dl),
@@ -5781,8 +5958,8 @@ export const mario_cap_wings_transparent = [
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 6, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (64 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_wings_half_1),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 64 - 1),
 	Gbi.gsSPDisplayList(mario_wings_half_1_dl),
@@ -5794,16 +5971,16 @@ export const mario_cap_wings_transparent = [
 	Gbi.gsSPSetGeometryMode(Gbi.G_CULL_BACK | Gbi.G_SHADING_SMOOTH),
 	Gbi.gsSPEndDisplayList(),
 ]
-
-export const mario_metal_cap_wings = [
+*/
+/*export const mario_metal_cap_wings = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALRGBA),
 	Gbi.gsSPClearGeometryMode(Gbi.G_CULL_BACK | Gbi.G_SHADING_SMOOTH),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 6, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (64 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPLight(mario_white_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_white_lights_group(customData).a, 2),
+	Gbi.gsSPLight(mario_white_lights_group.l[0], 1),
+	Gbi.gsSPLight(mario_white_lights_group.a, 2),
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, mario_texture_metal_wings_half_1),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 64 - 1),
 	Gbi.gsSPDisplayList(mario_wings_half_1_dl),
@@ -5814,9 +5991,9 @@ export const mario_metal_cap_wings = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
 	Gbi.gsSPSetGeometryMode(Gbi.G_CULL_BACK | Gbi.G_SHADING_SMOOTH),
 	Gbi.gsSPEndDisplayList(),
-]
+]*/
 
-export const mario_metal_cap_wings_transparent = [
+/*export const mario_metal_cap_wings_transparent = [
 	Gbi.gsSPClearGeometryMode(Gbi.G_TEXTURE_GEN),
 	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
 	//// TODO Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALFADEA),
@@ -5837,4 +6014,6 @@ export const mario_metal_cap_wings_transparent = [
 	Gbi.gsDPLoadTextureBlock(mario_texture_metal, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 64, 32, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0x0F80, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
 	Gbi.gsSPEndDisplayList(),
-]*/
+]
+
+*/

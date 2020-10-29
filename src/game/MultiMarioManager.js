@@ -252,34 +252,30 @@ export const recvValidPlayers = (validplayerbytes) => {
 }
 
 
-let lastMessageProcessed = -1
 export const recvMarioData = (mariolistbytes) => {
 
     zlib.inflate(mariolistbytes, (err, buffer) => {
         if (!err) {
             const marioListProto = MarioListMsg.deserializeBinary(buffer)
-            const messageCount = marioListProto.getMessagecount()
-            if (messageCount > lastMessageProcessed) {
-                lastMessageProcessed = messageCount
-                const marioList = marioListProto.getMarioList()
-                networkData.numOnline = marioList.length
-                marioList.forEach(marioProto => {
-                    const id = marioProto.getChannelid()
-                    if (id == networkData.myChannelID) return
+            const marioList = marioListProto.getMarioList()
+            networkData.numOnline = marioList.length
+            marioList.forEach(marioProto => {
+                const id = marioProto.getChannelid()
+                if (id == networkData.myChannelID) return
 
-                    if (networkData.remotePlayers[id] == undefined) {
-                        networkData.remotePlayers[id] = { 
-                            marioState: initNewRemoteMarioState(marioProto),
-                            skinData: defaultSkinData(),
-                            crashCount: 0,
-                            skipRender: 0
-                        }
-                        applyController(marioProto.getController())
-                    } else {
-                        updateRemoteMarioState(id, marioProto)
+                if (networkData.remotePlayers[id] == undefined) {
+                    networkData.remotePlayers[id] = { 
+                        marioState: initNewRemoteMarioState(marioProto),
+                        skinData: defaultSkinData(),
+                        crashCount: 0,
+                        skipRender: 0
                     }
-                })
-            }
+                    applyController(marioProto.getController())
+                } else {
+                    updateRemoteMarioState(id, marioProto)
+                }
+            })
+            
         }
     })
 

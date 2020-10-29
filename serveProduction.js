@@ -7,7 +7,6 @@ const port = 9208
 const ws_port = 3000
 
 const allChannels = {}
-const stats = {}
 
 let currentId = 0
 const generateID = () => {
@@ -15,15 +14,9 @@ const generateID = () => {
     return currentId
 }
 
-const broadcastDataWithOpcode = (bytes, opcode) => {
+const broadcastData = (bytes) => {
     if (bytes.length == undefined) bytes = Buffer.from(bytes)
-
-    const newbytes = new Uint8Array(bytes.length + 1)
-    newbytes.set([opcode], 0)
-    newbytes.set(bytes, 1)
-
-    Object.values(allChannels).forEach(s => { s.channel.send(newbytes, true) })
-
+    Object.values(allChannels).forEach(s => { s.channel.send(bytes, true) })
 }
 
 const processPlayerData = (channel_id, bytes) => {
@@ -31,7 +24,6 @@ const processPlayerData = (channel_id, bytes) => {
 
     //ignoring validation for now
     if (decodedMario.getPlayername().length < 3 || decodedMario.getPlayername().length > 14) return
-
     if (allChannels[channel_id] == undefined) return
 
     /// Data is Valid
@@ -40,7 +32,6 @@ const processPlayerData = (channel_id, bytes) => {
 }
 
 /// Every frame - 30 times per second
-let marioListCounter = 0
 setInterval(async () => {
     Object.values(allChannels).forEach(data => {
         if (data.valid > 0) data.valid--
@@ -50,12 +41,9 @@ setInterval(async () => {
     const mariolist = Object.values(allChannels).filter(data => data.decodedMario).map(data => data.decodedMario)
     const mariolistproto = new MarioListMsg()
     mariolistproto.setMarioList(mariolist)
-    mariolistproto.setMessagecount(marioListCounter)
     const bytes = mariolistproto.serializeBinary()
     const compressedMsg = await deflate(bytes)
-    stats.marioListSize = compressedMsg.length
-    broadcastDataWithOpcode(compressedMsg, 0)
-    marioListCounter++
+    broadcastData(compressedMsg)
 
 }, 33)
 
@@ -63,45 +51,19 @@ require('uWebSockets.js').App().ws('/*', {
 
     open: (channel) => {
         channel.my_id = generateID()
-        allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }
+        allChannels[channel.my_id] = { valid: 0, channel }
         channel.send(JSON.stringify({ id: channel.my_id }), false)
     },
 
-    message: (channel, bytes, isBinary) => {
-        const opcode = Buffer.from(bytes)[0]
-        switch (opcode) {
-            case 0: processPlayerData(channel.my_id, bytes.slice(1)); break
-            default: console.log("unknown opcode: " + opcode)
-        }
+    message: (channel, bytes) => {
+        processPlayerData(channel.my_id, bytes)
     },
 
     close: (channel) => {
         delete allChannels[channel.my_id]
     }
 
-}).listen(ws_port, () => { console.log("Starting websocket server") })
-
-/*geckos.onConnection(channel => {
-
-    channel.my_id = generateID()
-    allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }
-    channel.emit('id', { id: channel.my_id }, { reliable: true })
-
-    channel.onRaw(bytes => {
-        try {
-            const opcode = Buffer.from(bytes)[0]
-            switch (opcode) {
-                case 0: processPlayerData(channel.my_id, bytes.slice(1)); break
-                default: console.log("unknown opcode: " + opcode)
-            }
-        } catch (err) { console.log(err) }
-    })
-
-    channel.onDisconnect(() => {
-        delete allChannels[channel.my_id]
-    })
-})*/
-
+}).listen(ws_port, () => { console.log("Starting websocket server " + ws_port) })
 
 //// Express Static serving
 const express = require('express')

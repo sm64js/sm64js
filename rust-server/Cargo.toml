@@ -1,0 +1,15 @@
+[package]
+name = "sm64js-rust-server"
+version = "0.1.0"
+authors = ["Mario Reder <mreder1289@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+actix = "0.10"
+actix-codec = "0.3"
+actix-web = "3"
+actix-web-actors = "3"
+awc = "2"
+env_logger = "0.8"
+futures = "0.3"
+bytes = "0.6"

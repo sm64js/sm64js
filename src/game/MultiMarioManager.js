@@ -262,6 +262,7 @@ export const recvMarioData = (mariolistbytes) => {
             if (messageCount > lastMessageProcessed) {
                 lastMessageProcessed = messageCount
                 const marioList = marioListProto.getMarioList()
+                networkData.numOnline = marioList.length
                 marioList.forEach(marioProto => {
                     const id = marioProto.getChannelid()
                     if (id == networkData.myChannelID) return

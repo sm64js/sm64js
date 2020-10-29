@@ -1,5 +1,4 @@
 import * as Keydrown from "./keydrown.min.js"
-import { sendChat } from "./socket.js"
 import { gameData } from "./socket.js"
 
 /////// Keyboard / Gamepad Input ////////
@@ -13,7 +12,7 @@ window.addEventListener("keydown", (e) => {
     textboxfocus = $("#chatbox").is(':focus') || $("#playerNameInput").is(':focus')
 
     if ($("#chatbox").is(':focus') && e.keyCode == 13) {
-        sendChat(document.getElementById('chatbox').value)
+        //sendChat(document.getElementById('chatbox').value)
         document.getElementById('chatbox').value = ""
         document.getElementById('chatbox').blur()
     }

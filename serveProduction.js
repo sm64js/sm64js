@@ -1,5 +1,4 @@
-const { MarioMsg, MarioListMsg, ControllerMsg, ValidPlayersMsg } = require("./proto/mario_pb")
-const fs = require('fs')
+const { MarioMsg, MarioListMsg } = require("./proto/mario_pb")
 const http = require('http')
 const util = require('util')
 const zlib = require('zlib')
@@ -14,8 +13,6 @@ const geckos = require('@geckos.io/server').default({
     iceServers
 })
 
-const badwords = fs.readFileSync('otherTools/profanity_filter.txt').toString().split('\n')
-
 const allChannels = {}
 const stats = {}
 
@@ -25,41 +22,21 @@ const generateID = () => {
     return currentId
 }
 
-const sendDataWithOpcode = (bytes, opcode, channel) => {
-    if (bytes.length == undefined) bytes = Buffer.from(bytes)
-    const newbytes = new Uint8Array(bytes.length + 1)
-    newbytes.set([opcode], 0)
-    newbytes.set(bytes, 1)
-    channel.raw.emit(newbytes)
-}
-
-const broadcastDataWithOpcode = (bytes, opcode, channel) => {
+const broadcastDataWithOpcode = (bytes, opcode) => {
     if (bytes.length == undefined) bytes = Buffer.from(bytes)
 
     const newbytes = new Uint8Array(bytes.length + 1)
     newbytes.set([opcode], 0)
     newbytes.set(bytes, 1)
 
-    if (channel) channel.raw.broadcast.emit(newbytes)
-    else geckos.raw.emit(newbytes)
+    geckos.raw.emit(newbytes)
 
 }
-
-const sendValidUpdate = () => {
-
-    const validPlayers = Object.values(allChannels).filter(data => data.valid > 0).map(data => data.channel.my_id)
-
-    const validplayersmsg = new ValidPlayersMsg()
-    validplayersmsg.setValidplayersList(validPlayers)
-    broadcastDataWithOpcode(validplayersmsg.serializeBinary(), 8)
-}
-
 
 const processPlayerData = (channel_id, bytes) => {
     const decodedMario = MarioMsg.deserializeBinary(bytes)
 
-    //Pretty strict validation  -- ignoring validation for now
-    if (decodedMario.getChannelid() != decodedMario.getController().getChannelid()) return
+    //ignoring validation for now
     if (decodedMario.getPlayername().length < 3 || decodedMario.getPlayername().length > 14) return
 
     if (allChannels[channel_id] == undefined) return
@@ -67,140 +44,7 @@ const processPlayerData = (channel_id, bytes) => {
     /// Data is Valid
     allChannels[channel_id].decodedMario = decodedMario
     allChannels[channel_id].valid = 30
-
-    //publish
-    //broadcastDataWithOpcode(bytes, 0, allChannels[channel_id].channel)
 }
-
-const processControllerUpdate = (channel_id, bytes) => {
-    const decodedController = ControllerMsg.deserializeBinary(bytes)
-
-    /// do some validation here probably
-    allChannels[channel_id].decodedController = decodedController
-    //broadcastDataWithOpcode(bytes, 3, channel_id)
-}
-
-const validSkins = (skinData) => {
-    if (skinData.overalls.length != 6) return false
-    if (skinData.hat.length != 6) return false
-    if (skinData.shirt.length != 6) return false
-    if (skinData.gloves.length != 6) return false
-    if (skinData.boots.length != 6) return false
-    if (skinData.skin.length != 6) return false
-    if (skinData.hair.length != 6) return false
-
-
-    for (let i = 0; i < 6; i++) {
-        let number = skinData.overalls[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = skinData.hat[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = skinData.shirt[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = skinData.gloves[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = skinData.boots[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = skinData.skin[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = skinData.hair[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
-    }
-
-    return true
-
-}
-
-
-const processSkin = (channel_id, msg) => {
-    if (allChannels[channel_id].valid == 0) return
-
-    if (!validSkins(msg)) return
-
-    //const skinMsg = { channel_id, skinData: msg }
-    allChannels[channel_id].skinData = msg
-    allChannels[channel_id].skinData.updated = true
-    //allChannels[channel_id].channel.broadcast.emit('skin', skinMsg)
-}
-
-const sanitizeChat = (string) => {
-    string = string.substring(0, 200)
-    string = string.replace(/</g, "")
-    string = string.replace(/>/g, "")
-    return string
-}
-
-const processChat = (channel_id, msg) => {
-
-    if (allChannels[channel_id].chatCooldown > 0) return
-    if (msg.length == 0) return
-
-    const decodedMario = Object.values(allChannels).find(data => data.channel.my_id == channel_id).decodedMario
-    if (decodedMario == undefined) return
-
-
-    const sanitizedChat = sanitizeChat(msg)
-
-    const request = "http://www.purgomalum.com/service/json?text=" + sanitizedChat
-
-    http.get(request, res => {
-        const { statusCode } = res
-
-        if (statusCode != 200) {
-            console.error(`Profanity API did not return successful status code`)
-            return
-        }
-
-        res.setEncoding('utf8')
-        let rawData = ''
-        res.on('data', (chunk) => { rawData += chunk })
-        res.on('end', () => {
-            try {
-                const parsedMessage = JSON.parse(rawData).result
-
-                if (parsedMessage.length == 0) return
-
-                const chatmsg = {
-                    channel_id,
-                    msg: parsedMessage,
-                    sender: decodedMario.getPlayername()
-                }
-
-                allChannels[channel_id].chatCooldown = 3 // seconds
-
-                geckos.emit('chat', chatmsg)
-            } catch (e) {
-                console.error(`Got error with profanity api: ${e.message}`)
-            }
-        })
-    }).on('error', (e) => {
-        console.error(`Got error with profanity api: ${e.message}`)
-    })
-
-
-}
-
-const sendSkinsToChannel = (channel) => {
-    /// Send Skins
-    Object.entries(allChannels).forEach(([channel_id, data]) => {
-        if (data.skinData) {
-            const skinMsg = { channel_id, skinData: data.skinData }
-            channel.emit('skin', skinMsg)
-        }
-    })
-}
-
-const sendSkinsIfUpdated = () => {
-    /// Send Skins
-    Object.entries(allChannels).forEach(([channel_id, data]) => {
-        if (data.skinData) {
-            const skinMsg = { channel_id, skinData: data.skinData }
-            allChannels[channel_id].channel.broadcast.emit('skin', skinMsg)
-            data.skinData.updated = false
-        }
-    })
-}
-
 
 /// Every frame - 30 times per second
 let marioListCounter = 0
@@ -222,78 +66,26 @@ setInterval(async () => {
 
 }, 33)
 
-/// Every other frame - 16 times per second
-setInterval(async () => {
-/*    const controllerlist = Object.values(allChannels).filter(data => data.decodedController).map(data => data.decodedController)
-    const controllerlistproto = new ControllerListMsg()
-    controllerlistproto.setControllerList(controllerlist)
-    const bytes = controllerlistproto.serializeBinary()
-    const compressedMsg = await deflate(bytes)
-    broadcastDataWithOpcode(compressedMsg, 3)*/
-
-}, 66)
-
-
-/// Every 33 frames / once per second
-setInterval(() => {
-    sendValidUpdate()
-
-    //chat cooldown
-    Object.values(allChannels).forEach(data => {
-        if (data.chatCooldown > 0) data.chatCooldown--
-    })
-}, 1000)
-
-/// Every 10 seconds
-setInterval(() => {
-
-    /// ping to measure latency
-/*    Object.values(allChannels).forEach(data => {
-        const msg = new TextEncoder("utf-8").encode(JSON.stringify({ time: process.hrtime() }))
-        sendDataWithOpcode(msg, 99, data.channel)
-    })*/
-
-    sendSkinsIfUpdated()
-
-}, 10000)
-
-const measureAndPrintLatency = (msgBytes) => {
-    const time = JSON.parse(new TextDecoder("utf-8").decode(msgBytes)).time
-    const hrend = process.hrtime(time)
-    //console.info('Latency: %ds %dms', hrend[0], hrend[1] / 1000000)
-}
-
 geckos.onConnection(channel => {
 
     channel.my_id = generateID()
     allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }
     channel.emit('id', { id: channel.my_id }, { reliable: true })
 
-    sendSkinsToChannel(channel)
-
     channel.onRaw(bytes => {
         try {
             const opcode = Buffer.from(bytes)[0]
             switch (opcode) {
                 case 0: processPlayerData(channel.my_id, bytes.slice(1)); break
-                //case 2: processBasicAttack(channel.my_id, bytes.slice(1)); break
-                //case 3: processControllerUpdate(channel.my_id, bytes.slice(1)); break
-                //case 4: processKnockUp(channel.my_id, bytes.slice(1)); break
-                case 99: measureAndPrintLatency(bytes.slice(1)); break
                 default: console.log("unknown opcode: " + opcode)
             }
         } catch (err) { console.log(err) }
     })
 
-    channel.on('chat', msg => { processChat(channel.my_id, msg) })
-    channel.on('skin', msg => { processSkin(channel.my_id, msg) })
-
     channel.onDisconnect(() => {
         delete allChannels[channel.my_id]
     })
 })
-
-
 
 
 //// Express Static serving
@@ -304,98 +96,3 @@ app.use(express.static(__dirname + '/dist'))
 
 geckos.addServer(server)
 server.listen(port, () => { console.log(' Listening to combined servers at ' + port) })
-
-
-/////// necessary for server side rom extraction
-
-const { promisify } = require('util')
-const { spawn } = require('child_process')
-const { v4: uuidv4 } = require('uuid')
-
-app.get('/romTransfer', async (req, res) => {
-    console.log("rom transfer")
-
-    const uid = uuidv4()
-    await mkdir('extractTools/' + uid)
-
-    const file = fs.createWriteStream('extractTools/' + uid + '/baserom.us.z64')
-    await fileDownload(file, 'http://' + req.query.romExternal)
-
-    return res.send(await extractJsonFromRomFile(uid))
-})
-
-app.get('/stats', (req, res) => {
-    return res.send({
-        marioListSize: stats.marioListSize,
-        numPlayers: Object.keys(allChannels).length
-    })
-})
-
-const mkdir = promisify(fs.mkdir)
-
-const pythonExtract = (dir) => {
-    return new Promise((resolve, reject) => {
-        const pythonProcess = spawn('python3', ['extract_assets.py', 'us', dir], { cwd: 'extractTools/' })
-        //pythonProcess.stdout.on('data', (data) => { console.log(data.toString()) })
-        //pythonProcess.stderr.on('data', (data) => { console.log(data.toString()) })
-        pythonProcess.stderr.on('close', () => { resolve() })
-    })
-}
-
-const fileDownload = (file, url) => {
-    return new Promise((resolve, reject) => {
-        try {
-            http.get(url, (response) => {
-                const stream = response.pipe(file)
-                stream.on('error', () => { reject('Fail') })
-                stream.on('finish', () => { resolve('Success') })
-            })
-        } catch {
-            console.log("HTTP GET Error")
-            fs.rmdirSync('extractTools/' + uid, { recursive: true })
-            reject('Fail')
-        }
-    })
-}
-
-const extractJsonFromRomFile = async (dir) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            await pythonExtract(dir)
-
-            const extractedData = {}
-            const assets = JSON.parse(fs.readFileSync('extractTools/assets.json'))
-            Object.keys(assets).forEach((assetname) => {
-                let filepath = assetname
-                if (filepath == '@comment') return
-                if (filepath.indexOf("skyboxes") != -1) { /// skybox
-                    filepath = `extractTools/${dir}/${filepath}`
-                    filepath = filepath.slice(0, filepath.length - 4) + "_skybox.c"
-                    let filedata = fs.readFileSync(filepath, "utf8")
-                    filedata = filedata.replace(/\r/g, "")
-                    let lines = filedata.split("\n")
-                    lines = lines.filter(line => (line.length != 0) && (line[0] != '/'))
-                    while (lines.length > 0) {
-                        let section = lines.splice(0, 2)
-                        if (section[0].slice(0, 24) == 'ALIGNED8 static const u8') {
-                            const textureName = section[0].slice(25, section[0].length - 6)
-                            const textureData = section[1].slice(0, section[1].indexOf('}'))
-                            extractedData[textureName] = Buffer.from(textureData.split(','))
-                        }
-                    }
-                } else {  /// not skybox
-                    filepath = `extractTools/${dir}/${filepath}`
-                    filepath = filepath.substring(0, filepath.length - 4)
-                    const filedata = fs.readFileSync(filepath)
-                    extractedData[assetname] = filedata
-                }
-            })
-            fs.rmdirSync('extractTools/' + dir, { recursive: true })
-            resolve(extractedData)
-        } catch {
-            console.log('Rom Extraction Fail')
-            fs.rmdirSync('extractTools/' + dir, { recursive: true })
-            resolve('Fail')
-        }
-    })
-}

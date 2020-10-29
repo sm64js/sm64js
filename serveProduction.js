@@ -133,11 +133,15 @@ const sanitizeChat = (string) => {
 const processChat = (channel_id, msg) => {
 
     if (allChannels[channel_id].chatCooldown > 0) return
+    if (msg.length == 0) return
 
     const decodedMario = Object.values(allChannels).find(data => data.channel.my_id == channel_id).decodedMario
     if (decodedMario == undefined) return
 
-    const request = "http://www.purgomalum.com/service/json?text=" + sanitizeChat(msg)
+
+    const sanitizedChat = sanitizeChat(msg)
+
+    const request = "http://www.purgomalum.com/service/json?text=" + sanitizedChat
 
     http.get(request, res => {
         const { statusCode } = res
@@ -152,8 +156,15 @@ const processChat = (channel_id, msg) => {
         res.on('data', (chunk) => { rawData += chunk })
         res.on('end', () => {
             try {
-                const parsedData = JSON.parse(rawData)
-                const chatmsg = { channel_id, msg: parsedData.result, sender: decodedMario.getPlayername() }
+                const parsedMessage = JSON.parse(rawData).result
+
+                if (parsedMessage.length == 0) return
+
+                const chatmsg = {
+                    channel_id,
+                    msg: parsedMessage,
+                    sender: decodedMario.getPlayername()
+                }
 
                 allChannels[channel_id].chatCooldown = 3 // seconds
 

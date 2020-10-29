@@ -4,14 +4,7 @@ const util = require('util')
 const zlib = require('zlib')
 const deflate = util.promisify(zlib.deflate)
 const port = 9208
-const { iceServers } = require('@geckos.io/server')
-const geckos = require('@geckos.io/server').default({
-    portRange: {
-        min: 10000,
-        max: 12000
-    },
-    iceServers
-})
+const ws_port = 3000
 
 const allChannels = {}
 const stats = {}
@@ -29,7 +22,7 @@ const broadcastDataWithOpcode = (bytes, opcode) => {
     newbytes.set([opcode], 0)
     newbytes.set(bytes, 1)
 
-    geckos.raw.emit(newbytes)
+    Object.values(allChannels).forEach(s => { s.channel.send(newbytes, true) })
 
 }
 
@@ -66,7 +59,29 @@ setInterval(async () => {
 
 }, 33)
 
-geckos.onConnection(channel => {
+require('uWebSockets.js').App().ws('/*', {
+
+    open: (channel) => {
+        channel.my_id = generateID()
+        allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }
+        channel.send(JSON.stringify({ id: channel.my_id }), false)
+    },
+
+    message: (channel, bytes, isBinary) => {
+        const opcode = Buffer.from(bytes)[0]
+        switch (opcode) {
+            case 0: processPlayerData(channel.my_id, bytes.slice(1)); break
+            default: console.log("unknown opcode: " + opcode)
+        }
+    },
+
+    close: (channel) => {
+        delete allChannels[channel.my_id]
+    }
+
+}).listen(ws_port, () => { console.log("Starting websocket server") })
+
+/*geckos.onConnection(channel => {
 
     channel.my_id = generateID()
     allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }
@@ -85,7 +100,7 @@ geckos.onConnection(channel => {
     channel.onDisconnect(() => {
         delete allChannels[channel.my_id]
     })
-})
+})*/
 
 
 //// Express Static serving
@@ -94,5 +109,4 @@ const app = express()
 const server = http.Server(app)
 app.use(express.static(__dirname + '/dist'))
 
-geckos.addServer(server)
-server.listen(port, () => { console.log(' Listening to combined servers at ' + port) })
+server.listen(port, () => { console.log('Serving Files with express server ' + port) })

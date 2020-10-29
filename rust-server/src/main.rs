@@ -1,5 +1,9 @@
 mod data;
 
+pub mod proto {
+    include!(concat!(env!("OUT_DIR"), "/sm64js.rs"));
+}
+
 use data::Data;
 
 use actix::prelude::*;
@@ -16,13 +20,10 @@ const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 /// How long before lack of client response causes a timeout
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
 
-/// do websocket handshake and start `MyWebSocket` actor
 async fn ws_index(r: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
-    let res = ws::start(Sm64JsWebSocket::new(), &r, stream);
-    res
+    ws::start(Sm64JsWebSocket::new(), &r, stream)
 }
-
-struct Sm64JsWebSocket {
+pub struct Sm64JsWebSocket {
     hb: Instant,
 }
 

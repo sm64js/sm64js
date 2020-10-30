@@ -1,18 +1,20 @@
+#[macro_use]
+extern crate lazy_static;
+
 mod data;
 
 pub mod proto {
     include!(concat!(env!("OUT_DIR"), "/sm64js.rs"));
 }
 
-use data::Data;
+use data::{Client, DATA};
+use proto::MarioMsg;
 
 use actix::prelude::*;
 use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
-use std::{
-    sync::Arc,
-    time::{Duration, Instant},
-};
+use prost::Message;
+use std::time::{Duration, Instant};
 
 /// How often heartbeat pings are sent
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
@@ -31,6 +33,14 @@ impl Actor for Sm64JsWebSocket {
     type Context = ws::WebsocketContext<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
+        DATA.lock()
+            .unwrap()
+            .add_client(ctx.address(), Client::new());
+        self.hb(ctx);
+    }
+
+    fn stopped(&mut self, ctx: &mut Self::Context) {
+        DATA.lock().unwrap().remove_client(&ctx.address());
         self.hb(ctx);
     }
 }
@@ -47,8 +57,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWebSocket {
             Ok(ws::Message::Pong(_)) => {
                 self.hb = Instant::now();
             }
-            Ok(ws::Message::Text(text)) => ctx.text(text),
-            Ok(ws::Message::Binary(bin)) => ctx.binary(bin),
+            Ok(ws::Message::Binary(bin)) => {
+                let data = MarioMsg::decode(bin).unwrap();
+                DATA.lock().unwrap().set_data(&ctx.address(), data);
+            }
             Ok(ws::Message::Close(reason)) => {
                 ctx.close(reason);
                 ctx.stop();
@@ -90,11 +102,8 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_server=info,actix_web=info");
     env_logger::init();
 
-    let data = Arc::new(Data::new());
-
     HttpServer::new(move || {
         App::new()
-            .data(data.clone())
             .wrap(middleware::Logger::default())
             .service(web::resource("/").route(web::get().to(ws_index)))
     })

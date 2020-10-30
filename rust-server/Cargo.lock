@@ -1558,6 +1558,7 @@ dependencies = [
  "bytes 0.6.0",
  "env_logger",
  "futures",
+ "lazy_static",
  "prost",
  "prost-build",
 ]

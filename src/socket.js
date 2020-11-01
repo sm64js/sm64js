@@ -11,12 +11,12 @@ const sanitizeChat = (string, isMessage) => {
     string = string.replace(/</g, "");
     // string = string.replace(/>/g, ""); // commented out for ">:(" and "> text", should still sanitize with only <
     if(isMessage = true) {
-        string = string.replace(/:doublek:/g, "<img height='20' width='20' src='src/emotes/doublek.png' alt=':doublek:' />");
-        string = string.replace(/:facepalm:/g, "<img height='20' width='20' src='src/emotes/facepalm.png' alt=':facepalm:' />");
-        string = string.replace(/:kappa:/g, "<img height='20' width='20' src='src/emotes/kappa.png' alt=':kappa:' />");
-        string = string.replace(/:mariostyle:/g, "<img height='20' width='20' src='src/emotes/mariostyle.gif' alt=':mariostyle:' />");
-        string = string.replace(/:pogchamp:/g, "<img height='20' width='20' src='src/emotes/pogchamp.png' alt=':pogchamp:' />");
-        string = string.replace(/:strange:/g, "<img height='20' width='20' src='src/emotes/strange.png' alt=':strange:' />");
+        string = string.replace(/:doublek:/g, "<img height='20' width='20' src='emotes/doublek.png' alt=':doublek:' />");
+        string = string.replace(/:facepalm:/g, "<img height='20' width='20' src='emotes/facepalm.png' alt=':facepalm:' />");
+        string = string.replace(/:kappa:/g, "<img height='20' width='20' src='emotes/kappa.png' alt=':kappa:' />");
+        string = string.replace(/:mariostyle:/g, "<img height='20' width='20' src='emotes/mariostyle.gif' alt=':mariostyle:' />");
+        string = string.replace(/:pogchamp:/g, "<img height='20' width='20' src='emotes/pogchamp.png' alt=':pogchamp:' />");
+        string = string.replace(/:strange:/g, "<img height='20' width='20' src='emotes/strange.png' alt=':strange:' />");
         // string.replace any other emotes in this fashion.
     }
     return string;

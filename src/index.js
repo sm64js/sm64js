@@ -163,4 +163,8 @@ const startGame = () => {
     main_func()
 }
 
-if (checkForRom() && url.searchParams.get("autostart")) startGame()
+window.onload = () => {
+    if (checkForRom() && url.searchParams.get("autostart")) startGame()
+    document.getElementById('mainContent').hidden = false
+}
+

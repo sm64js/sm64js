@@ -1554,6 +1554,7 @@ dependencies = [
  "actix-codec",
  "actix-web",
  "actix-web-actors",
+ "actix_derive",
  "awc",
  "bytes 0.6.0",
  "env_logger",
@@ -1561,6 +1562,7 @@ dependencies = [
  "lazy_static",
  "prost",
  "prost-build",
+ "rand",
 ]
 
 [[package]]

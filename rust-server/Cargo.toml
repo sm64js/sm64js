@@ -8,6 +8,7 @@ edition = "2018"
 prost-build = "0.6"
 
 [dependencies]
+anyhow = "1"
 actix = "0.10"
 actix-codec = "0.3"
 actix_derive = "0.5"
@@ -16,7 +17,8 @@ actix-web-actors = "3"
 awc = "2"
 bytes = "0.6"
 env_logger = "0.8"
+flate2 = "1"
 futures = "0.3"
-lazy_static = "1"
 prost = "0.6"
-rand = "*"
+rand = "0.7"
+tokio = { version = "0.3", features = [ "full" ] }

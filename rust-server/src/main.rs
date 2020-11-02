@@ -1,9 +1,3 @@
-#[macro_use]
-extern crate actix_derive;
-
-#[macro_use]
-extern crate lazy_static;
-
 mod server;
 
 pub mod proto {
@@ -16,10 +10,7 @@ use actix::prelude::*;
 use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
 use prost::Message;
-use std::{
-    thread,
-    time::{Duration, Instant},
-};
+use std::time::{Duration, Instant};
 
 /// How often heartbeat pings are sent
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
@@ -63,12 +54,9 @@ impl Actor for Sm64JsWsSession {
             .wait(ctx);
     }
 
-    fn stopped(&mut self, ctx: &mut Self::Context) {
-        // TODO send stop message
-        // DATA.lock()
-        //     .unwrap()
-        //     .remove_client(&ctx.address().recipient());
-        self.hb(ctx);
+    fn stopping(&mut self, _: &mut Self::Context) -> Running {
+        self.addr.do_send(server::Disconnect { id: self.id });
+        Running::Stop
     }
 }
 
@@ -86,10 +74,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
             }
             Ok(ws::Message::Binary(bin)) => {
                 let data = MarioMsg::decode(bin).unwrap();
-                // send set data message
-                // DATA.lock()
-                //     .unwrap()
-                //     .set_data(&ctx.address().recipient(), data);
+                self.addr.do_send(server::SetData { id: self.id, data })
             }
             Ok(ws::Message::Close(reason)) => {
                 ctx.close(reason);
@@ -144,14 +129,11 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_server=info,actix_web=info");
     env_logger::init();
 
-    thread::spawn(|| loop {
-        // DATA.lock().unwrap().broadcast_data();
-        // TODO broadcast
-        thread::sleep(Duration::from_millis(33));
-    });
+    let server = server::Sm64JsServer::new().start();
 
     HttpServer::new(move || {
         App::new()
+            .data(server.clone())
             .wrap(middleware::Logger::default())
             .service(web::resource("/").route(web::get().to(ws_index)))
     })

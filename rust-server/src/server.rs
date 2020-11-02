@@ -1,9 +1,17 @@
 use crate::proto::{MarioListMsg, MarioMsg};
 
 use actix::{prelude::*, Recipient};
+use anyhow::Result;
+use flate2::{write::DeflateEncoder, Compression};
 use prost::Message as ProstMessage;
-use rand::{self, rngs::ThreadRng, Rng};
-use std::collections::HashMap;
+use rand::{self, Rng};
+use std::{
+    collections::HashMap,
+    io::prelude::*,
+    sync::{Arc, Mutex},
+    thread,
+    time::Duration,
+};
 
 #[derive(Message)]
 #[rtype(result = "()")]
@@ -13,6 +21,12 @@ pub struct Message(pub Vec<u8>);
 #[rtype(usize)]
 pub struct Connect {
     pub addr: Recipient<Message>,
+}
+
+#[derive(Message)]
+#[rtype(result = "()")]
+pub struct Disconnect {
+    pub id: usize,
 }
 
 #[derive(Message)]
@@ -31,27 +45,45 @@ pub struct RemoveClient {
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct SetData {
-    id: usize,
-    data: MarioMsg,
+    pub id: usize,
+    pub data: MarioMsg,
 }
 
 pub struct Sm64JsServer {
-    clients: HashMap<usize, Client>,
-    rng: ThreadRng,
+    clients: Arc<Mutex<HashMap<usize, Client>>>,
 }
 
 impl Actor for Sm64JsServer {
     type Context = Context<Self>;
+
+    fn started(&mut self, _: &mut Self::Context) {
+        let clients = self.clients.clone();
+
+        thread::spawn(move || loop {
+            Sm64JsServer::broadcast_data(clients.clone()).unwrap();
+            thread::sleep(Duration::from_millis(33));
+        });
+    }
 }
 
 impl Handler<Connect> for Sm64JsServer {
     type Result = usize;
 
     fn handle(&mut self, msg: Connect, _: &mut Context<Self>) -> Self::Result {
-        let id = self.rng.gen::<usize>();
-        // self.sessions.insert(id, msg.addr);
-        // TODO insert
+        let id = rand::thread_rng().gen::<usize>();
+        self.clients
+            .lock()
+            .unwrap()
+            .insert(id, Client::new(msg.addr));
         id
+    }
+}
+
+impl Handler<Disconnect> for Sm64JsServer {
+    type Result = ();
+
+    fn handle(&mut self, msg: Disconnect, _: &mut Context<Self>) {
+        self.clients.lock().unwrap().remove(&msg.id);
     }
 }
 
@@ -59,7 +91,7 @@ impl Handler<AddClient> for Sm64JsServer {
     type Result = ();
 
     fn handle(&mut self, msg: AddClient, _: &mut Context<Self>) {
-        self.clients.insert(msg.id, msg.client);
+        self.clients.lock().unwrap().insert(msg.id, msg.client);
     }
 }
 
@@ -67,7 +99,7 @@ impl Handler<RemoveClient> for Sm64JsServer {
     type Result = ();
 
     fn handle(&mut self, msg: RemoveClient, _: &mut Context<Self>) {
-        self.clients.remove(&msg.id);
+        self.clients.lock().unwrap().remove(&msg.id);
     }
 }
 
@@ -76,6 +108,8 @@ impl Handler<SetData> for Sm64JsServer {
 
     fn handle(&mut self, msg: SetData, _: &mut Context<Self>) {
         self.clients
+            .lock()
+            .unwrap()
             .get_mut(&msg.id)
             .map(|client| client.set_data(msg.data));
     }
@@ -84,14 +118,14 @@ impl Handler<SetData> for Sm64JsServer {
 impl Sm64JsServer {
     pub fn new() -> Self {
         Sm64JsServer {
-            clients: HashMap::new(),
-            rng: rand::thread_rng(),
+            clients: Arc::new(Mutex::new(HashMap::new())),
         }
     }
 
-    pub fn broadcast_data(&mut self) -> Result<(), prost::EncodeError> {
-        let mario_list: Vec<MarioMsg> = self
-            .clients
+    pub fn broadcast_data(clients: Arc<Mutex<HashMap<usize, Client>>>) -> Result<()> {
+        let mario_list: Vec<MarioMsg> = clients
+            .lock()
+            .unwrap()
             .values_mut()
             .filter_map(|client| {
                 client.valid -= 1;
@@ -104,9 +138,20 @@ impl Sm64JsServer {
         };
         let mut msg = vec![];
         mario_list_msg.encode(&mut msg)?;
-        self.clients.values().for_each(|client| {
-            client.send(Message(msg.clone()));
-        });
+
+        let mut encoder = DeflateEncoder::new(Vec::new(), Compression::default());
+        encoder.write_all(&msg)?;
+        let msg = encoder.finish()?;
+
+        clients
+            .lock()
+            .unwrap()
+            .values()
+            .map(|client| -> Result<()> {
+                client.send(Message(msg.clone()))?;
+                Ok(())
+            })
+            .collect::<Result<Vec<_>>>()?;
         Ok(())
     }
 
@@ -156,7 +201,8 @@ impl Client {
         self.valid = 30;
     }
 
-    pub fn send(&self, msg: Message) {
-        self.addr.do_send(msg);
+    pub fn send(&self, msg: Message) -> Result<()> {
+        self.addr.do_send(msg)?;
+        Ok(())
     }
 }

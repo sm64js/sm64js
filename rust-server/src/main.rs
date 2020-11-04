@@ -26,7 +26,7 @@ async fn ws_index(
     ws::start(Sm64JsWsSession::new(srv.get_ref().clone()), &r, stream)
 }
 pub struct Sm64JsWsSession {
-    id: usize,
+    id: u32,
     hb: Instant,
     addr: Addr<server::Sm64JsServer>,
 }
@@ -46,7 +46,6 @@ impl Actor for Sm64JsWsSession {
             .then(|res, act, ctx| {
                 match res {
                     Ok(res) => act.id = res,
-                    // something is wrong with chat server
                     _ => ctx.stop(),
                 }
                 fut::ready(())
@@ -63,7 +62,6 @@ impl Actor for Sm64JsWsSession {
 /// Handler for `ws::Message`
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
-        println!("WS: {:?}", msg);
         match msg {
             Ok(ws::Message::Ping(msg)) => {
                 self.hb = Instant::now();

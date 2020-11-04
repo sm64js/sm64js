@@ -1,10 +1,11 @@
-use crate::proto::{MarioListMsg, MarioMsg};
+use crate::proto::{sm64_js_message, ConnectedMsg, MarioListMsg, MarioMsg, Sm64JsMessage};
 
 use actix::{prelude::*, Recipient};
 use anyhow::Result;
 use flate2::{write::DeflateEncoder, Compression};
 use prost::Message as ProstMessage;
 use rand::{self, Rng};
+use serde::Serialize;
 use std::{
     collections::HashMap,
     io::prelude::*,
@@ -17,8 +18,13 @@ use std::{
 #[rtype(result = "()")]
 pub struct Message(pub Vec<u8>);
 
+#[derive(Debug, Serialize)]
+pub struct ConnectedMessage {
+    id: u32,
+}
+
 #[derive(Message)]
-#[rtype(usize)]
+#[rtype(u32)]
 pub struct Connect {
     pub addr: Recipient<Message>,
 }
@@ -26,31 +32,31 @@ pub struct Connect {
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct Disconnect {
-    pub id: usize,
+    pub id: u32,
 }
 
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct AddClient {
-    id: usize,
+    id: u32,
     client: Client,
 }
 
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct RemoveClient {
-    id: usize,
+    id: u32,
 }
 
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct SetData {
-    pub id: usize,
+    pub id: u32,
     pub data: MarioMsg,
 }
 
 pub struct Sm64JsServer {
-    clients: Arc<Mutex<HashMap<usize, Client>>>,
+    clients: Arc<Mutex<HashMap<u32, Client>>>,
 }
 
 impl Actor for Sm64JsServer {
@@ -67,14 +73,26 @@ impl Actor for Sm64JsServer {
 }
 
 impl Handler<Connect> for Sm64JsServer {
-    type Result = usize;
+    type Result = u32;
 
     fn handle(&mut self, msg: Connect, _: &mut Context<Self>) -> Self::Result {
-        let id = rand::thread_rng().gen::<usize>();
-        self.clients
-            .lock()
-            .unwrap()
-            .insert(id, Client::new(msg.addr));
+        let id = rand::thread_rng().gen::<u32>();
+        let client = Client::new(msg.addr);
+
+        let sm64js_msg = Sm64JsMessage {
+            message: Some(sm64_js_message::Message::ConnectedMsg(ConnectedMsg {
+                channel_id: id,
+            })),
+        };
+        let mut msg = vec![];
+        sm64js_msg.encode(&mut msg).unwrap();
+
+        let mut encoder = DeflateEncoder::new(Vec::new(), Compression::fast());
+        encoder.write_all(&msg).unwrap();
+        let msg = encoder.finish().unwrap();
+
+        client.send(Message(msg)).unwrap();
+        self.clients.lock().unwrap().insert(id, client);
         id
     }
 }
@@ -122,24 +140,33 @@ impl Sm64JsServer {
         }
     }
 
-    pub fn broadcast_data(clients: Arc<Mutex<HashMap<usize, Client>>>) -> Result<()> {
+    pub fn broadcast_data(clients: Arc<Mutex<HashMap<u32, Client>>>) -> Result<()> {
         let mario_list: Vec<MarioMsg> = clients
             .lock()
             .unwrap()
             .values_mut()
             .filter_map(|client| {
-                client.valid -= 1;
-                client.data.clone()
+                if client.valid > 0 {
+                    client.valid -= 1;
+                    client.data.clone()
+                } else if client.data.is_some() {
+                    // TODO disconnect
+                    None
+                } else {
+                    client.data.clone()
+                }
             })
             .collect();
-        let mario_list_msg = MarioListMsg {
-            message_count: mario_list.len() as u32,
-            mario: mario_list,
+        let sm64js_msg = Sm64JsMessage {
+            message: Some(sm64_js_message::Message::ListMsg(MarioListMsg {
+                message_count: mario_list.len() as u32,
+                mario: mario_list,
+            })),
         };
         let mut msg = vec![];
-        mario_list_msg.encode(&mut msg)?;
+        sm64js_msg.encode(&mut msg)?;
 
-        let mut encoder = DeflateEncoder::new(Vec::new(), Compression::default());
+        let mut encoder = DeflateEncoder::new(Vec::new(), Compression::fast());
         encoder.write_all(&msg)?;
         let msg = encoder.finish()?;
 
@@ -154,28 +181,6 @@ impl Sm64JsServer {
             .collect::<Result<Vec<_>>>()?;
         Ok(())
     }
-
-    /*
-        setInterval(async () => {
-        Object.values(allChannels).forEach(data => {
-            if (data.valid > 0) data.valid--
-            else if (data.decodedMario) data.channel.close()
-        })
-
-        const mariolist = Object.values(allChannels).filter(data => data.decodedMario).map(data => data.decodedMario)
-        const mariolistproto = new MarioListMsg()
-        mariolistproto.setMarioList(mariolist)
-        const bytes = mariolistproto.serializeBinary()
-        const compressedMsg = await deflate(bytes)
-        broadcastData(compressedMsg)
-
-    }, 33)
-
-    const broadcastData = (bytes) => {
-        if (bytes.length == undefined) bytes = Buffer.from(bytes)
-        Object.values(allChannels).forEach(s => { s.channel.send(bytes, true) })
-    }
-        */
 }
 
 pub struct Client {

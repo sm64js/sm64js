@@ -87,9 +87,9 @@ impl Handler<Connect> for Sm64JsServer {
         let mut msg = vec![];
         sm64js_msg.encode(&mut msg).unwrap();
 
-        let mut encoder = DeflateEncoder::new(Vec::new(), Compression::fast());
-        encoder.write_all(&msg).unwrap();
-        let msg = encoder.finish().unwrap();
+        // let mut encoder = DeflateEncoder::new(Vec::new(), Compression::fast());
+        // encoder.write_all(&msg).unwrap();
+        // let msg = encoder.finish().unwrap();
 
         client.send(Message(msg)).unwrap();
         self.clients.lock().unwrap().insert(id, client);
@@ -166,9 +166,9 @@ impl Sm64JsServer {
         let mut msg = vec![];
         sm64js_msg.encode(&mut msg)?;
 
-        let mut encoder = DeflateEncoder::new(Vec::new(), Compression::fast());
-        encoder.write_all(&msg)?;
-        let msg = encoder.finish()?;
+        // let mut encoder = DeflateEncoder::new(Vec::new(), Compression::fast());
+        // encoder.write_all(&msg)?;
+        // let msg = encoder.finish()?;
 
         clients
             .lock()

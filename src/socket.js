@@ -1,4 +1,6 @@
+import { Sm64JsMsg } from "../proto/mario_pb"
 import * as Multi from "./game/MultiMarioManager"
+import zlib from "zlib"
 
 const url = new URL(window.location.href)
 
@@ -22,13 +24,31 @@ const sendData = (bytes) => {
 socket.onopen = () => {
 
     socket.onmessage = async (message) => {
-        if (typeof message.data == "string") {
-            networkData.myChannelID = JSON.parse(message.data).id
-        } else if (typeof message.data == "object") {
-            const bytes = new Uint8Array(await message.data.arrayBuffer())
-            if (multiplayerReady()) Multi.recvMarioData(bytes)
-        } else throw "unknown message"
-
+        const bytes = new Uint8Array(await message.data.arrayBuffer())
+        // zlib.inflate(bytes, (err, buffer) => {
+            // if (err) {
+            //     console.error(err)
+            //     return
+            // }
+            const sm64jsMsg = Sm64JsMsg.deserializeBinary(bytes)
+            switch (sm64jsMsg.getMessageCase()) {
+                case Sm64JsMsg.MessageCase.LIST_MSG:            
+                    if (!multiplayerReady()) return
+                    const listMsg = sm64jsMsg.getListMsg()
+                    const marioList = listMsg.getMarioList()
+                    Multi.recvMarioData(marioList)
+                    break;
+                case Sm64JsMsg.MessageCase.CONNECTED_MSG:
+                    const connectedMsg = sm64jsMsg.getConnectedMsg()
+                    const channelID = connectedMsg.getChannelid()
+                    console.log('CONNECTED_MSG', channelID)
+                    networkData.myChannelID = channelID
+                    break;
+                case Sm64JsMsg.MessageCase.MESSAGE_NOT_SET:
+                default:
+                    throw new Error(`unhandled case in switch expression: ${sm64jsMsg.getMessageCase()}`)
+            }
+        // })
     }
 
     socket.onclose = () => { }

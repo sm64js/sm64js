@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package sm64js;
 
-message Sm64JsMessage {
+message Sm64JsMsg {
 	oneof message {
 		MarioListMsg list_msg = 1;
 		ConnectedMsg connected_msg = 2;

@@ -1,14 +1,14 @@
-use crate::proto::{sm64_js_message, ConnectedMsg, MarioListMsg, MarioMsg, Sm64JsMessage};
+use crate::proto::{sm64_js_msg, ConnectedMsg, MarioListMsg, MarioMsg, Sm64JsMsg};
 
 use actix::{prelude::*, Recipient};
 use anyhow::Result;
-use flate2::{write::DeflateEncoder, Compression};
+// use flate2::{write::DeflateEncoder, Compression};
 use prost::Message as ProstMessage;
 use rand::{self, Rng};
 use serde::Serialize;
 use std::{
     collections::HashMap,
-    io::prelude::*,
+    // io::prelude::*,
     sync::{Arc, Mutex},
     thread,
     time::Duration,
@@ -79,8 +79,8 @@ impl Handler<Connect> for Sm64JsServer {
         let id = rand::thread_rng().gen::<u32>();
         let client = Client::new(msg.addr);
 
-        let sm64js_msg = Sm64JsMessage {
-            message: Some(sm64_js_message::Message::ConnectedMsg(ConnectedMsg {
+        let sm64js_msg = Sm64JsMsg {
+            message: Some(sm64_js_msg::Message::ConnectedMsg(ConnectedMsg {
                 channel_id: id,
             })),
         };
@@ -157,8 +157,8 @@ impl Sm64JsServer {
                 }
             })
             .collect();
-        let sm64js_msg = Sm64JsMessage {
-            message: Some(sm64_js_message::Message::ListMsg(MarioListMsg {
+        let sm64js_msg = Sm64JsMsg {
+            message: Some(sm64_js_msg::Message::ListMsg(MarioListMsg {
                 message_count: mario_list.len() as u32,
                 mario: mario_list,
             })),

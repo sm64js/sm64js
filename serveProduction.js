@@ -47,23 +47,25 @@ setInterval(async () => {
 
 }, 33)
 
-require('uWebSockets.js').App().ws('/*', {
-
-    open: (channel) => {
-        channel.my_id = generateID()
-        allChannels[channel.my_id] = { valid: 0, channel }
-        channel.send(JSON.stringify({ id: channel.my_id }), false)
-    },
-
-    message: (channel, bytes) => {
-        processPlayerData(channel.my_id, bytes)
-    },
-
-    close: (channel) => {
-        delete allChannels[channel.my_id]
-    }
-
-}).listen(ws_port, () => { console.log("Starting websocket server " + ws_port) })
+if (process.env.NODE_WS) {
+    require('uWebSockets.js').App().ws('/*', {
+    
+        open: (channel) => {
+            channel.my_id = generateID()
+            allChannels[channel.my_id] = { valid: 0, channel }
+            channel.send(JSON.stringify({ id: channel.my_id }), false)
+        },
+    
+        message: (channel, bytes) => {
+            processPlayerData(channel.my_id, bytes)
+        },
+    
+        close: (channel) => {
+            delete allChannels[channel.my_id]
+        }
+    
+    }).listen(ws_port, () => { console.log("Starting websocket server " + ws_port) })
+}
 
 //// Express Static serving
 const express = require('express')

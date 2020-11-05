@@ -22,7 +22,8 @@
   },
   "scripts": {
     "quickstart": "npm install && webpack --mode production && node serveProduction.js",
-    "serve": "node serveProduction.js",
+    "serve": "cross-env NODE_WS=1 node serveProduction.js",
+    "serve:rust": "node serveProduction.js",
     "build": "webpack --mode production",
     "start": "webpack-dev-server --host 0.0.0.0 --disable-host-check  --mode development"
   },
@@ -35,6 +36,7 @@
     "@babel/core": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
     "babel-loader": "^8.1.0",
+    "cross-env": "^7.0.2",
     "html-loader": "^1.1.0",
     "html-webpack-plugin": "^4.3.0",
     "webpack-node-externals": "^1.7.2"

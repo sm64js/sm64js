@@ -1,5 +1,18 @@
 syntax = "proto3";
 
+package sm64js;
+
+message Sm64JsMsg {
+	oneof message {
+		MarioListMsg list_msg = 1;
+		ConnectedMsg connected_msg = 2;
+	}
+}
+
+message ConnectedMsg {
+	uint32 channelID = 1;
+}
+
 message MarioListMsg {
 	uint32 messageCount = 1;
 	repeated MarioMsg mario = 2;

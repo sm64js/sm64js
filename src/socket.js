@@ -42,9 +42,7 @@ const sendDataWithOpcode = (bytes, opcode) => {
 const measureAndPrintLatency = (msgBytes) => {
     const startTime = JSON.parse(new TextDecoder("utf-8").decode(msgBytes)).time
     const endTime = performance.now()
-    console.log(endTime - startTime)
     window.latency = parseInt(endTime - startTime)
-    //console.info('Latency: %ds %dms', hrend[0], hrend[1] / 1000000)
 }
 
 const recvChat = (chatmsg) => {

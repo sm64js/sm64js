@@ -257,11 +257,11 @@ setInterval(() => {
 
 }, 10000)
 
-const measureAndPrintLatency = (msgBytes) => {
-    const time = JSON.parse(new TextDecoder("utf-8").decode(msgBytes)).time
-    const hrend = process.hrtime(time)
-    //console.info('Latency: %ds %dms', hrend[0], hrend[1] / 1000000)
-}
+// const measureAndPrintLatency = (msgBytes) => {
+//     const time = JSON.parse(new TextDecoder("utf-8").decode(msgBytes)).time
+//     const hrend = process.hrtime(time)
+//     //console.info('Latency: %ds %dms', hrend[0], hrend[1] / 1000000)
+// }
 
 geckos.onConnection(channel => {
 
@@ -279,7 +279,7 @@ geckos.onConnection(channel => {
                 //case 2: processBasicAttack(channel.my_id, bytes.slice(1)); break
                 //case 3: processControllerUpdate(channel.my_id, bytes.slice(1)); break
                 //case 4: processKnockUp(channel.my_id, bytes.slice(1)); break
-                case 99: measureAndPrintLatency(bytes.slice(1)); break
+                case 99: channel.raw.emit(bytes); break  ///ping pong
                 default: console.log("unknown opcode: " + opcode)
             }
         } catch (err) { console.log(err) }

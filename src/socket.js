@@ -39,6 +39,14 @@ const sendDataWithOpcode = (bytes, opcode) => {
     channel.raw.emit(newbytes)
 }
 
+const measureAndPrintLatency = (msgBytes) => {
+    const startTime = JSON.parse(new TextDecoder("utf-8").decode(msgBytes)).time
+    const endTime = performance.now()
+    console.log(endTime - startTime)
+    window.latency = parseInt(endTime - startTime)
+    //console.info('Latency: %ds %dms', hrend[0], hrend[1] / 1000000)
+}
+
 const recvChat = (chatmsg) => {
 
     if (chatmsg.channel_id != networkData.myChannelID &&
@@ -75,7 +83,7 @@ channel.onConnect((err) => {
             //case 3: if (multiplayerReady()) Multi.recvControllerUpdate(msgBytes); break
             //case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
             case 8: Multi.recvValidPlayers(msgBytes); break
-            case 99: channel.raw.emit(message); break  ///ping pong
+            case 99: measureAndPrintLatency(bytes.slice(1)); break
             default: throw "unknown opcode"
         }
         const end = performance.now() - start
@@ -86,7 +94,7 @@ channel.onConnect((err) => {
     channel.on('chat', msg => { recvChat(msg) })
     channel.on('skin', msg => { Cosmetics.recvSkinData(msg) })
 
-    channel.onDisconnect(() => { channel.readyState = 0 })
+    channel.onDisconnect(() => { channel.readyState = 0; window.latency = null })
 })
 
 const multiplayerReady = () => {
@@ -122,6 +130,10 @@ export const post_main_loop_one_iteration = (frame) => {
                 channel.emit('skin', window.myMario.skinData)
             }
         }
+
+        /// ping to measure latency
+        const msg = new TextEncoder("utf-8").encode(JSON.stringify({ time: performance.now() }))
+        sendDataWithOpcode(msg, 99)
     }
 
     if (multiplayerReady() && frame % 1 == 0) {

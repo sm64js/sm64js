@@ -1133,6 +1133,14 @@ export class n64GfxProcessor {
         this.run_dl(commands)
         this.flush()
 
+        if (window.latency) {
+            context2d.globalAlpha = 0.8
+            context2d.font = "bold 14px verdana, sans-serif"
+            context2d.textAlign = "center"
+            context2d.fillStyle = "#9400D3"
+            context2d.fillText(`Ping: ${window.latency}ms`, 580, 20)
+        }
+
     }
 }
 

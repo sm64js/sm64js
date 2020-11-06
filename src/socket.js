@@ -51,7 +51,9 @@ const recvChat = (chatmsg) => {
         networkData.remotePlayers[chatmsg.channel_id] == undefined) return
 
     const chatlog = document.getElementById("chatlog")
-    chatlog.innerHTML += '<strong>' + sanitizeChat(chatmsg.sender, false) + '</strong>: ' + sanitizeChat(chatmsg.msg, true) + '<br/>'
+    const node = document.createElement("LI")                 // Create a <li> node
+    node.innerHTML = '<strong>' + sanitizeChat(chatmsg.sender, false) + '</strong>: ' + sanitizeChat(chatmsg.msg, true) + '<br/>'        // Create a text node
+    chatlog.appendChild(node)
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 
     let someobject

@@ -84,14 +84,14 @@ import {
     bob_seg7_texture_07001800,
     bob_seg7_texture_07002000
 } from "./levels/bob/textures.inc"
-import {
+/*import {
     wf_seg7_texture_07000000,
     wf_seg7_texture_07000800,
     wf_seg7_texture_07001000,
     wf_seg7_texture_07001800,
     wf_seg7_texture_07002000,
     wf_seg7_texture_07002800
-} from "./levels/wf/textures.inc"
+} from "./levels/wf/textures.inc"*/
 import {
     mountain_09000000,
     mountain_09000800,
@@ -135,6 +135,7 @@ import {
     snow_09009000,
     snow_09009800
 } from "./textures/snow"
+/*
 import {
     grass_09000000,
     grass_09000800,
@@ -159,7 +160,7 @@ import {
     grass_0900B000,
     grass_0900B800
 } from "./textures/grass"
-
+*/
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
@@ -265,13 +266,13 @@ const loadDataIntoGame = (data) => {
     bob_seg7_texture_07001800.push(...data["levels/bob/3.rgba16.png"].data)
     bob_seg7_texture_07002000.push(...data["levels/bob/4.rgba16.png"].data)
 
-    wf_seg7_texture_07000000.push(...data["levels/wf/0.rgba16.png"].data)
+/*    wf_seg7_texture_07000000.push(...data["levels/wf/0.rgba16.png"].data)
     wf_seg7_texture_07000800.push(...data["levels/wf/1.rgba16.png"].data)
     wf_seg7_texture_07001000.push(...data["levels/wf/2.rgba16.png"].data)
     wf_seg7_texture_07001800.push(...data["levels/wf/3.rgba16.png"].data)
     wf_seg7_texture_07002000.push(...data["levels/wf/4.rgba16.png"].data)
     // wf_seg7_texture_07002800.push(...data["levels/wf/5.rgba16.png"].data)
-
+*/
     snow_09000000.push(...data["textures/snow/ccm_textures.00000.rgba16.png"].data)
     snow_09000800.push(...data["textures/snow/ccm_textures.00800.rgba16.png"].data)
     snow_09001000.push(...data["textures/snow/ccm_textures.01000.rgba16.png"].data)

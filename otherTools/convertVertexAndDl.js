@@ -1,13 +1,11 @@
 const fs = require('fs')
-let num = "7"
-const input = require('os').homedir() + '/sm64ex/levels/pss/areas/1/' + num + '/model.inc.c'
-let inputStr = fs.readFileSync(input, 'utf8')
-inputStr = inputStr.replace(/\r/g, "")
 
-let lines = inputStr.split("\n")
-lines = lines.filter(line => (line.length != 0) && (line[0] != '/'))
+// Configure these variables to get it to work
+var level = "pss" // level name in sm64ex directory
+var num = 7 // number of model.inc.js files there are
+var snum = 1 // used as a counter variable
 
-let outputStr = ""
+
 
 const skipCommands = [
     'gsDPPipeSync',
@@ -21,6 +19,16 @@ const skipCommands = [
     'gDPSetAlpha',
     "gSPPerspNormalize",
 ]
+
+
+while (snum <= num) {
+
+var input = require('os').homedir() + '/sm64ex/levels/' + level + '/areas/1/' + snum + '/model.inc.c' // directory of each model file
+var inputStr = fs.readFileSync(input, 'utf8')
+var inputStr = inputStr.replace(/\r/g, "")
+var lines = inputStr.split("\n")
+var lines = lines.filter(line => (line.length != 0) && (line[0] != '/'))
+var outputStr = ""
 
 while (lines.length > 0) {
 
@@ -74,4 +82,9 @@ outputStr = outputStr.replace(/ G_/g, " Gbi.G_")
 outputStr = outputStr.replace(/\(G_/g, "(Gbi.G_")
 outputStr = outputStr.replace(/\.l/g, ".l[0]")
 
-fs.writeFileSync(__dirname + "/" + num + "model.inc.js", outputStr)
+outputStr = 'import * as Gbi from "../../../../../include/gbi"\n' + outputStr
+
+fs.writeFileSync(__dirname + "/" + snum + "model.inc.js", outputStr)
+
+snum = snum + 1
+}

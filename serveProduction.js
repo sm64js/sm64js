@@ -132,6 +132,7 @@ const sanitizeChat = (string) => {
 const processChat = async (channel_id, msg) => {
 
     if (allChannels[channel_id].chatCooldown > 0) return
+    allChannels[channel_id].chatCooldown = 3 // seconds
     if (msg.length == 0) return
 
     const decodedMario = Object.values(allChannels).find(data => data.channel.my_id == channel_id).decodedMario
@@ -157,8 +158,6 @@ const processChat = async (channel_id, msg) => {
             msg: filteredMessage,
             sender: decodedMario.getPlayername()
         }
-
-        allChannels[channel_id].chatCooldown = 3 // seconds
 
         geckos.emit('chat', chatmsg)
 

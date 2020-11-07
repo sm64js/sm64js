@@ -40,7 +40,7 @@ window.parseColorCode = (colorcode) => {
         let offset = (parseInt(gamesharkLines[i * 2], 16) & 0x00FFFFFF) - 0x7EC20;
         let value = gamesharkLines[(i * 2)+1].match(/.{1,2}/g).map(x => { return parseInt(x, 16) });
         // SPARK color code support removed for now; model is not suitable
-        if (offset > 0 && offset < 0x88){
+        if (offset >= 0 && offset < 0x88){
             buffer.set(value, offset);
         }
     }

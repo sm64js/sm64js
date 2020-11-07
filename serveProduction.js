@@ -1,6 +1,7 @@
 const { MarioMsg, MarioListMsg, ControllerMsg, ValidPlayersMsg } = require("./proto/mario_pb")
 const fs = require('fs')
 const http = require('http')
+const got = require('got')
 const util = require('util')
 const zlib = require('zlib')
 const deflate = util.promisify(zlib.deflate)
@@ -128,7 +129,7 @@ const sanitizeChat = (string) => {
     return string
 }
 
-const processChat = (channel_id, msg) => {
+const processChat = async (channel_id, msg) => {
 
     if (allChannels[channel_id].chatCooldown > 0) return
     if (msg.length == 0) return
@@ -140,41 +141,30 @@ const processChat = (channel_id, msg) => {
     const sanitizedChat = sanitizeChat(msg)
 
     const request = "http://www.purgomalum.com/service/json?text=" + sanitizedChat
+    const playerNameRequest = "http://www.purgomalum.com/service/json?text=" + decodedMario.getPlayername()
 
-    http.get(request, res => {
-        const { statusCode } = res
+    try {
+        const filteredMessage = JSON.parse((await got(request)).body).result
+        const filteredPlayerName = JSON.parse((await got(playerNameRequest)).body).result
 
-        if (statusCode != 200) {
-            console.error(`Profanity API did not return successful status code`)
+        if (decodedMario.getPlayername() != filteredPlayerName) {
+            allChannels[channel_id].channel.close()
             return
         }
 
-        res.setEncoding('utf8')
-        let rawData = ''
-        res.on('data', (chunk) => { rawData += chunk })
-        res.on('end', () => {
-            try {
-                const parsedMessage = JSON.parse(rawData).result
+        const chatmsg = {
+            channel_id,
+            msg: filteredMessage,
+            sender: decodedMario.getPlayername()
+        }
 
-                if (parsedMessage == undefined || parsedMessage.length == 0) return
+        allChannels[channel_id].chatCooldown = 3 // seconds
 
-                const chatmsg = {
-                    channel_id,
-                    msg: parsedMessage,
-                    sender: decodedMario.getPlayername()
-                }
+        geckos.emit('chat', chatmsg)
 
-                allChannels[channel_id].chatCooldown = 3 // seconds
-
-                geckos.emit('chat', chatmsg)
-            } catch (e) {
-                console.error(`Got error with profanity api: ${e.message}`)
-            }
-        })
-    }).on('error', (e) => {
-        console.error(`Got error with profanity api: ${e.message}`)
-    })
-
+    } catch (e) {
+        console.log(`Got error with profanity api: ${e}`)
+    }
 
 }
 

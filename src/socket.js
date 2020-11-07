@@ -29,7 +29,8 @@ export const networkData = {
     playerInteractions: true,
     remotePlayers: {},
     myChannelID: -1,
-    lastSentSkinData: {}
+    lastSentSkinData: {},
+    pingMessageCount: 0
 }
 
 export const gameData = {}
@@ -43,7 +44,9 @@ const sendDataWithOpcode = (bytes, opcode) => {
 }
 
 const measureAndPrintLatency = (msgBytes) => {
-    const startTime = JSON.parse(new TextDecoder("utf-8").decode(msgBytes)).time
+    const msg = JSON.parse(new TextDecoder("utf-8").decode(msgBytes))
+    if (networkData.pingMessageCount != msg.count) return
+    const startTime = msg.time
     const endTime = performance.now()
     window.latency = parseInt(endTime - startTime)
 }
@@ -137,7 +140,8 @@ export const post_main_loop_one_iteration = (frame) => {
         }
 
         /// ping to measure latency
-        const msg = new TextEncoder("utf-8").encode(JSON.stringify({ time: performance.now() }))
+        networkData.pingMessageCount++
+        const msg = new TextEncoder("utf-8").encode(JSON.stringify({ time: performance.now(), count: networkData.pingMessageCount }))
         sendDataWithOpcode(msg, 99)
     }
 

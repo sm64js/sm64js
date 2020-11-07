@@ -457,6 +457,8 @@ export const gSPFogPosition = (displaylist, min, max) => {
     })
 }
 
+
+
 export const gDPSetFogColor = (displaylist, r, g, b, a) => {
     displaylist.push({
         words: {
@@ -547,7 +549,6 @@ export const gDPSetRenderMode = (displaylist, mode) => {
         }
     })
 }
-
 export const gDPSetTextureFilter = (displaylist, newmode) => {
     displaylist.push({
         words: {

@@ -1,8 +1,8 @@
 const fs = require('fs')
 
 // Configure these variables to get it to work
-var level = "pss" // level name in sm64ex directory
-var num = 7 // number of model.inc.js files there are
+var level = "castle_inside" // level name in sm64ex directory
+var num = 26 // number of model.inc.js files there are
 var snum = 1 // used as a counter variable
 
 

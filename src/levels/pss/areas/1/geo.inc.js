@@ -17,7 +17,7 @@ export const pss_geo_000100 = [
         args: [10, canvas.width / 2, canvas.height / 2, canvas.width / 2, canvas.height / 2]
     },
     { command: GeoLayout.open_node },
-        { command: GeoLayout.node_master_list, args: [0] },
+        { command: GeoLayout.node_master_list, args: [1] },
         { command: GeoLayout.open_node },
             { command: GeoLayout.node_perspective, args: [45, 100, 20000, Camera.geo_camera_fov] },
             { command: GeoLayout.open_node },

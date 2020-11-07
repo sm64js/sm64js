@@ -12,7 +12,7 @@ const getSelectedLevel = () => {
         case "Castle Grounds": return LEVEL_CASTLE_GROUNDS
         case "Bob-omb Battlefield": return LEVEL_BOB
         case "Cool, Cool Mountain": return LEVEL_CCM
-        case "Whomp's Fortress": console.info("lolmao"); return LEVEL_CASTLE_GROUNDS
+        // case "Whomp's Fortress": console.info("lolmao"); return LEVEL_CASTLE_GROUNDS
         case "Princess's Secret Slide": return LEVEL_PSS
     }
 

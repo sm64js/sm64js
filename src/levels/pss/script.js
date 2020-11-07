@@ -3,7 +3,6 @@ import { bhvMario } from "../../game/BehaviorData"
 import { LevelUpdateInstance as LevelUpdate } from "../../game/LevelUpdate"
 import { pss_geo_000100 } from "./areas/1/geo.inc"
 import { pss_seg7_collision } from "./areas/1/collision.inc"
-import { bubbly_tree_geo } from "../../actors/tree/geo.inc"
 
 export const level_pss_entry = [
     { command: LevelCommands.init_level },

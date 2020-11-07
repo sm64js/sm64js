@@ -50,6 +50,8 @@ const recvChat = (chatmsg) => {
     if (chatmsg.channel_id != networkData.myChannelID &&
         networkData.remotePlayers[chatmsg.channel_id] == undefined) return
 
+    if (window.banPlayerList.includes(chatmsg.sender)) return
+
     const chatlog = document.getElementById("chatlog")
     const node = document.createElement("LI")                 // Create a <li> node
     node.innerHTML = '<strong>' + sanitizeChat(chatmsg.sender, false) + '</strong>: ' + sanitizeChat(chatmsg.msg, true) + '<br/>'        // Create a text node

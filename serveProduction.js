@@ -14,8 +14,6 @@ const geckos = require('@geckos.io/server').default({
     iceServers
 })
 
-const badwords = fs.readFileSync('otherTools/profanity_filter.txt').toString().split('\n')
-
 const allChannels = {}
 const stats = {}
 
@@ -158,7 +156,7 @@ const processChat = (channel_id, msg) => {
             try {
                 const parsedMessage = JSON.parse(rawData).result
 
-                if (parsedMessage.length == 0) return
+                if (parsedMessage == undefined || parsedMessage.length == 0) return
 
                 const chatmsg = {
                     channel_id,

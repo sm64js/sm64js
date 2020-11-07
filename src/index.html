@@ -160,10 +160,11 @@
             <h6 hidden id="connectedMsg" style="color:red">Not connected to server - Refresh the page</h6>
 
             <div class="row" style="justify-content:center">
-                <ul id="chatlog"></ul>
+                <ul style="margin-bottom: 5px !important" id="chatlog"></ul>
             </div>
             <div class="row" style="justify-content:center;">
-                <input id="chatbox" type="text" autocomplete="off" maxlength="100" class="form-control" placeholder="Chat box">
+                <input id="chatbox" class="chatbox form-control" style="margin-top: 0px !important" type="text" autocomplete="off" maxlength="100" placeholder="Chat box">
+                <input id="banbox" class="chatbox form-control" type="text" autocomplete="off" maxlength="100" placeholder="Block Player Chats - type their player name in here and hit enter">
             </div>
 
             <br />

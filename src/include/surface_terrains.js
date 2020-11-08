@@ -77,6 +77,7 @@ export const TERRAIN_MASK = 0x0007
 
 export const special_bubble_tree = 121
 export const special_level_geo_03 = 101
+export const special_snow_tree = 123
 
 export const COL_INIT = () => { return [TERRAIN_LOAD_VERTICES] }
 export const COL_END = () => { return [TERRAIN_LOAD_END] }

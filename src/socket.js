@@ -132,17 +132,21 @@ export const post_main_loop_one_iteration = (frame) => {
     if (frame % 30 == 0) updateConnectedMsg()
 
     if (frame % 150 == 0) { //every 5 seconds
-        if (multiplayerReady() && Cosmetics.validSkins()) {
-            if (JSON.stringify(window.myMario.skinData) != networkData.lastSentSkinData) {
-                networkData.lastSentSkinData = JSON.stringify(window.myMario.skinData)
-                channel.emit('skin', window.myMario.skinData)
+
+        if (multiplayerReady()) {
+            /// ping to measure latency
+            networkData.pingMessageCount++
+            const msg = new TextEncoder("utf-8").encode(JSON.stringify({ time: performance.now(), count: networkData.pingMessageCount }))
+            sendDataWithOpcode(msg, 99)
+
+            if (Cosmetics.validSkins()) {
+                if (JSON.stringify(window.myMario.skinData) != networkData.lastSentSkinData) {
+                    networkData.lastSentSkinData = JSON.stringify(window.myMario.skinData)
+                    channel.emit('skin', window.myMario.skinData)
+                }
             }
         }
 
-        /// ping to measure latency
-        networkData.pingMessageCount++
-        const msg = new TextEncoder("utf-8").encode(JSON.stringify({ time: performance.now(), count: networkData.pingMessageCount }))
-        sendDataWithOpcode(msg, 99)
     }
 
     if (multiplayerReady() && frame % 1 == 0) {

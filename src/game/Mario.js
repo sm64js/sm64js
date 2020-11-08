@@ -589,7 +589,7 @@ export const set_jump_from_landing = (m) => {
                     if (m.forwardVel > 20.0) set_mario_action(m, ACT_TRIPLE_JUMP, 0)
                     else set_mario_action(m, ACT_JUMP, 0)
                     break
-                default: set_mario_action(m, ACT_JUMP, 0)
+                default: set_mario_action(m, ACT_JUMP, 0) // throw err "no floor"
             }
         }
 
@@ -925,7 +925,7 @@ const update_mario_geometry_inputs = (m) => {
         }
 
     } else {
-        throw "no floor"
+        m.input |= INPUT_OFF_FLOOR;
     }
 }
 

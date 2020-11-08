@@ -8,6 +8,7 @@ import {
     COL_END,
     COL_SPECIAL_INIT,
     SPECIAL_OBJECT,
+    SPECIAL_OBJECT_WITH_YAW,
 
     COL_WATER_BOX_INIT,
     COL_WATER_BOX,
@@ -23,6 +24,13 @@ import {
     SURFACE_VERTICAL_WIND,
     SURFACE_NOISE_VERY_SLIPPERY,
     SURFACE_NO_CAM_COLLISION,
+
+    special_level_geo_03,
+    special_level_geo_04,
+    special_level_geo_05,
+    special_level_geo_06,
+    special_level_geo_07,
+
 
     special_snow_tree
 
@@ -1775,14 +1783,14 @@ export const ccm_seg7_area_1_collision = [
     ...COL_TRI(333, 610, 335),
     ...COL_TRI(336, 609, 616),
     ...COL_TRI_STOP(),
-    ...COL_SPECIAL_INIT(13),
+    ...COL_SPECIAL_INIT(19),
     //SPECIAL_OBJECT_WITH_YAW(preset special_null_start,       pos -1512, 2560, -2305, yaw 100), // unused, probably an early way to set intial position
-    //SPECIAL_OBJECT_WITH_YAW(preset special_level_geo_03,     pos  -409, 2765, -1637, yaw   0),
-    //SPECIAL_OBJECT_WITH_YAW(preset special_level_geo_04,     pos  2355, -4095, 4096, yaw   0),
-    //SPECIAL_OBJECT_WITH_YAW(preset special_level_geo_05,     pos -4210, -1446, 1874, yaw   0),
-    //SPECIAL_OBJECT_WITH_YAW(preset special_level_geo_05,     pos  2560, 2560, -1023, yaw   0),
-    //SPECIAL_OBJECT_WITH_YAW(preset special_level_geo_06,     pos  -818, 102, 2048, yaw   0),
-    //SPECIAL_OBJECT_WITH_YAW(preset special_level_geo_07,     pos  -511, -3071, -3583, yaw   0),
+    ...SPECIAL_OBJECT_WITH_YAW(special_level_geo_03,  -409, 2765, -1637, 0),
+    ...SPECIAL_OBJECT_WITH_YAW(special_level_geo_04,  2355, -4095, 4096, 0),
+    ...SPECIAL_OBJECT_WITH_YAW(special_level_geo_05, -4210, -1446, 1874, 0),
+    ...SPECIAL_OBJECT_WITH_YAW(special_level_geo_05,  2560, 2560, -1023, 0),
+    ...SPECIAL_OBJECT_WITH_YAW(special_level_geo_06,  -818, 102, 2048, 0),
+    ...SPECIAL_OBJECT_WITH_YAW(special_level_geo_07,  -511, -3071, -3583, 0),
     ...SPECIAL_OBJECT(special_snow_tree, -5201, -1740, 2994),
     ...SPECIAL_OBJECT(special_snow_tree,  1989, -4607, 4949),
     ...SPECIAL_OBJECT(special_snow_tree,  1248, -4607, 5474),

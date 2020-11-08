@@ -18,6 +18,7 @@ import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
 import { mario_execute_cutscene_action } from "./MarioActionsCutscene"
 import { gameData as socketGameData } from "../socket"
 import { int16, sins, coss } from "../utils"
+import { LEVEL_CCM } from "../levels/level_defines_constants"
 
 ////// Mario Constants
 export const ANIM_FLAG_NOLOOP = (1 << 0) // 0x01
@@ -903,6 +904,18 @@ const update_mario_joystick_inputs = (m) => {
     m.intendedYaw = m.intendedYaw < -32768 ? m.intendedYaw + 65536 : m.intendedYaw
 }
 
+const warp_death_plane = (m) => {
+    switch (Area.gCurrLevelNum) {
+        case (LEVEL_CCM): { // CCM
+            if (m.pos[1] <= -7166.0) m.pos = [-1512, 2560, -2305]
+            break
+        }
+        default: {
+            break
+        }
+    }
+}
+
 const update_mario_geometry_inputs = (m) => {
 
     m.old_floor = m.floor
@@ -951,6 +964,8 @@ const update_mario_geometry_inputs = (m) => {
     } else {
         m.input |= INPUT_OFF_FLOOR;
     }
+
+    warp_death_plane(m)
 }
 
 export const mario_floor_is_slippery = (m) => {

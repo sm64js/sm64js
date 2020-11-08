@@ -533,10 +533,6 @@ class Camera {
 
     update_camera(c) {
 
-        if(window.cheats.debug_camera_off == true) {
-            return
-        }
-
         this.gCamera = c
 
         this.sStatusFlags &= ~CAM_FLAG_FRAME_AFTER_CAM_INIT

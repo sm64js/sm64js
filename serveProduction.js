@@ -63,6 +63,9 @@ const processPlayerData = (channel_id, bytes) => {
 
     if (allChannels[channel_id] == undefined) return
 
+    /// server should always force the channel_id
+    decodedMario.setChannelid(channel_id)
+
     /// Data is Valid
     allChannels[channel_id].decodedMario = decodedMario
     allChannels[channel_id].valid = 30

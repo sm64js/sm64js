@@ -1,5 +1,4 @@
-import { MarioMsg, MarioListMsg, ControllerListMsg, ControllerMsg, ValidPlayersMsg } from "../../proto/mario_pb"
-import zlib from "zlib"
+import { Sm64JsMsg, MarioMsg, ControllerListMsg, ControllerMsg, ValidPlayersMsg } from "../../proto/mario_pb"
 import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "../socket"
 import { defaultSkinData } from "../cosmetics"
@@ -100,7 +99,10 @@ export const createMarioProtoMsg = () => {
     mariomsg.setChannelid(networkData.myChannelID)
     mariomsg.setPlayername(window.myMario.playerName)
 
-    return mariomsg.serializeBinary()
+    const sm64jsMsg = new Sm64JsMsg()
+    sm64jsMsg.setMarioMsg(mariomsg)
+
+    return sm64jsMsg.serializeBinary()
 }
 
 const initNewRemoteMarioState = (marioProto) => {
@@ -253,13 +255,14 @@ export const recvValidPlayers = (validplayerbytes) => {
 
 
 export const recvMarioData = (marioList) => {
+
     networkData.numOnline = marioList.length
     marioList.forEach(marioProto => {
         const id = marioProto.getChannelid()
         if (id == networkData.myChannelID) return
 
         if (networkData.remotePlayers[id] == undefined) {
-            networkData.remotePlayers[id] = {
+            networkData.remotePlayers[id] = { 
                 marioState: initNewRemoteMarioState(marioProto),
                 skinData: defaultSkinData(),
                 crashCount: 0,
@@ -269,6 +272,6 @@ export const recvMarioData = (marioList) => {
         } else {
             updateRemoteMarioState(id, marioProto)
         }
-    })
+    })    
 
 }

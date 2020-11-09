@@ -6,7 +6,13 @@ message Sm64JsMsg {
 	oneof message {
 		MarioListMsg list_msg = 1;
 		ConnectedMsg connected_msg = 2;
+		PingMsg ping_msg = 3;
+		MarioMsg mario_msg = 4;
 	}
+}
+
+message PingMsg {
+	float time = 1;
 }
 
 message ConnectedMsg {

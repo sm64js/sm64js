@@ -1,6 +1,6 @@
-import { Sm64JsMsg } from "../proto/mario_pb"
 import * as Multi from "./game/MultiMarioManager"
 import zlib from "zlib"
+import { Sm64JsMsg, PingMsg } from "../proto/mario_pb"
 
 const url = new URL(window.location.href)
 
@@ -25,33 +25,41 @@ socket.onopen = () => {
 
     socket.onmessage = async (message) => {
         const bytes = new Uint8Array(await message.data.arrayBuffer())
-        // zlib.inflate(bytes, (err, buffer) => {
-            // if (err) {
-            //     console.error(err)
-            //     return
-            // }
-            const sm64jsMsg = Sm64JsMsg.deserializeBinary(bytes)
+        zlib.inflate(bytes, (err, buffer) => {
+            if (err) {
+                console.error(`decompression fail ${err}`)
+                return
+            }
+            const sm64jsMsg = Sm64JsMsg.deserializeBinary(buffer)
             switch (sm64jsMsg.getMessageCase()) {
                 case Sm64JsMsg.MessageCase.LIST_MSG:            
                     if (!multiplayerReady()) return
                     const listMsg = sm64jsMsg.getListMsg()
                     const marioList = listMsg.getMarioList()
                     Multi.recvMarioData(marioList)
-                    break;
+                    break
                 case Sm64JsMsg.MessageCase.CONNECTED_MSG:
                     const connectedMsg = sm64jsMsg.getConnectedMsg()
                     const channelID = connectedMsg.getChannelid()
-                    console.log('CONNECTED_MSG', channelID)
                     networkData.myChannelID = channelID
-                    break;
+                    break
+                case Sm64JsMsg.MessageCase.PING_MSG:
+                    measureAndPrintLatency(sm64jsMsg.getPingMsg())
+                    break
                 case Sm64JsMsg.MessageCase.MESSAGE_NOT_SET:
                 default:
                     throw new Error(`unhandled case in switch expression: ${sm64jsMsg.getMessageCase()}`)
             }
-        // })
+        })
     }
 
-    socket.onclose = () => { }
+    socket.onclose = () => { window.latency = null }
+}
+
+const measureAndPrintLatency = (ping_proto) => {
+    const startTime = ping_proto.getTime()
+    const endTime = performance.now()
+    window.latency = parseInt(endTime - startTime)
 }
 
 const multiplayerReady = () => {
@@ -73,6 +81,15 @@ const updateConnectedMsg = () => {
 export const post_main_loop_one_iteration = (frame) => {
 
     if (frame % 30 == 0) updateConnectedMsg()
+
+    if (frame % 150 == 0) { //every 5 seconds
+        /// ping to measure latency
+        const sm64jsMsg = new Sm64JsMsg()
+        const pingmsg = new PingMsg()
+        pingmsg.setTime(performance.now())
+        sm64jsMsg.setPingMsg(pingmsg)
+        sendData(sm64jsMsg.serializeBinary())
+    }
 
     if (multiplayerReady() && frame % 1 == 0) {
         sendData(Multi.createMarioProtoMsg())

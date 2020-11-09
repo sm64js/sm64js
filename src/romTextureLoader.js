@@ -100,7 +100,6 @@ import {
     bob_seg7_texture_07001800,
     bob_seg7_texture_07002000
 } from "./levels/bob/textures.inc"
-<<<<<<< HEAD
 import {
     ddd_seg7_texture_07000000,
     ddd_seg7_texture_07001000,
@@ -108,11 +107,6 @@ import {
     ddd_seg7_texture_07002000,
     ddd_seg7_texture_07003000
 } from "./levels/ddd/textures.inc"
-=======
-
-import { pss_seg7_texture_07000000, pss_seg7_texture_07000800, pss_seg7_texture_07001000 } from "./levels/pss/textures.inc"
-
->>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 /*import {
     wf_seg7_texture_07000000,
     wf_seg7_texture_07000800,
@@ -121,10 +115,6 @@ import { pss_seg7_texture_07000000, pss_seg7_texture_07000800, pss_seg7_texture_
     wf_seg7_texture_07002000,
     wf_seg7_texture_07002800
 } from "./levels/wf/textures.inc"*/
-<<<<<<< HEAD
-=======
-
->>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 import {
     mountain_09000000,
     mountain_09000800,
@@ -148,10 +138,6 @@ import {
     mountain_0900B800,
     mountain_0900C000,
 } from "./textures/mountain.js"
-<<<<<<< HEAD
-=======
-
->>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 import {
     snow_09000000,
     snow_09000800,
@@ -172,11 +158,8 @@ import {
     snow_09009000,
     snow_09009800
 } from "./textures/snow"
-<<<<<<< HEAD
-=======
 
 
->>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 /*
 import {
     grass_09000000,
@@ -206,11 +189,7 @@ import {
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-<<<<<<< HEAD
-const textureVersion = 10
-=======
 const textureVersion = 11
->>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 
 const loadDataIntoGame = (data) => {
 
@@ -268,7 +247,6 @@ const loadDataIntoGame = (data) => {
     mountain_0900B800.push(...data['textures/mountain/ttm_textures.0B800.rgba16.png'].data)
     mountain_0900C000.push(...data['textures/mountain/ttm_textures.0C000.rgba16.png'].data)
 
-<<<<<<< HEAD
     water_09000000.push(...data['textures/water/jrb_textures.00000.rgba16.png'].data)
     water_09000800.push(...data['textures/water/jrb_textures.00800.rgba16.png'].data)
     water_09001800.push(...data['textures/water/jrb_textures.01800.rgba16.png'].data)
@@ -285,8 +263,6 @@ const loadDataIntoGame = (data) => {
     water_0900A800.push(...data['textures/water/jrb_textures.0A800.rgba16.png'].data)
     water_0900B800.push(...data['textures/water/jrb_textures.0B800.rgba16.png'].data)
 
-=======
->>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
     title_texture_0A0001C0.push(...data['textures/title_screen_bg/title_screen_bg.001C0.rgba16.png'].data)
     title_texture_0A000E40.push(...data['textures/title_screen_bg/title_screen_bg.00E40.rgba16.png'].data)
     title_texture_0A001AC0.push(...data['textures/title_screen_bg/title_screen_bg.01AC0.rgba16.png'].data)
@@ -331,17 +307,11 @@ const loadDataIntoGame = (data) => {
     bob_seg7_texture_07001800.push(...data["levels/bob/3.rgba16.png"].data)
     bob_seg7_texture_07002000.push(...data["levels/bob/4.rgba16.png"].data)
 
-<<<<<<< HEAD
     ddd_seg7_texture_07000000.push(...data["levels/ddd/0.rgba16.png"].data)
     ddd_seg7_texture_07001000.push(...data["levels/ddd/1.rgba16.png"].data)
     ddd_seg7_texture_07001800.push(...data["levels/ddd/2.rgba16.png"].data)
     ddd_seg7_texture_07002000.push(...data["levels/ddd/3.rgba16.png"].data)
     ddd_seg7_texture_07003000.push(...data["levels/ddd/4.rgba16.png"].data)
-=======
-    pss_seg7_texture_07000000.push(...data["levels/pss/0.rgba16.png"].data)
-    pss_seg7_texture_07000800.push(...data["levels/pss/1.ia16.png"].data)
-    pss_seg7_texture_07001000.push(...data["levels/pss/2.rgba16.png"].data)
->>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 
 /*    wf_seg7_texture_07000000.push(...data["levels/wf/0.rgba16.png"].data)
     wf_seg7_texture_07000800.push(...data["levels/wf/1.rgba16.png"].data)

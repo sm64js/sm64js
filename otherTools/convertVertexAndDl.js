@@ -1,10 +1,10 @@
 const fs = require('fs')
 
 // Configure these variables to get it to work
-var level = "ttm" // level name in sm64ex directory
+var level = "ccm" // level name in sm64ex directory
 var snum = 1 // used as a counter variable
-var num = 32 // number of model.inc.js files there are
-var areaNum = 1 // target area number
+var num = 7 // number of model.inc.js files there are
+var areaNum = 2 // target area number
 var vOutputStr1 = level // folder to put in 'converted'
 var mainDir = __dirname + '/converted/' + vOutputStr1 + '/areas/' + areaNum + '/' // directory to put models in
 

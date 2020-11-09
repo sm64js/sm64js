@@ -5,6 +5,8 @@ import { ccm_seg7_area_1_collision } from "./areas/1/collision.inc"
 import { ccm_geo_00051C } from "./areas/1/geo.inc"
 import { ccm_geo_00042C } from "./areas/1/6/geo.inc"
 import { snow_tree_geo } from "../../actors/tree/geo.inc"
+import { ccm_geo_0005E8 } from "./areas/2/geo.inc"
+import { ccm_seg7_area_2_collision } from "./areas/2/collision.inc"
 
 import {
     MODEL_CCM_SNOW_TREE,
@@ -26,6 +28,9 @@ export const level_ccm_entry = [
     { command: LevelCommands.load_model_from_geo, args: [MODEL_CCM_SNOW_TREE, snow_tree_geo] },
     { command: LevelCommands.begin_area, args: [1, ccm_geo_00051C] },
     { command: LevelCommands.terrain, args: [ccm_seg7_area_1_collision] },
+    { command: LevelCommands.end_area },
+    { command: LevelCommands.begin_area, args: [1, ccm_geo_0005E8] },
+    { command: LevelCommands.terrain, args: [ccm_seg7_area_2_collision] },
     { command: LevelCommands.end_area },
     { command: LevelCommands.set_mario_pos, args: [1, 140, -1512, 2560, -2305] },
     { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_or_update, LevelUpdate] },

@@ -4,10 +4,11 @@ const fs = require('fs')
 //You no longer need to touch snum or num, it checks if the files exist.
 
 // Configure these variables to get it to work
-var level = "ttm" // level name in sm64ex directory
+var level = "ccm" // level name in sm64ex directory
+var baseGeo = true // whether you're converting the base geo.inc or one within a model directory
 var snum = 1 // used as a counter variable (Keep 1!)
 var num = 32 // number of model.inc.js files there are
-var areaNum = 1 // target area number
+var areaNum = 2 // target area number
 var mainDir = __dirname + '/converted/' + level + '/areas/' + areaNum + '/' // directory to put models in
 
 //Not sure whether we need to skip commands.
@@ -78,9 +79,8 @@ function SearchAndApplyDLs(directory,reference,areaN) {
 MakeDirectory(mainDir);
 
 while (snum <= num) {
-
-var input = require('os').homedir() + '/sm64ex/levels/' + level + '/areas/' +areaNum+ '/' + snum + '/geo.inc.c' // directory of each model file
-var AreaDir = require('os').homedir() + '/sm64ex/levels/' + level + '/areas/' +areaNum+ '/' + snum + '/' // used for DL checks
+if (baseGeo == false) { var input = require('os').homedir() + '/sm64ex/levels/' + level + '/areas/' +areaNum+ '/' + snum + '/geo.inc.c' } else { var input = require('os').homedir() + '/sm64ex/levels/' + level + '/areas/' +areaNum+ '/geo.inc.c' }// directory of each model file
+if (baseGeo == false) { var AreaDir = require('os').homedir() + '/sm64ex/levels/' + level + '/areas/' +areaNum+ '/' + snum + '/' } else { var AreaDir = require('os').homedir() + '/sm64ex/levels/' + level + '/areas/' +areaNum + '/' } // used for DL checks
 var AdditionalFiles = ""
 if (fs.existsSync(input)) {
 var inputStr = fs.readFileSync(input, 'utf8')
@@ -145,7 +145,7 @@ lines.forEach(lineParse => {
 		} else if (lineParse.trim().slice(0, 28) == 'GEO_CAMERA_FRUSTUM_WITH_FUNC') { //dl
 			LoadCamera = true
 			const cFrFu = lineParse.trim().slice(29, lineParse.trim().indexOf('),'))
-			outputStr += `{ command: Geo.node_perspective, args: [${cFrFu}] }\n`
+			if(baseGeo == false) { outputStr += `{ command: Geo.node_perspective, args: [${cFrFu}] }\n` } else { outputStr += `{ command: Geo.node_perspective, args: [${cFrFu}] },\n` }
 		} else if (lineParse.trim().slice(0, 14) == 'GEO_BACKGROUND') { //dl
 			LoadSkybox = true
 			const background = lineParse.trim().slice(15, lineParse.trim().indexOf('),'))
@@ -174,10 +174,11 @@ if (LoadCamera) {outputStr = 'import { CameraInstance as Camera } from "../../..
 outputStr = 'import { GeoLayoutInstance as Geo } from "../../../../../engine/GeoLayout"\n' + outputStr
 //outputStr = 'import * as Gbi from "../../../../../include/gbi"\n' + outputStr
 
-var dir = mainDir + snum;
+if (baseGeo == false) { var dir = mainDir + snum } else { var dir = mainDir }
 
 MakeDirectory(dir);
-fs.writeFileSync(__dirname + '/converted/' + level + '/areas/' + areaNum + '/' + snum + '/geo.inc.js', outputStr)
+if (baseGeo == true) {fs.writeFileSync(__dirname + '/converted/' + level + '/areas/' + areaNum + '/geo.inc.js', outputStr)} else {fs.writeFileSync(__dirname + '/converted/' + level + '/areas/' + areaNum + '/' + snum + '/geo.inc.js', outputStr)}
 }
+else { console.log("File path " + input + " does not exist!") }
 snum = snum + 1
 }

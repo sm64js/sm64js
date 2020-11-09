@@ -8,7 +8,25 @@
 ## What is this?
 This is an ongoing work-in-progress port of the decompilation of original Nintendo game, Super Mario 64, to native Javascript (no emulation or web assembly). The project involved creating a Javascript WebGL port of N64 Fast 3D Renderer, originally implemented with OpenGL in C.  This project also includes the development of online mass multiplayer versions of sm64js and other custom multiplayer game modes.
 
-## Build instructions - Windows, Mac, or Linux
+## Build instructions - Windows, Mac, or Linux 
+
+### Prerequirements
+* Node.js
+
+### Run these commands
+```bash
+# Clone the source code
+git clone https://github.com/sm64js/sm64js.git && cd sm64js
+# Install node packages
+npm install
+# Launch wepback dev server
+npm run start
+```
+
+You should now be able to access the website with the game from a web browser by typing "localhost" into the address bar.
+
+
+## Build instructions With Docker - Windows, Mac, or Linux
 
 ### First install Docker
 * Windows - [Install Instructions](https://docs.docker.com/docker-for-windows/install-windows-home/)
@@ -18,7 +36,7 @@ This is an ongoing work-in-progress port of the decompilation of original Ninten
 ### Run these commands
 ```bash
 # Create and start lightweight docker container with NodeJs
-docker run --name mySm64JsServer -dp 80:80 node:13-alpine tail -f /dev/null
+docker run --name mySm64JsServer -dp 80:80 node:13 tail -f /dev/null
 # Connect to the docker container's shell
 docker exec -it mySm64JsServer /bin/sh
 
@@ -29,6 +47,7 @@ git clone https://github.com/sm64js/sm64js.git && cd sm64js
 
 # Install node packages, build, and serve
 npm run quickstart
+
 ```
 You should now be able to access the website with the game from a web browser by typing "localhost" into the address bar.
 

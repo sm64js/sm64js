@@ -5,10 +5,16 @@ import {
 	snow_09006800,
 	snow_09007000
 } from "../../../../../textures/snow"
+<<<<<<< HEAD
 import {
 	ccm_seg7_texture_07000000,
 	ccm_seg7_texture_07000900,
 } from "../../../texture.inc"
+=======
+
+import { ccm_seg7_texture_07000000, ccm_seg7_texture_07000900 } from "../../../texture.inc"
+
+>>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 const ccm_seg7_vertex_0700C438 = [
 	{ pos: [ 2852, -1535, 2490 ], flag: 0, tc: [ 0, 990 ], color: [ 255, 255, 255, 255 ] },
 	{ pos: [ 2811, -1317, 2304 ], flag: 0, tc: [ 992, -34 ], color: [ 255, 255, 255, 255 ] },

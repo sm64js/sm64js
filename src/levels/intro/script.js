@@ -3,7 +3,11 @@ import { intro_geo_0002D0, intro_geo_00035C } from "./geo"
 import { WARP_TRANSITION_FADE_INTO_COLOR, WARP_TRANSITION_FADE_FROM_STAR } from "../../game/Area"
 import { level_main_scripts_entry } from "../scripts"
 import { lvl_intro_update } from "../../menu/level_select_menu"
+<<<<<<< HEAD
 import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS, LEVEL_DDD } from "../level_defines_constants"
+=======
+import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS } from "../level_defines_constants"
+>>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 
 const getSelectedLevel = () => {
     const mapSelect = document.getElementById("mapSelect").value
@@ -14,7 +18,10 @@ const getSelectedLevel = () => {
         case "Cool, Cool Mountain": return LEVEL_CCM
         // case "Whomp's Fortress": console.info("lolmao"); return LEVEL_CASTLE_GROUNDS
         case "Princess's Secret Slide": return LEVEL_PSS
+<<<<<<< HEAD
         case "Dire Dire Docks": return LEVEL_DDD
+=======
+>>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
     }
 
     return LEVEL_CASTLE_GROUNDS

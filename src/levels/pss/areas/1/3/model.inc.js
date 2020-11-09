@@ -1,4 +1,5 @@
 import * as Gbi from "../../../../../include/gbi"
+<<<<<<< HEAD
 import {
     mountain_09000000,
     mountain_09000800,
@@ -27,6 +28,10 @@ import {
     pss_seg7_texture_07000800,
     pss_seg7_texture_07001000
 } from "../../../textures.inc.js"
+=======
+import { mountain_09007800 } from "../../../../../textures/mountain.js"
+
+>>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 const pss_seg7_vertex_0700B070 = [
 	{ pos: [ -5906, -4217, 3701 ], flag: 0, tc: [ 0, 478 ], color: [ 255, 255, 255, 255 ] },
 	{ pos: [ -5845, -4217, 3701 ], flag: 0, tc: [ 478, 480 ], color: [ 255, 255, 255, 255 ] },

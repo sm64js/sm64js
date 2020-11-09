@@ -9,6 +9,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 
+<<<<<<< HEAD
+=======
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-178244102-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || []
+        function gtag() { dataLayer.push(arguments) }
+        gtag('js', new Date())
+
+        gtag('config', 'UA-178244102-1')
+    </script>
+
+>>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 </head>
 
 <body class="text-center">
@@ -27,11 +40,11 @@
             </div>
         </header>
 
-        <main role="main" class="inner cover">
+        <main role="main" class="inner cover" hidden id="mainContent">
             <h1 class="cover-heading rainbowText">Super Mario 64 - Javascript Port</h1>
-
-            <form id="romSelect" class="form-group" enctype="multipart/form-data" method="post">
-                <h4 style="color:#fa3e3e">Select US SM64 ROM File from your computer</h4>
+            <h6 style="color:red">This project is currently still being developed. This page may be live from time to time for testing, but there may be glitches and performance issues. The server will go down and restart at random times without warning. If you would like to help with the project or have feedback please contact me.</h6>
+            <form id="romSelect" class="form-group">
+                <h4 style="color:#fa3e3e">Select US sm64 (z64) ROM File from your computer</h4>
                 <input id="romFile" class="btn btn-secondary btn-sm" type="file">
                 <input class="btn btn-primary btn-sm" type="submit">
             </form>
@@ -40,9 +53,7 @@
                 <button id="startbutton" type="button" class="btn btn-success" disabled>Start Game</button>
                 <a href="https://github.com/sm64js/sm64js/issues" style="margin-left:30px" type="button" class="btn btn-warning">Submit Bug</a>
             </div>
-            <div class="row" style="justify-content:center;">
-                <h6> <b>Gamepad is supported and recommended!</b> </h6>
-            </div>
+            <br />
             <div class="row" style="justify-content:center">
                 <div class="col-3">
                     <button type="button"
@@ -78,6 +89,7 @@
                         Full Window Mode
                     </button>
                 </div>
+<<<<<<< HEAD
                 <div class="col-3">
                     <button type="button"
                             class="btn btn-sm btn-primary"
@@ -92,6 +104,8 @@
                         Toggle Camera Off
                     </button>
                 </div>
+=======
+>>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
             </div>
 
             <div class="row" style="justify-content:center; padding-top:5px">
@@ -104,7 +118,10 @@
                         <option>Bob-omb Battlefield</option>
                         <option>Cool, Cool Mountain</option>
                         <option>Princess's Secret Slide</option>
+<<<<<<< HEAD
                         <option>Dire Dire Docks</option>
+=======
+>>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
                     </select>
                 </div>
 
@@ -171,27 +188,99 @@
             <br />
 
             <a name="Credits"></a>
-            <h4>Credits:</h4>
-            <h6>Super Mario 64 Decomp - <a href="https://github.com/n64decomp/sm64">Github</a></h6>
-            <p>Team that decompiled the original Super Mario 64 ROMs into C source code</p>
-            <h6>Super Mario 64 PC Port - <a href="https://github.com/sm64-port/sm64-port">Github</a></h6>
-            <p>Team that ported the decompiled project to PC</p>
-            <h6>N64 Fast 3D Renderer - <a href="https://github.com/Emill/n64-fast3d-engine">Github</a></h6>
-            <p>
-                OpenGL Implementation of a 3D renderer for the Nintendo 64's graphics
-                <br />
-                (I had to reimplement this in Javascript and WebGL)
-            </p>
+            <h4>Credits</h4>
             <br />
+
+
+            <div class="row" style="justify-content:center;">
+                <h5>
+                    <a style="font-weight:bold !important;" href="https://github.com/sm64js/sm64js/graphs/contributors">Developers / Contributors</a>
+                </h5>
+
+            </div>
+            <div class="row" style="justify-content:center;">
+                <p>
+                    <a style="color:#fdffd4" href="https://sm64js.com">Snuffy</a>,
+                    <a style="color:#fdffd4" href="https://github.com/ScottDikowitz">ScottDikowitz</a>,
+                    <a style="color:#fdffd4" href="https://github.com/luphoria">luphoria</a>,
+                    <a style="color:#fdffd4" href="https://github.com/djoslin0">djoslin0</a>
+                </p>
+            </div>
+            <br />
+
+
+            <div class="row">
+                <div class="col-6">
+                    <h6><a style="font-weight:bold !important" href="https://github.com/n64decomp/sm64">Super Mario 64 Decomp</a></h6>
+                    <p>Team that decompiled the original Super Mario 64 ROMs into C source code</p>
+                </div>
+                <div class="col-6">
+                    <h6><a style="font-weight:bold !important" href="https://github.com/sm64-port/sm64-port">Super Mario 64 PC Port</a></h6>
+                    <p>Team that ported the decompiled project to PC</p>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <h6><a style="font-weight:bold !important" href="https://github.com/Emill/n64-fast3d-engine">N64 Fast 3D Renderer</a></h6>
+                    <p class="mb-0">
+                        OpenGL Implementation of a 3D renderer for the Nintendo 64's graphics
+                    </p>
+                    <small>   (I had to reimplement this in Javascript and WebGL)   </small>
+                </div>
+            </div>
+
+            <br />
+
+            <div class="row">
+
+                <div class="col">
+                    <h6><a style="font-weight:bold !important" href="https://github.com/djoslin0/sm64ex-coop">Super Mario 64 Coop</a></h6>
+                    <p class="mb-0">
+                        Online cooperative multiplayer mod for SM64, aiming to synchronize all entities and every level for two players.
+
+                    </p>
+                    <small>
+                        (Special thanks to <a href="https://github.com/djoslin0">djoslin0</a>, the developer of this project, for consultation and advice on the implementation of multiplayer for sm64js. I also ported some  code from this project directly)
+                    </small>
+                </div>
+            </div>
+
+
+
+            <br />
+            <div class="row" style="justify-content:center;">
+                <h6>Other Libraries</h6>
+            </div>
+            <div class="row" style="justify-content:center;">
+                <p>
+                    <a style="color:#fdffd4" href="https://github.com/geckosio/geckos.io">Geckos.io</a>,
+                    <a style="color:#fdffd4" href="https://jeremyckahn.github.io/keydrown/">Keydrown</a>,
+                </p>
+            </div>
+
+            <div class="row" style="justify-content:center;">
+                <h6>Special Thanks to</h6>
+            </div>
+            <div class="row" style="justify-content:center;">
+                <p>
+                    <a style="color:#fdffd4" href="https://github.com/Tarnadas">Tarnadas</a>,
+                    <a style="color:#fdffd4" href="https://github.com/yandeu">Yannick</a>,
+                    <a style="color:#fdffd4" href="https://github.com/josegonzalez">Jose Diaz-Gonzalez</a>,
+                    <a style="color:#fdffd4" href="https://github.com/Emill">Emill</a>,
+                </p>
+            </div>
+
 
             <a name="Contact"></a>
             <h4>Contact</h4>
             <p>
                 Questions? Suggestions? Want to help with this project? =)
                 <br />
-                Discord: snuffysasa#2779
+                I have a discord server dedicated to sm64js: <a href="https://discord.gg/7UaDnJt"> Join Here </a>
                 <br />
-                I have a discord server dedicated to sm64js: <a href="https://discord.gg/7UaDnJt"> https://discord.gg/7UaDnJt </a>
+                Discord: snuffysasa#2779
             </p>
             <br />
 

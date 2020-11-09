@@ -1,6 +1,6 @@
 FROM node:13-alpine
 
-RUN apk update && apk add gcc libc-dev python3 bash
+RUN apk update && apk add gcc libc-dev bash python3
 
 RUN mkdir -p /usr/src/app
 
@@ -16,5 +16,7 @@ RUN npm install
 COPY . ./
 
 RUN npm run build
+
+COPY src/favicon.ico ./dist/
 
 CMD ["npm", "run", "serve"]

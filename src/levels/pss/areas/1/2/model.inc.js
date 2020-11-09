@@ -1,6 +1,7 @@
 import * as Gbi from "../../../../../include/gbi"
 import {
     mountain_09000000,
+<<<<<<< HEAD
     mountain_09000800,
     mountain_09001800,
     mountain_09002800,
@@ -27,6 +28,12 @@ import {
     pss_seg7_texture_07000800,
     pss_seg7_texture_07001000
 } from "../../../textures.inc.js"
+=======
+    mountain_09007000,
+    mountain_0900C000,
+} from "../../../../../textures/mountain.js"
+
+>>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 const pss_seg7_vertex_0700A8B8 = [
 	{ pos: [ -5128, -2129, 4118 ], flag: 0, tc: [ -6282, -1012 ], color: [ 140, 140, 140, 255 ] },
 	{ pos: [ -7586, -2129, 6525 ], flag: 0, tc: [ -9432, -2376 ], color: [ 140, 140, 140, 255 ] },
@@ -174,7 +181,11 @@ export const pss_seg7_dl_0700AF60 = [
 
 export const pss_seg7_dl_0700AFA8 = [
 	Gbi.gsDPSetCycleType(Gbi.G_CYC_2CYCLE),
+<<<<<<< HEAD
 	Gbi.gsDPSetRenderMode(Gbi.G_RM_FOG_SHADE_A_AA_ZB_OPA_SURF2),//	Gbi.gsDPSetRenderMode(Gbi.G_RM_FOG_SHADE_A, Gbi.G_RM_AA_ZB_OPA_SURF2),
+=======
+	Gbi.gsDPSetRenderMode(Gbi.G_RM_FOG_SHADE_A_AA_ZB_OPA_SURF2),
+>>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 	Gbi.gsDPSetFogColor(0, 0, 0, 255),
 	Gbi.gsSPFogPosition(980, 1000),
 	Gbi.gsSPSetGeometryMode(Gbi.G_FOG),
@@ -189,7 +200,11 @@ export const pss_seg7_dl_0700AFA8 = [
 	Gbi.gsSPDisplayList(pss_seg7_dl_0700AF60),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
 	Gbi.gsDPSetCycleType(Gbi.G_CYC_1CYCLE),
+<<<<<<< HEAD
 	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF_SURF2),//	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF, Gbi.G_RM_NOOP2),
+=======
+	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF_SURF2),
+>>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 	Gbi.gsSPClearGeometryMode(Gbi.G_FOG),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
 	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING),

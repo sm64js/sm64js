@@ -63,6 +63,10 @@ class MarioMisc {
             }
         }
     }
+
+    geo_switch_mario_cap_on_off(callContext, switchCase) {
+        switchCase.selectedCase = 0 ///TODO
+    }
 }
 
 export const MarioMiscInstance = new MarioMisc()

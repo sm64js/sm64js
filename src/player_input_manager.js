@@ -1,5 +1,4 @@
 import * as Keydrown from "./keydrown.min.js"
-import Cookies from "js-cookie"
 
 /////// Keyboard / Gamepad Input ////////
 window.playerInput = {}
@@ -131,9 +130,9 @@ const defaultGamepadButtonMapping = { ...gamepadButtonMapping }
 
 let deadzone = 0.08
 
-if (Cookies.get('controls')) {
-    Object.assign(keyboardButtonMapping, JSON.parse(Cookies.get('controls')).keyboard)
-    Object.assign(gamepadButtonMapping, JSON.parse(Cookies.get('controls')).gamepad)
+if (localStorage['controls']) {
+    Object.assign(keyboardButtonMapping, JSON.parse(localStorage['controls']).keyboard)
+    Object.assign(gamepadButtonMapping, JSON.parse(localStorage['controls']).gamepad)
 }
 
 /// Fillout the select options - Keyboard only - gamepad does this on gamepad connect
@@ -221,10 +220,10 @@ window.updateGamepadMapping = (chosenKey, gameButton) => {
 }
 
 window.saveControls = () => {
-    Cookies.set('controls', JSON.stringify({
+    localStorage['controls'] = JSON.stringify({
         keyboard: keyboardButtonMapping,
         gamepad: gamepadButtonMapping
-    }))
+    })
 }
 
 window.loadDefaultControls = () => {

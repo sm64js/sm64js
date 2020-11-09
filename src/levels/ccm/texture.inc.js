@@ -20,6 +20,7 @@ export const ccm_seg7_texture_07003B00 = []
 
 export const ccm_seg7_texture_07004300 = []
 
+<<<<<<< HEAD
 export const ccm_seg7_texture_07004B00 = []
 
 /*
@@ -38,3 +39,6 @@ import {
 	ccm_seg7_texture_07004B00
 } from "../../../texture.inc"
 */
+=======
+export const ccm_seg7_texture_07004B00 = []
+>>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7

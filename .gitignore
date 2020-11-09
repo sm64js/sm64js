@@ -1,5 +1,6 @@
 dist
 *lock.json
+yarn.lock
 node_modules
 .vs*
 .DS_Store

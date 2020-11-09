@@ -23,7 +23,7 @@ window.addEventListener("keydown", (e) => {
 
     // space and arrow keys
     if (textboxfocus) return
-    if ([32, 37, 38, 39, 40].includes(e.keyCode) > -1) {
+    if ([32, 37, 38, 39, 40].includes(e.keyCode)) {
         e.preventDefault()
     }
 }, false)

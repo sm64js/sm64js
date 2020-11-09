@@ -888,6 +888,7 @@ class Camera {
         ]
 
         let marioFloorHeight = 125 + this.sMarioGeometry.currFloorHeight
+        console.log("DEBUG " + this.sMarioGeometry.currFloor)
         const marioFloor = this.sMarioGeometry.currFloor
 
         let camFloorHeight = SurfaceCollision.find_floor(cPos[0], cPos[1] + 50, cPos[2], {}) + 125

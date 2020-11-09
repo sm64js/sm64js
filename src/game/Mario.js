@@ -512,6 +512,22 @@ export const find_mario_anim_flags_and_translation = (obj, yaw, translation) => 
 
 }
 
+const warp_death_plane = (m) => {
+    switch (Area.gCurrLevelNum) {
+        case (5) : { // CCM
+            if (m.pos[1] <= -7166.0) m.pos = [-1512, 2560, -2305];
+            break;
+        }
+        case (27) : { // PSS
+            if (m.pos[1] <= -7166.0) m.pos = [5632, 6451, -5631];
+            break;
+        }
+        default : {
+            break;
+        }
+    }
+}
+
 export const return_mario_anim_y_translation = (m) => {
     const translation = new Array(3)
     find_mario_anim_flags_and_translation(m.marioObj, 0, translation)
@@ -1154,6 +1170,7 @@ const update_mario_inputs = (m) => {
     }
     else update_mario_joystick_inputs(m, window.playerInput2)
 
+    warp_death_plane(m)
     update_mario_geometry_inputs(m)
 
     if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) {

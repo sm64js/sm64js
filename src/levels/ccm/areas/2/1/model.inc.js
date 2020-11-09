@@ -6,7 +6,7 @@ import {
     snow_09001000,
     snow_09002800,
     snow_09005000
-} from "./textures/snow"
+} from "../../../../../textures/snow"
 const ccm_seg7_lights_07016718 = Gbi.gdSPDefLights1(
 	    0x3f, 0x3f, 0x3f,
 	    0xff, 0xff, 0xff, 0x28, 0x28, 0x28

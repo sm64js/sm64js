@@ -1,44 +1,13 @@
 import * as Gbi from "../../../../../include/gbi"
 import {
     mountain_09000000,
-<<<<<<< HEAD
-    mountain_09000800,
-    mountain_09001800,
-    mountain_09002800,
-    mountain_09003000,
-    mountain_09003800,
-    mountain_09004000,
-    mountain_09004800,
-    mountain_09005000,
-    mountain_09005800,
-    mountain_09006800,
-    mountain_09007000,
-    mountain_09007800,
-    mountain_09008000,
-    mountain_09008800,
-    mountain_09009800,
-    mountain_0900A000,
-    mountain_0900A800,
-    mountain_0900B000,
-    mountain_0900B800,
-    mountain_0900C000,
-} from "../../../../../textures/mountain.js"
-import {
-    pss_seg7_texture_07000000,
-    pss_seg7_texture_07000800,
-    pss_seg7_texture_07001000
-} from "../../../textures.inc.js"
-=======
     mountain_09001800,
     mountain_09005800,
     mountain_0900C000,
 } from "../../../../../textures/mountain.js"
-
 import {
     pss_seg7_texture_07000000,
 } from "../../../textures.inc.js"
-
->>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 const pss_seg7_lights_07001800 = Gbi.gdSPDefLights1(
 	    0x23, 0x23, 0x23,
 	    0x8c, 0x8c, 0x8c, 0x28, 0x28, 0x28
@@ -2819,11 +2788,7 @@ export const pss_seg7_dl_07009750 = [
 
 export const pss_seg7_dl_0700A7C0 = [
 	Gbi.gsDPSetCycleType(Gbi.G_CYC_2CYCLE),
-<<<<<<< HEAD
 	Gbi.gsDPSetRenderMode(Gbi.G_RM_FOG_SHADE_A_AA_ZB_OPA_SURF2),//	Gbi.gsDPSetRenderMode(Gbi.G_RM_FOG_SHADE_A, Gbi.G_RM_AA_ZB_OPA_SURF2),
-=======
-	Gbi.gsDPSetRenderMode(Gbi.G_RM_FOG_SHADE_A_AA_ZB_OPA_SURF2),
->>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 	Gbi.gsDPSetFogColor(0, 0, 0, 255),
 	Gbi.gsSPFogPosition(980, 1000),
 	Gbi.gsSPSetGeometryMode(Gbi.G_FOG),
@@ -2843,11 +2808,7 @@ export const pss_seg7_dl_0700A7C0 = [
 	Gbi.gsSPDisplayList(pss_seg7_dl_07009750),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
 	Gbi.gsDPSetCycleType(Gbi.G_CYC_1CYCLE),
-<<<<<<< HEAD
 	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF_SURF2),//	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF, Gbi.G_RM_NOOP2),
-=======
-	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF_SURF2),
->>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 	Gbi.gsSPClearGeometryMode(Gbi.G_FOG),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
 	Gbi.gsSPEndDisplayList(),

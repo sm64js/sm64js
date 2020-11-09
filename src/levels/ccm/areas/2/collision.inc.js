@@ -8,7 +8,8 @@ import {
     COL_END,
     SURFACE_DEFAULT,
     SURFACE_ICE,
-    SURFACE_DEATH_PLANE
+    SURFACE_DEATH_PLANE,
+    SURFACE_NO_CAM_COL_SLIPPERY
 } from "../../../../include/surface_terrains"
 
 export const ccm_seg7_area_2_collision = [

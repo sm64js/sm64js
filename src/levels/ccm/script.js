@@ -29,7 +29,7 @@ export const level_ccm_entry = [
     { command: LevelCommands.begin_area, args: [1, ccm_geo_00051C] },
     { command: LevelCommands.terrain, args: [ccm_seg7_area_1_collision] },
     { command: LevelCommands.end_area },
-    { command: LevelCommands.begin_area, args: [1, ccm_geo_0005E8] },
+    { command: LevelCommands.begin_area, args: [2, ccm_geo_0005E8] },
     { command: LevelCommands.terrain, args: [ccm_seg7_area_2_collision] },
     { command: LevelCommands.end_area },
     { command: LevelCommands.set_mario_pos, args: [1, 140, -1512, 2560, -2305] },

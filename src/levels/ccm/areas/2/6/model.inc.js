@@ -1,7 +1,7 @@
 import * as Gbi from "../../../../../include/gbi"
 import {
     snow_09000800
-} from "./textures/snow"
+} from "../../../../../textures/snow"
 const ccm_seg7_vertex_0701FDE8 = [
 	{ pos: [ -7592, -5703, -6819 ], flag: 0, tc: [ 990, 990 ], color: [ 255, 255, 255, 255 ] },
 	{ pos: [ -7592, -5600, -6716 ], flag: 0, tc: [ 0, 0 ], color: [ 255, 255, 255, 255 ] },

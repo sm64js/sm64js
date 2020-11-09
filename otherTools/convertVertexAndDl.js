@@ -1,19 +1,12 @@
 const fs = require('fs')
 
 // Configure these variables to get it to work
-<<<<<<< HEAD
-var level = "ddd" // level name in sm64ex directory
-var num = 4 // number of model.inc.js files there are
-var snum = 1 // used as a counter variable
-
-=======
 var level = "ttm" // level name in sm64ex directory
 var snum = 1 // used as a counter variable
 var num = 32 // number of model.inc.js files there are
 var areaNum = 1 // target area number
 var vOutputStr1 = level // folder to put in 'converted'
 var mainDir = __dirname + '/converted/' + vOutputStr1 + '/areas/' + areaNum + '/' // directory to put models in
->>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 
 
 const skipCommands = [
@@ -30,41 +23,6 @@ const skipCommands = [
     'gsDPSetDepthSource'
 ]
 
-<<<<<<< HEAD
-
-while (snum <= num) {
-
-var input = require('os').homedir() + '/sm64ex/levels/' + level + '/areas/1/' + snum + '/model.inc.c' // directory of each model file
-var inputStr = fs.readFileSync(input, 'utf8')
-var inputStr = inputStr.replace(/\r/g, "")
-var lines = inputStr.split("\n")
-var lines = lines.filter(line => (line.length != 0) && (line[0] != '/'))
-var outputStr = ""
-
-while (lines.length > 0) {
-
-    let endSection = lines.indexOf('};')
-    if (lines.indexOf(');') != -1 && lines.indexOf(');') < endSection) endSection = lines.indexOf(');')
-    let section
-    if (lines[1].indexOf('};') != -1) {
-        section = lines.splice(0, 2)
-    } else {
-        section = lines.splice(0, endSection + 1)
-    }
-    if (section[0].slice(0, 16) == 'static const Vtx') { //vertex
-        const vtxArrayName = section[0].slice(17, section[0].indexOf('['))
-        outputStr += `const ${vtxArrayName} = [\n`
-        section.slice(1, section.length - 1).forEach(line => {
-            const items = line.split(',').map(item => parseInt(item.replace(/[{}\s]/g, '')))
-            outputStr += `\t{ pos: [ ${items[0]}, ${items[1]}, ${items[2]} ], flag: ${items[3]}, tc: [ ${items[4]}, ${items[5]} ], color: [ ${items[6]}, ${items[7]}, ${items[8]}, ${items[9]} ] },\n`
-        })
-        outputStr += `]\n\n`
-    } else if (section[0].slice(0, 9) == 'const Gfx' || section[0].slice(0, 16) == 'static const Gfx') { //DL
-        const dlArrayName = section[0].slice(section[0].indexOf('Gfx') + 4, section[0].indexOf('['))
-        outputStr += `export const ${dlArrayName} = [\n`
-        section.slice(1, section.length - 1).forEach(line => {
-            line = `Gbi.${line.slice(4)}`
-=======
 // Required, not sure why it wouldn't accept the mkdir directly..
 function MakeDirectory(directory) {
 	if (!fs.existsSync(directory)) {
@@ -74,7 +32,6 @@ function MakeDirectory(directory) {
 		});
 	}
 }
->>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7
 
 // Preemptively make the main directory for output to avoid issues.
 MakeDirectory(mainDir);
@@ -153,15 +110,6 @@ function convert(MDTY) {
 
 	var dir = mainDir + snum;
 
-<<<<<<< HEAD
-outputStr = 'import * as Gbi from "../../../../../include/gbi"\n' + outputStr
-
-fs.writeFileSync(__dirname + "/" + snum + "model.inc.js", outputStr)
-
-snum = snum + 1
-}
-=======
 	MakeDirectory(dir);
 	fs.writeFileSync(__dirname + '/converted/' + vOutputStr1 + '/areas/' + areaNum + '/' + snum + '/' + MDTY + '.inc.js', outputStr)	
 }
->>>>>>> 37f0d32e1c4f86a80aa40cc040879fbfb98c82c7

@@ -171,7 +171,7 @@ outputStr = outputStr.replace(/\.l/g, ".l[0]")
 outputStr = AdditionalFiles + outputStr
 if (LoadSkybox) {outputStr = 'import { geo_skybox_main } from "../../../../game/LevelGeo"\n' + outputStr}
 if (LoadCamera) {outputStr = 'import { CameraInstance as Camera } from "../../../../game/Camera"\n' + outputStr}
-outputStr = 'import { GeoLayoutInstance as Geo } from "../../../../engine/GeoLayout"\n' + outputStr
+outputStr = 'import { GeoLayoutInstance as Geo } from "../../../../../engine/GeoLayout"\n' + outputStr
 //outputStr = 'import * as Gbi from "../../../../../include/gbi"\n' + outputStr
 
 var dir = mainDir + snum;

@@ -7,6 +7,7 @@ import * as Mario from "../game/Mario"
 import { create_shadow_below_xyz } from "../game/Shadow"
 import { networkData } from "../socket"
 import { MarioMiscInstance as MarioMisc } from "../game/MarioMisc"
+import { cos } from "mathjs"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -339,6 +340,11 @@ class GeoRenderer {
             cullingRadius = geo.wrapper.radius
         } else {
             cullingRadius = 300
+        }
+
+        ////Remote mario max draw distance
+        if (node.wrapperObjectNode.wrapperObject.remoteMario) {
+            if (matrix[3][2] < -10000) return false
         }
 
         // Don't render if the object is close to or behind the camera

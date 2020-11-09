@@ -4,18 +4,27 @@ import { gameData } from "./socket.js"
 
 /////// Keyboard / Gamepad Input ////////
 window.playerInput = {}
-
+window.banPlayerList = []
 let textboxfocus = false
 
 
 //// Prevent scrolling for arrow keys
 window.addEventListener("keydown", (e) => {
-    textboxfocus = $("#chatbox").is(':focus') || $("#playerNameInput").is(':focus') || $("#ccPasteArea").is(':focus');
+    textboxfocus = $("#chatbox").is(':focus') ||
+                    $("#playerNameInput").is(':focus') ||
+                    $("#ccPasteArea").is(':focus') ||
+                    $("#banbox").is(':focus')
 
     if ($("#chatbox").is(':focus') && e.keyCode == 13) {
         sendChat(document.getElementById('chatbox').value)
         document.getElementById('chatbox').value = ""
         document.getElementById('chatbox').blur()
+    }
+
+    if ($("#banbox").is(':focus') && e.keyCode == 13) {
+        window.banPlayerList.push(document.getElementById('banbox').value)
+        document.getElementById('banbox').value = ""
+        document.getElementById('banbox').blur()
     }
 
     if ($("#playerNameInput").is(':focus') && e.keyCode == 13) {

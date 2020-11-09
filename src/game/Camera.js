@@ -2,7 +2,7 @@ import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { GEO_CONTEXT_RENDER, GEO_CONTEXT_CREATE } from "../engine/graph_node"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { AreaInstance as Area } from "./Area"
-import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM } from "../levels/level_defines_constants"
+import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS } from "../levels/level_defines_constants"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { atan2s } from "../engine/math_util"
 import * as MathUtil from "../engine/math_util"
@@ -462,7 +462,9 @@ class Camera {
             case LEVEL_CCM:  /// TODO
                 this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
                 break
-            default: throw "unimplemented level in init camera"
+            case LEVEL_PSS:  /// TODO
+                this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
+            default: this.gLakituState.mode = CAMERA_MODE_FREE_ROAM // throw err 'camera not implemented'
         }
 
         if (c.mode == CAMERA_MODE_8_DIRECTIONS) {

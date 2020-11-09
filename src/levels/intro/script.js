@@ -3,7 +3,7 @@ import { intro_geo_0002D0, intro_geo_00035C } from "./geo"
 import { WARP_TRANSITION_FADE_INTO_COLOR, WARP_TRANSITION_FADE_FROM_STAR } from "../../game/Area"
 import { level_main_scripts_entry } from "../scripts"
 import { lvl_intro_update } from "../../menu/level_select_menu"
-import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM } from "../level_defines_constants"
+import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS } from "../level_defines_constants"
 
 const getSelectedLevel = () => {
     const mapSelect = document.getElementById("mapSelect").value
@@ -12,6 +12,8 @@ const getSelectedLevel = () => {
         case "Castle Grounds": return LEVEL_CASTLE_GROUNDS
         case "Bob-omb Battlefield": return LEVEL_BOB
         case "Cool, Cool Mountain": return LEVEL_CCM
+        // case "Whomp's Fortress": console.info("lolmao"); return LEVEL_CASTLE_GROUNDS
+        case "Princess's Secret Slide": return LEVEL_PSS
     }
 
     return LEVEL_CASTLE_GROUNDS
@@ -37,7 +39,7 @@ const level_intro_entry_2 = () => {
         { command: LevelCommands.sleep, args: [20] },
         { command: LevelCommands.call_loop, args: [1, lvl_intro_update, null] },
         { command: LevelCommands.unload_area, args: [1] },
-        { command: LevelCommands.set_register, args: [LEVEL_BOB] },
+        { command: LevelCommands.set_register, args: [LEVEL_CCM] },
         { command: LevelCommands.execute, args: [level_main_scripts_entry] }
         /// Jump If
         /// Jump IF

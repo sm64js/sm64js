@@ -17,6 +17,9 @@ const sanitizeChat = (string, isMessage) => {
         string = string.replace(/:mariostyle:/g, "<img height='20' width='20' src='emotes/mariostyle.gif' alt=':mariostyle:' />");
         string = string.replace(/:pogchamp:/g, "<img height='20' width='20' src='emotes/pogchamp.png' alt=':pogchamp:' />");
         string = string.replace(/:strange:/g, "<img height='20' width='20' src='emotes/strange.png' alt=':strange:' />");
+        string = string.replace(/:kick:/g, "<img height='20' width='20' src='emotes/kick.gif' alt=':kick:' />");
+        string = string.replace(/:shock:/g, "<img height='20' width='20' src='emotes/shock.gif' alt=':shock:' />");
+        string = string.replace(/:bup:/g, "<img height='20' width='20' src='emotes/bup.jpg' alt=':bup:' />");
         // string.replace any other emotes in this fashion.
     }
     return string;
@@ -26,7 +29,8 @@ export const networkData = {
     playerInteractions: true,
     remotePlayers: {},
     myChannelID: -1,
-    lastSentSkinData: {}
+    lastSentSkinData: {},
+    pingMessageCount: 0
 }
 
 export const gameData = {}
@@ -40,7 +44,9 @@ const sendDataWithOpcode = (bytes, opcode) => {
 }
 
 const measureAndPrintLatency = (msgBytes) => {
-    const startTime = JSON.parse(new TextDecoder("utf-8").decode(msgBytes)).time
+    const msg = JSON.parse(new TextDecoder("utf-8").decode(msgBytes))
+    if (networkData.pingMessageCount != msg.count) return
+    const startTime = msg.time
     const endTime = performance.now()
     window.latency = parseInt(endTime - startTime)
 }
@@ -50,8 +56,12 @@ const recvChat = (chatmsg) => {
     if (chatmsg.channel_id != networkData.myChannelID &&
         networkData.remotePlayers[chatmsg.channel_id] == undefined) return
 
+    if (window.banPlayerList.includes(chatmsg.sender)) return
+
     const chatlog = document.getElementById("chatlog")
-    chatlog.innerHTML += '<strong>' + sanitizeChat(chatmsg.sender, false) + '</strong>: ' + sanitizeChat(chatmsg.msg, true) + '<br/>'
+    const node = document.createElement("LI")                 // Create a <li> node
+    node.innerHTML = '<strong>' + sanitizeChat(chatmsg.sender, false) + '</strong>: ' + sanitizeChat(chatmsg.msg, true) + '<br/>'        // Create a text node
+    chatlog.appendChild(node)
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 
     let someobject
@@ -122,16 +132,21 @@ export const post_main_loop_one_iteration = (frame) => {
     if (frame % 30 == 0) updateConnectedMsg()
 
     if (frame % 150 == 0) { //every 5 seconds
-        if (multiplayerReady() && Cosmetics.validSkins()) {
-            if (JSON.stringify(window.myMario.skinData) != networkData.lastSentSkinData) {
-                networkData.lastSentSkinData = JSON.stringify(window.myMario.skinData)
-                channel.emit('skin', window.myMario.skinData)
+
+        if (multiplayerReady()) {
+            /// ping to measure latency
+            networkData.pingMessageCount++
+            const msg = new TextEncoder("utf-8").encode(JSON.stringify({ time: performance.now(), count: networkData.pingMessageCount }))
+            sendDataWithOpcode(msg, 99)
+
+            if (Cosmetics.validSkins()) {
+                if (JSON.stringify(window.myMario.skinData) != networkData.lastSentSkinData) {
+                    networkData.lastSentSkinData = JSON.stringify(window.myMario.skinData)
+                    channel.emit('skin', window.myMario.skinData)
+                }
             }
         }
 
-        /// ping to measure latency
-        const msg = new TextEncoder("utf-8").encode(JSON.stringify({ time: performance.now() }))
-        sendDataWithOpcode(msg, 99)
     }
 
     if (multiplayerReady() && frame % 1 == 0) {

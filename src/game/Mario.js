@@ -910,6 +910,10 @@ const warp_death_plane = (m) => {
             if (m.pos[1] <= -7166.0) m.pos = [-1512, 2560, -2305]
             break
         }
+        case (LEVEL_TTM): { // TTM
+            if (m.pos[1] <= -7230.0) m.pos = [102, -4332, 5734]
+            break
+        }
         default: {
             break
         }

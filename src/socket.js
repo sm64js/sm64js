@@ -82,7 +82,7 @@ export const post_main_loop_one_iteration = (frame) => {
 
     if (frame % 30 == 0) updateConnectedMsg()
 
-    if (frame % 150 == 0) { //every 5 seconds
+    if (multiplayerReady() && frame % 150 == 0) { //every 5 seconds
         /// ping to measure latency
         const sm64jsMsg = new Sm64JsMsg()
         const pingmsg = new PingMsg()

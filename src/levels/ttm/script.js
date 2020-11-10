@@ -70,7 +70,7 @@ export const level_ttm_entry = [
     { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_13, ttm_geo_0009C0] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_14, ttm_geo_0009F0] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_15, ttm_geo_000A18] },
-    //{ command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_16, ttm_geo_000140] }, !! Missing???
+    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_16, ttm_geo_000A40] },
     { command: LevelCommands.begin_area, args: [1, ttm_geo_000A70] },
     { command: LevelCommands.terrain, args: [ttm_seg7_area_1_collision] },
     { command: LevelCommands.end_area },

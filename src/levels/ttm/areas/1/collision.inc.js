@@ -2324,7 +2324,7 @@ export const ttm_seg7_area_1_collision = [
     ...COL_TRI(477, 810, 470),
     ...COL_TRI(282, 811, 288),
     ...COL_TRI_STOP(),
-     ...COL_SPECIAL_INIT(27),
+     ...COL_SPECIAL_INIT(28),
     // ...SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_null_start,   /*pos*/   102, -4332,  5734, /*yaw*/ 32), // unused, probably an early way to set intial position
     ...SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_03, /*pos*/ -3276, -4423, -3685, /*yaw*/  0),
     ...SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_03, /*pos*/  7293, -5056,  1429, /*yaw*/  0),
@@ -2353,6 +2353,6 @@ export const ttm_seg7_area_1_collision = [
     ...SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_13, /*pos*/ -1842, -1791, -2866, /*yaw*/  0),
     ...SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_14, /*pos*/ -1228,  -613, -3071, /*yaw*/  0),
     ...SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_15, /*pos*/ -1740,  -204, -2354, /*yaw*/  0),
-    //...SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_16, /*pos*/ -2764, -2661,  3789, /*yaw*/  0),
+    ...SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_16, /*pos*/ -2764, -2661,  3789, /*yaw*/  0),
     ...COL_END(),
 ]

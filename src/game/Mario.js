@@ -522,6 +522,10 @@ const warp_death_plane = (m) => {
             if (m.pos[1] <= -7166.0) m.pos = [5632, 6451, -5631];
             break;
         }
+        case (36) : { // TTM
+            if (m.pos[1] <= -7166.0) m.pos = [102, -4332, 5734];
+            break;
+        }
         default : {
             break;
         }

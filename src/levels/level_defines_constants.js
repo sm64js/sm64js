@@ -3,3 +3,4 @@ export const LEVEL_BOB = 9
 export const LEVEL_CCM = 5
 export const LEVEL_PSS = 27
 export const LEVEL_DDD = 23
+export const LEVEL_TTM = 36

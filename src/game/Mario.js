@@ -18,7 +18,7 @@ import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
 import { mario_execute_cutscene_action } from "./MarioActionsCutscene"
 import { gameData as socketGameData } from "../socket"
 import { int16, sins, coss } from "../utils"
-import { LEVEL_CCM } from "../levels/level_defines_constants"
+import { LEVEL_CCM, LEVEL_TTM } from "../levels/level_defines_constants"
 
 ////// Mario Constants
 export const ANIM_FLAG_NOLOOP = (1 << 0) // 0x01

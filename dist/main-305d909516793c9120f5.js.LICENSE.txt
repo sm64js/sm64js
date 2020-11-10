@@ -1,0 +1,61 @@
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <http://feross.org>
+ * @license  MIT
+ */
+
+/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
+
+/*! keydrown - v1.2.7 - 2020-10-01 - http://jeremyckahn.github.com/keydrown */
+
+/**
+ * @license Complex.js v2.0.11 11/02/2016
+ *
+ * Copyright (c) 2016, Robert Eisele (robert@xarg.org)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ **/
+
+/**
+ * @license Fraction.js v4.0.12 09/09/2015
+ * http://www.xarg.org/2014/03/rational-numbers-in-javascript/
+ *
+ * Copyright (c) 2015, Robert Eisele (robert@xarg.org)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ **/
+
+//! (BLJ's) This properly handles long jumps from getting forward speed with
+
+//! (Exposed Ceilings) Because any point above a ceiling counts
+
+//! (Speed Crash) These casts can cause a crash if (dYaw * forwardVel / 12) or
+
+//! (Unreferenced Walls) Since this only returns the first four walls,
+
+//! (Wall Overlaps) Because this doesn't update the x and z local variables,
+
+//! (forwardVel * 170) exceed or equal 2^31.
+
+//! -0x4000 not handled - can slide down a slope while facing perpendicular to it
+
+//! 10k glitch
+
+//! Crash if mario's referenced ceiling is NULL (same for other hanging actions)
+
+//! If Mario is near OOB, these floorY's can sometimes be -11000.
+
+//! In Mario mode, the camera is zoomed out further than in lakitu mode (1400 vs 1200)
+
+//! Since the search for floors starts at y + 160, we will sometimes grab
+
+//! Some wall checks are larger than the buffer, meaning wall checks can
+
+//! Speed is capped a frame late (butt slide HSG)
+
+//! This is attempting to use trig derivatives to rotate mario's speed.
+
+//! This makes the HOLP not update when the camera is far away, and it
+
+//! Uncapped air speed. Net positive when moving forward.
+
+//! When the wall is not completely vertical or there is a slight wall

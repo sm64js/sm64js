@@ -1,18 +1,23 @@
-﻿import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_texture_0700B4A0, intro_seg7_texture_0700C4A0 } from "./levels/intro/leveldata"
+﻿import * as SkyboxWater from "./textures/skyboxes/water_skybox"
+import { assets } from "./assets"
+
+
+import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_texture_0700B4A0, intro_seg7_texture_0700C4A0 } from "./levels/intro/leveldata"
 import { castle_grounds_seg7_texture_07000000, castle_grounds_seg7_texture_07001000, castle_grounds_seg7_texture_07002000 } from "./levels/castle_grounds/texture.inc.js"
-import { ttm_seg7_texture_07000000 } from "./levels/ttm/textures.inc.js"
-import { ttm_seg7_texture_07000800 } from "./levels/ttm/textures.inc.js"
-import { ttm_seg7_texture_07001000 } from "./levels/ttm/textures.inc.js"
-import { ttm_seg7_texture_07001800 } from "./levels/ttm/textures.inc.js"
-import { ttm_seg7_texture_07002000 } from "./levels/ttm/textures.inc.js"
-import { ttm_seg7_texture_07002800 } from "./levels/ttm/textures.inc.js"
-import { ttm_seg7_texture_07003000 } from "./levels/ttm/textures.inc.js"
-import { ttm_seg7_texture_07004000 } from "./levels/ttm/textures.inc.js"
 import { title_texture_0A0001C0, title_texture_0A000E40, title_texture_0A001AC0, title_texture_0A002740 } from "./levels/intro/title_screen_bg"
 import { tree_seg3_texture_0302DE28, tree_seg3_texture_0302EE28, tree_seg3_texture_0302FF60, tree_seg3_texture_03031048, tree_seg3_texture_03032218 } from "./actors/tree/model.inc"
 import { texture_shadow_quarter_circle, texture_waterbox_water, texture_waterbox_lava, texture_transition_star_half } from "./common_gfx/segment2"
-import * as SkyboxWater from "./textures/skyboxes/water_skybox"
-import { assets } from "./assets"
+
+import {
+    ttm_seg7_texture_07000000,
+    ttm_seg7_texture_07000800,
+    ttm_seg7_texture_07001000,
+    ttm_seg7_texture_07001800,
+    ttm_seg7_texture_07002000,
+    ttm_seg7_texture_07002800,
+    ttm_seg7_texture_07003000,
+    ttm_seg7_texture_07004000,
+} from "./levels/ttm/textures.inc.js"
 
 import {
     gd_texture_mario_face_shine,

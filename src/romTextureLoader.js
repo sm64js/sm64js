@@ -1,5 +1,13 @@
 ﻿import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_texture_0700B4A0, intro_seg7_texture_0700C4A0 } from "./levels/intro/leveldata"
 import { castle_grounds_seg7_texture_07000000, castle_grounds_seg7_texture_07001000, castle_grounds_seg7_texture_07002000 } from "./levels/castle_grounds/texture.inc.js"
+import { ttm_seg7_texture_07000000 } from "./levels/ttm/textures.inc.js"
+import { ttm_seg7_texture_07000800 } from "./levels/ttm/textures.inc.js"
+import { ttm_seg7_texture_07001000 } from "./levels/ttm/textures.inc.js"
+import { ttm_seg7_texture_07001800 } from "./levels/ttm/textures.inc.js"
+import { ttm_seg7_texture_07002000 } from "./levels/ttm/textures.inc.js"
+import { ttm_seg7_texture_07002800 } from "./levels/ttm/textures.inc.js"
+import { ttm_seg7_texture_07003000 } from "./levels/ttm/textures.inc.js"
+import { ttm_seg7_texture_07004000 } from "./levels/ttm/textures.inc.js"
 import { title_texture_0A0001C0, title_texture_0A000E40, title_texture_0A001AC0, title_texture_0A002740 } from "./levels/intro/title_screen_bg"
 import { tree_seg3_texture_0302DE28, tree_seg3_texture_0302EE28, tree_seg3_texture_0302FF60, tree_seg3_texture_03031048, tree_seg3_texture_03032218 } from "./actors/tree/model.inc"
 import { texture_shadow_quarter_circle, texture_waterbox_water, texture_waterbox_lava, texture_transition_star_half } from "./common_gfx/segment2"
@@ -171,7 +179,7 @@ import {
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 11
+const textureVersion = 12
 
 const loadDataIntoGame = (data) => {
 
@@ -183,7 +191,16 @@ const loadDataIntoGame = (data) => {
     castle_grounds_seg7_texture_07000000.push(...data['levels/castle_grounds/0.rgba16.png'].data)
     castle_grounds_seg7_texture_07001000.push(...data['levels/castle_grounds/1.rgba16.png'].data)
     castle_grounds_seg7_texture_07002000.push(...data['levels/castle_grounds/2.rgba16.png'].data)
-
+	
+	ttm_seg7_texture_07000000.push(...data['levels/ttm/0.ia16.png'].data)
+	ttm_seg7_texture_07000800.push(...data['levels/ttm/1.rgba16.png'].data)
+	ttm_seg7_texture_07001000.push(...data['levels/ttm/2.rgba16.png'].data)
+	ttm_seg7_texture_07001800.push(...data['levels/ttm/3.rgba16.png'].data)
+	ttm_seg7_texture_07002000.push(...data['levels/ttm/4.rgba16.png'].data)
+	ttm_seg7_texture_07002800.push(...data['levels/ttm/5.rgba16.png'].data)
+	ttm_seg7_texture_07003000.push(...data['levels/ttm/6.rgba16.png'].data)
+	ttm_seg7_texture_07004000.push(...data['levels/ttm/7.rgba16.png'].data)
+	
     gd_texture_mario_face_shine.push(...data['textures/intro_raw/mario_face_shine.ia8.png'].data)
     gd_texture_red_star_0.push(...data['textures/intro_raw/red_star_0.rgba16.png'].data)
     gd_texture_red_star_1.push(...data['textures/intro_raw/red_star_1.rgba16.png'].data)

@@ -4,7 +4,7 @@ pub mod proto {
     include!(concat!(env!("OUT_DIR"), "/sm64js.rs"));
 }
 
-use proto::MarioMsg;
+use proto::{sm64_js_msg, Sm64JsMsg};
 
 use actix::prelude::*;
 use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
@@ -71,8 +71,32 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                 self.hb = Instant::now();
             }
             Ok(ws::Message::Binary(bin)) => {
-                let data = MarioMsg::decode(bin).unwrap();
-                self.addr.do_send(server::SetData { id: self.id, data })
+                let data = Sm64JsMsg::decode(bin.clone()).unwrap();
+                match data.message {
+                    Some(sm64_js_msg::Message::PingMsg(_)) => {
+                        use flate2::{write::ZlibEncoder, Compression};
+                        use std::io::Write;
+
+                        let mut encoder = ZlibEncoder::new(Vec::new(), Compression::fast());
+                        encoder.write_all(&bin).unwrap();
+                        let msg = encoder.finish().unwrap();
+
+                        ctx.binary(msg);
+                    }
+                    Some(sm64_js_msg::Message::MarioMsg(mario_msg)) => {
+                        self.addr.do_send(server::SetData {
+                            id: self.id,
+                            data: mario_msg,
+                        });
+                    }
+                    Some(sm64_js_msg::Message::ListMsg(_)) => {
+                        // TODO
+                    }
+                    Some(sm64_js_msg::Message::ConnectedMsg(_)) => {
+                        // TODO
+                    }
+                    None => {}
+                }
             }
             Ok(ws::Message::Close(reason)) => {
                 ctx.close(reason);

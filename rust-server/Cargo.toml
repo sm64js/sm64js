@@ -15,7 +15,7 @@ actix_derive = "0.5"
 actix-web = "3"
 actix-web-actors = "3"
 env_logger = "0.8"
-flate2 = "1"
+flate2 = { version = "1.0.17", features = ["zlib"], default-features = false }
 prost = "0.6"
 rand = "0.7"
 serde = "1"

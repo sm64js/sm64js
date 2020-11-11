@@ -61,20 +61,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "actix-cors"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "778c96f5953144b8986fafee72b3809642c1b5050a2552a97dc02247f00b4155"
-dependencies = [
- "actix-web",
- "derive_more",
- "futures-util",
- "log",
- "once_cell",
- "tinyvec 1.0.1",
-]
-
-[[package]]
 name = "actix-http"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1547,12 +1533,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c111b5bd5695e56cffe5129854aa230b39c93a305372fdbb2668ca2394eea9f8"
 
 [[package]]
-name = "sm64js-rust-server"
+name = "sm64js"
 version = "0.1.0"
 dependencies = [
  "actix",
  "actix-codec",
- "actix-cors",
  "actix-web",
  "actix-web-actors",
  "actix_derive",

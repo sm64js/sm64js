@@ -7,7 +7,8 @@ pub mod proto {
 use proto::{sm64_js_msg, Sm64JsMsg};
 
 use actix::prelude::*;
-use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
+use actix_cors::Cors;
+use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer, http::header};
 use actix_web_actors::ws;
 use prost::Message;
 use std::time::{Duration, Instant};
@@ -156,6 +157,11 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .data(server.clone())
+            .wrap(
+                Cors::permissive()
+                    .supports_credentials()
+                    .max_age(3600),
+             )
             .wrap(middleware::Logger::default())
             .service(web::resource("/").route(web::get().to(ws_index)))
     })

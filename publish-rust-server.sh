@@ -16,7 +16,7 @@ docker tag sm64js/sm64js-build sm64js/sm64js-build:$GIT_HASH
 docker push sm64js/sm64js-build:$GIT_HASH
 
 docker pull sm64js/sm64js || true
-docker build --cache-from=tarnadas/sm64js -t sm64js/sm64js -f ./rust-server/Dockerfile .
+docker build --cache-from=sm64js/sm64js -t sm64js/sm64js -f ./rust-server/Dockerfile .
 docker push sm64js/sm64js:latest
 docker tag sm64js/sm64js sm64js/sm64js:$GIT_HASH
 docker push sm64js/sm64js:$GIT_HASH

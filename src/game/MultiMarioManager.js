@@ -256,7 +256,6 @@ export const recvValidPlayers = (validplayerbytes) => {
 
 export const recvMarioData = (marioList) => {
 
-    networkData.numOnline = marioList.length
     marioList.forEach(marioProto => {
         const id = marioProto.getChannelid()
         if (id == networkData.myChannelID) return
@@ -272,6 +271,9 @@ export const recvMarioData = (marioList) => {
         } else {
             updateRemoteMarioState(id, marioProto)
         }
-    })    
+    })
+
+    networkData.numOnline = Object.keys(networkData.remotePlayers).length
+
 
 }

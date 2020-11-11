@@ -157,15 +157,10 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .data(server.clone())
-            .wrap(
-                Cors::permissive()
-                    .supports_credentials()
-                    .max_age(3600),
-             )
             .wrap(middleware::Logger::default())
             .service(web::resource("/").route(web::get().to(ws_index)))
     })
-    .bind("127.0.0.1:3000")?
+    .bind("198.199.74.8:3000")?
     .run()
     .await
 }

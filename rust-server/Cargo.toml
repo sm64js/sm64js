@@ -10,7 +10,6 @@ prost-build = "0.6"
 [dependencies]
 anyhow = "1"
 actix = "0.10"
-actix-cors = "0.5.1"
 actix-codec = "0.3"
 actix_derive = "0.5"
 actix-web = "3"

@@ -1,0 +1,64 @@
+on: [push, pull_request]
+
+name: Rust Server Test & Publish
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+
+      - uses: actions-rs/toolchain@v1
+        name: Install Toolchain
+        with:
+          profile: minimal
+          toolchain: nightly-2020-10-23
+          override: true
+          components: rustfmt, clippy
+
+      - uses: actions-rs/cargo@v1
+        name: Check
+        with:
+          command: check
+
+      - uses: actions-rs/cargo@v1
+        name: Test
+        with:
+          command: test
+
+      - uses: actions-rs/cargo@v1
+        name: Fmt
+        with:
+          command: fmt
+          args: -- --check
+
+      - uses: actions-rs/cargo@v1
+        name: Clippy
+        with:
+          command: clippy
+          args: -- -D warnings
+
+  publish:
+    # this needs to be changed, if the Rust server should be published from a different branch
+    if: github.ref == 'refs/heads/MMO_benchmark_rust'
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+
+      - uses: actions-rs/toolchain@v1
+        name: Install Toolchain
+        with:
+          profile: minimal
+          toolchain: nightly-2020-10-23
+          override: true
+
+      - name: Deploy to Docker Hub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: bash publish-rust-server.sh
+        continue-on-error: true

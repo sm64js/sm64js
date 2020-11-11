@@ -148,7 +148,6 @@ impl Sm64JsServer {
             .values_mut()
             .filter_map(|client| {
                 if client.valid > 0 {
-
                     client.valid -= 1;
                     client.data.clone()
                 } else if client.data.is_some() {
@@ -189,7 +188,7 @@ pub struct Client {
     addr: Recipient<Message>,
     data: Option<MarioMsg>,
     valid: u8,
-    myid: u32
+    myid: u32,
 }
 
 impl Client {
@@ -198,7 +197,7 @@ impl Client {
             addr,
             data: None,
             valid: 0,
-            myid: myid
+            myid: myid,
         }
     }
 
@@ -207,7 +206,7 @@ impl Client {
             return;
         }
         data.channel_id = self.myid;
-        
+
         self.data = Some(data);
         self.valid = 30;
     }

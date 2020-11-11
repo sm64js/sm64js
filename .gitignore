@@ -2,6 +2,7 @@ dist
 *lock.json
 yarn.lock
 node_modules
+/target
 .vs*
 .DS_Store
 extractTools/.assets-local.txt

@@ -159,7 +159,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .service(web::resource("/").route(web::get().to(ws_index)))
     })
-    .bind("198.199.74.8:3000")?
+    .bind("0.0.0.0:3000")?
     .run()
     .await
 }

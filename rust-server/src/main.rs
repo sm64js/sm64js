@@ -8,7 +8,7 @@ use proto::{sm64_js_msg, Sm64JsMsg};
 
 use actix::prelude::*;
 use actix_cors::Cors;
-use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer, http::header};
+use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
 use prost::Message;
 use std::time::{Duration, Instant};

@@ -77,13 +77,14 @@ impl Handler<Connect> for Sm64JsServer {
 
     fn handle(&mut self, msg: Connect, _: &mut Context<Self>) -> Self::Result {
         let id = rand::thread_rng().gen::<u32>();
-        let client = Client::new(msg.addr);
+        let client = Client::new(msg.addr, id);
 
         let sm64js_msg = Sm64JsMsg {
             message: Some(sm64_js_msg::Message::ConnectedMsg(ConnectedMsg {
                 channel_id: id,
             })),
         };
+
         let mut msg = vec![];
         sm64js_msg.encode(&mut msg).unwrap();
 
@@ -147,6 +148,7 @@ impl Sm64JsServer {
             .values_mut()
             .filter_map(|client| {
                 if client.valid > 0 {
+
                     client.valid -= 1;
                     client.data.clone()
                 } else if client.data.is_some() {
@@ -187,21 +189,25 @@ pub struct Client {
     addr: Recipient<Message>,
     data: Option<MarioMsg>,
     valid: u8,
+    myid: u32
 }
 
 impl Client {
-    pub fn new(addr: Recipient<Message>) -> Self {
+    pub fn new(addr: Recipient<Message>, myid: u32) -> Self {
         Client {
             addr,
             data: None,
             valid: 0,
+            myid: myid
         }
     }
 
-    pub fn set_data(&mut self, data: MarioMsg) {
+    pub fn set_data(&mut self, mut data: MarioMsg) {
         if data.player_name.len() < 3 || data.player_name.len() > 14 {
             return;
         }
+        data.channel_id = self.myid;
+        
         self.data = Some(data);
         self.valid = 30;
     }

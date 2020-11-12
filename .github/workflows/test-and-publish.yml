@@ -2,9 +2,11 @@ on:
   push:
     paths:
       - "rust-server/**/*"
+      - ".github/workflows/test-and-publish.yml"
   pull_request:
     paths:
       - "rust-server/**/*"
+      - ".github/workflows/test-and-publish.yml"
 
 name: Rust Server Test & Publish
 

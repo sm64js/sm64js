@@ -164,7 +164,7 @@ async fn main() -> std::io::Result<()> {
                     .index_file("index.html"),
             )
     })
-    .bind("0.0.0.0:3000")?
+    .bind("0.0.0.0:3060")?
     .run()
     .await
 }

@@ -16,8 +16,7 @@ var CWorkFolder = "sm64ex"
 
 //Levels to check & patch
 var LEVELS = [
-	'ttm',
-	//'ccm',
+	'thi',
 ]
 
 var srcTextures = [
@@ -148,12 +147,12 @@ function addToTGroup(mdl,target,add) {
 while (idx < LEVELS.length){
 	var lvl = LEVELS[idx]
 	
-	const LevelDirectory = require('os').homedir() + '/' + WorkFolder + '/src/levels/' + lvl + '/'
+	const LevelDirectory = require('os').homedir() + '/Documents/' + WorkFolder + '/src/levels/' + lvl + '/'
 	
-	const TexturesDirectory = require('os').homedir() + '/' + WorkFolder + '/src/textures/'
-	const AssetsDirectory = require('os').homedir() + '/' + WorkFolder + '/src/assets.js'
-	const EToolsAssetsDirectory = require('os').homedir() + '/' + WorkFolder + '/extractTools/assets.js'
-	const RomLoaderDirectory = require('os').homedir() + '/' + WorkFolder + '/src/romTextureLoader.js'
+	const TexturesDirectory = require('os').homedir() + '/Documents/' + WorkFolder + '/src/textures/'
+	const AssetsDirectory = require('os').homedir() + '/Documents/' + WorkFolder + '/src/assets.js'
+	const EToolsAssetsDirectory = require('os').homedir() + '/Documents/' + WorkFolder + '/extractTools/assets.js'
+	const RomLoaderDirectory = require('os').homedir() + '/Documents/' + WorkFolder + '/src/romTextureLoader.js'
 	
 	if (!fs.existsSync(LevelDirectory)) {
 		console.log(`Level directory invalid : ${LevelDirectory}`)

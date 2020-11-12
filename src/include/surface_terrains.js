@@ -37,6 +37,8 @@ export const SURFACE_HORIZONTAL_WIND              = 0x002C // Horizontal wind, h
 export const SURFACE_INSTANT_MOVING_QUICKSAND = 0x002D // Quicksand (lethal, flowing)
 export const SURFACE_CAMERA_ROTATE_LEFT           = 0x0070
 export const SURFACE_CAMERA_BOUNDARY              = 0x0072 // Intangible Area, only used to restrict camera movement
+export const SURFACE_CAMERA_FREE_ROAM             = 0x0066 // THI, TTC
+export const SURFACE_THI3_WALLKICK                = 0x0068
 
 export const SURFACE_HARD                          = 0x0030
 

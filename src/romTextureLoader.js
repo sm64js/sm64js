@@ -167,8 +167,10 @@ import {
     snow_09009800
 } from "./textures/snow"
 
-
-/*
+import {
+    thi_seg7_texture_07000000,
+    thi_seg7_texture_07000800
+} from "./levels/thi_3/texture.inc"
 import {
     grass_09000000,
     grass_09000800,
@@ -193,11 +195,11 @@ import {
     grass_0900B000,
     grass_0900B800
 } from "./textures/grass"
-*/
+
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 13
+const textureVersion = 14
 
 const loadDataIntoGame = (data) => {
 
@@ -355,6 +357,32 @@ const loadDataIntoGame = (data) => {
     snow_09008800.push(...data["textures/snow/ccm_textures.08800.rgba16.png"].data)
     snow_09009000.push(...data["textures/snow/ccm_textures.09000.ia16.png"].data)
     snow_09009800.push(...data["textures/snow/ccm_textures.09800.ia16.png"].data)
+
+    grass_09000000.push(...data["textures/grass/wf_textures.00000.rgba16.png"].data)
+    grass_09000800.push(...data["textures/grass/wf_textures.00800.rgba16.png"].data)
+    grass_09001000.push(...data["textures/grass/wf_textures.01000.rgba16.png"].data)
+    grass_09002000.push(...data["textures/grass/wf_textures.02000.rgba16.png"].data)
+    grass_09002800.push(...data["textures/grass/wf_textures.02800.rgba16.png"].data)
+    grass_09003000.push(...data["textures/grass/wf_textures.03000.rgba16.png"].data)
+    grass_09003800.push(...data["textures/grass/wf_textures.03800.rgba16.png"].data)
+    grass_09004000.push(...data["textures/grass/wf_textures.04000.rgba16.png"].data)
+    grass_09004800.push(...data["textures/grass/wf_textures.04800.rgba16.png"].data)
+    grass_09005000.push(...data["textures/grass/wf_textures.05000.rgba16.png"].data)
+    grass_09005800.push(...data["textures/grass/wf_textures.05800.rgba16.png"].data)
+    grass_09006000.push(...data["textures/grass/wf_textures.06000.rgba16.png"].data)
+    grass_09006800.push(...data["textures/grass/wf_textures.06800.rgba16.png"].data)
+    grass_09007000.push(...data["textures/grass/wf_textures.07000.rgba16.png"].data)
+    grass_09008000.push(...data["textures/grass/wf_textures.08000.rgba16.png"].data)
+    grass_09008800.push(...data["textures/grass/wf_textures.08800.rgba16.png"].data)
+    grass_09009000.push(...data["textures/grass/wf_textures.09000.rgba16.png"].data)
+    grass_09009800.push(...data["textures/grass/wf_textures.09800.rgba16.png"].data)
+    grass_0900A000.push(...data["textures/grass/wf_textures.0A000.rgba16.png"].data)
+    grass_0900A800.push(...data["textures/grass/wf_textures.0A800.rgba16.png"].data)
+    grass_0900B000.push(...data["textures/grass/wf_textures.0B000.ia16.png"].data)
+    grass_0900B800.push(...data["textures/grass/wf_textures.0B800.ia16.png"].data)
+
+    thi_seg7_texture_07000000.push(...data["levels/bob/0.rgba16.png"].data)
+    thi_seg7_texture_07000800.push(...data["levels/bob/1.rgba16.png"].data)
 
     mario_texture_yellow_button.push(...data['actors/mario/mario_overalls_button.rgba16.png'].data)
     mario_texture_m_logo.push(...data['actors/mario/mario_logo.rgba16.png'].data)

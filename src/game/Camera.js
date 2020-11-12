@@ -338,7 +338,6 @@ class Camera {
     }
 
     reset_camera(c) {
-
         this.gCamera = c
         this.gCameraMovementFlags = 0
         this.s2ndRotateFlags = 0

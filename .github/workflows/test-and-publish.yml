@@ -1,4 +1,10 @@
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - "rust-server/**/*"
+  pull_request:
+    paths:
+      - "rust-server/**/*"
 
 name: Rust Server Test & Publish
 

@@ -99,7 +99,7 @@ jobs:
       - name: Setup cache
         run: |
           mkdir sccache
-          mount -o bind /home/runner/.cache/sccache sccache
+          sudo mount -o bind /home/runner/.cache/sccache sccache
 
       - name: Start sccache server
         run: |

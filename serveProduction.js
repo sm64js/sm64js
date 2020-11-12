@@ -1,4 +1,4 @@
-const { MarioMsg, MarioListMsg, ControllerMsg, ValidPlayersMsg } = require("./proto/mario_pb")
+const { RootMsg, MarioListMsg, ControllerMsg, ValidPlayersMsg, Sm64JsMsg } = require("./proto/mario_pb")
 const fs = require('fs')
 const http = require('http')
 const got = require('got')
@@ -24,23 +24,32 @@ const generateID = () => {
     return currentId
 }
 
-const sendDataWithOpcode = (bytes, opcode, channel) => {
-    if (bytes.length == undefined) bytes = Buffer.from(bytes)
-    const newbytes = new Uint8Array(bytes.length + 1)
-    newbytes.set([opcode], 0)
-    newbytes.set(bytes, 1)
-    channel.raw.emit(newbytes)
+const text = {
+    decoder: new TextDecoder(),
+    encoder: new TextEncoder()
 }
 
-const broadcastDataWithOpcode = (bytes, opcode, channel) => {
+const sendJsonWithTopic = (topic, msg, channel) => {
+    const str = JSON.stringify({ topic, msg })
+    let bytes = text.encoder.encode(str)
+    const rootMsg = new RootMsg()
+    rootMsg.setJsonBytesMsg(bytes)
+    channel.raw.emit(rootMsg.serializeBinary())
+}
+
+const broadcastJsonWithTopic = (topic, msg) => {
+    const str = JSON.stringify({ topic, msg })
+    let bytes = text.encoder.encode(str)
+    const rootMsg = new RootMsg()
+    rootMsg.setJsonBytesMsg(bytes)
+    geckos.raw.emit(rootMsg.serializeBinary())
+}
+
+
+const broadcastData = (bytes, channel) => {
     if (bytes.length == undefined) bytes = Buffer.from(bytes)
-
-    const newbytes = new Uint8Array(bytes.length + 1)
-    newbytes.set([opcode], 0)
-    newbytes.set(bytes, 1)
-
     if (channel) channel.raw.broadcast.emit(newbytes)
-    else geckos.raw.emit(newbytes)
+    else geckos.raw.emit(bytes)
 
 }
 
@@ -50,17 +59,19 @@ const sendValidUpdate = () => {
 
     const validplayersmsg = new ValidPlayersMsg()
     validplayersmsg.setValidplayersList(validPlayers)
-    broadcastDataWithOpcode(validplayersmsg.serializeBinary(), 8)
+    const sm64jsMsg = new Sm64JsMsg()
+    sm64jsMsg.setValidPlayersMsg(validplayersmsg)
+    const rootMsg = new RootMsg()
+    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+    broadcastData(rootMsg.serializeBinary())
 }
 
 
-const processPlayerData = (channel_id, bytes) => {
-    const decodedMario = MarioMsg.deserializeBinary(bytes)
+const processPlayerData = (channel_id, decodedMario) => {
 
     //Pretty strict validation  -- ignoring validation for now
     if (decodedMario.getChannelid() != decodedMario.getController().getChannelid()) return
     if (decodedMario.getPlayername().length < 3 || decodedMario.getPlayername().length > 14) return
-
     if (allChannels[channel_id] == undefined) return
 
     /// server should always force the channel_id
@@ -70,8 +81,6 @@ const processPlayerData = (channel_id, bytes) => {
     allChannels[channel_id].decodedMario = decodedMario
     allChannels[channel_id].valid = 30
 
-    //publish
-    //broadcastDataWithOpcode(bytes, 0, allChannels[channel_id].channel)
 }
 
 const processControllerUpdate = (channel_id, bytes) => {
@@ -119,10 +128,8 @@ const processSkin = (channel_id, msg) => {
 
     if (!validSkins(msg)) return
 
-    //const skinMsg = { channel_id, skinData: msg }
     allChannels[channel_id].skinData = msg
     allChannels[channel_id].skinData.updated = true
-    //allChannels[channel_id].channel.broadcast.emit('skin', skinMsg)
 }
 
 const sanitizeChat = (string) => {
@@ -162,7 +169,7 @@ const processChat = async (channel_id, msg) => {
             sender: decodedMario.getPlayername()
         }
 
-        geckos.emit('chat', chatmsg)
+        broadcastJsonWithTopic('chat', chatmsg)
 
     } catch (e) {
         console.log(`Got error with profanity api: ${e}`)
@@ -175,7 +182,7 @@ const sendSkinsToChannel = (channel) => {
     Object.entries(allChannels).forEach(([channel_id, data]) => {
         if (data.skinData) {
             const skinMsg = { channel_id, skinData: data.skinData }
-            channel.emit('skin', skinMsg)
+            sendJsonWithTopic('skin', skinMsg, channel)
         }
     })
 }
@@ -185,7 +192,7 @@ const sendSkinsIfUpdated = () => {
     Object.entries(allChannels).forEach(([channel_id, data]) => {
         if (data.skinData) {
             const skinMsg = { channel_id, skinData: data.skinData }
-            allChannels[channel_id].channel.broadcast.emit('skin', skinMsg)
+            broadcastJsonWithTopic('skin', skinMsg)
             data.skinData.updated = false
         }
     })
@@ -200,15 +207,16 @@ setInterval(async () => {
         else if (data.decodedMario) data.channel.close()
     })
 
+    const sm64jsMsg = new Sm64JsMsg()
     const mariolist = Object.values(allChannels).filter(data => data.decodedMario).map(data => data.decodedMario)
     const mariolistproto = new MarioListMsg()
     mariolistproto.setMarioList(mariolist)
-    mariolistproto.setMessagecount(marioListCounter)
-    const bytes = mariolistproto.serializeBinary()
-    const compressedMsg = await deflate(bytes)
-    stats.marioListSize = compressedMsg.length
-    broadcastDataWithOpcode(compressedMsg, 0)
-    marioListCounter++
+    sm64jsMsg.setListMsg(mariolistproto)
+    const bytes = sm64jsMsg.serializeBinary()
+    const compressedBytes = await deflate(bytes)
+    const rootMsg = new RootMsg()
+    rootMsg.setCompressedSm64jsMsg(compressedBytes)
+    broadcastData(rootMsg.serializeBinary())
 
 }, 33)
 
@@ -257,26 +265,45 @@ geckos.onConnection(channel => {
 
     channel.my_id = generateID()
     allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }
-    channel.emit('id', { id: channel.my_id }, { reliable: true })
+    sendJsonWithTopic('id', { id: channel.my_id }, channel)
 
     sendSkinsToChannel(channel)
 
     channel.onRaw(bytes => {
         try {
-            const opcode = Buffer.from(bytes)[0]
-            switch (opcode) {
-                case 0: processPlayerData(channel.my_id, bytes.slice(1)); break
-                //case 2: processBasicAttack(channel.my_id, bytes.slice(1)); break
-                //case 3: processControllerUpdate(channel.my_id, bytes.slice(1)); break
-                //case 4: processKnockUp(channel.my_id, bytes.slice(1)); break
-                case 99: channel.raw.emit(bytes); break  ///ping pong
-                default: console.log("unknown opcode: " + opcode)
+            let sm64jsMsg
+            const rootMsg = RootMsg.deserializeBinary(bytes)
+
+            switch (rootMsg.getMessageCase()) {
+                case RootMsg.MessageCase.UNCOMPRESSED_SM64JS_MSG:
+                    sm64jsMsg = rootMsg.getUncompressedSm64jsMsg()
+                    switch (sm64jsMsg.getMessageCase()) {
+                        case Sm64JsMsg.MessageCase.MARIO_MSG:
+                            processPlayerData(channel.my_id, sm64jsMsg.getMarioMsg()); break
+                        //case 2: processBasicAttack(channel.my_id, bytes.slice(1)); break
+                        //case 3: processControllerUpdate(channel.my_id, bytes.slice(1)); break
+                        //case 4: processKnockUp(channel.my_id, bytes.slice(1)); break
+                        default: throw "unknown case for uncompressed proto message"
+                    }
+                    break
+                case RootMsg.MessageCase.JSON_BYTES_MSG:
+                    const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
+                    const { topic, msg } = JSON.parse(str)
+                    switch (topic) {
+                        case 'chat': processChat(channel.my_id, msg); break
+                        case 'skin': processSkin(channel.my_id, msg); break
+                        case 'ping': channel.raw.emit(bytes);  break
+                        default: throw "Unknown topic in json message"
+                    }
+                    break
+                case RootMsg.MessageCase.MESSAGE_NOT_SET:
+                default:
+                    throw new Error(`unhandled case in switch expression: ${rootMsg.getMessageCase()}`)
             }
+
+
         } catch (err) { console.log(err) }
     })
-
-    channel.on('chat', msg => { processChat(channel.my_id, msg) })
-    channel.on('skin', msg => { processSkin(channel.my_id, msg) })
 
     channel.onDisconnect(() => {
         delete allChannels[channel.my_id]

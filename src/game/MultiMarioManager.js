@@ -100,7 +100,7 @@ export const createMarioProtoMsg = () => {
     mariomsg.setChannelid(networkData.myChannelID)
     mariomsg.setPlayername(window.myMario.playerName)
 
-    return mariomsg.serializeBinary()
+    return mariomsg
 }
 
 const initNewRemoteMarioState = (marioProto) => {
@@ -239,8 +239,8 @@ export const recvControllerUpdate = (controllerbytes) => {
     })
 }
 
-export const recvValidPlayers = (validplayerbytes) => {
-    const validplayers = ValidPlayersMsg.deserializeBinary(validplayerbytes).getValidplayersList()
+export const recvValidPlayers = (validplayersproto) => {
+    const validplayers = validplayersproto.getValidplayersList()
 
     networkData.numOnline = validplayers.length
 
@@ -252,33 +252,21 @@ export const recvValidPlayers = (validplayerbytes) => {
 }
 
 
-let lastMessageProcessed = -1
-export const recvMarioData = (mariolistbytes) => {
+export const recvMarioData = (marioList) => {
+    marioList.forEach(marioProto => {
+        const id = marioProto.getChannelid()
+        if (id == networkData.myChannelID) return
 
-    zlib.inflate(mariolistbytes, (err, buffer) => {
-        if (!err) {
-            const marioListProto = MarioListMsg.deserializeBinary(buffer)
-            const messageCount = marioListProto.getMessagecount()
-            if (messageCount > lastMessageProcessed) {
-                lastMessageProcessed = messageCount
-                const marioList = marioListProto.getMarioList()
-                marioList.forEach(marioProto => {
-                    const id = marioProto.getChannelid()
-                    if (id == networkData.myChannelID) return
-
-                    if (networkData.remotePlayers[id] == undefined) {
-                        networkData.remotePlayers[id] = { 
-                            marioState: initNewRemoteMarioState(marioProto),
-                            skinData: defaultSkinData(),
-                            crashCount: 0,
-                            skipRender: 0
-                        }
-                        applyController(marioProto.getController())
-                    } else {
-                        updateRemoteMarioState(id, marioProto)
-                    }
-                })
+        if (networkData.remotePlayers[id] == undefined) {
+            networkData.remotePlayers[id] = { 
+                marioState: initNewRemoteMarioState(marioProto),
+                skinData: defaultSkinData(),
+                crashCount: 0,
+                skipRender: 0
             }
+            applyController(marioProto.getController())
+        } else {
+            updateRemoteMarioState(id, marioProto)
         }
     })
 

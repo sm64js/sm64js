@@ -1,3 +1,5 @@
+import { RootMsg, Sm64JsMsg  } from "../proto/mario_pb"
+import zlib from "zlib"
 import geckos from '@geckos.io/client'
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
@@ -29,23 +31,44 @@ export const networkData = {
     playerInteractions: true,
     remotePlayers: {},
     myChannelID: -1,
-    lastSentSkinData: {},
-    pingMessageCount: 0
+    lastSentSkinData: {}
 }
 
 export const gameData = {}
 
-const sendDataWithOpcode = (bytes, opcode) => {
-    if (bytes.length == undefined) bytes = Buffer.from(bytes)
-    const newbytes = new Uint8Array(bytes.length + 1)
-    newbytes.set([opcode], 0)
-    newbytes.set(bytes, 1)
-    channel.raw.emit(newbytes)
+const sendJsonWithTopic = (topic, msg) => {
+    const str = JSON.stringify({ topic, msg })
+    let bytes = text.encoder.encode(str)
+    const rootMsg = new RootMsg()
+    rootMsg.setJsonBytesMsg(bytes)
+    channel.raw.emit(rootMsg.serializeBinary())
 }
 
-const measureAndPrintLatency = (msgBytes) => {
-    const msg = JSON.parse(new TextDecoder("utf-8").decode(msgBytes))
-    if (networkData.pingMessageCount != msg.count) return
+/*const sendData = (bytes) => {
+    if (bytes.length == undefined) bytes = Buffer.from(bytes)
+    channel.raw.emit(bytes)
+}*/
+
+const text = {
+    decoder: new TextDecoder(),
+    encoder: new TextEncoder()
+}
+
+const unzip = (bytes) => {
+    return new Promise(function (resolve, reject) {
+
+        zlib.inflate(bytes, (err, buffer) => {
+            if (err) {
+                console.log("Error Unzipping")
+                reject(err)
+            }
+            resolve(buffer)
+        })
+    })
+}
+
+
+const measureLatency = (msg) => {
     const startTime = msg.time
     const endTime = performance.now()
     window.latency = parseInt(endTime - startTime)
@@ -80,27 +103,53 @@ channel.onConnect((err) => {
 
     channel.readyState = 1
 
-    channel.onRaw((message) => {
-        const start = performance.now()
-        const bytes = new Uint8Array(message)
-        const opcode = bytes[0]
-        const msgBytes = bytes.slice(1)
-        switch (opcode) {
-            case 0: if (multiplayerReady()) Multi.recvMarioData(msgBytes); break
-            //case 2: recvBasicAttack(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
-            //case 3: if (multiplayerReady()) Multi.recvControllerUpdate(msgBytes); break
-            //case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
-            case 8: Multi.recvValidPlayers(msgBytes); break
-            case 99: measureAndPrintLatency(bytes.slice(1)); break
-            default: throw "unknown opcode"
-        }
-        const end = performance.now() - start
-        //if (end > 100) console.log("Opcode: " + opcode + "  time: " + end +"ms  size: " + bytes.length)
-    })
+    channel.onRaw(async (message) => {
+        let sm64jsMsg
+        let bytes = new Uint8Array(message)
+        const rootMsg = RootMsg.deserializeBinary(bytes)
 
-    channel.on('id', msg => { networkData.myChannelID = msg.id })
-    channel.on('chat', msg => { recvChat(msg) })
-    channel.on('skin', msg => { Cosmetics.recvSkinData(msg) })
+        switch (rootMsg.getMessageCase()) {
+            case RootMsg.MessageCase.UNCOMPRESSED_SM64JS_MSG:
+                sm64jsMsg = rootMsg.getUncompressedSm64jsMsg()
+                switch (sm64jsMsg.getMessageCase()) {
+                    //case 0: if (multiplayerReady()) Multi.recvMarioData(msgBytes); break
+                    //case 2: recvBasicAttack(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
+                    //case 3: if (multiplayerReady()) Multi.recvControllerUpdate(msgBytes); break
+                    //case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
+                    case Sm64JsMsg.MessageCase.VALID_PLAYERS_MSG:
+                        Multi.recvValidPlayers(sm64jsMsg.getValidPlayersMsg())
+                        break
+                    //case 99: measureAndPrintLatency(bytes.slice(1)); break
+                    default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
+                }
+                break
+            case RootMsg.MessageCase.COMPRESSED_SM64JS_MSG:
+                if (!multiplayerReady()) return
+                const compressedBytes = rootMsg.getCompressedSm64jsMsg()
+                const buffer = await unzip(compressedBytes)
+                sm64jsMsg = Sm64JsMsg.deserializeBinary(buffer)
+                const listMsg = sm64jsMsg.getListMsg()
+                const marioList = listMsg.getMarioList()
+                Multi.recvMarioData(marioList)
+                break
+            case RootMsg.MessageCase.JSON_BYTES_MSG:
+                const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
+                const { topic, msg } = JSON.parse(str)
+                switch (topic) {
+                    case 'id': networkData.myChannelID = msg.id; break
+                    case 'chat': recvChat(msg); break
+                    case 'skin': Cosmetics.recvSkinData(msg); break
+                    case 'ping': measureLatency(msg); break
+                    default: throw "Unknown topic in json message"
+                }
+                break
+            case RootMsg.MessageCase.MESSAGE_NOT_SET:
+            default:
+                throw new Error(`unhandled case in switch expression: ${rootMsg.getMessageCase()}`)
+        }
+
+
+    })
 
     channel.onDisconnect(() => { channel.readyState = 0; window.latency = null })
 })
@@ -131,26 +180,28 @@ export const post_main_loop_one_iteration = (frame) => {
 
     if (frame % 30 == 0) updateConnectedMsg()
 
-    if (frame % 150 == 0) { //every 5 seconds
+    if (multiplayerReady()) {
 
-        if (multiplayerReady()) {
+        if (frame % 150 == 0) { //every 5 seconds
             /// ping to measure latency
-            networkData.pingMessageCount++
-            const msg = new TextEncoder("utf-8").encode(JSON.stringify({ time: performance.now(), count: networkData.pingMessageCount }))
-            sendDataWithOpcode(msg, 99)
+            sendJsonWithTopic('ping', { time: performance.now() })
 
+            //send skins if updated
             if (Cosmetics.validSkins()) {
                 if (JSON.stringify(window.myMario.skinData) != networkData.lastSentSkinData) {
                     networkData.lastSentSkinData = JSON.stringify(window.myMario.skinData)
-                    channel.emit('skin', window.myMario.skinData)
+                    sendJsonWithTopic('skin', window.myMario.skinData)
                 }
             }
         }
 
-    }
-
-    if (multiplayerReady() && frame % 1 == 0) {
-        sendDataWithOpcode(Multi.createMarioProtoMsg(), 0)
+        if (frame % 1 == 0) { /// every frame send mario data
+            const sm64jsMsg = new Sm64JsMsg()
+            sm64jsMsg.setMarioMsg(Multi.createMarioProtoMsg())
+            const rootMsg = new RootMsg()
+            rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+            channel.raw.emit(rootMsg.serializeBinary())
+        }
     }
 
     decrementChat()
@@ -167,7 +218,7 @@ const decrementChat = () => {
 }
 
 export const sendChat = (msg) => {
-    channel.emit('chat', msg)
+    sendJsonWithTopic('chat', msg)
 }
 
 export const sendPlayerInteraction = (channel_id, interaction) => {

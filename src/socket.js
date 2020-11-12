@@ -4,7 +4,7 @@ import { Sm64JsMsg, PingMsg } from "../proto/mario_pb"
 
 const url = new URL(window.location.href)
 
-const websocketServerPath = `ws://${url.hostname}:3000`
+const websocketServerPath = `ws://${url.hostname}:3000/ws/`
 const socket = new WebSocket(websocketServerPath)
 
 export const networkData = {

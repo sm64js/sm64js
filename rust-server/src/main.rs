@@ -157,7 +157,12 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(server.clone())
             .wrap(middleware::Logger::default())
-            .service(web::resource("/").route(web::get().to(ws_index)))
+            .service(web::resource("/ws/").to(ws_index))
+            .service(
+                actix_files::Files::new("/", "./dist")
+                    .show_files_listing()
+                    .index_file("index.html"),
+            )
     })
     .bind("0.0.0.0:3000")?
     .run()

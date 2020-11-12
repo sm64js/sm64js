@@ -13,11 +13,6 @@ name: Rust Server Audit
 jobs:
   ci:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        rust:
-          - stable
 
     steps:
       - uses: actions/checkout@v2
@@ -27,7 +22,7 @@ jobs:
         name: Install Toolchain
         with:
           profile: minimal
-          toolchain: ${{ matrix.rust }}
+          toolchain: nightly-2020-10-23
           override: true
 
       - uses: actions-rs/cargo@v1

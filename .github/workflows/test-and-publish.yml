@@ -51,7 +51,7 @@ jobs:
           mkdir -p $HOME/.local/bin
           curl -L "$LINK/$SCCACHE_VERSION/$SCCACHE_FILE.tar.gz" | tar xz
           mv -f $SCCACHE_FILE/sccache $HOME/.local/bin/sccache
-          echo "::add-path::$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
           
       - name: Start sccache server
         run: |
@@ -102,10 +102,6 @@ jobs:
         run: |
           mkdir sccache
           sudo mount -o bind /home/runner/.cache/sccache sccache
-
-      - name: Start sccache server
-        run: |
-          sccache --start-server
 
       - name: Deploy to Docker Hub
         env:

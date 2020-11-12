@@ -52,6 +52,7 @@ RUN mkdir -p $HOME/.local/bin; \
     curl -L "$LINK/$SCCACHE_VERSION/$SCCACHE_FILE.tar.gz" | tar xz
 RUN mv -f /sm64js/$SCCACHE_FILE/sccache /usr/bin/sccache
 COPY sccache sccache
+RUN sccache --start-server
 
 # copy files for dependency compilation
 COPY ./Cargo.toml ./Cargo.toml

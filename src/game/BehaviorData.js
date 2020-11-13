@@ -3,8 +3,10 @@ import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectList
 import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
+import { bhv_pole_init, bhv_giant_pole_loop } from "./behaviors/pole.inc"
 import { bhv_castle_flag_init } from "./behaviors/bhv_castle_flag_init.inc"
 import { castle_grounds_seg7_anims_flags } from "../levels/castle_grounds/areas/1/11/anim.inc"
+
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
 const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -48,6 +50,36 @@ export const bhvTree = [
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.set_int, args: { field: oInteractType, value: Interact.INTERACT_POLE } },
     { command: BhvCmds.set_hitbox, args: { radius: 80, height: 500 } },
+    { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_pole_base_loop } },
+    { command: BhvCmds.end_loop },
+]
+
+export const bhvYellowBall = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.cyclboard },
+    { command: BhvCmds.break },
+]
+
+export const bhvGiantPole = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.set_int, args: { field: oInteractType, value: Interact.INTERACT_POLE } },
+    { command: BhvCmds.set_hitbox, args: { radius: 80, height: 2100 } },
+    { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_giant_pole_loop } },
+    { command: BhvCmds.end_loop },
+]
+
+export const bhvPoleGrabbing = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.set_int, args: { field: oInteractType, value: Interact.INTERACT_POLE } },
+    { command: BhvCmds.set_hitbox, args: { radius: 80, height: 1500 } },
+	{ command: BhvCmds.call_native, args: { func: bhv_pole_init } },
     { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_pole_base_loop } },

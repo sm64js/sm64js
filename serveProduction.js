@@ -71,7 +71,7 @@ const processPlayerData = (channel_id, decodedMario) => {
 
     /// Data is Valid
     allChannels[channel_id].decodedMario = decodedMario
-    allChannels[channel_id].valid = 30
+    allChannels[channel_id].valid = 100
 
 }
 

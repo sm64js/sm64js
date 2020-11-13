@@ -185,10 +185,10 @@ upstream {{ $.APP }}-{{ $upstream_port }} {
   server {{ $listener_ip }}:{{ $upstream_port }};{{ end }}
 }
 {{ end }}
-upstream {{ $.APP }}-5001 {
+upstream {{ $.APP }}-3000 {
 {{ range $listeners := $.DOKKU_APP_WEB_LISTENERS | split " " }}
 {{ $listener_list := $listeners | split ":" }}
 {{ $listener_ip := index $listener_list 0 }}
-  server {{ $listener_ip }}:5001;{{ end }}
+  server {{ $listener_ip }}:3000;{{ end }}
 }
 {{ end }}

@@ -1,18 +1,19 @@
-on:
-  push:
-    paths:
-      - "rust-server/**/*"
-      - ".github/workflows/test-and-publish.yml"
-  pull_request:
-    paths:
-      - "rust-server/**/*"
-      - ".github/workflows/test-and-publish.yml"
+on: [push, pull_request]
 
 name: Rust Server Test & Publish
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    # TODO run Rust stuff conditionally
+    # push:
+    #   paths:
+    #     - "rust-server/**/*"
+    #     - ".github/workflows/test-and-publish.yml"
+    # pull_request:
+    #   paths:
+    #     - "rust-server/**/*"
+    #     - ".github/workflows/test-and-publish.yml"
 
     env:
       RUST_BACKTRACE: full

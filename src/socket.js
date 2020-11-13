@@ -1,13 +1,30 @@
 import { RootMsg, Sm64JsMsg  } from "../proto/mario_pb"
 import zlib from "zlib"
-import geckos from '@geckos.io/client'
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
 
-const url = new URL(window.location.href)
-const port = url.protocol == "https:" ? 443 : 9208
+const myArrayBuffer = () => {
+    return new Promise((resolve) => {
+        let fr = new FileReader()
+        fr.onload = () => { resolve(fr.result) }
+        fr.readAsArrayBuffer(this)
+    })
+}
 
-const channel = geckos({ port })
+File.prototype.arrayBuffer = File.prototype.arrayBuffer || myArrayBuffer
+Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
+
+const url = new URL(window.location.href)
+
+let websocketServerPath = ""
+
+if (url.protocol == "https:") {
+    websocketServerPath = `wss://${url.hostname}/websocket/`
+} else {
+    websocketServerPath = `ws://${url.hostname}:3000`
+}
+
+const channel = new WebSocket(websocketServerPath)
 
 const sanitizeChat = (string, isMessage) => {
     string = string.replace(/</g, "");
@@ -41,13 +58,10 @@ const sendJsonWithTopic = (topic, msg) => {
     let bytes = text.encoder.encode(str)
     const rootMsg = new RootMsg()
     rootMsg.setJsonBytesMsg(bytes)
-    channel.raw.emit(rootMsg.serializeBinary())
+    channel.send(rootMsg.serializeBinary())
 }
 
-/*const sendData = (bytes) => {
-    if (bytes.length == undefined) bytes = Buffer.from(bytes)
-    channel.raw.emit(bytes)
-}*/
+const sendData = (bytes) => { channel.send(bytes) }
 
 const text = {
     decoder: new TextDecoder(),
@@ -97,15 +111,11 @@ const recvChat = (chatmsg) => {
 
 }
 
-channel.onConnect((err) => {
+channel.onopen = () => {
 
-    if (err) { console.log(err); return }
-
-    channel.readyState = 1
-
-    channel.onRaw(async (message) => {
+    channel.onmessage = async (message) => {
         let sm64jsMsg
-        let bytes = new Uint8Array(message)
+        let bytes = new Uint8Array(await message.data.arrayBuffer())
         const rootMsg = RootMsg.deserializeBinary(bytes)
 
         switch (rootMsg.getMessageCase()) {
@@ -145,14 +155,13 @@ channel.onConnect((err) => {
                 break
             case RootMsg.MessageCase.MESSAGE_NOT_SET:
             default:
-                throw new Error(`unhandled case in switch expression: ${rootMsg.getMessageCase()}`)
+                throw new Error(`unhandled case in rootMsg switch expression: ${rootMsg.getMessageCase()}`)
         }
+    }
 
+    channel.onclose = () => { window.latency = null }
+}
 
-    })
-
-    channel.onDisconnect(() => { channel.readyState = 0; window.latency = null })
-})
 
 const multiplayerReady = () => {
     return channel && channel.readyState == 1 && gameData.marioState && networkData.myChannelID != -1
@@ -200,7 +209,7 @@ export const post_main_loop_one_iteration = (frame) => {
             sm64jsMsg.setMarioMsg(Multi.createMarioProtoMsg())
             const rootMsg = new RootMsg()
             rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-            channel.raw.emit(rootMsg.serializeBinary())
+            sendData(rootMsg.serializeBinary())
         }
     }
 

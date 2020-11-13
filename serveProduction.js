@@ -5,15 +5,8 @@ const got = require('got')
 const util = require('util')
 const zlib = require('zlib')
 const deflate = util.promisify(zlib.deflate)
-const port = 9208
-const { iceServers } = require('@geckos.io/server')
-const geckos = require('@geckos.io/server').default({
-    portRange: {
-        min: 10000,
-        max: 12000
-    },
-    iceServers
-})
+const port = 80
+const ws_port = 3000
 
 const allChannels = {}
 const stats = {}
@@ -34,7 +27,7 @@ const sendJsonWithTopic = (topic, msg, channel) => {
     let bytes = text.encoder.encode(str)
     const rootMsg = new RootMsg()
     rootMsg.setJsonBytesMsg(bytes)
-    channel.raw.emit(rootMsg.serializeBinary())
+    channel.send(rootMsg.serializeBinary(), true)
 }
 
 const broadcastJsonWithTopic = (topic, msg) => {
@@ -42,15 +35,14 @@ const broadcastJsonWithTopic = (topic, msg) => {
     let bytes = text.encoder.encode(str)
     const rootMsg = new RootMsg()
     rootMsg.setJsonBytesMsg(bytes)
-    geckos.raw.emit(rootMsg.serializeBinary())
+    bytes = rootMsg.serializeBinary()
+    Object.values(allChannels).forEach(s => { s.channel.send(bytes, true) })
 }
 
+const sendData = (bytes, channel) => { channel.send(bytes, true) }
 
 const broadcastData = (bytes, channel) => {
-    if (bytes.length == undefined) bytes = Buffer.from(bytes)
-    if (channel) channel.raw.broadcast.emit(newbytes)
-    else geckos.raw.emit(bytes)
-
+    Object.values(allChannels).forEach(s => { s.channel.send(bytes, true) })
 }
 
 const sendValidUpdate = () => {
@@ -200,7 +192,6 @@ const sendSkinsIfUpdated = () => {
 
 
 /// Every frame - 30 times per second
-let marioListCounter = 0
 setInterval(async () => {
     Object.values(allChannels).forEach(data => {
         if (data.valid > 0) data.valid--
@@ -245,31 +236,22 @@ setInterval(() => {
 /// Every 10 seconds
 setInterval(() => {
 
-    /// ping to measure latency
-/*    Object.values(allChannels).forEach(data => {
-        const msg = new TextEncoder("utf-8").encode(JSON.stringify({ time: process.hrtime() }))
-        sendDataWithOpcode(msg, 99, data.channel)
-    })*/
-
     sendSkinsIfUpdated()
 
 }, 10000)
 
-// const measureAndPrintLatency = (msgBytes) => {
-//     const time = JSON.parse(new TextDecoder("utf-8").decode(msgBytes)).time
-//     const hrend = process.hrtime(time)
-//     //console.info('Latency: %ds %dms', hrend[0], hrend[1] / 1000000)
-// }
 
-geckos.onConnection(channel => {
+require('uWebSockets.js').App().ws('/*', {
 
-    channel.my_id = generateID()
-    allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }
-    sendJsonWithTopic('id', { id: channel.my_id }, channel)
+    open: async (channel) => {
+        channel.my_id = generateID()
+        allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }
+        sendJsonWithTopic('id', { id: channel.my_id }, channel)
 
-    sendSkinsToChannel(channel)
+        sendSkinsToChannel(channel)
+    },
 
-    channel.onRaw(bytes => {
+    message: async (channel, bytes) => {
         try {
             let sm64jsMsg
             const rootMsg = RootMsg.deserializeBinary(bytes)
@@ -292,7 +274,7 @@ geckos.onConnection(channel => {
                     switch (topic) {
                         case 'chat': processChat(channel.my_id, msg); break
                         case 'skin': processSkin(channel.my_id, msg); break
-                        case 'ping': channel.raw.emit(bytes);  break
+                        case 'ping': sendData(bytes, channel); break
                         default: throw "Unknown topic in json message"
                     }
                     break
@@ -303,14 +285,13 @@ geckos.onConnection(channel => {
 
 
         } catch (err) { console.log(err) }
-    })
+    },
 
-    channel.onDisconnect(() => {
+    close: (channel) => {
         delete allChannels[channel.my_id]
-    })
-})
+    }
 
-
+}).listen(ws_port, () => { console.log("Starting websocket server " + ws_port) })
 
 
 //// Express Static serving
@@ -319,8 +300,7 @@ const app = express()
 const server = http.Server(app)
 app.use(express.static(__dirname + '/dist'))
 
-geckos.addServer(server)
-server.listen(port, () => { console.log(' Listening to combined servers at ' + port) })
+server.listen(port, () => { console.log('Serving Files with express server ' + port) })
 
 
 /////// necessary for server side rom extraction

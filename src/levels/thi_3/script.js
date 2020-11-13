@@ -6,7 +6,7 @@ import { thi_seg7_area_3_collision } from "./areas/3/collision.inc"
 
 export const level_thi_area_3_entry = [
     { command: LevelCommands.init_level },
-    { command: LevelCommands.init_mario, args: [1, 1, bhvMario] },
+    { command: LevelCommands.init_mario, args: [3, 1, bhvMario] },
     { command: LevelCommands.begin_area, args: [3, thi_geo_00079C] },
     { command: LevelCommands.terrain, args: [thi_seg7_area_3_collision] },
     { command: LevelCommands.end_area },

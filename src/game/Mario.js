@@ -18,7 +18,7 @@ import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
 import { mario_execute_cutscene_action } from "./MarioActionsCutscene"
 import { gameData as socketGameData } from "../socket"
 import { int16, sins, coss } from "../utils"
-import { LEVEL_CCM, LEVEL_TTM } from "../levels/level_defines_constants"
+import { LEVEL_CCM, LEVEL_TTM, LEVEL_WF } from "../levels/level_defines_constants"
 
 ////// Mario Constants
 export const ANIM_FLAG_NOLOOP = (1 << 0) // 0x01
@@ -912,6 +912,10 @@ const warp_death_plane = (m) => {
         }
         case (LEVEL_TTM): { // TTM
             if (m.pos[1] <= -7230.0) m.pos = [102, -4332, 5734]
+            break
+        }
+        case (LEVEL_WF): { // TTM
+            if (m.pos[1] <= -2000.0) m.pos = [2600, 1256, 5120]
             break
         }
         default: {

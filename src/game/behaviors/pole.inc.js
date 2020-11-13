@@ -15,9 +15,8 @@ export const bhv_giant_pole_loop = () => {
 	const o = ObjectListProc.gCurrentObject
 	var topBall = null;
 	if (o.rawData[oTimer] == 0) {
-		//topBall = spawn_object(o, MODEL_YELLOW_SPHERE, bhvYellowBall) 
-		//topBall.rawData[oPosY] += o.hitboxHeight + 50.0
-		console.log(spawn_object(o, MODEL_YELLOW_SPHERE, bhvYellowBall));
+		topBall = spawn_object(o, MODEL_YELLOW_SPHERE, bhvYellowBall) 
+		topBall.rawData[oPosY] += o.hitboxHeight + 50.0
 	}
 	bhv_pole_base_loop()
 }

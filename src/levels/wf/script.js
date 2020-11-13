@@ -86,7 +86,6 @@ export const level_wf_entry = [
 	{ command: LevelCommands.place_object, args: [0x1F, MODEL_LEVEL_GEOMETRY_0A, 3840,  794,  2688, 0,0,0, 0x00000000, bhvStaticObject] },
 	{ command: LevelCommands.place_object, args: [0x1F, MODEL_LEVEL_GEOMETRY_0C, 1408, 2522,  2431, 0,0,0, 0x00000000, bhvStaticObject] },
 	{ command: LevelCommands.place_object, args: [0x1F, MODEL_WF_GIANT_POLE    ,-2560, 2560,  -256, 0,0,0, 0x00000000, bhvGiantPole   ] },
-	{ command: LevelCommands.place_object, args: [0x1F, MODEL_YELLOW_SPHERE    ,-2560, 2660,  -256, 0,0,0, 0x00000000, bhvYellowBall   ] },
 	{ command: LevelCommands.place_object, args: [0x1F, MODEL_NONE             ,-2495, 1331,  -256, 0,0,0, 0x003D0000, bhvPoleGrabbing] },
     { command: LevelCommands.terrain, args: [wf_seg7_collision_070102D8] },
     { command: LevelCommands.end_area },

@@ -26,6 +26,36 @@ export const spawn_object_abs_with_rot = (parent, model, behavior, x, y, z, rx, 
     return newObj
 }
 
+export const spawn_object = (parent, model, behavior) => {
+    const obj = spawn_object_at_origin(parent, model, behavior)
+    obj_copy_pos_and_angle(obj, parent)
+    return obj
+}
+
+export const obj_copy_pos_and_angle = (dst, src) => {
+
+    obj_copy_pos(dst, src)
+    obj_copy_angle(dst, src)
+}
+
+export const obj_copy_angle = (dst, src) => {
+
+    dst.rawData[oFaceAnglePitch] = src.rawData[oFaceAnglePitch]
+    dst.rawData[oFaceAngleYaw] = src.rawData[oFaceAngleYaw]
+    dst.rawData[oFaceAngleRoll] = src.rawData[oFaceAngleRoll]
+
+    dst.rawData[oMoveAnglePitch] = src.rawData[oMoveAnglePitch]
+    dst.rawData[oMoveAngleYaw] = src.rawData[oMoveAngleYaw]
+    dst.rawData[oMoveAngleRoll] = src.rawData[oMoveAngleRoll]
+}
+
+export const obj_copy_pos = (dst, src) => {
+
+    dst.rawData[oPosX] = src.rawData[oPosX]
+    dst.rawData[oPosY] = src.rawData[oPosY]
+    dst.rawData[oPosZ] = src.rawData[oPosZ]
+}
+
 export const obj_set_pos = (obj, x, y, z) => {
 
     obj.rawData[oPosX] = x

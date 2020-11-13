@@ -1,6 +1,6 @@
-FROM node:13-alpine
+FROM node:13
 
-RUN apk update && apk add gcc libc-dev python3 bash git
+RUN apt-get update && apt-get update gcc libc-dev python3 bash
 
 RUN mkdir -p /usr/src/app
 

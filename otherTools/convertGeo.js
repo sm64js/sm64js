@@ -4,11 +4,11 @@ const fs = require('fs')
 //You no longer need to touch snum or num, it checks if the files exist.
 
 // Configure these variables to get it to work
-var level = "ccm" // level name in sm64ex directory
+var level = "wf" // level name in sm64ex directory
 var baseGeo = true // whether you're converting the base geo.inc or one within a model directory
 var snum = 1 // used as a counter variable (Keep 1!)
 var num = 32 // number of model.inc.js files there are
-var areaNum = 2 // target area number
+var areaNum = 1 // target area number
 var mainDir = __dirname + '/converted/' + level + '/areas/' + areaNum + '/' // directory to put models in
 
 //Not sure whether we need to skip commands.
@@ -84,7 +84,7 @@ function ReadFile(input) {
 	var lines = lines.filter(line => (line.length != 0) && (line[0] != '/'))
 	return lines;
 }
-function CompileGeo(lines,AreaDir) {
+function CompileGeo(lines,AreaDir,isBase = false) {
 	var LoadCamera = false
 	var LoadSkybox = false
 	var outputStr = ""
@@ -142,7 +142,7 @@ function CompileGeo(lines,AreaDir) {
 				LoadCamera = true
 				const cFrFu = lineParse.trim().slice(29, lineParse.trim().indexOf('),'))
 				const ArrayArgs = cFrFu.split(', ')
-				outputStr += `{ command: Geo.node_perspective, args: [${ArrayArgs[0]}, ${ArrayArgs[1]}, ${ArrayArgs[2]}, Camera.${ArrayArgs[3]}] }\n`
+				outputStr += `{ command: Geo.node_perspective, args: [${ArrayArgs[0]}, ${ArrayArgs[1]}, ${ArrayArgs[2]}, Camera.${ArrayArgs[3]}] },\n`
 			} else if (lineParse.trim().slice(0, 14) == 'GEO_BACKGROUND') { //dl
 				LoadSkybox = true
 				const background = lineParse.trim().slice(15, lineParse.trim().indexOf('),'))
@@ -166,9 +166,12 @@ function CompileGeo(lines,AreaDir) {
 	outputStr = outputStr.replace(/\.l/g, ".l[0]")
 
 	outputStr = AdditionalFiles + outputStr
-	if (LoadSkybox) {outputStr = 'import { geo_skybox_main } from "../../../../game/LevelGeo"\n' + outputStr}
-	if (LoadCamera) {outputStr = 'import { CameraInstance as Camera } from "../../../../game/Camera"\n' + outputStr}
-	outputStr = 'import { GeoLayoutInstance as Geo } from "../../../../../engine/GeoLayout"\n' + outputStr	
+	if (LoadSkybox && !isBase) {outputStr = 'import { geo_skybox_main } from "../../../../game/LevelGeo"\n' + outputStr}
+	if (LoadSkybox && isBase) {outputStr = 'import { geo_skybox_main } from "../../../game/LevelGeo"\n' + outputStr}
+	if (LoadCamera && !isBase) {outputStr = 'import { CameraInstance as Camera } from "../../../../game/Camera"\n' + outputStr}
+	if (LoadCamera && isBase) {outputStr = 'import { CameraInstance as Camera } from "../../../game/Camera"\n' + outputStr}
+	if (!isBase)outputStr = 'import { GeoLayoutInstance as Geo } from "../../../../../engine/GeoLayout"\n' + outputStr	
+	if (isBase)outputStr = 'import { GeoLayoutInstance as Geo } from "../../../engine/GeoLayout"\n' + outputStr	
 	return outputStr;
 }
 

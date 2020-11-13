@@ -1,3 +1,26 @@
+export const MODEL_NONE                            = 0x00
+
+export const MODEL_LEVEL_GEOMETRY_03               = 0x03
+export const MODEL_LEVEL_GEOMETRY_04               = 0x04
+export const MODEL_LEVEL_GEOMETRY_05               = 0x05
+export const MODEL_LEVEL_GEOMETRY_06               = 0x06
+export const MODEL_LEVEL_GEOMETRY_07               = 0x07
+export const MODEL_LEVEL_GEOMETRY_08               = 0x08
+export const MODEL_LEVEL_GEOMETRY_09               = 0x09
+export const MODEL_LEVEL_GEOMETRY_0A               = 0x0A
+export const MODEL_LEVEL_GEOMETRY_0B               = 0x0B
+export const MODEL_LEVEL_GEOMETRY_0C               = 0x0C
+export const MODEL_LEVEL_GEOMETRY_0D               = 0x0D
+export const MODEL_LEVEL_GEOMETRY_0E               = 0x0E
+export const MODEL_LEVEL_GEOMETRY_0F               = 0x0F
+export const MODEL_LEVEL_GEOMETRY_10               = 0x10
+export const MODEL_LEVEL_GEOMETRY_11               = 0x11
+export const MODEL_LEVEL_GEOMETRY_12               = 0x12
+export const MODEL_LEVEL_GEOMETRY_13               = 0x13
+export const MODEL_LEVEL_GEOMETRY_14               = 0x14
+export const MODEL_LEVEL_GEOMETRY_15               = 0x15
+export const MODEL_LEVEL_GEOMETRY_16               = 0x16
+
 export const MODEL_BOB_BUBBLY_TREE                 = 0x17        // bubbly_tree_geo
 export const MODEL_WDW_BUBBLY_TREE                 = 0x17        // bubbly_tree_geo
 export const MODEL_CASTLE_GROUNDS_BUBBLY_TREE      = 0x17        // bubbly_tree_geo
@@ -34,27 +57,9 @@ export const MODEL_WF_TOWER_TRAPEZOID_PLATORM      = 0x2C        // wf_geo_000AF
 export const MODEL_WF_TOWER_SQUARE_PLATORM         = 0x2D        // wf_geo_000B10
 export const MODEL_WF_TOWER_SQUARE_PLATORM_UNUSED  = 0x2E        // wf_geo_000B38 - unused & duplicated
 export const MODEL_WF_TOWER_SQUARE_PLATORM_ELEVATO = 0x2F        // wf_geo_000B60 - elevator platorm
+export const MODEL_WF_GIANT_POLE                   = MODEL_LEVEL_GEOMETRY_0D        // wf_geo_000B60 - elevator platorm
 
-export const MODEL_LEVEL_GEOMETRY_03               = 0x03
-export const MODEL_LEVEL_GEOMETRY_04               = 0x04
-export const MODEL_LEVEL_GEOMETRY_05               = 0x05
-export const MODEL_LEVEL_GEOMETRY_06               = 0x06
-export const MODEL_LEVEL_GEOMETRY_07               = 0x07
-export const MODEL_LEVEL_GEOMETRY_08               = 0x08
-export const MODEL_LEVEL_GEOMETRY_09               = 0x09
-export const MODEL_LEVEL_GEOMETRY_0A               = 0x0A
-export const MODEL_LEVEL_GEOMETRY_0B               = 0x0B
-export const MODEL_LEVEL_GEOMETRY_0C               = 0x0C
-export const MODEL_LEVEL_GEOMETRY_0D               = 0x0D
-export const MODEL_LEVEL_GEOMETRY_0E               = 0x0E
-export const MODEL_LEVEL_GEOMETRY_0F               = 0x0F
-export const MODEL_LEVEL_GEOMETRY_10               = 0x10
-export const MODEL_LEVEL_GEOMETRY_11               = 0x11
-export const MODEL_LEVEL_GEOMETRY_12               = 0x12
-export const MODEL_LEVEL_GEOMETRY_13               = 0x13
-export const MODEL_LEVEL_GEOMETRY_14               = 0x14
-export const MODEL_LEVEL_GEOMETRY_15               = 0x15
-export const MODEL_LEVEL_GEOMETRY_16 = 0x16
+export const MODEL_YELLOW_SPHERE                   = 0x55        // yellow_sphere_geo
 
 // castle grounds
 export const MODEL_CASTLE_GROUNDS_VCUTM_GRILL       =   0x36

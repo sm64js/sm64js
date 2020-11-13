@@ -220,7 +220,7 @@ class LevelCommands {
         }
         this.sCurrentScript.index++
     }
-
+	//  { command: LevelCommands.place_object, args: [ACT, MODEL, X,Y,Z, P,Y,R, BHARG, BHSCRIPT] },
     place_object(args) {
 
         const val7 = 1 << (Area.gCurrActNum - 1)

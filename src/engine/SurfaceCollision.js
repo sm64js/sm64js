@@ -39,10 +39,10 @@ class SurfaceCollision {
             return numCollisions
         }
 
-        // World (level) consists of a 16x16 grid. Find where the collision is on
+        // World (level) consists of a 16x16 (upgraded to 32x32) grid. Find where the collision is on
         // the grid (round toward -inf)
-        const cellX = parseInt((x + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0xF
-        const cellZ = parseInt((z + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0xF
+        const cellX = parseInt((x + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0x1F
+        const cellZ = parseInt((z + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0x1F
 
         const node = SurfaceLoad.gStaticSurfacePartition[cellZ][cellX][SurfaceLoad.SPATIAL_PARTITION_WALLS].next
         numCollisions += this.find_wall_collisions_from_list(node, colData)
@@ -70,8 +70,8 @@ class SurfaceCollision {
         }
 
         // Each level is split into cells to limit load, find the appropriate cell
-        const cellX = parseInt((x + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0xF
-        const cellZ = parseInt((z + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0xF
+        const cellX = parseInt((x + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0x1F
+        const cellZ = parseInt((z + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0x1F
 
         const surfaceList = SurfaceLoad.gStaticSurfacePartition[cellZ][cellX][SurfaceLoad.SPATIAL_PARTITION_CEILS].next
         const heightWrapper = { height }
@@ -97,8 +97,8 @@ class SurfaceCollision {
         }
 
         // Each level is split into cells to limit load, find the appropriate cell.
-        const cellX = parseInt((x + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0xF
-        const cellZ = parseInt((z + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0xF
+        const cellX = parseInt((x + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0x1F
+        const cellZ = parseInt((z + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0x1F
 
         const surfaceList = SurfaceLoad.gStaticSurfacePartition[cellZ][cellX][SurfaceLoad.SPATIAL_PARTITION_FLOORS].next
         const heightWrapper = { height }

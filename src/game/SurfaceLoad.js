@@ -9,8 +9,8 @@ class SurfaceLoad {
         this.SPATIAL_PARTITION_CEILS = 1
         this.SPATIAL_PARTITION_WALLS = 2
 
-        this.gStaticSurfacePartition = new Array(16).fill(0).map(() => new Array(16).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
-        this.gDynamicSurfacePartition = new Array(16).fill(0).map(() => new Array(16).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
+        this.gStaticSurfacePartition = new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
+        this.gDynamicSurfacePartition = new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
 
     }
 
@@ -86,16 +86,18 @@ class SurfaceLoad {
 
     lower_cell_index(coord) {
         // Move from range [-0x2000, 0x2000) to [0, 0x4000)
-        coord += 0x2000
+
+        // Move from range [-0x4000, 0x4000) to [0, 0x8000)
+        coord += Surfaces.LEVEL_BOUNDARY_MAX
         if (coord < 0) { coord = 0 }
 
         // [0, 16)
-        let index = Math.floor(coord / 0x400)
+        let index = Math.floor(coord / Surfaces.CELL_SIZE)
 
         // Include extra cell if close to boundary
         //! Some wall checks are larger than the buffer, meaning wall checks can
         //  miss walls that are near a cell border.
-        if (coord % 0x400 < 50) { index -= 1 }
+        if (coord % Surfaces.CELL_SIZE < 50) { index -= 1 }
 
         if (index < 0) { index = 0 }
 
@@ -105,18 +107,18 @@ class SurfaceLoad {
 
     upper_cell_index(coord) {
         // Move from range [-0x2000, 0x2000) to [0, 0x4000)
-        coord += 0x2000
+        coord += Surfaces.LEVEL_BOUNDARY_MAX
         if (coord < 0) { coord = 0 }
 
         // [0, 16)
-        let index = Math.floor(coord / 0x400)
+        let index = Math.floor(coord / Surfaces.CELL_SIZE)
 
         // Include extra cell if close to boundary
         //! Some wall checks are larger than the buffer, meaning wall checks can
         //  miss walls that are near a cell border.
-        if (coord % 0x400 > 0x400 - 50) { index += 1 }
+        if (coord % Surfaces.CELL_SIZE > Surfaces.CELL_SIZE - 50) { index += 1 }
 
-        if (index > 15) { index = 15 }
+        if (index > 31) { index = 31 }
 
         // Potentially < 0, but since lower index is >= 0, not exploitable
         return index

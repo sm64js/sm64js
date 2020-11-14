@@ -5,7 +5,7 @@ export const TERRAIN_LOAD_OBJECTS = 0x0043
 export const TERRAIN_LOAD_ENVIRONMENT = 0x0044 // Loads water/HMC gas
 
 
-export const LEVEL_BOUNDARY_MAX = 0x2000
+export const LEVEL_BOUNDARY_MAX = 0x4000
 export const CELL_SIZE          = 0x400
 
 // Surface Types

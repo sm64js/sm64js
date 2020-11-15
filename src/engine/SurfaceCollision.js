@@ -3,11 +3,11 @@ import { SurfaceLoadInstance as SurfaceLoad } from "../game/SurfaceLoad"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
 import { SpawnObjectInstance as Spawn } from "../game/SpawnObject"
 
+import { BOUNDS_EXTENSION, LEVEL_BOUNDARY_EXTENDED_MAX } from "../include/extend_bounds"
 
 class SurfaceCollision {
     constructor() {
         Spawn.SurfaceCollision = this
-        ObjectListProcessor.SurfaceCollision = this
     }
 
     find_floor_height_and_data(xPos, yPos, zPos, floorGeo) {
@@ -18,7 +18,7 @@ class SurfaceCollision {
             floorGeo.normalX = floorWrapper.floor.normal.x
             floorGeo.normalY = floorWrapper.floor.normal.y
             floorGeo.normalZ = floorWrapper.floor.normal.z
-            floorGeo.originOffset = floorWrapper.floor.originOffset
+            floorGeo.originOffset = floorWrapper.floor.originOffset * BOUNDS_EXTENSION
         }
 
         return floorHeight
@@ -28,8 +28,8 @@ class SurfaceCollision {
 
         let numCollisions = 0
 
-        const x = parseInt(colData.x)
-        const z = parseInt(colData.z)
+        const x = parseInt(colData.x) / BOUNDS_EXTENSION
+        const z = parseInt(colData.z) / BOUNDS_EXTENSION
 
         colData.numWalls = 0
 
@@ -57,9 +57,9 @@ class SurfaceCollision {
     find_ceil(posX, posY, posZ, ceilWrapper) {
         let height = 20000.0
 
-        const x = parseInt(posX)
+        const x = parseInt(posX) / BOUNDS_EXTENSION
         const y = parseInt(posY)
-        const z = parseInt(posZ)
+        const z = parseInt(posZ) / BOUNDS_EXTENSION
 
         ceilWrapper.ceil = null
 
@@ -84,9 +84,9 @@ class SurfaceCollision {
     find_floor(xPos, yPos, zPos, floorWrapper) {
         let height = -11000.0
 
-        const x = parseInt(xPos)
+        const x = parseInt(xPos) / BOUNDS_EXTENSION
         const y = parseInt(yPos)
-        const z = parseInt(zPos)
+        const z = parseInt(zPos) / BOUNDS_EXTENSION
 
         floorWrapper.floor = null
 
@@ -111,9 +111,9 @@ class SurfaceCollision {
 
     find_wall_collisions_from_list(surfaceNode, data) {
 
-        let radius = data.radius
+        let radius = data.radius / BOUNDS_EXTENSION
         let numCols = 0
-        const x = data.x, y = data.y + data.offsetY, z = data.z
+        const x = data.x / BOUNDS_EXTENSION, y = (data.y + data.offsetY) / BOUNDS_EXTENSION, z = data.z / BOUNDS_EXTENSION
         data.walls = []
 
         if (radius > 200.0) radius = 200.0
@@ -175,8 +175,8 @@ class SurfaceCollision {
 
             //! (Wall Overlaps) Because this doesn't update the x and z local variables,
             //  multiple walls can push mario more than is required.
-            data.x += surf.normal.x * (radius - offset)
-            data.z += surf.normal.z * (radius - offset)
+            data.x += surf.normal.x * (radius - offset) * BOUNDS_EXTENSION
+            data.z += surf.normal.z * (radius - offset) * BOUNDS_EXTENSION
 
             //! (Unreferenced Walls) Since this only returns the first four walls,
             //  this can lead to wall interaction being missed. Typically unreferenced walls
@@ -233,7 +233,7 @@ class SurfaceCollision {
             }
 
             // Find the ceil height at the specific point.
-            const height = -(x * nx + nz * z + oo) / ny
+            const height = -(x * nx + nz * z + oo) / ny * BOUNDS_EXTENSION
 
             // Checks for ceiling interaction with a 78 unit buffer.
             //! (Exposed Ceilings) Because any point above a ceiling counts
@@ -290,7 +290,7 @@ class SurfaceCollision {
             }
 
             // Find the height of the floor at a given location.
-            const height = -(x * nx + nz * z + oo) / ny
+            const height = -(x * nx + nz * z + oo) / ny * BOUNDS_EXTENSION
             // Checks for floor interaction with a 78 unit buffer.
             if (y - (height + -78.0) < 0.0) { continue }
 

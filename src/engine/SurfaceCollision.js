@@ -8,6 +8,7 @@ import { BOUNDS_EXTENSION, LEVEL_BOUNDARY_EXTENDED_MAX } from "../include/extend
 class SurfaceCollision {
     constructor() {
         Spawn.SurfaceCollision = this
+        ObjectListProcessor.SurfaceCollision = this
     }
 
     find_floor_height_and_data(xPos, yPos, zPos, floorGeo) {

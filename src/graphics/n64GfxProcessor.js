@@ -866,7 +866,7 @@ export class n64GfxProcessor {
 
     sp_vertex(dest_index, vertices) {
 
-        for (let i = 0; i < vertices.length; i++, dest_index++) {
+        for (let i = dest_index; i < vertices.length; i++) {
 
             const v = vertices[i]
             const normal = [
@@ -874,7 +874,7 @@ export class n64GfxProcessor {
                 v.color[1] > 127 ? v.color[1] - 256 : v.color[1],
                 v.color[2] > 127 ? v.color[2] - 256 : v.color[2]
             ]
-            const d = this.rsp.loaded_vertices[dest_index]
+            const d = this.rsp.loaded_vertices[i]
 
             const x = v.pos[0] * this.rsp.MP_matrix[0][0] + v.pos[1] * this.rsp.MP_matrix[1][0] + v.pos[2] * this.rsp.MP_matrix[2][0] + this.rsp.MP_matrix[3][0]
             const y = v.pos[0] * this.rsp.MP_matrix[0][1] + v.pos[1] * this.rsp.MP_matrix[1][1] + v.pos[2] * this.rsp.MP_matrix[2][1] + this.rsp.MP_matrix[3][1]

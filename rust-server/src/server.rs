@@ -141,17 +141,15 @@ impl Sm64JsServer {
 pub struct Client {
     addr: Recipient<Message>,
     data: Option<MarioMsg>,
-    // valid: u8,
-    myid: u32,
+    channel_id: u32,
 }
 
 impl Client {
-    pub fn new(addr: Recipient<Message>, myid: u32) -> Self {
+    pub fn new(addr: Recipient<Message>, channel_id: u32) -> Self {
         Client {
             addr,
             data: None,
-            // valid: 0,
-            myid: myid,
+            channel_id,
         }
     }
 
@@ -159,10 +157,9 @@ impl Client {
         if data.player_name.len() < 3 || data.player_name.len() > 14 {
             return;
         }
-        data.channel_id = self.myid;
+        data.channel_id = self.channel_id;
 
         self.data = Some(data);
-        // self.valid = 30;
     }
 
     pub fn send(&self, msg: Message) -> Result<()> {

@@ -28,6 +28,7 @@ async fn ws_index(
 pub struct Sm64JsWsSession {
     id: u32,
     hb: Instant,
+    hb_data: Option<Instant>,
     addr: Addr<server::Sm64JsServer>,
 }
 
@@ -84,6 +85,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                         ctx.binary(msg);
                     }
                     Some(sm64_js_msg::Message::MarioMsg(mario_msg)) => {
+                        self.hb_data = Some(Instant::now());
                         self.addr.do_send(server::SetData {
                             id: self.id,
                             data: mario_msg,
@@ -112,6 +114,7 @@ impl Sm64JsWsSession {
         Self {
             id: 0,
             hb: Instant::now(),
+            hb_data: None,
             addr,
         }
     }
@@ -121,16 +124,22 @@ impl Sm64JsWsSession {
     /// also this method checks heartbeats from client
     fn hb(&self, ctx: &mut <Self as Actor>::Context) {
         ctx.run_interval(HEARTBEAT_INTERVAL, |act, ctx| {
-            // check client heartbeats
             if Instant::now().duration_since(act.hb) > CLIENT_TIMEOUT {
-                // heartbeat timed out
                 println!("Websocket Client heartbeat failed, disconnecting!");
 
-                // stop actor
                 ctx.stop();
 
-                // don't try to send a ping
                 return;
+            }
+
+            if let Some(hb_data) = act.hb_data {
+                if Instant::now().duration_since(hb_data) > CLIENT_TIMEOUT {
+                    println!("Websocket Client timed out due to not sending data, disconnecting!");
+
+                    ctx.stop();
+
+                    return;
+                }
             }
 
             ctx.ping(b"");

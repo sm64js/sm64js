@@ -2,13 +2,13 @@ use crate::proto::{sm64_js_msg, ConnectedMsg, MarioListMsg, MarioMsg, Sm64JsMsg}
 
 use actix::{prelude::*, Recipient};
 use anyhow::Result;
+use dashmap::DashMap;
 use flate2::{write::ZlibEncoder, Compression};
-use parking_lot::RwLock;
 use prost::Message as ProstMessage;
+use rand::{self, Rng};
 use rayon::prelude::*;
 use serde::Serialize;
-use sharded_slab::Slab;
-use std::{collections::HashSet, io::prelude::*, sync::Arc, thread, time::Duration};
+use std::{io::prelude::*, sync::Arc, thread, time::Duration};
 
 #[derive(Message)]
 #[rtype(result = "()")]
@@ -39,8 +39,7 @@ pub struct SetData {
 }
 
 pub struct Sm64JsServer {
-    clients: Arc<Slab<RwLock<Client>>>,
-    keys: Arc<RwLock<HashSet<u32>>>,
+    clients: Arc<DashMap<u32, Client>>,
 }
 
 impl Actor for Sm64JsServer {
@@ -48,27 +47,10 @@ impl Actor for Sm64JsServer {
 
     fn started(&mut self, _: &mut Self::Context) {
         let clients = self.clients.clone();
-        let keys = self.keys.clone();
 
-        thread::spawn(move || {
-            let mut tick = 0;
-            loop {
-                tick += 1;
-                if tick == 120 {
-                    dbg!(keys.clone());
-                    let clients: Vec<_> = keys
-                        .read()
-                        .iter()
-                        .filter_map(|key| {
-                            clients.get(*key as usize).map(|client| client.read().myid)
-                        })
-                        .collect();
-                    dbg!(clients);
-                    tick = 0;
-                }
-                Sm64JsServer::broadcast_data(clients.clone(), keys.clone()).unwrap();
-                thread::sleep(Duration::from_millis(33));
-            }
+        thread::spawn(move || loop {
+            Sm64JsServer::broadcast_data(clients.clone()).unwrap();
+            thread::sleep(Duration::from_millis(33));
         });
     }
 }
@@ -77,13 +59,12 @@ impl Handler<Connect> for Sm64JsServer {
     type Result = u32;
 
     fn handle(&mut self, msg: Connect, _: &mut Context<Self>) -> Self::Result {
-        let entry = self.clients.vacant_entry().unwrap();
-        let key = entry.key() as u32;
-        let client = Client::new(msg.addr, key);
+        let channel_id = rand::thread_rng().gen::<u32>();
+        let client = Client::new(msg.addr, channel_id);
 
         let sm64js_msg = Sm64JsMsg {
             message: Some(sm64_js_msg::Message::ConnectedMsg(ConnectedMsg {
-                channel_id: key,
+                channel_id,
             })),
         };
 
@@ -95,10 +76,8 @@ impl Handler<Connect> for Sm64JsServer {
         let msg = encoder.finish().unwrap();
 
         client.send(Message(msg)).unwrap();
-        entry.insert(RwLock::new(client));
-        self.keys.write().insert(key);
-        dbg!("insert", key);
-        key
+        self.clients.insert(channel_id, client);
+        channel_id
     }
 }
 
@@ -106,9 +85,7 @@ impl Handler<Disconnect> for Sm64JsServer {
     type Result = ();
 
     fn handle(&mut self, msg: Disconnect, _: &mut Context<Self>) {
-        self.clients.take(msg.id as usize);
-        self.keys.write().remove(&msg.id);
-        dbg!("remove", msg.id);
+        self.clients.remove(&msg.id);
     }
 }
 
@@ -117,49 +94,23 @@ impl Handler<SetData> for Sm64JsServer {
 
     fn handle(&mut self, msg: SetData, _: &mut Context<Self>) {
         self.clients
-            .get(msg.id as usize)
-            .map(|client| client.write().set_data(msg.data));
+            .get_mut(&msg.id)
+            .map(|mut client| client.set_data(msg.data));
     }
 }
 
 impl Sm64JsServer {
     pub fn new() -> Self {
         Sm64JsServer {
-            clients: Arc::new(Slab::new()),
-            keys: Arc::new(RwLock::new(HashSet::new())),
+            clients: Arc::new(DashMap::new()),
         }
     }
 
-    pub fn broadcast_data(
-        clients: Arc<Slab<RwLock<Client>>>,
-        keys: Arc<RwLock<HashSet<u32>>>,
-    ) -> Result<()> {
-        // let mario_list: Vec<MarioMsg> = clients
-        //     .unique_iter()
-        //     .filter_map(|client| {
-        //         // if client.valid > 0 {
-        //         //     client.valid -= 1;
-        //         //     client.data.clone()
-        //         // } else if client.data.is_some() {
-        //         //     // TODO disconnect
-        //         //     None
-        //         // } else {
-        //         // client.read().data.clone()
-        //         Some(MarioMsg::default())
-        //         // }
-        //     })
-        //     .collect();
-        let mario_list: Vec<_> = keys
-            .read()
-            .par_iter()
-            // .iter()
-            .filter_map(|key| {
-                if let Some(client) = clients.get(*key as usize) {
-                    client.read().data.clone()
-                } else {
-                    None
-                }
-            })
+    pub fn broadcast_data(clients: Arc<DashMap<u32, Client>>) -> Result<()> {
+        let mario_list: Vec<_> = clients
+            .iter()
+            .par_bridge()
+            .filter_map(|client| client.data.clone())
             .collect();
         let sm64js_msg = Sm64JsMsg {
             message: Some(sm64_js_msg::Message::ListMsg(MarioListMsg {
@@ -174,13 +125,11 @@ impl Sm64JsServer {
         encoder.write_all(&msg)?;
         let msg = encoder.finish()?;
 
-        keys.read()
-            .par_iter()
-            // .iter()
-            .map(|key| -> Result<()> {
-                if let Some(client) = clients.get(*key as usize) {
-                    client.read().send(Message(msg.clone()))?;
-                }
+        clients
+            .iter()
+            .par_bridge()
+            .map(|client| -> Result<()> {
+                client.send(Message(msg.clone()))?;
                 Ok(())
             })
             .collect::<Result<Vec<_>>>()?;

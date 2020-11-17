@@ -2,6 +2,7 @@ import { RootMsg, Sm64JsMsg  } from "../proto/mario_pb"
 import zlib from "zlib"
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
+import { updateFlagData } from "./game/behaviors/bhv_castle_flag_init.inc"
 
 const myArrayBuffer = () => {
     return new Promise((resolve) => {
@@ -48,7 +49,13 @@ export const networkData = {
     playerInteractions: true,
     remotePlayers: {},
     myChannelID: -1,
-    lastSentSkinData: {}
+    lastSentSkinData: {},
+    flagData: new Array(4).fill(0).map(() => {
+        return {
+            pos: [0, 0, 0],
+            linkedToPlayer: false
+        }
+    })
 }
 
 export const gameData = {}
@@ -139,8 +146,8 @@ channel.onopen = () => {
                 const buffer = await unzip(compressedBytes)
                 sm64jsMsg = Sm64JsMsg.deserializeBinary(buffer)
                 const listMsg = sm64jsMsg.getListMsg()
-                const marioList = listMsg.getMarioList()
-                Multi.recvMarioData(marioList)
+                Multi.recvMarioData(listMsg.getMarioList())
+                recvFlagList(listMsg.getFlagList())
                 break
             case RootMsg.MessageCase.JSON_BYTES_MSG:
                 const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
@@ -160,6 +167,20 @@ channel.onopen = () => {
     }
 
     channel.onclose = () => { window.latency = null }
+}
+
+const recvFlagList = (flaglist) => {
+    networkData.flagData.pos = mainupdatemsg.getFlag().getPosList()
+    networkData.flagData.linkedToPlayer = mainupdatemsg.getFlag().getLinkedtoplayer()
+
+    if(networkData.flagData.linkedToPlayer) {
+        const socketData = serverData.extraPlayersByID[mainupdatemsg.getFlag().getSocketid()]
+        if (socketData == undefined) return
+        const newflagpos = [...socketData.marioData.pos]
+        newflagpos[1] += 150
+        updateFlagData(newflagpos, socketData.marioData.angle[1])
+    } else updateFlagData(serverData.flagData.pos, 0)
+
 }
 
 
@@ -214,6 +235,22 @@ export const post_main_loop_one_iteration = (frame) => {
     }
 
     decrementChat()
+
+    /////////////// check for grab flag
+    const m = gameData.marioState
+    if (m && !serverData.flagData.linkedToPlayer) {
+        const xDiff = m.pos[0] - serverData.flagData.pos[0]
+        const yDiff = m.pos[1] - serverData.flagData.pos[1]
+        const zDiff = m.pos[2] - serverData.flagData.pos[2]
+
+        const dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff + zDiff * zDiff)
+
+        if (dist < 40) {
+            const grabMsg = { pos: m.pos }
+            sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify(grabMsg)), 5)
+        }
+    }
+
 }
 
 

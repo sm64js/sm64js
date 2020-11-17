@@ -5,7 +5,7 @@ import { castle_grounds_seg7_dl_0700C768, castle_grounds_seg7_dl_0700C728, castl
 export const castle_grounds_geo_000660 = [
     { command: Geo.node_culling_radius, args: [1000] },
     { command: Geo.open_node },
-    { command: Geo.node_scale, args: [0x00, 24576] },
+    { command: Geo.node_scale, args: [0x00, 10000] },
     { command: Geo.open_node },
     { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, null] }, 
     { command: Geo.open_node },

@@ -20,11 +20,18 @@ message Sm64JsMsg {
 }
 
 message MarioListMsg {
+	repeated FlagMsg flag = 1;
 	repeated MarioMsg mario = 2;
 }
 
 message ControllerListMsg {
 	repeated ControllerMsg controller = 1;
+}
+
+message FlagMsg {
+     repeated sint32 pos = 1;
+     bool linkedToPlayer = 2;
+     uint32 socketID = 3;
 }
 
 message MarioMsg {

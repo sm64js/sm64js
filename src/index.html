@@ -12,11 +12,11 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-178244102-1"></script>
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
+        window.dataLayer = window.dataLayer || []
+        function gtag() { dataLayer.push(arguments) }
+        gtag('js', new Date())
 
-        gtag('config', 'UA-178244102-1');
+        gtag('config', 'UA-178244102-1')
     </script>
 
 </head>
@@ -37,10 +37,10 @@
             </div>
         </header>
 
-        <main role="main" class="inner cover">
+        <main role="main" class="inner cover" hidden id="mainContent">
             <h1 class="cover-heading rainbowText">Super Mario 64 - Javascript Port</h1>
             <h6 style="color:red">This project is currently still being developed. This page may be live from time to time for testing, but there may be glitches and performance issues. The server will go down and restart at random times without warning. If you would like to help with the project or have feedback please contact me.</h6>
-            <form id="romSelect" class="form-group" enctype="multipart/form-data" method="post">
+            <form id="romSelect" class="form-group">
                 <h4 style="color:#fa3e3e">Select US sm64 (z64) ROM File from your computer</h4>
                 <input id="romFile" class="btn btn-secondary btn-sm" type="file">
                 <input class="btn btn-primary btn-sm" type="submit">
@@ -81,6 +81,17 @@
                             data-toggle="skinCustomizerToggle"
                             data-placement="bottom">
                         Manually Customize Character/Skin
+                    </button>
+                </div>
+
+                <div class="col-3">
+                    <button type="button"
+                            class="btn btn-sm btn-primary"
+                            data-html="true"
+                            data-container="body"
+                            data-toggle="colorCodePasteWindowToggle"
+                            data-placement="bottom">
+                        Paste Color Code
                     </button>
                 </div>
 
@@ -134,6 +145,9 @@
                         <option>Castle Grounds</option>
                         <option>Bob-omb Battlefield</option>
                         <option>Cool, Cool Mountain</option>
+                        <option>Princess's Secret Slide</option>
+                        <option>Tall, Tall Mountain</option>
+                        <option>Whomps Fortress</option>
                     </select>
                 </div>
 
@@ -149,10 +163,11 @@
             <h6 hidden id="connectedMsg" style="color:red">Not connected to server - Refresh the page</h6>
 
             <div class="row" style="justify-content:center">
-                <div id="chatlog"></div>
+                <ul style="margin-bottom: 5px !important" id="chatlog"></ul>
             </div>
             <div class="row" style="justify-content:center;">
-                <input id="chatbox" type="text" autocomplete="off" maxlength="100" class="form-control" placeholder="Chat box">
+                <input id="chatbox" class="chatbox form-control" style="margin-top: 0px !important" type="text" autocomplete="off" maxlength="100" placeholder="Chat box">
+                <input id="banbox" class="chatbox form-control" type="text" autocomplete="off" maxlength="100" placeholder="Block Player Chats - type their player name in here and hit enter">
             </div>
 
             <br />
@@ -315,6 +330,41 @@
 
     </div>
 
+    <div id="rules-modal" class="modal fade" role="dialog" >
+        <div class="modal-dialog" style="max-width: 600px !important" >
+
+            <!-- Modal content-->
+            <div class="modal-content" style="height:400px; width:600px;" >
+                <div class="modal-header" style="justify-content:center">
+                    <h4 class="modal-title" style="color:black">Please agree to the rules before playing</h4>
+                </div>
+                <div class="modal-body" style="color:black; text-align:left">
+                    <p>Treat all players with respect</p>
+                    <p>Please keep all chat appropriate and safe for work/school</p>
+                    <p>Players may ask to be left alone, please respect their requests</p>
+                    <p>Inappropriate or offensive behavior may result in temporary or permanent ban</p>
+                    <br />
+                    <div class="row" style="text-align:right">
+                        <div class="col-3">
+                            <input class="form-check-input" type="checkbox" value="" id="defaultCheck1"
+                                   onclick="document.getElementById('rules-footer').hidden = false"
+                            >
+
+                        </div>
+                        <div class="col-9" style="text-align:left">
+                            <p>I have read and agreed to the rules</p>
+                        </div>
+                    </div>
+
+                </div>
+                <div hidden id="rules-footer" class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Agree</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
 
 
     <div hidden>
@@ -409,9 +459,25 @@
             <br />
 
             <div class="row" style="justify-content:center">
-                <button class="btn btn-sm btn-success" 
-                        onclick="window.myMario.skinData.customCapState = window.myMario.skinData.customCapState == 1 ? 0 : 1"
-                >Toggle Hat</button>
+                <button class="btn btn-sm btn-success"
+                        onclick="window.myMario.skinData.customCapState = window.myMario.skinData.customCapState == 1 ? 0 : 1">
+                    Toggle Hat
+                </button>
+            </div>
+
+
+        </div>
+
+        <div class="container" id="colorCodePasteWindow">
+            <div class="row">
+                <textarea class="form-control" id="ccPasteArea" placeholder="Enter your Color Code here..." rows="6"></textarea>
+            </div>
+            <br>
+            <div class="row" style="justify-content:center">
+                <button class="btn btn-sm btn-primary" style="justify-content:center;"
+                        onclick="window.myMario.skinData = window.parseColorCode($(`#ccPasteArea`).val()); $(`#ccPasteArea`).val('')">
+                    Import Color Code
+                </button>
             </div>
         </div>
 
@@ -470,7 +536,6 @@
                 <h6 style="text-align:center" id="noGamepadMessage">No Gamepad Detected Yet</h6>
                 <div hidden id="gamepadMessageDiv">
                     <h6 id="gamepadMessage">
-                        
                     </h6>
                     <h6 style="text-align:center" id="gamepadMessage">
                         Is your gamepad not working correctly?
@@ -521,11 +586,11 @@
                     </div>
                 </form>
 
-<!--                <div class="mx-sm-3 mb-2">
-                    <button class="btn btn-sm btn-secondary" onclick="window.switchGamepadFunc()">
-                        Multiple Gamepads?
-                    </button>
-                </div>-->
+                <!--                <div class="mx-sm-3 mb-2">
+                                <button class="btn btn-sm btn-secondary" onclick="window.switchGamepadFunc()">
+                                    Multiple Gamepads?
+                                </button>
+                            </div>-->
             </div>
 
             <div class="row" style="justify-content:center;">

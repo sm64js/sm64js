@@ -1,4 +1,5 @@
 import * as Surfaces from "../include/surface_terrains"
+import { BOUNDS_EXTENSION } from "../include/extend_bounds"
 import { spawn_special_objects } from "./MacroSpecialObjects"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 
@@ -39,17 +40,17 @@ class SurfaceLoad {
         const offset2 = 3 * vertexIndices[1]
         const offset3 = 3 * vertexIndices[2]
 
-        const x1 = vertexData[offset1 + 0]
-        const y1 = vertexData[offset1 + 1]
-        const z1 = vertexData[offset1 + 2]
+        const x1 = vertexData[offset1 + 0] / BOUNDS_EXTENSION
+        const y1 = vertexData[offset1 + 1] / BOUNDS_EXTENSION
+        const z1 = vertexData[offset1 + 2] / BOUNDS_EXTENSION
 
-        const x2 = vertexData[offset2 + 0]
-        const y2 = vertexData[offset2 + 1]
-        const z2 = vertexData[offset2 + 2]
+        const x2 = vertexData[offset2 + 0] / BOUNDS_EXTENSION
+        const y2 = vertexData[offset2 + 1] / BOUNDS_EXTENSION
+        const z2 = vertexData[offset2 + 2] / BOUNDS_EXTENSION
 
-        const x3 = vertexData[offset3 + 0]
-        const y3 = vertexData[offset3 + 1]
-        const z3 = vertexData[offset3 + 2]
+        const x3 = vertexData[offset3 + 0] / BOUNDS_EXTENSION
+        const y3 = vertexData[offset3 + 1] / BOUNDS_EXTENSION
+        const z3 = vertexData[offset3 + 2] / BOUNDS_EXTENSION
 
         let nx = (y2 - y1) * (z3 - z2) - (z2 - z1) * (y3 - y2)
         let ny = (z2 - z1) * (x3 - x2) - (x2 - x1) * (z3 - z2)

@@ -1,12 +1,43 @@
+import { RootMsg, Sm64JsMsg  } from "../proto/mario_pb"
+import zlib from "zlib"
 import * as Multi from "./game/MultiMarioManager"
 import zlib from "zlib"
 import { Sm64JsMsg, PingMsg } from "../proto/mario_pb"
+
+const myArrayBuffer = () => {
+    return new Promise((resolve) => {
+        let fr = new FileReader()
+        fr.onload = () => { resolve(fr.result) }
+        fr.readAsArrayBuffer(this)
+    })
+}
+
+File.prototype.arrayBuffer = File.prototype.arrayBuffer || myArrayBuffer
+Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
 
 const url = new URL(window.location.href)
 
 const websocketServerPath = `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/`
 
-const socket = new WebSocket(websocketServerPath)
+const channel = new WebSocket(websocketServerPath)
+
+const sanitizeChat = (string, isMessage) => {
+    string = string.replace(/</g, "");
+    // string = string.replace(/>/g, ""); // commented out for ">:(" and "> text", should still sanitize with only <
+    if(isMessage = true) {
+        string = string.replace(/:doublek:/g, "<img height='20' width='20' src='emotes/doublek.png' alt=':doublek:' />");
+        string = string.replace(/:facepalm:/g, "<img height='20' width='20' src='emotes/facepalm.png' alt=':facepalm:' />");
+        string = string.replace(/:kappa:/g, "<img height='20' width='20' src='emotes/kappa.png' alt=':kappa:' />");
+        string = string.replace(/:mariostyle:/g, "<img height='20' width='20' src='emotes/mariostyle.gif' alt=':mariostyle:' />");
+        string = string.replace(/:pogchamp:/g, "<img height='20' width='20' src='emotes/pogchamp.png' alt=':pogchamp:' />");
+        string = string.replace(/:strange:/g, "<img height='20' width='20' src='emotes/strange.png' alt=':strange:' />");
+        string = string.replace(/:kick:/g, "<img height='20' width='20' src='emotes/kick.gif' alt=':kick:' />");
+        string = string.replace(/:shock:/g, "<img height='20' width='20' src='emotes/shock.gif' alt=':shock:' />");
+        string = string.replace(/:bup:/g, "<img height='20' width='20' src='emotes/bup.jpg' alt=':bup:' />");
+        // string.replace any other emotes in this fashion.
+    }
+    return string;
+}
 
 export const networkData = {
     playerInteractions: true,
@@ -17,44 +48,59 @@ export const networkData = {
 
 export const gameData = {}
 
-const sendData = (bytes) => {
-    if (bytes.length == undefined) bytes = Buffer.from(bytes)
-    socket.send(bytes)
+const sendJsonWithTopic = (topic, msg) => {
+    const str = JSON.stringify({ topic, msg })
+    let bytes = text.encoder.encode(str)
+    const rootMsg = new RootMsg()
+    rootMsg.setJsonBytesMsg(bytes)
+    channel.send(rootMsg.serializeBinary())
 }
 
-socket.onopen = () => {
+const sendData = (bytes) => { channel.send(bytes) }
 
-    socket.onmessage = async (message) => {
-        const bytes = new Uint8Array(await message.data.arrayBuffer())
+const text = {
+    decoder: new TextDecoder(),
+    encoder: new TextEncoder()
+}
+
+const unzip = (bytes) => {
+    return new Promise(function (resolve, reject) {
+
         zlib.inflate(bytes, (err, buffer) => {
             if (err) {
-                console.error(`decompression fail ${err}`)
-                return
+                console.log("Error Unzipping")
+                reject(err)
             }
-            const sm64jsMsg = Sm64JsMsg.deserializeBinary(buffer)
-            switch (sm64jsMsg.getMessageCase()) {
-                case Sm64JsMsg.MessageCase.LIST_MSG:            
-                    if (!multiplayerReady()) return
-                    const listMsg = sm64jsMsg.getListMsg()
-                    const marioList = listMsg.getMarioList()
-                    Multi.recvMarioData(marioList)
-                    break
-                case Sm64JsMsg.MessageCase.CONNECTED_MSG:
-                    const connectedMsg = sm64jsMsg.getConnectedMsg()
-                    const channelID = connectedMsg.getChannelid()
-                    networkData.myChannelID = channelID
-                    break
-                case Sm64JsMsg.MessageCase.PING_MSG:
-                    measureAndPrintLatency(sm64jsMsg.getPingMsg())
-                    break
-                case Sm64JsMsg.MessageCase.MESSAGE_NOT_SET:
-                default:
-                    throw new Error(`unhandled case in switch expression: ${sm64jsMsg.getMessageCase()}`)
-            }
+            resolve(buffer)
         })
-    }
+    })
+}
 
-    socket.onclose = () => { window.latency = null }
+
+const measureLatency = (msg) => {
+    const startTime = msg.time
+    const endTime = performance.now()
+    window.latency = parseInt(endTime - startTime)
+}
+
+const recvChat = (chatmsg) => {
+
+    if (chatmsg.channel_id != networkData.myChannelID &&
+        networkData.remotePlayers[chatmsg.channel_id] == undefined) return
+
+    if (window.banPlayerList.includes(chatmsg.sender)) return
+
+    const chatlog = document.getElementById("chatlog")
+    const node = document.createElement("LI")                 // Create a <li> node
+    node.innerHTML = '<strong>' + sanitizeChat(chatmsg.sender, false) + '</strong>: ' + sanitizeChat(chatmsg.msg, true) + '<br/>'        // Create a text node
+    chatlog.appendChild(node)
+    chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
+
+    let someobject
+    if (chatmsg.channel_id == networkData.myChannelID)
+        someobject = window.myMario
+    else
+        someobject = networkData.remotePlayers[chatmsg.channel_id]
 }
 
 const measureAndPrintLatency = (ping_proto) => {
@@ -62,6 +108,61 @@ const measureAndPrintLatency = (ping_proto) => {
     const endTime = performance.now()
     window.latency = parseInt(endTime - startTime)
 }
+
+channel.onopen = () => {
+
+    channel.onmessage = async (message) => {
+        let sm64jsMsg
+        let bytes = new Uint8Array(await message.data.arrayBuffer())
+        const rootMsg = RootMsg.deserializeBinary(bytes)
+
+        switch (rootMsg.getMessageCase()) {
+            case RootMsg.MessageCase.UNCOMPRESSED_SM64JS_MSG:
+                sm64jsMsg = rootMsg.getUncompressedSm64jsMsg()
+                switch (sm64jsMsg.getMessageCase()) {
+                    //case 0: if (multiplayerReady()) Multi.recvMarioData(msgBytes); break
+                    //case 2: recvBasicAttack(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
+                    //case 3: if (multiplayerReady()) Multi.recvControllerUpdate(msgBytes); break
+                    //case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
+                    case Sm64JsMsg.MessageCase.VALID_PLAYERS_MSG:
+                        Multi.recvValidPlayers(sm64jsMsg.getValidPlayersMsg())
+                        break
+                    case Sm64JsMsg.MessageCase.PING_MSG:
+                        measureAndPrintLatency(sm64jsMsg.getPingMsg())
+                        break
+                    //case 99: measureAndPrintLatency(bytes.slice(1)); break
+                    default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
+                }
+                break
+            case RootMsg.MessageCase.COMPRESSED_SM64JS_MSG:
+                if (!multiplayerReady()) return
+                const compressedBytes = rootMsg.getCompressedSm64jsMsg()
+                const buffer = await unzip(compressedBytes)
+                sm64jsMsg = Sm64JsMsg.deserializeBinary(buffer)
+                const listMsg = sm64jsMsg.getListMsg()
+                const marioList = listMsg.getMarioList()
+                Multi.recvMarioData(marioList)
+                break
+            case RootMsg.MessageCase.JSON_BYTES_MSG:
+                const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
+                const { topic, msg } = JSON.parse(str)
+                switch (topic) {
+                    case 'id': networkData.myChannelID = msg.id; break
+                    case 'chat': recvChat(msg); break
+                    case 'skin': Cosmetics.recvSkinData(msg); break
+                    case 'ping': measureLatency(msg); break
+                    default: throw "Unknown topic in json message"
+                }
+                break
+            case RootMsg.MessageCase.MESSAGE_NOT_SET:
+            default:
+                throw new Error(`unhandled case in rootMsg switch expression: ${rootMsg.getMessageCase()}`)
+        }
+    }
+
+    channel.onclose = () => { window.latency = null }
+}
+
 
 const multiplayerReady = () => {
     return socket && socket.readyState == 1 && gameData.marioState && networkData.myChannelID != -1
@@ -83,18 +184,49 @@ export const post_main_loop_one_iteration = (frame) => {
 
     if (frame % 30 == 0) updateConnectedMsg()
 
-    if (multiplayerReady() && frame % 150 == 0) { //every 5 seconds
-        /// ping to measure latency
-        const sm64jsMsg = new Sm64JsMsg()
-        const pingmsg = new PingMsg()
-        pingmsg.setTime(performance.now())
-        sm64jsMsg.setPingMsg(pingmsg)
-        sendData(sm64jsMsg.serializeBinary())
-    }
+    if (multiplayerReady()) {
 
-    if (multiplayerReady() && frame % 1 == 0) {
-        sendData(Multi.createMarioProtoMsg())
+        if (frame % 150 == 0) { //every 5 seconds
+            /// ping to measure latency
+            const sm64jsMsg = new Sm64JsMsg()
+            const pingmsg = new PingMsg()
+            pingmsg.setTime(performance.now())
+            sm64jsMsg.setPingMsg(pingmsg)
+            sendData(sm64jsMsg.serializeBinary())
+
+            //send skins if updated
+            if (Cosmetics.validSkins()) {
+                if (JSON.stringify(window.myMario.skinData) != networkData.lastSentSkinData) {
+                    networkData.lastSentSkinData = JSON.stringify(window.myMario.skinData)
+                    sendJsonWithTopic('skin', window.myMario.skinData)
+                }
+            }
+        }
+
+        if (frame % 1 == 0) { /// every frame send mario data
+            const sm64jsMsg = new Sm64JsMsg()
+            sm64jsMsg.setMarioMsg(Multi.createMarioProtoMsg())
+            const rootMsg = new RootMsg()
+            rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+            sendData(rootMsg.serializeBinary())
+        }
     }
 
 }
 
+const decrementChat = () => {
+    Object.values(networkData.remotePlayers).forEach(data => {
+        if (data.chatData && data.chatData.timer > 0) data.chatData.timer--
+    })
+
+    const myChat = window.myMario.chatData
+    if (myChat && myChat.timer > 0) myChat.timer--
+}
+
+export const sendChat = (msg) => {
+    sendJsonWithTopic('chat', msg)
+}
+
+export const sendPlayerInteraction = (channel_id, interaction) => {
+    //channel.emit('playerInteract', { channel_id, interaction }, { reliable: true })
+}

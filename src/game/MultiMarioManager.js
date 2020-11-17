@@ -99,10 +99,7 @@ export const createMarioProtoMsg = () => {
     mariomsg.setChannelid(networkData.myChannelID)
     mariomsg.setPlayername(window.myMario.playerName)
 
-    const sm64jsMsg = new Sm64JsMsg()
-    sm64jsMsg.setMarioMsg(mariomsg)
-
-    return sm64jsMsg.serializeBinary()
+    return mariomsg
 }
 
 const initNewRemoteMarioState = (marioProto) => {
@@ -241,8 +238,8 @@ export const recvControllerUpdate = (controllerbytes) => {
     })
 }
 
-export const recvValidPlayers = (validplayerbytes) => {
-    const validplayers = ValidPlayersMsg.deserializeBinary(validplayerbytes).getValidplayersList()
+export const recvValidPlayers = (validplayersproto) => {
+    const validplayers = validplayersproto.getValidplayersList()
 
     networkData.numOnline = validplayers.length
 
@@ -255,7 +252,6 @@ export const recvValidPlayers = (validplayerbytes) => {
 
 
 export const recvMarioData = (marioList) => {
-
     marioList.forEach(marioProto => {
         const id = marioProto.getChannelid()
         if (id == networkData.myChannelID) return

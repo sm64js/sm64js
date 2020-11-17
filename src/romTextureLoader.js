@@ -1,10 +1,23 @@
-﻿import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_texture_0700B4A0, intro_seg7_texture_0700C4A0 } from "./levels/intro/leveldata"
+﻿import * as SkyboxWater from "./textures/skyboxes/water_skybox"
+import { assets } from "./assets"
+
+
+import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_texture_0700B4A0, intro_seg7_texture_0700C4A0 } from "./levels/intro/leveldata"
 import { castle_grounds_seg7_texture_07000000, castle_grounds_seg7_texture_07001000, castle_grounds_seg7_texture_07002000 } from "./levels/castle_grounds/texture.inc.js"
 import { title_texture_0A0001C0, title_texture_0A000E40, title_texture_0A001AC0, title_texture_0A002740 } from "./levels/intro/title_screen_bg"
 import { tree_seg3_texture_0302DE28, tree_seg3_texture_0302EE28, tree_seg3_texture_0302FF60, tree_seg3_texture_03031048, tree_seg3_texture_03032218 } from "./actors/tree/model.inc"
 import { texture_shadow_quarter_circle, texture_waterbox_water, texture_waterbox_lava, texture_transition_star_half } from "./common_gfx/segment2"
-import * as SkyboxWater from "./textures/skyboxes/water_skybox"
-import { assets } from "./assets"
+
+import {
+    ttm_seg7_texture_07000000,
+    ttm_seg7_texture_07000800,
+    ttm_seg7_texture_07001000,
+    ttm_seg7_texture_07001800,
+    ttm_seg7_texture_07002000,
+    ttm_seg7_texture_07002800,
+    ttm_seg7_texture_07003000,
+    ttm_seg7_texture_07004000,
+} from "./levels/ttm/textures.inc.js"
 
 import {
     gd_texture_mario_face_shine,
@@ -61,6 +74,8 @@ import {
     mario_texture_eyes_closed
 } from "./actors/mario/model.inc"
 
+import { yellow_sphere_seg5_texture_05000040 } from "./actors/yellow_sphere_small/model.inc"
+
 import {
     generic_09005800,
     generic_09006000,
@@ -85,6 +100,41 @@ import {
     bob_seg7_texture_07002000
 } from "./levels/bob/textures.inc"
 
+import { pss_seg7_texture_07000000, pss_seg7_texture_07000800, pss_seg7_texture_07001000 } from "./levels/pss/textures.inc"
+
+import {
+    wf_seg7_texture_07000000,
+    wf_seg7_texture_07000800,
+    wf_seg7_texture_07001000,
+    wf_seg7_texture_07001800,
+    wf_seg7_texture_07002000,
+    wf_seg7_texture_07002800
+} from "./levels/wf/textures.inc"
+
+import {
+    mountain_09000000,
+    mountain_09000800,
+    mountain_09001800,
+    mountain_09002800,
+    mountain_09003000,
+    mountain_09003800,
+    mountain_09004000,
+    mountain_09004800,
+    mountain_09005000,
+    mountain_09005800,
+    mountain_09006800,
+    mountain_09007000,
+    mountain_09007800,
+    mountain_09008000,
+    mountain_09008800,
+    mountain_09009800,
+    mountain_0900A000,
+    mountain_0900A800,
+    mountain_0900B000,
+    mountain_0900B800,
+    mountain_0900C000,
+} from "./textures/mountain.js"
+
 import {
     snow_09000000,
     snow_09000800,
@@ -106,10 +156,39 @@ import {
     snow_09009800
 } from "./textures/snow"
 
+
+
+import {
+    grass_09000000,
+    grass_09000800,
+    grass_09001000,
+    grass_09001800,
+    grass_09002000,
+    grass_09002800,
+    grass_09003000,
+    grass_09003800,
+    grass_09004000,
+    grass_09004800,
+    grass_09005000,
+    grass_09005800,
+    grass_09006000,
+    grass_09006800,
+    grass_09007000,
+    grass_09007800,
+    grass_09008000,
+    grass_09008800,
+    grass_09009000,
+    grass_09009800,
+    grass_0900A000,
+    grass_0900A800,
+    grass_0900B000,
+    grass_0900B800
+} from "./textures/grass"
+
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 7
+const textureVersion = 14
 
 const loadDataIntoGame = (data) => {
 
@@ -121,7 +200,16 @@ const loadDataIntoGame = (data) => {
     castle_grounds_seg7_texture_07000000.push(...data['levels/castle_grounds/0.rgba16.png'].data)
     castle_grounds_seg7_texture_07001000.push(...data['levels/castle_grounds/1.rgba16.png'].data)
     castle_grounds_seg7_texture_07002000.push(...data['levels/castle_grounds/2.rgba16.png'].data)
-
+	
+	ttm_seg7_texture_07000000.push(...data['levels/ttm/0.ia16.png'].data)
+	ttm_seg7_texture_07000800.push(...data['levels/ttm/1.rgba16.png'].data)
+	ttm_seg7_texture_07001000.push(...data['levels/ttm/2.rgba16.png'].data)
+	ttm_seg7_texture_07001800.push(...data['levels/ttm/3.rgba16.png'].data)
+	ttm_seg7_texture_07002000.push(...data['levels/ttm/4.rgba16.png'].data)
+	ttm_seg7_texture_07002800.push(...data['levels/ttm/5.rgba16.png'].data)
+	ttm_seg7_texture_07003000.push(...data['levels/ttm/6.rgba16.png'].data)
+	ttm_seg7_texture_07004000.push(...data['levels/ttm/7.rgba16.png'].data)
+	
     gd_texture_mario_face_shine.push(...data['textures/intro_raw/mario_face_shine.ia8.png'].data)
     gd_texture_red_star_0.push(...data['textures/intro_raw/red_star_0.rgba16.png'].data)
     gd_texture_red_star_1.push(...data['textures/intro_raw/red_star_1.rgba16.png'].data)
@@ -144,6 +232,28 @@ const loadDataIntoGame = (data) => {
     gd_texture_sparkle_2.push(...data['textures/intro_raw/sparkle_2.rgba16.png'].data)
     gd_texture_sparkle_3.push(...data['textures/intro_raw/sparkle_3.rgba16.png'].data)
     gd_texture_sparkle_4.push(...data['textures/intro_raw/sparkle_4.rgba16.png'].data)
+
+    mountain_09000000.push(...data['textures/mountain/ttm_textures.00000.rgba16.png'].data)
+    mountain_09000800.push(...data['textures/mountain/ttm_textures.00800.rgba16.png'].data)
+    mountain_09001800.push(...data['textures/mountain/ttm_textures.01800.rgba16.png'].data)
+    mountain_09002800.push(...data['textures/mountain/ttm_textures.02800.rgba16.png'].data)
+    mountain_09003000.push(...data['textures/mountain/ttm_textures.03000.rgba16.png'].data)
+    mountain_09003800.push(...data['textures/mountain/ttm_textures.03800.rgba16.png'].data)
+    mountain_09004000.push(...data['textures/mountain/ttm_textures.04000.rgba16.png'].data)
+    mountain_09004800.push(...data['textures/mountain/ttm_textures.04800.rgba16.png'].data)
+    mountain_09005000.push(...data['textures/mountain/ttm_textures.05000.rgba16.png'].data)
+    mountain_09005800.push(...data['textures/mountain/ttm_textures.05800.rgba16.png'].data)
+    mountain_09006800.push(...data['textures/mountain/ttm_textures.06800.rgba16.png'].data)
+    mountain_09007000.push(...data['textures/mountain/ttm_textures.07000.rgba16.png'].data)
+    mountain_09007800.push(...data['textures/mountain/ttm_textures.07800.rgba16.png'].data)
+    mountain_09008000.push(...data['textures/mountain/ttm_textures.08000.rgba16.png'].data)
+    mountain_09008800.push(...data['textures/mountain/ttm_textures.08800.rgba16.png'].data)
+    mountain_09009800.push(...data['textures/mountain/ttm_textures.09800.rgba16.png'].data)
+    mountain_0900A000.push(...data['textures/mountain/ttm_textures.0A000.rgba16.png'].data)
+    mountain_0900A800.push(...data['textures/mountain/ttm_textures.0A800.rgba16.png'].data)
+    mountain_0900B000.push(...data['textures/mountain/ttm_textures.0B000.rgba16.png'].data)
+    mountain_0900B800.push(...data['textures/mountain/ttm_textures.0B800.rgba16.png'].data)
+    mountain_0900C000.push(...data['textures/mountain/ttm_textures.0C000.rgba16.png'].data)
 
     title_texture_0A0001C0.push(...data['textures/title_screen_bg/title_screen_bg.001C0.rgba16.png'].data)
     title_texture_0A000E40.push(...data['textures/title_screen_bg/title_screen_bg.00E40.rgba16.png'].data)
@@ -169,6 +279,31 @@ const loadDataIntoGame = (data) => {
     outside_0900A800.push(...data['textures/outside/castle_grounds_textures.0A800.rgba16.png'].data)
     outside_0900BC00.push(...data['textures/outside/castle_grounds_textures.0BC00.ia16.png'].data)
 
+	grass_09000000.push(...data['textures/grass/wf_textures.00000.rgba16.png'].data)
+	grass_09000800.push(...data['textures/grass/wf_textures.00800.rgba16.png'].data)
+	grass_09001000.push(...data['textures/grass/wf_textures.01000.rgba16.png'].data)
+	grass_09001800.push(...data['textures/grass/wf_textures.01800.rgba16.png'].data)
+	grass_09002000.push(...data['textures/grass/wf_textures.02000.rgba16.png'].data)
+	grass_09002800.push(...data['textures/grass/wf_textures.02800.rgba16.png'].data)
+	grass_09003000.push(...data['textures/grass/wf_textures.03000.rgba16.png'].data)
+	grass_09003800.push(...data['textures/grass/wf_textures.03800.rgba16.png'].data)
+	grass_09004000.push(...data['textures/grass/wf_textures.04000.rgba16.png'].data)
+	grass_09004800.push(...data['textures/grass/wf_textures.04800.rgba16.png'].data)
+	grass_09005000.push(...data['textures/grass/wf_textures.05000.rgba16.png'].data)
+	grass_09005800.push(...data['textures/grass/wf_textures.05800.rgba16.png'].data)
+	grass_09006000.push(...data['textures/grass/wf_textures.06000.rgba16.png'].data)
+	grass_09006800.push(...data['textures/grass/wf_textures.06800.rgba16.png'].data)
+	grass_09007000.push(...data['textures/grass/wf_textures.07000.rgba16.png'].data)
+	grass_09007800.push(...data['textures/grass/wf_textures.07800.rgba16.png'].data)
+	grass_09008000.push(...data['textures/grass/wf_textures.08000.rgba16.png'].data)
+	grass_09008800.push(...data['textures/grass/wf_textures.08800.rgba16.png'].data)
+	grass_09009000.push(...data['textures/grass/wf_textures.09000.rgba16.png'].data)
+	grass_09009800.push(...data['textures/grass/wf_textures.09800.rgba16.png'].data)
+	grass_0900A000.push(...data['textures/grass/wf_textures.0A000.rgba16.png'].data)
+	grass_0900A800.push(...data['textures/grass/wf_textures.0A800.rgba16.png'].data)
+	grass_0900B000.push(...data['textures/grass/wf_textures.0B000.ia16.png'].data)
+	grass_0900B800.push(...data['textures/grass/wf_textures.0B800.ia16.png'].data)
+
     generic_09001800.push(...data["textures/generic/bob_textures.01800.rgba16.png"].data)
     generic_09002000.push(...data["textures/generic/bob_textures.02000.rgba16.png"].data)
     generic_09003000.push(...data["textures/generic/bob_textures.03000.rgba16.png"].data)
@@ -189,6 +324,17 @@ const loadDataIntoGame = (data) => {
     bob_seg7_texture_07001800.push(...data["levels/bob/3.rgba16.png"].data)
     bob_seg7_texture_07002000.push(...data["levels/bob/4.rgba16.png"].data)
 
+    pss_seg7_texture_07000000.push(...data["levels/pss/0.rgba16.png"].data)
+    pss_seg7_texture_07000800.push(...data["levels/pss/1.ia16.png"].data)
+    pss_seg7_texture_07001000.push(...data["levels/pss/2.rgba16.png"].data)
+
+    wf_seg7_texture_07000000.push(...data["levels/wf/0.rgba16.png"].data)
+    wf_seg7_texture_07000800.push(...data["levels/wf/1.rgba16.png"].data)
+    wf_seg7_texture_07001000.push(...data["levels/wf/2.rgba16.png"].data)
+    wf_seg7_texture_07001800.push(...data["levels/wf/3.rgba16.png"].data)
+    wf_seg7_texture_07002000.push(...data["levels/wf/4.rgba16.png"].data)
+    wf_seg7_texture_07002800.push(...data["levels/wf/5.ia8.png"].data)
+
     snow_09000000.push(...data["textures/snow/ccm_textures.00000.rgba16.png"].data)
     snow_09000800.push(...data["textures/snow/ccm_textures.00800.rgba16.png"].data)
     snow_09001000.push(...data["textures/snow/ccm_textures.01000.rgba16.png"].data)
@@ -203,6 +349,7 @@ const loadDataIntoGame = (data) => {
     snow_09006000.push(...data["textures/snow/ccm_textures.06000.rgba16.png"].data)
     snow_09006800.push(...data["textures/snow/ccm_textures.06800.rgba16.png"].data)
     snow_09007000.push(...data["textures/snow/ccm_textures.07000.rgba16.png"].data)
+    // Why is this here? snow_09007800.push(...data["textures/snow/ccm_textures.07800.rgba16.png"].data)
     snow_09008000.push(...data["textures/snow/ccm_textures.08000.rgba16.png"].data)
     snow_09008800.push(...data["textures/snow/ccm_textures.08800.rgba16.png"].data)
     snow_09009000.push(...data["textures/snow/ccm_textures.09000.ia16.png"].data)
@@ -215,6 +362,8 @@ const loadDataIntoGame = (data) => {
     mario_texture_eyes_front.push(...data["actors/mario/mario_eyes_center.rgba16.png"].data)
     mario_texture_eyes_half_closed.push(...data["actors/mario/mario_eyes_half_closed.rgba16.png"].data)
     mario_texture_eyes_closed.push(...data["actors/mario/mario_eyes_closed.rgba16.png"].data)
+
+	yellow_sphere_seg5_texture_05000040.push(...data["actors/yellow_sphere_small/small_yellow_sphere.rgba16.png"].data)
 
     tree_seg3_texture_0302DE28.push(...data["actors/tree/tree_left_side.rgba16.png"].data)
     tree_seg3_texture_0302EE28.push(...data["actors/tree/tree_right_side.rgba16.png"].data)

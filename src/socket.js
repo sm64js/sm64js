@@ -133,6 +133,9 @@ channel.onopen = () => {
                     case Sm64JsMsg.MessageCase.PING_MSG:
                         measureAndPrintLatency(sm64jsMsg.getPingMsg())
                         break
+                    case Sm64JsMsg.MessageCase.CONNECTED_MSG:
+                        networkData.myChannelID = sm64jsMsg.getConnectedMsg().getChannelid()
+                        break
                     //case 99: measureAndPrintLatency(bytes.slice(1)); break
                     default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
                 }
@@ -150,7 +153,6 @@ channel.onopen = () => {
                 const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
                 const { topic, msg } = JSON.parse(str)
                 switch (topic) {
-                    case 'id': networkData.myChannelID = msg.id; break
                     case 'chat': recvChat(msg); break
                     case 'skin': Cosmetics.recvSkinData(msg); break
                     case 'ping': measureLatency(msg); break

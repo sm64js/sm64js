@@ -1,4 +1,4 @@
-const { RootMsg, MarioListMsg, ControllerMsg, ValidPlayersMsg, Sm64JsMsg } = require("./proto/mario_pb")
+const { RootMsg, MarioListMsg, ControllerMsg, ValidPlayersMsg, Sm64JsMsg, ConnectedMsg } = require("./proto/mario_pb")
 const fs = require('fs')
 const http = require('http')
 const got = require('got')
@@ -246,7 +246,14 @@ require('uWebSockets.js').App().ws('/*', {
     open: async (channel) => {
         channel.my_id = generateID()
         allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }
-        sendJsonWithTopic('id', { id: channel.my_id }, channel)
+        
+        const connectedMsg = new ConnectedMsg()
+        connectedMsg.setChannelid(channel.my_id)
+        const sm64jsMsg = new Sm64JsMsg()
+        sm64jsMsg.setConnectedMsg(connectedMsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+        channel.send(rootMsg.serializeBinary(), true)
 
         sendSkinsToChannel(channel)
     },

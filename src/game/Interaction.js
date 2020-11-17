@@ -337,7 +337,7 @@ const interact_player = (m, o) => {
         }
         if (m.marioObj.localMario) {
             m2.ignoreUpdates = 40
-            //sendPlayerInteraction(m2.channel_id, interaction)  /// unused
+            sendPlayerInteraction(m2.channel_id, interaction)  /// unused
         }
         take_damage_and_knock_back(m2, m.marioObj)
         //bounce_back_from_attack(m, interaction)  //temp disable to fix glitch

@@ -1127,6 +1127,11 @@ class Camera {
         graphNode.pos = [...this.gLakituState.pos]
         graphNode.focus = [...this.gLakituState.focus]
 
+        if (window.parachuting) {
+            graphNode.pos[1] = LevelUpdate.gMarioState.pos[1] + 1000
+            graphNode.focus = [...LevelUpdate.gMarioState.pos]
+        }
+
     }
 
     geo_camera_main(callContext, graphNode) {

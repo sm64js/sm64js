@@ -24,6 +24,9 @@ const apply_gravity = (m) => {
     } else {
         m.vel[1] -= 4.0
         if (m.vel[1] < -75.0) m.vel[1] = -75.0
+        if (window.parachuting) {
+            if (m.vel[1] < -30.0) m.vel[1] = -30.0
+        }
     }
 }
 

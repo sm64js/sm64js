@@ -60,6 +60,8 @@ class LevelUpdate {
         if (this.sWarpDest.type != WARP_TYPE_NOT_WARPING) {
             throw "init_level - not warping"
         } else {
+            window.parachuting = true
+
             if (Area.gMarioSpawnInfo.areaIndex >= 0) {
                 Area.load_mario_area()
                 Mario.init_marios()

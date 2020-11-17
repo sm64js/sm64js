@@ -3,7 +3,7 @@ import { SurfaceLoadInstance as SurfaceLoad } from "../game/SurfaceLoad"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
 import { SpawnObjectInstance as Spawn } from "../game/SpawnObject"
 
-import { BOUNDS_EXTENSION, LEVEL_BOUNDARY_EXTENDED_MAX } from "../include/extend_bounds"
+import { BOUNDS_EXTENSION } from "../include/extend_bounds"
 
 class SurfaceCollision {
     constructor() {

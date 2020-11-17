@@ -9,6 +9,7 @@ const port = 80
 const ws_port = 3000
 
 const allChannels = {}
+const stats = {}
 
 let currentId = 0
 const generateID = () => {

@@ -150,10 +150,11 @@ window.enterFullScreenMode = () => {
 }
 
 ///// Start Game
-
+const rulesVersion = 1
 let gameStarted = false
 
 document.getElementById("startbutton").addEventListener('click', () => {
+    if (localStorage['rules'] != rulesVersion) return
     if (gameStarted) {
         window.location.search = '&autostart=1' /// Refresh page (Reset Game)
     }
@@ -174,7 +175,11 @@ const startGame = () => {
 }
 
 window.onload = () => {
-    if (checkForRom() && url.searchParams.get("autostart")) startGame()
+    if (checkForRom() && url.searchParams.get("autostart") && localStorage['rules'] == rulesVersion) startGame()
     document.getElementById('mainContent').hidden = false
 }
+
+if (localStorage['rules'] != rulesVersion) $('#rules-modal').modal({ backdrop: 'static', keyboard: false })
+$("#rules-modal").on('hide.bs.modal', () => { localStorage['rules'] = rulesVersion })
+
 

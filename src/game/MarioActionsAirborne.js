@@ -118,7 +118,6 @@ const common_air_action_step = (m, landAction, animation, stepArg) => {
         case Mario.AIR_STEP_NONE:
             Mario.set_mario_animation(m, animation); break
         case Mario.AIR_STEP_LANDED:
-            if (window.parachuting) window.parachuting = false
             Mario.set_mario_action(m, landAction, 0); break
         case Mario.AIR_STEP_HIT_WALL:
             Mario.set_mario_animation(m, animation)

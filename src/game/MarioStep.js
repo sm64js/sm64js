@@ -212,6 +212,8 @@ export const perform_air_step = (m, stepArg) => {
     m.marioObj.header.gfx.pos = [...m.pos]
     m.marioObj.header.gfx.angle = [0, m.faceAngle[1], 0]
 
+    if (Mario.AIR_STEP_NONE != stepResult && window.parachuting) window.parachuting = false
+
     return stepResult
 }
 

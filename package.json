@@ -23,8 +23,8 @@
     "quickstart": "npm install && webpack --mode production && node serveProduction.js",
     "serve": "cross-env NODE_WS=1 node serveProduction.js",
     "serve:rust": "node serveProduction.js",
-    "build": "webpack --mode production",
-    "start": "webpack-dev-server --host 0.0.0.0 --disable-host-check  --mode development",
+    "build": "webpack --mode production --env NODE_ENV=production",
+    "start": "webpack-dev-server --host 0.0.0.0 --disable-host-check  --mode development --env NODE_ENV=development",
     "protoc": "protoc --js_out=import_style=commonjs,binary:. proto/mario.proto"
   },
   "babel": {

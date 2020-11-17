@@ -15,6 +15,7 @@ message Sm64JsMsg {
 		ConnectedMsg connected_msg = 2;
 		PingMsg ping_msg = 3;
 		MarioMsg mario_msg = 4;
+		ValidPlayersMsg valid_players_msg = 5;
 		/*ControllerMsg controller_msg = 6;
 		ControllerListMsg controller_list_msg = 7;*/
 	}

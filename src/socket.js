@@ -1,8 +1,7 @@
-import { RootMsg, Sm64JsMsg  } from "../proto/mario_pb"
+import { RootMsg, Sm64JsMsg, PingMsg  } from "../proto/mario_pb"
 import zlib from "zlib"
 import * as Multi from "./game/MultiMarioManager"
-import zlib from "zlib"
-import { Sm64JsMsg, PingMsg } from "../proto/mario_pb"
+import * as Cosmetics from "./cosmetics"
 
 const myArrayBuffer = () => {
     return new Promise((resolve) => {
@@ -17,7 +16,11 @@ Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
 
 const url = new URL(window.location.href)
 
-const websocketServerPath = `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/`
+const websocketServerPath = process.env.NODE_ENV === 'production'
+    ? `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/`
+    : url.protocol == "https:"
+        ? `wss://${url.hostname}/websocket/`
+        : `ws://${url.hostname}:3000`
 
 const channel = new WebSocket(websocketServerPath)
 
@@ -165,13 +168,13 @@ channel.onopen = () => {
 
 
 const multiplayerReady = () => {
-    return socket && socket.readyState == 1 && gameData.marioState && networkData.myChannelID != -1
+    return channel && channel.readyState == 1 && gameData.marioState && networkData.myChannelID != -1
 }
 
 const updateConnectedMsg = () => {
     const elem = document.getElementById("connectedMsg")
     const numPlayers = networkData.numOnline ? networkData.numOnline : "?"
-    if (socket && socket.readyState == 1) {
+    if (channel && channel.readyState == 1) {
         elem.innerHTML = "Connected To Server  -  " + (numPlayers).toString() + " Players Online" 
         elem.style.color = "lawngreen"
     } else {

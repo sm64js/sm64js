@@ -292,8 +292,6 @@ require('uWebSockets.js').App().ws('/*', {
 
 }).listen(ws_port, () => { console.log("Starting websocket server " + ws_port) })
 
-}).listen(ws_port, () => { console.log("Starting websocket server " + ws_port) })
-
 //// Express Static serving
 const express = require('express')
 const app = express()

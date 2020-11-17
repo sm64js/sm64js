@@ -973,6 +973,13 @@ const update_mario_geometry_inputs = (m) => {
         m.input |= INPUT_OFF_FLOOR;
     }
 
+    /// bouncepad
+    if (m.floor.type == 0x0004 && !(m.input & INPUT_OFF_FLOOR)) {
+        set_mario_action(m, ACT_FREEFALL, 0)
+        m.vel[1] = 200
+        window.parachuting = true
+    }
+
     warp_death_plane(m)
 }
 

@@ -78,13 +78,33 @@ convert("6")
 convert("model")
 snum = snum + 1
 }
+
 function convert(MDTY) {
-	var input = require('os').homedir() + '/sm64ex/levels/' + level + '/areas/' +areaNum+ '/' + snum + '/'+MDTY+'.inc.c' // directory of each model file
+	var input = require('os').homedir() + '/sm64ex/levels/' + level + '/areas/' + areaNum + '/' + snum + '/' + MDTY + '.inc.c' // directory of each model file
 	if (!fs.existsSync(input)) {return;}
-	var inputStr = fs.readFileSync(input, 'utf8')
-	var inputStr = inputStr.replace(/\r/g, "")
-	var lines = inputStr.split("\n")
-	var lines = lines.filter(line => (line.length != 0) && (line[0] != '/'))
+	let inputStr = fs.readFileSync(input, 'utf8')
+	inputStr = inputStr.replace(/\r/g, "")
+	let lines = []
+
+	//// deal with ); or }; not being by itself on a line
+	inputStr.split("\n").forEach(line => {
+		if (line.indexOf(');') != -1) {
+			let splitline = line.split(');')
+			lines.push(splitline[0])
+			lines.push(');')
+			lines.push(splitline[1])
+		} else if (line.indexOf('};') != -1) {
+			let splitline = line.split('};')
+			lines.push(splitline[0])
+			lines.push('};')
+			lines.push(splitline[1])
+		} else {
+			lines.push(line)
+        }
+	})
+
+	lines = lines.filter(line => (line.length != 0) && (line[0] != '/'))
+
 	var outputStr = ""
 
 	while (lines.length > 0) {
@@ -97,6 +117,9 @@ function convert(MDTY) {
 		} else {
 			section = lines.splice(0, endSection + 1)
 		}
+
+		const firstElems = section[0].split(' ')
+
 		if (section[0].slice(0, 16) == 'static const Vtx') { //vertex
 			const vtxArrayName = section[0].slice(17, section[0].indexOf('['))
 			outputStr += `const ${vtxArrayName} = [\n`
@@ -121,8 +144,11 @@ function convert(MDTY) {
 				outputStr += `\t${line}\n`
 			})
 			outputStr += `]\n\n`
-		} else if (section[0].slice(0, 20) == 'static const Lights1') {
-			outputStr += `const ${section[0].slice(21, section[0].length - 16)} Gbi.gdSPDefLights1(\n`
+		} else if (section[0].slice(0, 20) == 'static const Lights1' || section[0].slice(0, 7) == 'Lights1') {
+
+			const startIndex = section[0].slice(0, 7) == 'Lights1' ? 8 : 21
+
+			outputStr += `const ${section[0].slice(startIndex, section[0].length - 16)} Gbi.gdSPDefLights1(\n`
 			section.slice(1, section.length - 1).forEach(line => {
 				outputStr += `\t${line}\n`
 			})
@@ -131,7 +157,10 @@ function convert(MDTY) {
 			const textureName = section[0].slice(25, section[0].length - 6)
 			const textureData = section[1].slice(0, section[1].indexOf('}'))
 			outputStr += `const ${textureName} = [\n${textureData}\n]\n`
-		} else {
+		} else if (firstElems[0] == 'u8') {
+			console.log('Warning not recognized section starting with u8 possibly a texture?')
+			console.log(section[0])
+        } else {
 			console.log("Could not parse: " + section[0])
 		}
 	}
@@ -146,5 +175,6 @@ function convert(MDTY) {
 	var dir = mainDir + snum;
 
 	MakeDirectory(dir);
-	fs.writeFileSync(__dirname + '/converted/' + vOutputStr1 + '/areas/' + areaNum + '/' + snum + '/' + MDTY + '.inc.js', outputStr)	
+	fs.writeFileSync(__dirname + '/converted/' + vOutputStr1 + '/areas/' + areaNum + '/' + snum + '/' + MDTY + '.inc.js', outputStr)
+
 }

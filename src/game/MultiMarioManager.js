@@ -269,7 +269,5 @@ export const recvMarioData = (marioList) => {
         }
     })
 
-    networkData.numOnline = Object.keys(networkData.remotePlayers).length
-
 
 }

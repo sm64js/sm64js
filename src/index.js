@@ -27,7 +27,8 @@ const produce_one_frame = () => {
     n_frames++
 
     playerInputUpdate() /// Keyboard buttons / joystick process to game input commands
-    Socket.send_controller_update(n_frames)
+    //Socket.send_controller_update(n_frames)
+    Socket.pre_main_loop_one_iteration(n_frames)
     GFX.start_frame()
     Game.main_loop_one_iteration()
     Socket.post_main_loop_one_iteration(n_frames)

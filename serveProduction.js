@@ -1,4 +1,4 @@
-const { RootMsg, MarioListMsg, ControllerMsg, ValidPlayersMsg, Sm64JsMsg } = require("./proto/mario_pb")
+const { RootMsg, MarioListMsg, ControllerMsg, ValidPlayersMsg, Sm64JsMsg, FlagMsg } = require("./proto/mario_pb")
 const fs = require('fs')
 const http = require('http')
 const got = require('got')
@@ -56,6 +56,16 @@ const sendValidUpdate = () => {
     const rootMsg = new RootMsg()
     rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
     broadcastData(rootMsg.serializeBinary())
+}
+
+const flagStartPos = [-2460, 206, 6266]
+
+const flagData = {
+    pos: flagStartPos,
+    linkedToPlayer: false,
+    atStartPosition: true,
+    socketID: null,
+    idleTimer: 0
 }
 
 
@@ -190,18 +200,95 @@ const sendSkinsIfUpdated = () => {
     })
 }
 
+const processBasicAttack = (attackerID, attackMsg) => {
+
+    if (allChannels[attackerID].valid == 0) return
+
+    /// redundant
+    attackMsg.setAttackerSocketId(attackerID)
+
+    if (flagData.linkedToPlayer && flagData.socketID == attackMsg.getTargetId()) {
+        flagData.linkedToPlayer = false
+        flagData.socketID = null
+        flagData.fallmode = true
+        const newFlagLocation = allChannels[attackMsg.id].decodedMario.getPosList()
+        newFlagLocation[0] += ((Math.random() * 1000.0) - 500.0)
+        newFlagLocation[1] += 400
+        newFlagLocation[2] += ((Math.random() * 1000.0) - 500.0)
+        flagData.pos = newFlagLocation
+    }
+}
+
+const processGrabFlagRequest = (socketID, grabFlagMsg) => {
+
+    if (flagData.linkedToPlayer) return
+
+    const pos = grabFlagMsg.getPosList()
+
+    const xDiff = pos[0] - flagData.pos[0]
+    const zDiff = pos[2] - flagData.pos[2]
+
+    const dist = Math.sqrt(xDiff * xDiff + zDiff * zDiff)
+    if (dist < 40) {
+        flagData.linkedToPlayer = true
+        flagData.fallmode = false
+        flagData.atStartPosition = false
+        flagData.socketID = socketID
+        flagData.idleTimer = 0
+    }
+}
+
+const checkForFlag = (socketID) => {
+    if (flagData.socketID == socketID) {
+        flagData.linkedToPlayer = false
+        flagData.socketID = null
+        flagData.fallmode = true
+        const newFlagLocation = allChannels[socketID].decodedMario.getPosList()
+        newFlagLocation[1] += 100
+        flagData.pos = [parseInt(newFlagLocation[0]), parseInt(newFlagLocation[1]), parseInt(newFlagLocation[2])]
+    }
+}
+
+
+
 
 /// Every frame - 30 times per second
 setInterval(async () => {
+
+    if (flagData.fallmode) {
+        if (flagData.pos[1] > -10000) flagData.pos[1] -= 3
+    }
+
+    if (!flagData.linkedToPlayer && !flagData.atStartPosition) {
+        flagData.idleTimer++
+        if (flagData.idleTimer > 3000) {
+            flagData.pos = flagStartPos
+            flagData.fallmode = false
+            flagData.atStartPosition = true
+            flagData.idleTimer = 0
+        }
+    }
+
     Object.values(allChannels).forEach(data => {
         if (data.valid > 0) data.valid--
-        else if (data.decodedMario) data.channel.close()
+        else if (data.decodedMario) {
+            checkForFlag(data.channel.my_id)
+            data.channel.close()
+        }
     })
 
     const sm64jsMsg = new Sm64JsMsg()
     const mariolist = Object.values(allChannels).filter(data => data.decodedMario).map(data => data.decodedMario)
     const mariolistproto = new MarioListMsg()
     mariolistproto.setMarioList(mariolist)
+
+    const flagmsg = new FlagMsg()
+    flagmsg.setLinkedtoplayer(flagData.linkedToPlayer)
+    if (flagData.linkedToPlayer) flagmsg.setSocketid(flagData.socketID)
+    else flagmsg.setPosList(flagData.pos)
+
+    mariolistproto.setFlagList([flagmsg])
+
     sm64jsMsg.setListMsg(mariolistproto)
     const bytes = sm64jsMsg.serializeBinary()
     const compressedBytes = await deflate(bytes)
@@ -262,7 +349,10 @@ require('uWebSockets.js').App().ws('/*', {
                     switch (sm64jsMsg.getMessageCase()) {
                         case Sm64JsMsg.MessageCase.MARIO_MSG:
                             processPlayerData(channel.my_id, sm64jsMsg.getMarioMsg()); break
-                        //case 2: processBasicAttack(channel.my_id, bytes.slice(1)); break
+                        case Sm64JsMsg.MessageCase.ATTACK_MSG:
+                            processBasicAttack(channel.my_id, sm64jsMsg.getAttackMsg()); break
+                        case Sm64JsMsg.MessageCase.GRAB_MSG:
+                            processGrabFlagRequest(channel.my_id, sm64jsMsg.getGrabMsg()); break
                         //case 3: processControllerUpdate(channel.my_id, bytes.slice(1)); break
                         //case 4: processKnockUp(channel.my_id, bytes.slice(1)); break
                         default: throw "unknown case for uncompressed proto message"
@@ -288,6 +378,7 @@ require('uWebSockets.js').App().ws('/*', {
     },
 
     close: (channel) => {
+        checkForFlag(channel.my_id)
         delete allChannels[channel.my_id]
     }
 

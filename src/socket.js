@@ -1,4 +1,4 @@
-import { RootMsg, Sm64JsMsg  } from "../proto/mario_pb"
+import { RootMsg, Sm64JsMsg, GrabFlagMsg } from "../proto/mario_pb"
 import zlib from "zlib"
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
@@ -170,16 +170,12 @@ channel.onopen = () => {
 }
 
 const recvFlagList = (flaglist) => {
-    networkData.flagData.pos = mainupdatemsg.getFlag().getPosList()
-    networkData.flagData.linkedToPlayer = mainupdatemsg.getFlag().getLinkedtoplayer()
 
-    if(networkData.flagData.linkedToPlayer) {
-        const socketData = serverData.extraPlayersByID[mainupdatemsg.getFlag().getSocketid()]
-        if (socketData == undefined) return
-        const newflagpos = [...socketData.marioData.pos]
-        newflagpos[1] += 150
-        updateFlagData(newflagpos, socketData.marioData.angle[1])
-    } else updateFlagData(serverData.flagData.pos, 0)
+    const firstFlag = flaglist[0]
+
+    networkData.flagData[0].pos = firstFlag.getPosList()
+    networkData.flagData[0].linkedToPlayer = firstFlag.getLinkedtoplayer()
+    networkData.flagData[0].socketId = firstFlag.getSocketid()
 
 }
 
@@ -204,6 +200,27 @@ export const send_controller_update = (frame) => {
 /*    if (multiplayerReady() && frame % 1 == 0) {
         sendDataWithOpcode(Multi.createControllerProtoMsg().serializeBinary(), 3)
     }*/
+}
+
+export const pre_main_loop_one_iteration = (frame) => {
+
+    const flagSocketId = networkData.flagData[0].socketId
+
+    if (networkData.flagData[0].linkedToPlayer) { /// someone has the flag
+        let newflagpos, angleForFlag
+        if (flagSocketId == networkData.myChannelID) { /// I have the flag
+            const m = gameData.marioState
+            newflagpos = [...m.pos]
+            angleForFlag = m.faceAngle[1]
+        } else { /// someone else has the flag
+            let socketData = networkData.remotePlayers[flagSocketId]
+            if (socketData == undefined) return
+            newflagpos = [...socketData.marioData.pos]
+            angleForFlag = socketData.marioData.angle[1]
+        }
+        newflagpos[1] += 150
+        updateFlagData(newflagpos, angleForFlag)
+    } else updateFlagData(networkData.flagData[0].pos, 0) /// no one has the flag
 }
 
 export const post_main_loop_one_iteration = (frame) => {
@@ -238,16 +255,22 @@ export const post_main_loop_one_iteration = (frame) => {
 
     /////////////// check for grab flag
     const m = gameData.marioState
-    if (m && !serverData.flagData.linkedToPlayer) {
-        const xDiff = m.pos[0] - serverData.flagData.pos[0]
-        const yDiff = m.pos[1] - serverData.flagData.pos[1]
-        const zDiff = m.pos[2] - serverData.flagData.pos[2]
+    if (m && !networkData.flagData[0].linkedToPlayer) {
+        const xDiff = m.pos[0] - networkData.flagData[0].pos[0]
+        const yDiff = m.pos[1] - networkData.flagData[0].pos[1]
+        const zDiff = m.pos[2] - networkData.flagData[0].pos[2]
 
         const dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff + zDiff * zDiff)
 
         if (dist < 40) {
-            const grabMsg = { pos: m.pos }
-            sendDataWithOpcode(new TextEncoder("utf-8").encode(JSON.stringify(grabMsg)), 5)
+            const grabMsg = new GrabFlagMsg()
+            grabMsg.setPosList([ parseInt(m.pos[0]), parseInt(m.pos[1]), parseInt(m.pos[2])] )
+
+            const sm64jsMsg = new Sm64JsMsg()
+            sm64jsMsg.setGrabMsg(grabMsg)
+            const rootMsg = new RootMsg()
+            rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+            sendData(rootMsg.serializeBinary())
         }
     }
 

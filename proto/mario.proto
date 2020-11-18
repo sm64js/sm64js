@@ -14,6 +14,8 @@ message Sm64JsMsg {
 		MarioListMsg list_msg = 1;
 		MarioMsg mario_msg = 2;
 		ValidPlayersMsg valid_players_msg = 3;
+		AttackMsg attack_msg = 4;
+		GrabFlagMsg grab_msg = 5;
 		/*ControllerMsg controller_msg = 6;
 		ControllerListMsg controller_list_msg = 7;*/
 	}
@@ -32,6 +34,15 @@ message FlagMsg {
      repeated sint32 pos = 1;
      bool linkedToPlayer = 2;
      uint32 socketID = 3;
+}
+
+message GrabFlagMsg {
+	repeated sint32 pos = 1;
+}
+
+message AttackMsg {
+	uint32 target_socket_id = 1;
+	uint32 attacker_socket_id = 2;
 }
 
 message MarioMsg {

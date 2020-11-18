@@ -79,13 +79,6 @@ const unzip = (bytes) => {
     })
 }
 
-
-const measureLatency = (msg) => {
-    const startTime = msg.time
-    const endTime = performance.now()
-    window.latency = parseInt(endTime - startTime)
-}
-
 const recvChat = (chatmsg) => {
 
     if (chatmsg.channel_id != networkData.myChannelID &&
@@ -136,7 +129,6 @@ channel.onopen = () => {
                     case Sm64JsMsg.MessageCase.CONNECTED_MSG:
                         networkData.myChannelID = sm64jsMsg.getConnectedMsg().getChannelid()
                         break
-                    //case 99: measureAndPrintLatency(bytes.slice(1)); break
                     default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
                 }
                 break
@@ -155,7 +147,6 @@ channel.onopen = () => {
                 switch (topic) {
                     case 'chat': recvChat(msg); break
                     case 'skin': Cosmetics.recvSkinData(msg); break
-                    case 'ping': measureLatency(msg); break
                     default: throw "Unknown topic in json message"
                 }
                 break
@@ -197,7 +188,9 @@ export const post_main_loop_one_iteration = (frame) => {
             const pingmsg = new PingMsg()
             pingmsg.setTime(performance.now())
             sm64jsMsg.setPingMsg(pingmsg)
-            sendData(sm64jsMsg.serializeBinary())
+            const rootMsg = new RootMsg()
+            rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+            sendData(rootMsg.serializeBinary())
 
             //send skins if updated
             if (Cosmetics.validSkins()) {

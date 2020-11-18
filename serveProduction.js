@@ -269,6 +269,8 @@ require('uWebSockets.js').App().ws('/*', {
                     switch (sm64jsMsg.getMessageCase()) {
                         case Sm64JsMsg.MessageCase.MARIO_MSG:
                             processPlayerData(channel.my_id, sm64jsMsg.getMarioMsg()); break
+                        case Sm64JsMsg.MessageCase.PING_MSG:
+                            sendData(bytes, channel); break
                         //case 2: processBasicAttack(channel.my_id, bytes.slice(1)); break
                         //case 3: processControllerUpdate(channel.my_id, bytes.slice(1)); break
                         //case 4: processKnockUp(channel.my_id, bytes.slice(1)); break
@@ -281,7 +283,6 @@ require('uWebSockets.js').App().ws('/*', {
                     switch (topic) {
                         case 'chat': processChat(channel.my_id, msg); break
                         case 'skin': processSkin(channel.my_id, msg); break
-                        case 'ping': sendData(bytes, channel); break
                         default: throw "Unknown topic in json message"
                     }
                     break

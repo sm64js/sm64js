@@ -3439,6 +3439,8 @@ export const mario_medium_poly_torso_dl = (customData) => {
 		Gbi.gsSPLight(mario_shirt_lights_group(customData).l[0], 1),
 		Gbi.gsSPLight(mario_shirt_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_medium_poly_tshirt_shared_dl),
+		Gbi.gsSPLight(mario_hat_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_hat_lights_group(customData).a, 2),
 		Gbi.gsSPEndDisplayList(),
 	]
 }
@@ -4004,6 +4006,8 @@ export const mario_low_poly_torso_dl = (customData) => {
 		Gbi.gsSPLight(mario_shirt_lights_group(customData).l[0], 1),
 		Gbi.gsSPLight(mario_shirt_lights_group(customData).a, 2),
 		Gbi.gsSPDisplayList(mario_low_poly_tshirt_shared_dl),
+		Gbi.gsSPLight(mario_hat_lights_group(customData).l[0], 1),
+		Gbi.gsSPLight(mario_hat_lights_group(customData).a, 2),
 		Gbi.gsSPEndDisplayList(),
 	]
 }

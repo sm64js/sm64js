@@ -171,11 +171,11 @@ channel.onopen = () => {
 
 const recvFlagList = (flaglist) => {
 
-    const firstFlag = flaglist[0]
-
-    networkData.flagData[0].pos = firstFlag.getPosList()
-    networkData.flagData[0].linkedToPlayer = firstFlag.getLinkedtoplayer()
-    networkData.flagData[0].socketId = firstFlag.getSocketid()
+    flaglist.forEach((flag, i) => {
+        networkData.flagData[i].pos = flag.getPosList()
+        networkData.flagData[i].linkedToPlayer = flag.getLinkedtoplayer()
+        networkData.flagData[i].socketId = flag.getSocketid()
+    })
 
 }
 
@@ -215,23 +215,26 @@ export const send_controller_update = (frame) => {
 
 export const pre_main_loop_one_iteration = (frame) => {
 
-    const flagSocketId = networkData.flagData[0].socketId
+    for (let i = 0; i < networkData.flagData.length; i++) {
+        const flagSocketId = networkData.flagData[i].socketId
 
-    if (networkData.flagData[0].linkedToPlayer) { /// someone has the flag
-        let newflagpos, angleForFlag
-        if (flagSocketId == networkData.myChannelID) { /// I have the flag
-            const m = gameData.marioState
-            newflagpos = [...m.pos]
-            angleForFlag = m.faceAngle[1]
-        } else { /// someone else has the flag
-            let socketData = networkData.remotePlayers[flagSocketId]
-            if (socketData == undefined) return
-            newflagpos = [...socketData.marioState.pos]
-            angleForFlag = socketData.marioState.faceAngle[1]
-        }
-        newflagpos[1] += 150
-        updateFlagData(newflagpos, angleForFlag)
-    } else updateFlagData(networkData.flagData[0].pos, 0) /// no one has the flag
+        if (networkData.flagData[i].linkedToPlayer) { /// someone has the flag
+            let newflagpos, angleForFlag
+            if (flagSocketId == networkData.myChannelID) { /// I have the flag
+                const m = gameData.marioState
+                newflagpos = [...m.pos]
+                angleForFlag = m.faceAngle[1]
+            } else { /// someone else has the flag
+                let socketData = networkData.remotePlayers[flagSocketId]
+                if (socketData == undefined) return
+                newflagpos = [...socketData.marioState.pos]
+                angleForFlag = socketData.marioState.faceAngle[1]
+            }
+            newflagpos[1] += 150
+            updateFlagData(newflagpos, angleForFlag, i)
+        } else updateFlagData(networkData.flagData[i].pos, 0, i) /// no one has the flag
+    }
+
 }
 
 export const post_main_loop_one_iteration = (frame) => {
@@ -267,6 +270,7 @@ export const post_main_loop_one_iteration = (frame) => {
     /////////////// check for grab flag
     const m = gameData.marioState
     if (m && !networkData.flagData[0].linkedToPlayer) {
+        console.log(m.pos)
         const xDiff = m.pos[0] - networkData.flagData[0].pos[0]
         const yDiff = Math.abs(m.pos[1] - networkData.flagData[0].pos[1])
         const zDiff = m.pos[2] - networkData.flagData[0].pos[2]
@@ -283,7 +287,6 @@ export const post_main_loop_one_iteration = (frame) => {
             rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
             sendData(rootMsg.serializeBinary())
 
-            console.log("grab flag request")
         }
     }
 

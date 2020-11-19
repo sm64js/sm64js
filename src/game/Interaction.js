@@ -336,7 +336,7 @@ const interact_player = (m, o) => {
             Mario.set_mario_action(m2, Mario.ACT_FREEFALL, 0)
         }
         if (m.marioObj.localMario) {
-            m2.ignoreUpdates = 40
+            //m2.ignoreUpdates = 40
             sendAttackToServer(m2.channel_id)
             //sendPlayerInteraction(m2.channel_id, interaction)  /// unused
         }

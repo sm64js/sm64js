@@ -131,7 +131,9 @@ const sanitizeChat = (string) => {
     return string
 }
 
-const processChat = async (channel_id, msg) => {
+const processChat = async (channel_id, sm64jsMsg) => {
+    const chatMsg = sm64jsMsg.getChatMsg()
+    const msg = chatMsg.getMessage()
 
     if (allChannels[channel_id].chatCooldown > 0) return
     allChannels[channel_id].chatCooldown = 3 // seconds
@@ -155,13 +157,13 @@ const processChat = async (channel_id, msg) => {
             return
         }
 
-        const chatmsg = {
-            channel_id,
-            msg: filteredMessage,
-            sender: decodedMario.getPlayername()
-        }
+        chatMsg.setChannelid(channel_id)
+        chatMsg.setMessage(filteredMessage)
+        chatMsg.setSender(decodedMario.getPlayername())
 
-        broadcastJsonWithTopic('chat', chatmsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+        broadcastData(rootMsg.serializeBinary())
 
     } catch (e) {
         console.log(`Got error with profanity api: ${e}`)
@@ -271,6 +273,8 @@ require('uWebSockets.js').App().ws('/*', {
                             processPlayerData(channel.my_id, sm64jsMsg.getMarioMsg()); break
                         case Sm64JsMsg.MessageCase.PING_MSG:
                             sendData(bytes, channel); break
+                        case Sm64JsMsg.MessageCase.CHAT_MSG:
+                            processChat(channel.my_id, sm64jsMsg); break
                         //case 2: processBasicAttack(channel.my_id, bytes.slice(1)); break
                         //case 3: processControllerUpdate(channel.my_id, bytes.slice(1)); break
                         //case 4: processKnockUp(channel.my_id, bytes.slice(1)); break
@@ -281,7 +285,6 @@ require('uWebSockets.js').App().ws('/*', {
                     const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
                     const { topic, msg } = JSON.parse(str)
                     switch (topic) {
-                        case 'chat': processChat(channel.my_id, msg); break
                         case 'skin': processSkin(channel.my_id, msg); break
                         default: throw "Unknown topic in json message"
                     }

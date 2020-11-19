@@ -1,4 +1,4 @@
-import { RootMsg, Sm64JsMsg, PingMsg  } from "../proto/mario_pb"
+import { RootMsg, Sm64JsMsg, PingMsg, ChatMsg } from "../proto/mario_pb"
 import zlib from "zlib"
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
@@ -80,23 +80,26 @@ const unzip = (bytes) => {
 }
 
 const recvChat = (chatmsg) => {
+    const channel_id = chatmsg.getChannelid()
+    const sender = chatmsg.getSender()
+    const msg = chatmsg.getMessage()
 
-    if (chatmsg.channel_id != networkData.myChannelID &&
-        networkData.remotePlayers[chatmsg.channel_id] == undefined) return
+    if (channel_id != networkData.myChannelID &&
+        networkData.remotePlayers[channel_id] == undefined) return
 
-    if (window.banPlayerList.includes(chatmsg.sender)) return
+    if (window.banPlayerList.includes(sender)) return
 
     const chatlog = document.getElementById("chatlog")
     const node = document.createElement("LI")                 // Create a <li> node
-    node.innerHTML = '<strong>' + sanitizeChat(chatmsg.sender, false) + '</strong>: ' + sanitizeChat(chatmsg.msg, true) + '<br/>'        // Create a text node
+    node.innerHTML = '<strong>' + sanitizeChat(sender, false) + '</strong>: ' + sanitizeChat(msg, true) + '<br/>'        // Create a text node
     chatlog.appendChild(node)
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 
     let someobject
-    if (chatmsg.channel_id == networkData.myChannelID)
+    if (channel_id == networkData.myChannelID)
         someobject = window.myMario
     else
-        someobject = networkData.remotePlayers[chatmsg.channel_id]
+        someobject = networkData.remotePlayers[channel_id]
 }
 
 const measureAndPrintLatency = (ping_proto) => {
@@ -129,6 +132,9 @@ channel.onopen = () => {
                     case Sm64JsMsg.MessageCase.CONNECTED_MSG:
                         networkData.myChannelID = sm64jsMsg.getConnectedMsg().getChannelid()
                         break
+                    case Sm64JsMsg.MessageCase.CHAT_MSG:
+                        recvChat(sm64jsMsg.getChatMsg())
+                        break
                     default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
                 }
                 break
@@ -145,7 +151,6 @@ channel.onopen = () => {
                 const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
                 const { topic, msg } = JSON.parse(str)
                 switch (topic) {
-                    case 'chat': recvChat(msg); break
                     case 'skin': Cosmetics.recvSkinData(msg); break
                     default: throw "Unknown topic in json message"
                 }
@@ -209,6 +214,8 @@ export const post_main_loop_one_iteration = (frame) => {
             sendData(rootMsg.serializeBinary())
         }
     }
+    
+    decrementChat()
 
 }
 
@@ -222,7 +229,13 @@ const decrementChat = () => {
 }
 
 export const sendChat = (msg) => {
-    sendJsonWithTopic('chat', msg)
+    const chatMsg = new ChatMsg()
+    chatMsg.setMessage(msg)
+    const sm64jsMsg = new Sm64JsMsg()
+    sm64jsMsg.setChatMsg(chatMsg)
+    const rootMsg = new RootMsg()
+    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+    sendData(rootMsg.serializeBinary())
 }
 
 export const sendPlayerInteraction = (channel_id, interaction) => {

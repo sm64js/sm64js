@@ -16,6 +16,7 @@ message Sm64JsMsg {
 		PingMsg ping_msg = 3;
 		MarioMsg mario_msg = 4;
 		ValidPlayersMsg valid_players_msg = 5;
+		ChatMsg chat_msg = 6;
 		/*ControllerMsg controller_msg = 6;
 		ControllerListMsg controller_list_msg = 7;*/
 	}
@@ -72,4 +73,11 @@ message ControllerMsg {
 
 message ValidPlayersMsg {
 	repeated uint32 validPlayers = 1;
+}
+
+message ChatMsg {
+	string message = 1;
+	// TODO having sender and channelID feels redundant
+	string sender = 2;
+	uint32 channelID = 3;
 }

@@ -238,7 +238,9 @@ export const pre_main_loop_one_iteration = (frame) => {
 }
 
 export const post_main_loop_one_iteration = (frame) => {
-
+	//Update the rainbows colors
+	if (frame % 2 == 0) Cosmetics.updateRainbowSkin()
+	
     if (frame % 30 == 0) updateConnectedMsg()
 
     if (multiplayerReady()) {
@@ -248,7 +250,7 @@ export const post_main_loop_one_iteration = (frame) => {
             sendJsonWithTopic('ping', { time: performance.now() })
 
             //send skins if updated
-            if (Cosmetics.validSkins()) {
+			if (Cosmetics.validSkins()) {
                 if (JSON.stringify(window.myMario.skinData) != networkData.lastSentSkinData) {
                     networkData.lastSentSkinData = JSON.stringify(window.myMario.skinData)
                     sendJsonWithTopic('skin', window.myMario.skinData)

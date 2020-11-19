@@ -111,6 +111,59 @@ Object.keys(window.myMario.skinData).forEach((skinType) => {
     if (skinData) window.myMario.skinData[skinType] = JSON.parse(skinData)
 })
 
+window.rainbow = [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00];
+window.rainbowState = 0;
+export const updateRainbowSkin = () => {
+	var VAL = 10;
+	switch (window.rainbowState) {
+		case (0) : {
+			window.rainbow[3] += VAL;
+			if (window.rainbow[3] >= 255) {window.rainbowState = 1}
+			break;
+		}
+		case (1) : {
+			window.rainbow[5] -= VAL; 
+			if (window.rainbow[5] <= 0) {window.rainbowState = 2}
+			break;
+		}
+		case (2) : {
+			window.rainbow[4] += VAL;
+			if (window.rainbow[4] >= 255) {window.rainbowState = 3}
+			break;
+		}
+		case (3) : {
+			window.rainbow[3] -= VAL;
+			if (window.rainbow[3] <= 0) {window.rainbowState = 4}
+			break;
+		}
+		case (4) : {
+			window.rainbow[5] += VAL;
+			if (window.rainbow[5] >= 255) {window.rainbowState = 5}
+			break;
+		}
+		case (5) : {
+			window.rainbow[4] -= VAL;
+			if (window.rainbow[4] <= 0) {window.rainbowState = 0}
+			break;
+		}
+	}
+	if (window.rainbow[3] > 255) {window.rainbow[3] = 255}
+	if (window.rainbow[4] > 255) {window.rainbow[4] = 255}
+	if (window.rainbow[5] > 255) {window.rainbow[5] = 255}
+	if (window.rainbow[3] < 0) {window.rainbow[3] = 0}
+	if (window.rainbow[4] < 0) {window.rainbow[4] = 0}
+	if (window.rainbow[5] < 0) {window.rainbow[5] = 0}
+	window.rainbow[0] = window.rainbow[3] / 4;
+	window.rainbow[1] = window.rainbow[4] / 4;
+	window.rainbow[2] = window.rainbow[5] / 4;
+	
+	window.rainbow[0] = parseInt(window.rainbow[0]);
+	window.rainbow[1] = parseInt(window.rainbow[1]);
+	window.rainbow[2] = parseInt(window.rainbow[2]);
+	window.rainbow[3] = parseInt(window.rainbow[3]);
+	window.rainbow[4] = parseInt(window.rainbow[4]);
+	window.rainbow[5] = parseInt(window.rainbow[5]);
+}
 
 window.updatePlayerName = (name) => {
     if (name.length < 3) {
@@ -132,29 +185,29 @@ export const recvSkinData = (msg) => {
 }
 
 export const validSkins = () => {
-    if (window.myMario.skinData.overalls.length != 6) return false
-    if (window.myMario.skinData.hat.length != 6) return false
-    if (window.myMario.skinData.shirt.length != 6) return false
-    if (window.myMario.skinData.gloves.length != 6) return false
-    if (window.myMario.skinData.boots.length != 6) return false
-    if (window.myMario.skinData.skin.length != 6) return false
-    if (window.myMario.skinData.hair.length != 6) return false
+    if (window.myMario.skinData.overalls.length != 6 && window.myMario.skinData.overalls != "r") return false
+    if (window.myMario.skinData.hat.length != 6 && window.myMario.skinData.hat != "r") return false
+    if (window.myMario.skinData.shirt.length != 6 && window.myMario.skinData.shirt != "r") return false
+    if (window.myMario.skinData.gloves.length != 6 && window.myMario.skinData.gloves != "r") return false
+    if (window.myMario.skinData.boots.length != 6 && window.myMario.skinData.boots != "r") return false
+    if (window.myMario.skinData.skin.length != 6 && window.myMario.skinData.skin != "r") return false
+    if (window.myMario.skinData.hair.length != 6 && window.myMario.skinData.hair != "r") return false
 
     for (let i = 0; i < 6; i++) {
         let number = window.myMario.skinData.overalls[i]
-        if (number < 0 || number > 255 || !Number.isInteger(number)) return false
+        if ((number < 0 || number > 255 || !Number.isInteger(number)) && window.myMario.skinData.overalls != "r") return false
         number = window.myMario.skinData.hat[i]
-        if (number < 0 || number > 255 || !Number.isInteger(number)) return false
+        if ((number < 0 || number > 255 || !Number.isInteger(number)) && window.myMario.skinData.hat != "r") return false
         number = window.myMario.skinData.shirt[i]
-        if (number < 0 || number > 255 || !Number.isInteger(number)) return false
+        if ((number < 0 || number > 255 || !Number.isInteger(number)) && window.myMario.skinData.shirt != "r") return false
         number = window.myMario.skinData.gloves[i]
-        if (number < 0 || number > 255 || !Number.isInteger(number)) return false
+        if ((number < 0 || number > 255 || !Number.isInteger(number)) && window.myMario.skinData.gloves != "r") return false
         number = window.myMario.skinData.boots[i]
-        if (number < 0 || number > 255 || !Number.isInteger(number)) return false
+        if ((number < 0 || number > 255 || !Number.isInteger(number)) && window.myMario.skinData.boots != "r") return false
         number = window.myMario.skinData.skin[i]
-        if (number < 0 || number > 255 || !Number.isInteger(number)) return false
+        if ((number < 0 || number > 255 || !Number.isInteger(number)) && window.myMario.skinData.skin != "r") return false
         number = window.myMario.skinData.hair[i]
-        if (number < 0 || number > 255 || !Number.isInteger(number)) return false
+        if ((number < 0 || number > 255 || !Number.isInteger(number)) && window.myMario.skinData.hair != "r") return false
     }
 
     if (window.myMario.skinData.customCapState != 0 && window.myMario.skinData.customCapState != 1) return false
@@ -168,13 +221,13 @@ export const getExtraRenderData = (channel_id) => {
     const myChat = window.myMario.chatData
 
     if (channel_id == networkData.myChannelID) return {
-        mario_overalls_lights: window.myMario.skinData.overalls,
-        mario_hat_lights: window.myMario.skinData.hat,
-        mario_shirt_lights: window.myMario.skinData.shirt,
-        mario_gloves_lights: window.myMario.skinData.gloves,
-        mario_boots_lights: window.myMario.skinData.boots,
-        mario_skin_lights: window.myMario.skinData.skin,
-        mario_hair_lights: window.myMario.skinData.hair,
+        mario_overalls_lights: (window.myMario.skinData.overalls == "r" ? window.rainbow : window.myMario.skinData.overalls),
+        mario_hat_lights: (window.myMario.skinData.hat == "r" ? window.rainbow : window.myMario.skinData.hat),
+        mario_shirt_lights: (window.myMario.skinData.shirt == "r" ? window.rainbow : window.myMario.skinData.shirt),
+        mario_gloves_lights: (window.myMario.skinData.gloves == "r" ? window.rainbow : window.myMario.skinData.gloves),
+        mario_boots_lights: (window.myMario.skinData.boots == "r" ? window.rainbow : window.myMario.skinData.boots),
+        mario_skin_lights: (window.myMario.skinData.skin == "r" ? window.rainbow : window.myMario.skinData.skin),
+        mario_hair_lights: (window.myMario.skinData.hair == "r" ? window.rainbow : window.myMario.skinData.hair),
         chat: (myChat && myChat.timer > 0) ? myChat.msg : null
     }
 
@@ -189,13 +242,13 @@ export const getExtraRenderData = (channel_id) => {
     const hair = networkData.remotePlayers[channel_id].skinData.hair
 
     return {
-        mario_overalls_lights: overalls,
-        mario_shirt_lights: shirt,
-        mario_hat_lights: hat,
-        mario_gloves_lights: gloves,
-        mario_boots_lights: boots,
-        mario_skin_lights: skin,
-        mario_hair_lights: hair,
+        mario_overalls_lights: (overalls == "r" ? window.rainbow : overalls),
+        mario_shirt_lights: (shirt == "r" ? window.rainbow : shirt),
+        mario_hat_lights: (hat == "r" ? window.rainbow : hat),
+        mario_gloves_lights: (gloves == "r" ? window.rainbow : gloves),
+        mario_boots_lights: (boots == "r" ? window.rainbow : boots),
+        mario_skin_lights: (skin == "r" ? window.rainbow : skin),
+        mario_hair_lights: (hair == "r" ? window.rainbow : hair),
         playerName: remoteMario.playerName,
         chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null
     }

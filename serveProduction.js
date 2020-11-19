@@ -101,30 +101,30 @@ const processControllerUpdate = (channel_id, bytes) => {
 }
 
 const validSkins = (skinData) => {
-    if (skinData.overalls.length != 6) return false
-    if (skinData.hat.length != 6) return false
-    if (skinData.shirt.length != 6) return false
-    if (skinData.gloves.length != 6) return false
-    if (skinData.boots.length != 6) return false
-    if (skinData.skin.length != 6) return false
-    if (skinData.hair.length != 6) return false
+    if (skinData.overalls.length != 6 && skinData.overalls != "r") return false
+    if (skinData.hat.length != 6 && skinData.hat != "r") return false
+    if (skinData.shirt.length != 6 && skinData.shirt != "r") return false
+    if (skinData.gloves.length != 6 && skinData.gloves != "r") return false
+    if (skinData.boots.length != 6 && skinData.boots != "r") return false
+    if (skinData.skin.length != 6 && skinData.skin != "r") return false
+    if (skinData.hair.length != 6 && skinData.hair != "r") return false
 
 
     for (let i = 0; i < 6; i++) {
         let number = skinData.overalls[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
+        if ((isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) && skinData.overalls != "r") return false
         number = skinData.hat[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
+        if ((isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) && skinData.hat != "r") return false
         number = skinData.shirt[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
+        if ((isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) && skinData.shirt != "r") return false
         number = skinData.gloves[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
+        if ((isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) && skinData.gloves != "r") return false
         number = skinData.boots[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
+        if ((isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) && skinData.boots != "r") return false
         number = skinData.skin[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
+        if ((isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) && skinData.skin != "r") return false
         number = skinData.hair[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
+        if ((isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) && skinData.hair != "r") return false
     }
 
     return true

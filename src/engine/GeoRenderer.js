@@ -7,7 +7,6 @@ import * as Mario from "../game/Mario"
 import { create_shadow_below_xyz } from "../game/Shadow"
 import { networkData } from "../socket"
 import { MarioMiscInstance as MarioMisc } from "../game/MarioMisc"
-import { cos } from "mathjs"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -367,6 +366,10 @@ class GeoRenderer {
 
         const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const object = node.wrapper.wrapperObjectNode.wrapperObject
+
+        if (object.captureableFlagIndex != undefined) {
+            this.geo_append_display_list([Gbi.gsSetFlagIndex(object.captureableFlagIndex)], 1)
+        }
 
         const hasAnimation = (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_HAS_ANIMATION) != 0
 

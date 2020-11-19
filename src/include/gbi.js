@@ -32,6 +32,7 @@ export const G_RDPLOADSYNC = 29
 
 /// Custom Opcodes
 export const G_SETPLAYERDATA = 30
+export const G_SETFLAGINDEX = 31
 
 export const G_ZBUFFER = 0x00000001
 export const G_SHADE = 0x00000004
@@ -847,6 +848,15 @@ export const gsSetPlayerData = (channel_id) => {
         words: {
             w0: G_SETPLAYERDATA,
             w1: { channel_id }
+        }
+    }
+}
+
+export const gsSetFlagIndex = (flagIndex) => {
+    return {
+        words: {
+            w0: G_SETFLAGINDEX,
+            w1: { flagIndex }
         }
     }
 }

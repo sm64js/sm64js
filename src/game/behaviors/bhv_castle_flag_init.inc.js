@@ -5,6 +5,7 @@ const flagObjects = []
 
 export const bhv_castle_flag_init = () => {
     const o = ObjectListProc.gCurrentObject
+    o.captureableFlagIndex = flagObjects.length
     o.header.gfx.unk38.animFrame = Math.floor(Math.random() * 28.0)
 
     flagObjects.push(o)

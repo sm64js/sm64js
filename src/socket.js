@@ -100,6 +100,8 @@ const recvChat = (chatmsg) => {
         someobject = window.myMario
     else
         someobject = networkData.remotePlayers[channel_id]
+        
+    Object.assign(someobject, { chatData: { msg: msg, timer: 150 } })
 }
 
 const measureAndPrintLatency = (ping_proto) => {
@@ -214,7 +216,7 @@ export const post_main_loop_one_iteration = (frame) => {
             sendData(rootMsg.serializeBinary())
         }
     }
-    
+
     decrementChat()
 
 }

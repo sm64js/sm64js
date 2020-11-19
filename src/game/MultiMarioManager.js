@@ -57,6 +57,7 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     m.faceAngle = update.faceangleList
     m.channel_id = update.channelid
     m.playerName = update.playername
+    m.parachuting = update.parachuting
 
     m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
 
@@ -93,6 +94,7 @@ export const createMarioProtoMsg = () => {
     mariomsg.setPosList(m.pos)
     mariomsg.setVelList(m.vel)
     mariomsg.setForwardvel(m.forwardVel)
+    mariomsg.setParachuting(m.parachuting)
 
     if (m.usedObj) mariomsg.setUsedobjid(m.usedObj.rawData[RAW.oSyncID])
 

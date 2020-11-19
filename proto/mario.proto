@@ -68,6 +68,7 @@ message MarioMsg {
 	repeated sint32 rawData = 18;
 	uint32 usedObjID = 19;
 	uint32 channelID = 20;
+	bool parachuting = 21;
 }
 
 message ControllerMsg {

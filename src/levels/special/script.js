@@ -16,8 +16,7 @@ export const level_special_entry = [
     { command: LevelCommands.begin_area, args: [1, special_area_1_geo] },
     { command: LevelCommands.terrain, args: [special_area_1_collision] },
     { command: LevelCommands.end_area },
-    { command: LevelCommands.set_mario_pos, args: [1, 45, 102, -4332, 5734] },
-	{ command: LevelCommands.set_mario_pos, args: [1, 180, 0, 18000, 0] },
+	{ command: LevelCommands.set_mario_pos, args: [1, 180, 0, 18000, 0, true] },
     { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_or_update, LevelUpdate] },
     { command: LevelCommands.call_loop, args: [1, LevelUpdate.lvl_init_or_update, LevelUpdate] },
 ]

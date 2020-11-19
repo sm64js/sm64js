@@ -442,7 +442,8 @@ export const init_marios = () => {
         pos: [ ...Area.gMarioSpawnInfo.startPos ],
         vel: [0, 0, 0],
         action: ACT_IDLE,
-        controller: { stickX: 0, stickY: 0, stickMag: 0 }
+        controller: { stickX: 0, stickY: 0, stickMag: 0 },
+        parachuting: Area.gMarioSpawnInfo.parachuteSpawn
     })
 
     Object.assign(LevelUpdate.gMarioState.marioObj.header.gfx, {
@@ -977,7 +978,7 @@ const update_mario_geometry_inputs = (m) => {
     if (m.floor.type == 0x0004 && !(m.input & INPUT_OFF_FLOOR)) {
         set_mario_action(m, ACT_FREEFALL, 0)
         m.vel[1] = 200
-        window.parachuting = true
+        m.parachuting = true
     }
 
     warp_death_plane(m)

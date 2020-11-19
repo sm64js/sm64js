@@ -84,7 +84,8 @@ class LevelCommands {
         Object.assign(Area.gMarioSpawnInfo, {
             areaIndex: args[0],
             startPos: [ args[2], args[3], args[4] ],
-            startAngle: [0, yaw, 0 ]
+            startAngle: [0, yaw, 0],
+            parachuteSpawn: args[5]
         })
 
         this.sCurrentScript.index++

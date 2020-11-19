@@ -49,13 +49,13 @@ const update_air_with_turn = (m) => {
             if (intendedDYaw < -32768) intendedDYaw += 65536
             intendedMag = m.intendedMag / 32.0;
 
-            if (window.parachuting) intendedMag *= 3.0
+            if (m.parachuting) intendedMag *= 3.0
 
             m.forwardVel += 1.5 * Math.cos(intendedDYaw / 0x8000 * Math.PI) * intendedMag;
             m.faceAngle[1] += Math.floor(512.0 * Math.sin(intendedDYaw / 0x8000 * Math.PI) * intendedMag)
         }
 
-        if (window.parachuting && m.forwardVel > 65.0) m.forwardVel = 65.0
+        if (m.parachuting && m.forwardVel > 65.0) m.forwardVel = 65.0
 
 
         //! Uncapped air speed. Net positive when moving forward.
@@ -109,7 +109,7 @@ const act_butt_slide_air = (m) => {
 const common_air_action_step = (m, landAction, animation, stepArg) => {
 
     ///TODO add this, this moves mario slightly while in air by joystick
-    if (window.parachuting) update_air_with_turn(m)
+    if (m.parachuting) update_air_with_turn(m)
      else update_air_without_turn(m)
 
     const stepResult = perform_air_step(m, stepArg)

@@ -1568,7 +1568,8 @@ proto.sm64js.GrabFlagMsg.prototype.toObject = function(opt_includeInstance) {
  */
 proto.sm64js.GrabFlagMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
-    posList: (f = jspb.Message.getRepeatedFloatingPointField(msg, 1)) == null ? undefined : f
+    posList: (f = jspb.Message.getRepeatedFloatingPointField(msg, 1)) == null ? undefined : f,
+    flagId: jspb.Message.getFieldWithDefault(msg, 2, 0)
   };
 
   if (includeInstance) {
@@ -1609,6 +1610,10 @@ proto.sm64js.GrabFlagMsg.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {!Array<number>} */ (reader.readPackedFloat());
       msg.setPosList(value);
       break;
+    case 2:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setFlagId(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -1642,6 +1647,13 @@ proto.sm64js.GrabFlagMsg.serializeBinaryToWriter = function(message, writer) {
   if (f.length > 0) {
     writer.writePackedFloat(
       1,
+      f
+    );
+  }
+  f = message.getFlagId();
+  if (f !== 0) {
+    writer.writeUint32(
+      2,
       f
     );
   }
@@ -1682,6 +1694,24 @@ proto.sm64js.GrabFlagMsg.prototype.addPos = function(value, opt_index) {
  */
 proto.sm64js.GrabFlagMsg.prototype.clearPosList = function() {
   return this.setPosList([]);
+};
+
+
+/**
+ * optional uint32 flag_id = 2;
+ * @return {number}
+ */
+proto.sm64js.GrabFlagMsg.prototype.getFlagId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.sm64js.GrabFlagMsg} returns this
+ */
+proto.sm64js.GrabFlagMsg.prototype.setFlagId = function(value) {
+  return jspb.Message.setProto3IntField(this, 2, value);
 };
 
 

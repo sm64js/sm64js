@@ -38,6 +38,7 @@ message FlagMsg {
 
 message GrabFlagMsg {
 	repeated float pos = 1;
+	uint32 flag_id = 2;
 }
 
 message AttackMsg {

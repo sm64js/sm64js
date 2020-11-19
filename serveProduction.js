@@ -228,32 +228,60 @@ const processBasicAttack = (attackerID, attackMsg) => {
 
 const processGrabFlagRequest = (socketID, grabFlagMsg) => {
 
-    if (flagData[0].linkedToPlayer) return
+    const i = grabFlagMsg.getFlagId()
+
+    if (flagData[i].linkedToPlayer) return
 
     const pos = grabFlagMsg.getPosList()
 
-    const xDiff = pos[0] - flagData[0].pos[0]
-    const zDiff = pos[2] - flagData[0].pos[2]
+    const xDiff = pos[0] - flagData[i].pos[0]
+    const zDiff = pos[2] - flagData[i].pos[2]
 
     const dist = Math.sqrt(xDiff * xDiff + zDiff * zDiff)
     if (dist < 50) {
-        flagData[0].linkedToPlayer = true
-        flagData[0].fallmode = false
-        flagData[0].atStartPosition = false
-        flagData[0].socketID = socketID
-        flagData[0].idleTimer = 0
+        flagData[i].linkedToPlayer = true
+        flagData[i].fallmode = false
+        flagData[i].atStartPosition = false
+        flagData[i].socketID = socketID
+        flagData[i].idleTimer = 0
     }
 }
 
 const checkForFlag = (socketID) => {
-    if (flagData[0].socketID == socketID) {
-        flagData[0].linkedToPlayer = false
-        flagData[0].socketID = null
-        flagData[0].fallmode = true
-        const newFlagLocation = allChannels[socketID].decodedMario.getPosList()
-        newFlagLocation[1] += 100
-        flagData[0].pos = [parseInt(newFlagLocation[0]), parseInt(newFlagLocation[1]), parseInt(newFlagLocation[2])]
+
+    for (let i = 0; i < flagData.length; i++) {
+        if (flagData[i].socketID == socketID) {
+            flagData[i].linkedToPlayer = false
+            flagData[i].socketID = null
+            flagData[i].fallmode = true
+            const newFlagLocation = allChannels[socketID].decodedMario.getPosList()
+            newFlagLocation[1] += 100
+            flagData[i].pos = [parseInt(newFlagLocation[0]), parseInt(newFlagLocation[1]), parseInt(newFlagLocation[2])]
+        }
     }
+
+}
+
+const serverSideFlagUpdate = () => {
+
+    for (let i = 0; i < flagData.length; i++) {
+
+        if (flagData[i].fallmode) {
+            if (flagData[i].pos[1] > -10000) flagData[i].pos[1] -= 2
+        }
+
+        if (!flagData[i].linkedToPlayer && !flagData[i].atStartPosition) {
+            flagData[i].idleTimer++
+            if (flagData[i].idleTimer > 3000) {
+                flagData[i].pos = [...flagStarts[i]]
+                flagData[i].fallmode = false
+                flagData[i].atStartPosition = true
+                flagData[i].idleTimer = 0
+            }
+        }
+
+    }
+
 }
 
 
@@ -262,24 +290,12 @@ const checkForFlag = (socketID) => {
 /// Every frame - 30 times per second
 setInterval(async () => {
 
-    if (flagData[0].fallmode) {
-        if (flagData[0].pos[1] > -10000) flagData[0].pos[1] -= 2
-    }
-
-    if (!flagData[0].linkedToPlayer && !flagData[0].atStartPosition) {
-        flagData[0].idleTimer++
-        if (flagData[0].idleTimer > 3000) {
-            flagData[0].pos = [...flagStarts[0]]
-            flagData[0].fallmode = false
-            flagData[0].atStartPosition = true
-            flagData[0].idleTimer = 0
-        }
-    }
+    serverSideFlagUpdate()
 
     Object.values(allChannels).forEach(data => {
         if (data.valid > 0) data.valid--
         else if (data.decodedMario) {
-            checkForFlag(data.channel.my_id)
+            checkForFlag(data.channel.my_id)   //// this line probably unnecessay because should be called when the socket is closed
             data.channel.close()
         }
     })

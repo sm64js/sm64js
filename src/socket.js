@@ -269,29 +269,42 @@ export const post_main_loop_one_iteration = (frame) => {
 
     decrementChat()
 
-    /////////////// check for grab flag
-    const m = gameData.marioState
-    if (m && !networkData.flagData[0].linkedToPlayer) {
-        console.log(m.pos)
-        const xDiff = m.pos[0] - networkData.flagData[0].pos[0]
-        const yDiff = Math.abs(m.pos[1] - networkData.flagData[0].pos[1])
-        const zDiff = m.pos[2] - networkData.flagData[0].pos[2]
+    if (gameData.marioState) checkForFlagGrab()
+}
 
-        const dist = Math.sqrt(xDiff * xDiff + zDiff * zDiff)
+const checkForFlagGrab = () => {
 
-        if (dist < 50 && yDiff < 120) {
-            const grabMsg = new GrabFlagMsg()
-            grabMsg.setPosList([ parseInt(m.pos[0]), parseInt(m.pos[1]), parseInt(m.pos[2])] )
-
-            const sm64jsMsg = new Sm64JsMsg()
-            sm64jsMsg.setGrabMsg(grabMsg)
-            const rootMsg = new RootMsg()
-            rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-            sendData(rootMsg.serializeBinary())
-
-        }
+    //// check all flags to see if linked to local mario, and skip this function
+    for (let i = 0; i < networkData.flagData.length; i++) {
+        const flagSocketId = networkData.flagData[i].socketId
+        if (networkData.flagData[i].linkedToPlayer && flagSocketId == networkData.myChannelID) return
     }
 
+    const m = gameData.marioState
+
+    for (let i = 0; i < networkData.flagData.length; i++) {
+        if (!networkData.flagData[i].linkedToPlayer) {
+            const xDiff = m.pos[0] - networkData.flagData[i].pos[0]
+            const yDiff = Math.abs(m.pos[1] - networkData.flagData[i].pos[1])
+            const zDiff = m.pos[2] - networkData.flagData[i].pos[2]
+
+            const dist = Math.sqrt(xDiff * xDiff + zDiff * zDiff)
+
+            if (dist < 50 && yDiff < 120) {
+                const grabMsg = new GrabFlagMsg()
+                grabMsg.setPosList([parseInt(m.pos[0]), parseInt(m.pos[1]), parseInt(m.pos[2])])
+                grabMsg.setFlagId(i)
+
+                const sm64jsMsg = new Sm64JsMsg()
+                sm64jsMsg.setGrabMsg(grabMsg)
+                const rootMsg = new RootMsg()
+                rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+                sendData(rootMsg.serializeBinary())
+
+            }
+        }
+    }
+    
 }
 
 

@@ -1,4 +1,4 @@
-import { RootMsg, Sm64JsMsg, GrabFlagMsg } from "../proto/mario_pb"
+import { RootMsg, Sm64JsMsg, GrabFlagMsg, AttackMsg } from "../proto/mario_pb"
 import zlib from "zlib"
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
@@ -179,6 +179,17 @@ const recvFlagList = (flaglist) => {
 
 }
 
+export const sendAttackToServer = (targetMarioID) => {
+    const attackMsg = new AttackMsg()
+    attackMsg.setTargetSocketId(targetMarioID)
+
+    const sm64jsMsg = new Sm64JsMsg()
+    sm64jsMsg.setAttackMsg(attackMsg)
+    const rootMsg = new RootMsg()
+    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+    sendData(rootMsg.serializeBinary()) 
+}
+
 
 const multiplayerReady = () => {
     return channel && channel.readyState == 1 && gameData.marioState && networkData.myChannelID != -1
@@ -215,8 +226,8 @@ export const pre_main_loop_one_iteration = (frame) => {
         } else { /// someone else has the flag
             let socketData = networkData.remotePlayers[flagSocketId]
             if (socketData == undefined) return
-            newflagpos = [...socketData.marioData.pos]
-            angleForFlag = socketData.marioData.angle[1]
+            newflagpos = [...socketData.marioState.pos]
+            angleForFlag = socketData.marioState.faceAngle[1]
         }
         newflagpos[1] += 150
         updateFlagData(newflagpos, angleForFlag)
@@ -257,12 +268,12 @@ export const post_main_loop_one_iteration = (frame) => {
     const m = gameData.marioState
     if (m && !networkData.flagData[0].linkedToPlayer) {
         const xDiff = m.pos[0] - networkData.flagData[0].pos[0]
-        const yDiff = m.pos[1] - networkData.flagData[0].pos[1]
+        const yDiff = Math.abs(m.pos[1] - networkData.flagData[0].pos[1])
         const zDiff = m.pos[2] - networkData.flagData[0].pos[2]
 
-        const dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff + zDiff * zDiff)
+        const dist = Math.sqrt(xDiff * xDiff + zDiff * zDiff)
 
-        if (dist < 40) {
+        if (dist < 50 && yDiff < 120) {
             const grabMsg = new GrabFlagMsg()
             grabMsg.setPosList([ parseInt(m.pos[0]), parseInt(m.pos[1]), parseInt(m.pos[2])] )
 
@@ -271,6 +282,8 @@ export const post_main_loop_one_iteration = (frame) => {
             const rootMsg = new RootMsg()
             rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
             sendData(rootMsg.serializeBinary())
+
+            console.log("grab flag request")
         }
     }
 

@@ -31,13 +31,13 @@ message ControllerListMsg {
 }
 
 message FlagMsg {
-     repeated sint32 pos = 1;
+     repeated float pos = 1;
      bool linkedToPlayer = 2;
      uint32 socketID = 3;
 }
 
 message GrabFlagMsg {
-	repeated sint32 pos = 1;
+	repeated float pos = 1;
 }
 
 message AttackMsg {

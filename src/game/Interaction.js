@@ -1,7 +1,7 @@
 import * as Mario from "./Mario"
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
 import { atan2s, vec3f_dif, vec3f_length } from "../engine/math_util"
-import { networkData, sendPlayerInteraction } from "../socket"
+import { networkData, sendPlayerInteraction, sendAttackToServer } from "../socket"
 import { sins, coss } from "../utils"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
@@ -143,7 +143,7 @@ const determine_interaction = (m, o) => {
             }
             if (m.flags & Mario.MARIO_TRIPPING) {
                 // 180 degrees total, or 90 each way
-                if (-0x4000 <= dYawToObject && dYawToObject <= 0x4000) {
+                if (true) {
                     interaction = INT_TRIP
                 }
             }
@@ -337,7 +337,8 @@ const interact_player = (m, o) => {
         }
         if (m.marioObj.localMario) {
             m2.ignoreUpdates = 40
-            sendPlayerInteraction(m2.channel_id, interaction)  /// unused
+            sendAttackToServer(m2.channel_id)
+            //sendPlayerInteraction(m2.channel_id, interaction)  /// unused
         }
         take_damage_and_knock_back(m2, m.marioObj)
         //bounce_back_from_attack(m, interaction)  //temp disable to fix glitch

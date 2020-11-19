@@ -1352,7 +1352,7 @@ proto.sm64js.FlagMsg.prototype.toObject = function(opt_includeInstance) {
  */
 proto.sm64js.FlagMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
-    posList: (f = jspb.Message.getRepeatedField(msg, 1)) == null ? undefined : f,
+    posList: (f = jspb.Message.getRepeatedFloatingPointField(msg, 1)) == null ? undefined : f,
     linkedtoplayer: jspb.Message.getBooleanFieldWithDefault(msg, 2, false),
     socketid: jspb.Message.getFieldWithDefault(msg, 3, 0)
   };
@@ -1392,7 +1392,7 @@ proto.sm64js.FlagMsg.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {!Array<number>} */ (reader.readPackedSint32());
+      var value = /** @type {!Array<number>} */ (reader.readPackedFloat());
       msg.setPosList(value);
       break;
     case 2:
@@ -1434,7 +1434,7 @@ proto.sm64js.FlagMsg.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getPosList();
   if (f.length > 0) {
-    writer.writePackedSint32(
+    writer.writePackedFloat(
       1,
       f
     );
@@ -1457,11 +1457,11 @@ proto.sm64js.FlagMsg.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * repeated sint32 pos = 1;
+ * repeated float pos = 1;
  * @return {!Array<number>}
  */
 proto.sm64js.FlagMsg.prototype.getPosList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 1));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedFloatingPointField(this, 1));
 };
 
 
@@ -1568,7 +1568,7 @@ proto.sm64js.GrabFlagMsg.prototype.toObject = function(opt_includeInstance) {
  */
 proto.sm64js.GrabFlagMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
-    posList: (f = jspb.Message.getRepeatedField(msg, 1)) == null ? undefined : f
+    posList: (f = jspb.Message.getRepeatedFloatingPointField(msg, 1)) == null ? undefined : f
   };
 
   if (includeInstance) {
@@ -1606,7 +1606,7 @@ proto.sm64js.GrabFlagMsg.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {!Array<number>} */ (reader.readPackedSint32());
+      var value = /** @type {!Array<number>} */ (reader.readPackedFloat());
       msg.setPosList(value);
       break;
     default:
@@ -1640,7 +1640,7 @@ proto.sm64js.GrabFlagMsg.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getPosList();
   if (f.length > 0) {
-    writer.writePackedSint32(
+    writer.writePackedFloat(
       1,
       f
     );
@@ -1649,11 +1649,11 @@ proto.sm64js.GrabFlagMsg.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * repeated sint32 pos = 1;
+ * repeated float pos = 1;
  * @return {!Array<number>}
  */
 proto.sm64js.GrabFlagMsg.prototype.getPosList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 1));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedFloatingPointField(this, 1));
 };
 
 

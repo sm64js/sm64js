@@ -207,15 +207,15 @@ const processBasicAttack = (attackerID, attackMsg) => {
     /// redundant
     attackMsg.setAttackerSocketId(attackerID)
 
-    if (flagData.linkedToPlayer && flagData.socketID == attackMsg.getTargetId()) {
+    if (flagData.linkedToPlayer && flagData.socketID == attackMsg.getTargetSocketId()) {
         flagData.linkedToPlayer = false
         flagData.socketID = null
         flagData.fallmode = true
-        const newFlagLocation = allChannels[attackMsg.id].decodedMario.getPosList()
+        const newFlagLocation = allChannels[attackerID].decodedMario.getPosList()
         newFlagLocation[0] += ((Math.random() * 1000.0) - 500.0)
-        newFlagLocation[1] += 400
+        newFlagLocation[1] += 700
         newFlagLocation[2] += ((Math.random() * 1000.0) - 500.0)
-        flagData.pos = newFlagLocation
+        flagData.pos = [parseInt(newFlagLocation[0]), parseInt(newFlagLocation[1]), parseInt(newFlagLocation[2])]
     }
 }
 
@@ -229,7 +229,7 @@ const processGrabFlagRequest = (socketID, grabFlagMsg) => {
     const zDiff = pos[2] - flagData.pos[2]
 
     const dist = Math.sqrt(xDiff * xDiff + zDiff * zDiff)
-    if (dist < 40) {
+    if (dist < 50) {
         flagData.linkedToPlayer = true
         flagData.fallmode = false
         flagData.atStartPosition = false
@@ -256,13 +256,13 @@ const checkForFlag = (socketID) => {
 setInterval(async () => {
 
     if (flagData.fallmode) {
-        if (flagData.pos[1] > -10000) flagData.pos[1] -= 3
+        if (flagData.pos[1] > -10000) flagData.pos[1] -= 2
     }
 
     if (!flagData.linkedToPlayer && !flagData.atStartPosition) {
         flagData.idleTimer++
         if (flagData.idleTimer > 3000) {
-            flagData.pos = flagStartPos
+            flagData.pos = [...flagStartPos]
             flagData.fallmode = false
             flagData.atStartPosition = true
             flagData.idleTimer = 0

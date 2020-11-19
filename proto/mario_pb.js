@@ -1354,7 +1354,8 @@ proto.sm64js.FlagMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
     posList: (f = jspb.Message.getRepeatedFloatingPointField(msg, 1)) == null ? undefined : f,
     linkedtoplayer: jspb.Message.getBooleanFieldWithDefault(msg, 2, false),
-    socketid: jspb.Message.getFieldWithDefault(msg, 3, 0)
+    socketid: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    heightBeforeFall: jspb.Message.getFloatingPointFieldWithDefault(msg, 4, 0.0)
   };
 
   if (includeInstance) {
@@ -1403,6 +1404,10 @@ proto.sm64js.FlagMsg.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {number} */ (reader.readUint32());
       msg.setSocketid(value);
       break;
+    case 4:
+      var value = /** @type {number} */ (reader.readFloat());
+      msg.setHeightBeforeFall(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -1450,6 +1455,13 @@ proto.sm64js.FlagMsg.serializeBinaryToWriter = function(message, writer) {
   if (f !== 0) {
     writer.writeUint32(
       3,
+      f
+    );
+  }
+  f = message.getHeightBeforeFall();
+  if (f !== 0.0) {
+    writer.writeFloat(
+      4,
       f
     );
   }
@@ -1526,6 +1538,24 @@ proto.sm64js.FlagMsg.prototype.getSocketid = function() {
  */
 proto.sm64js.FlagMsg.prototype.setSocketid = function(value) {
   return jspb.Message.setProto3IntField(this, 3, value);
+};
+
+
+/**
+ * optional float height_before_fall = 4;
+ * @return {number}
+ */
+proto.sm64js.FlagMsg.prototype.getHeightBeforeFall = function() {
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 4, 0.0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.sm64js.FlagMsg} returns this
+ */
+proto.sm64js.FlagMsg.prototype.setHeightBeforeFall = function(value) {
+  return jspb.Message.setProto3FloatField(this, 4, value);
 };
 
 

@@ -10,10 +10,17 @@ export const bhv_castle_flag_init = () => {
     flagObjects.push(o)
 }
 
+export const setInitFlagHeight = (initHeight, i) => {
+
+    if (flagObjects[i] == undefined) throw "error - set initFlagHeight before flag object initialized"
+
+    flagObjects[i].prevHeight = initHeight
+}
+
 export const updateFlagData = (pos, angle, i) => {
     if (flagObjects[i] == undefined) return
 
-    let minHeight = ObjectListProc.SurfaceCollision.find_floor(pos[0], flagObjects[i].rawData[oPosY], pos[2], {})
+    let minHeight = ObjectListProc.SurfaceCollision.find_floor(pos[0], flagObjects[i].prevHeight, pos[2], {})
 
     if (isNaN(minHeight)) minHeight = -10000
 
@@ -23,4 +30,5 @@ export const updateFlagData = (pos, angle, i) => {
     flagObjects[i].rawData[oFaceAngleYaw] = angle + 0x6000
 
     pos[1] = flagObjects[i].rawData[oPosY]
+    flagObjects[i].prevHeight = flagObjects[i].rawData[oPosY]
 }

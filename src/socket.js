@@ -2,7 +2,7 @@ import { RootMsg, Sm64JsMsg, GrabFlagMsg, AttackMsg } from "../proto/mario_pb"
 import zlib from "zlib"
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
-import { updateFlagData } from "./game/behaviors/bhv_castle_flag_init.inc"
+import { updateFlagData, setInitFlagHeight } from "./game/behaviors/bhv_castle_flag_init.inc"
 
 const myArrayBuffer = () => {
     return new Promise((resolve) => {
@@ -175,6 +175,14 @@ const recvFlagList = (flaglist) => {
         networkData.flagData[i].pos = flag.getPosList()
         networkData.flagData[i].linkedToPlayer = flag.getLinkedtoplayer()
         networkData.flagData[i].socketId = flag.getSocketid()
+
+        if (multiplayerReady()) {
+            if (!networkData.flagData[i].initHeightSet) {
+                setInitFlagHeight(flag.getHeightBeforeFall(), i)
+                networkData.flagData[i].initHeightSet = true
+            }
+        }
+
     })
 
 }

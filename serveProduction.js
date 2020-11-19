@@ -71,7 +71,8 @@ const flagData = new Array(flagStarts.length).fill(0).map((unused, i) => {
         linkedToPlayer: false,
         atStartPosition: true,
         socketID: null,
-        idleTimer: 0
+        idleTimer: 0,
+        heightBeforeFall: 20000
     }
 })
 
@@ -225,6 +226,7 @@ const processBasicAttack = (attackerID, attackMsg) => {
         newFlagLocation[0] += ((Math.random() * 1000.0) - 500.0)
         newFlagLocation[1] += 600
         newFlagLocation[2] += ((Math.random() * 1000.0) - 500.0)
+        flagData[flagIndex].heightBeforeFall = newFlagLocation[1]
         flagData[flagIndex].pos = [parseInt(newFlagLocation[0]), parseInt(newFlagLocation[1]), parseInt(newFlagLocation[2])]
     }
 
@@ -260,6 +262,7 @@ const checkForFlag = (socketID) => {
             flagData[i].fallmode = true
             const newFlagLocation = allChannels[socketID].decodedMario.getPosList()
             newFlagLocation[1] += 100
+            flagData[i].heightBeforeFall = newFlagLocation[1]
             flagData[i].pos = [parseInt(newFlagLocation[0]), parseInt(newFlagLocation[1]), parseInt(newFlagLocation[2])]
         }
     }
@@ -316,7 +319,10 @@ setInterval(async () => {
         const flagmsg = new FlagMsg()
         flagmsg.setLinkedtoplayer(flagData[i].linkedToPlayer)
         if (flagData[i].linkedToPlayer) flagmsg.setSocketid(flagData[i].socketID)
-        else flagmsg.setPosList(flagData[i].pos)
+        else {
+            flagmsg.setPosList(flagData[i].pos)
+            flagmsg.setHeightBeforeFall(flagData[i].heightBeforeFall)
+        }
         flagProtoList.push(flagmsg)
     }
 

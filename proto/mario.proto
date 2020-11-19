@@ -34,6 +34,7 @@ message FlagMsg {
      repeated float pos = 1;
      bool linkedToPlayer = 2;
      uint32 socketID = 3;
+	 float height_before_fall = 4;
 }
 
 message GrabFlagMsg {

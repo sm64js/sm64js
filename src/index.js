@@ -152,7 +152,7 @@ window.enterFullScreenMode = () => {
 }
 
 ///// Start Game
-const rulesVersion = 2
+const rulesVersion = 3
 let gameStarted = false
 
 document.getElementById("startbutton").addEventListener('click', () => {

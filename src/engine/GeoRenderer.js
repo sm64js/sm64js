@@ -483,8 +483,8 @@ class GeoRenderer {
             this.gCurGraphNodeObject = object.header.gfx
             MarioMisc.gBodyState = object.marioState.marioBodyState
             MarioMisc.customCapState = networkData.remotePlayers[remote_channel_id].skinData.customCapState
-            //document.getElementById("romMessage").innerHTML = (networkData.remotePlayers[remote_channel_id].marioState.parachuting).toString()
-			MarioMisc.parachuting = (networkData.remotePlayers[remote_channel_id].marioState.parachuting ? 0 : 1)
+
+            MarioMisc.parachuting = object.marioState.parachuting && object.marioState.vel[1] < 0.0
             this.geo_process_single_node(object.header.gfx.sharedChild)
             this.gCurGraphNodeObject = null
         }

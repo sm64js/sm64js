@@ -400,7 +400,7 @@ class GeoRenderer {
 
                     if (object.localMario) {
                         MarioMisc.gBodyState = object.marioState.marioBodyState
-                        MarioMisc.parachuting = (object.marioState.parachuting ? 0 : 1) && object.marioState.vel[1] < 0.0
+                        MarioMisc.parachuting = (object.marioState.parachuting) && object.marioState.vel[1] < 0.0
                         MarioMisc.customCapState = window.myMario.skinData.customCapState
                         //// sending my own custom gfx opcode to set skin id
                         this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.myChannelID)], 1) 

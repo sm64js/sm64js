@@ -214,16 +214,20 @@ const processBasicAttack = (attackerID, attackMsg) => {
     /// redundant
     attackMsg.setAttackerSocketId(attackerID)
 
-    if (flagData[0].linkedToPlayer && flagData[0].socketID == attackMsg.getTargetSocketId()) {
-        flagData[0].linkedToPlayer = false
-        flagData[0].socketID = null
-        flagData[0].fallmode = true
+    const flagIndex = attackMsg.getFlagId()
+    const targetId = attackMsg.getTargetSocketId()
+
+    if (flagData[flagIndex].linkedToPlayer && flagData[flagIndex].socketID == targetId) {
+        flagData[flagIndex].linkedToPlayer = false
+        flagData[flagIndex].socketID = null
+        flagData[flagIndex].fallmode = true
         const newFlagLocation = allChannels[attackerID].decodedMario.getPosList()
         newFlagLocation[0] += ((Math.random() * 1000.0) - 500.0)
         newFlagLocation[1] += 700
         newFlagLocation[2] += ((Math.random() * 1000.0) - 500.0)
-        flagData[0].pos = [parseInt(newFlagLocation[0]), parseInt(newFlagLocation[1]), parseInt(newFlagLocation[2])]
+        flagData[flagIndex].pos = [parseInt(newFlagLocation[0]), parseInt(newFlagLocation[1]), parseInt(newFlagLocation[2])]
     }
+
 }
 
 const processGrabFlagRequest = (socketID, grabFlagMsg) => {

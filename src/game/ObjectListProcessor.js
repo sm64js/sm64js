@@ -6,7 +6,7 @@ import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands
 import * as Mario from "./Mario"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { detect_object_collisions } from "./ObjectCollisions"
-import { networkData, gameData as socketGameData } from "../socket"
+import { networkData, gameData as socketGameData, updateNetworkBeforeRender } from "../socket"
 import { copyMarioUpdateToState } from "./MultiMarioManager"
 import { vec3f_dif, vec3f_length } from "../engine/math_util"
 
@@ -149,6 +149,8 @@ class ObjectListProcessor {
                 remotePlayer.crashCount++
             }  
         })
+
+        updateNetworkBeforeRender()
         
     }
 

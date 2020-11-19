@@ -44,6 +44,7 @@ message GrabFlagMsg {
 message AttackMsg {
 	uint32 target_socket_id = 1;
 	uint32 attacker_socket_id = 2;
+	uint32 flag_id = 3;
 }
 
 message MarioMsg {

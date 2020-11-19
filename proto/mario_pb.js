@@ -1748,7 +1748,8 @@ proto.sm64js.AttackMsg.prototype.toObject = function(opt_includeInstance) {
 proto.sm64js.AttackMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
     targetSocketId: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    attackerSocketId: jspb.Message.getFieldWithDefault(msg, 2, 0)
+    attackerSocketId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    flagId: jspb.Message.getFieldWithDefault(msg, 3, 0)
   };
 
   if (includeInstance) {
@@ -1793,6 +1794,10 @@ proto.sm64js.AttackMsg.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {number} */ (reader.readUint32());
       msg.setAttackerSocketId(value);
       break;
+    case 3:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setFlagId(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -1836,6 +1841,13 @@ proto.sm64js.AttackMsg.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getFlagId();
+  if (f !== 0) {
+    writer.writeUint32(
+      3,
+      f
+    );
+  }
 };
 
 
@@ -1872,6 +1884,24 @@ proto.sm64js.AttackMsg.prototype.getAttackerSocketId = function() {
  */
 proto.sm64js.AttackMsg.prototype.setAttackerSocketId = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
+};
+
+
+/**
+ * optional uint32 flag_id = 3;
+ * @return {number}
+ */
+proto.sm64js.AttackMsg.prototype.getFlagId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.sm64js.AttackMsg} returns this
+ */
+proto.sm64js.AttackMsg.prototype.setFlagId = function(value) {
+  return jspb.Message.setProto3IntField(this, 3, value);
 };
 
 

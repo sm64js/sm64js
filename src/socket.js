@@ -180,14 +180,22 @@ const recvFlagList = (flaglist) => {
 }
 
 export const sendAttackToServer = (targetMarioID) => {
-    const attackMsg = new AttackMsg()
-    attackMsg.setTargetSocketId(targetMarioID)
 
-    const sm64jsMsg = new Sm64JsMsg()
-    sm64jsMsg.setAttackMsg(attackMsg)
-    const rootMsg = new RootMsg()
-    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-    sendData(rootMsg.serializeBinary()) 
+    for (let i = 0; i < networkData.flagData.length; i++) {
+        const flagSocketId = networkData.flagData[i].socketId
+        if (networkData.flagData[i].linkedToPlayer && flagSocketId == targetMarioID) {
+            const attackMsg = new AttackMsg()
+            attackMsg.setTargetSocketId(targetMarioID)
+            attackMsg.setFlagId(i)
+
+            const sm64jsMsg = new Sm64JsMsg()
+            sm64jsMsg.setAttackMsg(attackMsg)
+            const rootMsg = new RootMsg()
+            rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+            sendData(rootMsg.serializeBinary()) 
+        }
+    }
+
 }
 
 
@@ -213,7 +221,7 @@ export const send_controller_update = (frame) => {
     }*/
 }
 
-export const pre_main_loop_one_iteration = (frame) => {
+export const updateNetworkBeforeRender = () => {
 
     for (let i = 0; i < networkData.flagData.length; i++) {
         const flagSocketId = networkData.flagData[i].socketId

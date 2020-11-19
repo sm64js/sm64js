@@ -6,6 +6,8 @@ import { level_ccm_entry } from "./ccm/script"
 import { level_pss_entry } from "./pss/script"
 import { level_ttm_entry } from "./ttm/script"
 import { level_wf_entry } from "./wf/script"
+import { level_special_entry } from "./special/script"
+
 
 export const level_defines_list = [
     {
@@ -34,6 +36,6 @@ export const level_defines_list = [
     },
     {
         command: LevelCommands.jump_if,
-        args: [LevelCommands.OP_EQ, LEVEL_SPECIAL, level_castle_grounds_entry]
+        args: [LevelCommands.OP_EQ, LEVEL_SPECIAL, level_special_entry]
     }
 ]

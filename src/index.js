@@ -161,6 +161,11 @@ document.getElementById("startbutton").addEventListener('click', () => {
     else startGame()
 })
 
+document.getElementById("deleteRom").addEventListener('click', () => {
+    localStorage.removeItem('sm64jsAssets')
+    window.location.reload()
+})
+
 const startGame = () => {
     console.log("Starting Game!")
     gameStarted = true

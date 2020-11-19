@@ -40,7 +40,7 @@ const level_intro_entry_2 = () => {
         { command: LevelCommands.sleep, args: [20] },
         { command: LevelCommands.call_loop, args: [1, lvl_intro_update, null] },
         { command: LevelCommands.unload_area, args: [1] },
-        { command: LevelCommands.set_register, args: [LEVEL_BOB] },
+        { command: LevelCommands.set_register, args: [LEVEL_TTM] },
         { command: LevelCommands.execute, args: [level_main_scripts_entry] }
         /// Jump If
         /// Jump IF

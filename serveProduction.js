@@ -59,10 +59,10 @@ const sendValidUpdate = () => {
 }
 
 const flagStarts = [
-    [-2060, 206, 6266],
-    [-2260, 206, 6266],
-    [-2460, 206, 6266],
-    [-2660, 206, 6266]
+    [9380, 7657, -8980],
+    [9700, 7677, -7270],
+    [7046, 7670, -7568],
+    [7140, 7657, -9614]
 ]
 
 const flagData = new Array(flagStarts.length).fill(0).map((unused, i) => {

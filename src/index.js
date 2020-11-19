@@ -131,6 +131,7 @@ const setStatsUpdate = setInterval(() => {
     const renderFrameTimeAvg = renderFrameTimeBuffer.getAvg().toFixed(2)
     const gameLogicFrametimeAvg = gameLogicFrameTimeBuffer.getAvg().toFixed(2)
     const maxFps = (1000 / totalFrameTimeAvg).toFixed(2)
+    window.fps = parseInt(maxFps)
     document.getElementById("maxFps").innerHTML = `Effective Max Fps: ${maxFps}`
     document.getElementById("timing-total").innerHTML = `${totalFrameTimeAvg}ms`
     document.getElementById("timing-game").innerHTML = `${gameLogicFrametimeAvg}ms`

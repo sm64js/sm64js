@@ -1144,6 +1144,13 @@ export class n64GfxProcessor {
             context2d.fillStyle = "#9400D3"
             context2d.fillText(`Ping: ${window.latency}ms`, 580, 20)
         }
+        if (window.fps) {
+            context2d.globalAlpha = 0.8
+            context2d.font = "bold 14px verdana, sans-serif"
+            context2d.textAlign = "center"
+            context2d.fillStyle = "#9400D3"
+            context2d.fillText(`fps: ${window.fps}`, 40, 20)
+        }
 
     }
 }

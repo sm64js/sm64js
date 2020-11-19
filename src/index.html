@@ -46,6 +46,26 @@
                 <input class="btn btn-primary btn-sm" type="submit">
             </form>
             <h6 id="romMessage">This project uses the textures and other game assets from the original game. Due to copyright issues, I cannot host those assets on this site. Please select a sm64 ROM to extract those assets before you can play.</h6>
+
+            <div class="well">
+                <div class="counter" id="clockdiv">
+                    <span class="title"><b>Large Server Test and Surprise</b></span>
+                    <div class="sq">
+                        <span class="days bord">1</span> <span class="smalltext">Days</span>
+                    </div>
+                    <div class="sq">
+                        <span class="hours bord">22</span> <span class="smalltext">Hours</span>
+                    </div>
+                    <div class="sq">
+                        <span class="minutes bord">40</span> <span class="smalltext">Mins</span>
+                    </div>
+                    <div class="sq">
+                        <span class="seconds bord">45</span> <span class="smalltext">Secs</span>
+                    </div>
+                </div>
+            </div>
+            <br />
+
             <div class="row" style="justify-content:center">
                 <button id="startbutton" type="button" class="btn btn-success" disabled>Start Game</button>
                 <a href="https://github.com/sm64js/sm64js/issues" style="margin-left:30px" type="button" class="btn btn-warning">Submit Bug</a>
@@ -343,14 +363,13 @@
                 <div class="modal-body" style="color:black; text-align:left">
                     <p>Treat all players with respect</p>
                     <p>Please keep all chat appropriate and safe for work/school</p>
-                    <p>Players may ask to be left alone, please respect their requests</p>
                     <p>Inappropriate or offensive behavior may result in temporary or permanent ban</p>
+                    <p>It is strongly recommended to have a strong/stable internet connection and fast computer</p>
                     <br />
                     <div class="row" style="text-align:right">
                         <div class="col-3">
                             <input class="form-check-input" type="checkbox" value="" id="defaultCheck1"
-                                   onclick="document.getElementById('rules-footer').hidden = false"
-                            >
+                                   onclick="document.getElementById('rules-footer').hidden = false">
 
                         </div>
                         <div class="col-9" style="text-align:left">

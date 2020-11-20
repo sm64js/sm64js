@@ -4,16 +4,17 @@ import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
 import { updateFlagData, setInitFlagHeight } from "./game/behaviors/bhv_castle_flag_init.inc"
 
-const myArrayBuffer = () => {
+Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
+
+function myArrayBuffer() {
     return new Promise((resolve) => {
         let fr = new FileReader()
-        fr.onload = () => { resolve(fr.result) }
+        fr.onload = () => {
+            resolve(fr.result)
+        }
         fr.readAsArrayBuffer(this)
     })
 }
-
-File.prototype.arrayBuffer = File.prototype.arrayBuffer || myArrayBuffer
-Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
 
 const url = new URL(window.location.href)
 
@@ -121,6 +122,7 @@ const recvChat = (chatmsg) => {
 channel.onopen = () => {
 
     channel.onmessage = async (message) => {
+
         let sm64jsMsg
         let bytes = new Uint8Array(await message.data.arrayBuffer())
         const rootMsg = RootMsg.deserializeBinary(bytes)

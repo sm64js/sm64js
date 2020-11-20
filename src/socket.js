@@ -248,7 +248,8 @@ export const updateNetworkBeforeRender = () => {
                 newflagpos = [...socketData.marioState.pos]
                 angleForFlag = socketData.marioState.faceAngle[1]
             }
-            newflagpos[1] += 150
+            newflagpos[1] += 150 // adjust so its above mario head
+            networkData.flagData[i].pos = newflagpos
             updateFlagData(newflagpos, angleForFlag, i)
         } else updateFlagData(networkData.flagData[i].pos, 0, i) /// no one has the flag
     }

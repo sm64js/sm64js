@@ -19,5 +19,6 @@ RUN npm run build
 
 COPY src/favicon.ico ./dist/
 COPY src/emotes/ ./dist/emotes/
+COPY src/mini/ ./dist/mini/
 
 CMD ["npm", "run", "serve"]

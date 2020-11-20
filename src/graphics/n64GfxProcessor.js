@@ -983,7 +983,8 @@ export class n64GfxProcessor {
     custom_set_player_data(channel_id) { 
         const data = getExtraRenderData(channel_id)
         this.customData3D = data.custom3D
-        Object.assign(customData2D, data.custom2D)
+        customData2D.chat = data.custom2D.chat
+        customData2D.playerName = data.custom2D.playerName
     }
 
     run_dl(commands) {

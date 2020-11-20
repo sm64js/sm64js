@@ -221,14 +221,18 @@ export const getExtraRenderData = (channel_id) => {
     const myChat = window.myMario.chatData
 
     if (channel_id == networkData.myChannelID) return {
-        mario_overalls_lights: (window.myMario.skinData.overalls == "r" ? rainbowLights : window.myMario.skinData.overalls),
-        mario_hat_lights: (window.myMario.skinData.hat == "r" ? rainbowLights : window.myMario.skinData.hat),
-        mario_shirt_lights: (window.myMario.skinData.shirt == "r" ? rainbowLights : window.myMario.skinData.shirt),
-        mario_gloves_lights: (window.myMario.skinData.gloves == "r" ? rainbowLights : window.myMario.skinData.gloves),
-        mario_boots_lights: (window.myMario.skinData.boots == "r" ? rainbowLights : window.myMario.skinData.boots),
-        mario_skin_lights: (window.myMario.skinData.skin == "r" ? rainbowLights : window.myMario.skinData.skin),
-        mario_hair_lights: (window.myMario.skinData.hair == "r" ? rainbowLights : window.myMario.skinData.hair),
-        chat: (myChat && myChat.timer > 0) ? myChat.msg : null
+        custom3D: {
+            mario_overalls_lights: (window.myMario.skinData.overalls == "r" ? rainbowLights : window.myMario.skinData.overalls),
+            mario_hat_lights: (window.myMario.skinData.hat == "r" ? rainbowLights : window.myMario.skinData.hat),
+            mario_shirt_lights: (window.myMario.skinData.shirt == "r" ? rainbowLights : window.myMario.skinData.shirt),
+            mario_gloves_lights: (window.myMario.skinData.gloves == "r" ? rainbowLights : window.myMario.skinData.gloves),
+            mario_boots_lights: (window.myMario.skinData.boots == "r" ? rainbowLights : window.myMario.skinData.boots),
+            mario_skin_lights: (window.myMario.skinData.skin == "r" ? rainbowLights : window.myMario.skinData.skin),
+            mario_hair_lights: (window.myMario.skinData.hair == "r" ? rainbowLights : window.myMario.skinData.hair),
+        },
+        custom2D: {
+            chat: (myChat && myChat.timer > 0) ? myChat.msg : null
+        }
     }
 
     const remoteMario = networkData.remotePlayers[channel_id].marioState
@@ -242,15 +246,20 @@ export const getExtraRenderData = (channel_id) => {
     const hair = networkData.remotePlayers[channel_id].skinData.hair
 
     return {
-        mario_overalls_lights: (overalls == "r" ? rainbowLights : overalls),
-        mario_shirt_lights: (shirt == "r" ? rainbowLights : shirt),
-        mario_hat_lights: (hat == "r" ? rainbowLights : hat),
-        mario_gloves_lights: (gloves == "r" ? rainbowLights : gloves),
-        mario_boots_lights: (boots == "r" ? rainbowLights : boots),
-        mario_skin_lights: (skin == "r" ? rainbowLights : skin),
-        mario_hair_lights: (hair == "r" ? rainbowLights : hair),
-        playerName: remoteMario.playerName,
-        chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null
+        custom3D: {
+            mario_overalls_lights: (overalls == "r" ? rainbowLights : overalls),
+            mario_shirt_lights: (shirt == "r" ? rainbowLights : shirt),
+            mario_hat_lights: (hat == "r" ? rainbowLights : hat),
+            mario_gloves_lights: (gloves == "r" ? rainbowLights : gloves),
+            mario_boots_lights: (boots == "r" ? rainbowLights : boots),
+            mario_skin_lights: (skin == "r" ? rainbowLights : skin),
+            mario_hair_lights: (hair == "r" ? rainbowLights : hair),
+        },
+        custom2D: {
+            playerName: remoteMario.playerName,
+            chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null
+        }
+
     }
 
 }

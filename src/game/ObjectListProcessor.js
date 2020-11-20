@@ -15,7 +15,7 @@ class ObjectListProcessor {
     constructor() {
 
         this.OBJECT_POOL_CAPACITY = 240
-
+		
         this.OBJ_LIST_PLAYER = 0      //  (0) mario
         this.OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
         this.OBJ_LIST_DESTRUCTIVE = 2 //  (2) things that can be used to destroy other objects, like
@@ -74,7 +74,6 @@ class ObjectListProcessor {
     }
 
     update_objects() {
-
         Object.values(networkData.remotePlayers).forEach(remotePlayer => {
             if (remotePlayer.marioUpdate) {
                 if (remotePlayer.marioState.ignoreUpdates > 0) {
@@ -85,7 +84,6 @@ class ObjectListProcessor {
                 }
             }
         })
-
         detect_object_collisions()
         this.update_non_terrain_objects()
     }
@@ -94,20 +92,6 @@ class ObjectListProcessor {
         this.sObjectListUpdateOrder.slice(2).forEach(listIndex => {
             this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[listIndex])
         })
-
-        ///Update Other Mario Behaviors  // removing old method
-/*        getExtraMarios().forEach(extraMario => {
-            this.gCurrentObject = {
-                bhvScript: { commands: window.bhvExtraMario, index: 4 },
-                rawData: [...this.marioPlayerObj.rawData],
-                bhvStack: [4]
-            }
-            this.gCurrentObject.rawData[oPosX] = extraMario.pos[0]
-            this.gCurrentObject.rawData[oPosY] = extraMario.pos[1]
-            this.gCurrentObject.rawData[oPosZ] = extraMario.pos[2]
-
-            Behavior.cur_obj_update()
-        })*/
     }
 
     update_objects_in_list(objList) {
@@ -155,7 +139,7 @@ class ObjectListProcessor {
     }
 
     copy_mario_state_to_object(marioState) {
-
+		
         marioState.marioObj.rawData[oPosX] = marioState.pos[0]
         marioState.marioObj.rawData[oPosY] = marioState.pos[1]
         marioState.marioObj.rawData[oPosZ] = marioState.pos[2]

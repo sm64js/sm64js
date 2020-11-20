@@ -88,6 +88,16 @@ class LevelCommands {
             parachuteSpawn: args[5]
         })
 
+        if (args[6]) { // x variability
+            const random = Math.random() - 0.5
+            Area.gMarioSpawnInfo.startPos[0] += (random * args[6])
+        }
+
+        if (args[7]) { // z variability
+            const random = Math.random() - 0.5
+            Area.gMarioSpawnInfo.startPos[2] += (random * args[7])
+        }
+
         this.sCurrentScript.index++
     }
 

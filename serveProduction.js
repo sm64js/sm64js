@@ -396,8 +396,10 @@ require('uWebSockets.js').App().ws('/*', {
         console.log('RemoteAddress16: ' + new Uint16Array(channel.getRemoteAddress()))
         console.log('RemoteAddress8: ' + new Uint8Array(channel.getRemoteAddress()))
 
-        console.log('X-Real-IP: ' + req.getHeader('x-real-ip'))
-        console.log('X-Forwarded-For: ' + req.getHeader('x-forwarded-for'))
+        let ip='';(new Uint8Array(channel.getRemoteAddress())).forEach((a,i)=>ip+=a.toString(16)+(i%2&&i!=15?':':''))
+
+        console.log('X-Real-IP: ' + channel.getHeader('x-real-ip'))
+        console.log('X-Forwarded-For: ' + channel.getHeader('x-forwarded-for'))
 
         channel.my_id = generateID()
         allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }

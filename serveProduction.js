@@ -47,7 +47,7 @@ const broadcastData = (bytes, channel) => {
 
 
 const adminTokens = process.env.ADMIN_TOKENS.split(":")
-
+console.log(adminTokens)
 
 const sendValidUpdate = () => {
 

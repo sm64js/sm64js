@@ -401,15 +401,28 @@ function remoteAddressToString(address) {
 
 require('uWebSockets.js').App().ws('/*', {
 
-    open: async (channel, req) => {
-        console.log('RemoteAddress16: ' + new Uint16Array(channel.getRemoteAddress()))
-        console.log('RemoteAddress8: ' + new Uint8Array(channel.getRemoteAddress()))
+    upgrade: (res, req, context) => { // a request was made to open websocket, res req have all the properties for the request, cookies etc
+        // add code here to determine if ws request should be accepted or denied
+        // can deny request with "return res.writeStatus('401').end()" see issue #367
+        res.upgrade( // upgrade to websocket
+           { ip: res.getRemoteAddress() }, // 1st argument sets which properties to pass to the ws object, in this case ip address
+           req.getHeader('sec-websocket-key'),
+           req.getHeader('sec-websocket-protocol'),
+           req.getHeader('sec-websocket-extensions'), // these 3 headers are used to setup the websocket
+           context // also used to setup the websocket
+        )
+     },
+    open: async (channel) => {
+        console.log(channel.ip)
 
-        let ip='';
-        (new Uint8Array(channel.getRemoteAddress())).forEach((a,i)=>ip+=a.toString(16)+(i%2&&i!=15?':':''))
-        console.log(ip)
+        // console.log('RemoteAddress16: ' + new Uint16Array(channel.getRemoteAddress()))
+        // console.log('RemoteAddress8: ' + new Uint8Array(channel.getRemoteAddress()))
 
-        console.log(remoteAddressToString(channel.getRemoteAddress()))
+        // let ip='';
+        // (new Uint8Array(channel.getRemoteAddress())).forEach((a,i)=>ip+=a.toString(16)+(i%2&&i!=15?':':''))
+        // console.log(ip)
+
+        // console.log(remoteAddressToString(channel.getRemoteAddress()))
 
         // console.log('X-Real-IP: ' + channel.getHeader('x-real-ip'))
         // console.log('X-Forwarded-For: ' + channel.getHeader('x-forwarded-for'))

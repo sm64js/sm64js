@@ -440,15 +440,21 @@ const { spawn } = require('child_process')
 const { v4: uuidv4 } = require('uuid')
 
 app.get('/romTransfer', async (req, res) => {
-    console.log("rom transfer")
 
-    const uid = uuidv4()
-    await mkdir('extractTools/' + uid)
+    try {
+        console.log("rom transfer")
 
-    const file = fs.createWriteStream('extractTools/' + uid + '/baserom.us.z64')
-    await fileDownload(file, 'http://' + req.query.romExternal)
+        const uid = uuidv4()
+        await mkdir('extractTools/' + uid)
 
-    return res.send(await extractJsonFromRomFile(uid))
+        const file = fs.createWriteStream('extractTools/' + uid + '/baserom.us.z64')
+        await fileDownload(file, 'http://' + req.query.romExternal)
+
+        return res.send(await extractJsonFromRomFile(uid))
+    } catch (e) {
+        console.log(`Rom extraction error: ${e}`)
+    }
+
 })
 
 app.get('/stats', (req, res) => {

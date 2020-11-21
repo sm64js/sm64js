@@ -432,6 +432,8 @@ app.use(express.static(__dirname + '/dist'))
 
 server.listen(port, () => { console.log('Serving Files with express server ' + port) })
 
+console.log(process.env.ADMIN_TOKENS)
+
 
 /////// necessary for server side rom extraction
 

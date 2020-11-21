@@ -45,6 +45,10 @@ const broadcastData = (bytes, channel) => {
     Object.values(allChannels).forEach(s => { s.channel.send(bytes, true) })
 }
 
+
+const adminTokens = process.env.ADMIN_TOKENS.split(":")
+
+
 const sendValidUpdate = () => {
 
     const validPlayers = Object.values(allChannels).filter(data => data.valid > 0).map(data => data.channel.my_id)
@@ -431,8 +435,6 @@ const server = http.Server(app)
 app.use(express.static(__dirname + '/dist'))
 
 server.listen(port, () => { console.log('Serving Files with express server ' + port) })
-
-console.log(process.env.ADMIN_TOKENS)
 
 
 /////// necessary for server side rom extraction

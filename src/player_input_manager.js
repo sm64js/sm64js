@@ -1,6 +1,7 @@
 import * as Keydrown from "./keydrown.min.js"
 import { sendChat } from "./socket.js"
 import { gameData } from "./socket.js"
+import { set_mario_action, ACT_TAUNT } from "./game/Mario.js"
 
 /////// Keyboard / Gamepad Input ////////
 window.playerInput = {}
@@ -8,6 +9,46 @@ window.banPlayerList = []
 window.show_minimap = 0
 let textboxfocus = false
 
+//// Taunt check - Sets local marios action if returns false
+const handleTaunt = (str) => {
+	switch (str) {
+		case ("!taunt-wave"): {
+			set_mario_action(gameData.marioState,ACT_TAUNT,0x1D)
+			return false
+		}
+		case ("!taunt-die"): {
+			set_mario_action(gameData.marioState,ACT_TAUNT,0x2E)
+			return false
+		}
+		case ("!taunt-star"): {
+			set_mario_action(gameData.marioState,ACT_TAUNT,0xCD)
+			return false
+		}
+		case ("!taunt-die2"): {
+			set_mario_action(gameData.marioState,ACT_TAUNT,0x79)
+			return false
+		}
+		case ("!taunt-shock"): {
+			set_mario_action(gameData.marioState,ACT_TAUNT,0x7A)
+			return false
+		}
+		case ("!taunt-magic"): {
+			set_mario_action(gameData.marioState,ACT_TAUNT,0xB3)
+			return false
+		}
+		default: {
+			if (str.trim().length >= ('!taunt-0x00').length) {
+				let id = parseInt(str.trim().slice(('!taunt-').length, str.length))
+				if (id >= 0x00 && id <= 0xD0 && str.trim().slice(0, ('!taunt-').length) == '!taunt-') {
+					set_mario_action(gameData.marioState,ACT_TAUNT,id)
+					return false
+				}
+			}
+			return true
+		}
+	}
+	return true
+}
 
 //// Prevent scrolling for arrow keys
 window.addEventListener("keydown", (e) => {
@@ -17,7 +58,7 @@ window.addEventListener("keydown", (e) => {
                     $("#banbox").is(':focus')
 
     if ($("#chatbox").is(':focus') && e.keyCode == 13) {
-        sendChat(document.getElementById('chatbox').value)
+        if(handleTaunt(document.getElementById('chatbox').value))sendChat(document.getElementById('chatbox').value)
         document.getElementById('chatbox').value = ""
         document.getElementById('chatbox').blur()
     }

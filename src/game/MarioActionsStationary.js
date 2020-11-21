@@ -33,7 +33,7 @@ const check_common_idle_cancels = (m) => {
 
     return 0
 }
-
+export const e_check_common_idle_cancels = (m) => {check_common_idle_cancels(m)}
 const act_idle = (m) => {
 
     if (check_common_idle_cancels(m)) {

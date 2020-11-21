@@ -46,7 +46,7 @@ const broadcastData = (bytes, channel) => {
 }
 
 
-const adminTokens = process.env.ADMIN_TOKENS.split(":")
+const adminTokens = process.env.ADMIN_TOKENS ? process.env.ADMIN_TOKENS.split(":") : []
 
 const sendValidUpdate = () => {
 
@@ -392,7 +392,13 @@ setInterval(() => {
 
 require('uWebSockets.js').App().ws('/*', {
 
-    open: async (channel) => {
+    open: async (channel, req) => {
+        console.log('RemoteAddress16: ' + new Uint16Array(channel.getRemoteAddress()))
+        console.log('RemoteAddress8: ' + new Uint8Array(channel.getRemoteAddress()))
+
+        console.log('X-Real-IP: ' + req.getHeader('x-real-ip'))
+        console.log('X-Forwarded-For: ' + req.getHeader('x-forwarded-for'))
+
         channel.my_id = generateID()
         allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }
         sendJsonWithTopic('id', { id: channel.my_id }, channel)
@@ -401,6 +407,7 @@ require('uWebSockets.js').App().ws('/*', {
     },
 
     message: async (channel, bytes) => {
+
         try {
             let sm64jsMsg
             const rootMsg = RootMsg.deserializeBinary(bytes)

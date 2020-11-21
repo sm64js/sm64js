@@ -1220,10 +1220,6 @@ const update_mario_inputs = (m) => {
         m.input |= INPUT_UNKNOWN_5;
     }
 
-    if ((window.playerInput.buttonPressedMap) && !(m.input & (INPUT_OFF_FLOOR))) {
-        set_mario_action(m, ACT_TAUNT, 0x8E)
-    }
-
     if (m.marioObj.rawData[oInteractStatus]
         & (Interact.INT_STATUS_HOOT_GRABBED_BY_MARIO | Interact.INT_STATUS_MARIO_UNK1 | Interact.INT_STATUS_MARIO_UNK4)) {
         m.input |= INPUT_UNKNOWN_10

@@ -390,6 +390,15 @@ setInterval(() => {
 }, 10000)
 
 
+function remoteAddressToString(address) {
+    if (address.byteLength == 4) {//IPv4
+        return new Uint8Array(address).join('.');
+    } else if (address.byteLength == 16) {//IPv6
+        return Array.from(new Uint16Array(address)).map(v => v.toString(16)).join(':').replace(/((^|:)(0(:|$))+)/, '::');
+    }
+}
+
+
 require('uWebSockets.js').App().ws('/*', {
 
     open: async (channel, req) => {
@@ -400,8 +409,10 @@ require('uWebSockets.js').App().ws('/*', {
         (new Uint8Array(channel.getRemoteAddress())).forEach((a,i)=>ip+=a.toString(16)+(i%2&&i!=15?':':''))
         console.log(ip)
 
-        console.log('X-Real-IP: ' + channel.getHeader('x-real-ip'))
-        console.log('X-Forwarded-For: ' + channel.getHeader('x-forwarded-for'))
+        console.log(remoteAddressToString(channel.getRemoteAddress()))
+
+        // console.log('X-Real-IP: ' + channel.getHeader('x-real-ip'))
+        // console.log('X-Forwarded-For: ' + channel.getHeader('x-forwarded-for'))
 
         channel.my_id = generateID()
         allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }

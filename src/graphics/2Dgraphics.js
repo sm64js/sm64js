@@ -9,10 +9,34 @@ export const customData2D = { playerName: "", chat: "" }
 // Minimap Stuff ~0x2480
 const Minimap_Img = new Image(535, 535); Minimap_Img.src = 'mini/bob_mountain.png'
 const Player_Img = new Image(14, 14); Player_Img.src = 'mini/player.png'
+const PlayerRemote_Img = new Image(14, 14); PlayerRemote_Img.src = 'mini/player_remote.png'
+const PlayerRemote_lower_Img = new Image(14, 14); PlayerRemote_lower_Img.src = 'mini/player_remote_lower.png'
+const PlayerRemote_upper_Img = new Image(14, 14); PlayerRemote_upper_Img.src = 'mini/player_remote_upper.png'
+const flag_outline = new Image(14, 14); flag_outline.src = "mini/flag0.png"
+const flag_base = new Image(14, 14); flag_base.src = "mini/flag1.png"
+
+const getFlagColor = (i) => {
+	switch (i) {
+		case (0): {
+			return [0.0,100.0,100.0]
+		}
+		case (1): {
+			return [94.0,100.0,100.0]
+		}
+		case (2): {
+			return [70.0,100.0,100.0]
+		}
+		case (3): {
+			return [-87.0,100.0,100.0]
+		}
+		default: {
+			return [0.0,-100.0,100.0]
+		}
+	}
+}
 
 const flagIcons = new Array(4).fill(0).map((unused, i) => {
-    const newflagIcon = new Image(14, 14)
-    newflagIcon.src = "mini/flag" + i + ".png"
+    const newflagIcon = getFlagColor(i);
     return newflagIcon
 })
 
@@ -58,6 +82,15 @@ const drawMinimapIcon = (sprite, width, height, X, Z, scale_map, scale_icon) => 
         (-(height / 2) * (scale_map)) + parseInt((16 + ((128 * scale_map) / 2)) + Z * (scale_icon * scale_map)), width * scale_map, height * scale_map)
 }
 
+const drawFlag = (sprite, width, height, X, Z, scale_map, scale_icon) => {
+	context2d.filter = `hue-rotate(${sprite[0]}deg) saturate(${sprite[1]}) brightness(${sprite[2]})`;
+    context2d.drawImage(flag_base, (-(width / 2) * (scale_map)) + parseInt((16 + ((128 * scale_map) / 2)) + X * (scale_icon * scale_map)),
+        (-(height / 2) * (scale_map)) + parseInt((16 + ((128 * scale_map) / 2)) + Z * (scale_icon * scale_map)), width * scale_map, height * scale_map)
+	context2d.filter = "none"
+    context2d.drawImage(flag_outline, (-(width / 2) * (scale_map)) + parseInt((16 + ((128 * scale_map) / 2)) + X * (scale_icon * scale_map)),
+        (-(height / 2) * (scale_map)) + parseInt((16 + ((128 * scale_map) / 2)) + Z * (scale_icon * scale_map)), width * scale_map, height * scale_map)
+}
+
 const drawMinimapIconRotation = (sprite, width, height, X, Z, scale_map, scale_icon, yaw) => {
     context2d.save()
     context2d.translate(parseInt((16 + ((128 * scale_map) / 2)) + X * (scale_icon * scale_map)),
@@ -84,14 +117,19 @@ export const draw2Dpost3Drendering = () => {
         context2d.fillStyle = "#9400D3"
         context2d.fillText(`fps: ${window.fps}`, 580, 40)
     }
-    if (window.show_minimap > 0) {
+    if (window.show_minimap > 0 && gameData.marioState) {
         var scale = 0.25 + window.show_minimap
         var miniScale = 0.00385
         context2d.drawImage(Minimap_Img, 16, 16, 128 * scale, 128 * scale)
         Object.values(networkData.remotePlayers).forEach(data => { /// all remote marios - should just be dots
             const m = data.marioState
-            const yaw = ((m.faceAngle[1] * (Math.PI / 180)) / 180) - 3.111111
-            drawMinimapIconRotation(Player_Img, 5, 5, m.pos[0], m.pos[2], scale, miniScale, yaw)
+			if (m.pos[1] < gameData.marioState.pos[1] - 200) {
+				drawMinimapIcon(PlayerRemote_lower_Img, 5, 5, m.pos[0], m.pos[2], scale, miniScale)
+			} else if (m.pos[1] > gameData.marioState.pos[1] + 200) {
+				drawMinimapIcon(PlayerRemote_upper_Img, 5, 5, m.pos[0], m.pos[2], scale, miniScale)
+			} else {
+				drawMinimapIcon(PlayerRemote_Img, 5, 5, m.pos[0], m.pos[2], scale, miniScale)
+			}
         })
         const m = gameData.marioState  /// local mario - should be an arrow
         const yaw = ((m.faceAngle[1] * (Math.PI / 180)) / 180) - 3.111111
@@ -99,7 +137,7 @@ export const draw2Dpost3Drendering = () => {
      
         if (window.show_minimap > 1) {
             flagIcons.forEach((flagIcon, i) => {
-                drawMinimapIcon(flagIcon, 5, 5, networkData.flagData[i].pos[0], networkData.flagData[i].pos[2], scale, miniScale)
+                drawFlag(flagIcon, 5, 5, networkData.flagData[i].pos[0], networkData.flagData[i].pos[2], scale, miniScale)
             })
         }
     }

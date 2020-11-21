@@ -47,7 +47,6 @@ const broadcastData = (bytes, channel) => {
 
 
 const adminTokens = process.env.ADMIN_TOKENS.split(":")
-console.log(adminTokens)
 
 const sendValidUpdate = () => {
 
@@ -153,11 +152,20 @@ const sanitizeChat = (string) => {
     return string
 }
 
+const processAdminCommand = (msg) => {
+    console.log(msg)
+}
+
 const processChat = async (channel_id, msg) => {
 
     if (allChannels[channel_id].chatCooldown > 0) return
     allChannels[channel_id].chatCooldown = 3 // seconds
     if (msg.length == 0) return
+
+    if (msg[0] == '/') {
+        processAdminCommand(msg.slice(1))
+        return
+    }
 
     const decodedMario = Object.values(allChannels).find(data => data.channel.my_id == channel_id).decodedMario
     if (decodedMario == undefined) return

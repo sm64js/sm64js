@@ -404,10 +404,8 @@ require('uWebSockets.js').App().ws('/*', {
     upgrade: (res, req, context) => { // a request was made to open websocket, res req have all the properties for the request, cookies etc
         // add code here to determine if ws request should be accepted or denied
         // can deny request with "return res.writeStatus('401').end()" see issue #367
-        console.log('X-Real-IP: ' + req.getHeader('x-real-ip'))
-        console.log('X-Forwarded-For: ' + req.getHeader('x-forwarded-for'))
         res.upgrade( // upgrade to websocket
-           { ip: res.getRemoteAddress() }, // 1st argument sets which properties to pass to the ws object, in this case ip address
+           { ip: req.getHeader('x-forwarded-for') }, // 1st argument sets which properties to pass to the ws object, in this case ip address
            req.getHeader('sec-websocket-key'),
            req.getHeader('sec-websocket-protocol'),
            req.getHeader('sec-websocket-extensions'), // these 3 headers are used to setup the websocket

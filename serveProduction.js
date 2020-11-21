@@ -153,7 +153,18 @@ const sanitizeChat = (string) => {
 }
 
 const processAdminCommand = (msg) => {
-    console.log(msg)
+    const parts = msg.split(' ')
+    const token = parts[0]
+
+    if (adminTokens.includes(token)) {
+        console.log("Admin authentication success")
+    } else {
+        console.log("Admin authentication fail - token not found: " + token)
+    }
+
+    switch (parts) {
+
+    }
 }
 
 const processChat = async (channel_id, msg) => {

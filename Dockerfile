@@ -15,8 +15,8 @@ COPY package.json ./
 RUN npm install
 
 COPY webpack.config.js ./
-COPY src/proto/ ./src/proto
 COPY src/ ./src/
+COPY src/proto/ ./src/proto
 RUN npm run build
 
 COPY . ./

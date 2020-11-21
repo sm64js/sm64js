@@ -396,7 +396,9 @@ require('uWebSockets.js').App().ws('/*', {
         console.log('RemoteAddress16: ' + new Uint16Array(channel.getRemoteAddress()))
         console.log('RemoteAddress8: ' + new Uint8Array(channel.getRemoteAddress()))
 
-        let ip='';(new Uint8Array(channel.getRemoteAddress())).forEach((a,i)=>ip+=a.toString(16)+(i%2&&i!=15?':':''))
+        let ip='';
+        (new Uint8Array(channel.getRemoteAddress())).forEach((a,i)=>ip+=a.toString(16)+(i%2&&i!=15?':':''))
+        console.log(ip)
 
         console.log('X-Real-IP: ' + channel.getHeader('x-real-ip'))
         console.log('X-Forwarded-For: ' + channel.getHeader('x-forwarded-for'))

@@ -1,12 +1,22 @@
 const { RootMsg, MarioListMsg, ControllerMsg, ValidPlayersMsg, Sm64JsMsg, FlagMsg } = require("./proto/mario_pb")
 const fs = require('fs')
 const http = require('http')
+const moment = require('moment')
 const got = require('got')
 const util = require('util')
 const zlib = require('zlib')
 const deflate = util.promisify(zlib.deflate)
 const port = 80
 const ws_port = 3000
+
+
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
+
+const adapter = new FileSync('/tmp/data/db.json')
+const db = low(adapter)
+db.defaults({ chats: [], adminCommands: [], bannedIPs: {} }).write()
+
 
 const allChannels = {}
 const stats = {}
@@ -186,6 +196,15 @@ const processChat = async (channel_id, msg) => {
     const decodedMario = socket.decodedMario
     if (decodedMario == undefined) return
 
+
+    /// record chat to DB
+    db.get('chats').push({
+        socketID: channel_id,
+        playerName: decodedMario.getPlayername(),
+        ip: socket.channel.ip,
+        timestamp: moment.unix(),
+        message: msg
+    }).write()
 
     const sanitizedChat = sanitizeChat(msg)
 

@@ -11,9 +11,10 @@ const ws_port = 3000
 const allChannels = {}
 const stats = {}
 
+
 let currentId = 0
 const generateID = () => {
-    if (++currentId > 1000000) currentId = 0
+    if (++currentId > 4294967294) currentId = 0
     return currentId
 }
 

@@ -13,7 +13,7 @@ const stats = {}
 
 let currentId = 0
 const generateID = () => {
-    if (++currentId > 1000000) currentId = 0
+    if (++currentId > 4294967294) currentId = 0
     return currentId
 }
 
@@ -44,6 +44,9 @@ const sendData = (bytes, channel) => { channel.send(bytes, true) }
 const broadcastData = (bytes, channel) => {
     Object.values(allChannels).forEach(s => { s.channel.send(bytes, true) })
 }
+
+
+const adminTokens = process.env.ADMIN_TOKENS ? process.env.ADMIN_TOKENS.split(":") : []
 
 const sendValidUpdate = () => {
 
@@ -131,15 +134,38 @@ const sanitizeChat = (string) => {
     return string
 }
 
+const processAdminCommand = (msg) => {
+    const parts = msg.split(' ')
+    const token = parts[0]
+
+    if (adminTokens.includes(token)) {
+        console.log("Admin authentication success")
+    } else {
+        console.log("Admin authentication fail - token not found: " + token)
+    }
+
+    switch (parts) {
+
+    }
+}
+
+
 const processChat = async (channel_id, msg) => {
 
-    if (allChannels[channel_id].chatCooldown > 0) return
-    allChannels[channel_id].chatCooldown = 3 // seconds
+    const socket = allChannels[channel_id]
+    if (socket == undefined) return
+
+    if (socket.chatCooldown > 0) return
+    socket.chatCooldown = 3 // seconds
     if (msg.length == 0) return
 
-    const decodedMario = Object.values(allChannels).find(data => data.channel.my_id == channel_id).decodedMario
-    if (decodedMario == undefined) return
+    if (msg[0] == '/') {
+        processAdminCommand(msg.slice(1))
+        return
+    }
 
+    const decodedMario = socket.decodedMario
+    if (decodedMario == undefined) return
 
     const sanitizedChat = sanitizeChat(msg)
 
@@ -242,6 +268,22 @@ setInterval(() => {
 
 
 require('uWebSockets.js').App().ws('/*', {
+
+    upgrade: (res, req, context) => { // a request was made to open websocket, res req have all the properties for the request, cookies etc
+        // add code here to determine if ws request should be accepted or denied
+        // can deny request with "return res.writeStatus('401').end()" see issue #367
+        let originHeader = req.getHeader('origin')
+        const url = new URL(originHeader)
+        const domainStr = url.hostname.substring(url.hostname.length - 11, url.hostname.length)
+        if (domainStr != ".sm64js.com" && url.hostname != "sm64js.com") return res.writeStatus('401').end()
+        res.upgrade( // upgrade to websocket
+            { ip: req.getHeader('x-forwarded-for') }, // 1st argument sets which properties to pass to the ws object, in this case ip address
+            req.getHeader('sec-websocket-key'),
+            req.getHeader('sec-websocket-protocol'),
+            req.getHeader('sec-websocket-extensions'), // these 3 headers are used to setup the websocket
+            context // also used to setup the websocket
+        )
+    },
 
     open: async (channel) => {
         channel.my_id = generateID()

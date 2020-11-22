@@ -13,11 +13,14 @@ RUN gcc -I extractTools extractTools/skyconv.c extractTools/n64graphics.c extrac
 
 COPY package.json ./
 RUN npm install
-COPY . ./
 
+COPY webpack.config.js ./
+COPY src/ ./src/
+COPY proto/ ./proto
 RUN npm run build
 
 COPY src/favicon.ico ./dist/
 COPY src/emotes/ ./dist/emotes/
+COPY . ./
 
 CMD ["npm", "run", "serve"]

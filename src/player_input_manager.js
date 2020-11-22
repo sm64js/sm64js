@@ -12,34 +12,34 @@ let textboxfocus = false
 //// Taunt check - Sets local marios action if returns false
 const handleTaunt = (str) => {
 	switch (str) {
-		case ("!taunt-wave"): {
+		case ("/taunt-wave"): {
 			set_mario_action(gameData.marioState,ACT_TAUNT,0x1D)
 			return false
 		}
-		case ("!taunt-die"): {
+		case ("/taunt-die"): {
 			set_mario_action(gameData.marioState,ACT_TAUNT,0x2E)
 			return false
 		}
-		case ("!taunt-star"): {
+		case ("/taunt-star"): {
 			set_mario_action(gameData.marioState,ACT_TAUNT,0xCD)
 			return false
 		}
-		case ("!taunt-die2"): {
+		case ("/taunt-die2"): {
 			set_mario_action(gameData.marioState,ACT_TAUNT,0x79)
 			return false
 		}
-		case ("!taunt-shock"): {
+		case ("/taunt-shock"): {
 			set_mario_action(gameData.marioState,ACT_TAUNT,0x7A)
 			return false
 		}
-		case ("!taunt-magic"): {
+		case ("/taunt-magic"): {
 			set_mario_action(gameData.marioState,ACT_TAUNT,0xB3)
 			return false
 		}
 		default: {
-			if (str.trim().length >= ('!taunt-0x00').length) {
-				let id = parseInt(str.trim().slice(('!taunt-').length, str.length))
-				if (id >= 0x00 && id <= 0xD0 && str.trim().slice(0, ('!taunt-').length) == '!taunt-') {
+			if (str.trim().length >= ('/taunt-0x00').length) {
+				let id = parseInt(str.trim().slice(('/taunt-').length, str.length))
+				if (id >= 0x00 && id <= 0xD0 && str.trim().slice(0, ('/taunt-').length) == '/taunt-') {
 					set_mario_action(gameData.marioState,ACT_TAUNT,id)
 					return false
 				}

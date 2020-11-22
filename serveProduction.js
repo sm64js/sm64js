@@ -1,7 +1,6 @@
 const { RootMsg, MarioListMsg, ControllerMsg, ValidPlayersMsg, Sm64JsMsg, FlagMsg } = require("./proto/mario_pb")
 const fs = require('fs')
 const http = require('http')
-const moment = require('moment')
 const got = require('got')
 const util = require('util')
 const zlib = require('zlib')
@@ -13,7 +12,7 @@ const ws_port = 3000
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
 
-const adapter = new FileSync('/tmp/data/db.json')
+const adapter = process.env.PRODUCTION ? new FileSync('/tmp/data/db.json') : new FileSync('testdb.json')
 const db = low(adapter)
 db.defaults({ chats: [], adminCommands: [], bannedIPs: {} }).write()
 
@@ -202,7 +201,7 @@ const processChat = async (channel_id, msg) => {
         socketID: channel_id,
         playerName: decodedMario.getPlayername(),
         ip: socket.channel.ip,
-        timestamp: moment.unix(),
+        timestampMs: Date.now(),
         message: msg
     }).write()
 
@@ -423,7 +422,7 @@ require('uWebSockets.js').App().ws('/*', {
             let originHeader = req.getHeader('origin')
             const url = new URL(originHeader)
             const domainStr = url.hostname.substring(url.hostname.length - 11, url.hostname.length)
-            if (domainStr != ".sm64js.com" && url.hostname != "sm64js.com") return res.writeStatus('401').end()
+            if (domainStr != ".sm64js.com" && url.hostname != "sm64js.com") return res.writeStatus('418').end()
         }
 
         res.upgrade( // upgrade to websocket

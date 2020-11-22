@@ -38,6 +38,9 @@ const ignoreStrings = [
 `r34`,
 `r_34`,
 `rule_34`,
+`MOD PLS BAN`, //Consistently spammed by the dude mocking others
+`xvideos`,
+`gonna cum in you`, // This was spammed at some point, very foul.
 ]
 
 Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
@@ -149,12 +152,26 @@ const measureLatency = (msg) => {
     window.latency = parseInt(endTime - startTime)
 }
 
+//Not optimized but should do the trick.
+const blockChatExtended = (str) => {
+	window.banPlayerList.forEach(blocked => {
+		if (blocked == "*") return true;
+		if (blocked.slice(blocked.length - 1, 1) == "*") {
+			let prefix = blocked.slice(0,blocked.length - 1)
+			if (str.length < prefix.length) return false;
+			if (str.slice(0,prefix.length) == prefix) return true;
+		}
+	})
+	return false;
+}
+
+
 const recvChat = (chatmsg) => {
 
     if (chatmsg.channel_id != networkData.myChannelID &&
         networkData.remotePlayers[chatmsg.channel_id] == undefined) return
 
-    if (window.banPlayerList.includes(chatmsg.sender)) return
+    if (window.banPlayerList.includes(chatmsg.sender) || blockChatExtended(chatmsg.sender)) return
 	if ((sanitizeChat(chatmsg.sender, false) == "" || shouldIgnore(chatmsg.msg) || shouldIgnore(sanitizeChat(chatmsg.sender, false))) && chatmsg.sender != window.myMario.playerName) return
 
 

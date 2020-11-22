@@ -395,15 +395,6 @@ setInterval(() => {
 }, 10000)
 
 
-function remoteAddressToString(address) {
-    if (address.byteLength == 4) {//IPv4
-        return new Uint8Array(address).join('.');
-    } else if (address.byteLength == 16) {//IPv6
-        return Array.from(new Uint16Array(address)).map(v => v.toString(16)).join(':').replace(/((^|:)(0(:|$))+)/, '::');
-    }
-}
-
-
 require('uWebSockets.js').App().ws('/*', {
 
     upgrade: (res, req, context) => { // a request was made to open websocket, res req have all the properties for the request, cookies etc

@@ -19,9 +19,9 @@ COPY src/ ./src/
 COPY proto/ ./proto
 RUN npm run build
 
-COPY . ./
 COPY src/favicon.ico ./dist/
 COPY src/emotes/ ./dist/emotes/
 COPY src/mini/ ./dist/mini/
+COPY . ./
 
 CMD ["npm", "run", "serve"]

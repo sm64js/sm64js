@@ -169,8 +169,12 @@ const processAdminCommand = (msg) => {
 
 const processChat = async (channel_id, msg) => {
 
-    if (allChannels[channel_id].chatCooldown > 0) return
-    allChannels[channel_id].chatCooldown = 3 // seconds
+    const socket = allChannels[channel_id]
+    if (socket == undefined) return
+
+    if (socket.chatCooldown > 0) return
+    socket.chatCooldown = 3 // seconds
+
     if (msg.length == 0) return
 
     if (msg[0] == '/') {
@@ -178,7 +182,7 @@ const processChat = async (channel_id, msg) => {
         return
     }
 
-    const decodedMario = Object.values(allChannels).find(data => data.channel.my_id == channel_id).decodedMario
+    const decodedMario = socket.decodedMario
     if (decodedMario == undefined) return
 
 
@@ -199,7 +203,7 @@ const processChat = async (channel_id, msg) => {
         const chatmsg = {
             channel_id,
             msg: filteredMessage,
-            sender: decodedMario.getPlayername()
+            sender: decodedMario.getPlayername(),
         }
 
         broadcastJsonWithTopic('chat', chatmsg)
@@ -413,16 +417,6 @@ require('uWebSockets.js').App().ws('/*', {
         )
      },
     open: async (channel) => {
-        console.log(channel.ip)
-
-        // console.log('RemoteAddress16: ' + new Uint16Array(channel.getRemoteAddress()))
-        // console.log('RemoteAddress8: ' + new Uint8Array(channel.getRemoteAddress()))
-
-        // let ip='';
-        // (new Uint8Array(channel.getRemoteAddress())).forEach((a,i)=>ip+=a.toString(16)+(i%2&&i!=15?':':''))
-        // console.log(ip)
-
-        // console.log(remoteAddressToString(channel.getRemoteAddress()))
 
         channel.my_id = generateID()
         allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }

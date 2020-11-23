@@ -124,43 +124,42 @@ window.updatePlayerName = (name) => {
     }
 }
 
-export const recvSkinData = (msg) => { 
-    if (msg.channel_id != networkData.mySocketID &&
-        networkData.remotePlayers[msg.channel_id] == undefined) return
+export const recvSkinData = (skinMsg) => { 
+    console.log('skinMsg', skinMsg, networkData.myChannelID)
+    const channelId = skinMsg.getChannelid()
+    console.log('channelId', channelId, networkData.myChannelID, networkData.remotePlayers)
+    if (channelId !== networkData.myChannelID ||
+        networkData.remotePlayers[channelId] == null) return
 
-    networkData.remotePlayers[msg.channel_id].skinData = msg.skinData
+    const skinData = {
+        overalls: skinMsg.getOverallsList(),
+        hat: skinMsg.getHatList(),
+        shirt: skinMsg.getShirtList(),
+        gloves: skinMsg.getGlovesList(),
+        boots: skinMsg.getBootsList(),
+        skin: skinMsg.getSkinList(),
+        hair: skinMsg.getHairList(),
+    }
+    console.log('skinData', skinData)
+    networkData.remotePlayers[channelId].skinData = skinData
+}
+
+const isValidSkinEntry = (skinEntry) => {
+    return skinEntry.length === 6 && !skinEntry.find(skinVal => isNaN(skinVal) || skinVal < 0 || skinVal > 255 || !Number.isInteger(skinVal))
 }
 
 export const validSkins = () => {
-    if (window.myMario.skinData.overalls.length != 6) return false
-    if (window.myMario.skinData.hat.length != 6) return false
-    if (window.myMario.skinData.shirt.length != 6) return false
-    if (window.myMario.skinData.gloves.length != 6) return false
-    if (window.myMario.skinData.boots.length != 6) return false
-    if (window.myMario.skinData.skin.length != 6) return false
-    if (window.myMario.skinData.hair.length != 6) return false
-
-    for (let i = 0; i < 6; i++) {
-        let number = window.myMario.skinData.overalls[i]
-        if (number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = window.myMario.skinData.hat[i]
-        if (number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = window.myMario.skinData.shirt[i]
-        if (number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = window.myMario.skinData.gloves[i]
-        if (number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = window.myMario.skinData.boots[i]
-        if (number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = window.myMario.skinData.skin[i]
-        if (number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = window.myMario.skinData.hair[i]
-        if (number < 0 || number > 255 || !Number.isInteger(number)) return false
-    }
-
-    if (window.myMario.skinData.customCapState != 0 && window.myMario.skinData.customCapState != 1) return false
+    const skinData = window.myMario.skinData
+    if (!isValidSkinEntry(skinData.overalls)) return false
+    if (!isValidSkinEntry(skinData.hat)) return false
+    if (!isValidSkinEntry(skinData.shirt)) return false
+    if (!isValidSkinEntry(skinData.gloves)) return false
+    if (!isValidSkinEntry(skinData.boots)) return false
+    if (!isValidSkinEntry(skinData.skin)) return false
+    if (!isValidSkinEntry(skinData.hair)) return false
+    if (skinData.customCapState !== 0 && skinData.customCapState !== 1) return false
 
     return true
-
 }
 
 export const getExtraRenderData = (channel_id) => {

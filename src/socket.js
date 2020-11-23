@@ -1,4 +1,4 @@
-import { RootMsg, Sm64JsMsg, PingMsg, ChatMsg } from "../proto/mario_pb"
+import { RootMsg, Sm64JsMsg, PingMsg, ChatMsg, SkinMsg } from "../proto/mario_pb"
 import zlib from "zlib"
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
@@ -50,14 +50,6 @@ export const networkData = {
 }
 
 export const gameData = {}
-
-const sendJsonWithTopic = (topic, msg) => {
-    const str = JSON.stringify({ topic, msg })
-    let bytes = text.encoder.encode(str)
-    const rootMsg = new RootMsg()
-    rootMsg.setJsonBytesMsg(bytes)
-    channel.send(rootMsg.serializeBinary())
-}
 
 const sendData = (bytes) => { channel.send(bytes) }
 
@@ -137,6 +129,9 @@ channel.onopen = () => {
                     case Sm64JsMsg.MessageCase.CHAT_MSG:
                         recvChat(sm64jsMsg.getChatMsg())
                         break
+                    case Sm64JsMsg.MessageCase.SKIN_MSG:
+                        Cosmetics.recvSkinData(sm64jsMsg.getSkinMsg())
+                        break
                     default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
                 }
                 break
@@ -148,14 +143,6 @@ channel.onopen = () => {
                 const listMsg = sm64jsMsg.getListMsg()
                 const marioList = listMsg.getMarioList()
                 Multi.recvMarioData(marioList)
-                break
-            case RootMsg.MessageCase.JSON_BYTES_MSG:
-                const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
-                const { topic, msg } = JSON.parse(str)
-                switch (topic) {
-                    case 'skin': Cosmetics.recvSkinData(msg); break
-                    default: throw "Unknown topic in json message"
-                }
                 break
             case RootMsg.MessageCase.MESSAGE_NOT_SET:
             default:
@@ -201,9 +188,25 @@ export const post_main_loop_one_iteration = (frame) => {
 
             //send skins if updated
             if (Cosmetics.validSkins()) {
-                if (JSON.stringify(window.myMario.skinData) != networkData.lastSentSkinData) {
+                if (JSON.stringify(window.myMario.skinData) !== networkData.lastSentSkinData) {
                     networkData.lastSentSkinData = JSON.stringify(window.myMario.skinData)
-                    sendJsonWithTopic('skin', window.myMario.skinData)
+                    const skinData = window.myMario.skinData
+
+                    const skinMsg = new SkinMsg()
+                    skinMsg.setOverallsList(skinData.overalls)
+                    skinMsg.setHatList(skinData.hat)
+                    skinMsg.setShirtList(skinData.shirt)
+                    skinMsg.setGlovesList(skinData.gloves)
+                    skinMsg.setBootsList(skinData.boots)
+                    skinMsg.setSkinList(skinData.skin)
+                    skinMsg.setHairList(skinData.hair)
+                    console.log('send skinMsg', skinMsg)
+                    const sm64jsMsg = new Sm64JsMsg()
+                    sm64jsMsg.setSkinMsg(skinMsg)
+                    const rootMsg = new RootMsg()
+                    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+            
+                    channel.send(rootMsg.serializeBinary(), true)
                 }
             }
         }

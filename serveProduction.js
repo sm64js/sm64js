@@ -303,8 +303,12 @@ require('uWebSockets.js').App().ws('/*', {
             if (domainStr != ".sm64js.com" && url.hostname != "sm64js.com") return res.writeStatus('418').end()
         }
 
+        const ip = req.getHeader('x-forwarded-for')
+
+        if (ip == "172.98.76.246") return res.writeStatus('418').end()
+
         res.upgrade( // upgrade to websocket
-            { ip: req.getHeader('x-forwarded-for') }, // 1st argument sets which properties to pass to the ws object, in this case ip address
+            { ip }, // 1st argument sets which properties to pass to the ws object, in this case ip address
             req.getHeader('sec-websocket-key'),
             req.getHeader('sec-websocket-protocol'),
             req.getHeader('sec-websocket-extensions'), // these 3 headers are used to setup the websocket
@@ -388,6 +392,20 @@ app.get('/romTransfer', async (req, res) => {
     await fileDownload(file, 'http://' + req.query.romExternal)
 
     return res.send(await extractJsonFromRomFile(uid))
+})
+
+app.get('/chatLog/:token/:timestamp/:range?', (req, res) => {
+
+    if (adminTokens.includes(req.params.token)) {
+        const results = db.get('chats').filter((entry) => {
+            if (entry.timestampMs >= req.params.timestamp - 60000 && entry.timestampMs <= req.params.timestamp + 60000) return true
+        }).value()
+        
+        return res.send(results)
+    } else {
+        res.writeStatus('401')
+    }
+
 })
 
 app.get('/stats', (req, res) => {

@@ -2,7 +2,6 @@
 import { GameInstance as Game } from "./game/Game"
 import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
-import moment from "moment"
 import  * as Socket from "./socket.js"
 import "./cosmetics"
 import "./cmts_cosmetics"
@@ -191,7 +190,7 @@ $("#rules-modal").on('hide.bs.modal', () => { localStorage['rules'] = rulesVersi
 
 $(document).ready(function () {
     function getTimeRemaining(endtime) {
-        var t = (endtime - moment().unix()) * 1000
+        var t = endtime - Date.now()
         if (t < 0) { return false }
         var seconds = Math.floor((t / 1000) % 60)
         var minutes = Math.floor((t / 1000 / 60) % 60)
@@ -226,5 +225,5 @@ $(document).ready(function () {
         updateClock()
         var timeinterval = setInterval(updateClock, 1000)
     }
-    initializeClock('clockdiv', 1606590000)
+    initializeClock('clockdiv', 1606590000000)
 })

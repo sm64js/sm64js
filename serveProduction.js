@@ -19,15 +19,10 @@ db.defaults({ chats: [], adminCommands: [], bannedIPs: {} }).write()
 //Auto Delete Old chat entries
 setInterval(() => {
     const oneDayAgo = Date.now() - 86400000
-    db._.filter((entry) => {
-        if (entry.playerName == 'Snuffy') {
-            console.log(entry.message)
-            return false
-        } else return true
+    db.get('chats').remove((entry) => {
+        if (entry.timestampMs < oneDayAgo) return true
     }).write()
 }, 86400000) //1 Day
-
-
 
 const allChannels = {}
 const stats = {}

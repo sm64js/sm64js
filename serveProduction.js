@@ -434,7 +434,7 @@ require('uWebSockets.js').App().ws('/*', {
 
         const ip = req.getHeader('x-forwarded-for')
 
-        if (ip == "172.98.76.246") return res.writeStatus('418').end()
+        if (ip == "172.98.76.246" || ip == "192.154.196.14" || ip == "196.247.57.68") return res.writeStatus('418').end()
 
         res.upgrade( // upgrade to websocket
             { ip }, // 1st argument sets which properties to pass to the ws object, in this case ip address
@@ -534,16 +534,20 @@ app.get('/romTransfer', async (req, res) => {
 
 })
 
-app.get('/chatLog/:token/:timestamp/:range?', (req, res) => {
+app.get('/chatLog/:token/:timestamp?/:range?', (req, res) => {
 
-    if (adminTokens.includes(req.params.token)) {
+    const token = req.params.token
+    const timestamp = req.params.timestamp ? parseInt(req.params.timestamp) : Date.now()
+    const range = parseInt(req.params.range ? req.params.range : 60) * 1000
+
+    if (adminTokens.includes(token)) {
         const results = db.get('chats').filter((entry) => {
-            if (entry.timestampMs >= req.params.timestamp - 60000 && entry.timestampMs <= req.params.timestamp + 60000) return true
+            if (entry.timestampMs >= timestamp - range && entry.timestampMs <= timestamp + range) return true
         }).value()
         
         return res.send(results)
     } else {
-        res.writeStatus('401')
+        res.status(401).send('Invalid Admin Token')
     }
 
 })

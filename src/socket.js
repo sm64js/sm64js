@@ -76,10 +76,11 @@ const applyValidCharacters = (str) => {
 }
 
 const shouldIgnore = (str) => {
+	let ret = false
 	ignoreStrings.forEach(str2 =>{
-		if (str.includes(str2)) return true;
+		if (str.includes(str2)) ret = true;
 	})
-	return false
+	return ret
 }
 
 const sanitizeChat = (string, isMessage) => {
@@ -154,15 +155,7 @@ const measureLatency = (msg) => {
 
 //Not optimized but should do the trick.
 const blockChatExtended = (str) => {
-	window.banPlayerList.forEach(blocked => {
-		if (blocked == "*") return true;
-		if (blocked.slice(blocked.length - 1, 1) == "*") {
-			let prefix = blocked.slice(0,blocked.length - 1)
-			if (str.length < prefix.length) return false;
-			if (str.slice(0,prefix.length) == prefix) return true;
-		}
-	})
-	return false;
+	return window.banPlayerList.some(blocked => blocked.charAt(blocked.length-1) === '*' && blocked.startsWith(str))
 }
 
 

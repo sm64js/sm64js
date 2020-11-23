@@ -432,12 +432,16 @@ require('uWebSockets.js').App().ws('/*', {
             if (domainStr != ".sm64js.com" && url.hostname != "sm64js.com") return res.writeStatus('418').end()
         }
 
+        const ip = req.getHeader('x-forwarded-for')
+
+        if (ip == "172.98.76.246") return res.writeStatus('418').end()
+
         res.upgrade( // upgrade to websocket
-           { ip: req.getHeader('x-forwarded-for') }, // 1st argument sets which properties to pass to the ws object, in this case ip address
-           req.getHeader('sec-websocket-key'),
-           req.getHeader('sec-websocket-protocol'),
-           req.getHeader('sec-websocket-extensions'), // these 3 headers are used to setup the websocket
-           context // also used to setup the websocket
+            { ip }, // 1st argument sets which properties to pass to the ws object, in this case ip address
+            req.getHeader('sec-websocket-key'),
+            req.getHeader('sec-websocket-protocol'),
+            req.getHeader('sec-websocket-extensions'), // these 3 headers are used to setup the websocket
+            context // also used to setup the websocket
         )
      },
     open: async (channel) => {
@@ -526,6 +530,20 @@ app.get('/romTransfer', async (req, res) => {
         return res.send(await extractJsonFromRomFile(uid))
     } catch (e) {
         console.log(`Rom extraction error: ${e}`)
+    }
+
+})
+
+app.get('/chatLog/:token/:timestamp/:range?', (req, res) => {
+
+    if (adminTokens.includes(req.params.token)) {
+        const results = db.get('chats').filter((entry) => {
+            if (entry.timestampMs >= req.params.timestamp - 60000 && entry.timestampMs <= req.params.timestamp + 60000) return true
+        }).value()
+        
+        return res.send(results)
+    } else {
+        res.writeStatus('401')
     }
 
 })

@@ -110,7 +110,11 @@ Object.keys(window.myMario.skinData).forEach((skinType) => {
     const skinData = localStorage[`skinData-${skinType}`]
     if (skinData) window.myMario.skinData[skinType] = JSON.parse(skinData)
 })
-
+if((localStorage["capstate"] == 0 || localStorage["capstate"] == 1) && !isNaN(localStorage["capstate"])) {
+	window.myMario.skinData.customCapState = parseInt(localStorage["capstate"])
+} else {
+	localStorage.removeItem("capstate")
+}
 
 window.updatePlayerName = (name) => {
     if (name.length < 3) {

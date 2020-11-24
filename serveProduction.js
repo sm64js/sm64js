@@ -8,6 +8,22 @@ const deflate = util.promisify(zlib.deflate)
 const port = 80
 const ws_port = 3000
 
+
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
+
+const adapter = process.env.PRODUCTION ? new FileSync('/tmp/data/db.json') : new FileSync('testdb.json')
+const db = low(adapter)
+db.defaults({ chats: [], adminCommands: [], ipList: [] }).write()
+
+//Auto Delete Old chat entries
+setInterval(() => {
+    const oneDayAgo = Date.now() - 86400000
+    db.get('chats').remove((entry) => {
+        if (entry.timestampMs < oneDayAgo) return true
+    }).write()
+}, 86400000) //1 Day
+
 const allChannels = {}
 const stats = {}
 
@@ -188,6 +204,15 @@ const processChat = async (channel_id, msg) => {
     const decodedMario = socket.decodedMario
     if (decodedMario == undefined) return
 
+
+    /// record chat to DB
+    db.get('chats').push({
+        socketID: channel_id,
+        playerName: decodedMario.getPlayername(),
+        ip: socket.channel.ip,
+        timestampMs: Date.now(),
+        message: msg
+    }).write()
 
     const sanitizedChat = sanitizeChat(msg)
 
@@ -399,17 +424,72 @@ setInterval(() => {
 
 require('uWebSockets.js').App().ws('/*', {
 
-    upgrade: (res, req, context) => { // a request was made to open websocket, res req have all the properties for the request, cookies etc
+    upgrade: async (res, req, context) => { // a request was made to open websocket, res req have all the properties for the request, cookies etc
+
         // add code here to determine if ws request should be accepted or denied
         // can deny request with "return res.writeStatus('401').end()" see issue #367
+
+        const ip = req.getHeader('x-forwarded-for')
+        const key = req.getHeader('sec-websocket-key')
+        const protocol = req.getHeader('sec-websocket-protocol')
+        const extensions = req.getHeader('sec-websocket-extensions')
+
+        res.onAborted(() => { console.log("!! aborted") })
+
+        try {
+
+            console.log("someone trying to connect: " + ip)
+
+            ///// check CORS
+            if (process.env.PRODUCTION) {
+                let originHeader = req.getHeader('origin')
+                const url = new URL(originHeader)
+                const domainStr = url.hostname.substring(url.hostname.length - 11, url.hostname.length)
+                if (domainStr != ".sm64js.com" && url.hostname != "sm64js.com") return res.writeStatus('418').end()
+            }
+
+            const ipStatus = db.get('ipList').find({ ip }).value()
+
+            if (ipStatus == undefined) {
+
+                console.log("trying to hit vpn api")
+                const vpnCheckRequest = `https://ipqualityscore.com/api/json/ip/${process.env.VPN_API_KEY}/${ip}?strictness=0&allow_public_access_points=true`
+                const initApiReponse = await got(vpnCheckRequest)
+                const response = JSON.parse(initApiReponse.body)
+
+                if (response.vpn || response.active_vpn || response.bot_status) {
+                    /// record chat to DB
+                    db.get('ipList').push({ ip, value: 'BANNED' }).write()
+                    console.log("Adding new VPN BAD IP " + ip)
+                    return res.writeStatus('403').end()
+                } else {
+                    console.log("Adding new Legit IP")
+                    db.get('ipList').push({ ip, value: 'ALLOWED'}).write()
+                }
+
+            } else if (ipStatus.value == "BANNED") {  /// BANNED or NOT ALLOWED IP
+                console.log("BANNED IP tried to connect")
+                return res.writeStatus('403').end()
+            } else if (ipStatus.value == "ALLOWED") { /// Whitelisted IP - OKAY
+                console.log("Known Whitelisted IP connecting")
+            }
+
+        } catch (e) {
+            console.log(`Got error with upgrading to websocket: ${e}`)
+            return res.writeStatus('500').end()
+        }
+        
         res.upgrade( // upgrade to websocket
-           { ip: req.getHeader('x-forwarded-for') }, // 1st argument sets which properties to pass to the ws object, in this case ip address
-           req.getHeader('sec-websocket-key'),
-           req.getHeader('sec-websocket-protocol'),
-           req.getHeader('sec-websocket-extensions'), // these 3 headers are used to setup the websocket
-           context // also used to setup the websocket
+            { ip }, // 1st argument sets which properties to pass to the ws object, in this case ip address
+            key,
+            protocol,
+            extensions, // these 3 headers are used to setup the websocket
+            context // also used to setup the websocket
         )
-     },
+
+
+    },
+
     open: async (channel) => {
 
         channel.my_id = generateID()
@@ -496,6 +576,24 @@ app.get('/romTransfer', async (req, res) => {
         return res.send(await extractJsonFromRomFile(uid))
     } catch (e) {
         console.log(`Rom extraction error: ${e}`)
+    }
+
+})
+
+app.get('/chatLog/:token/:timestamp?/:range?', (req, res) => {
+
+    const token = req.params.token
+    const timestamp = req.params.timestamp ? parseInt(req.params.timestamp) : Date.now()
+    const range = parseInt(req.params.range ? req.params.range : 60) * 1000
+
+    if (adminTokens.includes(token)) {
+        const results = db.get('chats').filter((entry) => {
+            if (entry.timestampMs >= timestamp - range && entry.timestampMs <= timestamp + range) return true
+        }).value()
+        
+        return res.send(results)
+    } else {
+        res.status(401).send('Invalid Admin Token')
     }
 
 })

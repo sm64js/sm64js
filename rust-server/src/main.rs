@@ -4,7 +4,7 @@ pub mod proto {
     include!(concat!(env!("OUT_DIR"), "/sm64js.rs"));
 }
 
-use proto::{sm64_js_msg, Sm64JsMsg};
+use proto::{root_msg, sm64_js_msg, RootMsg, Sm64JsMsg};
 
 use actix::prelude::*;
 use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
@@ -72,8 +72,23 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                 self.hb = Instant::now();
             }
             Ok(ws::Message::Binary(bin)) => {
-                let data = Sm64JsMsg::decode(bin.clone()).unwrap();
-                match data.message {
+                let data = RootMsg::decode(bin.clone()).unwrap();
+                let sm64js_msg: Sm64JsMsg = match data.message {
+                    Some(root_msg::Message::UncompressedSm64jsMsg(msg)) => msg,
+                    Some(root_msg::Message::CompressedSm64jsMsg(msg)) => {
+                        use flate2::write::ZlibDecoder;
+                        use std::io::Write;
+
+                        let mut decoder = ZlibDecoder::new(Vec::new());
+                        decoder.write_all(&msg).unwrap();
+                        let msg = decoder.finish().unwrap();
+                        Sm64JsMsg::decode(&msg[..]).unwrap()
+                    }
+                    None => {
+                        return;
+                    }
+                };
+                match sm64js_msg.message {
                     Some(sm64_js_msg::Message::PingMsg(_)) => {
                         use flate2::{write::ZlibEncoder, Compression};
                         use std::io::Write;
@@ -91,11 +106,20 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                             data: mario_msg,
                         });
                     }
-                    Some(sm64_js_msg::Message::ListMsg(_)) => {
+                    Some(sm64_js_msg::Message::ChatMsg(chat_msg)) => {
                         // TODO
                     }
-                    Some(sm64_js_msg::Message::ConnectedMsg(_)) => {
+                    Some(sm64_js_msg::Message::SkinMsg(skin_msg)) => {
                         // TODO
+                    }
+                    Some(sm64_js_msg::Message::ValidPlayersMsg(_)) => {
+                        // TODO unused
+                    }
+                    Some(sm64_js_msg::Message::ListMsg(_)) => {
+                        // TODO clients don't send this
+                    }
+                    Some(sm64_js_msg::Message::ConnectedMsg(_)) => {
+                        // TODO clients don't send this
                     }
                     None => {}
                 }

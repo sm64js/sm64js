@@ -114,7 +114,6 @@ impl Sm64JsServer {
             .collect();
         let sm64js_msg = Sm64JsMsg {
             message: Some(sm64_js_msg::Message::ListMsg(MarioListMsg {
-                message_count: mario_list.len() as u32,
                 mario: mario_list,
             })),
         };

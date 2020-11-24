@@ -127,8 +127,8 @@ window.updatePlayerName = (name) => {
 export const recvSkinData = (skinMsg) => { 
     console.log('skinMsg', skinMsg, networkData.myChannelID)
     const channelId = skinMsg.getChannelid()
-    console.log('channelId', channelId, networkData.myChannelID, networkData.remotePlayers)
-    if (channelId !== networkData.myChannelID ||
+    console.log('channelId', channelId, networkData.myChannelID, networkData.remotePlayers, networkData.remotePlayers[channelId])
+    if (channelId === networkData.myChannelID ||
         networkData.remotePlayers[channelId] == null) return
 
     const skinData = {

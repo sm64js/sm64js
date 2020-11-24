@@ -84,6 +84,8 @@ const recvChat = (chatmsg) => {
     const chatlog = document.getElementById("chatlog")
     const node = document.createElement("LI")                 // Create a <li> node
     node.innerHTML = '<strong>' + sanitizeChat(sender, false) + '</strong>: ' + sanitizeChat(msg, true) + '<br/>'        // Create a text node
+
+    if (window.showChatIds) node.innerHTML = `(${chatmsg.channel_id})` + node.innerHTML
     chatlog.appendChild(node)
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 

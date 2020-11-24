@@ -8,12 +8,28 @@ const deflate = util.promisify(zlib.deflate)
 const port = 3080
 const ws_port = 3000
 
+
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
+
+const adapter = process.env.PRODUCTION ? new FileSync('/tmp/data/db.json') : new FileSync('testdb.json')
+const db = low(adapter)
+db.defaults({ chats: [], adminCommands: [], ipList: [] }).write()
+
+//Auto Delete Old chat entries
+setInterval(() => {
+    const oneDayAgo = Date.now() - 86400000
+    db.get('chats').remove((entry) => {
+        if (entry.timestampMs < oneDayAgo) return true
+    }).write()
+}, 86400000) //1 Day
+
 const allChannels = {}
 const stats = {}
 
 let currentId = 0
 const generateID = () => {
-    if (++currentId > 1000000) currentId = 0
+    if (++currentId > 4294967294) currentId = 0
     return currentId
 }
 
@@ -27,6 +43,9 @@ const sendData = (bytes, channel) => { channel.send(bytes, true) }
 const broadcastData = (bytes) => {
     Object.values(allChannels).forEach(s => { s.channel.send(bytes, true) })
 }
+
+
+const adminTokens = process.env.ADMIN_TOKENS ? process.env.ADMIN_TOKENS.split(":") : []
 
 const sendValidUpdate = () => {
 
@@ -109,17 +128,48 @@ const sanitizeChat = (string) => {
     return string
 }
 
+const processAdminCommand = (msg) => {
+    const parts = msg.split(' ')
+    const token = parts[0]
+
+    if (adminTokens.includes(token)) {
+        console.log("Admin authentication success")
+    } else {
+        console.log("Admin authentication fail - token not found: " + token)
+    }
+
+    switch (parts) {
+
+    }
+}
+
 const processChat = async (channel_id, sm64jsMsg) => {
     const chatMsg = sm64jsMsg.getChatMsg()
     const msg = chatMsg.getMessage()
 
-    if (allChannels[channel_id].chatCooldown > 0) return
-    allChannels[channel_id].chatCooldown = 3 // seconds
+    const socket = allChannels[channel_id]
+    if (socket == undefined) return
+
+    if (socket.chatCooldown > 0) return
+    socket.chatCooldown = 3 // seconds
     if (msg.length == 0) return
 
-    const decodedMario = Object.values(allChannels).find(data => data.channel.my_id == channel_id).decodedMario
+    if (msg[0] == '/') {
+        processAdminCommand(msg.slice(1))
+        return
+    }
+
+    const decodedMario = socket.decodedMario
     if (decodedMario == undefined) return
 
+    /// record chat to DB
+    db.get('chats').push({
+        socketID: channel_id,
+        playerName: decodedMario.getPlayername(),
+        ip: socket.channel.ip,
+        timestampMs: Date.now(),
+        message: msg
+    }).write()
 
     const sanitizedChat = sanitizeChat(msg)
 
@@ -247,6 +297,77 @@ setInterval(() => {
 
 require('uWebSockets.js').App().ws('/*', {
 
+    upgrade: async (res, req, context) => { // a request was made to open websocket, res req have all the properties for the request, cookies etc
+
+        // add code here to determine if ws request should be accepted or denied
+        // can deny request with "return res.writeStatus('401').end()" see issue #367
+
+        const ip = req.getHeader('x-forwarded-for')
+        const key = req.getHeader('sec-websocket-key')
+        const protocol = req.getHeader('sec-websocket-protocol')
+        const extensions = req.getHeader('sec-websocket-extensions')
+
+        res.onAborted(() => { console.log("!! aborted") })
+
+        try {
+
+            console.log("someone trying to connect: " + ip)
+
+            ///// check CORS
+            if (process.env.PRODUCTION) {
+                let originHeader = req.getHeader('origin')
+                const url = new URL(originHeader)
+                const domainStr = url.hostname.substring(url.hostname.length - 11, url.hostname.length)
+                if (domainStr != ".sm64js.com" && url.hostname != "sm64js.com") return res.writeStatus('418').end()
+            }
+
+            const ipStatus = db.get('ipList').find({ ip }).value()
+
+            if (ipStatus == undefined) {
+
+                console.log("trying to hit vpn api")
+                const vpnCheckRequest = `http://v2.api.iphub.info/ip/${ip}`
+                const initApiReponse = await got(vpnCheckRequest, {
+                    headers: { 'X-Key': process.env.VPN_API_KEY }
+                })
+                const response = JSON.parse(initApiReponse.body)
+
+                if (response.block == undefined) {
+                    console.log("iphub reponse invalid")
+                    return res.writeStatus('500').end()
+                }
+
+                if (response.block == 1) {
+                    db.get('ipList').push({ ip, value: 'BANNED', reason: 'AutoVPN' }).write()
+                    console.log("Adding new VPN BAD IP " + ip)
+                    return res.writeStatus('403').end()
+                } else {
+                    console.log("Adding new Legit IP")
+                    db.get('ipList').push({ ip, value: 'ALLOWED'}).write()
+                }
+
+            } else if (ipStatus.value == "BANNED") {  /// BANNED or NOT ALLOWED IP
+                console.log("BANNED IP tried to connect")
+                return res.writeStatus('403').end()
+            } else if (ipStatus.value == "ALLOWED") { /// Whitelisted IP - OKAY
+                console.log("Known Whitelisted IP connecting")
+            }
+
+        } catch (e) {
+            console.log(`Got error with upgrading to websocket: ${e}`)
+            return res.writeStatus('500').end()
+        }
+        
+        res.upgrade( // upgrade to websocket
+            { ip }, // 1st argument sets which properties to pass to the ws object, in this case ip address
+            key,
+            protocol,
+            extensions, // these 3 headers are used to setup the websocket
+            context // also used to setup the websocket
+        )
+
+    },
+
     open: async (channel) => {
         channel.my_id = generateID()
         allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }
@@ -309,6 +430,80 @@ app.use(express.static(__dirname + '/dist'))
 server.listen(port, () => { console.log('Serving Files with express server ' + port) })
 
 
+////// Admin Commands
+app.get('/banIP/:token/:ip', (req, res) => {
+
+    const { token, ip } = req.params
+
+    const ipObject = db.get('ipList').find({ ip })
+    const ipValue = ipObject.value()
+
+    if (ipValue == undefined) {
+        db.get('ipList').push({ ip, value: 'BANNED', reason: 'Manual' }).write()
+        console.log("Admin BAD IP " + ip + "  " + token)
+
+        return res.send("BANNED")
+    } else if (ipValue.value == "ALLOWED") {
+        ipObject.assign({ value: 'BANNED', reason: 'Manual'  }).write()
+        console.log("Admin BAD Existing IP " + ip + "  " + token)
+
+        ///kick
+        Object.values(allChannels).forEach(data => {
+            if (data.channel.ip == ip) data.channel.close()
+        })
+
+        return res.send("BANNED")
+    } else if (ipValue.value == "BANNED") {
+        return res.send("Already BANNED")
+    }
+
+})
+
+app.get('/allowIP/:token/:ip', (req, res) => {
+
+    const { token, ip } = req.params
+
+    const ipObject = db.get('ipList').find({ ip })
+    const ipValue = ipObject.value()
+
+    if (ipValue == undefined) {
+        console.log("admin allowIP could not find")
+        return res.send("allowIP could not find")
+    } else if (ipValue.value == "BANNED") {
+        ipObject.assign({ value: 'ALLOWED' }).write()
+        console.log("Admin - Allowing Existing IP " + ip + "  " + token)
+
+        return res.send("Allowing Existing IP")
+    } else if (ipValue.value == "ALLOWED") {
+        console.log("Admin Allow - already allowed")
+        return res.send("Already ALLOWED")
+    }
+
+})
+
+app.get('/chatLog/:token/:timestamp?/:range?', (req, res) => {
+
+    const token = req.params.token
+    const timestamp = req.params.timestamp ? parseInt(req.params.timestamp) : Date.now()
+    const range = parseInt(req.params.range ? req.params.range : 60) * 1000
+
+    if (adminTokens.includes(token)) {
+        let stringResult = 'socketID,playerName,ip,message <br />'
+
+        db.get('chats').forEach((entry) => {
+            if (entry.timestampMs >= timestamp - range && entry.timestampMs <= timestamp + range) {
+                stringResult += `${entry.socketID},${entry.playerName},${entry.ip},${entry.message} <br />`
+            }
+        }).value()
+        
+        return res.send(stringResult)
+    } else {
+        res.status(401).send('Invalid Admin Token')
+    }
+
+})
+
+
 /////// necessary for server side rom extraction
 
 const { promisify } = require('util')
@@ -326,6 +521,7 @@ app.get('/romTransfer', async (req, res) => {
 
     return res.send(await extractJsonFromRomFile(uid))
 })
+
 
 app.get('/stats', (req, res) => {
     return res.send({

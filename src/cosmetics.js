@@ -44,6 +44,11 @@ window.updateSkinID = (skinID) => {
     window.myMario.skinData.overalls = overallsPresets[skinID]
     window.myMario.skinData.hat = hatShirtPresets[skinID]
     window.myMario.skinData.shirt = hatShirtPresets[skinID]
+
+    /// Save all
+    Object.keys(window.myMario.skinData).forEach((skinType) => {
+        localStorage[`skinData-${skinType}`] = JSON.stringify(window.myMario.skinData[skinType])
+    })
 }
 
 const skinCustomizerHtml = $('#skinCustomizerWindow').detach()
@@ -69,6 +74,11 @@ $('[data-toggle="skinCustomizerToggle"]').popover({
 })
 
 $('[data-toggle="skinCustomizerToggle"]').on('shown.bs.popover', () => { window.setSkinSliderValues() })
+
+window.toggleCapState = () => {
+    window.myMario.skinData.customCapState = window.myMario.skinData.customCapState == 1 ? 0 : 1
+    localStorage[`skinData-customCapState`] = JSON.stringify(window.myMario.skinData.customCapState)
+}
 
 window.customSkinUpdate = (slider) => {
     let color = getComputedStyle(slider).borderColor
@@ -106,6 +116,7 @@ window.myMario = {
 }
 document.getElementById('playerNameInput').value = window.myMario.playerName
 
+/// Load all
 Object.keys(window.myMario.skinData).forEach((skinType) => {
     const skinData = localStorage[`skinData-${skinType}`]
     if (skinData) window.myMario.skinData[skinType] = JSON.parse(skinData)

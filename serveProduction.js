@@ -96,6 +96,7 @@ const processSkin = (channel_id, skinMsg) => {
         boots: skinMsg.getBootsList(),
         skin: skinMsg.getSkinList(),
         hair: skinMsg.getHairList(),
+        customCapState: skinMsg.getCustomcapstate() != null ? skinMsg.getCustomcapstate() : 0,
     }
     allChannels[channel_id].skinData = skinData
     allChannels[channel_id].skinData.updated = true
@@ -160,6 +161,7 @@ const sendSkinsToChannel = (channel) => {
         skinMsg.setBootsList(data.skinData.boots)
         skinMsg.setSkinList(data.skinData.skin)
         skinMsg.setHairList(data.skinData.hair)
+        skinMsg.setCustomcapstate(1)
         const sm64jsMsg = new Sm64JsMsg()
         sm64jsMsg.setSkinMsg(skinMsg)
         const rootMsg = new RootMsg()

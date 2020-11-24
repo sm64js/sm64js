@@ -139,6 +139,7 @@ export const recvSkinData = (skinMsg) => {
         boots: skinMsg.getBootsList(),
         skin: skinMsg.getSkinList(),
         hair: skinMsg.getHairList(),
+        customCapState: skinMsg.getCustomcapstate(),
     }
     console.log('skinData', skinData)
     networkData.remotePlayers[channelId].skinData = skinData

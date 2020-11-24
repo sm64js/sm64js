@@ -200,6 +200,7 @@ export const post_main_loop_one_iteration = (frame) => {
                     skinMsg.setBootsList(skinData.boots)
                     skinMsg.setSkinList(skinData.skin)
                     skinMsg.setHairList(skinData.hair)
+                    skinMsg.setCustomcapstate(skinData.customCapState)
                     console.log('send skinMsg', skinMsg)
                     const sm64jsMsg = new Sm64JsMsg()
                     sm64jsMsg.setSkinMsg(skinMsg)

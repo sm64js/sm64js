@@ -2819,7 +2819,8 @@ proto.sm64js.SkinMsg.toObject = function(includeInstance, msg) {
     glovesList: jspb.Message.getRepeatedField(msg, 5),
     bootsList: jspb.Message.getRepeatedField(msg, 6),
     skinList: jspb.Message.getRepeatedField(msg, 7),
-    hairList: jspb.Message.getRepeatedField(msg, 8)
+    hairList: jspb.Message.getRepeatedField(msg, 8),
+    customcapstate: jspb.Message.getFieldWithDefault(msg, 9, 0)
   };
 
   if (includeInstance) {
@@ -2887,6 +2888,10 @@ proto.sm64js.SkinMsg.deserializeBinaryFromReader = function(msg, reader) {
     case 8:
       var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
       msg.setHairList(value);
+      break;
+    case 9:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setCustomcapstate(value);
       break;
     default:
       reader.skipField();
@@ -2970,6 +2975,13 @@ proto.sm64js.SkinMsg.serializeBinaryToWriter = function(message, writer) {
   if (f.length > 0) {
     writer.writePackedUint32(
       8,
+      f
+    );
+  }
+  f = message.getCustomcapstate();
+  if (f !== 0) {
+    writer.writeUint32(
+      9,
       f
     );
   }
@@ -3191,6 +3203,21 @@ proto.sm64js.SkinMsg.prototype.addHair = function(value, opt_index) {
 
 proto.sm64js.SkinMsg.prototype.clearHairList = function() {
   this.setHairList([]);
+};
+
+
+/**
+ * optional uint32 customCapState = 9;
+ * @return {number}
+ */
+proto.sm64js.SkinMsg.prototype.getCustomcapstate = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
+};
+
+
+/** @param {number} value */
+proto.sm64js.SkinMsg.prototype.setCustomcapstate = function(value) {
+  jspb.Message.setProto3IntField(this, 9, value);
 };
 
 

@@ -91,4 +91,5 @@ message SkinMsg {
 	repeated uint32 boots = 6;
 	repeated uint32 skin = 7;
 	repeated uint32 hair = 8;
+	uint32 customCapState = 9;
 }

@@ -451,12 +451,18 @@ require('uWebSockets.js').App().ws('/*', {
             if (ipStatus == undefined) {
 
                 console.log("trying to hit vpn api")
-                const vpnCheckRequest = `https://ipqualityscore.com/api/json/ip/${process.env.VPN_API_KEY}/${ip}?strictness=0&allow_public_access_points=true`
-                const initApiReponse = await got(vpnCheckRequest)
+                const vpnCheckRequest = `http://v2.api.iphub.info/ip/${ip}`
+                const initApiReponse = await got(vpnCheckRequest, {
+                    headers: { 'X-Key': process.env.VPN_API_KEY }
+                })
                 const response = JSON.parse(initApiReponse.body)
 
-                if (response.vpn || response.active_vpn || response.bot_status) {
-                    /// record chat to DB
+                if (response.block == undefined) {
+                    console.log("iphub reponse invalid")
+                    return res.writeStatus('500').end()
+                }
+
+                if (response.block == 1) {
                     db.get('ipList').push({ ip, value: 'BANNED' }).write()
                     console.log("Adding new VPN BAD IP " + ip)
                     return res.writeStatus('403').end()
@@ -554,26 +560,53 @@ app.use(express.static(__dirname + '/dist'))
 server.listen(port, () => { console.log('Serving Files with express server ' + port) })
 
 
-/////// necessary for server side rom extraction
+////// Admin Commands
+app.get('/banIP/:token/:ip', (req, res) => {
 
-const { promisify } = require('util')
-const { spawn } = require('child_process')
-const { v4: uuidv4 } = require('uuid')
+    const { token, ip } = req.params
 
-app.get('/romTransfer', async (req, res) => {
+    const ipObject = db.get('ipList').find({ ip })
+    const ipValue = ipObject.value()
 
-    try {
-        console.log("rom transfer")
+    if (ipValue == undefined) {
+        db.get('ipList').push({ ip, value: 'BANNED' }).write()
+        console.log("Admin BAD IP " + ip + "  " + token)
 
-        const uid = uuidv4()
-        await mkdir('extractTools/' + uid)
+        return res.send("BANNED")
+    } else if (ipValue.value == "ALLOWED") {
+        ipObject.assign({ value: 'BANNED'  }).write()
+        console.log("Admin BAD Existing IP " + ip + "  " + token)
 
-        const file = fs.createWriteStream('extractTools/' + uid + '/baserom.us.z64')
-        await fileDownload(file, 'http://' + req.query.romExternal)
+        ///kick
+        Object.values(allChannels).forEach(data => {
+            if (data.channel.ip == ip) data.channel.close()
+        })
 
-        return res.send(await extractJsonFromRomFile(uid))
-    } catch (e) {
-        console.log(`Rom extraction error: ${e}`)
+        return res.send("BANNED")
+    } else if (ipValue.value == "BANNED") {
+        return res.send("Already BANNED")
+    }
+
+})
+
+app.get('/allowIP/:token/:ip', (req, res) => {
+
+    const { token, ip } = req.params
+
+    const ipObject = db.get('ipList').find({ ip })
+    const ipValue = ipObject.value()
+
+    if (ipValue == undefined) {
+        console.log("admin allowIP could not find")
+        return res.send("allowIP could not find")
+    } else if (ipValue.value == "BANNED") {
+        ipObject.assign({ value: 'ALLOWED'  }).write()
+        console.log("Admin - Allowing Existing IP " + ip + "  " + token)
+
+        return res.send("Allowing Existing IP")
+    } else if (ipValue.value == "ALLOWED") {
+        console.log("Admin Allow - already allowed")
+        return res.send("Already ALLOWED")
     }
 
 })
@@ -585,16 +618,40 @@ app.get('/chatLog/:token/:timestamp?/:range?', (req, res) => {
     const range = parseInt(req.params.range ? req.params.range : 60) * 1000
 
     if (adminTokens.includes(token)) {
-        const results = db.get('chats').filter((entry) => {
-            if (entry.timestampMs >= timestamp - range && entry.timestampMs <= timestamp + range) return true
+        let stringResult = 'socketID,playerName,ip,message <br />'
+
+        db.get('chats').forEach((entry) => {
+            if (entry.timestampMs >= timestamp - range && entry.timestampMs <= timestamp + range) {
+                stringResult += `${entry.socketID},${entry.playerName},${entry.ip},${entry.message} <br />`
+            }
         }).value()
         
-        return res.send(results)
+        return res.send(stringResult)
     } else {
         res.status(401).send('Invalid Admin Token')
     }
 
 })
+
+
+/////// necessary for server side rom extraction
+
+const { promisify } = require('util')
+const { spawn } = require('child_process')
+const { v4: uuidv4 } = require('uuid')
+
+app.get('/romTransfer', async (req, res) => {
+    console.log("rom transfer")
+
+    const uid = uuidv4()
+    await mkdir('extractTools/' + uid)
+
+    const file = fs.createWriteStream('extractTools/' + uid + '/baserom.us.z64')
+    await fileDownload(file, 'http://' + req.query.romExternal)
+
+    return res.send(await extractJsonFromRomFile(uid))
+})
+
 
 app.get('/stats', (req, res) => {
     return res.send({

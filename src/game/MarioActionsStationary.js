@@ -1,6 +1,5 @@
 import * as Mario from "./Mario"
 import { stationary_ground_step } from "./MarioStep"
-import { StartGroup } from "../goddard/dynlists/dynlist_macros"
 
 const check_common_idle_cancels = (m) => {
 
@@ -31,9 +30,13 @@ const check_common_idle_cancels = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_START_CROUCHING, 0)
     }
 
+    if (m.input & Mario.INPUT_TAUNT) {
+        return Mario.set_mario_action(m, Mario.ACT_TAUNT, m.controller.taunt)
+    }
+
     return 0
 }
-export const e_check_common_idle_cancels = (m) => {check_common_idle_cancels(m)}
+
 const act_idle = (m) => {
 
     if (check_common_idle_cancels(m)) {

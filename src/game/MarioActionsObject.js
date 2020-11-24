@@ -1,6 +1,5 @@
 import * as Mario from "./Mario"
 import { perform_ground_step, stationary_ground_step } from "./MarioStep"
-import { e_check_common_idle_cancels } from "./MarioActionsStationary"
 
 const sPunchingForwardVelocities = [0, 1, 1, 2, 3, 5, 7, 10]
 
@@ -163,22 +162,42 @@ const act_stomach_slide_stop = (m) => {
     return 0
 }
 
-const taunt_handler = (m) => {
+const act_taunt = (m) => {
+    Mario.set_mario_animation(m, m.actionArg)
 
-    let animFrame = Mario.set_mario_animation(m, m.actionArg)
-	
-	if (e_check_common_idle_cancels(m)) {
-        return 1
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        return Mario.set_jumping_action(m, Mario.ACT_JUMP, 0)
+    }
+
+    if (m.input & Mario.INPUT_OFF_FLOOR) {
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
+    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
+        return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
+    }
+
+    if (m.input & Mario.INPUT_NONZERO_ANALOG) {
+
+        m.faceAngle[1] = m.intendedYaw
+
+        return Mario.set_mario_action(m, Mario.ACT_WALKING, 0)
+    }
+
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_PUNCHING, 0)
+    }
+
+    if (m.input & Mario.INPUT_Z_DOWN) {
+        return Mario.set_mario_action(m, Mario.ACT_START_CROUCHING, 0)
+    }
+
+    if (Mario.is_anim_at_end(m)) {
+        if (m.actionArg != 0x2E && m.actionArg != 0x79) Mario.set_mario_action(m, Mario.ACT_IDLE, 0)
     }
 
     stationary_ground_step(m)
 
-    return 0
-
-}
-
-const act_taunt = (m) => {
-    taunt_handler(m)
     return 0
 }
 export const mario_execute_object_action = (m) => {
@@ -186,7 +205,7 @@ export const mario_execute_object_action = (m) => {
     switch (m.action) {
         case Mario.ACT_PUNCHING: return act_punching(m)
         case Mario.ACT_STOMACH_SLIDE_STOP: return act_stomach_slide_stop(m)
-        case Mario.ACT_TAUNT:				 return act_taunt(m)
+        case Mario.ACT_TAUNT: return act_taunt(m)
         default: throw "unknown action object"
     }
 }

@@ -315,6 +315,7 @@ export const INPUT_UNKNOWN_12 = 0x1000
 export const INPUT_B_PRESSED = 0x2000
 export const INPUT_Z_DOWN = 0x4000
 export const INPUT_Z_PRESSED = 0x8000
+export const INPUT_TAUNT = 0x10000
 
 export const GROUND_STEP_LEFT_GROUND = 0
 export const GROUND_STEP_NONE = 1
@@ -735,7 +736,6 @@ export const set_mario_animation = (m, targetAnimID) => {
             }
         }
     }
-
     return o.header.gfx.unk38.animFrame
 
 }
@@ -1205,8 +1205,10 @@ const update_mario_inputs = (m) => {
     m.collidedObjInteractTypes = m.marioObj.collidedObjInteractTypes
     m.flags &= 0xFFFFFF
     update_mario_joystick_inputs(m)
-    update_mario_button_inputs(m)
+    update_mario_button_inputs(m) 
     update_mario_geometry_inputs(m)
+
+    if (m.controller.taunt && m.action == ACT_IDLE) m.input |= INPUT_TAUNT
 
     if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) {
         if (m.action & ACT_FLAG_ALLOW_FIRST_PERSON) {

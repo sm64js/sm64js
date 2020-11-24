@@ -4,6 +4,45 @@ import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
 import { updateFlagData, setInitFlagHeight } from "./game/behaviors/bhv_castle_flag_init.inc"
 
+//Valid characters for usernames.
+const validCharacters = [
+'a','b','c','d','e','f','g',
+'h','i','j','k','l','m','n',
+'o','p','q','r','s','t','u',
+'v','w','y','x','z','A','B',
+'C','D','E','F','G','H','I',
+'J','K','L','M','N','O','P',
+'Q','R','S','T','U','V','W',
+'Y','X','Z','1','2','3','4',
+'5','6','7','8','9','0','!',
+'@','$','^','*','(',')','{',
+'}','[',']',';',':',`'`,'"',
+`\\`,',','.','/','?','🙄','😫',
+'🤔','🔥','😌','😍','🤣','❤️','😭',
+'😂','⭐','✨','🎄','🎃','🔺','🔻',
+'🎄','🍬','🍭','🍫',' ',
+'-','_','=','|'
+]
+
+//Prevents a message from sending if it contains any strings that are in this array. Mainly to stop foul spam
+const ignoreStrings = [
+`pornhub`,
+`prnhub`,
+`prnhb`,
+`pornhb`,
+`porn_hub`,
+`prn_hub`,
+`prn_hb`,
+`porn_hb`,
+`rule34`,
+`r34`,
+`r_34`,
+`rule_34`,
+`MOD PLS BAN`, //Consistently spammed by the dude mocking others
+`xvideos`,
+`gonna cum in you`, // This was spammed at some point, very foul.
+]
+
 Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
 
 function myArrayBuffer() {
@@ -28,10 +67,26 @@ if (url.protocol == "https:") {
 
 const channel = new WebSocket(websocketServerPath)
 
+const applyValidCharacters = (str) => {
+	let temp = ""
+	str.split('').forEach(character => {
+		if (validCharacters.includes(character)){temp+=character}
+	})
+	return temp
+}
+
+const shouldIgnore = (str) => {
+	let ret = false
+	ignoreStrings.forEach(str2 =>{
+		if (str.includes(str2)) ret = true;
+	})
+	return ret
+}
+
 const sanitizeChat = (string, isMessage) => {
     string = string.replace(/</g, "");
     // string = string.replace(/>/g, ""); // commented out for ">:(" and "> text", should still sanitize with only <
-    if(isMessage = true) {
+    if(isMessage == true) {
         string = string.replace(/:doublek:/g, "<img height='20' width='20' src='emotes/doublek.png' alt=':doublek:' />");
         string = string.replace(/:facepalm:/g, "<img height='20' width='20' src='emotes/facepalm.png' alt=':facepalm:' />");
         string = string.replace(/:kappa:/g, "<img height='20' width='20' src='emotes/kappa.png' alt=':kappa:' />");
@@ -42,7 +97,9 @@ const sanitizeChat = (string, isMessage) => {
         string = string.replace(/:shock:/g, "<img height='20' width='20' src='emotes/shock.gif' alt=':shock:' />");
         string = string.replace(/:bup:/g, "<img height='20' width='20' src='emotes/bup.jpg' alt=':bup:' />");
         // string.replace any other emotes in this fashion.
-    }
+    } else {
+		string = applyValidCharacters(string)
+	}
     return string;
 }
 
@@ -96,12 +153,19 @@ const measureLatency = (msg) => {
     window.latency = parseInt(endTime - startTime)
 }
 
+//Not optimized but should do the trick.
+const blockChatExtended = (str) => {
+	return window.banPlayerList.some(blocked => blocked.charAt(blocked.length-1) === '*' && blocked.startsWith(str))
+}
+
+
 const recvChat = (chatmsg) => {
 
     if (chatmsg.channel_id != networkData.myChannelID &&
         networkData.remotePlayers[chatmsg.channel_id] == undefined) return
 
-    if (window.banPlayerList.includes(chatmsg.sender)) return
+    if (window.banPlayerList.includes(chatmsg.sender) || blockChatExtended(chatmsg.sender)) return
+	if ((sanitizeChat(chatmsg.sender, false) == "" || shouldIgnore(chatmsg.msg) || shouldIgnore(sanitizeChat(chatmsg.sender, false))) && chatmsg.sender != window.myMario.playerName) return
 
 
     const chatlog = document.getElementById("chatlog")

@@ -1,5 +1,6 @@
 import * as Mario from "./Mario"
 import { perform_ground_step, stationary_ground_step } from "./MarioStep"
+import { e_check_common_idle_cancels } from "./MarioActionsStationary"
 
 const sPunchingForwardVelocities = [0, 1, 1, 2, 3, 5, 7, 10]
 
@@ -162,11 +163,30 @@ const act_stomach_slide_stop = (m) => {
     return 0
 }
 
+const taunt_handler = (m) => {
+
+    let animFrame = Mario.set_mario_animation(m, m.actionArg)
+	
+	if (e_check_common_idle_cancels(m)) {
+        return 1
+    }
+
+    stationary_ground_step(m)
+
+    return 0
+
+}
+
+const act_taunt = (m) => {
+    taunt_handler(m)
+    return 0
+}
 export const mario_execute_object_action = (m) => {
 
     switch (m.action) {
         case Mario.ACT_PUNCHING: return act_punching(m)
         case Mario.ACT_STOMACH_SLIDE_STOP: return act_stomach_slide_stop(m)
+        case Mario.ACT_TAUNT:				 return act_taunt(m)
         default: throw "unknown action object"
     }
 }

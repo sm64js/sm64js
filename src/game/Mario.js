@@ -132,6 +132,8 @@ export const MARIO_ANIM_STAND_AGAINST_WALL = 0x7E
 export const MARIO_ANIM_PUSHING = 0x6C
 export const MARIO_ANIM_SIDESTEP_LEFT = 0x7F
 export const MARIO_ANIM_SIDESTEP_RIGHT = 0x80
+export const MARIO_ANIM_CREDITS_WAVING = 0x1D
+export const MARIO_ANIM_STAR_DANCE = 0xCD
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -163,7 +165,6 @@ export const ACT_GROUP_SUBMERGED = (3 << 6)
 export const ACT_GROUP_CUTSCENE = (4 << 6)
 export const ACT_GROUP_AUTOMATIC = (5 << 6)
 export const ACT_GROUP_OBJECT = (6 << 6)
-
 export const ACT_IDLE = 0x0C400201
 export const ACT_WALKING = 0x04000440
 export const ACT_DECELERATING = 0x0400044A
@@ -296,6 +297,7 @@ export const ACT_FLAG_PAUSE_EXIT = (1 << 27)
 export const ACT_FLAG_SWIMMING_OR_FLYING = (1 << 28)
 export const ACT_FLAG_WATER_OR_TEXT = (1 << 29)
 export const ACT_FLAG_THROWING = (1 << 31)
+export const ACT_TAUNT = (0x193 | ACT_FLAG_STATIONARY | ACT_FLAG_IDLE)
 
 export const INPUT_NONZERO_ANALOG = 0x0001
 export const INPUT_A_PRESSED = 0x0002
@@ -1202,7 +1204,6 @@ const update_mario_inputs = (m) => {
     m.input = 0
     m.collidedObjInteractTypes = m.marioObj.collidedObjInteractTypes
     m.flags &= 0xFFFFFF
-
     update_mario_joystick_inputs(m)
     update_mario_button_inputs(m)
     update_mario_geometry_inputs(m)

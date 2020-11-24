@@ -172,6 +172,8 @@ const processChat = async (channel_id, msg) => {
 
     const socket = allChannels[channel_id]
     if (socket == undefined) return
+	let ipBuffer
+    if (allChannels.some(sock => (sock.channel.ip == socket.channel.ip : ipBuffer++ : ipBuffer = ipBuffer) && ipBuffer >= 2) return
 
     if (socket.chatCooldown > 0) return
     socket.chatCooldown = 3 // seconds

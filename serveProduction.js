@@ -463,7 +463,7 @@ require('uWebSockets.js').App().ws('/*', {
                 }
 
                 if (response.block == 1) {
-                    db.get('ipList').push({ ip, value: 'BANNED' }).write()
+                    db.get('ipList').push({ ip, value: 'BANNED', reason: 'AutoVPN' }).write()
                     console.log("Adding new VPN BAD IP " + ip)
                     return res.writeStatus('403').end()
                 } else {
@@ -569,12 +569,12 @@ app.get('/banIP/:token/:ip', (req, res) => {
     const ipValue = ipObject.value()
 
     if (ipValue == undefined) {
-        db.get('ipList').push({ ip, value: 'BANNED' }).write()
+        db.get('ipList').push({ ip, value: 'BANNED', reason: 'Manual' }).write()
         console.log("Admin BAD IP " + ip + "  " + token)
 
         return res.send("BANNED")
     } else if (ipValue.value == "ALLOWED") {
-        ipObject.assign({ value: 'BANNED'  }).write()
+        ipObject.assign({ value: 'BANNED', reason: 'Manual'  }).write()
         console.log("Admin BAD Existing IP " + ip + "  " + token)
 
         ///kick
@@ -600,7 +600,7 @@ app.get('/allowIP/:token/:ip', (req, res) => {
         console.log("admin allowIP could not find")
         return res.send("allowIP could not find")
     } else if (ipValue.value == "BANNED") {
-        ipObject.assign({ value: 'ALLOWED'  }).write()
+        ipObject.assign({ value: 'ALLOWED' }).write()
         console.log("Admin - Allowing Existing IP " + ip + "  " + token)
 
         return res.send("Allowing Existing IP")

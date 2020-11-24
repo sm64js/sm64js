@@ -1,4 +1,6 @@
-use crate::proto::{sm64_js_msg, ConnectedMsg, MarioListMsg, MarioMsg, Sm64JsMsg};
+use crate::proto::{
+    root_msg, sm64_js_msg, ChatMsg, ConnectedMsg, MarioListMsg, MarioMsg, RootMsg, Sm64JsMsg,
+};
 
 use actix::{prelude::*, Recipient};
 use anyhow::Result;
@@ -9,6 +11,7 @@ use rand::{self, Rng};
 use rayon::prelude::*;
 use serde::Serialize;
 use std::{io::prelude::*, sync::Arc, thread, time::Duration};
+use v_htmlescape::escape;
 
 #[derive(Message)]
 #[rtype(result = "()")]
@@ -36,6 +39,12 @@ pub struct Disconnect {
 pub struct SetData {
     pub id: u32,
     pub data: MarioMsg,
+}
+
+#[derive(Message)]
+#[rtype(result = "()")]
+pub struct SendChat {
+    pub chat_msg: ChatMsg,
 }
 
 pub struct Sm64JsServer {
@@ -96,6 +105,34 @@ impl Handler<SetData> for Sm64JsServer {
         self.clients
             .get_mut(&msg.id)
             .map(|mut client| client.set_data(msg.data));
+    }
+}
+
+impl Handler<SendChat> for Sm64JsServer {
+    type Result = ();
+
+    fn handle(&mut self, send_chat: SendChat, _: &mut Context<Self>) {
+        let mut chat_msg = send_chat.chat_msg;
+        chat_msg.message = format!("{}", escape(&chat_msg.message));
+
+        let root_msg = RootMsg {
+            message: Some(root_msg::Message::UncompressedSm64jsMsg(Sm64JsMsg {
+                message: Some(sm64_js_msg::Message::ChatMsg(chat_msg)),
+            })),
+        };
+
+        let mut msg = vec![];
+        root_msg.encode(&mut msg).unwrap();
+
+        self.clients
+            .iter()
+            .par_bridge()
+            .map(|client| -> Result<()> {
+                client.send(Message(msg.clone()))?;
+                Ok(())
+            })
+            .collect::<Result<Vec<_>>>()
+            .unwrap();
     }
 }
 

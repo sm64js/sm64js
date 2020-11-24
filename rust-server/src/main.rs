@@ -107,7 +107,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                         });
                     }
                     Some(sm64_js_msg::Message::ChatMsg(chat_msg)) => {
-                        // TODO
+                        self.addr.do_send(server::SendChat { chat_msg });
                     }
                     Some(sm64_js_msg::Message::SkinMsg(skin_msg)) => {
                         // TODO

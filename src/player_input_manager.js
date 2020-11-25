@@ -54,13 +54,6 @@ window.addEventListener("keydown", (e) => {
 
     if (textboxfocus) return
 
-    if (!window.playerNameAccepted && e.keyCode == 13) {
-        document.getElementById("playerNameInput").style.borderColor = "red"
-        document.getElementById("playerNameInput").style.borderWidth = "3px"
-        document.getElementById("playerNameResult").style.color = "red"
-        $("#playerNameRow").effect( "shake", { direction: "down", times:3, distance: 3 }, 500 )
-    }
-
     // space and arrow keys
     if ([32, 37, 38, 39, 40].includes(e.keyCode)) { e.preventDefault()  }
 
@@ -395,5 +388,12 @@ export const playerInputUpdate = () => {
     if (window.show_minimap > 2) window.show_minimap = 0
 
     if (gameData.marioState) gameData.marioState.controller = window.playerInput
+
+    if (!window.playerNameAccepted && window.playerInput.buttonPressedStart) {
+        document.getElementById("playerNameInput").style.borderColor = "red"
+        document.getElementById("playerNameInput").style.borderWidth = "3px"
+        document.getElementById("playerNameResult").style.color = "red"
+        $("#playerNameRow").effect("shake", { direction: "down", times: 3, distance: 3 }, 500)
+    }
 
 }

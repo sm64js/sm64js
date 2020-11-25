@@ -25,6 +25,7 @@ setInterval(() => {
 }, 86400000) //1 Day
 
 const allChannels = {}
+const connectedIPs = {}
 const stats = {}
 
 
@@ -501,6 +502,11 @@ require('uWebSockets.js').App().ws('/*', {
         // can deny request with "return res.writeStatus('401').end()" see issue #367
 
         const ip = req.getHeader('x-forwarded-for')
+
+        if (connectedIPs[ip]) {
+            if (Object.keys(connectedIPs[ip].socketIDs).length >= 4) return res.writeStatus('403').end()
+        }
+
         const key = req.getHeader('sec-websocket-key')
         const protocol = req.getHeader('sec-websocket-protocol')
         const extensions = req.getHeader('sec-websocket-extensions')
@@ -572,7 +578,13 @@ require('uWebSockets.js').App().ws('/*', {
     open: async (channel) => {
 
         channel.my_id = generateID()
-        allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }
+
+        if (connectedIPs[channel.ip] == undefined)
+            connectedIPs[channel.ip] = { socketIDs: {}, chatCooldown: 0 }
+
+        connectedIPs[channel.ip].socketIDs[channel.my_id] = 1
+
+        allChannels[channel.my_id] = { valid: 0, channel }
         sendJsonWithTopic('id', { id: channel.my_id }, channel)
 
         sendSkinsToChannel(channel)
@@ -624,6 +636,7 @@ require('uWebSockets.js').App().ws('/*', {
 
     close: (channel) => {
         checkForFlag(channel.my_id)
+        delete connectedIPs[channel.ip].socketIDs[channel.my_id]
         delete allChannels[channel.my_id]
     }
 

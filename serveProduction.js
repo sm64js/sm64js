@@ -658,6 +658,8 @@ app.get('/banIP/:token/:ip', (req, res) => {
 
     const { token, ip } = req.params
 
+    if (!adminTokens.includes(token)) return res.status(401).send('Invalid Admin Token')
+
     const ipObject = db.get('ipList').find({ ip })
     const ipValue = ipObject.value()
 
@@ -685,6 +687,8 @@ app.get('/banIP/:token/:ip', (req, res) => {
 app.get('/allowIP/:token/:ip', (req, res) => {
 
     const { token, ip } = req.params
+
+    if (!adminTokens.includes(token)) return res.status(401).send('Invalid Admin Token')
 
     const ipObject = db.get('ipList').find({ ip })
     const ipValue = ipObject.value()

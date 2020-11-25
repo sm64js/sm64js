@@ -205,13 +205,6 @@ const applyValidCharacters = (str) => {
 
 const processAdminCommand = (msg) => {
     const parts = msg.split(' ')
-    const token = parts[0]
-
-    if (adminTokens.includes(token)) {
-        console.log("Admin authentication success")
-    } else {
-        console.log("Admin authentication fail - token not found: " + token)
-    }
 
     switch (parts) {
 
@@ -234,10 +227,12 @@ const processChat = async (channel_id, msg) => {
         return
     }
 
-    if (msg.length == 0) return
+    if (msg.message.length == 0) return
 
-    if (msg[0] == '/') {
-        processAdminCommand(msg.slice(1))
+    const isAdmin = adminTokens.includes(msg.adminToken)
+
+    if (isAdmin && msg.message[0] == '/') {
+        processAdminCommand(msg.message.slice(1))
         return
     }
 
@@ -252,10 +247,11 @@ const processChat = async (channel_id, msg) => {
         playerName: socket.playerName,
         ip: socket.channel.ip,
         timestampMs: Date.now(),
-        message: msg
+        message: msg.message,
+        adminToken: msg.adminToken
     }).write()
 
-    const sanitizedChat = sanitizeChat(msg)
+    const sanitizedChat = sanitizeChat(msg.message)
 
     const request = "http://www.purgomalum.com/service/json?text=" + sanitizedChat
 
@@ -266,6 +262,7 @@ const processChat = async (channel_id, msg) => {
             channel_id,
             msg: filteredMessage,
             sender: socket.playerName,
+            isAdmin
         }
 
         broadcastJsonWithTopic('chat', chatmsg)

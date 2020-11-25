@@ -26,9 +26,16 @@ export const recvChat = (chatmsg) => {
     if (window.banPlayerList.includes(chatmsg.sender) || blockChatExtended(chatmsg.sender)) return
 
     const chatlog = document.getElementById("chatlog")
-    const node = document.createElement("LI")         
-    node.innerHTML = '<strong>' + chatmsg.sender + '</strong>: ' + applyEmotes(chatmsg.msg) + '<br/>' 
+    const node = document.createElement("LI")
 
+    let adminTag = ""
+
+    if (chatmsg.isAdmin) {
+        node.style.color = "blue"
+        adminTag = "(Admin)"
+    }
+
+    node.innerHTML = '<strong>' + adminTag + chatmsg.sender + '</strong>: ' + applyEmotes(chatmsg.msg) + '<br/>' 
     chatlog.appendChild(node)
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 

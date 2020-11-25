@@ -34,7 +34,7 @@ window.addEventListener("keydown", (e) => {
         if (chatbox.value[0] == '!') {
             handleTaunt(chatbox.value)
         } else {
-            sendChat(chatbox.value)
+            sendChat({ message: chatbox.value })
         }
 
         chatbox.value = ""

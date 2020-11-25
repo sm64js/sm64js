@@ -306,7 +306,7 @@ export const submitPlayerName = () => {
 }
 
 export const sendChat = (msg) => {
-    if (window.admin.token) msg.adminToken = window.admin.token
+    if (window.admin && window.admin.token) msg.adminToken = window.admin.token
     sendJsonWithTopic('chat', msg)
 }
 

@@ -168,6 +168,10 @@ const keyboardButtonMapping = {
     down: 'down',
     left: 'left',
     right: 'right',
+    cu: 'i',
+    cd: 'k',
+    cl: 'j',
+    cr: 'l',
     map: 'm'
 }
 const defaultKeyboardButtonMapping = { ...keyboardButtonMapping }
@@ -360,10 +364,10 @@ export const playerInputUpdate = () => {
     let buttonDownB = gamepadFinal.b || keyboardFinal.b
     let buttonDownStart = gamepadFinal.start || keyboardFinal.start
     let buttonDownZ = gamepadFinal.z || keyboardFinal.z
-    let buttonDownCl = gamepadFinal.cl
-    let buttonDownCr = gamepadFinal.cr
-    let buttonDownCu = gamepadFinal.cu
-    let buttonDownCd = gamepadFinal.cd
+    let buttonDownCl = gamepadFinal.cl || keyboardFinal.cl
+    let buttonDownCr = gamepadFinal.cr || keyboardFinal.cr
+    let buttonDownCu = gamepadFinal.cu || keyboardFinal.cu
+    let buttonDownCd = gamepadFinal.cd || keyboardFinal.cd
     let buttonDownMap = gamepadFinal.map || keyboardFinal.map
 
     window.playerInput = {

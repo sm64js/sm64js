@@ -713,14 +713,15 @@ export const set_mario_action_moving = (m, action, actionArg) => {
     return action
 }
 
-export const set_mario_animation = (m, targetAnimID) => {
+export const set_mario_animation = (m, targetAnimID, reset) => {
 
     const o = m.marioObj
     m.animation.targetAnim = gMarioAnimData[targetAnimID]
 
     if (m.animation.targetAnim == undefined) throw "cant find animation"
 
-    if (o.header.gfx.unk38.animID != targetAnimID) {
+
+    if (o.header.gfx.unk38.animID != targetAnimID || reset) {
         o.header.gfx.unk38.animID = targetAnimID
         o.header.gfx.unk38.curAnim = m.animation.targetAnim
         o.header.gfx.unk38.animAccel = 0
@@ -1208,7 +1209,7 @@ const update_mario_inputs = (m) => {
     update_mario_button_inputs(m) 
     update_mario_geometry_inputs(m)
 
-    if (m.controller.taunt && m.action == ACT_IDLE) m.input |= INPUT_TAUNT
+    if (m.controller.taunt && (m.action == ACT_IDLE || m.action == ACT_TAUNT)) m.input |= INPUT_TAUNT
 
     if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) {
         if (m.action & ACT_FLAG_ALLOW_FIRST_PERSON) {

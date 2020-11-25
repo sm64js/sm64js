@@ -193,7 +193,8 @@ const act_taunt = (m) => {
     }
 
     if (Mario.is_anim_at_end(m)) {
-        if (m.actionArg != 0x2E && m.actionArg != 0x79) Mario.set_mario_action(m, Mario.ACT_IDLE, 0)
+        if (m.actionArg == 0x1D || m.actionArg == 0x7A) Mario.set_mario_animation(m, m.actionArg, true)
+        else if (m.actionArg != 0x2E && m.actionArg != 0x79) return Mario.set_mario_action(m, Mario.ACT_IDLE, 0)
     }
 
     stationary_ground_step(m)

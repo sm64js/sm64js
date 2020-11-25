@@ -29,10 +29,13 @@ export const recvChat = (chatmsg) => {
     const node = document.createElement("LI")         
     node.innerHTML = '<strong>' + chatmsg.sender + '</strong>: ' + applyEmotes(chatmsg.msg) + '<br/>' 
 
-    if (window.showChatIds) node.innerHTML = `(${chatmsg.channel_id})` + node.innerHTML
-
     chatlog.appendChild(node)
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
+
+    if (chatmsg.sender == "Server") {
+        node.style.color = "blue"
+        return
+    }
 
     let someobject
     if (chatmsg.channel_id == networkData.myChannelID)

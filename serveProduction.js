@@ -222,7 +222,15 @@ const processChat = async (channel_id, msg) => {
     const socket = allChannels[channel_id]
     if (socket == undefined || socket.playerName == undefined) return
 
-    if (socket.chatCooldown > 0) return
+    if (socket.chatCooldown > 0) {
+        const chatmsg = {
+            channel_id,
+            msg: "Chat message ignored: You have to wait longer between sending chat messages",
+            sender: "Server",
+        }
+        sendJsonWithTopic('chat', chatmsg, socket.channel)
+        return
+    }
     socket.chatCooldown = 3 // seconds
 
     if (msg.length == 0) return
@@ -269,7 +277,7 @@ const processChat = async (channel_id, msg) => {
 const processPlayerName = async (channel_id, msg) => {
     const socket = allChannels[channel_id]
     if (socket == undefined) return
-    if (socket.playerName != undefined || msg.length < 3 || msg.length > 14)  {
+    if (socket.playerName != undefined || msg.length < 3 || msg.length > 14 || msg == "server")  {
         return rejectPlayerName(socket.channel)
     }
 

@@ -223,7 +223,8 @@ const processChat = async (channel_id, msg) => {
     const socket = allChannels[channel_id]
     if (socket == undefined || socket.playerName == undefined) return
 
-    if (socket.chatCooldown > 0) {
+    /// Throttle chats by IP
+    if (connectedIPs[socket.channel.ip].chatCooldown > 10) {
         const chatmsg = {
             channel_id,
             msg: "Chat message ignored: You have to wait longer between sending chat messages",
@@ -232,7 +233,6 @@ const processChat = async (channel_id, msg) => {
         sendJsonWithTopic('chat', chatmsg, socket.channel)
         return
     }
-    socket.chatCooldown = 3 // seconds
 
     if (msg.length == 0) return
 
@@ -244,6 +244,7 @@ const processChat = async (channel_id, msg) => {
     const decodedMario = socket.decodedMario
     if (decodedMario == undefined) return
 
+    connectedIPs[socket.channel.ip].chatCooldown += 3 // seconds
 
     /// record chat to DB
     db.get('chats').push({
@@ -481,7 +482,7 @@ setInterval(() => {
     sendValidUpdate()
 
     //chat cooldown
-    Object.values(allChannels).forEach(data => {
+    Object.values(connectedIPs).forEach(data => {
         if (data.chatCooldown > 0) data.chatCooldown--
     })
 }, 1000)
@@ -580,7 +581,7 @@ require('uWebSockets.js').App().ws('/*', {
         channel.my_id = generateID()
 
         if (connectedIPs[channel.ip] == undefined)
-            connectedIPs[channel.ip] = { socketIDs: {}, chatCooldown: 0 }
+            connectedIPs[channel.ip] = { socketIDs: {}, chatCooldown: 15 }
 
         connectedIPs[channel.ip].socketIDs[channel.my_id] = 1
 

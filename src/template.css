@@ -25,6 +25,13 @@ a:hover {
     z-index: 10;
 }
 
+  .container {
+    margin-top: 10px;
+  }
+  hr.solid {
+      border-top: 3px solid #000000;
+  }
+
 /*
  * Base structure
  */

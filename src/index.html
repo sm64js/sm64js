@@ -6,6 +6,7 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 
@@ -47,25 +48,6 @@
             </form>
             <h6 id="romMessage">This project uses the textures and other game assets from the original game. Due to copyright issues, I cannot host those assets on this site. Please select a sm64 ROM to extract those assets before you can play.</h6>
 
-            <div class="well">
-                <div class="counter" id="clockdiv">
-                    <span class="title"><b>Large Server Test and Surprise</b></span>
-                    <div class="sq">
-                        <span class="days bord">1</span> <span class="smalltext">Days</span>
-                    </div>
-                    <div class="sq">
-                        <span class="hours bord">22</span> <span class="smalltext">Hours</span>
-                    </div>
-                    <div class="sq">
-                        <span class="minutes bord">40</span> <span class="smalltext">Mins</span>
-                    </div>
-                    <div class="sq">
-                        <span class="seconds bord">45</span> <span class="smalltext">Secs</span>
-                    </div>
-                </div>
-            </div>
-            <br />
-
             <div class="row" style="justify-content:center">
                 <button id="startbutton" type="button" class="btn btn-success" disabled>Start Game</button>
                 <a href="https://github.com/sm64js/sm64js/issues" style="margin-left:30px" type="button" class="btn btn-warning">Submit Bug</a>
@@ -102,7 +84,7 @@
                             data-container="body"
                             data-toggle="skinCustomizerToggle"
                             data-placement="bottom">
-                        Manually Customize Character/Skin
+                        Customize Character/Skin
                     </button>
                 </div>
 
@@ -136,27 +118,19 @@
                 </div>
             </div>
 
-            <div class="row" style="justify-content:center; margin-top: 10px;">
-                <div class="col-sm-4 col-form-label" style="justify-content:center">
-                    <label>Select Skin ID and type name :</label>
-                </div>
-                <div class="col-sm-2" style="justify-content:center; ">
-                    <select class="form-control" onchange="window.updateSkinID(this.value)">
-                        <option>0</option>
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                        <option>6</option>
-                        <option>7</option>
-                        <option>8</option>
-                        <option>9</option>
-                    </select>
-                </div>
-                <div class="col-sm-3 " style="justify-content:center">
-                    <input id="playerNameInput" type="text" class="form-control" minlength="3" maxlength="14" placeholder="enter name" onchange="window.updatePlayerName(this.value)">
-                </div>
+            <div id="playerNameRow" class="row" style="justify-content:center; margin-top: 10px;">
+                <form class="form-inline" id="playerNameForm">
+                    <div class="form-group mb-2">
+                      <label type="text" readonly class="col-form-label">Enter Player Name</label>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <input id="playerNameInput" type="text" class="form-control" minlength="3" maxlength="14" placeholder="enter name" onchange="window.updatePlayerName(this.value)">
+                    </div>
+                    <button id="playerNameButton" type="submit" class="btn btn-success mb-2">Submit</button>
+                    <div class="form-group mb-2">
+                        <label id="playerNameResult" type="text" readonly class="col-form-label" style="margin-left:15px; font-weight: bold;" >Waiting for name</label>
+                    </div>
+                  </form>
             </div>
             <div hidden class="row" style="justify-content:center; padding-top:5px">
                 <div class="col-3">
@@ -416,6 +390,29 @@
     <div hidden>
 
         <div class="container" id="skinCustomizerWindow">
+
+            <div class="row" style="justify-content:center; margin-top: 10px;">
+                <div class="col-sm-8 col-form-label" style="justify-content:center">
+                    <label>Select Skin Preset:</label>
+                </div>
+                <div class="col-sm-4" style="justify-content:center; ">
+                    <select class="form-control" onchange="window.updateSkinID(this.value)">
+                        <option>0</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr class="solid">
+
             <div class="row" style="justify-content:center">
                 <select id="skinTypes" class="form-control" style="width:320px" onchange="window.setSkinSliderValues()">
                     <option value="overalls">Overalls</option>

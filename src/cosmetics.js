@@ -1,4 +1,4 @@
-import { networkData } from "./socket"
+import { networkData, submitPlayerName } from "./socket"
 
 export const defaultSkinData = () => {
     return {
@@ -109,18 +109,14 @@ window.customSkinUpdate = (slider) => {
     localStorage[`skinData-${skinType}`] = JSON.stringify(window.myMario.skinData[skinType])
 }
 
-const storedPlayerName = localStorage['playername']
-window.myMario = {
-    playerName: storedPlayerName ? storedPlayerName : "Unnamed Player",
-    skinData: defaultSkinData()
-}
-document.getElementById('playerNameInput').value = window.myMario.playerName
 
 /// Load all
+window.myMario = { skinData: defaultSkinData() }
 Object.keys(window.myMario.skinData).forEach((skinType) => {
     const skinData = localStorage[`skinData-${skinType}`]
     if (skinData) window.myMario.skinData[skinType] = JSON.parse(skinData)
 })
+if (localStorage['playername']) document.getElementById('playerNameInput').value = localStorage['playername']
 
 const rainbowLights = [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00];
 let rainbowState = 0;
@@ -176,6 +172,12 @@ export const updateRainbowSkin = () => {
 	rainbowLights[5] = parseInt(rainbowLights[5]);
 }
 
+document.getElementById('playerNameForm').onsubmit = (e) => {
+    submitPlayerName()
+    e.preventDefault()
+}
+
+
 window.updatePlayerName = (name) => {
     if (name.length < 3) {
         document.getElementById("playerNameInput").style.borderColor = "red"
@@ -183,8 +185,22 @@ window.updatePlayerName = (name) => {
     } else {
         document.getElementById("playerNameInput").style.borderColor = "blue"
         document.getElementById("playerNameInput").style.borderWidth = "1px"
-        window.myMario.playerName = name
-        localStorage['playername'] = name
+    }
+}
+
+export const recvPlayerNameResponse = (msg) => {
+    if (msg.rejected) {
+        document.getElementById("playerNameResult").style.color = "red"
+        document.getElementById("playerNameResult").innerHTML = "Rejected"
+    }
+    if (msg.accepted) {
+        document.getElementById("playerNameInput").style.borderColor = "blue"
+        document.getElementById("playerNameResult").style.color = "#00ff00"
+        document.getElementById("playerNameResult").innerHTML = "Accepted"
+        document.getElementById("playerNameInput").disabled = true
+        document.getElementById("playerNameButton").hidden = true
+        window.playerNameAccepted = true
+        localStorage['playername'] = msg.playerName
     }
 }
 
@@ -193,6 +209,7 @@ export const recvSkinData = (msg) => {
         networkData.remotePlayers[msg.channel_id] == undefined) return
 
     networkData.remotePlayers[msg.channel_id].skinData = msg.skinData
+    networkData.remotePlayers[msg.channel_id].playerName = msg.playerName
 }
 
 export const validSkins = () => {
@@ -231,6 +248,7 @@ export const getExtraRenderData = (channel_id) => {
 
     const myChat = window.myMario.chatData
 
+    //// Local Mario
     if (channel_id == networkData.myChannelID) return {
         custom3D: {
             mario_overalls_lights: (window.myMario.skinData.overalls == "r" ? rainbowLights : window.myMario.skinData.overalls),
@@ -246,15 +264,16 @@ export const getExtraRenderData = (channel_id) => {
         }
     }
 
-    const remoteMario = networkData.remotePlayers[channel_id].marioState
-    const remoteChat = networkData.remotePlayers[channel_id].chatData
-    const overalls = networkData.remotePlayers[channel_id].skinData.overalls
-    const hat = networkData.remotePlayers[channel_id].skinData.hat
-    const shirt = networkData.remotePlayers[channel_id].skinData.shirt
-    const gloves = networkData.remotePlayers[channel_id].skinData.gloves
-    const boots = networkData.remotePlayers[channel_id].skinData.boots
-    const skin = networkData.remotePlayers[channel_id].skinData.skin
-    const hair = networkData.remotePlayers[channel_id].skinData.hair
+    const remote = networkData.remotePlayers[channel_id]
+
+    const remoteChat = remote.chatData
+    const overalls = remote.skinData.overalls
+    const hat = remote.skinData.hat
+    const shirt = remote.skinData.shirt
+    const gloves = remote.skinData.gloves
+    const boots = remote.skinData.boots
+    const skin = remote.skinData.skin
+    const hair = remote.skinData.hair
 
     return {
         custom3D: {
@@ -267,7 +286,7 @@ export const getExtraRenderData = (channel_id) => {
             mario_hair_lights: (hair == "r" ? rainbowLights : hair),
         },
         custom2D: {
-            playerName: remoteMario.playerName,
+            playerName: remote.playerName ? remote.playerName : null,
             chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null
         }
 

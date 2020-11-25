@@ -33,7 +33,7 @@ export const recvChat = (chatmsg) => {
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 
     if (chatmsg.sender == "Server") {
-        node.style.color = "blue"
+        node.style.color = "#D3D3D3"
         return
     }
 

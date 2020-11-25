@@ -101,7 +101,6 @@ const processPlayerData = (channel_id, decodedMario) => {
 
     //Pretty strict validation  -- ignoring validation for now
     if (decodedMario.getChannelid() != decodedMario.getController().getChannelid()) return
-    if (decodedMario.getPlayername().length < 3 || decodedMario.getPlayername().length > 14) return
     if (allChannels[channel_id] == undefined) return
 
     /// server should always force the channel_id
@@ -162,12 +161,46 @@ const processSkin = (channel_id, msg) => {
     allChannels[channel_id].skinData.updated = true
 }
 
+const rejectPlayerName = (channel) => {
+    sendJsonWithTopic('playerName', { rejected: true }, channel)
+}
+
 const sanitizeChat = (string) => {
     string = string.substring(0, 200)
     string = string.replace(/</g, "")
     string = string.replace(/>/g, "")
-    return string
+    return applyValidCharacters(string)
 }
+
+//Valid characters for usernames.
+const validCharacters = [
+    'a', 'b', 'c', 'd', 'e', 'f', 'g',
+    'h', 'i', 'j', 'k', 'l', 'm', 'n',
+    'o', 'p', 'q', 'r', 's', 't', 'u',
+    'v', 'w', 'y', 'x', 'z', 'A', 'B',
+    'C', 'D', 'E', 'F', 'G', 'H', 'I',
+    'J', 'K', 'L', 'M', 'N', 'O', 'P',
+    'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+    'Y', 'X', 'Z', '1', '2', '3', '4',
+    '5', '6', '7', '8', '9', '0', '!',
+    '@', '$', '^', '*', '(', ')', '{',
+    '}', '[', ']', ';', ':', `'`, '"',
+    `\\`, ',', '.', '/', '?', '🙄', '😫',
+    '🤔', '🔥', '😌', '😍', '🤣', '❤️', '😭',
+    '😂', '⭐', '✨', '🎄', '🎃', '🔺', '🔻',
+    '🎄', '🍬', '🍭', '🍫', ' ',
+    '-', '_', '=', '|', '<', '>', ':', "'"
+]
+
+
+const applyValidCharacters = (str) => {
+    let temp = ""
+    str.split('').forEach(character => {
+        if (validCharacters.includes(character)) { temp += character }
+    })
+    return temp
+}
+
 
 const processAdminCommand = (msg) => {
     const parts = msg.split(' ')
@@ -187,7 +220,7 @@ const processAdminCommand = (msg) => {
 const processChat = async (channel_id, msg) => {
 
     const socket = allChannels[channel_id]
-    if (socket == undefined) return
+    if (socket == undefined || socket.playerName == undefined) return
 
     if (socket.chatCooldown > 0) return
     socket.chatCooldown = 3 // seconds
@@ -206,7 +239,7 @@ const processChat = async (channel_id, msg) => {
     /// record chat to DB
     db.get('chats').push({
         socketID: channel_id,
-        playerName: decodedMario.getPlayername(),
+        playerName: socket.playerName,
         ip: socket.channel.ip,
         timestampMs: Date.now(),
         message: msg
@@ -215,21 +248,14 @@ const processChat = async (channel_id, msg) => {
     const sanitizedChat = sanitizeChat(msg)
 
     const request = "http://www.purgomalum.com/service/json?text=" + sanitizedChat
-    const playerNameRequest = "http://www.purgomalum.com/service/json?text=" + decodedMario.getPlayername()
 
     try {
         const filteredMessage = JSON.parse((await got(request)).body).result
-        const filteredPlayerName = JSON.parse((await got(playerNameRequest)).body).result
-
-        if (decodedMario.getPlayername() != filteredPlayerName) {
-            allChannels[channel_id].channel.close()
-            return
-        }
 
         const chatmsg = {
             channel_id,
             msg: filteredMessage,
-            sender: decodedMario.getPlayername(),
+            sender: socket.playerName,
         }
 
         broadcastJsonWithTopic('chat', chatmsg)
@@ -239,6 +265,45 @@ const processChat = async (channel_id, msg) => {
     }
 
 }
+
+const processPlayerName = async (channel_id, msg) => {
+    const socket = allChannels[channel_id]
+    if (socket == undefined) return
+    if (socket.playerName != undefined || msg.length < 3 || msg.length > 14)  {
+        return rejectPlayerName(socket.channel)
+    }
+
+    const sanitizedName = sanitizeChat(msg)
+
+    if (sanitizedName != msg) {
+        return rejectPlayerName(socket.channel)
+    }
+
+    const playerNameRequest = "http://www.purgomalum.com/service/json?text=" + sanitizedName
+
+    try {
+        const filteredPlayerName = JSON.parse((await got(playerNameRequest)).body).result
+
+        if (sanitizedName != filteredPlayerName) {
+            return rejectPlayerName(socket.channel)
+        }
+
+        socket.playerName = filteredPlayerName
+
+        const acceptMsg = {
+            accepted: true,
+            playerName: filteredPlayerName,  /// should be same as message
+        }
+
+        sendJsonWithTopic('playerName', acceptMsg, socket.channel)
+
+    } catch (e) {
+        console.log(`Got error with profanity api: ${e}`)
+    }
+
+
+}
+
 
 const sendSkinsToChannel = (channel) => {
     /// Send Skins
@@ -254,7 +319,7 @@ const sendSkinsIfUpdated = () => {
     /// Send Skins
     Object.entries(allChannels).forEach(([channel_id, data]) => {
         if (data.skinData) {
-            const skinMsg = { channel_id, skinData: data.skinData }
+            const skinMsg = { channel_id, skinData: data.skinData, playerName: data.playerName }
             broadcastJsonWithTopic('skin', skinMsg)
             data.skinData.updated = false
         }
@@ -513,6 +578,9 @@ require('uWebSockets.js').App().ws('/*', {
 
             switch (rootMsg.getMessageCase()) {
                 case RootMsg.MessageCase.UNCOMPRESSED_SM64JS_MSG:
+
+                    if (allChannels[channel.my_id].playerName == undefined) return
+
                     sm64jsMsg = rootMsg.getUncompressedSm64jsMsg()
                     switch (sm64jsMsg.getMessageCase()) {
                         case Sm64JsMsg.MessageCase.MARIO_MSG:
@@ -532,6 +600,7 @@ require('uWebSockets.js').App().ws('/*', {
                     switch (topic) {
                         case 'chat': processChat(channel.my_id, msg); break
                         case 'skin': processSkin(channel.my_id, msg); break
+                        case 'playerName': processPlayerName(channel.my_id, msg); break
                         case 'ping': sendData(bytes, channel); break
                         default: throw "Unknown topic in json message"
                     }

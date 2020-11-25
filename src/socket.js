@@ -124,6 +124,7 @@ channel.onopen = () => {
                     case 'chat': recvChat(msg); break
                     case 'skin': Cosmetics.recvSkinData(msg); break
                     case 'ping': measureLatency(msg); break
+                    case 'playerName': Cosmetics.recvPlayerNameResponse(msg); break
                     default: throw "Unknown topic in json message"
                 }
                 break
@@ -294,6 +295,14 @@ const checkForFlagGrab = () => {
 
 export const sendPlayerInteraction = (channel_id, interaction) => {
     //channel.emit('playerInteract', { channel_id, interaction }, { reliable: true })
+}
+
+
+export const submitPlayerName = () => {
+    const name = document.getElementById("playerNameInput").value
+    if (name.length >= 3) {
+        sendJsonWithTopic('playerName', name)
+    }
 }
 
 export const sendChat = (msg) => { sendJsonWithTopic('chat', msg) }

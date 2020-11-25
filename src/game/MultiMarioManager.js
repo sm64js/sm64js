@@ -56,7 +56,6 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     m.pos = update.posList
     m.faceAngle = update.faceangleList
     m.channel_id = update.channelid
-    m.playerName = update.playername
     m.parachuting = update.parachuting
 
     m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
@@ -76,8 +75,6 @@ export const createMarioProtoMsg = () => {
     const mariomsg = new MarioMsg()
 
     mariomsg.setController(createControllerProtoMsg())
-
-    mariomsg.setPlayername(window.myMario.playerName)
 
     mariomsg.setAction(m.action)
     mariomsg.setPrevaction(m.prevAction)
@@ -100,7 +97,6 @@ export const createMarioProtoMsg = () => {
 
     mariomsg.setRawdataList(getMarioRawDataSubset(m.marioObj.rawData))
     mariomsg.setChannelid(networkData.myChannelID)
-    mariomsg.setPlayername(window.myMario.playerName)
 
     return mariomsg
 }
@@ -112,7 +108,6 @@ const initNewRemoteMarioState = (marioProto) => {
     const newMarioState = {
 
         channel_id: marioProto.getChannelid(),
-        playerName: marioProto.getPlayername(),
 
         actionTimer: marioProto.getActiontimer(),
         actionState: marioProto.getActionstate(),

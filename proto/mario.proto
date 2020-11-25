@@ -50,7 +50,6 @@ message AttackMsg {
 
 message MarioMsg {
 	ControllerMsg controller = 1;
-	string playerName = 2;
 	uint32 action = 3;
 	uint32 prevAction = 4;
 	uint32 actionState = 5;

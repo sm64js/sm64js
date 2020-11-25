@@ -1975,7 +1975,6 @@ proto.sm64js.MarioMsg.prototype.toObject = function(opt_includeInstance) {
 proto.sm64js.MarioMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
     controller: (f = msg.getController()) && proto.sm64js.ControllerMsg.toObject(includeInstance, f),
-    playername: jspb.Message.getFieldWithDefault(msg, 2, ""),
     action: jspb.Message.getFieldWithDefault(msg, 3, 0),
     prevaction: jspb.Message.getFieldWithDefault(msg, 4, 0),
     actionstate: jspb.Message.getFieldWithDefault(msg, 5, 0),
@@ -2035,10 +2034,6 @@ proto.sm64js.MarioMsg.deserializeBinaryFromReader = function(msg, reader) {
       var value = new proto.sm64js.ControllerMsg;
       reader.readMessage(value,proto.sm64js.ControllerMsg.deserializeBinaryFromReader);
       msg.setController(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setPlayername(value);
       break;
     case 3:
       var value = /** @type {number} */ (reader.readUint32());
@@ -2151,13 +2146,6 @@ proto.sm64js.MarioMsg.serializeBinaryToWriter = function(message, writer) {
       1,
       f,
       proto.sm64js.ControllerMsg.serializeBinaryToWriter
-    );
-  }
-  f = message.getPlayername();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
     );
   }
   f = message.getAction();
@@ -2330,24 +2318,6 @@ proto.sm64js.MarioMsg.prototype.clearController = function() {
  */
 proto.sm64js.MarioMsg.prototype.hasController = function() {
   return jspb.Message.getField(this, 1) != null;
-};
-
-
-/**
- * optional string playerName = 2;
- * @return {string}
- */
-proto.sm64js.MarioMsg.prototype.getPlayername = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/**
- * @param {string} value
- * @return {!proto.sm64js.MarioMsg} returns this
- */
-proto.sm64js.MarioMsg.prototype.setPlayername = function(value) {
-  return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 

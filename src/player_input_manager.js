@@ -1,5 +1,5 @@
 import * as Keydrown from "./keydrown.min.js"
-import { sendChat } from "./socket.js"
+import { sendChat, submitPlayerName } from "./socket.js"
 import { gameData } from "./socket.js"
 
 /////// Keyboard / Gamepad Input ////////
@@ -49,13 +49,21 @@ window.addEventListener("keydown", (e) => {
 
     if ($("#playerNameInput").is(':focus') && e.keyCode == 13) {
         document.getElementById('playerNameInput').blur()
+        submitPlayerName()
+    }
+
+    if (textboxfocus) return
+
+    if (!window.playerNameAccepted && e.keyCode == 13) {
+        document.getElementById("playerNameInput").style.borderColor = "red"
+        document.getElementById("playerNameInput").style.borderWidth = "3px"
+        document.getElementById("playerNameResult").style.color = "red"
+        $("#playerNameRow").effect( "shake", { direction: "down", times:3, distance: 3 }, 500 )
     }
 
     // space and arrow keys
-    if (textboxfocus) return
-    if ([32, 37, 38, 39, 40].includes(e.keyCode) > -1) {
-        e.preventDefault()
-    }
+    if ([32, 37, 38, 39, 40].includes(e.keyCode)) { e.preventDefault()  }
+
 }, false)
 
 const keyboardButtons = {}

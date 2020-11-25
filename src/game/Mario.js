@@ -941,7 +941,7 @@ const update_mario_geometry_inputs = (m) => {
     }
 
     m.ceilHeight = vec3_find_ceil(m.pos, m.floorHeight, m)
-    m.waterLevel = -20000.0 //find_water_level(m->pos[0], m->pos[2]);
+    m.waterLevel = SurfaceCollision.find_water_level(m.pos[0], m.pos[2])
 
     if (!m.floor) { /// still no floor - short term fix?
         m.floor = m.old_floor

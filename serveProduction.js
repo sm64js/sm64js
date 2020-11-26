@@ -12,7 +12,7 @@ const ws_port = 3000
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
 
-const adapter = process.env.PRODUCTION ? new FileSync('/tmp/data/db.json') : new FileSync('testdb.json')
+const adapter = process.env.PRODUCTION ? new FileSync('/tmp/data/db_dev.json') : new FileSync('testdb.json')
 const db = low(adapter)
 db.defaults({ chats: [], adminCommands: [], ipList: [] }).write()
 

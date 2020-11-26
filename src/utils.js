@@ -13,7 +13,7 @@ export const coss = (num) => {
 }
 
 export const lerp = (min,max,amt) => { 
-	if (amt < 0) amt = 0;
-	if (amt > 1) amt = 1;
+	if (amt < 0) amt = 0
+	if (amt > 1) amt = 1
     return ((min * (1 - amt)) + (max * amt))
 }

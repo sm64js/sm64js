@@ -1,5 +1,4 @@
 import * as Gbi from "../../../../../include/gbi"
-import {lerp} from "../../../../../utils"
 
 import {NOANARCHY, boostpad, c0, c1, c2, c3 } from "../../../textures.inc.js"
 import {generic_09005000, } from "../../../../../textures/generic.js"
@@ -25307,15 +25306,15 @@ export const dl_NOANARCHY_mesh_0 = [
 //Final display list
 
 const special_Lighting = Gbi.gdSPDefLights1(
-	    0xef, 0xef, 0xef,
+	    0xff, 0xff, 0xff,
 	    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
 )
 
 export const special_DL = [
 	Gbi.gsDPSetCycleType(Gbi.G_CYC_2CYCLE),
 	Gbi.gsDPSetRenderMode(Gbi.G_RM_FOG_SHADE_A_AA_ZB_OPA_SURF2),
-	Gbi.gsDPSetFogColor(lerp(127,50,renderDistance), lerp(127,50,renderDistance), lerp(127,50,renderDistance), lerp(180,196,renderDistance)),
-	Gbi.gsSPFogPosition(lerp(965,980,renderDistance), lerp(995,1010,renderDistance)),
+	Gbi.gsDPSetFogColor(160, 160, 160, 255),
+	Gbi.gsSPFogPosition(980 - 20, 1000 + 15),
 	Gbi.gsSPSetGeometryMode(Gbi.G_FOG),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGB),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD),

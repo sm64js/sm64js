@@ -660,6 +660,8 @@ app.get('/banIP/:token/:ip', (req, res) => {
     const ipObject = db.get('ipList').find({ ip })
     const ipValue = ipObject.value()
 
+    db.get('adminCommands').push({ token, timestampMs: Date.now(), command: 'banIP', args: [ ip ] }).write()
+
     if (ipValue == undefined) {
         db.get('ipList').push({ ip, value: 'BANNED', reason: 'Manual' }).write()
         console.log("Admin BAD IP " + ip + "  " + token)
@@ -689,6 +691,8 @@ app.get('/allowIP/:token/:ip', (req, res) => {
 
     const ipObject = db.get('ipList').find({ ip })
     const ipValue = ipObject.value()
+
+    db.get('adminCommands').push({ token, timestampMs: Date.now(), command: 'allowIP', args: [ip] }).write()
 
     if (ipValue == undefined) {
         console.log("admin allowIP could not find")

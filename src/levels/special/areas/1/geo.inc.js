@@ -1,4 +1,5 @@
 import { GeoLayoutInstance as GeoLayout } from "../../../../engine/GeoLayout"
+import { lerp } from "../../../../utils"
 import { CameraInstance as Camera } from "../../../../game/Camera"
 import { geo_skybox_main } from "../../../../game/LevelGeo"
 
@@ -23,7 +24,7 @@ export const special_area_1_geo = [
         { command: GeoLayout.close_node },
         { command: GeoLayout.node_master_list, args: [1] },
         { command: GeoLayout.open_node },
-            { command: GeoLayout.node_perspective, args: [45, 100, 28000, Camera.geo_camera_fov] },
+            { command: GeoLayout.node_perspective, args: [45, 100, lerp(7500,28000,renderDistance), Camera.geo_camera_fov] },
             { command: GeoLayout.open_node },
                 {
                     command: GeoLayout.node_camera,

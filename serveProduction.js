@@ -712,7 +712,7 @@ app.get('/allowIP/:token/:ip', (req, res) => {
 app.get('/chatLog/:token/:timestamp?/:range?', (req, res) => {
 
     const token = req.params.token
-    const timestamp = req.params.timestamp ? parseInt(req.params.timestamp) : Date.now()
+    const timestamp = (req.params.timestamp && req.params.timestamp != '0') ? parseInt(req.params.timestamp) : Date.now()
     const range = parseInt(req.params.range ? req.params.range : 60) * 1000
 
     if (adminTokens.includes(token)) {

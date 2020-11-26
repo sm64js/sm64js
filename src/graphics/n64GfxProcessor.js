@@ -1140,7 +1140,6 @@ export class n64GfxProcessor {
             context2d.fillStyle = "#9400D3"
             context2d.fillText(`Ping: ${window.latency}ms`, 580, 20)
         }
-
     }
 }
 

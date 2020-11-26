@@ -1,0 +1,12 @@
+[workspace]
+members = [
+    "rust-server"
+]
+
+[profile]
+[profile.release]
+lto = "fat"
+codegen-units = 1
+
+[profile.dev]
+opt-level = 1

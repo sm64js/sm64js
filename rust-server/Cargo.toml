@@ -1,0 +1,26 @@
+[package]
+name = "sm64js"
+version = "0.1.0"
+authors = ["Mario Reder <mreder1289@gmail.com>"]
+edition = "2018"
+
+[build-dependencies]
+prost-build = "0.6"
+
+[dependencies]
+anyhow = "1"
+actix = "0.10"
+actix-codec = "0.3"
+actix_derive = "0.5"
+actix-files = "0.4"
+actix-web = "3"
+actix-web-actors = "3"
+dashmap = "*"
+env_logger = "0.8"
+flate2 = "1"
+# flate2 = { version = "1", features = ["zlib"], default-features = false }
+prost = "0.6"
+rand = "0.7"
+rayon = "1"
+serde = "1"
+v_htmlescape = "0.11"

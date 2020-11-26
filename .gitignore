@@ -1,7 +1,10 @@
 dist
 testdb.json
 *lock.json
+yarn.lock
 node_modules
+/target
+testdb.json
 .vs*
 .DS_Store
 extractTools/.assets-local.txt

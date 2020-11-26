@@ -1,0 +1,74 @@
+FROM debian:buster-slim as build
+
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH \
+    RUST_BACKTRACE=full \
+    RUSTC_WRAPPER=sccache \
+    SCCACHE_CACHE_SIZE=500M \
+    SCCACHE_DIR=/sm64js/sccache \
+    SCCACHE_IDLE_TIMEOUT=0
+
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+    ca-certificates \
+    gcc \
+    libc6-dev \
+    wget \
+    pkg-config \
+    openssl \
+    libssl-dev \
+    curl \
+    ; \
+    \
+    url="https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init"; \
+    wget "$url"; \
+    chmod +x rustup-init; \
+    ./rustup-init -y --no-modify-path --default-toolchain nightly-2020-10-23 --profile minimal; \
+    rm rustup-init; \
+    chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
+    rustup --version; \
+    cargo --version; \
+    rustc --version; \
+    \
+    apt-get remove -y --auto-remove \
+    wget \
+    ; \
+    rm -rf /var/lib/apt/lists/*;
+
+# set up project
+RUN cd / && \
+    mkdir -p sm64js && \
+    mkdir -p sm64js/rust-server && \
+    USER=root cargo init --bin sm64js
+WORKDIR /sm64js
+
+# set up sccache
+ENV SCCACHE_VERSION=0.2.13
+ENV SCCACHE_FILE=sccache-$SCCACHE_VERSION-x86_64-unknown-linux-musl
+ENV LINK=https://github.com/mozilla/sccache/releases/download
+RUN mkdir -p $HOME/.local/bin; \
+    curl -L "$LINK/$SCCACHE_VERSION/$SCCACHE_FILE.tar.gz" | tar xz
+RUN mv -f /sm64js/$SCCACHE_FILE/sccache /usr/bin/sccache
+COPY sccache sccache
+RUN sccache --start-server
+
+# copy files for dependency compilation
+COPY ./Cargo.toml ./Cargo.toml
+COPY ./rust-server/Cargo.toml ./rust-server/Cargo.toml
+COPY ./Cargo.lock ./Cargo.lock
+RUN rm ./src/main.rs && \
+    mkdir -p ./rust-server/src && \
+    echo "fn main() {}" >> ./rust-server/src/main.rs
+
+# compile dependencies
+RUN cargo fetch
+RUN cargo build --release
+RUN rm ./rust-server/src/*.rs
+
+# compile project
+COPY . .
+RUN rm ./target/release/deps/sm64js* && \
+    rm -r ./target/release/.fingerprint/sm64js*
+RUN cargo build --release

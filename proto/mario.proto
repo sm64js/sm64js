@@ -5,18 +5,29 @@ message RootMsg {
 	oneof message {
 		Sm64JsMsg uncompressed_sm64js_msg = 1;
 		bytes compressed_sm64js_msg = 2;
-		bytes json_bytes_msg = 3;
 	}
 }
 
 message Sm64JsMsg {
 	oneof message {
 		MarioListMsg list_msg = 1;
-		MarioMsg mario_msg = 2;
-		ValidPlayersMsg valid_players_msg = 3;
+		ConnectedMsg connected_msg = 2;
+		PingMsg ping_msg = 3;
+		MarioMsg mario_msg = 4;
+		ValidPlayersMsg valid_players_msg = 5;
+		ChatMsg chat_msg = 6;
+		SkinMsg skin_msg = 7;
 		/*ControllerMsg controller_msg = 6;
 		ControllerListMsg controller_list_msg = 7;*/
 	}
+}
+
+message PingMsg {
+	float time = 1;
+}
+
+message ConnectedMsg {
+	uint32 channelID = 1;
 }
 
 message MarioListMsg {
@@ -62,4 +73,23 @@ message ControllerMsg {
 
 message ValidPlayersMsg {
 	repeated uint32 validPlayers = 1;
+}
+
+message ChatMsg {
+	string message = 1;
+	// TODO having sender and channelID feels redundant
+	string sender = 2;
+	uint32 channelID = 3;
+}
+
+message SkinMsg {
+	uint32 channelID = 1;
+	repeated uint32 overalls = 2;
+	repeated uint32 hat = 3;
+	repeated uint32 shirt = 4;
+	repeated uint32 gloves = 5;
+	repeated uint32 boots = 6;
+	repeated uint32 skin = 7;
+	repeated uint32 hair = 8;
+	uint32 customCapState = 9;
 }

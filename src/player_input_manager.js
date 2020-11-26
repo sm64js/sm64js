@@ -1,6 +1,5 @@
 import * as Keydrown from "./keydrown.min.js"
-import { sendChat } from "./socket.js"
-import { gameData } from "./socket.js"
+import { gameData, sendChat } from "./socket.js"
 
 /////// Keyboard / Gamepad Input ////////
 window.playerInput = {}
@@ -33,7 +32,7 @@ window.addEventListener("keydown", (e) => {
 
     // space and arrow keys
     if (textboxfocus) return
-    if ([32, 37, 38, 39, 40].includes(e.keyCode) > -1) {
+    if ([32, 37, 38, 39, 40].includes(e.keyCode)) {
         e.preventDefault()
     }
 }, false)

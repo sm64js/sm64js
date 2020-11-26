@@ -1,11 +1,11 @@
-const { RootMsg, MarioListMsg, ControllerMsg, ValidPlayersMsg, Sm64JsMsg } = require("./proto/mario_pb")
+const { RootMsg, MarioListMsg, ControllerMsg, ValidPlayersMsg, Sm64JsMsg, ConnectedMsg, SkinMsg } = require("./proto/mario_pb")
 const fs = require('fs')
 const http = require('http')
 const got = require('got')
 const util = require('util')
 const zlib = require('zlib')
 const deflate = util.promisify(zlib.deflate)
-const port = 80
+const port = 3080
 const ws_port = 3000
 
 
@@ -38,26 +38,9 @@ const text = {
     encoder: new TextEncoder()
 }
 
-const sendJsonWithTopic = (topic, msg, channel) => {
-    const str = JSON.stringify({ topic, msg })
-    let bytes = text.encoder.encode(str)
-    const rootMsg = new RootMsg()
-    rootMsg.setJsonBytesMsg(bytes)
-    channel.send(rootMsg.serializeBinary(), true)
-}
-
-const broadcastJsonWithTopic = (topic, msg) => {
-    const str = JSON.stringify({ topic, msg })
-    let bytes = text.encoder.encode(str)
-    const rootMsg = new RootMsg()
-    rootMsg.setJsonBytesMsg(bytes)
-    bytes = rootMsg.serializeBinary()
-    Object.values(allChannels).forEach(s => { s.channel.send(bytes, true) })
-}
-
 const sendData = (bytes, channel) => { channel.send(bytes, true) }
 
-const broadcastData = (bytes, channel) => {
+const broadcastData = (bytes) => {
     Object.values(allChannels).forEach(s => { s.channel.send(bytes, true) })
 }
 
@@ -102,44 +85,39 @@ const processControllerUpdate = (channel_id, bytes) => {
     //broadcastDataWithOpcode(bytes, 3, channel_id)
 }
 
-const validSkins = (skinData) => {
-    if (skinData.overalls.length != 6) return false
-    if (skinData.hat.length != 6) return false
-    if (skinData.shirt.length != 6) return false
-    if (skinData.gloves.length != 6) return false
-    if (skinData.boots.length != 6) return false
-    if (skinData.skin.length != 6) return false
-    if (skinData.hair.length != 6) return false
+const isValidSkinEntry = (skinEntry) => {
+    return skinEntry.length === 6 && !skinEntry.find(skinVal => isNaN(skinVal) || skinVal < 0 || skinVal > 255 || !Number.isInteger(skinVal))
+}
 
-
-    for (let i = 0; i < 6; i++) {
-        let number = skinData.overalls[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = skinData.hat[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = skinData.shirt[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = skinData.gloves[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = skinData.boots[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = skinData.skin[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
-        number = skinData.hair[i]
-        if (isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) return false
-    }
+const validSkins = (skinMsg) => {
+    if (!isValidSkinEntry(skinMsg.getOverallsList())) return false
+    if (!isValidSkinEntry(skinMsg.getHatList())) return false
+    if (!isValidSkinEntry(skinMsg.getShirtList())) return false
+    if (!isValidSkinEntry(skinMsg.getGlovesList())) return false
+    if (!isValidSkinEntry(skinMsg.getBootsList())) return false
+    if (!isValidSkinEntry(skinMsg.getSkinList())) return false
+    if (!isValidSkinEntry(skinMsg.getHairList())) return false
 
     return true
-
 }
 
 
-const processSkin = (channel_id, msg) => {
+const processSkin = (channel_id, skinMsg) => {
     if (allChannels[channel_id].valid == 0) return
 
-    if (!validSkins(msg)) return
+    if (!validSkins(skinMsg)) return
 
-    allChannels[channel_id].skinData = msg
+    const skinData = {
+        overalls: skinMsg.getOverallsList(),
+        hat: skinMsg.getHatList(),
+        shirt: skinMsg.getShirtList(),
+        gloves: skinMsg.getGlovesList(),
+        boots: skinMsg.getBootsList(),
+        skin: skinMsg.getSkinList(),
+        hair: skinMsg.getHairList(),
+        customCapState: skinMsg.getCustomcapstate() != null ? skinMsg.getCustomcapstate() : 0,
+    }
+    allChannels[channel_id].skinData = skinData
     allChannels[channel_id].skinData.updated = true
 }
 
@@ -165,7 +143,9 @@ const processAdminCommand = (msg) => {
     }
 }
 
-const processChat = async (channel_id, msg) => {
+const processChat = async (channel_id, sm64jsMsg) => {
+    const chatMsg = sm64jsMsg.getChatMsg()
+    const msg = chatMsg.getMessage()
 
     const socket = allChannels[channel_id]
     if (socket == undefined) return
@@ -205,13 +185,13 @@ const processChat = async (channel_id, msg) => {
             return
         }
 
-        const chatmsg = {
-            channel_id,
-            msg: filteredMessage,
-            sender: decodedMario.getPlayername()
-        }
+        chatMsg.setChannelid(channel_id)
+        chatMsg.setMessage(filteredMessage)
+        chatMsg.setSender(decodedMario.getPlayername())
 
-        broadcastJsonWithTopic('chat', chatmsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+        broadcastData(rootMsg.serializeBinary())
 
     } catch (e) {
         console.log(`Got error with profanity api: ${e}`)
@@ -221,22 +201,46 @@ const processChat = async (channel_id, msg) => {
 
 const sendSkinsToChannel = (channel) => {
     /// Send Skins
-    Object.entries(allChannels).forEach(([channel_id, data]) => {
-        if (data.skinData) {
-            const skinMsg = { channel_id, skinData: data.skinData }
-            sendJsonWithTopic('skin', skinMsg, channel)
-        }
+    Object.entries(allChannels).filter(([_, data]) => data.skinData).forEach(([channelId, data]) => {
+        const skinMsg = new SkinMsg()
+        skinMsg.setChannelid(channelId)
+        skinMsg.setOverallsList(data.skinData.overalls)
+        skinMsg.setHatList(data.skinData.hat)
+        skinMsg.setShirtList(data.skinData.shirt)
+        skinMsg.setGlovesList(data.skinData.gloves)
+        skinMsg.setBootsList(data.skinData.boots)
+        skinMsg.setSkinList(data.skinData.skin)
+        skinMsg.setHairList(data.skinData.hair)
+        skinMsg.setCustomcapstate(1)
+        const sm64jsMsg = new Sm64JsMsg()
+        sm64jsMsg.setSkinMsg(skinMsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+
+        channel.send(rootMsg.serializeBinary(), true)
     })
 }
 
 const sendSkinsIfUpdated = () => {
     /// Send Skins
-    Object.entries(allChannels).forEach(([channel_id, data]) => {
-        if (data.skinData) {
-            const skinMsg = { channel_id, skinData: data.skinData }
-            broadcastJsonWithTopic('skin', skinMsg)
-            data.skinData.updated = false
-        }
+    Object.entries(allChannels).filter(([_, data]) => data.skinData && data.skinData.updated).forEach(([channelId, data]) => {
+        const skinMsg = new SkinMsg()
+        skinMsg.setChannelid(channelId)
+        skinMsg.setOverallsList(data.skinData.overalls)
+        skinMsg.setHatList(data.skinData.hat)
+        skinMsg.setShirtList(data.skinData.shirt)
+        skinMsg.setGlovesList(data.skinData.gloves)
+        skinMsg.setBootsList(data.skinData.boots)
+        skinMsg.setSkinList(data.skinData.skin)
+        skinMsg.setHairList(data.skinData.hair)
+        const sm64jsMsg = new Sm64JsMsg()
+        sm64jsMsg.setSkinMsg(skinMsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+
+        data.skinData.updated = false
+
+        broadcastData(rootMsg.serializeBinary())
     })
 }
 
@@ -367,7 +371,14 @@ require('uWebSockets.js').App().ws('/*', {
     open: async (channel) => {
         channel.my_id = generateID()
         allChannels[channel.my_id] = { valid: 0, channel, chatCooldown: 0 }
-        sendJsonWithTopic('id', { id: channel.my_id }, channel)
+        
+        const connectedMsg = new ConnectedMsg()
+        connectedMsg.setChannelid(channel.my_id)
+        const sm64jsMsg = new Sm64JsMsg()
+        sm64jsMsg.setConnectedMsg(connectedMsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+        channel.send(rootMsg.serializeBinary(), true)
 
         sendSkinsToChannel(channel)
     },
@@ -383,20 +394,16 @@ require('uWebSockets.js').App().ws('/*', {
                     switch (sm64jsMsg.getMessageCase()) {
                         case Sm64JsMsg.MessageCase.MARIO_MSG:
                             processPlayerData(channel.my_id, sm64jsMsg.getMarioMsg()); break
+                        case Sm64JsMsg.MessageCase.PING_MSG:
+                            sendData(bytes, channel); break
+                        case Sm64JsMsg.MessageCase.CHAT_MSG:
+                            processChat(channel.my_id, sm64jsMsg); break
+                        case Sm64JsMsg.MessageCase.SKIN_MSG:
+                            processSkin(channel.my_id, sm64jsMsg.getSkinMsg()); break
                         //case 2: processBasicAttack(channel.my_id, bytes.slice(1)); break
                         //case 3: processControllerUpdate(channel.my_id, bytes.slice(1)); break
                         //case 4: processKnockUp(channel.my_id, bytes.slice(1)); break
                         default: throw "unknown case for uncompressed proto message"
-                    }
-                    break
-                case RootMsg.MessageCase.JSON_BYTES_MSG:
-                    const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
-                    const { topic, msg } = JSON.parse(str)
-                    switch (topic) {
-                        case 'chat': processChat(channel.my_id, msg); break
-                        case 'skin': processSkin(channel.my_id, msg); break
-                        case 'ping': sendData(bytes, channel); break
-                        default: throw "Unknown topic in json message"
                     }
                     break
                 case RootMsg.MessageCase.MESSAGE_NOT_SET:
@@ -413,7 +420,6 @@ require('uWebSockets.js').App().ws('/*', {
     }
 
 }).listen(ws_port, () => { console.log("Starting websocket server " + ws_port) })
-
 
 //// Express Static serving
 const express = require('express')

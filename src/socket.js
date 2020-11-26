@@ -1,4 +1,4 @@
-import { RootMsg, Sm64JsMsg  } from "../proto/mario_pb"
+import { RootMsg, Sm64JsMsg, PingMsg, ChatMsg, SkinMsg } from "../proto/mario_pb"
 import zlib from "zlib"
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
@@ -16,13 +16,11 @@ Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
 
 const url = new URL(window.location.href)
 
-let websocketServerPath = ""
-
-if (url.protocol == "https:") {
-    websocketServerPath = `wss://${url.hostname}/websocket/`
-} else {
-    websocketServerPath = `ws://${url.hostname}:3000`
-}
+const websocketServerPath = process.env.NODE_ENV === 'production'
+    ? `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/`
+    : url.protocol == "https:"
+        ? `wss://${url.hostname}/websocket/`
+        : `ws://${url.hostname}:3000`
 
 const channel = new WebSocket(websocketServerPath)
 
@@ -53,14 +51,6 @@ export const networkData = {
 
 export const gameData = {}
 
-const sendJsonWithTopic = (topic, msg) => {
-    const str = JSON.stringify({ topic, msg })
-    let bytes = text.encoder.encode(str)
-    const rootMsg = new RootMsg()
-    rootMsg.setJsonBytesMsg(bytes)
-    channel.send(rootMsg.serializeBinary())
-}
-
 const sendData = (bytes) => { channel.send(bytes) }
 
 const text = {
@@ -81,37 +71,37 @@ const unzip = (bytes) => {
     })
 }
 
-
-const measureLatency = (msg) => {
-    const startTime = msg.time
-    const endTime = performance.now()
-    window.latency = parseInt(endTime - startTime)
-}
-
 const recvChat = (chatmsg) => {
+    const channel_id = chatmsg.getChannelid()
+    const sender = chatmsg.getSender()
+    const msg = chatmsg.getMessage()
 
-    if (chatmsg.channel_id != networkData.myChannelID &&
-        networkData.remotePlayers[chatmsg.channel_id] == undefined) return
+    if (channel_id != networkData.myChannelID &&
+        networkData.remotePlayers[channel_id] == undefined) return
 
-    if (window.banPlayerList.includes(chatmsg.sender)) return
+    if (window.banPlayerList.includes(sender)) return
 
     const chatlog = document.getElementById("chatlog")
     const node = document.createElement("LI")                 // Create a <li> node
-    node.innerHTML = '<strong>' + sanitizeChat(chatmsg.sender, false) + '</strong>: ' + sanitizeChat(chatmsg.msg, true) + '<br/>'        // Create a text node
+    node.innerHTML = '<strong>' + sanitizeChat(sender, false) + '</strong>: ' + sanitizeChat(msg, true) + '<br/>'        // Create a text node
 
     if (window.showChatIds) node.innerHTML = `(${chatmsg.channel_id})` + node.innerHTML
-
     chatlog.appendChild(node)
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 
     let someobject
-    if (chatmsg.channel_id == networkData.myChannelID)
+    if (channel_id == networkData.myChannelID)
         someobject = window.myMario
     else
-        someobject = networkData.remotePlayers[chatmsg.channel_id]
+        someobject = networkData.remotePlayers[channel_id]
+        
+    Object.assign(someobject, { chatData: { msg: msg, timer: 150 } })
+}
 
-    Object.assign(someobject, { chatData: { msg: chatmsg.msg, timer: 150 } })
-
+const measureAndPrintLatency = (ping_proto) => {
+    const startTime = ping_proto.getTime()
+    const endTime = performance.now()
+    window.latency = parseInt(endTime - startTime)
 }
 
 channel.onopen = () => {
@@ -132,7 +122,18 @@ channel.onopen = () => {
                     case Sm64JsMsg.MessageCase.VALID_PLAYERS_MSG:
                         Multi.recvValidPlayers(sm64jsMsg.getValidPlayersMsg())
                         break
-                    //case 99: measureAndPrintLatency(bytes.slice(1)); break
+                    case Sm64JsMsg.MessageCase.PING_MSG:
+                        measureAndPrintLatency(sm64jsMsg.getPingMsg())
+                        break
+                    case Sm64JsMsg.MessageCase.CONNECTED_MSG:
+                        networkData.myChannelID = sm64jsMsg.getConnectedMsg().getChannelid()
+                        break
+                    case Sm64JsMsg.MessageCase.CHAT_MSG:
+                        recvChat(sm64jsMsg.getChatMsg())
+                        break
+                    case Sm64JsMsg.MessageCase.SKIN_MSG:
+                        Cosmetics.recvSkinData(sm64jsMsg.getSkinMsg())
+                        break
                     default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
                 }
                 break
@@ -144,17 +145,6 @@ channel.onopen = () => {
                 const listMsg = sm64jsMsg.getListMsg()
                 const marioList = listMsg.getMarioList()
                 Multi.recvMarioData(marioList)
-                break
-            case RootMsg.MessageCase.JSON_BYTES_MSG:
-                const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
-                const { topic, msg } = JSON.parse(str)
-                switch (topic) {
-                    case 'id': networkData.myChannelID = msg.id; break
-                    case 'chat': recvChat(msg); break
-                    case 'skin': Cosmetics.recvSkinData(msg); break
-                    case 'ping': measureLatency(msg); break
-                    default: throw "Unknown topic in json message"
-                }
                 break
             case RootMsg.MessageCase.MESSAGE_NOT_SET:
             default:
@@ -182,12 +172,6 @@ const updateConnectedMsg = () => {
     }
 }
 
-export const send_controller_update = (frame) => {
-/*    if (multiplayerReady() && frame % 1 == 0) {
-        sendDataWithOpcode(Multi.createControllerProtoMsg().serializeBinary(), 3)
-    }*/
-}
-
 export const post_main_loop_one_iteration = (frame) => {
 
     if (frame % 30 == 0) updateConnectedMsg()
@@ -196,13 +180,35 @@ export const post_main_loop_one_iteration = (frame) => {
 
         if (frame % 150 == 0) { //every 5 seconds
             /// ping to measure latency
-            sendJsonWithTopic('ping', { time: performance.now() })
+            const sm64jsMsg = new Sm64JsMsg()
+            const pingmsg = new PingMsg()
+            pingmsg.setTime(performance.now())
+            sm64jsMsg.setPingMsg(pingmsg)
+            const rootMsg = new RootMsg()
+            rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+            sendData(rootMsg.serializeBinary())
 
             //send skins if updated
             if (Cosmetics.validSkins()) {
-                if (JSON.stringify(window.myMario.skinData) != networkData.lastSentSkinData) {
+                if (JSON.stringify(window.myMario.skinData) !== networkData.lastSentSkinData) {
                     networkData.lastSentSkinData = JSON.stringify(window.myMario.skinData)
-                    sendJsonWithTopic('skin', window.myMario.skinData)
+                    const skinData = window.myMario.skinData
+
+                    const skinMsg = new SkinMsg()
+                    skinMsg.setOverallsList(skinData.overalls)
+                    skinMsg.setHatList(skinData.hat)
+                    skinMsg.setShirtList(skinData.shirt)
+                    skinMsg.setGlovesList(skinData.gloves)
+                    skinMsg.setBootsList(skinData.boots)
+                    skinMsg.setSkinList(skinData.skin)
+                    skinMsg.setHairList(skinData.hair)
+                    skinMsg.setCustomcapstate(skinData.customCapState)
+                    const sm64jsMsg = new Sm64JsMsg()
+                    sm64jsMsg.setSkinMsg(skinMsg)
+                    const rootMsg = new RootMsg()
+                    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+            
+                    channel.send(rootMsg.serializeBinary(), true)
                 }
             }
         }
@@ -217,8 +223,8 @@ export const post_main_loop_one_iteration = (frame) => {
     }
 
     decrementChat()
-}
 
+}
 
 const decrementChat = () => {
     Object.values(networkData.remotePlayers).forEach(data => {
@@ -230,7 +236,13 @@ const decrementChat = () => {
 }
 
 export const sendChat = (msg) => {
-    sendJsonWithTopic('chat', msg)
+    const chatMsg = new ChatMsg()
+    chatMsg.setMessage(msg)
+    const sm64jsMsg = new Sm64JsMsg()
+    sm64jsMsg.setChatMsg(chatMsg)
+    const rootMsg = new RootMsg()
+    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+    sendData(rootMsg.serializeBinary())
 }
 
 export const sendPlayerInteraction = (channel_id, interaction) => {

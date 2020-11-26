@@ -1,5 +1,4 @@
-import { MarioMsg, MarioListMsg, ControllerListMsg, ControllerMsg, ValidPlayersMsg } from "../../proto/mario_pb"
-import zlib from "zlib"
+import { Sm64JsMsg, MarioMsg, ControllerListMsg, ControllerMsg, ValidPlayersMsg } from "../../proto/mario_pb"
 import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "../socket"
 import { defaultSkinData } from "../cosmetics"
@@ -269,5 +268,6 @@ export const recvMarioData = (marioList) => {
             updateRemoteMarioState(id, marioProto)
         }
     })
+
 
 }

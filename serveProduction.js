@@ -22,7 +22,7 @@ setInterval(() => {
     db.get('chats').remove((entry) => {
         if (entry.timestampMs < oneDayAgo) return true
     }).write()
-}, 86400000) //1 Day
+}, 86400000 * 3) //3 Days
 
 const allChannels = {}
 const connectedIPs = {}

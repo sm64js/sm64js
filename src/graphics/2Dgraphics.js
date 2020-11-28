@@ -180,12 +180,8 @@ export const draw2Dpost3Drendering = () => {
 			context2d.drawImage(TauntWheel,wheelPos[0],wheelPos[1],(Taunt.gfxTscaleICO*1.1),(Taunt.gfxTscaleICO*1.1))
 	}
     if (gameData.marioState && !window.playerInput.buttonDownTaunt && window.tauntOpened) {
-			window.tauntOpened = false
-			const TAUNT = Taunt.tauntsMap[Taunt.getSelectedTaunt()]
-			if (TAUNT != -1) {
-				window.taunt = TAUNT
-				console.log(TAUNT)
-				console.log(Taunt.getSelectedTaunt())
-			}
+		window.tauntOpened = false
+		const TAUNT = Taunt.tauntsMap[Taunt.getSelectedTaunt()]
+		if (TAUNT != -1) window.taunt = TAUNT
 	}
 }

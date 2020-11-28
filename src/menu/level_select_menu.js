@@ -1,3 +1,4 @@
+import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
 
 const intro_default = () => {
     //// core implementation is needed here
@@ -8,7 +9,12 @@ const intro_default = () => {
 }
 
 export const lvl_intro_update = (arg1) => {
-    switch (arg1) {
+
+    if (arg1.maxFrames && LevelCommands.callLoopFrameCounter > arg1.maxFrames) {
+        return 1
+    }
+
+    switch (arg1.state) {
         case 0: throw "play mario sound - audio not implemented"
         case 1: return intro_default()
     }

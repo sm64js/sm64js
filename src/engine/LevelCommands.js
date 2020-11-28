@@ -152,11 +152,17 @@ class LevelCommands {
         this.sCurrentScript.index++
     }
 
+    reset_call_loop(args) {
+        this.callLoopFrameCounter = 0
+        this.sCurrentScript.index++
+    }
+
     call_loop(args) {
         const func = args[1]
         const funcClass = args[2]
         this.sRegister = func.call(funcClass, args[0], this.sRegister)
-        
+        this.callLoopFrameCounter++
+
         if (this.sRegister == 0) {
             this.sScriptStatus = SCRIPT_PAUSED
         } else {

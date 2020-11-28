@@ -37,8 +37,8 @@ const level_intro_entry_2 = () => {
         { command: LevelCommands.load_area, args: [1] },
         /// Set Menu Music
         { command: LevelCommands.transition, args: [WARP_TRANSITION_FADE_FROM_STAR, 20, 0, 0, 0] },
-        { command: LevelCommands.sleep, args: [20] },
-        { command: LevelCommands.call_loop, args: [1, lvl_intro_update, null] },
+        { command: LevelCommands.reset_call_loop },
+        { command: LevelCommands.call_loop, args: [ { state: 1 }, lvl_intro_update, null] },
         { command: LevelCommands.unload_area, args: [1] },
         { command: LevelCommands.set_register, args: [LEVEL_SPECIAL] },
         { command: LevelCommands.execute, args: [level_main_scripts_entry] }
@@ -56,9 +56,8 @@ export const level_intro_entry_1 = [
     { command: LevelCommands.free_level_pool },
     // Call lvl intro update with var 0 - play sound its a me mario
     { command: LevelCommands.load_area, args: [1] },
-    { command: LevelCommands.sleep, args: [175] },
-    { command: LevelCommands.transition, args: [WARP_TRANSITION_FADE_INTO_COLOR, 16, 0, 0, 0] }, 
-    { command: LevelCommands.sleep, args: [16] },
+    { command: LevelCommands.reset_call_loop },
+    { command: LevelCommands.call_loop, args: [{ state: 1, maxFrames: 150 }, lvl_intro_update, null] },
     { command: LevelCommands.unload_area, args: [1] },
     { command: LevelCommands.sleep, args: [2] },
     { command: LevelCommands.execute, args: [level_intro_entry_2] }

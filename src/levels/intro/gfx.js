@@ -11,8 +11,8 @@ let gTitleZoomCounter = 0
 let gTitleFadeCounter = 0
 
 const INTRO_STEPS_ZOOM_IN = 20
-const INTRO_STEPS_HOLD_1 = 175
-const INTRO_STEPS_ZOOM_OUT = 191
+const INTRO_STEPS_HOLD_1 = 135
+const INTRO_STEPS_ZOOM_OUT = 151
 
 const INTRO_BACKGROUND_SUPER_MARIO = 0
 const INTRO_BACKGROUND_GAME_OVER = 1

@@ -56,7 +56,7 @@ export const level_intro_entry_1 = [
     { command: LevelCommands.free_level_pool },
     // Call lvl intro update with var 0 - play sound its a me mario
     { command: LevelCommands.load_area, args: [1] },
-    { command: LevelCommands.sleep, args: [75] },
+    { command: LevelCommands.sleep, args: [175] },
     { command: LevelCommands.transition, args: [WARP_TRANSITION_FADE_INTO_COLOR, 16, 0, 0, 0] }, 
     { command: LevelCommands.sleep, args: [16] },
     { command: LevelCommands.unload_area, args: [1] },

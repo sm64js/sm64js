@@ -32,7 +32,7 @@ export const intro_geo_0002D0 = [
     { command: GeoLayout.close_node },
     { command: GeoLayout.node_master_list, args: [0] },
     { command: GeoLayout.open_node },
-    { command: GeoLayout.node_generated, args: [ 0, geo_fade_transition ] },
+    //{ command: GeoLayout.node_generated, args: [ 0, geo_fade_transition ] },
     { command: GeoLayout.close_node },
     { command: GeoLayout.close_node },
     { command: GeoLayout.node_end }

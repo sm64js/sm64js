@@ -192,6 +192,12 @@ const act_taunt = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_START_CROUCHING, 0)
     }
 
+    if (m.input & Mario.INPUT_TAUNT && m.actionState != 0) {
+        return Mario.set_mario_action(m, Mario.ACT_TAUNT, m.controller.taunt)
+    }
+
+    m.actionState = 1
+
     if (Mario.is_anim_at_end(m)) {
         if (m.actionArg == 0x1D || m.actionArg == 0x7A) Mario.set_mario_animation(m, m.actionArg, true)
         else if (m.actionArg != 0x2E && m.actionArg != 0x79) return Mario.set_mario_action(m, Mario.ACT_IDLE, 0)

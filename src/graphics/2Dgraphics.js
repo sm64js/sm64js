@@ -1,10 +1,18 @@
 import { networkData, gameData } from "../socket"
 import { oFaceAngleYaw } from "../include/object_constants"
+import * as Taunt from "./taunt"
 
 const canvas2d = document.querySelector('#textCanvas')
 const context2d = canvas2d.getContext('2d')
 
 export const customData2D = { }
+
+//Easier image defines for stuff like taunts.
+const defImage = (w,h,path) => {
+	var IMG = new Image(w,h)
+	IMG.src = path
+	return IMG
+}
 
 // Minimap Stuff ~0x2480
 const Minimap_Img = new Image(535, 535); Minimap_Img.src = 'mini/bob_mountain.png'
@@ -14,6 +22,16 @@ const PlayerRemote_lower_Img = new Image(14, 14); PlayerRemote_lower_Img.src = '
 const PlayerRemote_upper_Img = new Image(14, 14); PlayerRemote_upper_Img.src = 'mini/player_remote_upper.png'
 const flag_outline = new Image(14, 14); flag_outline.src = "mini/flag0.png"
 const flag_base = new Image(14, 14); flag_base.src = "mini/flag1.png"
+
+const Taunts = [
+	{'img':defImage(32,32,'mini/taunts/skull.png'),'taunt':'!taunt-die'},
+	{'img':defImage(32,32,'mini/taunts/wave.png'),'taunt':'!taunt-wave'},
+	{'img':defImage(32,32,'mini/taunts/skull.png'),'taunt':'!taunt-die2'},
+	{'img':defImage(32,32,'mini/taunts/star.png'),'taunt':'!taunt-star'},
+	{'img':defImage(32,32,'mini/taunts/shock.png'),'taunt':'!taunt-shock'},
+	{'img':defImage(32,32,'mini/taunts/magic.png'),'taunt':'!taunt-magic'}
+]
+const TauntWheel = defImage(128,128,'mini/tauntWheel.png')
 
 const getFlagColor = (i) => {
 	switch (i) {
@@ -109,7 +127,6 @@ const drawMinimapIconRotation = (sprite, width, height, X, Z, scale_map, scale_i
     context2d.restore()
 }
 
-
 export const draw2Dpost3Drendering = () => {
     context2d.globalAlpha = 0.8
     if (window.latency) {
@@ -149,4 +166,26 @@ export const draw2Dpost3Drendering = () => {
             })
         }
     }
+    if (gameData.marioState && window.playerInput.buttonDownTaunt) {
+			window.tauntOpened = true
+			const SELECTED = Taunt.getSelectedTaunt()
+			const wheelPos = Taunt.tauntsPosWheel[SELECTED]
+			context2d.drawImage(TauntWheel,Taunt.tcx-(Taunt.gfxTscale*0.5),Taunt.tcy-(Taunt.gfxTscale*0.5),Taunt.gfxTscale,Taunt.gfxTscale)
+			context2d.drawImage(Taunts[0].img,Taunt.tauntsPos[8][0],Taunt.tauntsPos[8][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
+			context2d.drawImage(Taunts[1].img,Taunt.tauntsPos[1][0],Taunt.tauntsPos[1][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
+			context2d.drawImage(Taunts[2].img,Taunt.tauntsPos[2][0],Taunt.tauntsPos[2][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
+			context2d.drawImage(Taunts[3].img,Taunt.tauntsPos[4][0],Taunt.tauntsPos[4][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
+			context2d.drawImage(Taunts[4].img,Taunt.tauntsPos[5][0],Taunt.tauntsPos[5][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
+			context2d.drawImage(Taunts[5].img,Taunt.tauntsPos[6][0],Taunt.tauntsPos[6][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
+			context2d.drawImage(TauntWheel,wheelPos[0],wheelPos[1],(Taunt.gfxTscaleICO*1.1),(Taunt.gfxTscaleICO*1.1))
+	}
+    if (gameData.marioState && !window.playerInput.buttonDownTaunt && window.tauntOpened) {
+			window.tauntOpened = false
+			const TAUNT = Taunt.tauntsMap[Taunt.getSelectedTaunt()]
+			if (TAUNT != -1) {
+				window.taunt = TAUNT
+				console.log(TAUNT)
+				console.log(Taunt.getSelectedTaunt())
+			}
+	}
 }

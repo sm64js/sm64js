@@ -165,7 +165,8 @@ const keyboardButtonMapping = {
     cd: 'k',
     cl: 'j',
     cr: 'l',
-    map: 'm'
+    map: 'm',
+    taunt: 't'
 }
 const defaultKeyboardButtonMapping = { ...keyboardButtonMapping }
 
@@ -173,6 +174,7 @@ const gamepadButtonMapping = { //works for xbox
     a: 0,
     b: 2,
     map: 4,
+    taunt: 5,
     start: 9,
     z: 6,
     stickX: 0,
@@ -330,6 +332,7 @@ export const playerInputUpdate = () => {
             start: gamepad.buttons[gamepadButtonMapping['start']].touched,
             z: gamepad.buttons[gamepadButtonMapping['z']].touched,
             map: gamepad.buttons[gamepadButtonMapping['map']].touched,
+            taunt: gamepad.buttons[gamepadButtonMapping['taunt']].touched,
             cr: gamepad.axes[2] && gamepad.axes[2] > 0.5,
             cl: gamepad.axes[2] && gamepad.axes[2] < -0.5,
             cu: gamepad.axes[3] && gamepad.axes[3] < -0.5,
@@ -362,6 +365,7 @@ export const playerInputUpdate = () => {
     let buttonDownCu = gamepadFinal.cu || keyboardFinal.cu
     let buttonDownCd = gamepadFinal.cd || keyboardFinal.cd
     let buttonDownMap = gamepadFinal.map || keyboardFinal.map
+    let buttonDownTaunt = gamepadFinal.taunt || keyboardFinal.taunt
 
     window.playerInput = {
         stickX, stickY,
@@ -371,13 +375,13 @@ export const playerInputUpdate = () => {
         buttonPressedStart: buttonDownStart && !window.playerInput.buttonDownStart,
         buttonPressedB: buttonDownB && !window.playerInput.buttonDownB,
         buttonPressedZ: buttonDownZ && !window.playerInput.buttonDownZ,
-        buttonPressedCl: buttonDownCl && !window.playerInput.buttonDownCl,
-        buttonPressedCr: buttonDownCr && !window.playerInput.buttonDownCr,
-        buttonPressedCu: buttonDownCu && !window.playerInput.buttonDownCu,
-        buttonPressedCd: buttonDownCd && !window.playerInput.buttonDownCd,
+        buttonPressedCl: buttonDownCl && !window.playerInput.buttonDownCl && !buttonDownTaunt,
+        buttonPressedCr: buttonDownCr && !window.playerInput.buttonDownCr && !buttonDownTaunt,
+        buttonPressedCu: buttonDownCu && !window.playerInput.buttonDownCu && !buttonDownTaunt,
+        buttonPressedCd: buttonDownCd && !window.playerInput.buttonDownCd && !buttonDownTaunt,
         buttonPressedMap: buttonDownMap && !window.playerInput.buttonDownMap,
 
-        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap,
+        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap, buttonDownTaunt,
 
         taunt: window.taunt
     }

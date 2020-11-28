@@ -145,8 +145,8 @@ const processSkin = (channel_id, msg) => {
 
 const sanitizeChat = (string) => {
     string = string.substring(0, 200)
-    string = string.replace(/</g, "")
-    string = string.replace(/>/g, "")
+    string = string.replace(/</g, "&lt;")
+    string = string.replace(/>/g, "&gt;")
     return string
 }
 
@@ -197,9 +197,8 @@ const processChat = async (channel_id, msg) => {
 
     const sanitizedChat = sanitizeChat(msg)
 
-    const request = "http://www.purgomalum.com/service/json?text=" + sanitizedChat
-    const playerNameRequest = "http://www.purgomalum.com/service/json?text=" + decodedMario.getPlayername()
-
+    const request = "http://www.purgomalum.com/service/json?text=" + encodeURIComponent(sanitizedChat)
+    const playerNameRequest = "http://www.purgomalum.com/service/json?text=" + encodeURIComponent(decodedMario.getPlayername())
     try {
         const filteredMessage = JSON.parse((await got(request)).body).result
         const filteredPlayerName = JSON.parse((await got(playerNameRequest)).body).result

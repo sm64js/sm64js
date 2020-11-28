@@ -27,8 +27,6 @@ if (url.protocol == "https:") {
 const channel = new WebSocket(websocketServerPath)
 
 const sanitizeChat = (string, isMessage) => {
-    string = string.replace(/</g, "");
-    // string = string.replace(/>/g, ""); // commented out for ">:(" and "> text", should still sanitize with only <
     if(isMessage = true) {
         string = string.replace(/:doublek:/g, "<img height='20' width='20' src='emotes/doublek.png' alt=':doublek:' />");
         string = string.replace(/:facepalm:/g, "<img height='20' width='20' src='emotes/facepalm.png' alt=':facepalm:' />");

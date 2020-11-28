@@ -249,7 +249,7 @@ const processChat = async (channel_id, msg) => {
     const decodedMario = socket.decodedMario
     if (decodedMario == undefined) return
 
-    connectedIPs[socket.channel.ip].chatCooldown += 5 // seconds
+    connectedIPs[socket.channel.ip].chatCooldown += 3 // seconds
 
     /// record chat to DB
     db.get('chats').push({
@@ -429,7 +429,7 @@ const serverSideFlagUpdate = () => {
 
 
 
-/// Every frame - 30 times per second
+/// 20 times per second
 setInterval(async () => {
 
     serverSideFlagUpdate()
@@ -470,7 +470,7 @@ setInterval(async () => {
     rootMsg.setCompressedSm64jsMsg(compressedBytes)
     broadcastData(rootMsg.serializeBinary())
 
-}, 33)
+}, 50)
 
 /// Every other frame - 16 times per second
 setInterval(async () => {

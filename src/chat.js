@@ -59,6 +59,7 @@ export const decrementChat = () => {
     Object.values(networkData.remotePlayers).forEach(data => {
         if (data.chatData && data.chatData.timer > 0) data.chatData.timer--
     })
+    if (networkData.announcement.timer > 0) networkData.announcement.timer--
 
     const myChat = window.myMario.chatData
     if (myChat && myChat.timer > 0) myChat.timer--

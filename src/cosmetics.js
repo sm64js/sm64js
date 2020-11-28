@@ -260,7 +260,8 @@ export const getExtraRenderData = (channel_id) => {
             mario_hair_lights: (window.myMario.skinData.hair == "r" ? rainbowLights : window.myMario.skinData.hair),
         },
         custom2D: {
-            chat: (myChat && myChat.timer > 0) ? myChat.msg : null
+            chat: (myChat && myChat.timer > 0) ? myChat.msg : null,
+            announcement: (networkData.announcement.timer > 0) ? networkData.announcement.message : null
         }
     }
 
@@ -287,7 +288,8 @@ export const getExtraRenderData = (channel_id) => {
         },
         custom2D: {
             playerName: remote.playerName ? remote.playerName : null,
-            chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null
+            chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null,
+            announcement: (networkData.announcement.timer > 0) ? networkData.announcement.message : null
         }
 
     }

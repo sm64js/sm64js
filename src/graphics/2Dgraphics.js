@@ -4,7 +4,7 @@ import { oFaceAngleYaw } from "../include/object_constants"
 const canvas2d = document.querySelector('#textCanvas')
 const context2d = canvas2d.getContext('2d')
 
-export const customData2D = { playerName: "", chat: "" }
+export const customData2D = { }
 
 // Minimap Stuff ~0x2480
 const Minimap_Img = new Image(535, 535); Minimap_Img.src = 'mini/bob_mountain.png'
@@ -40,6 +40,25 @@ const flagIcons = new Array(4).fill(0).map((unused, i) => {
     return newflagIcon
 })
 
+const custom_draw_message_bubble = (text, fontsize, pixelX, pixelY, backgroundColor, backgroundAlpha, textColor, maxWidth) => {
+    context2d.font = `bold ${fontsize}px verdana, sans-serif`
+    const width = context2d.measureText(text).width
+
+    context2d.fillStyle = backgroundColor
+    context2d.globalAlpha = backgroundAlpha
+    context2d.rect(pixelX - (width / 2) - 5, pixelY - 50, width + 10, 30)
+    context2d.fill()
+    context2d.globalCompositeOperation = 'source-over'
+
+    context2d.globalAlpha = 1.0
+    context2d.font = `bold ${fontsize}px verdana, sans-serif`
+    context2d.textAlign = "center"
+    context2d.fillStyle = textColor
+    if (maxWidth) context2d.fillText(text, pixelX, pixelY - 30, [maxWidth])
+    else context2d.fillText(text, pixelX, pixelY - 30)
+    context2d.globalCompositeOperation = 'destination-over'
+}
+
 
 export const custom_draw_text = (x, y, w) => {
 
@@ -55,24 +74,13 @@ export const custom_draw_text = (x, y, w) => {
     }
 
     if (customData2D.chat) {
-        context2d.font = "bold 16px verdana, sans-serif"
-        const width = context2d.measureText(customData2D.chat).width
-
-        context2d.fillStyle = "#FFFFFF"
-        context2d.globalAlpha = 0.8
-        context2d.rect(pixelX - (width / 2) - 5, pixelY - 50, width + 10, 30)
-        context2d.fill()
-        context2d.globalCompositeOperation = 'source-over'
-
-
-        context2d.globalAlpha = 1.0
-        context2d.font = "bold 16px verdana, sans-serif"
-        context2d.textAlign = "center"
-        context2d.fillStyle = "#000000"
-        context2d.fillText(customData2D.chat, pixelX, pixelY - 30)
-        context2d.globalCompositeOperation = 'destination-over'
+        custom_draw_message_bubble(customData2D.chat, "16", pixelX, pixelY, "#FFFFFF", 0.8, "#000000")
     }
 
+    if (customData2D.announcement) {
+        custom_draw_message_bubble("Server Announcement:", "20", 320, 60, "#FFFFFF", 1.0, "#9400D3")
+        custom_draw_message_bubble(customData2D.announcement, "18", 320, 90, "#FFFFFF", 1.0, "#9400D3", 640)
+    }
 
 }
 

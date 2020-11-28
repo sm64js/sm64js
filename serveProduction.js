@@ -206,8 +206,11 @@ const applyValidCharacters = (str) => {
 const processAdminCommand = (msg) => {
     const parts = msg.split(' ')
 
-    switch (parts) {
-
+    switch (parts[0].toUpperCase()) {
+        case "ANNOUNCEMENT":
+            const remainingParts = parts.slice(1)
+            return broadcastJsonWithTopic('announcement', { message: remainingParts.join(" "), timer: 300 })
+        default: console.log("Unknown Admin Command: " + parts[0])
     }
 }
 
@@ -231,8 +234,8 @@ const processChat = async (channel_id, msg) => {
 
     const isAdmin = adminTokens.includes(msg.adminToken)
 
-    if (isAdmin && msg.message[0] == '/') {
-        processAdminCommand(msg.message.slice(1))
+    if (msg.message[0] == '/') {
+        if (isAdmin) processAdminCommand(msg.message.slice(1))
         return
     }
 

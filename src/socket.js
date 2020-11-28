@@ -37,6 +37,7 @@ export const networkData = {
     remotePlayers: {},
     myChannelID: -1,
     lastSentSkinData: {},
+    announcement: { message: "", timer: 0 },
     flagData: new Array(4).fill(0).map(() => {
         return {
             pos: [0, 0, 0],
@@ -125,6 +126,7 @@ channel.onopen = () => {
                     case 'skin': Cosmetics.recvSkinData(msg); break
                     case 'ping': measureLatency(msg); break
                     case 'playerName': Cosmetics.recvPlayerNameResponse(msg); break
+                    case 'announcement': recvAnnouncement(msg); break
                     default: throw "Unknown topic in json message"
                 }
                 break
@@ -136,6 +138,8 @@ channel.onopen = () => {
 
     channel.onclose = () => { window.latency = null }
 }
+
+const recvAnnouncement = (msg) => { networkData.announcement = msg }
 
 const recvFlagList = (flaglist) => {
 

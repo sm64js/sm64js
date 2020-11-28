@@ -985,6 +985,7 @@ export class n64GfxProcessor {
         this.customData3D = data.custom3D
         customData2D.chat = data.custom2D.chat
         customData2D.playerName = data.custom2D.playerName
+        customData2D.announcement = data.custom2D.announcement
     }
 
     run_dl(commands) {

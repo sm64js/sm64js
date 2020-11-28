@@ -519,7 +519,9 @@ require('uWebSockets.js').App().ws('/*', {
         const protocol = req.getHeader('sec-websocket-protocol')
         const extensions = req.getHeader('sec-websocket-extensions')
 
-        //res.onAborted(() => { console.log("!! aborted") })
+        res.onAborted(() => {
+            //console.log("!! aborted")
+        })
 
         if (process.env.PRODUCTION) {
 

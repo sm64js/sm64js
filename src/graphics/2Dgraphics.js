@@ -166,19 +166,21 @@ export const draw2Dpost3Drendering = () => {
             })
         }
     }
+
     if (gameData.marioState && window.playerInput.buttonDownTaunt) {
-			window.tauntOpened = true
-			const SELECTED = Taunt.getSelectedTaunt()
-			const wheelPos = Taunt.tauntsPosWheel[SELECTED]
-			context2d.drawImage(TauntWheel,Taunt.tcx-(Taunt.gfxTscale*0.5),Taunt.tcy-(Taunt.gfxTscale*0.5),Taunt.gfxTscale,Taunt.gfxTscale)
-			context2d.drawImage(Taunts[0].img,Taunt.tauntsPos[8][0],Taunt.tauntsPos[8][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
-			context2d.drawImage(Taunts[1].img,Taunt.tauntsPos[1][0],Taunt.tauntsPos[1][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
-			context2d.drawImage(Taunts[2].img,Taunt.tauntsPos[2][0],Taunt.tauntsPos[2][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
-			context2d.drawImage(Taunts[3].img,Taunt.tauntsPos[4][0],Taunt.tauntsPos[4][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
-			context2d.drawImage(Taunts[4].img,Taunt.tauntsPos[5][0],Taunt.tauntsPos[5][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
-			context2d.drawImage(Taunts[5].img,Taunt.tauntsPos[6][0],Taunt.tauntsPos[6][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
-			context2d.drawImage(TauntWheel,wheelPos[0],wheelPos[1],(Taunt.gfxTscaleICO*1.1),(Taunt.gfxTscaleICO*1.1))
-	}
+        window.tauntOpened = true
+        const SELECTED = Taunt.getSelectedTaunt()
+        const wheelPos = Taunt.tauntsPosWheel[SELECTED]
+        context2d.drawImage(TauntWheel,Taunt.tcx-(Taunt.gfxTscale*0.5),Taunt.tcy-(Taunt.gfxTscale*0.5),Taunt.gfxTscale,Taunt.gfxTscale)
+        context2d.drawImage(Taunts[0].img,Taunt.tauntsPos[8][0],Taunt.tauntsPos[8][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
+        context2d.drawImage(Taunts[1].img,Taunt.tauntsPos[1][0],Taunt.tauntsPos[1][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
+        context2d.drawImage(Taunts[2].img,Taunt.tauntsPos[2][0],Taunt.tauntsPos[2][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
+        context2d.drawImage(Taunts[3].img,Taunt.tauntsPos[4][0],Taunt.tauntsPos[4][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
+        context2d.drawImage(Taunts[4].img,Taunt.tauntsPos[5][0],Taunt.tauntsPos[5][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
+        context2d.drawImage(Taunts[5].img,Taunt.tauntsPos[6][0],Taunt.tauntsPos[6][1],Taunt.gfxTscaleICO,Taunt.gfxTscaleICO)
+        context2d.drawImage(TauntWheel,wheelPos[0],wheelPos[1],(Taunt.gfxTscaleICO*1.1),(Taunt.gfxTscaleICO*1.1))
+    }
+
     if (gameData.marioState && !window.playerInput.buttonDownTaunt && window.tauntOpened) {
 		window.tauntOpened = false
 		const TAUNT = Taunt.tauntsMap[Taunt.getSelectedTaunt()]

@@ -249,7 +249,7 @@ const processChat = async (channel_id, msg) => {
     const decodedMario = socket.decodedMario
     if (decodedMario == undefined) return
 
-    connectedIPs[socket.channel.ip].chatCooldown += 3 // seconds
+    connectedIPs[socket.channel.ip].chatCooldown += 5 // seconds
 
     /// record chat to DB
     db.get('chats').push({

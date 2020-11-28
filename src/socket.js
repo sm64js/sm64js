@@ -48,7 +48,8 @@ export const networkData = {
     playerInteractions: true,
     remotePlayers: {},
     myChannelID: -1,
-    lastSentSkinData: {}
+    lastSentSkinData: {},
+    announcement: { message: "", timer: 0 }
 }
 
 export const gameData = {}
@@ -86,6 +87,10 @@ const measureLatency = (msg) => {
     const startTime = msg.time
     const endTime = performance.now()
     window.latency = parseInt(endTime - startTime)
+}
+
+const recvAnnouncement = (msg) => {
+    networkData.announcement = msg
 }
 
 const recvChat = (chatmsg) => {
@@ -153,6 +158,7 @@ channel.onopen = () => {
                     case 'chat': recvChat(msg); break
                     case 'skin': Cosmetics.recvSkinData(msg); break
                     case 'ping': measureLatency(msg); break
+                    case 'announcement': recvAnnouncement(msg); break
                     default: throw "Unknown topic in json message"
                 }
                 break
@@ -224,6 +230,7 @@ const decrementChat = () => {
     Object.values(networkData.remotePlayers).forEach(data => {
         if (data.chatData && data.chatData.timer > 0) data.chatData.timer--
     })
+    if (networkData.announcement.timer > 0) networkData.announcement.timer--
 
     const myChat = window.myMario.chatData
     if (myChat && myChat.timer > 0) myChat.timer--

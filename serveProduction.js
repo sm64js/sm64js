@@ -158,11 +158,15 @@ const processAdminCommand = (msg) => {
         console.log("Admin authentication success")
     } else {
         console.log("Admin authentication fail - token not found: " + token)
+        return
     }
 
-    switch (parts) {
 
+    if (parts[1].toUpperCase() == "ANNOUNCEMENT") {
+        const remainingParts = parts.slice(2)
+        broadcastJsonWithTopic('announcement', { message: remainingParts.join(" "), timer: 300 })
     }
+
 }
 
 const processChat = async (channel_id, msg) => {
@@ -315,38 +319,40 @@ require('uWebSockets.js').App().ws('/*', {
                 const url = new URL(originHeader)
                 const domainStr = url.hostname.substring(url.hostname.length - 11, url.hostname.length)
                 if (domainStr != ".sm64js.com" && url.hostname != "sm64js.com") return res.writeStatus('418').end()
-            }
 
-            const ipStatus = db.get('ipList').find({ ip }).value()
 
-            if (ipStatus == undefined) {
+                const ipStatus = db.get('ipList').find({ ip }).value()
 
-                console.log("trying to hit vpn api")
-                const vpnCheckRequest = `http://v2.api.iphub.info/ip/${ip}`
-                const initApiReponse = await got(vpnCheckRequest, {
-                    headers: { 'X-Key': process.env.VPN_API_KEY }
-                })
-                const response = JSON.parse(initApiReponse.body)
+                if (ipStatus == undefined) {
 
-                if (response.block == undefined) {
-                    console.log("iphub reponse invalid")
-                    return res.writeStatus('500').end()
-                }
+                    console.log("trying to hit vpn api")
+                    const vpnCheckRequest = `http://v2.api.iphub.info/ip/${ip}`
+                    const initApiReponse = await got(vpnCheckRequest, {
+                        headers: { 'X-Key': process.env.VPN_API_KEY }
+                    })
+                    const response = JSON.parse(initApiReponse.body)
 
-                if (response.block == 1) {
-                    db.get('ipList').push({ ip, value: 'BANNED', reason: 'AutoVPN' }).write()
-                    console.log("Adding new VPN BAD IP " + ip)
+                    if (response.block == undefined) {
+                        console.log("iphub reponse invalid")
+                        return res.writeStatus('500').end()
+                    }
+
+                    if (response.block == 1) {
+                        db.get('ipList').push({ ip, value: 'BANNED', reason: 'AutoVPN' }).write()
+                        console.log("Adding new VPN BAD IP " + ip)
+                        return res.writeStatus('403').end()
+                    } else {
+                        console.log("Adding new Legit IP")
+                        db.get('ipList').push({ ip, value: 'ALLOWED' }).write()
+                    }
+
+                } else if (ipStatus.value == "BANNED") {  /// BANNED or NOT ALLOWED IP
+                    console.log("BANNED IP tried to connect")
                     return res.writeStatus('403').end()
-                } else {
-                    console.log("Adding new Legit IP")
-                    db.get('ipList').push({ ip, value: 'ALLOWED'}).write()
+                } else if (ipStatus.value == "ALLOWED") { /// Whitelisted IP - OKAY
+                    console.log("Known Whitelisted IP connecting")
                 }
 
-            } else if (ipStatus.value == "BANNED") {  /// BANNED or NOT ALLOWED IP
-                console.log("BANNED IP tried to connect")
-                return res.writeStatus('403').end()
-            } else if (ipStatus.value == "ALLOWED") { /// Whitelisted IP - OKAY
-                console.log("Known Whitelisted IP connecting")
             }
 
         } catch (e) {

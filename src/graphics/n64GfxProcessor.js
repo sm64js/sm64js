@@ -985,9 +985,28 @@ export class n64GfxProcessor {
         }
     }
 
+    custom_draw_message_bubble(text, fontsize, pixelX, pixelY, backgroundColor, backgroundAlpha, textColor, maxWidth) {
+        context2d.font = `bold ${fontsize}px verdana, sans-serif`
+        const width = context2d.measureText(text).width
+
+        context2d.fillStyle = backgroundColor
+        context2d.globalAlpha = backgroundAlpha
+        context2d.rect(pixelX - (width / 2) - 5, pixelY - 50, width + 10, 30)
+        context2d.fill()
+        context2d.globalCompositeOperation = 'source-over'
+
+        context2d.globalAlpha = 1.0
+        context2d.font = `bold ${fontsize}px verdana, sans-serif`
+        context2d.textAlign = "center"
+        context2d.fillStyle = textColor
+        if (maxWidth) context2d.fillText(text, pixelX, pixelY - 30, [maxWidth])
+        else context2d.fillText(text, pixelX, pixelY - 30)
+        context2d.globalCompositeOperation = 'destination-over'
+    }
+
     custom_draw_text(x, y, w) {
-        const pixelX = ((x / w) * 0.5 + 0.5) * canvas2d.width
-        const pixelY = ((y / w) * -0.5 + 0.5) * canvas2d.height
+        let pixelX = ((x / w) * 0.5 + 0.5) * canvas2d.width
+        let pixelY = ((y / w) * -0.5 + 0.5) * canvas2d.height
 
         if (this.customData.playerName) {
             context2d.globalAlpha = 0.8
@@ -998,22 +1017,12 @@ export class n64GfxProcessor {
         }
 
         if (this.customData.chat) {
-            context2d.font = "bold 16px verdana, sans-serif"
-            const width = context2d.measureText(this.customData.chat).width
+            this.custom_draw_message_bubble(this.customData.chat, "16", pixelX, pixelY, "#FFFFFF", 0.8, "#000000")
+        }
 
-            context2d.fillStyle = "#FFFFFF"
-            context2d.globalAlpha = 0.8
-            context2d.rect(pixelX - (width/2) - 5, pixelY - 50, width + 10, 30)
-            context2d.fill()
-            context2d.globalCompositeOperation = 'source-over'
-            
-
-            context2d.globalAlpha = 1.0
-            context2d.font = "bold 16px verdana, sans-serif"
-            context2d.textAlign = "center"
-            context2d.fillStyle = "#000000"
-            context2d.fillText(this.customData.chat, pixelX, pixelY - 30)
-            context2d.globalCompositeOperation = 'destination-over'
+        if (this.customData.announcement) {
+            this.custom_draw_message_bubble("Server Announcement", "20", 320, 60, "#FFFFFF", 1.0, "#9400D3")
+            this.custom_draw_message_bubble(this.customData.announcement, "18", 320, 90, "#FFFFFF", 1.0, "#9400D3", 640)
         }
         
 

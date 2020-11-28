@@ -185,7 +185,8 @@ export const getExtraRenderData = (channel_id) => {
         mario_boots_lights: window.myMario.skinData.boots,
         mario_skin_lights: window.myMario.skinData.skin,
         mario_hair_lights: window.myMario.skinData.hair,
-        chat: (myChat && myChat.timer > 0) ? myChat.msg : null
+        chat: (myChat && myChat.timer > 0) ? myChat.msg : null,
+        announcement: (networkData.announcement.timer > 0) ? networkData.announcement.message : null
     }
 
     const remoteMario = networkData.remotePlayers[channel_id].marioState
@@ -207,7 +208,8 @@ export const getExtraRenderData = (channel_id) => {
         mario_skin_lights: skin,
         mario_hair_lights: hair,
         playerName: remoteMario.playerName,
-        chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null
+        chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null,
+        announcement: (networkData.announcement.timer > 0) ? networkData.announcement.message : null
     }
 
 }

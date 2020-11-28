@@ -519,13 +519,13 @@ require('uWebSockets.js').App().ws('/*', {
         const protocol = req.getHeader('sec-websocket-protocol')
         const extensions = req.getHeader('sec-websocket-extensions')
 
-        res.onAborted(() => { console.log("!! aborted") })
+        //res.onAborted(() => { console.log("!! aborted") })
 
         if (process.env.PRODUCTION) {
 
             try {
 
-                console.log("someone trying to connect: " + ip)
+                //console.log("someone trying to connect: " + ip)
 
                 ///// check CORS
                 let originHeader = req.getHeader('origin')
@@ -537,7 +537,7 @@ require('uWebSockets.js').App().ws('/*', {
 
                 if (ipStatus == undefined) {
 
-                    console.log("trying to hit vpn api")
+                    //console.log("trying to hit vpn api")
                     const vpnCheckRequest = `http://v2.api.iphub.info/ip/${ip}`
                     const initApiReponse = await got(vpnCheckRequest, {
                         headers: { 'X-Key': process.env.VPN_API_KEY }
@@ -551,18 +551,18 @@ require('uWebSockets.js').App().ws('/*', {
 
                     if (response.block == 1) {
                         db.get('ipList').push({ ip, value: 'BANNED', reason: 'AutoVPN' }).write()
-                        console.log("Adding new VPN BAD IP " + ip)
+                       // console.log("Adding new VPN BAD IP " + ip)
                         return res.writeStatus('403').end()
                     } else {
-                        console.log("Adding new Legit IP")
+                        //console.log("Adding new Legit IP")
                         db.get('ipList').push({ ip, value: 'ALLOWED' }).write()
                     }
 
                 } else if (ipStatus.value == "BANNED") {  /// BANNED or NOT ALLOWED IP
-                    console.log("BANNED IP tried to connect")
+                    //console.log("BANNED IP tried to connect")
                     return res.writeStatus('403').end()
                 } else if (ipStatus.value == "ALLOWED") { /// Whitelisted IP - OKAY
-                    console.log("Known Whitelisted IP connecting")
+                    //console.log("Known Whitelisted IP connecting")
                 }
 
             } catch (e) {

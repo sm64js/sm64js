@@ -260,8 +260,8 @@ export const recvPlayerLists = (playerListsProto) => {
         for (let i = 0; i < mapSelecter.length; i++) {
             if (mapSelecter[i].value == roomKey) {
                 mapSelecter[i].innerHTML =
-                    `<p>${levelIdToName[roomKey]}</p> 
-                    <p id="meow"> - Online Players: ${roomProto.getValidplayersList().length}</p>`
+                    `<p style="color:blue">${levelIdToName[roomKey]}</p> 
+                     <p style="color:blue"> - Online Players: ${roomProto.getValidplayersList().length}</p>`
 
             }
         }

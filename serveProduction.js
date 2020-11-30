@@ -372,6 +372,9 @@ const sendSkinsToSocket = (socket) => {
 
     setTimeout(() => {
         const roomKey = socketIdsToRoomKeys[socket.my_id]
+        if (roomKey == undefined || clientsRoot[roomKey] == undefined) {
+            return  /// if they disconnect in this 500ms period
+        }
         /// Send Skins
         Object.entries(clientsRoot[roomKey]).forEach(([socket_id, data]) => {
             if (data.skinData) {

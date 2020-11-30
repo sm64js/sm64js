@@ -36,12 +36,7 @@ export const networkData = {
     mySocketID: -1,
     lastSentSkinData: {},
     announcement: { message: "", timer: 0 },
-    flagData: new Array(4).fill(0).map(() => {
-        return {
-            pos: [0, 0, 0],
-            linkedToPlayer: false
-        }
-    })
+    flagData: undefined // defined later
 }
 
 export const gameData = {}
@@ -141,6 +136,15 @@ const recvAnnouncement = (msg) => { networkData.announcement = msg }
 
 const recvFlagList = (flaglist) => {
 
+    if (networkData.flagData == undefined) {
+        networkData.flagData = new Array(flaglist.length).fill(0).map(() => {
+            return {
+                pos: [0, 0, 0],
+                linkedToPlayer: false
+            }
+        })
+    }
+
     flaglist.forEach((flag, i) => {
         networkData.flagData[i].pos = flag.getPosList()
         networkData.flagData[i].linkedToPlayer = flag.getLinkedtoplayer()
@@ -200,6 +204,8 @@ export const send_controller_update = (frame) => {
 }
 
 export const updateNetworkBeforeRender = () => {
+
+    if (networkData.flagData == undefined) return
 
     for (let i = 0; i < networkData.flagData.length; i++) {
         const flagSocketId = networkData.flagData[i].socketId
@@ -262,7 +268,7 @@ export const post_main_loop_one_iteration = (frame) => {
 
     decrementChat()
 
-    if (gameData.marioState) checkForFlagGrab()
+    if (gameData.marioState && networkData.flagData != undefined) checkForFlagGrab()
 }
 
 const checkForFlagGrab = () => {

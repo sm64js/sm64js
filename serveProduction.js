@@ -8,7 +8,6 @@ const deflate = util.promisify(zlib.deflate)
 const port = 80
 const ws_port = 3000
 
-
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
 
@@ -99,25 +98,41 @@ const sendValidUpdate = () => {
 
 }
 
-const allowedLevelRooms = [ 1000, 16, 9, 5, 27, 36, 24 ]  // client selectable levels
-const flagStarts = [
-    [9380, 7657, -8980],
-    [-5126, 3678, 10106],
-    [-14920, 3800, -8675],
-    [12043, 3000, 10086]
-]
+const allowedLevelRooms = [1000, 16, 9, 5, 27, 36, 24]  // client selectable levels
 
-const flagData = new Array(flagStarts.length).fill(0).map((unused, i) => {
-    return {
-        pos: [...flagStarts[i]],
-        linkedToPlayer: false,
-        atStartPosition: true,
-        socketID: null,
-        idleTimer: 0,
-        heightBeforeFall: 20000
-    }
-})
+/*1000: "Mushroom Battlefield",
+16: "Castle Grounds",
+9: "Bob-omb Battlefield",
+5: "Cool, Cool Mountain",
+27: "Princess's Secret Slide",
+36: "Tall, Tall Mountain",
+24: "Whomps Fortress"*/
 
+const flagStarts = {
+    1000: [[9380, 7657, -8980],
+           [-5126, 3678, 10106],
+           [-14920, 3800, -8675],
+           [12043, 3000, 10086]],
+    16: [[0, 3657, 0]],
+    9: [[-2384, 260, 6203]],
+    5: [[0, 7657, 0]],
+    27: [[0, 7657, 0]],
+    36: [[0, 7657, 0]],
+    24: [[0, 7657, 0]]
+}
+
+const flagData = Object.fromEntries(Object.keys(flagStarts).map((key) => {
+    return [ key, new Array(flagStarts[key].length).fill(0).map((_, i) => {
+        return {
+            pos: [...flagStarts[key][i]],
+            linkedToPlayer: false,
+            atStartPosition: true,
+            socketID: null,
+            idleTimer: 0,
+            heightBeforeFall: 20000
+        }
+    })]
+}))
 
 const processPlayerData = (socket_id, decodedMario) => {
 
@@ -415,16 +430,18 @@ const processBasicAttack = (attackerID, attackMsg) => {
     const flagIndex = attackMsg.getFlagId()
     const targetId = attackMsg.getTargetSocketId()
 
-    if (flagData[flagIndex].linkedToPlayer && flagData[flagIndex].socketID == targetId) {
-        flagData[flagIndex].linkedToPlayer = false
-        flagData[flagIndex].socketID = null
-        flagData[flagIndex].fallmode = true
+    const theFlag = flagData[roomKey][flagIndex]
+
+    if (theFlag.linkedToPlayer && theFlag.socketID == targetId) {
+        theFlag.linkedToPlayer = false
+        theFlag.socketID = null
+        theFlag.fallmode = true
         const newFlagLocation = clientData.decodedMario.getPosList()
         newFlagLocation[0] += ((Math.random() * 1000.0) - 500.0)
         newFlagLocation[1] += 600
         newFlagLocation[2] += ((Math.random() * 1000.0) - 500.0)
-        flagData[flagIndex].heightBeforeFall = newFlagLocation[1]
-        flagData[flagIndex].pos = [parseInt(newFlagLocation[0]), parseInt(newFlagLocation[1]), parseInt(newFlagLocation[2])]
+        theFlag.heightBeforeFall = newFlagLocation[1]
+        theFlag.pos = [parseInt(newFlagLocation[0]), parseInt(newFlagLocation[1]), parseInt(newFlagLocation[2])]
     }
 
 }
@@ -439,65 +456,69 @@ const processGrabFlagRequest = (socket_id, grabFlagMsg) => {
 
     const i = grabFlagMsg.getFlagId()
 
-    if (flagData[i].linkedToPlayer) return
+    const theFlag = flagData[roomKey][i]
+
+    if (theFlag.linkedToPlayer) return
 
     const pos = grabFlagMsg.getPosList()
 
-    const xDiff = pos[0] - flagData[i].pos[0]
-    const zDiff = pos[2] - flagData[i].pos[2]
+    const xDiff = pos[0] - theFlag.pos[0]
+    const zDiff = pos[2] - theFlag.pos[2]
 
     const dist = Math.sqrt(xDiff * xDiff + zDiff * zDiff)
     if (dist < 50) {
-        flagData[i].linkedToPlayer = true
-        flagData[i].fallmode = false
-        flagData[i].atStartPosition = false
-        flagData[i].socketID = socket_id
-        flagData[i].idleTimer = 0
+        theFlag.linkedToPlayer = true
+        theFlag.fallmode = false
+        theFlag.atStartPosition = false
+        theFlag.socketID = socket_id
+        theFlag.idleTimer = 0
     }
 }
 
 const checkForFlag = (socket_id) => {
 
-    for (let i = 0; i < flagData.length; i++) {
-        if (flagData[i].socketID == socket_id) {
+    Object.entries(flagData).forEach(([roomKey, flagRoom]) => {
+        flagRoom.forEach((flag, flagIndex) => {
+            if (flag.socketID == socket_id) {
+                const roomKey = socketIdsToRoomKeys[socket_id]
+                if (roomKey == undefined) return
 
-            const roomKey = socketIdsToRoomKeys[socket_id]
-            if (roomKey == undefined) break
+                const clientData = clientsRoot[roomKey][socket_id]
+                if (clientData == undefined) return
 
-            const clientData = clientsRoot[roomKey][socket_id]
-            if (clientData == undefined) break
+                flag.linkedToPlayer = false
+                flag.socketID = null
+                flag.fallmode = true
+                const newFlagLocation = clientData.decodedMario.getPosList()
+                newFlagLocation[1] += 100
+                flag.heightBeforeFall = newFlagLocation[1]
+                flag.pos = [parseInt(newFlagLocation[0]), parseInt(newFlagLocation[1]), parseInt(newFlagLocation[2])]
+            }
 
-            flagData[i].linkedToPlayer = false
-            flagData[i].socketID = null
-            flagData[i].fallmode = true
-            const newFlagLocation = clientData.decodedMario.getPosList()
-            newFlagLocation[1] += 100
-            flagData[i].heightBeforeFall = newFlagLocation[1]
-            flagData[i].pos = [parseInt(newFlagLocation[0]), parseInt(newFlagLocation[1]), parseInt(newFlagLocation[2])]
-        }
-    }
+        })
+    })
 
 }
 
 const serverSideFlagUpdate = () => {
 
-    for (let i = 0; i < flagData.length; i++) {
-
-        if (flagData[i].fallmode) {
-            if (flagData[i].pos[1] > -10000) flagData[i].pos[1] -= 2
-        }
-
-        if (!flagData[i].linkedToPlayer && !flagData[i].atStartPosition) {
-            flagData[i].idleTimer++
-            if (flagData[i].idleTimer > 3000) {
-                flagData[i].pos = [...flagStarts[i]]
-                flagData[i].fallmode = false
-                flagData[i].atStartPosition = true
-                flagData[i].idleTimer = 0
+    Object.entries(flagData).forEach(([roomKey, flagRoom]) => {
+        flagRoom.forEach((flag, flagIndex) => {
+            if (flag.fallmode) {
+                if (flag.pos[1] > -10000) flag.pos[1] -= 2
             }
-        }
 
-    }
+            if (!flag.linkedToPlayer && !flag.atStartPosition) {
+                flag.idleTimer++
+                if (flag.idleTimer > 3000) {
+                    flag.pos = [...flagStarts[roomKey][flagIndex]]
+                    flag.fallmode = false
+                    flag.atStartPosition = true
+                    flag.idleTimer = 0
+                }
+            }
+        })
+    })
 
 }
 
@@ -524,13 +545,14 @@ setInterval(async () => {
 
         const flagProtoList = []
 
-        for (let i = 0; i < flagData.length; i++) {
+        for (let i = 0; i < flagData[roomKey].length; i++) {
+            const theFlag = flagData[roomKey][i]
             const flagmsg = new FlagMsg()
-            flagmsg.setLinkedtoplayer(flagData[i].linkedToPlayer)
-            if (flagData[i].linkedToPlayer) flagmsg.setSocketid(flagData[i].socketID)
+            flagmsg.setLinkedtoplayer(theFlag.linkedToPlayer)
+            if (theFlag.linkedToPlayer) flagmsg.setSocketid(theFlag.socketID)
             else {
-                flagmsg.setPosList(flagData[i].pos)
-                flagmsg.setHeightBeforeFall(flagData[i].heightBeforeFall)
+                flagmsg.setPosList(theFlag.pos)
+                flagmsg.setHeightBeforeFall(theFlag.heightBeforeFall)
             }
             flagProtoList.push(flagmsg)
         }

@@ -16,7 +16,7 @@ const defImage = (w,h,path) => {
 // Minimap Images - First number is the selected map and the table contains the image and player scale.
 const Minimaps = {
 	'm1000':{'img':defImage(401,401,'mini/minimaps/bob_mountain.png'),'playerScaler':1.0,'hasFlags':true},
-	'm9':{'img':defImage(401,401,'mini/minimaps/bob_battlefield.png'),'playerScaler':1.82819,'hasFlags':false},
+	'm9':{'img':defImage(401,401,'mini/minimaps/bob_battlefield.png'),'playerScaler':1.82819,'hasFlags':true},
 }
 // Example: Minimaps[`m${window.selectedMap}`].img would return '1000's table on bob mount and '9's table on bob battlefield
 const Player_Img = new Image(14, 14); Player_Img.src = 'mini/player.png'
@@ -176,8 +176,9 @@ export const draw2Dpost3Drendering = () => {
         drawMinimapIconRotation(Player_Img, 5, 5, m.pos[0]*marScale, m.pos[2]*marScale, scale, miniScale, yaw)
      
         if (window.show_minimap > 1 && Minimaps[`m${window.selectedMap}`].hasFlags) {
-            flagIcons.forEach((flagIcon, i) => {
-                drawFlag(flagIcon, 5, 5, networkData.flagData[i].pos[0]*marScale, networkData.flagData[i].pos[2]*marScale, scale, miniScale)
+            networkData.flagData.forEach((flag, i) => {
+                const flagIcon = flagIcons[i]
+                drawFlag(flagIcon, 5, 5, flag.pos[0] * marScale, flag.pos[2] * marScale, scale, miniScale)
             })
         }
     }

@@ -230,22 +230,20 @@ const applyValidCharacters = (str) => {
 }
 
 
-const processAdminCommand = (msg, token) => {
+const processAdminCommand = (msg, token, roomKey) => {
     const parts = msg.split(' ')
     const command = parts[0].toUpperCase()
     const remainingParts = parts.slice(1)
-
-    let args
+    const args = remainingParts.join(" ")
 
     switch (command) {
         case "ANNOUNCEMENT":
-            args = remainingParts.join(" ")
-            broadcastJsonWithTopic('announcement', { message: remainingParts.join(" "), timer: 300 })
+            broadcastJsonWithTopic('announcement', { message: remainingParts.join(" "), timer: 300 }, roomKey)
             break
         default:  return console.log("Unknown Admin Command: " + parts[0])
     }
 
-    db.get('adminCommands').push({ token, timestampMs: Date.now(), command, args }).write()
+    db.get('adminCommands').push({ token, roomKey, timestampMs: Date.now(), command, args }).write()
 }
 
 const processChat = async (socket_id, msg) => {
@@ -272,7 +270,7 @@ const processChat = async (socket_id, msg) => {
     const isAdmin = adminTokens.includes(msg.adminToken)
 
     if (msg.message[0] == '/') {
-        if (isAdmin) processAdminCommand(msg.message.slice(1), msg.adminToken)
+        if (isAdmin) processAdminCommand(msg.message.slice(1), msg.adminToken, roomKey)
         return
     }
 

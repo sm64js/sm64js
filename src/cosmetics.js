@@ -195,10 +195,12 @@ export const recvPlayerNameResponse = (msg) => {
     }
     if (msg.accepted) {
         document.getElementById("playerNameInput").style.borderColor = "blue"
+        document.getElementById("playerNameInput").disabled = true
+        document.getElementById("playerNameInput").style.backgroundColor = "lightgrey"
         document.getElementById("playerNameResult").style.color = "#00ff00"
         document.getElementById("playerNameResult").innerHTML = "Accepted"
-        document.getElementById("playerNameInput").disabled = true
         document.getElementById("playerNameButton").hidden = true
+        document.getElementById("mapSelect").disabled = true
         window.playerNameAccepted = true
         localStorage['playername'] = msg.playerName
     }

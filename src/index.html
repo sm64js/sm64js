@@ -121,32 +121,27 @@
             <div id="playerNameRow" class="row" style="justify-content:center; margin-top: 10px;">
                 <form class="form-inline" id="playerNameForm">
                     <div class="form-group mb-2">
-                      <label type="text" readonly class="col-form-label">Enter Player Name</label>
+                        <label type="text" readonly class="col-form-label" style="color:skyblue">Choose Name and Map: </label>
                     </div>
-                    <div class="form-group mx-sm-3 mb-2">
-                        <input id="playerNameInput" type="text" class="form-control" minlength="3" maxlength="14" placeholder="enter name" onchange="window.updatePlayerName(this.value)">
-                    </div>
-                    <button id="playerNameButton" type="submit" class="btn btn-success mb-2">Submit</button>
                     <div class="form-group mb-2">
-                        <label id="playerNameResult" type="text" readonly class="col-form-label" style="margin-left:15px; font-weight: bold;" >Waiting for name</label>
+                        <input id="playerNameInput" type="text"  style="margin-left: 15px; max-width: 120px" class="form-control-sm" minlength="3" maxlength="14" placeholder="enter name" onchange="window.updatePlayerName(this.value)">
                     </div>
-                  </form>
-            </div>
-            <div hidden class="row" style="justify-content:center; padding-top:5px">
-                <div class="col-3">
-                    <h5 style="color:skyblue;padding-top:2px"> Select Map: </h5>
-                </div>
-                <div class="col-3">
-                    <select id="mapSelect" class="form-control form-control-sm">
-                        <option>Castle Grounds</option>
-                        <option>Bob-omb Battlefield</option>
-                        <option>Cool, Cool Mountain</option>
-                        <option>Princess's Secret Slide</option>
-                        <option>Tall, Tall Mountain</option>
-                        <option>Whomps Fortress</option>
-                    </select>
-                </div>
-
+                    <div class="form-group mb-2" style="margin-left:15px;">
+                        <select id="mapSelect" class="form-control form-control-sm">
+                            <option>Mushroom Battlefield</option>
+                            <option>Castle Grounds</option>
+                            <option>Bob-omb Battlefield</option>
+                            <option>Cool, Cool Mountain</option>
+                            <option>Princess's Secret Slide</option>
+                            <option>Tall, Tall Mountain</option>
+                            <option>Whomps Fortress</option>
+                        </select>
+                    </div>
+                    <button id="playerNameButton" type="submit" class="btn btn-success mb-2" style="margin-left:15px;">Submit</button>
+                    <div class="form-group mb-2" style="margin-left:15px;">
+                        <label id="playerNameResult" type="text" readonly class="col-form-label"  font-weight: bold;">Waiting for name</label>
+                    </div>
+                </form>
             </div>
 
             <br />

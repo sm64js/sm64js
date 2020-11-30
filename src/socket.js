@@ -4,6 +4,7 @@ import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
 import { updateFlagData, setInitFlagHeight } from "./game/behaviors/bhv_castle_flag_init.inc"
 import { recvChat, decrementChat } from "./chat"
+import { getSelectedLevel } from "./utils"
 
 Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
 
@@ -303,9 +304,10 @@ export const sendPlayerInteraction = (channel_id, interaction) => {
 
 
 export const submitPlayerName = () => {
+    const level = getSelectedLevel()
     const name = document.getElementById("playerNameInput").value
     if (name.length >= 3) {
-        sendJsonWithTopic('playerName', name)
+        sendJsonWithTopic('playerName', { name, level })
     }
 }
 

@@ -283,16 +283,17 @@ const processChat = async (channel_id, msg) => {
 
 }
 
-const processPlayerName = async (channel_id, msg) => {
+const processPlayerName = async (channel_id, msgJson) => {
+    const { name, level } = msgJson
     const socket = allChannels[channel_id]
     if (socket == undefined) return
-    if (socket.playerName != undefined || msg.length < 3 || msg.length > 14 || msg == "server")  {
+    if (socket.playerName != undefined || name.length < 3 || name.length > 14 || name == "server")  {
         return rejectPlayerName(socket.channel)
     }
 
-    const sanitizedName = sanitizeChat(msg)
+    const sanitizedName = sanitizeChat(name)
 
-    if (sanitizedName != msg) {
+    if (sanitizedName != name) {
         return rejectPlayerName(socket.channel)
     }
 
@@ -519,9 +520,7 @@ require('uWebSockets.js').App().ws('/*', {
         const protocol = req.getHeader('sec-websocket-protocol')
         const extensions = req.getHeader('sec-websocket-extensions')
 
-        res.onAborted(() => {
-            //console.log("!! aborted")
-        })
+        res.onAborted(() => {})
 
         if (process.env.PRODUCTION) {
 

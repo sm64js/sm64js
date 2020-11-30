@@ -406,7 +406,7 @@ class GeoRenderer {
                         MarioMisc.parachuting = (object.marioState.parachuting) && object.marioState.vel[1] < 0.0
                         MarioMisc.customCapState = window.myMario.skinData.customCapState
                         //// sending my own custom gfx opcode to set skin id
-                        this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.myChannelID)], 1) 
+                        this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.mySocketID)], 1) 
                     }
 
                     this.gCurGraphNodeObject = node.wrapper
@@ -480,12 +480,12 @@ class GeoRenderer {
         if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) {
 
             //// sending my own custom gfx opcode to set skin id and playerName
-            const remote_channel_id = object.marioState.channel_id
-            this.geo_append_display_list([Gbi.gsSetPlayerData(remote_channel_id)], 1)
+            const remote_socket_id = object.marioState.socket_id
+            this.geo_append_display_list([Gbi.gsSetPlayerData(remote_socket_id)], 1)
 
             this.gCurGraphNodeObject = object.header.gfx
             MarioMisc.gBodyState = object.marioState.marioBodyState
-            MarioMisc.customCapState = networkData.remotePlayers[remote_channel_id].skinData.customCapState
+            MarioMisc.customCapState = networkData.remotePlayers[remote_socket_id].skinData.customCapState
 
             MarioMisc.parachuting = object.marioState.parachuting && object.marioState.vel[1] < 0.0
             this.geo_process_single_node(object.header.gfx.sharedChild)

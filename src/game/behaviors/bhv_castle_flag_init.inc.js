@@ -13,7 +13,7 @@ export const bhv_castle_flag_init = () => {
 
 export const setInitFlagHeight = (initHeight, i) => {
 
-    if (flagObjects[i] == undefined) throw "error - set initFlagHeight before flag object initialized"
+    if (flagObjects[i] == undefined) return
 
     flagObjects[i].prevHeight = initHeight
 }

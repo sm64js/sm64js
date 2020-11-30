@@ -203,15 +203,19 @@ export const recvPlayerNameResponse = (msg) => {
         document.getElementById("mapSelect").disabled = true
         window.playerNameAccepted = true
         localStorage['playername'] = msg.playerName
+
+        window.selectedMap = msg.level
     }
 }
 
-export const recvSkinData = (msg) => { 
-    if (msg.channel_id != networkData.mySocketID &&
-        networkData.remotePlayers[msg.channel_id] == undefined) return
+export const recvSkinData = (msg) => {
 
-    networkData.remotePlayers[msg.channel_id].skinData = msg.skinData
-    networkData.remotePlayers[msg.channel_id].playerName = msg.playerName
+    const socket_id = parseInt(msg.socket_id)
+    if (socket_id == networkData.mySocketID) return
+    if (networkData.remotePlayers[socket_id] == undefined) return
+
+    networkData.remotePlayers[msg.socket_id].skinData = msg.skinData
+    networkData.remotePlayers[msg.socket_id].playerName = msg.playerName
 }
 
 export const validSkins = () => {
@@ -246,12 +250,12 @@ export const validSkins = () => {
 
 }
 
-export const getExtraRenderData = (channel_id) => {
+export const getExtraRenderData = (socket_id) => {
 
     const myChat = window.myMario.chatData
 
     //// Local Mario
-    if (channel_id == networkData.myChannelID) return {
+    if (socket_id == networkData.mySocketID) return {
         custom3D: {
             mario_overalls_lights: (window.myMario.skinData.overalls == "r" ? rainbowLights : window.myMario.skinData.overalls),
             mario_hat_lights: (window.myMario.skinData.hat == "r" ? rainbowLights : window.myMario.skinData.hat),
@@ -267,7 +271,7 @@ export const getExtraRenderData = (channel_id) => {
         }
     }
 
-    const remote = networkData.remotePlayers[channel_id]
+    const remote = networkData.remotePlayers[socket_id]
 
     const remoteChat = remote.chatData
     const overalls = remote.skinData.overalls

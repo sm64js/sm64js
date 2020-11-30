@@ -28,15 +28,12 @@ if (url.protocol == "https:") {
     websocketServerPath = `ws://${url.hostname}:3000`
 }
 
-const channel = new WebSocket(websocketServerPath)
-
-
-
+const socket = new WebSocket(websocketServerPath)
 
 export const networkData = {
     playerInteractions: true,
     remotePlayers: {},
-    myChannelID: -1,
+    mySocketID: -1,
     lastSentSkinData: {},
     announcement: { message: "", timer: 0 },
     flagData: new Array(4).fill(0).map(() => {
@@ -54,10 +51,10 @@ const sendJsonWithTopic = (topic, msg) => {
     let bytes = text.encoder.encode(str)
     const rootMsg = new RootMsg()
     rootMsg.setJsonBytesMsg(bytes)
-    channel.send(rootMsg.serializeBinary())
+    socket.send(rootMsg.serializeBinary())
 }
 
-const sendData = (bytes) => { channel.send(bytes) }
+const sendData = (bytes) => { socket.send(bytes) }
 
 const text = {
     decoder: new TextDecoder(),
@@ -86,9 +83,9 @@ const measureLatency = (msg) => {
 
 
 
-channel.onopen = () => {
+socket.onopen = () => {
 
-    channel.onmessage = async (message) => {
+    socket.onmessage = async (message) => {
 
         let sm64jsMsg
         let bytes = new Uint8Array(await message.data.arrayBuffer())
@@ -102,8 +99,8 @@ channel.onopen = () => {
                     //case 2: recvBasicAttack(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
                     //case 3: if (multiplayerReady()) Multi.recvControllerUpdate(msgBytes); break
                     //case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
-                    case Sm64JsMsg.MessageCase.VALID_PLAYERS_MSG:
-                        Multi.recvValidPlayers(sm64jsMsg.getValidPlayersMsg())
+                    case Sm64JsMsg.MessageCase.PLAYER_LISTS_MSG:
+                        Multi.recvPlayerLists(sm64jsMsg.getPlayerListsMsg())
                         break
                     //case 99: measureAndPrintLatency(bytes.slice(1)); break
                     default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
@@ -122,7 +119,7 @@ channel.onopen = () => {
                 const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
                 const { topic, msg } = JSON.parse(str)
                 switch (topic) {
-                    case 'id': networkData.myChannelID = msg.id; break
+                    case 'id': networkData.mySocketID = msg.id; break
                     case 'chat': recvChat(msg); break
                     case 'skin': Cosmetics.recvSkinData(msg); break
                     case 'ping': measureLatency(msg); break
@@ -137,7 +134,7 @@ channel.onopen = () => {
         }
     }
 
-    channel.onclose = () => { window.latency = null }
+    socket.onclose = () => { window.latency = null }
 }
 
 const recvAnnouncement = (msg) => { networkData.announcement = msg }
@@ -181,13 +178,13 @@ export const sendAttackToServer = (targetMarioID) => {
 
 
 const multiplayerReady = () => {
-    return channel && channel.readyState == 1 && gameData.marioState && networkData.myChannelID != -1
+    return socket && socket.readyState == 1 && gameData.marioState && networkData.mySocketID != -1
 }
 
 const updateConnectedMsg = () => {
     const elem = document.getElementById("connectedMsg")
     const numPlayers = networkData.numOnline ? networkData.numOnline : "?"
-    if (channel && channel.readyState == 1) {
+    if (socket && socket.readyState == 1) {
         elem.innerHTML = "Connected To Server  -  " + (numPlayers).toString() + " Players Online" 
         elem.style.color = "lawngreen"
     } else {
@@ -209,7 +206,7 @@ export const updateNetworkBeforeRender = () => {
 
         if (networkData.flagData[i].linkedToPlayer) { /// someone has the flag
             let newflagpos, angleForFlag
-            if (flagSocketId == networkData.myChannelID) { /// I have the flag
+            if (flagSocketId == networkData.mySocketID) { /// I have the flag
                 const m = gameData.marioState
                 newflagpos = [...m.pos]
                 angleForFlag = m.faceAngle[1]
@@ -235,6 +232,11 @@ export const post_main_loop_one_iteration = (frame) => {
     if (frame % 30 == 0) updateConnectedMsg()
 
     if (multiplayerReady()) {
+
+        if (!networkData.requestedInitData) {
+            sendJsonWithTopic('getInitSkinData', { })
+            networkData.requestedInitData = true
+        }
 
         if (frame % 150 == 0) { //every 5 seconds
             /// ping to measure latency
@@ -268,7 +270,7 @@ const checkForFlagGrab = () => {
     //// check all flags to see if linked to local mario, and skip this function
     for (let i = 0; i < networkData.flagData.length; i++) {
         const flagSocketId = networkData.flagData[i].socketId
-        if (networkData.flagData[i].linkedToPlayer && flagSocketId == networkData.myChannelID) return
+        if (networkData.flagData[i].linkedToPlayer && flagSocketId == networkData.mySocketID) return
     }
 
     const m = gameData.marioState
@@ -298,8 +300,8 @@ const checkForFlagGrab = () => {
     
 }
 
-export const sendPlayerInteraction = (channel_id, interaction) => {
-    //channel.emit('playerInteract', { channel_id, interaction }, { reliable: true })
+export const sendPlayerInteraction = (socket_id, interaction) => {
+    //socket.emit('playerInteract', { socket_id, interaction }, { reliable: true })
 }
 
 

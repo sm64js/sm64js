@@ -13,7 +13,7 @@ message Sm64JsMsg {
 	oneof message {
 		MarioListMsg list_msg = 1;
 		MarioMsg mario_msg = 2;
-		ValidPlayersMsg valid_players_msg = 3;
+		PlayerListsMsg player_lists_msg = 3;
 		AttackMsg attack_msg = 4;
 		GrabFlagMsg grab_msg = 5;
 		/*ControllerMsg controller_msg = 6;
@@ -67,7 +67,7 @@ message MarioMsg {
 	float forwardVel = 17;
 	repeated sint32 rawData = 18;
 	uint32 usedObjID = 19;
-	uint32 channelID = 20;
+	uint32 socketID = 20;
 	bool parachuting = 21;
 }
 
@@ -78,9 +78,14 @@ message ControllerMsg {
 	uint32 buttonDown = 4;
 	uint32 buttonPressed = 5;
 	sint32 cameraYaw = 6;
-	uint32 channelID = 7;
+	uint32 socketID = 7;
+}
+
+message PlayerListsMsg {
+	repeated ValidPlayersMsg room = 1;
 }
 
 message ValidPlayersMsg {
-	repeated uint32 validPlayers = 1;
+	uint32 room_key = 1;
+	repeated uint32 validPlayers = 2;
 }

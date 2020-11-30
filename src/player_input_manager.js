@@ -383,7 +383,7 @@ export const playerInputUpdate = () => {
 
         buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap, buttonDownTaunt,
 
-        taunt: window.taunt
+        taunt: (Object.values(tauntsMap).includes(window.taunt)) ? window.taunt : undefined
     }
 
     window.taunt = undefined

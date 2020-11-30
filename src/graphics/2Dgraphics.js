@@ -1,5 +1,4 @@
 import { networkData, gameData } from "../socket"
-import { oFaceAngleYaw } from "../include/object_constants"
 import * as Taunt from "./taunt"
 
 const canvas2d = document.querySelector('#textCanvas')
@@ -31,7 +30,11 @@ const Taunts = [
 	{'img':defImage(32,32,'mini/taunts/shock.png'),'taunt':'!taunt-shock'},
 	{'img':defImage(32,32,'mini/taunts/magic.png'),'taunt':'!taunt-magic'}
 ]
-const TauntWheel = defImage(128,128,'mini/tauntWheel.png')
+const TauntWheel = defImage(128, 128, 'mini/tauntWheel.png')
+
+const minimapEnabledLevel = () => {
+    return window.selectedMap == 1000
+}
 
 const getFlagColor = (i) => {
 	switch (i) {
@@ -80,6 +83,8 @@ const custom_draw_message_bubble = (text, fontsize, pixelX, pixelY, backgroundCo
 
 export const custom_draw_text = (x, y, w) => {
 
+    context2d.save()
+
     const pixelX = ((x / w) * 0.5 + 0.5) * canvas2d.width
     const pixelY = ((y / w) * -0.5 + 0.5) * canvas2d.height
 
@@ -99,6 +104,8 @@ export const custom_draw_text = (x, y, w) => {
         custom_draw_message_bubble("Server Announcement:", "20", 320, 60, "#FFFFFF", 1.0, "#9400D3")
         custom_draw_message_bubble(customData2D.announcement, "18", 320, 90, "#FFFFFF", 1.0, "#9400D3", 640)
     }
+
+    context2d.restore()
 
 }
 
@@ -142,7 +149,10 @@ export const draw2Dpost3Drendering = () => {
         context2d.fillStyle = "#9400D3"
         context2d.fillText(`fps: ${window.fps}`, 580, 40)
     }
-    if (window.show_minimap > 0 && gameData.marioState) {
+
+    if (window.show_minimap > 0 && gameData.marioState && minimapEnabledLevel()) {
+        context2d.globalAlpha = 0.8
+
         var scale = 0.25 + window.show_minimap
         var miniScale = 0.00385
         context2d.drawImage(Minimap_Img, 16, 16, 128 * scale, 128 * scale)

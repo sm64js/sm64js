@@ -843,11 +843,11 @@ export const gsDPSetPrimColor = (m, l, r, g, b, a) => {
     }
 }
 
-export const gsSetPlayerData = (channel_id) => {
+export const gsSetPlayerData = (socket_id) => {
     return {
         words: {
             w0: G_SETPLAYERDATA,
-            w1: { channel_id }
+            w1: { socket_id }
         }
     }
 }

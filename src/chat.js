@@ -20,8 +20,8 @@ const blockChatExtended = (str) => {
 
 export const recvChat = (chatmsg) => {
 
-    if (chatmsg.channel_id != networkData.myChannelID &&
-        networkData.remotePlayers[chatmsg.channel_id] == undefined) return
+    if (chatmsg.socket_id != networkData.mySocketID &&
+        networkData.remotePlayers[chatmsg.socket_id] == undefined) return
 
     if (window.banPlayerList.includes(chatmsg.sender) || blockChatExtended(chatmsg.sender)) return
 
@@ -45,10 +45,10 @@ export const recvChat = (chatmsg) => {
     }
 
     let someobject
-    if (chatmsg.channel_id == networkData.myChannelID)
+    if (chatmsg.socket_id == networkData.mySocketID)
         someobject = window.myMario
     else
-        someobject = networkData.remotePlayers[chatmsg.channel_id]
+        someobject = networkData.remotePlayers[chatmsg.socket_id]
 
     Object.assign(someobject, { chatData: { msg: chatmsg.msg, timer: 150 } })
 

@@ -980,8 +980,8 @@ export class n64GfxProcessor {
         }
     }
 
-    custom_set_player_data(channel_id) { 
-        const data = getExtraRenderData(channel_id)
+    custom_set_player_data(socket_id) { 
+        const data = getExtraRenderData(socket_id)
         this.customData3D = data.custom3D
         customData2D.chat = data.custom2D.chat
         customData2D.playerName = data.custom2D.playerName
@@ -1063,7 +1063,7 @@ export class n64GfxProcessor {
                     this.dp_fill_rectangle(args.ulx, args.uly, args.lrx, args.lry)
                     break
                 case Gbi.G_SETPLAYERDATA:
-                    this.custom_set_player_data(args.channel_id)
+                    this.custom_set_player_data(args.socket_id)
                     break
                 case Gbi.G_SETFLAGINDEX:
                     flagCounter.data = args.flagIndex

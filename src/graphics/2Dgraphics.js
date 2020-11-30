@@ -13,8 +13,12 @@ const defImage = (w,h,path) => {
 	return IMG
 }
 
-// Minimap Stuff ~0x2480
-const Minimap_Img = new Image(535, 535); Minimap_Img.src = 'mini/bob_mountain.png'
+// Minimap Images - First number is the selected map and the table contains the image and player scale.
+const Minimaps = {
+	'm1000':{'img':defImage(401,401,'mini/minimaps/bob_mountain.png'),'playerScaler':1.0,'hasFlags':true},
+	'm9':{'img':defImage(401,401,'mini/minimaps/bob_battlefield.png'),'playerScaler':1.82819,'hasFlags':false},
+}
+// Example: Minimaps[`m${window.selectedMap}`].img would return '1000's table on bob mount and '9's table on bob battlefield
 const Player_Img = new Image(14, 14); Player_Img.src = 'mini/player.png'
 const PlayerRemote_Img = new Image(14, 14); PlayerRemote_Img.src = 'mini/player_remote.png'
 const PlayerRemote_lower_Img = new Image(14, 14); PlayerRemote_lower_Img.src = 'mini/player_remote_lower.png'
@@ -33,7 +37,7 @@ const Taunts = [
 const TauntWheel = defImage(128, 128, 'mini/tauntWheel.png')
 
 const minimapEnabledLevel = () => {
-    return window.selectedMap == 1000
+    return Minimaps.[`m${window.selectedMap}`] != null
 }
 
 const getFlagColor = (i) => {
@@ -154,25 +158,26 @@ export const draw2Dpost3Drendering = () => {
         context2d.globalAlpha = 0.8
 
         var scale = 0.25 + window.show_minimap
+		var marScale = Minimaps[`m${window.selectedMap}`].playerScaler
         var miniScale = 0.00385
-        context2d.drawImage(Minimap_Img, 16, 16, 128 * scale, 128 * scale)
+        context2d.drawImage(Minimaps[`m${window.selectedMap}`].img, 16, 16, 128 * scale, 128 * scale)
         Object.values(networkData.remotePlayers).forEach(data => { /// all remote marios - should just be dots
             const m = data.marioState
 			if (m.pos[1] < gameData.marioState.pos[1] - 200) {
-				drawMinimapIcon(PlayerRemote_lower_Img, 5, 5, m.pos[0], m.pos[2], scale, miniScale)
+				drawMinimapIcon(PlayerRemote_lower_Img, 5, 5, m.pos[0]*marScale, m.pos[2]*marScale, scale, miniScale)
 			} else if (m.pos[1] > gameData.marioState.pos[1] + 200) {
-				drawMinimapIcon(PlayerRemote_upper_Img, 5, 5, m.pos[0], m.pos[2], scale, miniScale)
+				drawMinimapIcon(PlayerRemote_upper_Img, 5, 5, m.pos[0]*marScale, m.pos[2]*marScale, scale, miniScale)
 			} else {
-				drawMinimapIcon(PlayerRemote_Img, 5, 5, m.pos[0], m.pos[2], scale, miniScale)
+				drawMinimapIcon(PlayerRemote_Img, 5, 5, m.pos[0]*marScale, m.pos[2]*marScale, scale, miniScale)
 			}
         })
         const m = gameData.marioState  /// local mario - should be an arrow
         const yaw = ((m.faceAngle[1] * (Math.PI / 180)) / 180) - 3.111111
-        drawMinimapIconRotation(Player_Img, 5, 5, m.pos[0], m.pos[2], scale, miniScale, yaw)
+        drawMinimapIconRotation(Player_Img, 5, 5, m.pos[0]*marScale, m.pos[2]*marScale, scale, miniScale, yaw)
      
-        if (window.show_minimap > 1) {
+        if (window.show_minimap > 1 && Minimaps[`m${window.selectedMap}`].hasFlags) {
             flagIcons.forEach((flagIcon, i) => {
-                drawFlag(flagIcon, 5, 5, networkData.flagData[i].pos[0], networkData.flagData[i].pos[2], scale, miniScale)
+                drawFlag(flagIcon, 5, 5, networkData.flagData[i].pos[0]*marScale, networkData.flagData[i].pos[2]*marScale, scale, miniScale)
             })
         }
     }

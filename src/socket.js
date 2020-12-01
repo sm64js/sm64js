@@ -1,18 +1,22 @@
-import { RootMsg, Sm64JsMsg, PingMsg, ChatMsg, SkinMsg } from "../proto/mario_pb"
+import { RootMsg, Sm64JsMsg, GrabFlagMsg, AttackMsg, PingMsg, ChatMsg, SkinMsg } from "../proto/mario_pb"
 import zlib from "zlib"
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
+import { updateFlagData, setInitFlagHeight } from "./game/behaviors/bhv_castle_flag_init.inc"
+import { recvChat, decrementChat } from "./chat"
+import { getSelectedLevel } from "./utils"
 
-const myArrayBuffer = () => {
+Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
+
+function myArrayBuffer() {
     return new Promise((resolve) => {
         let fr = new FileReader()
-        fr.onload = () => { resolve(fr.result) }
+        fr.onload = () => {
+            resolve(fr.result)
+        }
         fr.readAsArrayBuffer(this)
     })
 }
-
-File.prototype.arrayBuffer = File.prototype.arrayBuffer || myArrayBuffer
-Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
 
 const url = new URL(window.location.href)
 
@@ -22,36 +26,28 @@ const websocketServerPath = process.env.NODE_ENV === 'production'
         ? `wss://${url.hostname}/websocket/`
         : `ws://${url.hostname}:3000`
 
-const channel = new WebSocket(websocketServerPath)
-
-const sanitizeChat = (string, isMessage) => {
-    string = string.replace(/</g, "");
-    // string = string.replace(/>/g, ""); // commented out for ">:(" and "> text", should still sanitize with only <
-    if(isMessage = true) {
-        string = string.replace(/:doublek:/g, "<img height='20' width='20' src='emotes/doublek.png' alt=':doublek:' />");
-        string = string.replace(/:facepalm:/g, "<img height='20' width='20' src='emotes/facepalm.png' alt=':facepalm:' />");
-        string = string.replace(/:kappa:/g, "<img height='20' width='20' src='emotes/kappa.png' alt=':kappa:' />");
-        string = string.replace(/:mariostyle:/g, "<img height='20' width='20' src='emotes/mariostyle.gif' alt=':mariostyle:' />");
-        string = string.replace(/:pogchamp:/g, "<img height='20' width='20' src='emotes/pogchamp.png' alt=':pogchamp:' />");
-        string = string.replace(/:strange:/g, "<img height='20' width='20' src='emotes/strange.png' alt=':strange:' />");
-        string = string.replace(/:kick:/g, "<img height='20' width='20' src='emotes/kick.gif' alt=':kick:' />");
-        string = string.replace(/:shock:/g, "<img height='20' width='20' src='emotes/shock.gif' alt=':shock:' />");
-        string = string.replace(/:bup:/g, "<img height='20' width='20' src='emotes/bup.jpg' alt=':bup:' />");
-        // string.replace any other emotes in this fashion.
-    }
-    return string;
-}
+const socket = new WebSocket(websocketServerPath)
 
 export const networkData = {
     playerInteractions: true,
     remotePlayers: {},
-    myChannelID: -1,
-    lastSentSkinData: {}
+    mySocketID: -1,
+    lastSentSkinData: {},
+    announcement: { message: "", timer: 0 },
+    flagData: undefined // defined later
 }
 
 export const gameData = {}
 
-const sendData = (bytes) => { channel.send(bytes) }
+const sendJsonWithTopic = (topic, msg) => {
+    const str = JSON.stringify({ topic, msg })
+    let bytes = text.encoder.encode(str)
+    const rootMsg = new RootMsg()
+    rootMsg.setJsonBytesMsg(bytes)
+    socket.send(rootMsg.serializeBinary())
+}
+
+const sendData = (bytes) => { socket.send(bytes) }
 
 const text = {
     decoder: new TextDecoder(),
@@ -71,42 +67,43 @@ const unzip = (bytes) => {
     })
 }
 
-const recvChat = (chatmsg) => {
-    const channel_id = chatmsg.getChannelid()
-    const sender = chatmsg.getSender()
-    const msg = chatmsg.getMessage()
+// TODO moved to chat.js
+// const recvChat = (chatmsg) => {
+//     const channel_id = chatmsg.getChannelid()
+//     const sender = chatmsg.getSender()
+//     const msg = chatmsg.getMessage()
 
-    if (channel_id != networkData.myChannelID &&
-        networkData.remotePlayers[channel_id] == undefined) return
+//     if (channel_id != networkData.myChannelID &&
+//         networkData.remotePlayers[channel_id] == undefined) return
 
-    if (window.banPlayerList.includes(sender)) return
+//     if (window.banPlayerList.includes(sender)) return
 
-    const chatlog = document.getElementById("chatlog")
-    const node = document.createElement("LI")                 // Create a <li> node
-    node.innerHTML = '<strong>' + sanitizeChat(sender, false) + '</strong>: ' + sanitizeChat(msg, true) + '<br/>'        // Create a text node
+//     const chatlog = document.getElementById("chatlog")
+//     const node = document.createElement("LI")                 // Create a <li> node
+//     node.innerHTML = '<strong>' + sanitizeChat(sender, false) + '</strong>: ' + sanitizeChat(msg, true) + '<br/>'        // Create a text node
 
-    if (window.showChatIds) node.innerHTML = `(${chatmsg.channel_id})` + node.innerHTML
-    chatlog.appendChild(node)
-    chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
+//     if (window.showChatIds) node.innerHTML = `(${chatmsg.channel_id})` + node.innerHTML
+//     chatlog.appendChild(node)
+//     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 
-    let someobject
-    if (channel_id == networkData.myChannelID)
-        someobject = window.myMario
-    else
-        someobject = networkData.remotePlayers[channel_id]
+//     let someobject
+//     if (channel_id == networkData.myChannelID)
+//         someobject = window.myMario
+//     else
+//         someobject = networkData.remotePlayers[channel_id]
         
-    Object.assign(someobject, { chatData: { msg: msg, timer: 150 } })
-}
+//     Object.assign(someobject, { chatData: { msg: msg, timer: 150 } })
+// }
 
-const measureAndPrintLatency = (ping_proto) => {
+const measureLatency = (ping_proto) => {
     const startTime = ping_proto.getTime()
     const endTime = performance.now()
     window.latency = parseInt(endTime - startTime)
 }
 
-channel.onopen = () => {
+socket.onopen = () => {
 
-    channel.onmessage = async (message) => {
+    socket.onmessage = async (message) => {
         let sm64jsMsg
         let bytes = new Uint8Array(await message.data.arrayBuffer())
         const rootMsg = RootMsg.deserializeBinary(bytes)
@@ -119,14 +116,14 @@ channel.onopen = () => {
                     //case 2: recvBasicAttack(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
                     //case 3: if (multiplayerReady()) Multi.recvControllerUpdate(msgBytes); break
                     //case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
-                    case Sm64JsMsg.MessageCase.VALID_PLAYERS_MSG:
-                        Multi.recvValidPlayers(sm64jsMsg.getValidPlayersMsg())
+                    case Sm64JsMsg.MessageCase.PLAYER_LISTS_MSG:
+                        Multi.recvPlayerLists(sm64jsMsg.getPlayerListsMsg())
                         break
                     case Sm64JsMsg.MessageCase.PING_MSG:
                         measureAndPrintLatency(sm64jsMsg.getPingMsg())
                         break
                     case Sm64JsMsg.MessageCase.CONNECTED_MSG:
-                        networkData.myChannelID = sm64jsMsg.getConnectedMsg().getChannelid()
+                        networkData.mySocketID = sm64jsMsg.getConnectedMsg().getChannelid()
                         break
                     case Sm64JsMsg.MessageCase.CHAT_MSG:
                         recvChat(sm64jsMsg.getChatMsg())
@@ -143,8 +140,17 @@ channel.onopen = () => {
                 const buffer = await unzip(compressedBytes)
                 sm64jsMsg = Sm64JsMsg.deserializeBinary(buffer)
                 const listMsg = sm64jsMsg.getListMsg()
-                const marioList = listMsg.getMarioList()
-                Multi.recvMarioData(marioList)
+                Multi.recvMarioData(listMsg.getMarioList())
+                recvFlagList(listMsg.getFlagList())
+                break
+            case RootMsg.MessageCase.JSON_BYTES_MSG:
+                const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
+                const { topic, msg } = JSON.parse(str)
+                switch (topic) {
+                    case 'playerName': Cosmetics.recvPlayerNameResponse(msg); break
+                    case 'announcement': recvAnnouncement(msg); break
+                    default: throw "Unknown topic in json message"
+                }
                 break
             case RootMsg.MessageCase.MESSAGE_NOT_SET:
             default:
@@ -152,18 +158,66 @@ channel.onopen = () => {
         }
     }
 
-    channel.onclose = () => { window.latency = null }
+    socket.onclose = () => { window.latency = null }
+}
+
+const recvAnnouncement = (msg) => { networkData.announcement = msg }
+
+const recvFlagList = (flaglist) => {
+
+    if (networkData.flagData == undefined) {
+        networkData.flagData = new Array(flaglist.length).fill(0).map(() => {
+            return {
+                pos: [0, 0, 0],
+                linkedToPlayer: false
+            }
+        })
+    }
+
+    flaglist.forEach((flag, i) => {
+        networkData.flagData[i].pos = flag.getPosList()
+        networkData.flagData[i].linkedToPlayer = flag.getLinkedtoplayer()
+        networkData.flagData[i].socketId = flag.getSocketid()
+
+        if (multiplayerReady()) {
+            if (!networkData.flagData[i].initHeightSet) {
+                setInitFlagHeight(flag.getHeightBeforeFall(), i)
+                networkData.flagData[i].initHeightSet = true
+            }
+        }
+
+    })
+
+}
+
+export const sendAttackToServer = (targetMarioID) => {
+
+    for (let i = 0; i < networkData.flagData.length; i++) {
+        const flagSocketId = networkData.flagData[i].socketId
+        if (networkData.flagData[i].linkedToPlayer && flagSocketId == targetMarioID) {
+            const attackMsg = new AttackMsg()
+            attackMsg.setTargetSocketId(targetMarioID)
+            attackMsg.setFlagId(i)
+
+            const sm64jsMsg = new Sm64JsMsg()
+            sm64jsMsg.setAttackMsg(attackMsg)
+            const rootMsg = new RootMsg()
+            rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+            sendData(rootMsg.serializeBinary()) 
+        }
+    }
+
 }
 
 
 const multiplayerReady = () => {
-    return channel && channel.readyState == 1 && gameData.marioState && networkData.myChannelID != -1
+    return socket && socket.readyState == 1 && gameData.marioState && networkData.mySocketID != -1
 }
 
 const updateConnectedMsg = () => {
     const elem = document.getElementById("connectedMsg")
     const numPlayers = networkData.numOnline ? networkData.numOnline : "?"
-    if (channel && channel.readyState == 1) {
+    if (socket && socket.readyState == 1) {
         elem.innerHTML = "Connected To Server  -  " + (numPlayers).toString() + " Players Online" 
         elem.style.color = "lawngreen"
     } else {
@@ -172,11 +226,52 @@ const updateConnectedMsg = () => {
     }
 }
 
+export const send_controller_update = (frame) => {
+/*    if (multiplayerReady() && frame % 1 == 0) {
+        sendDataWithOpcode(Multi.createControllerProtoMsg().serializeBinary(), 3)
+    }*/
+}
+
+export const updateNetworkBeforeRender = () => {
+
+    if (networkData.flagData == undefined) return
+
+    for (let i = 0; i < networkData.flagData.length; i++) {
+        const flagSocketId = networkData.flagData[i].socketId
+
+        if (networkData.flagData[i].linkedToPlayer) { /// someone has the flag
+            let newflagpos, angleForFlag
+            if (flagSocketId == networkData.mySocketID) { /// I have the flag
+                const m = gameData.marioState
+                newflagpos = [...m.pos]
+                angleForFlag = m.faceAngle[1]
+            } else { /// someone else has the flag
+                let socketData = networkData.remotePlayers[flagSocketId]
+                if (socketData == undefined) return
+                newflagpos = [...socketData.marioState.pos]
+                angleForFlag = socketData.marioState.faceAngle[1]
+            }
+            newflagpos[1] += 150 // adjust so its above mario head
+            networkData.flagData[i].pos = newflagpos
+            updateFlagData(newflagpos, angleForFlag, i)
+        } else updateFlagData(networkData.flagData[i].pos, 0, i) /// no one has the flag
+    }
+
+}
+
 export const post_main_loop_one_iteration = (frame) => {
 
+	//Update the rainbows colors
+	if (frame % 2 == 0) Cosmetics.updateRainbowSkin()
+	
     if (frame % 30 == 0) updateConnectedMsg()
 
     if (multiplayerReady()) {
+
+        if (!networkData.requestedInitData) {
+            sendJsonWithTopic('getInitSkinData', { })
+            networkData.requestedInitData = true
+        }
 
         if (frame % 150 == 0) { //every 5 seconds
             /// ping to measure latency
@@ -208,7 +303,7 @@ export const post_main_loop_one_iteration = (frame) => {
                     const rootMsg = new RootMsg()
                     rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
             
-                    channel.send(rootMsg.serializeBinary(), true)
+                    socket.send(rootMsg.serializeBinary(), true)
                 }
             }
         }
@@ -224,18 +319,60 @@ export const post_main_loop_one_iteration = (frame) => {
 
     decrementChat()
 
+    if (gameData.marioState && networkData.flagData != undefined) checkForFlagGrab()
 }
 
-const decrementChat = () => {
-    Object.values(networkData.remotePlayers).forEach(data => {
-        if (data.chatData && data.chatData.timer > 0) data.chatData.timer--
-    })
+const checkForFlagGrab = () => {
 
-    const myChat = window.myMario.chatData
-    if (myChat && myChat.timer > 0) myChat.timer--
+    //// check all flags to see if linked to local mario, and skip this function
+    for (let i = 0; i < networkData.flagData.length; i++) {
+        const flagSocketId = networkData.flagData[i].socketId
+        if (networkData.flagData[i].linkedToPlayer && flagSocketId == networkData.mySocketID) return
+    }
+
+    const m = gameData.marioState
+
+    for (let i = 0; i < networkData.flagData.length; i++) {
+        if (!networkData.flagData[i].linkedToPlayer) {
+            const xDiff = m.pos[0] - networkData.flagData[i].pos[0]
+            const yDiff = Math.abs(m.pos[1] - networkData.flagData[i].pos[1])
+            const zDiff = m.pos[2] - networkData.flagData[i].pos[2]
+
+            const dist = Math.sqrt(xDiff * xDiff + zDiff * zDiff)
+
+            if (dist < 50 && yDiff < 120) {
+                const grabMsg = new GrabFlagMsg()
+                grabMsg.setPosList([parseInt(m.pos[0]), parseInt(m.pos[1]), parseInt(m.pos[2])])
+                grabMsg.setFlagId(i)
+
+                const sm64jsMsg = new Sm64JsMsg()
+                sm64jsMsg.setGrabMsg(grabMsg)
+                const rootMsg = new RootMsg()
+                rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+                sendData(rootMsg.serializeBinary())
+
+            }
+        }
+    }
+    
+}
+
+export const sendPlayerInteraction = (socket_id, interaction) => {
+    //socket.emit('playerInteract', { socket_id, interaction }, { reliable: true })
+}
+
+
+export const submitPlayerName = () => {
+    const level = getSelectedLevel()
+    const name = document.getElementById("playerNameInput").value
+    if (name.length >= 3) {
+        sendJsonWithTopic('playerName', { name, level })
+    }
 }
 
 export const sendChat = (msg) => {
+    // TODO admin token
+    // if (window.admin && window.admin.token) msg.adminToken = window.admin.token
     const chatMsg = new ChatMsg()
     chatMsg.setMessage(msg)
     const sm64jsMsg = new Sm64JsMsg()
@@ -245,6 +382,3 @@ export const sendChat = (msg) => {
     sendData(rootMsg.serializeBinary())
 }
 
-export const sendPlayerInteraction = (channel_id, interaction) => {
-    //channel.emit('playerInteract', { channel_id, interaction }, { reliable: true })
-}

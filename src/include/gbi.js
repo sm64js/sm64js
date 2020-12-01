@@ -32,6 +32,7 @@ export const G_RDPLOADSYNC = 29
 
 /// Custom Opcodes
 export const G_SETPLAYERDATA = 30
+export const G_SETFLAGINDEX = 31
 
 export const G_ZBUFFER = 0x00000001
 export const G_SHADE = 0x00000004
@@ -337,6 +338,11 @@ export const G_MTX_NOPUSH        = 0	/* push or not */
 export const G_MTX_PUSH = 4
 
 export const G_CC_MODULATERGB = {
+    alpha: [7, 7, 7, 4],
+    rgb: [1, 15, 4, 7]
+}
+
+export const G_CC_MODULATERGBFADE = {   //// TODO - NOT CORRECT Look this one up
     alpha: [7, 7, 7, 4],
     rgb: [1, 15, 4, 7]
 }
@@ -842,11 +848,20 @@ export const gsDPSetPrimColor = (m, l, r, g, b, a) => {
     }
 }
 
-export const gsSetPlayerData = (channel_id) => {
+export const gsSetPlayerData = (socket_id) => {
     return {
         words: {
             w0: G_SETPLAYERDATA,
-            w1: { channel_id }
+            w1: { socket_id }
+        }
+    }
+}
+
+export const gsSetFlagIndex = (flagIndex) => {
+    return {
+        words: {
+            w0: G_SETFLAGINDEX,
+            w1: { flagIndex }
         }
     }
 }

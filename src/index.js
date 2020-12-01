@@ -6,7 +6,6 @@ import  * as Socket from "./socket.js"
 import "./cosmetics"
 import "./cmts_cosmetics"
 import "./template.css"
-import "./countdown-widget.css"
 
 
 const send_display_list = (gfx_list) => {
@@ -28,6 +27,7 @@ const produce_one_frame = () => {
     n_frames++
 
     playerInputUpdate() /// Keyboard buttons / joystick process to game input commands
+    //Socket.send_controller_update(n_frames)
     GFX.start_frame()
     Game.main_loop_one_iteration()
     Socket.post_main_loop_one_iteration(n_frames)
@@ -129,6 +129,7 @@ const setStatsUpdate = setInterval(() => {
     const renderFrameTimeAvg = renderFrameTimeBuffer.getAvg().toFixed(2)
     const gameLogicFrametimeAvg = gameLogicFrameTimeBuffer.getAvg().toFixed(2)
     const maxFps = (1000 / totalFrameTimeAvg).toFixed(2)
+    window.fps = parseInt(maxFps)
     document.getElementById("maxFps").innerHTML = `Effective Max Fps: ${maxFps}`
     document.getElementById("timing-total").innerHTML = `${totalFrameTimeAvg}ms`
     document.getElementById("timing-game").innerHTML = `${gameLogicFrametimeAvg}ms`
@@ -150,7 +151,7 @@ window.enterFullScreenMode = () => {
 }
 
 ///// Start Game
-const rulesVersion = 2
+const rulesVersion = 11
 let gameStarted = false
 
 document.getElementById("startbutton").addEventListener('click', () => {
@@ -186,44 +187,3 @@ window.onload = () => {
 
 if (localStorage['rules'] != rulesVersion) $('#rules-modal').modal({ backdrop: 'static', keyboard: false })
 $("#rules-modal").on('hide.bs.modal', () => { localStorage['rules'] = rulesVersion })
-
-
-$(document).ready(function () {
-    function getTimeRemaining(endtime) {
-        var t = endtime - Date.now()
-        if (t < 0) { return false }
-        var seconds = Math.floor((t / 1000) % 60)
-        var minutes = Math.floor((t / 1000 / 60) % 60)
-        var hours = Math.floor((t / (1000 * 60 * 60)) % 24)
-        var days = Math.floor(t / (1000 * 60 * 60 * 24))
-        return {
-            'total': t,
-            'days': days,
-            'hours': hours,
-            'minutes': minutes,
-            'seconds': seconds
-        }
-    }
-    function initializeClock(id, endtime) {
-        var clock = document.getElementById(id)
-        var daysSpan = clock.querySelector('.days')
-        var hoursSpan = clock.querySelector('.hours')
-        var minutesSpan = clock.querySelector('.minutes')
-        var secondsSpan = clock.querySelector('.seconds')
-        function updateClock() {
-            var t = getTimeRemaining(endtime)
-            if (t) {
-                daysSpan.innerHTML = t.days
-                hoursSpan.innerHTML = ('0' + t.hours).slice(-2)
-                minutesSpan.innerHTML = ('0' + t.minutes).slice(-2)
-                secondsSpan.innerHTML = ('0' + t.seconds).slice(-2)
-            } else {
-                clearInterval(timeinterval)
-            }
-        }
-
-        updateClock()
-        var timeinterval = setInterval(updateClock, 1000)
-    }
-    initializeClock('clockdiv', 1606590000000)
-})

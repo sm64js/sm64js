@@ -1,8 +1,10 @@
 import { Sm64JsMsg, MarioMsg, ControllerListMsg, ControllerMsg, ValidPlayersMsg } from "../../proto/mario_pb"
+import zlib from "zlib"
 import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "../socket"
 import { defaultSkinData } from "../cosmetics"
 import { INTERACT_PLAYER } from "./Interaction"
+import { levelIdToName } from "../utils"
 
 const rawDataMap = {
     0: RAW.oMarioPoleYawVel,
@@ -43,7 +45,7 @@ export const copyMarioUpdateToState = (remotePlayer) => {
 
     m.action = update.action
     m.prevAction = update.prevaction
-    m.actionArg = update.actionarg > 32767 ? update.actionarg - 65536 : update.actionarg
+    m.actionArg = update.actionarg
     m.invincTimer = update.invinctimer
     m.framesSinceA = update.framessincea
     m.framesSinceB = update.framessinceb
@@ -54,8 +56,8 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     m.vel = update.velList
     m.pos = update.posList
     m.faceAngle = update.faceangleList
-    m.channel_id = update.channelid
-    m.playerName = update.playername
+    m.socket_id = update.socketid
+    m.parachuting = update.parachuting
 
     m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
 
@@ -75,8 +77,6 @@ export const createMarioProtoMsg = () => {
 
     mariomsg.setController(createControllerProtoMsg())
 
-    mariomsg.setPlayername(window.myMario.playerName)
-
     mariomsg.setAction(m.action)
     mariomsg.setPrevaction(m.prevAction)
     mariomsg.setActionstate(m.actionState)
@@ -92,12 +92,12 @@ export const createMarioProtoMsg = () => {
     mariomsg.setPosList(m.pos)
     mariomsg.setVelList(m.vel)
     mariomsg.setForwardvel(m.forwardVel)
+    mariomsg.setParachuting(m.parachuting)
 
     if (m.usedObj) mariomsg.setUsedobjid(m.usedObj.rawData[RAW.oSyncID])
 
     mariomsg.setRawdataList(getMarioRawDataSubset(m.marioObj.rawData))
-    mariomsg.setChannelid(networkData.myChannelID)
-    mariomsg.setPlayername(window.myMario.playerName)
+    mariomsg.setSocketid(networkData.mySocketID)
 
     return mariomsg
 }
@@ -108,11 +108,11 @@ const initNewRemoteMarioState = (marioProto) => {
 
     const newMarioState = {
 
-        channel_id: marioProto.getChannelid(),
-        playerName: marioProto.getPlayername(),
+        socket_id: marioProto.getSocketid(),
 
         actionTimer: marioProto.getActiontimer(),
         actionState: marioProto.getActionstate(),
+        actionArg: marioProto.getActionarg(),
         framesSinceA: 0xFF,
         framesSinceB: 0xFF,
         invincTimer: 0,
@@ -200,13 +200,13 @@ export const createControllerProtoMsg = () => {
 
     controllermsg.setCamerayaw(m.area.camera.yaw)
 
-    controllermsg.setChannelid(networkData.myChannelID)
+    controllermsg.setSocketid(networkData.mySocketID)
 
     return controllermsg
 }
 
 const applyController = (controllerProto) => {
-    const id = controllerProto.getChannelid()
+    const id = controllerProto.getSocketid()
     if (networkData.remotePlayers[id] == undefined) return
     const m = networkData.remotePlayers[id].marioState
     const buttonDown = controllerProto.getButtondown()
@@ -238,23 +238,42 @@ export const recvControllerUpdate = (controllerbytes) => {
     })
 }
 
-export const recvValidPlayers = (validplayersproto) => {
-    const validplayers = validplayersproto.getValidplayersList()
+export const recvPlayerLists = (playerListsProto) => {
 
-    networkData.numOnline = validplayers.length
+    const rooms = playerListsProto.getRoomList()
 
-    Object.keys(networkData.remotePlayers).forEach(channel_id => {
-        if (!validplayers.includes(parseInt(channel_id))) {
-            delete networkData.remotePlayers[channel_id]
+    rooms.forEach(roomProto => {
+        const roomKey = roomProto.getRoomKey()
+        if (roomKey == window.selectedMap) {
+            const validplayers = roomProto.getValidplayersList()
+            networkData.numOnline = validplayers.length
+
+            Object.keys(networkData.remotePlayers).forEach(socket_id => {
+                if (!validplayers.includes(parseInt(socket_id))) {
+                    delete networkData.remotePlayers[socket_id]
+                }
+            })
+        }
+
+        const mapSelecter = document.getElementById("mapSelect")
+
+        for (let i = 0; i < mapSelecter.length; i++) {
+            if (mapSelecter[i].value == roomKey) {
+                mapSelecter[i].innerHTML =
+                    `<p style="color:blue">${levelIdToName[roomKey]}</p> 
+                     <p style="color:blue"> - Online Players: ${roomProto.getValidplayersList().length}</p>`
+
+            }
         }
     })
+
 }
 
 
 export const recvMarioData = (marioList) => {
     marioList.forEach(marioProto => {
-        const id = marioProto.getChannelid()
-        if (id == networkData.myChannelID) return
+        const id = marioProto.getSocketid()
+        if (id == networkData.mySocketID) return
 
         if (networkData.remotePlayers[id] == undefined) {
             networkData.remotePlayers[id] = { 

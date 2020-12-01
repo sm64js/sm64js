@@ -1,5 +1,5 @@
 import { LevelCommandsInstance as LevelCommands } from "../../engine/LevelCommands"
-import { bhvMario, bhvExtraMario, bhvCastleFlagWaving } from "../../game/BehaviorData"
+import { bhvMario, bhvCastleFlagWaving } from "../../game/BehaviorData"
 import { castle_grounds_geo_00073C } from "./areas/1/geo"
 import { castle_grounds_geo_0006F4 } from "./areas/1/3/geo.inc"
 import { castle_grounds_geo_000660 } from "./areas/1/11/geo.inc"
@@ -24,7 +24,7 @@ export const level_castle_grounds_entry = [
     { command: LevelCommands.load_model_from_geo, args: [MODEL_BOB_BUBBLY_TREE, bubbly_tree_geo] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_CASTLE_GROUNDS_FLAG, castle_grounds_geo_000660] },
     { command: LevelCommands.begin_area, args: [1, castle_grounds_geo_00073C] },
-    { command: LevelCommands.jump_link, args: [script_func_local_3] },
+    //{ command: LevelCommands.jump_link, args: [script_func_local_3] }, temp remove flags from castlegrounds
     { command: LevelCommands.terrain, args: [castle_grounds_seg7_collision_level] },
     { command: LevelCommands.end_area },
     { command: LevelCommands.free_level_pool },

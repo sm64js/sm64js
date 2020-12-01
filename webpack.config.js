@@ -3,6 +3,8 @@ const HtmlWebPackPlugin = require("html-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const OptimizeCSSAssetsWebpackPlugin = require("optimize-css-assets-webpack-plugin")
 const TerserWebpackPlugin = require("terser-webpack-plugin")
+const express = require('express')
+const path = require('path')
 
 
 module.exports = env => ({
@@ -30,7 +32,10 @@ module.exports = env => ({
         extensions: ['*', '.js']
     },
     devServer: {
-        port: 9300
+        port: 9300,
+        before(app) {
+            app.use('/mini', express.static(path.resolve('src/mini')))
+        }
     },
     plugins: [
         new webpack.DefinePlugin({

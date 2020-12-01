@@ -1,6 +1,10 @@
 import { WebGLInstance as WebGL } from "./WebGL"
 import * as Gbi from "../include/gbi"
 import { getExtraRenderData } from "../cosmetics"
+import { flagCounter } from "../levels/castle_grounds/areas/1/11/model.inc"
+import { customData2D, custom_draw_text, draw2Dpost3Drendering } from "./2Dgraphics"
+const canvas2d = document.querySelector('#textCanvas')
+
 
 const precomp_shaders = [
     0x01200200,
@@ -34,13 +38,8 @@ const MAX_VERTICES = 64
 
 let opCount = 0
 
-const canvas2d = document.querySelector('#textCanvas')
-const context2d = canvas2d.getContext('2d')
-
 export class n64GfxProcessor {
     constructor() {
-
-        this.random = 0
 
         //buffer
         this.buf_vbo = [] //new Array(MAX_BUFFERED * 26 * 3).fill(0.0) // 3 vertices in a triangle and 26 floats per vtx
@@ -96,11 +95,7 @@ export class n64GfxProcessor {
             color_image_address: null
         }
 
-        this.customData = {
-            playerName: "",
-            skinID: 0,
-            chat: ""
-        }
+        this.customData3D = { skinID: 0 }
 
         this.color_combiner_pool = []
 
@@ -963,7 +958,7 @@ export class n64GfxProcessor {
             d.u = U; d.v = V
 
             if (v.special == "nameplate" && w < 2000 && !d.clip_rej) {
-                this.custom_draw_text(x, y, w)
+                custom_draw_text(x, y, w)
             }
 
             Object.assign(d, { x, y, z, w })
@@ -985,42 +980,12 @@ export class n64GfxProcessor {
         }
     }
 
-    custom_draw_text(x, y, w) {
-        const pixelX = ((x / w) * 0.5 + 0.5) * canvas2d.width
-        const pixelY = ((y / w) * -0.5 + 0.5) * canvas2d.height
-
-        if (this.customData.playerName) {
-            context2d.globalAlpha = 0.8
-            context2d.font = "bold 14px verdana, sans-serif"
-            context2d.textAlign = "center"
-            context2d.fillStyle = "#9400D3"
-            context2d.fillText(this.customData.playerName, pixelX, pixelY)
-        }
-
-        if (this.customData.chat) {
-            context2d.font = "bold 16px verdana, sans-serif"
-            const width = context2d.measureText(this.customData.chat).width
-
-            context2d.fillStyle = "#FFFFFF"
-            context2d.globalAlpha = 0.8
-            context2d.rect(pixelX - (width/2) - 5, pixelY - 50, width + 10, 30)
-            context2d.fill()
-            context2d.globalCompositeOperation = 'source-over'
-            
-
-            context2d.globalAlpha = 1.0
-            context2d.font = "bold 16px verdana, sans-serif"
-            context2d.textAlign = "center"
-            context2d.fillStyle = "#000000"
-            context2d.fillText(this.customData.chat, pixelX, pixelY - 30)
-            context2d.globalCompositeOperation = 'destination-over'
-        }
-        
-
-    }
-
-    custom_set_player_data(channel_id) { 
-        this.customData = getExtraRenderData(channel_id)
+    custom_set_player_data(socket_id) { 
+        const data = getExtraRenderData(socket_id)
+        this.customData3D = data.custom3D
+        customData2D.chat = data.custom2D.chat
+        customData2D.playerName = data.custom2D.playerName
+        customData2D.announcement = data.custom2D.announcement
     }
 
     run_dl(commands) {
@@ -1098,10 +1063,13 @@ export class n64GfxProcessor {
                     this.dp_fill_rectangle(args.ulx, args.uly, args.lrx, args.lry)
                     break
                 case Gbi.G_SETPLAYERDATA:
-                    this.custom_set_player_data(args.channel_id)
+                    this.custom_set_player_data(args.socket_id)
+                    break
+                case Gbi.G_SETFLAGINDEX:
+                    flagCounter.data = args.flagIndex
                     break
                 case Gbi.G_DL:
-                    const displayList = args.childDisplayList.call ? args.childDisplayList(this.customData) : args.childDisplayList
+                    const displayList = args.childDisplayList.call ? args.childDisplayList(this.customData3D) : args.childDisplayList
                     if (args.branch == 0) {
                         this.run_dl(displayList)
                     } else {
@@ -1127,20 +1095,13 @@ export class n64GfxProcessor {
     run(commands) {
         window.totalTriangles = 0
         this.sp_reset()
-
         WebGL.start_frame()
         canvas2d.width = canvas2d.width
         this.run_dl(commands)
         this.flush()
 
-        if (window.latency) {
-            context2d.globalAlpha = 0.8
-            context2d.font = "bold 14px verdana, sans-serif"
-            context2d.textAlign = "center"
-            context2d.fillStyle = "#9400D3"
-            context2d.fillText(`Ping: ${window.latency}ms`, 580, 20)
-        }
+        draw2Dpost3Drendering()
+
     }
 }
-
 export const n64GfxProcessorInstance = new n64GfxProcessor()

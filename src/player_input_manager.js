@@ -1,23 +1,43 @@
 import * as Keydrown from "./keydrown.min.js"
-import { gameData, sendChat } from "./socket.js"
+import { gameData, sendChat, submitPlayerName } from "./socket.js"
 
 /////// Keyboard / Gamepad Input ////////
 window.playerInput = {}
 window.banPlayerList = []
+window.show_minimap = 0
 let textboxfocus = false
 
+const tauntsMap = {
+    "!taunt-wave": 0x1D,
+    "!taunt-die": 0x2E,
+    "!taunt-star": 0xCD,
+    "!taunt-die2": 0x79,
+    "!taunt-shock": 0x7A,
+    "!taunt-magic": 0xB3
+}
+
+const handleTaunt = (str) => { window.taunt = tauntsMap[str] }
 
 //// Prevent scrolling for arrow keys
 window.addEventListener("keydown", (e) => {
+
     textboxfocus = $("#chatbox").is(':focus') ||
                     $("#playerNameInput").is(':focus') ||
                     $("#ccPasteArea").is(':focus') ||
                     $("#banbox").is(':focus')
 
     if ($("#chatbox").is(':focus') && e.keyCode == 13) {
-        sendChat(document.getElementById('chatbox').value)
-        document.getElementById('chatbox').value = ""
-        document.getElementById('chatbox').blur()
+
+        const chatbox = document.getElementById('chatbox')
+
+        if (chatbox.value[0] == '!') {
+            handleTaunt(chatbox.value)
+        } else {
+            sendChat({ message: chatbox.value })
+        }
+
+        chatbox.value = ""
+        chatbox.blur()
     }
 
     if ($("#banbox").is(':focus') && e.keyCode == 13) {
@@ -28,13 +48,14 @@ window.addEventListener("keydown", (e) => {
 
     if ($("#playerNameInput").is(':focus') && e.keyCode == 13) {
         document.getElementById('playerNameInput').blur()
+        submitPlayerName()
     }
 
-    // space and arrow keys
     if (textboxfocus) return
-    if ([32, 37, 38, 39, 40].includes(e.keyCode)) {
-        e.preventDefault()
-    }
+
+    // space and arrow keys
+    if ([32, 37, 38, 39, 40].includes(e.keyCode)) { e.preventDefault()  }
+
 }, false)
 
 const keyboardButtons = {}
@@ -138,13 +159,21 @@ const keyboardButtonMapping = {
     up: 'up',
     down: 'down',
     left: 'left',
-    right: 'right'
+    right: 'right',
+    cu: 'i',
+    cd: 'k',
+    cl: 'j',
+    cr: 'l',
+    map: 'm',
+    taunt: 't'
 }
 const defaultKeyboardButtonMapping = { ...keyboardButtonMapping }
 
 const gamepadButtonMapping = { //works for xbox
     a: 0,
     b: 2,
+    map: 4,
+    taunt: 5,
     start: 9,
     z: 6,
     stickX: 0,
@@ -301,6 +330,8 @@ export const playerInputUpdate = () => {
             b: gamepad.buttons[gamepadButtonMapping['b']].touched,
             start: gamepad.buttons[gamepadButtonMapping['start']].touched,
             z: gamepad.buttons[gamepadButtonMapping['z']].touched,
+            map: gamepad.buttons[gamepadButtonMapping['map']].touched,
+            taunt: gamepad.buttons[gamepadButtonMapping['taunt']].touched,
             cr: gamepad.axes[2] && gamepad.axes[2] > 0.5,
             cl: gamepad.axes[2] && gamepad.axes[2] < -0.5,
             cu: gamepad.axes[3] && gamepad.axes[3] < -0.5,
@@ -328,10 +359,12 @@ export const playerInputUpdate = () => {
     let buttonDownB = gamepadFinal.b || keyboardFinal.b
     let buttonDownStart = gamepadFinal.start || keyboardFinal.start
     let buttonDownZ = gamepadFinal.z || keyboardFinal.z
-    let buttonDownCl = gamepadFinal.cl
-    let buttonDownCr = gamepadFinal.cr
-    let buttonDownCu = gamepadFinal.cu
-    let buttonDownCd = gamepadFinal.cd
+    let buttonDownCl = gamepadFinal.cl || keyboardFinal.cl
+    let buttonDownCr = gamepadFinal.cr || keyboardFinal.cr
+    let buttonDownCu = gamepadFinal.cu || keyboardFinal.cu
+    let buttonDownCd = gamepadFinal.cd || keyboardFinal.cd
+    let buttonDownMap = gamepadFinal.map || keyboardFinal.map
+    let buttonDownTaunt = gamepadFinal.taunt || keyboardFinal.taunt
 
     window.playerInput = {
         stickX, stickY,
@@ -341,14 +374,29 @@ export const playerInputUpdate = () => {
         buttonPressedStart: buttonDownStart && !window.playerInput.buttonDownStart,
         buttonPressedB: buttonDownB && !window.playerInput.buttonDownB,
         buttonPressedZ: buttonDownZ && !window.playerInput.buttonDownZ,
-        buttonPressedCl: buttonDownCl && !window.playerInput.buttonDownCl,
-        buttonPressedCr: buttonDownCr && !window.playerInput.buttonDownCr,
-        buttonPressedCu: buttonDownCu && !window.playerInput.buttonDownCu,
-        buttonPressedCd: buttonDownCd && !window.playerInput.buttonDownCd,
+        buttonPressedCl: buttonDownCl && !window.playerInput.buttonDownCl && !buttonDownTaunt,
+        buttonPressedCr: buttonDownCr && !window.playerInput.buttonDownCr && !buttonDownTaunt,
+        buttonPressedCu: buttonDownCu && !window.playerInput.buttonDownCu && !buttonDownTaunt,
+        buttonPressedCd: buttonDownCd && !window.playerInput.buttonDownCd && !buttonDownTaunt,
+        buttonPressedMap: buttonDownMap && !window.playerInput.buttonDownMap,
 
-        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd
+        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap, buttonDownTaunt,
+
+        taunt: (Object.values(tauntsMap).includes(window.taunt)) ? window.taunt : undefined
     }
-    
+
+    window.taunt = undefined
+
+    if (window.playerInput.buttonPressedMap) window.show_minimap += 1
+    if (window.show_minimap > 2) window.show_minimap = 0
+
     if (gameData.marioState) gameData.marioState.controller = window.playerInput
+
+    if (!window.playerNameAccepted && window.playerInput.buttonPressedStart) {
+        document.getElementById("playerNameInput").style.borderColor = "red"
+        document.getElementById("playerNameInput").style.borderWidth = "3px"
+        document.getElementById("playerNameResult").style.color = "red"
+        $("#playerNameRow").effect("shake", { direction: "down", times: 3, distance: 3 }, 500)
+    }
 
 }

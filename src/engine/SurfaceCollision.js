@@ -3,12 +3,42 @@ import { SurfaceLoadInstance as SurfaceLoad } from "../game/SurfaceLoad"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
 import { SpawnObjectInstance as Spawn } from "../game/SpawnObject"
 
-import { BOUNDS_EXTENSION, LEVEL_BOUNDARY_EXTENDED_MAX } from "../include/extend_bounds"
+import { BOUNDS_EXTENSION } from "../include/extend_bounds"
 
 class SurfaceCollision {
     constructor() {
         Spawn.SurfaceCollision = this
         ObjectListProcessor.SurfaceCollision = this
+    }
+
+    find_water_level(x, z) {
+        let waterLevel = -11000.0
+
+        const p = ObjectListProcessor.gEnvironmentRegions /// array
+
+        if (p && p[0]) {
+            const numRegions = p[0]
+            let dataIndex = 1
+
+            for (let i = 0; i < numRegions; i++) {
+                let val = p[dataIndex++]
+                let loX = p[dataIndex++]
+                let loZ = p[dataIndex++]
+                let hiX = p[dataIndex++]
+                let hiZ = p[dataIndex++]
+    
+                // If the location is within a water box and it is a water box.
+                // Water is less than 50 val only, while above is gas and such.
+                if (loX < x && x < hiX && loZ < z && z < hiZ && val < 50) {
+                    // Set the water height. Since this breaks, only return the first height.
+                    waterLevel = p[dataIndex]
+                    break
+                }
+                dataIndex++
+            }
+        }
+
+        return waterLevel
     }
 
     find_floor_height_and_data(xPos, yPos, zPos, floorGeo) {

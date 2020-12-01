@@ -56,6 +56,7 @@ import {
     mario_low_poly_cap_off_eyes_half_closed,
     mario_low_poly_cap_off_eyes_closed,
  } from "./model.inc"
+import { parachute_DL, parachute_off_DL } from "../parachute/model.inc"
 import { MarioMiscInstance as MarioMisc } from "../../game/MarioMisc"
 import { SHADOW_CIRCLE_PLAYER } from "../../game/Shadow"
 
@@ -311,6 +312,11 @@ export const mario_geo = [
     { command: Geo.open_node },
         { command: Geo.node_scale, args: [0x00, 16384] },
         { command: Geo.open_node },
+			{ command: Geo.node_switch_case, args: [0, MarioMisc.geo_switch_parachuting, MarioMisc] },
+				{ command: Geo.open_node },
+                	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, parachute_off_DL] },
+					{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, parachute_DL] },
+				{ command: Geo.close_node },
             { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, mario_nameplate] },
             { command: Geo.branch, args: [1, mario_geo_render_body ] },
         { command: Geo.close_node },

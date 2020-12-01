@@ -84,8 +84,19 @@ class LevelCommands {
         Object.assign(Area.gMarioSpawnInfo, {
             areaIndex: args[0],
             startPos: [ args[2], args[3], args[4] ],
-            startAngle: [0, yaw, 0 ]
+            startAngle: [0, yaw, 0],
+            parachuteSpawn: args[5]
         })
+
+        if (args[6]) { // x variability
+            const random = Math.random() - 0.5
+            Area.gMarioSpawnInfo.startPos[0] += (random * args[6])
+        }
+
+        if (args[7]) { // z variability
+            const random = Math.random() - 0.5
+            Area.gMarioSpawnInfo.startPos[2] += (random * args[7])
+        }
 
         this.sCurrentScript.index++
     }
@@ -141,11 +152,17 @@ class LevelCommands {
         this.sCurrentScript.index++
     }
 
+    reset_call_loop(args) {
+        this.callLoopFrameCounter = 0
+        this.sCurrentScript.index++
+    }
+
     call_loop(args) {
         const func = args[1]
         const funcClass = args[2]
         this.sRegister = func.call(funcClass, args[0], this.sRegister)
-        
+        this.callLoopFrameCounter++
+
         if (this.sRegister == 0) {
             this.sScriptStatus = SCRIPT_PAUSED
         } else {

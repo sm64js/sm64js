@@ -5,6 +5,7 @@ message RootMsg {
 	oneof message {
 		Sm64JsMsg uncompressed_sm64js_msg = 1;
 		bytes compressed_sm64js_msg = 2;
+		bytes json_bytes_msg = 3;
 	}
 }
 
@@ -14,9 +15,11 @@ message Sm64JsMsg {
 		ConnectedMsg connected_msg = 2;
 		PingMsg ping_msg = 3;
 		MarioMsg mario_msg = 4;
-		ValidPlayersMsg valid_players_msg = 5;
-		ChatMsg chat_msg = 6;
-		SkinMsg skin_msg = 7;
+		PlayerListsMsg player_lists_msg = 5;
+		AttackMsg attack_msg = 6;
+		GrabFlagMsg grab_msg = 7;
+		ChatMsg chat_msg = 8;
+		SkinMsg skin_msg = 9;
 		/*ControllerMsg controller_msg = 6;
 		ControllerListMsg controller_list_msg = 7;*/
 	}
@@ -31,6 +34,7 @@ message ConnectedMsg {
 }
 
 message MarioListMsg {
+	repeated FlagMsg flag = 1;
 	repeated MarioMsg mario = 2;
 }
 
@@ -38,9 +42,26 @@ message ControllerListMsg {
 	repeated ControllerMsg controller = 1;
 }
 
+message FlagMsg {
+     repeated float pos = 1;
+     bool linkedToPlayer = 2;
+     uint32 socketID = 3;
+	 float height_before_fall = 4;
+}
+
+message GrabFlagMsg {
+	repeated float pos = 1;
+	uint32 flag_id = 2;
+}
+
+message AttackMsg {
+	uint32 target_socket_id = 1;
+	uint32 attacker_socket_id = 2;
+	uint32 flag_id = 3;
+}
+
 message MarioMsg {
 	ControllerMsg controller = 1;
-	string playerName = 2;
 	uint32 action = 3;
 	uint32 prevAction = 4;
 	uint32 actionState = 5;
@@ -58,7 +79,8 @@ message MarioMsg {
 	float forwardVel = 17;
 	repeated sint32 rawData = 18;
 	uint32 usedObjID = 19;
-	uint32 channelID = 20;
+	uint32 socketID = 20;
+	bool parachuting = 21;
 }
 
 message ControllerMsg {
@@ -68,13 +90,19 @@ message ControllerMsg {
 	uint32 buttonDown = 4;
 	uint32 buttonPressed = 5;
 	sint32 cameraYaw = 6;
-	uint32 channelID = 7;
+	uint32 socketID = 7;
+}
+
+message PlayerListsMsg {
+	repeated ValidPlayersMsg room = 1;
 }
 
 message ValidPlayersMsg {
-	repeated uint32 validPlayers = 1;
+	uint32 room_key = 1;
+	repeated uint32 validPlayers = 2;
 }
 
+// TODO isAdmin
 message ChatMsg {
 	string message = 1;
 	// TODO having sender and channelID feels redundant
@@ -82,6 +110,7 @@ message ChatMsg {
 	uint32 channelID = 3;
 }
 
+// TODO rainbow skin
 message SkinMsg {
 	uint32 channelID = 1;
 	repeated uint32 overalls = 2;

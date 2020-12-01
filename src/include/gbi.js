@@ -342,6 +342,11 @@ export const G_CC_MODULATERGB = {
     rgb: [1, 15, 4, 7]
 }
 
+export const G_CC_MODULATERGBFADE = {   //// TODO - NOT CORRECT Look this one up
+    alpha: [7, 7, 7, 4],
+    rgb: [1, 15, 4, 7]
+}
+
 export const G_CC_MODULATERGBA = {
     alpha: [1, 7, 4, 7],
     rgb: [1, 15, 4, 7]

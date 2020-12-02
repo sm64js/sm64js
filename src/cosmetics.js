@@ -208,9 +208,9 @@ export const recvPlayerNameResponse = (msg) => {
 }
 
 export const recvSkinData = (skinMsg) => { 
-    const channelId = skinMsg.getChannelid()
-    if (channelId === networkData.myChannelID ||
-        networkData.remotePlayers[channelId] == null) return
+    const socket_id = skinMsg.getSocketid()
+    if (socket_id === networkData.mySocketID ||
+        networkData.remotePlayers[socket_id] == null) return
 
     const skinData = {
         overalls: skinMsg.getOverallsList(),
@@ -222,7 +222,7 @@ export const recvSkinData = (skinMsg) => {
         hair: skinMsg.getHairList(),
         customCapState: skinMsg.getCustomcapstate(),
     }
-    networkData.remotePlayers[channelId].skinData = skinData
+    networkData.remotePlayers[socket_id].skinData = skinData
 }
 
 const isValidSkinEntry = (skinEntry) => {

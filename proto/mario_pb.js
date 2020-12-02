@@ -1075,7 +1075,7 @@ proto.sm64js.ConnectedMsg.prototype.toObject = function(opt_includeInstance) {
  */
 proto.sm64js.ConnectedMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
-    channelid: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    socketid: jspb.Message.getFieldWithDefault(msg, 1, 0)
   };
 
   if (includeInstance) {
@@ -1114,7 +1114,7 @@ proto.sm64js.ConnectedMsg.deserializeBinaryFromReader = function(msg, reader) {
     switch (field) {
     case 1:
       var value = /** @type {number} */ (reader.readUint32());
-      msg.setChannelid(value);
+      msg.setSocketid(value);
       break;
     default:
       reader.skipField();
@@ -1145,7 +1145,7 @@ proto.sm64js.ConnectedMsg.prototype.serializeBinary = function() {
  */
 proto.sm64js.ConnectedMsg.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getChannelid();
+  f = message.getSocketid();
   if (f !== 0) {
     writer.writeUint32(
       1,
@@ -1156,16 +1156,16 @@ proto.sm64js.ConnectedMsg.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional uint32 channelID = 1;
+ * optional uint32 socketID = 1;
  * @return {number}
  */
-proto.sm64js.ConnectedMsg.prototype.getChannelid = function() {
+proto.sm64js.ConnectedMsg.prototype.getSocketid = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
 /** @param {number} value */
-proto.sm64js.ConnectedMsg.prototype.setChannelid = function(value) {
+proto.sm64js.ConnectedMsg.prototype.setSocketid = function(value) {
   jspb.Message.setProto3IntField(this, 1, value);
 };
 

@@ -393,7 +393,7 @@ const sendSkinsToSocket = (socket) => {
         /// Send Skins
         Object.entries(clientsRoot[roomKey]).filter(([_, data]) => data.skinData).forEach(([socket_id, data]) => {
             const skinMsg = new SkinMsg()
-            skinMsg.setChannelid(socket_id)
+            skinMsg.setSocketid(socket_id)
             skinMsg.setOverallsList(data.skinData.overalls)
             skinMsg.setHatList(data.skinData.hat)
             skinMsg.setShirtList(data.skinData.shirt)
@@ -418,7 +418,7 @@ const sendSkinsIfUpdated = () => {
         /// Send Skins
         Object.entries(roomData).filter(([_, data]) => data.skinData && data.skinData.updated).forEach(([socket_id, data]) => {
             const skinMsg = new SkinMsg()
-            skinMsg.setChannelid(socket_id)
+            skinMsg.setSocketid(socket_id)
             skinMsg.setOverallsList(data.skinData.overalls)
             skinMsg.setHatList(data.skinData.hat)
             skinMsg.setShirtList(data.skinData.shirt)
@@ -716,7 +716,7 @@ require('uWebSockets.js').App().ws('/*', {
         socketsInLobby.push(socket)
         
         const connectedMsg = new ConnectedMsg()
-        connectedMsg.setChannelid(socket.my_id)
+        connectedMsg.setSocketid(socket.my_id)
         const sm64jsMsg = new Sm64JsMsg()
         sm64jsMsg.setConnectedMsg(connectedMsg)
         const rootMsg = new RootMsg()

@@ -30,7 +30,7 @@ message PingMsg {
 }
 
 message ConnectedMsg {
-	uint32 channelID = 1;
+	uint32 socketID = 1;
 }
 
 message MarioListMsg {

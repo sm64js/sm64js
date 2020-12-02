@@ -95,7 +95,7 @@ socket.onopen = () => {
                         measureAndPrintLatency(sm64jsMsg.getPingMsg())
                         break
                     case Sm64JsMsg.MessageCase.CONNECTED_MSG:
-                        networkData.mySocketID = sm64jsMsg.getConnectedMsg().getChannelid()
+                        networkData.mySocketID = sm64jsMsg.getConnectedMsg().getSocketid()
                         break
                     case Sm64JsMsg.MessageCase.CHAT_MSG:
                         recvChat(sm64jsMsg.getChatMsg())

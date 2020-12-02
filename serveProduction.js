@@ -268,21 +268,25 @@ const processChat = async (socket_id, sm64jsMsg) => {
 
     /// Throttle chats by IP
     if (connectedIPs[clientData.socket.ip].chatCooldown > 10) {
-        const chatmsg = {
-            socket_id,
-            msg: "Chat message ignored: You have to wait longer between sending chat messages",
-            sender: "Server",
-        }
-        sendJsonWithTopic('chat', chatmsg, clientData.socket)
+        const chatMsg = new ChatMsg()
+        chatMsg.setSocketid(socket_id)
+        chatMsg.setMessage("Chat message ignored: You have to wait longer between sending chat messages")
+        chatMsg.setSender("Server")
+        const sm64jsMsg = new Sm64JsMsg()
+        sm64jsMsg.setChatMsg(chatMsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+        sendData(rootMsg.serializeBinary(), clientData.socket)
         return
     }
 
-    if (msg.message.length == 0) return
+    if (message.length == 0) return
 
-    const isAdmin = adminTokens.includes(msg.adminToken)
+    const adminToken = chatMsg.getAdmintoken()
+    const isAdmin = adminToken != null && adminTokens.includes(adminToken)
 
-    if (msg.message[0] == '/') {
-        if (isAdmin) processAdminCommand(msg.message.slice(1), msg.adminToken, roomKey)
+    if (message[0] == '/') {
+        if (isAdmin) processAdminCommand(message.slice(1), adminToken, roomKey)
         return
     }
 
@@ -308,10 +312,10 @@ const processChat = async (socket_id, sm64jsMsg) => {
     try {
         const filteredMessage = JSON.parse((await got(request)).body).result
 
-        // TODO isAdmin
-        chatMsg.setChannelid(socket_id)
+        chatMsg.setSocketid(socket_id)
         chatMsg.setMessage(filteredMessage)
         chatMsg.setSender(clientData.playerName)
+        chatMsg.setIsadmin(isAdmin)
 
         const rootMsg = new RootMsg()
         rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)

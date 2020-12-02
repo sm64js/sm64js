@@ -3646,7 +3646,9 @@ proto.sm64js.ChatMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
     message: jspb.Message.getFieldWithDefault(msg, 1, ""),
     sender: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    channelid: jspb.Message.getFieldWithDefault(msg, 3, 0)
+    socketid: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    admintoken: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    isadmin: jspb.Message.getFieldWithDefault(msg, 5, false)
   };
 
   if (includeInstance) {
@@ -3693,7 +3695,15 @@ proto.sm64js.ChatMsg.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 3:
       var value = /** @type {number} */ (reader.readUint32());
-      msg.setChannelid(value);
+      msg.setSocketid(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAdmintoken(value);
+      break;
+    case 5:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsadmin(value);
       break;
     default:
       reader.skipField();
@@ -3738,10 +3748,24 @@ proto.sm64js.ChatMsg.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getChannelid();
+  f = message.getSocketid();
   if (f !== 0) {
     writer.writeUint32(
       3,
+      f
+    );
+  }
+  f = message.getAdmintoken();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
+  f = message.getIsadmin();
+  if (f) {
+    writer.writeBool(
+      5,
       f
     );
   }
@@ -3779,17 +3803,49 @@ proto.sm64js.ChatMsg.prototype.setSender = function(value) {
 
 
 /**
- * optional uint32 channelID = 3;
+ * optional uint32 socketID = 3;
  * @return {number}
  */
-proto.sm64js.ChatMsg.prototype.getChannelid = function() {
+proto.sm64js.ChatMsg.prototype.getSocketid = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
 
 /** @param {number} value */
-proto.sm64js.ChatMsg.prototype.setChannelid = function(value) {
+proto.sm64js.ChatMsg.prototype.setSocketid = function(value) {
   jspb.Message.setProto3IntField(this, 3, value);
+};
+
+
+/**
+ * optional string adminToken = 4;
+ * @return {string}
+ */
+proto.sm64js.ChatMsg.prototype.getAdmintoken = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/** @param {string} value */
+proto.sm64js.ChatMsg.prototype.setAdmintoken = function(value) {
+  jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * optional bool isAdmin = 5;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.sm64js.ChatMsg.prototype.getIsadmin = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 5, false));
+};
+
+
+/** @param {boolean} value */
+proto.sm64js.ChatMsg.prototype.setIsadmin = function(value) {
+  jspb.Message.setProto3BooleanField(this, 5, value);
 };
 
 
@@ -3847,7 +3903,7 @@ proto.sm64js.SkinMsg.prototype.toObject = function(opt_includeInstance) {
  */
 proto.sm64js.SkinMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
-    channelid: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    socketid: jspb.Message.getFieldWithDefault(msg, 1, 0),
     overallsList: jspb.Message.getRepeatedField(msg, 2),
     hatList: jspb.Message.getRepeatedField(msg, 3),
     shirtList: jspb.Message.getRepeatedField(msg, 4),
@@ -3894,7 +3950,7 @@ proto.sm64js.SkinMsg.deserializeBinaryFromReader = function(msg, reader) {
     switch (field) {
     case 1:
       var value = /** @type {number} */ (reader.readUint32());
-      msg.setChannelid(value);
+      msg.setSocketid(value);
       break;
     case 2:
       var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
@@ -3957,7 +4013,7 @@ proto.sm64js.SkinMsg.prototype.serializeBinary = function() {
  */
 proto.sm64js.SkinMsg.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getChannelid();
+  f = message.getSocketid();
   if (f !== 0) {
     writer.writeUint32(
       1,
@@ -4024,16 +4080,16 @@ proto.sm64js.SkinMsg.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional uint32 channelID = 1;
+ * optional uint32 socketID = 1;
  * @return {number}
  */
-proto.sm64js.SkinMsg.prototype.getChannelid = function() {
+proto.sm64js.SkinMsg.prototype.getSocketid = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
 /** @param {number} value */
-proto.sm64js.SkinMsg.prototype.setChannelid = function(value) {
+proto.sm64js.SkinMsg.prototype.setSocketid = function(value) {
   jspb.Message.setProto3IntField(this, 1, value);
 };
 

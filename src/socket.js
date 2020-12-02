@@ -67,34 +67,6 @@ const unzip = (bytes) => {
     })
 }
 
-// TODO moved to chat.js
-// const recvChat = (chatmsg) => {
-//     const channel_id = chatmsg.getChannelid()
-//     const sender = chatmsg.getSender()
-//     const msg = chatmsg.getMessage()
-
-//     if (channel_id != networkData.myChannelID &&
-//         networkData.remotePlayers[channel_id] == undefined) return
-
-//     if (window.banPlayerList.includes(sender)) return
-
-//     const chatlog = document.getElementById("chatlog")
-//     const node = document.createElement("LI")                 // Create a <li> node
-//     node.innerHTML = '<strong>' + sanitizeChat(sender, false) + '</strong>: ' + sanitizeChat(msg, true) + '<br/>'        // Create a text node
-
-//     if (window.showChatIds) node.innerHTML = `(${chatmsg.channel_id})` + node.innerHTML
-//     chatlog.appendChild(node)
-//     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
-
-//     let someobject
-//     if (channel_id == networkData.myChannelID)
-//         someobject = window.myMario
-//     else
-//         someobject = networkData.remotePlayers[channel_id]
-        
-//     Object.assign(someobject, { chatData: { msg: msg, timer: 150 } })
-// }
-
 const measureLatency = (ping_proto) => {
     const startTime = ping_proto.getTime()
     const endTime = performance.now()
@@ -371,9 +343,8 @@ export const submitPlayerName = () => {
 }
 
 export const sendChat = (msg) => {
-    // TODO admin token
-    // if (window.admin && window.admin.token) msg.adminToken = window.admin.token
     const chatMsg = new ChatMsg()
+    if (window.admin && window.admin.token) chatMsg.setAdmintoken(window.admin.token)
     chatMsg.setMessage(msg)
     const sm64jsMsg = new Sm64JsMsg()
     sm64jsMsg.setChatMsg(chatMsg)

@@ -43,10 +43,10 @@ message ControllerListMsg {
 }
 
 message FlagMsg {
-     repeated float pos = 1;
-     bool linkedToPlayer = 2;
-     uint32 socketID = 3;
-	 float height_before_fall = 4;
+	repeated float pos = 1;
+	bool linkedToPlayer = 2;
+	uint32 socketID = 3;
+	float height_before_fall = 4;
 }
 
 message GrabFlagMsg {
@@ -102,17 +102,17 @@ message ValidPlayersMsg {
 	repeated uint32 validPlayers = 2;
 }
 
-// TODO isAdmin
 message ChatMsg {
 	string message = 1;
-	// TODO having sender and channelID feels redundant
 	string sender = 2;
-	uint32 channelID = 3;
+	uint32 socketID = 3;
+	string adminToken = 4;
+	bool isAdmin = 5;
 }
 
 // TODO rainbow skin
 message SkinMsg {
-	uint32 channelID = 1;
+	uint32 socketID = 1;
 	repeated uint32 overalls = 2;
 	repeated uint32 hat = 3;
 	repeated uint32 shirt = 4;

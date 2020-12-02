@@ -19,38 +19,42 @@ const blockChatExtended = (str) => {
 }
 
 export const recvChat = (chatmsg) => {
+    const socket_id = chatmsg.getSocketid()
+    const sender = chatmsg.getSender()
+    const msg = chatmsg.getMessage()
+    const isAdmin = chatmsg.getIsadmin()
 
-    if (chatmsg.socket_id != networkData.mySocketID &&
-        networkData.remotePlayers[chatmsg.socket_id] == undefined) return
+    if (socket_id != networkData.mySocketID &&
+        networkData.remotePlayers[socket_id] == undefined) return
 
-    if (window.banPlayerList.includes(chatmsg.sender) || blockChatExtended(chatmsg.sender)) return
+    if (window.banPlayerList.includes(sender) || blockChatExtended(sender)) return
 
     const chatlog = document.getElementById("chatlog")
     const node = document.createElement("LI")
 
     let adminTag = ""
 
-    if (chatmsg.isAdmin) {
+    if (isAdmin) {
         node.style.color = "blue"
         adminTag = "(Admin)"
     }
 
-    node.innerHTML = '<strong>' + adminTag + chatmsg.sender + '</strong>: ' + applyEmotes(chatmsg.msg) + '<br/>' 
+    node.innerHTML = '<strong>' + adminTag + sender + '</strong>: ' + applyEmotes(msg) + '<br/>' 
     chatlog.appendChild(node)
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 
-    if (chatmsg.sender == "Server") {
+    if (sender == "Server") {
         node.style.color = "#D3D3D3"
         return
     }
 
     let someobject
-    if (chatmsg.socket_id == networkData.mySocketID)
+    if (socket_id == networkData.mySocketID)
         someobject = window.myMario
     else
-        someobject = networkData.remotePlayers[chatmsg.socket_id]
+        someobject = networkData.remotePlayers[socket_id]
 
-    Object.assign(someobject, { chatData: { msg: chatmsg.msg, timer: 150 } })
+    Object.assign(someobject, { chatData: { msg: msg, timer: 150 } })
 
 }
 

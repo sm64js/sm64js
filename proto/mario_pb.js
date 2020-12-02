@@ -23,7 +23,10 @@ goog.exportSymbol('proto.sm64js.MarioMsg', null, global);
 goog.exportSymbol('proto.sm64js.PingMsg', null, global);
 goog.exportSymbol('proto.sm64js.PlayerListsMsg', null, global);
 goog.exportSymbol('proto.sm64js.RootMsg', null, global);
+goog.exportSymbol('proto.sm64js.SkinData', null, global);
 goog.exportSymbol('proto.sm64js.SkinMsg', null, global);
+goog.exportSymbol('proto.sm64js.SkinValue', null, global);
+goog.exportSymbol('proto.sm64js.SkinValue.SpecialSkinValues', null, global);
 goog.exportSymbol('proto.sm64js.Sm64JsMsg', null, global);
 goog.exportSymbol('proto.sm64js.ValidPlayersMsg', null, global);
 
@@ -3861,19 +3864,12 @@ proto.sm64js.ChatMsg.prototype.setIsadmin = function(value) {
  * @constructor
  */
 proto.sm64js.SkinMsg = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.sm64js.SkinMsg.repeatedFields_, null);
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.sm64js.SkinMsg, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   proto.sm64js.SkinMsg.displayName = 'proto.sm64js.SkinMsg';
 }
-/**
- * List of repeated fields within this message type.
- * @private {!Array<number>}
- * @const
- */
-proto.sm64js.SkinMsg.repeatedFields_ = [2,3,4,5,6,7,8];
-
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -3904,14 +3900,7 @@ proto.sm64js.SkinMsg.prototype.toObject = function(opt_includeInstance) {
 proto.sm64js.SkinMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
     socketid: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    overallsList: jspb.Message.getRepeatedField(msg, 2),
-    hatList: jspb.Message.getRepeatedField(msg, 3),
-    shirtList: jspb.Message.getRepeatedField(msg, 4),
-    glovesList: jspb.Message.getRepeatedField(msg, 5),
-    bootsList: jspb.Message.getRepeatedField(msg, 6),
-    skinList: jspb.Message.getRepeatedField(msg, 7),
-    hairList: jspb.Message.getRepeatedField(msg, 8),
-    customcapstate: jspb.Message.getFieldWithDefault(msg, 9, 0)
+    skindata: (f = msg.getSkindata()) && proto.sm64js.SkinData.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -3953,36 +3942,9 @@ proto.sm64js.SkinMsg.deserializeBinaryFromReader = function(msg, reader) {
       msg.setSocketid(value);
       break;
     case 2:
-      var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
-      msg.setOverallsList(value);
-      break;
-    case 3:
-      var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
-      msg.setHatList(value);
-      break;
-    case 4:
-      var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
-      msg.setShirtList(value);
-      break;
-    case 5:
-      var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
-      msg.setGlovesList(value);
-      break;
-    case 6:
-      var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
-      msg.setBootsList(value);
-      break;
-    case 7:
-      var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
-      msg.setSkinList(value);
-      break;
-    case 8:
-      var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
-      msg.setHairList(value);
-      break;
-    case 9:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setCustomcapstate(value);
+      var value = new proto.sm64js.SkinData;
+      reader.readMessage(value,proto.sm64js.SkinData.deserializeBinaryFromReader);
+      msg.setSkindata(value);
       break;
     default:
       reader.skipField();
@@ -4020,60 +3982,12 @@ proto.sm64js.SkinMsg.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getOverallsList();
-  if (f.length > 0) {
-    writer.writePackedUint32(
+  f = message.getSkindata();
+  if (f != null) {
+    writer.writeMessage(
       2,
-      f
-    );
-  }
-  f = message.getHatList();
-  if (f.length > 0) {
-    writer.writePackedUint32(
-      3,
-      f
-    );
-  }
-  f = message.getShirtList();
-  if (f.length > 0) {
-    writer.writePackedUint32(
-      4,
-      f
-    );
-  }
-  f = message.getGlovesList();
-  if (f.length > 0) {
-    writer.writePackedUint32(
-      5,
-      f
-    );
-  }
-  f = message.getBootsList();
-  if (f.length > 0) {
-    writer.writePackedUint32(
-      6,
-      f
-    );
-  }
-  f = message.getSkinList();
-  if (f.length > 0) {
-    writer.writePackedUint32(
-      7,
-      f
-    );
-  }
-  f = message.getHairList();
-  if (f.length > 0) {
-    writer.writePackedUint32(
-      8,
-      f
-    );
-  }
-  f = message.getCustomcapstate();
-  if (f !== 0) {
-    writer.writeUint32(
-      9,
-      f
+      f,
+      proto.sm64js.SkinData.serializeBinaryToWriter
     );
   }
 };
@@ -4095,220 +4009,712 @@ proto.sm64js.SkinMsg.prototype.setSocketid = function(value) {
 
 
 /**
- * repeated uint32 overalls = 2;
- * @return {!Array<number>}
+ * optional SkinData skinData = 2;
+ * @return {?proto.sm64js.SkinData}
  */
-proto.sm64js.SkinMsg.prototype.getOverallsList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 2));
+proto.sm64js.SkinMsg.prototype.getSkindata = function() {
+  return /** @type{?proto.sm64js.SkinData} */ (
+    jspb.Message.getWrapperField(this, proto.sm64js.SkinData, 2));
 };
 
 
-/** @param {!Array<number>} value */
-proto.sm64js.SkinMsg.prototype.setOverallsList = function(value) {
-  jspb.Message.setField(this, 2, value || []);
+/** @param {?proto.sm64js.SkinData|undefined} value */
+proto.sm64js.SkinMsg.prototype.setSkindata = function(value) {
+  jspb.Message.setWrapperField(this, 2, value);
+};
+
+
+proto.sm64js.SkinMsg.prototype.clearSkindata = function() {
+  this.setSkindata(undefined);
 };
 
 
 /**
- * @param {!number} value
- * @param {number=} opt_index
+ * Returns whether this field is set.
+ * @return {!boolean}
  */
-proto.sm64js.SkinMsg.prototype.addOveralls = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 2, value, opt_index);
+proto.sm64js.SkinMsg.prototype.hasSkindata = function() {
+  return jspb.Message.getField(this, 2) != null;
 };
 
 
-proto.sm64js.SkinMsg.prototype.clearOverallsList = function() {
-  this.setOverallsList([]);
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.sm64js.SkinData = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.sm64js.SkinData, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.sm64js.SkinData.displayName = 'proto.sm64js.SkinData';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.sm64js.SkinData.prototype.toObject = function(opt_includeInstance) {
+  return proto.sm64js.SkinData.toObject(opt_includeInstance, this);
 };
 
 
 /**
- * repeated uint32 hat = 3;
- * @return {!Array<number>}
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.sm64js.SkinData} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.sm64js.SkinMsg.prototype.getHatList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 3));
+proto.sm64js.SkinData.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    overalls: (f = msg.getOveralls()) && proto.sm64js.SkinValue.toObject(includeInstance, f),
+    hat: (f = msg.getHat()) && proto.sm64js.SkinValue.toObject(includeInstance, f),
+    shirt: (f = msg.getShirt()) && proto.sm64js.SkinValue.toObject(includeInstance, f),
+    gloves: (f = msg.getGloves()) && proto.sm64js.SkinValue.toObject(includeInstance, f),
+    boots: (f = msg.getBoots()) && proto.sm64js.SkinValue.toObject(includeInstance, f),
+    skin: (f = msg.getSkin()) && proto.sm64js.SkinValue.toObject(includeInstance, f),
+    hair: (f = msg.getHair()) && proto.sm64js.SkinValue.toObject(includeInstance, f),
+    customcapstate: jspb.Message.getFieldWithDefault(msg, 8, 0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
 };
+}
 
 
-/** @param {!Array<number>} value */
-proto.sm64js.SkinMsg.prototype.setHatList = function(value) {
-  jspb.Message.setField(this, 3, value || []);
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.sm64js.SkinData}
+ */
+proto.sm64js.SkinData.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.sm64js.SkinData;
+  return proto.sm64js.SkinData.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
- * @param {!number} value
- * @param {number=} opt_index
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.sm64js.SkinData} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.sm64js.SkinData}
  */
-proto.sm64js.SkinMsg.prototype.addHat = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 3, value, opt_index);
-};
-
-
-proto.sm64js.SkinMsg.prototype.clearHatList = function() {
-  this.setHatList([]);
+proto.sm64js.SkinData.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new proto.sm64js.SkinValue;
+      reader.readMessage(value,proto.sm64js.SkinValue.deserializeBinaryFromReader);
+      msg.setOveralls(value);
+      break;
+    case 2:
+      var value = new proto.sm64js.SkinValue;
+      reader.readMessage(value,proto.sm64js.SkinValue.deserializeBinaryFromReader);
+      msg.setHat(value);
+      break;
+    case 3:
+      var value = new proto.sm64js.SkinValue;
+      reader.readMessage(value,proto.sm64js.SkinValue.deserializeBinaryFromReader);
+      msg.setShirt(value);
+      break;
+    case 4:
+      var value = new proto.sm64js.SkinValue;
+      reader.readMessage(value,proto.sm64js.SkinValue.deserializeBinaryFromReader);
+      msg.setGloves(value);
+      break;
+    case 5:
+      var value = new proto.sm64js.SkinValue;
+      reader.readMessage(value,proto.sm64js.SkinValue.deserializeBinaryFromReader);
+      msg.setBoots(value);
+      break;
+    case 6:
+      var value = new proto.sm64js.SkinValue;
+      reader.readMessage(value,proto.sm64js.SkinValue.deserializeBinaryFromReader);
+      msg.setSkin(value);
+      break;
+    case 7:
+      var value = new proto.sm64js.SkinValue;
+      reader.readMessage(value,proto.sm64js.SkinValue.deserializeBinaryFromReader);
+      msg.setHair(value);
+      break;
+    case 8:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setCustomcapstate(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
 };
 
 
 /**
- * repeated uint32 shirt = 4;
- * @return {!Array<number>}
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
  */
-proto.sm64js.SkinMsg.prototype.getShirtList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 4));
-};
-
-
-/** @param {!Array<number>} value */
-proto.sm64js.SkinMsg.prototype.setShirtList = function(value) {
-  jspb.Message.setField(this, 4, value || []);
+proto.sm64js.SkinData.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.sm64js.SkinData.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
 };
 
 
 /**
- * @param {!number} value
- * @param {number=} opt_index
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.sm64js.SkinData} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.sm64js.SkinMsg.prototype.addShirt = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 4, value, opt_index);
-};
-
-
-proto.sm64js.SkinMsg.prototype.clearShirtList = function() {
-  this.setShirtList([]);
+proto.sm64js.SkinData.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getOveralls();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      proto.sm64js.SkinValue.serializeBinaryToWriter
+    );
+  }
+  f = message.getHat();
+  if (f != null) {
+    writer.writeMessage(
+      2,
+      f,
+      proto.sm64js.SkinValue.serializeBinaryToWriter
+    );
+  }
+  f = message.getShirt();
+  if (f != null) {
+    writer.writeMessage(
+      3,
+      f,
+      proto.sm64js.SkinValue.serializeBinaryToWriter
+    );
+  }
+  f = message.getGloves();
+  if (f != null) {
+    writer.writeMessage(
+      4,
+      f,
+      proto.sm64js.SkinValue.serializeBinaryToWriter
+    );
+  }
+  f = message.getBoots();
+  if (f != null) {
+    writer.writeMessage(
+      5,
+      f,
+      proto.sm64js.SkinValue.serializeBinaryToWriter
+    );
+  }
+  f = message.getSkin();
+  if (f != null) {
+    writer.writeMessage(
+      6,
+      f,
+      proto.sm64js.SkinValue.serializeBinaryToWriter
+    );
+  }
+  f = message.getHair();
+  if (f != null) {
+    writer.writeMessage(
+      7,
+      f,
+      proto.sm64js.SkinValue.serializeBinaryToWriter
+    );
+  }
+  f = message.getCustomcapstate();
+  if (f !== 0) {
+    writer.writeUint32(
+      8,
+      f
+    );
+  }
 };
 
 
 /**
- * repeated uint32 gloves = 5;
- * @return {!Array<number>}
+ * optional SkinValue overalls = 1;
+ * @return {?proto.sm64js.SkinValue}
  */
-proto.sm64js.SkinMsg.prototype.getGlovesList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 5));
+proto.sm64js.SkinData.prototype.getOveralls = function() {
+  return /** @type{?proto.sm64js.SkinValue} */ (
+    jspb.Message.getWrapperField(this, proto.sm64js.SkinValue, 1));
 };
 
 
-/** @param {!Array<number>} value */
-proto.sm64js.SkinMsg.prototype.setGlovesList = function(value) {
-  jspb.Message.setField(this, 5, value || []);
+/** @param {?proto.sm64js.SkinValue|undefined} value */
+proto.sm64js.SkinData.prototype.setOveralls = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.sm64js.SkinData.prototype.clearOveralls = function() {
+  this.setOveralls(undefined);
 };
 
 
 /**
- * @param {!number} value
- * @param {number=} opt_index
+ * Returns whether this field is set.
+ * @return {!boolean}
  */
-proto.sm64js.SkinMsg.prototype.addGloves = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 5, value, opt_index);
-};
-
-
-proto.sm64js.SkinMsg.prototype.clearGlovesList = function() {
-  this.setGlovesList([]);
+proto.sm64js.SkinData.prototype.hasOveralls = function() {
+  return jspb.Message.getField(this, 1) != null;
 };
 
 
 /**
- * repeated uint32 boots = 6;
- * @return {!Array<number>}
+ * optional SkinValue hat = 2;
+ * @return {?proto.sm64js.SkinValue}
  */
-proto.sm64js.SkinMsg.prototype.getBootsList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 6));
+proto.sm64js.SkinData.prototype.getHat = function() {
+  return /** @type{?proto.sm64js.SkinValue} */ (
+    jspb.Message.getWrapperField(this, proto.sm64js.SkinValue, 2));
 };
 
 
-/** @param {!Array<number>} value */
-proto.sm64js.SkinMsg.prototype.setBootsList = function(value) {
-  jspb.Message.setField(this, 6, value || []);
+/** @param {?proto.sm64js.SkinValue|undefined} value */
+proto.sm64js.SkinData.prototype.setHat = function(value) {
+  jspb.Message.setWrapperField(this, 2, value);
+};
+
+
+proto.sm64js.SkinData.prototype.clearHat = function() {
+  this.setHat(undefined);
 };
 
 
 /**
- * @param {!number} value
- * @param {number=} opt_index
+ * Returns whether this field is set.
+ * @return {!boolean}
  */
-proto.sm64js.SkinMsg.prototype.addBoots = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 6, value, opt_index);
-};
-
-
-proto.sm64js.SkinMsg.prototype.clearBootsList = function() {
-  this.setBootsList([]);
+proto.sm64js.SkinData.prototype.hasHat = function() {
+  return jspb.Message.getField(this, 2) != null;
 };
 
 
 /**
- * repeated uint32 skin = 7;
- * @return {!Array<number>}
+ * optional SkinValue shirt = 3;
+ * @return {?proto.sm64js.SkinValue}
  */
-proto.sm64js.SkinMsg.prototype.getSkinList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 7));
+proto.sm64js.SkinData.prototype.getShirt = function() {
+  return /** @type{?proto.sm64js.SkinValue} */ (
+    jspb.Message.getWrapperField(this, proto.sm64js.SkinValue, 3));
 };
 
 
-/** @param {!Array<number>} value */
-proto.sm64js.SkinMsg.prototype.setSkinList = function(value) {
-  jspb.Message.setField(this, 7, value || []);
+/** @param {?proto.sm64js.SkinValue|undefined} value */
+proto.sm64js.SkinData.prototype.setShirt = function(value) {
+  jspb.Message.setWrapperField(this, 3, value);
+};
+
+
+proto.sm64js.SkinData.prototype.clearShirt = function() {
+  this.setShirt(undefined);
 };
 
 
 /**
- * @param {!number} value
- * @param {number=} opt_index
+ * Returns whether this field is set.
+ * @return {!boolean}
  */
-proto.sm64js.SkinMsg.prototype.addSkin = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 7, value, opt_index);
-};
-
-
-proto.sm64js.SkinMsg.prototype.clearSkinList = function() {
-  this.setSkinList([]);
+proto.sm64js.SkinData.prototype.hasShirt = function() {
+  return jspb.Message.getField(this, 3) != null;
 };
 
 
 /**
- * repeated uint32 hair = 8;
- * @return {!Array<number>}
+ * optional SkinValue gloves = 4;
+ * @return {?proto.sm64js.SkinValue}
  */
-proto.sm64js.SkinMsg.prototype.getHairList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 8));
+proto.sm64js.SkinData.prototype.getGloves = function() {
+  return /** @type{?proto.sm64js.SkinValue} */ (
+    jspb.Message.getWrapperField(this, proto.sm64js.SkinValue, 4));
 };
 
 
-/** @param {!Array<number>} value */
-proto.sm64js.SkinMsg.prototype.setHairList = function(value) {
-  jspb.Message.setField(this, 8, value || []);
+/** @param {?proto.sm64js.SkinValue|undefined} value */
+proto.sm64js.SkinData.prototype.setGloves = function(value) {
+  jspb.Message.setWrapperField(this, 4, value);
+};
+
+
+proto.sm64js.SkinData.prototype.clearGloves = function() {
+  this.setGloves(undefined);
 };
 
 
 /**
- * @param {!number} value
- * @param {number=} opt_index
+ * Returns whether this field is set.
+ * @return {!boolean}
  */
-proto.sm64js.SkinMsg.prototype.addHair = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 8, value, opt_index);
-};
-
-
-proto.sm64js.SkinMsg.prototype.clearHairList = function() {
-  this.setHairList([]);
+proto.sm64js.SkinData.prototype.hasGloves = function() {
+  return jspb.Message.getField(this, 4) != null;
 };
 
 
 /**
- * optional uint32 customCapState = 9;
+ * optional SkinValue boots = 5;
+ * @return {?proto.sm64js.SkinValue}
+ */
+proto.sm64js.SkinData.prototype.getBoots = function() {
+  return /** @type{?proto.sm64js.SkinValue} */ (
+    jspb.Message.getWrapperField(this, proto.sm64js.SkinValue, 5));
+};
+
+
+/** @param {?proto.sm64js.SkinValue|undefined} value */
+proto.sm64js.SkinData.prototype.setBoots = function(value) {
+  jspb.Message.setWrapperField(this, 5, value);
+};
+
+
+proto.sm64js.SkinData.prototype.clearBoots = function() {
+  this.setBoots(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.sm64js.SkinData.prototype.hasBoots = function() {
+  return jspb.Message.getField(this, 5) != null;
+};
+
+
+/**
+ * optional SkinValue skin = 6;
+ * @return {?proto.sm64js.SkinValue}
+ */
+proto.sm64js.SkinData.prototype.getSkin = function() {
+  return /** @type{?proto.sm64js.SkinValue} */ (
+    jspb.Message.getWrapperField(this, proto.sm64js.SkinValue, 6));
+};
+
+
+/** @param {?proto.sm64js.SkinValue|undefined} value */
+proto.sm64js.SkinData.prototype.setSkin = function(value) {
+  jspb.Message.setWrapperField(this, 6, value);
+};
+
+
+proto.sm64js.SkinData.prototype.clearSkin = function() {
+  this.setSkin(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.sm64js.SkinData.prototype.hasSkin = function() {
+  return jspb.Message.getField(this, 6) != null;
+};
+
+
+/**
+ * optional SkinValue hair = 7;
+ * @return {?proto.sm64js.SkinValue}
+ */
+proto.sm64js.SkinData.prototype.getHair = function() {
+  return /** @type{?proto.sm64js.SkinValue} */ (
+    jspb.Message.getWrapperField(this, proto.sm64js.SkinValue, 7));
+};
+
+
+/** @param {?proto.sm64js.SkinValue|undefined} value */
+proto.sm64js.SkinData.prototype.setHair = function(value) {
+  jspb.Message.setWrapperField(this, 7, value);
+};
+
+
+proto.sm64js.SkinData.prototype.clearHair = function() {
+  this.setHair(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.sm64js.SkinData.prototype.hasHair = function() {
+  return jspb.Message.getField(this, 7) != null;
+};
+
+
+/**
+ * optional uint32 customCapState = 8;
  * @return {number}
  */
-proto.sm64js.SkinMsg.prototype.getCustomcapstate = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
+proto.sm64js.SkinData.prototype.getCustomcapstate = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
 };
 
 
 /** @param {number} value */
-proto.sm64js.SkinMsg.prototype.setCustomcapstate = function(value) {
-  jspb.Message.setProto3IntField(this, 9, value);
+proto.sm64js.SkinData.prototype.setCustomcapstate = function(value) {
+  jspb.Message.setProto3IntField(this, 8, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.sm64js.SkinValue = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, proto.sm64js.SkinValue.oneofGroups_);
+};
+goog.inherits(proto.sm64js.SkinValue, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.sm64js.SkinValue.displayName = 'proto.sm64js.SkinValue';
+}
+/**
+ * Oneof group definitions for this message. Each group defines the field
+ * numbers belonging to that group. When of these fields' value is set, all
+ * other fields in the group are cleared. During deserialization, if multiple
+ * fields are encountered for a group, only the last value seen will be kept.
+ * @private {!Array<!Array<number>>}
+ * @const
+ */
+proto.sm64js.SkinValue.oneofGroups_ = [[1,2]];
+
+/**
+ * @enum {number}
+ */
+proto.sm64js.SkinValue.ValueCase = {
+  VALUE_NOT_SET: 0,
+  BYTES: 1,
+  SPECIAL: 2
+};
+
+/**
+ * @return {proto.sm64js.SkinValue.ValueCase}
+ */
+proto.sm64js.SkinValue.prototype.getValueCase = function() {
+  return /** @type {proto.sm64js.SkinValue.ValueCase} */(jspb.Message.computeOneofCase(this, proto.sm64js.SkinValue.oneofGroups_[0]));
+};
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.sm64js.SkinValue.prototype.toObject = function(opt_includeInstance) {
+  return proto.sm64js.SkinValue.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.sm64js.SkinValue} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.sm64js.SkinValue.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    bytes: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    special: jspb.Message.getFieldWithDefault(msg, 2, 0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.sm64js.SkinValue}
+ */
+proto.sm64js.SkinValue.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.sm64js.SkinValue;
+  return proto.sm64js.SkinValue.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.sm64js.SkinValue} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.sm64js.SkinValue}
+ */
+proto.sm64js.SkinValue.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setBytes(value);
+      break;
+    case 2:
+      var value = /** @type {!proto.sm64js.SkinValue.SpecialSkinValues} */ (reader.readEnum());
+      msg.setSpecial(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.sm64js.SkinValue.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.sm64js.SkinValue.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.sm64js.SkinValue} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.sm64js.SkinValue.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = /** @type {number} */ (jspb.Message.getField(message, 1));
+  if (f != null) {
+    writer.writeUint64(
+      1,
+      f
+    );
+  }
+  f = /** @type {!proto.sm64js.SkinValue.SpecialSkinValues} */ (jspb.Message.getField(message, 2));
+  if (f != null) {
+    writer.writeEnum(
+      2,
+      f
+    );
+  }
+};
+
+
+/**
+ * @enum {number}
+ */
+proto.sm64js.SkinValue.SpecialSkinValues = {
+  RAINBOW: 0
+};
+
+/**
+ * optional uint64 bytes = 1;
+ * @return {number}
+ */
+proto.sm64js.SkinValue.prototype.getBytes = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/** @param {number} value */
+proto.sm64js.SkinValue.prototype.setBytes = function(value) {
+  jspb.Message.setOneofField(this, 1, proto.sm64js.SkinValue.oneofGroups_[0], value);
+};
+
+
+proto.sm64js.SkinValue.prototype.clearBytes = function() {
+  jspb.Message.setOneofField(this, 1, proto.sm64js.SkinValue.oneofGroups_[0], undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.sm64js.SkinValue.prototype.hasBytes = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional SpecialSkinValues special = 2;
+ * @return {!proto.sm64js.SkinValue.SpecialSkinValues}
+ */
+proto.sm64js.SkinValue.prototype.getSpecial = function() {
+  return /** @type {!proto.sm64js.SkinValue.SpecialSkinValues} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {!proto.sm64js.SkinValue.SpecialSkinValues} value */
+proto.sm64js.SkinValue.prototype.setSpecial = function(value) {
+  jspb.Message.setOneofField(this, 2, proto.sm64js.SkinValue.oneofGroups_[0], value);
+};
+
+
+proto.sm64js.SkinValue.prototype.clearSpecial = function() {
+  jspb.Message.setOneofField(this, 2, proto.sm64js.SkinValue.oneofGroups_[0], undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.sm64js.SkinValue.prototype.hasSpecial = function() {
+  return jspb.Message.getField(this, 2) != null;
 };
 
 

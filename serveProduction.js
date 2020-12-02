@@ -1,4 +1,4 @@
-const { RootMsg, MarioListMsg, ValidPlayersMsg, Sm64JsMsg, ConnectedMsg, SkinMsg, PlayerListsMsg, FlagMsg } = require("./proto/mario_pb")
+const { RootMsg, MarioListMsg, ValidPlayersMsg, Sm64JsMsg, ConnectedMsg, SkinMsg, SkinValue, PlayerListsMsg, FlagMsg } = require("./proto/mario_pb")
 const fs = require('fs')
 const http = require('http')
 const got = require('got')
@@ -159,45 +159,17 @@ const processPlayerData = (socket_id, decodedMario) => {
     //broadcastDataWithOpcode(bytes, 3, socket_id)
 }*/
 
-// TODO rainbow skin
-const isValidSkinEntry = (skinEntry) => {
-    return skinEntry.length === 6 && !skinEntry.find(skinVal => isNaN(skinVal) || skinVal < 0 || skinVal > 255 || !Number.isInteger(skinVal))
-}
-
-const validSkins = (skinMsg) => {
-    if (!isValidSkinEntry(skinMsg.getOverallsList())) return false
-    if (!isValidSkinEntry(skinMsg.getHatList())) return false
-    if (!isValidSkinEntry(skinMsg.getShirtList())) return false
-    if (!isValidSkinEntry(skinMsg.getGlovesList())) return false
-    if (!isValidSkinEntry(skinMsg.getBootsList())) return false
-    if (!isValidSkinEntry(skinMsg.getSkinList())) return false
-    if (!isValidSkinEntry(skinMsg.getHairList())) return false
-
-    return true
-}
-
-
-const processSkin = (channel_id, skinMsg) => {
+const processSkin = (socket_id, skinMsg) => {
 
     const roomKey = socketIdsToRoomKeys[socket_id]
     if (roomKey == undefined) return 
 
     if (clientsRoot[roomKey][socket_id].valid == 0) return
 
-    if (!validSkins(skinMsg)) return
+    const skinData = skinMsg.getSkindata()
 
-    const skinData = {
-        overalls: skinMsg.getOverallsList(),
-        hat: skinMsg.getHatList(),
-        shirt: skinMsg.getShirtList(),
-        gloves: skinMsg.getGlovesList(),
-        boots: skinMsg.getBootsList(),
-        skin: skinMsg.getSkinList(),
-        hair: skinMsg.getHairList(),
-        customCapState: skinMsg.getCustomcapstate() != null ? skinMsg.getCustomcapstate() : 0,
-    }
     clientsRoot[roomKey][socket_id].skinData = skinData
-    clientsRoot[roomKey][socket_id].skinData.updated = true
+    clientsRoot[roomKey][socket_id].skinDataUpdated = true
 }
 
 const rejectPlayerName = (socket) => {
@@ -394,14 +366,7 @@ const sendSkinsToSocket = (socket) => {
         Object.entries(clientsRoot[roomKey]).filter(([_, data]) => data.skinData).forEach(([socket_id, data]) => {
             const skinMsg = new SkinMsg()
             skinMsg.setSocketid(socket_id)
-            skinMsg.setOverallsList(data.skinData.overalls)
-            skinMsg.setHatList(data.skinData.hat)
-            skinMsg.setShirtList(data.skinData.shirt)
-            skinMsg.setGlovesList(data.skinData.gloves)
-            skinMsg.setBootsList(data.skinData.boots)
-            skinMsg.setSkinList(data.skinData.skin)
-            skinMsg.setHairList(data.skinData.hair)
-            skinMsg.setCustomcapstate(data.skinData.customCapState)
+            skinMsg.setSkindata(data.skinData)
             const sm64jsMsg = new Sm64JsMsg()
             sm64jsMsg.setSkinMsg(skinMsg)
             const rootMsg = new RootMsg()
@@ -416,23 +381,16 @@ const sendSkinsIfUpdated = () => {
 
     Object.entries(clientsRoot).forEach(([roomKey, roomData]) => {
         /// Send Skins
-        Object.entries(roomData).filter(([_, data]) => data.skinData && data.skinData.updated).forEach(([socket_id, data]) => {
+        Object.entries(roomData).filter(([_, data]) => data.skinData && data.skinDataUpdated).forEach(([socket_id, data]) => {
             const skinMsg = new SkinMsg()
             skinMsg.setSocketid(socket_id)
-            skinMsg.setOverallsList(data.skinData.overalls)
-            skinMsg.setHatList(data.skinData.hat)
-            skinMsg.setShirtList(data.skinData.shirt)
-            skinMsg.setGlovesList(data.skinData.gloves)
-            skinMsg.setBootsList(data.skinData.boots)
-            skinMsg.setSkinList(data.skinData.skin)
-            skinMsg.setHairList(data.skinData.hair)
-            skinMsg.setCustomcapstate(data.skinData.customCapState)
+            skinMsg.setSkindata(data.skinData)
             const sm64jsMsg = new Sm64JsMsg()
             sm64jsMsg.setSkinMsg(skinMsg)
             const rootMsg = new RootMsg()
             rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
 
-            data.skinData.updated = false
+            data.skinDataUpdated = false
 
             broadcastData(rootMsg.serializeBinary(), roomKey)
         })

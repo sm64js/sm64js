@@ -207,26 +207,46 @@ export const recvPlayerNameResponse = (msg) => {
     }
 }
 
+const fromSkinValue = (skinValue) => {
+    const bytes = skinValue.getBytes()
+    if (bytes != null) {
+        return [
+            bytes & 0xff,
+            (bytes / Math.pow(2, 8)) & 0xff,
+            (bytes / Math.pow(2, 0x10)) & 0xff,
+            (bytes / Math.pow(2, 0x18)) & 0xff,
+            (bytes / Math.pow(2, 0x20)) & 0xff,
+            (bytes / Math.pow(2, 0x28)) & 0xff,
+        ]
+    }
+    const special = val.getSpecial()
+    if (special === SkinValue.SpecialSkinValues.RAINBOW) {
+        return "r"
+    }
+}
+
 export const recvSkinData = (skinMsg) => { 
     const socket_id = skinMsg.getSocketid()
     if (socket_id === networkData.mySocketID ||
         networkData.remotePlayers[socket_id] == null) return
 
+    const sinDataMsg = skinMsg.getSkindata()
     const skinData = {
-        overalls: skinMsg.getOverallsList(),
-        hat: skinMsg.getHatList(),
-        shirt: skinMsg.getShirtList(),
-        gloves: skinMsg.getGlovesList(),
-        boots: skinMsg.getBootsList(),
-        skin: skinMsg.getSkinList(),
-        hair: skinMsg.getHairList(),
-        customCapState: skinMsg.getCustomcapstate(),
+        overalls: fromSkinValue(sinDataMsg.getOveralls()),
+        hat: fromSkinValue(sinDataMsg.getHat()),
+        shirt: fromSkinValue(sinDataMsg.getShirt()),
+        gloves: fromSkinValue(sinDataMsg.getGloves()),
+        boots: fromSkinValue(sinDataMsg.getBoots()),
+        skin: fromSkinValue(sinDataMsg.getSkin()),
+        hair: fromSkinValue(sinDataMsg.getHair()),
+        customCapState: sinDataMsg.getCustomcapstate(),
     }
     networkData.remotePlayers[socket_id].skinData = skinData
 }
 
 const isValidSkinEntry = (skinEntry) => {
-    return skinEntry.length === 6 && !skinEntry.find(skinVal => isNaN(skinVal) || skinVal < 0 || skinVal > 255 || !Number.isInteger(skinVal))
+    return skinEntry === "r" ||
+        skinEntry.length === 6 && !skinEntry.find(skinVal => isNaN(skinVal) || skinVal < 0 || skinVal > 255 || !Number.isInteger(skinVal))
 }
 
 export const validSkins = () => {

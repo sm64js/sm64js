@@ -1,4 +1,4 @@
-import { RootMsg, Sm64JsMsg, GrabFlagMsg, AttackMsg, PingMsg, ChatMsg, SkinMsg } from "../proto/mario_pb"
+import { RootMsg, Sm64JsMsg, GrabFlagMsg, AttackMsg, PingMsg, ChatMsg, SkinMsg, SkinData, SkinValue } from "../proto/mario_pb"
 import zlib from "zlib"
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
@@ -92,7 +92,7 @@ socket.onopen = () => {
                         Multi.recvPlayerLists(sm64jsMsg.getPlayerListsMsg())
                         break
                     case Sm64JsMsg.MessageCase.PING_MSG:
-                        measureAndPrintLatency(sm64jsMsg.getPingMsg())
+                        measureLatency(sm64jsMsg.getPingMsg())
                         break
                     case Sm64JsMsg.MessageCase.CONNECTED_MSG:
                         networkData.mySocketID = sm64jsMsg.getConnectedMsg().getSocketid()
@@ -231,6 +231,26 @@ export const updateNetworkBeforeRender = () => {
 
 }
 
+const toSkinValue = (data) => {
+    if (Array.isArray(data)) {
+        let bytes = 0;
+        data.forEach((val, i) => {
+            bytes += (val & 0xff) * Math.pow(2, 8 * i)
+        })
+        const skinValue = new SkinValue()
+        skinValue.setBytes(bytes)
+        return skinValue
+    }
+
+    if (data = "r") {
+        const skinValue = new SkinValue()
+        skinValue.setSpecial(SkinValue.SpecialSkinValues.RAINBOW)
+        return skinValue
+    }
+
+    throw new Error(`Could not create skinValue from ${data}`)
+}
+
 export const post_main_loop_one_iteration = (frame) => {
 
 	//Update the rainbows colors
@@ -260,16 +280,19 @@ export const post_main_loop_one_iteration = (frame) => {
                 if (JSON.stringify(window.myMario.skinData) !== networkData.lastSentSkinData) {
                     networkData.lastSentSkinData = JSON.stringify(window.myMario.skinData)
                     const skinData = window.myMario.skinData
+                    console.log('skinData', skinData)
 
+                    const skinDataMsg = new SkinData()
+                    skinDataMsg.setOveralls(toSkinValue(skinData.overalls))
+                    skinDataMsg.setHat(toSkinValue(skinData.hat))
+                    skinDataMsg.setShirt(toSkinValue(skinData.shirt))
+                    skinDataMsg.setGloves(toSkinValue(skinData.gloves))
+                    skinDataMsg.setBoots(toSkinValue(skinData.boots))
+                    skinDataMsg.setSkin(toSkinValue(skinData.skin))
+                    skinDataMsg.setHair(toSkinValue(skinData.hair))
+                    skinDataMsg.setCustomcapstate(skinData.customCapState)
                     const skinMsg = new SkinMsg()
-                    skinMsg.setOverallsList(skinData.overalls)
-                    skinMsg.setHatList(skinData.hat)
-                    skinMsg.setShirtList(skinData.shirt)
-                    skinMsg.setGlovesList(skinData.gloves)
-                    skinMsg.setBootsList(skinData.boots)
-                    skinMsg.setSkinList(skinData.skin)
-                    skinMsg.setHairList(skinData.hair)
-                    skinMsg.setCustomcapstate(skinData.customCapState)
+                    skinMsg.setSkindata(skinDataMsg)
                     const sm64jsMsg = new Sm64JsMsg()
                     sm64jsMsg.setSkinMsg(skinMsg)
                     const rootMsg = new RootMsg()

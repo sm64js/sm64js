@@ -13,7 +13,7 @@ const createEmote = (type) => {
     img.height = '20';
     img.width = '20';
     img.alt = `:${type}:`;
-    img.src = `src/emotes/${emoteImg[type]}`;
+    img.src = `emotes/${emoteImg[type]}`;
     return img;
 }
 

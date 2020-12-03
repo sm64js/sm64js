@@ -280,7 +280,6 @@ export const post_main_loop_one_iteration = (frame) => {
                 if (JSON.stringify(window.myMario.skinData) !== networkData.lastSentSkinData) {
                     networkData.lastSentSkinData = JSON.stringify(window.myMario.skinData)
                     const skinData = window.myMario.skinData
-                    console.log('skinData', skinData)
 
                     const skinDataMsg = new SkinData()
                     skinDataMsg.setOveralls(toSkinValue(skinData.overalls))
@@ -365,10 +364,10 @@ export const submitPlayerName = () => {
     }
 }
 
-export const sendChat = (msg) => {
+export const sendChat = ({ message }) => {
     const chatMsg = new ChatMsg()
     if (window.admin && window.admin.token) chatMsg.setAdmintoken(window.admin.token)
-    chatMsg.setMessage(msg)
+    chatMsg.setMessage(message)
     const sm64jsMsg = new Sm64JsMsg()
     sm64jsMsg.setChatMsg(chatMsg)
     const rootMsg = new RootMsg()

@@ -230,7 +230,7 @@ const processAdminCommand = (msg, token, roomKey) => {
 
 const processChat = async (socket_id, sm64jsMsg) => {
     const chatMsg = sm64jsMsg.getChatMsg()
-    const msg = chatMsg.getMessage()
+    const message = chatMsg.getMessage()
 
     const roomKey = socketIdsToRoomKeys[socket_id]
     if (roomKey == undefined) return 
@@ -273,11 +273,11 @@ const processChat = async (socket_id, sm64jsMsg) => {
         playerName: clientData.playerName,
         ip: clientData.socket.ip,
         timestampMs: Date.now(),
-        message: msg.message,
-        adminToken: msg.adminToken
+        message,
+        adminToken
     }).write()
 
-    const sanitizedChat = sanitizeChat(msg.message)
+    const sanitizedChat = sanitizeChat(message)
 
     const request = "http://www.purgomalum.com/service/json?text=" + sanitizedChat
 

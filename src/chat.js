@@ -54,7 +54,7 @@ export const recvChat = (chatmsg) => {
     else
         someobject = networkData.remotePlayers[socket_id]
 
-    Object.assign(someobject, { chatData: { msg: msg, timer: 150 } })
+    Object.assign(someobject, { chatData: { msg, timer: 150 } })
 
 }
 

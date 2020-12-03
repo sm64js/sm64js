@@ -19,8 +19,8 @@ const createEmote = (type) => {
 
 const createMessage = (string) => {
     const message = document.createElement('span');
-    string.split(/(:\w+:)/g).forEach(token => {
-        if (token.charAt(0) === ':' && token.charAt(token.length-1) === ':') {
+    string.split(/(:\w+:)/g).forEach((token, i) => {
+        if (i%2 === 1) {
             const emoteType = token.slice(1, token.length-1);
             if (emoteImg[emoteType]) {
                 message.appendChild(createEmote(emoteType));

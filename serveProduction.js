@@ -178,13 +178,11 @@ const rejectPlayerName = (socket) => {
 
 const sanitizeChat = (string) => {
     string = string.substring(0, 200)
-    string = string.replace(/</g, "")
-    string = string.replace(/>/g, "")
     return applyValidCharacters(string)
 }
 
 //Valid characters for usernames.
-const validCharacters = [
+const validCharacters = new Set([
     'a', 'b', 'c', 'd', 'e', 'f', 'g',
     'h', 'i', 'j', 'k', 'l', 'm', 'n',
     'o', 'p', 'q', 'r', 's', 't', 'u',
@@ -201,15 +199,11 @@ const validCharacters = [
     '😂', '⭐', '✨', '🎄', '🎃', '🔺', '🔻',
     '🎄', '🍬', '🍭', '🍫', ' ',
     '-', '_', '=', '|', '<', '>', ':', "'"
-]
+]);
 
 
 const applyValidCharacters = (str) => {
-    let temp = ""
-    str.split('').forEach(character => {
-        if (validCharacters.includes(character)) { temp += character }
-    })
-    return temp
+    return str.split('').filter(c => validCharacters.has(c)).join('');
 }
 
 const processAdminCommand = (msg, token, roomKey) => {

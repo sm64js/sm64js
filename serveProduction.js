@@ -1,4 +1,4 @@
-const { RootMsg, MarioListMsg, ValidPlayersMsg, Sm64JsMsg, ConnectedMsg, SkinMsg, SkinValue, PlayerListsMsg, FlagMsg } = require("./proto/mario_pb")
+const { RootMsg, MarioListMsg, ValidPlayersMsg, Sm64JsMsg, ConnectedMsg, SkinMsg, PlayerListsMsg, FlagMsg } = require("./proto/mario_pb")
 const fs = require('fs')
 const http = require('http')
 const got = require('got')

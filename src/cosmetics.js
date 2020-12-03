@@ -1,4 +1,5 @@
 import { networkData, submitPlayerName } from "./socket"
+import { SkinValue } from "../proto/mario_pb"
 
 export const defaultSkinData = () => {
     return {
@@ -208,20 +209,28 @@ export const recvPlayerNameResponse = (msg) => {
 }
 
 const fromSkinValue = (skinValue) => {
-    const bytes = skinValue.getBytes()
-    if (bytes != null) {
-        return [
-            bytes & 0xff,
-            (bytes / Math.pow(2, 8)) & 0xff,
-            (bytes / Math.pow(2, 0x10)) & 0xff,
-            (bytes / Math.pow(2, 0x18)) & 0xff,
-            (bytes / Math.pow(2, 0x20)) & 0xff,
-            (bytes / Math.pow(2, 0x28)) & 0xff,
-        ]
-    }
-    const special = val.getSpecial()
-    if (special === SkinValue.SpecialSkinValues.RAINBOW) {
-        return "r"
+    switch (skinValue.getValueCase()) {
+        case SkinValue.ValueCase.BYTES:
+            const bytes = skinValue.getBytes()
+            if (bytes != null) {
+                return [
+                    bytes & 0xff,
+                    (bytes / Math.pow(2, 8)) & 0xff,
+                    (bytes / Math.pow(2, 0x10)) & 0xff,
+                    (bytes / Math.pow(2, 0x18)) & 0xff,
+                    (bytes / Math.pow(2, 0x20)) & 0xff,
+                    (bytes / Math.pow(2, 0x28)) & 0xff,
+                ]
+            }
+            break
+        case SkinValue.ValueCase.SPECIAL:
+            const special = skinValue.getSpecial()
+            if (special === SkinValue.SpecialSkinValues.RAINBOW) {
+                return "r"
+            }
+            break
+        case SkinValue.ValueCase.VALUE_NOT_SET:
+        default:
     }
 }
 
@@ -230,16 +239,16 @@ export const recvSkinData = (skinMsg) => {
     if (socket_id === networkData.mySocketID ||
         networkData.remotePlayers[socket_id] == null) return
 
-    const sinDataMsg = skinMsg.getSkindata()
+    const skinDataMsg = skinMsg.getSkindata()
     const skinData = {
-        overalls: fromSkinValue(sinDataMsg.getOveralls()),
-        hat: fromSkinValue(sinDataMsg.getHat()),
-        shirt: fromSkinValue(sinDataMsg.getShirt()),
-        gloves: fromSkinValue(sinDataMsg.getGloves()),
-        boots: fromSkinValue(sinDataMsg.getBoots()),
-        skin: fromSkinValue(sinDataMsg.getSkin()),
-        hair: fromSkinValue(sinDataMsg.getHair()),
-        customCapState: sinDataMsg.getCustomcapstate(),
+        overalls: fromSkinValue(skinDataMsg.getOveralls()),
+        hat: fromSkinValue(skinDataMsg.getHat()),
+        shirt: fromSkinValue(skinDataMsg.getShirt()),
+        gloves: fromSkinValue(skinDataMsg.getGloves()),
+        boots: fromSkinValue(skinDataMsg.getBoots()),
+        skin: fromSkinValue(skinDataMsg.getSkin()),
+        hair: fromSkinValue(skinDataMsg.getHair()),
+        customCapState: skinDataMsg.getCustomcapstate(),
     }
     networkData.remotePlayers[socket_id].skinData = skinData
 }

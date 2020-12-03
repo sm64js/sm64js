@@ -242,7 +242,7 @@ const toSkinValue = (data) => {
         return skinValue
     }
 
-    if (data = "r") {
+    if (data === "r") {
         const skinValue = new SkinValue()
         skinValue.setSpecial(SkinValue.SpecialSkinValues.RAINBOW)
         return skinValue

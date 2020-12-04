@@ -1,4 +1,14 @@
-const { RootMsg, MarioListMsg, ValidPlayersMsg, Sm64JsMsg, ConnectedMsg, SkinMsg, PlayerListsMsg, FlagMsg } = require("./proto/mario_pb")
+const {
+    RootMsg,
+    MarioListMsg,
+    ValidPlayersMsg,
+    Sm64JsMsg,
+    ConnectedMsg,
+    SkinMsg,
+    PlayerListsMsg,
+    FlagMsg,
+    PlayerNameMsg
+} = require("./proto/mario_pb")
 const fs = require('fs')
 const http = require('http')
 const got = require('got')
@@ -173,7 +183,13 @@ const processSkin = (socket_id, skinMsg) => {
 }
 
 const rejectPlayerName = (socket) => {
-    sendJsonWithTopic('playerName', { rejected: true }, socket)
+    const playerNameMsg = new PlayerNameMsg()
+    playerNameMsg.setAccepted(false)
+    const sm64jsMsg = new Sm64JsMsg()
+    sm64jsMsg.setPlayerNameMsg(playerNameMsg)
+    const rootMsg = new RootMsg()
+    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+    socket.send(rootMsg.serializeBinary(), true)
 }
 
 const sanitizeChat = (string) => {
@@ -293,11 +309,12 @@ const processChat = async (socket_id, sm64jsMsg) => {
 
 }
 
-const processPlayerName = async (socket, msgJson) => {
+const processPlayerName = async (socket, msg) => {
 
     if (socketIdsToRoomKeys[socket.my_id] != undefined) return ///already initialized
 
-    const { name, level } = msgJson
+    const name = msg.getName()
+    const level = msg.getLevel()
 
     if (!allowedLevelRooms.includes(level)) return rejectPlayerName(socket)
 
@@ -334,13 +351,15 @@ const processPlayerName = async (socket, msgJson) => {
 
         socketsInLobby = socketsInLobby.filter((lobbySocket) => { return lobbySocket != socket })
 
-        const acceptMsg = {
-            accepted: true,
-            playerName: filteredPlayerName,  /// should be same as message
-            level
-        }
-
-        sendJsonWithTopic('playerName', acceptMsg, socket)
+        const playerNameMsg = new PlayerNameMsg()
+        playerNameMsg.setName(filteredPlayerName)
+        playerNameMsg.setLevel(level)
+        playerNameMsg.setAccepted(true)
+        const sm64jsMsg = new Sm64JsMsg()
+        sm64jsMsg.setPlayerNameMsg(playerNameMsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+        socket.send(rootMsg.serializeBinary(), true)
 
     } catch (e) {
         console.log(`Got error with profanity api: ${e}`)
@@ -684,22 +703,29 @@ require('uWebSockets.js').App().ws('/*', {
 
             switch (rootMsg.getMessageCase()) {
                 case RootMsg.MessageCase.UNCOMPRESSED_SM64JS_MSG:
-                    if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
 
                     sm64jsMsg = rootMsg.getUncompressedSm64jsMsg()
                     switch (sm64jsMsg.getMessageCase()) {
                         case Sm64JsMsg.MessageCase.MARIO_MSG:
+                            if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
                             processPlayerData(socket.my_id, sm64jsMsg.getMarioMsg()); break
                         case Sm64JsMsg.MessageCase.PING_MSG:
+                            if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
                             sendData(bytes, socket); break
                         case Sm64JsMsg.MessageCase.ATTACK_MSG:
+                            if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
                             processBasicAttack(socket.my_id, sm64jsMsg.getAttackMsg()); break
                         case Sm64JsMsg.MessageCase.GRAB_MSG:
+                            if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
                             processGrabFlagRequest(socket.my_id, sm64jsMsg.getGrabMsg()); break
                         case Sm64JsMsg.MessageCase.CHAT_MSG:
+                            if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
                             processChat(socket.my_id, sm64jsMsg); break
                         case Sm64JsMsg.MessageCase.SKIN_MSG:
+                            if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
                             processSkin(socket.my_id, sm64jsMsg.getSkinMsg()); break
+                        case Sm64JsMsg.MessageCase.PLAYER_NAME_MSG:
+                            processPlayerName(socket, sm64jsMsg.getPlayerNameMsg()); break
                         //case 3: processControllerUpdate(socket.my_id, bytes.slice(1)); break
                         //case 4: processKnockUp(socket.my_id, bytes.slice(1)); break
                         default: throw "unknown case for uncompressed proto message"
@@ -710,7 +736,6 @@ require('uWebSockets.js').App().ws('/*', {
                     const { topic, msg } = JSON.parse(str)
                     switch (topic) {
                         case 'getInitSkinData': sendSkinsToSocket(socket); break
-                        case 'playerName': processPlayerName(socket, msg); break
                         default: throw "Unknown topic in json message"
                     }
                     break

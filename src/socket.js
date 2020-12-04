@@ -1,4 +1,15 @@
-import { RootMsg, Sm64JsMsg, GrabFlagMsg, AttackMsg, PingMsg, ChatMsg, SkinMsg, SkinData, SkinValue } from "../proto/mario_pb"
+import {
+    RootMsg,
+    Sm64JsMsg,
+    GrabFlagMsg,
+    AttackMsg,
+    PingMsg,
+    ChatMsg,
+    SkinMsg,
+    SkinData,
+    SkinValue,
+    PlayerNameMsg
+} from "../proto/mario_pb"
 import zlib from "zlib"
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
@@ -38,14 +49,6 @@ export const networkData = {
 }
 
 export const gameData = {}
-
-const sendJsonWithTopic = (topic, msg) => {
-    const str = JSON.stringify({ topic, msg })
-    let bytes = text.encoder.encode(str)
-    const rootMsg = new RootMsg()
-    rootMsg.setJsonBytesMsg(bytes)
-    socket.send(rootMsg.serializeBinary())
-}
 
 const sendData = (bytes) => { socket.send(bytes) }
 
@@ -103,6 +106,9 @@ socket.onopen = () => {
                     case Sm64JsMsg.MessageCase.SKIN_MSG:
                         Cosmetics.recvSkinData(sm64jsMsg.getSkinMsg())
                         break
+                    case Sm64JsMsg.MessageCase.PLAYER_NAME_MSG:
+                        Cosmetics.recvPlayerNameResponse(sm64jsMsg.getPlayerNameMsg())
+                        break
                     default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
                 }
                 break
@@ -119,7 +125,6 @@ socket.onopen = () => {
                 const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
                 const { topic, msg } = JSON.parse(str)
                 switch (topic) {
-                    case 'playerName': Cosmetics.recvPlayerNameResponse(msg); break
                     case 'announcement': recvAnnouncement(msg); break
                     default: throw "Unknown topic in json message"
                 }
@@ -261,7 +266,8 @@ export const post_main_loop_one_iteration = (frame) => {
     if (multiplayerReady()) {
 
         if (!networkData.requestedInitData) {
-            sendJsonWithTopic('getInitSkinData', { })
+            // TODO
+            // sendJsonWithTopic('getInitSkinData', { })
             networkData.requestedInitData = true
         }
 
@@ -360,7 +366,15 @@ export const submitPlayerName = () => {
     const level = getSelectedLevel()
     const name = document.getElementById("playerNameInput").value
     if (name.length >= 3) {
-        sendJsonWithTopic('playerName', { name, level })
+        const playerNameMsg = new PlayerNameMsg()
+        playerNameMsg.setName(name)
+        playerNameMsg.setLevel(level)
+        const sm64jsMsg = new Sm64JsMsg()
+        sm64jsMsg.setPlayerNameMsg(playerNameMsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+        console.log('SEND NAME', name)
+        sendData(rootMsg.serializeBinary())
     }
 }
 

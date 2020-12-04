@@ -189,11 +189,11 @@ window.updatePlayerName = (name) => {
 }
 
 export const recvPlayerNameResponse = (msg) => {
-    if (msg.rejected) {
+    const accepted = msg.getAccepted()
+    if (!accepted) {
         document.getElementById("playerNameResult").style.color = "red"
         document.getElementById("playerNameResult").innerHTML = "Rejected"
-    }
-    if (msg.accepted) {
+    } else  {
         document.getElementById("playerNameInput").style.borderColor = "blue"
         document.getElementById("playerNameInput").disabled = true
         document.getElementById("playerNameInput").style.backgroundColor = "lightgrey"

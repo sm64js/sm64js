@@ -5,7 +5,6 @@ message RootMsg {
 	oneof message {
 		Sm64JsMsg uncompressed_sm64js_msg = 1;
 		bytes compressed_sm64js_msg = 2;
-		bytes json_bytes_msg = 3;
 	}
 }
 
@@ -20,22 +19,23 @@ message Sm64JsMsg {
 		GrabFlagMsg grab_msg = 7;
 		ChatMsg chat_msg = 8;
 		SkinMsg skin_msg = 9;
+		PlayerNameMsg player_name_msg = 10;
 		/*ControllerMsg controller_msg = 6;
 		ControllerListMsg controller_list_msg = 7;*/
 	}
 }
 
-message PingMsg {
-	float time = 1;
+message MarioListMsg {
+	repeated FlagMsg flag = 1;
+	repeated MarioMsg mario = 2;
 }
 
 message ConnectedMsg {
 	uint32 socketID = 1;
 }
 
-message MarioListMsg {
-	repeated FlagMsg flag = 1;
-	repeated MarioMsg mario = 2;
+message PingMsg {
+	float time = 1;
 }
 
 message ControllerListMsg {
@@ -134,4 +134,10 @@ message SkinValue {
 		uint64 bytes = 1;
 		SpecialSkinValues special = 2;
 	}
+}
+
+message PlayerNameMsg {
+	string name = 1;
+	uint32 level = 2;
+	bool accepted = 3;
 }

@@ -68,12 +68,12 @@ impl Handler<Connect> for Sm64JsServer {
     type Result = u32;
 
     fn handle(&mut self, msg: Connect, _: &mut Context<Self>) -> Self::Result {
-        let channel_id = rand::thread_rng().gen::<u32>();
-        let client = Client::new(msg.addr, channel_id);
+        let socket_id = rand::thread_rng().gen::<u32>();
+        let client = Client::new(msg.addr, socket_id);
 
         let sm64js_msg = Sm64JsMsg {
             message: Some(sm64_js_msg::Message::ConnectedMsg(ConnectedMsg {
-                channel_id,
+                socket_id,
             })),
         };
 
@@ -85,8 +85,8 @@ impl Handler<Connect> for Sm64JsServer {
         let msg = encoder.finish().unwrap();
 
         client.send(Message(msg)).unwrap();
-        self.clients.insert(channel_id, client);
-        channel_id
+        self.clients.insert(socket_id, client);
+        socket_id
     }
 }
 
@@ -151,6 +151,7 @@ impl Sm64JsServer {
             .collect();
         let sm64js_msg = Sm64JsMsg {
             message: Some(sm64_js_msg::Message::ListMsg(MarioListMsg {
+                flag: vec![],
                 mario: mario_list,
             })),
         };
@@ -177,23 +178,20 @@ impl Sm64JsServer {
 pub struct Client {
     addr: Recipient<Message>,
     data: Option<MarioMsg>,
-    channel_id: u32,
+    socket_id: u32,
 }
 
 impl Client {
-    pub fn new(addr: Recipient<Message>, channel_id: u32) -> Self {
+    pub fn new(addr: Recipient<Message>, socket_id: u32) -> Self {
         Client {
             addr,
             data: None,
-            channel_id,
+            socket_id,
         }
     }
 
     pub fn set_data(&mut self, mut data: MarioMsg) {
-        if data.player_name.len() < 3 || data.player_name.len() > 14 {
-            return;
-        }
-        data.channel_id = self.channel_id;
+        data.socket_id = self.socket_id;
 
         self.data = Some(data);
     }

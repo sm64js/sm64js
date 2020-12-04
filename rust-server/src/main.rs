@@ -87,6 +87,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                     None => {
                         return;
                     }
+                    Some(root_msg::Message::JsonBytesMsg(_)) => todo!(),
                 };
                 match sm64js_msg.message {
                     Some(sm64_js_msg::Message::PingMsg(_)) => {
@@ -106,14 +107,20 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                             data: mario_msg,
                         });
                     }
+                    Some(sm64_js_msg::Message::PlayerListsMsg(player_lists_msg)) => {
+                        // TODO
+                    }
+                    Some(sm64_js_msg::Message::AttackMsg(attack_msg)) => {
+                        // TODO
+                    }
+                    Some(sm64_js_msg::Message::GrabMsg(grab_msg)) => {
+                        // TODO
+                    }
                     Some(sm64_js_msg::Message::ChatMsg(chat_msg)) => {
                         self.addr.do_send(server::SendChat { chat_msg });
                     }
                     Some(sm64_js_msg::Message::SkinMsg(skin_msg)) => {
                         // TODO
-                    }
-                    Some(sm64_js_msg::Message::ValidPlayersMsg(_)) => {
-                        // TODO unused
                     }
                     Some(sm64_js_msg::Message::ListMsg(_)) => {
                         // TODO clients don't send this

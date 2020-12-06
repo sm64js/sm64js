@@ -440,7 +440,8 @@ export const init_marios = () => {
             angleVel: [0, 0, 0],
             pos: [...ObjectListProcessor.gMarioObject[index].header.gfx.pos],///[ ...Area.gMarioSpawnInfo.startPos ],
             vel: [0, 0, 0],
-            action: ACT_IDLE
+            action: ACT_IDLE,
+            swimming: 0
         })
 
         const marioRawData = LevelUpdate.gMarioState[index].marioObj.rawData

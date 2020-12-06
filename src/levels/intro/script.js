@@ -3,7 +3,7 @@ import { intro_geo_0002D0, intro_geo_00035C } from "./geo"
 import { WARP_TRANSITION_FADE_INTO_COLOR, WARP_TRANSITION_FADE_FROM_STAR } from "../../game/Area"
 import { level_main_scripts_entry } from "../scripts"
 import { lvl_intro_update } from "../../menu/level_select_menu"
-import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS, LEVEL_DDD, LEVEL_TTM, LEVEL_THI_3 } from "../level_defines_constants"
+import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS, LEVEL_DDD, LEVEL_TTM, LEVEL_THI_3, LEVEL_CASTLE_INSIDE } from "../level_defines_constants"
 
 const getSelectedLevel = () => {
     const mapSelect = document.getElementById("mapSelect").value
@@ -17,6 +17,7 @@ const getSelectedLevel = () => {
         case "Dire Dire Docks": return LEVEL_DDD
         case "Tall, Tall Mountain": return LEVEL_TTM
         case "Tiny Huge Island (3)": return LEVEL_THI_3
+        case "Castle Inside": return LEVEL_CASTLE_INSIDE
     }
 
     return LEVEL_CASTLE_GROUNDS

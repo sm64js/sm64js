@@ -5,3 +5,4 @@ export const LEVEL_PSS = 27
 export const LEVEL_DDD = 23
 export const LEVEL_TTM = 36
 export const LEVEL_THI_3 = 13
+export const LEVEL_CASTLE_INSIDE = 6

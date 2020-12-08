@@ -1,4 +1,15 @@
-import { RootMsg, Sm64JsMsg, GrabFlagMsg, AttackMsg } from "../proto/mario_pb"
+import {
+    RootMsg,
+    Sm64JsMsg,
+    GrabFlagMsg,
+    AttackMsg,
+    PingMsg,
+    ChatMsg,
+    SkinMsg,
+    SkinData,
+    SkinValue,
+    PlayerNameMsg
+} from "../proto/mario_pb"
 import zlib from "zlib"
 import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
@@ -20,13 +31,11 @@ function myArrayBuffer() {
 
 const url = new URL(window.location.href)
 
-let websocketServerPath = ""
-
-if (url.protocol == "https:") {
-    websocketServerPath = `wss://${url.hostname}/websocket/`
-} else {
-    websocketServerPath = `ws://${url.hostname}:3000`
-}
+const websocketServerPath = process.env.NODE_ENV === 'production'
+    ? `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/`
+    : url.protocol == "https:"
+        ? `wss://${url.hostname}/websocket/`
+        : `ws://${url.hostname}:3000`
 
 const socket = new WebSocket(websocketServerPath)
 
@@ -40,14 +49,6 @@ export const networkData = {
 }
 
 export const gameData = {}
-
-const sendJsonWithTopic = (topic, msg) => {
-    const str = JSON.stringify({ topic, msg })
-    let bytes = text.encoder.encode(str)
-    const rootMsg = new RootMsg()
-    rootMsg.setJsonBytesMsg(bytes)
-    socket.send(rootMsg.serializeBinary())
-}
 
 const sendData = (bytes) => { socket.send(bytes) }
 
@@ -69,19 +70,15 @@ const unzip = (bytes) => {
     })
 }
 
-
-const measureLatency = (msg) => {
-    const startTime = msg.time
+const measureLatency = (ping_proto) => {
+    const startTime = ping_proto.getTime()
     const endTime = performance.now()
     window.latency = parseInt(endTime - startTime)
 }
 
-
-
 socket.onopen = () => {
 
     socket.onmessage = async (message) => {
-
         let sm64jsMsg
         let bytes = new Uint8Array(await message.data.arrayBuffer())
         const rootMsg = RootMsg.deserializeBinary(bytes)
@@ -97,7 +94,21 @@ socket.onopen = () => {
                     case Sm64JsMsg.MessageCase.PLAYER_LISTS_MSG:
                         Multi.recvPlayerLists(sm64jsMsg.getPlayerListsMsg())
                         break
-                    //case 99: measureAndPrintLatency(bytes.slice(1)); break
+                    case Sm64JsMsg.MessageCase.PING_MSG:
+                        measureLatency(sm64jsMsg.getPingMsg())
+                        break
+                    case Sm64JsMsg.MessageCase.CONNECTED_MSG:
+                        networkData.mySocketID = sm64jsMsg.getConnectedMsg().getSocketid()
+                        break
+                    case Sm64JsMsg.MessageCase.CHAT_MSG:
+                        recvChat(sm64jsMsg.getChatMsg())
+                        break
+                    case Sm64JsMsg.MessageCase.SKIN_MSG:
+                        Cosmetics.recvSkinData(sm64jsMsg.getSkinMsg())
+                        break
+                    case Sm64JsMsg.MessageCase.PLAYER_NAME_MSG:
+                        Cosmetics.recvPlayerNameResponse(sm64jsMsg.getPlayerNameMsg())
+                        break
                     default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
                 }
                 break
@@ -114,11 +125,6 @@ socket.onopen = () => {
                 const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
                 const { topic, msg } = JSON.parse(str)
                 switch (topic) {
-                    case 'id': networkData.mySocketID = msg.id; break
-                    case 'chat': recvChat(msg); break
-                    case 'skin': Cosmetics.recvSkinData(msg); break
-                    case 'ping': measureLatency(msg); break
-                    case 'playerName': Cosmetics.recvPlayerNameResponse(msg); break
                     case 'announcement': recvAnnouncement(msg); break
                     default: throw "Unknown topic in json message"
                 }
@@ -230,6 +236,26 @@ export const updateNetworkBeforeRender = () => {
 
 }
 
+const toSkinValue = (data) => {
+    if (Array.isArray(data)) {
+        let bytes = 0;
+        data.forEach((val, i) => {
+            bytes += (val & 0xff) * Math.pow(2, 8 * i)
+        })
+        const skinValue = new SkinValue()
+        skinValue.setBytes(bytes)
+        return skinValue
+    }
+
+    if (data === "r") {
+        const skinValue = new SkinValue()
+        skinValue.setSpecial(SkinValue.SpecialSkinValues.RAINBOW)
+        return skinValue
+    }
+
+    throw new Error(`Could not create skinValue from ${data}`)
+}
+
 export const post_main_loop_one_iteration = (frame) => {
 
 	//Update the rainbows colors
@@ -240,19 +266,44 @@ export const post_main_loop_one_iteration = (frame) => {
     if (multiplayerReady()) {
 
         if (!networkData.requestedInitData) {
-            sendJsonWithTopic('getInitSkinData', { })
+            // TODO
+            // sendJsonWithTopic('getInitSkinData', { })
             networkData.requestedInitData = true
         }
 
         if (frame % 150 == 0) { //every 5 seconds
             /// ping to measure latency
-            sendJsonWithTopic('ping', { time: performance.now() })
+            const sm64jsMsg = new Sm64JsMsg()
+            const pingmsg = new PingMsg()
+            pingmsg.setTime(performance.now())
+            sm64jsMsg.setPingMsg(pingmsg)
+            const rootMsg = new RootMsg()
+            rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+            sendData(rootMsg.serializeBinary())
 
             //send skins if updated
-			if (Cosmetics.validSkins()) {
-                if (JSON.stringify(window.myMario.skinData) != networkData.lastSentSkinData) {
+            if (Cosmetics.validSkins()) {
+                if (JSON.stringify(window.myMario.skinData) !== networkData.lastSentSkinData) {
                     networkData.lastSentSkinData = JSON.stringify(window.myMario.skinData)
-                    sendJsonWithTopic('skin', window.myMario.skinData)
+                    const skinData = window.myMario.skinData
+
+                    const skinDataMsg = new SkinData()
+                    skinDataMsg.setOveralls(toSkinValue(skinData.overalls))
+                    skinDataMsg.setHat(toSkinValue(skinData.hat))
+                    skinDataMsg.setShirt(toSkinValue(skinData.shirt))
+                    skinDataMsg.setGloves(toSkinValue(skinData.gloves))
+                    skinDataMsg.setBoots(toSkinValue(skinData.boots))
+                    skinDataMsg.setSkin(toSkinValue(skinData.skin))
+                    skinDataMsg.setHair(toSkinValue(skinData.hair))
+                    skinDataMsg.setCustomcapstate(skinData.customCapState)
+                    const skinMsg = new SkinMsg()
+                    skinMsg.setSkindata(skinDataMsg)
+                    const sm64jsMsg = new Sm64JsMsg()
+                    sm64jsMsg.setSkinMsg(skinMsg)
+                    const rootMsg = new RootMsg()
+                    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+            
+                    socket.send(rootMsg.serializeBinary(), true)
                 }
             }
         }
@@ -315,12 +366,26 @@ export const submitPlayerName = () => {
     const level = getSelectedLevel()
     const name = document.getElementById("playerNameInput").value
     if (name.length >= 3) {
-        sendJsonWithTopic('playerName', { name, level })
+        const playerNameMsg = new PlayerNameMsg()
+        playerNameMsg.setName(name)
+        playerNameMsg.setLevel(level)
+        const sm64jsMsg = new Sm64JsMsg()
+        sm64jsMsg.setPlayerNameMsg(playerNameMsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+        console.log('SEND NAME', name)
+        sendData(rootMsg.serializeBinary())
     }
 }
 
-export const sendChat = (msg) => {
-    if (window.admin && window.admin.token) msg.adminToken = window.admin.token
-    sendJsonWithTopic('chat', msg)
+export const sendChat = ({ message }) => {
+    const chatMsg = new ChatMsg()
+    if (window.admin && window.admin.token) chatMsg.setAdmintoken(window.admin.token)
+    chatMsg.setMessage(message)
+    const sm64jsMsg = new Sm64JsMsg()
+    sm64jsMsg.setChatMsg(chatMsg)
+    const rootMsg = new RootMsg()
+    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+    sendData(rootMsg.serializeBinary())
 }
 

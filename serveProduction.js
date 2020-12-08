@@ -1,11 +1,21 @@
-const { RootMsg, MarioListMsg, ValidPlayersMsg, PlayerListsMsg, Sm64JsMsg, FlagMsg } = require("./proto/mario_pb")
+const {
+    RootMsg,
+    MarioListMsg,
+    ValidPlayersMsg,
+    Sm64JsMsg,
+    ConnectedMsg,
+    SkinMsg,
+    PlayerListsMsg,
+    FlagMsg,
+    PlayerNameMsg
+} = require("./proto/mario_pb")
 const fs = require('fs')
 const http = require('http')
 const got = require('got')
 const util = require('util')
 const zlib = require('zlib')
 const deflate = util.promisify(zlib.deflate)
-const port = 80
+const port = 3080
 const ws_port = 3000
 
 const low = require('lowdb')
@@ -159,64 +169,36 @@ const processPlayerData = (socket_id, decodedMario) => {
     //broadcastDataWithOpcode(bytes, 3, socket_id)
 }*/
 
-const validSkins = (skinData) => {
-    if (skinData.overalls.length != 6 && skinData.overalls != "r") return false
-    if (skinData.hat.length != 6 && skinData.hat != "r") return false
-    if (skinData.shirt.length != 6 && skinData.shirt != "r") return false
-    if (skinData.gloves.length != 6 && skinData.gloves != "r") return false
-    if (skinData.boots.length != 6 && skinData.boots != "r") return false
-    if (skinData.skin.length != 6 && skinData.skin != "r") return false
-    if (skinData.hair.length != 6 && skinData.hair != "r") return false
-
-
-    for (let i = 0; i < 6; i++) {
-        let number = skinData.overalls[i]
-        if ((isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) && skinData.overalls != "r") return false
-        number = skinData.hat[i]
-        if ((isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) && skinData.hat != "r") return false
-        number = skinData.shirt[i]
-        if ((isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) && skinData.shirt != "r") return false
-        number = skinData.gloves[i]
-        if ((isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) && skinData.gloves != "r") return false
-        number = skinData.boots[i]
-        if ((isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) && skinData.boots != "r") return false
-        number = skinData.skin[i]
-        if ((isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) && skinData.skin != "r") return false
-        number = skinData.hair[i]
-        if ((isNaN(number) || number < 0 || number > 255 || !Number.isInteger(number)) && skinData.hair != "r") return false
-    }
-
-    return true
-
-}
-
-
-const processSkin = (socket_id, msg) => {
+const processSkin = (socket_id, skinMsg) => {
 
     const roomKey = socketIdsToRoomKeys[socket_id]
     if (roomKey == undefined) return 
 
     if (clientsRoot[roomKey][socket_id].valid == 0) return
 
-    if (!validSkins(msg)) return
+    const skinData = skinMsg.getSkindata()
 
-    clientsRoot[roomKey][socket_id].skinData = msg
-    clientsRoot[roomKey][socket_id].skinData.updated = true
+    clientsRoot[roomKey][socket_id].skinData = skinData
+    clientsRoot[roomKey][socket_id].skinDataUpdated = true
 }
 
 const rejectPlayerName = (socket) => {
-    sendJsonWithTopic('playerName', { rejected: true }, socket)
+    const playerNameMsg = new PlayerNameMsg()
+    playerNameMsg.setAccepted(false)
+    const sm64jsMsg = new Sm64JsMsg()
+    sm64jsMsg.setPlayerNameMsg(playerNameMsg)
+    const rootMsg = new RootMsg()
+    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+    socket.send(rootMsg.serializeBinary(), true)
 }
 
 const sanitizeChat = (string) => {
     string = string.substring(0, 200)
-    string = string.replace(/</g, "")
-    string = string.replace(/>/g, "")
     return applyValidCharacters(string)
 }
 
 //Valid characters for usernames.
-const validCharacters = [
+const validCharacters = new Set([
     'a', 'b', 'c', 'd', 'e', 'f', 'g',
     'h', 'i', 'j', 'k', 'l', 'm', 'n',
     'o', 'p', 'q', 'r', 's', 't', 'u',
@@ -233,17 +215,12 @@ const validCharacters = [
     '😂', '⭐', '✨', '🎄', '🎃', '🔺', '🔻',
     '🎄', '🍬', '🍭', '🍫', ' ',
     '-', '_', '=', '|', '<', '>', ':', "'"
-]
+]);
 
 
 const applyValidCharacters = (str) => {
-    let temp = ""
-    str.split('').forEach(character => {
-        if (validCharacters.includes(character)) { temp += character }
-    })
-    return temp
+    return str.split('').filter(c => validCharacters.has(c)).join('');
 }
-
 
 const processAdminCommand = (msg, token, roomKey) => {
     const parts = msg.split(' ')
@@ -261,7 +238,9 @@ const processAdminCommand = (msg, token, roomKey) => {
     db.get('adminCommands').push({ token, roomKey, timestampMs: Date.now(), command, args }).write()
 }
 
-const processChat = async (socket_id, msg) => {
+const processChat = async (socket_id, sm64jsMsg) => {
+    const chatMsg = sm64jsMsg.getChatMsg()
+    const message = chatMsg.getMessage()
 
     const roomKey = socketIdsToRoomKeys[socket_id]
     if (roomKey == undefined) return 
@@ -271,21 +250,25 @@ const processChat = async (socket_id, msg) => {
 
     /// Throttle chats by IP
     if (connectedIPs[clientData.socket.ip].chatCooldown > 10) {
-        const chatmsg = {
-            socket_id,
-            msg: "Chat message ignored: You have to wait longer between sending chat messages",
-            sender: "Server",
-        }
-        sendJsonWithTopic('chat', chatmsg, clientData.socket)
+        const chatMsg = new ChatMsg()
+        chatMsg.setSocketid(socket_id)
+        chatMsg.setMessage("Chat message ignored: You have to wait longer between sending chat messages")
+        chatMsg.setSender("Server")
+        const sm64jsMsg = new Sm64JsMsg()
+        sm64jsMsg.setChatMsg(chatMsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+        sendData(rootMsg.serializeBinary(), clientData.socket)
         return
     }
 
-    if (msg.message.length == 0) return
+    if (message.length == 0) return
 
-    const isAdmin = adminTokens.includes(msg.adminToken)
+    const adminToken = chatMsg.getAdmintoken()
+    const isAdmin = adminToken != null && adminTokens.includes(adminToken)
 
-    if (msg.message[0] == '/') {
-        if (isAdmin) processAdminCommand(msg.message.slice(1), msg.adminToken, roomKey)
+    if (message[0] == '/') {
+        if (isAdmin) processAdminCommand(message.slice(1), adminToken, roomKey)
         return
     }
 
@@ -300,25 +283,25 @@ const processChat = async (socket_id, msg) => {
         playerName: clientData.playerName,
         ip: clientData.socket.ip,
         timestampMs: Date.now(),
-        message: msg.message,
-        adminToken: msg.adminToken
+        message,
+        adminToken
     }).write()
 
-    const sanitizedChat = sanitizeChat(msg.message)
+    const sanitizedChat = sanitizeChat(message)
 
     const request = "http://www.purgomalum.com/service/json?text=" + sanitizedChat
 
     try {
         const filteredMessage = JSON.parse((await got(request)).body).result
 
-        const chatmsg = {
-            socket_id,
-            msg: filteredMessage,
-            sender: clientData.playerName,
-            isAdmin
-        }
+        chatMsg.setSocketid(socket_id)
+        chatMsg.setMessage(filteredMessage)
+        chatMsg.setSender(clientData.playerName)
+        chatMsg.setIsadmin(isAdmin)
 
-        broadcastJsonWithTopic('chat', chatmsg, roomKey)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+        broadcastData(rootMsg.serializeBinary(), roomKey)
 
     } catch (e) {
         console.log(`Got error with profanity api: ${e}`)
@@ -326,11 +309,12 @@ const processChat = async (socket_id, msg) => {
 
 }
 
-const processPlayerName = async (socket, msgJson) => {
+const processPlayerName = async (socket, msg) => {
 
     if (socketIdsToRoomKeys[socket.my_id] != undefined) return ///already initialized
 
-    const { name, level } = msgJson
+    const name = msg.getName()
+    const level = msg.getLevel()
 
     if (!allowedLevelRooms.includes(level)) return rejectPlayerName(socket)
 
@@ -367,13 +351,15 @@ const processPlayerName = async (socket, msgJson) => {
 
         socketsInLobby = socketsInLobby.filter((lobbySocket) => { return lobbySocket != socket })
 
-        const acceptMsg = {
-            accepted: true,
-            playerName: filteredPlayerName,  /// should be same as message
-            level
-        }
-
-        sendJsonWithTopic('playerName', acceptMsg, socket)
+        const playerNameMsg = new PlayerNameMsg()
+        playerNameMsg.setName(filteredPlayerName)
+        playerNameMsg.setLevel(level)
+        playerNameMsg.setAccepted(true)
+        const sm64jsMsg = new Sm64JsMsg()
+        sm64jsMsg.setPlayerNameMsg(playerNameMsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+        socket.send(rootMsg.serializeBinary(), true)
 
     } catch (e) {
         console.log(`Got error with profanity api: ${e}`)
@@ -381,7 +367,6 @@ const processPlayerName = async (socket, msgJson) => {
 
 
 }
-
 
 const sendSkinsToSocket = (socket) => { 
 
@@ -391,26 +376,36 @@ const sendSkinsToSocket = (socket) => {
             return  /// if they disconnect in this 500ms period
         }
         /// Send Skins
-        Object.entries(clientsRoot[roomKey]).forEach(([socket_id, data]) => {
-            if (data.skinData) {
-                const skinMsg = { socket_id, skinData: data.skinData }
-                sendJsonWithTopic('skin', skinMsg, socket)
-            }
+        Object.entries(clientsRoot[roomKey]).filter(([_, data]) => data.skinData).forEach(([socket_id, data]) => {
+            const skinMsg = new SkinMsg()
+            skinMsg.setSocketid(socket_id)
+            skinMsg.setSkindata(data.skinData)
+            const sm64jsMsg = new Sm64JsMsg()
+            sm64jsMsg.setSkinMsg(skinMsg)
+            const rootMsg = new RootMsg()
+            rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+    
+            socket.send(rootMsg.serializeBinary(), true)
         })
     }, 500)
 
 }
-
 const sendSkinsIfUpdated = () => {
 
     Object.entries(clientsRoot).forEach(([roomKey, roomData]) => {
         /// Send Skins
-        Object.entries(roomData).forEach(([socket_id, data]) => {
-            if (data.skinData) {
-                const skinMsg = { socket_id, skinData: data.skinData, playerName: data.playerName }
-                broadcastJsonWithTopic('skin', skinMsg, roomKey)
-                data.skinData.updated = false
-            }
+        Object.entries(roomData).filter(([_, data]) => data.skinData && data.skinDataUpdated).forEach(([socket_id, data]) => {
+            const skinMsg = new SkinMsg()
+            skinMsg.setSocketid(socket_id)
+            skinMsg.setSkindata(data.skinData)
+            const sm64jsMsg = new Sm64JsMsg()
+            sm64jsMsg.setSkinMsg(skinMsg)
+            const rootMsg = new RootMsg()
+            rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+
+            data.skinDataUpdated = false
+
+            broadcastData(rootMsg.serializeBinary(), roomKey)
         })
     })
 
@@ -682,7 +677,6 @@ require('uWebSockets.js').App().ws('/*', {
     },
 
     open: async (socket) => {
-
         socket.my_id = generateID()
 
         if (connectedIPs[socket.ip] == undefined)
@@ -691,7 +685,14 @@ require('uWebSockets.js').App().ws('/*', {
         connectedIPs[socket.ip].socketIDs[socket.my_id] = 1
 
         socketsInLobby.push(socket)
-        sendJsonWithTopic('id', { id: socket.my_id }, socket)
+        
+        const connectedMsg = new ConnectedMsg()
+        connectedMsg.setSocketid(socket.my_id)
+        const sm64jsMsg = new Sm64JsMsg()
+        sm64jsMsg.setConnectedMsg(connectedMsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+        socket.send(rootMsg.serializeBinary(), true)
     },
 
     message: async (socket, bytes) => {
@@ -702,16 +703,29 @@ require('uWebSockets.js').App().ws('/*', {
 
             switch (rootMsg.getMessageCase()) {
                 case RootMsg.MessageCase.UNCOMPRESSED_SM64JS_MSG:
-                    if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
 
                     sm64jsMsg = rootMsg.getUncompressedSm64jsMsg()
                     switch (sm64jsMsg.getMessageCase()) {
                         case Sm64JsMsg.MessageCase.MARIO_MSG:
+                            if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
                             processPlayerData(socket.my_id, sm64jsMsg.getMarioMsg()); break
+                        case Sm64JsMsg.MessageCase.PING_MSG:
+                            if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
+                            sendData(bytes, socket); break
                         case Sm64JsMsg.MessageCase.ATTACK_MSG:
+                            if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
                             processBasicAttack(socket.my_id, sm64jsMsg.getAttackMsg()); break
                         case Sm64JsMsg.MessageCase.GRAB_MSG:
+                            if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
                             processGrabFlagRequest(socket.my_id, sm64jsMsg.getGrabMsg()); break
+                        case Sm64JsMsg.MessageCase.CHAT_MSG:
+                            if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
+                            processChat(socket.my_id, sm64jsMsg); break
+                        case Sm64JsMsg.MessageCase.SKIN_MSG:
+                            if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
+                            processSkin(socket.my_id, sm64jsMsg.getSkinMsg()); break
+                        case Sm64JsMsg.MessageCase.PLAYER_NAME_MSG:
+                            processPlayerName(socket, sm64jsMsg.getPlayerNameMsg()); break
                         //case 3: processControllerUpdate(socket.my_id, bytes.slice(1)); break
                         //case 4: processKnockUp(socket.my_id, bytes.slice(1)); break
                         default: throw "unknown case for uncompressed proto message"
@@ -721,11 +735,7 @@ require('uWebSockets.js').App().ws('/*', {
                     const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
                     const { topic, msg } = JSON.parse(str)
                     switch (topic) {
-                        case 'chat': processChat(socket.my_id, msg); break
                         case 'getInitSkinData': sendSkinsToSocket(socket); break
-                        case 'skin': processSkin(socket.my_id, msg); break
-                        case 'playerName': processPlayerName(socket, msg); break
-                        case 'ping': sendData(bytes, socket); break
                         default: throw "Unknown topic in json message"
                     }
                     break
@@ -752,7 +762,6 @@ require('uWebSockets.js').App().ws('/*', {
     }
 
 }).listen(ws_port, () => { console.log("Starting websocket server " + ws_port) })
-
 
 //// Express Static serving
 const express = require('express')

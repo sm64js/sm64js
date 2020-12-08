@@ -1,4 +1,5 @@
 import { networkData, submitPlayerName } from "./socket"
+import { SkinValue } from "../proto/mario_pb"
 
 export const defaultSkinData = () => {
     return {
@@ -177,7 +178,6 @@ document.getElementById('playerNameForm').onsubmit = (e) => {
     e.preventDefault()
 }
 
-
 window.updatePlayerName = (name) => {
     if (name.length < 3) {
         document.getElementById("playerNameInput").style.borderColor = "red"
@@ -189,11 +189,11 @@ window.updatePlayerName = (name) => {
 }
 
 export const recvPlayerNameResponse = (msg) => {
-    if (msg.rejected) {
+    const accepted = msg.getAccepted()
+    if (!accepted) {
         document.getElementById("playerNameResult").style.color = "red"
         document.getElementById("playerNameResult").innerHTML = "Rejected"
-    }
-    if (msg.accepted) {
+    } else  {
         document.getElementById("playerNameInput").style.borderColor = "blue"
         document.getElementById("playerNameInput").disabled = true
         document.getElementById("playerNameInput").style.backgroundColor = "lightgrey"
@@ -208,46 +208,68 @@ export const recvPlayerNameResponse = (msg) => {
     }
 }
 
-export const recvSkinData = (msg) => {
+const fromSkinValue = (skinValue) => {
+    switch (skinValue.getValueCase()) {
+        case SkinValue.ValueCase.BYTES:
+            const bytes = skinValue.getBytes()
+            if (bytes != null) {
+                return [
+                    bytes & 0xff,
+                    (bytes / Math.pow(2, 8)) & 0xff,
+                    (bytes / Math.pow(2, 0x10)) & 0xff,
+                    (bytes / Math.pow(2, 0x18)) & 0xff,
+                    (bytes / Math.pow(2, 0x20)) & 0xff,
+                    (bytes / Math.pow(2, 0x28)) & 0xff,
+                ]
+            }
+            break
+        case SkinValue.ValueCase.SPECIAL:
+            const special = skinValue.getSpecial()
+            if (special === SkinValue.SpecialSkinValues.RAINBOW) {
+                return "r"
+            }
+            break
+        case SkinValue.ValueCase.VALUE_NOT_SET:
+        default:
+    }
+}
 
-    const socket_id = parseInt(msg.socket_id)
-    if (socket_id == networkData.mySocketID) return
-    if (networkData.remotePlayers[socket_id] == undefined) return
+export const recvSkinData = (skinMsg) => { 
+    const socket_id = skinMsg.getSocketid()
+    if (socket_id === networkData.mySocketID ||
+        networkData.remotePlayers[socket_id] == null) return
 
-    networkData.remotePlayers[msg.socket_id].skinData = msg.skinData
-    networkData.remotePlayers[msg.socket_id].playerName = msg.playerName
+    const skinDataMsg = skinMsg.getSkindata()
+    const skinData = {
+        overalls: fromSkinValue(skinDataMsg.getOveralls()),
+        hat: fromSkinValue(skinDataMsg.getHat()),
+        shirt: fromSkinValue(skinDataMsg.getShirt()),
+        gloves: fromSkinValue(skinDataMsg.getGloves()),
+        boots: fromSkinValue(skinDataMsg.getBoots()),
+        skin: fromSkinValue(skinDataMsg.getSkin()),
+        hair: fromSkinValue(skinDataMsg.getHair()),
+        customCapState: skinDataMsg.getCustomcapstate(),
+    }
+    networkData.remotePlayers[socket_id].skinData = skinData
+}
+
+const isValidSkinEntry = (skinEntry) => {
+    return skinEntry === "r" ||
+        skinEntry.length === 6 && !skinEntry.find(skinVal => isNaN(skinVal) || skinVal < 0 || skinVal > 255 || !Number.isInteger(skinVal))
 }
 
 export const validSkins = () => {
-    if (window.myMario.skinData.overalls.length != 6 && window.myMario.skinData.overalls != "r") return false
-    if (window.myMario.skinData.hat.length != 6 && window.myMario.skinData.hat != "r") return false
-    if (window.myMario.skinData.shirt.length != 6 && window.myMario.skinData.shirt != "r") return false
-    if (window.myMario.skinData.gloves.length != 6 && window.myMario.skinData.gloves != "r") return false
-    if (window.myMario.skinData.boots.length != 6 && window.myMario.skinData.boots != "r") return false
-    if (window.myMario.skinData.skin.length != 6 && window.myMario.skinData.skin != "r") return false
-    if (window.myMario.skinData.hair.length != 6 && window.myMario.skinData.hair != "r") return false
-
-    for (let i = 0; i < 6; i++) {
-        let number = window.myMario.skinData.overalls[i]
-        if ((number < 0 || number > 255 || !Number.isInteger(number)) && window.myMario.skinData.overalls != "r") return false
-        number = window.myMario.skinData.hat[i]
-        if ((number < 0 || number > 255 || !Number.isInteger(number)) && window.myMario.skinData.hat != "r") return false
-        number = window.myMario.skinData.shirt[i]
-        if ((number < 0 || number > 255 || !Number.isInteger(number)) && window.myMario.skinData.shirt != "r") return false
-        number = window.myMario.skinData.gloves[i]
-        if ((number < 0 || number > 255 || !Number.isInteger(number)) && window.myMario.skinData.gloves != "r") return false
-        number = window.myMario.skinData.boots[i]
-        if ((number < 0 || number > 255 || !Number.isInteger(number)) && window.myMario.skinData.boots != "r") return false
-        number = window.myMario.skinData.skin[i]
-        if ((number < 0 || number > 255 || !Number.isInteger(number)) && window.myMario.skinData.skin != "r") return false
-        number = window.myMario.skinData.hair[i]
-        if ((number < 0 || number > 255 || !Number.isInteger(number)) && window.myMario.skinData.hair != "r") return false
-    }
-
-    if (window.myMario.skinData.customCapState != 0 && window.myMario.skinData.customCapState != 1) return false
+    const skinData = window.myMario.skinData
+    if (!isValidSkinEntry(skinData.overalls)) return false
+    if (!isValidSkinEntry(skinData.hat)) return false
+    if (!isValidSkinEntry(skinData.shirt)) return false
+    if (!isValidSkinEntry(skinData.gloves)) return false
+    if (!isValidSkinEntry(skinData.boots)) return false
+    if (!isValidSkinEntry(skinData.skin)) return false
+    if (!isValidSkinEntry(skinData.hair)) return false
+    if (skinData.customCapState !== 0 && skinData.customCapState !== 1) return false
 
     return true
-
 }
 
 export const getExtraRenderData = (socket_id) => {

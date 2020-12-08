@@ -1,6 +1,5 @@
 import * as Keydrown from "./keydrown.min.js"
-import { sendChat, submitPlayerName } from "./socket.js"
-import { gameData } from "./socket.js"
+import { gameData, sendChat, submitPlayerName } from "./socket.js"
 
 /////// Keyboard / Gamepad Input ////////
 window.playerInput = {}

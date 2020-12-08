@@ -5,17 +5,21 @@ message RootMsg {
 	oneof message {
 		Sm64JsMsg uncompressed_sm64js_msg = 1;
 		bytes compressed_sm64js_msg = 2;
-		bytes json_bytes_msg = 3;
 	}
 }
 
 message Sm64JsMsg {
 	oneof message {
 		MarioListMsg list_msg = 1;
-		MarioMsg mario_msg = 2;
-		PlayerListsMsg player_lists_msg = 3;
-		AttackMsg attack_msg = 4;
-		GrabFlagMsg grab_msg = 5;
+		ConnectedMsg connected_msg = 2;
+		PingMsg ping_msg = 3;
+		MarioMsg mario_msg = 4;
+		PlayerListsMsg player_lists_msg = 5;
+		AttackMsg attack_msg = 6;
+		GrabFlagMsg grab_msg = 7;
+		ChatMsg chat_msg = 8;
+		SkinMsg skin_msg = 9;
+		PlayerNameMsg player_name_msg = 10;
 		/*ControllerMsg controller_msg = 6;
 		ControllerListMsg controller_list_msg = 7;*/
 	}
@@ -26,15 +30,23 @@ message MarioListMsg {
 	repeated MarioMsg mario = 2;
 }
 
+message ConnectedMsg {
+	uint32 socketID = 1;
+}
+
+message PingMsg {
+	float time = 1;
+}
+
 message ControllerListMsg {
 	repeated ControllerMsg controller = 1;
 }
 
 message FlagMsg {
-     repeated float pos = 1;
-     bool linkedToPlayer = 2;
-     uint32 socketID = 3;
-	 float height_before_fall = 4;
+	repeated float pos = 1;
+	bool linkedToPlayer = 2;
+	uint32 socketID = 3;
+	float height_before_fall = 4;
 }
 
 message GrabFlagMsg {
@@ -88,4 +100,44 @@ message PlayerListsMsg {
 message ValidPlayersMsg {
 	uint32 room_key = 1;
 	repeated uint32 validPlayers = 2;
+}
+
+message ChatMsg {
+	string message = 1;
+	string sender = 2;
+	uint32 socketID = 3;
+	string adminToken = 4;
+	bool isAdmin = 5;
+}
+
+message SkinMsg {
+	uint32 socketID = 1;
+	SkinData skinData = 2;
+}
+
+message SkinData {
+	SkinValue overalls = 1;
+	SkinValue hat = 2;
+	SkinValue shirt = 3;
+	SkinValue gloves = 4;
+	SkinValue boots = 5;
+	SkinValue skin = 6;
+	SkinValue hair = 7;
+	uint32 customCapState = 8;
+}
+
+message SkinValue {
+	enum SpecialSkinValues {
+		RAINBOW = 0;
+	}
+	oneof value {
+		uint64 bytes = 1;
+		SpecialSkinValues special = 2;
+	}
+}
+
+message PlayerNameMsg {
+	string name = 1;
+	uint32 level = 2;
+	bool accepted = 3;
 }

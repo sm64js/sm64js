@@ -177,7 +177,9 @@ const gamepadButtonMapping = { //works for xbox
     start: 9,
     z: 6,
     stickX: 0,
-    stickY: 1
+    stickY: 1,
+    cStickX: 2,
+    cStickY: 3
 }
 
 const defaultGamepadButtonMapping = { ...gamepadButtonMapping }
@@ -332,10 +334,10 @@ export const playerInputUpdate = () => {
             z: gamepad.buttons[gamepadButtonMapping['z']].touched,
             map: gamepad.buttons[gamepadButtonMapping['map']].touched,
             taunt: gamepad.buttons[gamepadButtonMapping['taunt']].touched,
-            cr: gamepad.axes[2] && gamepad.axes[2] > 0.5,
-            cl: gamepad.axes[2] && gamepad.axes[2] < -0.5,
-            cu: gamepad.axes[3] && gamepad.axes[3] < -0.5,
-            cd: gamepad.axes[3] && gamepad.axes[3] > 0.5,
+            cr: gamepad.axes[gamepadButtonMapping['cStickX']] && gamepad.axes[gamepadButtonMapping['cStickX']] > 0.5,
+            cl: gamepad.axes[gamepadButtonMapping['cStickX']] && gamepad.axes[gamepadButtonMapping['cStickX']] < -0.5,
+            cu: gamepad.axes[gamepadButtonMapping['cStickY']] && gamepad.axes[gamepadButtonMapping['cStickY']] < -0.5,
+            cd: gamepad.axes[gamepadButtonMapping['cStickY']] && gamepad.axes[gamepadButtonMapping['cStickY']] > 0.5,
         })
     }
 

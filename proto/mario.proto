@@ -18,8 +18,10 @@ message Sm64JsMsg {
 		AttackMsg attack_msg = 6;
 		GrabFlagMsg grab_msg = 7;
 		ChatMsg chat_msg = 8;
-		SkinMsg skin_msg = 9;
-		PlayerNameMsg player_name_msg = 10;
+		InitMsg init_msg = 9;
+		SkinMsg skin_msg = 10;
+		PlayerNameMsg player_name_msg = 11;
+		AnnouncementMsg announcement_msg = 12;
 		/*ControllerMsg controller_msg = 6;
 		ControllerListMsg controller_list_msg = 7;*/
 	}
@@ -110,6 +112,9 @@ message ChatMsg {
 	bool isAdmin = 5;
 }
 
+message InitMsg {
+}
+
 message SkinMsg {
 	uint32 socketID = 1;
 	SkinData skinData = 2;
@@ -140,4 +145,9 @@ message PlayerNameMsg {
 	string name = 1;
 	uint32 level = 2;
 	bool accepted = 3;
+}
+
+message AnnouncementMsg {
+	string message = 1;
+	uint32 timer = 2;
 }

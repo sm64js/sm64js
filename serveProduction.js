@@ -7,7 +7,8 @@ const {
     SkinMsg,
     PlayerListsMsg,
     FlagMsg,
-    PlayerNameMsg
+    PlayerNameMsg,
+    AnnouncementMsg,
 } = require("./proto/mario_pb")
 const fs = require('fs')
 const http = require('http')
@@ -230,7 +231,14 @@ const processAdminCommand = (msg, token, roomKey) => {
 
     switch (command) {
         case "ANNOUNCEMENT":
-            broadcastJsonWithTopic('announcement', { message: remainingParts.join(" "), timer: 300 }, roomKey)
+            const announcementMsg = new AnnouncementMsg()
+            announcementMsg.setMessage(args)
+            announcementMsg.setTimer(300)
+            const sm64jsMsg = new Sm64JsMsg()
+            sm64jsMsg.setAnnouncementMsg(announcementMsg)
+            const rootMsg = new RootMsg()
+            rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+            broadcastData(rootMsg.serializeBinary(), roomKey)
             break
         default:  return console.log("Unknown Admin Command: " + parts[0])
     }
@@ -721,6 +729,8 @@ require('uWebSockets.js').App().ws('/*', {
                         case Sm64JsMsg.MessageCase.CHAT_MSG:
                             if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
                             processChat(socket.my_id, sm64jsMsg); break
+                        case Sm64JsMsg.MessageCase.INIT_MSG:
+                            sendSkinsToSocket(socket); break
                         case Sm64JsMsg.MessageCase.SKIN_MSG:
                             if (socketIdsToRoomKeys[socket.my_id] == undefined) return 
                             processSkin(socket.my_id, sm64jsMsg.getSkinMsg()); break
@@ -729,14 +739,6 @@ require('uWebSockets.js').App().ws('/*', {
                         //case 3: processControllerUpdate(socket.my_id, bytes.slice(1)); break
                         //case 4: processKnockUp(socket.my_id, bytes.slice(1)); break
                         default: throw "unknown case for uncompressed proto message"
-                    }
-                    break
-                case RootMsg.MessageCase.JSON_BYTES_MSG:
-                    const str = text.decoder.decode(rootMsg.getJsonBytesMsg())
-                    const { topic, msg } = JSON.parse(str)
-                    switch (topic) {
-                        case 'getInitSkinData': sendSkinsToSocket(socket); break
-                        default: throw "Unknown topic in json message"
                     }
                     break
                 case RootMsg.MessageCase.MESSAGE_NOT_SET:

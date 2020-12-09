@@ -11,6 +11,7 @@ var jspb = require('google-protobuf');
 var goog = jspb;
 var global = Function('return this')();
 
+goog.exportSymbol('proto.sm64js.AnnouncementMsg', null, global);
 goog.exportSymbol('proto.sm64js.AttackMsg', null, global);
 goog.exportSymbol('proto.sm64js.ChatMsg', null, global);
 goog.exportSymbol('proto.sm64js.ConnectedMsg', null, global);
@@ -18,6 +19,7 @@ goog.exportSymbol('proto.sm64js.ControllerListMsg', null, global);
 goog.exportSymbol('proto.sm64js.ControllerMsg', null, global);
 goog.exportSymbol('proto.sm64js.FlagMsg', null, global);
 goog.exportSymbol('proto.sm64js.GrabFlagMsg', null, global);
+goog.exportSymbol('proto.sm64js.InitMsg', null, global);
 goog.exportSymbol('proto.sm64js.MarioListMsg', null, global);
 goog.exportSymbol('proto.sm64js.MarioMsg', null, global);
 goog.exportSymbol('proto.sm64js.PingMsg', null, global);
@@ -306,7 +308,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.sm64js.Sm64JsMsg.oneofGroups_ = [[1,2,3,4,5,6,7,8,9,10]];
+proto.sm64js.Sm64JsMsg.oneofGroups_ = [[1,2,3,4,5,6,7,8,9,10,11,12]];
 
 /**
  * @enum {number}
@@ -321,8 +323,10 @@ proto.sm64js.Sm64JsMsg.MessageCase = {
   ATTACK_MSG: 6,
   GRAB_MSG: 7,
   CHAT_MSG: 8,
-  SKIN_MSG: 9,
-  PLAYER_NAME_MSG: 10
+  INIT_MSG: 9,
+  SKIN_MSG: 10,
+  PLAYER_NAME_MSG: 11,
+  ANNOUNCEMENT_MSG: 12
 };
 
 /**
@@ -369,8 +373,10 @@ proto.sm64js.Sm64JsMsg.toObject = function(includeInstance, msg) {
     attackMsg: (f = msg.getAttackMsg()) && proto.sm64js.AttackMsg.toObject(includeInstance, f),
     grabMsg: (f = msg.getGrabMsg()) && proto.sm64js.GrabFlagMsg.toObject(includeInstance, f),
     chatMsg: (f = msg.getChatMsg()) && proto.sm64js.ChatMsg.toObject(includeInstance, f),
+    initMsg: (f = msg.getInitMsg()) && proto.sm64js.InitMsg.toObject(includeInstance, f),
     skinMsg: (f = msg.getSkinMsg()) && proto.sm64js.SkinMsg.toObject(includeInstance, f),
-    playerNameMsg: (f = msg.getPlayerNameMsg()) && proto.sm64js.PlayerNameMsg.toObject(includeInstance, f)
+    playerNameMsg: (f = msg.getPlayerNameMsg()) && proto.sm64js.PlayerNameMsg.toObject(includeInstance, f),
+    announcementMsg: (f = msg.getAnnouncementMsg()) && proto.sm64js.AnnouncementMsg.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -448,14 +454,24 @@ proto.sm64js.Sm64JsMsg.deserializeBinaryFromReader = function(msg, reader) {
       msg.setChatMsg(value);
       break;
     case 9:
+      var value = new proto.sm64js.InitMsg;
+      reader.readMessage(value,proto.sm64js.InitMsg.deserializeBinaryFromReader);
+      msg.setInitMsg(value);
+      break;
+    case 10:
       var value = new proto.sm64js.SkinMsg;
       reader.readMessage(value,proto.sm64js.SkinMsg.deserializeBinaryFromReader);
       msg.setSkinMsg(value);
       break;
-    case 10:
+    case 11:
       var value = new proto.sm64js.PlayerNameMsg;
       reader.readMessage(value,proto.sm64js.PlayerNameMsg.deserializeBinaryFromReader);
       msg.setPlayerNameMsg(value);
+      break;
+    case 12:
+      var value = new proto.sm64js.AnnouncementMsg;
+      reader.readMessage(value,proto.sm64js.AnnouncementMsg.deserializeBinaryFromReader);
+      msg.setAnnouncementMsg(value);
       break;
     default:
       reader.skipField();
@@ -550,10 +566,18 @@ proto.sm64js.Sm64JsMsg.serializeBinaryToWriter = function(message, writer) {
       proto.sm64js.ChatMsg.serializeBinaryToWriter
     );
   }
-  f = message.getSkinMsg();
+  f = message.getInitMsg();
   if (f != null) {
     writer.writeMessage(
       9,
+      f,
+      proto.sm64js.InitMsg.serializeBinaryToWriter
+    );
+  }
+  f = message.getSkinMsg();
+  if (f != null) {
+    writer.writeMessage(
+      10,
       f,
       proto.sm64js.SkinMsg.serializeBinaryToWriter
     );
@@ -561,9 +585,17 @@ proto.sm64js.Sm64JsMsg.serializeBinaryToWriter = function(message, writer) {
   f = message.getPlayerNameMsg();
   if (f != null) {
     writer.writeMessage(
-      10,
+      11,
       f,
       proto.sm64js.PlayerNameMsg.serializeBinaryToWriter
+    );
+  }
+  f = message.getAnnouncementMsg();
+  if (f != null) {
+    writer.writeMessage(
+      12,
+      f,
+      proto.sm64js.AnnouncementMsg.serializeBinaryToWriter
     );
   }
 };
@@ -810,18 +842,48 @@ proto.sm64js.Sm64JsMsg.prototype.hasChatMsg = function() {
 
 
 /**
- * optional SkinMsg skin_msg = 9;
+ * optional InitMsg init_msg = 9;
+ * @return {?proto.sm64js.InitMsg}
+ */
+proto.sm64js.Sm64JsMsg.prototype.getInitMsg = function() {
+  return /** @type{?proto.sm64js.InitMsg} */ (
+    jspb.Message.getWrapperField(this, proto.sm64js.InitMsg, 9));
+};
+
+
+/** @param {?proto.sm64js.InitMsg|undefined} value */
+proto.sm64js.Sm64JsMsg.prototype.setInitMsg = function(value) {
+  jspb.Message.setOneofWrapperField(this, 9, proto.sm64js.Sm64JsMsg.oneofGroups_[0], value);
+};
+
+
+proto.sm64js.Sm64JsMsg.prototype.clearInitMsg = function() {
+  this.setInitMsg(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.sm64js.Sm64JsMsg.prototype.hasInitMsg = function() {
+  return jspb.Message.getField(this, 9) != null;
+};
+
+
+/**
+ * optional SkinMsg skin_msg = 10;
  * @return {?proto.sm64js.SkinMsg}
  */
 proto.sm64js.Sm64JsMsg.prototype.getSkinMsg = function() {
   return /** @type{?proto.sm64js.SkinMsg} */ (
-    jspb.Message.getWrapperField(this, proto.sm64js.SkinMsg, 9));
+    jspb.Message.getWrapperField(this, proto.sm64js.SkinMsg, 10));
 };
 
 
 /** @param {?proto.sm64js.SkinMsg|undefined} value */
 proto.sm64js.Sm64JsMsg.prototype.setSkinMsg = function(value) {
-  jspb.Message.setOneofWrapperField(this, 9, proto.sm64js.Sm64JsMsg.oneofGroups_[0], value);
+  jspb.Message.setOneofWrapperField(this, 10, proto.sm64js.Sm64JsMsg.oneofGroups_[0], value);
 };
 
 
@@ -835,23 +897,23 @@ proto.sm64js.Sm64JsMsg.prototype.clearSkinMsg = function() {
  * @return {!boolean}
  */
 proto.sm64js.Sm64JsMsg.prototype.hasSkinMsg = function() {
-  return jspb.Message.getField(this, 9) != null;
+  return jspb.Message.getField(this, 10) != null;
 };
 
 
 /**
- * optional PlayerNameMsg player_name_msg = 10;
+ * optional PlayerNameMsg player_name_msg = 11;
  * @return {?proto.sm64js.PlayerNameMsg}
  */
 proto.sm64js.Sm64JsMsg.prototype.getPlayerNameMsg = function() {
   return /** @type{?proto.sm64js.PlayerNameMsg} */ (
-    jspb.Message.getWrapperField(this, proto.sm64js.PlayerNameMsg, 10));
+    jspb.Message.getWrapperField(this, proto.sm64js.PlayerNameMsg, 11));
 };
 
 
 /** @param {?proto.sm64js.PlayerNameMsg|undefined} value */
 proto.sm64js.Sm64JsMsg.prototype.setPlayerNameMsg = function(value) {
-  jspb.Message.setOneofWrapperField(this, 10, proto.sm64js.Sm64JsMsg.oneofGroups_[0], value);
+  jspb.Message.setOneofWrapperField(this, 11, proto.sm64js.Sm64JsMsg.oneofGroups_[0], value);
 };
 
 
@@ -865,7 +927,37 @@ proto.sm64js.Sm64JsMsg.prototype.clearPlayerNameMsg = function() {
  * @return {!boolean}
  */
 proto.sm64js.Sm64JsMsg.prototype.hasPlayerNameMsg = function() {
-  return jspb.Message.getField(this, 10) != null;
+  return jspb.Message.getField(this, 11) != null;
+};
+
+
+/**
+ * optional AnnouncementMsg announcement_msg = 12;
+ * @return {?proto.sm64js.AnnouncementMsg}
+ */
+proto.sm64js.Sm64JsMsg.prototype.getAnnouncementMsg = function() {
+  return /** @type{?proto.sm64js.AnnouncementMsg} */ (
+    jspb.Message.getWrapperField(this, proto.sm64js.AnnouncementMsg, 12));
+};
+
+
+/** @param {?proto.sm64js.AnnouncementMsg|undefined} value */
+proto.sm64js.Sm64JsMsg.prototype.setAnnouncementMsg = function(value) {
+  jspb.Message.setOneofWrapperField(this, 12, proto.sm64js.Sm64JsMsg.oneofGroups_[0], value);
+};
+
+
+proto.sm64js.Sm64JsMsg.prototype.clearAnnouncementMsg = function() {
+  this.setAnnouncementMsg(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.sm64js.Sm64JsMsg.prototype.hasAnnouncementMsg = function() {
+  return jspb.Message.getField(this, 12) != null;
 };
 
 
@@ -3843,6 +3935,122 @@ proto.sm64js.ChatMsg.prototype.setIsadmin = function(value) {
  * @extends {jspb.Message}
  * @constructor
  */
+proto.sm64js.InitMsg = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.sm64js.InitMsg, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.sm64js.InitMsg.displayName = 'proto.sm64js.InitMsg';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.sm64js.InitMsg.prototype.toObject = function(opt_includeInstance) {
+  return proto.sm64js.InitMsg.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.sm64js.InitMsg} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.sm64js.InitMsg.toObject = function(includeInstance, msg) {
+  var f, obj = {
+
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.sm64js.InitMsg}
+ */
+proto.sm64js.InitMsg.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.sm64js.InitMsg;
+  return proto.sm64js.InitMsg.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.sm64js.InitMsg} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.sm64js.InitMsg}
+ */
+proto.sm64js.InitMsg.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.sm64js.InitMsg.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.sm64js.InitMsg.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.sm64js.InitMsg} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.sm64js.InitMsg.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
 proto.sm64js.SkinMsg = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
@@ -4893,6 +5101,175 @@ proto.sm64js.PlayerNameMsg.prototype.getAccepted = function() {
 /** @param {boolean} value */
 proto.sm64js.PlayerNameMsg.prototype.setAccepted = function(value) {
   jspb.Message.setProto3BooleanField(this, 3, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.sm64js.AnnouncementMsg = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.sm64js.AnnouncementMsg, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.sm64js.AnnouncementMsg.displayName = 'proto.sm64js.AnnouncementMsg';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.sm64js.AnnouncementMsg.prototype.toObject = function(opt_includeInstance) {
+  return proto.sm64js.AnnouncementMsg.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.sm64js.AnnouncementMsg} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.sm64js.AnnouncementMsg.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    message: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    timer: jspb.Message.getFieldWithDefault(msg, 2, 0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.sm64js.AnnouncementMsg}
+ */
+proto.sm64js.AnnouncementMsg.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.sm64js.AnnouncementMsg;
+  return proto.sm64js.AnnouncementMsg.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.sm64js.AnnouncementMsg} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.sm64js.AnnouncementMsg}
+ */
+proto.sm64js.AnnouncementMsg.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setMessage(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setTimer(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.sm64js.AnnouncementMsg.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.sm64js.AnnouncementMsg.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.sm64js.AnnouncementMsg} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.sm64js.AnnouncementMsg.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getMessage();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
+  f = message.getTimer();
+  if (f !== 0) {
+    writer.writeUint32(
+      2,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional string message = 1;
+ * @return {string}
+ */
+proto.sm64js.AnnouncementMsg.prototype.getMessage = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/** @param {string} value */
+proto.sm64js.AnnouncementMsg.prototype.setMessage = function(value) {
+  jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional uint32 timer = 2;
+ * @return {number}
+ */
+proto.sm64js.AnnouncementMsg.prototype.getTimer = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {number} value */
+proto.sm64js.AnnouncementMsg.prototype.setTimer = function(value) {
+  jspb.Message.setProto3IntField(this, 2, value);
 };
 
 

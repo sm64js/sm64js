@@ -127,13 +127,13 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                     Some(sm64_js_msg::Message::PlayerNameMsg(player_name_msg)) => {
                         // TODO
                     }
-                    Some(sm64_js_msg::Message::AnnouncementMsg(announcement_msg)) => {
-                        // TODO
-                    }
                     Some(sm64_js_msg::Message::ListMsg(_)) => {
                         // TODO clients don't send this
                     }
                     Some(sm64_js_msg::Message::ConnectedMsg(_)) => {
+                        // TODO clients don't send this
+                    }
+                    Some(sm64_js_msg::Message::AnnouncementMsg(_)) => {
                         // TODO clients don't send this
                     }
                     None => {}

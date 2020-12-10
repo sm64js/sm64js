@@ -87,7 +87,6 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                     None => {
                         return;
                     }
-                    Some(root_msg::Message::JsonBytesMsg(_)) => todo!(),
                 };
                 match sm64js_msg.message {
                     Some(sm64_js_msg::Message::PingMsg(_)) => {
@@ -119,7 +118,16 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                     Some(sm64_js_msg::Message::ChatMsg(chat_msg)) => {
                         self.addr.do_send(server::SendChat { chat_msg });
                     }
+                    Some(sm64_js_msg::Message::InitMsg(init_msg)) => {
+                        // TODO
+                    }
                     Some(sm64_js_msg::Message::SkinMsg(skin_msg)) => {
+                        // TODO
+                    }
+                    Some(sm64_js_msg::Message::PlayerNameMsg(player_name_msg)) => {
+                        // TODO
+                    }
+                    Some(sm64_js_msg::Message::AnnouncementMsg(announcement_msg)) => {
                         // TODO
                     }
                     Some(sm64_js_msg::Message::ListMsg(_)) => {

@@ -71,18 +71,16 @@ impl Handler<Connect> for Sm64JsServer {
         let socket_id = rand::thread_rng().gen::<u32>();
         let client = Client::new(msg.addr, socket_id);
 
-        let sm64js_msg = Sm64JsMsg {
-            message: Some(sm64_js_msg::Message::ConnectedMsg(ConnectedMsg {
-                socket_id,
+        let root_msg = RootMsg {
+            message: Some(root_msg::Message::UncompressedSm64jsMsg(Sm64JsMsg {
+                message: Some(sm64_js_msg::Message::ConnectedMsg(ConnectedMsg {
+                    socket_id,
+                })),
             })),
         };
 
         let mut msg = vec![];
-        sm64js_msg.encode(&mut msg).unwrap();
-
-        let mut encoder = ZlibEncoder::new(Vec::new(), Compression::fast());
-        encoder.write_all(&msg).unwrap();
-        let msg = encoder.finish().unwrap();
+        root_msg.encode(&mut msg).unwrap();
 
         client.send(Message(msg)).unwrap();
         self.clients.insert(socket_id, client);
@@ -161,6 +159,12 @@ impl Sm64JsServer {
         let mut encoder = ZlibEncoder::new(Vec::new(), Compression::fast());
         encoder.write_all(&msg)?;
         let msg = encoder.finish()?;
+
+        let root_msg = RootMsg {
+            message: Some(root_msg::Message::CompressedSm64jsMsg(msg)),
+        };
+        let mut msg = vec![];
+        root_msg.encode(&mut msg)?;
 
         clients
             .iter()

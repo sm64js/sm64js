@@ -5,6 +5,7 @@ use crate::proto::{
 
 use actix::{prelude::*, Recipient};
 use anyhow::Result;
+use censor::Censor;
 use dashmap::DashMap;
 use flate2::{write::ZlibEncoder, Compression};
 use prost::Message as ProstMessage;
@@ -196,6 +197,8 @@ impl Sm64JsServer {
 
     fn handle_chat(mut chat_msg: ChatMsg) -> Option<Vec<u8>> {
         chat_msg.message = format!("{}", escape(&chat_msg.message));
+        let censor = Censor::Standard;
+        chat_msg.message = censor.censor(&chat_msg.message);
 
         let root_msg = RootMsg {
             message: Some(root_msg::Message::UncompressedSm64jsMsg(Sm64JsMsg {

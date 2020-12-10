@@ -8,11 +8,18 @@ use anyhow::Result;
 use censor::Censor;
 use dashmap::DashMap;
 use flate2::{write::ZlibEncoder, Compression};
+use parking_lot::RwLock;
 use prost::Message as ProstMessage;
 use rand::{self, Rng};
 use rayon::prelude::*;
-use std::{env, io::prelude::*, sync::Arc, thread, time::Duration};
+use std::{collections::HashSet, env, io::prelude::*, sync::Arc, thread, time::Duration};
 use v_htmlescape::escape;
+
+lazy_static! {
+    pub static ref ADMIN_COMMANDS: HashSet<&'static str> = hashset! {"ANNOUNCEMENT"};
+    pub static ref ADMIN_TOKENS: Arc<RwLock<HashSet<String>>> =
+        Arc::new(RwLock::new(HashSet::new()));
+}
 
 #[derive(Message)]
 #[rtype(result = "()")]
@@ -130,6 +137,14 @@ impl Handler<SendChat> for Sm64JsServer {
 
 impl Sm64JsServer {
     pub fn new() -> Self {
+        if let Ok(admin_tokens) = env::var("ADMIN_TOKENS") {
+            admin_tokens
+                .split(':')
+                .par_bridge()
+                .for_each(|admin_token| {
+                    ADMIN_TOKENS.write().insert(admin_token.to_string());
+                })
+        }
         Sm64JsServer {
             clients: Arc::new(DashMap::new()),
         }
@@ -174,21 +189,25 @@ impl Sm64JsServer {
     fn handle_command(message: String) -> Option<Vec<u8>> {
         if let Some(index) = message.find(' ') {
             let (cmd, message) = message.split_at(index);
-            if cmd.to_ascii_uppercase() == "ANNOUNCEMENT" {
-                let root_msg = RootMsg {
-                    message: Some(root_msg::Message::UncompressedSm64jsMsg(Sm64JsMsg {
-                        message: Some(sm64_js_msg::Message::AnnouncementMsg(AnnouncementMsg {
-                            message: message.to_string(),
-                            timer: 300,
+            if ADMIN_COMMANDS.contains(cmd) && !ADMIN_TOKENS.read().contains(cmd) {
+                return None;
+            }
+            match cmd.to_ascii_uppercase().as_ref() {
+                "ANNOUNCEMENT" => {
+                    let root_msg = RootMsg {
+                        message: Some(root_msg::Message::UncompressedSm64jsMsg(Sm64JsMsg {
+                            message: Some(sm64_js_msg::Message::AnnouncementMsg(AnnouncementMsg {
+                                message: message.to_string(),
+                                timer: 300,
+                            })),
                         })),
-                    })),
-                };
+                    };
 
-                let mut msg = vec![];
-                root_msg.encode(&mut msg).unwrap();
-                Some(msg)
-            } else {
-                None
+                    let mut msg = vec![];
+                    root_msg.encode(&mut msg).unwrap();
+                    Some(msg)
+                }
+                _ => None,
             }
         } else {
             None

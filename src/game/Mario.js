@@ -887,6 +887,26 @@ const update_mario_joystick_inputs = (m, playerInput) => {
     m.intendedYaw = m.intendedYaw < -32768 ? m.intendedYaw + 65536 : m.intendedYaw
 }
 
+const warp_death_plane = (m) => {
+    switch (Area.gCurrLevelNum) {
+        case (LEVEL_CCM): { // CCM
+            if (m.pos[1] <= -7166.0) m.pos = [-1512, 2560, -2305]
+            break
+        }
+        case (LEVEL_TTM): { // TTM
+            if (m.pos[1] <= -7230.0) m.pos = [102, -4332, 5734]
+            break
+        }
+        case (LEVEL_WF): { // TTM
+            if (m.pos[1] <= -2000.0) m.pos = [2600, 1256, 5120]
+            break
+        }
+        default: {
+            break
+        }
+    }
+}
+
 const update_mario_geometry_inputs = (m) => {
 
     m.floorHeight = SurfaceCollision.find_floor(m.pos[0], m.pos[1], m.pos[2], m)
@@ -927,6 +947,7 @@ const update_mario_geometry_inputs = (m) => {
     } else {
         m.input |= INPUT_OFF_FLOOR;
     }
+    if (window.cheats.warp_death_plane) warp_death_plane(m)
 }
 
 export const mario_floor_is_slippery = (m) => {

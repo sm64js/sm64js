@@ -745,7 +745,8 @@ require('uWebSockets.js').App().ws('/*', {
                     break
                 case RootMsg.MessageCase.MESSAGE_NOT_SET:
                 default:
-                    throw new Error(`unhandled case in switch expression: ${rootMsg.getMessageCase()}`)
+                    if (rootMsg.getMessageCase() != 0)
+                        throw new Error(`unhandled case in switch expression: ${rootMsg.getMessageCase()}`)
             }
 
 

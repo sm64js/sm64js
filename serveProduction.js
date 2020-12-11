@@ -9,7 +9,9 @@ const {
     FlagMsg,
     PlayerNameMsg,
     AnnouncementMsg,
+    ChatMsg
 } = require("./proto/mario_pb")
+
 const fs = require('fs')
 const http = require('http')
 const got = require('got')

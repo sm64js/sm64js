@@ -328,7 +328,7 @@ const processPlayerName = async (socket, msg) => {
 
     if (!allowedLevelRooms.includes(level)) return rejectPlayerName(socket)
 
-    if (name.length < 3 || name.length > 14 || name == "server")  {
+    if (name.length < 3 || name.length > 14 || name.toUpperCase() == "SERVER")  {
         return rejectPlayerName(socket)
     }
 

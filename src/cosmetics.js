@@ -189,6 +189,7 @@ window.updatePlayerName = (name) => {
 }
 
 export const recvPlayerNameResponse = (msg) => {
+
     const accepted = msg.getAccepted()
     if (!accepted) {
         document.getElementById("playerNameResult").style.color = "red"
@@ -202,9 +203,9 @@ export const recvPlayerNameResponse = (msg) => {
         document.getElementById("playerNameButton").hidden = true
         document.getElementById("mapSelect").disabled = true
         window.playerNameAccepted = true
-        localStorage['playername'] = msg.playerName
+        localStorage['playername'] = msg.getName()
 
-        window.selectedMap = msg.level
+        window.selectedMap = msg.getLevel()
     }
 }
 

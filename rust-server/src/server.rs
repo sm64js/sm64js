@@ -1,6 +1,6 @@
 use crate::proto::{
-    root_msg, sm64_js_msg, AnnouncementMsg, ChatMsg, ConnectedMsg, MarioListMsg, MarioMsg, RootMsg,
-    Sm64JsMsg,
+    root_msg, sm64_js_msg, AnnouncementMsg, AttackMsg, ChatMsg, ConnectedMsg, GrabFlagMsg,
+    MarioListMsg, MarioMsg, RootMsg, Sm64JsMsg,
 };
 
 use actix::{prelude::*, Recipient};
@@ -100,6 +100,36 @@ impl Handler<SetData> for Sm64JsServer {
         self.clients
             .get_mut(&msg.id)
             .map(|mut client| client.set_data(msg.data));
+    }
+}
+
+#[derive(Message)]
+#[rtype(result = "()")]
+pub struct SendAttack {
+    pub attack_msg: AttackMsg,
+}
+
+impl Handler<SendAttack> for Sm64JsServer {
+    type Result = ();
+
+    fn handle(&mut self, send_attack: SendAttack, _: &mut Context<Self>) {
+        let _attack_msg = send_attack.attack_msg;
+        // TODO
+    }
+}
+
+#[derive(Message)]
+#[rtype(result = "()")]
+pub struct SendGrabFlag {
+    pub grab_flag_msg: GrabFlagMsg,
+}
+
+impl Handler<SendGrabFlag> for Sm64JsServer {
+    type Result = ();
+
+    fn handle(&mut self, send_grab: SendGrabFlag, _: &mut Context<Self>) {
+        let _grab_flag_msg = send_grab.grab_flag_msg;
+        // TODO
     }
 }
 

@@ -112,31 +112,31 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                             data: mario_msg,
                         });
                     }
-                    Some(sm64_js_msg::Message::PlayerListsMsg(player_lists_msg)) => {
-                        // TODO
-                    }
                     Some(sm64_js_msg::Message::AttackMsg(attack_msg)) => {
-                        // TODO
+                        self.addr.do_send(server::SendAttack { attack_msg })
                     }
-                    Some(sm64_js_msg::Message::GrabMsg(grab_msg)) => {
-                        // TODO
+                    Some(sm64_js_msg::Message::GrabMsg(grab_flag_msg)) => {
+                        self.addr.do_send(server::SendGrabFlag { grab_flag_msg })
                     }
                     Some(sm64_js_msg::Message::ChatMsg(chat_msg)) => {
                         self.addr.do_send(server::SendChat { chat_msg });
                     }
-                    Some(sm64_js_msg::Message::InitMsg(init_msg)) => {
+                    Some(sm64_js_msg::Message::InitMsg(_init_msg)) => {
                         // TODO
                     }
-                    Some(sm64_js_msg::Message::SkinMsg(skin_msg)) => {
+                    Some(sm64_js_msg::Message::SkinMsg(_skin_msg)) => {
                         // TODO
                     }
-                    Some(sm64_js_msg::Message::PlayerNameMsg(player_name_msg)) => {
+                    Some(sm64_js_msg::Message::PlayerNameMsg(_player_name_msg)) => {
                         // TODO
                     }
                     Some(sm64_js_msg::Message::ListMsg(_)) => {
                         // TODO clients don't send this
                     }
                     Some(sm64_js_msg::Message::ConnectedMsg(_)) => {
+                        // TODO clients don't send this
+                    }
+                    Some(sm64_js_msg::Message::PlayerListsMsg(_player_lists_msg)) => {
                         // TODO clients don't send this
                     }
                     Some(sm64_js_msg::Message::AnnouncementMsg(_)) => {

@@ -1,7 +1,7 @@
 use crate::{
     proto::{
         root_msg, sm64_js_msg, AnnouncementMsg, AttackMsg, ChatMsg, ConnectedMsg, GrabFlagMsg,
-        MarioListMsg, MarioMsg, RootMsg, Sm64JsMsg,
+        MarioMsg, RootMsg, Sm64JsMsg,
     },
     Room,
 };
@@ -10,12 +10,11 @@ use actix::{prelude::*, Recipient};
 use anyhow::Result;
 use censor::Censor;
 use dashmap::DashMap;
-use flate2::{write::ZlibEncoder, Compression};
 use parking_lot::RwLock;
 use prost::Message as ProstMessage;
 use rand::{self, Rng};
 use rayon::prelude::*;
-use std::{collections::HashSet, env, io::prelude::*, sync::Arc, thread, time::Duration};
+use std::{collections::HashSet, env, sync::Arc, thread, time::Duration};
 use v_htmlescape::escape;
 
 lazy_static! {
@@ -30,19 +29,18 @@ pub struct Message(pub Vec<u8>);
 
 pub struct Sm64JsServer {
     clients: Arc<DashMap<u32, Client>>,
-    rooms: Arc<DashMap<u16, Room>>,
+    rooms: Arc<DashMap<u16, Room<'static>>>,
 }
 
 impl Actor for Sm64JsServer {
     type Context = Context<Self>;
 
     fn started(&mut self, _: &mut Self::Context) {
-        let clients = self.clients.clone();
         let rooms = self.rooms.clone();
 
         thread::spawn(move || loop {
             Sm64JsServer::process_flags(rooms.clone());
-            Sm64JsServer::broadcast_data(clients.clone()).unwrap();
+            Sm64JsServer::broadcast_data(rooms.clone()).unwrap();
             thread::sleep(Duration::from_millis(33));
         });
     }
@@ -194,38 +192,11 @@ impl Sm64JsServer {
             .for_each(|mut room| room.process_flags());
     }
 
-    pub fn broadcast_data(clients: Arc<DashMap<u32, Client>>) -> Result<()> {
-        let mario_list: Vec<_> = clients
+    pub fn broadcast_data(rooms: Arc<DashMap<u16, Room>>) -> Result<()> {
+        rooms
             .iter()
             .par_bridge()
-            .filter_map(|client| client.data.clone())
-            .collect();
-        let sm64js_msg = Sm64JsMsg {
-            message: Some(sm64_js_msg::Message::ListMsg(MarioListMsg {
-                flag: vec![],
-                mario: mario_list,
-            })),
-        };
-        let mut msg = vec![];
-        sm64js_msg.encode(&mut msg)?;
-
-        let mut encoder = ZlibEncoder::new(Vec::new(), Compression::fast());
-        encoder.write_all(&msg)?;
-        let msg = encoder.finish()?;
-
-        let root_msg = RootMsg {
-            message: Some(root_msg::Message::CompressedSm64jsMsg(msg)),
-        };
-        let mut msg = vec![];
-        root_msg.encode(&mut msg)?;
-
-        clients
-            .iter()
-            .par_bridge()
-            .map(|client| -> Result<()> {
-                client.send(Message(msg.clone()))?;
-                Ok(())
-            })
+            .map(|room| room.broadcast_data())
             .collect::<Result<Vec<_>>>()?;
         Ok(())
     }
@@ -293,12 +264,28 @@ impl Client {
 
     pub fn set_data(&mut self, mut data: MarioMsg) {
         data.socket_id = self.socket_id;
-
         self.data = Some(data);
     }
 
     pub fn send(&self, msg: Message) -> Result<()> {
         self.addr.do_send(msg)?;
         Ok(())
+    }
+}
+
+#[derive(Debug)]
+pub struct Player<'a> {
+    client: &'a Client,
+    level: String,
+    name: String,
+}
+
+impl<'a> Player<'a> {
+    pub fn get_data(&self) -> Option<MarioMsg> {
+        self.client.data.clone()
+    }
+
+    pub fn send_message(&self, msg: Vec<u8>) -> Result<()> {
+        self.client.send(Message(msg))
     }
 }

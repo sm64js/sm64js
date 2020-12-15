@@ -8,6 +8,7 @@ mod room;
 mod server;
 
 pub use room::{Flag, Room};
+pub use server::{Message, Player};
 
 pub mod proto {
     include!(concat!(env!("OUT_DIR"), "/sm64js.rs"));
@@ -18,7 +19,7 @@ use proto::{root_msg, sm64_js_msg, RootMsg, Sm64JsMsg};
 use actix::prelude::*;
 use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
-use prost::Message;
+use prost::Message as ProstMessage;
 use std::time::{Duration, Instant};
 
 /// How often heartbeat pings are sent

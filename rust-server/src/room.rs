@@ -10,6 +10,8 @@ use prost::Message as ProstMessage;
 use rayon::prelude::*;
 use std::{io::prelude::*, sync::Arc};
 
+pub type Rooms<'a> = DashMap<u32, Room<'a>>;
+
 pub struct Room<'a> {
     id: String,
     flags: Vec<Flag>,
@@ -17,7 +19,7 @@ pub struct Room<'a> {
 }
 
 impl<'a> Room<'a> {
-    pub fn init_rooms() -> DashMap<u16, Room<'a>> {
+    pub fn init_rooms() -> Rooms<'a> {
         let rooms = DashMap::new();
         rooms.insert(
             5,

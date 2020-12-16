@@ -4,11 +4,13 @@ extern crate lazy_static;
 #[macro_use]
 extern crate maplit;
 
+mod client;
 mod room;
 mod server;
 
-pub use room::{Flag, Room};
-pub use server::{Message, Player};
+pub use client::{Client, Clients, Player};
+pub use room::{Flag, Room, Rooms};
+pub use server::Message;
 
 pub mod proto {
     include!(concat!(env!("OUT_DIR"), "/sm64js.rs"));
@@ -131,8 +133,9 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                     Some(sm64_js_msg::Message::SkinMsg(_skin_msg)) => {
                         // TODO
                     }
-                    Some(sm64_js_msg::Message::PlayerNameMsg(_player_name_msg)) => {
-                        // TODO
+                    Some(sm64_js_msg::Message::PlayerNameMsg(player_name_msg)) => {
+                        self.addr
+                            .do_send(server::SendPlayerName { player_name_msg });
                     }
                     Some(sm64_js_msg::Message::ListMsg(_)) => {
                         // TODO clients don't send this

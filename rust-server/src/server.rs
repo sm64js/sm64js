@@ -1,9 +1,9 @@
 use crate::{
     proto::{
         root_msg, sm64_js_msg, AnnouncementMsg, AttackMsg, ChatMsg, ConnectedMsg, GrabFlagMsg,
-        MarioMsg, RootMsg, Sm64JsMsg,
+        MarioMsg, PlayerNameMsg, RootMsg, Sm64JsMsg,
     },
-    Room,
+    Client, Clients, Room, Rooms,
 };
 
 use actix::{prelude::*, Recipient};
@@ -28,8 +28,8 @@ lazy_static! {
 pub struct Message(pub Vec<u8>);
 
 pub struct Sm64JsServer {
-    clients: Arc<DashMap<u32, Client>>,
-    rooms: Arc<DashMap<u16, Room<'static>>>,
+    clients: Arc<Clients>,
+    rooms: Arc<Rooms<'static>>,
 }
 
 impl Actor for Sm64JsServer {
@@ -169,6 +169,21 @@ impl Handler<SendChat> for Sm64JsServer {
     }
 }
 
+#[derive(Message)]
+#[rtype(result = "()")]
+pub struct SendPlayerName {
+    pub player_name_msg: PlayerNameMsg,
+}
+
+impl Handler<SendPlayerName> for Sm64JsServer {
+    type Result = ();
+
+    fn handle(&mut self, send_player_name: SendPlayerName, _: &mut Context<Self>) {
+        let player_name_msg = send_player_name.player_name_msg;
+        if self.rooms.contains_key(&player_name_msg.level) {}
+    }
+}
+
 impl Sm64JsServer {
     pub fn new() -> Self {
         if let Ok(admin_tokens) = env::var("ADMIN_TOKENS") {
@@ -185,14 +200,14 @@ impl Sm64JsServer {
         }
     }
 
-    pub fn process_flags(rooms: Arc<DashMap<u16, Room>>) {
+    pub fn process_flags(rooms: Arc<DashMap<u32, Room>>) {
         rooms
             .iter_mut()
             .par_bridge()
             .for_each(|mut room| room.process_flags());
     }
 
-    pub fn broadcast_data(rooms: Arc<DashMap<u16, Room>>) -> Result<()> {
+    pub fn broadcast_data(rooms: Arc<Rooms>) -> Result<()> {
         rooms
             .iter()
             .par_bridge()
@@ -243,49 +258,5 @@ impl Sm64JsServer {
         let mut msg = vec![];
         root_msg.encode(&mut msg).unwrap();
         Some(msg)
-    }
-}
-
-#[derive(Debug)]
-pub struct Client {
-    addr: Recipient<Message>,
-    data: Option<MarioMsg>,
-    socket_id: u32,
-}
-
-impl Client {
-    pub fn new(addr: Recipient<Message>, socket_id: u32) -> Self {
-        Client {
-            addr,
-            data: None,
-            socket_id,
-        }
-    }
-
-    pub fn set_data(&mut self, mut data: MarioMsg) {
-        data.socket_id = self.socket_id;
-        self.data = Some(data);
-    }
-
-    pub fn send(&self, msg: Message) -> Result<()> {
-        self.addr.do_send(msg)?;
-        Ok(())
-    }
-}
-
-#[derive(Debug)]
-pub struct Player<'a> {
-    client: &'a Client,
-    level: String,
-    name: String,
-}
-
-impl<'a> Player<'a> {
-    pub fn get_data(&self) -> Option<MarioMsg> {
-        self.client.data.clone()
-    }
-
-    pub fn send_message(&self, msg: Vec<u8>) -> Result<()> {
-        self.client.send(Message(msg))
     }
 }

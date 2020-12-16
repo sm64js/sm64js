@@ -8,7 +8,7 @@ mod client;
 mod room;
 mod server;
 
-pub use client::{Client, Clients, Player};
+pub use client::{Client, Clients, Player, Players};
 pub use room::{Flag, Room, Rooms};
 pub use server::Message;
 
@@ -133,9 +133,42 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                     Some(sm64_js_msg::Message::SkinMsg(_skin_msg)) => {
                         // TODO
                     }
-                    Some(sm64_js_msg::Message::PlayerNameMsg(player_name_msg)) => {
+                    Some(sm64_js_msg::Message::PlayerNameMsg(mut player_name_msg)) => {
                         self.addr
-                            .do_send(server::SendPlayerName { player_name_msg });
+                            .send(server::SendPlayerName {
+                                socket_id: self.id,
+                                player_name_msg: player_name_msg.clone(),
+                            })
+                            .into_actor(self)
+                            .then(move |res, _act, ctx| {
+                                match res {
+                                    Ok(res) => {
+                                        if let Some(accepted) = res {
+                                            player_name_msg.accepted = accepted;
+                                            let root_msg = RootMsg {
+                                                message: Some(
+                                                    root_msg::Message::UncompressedSm64jsMsg(
+                                                        Sm64JsMsg {
+                                                            message: Some(
+                                                                sm64_js_msg::Message::PlayerNameMsg(
+                                                                    player_name_msg,
+                                                                ),
+                                                            ),
+                                                        },
+                                                    ),
+                                                ),
+                                            };
+                                            let mut msg = vec![];
+                                            root_msg.encode(&mut msg).unwrap();
+
+                                            ctx.binary(msg);
+                                        }
+                                    }
+                                    Err(_) => {}
+                                }
+                                fut::ready(())
+                            })
+                            .wait(ctx);
                     }
                     Some(sm64_js_msg::Message::ListMsg(_)) => {
                         // TODO clients don't send this

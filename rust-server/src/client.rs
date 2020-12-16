@@ -3,8 +3,10 @@ use crate::{proto::MarioMsg, Message};
 use actix::Recipient;
 use anyhow::Result;
 use dashmap::DashMap;
+use std::sync::Arc;
 
 pub type Clients = DashMap<u32, Client>;
+pub type Players = DashMap<u32, Player>;
 
 #[derive(Debug)]
 pub struct Client {
@@ -27,6 +29,10 @@ impl Client {
         self.data = Some(data);
     }
 
+    pub fn get_socket_id(&self) -> u32 {
+        self.socket_id
+    }
+
     pub fn send(&self, msg: Message) -> Result<()> {
         self.addr.do_send(msg)?;
         Ok(())
@@ -34,18 +40,31 @@ impl Client {
 }
 
 #[derive(Debug)]
-pub struct Player<'a> {
-    client: &'a Client,
-    level: String,
+pub struct Player {
+    clients: Arc<Clients>,
+    socket_id: u32,
+    level: u32,
     name: String,
 }
 
-impl<'a> Player<'a> {
+impl Player {
+    pub fn new(clients: Arc<Clients>, socket_id: u32, level: u32, name: String) -> Self {
+        Self {
+            clients,
+            socket_id,
+            level,
+            name,
+        }
+    }
+
     pub fn get_data(&self) -> Option<MarioMsg> {
-        self.client.data.clone()
+        self.clients.get(&self.socket_id).unwrap().data.clone()
     }
 
     pub fn send_message(&self, msg: Vec<u8>) -> Result<()> {
-        self.client.send(Message(msg))
+        self.clients
+            .get(&self.socket_id)
+            .unwrap()
+            .send(Message(msg))
     }
 }

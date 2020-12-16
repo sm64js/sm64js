@@ -1,6 +1,6 @@
 use crate::{
     proto::{root_msg, sm64_js_msg, FlagMsg, MarioListMsg, RootMsg, Sm64JsMsg},
-    Player,
+    Clients, Player, Players,
 };
 
 use anyhow::Result;
@@ -10,16 +10,16 @@ use prost::Message as ProstMessage;
 use rayon::prelude::*;
 use std::{io::prelude::*, sync::Arc};
 
-pub type Rooms<'a> = DashMap<u32, Room<'a>>;
+pub type Rooms = DashMap<u32, Room>;
 
-pub struct Room<'a> {
+pub struct Room {
     id: String,
     flags: Vec<Flag>,
-    players: Arc<DashMap<u32, Player<'a>>>,
+    players: Arc<Players>,
 }
 
-impl<'a> Room<'a> {
-    pub fn init_rooms() -> Rooms<'a> {
+impl Room {
+    pub fn init_rooms() -> Rooms {
         let rooms = DashMap::new();
         rooms.insert(
             5,
@@ -133,6 +133,15 @@ impl<'a> Room<'a> {
             })
             .collect::<Result<Vec<_>>>()?;
         Ok(())
+    }
+
+    pub fn has_player(&self, socket_id: u32) -> bool {
+        self.players.contains_key(&socket_id)
+    }
+
+    pub fn add_player(&mut self, clients: Arc<Clients>, socket_id: u32, level: u32, name: String) {
+        let player = Player::new(clients, socket_id, level, name);
+        self.players.insert(socket_id, player);
     }
 }
 

@@ -29,7 +29,7 @@ pub struct Message(pub Vec<u8>);
 
 pub struct Sm64JsServer {
     clients: Arc<Clients>,
-    rooms: Arc<Rooms<'static>>,
+    rooms: Arc<Rooms>,
 }
 
 impl Actor for Sm64JsServer {
@@ -87,6 +87,7 @@ impl Handler<Disconnect> for Sm64JsServer {
 
     fn handle(&mut self, msg: Disconnect, _: &mut Context<Self>) {
         self.clients.remove(&msg.id);
+        // TODO remove player from room
     }
 }
 
@@ -170,17 +171,37 @@ impl Handler<SendChat> for Sm64JsServer {
 }
 
 #[derive(Message)]
-#[rtype(result = "()")]
+#[rtype(result = "Option<bool>")]
 pub struct SendPlayerName {
+    pub socket_id: u32,
     pub player_name_msg: PlayerNameMsg,
 }
 
 impl Handler<SendPlayerName> for Sm64JsServer {
-    type Result = ();
+    type Result = Option<bool>;
 
-    fn handle(&mut self, send_player_name: SendPlayerName, _: &mut Context<Self>) {
+    fn handle(&mut self, send_player_name: SendPlayerName, _: &mut Context<Self>) -> Self::Result {
         let player_name_msg = send_player_name.player_name_msg;
-        if self.rooms.contains_key(&player_name_msg.level) {}
+        let socket_id = send_player_name.socket_id;
+        if let Some(mut room) = self.rooms.get_mut(&player_name_msg.level) {
+            if room.has_player(socket_id) {
+                None
+            } else {
+                if Self::is_name_valid(&player_name_msg.name) {
+                    room.add_player(
+                        self.clients.clone(),
+                        socket_id,
+                        player_name_msg.level,
+                        player_name_msg.name,
+                    );
+                    Some(true)
+                } else {
+                    Some(false)
+                }
+            }
+        } else {
+            None
+        }
     }
 }
 
@@ -258,5 +279,15 @@ impl Sm64JsServer {
         let mut msg = vec![];
         root_msg.encode(&mut msg).unwrap();
         Some(msg)
+    }
+
+    fn is_name_valid(name: &String) -> bool {
+        if name.len() < 3 || name.len() > 14 || name.to_ascii_uppercase() == "SERVER" {
+            return false;
+        }
+        let mut sanitized_name = format!("{}", escape(&name));
+        let censor = Censor::Standard;
+        sanitized_name = censor.censor(&sanitized_name);
+        &sanitized_name == name
     }
 }

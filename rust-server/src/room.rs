@@ -1,21 +1,22 @@
 use crate::{
     proto::{root_msg, sm64_js_msg, FlagMsg, MarioListMsg, RootMsg, Sm64JsMsg},
-    Clients, Player, Players,
+    Player, WeakPlayers,
 };
 
 use anyhow::Result;
 use dashmap::DashMap;
 use flate2::{write::ZlibEncoder, Compression};
+use parking_lot::RwLock;
 use prost::Message as ProstMessage;
 use rayon::prelude::*;
-use std::{io::prelude::*, sync::Arc};
+use std::{collections::HashMap, io::prelude::*, sync::Weak};
 
 pub type Rooms = DashMap<u32, Room>;
 
 pub struct Room {
     id: String,
     flags: Vec<Flag>,
-    players: Arc<Players>,
+    players: WeakPlayers,
 }
 
 impl Room {
@@ -26,7 +27,7 @@ impl Room {
             Room {
                 id: "Cool, Cool Mountain".to_string(),
                 flags: vec![Flag::new([0., 7657., 0.])],
-                players: Arc::new(DashMap::new()),
+                players: HashMap::new(),
             },
         );
         rooms.insert(
@@ -34,7 +35,7 @@ impl Room {
             Room {
                 id: "Bob-omb Battlefield".to_string(),
                 flags: vec![Flag::new([-2384., 260., 6203.])],
-                players: Arc::new(DashMap::new()),
+                players: HashMap::new(),
             },
         );
         rooms.insert(
@@ -42,7 +43,7 @@ impl Room {
             Room {
                 id: "Castle Grounds".to_string(),
                 flags: vec![Flag::new([0., 3657., 0.])],
-                players: Arc::new(DashMap::new()),
+                players: HashMap::new(),
             },
         );
         rooms.insert(
@@ -50,7 +51,7 @@ impl Room {
             Room {
                 id: "Whomps Fortress".to_string(),
                 flags: vec![Flag::new([0., 7657., 0.])],
-                players: Arc::new(DashMap::new()),
+                players: HashMap::new(),
             },
         );
         rooms.insert(
@@ -58,7 +59,7 @@ impl Room {
             Room {
                 id: "Princess's Secret Slide".to_string(),
                 flags: vec![Flag::new([0., 7657., 0.])],
-                players: Arc::new(DashMap::new()),
+                players: HashMap::new(),
             },
         );
         rooms.insert(
@@ -66,7 +67,7 @@ impl Room {
             Room {
                 id: "Tall, Tall Mountain".to_string(),
                 flags: vec![Flag::new([0., 7657., 0.])],
-                players: Arc::new(DashMap::new()),
+                players: HashMap::new(),
             },
         );
         rooms.insert(
@@ -79,7 +80,7 @@ impl Room {
                     Flag::new([-14920., 3800., -8675.]),
                     Flag::new([12043., 3000., 10086.]),
                 ],
-                players: Arc::new(DashMap::new()),
+                players: HashMap::new(),
             },
         );
         rooms
@@ -95,9 +96,9 @@ impl Room {
     pub fn broadcast_data(&self) -> Result<()> {
         let mario_list: Vec<_> = self
             .players
-            .iter()
+            .values()
             .par_bridge()
-            .filter_map(|player| player.get_data())
+            .filter_map(|player| player.upgrade().unwrap().read().get_data())
             .collect();
         let flag_list: Vec<_> = self
             .flags
@@ -125,10 +126,10 @@ impl Room {
         root_msg.encode(&mut msg)?;
 
         self.players
-            .iter()
+            .values()
             .par_bridge()
             .map(|player| -> Result<()> {
-                player.send_message(msg.clone())?;
+                player.upgrade().unwrap().read().send_message(msg.clone())?;
                 Ok(())
             })
             .collect::<Result<Vec<_>>>()?;
@@ -139,8 +140,7 @@ impl Room {
         self.players.contains_key(&socket_id)
     }
 
-    pub fn add_player(&mut self, clients: Arc<Clients>, socket_id: u32, level: u32, name: String) {
-        let player = Player::new(clients, socket_id, level, name);
+    pub fn add_player(&mut self, socket_id: u32, player: Weak<RwLock<Player>>) {
         self.players.insert(socket_id, player);
     }
 }

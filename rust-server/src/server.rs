@@ -3,7 +3,7 @@ use crate::{
         root_msg, sm64_js_msg, AnnouncementMsg, AttackMsg, ChatMsg, ConnectedMsg, GrabFlagMsg,
         MarioMsg, PlayerNameMsg, RootMsg, Sm64JsMsg,
     },
-    Client, Clients, Room, Rooms,
+    Client, Clients, Player, Players, Room, Rooms,
 };
 
 use actix::{prelude::*, Recipient};
@@ -14,7 +14,13 @@ use parking_lot::RwLock;
 use prost::Message as ProstMessage;
 use rand::{self, Rng};
 use rayon::prelude::*;
-use std::{collections::HashSet, env, sync::Arc, thread, time::Duration};
+use std::{
+    collections::{HashMap, HashSet},
+    env,
+    sync::Arc,
+    thread,
+    time::Duration,
+};
 use v_htmlescape::escape;
 
 lazy_static! {
@@ -29,6 +35,7 @@ pub struct Message(pub Vec<u8>);
 
 pub struct Sm64JsServer {
     clients: Arc<Clients>,
+    players: Players,
     rooms: Arc<Rooms>,
 }
 
@@ -87,7 +94,7 @@ impl Handler<Disconnect> for Sm64JsServer {
 
     fn handle(&mut self, msg: Disconnect, _: &mut Context<Self>) {
         self.clients.remove(&msg.id);
-        // TODO remove player from room
+        self.players.remove(&msg.id);
     }
 }
 
@@ -188,12 +195,14 @@ impl Handler<SendPlayerName> for Sm64JsServer {
                 None
             } else {
                 if Self::is_name_valid(&player_name_msg.name) {
-                    room.add_player(
+                    let player = Arc::new(RwLock::new(Player::new(
                         self.clients.clone(),
                         socket_id,
                         player_name_msg.level,
                         player_name_msg.name,
-                    );
+                    )));
+                    room.add_player(socket_id, Arc::downgrade(&player));
+                    self.players.insert(socket_id, player);
                     Some(true)
                 } else {
                     Some(false)
@@ -217,11 +226,12 @@ impl Sm64JsServer {
         }
         Sm64JsServer {
             clients: Arc::new(DashMap::new()),
+            players: HashMap::new(),
             rooms: Arc::new(Room::init_rooms()),
         }
     }
 
-    pub fn process_flags(rooms: Arc<DashMap<u32, Room>>) {
+    pub fn process_flags(rooms: Arc<Rooms>) {
         rooms
             .iter_mut()
             .par_bridge()

@@ -8,7 +8,7 @@ mod client;
 mod room;
 mod server;
 
-pub use client::{Client, Clients, Player, Players};
+pub use client::{Client, Clients, Player, Players, WeakPlayers};
 pub use room::{Flag, Room, Rooms};
 pub use server::Message;
 

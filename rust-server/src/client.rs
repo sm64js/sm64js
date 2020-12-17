@@ -3,10 +3,15 @@ use crate::{proto::MarioMsg, Message};
 use actix::Recipient;
 use anyhow::Result;
 use dashmap::DashMap;
-use std::sync::Arc;
+use parking_lot::RwLock;
+use std::{
+    collections::HashMap,
+    sync::{Arc, Weak},
+};
 
 pub type Clients = DashMap<u32, Client>;
-pub type Players = DashMap<u32, Player>;
+pub type Players = HashMap<u32, Arc<RwLock<Player>>>;
+pub type WeakPlayers = HashMap<u32, Weak<RwLock<Player>>>;
 
 #[derive(Debug)]
 pub struct Client {

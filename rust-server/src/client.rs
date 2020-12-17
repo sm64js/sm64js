@@ -1,4 +1,7 @@
-use crate::{proto::MarioMsg, Message};
+use crate::{
+    proto::{MarioMsg, SkinData},
+    Message,
+};
 
 use actix::Recipient;
 use anyhow::Result;
@@ -50,6 +53,7 @@ pub struct Player {
     socket_id: u32,
     level: u32,
     name: String,
+    skin_data: Option<SkinData>,
 }
 
 impl Player {
@@ -59,11 +63,16 @@ impl Player {
             socket_id,
             level,
             name,
+            skin_data: None,
         }
     }
 
     pub fn get_data(&self) -> Option<MarioMsg> {
         self.clients.get(&self.socket_id).unwrap().data.clone()
+    }
+
+    pub fn set_skin_data(&mut self, skin_data: Option<SkinData>) {
+        self.skin_data = skin_data;
     }
 
     pub fn send_message(&self, msg: Vec<u8>) -> Result<()> {

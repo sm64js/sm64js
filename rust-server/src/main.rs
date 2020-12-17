@@ -67,7 +67,7 @@ impl Actor for Sm64JsWsSession {
     }
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
-        self.addr.do_send(server::Disconnect { id: self.id });
+        self.addr.do_send(server::Disconnect { socket_id: self.id });
         Running::Stop
     }
 }
@@ -114,7 +114,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                     Some(sm64_js_msg::Message::MarioMsg(mario_msg)) => {
                         self.hb_data = Some(Instant::now());
                         self.addr.do_send(server::SetData {
-                            id: self.id,
+                            socket_id: self.id,
                             data: mario_msg,
                         });
                     }
@@ -130,8 +130,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                     Some(sm64_js_msg::Message::InitMsg(_init_msg)) => {
                         // TODO
                     }
-                    Some(sm64_js_msg::Message::SkinMsg(_skin_msg)) => {
-                        // TODO
+                    Some(sm64_js_msg::Message::SkinMsg(skin_msg)) => {
+                        self.addr.do_send(server::SendSkin {
+                            socket_id: self.id,
+                            skin_msg,
+                        });
                     }
                     Some(sm64_js_msg::Message::PlayerNameMsg(mut player_name_msg)) => {
                         self.addr

@@ -1,7 +1,7 @@
 use crate::{
     proto::{
         root_msg, sm64_js_msg, AnnouncementMsg, AttackMsg, ChatMsg, ConnectedMsg, GrabFlagMsg,
-        MarioMsg, PlayerNameMsg, RootMsg, Sm64JsMsg,
+        MarioMsg, PlayerNameMsg, RootMsg, SkinMsg, Sm64JsMsg,
     },
     Client, Clients, Player, Players, Room, Rooms,
 };
@@ -86,22 +86,22 @@ impl Handler<Connect> for Sm64JsServer {
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct Disconnect {
-    pub id: u32,
+    pub socket_id: u32,
 }
 
 impl Handler<Disconnect> for Sm64JsServer {
     type Result = ();
 
     fn handle(&mut self, msg: Disconnect, _: &mut Context<Self>) {
-        self.clients.remove(&msg.id);
-        self.players.remove(&msg.id);
+        self.clients.remove(&msg.socket_id);
+        self.players.remove(&msg.socket_id);
     }
 }
 
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct SetData {
-    pub id: u32,
+    pub socket_id: u32,
     pub data: MarioMsg,
 }
 
@@ -110,7 +110,7 @@ impl Handler<SetData> for Sm64JsServer {
 
     fn handle(&mut self, msg: SetData, _: &mut Context<Self>) {
         self.clients
-            .get_mut(&msg.id)
+            .get_mut(&msg.socket_id)
             .map(|mut client| client.set_data(msg.data));
     }
 }
@@ -173,6 +173,25 @@ impl Handler<SendChat> for Sm64JsServer {
                 })
                 .collect::<Result<Vec<_>>>()
                 .unwrap();
+        }
+    }
+}
+
+#[derive(Message)]
+#[rtype(result = "()")]
+pub struct SendSkin {
+    pub socket_id: u32,
+    pub skin_msg: SkinMsg,
+}
+
+impl Handler<SendSkin> for Sm64JsServer {
+    type Result = ();
+
+    fn handle(&mut self, send_skin: SendSkin, _: &mut Context<Self>) {
+        let socket_id = send_skin.socket_id;
+        let skin_msg = send_skin.skin_msg;
+        if let Some(player) = self.players.get_mut(&socket_id) {
+            player.write().set_skin_data(skin_msg.skin_data);
         }
     }
 }

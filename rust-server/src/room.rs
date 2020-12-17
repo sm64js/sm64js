@@ -98,7 +98,13 @@ impl Room {
             .players
             .values()
             .par_bridge()
-            .filter_map(|player| player.upgrade().unwrap().read().get_data())
+            .filter_map(|player| {
+                if let Some(player) = player.upgrade() {
+                    player.read().get_data()
+                } else {
+                    None
+                }
+            })
             .collect();
         let flag_list: Vec<_> = self
             .flags
@@ -129,7 +135,9 @@ impl Room {
             .values()
             .par_bridge()
             .map(|player| -> Result<()> {
-                player.upgrade().unwrap().read().send_message(msg.clone())?;
+                if let Some(player) = player.upgrade() {
+                    player.read().send_message(msg.clone())?
+                }
                 Ok(())
             })
             .collect::<Result<Vec<_>>>()?;
@@ -137,7 +145,15 @@ impl Room {
     }
 
     pub fn has_player(&self, socket_id: u32) -> bool {
-        self.players.contains_key(&socket_id)
+        if let Some(res) = self
+            .players
+            .get(&socket_id)
+            .map(|player| player.strong_count() > 0)
+        {
+            res
+        } else {
+            false
+        }
     }
 
     pub fn add_player(&mut self, socket_id: u32, player: Weak<RwLock<Player>>) {

@@ -45,10 +45,17 @@ impl Actor for Sm64JsServer {
     fn started(&mut self, _: &mut Self::Context) {
         let rooms = self.rooms.clone();
 
-        thread::spawn(move || loop {
-            Sm64JsServer::process_flags(rooms.clone());
-            Sm64JsServer::broadcast_data(rooms.clone()).unwrap();
-            thread::sleep(Duration::from_millis(33));
+        thread::spawn(move || {
+            let mut i = 0;
+            loop {
+                i += 1;
+                Sm64JsServer::process_flags(rooms.clone());
+                Sm64JsServer::broadcast_data(rooms.clone()).unwrap();
+                if i == 30 {
+                    Sm64JsServer::broadcast_skins(rooms.clone()).unwrap();
+                }
+                thread::sleep(Duration::from_millis(33));
+            }
         });
     }
 }
@@ -262,6 +269,15 @@ impl Sm64JsServer {
             .iter()
             .par_bridge()
             .map(|room| room.broadcast_data())
+            .collect::<Result<Vec<_>>>()?;
+        Ok(())
+    }
+
+    pub fn broadcast_skins(rooms: Arc<Rooms>) -> Result<()> {
+        rooms
+            .iter_mut()
+            .par_bridge()
+            .map(|mut room| room.broadcast_skins())
             .collect::<Result<Vec<_>>>()?;
         Ok(())
     }

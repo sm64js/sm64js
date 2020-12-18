@@ -1,5 +1,5 @@
 use crate::{
-    proto::{root_msg, sm64_js_msg, FlagMsg, MarioListMsg, RootMsg, Sm64JsMsg},
+    proto::{root_msg, sm64_js_msg, FlagMsg, MarioListMsg, RootMsg, SkinMsg, Sm64JsMsg},
     Player, WeakPlayers,
 };
 
@@ -131,16 +131,39 @@ impl Room {
         let mut msg = vec![];
         root_msg.encode(&mut msg)?;
 
-        self.players
-            .values()
-            .par_bridge()
-            .map(|player| -> Result<()> {
-                if let Some(player) = player.upgrade() {
-                    player.read().send_message(msg.clone())?
-                }
-                Ok(())
+        self.broadcast_message(&msg)
+    }
+
+    pub fn broadcast_skins(&mut self) -> Result<()> {
+        let messages: Vec<_> = self
+            .players
+            .par_iter_mut()
+            .filter_map(|(_, player)| {
+                player
+                    .upgrade()
+                    .map(|player| player.write().get_updated_skin_data())
+                    .flatten()
+            })
+            .map(|skin_data| -> Result<_> {
+                let root_msg = RootMsg {
+                    message: Some(root_msg::Message::UncompressedSm64jsMsg(Sm64JsMsg {
+                        message: Some(sm64_js_msg::Message::SkinMsg(SkinMsg {
+                            socket_id: 0,
+                            skin_data: Some(skin_data),
+                        })),
+                    })),
+                };
+                let mut msg = vec![];
+                root_msg.encode(&mut msg)?;
+                Ok(msg)
             })
             .collect::<Result<Vec<_>>>()?;
+
+        messages
+            .par_iter()
+            .map(|msg| self.broadcast_message(msg))
+            .collect::<Result<Vec<_>>>()?;
+
         Ok(())
     }
 
@@ -158,6 +181,20 @@ impl Room {
 
     pub fn add_player(&mut self, socket_id: u32, player: Weak<RwLock<Player>>) {
         self.players.insert(socket_id, player);
+    }
+
+    fn broadcast_message(&self, msg: &Vec<u8>) -> Result<()> {
+        self.players
+            .values()
+            .par_bridge()
+            .map(|player| -> Result<()> {
+                if let Some(player) = player.upgrade() {
+                    player.read().send_message(msg.clone())?
+                }
+                Ok(())
+            })
+            .collect::<Result<Vec<_>>>()?;
+        Ok(())
     }
 }
 

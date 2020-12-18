@@ -54,6 +54,7 @@ pub struct Player {
     level: u32,
     name: String,
     skin_data: Option<SkinData>,
+    skin_data_updated: bool,
 }
 
 impl Player {
@@ -64,6 +65,7 @@ impl Player {
             level,
             name,
             skin_data: None,
+            skin_data_updated: false,
         }
     }
 
@@ -73,6 +75,7 @@ impl Player {
 
     pub fn set_skin_data(&mut self, skin_data: Option<SkinData>) {
         self.skin_data = skin_data;
+        self.skin_data_updated = true;
     }
 
     pub fn send_message(&self, msg: Vec<u8>) -> Result<()> {
@@ -80,5 +83,14 @@ impl Player {
             .get(&self.socket_id)
             .unwrap()
             .send(Message(msg))
+    }
+
+    pub fn get_updated_skin_data(&mut self) -> Option<SkinData> {
+        if self.skin_data_updated {
+            self.skin_data_updated = false;
+            self.skin_data.clone()
+        } else {
+            None
+        }
     }
 }

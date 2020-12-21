@@ -4,10 +4,12 @@ extern crate lazy_static;
 #[macro_use]
 extern crate maplit;
 
+mod chat;
 mod client;
 mod room;
 mod server;
 
+pub use chat::{ChatError, ChatHistory, ChatResult};
 pub use client::{Client, Clients, Player, Players, WeakPlayers};
 pub use room::{Flag, Room, Rooms};
 pub use server::Message;
@@ -125,10 +127,23 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                         self.addr.do_send(server::SendGrabFlag { grab_flag_msg })
                     }
                     Some(sm64_js_msg::Message::ChatMsg(chat_msg)) => {
-                        self.addr.do_send(server::SendChat { chat_msg });
+                        self.addr
+                            .send(server::SendChat {
+                                socket_id: self.id,
+                                chat_msg,
+                            })
+                            .into_actor(self)
+                            .then(move |res, _act, ctx| {
+                                if let Ok(Some(msg)) = res {
+                                    ctx.binary(msg);
+                                }
+
+                                fut::ready(())
+                            })
+                            .wait(ctx);
                     }
                     Some(sm64_js_msg::Message::InitMsg(_init_msg)) => {
-                        // TODO
+                        // TODO not necessary
                     }
                     Some(sm64_js_msg::Message::SkinMsg(skin_msg)) => {
                         self.addr.do_send(server::SendSkin {

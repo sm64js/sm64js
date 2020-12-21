@@ -3,7 +3,7 @@ use crate::{
         root_msg, sm64_js_msg, AnnouncementMsg, AttackMsg, ChatMsg, ConnectedMsg, GrabFlagMsg,
         MarioMsg, PlayerNameMsg, RootMsg, SkinMsg, Sm64JsMsg,
     },
-    Client, Clients, Player, Players, Room, Rooms,
+    ChatError, ChatResult, Client, Clients, Player, Players, Room, Rooms,
 };
 
 use actix::{prelude::*, Recipient};
@@ -153,33 +153,38 @@ impl Handler<SendGrabFlag> for Sm64JsServer {
 }
 
 #[derive(Message)]
-#[rtype(result = "()")]
+#[rtype(result = "Option<Vec<u8>>")]
 pub struct SendChat {
+    pub socket_id: u32,
     pub chat_msg: ChatMsg,
 }
 
 impl Handler<SendChat> for Sm64JsServer {
-    type Result = ();
+    type Result = Option<Vec<u8>>;
 
-    fn handle(&mut self, send_chat: SendChat, _: &mut Context<Self>) {
+    fn handle(&mut self, send_chat: SendChat, _: &mut Context<Self>) -> Self::Result {
+        let socket_id = send_chat.socket_id;
         let chat_msg = send_chat.chat_msg;
 
         let msg = if chat_msg.message.starts_with('/') {
-            Self::handle_command(chat_msg.message)
+            Ok(Self::handle_command(chat_msg))
         } else {
-            Self::handle_chat(chat_msg)
+            if let Some(player) = self.players.get(&socket_id) {
+                Self::handle_chat(player, chat_msg)
+            } else {
+                Ok(None)
+            }
         };
 
-        if let Some(msg) = msg {
-            self.clients
-                .iter()
-                .par_bridge()
-                .map(|client| -> Result<()> {
-                    client.send(Message(msg.clone()))?;
-                    Ok(())
-                })
-                .collect::<Result<Vec<_>>>()
-                .unwrap();
+        match msg {
+            Ok(Some(msg)) => {
+                let level = self.clients.get(&socket_id)?.get_level()?;
+                let room = self.rooms.get(&level)?;
+                room.broadcast_message(&msg);
+                None
+            }
+            Ok(None) => None,
+            Err(msg) => Some(msg),
         }
     }
 }
@@ -221,13 +226,17 @@ impl Handler<SendPlayerName> for Sm64JsServer {
                 None
             } else {
                 if Self::is_name_valid(&player_name_msg.name) {
+                    let level = player_name_msg.level;
                     let player = Arc::new(RwLock::new(Player::new(
                         self.clients.clone(),
                         socket_id,
-                        player_name_msg.level,
+                        level,
                         player_name_msg.name,
                     )));
                     room.add_player(socket_id, Arc::downgrade(&player));
+                    self.clients
+                        .get_mut(&socket_id)
+                        .map(|mut client| client.set_level(level));
                     self.players.insert(socket_id, player);
                     Some(true)
                 } else {
@@ -282,10 +291,12 @@ impl Sm64JsServer {
         Ok(())
     }
 
-    fn handle_command(message: String) -> Option<Vec<u8>> {
+    fn handle_command(chat_msg: ChatMsg) -> Option<Vec<u8>> {
+        let message = chat_msg.message;
         if let Some(index) = message.find(' ') {
             let (cmd, message) = message.split_at(index);
-            if ADMIN_COMMANDS.contains(cmd) && !ADMIN_TOKENS.read().contains(cmd) {
+            if ADMIN_COMMANDS.contains(cmd) && !ADMIN_TOKENS.read().contains(&chat_msg.admin_token)
+            {
                 return None;
             }
             match cmd.to_ascii_uppercase().as_ref() {
@@ -310,20 +321,46 @@ impl Sm64JsServer {
         }
     }
 
-    fn handle_chat(mut chat_msg: ChatMsg) -> Option<Vec<u8>> {
-        chat_msg.message = format!("{}", escape(&chat_msg.message));
-        let censor = Censor::Standard;
-        chat_msg.message = censor.censor(&chat_msg.message);
+    fn handle_chat(
+        player: &Arc<RwLock<Player>>,
+        mut chat_msg: ChatMsg,
+    ) -> Result<Option<Vec<u8>>, Vec<u8>> {
+        let root_msg = match player.write().add_chat_message(&chat_msg.message) {
+            ChatResult::Ok(message) => {
+                chat_msg.message = message;
+                chat_msg.is_admin = ADMIN_TOKENS.read().contains(&chat_msg.admin_token);
+                Some(RootMsg {
+                    message: Some(root_msg::Message::UncompressedSm64jsMsg(Sm64JsMsg {
+                        message: Some(sm64_js_msg::Message::ChatMsg(chat_msg)),
+                    })),
+                })
+            }
+            ChatResult::Err(err) => match err {
+                ChatError::Spam => {
+                    chat_msg.message =
+                            "Chat message ignored: You have to wait longer between sending chat messages"
+                                .to_string();
+                    chat_msg.sender = "Server".to_string();
+                    let root_msg = RootMsg {
+                        message: Some(root_msg::Message::UncompressedSm64jsMsg(Sm64JsMsg {
+                            message: Some(sm64_js_msg::Message::ChatMsg(chat_msg)),
+                        })),
+                    };
+                    let mut msg = vec![];
+                    root_msg.encode(&mut msg).unwrap();
 
-        let root_msg = RootMsg {
-            message: Some(root_msg::Message::UncompressedSm64jsMsg(Sm64JsMsg {
-                message: Some(sm64_js_msg::Message::ChatMsg(chat_msg)),
-            })),
+                    return Err(msg);
+                }
+            },
         };
 
-        let mut msg = vec![];
-        root_msg.encode(&mut msg).unwrap();
-        Some(msg)
+        Ok(if let Some(root_msg) = root_msg {
+            let mut msg = vec![];
+            root_msg.encode(&mut msg).unwrap();
+            Some(msg)
+        } else {
+            None
+        })
     }
 
     fn is_name_valid(name: &String) -> bool {

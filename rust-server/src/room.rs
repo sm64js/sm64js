@@ -131,7 +131,8 @@ impl Room {
         let mut msg = vec![];
         root_msg.encode(&mut msg)?;
 
-        self.broadcast_message(&msg)
+        self.broadcast_message(&msg);
+        Ok(())
     }
 
     pub fn broadcast_skins(&mut self) -> Result<()> {
@@ -161,10 +162,23 @@ impl Room {
 
         messages
             .par_iter()
-            .map(|msg| self.broadcast_message(msg))
-            .collect::<Result<Vec<_>>>()?;
+            .for_each(|msg| self.broadcast_message(msg));
 
         Ok(())
+    }
+
+    pub fn broadcast_message(&self, msg: &Vec<u8>) {
+        self.players
+            .values()
+            .par_bridge()
+            .map(|player| -> Result<()> {
+                if let Some(player) = player.upgrade() {
+                    player.read().send_message(msg.clone())?
+                }
+                Ok(())
+            })
+            .filter_map(Result::ok)
+            .collect::<Vec<_>>();
     }
 
     pub fn has_player(&self, socket_id: u32) -> bool {
@@ -181,20 +195,6 @@ impl Room {
 
     pub fn add_player(&mut self, socket_id: u32, player: Weak<RwLock<Player>>) {
         self.players.insert(socket_id, player);
-    }
-
-    fn broadcast_message(&self, msg: &Vec<u8>) -> Result<()> {
-        self.players
-            .values()
-            .par_bridge()
-            .map(|player| -> Result<()> {
-                if let Some(player) = player.upgrade() {
-                    player.read().send_message(msg.clone())?
-                }
-                Ok(())
-            })
-            .collect::<Result<Vec<_>>>()?;
-        Ok(())
     }
 }
 

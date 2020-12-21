@@ -1,6 +1,6 @@
 use crate::{
     proto::{MarioMsg, SkinData},
-    Message,
+    ChatHistory, ChatResult, Message,
 };
 
 use actix::Recipient;
@@ -21,6 +21,7 @@ pub struct Client {
     addr: Recipient<Message>,
     data: Option<MarioMsg>,
     socket_id: u32,
+    level: Option<u32>,
 }
 
 impl Client {
@@ -29,6 +30,7 @@ impl Client {
             addr,
             data: None,
             socket_id,
+            level: None,
         }
     }
 
@@ -39,6 +41,14 @@ impl Client {
 
     pub fn get_socket_id(&self) -> u32 {
         self.socket_id
+    }
+
+    pub fn set_level(&mut self, level: u32) {
+        self.level = Some(level);
+    }
+
+    pub fn get_level(&self) -> Option<u32> {
+        self.level
     }
 
     pub fn send(&self, msg: Message) -> Result<()> {
@@ -53,6 +63,7 @@ pub struct Player {
     socket_id: u32,
     level: u32,
     name: String,
+    chat_history: ChatHistory,
     skin_data: Option<SkinData>,
     skin_data_updated: bool,
 }
@@ -64,6 +75,7 @@ impl Player {
             socket_id,
             level,
             name,
+            chat_history: ChatHistory::new(),
             skin_data: None,
             skin_data_updated: false,
         }
@@ -83,6 +95,10 @@ impl Player {
             .get(&self.socket_id)
             .unwrap()
             .send(Message(msg))
+    }
+
+    pub fn add_chat_message(&mut self, message: &String) -> ChatResult {
+        self.chat_history.add_message(message)
     }
 
     pub fn get_updated_skin_data(&mut self) -> Option<SkinData> {

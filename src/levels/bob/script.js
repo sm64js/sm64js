@@ -5,6 +5,7 @@ import { bob_geo_000488 } from "./areas/1/geo.inc"
 import { bob_seg7_collision_level } from "./areas/1/collision.inc"
 import { bubbly_tree_geo } from "../../actors/tree/geo.inc"
 import { MODEL_BOB_BUBBLY_TREE, MODEL_CASTLE_GROUNDS_FLAG } from "../../include/model_ids"
+import { script_func_global_1 } from "../global_scripts"
 import { castle_grounds_geo_000660 } from "../castle_grounds/areas/1/11/geo.inc"
 
 const load_one_flag = [
@@ -12,9 +13,11 @@ const load_one_flag = [
     { command: LevelCommands.return }
 ]
 
+
 export const level_bob_entry = [
     { command: LevelCommands.init_level },
     { command: LevelCommands.init_mario, args: [1, 1, bhvMario] },
+    { command: LevelCommands.jump_link, args: [script_func_global_1] }, 
     { command: LevelCommands.load_model_from_geo, args: [MODEL_BOB_BUBBLY_TREE, bubbly_tree_geo] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_CASTLE_GROUNDS_FLAG, castle_grounds_geo_000660] },
     { command: LevelCommands.begin_area, args: [1, bob_geo_000488] },

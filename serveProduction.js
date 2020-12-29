@@ -54,33 +54,33 @@ const text = {
     encoder: new TextEncoder()
 }
 
-const sendJsonWithTopic = (topic, msg, socket) => {
-    const str = JSON.stringify({ topic, msg })
-    let bytes = text.encoder.encode(str)
-    const rootMsg = new RootMsg()
-    rootMsg.setJsonBytesMsg(bytes)
-    socket.send(rootMsg.serializeBinary(), true)
-}
+// const sendJsonWithTopic = (topic, msg, socket) => {
+//     const str = JSON.stringify({ topic, msg })
+//     let bytes = text.encoder.encode(str)
+//     const rootMsg = new RootMsg()
+//     rootMsg.setJsonBytesMsg(bytes)
+//     socket.send(rootMsg.serializeBinary(), true)
+// }
 
-const broadcastJsonWithTopic = (topic, msg, roomKey) => { /// TODO
-    const str = JSON.stringify({ topic, msg })
-    let bytes = text.encoder.encode(str)
-    const rootMsg = new RootMsg()
-    rootMsg.setJsonBytesMsg(bytes)
-    bytes = rootMsg.serializeBinary()
-    Object.values(clientsRoot[roomKey]).forEach(x => { x.socket.send(bytes, true) })
-}
+// const broadcastJsonWithTopic = (topic, msg, roomKey) => { /// TODO
+//     const str = JSON.stringify({ topic, msg })
+//     let bytes = text.encoder.encode(str)
+//     const rootMsg = new RootMsg()
+//     rootMsg.setJsonBytesMsg(bytes)
+//     bytes = rootMsg.serializeBinary()
+//     Object.values(clientsRoot[roomKey]).forEach(x => { x.socket.send(bytes, true) })
+// }
 
-const sendData = (bytes, socket) => { socket.send(bytes, true) }
+const sendData = (bytes, socket) => { if (!socket.closed) socket.send(bytes, true) }
 
 const broadcastData = (bytes, roomKey) => {
     if (roomKey == "lobbySockets") { // send to lobbySockets
-        socketsInLobby.forEach(socket => { socket.send(bytes, true) })
+        socketsInLobby.forEach(socket => { sendData(bytes, socket) })
     } else if (roomKey) { // normal room
-        Object.values(clientsRoot[roomKey]).forEach(x => { x.socket.send(bytes, true) })
+        Object.values(clientsRoot[roomKey]).forEach(x => { sendData(bytes, x.socket) })
     } else { /// send to all rooms 
         Object.keys(clientsRoot).forEach(roomKey => {
-            Object.values(clientsRoot[roomKey]).forEach(x => { x.socket.send(bytes, true) })
+            Object.values(clientsRoot[roomKey]).forEach(x => { sendData(bytes, x.socket) })
         })
     }
 }
@@ -192,7 +192,7 @@ const rejectPlayerName = (socket) => {
     sm64jsMsg.setPlayerNameMsg(playerNameMsg)
     const rootMsg = new RootMsg()
     rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-    socket.send(rootMsg.serializeBinary(), true)
+    sendData(rootMsg.serializeBinary(), socket)
 }
 
 const sanitizeChat = (string) => {
@@ -369,7 +369,7 @@ const processPlayerName = async (socket, msg) => {
         sm64jsMsg.setPlayerNameMsg(playerNameMsg)
         const rootMsg = new RootMsg()
         rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-        socket.send(rootMsg.serializeBinary(), true)
+        sendData(rootMsg.serializeBinary(), socket)
 
     } catch (e) {
         console.log(`Got error with profanity api: ${e}`)
@@ -394,8 +394,7 @@ const sendSkinsToSocket = (socket) => {
             sm64jsMsg.setSkinMsg(skinMsg)
             const rootMsg = new RootMsg()
             rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-    
-            socket.send(rootMsg.serializeBinary(), true)
+            sendData(rootMsg.serializeBinary(), socket)
         })
     }, 500)
 
@@ -702,7 +701,7 @@ require('uWebSockets.js').App().ws('/*', {
         sm64jsMsg.setConnectedMsg(connectedMsg)
         const rootMsg = new RootMsg()
         rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-        socket.send(rootMsg.serializeBinary(), true)
+        sendData(rootMsg.serializeBinary(), socket)
     },
 
     message: async (socket, bytes) => {
@@ -754,6 +753,7 @@ require('uWebSockets.js').App().ws('/*', {
     },
 
     close: (socket) => {
+        socket.closed = true
         checkForFlag(socket.my_id)
         delete connectedIPs[socket.ip].socketIDs[socket.my_id]
 

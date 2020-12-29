@@ -1,6 +1,7 @@
 dist
 *lock.json
 node_modules
+testdb.json
 .vs*
 .DS_Store
 extractTools/.assets-local.txt

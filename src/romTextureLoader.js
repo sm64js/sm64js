@@ -76,6 +76,8 @@ import {
 
 import { yellow_sphere_seg5_texture_05000040 } from "./actors/yellow_sphere_small/model.inc"
 
+import { checkerboard_platform_seg8_texture_0800C840, checkerboard_platform_seg8_texture_0800CC40 } from "./actors/checkerboard_platform/model.inc"
+
 import {
     generic_09005800,
     generic_09006000,
@@ -188,7 +190,7 @@ import {
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 14
+const textureVersion = 15
 
 const loadDataIntoGame = (data) => {
 
@@ -376,6 +378,9 @@ const loadDataIntoGame = (data) => {
 
     texture_waterbox_water.push(...data["textures/segment2/segment2.11C58.rgba16.png"].data)
     texture_waterbox_lava.push(...data["textures/segment2/segment2.13C58.rgba16.png"].data)
+
+    checkerboard_platform_seg8_texture_0800C840.push(...data["actors/checkerboard_platform/checkerboard_platform_side.rgba16.png"].data)
+    checkerboard_platform_seg8_texture_0800CC40.push(...data["actors/checkerboard_platform/checkerboard_platform.rgba16.png"].data)
 
     SkyboxWater.water_skybox_texture_00000.push(...data["water_skybox_texture_00000"].data)
     SkyboxWater.water_skybox_texture_00001.push(...data["water_skybox_texture_00001"].data)

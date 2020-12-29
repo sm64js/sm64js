@@ -64,4 +64,6 @@ export const MODEL_YELLOW_SPHERE                   = 0x55        // yellow_spher
 // castle grounds
 export const MODEL_CASTLE_GROUNDS_VCUTM_GRILL       =   0x36
 export const MODEL_CASTLE_GROUNDS_FLAG              =   0x37
-export const MODEL_CASTLE_GROUNDS_CANNON_GRILL      =   0x38
+export const MODEL_CASTLE_GROUNDS_CANNON_GRILL = 0x38
+
+export const MODEL_CHECKERBOARD_PLATFORM = 0xCA

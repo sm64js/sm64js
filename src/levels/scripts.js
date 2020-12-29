@@ -3,7 +3,6 @@ import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
 import { level_defines_list } from "./level_defines"
 import { mario_geo } from "../actors/mario/geo.inc"
 
-
 export const script_exec_level_table = [
     {
         command: LevelCommands.get_or_set,

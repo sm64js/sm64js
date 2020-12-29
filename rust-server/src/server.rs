@@ -1,18 +1,26 @@
-use crate::proto::{
-    root_msg, sm64_js_msg, AnnouncementMsg, ChatMsg, ConnectedMsg, MarioListMsg, MarioMsg, RootMsg,
-    Sm64JsMsg,
+use crate::{
+    proto::{
+        root_msg, sm64_js_msg, AnnouncementMsg, AttackMsg, ChatMsg, ConnectedMsg, GrabFlagMsg,
+        MarioMsg, PlayerNameMsg, RootMsg, SkinMsg, Sm64JsMsg,
+    },
+    Client, Clients, Player, Players, Room, Rooms,
 };
 
 use actix::{prelude::*, Recipient};
 use anyhow::Result;
 use censor::Censor;
 use dashmap::DashMap;
-use flate2::{write::ZlibEncoder, Compression};
 use parking_lot::RwLock;
 use prost::Message as ProstMessage;
 use rand::{self, Rng};
 use rayon::prelude::*;
-use std::{collections::HashSet, env, io::prelude::*, sync::Arc, thread, time::Duration};
+use std::{
+    collections::{HashMap, HashSet},
+    env,
+    sync::Arc,
+    thread,
+    time::Duration,
+};
 use v_htmlescape::escape;
 
 lazy_static! {
@@ -26,17 +34,20 @@ lazy_static! {
 pub struct Message(pub Vec<u8>);
 
 pub struct Sm64JsServer {
-    clients: Arc<DashMap<u32, Client>>,
+    clients: Arc<Clients>,
+    players: Players,
+    rooms: Arc<Rooms>,
 }
 
 impl Actor for Sm64JsServer {
     type Context = Context<Self>;
 
     fn started(&mut self, _: &mut Self::Context) {
-        let clients = self.clients.clone();
+        let rooms = self.rooms.clone();
 
         thread::spawn(move || loop {
-            Sm64JsServer::broadcast_data(clients.clone()).unwrap();
+            Sm64JsServer::process_flags(rooms.clone());
+            Sm64JsServer::broadcast_data(rooms.clone()).unwrap();
             thread::sleep(Duration::from_millis(33));
         });
     }
@@ -75,21 +86,22 @@ impl Handler<Connect> for Sm64JsServer {
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct Disconnect {
-    pub id: u32,
+    pub socket_id: u32,
 }
 
 impl Handler<Disconnect> for Sm64JsServer {
     type Result = ();
 
     fn handle(&mut self, msg: Disconnect, _: &mut Context<Self>) {
-        self.clients.remove(&msg.id);
+        self.clients.remove(&msg.socket_id);
+        self.players.remove(&msg.socket_id);
     }
 }
 
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct SetData {
-    pub id: u32,
+    pub socket_id: u32,
     pub data: MarioMsg,
 }
 
@@ -98,8 +110,38 @@ impl Handler<SetData> for Sm64JsServer {
 
     fn handle(&mut self, msg: SetData, _: &mut Context<Self>) {
         self.clients
-            .get_mut(&msg.id)
+            .get_mut(&msg.socket_id)
             .map(|mut client| client.set_data(msg.data));
+    }
+}
+
+#[derive(Message)]
+#[rtype(result = "()")]
+pub struct SendAttack {
+    pub attack_msg: AttackMsg,
+}
+
+impl Handler<SendAttack> for Sm64JsServer {
+    type Result = ();
+
+    fn handle(&mut self, send_attack: SendAttack, _: &mut Context<Self>) {
+        let _attack_msg = send_attack.attack_msg;
+        // TODO
+    }
+}
+
+#[derive(Message)]
+#[rtype(result = "()")]
+pub struct SendGrabFlag {
+    pub grab_flag_msg: GrabFlagMsg,
+}
+
+impl Handler<SendGrabFlag> for Sm64JsServer {
+    type Result = ();
+
+    fn handle(&mut self, send_grab: SendGrabFlag, _: &mut Context<Self>) {
+        let _grab_flag_msg = send_grab.grab_flag_msg;
+        // TODO
     }
 }
 
@@ -135,6 +177,62 @@ impl Handler<SendChat> for Sm64JsServer {
     }
 }
 
+#[derive(Message)]
+#[rtype(result = "()")]
+pub struct SendSkin {
+    pub socket_id: u32,
+    pub skin_msg: SkinMsg,
+}
+
+impl Handler<SendSkin> for Sm64JsServer {
+    type Result = ();
+
+    fn handle(&mut self, send_skin: SendSkin, _: &mut Context<Self>) {
+        let socket_id = send_skin.socket_id;
+        let skin_msg = send_skin.skin_msg;
+        if let Some(player) = self.players.get_mut(&socket_id) {
+            player.write().set_skin_data(skin_msg.skin_data);
+        }
+    }
+}
+
+#[derive(Message)]
+#[rtype(result = "Option<bool>")]
+pub struct SendPlayerName {
+    pub socket_id: u32,
+    pub player_name_msg: PlayerNameMsg,
+}
+
+impl Handler<SendPlayerName> for Sm64JsServer {
+    type Result = Option<bool>;
+
+    fn handle(&mut self, send_player_name: SendPlayerName, _: &mut Context<Self>) -> Self::Result {
+        let player_name_msg = send_player_name.player_name_msg;
+        let socket_id = send_player_name.socket_id;
+        if let Some(mut room) = self.rooms.get_mut(&player_name_msg.level) {
+            if room.has_player(socket_id) {
+                None
+            } else {
+                if Self::is_name_valid(&player_name_msg.name) {
+                    let player = Arc::new(RwLock::new(Player::new(
+                        self.clients.clone(),
+                        socket_id,
+                        player_name_msg.level,
+                        player_name_msg.name,
+                    )));
+                    room.add_player(socket_id, Arc::downgrade(&player));
+                    self.players.insert(socket_id, player);
+                    Some(true)
+                } else {
+                    Some(false)
+                }
+            }
+        } else {
+            None
+        }
+    }
+}
+
 impl Sm64JsServer {
     pub fn new() -> Self {
         if let Ok(admin_tokens) = env::var("ADMIN_TOKENS") {
@@ -147,41 +245,23 @@ impl Sm64JsServer {
         }
         Sm64JsServer {
             clients: Arc::new(DashMap::new()),
+            players: HashMap::new(),
+            rooms: Arc::new(Room::init_rooms()),
         }
     }
 
-    pub fn broadcast_data(clients: Arc<DashMap<u32, Client>>) -> Result<()> {
-        let mario_list: Vec<_> = clients
+    pub fn process_flags(rooms: Arc<Rooms>) {
+        rooms
+            .iter_mut()
+            .par_bridge()
+            .for_each(|mut room| room.process_flags());
+    }
+
+    pub fn broadcast_data(rooms: Arc<Rooms>) -> Result<()> {
+        rooms
             .iter()
             .par_bridge()
-            .filter_map(|client| client.data.clone())
-            .collect();
-        let sm64js_msg = Sm64JsMsg {
-            message: Some(sm64_js_msg::Message::ListMsg(MarioListMsg {
-                flag: vec![],
-                mario: mario_list,
-            })),
-        };
-        let mut msg = vec![];
-        sm64js_msg.encode(&mut msg)?;
-
-        let mut encoder = ZlibEncoder::new(Vec::new(), Compression::fast());
-        encoder.write_all(&msg)?;
-        let msg = encoder.finish()?;
-
-        let root_msg = RootMsg {
-            message: Some(root_msg::Message::CompressedSm64jsMsg(msg)),
-        };
-        let mut msg = vec![];
-        root_msg.encode(&mut msg)?;
-
-        clients
-            .iter()
-            .par_bridge()
-            .map(|client| -> Result<()> {
-                client.send(Message(msg.clone()))?;
-                Ok(())
-            })
+            .map(|room| room.broadcast_data())
             .collect::<Result<Vec<_>>>()?;
         Ok(())
     }
@@ -229,32 +309,14 @@ impl Sm64JsServer {
         root_msg.encode(&mut msg).unwrap();
         Some(msg)
     }
-}
 
-#[derive(Debug)]
-pub struct Client {
-    addr: Recipient<Message>,
-    data: Option<MarioMsg>,
-    socket_id: u32,
-}
-
-impl Client {
-    pub fn new(addr: Recipient<Message>, socket_id: u32) -> Self {
-        Client {
-            addr,
-            data: None,
-            socket_id,
+    fn is_name_valid(name: &String) -> bool {
+        if name.len() < 3 || name.len() > 14 || name.to_ascii_uppercase() == "SERVER" {
+            return false;
         }
-    }
-
-    pub fn set_data(&mut self, mut data: MarioMsg) {
-        data.socket_id = self.socket_id;
-
-        self.data = Some(data);
-    }
-
-    pub fn send(&self, msg: Message) -> Result<()> {
-        self.addr.do_send(msg)?;
-        Ok(())
+        let mut sanitized_name = format!("{}", escape(&name));
+        let censor = Censor::Standard;
+        sanitized_name = censor.censor(&sanitized_name);
+        &sanitized_name == name
     }
 }

@@ -4,7 +4,13 @@ extern crate lazy_static;
 #[macro_use]
 extern crate maplit;
 
+mod client;
+mod room;
 mod server;
+
+pub use client::{Client, Clients, Player, Players, WeakPlayers};
+pub use room::{Flag, Room, Rooms};
+pub use server::Message;
 
 pub mod proto {
     include!(concat!(env!("OUT_DIR"), "/sm64js.rs"));
@@ -15,7 +21,7 @@ use proto::{root_msg, sm64_js_msg, RootMsg, Sm64JsMsg};
 use actix::prelude::*;
 use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
-use prost::Message;
+use prost::Message as ProstMessage;
 use std::time::{Duration, Instant};
 
 /// How often heartbeat pings are sent
@@ -61,7 +67,7 @@ impl Actor for Sm64JsWsSession {
     }
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
-        self.addr.do_send(server::Disconnect { id: self.id });
+        self.addr.do_send(server::Disconnect { socket_id: self.id });
         Running::Stop
     }
 }
@@ -108,35 +114,72 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sm64JsWsSession {
                     Some(sm64_js_msg::Message::MarioMsg(mario_msg)) => {
                         self.hb_data = Some(Instant::now());
                         self.addr.do_send(server::SetData {
-                            id: self.id,
+                            socket_id: self.id,
                             data: mario_msg,
                         });
                     }
-                    Some(sm64_js_msg::Message::PlayerListsMsg(player_lists_msg)) => {
-                        // TODO
-                    }
                     Some(sm64_js_msg::Message::AttackMsg(attack_msg)) => {
-                        // TODO
+                        self.addr.do_send(server::SendAttack { attack_msg })
                     }
-                    Some(sm64_js_msg::Message::GrabMsg(grab_msg)) => {
-                        // TODO
+                    Some(sm64_js_msg::Message::GrabMsg(grab_flag_msg)) => {
+                        self.addr.do_send(server::SendGrabFlag { grab_flag_msg })
                     }
                     Some(sm64_js_msg::Message::ChatMsg(chat_msg)) => {
                         self.addr.do_send(server::SendChat { chat_msg });
                     }
-                    Some(sm64_js_msg::Message::InitMsg(init_msg)) => {
+                    Some(sm64_js_msg::Message::InitMsg(_init_msg)) => {
                         // TODO
                     }
                     Some(sm64_js_msg::Message::SkinMsg(skin_msg)) => {
-                        // TODO
+                        self.addr.do_send(server::SendSkin {
+                            socket_id: self.id,
+                            skin_msg,
+                        });
                     }
-                    Some(sm64_js_msg::Message::PlayerNameMsg(player_name_msg)) => {
-                        // TODO
+                    Some(sm64_js_msg::Message::PlayerNameMsg(mut player_name_msg)) => {
+                        self.addr
+                            .send(server::SendPlayerName {
+                                socket_id: self.id,
+                                player_name_msg: player_name_msg.clone(),
+                            })
+                            .into_actor(self)
+                            .then(move |res, _act, ctx| {
+                                match res {
+                                    Ok(res) => {
+                                        if let Some(accepted) = res {
+                                            player_name_msg.accepted = accepted;
+                                            let root_msg = RootMsg {
+                                                message: Some(
+                                                    root_msg::Message::UncompressedSm64jsMsg(
+                                                        Sm64JsMsg {
+                                                            message: Some(
+                                                                sm64_js_msg::Message::PlayerNameMsg(
+                                                                    player_name_msg,
+                                                                ),
+                                                            ),
+                                                        },
+                                                    ),
+                                                ),
+                                            };
+                                            let mut msg = vec![];
+                                            root_msg.encode(&mut msg).unwrap();
+
+                                            ctx.binary(msg);
+                                        }
+                                    }
+                                    Err(_) => {}
+                                }
+                                fut::ready(())
+                            })
+                            .wait(ctx);
                     }
                     Some(sm64_js_msg::Message::ListMsg(_)) => {
                         // TODO clients don't send this
                     }
                     Some(sm64_js_msg::Message::ConnectedMsg(_)) => {
+                        // TODO clients don't send this
+                    }
+                    Some(sm64_js_msg::Message::PlayerListsMsg(_player_lists_msg)) => {
                         // TODO clients don't send this
                     }
                     Some(sm64_js_msg::Message::AnnouncementMsg(_)) => {

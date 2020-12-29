@@ -186,6 +186,27 @@ export const geo_add_child = (parent, childNode) => {
 
 }
 
+export const geo_remove_child = (graphNode) => {
+    const parent = graphNode.parent
+    let firstChild = parent.children[0]
+
+    // Remove link with siblings
+    graphNode.prev.next = graphNode.next
+    graphNode.next.prev = graphNode.prev
+
+    // If this node was the first child, a new first child must be chosen
+    if (firstChild == graphNode) {
+        // The list is circular, so this checks whether it was the only child
+        if (graphNode.next == graphNode) {
+            firstChild = null // Parent has no children anymore
+        } else {
+            firstChild = graphNode.next // Choose a new first child
+        }
+    }
+
+    return parent
+}
+
 const getTopBits = (number) => {
     number = number >>> 16
     return number > 32767 ? number - 65536 : number

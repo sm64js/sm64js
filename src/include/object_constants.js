@@ -35,6 +35,7 @@ export const OBJ_MOVE_13  = (1 << 13) // 0x2000
 export const OBJ_MOVE_ABOVE_DEATH_BARRIER = (1 << 14) // 0x4000
 
 export const OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE = (1 << 0) // 0x00000001
+export const OBJ_FLAG_COMPUTE_DIST_TO_MARIO = (1 << 6) // 0x00000040
 
 export const oFlags = 1
 
@@ -77,6 +78,10 @@ export const oAnimations = 0x26
 export const oInteractType = 0x2A
 export const oInteractStatus = 0x2B
 
+export const oParentRelativePosX = 0x2C
+export const oParentRelativePosY = 0x2D
+export const oParentRelativePosZ = 0x2E
+
 export const oBehParams2ndByte = 0x2F
 
 export const oDistanceToMario = 0x35
@@ -97,4 +102,10 @@ export const oAction = 0x31
 export const oSubAction = 0x32
 
 export const oTimer = 0x33
+
+
+/* Checkerboard Platform */
+export const oCheckerBoardPlatformUnkF8  = 0x1C
+export const oCheckerBoardPlatformUnkFC  = 0x1D
+export const oCheckerBoardPlatformUnk1AC = 0x49
 

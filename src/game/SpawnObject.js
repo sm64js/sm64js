@@ -1,10 +1,9 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
-import { geo_add_child, GRAPH_RENDER_INVISIBLE, GRAPH_NODE_TYPE_OBJECT } from "../engine/graph_node"
+import { geo_add_child, GRAPH_RENDER_INVISIBLE, GRAPH_NODE_TYPE_OBJECT, geo_remove_child, GRAPH_RENDER_BILLBOARD, GRAPH_RENDER_ACTIVE } from "../engine/graph_node"
 import { GeoLayoutInstance } from "../engine/GeoLayout"
-import { ACTIVE_FLAG_ACTIVE, ACTIVE_FLAG_UNK8, RESPAWN_INFO_TYPE_NULL, ACTIVE_FLAG_UNIMPORTANT, OBJ_MOVE_ON_GROUND, oIntangibleTimer, oDamageOrCoinValue, oHealth, oCollisionDistance, oDrawingDistance, oDistanceToMario, oRoom, oFloorHeight, oPosX, oPosY, oPosZ, oSyncID } from "../include/object_constants"
+import { ACTIVE_FLAG_ACTIVE, ACTIVE_FLAG_UNK8, RESPAWN_INFO_TYPE_NULL, ACTIVE_FLAG_UNIMPORTANT, OBJ_MOVE_ON_GROUND, oIntangibleTimer, oDamageOrCoinValue, oHealth, oCollisionDistance, oDrawingDistance, oDistanceToMario, oRoom, oFloorHeight, oPosX, oPosY, oPosZ, ACTIVE_FLAGS_DEACTIVATED, oSyncID } from "../include/object_constants"
 import { mtxf_identity } from "../engine/math_util"
-//import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 
 class SpawnObject {
     constructor() {
@@ -109,6 +108,28 @@ class SpawnObject {
             obj.oPosY = obj.oFloorHeight
             obj.oMoveFlags |= OBJ_MOVE_ON_GROUND
         }
+    }
+
+    deallocate_object(obj) {
+        // Remove from object list
+        obj.next.prev = obj.prev
+        obj.prev.next = obj.next
+    }
+
+    unload_object(obj) {
+        obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED
+        obj.prevObj = null
+
+        obj.header.gfx.throwMatrix = null
+
+        //func_803206F8 TODO
+        geo_remove_child(obj.header.gfx.node)
+        geo_add_child(GeoLayoutInstance.gObjParentGraphNode.node, obj.header.gfx.node)
+
+        obj.header.gfx.node.flags &= ~GRAPH_RENDER_BILLBOARD
+        obj.header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE
+
+        this.deallocate_object(obj.header)
     }
 
     create_object(bhvScript) {

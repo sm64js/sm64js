@@ -1,12 +1,13 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
-import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer } from "../include/object_constants"
+import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 import { bhv_extra_mario_base_loop } from "./behaviors/extra_mario.inc"
 import { bhv_pole_init, bhv_giant_pole_loop } from "./behaviors/pole.inc"
 import { bhv_castle_flag_init } from "./behaviors/bhv_castle_flag_init.inc"
 import { castle_grounds_seg7_anims_flags } from "../levels/castle_grounds/areas/1/11/anim.inc"
+import { bhv_checkerboard_elevator_group_init } from "./behaviors/checkerboard_platform.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -113,3 +114,19 @@ export const bhvCastleFlagWaving = [
     { command: BhvCmds.begin_loop },
     { command: BhvCmds.end_loop },
 ]
+
+export const bhvCheckerboardPlatformSub = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SURFACE } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
+    { command: BhvCmds.begin_loop },
+    { command: BhvCmds.end_loop },
+]
+
+export const bhvCheckerboardElevatorGroup = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SPAWNER } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.call_native, args: { func: bhv_checkerboard_elevator_group_init } },
+    { command: BhvCmds.delay, args: { num: 1 } },
+    { command: BhvCmds.deactivate }
+]
+

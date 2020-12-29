@@ -57,6 +57,24 @@ class BehaviorCommands {
         return this.BHV_PROC_CONTINUE
     }
 
+    delay(args) {
+        const num = args.num
+
+        if (ObjListProc.gCurrentObject.bhvDelayTimer < num - 1) {
+            ObjListProc.gCurrentObject.bhvDelayTimer++
+        } else {
+            ObjListProc.gCurrentObject.bhvDelayTimer = 0
+            this.bhvScript.index++
+        }
+
+        return this.BHV_PROC_BREAK
+    }
+
+    deactivate(args) {
+        ObjListProc.gCurrentObject.activeFlags = 0
+        return this.BHV_PROC_BREAK
+    }
+
     set_int(args) {
         ObjListProc.gCurrentObject.rawData[args.field] = args.value
         this.bhvScript.index++

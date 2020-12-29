@@ -1,5 +1,5 @@
 import { PlatformDisplacementInstance as PlatformDisplacement } from "./PlatformDisplacement"
-import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte } from "../include/object_constants"
+import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte, ACTIVE_FLAG_ACTIVE } from "../include/object_constants"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import * as GraphNode from "../engine/graph_node"
 import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands"
@@ -84,8 +84,19 @@ class ObjectListProcessor {
                 }
             }
         })
+        this.gObjectCounter = 0  /// probaly not used and not needed
+
+        this.update_terrain_objects()
+
         detect_object_collisions()
         this.update_non_terrain_objects()
+
+        this.unload_deactivated_objects()
+    }
+
+    update_terrain_objects() {
+        this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[this.OBJ_LIST_SPAWNER])
+        this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[this.OBJ_LIST_SURFACE])
     }
 
     update_non_terrain_objects() {
@@ -110,6 +121,30 @@ class ObjectListProcessor {
             count++
         }
         return count
+    }
+
+    unload_deactivated_objects_in_list(objList) {
+        let obj = objList.next
+
+        while (objList != obj) {
+            this.gCurrentObject = obj.wrapperObject
+            obj = obj.next
+
+            if ((this.gCurrentObject.activeFlags & ACTIVE_FLAG_ACTIVE) != ACTIVE_FLAG_ACTIVE) {
+                /// TODO - Prevent object from respawning after exiting and re-entering the area
+
+                Spawn.unload_object(this.gCurrentObject)
+            }
+
+        }
+
+        return 0
+    }
+
+    unload_deactivated_objects() {
+        this.sObjectListUpdateOrder.forEach(listIndex => {
+            this.unload_deactivated_objects_in_list(this.gObjectLists[listIndex])
+        })
     }
 
     bhv_mario_update() {

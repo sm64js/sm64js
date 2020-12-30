@@ -110,7 +110,7 @@ const set_pole_position = (m, offsetY) => {
 
 
     const colData = {
-        x: m.pos[0], y: m.pos[1], z: m.pos[2], offsetY: 60.0, radius: 50.0
+        x: m.pos[0], y: m.pos[1], z: m.pos[2], offsetY: 60.0, radius: 50.0, walls: []
     }
     let collided = SurfaceCollision.find_wall_collisions(colData)
     m.pos = [colData.x, colData.y, colData.z]

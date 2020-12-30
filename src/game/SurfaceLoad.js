@@ -2,9 +2,15 @@ import * as Surfaces from "../include/surface_terrains"
 import { BOUNDS_EXTENSION } from "../include/extend_bounds"
 import { spawn_special_objects } from "./MacroSpecialObjects"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
+import { oDistanceToMario, oCollisionDistance, oDrawingDistance, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oPosX, oFaceAnglePitch } from "../include/object_constants"
+import { GRAPH_RENDER_ACTIVE } from "../engine/graph_node"
+import { dist_between_objects, obj_build_transform_from_pos_and_angle, obj_apply_scale_to_matrix } from "./ObjectHelpers"
+import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 
 class SurfaceLoad {
     constructor() {
+
+        Spawn.SurfaceLoad = this
 
         this.SPATIAL_PARTITION_FLOORS = 0
         this.SPATIAL_PARTITION_CEILS = 1
@@ -276,6 +282,117 @@ class SurfaceLoad {
         this.gNumStaticSurfaceNodes = this.gSurfaceNodesAllocated
         this.gNumStaticSurfaces = this.gSurfacesAllocated
 
+    }
+
+    clear_dynamic_surfaces() {
+        if (!(ObjectListProc.gTimeStopState & ObjectListProc.TIME_STOP_ACTIVE)) {
+            this.gSurfacesAllocated = this.gNumStaticSurfaces
+            this.gSurfaceNodesAllocated = this.gNumStaticSurfaceNodes
+
+            ///clear_spatial_partition
+            this.gDynamicSurfacePartition = new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
+        }
+    }
+
+    transform_object_vertices(collisionData, vertexData) {
+        const objectTransform = ObjectListProc.gCurrentObject.transform
+
+        let numVertices = collisionData.data[collisionData.dataIndex++]
+
+        if (ObjectListProc.gCurrentObject.header.gfx.throwMatrix == null) {
+            ObjectListProc.gCurrentObject.header.gfx.throwMatrix = objectTransform
+            obj_build_transform_from_pos_and_angle(ObjectListProc.gCurrentObject, oPosX, oFaceAnglePitch)
+        }
+
+        const m = new Array(4).fill(0).map(() => new Array(4).fill(0))
+
+        obj_apply_scale_to_matrix(ObjectListProc.gCurrentObject, m, objectTransform)
+
+        while (numVertices--) {
+            let vx = collisionData.data[collisionData.dataIndex++]
+            let vy = collisionData.data[collisionData.dataIndex++]
+            let vz = collisionData.data[collisionData.dataIndex++]
+
+            vertexData.push(vx * m[0][0] + vy * m[1][0] + vz * m[2][0] + m[3][0])
+            vertexData.push(vx * m[0][1] + vy * m[1][1] + vz * m[2][1] + m[3][1])
+            vertexData.push(vx * m[0][2] + vy * m[1][2] + vz * m[2][2] + m[3][2])
+        }
+
+    }
+
+    load_object_surfaces(collisionData, vertexData) {
+
+        const surfaceType = collisionData.data[collisionData.dataIndex++]
+        const numSurfaces = collisionData.data[collisionData.dataIndex++]
+
+        const hasForce = this.surface_has_force(surfaceType)
+
+        let flags = this.surf_has_no_cam_collision(surfaceType)
+        flags |= Surfaces.SURFACE_FLAG_DYNAMIC
+
+        /// TODO certain object behavior DDDwarp sets a room
+
+        for (let i = 0; i < numSurfaces; i++) {
+            const vertexIndices = collisionData.data.slice(collisionData.dataIndex, collisionData.dataIndex + 3)
+            const surface = this.read_surface_data(vertexData, vertexIndices)
+
+            if (surface) {
+                surface.object = ObjectListProc.gCurrentObject
+                surface.type = surfaceType
+
+                if (hasForce) surface.force = collisionData.data[collisionData.dataIndex + 3]
+                else surface.force = 0
+
+                surface.flags |= flags
+                surface.room = 0
+                this.add_surface(surface, true)
+            }
+
+            if (hasForce) collisionData.dataIndex += 4
+            else collisionData.dataIndex += 3
+        }
+    }
+
+    load_object_collision_model() {
+
+        const vertexData = []
+
+        let marioDist = ObjectListProc.gCurrentObject.rawData[oDistanceToMario]
+        const tangibleDist = ObjectListProc.gCurrentObject.rawData[oCollisionDistance]
+
+        // On an object's first frame, the distance is set to 19000.0f.
+        // If the distance hasn't been updated, update it now.
+        if (marioDist == 19000.0) {
+            marioDist = dist_between_objects(ObjectListProc.gCurrentObject, ObjectListProc.gMarioObject)
+        }
+
+        // If the object collision is supposed to be loaded more than the
+        // drawing distance of 4000, extend the drawing range.
+        if (tangibleDist > 4000.0) {
+            ObjectListProc.gCurrentObject.rawData[oDrawingDistance] = tangibleDist
+        }
+
+        if (!(ObjectListProc.gTimeStopState & ObjectListProc.TIME_STOP_ACTIVE) &&
+            marioDist < tangibleDist &&
+            !(ObjectListProc.gCurrentObject.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
+
+            const collisionData = {
+                data: ObjectListProc.gCurrentObject.collisionData,
+                dataIndex: 1
+            }
+            this.transform_object_vertices(collisionData, vertexData)
+
+            while (collisionData.data[collisionData.dataIndex] != Surfaces.TERRAIN_LOAD_CONTINUE) {
+                this.load_object_surfaces(collisionData, vertexData)
+            }
+        }
+
+
+        if (marioDist < ObjectListProc.gCurrentObject.rawData[oDrawingDistance]) {
+            ObjectListProc.gCurrentObject.header.gfx.node.flags |= GRAPH_RENDER_ACTIVE
+        } else {
+            ObjectListProc.gCurrentObject.header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE
+        }
     }
 }
 

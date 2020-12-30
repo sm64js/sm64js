@@ -1184,7 +1184,8 @@ export const resolve_and_return_wall_collisions = (pos, offset, radius) => {
     const collisionData = {
         radius,
         offsetY: offset,
-        x: pos[0], y: pos[1], z: pos[2]
+        x: pos[0], y: pos[1], z: pos[2],
+        walls: []
     }
 
     let wall

@@ -223,7 +223,8 @@ const check_ledge_climb_down = (m) => {
             y: m.pos[1],
             z: m.pos[2],
             radius: 10.0,
-            offsetY: -10.0
+            offsetY: -10.0,
+            walls: []
         }
 
         if (SurfaceCollision.find_wall_collisions(wallCols) != 0) {

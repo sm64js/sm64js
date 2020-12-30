@@ -76,7 +76,10 @@ class SurfaceCollision {
         const cellX = parseInt((x + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0xF
         const cellZ = parseInt((z + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0xF
 
-        const node = SurfaceLoad.gStaticSurfacePartition[cellZ][cellX][SurfaceLoad.SPATIAL_PARTITION_WALLS].next
+        let node = SurfaceLoad.gDynamicSurfacePartition[cellZ][cellX][SurfaceLoad.SPATIAL_PARTITION_WALLS].next
+        numCollisions += this.find_wall_collisions_from_list(node, colData)
+
+        node = SurfaceLoad.gStaticSurfacePartition[cellZ][cellX][SurfaceLoad.SPATIAL_PARTITION_WALLS].next
         numCollisions += this.find_wall_collisions_from_list(node, colData)
 
         return numCollisions
@@ -105,9 +108,18 @@ class SurfaceCollision {
         const cellX = parseInt((x + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0xF
         const cellZ = parseInt((z + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0xF
 
-        const surfaceList = SurfaceLoad.gStaticSurfacePartition[cellZ][cellX][SurfaceLoad.SPATIAL_PARTITION_CEILS].next
+        let surfaceList = SurfaceLoad.gDynamicSurfacePartition[cellZ][cellX][SurfaceLoad.SPATIAL_PARTITION_CEILS].next
+        const dynamicHeightWrapper = { height }
+        const dynamicCeil = this.find_ceil_from_list(surfaceList, x, y, z, dynamicHeightWrapper)
+
+        surfaceList = SurfaceLoad.gStaticSurfacePartition[cellZ][cellX][SurfaceLoad.SPATIAL_PARTITION_CEILS].next
         const heightWrapper = { height }
         ceilWrapper.ceil = this.find_ceil_from_list(surfaceList, x, y, z, heightWrapper)
+
+        if (dynamicHeightWrapper.height < heightWrapper.height) {
+            ceilWrapper.ceil = dynamicCeil
+            heightWrapper.height = dynamicHeightWrapper.height
+        }
 
         return heightWrapper.height
     }
@@ -132,9 +144,18 @@ class SurfaceCollision {
         const cellX = parseInt((x + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0xF
         const cellZ = parseInt((z + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & 0xF
 
-        const surfaceList = SurfaceLoad.gStaticSurfacePartition[cellZ][cellX][SurfaceLoad.SPATIAL_PARTITION_FLOORS].next
+        let surfaceList = SurfaceLoad.gDynamicSurfacePartition[cellZ][cellX][SurfaceLoad.SPATIAL_PARTITION_FLOORS].next
+        const dynamicHeightWrapper = { height }
+        const dynamicFloor = this.find_floor_from_list(surfaceList, x, y, z, dynamicHeightWrapper)
+
+        surfaceList = SurfaceLoad.gStaticSurfacePartition[cellZ][cellX][SurfaceLoad.SPATIAL_PARTITION_FLOORS].next
         const heightWrapper = { height }
         floorWrapper.floor = this.find_floor_from_list(surfaceList, x, y, z, heightWrapper)
+
+        if (dynamicHeightWrapper.height > heightWrapper.height) {
+            floorWrapper.floor = dynamicFloor
+            heightWrapper.height = dynamicHeightWrapper.height
+        }
 
         return heightWrapper.height
 
@@ -144,8 +165,8 @@ class SurfaceCollision {
 
         let radius = data.radius / BOUNDS_EXTENSION
         let numCols = 0
+
         const x = data.x / BOUNDS_EXTENSION, y = (data.y + data.offsetY) / BOUNDS_EXTENSION, z = data.z / BOUNDS_EXTENSION
-        data.walls = []
 
         if (radius > 200.0) radius = 200.0
 

@@ -8,6 +8,7 @@ import { bhv_pole_init, bhv_giant_pole_loop } from "./behaviors/pole.inc"
 import { bhv_castle_flag_init } from "./behaviors/bhv_castle_flag_init.inc"
 import { castle_grounds_seg7_anims_flags } from "../levels/castle_grounds/areas/1/11/anim.inc"
 import { bhv_checkerboard_elevator_group_init, bhv_checkerboard_platform_init, bhv_checkerboard_platform_loop } from "./behaviors/checkerboard_platform.inc"
+import { checkerboard_platform_seg8_collision_0800D710 } from "../actors/checkerboard_platform/collision.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -40,7 +41,6 @@ export const bhvMario = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PLAYER } },
     { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.set_hitbox, args: { radius: 37, height: 160 } },
-    { command: BhvCmds.set_interact_type, args: { type: Interact.INTERACT_PLAYER } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: ObjectListProcessor.bhv_mario_update, funcClass: ObjectListProcessor } },
     { command: BhvCmds.end_loop },
@@ -118,6 +118,7 @@ export const bhvCastleFlagWaving = [
 export const bhvCheckerboardPlatformSub = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SURFACE } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
+    { command: BhvCmds.load_collision_data, args: { data: checkerboard_platform_seg8_collision_0800D710 } },
     { command: BhvCmds.call_native, args: { func: bhv_checkerboard_platform_init } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_checkerboard_platform_loop } },

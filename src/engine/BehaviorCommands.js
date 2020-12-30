@@ -1,7 +1,7 @@
 import { ObjectListProcessorInstance as ObjListProc } from "../game/ObjectListProcessor"
-import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction, oAnimations, oInteractType, oHomeX, oHomeY, oHomeZ, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, oDistanceToMario } from "../include/object_constants"
 import { GRAPH_RENDER_CYLBOARD, geo_obj_init_animation, GRAPH_RENDER_BILLBOARD } from "./graph_node"
-import { dist_between_objects } from "../game/ObjectHelpers"
+import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction, oAnimations, oInteractType, oHomeX, oHomeY, oHomeZ, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, oDistanceToMario, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, oAngleToMario, oMoveAngleYaw, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW } from "../include/object_constants"
+import { dist_between_objects, obj_angle_to_object } from "../game/ObjectHelpers"
 
 class BehaviorCommands {
 
@@ -19,6 +19,10 @@ class BehaviorCommands {
         if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {
             ObjListProc.gCurrentObject.rawData[oDistanceToMario] = dist_between_objects(ObjListProc.gCurrentObject, ObjListProc.gMarioObject)
             distanceFromMario = ObjListProc.gCurrentObject.rawData[oDistanceToMario]
+        }
+
+        if (objFlags & OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO) {
+            ObjListProc.gCurrentObject.rawData[oAngleToMario] = obj_angle_to_object(ObjListProc.gCurrentObject, ObjListProc.gMarioObject)
         }
 
         this.bhvScript = ObjListProc.gCurrentObject.bhvScript
@@ -41,6 +45,10 @@ class BehaviorCommands {
         }
 
         objFlags = ObjListProc.gCurrentObject.rawData[oFlags]
+
+        if (objFlags & OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW) {
+            ObjListProc.gCurrentObject.rawData[oFaceAngleYaw] = ObjListProc.gCurrentObject.rawData[oMoveAngleYaw]
+        }
 
         if (objFlags & OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE) {
             this.obj_update_gfx_pos_and_angle(ObjListProc.gCurrentObject)

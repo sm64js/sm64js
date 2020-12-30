@@ -63,7 +63,7 @@ export const MODEL_YELLOW_SPHERE                   = 0x55        // yellow_spher
 
 // castle grounds
 export const MODEL_CASTLE_GROUNDS_VCUTM_GRILL       =   0x36
-export const MODEL_CASTLE_GROUNDS_FLAG              =   0x37
+export const MODEL_CASTLE_GROUNDS_FLAG              =   0x39  //fix because its the same as the seasaw on bob
 export const MODEL_CASTLE_GROUNDS_CANNON_GRILL = 0x38
 
 // bob

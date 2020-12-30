@@ -1,9 +1,10 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { oBehParams2ndByte, oCheckerBoardPlatformUnk1AC, oCheckerBoardPlatformUnkFC, oCheckerBoardPlatformUnkF8, oDistanceToMario, oAction, oMoveAnglePitch, oAngleVelPitch, oForwardVel, oVelY, oTimer, oFaceAnglePitch, oFaceAngleYaw, oMoveAngleYaw } from "../../include/object_constants"
-import { spawn_object, spawn_object_relative, cur_obj_move_using_fvel_and_gravity } from "../ObjectHelpers"
+import { spawn_object_relative, cur_obj_move_using_fvel_and_gravity } from "../ObjectHelpers"
 import { MODEL_CHECKERBOARD_PLATFORM } from "../../include/model_ids"
 import { bhvCheckerboardPlatformSub } from "../BehaviorData"
 import { sins, coss } from "../../utils"
+import { SurfaceLoadInstance } from "../SurfaceLoad"
 
 const checkerPlatformData = [
 	{ unk0: 145, unk1: [0.7, 1.5, 0.7], unk2: 7.0 },
@@ -100,4 +101,5 @@ export const bhv_checkerboard_platform_loop = () => {
 		o.rawData[oFaceAnglePitch] &= ~0x7FFF
 	}
 	cur_obj_move_using_fvel_and_gravity()
+	SurfaceLoadInstance.load_object_collision_model()
 }

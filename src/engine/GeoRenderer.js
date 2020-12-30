@@ -361,10 +361,12 @@ class GeoRenderer {
 
         if (object.header.gfx.unk18 == this.gCurGraphNodeRoot.wrapper.areaIndex) {
 
-            if (object.header.gfx.throwMatrix || object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_BILLBOARD) 
+            if (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_BILLBOARD) 
                 throw "more implementation needed in geo process object"
 
-            if (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_CYLBOARD) {
+            if (object.header.gfx.throwMatrix != null) {
+                MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], object.header.gfx.throwMatrix, this.gMatStack[this.gMatStackIndex])
+            } else if (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_CYLBOARD) {
                 MathUtil.mtxf_cylboard(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex], object.header.gfx.pos, this.gCurGraphNodeCamera.wrapper.roll)
             } else {
                 MathUtil.mtxf_rotate_zxy_and_translate(mtxf, object.header.gfx.pos, object.header.gfx.angle)

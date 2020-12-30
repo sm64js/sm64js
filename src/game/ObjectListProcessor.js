@@ -7,10 +7,18 @@ import * as Mario from "./Mario"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { detect_object_collisions } from "./ObjectCollisions"
 
-
-
 class ObjectListProcessor {
     constructor() {
+
+        PlatformDisplacement.ObjectListProc = this
+
+        this.TIME_STOP_UNKNOWN_0 = (1 << 0)
+        this.TIME_STOP_ENABLED = (1 << 1)
+        this.TIME_STOP_DIALOG = (1 << 2)
+        this.TIME_STOP_MARIO_AND_DOORS = (1 << 3)
+        this.TIME_STOP_ALL_OBJECTS = (1 << 4)
+        this.TIME_STOP_MARIO_OPENED_DOOR = (1 << 5)
+        this.TIME_STOP_ACTIVE = (1 << 6)
 
         this.OBJECT_POOL_CAPACITY = 240
 
@@ -72,11 +80,17 @@ class ObjectListProcessor {
     update_objects() {
         this.gObjectCounter = 0  /// probaly not used and not needed
 
+        Spawn.SurfaceLoad.clear_dynamic_surfaces()
         this.update_terrain_objects()
+
+        PlatformDisplacement.apply_mario_platform_displacement()
+
         detect_object_collisions()
         this.update_non_terrain_objects()
 
         this.unload_deactivated_objects()
+
+        PlatformDisplacement.update_mario_platform()
     }
 
     update_terrain_objects() {
@@ -230,7 +244,7 @@ class ObjectListProcessor {
     clear_objects() {
 
         Spawn.clear_object_lists()
-
+        Spawn.SurfaceLoad.clear_dynamic_surfaces()
     }
 }
 

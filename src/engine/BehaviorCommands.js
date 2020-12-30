@@ -114,6 +114,14 @@ class BehaviorCommands {
         return this.BHV_PROC_CONTINUE
     }
 
+    load_collision_data(args) {
+
+        ObjListProc.gCurrentObject.collisionData = args.data
+
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
     load_animations(args) {
         ObjListProc.gCurrentObject.rawData[args.field] = args.anims
         this.bhvScript.index++

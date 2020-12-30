@@ -28,7 +28,29 @@ export const spawn_object_abs_with_rot = (parent, model, behavior, x, y, z, rx, 
     return newObj
 }
 
-const obj_build_transform_from_pos_and_angle = (obj, posIndex, angleIndex) => {
+export const obj_apply_scale_to_matrix = (obj, dst, src) => {
+    dst[0][0] = src[0][0] * obj.header.gfx.scale[0]
+    dst[1][0] = src[1][0] * obj.header.gfx.scale[1]
+    dst[2][0] = src[2][0] * obj.header.gfx.scale[2]
+    dst[3][0] = src[3][0]
+
+    dst[0][1] = src[0][1] * obj.header.gfx.scale[0]
+    dst[1][1] = src[1][1] * obj.header.gfx.scale[1]
+    dst[2][1] = src[2][1] * obj.header.gfx.scale[2]
+    dst[3][1] = src[3][1]
+
+    dst[0][2] = src[0][2] * obj.header.gfx.scale[0]
+    dst[1][2] = src[1][2] * obj.header.gfx.scale[1]
+    dst[2][2] = src[2][2] * obj.header.gfx.scale[2]
+    dst[3][2] = src[3][2]
+
+    dst[0][3] = src[0][3]
+    dst[1][3] = src[1][3]
+    dst[2][3] = src[2][3]
+    dst[3][3] = src[3][3]
+}
+
+export const obj_build_transform_from_pos_and_angle = (obj, posIndex, angleIndex) => {
     const translate = new Array(3)
     const rotation = new Array(3)
 
@@ -57,6 +79,18 @@ const obj_translate_local = (obj, posIndex, localTranslateIndex) => {
 const obj_build_relative_transform = (obj) => {
     obj_build_transform_from_pos_and_angle(obj, oParentRelativePosX /* Takes all XYZ */, oFaceAnglePitch, /* Takes all roll, pitch, yaw */)
     obj_translate_local(obj, oPosX, oParentRelativePosX)
+}
+
+export const linear_mtxf_mul_vec3f = (m, dst, v) => {
+    for (let i = 0; i < 3; i++) {
+        dst[i] = m[0][i] * v[0] + m[1][i] * v[1] + m[2][i] * v[2]
+    }
+}
+
+export const linear_mtxf_transpose_mul_vec3f = (m, dst, v) => {
+    for (let i = 0; i < 3; i++) {
+        dst[i] = m[i][0] * v[0] + m[i][1] * v[1] + m[i][2] * v[2]
+    }
 }
 
 export const spawn_object_relative = (behaviorParam, relativePosX, relativePosY, relativePosZ, parent, model, behavior) => {

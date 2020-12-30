@@ -1,6 +1,7 @@
 import { ObjectListProcessorInstance as ObjListProc } from "../game/ObjectListProcessor"
-import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction, oAnimations, oInteractType } from "../include/object_constants"
+import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction, oAnimations, oInteractType, oHomeX, oHomeY, oHomeZ, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, oDistanceToMario } from "../include/object_constants"
 import { GRAPH_RENDER_CYLBOARD, geo_obj_init_animation } from "./graph_node"
+import { dist_between_objects } from "../game/ObjectHelpers"
 
 class BehaviorCommands {
 
@@ -12,6 +13,13 @@ class BehaviorCommands {
     cur_obj_update() {
 
         let objFlags = ObjListProc.gCurrentObject.rawData[oFlags]
+
+        let distanceFromMario = 0.0
+
+        if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {
+            ObjListProc.gCurrentObject.rawData[oDistanceToMario] = dist_between_objects(ObjListProc.gCurrentObject, ObjListProc.gMarioObject[0])
+            distanceFromMario = ObjListProc.gCurrentObject.rawData[oDistanceToMario]
+        }
 
         this.bhvScript = ObjListProc.gCurrentObject.bhvScript
 
@@ -82,6 +90,15 @@ class BehaviorCommands {
 
     set_interact_type(args) {
         ObjListProc.gCurrentObject.rawData[oInteractType] = args.type
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    set_home(args) {
+        ObjListProc.gCurrentObject.rawData[oHomeX] = ObjListProc.gCurrentObject.rawData[oPosX]
+        ObjListProc.gCurrentObject.rawData[oHomeY] = ObjListProc.gCurrentObject.rawData[oPosY]
+        ObjListProc.gCurrentObject.rawData[oHomeZ] = ObjListProc.gCurrentObject.rawData[oPosZ]
+
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }

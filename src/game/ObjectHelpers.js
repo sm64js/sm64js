@@ -4,7 +4,7 @@ import { geo_obj_init } from "../engine/graph_node"
 import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity } from "../include/object_constants"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
-import { mtxf_rotate_zxy_and_translate } from "../engine/math_util"
+import { atan2s, mtxf_rotate_zxy_and_translate } from "../engine/math_util"
 import { sins, coss } from "../utils"
 
 const spawn_object_at_origin = (parent, model, behavior) => {
@@ -210,4 +210,11 @@ export const dist_between_objects = (obj1, obj2) => {
     const dy = obj1.rawData[oPosY] - obj2.rawData[oPosY]
     const dz = obj1.rawData[oPosZ] - obj2.rawData[oPosZ]
     return Math.sqrt(dx * dx + dy * dy + dz * dz)
+}
+
+export const obj_angle_to_object = (obj1, obj2) => {
+    const x1 = obj1.rawData[oPosX], z1 = obj1.rawData[oPosZ]
+    const x2 = obj2.rawData[oPosX], z2 = obj2.rawData[oPosZ]
+
+    return atan2s(z2 - z1, x2 - x1)
 }

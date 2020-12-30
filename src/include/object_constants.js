@@ -132,3 +132,5 @@ export const oCheckerBoardPlatformUnkF8  = 0x1C
 export const oCheckerBoardPlatformUnkFC  = 0x1D
 export const oCheckerBoardPlatformUnk1AC = 0x49
 
+/* Seesaw Platform */
+export const oSeesawPlatformPitchVel = 0x1B

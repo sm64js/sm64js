@@ -6,6 +6,7 @@ import { GoddardRendererInstance as GoddardRenderer } from "../goddard/GoddardRe
 import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
 import { init_graph_node_start } from "./graph_node"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
+import { arg } from "mathjs"
 
 const SCRIPT_RUNNING = 1
 const SCRIPT_PAUSED = 0
@@ -233,7 +234,7 @@ class LevelCommands {
                 areaIndex: this.sCurrAreaIndex,
                 activeAreaIndex: this.sCurrAreaIndex,
                 behaviorArg: args[8],
-                behaviorScript: args[9],
+                behaviorScript: args[9].call ? args[9]() : args[9],
                 unk18: Area.gLoadedGraphNodes[model],
                 next: Area.gAreas[this.sCurrAreaIndex].objectSpawnInfos
             }

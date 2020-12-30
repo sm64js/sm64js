@@ -34,8 +34,24 @@ export const OBJ_MOVE_LEAVING_WATER  = (1 << 12) // 0x1000
 export const OBJ_MOVE_13  = (1 << 13) // 0x2000
 export const OBJ_MOVE_ABOVE_DEATH_BARRIER = (1 << 14) // 0x4000
 
-export const OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE = (1 << 0) // 0x00000001
-export const OBJ_FLAG_COMPUTE_DIST_TO_MARIO = (1 << 6) // 0x00000040
+/* oFlags */
+export const OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE        =  (1 <<  0) // 0x00000001
+export const OBJ_FLAG_MOVE_XZ_USING_FVEL              =  (1 <<  1) // 0x00000002
+export const OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL        =  (1 <<  2) // 0x00000004
+export const OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW        =  (1 <<  3) // 0x00000008
+export const OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE    =  (1 <<  4) // 0x00000010
+export const OBJ_FLAG_0020                            =  (1 <<  5) // 0x00000020
+export const OBJ_FLAG_COMPUTE_DIST_TO_MARIO           =  (1 <<  6) // 0x00000040
+export const OBJ_FLAG_ACTIVE_FROM_AFAR                =  (1 <<  7) // 0x00000080
+export const OBJ_FLAG_0100                            =  (1 <<  8) // 0x00000100
+export const OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT    =  (1 <<  9) // 0x00000200
+export const OBJ_FLAG_HOLDABLE                        =  (1 << 10) // 0x00000400
+export const OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM =  (1 << 11) // 0x00000800
+export const OBJ_FLAG_1000                            =  (1 << 12) // 0x00001000
+export const OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO          =  (1 << 13) // 0x00002000
+export const OBJ_FLAG_PERSISTENT_RESPAWN              =  (1 << 14) // 0x00004000
+export const OBJ_FLAG_8000                            =  (1 << 15) // 0x00008000
+export const OBJ_FLAG_30                              =  (1 << 30) // 0x40000000
 
 export const oFlags = 1
 

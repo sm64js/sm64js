@@ -1,9 +1,10 @@
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { AreaInstance as Area } from "./Area"
 import { geo_obj_init } from "../engine/graph_node"
-import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams } from "../include/object_constants"
+import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity } from "../include/object_constants"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { mtxf_rotate_zxy_and_translate } from "../engine/math_util"
+import { sins, coss } from "../utils"
 
 const spawn_object_at_origin = (parent, model, behavior) => {
 
@@ -126,6 +127,37 @@ export const obj_set_angle = (obj, pitch, yaw, roll) => {
     obj.rawData[oMoveAngleRoll] = roll
 }
 
+export const cur_obj_within_12k_bounds = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.rawData[oPosX] < -12000 || 12000 < o.rawData[oPosX]) return 0
+    if (o.rawData[oPosY] < -12000 || 12000 < o.rawData[oPosY]) return 0
+    if (o.rawData[oPosZ] < -12000 || 12000 < o.rawData[oPosZ]) return 0
+
+    return 1
+}
+
+export const cur_obj_compute_vel_xz = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oVelX] = o.rawData[oForwardVel] * sins(o.rawData[oMoveAngleYaw])
+    o.rawData[oVelZ] = o.rawData[oForwardVel] * coss(o.rawData[oMoveAngleYaw])
+}
+
+export const cur_obj_move_using_vel_and_gravity = () => {
+    const o = ObjectListProc.gCurrentObject
+    if (cur_obj_within_12k_bounds()) {
+        o.rawData[oPosX] += o.rawData[oVelX]
+        o.rawData[oPosZ] += o.rawData[oVelZ]
+        o.rawData[oVelY] += o.rawData[oGravity]
+        o.rawData[oPosY] += o.rawData[oVelY]
+    }
+}
+
+export const cur_obj_move_using_fvel_and_gravity = () => {
+    cur_obj_compute_vel_xz()
+    cur_obj_move_using_vel_and_gravity()
+}
+
 export const cur_obj_push_mario_away = (radius, m) => {
     const o = ObjectListProc.gCurrentObject
     const marioRelX = m.marioObj.rawData[oPosX] - o.rawData[oPosX]
@@ -151,3 +183,9 @@ export const cur_obj_push_mario_away = (radius, m) => {
     }
 }
 
+export const dist_between_objects = (obj1, obj2) => {
+    const dx = obj1.rawData[oPosX] - obj2.rawData[oPosX]
+    const dy = obj1.rawData[oPosY] - obj2.rawData[oPosY]
+    const dz = obj1.rawData[oPosZ] - obj2.rawData[oPosZ]
+    return Math.sqrt(dx * dx + dy * dy + dz * dz)
+}

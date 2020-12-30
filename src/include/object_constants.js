@@ -53,11 +53,13 @@ export const oFaceAnglePitch = 0x12
 export const oFaceAngleYaw = 0x13
 export const oFaceAngleRoll = 0x14
 
+export const oGravity = 0x17
 export const oFloorHeight = 0x18
 
 export const oVelX = 0x09
 export const oVelY = 0x0A
 export const oVelZ = 0x0B
+export const oForwardVel = 0x0C
 
 export const oMarioParticleFlags    = 0x1B
 export const oMarioPoleUnk108       = 0x20
@@ -85,6 +87,11 @@ export const oParentRelativePosZ = 0x2E
 export const oBehParams2ndByte = 0x2F
 
 export const oDistanceToMario = 0x35
+export const oAngleToMario = 0x36
+export const oHomeX = 0x37
+export const oHomeY = 0x38
+export const oHomeZ = 0x39
+
 
 export const oDamageOrCoinValue  = 0x3E
 export const oHealth             = 0x3F

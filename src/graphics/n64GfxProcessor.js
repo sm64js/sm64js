@@ -130,9 +130,15 @@ export class n64GfxProcessor {
             dstCanvas.hidden = false
             WebGL.canvas.hidden = true
             if (window.fullWindowMode) {
+                const windowAspect = window.innerWidth / window.innerHeight
+                if (windowAspect > 1.33) { /// wider than tall
+                    dstCanvas.height = window.innerHeight
+                    dstCanvas.width = window.innerHeight * 1.33
+                } else {  /// taller than wide
+                    dstCanvas.width = window.innerWidth
+                    dstCanvas.height = window.innerWidth / 1.33
+                }
                 window.scrollTo(0, 0)
-                dstCanvas.width = window.innerWidth
-                dstCanvas.height = window.innerHeight
                 document.body.style.overflowY = "hidden"
             }
             dstCtx.drawImage(WebGL.canvas, 0, 0, dstCanvas.width, dstCanvas.height)

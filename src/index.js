@@ -8,38 +8,29 @@ import "./cmts_cosmetics"
 import "./template.css"
 
 
-const send_display_list = (gfx_list) => {
-    start_render = performance.now()
-    GFX.run(gfx_list)
-}
+const send_display_list = (gfx_list) => { GFX.run(gfx_list) }
 
 let n_frames = 0
 let target_time = 0
 let frameSpeed = 0.03
-let start_render = 0
 
 const produce_one_frame = () => {
 
     const start_frame = performance.now()
-
-    //if (n_frames > 100000) { throw "Hit max frames" }
-    //console.log("new frame: " + n_frames)
-    n_frames++
 
     playerInputUpdate() /// Keyboard buttons / joystick process to game input commands
     //Socket.send_controller_update(n_frames)
     GFX.start_frame()
     Game.main_loop_one_iteration()
     Socket.post_main_loop_one_iteration(n_frames)
-    GFX.end_frame()
-
     /// Audio TODO
 
     const finished_frame = performance.now()
-    webpage_update()
-    gameLogicFrameTimeBuffer.push(start_render - start_frame)
-    renderFrameTimeBuffer.push(finished_frame - start_render)
     totalFrameTimeBuffer.push(finished_frame - start_frame)
+
+    //if (n_frames > 100000) { throw "Hit max frames" }
+    //console.log("new frame: " + n_frames)
+    n_frames++
 }
 
 //// implementation from Emil <3
@@ -121,29 +112,15 @@ const createRingBuffer = (length) => {
 }
 
 const totalFrameTimeBuffer = createRingBuffer(10)
-const renderFrameTimeBuffer = createRingBuffer(10)
-const gameLogicFrameTimeBuffer = createRingBuffer(10)
 
 const setStatsUpdate = setInterval(() => {
     const totalFrameTimeAvg = totalFrameTimeBuffer.getAvg().toFixed(2)
-    const renderFrameTimeAvg = renderFrameTimeBuffer.getAvg().toFixed(2)
-    const gameLogicFrametimeAvg = gameLogicFrameTimeBuffer.getAvg().toFixed(2)
     const maxFps = (1000 / totalFrameTimeAvg).toFixed(2)
     window.fps = parseInt(maxFps)
     document.getElementById("maxFps").innerHTML = `Effective Max Fps: ${maxFps}`
     document.getElementById("timing-total").innerHTML = `${totalFrameTimeAvg}ms`
-    document.getElementById("timing-game").innerHTML = `${gameLogicFrametimeAvg}ms`
-    document.getElementById("timing-render").innerHTML = `${renderFrameTimeAvg}ms`
 }, 500)
 
-const webpage_update = () => {
-    document.getElementById("numTriangles").innerHTML = `Total Triangles this frame: ${window.totalTriangles}`
-}
-
-/*document.getElementById("slider").addEventListener('change', (event) => {
-    frameSpeed = 1000 / event.target.value
-    document.getElementById("fps").innerHTML = `${event.target.value} fps`
-})*/
 
 window.enterFullScreenMode = () => {
     const dstCanvas = document.getElementById('fullCanvas')

@@ -188,7 +188,6 @@ class GeoRenderer {
 
     geo_process_generated_list(node) {
         if (node.wrapper.fnNode.func) {
-            //console.log("processing function from generated_list")
 
             const fnNode = node.wrapper.fnNode
 

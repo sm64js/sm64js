@@ -31,8 +31,6 @@ const MAX_BUFFERED = 256
 const MAX_LIGHTS = 2
 const MAX_VERTICES = 64
 
-let opCount = 0
-
 export class n64GfxProcessor {
     constructor() {
 
@@ -118,11 +116,6 @@ export class n64GfxProcessor {
     }
 
     start_frame(){
-        /// handle input
-        /// handle dimensions
-    }
-
-    end_frame() {
         const dstCanvas = document.getElementById("fullCanvas")
 
         if (window.fullWindowMode || document.fullscreenElement) {
@@ -980,8 +973,6 @@ export class n64GfxProcessor {
 
             const opcode = command.words.w0
             const args = command.words.w1
-
-            opCount++
 
             switch (opcode) {
                 case Gbi.G_ENDDL: /// not necessary for JS

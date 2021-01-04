@@ -1,11 +1,32 @@
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { AreaInstance as Area } from "./Area"
-import { geo_obj_init } from "../engine/graph_node"
-import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity } from "../include/object_constants"
+import { geo_obj_init, geo_obj_init_animation_accel } from "../engine/graph_node"
+import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations } from "../include/object_constants"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { atan2s, mtxf_rotate_zxy_and_translate } from "../engine/math_util"
 import { sins, coss } from "../utils"
+import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
+
+export const geo_switch_anim_state = (run, node) => {
+    if (run == 1) {
+        let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
+
+        const switchCase = node
+
+        if (GeoRenderer.gCurGraphNodeHeldObject) {
+            obj = GeoRenderer.gCurGraphNodeHeldObject.objNode
+        }
+
+        // if the case is greater than the number of cases, set to 0 to avoid overflowing
+        // the switch.
+        if (obj.rawData[oAnimState] >= switchCase.numCases) {
+            obj.rawData[oAnimState] = 0
+        }
+
+        switchCase.selectedCase = obj.rawData[oAnimState]
+    }
+}
 
 const spawn_object_at_origin = (parent, model, behavior) => {
 
@@ -24,7 +45,7 @@ const spawn_object_at_origin = (parent, model, behavior) => {
 export const spawn_object_abs_with_rot = (parent, model, behavior, x, y, z, rx, ry, rz) => {
     const newObj = spawn_object_at_origin(parent, model, behavior)
     obj_set_pos(newObj, x, y, z)
-    obj_set_angle(newObj, rz, ry, rz)
+    obj_set_angle(newObj, rx, ry, rz)
     return newObj
 }
 
@@ -170,6 +191,25 @@ export const cur_obj_within_12k_bounds = () => {
     if (o.rawData[oPosZ] < -12000 || 12000 < o.rawData[oPosZ]) return 0
 
     return 1
+}
+
+export const cur_obj_become_tangible = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oIntangibleTimer] = 0
+}
+
+export const cur_obj_scale = (scale) => {
+    const o = ObjectListProc.gCurrentObject
+    o.header.gfx.scale[0] = scale
+    o.header.gfx.scale[1] = scale
+    o.header.gfx.scale[2] = scale
+}
+
+export const cur_obj_init_animation_with_accel_and_sound = (animIndex, accel) => {
+    const o = ObjectListProc.gCurrentObject
+    const anims = o.rawData[oAnimations]
+    const animAccel = parseInt(accel * 65536.0)
+    geo_obj_init_animation_accel(o.header.gfx, anims[animIndex], animAccel)
 }
 
 export const cur_obj_compute_vel_xz = () => {

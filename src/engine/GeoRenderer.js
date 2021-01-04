@@ -471,6 +471,30 @@ class GeoRenderer {
         }
     }
 
+    geo_process_billboard(node) {
+        const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
+
+        this.gMatStackIndex++
+        const translation = [...node.wrapper.translation]
+        MathUtil.mtxf_billboard(this.gMatStack[this.gMatStackIndex], this.gMatStack[this.gMatStackIndex - 1], translation, this.gCurGraphNodeCamera.wrapper.roll)
+
+        if (this.gCurGraphNodeHeldObject) {
+            throw "billboard for held objects"
+        } else {
+            MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex], this.gMatStack[this.gMatStackIndex], this.gCurGraphNodeObject.scale)
+        }
+
+        if (node.wrapper.displayList) {
+            this.geo_append_display_list(node.wrapper.displayList, node.flags >> 8)
+        }
+
+        if (node.children[0]) {
+            this.geo_process_node_and_siblings(node.children)
+        }
+        this.gMatStackIndex--
+
+    }
+
     geo_process_shadow(node) {
 
         let shadowPos, shadowScale
@@ -583,6 +607,9 @@ class GeoRenderer {
 
             case GraphNode.GRAPH_NODE_TYPE_LEVEL_OF_DETAIL:
                 this.geo_process_level_of_detail(node); break
+
+            case GraphNode.GRAPH_NODE_TYPE_BILLBOARD:
+                this.geo_process_billboard(node); break
 
             default:
                 /// remove this check once all types have been added

@@ -2,11 +2,13 @@ import { LEVEL_BOUNDARY_MAX, CELL_SIZE, SURFACE_FLAG_NO_CAM_COLLISION, SURFACE_C
 import { SurfaceLoadInstance as SurfaceLoad } from "../game/SurfaceLoad"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
 import { SpawnObjectInstance as Spawn } from "../game/SpawnObject"
+import { BehaviorCommandsInstance as BhvCmds } from "./BehaviorCommands"
 
 
 class SurfaceCollision {
     constructor() {
         Spawn.SurfaceCollision = this
+        BhvCmds.SurfaceCollision = this
     }
 
     find_water_level(x, z) {
@@ -37,6 +39,10 @@ class SurfaceCollision {
         }
 
         return waterLevel
+    }
+
+    find_floor_height(x, y, z) {
+        return this.find_floor(x, y, z, {})
     }
 
     find_floor_height_and_data(xPos, yPos, zPos, floorGeo) {

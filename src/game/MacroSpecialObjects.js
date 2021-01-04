@@ -51,7 +51,9 @@ import {
 
 import { bhvTree, bhvStaticObject } from "./BehaviorData"
 import { spawn_object_abs_with_rot } from "./ObjectHelpers"
-import { oBehParams } from "../include/object_constants"
+import { oBehParams, RESPAWN_INFO_DONT_RESPAWN, oUnk1A8, oBehParams2ndByte, RESPAWN_INFO_TYPE_16 } from "../include/object_constants"
+import { MacroObjectPresets } from "../include/macro_presets"
+import { uint16, int16 } from "../utils"
 
 const SPTYPE_NO_YROT_OR_PARAMS  = 0 // object is 8-bytes long, no y-rotation or any behavior params
 const SPTYPE_YROT_NO_PARAMS     = 1 // object is 10-bytes long, has y-rotation but no params
@@ -85,8 +87,26 @@ SpecialObjectPresets[special_level_geo_16] = { type: SPTYPE_YROT_NO_PARAMS, defP
 
 
 const convert_rotation = (inRotation) => {
-    if (inRotation != 0) throw "implement convert_rotation - MacroSpecialObjects"
-    return inRotation
+    let rotation = uint16(inRotation & 0xFF)
+    rotation <<= 8
+
+    if (rotation == 0x3F00) {
+        rotation = 0x4000
+    }
+
+    if (rotation == 0x7F00) {
+        rotation = 0x8000
+    }
+
+    if (rotation == 0xBF00) {
+        rotation = 0xC000
+    }
+
+    if (rotation == 0xFF00) {
+        rotation = 0x0000
+    }
+
+    return int16(rotation)
 }
 
 const spawn_macro_abs_yrot_2params = (model, behavior, x, y, z, ry, params) => {
@@ -124,4 +144,36 @@ export const spawn_special_objects = (areaIndex, specialObjList, dataIndex) => {
     }
 
     return dataIndex
+}
+
+export const spawn_macro_objects = (areaIndex, macroObjList) => {
+    ObjectListProc.gMacroObjectDefaultParent.header.gfx.unk18 = areaIndex
+    ObjectListProc.gMacroObjectDefaultParent.header.gfx.unk19 = areaIndex
+
+    macroObjList.forEach(objToSpawn => {
+        const presetID = objToSpawn.preset
+
+        const macroObject = {
+            obj_y_rot: objToSpawn.yaw * 2 * 0x10 / 45,
+            obj_pos: objToSpawn.pos,
+            obj_param: objToSpawn.param
+        }
+
+        const preset = MacroObjectPresets[presetID]
+
+        macroObject.obj_param = (macroObject.obj_param & 0xFF00) + (preset.param & 0x00FF)
+
+        if (((macroObject.obj_param >> 8) & RESPAWN_INFO_DONT_RESPAWN) != RESPAWN_INFO_DONT_RESPAWN) {
+            const newObj = spawn_object_abs_with_rot(ObjectListProc.gMacroObjectDefaultParent, preset.model, preset.behavior,
+                macroObject.obj_pos[0], macroObject.obj_pos[1], macroObject.obj_pos[2], 0, convert_rotation(macroObject.obj_y_rot), 0)
+
+            newObj.rawData[oUnk1A8] = macroObject.obj_param
+            newObj.rawData[oBehParams] = ((macroObject.obj_param & 0x00FF) << 16) + (macroObject.obj_param & 0xFF00)
+            newObj.rawData[oBehParams2ndByte] = macroObject.obj_param & 0x00FF
+            newObj.respawnInfoType = RESPAWN_INFO_TYPE_16
+            newObj.respawnInfo = macroObject.obj_param
+            newObj.parentObj = newObj
+        }
+
+    })
 }

@@ -755,6 +755,15 @@ export const gsSPLight = (lightData, index) => {
     }
 }
 
+export const gsSPNumLights = (num) => {
+    return {
+        words: {
+            w0: G_MOVEWORD,
+            w1: { type: G_MW_NUMLIGHT, data: num + 1 } //includes 1 ambient light
+        }
+    }
+}
+
 export const gsSPFogFactor = (f_mul, f_offset) => {
     return {
         words: {

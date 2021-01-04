@@ -263,6 +263,16 @@ class LevelCommands {
         this.sCurrentScript.index++
     }
 
+    macro_objects(args) {
+        if (this.sCurrAreaIndex != -1) {
+            const data = args[0]
+
+            Area.gAreas[this.sCurrAreaIndex].macroObjects = data
+        }
+
+        this.sCurrentScript.index++
+    }
+
     terrain(args) {
         if (this.sCurrAreaIndex != -1)
             Area.gAreas[this.sCurrAreaIndex].terrainData = args[0]

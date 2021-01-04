@@ -71,6 +71,9 @@ export const oFaceAngleRoll = 0x14
 
 export const oGravity = 0x17
 export const oFloorHeight = 0x18
+export const oMoveFlags = 0x19
+
+export const oAnimState = 0x1A
 
 export const oVelX = 0x09
 export const oVelY = 0x0A
@@ -117,7 +120,8 @@ export const oInteractionSubtype = 0x42
 export const oCollisionDistance  = 0x43
 export const oNumLootCoins       = 0x44
 export const oDrawingDistance    = 0x45
-export const oRoom               = 0x46
+export const oRoom = 0x46
+export const oUnk1A8 = 0x48
 
 export const oGraphYOffset = 0x15
 
@@ -134,3 +138,25 @@ export const oCheckerBoardPlatformUnk1AC = 0x49
 
 /* Seesaw Platform */
 export const oSeesawPlatformPitchVel = 0x1B
+
+/* Goomba */
+export const oGoombaSize                = 0x1B
+export const oGoombaScale               = 0x1C
+export const oGoombaWalkTimer           = 0x1D
+export const oGoombaTargetYaw           = 0x1E
+export const oGoombaBlinkTimer          = 0x1F
+export const oGoombaTurningAwayFromWall = 0x20
+export const oGoombaRelativeSpeed = 0x21
+
+
+/* Goomba */
+    /* oBehParams2ndByte */
+    export const GOOMBA_BP_SIZE_MASK = 0x00000003
+    export const GOOMBA_SIZE_REGULAR = 0
+    export const GOOMBA_SIZE_HUGE = 1
+    export const GOOMBA_SIZE_TINY = 2
+    export const GOOMBA_BP_TRIPLET_FLAG_MASK = 0x000000FC
+    /* oAction */
+    export const GOOMBA_ACT_WALK = 0
+    export const GOOMBA_ACT_ATTACKED_MARIO = 1
+    export const GOOMBA_ACT_JUMP = 2

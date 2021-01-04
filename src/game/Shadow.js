@@ -4,7 +4,7 @@ import * as Mario from "./Mario"
 import { atan2s } from "../engine/math_util"
 import { make_vertex, round_float } from "./GeoMisc"
 import * as Gbi from "../include/gbi"
-import { dl_shadow_circle, dl_shadow_9_verts, dl_shadow_end } from "../common_gfx/segment2"
+import { dl_shadow_circle, dl_shadow_9_verts, dl_shadow_end, dl_shadow_4_verts } from "../common_gfx/segment2"
 
 export const SHADOW_CIRCLE_9_VERTS = 0
 export const SHADOW_CIRCLE_4_VERTS = 1
@@ -162,6 +162,9 @@ const calculate_vertex_xyz = (index, s, posVtx, shadowVertexType) => {
             case SHADOW_WITH_9_VERTS:
                 posVtx[1] = SurfaceCollision.find_floor_height_and_data(posVtx[0], s.parentY, posVtx[2], {})
                 break
+            case SHADOW_WITH_4_VERTS:
+                posVtx[1] = extrapolate_vertex_y_position(s, posVtx[0], posVtx[2])
+                break
             default: throw "unimplemented shadow vertex type"
         }
     }
@@ -171,6 +174,11 @@ const calculate_vertex_xyz = (index, s, posVtx, shadowVertexType) => {
 const get_texture_coords_9_vertices = (vertexNum, textures) => {
     textures.X = vertexNum % 3 * 15 - 15
     textures.Y = Math.floor(vertexNum / 3) * 15 - 15
+}
+
+const get_texture_coords_4_vertices = (vertexNum, textures) => {
+    textures.X = (vertexNum % 2) * 2 * 15 - 15
+    textures.Y = Math.floor(vertexNum / 2) * 2 * 15 - 15
 }
 
 const make_shadow_vertex_at_xyz = (vertices, index, relX, relY, relZ, alpha, shadowVertexType) => {
@@ -184,6 +192,9 @@ const make_shadow_vertex_at_xyz = (vertices, index, relX, relY, relZ, alpha, sha
     switch (shadowVertexType) {
         case SHADOW_WITH_9_VERTS:
             get_texture_coords_9_vertices(index, textures)
+            break
+        case SHADOW_WITH_4_VERTS:
+            get_texture_coords_4_vertices(index, textures)
             break
         default: throw "unimplmented shadow vertex type"
     }
@@ -225,7 +236,9 @@ const add_shadow_to_display_list = (displayList, verts, shadowVertexType, shadow
             Gbi.gSPDisplayList(displayList, dl_shadow_9_verts)
             break
         case SHADOW_WITH_4_VERTS:
-            throw "need to add 4 verts shadow"
+            Gbi.gSPVertex(displayList, verts, 4, 0)
+            Gbi.gSPDisplayList(displayList, dl_shadow_4_verts)
+            break
     }
     Gbi.gSPDisplayList(displayList, dl_shadow_end)
     Gbi.gSPEndDisplayList(displayList)
@@ -253,6 +266,21 @@ const create_shadow_player = (xPos, yPos, zPos, shadowScale, solidity, isLuigi) 
     return displayList
 }
 
+const create_shadow_circle_4_verts = (xPos, yPos, zPos, shadowScale, solidity) => {
+    const shadow = {}
+
+    if (init_shadow(shadow, xPos, yPos, zPos, shadowScale, solidity) != 0) return
+
+    const verts = new Array(4)
+    const displayList = []
+
+    for (let i = 0; i < 4; i++) {
+        make_shadow_vertex(verts, i, shadow, SHADOW_WITH_4_VERTS)
+    }
+    add_shadow_to_display_list(displayList, verts, SHADOW_WITH_4_VERTS, SHADOW_SHAPE_CIRCLE)
+    return displayList
+}
+
 export const create_shadow_below_xyz = (xPos, yPos, zPos, shadowScale, shadowSolidity, shadowType) => {
 
     const floorWrapper = {}
@@ -265,6 +293,8 @@ export const create_shadow_below_xyz = (xPos, yPos, zPos, shadowScale, shadowSol
     switch (shadowType) {
         case SHADOW_CIRCLE_PLAYER:
             return create_shadow_player(xPos, yPos, zPos, shadowScale, shadowSolidity, false)
+        case SHADOW_CIRCLE_4_VERTS:
+            return create_shadow_circle_4_verts(xPos, yPos, zPos, shadowScale, shadowSolidity)
         default: throw "unimplemented shadow type - create_shadow_below_xyz"
     }
 

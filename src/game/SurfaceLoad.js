@@ -1,6 +1,6 @@
 import * as Surfaces from "../include/surface_terrains"
 import { BOUNDS_EXTENSION } from "../include/extend_bounds"
-import { spawn_special_objects } from "./MacroSpecialObjects"
+import { spawn_special_objects, spawn_macro_objects } from "./MacroSpecialObjects"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { oDistanceToMario, oCollisionDistance, oDrawingDistance, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oPosX, oFaceAnglePitch } from "../include/object_constants"
 import { GRAPH_RENDER_ACTIVE } from "../engine/graph_node"
@@ -278,6 +278,11 @@ class SurfaceLoad {
                 continue
             }
         }
+
+        if (macroObjects) {
+            if (macroObjects[0].preset < 30) throw "spawn objects shortcut method?"
+            else spawn_macro_objects(index, macroObjects)
+        } 
 
         this.gNumStaticSurfaceNodes = this.gSurfaceNodesAllocated
         this.gNumStaticSurfaces = this.gSurfacesAllocated

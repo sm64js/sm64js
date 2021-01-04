@@ -122,17 +122,17 @@ export const geo_obj_init_animation = (graphNode, anim) => {
 
 }
 
-export const init_graph_node_billboard = (drawingLayer, displayList, translation) => {
-    const graphNode = {
-        node: {},
-        translation: [...translation],
-        displayList
+export const geo_obj_init_animation_accel = (graphNode, anim, animAccel) => {
+
+    if (graphNode.unk38.curAnim != anim) {
+        graphNode.unk38.curAnim = anim
+        graphNode.unk38.animFrameAccelAssist = (anim.unk04 << 16) + ((anim.flags & Mario.ANIM_FLAG_FORWARD) ? animAccel : -animAccel)
+        graphNode.unk38.animFrame = graphNode.unk38.animFrameAccelAssist >> 16
+        graphNode.unk38.animYTrans = 0
     }
 
-    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_BILLBOARD)
-    graphNode.node.flags = (drawingLayer << 8) | (graphNode.node.flags & 0xFF)
+    graphNode.unk38.animAccel = animAccel
 
-    return graphNode
 }
 
 export const geo_reset_object_node = (graphNode) =>  {
@@ -421,6 +421,19 @@ export const init_graph_node_animated_part = (drawingLayer, displayList, transla
 
     return graphNode
 
+}
+
+export const init_graph_node_billboard = (drawingLayer, displayList, translation) => {
+    const graphNode = {
+        node: {},
+        translation: [...translation],
+        displayList
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_BILLBOARD)
+    graphNode.node.flags = (drawingLayer << 8) | (graphNode.node.flags & 0xFF)
+
+    return graphNode
 }
 
 export const init_graph_node_camera = (pool, graphNode, pos, focus, func, mode) => {

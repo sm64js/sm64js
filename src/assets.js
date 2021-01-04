@@ -21,6 +21,10 @@ export const assets = {
 "actors/checkerboard_platform/checkerboard_platform.rgba16.png": [32, 32, 2048, { "jp": [2032944, 52288], "us": [2040320, 52288], "eu": [1912288, 52288], "sh": [1888800, 52288] }],
 "actors/checkerboard_platform/checkerboard_platform_side.rgba16.png": [32, 16, 1024, { "jp": [2032944, 51264], "us": [2040320, 51264], "eu": [1912288, 51264], "sh": [1888800, 51264] }],
 
+"actors/goomba/goomba_body.rgba16.png": [32, 32, 2048, { "jp": [2032944, 103728], "us": [2040320, 103728], "eu": [1912288, 103728], "sh": [1888800, 103728] }],
+"actors/goomba/goomba_face.rgba16.png": [32, 32, 2048, { "jp": [2032944, 105776], "us": [2040320, 105776], "eu": [1912288, 105776], "sh": [1888800, 105776] }],
+"actors/goomba/goomba_face_blink.rgba16.png": [32, 32, 2048, { "jp": [2032944, 107824], "us": [2040320, 107824], "eu": [1912288, 107824], "sh": [1888800, 107824] }],
+
 "textures/intro_raw/mario_face_shine.ia8.png": [32,32,1024,{"jp":[2503888],"us":[2511696],"eu":[2380496],"sh":[2357264]}],
 "textures/intro_raw/red_star_0.rgba16.png": [32,32,2048,{"jp":[2457352],"us":[2465160],"eu":[2333960],"sh":[2310728]}],
 "textures/intro_raw/red_star_1.rgba16.png": [32,32,2048,{"jp":[2459400],"us":[2467208],"eu":[2336008],"sh":[2312776]}],

@@ -18,6 +18,10 @@ export const ACTIVE_FLAG_UNK10                  =  (1 << 10) // 0x0400
 
 export const ACTIVE_FLAGS_DEACTIVATED = 0
 
+export const OBJ_ACT_HORIZONTAL_KNOCKBACK = 100
+export const OBJ_ACT_VERTICAL_KNOCKBACK = 101
+export const OBJ_ACT_SQUISHED = 102
+
 export const OBJ_MOVE_LANDED  = (1 << 0) // 0x0001
 export const OBJ_MOVE_ON_GROUND  = (1 << 1) // 0x0002  // mutually exclusive to OBJ_MOVE_LANDED
 export const OBJ_MOVE_LEFT_GROUND  = (1 << 2) // 0x0004

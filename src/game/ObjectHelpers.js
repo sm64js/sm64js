@@ -1,11 +1,20 @@
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { AreaInstance as Area } from "./Area"
-import { geo_obj_init, geo_obj_init_animation_accel } from "../engine/graph_node"
-import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations } from "../include/object_constants"
+import { geo_obj_init, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
+import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations, ACTIVE_FLAGS_DEACTIVATED } from "../include/object_constants"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { atan2s, mtxf_rotate_zxy_and_translate } from "../engine/math_util"
 import { sins, coss } from "../utils"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
+
+export const cur_obj_extend_animation_if_at_end = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    const sp4 = o.header.gfx.unk38.animFrame
+    const sp0 = o.header.gfx.unk38.curAnim.unk08 - 2
+
+    if (sp4 == sp0) o.header.gfx.unk38.animFrame--
+}
 
 export const geo_switch_anim_state = (run, node) => {
     if (run == 1) {
@@ -113,6 +122,14 @@ export const linear_mtxf_transpose_mul_vec3f = (m, dst, v) => {
     }
 }
 
+export const cur_obj_update_floor_and_resolve_wall_collisions = (steepSlopeDegrees) => {
+    //// TODO
+}
+
+export const cur_obj_update_floor_and_walls = () => {
+    cur_obj_update_floor_and_resolve_wall_collisions(60)
+}
+
 export const spawn_object_relative = (behaviorParam, relativePosX, relativePosY, relativePosZ, parent, model, behavior) => {
 
     const obj = spawn_object_at_origin(parent, model, behavior)
@@ -195,6 +212,19 @@ export const cur_obj_within_12k_bounds = () => {
 export const cur_obj_become_tangible = () => {
     const o = ObjectListProc.gCurrentObject
     o.rawData[oIntangibleTimer] = 0
+}
+
+export const cur_obj_become_intangible = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oIntangibleTimer] = -1
+}
+
+export const cur_obj_hide = () => {
+    o.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
+}
+
+export const obj_mark_for_deletion = (obj) => {
+    obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED
 }
 
 export const cur_obj_scale = (scale) => {

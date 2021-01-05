@@ -1,7 +1,7 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
-import { oIntangibleTimer, oPosY, oPosX, oPosZ, oInteractType } from "../include/object_constants"
 import { networkData } from "../socket"
-import { INTERACT_PLAYER } from "./Interaction"
+import { oIntangibleTimer, oPosY, oPosX, oPosZ, oInteractType, oInteractionSubtype } from "../include/object_constants"
+import { INT_SUBTYPE_DELAY_INVINCIBILITY, INTERACT_PLAYER} from "./Interaction"
 
 const clear_object_collision = (startNode) => {
     let sp4 = startNode.next
@@ -51,6 +51,34 @@ const detect_object_hitbox_overlap = (a, b) => {
     }
 }
 
+const detect_object_hurtbox_overlap = (a, b) => {
+    const sp3C = a.rawData[oPosY] - a.hitboxDownOffset
+    const sp38 = b.rawData[oPosY] - b.hitboxDownOffset
+    const dx = a.rawData[oPosX] - b.rawData[oPosX]
+    const dz = a.rawData[oPosZ] - b.rawData[oPosZ]
+    const collisionRadius = a.hurtboxRadius + b.hurtboxRadius
+    const distance = Math.sqrt(dx * dx + dz * dz)
+
+    if (a == ObjectListProc.gMarioObject) {
+        b.rawData[oInteractionSubtype] |= INT_SUBTYPE_DELAY_INVINCIBILITY
+    }
+
+    if (collisionRadius > distance) {
+        let sp20 = a.hitboxHeight + sp3C
+        let sp1C = b.hurtboxHeight + sp38
+
+        if (sp3C > sp1C) return 0
+        if (sp20 < sp38) return 0
+
+        if (a == ObjectListProc.gMarioObject) {
+            b.rawData[oInteractionSubtype] &= ~INT_SUBTYPE_DELAY_INVINCIBILITY
+        }
+
+        return 1
+
+    }
+}
+
 
 const detect_player_hitbox_overlap = (local, remote) => {
 
@@ -90,12 +118,11 @@ const detect_player_hitbox_overlap = (local, remote) => {
 
         a.collidedObjInteractTypes |= b.rawData[oInteractType]
         b.collidedObjInteractTypes |= a.rawData[oInteractType]
-
         return 1
 
     }
-
 }
+
 
 const check_collision_in_list = (a, bStart) => {
     
@@ -105,7 +132,6 @@ const check_collision_in_list = (a, bStart) => {
             const b = bNode.wrapperObject
             if (b.rawData[oIntangibleTimer] == 0) {
                 if (detect_object_hitbox_overlap(a, b) && b.hurtboxRadius != 0.0) {
-                    throw "unimplemented hurt box"
                     detect_object_hurtbox_overlap(a, b)
                 }
             }
@@ -120,18 +146,14 @@ const check_player_object_collision = () => {
 
     if (!localMarioObj.localMario) throw "error: this is not right - check_player_object_collision"
     
-    //check_collision_in_list(sp18, sp18.header.next) ///only for players collide with players
     check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE])
-    //check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_LEVEL])
-    //check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR])
-    //check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE])
-    //check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE])
-    //check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE])
+    check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE])
 
     Object.values(networkData.remotePlayers).forEach(remotePlayer => {
         const remoteMarioObj = remotePlayer.marioState.marioObj
         detect_player_hitbox_overlap(localMarioObj, remotePlayer)
         check_collision_in_list(remoteMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE])
+        check_collision_in_list(remoteMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE])
     })
 
 }

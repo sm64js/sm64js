@@ -105,13 +105,12 @@ export const INT_STATUS_HIT_MINE = (1 << 21) /* 0x00200000 */
 export const INT_STATUS_STOP_RIDING = (1 << 22) /* 0x00400000 */
 export const INT_STATUS_TOUCHED_BOB_OMB = (1 << 23) /* 0x00800000 */
 
-const ATTACK_PUNCH                 = 1
-const ATTACK_KICK_OR_TRIP          = 2
-const ATTACK_FROM_ABOVE            = 3
-const ATTACK_GROUND_POUND_OR_TWIRL = 4
-const ATTACK_FAST_ATTACK           = 5
-const ATTACK_FROM_BELOW            = 6
-
+export const ATTACK_PUNCH                 = 1
+export const ATTACK_KICK_OR_TRIP          = 2
+export const ATTACK_FROM_ABOVE            = 3
+export const ATTACK_GROUND_POUND_OR_TWIRL = 4
+export const ATTACK_FAST_ATTACK           = 5
+export const ATTACK_FROM_BELOW            = 6
 
 let sDelayInvincTimer = false
 let sInvulnerable = false

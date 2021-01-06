@@ -2,7 +2,7 @@ import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProc
 import { oGoombaSize, GOOMBA_BP_SIZE_MASK, oBehParams2ndByte, oGoombaScale, oDrawingDistance, oDamageOrCoinValue, oGravity, oForwardVel, oGoombaBlinkTimer, oAnimState, GOOMBA_ACT_ATTACKED_MARIO } from "../../include/object_constants"
 import * as ObjBhvs2 from "../ObjBehaviors2"
 import { INTERACT_BOUNCE_TOP } from "../Interaction"
-import { cur_obj_scale, cur_obj_init_animation_with_accel_and_sound } from "../ObjectHelpers"
+import { cur_obj_scale, cur_obj_init_animation_with_accel_and_sound, cur_obj_update_floor_and_walls, cur_obj_move_standard } from "../ObjectHelpers"
 
 const sGoombaProperties = [
     { scale: 1.5, deathSound: null, drawDistance: 4000, damage: 1 },
@@ -73,6 +73,8 @@ export const bhv_goomba_update = () => {
         ObjBhvs2.obj_update_blinking(blinkWrapper, 30, 50, 5)
         o.rawData[oGoombaBlinkTimer] = blinkWrapper.value
 
+        cur_obj_update_floor_and_walls()
+
         let animSpeed = o.rawData[oForwardVel] / o.rawData[oGoombaScale] * 0.4
         if (animSpeed < 1.0) { animSpeed = 1.0 }
         cur_obj_init_animation_with_accel_and_sound(0, animSpeed)
@@ -81,6 +83,8 @@ export const bhv_goomba_update = () => {
                                                 sGoombaAttackHandlers[o.rawData[oGoombaSize] & 1])) {
             console.log("mark goomba as dead")
         }
+
+        cur_obj_move_standard(-78)
 
     } else {
         o.rawData[oAnimState] = 1

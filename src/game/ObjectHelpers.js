@@ -1,11 +1,13 @@
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { AreaInstance as Area } from "./Area"
 import { geo_obj_init, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
-import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations, ACTIVE_FLAGS_DEACTIVATED } from "../include/object_constants"
+import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations, ACTIVE_FLAGS_DEACTIVATED, OBJ_MOVE_ABOVE_DEATH_BARRIER, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oFloorHeight, oFloor, oFloorType, oFloorRoom, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR, oWallHitboxRadius, oWallAngle, oMoveFlags, OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, oBounciness, oBuoyancy, oDragStrength, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND, OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER, OBJ_MOVE_ENTERED_WATER, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND, OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, oRoom, ACTIVE_FLAG_UNK10, OBJ_MOVE_13, OBJ_MOVE_LANDED } from "../include/object_constants"
+
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { atan2s, mtxf_rotate_zxy_and_translate } from "../engine/math_util"
 import { sins, coss } from "../utils"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
+import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 
 export const cur_obj_extend_animation_if_at_end = () => {
     const o = ObjectListProc.gCurrentObject
@@ -122,12 +124,343 @@ export const linear_mtxf_transpose_mul_vec3f = (m, dst, v) => {
     }
 }
 
-export const cur_obj_update_floor_and_resolve_wall_collisions = (steepSlopeDegrees) => {
-    //// TODO
+export const abs_angle_diff = (x0, x1) => {
+    const diff = x1 - x0
+
+    if (diff == -0x8000) {
+        diff = -0x7FFF
+    }
+
+    if (diff < 0) {
+        diff = -diff
+    }
+
+    return diff
 }
 
+export const cur_obj_resolve_wall_collisions = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    const offsetY = 10.0
+    const radius = o.rawData[oWallHitboxRadius]
+
+    if (radius > 0.1) {
+        const collisionData = {
+            offsetY,
+            radius,
+            x: parseInt(o.rawData[oPosX]),
+            y: parseInt(o.rawData[oPosY]),
+            z: parseInt(o.rawData[oPosZ]),
+            walls: []
+        }
+
+        const numCollisions = Spawn.SurfaceCollision.find_wall_collisions(collisionData)
+        if (numCollisions != 0) {
+            o.rawData[oPosX] = collisionData.x
+            o.rawData[oPosY] = collisionData.y
+            o.rawData[oPosZ] = collisionData.z
+
+            const wall = collisionData.walls[collisionData.numWalls - 1]
+
+            o.rawData[oWallAngle] = atan2s(wall.normal.z, wall.normal.x)
+            if (abs_angle_diff(o.rawData[oWallAngle], o.rawData[oMoveAngleYaw]) > 0x4000) {
+                return 1
+            } else {
+                return 0
+            }
+
+        }
+    }
+
+    return 0
+}
+
+export const cur_obj_update_floor_height_and_get_floor = () => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    const floorWrapper = {}
+    o.rawData[oFloorHeight] = Spawn.SurfaceCollision.find_floor(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], floorWrapper)
+    return floorWrapper.floor
+}
+
+
+export const cur_obj_update_floor = () => {
+    const o = ObjectListProc.gCurrentObject
+    const floor = cur_obj_update_floor_height_and_get_floor()
+    o.rawData[oFloor] = floor
+
+    if (floor) {
+        if (floor.type == SURFACE_BURNING) o.rawData[oMoveFlags] |= OBJ_MOVE_ABOVE_LAVA
+        else if (floor.type == SURFACE_DEATH_PLANE) o.rawData[oMoveFlags] |= OBJ_MOVE_ABOVE_DEATH_BARRIER
+
+        o.rawData[oFloorType] = floor.type
+        o.rawData[oFloorRoom] = floor.room
+    } else {
+        o.rawData[oFloorType] = 0
+        o.rawData[oFloorRoom] = 0
+    }
+
+}
+
+export const cur_obj_update_floor_and_resolve_wall_collisions = (steepSlopeDegrees) => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.rawData[oMoveFlags] &= ~(OBJ_MOVE_ABOVE_LAVA | OBJ_MOVE_ABOVE_DEATH_BARRIER)
+
+    if (o.activeFlags & (ACTIVE_FLAG_FAR_AWAY | ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
+        cur_obj_update_floor()
+        o.rawData[oMoveFlags] &= ~OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER
+
+        if (o.rawData[oPosY] > o.rawData[oFloorHeight]) {
+            o.rawData[oMoveFlags] |= OBJ_MOVE_IN_AIR
+        }
+    } else {
+        o.rawData[oMoveFlags] &= ~OBJ_MOVE_HIT_WALL
+        if (cur_obj_resolve_wall_collisions()) {
+            o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_WALL
+        }
+
+        cur_obj_update_floor()
+
+        if (o.rawData[oPosY] > o.rawData[oFloorHeight]) {
+            o.rawData[oMoveFlags] |= OBJ_MOVE_IN_AIR
+        }
+
+        /// TODO detect steep floor as hitting wall
+
+    }
+}
 export const cur_obj_update_floor_and_walls = () => {
     cur_obj_update_floor_and_resolve_wall_collisions(60)
+}
+
+export const clear_move_flag = (bitSet, flag) => {
+    if (bitSet & flag) {
+        bitSet &= flag ^ 0xFFFFFFFF
+        return { result: 1, bitSet }
+    } else {
+        return { result: 0, bitSet }
+    }
+}
+
+export const cur_obj_move_update_ground_air_flags = (gravity, bounciness) => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    o.rawData[oMoveFlags] &= ~OBJ_MOVE_13
+
+    if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
+        // On the first frame that we touch the ground, set OBJ_MOVE_LANDED.
+        // On subsequent frames, set OBJ_MOVE_ON_GROUND
+        if (!(o.rawData[oMoveFlags] & OBJ_MOVE_ON_GROUND)) {
+
+            const { result, newBitSet } = clear_move_flag(o.rawData[oMoveFlags], OBJ_MOVE_LANDED)
+            o.rawData[oMoveFlags] = newBitSet
+            if (result) {
+                o.rawData[oMoveFlags] |= OBJ_MOVE_ON_GROUND
+            } else {
+                o.rawData[oMoveFlags] |= OBJ_MOVE_LANDED
+            }
+        }
+
+        o.rawData[oPosY] = o.rawData[oFloorHeight]
+
+        if (o.rawData[oVelY] < 0.0) {
+            o.rawData[oVelY] *= bounciness
+        }
+
+        if (o.rawData[oVelY] > 5.0) {
+            //! If OBJ_MOVE_13 tracks bouncing, it overestimates, since velY
+            // could be > 5 here without bounce (e.g. jump into misa)
+            o.rawData[oMoveFlags] |= OBJ_MOVE_13
+        }
+    } else {
+        o.rawData[oMoveFlags] &= ~OBJ_MOVE_LANDED
+        const { result, newBitSet } = clear_move_flag(o.rawData[oMoveFlags], OBJ_MOVE_ON_GROUND)
+        o.rawData[oMoveFlags] = newBitSet
+        if (result) {
+            o.rawData[oMoveFlags] |= OBJ_MOVE_LEFT_GROUND
+        }
+    }
+
+    o.rawData[oMoveFlags] &= ~OBJ_MOVE_MASK_IN_WATER
+}
+
+export const cur_obj_move_y_and_get_water_level = (gravity, buoyancy) => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    let waterLevel
+
+    o.rawData[oVelY] += gravity + buoyancy
+    if (o.rawData[oVelY] < -78.0) {
+        o.rawData[oVelY] = -78.0
+    }
+
+    o.rawData[oPosY] += o.rawData[oVelY]
+    if (o.activeFlags & ACTIVE_FLAG_UNK10) {
+        waterLevel = -11000.0
+    } else {
+        waterLevel = Spawn.SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ])
+    }
+
+    return waterLevel
+}
+
+
+export const cur_obj_move_xz = (steepSlopeNormalY, careAboutEdgesAndSteepSlopes) => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    const intendedX = o.rawData[oPosX] + o.rawData[oVelX]
+    const intendedZ = o.rawData[oPosZ] + o.rawData[oVelZ]
+
+    const intendedFloorWrapper = {}
+    const intendedFloorHeight = Spawn.SurfaceCollision.find_floor(intendedX, o.rawData[oPosY], intendedZ, intendedFloorWrapper)
+    const deltaFloorHeight = intendedFloorHeight - o.rawData[oFloorHeight]
+
+
+    o.rawData[oMoveFlags] &= ~OBJ_MOVE_HIT_EDGE 
+
+    if (o.rawData[oRoom] != -1 && intendedFloorWrapper.floor) {
+        if (intendedFloorWrapper.floor.room != 0 && o.rawData[oRoom] != intendedFloorWrapper.floor.room && intendedFloorWrapper.floor.room != 18) {
+            // Don't leave native room
+            return 0
+        }
+    }
+
+    if (intendedFloorHeight < -10000.0) {
+        // Don't move into OoB
+        o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_EDGE
+        return 0
+    } else if (deltaFloorHeight < 5.0) {
+        if (!careAboutEdgesAndSteepSlopes) {
+            // If we don't care about edges or steep slopes, okay to move
+            o.rawData[oPosX] = intendedX
+            o.rawData[oPosZ] = intendedZ
+            return 1
+        } else if (deltaFloorHeight < -50.0 && (o.rawData[oMoveFlags] & OBJ_MOVE_ON_GROUND)) {
+            // Don't walk off an edge
+            o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_EDGE
+            return 0
+        } else if (intendedFloorWrapper.floor.normal.y > steepSlopeNormalY) {
+            // Allow movement onto a slope, provided it's not too steep
+            o.rawData[oPosX] = intendedX
+            o.rawData[oPosZ] = intendedZ
+            return 1
+        } else {
+            // We are likely trying to move onto a steep downward slope
+            o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_EDGE
+            return 0
+        }
+    } else if ((intendedFloorWrapper.floor.normal.y) > steepSlopeNormalY || o.rawData[oPosY] > intendedFloorHeight) {
+        // Allow movement upward, provided either:
+        // - The target floor is flat enough (e.g. walking up stairs)
+        // - We are above the target floor (most likely in the air)
+        o.rawData[oPosX] = intendedX
+        o.rawData[oPosZ] = intendedZ
+        //! Returning FALSE but moving anyway (not exploitable; return value is
+        //  never used)
+    }
+
+    // We are likely trying to move onto a steep upward slope
+    return 0
+}
+
+export const cur_obj_move_y = (gravity, bounciness, buoyancy) => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    o.rawData[oMoveFlags] &= ~OBJ_MOVE_LEFT_GROUND
+
+    if (o.rawData[oMoveFlags] & OBJ_MOVE_AT_WATER_SURFACE) {
+        if (o.rawData[oVelY] > 5.0) {
+            o.rawData[oMoveFlags] &= ~OBJ_MOVE_MASK_IN_WATER
+            o.rawData[oMoveFlags] |= OBJ_MOVE_LEAVING_WATER
+        }
+    }
+
+    if (!(o.rawData[oMoveFlags] & OBJ_MOVE_MASK_IN_WATER)) {
+        const waterLevel = cur_obj_move_y_and_get_water_level(gravity, 0.0)
+        if (o.rawData[oPosY] > waterLevel) {
+            //! We only handle floor collision if the object does not enter
+            //  water. This allows e.g. coins to clip through floors if they
+            //  enter water on the same frame.
+            cur_obj_move_update_ground_air_flags(gravity, bounciness)
+        } else {
+            o.rawData[oMoveFlags] |= OBJ_MOVE_ENTERED_WATER
+            o.rawData[oMoveFlags] &= ~OBJ_MOVE_MASK_ON_GROUND
+        }
+    } else {
+        o.rawData[oMoveFlags] &= ~OBJ_MOVE_ENTERED_WATER
+
+        const waterLevel = cur_obj_move_y_and_get_water_level(gravity, buoyancy)
+        if (o.rawData[oPosY] < waterLevel) {
+            throw "cur_obj_move_y implement underwater"
+            cur_obj_move_update_underwater_flags()
+        } else {
+            if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
+                o.rawData[oPosY] = o.rawData[oFloorHeight]
+                o.rawData[oMoveFlags] &= ~OBJ_MOVE_MASK_IN_WATER
+            } else {
+                o.rawData[oPosY] = waterLevel
+                o.rawData[oVelY] = 0.0
+                o.rawData[oMoveFlags] &= ~(OBJ_MOVE_UNDERWATER_OFF_GROUND | OBJ_MOVE_UNDERWATER_ON_GROUND)
+                o.rawData[oMoveFlags] |= OBJ_MOVE_AT_WATER_SURFACE
+            }
+        }
+    }
+
+    if (o.rawData[oMoveFlags] & OBJ_MOVE_MASK_33) {
+        o.rawData[oMoveFlags] &= ~OBJ_MOVE_IN_AIR
+    } else {
+        o.rawData[oMoveFlags] |= OBJ_MOVE_IN_AIR
+    }
+}
+
+
+export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
+    const o = ObjectListProc.gCurrentObject
+    const gravity = o.rawData[oGravity]
+    const bounciness = o.rawData[oBounciness]
+    const bouyancy = o.rawData[oBuoyancy]
+    const dragStrength = o.rawData[oDragStrength]
+    let steepSlopeNormalY
+    let careAboutEdgesAndSteepSlopes = 0
+    let negativeSpeed = 0
+
+    //! Because some objects allow these active flags to be set but don't
+    //  avoid updating when they are, we end up with "partial" updates, where
+    //  an object's internal state will be updated, but it doesn't move.
+    //  This allows numerous glitches and is typically referred to as
+    //  deactivation (though this term has a different meaning in the code).
+    //  Objects that do this will be marked with //PARTIAL_UPDATE.
+
+    if (!(o.activeFlags & (ACTIVE_FLAG_FAR_AWAY | ACTIVE_FLAG_IN_DIFFERENT_ROOM))) {
+        if (steepSlopeAngleDegrees < 0) {
+            careAboutEdgesAndSteepSlopes = 1
+            steepSlopeAngleDegrees = -steepSlopeAngleDegrees
+        }
+
+        steepSlopeNormalY = coss(steepSlopeAngleDegrees * (0x10000 / 360))
+
+        cur_obj_compute_vel_xz()
+        cur_obj_apply_drag_xz(dragStrength)
+
+        cur_obj_move_xz(steepSlopeNormalY, careAboutEdgesAndSteepSlopes)
+        cur_obj_move_y(gravity, bounciness, bouyancy)
+
+        if (o.rawData[oForwardVel] < 0) {
+            negativeSpeed = 1
+        }
+
+        o.rawData[oForwardVel] = Math.sqrt(Math.pow(o.rawData[oVelX], 2) + Math.pow(o.rawData[oVelZ], 2))
+        if (negativeSpeed) {
+            o.rawData[oForwardVel] = -o.rawData[oForwardVel]
+        }
+    }
+
 }
 
 export const spawn_object_relative = (behaviorParam, relativePosX, relativePosY, relativePosZ, parent, model, behavior) => {
@@ -245,6 +578,40 @@ export const cur_obj_compute_vel_xz = () => {
     const o = ObjectListProc.gCurrentObject
     o.rawData[oVelX] = o.rawData[oForwardVel] * sins(o.rawData[oMoveAngleYaw])
     o.rawData[oVelZ] = o.rawData[oForwardVel] * coss(o.rawData[oMoveAngleYaw])
+}
+
+export const apply_drag_to_value = (ptr, dragStrength) => {
+
+    if (ptr.value != 0) {
+        //! Can overshoot if |*value| > 1/(dragStrength * 0.0001)
+        const decel = (ptr.value) * (ptr.value) * (dragStrength * 0.0001)
+
+        if (ptr.value > 0) {
+            ptr.value -= decel
+            if (ptr.value < 0.001) {
+                ptr.value = 0
+            }
+        } else {
+            ptr.value += decel
+            if (ptr.value > -0.001) {
+                ptr.value = 0
+            }
+        }
+    }
+}
+
+
+export const cur_obj_apply_drag_xz = (dragStrength) => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    const wrapper = { value: o.rawData[oVelX] }
+    apply_drag_to_value(wrapper, dragStrength)
+    o.rawData[oVelX] = wrapper.value
+
+    wrapper.value = o.rawData[oVelZ]
+    apply_drag_to_value(wrapper, dragStrength)
+    o.rawData[oVelZ] = wrapper.value
 }
 
 export const cur_obj_move_using_vel_and_gravity = () => {

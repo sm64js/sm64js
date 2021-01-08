@@ -18,6 +18,11 @@ export const ACTIVE_FLAG_UNK10                  =  (1 << 10) // 0x0400
 
 export const ACTIVE_FLAGS_DEACTIVATED = 0
 
+export const OBJ_ACT_HORIZONTAL_KNOCKBACK = 100
+export const OBJ_ACT_VERTICAL_KNOCKBACK = 101
+export const OBJ_ACT_SQUISHED = 102
+
+/* oMoveFlags */
 export const OBJ_MOVE_LANDED  = (1 << 0) // 0x0001
 export const OBJ_MOVE_ON_GROUND  = (1 << 1) // 0x0002  // mutually exclusive to OBJ_MOVE_LANDED
 export const OBJ_MOVE_LEFT_GROUND  = (1 << 2) // 0x0004
@@ -33,6 +38,12 @@ export const OBJ_MOVE_ABOVE_LAVA  = (1 << 11) // 0x0800
 export const OBJ_MOVE_LEAVING_WATER  = (1 << 12) // 0x1000
 export const OBJ_MOVE_13  = (1 << 13) // 0x2000
 export const OBJ_MOVE_ABOVE_DEATH_BARRIER = (1 << 14) // 0x4000
+
+export const OBJ_MOVE_MASK_ON_GROUND = (OBJ_MOVE_LANDED | OBJ_MOVE_ON_GROUND)
+export const OBJ_MOVE_MASK_33 =  0x33
+export const OBJ_MOVE_MASK_IN_WATER = (OBJ_MOVE_ENTERED_WATER | OBJ_MOVE_AT_WATER_SURFACE | OBJ_MOVE_UNDERWATER_OFF_GROUND | OBJ_MOVE_UNDERWATER_ON_GROUND)
+export const OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER = (OBJ_MOVE_HIT_WALL | OBJ_MOVE_MASK_IN_WATER)
+export const OBJ_MOVE_MASK_NOT_AIR = ( OBJ_MOVE_LANDED | OBJ_MOVE_ON_GROUND | OBJ_MOVE_AT_WATER_SURFACE | OBJ_MOVE_UNDERWATER_ON_GROUND)
 
 /* oFlags */
 export const OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE        =  (1 <<  0) // 0x00000001
@@ -71,6 +82,9 @@ export const oFaceAngleRoll = 0x14
 
 export const oGravity = 0x17
 export const oFloorHeight = 0x18
+export const oMoveFlags = 0x19
+
+export const oAnimState = 0x1A
 
 export const oVelX = 0x09
 export const oVelY = 0x0A
@@ -92,7 +106,8 @@ export const oAngleVelPitch = 0x23
 export const oAngleVelYaw = 0x24
 export const oAngleVelRoll = 0x25
 export const oAnimations = 0x26
-
+export const oWallHitboxRadius = 0x28
+export const oDragStrength = 0x29
 export const oInteractType = 0x2A
 export const oInteractStatus = 0x2B
 
@@ -102,12 +117,15 @@ export const oParentRelativePosZ = 0x2E
 
 export const oBehParams2ndByte = 0x2F
 
+export const oTimer = 0x33
+export const oBounciness      = 0x34
 export const oDistanceToMario = 0x35
-export const oAngleToMario = 0x36
-export const oHomeX = 0x37
-export const oHomeY = 0x38
-export const oHomeZ = 0x39
-
+export const oAngleToMario    = 0x36
+export const oHomeX           = 0x37
+export const oHomeY           = 0x38
+export const oHomeZ           = 0x39
+export const oFriction        = 0x3A
+export const oBuoyancy        = 0x3B
 
 export const oDamageOrCoinValue  = 0x3E
 export const oHealth             = 0x3F
@@ -117,15 +135,18 @@ export const oInteractionSubtype = 0x42
 export const oCollisionDistance  = 0x43
 export const oNumLootCoins       = 0x44
 export const oDrawingDistance    = 0x45
-export const oRoom               = 0x46
+export const oRoom = 0x46
+export const oUnk1A8 = 0x48
+export const oWallAngle          = 0x4B
+export const oFloorType          = 0x4C
+export const oFloorRoom          = 0x4C
+export const oAngleToHome        = 0x4D
+export const oFloor = 0x4E
 
 export const oGraphYOffset = 0x15
 
 export const oAction = 0x31
 export const oSubAction = 0x32
-
-export const oTimer = 0x33
-
 
 /* Checkerboard Platform */
 export const oCheckerBoardPlatformUnkF8  = 0x1C
@@ -134,3 +155,25 @@ export const oCheckerBoardPlatformUnk1AC = 0x49
 
 /* Seesaw Platform */
 export const oSeesawPlatformPitchVel = 0x1B
+
+/* Goomba */
+export const oGoombaSize                = 0x1B
+export const oGoombaScale               = 0x1C
+export const oGoombaWalkTimer           = 0x1D
+export const oGoombaTargetYaw           = 0x1E
+export const oGoombaBlinkTimer          = 0x1F
+export const oGoombaTurningAwayFromWall = 0x20
+export const oGoombaRelativeSpeed = 0x21
+
+
+/* Goomba */
+    /* oBehParams2ndByte */
+    export const GOOMBA_BP_SIZE_MASK = 0x00000003
+    export const GOOMBA_SIZE_REGULAR = 0
+    export const GOOMBA_SIZE_HUGE = 1
+    export const GOOMBA_SIZE_TINY = 2
+    export const GOOMBA_BP_TRIPLET_FLAG_MASK = 0x000000FC
+    /* oAction */
+    export const GOOMBA_ACT_WALK = 0
+    export const GOOMBA_ACT_ATTACKED_MARIO = 1
+    export const GOOMBA_ACT_JUMP = 2

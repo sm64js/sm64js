@@ -4,6 +4,12 @@ export const int16 = (num) => {
     return num
 }
 
+export const uint16 = (num) => {
+    num = num > 65535 ? num - 65536 : num
+    num = num < 0 ? num + 65536 : num
+    return num
+}
+
 export const sins = (num) => {
     return Math.sin(num / 0x8000 * Math.PI)
 }

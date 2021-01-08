@@ -68,9 +68,9 @@ class ObjectListProcessor {
         this.gCheckingSurfaceCollisionsForCamera = 0
         this.gObjectLists = new Array(13).fill(0).map(() => { 
 
-            const blankObj = { header: {} }
-            blankObj.header.prev = blankObj
-            blankObj.header.next = blankObj
+            const blankObj = { gfx: {} }
+            blankObj.prev = blankObj
+            blankObj.next = blankObj
             return blankObj
 
         })

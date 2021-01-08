@@ -215,6 +215,23 @@ class GeoLayout {
         this.sCurrentLayout.index++
     }
 
+    node_billboard(args) {
+        let drawingLayer = 0
+        let params = args ? args[0] : 0
+        const translation = args ? [args[1], args[2], args[3]] : [0, 0, 0]
+
+        let displaylist
+
+        if (params & 0x80) {
+            throw "more implementation needed in geo node billboard"
+        }
+
+        const graphNode = GraphNode.init_graph_node_billboard(drawingLayer, displaylist, translation)
+
+        GraphNode.register_scene_graph_node(this, graphNode)
+        this.sCurrentLayout.index++
+    }
+
     node_scale(args) {
         let drawingLayer = 0
         const params = args[0]

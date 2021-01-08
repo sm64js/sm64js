@@ -78,6 +78,8 @@ import { yellow_sphere_seg5_texture_05000040 } from "./actors/yellow_sphere_smal
 
 import { checkerboard_platform_seg8_texture_0800C840, checkerboard_platform_seg8_texture_0800CC40 } from "./actors/checkerboard_platform/model.inc"
 
+import { goomba_seg8_texture_08019530, goomba_seg8_texture_08019D30, goomba_seg8_texture_0801A530 } from "./actors/goomba/model.inc"
+
 import {
     generic_09005800,
     generic_09006000,
@@ -158,8 +160,6 @@ import {
     snow_09009800
 } from "./textures/snow"
 
-
-
 import {
     grass_09000000,
     grass_09000800,
@@ -190,7 +190,7 @@ import {
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 15
+const textureVersion = 16
 
 const loadDataIntoGame = (data) => {
 
@@ -381,6 +381,10 @@ const loadDataIntoGame = (data) => {
 
     checkerboard_platform_seg8_texture_0800C840.push(...data["actors/checkerboard_platform/checkerboard_platform_side.rgba16.png"].data)
     checkerboard_platform_seg8_texture_0800CC40.push(...data["actors/checkerboard_platform/checkerboard_platform.rgba16.png"].data)
+
+    goomba_seg8_texture_08019530.push(...data["actors/goomba/goomba_body.rgba16.png"].data)
+    goomba_seg8_texture_08019D30.push(...data["actors/goomba/goomba_face.rgba16.png"].data)
+    goomba_seg8_texture_0801A530.push(...data["actors/goomba/goomba_face_blink.rgba16.png"].data)
 
     SkyboxWater.water_skybox_texture_00000.push(...data["water_skybox_texture_00000"].data)
     SkyboxWater.water_skybox_texture_00001.push(...data["water_skybox_texture_00001"].data)

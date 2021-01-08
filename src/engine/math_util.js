@@ -1,3 +1,5 @@
+import { coss, sins } from "../utils"
+
 export const approach_number = (current, target, inc, dec) => {
     if (current < target) {
         current += inc
@@ -59,6 +61,31 @@ export const mtxf_to_mtx = (dest, src) => {
             dest[i][j] = src[i][j]
         }
     }
+}
+
+export const mtxf_billboard = (dest, mtx, position, angle) => {
+    dest[0][0] = coss(angle)
+    dest[0][1] = sins(angle)
+    dest[0][2] = 0
+    dest[0][3] = 0
+
+    dest[1][0] = -dest[0][1]
+    dest[1][1] = dest[0][0]
+    dest[1][2] = 0
+    dest[1][3] = 0
+
+    dest[2][0] = 0
+    dest[2][1] = 0
+    dest[2][2] = 1
+    dest[2][3] = 0
+
+    dest[3][0] =
+        mtx[0][0] * position[0] + mtx[1][0] * position[1] + mtx[2][0] * position[2] + mtx[3][0]
+    dest[3][1] =
+        mtx[0][1] * position[0] + mtx[1][1] * position[1] + mtx[2][1] * position[2] + mtx[3][1]
+    dest[3][2] =
+        mtx[0][2] * position[0] + mtx[1][2] * position[1] + mtx[2][2] * position[2] + mtx[3][2]
+    dest[3][3] = 1
 }
 
 export const mtxf_cylboard = (dest, mtx, position, angle) => {
@@ -375,42 +402,4 @@ export const atan2s = (y, x) => {
 
     return parseInt(Math.atan2(x, y) * 10430.5)
 
-/*    let ret
-
-    if (x >= 0) {
-        if (y >= 0) {
-            if (y >= x) {
-                ret = Math.atan(x / y)
-            } else {
-                ret = 0x4000 - Math.atan(y / x)
-            }
-        } else {
-            y = -y
-            if (y < x) {
-                ret = 0x4000 + Math.atan(y / x)
-            } else {
-                ret = 0x8000 - Math.atan(x / y)
-            }
-        }
-    } else {
-        x = -x
-        if (y < 0) {
-            y = -y
-            if (y >= x) {
-                ret = 0x8000 + Math.atan(x / y)
-            } else {
-                ret = 0xC000 - Math.atan(y / x)
-            }
-        } else {
-            if (y < x) {
-                ret = 0xC000 + Math.atan(y / x)
-            } else {
-                ret = -Math.atan(x / y)
-            }
-        }
-    }
-
-    if (isNaN(ret)) return 0
-
-    return ret > 32767 ? ret - 65536 : ret*/
 }

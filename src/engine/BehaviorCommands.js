@@ -1,6 +1,6 @@
 import { ObjectListProcessorInstance as ObjListProc } from "../game/ObjectListProcessor"
-import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction, oAnimations, oInteractType, oHomeX, oHomeY, oHomeZ, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, oDistanceToMario, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, oAngleToMario, oMoveAngleYaw, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW } from "../include/object_constants"
-import { GRAPH_RENDER_CYLBOARD, geo_obj_init_animation } from "./graph_node"
+import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction, oAnimations, oInteractType, oHomeX, oHomeY, oHomeZ, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, oDistanceToMario, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, oAngleToMario, oMoveAngleYaw, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveFlags, OBJ_MOVE_ON_GROUND, oWallHitboxRadius, oGravity, oBounciness, oDragStrength, oFriction, oBuoyancy } from "../include/object_constants"
+import { GRAPH_RENDER_CYLBOARD, geo_obj_init_animation, GRAPH_RENDER_BILLBOARD } from "./graph_node"
 import { dist_between_objects, obj_angle_to_object } from "../game/ObjectHelpers"
 
 class BehaviorCommands {
@@ -8,6 +8,10 @@ class BehaviorCommands {
     constructor() {
         this.BHV_PROC_CONTINUE = 0
         this.BHV_PROC_BREAK    = 1
+    }
+
+    random_sign() {
+        return Math.random() > 0.5 ? 1 : -1
     }
 
     cur_obj_update() {
@@ -111,6 +115,18 @@ class BehaviorCommands {
         return this.BHV_PROC_CONTINUE
     }
 
+    set_obj_physics(args) {
+        ObjListProc.gCurrentObject.rawData[oWallHitboxRadius] = args.hitboxRadius
+        ObjListProc.gCurrentObject.rawData[oGravity] = args.gravity / 100.0
+        ObjListProc.gCurrentObject.rawData[oBounciness] = args.bounciness / 100.0
+        ObjListProc.gCurrentObject.rawData[oDragStrength] = args.dragStrenth / 100.0
+        ObjListProc.gCurrentObject.rawData[oFriction] = args.friction / 100.0
+        ObjListProc.gCurrentObject.rawData[oBuoyancy] = args.buoyancy / 100.0
+
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
     or_int(args) {
         const objectOffset = args.field
         let value = args.value
@@ -150,6 +166,27 @@ class BehaviorCommands {
         ObjListProc.gCurrentObject.header.gfx.node.flags |= GRAPH_RENDER_CYLBOARD
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
+    }
+
+    billboard(args) {
+        ObjListProc.gCurrentObject.header.gfx.node.flags |= GRAPH_RENDER_BILLBOARD
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    drop_to_floor(args) {
+        const x = ObjListProc.gCurrentObject.rawData[oPosX]
+        const y = ObjListProc.gCurrentObject.rawData[oPosY]
+        const z = ObjListProc.gCurrentObject.rawData[oPosZ]
+
+        const floorHeight = this.SurfaceCollision.find_floor_height(x, y + 200.0, z)
+
+        ObjListProc.gCurrentObject.rawData[oPosY] = floorHeight
+        ObjListProc.gCurrentObject.rawData[oMoveFlags] |= OBJ_MOVE_ON_GROUND
+
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+
     }
 
     set_hitbox(args) {

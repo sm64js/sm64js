@@ -1,7 +1,11 @@
-import { oFlags, OBJ_FLAG_30, oInteractType, oDamageOrCoinValue, oHealth, oNumLootCoins, oAnimState, oAction, OBJ_ACT_HORIZONTAL_KNOCKBACK, OBJ_ACT_VERTICAL_KNOCKBACK, OBJ_ACT_SQUISHED, oInteractStatus, oTimer, oForwardVel, oVelY, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveAngleYaw, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_HIT_WALL, OBJ_MOVE_ABOVE_LAVA  } from "../include/object_constants"
-import { cur_obj_become_tangible, cur_obj_extend_animation_if_at_end, cur_obj_become_intangible, cur_obj_hide, obj_mark_for_deletion, obj_angle_to_object, cur_obj_update_floor_and_walls, cur_obj_move_standard } from "./ObjectHelpers"
+import { oFlags, OBJ_FLAG_30, oInteractType, oDamageOrCoinValue, oHealth, oNumLootCoins, oAnimState, oAction, OBJ_ACT_HORIZONTAL_KNOCKBACK, OBJ_ACT_VERTICAL_KNOCKBACK, OBJ_ACT_SQUISHED, oInteractStatus, oTimer, oForwardVel, oVelY, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveAngleYaw, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_HIT_WALL, OBJ_MOVE_ABOVE_LAVA, oHomeX, oHomeY, oHomeZ, oPosX, oPosY, oPosZ, oDistanceToMario, oAngleToMario, OBJ_MOVE_HIT_EDGE } from "../include/object_constants"
+
+import { cur_obj_become_tangible, cur_obj_extend_animation_if_at_end, cur_obj_become_intangible, cur_obj_hide, obj_mark_for_deletion, obj_angle_to_object, cur_obj_update_floor_and_walls, cur_obj_move_standard, abs_angle_diff, cur_obj_rotate_yaw_toward, cur_obj_reflect_move_angle_off_wall } from "./ObjectHelpers"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { INT_STATUS_INTERACTED, INT_STATUS_ATTACK_MASK, INT_STATUS_ATTACKED_MARIO, ATTACK_KICK_OR_TRIP, ATTACK_FAST_ATTACK } from "./Interaction"
+import { atan2s } from "../engine/math_util"
+import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
+import { coss, sins, int16 } from "../utils"
 
 export const ATTACK_HANDLER_NOP = 0
 export const ATTACK_HANDLER_DIE_IF_HEALTH_NON_POSITIVE = 1
@@ -55,6 +59,21 @@ export const oscillate_toward = (valueObj, velObj, target, velCloseToZero, accel
     return 0
 }
 
+export const obj_random_fixed_turn = (delta) => {
+    const o = ObjectListProc.gCurrentObject
+    return o.rawData[oMoveAngleYaw] + parseInt(BhvCmds.random_sign() * delta)
+}
+
+export const obj_forward_vel_approach = (target, delta) => {
+    const o = ObjectListProc.gCurrentObject
+
+    const wrapper = { value: o.rawData[oForwardVel] }
+    const result = approach_number_ptr(wrapper, target, delta)
+    o.rawData[oForwardVel] = wrapper.value
+
+    return result
+}
+
 export const obj_set_hitbox = (obj, hitbox) => {
     if (!(obj.rawData[oFlags] & OBJ_FLAG_30)) {
         obj.rawData[oFlags] |= OBJ_FLAG_30
@@ -72,6 +91,69 @@ export const obj_set_hitbox = (obj, hitbox) => {
     obj.hurtboxRadius = obj.header.gfx.scale[0] * hitbox.hurtboxRadius
     obj.hurtboxHeight = obj.header.gfx.scale[1] * hitbox.hurtboxHeight
     obj.hitboxDownOffset = obj.header.gfx.scale[1] * hitbox.downOffset
+}
+
+export const obj_bounce_off_walls_edges_objects = (targetYawWrapper) => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.rawData[oMoveFlags] & OBJ_MOVE_HIT_WALL) {
+        targetYawWrapper.value = cur_obj_reflect_move_angle_off_wall()
+    } else if (o.rawData[oMoveFlags] & OBJ_MOVE_HIT_EDGE) {
+        targetYawWrapper.value = int16(o.rawData[oMoveAngleYaw] + 0x8000)
+    } else if (!obj_resolve_object_collisions(targetYawWrapper)) {
+        return 0
+    }
+
+    return 1
+}
+
+export const obj_resolve_object_collisions = (targetYawWrapper) => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.numCollidedObjs != 0) {
+        const otherObject = o.collidedObjs[0]
+        if (otherObject != ObjectListProc.gMarioObject[0]) {
+            //! If one object moves after collisions are detected and this code
+            //  runs, the objects can move toward each other (transport cloning)
+
+            const dx = otherObject.rawData[oPosX] - o.rawData[oPosX]
+            const dz = otherObject.rawData[oPosZ] - o.rawData[oPosZ]
+            const angle = atan2s(dx, dz) //! This should be atan2s(dz, dx)
+
+            const radius = o.hitboxRadius
+            const otherRadius = otherObject.hitboxRadius
+            const relativeRadius = radius / (radius + otherRadius)
+
+            const newCenterX = o.rawData[oPosX] + dx * relativeRadius
+            const newCenterZ = o.rawData[oPosZ] + dz * relativeRadius
+
+            o.rawData[oPosX] = newCenterX - radius * coss(angle) 
+            o.rawData[oPosZ] = newCenterZ - radius * sins(angle)
+
+            otherObject.rawData[oPosX] = newCenterX + otherRadius * coss(angle)
+            otherObject.rawData[oPosZ] = newCenterZ + otherRadius * sins(angle)
+
+            if (targetYawWrapper.value && abs_angle_diff(o.rawData[oMoveAngleYaw], angle) < 0x4000) {
+                // Bounce off object (or it would, if the above atan2s bug
+                // were fixed)
+                targetYawWrapper.value = parseInt(angle - o.rawData[oMoveAngleYaw] + angle + 0x8000)
+                return 1
+            }
+        }
+    }
+
+    return 0
+}
+
+export const obj_resolve_collisions_and_turn = (targetYaw, turnSpeed) => {
+    obj_resolve_object_collisions({})
+
+    if (cur_obj_rotate_yaw_toward(targetYaw, turnSpeed)) {
+        return 0
+    } else {
+        return 1
+    }
 }
 
 export const obj_update_blinking = (blinkTimer, baseCycleLength, cycleLengthRange, blinkLength) => {
@@ -238,4 +320,27 @@ export const obj_handle_attacks = (hitbox, attackedMarioAction, attackHandlers) 
     o.rawData[oInteractStatus] = 0
     return 0
 
+}
+
+export const treat_far_home_as_mario = (threshold) => {
+    const o = ObjectListProc.gCurrentObject
+
+    let dx = o.rawData[oHomeX] - o.rawData[oPosX]
+    let dy = o.rawData[oHomeY] - o.rawData[oPosY]
+    let dz = o.rawData[oHomeZ] - o.rawData[oPosZ]
+    let distance = Math.sqrt(dx * dx + dy * dy + dz * dz)
+
+    if (distance > threshold) {
+        o.rawData[oAngleToMario] = atan2s(dz, dx)
+        o.rawData[oDistanceToMario] = 25000.0
+    } else {
+        dx = o.rawData[oHomeX] - ObjectListProc.gMarioObject[0].rawData[oPosX]
+        dy = o.rawData[oHomeY] - ObjectListProc.gMarioObject[0].rawData[oPosY]
+        dz = o.rawData[oHomeZ] - ObjectListProc.gMarioObject[0].rawData[oPosZ]
+        distance = Math.sqrt(dx * dx + dy * dy + dz * dz)
+
+        if (distance > threshold) {
+            o.rawData[oDistanceToMario] = 20000.0
+        }
+    }
 }

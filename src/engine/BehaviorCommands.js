@@ -10,6 +10,10 @@ class BehaviorCommands {
         this.BHV_PROC_BREAK    = 1
     }
 
+    random_sign() {
+        return Math.random() > 0.5 ? 1 : -1
+    }
+
     cur_obj_update() {
 
         let objFlags = ObjListProc.gCurrentObject.rawData[oFlags]

@@ -140,17 +140,23 @@ impl Room {
             .players
             .par_iter_mut()
             .filter_map(|(_, player)| {
-                player
-                    .upgrade()
-                    .map(|player| player.write().get_updated_skin_data())
-                    .flatten()
+                if let Some(player) = player.upgrade() {
+                    if let Some(skin_data) = player.write().get_updated_skin_data() {
+                        Some((skin_data, player.read().get_name().clone()))
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
             })
-            .map(|skin_data| -> Result<_> {
+            .map(|(skin_data, player_name)| -> Result<_> {
                 let root_msg = RootMsg {
                     message: Some(root_msg::Message::UncompressedSm64jsMsg(Sm64JsMsg {
                         message: Some(sm64_js_msg::Message::SkinMsg(SkinMsg {
                             socket_id: 0,
                             skin_data: Some(skin_data),
+                            player_name,
                         })),
                     })),
                 };

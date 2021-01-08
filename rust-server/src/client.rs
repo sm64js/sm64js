@@ -81,6 +81,10 @@ impl Player {
         }
     }
 
+    pub fn get_name(&self) -> &String {
+        &self.name
+    }
+
     pub fn get_data(&self) -> Option<MarioMsg> {
         self.clients.get(&self.socket_id).unwrap().data.clone()
     }

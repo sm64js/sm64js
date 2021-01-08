@@ -249,9 +249,11 @@ export const recvSkinData = (skinMsg) => {
         boots: fromSkinValue(skinDataMsg.getBoots()),
         skin: fromSkinValue(skinDataMsg.getSkin()),
         hair: fromSkinValue(skinDataMsg.getHair()),
-        customCapState: skinDataMsg.getCustomcapstate(),
+        customCapState: skinDataMsg.getCustomcapstate()
     }
+
     networkData.remotePlayers[socket_id].skinData = skinData
+    networkData.remotePlayers[socket_id].playerName = skinMsg.getPlayername()
 }
 
 const isValidSkinEntry = (skinEntry) => {

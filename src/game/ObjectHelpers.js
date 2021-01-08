@@ -1,11 +1,11 @@
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { AreaInstance as Area } from "./Area"
 import { geo_obj_init, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
-import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations, ACTIVE_FLAGS_DEACTIVATED, OBJ_MOVE_ABOVE_DEATH_BARRIER, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oFloorHeight, oFloor, oFloorType, oFloorRoom, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR, oWallHitboxRadius, oWallAngle, oMoveFlags, OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, oBounciness, oBuoyancy, oDragStrength, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND, OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER, OBJ_MOVE_ENTERED_WATER, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND, OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, oRoom, ACTIVE_FLAG_UNK10, OBJ_MOVE_13, OBJ_MOVE_LANDED } from "../include/object_constants"
+import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations, ACTIVE_FLAGS_DEACTIVATED, OBJ_MOVE_ABOVE_DEATH_BARRIER, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oFloorHeight, oFloor, oFloorType, oFloorRoom, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR, oWallHitboxRadius, oWallAngle, oMoveFlags, OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, oBounciness, oBuoyancy, oDragStrength, oAngleVelYaw, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND, OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER, OBJ_MOVE_ENTERED_WATER, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND, OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, oRoom, ACTIVE_FLAG_UNK10, OBJ_MOVE_13, OBJ_MOVE_LANDED } from "../include/object_constants"
 
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { atan2s, mtxf_rotate_zxy_and_translate } from "../engine/math_util"
-import { sins, coss } from "../utils"
+import { sins, coss, int16 } from "../utils"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 
@@ -122,6 +122,31 @@ export const linear_mtxf_transpose_mul_vec3f = (m, dst, v) => {
     for (let i = 0; i < 3; i++) {
         dst[i] = m[i][0] * v[0] + m[i][1] * v[1] + m[i][2] * v[2]
     }
+}
+
+export const cur_obj_reflect_move_angle_off_wall = () => {
+    const o = ObjectListProc.gCurrentObject
+    return int16(o.rawData[oWallAngle] - (int16(o.rawData[oMoveAngleYaw]) - int16(o.rawData[oWallAngle])) + 0x8000)
+}
+
+export const approach_symmetric = (value, target, increment) => {
+    const dist = target - value
+
+    if (dist >= 0) {
+        if (dist > increment) {
+            value += increment
+        } else {
+            value = target
+        }
+    } else {
+        if (dist < -increment) {
+            value -= increment
+        } else {
+            value = target
+        }
+    }
+
+    return value
 }
 
 export const abs_angle_diff = (x0, x1) => {
@@ -241,6 +266,21 @@ export const clear_move_flag = (bitSet, flag) => {
         return { result: 1, bitSet }
     } else {
         return { result: 0, bitSet }
+    }
+}
+
+export const cur_obj_rotate_yaw_toward = (target, increment) => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    const startYaw = parseInt(o.rawData[oMoveAngleYaw]) 
+    o.rawData[oMoveAngleYaw] = approach_symmetric(o.rawData[oMoveAngleYaw], target, increment)
+
+    o.rawData[oAngleVelYaw] = parseInt(o.rawData[oMoveAngleYaw] - startYaw)
+    if ((o.rawData[oAngleVelYaw]) == 0) {
+        return 1
+    } else {
+        return 0
     }
 }
 

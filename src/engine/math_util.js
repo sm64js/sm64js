@@ -421,42 +421,4 @@ export const atan2s = (y, x) => {
 
     return parseInt(Math.atan2(x, y) * 10430.5)
 
-/*    let ret
-
-    if (x >= 0) {
-        if (y >= 0) {
-            if (y >= x) {
-                ret = Math.atan(x / y)
-            } else {
-                ret = 0x4000 - Math.atan(y / x)
-            }
-        } else {
-            y = -y
-            if (y < x) {
-                ret = 0x4000 + Math.atan(y / x)
-            } else {
-                ret = 0x8000 - Math.atan(x / y)
-            }
-        }
-    } else {
-        x = -x
-        if (y < 0) {
-            y = -y
-            if (y >= x) {
-                ret = 0x8000 + Math.atan(x / y)
-            } else {
-                ret = 0xC000 - Math.atan(y / x)
-            }
-        } else {
-            if (y < x) {
-                ret = 0xC000 + Math.atan(y / x)
-            } else {
-                ret = -Math.atan(x / y)
-            }
-        }
-    }
-
-    if (isNaN(ret)) return 0
-
-    return ret > 32767 ? ret - 65536 : ret*/
 }

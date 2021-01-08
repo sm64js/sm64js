@@ -1,6 +1,6 @@
 import { ObjectListProcessorInstance as ObjListProc } from "../game/ObjectListProcessor"
 import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction, oAnimations, oInteractType, oHomeX, oHomeY, oHomeZ, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, oDistanceToMario, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, oAngleToMario, oMoveAngleYaw, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveFlags, OBJ_MOVE_ON_GROUND, oWallHitboxRadius, oGravity, oBounciness, oDragStrength, oFriction, oBuoyancy } from "../include/object_constants"
-import { GRAPH_RENDER_CYLBOARD, geo_obj_init_animation } from "./graph_node"
+import { GRAPH_RENDER_CYLBOARD, geo_obj_init_animation, GRAPH_RENDER_BILLBOARD } from "./graph_node"
 import { dist_between_objects, obj_angle_to_object } from "../game/ObjectHelpers"
 
 class BehaviorCommands {
@@ -164,6 +164,12 @@ class BehaviorCommands {
 
     cyclboard(args) {
         ObjListProc.gCurrentObject.header.gfx.node.flags |= GRAPH_RENDER_CYLBOARD
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    billboard(args) {
+        ObjListProc.gCurrentObject.header.gfx.node.flags |= GRAPH_RENDER_BILLBOARD
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }

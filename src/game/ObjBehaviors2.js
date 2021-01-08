@@ -212,6 +212,8 @@ export const obj_act_knockback = () => {
 export const obj_act_squished = (baseScale) => {
     const targetScaleY = baseScale * 0.3
 
+    cur_obj_update_floor_and_walls()
+
     const o = ObjectListProc.gCurrentObject
 
     if (o.header.gfx.unk38.curAnim) {
@@ -232,7 +234,7 @@ export const obj_act_squished = (baseScale) => {
     }
 
     o.rawData[oForwardVel] = 0.0
-    /// TODO cur obj move
+    cur_obj_move_standard(-78)
 
 }
 

@@ -14,6 +14,7 @@ class SpawnObject {
         for (let i = 0; i < ObjectListProc.NUM_OBJ_LISTS; i++) {
             ObjectListProc.gObjectLists[i].next = ObjectListProc.gObjectLists[i]
             ObjectListProc.gObjectLists[i].prev = ObjectListProc.gObjectLists[i]
+            ObjectListProc.gObjectLists[i].gfx.wrapperObjectNode = null
         }
     }
 
@@ -46,10 +47,17 @@ class SpawnObject {
         const newObject = { header: nextObj, activeFlags: 0, rawData: new Array(0x50).fill(0) }
         nextObj.wrapperObject = newObject
 
+        if (!destList.gfx.wrapperObjectNode) { /// no object has been initialized yet
+            Object.assign(destList, nextObj)
+            destList.prev = destList
+            destList.next = destList
+        }
+
         nextObj.prev = destList.prev
         nextObj.next = destList
         destList.prev.next = nextObj
         destList.prev = nextObj
+        
 
         geo_add_child(GeoLayoutInstance.gObjParentGraphNode.node, nextObj.gfx.node)
         return nextObj.wrapperObject

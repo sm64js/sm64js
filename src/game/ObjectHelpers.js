@@ -151,7 +151,7 @@ export const approach_symmetric = (value, target, increment) => {
 }
 
 export const abs_angle_diff = (x0, x1) => {
-    const diff = x1 - x0
+    let diff = x1 - x0
 
     if (diff == -0x8000) {
         diff = -0x7FFF
@@ -162,6 +162,33 @@ export const abs_angle_diff = (x0, x1) => {
     }
 
     return diff
+}
+
+export const cur_obj_detect_steep_floor = (steepAngleDegrees) => {
+
+    const o = ObjectListProc.gCurrentObject
+    const steepNormalY = coss(parseInt(steepAngleDegrees * (0x10000 / 360)))
+
+    if (o.rawData[oForwardVel] != 0) {
+        const intendedX = o.rawData[oPosX] + o.rawData[oVelX]
+        const intendedZ = o.rawData[oPosZ] + o.rawData[oVelZ]
+        const intendedFloorWrapper = {}
+        const intendedFloorHeight = Spawn.SurfaceCollision.find_floor(intendedX, o.rawData[oPosY], intendedZ, intendedFloorWrapper)
+        const intendedFloor = intendedFloorWrapper.floor
+        const deltaFloorHeight = intendedFloorHeight - o.rawData[oFloorHeight]
+
+        if (intendedFloorHeight < -10000.0) {
+            o.rawData[oWallAngle] = o.rawData[oMoveAngleYaw] + 0x8000
+            return 2
+        } else if (intendedFloor.normal.y < steepNormalY && deltaFloorHeight > 0 && intendedFloorHeight > o.rawData[oPosY]) {
+            o.rawData[oWallAngle] = atan2s(intendedFloor.normal.z, intendedFloor.normal.x)
+            return 1
+        } else {
+            return 0
+        }
+    }
+
+    return 0
 }
 
 export const cur_obj_resolve_wall_collisions = () => {
@@ -253,7 +280,9 @@ export const cur_obj_update_floor_and_resolve_wall_collisions = (steepSlopeDegre
             o.rawData[oMoveFlags] |= OBJ_MOVE_IN_AIR
         }
 
-        /// TODO detect steep floor as hitting wall
+        if (cur_obj_detect_steep_floor(steepSlopeDegrees)) {
+            o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_WALL
+        }
 
     }
 }
@@ -639,6 +668,7 @@ export const apply_drag_to_value = (ptr, dragStrength) => {
             }
         }
     }
+
 }
 
 

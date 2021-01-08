@@ -144,6 +144,7 @@ export const bhvGoomba = [
     { command: BhvCmds.drop_to_floor },
     { command: BhvCmds.load_animations, args: { field: oAnimations, anims: goomba_seg8_anims_0801DA4C } },
     { command: BhvCmds.set_home },
+    { command: BhvCmds.set_obj_physics, args: { hitboxRadius: 40, gravity: -400, bounciness: -50, dragStrenth: 1000, friction: 1000, buoyancy: 0 } },
     { command: BhvCmds.call_native, args: { func: bhv_goomba_init } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_goomba_update } },

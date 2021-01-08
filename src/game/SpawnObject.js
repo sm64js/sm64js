@@ -4,7 +4,6 @@ import { geo_add_child, GRAPH_RENDER_INVISIBLE, GRAPH_NODE_TYPE_OBJECT, geo_remo
 import { GeoLayoutInstance } from "../engine/GeoLayout"
 import { ACTIVE_FLAG_ACTIVE, ACTIVE_FLAG_UNK8, RESPAWN_INFO_TYPE_NULL, ACTIVE_FLAG_UNIMPORTANT, OBJ_MOVE_ON_GROUND, oIntangibleTimer, oDamageOrCoinValue, oHealth, oCollisionDistance, oDrawingDistance, oDistanceToMario, oRoom, oFloorHeight, oPosX, oPosY, oPosZ, ACTIVE_FLAGS_DEACTIVATED } from "../include/object_constants"
 import { mtxf_identity } from "../engine/math_util"
-//import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 
 class SpawnObject {
     constructor() {
@@ -15,6 +14,7 @@ class SpawnObject {
         for (let i = 0; i < ObjectListProc.NUM_OBJ_LISTS; i++) {
             ObjectListProc.gObjectLists[i].next = ObjectListProc.gObjectLists[i]
             ObjectListProc.gObjectLists[i].prev = ObjectListProc.gObjectLists[i]
+            ObjectListProc.gObjectLists[i].gfx.wrapperObjectNode = null
         }
     }
 
@@ -47,10 +47,17 @@ class SpawnObject {
         const newObject = { header: nextObj, activeFlags: 0, rawData: new Array(0x50).fill(0) }
         nextObj.wrapperObject = newObject
 
+        if (!destList.gfx.wrapperObjectNode) { /// no object has been initialized yet
+            Object.assign(destList, nextObj)
+            destList.prev = destList
+            destList.next = destList
+        }
+
         nextObj.prev = destList.prev
         nextObj.next = destList
         destList.prev.next = nextObj
         destList.prev = nextObj
+        
 
         geo_add_child(GeoLayoutInstance.gObjParentGraphNode.node, nextObj.gfx.node)
         return nextObj.wrapperObject

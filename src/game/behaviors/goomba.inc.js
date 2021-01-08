@@ -1,5 +1,5 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { oGoombaSize, GOOMBA_BP_SIZE_MASK, oBehParams2ndByte, oGoombaScale, oDrawingDistance, oDamageOrCoinValue, oGravity, oForwardVel, oGoombaBlinkTimer, oAnimState, GOOMBA_ACT_ATTACKED_MARIO, oAction, GOOMBA_ACT_WALK, oGoombaRelativeSpeed, oGoombaTurningAwayFromWall, oGoombaTargetYaw, oGoombaWalkTimer, oDistanceToMario, oAngleToMario, oMoveAngleYaw } from "../../include/object_constants"
+import { oGoombaSize, GOOMBA_BP_SIZE_MASK, oBehParams2ndByte, oGoombaScale, oDrawingDistance, oDamageOrCoinValue, oGravity, oForwardVel, oGoombaBlinkTimer, oAnimState, GOOMBA_ACT_ATTACKED_MARIO, oAction, GOOMBA_ACT_WALK, oGoombaRelativeSpeed, oGoombaTurningAwayFromWall, oGoombaTargetYaw, oGoombaWalkTimer, oDistanceToMario, oAngleToMario, oMoveAngleYaw, GOOMBA_ACT_JUMP, oVelY, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, GOOMBA_SIZE_TINY, oNumLootCoins } from "../../include/object_constants"
 import * as ObjBhvs2 from "../ObjBehaviors2"
 import { INTERACT_BOUNCE_TOP } from "../Interaction"
 import { cur_obj_scale, cur_obj_init_animation_with_accel_and_sound, cur_obj_update_floor_and_walls, cur_obj_move_standard, cur_obj_rotate_yaw_toward } from "../ObjectHelpers"
@@ -46,6 +46,41 @@ const sGoombaAttackHandlers = [
     ]
 ]
 
+const goomba_act_jump = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    ObjBhvs2.obj_resolve_object_collisions({})
+
+    //! If we move outside the goomba's drawing radius the frame it enters the
+    //  jump action, then it will keep its velY, but it will still be counted
+    //  as being on the ground.
+    //  Next frame, the jump action will think it has already ended because it is
+    //  still on the ground.
+    //  This puts the goomba back in the walk action, but the positive velY will
+    //  make it hop into the air. We can then trigger another jump.
+    if (o.rawData[oMoveFlags] & OBJ_MOVE_MASK_ON_GROUND) {
+        o.rawData[oAction] = GOOMBA_ACT_WALK
+    } else {
+        cur_obj_rotate_yaw_toward(o.rawData[oGoombaTargetYaw], 0x800)
+    }
+}
+
+export const goomba_act_attacked_mario = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.rawData[oGoombaSize] == GOOMBA_SIZE_TINY) {
+        /// TODO mark_goomba_as_dead()
+        o.rawData[oNumLootCoins] = 0
+        ObjBhvs2.obj_die_if_health_non_positive()
+    } else {
+        //! This can happen even when the goomba is already in the air. It's
+        //  hard to chain these in practice
+        goomba_begin_jump()
+        o.rawData[oGoombaTargetYaw] = o.rawData[oAngleToMario]
+        o.rawData[oGoombaTurningAwayFromWall] = 0
+    }
+}
+
 const goomba_act_walk = () => {
     const o = ObjectListProc.gCurrentObject
 
@@ -84,7 +119,7 @@ const goomba_act_walk = () => {
                 // him, jump first
 
                 if (o.rawData[oGoombaRelativeSpeed] <= 2.0) {
-                    //goomba_begin_jump();
+                    goomba_begin_jump();
                 }
 
                 o.rawData[oGoombaTargetYaw] = o.rawData[oAngleToMario]
@@ -101,7 +136,7 @@ const goomba_act_walk = () => {
                         o.rawData[oGoombaTargetYaw] = ObjBhvs2.obj_random_fixed_turn(0x2000)
                         o.rawData[oGoombaWalkTimer] = ObjBhvs2.random_linear_offset(100, 100)
                     } else {
-                        //goomba_begin_jump();
+                        goomba_begin_jump();
                         o.rawData[oGoombaTargetYaw] = ObjBhvs2.obj_random_fixed_turn(0x6000)
                     }
                 }
@@ -112,6 +147,15 @@ const goomba_act_walk = () => {
         cur_obj_rotate_yaw_toward(o.rawData[oGoombaTargetYaw], 0x200)
     }
 
+}
+
+const goomba_begin_jump = () => {
+    const o = ObjectListProc.gCurrentObject
+    //play sound
+
+    o.rawData[oAction] = GOOMBA_ACT_JUMP
+    o.rawData[oForwardVel] = 0.0
+    o.rawData[oVelY] = 50.0 / 3.0 * o.rawData[oGoombaScale]
 }
 
 export const bhv_goomba_init = () => {
@@ -152,7 +196,10 @@ export const bhv_goomba_update = () => {
                 goomba_act_walk()
                 break
             case GOOMBA_ACT_ATTACKED_MARIO:
-                goomba_act_walk()
+                goomba_act_attacked_mario()
+                break
+            case GOOMBA_ACT_JUMP:
+                goomba_act_jump()
                 break
             default: throw "goomba act not implemented"
         }

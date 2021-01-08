@@ -189,8 +189,8 @@ window.updatePlayerName = (name) => {
 }
 
 export const shakePlayerNameInput = () => {
-    document.getElementById("playerNameResult").style.color = "red"
     document.getElementById("playerNameResult").innerHTML = "Rejected"
+    document.getElementById("playerNameResult").style.color = "red"
     document.getElementById("playerNameInput").style.borderColor = "red"
     document.getElementById("playerNameInput").style.borderWidth = "3px"
     $("#playerNameRow").effect("shake", { direction: "down", times: 3, distance: 3 }, 500)

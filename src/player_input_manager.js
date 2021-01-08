@@ -1,5 +1,5 @@
 import * as Keydrown from "./keydrown.min.js"
-import { gameData, sendChat, submitPlayerName } from "./socket.js"
+import { gameData, sendChat, submitPlayerName } from "./socket"
 
 /////// Keyboard / Gamepad Input ////////
 window.playerInput = {}
@@ -393,5 +393,9 @@ export const playerInputUpdate = () => {
     if (window.show_minimap > 2) window.show_minimap = 0
 
     if (gameData.marioState) gameData.marioState.controller = window.playerInput
+
+    if (window.playerInput.buttonPressedStart && keyboardButtonMapping.start != "enter") {
+        submitPlayerName()
+    }
 
 }

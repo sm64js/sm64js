@@ -188,12 +188,19 @@ window.updatePlayerName = (name) => {
     }
 }
 
+export const shakePlayerNameInput = () => {
+    document.getElementById("playerNameResult").style.color = "red"
+    document.getElementById("playerNameResult").innerHTML = "Rejected"
+    document.getElementById("playerNameInput").style.borderColor = "red"
+    document.getElementById("playerNameInput").style.borderWidth = "3px"
+    $("#playerNameRow").effect("shake", { direction: "down", times: 3, distance: 3 }, 500)
+}
+
 export const recvPlayerNameResponse = (msg) => {
 
     const accepted = msg.getAccepted()
     if (!accepted) {
-        document.getElementById("playerNameResult").style.color = "red"
-        document.getElementById("playerNameResult").innerHTML = "Rejected"
+        shakePlayerNameInput()
     } else  {
         document.getElementById("playerNameInput").style.borderColor = "blue"
         document.getElementById("playerNameInput").disabled = true

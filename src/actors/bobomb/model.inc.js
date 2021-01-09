@@ -1,23 +1,11 @@
 import * as Gbi from "../../include/gbi"
 
-const bobomb_seg8_texture_0801DA60 = [
-//#include "actors/bobomb/bob-omb_left_side.rgba16.inc.c
-]
-const bobomb_seg8_texture_0801EA60 = [
-//#include "actors/bobomb/bob-omb_right_side.rgba16.inc.c
-]
-const bobomb_seg8_texture_0801FA60 = [
-//#include "actors/bobomb/bob-omb_buddy_left_side.rgba16.inc.c
-]
-const bobomb_seg8_texture_08020A60 = [
-//#include "actors/bobomb/bob-omb_buddy_right_side.rgba16.inc.c
-]
-const bobomb_seg8_texture_08021A60 = [
-//#include "actors/bobomb/bob-omb_eyes.rgba16.inc.c
-]
-const bobomb_seg8_texture_08022260 = [
-//#include "actors/bobomb/bob-omb_eyes_blink.rgba16.inc.c
-]
+export const bobomb_seg8_texture_0801DA60 = []
+export const bobomb_seg8_texture_0801EA60 = []
+export const bobomb_seg8_texture_0801FA60 = []
+export const bobomb_seg8_texture_08020A60 = []
+export const bobomb_seg8_texture_08021A60 = []
+export const bobomb_seg8_texture_08022260 = []
 
 const bobomb_seg8_vertex_08022A60 = [
 	{ pos: [ 133, -47, 0 ], flag: 0, tc: [ 480, 0 ], color: [ 255, 255, 255, 255 ] },

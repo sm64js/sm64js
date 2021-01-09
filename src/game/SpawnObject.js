@@ -73,7 +73,6 @@ class SpawnObject {
         obj.numCollidedObjs = 0 /// possibly unnecessary
         obj.collidedObjs = []
 
-        obj.unused1 = 0;
         obj.bhvStackIndex = 0
         obj.bhvDelayTimer = 0
     

@@ -81,6 +81,15 @@ import { checkerboard_platform_seg8_texture_0800C840, checkerboard_platform_seg8
 import { goomba_seg8_texture_08019530, goomba_seg8_texture_08019D30, goomba_seg8_texture_0801A530 } from "./actors/goomba/model.inc"
 
 import {
+    bobomb_seg8_texture_0801DA60,
+    bobomb_seg8_texture_0801EA60,
+    bobomb_seg8_texture_0801FA60,
+    bobomb_seg8_texture_08020A60,
+    bobomb_seg8_texture_08021A60,
+    bobomb_seg8_texture_08022260
+} from "./actors/bobomb/model.inc"
+
+import {
     generic_09005800,
     generic_09006000,
     generic_09009800,
@@ -190,7 +199,7 @@ import {
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 16
+const textureVersion = 17
 
 const loadDataIntoGame = (data) => {
 
@@ -385,6 +394,13 @@ const loadDataIntoGame = (data) => {
     goomba_seg8_texture_08019530.push(...data["actors/goomba/goomba_body.rgba16.png"].data)
     goomba_seg8_texture_08019D30.push(...data["actors/goomba/goomba_face.rgba16.png"].data)
     goomba_seg8_texture_0801A530.push(...data["actors/goomba/goomba_face_blink.rgba16.png"].data)
+
+    bobomb_seg8_texture_0801DA60.push(...data["actors/bobomb/bob-omb_left_side.rgba16.png"].data)
+    bobomb_seg8_texture_0801EA60.push(...data["actors/bobomb/bob-omb_right_side.rgba16.png"].data)
+    bobomb_seg8_texture_0801FA60.push(...data["actors/bobomb/bob-omb_buddy_left_side.rgba16.png"].data)
+    bobomb_seg8_texture_08020A60.push(...data["actors/bobomb/bob-omb_buddy_right_side.rgba16.png"].data)
+    bobomb_seg8_texture_08021A60.push(...data["actors/bobomb/bob-omb_eyes.rgba16.png"].data)
+    bobomb_seg8_texture_08022260.push(...data["actors/bobomb/bob-omb_eyes_blink.rgba16.png"].data)
 
     SkyboxWater.water_skybox_texture_00000.push(...data["water_skybox_texture_00000"].data)
     SkyboxWater.water_skybox_texture_00001.push(...data["water_skybox_texture_00001"].data)

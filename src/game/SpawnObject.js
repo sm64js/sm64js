@@ -132,7 +132,8 @@ class SpawnObject {
 
         //func_803206F8 TODO
         geo_remove_child(obj.header.gfx.node)
-        geo_add_child(GeoLayoutInstance.gObjParentGraphNode.node, obj.header.gfx.node)
+
+        // Don't think this is needed in JS ...? //geo_add_child(GeoLayoutInstance.gObjParentGraphNode.node, obj.header.gfx.node)
 
         obj.header.gfx.node.flags &= ~GRAPH_RENDER_BILLBOARD
         obj.header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE

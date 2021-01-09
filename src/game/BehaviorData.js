@@ -12,7 +12,7 @@ import { checkerboard_platform_seg8_collision_0800D710 } from "../actors/checker
 import { bhv_seesaw_platform_init, bhv_seesaw_platform_update } from "./behaviors/seesaw_platform.inc"
 import { SurfaceLoadInstance as SurfaceLoad } from "./SurfaceLoad"
 import { goomba_seg8_anims_0801DA4C } from "../actors/goomba/anims/table.inc"
-import { bhv_goomba_init, bhv_goomba_update } from "./behaviors/goomba.inc"
+import { bhv_goomba_init, bhv_goomba_update, bhv_goomba_triplet_spawner_update } from "./behaviors/goomba.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -160,6 +160,15 @@ export const bhvGoomba = [
     { command: BhvCmds.call_native, args: { func: bhv_goomba_init } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_goomba_update } },
+    { command: BhvCmds.end_loop }
+]
+
+export const bhvGoombaTripletSpawner = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PUSHABLE } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
+    { command: BhvCmds.drop_to_floor },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_goomba_triplet_spawner_update } },
     { command: BhvCmds.end_loop }
 ]
 

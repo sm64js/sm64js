@@ -1,8 +1,11 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { oGoombaSize, GOOMBA_BP_SIZE_MASK, oBehParams2ndByte, oGoombaScale, oDrawingDistance, oDamageOrCoinValue, oGravity, oForwardVel, oGoombaBlinkTimer, oAnimState, GOOMBA_ACT_ATTACKED_MARIO, oAction, GOOMBA_ACT_WALK, oGoombaRelativeSpeed, oGoombaTurningAwayFromWall, oGoombaTargetYaw, oGoombaWalkTimer, oDistanceToMario, oAngleToMario, oMoveAngleYaw, GOOMBA_ACT_JUMP, oVelY, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, GOOMBA_SIZE_TINY, oNumLootCoins } from "../../include/object_constants"
+import { oGoombaSize, GOOMBA_BP_SIZE_MASK, oBehParams2ndByte, oGoombaScale, oDrawingDistance, oDamageOrCoinValue, oGravity, oForwardVel, oGoombaBlinkTimer, oAnimState, GOOMBA_ACT_ATTACKED_MARIO, oAction, GOOMBA_ACT_WALK, oGoombaRelativeSpeed, oGoombaTurningAwayFromWall, oGoombaTargetYaw, oGoombaWalkTimer, oDistanceToMario, oAngleToMario, oMoveAngleYaw, GOOMBA_ACT_JUMP, oVelY, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, GOOMBA_SIZE_TINY, oNumLootCoins, GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED, GOOMBA_BP_TRIPLET_FLAG_MASK, oBehParams, GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK, GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK } from "../../include/object_constants"
 import * as ObjBhvs2 from "../ObjBehaviors2"
 import { INTERACT_BOUNCE_TOP } from "../Interaction"
-import { cur_obj_scale, cur_obj_init_animation_with_accel_and_sound, cur_obj_update_floor_and_walls, cur_obj_move_standard, cur_obj_rotate_yaw_toward } from "../ObjectHelpers"
+import { cur_obj_scale, cur_obj_init_animation_with_accel_and_sound, cur_obj_update_floor_and_walls, cur_obj_move_standard, cur_obj_rotate_yaw_toward, obj_mark_for_deletion, spawn_object_relative } from "../ObjectHelpers"
+import { coss, sins } from "../../utils"
+import { MODEL_GOOMBA } from "../../include/model_ids"
+import { bhvGoomba } from "../BehaviorData"
 
 const sGoombaProperties = [
     { scale: 1.5, deathSound: null, drawDistance: 4000, damage: 1 },
@@ -69,7 +72,7 @@ export const goomba_act_attacked_mario = () => {
     const o = ObjectListProc.gCurrentObject
 
     if (o.rawData[oGoombaSize] == GOOMBA_SIZE_TINY) {
-        /// TODO mark_goomba_as_dead()
+        mark_goomba_as_dead()
         o.rawData[oNumLootCoins] = 0
         ObjBhvs2.obj_die_if_health_non_positive()
     } else {
@@ -174,11 +177,28 @@ export const bhv_goomba_init = () => {
 
 }
 
+export const mark_goomba_as_dead = () => {
+    const o = ObjectListProc.gCurrentObject
+    if (o.parentObj != o) {
+        ObjectListProc.set_object_respawn_info_bits(o.parentObj, (o.rawData[oBehParams2ndByte] & GOOMBA_BP_TRIPLET_FLAG_MASK) >> 2)
+
+        o.parentObj.rawData[oBehParams] = o.parentObj.rawData[oBehParams] | (o.rawData[oBehParams2ndByte] & GOOMBA_BP_TRIPLET_FLAG_MASK) << 6
+    }
+}
+
 export const bhv_goomba_update = () => {
 
     const o = ObjectListProc.gCurrentObject
 
     if (ObjBhvs2.obj_update_standard_actions(o.rawData[oGoombaScale])) {
+
+        // If this goomba has a spawner and mario moved away from the spawner, unload
+        if (o.parentObj != o) {
+            if (o.parentObj.rawData[oAction] == GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED) {
+                obj_mark_for_deletion(o)
+            }
+        }
+
         cur_obj_scale(o.rawData[oGoombaScale])
 
         const blinkWrapper = { value: o.rawData[oGoombaBlinkTimer] }
@@ -206,13 +226,42 @@ export const bhv_goomba_update = () => {
 
         if (ObjBhvs2.obj_handle_attacks(sGoombaHitbox, GOOMBA_ACT_ATTACKED_MARIO,
                                                 sGoombaAttackHandlers[o.rawData[oGoombaSize] & 1])) {
-            //TODO mark goomba as dead for triplet spawner
+            mark_goomba_as_dead()
         }
 
         cur_obj_move_standard(-78)
 
     } else {
         o.rawData[oAnimState] = 1
+    }
+
+}
+
+export const bhv_goomba_triplet_spawner_update = () => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    // If mario is close enough and the goombas aren't currently loaded, then spawn them
+    if (o.rawData[oAction] == GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED) {
+        if (o.rawData[oDistanceToMario] < 3000.0) {
+            // The spawner is capable of spawning more than 3 goombas, but this is not used in the game
+            const dAngle = 0x10000 / (((o.rawData[oBehParams2ndByte & GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK]) >> 2) + 3)
+
+            for (let angle = 0, goombaFlag = 1 << 8; angle < 0xFFFF; angle += dAngle, goombaFlag <<= 1) {
+                if (!(o.rawData[oBehParams] & goombaFlag)) {
+                    const dx = 500 * coss(angle)
+                    const dz = 500 * sins(angle)
+
+                    spawn_object_relative((o.rawData[oBehParams2ndByte] & GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK) | (goombaFlag >> 6),
+                        dx, 0, dz, o, MODEL_GOOMBA, bhvGoomba)
+                }
+            }
+
+            o.rawData[oAction] += 1
+        }
+
+    } else if (o.rawData[oDistanceToMario] > 4000.0) {
+        o.rawData[oAction] = GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED
     }
 
 }

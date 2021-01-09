@@ -166,6 +166,14 @@ export const oGoombaTurningAwayFromWall = 0x20
 export const oGoombaRelativeSpeed = 0x21
 
 
+/* Goomba triplet spawner */
+    /* oBehParams2ndByte */
+    export const GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK = 0x00000003
+    export const GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK = 0x000000FC
+    /* oAction */
+    export const GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED = 0
+    export const GOOMBA_TRIPLET_SPAWNER_ACT_LOADED = 1
+
 /* Goomba */
     /* oBehParams2ndByte */
     export const GOOMBA_BP_SIZE_MASK = 0x00000003

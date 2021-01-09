@@ -207,15 +207,7 @@ export const geo_remove_child = (graphNode) => {
     graphNode.prev.next = graphNode.next
     graphNode.next.prev = graphNode.prev
 
-    // If this node was the first child, a new first child must be chosen
-    if (firstChild == graphNode) {
-        // The list is circular, so this checks whether it was the only child
-        if (graphNode.next == graphNode) {
-            firstChild = null // Parent has no children anymore
-        } else {
-            firstChild = graphNode.next // Choose a new first child
-        }
-    }
+    parent.children = parent.children.filter(child => child != graphNode)
 
     return parent
 }

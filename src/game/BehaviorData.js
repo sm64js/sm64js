@@ -14,7 +14,7 @@ import { SurfaceLoadInstance as SurfaceLoad } from "./SurfaceLoad"
 import { goomba_seg8_anims_0801DA4C } from "../actors/goomba/anims/table.inc"
 import { bhv_goomba_init, bhv_goomba_update, bhv_goomba_triplet_spawner_update } from "./behaviors/goomba.inc"
 import { bobomb_seg8_anims_0802396C } from "../actors/bobomb/anims/table.inc"
-import { bhv_bobomb_loop } from "./behaviors/bobomb.inc"
+import { bhv_bobomb_loop, bhv_bobomb_init } from "./behaviors/bobomb.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -183,7 +183,7 @@ export const bhvBobomb = [
     { command: BhvCmds.animate, args: { animIndex: 0 } },
     { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.set_home },
-    //{ command: BhvCmds.call_native, args: { func: bhv_goomba_init } },
+    { command: BhvCmds.call_native, args: { func: bhv_bobomb_init } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_bobomb_loop } },
     { command: BhvCmds.end_loop }

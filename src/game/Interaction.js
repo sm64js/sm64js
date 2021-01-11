@@ -2,6 +2,8 @@ import * as Mario from "./Mario"
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
 import { atan2s } from "../engine/math_util"
 import { sins, coss } from "../utils"
+import { gLinker } from "./Linker"
+import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
 export const INTERACT_GRABBABLE      /* 0x00000002 */ = (1 << 1)
@@ -145,6 +147,17 @@ const interact_bounce_top = (m, o) => {
 
 }
 
+const interact_grabbable = (m, o) => {
+
+    const script = o.behavior
+
+    if (script != gLinker.bhvBowser) {
+        push_mario_out_of_object(m, o, -5.0)
+    }
+
+    return 0
+}
+
 const interact_pole = (m, o) => {
     const actionId = m.action & Mario.ACT_ID_MASK
     if (actionId >= 0x80 && actionId < 0x0A0) {
@@ -181,6 +194,40 @@ const mario_obj_angle_to_object = (m, o) => {
     const dz = o.rawData[oPosZ] - m.pos[2]
 
     return atan2s(dz, dx)
+}
+
+const push_mario_out_of_object = (m, o, padding) => {
+    const minDistance = o.hitboxRadius + m.marioObj.hitboxRadius + padding
+
+    const offsetX = m.pos[0] - o.rawData[oPosX]
+    const offsetZ = m.pos[2] - o.rawData[oPosZ]
+    const distance = Math.sqrt(offsetX * offsetX + offsetZ * offsetZ)
+
+    if (distance < minDistance) {
+        let pushAngle
+
+        if (distance == 0.0) {
+            pushAngle = m.faceAngle[1]
+        } else {
+            pushAngle = atan2s(offsetZ, offsetX)
+        }
+
+        const newMarioX = { value: o.rawData[oPosX] + minDistance * sins(pushAngle) }
+        const newMarioZ = { value: o.rawData[oPosZ] + minDistance * coss(pushAngle) }
+        const newMarioY = { value: m.pos[1] }
+
+        Spawn.SurfaceCollision.find_wall_collision(newMarioX, newMarioY, newMarioZ, 60.0, 50.0)
+        m.pos[1] = newMarioY.value
+
+        const floorWrapper = {}
+        Spawn.SurfaceCollision.find_floor(newMarioX.value, m.pos[1], newMarioZ.value, floorWrapper)
+        if (floorWrapper.floor != null) {
+            //! Doesn't update mario's referenced floor (allows oob death when
+            // an object pushes you into a steep slope while in a ground action)
+            m.pos[0] = newMarioX.value
+            m.pos[2] = newMarioZ.value
+        }
+    }
 }
 
 const attack_object = (o, interaction) => {
@@ -454,7 +501,7 @@ const sInteractionHandlers = [
     { interactType: INTERACT_KOOPA_SHELL, handler: null },
     { interactType: INTERACT_UNKNOWN_08, handler: null },
     { interactType: INTERACT_CAP, handler: null },
-    { interactType: INTERACT_GRABBABLE, handler: null },
+    { interactType: INTERACT_GRABBABLE, handler: interact_grabbable },
     { interactType: INTERACT_TEXT, handler: null },
 ]
 

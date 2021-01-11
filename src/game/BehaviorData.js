@@ -1,6 +1,6 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
-import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW } from "../include/object_constants"
+import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 import { bhv_extra_mario_base_loop } from "./behaviors/extra_mario.inc"
@@ -13,6 +13,8 @@ import { bhv_seesaw_platform_init, bhv_seesaw_platform_update } from "./behavior
 import { SurfaceLoadInstance as SurfaceLoad } from "./SurfaceLoad"
 import { goomba_seg8_anims_0801DA4C } from "../actors/goomba/anims/table.inc"
 import { bhv_goomba_init, bhv_goomba_update, bhv_goomba_triplet_spawner_update } from "./behaviors/goomba.inc"
+import { bobomb_seg8_anims_0802396C } from "../actors/bobomb/anims/table.inc"
+import { bhv_bobomb_loop } from "./behaviors/bobomb.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -173,3 +175,16 @@ export const bhvGoombaTripletSpawner = [
     { command: BhvCmds.end_loop }
 ]
 
+export const bhvBobomb = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DESTRUCTIVE } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_PERSISTENT_RESPAWN | OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_HOLDABLE | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW } },
+    { command: BhvCmds.load_animations, args: { field: oAnimations, anims: bobomb_seg8_anims_0802396C } },
+    { command: BhvCmds.drop_to_floor },
+    { command: BhvCmds.animate, args: { animIndex: 0 } },
+    { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
+    { command: BhvCmds.set_home },
+    //{ command: BhvCmds.call_native, args: { func: bhv_goomba_init } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_bobomb_loop } },
+    { command: BhvCmds.end_loop }
+]

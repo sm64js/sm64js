@@ -185,3 +185,8 @@ export const oGoombaRelativeSpeed = 0x21
     export const GOOMBA_ACT_WALK = 0
     export const GOOMBA_ACT_ATTACKED_MARIO = 1
     export const GOOMBA_ACT_JUMP = 2
+
+/* Bob-omb */
+export const oBobombBlinkTimer = 0x1B
+export const oBobombFuseLit    = 0x1C
+export const oBobombFuseTimer  = 0x1D

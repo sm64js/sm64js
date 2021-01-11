@@ -533,6 +533,40 @@ export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
 
 }
 
+export const obj_turn_toward_object = (obj, target, angleIndex, turnAmount) => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    let targetAngle, a, b, c, d
+    switch (angleIndex) {
+        case oMoveAnglePitch:
+        case oFaceAnglePitch:
+            a = target.rawData[oPosX] - obj.rawData[oPosX]
+            c = target.rawData[oPosZ] - obj.rawData[oPosZ]
+            a = Math.sqrt(a * a + c * c)
+
+            b = -obj.rawData[oPosY]
+            d = -target.rawData[oPosY]
+
+            targetAngle = atan2s(a, d - b)
+            break
+
+        case oMoveAngleYaw:
+        case oFaceAngleYaw:
+            a = obj.rawData[oPosZ]
+            c = target.rawData[oPosZ]
+            b = obj.rawData[oPosX]
+            d = target.rawData[oPosX]
+
+            targetAngle = atan2s(c - a, d - b)
+            break
+    }
+
+    const startAngle = int16(o.rawData[angleIndex])
+    o.rawData[angleIndex] = approach_symmetric(startAngle, targetAngle, turnAmount)
+    return targetAngle
+}
+
 export const spawn_object_relative = (behaviorParam, relativePosX, relativePosY, relativePosZ, parent, model, behavior) => {
 
     const obj = spawn_object_at_origin(parent, model, behavior)

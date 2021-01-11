@@ -2,6 +2,7 @@ import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProc
 import { is_point_within_radius_of_mario, object_step, obj_return_home_if_safe, obj_check_if_facing_toward_angle, obj_check_floor_death, sObjFloor } from "../ObjBehaviors"
 import { oPosX, oPosY, oPosZ, oAnimState, oBobombBlinkTimer, oHeldState, HELD_FREE, oBehParams, oBehParams2ndByte, BOBOMB_BP_STYPE_GENERIC, oAction, BOBOMB_ACT_PATROL, BOBOMB_ACT_CHASE_MARIO, BOBOMB_ACT_EXPLODE, oBobombFuseTimer, oForwardVel, oGravity, oFriction, oBuoyancy, oInteractionSubtype, oHomeX, oHomeY, oHomeZ, oMoveAngleYaw, oAngleToMario, oBobombFuseLit, oFaceAngleYaw } from "../../include/object_constants"
 import { INT_SUBTYPE_KICKABLE } from "../Interaction"
+import { obj_turn_toward_object } from "../ObjectHelpers"
 
 const curr_obj_random_blink = (blinkTimer) => {
 
@@ -43,8 +44,25 @@ const bobomb_act_patrol = () => {
     if ((obj_return_home_if_safe(o, o.rawData[oHomeX], o.rawData[oHomeY], o.rawData[oHomeZ], 400) == 1)
         && (obj_check_if_facing_toward_angle(o.rawData[oMoveAngleYaw], o.rawData[oAngleToMario], 0x2000) == 1)) {
         o.rawData[oBobombFuseLit] = 1
-        //console.log("Chase Mario")
+        o.rawData[oAction] = BOBOMB_ACT_CHASE_MARIO
     }
+    obj_check_floor_death(collisionFlags, sObjFloor)
+}
+
+const bobomb_act_chase_mario = () => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    const sp1a = ++o.header.gfx.unk38.animFrame
+    o.rawData[oForwardVel] = 20.0
+
+    const collisionFlags = object_step()
+
+    /// TODO sound
+    //if (sp1a == 5 || sp1a == 16)
+    //    cur_obj_play_sound_2(SOUND_OBJ_BOBOMB_WALK)
+
+    obj_turn_toward_object(o, ObjectListProc.gMarioObject, 16, 0x800)
     obj_check_floor_death(collisionFlags, sObjFloor)
 }
 
@@ -57,6 +75,7 @@ const generic_bobomb_free_loop = () => {
             bobomb_act_patrol()
             break
         case BOBOMB_ACT_CHASE_MARIO:
+            bobomb_act_chase_mario()
             break
         case BOBOMB_ACT_EXPLODE:
             break

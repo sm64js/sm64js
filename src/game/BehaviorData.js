@@ -15,6 +15,7 @@ import { goomba_seg8_anims_0801DA4C } from "../actors/goomba/anims/table.inc"
 import { bhv_goomba_init, bhv_goomba_update, bhv_goomba_triplet_spawner_update } from "./behaviors/goomba.inc"
 import { bobomb_seg8_anims_0802396C } from "../actors/bobomb/anims/table.inc"
 import { bhv_bobomb_loop, bhv_bobomb_init } from "./behaviors/bobomb.inc"
+import { gLinker } from "./Linker"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -153,6 +154,7 @@ export const bhvSeesawPlatform = () => {
     ]
 }
 
+
 export const bhvGoomba = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PUSHABLE } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
@@ -188,3 +190,7 @@ export const bhvBobomb = [
         { command: BhvCmds.call_native, args: { func: bhv_bobomb_loop } },
     { command: BhvCmds.end_loop }
 ]
+
+const bhvBowser = []
+
+gLinker.bhvBowser = bhvBowser

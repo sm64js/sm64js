@@ -18,6 +18,10 @@ export const ACTIVE_FLAG_UNK10                  =  (1 << 10) // 0x0400
 
 export const ACTIVE_FLAGS_DEACTIVATED = 0
 
+/* oAction */
+export const OBJ_ACT_LAVA_DEATH = 100
+export const OBJ_ACT_DEATH_PLANE_DEATH = 101
+
 export const OBJ_ACT_HORIZONTAL_KNOCKBACK = 100
 export const OBJ_ACT_VERTICAL_KNOCKBACK = 101
 export const OBJ_ACT_SQUISHED = 102
@@ -62,7 +66,13 @@ export const OBJ_FLAG_1000                            =  (1 << 12) // 0x00001000
 export const OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO          =  (1 << 13) // 0x00002000
 export const OBJ_FLAG_PERSISTENT_RESPAWN              =  (1 << 14) // 0x00004000
 export const OBJ_FLAG_8000                            =  (1 << 15) // 0x00008000
-export const OBJ_FLAG_30                              =  (1 << 30) // 0x40000000
+export const OBJ_FLAG_30 = (1 << 30) // 0x40000000
+
+/* oHeldState */
+export const HELD_FREE = 0
+export const HELD_HELD = 1
+export const HELD_THROWN = 2
+export const HELD_DROPPED = 3
 
 export const oFlags = 1
 
@@ -106,6 +116,7 @@ export const oAngleVelPitch = 0x23
 export const oAngleVelYaw = 0x24
 export const oAngleVelRoll = 0x25
 export const oAnimations = 0x26
+export const oHeldState = 0x27
 export const oWallHitboxRadius = 0x28
 export const oDragStrength = 0x29
 export const oInteractType = 0x2A
@@ -165,6 +176,10 @@ export const oGoombaBlinkTimer          = 0x1F
 export const oGoombaTurningAwayFromWall = 0x20
 export const oGoombaRelativeSpeed = 0x21
 
+/* Bob-omb */
+export const oBobombBlinkTimer = 0x1B
+export const oBobombFuseLit = 0x1C
+export const oBobombFuseTimer = 0x1D
 
 /* Goomba triplet spawner */
     /* oBehParams2ndByte */
@@ -187,6 +202,14 @@ export const oGoombaRelativeSpeed = 0x21
     export const GOOMBA_ACT_JUMP = 2
 
 /* Bob-omb */
-export const oBobombBlinkTimer = 0x1B
-export const oBobombFuseLit    = 0x1C
-export const oBobombFuseTimer  = 0x1D
+    /* oBehParams2ndByte */
+    export const BOBOMB_BP_STYPE_GENERIC =0
+    export const BOBOMB_BP_STYPE_STATIONARY =1
+    /* oAction */
+    export const BOBOMB_ACT_PATROL = 0
+    export const BOBOMB_ACT_LAUNCHED = 1
+    export const BOBOMB_ACT_CHASE_MARIO = 2
+    export const BOBOMB_ACT_EXPLODE = 3
+    export const BOBOMB_ACT_LAVA_DEATH = 100
+    export const BOBOMB_ACT_DEATH_PLANE_DEATH = 101
+

@@ -2,7 +2,7 @@ import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProc
 import { is_point_within_radius_of_mario, object_step, obj_return_home_if_safe, obj_check_if_facing_toward_angle, obj_check_floor_death, sObjFloor } from "../ObjBehaviors"
 import { oPosX, oPosY, oPosZ, oAnimState, oBobombBlinkTimer, oHeldState, HELD_FREE, oBehParams, oBehParams2ndByte, BOBOMB_BP_STYPE_GENERIC, oAction, BOBOMB_ACT_PATROL, BOBOMB_ACT_CHASE_MARIO, BOBOMB_ACT_EXPLODE, oBobombFuseTimer, oForwardVel, oGravity, oFriction, oBuoyancy, oInteractionSubtype, oHomeX, oHomeY, oHomeZ, oMoveAngleYaw, oAngleToMario, oBobombFuseLit, oFaceAngleYaw } from "../../include/object_constants"
 import { INT_SUBTYPE_KICKABLE, INTERACT_GRABBABLE } from "../Interaction"
-import { obj_turn_toward_object } from "../ObjectHelpers"
+import { obj_turn_toward_object, obj_attack_collided_from_other_object } from "../ObjectHelpers"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 
 const sBobombHitbox = {
@@ -82,6 +82,10 @@ const bobomb_act_chase_mario = () => {
 const bobomb_check_interactions = () => {
     const o = ObjectListProc.gCurrentObject
     obj_set_hitbox(o, sBobombHitbox)
+
+    if (obj_attack_collided_from_other_object(o) == 1) {
+        o.rawData[oAction] = BOBOMB_ACT_EXPLODE
+    }
 }
 
 const generic_bobomb_free_loop = () => {

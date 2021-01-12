@@ -149,6 +149,9 @@ const check_player_object_collision = () => {
     check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE])
     check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE])
     check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE])
+    check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_LEVEL].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_LEVEL])
+    check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR])
+    check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE])
 
     Object.values(networkData.remotePlayers).forEach(remotePlayer => {
         const remoteMarioObj = remotePlayer.marioState.marioObj
@@ -156,8 +159,27 @@ const check_player_object_collision = () => {
         check_collision_in_list(remoteMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE])
         check_collision_in_list(remoteMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE])
         check_collision_in_list(remoteMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE])
+        check_collision_in_list(remoteMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_LEVEL].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_LEVEL])
+        check_collision_in_list(remoteMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR])
+        check_collision_in_list(remoteMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE])
     })
 
+}
+
+const check_destructive_object_collision = () => {
+    const sp1C = ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE]
+    let sp18 = sp1C.next
+
+    while (sp18 != sp1C) {
+        const obj = sp18.wrapperObject
+        if (obj.rawData[oDistanceToMario] < 2000 && !(obj.activeFlags & ACTIVE_FLAG_UNK9)) {
+            check_collision_in_list(obj, sp18.next, sp1C)
+            check_collision_in_list(obj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR])
+            check_collision_in_list(obj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE])
+            check_collision_in_list(obj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE])
+        }
+        sp18 = sp18.next
+    }
 }
 
 const check_pushable_object_collision = () => {
@@ -187,4 +209,5 @@ export const detect_object_collisions = () => {
     })
     check_player_object_collision()
     check_pushable_object_collision()
+    check_destructive_object_collision()
 }

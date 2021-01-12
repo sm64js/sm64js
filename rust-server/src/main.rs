@@ -20,10 +20,15 @@ pub mod proto {
 }
 
 use actix::prelude::*;
-use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
+use actix_web::{middleware, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
+use paperclip::{
+    actix::{api_v2_operation, web, OpenApiExt},
+    v2::models::{DefaultApiRaw, Info, Tag},
+};
 use session::Sm64JsWsSession;
 
+#[api_v2_operation(tags(Hidden))]
 async fn ws_index(
     r: HttpRequest,
     stream: web::Payload,
@@ -40,15 +45,38 @@ async fn main() -> std::io::Result<()> {
     let server = server::Sm64JsServer::new().start();
 
     HttpServer::new(move || {
+        let spec = DefaultApiRaw {
+            tags: vec![
+                Tag {
+                    name: "Hidden".to_string(),
+                    description: None,
+                    external_docs: None,
+                },
+                Tag {
+                    name: "Chat".to_string(),
+                    description: Some("Chat related API endpoints".to_string()),
+                    external_docs: None,
+                },
+            ],
+            info: Info {
+                title: "SM64JS API".into(),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+
         App::new()
+            .wrap_api_with_spec(spec)
             .data(server.clone())
             .wrap(middleware::Logger::default())
+            .with_json_spec_at("/api/spec")
             .service(web::resource("/ws/").to(ws_index))
             .service(
-                actix_files::Files::new("/", "./dist")
-                    .show_files_listing()
+                actix_files::Files::new("/api", "./rust-server/src/openapi")
                     .index_file("index.html"),
             )
+            .service(actix_files::Files::new("/", "./dist").index_file("index.html"))
+            .build()
     })
     .bind("0.0.0.0:3060")?
     .run()

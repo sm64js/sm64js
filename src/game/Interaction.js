@@ -317,6 +317,16 @@ const interact_bounce_top = (m, o) => {
 
 }
 
+const interact_damage = (m, o) => {
+    if (take_damage_and_knock_back(m, o)) return 1
+
+    if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+        sDelayInvincTimer = 1
+    }
+
+    return 0
+}
+
 const interact_grabbable = (m, o) => {
 
     const script = o.behavior
@@ -644,7 +654,7 @@ const sInteractionHandlers = [
     { interactType: INTERACT_MR_BLIZZARD, handler: null },
     { interactType: INTERACT_HIT_FROM_BELOW, handler: null },
     { interactType: INTERACT_BOUNCE_TOP, handler: interact_bounce_top },
-    { interactType: INTERACT_DAMAGE, handler: null },
+    { interactType: INTERACT_DAMAGE, handler: interact_damage },
     { interactType: INTERACT_POLE, handler: interact_pole },
     { interactType: INTERACT_HOOT, handler: null },
     { interactType: INTERACT_BREAKABLE, handler: null },

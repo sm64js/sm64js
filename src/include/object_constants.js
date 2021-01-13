@@ -136,7 +136,8 @@ export const oHomeX           = 0x37
 export const oHomeY           = 0x38
 export const oHomeZ           = 0x39
 export const oFriction        = 0x3A
-export const oBuoyancy        = 0x3B
+export const oBuoyancy = 0x3B
+export const oOpacity = 0x3D
 
 export const oDamageOrCoinValue  = 0x3E
 export const oHealth             = 0x3F

@@ -73,5 +73,6 @@ export const MODEL_BOB_BARS_GRILLS = 0x38        // bob_geo_000470
 
 export const MODEL_BLACK_BOBOMB = 0xBC
 
-export const MODEL_CHECKERBOARD_PLATFORM = 0xCA
 export const MODEL_GOOMBA = 0xC0 
+export const MODEL_CHECKERBOARD_PLATFORM = 0xCA
+export const MODEL_EXPLOSION = 0xCD        // explosion_geo

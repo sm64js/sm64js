@@ -17,6 +17,7 @@ import { bobomb_seg8_anims_0802396C } from "../actors/bobomb/anims/table.inc"
 import { bhv_bobomb_loop, bhv_bobomb_init } from "./behaviors/bobomb.inc"
 import { gLinker } from "./Linker"
 import { bhv_explosion_init, bhv_explosion_loop } from "./behaviors/explosion.inc"
+import { bhv_respawner_loop } from "./behaviors/corkbox.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -155,6 +156,13 @@ export const bhvSeesawPlatform = () => {
     ]
 }
 
+export const bhvRespawner = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_respawner_loop } },
+    { command: BhvCmds.end_loop },
+]
 
 export const bhvGoomba = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PUSHABLE } },

@@ -1,6 +1,6 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
-import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE } from "../include/object_constants"
+import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 import { bhv_pole_init, bhv_giant_pole_loop } from "./behaviors/pole.inc"
@@ -15,6 +15,7 @@ import { bhv_goomba_init, bhv_goomba_update, bhv_goomba_triplet_spawner_update }
 import { bobomb_seg8_anims_0802396C } from "../actors/bobomb/anims/table.inc"
 import { bhv_bobomb_loop, bhv_bobomb_init } from "./behaviors/bobomb.inc"
 import { gLinker } from "./Linker"
+import { bhv_explosion_init, bhv_explosion_loop } from "./behaviors/explosion.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -175,6 +176,22 @@ export const bhvBobomb = [
     { command: BhvCmds.call_native, args: { func: bhv_bobomb_init } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_bobomb_loop } },
+    { command: BhvCmds.end_loop }
+]
+
+export const bhvExplosion = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DESTRUCTIVE } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.set_interact_type, args: { type: Interact.INTERACT_DAMAGE } },
+    { command: BhvCmds.set_int, args: { field: oDamageOrCoinValue, value: 2 } },
+    { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
+    { command: BhvCmds.set_hitbox_with_offset, args: { radius: 150, height: 150, downOffset: 150 } },
+    { command: BhvCmds.set_int, args: { field: oAnimState, value: -1 } },
+    { command: BhvCmds.call_native, args: { func: bhv_explosion_init } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_explosion_loop } },
+        { command: BhvCmds.add_int, args: { field: oAnimState, value: 1 } },
     { command: BhvCmds.end_loop }
 ]
 

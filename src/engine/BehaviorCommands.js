@@ -94,6 +94,12 @@ class BehaviorCommands {
         return this.BHV_PROC_BREAK
     }
 
+    add_int(args) {
+        ObjListProc.gCurrentObject.rawData[args.field] += args.value
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
     set_int(args) {
         ObjListProc.gCurrentObject.rawData[args.field] = args.value
         this.bhvScript.index++
@@ -192,6 +198,14 @@ class BehaviorCommands {
     set_hitbox(args) {
         ObjListProc.gCurrentObject.hitboxRadius = args.radius
         ObjListProc.gCurrentObject.hitboxHeight = args.height
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    set_hitbox_with_offset(args) {
+        ObjListProc.gCurrentObject.hitboxRadius = args.radius
+        ObjListProc.gCurrentObject.hitboxHeight = args.height
+        ObjListProc.gCurrentObject.hitboxDownOffset = args.downOffset
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }

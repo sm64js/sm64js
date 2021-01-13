@@ -364,7 +364,7 @@ class GeoRenderer {
                 MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], object.header.gfx.throwMatrix, this.gMatStack[this.gMatStackIndex])
             } else if (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_CYLBOARD) {
                 MathUtil.mtxf_cylboard(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex], object.header.gfx.pos, this.gCurGraphNodeCamera.wrapper.roll)
-            } else if (object.header.gfx.node.flags & GraphNode.GRAPH_NODE_TYPE_BILLBOARD) {
+            } else if (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_BILLBOARD) {
                 MathUtil.mtxf_billboard(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex], object.header.gfx.pos, this.gCurGraphNodeCamera.wrapper.roll)
             } else {
                 MathUtil.mtxf_rotate_zxy_and_translate(mtxf, object.header.gfx.pos, object.header.gfx.angle)

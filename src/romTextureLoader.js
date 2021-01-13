@@ -90,6 +90,16 @@ import {
 } from "./actors/bobomb/model.inc"
 
 import {
+    explosion_seg3_texture_03000A08,
+    explosion_seg3_texture_03001208,
+    explosion_seg3_texture_03001A08,
+    explosion_seg3_texture_03002208,
+    explosion_seg3_texture_03002A08,
+    explosion_seg3_texture_03003208,
+    explosion_seg3_texture_03003A08
+} from "./actors/explosion/model.inc"
+
+import {
     generic_09005800,
     generic_09006000,
     generic_09009800,
@@ -199,7 +209,7 @@ import {
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 17
+const textureVersion = 18
 
 const loadDataIntoGame = (data) => {
 
@@ -401,6 +411,14 @@ const loadDataIntoGame = (data) => {
     bobomb_seg8_texture_08020A60.push(...data["actors/bobomb/bob-omb_buddy_right_side.rgba16.png"].data)
     bobomb_seg8_texture_08021A60.push(...data["actors/bobomb/bob-omb_eyes.rgba16.png"].data)
     bobomb_seg8_texture_08022260.push(...data["actors/bobomb/bob-omb_eyes_blink.rgba16.png"].data)
+
+    explosion_seg3_texture_03000A08.push(...data["actors/explosion/explosion_0.rgba16.png"].data)
+    explosion_seg3_texture_03001208.push(...data["actors/explosion/explosion_1.rgba16.png"].data)
+    explosion_seg3_texture_03001A08.push(...data["actors/explosion/explosion_2.rgba16.png"].data)
+    explosion_seg3_texture_03002208.push(...data["actors/explosion/explosion_3.rgba16.png"].data)
+    explosion_seg3_texture_03002A08.push(...data["actors/explosion/explosion_4.rgba16.png"].data)
+    explosion_seg3_texture_03003208.push(...data["actors/explosion/explosion_5.rgba16.png"].data)
+    explosion_seg3_texture_03003A08.push(...data["actors/explosion/explosion_6.rgba16.png"].data)
 
     SkyboxWater.water_skybox_texture_00000.push(...data["water_skybox_texture_00000"].data)
     SkyboxWater.water_skybox_texture_00001.push(...data["water_skybox_texture_00001"].data)

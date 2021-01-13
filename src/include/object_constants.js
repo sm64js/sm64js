@@ -214,3 +214,7 @@ export const oBobombFuseTimer = 0x1D
     export const BOBOMB_ACT_LAVA_DEATH = 100
     export const BOBOMB_ACT_DEATH_PLANE_DEATH = 101
 
+/* Object Respawner */
+export const oRespawnerModelToRespawn    = 0x1B
+export const oRespawnerMinSpawnDist      = 0x1C
+export const oRespawnerBehaviorToRespawn = 0x1D

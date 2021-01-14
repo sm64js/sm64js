@@ -1,6 +1,6 @@
 use crate::{
     proto::{MarioMsg, SkinData},
-    Message,
+    ChatHistory, ChatResult, Message,
 };
 
 use actix::Recipient;
@@ -21,6 +21,7 @@ pub struct Client {
     addr: Recipient<Message>,
     data: Option<MarioMsg>,
     socket_id: u32,
+    level: Option<u32>,
 }
 
 impl Client {
@@ -29,6 +30,7 @@ impl Client {
             addr,
             data: None,
             socket_id,
+            level: None,
         }
     }
 
@@ -39,6 +41,14 @@ impl Client {
 
     pub fn get_socket_id(&self) -> u32 {
         self.socket_id
+    }
+
+    pub fn set_level(&mut self, level: u32) {
+        self.level = Some(level);
+    }
+
+    pub fn get_level(&self) -> Option<u32> {
+        self.level
     }
 
     pub fn send(&self, msg: Message) -> Result<()> {
@@ -53,7 +63,9 @@ pub struct Player {
     socket_id: u32,
     level: u32,
     name: String,
+    chat_history: ChatHistory,
     skin_data: Option<SkinData>,
+    skin_data_updated: bool,
 }
 
 impl Player {
@@ -63,8 +75,14 @@ impl Player {
             socket_id,
             level,
             name,
+            chat_history: ChatHistory::new(),
             skin_data: None,
+            skin_data_updated: false,
         }
+    }
+
+    pub fn get_name(&self) -> &String {
+        &self.name
     }
 
     pub fn get_data(&self) -> Option<MarioMsg> {
@@ -73,6 +91,7 @@ impl Player {
 
     pub fn set_skin_data(&mut self, skin_data: Option<SkinData>) {
         self.skin_data = skin_data;
+        self.skin_data_updated = true;
     }
 
     pub fn send_message(&self, msg: Vec<u8>) -> Result<()> {
@@ -80,5 +99,18 @@ impl Player {
             .get(&self.socket_id)
             .unwrap()
             .send(Message(msg))
+    }
+
+    pub fn add_chat_message(&mut self, message: &String) -> ChatResult {
+        self.chat_history.add_message(message)
+    }
+
+    pub fn get_updated_skin_data(&mut self) -> Option<SkinData> {
+        if self.skin_data_updated {
+            self.skin_data_updated = false;
+            self.skin_data.clone()
+        } else {
+            None
+        }
     }
 }

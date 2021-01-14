@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SM64JS API</title>
+    <meta charset="UTF-8" />
+    <script type="module" src="./api/rapidoc-min.js"></script>
+    <style>
+      html {
+        box-sizing: border-box;
+        overflow: -moz-scrollbars-vertical;
+        overflow-y: scroll;
+      }
+      *,
+      *:before,
+      *:after {
+        box-sizing: inherit;
+      }
+      body {
+        margin: 0;
+        background: #fafafa;
+      }
+    </style>
+  </head>
+  <body>
+    <rapi-doc
+      spec-url="./api/spec"
+      theme="dark"
+      show-header="false"
+      render-style="read"
+      allow-spec-url-load="false"
+      allow-spec-file-load="false"
+    >
+      <div slot="nav-logo" style="display: flex; justify-content: space-around">
+        <img src="./api/icon.png" />
+        <h2>SM64JS API</h2>
+      </div>
+    </rapi-doc>
+  </body>
+</html>

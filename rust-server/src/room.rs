@@ -1,5 +1,5 @@
 use crate::{
-    proto::{root_msg, sm64_js_msg, FlagMsg, MarioListMsg, RootMsg, Sm64JsMsg},
+    proto::{root_msg, sm64_js_msg, FlagMsg, MarioListMsg, RootMsg, SkinMsg, Sm64JsMsg},
     Player, WeakPlayers,
 };
 
@@ -131,6 +131,49 @@ impl Room {
         let mut msg = vec![];
         root_msg.encode(&mut msg)?;
 
+        self.broadcast_message(&msg);
+        Ok(())
+    }
+
+    pub fn broadcast_skins(&mut self) -> Result<()> {
+        let messages: Vec<_> = self
+            .players
+            .par_iter_mut()
+            .filter_map(|(_, player)| {
+                if let Some(player) = player.upgrade() {
+                    if let Some(skin_data) = player.write().get_updated_skin_data() {
+                        Some((skin_data, player.read().get_name().clone()))
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            })
+            .map(|(skin_data, player_name)| -> Result<_> {
+                let root_msg = RootMsg {
+                    message: Some(root_msg::Message::UncompressedSm64jsMsg(Sm64JsMsg {
+                        message: Some(sm64_js_msg::Message::SkinMsg(SkinMsg {
+                            socket_id: 0,
+                            skin_data: Some(skin_data),
+                            player_name,
+                        })),
+                    })),
+                };
+                let mut msg = vec![];
+                root_msg.encode(&mut msg)?;
+                Ok(msg)
+            })
+            .collect::<Result<Vec<_>>>()?;
+
+        messages
+            .par_iter()
+            .for_each(|msg| self.broadcast_message(msg));
+
+        Ok(())
+    }
+
+    pub fn broadcast_message(&self, msg: &Vec<u8>) {
         self.players
             .values()
             .par_bridge()
@@ -140,8 +183,8 @@ impl Room {
                 }
                 Ok(())
             })
-            .collect::<Result<Vec<_>>>()?;
-        Ok(())
+            .filter_map(Result::ok)
+            .collect::<Vec<_>>();
     }
 
     pub fn has_player(&self, socket_id: u32) -> bool {

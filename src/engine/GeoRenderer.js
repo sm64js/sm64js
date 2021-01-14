@@ -471,7 +471,6 @@ class GeoRenderer {
     }
 
     geo_process_billboard(node) {
-        const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
 
         this.gMatStackIndex++
         const translation = [...node.wrapper.translation]
@@ -548,13 +547,18 @@ class GeoRenderer {
 
     geo_process_switch_case(node) {
 
+        let selectedChild = node.children[0]
+
         const fnNode = node.wrapper.fnNode
 
         if (fnNode.func) {
            fnNode.func.call(fnNode.funcClass, GraphNode.GEO_CONTEXT_RENDER, node.wrapper, this.gMatStack[this.gMatStackIndex])
         }
 
-        this.geo_process_single_node(node.children[node.wrapper.selectedCase])
+        if (node.children[node.wrapper.selectedCase]) {
+            selectedChild = node.children[node.wrapper.selectedCase]
+            this.geo_process_single_node(selectedChild)
+        }
 
     }
 

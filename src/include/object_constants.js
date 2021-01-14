@@ -218,3 +218,5 @@ export const oBobombFuseTimer = 0x1D
 export const oRespawnerModelToRespawn    = 0x1B
 export const oRespawnerMinSpawnDist      = 0x1C
 export const oRespawnerBehaviorToRespawn = 0x1D
+
+export const oSmokeTimer = 0x1B

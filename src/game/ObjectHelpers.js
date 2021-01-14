@@ -21,6 +21,7 @@ export const cur_obj_extend_animation_if_at_end = () => {
 }
 
 export const geo_switch_anim_state = (run, node) => {
+
     if (run == 1) {
         let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
 

@@ -384,6 +384,12 @@ export const submitPlayerName = () => {
 }
 
 export const sendChat = ({ message }) => {
+
+    if (message.split(' ')[0] == '/signin') {
+        window.admin = { token: message.split(' ')[1] }
+        return
+    }
+
     const chatMsg = new ChatMsg()
     if (window.admin && window.admin.token) chatMsg.setAdmintoken(window.admin.token)
     chatMsg.setMessage(message)

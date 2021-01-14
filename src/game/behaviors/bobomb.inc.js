@@ -1,12 +1,13 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { is_point_within_radius_of_mario, object_step, obj_return_home_if_safe, obj_check_if_facing_toward_angle, obj_check_floor_death, sObjFloor } from "../ObjBehaviors"
-import { oPosX, oPosY, oPosZ, oAnimState, oBobombBlinkTimer, oHeldState, HELD_FREE, oBehParams, oBehParams2ndByte, BOBOMB_BP_STYPE_GENERIC, oAction, BOBOMB_ACT_PATROL, BOBOMB_ACT_CHASE_MARIO, BOBOMB_ACT_EXPLODE, oBobombFuseTimer, oForwardVel, oGravity, oFriction, oBuoyancy, oInteractionSubtype, oHomeX, oHomeY, oHomeZ, oMoveAngleYaw, oAngleToMario, oBobombFuseLit, oFaceAngleYaw, oTimer, ACTIVE_FLAGS_DEACTIVATED, oInteractStatus, oVelY, BOBOMB_ACT_LAUNCHED, oGraphYOffset } from "../../include/object_constants"
+import { oPosX, oPosY, oPosZ, oAnimState, oBobombBlinkTimer, oHeldState, HELD_FREE, oBehParams, oBehParams2ndByte, BOBOMB_BP_STYPE_GENERIC, oAction, BOBOMB_ACT_PATROL, BOBOMB_ACT_CHASE_MARIO, BOBOMB_ACT_EXPLODE, oBobombFuseTimer, oForwardVel, oGravity, oFriction, oBuoyancy, oInteractionSubtype, oHomeX, oHomeY, oHomeZ, oMoveAngleYaw, oAngleToMario, oBobombFuseLit, oSmokeTimer, oTimer, ACTIVE_FLAGS_DEACTIVATED, oInteractStatus, oVelY, BOBOMB_ACT_LAUNCHED, oGraphYOffset, oVelX, oVelZ } from "../../include/object_constants"
 import { INT_SUBTYPE_KICKABLE, INTERACT_GRABBABLE, INT_STATUS_INTERACTED, INT_STATUS_MARIO_UNK1, INT_STATUS_TOUCHED_BOB_OMB } from "../Interaction"
-import { obj_turn_toward_object, obj_attack_collided_from_other_object, cur_obj_scale, spawn_object } from "../ObjectHelpers"
+import { obj_turn_toward_object, obj_attack_collided_from_other_object, cur_obj_scale, spawn_object, obj_mark_for_deletion } from "../ObjectHelpers"
 import { obj_set_hitbox } from "../ObjBehaviors2"
-import { MODEL_EXPLOSION, MODEL_BLACK_BOBOMB } from "../../include/model_ids"
-import { bhvExplosion, bhvBobomb } from "../BehaviorData"
+import { MODEL_EXPLOSION, MODEL_BLACK_BOBOMB, MODEL_SMOKE } from "../../include/model_ids"
+import { bhvExplosion, bhvBobomb, bhvBobombFuseSmoke } from "../BehaviorData"
 import { create_respawner } from "./corkbox.inc"
+import { int32 } from "../../utils"
 
 const sBobombHitbox = {
     interactType: INTERACT_GRABBABLE,
@@ -177,7 +178,9 @@ export const bhv_bobomb_loop = () => {
             else 
                 dustPeriodMinus1 = 7
 
-            /// smoke particle objects
+            if ((dustPeriodMinus1 & o.rawData[oBobombFuseTimer]) == 0) {
+                spawn_object(o, MODEL_SMOKE, bhvBobombFuseSmoke)
+            }
 
             // TODO Smoke Lit Sound
 
@@ -185,4 +188,27 @@ export const bhv_bobomb_loop = () => {
         }
         
     }
+}
+
+export const bhv_bobomb_fuse_smoke_init = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.rawData[oPosX] += int32(Math.random() * 80) - 40
+    o.rawData[oPosY] += int32(Math.random() * 80) + 60
+    o.rawData[oPosZ] += int32(Math.random() * 80) - 40
+    cur_obj_scale(1.2)
+}
+
+export const bhv_dust_smoke_loop = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.rawData[oPosX] += o.rawData[oVelX]
+    o.rawData[oPosY] += o.rawData[oVelY]
+    o.rawData[oPosZ] += o.rawData[oVelZ]
+
+    if (o.rawData[oSmokeTimer] == 10) {
+        obj_mark_for_deletion(o)
+    }
+
+    o.rawData[oSmokeTimer]++
 }

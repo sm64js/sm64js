@@ -14,7 +14,7 @@ import { SurfaceLoadInstance as SurfaceLoad } from "./SurfaceLoad"
 import { goomba_seg8_anims_0801DA4C } from "../actors/goomba/anims/table.inc"
 import { bhv_goomba_init, bhv_goomba_update, bhv_goomba_triplet_spawner_update } from "./behaviors/goomba.inc"
 import { bobomb_seg8_anims_0802396C } from "../actors/bobomb/anims/table.inc"
-import { bhv_bobomb_loop, bhv_bobomb_init } from "./behaviors/bobomb.inc"
+import { bhv_bobomb_loop, bhv_bobomb_init, bhv_bobomb_fuse_smoke_init, bhv_dust_smoke_loop } from "./behaviors/bobomb.inc"
 import { gLinker } from "./Linker"
 import { bhv_explosion_init, bhv_explosion_loop } from "./behaviors/explosion.inc"
 import { bhv_respawner_loop } from "./behaviors/corkbox.inc"
@@ -212,6 +212,19 @@ export const bhvExplosion = [
     { command: BhvCmds.call_native, args: { func: bhv_explosion_init } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_explosion_loop } },
+        { command: BhvCmds.add_int, args: { field: oAnimState, value: 1 } },
+    { command: BhvCmds.end_loop }
+]
+
+export const bhvBobombFuseSmoke = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.set_int, args: { field: oAnimState, value: -1 } },
+    { command: BhvCmds.call_native, args: { func: bhv_bobomb_fuse_smoke_init } },
+    { command: BhvCmds.delay, args: { num: 1 } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_dust_smoke_loop } },
         { command: BhvCmds.add_int, args: { field: oAnimState, value: 1 } },
     { command: BhvCmds.end_loop }
 ]

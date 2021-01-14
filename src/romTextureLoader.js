@@ -100,6 +100,16 @@ import {
 } from "./actors/explosion/model.inc"
 
 import {
+    smoke_seg4_texture_0401DEA0,
+    smoke_seg4_texture_0401E6A0,
+    smoke_seg4_texture_0401EEA0,
+    smoke_seg4_texture_0401F6A0,
+    smoke_seg4_texture_0401FEA0,
+    smoke_seg4_texture_040206A0,
+    smoke_seg4_texture_04020EA0
+} from "./actors/walk_smoke/model.inc"
+
+import {
     generic_09005800,
     generic_09006000,
     generic_09009800,
@@ -206,10 +216,11 @@ import {
     grass_0900B800
 } from "./textures/grass"
 
+
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 18
+const textureVersion = 19
 
 const loadDataIntoGame = (data) => {
 
@@ -419,6 +430,14 @@ const loadDataIntoGame = (data) => {
     explosion_seg3_texture_03002A08.push(...data["actors/explosion/explosion_4.rgba16.png"].data)
     explosion_seg3_texture_03003208.push(...data["actors/explosion/explosion_5.rgba16.png"].data)
     explosion_seg3_texture_03003A08.push(...data["actors/explosion/explosion_6.rgba16.png"].data)
+
+    smoke_seg4_texture_0401DEA0.push(...data["actors/walk_smoke/walk_smoke_0.ia16.png"].data)
+    smoke_seg4_texture_0401E6A0.push(...data["actors/walk_smoke/walk_smoke_1.ia16.png"].data)
+    smoke_seg4_texture_0401EEA0.push(...data["actors/walk_smoke/walk_smoke_2.ia16.png"].data)
+    smoke_seg4_texture_0401F6A0.push(...data["actors/walk_smoke/walk_smoke_3.ia16.png"].data)
+    smoke_seg4_texture_0401FEA0.push(...data["actors/walk_smoke/walk_smoke_4.ia16.png"].data)
+    smoke_seg4_texture_040206A0.push(...data["actors/walk_smoke/walk_smoke_5.ia16.png"].data)
+    smoke_seg4_texture_04020EA0.push(...data["actors/walk_smoke/walk_smoke_6.ia16.png"].data)
 
     SkyboxWater.water_skybox_texture_00000.push(...data["water_skybox_texture_00000"].data)
     SkyboxWater.water_skybox_texture_00001.push(...data["water_skybox_texture_00001"].data)

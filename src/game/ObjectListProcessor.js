@@ -178,7 +178,6 @@ class ObjectListProcessor {
                 info16 |= bits << 8
                 obj.respawnInfo = info16
                 break
-            default: throw "unknown obj respawn type"
         }
     }
 

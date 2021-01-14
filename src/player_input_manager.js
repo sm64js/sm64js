@@ -1,5 +1,5 @@
 import * as Keydrown from "./keydrown.min.js"
-import { gameData, sendChat, submitPlayerName } from "./socket.js"
+import { gameData, sendChat, submitPlayerName } from "./socket"
 
 /////// Keyboard / Gamepad Input ////////
 window.playerInput = {}
@@ -46,7 +46,7 @@ window.addEventListener("keydown", (e) => {
         document.getElementById('banbox').blur()
     }
 
-    if ($("#playerNameInput").is(':focus') && e.keyCode == 13) {
+    if (!window.playerNameAccepted && e.keyCode == 13) {
         document.getElementById('playerNameInput').blur()
         submitPlayerName()
     }
@@ -151,7 +151,7 @@ Keydrown.LEFT.up(() => { keyboardButtons.left = false })
 Keydrown.RIGHT.up(() => { keyboardButtons.right = false })
 Keydrown.CTRL.up(() => { keyboardButtons.ctrl = false })
 
-const keyboardButtonMapping = {
+const defaultKeyboardButtonMapping = {
     a: 'space',
     b: 'b',
     start: 'enter',
@@ -167,7 +167,7 @@ const keyboardButtonMapping = {
     map: 'm',
     taunt: 't'
 }
-const defaultKeyboardButtonMapping = { ...keyboardButtonMapping }
+const keyboardButtonMapping = { ...defaultKeyboardButtonMapping }
 
 const gamepadButtonMapping = { //works for xbox
     a: 0,
@@ -394,11 +394,8 @@ export const playerInputUpdate = () => {
 
     if (gameData.marioState) gameData.marioState.controller = window.playerInput
 
-    if (!window.playerNameAccepted && window.playerInput.buttonPressedStart) {
-        document.getElementById("playerNameInput").style.borderColor = "red"
-        document.getElementById("playerNameInput").style.borderWidth = "3px"
-        document.getElementById("playerNameResult").style.color = "red"
-        $("#playerNameRow").effect("shake", { direction: "down", times: 3, distance: 3 }, 500)
+    if (window.playerInput.buttonPressedStart && keyboardButtonMapping.start != "enter") {
+        submitPlayerName()
     }
 
 }

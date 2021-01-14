@@ -162,5 +162,13 @@ window.onload = () => {
     document.getElementById('mainContent').hidden = false
 }
 
+window.addEventListener("keydown", (e) => {
+    if (e.keyCode == 13 && !gameStarted) {
+        if (document.getElementById("startbutton").disabled) {
+            $("#romSelect").effect("shake", { direction: "down", times: 3, distance: 3 }, 500)
+        } else startGame()
+    }
+})
+
 if (localStorage['rules'] != rulesVersion) $('#rules-modal').modal({ backdrop: 'static', keyboard: false })
 $("#rules-modal").on('hide.bs.modal', () => { localStorage['rules'] = rulesVersion })

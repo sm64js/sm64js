@@ -380,6 +380,8 @@ export const submitPlayerName = () => {
         const rootMsg = new RootMsg()
         rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
         sendData(rootMsg.serializeBinary())
+    } else {
+        Cosmetics.shakePlayerNameInput()
     }
 }
 

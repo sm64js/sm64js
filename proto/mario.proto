@@ -118,6 +118,7 @@ message InitMsg {
 message SkinMsg {
 	uint32 socketID = 1;
 	SkinData skinData = 2;
+	string playerName = 3;
 }
 
 message SkinData {

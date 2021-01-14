@@ -1,27 +1,31 @@
-use chrono::{DateTime, TimeZone, Utc};
-use serde::{self, Deserialize, Deserializer, Serializer};
+use chrono::prelude::*;
+use serde::{self, Deserialize, Deserializer};
 
 const FORMAT: &'static str = "%Y-%m-%d %H:%M:%S";
 
-pub fn serialize<S>(date: &Option<DateTime<Utc>>, serializer: S) -> Result<S::Ok, S::Error>
+#[derive(Debug, Deserialize)]
+struct WrappedDateTime(#[serde(deserialize_with = "deserialize")] DateTime<Utc>);
+
+pub fn deserialize_opt<'de, D>(deserializer: D) -> Result<Option<DateTime<Utc>>, D::Error>
 where
-    S: Serializer,
+    D: Deserializer<'de>,
 {
-    let s = format!("{}", date.unwrap().format(FORMAT));
-    serializer.serialize_str(&s)
+    Option::<WrappedDateTime>::deserialize(deserializer).map(
+        |opt_wrapped: Option<WrappedDateTime>| {
+            opt_wrapped.map(|wrapped: WrappedDateTime| wrapped.0)
+        },
+    )
 }
 
-pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<DateTime<Utc>>, D::Error>
+fn deserialize<'de, D>(deserializer: D) -> Result<DateTime<Utc>, D::Error>
 where
     D: Deserializer<'de>,
 {
     let s = String::deserialize(deserializer)?;
-    if s.is_empty() {
-        Ok(None)
-    } else {
-        Ok(Some(
-            Utc.datetime_from_str(&s, FORMAT)
-                .map_err(serde::de::Error::custom)?,
-        ))
-    }
+    Utc.datetime_from_str(&s, FORMAT)
+        .map_err(serde::de::Error::custom)
+}
+
+pub fn empty() -> Option<DateTime<Utc>> {
+    None
 }

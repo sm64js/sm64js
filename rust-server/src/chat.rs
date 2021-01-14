@@ -7,16 +7,23 @@ use v_htmlescape::escape;
 
 #[api_v2_operation(tags(Chat))]
 pub async fn get_chat(query: web::Query<GetChat>) -> web::Json<Vec<ChatMessage>> {
+    dbg!(query);
     web::Json(vec![])
 }
 
-#[derive(Apiv2Schema, Deserialize, Serialize)]
+#[derive(Apiv2Schema, Debug, Deserialize)]
 pub struct GetChat {
     /// Format must be given as %Y-%m-%d %H:%M:%S
-    #[serde(with = "crate::date_format", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        deserialize_with = "crate::date_format::deserialize_opt",
+        default = "crate::date_format::empty"
+    )]
     from: Option<DateTime<Utc>>,
     /// Format must be given as %Y-%m-%d %H:%M:%S
-    #[serde(with = "crate::date_format", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        deserialize_with = "crate::date_format::deserialize_opt",
+        default = "crate::date_format::empty"
+    )]
     to: Option<DateTime<Utc>>,
     player_name: Option<String>,
 }

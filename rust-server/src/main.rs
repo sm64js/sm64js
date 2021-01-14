@@ -76,8 +76,8 @@ async fn main() -> std::io::Result<()> {
                 actix_files::Files::new("/api", "./rust-server/src/openapi")
                     .index_file("index.html"),
             )
-            .service(actix_files::Files::new("/", "./dist").index_file("index.html"))
             .service(web::resource("/chat").route(web::get().to(chat::get_chat)))
+            .service(actix_files::Files::new("/", "./dist").index_file("index.html"))
             .build()
     })
     .bind("0.0.0.0:3060")?

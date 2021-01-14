@@ -16,7 +16,7 @@ export const explosion_seg3_texture_03003208 = []
 export const explosion_seg3_texture_03003A08 = []
 
 export const explosion_seg3_dl_03004208 = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALRGBA), /// TODO Combine Mode
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALFADEA),
 	Gbi.gsDPSetEnvColor(255, 255, 255, 150),
 	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),

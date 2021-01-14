@@ -361,7 +361,7 @@ export class n64GfxProcessor {
         const rgba32_buf = []
 
         for (let i = 0; i < this.rdp.loaded_texture[tile].size_bytes / 2; i++) {
-            const intensity = this.rdp.loaded_texture[tile].textureData[2 * i] >> 4
+            const intensity = this.rdp.loaded_texture[tile].textureData[2 * i]
             const alpha = this.rdp.loaded_texture[tile].textureData[2* i + 1]
 
             rgba32_buf.push(intensity)

@@ -1,3 +1,5 @@
+import { coss, sins } from "../utils"
+
 export const approach_number = (current, target, inc, dec) => {
     if (current < target) {
         current += inc
@@ -89,6 +91,31 @@ export const mtxf_cylboard = (dest, mtx, position, angle) => {
     dest[3][0] = mtx[0][0] * position[0] + mtx[1][0] * position[1] + mtx[2][0] * position[2] + mtx[3][0]
     dest[3][1] = mtx[0][1] * position[0] + mtx[1][1] * position[1] + mtx[2][1] * position[2] + mtx[3][1]
     dest[3][2] = mtx[0][2] * position[0] + mtx[1][2] * position[1] + mtx[2][2] * position[2] + mtx[3][2]
+    dest[3][3] = 1
+}
+
+export const mtxf_billboard = (dest, mtx, position, angle) => {
+    dest[0][0] = coss(angle)
+    dest[0][1] = sins(angle)
+    dest[0][2] = 0
+    dest[0][3] = 0
+
+    dest[1][0] = -dest[0][1]
+    dest[1][1] = dest[0][0]
+    dest[1][2] = 0
+    dest[1][3] = 0
+
+    dest[2][0] = 0
+    dest[2][1] = 0
+    dest[2][2] = 1
+    dest[2][3] = 0
+
+    dest[3][0] =
+        mtx[0][0] * position[0] + mtx[1][0] * position[1] + mtx[2][0] * position[2] + mtx[3][0]
+    dest[3][1] =
+        mtx[0][1] * position[0] + mtx[1][1] * position[1] + mtx[2][1] * position[2] + mtx[3][1]
+    dest[3][2] =
+        mtx[0][2] * position[0] + mtx[1][2] * position[1] + mtx[2][2] * position[2] + mtx[3][2]
     dest[3][3] = 1
 }
 

@@ -122,6 +122,19 @@ export const geo_obj_init_animation = (graphNode, anim) => {
 
 }
 
+export const init_graph_node_billboard = (drawingLayer, displayList, translation) => {
+    const graphNode = {
+        node: {},
+        translation: [...translation],
+        displayList
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_BILLBOARD)
+    graphNode.node.flags = (drawingLayer << 8) | (graphNode.node.flags & 0xFF)
+
+    return graphNode
+}
+
 export const geo_reset_object_node = (graphNode) =>  {
     const zeroVec = [0, 0, 0]
     const oneVec = [1, 1, 1]

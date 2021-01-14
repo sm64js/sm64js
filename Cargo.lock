@@ -1375,6 +1375,7 @@ source = "git+https://github.com/Tarnadas/paperclip.git#57173df635435946eb0265f2
 dependencies = [
  "actix-files",
  "actix-web",
+ "chrono",
  "mime",
  "once_cell",
  "paperclip-macros",
@@ -1885,6 +1886,7 @@ dependencies = [
  "prost-build",
  "rand",
  "rayon",
+ "serde",
  "v_htmlescape 0.11.0",
 ]
 

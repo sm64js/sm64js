@@ -6,6 +6,7 @@ extern crate maplit;
 
 mod chat;
 mod client;
+mod date_format;
 mod room;
 mod server;
 mod session;
@@ -76,6 +77,7 @@ async fn main() -> std::io::Result<()> {
                     .index_file("index.html"),
             )
             .service(actix_files::Files::new("/", "./dist").index_file("index.html"))
+            .service(web::resource("/chat").route(web::get().to(chat::get_chat)))
             .build()
     })
     .bind("0.0.0.0:3060")?

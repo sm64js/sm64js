@@ -24,9 +24,10 @@ flate2 = "1"
 indexmap = "1"
 lazy_static = "1"
 maplit = "1"
-paperclip = { git = "https://github.com/Tarnadas/paperclip.git", commit = "57173df635435946eb0265f2706b34ab5492d0b7", features = ["actix-nightly", "actix-files"] }
+paperclip = { git = "https://github.com/Tarnadas/paperclip.git", commit = "57173df635435946eb0265f2706b34ab5492d0b7", features = ["actix-nightly", "actix-files", "chrono"] }
 parking_lot = "0.11"
 prost = "0.6"
 rand = "0.7"
 rayon = "1"
+serde = "*"
 v_htmlescape = "0.11"

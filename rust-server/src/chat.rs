@@ -1,7 +1,25 @@
 use censor::Censor;
 use chrono::{prelude::*, Duration};
 use indexmap::IndexMap;
+use paperclip::actix::{api_v2_operation, web, Apiv2Schema};
+use serde::{Deserialize, Serialize};
 use v_htmlescape::escape;
+
+#[api_v2_operation(tags(Chat))]
+pub async fn get_chat(query: web::Query<GetChat>) -> web::Json<Vec<ChatMessage>> {
+    web::Json(vec![])
+}
+
+#[derive(Apiv2Schema, Deserialize, Serialize)]
+pub struct GetChat {
+    /// Format must be given as %Y-%m-%d %H:%M:%S
+    #[serde(with = "crate::date_format", skip_serializing_if = "Option::is_none")]
+    from: Option<DateTime<Utc>>,
+    /// Format must be given as %Y-%m-%d %H:%M:%S
+    #[serde(with = "crate::date_format", skip_serializing_if = "Option::is_none")]
+    to: Option<DateTime<Utc>>,
+    player_name: Option<String>,
+}
 
 #[derive(Debug)]
 pub struct ChatHistory(IndexMap<DateTime<Utc>, ChatMessage>);
@@ -42,7 +60,7 @@ impl ChatHistory {
     }
 }
 
-#[derive(Debug)]
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
 pub struct ChatMessage {
     message: String,
     is_escaped: bool,

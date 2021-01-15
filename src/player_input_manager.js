@@ -44,9 +44,9 @@ window.addEventListener("keydown", (e) => {
         const message = document.getElementById('banbox').value
         if (message.split(' ')[0] == '/signin') {
             window.admin = { token: message.split(' ')[1] }
-            return
+        } else {
+            window.banPlayerList.push(message)
         }
-        window.banPlayerList.push(message)
         document.getElementById('banbox').value = ""
         document.getElementById('banbox').blur()
     }

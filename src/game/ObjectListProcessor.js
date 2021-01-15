@@ -1,11 +1,12 @@
 import { PlatformDisplacementInstance as PlatformDisplacement } from "./PlatformDisplacement"
-import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte, ACTIVE_FLAG_ACTIVE } from "../include/object_constants"
+import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte, ACTIVE_FLAG_ACTIVE, RESPAWN_INFO_TYPE_16, oFlags, OBJ_FLAG_PERSISTENT_RESPAWN } from "../include/object_constants"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import * as GraphNode from "../engine/graph_node"
 import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands"
 import * as Mario from "./Mario"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { detect_object_collisions } from "./ObjectCollisions"
+import { uint32, uint16 } from "../utils"
 
 class ObjectListProcessor {
     constructor() {
@@ -130,7 +131,10 @@ class ObjectListProcessor {
             obj = obj.next
 
             if ((this.gCurrentObject.activeFlags & ACTIVE_FLAG_ACTIVE) != ACTIVE_FLAG_ACTIVE) {
-                /// TODO - Prevent object from respawning after exiting and re-entering the area
+                /// Prevent object from respawning after exiting and re-entering the area
+                if (!(this.gCurrentObject.rawData[oFlags] & OBJ_FLAG_PERSISTENT_RESPAWN)) {
+                    this.set_object_respawn_info_bits(this.gCurrentObject, RESPAWN_INFO_DONT_RESPAWN)
+                }
 
                 Spawn.unload_object(this.gCurrentObject)
             }
@@ -144,6 +148,21 @@ class ObjectListProcessor {
         this.sObjectListUpdateOrder.forEach(listIndex => {
             this.unload_deactivated_objects_in_list(this.gObjectLists[listIndex])
         })
+    }
+
+    set_object_respawn_info_bits(obj, bits) {
+        switch (obj.respawnInfoType) {
+            case RESPAWN_INFO_TYPE_32:
+                let info32 = uint32(obj.respawnInfo)
+                info32 |= bits << 8
+                obj.respawnInfo = info32
+                break
+            case RESPAWN_INFO_TYPE_16:
+                let info16 = uint16(obj.respawnInfo)
+                info16 |= bits << 8
+                obj.respawnInfo = info16
+                break
+        }
     }
 
     bhv_mario_update() {

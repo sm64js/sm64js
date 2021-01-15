@@ -59,6 +59,26 @@ class SurfaceCollision {
         return floorHeight
     }
 
+    find_wall_collision(xPtr, yPtr, zPtr, offsetY, radius) {
+        const collisionData = {
+            radius,
+            offsetY,
+            x: xPtr.value,
+            y: yPtr.value,
+            z: zPtr.value,
+            walls: []
+        }
+
+        const numCollisions = this.find_wall_collisions(collisionData)
+
+        xPtr.value = collisionData.x
+        yPtr.value = collisionData.y
+        zPtr.value = collisionData.z
+
+        return numCollisions
+
+    }
+
     find_wall_collisions(colData) {
 
         let numCollisions = 0

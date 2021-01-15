@@ -1,4 +1,5 @@
 export const MODEL_NONE                            = 0x00
+export const MODEL_MARIO                           = 0x01
 
 export const MODEL_LEVEL_GEOMETRY_03               = 0x03
 export const MODEL_LEVEL_GEOMETRY_04               = 0x04
@@ -71,5 +72,10 @@ export const MODEL_BOB_CHAIN_CHOMP_GATE             = 0x36        // bob_geo_000
 export const MODEL_BOB_SEESAW_PLATFORM              = 0x37        // bob_geo_000458
 export const MODEL_BOB_BARS_GRILLS = 0x38        // bob_geo_000470
 
-export const MODEL_CHECKERBOARD_PLATFORM = 0xCA
+export const MODEL_SMOKE = 0x96        // smoke_geo
+
+export const MODEL_BLACK_BOBOMB = 0xBC
+
 export const MODEL_GOOMBA = 0xC0 
+export const MODEL_CHECKERBOARD_PLATFORM = 0xCA
+export const MODEL_EXPLOSION = 0xCD        // explosion_geo

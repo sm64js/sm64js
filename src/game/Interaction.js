@@ -2,6 +2,8 @@ import * as Mario from "./Mario"
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
 import { atan2s } from "../engine/math_util"
 import { sins, coss } from "../utils"
+import { gLinker } from "./Linker"
+import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
 export const INTERACT_GRABBABLE      /* 0x00000002 */ = (1 << 1)
@@ -145,6 +147,48 @@ const interact_bounce_top = (m, o) => {
 
 }
 
+const interact_damage = (m, o) => {
+    if (take_damage_and_knock_back(m, o)) return 1
+
+    if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+        sDelayInvincTimer = 1
+    }
+
+    return 0
+}
+
+const interact_grabbable = (m, o) => {
+
+    const script = o.behavior
+
+    if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_KICKABLE) {
+        const interaction = determine_interaction(m, o)
+        if (interaction & (INT_KICK | INT_TRIP)) {
+            attack_object(o, interaction)
+            bounce_back_from_attack(m, interaction)
+            return 0
+        }
+    }
+
+    if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_GRABS_MARIO) {
+        throw "unimplemented object grabs mario - interact_grabbable"
+    }
+
+    if (able_to_grab_object(m)) {
+        if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_NOT_GRABBABLE)) {
+            m.interactObj = o
+            m.input |= Mario.INPUT_INTERACT_OBJ_GRABBABLE
+            return 1
+        }
+    }
+
+    if (script != gLinker.bhvBowser) {
+        push_mario_out_of_object(m, o, -5.0)
+    }
+
+    return 0
+}
+
 const interact_pole = (m, o) => {
     const actionId = m.action & Mario.ACT_ID_MASK
     if (actionId >= 0x80 && actionId < 0x0A0) {
@@ -176,11 +220,61 @@ const interact_pole = (m, o) => {
     return 0
 }
 
+const able_to_grab_object = (m) => {
+    const action = m.action
+
+    if (action == Mario.ACT_DIVE_SLIDE || action == Mario.ACT_DIVE) {
+        if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_GRABS_MARIO)) {
+            return 1
+        }
+    } else if (action == Mario.ACT_PUNCHING || action == Mario.ACT_MOVE_PUNCHING) {
+        if (m.actionArg < 2) {
+            return 1
+        }
+    }
+
+    return 0
+}
+
 const mario_obj_angle_to_object = (m, o) => {
     const dx = o.rawData[oPosX] - m.pos[0]
     const dz = o.rawData[oPosZ] - m.pos[2]
 
     return atan2s(dz, dx)
+}
+
+const push_mario_out_of_object = (m, o, padding) => {
+    const minDistance = o.hitboxRadius + m.marioObj.hitboxRadius + padding
+
+    const offsetX = m.pos[0] - o.rawData[oPosX]
+    const offsetZ = m.pos[2] - o.rawData[oPosZ]
+    const distance = Math.sqrt(offsetX * offsetX + offsetZ * offsetZ)
+
+    if (distance < minDistance) {
+        let pushAngle
+
+        if (distance == 0.0) {
+            pushAngle = m.faceAngle[1]
+        } else {
+            pushAngle = atan2s(offsetZ, offsetX)
+        }
+
+        const newMarioX = { value: o.rawData[oPosX] + minDistance * sins(pushAngle) }
+        const newMarioZ = { value: o.rawData[oPosZ] + minDistance * coss(pushAngle) }
+        const newMarioY = { value: m.pos[1] }
+
+        Spawn.SurfaceCollision.find_wall_collision(newMarioX, newMarioY, newMarioZ, 60.0, 50.0)
+        m.pos[1] = newMarioY.value
+
+        const floorWrapper = {}
+        Spawn.SurfaceCollision.find_floor(newMarioX.value, m.pos[1], newMarioZ.value, floorWrapper)
+        if (floorWrapper.floor != null) {
+            //! Doesn't update mario's referenced floor (allows oob death when
+            // an object pushes you into a steep slope while in a ground action)
+            m.pos[0] = newMarioX.value
+            m.pos[2] = newMarioZ.value
+        }
+    }
 }
 
 const attack_object = (o, interaction) => {
@@ -446,7 +540,7 @@ const sInteractionHandlers = [
     { interactType: INTERACT_MR_BLIZZARD, handler: null },
     { interactType: INTERACT_HIT_FROM_BELOW, handler: null },
     { interactType: INTERACT_BOUNCE_TOP, handler: interact_bounce_top },
-    { interactType: INTERACT_DAMAGE, handler: null },
+    { interactType: INTERACT_DAMAGE, handler: interact_damage },
     { interactType: INTERACT_POLE, handler: interact_pole },
     { interactType: INTERACT_HOOT, handler: null },
     { interactType: INTERACT_BREAKABLE, handler: null },
@@ -454,7 +548,7 @@ const sInteractionHandlers = [
     { interactType: INTERACT_KOOPA_SHELL, handler: null },
     { interactType: INTERACT_UNKNOWN_08, handler: null },
     { interactType: INTERACT_CAP, handler: null },
-    { interactType: INTERACT_GRABBABLE, handler: null },
+    { interactType: INTERACT_GRABBABLE, handler: interact_grabbable },
     { interactType: INTERACT_TEXT, handler: null },
 ]
 

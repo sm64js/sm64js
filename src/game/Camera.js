@@ -6,9 +6,10 @@ import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS } from "../levels
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { atan2s } from "../engine/math_util"
 import * as MathUtil from "../engine/math_util"
-import { ACT_FLAG_METAL_WATER, ACT_FLAG_ON_POLE, ACT_FLAG_HANGING, ACT_RIDING_HOOT, ACT_LONG_JUMP, ACT_TOP_OF_POLE, ACT_SLEEPING, ACT_START_SLEEPING } from "./Mario"
+import { ACT_FLAG_METAL_WATER, ACT_FLAG_ON_POLE, ACT_FLAG_HANGING, ACT_RIDING_HOOT, ACT_LONG_JUMP, ACT_TOP_OF_POLE, ACT_SLEEPING, ACT_START_SLEEPING, ACT_DIVE } from "./Mario"
 import { oPosY } from "../include/object_constants"
 import { SURFACE_DEATH_PLANE } from "../include/surface_terrains"
+import { sins } from "../utils"
 
 const CAM_FOV_DEFAULT = 2
 
@@ -85,6 +86,25 @@ const DOOR_ENTER_LOBBY     = 2
 class Camera {
     constructor() {
 
+        this.SHAKE_ENV_EXPLOSION           = 1
+        this.SHAKE_ENV_BOWSER_THROW_BOUNCE = 2
+        this.SHAKE_ENV_BOWSER_JUMP         = 3
+        this.SHAKE_ENV_UNUSED_5            = 5
+        this.SHAKE_ENV_UNUSED_6            = 6
+        this.SHAKE_ENV_UNUSED_7            = 7
+        this.SHAKE_ENV_PYRAMID_EXPLODE     = 8
+        this.SHAKE_ENV_JRB_SHIP_DRAIN      = 9
+        this.SHAKE_ENV_FALLING_BITS_PLAT = 10
+
+        this.SHAKE_ATTACK         = 1
+        this.SHAKE_GROUND_POUND   = 2
+        this.SHAKE_SMALL_DAMAGE   = 3
+        this.SHAKE_MED_DAMAGE     = 4
+        this.SHAKE_LARGE_DAMAGE   = 5
+        this.SHAKE_HIT_FROM_BELOW = 8
+        this.SHAKE_FALL_DAMAGE    = 9
+        this.SHAKE_SHOCK          = 10
+
         this.CAM_MOVE_C_UP_MODE = 0x2000
 
         this.floor = null
@@ -126,6 +146,9 @@ class Camera {
             curPos: [0.0, 0.0, 0.0],
             goalFocus: [0.0, 0.0, 0.0],
             goalPos: [0.0, 0.0, 0.0],
+
+            shakeMagnitude: [0.0, 0.0, 0.0],
+            shakePitchPhase: 0,
 
             mode: 0,
             defMode: 0,
@@ -1093,6 +1116,16 @@ class Camera {
 
             this.gLakituState.roll = 0
 
+            // Apply camera shakes TODO
+            this.shake_camera_pitch(this.gLakituState.pos, this.gLakituState.focus)
+            //shake_camera_yaw()
+            //shake_camera_roll()
+            //shake_camera_handheld()
+
+            if (this.gPlayerCameraState.action == ACT_DIVE && this.gLakituState.lastFrameAction != ACT_DIVE) {
+                this.set_camera_shake_from_hit(this.SHAKE_HIT_FROM_BELOW)
+            }
+
             this.gLakituState.roll += this.gLakituState.keyDanceRoll
 
             if (c.mode != CAMERA_MODE_C_UP && c.cutscene == 0) {
@@ -1173,6 +1206,61 @@ class Camera {
         } else {
             const wrapper = { current: this.sFOVState.fov }
             this.camera_approach_symmetric_bool(wrapper, 45, (45 - this.sFOVState.fov) / 30)
+        }
+    }
+
+    set_camera_shake_from_hit(shake) {
+        switch (shake) {
+            case this.SHAKE_GROUND_POUND:
+                this.set_camera_pitch_shake(0x60, 0xC, 0x8000)
+                break
+            case this.SHAKE_HIT_FROM_BELOW:
+                this.gLakituState.focHSpeed = 0.07
+                this.gLakituState.posHSpeed = 0.07
+                break
+            default: throw "unimplemented camera shake from hit - set_camera_shake_from_hit"
+        }
+    }
+
+    increment_shake_offset(offsetWrapper, increment) {
+        if (increment == -0x8000) {
+            offsetWrapper.value = (offsetWrapper.value & 0x8000) + 0xC000
+        } else {
+            offsetWrapper.value += increment
+        }
+    }
+
+    shake_camera_pitch(pos, focus) {
+        if (this.gLakituState.shakeMagnitude[0] | this.gLakituState.shakeMagnitude[1]) {
+            const output = {}
+            MathUtil.vec3f_get_dist_and_angle(pos, focus, output)
+            output.pitch += this.gLakituState.shakeMagnitude[0] * sins(this.gLakituState.shakePitchPhase)
+            MathUtil.vec3f_set_dist_and_angle(pos, focus, output.dist, output.pitch, output.yaw)
+            const wrapper = { value: this.gLakituState.shakePitchPhase }
+            this.increment_shake_offset(wrapper, this.gLakituState.shakePitchVel)
+            this.gLakituState.shakePitchPhase = wrapper.value
+            const currentWrapper = { current: this.gLakituState.shakeMagnitude[0] }
+            if (this.camera_approach_symmetric_bool(currentWrapper, 0, this.gLakituState.shakePitchDecay) == 0) {
+                this.gLakituState.shakePitchPhase = 0
+            }
+            this.gLakituState.shakeMagnitude[0] = currentWrapper.current
+        }
+    }
+
+    set_camera_pitch_shake(mag, decay, inc) {
+        if (this.gLakituState.shakeMagnitude[0] < mag) {
+            this.gLakituState.shakeMagnitude[0] = mag
+            this.gLakituState.shakePitchDecay = decay
+            this.gLakituState.shakePitchVel = inc
+        }
+    }
+
+    set_environmental_camera_shake(shake) {
+        switch (shake) {
+            case this.SHAKE_ENV_EXPLOSION:
+                this.set_camera_pitch_shake(0x60, 0x8, 0x4000)
+                break
+            default: throw "unimplemented camera shake type " + shake
         }
     }
 }

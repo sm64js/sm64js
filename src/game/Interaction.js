@@ -331,6 +331,27 @@ const interact_grabbable = (m, o) => {
 
     const script = o.behavior
 
+    if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_KICKABLE) {
+        const interaction = determine_interaction(m, o)
+        if (interaction & (INT_KICK | INT_TRIP)) {
+            attack_object(o, interaction)
+            bounce_back_from_attack(m, interaction)
+            return 0
+        }
+    }
+
+    if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_GRABS_MARIO) {
+        throw "unimplemented object grabs mario - interact_grabbable"
+    }
+
+    if (able_to_grab_object(m)) {
+        if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_NOT_GRABBABLE)) {
+            m.interactObj = o
+            m.input |= Mario.INPUT_INTERACT_OBJ_GRABBABLE
+            return 1
+        }
+    }
+
     if (script != gLinker.bhvBowser) {
         push_mario_out_of_object(m, o, -5.0)
     }
@@ -363,6 +384,22 @@ const interact_pole = (m, o) => {
             reset_mario_pitch(m) /// TODO: WATER JUMP || SHOT FROM CANNON || ACT_FLYING
             return Mario.set_mario_action(m, Mario.ACT_GRAB_POLE_FAST, 0)
 
+        }
+    }
+
+    return 0
+}
+
+const able_to_grab_object = (m) => {
+    const action = m.action
+
+    if (action == Mario.ACT_DIVE_SLIDE || action == Mario.ACT_DIVE) {
+        if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_GRABS_MARIO)) {
+            return 1
+        }
+    } else if (action == Mario.ACT_PUNCHING || action == Mario.ACT_MOVE_PUNCHING) {
+        if (m.actionArg < 2) {
+            return 1
         }
     }
 

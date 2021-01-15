@@ -1,7 +1,9 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { oTimer, oOpacity, oPosX, oPosZ, ACTIVE_FLAGS_DEACTIVATED } from "../../include/object_constants"
+import { oTimer, oOpacity, oPosX, oPosZ, ACTIVE_FLAGS_DEACTIVATED, oPosY } from "../../include/object_constants"
 import { SpawnObjectInstance as Spawn } from "../SpawnObject"
-import { cur_obj_scale } from "../ObjectHelpers"
+import { cur_obj_scale, spawn_object } from "../ObjectHelpers"
+import { MODEL_SMOKE } from "../../include/model_ids"
+import { bhvBobombBullyDeathSmoke } from "../BehaviorData"
 
 export const bhv_explosion_init = () => {
 
@@ -17,10 +19,10 @@ export const bhv_explosion_loop = () => {
     const o = ObjectListProc.gCurrentObject
 
     if (o.rawData[oTimer] == 9) {
-        if (Spawn.SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ])) {
+        if (Spawn.SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ]) > o.rawData[oPosY]) {
             // TODO make bubbles
         } else {
-            /// TODO spawn death smoke
+            spawn_object(o, MODEL_SMOKE, bhvBobombBullyDeathSmoke)
         }
 
         o.activeFlags = ACTIVE_FLAGS_DEACTIVATED

@@ -1,6 +1,6 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
-import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState } from "../include/object_constants"
+import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 import { bhv_extra_mario_base_loop } from "./behaviors/extra_mario.inc"
@@ -17,7 +17,7 @@ import { bobomb_seg8_anims_0802396C } from "../actors/bobomb/anims/table.inc"
 import { bhv_bobomb_loop, bhv_bobomb_init, bhv_bobomb_fuse_smoke_init, bhv_dust_smoke_loop } from "./behaviors/bobomb.inc"
 import { gLinker } from "./Linker"
 import { bhv_explosion_init, bhv_explosion_loop } from "./behaviors/explosion.inc"
-import { bhv_respawner_loop } from "./behaviors/corkbox.inc"
+import { bhv_respawner_loop, bhv_bobomb_bully_death_smoke_init } from "./behaviors/corkbox.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -222,6 +222,19 @@ export const bhvBobombFuseSmoke = [
     { command: BhvCmds.billboard },
     { command: BhvCmds.set_int, args: { field: oAnimState, value: -1 } },
     { command: BhvCmds.call_native, args: { func: bhv_bobomb_fuse_smoke_init } },
+    { command: BhvCmds.delay, args: { num: 1 } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_dust_smoke_loop } },
+        { command: BhvCmds.add_int, args: { field: oAnimState, value: 1 } },
+    { command: BhvCmds.end_loop }
+]
+
+export const bhvBobombBullyDeathSmoke = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL | OBJ_FLAG_MOVE_XZ_USING_FVEL } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.set_int, args: { field: oAnimState, value: -1 } },
+    { command: BhvCmds.call_native, args: { func: bhv_bobomb_bully_death_smoke_init } },
     { command: BhvCmds.delay, args: { num: 1 } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_dust_smoke_loop } },

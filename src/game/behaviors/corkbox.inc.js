@@ -1,10 +1,16 @@
-import { spawn_object_abs_with_rot, spawn_object } from "../ObjectHelpers"
+import { spawn_object_abs_with_rot, spawn_object, cur_obj_scale } from "../ObjectHelpers"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { MODEL_NONE } from "../../include/model_ids"
 import { oHomeX, oHomeY, oHomeZ, oBehParams, oRespawnerModelToRespawn, oRespawnerMinSpawnDist, oRespawnerBehaviorToRespawn, oPosX, oPosY, oPosZ, ACTIVE_FLAGS_DEACTIVATED } from "../../include/object_constants"
 import { is_point_within_radius_of_mario } from "../ObjBehaviors"
 import { bhvRespawner } from "../BehaviorData"
 
+export const bhv_bobomb_bully_death_smoke_init = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.rawData[oPosY] -= 300
+    cur_obj_scale(10.0)
+}
 
 export const bhv_respawner_loop = () => {
     const o = ObjectListProc.gCurrentObject

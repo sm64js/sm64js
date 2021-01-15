@@ -37,15 +37,11 @@ if (gameID) { document.getElementById("mapSelect").hidden = true }
 
 let websocketServerPath
 
-if (process.env.NODE_ENV === 'production') { ///Tarnadas? Rust Server
-    websocketServerPath = `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/`
-} else { /// Snuffy - sm64js.com
-    if (url.protocol == "https:") { //production
-        websocketServerPath = `wss://server.sm64js.com/websocket/`
-    } else {  /// local testing
-        websocketServerPath = `ws://${url.hostname}:3000`
-    }
-}
+const websocketServerPath = process.env.NODE_ENV === 'rust'
+    ? `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/` // Tarnadas - Rust Server
+    : url.protocol == "https:" // Snuffy - sm64js.com
+        ? `wss://${url.hostname}/websocket/` // production
+        : `ws://${url.hostname}:3000` // local testing
 
 const socket = new WebSocket(websocketServerPath)
 

@@ -41,7 +41,12 @@ window.addEventListener("keydown", (e) => {
     }
 
     if ($("#banbox").is(':focus') && e.keyCode == 13) {
-        window.banPlayerList.push(document.getElementById('banbox').value)
+        const message = document.getElementById('banbox').value
+        if (message.split(' ')[0] == '/signin') {
+            window.admin = { token: message.split(' ')[1] }
+            return
+        }
+        window.banPlayerList.push(message)
         document.getElementById('banbox').value = ""
         document.getElementById('banbox').blur()
     }

@@ -142,6 +142,9 @@ class SpawnObject {
 
     create_object(bhvScript) {
 
+        /// Some behvior scripts cannot be initialized due to circular dependancies, so are left as functions to be initialized when they are needed
+        if (bhvScript.call) bhvScript = bhvScript()
+
         let objListIndex
 
         if (bhvScript[0].command == BhvCmds.begin) {

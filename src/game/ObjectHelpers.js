@@ -40,7 +40,7 @@ export const geo_switch_anim_state = (run, node) => {
     }
 }
 
-const spawn_object_at_origin = (parent, model, behavior) => {
+export const spawn_object_at_origin = (parent, model, behavior) => {
 
     const obj = Spawn.create_object(behavior)
 

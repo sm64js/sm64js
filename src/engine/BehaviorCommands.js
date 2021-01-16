@@ -1,7 +1,7 @@
 import { ObjectListProcessorInstance as ObjListProc } from "../game/ObjectListProcessor"
-import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction, oAnimations, oInteractType, oHomeX, oHomeY, oHomeZ, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, oDistanceToMario, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, oAngleToMario, oMoveAngleYaw, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveFlags, OBJ_MOVE_ON_GROUND, oWallHitboxRadius, oGravity, oBounciness, oDragStrength, oFriction, oBuoyancy } from "../include/object_constants"
+import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction, oAnimations, oInteractType, oHomeX, oHomeY, oHomeZ, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, oDistanceToMario, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, oAngleToMario, oMoveAngleYaw, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveFlags, OBJ_MOVE_ON_GROUND, oWallHitboxRadius, oGravity, oBounciness, oDragStrength, oFriction, oBuoyancy, oBehParams2ndByte } from "../include/object_constants"
 import { GRAPH_RENDER_CYLBOARD, geo_obj_init_animation, GRAPH_RENDER_BILLBOARD } from "./graph_node"
-import { dist_between_objects, obj_angle_to_object } from "../game/ObjectHelpers"
+import { dist_between_objects, obj_angle_to_object, spawn_object_at_origin, obj_copy_pos_and_angle, cur_obj_scale } from "../game/ObjectHelpers"
 
 class BehaviorCommands {
 
@@ -101,7 +101,7 @@ class BehaviorCommands {
         return this.BHV_PROC_CONTINUE
     }
 
-    set_int(args) {
+    set_objectData_value(args) {
         ObjListProc.gCurrentObject.rawData[args.field] = args.value
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
@@ -129,6 +129,13 @@ class BehaviorCommands {
         ObjListProc.gCurrentObject.rawData[oDragStrength] = args.dragStrenth / 100.0
         ObjListProc.gCurrentObject.rawData[oFriction] = args.friction / 100.0
         ObjListProc.gCurrentObject.rawData[oBuoyancy] = args.buoyancy / 100.0
+
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    scale(args) {
+        cur_obj_scale(args.percent / 100.0)
 
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
@@ -206,6 +213,15 @@ class BehaviorCommands {
         ObjListProc.gCurrentObject.hitboxRadius = args.radius
         ObjListProc.gCurrentObject.hitboxHeight = args.height
         ObjListProc.gCurrentObject.hitboxDownOffset = args.downOffset
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    spawn_child_with_param(args) {
+        const child = spawn_object_at_origin(ObjListProc.gCurrentObject, args.model, args.behavior)
+        obj_copy_pos_and_angle(child, ObjListProc.gCurrentObject)
+        child.rawData[oBehParams2ndByte] = args.bhvParam
+
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }

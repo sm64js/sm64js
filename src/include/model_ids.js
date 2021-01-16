@@ -79,3 +79,12 @@ export const MODEL_BLACK_BOBOMB = 0xBC
 export const MODEL_GOOMBA = 0xC0 
 export const MODEL_CHECKERBOARD_PLATFORM = 0xCA
 export const MODEL_EXPLOSION = 0xCD        // explosion_geo
+
+// group 14
+export const MODEL_PIRANHA_PLANT               = 0x64        // piranha_plant_geo
+export const MODEL_WHOMP                       = 0x67        // whomp_geo
+export const MODEL_KOOPA_WITH_SHELL            = 0x68        // koopa_with_shell_geo
+export const MODEL_METALLIC_BALL               = 0x65        // metallic_ball_geo
+export const MODEL_CHAIN_CHOMP                 = 0x66        // chain_chomp
+export const MODEL_KOOPA_FLAG                  = 0x6A        // koopa_flag_geo
+export const MODEL_WOODEN_POST                 = 0x6B        // wooden_post_geo

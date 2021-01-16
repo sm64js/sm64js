@@ -216,11 +216,23 @@ import {
     grass_0900B800
 } from "./textures/grass"
 
+import { chain_ball_seg6_texture_06020AE8 } from "./actors/chain_ball/model.inc"
+
+import {
+    chain_chomp_seg6_texture_060213D0,
+    chain_chomp_seg6_texture_06021BD0,
+    chain_chomp_seg6_texture_060223D0,
+    chain_chomp_seg6_texture_06022BD0,
+    chain_chomp_seg6_texture_060233D0
+} from "./actors/chain_chomp/model.inc"
+
+import { poundable_pole_seg6_texture_06001050, poundable_pole_seg6_texture_06001850 } from "./actors/poundable_pole/model.inc"
+
 
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 19
+const textureVersion = 20
 
 const loadDataIntoGame = (data) => {
 
@@ -438,6 +450,17 @@ const loadDataIntoGame = (data) => {
     smoke_seg4_texture_0401FEA0.push(...data["actors/walk_smoke/walk_smoke_4.ia16.png"].data)
     smoke_seg4_texture_040206A0.push(...data["actors/walk_smoke/walk_smoke_5.ia16.png"].data)
     smoke_seg4_texture_04020EA0.push(...data["actors/walk_smoke/walk_smoke_6.ia16.png"].data)
+
+    chain_ball_seg6_texture_06020AE8.push(...data["actors/chain_ball/chain_ball.rgba16.png"].data)
+
+    chain_chomp_seg6_texture_060213D0.push(...data["actors/chain_chomp/chain_chomp_bright_shine.rgba16.png"].data)
+    chain_chomp_seg6_texture_06021BD0.push(...data["actors/chain_chomp/chain_chomp_dull_shine.rgba16.png"].data)
+    chain_chomp_seg6_texture_060223D0.push(...data["actors/chain_chomp/chain_chomp_tongue.rgba16.png"].data)
+    chain_chomp_seg6_texture_06022BD0.push(...data["actors/chain_chomp/chain_chomp_tooth.rgba16.png"].data)
+    chain_chomp_seg6_texture_060233D0.push(...data["actors/chain_chomp/chain_chomp_eye.rgba16.png"].data)
+
+    poundable_pole_seg6_texture_06001050.push(...data["actors/poundable_pole/poundable_pole_top.rgba16.png"].data)
+    poundable_pole_seg6_texture_06001850.push(...data["actors/poundable_pole/poundable_pole_side.rgba16.png"].data)
 
     SkyboxWater.water_skybox_texture_00000.push(...data["water_skybox_texture_00000"].data)
     SkyboxWater.water_skybox_texture_00001.push(...data["water_skybox_texture_00001"].data)

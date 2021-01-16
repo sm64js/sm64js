@@ -48,6 +48,16 @@ export const assets = {
 "actors/walk_smoke/walk_smoke_5.ia16.png": [32,32,2048,{"jp":[1125200,132768],"us":[1132368,132768],"eu":[1004336,132768],"sh":[980848,132768]}],
 "actors/walk_smoke/walk_smoke_6.ia16.png": [32,32,2048,{"jp":[1125200,134816],"us":[1132368,134816],"eu":[1004336,134816],"sh":[980848,134816]}],
 
+"actors/chain_ball/chain_ball.rgba16.png": [32,32,2048,{"jp":[1844608,133864],"us":[1851952,133864],"eu":[1723920,133864],"sh":[1700432,133864]}],
+"actors/chain_chomp/chain_chomp_bright_shine.rgba16.png": [32,32,2048,{"jp":[1844608,136144],"us":[1851952,136144],"eu":[1723920,136144],"sh":[1700432,136144]}],
+"actors/chain_chomp/chain_chomp_dull_shine.rgba16.png": [32,32,2048,{"jp":[1844608,138192],"us":[1851952,138192],"eu":[1723920,138192],"sh":[1700432,138192]}],
+"actors/chain_chomp/chain_chomp_eye.rgba16.png": [32,32,2048,{"jp":[1844608,144336],"us":[1851952,144336],"eu":[1723920,144336],"sh":[1700432,144336]}],
+"actors/chain_chomp/chain_chomp_tongue.rgba16.png": [32,32,2048,{"jp":[1844608,140240],"us":[1851952,140240],"eu":[1723920,140240],"sh":[1700432,140240]}],
+"actors/chain_chomp/chain_chomp_tooth.rgba16.png": [32,32,2048,{"jp":[1462368,27376],"us":[1469536,27376],"eu":[1341504,27376],"sh":[1318016,27376]}],
+
+"actors/poundable_pole/poundable_pole_side.rgba16.png": [32,32,2048,{"jp":[1844608,6224],"us":[1851952,6224],"eu":[1723920,6224],"sh":[1700432,6224]}],
+"actors/poundable_pole/poundable_pole_top.rgba16.png": [32,32,2048,{"jp":[1844608,4176],"us":[1851952,4176],"eu":[1723920,4176],"sh":[1700432,4176]}],
+
 "textures/intro_raw/mario_face_shine.ia8.png": [32,32,1024,{"jp":[2503888],"us":[2511696],"eu":[2380496],"sh":[2357264]}],
 "textures/intro_raw/red_star_0.rgba16.png": [32,32,2048,{"jp":[2457352],"us":[2465160],"eu":[2333960],"sh":[2310728]}],
 "textures/intro_raw/red_star_1.rgba16.png": [32,32,2048,{"jp":[2459400],"us":[2467208],"eu":[2336008],"sh":[2312776]}],

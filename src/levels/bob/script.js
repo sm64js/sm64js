@@ -5,7 +5,7 @@ import { bob_geo_000488 } from "./areas/1/geo.inc"
 import { bob_seg7_collision_level } from "./areas/1/collision.inc"
 import { bubbly_tree_geo } from "../../actors/tree/geo.inc"
 import { MODEL_BOB_BUBBLY_TREE, MODEL_BOB_SEESAW_PLATFORM, MODEL_CHECKERBOARD_PLATFORM } from "../../include/model_ids"
-import { script_func_global_1 } from "../global_scripts"
+import { script_func_global_1, script_func_global_15 } from "../global_scripts"
 import { bob_geo_000458 } from "./seesaw_platform/geo.inc"
 import { bob_seg7_macro_objs } from "./areas/1/macro.inc"
 
@@ -19,6 +19,7 @@ export const level_bob_entry = [
     { command: LevelCommands.init_level },
     { command: LevelCommands.init_mario, args: [1, 1, bhvMario] },
     { command: LevelCommands.jump_link, args: [script_func_global_1] }, 
+    { command: LevelCommands.jump_link, args: [script_func_global_15] }, 
     { command: LevelCommands.load_model_from_geo, args: [MODEL_BOB_BUBBLY_TREE, bubbly_tree_geo] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_BOB_SEESAW_PLATFORM, bob_geo_000458] },
     { command: LevelCommands.begin_area, args: [1, bob_geo_000488] },

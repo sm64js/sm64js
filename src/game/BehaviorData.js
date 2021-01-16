@@ -1,6 +1,6 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
-import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL } from "../include/object_constants"
+import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 import { bhv_pole_init, bhv_giant_pole_loop } from "./behaviors/pole.inc"
@@ -17,6 +17,8 @@ import { bhv_bobomb_loop, bhv_bobomb_init, bhv_bobomb_fuse_smoke_init, bhv_dust_
 import { gLinker } from "./Linker"
 import { bhv_explosion_init, bhv_explosion_loop } from "./behaviors/explosion.inc"
 import { bhv_respawner_loop, bhv_bobomb_bully_death_smoke_init } from "./behaviors/corkbox.inc"
+import { MODEL_WOODEN_POST } from "../include/model_ids"
+import { poundable_pole_collision_06002490 } from "../actors/poundable_pole/collision.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -47,7 +49,7 @@ const NUM_OBJ_LISTS = 13
 
 export const bhvMario = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PLAYER } },
-    { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.set_hitbox, args: { radius: 37, height: 160 } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: ObjectListProcessor.bhv_mario_update, funcClass: ObjectListProcessor } },
@@ -58,9 +60,9 @@ export const bhvTree = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE } },
     { command: BhvCmds.cyclboard },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
-    { command: BhvCmds.set_int, args: { field: oInteractType, value: Interact.INTERACT_POLE } },
+    { command: BhvCmds.set_objectData_value, args: { field: oInteractType, value: Interact.INTERACT_POLE } },
     { command: BhvCmds.set_hitbox, args: { radius: 80, height: 500 } },
-    { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_pole_base_loop } },
     { command: BhvCmds.end_loop },
@@ -76,9 +78,9 @@ export const bhvYellowBall = [
 export const bhvGiantPole = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
-    { command: BhvCmds.set_int, args: { field: oInteractType, value: Interact.INTERACT_POLE } },
+    { command: BhvCmds.set_objectData_value, args: { field: oInteractType, value: Interact.INTERACT_POLE } },
     { command: BhvCmds.set_hitbox, args: { radius: 80, height: 2100 } },
-    { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_giant_pole_loop } },
     { command: BhvCmds.end_loop },
@@ -87,10 +89,10 @@ export const bhvGiantPole = [
 export const bhvPoleGrabbing = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
-    { command: BhvCmds.set_int, args: { field: oInteractType, value: Interact.INTERACT_POLE } },
+    { command: BhvCmds.set_objectData_value, args: { field: oInteractType, value: Interact.INTERACT_POLE } },
     { command: BhvCmds.set_hitbox, args: { radius: 80, height: 1500 } },
 	{ command: BhvCmds.call_native, args: { func: bhv_pole_init } },
-    { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_pole_base_loop } },
     { command: BhvCmds.end_loop },
@@ -179,7 +181,7 @@ export const bhvBobomb = [
     { command: BhvCmds.load_animations, args: { field: oAnimations, anims: bobomb_seg8_anims_0802396C } },
     { command: BhvCmds.drop_to_floor },
     { command: BhvCmds.animate, args: { animIndex: 0 } },
-    { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.set_home },
     { command: BhvCmds.call_native, args: { func: bhv_bobomb_init } },
     { command: BhvCmds.begin_loop },
@@ -191,11 +193,11 @@ export const bhvExplosion = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DESTRUCTIVE } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
     { command: BhvCmds.billboard },
-    { command: BhvCmds.set_interact_type, args: { type: Interact.INTERACT_DAMAGE } },
-    { command: BhvCmds.set_int, args: { field: oDamageOrCoinValue, value: 2 } },
-    { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
+    { command: BhvCmds.set_objectData_valueeract_type, args: { type: Interact.INTERACT_DAMAGE } },
+    { command: BhvCmds.set_objectData_value, args: { field: oDamageOrCoinValue, value: 2 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.set_hitbox_with_offset, args: { radius: 150, height: 150, downOffset: 150 } },
-    { command: BhvCmds.set_int, args: { field: oAnimState, value: -1 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oAnimState, value: -1 } },
     { command: BhvCmds.call_native, args: { func: bhv_explosion_init } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_explosion_loop } },
@@ -207,7 +209,7 @@ export const bhvBobombFuseSmoke = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.billboard },
-    { command: BhvCmds.set_int, args: { field: oAnimState, value: -1 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oAnimState, value: -1 } },
     { command: BhvCmds.call_native, args: { func: bhv_bobomb_fuse_smoke_init } },
     { command: BhvCmds.delay, args: { num: 1 } },
     { command: BhvCmds.begin_loop },
@@ -220,12 +222,38 @@ export const bhvBobombBullyDeathSmoke = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL | OBJ_FLAG_MOVE_XZ_USING_FVEL } },
     { command: BhvCmds.billboard },
-    { command: BhvCmds.set_int, args: { field: oAnimState, value: -1 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oAnimState, value: -1 } },
     { command: BhvCmds.call_native, args: { func: bhv_bobomb_bully_death_smoke_init } },
     { command: BhvCmds.delay, args: { num: 1 } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_dust_smoke_loop } },
         { command: BhvCmds.add_int, args: { field: oAnimState, value: 1 } },
+    { command: BhvCmds.end_loop }
+]
+
+export const bhvWoodenPost = () => {
+    return [
+        { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SURFACE } },
+        { command: BhvCmds.load_collision_data, args: { data: poundable_pole_collision_06002490 } },
+        { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
+        { command: BhvCmds.set_obj_physics, args: { hitboxRadius: 0, gravity: -400, bounciness: -50, dragStrenth: 1000, friction: 1000, buoyancy: 200 } },
+        { command: BhvCmds.set_objectData_value, args: { field: oNumLootCoins, value: 5 } },
+        { command: BhvCmds.drop_to_floor },
+        { command: BhvCmds.set_home },
+        { command: BhvCmds.scale, args: { percent: 50 } },
+        { command: BhvCmds.begin_loop },
+            { command: BhvCmds.call_native, args: { func: SurfaceLoad.load_object_collision_model, funcClass: SurfaceLoad } },
+        { command: BhvCmds.end_loop }
+    ]
+}
+
+export const bhvChainChomp = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_GENACTOR } },
+    { command: BhvCmds.drop_to_floor },
+    { command: BhvCmds.set_home },
+    { command: BhvCmds.set_objectData_value, args: { field: oGraphYOffset, value: 240 } },
+    { command: BhvCmds.spawn_child_with_param, args: { bhvParam: 0, model: MODEL_WOODEN_POST, behavior: bhvWoodenPost } },
+    { command: BhvCmds.begin_loop },
     { command: BhvCmds.end_loop }
 ]
 

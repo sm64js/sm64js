@@ -10,9 +10,9 @@ var snum = 1 // used as a counter variable (Keep 1!)
 var num = 32 // number of model.inc.js files there are
 var areaNum = 1 // target area number
 var mainDir = __dirname + '/converted/' + level + '/areas/' + areaNum + '/' // directory to put models in
-var inputBase = require('os').homedir() + '/Programming/sm64pc/actors/explosion/geo.inc.c' // directory of each model file
+var inputBase = require('os').homedir() + '/Programming/sm64pc/actors/poundable_pole/geo.inc.c' // directory of each model file
 
-const mydir = require('os').homedir() + '/Programming/sm64pc/actors/bobomb/'
+const mydir = require('os').homedir() + '/Programming/sm64pc/actors/poundable_pole/'
 
 //Not sure whether we need to skip commands.
 const skipCommands = [
@@ -139,6 +139,7 @@ function CompileGeo(lines,AreaDir,isBase = false) {
 				outputStr += `},\n`
 			} else if (lineParse.trim().slice(0, 17) == 'GEO_ANIMATED_PART') {
 				const args = lineParse.trim().slice(18, lineParse.trim().indexOf('),'))
+				AdditionalFiles += SearchAndApplyDLs(AreaDir, args.split(',')[4], snum)
 				outputStr += `\t{ `
 				outputStr += `command: Geo.node_animated_part,`
 				outputStr += `args: [Geo.${args}],`

@@ -4,6 +4,9 @@ import { checkerboard_platform_geo } from "../actors/checkerboard_platform/geo.i
 import { goomba_geo } from "../actors/goomba/geo.inc"
 import { black_bobomb_geo } from "../actors/bobomb/geo.inc"
 import { explosion_geo } from "../actors/explosion/geo.inc"
+import { metallic_ball_geo } from "../actors/chain_ball/geo.inc"
+import { chain_chomp_geo } from "../actors/chain_chomp/geo.inc"
+import { wooden_post_geo } from "../actors/poundable_pole/geo.inc"
 
 export const script_func_global_1 = [
     { command: LevelCommands.load_model_from_geo, args: [MODEL_CHECKERBOARD_PLATFORM, checkerboard_platform_geo] },
@@ -17,4 +20,5 @@ export const script_func_global_15 = [
     { command: LevelCommands.load_model_from_geo, args: [MODEL_METALLIC_BALL, metallic_ball_geo] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_CHAIN_CHOMP, chain_chomp_geo] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_WOODEN_POST, wooden_post_geo] },
+    { command: LevelCommands.return }
 ]

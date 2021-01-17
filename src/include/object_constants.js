@@ -182,6 +182,42 @@ export const oBobombBlinkTimer = 0x1B
 export const oBobombFuseLit = 0x1C
 export const oBobombFuseTimer = 0x1D
 
+/* Wooden Post */
+export const oWoodenPostTotalMarioAngle  = 0x1B
+export const oWoodenPostPrevAngleToMario = 0x1C
+export const oWoodenPostSpeedY           = 0x1D
+export const oWoodenPostMarioPounding    = 0x1E
+export const oWoodenPostOffsetY = 0x1F
+
+
+/* Chain Chomp */
+export const oChainChompSegments                     = 0x1B
+export const oChainChompMaxDistFromPivotPerChainPart = 0x1C
+export const oChainChompMaxDistBetweenChainParts     = 0x1D
+export const oChainChompDistToPivot                  = 0x1E
+export const oChainChompUnk104                       = 0x1F
+export const oChainChompRestrictedByChain            = 0x20
+export const oChainChompTargetPitch                  = 0x21
+export const oChainChompNumLunges                    = 0x22
+export const oChainChompReleaseStatus                = 0x49
+export const oChainChompHitGate = 0x4A
+
+/* oChainChompReleaseStatus */
+export const CHAIN_CHOMP_NOT_RELEASED = 0
+export const CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE = 1
+export const CHAIN_CHOMP_RELEASED_LUNGE_AROUND = 2
+export const CHAIN_CHOMP_RELEASED_BREAK_GATE = 3
+export const CHAIN_CHOMP_RELEASED_JUMP_AWAY = 4
+export const CHAIN_CHOMP_RELEASED_END_CUTSCENE = 5
+
+/* Chain chomp chain part */
+    /* oBehParams2ndByte */
+export const CHAIN_CHOMP_CHAIN_PART_BP_PIVOT = 0
+
+/* Wooden post */
+    /* oBehParams */
+export const WOODEN_POST_BP_NO_COINS_MASK = 0x0000FF00
+
 /* Goomba triplet spawner */
     /* oBehParams2ndByte */
     export const GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK = 0x00000003

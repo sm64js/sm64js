@@ -469,6 +469,8 @@ export const init_marios = () => {
         })
     })
 
+    LevelUpdate.gMarioState[0].marioObj.marioState = LevelUpdate.gMarioState[0]
+
 }
 
 export const set_forward_vel = (m, forwardVel) => {

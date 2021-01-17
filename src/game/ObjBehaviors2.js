@@ -22,7 +22,7 @@ export const random_linear_offset = (base, range) => {
     return parseInt(base + (range * Math.random()))
 }
 
-const approach_number_ptr = (px, target, delta) => {
+export const approach_number_ptr = (px, target, delta) => {
     if (px.value > target) delta = -delta
 
     px.value += delta

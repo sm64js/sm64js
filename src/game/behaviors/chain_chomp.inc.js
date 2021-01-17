@@ -31,7 +31,6 @@ export const bhv_wooden_post_update = () => {
         o.rawData[oWoodenPostOffsetY] = -190
         if (o.parentObj != o) {
             ///play puzzle jingle sound
-            console.log("RELEASE THE KRACKEN!!")
             o.parentObj.rawData[oChainChompReleaseStatus] = CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE
             o.parentObj = o
         }
@@ -55,4 +54,8 @@ export const bhv_wooden_post_update = () => {
 
         o.rawData[oWoodenPostPrevAngleToMario] = o.rawData[oAngleToMario]
     }
+}
+
+export const bhv_chain_chomp_update = () => {
+    const o = ObjectListProc.gCurrentObject
 }

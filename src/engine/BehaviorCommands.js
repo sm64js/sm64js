@@ -20,15 +20,25 @@ class BehaviorCommands {
 
         let distanceFromMario = 0.0
 
+        // Calculate the distance from the object to Mario.
         if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {
             ObjListProc.gCurrentObject.rawData[oDistanceToMario] = dist_between_objects(ObjListProc.gCurrentObject, ObjListProc.gMarioObject)
             distanceFromMario = ObjListProc.gCurrentObject.rawData[oDistanceToMario]
         }
 
+        // Calculate the angle from the object to Mario.
         if (objFlags & OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO) {
             ObjListProc.gCurrentObject.rawData[oAngleToMario] = obj_angle_to_object(ObjListProc.gCurrentObject, ObjListProc.gMarioObject)
         }
 
+        // If the object's action has changed, reset the action timer.
+        if (ObjListProc.gCurrentObject.rawData[oAction] != ObjListProc.gCurrentObject.rawData[oPrevAction]) {
+            ObjListProc.gCurrentObject.rawData[oTimer] = 0
+            ObjListProc.gCurrentObject.rawData[oSubAction] = 0
+            ObjListProc.gCurrentObject.rawData[oPrevAction] = ObjListProc.gCurrentObject.rawData[oAction]
+        }
+
+        // Execute the behavior script.
         this.bhvScript = ObjListProc.gCurrentObject.bhvScript
 
         let bhvProcResult = this.BHV_PROC_CONTINUE
@@ -38,6 +48,7 @@ class BehaviorCommands {
             bhvProcResult = bhvFunc.command.call(this, bhvFunc.args)
         }
 
+        // Increment the object's timer.
         if (ObjListProc.gCurrentObject.rawData[oTimer] < 0x3FFFFFFF) {
             ObjListProc.gCurrentObject.rawData[oTimer]++
         }

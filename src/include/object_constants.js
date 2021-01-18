@@ -202,6 +202,15 @@ export const oChainChompNumLunges                    = 0x22
 export const oChainChompReleaseStatus                = 0x49
 export const oChainChompHitGate = 0x4A
 
+/* oAction */
+export const CHAIN_CHOMP_ACT_UNINITIALIZED = 0
+export const CHAIN_CHOMP_ACT_MOVE = 1
+export const CHAIN_CHOMP_ACT_UNLOAD_CHAIN = 2
+
+/* oSubAction */
+export const CHAIN_CHOMP_SUB_ACT_TURN = 0
+export const CHAIN_CHOMP_SUB_ACT_LUNGE = 1
+
 /* oChainChompReleaseStatus */
 export const CHAIN_CHOMP_NOT_RELEASED = 0
 export const CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE = 1

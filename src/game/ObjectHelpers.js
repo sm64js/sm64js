@@ -71,6 +71,22 @@ export const spawn_object_abs_with_rot = (parent, model, behavior, x, y, z, rx, 
     return newObj
 }
 
+export const cur_obj_check_anim_frame = (frame) => {
+    const o = ObjectListProc.gCurrentObject
+
+    const animFrame = o.header.gfx.unk38.animFrame
+    if (animFrame == frame) return 1
+    else return 0
+}
+
+export const cur_obj_reverse_animation = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.header.gfx.unk38.animFrame >= 0) {
+        o.header.gfx.unk38.animFrame--
+    }
+}
+
 export const obj_apply_scale_to_matrix = (obj, dst, src) => {
     dst[0][0] = src[0][0] * obj.header.gfx.scale[0]
     dst[1][0] = src[1][0] * obj.header.gfx.scale[1]

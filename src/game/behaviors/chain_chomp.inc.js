@@ -1,9 +1,9 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { oWoodenPostMarioPounding, oWoodenPostSpeedY, oWoodenPostOffsetY, oChainChompReleaseStatus, CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE, oPosX, oPosY, oHomeY, oBehParams, WOODEN_POST_BP_NO_COINS_MASK, oDistanceToMario, oTimer, oWoodenPostTotalMarioAngle, oAngleToMario, oWoodenPostPrevAngleToMario, oAction, CHAIN_CHOMP_ACT_UNINITIALIZED, CHAIN_CHOMP_ACT_MOVE, CHAIN_CHOMP_ACT_UNLOAD_CHAIN, oChainChompSegments, CHAIN_CHOMP_CHAIN_PART_BP_PIVOT, oBehParams2ndByte, CHAIN_CHOMP_NOT_RELEASED, oPosZ, oSubAction, CHAIN_CHOMP_SUB_ACT_TURN, CHAIN_CHOMP_SUB_ACT_LUNGE, oGravity, oChainChompDistToPivot, oChainChompMaxDistFromPivotPerChainPart, oChainChompRestrictedByChain, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, oMoveAngleYaw, oForwardVel, oVelY } from "../../include/object_constants"
-import { cur_obj_is_mario_ground_pounding_platform, cur_obj_set_pos_to_home, cur_obj_unhide, spawn_object, obj_mark_for_deletion, cur_obj_update_floor_and_walls, cur_obj_move_standard, spawn_object_relative, cur_obj_rotate_yaw_toward, abs_angle_diff } from "../ObjectHelpers"
+import { oWoodenPostMarioPounding, oWoodenPostSpeedY, oWoodenPostOffsetY, oChainChompReleaseStatus, CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE, oPosX, oPosY, oHomeY, oBehParams, WOODEN_POST_BP_NO_COINS_MASK, oDistanceToMario, oTimer, oWoodenPostTotalMarioAngle, oAngleToMario, oWoodenPostPrevAngleToMario, oAction, CHAIN_CHOMP_ACT_UNINITIALIZED, CHAIN_CHOMP_ACT_MOVE, CHAIN_CHOMP_ACT_UNLOAD_CHAIN, oChainChompSegments, CHAIN_CHOMP_CHAIN_PART_BP_PIVOT, oBehParams2ndByte, CHAIN_CHOMP_NOT_RELEASED, oPosZ, oSubAction, CHAIN_CHOMP_SUB_ACT_TURN, CHAIN_CHOMP_SUB_ACT_LUNGE, oGravity, oChainChompDistToPivot, oChainChompMaxDistFromPivotPerChainPart, oChainChompRestrictedByChain, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, oMoveAngleYaw, oForwardVel, oVelY, oChainChompMaxDistBetweenChainParts } from "../../include/object_constants"
+import { cur_obj_is_mario_ground_pounding_platform, cur_obj_set_pos_to_home, cur_obj_unhide, spawn_object, obj_mark_for_deletion, cur_obj_update_floor_and_walls, cur_obj_move_standard, spawn_object_relative, cur_obj_rotate_yaw_toward, abs_angle_diff, cur_obj_check_anim_frame, cur_obj_reverse_animation } from "../ObjectHelpers"
 import { approach_number_ptr } from "../ObjBehaviors2"
 import { int16 } from "../../utils"
-import { MODEL_METALLIC_BALL, MODEL_NONE } from "../../include/model_ids"
+import { MODEL_METALLIC_BALL } from "../../include/model_ids"
 import { bhvChainChompChainPart } from "../BehaviorData"
 
 const wooden_post_approach_speed = () => {
@@ -58,6 +58,68 @@ export const bhv_wooden_post_update = () => {
     }
 }
 
+const chain_chomp_update_chain_segments = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    let segmentVelY
+
+    if (o.rawData[oVelY] < 0.0) {
+        segmentVelY = o.rawData[oVelY]
+    } else {
+        segmentVelY = -20.0
+    }
+
+    // Segment 0 connects the pivot to the chain chomp itself, and segment i>0
+    // connects the pivot to chain part i (1 is closest to the chain chomp).
+
+    let prevSegment
+    let segment
+
+    for (let i = 1; i <= 4; i++) {
+        prevSegment = o.rawData[oChainChompSegments][i - 1]
+        segment = o.rawData[oChainChompSegments][i]
+
+        // Apply gravity
+        segment.posY += segmentVelY
+        if (segment.posY < 0.0) { segment.posY = 0.0 }
+
+        // Cap distance to previous chain part (so that the tail follows the chomp)
+        let offsetX = segment.posX - prevSegment.posX
+        let offsetY = segment.posY - prevSegment.posY
+        let offsetZ = segment.posZ - prevSegment.posZ
+
+        let offset = Math.sqrt(offsetX * offsetX + offsetY * offsetY + offsetZ * offsetZ)
+
+        if (offset > o.rawData[oChainChompMaxDistFromPivotPerChainPart]) {
+            offset = o.rawData[oChainChompMaxDistFromPivotPerChainPart] / offset
+            offsetX *= offset
+            offsetY *= offset
+            offsetZ *= offset
+        }
+
+        // Cap distance to pivot (so that it stretches when the chomp moves far from the wooden post)
+
+        offsetX += prevSegment.posX
+        offsetY += prevSegment.posY
+        offsetZ += prevSegment.posZ
+        offset = Math.sqrt(offsetX * offsetX + offsetY * offsetY + offsetZ * offsetZ)
+
+        const maxTotalOffset = o.rawData[oChainChompMaxDistFromPivotPerChainPart] * (5 - i)
+
+        if (offset > maxTotalOffset) {
+            offset = maxTotalOffset / offset
+            offsetX *= offset
+            offsetY *= offset
+            offsetZ *= offset
+        }
+
+        segment.posX = offsetX
+        segment.posY = offsetY
+        segment.posZ = offsetZ
+    }
+
+}
+
 export const bhv_chain_chomp_chain_part_update = () => {
     const o = ObjectListProc.gCurrentObject
 
@@ -80,10 +142,10 @@ const chain_chomp_act_uninitialized = () => {
     const o = ObjectListProc.gCurrentObject
 
     if (o.rawData[oDistanceToMario] < 3000.0) {
-        const segments = new Array(4)
+        const segments = new Array(5)
         o.rawData[oChainChompSegments] = segments
 
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i <= 4; i++) {
             segments[i] = { posX: 0.0, posY: 0.0, posZ: 0.0, pitch: 0, yaw: 0, roll: 0 }
         }
 
@@ -92,7 +154,7 @@ const chain_chomp_act_uninitialized = () => {
         o.parentObj = spawn_object(o, CHAIN_CHOMP_CHAIN_PART_BP_PIVOT, bhvChainChompChainPart)
 
         // Spawn the non-pivot chain parts, starting from the chain chomp and moving toward the pivot
-        for (let i = 0; i < 4; i++) {
+        for (let i = 1; i <= 4; i++) {
             spawn_object_relative(i, 0, 0, 0, o, MODEL_METALLIC_BALL, bhvChainChompChainPart)
         }
 
@@ -102,17 +164,30 @@ const chain_chomp_act_uninitialized = () => {
     }
 }
 
+const chain_chomp_restore_normal_chain_lengths = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    const wrapper = { value: o.rawData[oChainChompMaxDistFromPivotPerChainPart] }
+    approach_number_ptr(wrapper, 750.0 / 5, 4.0)
+    o.rawData[oChainChompMaxDistFromPivotPerChainPart] = wrapper.value
+
+    o.rawData[oChainChompMaxDistBetweenChainParts] = o.rawData[oChainChompMaxDistFromPivotPerChainPart]
+}
+
 const chain_chomp_sub_act_turn = () => {
     const o = ObjectListProc.gCurrentObject
 
     o.rawData[oGravity] = -4.0
-    //chain_chomp_restore_normal_chain_lengths()
+    chain_chomp_restore_normal_chain_lengths()
     //obj_move_p
 
     if (o.rawData[oMoveFlags] & OBJ_MOVE_MASK_ON_GROUND) {
         cur_obj_rotate_yaw_toward(o.rawData[oAngleToMario], 0x400)
         if (abs_angle_diff(o.rawData[oAngleToMario], o.rawData[oMoveAngleYaw]) < 0x800) {
-            if (false) {
+            if (o.rawData[oTimer] > 30) {
+                if (cur_obj_check_anim_frame(0)) {
+                    cur_obj_reverse_animation()
+                }
 
             } else {
                 o.rawData[oForwardVel] = 0.0
@@ -165,6 +240,11 @@ const chain_chomp_act_move = () => {
         const maxDistToPivot = o.rawData[oChainChompMaxDistFromPivotPerChainPart] * 5
 
         o.rawData[oChainChompRestrictedByChain] = 0
+
+        chain_chomp_update_chain_segments()
+
+
+        //Begin Lunge
 
         
     }

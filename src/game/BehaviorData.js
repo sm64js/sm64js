@@ -19,7 +19,7 @@ import { bhv_explosion_init, bhv_explosion_loop } from "./behaviors/explosion.in
 import { bhv_respawner_loop, bhv_bobomb_bully_death_smoke_init } from "./behaviors/corkbox.inc"
 import { MODEL_WOODEN_POST } from "../include/model_ids"
 import { poundable_pole_collision_06002490 } from "../actors/poundable_pole/collision.inc"
-import { bhv_wooden_post_update, bhv_chain_chomp_update } from "./behaviors/chain_chomp.inc"
+import { bhv_wooden_post_update, bhv_chain_chomp_update, bhv_chain_chomp_chain_part_update } from "./behaviors/chain_chomp.inc"
 import { chain_chomp_seg6_anims_06025178 } from "../actors/chain_chomp/anims/table.inc"
 
 
@@ -257,13 +257,25 @@ export const bhvChainChomp = [
     { command: BhvCmds.load_animations, args: { field: oAnimations, anims: chain_chomp_seg6_anims_06025178 } },
     { command: BhvCmds.animate, args: { animIndex: 0 } },
     { command: BhvCmds.set_obj_physics, args: { hitboxRadius: 0, gravity: -400, bounciness: -50, dragStrenth: 0, friction: 1000, buoyancy: 200 } },
-    //{ command: BhvCmds.hide },
+    { command: BhvCmds.hide },
     { command: BhvCmds.set_home },
     { command: BhvCmds.set_objectData_value, args: { field: oGraphYOffset, value: 240 } },
     { command: BhvCmds.scale, args: { percent: 200 } },
     { command: BhvCmds.spawn_child_with_param, args: { bhvParam: 0, model: MODEL_WOODEN_POST, behavior: bhvWoodenPost } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_chain_chomp_update } },
+    { command: BhvCmds.end_loop }
+]
+
+export const bhvChainChompChainPart = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_GENACTOR } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } }, 
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.set_obj_physics, args: { hitboxRadius: 0, gravity: -400, bounciness: -50, dragStrenth: 1000, friction: 1000, buoyancy: 200 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oGraphYOffset, value: 40 } },
+    { command: BhvCmds.scale, args: { percent: 200 } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_chain_chomp_chain_part_update } },
     { command: BhvCmds.end_loop }
 ]
 

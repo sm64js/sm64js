@@ -1,11 +1,24 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { oWoodenPostMarioPounding, oWoodenPostSpeedY, oWoodenPostOffsetY, oChainChompReleaseStatus, CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE, oPosX, oPosY, oHomeY, oBehParams, WOODEN_POST_BP_NO_COINS_MASK, oDistanceToMario, oTimer, oWoodenPostTotalMarioAngle, oAngleToMario, oWoodenPostPrevAngleToMario, oAction, CHAIN_CHOMP_ACT_UNINITIALIZED, CHAIN_CHOMP_ACT_MOVE, CHAIN_CHOMP_ACT_UNLOAD_CHAIN, oChainChompSegments, CHAIN_CHOMP_CHAIN_PART_BP_PIVOT, oBehParams2ndByte, CHAIN_CHOMP_NOT_RELEASED, oPosZ, oSubAction, CHAIN_CHOMP_SUB_ACT_TURN, CHAIN_CHOMP_SUB_ACT_LUNGE, oGravity, oChainChompDistToPivot, oChainChompMaxDistFromPivotPerChainPart, oChainChompRestrictedByChain, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, oMoveAngleYaw, oForwardVel, oVelY, oChainChompMaxDistBetweenChainParts, oChainChompTargetPitch, oChainChompUnk104 } from "../../include/object_constants"
 import { cur_obj_is_mario_ground_pounding_platform, cur_obj_set_pos_to_home, cur_obj_unhide, spawn_object, obj_mark_for_deletion, cur_obj_update_floor_and_walls, cur_obj_move_standard, spawn_object_relative, cur_obj_rotate_yaw_toward, abs_angle_diff, cur_obj_check_anim_frame, cur_obj_reverse_animation } from "../ObjectHelpers"
-import { approach_number_ptr, obj_get_pitch_from_vel, obj_move_pitch_approach, obj_face_pitch_approach } from "../ObjBehaviors2"
+import { approach_number_ptr, obj_get_pitch_from_vel, obj_move_pitch_approach, obj_face_pitch_approach, obj_check_attacks } from "../ObjBehaviors2"
 import { int16 } from "../../utils"
 import { MODEL_METALLIC_BALL } from "../../include/model_ids"
 import { bhvChainChompChainPart } from "../BehaviorData"
 import { atan2s } from "../../engine/math_util"
+import { INTERACT_MR_BLIZZARD } from "../Interaction"
+
+const sChainChompHitbox = {
+    interactType: INTERACT_MR_BLIZZARD,
+    downOffset: 0,
+    damageOrCoinValue: 3,
+    health: 1,
+    numLootCoins: 0,
+    radius: 80,
+    height: 160,
+    hurtboxRadius: 80,
+    hurtboxHeight: 160
+}
 
 const wooden_post_approach_speed = () => {
     const o = ObjectListProc.gCurrentObject
@@ -34,7 +47,7 @@ export const bhv_wooden_post_update = () => {
         o.rawData[oWoodenPostOffsetY] = -190
         if (o.parentObj != o) {
             ///play puzzle jingle sound
-            o.parentObj.rawData[oChainChompReleaseStatus] = CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE
+            //o.parentObj.rawData[oChainChompReleaseStatus] = CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE
             o.parentObj = o
         }
     }
@@ -333,7 +346,14 @@ const chain_chomp_act_move = () => {
 
 
         // TODO Begin a lunge if mario tries to attack
-
+        if (obj_check_attacks(sChainChompHitbox, o.rawData[oAction])) {
+            o.rawData[oSubAction] = CHAIN_CHOMP_SUB_ACT_LUNGE
+            o.rawData[oChainChompMaxDistFromPivotPerChainPart] = 900.0 / 5
+            o.rawData[oForwardVel] = 0.0
+            o.rawData[oVelY] = 300.0
+            o.rawData[oGravity] = -4.0
+            o.rawData[oChainChompTargetPitch] = -0x3000
+        }
         
     }
 }

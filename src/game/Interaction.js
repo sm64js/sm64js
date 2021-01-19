@@ -1,7 +1,7 @@
 import * as Mario from "./Mario"
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
 import { atan2s } from "../engine/math_util"
-import { sins, coss } from "../utils"
+import { sins, coss, int16 } from "../utils"
 import { gLinker } from "./Linker"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 
@@ -149,6 +149,18 @@ const interact_bounce_top = (m, o) => {
 
 const interact_damage = (m, o) => {
     if (take_damage_and_knock_back(m, o)) return 1
+
+    if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+        sDelayInvincTimer = 1
+    }
+
+    return 0
+}
+
+const interact_mr_blizzard = (m, o) => {
+    if (take_damage_and_knock_back(m, o)) {
+        return 1
+    }
 
     if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
         sDelayInvincTimer = 1
@@ -419,9 +431,7 @@ const determine_knockback_action = (m) => {
 
     const angleToObject = mario_obj_angle_to_object(m, m.interactObj)
 
-    let facingDYaw = angleToObject - m.faceAngle[1]
-    facingDYaw = facingDYaw > 32767 ? facingDYaw - 65536 : facingDYaw
-    facingDYaw = facingDYaw < -32768 ? facingDYaw + 65536 : facingDYaw
+    let facingDYaw = int16( angleToObject - m.faceAngle[1] )
 
     const remainingHealth = m.health - 0x40 * m.hurtCounter
 
@@ -537,7 +547,7 @@ const sInteractionHandlers = [
     { interactType: INTERACT_BULLY, handler: null },
     { interactType: INTERACT_SHOCK, handler: null },
     { interactType: INTERACT_BOUNCE_TOP2, handler: null },
-    { interactType: INTERACT_MR_BLIZZARD, handler: null },
+    { interactType: INTERACT_MR_BLIZZARD, handler: interact_mr_blizzard },
     { interactType: INTERACT_HIT_FROM_BELOW, handler: null },
     { interactType: INTERACT_BOUNCE_TOP, handler: interact_bounce_top },
     { interactType: INTERACT_DAMAGE, handler: interact_damage },

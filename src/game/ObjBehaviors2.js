@@ -318,6 +318,33 @@ export const obj_set_knockback_action = (attackType) => {
     o.rawData[oMoveAngleYaw] = obj_angle_to_object(ObjectListProc.gMarioObject, o)
 }
 
+export const obj_check_attacks = (hitbox, attackedMarioAction) => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    obj_set_hitbox(o, hitbox)
+
+    //! Dies immediately if above lava
+    if (false) {
+        return 1
+    } else if (o.rawData[oInteractStatus] & INT_STATUS_INTERACTED) {
+        if (o.rawData[oInteractStatus] & INT_STATUS_ATTACKED_MARIO) {
+            if (o.rawData[oAction] != attackedMarioAction) {
+                o.rawData[oAction] = attackedMarioAction
+                o.rawData[oTimer] = 0
+            }
+        } else {
+            const attackType = o.rawData[oInteractStatus] & INT_STATUS_ATTACK_MASK
+            obj_die_if_health_non_positive()
+            o.rawData[oInteractStatus] = 0
+            return attackType
+        }
+    }
+
+    o.rawData[oInteractStatus] = 0
+    return 0
+}
+
 export const obj_handle_attacks = (hitbox, attackedMarioAction, attackHandlers) => {
 
     const o = ObjectListProc.gCurrentObject

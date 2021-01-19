@@ -1,6 +1,6 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { oWoodenPostMarioPounding, oWoodenPostSpeedY, oWoodenPostOffsetY, oChainChompReleaseStatus, CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE, oPosX, oPosY, oHomeY, oBehParams, WOODEN_POST_BP_NO_COINS_MASK, oDistanceToMario, oTimer, oWoodenPostTotalMarioAngle, oAngleToMario, oWoodenPostPrevAngleToMario, oAction, CHAIN_CHOMP_ACT_UNINITIALIZED, CHAIN_CHOMP_ACT_MOVE, CHAIN_CHOMP_ACT_UNLOAD_CHAIN, oChainChompSegments, CHAIN_CHOMP_CHAIN_PART_BP_PIVOT, oBehParams2ndByte, CHAIN_CHOMP_NOT_RELEASED, oPosZ, oSubAction, CHAIN_CHOMP_SUB_ACT_TURN, CHAIN_CHOMP_SUB_ACT_LUNGE, oGravity, oChainChompDistToPivot, oChainChompMaxDistFromPivotPerChainPart, oChainChompRestrictedByChain, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, oMoveAngleYaw, oForwardVel, oVelY, oChainChompMaxDistBetweenChainParts, oChainChompTargetPitch, oChainChompUnk104 } from "../../include/object_constants"
-import { cur_obj_is_mario_ground_pounding_platform, cur_obj_set_pos_to_home, cur_obj_unhide, spawn_object, obj_mark_for_deletion, cur_obj_update_floor_and_walls, cur_obj_move_standard, spawn_object_relative, cur_obj_rotate_yaw_toward, abs_angle_diff, cur_obj_check_anim_frame, cur_obj_reverse_animation } from "../ObjectHelpers"
+import { cur_obj_is_mario_ground_pounding_platform, cur_obj_set_pos_to_home, cur_obj_unhide, spawn_object, obj_mark_for_deletion, cur_obj_update_floor_and_walls, cur_obj_move_standard, spawn_object_relative, cur_obj_rotate_yaw_toward, abs_angle_diff, cur_obj_check_anim_frame, cur_obj_reverse_animation, cur_obj_hide } from "../ObjectHelpers"
 import { approach_number_ptr, obj_get_pitch_from_vel, obj_move_pitch_approach, obj_face_pitch_approach, obj_check_attacks } from "../ObjBehaviors2"
 import { int16 } from "../../utils"
 import { MODEL_METALLIC_BALL } from "../../include/model_ids"
@@ -345,7 +345,7 @@ const chain_chomp_act_move = () => {
         chain_chomp_update_chain_segments()
 
 
-        // TODO Begin a lunge if mario tries to attack
+        // Begin a lunge if mario tries to attack
         if (obj_check_attacks(sChainChompHitbox, o.rawData[oAction])) {
             o.rawData[oSubAction] = CHAIN_CHOMP_SUB_ACT_LUNGE
             o.rawData[oChainChompMaxDistFromPivotPerChainPart] = 900.0 / 5
@@ -356,6 +356,20 @@ const chain_chomp_act_move = () => {
         }
         
     }
+}
+
+const chain_chomp_act_unload_chain = () => {
+    const o = ObjectListProc.gCurrentObject
+    cur_obj_hide()
+
+    o.rawData[oChainChompSegments] = null
+
+    o.rawData[oAction] = CHAIN_CHOMP_ACT_UNINITIALIZED
+
+    if (o.rawData[oChainChompReleaseStatus] != CHAIN_CHOMP_NOT_RELEASED) {
+        obj_mark_for_deletion(o)
+    }
+
 }
 
 export const bhv_chain_chomp_update = () => {
@@ -369,7 +383,7 @@ export const bhv_chain_chomp_update = () => {
             chain_chomp_act_move()
             break
         case CHAIN_CHOMP_ACT_UNLOAD_CHAIN:
-            throw "todo unload chain"
+            chain_chomp_act_unload_chain()
             break
     }
 }

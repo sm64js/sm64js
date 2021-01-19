@@ -1,10 +1,11 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { oWoodenPostMarioPounding, oWoodenPostSpeedY, oWoodenPostOffsetY, oChainChompReleaseStatus, CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE, oPosX, oPosY, oHomeY, oBehParams, WOODEN_POST_BP_NO_COINS_MASK, oDistanceToMario, oTimer, oWoodenPostTotalMarioAngle, oAngleToMario, oWoodenPostPrevAngleToMario, oAction, CHAIN_CHOMP_ACT_UNINITIALIZED, CHAIN_CHOMP_ACT_MOVE, CHAIN_CHOMP_ACT_UNLOAD_CHAIN, oChainChompSegments, CHAIN_CHOMP_CHAIN_PART_BP_PIVOT, oBehParams2ndByte, CHAIN_CHOMP_NOT_RELEASED, oPosZ, oSubAction, CHAIN_CHOMP_SUB_ACT_TURN, CHAIN_CHOMP_SUB_ACT_LUNGE, oGravity, oChainChompDistToPivot, oChainChompMaxDistFromPivotPerChainPart, oChainChompRestrictedByChain, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, oMoveAngleYaw, oForwardVel, oVelY, oChainChompMaxDistBetweenChainParts } from "../../include/object_constants"
+import { oWoodenPostMarioPounding, oWoodenPostSpeedY, oWoodenPostOffsetY, oChainChompReleaseStatus, CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE, oPosX, oPosY, oHomeY, oBehParams, WOODEN_POST_BP_NO_COINS_MASK, oDistanceToMario, oTimer, oWoodenPostTotalMarioAngle, oAngleToMario, oWoodenPostPrevAngleToMario, oAction, CHAIN_CHOMP_ACT_UNINITIALIZED, CHAIN_CHOMP_ACT_MOVE, CHAIN_CHOMP_ACT_UNLOAD_CHAIN, oChainChompSegments, CHAIN_CHOMP_CHAIN_PART_BP_PIVOT, oBehParams2ndByte, CHAIN_CHOMP_NOT_RELEASED, oPosZ, oSubAction, CHAIN_CHOMP_SUB_ACT_TURN, CHAIN_CHOMP_SUB_ACT_LUNGE, oGravity, oChainChompDistToPivot, oChainChompMaxDistFromPivotPerChainPart, oChainChompRestrictedByChain, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, oMoveAngleYaw, oForwardVel, oVelY, oChainChompMaxDistBetweenChainParts, oChainChompTargetPitch, oChainChompUnk104 } from "../../include/object_constants"
 import { cur_obj_is_mario_ground_pounding_platform, cur_obj_set_pos_to_home, cur_obj_unhide, spawn_object, obj_mark_for_deletion, cur_obj_update_floor_and_walls, cur_obj_move_standard, spawn_object_relative, cur_obj_rotate_yaw_toward, abs_angle_diff, cur_obj_check_anim_frame, cur_obj_reverse_animation } from "../ObjectHelpers"
-import { approach_number_ptr } from "../ObjBehaviors2"
+import { approach_number_ptr, obj_get_pitch_from_vel, obj_move_pitch_approach, obj_face_pitch_approach } from "../ObjBehaviors2"
 import { int16 } from "../../utils"
 import { MODEL_METALLIC_BALL } from "../../include/model_ids"
 import { bhvChainChompChainPart } from "../BehaviorData"
+import { atan2s } from "../../engine/math_util"
 
 const wooden_post_approach_speed = () => {
     const o = ObjectListProc.gCurrentObject
@@ -179,7 +180,7 @@ const chain_chomp_sub_act_turn = () => {
 
     o.rawData[oGravity] = -4.0
     chain_chomp_restore_normal_chain_lengths()
-    //obj_move_p
+    obj_move_pitch_approach(0, 0x100)
 
     if (o.rawData[oMoveFlags] & OBJ_MOVE_MASK_ON_GROUND) {
         cur_obj_rotate_yaw_toward(o.rawData[oAngleToMario], 0x400)
@@ -187,6 +188,19 @@ const chain_chomp_sub_act_turn = () => {
             if (o.rawData[oTimer] > 30) {
                 if (cur_obj_check_anim_frame(0)) {
                     cur_obj_reverse_animation()
+                    if (o.rawData[oTimer] > 40) {
+                        // Increase the maximum distance from the pivot and enter the lunging sub-action.
+
+                        //play sound
+
+                        o.rawData[oSubAction] = CHAIN_CHOMP_SUB_ACT_LUNGE
+                        o.rawData[oChainChompMaxDistFromPivotPerChainPart] = 900.0 / 5
+
+                        o.rawData[oForwardVel] = 140
+                        o.rawData[oVelY] = 20
+                        o.rawData[oGravity] = 0.0
+                        o.rawData[oChainChompTargetPitch] = obj_get_pitch_from_vel()
+                    }
                 }
 
             } else {
@@ -201,6 +215,50 @@ const chain_chomp_sub_act_turn = () => {
         cur_obj_rotate_yaw_toward(o.rawData[oAngleToMario], 0x190)
         o.rawData[oTimer] = 0
     }
+}
+
+const chain_chomp_sub_act_lunge = () => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    obj_face_pitch_approach(o.rawData[oChainChompTargetPitch], 0x400)
+
+    if (o.rawData[oForwardVel] != 0.0) {
+        if (o.rawData[oChainChompRestrictedByChain] == 1) {
+            o.rawData[oForwardVel] = 0.0
+            o.rawData[oVelY] = 0.0
+        }
+
+        // TODO: What is this
+        let val04 = 900.0 - o.rawData[oChainChompDistToPivot]
+        if (val04 > 220.0) {
+            val04 = 220.0
+        }
+
+        o.rawData[oChainChompMaxDistBetweenChainParts] = val04 / 220.0 * o.rawData[oChainChompMaxDistFromPivotPerChainPart]
+        o.rawData[oTimer] = 0
+    } else {
+        cur_obj_rotate_yaw_toward(atan2s(o.rawData[oChainChompSegments][0].posZ, o.rawData[oChainChompSegments][0].posX), 0x1000)
+
+        if (o.rawData[oChainChompUnk104] != 0.0) {
+            const wrapper = { value: o.rawData[oChainChompUnk104] }
+            approach_number_ptr(wrapper, 0.0, 0.8)
+            o.rawData[oChainChompUnk104] = wrapper.value
+        } else {
+            o.rawData[oSubAction] = CHAIN_CHOMP_SUB_ACT_TURN
+        }
+
+        o.rawData[oChainChompMaxDistBetweenChainParts] = o.rawData[oChainChompUnk104]
+
+        if (window.gGlobalTimer % 2 != 0) {
+            o.rawData[oChainChompMaxDistBetweenChainParts] = -o.rawData[oChainChompUnk104]
+        }
+    }
+
+    if (o.rawData[oTimer] < 30) {
+        cur_obj_reverse_animation()
+    }
+
 }
 
 const chain_chomp_act_move = () => {
@@ -218,6 +276,7 @@ const chain_chomp_act_move = () => {
                         chain_chomp_sub_act_turn()
                         break
                     case CHAIN_CHOMP_SUB_ACT_LUNGE:
+                        chain_chomp_sub_act_lunge()
                         break
                 }
                 break
@@ -238,13 +297,42 @@ const chain_chomp_act_move = () => {
         )
 
         const maxDistToPivot = o.rawData[oChainChompMaxDistFromPivotPerChainPart] * 5
+        if (o.rawData[oChainChompDistToPivot] > maxDistToPivot) {
+            const ratio = maxDistToPivot / o.rawData[oChainChompDistToPivot]
+            o.rawData[oChainChompDistToPivot] = maxDistToPivot
 
-        o.rawData[oChainChompRestrictedByChain] = 0
+            o.rawData[oChainChompSegments][0].posX *= ratio
+            o.rawData[oChainChompSegments][0].posY *= ratio
+            o.rawData[oChainChompSegments][0].posZ *= ratio
+
+            if (o.rawData[oChainChompReleaseStatus] == CHAIN_CHOMP_NOT_RELEASED) {
+                // Restrict chain chomp position
+
+                o.rawData[oPosX] = o.parentObj.rawData[oPosX] + o.rawData[oChainChompSegments][0].posX
+                o.rawData[oPosY] = o.parentObj.rawData[oPosY] + o.rawData[oChainChompSegments][0].posY
+                o.rawData[oPosZ] = o.parentObj.rawData[oPosZ] + o.rawData[oChainChompSegments][0].posZ
+
+                o.rawData[oChainChompRestrictedByChain] = 1
+
+            } else {
+                // Move pivot like the chain chomp is pulling it along
+                const oldPivotY = o.parentObj.rawData[oPosY]
+
+                o.parentObj.rawData[oPosX] = o.rawData[oPosX] - o.rawData[oChainChompSegments][0].posX
+                o.parentObj.rawData[oPosY] = o.rawData[oPosY] - o.rawData[oChainChompSegments][0].posY
+                o.parentObj.rawData[oVelY] = o.parentObj.rawData[oPosY] - oldPivotY
+                o.parentObj.rawData[oPosZ] = o.rawData[oPosZ] - o.rawData[oChainChompSegments][0].posZ
+            }
+
+
+        } else {
+            o.rawData[oChainChompRestrictedByChain] = 0
+        }
 
         chain_chomp_update_chain_segments()
 
 
-        //Begin Lunge
+        // TODO Begin a lunge if mario tries to attack
 
         
     }

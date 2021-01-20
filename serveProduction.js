@@ -15,11 +15,14 @@ const {
 const fs = require('fs')
 const http = require('http')
 const got = require('got')
+const crypto = require('crypto-js')
 const util = require('util')
 const zlib = require('zlib')
 const deflate = util.promisify(zlib.deflate)
 const port = 3080
 const ws_port = 3000
+
+const ip_encryption_key = process.env.PRODUCTION ? process.env.IP_ENCRYPTION_KEY : "abcdef123456"
 
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
@@ -86,7 +89,7 @@ const broadcastData = (bytes, roomKey) => {
 }
 
 
-const adminTokens = process.env.ADMIN_TOKENS ? process.env.ADMIN_TOKENS.split(":") : []
+const adminTokens = process.env.PRODUCTION ? process.env.ADMIN_TOKENS.split(":") : ["testAdminToken"]
 
 const sendValidUpdate = () => {
 
@@ -782,7 +785,8 @@ server.listen(port, () => { console.log('Serving Files with express server ' + p
 ////// Admin Commands
 app.get('/banIP/:token/:ip', (req, res) => {
 
-    const { token, ip } = req.params
+    const token = req.params.token
+    const ip = crypto.AES.decrypt(req.params.ip, ip_encryption_key).toString(crypto.enc.Utf8)
 
     if (!adminTokens.includes(token)) return res.status(401).send('Invalid Admin Token')
 
@@ -795,7 +799,7 @@ app.get('/banIP/:token/:ip', (req, res) => {
         db.get('ipList').push({ ip, value: 'BANNED', reason: 'Manual' }).write()
         console.log("Admin BAD IP " + ip + "  " + token)
 
-        return res.send("BANNED")
+        return res.send("IP BAN SUCCESS")
     } else if (ipValue.value == "ALLOWED") {
         ipObject.assign({ value: 'BANNED', reason: 'Manual'  }).write()
         console.log("Admin BAD Existing IP " + ip + "  " + token)
@@ -807,16 +811,17 @@ app.get('/banIP/:token/:ip', (req, res) => {
             })
         })
 
-        return res.send("BANNED")
+        return res.send("IP BAN SUCCESS")
     } else if (ipValue.value == "BANNED") {
-        return res.send("Already BANNED")
+        return res.send("This IP is already BANNED")
     }
 
 })
 
-app.get('/allowIP/:token/:ip', (req, res) => {
+app.get('/allowIP/:token/:ip/:plaintext?', (req, res) => {
 
-    const { token, ip } = req.params
+    const token = req.params.token
+    const ip = req.params.plaintext ? req.params.ip : crypto.AES.decrypt(req.params.ip, ip_encryption_key).toString(crypto.enc.Utf8)
 
     if (!adminTokens.includes(token)) return res.status(401).send('Invalid Admin Token')
 
@@ -827,15 +832,15 @@ app.get('/allowIP/:token/:ip', (req, res) => {
 
     if (ipValue == undefined) {
         console.log("admin allowIP could not find")
-        return res.send("allowIP could not find")
+        return res.send("This IP was not found in the banned list")
     } else if (ipValue.value == "BANNED") {
         ipObject.assign({ value: 'ALLOWED' }).write()
         console.log("Admin - Allowing Existing IP " + ip + "  " + token)
 
-        return res.send("Allowing Existing IP")
+        return res.send("SUCCESS - Unbanning Requested IP")
     } else if (ipValue.value == "ALLOWED") {
         console.log("Admin Allow - already allowed")
-        return res.send("Already ALLOWED")
+        return res.send("This IP is already marked as allowed")
     }
 
 })
@@ -851,7 +856,8 @@ app.get('/chatLog/:token/:timestamp?/:range?', (req, res) => {
 
         db.get('chats').forEach((entry) => {
             if (entry.timestampMs >= timestamp - range && entry.timestampMs <= timestamp + range) {
-                stringResult += `${entry.socketID},${entry.playerName},${entry.ip},${entry.message} <br />`
+                const encrypted_ip = crypto.AES.encrypt(entry.ip, ip_encryption_key).toString()
+                stringResult += `${entry.socketID},${entry.playerName},${encrypted_ip},${entry.message} <br />`
             }
         }).value()
         

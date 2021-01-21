@@ -240,6 +240,7 @@ const chain_chomp_sub_act_lunge = () => {
         if (o.rawData[oChainChompRestrictedByChain] == 1) {
             o.rawData[oForwardVel] = 0.0
             o.rawData[oVelY] = 0.0
+            o.rawData[oChainChompUnk104] = 30.0
         }
 
         // TODO: What is this
@@ -309,6 +310,7 @@ const chain_chomp_act_move = () => {
             + o.rawData[oChainChompSegments][0].posZ * o.rawData[oChainChompSegments][0].posZ
         )
 
+        // If the chain is fully stretched
         const maxDistToPivot = o.rawData[oChainChompMaxDistFromPivotPerChainPart] * 5
         if (o.rawData[oChainChompDistToPivot] > maxDistToPivot) {
             const ratio = maxDistToPivot / o.rawData[oChainChompDistToPivot]

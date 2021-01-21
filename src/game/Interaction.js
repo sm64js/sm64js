@@ -572,6 +572,9 @@ const mario_get_collided_object = (m, interactType) => {
 
 export const mario_process_interactions = (m) => {
 
+    sDelayInvincTimer = 0
+    sInvulnerable = (m.action & Mario.ACT_FLAG_INVULNERABLE) || m.invincTimer != 0
+
 
     if (!(m.action & Mario.ACT_FLAG_INTANGIBLE) && m.collidedObjInteractTypes != 0) {
 

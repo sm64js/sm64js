@@ -786,7 +786,8 @@ server.listen(port, () => { console.log('Serving Files with express server ' + p
 app.get('/banIP/:token/:ip', (req, res) => {
 
     const token = req.params.token
-    const ip = crypto.AES.decrypt(req.params.ip, ip_encryption_key).toString(crypto.enc.Utf8)
+    const ipSlashPatch = req.params.ip.replace(/\*/g,"/") // hopefully this isn't too spaghetti :sh:
+    const ip = crypto.AES.decrypt(ipSlashPatch, ip_encryption_key).toString(crypto.enc.Utf8)
 
     if (!adminTokens.includes(token)) return res.status(401).send('Invalid Admin Token')
 
@@ -795,7 +796,7 @@ app.get('/banIP/:token/:ip', (req, res) => {
 
     db.get('adminCommands').push({ token, timestampMs: Date.now(), command: 'banIP', args: [ ip ] }).write()
 
-    if (ipValue == undefined) {
+    if (ipValue == undefined || ip == "") {
         db.get('ipList').push({ ip, value: 'BANNED', reason: 'Manual' }).write()
         console.log("Admin BAD IP " + ip + "  " + token)
 
@@ -814,14 +815,15 @@ app.get('/banIP/:token/:ip', (req, res) => {
         return res.send("IP BAN SUCCESS")
     } else if (ipValue.value == "BANNED") {
         return res.send("This IP is already BANNED")
-    }
+    } else { return res.send("Unknown error")}
 
 })
 
 app.get('/allowIP/:token/:ip/:plaintext?', (req, res) => {
 
     const token = req.params.token
-    const ip = req.params.plaintext ? req.params.ip : crypto.AES.decrypt(req.params.ip, ip_encryption_key).toString(crypto.enc.Utf8)
+    const ipSlashPatch = req.params.plaintext ? req.params.ip : req.params.ip.replace(/\*/g,"/")
+    const ip = req.params.plaintext ? req.params.ip : crypto.AES.decrypt(ipSlashPatch, ip_encryption_key).toString(crypto.enc.Utf8)
 
     if (!adminTokens.includes(token)) return res.status(401).send('Invalid Admin Token')
 
@@ -841,7 +843,7 @@ app.get('/allowIP/:token/:ip/:plaintext?', (req, res) => {
     } else if (ipValue.value == "ALLOWED") {
         console.log("Admin Allow - already allowed")
         return res.send("This IP is already marked as allowed")
-    }
+    }else { return res.send("Unknown error")}
 
 })
 
@@ -856,7 +858,7 @@ app.get('/chatLog/:token/:timestamp?/:range?', (req, res) => {
 
         db.get('chats').forEach((entry) => {
             if (entry.timestampMs >= timestamp - range && entry.timestampMs <= timestamp + range) {
-                const encrypted_ip = crypto.AES.encrypt(entry.ip, ip_encryption_key).toString()
+                const encrypted_ip = crypto.AES.encrypt(entry.ip, ip_encryption_key).toString().replace(/\//g,"*")
                 stringResult += `${entry.socketID},${entry.playerName},${encrypted_ip},${entry.message} <br />`
             }
         }).value()

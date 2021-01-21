@@ -344,7 +344,7 @@ const interact_grabbable = (m, o) => {
         throw "unimplemented object grabs mario - interact_grabbable"
     }
 
-    if (able_to_grab_object(m)) {
+    if (able_to_grab_object(m, o)) {
         if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_NOT_GRABBABLE)) {
             m.interactObj = o
             m.input |= Mario.INPUT_INTERACT_OBJ_GRABBABLE
@@ -390,7 +390,7 @@ const interact_pole = (m, o) => {
     return 0
 }
 
-const able_to_grab_object = (m) => {
+const able_to_grab_object = (m, o) => {
     const action = m.action
 
     if (action == Mario.ACT_DIVE_SLIDE || action == Mario.ACT_DIVE) {

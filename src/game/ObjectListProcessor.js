@@ -1,5 +1,5 @@
 import { PlatformDisplacementInstance as PlatformDisplacement } from "./PlatformDisplacement"
-import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte, ACTIVE_FLAG_ACTIVE, RESPAWN_INFO_TYPE_16, oFlags, OBJ_FLAG_PERSISTENT_RESPAWN } from "../include/object_constants"
+import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte, ACTIVE_FLAG_ACTIVE, RESPAWN_INFO_TYPE_16, oFlags, OBJ_FLAG_PERSISTENT_RESPAWN, oMarioParticleFlags, ACTIVE_PARTICLE_H_STAR } from "../include/object_constants"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import * as GraphNode from "../engine/graph_node"
 import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands"
@@ -10,6 +10,12 @@ import { networkData, gameData as socketGameData, updateNetworkBeforeRender } fr
 import { copyMarioUpdateToState } from "./MultiMarioManager"
 import { vec3f_dif, vec3f_length } from "../engine/math_util"
 import { uint32, uint16 } from "../utils"
+import { MODEL_NONE } from "../include/model_ids"
+import * as MarioConstants from "../include/mario_constants"
+
+const sParticleTypes = [
+    //{ particleFlag: MarioConstants.PARTICLE_HORIZONTAL_STAR, activeParticleFlag: ACTIVE_PARTICLE_H_STAR, model: MODEL_NONE, behavior: bhvHorStarParticleSpawner }
+]
 
 class ObjectListProcessor {
     constructor() {
@@ -103,7 +109,11 @@ class ObjectListProcessor {
         PlatformDisplacement.apply_mario_platform_displacement()
 
         detect_object_collisions()
-        this.update_non_terrain_objects()
+        this.update_non_terrain_objects()  /// includes local mario
+
+        this.update_remote_marios()
+
+        updateNetworkBeforeRender()
 
         this.unload_deactivated_objects()
 
@@ -188,23 +198,39 @@ class ObjectListProcessor {
         if (vec3f_length(torsoDiff) > 300)
             LevelUpdate.gMarioState.marioBodyState.torsoPos = [ ...LevelUpdate.gMarioState.pos ]
 
-        Mario.execute_mario_action(LevelUpdate.gMarioState)
+        const particleFlags = Mario.execute_mario_action(LevelUpdate.gMarioState)
+        this.gCurrentObject.rawData[oMarioParticleFlags] = particleFlags
         this.copy_mario_state_to_object(LevelUpdate.gMarioState)
 
+        sParticleTypes.forEach(particleType => {
+            if (particleFlags & particleType.particleFlag) {
+            }
+        })
+
+    }
+
+    update_remote_marios() {
+
+        //// Remote Mario behavior
         Object.values(networkData.remotePlayers).forEach(remotePlayer => {
             try { /// surpress bugs for now
-                Mario.execute_mario_action(remotePlayer.marioState)
+
+                const particleFlags = Mario.execute_mario_action(remotePlayer.marioState)
+                this.gCurrentObject.rawData[oMarioParticleFlags] = particleFlags
                 this.copy_mario_state_to_object(remotePlayer.marioState)
+
+                sParticleTypes.forEach(particleType => {
+                    if (particleFlags & particleType.particleFlag) {
+                    }
+                })
+
                 remotePlayer.crashCount = 0
             } catch (error) {
                 console.log("unknown error in 'execute_mario_action' - please report this issue to sm64js devs  -- playerName: " + remotePlayer.marioState.playerName)
                 console.log(error)
                 remotePlayer.crashCount++
-            } 
+            }
         })
-
-        updateNetworkBeforeRender()
-        
     }
 
     copy_mario_state_to_object(marioState) {

@@ -1,4 +1,5 @@
 import * as Mario from "./Mario"
+import * as MarioConstants from "../include/mario_constants"
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
 import { atan2s, vec3f_dif, vec3f_length } from "../engine/math_util"
 import { networkData, sendPlayerInteraction, sendAttackToServer } from "../socket"
@@ -127,15 +128,6 @@ const determine_player_damage_value = (interaction) => {
     return 1
 }
 
-const bounce_off_object = (m, o, velY) => {
-    m.pos[1] = o.rawData[oPosY] + o.hitboxHeight
-    m.vel[1] = velY
-
-    m.flags &= ~Mario.MARIO_UNKNOWN_08
-
-    //play_sound(SOUND_ACTION_BOUNCE_OFF_OBJECT, m->marioObj->header.gfx.cameraToObject);
-}
-
 const player_is_sliding = (m) => {
     if (m.action & (Mario.ACT_FLAG_BUTT_OR_STOMACH_SLIDE | Mario.ACT_FLAG_DIVING)) {
         return true
@@ -149,28 +141,6 @@ const player_is_sliding = (m) => {
             return true
     }
     return false
-}
-
-
-const bounce_back_from_attack = (m, interaction) => {
-    if (interaction & (INT_PUNCH | INT_KICK | INT_TRIP)) {
-        if (m.action == Mario.ACT_PUNCHING) {
-            m.action = Mario.ACT_MOVE_PUNCHING
-        }
-
-        if (m.action & Mario.ACT_FLAG_AIR) {
-            Mario.set_forward_vel(m, -16.0)
-        } else {
-            Mario.set_forward_vel(m, -48.0)
-        }
-
-        //if (m.marioObj.localMario) { set_camera_shake_from_hit(SHAKE_ATTACK); }
-        m.particleFlags |= Mario.PARTICLE_TRIANGLE
-    }
-
-    // if (interaction & (INT_PUNCH | INT_KICK | INT_TRIP | INT_FAST_ATTACK_OR_SHELL)) {
-    //     play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
-    // }
 }
 
 const resolve_player_collision = (m, m2) => {
@@ -489,6 +459,38 @@ const attack_object = (o, interaction) => {
     return attackType
 }
 
+const bounce_off_object = (m, o, velY) => {
+    m.pos[1] = o.rawData[oPosY] + o.hitboxHeight
+    m.vel[1] = velY
+
+    m.flags &= ~Mario.MARIO_UNKNOWN_08
+
+    //play_sound(SOUND_ACTION_BOUNCE_OFF_OBJECT, m -> marioObj -> header.gfx.cameraToObject)
+}
+
+const bounce_back_from_attack = (m, interaction) => {
+
+    if (interaction & (INT_PUNCH | INT_KICK | INT_TRIP)) {
+        if (m.action == Mario.ACT_PUNCHING) {
+            m.action = Mario.ACT_MOVE_PUNCHING
+        }
+
+        if (m.action & Mario.ACT_FLAG_AIR) {
+            Mario.set_forward_vel(m, -16.0)
+        } else {
+            Mario.set_forward_vel(m, -48.0)
+        }
+
+        //set_camera_shake_from_hit(SHAKE_ATTACK) TODO
+        //if (m.marioObj.localMario) { set_camera_shake_from_hit(SHAKE_ATTACK); }
+        m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE
+    }
+
+    if (interaction & (INT_PUNCH | INT_KICK | INT_TRIP | INT_FAST_ATTACK_OR_SHELL)) {
+        //play_sound(SOUND_ACTION_HIT_2, m -> marioObj -> header.gfx.cameraToObject)
+    }
+}
+
 const determine_interaction = (m, o) => {
     let interaction = 0
     const action = m.action
@@ -669,11 +671,11 @@ const check_kick_or_punch_wall = (m) => {
 
                 Mario.set_forward_vel(m, -48.0);
                 // play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
-                m.particleFlags |= Mario.PARTICLE_TRIANGLE;
+                m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             } else if (m.action & Mario.ACT_FLAG_AIR) {
                 Mario.set_forward_vel(m, -16.0);
                 // play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
-                m.particleFlags |= Mario.PARTICLE_TRIANGLE;
+                m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             }
         }
     }

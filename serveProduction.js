@@ -786,7 +786,7 @@ server.listen(port, () => { console.log('Serving Files with express server ' + p
 app.get('/banIP/:token/:ip', (req, res) => {
 
     const token = req.params.token
-    const ip = crypto.AES.decrypt(req.params.ip, ip_encryption_key).toString(crypto.enc.Utf8)
+    const ip = crypto.AES.decrypt(decodeURIComponent(req.params.ip), ip_encryption_key).toString(crypto.enc.Utf8)
 
     if (!adminTokens.includes(token)) return res.status(401).send('Invalid Admin Token')
 
@@ -821,7 +821,7 @@ app.get('/banIP/:token/:ip', (req, res) => {
 app.get('/allowIP/:token/:ip/:plaintext?', (req, res) => {
 
     const token = req.params.token
-    const ip = req.params.plaintext ? req.params.ip : crypto.AES.decrypt(req.params.ip, ip_encryption_key).toString(crypto.enc.Utf8)
+    const ip = req.params.plaintext ? req.params.ip : crypto.AES.decrypt(decodeURIComponent(req.params.ip), ip_encryption_key).toString(crypto.enc.Utf8)
 
     if (!adminTokens.includes(token)) return res.status(401).send('Invalid Admin Token')
 
@@ -856,7 +856,7 @@ app.get('/chatLog/:token/:timestamp?/:range?', (req, res) => {
 
         db.get('chats').forEach((entry) => {
             if (entry.timestampMs >= timestamp - range && entry.timestampMs <= timestamp + range) {
-                const encrypted_ip = crypto.AES.encrypt(entry.ip, ip_encryption_key).toString()
+                const encrypted_ip = encodeURIComponent(crypto.AES.encrypt(entry.ip, ip_encryption_key).toString())
                 stringResult += `${entry.socketID},${entry.playerName},${encrypted_ip},${entry.message} <br />`
             }
         }).value()
@@ -868,6 +868,22 @@ app.get('/chatLog/:token/:timestamp?/:range?', (req, res) => {
 
 })
 
+app.get('/adminLog/:token', (req, res) => {
+
+    const token = req.params.token
+
+    if (token != process.env.IP_ENCRYPTION_KEY) return
+
+    let stringResult = ""
+
+    db.get('adminCommands').forEach((entry) => {
+        stringResult += JSON.stringify(entry)
+        stringResult += '<br />'
+    }).value()
+
+    return res.send(stringResult)
+
+})
 
 /////// necessary for server side rom extraction
 

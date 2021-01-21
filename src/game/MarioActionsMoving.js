@@ -1,4 +1,5 @@
 import * as Mario from "./Mario"
+import * as MarioConstants from "../include/mario_constants"
 import { SURFACE_SLOW, SURFACE_CLASS_VERY_SLIPPERY, SURFACE_CLASS_SLIPPERY, SURFACE_CLASS_NOT_SLIPPERY, TERRAIN_MASK, TERRAIN_SLIDE } from "../include/surface_terrains"
 import * as SurfaceTerrains from "../include/surface_terrains"
 import { mario_bonk_reflection, perform_ground_step } from "./MarioStep"
@@ -305,7 +306,7 @@ const act_walking = (m) => {
     switch (perform_ground_step(m)) {
         case Mario.GROUND_STEP_NONE:
             anim_and_audio_for_walk(m)
-            if (m.intendedMag - m.forwardVel > 16.0) m.particleFlags |= Mario.PARTICLE_DUST
+            if (m.intendedMag - m.forwardVel > 16.0) m.particleFlags |= MarioConstants.PARTICLE_DUST
             break
         case Mario.GROUND_STEP_LEFT_GROUND:
             Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
@@ -353,7 +354,7 @@ const act_braking = (m) => {
             Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
             break
         case Mario.GROUND_STEP_NONE:
-            m.particleFlags |= Mario.PARTICLE_DUST
+            m.particleFlags |= MarioConstants.PARTICLE_DUST
             break
         case Mario.GROUND_STEP_HIT_WALL:
             slide_bonk(m, Mario.ACT_BACKWARD_GROUND_KB, Mario.ACT_BRAKING_STOP);
@@ -454,7 +455,7 @@ const act_turning_around = (m) => {
             break
 
         case Mario.GROUND_STEP_NONE:
-            m.particleFlags |= Mario.PARTICLE_DUST
+            m.particleFlags |= MarioConstants.PARTICLE_DUST
             break
     }
 
@@ -550,7 +551,7 @@ const common_landing_action = (m, animation, airAction) => {
             break
     }
 
-    if (m.forwardVel > 16.0) m.particleFlags |= Mario.PARTICLE_DUST
+    if (m.forwardVel > 16.0) m.particleFlags |= MarioConstants.PARTICLE_DUST
 
     Mario.set_mario_animation(m, animation)
 
@@ -756,7 +757,7 @@ const common_slide_action = (m, stopAction, airAction, animation) => {
         case Mario.GROUND_STEP_NONE:
             Mario.set_mario_animation(m, animation)
             align_with_floor(m)
-            m.particleFlags |= Mario.PARTICLE_DUST
+            m.particleFlags |= MarioConstants.PARTICLE_DUST
             break
         case Mario.GROUND_STEP_HIT_WALL:
             align_with_floor(m)
@@ -841,7 +842,7 @@ const push_or_sidle_wall = (m, startPos) => {
 
         if (m.marioObj.header.gfx.unk38.animFrame < 20) {
             // play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.header.gfx.cameraToObject);
-            m.particleFlags |= Mario.PARTICLE_DUST;
+            m.particleFlags |= MarioConstants.PARTICLE_DUST;
         }
 
         m.actionState = 1;
@@ -1029,7 +1030,7 @@ const act_move_punching = (m) => {
             Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
             break
         case Mario.GROUND_STEP_NONE:
-            m.particleFlags |= Mario.PARTICLE_DUST
+            m.particleFlags |= MarioConstants.PARTICLE_DUST
             break
     }
 
@@ -1057,7 +1058,7 @@ const act_slide_kick_slide = (m) => {
     }
 
     //play sound
-    m.particleFlags |= Mario.PARTICLE_DUST
+    m.particleFlags |= MarioConstants.PARTICLE_DUST
     return 0
 }
 

@@ -1,4 +1,5 @@
 import * as Mario from "./Mario"
+import * as MarioConstants from "../include/mario_constants"
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
 import { atan2s } from "../engine/math_util"
 import { sins, coss, int16 } from "../utils"
@@ -342,7 +343,7 @@ const bounce_back_from_attack = (m, interaction) => {
         }
 
         //set_camera_shake_from_hit(SHAKE_ATTACK) TODO
-        m.particleFlags |= Mario.PARTICLE_TRIANGLE
+        m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE
     }
 
     if (interaction & (INT_PUNCH | INT_KICK | INT_TRIP | INT_FAST_ATTACK_OR_SHELL)) {
@@ -518,11 +519,11 @@ const check_kick_or_punch_wall = (m) => {
 
                 Mario.set_forward_vel(m, -48.0);
                 // play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
-                m.particleFlags |= Mario.PARTICLE_TRIANGLE;
+                m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             } else if (m.action & Mario.ACT_FLAG_AIR) {
                 Mario.set_forward_vel(m, -16.0);
                 // play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
-                m.particleFlags |= Mario.PARTICLE_TRIANGLE;
+                m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             }
         }
     }

@@ -1,6 +1,6 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
-import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins, OBJ_FLAG_ACTIVE_FROM_AFAR, oActiveParticleFlags, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_V_STAR } from "../include/object_constants"
+import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins, OBJ_FLAG_ACTIVE_FROM_AFAR, oActiveParticleFlags, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 import { bhv_pole_init, bhv_giant_pole_loop } from "./behaviors/pole.inc"
@@ -21,7 +21,7 @@ import { MODEL_WOODEN_POST } from "../include/model_ids"
 import { poundable_pole_collision_06002490 } from "../actors/poundable_pole/collision.inc"
 import { bhv_wooden_post_update, bhv_chain_chomp_update, bhv_chain_chomp_chain_part_update } from "./behaviors/chain_chomp.inc"
 import { chain_chomp_seg6_anims_06025178 } from "../actors/chain_chomp/anims/table.inc"
-import { bhv_pound_tiny_star_particle_init, bhv_pound_tiny_star_particle_loop, bhv_tiny_star_particles_init, bhv_wall_tiny_star_particle_loop } from "./behaviors/collide_particles.inc"
+import { bhv_pound_tiny_star_particle_init, bhv_pound_tiny_star_particle_loop, bhv_tiny_star_particles_init, bhv_wall_tiny_star_particle_loop, bhv_punch_tiny_triangle_loop, bhv_punch_tiny_triangle_init } from "./behaviors/collide_particles.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -300,6 +300,15 @@ export const bhvVertStarParticleSpawner = [
     { command: BhvCmds.deactivate }
 ]
 
+export const bhvTriangleParticleSpawner = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.disable_rendering },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.parent_bit_clear, args: { field: oActiveParticleFlags, value: ACTIVE_PARTICLE_TRIANGLE } },
+        { command: BhvCmds.call_native, args: { func: bhv_punch_tiny_triangle_init } },
+    { command: BhvCmds.delay, args: { num: 1 } },
+    { command: BhvCmds.deactivate }
+]
 
 export const bhvPoundTinyStarParticle = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
@@ -321,11 +330,21 @@ export const bhvWallTinyStarParticle = [
     { command: BhvCmds.deactivate }
 ]
 
+export const bhvPunchTinyTriangle = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_punch_tiny_triangle_loop } },
+    { command: BhvCmds.end_loop },
+]
+
 
 const bhvBowser = []
 
 gLinker.behaviors = {
     bhvBowser,
     bhvHorStarParticleSpawner,
-    bhvVertStarParticleSpawner
+    bhvVertStarParticleSpawner,
+    bhvTriangleParticleSpawner
 }

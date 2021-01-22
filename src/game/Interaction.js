@@ -195,7 +195,7 @@ const interact_grabbable = (m, o) => {
         }
     }
 
-    if (script != gLinker.bhvBowser) {
+    if (script != gLinker.behaviors.bhvBowser) {
         push_mario_out_of_object(m, o, -5.0)
     }
 

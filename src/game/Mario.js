@@ -838,6 +838,8 @@ export const execute_mario_action = (marioIndex) => {
         update_mario_info_for_cam(LevelUpdate.gMarioState[marioIndex])
 
         LevelUpdate.gMarioState[marioIndex].marioObj.rawData[oInteractStatus] = 0
+
+        return LevelUpdate.gMarioState[marioIndex].particleFlags
     }
 }
 

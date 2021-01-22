@@ -2,6 +2,9 @@ import { ObjectListProcessorInstance as ObjListProc } from "../game/ObjectListPr
 import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction, oAnimations, oInteractType, oHomeX, oHomeY, oHomeZ, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, oDistanceToMario, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, oAngleToMario, oMoveAngleYaw, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveFlags, OBJ_MOVE_ON_GROUND, oWallHitboxRadius, oGravity, oBounciness, oDragStrength, oFriction, oBuoyancy, oBehParams2ndByte, oRoom, OBJ_FLAG_ACTIVE_FROM_AFAR, oDrawingDistance, ACTIVE_FLAG_FAR_AWAY, oHeldState, HELD_FREE } from "../include/object_constants"
 import { GRAPH_RENDER_CYLBOARD, geo_obj_init_animation, GRAPH_RENDER_BILLBOARD, GRAPH_RENDER_ACTIVE } from "./graph_node"
 import { dist_between_objects, obj_angle_to_object, spawn_object_at_origin, obj_copy_pos_and_angle, cur_obj_scale, cur_obj_hide } from "../game/ObjectHelpers"
+import { int32 } from "../utils"
+
+const obj_and_int = (object, field, value) => { object.rawData[field] &= int32(value) }
 
 class BehaviorCommands {
 
@@ -176,6 +179,20 @@ class BehaviorCommands {
         return this.BHV_PROC_CONTINUE
     }
 
+    disable_rendering(args) {
+        ObjListProc.gCurrentObject.header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    parent_bit_clear(args) {
+        const value = args.value ^ 0xFFFFFFFF
+        obj_and_int(ObjListProc.gCurrentObject.parentObj, args.field, value)
+
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
     or_int(args) {
         const objectOffset = args.field
         let value = args.value
@@ -260,6 +277,29 @@ class BehaviorCommands {
 
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
+    }
+
+    begin_repeat(args) {
+        this.bhvScript.index++
+        ObjListProc.gCurrentObject.bhvStack.push(this.bhvScript.index)
+        ObjListProc.gCurrentObject.bhvStack.push(args.count)
+        return this.BHV_PROC_CONTINUE
+    }
+
+    end_repeat(args) {
+        this.bhvScript.index++
+        let count = ObjListProc.gCurrentObject.bhvStack.pop()
+        count--
+
+        if (count != 0) {
+            this.bhvScript.index = ObjListProc.gCurrentObject.bhvStack.pop()
+            ObjListProc.gCurrentObject.bhvStack.push(this.bhvScript.index)
+            ObjListProc.gCurrentObject.bhvStack.push(count)
+        } else {
+            ObjListProc.gCurrentObject.bhvStack.pop()
+        }
+
+        return this.BHV_PROC_BREAK
     }
 
     begin_loop(args) {

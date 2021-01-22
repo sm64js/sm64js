@@ -1,5 +1,5 @@
 import { PlatformDisplacementInstance as PlatformDisplacement } from "./PlatformDisplacement"
-import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte, ACTIVE_FLAG_ACTIVE, RESPAWN_INFO_TYPE_16, oFlags, OBJ_FLAG_PERSISTENT_RESPAWN, oMarioParticleFlags, ACTIVE_PARTICLE_H_STAR } from "../include/object_constants"
+import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte, ACTIVE_FLAG_ACTIVE, RESPAWN_INFO_TYPE_16, oFlags, OBJ_FLAG_PERSISTENT_RESPAWN, oMarioParticleFlags, ACTIVE_PARTICLE_H_STAR, oActiveParticleFlags } from "../include/object_constants"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import * as GraphNode from "../engine/graph_node"
 import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands"
@@ -9,15 +9,21 @@ import { detect_object_collisions } from "./ObjectCollisions"
 import { uint32, uint16 } from "../utils"
 import { MODEL_NONE } from "../include/model_ids"
 import * as MarioConstants from "../include/mario_constants"
-
-const sParticleTypes = [
-    //{ particleFlag: MarioConstants.PARTICLE_HORIZONTAL_STAR, activeParticleFlag: ACTIVE_PARTICLE_H_STAR, model: MODEL_NONE, behavior: bhvHorStarParticleSpawner }
-]
+import { gLinker } from "./Linker"
+import { spawn_object_at_origin, obj_copy_pos_and_angle } from "./ObjectHelpers"
 
 class ObjectListProcessor {
     constructor() {
 
         PlatformDisplacement.ObjectListProc = this
+        this.sParticleTypesInit = () => {
+            return [
+                {
+                    particleFlag: MarioConstants.PARTICLE_HORIZONTAL_STAR, activeParticleFlag: ACTIVE_PARTICLE_H_STAR, model: MODEL_NONE,
+                    behavior: gLinker.behaviors.bhvHorStarParticleSpawner
+                }
+            ]
+        }
 
         this.TIME_STOP_UNKNOWN_0 = (1 << 0)
         this.TIME_STOP_ENABLED = (1 << 1)
@@ -171,6 +177,14 @@ class ObjectListProcessor {
         }
     }
 
+    spawn_particle(activeParticleFlag, model, behavior) {
+        if (!(this.gCurrentObject.rawData[oActiveParticleFlags] & activeParticleFlag)) {
+            this.gCurrentObject.rawData[oActiveParticleFlags] |= activeParticleFlag
+            const particle = spawn_object_at_origin(this.gCurrentObject, model, behavior)
+            obj_copy_pos_and_angle(particle, this.gCurrentObject)
+        }
+    }
+
     bhv_mario_update() {
 
         const marioIndex = this.gCurrentObject.OG ? 0 : 1
@@ -179,8 +193,10 @@ class ObjectListProcessor {
         this.gCurrentObject.rawData[oMarioParticleFlags] = particleFlags
         this.copy_mario_state_to_object(marioIndex)
 
-        sParticleTypes.forEach(particleType => {
+        if (this.sParticleTypes == undefined) this.sParticleTypes = this.sParticleTypesInit()
+        this.sParticleTypes.forEach(particleType => {
             if (particleFlags & particleType.particleFlag) {
+                this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
             }
         })
         

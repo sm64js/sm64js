@@ -1,6 +1,6 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
-import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins, OBJ_FLAG_ACTIVE_FROM_AFAR } from "../include/object_constants"
+import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins, OBJ_FLAG_ACTIVE_FROM_AFAR, oActiveParticleFlags, ACTIVE_PARTICLE_H_STAR } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 import { bhv_extra_mario_base_loop } from "./behaviors/extra_mario.inc"
@@ -22,6 +22,7 @@ import { MODEL_WOODEN_POST } from "../include/model_ids"
 import { poundable_pole_collision_06002490 } from "../actors/poundable_pole/collision.inc"
 import { bhv_wooden_post_update, bhv_chain_chomp_update, bhv_chain_chomp_chain_part_update } from "./behaviors/chain_chomp.inc"
 import { chain_chomp_seg6_anims_06025178 } from "../actors/chain_chomp/anims/table.inc"
+import { bhv_pound_tiny_star_particle_init, bhv_pound_tiny_star_particle_loop } from "./behaviors/collide_particles.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -292,7 +293,31 @@ export const bhvChainChompChainPart = [
     { command: BhvCmds.end_loop }
 ]
 
+export const bhvHorStarParticleSpawner = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.disable_rendering },
+    { command: BhvCmds.parent_bit_clear, args: { field: oActiveParticleFlags, value: ACTIVE_PARTICLE_H_STAR } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.call_native, args: { func: bhv_pound_tiny_star_particle_init } },
+    { command: BhvCmds.delay, args: { num: 1 } },
+    { command: BhvCmds.deactivate }
+]
+
+export const bhvPoundTinyStarParticle = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } }, 
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.begin_repeat, args: { count: 10 } },
+        { command: BhvCmds.call_native, args: { func: bhv_pound_tiny_star_particle_loop } },
+    { command: BhvCmds.end_repeat },
+    { command: BhvCmds.deactivate }
+]
+
+
 const bhvBowser = []
 
-gLinker.bhvBowser = bhvBowser
-gLinker.bhvMario = bhvMario
+gLinker.behaviors = {
+    bhvBowser,
+    bhvMario,
+    bhvHorStarParticleSpawner
+}

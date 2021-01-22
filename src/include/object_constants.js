@@ -179,7 +179,9 @@ export const oFloorRoom          = 0x4C
 export const oAngleToHome        = 0x4D
 export const oFloor = 0x4E
 
+
 export const oGraphYOffset = 0x15
+export const oActiveParticleFlags = 0x16
 
 export const oAction = 0x31
 export const oSubAction = 0x32
@@ -191,6 +193,9 @@ export const oCheckerBoardPlatformUnk1AC = 0x49
 
 /* Seesaw Platform */
 export const oSeesawPlatformPitchVel = 0x1B
+
+/* Collision Particle */
+export const oCollisionParticleUnkF4 = 0x1B
 
 /* Goomba */
 export const oGoombaSize                = 0x1B
@@ -212,7 +217,6 @@ export const oWoodenPostPrevAngleToMario = 0x1C
 export const oWoodenPostSpeedY           = 0x1D
 export const oWoodenPostMarioPounding    = 0x1E
 export const oWoodenPostOffsetY = 0x1F
-
 
 /* Chain Chomp */
 export const oChainChompSegments                     = 0x1B

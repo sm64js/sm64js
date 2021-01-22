@@ -10,7 +10,8 @@ import { gLinker } from "./Linker"
 const rawDataMap = {
     0: RAW.oMarioPoleYawVel,
     1: RAW.oMarioPolePos,
-    2: RAW.oIntangibleTimer
+    2: RAW.oIntangibleTimer,
+    3: RAW.oActiveParticleFlags
 }
 
 const getMarioRawDataSubset = (fullRawData) => {
@@ -141,6 +142,7 @@ const initNewRemoteMarioState = (marioProto) => {
                     pos: [0, 0, 0],
                     scale: [1, 1, 1],
                     sharedChild: m.marioObj.header.gfx.sharedChild,
+                    unk18: m.marioObj.header.gfx.unk18,
                     unk38: {
                         animID: -1, animFrame: 0,
                         animFrameAccelAssist: 0, animAccel: 0x10000,
@@ -160,7 +162,7 @@ const initNewRemoteMarioState = (marioProto) => {
             hitboxRadius: 37,
             collidedObjs: [],
             rawData: expandRawDataSubset(marioProto.getRawdataList()),
-            bhvScript: { commands: gLinker.bhvMario, index: 0 }
+            bhvScript: { commands: gLinker.behaviors.bhvMario, index: 0 }
         },
         faceAngle: marioProto.getFaceangleList(),
         angleVel: marioProto.getAnglevelList(),

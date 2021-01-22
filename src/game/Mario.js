@@ -850,6 +850,8 @@ export const execute_mario_action = (m) => {
         update_mario_info_for_cam(m)
 
         m.marioObj.rawData[oInteractStatus] = 0
+
+        return m.particleFlags
     }
 }
 

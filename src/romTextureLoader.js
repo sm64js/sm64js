@@ -228,11 +228,13 @@ import {
 
 import { poundable_pole_seg6_texture_06001050, poundable_pole_seg6_texture_06001850 } from "./actors/poundable_pole/model.inc"
 
+import { dirt_seg3_texture_0302BDF8 } from "./actors/dirt/model.inc"
+
 
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 20
+const textureVersion = 21
 
 const loadDataIntoGame = (data) => {
 
@@ -461,6 +463,8 @@ const loadDataIntoGame = (data) => {
 
     poundable_pole_seg6_texture_06001050.push(...data["actors/poundable_pole/poundable_pole_top.rgba16.png"].data)
     poundable_pole_seg6_texture_06001850.push(...data["actors/poundable_pole/poundable_pole_side.rgba16.png"].data)
+
+    dirt_seg3_texture_0302BDF8.push(...data["actors/dirt/dirt_particle.rgba16.png"].data)
 
     SkyboxWater.water_skybox_texture_00000.push(...data["water_skybox_texture_00000"].data)
     SkyboxWater.water_skybox_texture_00001.push(...data["water_skybox_texture_00001"].data)

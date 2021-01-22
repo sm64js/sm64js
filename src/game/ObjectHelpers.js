@@ -20,6 +20,22 @@ export const cur_obj_set_pos_to_home = () => {
     o.rawData[oPosZ] = o.rawData[oHomeZ]
 }
 
+export const cur_obj_set_pos_relative = (other, dleft, dy, dforward) => {
+    const o = ObjectListProc.gCurrentObject
+
+    const facingZ = coss(other.rawData[oMoveAngleYaw])
+    const facingX = sins(other.rawData[oMoveAngleYaw])
+
+    const dz = dforward * facingZ - dleft * facingX
+    const dx = dforward * facingX + dleft * facingZ
+
+    o.rawData[oMoveAngleYaw] = other.rawData[oMoveAngleYaw]
+
+    o.rawData[oPosX] = other.rawData[oPosX] + dx
+    o.rawData[oPosY] = other.rawData[oPosY] + dy
+    o.rawData[oPosZ] = other.rawData[oPosZ] + dz
+}
+
 export const cur_obj_extend_animation_if_at_end = () => {
     const o = ObjectListProc.gCurrentObject
 

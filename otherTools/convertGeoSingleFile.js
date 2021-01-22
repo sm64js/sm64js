@@ -10,9 +10,9 @@ var snum = 1 // used as a counter variable (Keep 1!)
 var num = 32 // number of model.inc.js files there are
 var areaNum = 1 // target area number
 var mainDir = __dirname + '/converted/' + level + '/areas/' + areaNum + '/' // directory to put models in
-var inputBase = require('os').homedir() + '/Programming/sm64pc/actors/poundable_pole/geo.inc.c' // directory of each model file
+var inputBase = require('os').homedir() + '/Programming/sm64pc/actors/mist/geo.inc.c' // directory of each model file
 
-const mydir = require('os').homedir() + '/Programming/sm64pc/actors/poundable_pole/'
+const mydir = require('os').homedir() + '/Programming/sm64pc/actors/mist/'
 
 //Not sure whether we need to skip commands.
 const skipCommands = [
@@ -73,6 +73,8 @@ function CompileGeo(lines,AreaDir,isBase = false) {
 				outputStr += `\t{ command: Geo.open_node },\n`
 			} else if (lineParse.trim().slice(0, 14) == 'GEO_CLOSE_NODE') { //close node
 				outputStr += `\t{ command: Geo.close_node },\n`
+			} else if (lineParse.trim().slice(0, 14) == 'GEO_NODE_START') { //close node
+				outputStr += `\t{ command: Geo.node_start },\n`
 			} else if (lineParse.trim().slice(0, 13) == 'GEO_BILLBOARD') { //billboard
 				outputStr += `\t{ command: Geo.node_billboard },\n`
 			} else if (lineParse.trim().slice(0, 7) == 'GEO_END') { //end

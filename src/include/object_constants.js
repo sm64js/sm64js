@@ -293,3 +293,8 @@ export const oRespawnerMinSpawnDist      = 0x1C
 export const oRespawnerBehaviorToRespawn = 0x1D
 
 export const oSmokeTimer = 0x1B
+
+/* White Puff Explode */
+export const oWhitePuffUnkF4 = 0x1B
+export const oWhitePuffUnkF8 = 0x1C
+export const oWhitePuffUnkFC = 0x1D

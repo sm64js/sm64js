@@ -1,5 +1,5 @@
 import { PlatformDisplacementInstance as PlatformDisplacement } from "./PlatformDisplacement"
-import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte, ACTIVE_FLAG_ACTIVE, RESPAWN_INFO_TYPE_16, oFlags, OBJ_FLAG_PERSISTENT_RESPAWN, oMarioParticleFlags, ACTIVE_PARTICLE_H_STAR, oActiveParticleFlags, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE } from "../include/object_constants"
+import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte, ACTIVE_FLAG_ACTIVE, RESPAWN_INFO_TYPE_16, oFlags, OBJ_FLAG_PERSISTENT_RESPAWN, oMarioParticleFlags, ACTIVE_PARTICLE_H_STAR, oActiveParticleFlags, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE, ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_MIST_CIRCLE } from "../include/object_constants"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import * as GraphNode from "../engine/graph_node"
 import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands"
@@ -7,7 +7,7 @@ import * as Mario from "./Mario"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { detect_object_collisions } from "./ObjectCollisions"
 import { uint32, uint16 } from "../utils"
-import { MODEL_NONE } from "../include/model_ids"
+import { MODEL_NONE, MODEL_MIST } from "../include/model_ids"
 import * as MarioConstants from "../include/mario_constants"
 import { gLinker } from "./Linker"
 import { spawn_object_at_origin, obj_copy_pos_and_angle } from "./ObjectHelpers"
@@ -29,6 +29,14 @@ class ObjectListProcessor {
                 {
                     particleFlag: MarioConstants.PARTICLE_TRIANGLE, activeParticleFlag: ACTIVE_PARTICLE_TRIANGLE, model: MODEL_NONE,
                     behavior: gLinker.behaviors.bhvTriangleParticleSpawner
+                },
+                {
+                    particleFlag: MarioConstants.PARTICLE_DUST, activeParticleFlag: ACTIVE_PARTICLE_DUST, model: MODEL_MIST,
+                    behavior: gLinker.behaviors.bhvMistParticleSpawner
+                },
+                {
+                    particleFlag: MarioConstants.PARTICLE_MIST_CIRCLE, activeParticleFlag: ACTIVE_PARTICLE_MIST_CIRCLE, model: MODEL_NONE,
+                    behavior: gLinker.behaviors.bhvMistCircParticleSpawner
                 }
             ]
         }

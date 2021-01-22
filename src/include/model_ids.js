@@ -103,4 +103,9 @@ export const MODEL_MARIOS_CAP                 = 0x88        // marios_cap_geo
 export const MODEL_EXCLAMATION_BOX            = 0x89        // exclamation_box_geo
 export const MODEL_DIRT_ANIMATION             = 0x8A        // dirt_animation_geo
 export const MODEL_CARTOON_STAR               = 0x8B        // cartoon_star_geo
-export const MODEL_BLUE_COIN_SWITCH           = 0x8C        // blue_coin_switch_geo
+export const MODEL_BLUE_COIN_SWITCH = 0x8C        // blue_coin_switch_geo
+
+export const MODEL_MIST                       = 0x8E        // mist_geo
+export const MODEL_SPARKLES_ANIMATION         = 0x8F        // sparkles_animation_geo
+export const MODEL_RED_FLAME                  = 0x90        // red_flame_geo
+export const MODEL_BLUE_FLAME                 = 0x91        // blue_flame_geo

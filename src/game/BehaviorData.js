@@ -1,6 +1,6 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
-import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins, OBJ_FLAG_ACTIVE_FROM_AFAR, oActiveParticleFlags, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE } from "../include/object_constants"
+import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins, OBJ_FLAG_ACTIVE_FROM_AFAR, oActiveParticleFlags, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE, ACTIVE_PARTICLE_DUST } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 import { bhv_extra_mario_base_loop } from "./behaviors/extra_mario.inc"
@@ -18,11 +18,14 @@ import { bhv_bobomb_loop, bhv_bobomb_init, bhv_bobomb_fuse_smoke_init, bhv_dust_
 import { gLinker } from "./Linker"
 import { bhv_explosion_init, bhv_explosion_loop } from "./behaviors/explosion.inc"
 import { bhv_respawner_loop, bhv_bobomb_bully_death_smoke_init } from "./behaviors/corkbox.inc"
-import { MODEL_WOODEN_POST } from "../include/model_ids"
+import { MODEL_WOODEN_POST, MODEL_MIST, MODEL_SMOKE } from "../include/model_ids"
 import { poundable_pole_collision_06002490 } from "../actors/poundable_pole/collision.inc"
 import { bhv_wooden_post_update, bhv_chain_chomp_update, bhv_chain_chomp_chain_part_update } from "./behaviors/chain_chomp.inc"
 import { chain_chomp_seg6_anims_06025178 } from "../actors/chain_chomp/anims/table.inc"
 import { bhv_pound_tiny_star_particle_init, bhv_pound_tiny_star_particle_loop, bhv_tiny_star_particles_init, bhv_wall_tiny_star_particle_loop, bhv_punch_tiny_triangle_loop, bhv_punch_tiny_triangle_init } from "./behaviors/collide_particles.inc"
+import { bhv_white_puff_1_loop, bhv_white_puff_2_loop } from "./behaviors/white_puff.inc"
+import { bhv_pound_white_puffs_init } from "./behaviors/ground_particles.inc"
+import { bhv_white_puff_exploding_loop } from "./behaviors/white_puff_explode.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -352,6 +355,56 @@ export const bhvPunchTinyTriangle = [
     { command: BhvCmds.end_loop },
 ]
 
+export const bhvWhitePuff1 = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.parent_bit_clear, args: { field: oActiveParticleFlags, value: ACTIVE_PARTICLE_DUST } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_white_puff_1_loop } },
+    { command: BhvCmds.end_loop }
+]
+
+
+export const bhvWhitePuff2 = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_MOVE_XZ_USING_FVEL } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.set_objectData_value, args: { field: oAnimState, value: -1 } },
+    { command: BhvCmds.begin_repeat, args: { count: 7 } },
+        { command: BhvCmds.call_native, args: { func: bhv_white_puff_2_loop } },
+        { command: BhvCmds.add_int, args: { field: oAnimState, value: 1 } },
+    { command: BhvCmds.end_repeat },
+    { command: BhvCmds.deactivate }
+]
+
+
+export const bhvMistParticleSpawner = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.parent_bit_clear, args: { field: oActiveParticleFlags, value: ACTIVE_PARTICLE_DUST } },
+    { command: BhvCmds.disable_rendering },
+    { command: BhvCmds.spawn_child_with_param, args: { bhvParam: 0, model: MODEL_MIST, behavior: bhvWhitePuff1 } },
+    { command: BhvCmds.spawn_child_with_param, args: { bhvParam: 0, model: MODEL_SMOKE, behavior: bhvWhitePuff2 } },
+    { command: BhvCmds.delay, args: { num: 1 } },
+    { command: BhvCmds.deactivate }
+]
+
+export const bhvMistCircParticleSpawner = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+        { command: BhvCmds.call_native, args: { func: bhv_pound_white_puffs_init } },
+    { command: BhvCmds.delay, args: { num: 1 } },
+    { command: BhvCmds.deactivate }
+]
+
+export const bhvWhitePuffExplosion = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_white_puff_exploding_loop } },
+    { command: BhvCmds.end_loop }
+]
 
 const bhvBowser = []
 
@@ -360,5 +413,8 @@ gLinker.behaviors = {
     bhvMario,
     bhvHorStarParticleSpawner,
     bhvVertStarParticleSpawner,
-    bhvTriangleParticleSpawner
+    bhvTriangleParticleSpawner,
+    bhvMistParticleSpawner,
+    bhvMistCircParticleSpawner,
+    bhvWhitePuffExplosion
 }

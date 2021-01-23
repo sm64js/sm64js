@@ -35,7 +35,7 @@ const url = new URL(window.location.href)
 const websocketServerPath = process.env.NODE_ENV === 'production'
     ? `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/`
     : url.protocol == "https:"
-        ? `wss://${url.hostname}/websocket/`
+        ? `wss://server.${url.hostname}/websocket/`
         : `ws://${url.hostname}:3000`
 
 const socket = new WebSocket(websocketServerPath)

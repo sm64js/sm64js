@@ -1,6 +1,4 @@
-FROM node:13-alpine
-
-RUN apk update && apk add gcc libc-dev bash python3
+FROM node:13-alpine as build
 
 RUN mkdir -p /usr/src/app
 
@@ -14,4 +12,6 @@ RUN npm run build
 
 COPY src/favicon.ico ./dist/
 
-CMD ["npm", "run", "serve"]
+FROM nginx:stable-alpine
+
+COPY --from=build ./dist /usr/share/nginx/html

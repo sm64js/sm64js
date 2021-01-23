@@ -1,4 +1,4 @@
-FROM node:13
+FROM node:13 as build
 
 RUN apt-get update && apt-get install gcc libc-dev python3 bash
 
@@ -24,4 +24,7 @@ COPY src/emotes/ ./dist/emotes/
 COPY src/mini/ ./dist/mini/
 COPY . ./
 
-CMD ["npm", "run", "serve"]
+
+FROM nginx:stable-alpine
+
+COPY --from=build /usr/src/app/dist /usr/share/nginx/html

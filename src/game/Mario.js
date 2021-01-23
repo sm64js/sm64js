@@ -240,6 +240,7 @@ export const ACT_BUTT_SLIDE = 0x00840452
 export const ACT_HOLD_BUTT_SLIDE = 0x00840454
 export const ACT_RIDING_SHELL_GROUND = 0x20810446
 export const ACT_WATER_PUNCH = 0x300024E1
+export const ACT_WATER_PLUNGE = 0x300022E2
 export const ACT_TWIRL_LAND = 0x18800238
 export const ACT_TWIRLING = 0x108008A4
 export const ACT_IN_CANNON               = 0x00001371
@@ -289,7 +290,7 @@ export const ACT_FLAG_CONTROL_JUMP_HEIGHT = (1 << 25)
 export const ACT_FLAG_ALLOW_FIRST_PERSON = (1 << 26)
 export const ACT_FLAG_PAUSE_EXIT = (1 << 27)
 export const ACT_FLAG_SWIMMING_OR_FLYING = (1 << 28)
-export const ACT_FLAG_WATER_OR_TEXT = (1 << 29)
+export const ACT_FLAGWATER_OR_TEXT = (1 << 29)
 export const ACT_FLAG_THROWING = (1 << 31)
 
 export const INPUT_NONZERO_ANALOG = 0x0001
@@ -1215,4 +1216,23 @@ export const init_mario_from_save_file = () => {
     })
 
 
+}
+
+const set_water_plunge_action = m => {
+  m.forwardVel = m.forwardVel / 4
+  m.vel[1] = m.vel[1] / 2
+
+  m.pos[1] = m.waterLevel - 100
+
+  m.faceAngle[2] = 0
+
+  vec3s_set(m.angleVel, 0, 0, 0)
+
+  if (!m.action && ACT_FLAG_DIVING) {
+    m.faceAngle[0] = 0
+  }
+
+  //TODO implement camera
+
+  return set_mario_action(m, ACT_WATER_PLUNGE, 0)
 }

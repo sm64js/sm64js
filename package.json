@@ -3,20 +3,16 @@
   "version": "0.0.0",
   "description": "sm64js",
   "author": {
-    "name": ""
+    "name": "Snuffy"
   },
   "dependencies": {
-    "crypto-js": "^4.0.0",
     "css-loader": "^3.6.0",
     "google-protobuf": "^3.13.0",
-    "got": "^11.8.0",
-    "lowdb": "^1.0.0",
     "mathjs": "^7.0.1",
     "mini-css-extract-plugin": "^0.9.0",
     "optimize-css-assets-webpack-plugin": "^5.0.4",
     "style-loader": "^1.2.1",
     "terser-webpack-plugin": "^4.2.2",
-    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v18.8.0",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.11.0"

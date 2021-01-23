@@ -567,13 +567,9 @@ export const checkForRom = () => {   /// happens one time when the page is loade
     if (url.searchParams.get("romExternal") && !loadedGameAssets) {
         msgElement.innerHTML = "Transfering ROM Data..."
         msgElement.style = "color:yellow"
-        $.ajax({
-            url: '/romTransfer',
-            type: 'GET',
-            dataType: 'json',
-            data: { romExternal: url.searchParams.get("romExternal") },
-            success: (extractedData) => { processExtractedResults(extractedData) }
-        })
+        //TODO transfer ROM to client and extract
+        ///extractAssetsFromRom and url.searchParams.get("romExternal")
+        throw "temporarily unsupported"
     }
 
     return loadedGameAssets

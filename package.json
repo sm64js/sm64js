@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "sm64js",
   "author": {
-    "name": ""
+    "name": "Snuffy"
   },
   "dependencies": {
     "css-loader": "^3.6.0",
@@ -17,8 +17,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "scripts": {
-    "quickstart": "npm install && webpack --mode production && node serveProduction.js",
-    "serve": "node serveProduction.js",
+    "serve": "node serveStatic.js",
     "build": "webpack --mode production",
     "start": "webpack-dev-server --host 0.0.0.0 --disable-host-check  --mode development"
   },

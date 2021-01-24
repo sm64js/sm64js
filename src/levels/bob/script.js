@@ -15,8 +15,8 @@ const load_one_flag = [
 ]
 
 const script_func_local_1 = [
-    { command: LevelCommands.place_object, args: [/*acts?*/ 0x1F, /*model*/ MODEL_BOB_SEESAW_PLATFORM, /*pos*/ -2303,   717,  1024, /*angle*/ 0, 45, 0,  /*behParam*/ 0x00030000, /*beh*/ bhvSeesawPlatform] },
-    { command: LevelCommands.place_object, args: [/*acts?*/ 0x1F, /*model*/ MODEL_CHECKERBOARD_PLATFORM, /*pos*/ 1612, 300, 4611, /*angle*/ 0, 0, 0, /*behParam*/ 0x00280000, /*beh*/ bhvCheckerboardElevatorGroup] },
+    //{ command: LevelCommands.place_object, args: [/*acts?*/ 0x1F, /*model*/ MODEL_BOB_SEESAW_PLATFORM, /*pos*/ -2303,   717,  1024, /*angle*/ 0, 45, 0,  /*behParam*/ 0x00030000, /*beh*/ bhvSeesawPlatform] },
+    //{ command: LevelCommands.place_object, args: [/*acts?*/ 0x1F, /*model*/ MODEL_CHECKERBOARD_PLATFORM, /*pos*/ 1612, 300, 4611, /*angle*/ 0, 0, 0, /*behParam*/ 0x00280000, /*beh*/ bhvCheckerboardElevatorGroup] },
     { command: LevelCommands.return }
 ]
 

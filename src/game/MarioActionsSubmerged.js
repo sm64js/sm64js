@@ -1,5 +1,6 @@
 import * as Mario from "./Mario"
-import { atan2s, approach_s32, approach_f32, vec3f_copy, vec3f_set } from "../engine/math_util"
+import { atan2s, vec3f_set, approach_number } from "../engine/math_util"
+import { SurfaceCollisionInstance as SurfaceCollisions } from "../engine/SurfaceCollision"
 import { coss, sins } from "../utils"
 import { PARTICLE_IDLE_WATER_WAVE, PARTICLE_WATER_SPLASH } from "../include/mario_constants"
 import { SURFACE_FLOWING_WATER } from "../include/surface_terrains"
@@ -64,7 +65,7 @@ const update_swimming_yaw = (m) => {
                 m.angleVel[1] = 0x10
             }
         } else {
-            m.angleVel[1] = approach_s32(m.angleVel[1], targetYawVel, 0x10, 0x20)
+            m.angleVel[1] = approach_number(m.angleVel[1], targetYawVel, 0x10, 0x20)
         }
     } else if (targetYawVel < 0) {
         if (m.angleVel[1] > 0) {
@@ -73,10 +74,10 @@ const update_swimming_yaw = (m) => {
                 m.angleVel[1] = -0x10
             }
         } else {
-            m.angleVel[1] = approach_s32(m.angleVel[1], targetYawVel, 0x20, 0x10)
+            m.angleVel[1] = approach_number(m.angleVel[1], targetYawVel, 0x20, 0x10)
         }
     } else {
-        m.angleVel[1] = approach_s32(m.angleVel[1], 0, 0x40, 0x40)
+        m.angleVel[1] = approach_number(m.angleVel[1], 0, 0x40, 0x40)
     }
 
     m.faceAngle[1] += m.angleVel[1]
@@ -114,9 +115,9 @@ const common_idle_step = (m, animation, arg) => {
     update_water_pitch(m)
 
     if (m.faceAngle[0] > 0) {
-        val = approach_s32(val, m.faceAngle[0] / 2, 0x80, 0x200)
+        val = approach_number(val, m.faceAngle[0] / 2, 0x80, 0x200)
     } else {
-        val = approach_s32(val, 0, 0x200, 0x200)
+        val = approach_number(val, 0, 0x200, 0x200)
     }
 
     if (arg === 0) {
@@ -204,11 +205,11 @@ const stationary_slow_down = (m) => {
     m.angleVel[0] = 0
     m.angleVel[1] = 0
 
-    m.forwardVel = approach_f32(m.forwardVel, 0.0, 1.0, 1.0)
-    m.vel[1] = approach_f32(m.vel[1], buoyancy, 2.0, 1.0)
+    m.forwardVel = approach_number(m.forwardVel, 0.0, 1.0, 1.0)
+    m.vel[1] = approach_number(m.vel[1], buoyancy, 2.0, 1.0)
 
-    m.faceAngle[0] = approach_s32(m.faceAngle[0], 0, 0x200, 0x200)
-    m.faceAngle[2] = approach_s32(m.faceAngle[2], 0, 0x100, 0x100)
+    m.faceAngle[0] = approach_number(m.faceAngle[0], 0, 0x200, 0x200)
+    m.faceAngle[2] = approach_number(m.faceAngle[2], 0, 0x100, 0x100)
 
     m.vel[0] = m.forwardVel * coss(m.faceAngle[0]) * sins(m.faceAngle[1])
     m.vel[2] = m.forwardVel * coss(m.faceAngle[0]) * coss(m.faceAngle[1])
@@ -246,7 +247,7 @@ const perform_water_step = (m) => {
     let step = [0, 0, 0]
     let marioObj = m.marioObj
 
-    vec3f_copy(step, m.vel)
+    step = [...m.vel]
 
     if (m.action & Mario.ACT_FLAG_SWIMMING) {
         apply_water_current(m, step)
@@ -263,18 +264,19 @@ const perform_water_step = (m) => {
 
     stepResult = perform_water_full_step(m, nextPos)
 
-    vec3f_copy(marioObj.header.gfx.pos, m.pos)
+    marioObj.header.gfx.pos = [...m.pos]
     vec3s_set(marioObj.header.gfx.angle, -m.faceAngle[0], m.faceAngle[1], m.faceAngle[2])
 
     return stepResult
 }
 
 const perform_water_full_step = (m, nextPos) => {
-    let wall = Mario.resolve_and_return_wall_collisions(nextPos, 10.0, 110.0)
-    let ceil
-    let floor
-    let floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], floor)
-    let ceilHeight = vec3f_find_ceil(nextPos, floorHeight, ceil)
+    const wall = Mario.resolve_and_return_wall_collisions(nextPos, 10.0, 110.0)
+    const floorWrapper = {}
+    const floorHeight = SurfaceCollisions.find_floor(nextPos[0], nextPos[1], nextPos[2], floorWrapper)
+    console.log(floorHeight)
+    const ceilWrapper = {}
+    let ceilHeight = SurfaceCollisions./*vec3f_*/find_ceil(nextPos, floorHeight, ceilWrapper)
 
     if (floor === null) {
         return Mario.WATER_STEP_CANCELLED
@@ -282,12 +284,12 @@ const perform_water_full_step = (m, nextPos) => {
 
     if (nextPos[1] >= floorHeight) {
         if (ceilHeight - nextPos[1] >= 160.0) {
-            vec3f_copy(m.pos, nextPos)
+            m.pos = [...nextPos]
             m.floor = floor
             m.floorHeight = floorHeight
 
             if (wall != null) {
-                return Mario.WATER_STEP_HIT_WALL //TODO ask if they can be moved here
+                return Mario.WATER_STEP_HIT_WALL 
             } else {
                 return Mario.WATER_STEP_NONE
             }
@@ -334,7 +336,7 @@ const apply_water_current = (m, step) => {
             dy = whirlpool.pos[1] - m.pos[1]
             dz = whirlpool.pos[2] - m.pos[2]
 
-            lateralDist = Math.sqrt(dx * dx + dz * dz) //TODO sqrtf?
+            lateralDist = Math.sqrt(dx * dx + dz * dz) 
             distance = Math.sqrt(lateralDist * lateralDist + dy * dy)
 
             pitchToWhirlpool = atan2s(lateralDist, dy)

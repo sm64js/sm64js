@@ -1,5 +1,8 @@
 import { coss, sins } from "../utils"
 
+/**
+ * Unified version of approach_f32 and approach_s32 from the C version
+ */
 export const approach_number = (current, target, inc, dec) => {
     if (current < target) {
         current += inc
@@ -54,11 +57,6 @@ export const vec3f_cross = (dest, a, b) => {
     return dest 
 }
 
-export const vec3f_copy = (dest, src) => {
-    dest = [...src]; //TODO ask if it's ok
-    return dest; 
-}
-
 export const vec3f_set = (dest, x, y, z) => {
     dest[0] = x;
     dest[1] = y;
@@ -71,36 +69,6 @@ export const vec3s_set = (dest, x, y, z) => {
     dest[1] = y;
     dest[2] = z;
     return dest; 
-}
-
-export const approach_s32 = (current, target, inc, dec) => {
-    if (current < target) {
-        current += inc;
-        if (current > target) {
-            current = target;
-        }
-    } else {
-        current -= dec;
-        if (current < target) {
-            current = target;
-        }
-    }
-    return current;
-}
-
-export const approach_f32 = (current, target, inc, dec) => {
-    if (current < target) {
-        current += inc;
-        if (current > target) {
-            current = target;
-        }
-    } else {
-        current -= dec;
-        if (current < target) {
-            current = target;
-        }
-    }
-    return current;
 }
 
 export const mtxf_identity = (mtx) => {

@@ -711,7 +711,27 @@ const act_steep_jump = (m) => {
     return 0
 }
 
+const check_common_airborne_cancels =(m) => {
+    if (m.pos[1] < m.waterLevel - 100) {
+        return Mario.set_water_plunge_action(m)
+    }
+    /*TODO
+    if (m.input & INPUT_SQUISHED) {
+        return drop_and_set_mario_action(m, ACT_SQUISHED, 0)
+    }
+
+    if (m.floor.type == SURFACE_VERTICAL_WIND && (m.action & ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)) {
+        return drop_and_set_mario_action(m, ACT_VERTICAL_WIND, 0)
+    }
+
+    m.quicksandDepth = 0.0;
+    */
+    return false
+}
+
 export const mario_execute_airborne_action = (m) => {
+    if (check_common_airborne_cancels(m)) 
+        return 1 
 
     switch (m.action) {
         case Mario.ACT_JUMP: return act_jump(m)

@@ -54,6 +54,55 @@ export const vec3f_cross = (dest, a, b) => {
     return dest 
 }
 
+export const vec3f_copy = (dest, src) => {
+    dest = [...src]; //TODO ask if it's ok
+    return dest; 
+}
+
+export const vec3f_set = (dest, x, y, z) => {
+    dest[0] = x;
+    dest[1] = y;
+    dest[2] = z;
+    return dest; 
+}
+
+export const vec3s_set = (dest, x, y, z) => {
+    dest[0] = x;
+    dest[1] = y;
+    dest[2] = z;
+    return dest; 
+}
+
+export const approach_s32 = (current, target, inc, dec) => {
+    if (current < target) {
+        current += inc;
+        if (current > target) {
+            current = target;
+        }
+    } else {
+        current -= dec;
+        if (current < target) {
+            current = target;
+        }
+    }
+    return current;
+}
+
+export const approach_f32 = (current, target, inc, dec) => {
+    if (current < target) {
+        current += inc;
+        if (current > target) {
+            current = target;
+        }
+    } else {
+        current -= dec;
+        if (current < target) {
+            current = target;
+        }
+    }
+    return current;
+}
+
 export const mtxf_identity = (mtx) => {
     for (let i = 0; i < mtx.length; i++) {
         for (let j = 0; j < mtx[i].length; j++) {

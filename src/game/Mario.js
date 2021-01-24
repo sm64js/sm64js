@@ -6,12 +6,13 @@ import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectList
 import { GRAPH_RENDER_INVISIBLE, geo_update_animation_frame, retrieve_animation_index } from "../engine/graph_node"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import * as SurfaceTerrains from "../include/surface_terrains"
-import { atan2s } from "../engine/math_util"
+import { atan2s, vec3s_set } from "../engine/math_util"
 import { mario_execute_stationary_action } from "./MarioActionsStationary"
 import { gMarioAnimData } from "../actors/mario/marioAnimData"
 import { mario_execute_moving_action } from "./MarioActionsMoving"
 import { mario_execute_airborne_action } from "./MarioActionsAirborne"
 import { mario_execute_object_action } from "./MarioActionsObject"
+import { mario_execute_submerged_action } from "./MarioActionsSubmerged"
 import { oMarioWalkingPitch, oInteractStatus, oPosX, oPosY, oPosZ, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oMarioSteepJumpYaw } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
@@ -239,8 +240,6 @@ export const ACT_HANGING = 0x00200349
 export const ACT_BUTT_SLIDE = 0x00840452
 export const ACT_HOLD_BUTT_SLIDE = 0x00840454
 export const ACT_RIDING_SHELL_GROUND = 0x20810446
-export const ACT_WATER_PUNCH = 0x300024E1
-export const ACT_WATER_PLUNGE = 0x300022E2
 export const ACT_TWIRL_LAND = 0x18800238
 export const ACT_TWIRLING = 0x108008A4
 export const ACT_IN_CANNON               = 0x00001371
@@ -260,6 +259,41 @@ export const ACT_BACKWARD_AIR_KB       =  0x010208B0
 export const ACT_FORWARD_AIR_KB        =  0x010208B1 
 export const ACT_HARD_FORWARD_AIR_KB   =  0x010208B2 
 export const ACT_HARD_BACKWARD_AIR_KB  =  0x010208B3
+
+// group 0x0C0: submerged actions
+export const ACT_WATER_IDLE                =0x380022C0 
+export const ACT_HOLD_WATER_IDLE           =0x380022C1 
+export const ACT_WATER_ACTION_END          =0x300022C2 
+export const ACT_HOLD_WATER_ACTION_END     =0x300022C3 
+export const ACT_DROWNING                  =0x300032C4 
+export const ACT_BACKWARD_WATER_KB         =0x300222C5 
+export const ACT_FORWARD_WATER_KB          =0x300222C6 
+export const ACT_WATER_DEATH               =0x300032C7 
+export const ACT_WATER_SHOCKED             =0x300222C8 
+export const ACT_BREASTSTROKE              =0x300024D0 
+export const ACT_SWIMMING_END              =0x300024D1 
+export const ACT_FLUTTER_KICK              =0x300024D2 
+export const ACT_HOLD_BREASTSTROKE         =0x300024D3 
+export const ACT_HOLD_SWIMMING_END         =0x300024D4 
+export const ACT_HOLD_FLUTTER_KICK         =0x300024D5 
+export const ACT_WATER_SHELL_SWIMMING      =0x300024D6 
+export const ACT_WATER_THROW               =0x300024E0 
+export const ACT_WATER_PUNCH               =0x300024E1 
+export const ACT_WATER_PLUNGE              =0x300022E2 
+export const ACT_CAUGHT_IN_WHIRLPOOL       =0x300222E3 
+export const ACT_METAL_WATER_STANDING      =0x080042F0 
+export const ACT_HOLD_METAL_WATER_STANDING =0x080042F1 
+export const ACT_METAL_WATER_WALKING       =0x000044F2 
+export const ACT_HOLD_METAL_WATER_WALKING  =0x000044F3 
+export const ACT_METAL_WATER_FALLING       =0x000042F4 
+export const ACT_HOLD_METAL_WATER_FALLING  =0x000042F5 
+export const ACT_METAL_WATER_FALL_LAND     =0x000042F6 
+export const ACT_HOLD_METAL_WATER_FALL_LAND=0x000042F7 
+export const ACT_METAL_WATER_JUMP          =0x000044F8 
+export const ACT_HOLD_METAL_WATER_JUMP     =0x000044F9 
+export const ACT_METAL_WATER_JUMP_LAND     =0x000044FA 
+export const ACT_HOLD_METAL_WATER_JUMP_LAND=0x000044FB 
+
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -315,6 +349,12 @@ export const GROUND_STEP_NONE = 1
 export const GROUND_STEP_HIT_WALL = 2
 export const GROUND_STEP_HIT_WALL_STOP_QSTEPS = 2
 export const GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS = 3
+
+export const WATER_STEP_NONE        = 0
+export const WATER_STEP_HIT_FLOOR   = 1
+export const WATER_STEP_HIT_CEILING = 2
+export const WATER_STEP_CANCELLED   = 3
+export const WATER_STEP_HIT_WALL    = 4
 
 export const sJumpLandAction = {
     numFrames: 4,
@@ -832,6 +872,9 @@ export const execute_mario_action = (marioIndex) => {
                 case ACT_GROUP_AUTOMATIC:
                     inLoop = mario_execute_automatic_action(LevelUpdate.gMarioState[marioIndex]); break
 
+                case ACT_GROUP_SUBMERGED:
+                    inLoop = mario_execute_submerged_action(LevelUpdate.gMarioState[marioIndex]); break
+
                 default: throw "unkown action group"
             }
         }
@@ -1218,7 +1261,7 @@ export const init_mario_from_save_file = () => {
 
 }
 
-const set_water_plunge_action = m => {
+export const set_water_plunge_action = m => {
   m.forwardVel = m.forwardVel / 4
   m.vel[1] = m.vel[1] / 2
 
@@ -1228,7 +1271,7 @@ const set_water_plunge_action = m => {
 
   vec3s_set(m.angleVel, 0, 0, 0)
 
-  if (!m.action && ACT_FLAG_DIVING) {
+  if (!(m.action && ACT_FLAG_DIVING)) {
     m.faceAngle[0] = 0
   }
 

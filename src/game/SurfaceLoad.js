@@ -279,7 +279,7 @@ class SurfaceLoad {
             }
         }
 
-        if (macroObjects) {
+        if (macroObjects && macroObjects[0]) {
             if (macroObjects[0].preset < 30) throw "spawn objects shortcut method?"
             else spawn_macro_objects(index, macroObjects)
         } 

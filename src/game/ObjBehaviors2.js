@@ -202,7 +202,7 @@ export const obj_set_knockback_action = (attackType) => {
     }
 
     o.rawData[oFlags] &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW
-    o.rawData[oMoveAngleYaw] = obj_angle_to_object(ObjectListProc.gMarioObject[0], o)
+    o.rawData[oMoveAngleYaw] = obj_angle_to_object(ObjectListProc.gMarioObject, o)
 }
 
 export const obj_handle_attacks = (hitbox, attackedMarioAction, attackHandlers) => {

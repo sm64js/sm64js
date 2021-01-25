@@ -45,6 +45,7 @@ export const bhvMario = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PLAYER } },
     { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.set_hitbox, args: { radius: 37, height: 160 } },
+    { command: BhvCmds.set_interact_type, args: { type: Interact.INTERACT_PLAYER } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: ObjectListProcessor.bhv_mario_update, funcClass: ObjectListProcessor } },
     { command: BhvCmds.end_loop },

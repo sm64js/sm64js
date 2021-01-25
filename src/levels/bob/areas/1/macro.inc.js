@@ -18,8 +18,8 @@ export const bob_seg7_macro_objs = [
     { preset: MACRO_BOBOMB, yaw: 0, pos: [-1750, 0, -2800], param: 0 },
     { preset: MACRO_BOBOMB, yaw: 0, pos: [-1400, 0, -950], param: 0 },
     { preset: MACRO_BOBOMB, yaw: 0, pos: [-2650, 0, 1750], param: 0 },
-    { preset: MACRO_BOBOMB, yaw: 0, pos: [-1900, 0, 3450], param: 0 },*/
+    { preset: MACRO_BOBOMB, yaw: 0, pos: [-1900, 0, 3450], param: 0 },
 
-    { preset: MACRO_CHAIN_CHOMP, yaw: 0, pos: [260, 735, 1920], param: 0 },
+    { preset: MACRO_CHAIN_CHOMP, yaw: 0, pos: [260, 735, 1920], param: 0 },*/
 
 ]

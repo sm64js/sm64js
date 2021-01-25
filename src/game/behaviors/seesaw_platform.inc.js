@@ -24,7 +24,7 @@ export const bhv_seesaw_platform_update = () => {
 
     /// TODO rocking sound
 
-    if (ObjectListProc.gMarioObject[0].platform == o) {  /// mario is on the platform
+    if (ObjectListProc.gMarioObject.platform == o) {  /// mario is on the platform
         let rotation = o.rawData[oDistanceToMario] * coss(o.rawData[oAngleToMario] - o.rawData[oMoveAngleYaw])
 
         // Deceleration is faster than acceleration

@@ -79,7 +79,7 @@ const bobomb_act_chase_mario = () => {
     //if (sp1a == 5 || sp1a == 16)
     //    cur_obj_play_sound_2(SOUND_OBJ_BOBOMB_WALK)
 
-    obj_turn_toward_object(o, ObjectListProc.gMarioObject[0], 16, 0x800)
+    obj_turn_toward_object(o, ObjectListProc.gMarioObject, 16, 0x800)
     obj_check_floor_death(collisionFlags, sObjFloor)
 }
 
@@ -113,7 +113,7 @@ const bobomb_check_interactions = () => {
 
     if ((o.rawData[oInteractStatus] & INT_STATUS_INTERACTED) != 0) {
         if ((o.rawData[oInteractStatus] & INT_STATUS_MARIO_UNK1) != 0) {
-            o.rawData[oMoveAngleYaw] = ObjectListProc.gMarioObject[0].header.gfx.angle[1]
+            o.rawData[oMoveAngleYaw] = ObjectListProc.gMarioObject.header.gfx.angle[1]
             o.rawData[oForwardVel] = 25.0
             o.rawData[oVelY] = 30
             o.rawData[oAction] = BOBOMB_ACT_LAUNCHED

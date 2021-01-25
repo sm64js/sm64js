@@ -92,6 +92,7 @@ class ObjectListProcessor {
 
         this.gEnvironmentLevels = new Array(20)
 
+        this.totalMarios = 0
         this.gObjectCounter = 0
         this.gCCMEnteredSlide = 0
         this.gCheckingSurfaceCollisionsForCamera = 0
@@ -203,11 +204,9 @@ class ObjectListProcessor {
 
     bhv_mario_update() {
 
-        const marioIndex = this.gCurrentObject.OG ? 0 : 1
-
-        const particleFlags = Mario.execute_mario_action(marioIndex)
+        const particleFlags = Mario.execute_mario_action()
         this.gCurrentObject.rawData[oMarioParticleFlags] = particleFlags
-        this.copy_mario_state_to_object(marioIndex)
+        this.copy_mario_state_to_object()
 
         if (this.sParticleTypes == undefined) this.sParticleTypes = this.sParticleTypesInit()
         this.sParticleTypes.forEach(particleType => {
@@ -218,11 +217,11 @@ class ObjectListProcessor {
         
     }
 
-    copy_mario_state_to_object(marioIndex) {
+    copy_mario_state_to_object() {
 
-        this.gCurrentObject.rawData[oPosX] = LevelUpdate.gMarioState[marioIndex].pos[0]
-        this.gCurrentObject.rawData[oPosY] = LevelUpdate.gMarioState[marioIndex].pos[1]
-        this.gCurrentObject.rawData[oPosZ] = LevelUpdate.gMarioState[marioIndex].pos[2]
+        this.gCurrentObject.rawData[oPosX] = LevelUpdate.gMarioState.pos[0]
+        this.gCurrentObject.rawData[oPosY] = LevelUpdate.gMarioState.pos[1]
+        this.gCurrentObject.rawData[oPosZ] = LevelUpdate.gMarioState.pos[2]
 
         this.gCurrentObject.rawData[oFaceAnglePitch] = this.gCurrentObject.header.gfx.angle[0]
         this.gCurrentObject.rawData[oFaceAngleYaw] = this.gCurrentObject.header.gfx.angle[1]
@@ -232,13 +231,13 @@ class ObjectListProcessor {
         this.gCurrentObject.rawData[oMoveAngleYaw] = this.gCurrentObject.header.gfx.angle[1]
         this.gCurrentObject.rawData[oMoveAngleRoll] = this.gCurrentObject.header.gfx.angle[2]
 
-        this.gCurrentObject.rawData[oVelX] = LevelUpdate.gMarioState[marioIndex].vel[0]
-        this.gCurrentObject.rawData[oVelY] = LevelUpdate.gMarioState[marioIndex].vel[1]
-        this.gCurrentObject.rawData[oVelZ] = LevelUpdate.gMarioState[marioIndex].vel[2]
+        this.gCurrentObject.rawData[oVelX] = LevelUpdate.gMarioState.vel[0]
+        this.gCurrentObject.rawData[oVelY] = LevelUpdate.gMarioState.vel[1]
+        this.gCurrentObject.rawData[oVelZ] = LevelUpdate.gMarioState.vel[2]
 
-        this.gCurrentObject.rawData[oAngleVelPitch] = LevelUpdate.gMarioState[marioIndex].angleVel[0]
-        this.gCurrentObject.rawData[oAngleVelYaw] = LevelUpdate.gMarioState[marioIndex].angleVel[1]
-        this.gCurrentObject.rawData[oAngleVelRoll] = LevelUpdate.gMarioState[marioIndex].angleVel[2]
+        this.gCurrentObject.rawData[oAngleVelPitch] = LevelUpdate.gMarioState.angleVel[0]
+        this.gCurrentObject.rawData[oAngleVelYaw] = LevelUpdate.gMarioState.angleVel[1]
+        this.gCurrentObject.rawData[oAngleVelRoll] = LevelUpdate.gMarioState.angleVel[2]
     }
 
     spawn_objects_from_info(spawnInfo) {
@@ -272,15 +271,10 @@ class ObjectListProcessor {
                 object.respawnInfo = spawnInfo.behaviorArg
 
                 if (spawnInfo.behaviorArg & 0x01) { // Is mario
-                    object.marioIndex = this.totalMarios++
-                    if (this.gMarioObject) { //2nd Mario
-                        object.OG = false
-                        this.gMarioObject.push(object)
-                    } else {  ///OG Mario
-                        object.OG = true
-                        this.gMarioObject = [object]
-                        GraphNode.geo_make_first_child(object.header.gfx.node)
-                    }
+                    if (this.totalMarios != 0) throw "ERROR, only 1 mario should be initialized here, and this is vanilla anyways"
+                    this.totalMarios++
+                    this.gMarioObject = object
+                    GraphNode.geo_make_first_child(object.header.gfx.node)
                 }
 
                 GraphNode.geo_obj_init_spawninfo(object.header.gfx, spawnInfo)

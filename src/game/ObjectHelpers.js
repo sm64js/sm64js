@@ -639,8 +639,8 @@ export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
 }
 
 export const cur_obj_is_mario_ground_pounding_platform = () => {
-    if (ObjectListProc.gMarioObject[0].platform == ObjectListProc.gCurrentObject) {
-        if (ObjectListProc.gMarioObject[0].marioState.action == ACT_GROUND_POUND_LAND) {
+    if (ObjectListProc.gMarioObject.platform == ObjectListProc.gCurrentObject) {
+        if (ObjectListProc.gMarioObject.marioState.action == ACT_GROUND_POUND_LAND) {
             return 1
         }
     }
@@ -687,7 +687,7 @@ export const obj_attack_collided_from_other_object = (obj) => {
     if (obj.numCollidedObjs != 0) {
         const other = obj.collidedObjs[0]
 
-        if (other != ObjectListProc.gMarioObject[0]) {
+        if (other != ObjectListProc.gMarioObject) {
             other.rawData[oInteractStatus] |= ATTACK_PUNCH | INT_STATUS_WAS_ATTACKED | INT_STATUS_INTERACTED | INT_STATUS_TOUCHED_BOB_OMB
             return 1
         }
@@ -915,13 +915,13 @@ export const cur_obj_move_using_fvel_and_gravity = () => {
 
 export const cur_obj_push_mario_away = (radius) => {
     const o = ObjectListProc.gCurrentObject
-    const marioRelX = ObjectListProc.gMarioObject[0].rawData[oPosX] - o.rawData[oPosX]
-    const marioRelZ = ObjectListProc.gMarioObject[0].rawData[oPosZ] - o.rawData[oPosZ]
+    const marioRelX = ObjectListProc.gMarioObject.rawData[oPosX] - o.rawData[oPosX]
+    const marioRelZ = ObjectListProc.gMarioObject.rawData[oPosZ] - o.rawData[oPosZ]
     const marioDist = Math.sqrt(Math.pow(marioRelX, 2) + Math.pow(marioRelZ, 2))
 
     if (marioDist < radius) {
-        LevelUpdate.gMarioState[0].pos[0] += (radius - marioDist) / radius * marioRelX
-        LevelUpdate.gMarioState[0].pos[2] += (radius - marioDist) / radius * marioRelZ
+        LevelUpdate.gMarioState.pos[0] += (radius - marioDist) / radius * marioRelX
+        LevelUpdate.gMarioState.pos[2] += (radius - marioDist) / radius * marioRelZ
     }
 }
 

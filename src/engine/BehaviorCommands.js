@@ -25,13 +25,13 @@ class BehaviorCommands {
 
         // Calculate the distance from the object to Mario.
         if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {
-            ObjListProc.gCurrentObject.rawData[oDistanceToMario] = dist_between_objects(ObjListProc.gCurrentObject, ObjListProc.gMarioObject[0])
+            ObjListProc.gCurrentObject.rawData[oDistanceToMario] = dist_between_objects(ObjListProc.gCurrentObject, ObjListProc.gMarioObject)
             distanceFromMario = ObjListProc.gCurrentObject.rawData[oDistanceToMario]
         }
 
         // Calculate the angle from the object to Mario.
         if (objFlags & OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO) {
-            ObjListProc.gCurrentObject.rawData[oAngleToMario] = obj_angle_to_object(ObjListProc.gCurrentObject, ObjListProc.gMarioObject[0])
+            ObjListProc.gCurrentObject.rawData[oAngleToMario] = obj_angle_to_object(ObjListProc.gCurrentObject, ObjListProc.gMarioObject)
         }
 
         // If the object's action has changed, reset the action timer.

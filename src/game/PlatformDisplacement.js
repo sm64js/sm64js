@@ -10,9 +10,9 @@ class PlatformDisplacement {
     }
 
     set_mario_pos(x, y, z) {
-        LevelUpdate.gMarioState[0].pos[0] = x
-        LevelUpdate.gMarioState[0].pos[1] = y
-        LevelUpdate.gMarioState[0].pos[2] = z
+        LevelUpdate.gMarioState.pos[0] = x
+        LevelUpdate.gMarioState.pos[1] = y
+        LevelUpdate.gMarioState.pos[2] = z
     }
 
     apply_platform_displacement(isMario, platform) {
@@ -26,9 +26,9 @@ class PlatformDisplacement {
         let x, y, z
 
         if (isMario) {
-            x = LevelUpdate.gMarioState[0].pos[0]
-            y = LevelUpdate.gMarioState[0].pos[1]
-            z = LevelUpdate.gMarioState[0].pos[2]
+            x = LevelUpdate.gMarioState.pos[0]
+            y = LevelUpdate.gMarioState.pos[1]
+            z = LevelUpdate.gMarioState.pos[2]
         } else {
             x = this.ObjectListProc.gCurrentObject.rawData[oPosX]
             y = this.ObjectListProc.gCurrentObject.rawData[oPosY]
@@ -40,7 +40,7 @@ class PlatformDisplacement {
 
         if (rotation[0] != 0 || rotation[1] != 0 || rotation[2] != 0) {
 
-            if (isMario) LevelUpdate.gMarioState[0].faceAngle[1] += rotation[1]
+            if (isMario) LevelUpdate.gMarioState.faceAngle[1] += rotation[1]
 
             const platformPosX = platform.rawData[oPosX]
             const platformPosY = platform.rawData[oPosY]
@@ -84,7 +84,7 @@ class PlatformDisplacement {
 
     apply_mario_platform_displacement() {
         if (!(this.ObjectListProc.gTimeStopState & this.ObjectListProc.TIME_STOP_ACTIVE) &&
-            this.ObjectListProc.gMarioObject[0] && this.gMarioPlatform) {
+            this.ObjectListProc.gMarioObject && this.gMarioPlatform) {
 
             this.apply_platform_displacement(1, this.gMarioPlatform)
         }
@@ -92,11 +92,11 @@ class PlatformDisplacement {
 
     update_mario_platform() {
 
-        if (this.ObjectListProc.gMarioObject[0] == undefined) return
+        if (this.ObjectListProc.gMarioObject == undefined) return
 
-        const marioX = this.ObjectListProc.gMarioObject[0].rawData[oPosX]
-        const marioY = this.ObjectListProc.gMarioObject[0].rawData[oPosY]
-        const marioZ = this.ObjectListProc.gMarioObject[0].rawData[oPosZ]
+        const marioX = this.ObjectListProc.gMarioObject.rawData[oPosX]
+        const marioY = this.ObjectListProc.gMarioObject.rawData[oPosY]
+        const marioZ = this.ObjectListProc.gMarioObject.rawData[oPosZ]
 
         const floorWrapper = {}
         const floorHeight = Spawn.SurfaceCollision.find_floor(marioX, marioY, marioZ, floorWrapper)
@@ -106,16 +106,16 @@ class PlatformDisplacement {
         switch (awayFromFloor) {
             case 1:
                 this.gMarioPlatform = null
-                this.ObjectListProc.gMarioObject[0].platform = null
+                this.ObjectListProc.gMarioObject.platform = null
                 break
 
             case 0:
                 if (floorWrapper.floor && floorWrapper.floor.object) {
                     this.gMarioPlatform = floorWrapper.floor.object
-                    this.ObjectListProc.gMarioObject[0].platform = floorWrapper.floor.object
+                    this.ObjectListProc.gMarioObject.platform = floorWrapper.floor.object
                 } else {
                     this.gMarioPlatform = null
-                    this.ObjectListProc.gMarioObject[0].platform = null
+                    this.ObjectListProc.gMarioObject.platform = null
                 }
                 break
         }

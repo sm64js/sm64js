@@ -19,7 +19,7 @@ export const bhv_punch_tiny_triangle_init = () => {
     const o = ObjectListProc.gCurrentObject
     for (let i = 0; i < 6; i++) {
         const particle = spawn_object(o, MODEL_DIRT_ANIMATION, bhvPunchTinyTriangle) 
-        particle.rawData[oMoveAngleYaw] = ObjectListProc.gMarioObject[0].rawData[oMoveAngleYaw] + D_8032F2E4[2 * i] + 0x8000
+        particle.rawData[oMoveAngleYaw] = ObjectListProc.gMarioObject.rawData[oMoveAngleYaw] + D_8032F2E4[2 * i] + 0x8000
         particle.rawData[oVelY] = sins(D_8032F2E4[2 * i + 1]) * 25.0
         particle.rawData[oForwardVel] = coss(D_8032F2E4[2 * i + 1]) * 25.0
     }
@@ -29,7 +29,7 @@ export const bhv_tiny_star_particles_init = () => {
     const o = ObjectListProc.gCurrentObject
     for (let i = 0; i < 7; i++) {
         const particle = spawn_object(o, MODEL_CARTOON_STAR, bhvWallTinyStarParticle)
-        particle.rawData[oMoveAngleYaw] = ObjectListProc.gMarioObject[0].rawData[oMoveAngleYaw] + D_8032F2E4[2 * i] + 0x8000
+        particle.rawData[oMoveAngleYaw] = ObjectListProc.gMarioObject.rawData[oMoveAngleYaw] + D_8032F2E4[2 * i] + 0x8000
         particle.rawData[oVelY] = sins(D_8032F2E4[2 * i + 1]) * 25.0
         particle.rawData[oForwardVel] = coss(D_8032F2E4[2 * i + 1]) * 25.0
     }
@@ -53,7 +53,7 @@ export const bhv_wall_tiny_star_particle_loop = () => {
     if (o.rawData[oTimer] == 0) {
         const sp1E = o.rawData[oMoveAngleYaw]
         o.rawData[oCollisionParticleUnkF4] = 0.28
-        cur_obj_set_pos_relative(ObjectListProc.gMarioObject[0], 0.0, 30.0, 110.0)
+        cur_obj_set_pos_relative(ObjectListProc.gMarioObject, 0.0, 30.0, 110.0)
         o.rawData[oMoveAngleYaw] = sp1E
 
     }
@@ -88,7 +88,7 @@ export const bhv_punch_tiny_triangle_loop = () => {
     if (o.rawData[oTimer] == 0) {
         const sp1E = o.rawData[oMoveAngleYaw]
         o.rawData[oCollisionParticleUnkF4] = 1.28
-        cur_obj_set_pos_relative(ObjectListProc.gMarioObject[0], 0.0, 60.0, 100.0)
+        cur_obj_set_pos_relative(ObjectListProc.gMarioObject, 0.0, 60.0, 100.0)
         o.rawData[oMoveAngleYaw] = sp1E
     }
     cur_obj_move_using_fvel_and_gravity()

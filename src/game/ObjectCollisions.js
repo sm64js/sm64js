@@ -54,7 +54,7 @@ const detect_object_hurtbox_overlap = (a, b) => {
     const collisionRadius = a.hurtboxRadius + b.hurtboxRadius
     const distance = Math.sqrt(dx * dx + dz * dz)
 
-    if (a == ObjectListProc.gMarioObject[0]) {
+    if (a == ObjectListProc.gMarioObject) {
         b.rawData[oInteractionSubtype] |= INT_SUBTYPE_DELAY_INVINCIBILITY
     }
 
@@ -65,7 +65,7 @@ const detect_object_hurtbox_overlap = (a, b) => {
         if (sp3C > sp1C) return 0
         if (sp20 < sp38) return 0
 
-        if (a == ObjectListProc.gMarioObject[0]) {
+        if (a == ObjectListProc.gMarioObject) {
             b.rawData[oInteractionSubtype] &= ~INT_SUBTYPE_DELAY_INVINCIBILITY
         }
 

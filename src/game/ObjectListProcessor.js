@@ -12,7 +12,7 @@ import { uint32, uint16 } from "../utils"
 import { MODEL_NONE } from "../include/model_ids"
 import * as MarioConstants from "../include/mario_constants"
 import { gLinker } from "./Linker"
-import { spawn_object_at_origin, obj_copy_pos_and_angle } from "./ObjectHelpers"
+import { spawn_object_at_origin, obj_copy_pos_and_angle, dist_between_objects } from "./ObjectHelpers"
 
 class ObjectListProcessor {
     constructor() {
@@ -243,7 +243,10 @@ class ObjectListProcessor {
         this.sParticleTypes.forEach(particleType => {
             if (particleFlags & particleType.particleFlag) {
                 //// TODO Check mario distance
-                this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
+                const distanceToLocalMario = dist_between_objects(this.gCurrentObject, this.gMarioObject)
+                if (distanceToLocalMario < 1000.0) {
+                    this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
+                }
             }
         })
 

@@ -295,3 +295,4 @@ export const bhvChainChompChainPart = [
 const bhvBowser = []
 
 gLinker.bhvBowser = bhvBowser
+gLinker.bhvMario = bhvMario

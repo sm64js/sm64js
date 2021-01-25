@@ -5,6 +5,7 @@ import { networkData, gameData } from "../socket"
 import { defaultSkinData } from "../cosmetics"
 import { INTERACT_PLAYER } from "./Interaction"
 import { levelIdToName } from "../utils"
+import { gLinker } from "./Linker"
 
 const rawDataMap = {
     0: RAW.oMarioPoleYawVel,
@@ -60,6 +61,7 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     m.parachuting = update.parachuting
 
     m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
+    m.marioObj.rawData[RAW.oRoom] = -1
 
     if (update.usedobjid >= 1000 && update.usedobjid <= 2000) {
         m.usedObj = gameData.spawnObjectsBySyncID[update.usedobjid - 1000]
@@ -157,7 +159,8 @@ const initNewRemoteMarioState = (marioProto) => {
             hitboxHeight: 160,
             hitboxRadius: 37,
             collidedObjs: [],
-            rawData: expandRawDataSubset(marioProto.getRawdataList())
+            rawData: expandRawDataSubset(marioProto.getRawdataList()),
+            bhvScript: { commands: gLinker.bhvMario, index: 0 }
         },
         faceAngle: marioProto.getFaceangleList(),
         angleVel: marioProto.getAnglevelList(),
@@ -168,6 +171,7 @@ const initNewRemoteMarioState = (marioProto) => {
     }
 
     newMarioState.marioObj.rawData[RAW.oInteractType] = INTERACT_PLAYER
+    newMarioState.marioObj.rawData[RAW.oRoom] = -1
 
     newMarioState.marioObj.marioState = newMarioState
     newMarioState.marioObj.header.wrapperObject = newMarioState.marioObj

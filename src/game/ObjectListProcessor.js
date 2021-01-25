@@ -4,14 +4,11 @@ import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import * as GraphNode from "../engine/graph_node"
 import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands"
 import * as Mario from "./Mario"
-import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { detect_object_collisions } from "./ObjectCollisions"
 import { networkData, gameData as socketGameData, updateNetworkBeforeRender } from "../socket"
 import { copyMarioUpdateToState } from "./MultiMarioManager"
 import { vec3f_dif, vec3f_length } from "../engine/math_util"
 import { uint32, uint16 } from "../utils"
-import { MODEL_NONE } from "../include/model_ids"
-import * as MarioConstants from "../include/mario_constants"
 
 const sParticleTypes = [
     //{ particleFlag: MarioConstants.PARTICLE_HORIZONTAL_STAR, activeParticleFlag: ACTIVE_PARTICLE_H_STAR, model: MODEL_NONE, behavior: bhvHorStarParticleSpawner }
@@ -91,6 +88,7 @@ class ObjectListProcessor {
     }
 
     update_objects() {
+
         Object.values(networkData.remotePlayers).forEach(remotePlayer => {
             if (remotePlayer.marioUpdate) {
                 if (remotePlayer.marioState.ignoreUpdates > 0) {
@@ -101,6 +99,7 @@ class ObjectListProcessor {
                 }
             }
         })
+
         this.gObjectCounter = 0  /// probaly not used and not needed
 
         Spawn.SurfaceLoad.clear_dynamic_surfaces()
@@ -118,6 +117,28 @@ class ObjectListProcessor {
         this.unload_deactivated_objects()
 
         PlatformDisplacement.update_mario_platform()
+    }
+
+    update_remote_marios() {
+
+        Object.values(networkData.remotePlayers).forEach(remotePlayer => {
+            this.gCurrentObject = remotePlayer.marioState.marioObj
+            this.gCurrentObject.header.gfx.node.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION
+
+            try { /// surpress bugs for now
+
+                Behavior.cur_obj_update()
+
+                remotePlayer.crashCount = 0
+
+            } catch (error) {
+                console.log("unknown error in 'execute_mario_action' - please report this issue to sm64js devs  -- playerName: " + this.gCurrentObject.marioState.playerName)
+                console.log(error)
+                remotePlayer.crashCount++
+            }
+
+            
+        })
     }
 
     update_terrain_objects() {
@@ -192,45 +213,21 @@ class ObjectListProcessor {
     }
 
     bhv_mario_update() {
-
+            
         const torsoDiff = [0, 0, 0]
-        vec3f_dif(torsoDiff, LevelUpdate.gMarioState.pos, LevelUpdate.gMarioState.marioBodyState.torsoPos)
+        vec3f_dif(torsoDiff, this.gCurrentObject.marioState.pos, this.gCurrentObject.marioState.marioBodyState.torsoPos)
         if (vec3f_length(torsoDiff) > 300)
-            LevelUpdate.gMarioState.marioBodyState.torsoPos = [ ...LevelUpdate.gMarioState.pos ]
+            this.gCurrentObject.marioState.marioBodyState.torsoPos = [...this.gCurrentObject.marioState.pos]
 
-        const particleFlags = Mario.execute_mario_action(LevelUpdate.gMarioState)
+        const particleFlags = Mario.execute_mario_action(this.gCurrentObject.marioState)
         this.gCurrentObject.rawData[oMarioParticleFlags] = particleFlags
-        this.copy_mario_state_to_object(LevelUpdate.gMarioState)
+        this.copy_mario_state_to_object(this.gCurrentObject.marioState)
 
         sParticleTypes.forEach(particleType => {
             if (particleFlags & particleType.particleFlag) {
             }
         })
 
-    }
-
-    update_remote_marios() {
-
-        //// Remote Mario behavior
-        Object.values(networkData.remotePlayers).forEach(remotePlayer => {
-            try { /// surpress bugs for now
-
-                const particleFlags = Mario.execute_mario_action(remotePlayer.marioState)
-                this.gCurrentObject.rawData[oMarioParticleFlags] = particleFlags
-                this.copy_mario_state_to_object(remotePlayer.marioState)
-
-                sParticleTypes.forEach(particleType => {
-                    if (particleFlags & particleType.particleFlag) {
-                    }
-                })
-
-                remotePlayer.crashCount = 0
-            } catch (error) {
-                console.log("unknown error in 'execute_mario_action' - please report this issue to sm64js devs  -- playerName: " + remotePlayer.marioState.playerName)
-                console.log(error)
-                remotePlayer.crashCount++
-            }
-        })
     }
 
     copy_mario_state_to_object(marioState) {

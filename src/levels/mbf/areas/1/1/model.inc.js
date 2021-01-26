@@ -25284,11 +25284,11 @@ const special_Lighting = Gbi.gdSPDefLights1(
 
 export const special_DL = [
 /// Disabling Fog for now, not sure what people like better
-/*	Gbi.gsDPSetCycleType(Gbi.G_CYC_2CYCLE),
+	Gbi.gsDPSetCycleType(Gbi.G_CYC_2CYCLE),
 	Gbi.gsDPSetRenderMode(Gbi.G_RM_FOG_SHADE_A_AA_ZB_OPA_SURF2),
 	Gbi.gsDPSetFogColor(160, 160, 160, 255),
 	Gbi.gsSPFogPosition(980 - 20, 1000 + 15),
-	Gbi.gsSPSetGeometryMode(Gbi.G_FOG),*/
+	Gbi.gsSPSetGeometryMode(Gbi.G_FOG),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGB),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD),
 	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),

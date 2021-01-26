@@ -40,7 +40,7 @@ if (process.env.NODE_ENV === 'production') { ///Tarnadas? Rust Server
     websocketServerPath = `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/`
 } else { /// Snuffy - sm64js.com
     if (url.protocol == "https:") { //production
-        websocketServerPath = gameID ? `wss://custom.sm64js.com/websocket/` : `wss://server.sm64js.com/websocket/`
+        websocketServerPath = `wss://${url.hostname}/websocket/`
     } else {  /// local testing
         websocketServerPath = `ws://${url.hostname}:3000`
     }

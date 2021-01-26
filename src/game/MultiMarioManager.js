@@ -7,6 +7,8 @@ import { INTERACT_PLAYER } from "./Interaction"
 import { levelIdToName } from "../utils"
 import { gLinker } from "./Linker"
 
+const url = new URL(window.location.href)
+
 const rawDataMap = {
     0: RAW.oMarioPoleYawVel,
     1: RAW.oMarioPolePos,
@@ -248,30 +250,43 @@ export const recvPlayerLists = (playerListsProto) => {
 
     const rooms = playerListsProto.getRoomList()
 
-    rooms.forEach(roomProto => {
-        const roomKey = roomProto.getRoomKey()
-        if (roomKey == window.selectedMap) {
-            const validplayers = roomProto.getValidplayersList()
-            networkData.numOnline = validplayers.length
+    if (window.playerNameAccepted) { // joined a game
 
-            Object.keys(networkData.remotePlayers).forEach(socket_id => {
-                if (!validplayers.includes(parseInt(socket_id))) {
-                    delete networkData.remotePlayers[socket_id]
-                }
-            })
+        if (rooms.length != 1) {
+            console.log("ignoring data ", rooms.length)
+            return
         }
 
-        const mapSelecter = document.getElementById("mapSelect")
+        const roomProto = rooms[0]
+        const level = roomProto.getLevelId() 
+        if (level != window.selectedMap) throw "error valid player list level does not match loaded level"
+        const validplayers = roomProto.getValidplayersList()
+        networkData.numOnline = validplayers.length
 
-        for (let i = 0; i < mapSelecter.length; i++) {
-            if (mapSelecter[i].value == roomKey) {
-                mapSelecter[i].innerHTML =
-                    `<p style="color:blue">${levelIdToName[roomKey]}</p> 
+        Object.keys(networkData.remotePlayers).forEach(socket_id => {
+            if (!validplayers.includes(parseInt(socket_id))) {
+                delete networkData.remotePlayers[socket_id]
+            }
+        })
+
+    } else { /// still in a lobby
+
+        rooms.forEach(roomProto => {
+            const roomKey = roomProto.getLevelId()
+
+            const mapSelecter = document.getElementById("mapSelect")
+
+            for (let i = 0; i < mapSelecter.length; i++) {
+                if (mapSelecter[i].value == roomKey) {
+                    mapSelecter[i].innerHTML =
+                        `<p style="color:blue">${levelIdToName[roomKey]}</p> 
                      <p style="color:blue"> - Online Players: ${roomProto.getValidplayersList().length}</p>`
 
+                }
             }
-        }
-    })
+        })
+
+    }
 
 }
 

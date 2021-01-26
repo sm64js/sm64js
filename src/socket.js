@@ -16,7 +16,6 @@ import * as Multi from "./game/MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
 import { updateFlagData, setInitFlagHeight } from "./game/behaviors/bhv_castle_flag_init.inc"
 import { recvChat, decrementChat } from "./chat"
-import { getSelectedLevel } from "./utils"
 
 Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
 
@@ -32,11 +31,20 @@ function myArrayBuffer() {
 
 const url = new URL(window.location.href)
 
-const websocketServerPath = process.env.NODE_ENV === 'production'
-    ? `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/`
-    : url.protocol == "https:"
-        ? `wss://server.sm64js.com/websocket/`
-        : `ws://${url.hostname}:3000`
+const gameID = url.searchParams.get("gameID")
+if (gameID) { document.getElementById("mapSelect").hidden = true }
+
+let websocketServerPath
+
+if (process.env.NODE_ENV === 'production') { ///Tarnadas? Rust Server
+    websocketServerPath = `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/`
+} else { /// Snuffy - sm64js.com
+    if (url.protocol == "https:") { //production
+        websocketServerPath = gameID ? `wss://custom.sm64js.com/websocket/` : `wss://server.sm64js.com/websocket/`
+    } else {  /// local testing
+        websocketServerPath = `ws://${url.hostname}:3000`
+    }
+}
 
 const socket = new WebSocket(websocketServerPath)
 
@@ -367,14 +375,15 @@ export const sendPlayerInteraction = (socket_id, interaction) => {
     //socket.emit('playerInteract', { socket_id, interaction }, { reliable: true })
 }
 
-
 export const submitPlayerName = () => {
-    const level = getSelectedLevel()
+    const level = gameID ? 0 : parseInt(document.getElementById("mapSelect").value)
+
     const name = document.getElementById("playerNameInput").value
     if (name.length >= 3) {
         const playerNameMsg = new PlayerNameMsg()
         playerNameMsg.setName(name)
         playerNameMsg.setLevel(level)
+        if (gameID) { playerNameMsg.setGameId(gameID) } 
         const sm64jsMsg = new Sm64JsMsg()
         sm64jsMsg.setPlayerNameMsg(playerNameMsg)
         const rootMsg = new RootMsg()

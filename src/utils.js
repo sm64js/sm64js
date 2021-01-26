@@ -37,7 +37,7 @@ export const lerp = (min,max,amt) => {
 }
 
 export const getSelectedLevel = () => {
-    return parseInt(document.getElementById("mapSelect").value)
+    return window.selectedMap
 }
 
 export const levelIdToName = {

@@ -1,7 +1,8 @@
 import * as Mario from "./Mario"
+import * as MarioConstants from "../include/mario_constants"
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
 import { atan2s } from "../engine/math_util"
-import { sins, coss } from "../utils"
+import { sins, coss, int16 } from "../utils"
 import { gLinker } from "./Linker"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 
@@ -157,6 +158,18 @@ const interact_damage = (m, o) => {
     return 0
 }
 
+const interact_mr_blizzard = (m, o) => {
+    if (take_damage_and_knock_back(m, o)) {
+        return 1
+    }
+
+    if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+        sDelayInvincTimer = 1
+    }
+
+    return 0
+}
+
 const interact_grabbable = (m, o) => {
 
     const script = o.behavior
@@ -174,7 +187,7 @@ const interact_grabbable = (m, o) => {
         throw "unimplemented object grabs mario - interact_grabbable"
     }
 
-    if (able_to_grab_object(m)) {
+    if (able_to_grab_object(m, o)) {
         if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_NOT_GRABBABLE)) {
             m.interactObj = o
             m.input |= Mario.INPUT_INTERACT_OBJ_GRABBABLE
@@ -182,7 +195,7 @@ const interact_grabbable = (m, o) => {
         }
     }
 
-    if (script != gLinker.bhvBowser) {
+    if (script != gLinker.behaviors.bhvBowser) {
         push_mario_out_of_object(m, o, -5.0)
     }
 
@@ -220,7 +233,7 @@ const interact_pole = (m, o) => {
     return 0
 }
 
-const able_to_grab_object = (m) => {
+const able_to_grab_object = (m, o) => {
     const action = m.action
 
     if (action == Mario.ACT_DIVE_SLIDE || action == Mario.ACT_DIVE) {
@@ -330,7 +343,7 @@ const bounce_back_from_attack = (m, interaction) => {
         }
 
         //set_camera_shake_from_hit(SHAKE_ATTACK) TODO
-        m.particleFlags |= Mario.PARTICLE_TRIANGLE
+        m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE
     }
 
     if (interaction & (INT_PUNCH | INT_KICK | INT_TRIP | INT_FAST_ATTACK_OR_SHELL)) {
@@ -419,9 +432,7 @@ const determine_knockback_action = (m) => {
 
     const angleToObject = mario_obj_angle_to_object(m, m.interactObj)
 
-    let facingDYaw = angleToObject - m.faceAngle[1]
-    facingDYaw = facingDYaw > 32767 ? facingDYaw - 65536 : facingDYaw
-    facingDYaw = facingDYaw < -32768 ? facingDYaw + 65536 : facingDYaw
+    let facingDYaw = int16( angleToObject - m.faceAngle[1] )
 
     const remainingHealth = m.health - 0x40 * m.hurtCounter
 
@@ -508,11 +519,11 @@ const check_kick_or_punch_wall = (m) => {
 
                 Mario.set_forward_vel(m, -48.0);
                 // play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
-                m.particleFlags |= Mario.PARTICLE_TRIANGLE;
+                m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             } else if (m.action & Mario.ACT_FLAG_AIR) {
                 Mario.set_forward_vel(m, -16.0);
                 // play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
-                m.particleFlags |= Mario.PARTICLE_TRIANGLE;
+                m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             }
         }
     }
@@ -537,7 +548,7 @@ const sInteractionHandlers = [
     { interactType: INTERACT_BULLY, handler: null },
     { interactType: INTERACT_SHOCK, handler: null },
     { interactType: INTERACT_BOUNCE_TOP2, handler: null },
-    { interactType: INTERACT_MR_BLIZZARD, handler: null },
+    { interactType: INTERACT_MR_BLIZZARD, handler: interact_mr_blizzard },
     { interactType: INTERACT_HIT_FROM_BELOW, handler: null },
     { interactType: INTERACT_BOUNCE_TOP, handler: interact_bounce_top },
     { interactType: INTERACT_DAMAGE, handler: interact_damage },
@@ -561,6 +572,9 @@ const mario_get_collided_object = (m, interactType) => {
 }
 
 export const mario_process_interactions = (m) => {
+
+    sDelayInvincTimer = 0
+    sInvulnerable = (m.action & Mario.ACT_FLAG_INVULNERABLE) || m.invincTimer != 0
 
 
     if (!(m.action & Mario.ACT_FLAG_INTANGIBLE) && m.collidedObjInteractTypes != 0) {

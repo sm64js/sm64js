@@ -1,7 +1,7 @@
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { AreaInstance as Area } from "./Area"
 import { geo_obj_init, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
-import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations, ACTIVE_FLAGS_DEACTIVATED, OBJ_MOVE_ABOVE_DEATH_BARRIER, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oFloorHeight, oFloor, oFloorType, oFloorRoom, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR, oWallHitboxRadius, oWallAngle, oMoveFlags, OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, oBounciness, oBuoyancy, oDragStrength, oAngleVelYaw, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND, OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER, OBJ_MOVE_ENTERED_WATER, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND, OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, oRoom, ACTIVE_FLAG_UNK10, OBJ_MOVE_13, OBJ_MOVE_LANDED, oInteractStatus } from "../include/object_constants"
+import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations, ACTIVE_FLAGS_DEACTIVATED, OBJ_MOVE_ABOVE_DEATH_BARRIER, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oFloorHeight, oFloor, oFloorType, oFloorRoom, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR, oWallHitboxRadius, oWallAngle, oMoveFlags, OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, oBounciness, oBuoyancy, oDragStrength, oAngleVelYaw, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND, OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER, OBJ_MOVE_ENTERED_WATER, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND, OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, oRoom, ACTIVE_FLAG_UNK10, OBJ_MOVE_13, OBJ_MOVE_LANDED, oInteractStatus, oHomeX, oHomeY, oHomeZ, oOpacity, ACTIVE_FLAG_UNK7 } from "../include/object_constants"
 
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
@@ -10,6 +10,33 @@ import { sins, coss, int16 } from "../utils"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { ATTACK_PUNCH, INT_STATUS_WAS_ATTACKED, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "./Interaction"
+import { ACT_GROUND_POUND_LAND } from "./Mario"
+import { gLinker } from "./Linker"
+import * as Gbi from "../include/gbi"
+
+export const cur_obj_set_pos_to_home = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.rawData[oPosX] = o.rawData[oHomeX]
+    o.rawData[oPosY] = o.rawData[oHomeY]
+    o.rawData[oPosZ] = o.rawData[oHomeZ]
+}
+
+export const cur_obj_set_pos_relative = (other, dleft, dy, dforward) => {
+    const o = ObjectListProc.gCurrentObject
+
+    const facingZ = coss(other.rawData[oMoveAngleYaw])
+    const facingX = sins(other.rawData[oMoveAngleYaw])
+
+    const dz = dforward * facingZ - dleft * facingX
+    const dx = dforward * facingX + dleft * facingZ
+
+    o.rawData[oMoveAngleYaw] = other.rawData[oMoveAngleYaw]
+
+    o.rawData[oPosX] = other.rawData[oPosX] + dx
+    o.rawData[oPosY] = other.rawData[oPosY] + dy
+    o.rawData[oPosZ] = other.rawData[oPosZ] + dz
+}
 
 export const cur_obj_extend_animation_if_at_end = () => {
     const o = ObjectListProc.gCurrentObject
@@ -41,7 +68,53 @@ export const geo_switch_anim_state = (run, node) => {
     }
 }
 
-const spawn_object_at_origin = (parent, model, behavior) => {
+export const geo_update_layer_transparency = (run, node) => {
+
+    let sp3C = []
+
+    if (run == 1) {
+        let sp34 = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
+        let sp30 = node
+        let sp2C = node
+
+        if (GeoRenderer.gCurGraphNodeHeldObject) {
+            sp34 = GeoRenderer.gCurGraphNodeHeldObject.objNode
+        }
+
+        const sp28 = sp34.rawData[oOpacity]
+
+        const sp38 = sp3C
+
+        if (sp28 == 0xFF) {
+            console.log(sp30)
+            throw "more implementation needed: geo_update_layer_transparency"
+            if (sp30.paremeter == 20) {
+
+            }
+        } else {
+            if (sp30.wrapper.param == 20) {
+                sp30.flags = 0x600 | (sp30.flags & 0xFF)
+            } else {
+                sp30.flags = 0x500 | (sp30.flags & 0xFF)
+            }
+
+            sp34.rawData[oAnimState] = 1
+
+            if (sp28 == 0 && gLinker.behaviors.bhvBowser == sp34.behavior) {
+                sp34.rawData[oAnimState] = 2
+            }
+
+        }
+
+        Gbi.gDPSetEnvColor(sp38, 255, 255, 255, sp28)
+        Gbi.gSPEndDisplayList(sp38)
+
+    }
+
+    return sp3C
+}
+
+export const spawn_object_at_origin = (parent, model, behavior) => {
 
     const obj = Spawn.create_object(behavior)
 
@@ -60,6 +133,27 @@ export const spawn_object_abs_with_rot = (parent, model, behavior, x, y, z, rx, 
     obj_set_pos(newObj, x, y, z)
     obj_set_angle(newObj, rx, ry, rz)
     return newObj
+}
+
+export const cur_obj_check_anim_frame = (frame) => {
+    const o = ObjectListProc.gCurrentObject
+
+    const animFrame = o.header.gfx.unk38.animFrame
+    if (animFrame == frame) return 1
+    else return 0
+}
+
+export const cur_obj_reverse_animation = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.header.gfx.unk38.animFrame >= 0) {
+        o.header.gfx.unk38.animFrame--
+    }
+}
+
+export const obj_translate_xz_random = (obj, rangeLength) => {
+    obj.rawData[oPosX] += Math.random() * rangeLength - rangeLength * 0.5
+    obj.rawData[oPosZ] += Math.random() * rangeLength - rangeLength * 0.5
 }
 
 export const obj_apply_scale_to_matrix = (obj, dst, src) => {
@@ -380,6 +474,15 @@ export const cur_obj_move_y_and_get_water_level = (gravity, buoyancy) => {
     return waterLevel
 }
 
+export const cur_obj_move_xz_using_fvel_and_yaw = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.rawData[oVelX] = o.rawData[oForwardVel] * sins(o.rawData[oMoveAngleYaw])
+    o.rawData[oVelZ] = o.rawData[oForwardVel] * coss(o.rawData[oMoveAngleYaw])
+
+    o.rawData[oPosX] += o.rawData[oVelX]
+    o.rawData[oPosZ] += o.rawData[oVelZ]
+}
 
 export const cur_obj_move_xz = (steepSlopeNormalY, careAboutEdgesAndSteepSlopes) => {
 
@@ -535,6 +638,16 @@ export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
 
 }
 
+export const cur_obj_is_mario_ground_pounding_platform = () => {
+    if (ObjectListProc.gMarioObject.platform == ObjectListProc.gCurrentObject) {
+        if (ObjectListProc.gMarioObject.marioState.action == ACT_GROUND_POUND_LAND) {
+            return 1
+        }
+    }
+
+    return 0
+}
+
 export const obj_turn_toward_object = (obj, target, angleIndex, turnAmount) => {
 
     const o = ObjectListProc.gCurrentObject
@@ -574,7 +687,7 @@ export const obj_attack_collided_from_other_object = (obj) => {
     if (obj.numCollidedObjs != 0) {
         const other = obj.collidedObjs[0]
 
-        if (other != ObjectListProc.gMarioObject[0]) {
+        if (other != ObjectListProc.gMarioObject) {
             other.rawData[oInteractStatus] |= ATTACK_PUNCH | INT_STATUS_WAS_ATTACKED | INT_STATUS_INTERACTED | INT_STATUS_TOUCHED_BOB_OMB
             return 1
         }
@@ -602,6 +715,42 @@ export const spawn_object = (parent, model, behavior) => {
     const obj = spawn_object_at_origin(parent, model, behavior)
     obj_copy_pos_and_angle(obj, parent)
     return obj
+}
+
+export const cur_obj_spawn_particles = (info) => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    let numParticles = info.count
+
+    // If there are a lot of objects already, limit the number of particles
+    if (ObjectListProc.gPrevFrameObjectCount > 150 && numParticles > 10) {
+        numParticles = 10
+    }
+
+    // We're close to running out of object slots, so don't spawn particles at all
+    if (ObjectListProc.gPrevFrameObjectCount > 210) {
+        numParticles = 0
+    }
+
+    for (let i = 0; i < numParticles; i++) {
+        const scale = Math.random() * (info.sizeRange * 0.1) + (info.sizeBase * 0.1)
+
+        const particle = spawn_object(o, info.model, gLinker.behaviors.bhvWhitePuffExplosion)
+
+        particle.rawData[oBehParams2ndByte] = info.behParam
+        particle.rawData[oMoveAngleYaw] = Math.floor(Math.random() * 65535)
+        particle.rawData[oGravity] = info.gravity
+        particle.rawData[oDragStrength] = info.dragStrength
+
+        particle.rawData[oPosY] += info.offsetY
+        particle.rawData[oForwardVel] = Math.random() * info.forwardVelRange + info.forwardVelBase
+        particle.rawData[oVelY] = Math.random() * info.velYRange + info.velYBase
+
+        obj_scale_xyz(particle, scale, scale, scale)
+
+    }
+
 }
 
 export const obj_copy_pos_and_angle = (dst, src) => {
@@ -674,11 +823,24 @@ export const cur_obj_become_intangible = () => {
 }
 
 export const cur_obj_hide = () => {
+    const o = ObjectListProc.gCurrentObject
     o.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
 }
 
+export const cur_obj_unhide = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+}
+
+
 export const obj_mark_for_deletion = (obj) => {
     obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED
+}
+
+export const obj_scale_xyz = (obj, xScale, yScale, zScale) => {
+    obj.header.gfx.scale[0] = xScale
+    obj.header.gfx.scale[1] = yScale
+    obj.header.gfx.scale[2] = zScale
 }
 
 export const cur_obj_scale = (scale) => {
@@ -753,13 +915,13 @@ export const cur_obj_move_using_fvel_and_gravity = () => {
 
 export const cur_obj_push_mario_away = (radius) => {
     const o = ObjectListProc.gCurrentObject
-    const marioRelX = ObjectListProc.gMarioObject[0].rawData[oPosX] - o.rawData[oPosX]
-    const marioRelZ = ObjectListProc.gMarioObject[0].rawData[oPosZ] - o.rawData[oPosZ]
+    const marioRelX = ObjectListProc.gMarioObject.rawData[oPosX] - o.rawData[oPosX]
+    const marioRelZ = ObjectListProc.gMarioObject.rawData[oPosZ] - o.rawData[oPosZ]
     const marioDist = Math.sqrt(Math.pow(marioRelX, 2) + Math.pow(marioRelZ, 2))
 
     if (marioDist < radius) {
-        LevelUpdate.gMarioState[0].pos[0] += (radius - marioDist) / radius * marioRelX
-        LevelUpdate.gMarioState[0].pos[2] += (radius - marioDist) / radius * marioRelZ
+        LevelUpdate.gMarioState.pos[0] += (radius - marioDist) / radius * marioRelX
+        LevelUpdate.gMarioState.pos[2] += (radius - marioDist) / radius * marioRelZ
     }
 }
 

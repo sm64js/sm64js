@@ -10,9 +10,9 @@ var snum = 1 // used as a counter variable (Keep 1!)
 var num = 32 // number of model.inc.js files there are
 var areaNum = 1 // target area number
 var mainDir = __dirname + '/converted/' + level + '/areas/' + areaNum + '/' // directory to put models in
-var inputBase = require('os').homedir() + '/Programming/sm64pc/actors/poundable_pole/geo.inc.c' // directory of each model file
+var inputBase = require('os').homedir() + '/Programming/sm64pc/actors/mist/geo.inc.c' // directory of each model file
 
-const mydir = require('os').homedir() + '/Programming/sm64pc/actors/poundable_pole/'
+const mydir = require('os').homedir() + '/Programming/sm64pc/actors/mist/'
 
 //Not sure whether we need to skip commands.
 const skipCommands = [
@@ -73,6 +73,8 @@ function CompileGeo(lines,AreaDir,isBase = false) {
 				outputStr += `\t{ command: Geo.open_node },\n`
 			} else if (lineParse.trim().slice(0, 14) == 'GEO_CLOSE_NODE') { //close node
 				outputStr += `\t{ command: Geo.close_node },\n`
+			} else if (lineParse.trim().slice(0, 14) == 'GEO_NODE_START') { //close node
+				outputStr += `\t{ command: Geo.node_start },\n`
 			} else if (lineParse.trim().slice(0, 13) == 'GEO_BILLBOARD') { //billboard
 				outputStr += `\t{ command: Geo.node_billboard },\n`
 			} else if (lineParse.trim().slice(0, 7) == 'GEO_END') { //end
@@ -102,7 +104,7 @@ function CompileGeo(lines,AreaDir,isBase = false) {
 				outputStr += `// TODO GEO_BACKGROUND_COLOR(${ortho}),\n`
 			} else if (lineParse.trim().slice(0, 20) == 'GEO_NODE_SCREEN_AREA') { //dl
 				const scrArea = lineParse.trim().slice(21, lineParse.trim().indexOf('),'))
-				var ScrAreaFIXED = `args: [${scrArea}],`
+				var ScrAreaFIXED = ` args: [${scrArea}]`
 				ScrAreaFIXED = ScrAreaFIXED.replace("SCREEN_WIDTH", "canvas.width") // Fix the screen area arguments. Cheap method.
 				ScrAreaFIXED = ScrAreaFIXED.replace("SCREEN_HEIGHT", "canvas.height") // Fix the screen area arguments. Cheap method.
 				outputStr += `\t{ `
@@ -122,33 +124,33 @@ function CompileGeo(lines,AreaDir,isBase = false) {
 				const args = lineParse.trim().slice(16, lineParse.trim().indexOf('),'))
 				outputStr += `\t{ `
 				outputStr += `command: Geo.node_switch_case,`
-				outputStr += `args: [${args}],`
+				outputStr += ` args: [${args}]`
 				outputStr += `},\n`
 			} else if (lineParse.trim().slice(0, 10) == 'GEO_CAMERA') { //dl
 				LoadCamera = true
 				const cCam = lineParse.trim().slice(11, lineParse.trim().indexOf('),'))
 				outputStr += `\t{ `
 				outputStr += `command: Geo.node_camera,`
-				outputStr += `args: [${cCam}],`
+				outputStr += ` args: [${cCam}]`
 				outputStr += `},\n`
 			} else if (lineParse.trim().slice(0, 9) == 'GEO_SCALE') {
 				const args = lineParse.trim().slice(10, lineParse.trim().indexOf('),'))
 				outputStr += `\t{ `
 				outputStr += `command: Geo.node_scale,`
-				outputStr += `args: [${args}],`
+				outputStr += ` args: [${args}]`
 				outputStr += `},\n`
 			} else if (lineParse.trim().slice(0, 17) == 'GEO_ANIMATED_PART') {
 				const args = lineParse.trim().slice(18, lineParse.trim().indexOf('),'))
 				AdditionalFiles += SearchAndApplyDLs(AreaDir, args.split(',')[4], snum)
 				outputStr += `\t{ `
 				outputStr += `command: Geo.node_animated_part,`
-				outputStr += `args: [Geo.${args}],`
+				outputStr += ` args: [Geo.${args}]`
 				outputStr += `},\n`
 			} else if (lineParse.trim().slice(0, 10) == 'GEO_SHADOW') {
 				const args = lineParse.trim().slice(11, lineParse.trim().indexOf('),'))
 				outputStr += `\t{ `
 				outputStr += `command: Geo.node_shadow,`
-				outputStr += `args: [${args}],`
+				outputStr += ` args: [${args}]`
 				outputStr += `},\n`
 			} else {
 				console.log("Could not parse: " + lineParse.trim())

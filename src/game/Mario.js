@@ -315,27 +315,6 @@ export const GROUND_STEP_HIT_WALL = 2
 export const GROUND_STEP_HIT_WALL_STOP_QSTEPS = 2
 export const GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS = 3
 
-export const PARTICLE_DUST                 /* 0x00000001 */ = (1 << 0)
-export const PARTICLE_VERTICAL_STAR        /* 0x00000002 */ = (1 << 1)
-export const PARTICLE_2                    /* 0x00000004 */ = (1 << 2)
-export const PARTICLE_SPARKLES             /* 0x00000008 */ = (1 << 3)
-export const PARTICLE_HORIZONTAL_STAR      /* 0x00000010 */ = (1 << 4)
-export const PARTICLE_BUBBLE               /* 0x00000020 */ = (1 << 5)
-export const PARTICLE_WATER_SPLASH         /* 0x00000040 */ = (1 << 6)
-export const PARTICLE_IDLE_WATER_WAVE      /* 0x00000080 */ = (1 << 7)
-export const PARTICLE_SHALLOW_WATER_WAVE   /* 0x00000100 */ = (1 << 8)
-export const PARTICLE_PLUNGE_BUBBLE        /* 0x00000200 */ = (1 << 9)
-export const PARTICLE_WAVE_TRAIL           /* 0x00000400 */ = (1 << 10)
-export const PARTICLE_FIRE                 /* 0x00000800 */ = (1 << 11)
-export const PARTICLE_SHALLOW_WATER_SPLASH /* 0x00001000 */ = (1 << 12)
-export const PARTICLE_LEAF                 /* 0x00002000 */ = (1 << 13)
-export const PARTICLE_SNOW                 /* 0x00004000 */ = (1 << 14)
-export const PARTICLE_DIRT                 /* 0x00008000 */ = (1 << 15)
-export const PARTICLE_MIST_CIRCLE          /* 0x00010000 */ = (1 << 16)
-export const PARTICLE_BREATH               /* 0x00020000 */ = (1 << 17)
-export const PARTICLE_TRIANGLE             /* 0x00040000 */ = (1 << 18)
-export const PARTICLE_19                   /* 0x00080000 */ = (1 << 19)
-
 export const sJumpLandAction = {
     numFrames: 4,
     unk02: 5,
@@ -418,56 +397,40 @@ export const sBackwardKnockbackActions = [
 
 export const init_marios = () => {
 
-    if (LevelUpdate.gMarioState.length != ObjectListProcessor.gMarioObject.length)
-        throw "Error incorrect number of Marios -- init marios"
-
-    LevelUpdate.gMarioState.forEach((marioState, index) => {
-        Object.assign(marioState, {
-            actionTimer: 0,
-            framesSinceA: 0xFF,
-            framesSinceB: 0xFF,
-            invincTimer: 0,
-            flags: MARIO_CAP_ON_HEAD | MARIO_NORMAL_CAP,
-            forwardVel: 0.0,
-            squishTimer: 0,
-            hurtCounter: 0,
-            healCounter: 0,
-            capTimer: 0,
-            quicksandDepth: 0.0,
-            area: Area.gCurrentArea,
-            marioObj: ObjectListProcessor.gMarioObject[index],
-            faceAngle: [...ObjectListProcessor.gMarioObject[index].header.gfx.angle], //[ ...Area.gMarioSpawnInfo.startAngle ],
-            angleVel: [0, 0, 0],
-            pos: [...ObjectListProcessor.gMarioObject[index].header.gfx.pos],///[ ...Area.gMarioSpawnInfo.startPos ],
-            vel: [0, 0, 0],
-            action: ACT_IDLE
-        })
-
-        const marioRawData = LevelUpdate.gMarioState[index].marioObj.rawData
-        marioRawData[oPosX] = LevelUpdate.gMarioState[index].pos[0]
-        marioRawData[oPosY] = LevelUpdate.gMarioState[index].pos[1]
-        marioRawData[oPosZ] = LevelUpdate.gMarioState[index].pos[2]
-        marioRawData[oMoveAnglePitch] = LevelUpdate.gMarioState[index].faceAngle[0]
-        marioRawData[oMoveAngleYaw] = LevelUpdate.gMarioState[index].faceAngle[1]
-        marioRawData[oMoveAngleRoll] = LevelUpdate.gMarioState[index].faceAngle[2]
+    Object.assign(LevelUpdate.gMarioState, {
+        actionTimer: 0,
+        framesSinceA: 0xFF,
+        framesSinceB: 0xFF,
+        invincTimer: 0,
+        flags: MARIO_CAP_ON_HEAD | MARIO_NORMAL_CAP,
+        forwardVel: 0.0,
+        squishTimer: 0,
+        hurtCounter: 0,
+        healCounter: 0,
+        capTimer: 0,
+        quicksandDepth: 0.0,
+        area: Area.gCurrentArea,
+        marioObj: ObjectListProcessor.gMarioObject,
+        faceAngle: [ ...Area.gMarioSpawnInfo.startAngle ],
+        angleVel: [0, 0, 0],
+        pos: [ ...Area.gMarioSpawnInfo.startPos ],
+        vel: [0, 0, 0],
+        action: ACT_IDLE
     })
 
-    LevelUpdate.gMarioState.forEach((marioState) => {
-        Object.assign(marioState.marioObj.header.gfx, {
-            //// Also Redundant
-            //pos: [ ...LevelUpdate.gMarioState.pos ],
-            //angle: [ 0, LevelUpdate.gMarioState.faceAngle[1], 0 ],
-            unk38: {
-                ...marioState.marioObj.header.gfx.unk38,
-                animID: -1,
-                animID: 0,
-                animFrame: 0,
-                animFrameAccelAssist: 0,
-                animAccel: 0x10000,
-                animTimer: 0
-            }
-        })
+    Object.assign(LevelUpdate.gMarioState.marioObj.header.gfx, {
+        unk38: {
+            ...LevelUpdate.gMarioState.marioObj.header.gfx.unk38,
+            animID: -1,
+            animID: 0,
+            animFrame: 0,
+            animFrameAccelAssist: 0,
+            animAccel: 0x10000,
+            animTimer: 0
+        }
     })
+
+    LevelUpdate.gMarioState.marioObj.marioState = LevelUpdate.gMarioState
 
 }
 
@@ -823,40 +786,42 @@ const mario_reset_bodystate = (m) => {
     m.flags &= ~MARIO_METAL_SHOCK
 }
 
-export const execute_mario_action = (marioIndex) => {
-    if (LevelUpdate.gMarioState[marioIndex].action) {
+export const execute_mario_action = () => {
+    if (LevelUpdate.gMarioState.action) {
 
-        LevelUpdate.gMarioState[marioIndex].marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
-        mario_reset_bodystate(LevelUpdate.gMarioState[marioIndex])
-        update_mario_inputs(LevelUpdate.gMarioState[marioIndex])
-        Interact.mario_process_interactions(LevelUpdate.gMarioState[marioIndex])
+        LevelUpdate.gMarioState.marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+        mario_reset_bodystate(LevelUpdate.gMarioState)
+        update_mario_inputs(LevelUpdate.gMarioState)
+        Interact.mario_process_interactions(LevelUpdate.gMarioState)
 
         let inLoop = 1
 
         while (inLoop) {
-            switch (LevelUpdate.gMarioState[marioIndex].action & ACT_GROUP_MASK) {
+            switch (LevelUpdate.gMarioState.action & ACT_GROUP_MASK) {
                 case ACT_GROUP_STATIONARY:
-                    inLoop = mario_execute_stationary_action(LevelUpdate.gMarioState[marioIndex]); break
+                    inLoop = mario_execute_stationary_action(LevelUpdate.gMarioState); break
 
                 case ACT_GROUP_MOVING:
-                    inLoop = mario_execute_moving_action(LevelUpdate.gMarioState[marioIndex]); break
+                    inLoop = mario_execute_moving_action(LevelUpdate.gMarioState); break
 
                 case ACT_GROUP_AIRBORNE:
-                    inLoop = mario_execute_airborne_action(LevelUpdate.gMarioState[marioIndex]); break
+                    inLoop = mario_execute_airborne_action(LevelUpdate.gMarioState); break
 
                 case ACT_GROUP_OBJECT:
-                    inLoop = mario_execute_object_action(LevelUpdate.gMarioState[marioIndex]); break
+                    inLoop = mario_execute_object_action(LevelUpdate.gMarioState); break
 
                 case ACT_GROUP_AUTOMATIC:
-                    inLoop = mario_execute_automatic_action(LevelUpdate.gMarioState[marioIndex]); break
+                    inLoop = mario_execute_automatic_action(LevelUpdate.gMarioState); break
 
                 default: throw "unkown action group"
             }
         }
 
-        update_mario_info_for_cam(LevelUpdate.gMarioState[marioIndex])
+        update_mario_info_for_cam(LevelUpdate.gMarioState)
 
-        LevelUpdate.gMarioState[marioIndex].marioObj.rawData[oInteractStatus] = 0
+        LevelUpdate.gMarioState.marioObj.rawData[oInteractStatus] = 0
+
+        return LevelUpdate.gMarioState.particleFlags
     }
 }
 
@@ -1170,12 +1135,8 @@ const update_mario_inputs = (m) => {
     m.collidedObjInteractTypes = m.marioObj.collidedObjInteractTypes
     m.flags &= 0xFFFFFF
 
-    if (m.marioObj.OG) {
-        update_mario_joystick_inputs(m, window.playerInput)
-        update_mario_button_inputs(m, window.playerInput)
-    }
-    else update_mario_joystick_inputs(m, window.playerInput2)
-
+    update_mario_joystick_inputs(m, window.playerInput)
+    update_mario_button_inputs(m, window.playerInput)
     update_mario_geometry_inputs(m)
 
     if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) {
@@ -1217,19 +1178,16 @@ const update_mario_info_for_cam = (m) => {
 
 export const init_mario_from_save_file = () => {
 
-    LevelUpdate.gMarioState.forEach(marioState => {
-        Object.assign(marioState, {
-            unk00: 0, flags: 0, action: 0,
-            spawnInfo: Area.gMarioSpawnInfo,
-            statusForCamera: Camera.gPlayerCameraState,
-            marioBodyState: MarioMisc.gBodyState,
-            controller: null,
-            animation: { animList: gMarioAnimData, targetAnim: null },
-            numCoins: 0, numStars: 0, numKeys: 0,
-            numLives: 4, health: 0x880,
-            unkB8: 0, unkB0: 0xBD
-        })
+    Object.assign(LevelUpdate.gMarioState, {
+        unk00: 0, flags: 0, action: 0,
+        spawnInfo: Area.gMarioSpawnInfo,
+        statusForCamera: Camera.gPlayerCameraState,
+        marioBodyState: MarioMisc.gBodyState,
+        controller: null,
+        animation: { animList: gMarioAnimData, targetAnim: null },
+        numCoins: 0, numStars: 0, numKeys: 0,
+        numLives: 4, health: 0x880,
+        unkB8: 0, unkB0: 0xBD
     })
-
 
 }

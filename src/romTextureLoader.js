@@ -228,11 +228,14 @@ import {
 
 import { poundable_pole_seg6_texture_06001050, poundable_pole_seg6_texture_06001850 } from "./actors/poundable_pole/model.inc"
 
+import { dirt_seg3_texture_0302BDF8 } from "./actors/dirt/model.inc"
+import { mist_seg3_texture_03000080 } from "./actors/mist/model.inc"
+
 
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 20
+const textureVersion = 22
 
 const loadDataIntoGame = (data) => {
 
@@ -462,6 +465,10 @@ const loadDataIntoGame = (data) => {
     poundable_pole_seg6_texture_06001050.push(...data["actors/poundable_pole/poundable_pole_top.rgba16.png"].data)
     poundable_pole_seg6_texture_06001850.push(...data["actors/poundable_pole/poundable_pole_side.rgba16.png"].data)
 
+    dirt_seg3_texture_0302BDF8.push(...data["actors/dirt/dirt_particle.rgba16.png"].data)
+
+    mist_seg3_texture_03000080.push(...data["actors/mist/mist.ia16.png"].data)
+
     SkyboxWater.water_skybox_texture_00000.push(...data["water_skybox_texture_00000"].data)
     SkyboxWater.water_skybox_texture_00001.push(...data["water_skybox_texture_00001"].data)
     SkyboxWater.water_skybox_texture_00002.push(...data["water_skybox_texture_00002"].data)
@@ -560,13 +567,9 @@ export const checkForRom = () => {   /// happens one time when the page is loade
     if (url.searchParams.get("romExternal") && !loadedGameAssets) {
         msgElement.innerHTML = "Transfering ROM Data..."
         msgElement.style = "color:yellow"
-        $.ajax({
-            url: '/romTransfer',
-            type: 'GET',
-            dataType: 'json',
-            data: { romExternal: url.searchParams.get("romExternal") },
-            success: (extractedData) => { processExtractedResults(extractedData) }
-        })
+        //TODO transfer ROM to client and extract
+        ///extractAssetsFromRom and url.searchParams.get("romExternal")
+        throw "temporarily unsupported"
     }
 
     return loadedGameAssets

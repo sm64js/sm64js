@@ -70,7 +70,7 @@ const convertRenderModeLine = (line) => {
 convert()
 
 function convert(MDTY) {
-	var input = require('os').homedir() + '/Programming/sm64pc/actors/explosion/model.inc.c' // directory of each model file
+	var input = require('os').homedir() + '/Programming/sm64pc/actors/chain_ball/model.inc.c' // directory of each model file
 	if (!fs.existsSync(input)) {return;}
 	let inputStr = fs.readFileSync(input, 'utf8')
 	inputStr = inputStr.replace(/\r/g, "")
@@ -130,6 +130,7 @@ function convert(MDTY) {
 				if (idx != -1) line = `${line.slice(0, idx - 2)}),`
 				if (line.slice(4, 12) == 'gsSP2Tri') line = `...${line}`
 				if (line.slice(4, 17) == 'gsDPSetRender') line = convertRenderModeLine(line)
+				if (line.slice(4, 19) == 'gsDPLoadTexture') line = `...${line}`
 
 				outputStr += `\t${line}\n`
 			})

@@ -622,7 +622,7 @@ class Camera {
             }
         }
 
-        const marioObj = LevelUpdate.gMarioState[0]
+        const marioObj = LevelUpdate.gMarioState
 
         if (this.gPlayerCameraState.action & ACT_FLAG_ON_POLE) {
             const pole = marioObj.usedObj
@@ -865,7 +865,7 @@ class Camera {
         if (avoidStatus == 3) { //TODO
             throw "implement this"
         } else {
-            if (LevelUpdate.gMarioState[0].forwardVel == 0) {
+            if (LevelUpdate.gMarioState.forwardVel == 0) {
                 yawVel = nextYawVel
             } else {
                 if (nextYawVel == 0x1000) {
@@ -976,7 +976,7 @@ class Camera {
         }
 
         if (this.gPlayerCameraState.action & ACT_FLAG_ON_POLE) {
-            camFloorHeight = LevelUpdate.gMarioState[0].usedObj.rawData[oPosY] + 125
+            camFloorHeight = LevelUpdate.gMarioState.usedObj.rawData[oPosY] + 125
             if (this.gPlayerCameraState.pos[1] - 100 > camFloorHeight) {
                 camFloorHeight = this.gPlayerCameraState.pos[1] - 100
             }
@@ -1155,10 +1155,10 @@ class Camera {
 
     update_graph_node_camera(graphNode) {
         // graphNode.myDemoAngle += 0.02
-/*        graphNode.pos[0] = (Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius) + LevelUpdate.gMarioState[0].pos[0]
-        graphNode.pos[2] = (Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius) + LevelUpdate.gMarioState[0].pos[2]
+/*        graphNode.pos[0] = (Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius) + LevelUpdate.gMarioState.pos[0]
+        graphNode.pos[2] = (Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius) + LevelUpdate.gMarioState.pos[2]
 
-        graphNode.focus = [ ...LevelUpdate.gMarioState[0].pos ]*/
+        graphNode.focus = [ ...LevelUpdate.gMarioState.pos ]*/
 
         graphNode.rollScreen = this.gLakituState.roll
         graphNode.pos = [...this.gLakituState.pos]
@@ -1180,7 +1180,7 @@ class Camera {
 
     geo_camera_fov(callContext, graphNode) {
 
-        const marioState = LevelUpdate.gMarioState[0]
+        const marioState = LevelUpdate.gMarioState
         const fovFunc = this.sFOVState.fovFunc
 
         if (callContext == GEO_CONTEXT_RENDER) {

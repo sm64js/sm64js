@@ -68,6 +68,30 @@ export const OBJ_FLAG_PERSISTENT_RESPAWN              =  (1 << 14) // 0x00004000
 export const OBJ_FLAG_8000                            =  (1 << 15) // 0x00008000
 export const OBJ_FLAG_30 = (1 << 30) // 0x40000000
 
+
+
+/* oActiveParticleFlags */
+export const ACTIVE_PARTICLE_DUST = (1 << 0) // 0x00000001
+export const ACTIVE_PARTICLE_UNUSED_1 = (1 << 1) // 0x00000002
+export const ACTIVE_PARTICLE_UNUSED_2 = (1 << 2) // 0x00000004
+export const ACTIVE_PARTICLE_SPARKLES = (1 << 3) // 0x00000008
+export const ACTIVE_PARTICLE_H_STAR = (1 << 4) // 0x00000010
+export const ACTIVE_PARTICLE_BUBBLE = (1 << 5) // 0x00000020
+export const ACTIVE_PARTICLE_WATER_SPLASH = (1 << 6) // 0x00000040
+export const ACTIVE_PARTICLE_IDLE_WATER_WAVE = (1 << 7) // 0x00000080
+export const ACTIVE_PARTICLE_SHALLOW_WATER_WAVE = (1 << 8) // 0x00000100
+export const ACTIVE_PARTICLE_PLUNGE_BUBBLE = (1 << 9) // 0x00000200
+export const ACTIVE_PARTICLE_WAVE_TRAIL = (1 << 10) // 0x00000400
+export const ACTIVE_PARTICLE_FIRE = (1 << 11) // 0x00000800
+export const ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH = (1 << 12) // 0x00001000
+export const ACTIVE_PARTICLE_LEAF = (1 << 13) // 0x00002000
+export const ACTIVE_PARTICLE_DIRT = (1 << 14) // 0x00004000
+export const ACTIVE_PARTICLE_MIST_CIRCLE = (1 << 15) // 0x00008000
+export const ACTIVE_PARTICLE_SNOW = (1 << 16) // 0x00010000
+export const ACTIVE_PARTICLE_BREATH = (1 << 17) // 0x00020000
+export const ACTIVE_PARTICLE_V_STAR = (1 << 18) // 0x00040000
+export const ACTIVE_PARTICLE_TRIANGLE = (1 << 19) // 0x00080000
+
 /* oHeldState */
 export const HELD_FREE = 0
 export const HELD_HELD = 1
@@ -155,7 +179,9 @@ export const oFloorRoom          = 0x4C
 export const oAngleToHome        = 0x4D
 export const oFloor = 0x4E
 
+
 export const oGraphYOffset = 0x15
+export const oActiveParticleFlags = 0x16
 
 export const oAction = 0x31
 export const oSubAction = 0x32
@@ -167,6 +193,9 @@ export const oCheckerBoardPlatformUnk1AC = 0x49
 
 /* Seesaw Platform */
 export const oSeesawPlatformPitchVel = 0x1B
+
+/* Collision Particle */
+export const oCollisionParticleUnkF4 = 0x1B
 
 /* Goomba */
 export const oGoombaSize                = 0x1B
@@ -181,6 +210,50 @@ export const oGoombaRelativeSpeed = 0x21
 export const oBobombBlinkTimer = 0x1B
 export const oBobombFuseLit = 0x1C
 export const oBobombFuseTimer = 0x1D
+
+/* Wooden Post */
+export const oWoodenPostTotalMarioAngle  = 0x1B
+export const oWoodenPostPrevAngleToMario = 0x1C
+export const oWoodenPostSpeedY           = 0x1D
+export const oWoodenPostMarioPounding    = 0x1E
+export const oWoodenPostOffsetY = 0x1F
+
+/* Chain Chomp */
+export const oChainChompSegments                     = 0x1B
+export const oChainChompMaxDistFromPivotPerChainPart = 0x1C
+export const oChainChompMaxDistBetweenChainParts     = 0x1D
+export const oChainChompDistToPivot                  = 0x1E
+export const oChainChompUnk104                       = 0x1F
+export const oChainChompRestrictedByChain            = 0x20
+export const oChainChompTargetPitch                  = 0x21
+export const oChainChompNumLunges                    = 0x22
+export const oChainChompReleaseStatus                = 0x49
+export const oChainChompHitGate = 0x4A
+
+/* oAction */
+export const CHAIN_CHOMP_ACT_UNINITIALIZED = 0
+export const CHAIN_CHOMP_ACT_MOVE = 1
+export const CHAIN_CHOMP_ACT_UNLOAD_CHAIN = 2
+
+/* oSubAction */
+export const CHAIN_CHOMP_SUB_ACT_TURN = 0
+export const CHAIN_CHOMP_SUB_ACT_LUNGE = 1
+
+/* oChainChompReleaseStatus */
+export const CHAIN_CHOMP_NOT_RELEASED = 0
+export const CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE = 1
+export const CHAIN_CHOMP_RELEASED_LUNGE_AROUND = 2
+export const CHAIN_CHOMP_RELEASED_BREAK_GATE = 3
+export const CHAIN_CHOMP_RELEASED_JUMP_AWAY = 4
+export const CHAIN_CHOMP_RELEASED_END_CUTSCENE = 5
+
+/* Chain chomp chain part */
+    /* oBehParams2ndByte */
+export const CHAIN_CHOMP_CHAIN_PART_BP_PIVOT = 0
+
+/* Wooden post */
+    /* oBehParams */
+export const WOODEN_POST_BP_NO_COINS_MASK = 0x0000FF00
 
 /* Goomba triplet spawner */
     /* oBehParams2ndByte */
@@ -220,3 +293,8 @@ export const oRespawnerMinSpawnDist      = 0x1C
 export const oRespawnerBehaviorToRespawn = 0x1D
 
 export const oSmokeTimer = 0x1B
+
+/* White Puff Explode */
+export const oWhitePuffUnkF4 = 0x1B
+export const oWhitePuffUnkF8 = 0x1C
+export const oWhitePuffUnkFC = 0x1D

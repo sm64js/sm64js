@@ -1,5 +1,5 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { is_point_within_radius_of_mario, object_step, obj_return_home_if_safe, obj_check_if_facing_toward_angle, obj_check_floor_death, sObjFloor } from "../ObjBehaviors"
+import { is_point_within_radius_of_mario, object_step, obj_return_home_if_safe, obj_check_if_facing_toward_angle, obj_check_floor_death, sObjFloor, OBJ_COL_FLAG_GROUNDED } from "../ObjBehaviors"
 import { oPosX, oPosY, oPosZ, oAnimState, oBobombBlinkTimer, oHeldState, HELD_FREE, oBehParams, oBehParams2ndByte, BOBOMB_BP_STYPE_GENERIC, oAction, BOBOMB_ACT_PATROL, BOBOMB_ACT_CHASE_MARIO, BOBOMB_ACT_EXPLODE, oBobombFuseTimer, oForwardVel, oGravity, oFriction, oBuoyancy, oInteractionSubtype, oHomeX, oHomeY, oHomeZ, oMoveAngleYaw, oAngleToMario, oBobombFuseLit, oSmokeTimer, oTimer, ACTIVE_FLAGS_DEACTIVATED, oInteractStatus, oVelY, BOBOMB_ACT_LAUNCHED, oGraphYOffset, oVelX, oVelZ } from "../../include/object_constants"
 import { INT_SUBTYPE_KICKABLE, INTERACT_GRABBABLE, INT_STATUS_INTERACTED, INT_STATUS_MARIO_UNK1, INT_STATUS_TOUCHED_BOB_OMB } from "../Interaction"
 import { obj_turn_toward_object, obj_attack_collided_from_other_object, cur_obj_scale, spawn_object, obj_mark_for_deletion } from "../ObjectHelpers"
@@ -79,7 +79,7 @@ const bobomb_act_chase_mario = () => {
     //if (sp1a == 5 || sp1a == 16)
     //    cur_obj_play_sound_2(SOUND_OBJ_BOBOMB_WALK)
 
-    obj_turn_toward_object(o, ObjectListProc.gMarioObject[0], 16, 0x800)
+    obj_turn_toward_object(o, ObjectListProc.gMarioObject, 16, 0x800)
     obj_check_floor_death(collisionFlags, sObjFloor)
 }
 
@@ -98,13 +98,22 @@ const bobomb_act_explode = () => {
 
 }
 
+const bobomb_act_launched = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    const collisionFlags = object_step()
+    if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) == OBJ_COL_FLAG_GROUNDED) {
+        o.rawData[oAction] = BOBOMB_ACT_EXPLODE
+    }
+}
+
 const bobomb_check_interactions = () => {
     const o = ObjectListProc.gCurrentObject
     obj_set_hitbox(o, sBobombHitbox)
 
     if ((o.rawData[oInteractStatus] & INT_STATUS_INTERACTED) != 0) {
         if ((o.rawData[oInteractStatus] & INT_STATUS_MARIO_UNK1) != 0) {
-            o.rawData[oMoveAngleYaw] = ObjectListProc.gMarioObject[0].header.gfx.angle[1]
+            o.rawData[oMoveAngleYaw] = ObjectListProc.gMarioObject.header.gfx.angle[1]
             o.rawData[oForwardVel] = 25.0
             o.rawData[oVelY] = 30
             o.rawData[oAction] = BOBOMB_ACT_LAUNCHED
@@ -132,6 +141,9 @@ const generic_bobomb_free_loop = () => {
             break
         case BOBOMB_ACT_CHASE_MARIO:
             bobomb_act_chase_mario()
+            break
+        case BOBOMB_ACT_LAUNCHED:
+            bobomb_act_launched()
             break
         case BOBOMB_ACT_EXPLODE:
             bobomb_act_explode()

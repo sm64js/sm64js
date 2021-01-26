@@ -369,7 +369,7 @@ class SurfaceLoad {
         // On an object's first frame, the distance is set to 19000.0f.
         // If the distance hasn't been updated, update it now.
         if (marioDist == 19000.0) {
-            marioDist = dist_between_objects(ObjectListProc.gCurrentObject, ObjectListProc.gMarioObject[0])
+            marioDist = dist_between_objects(ObjectListProc.gCurrentObject, ObjectListProc.gMarioObject)
         }
 
         // If the object collision is supposed to be loaded more than the

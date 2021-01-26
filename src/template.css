@@ -49,25 +49,6 @@ body {
     margin-bottom: 2rem;
 }
 
-/*.slider {
-    -webkit-appearance: none;
-    border-radius: 10px;
-    border-color: transparent;
-    height: 10px;
-    margin-top: 10px;
-    background-color: white;
-}
-
-
-.slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    border-radius: 60px;
-    width: 60px;*/ /* Set a specific slider handle width */
-    /*height: 60px;*/ /* Slider handle height */
-    /*background: #0094ff;*/ /* Green background */
-/*}*/
-
-
 .nav-masthead .nav-link {
     padding: .25rem 0;
     font-weight: 700;

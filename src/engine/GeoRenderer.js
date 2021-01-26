@@ -188,7 +188,6 @@ class GeoRenderer {
 
     geo_process_generated_list(node) {
         if (node.wrapper.fnNode.func) {
-            //console.log("processing function from generated_list")
 
             const fnNode = node.wrapper.fnNode
 
@@ -361,11 +360,12 @@ class GeoRenderer {
 
         if (object.header.gfx.unk18 == this.gCurGraphNodeRoot.wrapper.areaIndex) {
 
-            if (object.header.gfx.throwMatrix || object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_BILLBOARD) 
-                throw "more implementation needed in geo process object"
-
-            if (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_CYLBOARD) {
+            if (object.header.gfx.throwMatrix != null) {
+                MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], object.header.gfx.throwMatrix, this.gMatStack[this.gMatStackIndex])
+            } else if (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_CYLBOARD) {
                 MathUtil.mtxf_cylboard(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex], object.header.gfx.pos, this.gCurGraphNodeCamera.wrapper.roll)
+            } else if (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_BILLBOARD) {
+                MathUtil.mtxf_billboard(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex], object.header.gfx.pos, this.gCurGraphNodeCamera.wrapper.roll)
             } else {
                 MathUtil.mtxf_rotate_zxy_and_translate(mtxf, object.header.gfx.pos, object.header.gfx.angle)
                 MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
@@ -470,6 +470,29 @@ class GeoRenderer {
         }
     }
 
+    geo_process_billboard(node) {
+
+        this.gMatStackIndex++
+        const translation = [...node.wrapper.translation]
+        MathUtil.mtxf_billboard(this.gMatStack[this.gMatStackIndex], this.gMatStack[this.gMatStackIndex - 1], translation, this.gCurGraphNodeCamera.wrapper.roll)
+
+        if (this.gCurGraphNodeHeldObject) {
+            throw "billboard for held objects"
+        } else {
+            MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex], this.gMatStack[this.gMatStackIndex], this.gCurGraphNodeObject.scale)
+        }
+
+        if (node.wrapper.displayList) {
+            this.geo_append_display_list(node.wrapper.displayList, node.flags >> 8)
+        }
+
+        if (node.children[0]) {
+            this.geo_process_node_and_siblings(node.children)
+        }
+        this.gMatStackIndex--
+
+    }
+
     geo_process_shadow(node) {
 
         let shadowPos, shadowScale
@@ -524,13 +547,18 @@ class GeoRenderer {
 
     geo_process_switch_case(node) {
 
+        let selectedChild = node.children[0]
+
         const fnNode = node.wrapper.fnNode
 
         if (fnNode.func) {
            fnNode.func.call(fnNode.funcClass, GraphNode.GEO_CONTEXT_RENDER, node.wrapper, this.gMatStack[this.gMatStackIndex])
         }
 
-        this.geo_process_single_node(node.children[node.wrapper.selectedCase])
+        if (node.children[node.wrapper.selectedCase]) {
+            selectedChild = node.children[node.wrapper.selectedCase]
+            this.geo_process_single_node(selectedChild)
+        }
 
     }
 
@@ -582,6 +610,9 @@ class GeoRenderer {
 
             case GraphNode.GRAPH_NODE_TYPE_LEVEL_OF_DETAIL:
                 this.geo_process_level_of_detail(node); break
+
+            case GraphNode.GRAPH_NODE_TYPE_BILLBOARD:
+                this.geo_process_billboard(node); break
 
             default:
                 /// remove this check once all types have been added

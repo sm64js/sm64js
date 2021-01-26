@@ -1,3 +1,5 @@
+import { coss, sins } from "../utils"
+
 export const approach_number = (current, target, inc, dec) => {
     if (current < target) {
         current += inc
@@ -35,6 +37,22 @@ export const vec3f_add = (dest, a) => {
     dest[2] += a[2]
 }
 
+export const vec3f_normalize = (dest) => {
+    //! Possible division by zero
+    const invsqrt = 1.0 / Math.sqrt(dest[0] * dest[0] + dest[1] * dest[1] + dest[2] * dest[2])
+
+    dest[0] *= invsqrt
+    dest[1] *= invsqrt
+    dest[2] *= invsqrt
+    return dest
+}
+
+export const vec3f_cross = (dest, a, b) => {
+    dest[0] = a[1] * b[2] - b[1] * a[2]
+    dest[1] = a[2] * b[0] - b[2] * a[0]
+    dest[2] = a[0] * b[1] - b[0] * a[1]
+    return dest 
+}
 
 export const mtxf_identity = (mtx) => {
     for (let i = 0; i < mtx.length; i++) {
@@ -61,6 +79,31 @@ export const mtxf_to_mtx = (dest, src) => {
     }
 }
 
+export const mtxf_billboard = (dest, mtx, position, angle) => {
+    dest[0][0] = coss(angle)
+    dest[0][1] = sins(angle)
+    dest[0][2] = 0
+    dest[0][3] = 0
+
+    dest[1][0] = -dest[0][1]
+    dest[1][1] = dest[0][0]
+    dest[1][2] = 0
+    dest[1][3] = 0
+
+    dest[2][0] = 0
+    dest[2][1] = 0
+    dest[2][2] = 1
+    dest[2][3] = 0
+
+    dest[3][0] =
+        mtx[0][0] * position[0] + mtx[1][0] * position[1] + mtx[2][0] * position[2] + mtx[3][0]
+    dest[3][1] =
+        mtx[0][1] * position[0] + mtx[1][1] * position[1] + mtx[2][1] * position[2] + mtx[3][1]
+    dest[3][2] =
+        mtx[0][2] * position[0] + mtx[1][2] * position[1] + mtx[2][2] * position[2] + mtx[3][2]
+    dest[3][3] = 1
+}
+
 export const mtxf_cylboard = (dest, mtx, position, angle) => {
     dest[0][0] = Math.cos(angle / 0x8000 * Math.PI)
     dest[0][1] = Math.sin(angle / 0x8000 * Math.PI)
@@ -81,6 +124,40 @@ export const mtxf_cylboard = (dest, mtx, position, angle) => {
     dest[3][1] = mtx[0][1] * position[0] + mtx[1][1] * position[1] + mtx[2][1] * position[2] + mtx[3][1]
     dest[3][2] = mtx[0][2] * position[0] + mtx[1][2] * position[1] + mtx[2][2] * position[2] + mtx[3][2]
     dest[3][3] = 1
+}
+
+export const mtxf_align_terrain_normal = (dest, upDir, pos, yaw) => {
+    const leftDir = new Array(3)
+    const forwardDir = new Array(3)
+
+    const lateralDir = [sins(yaw), 0, coss(yaw)]
+    vec3f_normalize(upDir)
+
+    vec3f_cross(leftDir, upDir, lateralDir)
+    vec3f_normalize(leftDir)
+
+    vec3f_cross(forwardDir, leftDir, upDir)
+    vec3f_normalize(forwardDir)
+
+    dest[0][0] = leftDir[0]
+    dest[0][1] = leftDir[1]
+    dest[0][2] = leftDir[2]
+    dest[3][0] = pos[0]
+
+    dest[1][0] = upDir[0]
+    dest[1][1] = upDir[1]
+    dest[1][2] = upDir[2]
+    dest[3][1] = pos[1]
+
+    dest[2][0] = forwardDir[0]
+    dest[2][1] = forwardDir[1]
+    dest[2][2] = forwardDir[2]
+    dest[3][2] = pos[2]
+
+    dest[0][3] = 0.0
+    dest[1][3] = 0.0
+    dest[2][3] = 0.0
+    dest[3][3] = 1.0
 }
 
 export const mtxf_rotate_xyz_and_translate = (dest, b, c) => {
@@ -375,42 +452,4 @@ export const atan2s = (y, x) => {
 
     return parseInt(Math.atan2(x, y) * 10430.5)
 
-/*    let ret
-
-    if (x >= 0) {
-        if (y >= 0) {
-            if (y >= x) {
-                ret = Math.atan(x / y)
-            } else {
-                ret = 0x4000 - Math.atan(y / x)
-            }
-        } else {
-            y = -y
-            if (y < x) {
-                ret = 0x4000 + Math.atan(y / x)
-            } else {
-                ret = 0x8000 - Math.atan(x / y)
-            }
-        }
-    } else {
-        x = -x
-        if (y < 0) {
-            y = -y
-            if (y >= x) {
-                ret = 0x8000 + Math.atan(x / y)
-            } else {
-                ret = 0xC000 - Math.atan(y / x)
-            }
-        } else {
-            if (y < x) {
-                ret = 0xC000 + Math.atan(y / x)
-            } else {
-                ret = -Math.atan(x / y)
-            }
-        }
-    }
-
-    if (isNaN(ret)) return 0
-
-    return ret > 32767 ? ret - 65536 : ret*/
 }

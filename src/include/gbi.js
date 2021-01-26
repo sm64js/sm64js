@@ -337,8 +337,24 @@ export const G_MTX_LOAD          = 2
 export const G_MTX_NOPUSH        = 0	/* push or not */
 export const G_MTX_PUSH = 4
 
+export const G_CC_PRIMITIVE = {
+    alpha: [7, 7, 7, 3],
+    rgb: [15, 15, 31, 3]
+}
+
 export const G_CC_MODULATERGB = {
     alpha: [7, 7, 7, 4],
+    rgb: [1, 15, 4, 7]
+}
+
+export const G_CC_MODULATEI = {
+    alpha: [7, 7, 7, 4],
+    rgb: [1, 15, 4, 7]
+}
+
+
+export const G_CC_MODULATERGBFADE = { 
+    alpha: [7, 7, 7, 5],
     rgb: [1, 15, 4, 7]
 }
 
@@ -349,6 +365,11 @@ export const G_CC_MODULATERGBA = {
 
 export const G_CC_MODULATEIA = {
     alpha: [1, 7, 4, 7],
+    rgb: [1, 15, 4, 7]
+}
+
+export const G_CC_MODULATEIFADEA = {
+    alpha: [1, 7, 5, 7],
     rgb: [1, 15, 4, 7]
 }
 
@@ -379,6 +400,11 @@ export const G_CC_BLENDRGBFADEA = {
 
 export const G_CC_DECALFADE = {
     alpha: [7, 7, 7, 5],
+    rgb: [15, 15, 31, 1]
+}
+
+export const G_CC_DECALFADEA = {
+    alpha: [1, 7, 5, 7],
     rgb: [15, 15, 31, 1]
 }
 
@@ -738,6 +764,15 @@ export const gsSPLight = (lightData, index) => {
             w0: G_MOVEMEM,
             w1: { type: G_MV_L, data: lightData, index: index - 1 }
             // the `index - 1` I don't like and isn't needed, but it makes matching with decomp code easier
+        }
+    }
+}
+
+export const gsSPNumLights = (num) => {
+    return {
+        words: {
+            w0: G_MOVEWORD,
+            w1: { type: G_MW_NUMLIGHT, data: num + 1 } //includes 1 ambient light
         }
     }
 }

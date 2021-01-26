@@ -25,7 +25,7 @@ export const pss_seg7_dl_0700E3A0 = [
 
 export const pss_seg7_dl_0700E3E8 = [
 	Gbi.gsDPSetCycleType(Gbi.G_CYC_2CYCLE),
-	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_DECAL_DECAL2),//	Gbi.gsDPSetRenderMode(Gbi.G_RM_FOG_SHADE_A, Gbi.G_RM_AA_ZB_OPA_DECAL2),
+	Gbi.gsDPSetRenderMode(Gbi.G_RM_FOG_SHADE_A_AA_ZB_OPA_DECAL2), 
 	Gbi.gsDPSetFogColor(0, 0, 0, 255),
 	Gbi.gsSPFogPosition(980, 1000),
 	Gbi.gsSPSetGeometryMode(Gbi.G_FOG),
@@ -37,7 +37,7 @@ export const pss_seg7_dl_0700E3E8 = [
 	Gbi.gsSPDisplayList(pss_seg7_dl_0700E3A0),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
 	Gbi.gsDPSetCycleType(Gbi.G_CYC_1CYCLE),
-	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF_SURF2),//	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_DECAL, Gbi.G_RM_NOOP2),
+	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_DECAL_DECAL2),
 	Gbi.gsSPClearGeometryMode(Gbi.G_FOG),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
 	Gbi.gsSPEndDisplayList(),

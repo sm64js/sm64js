@@ -1,7 +1,10 @@
 import * as Mario from "./Mario"
+import * as MarioConstants from "../include/mario_constants"
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
 import { atan2s } from "../engine/math_util"
-import { sins, coss } from "../utils"
+import { sins, coss, int16 } from "../utils"
+import { gLinker } from "./Linker"
+import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
 export const INTERACT_GRABBABLE      /* 0x00000002 */ = (1 << 1)
@@ -76,6 +79,10 @@ export const INT_FAST_ATTACK_OR_SHELL  = (1 << 5) // 0x20
 export const INT_HIT_FROM_ABOVE  = (1 << 6) // 0x40
 export const INT_HIT_FROM_BELOW = (1 << 7) // 0x80
 
+export const INT_ATTACK_NOT_FROM_BELOW = (INT_GROUND_POUND_OR_TWIRL | INT_PUNCH | INT_KICK | INT_TRIP | INT_SLIDE_KICK | INT_FAST_ATTACK_OR_SHELL | INT_HIT_FROM_ABOVE)
+
+export const INT_STATUS_ATTACK_MASK = 0x000000FF
+
 export const INT_STATUS_HOOT_GRABBED_BY_MARIO = (1 << 0) /* 0x00000001 */
 export const INT_STATUS_MARIO_UNK1 = (1 << 1) /* 0x00000002 */
 export const INT_STATUS_MARIO_UNK2 = (1 << 2) /* 0x00000004 */
@@ -93,12 +100,106 @@ export const INT_STATUS_HIT_MINE = (1 << 21) /* 0x00200000 */
 export const INT_STATUS_STOP_RIDING = (1 << 22) /* 0x00400000 */
 export const INT_STATUS_TOUCHED_BOB_OMB = (1 << 23) /* 0x00800000 */
 
+export const ATTACK_PUNCH                 = 1
+export const ATTACK_KICK_OR_TRIP          = 2
+export const ATTACK_FROM_ABOVE            = 3
+export const ATTACK_GROUND_POUND_OR_TWIRL = 4
+export const ATTACK_FAST_ATTACK           = 5
+export const ATTACK_FROM_BELOW            = 6
 
 let sDelayInvincTimer = false
 let sInvulnerable = false
 
 const reset_mario_pitch = (m) => {
     /// TODO: WATER JUMP || SHOT FROM CANNON || ACT_FLYING
+}
+
+const interact_bounce_top = (m, o) => {
+    let interaction 
+
+    if (m.flags & Mario.MARIO_METAL_CAP) {
+        interaction = INT_FAST_ATTACK_OR_SHELL
+    } else {
+        interaction = determine_interaction(m, o)
+    }
+
+    if (interaction & INT_ATTACK_NOT_FROM_BELOW) {
+        attack_object(o, interaction)
+        bounce_back_from_attack(m, interaction)
+
+        if (interaction & INT_HIT_FROM_ABOVE) {
+
+            if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_TWIRL_BOUNCE) {
+                throw "need to implement twirl bounce"
+            } else {
+                bounce_off_object(m, o, 30.0)
+            }
+
+        }
+
+    } else if (take_damage_and_knock_back(m, o)) {
+        return 1
+    }
+
+    if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+        sDelayInvincTimer = 1
+    }
+    return 0
+
+}
+
+const interact_damage = (m, o) => {
+    if (take_damage_and_knock_back(m, o)) return 1
+
+    if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+        sDelayInvincTimer = 1
+    }
+
+    return 0
+}
+
+const interact_mr_blizzard = (m, o) => {
+    if (take_damage_and_knock_back(m, o)) {
+        return 1
+    }
+
+    if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+        sDelayInvincTimer = 1
+    }
+
+    return 0
+}
+
+const interact_grabbable = (m, o) => {
+
+    const script = o.behavior
+
+    if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_KICKABLE) {
+        const interaction = determine_interaction(m, o)
+        if (interaction & (INT_KICK | INT_TRIP)) {
+            attack_object(o, interaction)
+            bounce_back_from_attack(m, interaction)
+            return 0
+        }
+    }
+
+    if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_GRABS_MARIO) {
+        throw "unimplemented object grabs mario - interact_grabbable"
+    }
+
+    if (able_to_grab_object(m, o)) {
+        if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_NOT_GRABBABLE)) {
+            m.interactObj = o
+            m.input |= Mario.INPUT_INTERACT_OBJ_GRABBABLE
+            return 1
+        }
+    }
+
+    if (script != gLinker.behaviors.bhvBowser) {
+        push_mario_out_of_object(m, o, -5.0)
+    }
+
+    return 0
 }
 
 const interact_pole = (m, o) => {
@@ -132,6 +233,22 @@ const interact_pole = (m, o) => {
     return 0
 }
 
+const able_to_grab_object = (m, o) => {
+    const action = m.action
+
+    if (action == Mario.ACT_DIVE_SLIDE || action == Mario.ACT_DIVE) {
+        if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_GRABS_MARIO)) {
+            return 1
+        }
+    } else if (action == Mario.ACT_PUNCHING || action == Mario.ACT_MOVE_PUNCHING) {
+        if (m.actionArg < 2) {
+            return 1
+        }
+    }
+
+    return 0
+}
+
 const mario_obj_angle_to_object = (m, o) => {
     const dx = o.rawData[oPosX] - m.pos[0]
     const dz = o.rawData[oPosZ] - m.pos[2]
@@ -139,13 +256,183 @@ const mario_obj_angle_to_object = (m, o) => {
     return atan2s(dz, dx)
 }
 
+const push_mario_out_of_object = (m, o, padding) => {
+    const minDistance = o.hitboxRadius + m.marioObj.hitboxRadius + padding
+
+    const offsetX = m.pos[0] - o.rawData[oPosX]
+    const offsetZ = m.pos[2] - o.rawData[oPosZ]
+    const distance = Math.sqrt(offsetX * offsetX + offsetZ * offsetZ)
+
+    if (distance < minDistance) {
+        let pushAngle
+
+        if (distance == 0.0) {
+            pushAngle = m.faceAngle[1]
+        } else {
+            pushAngle = atan2s(offsetZ, offsetX)
+        }
+
+        const newMarioX = { value: o.rawData[oPosX] + minDistance * sins(pushAngle) }
+        const newMarioZ = { value: o.rawData[oPosZ] + minDistance * coss(pushAngle) }
+        const newMarioY = { value: m.pos[1] }
+
+        Spawn.SurfaceCollision.find_wall_collision(newMarioX, newMarioY, newMarioZ, 60.0, 50.0)
+        m.pos[1] = newMarioY.value
+
+        const floorWrapper = {}
+        Spawn.SurfaceCollision.find_floor(newMarioX.value, m.pos[1], newMarioZ.value, floorWrapper)
+        if (floorWrapper.floor != null) {
+            //! Doesn't update mario's referenced floor (allows oob death when
+            // an object pushes you into a steep slope while in a ground action)
+            m.pos[0] = newMarioX.value
+            m.pos[2] = newMarioZ.value
+        }
+    }
+}
+
+const attack_object = (o, interaction) => {
+    let attackType = 0
+
+    switch (interaction) {
+        case INT_GROUND_POUND_OR_TWIRL:
+            attackType = ATTACK_GROUND_POUND_OR_TWIRL
+            break
+        case INT_PUNCH:
+            attackType = ATTACK_PUNCH
+            break
+        case INT_KICK:
+        case INT_TRIP:
+            attackType = ATTACK_KICK_OR_TRIP
+            break
+        case INT_SLIDE_KICK:
+        case INT_FAST_ATTACK_OR_SHELL:
+            attackType = ATTACK_FAST_ATTACK
+            break
+        case INT_HIT_FROM_ABOVE:
+            attackType = ATTACK_FROM_ABOVE
+            break
+        case INT_HIT_FROM_BELOW:
+            attackType = ATTACK_FROM_BELOW
+            break
+    }
+
+    o.rawData[oInteractStatus] = attackType + (INT_STATUS_INTERACTED | INT_STATUS_WAS_ATTACKED)
+    return attackType
+}
+
+const bounce_off_object = (m, o, velY) => {
+    m.pos[1] = o.rawData[oPosY] + o.hitboxHeight
+    m.vel[1] = velY
+
+    m.flags &= ~Mario.MARIO_UNKNOWN_08
+
+    //play_sound(SOUND_ACTION_BOUNCE_OFF_OBJECT, m -> marioObj -> header.gfx.cameraToObject)
+}
+
+const bounce_back_from_attack = (m, interaction) => {
+
+    if (interaction & (INT_PUNCH | INT_KICK | INT_TRIP)) {
+        if (m.action == Mario.ACT_PUNCHING) {
+            m.action = Mario.ACT_MOVE_PUNCHING
+        }
+
+        if (m.action & Mario.ACT_FLAG_AIR) {
+            Mario.set_forward_vel(m, -16.0)
+        } else {
+            Mario.set_forward_vel(m, -48.0)
+        }
+
+        //set_camera_shake_from_hit(SHAKE_ATTACK) TODO
+        m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE
+    }
+
+    if (interaction & (INT_PUNCH | INT_KICK | INT_TRIP | INT_FAST_ATTACK_OR_SHELL)) {
+        //play_sound(SOUND_ACTION_HIT_2, m -> marioObj -> header.gfx.cameraToObject)
+    }
+}
+
+const determine_interaction = (m, o) => {
+    let interaction = 0
+    const action = m.action
+
+    let dYawToObject = mario_obj_angle_to_object(m, o) - m.faceAngle[1]
+    dYawToObject = dYawToObject > 32767 ? dYawToObject - 65536 : dYawToObject
+    dYawToObject = dYawToObject < -32768 ? dYawToObject + 65536 : dYawToObject
+
+    // hack: make water punch actually do something
+    if (m.action == Mario.ACT_WATER_PUNCH && o.rawData[oInteractType] & INTERACT_PLAYER) {
+        if (-0x2AAA <= dYawToObject && dYawToObject <= 0x2AAA) {
+            return INT_PUNCH
+        }
+    }
+
+    if (action & Mario.ACT_FLAG_ATTACKING) {
+        if (action == Mario.ACT_PUNCHING || action == Mario.ACT_MOVE_PUNCHING || action == Mario.ACT_JUMP_KICK) {
+
+            if (m.flags & Mario.MARIO_PUNCHING) {
+                // 120 degrees total, or 60 each way
+                if (-0x2AAA <= dYawToObject && dYawToObject <= 0x2AAA) {
+                    interaction = INT_PUNCH
+                }
+            }
+            if (m.flags & Mario.MARIO_KICKING) {
+                // 120 degrees total, or 60 each way
+                if (-0x2AAA <= dYawToObject && dYawToObject <= 0x2AAA) {
+                    interaction = INT_KICK
+                }
+            }
+            if (m.flags & Mario.MARIO_TRIPPING) {
+                // 180 degrees total, or 90 each way
+                if (true) {
+                    interaction = INT_TRIP
+                }
+            }
+        } else if (action == Mario.ACT_GROUND_POUND || action == Mario.ACT_TWIRLING) {
+            if (m.vel[1] < 0.0) {
+                interaction = INT_GROUND_POUND_OR_TWIRL
+            }
+        } else if (action == Mario.ACT_GROUND_POUND_LAND || action == Mario.ACT_TWIRL_LAND) {
+            // Neither ground pounding nor twirling change Mario's vertical speed on landing.,
+            // so the speed check is nearly always true (perhaps not if you land while going upwards?)
+            // Additionally, actionState it set on each first thing in their action, so this is
+            // only true prior to the very first frame (i.e. active 1 frame prior to it run).
+            if (m.vel[1] < 0.0 && m.actionState == 0) {
+                interaction = INT_GROUND_POUND_OR_TWIRL
+            }
+        } else if (action == Mario.ACT_SLIDE_KICK || action == Mario.ACT_SLIDE_KICK_SLIDE) {
+            interaction = INT_SLIDE_KICK
+        } else if (action & Mario.ACT_FLAG_RIDING_SHELL) {
+            interaction = INT_FAST_ATTACK_OR_SHELL
+        } else if (m.forwardVel <= -26.0 || 26.0 <= m.forwardVel) {
+            interaction = INT_FAST_ATTACK_OR_SHELL
+        }
+
+    }
+
+    // Prior to this, the interaction type could be overwritten. This requires, however,
+    // that the interaction not be set prior. This specifically overrides turning a ground
+    // pound into just a bounce.
+
+    if (interaction == 0 && (action & Mario.ACT_FLAG_AIR)) {
+        if (m.vel[1] < 0.0) {
+            if (m.pos[1] > o.rawData[oPosY]) {
+                interaction = INT_HIT_FROM_ABOVE
+            }
+        } else {
+            if (m.pos[1] < o.rawData[oPosY]) {
+                interaction = INT_HIT_FROM_BELOW
+            }
+        }
+    }
+
+    return interaction
+}
+
 const determine_knockback_action = (m) => {
 
     const angleToObject = mario_obj_angle_to_object(m, m.interactObj)
 
-    let facingDYaw = angleToObject - m.faceAngle[1]
-    facingDYaw = facingDYaw > 32767 ? facingDYaw - 65536 : facingDYaw
-    facingDYaw = facingDYaw < -32768 ? facingDYaw + 65536 : facingDYaw
+    let facingDYaw = int16( angleToObject - m.faceAngle[1] )
 
     const remainingHealth = m.health - 0x40 * m.hurtCounter
 
@@ -209,7 +496,7 @@ export const take_damage_and_knock_back = (m, o) => {
         if (o.rawData[oDamageOrCoinValue] > 0); //play sound
 
         //update mario sound and camera
-        return Mario.drop_and_set_mario_action(m, determins(m, o.rawData[oDamageOrCoinValue]), damage)
+        return Mario.drop_and_set_mario_action(m, determine_knockback_action(m, o.rawData[oDamageOrCoinValue]), damage)
 
     }
 
@@ -232,11 +519,11 @@ const check_kick_or_punch_wall = (m) => {
 
                 Mario.set_forward_vel(m, -48.0);
                 // play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
-                m.particleFlags |= Mario.PARTICLE_TRIANGLE;
+                m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             } else if (m.action & Mario.ACT_FLAG_AIR) {
                 Mario.set_forward_vel(m, -16.0);
                 // play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
-                m.particleFlags |= Mario.PARTICLE_TRIANGLE;
+                m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             }
         }
     }
@@ -261,10 +548,10 @@ const sInteractionHandlers = [
     { interactType: INTERACT_BULLY, handler: null },
     { interactType: INTERACT_SHOCK, handler: null },
     { interactType: INTERACT_BOUNCE_TOP2, handler: null },
-    { interactType: INTERACT_MR_BLIZZARD, handler: null },
+    { interactType: INTERACT_MR_BLIZZARD, handler: interact_mr_blizzard },
     { interactType: INTERACT_HIT_FROM_BELOW, handler: null },
-    { interactType: INTERACT_BOUNCE_TOP, handler: null },
-    { interactType: INTERACT_DAMAGE, handler: null },
+    { interactType: INTERACT_BOUNCE_TOP, handler: interact_bounce_top },
+    { interactType: INTERACT_DAMAGE, handler: interact_damage },
     { interactType: INTERACT_POLE, handler: interact_pole },
     { interactType: INTERACT_HOOT, handler: null },
     { interactType: INTERACT_BREAKABLE, handler: null },
@@ -272,7 +559,7 @@ const sInteractionHandlers = [
     { interactType: INTERACT_KOOPA_SHELL, handler: null },
     { interactType: INTERACT_UNKNOWN_08, handler: null },
     { interactType: INTERACT_CAP, handler: null },
-    { interactType: INTERACT_GRABBABLE, handler: null },
+    { interactType: INTERACT_GRABBABLE, handler: interact_grabbable },
     { interactType: INTERACT_TEXT, handler: null },
 ]
 
@@ -286,13 +573,16 @@ const mario_get_collided_object = (m, interactType) => {
 
 export const mario_process_interactions = (m) => {
 
+    sDelayInvincTimer = 0
+    sInvulnerable = (m.action & Mario.ACT_FLAG_INVULNERABLE) || m.invincTimer != 0
+
 
     if (!(m.action & Mario.ACT_FLAG_INTANGIBLE) && m.collidedObjInteractTypes != 0) {
 
         for (let i = 0; i < 31; i++) {
             const { interactType, handler } = sInteractionHandlers[i]
             if (m.collidedObjInteractTypes & interactType) {
-                if (!handler) throw "need to implement interact handler for type: " + interactType
+                if (!handler) throw "need to implement interact handler for type: " + interactType + " all types: " + m.collidedObjInteractTypes
 
                 const object = mario_get_collided_object(m, interactType)
 

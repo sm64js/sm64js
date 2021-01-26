@@ -1,6 +1,5 @@
 import { GeoLayoutInstance as GeoLayout } from "../../../../engine/GeoLayout"
 import { CameraInstance as Camera } from "../../../../game/Camera"
-import { geo_skybox_main } from "../../../../game/LevelGeo"
 import { pss_seg7_dl_0700A7C0 } from "./1/model.inc"
 import { pss_seg7_dl_0700AFA8 } from "./2/model.inc"
 import { pss_seg7_dl_0700B3F0 } from "./3/model.inc"

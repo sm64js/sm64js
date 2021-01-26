@@ -220,7 +220,7 @@ class LevelCommands {
         }
         this.sCurrentScript.index++
     }
-
+	//  { command: LevelCommands.place_object, args: [ACT, MODEL, X,Y,Z, P,Y,R, BHARG, BHSCRIPT] },
     place_object(args) {
 
         const val7 = 1 << (Area.gCurrActNum - 1)
@@ -240,6 +240,16 @@ class LevelCommands {
 
             Area.gAreas[this.sCurrAreaIndex].objectSpawnInfos = spawnInfo
 
+        }
+
+        this.sCurrentScript.index++
+    }
+
+    macro_objects(args) {
+        if (this.sCurrAreaIndex != -1) {
+            const data = args[0]
+
+            Area.gAreas[this.sCurrAreaIndex].macroObjects = data
         }
 
         this.sCurrentScript.index++

@@ -122,6 +122,19 @@ export const geo_obj_init_animation = (graphNode, anim) => {
 
 }
 
+export const geo_obj_init_animation_accel = (graphNode, anim, animAccel) => {
+
+    if (graphNode.unk38.curAnim != anim) {
+        graphNode.unk38.curAnim = anim
+        graphNode.unk38.animFrameAccelAssist = (anim.unk04 << 16) + ((anim.flags & Mario.ANIM_FLAG_FORWARD) ? animAccel : -animAccel)
+        graphNode.unk38.animFrame = graphNode.unk38.animFrameAccelAssist >> 16
+        graphNode.unk38.animYTrans = 0
+    }
+
+    graphNode.unk38.animAccel = animAccel
+
+}
+
 export const geo_reset_object_node = (graphNode) =>  {
     const zeroVec = [0, 0, 0]
     const oneVec = [1, 1, 1]
@@ -184,6 +197,19 @@ export const geo_add_child = (parent, childNode) => {
 
     return childNode
 
+}
+
+export const geo_remove_child = (graphNode) => {
+    const parent = graphNode.parent
+    let firstChild = parent.children[0]
+
+    // Remove link with siblings
+    graphNode.prev.next = graphNode.next
+    graphNode.next.prev = graphNode.prev
+
+    parent.children = parent.children.filter(child => child != graphNode)
+
+    return parent
 }
 
 const getTopBits = (number) => {
@@ -387,6 +413,19 @@ export const init_graph_node_animated_part = (drawingLayer, displayList, transla
 
     return graphNode
 
+}
+
+export const init_graph_node_billboard = (drawingLayer, displayList, translation) => {
+    const graphNode = {
+        node: {},
+        translation: [...translation],
+        displayList
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_BILLBOARD)
+    graphNode.node.flags = (drawingLayer << 8) | (graphNode.node.flags & 0xFF)
+
+    return graphNode
 }
 
 export const init_graph_node_camera = (pool, graphNode, pos, focus, func, mode) => {

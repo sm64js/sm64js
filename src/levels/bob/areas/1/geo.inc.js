@@ -29,7 +29,7 @@ export const bob_geo_000488 = [
             { command: GeoLayout.open_node },
                 {
                     command: GeoLayout.node_camera,
-                    args: [1, 0, 2000, 6000, 0, 2000, 0, Camera.geo_camera_main]
+                    args: [1, 0, 2000, 6000, 3072, 0, -4608, Camera.geo_camera_main]
                 },
                 { command: GeoLayout.open_node },
                     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, bob_seg7_dl_07004390] },

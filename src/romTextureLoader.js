@@ -1,18 +1,23 @@
-﻿import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_texture_0700B4A0, intro_seg7_texture_0700C4A0 } from "./levels/intro/leveldata"
+﻿import * as SkyboxWater from "./textures/skyboxes/water_skybox"
+import { assets } from "./assets"
+
+
+import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_texture_0700B4A0, intro_seg7_texture_0700C4A0 } from "./levels/intro/leveldata"
 import { castle_grounds_seg7_texture_07000000, castle_grounds_seg7_texture_07001000, castle_grounds_seg7_texture_07002000 } from "./levels/castle_grounds/texture.inc.js"
-import { ttm_seg7_texture_07000000 } from "./levels/ttm/textures.inc.js"
-import { ttm_seg7_texture_07000800 } from "./levels/ttm/textures.inc.js"
-import { ttm_seg7_texture_07001000 } from "./levels/ttm/textures.inc.js"
-import { ttm_seg7_texture_07001800 } from "./levels/ttm/textures.inc.js"
-import { ttm_seg7_texture_07002000 } from "./levels/ttm/textures.inc.js"
-import { ttm_seg7_texture_07002800 } from "./levels/ttm/textures.inc.js"
-import { ttm_seg7_texture_07003000 } from "./levels/ttm/textures.inc.js"
-import { ttm_seg7_texture_07004000 } from "./levels/ttm/textures.inc.js"
 import { title_texture_0A0001C0, title_texture_0A000E40, title_texture_0A001AC0, title_texture_0A002740 } from "./levels/intro/title_screen_bg"
 import { tree_seg3_texture_0302DE28, tree_seg3_texture_0302EE28, tree_seg3_texture_0302FF60, tree_seg3_texture_03031048, tree_seg3_texture_03032218 } from "./actors/tree/model.inc"
 import { texture_shadow_quarter_circle, texture_waterbox_water, texture_waterbox_lava, texture_transition_star_half } from "./common_gfx/segment2"
-import * as SkyboxWater from "./textures/skyboxes/water_skybox"
-import { assets } from "./assets"
+
+import {
+    ttm_seg7_texture_07000000,
+    ttm_seg7_texture_07000800,
+    ttm_seg7_texture_07001000,
+    ttm_seg7_texture_07001800,
+    ttm_seg7_texture_07002000,
+    ttm_seg7_texture_07002800,
+    ttm_seg7_texture_07003000,
+    ttm_seg7_texture_07004000,
+} from "./levels/ttm/textures.inc.js"
 
 import {
     gd_texture_mario_face_shine,
@@ -69,6 +74,41 @@ import {
     mario_texture_eyes_closed
 } from "./actors/mario/model.inc"
 
+import { yellow_sphere_seg5_texture_05000040 } from "./actors/yellow_sphere_small/model.inc"
+
+import { checkerboard_platform_seg8_texture_0800C840, checkerboard_platform_seg8_texture_0800CC40 } from "./actors/checkerboard_platform/model.inc"
+
+import { goomba_seg8_texture_08019530, goomba_seg8_texture_08019D30, goomba_seg8_texture_0801A530 } from "./actors/goomba/model.inc"
+
+import {
+    bobomb_seg8_texture_0801DA60,
+    bobomb_seg8_texture_0801EA60,
+    bobomb_seg8_texture_0801FA60,
+    bobomb_seg8_texture_08020A60,
+    bobomb_seg8_texture_08021A60,
+    bobomb_seg8_texture_08022260
+} from "./actors/bobomb/model.inc"
+
+import {
+    explosion_seg3_texture_03000A08,
+    explosion_seg3_texture_03001208,
+    explosion_seg3_texture_03001A08,
+    explosion_seg3_texture_03002208,
+    explosion_seg3_texture_03002A08,
+    explosion_seg3_texture_03003208,
+    explosion_seg3_texture_03003A08
+} from "./actors/explosion/model.inc"
+
+import {
+    smoke_seg4_texture_0401DEA0,
+    smoke_seg4_texture_0401E6A0,
+    smoke_seg4_texture_0401EEA0,
+    smoke_seg4_texture_0401F6A0,
+    smoke_seg4_texture_0401FEA0,
+    smoke_seg4_texture_040206A0,
+    smoke_seg4_texture_04020EA0
+} from "./actors/walk_smoke/model.inc"
+
 import {
     generic_09005800,
     generic_09006000,
@@ -84,23 +124,7 @@ import {
     generic_09008800,
     generic_0900B000
 } from "./textures/generic"
-import {
-    water_09000000,
-    water_09000800,
-    water_09001800,
-    water_09002800,
-    water_09003800,
-    water_09004800,
-    water_09005800,
-    water_09006000,
-    water_09006800,
-    water_09007800,
-    water_09008800,
-    water_09009000,
-    water_0900A000,
-    water_0900A800,
-    water_0900B800
-} from "./textures/water"
+
 import {
     bob_seg7_texture_07000000,
     bob_seg7_texture_07000800,
@@ -108,21 +132,28 @@ import {
     bob_seg7_texture_07001800,
     bob_seg7_texture_07002000
 } from "./levels/bob/textures.inc"
+
+import { pss_seg7_texture_07000000, pss_seg7_texture_07000800, pss_seg7_texture_07001000 } from "./levels/pss/textures.inc"
+
 import {
-    ddd_seg7_texture_07000000,
-    ddd_seg7_texture_07001000,
-    ddd_seg7_texture_07001800,
-    ddd_seg7_texture_07002000,
-    ddd_seg7_texture_07003000
-} from "./levels/ddd/textures.inc"
-/*import {
     wf_seg7_texture_07000000,
     wf_seg7_texture_07000800,
     wf_seg7_texture_07001000,
     wf_seg7_texture_07001800,
     wf_seg7_texture_07002000,
     wf_seg7_texture_07002800
-} from "./levels/wf/textures.inc"*/
+} from "./levels/wf/textures.inc"
+
+import {
+    hmc_seg7_texture_07000000,
+    hmc_seg7_texture_07001000,
+    hmc_seg7_texture_07002000,
+    hmc_seg7_texture_07003000,
+    hmc_seg7_texture_07003800,
+    hmc_seg7_texture_07004000,
+    hmc_seg7_texture_07004800
+} from "./levels/hmc/texture.inc"
+
 import {
     mountain_09000000,
     mountain_09000800,
@@ -146,6 +177,7 @@ import {
     mountain_0900B800,
     mountain_0900C000,
 } from "./textures/mountain.js"
+
 import {
     snow_09000000,
     snow_09000800,
@@ -168,13 +200,10 @@ import {
 } from "./textures/snow"
 
 import {
-    thi_seg7_texture_07000000,
-    thi_seg7_texture_07000800
-} from "./levels/thi_3/texture.inc"
-import {
     grass_09000000,
     grass_09000800,
     grass_09001000,
+    grass_09001800,
     grass_09002000,
     grass_09002800,
     grass_09003000,
@@ -186,6 +215,7 @@ import {
     grass_09006000,
     grass_09006800,
     grass_09007000,
+    grass_09007800,
     grass_09008000,
     grass_09008800,
     grass_09009000,
@@ -195,54 +225,47 @@ import {
     grass_0900B000,
     grass_0900B800
 } from "./textures/grass"
+
 import {
-    inside_09000000,
-    inside_09001000,
-    inside_09002000,
-    inside_09003000,
-    inside_09003800,
-    inside_09004000,
-    inside_09004800,
-    inside_09005000,
-    inside_09005800,
-    inside_09006000,
-    inside_09007000,
-    inside_09008000,
-    inside_09008800,
-    inside_09009000,
-    inside_0900A000,
-    inside_0900B000,
-    inside_0900B800
-} from "./textures/inside"
+    cave_09000000,
+    cave_09001000,
+    cave_09001800,
+    cave_09002800,
+    cave_09003000,
+    cave_09003800,
+    cave_09004800,
+    cave_09005800,
+    cave_09006800,
+    cave_09007000,
+    cave_09007800,
+    cave_09008800,
+    cave_09009800,
+    cave_0900A000,
+    cave_0900A800,
+    cave_0900B800,
+    cave_0900C000
+} from "./textures/cave"
+
+import { chain_ball_seg6_texture_06020AE8 } from "./actors/chain_ball/model.inc"
+
 import {
-    texture_castle_light,
-    inside_castle_seg7_texture_07000800,
-    inside_castle_seg7_texture_07001000,
-    inside_castle_seg7_texture_07002000,
-    inside_castle_seg7_texture_07003000,
-    inside_castle_seg7_texture_07003800,
-    inside_castle_seg7_texture_07004800,
-    inside_castle_seg7_texture_07005800,
-    inside_castle_seg7_texture_07006000,
-    inside_castle_seg7_texture_07006800,
-    inside_castle_seg7_texture_07007000,
-    inside_castle_seg7_texture_07007800,
-    inside_castle_seg7_texture_07008000,
-    inside_castle_seg7_texture_07008800,
-    inside_castle_seg7_texture_07009000,
-    inside_castle_seg7_texture_07009800,
-    inside_castle_seg7_texture_0700A000,
-    inside_castle_seg7_texture_0700A800,
-    inside_castle_seg7_texture_0700B800,
-    inside_castle_seg7_texture_0700C800,
-    inside_castle_seg7_texture_0700D800,
-    inside_castle_seg7_texture_0700E800,
-    inside_castle_seg7_texture_0700F800
-} from "./levels/castle_inside/textures.inc"
+    chain_chomp_seg6_texture_060213D0,
+    chain_chomp_seg6_texture_06021BD0,
+    chain_chomp_seg6_texture_060223D0,
+    chain_chomp_seg6_texture_06022BD0,
+    chain_chomp_seg6_texture_060233D0
+} from "./actors/chain_chomp/model.inc"
+
+import { poundable_pole_seg6_texture_06001050, poundable_pole_seg6_texture_06001850 } from "./actors/poundable_pole/model.inc"
+
+import { dirt_seg3_texture_0302BDF8 } from "./actors/dirt/model.inc"
+import { mist_seg3_texture_03000080 } from "./actors/mist/model.inc"
+
+
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 14
+const textureVersion = 22
 
 const loadDataIntoGame = (data) => {
 
@@ -309,22 +332,6 @@ const loadDataIntoGame = (data) => {
     mountain_0900B800.push(...data['textures/mountain/ttm_textures.0B800.rgba16.png'].data)
     mountain_0900C000.push(...data['textures/mountain/ttm_textures.0C000.rgba16.png'].data)
 
-    water_09000000.push(...data['textures/water/jrb_textures.00000.rgba16.png'].data)
-    water_09000800.push(...data['textures/water/jrb_textures.00800.rgba16.png'].data)
-    water_09001800.push(...data['textures/water/jrb_textures.01800.rgba16.png'].data)
-    water_09002800.push(...data['textures/water/jrb_textures.02800.rgba16.png'].data)
-    water_09003800.push(...data['textures/water/jrb_textures.03800.rgba16.png'].data)
-    water_09004800.push(...data['textures/water/jrb_textures.04800.rgba16.png'].data)
-    water_09005800.push(...data['textures/water/jrb_textures.05800.rgba16.png'].data)
-    water_09006000.push(...data['textures/water/jrb_textures.06000.rgba16.png'].data)
-    water_09006800.push(...data['textures/water/jrb_textures.06800.rgba16.png'].data)
-    water_09007800.push(...data['textures/water/jrb_textures.07800.rgba16.png'].data)
-    water_09008800.push(...data['textures/water/jrb_textures.08800.rgba16.png'].data)
-    water_09009000.push(...data['textures/water/jrb_textures.09000.rgba16.png'].data)
-    water_0900A000.push(...data['textures/water/jrb_textures.0A000.rgba16.png'].data)
-    water_0900A800.push(...data['textures/water/jrb_textures.0A800.rgba16.png'].data)
-    water_0900B800.push(...data['textures/water/jrb_textures.0B800.rgba16.png'].data)
-
     title_texture_0A0001C0.push(...data['textures/title_screen_bg/title_screen_bg.001C0.rgba16.png'].data)
     title_texture_0A000E40.push(...data['textures/title_screen_bg/title_screen_bg.00E40.rgba16.png'].data)
     title_texture_0A001AC0.push(...data['textures/title_screen_bg/title_screen_bg.01AC0.rgba16.png'].data)
@@ -349,47 +356,30 @@ const loadDataIntoGame = (data) => {
     outside_0900A800.push(...data['textures/outside/castle_grounds_textures.0A800.rgba16.png'].data)
     outside_0900BC00.push(...data['textures/outside/castle_grounds_textures.0BC00.ia16.png'].data)
 
-    inside_09000000.push(...data['textures/inside/inside.00000.rgba16.png'].data)
-    inside_09001000.push(...data['textures/inside/inside.01000.rgba16.png'].data)
-    inside_09002000.push(...data['textures/inside/inside.02000.rgba16.png'].data)
-    inside_09003000.push(...data['textures/inside/inside.03000.rgba16.png'].data)
-    inside_09003800.push(...data['textures/inside/inside.03800.rgba16.png'].data)
-    inside_09004000.push(...data['textures/inside/inside.04000.rgba16.png'].data)
-    inside_09004800.push(...data['textures/inside/inside.04800.rgba16.png'].data)
-    inside_09005000.push(...data['textures/inside/inside.05000.rgba16.png'].data)
-    inside_09005800.push(...data['textures/inside/inside.05800.rgba16.png'].data)
-    inside_09006000.push(...data['textures/inside/inside.06000.rgba16.png'].data)
-    inside_09007000.push(...data['textures/inside/inside.07000.rgba16.png'].data)
-    inside_09008000.push(...data['textures/inside/inside.08000.rgba16.png'].data)
-    inside_09008800.push(...data['textures/inside/inside.08800.rgba16.png'].data)
-    inside_09009000.push(...data['textures/inside/inside.09000.rgba16.png'].data)
-    inside_0900A000.push(...data['textures/inside/inside.0A000.rgba16.png'].data)
-    inside_0900B000.push(...data['textures/inside/inside.0B000.rgba16.png'].data)
-    inside_0900B800.push(...data['textures/inside/inside.0B800.rgba16.png'].data)
-
-    texture_castle_light.push(...data['levels/castle_inside/castle_light.ia16.png'].data)
-    inside_castle_seg7_texture_07000800.push(...data['levels/castle_inside/1.rgba16.png'].data)
-    inside_castle_seg7_texture_07001000.push(...data['levels/castle_inside/2.ia16.png'].data)
-    inside_castle_seg7_texture_07002000.push(...data['levels/castle_inside/3.rgba16.png'].data)
-    inside_castle_seg7_texture_07003000.push(...data['levels/castle_inside/4.rgba16.png'].data)
-    inside_castle_seg7_texture_07003800.push(...data['levels/castle_inside/5.rgba16.png'].data)
-    inside_castle_seg7_texture_07004800.push(...data['levels/castle_inside/6.rgba16.png'].data)
-    inside_castle_seg7_texture_07005800.push(...data['levels/castle_inside/7.rgba16.png'].data)
-    inside_castle_seg7_texture_07006000.push(...data['levels/castle_inside/8.rgba16.png'].data)
-    inside_castle_seg7_texture_07006800.push(...data['levels/castle_inside/9.rgba16.png'].data)
-    inside_castle_seg7_texture_07007000.push(...data['levels/castle_inside/10.rgba16.png'].data)
-    inside_castle_seg7_texture_07007800.push(...data['levels/castle_inside/11.rgba16.png'].data)
-    inside_castle_seg7_texture_07008000.push(...data['levels/castle_inside/12.rgba16.png'].data)
-    inside_castle_seg7_texture_07008800.push(...data['levels/castle_inside/13.rgba16.png'].data)
-    inside_castle_seg7_texture_07009000.push(...data['levels/castle_inside/14.rgba16.png'].data)
-    inside_castle_seg7_texture_07009800.push(...data['levels/castle_inside/15.rgba16.png'].data)
-    inside_castle_seg7_texture_0700A000.push(...data['levels/castle_inside/16.ia16.png'].data)
-    inside_castle_seg7_texture_0700A800.push(...data['levels/castle_inside/17.rgba16.png'].data)
-    inside_castle_seg7_texture_0700B800.push(...data['levels/castle_inside/18.rgba16.png'].data)
-    inside_castle_seg7_texture_0700C800.push(...data['levels/castle_inside/19.rgba16.png'].data)
-    inside_castle_seg7_texture_0700D800.push(...data['levels/castle_inside/20.rgba16.png'].data)
-    inside_castle_seg7_texture_0700E800.push(...data['levels/castle_inside/21.rgba16.png'].data)
-    inside_castle_seg7_texture_0700F800.push(...data['levels/castle_inside/22.rgba16.png'].data)
+	grass_09000000.push(...data['textures/grass/wf_textures.00000.rgba16.png'].data)
+	grass_09000800.push(...data['textures/grass/wf_textures.00800.rgba16.png'].data)
+	grass_09001000.push(...data['textures/grass/wf_textures.01000.rgba16.png'].data)
+	grass_09001800.push(...data['textures/grass/wf_textures.01800.rgba16.png'].data)
+	grass_09002000.push(...data['textures/grass/wf_textures.02000.rgba16.png'].data)
+	grass_09002800.push(...data['textures/grass/wf_textures.02800.rgba16.png'].data)
+	grass_09003000.push(...data['textures/grass/wf_textures.03000.rgba16.png'].data)
+	grass_09003800.push(...data['textures/grass/wf_textures.03800.rgba16.png'].data)
+	grass_09004000.push(...data['textures/grass/wf_textures.04000.rgba16.png'].data)
+	grass_09004800.push(...data['textures/grass/wf_textures.04800.rgba16.png'].data)
+	grass_09005000.push(...data['textures/grass/wf_textures.05000.rgba16.png'].data)
+	grass_09005800.push(...data['textures/grass/wf_textures.05800.rgba16.png'].data)
+	grass_09006000.push(...data['textures/grass/wf_textures.06000.rgba16.png'].data)
+	grass_09006800.push(...data['textures/grass/wf_textures.06800.rgba16.png'].data)
+	grass_09007000.push(...data['textures/grass/wf_textures.07000.rgba16.png'].data)
+	grass_09007800.push(...data['textures/grass/wf_textures.07800.rgba16.png'].data)
+	grass_09008000.push(...data['textures/grass/wf_textures.08000.rgba16.png'].data)
+	grass_09008800.push(...data['textures/grass/wf_textures.08800.rgba16.png'].data)
+	grass_09009000.push(...data['textures/grass/wf_textures.09000.rgba16.png'].data)
+	grass_09009800.push(...data['textures/grass/wf_textures.09800.rgba16.png'].data)
+	grass_0900A000.push(...data['textures/grass/wf_textures.0A000.rgba16.png'].data)
+	grass_0900A800.push(...data['textures/grass/wf_textures.0A800.rgba16.png'].data)
+	grass_0900B000.push(...data['textures/grass/wf_textures.0B000.ia16.png'].data)
+	grass_0900B800.push(...data['textures/grass/wf_textures.0B800.ia16.png'].data)
 
     generic_09001800.push(...data["textures/generic/bob_textures.01800.rgba16.png"].data)
     generic_09002000.push(...data["textures/generic/bob_textures.02000.rgba16.png"].data)
@@ -405,25 +395,49 @@ const loadDataIntoGame = (data) => {
     generic_0900A000.push(...data["textures/generic/bob_textures.0A000.rgba16.png"].data)
     generic_0900B000.push(...data["textures/generic/bob_textures.0B000.ia16.png"].data)
 
+    cave_09000000.push(...data["textures/cave/hmc_textures.00000.rgba16.png"].data)
+    cave_09001000.push(...data["textures/cave/hmc_textures.01000.rgba16.png"].data)
+    cave_09001800.push(...data["textures/cave/hmc_textures.01800.rgba16.png"].data)
+    cave_09002800.push(...data["textures/cave/hmc_textures.02800.rgba16.png"].data)
+    cave_09003000.push(...data["textures/cave/hmc_textures.03000.rgba16.png"].data)
+    cave_09003800.push(...data["textures/cave/hmc_textures.03800.rgba16.png"].data)
+    cave_09004800.push(...data["textures/cave/hmc_textures.04800.rgba16.png"].data)
+    cave_09005800.push(...data["textures/cave/hmc_textures.05800.rgba16.png"].data)
+    cave_09006800.push(...data["textures/cave/hmc_textures.06800.rgba16.png"].data)
+    cave_09007000.push(...data["textures/cave/hmc_textures.07000.rgba16.png"].data)
+    cave_09007800.push(...data["textures/cave/hmc_textures.07800.rgba16.png"].data)
+    cave_09008800.push(...data["textures/cave/hmc_textures.08800.rgba16.png"].data)
+    cave_09009800.push(...data["textures/cave/hmc_textures.09800.rgba16.png"].data)
+    cave_0900A000.push(...data["textures/cave/hmc_textures.0A000.rgba16.png"].data)
+    cave_0900A800.push(...data["textures/cave/hmc_textures.0A800.rgba16.png"].data)
+    cave_0900B800.push(...data["textures/cave/hmc_textures.0B800.ia16.png"].data)
+    cave_0900C000.push(...data["textures/cave/hmc_textures.0C000.ia16.png"].data)
+
+    hmc_seg7_texture_07000000.push(...data["levels/hmc/0.rgba16.png"].data)
+    hmc_seg7_texture_07001000.push(...data["levels/hmc/1.rgba16.png"].data)
+    hmc_seg7_texture_07002000.push(...data["levels/hmc/2.rgba16.png"].data)
+    hmc_seg7_texture_07003000.push(...data["levels/hmc/3.rgba16.png"].data)
+    hmc_seg7_texture_07003800.push(...data["levels/hmc/4.rgba16.png"].data)
+    hmc_seg7_texture_07004000.push(...data["levels/hmc/5.rgba16.png"].data)
+    hmc_seg7_texture_07004800.push(...data["levels/hmc/6.rgba16.png"].data)
+
     bob_seg7_texture_07000000.push(...data["levels/bob/0.rgba16.png"].data)
     bob_seg7_texture_07000800.push(...data["levels/bob/1.rgba16.png"].data)
     bob_seg7_texture_07001000.push(...data["levels/bob/2.rgba16.png"].data)
     bob_seg7_texture_07001800.push(...data["levels/bob/3.rgba16.png"].data)
     bob_seg7_texture_07002000.push(...data["levels/bob/4.rgba16.png"].data)
 
-    ddd_seg7_texture_07000000.push(...data["levels/ddd/0.rgba16.png"].data)
-    ddd_seg7_texture_07001000.push(...data["levels/ddd/1.rgba16.png"].data)
-    ddd_seg7_texture_07001800.push(...data["levels/ddd/2.rgba16.png"].data)
-    ddd_seg7_texture_07002000.push(...data["levels/ddd/3.rgba16.png"].data)
-    ddd_seg7_texture_07003000.push(...data["levels/ddd/4.rgba16.png"].data)
+    pss_seg7_texture_07000000.push(...data["levels/pss/0.rgba16.png"].data)
+    pss_seg7_texture_07000800.push(...data["levels/pss/1.ia16.png"].data)
+    pss_seg7_texture_07001000.push(...data["levels/pss/2.rgba16.png"].data)
 
-/*    wf_seg7_texture_07000000.push(...data["levels/wf/0.rgba16.png"].data)
+    wf_seg7_texture_07000000.push(...data["levels/wf/0.rgba16.png"].data)
     wf_seg7_texture_07000800.push(...data["levels/wf/1.rgba16.png"].data)
     wf_seg7_texture_07001000.push(...data["levels/wf/2.rgba16.png"].data)
     wf_seg7_texture_07001800.push(...data["levels/wf/3.rgba16.png"].data)
     wf_seg7_texture_07002000.push(...data["levels/wf/4.rgba16.png"].data)
-    // wf_seg7_texture_07002800.push(...data["levels/wf/5.rgba16.png"].data)
-*/
+    wf_seg7_texture_07002800.push(...data["levels/wf/5.ia8.png"].data)
+
     snow_09000000.push(...data["textures/snow/ccm_textures.00000.rgba16.png"].data)
     snow_09000800.push(...data["textures/snow/ccm_textures.00800.rgba16.png"].data)
     snow_09001000.push(...data["textures/snow/ccm_textures.01000.rgba16.png"].data)
@@ -438,36 +452,11 @@ const loadDataIntoGame = (data) => {
     snow_09006000.push(...data["textures/snow/ccm_textures.06000.rgba16.png"].data)
     snow_09006800.push(...data["textures/snow/ccm_textures.06800.rgba16.png"].data)
     snow_09007000.push(...data["textures/snow/ccm_textures.07000.rgba16.png"].data)
+    // Why is this here? snow_09007800.push(...data["textures/snow/ccm_textures.07800.rgba16.png"].data)
     snow_09008000.push(...data["textures/snow/ccm_textures.08000.rgba16.png"].data)
     snow_09008800.push(...data["textures/snow/ccm_textures.08800.rgba16.png"].data)
     snow_09009000.push(...data["textures/snow/ccm_textures.09000.ia16.png"].data)
     snow_09009800.push(...data["textures/snow/ccm_textures.09800.ia16.png"].data)
-
-    grass_09000000.push(...data["textures/grass/wf_textures.00000.rgba16.png"].data)
-    grass_09000800.push(...data["textures/grass/wf_textures.00800.rgba16.png"].data)
-    grass_09001000.push(...data["textures/grass/wf_textures.01000.rgba16.png"].data)
-    grass_09002000.push(...data["textures/grass/wf_textures.02000.rgba16.png"].data)
-    grass_09002800.push(...data["textures/grass/wf_textures.02800.rgba16.png"].data)
-    grass_09003000.push(...data["textures/grass/wf_textures.03000.rgba16.png"].data)
-    grass_09003800.push(...data["textures/grass/wf_textures.03800.rgba16.png"].data)
-    grass_09004000.push(...data["textures/grass/wf_textures.04000.rgba16.png"].data)
-    grass_09004800.push(...data["textures/grass/wf_textures.04800.rgba16.png"].data)
-    grass_09005000.push(...data["textures/grass/wf_textures.05000.rgba16.png"].data)
-    grass_09005800.push(...data["textures/grass/wf_textures.05800.rgba16.png"].data)
-    grass_09006000.push(...data["textures/grass/wf_textures.06000.rgba16.png"].data)
-    grass_09006800.push(...data["textures/grass/wf_textures.06800.rgba16.png"].data)
-    grass_09007000.push(...data["textures/grass/wf_textures.07000.rgba16.png"].data)
-    grass_09008000.push(...data["textures/grass/wf_textures.08000.rgba16.png"].data)
-    grass_09008800.push(...data["textures/grass/wf_textures.08800.rgba16.png"].data)
-    grass_09009000.push(...data["textures/grass/wf_textures.09000.rgba16.png"].data)
-    grass_09009800.push(...data["textures/grass/wf_textures.09800.rgba16.png"].data)
-    grass_0900A000.push(...data["textures/grass/wf_textures.0A000.rgba16.png"].data)
-    grass_0900A800.push(...data["textures/grass/wf_textures.0A800.rgba16.png"].data)
-    grass_0900B000.push(...data["textures/grass/wf_textures.0B000.ia16.png"].data)
-    grass_0900B800.push(...data["textures/grass/wf_textures.0B800.ia16.png"].data)
-
-    thi_seg7_texture_07000000.push(...data["levels/bob/0.rgba16.png"].data)
-    thi_seg7_texture_07000800.push(...data["levels/bob/1.rgba16.png"].data)
 
     mario_texture_yellow_button.push(...data['actors/mario/mario_overalls_button.rgba16.png'].data)
     mario_texture_m_logo.push(...data['actors/mario/mario_logo.rgba16.png'].data)
@@ -476,6 +465,8 @@ const loadDataIntoGame = (data) => {
     mario_texture_eyes_front.push(...data["actors/mario/mario_eyes_center.rgba16.png"].data)
     mario_texture_eyes_half_closed.push(...data["actors/mario/mario_eyes_half_closed.rgba16.png"].data)
     mario_texture_eyes_closed.push(...data["actors/mario/mario_eyes_closed.rgba16.png"].data)
+
+	yellow_sphere_seg5_texture_05000040.push(...data["actors/yellow_sphere_small/small_yellow_sphere.rgba16.png"].data)
 
     tree_seg3_texture_0302DE28.push(...data["actors/tree/tree_left_side.rgba16.png"].data)
     tree_seg3_texture_0302EE28.push(...data["actors/tree/tree_right_side.rgba16.png"].data)
@@ -488,6 +479,51 @@ const loadDataIntoGame = (data) => {
 
     texture_waterbox_water.push(...data["textures/segment2/segment2.11C58.rgba16.png"].data)
     texture_waterbox_lava.push(...data["textures/segment2/segment2.13C58.rgba16.png"].data)
+
+    checkerboard_platform_seg8_texture_0800C840.push(...data["actors/checkerboard_platform/checkerboard_platform_side.rgba16.png"].data)
+    checkerboard_platform_seg8_texture_0800CC40.push(...data["actors/checkerboard_platform/checkerboard_platform.rgba16.png"].data)
+
+    goomba_seg8_texture_08019530.push(...data["actors/goomba/goomba_body.rgba16.png"].data)
+    goomba_seg8_texture_08019D30.push(...data["actors/goomba/goomba_face.rgba16.png"].data)
+    goomba_seg8_texture_0801A530.push(...data["actors/goomba/goomba_face_blink.rgba16.png"].data)
+
+    bobomb_seg8_texture_0801DA60.push(...data["actors/bobomb/bob-omb_left_side.rgba16.png"].data)
+    bobomb_seg8_texture_0801EA60.push(...data["actors/bobomb/bob-omb_right_side.rgba16.png"].data)
+    bobomb_seg8_texture_0801FA60.push(...data["actors/bobomb/bob-omb_buddy_left_side.rgba16.png"].data)
+    bobomb_seg8_texture_08020A60.push(...data["actors/bobomb/bob-omb_buddy_right_side.rgba16.png"].data)
+    bobomb_seg8_texture_08021A60.push(...data["actors/bobomb/bob-omb_eyes.rgba16.png"].data)
+    bobomb_seg8_texture_08022260.push(...data["actors/bobomb/bob-omb_eyes_blink.rgba16.png"].data)
+
+    explosion_seg3_texture_03000A08.push(...data["actors/explosion/explosion_0.rgba16.png"].data)
+    explosion_seg3_texture_03001208.push(...data["actors/explosion/explosion_1.rgba16.png"].data)
+    explosion_seg3_texture_03001A08.push(...data["actors/explosion/explosion_2.rgba16.png"].data)
+    explosion_seg3_texture_03002208.push(...data["actors/explosion/explosion_3.rgba16.png"].data)
+    explosion_seg3_texture_03002A08.push(...data["actors/explosion/explosion_4.rgba16.png"].data)
+    explosion_seg3_texture_03003208.push(...data["actors/explosion/explosion_5.rgba16.png"].data)
+    explosion_seg3_texture_03003A08.push(...data["actors/explosion/explosion_6.rgba16.png"].data)
+
+    smoke_seg4_texture_0401DEA0.push(...data["actors/walk_smoke/walk_smoke_0.ia16.png"].data)
+    smoke_seg4_texture_0401E6A0.push(...data["actors/walk_smoke/walk_smoke_1.ia16.png"].data)
+    smoke_seg4_texture_0401EEA0.push(...data["actors/walk_smoke/walk_smoke_2.ia16.png"].data)
+    smoke_seg4_texture_0401F6A0.push(...data["actors/walk_smoke/walk_smoke_3.ia16.png"].data)
+    smoke_seg4_texture_0401FEA0.push(...data["actors/walk_smoke/walk_smoke_4.ia16.png"].data)
+    smoke_seg4_texture_040206A0.push(...data["actors/walk_smoke/walk_smoke_5.ia16.png"].data)
+    smoke_seg4_texture_04020EA0.push(...data["actors/walk_smoke/walk_smoke_6.ia16.png"].data)
+
+    chain_ball_seg6_texture_06020AE8.push(...data["actors/chain_ball/chain_ball.rgba16.png"].data)
+
+    chain_chomp_seg6_texture_060213D0.push(...data["actors/chain_chomp/chain_chomp_bright_shine.rgba16.png"].data)
+    chain_chomp_seg6_texture_06021BD0.push(...data["actors/chain_chomp/chain_chomp_dull_shine.rgba16.png"].data)
+    chain_chomp_seg6_texture_060223D0.push(...data["actors/chain_chomp/chain_chomp_tongue.rgba16.png"].data)
+    chain_chomp_seg6_texture_06022BD0.push(...data["actors/chain_chomp/chain_chomp_tooth.rgba16.png"].data)
+    chain_chomp_seg6_texture_060233D0.push(...data["actors/chain_chomp/chain_chomp_eye.rgba16.png"].data)
+
+    poundable_pole_seg6_texture_06001050.push(...data["actors/poundable_pole/poundable_pole_top.rgba16.png"].data)
+    poundable_pole_seg6_texture_06001850.push(...data["actors/poundable_pole/poundable_pole_side.rgba16.png"].data)
+
+    dirt_seg3_texture_0302BDF8.push(...data["actors/dirt/dirt_particle.rgba16.png"].data)
+
+    mist_seg3_texture_03000080.push(...data["actors/mist/mist.ia16.png"].data)
 
     SkyboxWater.water_skybox_texture_00000.push(...data["water_skybox_texture_00000"].data)
     SkyboxWater.water_skybox_texture_00001.push(...data["water_skybox_texture_00001"].data)
@@ -587,13 +623,9 @@ export const checkForRom = () => {   /// happens one time when the page is loade
     if (url.searchParams.get("romExternal") && !loadedGameAssets) {
         msgElement.innerHTML = "Transfering ROM Data..."
         msgElement.style = "color:yellow"
-        $.ajax({
-            url: '/romTransfer',
-            type: 'GET',
-            dataType: 'json',
-            data: { romExternal: url.searchParams.get("romExternal") },
-            success: (extractedData) => { processExtractedResults(extractedData) }
-        })
+        //TODO transfer ROM to client and extract
+        ///extractAssetsFromRom and url.searchParams.get("romExternal")
+        throw "temporarily unsupported"
     }
 
     return loadedGameAssets

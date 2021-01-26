@@ -1,5 +1,6 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
-import { oIntangibleTimer, oPosY, oPosX, oPosZ, oInteractType } from "../include/object_constants"
+import { oIntangibleTimer, oPosY, oPosX, oPosZ, oInteractType, oInteractionSubtype, oDistanceToMario, ACTIVE_FLAG_UNK9 } from "../include/object_constants"
+import { INT_SUBTYPE_DELAY_INVINCIBILITY } from "./Interaction"
 
 const clear_object_collision = (startNode) => {
     let sp4 = startNode.next
@@ -45,37 +46,93 @@ const detect_object_hitbox_overlap = (a, b) => {
     }
 }
 
-const check_collision_in_list = (a, bStart) => {
+const detect_object_hurtbox_overlap = (a, b) => {
+    const sp3C = a.rawData[oPosY] - a.hitboxDownOffset
+    const sp38 = b.rawData[oPosY] - b.hitboxDownOffset
+    const dx = a.rawData[oPosX] - b.rawData[oPosX]
+    const dz = a.rawData[oPosZ] - b.rawData[oPosZ]
+    const collisionRadius = a.hurtboxRadius + b.hurtboxRadius
+    const distance = Math.sqrt(dx * dx + dz * dz)
+
+    if (a == ObjectListProc.gMarioObject) {
+        b.rawData[oInteractionSubtype] |= INT_SUBTYPE_DELAY_INVINCIBILITY
+    }
+
+    if (collisionRadius > distance) {
+        let sp20 = a.hitboxHeight + sp3C
+        let sp1C = b.hurtboxHeight + sp38
+
+        if (sp3C > sp1C) return 0
+        if (sp20 < sp38) return 0
+
+        if (a == ObjectListProc.gMarioObject) {
+            b.rawData[oInteractionSubtype] &= ~INT_SUBTYPE_DELAY_INVINCIBILITY
+        }
+
+        return 1
+
+    }
+}
+
+
+
+const check_collision_in_list = (aObj, b, c) => {
     
-    if (a.rawData[oIntangibleTimer] == 0) {
-        let bNode = bStart.next
-        while (bNode != bStart) {
-            const b = bNode.wrapperObject
-            if (b.rawData[oIntangibleTimer] == 0) {
-                if (detect_object_hitbox_overlap(a, b) && b.hurtboxRadius != 0.0) {
-                    throw "unimplemented hurt box"
-                    detect_object_hurtbox_overlap(a, b)
+    if (aObj.rawData[oIntangibleTimer] == 0) {
+        while (b != c) {
+            const bObj = b.wrapperObject
+            if (bObj.rawData[oIntangibleTimer] == 0) {
+                if (detect_object_hitbox_overlap(aObj, bObj) && bObj.hurtboxRadius != 0.0) {
+                    detect_object_hurtbox_overlap(aObj, bObj)
                 }
             }
-            bNode = bNode.next
+            b = b.next
         }
     }
 }
 
 const check_player_object_collision = () => {
-    const playerObjectList = ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PLAYER]
-    let mario1Object = playerObjectList.next.wrapperObject
 
-    //while (sp18 != sp1C) {
-        ///check_collision_in_list(sp18, sp18.header.next) only for players collide with players
-           check_collision_in_list(mario1Object, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE])
-/*        check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_LEVEL])
-        check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR])
-        check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE])
-        check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE])
-        check_collision_in_list(sp18, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE])*/
+    const playerObjectList = ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PLAYER]
+    let mario1Object = playerObjectList.wrapperObject
+
+    //while (sp18 != sp1C) { /// only 1 player in vanilla, so don't need this while loop
+        //check_collision_in_list(sp18, sp18.header.next) only for players collide with players
+    check_collision_in_list(mario1Object, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE])
+    check_collision_in_list(mario1Object, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_LEVEL].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_LEVEL])
+    check_collision_in_list(mario1Object, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR])
+    check_collision_in_list(mario1Object, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE])
+    check_collision_in_list(mario1Object, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE])
+    check_collision_in_list(mario1Object, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE])
         //sp18 = sp18.next
     //}
+}
+
+const check_destructive_object_collision = () => {
+    const sp1C = ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE]
+    let sp18 = sp1C.next
+
+    while (sp18 != sp1C) {
+        const obj = sp18.wrapperObject
+        if (obj.rawData[oDistanceToMario] < 2000 && !(obj.activeFlags & ACTIVE_FLAG_UNK9)) {
+            check_collision_in_list(obj, sp18.next, sp1C)
+            check_collision_in_list(obj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR])
+            check_collision_in_list(obj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE])
+            check_collision_in_list(obj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE])
+        }
+        sp18 = sp18.next
+    }
+}
+
+const check_pushable_object_collision = () => {
+    const sp1C = ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE]
+    let sp18 = sp1C.next
+
+    while (sp18 != sp1C) {
+        const obj = sp18.wrapperObject
+        check_collision_in_list(obj, sp18.next, sp1C)
+        sp18 = sp18.next
+    }
 }
 
 export const detect_object_collisions = () => {
@@ -87,4 +144,6 @@ export const detect_object_collisions = () => {
     clear_object_collision(ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE])
     clear_object_collision(ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE])
     check_player_object_collision()
+    check_pushable_object_collision()
+    check_destructive_object_collision()
 }

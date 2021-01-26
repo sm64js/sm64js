@@ -31,8 +31,6 @@ const MAX_BUFFERED = 256
 const MAX_LIGHTS = 2
 const MAX_VERTICES = 64
 
-let opCount = 0
-
 export class n64GfxProcessor {
     constructor() {
 
@@ -118,11 +116,6 @@ export class n64GfxProcessor {
     }
 
     start_frame(){
-        /// handle input
-        /// handle dimensions
-    }
-
-    end_frame() {
         const dstCanvas = document.getElementById("fullCanvas")
 
         if (window.fullWindowMode || document.fullscreenElement) {
@@ -130,9 +123,15 @@ export class n64GfxProcessor {
             dstCanvas.hidden = false
             WebGL.canvas.hidden = true
             if (window.fullWindowMode) {
+                const windowAspect = window.innerWidth / window.innerHeight
+                if (windowAspect > 1.33) { /// wider than tall
+                    dstCanvas.height = window.innerHeight
+                    dstCanvas.width = window.innerHeight * 1.33
+                } else {  /// taller than wide
+                    dstCanvas.width = window.innerWidth
+                    dstCanvas.height = window.innerWidth / 1.33
+                }
                 window.scrollTo(0, 0)
-                dstCanvas.width = window.innerWidth
-                dstCanvas.height = window.innerHeight
                 document.body.style.overflowY = "hidden"
             }
             dstCtx.drawImage(WebGL.canvas, 0, 0, dstCanvas.width, dstCanvas.height)
@@ -362,7 +361,7 @@ export class n64GfxProcessor {
         const rgba32_buf = []
 
         for (let i = 0; i < this.rdp.loaded_texture[tile].size_bytes / 2; i++) {
-            const intensity = this.rdp.loaded_texture[tile].textureData[2 * i] >> 4
+            const intensity = this.rdp.loaded_texture[tile].textureData[2 * i]
             const alpha = this.rdp.loaded_texture[tile].textureData[2* i + 1]
 
             rgba32_buf.push(intensity)
@@ -866,7 +865,7 @@ export class n64GfxProcessor {
 
     sp_vertex(dest_index, vertices) {
 
-        for (let i = 0; i < vertices.length; i++, dest_index++) {
+        for (let i = dest_index; i < vertices.length; i++) {
 
             const v = vertices[i]
             const normal = [
@@ -874,7 +873,7 @@ export class n64GfxProcessor {
                 v.color[1] > 127 ? v.color[1] - 256 : v.color[1],
                 v.color[2] > 127 ? v.color[2] - 256 : v.color[2]
             ]
-            const d = this.rsp.loaded_vertices[dest_index]
+            const d = this.rsp.loaded_vertices[i]
 
             const x = v.pos[0] * this.rsp.MP_matrix[0][0] + v.pos[1] * this.rsp.MP_matrix[1][0] + v.pos[2] * this.rsp.MP_matrix[2][0] + this.rsp.MP_matrix[3][0]
             const y = v.pos[0] * this.rsp.MP_matrix[0][1] + v.pos[1] * this.rsp.MP_matrix[1][1] + v.pos[2] * this.rsp.MP_matrix[2][1] + this.rsp.MP_matrix[3][1]
@@ -974,8 +973,6 @@ export class n64GfxProcessor {
 
             const opcode = command.words.w0
             const args = command.words.w1
-
-            opCount++
 
             switch (opcode) {
                 case Gbi.G_ENDDL: /// not necessary for JS

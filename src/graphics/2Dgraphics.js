@@ -17,9 +17,9 @@ const defImage = (w,h,path) => {
 const Minimaps = {
 	'm1000':{'img':defImage(401,401,'mini/minimaps/bob_mountain.png'),'playerScaler':1.0,'hasFlags':true},
 	'm9':{'img':defImage(401,401,'mini/minimaps/bob_battlefield.png'),'playerScaler':1.82819,'hasFlags':true},
-	'm16':{'img':defImage(401,401,'mini/minimaps/castle_grounds.png'),'playerScaler':1.80144,'hasFlags':false},
-	'm36':{'img':defImage(401,401,'mini/minimaps/ttm.png'),'playerScaler':1.9838,'hasFlags':false},
-	'm1001':{'img':defImage(401,401,'mini/minimaps/ctf00.png'),'playerScaler':1.2,'hasFlags':false},
+	'm16':{'img':defImage(401,401,'mini/minimaps/castle_grounds.png'),'playerScaler':1.80144,'hasFlags':true},
+	'm36':{'img':defImage(401,401,'mini/minimaps/ttm.png'),'playerScaler':1.9838,'hasFlags':true},
+	'm1001':{'img':defImage(401,401,'mini/minimaps/ctf00.png'),'playerScaler':1.2,'hasFlags':true},
 }
 // Example: Minimaps[`m${window.selectedMap}`].img would return '1000's table on bob mount and '9's table on bob battlefield
 const Player_Img = new Image(14, 14); Player_Img.src = 'mini/player.png'

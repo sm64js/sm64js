@@ -41,6 +41,7 @@ export const getSelectedLevel = () => {
 }
 
 export const levelIdToName = {
+    1001: "CTF/Race Map",
     1000: "Mushroom Battlefield",
     16: "Castle Grounds",
     9: "Bob-omb Battlefield",

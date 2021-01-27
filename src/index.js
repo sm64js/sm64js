@@ -134,7 +134,9 @@ let gameStarted = false
 document.getElementById("startbutton").addEventListener('click', () => {
     if (localStorage['rules'] != rulesVersion) return
     if (gameStarted) {
-        window.location.search = '&autostart=1' /// Refresh page (Reset Game)
+        const params = new URLSearchParams(url.search)
+        params.set('autostart', 1)
+        window.location.search = params /// Refresh page (Reset Game)
     }
     else startGame()
 })

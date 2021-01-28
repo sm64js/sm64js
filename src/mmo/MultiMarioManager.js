@@ -248,7 +248,7 @@ export const recvControllerUpdate = (controllerbytes) => {
 
 export const recvPlayerLists = (playerListsProto) => {
 
-    const rooms = playerListsProto.getRoomList()
+    const rooms = playerListsProto.getGameList()
 
     if (window.playerNameAccepted) { // joined a game
 

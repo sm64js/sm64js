@@ -1,22 +1,12 @@
 import * as Keydrown from "./keydrown.min.js"
-import { gameData, sendChat, submitPlayerName } from "./socket"
+import { gameData, sendChat, submitPlayerName } from "./mmo/socket"
+import { tauntCommands, handleTaunt } from "./mmo/graphics/taunt"
 
 /////// Keyboard / Gamepad Input ////////
 window.playerInput = {}
 window.banPlayerList = []
 window.show_minimap = 0
 let textboxfocus = false
-
-const tauntsMap = {
-    "!taunt-wave": 0x1D,
-    "!taunt-die": 0x2E,
-    "!taunt-star": 0xCD,
-    "!taunt-die2": 0x79,
-    "!taunt-shock": 0x7A,
-    "!taunt-magic": 0xB3
-}
-
-const handleTaunt = (str) => { window.taunt = tauntsMap[str] }
 
 //// Prevent scrolling for arrow keys
 window.addEventListener("keydown", (e) => {
@@ -389,7 +379,7 @@ export const playerInputUpdate = () => {
 
         buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap, buttonDownTaunt,
 
-        taunt: (Object.values(tauntsMap).includes(window.taunt)) ? window.taunt : undefined
+        taunt: (Object.values(tauntCommands).includes(window.taunt)) ? window.taunt : undefined
     }
 
     window.taunt = undefined

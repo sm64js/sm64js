@@ -1,5 +1,5 @@
 import { networkData, submitPlayerName } from "./socket"
-import { SkinValue } from "../proto/mario_pb"
+import { SkinValue } from "../../proto/mario_pb"
 
 export const defaultSkinData = () => {
     return {

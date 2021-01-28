@@ -5,7 +5,7 @@ import * as Gbi from "../include/gbi"
 import { CameraInstance as Camera } from "../game/Camera"
 import * as Mario from "../game/Mario"
 import { create_shadow_below_xyz } from "../game/Shadow"
-import { networkData } from "../socket"
+import { networkData } from "../mmo/socket"
 import { MarioMiscInstance as MarioMisc } from "../game/MarioMisc"
 
 const canvas = document.querySelector('#gameCanvas')

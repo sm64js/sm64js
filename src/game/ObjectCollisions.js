@@ -1,5 +1,5 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
-import { networkData } from "../socket"
+import { networkData } from "../mmo/socket"
 import { INT_SUBTYPE_DELAY_INVINCIBILITY, INTERACT_PLAYER} from "./Interaction"
 import { oIntangibleTimer, oPosY, oPosX, oPosZ, oInteractType, oInteractionSubtype, oDistanceToMario, ACTIVE_FLAG_UNK9 } from "../include/object_constants"
 

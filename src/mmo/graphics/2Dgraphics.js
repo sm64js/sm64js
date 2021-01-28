@@ -15,29 +15,29 @@ const defImage = (w,h,path) => {
 
 // Minimap Images - First number is the selected map and the table contains the image and player scale.
 const Minimaps = {
-	'm1000':{'img':defImage(401,401,'mini/minimaps/bob_mountain.png'),'playerScaler':1.0,'hasFlags':true},
-	'm9':{'img':defImage(401,401,'mini/minimaps/bob_battlefield.png'),'playerScaler':1.82819,'hasFlags':true},
-	'm16':{'img':defImage(401,401,'mini/minimaps/castle_grounds.png'),'playerScaler':1.80144,'hasFlags':true},
-	'm36':{'img':defImage(401,401,'mini/minimaps/ttm.png'),'playerScaler':1.9838,'hasFlags':true},
-	'm1001':{'img':defImage(401,401,'mini/minimaps/ctf00.png'),'playerScaler':1.2,'hasFlags':true},
+	'm1000':{'img':defImage(401,401,'mmo/assets/minimaps/maps/bob_mountain.png'),'playerScaler':1.0,'hasFlags':true},
+	'm9':{'img':defImage(401,401,'mmo/assets/minimaps/maps/bob_battlefield.png'),'playerScaler':1.82819,'hasFlags':true},
+	'm16':{'img':defImage(401,401,'mmo/assets/minimaps/maps/castle_grounds.png'),'playerScaler':1.80144,'hasFlags':true},
+	'm36':{'img':defImage(401,401,'mmo/assets/minimaps/maps/ttm.png'),'playerScaler':1.9838,'hasFlags':true},
+	'm1001':{'img':defImage(401,401,'mmo/assets/minimaps/maps/ctf00.png'),'playerScaler':1.2,'hasFlags':true},
 }
 // Example: Minimaps[`m${window.selectedMap}`].img would return '1000's table on bob mount and '9's table on bob battlefield
-const Player_Img = new Image(14, 14); Player_Img.src = 'mini/player.png'
-const PlayerRemote_Img = new Image(14, 14); PlayerRemote_Img.src = 'mini/player_remote.png'
-const PlayerRemote_lower_Img = new Image(14, 14); PlayerRemote_lower_Img.src = 'mini/player_remote_lower.png'
-const PlayerRemote_upper_Img = new Image(14, 14); PlayerRemote_upper_Img.src = 'mini/player_remote_upper.png'
-const flag_outline = new Image(14, 14); flag_outline.src = "mini/flag0.png"
-const flag_base = new Image(14, 14); flag_base.src = "mini/flag1.png"
+const Player_Img = new Image(14, 14); Player_Img.src = 'mmo/assets/minimaps/player.png'
+const PlayerRemote_Img = new Image(14, 14); PlayerRemote_Img.src = 'mmo/assets/minimaps/player_remote.png'
+const PlayerRemote_lower_Img = new Image(14, 14); PlayerRemote_lower_Img.src = 'mmo/assets/minimaps/player_remote_lower.png'
+const PlayerRemote_upper_Img = new Image(14, 14); PlayerRemote_upper_Img.src = 'mmo/assets/minimaps/player_remote_upper.png'
+const flag_outline = new Image(14, 14); flag_outline.src = "mmo/assets/minimaps/flag0.png"
+const flag_base = new Image(14, 14); flag_base.src = "mmo/assets/minimaps/flag1.png"
 
 const Taunts = [
-	{'img':defImage(32,32,'mini/taunts/skull.png'),'taunt':'!taunt-die'},
-	{'img':defImage(32,32,'mini/taunts/wave.png'),'taunt':'!taunt-wave'},
-	{'img':defImage(32,32,'mini/taunts/skull.png'),'taunt':'!taunt-die2'},
-	{'img':defImage(32,32,'mini/taunts/star.png'),'taunt':'!taunt-star'},
-	{'img':defImage(32,32,'mini/taunts/shock.png'),'taunt':'!taunt-shock'},
-	{'img':defImage(32,32,'mini/taunts/magic.png'),'taunt':'!taunt-magic'}
+    { 'img': defImage(32, 32,'mmo/assets/taunts/skull.png'),'taunt':'!taunt-die'},
+	{'img':defImage(32,32,'mmo/assets/taunts/wave.png'),'taunt':'!taunt-wave'},
+	{'img':defImage(32,32,'mmo/assets/taunts/skull.png'),'taunt':'!taunt-die2'},
+	{'img':defImage(32,32,'mmo/assets/taunts/star.png'),'taunt':'!taunt-star'},
+	{'img':defImage(32,32,'mmo/assets/taunts/shock.png'),'taunt':'!taunt-shock'},
+	{'img':defImage(32,32,'mmo/assets/taunts/magic.png'),'taunt':'!taunt-magic'}
 ]
-const TauntWheel = defImage(128, 128, 'mini/tauntWheel.png')
+const TauntWheel = defImage(128, 128, 'mmo/assets/taunts/tauntWheel.png')
 
 const minimapEnabledLevel = () => {
     return Minimaps.[`m${window.selectedMap}`] != null

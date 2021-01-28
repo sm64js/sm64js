@@ -2,9 +2,9 @@
 import { GameInstance as Game } from "./game/Game"
 import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
-import  * as Socket from "./socket.js"
-import "./cosmetics"
-import "./cmts_cosmetics"
+import  * as Socket from "./mmo/socket.js"
+import "./mmo/cosmetics"
+import "./mmo/cmts_cosmetics"
 import "./template.css"
 
 

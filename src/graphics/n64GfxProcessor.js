@@ -1,8 +1,8 @@
 import { WebGLInstance as WebGL } from "./WebGL"
 import * as Gbi from "../include/gbi"
-import { getExtraRenderData } from "../cosmetics"
+import { getExtraRenderData } from "../mmo/cosmetics"
 import { flagCounter } from "../levels/castle_grounds/areas/1/11/model.inc"
-import { customData2D, custom_draw_text, draw2Dpost3Drendering } from "./2Dgraphics"
+import { customData2D, custom_draw_text, draw2Dpost3Drendering } from "../mmo/graphics/2Dgraphics"
 const canvas2d = document.querySelector('#textCanvas')
 
 

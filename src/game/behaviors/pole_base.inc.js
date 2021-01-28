@@ -2,7 +2,7 @@ import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProc
 import { oPosY, oTimer } from "../../include/object_constants"
 import { MARIO_PUNCHING, ACT_GROUP_MASK, ACT_GROUP_AIRBORNE } from "../Mario"
 import { cur_obj_push_mario_away } from "../ObjectHelpers"
-import { networkData } from "../../socket"
+import { networkData } from "../../mmo/socket"
 
 const checkMarioPosAndPushAway = (m) => {
     const o = ObjectListProc.gCurrentObject

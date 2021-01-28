@@ -10,11 +10,12 @@ import {
     SkinValue,
     PlayerNameMsg,
     InitMsg
-} from "../proto/mario_pb"
+} from "../../proto/mario_pb"
+
 import zlib from "zlib"
-import * as Multi from "./game/MultiMarioManager"
+import * as Multi from "./MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
-import { updateFlagData, setInitFlagHeight } from "./game/behaviors/bhv_castle_flag_init.inc"
+import { updateFlagData, setInitFlagHeight } from "../game/behaviors/bhv_castle_flag_init.inc"
 import { recvChat, decrementChat } from "./chat"
 
 Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer

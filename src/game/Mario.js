@@ -16,7 +16,7 @@ import { oMarioWalkingPitch, oInteractStatus, oPosX, oPosY, oPosZ, oMoveAnglePit
 import * as Interact from "./Interaction"
 import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
 import { mario_execute_cutscene_action } from "./MarioActionsCutscene"
-import { gameData as socketGameData } from "../socket"
+import { gameData as socketGameData } from "../mmo/socket"
 import { int16, sins, coss } from "../utils"
 import { LEVEL_CCM, LEVEL_TTM, LEVEL_WF, LEVEL_CTF00 } from "../levels/level_defines_constants"
 

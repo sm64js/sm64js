@@ -34,7 +34,7 @@ module.exports = env => ({
     devServer: {
         port: 9300,
         before(app) {
-            app.use('/mini', express.static(path.resolve('src/mini')))
+            app.use('/mmo', express.static(path.resolve('src/mmo')))
         }
     },
     plugins: [

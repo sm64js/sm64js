@@ -1,11 +1,11 @@
 import { Sm64JsMsg, MarioMsg, ControllerListMsg, ControllerMsg, ValidPlayersMsg } from "../../proto/mario_pb"
 import zlib from "zlib"
 import * as RAW from "../include/object_constants"
-import { networkData, gameData } from "../socket"
-import { defaultSkinData } from "../cosmetics"
-import { INTERACT_PLAYER } from "./Interaction"
+import { networkData, gameData } from "./socket"
+import { defaultSkinData } from "./cosmetics"
+import { INTERACT_PLAYER } from "../game/Interaction"
 import { levelIdToName } from "../utils"
-import { gLinker } from "./Linker"
+import { gLinker } from "../game/Linker"
 
 const url = new URL(window.location.href)
 

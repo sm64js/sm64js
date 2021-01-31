@@ -1,7 +1,7 @@
 import * as Mario from "./Mario"
 import { atan2s, vec3f_set, approach_number } from "../engine/math_util"
 import { SurfaceCollisionInstance as SurfaceCollisions } from "../engine/SurfaceCollision"
-import { coss, sins } from "../utils"
+import { coss, int16, sins } from "../utils"
 import { PARTICLE_IDLE_WATER_WAVE, PARTICLE_WATER_SPLASH } from "../include/mario_constants"
 import { SURFACE_FLOWING_WATER } from "../include/surface_terrains"
 import { AreaInstance as Area } from "../game/Area"
@@ -56,7 +56,7 @@ const update_swimming_speed = (m, decelThreshold) => {
 }
 
 const update_swimming_yaw = (m) => {
-    targetYawVel = -(10.0 * m.controller.stickX)
+    targetYawVel = -int16(10.0 * m.controller.stickX)
 
     if (targetYawVel > 0) {
         if (m.angleVel[1] < 0) {
@@ -85,7 +85,7 @@ const update_swimming_yaw = (m) => {
 }
 
 const update_swimming_pitch = (m) => {
-    targetPitch = -(252.0 * m.controller.stickY)
+    targetPitch = -s16(252.0 * m.controller.stickY)
 
     pitchVel
     if (m.faceAngle[0] < 0) {
@@ -342,7 +342,7 @@ const apply_water_current = (m, step) => {
             pitchToWhirlpool = atan2s(lateralDist, dy)
             yawToWhirlpool = atan2s(dz, dx)
 
-            yawToWhirlpool -= (0x2000 * 1000.0) / (distance + 1000.0)
+            yawToWhirlpool -= int16((0x2000 * 1000.0) / (distance + 1000.0))
 
             if (whirlpool.strength >= 0) {
                 if (gCurrLevelNum === LEVEL_DDD && gCurrAreaIndex === 2) {

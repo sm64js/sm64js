@@ -8,8 +8,10 @@ import {
     SkinMsg,
     SkinData,
     SkinValue,
-    PlayerNameMsg,
-    InitMsg
+    InitializationMsg,
+    AccessCodeMsg,
+    JoinGameMsg,
+    RequestCosmeticsMsg
 } from "../../proto/mario_pb"
 
 import zlib from "zlib"
@@ -32,10 +34,8 @@ function myArrayBuffer() {
 
 const url = new URL(window.location.href)
 
-const gameID = url.searchParams.get("gameID")
+const gameID = url.searchParams.get("gameID") || url.searchParams.get("state")
 if (gameID) { document.getElementById("mapSelect").hidden = true }
-
-let websocketServerPath
 
 const websocketServerPath = process.env.NODE_ENV === 'rust'
     ? `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/` // Tarnadas - Rust Server
@@ -84,6 +84,19 @@ const measureLatency = (ping_proto) => {
 
 socket.onopen = () => {
 
+    if (url.searchParams.has('code')) {
+        /// send access code to server
+        const accessCodeMsg = new AccessCodeMsg()
+        accessCodeMsg.setAccessCode(url.searchParams.get('code'))
+        const initializationMsg = new InitializationMsg()
+        initializationMsg.setAccessCodeMsg(accessCodeMsg)
+        const sm64jsMsg = new Sm64JsMsg()
+        sm64jsMsg.setInitializationMsg(initializationMsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+        sendData(rootMsg.serializeBinary())
+    }
+
     socket.onmessage = async (message) => {
         let sm64jsMsg
         let bytes = new Uint8Array(await message.data.arrayBuffer())
@@ -93,18 +106,11 @@ socket.onopen = () => {
             case RootMsg.MessageCase.UNCOMPRESSED_SM64JS_MSG:
                 sm64jsMsg = rootMsg.getUncompressedSm64jsMsg()
                 switch (sm64jsMsg.getMessageCase()) {
-                    //case 0: if (multiplayerReady()) Multi.recvMarioData(msgBytes); break
-                    //case 2: recvBasicAttack(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
-                    //case 3: if (multiplayerReady()) Multi.recvControllerUpdate(msgBytes); break
-                    //case 4: recvKnockUp(JSON.parse(new TextDecoder("utf-8").decode(msgBytes))); break
                     case Sm64JsMsg.MessageCase.PLAYER_LISTS_MSG:
                         Multi.recvPlayerLists(sm64jsMsg.getPlayerListsMsg())
                         break
                     case Sm64JsMsg.MessageCase.PING_MSG:
                         measureLatency(sm64jsMsg.getPingMsg())
-                        break
-                    case Sm64JsMsg.MessageCase.CONNECTED_MSG:
-                        networkData.mySocketID = sm64jsMsg.getConnectedMsg().getSocketid()
                         break
                     case Sm64JsMsg.MessageCase.CHAT_MSG:
                         recvChat(sm64jsMsg.getChatMsg())
@@ -112,11 +118,18 @@ socket.onopen = () => {
                     case Sm64JsMsg.MessageCase.SKIN_MSG:
                         Cosmetics.recvSkinData(sm64jsMsg.getSkinMsg())
                         break
-                    case Sm64JsMsg.MessageCase.PLAYER_NAME_MSG:
-                        Cosmetics.recvPlayerNameResponse(sm64jsMsg.getPlayerNameMsg())
-                        break
                     case Sm64JsMsg.MessageCase.ANNOUNCEMENT_MSG:
                         recvAnnouncement(sm64jsMsg.getAnnouncementMsg())
+                        break
+                    case Sm64JsMsg.MessageCase.INITIALIZATION_MSG:
+                        const initializationMsg = sm64jsMsg.getInitializationMsg()
+                        switch (initializationMsg.getMessageCase()) {
+                            case InitializationMsg.MessageCase.AUTHORIZED_USER_MSG:
+                                recvAuthorizedUser(initializationMsg.getAuthorizedUserMsg()); break
+                            case InitializationMsg.MessageCase.INIT_GAME_DATA_MSG:
+                                Cosmetics.recvPlayerNameResponse(initializationMsg.getInitGameDataMsg()); break
+                            default: throw "unknown case for initialization proto message"
+                        }
                         break
                     default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
                 }
@@ -272,9 +285,10 @@ export const post_main_loop_one_iteration = (frame) => {
     if (multiplayerReady()) {
 
         if (!networkData.requestedInitData) {
+            const initializationMsg = new InitializationMsg()
+            initializationMsg.setRequestCosmeticsMsg(new RequestCosmeticsMsg())
             const sm64jsMsg = new Sm64JsMsg()
-            const initMsg = new InitMsg()
-            sm64jsMsg.setInitMsg(initMsg)
+            sm64jsMsg.setInitializationMsg(initializationMsg)
             const rootMsg = new RootMsg()
             rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
             sendData(rootMsg.serializeBinary())
@@ -373,22 +387,32 @@ export const sendPlayerInteraction = (socket_id, interaction) => {
 }
 
 export const submitPlayerName = () => {
-    const level = gameID ? 0 : parseInt(document.getElementById("mapSelect").value)
 
-    const name = document.getElementById("playerNameInput").value
-    if (name.length >= 3) {
-        const playerNameMsg = new PlayerNameMsg()
-        playerNameMsg.setName(name)
-        playerNameMsg.setLevel(level)
-        if (gameID) { playerNameMsg.setGameId(gameID) } 
-        const sm64jsMsg = new Sm64JsMsg()
-        sm64jsMsg.setPlayerNameMsg(playerNameMsg)
-        const rootMsg = new RootMsg()
-        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-        sendData(rootMsg.serializeBinary())
-    } else {
-        Cosmetics.shakePlayerNameInput()
+    const joinGameMsg = new JoinGameMsg()
+
+    if (document.getElementById("customNameRow").hidden) { /// Discord Name Option
+        joinGameMsg.setUseDiscordName(true)
+    } else { // Custom Name Option
+        joinGameMsg.setUseDiscordName(false)
+        const name = document.getElementById("playerNameInput").value
+        if (name.length >= 3) {
+            joinGameMsg.setName(name)
+        } else {
+            return Cosmetics.shakePlayerNameInput()
+        }
     }
+
+    const level = gameID ? 0 : parseInt(document.getElementById("mapSelect").value)
+    joinGameMsg.setLevel(level)
+    if (gameID) { joinGameMsg.setGameId(gameID) }
+    const initializationMsg = new InitializationMsg()
+    initializationMsg.setJoinGameMsg(joinGameMsg)
+    const sm64jsMsg = new Sm64JsMsg()
+    sm64jsMsg.setInitializationMsg(initializationMsg)
+    const rootMsg = new RootMsg()
+    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+    sendData(rootMsg.serializeBinary())
+
 }
 
 export const sendChat = ({ message }) => {
@@ -401,5 +425,40 @@ export const sendChat = ({ message }) => {
     const rootMsg = new RootMsg()
     rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
     sendData(rootMsg.serializeBinary())
+}
+
+const discordOAuth2Link = `https://discord.com/api/oauth2/authorize?client_id=804570849398751272&redirect_uri=http%3A%2F%2Flocalhost%3A9300&response_type=code&scope=identify`
+
+if (url.searchParams.has('code')) document.getElementById("discordSigninButton").hidden = true
+
+document.getElementById("switchCustom").addEventListener('click', (e) => {
+    e.preventDefault()
+    document.getElementById("customNameRow").hidden = false
+    document.getElementById("discordNameRow").hidden = true
+})
+
+document.getElementById("switchDiscord").addEventListener('click', (e) => {
+    e.preventDefault()
+    document.getElementById("customNameRow").hidden = true
+    document.getElementById("discordNameRow").hidden = false
+})
+
+document.getElementById("discordSigninButton").addEventListener('click', () => {
+    if (gameID) {
+        window.location = `${discordOAuth2Link}&state=${gameID}`
+    } else {
+        window.location = discordOAuth2Link
+    }
+})
+
+const recvAuthorizedUser = (msg) => {
+    if (msg.getStatus()) {
+        document.getElementById("playerNameRow").hidden = false
+        document.getElementById("discordNameBox").value = msg.getUsername()
+    } else { //authorization fail - refresh page without discord access code
+        let params = url.searchParams
+        params.delete('code') 
+        window.location.search = params
+    }
 }
 

@@ -117,7 +117,7 @@ Object.keys(window.myMario.skinData).forEach((skinType) => {
     const skinData = localStorage[`skinData-${skinType}`]
     if (skinData) window.myMario.skinData[skinType] = JSON.parse(skinData)
 })
-if (localStorage['playername']) document.getElementById('playerNameInput').value = localStorage['playername']
+//if (localStorage['playername']) document.getElementById('playerNameInput').value = localStorage['playername']
 
 const rainbowLights = [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00];
 let rainbowState = 0;
@@ -174,8 +174,8 @@ export const updateRainbowSkin = () => {
 }
 
 document.getElementById('playerNameForm').onsubmit = (e) => {
-    submitPlayerName()
     e.preventDefault()
+    submitPlayerName()
 }
 
 window.updatePlayerName = (name) => {
@@ -201,16 +201,19 @@ export const recvPlayerNameResponse = (msg) => {
     const accepted = msg.getAccepted()
     if (!accepted) {
         shakePlayerNameInput()
-    } else  {
+    } else {
+        networkData.mySocketID = msg.getSocketId()
         document.getElementById("playerNameInput").style.borderColor = "blue"
         document.getElementById("playerNameInput").disabled = true
         document.getElementById("playerNameInput").style.backgroundColor = "lightgrey"
         document.getElementById("playerNameResult").style.color = "#00ff00"
         document.getElementById("playerNameResult").innerHTML = "Accepted"
         document.getElementById("playerNameButton").hidden = true
+        document.getElementById("discordNameRow").hidden = true
+        document.getElementById("customNameRow").hidden = true
         document.getElementById("mapSelect").disabled = true
         window.playerNameAccepted = true
-        localStorage['playername'] = msg.getName()
+        //localStorage['playername'] = msg.getName()
 
         window.selectedMap = msg.getLevel()
     }

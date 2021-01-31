@@ -5,7 +5,7 @@ const emoteImg = {
     kappa: 'kappa.png', mariostyle: 'mariostyle.gif',
     pogchamp: 'pogchamp.png', strange: 'strange.png',
     kick: 'kick.gif', shock: 'shock.gif',
-    bup: 'bup.jpg', blj: 'blj.gif'
+    bup: 'bup.jpg', blj: 'blj.gif', discord: 'discord.png'
 }
 
 const createEmote = (type) => {
@@ -50,19 +50,17 @@ export const recvChat = (chatmsg) => {
     const chatlog = document.getElementById("chatlog")
     const node = document.createElement("li")
 
-    let adminTag = ""
-
+    const from = document.createElement('strong')
+    if (sender.includes('#')) from.append(createEmote('discord'))
     if (isAdmin) {
         node.style.color = "blue"
-        adminTag = "(Admin)"
+        from.append("(Admin)")
     }
-
-    const from = document.createElement('strong');
-    from.append(`${adminTag}${sender}`);
-    node.appendChild(from);
-    node.append(': ');
-    node.appendChild(createMessage(msg));
-    chatlog.appendChild(node);
+    from.append(sender)
+    node.appendChild(from)
+    node.append(': ')
+    node.appendChild(createMessage(msg))
+    chatlog.appendChild(node)
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 
     if (sender == "Server") {

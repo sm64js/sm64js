@@ -179,10 +179,12 @@ export const draw2Dpost3Drendering = () => {
         drawMinimapIconRotation(Player_Img, 5, 5, m.pos[0]*marScale, m.pos[2]*marScale, scale, miniScale, yaw)
      
         if (window.show_minimap > 1 && Minimaps[`m${window.selectedMap}`].hasFlags) {
-            networkData.flagData.forEach((flag, i) => {
-                const flagIcon = flagIcons[i]
-                drawFlag(flagIcon, 5, 5, flag.pos[0] * marScale, flag.pos[2] * marScale, scale, miniScale)
-            })
+            if (networkData.flagData) {
+                networkData.flagData.forEach((flag, i) => {
+                    const flagIcon = flagIcons[i]
+                    drawFlag(flagIcon, 5, 5, flag.pos[0] * marScale, flag.pos[2] * marScale, scale, miniScale)
+                })
+            }
         }
     }
 

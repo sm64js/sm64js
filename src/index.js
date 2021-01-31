@@ -76,7 +76,8 @@ $('[data-toggle="popover"]').popover({
     },
 })
 
-const url = new URL(window.location.href)
+//const url_hash = new URLSearchParams(window.location.hash.slice(1))
+const url_params = new URLSearchParams(window.location.search)
 
 const letterColors = ["#3e51fa", "#fa3e3e", "#00ff00", "yellow"]
 
@@ -134,9 +135,8 @@ let gameStarted = false
 document.getElementById("startbutton").addEventListener('click', () => {
     if (localStorage['rules'] != rulesVersion) return
     if (gameStarted) {
-        const params = new URLSearchParams(url.search)
-        params.set('autostart', 1)
-        window.location.search = params /// Refresh page (Reset Game)
+        url_params.set('autostart', 1)
+        window.location.search = url_params /// Refresh page (Reset Game)
     }
     else startGame()
 })
@@ -160,8 +160,37 @@ const startGame = () => {
 }
 
 window.onload = () => {
-    if (checkForRom() && url.searchParams.get("autostart") && localStorage['rules'] == rulesVersion) startGame()
+    if (checkForRom() && url_params.has("autostart") && localStorage['rules'] == rulesVersion) startGame()
     document.getElementById('mainContent').hidden = false
+
+    ///Discord
+/*    if (url_hash.has("access_token")) {
+        const accessToken = url_hash.get("access_token")
+        const tokenType = url_hash.get("token_type")
+
+        const fragment = new URLSearchParams(window.location.hash.slice(1))
+
+        const discordFetch = fetch('https://discord.com/api/users/@me', {
+            headers: { authorization: `${tokenType} ${accessToken}` }
+        })
+
+        discordFetch.then(res => res.json()).then(response => {
+            const { username, discriminator } = response
+            console.log(username, discriminator)
+            //document.getElementById('info').innerText += ` ${username}#${discriminator}`
+        }).catch(console.error)
+    }*/
+/*    if (url_params.has("code")) {
+        const serverFetch = fetch(`http://localhost:3080/discord`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ code: url_params.get("code") })
+        })
+
+    }*/
+
 }
 
 window.addEventListener("keydown", (e) => {

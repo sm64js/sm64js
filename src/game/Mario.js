@@ -139,9 +139,6 @@ export const MARIO_ANIM_STOP_GRAB_OBJ_WATER = 0xa3
 export const MARIO_ANIM_BACKWARDS_WATER_KB = 0x9E 
 export const MARIO_ANIM_WATER_FORWARD_KB = 0xA8 
 
-
-
-
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
 export const MARIO_METAL_CAP = 0x00000004
@@ -808,8 +805,27 @@ export const set_mario_anim_with_accel = (m, targetAnimID, accel) => {
 
 }
 
+export const set_anim_to_frame = (m, animFrame) => {
+    const animInfo = m.marioObj.header.gfx.unk38;
+    const curAnim = animInfo.curAnim;
+
+    if (animInfo.animAccel) {
+        if (curAnim.flags & ANIM_FLAG_FORWARD) {
+            animInfo.animFrameAccelAssist = (animFrame << 0x10) + animInfo.animAccel;
+        } else {
+            animInfo.animFrameAccelAssist = (animFrame << 0x10) - animInfo.animAccel;
+        }
+    } else {
+        if (curAnim.flags & ANIM_FLAG_FORWARD) {
+            animInfo.animFrame = animFrame + 1;
+        } else {
+            animInfo.animFrame = animFrame - 1;
+        }
+    }
+}
+
 export const is_anim_at_end = (m) => {
-    const o = m.marioObj
+    const o = m.marioObj //TODO fix unk38 as animInfo
     return (o.header.gfx.unk38.animFrame + 1) == o.header.gfx.unk38.curAnim.unk08
 }
 

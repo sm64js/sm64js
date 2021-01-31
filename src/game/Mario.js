@@ -129,6 +129,10 @@ export const MARIO_ANIM_STAND_AGAINST_WALL = 0x7E
 export const MARIO_ANIM_PUSHING = 0x6C
 export const MARIO_ANIM_SIDESTEP_LEFT = 0x7F
 export const MARIO_ANIM_SIDESTEP_RIGHT = 0x80
+export const MARIO_ANIM_DROWNING_PART1 = 0xA5
+export const MARIO_ANIM_DROWNING_PART2 = 0xA6
+export const MARIO_ANIM_WATER_IDLE_WITH_OBJ = 0xA4
+export const MARIO_ANIM_WATER_IDLE = 0xB2
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -1278,4 +1282,16 @@ export const set_water_plunge_action = m => {
   //TODO implement camera
 
   return set_mario_action(m, ACT_WATER_PLUNGE, 0)
+}
+
+export const transition_submerged_to_walking = m => {
+    // TODO set_camera_mode(m.area.camera, m.area.camera.defMode, 1);
+
+    m.angleVel = [0, 0, 0];
+
+    if (m.heldObj === NULL) {
+        return set_mario_action(m, ACT_WALKING, 0);
+    } else {
+        return set_mario_action(m, ACT_HOLD_WALKING, 0);
+    }
 }

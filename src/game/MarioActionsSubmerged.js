@@ -5,6 +5,7 @@ import { coss, int16, sins } from "../utils"
 import { PARTICLE_IDLE_WATER_WAVE, PARTICLE_WATER_SPLASH } from "../include/mario_constants"
 import { SURFACE_FLOWING_WATER } from "../include/surface_terrains"
 import { AreaInstance as Area } from "../game/Area"
+import { INT_STATUS_MARIO_DROP_OBJECT, INT_STATUS_STOP_RIDING } from "./Interaction"
 
 const MIN_SWIM_STRENGTH = 160
 const MIN_SWIM_SPEED = 160
@@ -146,22 +147,22 @@ const act_water_idle = (m) => {
     let val = 0x10000
 
     if (m.flags & Mario.MARIO_METAL_CAP) {
-        return Mario.set_mario_action(m, ACT_METAL_WATER_FALLING, 1)
+        return Mario.set_mario_action(m, Mario.ACT_METAL_WATER_FALLING, 1)
     }
 
     if (m.input & Mario.INPUT_B_PRESSED) {
-        return Mario.set_mario_action(m, ACT_WATER_PUNCH, 0)
+        return Mario.set_mario_action(m, Mario.ACT_WATER_PUNCH, 0)
     }
 
     if (m.input & Mario.INPUT_A_PRESSED) {
-        return Mario.set_mario_action(m, ACT_BREASTSTROKE, 0)
+        return Mario.set_mario_action(m, Mario.ACT_BREASTSTROKE, 0)
     }
 
     if (m.faceAngle[0] < -0x1000) {
         val = 0x30000
     }
 
-    common_idle_step(m, MARIO_ANIM_WATER_IDLE, val)
+    common_idle_step(m, Mario.MARIO_ANIM_WATER_IDLE, val)
     return 0
 }
 
@@ -265,7 +266,7 @@ const perform_water_step = (m) => {
     stepResult = perform_water_full_step(m, nextPos)
 
     marioObj.header.gfx.pos = [...m.pos]
-    marioObj.header.gfx.angle=[ -m.faceAngle[0], m.faceAngle[1], m.faceAngle[2]]
+    marioObj.header.gfx.angle = [-m.faceAngle[0], m.faceAngle[1], m.faceAngle[2]]
 
     return stepResult
 }
@@ -273,10 +274,14 @@ const perform_water_step = (m) => {
 const perform_water_full_step = (m, nextPos) => {
     const wall = Mario.resolve_and_return_wall_collisions(nextPos, 10.0, 110.0)
     const floorWrapper = {}
-    const floorHeight = SurfaceCollisions.find_floor(nextPos[0], nextPos[1], nextPos[2], floorWrapper)
+    const floorHeight = SurfaceCollisions.find_floor(
+        nextPos[0],
+        nextPos[1],
+        nextPos[2],
+        floorWrapper
+    )
     const ceilWrapper = {}
     let ceilHeight = Mario.vec3_find_ceil(nextPos, floorHeight, ceilWrapper)
-    console.log(floorWrapper)
 
     if (floorWrapper.floor === null) {
         return Mario.WATER_STEP_CANCELLED
@@ -289,7 +294,7 @@ const perform_water_full_step = (m, nextPos) => {
             m.floorHeight = floorHeight
 
             if (wall != null) {
-                return Mario.WATER_STEP_HIT_WALL 
+                return Mario.WATER_STEP_HIT_WALL
             } else {
                 return Mario.WATER_STEP_NONE
             }
@@ -309,7 +314,7 @@ const perform_water_full_step = (m, nextPos) => {
             return Mario.WATER_STEP_CANCELLED
         }
 
-        m.pos= [nextPos[0], floorHeight, nextPos[2]]
+        m.pos = [nextPos[0], floorHeight, nextPos[2]]
         m.floor = floorWrapper
         m.floorHeight = floorHeight
         return Mario.WATER_STEP_HIT_FLOOR
@@ -336,7 +341,7 @@ const apply_water_current = (m, step) => {
             dy = whirlpool.pos[1] - m.pos[1]
             dz = whirlpool.pos[2] - m.pos[2]
 
-            lateralDist = Math.sqrt(dx * dx + dz * dz) 
+            lateralDist = Math.sqrt(dx * dx + dz * dz)
             distance = Math.sqrt(lateralDist * lateralDist + dy * dy)
 
             pitchToWhirlpool = atan2s(lateralDist, dy)
@@ -363,37 +368,83 @@ const apply_water_current = (m, step) => {
     }
 }
 
-/* TODO
- const check_common_submerged_cancels = m => {
+const act_drowning = (m) => {
+    switch (m.actionState) {
+        case 0:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_DROWNING_PART1)
+            // TODO m.marioBodyState.eyeState = Mario.MARIO_EYES_HALF_CLOSED;
+            if (is_anim_at_end(m)) {
+                m.actionState = 1
+            }
+            break
+
+        case 1:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_DROWNING_PART2)
+            // TODO m.marioBodyState.eyeState = Mario.MARIO_EYES_DEAD;
+            if (m.marioObj.header.gfx.animInfo.animFrame == 30) {
+                // TODO level_trigger_warp(m, WARP_OP_DEATH);
+            }
+            break
+    }
+
+    // TODO play_sound_if_no_flag(m, SOUND_MARIO_DROWNING, MARIO_ACTION_SOUND_PLAYED)
+    stationary_slow_down(m)
+    perform_water_step(m)
+
+    return 0
+}
+
+const act_hold_water_idle = (m) => {
+    if (m.flags & Mario.MARIO_METAL_CAP) {
+        return Mario.set_mario_action(m, Mario.ACT_HOLD_METAL_WATER_FALLING, 0)
+    }
+
+    if (m.marioObj.oInteractStatus & INT_STATUS_MARIO_DROP_OBJECT) {
+        return Mario.drop_and_set_mario_action(m, Mario.ACT_WATER_IDLE, 0)
+    }
+
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_WATER_THROW, 0)
+    }
+
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_HOLD_BREASTSTROKE, 0)
+    }
+
+    common_idle_step(m, Mario.MARIO_ANIM_WATER_IDLE_WITH_OBJ, 0)
+    return 0
+}
+
+const check_common_submerged_cancels = (m) => {
     if (m.pos[1] > m.waterLevel - 80) {
         if (m.waterLevel - 80 > m.floorHeight) {
-            m.pos[1] = m.waterLevel - 80;
+            m.pos[1] = m.waterLevel - 80
         } else {
             //! If you press B to throw the shell, there is a ~5 frame window
             // where your held object is the shell, but you are not in the
             // water shell swimming action. This allows you to hold the water
             // shell on land (used for cloning in DDD).
-            if (m.action == ACT_WATER_SHELL_SWIMMING && m.heldObj != null) {
-                m.heldObj.oInteractStatus = INT_STATUS_STOP_RIDING;
-                m.heldObj = null;
-                // stop_shell_music();
+            if (m.action === Mario.ACT_WATER_SHELL_SWIMMING && m.heldObj !== null) {
+                m.heldObj.oInteractStatus = INT_STATUS_STOP_RIDING
+                m.heldObj = null
+                // TODO stop_shell_music();
             }
 
-            return transition_submerged_to_walking(m);
+            return transition_submerged_to_walking(m)
         }
     }
 
-    if (m.health < 0x100 && !(m.action & (ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE))) {
-        set_mario_action(m, ACT_DROWNING, 0);
+    if (m.health < 0x100 && !(m.action & (Mario.ACT_FLAG_INTANGIBLE | Mario.ACT_FLAG_INVULNERABLE))) {
+        Mario.set_mario_action(m, Mario.ACT_DROWNING, 0)
     }
 
-    return 0;
-} */
+    return 0
+}
 
 export const mario_execute_submerged_action = (m) => {
-    /* TODO if (check_common_submerged_cancels(m)) {
-    return 1
-  }*/
+    if (check_common_submerged_cancels(m)) {
+        return 1
+    }
 
     m.quicksandDepth = 0.0
 
@@ -403,10 +454,12 @@ export const mario_execute_submerged_action = (m) => {
     switch (m.action) {
         case Mario.ACT_WATER_IDLE:
             return act_water_idle(m)
-        //case Mario.ACT_HOLD_WATER_IDLE:            return //act_hold_water_idle(m);
+        case Mario.ACT_DROWNING:
+            return act_drowning(m)
+        case Mario.ACT_HOLD_WATER_IDLE:
+            return act_hold_water_idle(m)
         //case Mario.ACT_WATER_ACTION_END:           return //act_water_action_end(m);
         //case Mario.ACT_HOLD_WATER_ACTION_END:      return //act_hold_water_action_end(m);
-        //case Mario.ACT_DROWNING:                   return //act_drowning(m);
         //case Mario.ACT_BACKWARD_WATER_KB:          return //act_backward_water_kb(m);
         //case Mario.ACT_FORWARD_WATER_KB:           return //act_forward_water_kb(m);
         //case Mario.ACT_WATER_DEATH:                return //act_water_death(m);

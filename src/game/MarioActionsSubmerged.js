@@ -415,7 +415,7 @@ const act_hold_water_idle = (m) => {
     return 0
 }
 
-export const act_water_action_end = (m) => {
+const act_water_action_end = (m) => {
     if (m.flags & Mario.MARIO_METAL_CAP) {
         return Mario.set_mario_action(m, Mario.ACT_METAL_WATER_FALLING, 1)
     }
@@ -435,29 +435,83 @@ export const act_water_action_end = (m) => {
     return 0
 }
 
-export const act_hold_water_action_end = m => {
+const act_hold_water_action_end = (m) => {
     if (m.flags & Mario.MARIO_METAL_CAP) {
-        return Mario.set_mario_action(m, Mario.ACT_HOLD_METAL_WATER_FALLING, 0);
+        return Mario.set_mario_action(m, Mario.ACT_HOLD_METAL_WATER_FALLING, 0)
     }
 
     if (m.marioObj.oInteractStatus & INT_STATUS_MARIO_DROP_OBJECT) {
-        return Mario.drop_and_set_mario_action(m, Mario.ACT_WATER_IDLE, 0);
+        return Mario.drop_and_set_mario_action(m, Mario.ACT_WATER_IDLE, 0)
     }
 
     if (m.input & Mario.INPUT_B_PRESSED) {
-        return Mario.set_mario_action(m, Mario.ACT_WATER_THROW, 0);
+        return Mario.set_mario_action(m, Mario.ACT_WATER_THROW, 0)
     }
 
     if (m.input & Mario.INPUT_A_PRESSED) {
-        return Mario.set_mario_action(m, Mario.ACT_HOLD_BREASTSTROKE, 0);
+        return Mario.set_mario_action(m, Mario.ACT_HOLD_BREASTSTROKE, 0)
     }
 
     common_idle_step(
-        m, m.actionArg == 0 ? Mario.MARIO_ANIM_WATER_ACTION_END_WITH_OBJ : Mario.MARIO_ANIM_STOP_GRAB_OBJ_WATER,
-        0);
+        m,
+        m.actionArg == 0
+            ? Mario.MARIO_ANIM_WATER_ACTION_END_WITH_OBJ
+            : Mario.MARIO_ANIM_STOP_GRAB_OBJ_WATER,
+        0
+    )
     if (Mario.is_anim_at_end(m)) {
-        Mario.set_mario_action(m, Mario.ACT_HOLD_WATER_IDLE, 0);
+        Mario.set_mario_action(m, Mario.ACT_HOLD_WATER_IDLE, 0)
     }
+    return 0
+}
+
+const act_backward_water_kb = (m) => {
+    common_water_knockback_step(
+        m,
+        Mario.MARIO_ANIM_BACKWARDS_WATER_KB,
+        Mario.ACT_WATER_IDLE,
+        m.actionArg
+    )
+    return 0
+}
+
+const act_forward_water_kb = (m) => {
+    common_water_knockback_step(
+        m,
+        Mario.MARIO_ANIM_WATER_FORWARD_KB,
+        Mario.ACT_WATER_IDLE,
+        m.actionArg
+    )
+    return 0
+}
+
+const common_water_knockback_step = (m, animation, endAction, arg3) => {
+    stationary_slow_down(m)
+    perform_water_step(m)
+    Mario.set_mario_animation(m, animation)
+
+    m.marioBodyState.headAngle[0] = 0
+
+    if (Mario.is_anim_at_end(m)) {
+        if (arg3 > 0) {
+            m.invincTimer = 30
+        }
+
+        Mario.set_mario_action(m, m.health >= 0x100 ? endAction : ACT_WATER_DEATH, 0)
+    }
+}
+
+const act_water_death = (m) => {
+    stationary_slow_down(m);
+    perform_water_step(m);
+
+    // TODO m.marioBodyState.eyeState = MARIO_EYES_DEAD;
+
+    /* TODO Mario.set_mario_animation(m, Mario.MARIO_ANIM_WATER_DYING);
+    if (Mario.set_mario_animation(m, Mario.MARIO_ANIM_WATER_DYING) == 35) {
+        level_trigger_warp(m, WARP_OP_DEATH);
+    }*/
+
     return 0;
 }
 
@@ -511,9 +565,12 @@ export const mario_execute_submerged_action = (m) => {
             return act_water_action_end(m)
         case Mario.ACT_HOLD_WATER_ACTION_END:
             return act_hold_water_action_end(m)
-        //case Mario.ACT_BACKWARD_WATER_KB:          return //act_backward_water_kb(m);
-        //case Mario.ACT_FORWARD_WATER_KB:           return //act_forward_water_kb(m);
-        //case Mario.ACT_WATER_DEATH:                return //act_water_death(m);
+        case Mario.ACT_BACKWARD_WATER_KB:
+            return act_backward_water_kb(m)
+        case Mario.ACT_FORWARD_WATER_KB:
+            return act_forward_water_kb(m)
+        case Mario.ACT_WATER_DEATH:
+            return act_water_death(m)
         //case Mario.ACT_WATER_SHOCKED:              return //act_water_shocked(m);
         //case Mario.ACT_BREASTSTROKE:               return //act_breaststroke(m);
         //case Mario.ACT_SWIMMING_END:               return //act_swimming_end(m);

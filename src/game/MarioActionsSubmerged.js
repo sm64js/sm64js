@@ -1,5 +1,5 @@
 import * as Mario from "./Mario"
-import { atan2s, vec3f_set, approach_number } from "../engine/math_util"
+import { atan2s, approach_number } from "../engine/math_util"
 import { SurfaceCollisionInstance as SurfaceCollisions } from "../engine/SurfaceCollision"
 import { coss, int16, sins } from "../utils"
 import { PARTICLE_IDLE_WATER_WAVE, PARTICLE_WATER_SPLASH } from "../include/mario_constants"
@@ -265,7 +265,7 @@ const perform_water_step = (m) => {
     stepResult = perform_water_full_step(m, nextPos)
 
     marioObj.header.gfx.pos = [...m.pos]
-    vec3s_set(marioObj.header.gfx.angle, -m.faceAngle[0], m.faceAngle[1], m.faceAngle[2])
+    marioObj.header.gfx.angle=[ -m.faceAngle[0], m.faceAngle[1], m.faceAngle[2]]
 
     return stepResult
 }
@@ -274,18 +274,18 @@ const perform_water_full_step = (m, nextPos) => {
     const wall = Mario.resolve_and_return_wall_collisions(nextPos, 10.0, 110.0)
     const floorWrapper = {}
     const floorHeight = SurfaceCollisions.find_floor(nextPos[0], nextPos[1], nextPos[2], floorWrapper)
-    console.log(floorHeight)
     const ceilWrapper = {}
-    let ceilHeight = SurfaceCollisions./*vec3f_*/find_ceil(nextPos, floorHeight, ceilWrapper)
+    let ceilHeight = Mario.vec3_find_ceil(nextPos, floorHeight, ceilWrapper)
+    console.log(floorWrapper)
 
-    if (floor === null) {
+    if (floorWrapper.floor === null) {
         return Mario.WATER_STEP_CANCELLED
     }
 
     if (nextPos[1] >= floorHeight) {
         if (ceilHeight - nextPos[1] >= 160.0) {
             m.pos = [...nextPos]
-            m.floor = floor
+            m.floor = floorWrapper
             m.floorHeight = floorHeight
 
             if (wall != null) {
@@ -300,8 +300,8 @@ const perform_water_full_step = (m, nextPos) => {
         }
 
         //! Water ceiling downwarp
-        vec3f_set(m.pos, nextPos[0], ceilHeight - 160.0, nextPos[2])
-        m.floor = floor
+        m.pos = [nextPos[0], ceilHeight - 160.0, nextPos[2]]
+        m.floor = floorWrapper
         m.floorHeight = floorHeight
         return Mario.WATER_STEP_HIT_CEILING
     } else {
@@ -309,8 +309,8 @@ const perform_water_full_step = (m, nextPos) => {
             return Mario.WATER_STEP_CANCELLED
         }
 
-        vec3f_set(m.pos, nextPos[0], floorHeight, nextPos[2])
-        m.floor = floor
+        m.pos= [nextPos[0], floorHeight, nextPos[2]]
+        m.floor = floorWrapper
         m.floorHeight = floorHeight
         return Mario.WATER_STEP_HIT_FLOOR
     }

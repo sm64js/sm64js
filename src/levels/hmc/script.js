@@ -2,30 +2,16 @@ import { LevelCommandsInstance as LevelCommands } from "../../engine/LevelComman
 import { bhvMario } from "../../game/BehaviorData"
 import { LevelUpdateInstance as LevelUpdate } from "../../game/LevelUpdate"
 import { hmc_seg7_collision_level } from "./areas/1/collision.inc"
-import { hmc_geo_0005E8 } from "./areas/1/geo.inc"
-import { hmc_geo_000618 } from "./areas/1/geo.inc"
-import { hmc_geo_000658 } from "./areas/1/geo.inc"
-import { hmc_geo_0006A8 } from "./areas/1/geo.inc"
-import { hmc_geo_0006E0 } from "./areas/1/geo.inc"
-import { hmc_geo_000700 } from "./areas/1/geo.inc"
-import { hmc_geo_000748 } from "./areas/1/geo.inc"
-import { hmc_geo_000770 } from "./areas/1/geo.inc"
-import { hmc_geo_000798 } from "./areas/1/geo.inc"
-import { hmc_geo_0007F8 } from "./areas/1/geo.inc"
-import { hmc_geo_000850 } from "./areas/1/geo.inc"
-import { hmc_geo_0008D0 } from "./areas/1/geo.inc"
-import { hmc_geo_000938 } from "./areas/1/geo.inc"
-import { hmc_geo_000998 } from "./areas/1/geo.inc"
-import { hmc_geo_000A18 } from "./areas/1/geo.inc"
-import { hmc_geo_000A88 } from "./areas/1/geo.inc"
-import { hmc_geo_000AE8 } from "./areas/1/geo.inc"
-import { hmc_geo_000B48 } from "./areas/1/geo.inc"
-import { hmc_geo_000B90 } from "./areas/1/geo.inc"
+import {hmc_geo} from "./areas/1/geo_fix_att"
+
+import {
+    MODEL_HMC_HAZY_MAZE_DOOR
+} from "../../include/model_ids"
 
 export const level_hmc_entry = [
     { command: LevelCommands.init_level },
     { command: LevelCommands.init_mario, args: [1, 1, bhvMario] },
-    { command: LevelCommands.begin_area, args: [1, hmc_geo_000B90] },
+    { command: LevelCommands.begin_area, args: [1, hmc_geo] },
     { command: LevelCommands.terrain, args: [hmc_seg7_collision_level] },
     { command: LevelCommands.end_area },
     { command: LevelCommands.set_mario_pos, args: [/*area*/ 1, /*yaw*/ 135, /*pos*/ -7152, 2161, 7181] },

@@ -133,6 +133,9 @@ export const MARIO_ANIM_DROWNING_PART1 = 0xA5
 export const MARIO_ANIM_DROWNING_PART2 = 0xA6
 export const MARIO_ANIM_WATER_IDLE_WITH_OBJ = 0xA4
 export const MARIO_ANIM_WATER_IDLE = 0xB2
+export const MARIO_ANIM_WATER_ACTION_END_WITH_OBJ = 0xA2 // either swimming or flutterkicking
+export const MARIO_ANIM_WATER_ACTION_END = 0xAD  // either swimming or flutterkicking
+
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002

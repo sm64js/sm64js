@@ -415,6 +415,26 @@ const act_hold_water_idle = (m) => {
     return 0
 }
 
+export const act_water_action_end = m => {
+    if (m.flags & Mario.MARIO_METAL_CAP) {
+        return Mario.set_mario_action(m, Mario.ACT_METAL_WATER_FALLING, 1);
+    }
+
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_WATER_PUNCH, 0);
+    }
+
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_BREASTSTROKE, 0);
+    }
+
+    common_idle_step(m, Mario.MARIO_ANIM_WATER_ACTION_END, 0);
+    if (Mario.is_anim_at_end(m)) {
+        Mario.set_mario_action(m, Mario.ACT_WATER_IDLE, 0);
+    }
+    return 0;
+}
+
 const check_common_submerged_cancels = (m) => {
     if (m.pos[1] > m.waterLevel - 80) {
         if (m.waterLevel - 80 > m.floorHeight) {
@@ -434,7 +454,10 @@ const check_common_submerged_cancels = (m) => {
         }
     }
 
-    if (m.health < 0x100 && !(m.action & (Mario.ACT_FLAG_INTANGIBLE | Mario.ACT_FLAG_INVULNERABLE))) {
+    if (
+        m.health < 0x100 &&
+        !(m.action & (Mario.ACT_FLAG_INTANGIBLE | Mario.ACT_FLAG_INVULNERABLE))
+    ) {
         Mario.set_mario_action(m, Mario.ACT_DROWNING, 0)
     }
 
@@ -458,7 +481,8 @@ export const mario_execute_submerged_action = (m) => {
             return act_drowning(m)
         case Mario.ACT_HOLD_WATER_IDLE:
             return act_hold_water_idle(m)
-        //case Mario.ACT_WATER_ACTION_END:           return //act_water_action_end(m);
+        case Mario.ACT_WATER_ACTION_END:
+            return act_water_action_end(m)
         //case Mario.ACT_HOLD_WATER_ACTION_END:      return //act_hold_water_action_end(m);
         //case Mario.ACT_BACKWARD_WATER_KB:          return //act_backward_water_kb(m);
         //case Mario.ACT_FORWARD_WATER_KB:           return //act_forward_water_kb(m);

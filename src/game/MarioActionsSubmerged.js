@@ -1,7 +1,7 @@
 import * as Mario from "./Mario"
 import { atan2s, approach_number } from "../engine/math_util"
 import { SurfaceCollisionInstance as SurfaceCollisions } from "../engine/SurfaceCollision"
-import { coss, int16, sins } from "../utils"
+import { coss, int16, int32, sins } from "../utils"
 import { PARTICLE_IDLE_WATER_WAVE, PARTICLE_WATER_SPLASH, PARTICLE_WAVE_TRAIL } from "../include/mario_constants"
 import { SURFACE_FLOWING_WATER } from "../include/surface_terrains"
 import { AreaInstance as Area } from "../game/Area"
@@ -434,6 +434,63 @@ const act_water_action_end = (m) => {
     return 0
 }
 
+const act_swimming_end = (m) => {
+    if (m.flags & Mario.MARIO_METAL_CAP) {
+        return Mario.set_mario_action(m, Mario.ACT_METAL_WATER_FALLING, 1);
+    }
+
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, ACT_WATER_PUNCH, 0);
+    }
+
+    if (m.actionTimer >= 15) {
+        return Mario.set_mario_action(m, Mario.ACT_WATER_ACTION_END, 0);
+    }
+
+    if (check_water_jump(m)) {
+        return 1;
+    }
+
+    if ((m.input & Mario.INPUT_A_DOWN) && m.actionTimer >= 7) {
+        if (m.actionTimer === 7 && sSwimStrength < 280) {
+            sSwimStrength += 10;
+        }
+        return Mario.set_mario_action(m, Mario.ACT_BREASTSTROKE, 1);
+    }
+
+    if (m.actionTimer >= 7) {
+        sSwimStrength = MIN_SWIM_STRENGTH;
+    }
+
+    m.actionTimer++;
+
+    m.forwardVel -= 0.25;
+    Mario.set_mario_animation(m, MARIO_ANIM_SWIM_PART2);
+    common_swimming_step(m, sSwimStrength);
+
+    return 0;
+}
+
+const check_water_jump = (m) => {
+    let probe = int32(m.pos[1] + 1.5);
+
+    if (m.input & Mario.INPUT_A_PRESSED) {
+        if (probe >= m.waterLevel - 80 && m.faceAngle[0] >= 0 && m.controller.stickY < -60.0) {
+            m.angleVel = [0, 0, 0]
+
+            m.vel[1] = 62.0
+
+            if (m.heldObj === null) {
+                return  Mario.set_mario_action(m, Mario.ACT_WATER_JUMP, 0);
+            } else {
+                return  Mario.set_mario_action(m, Mario.ACT_HOLD_WATER_JUMP, 0);
+            }
+        }
+    }
+
+    return 0;
+}
+
 const act_breaststroke = (m) => {
     if (m.actionArg === 0) {
         sSwimStrength = MIN_SWIM_STRENGTH
@@ -696,7 +753,8 @@ export const mario_execute_submerged_action = (m) => {
             return act_water_shocked(m)
         case Mario.ACT_BREASTSTROKE:
             return act_breaststroke(m)
-        //case Mario.ACT_SWIMMING_END:               return //act_swimming_end(m);
+        case Mario.ACT_SWIMMING_END:
+            return act_swimming_end(m)
         //case Mario.ACT_FLUTTER_KICK:               return //act_flutter_kick(m);
         //case Mario.ACT_HOLD_BREASTSTROKE:          return //act_hold_breaststroke(m);
         //case Mario.ACT_HOLD_SWIMMING_END:          return //act_hold_swimming_end(m);

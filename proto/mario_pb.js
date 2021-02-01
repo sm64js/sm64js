@@ -2023,7 +2023,8 @@ proto.sm64js.AccessCodeMsg.prototype.toObject = function(opt_includeInstance) {
  */
 proto.sm64js.AccessCodeMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
-    accessCode: jspb.Message.getFieldWithDefault(msg, 1, "")
+    accessCode: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    type: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -2064,6 +2065,10 @@ proto.sm64js.AccessCodeMsg.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {string} */ (reader.readString());
       msg.setAccessCode(value);
       break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setType(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -2100,6 +2105,13 @@ proto.sm64js.AccessCodeMsg.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getType();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
 };
 
 
@@ -2118,6 +2130,24 @@ proto.sm64js.AccessCodeMsg.prototype.getAccessCode = function() {
  */
 proto.sm64js.AccessCodeMsg.prototype.setAccessCode = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional string type = 2;
+ * @return {string}
+ */
+proto.sm64js.AccessCodeMsg.prototype.getType = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.sm64js.AccessCodeMsg} returns this
+ */
+proto.sm64js.AccessCodeMsg.prototype.setType = function(value) {
+  return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 

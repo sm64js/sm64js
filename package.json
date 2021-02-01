@@ -19,7 +19,7 @@
   },
   "scripts": {
     "serve": "node serveStatic.js",
-    "build": "webpack --mode production --env production",
+    "build": "webpack --mode production",
     "build:rust": "webpack --mode production --env rust",
     "start": "webpack-dev-server --host 0.0.0.0 --disable-host-check  --mode development --env development",
     "protoc": "protoc --js_out=import_style=commonjs,binary:. proto/mario.proto"

@@ -104,7 +104,7 @@
 
             </div>
 
-            <div class="row" style="justify-content:center; padding-top:10px">
+            <div class="row" style="justify-content:center; padding-top:10px; padding-bottom: 10px">
                 <div class="col-3">
                     <button type="button"
                             class="btn btn-sm btn-primary"
@@ -121,11 +121,12 @@
                 </div>
             </div>
 
-            <div class="row" style="justify-content:center; margin-top: 10px;">
-                <button id="discordSigninButton" type="submit" class="btn btn-light">
+            <div id="signinButtons" class="row" style="justify-content:center; margin-top: 10px;">
+                <button id="discordSigninButton" type="submit" class="btn btn-light" style="height:50px; margin-top: 5px">
                     <b>Sign In with</b>
                     <img src="https://discord.com/assets/e4923594e694a21542a489471ecffa50.svg" width="100" />
                 </button>
+                <img id="googleSigninButton" src="/mmo/assets/google_signin.png" width="240" style="margin-left:15px;">
             </div>
 
             <div hidden id="playerNameRow" margin-top: 10px;">

@@ -34,7 +34,17 @@ function myArrayBuffer() {
 
 const url = new URL(window.location.href)
 
-const gameID = url.searchParams.get("gameID") || url.searchParams.get("state")
+const getGameIdFromURL = () => {
+    if (url.searchParams.has("gameID")) return url.searchParams.get("gameID")
+    else if (url.searchParams.has("state")) {
+        const state = JSON.parse(decodeURIComponent(url.searchParams.get("state")))
+        return state.gameID
+    }
+
+    //else undefined
+}
+
+const gameID = getGameIdFromURL() 
 if (gameID) { document.getElementById("mapSelect").hidden = true }
 
 const websocketServerPath = process.env.NODE_ENV === 'rust'
@@ -85,9 +95,12 @@ const measureLatency = (ping_proto) => {
 socket.onopen = () => {
 
     if (url.searchParams.has('code')) {
+
         /// send access code to server
+        const state = JSON.parse(decodeURIComponent(url.searchParams.get("state")))
         const accessCodeMsg = new AccessCodeMsg()
         accessCodeMsg.setAccessCode(url.searchParams.get('code'))
+        accessCodeMsg.setType(state.type)
         const initializationMsg = new InitializationMsg()
         initializationMsg.setAccessCodeMsg(accessCodeMsg)
         const sm64jsMsg = new Sm64JsMsg()
@@ -427,9 +440,15 @@ export const sendChat = ({ message }) => {
     sendData(rootMsg.serializeBinary())
 }
 
-const discordOAuth2Link = `https://discord.com/api/oauth2/authorize?client_id=804570849398751272&redirect_uri=http%3A%2F%2Flocalhost%3A9300&response_type=code&scope=identify`
+const redirect_uri = encodeURIComponent(process.env.PRODUCTION ? 'https://sm64js.com' : 'http://localhost:9300')
 
-if (url.searchParams.has('code')) document.getElementById("discordSigninButton").hidden = true
+const discord_client_id = process.env.DISCORD_CLIENT_ID
+const discordOAuthURL = "https://discord.com/api/oauth2/authorize?client_id=" + discord_client_id + "&redirect_uri=" + redirect_uri + "&response_type=code&scope=identify"
+
+const google_client_id = process.env.GOOGLE_CLIENT_ID + ".apps.googleusercontent.com"
+const googleOAuthURL = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=" + google_client_id + "&redirect_uri=" + redirect_uri + "&scope=email" 
+
+if (url.searchParams.has('code')) document.getElementById("signinButtons").hidden = true
 
 document.getElementById("switchCustom").addEventListener('click', (e) => {
     e.preventDefault()
@@ -444,17 +463,26 @@ document.getElementById("switchDiscord").addEventListener('click', (e) => {
 })
 
 document.getElementById("discordSigninButton").addEventListener('click', () => {
-    if (gameID) {
-        window.location = `${discordOAuth2Link}&state=${gameID}`
-    } else {
-        window.location = discordOAuth2Link
-    }
+    const state = { type: "discord" }
+    if (gameID) state.gameID = gameID
+    window.location = `${discordOAuthURL}&state=${ encodeURIComponent(JSON.stringify(state)) }`
+})
+
+document.getElementById("googleSigninButton").addEventListener('click', () => {
+    const state = { type: "google" }
+    if (gameID) state.gameID = gameID
+    window.location = `${googleOAuthURL}&state=${encodeURIComponent(JSON.stringify(state))}`
 })
 
 const recvAuthorizedUser = (msg) => {
     if (msg.getStatus()) {
         document.getElementById("playerNameRow").hidden = false
         document.getElementById("discordNameBox").value = msg.getUsername()
+        if (msg.getUsername() == "") { /// Discord Username option not available
+            document.getElementById("customNameRow").hidden = false
+            document.getElementById("discordNameRow").hidden = true
+            document.getElementById("switchDiscord").hidden = true
+        }
     } else { //authorization fail - refresh page without discord access code
         let params = url.searchParams
         params.delete('code') 

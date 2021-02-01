@@ -4,6 +4,7 @@ import { perform_air_step, mario_bonk_reflection } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
 import { oMarioSteepJumpYaw } from "../include/object_constants"
 import { CameraInstance as Camera } from "./Camera"
+import { SURFACE_VERTICAL_WIND } from "../include/surface_terrains"
 
 
 const update_air_without_turn = (m) => {
@@ -711,22 +712,20 @@ const act_steep_jump = (m) => {
     return 0
 }
 
-const check_common_airborne_cancels =(m) => {
+const check_common_airborne_cancels = (m) => {
     if (m.pos[1] < m.waterLevel - 100) {
         return Mario.set_water_plunge_action(m)
     }
-    /*TODO
-    if (m.input & INPUT_SQUISHED) {
-        return drop_and_set_mario_action(m, ACT_SQUISHED, 0)
+    if (m.input & Mario.INPUT_SQUISHED) {
+        return Mario.drop_and_set_mario_action(m, Mario.ACT_SQUISHED, 0)
     }
 
-    if (m.floor.type == SURFACE_VERTICAL_WIND && (m.action & ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)) {
-        return drop_and_set_mario_action(m, ACT_VERTICAL_WIND, 0)
+    if (m.floor.type === SURFACE_VERTICAL_WIND && (m.action & Mario.ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)) {
+        return Mario.drop_and_set_mario_action(m, Mario.ACT_VERTICAL_WIND, 0)
     }
 
     m.quicksandDepth = 0.0;
-    */
-    return false
+    return 0
 }
 
 export const mario_execute_airborne_action = (m) => {

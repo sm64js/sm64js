@@ -20,7 +20,7 @@ let sSwimStrength = MIN_SWIM_STRENGTH
 const sWaterCurrentSpeed = [28, 12, 8, 4]
 
 const update_water_pitch = (m) => {
-    marioObj = m.marioObj
+    const marioObj = m.marioObj
 
     if (marioObj.header.gfx.angle[0] > 0) {
         marioObj.header.gfx.pos[1] += 60.0 * sins(marioObj.header.gfx.angle[0]) * sins(marioObj.header.gfx.angle[0])
@@ -36,10 +36,10 @@ const update_water_pitch = (m) => {
 }
 
 const update_swimming_speed = (m, decelThreshold) => {
-    buoyancy = get_buoyancy(m)
-    maxSpeed = 28.0
+    const buoyancy = get_buoyancy(m)
+    const maxSpeed = 28.0
 
-    if (m.action & ACT_FLAG_STATIONARY) {
+    if (m.action & Mario.ACT_FLAG_STATIONARY) {
         m.forwardVel -= 2.0
     }
 
@@ -135,7 +135,7 @@ const common_idle_step = (m, animation, arg) => {
 }
 
 const set_swimming_at_surface_particles = (m, particleFlag) => {
-    atSurface = m.pos[1] >= m.waterLevel - 130
+    const atSurface = m.pos[1] >= m.waterLevel - 130
 
     if (atSurface) {
         m.particleFlags |= particleFlag
@@ -253,7 +253,7 @@ const act_water_plunge = (m) => {
 }
 
 const stationary_slow_down = (m) => {
-    let buoyancy = get_buoyancy(m)
+    const buoyancy = get_buoyancy(m)
 
     m.angleVel[0] = 0
     m.angleVel[1] = 0

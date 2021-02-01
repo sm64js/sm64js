@@ -145,6 +145,16 @@ import {
 } from "./levels/wf/textures.inc"
 
 import {
+    hmc_seg7_texture_07000000,
+    hmc_seg7_texture_07001000,
+    hmc_seg7_texture_07002000,
+    hmc_seg7_texture_07003000,
+    hmc_seg7_texture_07003800,
+    hmc_seg7_texture_07004000,
+    hmc_seg7_texture_07004800
+} from "./levels/hmc/texture.inc"
+
+import {
     mountain_09000000,
     mountain_09000800,
     mountain_09001800,
@@ -215,6 +225,26 @@ import {
     grass_0900B000,
     grass_0900B800
 } from "./textures/grass"
+
+import {
+    cave_09000000,
+    cave_09001000,
+    cave_09001800,
+    cave_09002800,
+    cave_09003000,
+    cave_09003800,
+    cave_09004800,
+    cave_09005800,
+    cave_09006800,
+    cave_09007000,
+    cave_09007800,
+    cave_09008800,
+    cave_09009800,
+    cave_0900A000,
+    cave_0900A800,
+    cave_0900B800,
+    cave_0900C000
+} from "./textures/cave"
 
 import { chain_ball_seg6_texture_06020AE8 } from "./actors/chain_ball/model.inc"
 
@@ -364,6 +394,32 @@ const loadDataIntoGame = (data) => {
     generic_09009800.push(...data["textures/generic/bob_textures.09800.rgba16.png"].data)
     generic_0900A000.push(...data["textures/generic/bob_textures.0A000.rgba16.png"].data)
     generic_0900B000.push(...data["textures/generic/bob_textures.0B000.ia16.png"].data)
+
+    cave_09000000.push(...data["textures/cave/hmc_textures.00000.rgba16.png"].data)
+    cave_09001000.push(...data["textures/cave/hmc_textures.01000.rgba16.png"].data)
+    cave_09001800.push(...data["textures/cave/hmc_textures.01800.rgba16.png"].data)
+    cave_09002800.push(...data["textures/cave/hmc_textures.02800.rgba16.png"].data)
+    cave_09003000.push(...data["textures/cave/hmc_textures.03000.rgba16.png"].data)
+    cave_09003800.push(...data["textures/cave/hmc_textures.03800.rgba16.png"].data)
+    cave_09004800.push(...data["textures/cave/hmc_textures.04800.rgba16.png"].data)
+    cave_09005800.push(...data["textures/cave/hmc_textures.05800.rgba16.png"].data)
+    cave_09006800.push(...data["textures/cave/hmc_textures.06800.rgba16.png"].data)
+    cave_09007000.push(...data["textures/cave/hmc_textures.07000.rgba16.png"].data)
+    cave_09007800.push(...data["textures/cave/hmc_textures.07800.rgba16.png"].data)
+    cave_09008800.push(...data["textures/cave/hmc_textures.08800.rgba16.png"].data)
+    cave_09009800.push(...data["textures/cave/hmc_textures.09800.rgba16.png"].data)
+    cave_0900A000.push(...data["textures/cave/hmc_textures.0A000.rgba16.png"].data)
+    cave_0900A800.push(...data["textures/cave/hmc_textures.0A800.rgba16.png"].data)
+    cave_0900B800.push(...data["textures/cave/hmc_textures.0B800.ia16.png"].data)
+    cave_0900C000.push(...data["textures/cave/hmc_textures.0C000.ia16.png"].data)
+
+    hmc_seg7_texture_07000000.push(...data["levels/hmc/0.rgba16.png"].data)
+    hmc_seg7_texture_07001000.push(...data["levels/hmc/1.rgba16.png"].data)
+    hmc_seg7_texture_07002000.push(...data["levels/hmc/2.rgba16.png"].data)
+    hmc_seg7_texture_07003000.push(...data["levels/hmc/3.rgba16.png"].data)
+    hmc_seg7_texture_07003800.push(...data["levels/hmc/4.rgba16.png"].data)
+    hmc_seg7_texture_07004000.push(...data["levels/hmc/5.rgba16.png"].data)
+    hmc_seg7_texture_07004800.push(...data["levels/hmc/6.rgba16.png"].data)
 
     bob_seg7_texture_07000000.push(...data["levels/bob/0.rgba16.png"].data)
     bob_seg7_texture_07000800.push(...data["levels/bob/1.rgba16.png"].data)

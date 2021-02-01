@@ -6,6 +6,7 @@ import { PARTICLE_IDLE_WATER_WAVE, PARTICLE_WATER_SPLASH, PARTICLE_WAVE_TRAIL } 
 import { SURFACE_FLOWING_WATER } from "../include/surface_terrains"
 import { AreaInstance as Area } from "../game/Area"
 import { INT_STATUS_MARIO_DROP_OBJECT, INT_STATUS_STOP_RIDING } from "./Interaction"
+import { CameraInstance as Camera } from "./Camera"
 
 const MIN_SWIM_STRENGTH = 160
 const MIN_SWIM_SPEED = 160
@@ -574,6 +575,27 @@ const act_hold_water_action_end = (m) => {
     if (Mario.is_anim_at_end(m)) {
         Mario.set_mario_action(m, Mario.ACT_HOLD_WATER_IDLE, 0)
     }
+    return 0
+}
+
+const act_water_shocked = (m) => {
+    //TODO play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_ACTION_SOUND_PLAYED);
+    //TODO play_sound(SOUND_MOVING_SHOCKED, m.marioObj.header.gfx.cameraToObject);
+    Camera.set_camera_shake_from_hit(Camera.SHAKE_SHOCK)
+
+    if (Mario.set_mario_animation(m, Mario.MARIO_ANIM_SHOCKED) == 0) {
+        m.actionTimer++
+        m.flags |= Mario.MARIO_METAL_SHOCK
+    }
+
+    if (m.actionTimer >= 6) {
+        m.invincTimer = 30
+        Mario.set_mario_action(m, m.health < 0x100 ? Mario.ACT_WATER_DEATH : Mario.ACT_WATER_IDLE, 0)
+    }
+
+    stationary_slow_down(m)
+    perform_water_step(m)
+    m.marioBodyState.headAngle[0] = 0
     return 0
 }
 

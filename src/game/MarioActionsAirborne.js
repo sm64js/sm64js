@@ -712,6 +712,68 @@ const act_steep_jump = (m) => {
     return 0
 }
 
+const act_water_jump = (m) => {
+    if (m.forwardVel < 15.0) {
+        Mario.set_forward_vel(m, 15.0);
+    }
+
+    //TODO play_mario_sound(m, SOUND_ACTION_UNKNOWN432, 0);
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_SINGLE_JUMP);
+
+    switch (perform_air_step(m, Mario.AIR_STEP_CHECK_LEDGE_GRAB)) {
+        case Mario.AIR_STEP_LANDED:
+            Mario.set_mario_action(m, Mario.ACT_JUMP_LAND, 0);
+            //TODO set_camera_mode(m.area.camera, m.area.camera.defMode, 1);
+            break;
+        case Mario.AIR_STEP_HIT_WALL:
+            Mario.set_forward_vel(m, 15.0);
+            break;
+        case Mario.AIR_STEP_GRABBED_LEDGE:
+            Mario.set_mario_action(m, ACT_LEDGE_GRAB, 0);
+            //TODO set_camera_mode(m.area.camera, m.area.camera.defMode, 1);
+            break;
+
+        case Mario.AIR_STEP_HIT_LAVA_WALL:
+            //TODO lava_boost_on_wall(m);
+            break;
+    }
+
+    return 0;
+}
+
+const act_hold_water_jump = (m) => {
+    console.warn("the method act_hold_water_jump is incomplete") //TODO 
+    if (m.marioObj.oInteractStatus & INT_STATUS_MARIO_DROP_OBJECT) {
+        return Mario.drop_and_set_mario_action(m, Mario.ACT_FREEFALL, 0);
+    }
+
+    if (m.forwardVel < 15.0) {
+        Mario.set_forward_vel(m, 15.0);
+    }
+
+    //TODO play_mario_sound(m, SOUND_ACTION_UNKNOWN432, 0);
+    Mario.set_mario_animation(m, MARIO_ANIM_JUMP_WITH_LIGHT_OBJ);
+
+    switch (perform_air_step(m, 0)) {
+        case Mario.AIR_STEP_LANDED:
+            Mario.set_mario_action(m, ACT_HOLD_JUMP_LAND, 0);
+            //TODO set_camera_mode(m.area.camera, m.area.camera.defMode, 1);
+            break;
+
+        case Mario.AIR_STEP_HIT_WALL:
+            mario_set_forward_vel(m, 15.0);
+            break;
+
+        case Mario.AIR_STEP_HIT_LAVA_WALL:
+            //TODO lava_boost_on_wall(m);
+            break;
+    }
+
+    return FALSE;
+}
+
+
+
 const check_common_airborne_cancels = (m) => {
     if (m.pos[1] < m.waterLevel - 100) {
         return Mario.set_water_plunge_action(m)
@@ -756,6 +818,8 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_FORWARD_AIR_KB: return act_forward_air_kb(m)
         case Mario.ACT_HARD_BACKWARD_AIR_KB: return act_hard_backward_air_kb(m)
         case Mario.ACT_HARD_FORWARD_AIR_KB: return act_hard_forward_air_kb(m)
+        case Mario.ACT_WATER_JUMP: return act_water_jump(m)
+        case Mario.ACT_HOLD_WATER_JUMP: return act_hold_water_jump(m)
         default: throw "unkown action airborne"
     }
 }

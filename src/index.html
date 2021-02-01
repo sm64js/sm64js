@@ -129,7 +129,7 @@
                 <img id="googleSigninButton" src="/mmo/assets/google_signin.png" width="240" style="margin-left:15px;">
             </div>
 
-            <div hidden id="playerNameRow" margin-top: 10px;">
+            <div hidden id="playerNameRow" style="margin-top: 10px;">
                 <form id="playerNameForm">
                     <div id="discordNameRow" class="row" style="justify-content:center;">
                         <div class="form-group mb-2">
@@ -139,7 +139,7 @@
                             <input readonly id="discordNameBox" type="text" style="margin-left: 15px; max-width: 200px" class="form-control-sm" minlength="3" maxlength="20">
                         </div>
                         <div class="form-group mb-2">
-                            <button id="switchCustom" class="btn btn-sm btn-outline-primary mb-2" style="margin-left:15px;">Switch to Custom Display Name</button>
+                            <button id="switchCustom" type="button" class="btn btn-sm btn-outline-primary mb-2" style="margin-left:15px;">Switch to Custom Display Name</button>
                         </div>
                     </div>
                     <div hidden id="customNameRow" class="row" style="justify-content:center;">
@@ -150,7 +150,7 @@
                             <input id="playerNameInput" type="text" style="margin-left: 15px; max-width: 120px" class="form-control-sm" minlength="3" maxlength="14" placeholder="enter name" onchange="window.updatePlayerName(this.value)">
                         </div>
                         <div class="form-group mb-2">
-                            <button id="switchDiscord" class="btn btn-sm btn-outline-primary mb-2" style="margin-left:15px;">Switch to Discord Username</button>
+                            <button id="switchDiscord" type="button" class="btn btn-sm btn-outline-primary mb-2" style="margin-left:15px;">Switch to Discord Username</button>
                         </div>
                     </div>
                     <div class="row" style="justify-content:center;">

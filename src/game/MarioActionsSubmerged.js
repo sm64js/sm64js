@@ -759,7 +759,7 @@ const check_common_submerged_cancels = (m) => {
                 // TODO stop_shell_music();
             }
 
-            return transition_submerged_to_walking(m)
+            return Mario.transition_submerged_to_walking(m)
         }
     }
 

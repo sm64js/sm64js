@@ -141,8 +141,9 @@ export const MARIO_ANIM_WATER_FORWARD_KB = 0xA8
 export const MARIO_ANIM_SHOCKED = 0x7A 
 export const MARIO_ANIM_FLUTTERKICK_WITH_OBJ = 0xA1 
 export const MARIO_ANIM_FLUTTERKICK = 0xAC 
-
-
+export const MARIO_ANIM_FALL_WITH_LIGHT_OBJ = 0x43 
+export const MARIO_ANIM_SWIM_PART1 = 0xAA 
+export const MARIO_ANIM_SWIM_PART2 = 0xAB 
 
 
 export const MARIO_NORMAL_CAP = 0x00000001

@@ -2,7 +2,7 @@ import * as Mario from "./Mario"
 import { atan2s, approach_number } from "../engine/math_util"
 import { SurfaceCollisionInstance as SurfaceCollisions } from "../engine/SurfaceCollision"
 import { coss, int16, int32, sins } from "../utils"
-import { PARTICLE_IDLE_WATER_WAVE, PARTICLE_WATER_SPLASH, PARTICLE_WAVE_TRAIL } from "../include/mario_constants"
+import * as Particles from "../include/mario_constants"
 import { SURFACE_FLOWING_WATER } from "../include/surface_terrains"
 import { AreaInstance as Area } from "../game/Area"
 import { INT_STATUS_MARIO_DROP_OBJECT, INT_STATUS_STOP_RIDING } from "./Interaction"
@@ -16,7 +16,7 @@ let D_80339FD2
 let D_80339FD4
 
 let sWasAtSurface = false
-let sSwimStrentgh = MIN_SWIM_STRENGTH
+let sSwimStrength = MIN_SWIM_STRENGTH
 const sWaterCurrentSpeed = [28, 12, 8, 4]
 
 const update_water_pitch = (m) => {
@@ -61,7 +61,7 @@ const update_swimming_speed = (m, decelThreshold) => {
 }
 
 const update_swimming_yaw = (m) => {
-    targetYawVel = -int16(10.0 * m.controller.stickX)
+    let targetYawVel = -int16(10.0 * m.controller.stickX)
 
     if (targetYawVel > 0) {
         if (m.angleVel[1] < 0) {
@@ -90,9 +90,9 @@ const update_swimming_yaw = (m) => {
 }
 
 const update_swimming_pitch = (m) => {
-    targetPitch = -int16(252.0 * m.controller.stickY)
+    let targetPitch = -int16(252.0 * m.controller.stickY)
 
-    pitchVel
+    let pitchVel
     if (m.faceAngle[0] < 0) {
         pitchVel = 0x100
     } else {
@@ -131,7 +131,7 @@ const common_idle_step = (m, animation, arg) => {
         Mario.set_mario_anim_with_accel(m, animation, arg)
     }
 
-    set_swimming_at_surface_particles(m, PARTICLE_IDLE_WATER_WAVE)
+    set_swimming_at_surface_particles(m, Particles.PARTICLE_IDLE_WATER_WAVE)
 }
 
 const set_swimming_at_surface_particles = (m, particleFlag) => {
@@ -191,7 +191,7 @@ const act_water_plunge = (m) => {
 
     stationary_slow_down(m)
 
-    stepResult = perform_water_step(m) // TODO ?
+    stepResult = perform_water_step(m)
 
     if (m.actionState === 0) {
         /* TODO play_sound(SOUND_ACTION_UNKNOWN430, m.marioObj.header.gfx.cameraToObject);
@@ -199,9 +199,57 @@ const act_water_plunge = (m) => {
             play_sound(SOUND_MARIO_HAHA_2, m.marioObj.header.gfx.cameraToObject);
         }*/
 
-        m.particleFlags |= PARTICLE_WATER_SPLASH
+        m.particleFlags |= Particles.PARTICLE_WATER_SPLASH
         m.actionState = 1
     }
+
+    if (stepResult === Mario.WATER_STEP_HIT_FLOOR || m.vel[1] >= endVSpeed || m.actionTimer > 20) {
+        switch (stateFlags) {
+            case 0:
+                Mario.set_mario_action(m, Mario.ACT_WATER_ACTION_END, 0)
+                break
+            case 1:
+                Mario.set_mario_action(m, Mario.ACT_HOLD_WATER_ACTION_END, 0)
+                break
+            case 2:
+                Mario.set_mario_action(m, Mario.ACT_FLUTTER_KICK, 0)
+                break
+            case 3:
+                Mario.set_mario_action(m, Mario.ACT_HOLD_FLUTTER_KICK, 0)
+                break
+            case 4:
+                Mario.set_mario_action(m, Mario.ACT_METAL_WATER_FALLING, 0)
+                break
+            case 5:
+                Mario.set_mario_action(m, Mario.ACT_HOLD_METAL_WATER_FALLING, 0)
+                break
+        }
+        D_80339FD2 = 0
+    }
+
+    switch (stateFlags) { //TODO boolean?
+        case 0:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_WATER_ACTION_END)
+            break
+        case 1:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_WATER_ACTION_END_WITH_OBJ)
+            break
+        case 2:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_FLUTTERKICK)
+            break
+        case 3:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_FLUTTERKICK_WITH_OBJ)
+            break
+        case 4:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_GENERAL_FALL)
+            break
+        case 5:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_FALL_WITH_LIGHT_OBJ)
+            break
+    }
+
+    m.particleFlags |= Particles.PARTICLE_PLUNGE_BUBBLE
+    return 0
 }
 
 const stationary_slow_down = (m) => {
@@ -243,7 +291,7 @@ const swimming_near_surface = (m) => {
         return 0
     }
 
-    return m.waterLevel - 80 - m.pos[1] < 400.0
+    return m.waterLevel - 80 - m.pos[1] < 400.0 ? 1 : 0
 }
 
 const perform_water_step = (m) => {
@@ -440,7 +488,7 @@ const act_swimming_end = (m) => {
     }
 
     if (m.input & Mario.INPUT_B_PRESSED) {
-        return Mario.set_mario_action(m, ACT_WATER_PUNCH, 0)
+        return Mario.set_mario_action(m, Mario.ACT_WATER_PUNCH, 0)
     }
 
     if (m.actionTimer >= 15) {
@@ -465,7 +513,7 @@ const act_swimming_end = (m) => {
     m.actionTimer++
 
     m.forwardVel -= 0.25
-    Mario.set_mario_animation(m, MARIO_ANIM_SWIM_PART2)
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_SWIM_PART2)
     common_swimming_step(m, sSwimStrength)
 
     return 0
@@ -539,7 +587,7 @@ const act_breaststroke = (m) => {
         reset_float_globals(m)
     }
 
-    Mario.set_mario_animation(m, MARIO_ANIM_SWIM_PART1)
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_SWIM_PART1)
     common_swimming_step(m, sSwimStrength)
 
     return 0
@@ -587,7 +635,7 @@ const common_swimming_step = (m, swimStrength) => {
     m.marioBodyState.headAngle[0] = approach_number(m.marioBodyState.headAngle[0], 0, 0x200, 0x200)
 
     float_surface_gfx(m)
-    set_swimming_at_surface_particles(m, PARTICLE_WAVE_TRAIL)
+    set_swimming_at_surface_particles(m, Particles.PARTICLE_WAVE_TRAIL)
 }
 
 const float_surface_gfx = (m) => {
@@ -724,31 +772,31 @@ const check_common_submerged_cancels = (m) => {
 
 const act_flutter_kick = (m) => {
     if (m.flags & Mario.MARIO_METAL_CAP) {
-        return Mario.set_mario_action(m, Mario.ACT_METAL_WATER_FALLING, 1);
+        return Mario.set_mario_action(m, Mario.ACT_METAL_WATER_FALLING, 1)
     }
 
     if (m.input & Mario.INPUT_B_PRESSED) {
-        return Mario.set_mario_action(m, Mario.ACT_WATER_PUNCH, 0);
+        return Mario.set_mario_action(m, Mario.ACT_WATER_PUNCH, 0)
     }
 
     if (!(m.input & Mario.INPUT_A_DOWN)) {
         if (m.actionTimer == 0 && sSwimStrength < 280) {
-            sSwimStrength += 10;
+            sSwimStrength += 10
         }
-        return Mario.set_mario_action(m, Mario.ACT_SWIMMING_END, 0);
+        return Mario.set_mario_action(m, Mario.ACT_SWIMMING_END, 0)
     }
 
-    m.forwardVel = approach_number(m.forwardVel, 12.0, 0.1, 0.15);
-    m.actionTimer = 1;
-    sSwimStrength = MIN_SWIM_STRENGTH;
+    m.forwardVel = approach_number(m.forwardVel, 12.0, 0.1, 0.15)
+    m.actionTimer = 1
+    sSwimStrength = MIN_SWIM_STRENGTH
 
     if (m.forwardVel < 14.0) {
         //TODO play_swimming_noise(m);
-        Mario.set_mario_animation(m, Mario.MARIO_ANIM_FLUTTERKICK);
+        Mario.set_mario_animation(m, Mario.MARIO_ANIM_FLUTTERKICK)
     }
 
-    common_swimming_step(m, sSwimStrength);
-    return 0;
+    common_swimming_step(m, sSwimStrength)
+    return 0
 }
 
 export const mario_execute_submerged_action = (m) => {
@@ -760,6 +808,8 @@ export const mario_execute_submerged_action = (m) => {
 
     m.marioBodyState.headAngle[1] = 0
     m.marioBodyState.headAngle[2] = 0
+
+    console.log(m.action)
 
     switch (m.action) {
         case Mario.ACT_WATER_IDLE:

@@ -139,6 +139,10 @@ export const MARIO_ANIM_STOP_GRAB_OBJ_WATER = 0xa3
 export const MARIO_ANIM_BACKWARDS_WATER_KB = 0x9E 
 export const MARIO_ANIM_WATER_FORWARD_KB = 0xA8 
 export const MARIO_ANIM_SHOCKED = 0x7A 
+export const MARIO_ANIM_FLUTTERKICK_WITH_OBJ = 0xA1 
+export const MARIO_ANIM_FLUTTERKICK = 0xAC 
+
+
 
 
 export const MARIO_NORMAL_CAP = 0x00000001
@@ -1151,7 +1155,6 @@ export const mario_get_floor_class = (m) => {
 }
 
 export const vec3_find_ceil = (pos, height, ceil) => {
-
     return SurfaceCollision.find_ceil(pos[0], height + 80.0, pos[2], ceil)
 }
 
@@ -1320,7 +1323,7 @@ export const transition_submerged_to_walking = m => {
 
     m.angleVel = [0, 0, 0];
 
-    if (m.heldObj === NULL) {
+    if (m.heldObj == null) {
         return set_mario_action(m, ACT_WALKING, 0);
     } else {
         return set_mario_action(m, ACT_HOLD_WALKING, 0);

@@ -90,7 +90,7 @@ const update_swimming_yaw = (m) => {
 }
 
 const update_swimming_pitch = (m) => {
-    targetPitch = -s16(252.0 * m.controller.stickY)
+    targetPitch = -int16(252.0 * m.controller.stickY)
 
     pitchVel
     if (m.faceAngle[0] < 0) {
@@ -289,7 +289,7 @@ const perform_water_full_step = (m, nextPos) => {
     if (nextPos[1] >= floorHeight) {
         if (ceilHeight - nextPos[1] >= 160.0) {
             m.pos = [...nextPos]
-            m.floor = floorWrapper
+            m.floor = floorWrapper.floor
             m.floorHeight = floorHeight
 
             if (wall != null) {
@@ -305,7 +305,7 @@ const perform_water_full_step = (m, nextPos) => {
 
         //! Water ceiling downwarp
         m.pos = [nextPos[0], ceilHeight - 160.0, nextPos[2]]
-        m.floor = floorWrapper
+        m.floor = floorWrapper.floor
         m.floorHeight = floorHeight
         return Mario.WATER_STEP_HIT_CEILING
     } else {
@@ -314,7 +314,7 @@ const perform_water_full_step = (m, nextPos) => {
         }
 
         m.pos = [nextPos[0], floorHeight, nextPos[2]]
-        m.floor = floorWrapper
+        m.floor = floorWrapper.floor
         m.floorHeight = floorHeight
         return Mario.WATER_STEP_HIT_FLOOR
     }
@@ -436,43 +436,43 @@ const act_water_action_end = (m) => {
 
 const act_swimming_end = (m) => {
     if (m.flags & Mario.MARIO_METAL_CAP) {
-        return Mario.set_mario_action(m, Mario.ACT_METAL_WATER_FALLING, 1);
+        return Mario.set_mario_action(m, Mario.ACT_METAL_WATER_FALLING, 1)
     }
 
     if (m.input & Mario.INPUT_B_PRESSED) {
-        return Mario.set_mario_action(m, ACT_WATER_PUNCH, 0);
+        return Mario.set_mario_action(m, ACT_WATER_PUNCH, 0)
     }
 
     if (m.actionTimer >= 15) {
-        return Mario.set_mario_action(m, Mario.ACT_WATER_ACTION_END, 0);
+        return Mario.set_mario_action(m, Mario.ACT_WATER_ACTION_END, 0)
     }
 
     if (check_water_jump(m)) {
-        return 1;
+        return 1
     }
 
-    if ((m.input & Mario.INPUT_A_DOWN) && m.actionTimer >= 7) {
+    if (m.input & Mario.INPUT_A_DOWN && m.actionTimer >= 7) {
         if (m.actionTimer === 7 && sSwimStrength < 280) {
-            sSwimStrength += 10;
+            sSwimStrength += 10
         }
-        return Mario.set_mario_action(m, Mario.ACT_BREASTSTROKE, 1);
+        return Mario.set_mario_action(m, Mario.ACT_BREASTSTROKE, 1)
     }
 
     if (m.actionTimer >= 7) {
-        sSwimStrength = MIN_SWIM_STRENGTH;
+        sSwimStrength = MIN_SWIM_STRENGTH
     }
 
-    m.actionTimer++;
+    m.actionTimer++
 
-    m.forwardVel -= 0.25;
-    Mario.set_mario_animation(m, MARIO_ANIM_SWIM_PART2);
-    common_swimming_step(m, sSwimStrength);
+    m.forwardVel -= 0.25
+    Mario.set_mario_animation(m, MARIO_ANIM_SWIM_PART2)
+    common_swimming_step(m, sSwimStrength)
 
-    return 0;
+    return 0
 }
 
 const check_water_jump = (m) => {
-    let probe = int32(m.pos[1] + 1.5);
+    let probe = int32(m.pos[1] + 1.5)
 
     if (m.input & Mario.INPUT_A_PRESSED) {
         if (probe >= m.waterLevel - 80 && m.faceAngle[0] >= 0 && m.controller.stickY < -60.0) {
@@ -480,15 +480,15 @@ const check_water_jump = (m) => {
 
             m.vel[1] = 62.0
 
-            if (m.heldObj === null) {
-                return  Mario.set_mario_action(m, Mario.ACT_WATER_JUMP, 0);
+            if (m.heldObj == null) {
+                return Mario.set_mario_action(m, Mario.ACT_WATER_JUMP, 0)
             } else {
-                return  Mario.set_mario_action(m, Mario.ACT_HOLD_WATER_JUMP, 0);
+                return Mario.set_mario_action(m, Mario.ACT_HOLD_WATER_JUMP, 0)
             }
         }
     }
 
-    return 0;
+    return 0
 }
 
 const act_breaststroke = (m) => {
@@ -705,7 +705,7 @@ const check_common_submerged_cancels = (m) => {
             // where your held object is the shell, but you are not in the
             // water shell swimming action. This allows you to hold the water
             // shell on land (used for cloning in DDD).
-            if (m.action === Mario.ACT_WATER_SHELL_SWIMMING && m.heldObj !== null) {
+            if (m.action === Mario.ACT_WATER_SHELL_SWIMMING && m.heldObj != null) {
                 m.heldObj.oInteractStatus = INT_STATUS_STOP_RIDING
                 m.heldObj = null
                 // TODO stop_shell_music();
@@ -720,6 +720,35 @@ const check_common_submerged_cancels = (m) => {
     }
 
     return 0
+}
+
+const act_flutter_kick = (m) => {
+    if (m.flags & Mario.MARIO_METAL_CAP) {
+        return Mario.set_mario_action(m, Mario.ACT_METAL_WATER_FALLING, 1);
+    }
+
+    if (m.input & Mario.INPUT_B_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_WATER_PUNCH, 0);
+    }
+
+    if (!(m.input & Mario.INPUT_A_DOWN)) {
+        if (m.actionTimer == 0 && sSwimStrength < 280) {
+            sSwimStrength += 10;
+        }
+        return Mario.set_mario_action(m, Mario.ACT_SWIMMING_END, 0);
+    }
+
+    m.forwardVel = approach_number(m.forwardVel, 12.0, 0.1, 0.15);
+    m.actionTimer = 1;
+    sSwimStrength = MIN_SWIM_STRENGTH;
+
+    if (m.forwardVel < 14.0) {
+        //TODO play_swimming_noise(m);
+        Mario.set_mario_animation(m, Mario.MARIO_ANIM_FLUTTERKICK);
+    }
+
+    common_swimming_step(m, sSwimStrength);
+    return 0;
 }
 
 export const mario_execute_submerged_action = (m) => {
@@ -755,7 +784,8 @@ export const mario_execute_submerged_action = (m) => {
             return act_breaststroke(m)
         case Mario.ACT_SWIMMING_END:
             return act_swimming_end(m)
-        //case Mario.ACT_FLUTTER_KICK:               return //act_flutter_kick(m);
+        case Mario.ACT_FLUTTER_KICK:
+            return act_flutter_kick(m)
         //case Mario.ACT_HOLD_BREASTSTROKE:          return //act_hold_breaststroke(m);
         //case Mario.ACT_HOLD_SWIMMING_END:          return //act_hold_swimming_end(m);
         //case Mario.ACT_HOLD_FLUTTER_KICK:          return //act_hold_flutter_kick(m);

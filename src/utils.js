@@ -45,6 +45,7 @@ export const levelIdToName = {
     1000: "Mushroom Battlefield",
     16: "Castle Grounds",
     9: "Bob-omb Battlefield",
+    7: "Hazy Maze Cave",
     5: "Cool, Cool Mountain",
     27: "Princess's Secret Slide",
     36: "Tall, Tall Mountain",

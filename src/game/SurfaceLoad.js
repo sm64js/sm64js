@@ -249,7 +249,7 @@ class SurfaceLoad {
 
     load_area_terrain(index, data, surfaceRooms, macroObjects) {
 
-        surfaceRooms = { index: 0, surfaceRooms }
+        if (surfaceRooms) surfaceRooms = { index: 0, surfaceRooms }
 
         this.gTerrainData = data  /// TODO refactor our function args to data, because we are storing it as a class variable
 

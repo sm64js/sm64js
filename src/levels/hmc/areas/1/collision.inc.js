@@ -14,6 +14,10 @@ import {
     SURFACE_VERY_SLIPPERY,
     SURFACE_NOT_SLIPPERY,
     SURFACE_WALL_MISC,
+    SURFACE_DEATH_PLANE,
+    SURFACE_NO_CAM_COLLISION,
+    SURFACE_PAINTING_WOBBLE_D0,
+    SURFACE_WOBBLING_WARP,
 } from "../../../../include/surface_terrains"
 export const hmc_seg7_collision_level = [
     ...COL_INIT(),
@@ -3402,7 +3406,7 @@ export const hmc_seg7_collision_level = [
     ...COL_TRI(182, 189, 187),
     ...COL_TRI(183, 190, 191),
     ...COL_TRI(171, 172, 184),
-    ...COL_TRI_INIT(SURFACE_VERY_SLIPPERY, 6), // death plane
+    ...COL_TRI_INIT(SURFACE_DEATH_PLANE, 6), // death plane
     ...COL_TRI(4, 5, 6),
     ...COL_TRI(4, 7, 5),
     ...COL_TRI(8, 9, 10),
@@ -3571,7 +3575,7 @@ export const hmc_seg7_collision_level = [
     ...COL_TRI(45, 54, 53),
     ...COL_TRI(163, 164, 165),
     ...COL_TRI(163, 165, 166),
-    ...COL_TRI_INIT(SURFACE_DEFAULT, 35), // no cam collision
+    ...COL_TRI_INIT(SURFACE_NO_CAM_COLLISION, 35), // no cam collision
     ...COL_TRI(66, 69, 70),
     ...COL_TRI(59, 60, 61),
     ...COL_TRI(59, 61, 62),
@@ -3607,10 +3611,10 @@ export const hmc_seg7_collision_level = [
     ...COL_TRI(80, 81, 59),
     ...COL_TRI(82, 80, 59),
     ...COL_TRI(64, 82, 59),
-    ...COL_TRI_INIT(SURFACE_DEFAULT, 2), // SURFACE_PAINTING_WOBBLE_D0
+    ...COL_TRI_INIT(SURFACE_PAINTING_WOBBLE_D0, 2), // SURFACE_PAINTING_WOBBLE_D0
     ...COL_TRI(0, 1, 2),
     ...COL_TRI(0, 3, 1),
-    ...COL_TRI_INIT(SURFACE_DEFAULT, 2), // SURFACE_WOBBLING_WARP
+    ...COL_TRI_INIT(SURFACE_WOBBLING_WARP, 2), // SURFACE_WOBBLING_WARP
     ...COL_TRI(55, 56, 57),
     ...COL_TRI(55, 58, 56),
     ...COL_TRI_STOP(),

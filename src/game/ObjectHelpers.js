@@ -68,6 +68,33 @@ export const geo_switch_anim_state = (run, node) => {
     }
 }
 
+export const geo_switch_area = (run, node) => {
+    const switchCase = node
+    if (run == 1) {
+
+        if (ObjectListProc.gMarioObject == undefined) {
+            switchCase.selectedCase = 0
+        } else {
+            ///TODO gFindFloorIncludeSurfaceIntangible = 1
+
+            const marioObj = ObjectListProc.gMarioObject
+
+            const floorWrapper = {}
+            const height = Spawn.SurfaceCollision.find_floor(marioObj.rawData[oPosX], marioObj.rawData[oPosY], marioObj.rawData[oPosZ], floorWrapper)
+
+            if (floorWrapper.floor) {
+                ObjectListProc.gMarioCurrentRoom = floorWrapper.floor.room
+                let selectedRoom = floorWrapper.floor.room - 1
+
+                if (selectedRoom >= 0) switchCase.selectedCase = selectedRoom
+            }
+
+        }
+    } else {
+        switchCase.selectedCase = 0
+    }
+}
+
 export const geo_update_layer_transparency = (run, node) => {
 
     let sp3C = []

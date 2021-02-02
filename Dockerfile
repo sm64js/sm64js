@@ -15,3 +15,4 @@ COPY src/favicon.ico ./dist/
 FROM nginx:stable-alpine
 
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html
+

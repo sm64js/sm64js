@@ -642,7 +642,7 @@ class GeoRenderer {
         const fnNode = node.wrapper.fnNode
 
         if (fnNode.func) {
-           fnNode.func.call(fnNode.funcClass, GraphNode.GEO_CONTEXT_RENDER, node.wrapper, this.gMatStack[this.gMatStackIndex])
+            fnNode.func.call(fnNode.funcClass, GraphNode.GEO_CONTEXT_RENDER, node.wrapper, this.gMatStack[this.gMatStackIndex])
         }
 
         if (node.children[node.wrapper.selectedCase]) {

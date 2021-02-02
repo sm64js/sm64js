@@ -4,4 +4,4 @@ export const LEVEL_CCM = 5
 export const LEVEL_PSS = 27
 export const LEVEL_TTM = 36
 export const LEVEL_WF = 24
-export const LEVEL_HMC = 6969
+export const LEVEL_HMC = 7

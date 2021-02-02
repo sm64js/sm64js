@@ -1,7 +1,7 @@
 const fs = require('fs')
 
 // Configure these variables to get it to work
-var level = "castle_grounds" // level name in sm64ex directory
+var level = "hmc" // level name in sm64ex directory
 var snum = 1 // used as a counter variable
 var num = 32 // number of model.inc.js files there are
 var areaNum = 1 // target area number
@@ -43,14 +43,16 @@ const renderModes = {
 	"G_RM_AA_ZB_OPA_INTER,G_RM_NOOP2": "G_RM_AA_ZB_OPA_INTER_NOOP2",
 	"G_RM_AA_ZB_XLU_DECAL,G_RM_AA_ZB_XLU_DECAL2": "G_RM_AA_ZB_XLU_DECAL_DECAL2",
 	"G_RM_AA_ZB_XLU_SURF,G_RM_AA_ZB_XLU_SURF2": "G_RM_AA_ZB_XLU_SURF_SURF2",
+	"G_RM_AA_ZB_XLU_SURF,G_RM_NOOP2": "G_RM_AA_ZB_XLU_SURF_NOOP2",
 	"G_RM_AA_ZB_OPA_SURF,G_RM_AA_ZB_OPA_SURF2": "G_RM_AA_ZB_OPA_SURF_SURF2",
 	"G_RM_AA_ZB_OPA_DECAL,G_RM_AA_ZB_OPA_DECAL2": "G_RM_AA_ZB_OPA_DECAL_DECAL2",
 	"G_RM_AA_ZB_XLU_INTER,G_RM_AA_ZB_XLU_INTER2": "G_RM_AA_ZB_XLU_INTER_INTER2",
 	"G_RM_FOG_SHADE_A,G_RM_AA_ZB_OPA_SURF2": "G_RM_FOG_SHADE_A_AA_ZB_OPA_SURF2",
 	"G_RM_FOG_SHADE_A,G_RM_AA_ZB_TEX_EDGE2": "G_RM_FOG_SHADE_A_AA_ZB_TEX_EDGE2",
 	"G_RM_FOG_SHADE_A,G_RM_AA_ZB_OPA_DECAL2": "G_RM_FOG_SHADE_A_AA_ZB_OPA_DECAL2",
-	"G_RM_AA_ZB_OPA_SURF,G_RM_NOOP2": "G_RM_AA_ZB_OPA_SURF_SURF2",  ///not exact match but seems to work
-	"G_RM_AA_ZB_OPA_DECAL,G_RM_NOOP2": "G_RM_AA_ZB_OPA_DECAL_DECAL2",  ///not exact match but seems to work
+	"G_RM_FOG_SHADE_A,G_RM_AA_ZB_XLU_SURF2": "G_RM_FOG_SHADE_A_AA_ZB_XLU_SURF2",
+	"G_RM_AA_ZB_OPA_SURF,G_RM_NOOP2": "G_RM_AA_ZB_OPA_SURF_NOOP2", 
+	"G_RM_AA_ZB_OPA_DECAL,G_RM_NOOP2": "G_RM_AA_ZB_OPA_DECAL_NOOP2", 
 }
 
 const convertRenderModeLine = (line) => {
@@ -63,7 +65,7 @@ const convertRenderModeLine = (line) => {
 		console.log(line)
 		return line
 	}
-	return line
+	return line.substring(0, index + 1) + jsRenderMode + "),"
 }
 
 // Preemptively make the main directory for output to avoid issues.
@@ -80,7 +82,7 @@ snum = snum + 1
 }
 
 function convert(MDTY) {
-	var input = require('os').homedir() + '/sm64ex/levels/' + level + '/areas/' + areaNum + '/' + snum + '/' + MDTY + '.inc.c' // directory of each model file
+	var input = require('os').homedir() + '/Programming/sm64pc/levels/' + level + '/areas/' + areaNum + '/' + snum + '/' + MDTY + '.inc.c' // directory of each model file
 	if (!fs.existsSync(input)) {return;}
 	let inputStr = fs.readFileSync(input, 'utf8')
 	inputStr = inputStr.replace(/\r/g, "")

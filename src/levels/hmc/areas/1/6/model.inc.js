@@ -1,7 +1,8 @@
 import * as Gbi from "../../../../../include/gbi"
 import {
-    cave_09001000,
-    cave_09003000} from "../../../../../textures/cave"
+	cave_09001000,
+	cave_09003000
+} from "../../../../../textures/cave"
 const hmc_seg7_vertex_0700E5B0 = [
 	{ pos: [ 6244, 154, 2560 ], flag: 0, tc: [ 4056, -3098 ], color: [ 255, 255, 255, 255 ] },
 	{ pos: [ 5579, 154, 2560 ], flag: 0, tc: [ -2586, -3098 ], color: [ 255, 255, 255, 255 ] },
@@ -191,7 +192,7 @@ export const hmc_seg7_dl_0700EE38 = [
 
 export const hmc_seg7_dl_0700EF00 = [
 	Gbi.gsDPSetCycleType(Gbi.G_CYC_2CYCLE),
-	Gbi.gsDPSetRenderMode(Gbi.G_RM_FOG_SHADE_A_AA_ZB_OPA_SURF2),
+	Gbi.gsDPSetRenderMode(Gbi.G_RM_FOG_SHADE_A_AA_ZB_TEX_EDGE2),
 	Gbi.gsDPSetFogColor(0, 0, 0, 255),
 	Gbi.gsSPFogPosition(960, 1000),
 	Gbi.gsSPSetGeometryMode(Gbi.G_FOG),
@@ -207,7 +208,7 @@ export const hmc_seg7_dl_0700EF00 = [
 	Gbi.gsSPDisplayList(hmc_seg7_dl_0700EE38),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
 	Gbi.gsDPSetCycleType(Gbi.G_CYC_1CYCLE),
-	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF_SURF2),
+	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_TEX_EDGE_NOOP2),
 	Gbi.gsSPClearGeometryMode(Gbi.G_FOG),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
 	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),

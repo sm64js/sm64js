@@ -1,6 +1,6 @@
 import * as Gbi from "../../../../../include/gbi"
 import {
-    cave_0900C000
+	cave_0900C000
 } from "../../../../../textures/cave"
 const hmc_seg7_lights_07014CB8 = Gbi.gdSPDefLights1(
 	    0x23, 0x2b, 0x14,

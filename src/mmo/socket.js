@@ -108,6 +108,18 @@ socket.onopen = () => {
         const rootMsg = new RootMsg()
         rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
         sendData(rootMsg.serializeBinary())
+    } else if (process.env.PRODUCTION == undefined) {
+        /// send access code to server
+        const accessCodeMsg = new AccessCodeMsg()
+        accessCodeMsg.setAccessCode("122345")
+        accessCodeMsg.setType("discord")
+        const initializationMsg = new InitializationMsg()
+        initializationMsg.setAccessCodeMsg(accessCodeMsg)
+        const sm64jsMsg = new Sm64JsMsg()
+        sm64jsMsg.setInitializationMsg(initializationMsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+        sendData(rootMsg.serializeBinary())
     }
 
     socket.onmessage = async (message) => {
@@ -448,7 +460,7 @@ const discordOAuthURL = "https://discord.com/api/oauth2/authorize?client_id=" + 
 const google_client_id = process.env.GOOGLE_CLIENT_ID + ".apps.googleusercontent.com"
 const googleOAuthURL = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=" + google_client_id + "&redirect_uri=" + redirect_uri + "&scope=email" 
 
-if (url.searchParams.has('code')) document.getElementById("signinButtons").hidden = true
+if (url.searchParams.has('code') || process.env.PRODUCTION == undefined) document.getElementById("signinButtons").hidden = true
 
 document.getElementById("switchCustom").addEventListener('click', (e) => {
     e.preventDefault()

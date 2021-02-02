@@ -265,7 +265,7 @@ import { mist_seg3_texture_03000080 } from "./actors/mist/model.inc"
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 22
+const textureVersion = 23
 
 const loadDataIntoGame = (data) => {
 

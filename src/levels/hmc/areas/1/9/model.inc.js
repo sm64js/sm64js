@@ -1,6 +1,7 @@
 import * as Gbi from "../../../../../include/gbi"
 import {
-    cave_09007000} from "../../../../../textures/cave"
+	cave_09007000
+} from "../../../../../textures/cave"
 const hmc_seg7_vertex_0700FAB0 = [
 	{ pos: [ 1137, 358, 6543 ], flag: 0, tc: [ 990, 990 ], color: [ 255, 255, 255, 255 ] },
 	{ pos: [ 1014, 563, 6543 ], flag: 0, tc: [ 0, 0 ], color: [ 255, 255, 255, 255 ] },

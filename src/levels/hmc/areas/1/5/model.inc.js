@@ -1,16 +1,17 @@
 import * as Gbi from "../../../../../include/gbi"
 import {
-    cave_09000000,
-    cave_09001800,
-    cave_09003800,
-    cave_09004800,
-    cave_09006800,
-    cave_09007800,
-    cave_09008800,
-    cave_09009800} from "../../../../../textures/cave"
+	cave_09000000,
+	cave_09001800,
+	cave_09003800,
+	cave_09004800,
+	cave_09006800,
+	cave_09007800,
+	cave_09008800,
+	cave_09009800
+} from "../../../../../textures/cave"
 import {
 	hmc_seg7_texture_07000000,
-    hmc_seg7_texture_07001000,
+	hmc_seg7_texture_07001000,
 } from "../../../texture.inc"
 const hmc_seg7_lights_07009460 = Gbi.gdSPDefLights1(
 	    0x79, 0x79, 0x79,
@@ -1641,7 +1642,7 @@ export const hmc_seg7_dl_0700E448 = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
 	Gbi.gsSPDisplayList(hmc_seg7_dl_0700E428),
 	Gbi.gsDPSetCycleType(Gbi.G_CYC_1CYCLE),
-	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF_SURF2),
+	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF_NOOP2),
 	Gbi.gsSPClearGeometryMode(Gbi.G_FOG),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
 	Gbi.gsSPEndDisplayList(),

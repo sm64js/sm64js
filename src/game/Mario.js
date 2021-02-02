@@ -18,7 +18,6 @@ import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
 import { mario_execute_cutscene_action } from "./MarioActionsCutscene"
 import { gameData as socketGameData } from "../mmo/socket"
 import { int16, sins, coss } from "../utils"
-import { LEVEL_CCM, LEVEL_TTM, LEVEL_WF, LEVEL_CTF00 } from "../levels/level_defines_constants"
 
 ////// Mario Constants
 export const ANIM_FLAG_NOLOOP = (1 << 0) // 0x01
@@ -819,6 +818,7 @@ export const execute_mario_action = (m) => {
         m.marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
         mario_reset_bodystate(m)
         update_mario_inputs(m)
+        Interact.mario_handle_special_floors(m)
         Interact.mario_process_interactions(m)
 
         let inLoop = 1
@@ -889,30 +889,6 @@ const update_mario_joystick_inputs = (m) => {
     m.intendedYaw = m.intendedYaw < -32768 ? m.intendedYaw + 65536 : m.intendedYaw
 }
 
-const warp_death_plane = (m) => {
-    switch (Area.gCurrLevelNum) {
-        case (LEVEL_CCM): { // CCM
-            if (m.pos[1] <= -7166.0) m.pos = [-1512, 2560, -2305]
-            break
-        }
-        case (LEVEL_TTM): { // TTM
-            if (m.pos[1] <= -7230.0) m.pos = [102, -4332, 5734]
-            break
-        }
-        case (LEVEL_CTF00): { // CTF00
-            if (m.pos[1] <= -6500.0) m.pos = [0, 3461, 0]
-            break
-        }
-        case (LEVEL_WF): { // WF
-            if (m.pos[1] <= -2000.0) m.pos = [2600, 1256, 5120]
-            break
-        }
-        default: {
-            break
-        }
-    }
-}
-
 const update_mario_geometry_inputs = (m) => {
 
     m.old_floor = m.floor
@@ -969,7 +945,6 @@ const update_mario_geometry_inputs = (m) => {
         m.parachuting = true
     }
 
-    warp_death_plane(m)
 }
 
 export const mario_floor_is_slippery = (m) => {

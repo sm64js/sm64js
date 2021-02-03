@@ -3,7 +3,7 @@ import { intro_geo_0002D0, intro_geo_00035C } from "./geo"
 import { WARP_TRANSITION_FADE_INTO_COLOR, WARP_TRANSITION_FADE_FROM_STAR } from "../../game/Area"
 import { level_main_scripts_entry } from "../scripts"
 import { lvl_intro_update } from "../../menu/level_select_menu"
-import { LEVEL_CASTLE_GROUNDS, LEVEL_CASTLE_COURTYARD, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS, LEVEL_TTM, LEVEL_WF, LEVEL_HMC, LEVEL_BBH } from "../level_defines_constants"
+import { LEVEL_CASTLE_GROUNDS, LEVEL_CASTLE_COURTYARD, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS, LEVEL_TTM, LEVEL_WF, LEVEL_HMC, LEVEL_BBH, LEVEL_CASTLE_INSIDE } from "../level_defines_constants"
 
 const getSelectedLevel = () => {
     const mapSelect = document.getElementById("mapSelect").value
@@ -11,6 +11,7 @@ const getSelectedLevel = () => {
     switch (mapSelect) {
         case "Castle Grounds": return LEVEL_CASTLE_GROUNDS
         case "Castle Courtyard": return LEVEL_CASTLE_COURTYARD
+        case "Castle Inside": return LEVEL_CASTLE_INSIDE
         case "Bob-omb Battlefield": return LEVEL_BOB
         case "Cool, Cool Mountain": return LEVEL_CCM
         case "Princess's Secret Slide": return LEVEL_PSS

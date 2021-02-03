@@ -132,6 +132,8 @@ export const assets = {
 "textures/outside/castle_grounds_textures.0A800.rgba16.png": [32,32,2048,{"jp":[3527344,43008],"us":[3534096,43008],"eu":[3407696,43008],"sh":[3382064,43008]}],
 "textures/outside/castle_grounds_textures.0B000.rgba16.png": [16,32,1024,{"jp":[3527344,45056],"us":[3534096,45056],"eu":[3407696,45056],"sh":[3382064,45056]}],
 "textures/outside/castle_grounds_textures.0B400.rgba16.png": [32,32,2048,{"jp":[3527344,46080],"us":[3534096,46080],"eu":[3407696,46080],"sh":[3382064,46080]}],
+"textures/outside/castle_grounds_textures.00800.rgba16.png": [32,32,2048,{"jp":[3527344,2048],"us":[3534096,2048],"eu":[3407696,2048],"sh":[3382064,2048]}],
+"textures/outside/castle_grounds_textures.08800.rgba16.png": [32,32,2048,{"jp":[3527344,34816],"us":[3534096,34816],"eu":[3407696,34816],"sh":[3382064,34816]}],
 "textures/outside/castle_grounds_textures.0BC00.ia16.png": [32,32,2048,{"jp":[3323408,45056],"us":[3330160,45056],"eu":[3203760,45056],"sh":[3178128,45056]}],
 
 "textures/generic/bob_textures.00000.rgba16.png": [32, 32, 2048, { "jp": [3323408, 0], "us": [3330160, 0], "eu": [3203760, 0], "sh": [3178128, 0] }],

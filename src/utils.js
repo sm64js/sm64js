@@ -44,6 +44,7 @@ export const levelIdToName = {
     1001: "CTF/Race Map",
     1000: "Mushroom Battlefield",
     16: "Castle Grounds",
+    26: "Castle Courtyard",
     9: "Bob-omb Battlefield",
     7: "Hazy Maze Cave",
     4: "Big Boo's Haunt",

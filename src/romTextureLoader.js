@@ -62,6 +62,8 @@ import {
     outside_0900B400,
     outside_0900BC00,
     outside_0900A800,
+    outside_09000800,
+    outside_09008800
 } from "./textures/outside"
 
 import { 
@@ -295,7 +297,7 @@ import { mist_seg3_texture_03000080 } from "./actors/mist/model.inc"
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 24
+const textureVersion = 25
 
 const loadDataIntoGame = (data) => {
 
@@ -384,6 +386,8 @@ const loadDataIntoGame = (data) => {
     outside_0900B000.push(...data['textures/outside/castle_grounds_textures.0B000.rgba16.png'].data)
     outside_0900B400.push(...data['textures/outside/castle_grounds_textures.0B400.rgba16.png'].data)
     outside_0900A800.push(...data['textures/outside/castle_grounds_textures.0A800.rgba16.png'].data)
+    outside_09000800.push(...data['textures/outside/castle_grounds_textures.00800.rgba16.png'].data)
+    outside_09008800.push(...data['textures/outside/castle_grounds_textures.08800.rgba16.png'].data)
     outside_0900BC00.push(...data['textures/outside/castle_grounds_textures.0BC00.ia16.png'].data)
 
 	grass_09000000.push(...data['textures/grass/wf_textures.00000.rgba16.png'].data)

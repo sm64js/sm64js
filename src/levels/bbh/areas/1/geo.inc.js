@@ -1,6 +1,7 @@
 import { GeoLayoutInstance as Geo } from "../../../../engine/GeoLayout"
 import { CameraInstance as Camera } from "../../../../game/Camera"
 import { geo_skybox_main } from "../../../../game/LevelGeo"
+import { geo_switch_area } from "../../../../game/ObjectHelpers"
 
 import { bbh_seg7_dl_070075A8 } from "./1/model.inc"
 import { bbh_seg7_dl_07007940 } from "./2/model.inc"
@@ -495,7 +496,7 @@ export const geo_bbh_000F00 = [
 	{ command: Geo.open_node },
 	{ command: Geo.node_camera, args: [4, 0, 2000, 6000, 0, 0, 0, Camera.geo_camera_main]},
 	{ command: Geo.open_node },
-	{ command: Geo.node_switch_case, args: [32, Camera.geo_switch_area]},
+	{ command: Geo.node_switch_case, args: [32, geo_switch_area]},
 	{ command: Geo.open_node },
 	{ command: Geo.branch, args: [1,geo_bbh_000670]},
 	{ command: Geo.branch, args: [1,geo_bbh_0006B0]},

@@ -9,14 +9,14 @@ const fs = require('fs')
 
 // Configure these variables to get it to work
 
-var WorkFolder = "sm64js"
+var WorkFolder = "Documents/sm64js"
 
 //This is where it will get info on missing assets.
 var CWorkFolder = "sm64ex"
 
 //Levels to check & patch
 var LEVELS = [
-	'ttm',
+	'bbh',
 	//'ccm',
 ]
 
@@ -171,7 +171,7 @@ while (idx < LEVELS.length){
 	if (fs.existsSync(LevelDirectory + "model.inc.js")) {console.log(`Found : ${LevelDirectory}model.inc.js`)}
 	for (LOOP = 1; LOOP <= 16; LOOP++) {
 		addMdlToList(LevelDirectory + "areas/"  + LOOP+"/model.inc.js")
-		for (LOOP2 = 1; LOOP2 <= 32; LOOP2++) {
+		for (LOOP2 = 1; LOOP2 <= 39; LOOP2++) {
 			addMdlToList(LevelDirectory + "areas/" + LOOP+"/"+LOOP2+"/model.inc.js")
 			for (LOOP3 = 1; LOOP3 <= 8; LOOP3++) {
 				addMdlToList(LevelDirectory + "areas/" + LOOP+"/"+LOOP2+"/"+LOOP3+".inc.js")

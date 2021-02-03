@@ -5,7 +5,6 @@ import { level_main_scripts_entry } from "../scripts"
 import { lvl_intro_update } from "../../menu/level_select_menu"
 import { getSelectedLevel } from "../../utils"
 
-
 const level_intro_entry_2 = () => {
     return [
         { command: LevelCommands.init_level },

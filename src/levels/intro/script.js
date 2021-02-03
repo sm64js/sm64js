@@ -3,7 +3,7 @@ import { intro_geo_0002D0, intro_geo_00035C } from "./geo"
 import { WARP_TRANSITION_FADE_INTO_COLOR, WARP_TRANSITION_FADE_FROM_STAR } from "../../game/Area"
 import { level_main_scripts_entry } from "../scripts"
 import { lvl_intro_update } from "../../menu/level_select_menu"
-import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS, LEVEL_TTM, LEVEL_WF, LEVEL_HMC } from "../level_defines_constants"
+import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS, LEVEL_TTM, LEVEL_WF, LEVEL_HMC, LEVEL_BBH } from "../level_defines_constants"
 
 const getSelectedLevel = () => {
     const mapSelect = document.getElementById("mapSelect").value
@@ -16,6 +16,7 @@ const getSelectedLevel = () => {
         case "Tall, Tall Mountain": return LEVEL_TTM
         case "Whomps Fortress": return LEVEL_WF
         case "Hazy Maze Cave": return LEVEL_HMC
+        case "Big Boo's Haunt": return LEVEL_BBH
     }
 
     return LEVEL_CASTLE_GROUNDS

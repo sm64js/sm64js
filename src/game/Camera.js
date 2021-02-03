@@ -341,7 +341,9 @@ class Camera {
         tempVec[1] = (to[1] - from[1]) * scale + from[1]
         tempVec[2] = (to[2] - from[2]) * scale + from[2]
 
-        dst = [...tempVec]
+        dst[0] = tempVec[0]
+        dst[1] = tempVec[1]
+        dst[2] = tempVec[2]
     }
 
     approach_camera_height(c, goal, inc) {

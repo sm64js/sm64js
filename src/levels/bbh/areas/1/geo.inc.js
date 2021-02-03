@@ -462,7 +462,7 @@ export const geo_bbh_000F00 = [
 	{ command: Geo.open_node },
 	{ command: Geo.node_camera, args: [4, 0, 2000, 6000, 0, 0, 0, Camera.geo_camera_main]},
 	{ command: Geo.open_node },
-//	{ command: Geo.node_switch_case, args: [32, geo_switch_area]},
+	{ command: Geo.node_switch_case, args: [32, Camera.geo_switch_area]},
 	{ command: Geo.open_node },
 	{ command: Geo.close_node },
 	{ command: Geo.node_render_object_parent },

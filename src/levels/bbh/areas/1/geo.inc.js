@@ -54,6 +54,7 @@ export const geo_bbh_000670 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07008B58] },
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_07008EA8] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_0006B0 = [
@@ -65,6 +66,7 @@ export const geo_bbh_0006B0 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_0700B9E0] },
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_0700BBF8] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_0006E8 = [
@@ -78,6 +80,7 @@ export const geo_bbh_0006E8 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07012510] },
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_070126E8] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000730 = [
@@ -86,6 +89,7 @@ export const geo_bbh_000730 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_0700F510] },
 	{ command: Geo.display_list, args: [Geo.LAYER_ALPHA, bbh_seg7_dl_0700F848] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000750 = [
@@ -93,6 +97,7 @@ export const geo_bbh_000750 = [
 	{ command: Geo.open_node },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07011120] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000768 = [
@@ -106,6 +111,7 @@ export const geo_bbh_000768 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07012510] },
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_070126E8] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_0007B0 = [
@@ -114,6 +120,7 @@ export const geo_bbh_0007B0 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_070139A8] },
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_07013BE8] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_0007D0 = [
@@ -124,6 +131,7 @@ export const geo_bbh_0007D0 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_070156E0] },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07015A20] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000800 = [
@@ -133,6 +141,7 @@ export const geo_bbh_000800 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07017570] },
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_07017788] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000828 = [
@@ -144,6 +153,7 @@ export const geo_bbh_000828 = [
 //	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
 //	{ command: Geo.node_generated, args: [0x0401, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000860 = [
@@ -153,6 +163,7 @@ export const geo_bbh_000860 = [
 //	{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
 //	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000888 = [
@@ -162,6 +173,7 @@ export const geo_bbh_000888 = [
 //	{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
 //	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_0008B0 = [
@@ -173,6 +185,7 @@ export const geo_bbh_0008B0 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_0701EEC8] },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_0701F070] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_0008E8 = [
@@ -190,6 +203,7 @@ export const geo_bbh_0008E8 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_0700B9E0] },
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_0700BBF8] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000950 = [
@@ -209,6 +223,7 @@ export const geo_bbh_000950 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07012510] },
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_070126E8] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_0009C8 = [
@@ -223,6 +238,7 @@ export const geo_bbh_0009C8 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_0700F510] },
 	{ command: Geo.display_list, args: [Geo.LAYER_ALPHA, bbh_seg7_dl_0700F848] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000A18 = [
@@ -236,6 +252,7 @@ export const geo_bbh_000A18 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_07008EA8] },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07011120] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000A60 = [
@@ -255,6 +272,7 @@ export const geo_bbh_000A60 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07012510] },
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_070126E8] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000AD8 = [
@@ -269,6 +287,7 @@ export const geo_bbh_000AD8 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_070139A8] },
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_07013BE8] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000B28 = [
@@ -285,6 +304,7 @@ export const geo_bbh_000B28 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_070156E0] },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07015A20] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000B88 = [
@@ -302,6 +322,7 @@ export const geo_bbh_000B88 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_0701EEC8] },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_0701F070] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000BF0 = [
@@ -315,6 +336,7 @@ export const geo_bbh_000BF0 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_0700F510] },
 	{ command: Geo.display_list, args: [Geo.LAYER_ALPHA, bbh_seg7_dl_0700F848] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000C38 = [
@@ -329,6 +351,7 @@ export const geo_bbh_000C38 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07017570] },
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_07017788] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000C88 = [
@@ -345,6 +368,7 @@ export const geo_bbh_000C88 = [
 //	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
 //	{ command: Geo.node_generated, args: [0x0401, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000CE8 = [
@@ -356,6 +380,7 @@ export const geo_bbh_000CE8 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_0700D7E0] },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07011120] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000D20 = [
@@ -369,6 +394,7 @@ export const geo_bbh_000D20 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07012510] },
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_070126E8] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000D68 = [
@@ -382,6 +408,7 @@ export const geo_bbh_000D68 = [
 //	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
 //	{ command: Geo.node_generated, args: [0x0401, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000DB0 = [
@@ -394,6 +421,7 @@ export const geo_bbh_000DB0 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_0701EEC8] },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_0701F070] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000DF0 = [
@@ -408,6 +436,7 @@ export const geo_bbh_000DF0 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_0701EEC8] },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_0701F070] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000E40 = [
@@ -420,6 +449,7 @@ export const geo_bbh_000E40 = [
 //	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
 //	{ command: Geo.node_generated, args: [0x0401, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000E80 = [
@@ -430,6 +460,7 @@ export const geo_bbh_000E80 = [
 //	{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
 //	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const geo_bbh_000EB0 = [
@@ -444,6 +475,8 @@ export const geo_bbh_000EB0 = [
 //	{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
 //	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
+	{ command: Geo.return },
+
 ]
 
 export const geo_bbh_000F00 = [
@@ -498,7 +531,6 @@ export const geo_bbh_000F00 = [
 	{ command: Geo.branch, args: [1,geo_bbh_000EB0]},
 	{ command: Geo.close_node },
 	{ command: Geo.node_render_object_parent },
-//	{ command: Geo.node_generated, args: [0, geo_envfx_main]},
 	{ command: Geo.close_node },
 	{ command: Geo.close_node },
 	{ command: Geo.close_node },

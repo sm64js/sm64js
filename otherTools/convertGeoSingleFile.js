@@ -4,15 +4,15 @@ const fs = require('fs')
 //You no longer need to touch snum or num, it checks if the files exist.
 
 // Configure these variables to get it to work
-var level = "castle_inside" // level name in sm64ex directory
+var level = "bits" // level name in sm64ex directory
 var baseGeo = true // whether you're converting the base geo.inc or one within a model directory
 var snum = 1 // used as a counter variable (Keep 1!)
-var num = 26 // number of model.inc.js files there are
+var num = 32 // number of model.inc.js files there are
 var areaNum = 1 // target area number
 var mainDir = __dirname + '/converted/' + level + '/areas/' + areaNum + '/' // directory to put models in
-var inputBase = require('os').homedir() + '/sm64ex/levels/castle_inside/areas/1/geo.inc.c' // directory of each model file
+var inputBase = require('os').homedir() + '/sm64ex/levels/bits/areas/1/geo.inc.c' // directory of each model file
 
-const mydir = require('os').homedir() + '/sm64ex/levels/castle_inside/areas/1/'
+const mydir = require('os').homedir() + '/sm64ex/levels/bits/areas/1/'
 
 //Not sure whether we need to skip commands.
 const skipCommands = [
@@ -105,8 +105,8 @@ function CompileGeo(lines,AreaDir,isBase = false) {
 			} else if (lineParse.trim().slice(0, 20) == 'GEO_NODE_SCREEN_AREA') { //dl
 				const scrArea = lineParse.trim().slice(21, lineParse.trim().indexOf('),'))
 				var ScrAreaFIXED = ` args: [${scrArea}]`
-				ScrAreaFIXED = ScrAreaFIXED.replace("SCREEN_WIDTH", "canvas.width") // Fix the screen area arguments. Cheap method.
-				ScrAreaFIXED = ScrAreaFIXED.replace("SCREEN_HEIGHT", "canvas.height") // Fix the screen area arguments. Cheap method.
+				ScrAreaFIXED = ScrAreaFIXED.replace(/SCREEN_WIDTH/g, "canvas.width") // Fix the screen area arguments. Cheap method.
+				ScrAreaFIXED = ScrAreaFIXED.replace(/SCREEN_HEIGHT/g, "canvas.height") // Fix the screen area arguments. Cheap method.
 				outputStr += `\t{ `
 				outputStr += `command: Geo.node_screen_area,`
 				outputStr += ScrAreaFIXED
@@ -188,4 +188,4 @@ while (snum <= num) {
 	snum = snum + 1
 }*/
 
-fs.writeFileSync(__dirname + '/geo.inc.js', CompileGeo(ReadFile(inputBase)))
+fs.writeFileSync(__dirname + '/converted/geo.inc.js', CompileGeo(ReadFile(inputBase)))

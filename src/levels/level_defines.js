@@ -9,7 +9,7 @@ import { level_wf_entry } from "./wf/script"
 import { level_hmc_entry } from "./hmc/script"
 import { level_bbh_entry } from "./bbh/script"
 import { level_castle_courtyard_entry } from "./castle_courtyard/script"
-import { level_castle_inside_entry } from "./castle_inside/script"
+import { level_thi_entry } from "./thi/script"
 
 export const level_defines_list = [
     {
@@ -22,7 +22,7 @@ export const level_defines_list = [
     },
     {
         command: LevelCommands.jump_if,
-        args: [LevelCommands.OP_EQ, LEVEL_CASTLE_INSIDE, level_castle_inside_entry]
+        args: [LevelCommands.OP_EQ, LEVEL_CASTLE_INSIDE, level_thi_entry]
     },
     {
         command: LevelCommands.jump_if,

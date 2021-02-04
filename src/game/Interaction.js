@@ -396,18 +396,6 @@ const mario_stop_riding_and_holding = (m) => {
     }
 }
 
-const able_to_grab_object = (m,o) => {
-    if(m.action == Mario.ACT_DIVE_SLIDE || m.action == Mario.ACT_DIVE) {
-        if(!(o.oInteractionSubtype & INT_SUBTYPE_GRABS_MARIO)) {
-            return true
-        }
-    } else if (m.action == Mario.ACT_PUNCHING || m.action == Mario.ACT_MOVE_PUNCHING) { 
-        if(m.actionArg < 2) {
-            return true
-        }
-    }
-}
-
 const attack_object = (o, interaction) => {
     let attackType = 0
 

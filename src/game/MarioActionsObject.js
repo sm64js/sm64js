@@ -142,6 +142,40 @@ const act_punching = (m) => {
 
 }
 
+const act_picking_up = (m) => {
+
+    if (m.input & Mario.INPUT_UNKNOWN_10) {
+        return Mario.drop_and_set_mario_action(m,Mario.ACT_SHOCKWAVE_BOUNCE,0)
+    }
+
+    if (m.input & (Mario.INPUT_OFF_FLOOR)) {
+        return Mario.drop_and_set_mario_action(m,Mario.Mario.ACT_FREEFALL,0)
+    }
+
+    if (m.actionState == 0 && Mario.is_anim_at_end(m)) {
+        Mario.mario_grab_used_object(m) // TODO
+        // play sound HRMM
+        m.actionState = 1
+    }
+
+    if (m.actionState == 1) {
+        if (m.heldObj.oInteractionSubtype /*TODO*/ & Mario.INT_SUBTYPE_GRABS_MARIO /*TODO*/) {
+            m.marioBodyState.grabPos = GRAB_POS_HEAVY_OBJ
+            Mario.set_mario_animation(m,Mario.MARIO_ANIM_GRAB_HEAVY_OBJECT)
+            if (Mario.is_anim_at_end(m)) {
+                Mario.set_mario_action(m,Mario.ACT_HOLD_HEAVY_IDLE,0)
+            }
+        } else {
+            m.marioBodyState.grabPos = GRAB_POS_LIGHT_OBJ
+            Mario.set_mario_animation(m,Mario.MARIO_ANIM_PICK_UP_LIGHT_OBJ)
+            if(Mario.is_anim_at_end(m)) {
+                Mario.set_mario_action(m,Mario.ACT_HOLD_IDLE,0)
+            }
+        }
+    }
+
+}
+
 const animated_stationary_ground_step = (m, animation, endAction) => {
     stationary_ground_step(m)
     Mario.set_mario_animation(m, animation)

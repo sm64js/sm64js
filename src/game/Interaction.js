@@ -342,6 +342,72 @@ const push_mario_out_of_object = (m, o, padding) => {
     }
 }
 
+const mario_stop_riding_object = (m) => {
+    if(m.riddenObj != null) {
+        m.riddenObj.oInteractStatus = INT_STATUS_STOP_RIDING
+        //stop shell music
+        m.riddenObj = null
+    }
+}
+
+const mario_grab_used_object = (m) => {
+    if (m.heldObj == null) {
+        m.heldObj = m.usedObj
+        obj_set_held_state(m.heldObj,bhvCarrySomething3)
+    }
+}
+
+const mario_drop_held_object = (m) => {
+    if(m.heldObj != null) {
+        // if shell stop shell music
+        obj_set_held_state(m.heldObj,bhvCarrySomething4)
+
+        m.heldObj.oPosX = m.marioBodyState.heldObjLastPosition[0]
+        m.heldObj.oPosY = m.pos[1]
+        m.heldObj.oPosZ = m.marioBodyState.heldObjLastPosition[2]
+
+        m.heldObj.oMoveAngleYaw = m.faceAngle[1]
+
+        m.heldObj = null
+    }
+}
+
+const mario_throw_held_object = (m) => {
+    if(m.heldObj != null) {
+        // if shell stop shell music
+    }
+    obj_set_held_state(m.heldObj,bhvCarrySomething5)
+
+    m.heldObj.oPosX = m.marioBodyState.heldObjLastPosition[0] + 32 * Math.sin(m.faceAngle[1])
+    m.heldObj.oPosY = m.pos[1]
+    m.heldObj.oPosZ = m.marioBodyState.heldObjLastPosition[2] + 32 * Math.cos(m.faceAngle[1])
+
+    m.heldObj.oMoveAngleYaw = m.faceAngle[1]
+
+    m.heldObj = null
+}
+
+const mario_stop_riding_and_holding = (m) => {
+    mario_drop_held_object(m)
+    mario_stop_riding_object(m)
+    if(m.action == Mario.ACT_RIDING_HOOT) {
+        m.usedObj.oInteractStatus = 0
+        // m.usedObj.oHootMarioReleaseTime = gGlobalTimer
+    }
+}
+
+const able_to_grab_object = (m,o) => {
+    if(m.action == Mario.ACT_DIVE_SLIDE || m.action == Mario.ACT_DIVE) {
+        if(!(o.oInteractionSubtype & INT_SUBTYPE_GRABS_MARIO)) {
+            return true
+        }
+    } else if (m.action == Mario.ACT_PUNCHING || m.action == Mario.ACT_MOVE_PUNCHING) { 
+        if(m.actionArg < 2) {
+            return true
+        }
+    }
+}
+
 const attack_object = (o, interaction) => {
     let attackType = 0
 

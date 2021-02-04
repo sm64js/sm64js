@@ -409,6 +409,9 @@ export const init_marios = () => {
         healCounter: 0,
         capTimer: 0,
         quicksandDepth: 0.0,
+        heldObj = null,
+        riddenObj = null,
+        usedObj = null,
         area: Area.gCurrentArea,
         marioObj: ObjectListProcessor.gMarioObject,
         faceAngle: [ ...Area.gMarioSpawnInfo.startAngle ],
@@ -503,7 +506,8 @@ export const check_common_action_exits = (m) => {
 
 
 export const drop_and_set_mario_action = (m, action, actionArg) => {
-    //drop item
+    mario_stop_riding_and_holding(m) // TODO
+
     return set_mario_action(m, action, actionArg)
 }
 

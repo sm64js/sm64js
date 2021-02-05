@@ -1,10 +1,13 @@
 import * as Mario from "./Mario"
+import { AreaInstance as Area } from "./Area"
 import * as MarioConstants from "../include/mario_constants"
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
 import { atan2s } from "../engine/math_util"
 import { sins, coss, int16 } from "../utils"
 import { gLinker } from "./Linker"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
+import { SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND } from "../include/surface_terrains"
+import { LEVEL_CCM, LEVEL_TTM, LEVEL_WF, LEVEL_HMC } from "../levels/level_defines_constants"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
 export const INTERACT_GRABBABLE      /* 0x00000002 */ = (1 << 1)
@@ -112,6 +115,55 @@ let sInvulnerable = false
 
 const reset_mario_pitch = (m) => {
     /// TODO: WATER JUMP || SHOT FROM CANNON || ACT_FLYING
+}
+
+const check_death_barrier = (m) => {
+
+    //// the actual code
+    /*    if (m -> pos[1] < m -> floorHeight + 2048.0f) {
+            if (level_trigger_warp(m, WARP_OP_WARP_FLOOR) == 20 && !(m -> flags & MARIO_UNKNOWN_18)) {
+                play_sound(SOUND_MARIO_WAAAOOOW, m -> marioObj -> header.gfx.cameraToObject)
+            }
+        }*/
+
+    /// Temp code because death is not implemented
+    if (m.pos[1] < m.floorHeight + 2048) {
+        switch (Area.gCurrLevelNum) {
+            case LEVEL_CCM:  // CCM
+                m.pos = [-1512, 2560, -2305]
+                break
+
+            case LEVEL_TTM:  // TTM
+                m.pos = [102, -4332, 5734]
+                break
+
+            case LEVEL_WF:  // WF
+                m.pos = [2600, 1256, 5120]
+                break
+
+            case LEVEL_HMC:
+                m.pos = [-7152, 2161, 7181]
+                break
+        }
+    }
+
+}
+
+export const mario_handle_special_floors = (m) => {
+    if ((m.action & Mario.ACT_GROUP_MASK) == Mario.ACT_GROUP_CUTSCENE) {
+        return
+    }
+
+    if (m.floor != null) {
+        const floorType = m.floor.type
+
+        switch (floorType) {
+            case SURFACE_DEATH_PLANE:
+            case SURFACE_VERTICAL_WIND:
+                check_death_barrier(m)
+                break
+        }
+    }
 }
 
 const interact_bounce_top = (m, o) => {

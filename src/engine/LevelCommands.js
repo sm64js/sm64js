@@ -255,6 +255,13 @@ class LevelCommands {
         this.sCurrentScript.index++
     }
 
+    rooms(args) {
+        if (this.sCurrAreaIndex != -1)
+            Area.gAreas[this.sCurrAreaIndex].surfaceRooms = args[0]
+
+        this.sCurrentScript.index++
+    }
+
     terrain(args) {
         if (this.sCurrAreaIndex != -1)
             Area.gAreas[this.sCurrAreaIndex].terrainData = args[0]

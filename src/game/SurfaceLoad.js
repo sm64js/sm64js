@@ -199,7 +199,10 @@ class SurfaceLoad {
         const numSurfaces = data[dataIndex++]
 
         for (let i = 0; i < numSurfaces; i++) {
-            if (surfaceRooms) throw "surfaceRooms - load static surfaces"
+            if (surfaceRooms) {
+                room = surfaceRooms.surfaceRooms[surfaceRooms.index]
+                surfaceRooms.index++
+            }
 
             const surface = this.read_surface_data(data.slice(vertexDataIndex, dataIndex), data.slice(dataIndex, dataIndex + 3))
             if (surface) {
@@ -245,6 +248,8 @@ class SurfaceLoad {
     }
 
     load_area_terrain(index, data, surfaceRooms, macroObjects) {
+
+        if (surfaceRooms) surfaceRooms = { index: 0, surfaceRooms }
 
         this.gTerrainData = data  /// TODO refactor our function args to data, because we are storing it as a class variable
 

@@ -145,6 +145,16 @@ import {
 } from "./levels/wf/textures.inc"
 
 import {
+    hmc_seg7_texture_07000000,
+    hmc_seg7_texture_07001000,
+    hmc_seg7_texture_07002000,
+    hmc_seg7_texture_07003000,
+    hmc_seg7_texture_07003800,
+    hmc_seg7_texture_07004000,
+    hmc_seg7_texture_07004800
+} from "./levels/hmc/texture.inc"
+
+import {
     mountain_09000000,
     mountain_09000800,
     mountain_09001800,
@@ -216,6 +226,56 @@ import {
     grass_0900B800
 } from "./textures/grass"
 
+import {
+    cave_09000000,
+    cave_09001000,
+    cave_09001800,
+    cave_09002800,
+    cave_09003000,
+    cave_09003800,
+    cave_09004800,
+    cave_09005800,
+    cave_09006800,
+    cave_09007000,
+    cave_09007800,
+    cave_09008800,
+    cave_09009800,
+    cave_0900A000,
+    cave_0900A800,
+    cave_0900B800,
+    cave_0900C000
+} from "./textures/cave"
+
+import {
+    spooky_09000000,
+    spooky_09000800,
+    spooky_09001800,
+    spooky_09002800,
+    spooky_09003800,
+    spooky_09004800,
+    spooky_09005000,
+    spooky_09006000,
+    spooky_09006800,
+    spooky_09007000,
+    spooky_09008000,
+    spooky_09008800,
+    spooky_09009000,
+    spooky_0900A000,
+    spooky_0900A800,
+    spooky_0900B000,
+    spooky_0900B800
+} from "./textures/spooky"
+
+import {
+    bbh_seg7_texture_07000000,
+    bbh_seg7_texture_07001000,
+    bbh_seg7_texture_07001800,
+    bbh_seg7_texture_07002000,
+    bbh_seg7_texture_07003000,
+    bbh_seg7_texture_07003400,
+    bbh_seg7_texture_07004400
+} from "./levels/bbh/texture.inc"
+
 import { chain_ball_seg6_texture_06020AE8 } from "./actors/chain_ball/model.inc"
 
 import {
@@ -235,7 +295,7 @@ import { mist_seg3_texture_03000080 } from "./actors/mist/model.inc"
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 22
+const textureVersion = 24
 
 const loadDataIntoGame = (data) => {
 
@@ -365,6 +425,32 @@ const loadDataIntoGame = (data) => {
     generic_0900A000.push(...data["textures/generic/bob_textures.0A000.rgba16.png"].data)
     generic_0900B000.push(...data["textures/generic/bob_textures.0B000.ia16.png"].data)
 
+    cave_09000000.push(...data["textures/cave/hmc_textures.00000.rgba16.png"].data)
+    cave_09001000.push(...data["textures/cave/hmc_textures.01000.rgba16.png"].data)
+    cave_09001800.push(...data["textures/cave/hmc_textures.01800.rgba16.png"].data)
+    cave_09002800.push(...data["textures/cave/hmc_textures.02800.rgba16.png"].data)
+    cave_09003000.push(...data["textures/cave/hmc_textures.03000.rgba16.png"].data)
+    cave_09003800.push(...data["textures/cave/hmc_textures.03800.rgba16.png"].data)
+    cave_09004800.push(...data["textures/cave/hmc_textures.04800.rgba16.png"].data)
+    cave_09005800.push(...data["textures/cave/hmc_textures.05800.rgba16.png"].data)
+    cave_09006800.push(...data["textures/cave/hmc_textures.06800.rgba16.png"].data)
+    cave_09007000.push(...data["textures/cave/hmc_textures.07000.rgba16.png"].data)
+    cave_09007800.push(...data["textures/cave/hmc_textures.07800.rgba16.png"].data)
+    cave_09008800.push(...data["textures/cave/hmc_textures.08800.rgba16.png"].data)
+    cave_09009800.push(...data["textures/cave/hmc_textures.09800.rgba16.png"].data)
+    cave_0900A000.push(...data["textures/cave/hmc_textures.0A000.rgba16.png"].data)
+    cave_0900A800.push(...data["textures/cave/hmc_textures.0A800.rgba16.png"].data)
+    cave_0900B800.push(...data["textures/cave/hmc_textures.0B800.ia16.png"].data)
+    cave_0900C000.push(...data["textures/cave/hmc_textures.0C000.ia16.png"].data)
+
+    hmc_seg7_texture_07000000.push(...data["levels/hmc/0.rgba16.png"].data)
+    hmc_seg7_texture_07001000.push(...data["levels/hmc/1.rgba16.png"].data)
+    hmc_seg7_texture_07002000.push(...data["levels/hmc/2.rgba16.png"].data)
+    hmc_seg7_texture_07003000.push(...data["levels/hmc/3.rgba16.png"].data)
+    hmc_seg7_texture_07003800.push(...data["levels/hmc/4.rgba16.png"].data)
+    hmc_seg7_texture_07004000.push(...data["levels/hmc/5.rgba16.png"].data)
+    hmc_seg7_texture_07004800.push(...data["levels/hmc/6.rgba16.png"].data)
+
     bob_seg7_texture_07000000.push(...data["levels/bob/0.rgba16.png"].data)
     bob_seg7_texture_07000800.push(...data["levels/bob/1.rgba16.png"].data)
     bob_seg7_texture_07001000.push(...data["levels/bob/2.rgba16.png"].data)
@@ -453,6 +539,32 @@ const loadDataIntoGame = (data) => {
     smoke_seg4_texture_0401FEA0.push(...data["actors/walk_smoke/walk_smoke_4.ia16.png"].data)
     smoke_seg4_texture_040206A0.push(...data["actors/walk_smoke/walk_smoke_5.ia16.png"].data)
     smoke_seg4_texture_04020EA0.push(...data["actors/walk_smoke/walk_smoke_6.ia16.png"].data)
+
+    spooky_09000000.push(...data["textures/spooky/bbh_textures.00000.rgba16.png"].data)
+    spooky_09000800.push(...data["textures/spooky/bbh_textures.00800.rgba16.png"].data)
+    spooky_09001800.push(...data["textures/spooky/bbh_textures.01800.rgba16.png"].data)
+    spooky_09002800.push(...data["textures/spooky/bbh_textures.02800.rgba16.png"].data)
+    spooky_09003800.push(...data["textures/spooky/bbh_textures.03800.rgba16.png"].data)
+    spooky_09004800.push(...data["textures/spooky/bbh_textures.04800.rgba16.png"].data)
+    spooky_09005000.push(...data["textures/spooky/bbh_textures.05000.rgba16.png"].data)
+    spooky_09006000.push(...data["textures/spooky/bbh_textures.06000.rgba16.png"].data)
+    spooky_09006800.push(...data["textures/spooky/bbh_textures.06800.rgba16.png"].data)
+    spooky_09007000.push(...data["textures/spooky/bbh_textures.07000.rgba16.png"].data)
+    spooky_09008000.push(...data["textures/spooky/bbh_textures.08000.rgba16.png"].data)
+    spooky_09008800.push(...data["textures/spooky/bbh_textures.08800.rgba16.png"].data)
+    spooky_09009000.push(...data["textures/spooky/bbh_textures.09000.rgba16.png"].data)
+    spooky_0900A000.push(...data["textures/spooky/bbh_textures.0A000.rgba16.png"].data)
+    spooky_0900A800.push(...data["textures/spooky/bbh_textures.0A800.ia16.png"].data)
+    spooky_0900B000.push(...data["textures/spooky/bbh_textures.0B000.ia16.png"].data)
+    spooky_0900B800.push(...data["textures/spooky/bbh_textures.0B800.ia16.png"].data)
+
+    bbh_seg7_texture_07000000.push(...data["levels/bbh/0.rgba16.png"].data)
+    bbh_seg7_texture_07001000.push(...data["levels/bbh/1.rgba16.png"].data)
+    bbh_seg7_texture_07001800.push(...data["levels/bbh/2.rgba16.png"].data)
+    bbh_seg7_texture_07002000.push(...data["levels/bbh/3.rgba16.png"].data)
+    bbh_seg7_texture_07003000.push(...data["levels/bbh/4.rgba16.png"].data)
+    bbh_seg7_texture_07003400.push(...data["levels/bbh/5.rgba16.png"].data)
+    bbh_seg7_texture_07004400.push(...data["levels/bbh/6.rgba16.png"].data)
 
     chain_ball_seg6_texture_06020AE8.push(...data["actors/chain_ball/chain_ball.rgba16.png"].data)
 

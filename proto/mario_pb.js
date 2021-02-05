@@ -2184,7 +2184,8 @@ proto.sm64js.AuthorizedUserMsg.prototype.toObject = function(opt_includeInstance
 proto.sm64js.AuthorizedUserMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
     username: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    status: jspb.Message.getFieldWithDefault(msg, 2, 0)
+    status: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    message: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
   if (includeInstance) {
@@ -2229,6 +2230,10 @@ proto.sm64js.AuthorizedUserMsg.deserializeBinaryFromReader = function(msg, reade
       var value = /** @type {number} */ (reader.readUint32());
       msg.setStatus(value);
       break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setMessage(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -2272,6 +2277,13 @@ proto.sm64js.AuthorizedUserMsg.serializeBinaryToWriter = function(message, write
       f
     );
   }
+  f = message.getMessage();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
 };
 
 
@@ -2308,6 +2320,24 @@ proto.sm64js.AuthorizedUserMsg.prototype.getStatus = function() {
  */
 proto.sm64js.AuthorizedUserMsg.prototype.setStatus = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
+};
+
+
+/**
+ * optional string message = 3;
+ * @return {string}
+ */
+proto.sm64js.AuthorizedUserMsg.prototype.getMessage = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.sm64js.AuthorizedUserMsg} returns this
+ */
+proto.sm64js.AuthorizedUserMsg.prototype.setMessage = function(value) {
+  return jspb.Message.setProto3StringField(this, 3, value);
 };
 
 

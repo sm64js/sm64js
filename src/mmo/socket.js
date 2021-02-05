@@ -452,7 +452,7 @@ export const sendChat = ({ message }) => {
     sendData(rootMsg.serializeBinary())
 }
 
-const redirect_uri = encodeURIComponent(process.env.PRODUCTION ? 'https://sm64js.com' : 'http://localhost:9300')
+const redirect_uri = encodeURIComponent(url.protocol == "https:" ? 'https://sm64js.com' : 'http://localhost:9300')
 
 const discord_client_id = process.env.DISCORD_CLIENT_ID
 const discordOAuthURL = "https://discord.com/api/oauth2/authorize?client_id=" + discord_client_id + "&redirect_uri=" + redirect_uri + "&response_type=code&scope=identify"
@@ -487,7 +487,7 @@ document.getElementById("googleSigninButton").addEventListener('click', () => {
 })
 
 const recvAuthorizedUser = (msg) => {
-    if (msg.getStatus()) {
+    if (msg.getStatus() == 1) {
         document.getElementById("playerNameRow").hidden = false
         document.getElementById("discordNameBox").value = msg.getUsername()
         if (msg.getUsername() == "") { /// Discord Username option not available
@@ -495,10 +495,18 @@ const recvAuthorizedUser = (msg) => {
             document.getElementById("discordNameRow").hidden = true
             document.getElementById("switchDiscord").hidden = true
         }
-    } else { //authorization fail - refresh page without discord access code
-        let params = url.searchParams
-        params.delete('code') 
-        window.location.search = params
+    } else { //authorization fail - refresh page without access code
+        document.getElementById("authFailMsg").innerHTML = "Authorization Fail: " + msg.getMessage()
+        document.getElementById("authFailMsg").hidden = false
+        if (msg.getStatus() == 2) { // refreshing won't help
+        } else {
+            document.getElementById("authFailMsg").innerHTML += `<br/> Please Try Again - Auto refreshing in 3 seconds`
+            setTimeout(() => {
+                let params = url.searchParams
+                params.delete('code')
+                window.location.search = params
+            }, 3000)
+        }
     }
 }
 

@@ -48,7 +48,7 @@ export const level_defines_list = [
         command: LevelCommands.jump_if,
         args: [LevelCommands.OP_EQ, LEVEL_MBF, level_mbf_entry]
     },
--   {
+    {
         command: LevelCommands.jump_if,
         args: [LevelCommands.OP_EQ, LEVEL_CTF00, level_ctf00_entry]
     }

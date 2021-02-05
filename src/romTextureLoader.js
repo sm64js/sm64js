@@ -112,18 +112,27 @@ import {
 } from "./actors/walk_smoke/model.inc"
 
 import {
-    generic_09005800,
-    generic_09006000,
-    generic_09009800,
-    generic_09009000,
-    generic_0900A000,
+    generic_09000000,
+    generic_09000800,
+    generic_09001000,
     generic_09001800,
     generic_09002000,
+    generic_09002800,
     generic_09003000,
     generic_09003800,
+    generic_09004000,
     generic_09004800,
     generic_09005000,
+    generic_09005800,
+    generic_09006000,
+    generic_09007000,
+    generic_09007800,
+    generic_09008000,
     generic_09008800,
+    generic_09009000,
+    generic_09009800,
+    generic_0900A000,
+    generic_0900A800,
     generic_0900B000
 } from "./textures/generic"
 
@@ -268,6 +277,7 @@ import {
     spooky_0900B800
 } from "./textures/spooky"
 
+
 import {
     bbh_seg7_texture_07000000,
     bbh_seg7_texture_07001000,
@@ -277,6 +287,15 @@ import {
     bbh_seg7_texture_07003400,
     bbh_seg7_texture_07004400
 } from "./levels/bbh/texture.inc"
+
+import {
+    ssl_seg7_texture_07000000,
+    ssl_seg7_texture_07000800,
+    ssl_seg7_texture_07001800,
+    ssl_seg7_texture_07002000,
+    ssl_seg7_texture_07002800,
+    ssl_seg7_texture_07003800
+} from "./levels/ssl/texture.inc"
 
 import { chain_ball_seg6_texture_06020AE8 } from "./actors/chain_ball/model.inc"
 
@@ -297,7 +316,7 @@ import { mist_seg3_texture_03000080 } from "./actors/mist/model.inc"
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 25
+const textureVersion = 26
 
 const loadDataIntoGame = (data) => {
 
@@ -415,19 +434,29 @@ const loadDataIntoGame = (data) => {
 	grass_0900B000.push(...data['textures/grass/wf_textures.0B000.ia16.png'].data)
 	grass_0900B800.push(...data['textures/grass/wf_textures.0B800.ia16.png'].data)
 
+    generic_09000000.push(...data["textures/generic/bob_textures.00000.rgba16.png"].data)
+    generic_09000800.push(...data["textures/generic/bob_textures.00800.rgba16.png"].data)
+    generic_09001000.push(...data["textures/generic/bob_textures.01000.rgba16.png"].data)
     generic_09001800.push(...data["textures/generic/bob_textures.01800.rgba16.png"].data)
     generic_09002000.push(...data["textures/generic/bob_textures.02000.rgba16.png"].data)
+    generic_09002800.push(...data["textures/generic/bob_textures.02800.rgba16.png"].data)
     generic_09003000.push(...data["textures/generic/bob_textures.03000.rgba16.png"].data)
     generic_09003800.push(...data["textures/generic/bob_textures.03800.rgba16.png"].data)
+    generic_09004000.push(...data["textures/generic/bob_textures.04000.rgba16.png"].data)
     generic_09004800.push(...data["textures/generic/bob_textures.04800.rgba16.png"].data)
     generic_09005000.push(...data["textures/generic/bob_textures.05000.rgba16.png"].data)
     generic_09005800.push(...data["textures/generic/bob_textures.05800.rgba16.png"].data)
     generic_09006000.push(...data["textures/generic/bob_textures.06000.rgba16.png"].data)
+    generic_09007000.push(...data["textures/generic/bob_textures.07000.rgba16.png"].data)
+    generic_09007800.push(...data["textures/generic/bob_textures.07800.rgba16.png"].data)
+    generic_09008000.push(...data["textures/generic/bob_textures.08000.rgba16.png"].data)
     generic_09008800.push(...data["textures/generic/bob_textures.08800.rgba16.png"].data)
     generic_09009000.push(...data["textures/generic/bob_textures.09000.rgba16.png"].data)
     generic_09009800.push(...data["textures/generic/bob_textures.09800.rgba16.png"].data)
     generic_0900A000.push(...data["textures/generic/bob_textures.0A000.rgba16.png"].data)
+    generic_0900A800.push(...data["textures/generic/bob_textures.0A800.rgba16.png"].data)
     generic_0900B000.push(...data["textures/generic/bob_textures.0B000.ia16.png"].data)
+
 
     cave_09000000.push(...data["textures/cave/hmc_textures.00000.rgba16.png"].data)
     cave_09001000.push(...data["textures/cave/hmc_textures.01000.rgba16.png"].data)
@@ -471,6 +500,13 @@ const loadDataIntoGame = (data) => {
     wf_seg7_texture_07001800.push(...data["levels/wf/3.rgba16.png"].data)
     wf_seg7_texture_07002000.push(...data["levels/wf/4.rgba16.png"].data)
     wf_seg7_texture_07002800.push(...data["levels/wf/5.ia8.png"].data)
+
+    ssl_seg7_texture_07000000.push(...data["levels/ssl/0.rgba16.png"].data)
+    ssl_seg7_texture_07000800.push(...data["levels/ssl/1.ia16.png"].data)
+    ssl_seg7_texture_07001800.push(...data["levels/ssl/2.rgba16.png"].data)
+    ssl_seg7_texture_07002000.push(...data["levels/ssl/3.rgba16.png"].data)
+    ssl_seg7_texture_07002800.push(...data["levels/ssl/4.rgba16.png"].data)
+    ssl_seg7_texture_07003800.push(...data["levels/ssl/5.rgba16.png"].data)
 
     snow_09000000.push(...data["textures/snow/ccm_textures.00000.rgba16.png"].data)
     snow_09000800.push(...data["textures/snow/ccm_textures.00800.rgba16.png"].data)

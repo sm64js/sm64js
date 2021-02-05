@@ -46,6 +46,7 @@ export const levelIdToName = {
     16: "Castle Grounds",
     26: "Castle Courtyard",
     9: "Bob-omb Battlefield",
+    8: "Shifting Sand Land",
     7: "Hazy Maze Cave",
     4: "Big Boo's Haunt",
     5: "Cool, Cool Mountain",

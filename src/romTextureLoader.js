@@ -593,7 +593,7 @@ const loadDataIntoGame = (data) => {
     spooky_0900B000.push(...data["textures/spooky/bbh_textures.0B000.ia16.png"].data)
     spooky_0900B800.push(...data["textures/spooky/bbh_textures.0B800.ia16.png"].data)
 	
-    bbheg7_texture_07000000.push(...data["levels/bbh/0.rgba16.png"].data)
+    bbh_seg7_texture_07000000.push(...data["levels/bbh/0.rgba16.png"].data)
     bbh_seg7_texture_07001000.push(...data["levels/bbh/1.rgba16.png"].data)
     bbh_seg7_texture_07001800.push(...data["levels/bbh/2.rgba16.png"].data)
     bbh_seg7_texture_07002000.push(...data["levels/bbh/3.rgba16.png"].data)

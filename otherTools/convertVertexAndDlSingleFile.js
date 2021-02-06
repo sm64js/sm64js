@@ -1,9 +1,9 @@
 const fs = require('fs')
 
 // Configure these variables to get it to work
-var level = "castle_grounds" // level name in sm64ex directory
+var level = "castle_inside" // level name in sm64ex directory
 var snum = 1 // used as a counter variable
-var num = 32 // number of model.inc.js files there are
+var num = 10 // number of model.inc.js files there are
 var areaNum = 1 // target area number
 var vOutputStr1 = level // folder to put in 'converted'
 var mainDir = __dirname + '/converted/' + vOutputStr1 + '/areas/' + areaNum + '/' // directory to put models in
@@ -71,7 +71,7 @@ const convertRenderModeLine = (line) => {
 convert()
 
 function convert(MDTY) {
-	var input = require('os').homedir() + '/Programming/sm64pc/actors/chain_ball/model.inc.c' // directory of each model file
+	var input = require('os').homedir() + '/sm64ex/levels/castle_inside/1/10/model.inc.c' // directory of each model file
 	if (!fs.existsSync(input)) {return;}
 	let inputStr = fs.readFileSync(input, 'utf8')
 	inputStr = inputStr.replace(/\r/g, "")

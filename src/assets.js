@@ -316,5 +316,6 @@ export const assets = {
 "actors/mario/mario_eyes_half_closed.rgba16.png": [32,32,2048,{"jp":[1125200,14480],"us":[1132368,14480],"eu":[1004336,14480],"sh":[980848,14480]}],
 "actors/mario/mario_eyes_closed.rgba16.png": [32,32,2048,{"jp":[1125200,16528],"us":[1132368,16528],"eu":[1004336,16528],"sh":[980848,16528]}],
 
+"textures/skyboxes/ssl.png": [131392,{"jp":[3078784,0],"us":[3085536,0],"eu":[2959136,0]}],
 "textures/skyboxes/water.png": [131392,{"jp":[2796624,0],"us":[2803376,0],"eu":[2676976,0]}]
 }

@@ -22,15 +22,15 @@ class SkyBox {
 
         this.sSkyboxTextures = [
             water_skybox_ptrlist,
-/*            bitfs_skybox_ptrlist,
-            wdw_skybox_ptrlist,
-            cloud_floor_skybox_ptrlist,
-            ccm_skybox_ptrlist,
-            ssl_skybox_ptrlist,
-            bbh_skybox_ptrlist,
-            bidw_skybox_ptrlist,
-            clouds_skybox_ptrlist,
-            bits_skybox_ptrlist,*/
+            null, //bitfs_skybox_ptrlist,
+            null, //wdw_skybox_ptrlist,
+            null, //cloud_floor_skybox_ptrlist,
+            null, //ccm_skybox_ptrlist,
+            null, //ssl_skybox_ptrlist,
+            null, //bbh_skybox_ptrlist,
+            null, //bidw_skybox_ptrlist,
+            null, //clouds_skybox_ptrlist,
+            null, //bits_skybox_ptrlist,
         ]
 
         this.sSkyboxColors = [

@@ -1,4 +1,5 @@
-﻿import * as SkyboxWater from "./textures/skyboxes/water_skybox"
+import * as SkyboxSSL from "./textures/skyboxes/ssl_skybox"
+import * as SkyboxWater from "./textures/skyboxes/water_skybox"
 import { assets } from "./assets"
 
 
@@ -316,7 +317,7 @@ import { mist_seg3_texture_03000080 } from "./actors/mist/model.inc"
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 26
+const textureVersion = 27
 
 const loadDataIntoGame = (data) => {
 
@@ -620,6 +621,74 @@ const loadDataIntoGame = (data) => {
     dirt_seg3_texture_0302BDF8.push(...data["actors/dirt/dirt_particle.rgba16.png"].data)
 
     mist_seg3_texture_03000080.push(...data["actors/mist/mist.ia16.png"].data)
+
+    SkyboxSSL.ssl_skybox_texture_00000.push(...data["ssl_skybox_texture_00000"].data)
+    SkyboxSSL.ssl_skybox_texture_00001.push(...data["ssl_skybox_texture_00001"].data)
+    SkyboxSSL.ssl_skybox_texture_00002.push(...data["ssl_skybox_texture_00002"].data)
+    SkyboxSSL.ssl_skybox_texture_00003.push(...data["ssl_skybox_texture_00003"].data)
+    SkyboxSSL.ssl_skybox_texture_00004.push(...data["ssl_skybox_texture_00004"].data)
+    SkyboxSSL.ssl_skybox_texture_00005.push(...data["ssl_skybox_texture_00005"].data)
+    SkyboxSSL.ssl_skybox_texture_00006.push(...data["ssl_skybox_texture_00006"].data)
+    SkyboxSSL.ssl_skybox_texture_00007.push(...data["ssl_skybox_texture_00007"].data)
+    SkyboxSSL.ssl_skybox_texture_00008.push(...data["ssl_skybox_texture_00008"].data)
+    SkyboxSSL.ssl_skybox_texture_00009.push(...data["ssl_skybox_texture_00009"].data)
+    SkyboxSSL.ssl_skybox_texture_0000A.push(...data["ssl_skybox_texture_0000A"].data)
+    SkyboxSSL.ssl_skybox_texture_0000B.push(...data["ssl_skybox_texture_0000B"].data)
+    SkyboxSSL.ssl_skybox_texture_0000C.push(...data["ssl_skybox_texture_0000C"].data)
+    SkyboxSSL.ssl_skybox_texture_0000D.push(...data["ssl_skybox_texture_0000D"].data)
+    SkyboxSSL.ssl_skybox_texture_0000E.push(...data["ssl_skybox_texture_0000E"].data)
+    SkyboxSSL.ssl_skybox_texture_0000F.push(...data["ssl_skybox_texture_0000F"].data)
+
+    SkyboxSSL.ssl_skybox_texture_00010.push(...data["ssl_skybox_texture_00010"].data)
+    SkyboxSSL.ssl_skybox_texture_00011.push(...data["ssl_skybox_texture_00011"].data)
+    SkyboxSSL.ssl_skybox_texture_00012.push(...data["ssl_skybox_texture_00012"].data)
+    SkyboxSSL.ssl_skybox_texture_00013.push(...data["ssl_skybox_texture_00013"].data)
+    SkyboxSSL.ssl_skybox_texture_00014.push(...data["ssl_skybox_texture_00014"].data)
+    SkyboxSSL.ssl_skybox_texture_00015.push(...data["ssl_skybox_texture_00015"].data)
+    SkyboxSSL.ssl_skybox_texture_00016.push(...data["ssl_skybox_texture_00016"].data)
+    SkyboxSSL.ssl_skybox_texture_00017.push(...data["ssl_skybox_texture_00017"].data)
+    SkyboxSSL.ssl_skybox_texture_00018.push(...data["ssl_skybox_texture_00018"].data)
+    SkyboxSSL.ssl_skybox_texture_00019.push(...data["ssl_skybox_texture_00019"].data)
+    SkyboxSSL.ssl_skybox_texture_0001A.push(...data["ssl_skybox_texture_0001A"].data)
+    SkyboxSSL.ssl_skybox_texture_0001B.push(...data["ssl_skybox_texture_0001B"].data)
+    SkyboxSSL.ssl_skybox_texture_0001C.push(...data["ssl_skybox_texture_0001C"].data)
+    SkyboxSSL.ssl_skybox_texture_0001D.push(...data["ssl_skybox_texture_0001D"].data)
+    SkyboxSSL.ssl_skybox_texture_0001E.push(...data["ssl_skybox_texture_0001E"].data)
+    SkyboxSSL.ssl_skybox_texture_0001F.push(...data["ssl_skybox_texture_0001F"].data)
+
+    SkyboxSSL.ssl_skybox_texture_00020.push(...data["ssl_skybox_texture_00020"].data)
+    SkyboxSSL.ssl_skybox_texture_00021.push(...data["ssl_skybox_texture_00021"].data)
+    SkyboxSSL.ssl_skybox_texture_00022.push(...data["ssl_skybox_texture_00022"].data)
+    SkyboxSSL.ssl_skybox_texture_00023.push(...data["ssl_skybox_texture_00023"].data)
+    SkyboxSSL.ssl_skybox_texture_00024.push(...data["ssl_skybox_texture_00024"].data)
+    SkyboxSSL.ssl_skybox_texture_00025.push(...data["ssl_skybox_texture_00025"].data)
+    SkyboxSSL.ssl_skybox_texture_00026.push(...data["ssl_skybox_texture_00026"].data)
+    SkyboxSSL.ssl_skybox_texture_00027.push(...data["ssl_skybox_texture_00027"].data)
+    SkyboxSSL.ssl_skybox_texture_00028.push(...data["ssl_skybox_texture_00028"].data)
+    SkyboxSSL.ssl_skybox_texture_00029.push(...data["ssl_skybox_texture_00029"].data)
+    SkyboxSSL.ssl_skybox_texture_0002A.push(...data["ssl_skybox_texture_0002A"].data)
+    SkyboxSSL.ssl_skybox_texture_0002B.push(...data["ssl_skybox_texture_0002B"].data)
+    SkyboxSSL.ssl_skybox_texture_0002C.push(...data["ssl_skybox_texture_0002C"].data)
+    SkyboxSSL.ssl_skybox_texture_0002D.push(...data["ssl_skybox_texture_0002D"].data)
+    SkyboxSSL.ssl_skybox_texture_0002E.push(...data["ssl_skybox_texture_0002E"].data)
+    SkyboxSSL.ssl_skybox_texture_0002F.push(...data["ssl_skybox_texture_0002F"].data)
+
+    SkyboxSSL.ssl_skybox_texture_00030.push(...data["ssl_skybox_texture_00030"].data)
+    SkyboxSSL.ssl_skybox_texture_00031.push(...data["ssl_skybox_texture_00031"].data)
+    SkyboxSSL.ssl_skybox_texture_00032.push(...data["ssl_skybox_texture_00032"].data)
+    SkyboxSSL.ssl_skybox_texture_00033.push(...data["ssl_skybox_texture_00033"].data)
+    SkyboxSSL.ssl_skybox_texture_00034.push(...data["ssl_skybox_texture_00034"].data)
+    SkyboxSSL.ssl_skybox_texture_00035.push(...data["ssl_skybox_texture_00035"].data)
+    SkyboxSSL.ssl_skybox_texture_00036.push(...data["ssl_skybox_texture_00036"].data)
+    SkyboxSSL.ssl_skybox_texture_00037.push(...data["ssl_skybox_texture_00037"].data)
+    SkyboxSSL.ssl_skybox_texture_00038.push(...data["ssl_skybox_texture_00038"].data)
+    SkyboxSSL.ssl_skybox_texture_00039.push(...data["ssl_skybox_texture_00039"].data)
+    SkyboxSSL.ssl_skybox_texture_0003A.push(...data["ssl_skybox_texture_0003A"].data)
+    SkyboxSSL.ssl_skybox_texture_0003B.push(...data["ssl_skybox_texture_0003B"].data)
+    SkyboxSSL.ssl_skybox_texture_0003C.push(...data["ssl_skybox_texture_0003C"].data)
+    SkyboxSSL.ssl_skybox_texture_0003D.push(...data["ssl_skybox_texture_0003D"].data)
+    SkyboxSSL.ssl_skybox_texture_0003E.push(...data["ssl_skybox_texture_0003E"].data)
+    SkyboxSSL.ssl_skybox_texture_0003F.push(...data["ssl_skybox_texture_0003F"].data)
 
     SkyboxWater.water_skybox_texture_00000.push(...data["water_skybox_texture_00000"].data)
     SkyboxWater.water_skybox_texture_00001.push(...data["water_skybox_texture_00001"].data)

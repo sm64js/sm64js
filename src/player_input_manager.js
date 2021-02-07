@@ -113,7 +113,11 @@ const keyboardButtonMapping = {
     up: 'up',
     down: 'down',
     left: 'left',
-    right: 'right'
+    right: 'right',
+    cu: 'i',
+    cd: 'k',
+    cl: 'j',
+    cr: 'l'
 }
 const defaultKeyboardButtonMapping = { ...keyboardButtonMapping }
 
@@ -123,7 +127,9 @@ const gamepadButtonMapping = { //works for xbox
     start: 9,
     z: 6,
     stickX: 0,
-    stickY: 1
+    stickY: 1,
+    cStickX: 2,
+    cStickY: 3
 }
 
 const defaultGamepadButtonMapping = { ...gamepadButtonMapping }
@@ -300,10 +306,10 @@ export const playerInputUpdate = () => {
     let buttonDownB = gamepadFinal.b || keyboardFinal.b
     let buttonDownStart = gamepadFinal.start || keyboardFinal.start
     let buttonDownZ = gamepadFinal.z || keyboardFinal.z
-    let buttonDownCl = gamepadFinal.cl
-    let buttonDownCr = gamepadFinal.cr
-    let buttonDownCu = gamepadFinal.cu
-    let buttonDownCd = gamepadFinal.cd
+    let buttonDownCl = gamepadFinal.cl || keyboardFinal.cl
+    let buttonDownCr = gamepadFinal.cr || keyboardFinal.cr
+    let buttonDownCu = gamepadFinal.cu || keyboardFinal.cu
+    let buttonDownCd = gamepadFinal.cd || keyboardFinal.cd
 
     window.playerInput = {
         stickX, stickY,

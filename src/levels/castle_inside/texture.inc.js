@@ -66,4 +66,10 @@ export const inside_castle_seg7_texture_0700E800 = []
 // 0x0700F800 - 0x07010800
 export const inside_castle_seg7_texture_0700F800 = []
 
-export const inside_castle_seg7_vertex_07030940 = [] // never gets defined, here to stop an error
+
+// never gets defined, here to stop an error
+
+export const inside_castle_seg7_texture_07010800 = [] 
+export const inside_castle_seg7_texture_07011800 = [] 
+export const inside_castle_seg7_texture_07019800 = [] 
+export const inside_castle_seg7_texture_0701A800 = [] 

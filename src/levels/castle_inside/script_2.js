@@ -9,7 +9,7 @@ import { castle_geo_001858 } from "./areas/2/geo.inc"
 export const level_castle_inside_2_entry = [
     { command: LevelCommands.init_level },
     { command: LevelCommands.init_mario, args: [1, 1, bhvMario] },
-    { command: LevelCommands.begin_area, args: [1, castle_geo_001858] },
+    { command: LevelCommands.begin_area, args: [2, castle_geo_001858] },
     { command: LevelCommands.terrain, args: [inside_castle_seg7_area_2_collision] },
     { command: LevelCommands.rooms, args: [inside_castle_seg7_area_2_rooms] },
     { command: LevelCommands.end_area },

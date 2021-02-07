@@ -25,6 +25,7 @@ export const castle_geo_001560 = [
 	{ command: Geo.open_node },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, inside_castle_seg7_dl_0703E6F0] },
 	{ command: Geo.close_node },
+	{ command: Geo.return },
 ]
 
 export const castle_geo_001578 = [
@@ -186,6 +187,7 @@ export const castle_geo_001858 = [
 	{ command: Geo.node_camera, args: [4, 0, 2000, 6000, 0, 0, 0, Camera.geo_camera_main]},
 	{ command: Geo.open_node },
 	{ command: Geo.node_switch_case, args: [11, geo_switch_area]},
+	{ command: Geo.open_node },
 	{ command: Geo.branch, args: [1, castle_geo_001560]},
 	{ command: Geo.branch, args: [1, castle_geo_001578]},
 	{ command: Geo.branch, args: [1, castle_geo_0015B8]},
@@ -197,9 +199,9 @@ export const castle_geo_001858 = [
 	{ command: Geo.branch, args: [1, castle_geo_001740]},
 	{ command: Geo.branch, args: [1, castle_geo_001798]},
 	{ command: Geo.branch, args: [1, castle_geo_001800]},
-	{ command: Geo.open_node },
 	{ command: Geo.close_node },
 	{ command: Geo.node_render_object_parent },
+//	{ command: Geo.node_generated, args: [0, geo_envfx_main]},
 	{ command: Geo.close_node },
 	{ command: Geo.close_node },
 	{ command: Geo.close_node },

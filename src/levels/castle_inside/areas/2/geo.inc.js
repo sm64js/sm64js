@@ -1,8 +1,9 @@
 import { GeoLayoutInstance as Geo } from "../../../../engine/GeoLayout"
 import { CameraInstance as Camera } from "../../../../game/Camera"
+import { geo_switch_area } from "../../../../game/ObjectHelpers"
+
 import { inside_castle_seg7_dl_0703E6F0 } from "./1/model.inc"
 import { inside_castle_seg7_dl_07043028 } from "./2/model.inc"
-
 import { inside_castle_seg7_dl_07043B48 } from "./3/model.inc"
 import { inside_castle_seg7_dl_07043CD8 } from "./4/model.inc"
 import { inside_castle_seg7_dl_0704A0E8 } from "./5/model.inc"
@@ -182,7 +183,7 @@ export const castle_geo_001858 = [
 	{ command: Geo.open_node },
 	{ command: Geo.node_perspective, args: [64, 50, 8000, Camera.geo_camera_fov] },
 	{ command: Geo.open_node },
-	{ command: Geo.node_camera, args: [4, 0, 2000, 6000, 0, 0, 0, geo_camera_main]},
+	{ command: Geo.node_camera, args: [4, 0, 2000, 6000, 0, 0, 0, Camera.geo_camera_main]},
 	{ command: Geo.open_node },
 	{ command: Geo.node_switch_case, args: [11, geo_switch_area]},
 	{ command: Geo.branch, args: [1, castle_geo_001560]},

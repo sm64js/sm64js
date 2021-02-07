@@ -23,6 +23,10 @@ import {
 	inside_castle_seg7_texture_0700D800,
 	inside_castle_seg7_texture_0700E800,
 	inside_castle_seg7_texture_0700F800,
+	inside_castle_seg7_texture_07010800,
+	inside_castle_seg7_texture_07011800,
+	inside_castle_seg7_texture_07019800,
+	inside_castle_seg7_texture_0701A800
 } from "../../../texture.inc"
 import {
 	inside_09000000,

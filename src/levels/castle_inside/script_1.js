@@ -1,6 +1,7 @@
 import { LevelCommandsInstance as LevelCommands } from "../../engine/LevelCommands"
 import { bhvMario } from "../../game/BehaviorData"
 import { LevelUpdateInstance as LevelUpdate } from "../../game/LevelUpdate"
+
 import { inside_castle_seg7_area_1_collision } from "./areas/1/collision.inc"
 import { inside_castle_seg7_area_1_rooms } from "./areas/1/room.inc"
 import { castle_geo_001400 } from "./areas/1/geo.inc"

@@ -1,5 +1,5 @@
 import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
-import { LEVEL_CASTLE_GROUNDS, LEVEL_CASTLE_COURTYARD, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS, LEVEL_TTM, LEVEL_WF, LEVEL_HMC, LEVEL_BBH, LEVEL_SSL, LEVEL_CASTLE_INSIDE_1, LEVEL_CASTLE_INSIDE_2 } from "../level_defines_constants"
+import { LEVEL_CASTLE_GROUNDS, LEVEL_CASTLE_COURTYARD, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS, LEVEL_TTM, LEVEL_WF, LEVEL_HMC, LEVEL_BBH, LEVEL_SSL, LEVEL_CASTLE_INSIDE_1, LEVEL_CASTLE_INSIDE_2 } from "./level_defines_constants"
 import { level_castle_grounds_entry } from "./castle_grounds/script"
 import { level_bob_entry } from "./bob/script"
 import { level_ccm_entry } from "./ccm/script"

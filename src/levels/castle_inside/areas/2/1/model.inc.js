@@ -23,7 +23,7 @@ import {
 	inside_castle_seg7_texture_0700D800,
 	inside_castle_seg7_texture_0700E800,
 	inside_castle_seg7_texture_0700F800,
-} from "./levels/castle_inside/texture.inc"
+} from "../../../texture.inc"
 import {
 	inside_09000000,
 	inside_09001000,
@@ -42,7 +42,7 @@ import {
 	inside_0900A000,
 	inside_0900B000,
 	inside_0900B800,
-} from "./textures/inside"
+} from "../../../../../textures/inside"
 
 const inside_castle_seg7_lights_0703C040 = Gbi.gdSPDefLights1(
 	    0x4c, 0x4c, 0x4c,

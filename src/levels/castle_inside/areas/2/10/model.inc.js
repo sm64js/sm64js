@@ -23,7 +23,7 @@ import {
 	inside_castle_seg7_texture_0700D800,
 	inside_castle_seg7_texture_0700E800,
 	inside_castle_seg7_texture_0700F800,
-} from "./levels/castle_inside/texture.inc"
+} from "../../../texture.inc"
 import {
 	inside_09000000,
 	inside_09001000,
@@ -42,7 +42,7 @@ import {
 	inside_0900A000,
 	inside_0900B000,
 	inside_0900B800,
-} from "./textures/inside"
+} from "../../../../../textures/inside"
 const inside_castle_seg7_vertex_07051370 = [
 	{ pos: [ 1384, 2765, 7197 ], flag: 0, tc: [ 2012, 990 ], color: [ 255, 255, 255, 255 ] },
 	{ pos: [ 1384, 2867, 6992 ], flag: 0, tc: [ 0, 0 ], color: [ 255, 255, 255, 255 ] },

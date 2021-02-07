@@ -68,7 +68,7 @@ export const inside_castle_seg7_texture_0700F800 = []
 
 
 // never gets defined, here to stop an error
-
+export const inside_castle_seg7_texture_07030940 = []
 export const inside_castle_seg7_texture_07010800 = [] 
 export const inside_castle_seg7_texture_07011800 = [] 
 export const inside_castle_seg7_texture_07019800 = [] 

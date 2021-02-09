@@ -108,7 +108,7 @@ socket.onopen = () => {
         const rootMsg = new RootMsg()
         rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
         sendData(rootMsg.serializeBinary())
-    } else if (process.env.PRODUCTION == undefined) {
+    } else if (process.env.PRODUCTION == 0) {
         /// send access code to server
         const accessCodeMsg = new AccessCodeMsg()
         accessCodeMsg.setAccessCode("122345")

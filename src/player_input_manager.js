@@ -41,7 +41,11 @@ window.addEventListener("keydown", (e) => {
         document.getElementById('banbox').blur()
     }
 
-    if (!window.playerNameAccepted && e.keyCode == 13) {
+    if (document.getElementById("playerNameRow").hidden && e.keyCode == 13) {
+        $("#signinSection").effect("shake", { direction: "down", times: 3, distance: 3 }, 500)
+    }
+
+    if (!window.playerNameAccepted && e.keyCode == 13 && !document.getElementById("playerNameRow").hidden) {
         document.getElementById('playerNameInput').blur()
         submitPlayerName()
     }

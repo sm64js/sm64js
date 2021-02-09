@@ -121,68 +121,72 @@
                 </div>
             </div>
 
-            <div id="signinButtons" class="row" style="justify-content:center; margin-top: 10px;">
-                <button id="discordSigninButton" type="submit" class="btn btn-light" style="height:50px; margin-top: 5px">
-                    <b>Sign In with</b>
-                    <img src="https://discord.com/assets/e4923594e694a21542a489471ecffa50.svg" width="100" />
-                </button>
-                <img id="googleSigninButton" src="/mmo/assets/google_signin.png" width="240" style="margin-left:15px;">
+            <div id="signinSection">
+                <div id="signinButtons" class="row" style="justify-content:center; margin-top: 10px;">
+                    <button id="discordSigninButton" type="submit" class="btn btn-light" style="height:50px; margin-top: 5px">
+                        <b>Sign In with</b>
+                        <img src="https://discord.com/assets/e4923594e694a21542a489471ecffa50.svg" width="100" />
+                    </button>
+                    <img id="googleSigninButton" src="/mmo/assets/google_signin.png" width="240" style="margin-left:15px;">
+                </div>
+
+                <div hidden id="playerNameRow" style="margin-top: 10px;">
+                    <form id="playerNameForm">
+                        <div id="discordNameRow" class="row" style="justify-content:center;">
+                            <div class="form-group mb-2">
+                                <label type="text" readonly class="col-form-label" style="color:skyblue">Discord Name: </label>
+                            </div>
+                            <div class="form-group mb-2">
+                                <input readonly id="discordNameBox" type="text" style="margin-left: 15px; max-width: 200px" class="form-control-sm" minlength="3" maxlength="20">
+                            </div>
+                            <div class="form-group mb-2">
+                                <button id="switchCustom" type="button" class="btn btn-sm btn-outline-primary mb-2" style="margin-left:15px;">Switch to Custom Display Name</button>
+                            </div>
+                        </div>
+                        <div hidden id="customNameRow" class="row" style="justify-content:center;">
+                            <div class="form-group mb-2">
+                                <label type="text" readonly class="col-form-label" style="color:skyblue">Custom Display Name: </label>
+                            </div>
+                            <div class="form-group mb-2">
+                                <input id="playerNameInput" type="text" style="margin-left: 15px; max-width: 120px" class="form-control-sm" minlength="3" maxlength="14" placeholder="enter name" onchange="window.updatePlayerName(this.value)">
+                            </div>
+                            <div class="form-group mb-2">
+                                <button id="switchDiscord" type="button" class="btn btn-sm btn-outline-primary mb-2" style="margin-left:15px;">Switch to Discord Username</button>
+                            </div>
+                        </div>
+                        <div class="row" style="justify-content:center;">
+                            <div class="form-group mb-2">
+                                <label type="text" readonly class="col-form-label" style="color:skyblue">Select Map: </label>
+                            </div>
+                            <div class="form-group mb-2" style="margin-left:15px;">
+                                <select id="mapSelect" class="form-control form-control-sm">
+                                    <option value="1000"> Mushroom Battlefield </option>
+                                    <option value="1001"> CTF/Race Map </option>
+                                    <option value="16"> Castle Grounds </option>
+                                    <option value="26"> Castle Courtyard </option>
+                                    <option value="9"> Bob-omb Battlefield </option>
+                                    <option value="5"> Cool, Cool Mountain </option>
+                                    <option value="27"> Princess's Secret Slide </option>
+                                    <option value="36"> Tall, Tall Mountain </option>
+                                    <option value="24"> Whomps Fortress </option>
+                                    <option value="7"> Hazy Maze Cave  </option>
+                                    <option value="4"> Big Boo's Haunt </option>
+                                    <option value="8"> Shifting Sand Land </option>
+                                </select>
+                            </div>
+                            <button id="playerNameButton" type="submit" class="btn btn-success mb-2" style="margin-left:15px;">Submit</button>
+                            <div class="form-group mb-2" style="margin-left:15px;">
+                                <label id="playerNameResult" type="text" readonly class="col-form-label" style="font-weight:bold">Waiting for selection</label>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+                <h6 hidden id="authFailMsg" style="color:red"></h6>
+
             </div>
 
-            <div hidden id="playerNameRow" style="margin-top: 10px;">
-                <form id="playerNameForm">
-                    <div id="discordNameRow" class="row" style="justify-content:center;">
-                        <div class="form-group mb-2">
-                            <label type="text" readonly class="col-form-label" style="color:skyblue">Discord Name: </label>
-                        </div>
-                        <div class="form-group mb-2">
-                            <input readonly id="discordNameBox" type="text" style="margin-left: 15px; max-width: 200px" class="form-control-sm" minlength="3" maxlength="20">
-                        </div>
-                        <div class="form-group mb-2">
-                            <button id="switchCustom" type="button" class="btn btn-sm btn-outline-primary mb-2" style="margin-left:15px;">Switch to Custom Display Name</button>
-                        </div>
-                    </div>
-                    <div hidden id="customNameRow" class="row" style="justify-content:center;">
-                        <div class="form-group mb-2">
-                            <label type="text" readonly class="col-form-label" style="color:skyblue">Custom Display Name: </label>
-                        </div>
-                        <div class="form-group mb-2">
-                            <input id="playerNameInput" type="text" style="margin-left: 15px; max-width: 120px" class="form-control-sm" minlength="3" maxlength="14" placeholder="enter name" onchange="window.updatePlayerName(this.value)">
-                        </div>
-                        <div class="form-group mb-2">
-                            <button id="switchDiscord" type="button" class="btn btn-sm btn-outline-primary mb-2" style="margin-left:15px;">Switch to Discord Username</button>
-                        </div>
-                    </div>
-                    <div class="row" style="justify-content:center;">
-                        <div class="form-group mb-2">
-                            <label type="text" readonly class="col-form-label" style="color:skyblue">Select Map: </label>
-                        </div>
-                        <div class="form-group mb-2" style="margin-left:15px;">
-                            <select id="mapSelect" class="form-control form-control-sm">
-                                <option value="1000"> Mushroom Battlefield </option>
-                                <option value="1001"> CTF/Race Map </option>
-                                <option value="16"> Castle Grounds </option>
-                                <option value="26"> Castle Courtyard </option>
-                                <option value="9"> Bob-omb Battlefield </option>
-                                <option value="5"> Cool, Cool Mountain </option>
-                                <option value="27"> Princess's Secret Slide </option>
-                                <option value="36"> Tall, Tall Mountain </option>
-                                <option value="24"> Whomps Fortress </option>
-                                <option value="7"> Hazy Maze Cave  </option>
-                                <option value="4"> Big Boo's Haunt </option>
-                                <option value="8"> Shifting Sand Land </option>
-                            </select>
-                        </div>
-                        <button id="playerNameButton" type="submit" class="btn btn-success mb-2" style="margin-left:15px;">Submit</button>
-                        <div class="form-group mb-2" style="margin-left:15px;">
-                            <label id="playerNameResult" type="text" readonly class="col-form-label" style="font-weight:bold">Waiting for selection</label>
-                        </div>
-                    </div>
-
-                </form>
-            </div>
-
-            <h6 hidden id="authFailMsg" style="color:red"></h6>
 
             <br />
 

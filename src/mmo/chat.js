@@ -5,7 +5,11 @@ const emoteImg = {
     mariostyle: 'mariostyle.gif', pogchamp: 'pogchamp.png', 
     strange: 'strange.png', kick: 'kick.gif', 
     shock: 'shock.gif', bup: 'bup.jpg', 
-    blj: 'blj.gif', discord: 'discord.png'
+    blj: 'blj.gif', discord: 'discord.png',
+    sus: 'sus.png', mariospeen: 'mariospeen.gif',
+    luph_massacre: 'luph_massacre.png', fenceslide: 'fenceslide.png',
+    luphirl: 'luphirl.png', coolioirl: 'coolioirl.png',
+    mariosus: 'mariosus.png', bupchamp: 'bupchamp.png',
 }
 
 const createEmote = (type) => {

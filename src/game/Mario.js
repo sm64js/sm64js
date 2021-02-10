@@ -420,7 +420,7 @@ export const init_marios = () => {
         marioObj: ObjectListProcessor.gMarioObject,
         faceAngle: [ ...Area.gMarioSpawnInfo.startAngle ],
         angleVel: [0, 0, 0],
-        pos: [ ...Area.gMarioSpawnInfo.startPos ],
+        pos: [ 9999, 9999, 9999 ],
         vel: [0, 0, 0],
         action: ACT_IDLE,
         controller: { stickX: 0, stickY: 0, stickMag: 0 },
@@ -434,7 +434,8 @@ export const init_marios = () => {
             animFrame: 0,
             animFrameAccelAssist: 0,
             animAccel: 0x10000,
-            animTimer: 0
+            animTimer: 0,
+            localMario: true
         }
     })
 
@@ -822,7 +823,6 @@ export const execute_mario_action = (m) => {
         Interact.mario_process_interactions(m)
 
         let inLoop = 1
-
         while (inLoop) {
             switch (m.action & ACT_GROUP_MASK) {
                 case ACT_GROUP_STATIONARY:
@@ -846,6 +846,7 @@ export const execute_mario_action = (m) => {
                 default: throw "unkown action group"
             }
         }
+
 
         update_mario_info_for_cam(m)
 
@@ -1170,7 +1171,7 @@ const update_mario_inputs = (m) => {
     update_mario_button_inputs(m) 
     update_mario_geometry_inputs(m)
 
-    if (m.controller.taunt && (m.action == ACT_IDLE || m.action == ACT_TAUNT)) m.input |= INPUT_TAUNT
+    if (m.controller && m.controller.taunt && (m.action == ACT_IDLE || m.action == ACT_TAUNT)) m.input |= INPUT_TAUNT
 
     if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) {
         if (m.action & ACT_FLAG_ALLOW_FIRST_PERSON) {

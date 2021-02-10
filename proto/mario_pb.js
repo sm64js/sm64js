@@ -4493,7 +4493,7 @@ proto.sm64js.ControllerMsg.toObject = function(includeInstance, msg) {
     sticky: jspb.Message.getFloatingPointFieldWithDefault(msg, 2, 0.0),
     stickmag: jspb.Message.getFloatingPointFieldWithDefault(msg, 3, 0.0),
     buttondown: jspb.Message.getFieldWithDefault(msg, 4, 0),
-    buttonpressed: jspb.Message.getFieldWithDefault(msg, 5, 0),
+    taunt: jspb.Message.getFieldWithDefault(msg, 5, 0),
     camerayaw: jspb.Message.getFieldWithDefault(msg, 6, 0),
     socketid: jspb.Message.getFieldWithDefault(msg, 7, 0)
   };
@@ -4550,7 +4550,7 @@ proto.sm64js.ControllerMsg.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 5:
       var value = /** @type {number} */ (reader.readUint32());
-      msg.setButtonpressed(value);
+      msg.setTaunt(value);
       break;
     case 6:
       var value = /** @type {number} */ (reader.readSint32());
@@ -4617,7 +4617,7 @@ proto.sm64js.ControllerMsg.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getButtonpressed();
+  f = message.getTaunt();
   if (f !== 0) {
     writer.writeUint32(
       5,
@@ -4714,10 +4714,10 @@ proto.sm64js.ControllerMsg.prototype.setButtondown = function(value) {
 
 
 /**
- * optional uint32 buttonPressed = 5;
+ * optional uint32 taunt = 5;
  * @return {number}
  */
-proto.sm64js.ControllerMsg.prototype.getButtonpressed = function() {
+proto.sm64js.ControllerMsg.prototype.getTaunt = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
 };
 
@@ -4726,7 +4726,7 @@ proto.sm64js.ControllerMsg.prototype.getButtonpressed = function() {
  * @param {number} value
  * @return {!proto.sm64js.ControllerMsg} returns this
  */
-proto.sm64js.ControllerMsg.prototype.setButtonpressed = function(value) {
+proto.sm64js.ControllerMsg.prototype.setTaunt = function(value) {
   return jspb.Message.setProto3IntField(this, 5, value);
 };
 

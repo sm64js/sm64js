@@ -1153,14 +1153,9 @@ class Camera {
 
     update_graph_node_camera(graphNode) {
 
-        graphNode.rollScreen = this.gLakituState.roll
-        graphNode.pos = [...this.gLakituState.pos]
-        graphNode.focus = [...this.gLakituState.focus]
-
-        if (LevelUpdate.gMarioState.parachuting) {
-            graphNode.pos[1] = LevelUpdate.gMarioState.pos[1] + 1000
-            graphNode.focus = [...LevelUpdate.gMarioState.pos]
-        }
+        graphNode.rollScreen = 0//this.gLakituState.roll
+        graphNode.pos = [-1000,2000,7000]
+        graphNode.focus = [-2000, 0, 2000]
 
     }
 

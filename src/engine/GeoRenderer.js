@@ -294,6 +294,8 @@ class GeoRenderer {
 
     geo_set_animation_globals(node, hasAnimation) {
 
+        if (node.localMario) return
+
         const anim = node.curAnim
 
         if (anim == 0) throw "node.curAnim is 0 should be object"
@@ -398,7 +400,7 @@ class GeoRenderer {
                 this.geo_set_animation_globals(object.header.gfx.unk38, hasAnimation)
             }
 
-            if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) { 
+            if (false) { 
                 if (object.header.gfx.sharedChild) {
 
                     if (object.localMario) {

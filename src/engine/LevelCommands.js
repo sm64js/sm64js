@@ -6,6 +6,8 @@ import { GoddardRendererInstance as GoddardRenderer } from "../goddard/GoddardRe
 import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
 import { init_graph_node_start } from "./graph_node"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
+import { GeoRendererInstance as GeoRenderer } from "./GeoRenderer"
+import { networkData } from "../mmo/socket"
 
 const SCRIPT_RUNNING = 1
 const SCRIPT_PAUSED = 0
@@ -341,10 +343,36 @@ class LevelCommands {
             cmd.command.call(this, cmd.args)
         }
 
-        Game.init_render_image()
-        Area.render_game()
-        Game.end_master_display_list()
 
+        if (window.gameMasterDebug) {
+            Game.init_render_image()
+            Area.render_game()
+            Game.end_master_display_list()
+        }
+
+        //animations for all marios
+        if (LevelUpdate.gMarioState && LevelUpdate.gMarioState.marioObj)
+            GeoRenderer.geo_set_animation_globals(LevelUpdate.gMarioState.marioObj.header.gfx.unk38, true)
+
+        const remotePlayerList = Object.values(networkData.remotePlayers)
+        for (let i = 0; i < remotePlayerList.length; i++) {
+            const data = remotePlayerList[i]
+            if (data.skipRender > 0) data.skipRender--
+            if (data.crashCount > 0 || data.skipRender > 0) return
+
+            if (data.marioState.marioObj.header.gfx.unk38.curAnim == 0) {
+                console.log("remote mario not initialized yet or not initialized properly, skipping rendering -- playerName: " + data.marioState.playerName)
+                continue
+            }
+
+            try {
+                GeoRenderer.geo_set_animation_globals(data.marioState.marioObj.header.gfx.unk38, true)
+            } catch (error) {
+                console.log("unknown error in 'geo_process_extra_mario' - please report this issue to sm64js devs -- playerName: " + data.marioState.playerName)
+                console.log(error)
+                data.skipRender = 30
+            }
+        }
     }
 
 }

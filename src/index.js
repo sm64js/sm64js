@@ -7,8 +7,9 @@ import "./mmo/cosmetics"
 import "./mmo/cmts_cosmetics"
 import "./template.css"
 
+window.gameMasterDebug = true
 
-const send_display_list = (gfx_list) => { GFX.run(gfx_list) }
+const send_display_list = (gfx_list) => { if (window.gameMasterDebug) GFX.run(gfx_list) }
 
 let n_frames = 0
 let target_time = 0

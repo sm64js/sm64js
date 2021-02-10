@@ -1,4 +1,4 @@
-import { Sm64JsMsg, MarioMsg, ControllerListMsg, ControllerMsg, ValidPlayersMsg } from "../../proto/mario_pb"
+import { Sm64JsMsg, MarioMsg, ControllerListMsg, ControllerMsg, MarioListMsg } from "../../proto/mario_pb"
 import zlib from "zlib"
 import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "./socket"
@@ -36,7 +36,7 @@ const updateRemoteMarioState = (id, marioProto) => {
     applyController(controllerProto)
 
     /// other mario updates
-    networkData.remotePlayers[id].marioUpdate = marioProto.toObject()
+    //networkData.remotePlayers[id].marioUpdate = marioProto.toObject()
 
 }
 
@@ -71,6 +71,53 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     }
 
     remotePlayer.marioUpdate = null
+
+}
+
+
+export const createAllMarioMsg = () => {
+
+    const marioListMsg = new MarioListMsg()
+
+    //if (networkData.remotePlayers == undefined) return
+
+    const marios = []
+
+    Object.values(networkData.remotePlayers).forEach(remoteMario => {
+        const mariomsg = new MarioMsg()
+
+        mariomsg.setActionstate(remoteMario.marioState.actionState)
+        mariomsg.setActiontimer(remoteMario.marioState.actionTimer)
+
+        mariomsg.setAction(remoteMario.marioState.action)
+        mariomsg.setPrevaction(remoteMario.marioState.prevAction)
+        mariomsg.setActionarg(remoteMario.marioState.actionArg)
+        mariomsg.setInvinctimer(remoteMario.marioState.invincTimer)
+        mariomsg.setFramessincea(remoteMario.marioState.framesSinceA)
+        mariomsg.setFramessinceb(remoteMario.marioState.framesSinceB)
+        mariomsg.setWallkicktimer(remoteMario.marioState.wallKickTimer)
+        mariomsg.setDoublejumptimer(remoteMario.marioState.doubleJumpTimer)
+        mariomsg.setAnglevelList(remoteMario.marioState.angleVel)
+        mariomsg.setForwardvel(remoteMario.marioState.forwardVel)
+        mariomsg.setVelList(remoteMario.marioState.vel)
+        mariomsg.setPosList(remoteMario.marioState.pos)
+        mariomsg.setFaceangleList(remoteMario.marioState.faceAngle)
+        mariomsg.setSocketid(remoteMario.marioState.socket_id)
+        mariomsg.setParachuting(remoteMario.marioState.parachuting)
+
+
+        if (remoteMario.marioState.usedObj) mariomsg.setUsedobjid(remoteMario.marioState.usedObj.rawData[RAW.oSyncID])
+
+        mariomsg.setRawdataList(getMarioRawDataSubset(remoteMario.marioState.marioObj.rawData))
+
+
+        marios.push(mariomsg)
+
+    })
+
+    marioListMsg.setMarioList(marios)
+
+    return marioListMsg
 
 }
 
@@ -112,6 +159,8 @@ const initNewRemoteMarioState = (marioProto) => {
     const m = gameData.marioState
 
     const newMarioState = {
+
+        controller: { buttonDownStart: 0, buttonDownA: 0, buttonDownB: 0, buttonDownZ: 0 },
 
         socket_id: marioProto.getSocketid(),
 
@@ -218,7 +267,6 @@ const applyController = (controllerProto) => {
     if (networkData.remotePlayers[id] == undefined) return
     const m = networkData.remotePlayers[id].marioState
     const buttonDown = controllerProto.getButtondown()
-    const buttonPressed = controllerProto.getButtonpressed()
     m.controller = {
         stickX: controllerProto.getStickx(),
         stickY: controllerProto.getSticky(),
@@ -227,11 +275,12 @@ const applyController = (controllerProto) => {
         buttonDownB: buttonDown & 0x2,
         buttonDownZ: buttonDown & 0x4,
         buttonDownStart: buttonDown & 0x8,
-        buttonPressedA: buttonPressed & 0x1,
-        buttonPressedB: buttonPressed & 0x2,
-        buttonPressedZ: buttonPressed & 0x4,
-        buttonPressedStart: buttonPressed & 0x8,
-        cameraYaw: controllerProto.getCamerayaw()
+        buttonPressedA: (buttonDown & 0x1) && !m.controller.buttonDownA,
+        buttonPressedB: (buttonDown & 0x2) && !m.controller.buttonDownB,
+        buttonPressedZ: (buttonDown & 0x4) && !m.controller.buttonDownZ,
+        buttonPressedStart: (buttonDown & 0x8) && !m.controller.buttonDownStart,
+        cameraYaw: controllerProto.getCamerayaw(),
+        taunt: controllerProto.getTaunt()
     }
 }
 
@@ -301,9 +350,9 @@ export const recvMarioData = (marioList) => {
                 marioState: initNewRemoteMarioState(marioProto),
                 skinData: defaultSkinData(),
                 crashCount: 0,
-                skipRender: 0
+                skipRender: 0,
             }
-            applyController(marioProto.getController())
+            //applyController(marioProto.getController())
         } else {
             updateRemoteMarioState(id, marioProto)
         }

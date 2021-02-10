@@ -245,6 +245,8 @@ class ObjectListProcessor {
     }
 
     bhv_mario_update() {
+
+        if (this.gCurrentObject.localMario) return
             
         const torsoDiff = [0, 0, 0]
         vec3f_dif(torsoDiff, this.gCurrentObject.marioState.pos, this.gCurrentObject.marioState.marioBodyState.torsoPos)
@@ -252,17 +254,14 @@ class ObjectListProcessor {
             this.gCurrentObject.marioState.marioBodyState.torsoPos = [...this.gCurrentObject.marioState.pos]
 
         const particleFlags = Mario.execute_mario_action(this.gCurrentObject.marioState)
+
         this.gCurrentObject.rawData[oMarioParticleFlags] = particleFlags
         this.copy_mario_state_to_object(this.gCurrentObject.marioState)
 
         if (this.sParticleTypes == undefined) this.sParticleTypes = this.sParticleTypesInit()
         this.sParticleTypes.forEach(particleType => {
             if (particleFlags & particleType.particleFlag) {
-                //// TODO Check mario distance
-                const distanceToLocalMario = dist_between_objects(this.gCurrentObject, this.gMarioObject)
-                if (distanceToLocalMario < 1000.0) {
-                    this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
-                }
+                this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
             }
         })
 

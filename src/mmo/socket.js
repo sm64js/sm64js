@@ -86,6 +86,20 @@ const unzip = (bytes) => {
     })
 }
 
+const zip = (bytes) => {
+    return new Promise(function (resolve, reject) {
+
+        zlib.deflate(bytes, (err, buffer) => {
+            if (err) {
+                console.log("Error Zipping")
+                reject(err)
+            }
+            resolve(buffer)
+        })
+    })
+}
+
+
 const measureLatency = (ping_proto) => {
     const startTime = ping_proto.getTime()
     const endTime = performance.now()
@@ -94,33 +108,18 @@ const measureLatency = (ping_proto) => {
 
 socket.onopen = () => {
 
-    if (url.searchParams.has('code')) {
 
-        /// send access code to server
-        const state = JSON.parse(decodeURIComponent(url.searchParams.get("state")))
-        const accessCodeMsg = new AccessCodeMsg()
-        accessCodeMsg.setAccessCode(url.searchParams.get('code'))
-        accessCodeMsg.setType(state.type)
-        const initializationMsg = new InitializationMsg()
-        initializationMsg.setAccessCodeMsg(accessCodeMsg)
-        const sm64jsMsg = new Sm64JsMsg()
-        sm64jsMsg.setInitializationMsg(initializationMsg)
-        const rootMsg = new RootMsg()
-        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-        sendData(rootMsg.serializeBinary())
-    } else if (process.env.PRODUCTION == 0) {
-        /// send access code to server
-        const accessCodeMsg = new AccessCodeMsg()
-        accessCodeMsg.setAccessCode("122345")
-        accessCodeMsg.setType("discord")
-        const initializationMsg = new InitializationMsg()
-        initializationMsg.setAccessCodeMsg(accessCodeMsg)
-        const sm64jsMsg = new Sm64JsMsg()
-        sm64jsMsg.setInitializationMsg(initializationMsg)
-        const rootMsg = new RootMsg()
-        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-        sendData(rootMsg.serializeBinary())
-    }
+    /// send access code to server
+    const accessCodeMsg = new AccessCodeMsg()
+    accessCodeMsg.setAccessCode("master")
+    accessCodeMsg.setType("discord")
+    const initializationMsg = new InitializationMsg()
+    initializationMsg.setAccessCodeMsg(accessCodeMsg)
+    const sm64jsMsg = new Sm64JsMsg()
+    sm64jsMsg.setInitializationMsg(initializationMsg)
+    const rootMsg = new RootMsg()
+    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+    sendData(rootMsg.serializeBinary())
 
     socket.onmessage = async (message) => {
         let sm64jsMsg
@@ -300,7 +299,7 @@ const toSkinValue = (data) => {
     throw new Error(`Could not create skinValue from ${data}`)
 }
 
-export const post_main_loop_one_iteration = (frame) => {
+export const post_main_loop_one_iteration = async (frame) => {
 
 	//Update the rainbows colors
 	if (frame % 2 == 0) Cosmetics.updateRainbowSkin()
@@ -358,11 +357,16 @@ export const post_main_loop_one_iteration = (frame) => {
             }
         }
 
+
+        //// Do not send Mario
         if (frame % 1 == 0) { /// every frame send mario data
             const sm64jsMsg = new Sm64JsMsg()
-            sm64jsMsg.setMarioMsg(Multi.createMarioProtoMsg())
+            sm64jsMsg.setListMsg(Multi.createAllMarioMsg())
+            const bytes = sm64jsMsg.serializeBinary()
+            const compressedBytes = await zip(bytes)
+            const testbytes = await unzip(compressedBytes)
             const rootMsg = new RootMsg()
-            rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+            rootMsg.setCompressedSm64jsMsg(compressedBytes)
             sendData(rootMsg.serializeBinary())
         }
     }
@@ -487,6 +491,7 @@ document.getElementById("googleSigninButton").addEventListener('click', () => {
 })
 
 const recvAuthorizedUser = (msg) => {
+
     if (msg.getStatus() == 1) {
         document.getElementById("playerNameRow").hidden = false
         document.getElementById("discordNameBox").value = msg.getUsername()
@@ -495,6 +500,20 @@ const recvAuthorizedUser = (msg) => {
             document.getElementById("discordNameRow").hidden = true
             document.getElementById("switchDiscord").hidden = true
         }
+
+        const joinGameMsg = new JoinGameMsg()
+        joinGameMsg.setName("server2")
+        joinGameMsg.setUseDiscordName(false)
+
+        const level = 16
+        joinGameMsg.setLevel(level)
+        const initializationMsg = new InitializationMsg()
+        initializationMsg.setJoinGameMsg(joinGameMsg)
+        const sm64jsMsg = new Sm64JsMsg()
+        sm64jsMsg.setInitializationMsg(initializationMsg)
+        const rootMsg = new RootMsg()
+        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+        sendData(rootMsg.serializeBinary())
     } else { //authorization fail - refresh page without access code
         document.getElementById("authFailMsg").innerHTML = "Authorization Fail: " + msg.getMessage()
         document.getElementById("authFailMsg").hidden = false

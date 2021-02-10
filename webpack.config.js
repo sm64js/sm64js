@@ -32,7 +32,7 @@ module.exports = env => ({
         extensions: ['*', '.js']
     },
     devServer: {
-        port: 9300,
+        port: 9400,
         before(app) {
             app.use('/mmo', express.static(path.resolve('src/mmo')))
         }
@@ -40,9 +40,7 @@ module.exports = env => ({
     plugins: [
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(env || 'development'),
-            'process.env.PRODUCTION': JSON.stringify(process.env.PRODUCTION),
-            'process.env.DISCORD_CLIENT_ID': JSON.stringify(process.env.DISCORD_CLIENT_ID),
-            'process.env.GOOGLE_CLIENT_ID': JSON.stringify(process.env.GOOGLE_CLIENT_ID),
+            'process.env.PRODUCTION': JSON.stringify(process.env.PRODUCTION)
         }),
         new HtmlWebPackPlugin({
             template: "./src/index.html",

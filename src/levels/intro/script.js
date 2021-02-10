@@ -25,7 +25,7 @@ const level_intro_entry_2 = () => {
         { command: LevelCommands.reset_call_loop },
         { command: LevelCommands.call_loop, args: [ { state: 1 }, lvl_intro_update, null] },
         { command: LevelCommands.unload_area, args: [1] },
-        { command: LevelCommands.set_register, args: [getSelectedLevel] },
+        { command: LevelCommands.set_register, args: [16] },
         { command: LevelCommands.execute, args: [level_main_scripts_entry] }
         /// Jump If
         /// Jump IF

@@ -3,9 +3,11 @@ const HtmlWebPackPlugin = require("html-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const OptimizeCSSAssetsWebpackPlugin = require("optimize-css-assets-webpack-plugin")
 const TerserWebpackPlugin = require("terser-webpack-plugin")
+const CopyPlugin = require("copy-webpack-plugin")
 const express = require('express')
 const path = require('path')
 
+require('dotenv').config()
 
 module.exports = env => ({
     module: {
@@ -51,7 +53,13 @@ module.exports = env => ({
         new MiniCssExtractPlugin({
             filename: "template.css",
             chunkFilename: "[id].css"
-        })
+        }),
+        new CopyPlugin({
+            patterns: [
+                { from: "./src/mmo/assets", to: "./mmo/assets" },
+                { from: "./src/mmo/html", to: "./mmo/html" }
+            ],
+        }),
     ],
     output: {
         publicPath: "/",

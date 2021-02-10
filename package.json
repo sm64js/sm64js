@@ -33,6 +33,8 @@
     "@babel/core": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
     "babel-loader": "^8.1.0",
+    "copy-webpack-plugin": "6",
+    "dotenv": "^8.2.0",
     "html-loader": "^1.1.0",
     "html-webpack-plugin": "^4.3.0",
     "webpack-node-externals": "^1.7.2"

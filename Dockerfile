@@ -21,8 +21,6 @@ COPY proto/ ./proto
 RUN npm run build
 
 COPY src/favicon.ico ./dist/
-COPY src/mmo/assets/ ./dist/mmo/assets
-COPY src/mmo/html/ ./dist/mmo/html
 COPY . ./
 
 

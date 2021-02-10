@@ -30,6 +30,19 @@ export const coss = (num) => {
     return Math.cos(num / 0x8000 * Math.PI)
 }
 
+export const distance3d = (p1, p2) => {
+    const dx = p1[0] - p2[0]
+    const dy = p1[1] - p2[1]
+    const dz = p1[2] - p2[2]
+    return Math.sqrt(dx * dx + dy * dy + dz * dz)
+}
+
+export const distanceXZ = (p1, p2) => {
+    const dx = p1[0] - p2[0]
+    const dz = p1[2] - p2[2]
+    return Math.sqrt(dx * dx + dz * dz)
+}
+
 export const lerp = (min,max,amt) => { 
 	if (amt < 0) amt = 0
 	if (amt > 1) amt = 1

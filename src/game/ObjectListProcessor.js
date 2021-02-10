@@ -6,13 +6,14 @@ import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands
 import * as Mario from "./Mario"
 import { detect_object_collisions } from "./ObjectCollisions"
 import { networkData, gameData as socketGameData, updateNetworkBeforeRender } from "../mmo/socket"
-import { copyMarioUpdateToState } from "../mmo/MultiMarioManager"
+import { copyMarioUpdateToState, updateLocalMarioState, updateLocalMarioState2 } from "../mmo/MultiMarioManager"
 import { vec3f_dif, vec3f_length } from "../engine/math_util"
 import { uint32, uint16 } from "../utils"
 import { MODEL_NONE, MODEL_MIST } from "../include/model_ids"
 import * as MarioConstants from "../include/mario_constants"
 import { gLinker } from "./Linker"
 import { spawn_object_at_origin, obj_copy_pos_and_angle, dist_between_objects } from "./ObjectHelpers"
+import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 
 class ObjectListProcessor {
     constructor() {
@@ -118,11 +119,21 @@ class ObjectListProcessor {
                 if (remotePlayer.marioState.ignoreUpdates > 0) {
                     remotePlayer.marioState.ignoreUpdates--
                 } else {
-                    copyMarioUpdateToState(remotePlayer)
+                    copyMarioUpdateToState(remotePlayer.marioState, remotePlayer.marioUpdate)
+                    remotePlayer.marioUpdate = null
                     this.copy_mario_state_to_object(remotePlayer.marioState)
                 }
             }
         })
+
+        if (networkData.yourMarioUpdate) {
+            this.gCurrentObject = LevelUpdate.gMarioState.marioObj
+            updateLocalMarioState(LevelUpdate.gMarioState, networkData.yourMarioUpdate)
+            networkData.yourMarioUpdate = null
+            this.copy_mario_state_to_object(LevelUpdate.gMarioState)
+        } else {
+            //console.log("skipping an update")
+        }
 
         this.gObjectCounter = 0  /// probaly not used and not needed
 
@@ -245,6 +256,13 @@ class ObjectListProcessor {
     }
 
     bhv_mario_update() {
+
+        const saveController = this.gCurrentObject.marioState.controller
+        if (this.gCurrentObject.localMario) {
+            //this.gCurrentObject.marioState.controller.buttonPressedA = false
+            //this.gCurrentObject.marioState.controller.buttonPressedB = false
+            //this.gCurrentObject.marioState.controller.buttonPressedZ = false
+        }
             
         const torsoDiff = [0, 0, 0]
         vec3f_dif(torsoDiff, this.gCurrentObject.marioState.pos, this.gCurrentObject.marioState.marioBodyState.torsoPos)
@@ -265,6 +283,10 @@ class ObjectListProcessor {
                 }
             }
         })
+
+        if (this.gCurrentObject.localMario) {
+            this.gCurrentObject.marioState.controller = saveController
+        }
 
     }
 

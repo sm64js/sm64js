@@ -1170,7 +1170,7 @@ const update_mario_inputs = (m) => {
     update_mario_button_inputs(m) 
     update_mario_geometry_inputs(m)
 
-    if (m.controller.taunt && (m.action == ACT_IDLE || m.action == ACT_TAUNT)) m.input |= INPUT_TAUNT
+    if (m.controller && m.controller.taunt && (m.action == ACT_IDLE || m.action == ACT_TAUNT)) m.input |= INPUT_TAUNT
 
     if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) {
         if (m.action & ACT_FLAG_ALLOW_FIRST_PERSON) {

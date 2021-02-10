@@ -4,8 +4,9 @@ import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "./socket"
 import { defaultSkinData } from "./cosmetics"
 import { INTERACT_PLAYER } from "../game/Interaction"
-import { levelIdToName } from "../utils"
+import { levelIdToName, distance3d } from "../utils"
 import { gLinker } from "../game/Linker"
+import { dist_between_objects, cur_obj_rotate_yaw_toward, approach_symmetric } from "../game/ObjectHelpers"
 
 const url = new URL(window.location.href)
 
@@ -40,9 +41,9 @@ const updateRemoteMarioState = (id, marioProto) => {
 
 }
 
-export const copyMarioUpdateToState = (remotePlayer) => {
-    const m = remotePlayer.marioState
-    const update = remotePlayer.marioUpdate
+export const copyMarioUpdateToState = (m, update) => {
+    //const m = remotePlayer.marioState
+    //const update = remotePlayer.marioUpdate
 
     m.actionState = (m.action != update.action) ? 0 : update.actionstate
     m.actionTimer = (m.action != update.action) ? 0 : update.actiontimer
@@ -60,7 +61,7 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     m.vel = update.velList
     m.pos = update.posList
     m.faceAngle = update.faceangleList
-    m.socket_id = update.socketid
+    m.socket_id = update.socketid // should not be needed
     m.parachuting = update.parachuting
 
     m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
@@ -70,7 +71,108 @@ export const copyMarioUpdateToState = (remotePlayer) => {
         m.usedObj = gameData.spawnObjectsBySyncID[update.usedobjid - 1000]
     }
 
-    remotePlayer.marioUpdate = null
+}
+
+const constrainNumber = (number, max) => {
+    if (number > max) number = max
+    if (number < -max) number = -max
+    return number
+}
+
+export const updateLocalMarioState = (m, update) => {
+
+    const distance = distance3d(m.pos, update.posList)
+    if (distance > 1500.0) {
+        console.log("full sync")
+
+        m.actionState = update.actionstate
+        m.actionTimer = update.actiontimer
+
+        m.action = update.action
+        m.prevAction = update.prevaction
+        m.actionArg = update.actionarg
+        m.invincTimer = update.invinctimer
+        m.framesSinceA = update.framessincea
+        m.framesSinceB = update.framessinceb
+        m.wallKickTimer = update.wallkicktimer
+        m.doubleJumpTimer = update.doublejumptimer
+        m.angleVel = update.anglevelList
+        m.forwardVel = update.forwardvel
+        m.pos = update.posList
+        m.vel = update.velList
+
+        m.faceAngle = update.faceangleList
+        m.socket_id = update.socketid  // should not be needed
+        m.parachuting = update.parachuting
+
+        m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
+        m.marioObj.rawData[RAW.oRoom] = -1
+
+        if (update.usedobjid >= 1000 && update.usedobjid <= 2000) {
+            m.usedObj = gameData.spawnObjectsBySyncID[update.usedobjid - 1000]
+        }
+    } else {
+        m.pos[0] += constrainNumber(update.posList[0] - m.pos[0], 6)
+        //m.pos[1] += constrainNumber(update.posList[1] - m.pos[1], 8)
+        m.pos[2] += constrainNumber(update.posList[2] - m.pos[2], 6)
+
+        m.vel[0] += constrainNumber(update.velList[0] - m.vel[0], 2)
+        //m.vel[1] += constrainNumber(update.velList[1] - m.vel[1], 2)
+        m.vel[2] += constrainNumber(update.velList[2] - m.vel[2], 2)
+        m.forwardVel += constrainNumber(update.forwardvel - m.forwardVel, 2)
+
+        //console.log(update.faceangleList[1] - m.faceAngle[1])
+        //cur_obj_rotate_yaw_toward(update.faceangleList[1], 10)
+        m.faceAngle[1] = approach_symmetric(m.faceAngle[1], update.faceangleList[1], 10)
+    }
+
+}
+
+export const updateLocalMarioState2 = (m, update) => {
+
+    const distance = distance3d(m.pos, update.posList)
+    if (distance > 1500.0) {
+        console.log("full sync")
+        m.pos = update.posList
+        m.faceAngle = update.faceangleList
+    } else {
+        m.pos[0] += constrainNumber(update.posList[0] - m.pos[0], 8)
+        m.pos[1] += constrainNumber(update.posList[1] - m.pos[1], 8)
+        m.pos[2] += constrainNumber(update.posList[2] - m.pos[2], 8)
+        m.faceAngle[1] = approach_symmetric(m.faceAngle[1], update.faceangleList[1], 10)
+
+    }
+
+    //m.vel[0] += constrainNumber(update.velList[0] - m.vel[0], 0.2)
+    //m.vel[1] += constrainNumber(update.velList[1] - m.vel[1], 0.2)
+    //m.vel[2] += constrainNumber(update.velList[2] - m.vel[2], 0.2)
+    //m.forwardVel += constrainNumber(update.forwardvel - m.forwardVel, 0.2)
+
+    m.actionState = (m.action != update.action) ? 0 : update.actionstate
+    m.actionTimer = (m.action != update.action) ? 0 : update.actiontimer
+
+    m.action = update.action
+    m.prevAction = update.prevaction
+    m.actionArg = update.actionarg
+    m.invincTimer = update.invinctimer
+    m.framesSinceA = update.framessincea
+    m.framesSinceB = update.framessinceb
+    m.wallKickTimer = update.wallkicktimer
+    m.doubleJumpTimer = update.doublejumptimer
+    m.angleVel = update.anglevelList
+    m.forwardVel = update.forwardvel
+    m.vel = update.velList
+    //m.pos = update.posList
+    //m.faceAngle = update.faceangleList
+    m.socket_id = update.socketid // should not be needed
+    m.parachuting = update.parachuting
+
+    m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
+    m.marioObj.rawData[RAW.oRoom] = -1
+
+    if (update.usedobjid >= 1000 && update.usedobjid <= 2000) {
+        m.usedObj = gameData.spawnObjectsBySyncID[update.usedobjid - 1000]
+    }
 
 }
 
@@ -112,6 +214,8 @@ const initNewRemoteMarioState = (marioProto) => {
     const m = gameData.marioState
 
     const newMarioState = {
+
+        controller: { buttonDownStart: 0, buttonDownA: 0, buttonDownB: 0, buttonDownZ: 0 },
 
         socket_id: marioProto.getSocketid(),
 
@@ -199,12 +303,14 @@ export const createControllerProtoMsg = () => {
     buttonDown |= (m.controller.buttonDownStart << 3)
     controllermsg.setButtondown(buttonDown)
 
-    let buttonPressed = 0
+/*    let buttonPressed = 0
     buttonPressed |= (m.controller.buttonPressedA << 0)
     buttonPressed |= (m.controller.buttonPressedB << 1)
     buttonPressed |= (m.controller.buttonPressedZ << 2)
     buttonPressed |= (m.controller.buttonPressedStart << 3)
-    controllermsg.setButtonpressed(buttonPressed)
+    controllermsg.setButtonpressed(buttonPressed)*/
+
+    controllermsg.setTaunt(m.controller.taunt)
 
     controllermsg.setCamerayaw(m.area.camera.yaw)
 
@@ -218,7 +324,6 @@ const applyController = (controllerProto) => {
     if (networkData.remotePlayers[id] == undefined) return
     const m = networkData.remotePlayers[id].marioState
     const buttonDown = controllerProto.getButtondown()
-    const buttonPressed = controllerProto.getButtonpressed()
     m.controller = {
         stickX: controllerProto.getStickx(),
         stickY: controllerProto.getSticky(),
@@ -227,11 +332,12 @@ const applyController = (controllerProto) => {
         buttonDownB: buttonDown & 0x2,
         buttonDownZ: buttonDown & 0x4,
         buttonDownStart: buttonDown & 0x8,
-        buttonPressedA: buttonPressed & 0x1,
-        buttonPressedB: buttonPressed & 0x2,
-        buttonPressedZ: buttonPressed & 0x4,
-        buttonPressedStart: buttonPressed & 0x8,
-        cameraYaw: controllerProto.getCamerayaw()
+        buttonPressedA: (buttonDown & 0x1) && !m.controller.buttonDownA,
+        buttonPressedB: (buttonDown & 0x2) && !m.controller.buttonDownB,
+        buttonPressedZ: (buttonDown & 0x4) && !m.controller.buttonDownZ,
+        buttonPressedStart: (buttonDown & 0x8) && !m.controller.buttonDownStart,
+        cameraYaw: controllerProto.getCamerayaw(),
+        taunt: controllerProto.getTaunt()
     }
 }
 
@@ -294,7 +400,15 @@ export const recvPlayerLists = (playerListsProto) => {
 export const recvMarioData = (marioList) => {
     marioList.forEach(marioProto => {
         const id = marioProto.getSocketid()
-        if (id == networkData.mySocketID) return
+        if (id == networkData.mySocketID) {
+            //const controllerProto = marioProto.getController()
+            //applyController(controllerProto)
+
+            /// other mario updates
+            //if (networkData.yourMarioUpdate != null) console.log("extra update")
+            networkData.yourMarioUpdate = marioProto.toObject()
+            return
+        }
 
         if (networkData.remotePlayers[id] == undefined) {
             networkData.remotePlayers[id] = { 

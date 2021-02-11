@@ -29,6 +29,7 @@ export const G_SETSCISSOR = 26
 export const G_SETZIMG = 27
 export const G_SETCIMG = 28
 export const G_RDPLOADSYNC = 29
+export const G_TEXRECT = 30
 
 /// Custom Opcodes
 export const G_SETPLAYERDATA = 30
@@ -535,6 +536,23 @@ export const gDPFillRectangle = (displaylist, ulx, uly, lrx, lry) => {
     })
 }
 
+export const gSPTextureRectangle = (displaylist, ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy) => {
+    displaylist.push({
+        words: {
+            w0: G_TEXRECT,
+            w1: { ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy }
+        }
+    })
+}
+
+export const gSPTextureRectangleFlip = (displaylist, ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy) => {
+    displaylist.push({
+        words: {
+            w0: G_FILLRECTFLIP,
+            w1: { ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy }
+        }
+    })
+}
 
 export const gSPTexture = (displaylist, s, t, level, tile, on) => {
     displaylist.push({

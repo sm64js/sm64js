@@ -44,7 +44,8 @@ class Print {
     }
 
     print_text(x, y, str) {
-        str += "\0";
+        str += "\0"; // Oh jeez, we have to do logic on C strings (terminated with a null character) and Javascript strings (that just stores characters in an array? who even knows)
+                     // Consider this function incorrect
         var c = "\0";
         var length = 0;
         var srcIndex = 0;
@@ -73,8 +74,9 @@ class Print {
     }
 
     print_text_fmt_int(x, y, str, n) {
-        // console.log("Should print", x, y, str, n)
-        // return;
+        // Same as print_text, I'm unsure what to do here
+
+        return;
         str += "\0";
 
         var c = 0;

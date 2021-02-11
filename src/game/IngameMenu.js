@@ -3,6 +3,7 @@ import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../include/config"
 import * as Gbi from "../include/gbi"
 import { GameInstance as Game } from "./Game"
 
+
 export const create_dl_ortho_matrix = () => {
     // if (matrix == NULL) {
     //     return;
@@ -16,6 +17,8 @@ export const create_dl_ortho_matrix = () => {
 
     Gbi.gSPMatrix(Game.gDisplayList, matrix, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_MUL | Gbi.G_MTX_NOPUSH)
 }
+
+// This is probably incorrect. I'm not sure what kind of identity matrix should be created here
 
 export const create_dl_identity_matrix = () => {
     var matrix = new Array(4).fill(0).map(() => new Array(4).fill(0));

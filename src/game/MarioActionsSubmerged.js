@@ -5,7 +5,7 @@ import { coss, int16, int32, sins } from "../utils"
 import * as Particles from "../include/mario_constants"
 import { SURFACE_FLOWING_WATER } from "../include/surface_terrains"
 import { AreaInstance as Area } from "../game/Area"
-import { INT_STATUS_MARIO_DROP_OBJECT, INT_STATUS_STOP_RIDING } from "./Interaction"
+import { INT_STATUS_MARIO_DROP_OBJECT, INT_STATUS_STOP_RIDING, INTERACT_GRABBABLE } from "./Interaction"
 import { CameraInstance as Camera } from "./Camera"
 
 const MIN_SWIM_STRENGTH = 160
@@ -227,7 +227,7 @@ const act_water_plunge = (m) => {
         D_80339FD2 = 0
     }
 
-    switch (stateFlags) { //TODO boolean?
+    switch (stateFlags) {
         case 0:
             Mario.set_mario_animation(m, Mario.MARIO_ANIM_WATER_ACTION_END)
             break
@@ -770,6 +770,73 @@ const check_common_submerged_cancels = (m) => {
     return 0
 }
 
+const act_water_punch = (m) => {
+    if (m.forwardVel < 7.0) {
+        m.forwardVel += 1.0
+    }
+
+    update_swimming_yaw(m)
+    update_swimming_pitch(m)
+    update_swimming_speed(m, MIN_SWIM_SPEED)
+    perform_water_step(m)
+    update_water_pitch(m)
+
+    m.marioBodyState.headAngle[0] = approach_number(m.marioBodyState.headAngle[0], 0, 0x200, 0x200)
+
+    //TODO play_sound_if_no_flag(m, SOUND_ACTION_SWIM, MARIO_ACTION_SOUND_PLAYED);
+
+    switch (m.actionState) {
+        case 0:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_WATER_GRAB_OBJ_PART1)
+            if (Mario.is_anim_at_end(m)) {
+                m.actionState = check_water_grab(m) + 1
+            }
+            break
+
+        case 1:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_WATER_GRAB_OBJ_PART2)
+            if (Mario.is_anim_at_end(m)) {
+                Mario.set_mario_action(m, Mario.ACT_WATER_ACTION_END, 0)
+            }
+            break
+
+        case 2:
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_WATER_PICK_UP_OBJ)
+            if (Mario.is_anim_at_end(m)) {
+                /*TODO if (m.heldObj.behavior == segmented_to_virtual(bhvKoopaShellUnderwater)) {
+                    //TODO play_shell_music();
+                    Mario.set_mario_action(m, Mario.ACT_WATER_SHELL_SWIMMING, 0)
+                } else {
+                    Mario.set_mario_action(m, Mario.ACT_HOLD_WATER_ACTION_END, 1)
+                }*/
+            }
+            break
+    }
+
+    return 0
+}
+
+const check_water_grab = (m) => {
+    //! Heave hos have the grabbable interaction type but are not normally
+    // grabbable. Since water grabbing doesn't check the appropriate input flag,
+    // you can use water grab to pick up heave ho.
+    if (m.marioObj.collidedObjInteractTypes & INTERACT_GRABBABLE) {
+        const object = mario_get_collided_object(m, INTERACT_GRABBABLE)
+        const dx = object.oPosX - m.pos[0]
+        const dz = object.oPosZ - m.pos[2]
+        const dAngleToObject = atan2s(dz, dx) - m.faceAngle[1]
+
+        if (dAngleToObject >= -0x2aaa && dAngleToObject <= 0x2aaa) {
+            m.usedObj = object
+            mario_grab_used_object(m)
+            m.marioBodyState.grabPos = GRAB_POS_LIGHT_OBJ
+            return 1
+        }
+    }
+
+    return 0
+}
+
 const act_flutter_kick = (m) => {
     if (m.flags & Mario.MARIO_METAL_CAP) {
         return Mario.set_mario_action(m, Mario.ACT_METAL_WATER_FALLING, 1)
@@ -841,7 +908,8 @@ export const mario_execute_submerged_action = (m) => {
         //case Mario.ACT_HOLD_FLUTTER_KICK:          return //act_hold_flutter_kick(m);
         //case Mario.ACT_WATER_SHELL_SWIMMING:       return //act_water_shell_swimming(m);
         //case Mario.ACT_WATER_THROW:                return //act_water_throw(m);
-        //case Mario.ACT_WATER_PUNCH:                return //act_water_punch(m);
+        case Mario.ACT_WATER_PUNCH:
+            return act_water_punch(m)
         case Mario.ACT_WATER_PLUNGE:
             return act_water_plunge(m)
         //case Mario.ACT_CAUGHT_IN_WHIRLPOOL:        return //act_caught_in_whirlpool(m);

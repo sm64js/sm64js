@@ -769,7 +769,7 @@ const act_hold_water_jump = (m) => {
             break;
     }
 
-    return FALSE;
+    return 0;
 }
 
 

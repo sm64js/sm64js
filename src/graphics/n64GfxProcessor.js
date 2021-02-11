@@ -760,7 +760,7 @@ export class n64GfxProcessor {
     dp_texture_rectangle(ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy, flip) {
         const saved_combine_mode = this.rdp.combine_mode
 
-        if ((this.rdp.other_mode_h & (3 << Gbi.G_MDSFT_CYCLETYPE)) == Gbi.G_CYC_COPY) {
+        if (this.rdp.other_mode_h[Gbi.G_MDSFT_CYCLETYPE] == Gbi.G_CYC_COPY) {
             // Per RDP Command Summary Set Tile's shift s and this dsdx should be set to 4 texels
             // Divide by 4 to get 1 instead
             dsdx >>= 2

@@ -263,6 +263,19 @@ export const G_IM_SIZ_16b	= 2
 export const G_IM_SIZ_32b	= 3
 export const G_IM_SIZ_DD = 5
 
+
+export const G_SETBLENDCOLOR = 0xf9	/*  -7 */
+export const G_LOADTILE = 0xf4	/* -12 */
+export const G_RDPSETOTHERMODE = 0xef	/* -17 */
+export const G_SETPRIMDEPTH = 0xee	/* -18 */
+export const G_SETCONVERT = 0xec	/* -20 */
+export const G_SETKEYR = 0xeb	/* -21 */
+export const G_SETKEYGB = 0xea	/* -22 */
+export const G_RDPFULLSYNC = 0xe9	/* -23 */
+export const G_RDPTILESYNC = 0xe8	/* -24 */
+export const G_RDPPIPESYNC = 0xe7	/* -25 */
+export const G_TEXRECT = 0xe4	/* -28 */
+
 export const G_IM_SIZ_INCR_TABLE = {
     1: 1,
     2: 0
@@ -340,6 +353,10 @@ export const G_MTX_MUL           = 0	/* concat or load */
 export const G_MTX_LOAD          = 2
 export const G_MTX_NOPUSH        = 0	/* push or not */
 export const G_MTX_PUSH = 4
+
+export const G_IM_SIZ_16b_BYTES	= 2;
+export const G_IM_SIZ_16b_TILE_BYTES = G_IM_SIZ_16b_BYTES;
+export const G_IM_SIZ_16b_LINE_BYTES = G_IM_SIZ_16b_BYTES;
 
 export const G_CC_PRIMITIVE = {
     alpha: [7, 7, 7, 3],
@@ -653,6 +670,24 @@ export const gSPClearGeometryMode = (displaylist, mode) => {
     })
 }
 
+export const gSPTextureRectangle = (displaylist, ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy) => {
+    displaylist.push({
+        words: {
+            w0: G_TEXRECT,
+            w1: { ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy }
+        }
+    })
+}
+
+export const gSPTextureRectangleFlip = (displaylist, ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy) => {
+    displaylist.push({
+        words: {
+            w0: G_FILLRECTFLIP,
+            w1: { ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy }
+        }
+    })
+}
+
 export const gSPEndDisplayList = (displaylist) => {
     displaylist.push({
         words: {
@@ -679,14 +714,14 @@ export const gSPDisplayList = (displaylist, childDisplayList) => {
     })
 }
 
-/*export const gDPSetTextureImage = (displaylist, format, size, width, imageData) => {
-    displaylist.push({
+export const gDPSetTextureImage = (format, size, width, imageData) => {
+   return {
         words: {
             w0: G_SETTIMG,
             w1: { format, size, width, imageData }
         }
-    })
-}*/
+    };
+}
 
 export const gDPLoadBlockTexture = (displaylist, width, height, format, image) => {
     displaylist.push(

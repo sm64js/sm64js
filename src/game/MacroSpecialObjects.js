@@ -27,7 +27,6 @@ import {
 import {
     MODEL_BOB_BUBBLY_TREE,
     MODEL_CCM_SNOW_TREE,
-    MODEL_SL_SNOW_TREE,
     MODEL_LEVEL_GEOMETRY_03,
     MODEL_LEVEL_GEOMETRY_04,
     MODEL_LEVEL_GEOMETRY_05,
@@ -65,7 +64,6 @@ const SPTYPE_DEF_PARAM_AND_YROT = 4 // object is 10-bytes long, has y-rotation a
 const SpecialObjectPresets = {}
 SpecialObjectPresets[special_bubble_tree] = { type: SPTYPE_NO_YROT_OR_PARAMS, defParam: 0, model: MODEL_BOB_BUBBLY_TREE, behavior: bhvTree }
 SpecialObjectPresets[special_snow_tree] = { type: SPTYPE_NO_YROT_OR_PARAMS, defParam: 0, model: MODEL_CCM_SNOW_TREE, behavior: bhvTree }
-SpecialObjectPresets[special_snow_tree] = { type: SPTYPE_NO_YROT_OR_PARAMS, defParam: 0, model: MODEL_SL_SNOW_TREE, behavior: bhvTree }
 SpecialObjectPresets[special_level_geo_03] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_03, behavior: bhvStaticObject }
 SpecialObjectPresets[special_level_geo_04] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_04, behavior: bhvStaticObject }
 SpecialObjectPresets[special_level_geo_05] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_05, behavior: bhvStaticObject }

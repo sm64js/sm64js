@@ -286,12 +286,13 @@ import { poundable_pole_seg6_texture_06001050, poundable_pole_seg6_texture_06001
 
 import { dirt_seg3_texture_0302BDF8 } from "./actors/dirt/model.inc"
 import { mist_seg3_texture_03000080 } from "./actors/mist/model.inc"
+import { bubble_seg4_texture_0401CD60, bubble_seg4_texture_0401D560 } from "./actors/bubble/model.inc"
 
 
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 27
+const textureVersion = 28
 
 const loadDataIntoGame = (data) => {
 
@@ -562,6 +563,9 @@ const loadDataIntoGame = (data) => {
     dirt_seg3_texture_0302BDF8.push(...data["actors/dirt/dirt_particle.rgba16.png"].data)
 
     mist_seg3_texture_03000080.push(...data["actors/mist/mist.ia16.png"].data)
+
+    bubble_seg4_texture_0401CD60.push(...data["actors/bubble/bubble.rgba16.png"].data)
+    bubble_seg4_texture_0401D560.push(...data["actors/bubble/mr_i_bubble.rgba16.png"].data)
 
     SkyboxSSL.ssl_skybox_texture_00000.push(...data["ssl_skybox_texture_00000"].data)
     SkyboxSSL.ssl_skybox_texture_00001.push(...data["ssl_skybox_texture_00001"].data)

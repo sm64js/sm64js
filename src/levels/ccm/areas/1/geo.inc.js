@@ -19,7 +19,7 @@ export const ccm_geo_00051C = [
     { command: GeoLayout.open_node },
     { command: GeoLayout.node_ortho, args: [100] },
     { command: GeoLayout.open_node },
-    { command: GeoLayout.node_background, args: [GeoLayout.BACKGROUND_OCEAN_SKY, geo_skybox_main] },
+    { command: GeoLayout.node_background, args: [GeoLayout.BACKGROUND_SNOW_MOUNTAINS, geo_skybox_main] },
     { command: GeoLayout.close_node },
     { command: GeoLayout.close_node },
     { command: GeoLayout.node_master_list, args: [1] },

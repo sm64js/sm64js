@@ -8,5 +8,6 @@ export const LEVEL_WF = 24
 export const LEVEL_HMC = 7
 export const LEVEL_BBH = 4
 export const LEVEL_SSL = 8
+export const LEVEL_SL = 10
 export const LEVEL_MBF = 1000
 export const LEVEL_CTF00 = 1001

@@ -28,6 +28,7 @@ import {
     SURFACE_CLOSE_CAMERA,
 	SURFACE_SHALLOW_QUICKSAND,
     SURFACE_CAMERA_ROTATE_LEFT,
+    SURFACE_DEATH_PLANE,
 	
 	special_level_geo_03,
     special_level_geo_04,
@@ -1697,7 +1698,7 @@ export const ttm_seg7_area_1_collision = [
     ...COL_TRI(808, 806, 805),
     ...COL_TRI(809, 806, 808),
     ...COL_TRI(809, 807, 806),
-    ...COL_TRI_INIT(SURFACE_VERY_SLIPPERY /*SURFACE_DEATH_PLANE*/, 2),
+    ...COL_TRI_INIT(SURFACE_DEATH_PLANE, 2),
     ...COL_TRI(801, 802, 803),
     ...COL_TRI(801, 804, 802),
     ...COL_TRI_INIT(SURFACE_FLOWING_WATER, 15),

@@ -6,12 +6,13 @@ import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectList
 import { GRAPH_RENDER_INVISIBLE, geo_update_animation_frame, retrieve_animation_index } from "../engine/graph_node"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import * as SurfaceTerrains from "../include/surface_terrains"
-import { atan2s } from "../engine/math_util"
+import { atan2s, vec3s_set } from "../engine/math_util"
 import { mario_execute_stationary_action } from "./MarioActionsStationary"
 import { gMarioAnimData } from "../actors/mario/marioAnimData"
 import { mario_execute_moving_action } from "./MarioActionsMoving"
 import { mario_execute_airborne_action } from "./MarioActionsAirborne"
 import { mario_execute_object_action } from "./MarioActionsObject"
+import { mario_execute_submerged_action } from "./MarioActionsSubmerged"
 import { oMarioWalkingPitch, oInteractStatus, oPosX, oPosY, oPosZ, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oMarioSteepJumpYaw } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
@@ -133,6 +134,25 @@ export const MARIO_ANIM_SIDESTEP_LEFT = 0x7F
 export const MARIO_ANIM_SIDESTEP_RIGHT = 0x80
 export const MARIO_ANIM_CREDITS_WAVING = 0x1D
 export const MARIO_ANIM_STAR_DANCE = 0xCD
+export const MARIO_ANIM_DROWNING_PART1 = 0xA5
+export const MARIO_ANIM_DROWNING_PART2 = 0xA6
+export const MARIO_ANIM_WATER_IDLE_WITH_OBJ = 0xA4
+export const MARIO_ANIM_WATER_IDLE = 0xB2
+export const MARIO_ANIM_WATER_ACTION_END_WITH_OBJ = 0xA2 // either swimming or flutterkicking
+export const MARIO_ANIM_WATER_ACTION_END = 0xAD  // either swimming or flutterkicking
+export const MARIO_ANIM_STOP_GRAB_OBJ_WATER = 0xa3
+export const MARIO_ANIM_BACKWARDS_WATER_KB = 0x9E 
+export const MARIO_ANIM_WATER_FORWARD_KB = 0xA8 
+export const MARIO_ANIM_SHOCKED = 0x7A 
+export const MARIO_ANIM_FLUTTERKICK_WITH_OBJ = 0xA1 
+export const MARIO_ANIM_FLUTTERKICK = 0xAC 
+export const MARIO_ANIM_FALL_WITH_LIGHT_OBJ = 0x43 
+export const MARIO_ANIM_SWIM_PART1 = 0xAA 
+export const MARIO_ANIM_SWIM_PART2 = 0xAB 
+export const MARIO_ANIM_WATER_PICK_UP_OBJ = 0xAE
+export const MARIO_ANIM_WATER_GRAB_OBJ_PART2 = 0xAF 
+export const MARIO_ANIM_WATER_GRAB_OBJ_PART1 = 0xB0 
+
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -233,7 +253,6 @@ export const ACT_RIDING_HOOT = 0x000004A8
 export const ACT_SLEEPING = 0x0C000203
 export const ACT_START_SLEEPING = 0x0C400202
 export const ACT_THROWN_BACKWARD = 0x010208BE
-export const ACT_BUTT_STUCK_IN_GROUND = 0x0002033B
 export const ACT_KNOCKED_UP = 0x010208BF
 export const ACT_LEDGE_CLIMB_DOWN = 0x0000054E
 export const ACT_LEDGE_CLIMB_SLOW_1 = 0x0000054C
@@ -246,13 +265,19 @@ export const ACT_HANGING = 0x00200349
 export const ACT_BUTT_SLIDE = 0x00840452
 export const ACT_HOLD_BUTT_SLIDE = 0x00840454
 export const ACT_RIDING_SHELL_GROUND = 0x20810446
-export const ACT_WATER_PUNCH = 0x300024E1
 export const ACT_TWIRL_LAND = 0x18800238
 export const ACT_TWIRLING = 0x108008A4
 export const ACT_IN_CANNON               = 0x00001371
 export const ACT_BUTT_SLIDE_AIR          = 0x0300088E
 export const ACT_HOLD_BUTT_SLIDE_AIR = 0x010008A2
 export const ACT_STEEP_JUMP = 0x03000885
+export const ACT_BUTT_STUCK_IN_GROUND = 0x0002033B
+export const ACT_FEET_STUCK_IN_GROUND = 0x0002033C
+export const ACT_VERTICAL_WIND = 0x1008089C
+export const ACT_SQUISHED = 0x00020339
+export const ACT_STANDING_DEATH = 0x00021311
+
+
 
 export const ACT_HARD_BACKWARD_GROUND_KB  =  0x00020460 
 export const ACT_HARD_FORWARD_GROUND_KB   =  0x00020461 
@@ -264,6 +289,46 @@ export const ACT_BACKWARD_AIR_KB       =  0x010208B0
 export const ACT_FORWARD_AIR_KB        =  0x010208B1 
 export const ACT_HARD_FORWARD_AIR_KB   =  0x010208B2 
 export const ACT_HARD_BACKWARD_AIR_KB  =  0x010208B3
+
+// group 0x0C0: submerged actions
+export const ACT_WATER_IDLE                =0x380022C0 
+export const ACT_HOLD_WATER_IDLE           =0x380022C1 
+export const ACT_WATER_ACTION_END          =0x300022C2 
+export const ACT_HOLD_WATER_ACTION_END     =0x300022C3 
+export const ACT_DROWNING                  =0x300032C4 
+export const ACT_BACKWARD_WATER_KB         =0x300222C5 
+export const ACT_FORWARD_WATER_KB          =0x300222C6 
+export const ACT_WATER_DEATH               =0x300032C7 
+export const ACT_WATER_SHOCKED             =0x300222C8 
+export const ACT_BREASTSTROKE              =0x300024D0 
+export const ACT_SWIMMING_END              =0x300024D1 
+export const ACT_FLUTTER_KICK              =0x300024D2 
+export const ACT_HOLD_BREASTSTROKE         =0x300024D3 
+export const ACT_HOLD_SWIMMING_END         =0x300024D4 
+export const ACT_HOLD_FLUTTER_KICK         =0x300024D5 
+export const ACT_WATER_SHELL_SWIMMING      =0x300024D6 
+export const ACT_WATER_THROW               =0x300024E0 
+export const ACT_WATER_PUNCH               =0x300024E1 
+export const ACT_WATER_PLUNGE              =0x300022E2 
+export const ACT_CAUGHT_IN_WHIRLPOOL       =0x300222E3 
+export const ACT_METAL_WATER_STANDING      =0x080042F0 
+export const ACT_HOLD_METAL_WATER_STANDING =0x080042F1 
+export const ACT_METAL_WATER_WALKING       =0x000044F2 
+export const ACT_HOLD_METAL_WATER_WALKING  =0x000044F3 
+export const ACT_METAL_WATER_FALLING       =0x000042F4 
+export const ACT_HOLD_METAL_WATER_FALLING  =0x000042F5 
+export const ACT_METAL_WATER_FALL_LAND     =0x000042F6 
+export const ACT_HOLD_METAL_WATER_FALL_LAND=0x000042F7 
+export const ACT_METAL_WATER_JUMP          =0x000044F8 
+export const ACT_HOLD_METAL_WATER_JUMP     =0x000044F9 
+export const ACT_METAL_WATER_JUMP_LAND     =0x000044FA 
+export const ACT_HOLD_METAL_WATER_JUMP_LAND=0x000044FB 
+
+export const ACT_WATER_JUMP       = 0x01000889
+export const ACT_HOLD_WATER_JUMP  = 0x010008A3
+
+
+
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
 export const AIR_STEP_CHECK_HANG = 0x00000002
@@ -294,7 +359,7 @@ export const ACT_FLAG_CONTROL_JUMP_HEIGHT = (1 << 25)
 export const ACT_FLAG_ALLOW_FIRST_PERSON = (1 << 26)
 export const ACT_FLAG_PAUSE_EXIT = (1 << 27)
 export const ACT_FLAG_SWIMMING_OR_FLYING = (1 << 28)
-export const ACT_FLAG_WATER_OR_TEXT = (1 << 29)
+export const ACT_FLAGWATER_OR_TEXT = (1 << 29)
 export const ACT_FLAG_THROWING = (1 << 31)
 export const ACT_TAUNT = (0x193 | ACT_FLAG_STATIONARY | ACT_FLAG_IDLE)
 
@@ -321,6 +386,12 @@ export const GROUND_STEP_NONE = 1
 export const GROUND_STEP_HIT_WALL = 2
 export const GROUND_STEP_HIT_WALL_STOP_QSTEPS = 2
 export const GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS = 3
+
+export const WATER_STEP_NONE        = 0
+export const WATER_STEP_HIT_FLOOR   = 1
+export const WATER_STEP_HIT_CEILING = 2
+export const WATER_STEP_CANCELLED   = 3
+export const WATER_STEP_HIT_WALL    = 4
 
 export const sJumpLandAction = {
     numFrames: 4,
@@ -720,21 +791,6 @@ export const set_mario_animation = (m, targetAnimID, reset) => {
 
 }
 
-export const set_anim_to_frame = (m, animFrame) => {
-    const animInfo = m.marioObj.header.gfx.unk38
-    const curAnim = animInfo.curAnim
-
-    if (animInfo.animAccel) {
-        throw "implement set anim to frame with accel"
-    } else {
-        if (curAnim.flags & ANIM_FLAG_FORWARD) {
-            animInfo.animFrame = animFrame + 1
-        } else {
-            animInfo.animFrame = animFrame - 1
-        }
-    }
-}
-
 export const set_mario_anim_with_accel = (m, targetAnimID, accel) => {
 
     const o = m.marioObj
@@ -764,8 +820,27 @@ export const set_mario_anim_with_accel = (m, targetAnimID, accel) => {
 
 }
 
+export const set_anim_to_frame = (m, animFrame) => {
+    const animInfo = m.marioObj.header.gfx.unk38;
+    const curAnim = animInfo.curAnim;
+
+    if (animInfo.animAccel) {
+        if (curAnim.flags & ANIM_FLAG_FORWARD) {
+            animInfo.animFrameAccelAssist = (animFrame << 0x10) + animInfo.animAccel;
+        } else {
+            animInfo.animFrameAccelAssist = (animFrame << 0x10) - animInfo.animAccel;
+        }
+    } else {
+        if (curAnim.flags & ANIM_FLAG_FORWARD) {
+            animInfo.animFrame = animFrame + 1;
+        } else {
+            animInfo.animFrame = animFrame - 1;
+        }
+    }
+}
+
 export const is_anim_at_end = (m) => {
-    const o = m.marioObj
+    const o = m.marioObj //TODO fix unk38 as animInfo
     return (o.header.gfx.unk38.animFrame + 1) == o.header.gfx.unk38.curAnim.unk08
 }
 
@@ -844,6 +919,9 @@ export const execute_mario_action = (m) => {
 
                 case ACT_GROUP_CUTSCENE:
                     inLoop = mario_execute_cutscene_action(m); break
+
+                case ACT_GROUP_SUBMERGED:
+                    inLoop = mario_execute_submerged_action(m); break
 
                 default: throw "unkown action group"
             }
@@ -1110,7 +1188,6 @@ export const mario_get_floor_class = (m) => {
 }
 
 export const vec3_find_ceil = (pos, height, ceil) => {
-
     return SurfaceCollision.find_ceil(pos[0], height + 80.0, pos[2], ceil)
 }
 
@@ -1246,4 +1323,35 @@ export const init_mario_from_save_file = () => {
         unkB8: 0, unkB0: 0xBD
     })
 
+}
+
+export const set_water_plunge_action = m => {
+  m.forwardVel = m.forwardVel / 4
+  m.vel[1] = m.vel[1] / 2
+
+  m.pos[1] = m.waterLevel - 100
+
+  m.faceAngle[2] = 0
+
+  vec3s_set(m.angleVel, 0, 0, 0)
+
+  if (!(m.action && ACT_FLAG_DIVING)) {
+    m.faceAngle[0] = 0
+  }
+
+  //TODO implement camera
+
+  return set_mario_action(m, ACT_WATER_PLUNGE, 0)
+}
+
+export const transition_submerged_to_walking = m => {
+    // TODO set_camera_mode(m.area.camera, m.area.camera.defMode, 1);
+
+    m.angleVel = [0, 0, 0];
+
+    if (m.heldObj == null) {
+        return set_mario_action(m, ACT_WALKING, 0);
+    } else {
+        return set_mario_action(m, ACT_HOLD_WALKING, 0);
+    }
 }

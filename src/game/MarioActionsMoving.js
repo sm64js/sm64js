@@ -752,7 +752,7 @@ const common_slide_action = (m, stopAction, airAction, animation) => {
         case Mario.GROUND_STEP_LEFT_GROUND:
             Mario.set_mario_action(m, airAction, 0)
             if (m.forwardVel < -50.0 || 50.0 < m.forwardVel) {
-                //play_sound(SOUND_MARIO_HOOHOO, m->marioObj->header.gfx.cameraToObject)
+                //play_sound(SOUND_MARIO_HOOHOO, m.marioObj.header.gfx.cameraToObject)
             }
             break
         case Mario.GROUND_STEP_NONE:
@@ -1141,8 +1141,35 @@ export const act_hard_forward_ground_kb = (m) => {
     return 0
 }
 
+const check_common_moving_cancels = (m) => {
+    if (m.pos[1] < m.waterLevel - 100) {
+        return Mario.set_water_plunge_action(m);
+    }
+
+    if (!(m.action & Mario.ACT_FLAG_INVULNERABLE) && (m.input & Mario.INPUT_UNKNOWN_10)) {
+        return Mario.drop_and_set_mario_action(m, Mario.ACT_SHOCKWAVE_BOUNCE, 0);
+    }
+
+    if (m.input & Mario.INPUT_SQUISHED) {
+        return Mario.drop_and_set_mario_action(m, Mario.ACT_SQUISHED, 0);
+    }
+
+    if (!(m.action & Mario.ACT_FLAG_INVULNERABLE)) {
+        if (m.health < 0x100) {
+            return Mario.drop_and_set_mario_action(m, Mario.ACT_STANDING_DEATH, 0);
+        }
+    }
+
+    return 0;
+}
 
 export const mario_execute_moving_action = (m) => {
+    
+    if (check_common_moving_cancels(m)) {
+        return 1;
+    }
+    
+    //TODO update quicksand
 
     switch (m.action) {
         case Mario.ACT_WALKING: return act_walking(m)

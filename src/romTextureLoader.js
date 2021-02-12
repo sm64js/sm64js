@@ -1,3 +1,4 @@
+import * as SkyboxCCM from "./textures/skyboxes/ccm_skybox"
 import * as SkyboxSSL from "./textures/skyboxes/ssl_skybox"
 import * as SkyboxWater from "./textures/skyboxes/water_skybox"
 
@@ -272,6 +273,14 @@ import {
     ssl_seg7_texture_07003800
 } from "./levels/ssl/texture.inc"
 
+import {
+    sl_seg7_texture_07000000,
+    sl_seg7_texture_07000800,
+    sl_seg7_texture_07001000,
+    sl_seg7_texture_07001800,
+    sl_seg7_texture_07002000
+} from "./levels/sl/texture.inc"
+
 import { chain_ball_seg6_texture_06020AE8 } from "./actors/chain_ball/model.inc"
 
 import {
@@ -292,7 +301,7 @@ import { bubble_seg4_texture_0401CD60, bubble_seg4_texture_0401D560 } from "./ac
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 28
+const textureVersion = 29
 
 const loadDataIntoGame = (data) => {
 
@@ -451,6 +460,12 @@ const loadDataIntoGame = (data) => {
     ssl_seg7_texture_07002800.push(...data["levels/ssl/4.rgba16.png"].data)
     ssl_seg7_texture_07003800.push(...data["levels/ssl/5.rgba16.png"].data)
 
+    sl_seg7_texture_07000000.push(...data["levels/sl/0.rgba16.png"].data)
+    sl_seg7_texture_07000800.push(...data["levels/sl/1.rgba16.png"].data)
+    sl_seg7_texture_07001000.push(...data["levels/sl/2.rgba16.png"].data)
+    sl_seg7_texture_07001800.push(...data["levels/sl/3.rgba16.png"].data)
+    sl_seg7_texture_07002000.push(...data["levels/sl/4.rgba16.png"].data)
+
     snow_09000000.push(...data["textures/snow/ccm_textures.00000.rgba16.png"].data)
     snow_09000800.push(...data["textures/snow/ccm_textures.00800.rgba16.png"].data)
     snow_09001000.push(...data["textures/snow/ccm_textures.01000.rgba16.png"].data)
@@ -564,8 +579,77 @@ const loadDataIntoGame = (data) => {
 
     mist_seg3_texture_03000080.push(...data["actors/mist/mist.ia16.png"].data)
 
+
     bubble_seg4_texture_0401CD60.push(...data["actors/bubble/bubble.rgba16.png"].data)
     bubble_seg4_texture_0401D560.push(...data["actors/bubble/mr_i_bubble.rgba16.png"].data)
+
+    SkyboxCCM.ccm_skybox_texture_00000.push(...data["ccm_skybox_texture_00000"].data)
+    SkyboxCCM.ccm_skybox_texture_00001.push(...data["ccm_skybox_texture_00001"].data)
+    SkyboxCCM.ccm_skybox_texture_00002.push(...data["ccm_skybox_texture_00002"].data)
+    SkyboxCCM.ccm_skybox_texture_00003.push(...data["ccm_skybox_texture_00003"].data)
+    SkyboxCCM.ccm_skybox_texture_00004.push(...data["ccm_skybox_texture_00004"].data)
+    SkyboxCCM.ccm_skybox_texture_00005.push(...data["ccm_skybox_texture_00005"].data)
+    SkyboxCCM.ccm_skybox_texture_00006.push(...data["ccm_skybox_texture_00006"].data)
+    SkyboxCCM.ccm_skybox_texture_00007.push(...data["ccm_skybox_texture_00007"].data)
+    SkyboxCCM.ccm_skybox_texture_00008.push(...data["ccm_skybox_texture_00008"].data)
+    SkyboxCCM.ccm_skybox_texture_00009.push(...data["ccm_skybox_texture_00009"].data)
+    SkyboxCCM.ccm_skybox_texture_0000A.push(...data["ccm_skybox_texture_0000A"].data)
+    SkyboxCCM.ccm_skybox_texture_0000B.push(...data["ccm_skybox_texture_0000B"].data)
+    SkyboxCCM.ccm_skybox_texture_0000C.push(...data["ccm_skybox_texture_0000C"].data)
+    SkyboxCCM.ccm_skybox_texture_0000D.push(...data["ccm_skybox_texture_0000D"].data)
+    SkyboxCCM.ccm_skybox_texture_0000E.push(...data["ccm_skybox_texture_0000E"].data)
+    SkyboxCCM.ccm_skybox_texture_0000F.push(...data["ccm_skybox_texture_0000F"].data)
+
+    SkyboxCCM.ccm_skybox_texture_00010.push(...data["ccm_skybox_texture_00010"].data)
+    SkyboxCCM.ccm_skybox_texture_00011.push(...data["ccm_skybox_texture_00011"].data)
+    SkyboxCCM.ccm_skybox_texture_00012.push(...data["ccm_skybox_texture_00012"].data)
+    SkyboxCCM.ccm_skybox_texture_00013.push(...data["ccm_skybox_texture_00013"].data)
+    SkyboxCCM.ccm_skybox_texture_00014.push(...data["ccm_skybox_texture_00014"].data)
+    SkyboxCCM.ccm_skybox_texture_00015.push(...data["ccm_skybox_texture_00015"].data)
+    SkyboxCCM.ccm_skybox_texture_00016.push(...data["ccm_skybox_texture_00016"].data)
+    SkyboxCCM.ccm_skybox_texture_00017.push(...data["ccm_skybox_texture_00017"].data)
+    SkyboxCCM.ccm_skybox_texture_00018.push(...data["ccm_skybox_texture_00018"].data)
+    SkyboxCCM.ccm_skybox_texture_00019.push(...data["ccm_skybox_texture_00019"].data)
+    SkyboxCCM.ccm_skybox_texture_0001A.push(...data["ccm_skybox_texture_0001A"].data)
+    SkyboxCCM.ccm_skybox_texture_0001B.push(...data["ccm_skybox_texture_0001B"].data)
+    SkyboxCCM.ccm_skybox_texture_0001C.push(...data["ccm_skybox_texture_0001C"].data)
+    SkyboxCCM.ccm_skybox_texture_0001D.push(...data["ccm_skybox_texture_0001D"].data)
+    SkyboxCCM.ccm_skybox_texture_0001E.push(...data["ccm_skybox_texture_0001E"].data)
+    SkyboxCCM.ccm_skybox_texture_0001F.push(...data["ccm_skybox_texture_0001F"].data)
+
+    SkyboxCCM.ccm_skybox_texture_00020.push(...data["ccm_skybox_texture_00020"].data)
+    SkyboxCCM.ccm_skybox_texture_00021.push(...data["ccm_skybox_texture_00021"].data)
+    SkyboxCCM.ccm_skybox_texture_00022.push(...data["ccm_skybox_texture_00022"].data)
+    SkyboxCCM.ccm_skybox_texture_00023.push(...data["ccm_skybox_texture_00023"].data)
+    SkyboxCCM.ccm_skybox_texture_00024.push(...data["ccm_skybox_texture_00024"].data)
+    SkyboxCCM.ccm_skybox_texture_00025.push(...data["ccm_skybox_texture_00025"].data)
+    SkyboxCCM.ccm_skybox_texture_00026.push(...data["ccm_skybox_texture_00026"].data)
+    SkyboxCCM.ccm_skybox_texture_00027.push(...data["ccm_skybox_texture_00027"].data)
+    SkyboxCCM.ccm_skybox_texture_00028.push(...data["ccm_skybox_texture_00028"].data)
+    SkyboxCCM.ccm_skybox_texture_00029.push(...data["ccm_skybox_texture_00029"].data)
+    SkyboxCCM.ccm_skybox_texture_0002A.push(...data["ccm_skybox_texture_0002A"].data)
+    SkyboxCCM.ccm_skybox_texture_0002B.push(...data["ccm_skybox_texture_0002B"].data)
+    SkyboxCCM.ccm_skybox_texture_0002C.push(...data["ccm_skybox_texture_0002C"].data)
+    SkyboxCCM.ccm_skybox_texture_0002D.push(...data["ccm_skybox_texture_0002D"].data)
+    SkyboxCCM.ccm_skybox_texture_0002E.push(...data["ccm_skybox_texture_0002E"].data)
+    SkyboxCCM.ccm_skybox_texture_0002F.push(...data["ccm_skybox_texture_0002F"].data)
+
+    SkyboxCCM.ccm_skybox_texture_00030.push(...data["ccm_skybox_texture_00030"].data)
+    SkyboxCCM.ccm_skybox_texture_00031.push(...data["ccm_skybox_texture_00031"].data)
+    SkyboxCCM.ccm_skybox_texture_00032.push(...data["ccm_skybox_texture_00032"].data)
+    SkyboxCCM.ccm_skybox_texture_00033.push(...data["ccm_skybox_texture_00033"].data)
+    SkyboxCCM.ccm_skybox_texture_00034.push(...data["ccm_skybox_texture_00034"].data)
+    SkyboxCCM.ccm_skybox_texture_00035.push(...data["ccm_skybox_texture_00035"].data)
+    SkyboxCCM.ccm_skybox_texture_00036.push(...data["ccm_skybox_texture_00036"].data)
+    SkyboxCCM.ccm_skybox_texture_00037.push(...data["ccm_skybox_texture_00037"].data)
+    SkyboxCCM.ccm_skybox_texture_00038.push(...data["ccm_skybox_texture_00038"].data)
+    SkyboxCCM.ccm_skybox_texture_00039.push(...data["ccm_skybox_texture_00039"].data)
+    SkyboxCCM.ccm_skybox_texture_0003A.push(...data["ccm_skybox_texture_0003A"].data)
+    SkyboxCCM.ccm_skybox_texture_0003B.push(...data["ccm_skybox_texture_0003B"].data)
+    SkyboxCCM.ccm_skybox_texture_0003C.push(...data["ccm_skybox_texture_0003C"].data)
+    SkyboxCCM.ccm_skybox_texture_0003D.push(...data["ccm_skybox_texture_0003D"].data)
+    SkyboxCCM.ccm_skybox_texture_0003E.push(...data["ccm_skybox_texture_0003E"].data)
+    SkyboxCCM.ccm_skybox_texture_0003F.push(...data["ccm_skybox_texture_0003F"].data)
 
     SkyboxSSL.ssl_skybox_texture_00000.push(...data["ssl_skybox_texture_00000"].data)
     SkyboxSSL.ssl_skybox_texture_00001.push(...data["ssl_skybox_texture_00001"].data)

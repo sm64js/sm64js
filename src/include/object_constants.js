@@ -298,3 +298,9 @@ export const oSmokeTimer = 0x1B
 export const oWhitePuffUnkF4 = 0x1B
 export const oWhitePuffUnkF8 = 0x1C
 export const oWhitePuffUnkFC = 0x1D
+
+/* Water Objects */
+export const oWaterObjUnkF4  = 0x1B
+export const oWaterObjUnkF8  = 0x1C
+export const oWaterObjUnkFC  = 0x1D
+export const oWaterObjUnk100 = 0x1E

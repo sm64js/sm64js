@@ -126,12 +126,25 @@ class BehaviorCommands {
         return this.BHV_PROC_BREAK
     }
 
+    delay_var(args) {
+        const num = parseInt(ObjListProc.gCurrentObject.rawData[args.var])
+
+        if (ObjListProc.gCurrentObject.bhvDelayTimer < num - 1) {
+            ObjListProc.gCurrentObject.bhvDelayTimer++
+        } else {
+            ObjListProc.gCurrentObject.bhvDelayTimer = 0
+            this.bhvScript.index++
+        }
+
+        return this.BHV_PROC_BREAK
+    }
+
     deactivate(args) {
         ObjListProc.gCurrentObject.activeFlags = 0
         return this.BHV_PROC_BREAK
     }
 
-    add_int(args) {
+    add_number(args) {
         ObjListProc.gCurrentObject.rawData[args.field] += args.value
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
@@ -143,8 +156,26 @@ class BehaviorCommands {
         return this.BHV_PROC_CONTINUE
     }
 
+    set_random_int(args) {
+        ObjListProc.gCurrentObject.rawData[args.field] = parseInt(Math.random() * args.range) + args.minimum
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    set_random_float(args) {
+        ObjListProc.gCurrentObject.rawData[args.field] = (Math.random() * args.range) + args.minimum
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
     set_interact_type(args) {
         ObjListProc.gCurrentObject.rawData[oInteractType] = args.type
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    sum_float(args) {
+        ObjListProc.gCurrentObject.rawData[args.dest] = ObjListProc.gCurrentObject.rawData[args.value1] + ObjListProc.gCurrentObject.rawData[args.value2]
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }
@@ -280,6 +311,22 @@ class BehaviorCommands {
         child.rawData[oBehParams2ndByte] = args.bhvParam
 
         this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    call(args) {
+        this.bhvScript.index++
+        ObjListProc.gCurrentObject.bhvStack.push(this.bhvScript.index)
+        ObjListProc.gCurrentObject.bhvStack.push(this.bhvScript.commands) // push the whole script
+        const calledScript = args.script
+        this.bhvScript = { index: 0, commands: calledScript }
+
+        return this.BHV_PROC_CONTINUE
+    }
+
+    return(args) {
+        this.bhvScript.commands = ObjListProc.gCurrentObject.bhvStack.pop()
+        this.bhvScript.index = ObjListProc.gCurrentObject.bhvStack.pop()
         return this.BHV_PROC_CONTINUE
     }
 

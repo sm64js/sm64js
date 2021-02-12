@@ -17,6 +17,7 @@ import { oMarioWalkingPitch, oInteractStatus, oPosX, oPosY, oPosZ, oMoveAnglePit
 import * as Interact from "./Interaction"
 import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
 import { int16, sins, coss } from "../utils"
+import { PARTICLE_BUBBLE } from "../include/mario_constants"
 
 ////// Mario Constants
 export const ANIM_FLAG_NOLOOP = (1 << 0) // 0x01
@@ -911,6 +912,7 @@ export const execute_mario_action = () => {
             }
         }
 
+        set_submerged_cam_preset_and_spawn_bubbles(LevelUpdate.gMarioState)
         update_mario_info_for_cam(LevelUpdate.gMarioState)
 
         LevelUpdate.gMarioState.marioObj.rawData[oInteractStatus] = 0
@@ -1247,6 +1249,30 @@ const update_mario_info_for_cam = (m) => {
     if ((m.flags & MARIO_UNKNOWN_25) == 0) {
         m.statusForCamera.pos = [...m.pos]
     }
+}
+
+const set_submerged_cam_preset_and_spawn_bubbles = (m) => {
+
+    if ((m.action & ACT_GROUP_MASK) == ACT_GROUP_SUBMERGED) {
+        const heightBelowWater = (m.waterLevel - 80) - m.pos[1]
+        const camPreset = m.area.camera.mode
+
+        if (m.action & ACT_FLAG_METAL_WATER) {
+            throw "Todo ACT_FLAG_METAL_WATER - set_submerged_cam_preset_and_spawn_bubbles"
+        } else {
+
+            //// TODO set submerged camera modes  CAMERA_MODE_BEHIND_MARIO, CAMERA_MODE_WATER_SURFACE
+
+            // As long as Mario isn't drowning or at the top
+            // of the water with his head out, spawn bubbles.
+            if ((m.action & ACT_FLAG_INTANGIBLE) == 0) {
+                if ((m.pos[1] < (m.waterLevel - 160)) || (m.faceAngle[0] < -0x800)) {
+                    m.particleFlags |= PARTICLE_BUBBLE
+                }
+            }
+        }
+    }
+
 }
 
 export const init_mario_from_save_file = () => {

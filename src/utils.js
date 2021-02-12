@@ -65,5 +65,6 @@ export const levelIdToName = {
     5: "Cool, Cool Mountain",
     27: "Princess's Secret Slide",
     36: "Tall, Tall Mountain",
-    24: "Whomps Fortress"
+    24: "Whomps Fortress",
+    10: "Snowman's Land"
 }

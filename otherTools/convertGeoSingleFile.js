@@ -10,9 +10,9 @@ var snum = 1 // used as a counter variable (Keep 1!)
 var num = 5 // number of model.inc.js files there are
 var areaNum = 1 // target area number
 var mainDir = __dirname + '/converted/' + level + '/areas/' + areaNum + '/' // directory to put models in
-var inputBase = require('os').homedir() + '/sm64ex/levels/bbh/areas/1/geo.inc.c' // directory of each model file
+var inputBase = require('os').homedir() + '/Programming/sm64pc/actors/bubble/geo.inc.c' // directory of each model file
 
-const mydir = require('os').homedir() + '/sm64ex/levels/ssl/areas/1/'
+const mydir = require('os').homedir() + '/Programming/sm64pc/actors/bubble/'
 
 //Not sure whether we need to skip commands.
 const skipCommands = [

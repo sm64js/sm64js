@@ -14,7 +14,6 @@ const rawDataMap = {
     0: RAW.oMarioPoleYawVel,
     1: RAW.oMarioPolePos,
     2: RAW.oIntangibleTimer,
-    3: RAW.oActiveParticleFlags
 }
 
 const getMarioRawDataSubset = (fullRawData) => {

@@ -1,4 +1,6 @@
-﻿import * as SkyboxWater from "./textures/skyboxes/water_skybox"
+import * as SkyboxCCM from "./textures/skyboxes/ccm_skybox"
+import * as SkyboxSSL from "./textures/skyboxes/ssl_skybox"
+import * as SkyboxWater from "./textures/skyboxes/water_skybox"
 import { assets } from "./assets"
 
 
@@ -62,6 +64,8 @@ import {
     outside_0900B400,
     outside_0900BC00,
     outside_0900A800,
+    outside_09000800,
+    outside_09008800
 } from "./textures/outside"
 
 import { 
@@ -110,18 +114,27 @@ import {
 } from "./actors/walk_smoke/model.inc"
 
 import {
-    generic_09005800,
-    generic_09006000,
-    generic_09009800,
-    generic_09009000,
-    generic_0900A000,
+    generic_09000000,
+    generic_09000800,
+    generic_09001000,
     generic_09001800,
     generic_09002000,
+    generic_09002800,
     generic_09003000,
     generic_09003800,
+    generic_09004000,
     generic_09004800,
     generic_09005000,
+    generic_09005800,
+    generic_09006000,
+    generic_09007000,
+    generic_09007800,
+    generic_09008000,
     generic_09008800,
+    generic_09009000,
+    generic_09009800,
+    generic_0900A000,
+    generic_0900A800,
     generic_0900B000
 } from "./textures/generic"
 
@@ -153,6 +166,53 @@ import {
     hmc_seg7_texture_07004000,
     hmc_seg7_texture_07004800
 } from "./levels/hmc/texture.inc"
+
+import {
+    texture_castle_light,
+    inside_castle_seg7_texture_07000800,
+    inside_castle_seg7_texture_07001000,
+    inside_castle_seg7_texture_07002000,
+    inside_castle_seg7_texture_07003000,
+    inside_castle_seg7_texture_07003800,
+    inside_castle_seg7_texture_07004800,
+    inside_castle_seg7_texture_07005800,
+    inside_castle_seg7_texture_07006000,
+    inside_castle_seg7_texture_07006800,
+    inside_castle_seg7_texture_07007000,
+    inside_castle_seg7_texture_07007800,
+    inside_castle_seg7_texture_07008000,
+    inside_castle_seg7_texture_07008800,
+    inside_castle_seg7_texture_07009000,
+    inside_castle_seg7_texture_07009800,
+    inside_castle_seg7_texture_0700A000,
+    inside_castle_seg7_texture_0700A800,
+    inside_castle_seg7_texture_0700B800,
+    inside_castle_seg7_texture_0700C800,
+    inside_castle_seg7_texture_0700D800,
+    inside_castle_seg7_texture_0700E800,
+    inside_castle_seg7_texture_0700F800,
+} from "./levels/castle_inside/texture.inc"
+
+import {
+    inside_09000000,
+    inside_09001000,
+    inside_09002000,
+    inside_09003000,
+    inside_09003800,
+    inside_09004000,
+    inside_09004800,
+    inside_09005000,
+    inside_09005800,
+    inside_09006000,
+    inside_09007000,
+    inside_09008000,
+    inside_09008800,
+    inside_09009000,
+    inside_0900A000,
+    inside_0900B000,
+    inside_0900B800,
+} from "./textures/inside"
+
 
 import {
     mountain_09000000,
@@ -266,6 +326,7 @@ import {
     spooky_0900B800
 } from "./textures/spooky"
 
+
 import {
     bbh_seg7_texture_07000000,
     bbh_seg7_texture_07001000,
@@ -275,6 +336,23 @@ import {
     bbh_seg7_texture_07003400,
     bbh_seg7_texture_07004400
 } from "./levels/bbh/texture.inc"
+
+import {
+    ssl_seg7_texture_07000000,
+    ssl_seg7_texture_07000800,
+    ssl_seg7_texture_07001800,
+    ssl_seg7_texture_07002000,
+    ssl_seg7_texture_07002800,
+    ssl_seg7_texture_07003800
+} from "./levels/ssl/texture.inc"
+
+import {
+    sl_seg7_texture_07000000,
+    sl_seg7_texture_07000800,
+    sl_seg7_texture_07001000,
+    sl_seg7_texture_07001800,
+    sl_seg7_texture_07002000
+} from "./levels/sl/texture.inc"
 
 import { chain_ball_seg6_texture_06020AE8 } from "./actors/chain_ball/model.inc"
 
@@ -290,12 +368,13 @@ import { poundable_pole_seg6_texture_06001050, poundable_pole_seg6_texture_06001
 
 import { dirt_seg3_texture_0302BDF8 } from "./actors/dirt/model.inc"
 import { mist_seg3_texture_03000080 } from "./actors/mist/model.inc"
+import { bubble_seg4_texture_0401CD60, bubble_seg4_texture_0401D560 } from "./actors/bubble/model.inc"
 
 
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 24
+const textureVersion = 30
 
 const loadDataIntoGame = (data) => {
 
@@ -384,6 +463,8 @@ const loadDataIntoGame = (data) => {
     outside_0900B000.push(...data['textures/outside/castle_grounds_textures.0B000.rgba16.png'].data)
     outside_0900B400.push(...data['textures/outside/castle_grounds_textures.0B400.rgba16.png'].data)
     outside_0900A800.push(...data['textures/outside/castle_grounds_textures.0A800.rgba16.png'].data)
+    outside_09000800.push(...data['textures/outside/castle_grounds_textures.00800.rgba16.png'].data)
+    outside_09008800.push(...data['textures/outside/castle_grounds_textures.08800.rgba16.png'].data)
     outside_0900BC00.push(...data['textures/outside/castle_grounds_textures.0BC00.ia16.png'].data)
 
 	grass_09000000.push(...data['textures/grass/wf_textures.00000.rgba16.png'].data)
@@ -411,19 +492,29 @@ const loadDataIntoGame = (data) => {
 	grass_0900B000.push(...data['textures/grass/wf_textures.0B000.ia16.png'].data)
 	grass_0900B800.push(...data['textures/grass/wf_textures.0B800.ia16.png'].data)
 
+    generic_09000000.push(...data["textures/generic/bob_textures.00000.rgba16.png"].data)
+    generic_09000800.push(...data["textures/generic/bob_textures.00800.rgba16.png"].data)
+    generic_09001000.push(...data["textures/generic/bob_textures.01000.rgba16.png"].data)
     generic_09001800.push(...data["textures/generic/bob_textures.01800.rgba16.png"].data)
     generic_09002000.push(...data["textures/generic/bob_textures.02000.rgba16.png"].data)
+    generic_09002800.push(...data["textures/generic/bob_textures.02800.rgba16.png"].data)
     generic_09003000.push(...data["textures/generic/bob_textures.03000.rgba16.png"].data)
     generic_09003800.push(...data["textures/generic/bob_textures.03800.rgba16.png"].data)
+    generic_09004000.push(...data["textures/generic/bob_textures.04000.rgba16.png"].data)
     generic_09004800.push(...data["textures/generic/bob_textures.04800.rgba16.png"].data)
     generic_09005000.push(...data["textures/generic/bob_textures.05000.rgba16.png"].data)
     generic_09005800.push(...data["textures/generic/bob_textures.05800.rgba16.png"].data)
     generic_09006000.push(...data["textures/generic/bob_textures.06000.rgba16.png"].data)
+    generic_09007000.push(...data["textures/generic/bob_textures.07000.rgba16.png"].data)
+    generic_09007800.push(...data["textures/generic/bob_textures.07800.rgba16.png"].data)
+    generic_09008000.push(...data["textures/generic/bob_textures.08000.rgba16.png"].data)
     generic_09008800.push(...data["textures/generic/bob_textures.08800.rgba16.png"].data)
     generic_09009000.push(...data["textures/generic/bob_textures.09000.rgba16.png"].data)
     generic_09009800.push(...data["textures/generic/bob_textures.09800.rgba16.png"].data)
     generic_0900A000.push(...data["textures/generic/bob_textures.0A000.rgba16.png"].data)
+    generic_0900A800.push(...data["textures/generic/bob_textures.0A800.rgba16.png"].data)
     generic_0900B000.push(...data["textures/generic/bob_textures.0B000.ia16.png"].data)
+
 
     cave_09000000.push(...data["textures/cave/hmc_textures.00000.rgba16.png"].data)
     cave_09001000.push(...data["textures/cave/hmc_textures.01000.rgba16.png"].data)
@@ -442,6 +533,48 @@ const loadDataIntoGame = (data) => {
     cave_0900A800.push(...data["textures/cave/hmc_textures.0A800.rgba16.png"].data)
     cave_0900B800.push(...data["textures/cave/hmc_textures.0B800.ia16.png"].data)
     cave_0900C000.push(...data["textures/cave/hmc_textures.0C000.ia16.png"].data)
+
+    texture_castle_light.push(...data["levels/castle_inside/castle_light.ia16.png"].data)
+    inside_castle_seg7_texture_07000800.push(...data["levels/castle_inside/1.rgba16.png"].data)
+    inside_castle_seg7_texture_07001000.push(...data["levels/castle_inside/2.ia16.png"].data)
+    inside_castle_seg7_texture_07002000.push(...data["levels/castle_inside/3.rgba16.png"].data)
+    inside_castle_seg7_texture_07003000.push(...data["levels/castle_inside/4.rgba16.png"].data)
+    inside_castle_seg7_texture_07003800.push(...data["levels/castle_inside/5.rgba16.png"].data)
+    inside_castle_seg7_texture_07004800.push(...data["levels/castle_inside/6.rgba16.png"].data)
+    inside_castle_seg7_texture_07005800.push(...data["levels/castle_inside/7.rgba16.png"].data)
+    inside_castle_seg7_texture_07006000.push(...data["levels/castle_inside/8.rgba16.png"].data)
+    inside_castle_seg7_texture_07006800.push(...data["levels/castle_inside/9.rgba16.png"].data)
+    inside_castle_seg7_texture_07007000.push(...data["levels/castle_inside/10.rgba16.png"].data)
+    inside_castle_seg7_texture_07007800.push(...data["levels/castle_inside/11.rgba16.png"].data)
+    inside_castle_seg7_texture_07008000.push(...data["levels/castle_inside/12.rgba16.png"].data)
+    inside_castle_seg7_texture_07008800.push(...data["levels/castle_inside/13.rgba16.png"].data)
+    inside_castle_seg7_texture_07009000.push(...data["levels/castle_inside/14.rgba16.png"].data)
+    inside_castle_seg7_texture_07009800.push(...data["levels/castle_inside/15.rgba16.png"].data)
+    inside_castle_seg7_texture_0700A000.push(...data["levels/castle_inside/16.ia16.png"].data)
+    inside_castle_seg7_texture_0700A800.push(...data["levels/castle_inside/17.rgba16.png"].data)
+    inside_castle_seg7_texture_0700B800.push(...data["levels/castle_inside/18.rgba16.png"].data)
+    inside_castle_seg7_texture_0700C800.push(...data["levels/castle_inside/19.rgba16.png"].data)
+    inside_castle_seg7_texture_0700D800.push(...data["levels/castle_inside/20.rgba16.png"].data)
+    inside_castle_seg7_texture_0700E800.push(...data["levels/castle_inside/21.rgba16.png"].data)
+    inside_castle_seg7_texture_0700F800.push(...data["levels/castle_inside/22.rgba16.png"].data)
+
+    inside_09000000.push(...data["textures/inside/inside_castle_textures.00000.rgba16.png"].data)
+    inside_09001000.push(...data["textures/inside/inside_castle_textures.01000.rgba16.png"].data)
+    inside_09002000.push(...data["textures/inside/inside_castle_textures.02000.rgba16.png"].data)
+    inside_09003000.push(...data["textures/inside/inside_castle_textures.03000.rgba16.png"].data)
+    inside_09003800.push(...data["textures/inside/inside_castle_textures.03800.rgba16.png"].data)
+    inside_09004000.push(...data["textures/inside/inside_castle_textures.04000.rgba16.png"].data)
+    inside_09004800.push(...data["textures/inside/inside_castle_textures.04800.rgba16.png"].data)
+    inside_09005000.push(...data["textures/inside/inside_castle_textures.05000.rgba16.png"].data)
+    inside_09005800.push(...data["textures/inside/inside_castle_textures.05800.rgba16.png"].data)
+    inside_09006000.push(...data["textures/inside/inside_castle_textures.06000.rgba16.png"].data)
+    inside_09007000.push(...data["textures/inside/inside_castle_textures.07000.rgba16.png"].data)
+    inside_09008000.push(...data["textures/inside/inside_castle_textures.08000.rgba16.png"].data)
+    inside_09008800.push(...data["textures/inside/inside_castle_textures.08800.rgba16.png"].data)
+    inside_09009000.push(...data["textures/inside/inside_castle_textures.09000.rgba16.png"].data)
+    inside_0900A000.push(...data["textures/inside/inside_castle_textures.0A000.rgba16.png"].data)
+    inside_0900B000.push(...data["textures/inside/inside_castle_textures.0B000.rgba16.png"].data)
+    inside_0900B800.push(...data["textures/inside/inside_castle_textures.0B800.rgba16.png"].data)
 
     hmc_seg7_texture_07000000.push(...data["levels/hmc/0.rgba16.png"].data)
     hmc_seg7_texture_07001000.push(...data["levels/hmc/1.rgba16.png"].data)
@@ -467,6 +600,19 @@ const loadDataIntoGame = (data) => {
     wf_seg7_texture_07001800.push(...data["levels/wf/3.rgba16.png"].data)
     wf_seg7_texture_07002000.push(...data["levels/wf/4.rgba16.png"].data)
     wf_seg7_texture_07002800.push(...data["levels/wf/5.ia8.png"].data)
+
+    ssl_seg7_texture_07000000.push(...data["levels/ssl/0.rgba16.png"].data)
+    ssl_seg7_texture_07000800.push(...data["levels/ssl/1.ia16.png"].data)
+    ssl_seg7_texture_07001800.push(...data["levels/ssl/2.rgba16.png"].data)
+    ssl_seg7_texture_07002000.push(...data["levels/ssl/3.rgba16.png"].data)
+    ssl_seg7_texture_07002800.push(...data["levels/ssl/4.rgba16.png"].data)
+    ssl_seg7_texture_07003800.push(...data["levels/ssl/5.rgba16.png"].data)
+
+    sl_seg7_texture_07000000.push(...data["levels/sl/0.rgba16.png"].data)
+    sl_seg7_texture_07000800.push(...data["levels/sl/1.rgba16.png"].data)
+    sl_seg7_texture_07001000.push(...data["levels/sl/2.rgba16.png"].data)
+    sl_seg7_texture_07001800.push(...data["levels/sl/3.rgba16.png"].data)
+    sl_seg7_texture_07002000.push(...data["levels/sl/4.rgba16.png"].data)
 
     snow_09000000.push(...data["textures/snow/ccm_textures.00000.rgba16.png"].data)
     snow_09000800.push(...data["textures/snow/ccm_textures.00800.rgba16.png"].data)
@@ -580,6 +726,146 @@ const loadDataIntoGame = (data) => {
     dirt_seg3_texture_0302BDF8.push(...data["actors/dirt/dirt_particle.rgba16.png"].data)
 
     mist_seg3_texture_03000080.push(...data["actors/mist/mist.ia16.png"].data)
+
+
+    bubble_seg4_texture_0401CD60.push(...data["actors/bubble/bubble.rgba16.png"].data)
+    bubble_seg4_texture_0401D560.push(...data["actors/bubble/mr_i_bubble.rgba16.png"].data)
+
+    SkyboxCCM.ccm_skybox_texture_00000.push(...data["ccm_skybox_texture_00000"].data)
+    SkyboxCCM.ccm_skybox_texture_00001.push(...data["ccm_skybox_texture_00001"].data)
+    SkyboxCCM.ccm_skybox_texture_00002.push(...data["ccm_skybox_texture_00002"].data)
+    SkyboxCCM.ccm_skybox_texture_00003.push(...data["ccm_skybox_texture_00003"].data)
+    SkyboxCCM.ccm_skybox_texture_00004.push(...data["ccm_skybox_texture_00004"].data)
+    SkyboxCCM.ccm_skybox_texture_00005.push(...data["ccm_skybox_texture_00005"].data)
+    SkyboxCCM.ccm_skybox_texture_00006.push(...data["ccm_skybox_texture_00006"].data)
+    SkyboxCCM.ccm_skybox_texture_00007.push(...data["ccm_skybox_texture_00007"].data)
+    SkyboxCCM.ccm_skybox_texture_00008.push(...data["ccm_skybox_texture_00008"].data)
+    SkyboxCCM.ccm_skybox_texture_00009.push(...data["ccm_skybox_texture_00009"].data)
+    SkyboxCCM.ccm_skybox_texture_0000A.push(...data["ccm_skybox_texture_0000A"].data)
+    SkyboxCCM.ccm_skybox_texture_0000B.push(...data["ccm_skybox_texture_0000B"].data)
+    SkyboxCCM.ccm_skybox_texture_0000C.push(...data["ccm_skybox_texture_0000C"].data)
+    SkyboxCCM.ccm_skybox_texture_0000D.push(...data["ccm_skybox_texture_0000D"].data)
+    SkyboxCCM.ccm_skybox_texture_0000E.push(...data["ccm_skybox_texture_0000E"].data)
+    SkyboxCCM.ccm_skybox_texture_0000F.push(...data["ccm_skybox_texture_0000F"].data)
+
+    SkyboxCCM.ccm_skybox_texture_00010.push(...data["ccm_skybox_texture_00010"].data)
+    SkyboxCCM.ccm_skybox_texture_00011.push(...data["ccm_skybox_texture_00011"].data)
+    SkyboxCCM.ccm_skybox_texture_00012.push(...data["ccm_skybox_texture_00012"].data)
+    SkyboxCCM.ccm_skybox_texture_00013.push(...data["ccm_skybox_texture_00013"].data)
+    SkyboxCCM.ccm_skybox_texture_00014.push(...data["ccm_skybox_texture_00014"].data)
+    SkyboxCCM.ccm_skybox_texture_00015.push(...data["ccm_skybox_texture_00015"].data)
+    SkyboxCCM.ccm_skybox_texture_00016.push(...data["ccm_skybox_texture_00016"].data)
+    SkyboxCCM.ccm_skybox_texture_00017.push(...data["ccm_skybox_texture_00017"].data)
+    SkyboxCCM.ccm_skybox_texture_00018.push(...data["ccm_skybox_texture_00018"].data)
+    SkyboxCCM.ccm_skybox_texture_00019.push(...data["ccm_skybox_texture_00019"].data)
+    SkyboxCCM.ccm_skybox_texture_0001A.push(...data["ccm_skybox_texture_0001A"].data)
+    SkyboxCCM.ccm_skybox_texture_0001B.push(...data["ccm_skybox_texture_0001B"].data)
+    SkyboxCCM.ccm_skybox_texture_0001C.push(...data["ccm_skybox_texture_0001C"].data)
+    SkyboxCCM.ccm_skybox_texture_0001D.push(...data["ccm_skybox_texture_0001D"].data)
+    SkyboxCCM.ccm_skybox_texture_0001E.push(...data["ccm_skybox_texture_0001E"].data)
+    SkyboxCCM.ccm_skybox_texture_0001F.push(...data["ccm_skybox_texture_0001F"].data)
+
+    SkyboxCCM.ccm_skybox_texture_00020.push(...data["ccm_skybox_texture_00020"].data)
+    SkyboxCCM.ccm_skybox_texture_00021.push(...data["ccm_skybox_texture_00021"].data)
+    SkyboxCCM.ccm_skybox_texture_00022.push(...data["ccm_skybox_texture_00022"].data)
+    SkyboxCCM.ccm_skybox_texture_00023.push(...data["ccm_skybox_texture_00023"].data)
+    SkyboxCCM.ccm_skybox_texture_00024.push(...data["ccm_skybox_texture_00024"].data)
+    SkyboxCCM.ccm_skybox_texture_00025.push(...data["ccm_skybox_texture_00025"].data)
+    SkyboxCCM.ccm_skybox_texture_00026.push(...data["ccm_skybox_texture_00026"].data)
+    SkyboxCCM.ccm_skybox_texture_00027.push(...data["ccm_skybox_texture_00027"].data)
+    SkyboxCCM.ccm_skybox_texture_00028.push(...data["ccm_skybox_texture_00028"].data)
+    SkyboxCCM.ccm_skybox_texture_00029.push(...data["ccm_skybox_texture_00029"].data)
+    SkyboxCCM.ccm_skybox_texture_0002A.push(...data["ccm_skybox_texture_0002A"].data)
+    SkyboxCCM.ccm_skybox_texture_0002B.push(...data["ccm_skybox_texture_0002B"].data)
+    SkyboxCCM.ccm_skybox_texture_0002C.push(...data["ccm_skybox_texture_0002C"].data)
+    SkyboxCCM.ccm_skybox_texture_0002D.push(...data["ccm_skybox_texture_0002D"].data)
+    SkyboxCCM.ccm_skybox_texture_0002E.push(...data["ccm_skybox_texture_0002E"].data)
+    SkyboxCCM.ccm_skybox_texture_0002F.push(...data["ccm_skybox_texture_0002F"].data)
+
+    SkyboxCCM.ccm_skybox_texture_00030.push(...data["ccm_skybox_texture_00030"].data)
+    SkyboxCCM.ccm_skybox_texture_00031.push(...data["ccm_skybox_texture_00031"].data)
+    SkyboxCCM.ccm_skybox_texture_00032.push(...data["ccm_skybox_texture_00032"].data)
+    SkyboxCCM.ccm_skybox_texture_00033.push(...data["ccm_skybox_texture_00033"].data)
+    SkyboxCCM.ccm_skybox_texture_00034.push(...data["ccm_skybox_texture_00034"].data)
+    SkyboxCCM.ccm_skybox_texture_00035.push(...data["ccm_skybox_texture_00035"].data)
+    SkyboxCCM.ccm_skybox_texture_00036.push(...data["ccm_skybox_texture_00036"].data)
+    SkyboxCCM.ccm_skybox_texture_00037.push(...data["ccm_skybox_texture_00037"].data)
+    SkyboxCCM.ccm_skybox_texture_00038.push(...data["ccm_skybox_texture_00038"].data)
+    SkyboxCCM.ccm_skybox_texture_00039.push(...data["ccm_skybox_texture_00039"].data)
+    SkyboxCCM.ccm_skybox_texture_0003A.push(...data["ccm_skybox_texture_0003A"].data)
+    SkyboxCCM.ccm_skybox_texture_0003B.push(...data["ccm_skybox_texture_0003B"].data)
+    SkyboxCCM.ccm_skybox_texture_0003C.push(...data["ccm_skybox_texture_0003C"].data)
+    SkyboxCCM.ccm_skybox_texture_0003D.push(...data["ccm_skybox_texture_0003D"].data)
+    SkyboxCCM.ccm_skybox_texture_0003E.push(...data["ccm_skybox_texture_0003E"].data)
+    SkyboxCCM.ccm_skybox_texture_0003F.push(...data["ccm_skybox_texture_0003F"].data)
+
+    SkyboxSSL.ssl_skybox_texture_00000.push(...data["ssl_skybox_texture_00000"].data)
+    SkyboxSSL.ssl_skybox_texture_00001.push(...data["ssl_skybox_texture_00001"].data)
+    SkyboxSSL.ssl_skybox_texture_00002.push(...data["ssl_skybox_texture_00002"].data)
+    SkyboxSSL.ssl_skybox_texture_00003.push(...data["ssl_skybox_texture_00003"].data)
+    SkyboxSSL.ssl_skybox_texture_00004.push(...data["ssl_skybox_texture_00004"].data)
+    SkyboxSSL.ssl_skybox_texture_00005.push(...data["ssl_skybox_texture_00005"].data)
+    SkyboxSSL.ssl_skybox_texture_00006.push(...data["ssl_skybox_texture_00006"].data)
+    SkyboxSSL.ssl_skybox_texture_00007.push(...data["ssl_skybox_texture_00007"].data)
+    SkyboxSSL.ssl_skybox_texture_00008.push(...data["ssl_skybox_texture_00008"].data)
+    SkyboxSSL.ssl_skybox_texture_00009.push(...data["ssl_skybox_texture_00009"].data)
+    SkyboxSSL.ssl_skybox_texture_0000A.push(...data["ssl_skybox_texture_0000A"].data)
+    SkyboxSSL.ssl_skybox_texture_0000B.push(...data["ssl_skybox_texture_0000B"].data)
+    SkyboxSSL.ssl_skybox_texture_0000C.push(...data["ssl_skybox_texture_0000C"].data)
+    SkyboxSSL.ssl_skybox_texture_0000D.push(...data["ssl_skybox_texture_0000D"].data)
+    SkyboxSSL.ssl_skybox_texture_0000E.push(...data["ssl_skybox_texture_0000E"].data)
+    SkyboxSSL.ssl_skybox_texture_0000F.push(...data["ssl_skybox_texture_0000F"].data)
+
+    SkyboxSSL.ssl_skybox_texture_00010.push(...data["ssl_skybox_texture_00010"].data)
+    SkyboxSSL.ssl_skybox_texture_00011.push(...data["ssl_skybox_texture_00011"].data)
+    SkyboxSSL.ssl_skybox_texture_00012.push(...data["ssl_skybox_texture_00012"].data)
+    SkyboxSSL.ssl_skybox_texture_00013.push(...data["ssl_skybox_texture_00013"].data)
+    SkyboxSSL.ssl_skybox_texture_00014.push(...data["ssl_skybox_texture_00014"].data)
+    SkyboxSSL.ssl_skybox_texture_00015.push(...data["ssl_skybox_texture_00015"].data)
+    SkyboxSSL.ssl_skybox_texture_00016.push(...data["ssl_skybox_texture_00016"].data)
+    SkyboxSSL.ssl_skybox_texture_00017.push(...data["ssl_skybox_texture_00017"].data)
+    SkyboxSSL.ssl_skybox_texture_00018.push(...data["ssl_skybox_texture_00018"].data)
+    SkyboxSSL.ssl_skybox_texture_00019.push(...data["ssl_skybox_texture_00019"].data)
+    SkyboxSSL.ssl_skybox_texture_0001A.push(...data["ssl_skybox_texture_0001A"].data)
+    SkyboxSSL.ssl_skybox_texture_0001B.push(...data["ssl_skybox_texture_0001B"].data)
+    SkyboxSSL.ssl_skybox_texture_0001C.push(...data["ssl_skybox_texture_0001C"].data)
+    SkyboxSSL.ssl_skybox_texture_0001D.push(...data["ssl_skybox_texture_0001D"].data)
+    SkyboxSSL.ssl_skybox_texture_0001E.push(...data["ssl_skybox_texture_0001E"].data)
+    SkyboxSSL.ssl_skybox_texture_0001F.push(...data["ssl_skybox_texture_0001F"].data)
+
+    SkyboxSSL.ssl_skybox_texture_00020.push(...data["ssl_skybox_texture_00020"].data)
+    SkyboxSSL.ssl_skybox_texture_00021.push(...data["ssl_skybox_texture_00021"].data)
+    SkyboxSSL.ssl_skybox_texture_00022.push(...data["ssl_skybox_texture_00022"].data)
+    SkyboxSSL.ssl_skybox_texture_00023.push(...data["ssl_skybox_texture_00023"].data)
+    SkyboxSSL.ssl_skybox_texture_00024.push(...data["ssl_skybox_texture_00024"].data)
+    SkyboxSSL.ssl_skybox_texture_00025.push(...data["ssl_skybox_texture_00025"].data)
+    SkyboxSSL.ssl_skybox_texture_00026.push(...data["ssl_skybox_texture_00026"].data)
+    SkyboxSSL.ssl_skybox_texture_00027.push(...data["ssl_skybox_texture_00027"].data)
+    SkyboxSSL.ssl_skybox_texture_00028.push(...data["ssl_skybox_texture_00028"].data)
+    SkyboxSSL.ssl_skybox_texture_00029.push(...data["ssl_skybox_texture_00029"].data)
+    SkyboxSSL.ssl_skybox_texture_0002A.push(...data["ssl_skybox_texture_0002A"].data)
+    SkyboxSSL.ssl_skybox_texture_0002B.push(...data["ssl_skybox_texture_0002B"].data)
+    SkyboxSSL.ssl_skybox_texture_0002C.push(...data["ssl_skybox_texture_0002C"].data)
+    SkyboxSSL.ssl_skybox_texture_0002D.push(...data["ssl_skybox_texture_0002D"].data)
+    SkyboxSSL.ssl_skybox_texture_0002E.push(...data["ssl_skybox_texture_0002E"].data)
+    SkyboxSSL.ssl_skybox_texture_0002F.push(...data["ssl_skybox_texture_0002F"].data)
+
+    SkyboxSSL.ssl_skybox_texture_00030.push(...data["ssl_skybox_texture_00030"].data)
+    SkyboxSSL.ssl_skybox_texture_00031.push(...data["ssl_skybox_texture_00031"].data)
+    SkyboxSSL.ssl_skybox_texture_00032.push(...data["ssl_skybox_texture_00032"].data)
+    SkyboxSSL.ssl_skybox_texture_00033.push(...data["ssl_skybox_texture_00033"].data)
+    SkyboxSSL.ssl_skybox_texture_00034.push(...data["ssl_skybox_texture_00034"].data)
+    SkyboxSSL.ssl_skybox_texture_00035.push(...data["ssl_skybox_texture_00035"].data)
+    SkyboxSSL.ssl_skybox_texture_00036.push(...data["ssl_skybox_texture_00036"].data)
+    SkyboxSSL.ssl_skybox_texture_00037.push(...data["ssl_skybox_texture_00037"].data)
+    SkyboxSSL.ssl_skybox_texture_00038.push(...data["ssl_skybox_texture_00038"].data)
+    SkyboxSSL.ssl_skybox_texture_00039.push(...data["ssl_skybox_texture_00039"].data)
+    SkyboxSSL.ssl_skybox_texture_0003A.push(...data["ssl_skybox_texture_0003A"].data)
+    SkyboxSSL.ssl_skybox_texture_0003B.push(...data["ssl_skybox_texture_0003B"].data)
+    SkyboxSSL.ssl_skybox_texture_0003C.push(...data["ssl_skybox_texture_0003C"].data)
+    SkyboxSSL.ssl_skybox_texture_0003D.push(...data["ssl_skybox_texture_0003D"].data)
+    SkyboxSSL.ssl_skybox_texture_0003E.push(...data["ssl_skybox_texture_0003E"].data)
+    SkyboxSSL.ssl_skybox_texture_0003F.push(...data["ssl_skybox_texture_0003F"].data)
 
     SkyboxWater.water_skybox_texture_00000.push(...data["water_skybox_texture_00000"].data)
     SkyboxWater.water_skybox_texture_00001.push(...data["water_skybox_texture_00001"].data)

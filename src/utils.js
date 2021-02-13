@@ -57,6 +57,8 @@ export const levelIdToName = {
     1001: "CTF/Race Map",
     1000: "Mushroom Battlefield",
     16: "Castle Grounds",
+    6: "Castle Inside First Level",
+    602: "Castle Inside Second Level",
     26: "Castle Courtyard",
     9: "Bob-omb Battlefield",
     8: "Shifting Sand Land",

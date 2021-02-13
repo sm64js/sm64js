@@ -168,6 +168,53 @@ import {
 } from "./levels/hmc/texture.inc"
 
 import {
+    texture_castle_light,
+    inside_castle_seg7_texture_07000800,
+    inside_castle_seg7_texture_07001000,
+    inside_castle_seg7_texture_07002000,
+    inside_castle_seg7_texture_07003000,
+    inside_castle_seg7_texture_07003800,
+    inside_castle_seg7_texture_07004800,
+    inside_castle_seg7_texture_07005800,
+    inside_castle_seg7_texture_07006000,
+    inside_castle_seg7_texture_07006800,
+    inside_castle_seg7_texture_07007000,
+    inside_castle_seg7_texture_07007800,
+    inside_castle_seg7_texture_07008000,
+    inside_castle_seg7_texture_07008800,
+    inside_castle_seg7_texture_07009000,
+    inside_castle_seg7_texture_07009800,
+    inside_castle_seg7_texture_0700A000,
+    inside_castle_seg7_texture_0700A800,
+    inside_castle_seg7_texture_0700B800,
+    inside_castle_seg7_texture_0700C800,
+    inside_castle_seg7_texture_0700D800,
+    inside_castle_seg7_texture_0700E800,
+    inside_castle_seg7_texture_0700F800,
+} from "./levels/castle_inside/texture.inc"
+
+import {
+    inside_09000000,
+    inside_09001000,
+    inside_09002000,
+    inside_09003000,
+    inside_09003800,
+    inside_09004000,
+    inside_09004800,
+    inside_09005000,
+    inside_09005800,
+    inside_09006000,
+    inside_09007000,
+    inside_09008000,
+    inside_09008800,
+    inside_09009000,
+    inside_0900A000,
+    inside_0900B000,
+    inside_0900B800,
+} from "./textures/inside"
+
+
+import {
     mountain_09000000,
     mountain_09000800,
     mountain_09001800,
@@ -327,7 +374,7 @@ import { bubble_seg4_texture_0401CD60, bubble_seg4_texture_0401D560 } from "./ac
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 29
+const textureVersion = 30
 
 const loadDataIntoGame = (data) => {
 
@@ -486,6 +533,48 @@ const loadDataIntoGame = (data) => {
     cave_0900A800.push(...data["textures/cave/hmc_textures.0A800.rgba16.png"].data)
     cave_0900B800.push(...data["textures/cave/hmc_textures.0B800.ia16.png"].data)
     cave_0900C000.push(...data["textures/cave/hmc_textures.0C000.ia16.png"].data)
+
+    texture_castle_light.push(...data["levels/castle_inside/castle_light.ia16.png"].data)
+    inside_castle_seg7_texture_07000800.push(...data["levels/castle_inside/1.rgba16.png"].data)
+    inside_castle_seg7_texture_07001000.push(...data["levels/castle_inside/2.ia16.png"].data)
+    inside_castle_seg7_texture_07002000.push(...data["levels/castle_inside/3.rgba16.png"].data)
+    inside_castle_seg7_texture_07003000.push(...data["levels/castle_inside/4.rgba16.png"].data)
+    inside_castle_seg7_texture_07003800.push(...data["levels/castle_inside/5.rgba16.png"].data)
+    inside_castle_seg7_texture_07004800.push(...data["levels/castle_inside/6.rgba16.png"].data)
+    inside_castle_seg7_texture_07005800.push(...data["levels/castle_inside/7.rgba16.png"].data)
+    inside_castle_seg7_texture_07006000.push(...data["levels/castle_inside/8.rgba16.png"].data)
+    inside_castle_seg7_texture_07006800.push(...data["levels/castle_inside/9.rgba16.png"].data)
+    inside_castle_seg7_texture_07007000.push(...data["levels/castle_inside/10.rgba16.png"].data)
+    inside_castle_seg7_texture_07007800.push(...data["levels/castle_inside/11.rgba16.png"].data)
+    inside_castle_seg7_texture_07008000.push(...data["levels/castle_inside/12.rgba16.png"].data)
+    inside_castle_seg7_texture_07008800.push(...data["levels/castle_inside/13.rgba16.png"].data)
+    inside_castle_seg7_texture_07009000.push(...data["levels/castle_inside/14.rgba16.png"].data)
+    inside_castle_seg7_texture_07009800.push(...data["levels/castle_inside/15.rgba16.png"].data)
+    inside_castle_seg7_texture_0700A000.push(...data["levels/castle_inside/16.ia16.png"].data)
+    inside_castle_seg7_texture_0700A800.push(...data["levels/castle_inside/17.rgba16.png"].data)
+    inside_castle_seg7_texture_0700B800.push(...data["levels/castle_inside/18.rgba16.png"].data)
+    inside_castle_seg7_texture_0700C800.push(...data["levels/castle_inside/19.rgba16.png"].data)
+    inside_castle_seg7_texture_0700D800.push(...data["levels/castle_inside/20.rgba16.png"].data)
+    inside_castle_seg7_texture_0700E800.push(...data["levels/castle_inside/21.rgba16.png"].data)
+    inside_castle_seg7_texture_0700F800.push(...data["levels/castle_inside/22.rgba16.png"].data)
+
+    inside_09000000.push(...data["textures/inside/inside_castle_textures.00000.rgba16.png"].data)
+    inside_09001000.push(...data["textures/inside/inside_castle_textures.01000.rgba16.png"].data)
+    inside_09002000.push(...data["textures/inside/inside_castle_textures.02000.rgba16.png"].data)
+    inside_09003000.push(...data["textures/inside/inside_castle_textures.03000.rgba16.png"].data)
+    inside_09003800.push(...data["textures/inside/inside_castle_textures.03800.rgba16.png"].data)
+    inside_09004000.push(...data["textures/inside/inside_castle_textures.04000.rgba16.png"].data)
+    inside_09004800.push(...data["textures/inside/inside_castle_textures.04800.rgba16.png"].data)
+    inside_09005000.push(...data["textures/inside/inside_castle_textures.05000.rgba16.png"].data)
+    inside_09005800.push(...data["textures/inside/inside_castle_textures.05800.rgba16.png"].data)
+    inside_09006000.push(...data["textures/inside/inside_castle_textures.06000.rgba16.png"].data)
+    inside_09007000.push(...data["textures/inside/inside_castle_textures.07000.rgba16.png"].data)
+    inside_09008000.push(...data["textures/inside/inside_castle_textures.08000.rgba16.png"].data)
+    inside_09008800.push(...data["textures/inside/inside_castle_textures.08800.rgba16.png"].data)
+    inside_09009000.push(...data["textures/inside/inside_castle_textures.09000.rgba16.png"].data)
+    inside_0900A000.push(...data["textures/inside/inside_castle_textures.0A000.rgba16.png"].data)
+    inside_0900B000.push(...data["textures/inside/inside_castle_textures.0B000.rgba16.png"].data)
+    inside_0900B800.push(...data["textures/inside/inside_castle_textures.0B800.rgba16.png"].data)
 
     hmc_seg7_texture_07000000.push(...data["levels/hmc/0.rgba16.png"].data)
     hmc_seg7_texture_07001000.push(...data["levels/hmc/1.rgba16.png"].data)

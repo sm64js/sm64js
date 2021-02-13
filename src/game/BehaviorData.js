@@ -399,7 +399,7 @@ export const bhvSmallWaterWave398 = [
     { command: BhvCmds.add_number, args: { field: oPosY, value: 7 } },
     { command: BhvCmds.set_random_float, args: { field: oWaterObjUnkF4, minimum: -2, range: 5 } },
     { command: BhvCmds.set_random_float, args: { field: oWaterObjUnkF8, minimum: -2, range: 5 } },
-    { command: BhvCmds.sum_float, args: { dest: oPosX, value1: oPosX, value2: oWaterObjUnkFC } },
+    { command: BhvCmds.sum_float, args: { dest: oPosX, value1: oPosX, value2: oWaterObjUnkF4 } },
     { command: BhvCmds.sum_float, args: { dest: oPosZ, value1: oPosZ, value2: oWaterObjUnkF8 } },
     { command: BhvCmds.return }
 ]

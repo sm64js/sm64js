@@ -725,7 +725,7 @@ const common_water_knockback_step = (m, animation, endAction, arg3) => {
             m.invincTimer = 30
         }
 
-        Mario.set_mario_action(m, m.health >= 0x100 ? endAction : ACT_WATER_DEATH, 0)
+        Mario.set_mario_action(m, m.health >= 0x100 ? endAction : Mario.ACT_WATER_DEATH, 0)
     }
 }
 

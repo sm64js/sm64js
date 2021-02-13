@@ -142,6 +142,7 @@ function convert(MDTY) {
 				if (idx != -1) line = `${line.slice(0, idx - 2)}),`
 				if (line.slice(4, 12) == 'gsSP2Tri') line = `...${line}`
 				if (line.slice(4, 17) == 'gsDPSetRender') line = convertRenderModeLine(line)
+				if (line.slice(4, 19) == 'gsDPLoadTexture') line = `...${line}`
 
 				outputStr += `\t${line}\n`
 			})

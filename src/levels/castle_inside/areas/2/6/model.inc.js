@@ -76,7 +76,11 @@ export const inside_castle_seg7_dl_0704A290 = [
 export const inside_castle_seg7_dl_0704A2E0 = [
 	Gbi.gsSPSetGeometryMode(Gbi.G_TEXTURE_GEN),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATEIA),
+<<<<<<< HEAD
 	Gbi.gsDPLoadTextureBlock(inside_castle_seg7_texture_0700A000, Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_16b, 32, 32, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
+=======
+	...Gbi.gsDPLoadTextureBlock(inside_castle_seg7_texture_0700A000, Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_16b, 32, 32, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
+>>>>>>> upstream/vanilla
 	Gbi.gsSPTexture(0x07C0, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
 	Gbi.gsSPDisplayList(inside_castle_seg7_dl_0704A290),
 	Gbi.gsSPTexture(0x07C0, 0x07C0, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),

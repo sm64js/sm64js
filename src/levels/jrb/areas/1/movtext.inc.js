@@ -28,6 +28,7 @@ const jrb_movtex_ocean_cave_water_data = [
     ...MOV_TEX_END(),
 ]
 // Leaving this as an unused const for now, but might use
+/*
 const jrb_movtex_intial_mist_data = [
     ...MOV_TEX_INIT_LOAD(   1),
     ...MOV_TEX_ROT_SPEED(   20),
@@ -41,10 +42,11 @@ const jrb_movtex_intial_mist_data = [
     ...MOV_TEX_DEFINE(  TEXTURE_MIST),
     ...MOV_TEX_END(),
 ]
+*/
 // 0x0700D2CC
 export const jrb_movtex_water = [
     {id: 0, movtex: jrb_movtex_water_data},
     {id: 1, movtex: jrb_movtex_ocean_cave_water_data},
-    {id: -1, movtex: NULL},
+    {id: -1},
 ]
 

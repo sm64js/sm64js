@@ -2,6 +2,7 @@ import { GEO_CONTEXT_RENDER } from "../engine/graph_node"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { castle_grounds_movtex_water, castle_grounds_movtex_tris_waterfall, castle_grounds_dl_waterfall } from "../levels/castle_grounds/areas/1/movtext.inc"
 import { ccm_movtex_penguin_puddle_water } from "../levels/ccm/areas/1/movtext.inc"
+import { jrb_movtex_water } from "../levels/jrb/areas/1/movtext.inc"
 import { wf_movtex_water } from "../levels/wf/areas/1/movtext.inc"
 import { GeoLayoutInstance as GeoLayout } from "../engine/GeoLayout"
 import * as Gbi from "../include/gbi"
@@ -123,6 +124,8 @@ const get_quad_collection_from_id = (id) => {
             return ccm_movtex_penguin_puddle_water
         case WF_MOVTEX_WATER:
             return wf_movtex_water
+        case JRB_MOVTEX_WATER:
+            return jrb_movtex_water
         default: throw "unknown case - get quad collection from id"
     }
 }

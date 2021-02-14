@@ -10,8 +10,6 @@ import { level_wf_entry } from "./wf/script"
 import { level_hmc_entry } from "./hmc/script"
 import { level_bbh_entry } from "./bbh/script"
 import { level_castle_courtyard_entry } from "./castle_courtyard/script"
-import { level_castle_inside_entry } from "./castle_inside/script_1"
-import { level_castle_inside_2_entry } from "./castle_inside/script_2"
 import { level_ssl_entry } from "./ssl/script"
 import { level_sl_entry } from "./sl/script"
 import { level_castle_inside_entry } from "./castle_inside/script_1"
@@ -25,14 +23,6 @@ export const level_defines_list = [
     {
         command: LevelCommands.jump_if,
         args: [LevelCommands.OP_EQ, LEVEL_CASTLE_COURTYARD, level_castle_courtyard_entry]
-    },
-    {
-        command: LevelCommands.jump_if,
-        args: [LevelCommands.OP_EQ, LEVEL_CASTLE_INSIDE_1, level_castle_inside_entry]
-    },
-    {
-        command: LevelCommands.jump_if,
-        args: [LevelCommands.OP_EQ, LEVEL_CASTLE_INSIDE_2, level_castle_inside_2_entry]
     },
     {
         command: LevelCommands.jump_if,

@@ -354,6 +354,31 @@ import {
     sl_seg7_texture_07002000
 } from "./levels/sl/texture.inc"
 
+import {
+    jrb_seg7_texture_07000000,
+    jrb_seg7_texture_07000800,
+    jrb_seg7_texture_07001800,
+    jrb_seg7_texture_07002000
+} from "./levels/jrb/texture.inc"
+
+import {
+    water_09000000,
+    water_09000800,
+    water_09001800,
+    water_09002800,
+    water_09003800,
+    water_09004800,
+    water_09005800,
+    water_09006000,
+    water_09006800,
+    water_09007800,
+    water_09008800,
+    water_09009000,
+    water_0900A000,
+    water_0900A800,
+    water_0900B800
+} from "./textures/water"
+
 import { chain_ball_seg6_texture_06020AE8 } from "./actors/chain_ball/model.inc"
 
 import {
@@ -799,6 +824,27 @@ const loadDataIntoGame = (data) => {
     bbh_seg7_texture_07003000.push(...data["levels/bbh/4.rgba16.png"].data)
     bbh_seg7_texture_07003400.push(...data["levels/bbh/5.rgba16.png"].data)
     bbh_seg7_texture_07004400.push(...data["levels/bbh/6.rgba16.png"].data)
+
+    jrb_seg7_texture_07000000.push(...data["levels/jrb/0.rgba16.png"].data)
+    jrb_seg7_texture_07000800.push(...data["levels/jrb/1.rgba16.png"].data)
+    jrb_seg7_texture_07001800.push(...data["levels/jrb/2.rgba16.png"].data)
+    jrb_seg7_texture_07002000.push(...data["levels/jrb/3.rgba16.png"].data)
+
+    water_09000000.push(...data["textures/water/jrb_textures.00000.rgba16.png"].data)
+    water_09000800.push(...data["textures/water/jrb_textures.00800.rgba16.png"].data)
+    water_09001800.push(...data["textures/water/jrb_textures.01800.rgba16.png"].data)
+    water_09002800.push(...data["textures/water/jrb_textures.02800.rgba16.png"].data)
+    water_09003800.push(...data["textures/water/jrb_textures.03800.rgba16.png"].data)
+    water_09004800.push(...data["textures/water/jrb_textures.04800.rgba16.png"].data)
+    water_09005800.push(...data["textures/water/jrb_textures.05800.rgba16.png"].data)
+    water_09006000.push(...data["textures/water/jrb_textures.06000.rgba16.png"].data)
+    water_09006800.push(...data["textures/water/jrb_textures.06800.rgba16.png"].data)
+    water_09007800.push(...data["textures/water/jrb_textures.07800.rgba16.png"].data)
+    water_09008800.push(...data["textures/water/jrb_textures.08800.rgba16.png"].data)
+    water_09009000.push(...data["textures/water/jrb_textures.09000.rgba16.png"].data)
+    water_0900A000.push(...data["textures/water/jrb_textures.0A000.rgba16.png"].data)
+    water_0900A800.push(...data["textures/water/jrb_textures.0A800.rgba16.png"].data)
+    water_0900B800.push(...data["textures/water/jrb_textures.0B800.rgba16.png"].data)
 
     chain_ball_seg6_texture_06020AE8.push(...data["actors/chain_ball/chain_ball.rgba16.png"].data)
 

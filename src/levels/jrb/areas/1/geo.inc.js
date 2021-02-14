@@ -1,4 +1,4 @@
-import { GeoLayoutInstance as Geo } from "../../../../../engine/Geo"
+import { GeoLayoutInstance as Geo } from "../../../../engine/GeoLayout"
 import { CameraInstance as Camera } from "../../../../game/Camera"
 import { geo_skybox_main } from "../../../../game/LevelGeo"
 import { geo_movtex_draw_water_regions } from "../../../../game/MovingTexture"

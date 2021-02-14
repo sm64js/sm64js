@@ -4,7 +4,7 @@ import {
     jrb_seg7_texture_07000800,
     jrb_seg7_texture_07001800,
     jrb_seg7_texture_07002000
-} from "../../../../../textures/water"
+} from "../../../texture.inc"
 
 import {
     water_09000000,
@@ -22,8 +22,7 @@ import {
     water_0900A000,
     water_0900A800,
     water_0900B800
-} from "../../../texture.inc"
-
+} from "../../../../../textures/water"
 const jrb_seg7_vertex_07007628 = [
 	{ pos: [ 4569, -5221, 2892 ], flag: 0, tc: [ 4056, 6098 ], color: [ 255, 255, 255, 255 ] },
 	{ pos: [ 5388, -5221, 2892 ], flag: 0, tc: [ 4056, -2076 ], color: [ 255, 255, 255, 255 ] },

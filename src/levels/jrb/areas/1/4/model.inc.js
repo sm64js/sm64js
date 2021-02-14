@@ -4,7 +4,7 @@ import {
     jrb_seg7_texture_07000800,
     jrb_seg7_texture_07001800,
     jrb_seg7_texture_07002000
-} from "../../../../../textures/water"
+} from "../../../texture.inc"
 
 import {
     water_09000000,
@@ -22,7 +22,7 @@ import {
     water_0900A000,
     water_0900A800,
     water_0900B800
-} from "../../../texture.inc"
+} from "../../../../../textures/water"
 
 const jrb_seg7_lights_07004D40 = Gbi.gdSPDefLights1(
 	    0x00, 0x00, 0x00,

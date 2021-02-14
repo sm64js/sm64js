@@ -8,7 +8,7 @@ import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_te
 import { castle_grounds_seg7_texture_07000000, castle_grounds_seg7_texture_07001000, castle_grounds_seg7_texture_07002000 } from "./levels/castle_grounds/texture.inc.js"
 import { title_texture_0A0001C0, title_texture_0A000E40, title_texture_0A001AC0, title_texture_0A002740 } from "./levels/intro/title_screen_bg"
 import { tree_seg3_texture_0302DE28, tree_seg3_texture_0302EE28, tree_seg3_texture_0302FF60, tree_seg3_texture_03031048, tree_seg3_texture_03032218 } from "./actors/tree/model.inc"
-import { texture_shadow_quarter_circle, texture_waterbox_water, texture_waterbox_lava, texture_transition_star_half } from "./common_gfx/segment2"
+import { texture_shadow_quarter_circle, texture_waterbox_water, texture_waterbox_jrb_water, texture_waterbox_lava, texture_transition_star_half } from "./common_gfx/segment2"
 
 import {
     ttm_seg7_texture_07000000,
@@ -397,7 +397,7 @@ import {
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 30
+const textureVersion = 31
 
 const loadDataIntoGame = (data) => {
 
@@ -636,6 +636,7 @@ const loadDataIntoGame = (data) => {
 
     texture_waterbox_water.push(...data["textures/segment2/segment2.11C58.rgba16.png"].data)
     texture_waterbox_lava.push(...data["textures/segment2/segment2.13C58.rgba16.png"].data)
+    texture_waterbox_jrb_water.push(...data["textures/segment2/segment2.12458.rgba16.png"].data)
 
     checkerboard_platform_seg8_texture_0800C840.push(...data["actors/checkerboard_platform/checkerboard_platform_side.rgba16.png"].data)
     checkerboard_platform_seg8_texture_0800CC40.push(...data["actors/checkerboard_platform/checkerboard_platform.rgba16.png"].data)

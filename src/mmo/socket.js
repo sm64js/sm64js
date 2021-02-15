@@ -427,10 +427,10 @@ const redirect_uri = encodeURIComponent(process.env.NODE_ENV === 'rust'
     ? `${url.protocol}//${window.location.host}`
     : url.protocol == "https:" ? 'https://sm64js.com' : 'http://localhost:9300')
 
-const discord_client_id = process.env.DISCORD_CLIENT_ID
+const discord_client_id = "807123464414429184"
 const discordOAuthURL = "https://discord.com/api/oauth2/authorize?client_id=" + discord_client_id + "&redirect_uri=" + redirect_uri + "&response_type=code&scope=identify"
 
-const google_client_id = process.env.GOOGLE_CLIENT_ID + ".apps.googleusercontent.com"
+const google_client_id = "1000892686951-dkp1vpqohmbq64h7jiiop9v6ic4t1mul.apps.googleusercontent.com"
 const googleOAuthURL = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=" + google_client_id + "&redirect_uri=" + redirect_uri + "&scope=openid email" 
 
 if (url.searchParams.has('code') || (process.env.PRODUCTION != 1 && process.env.NODE_ENV !== 'rust')) document.getElementById("signinButtons").hidden = true

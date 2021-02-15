@@ -43,8 +43,6 @@ module.exports = env => ({
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(env || 'development'),
             'process.env.PRODUCTION': JSON.stringify(process.env.PRODUCTION),
-            'process.env.DISCORD_CLIENT_ID': JSON.stringify(process.env.DISCORD_CLIENT_ID),
-            'process.env.GOOGLE_CLIENT_ID': JSON.stringify(process.env.GOOGLE_CLIENT_ID),
         }),
         new HtmlWebPackPlugin({
             template: "./src/index.html",

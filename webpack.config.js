@@ -7,8 +7,6 @@ const CopyPlugin = require("copy-webpack-plugin")
 const express = require('express')
 const path = require('path')
 
-require('dotenv').config()
-
 module.exports = env => ({
     module: {
         rules: [

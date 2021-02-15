@@ -121,8 +121,6 @@ socket.onopen = () => {
                     case Sm64JsMsg.MessageCase.INITIALIZATION_MSG:
                         const initializationMsg = sm64jsMsg.getInitializationMsg()
                         switch (initializationMsg.getMessageCase()) {
-                            case InitializationMsg.MessageCase.AUTHORIZED_USER_MSG:
-                                recvAuthorizedUser(initializationMsg.getAuthorizedUserMsg()); break
                             case InitializationMsg.MessageCase.INIT_GAME_DATA_MSG:
                                 Cosmetics.recvPlayerNameResponse(initializationMsg.getInitGameDataMsg()); break
                             default: throw "unknown case for initialization proto message"
@@ -433,7 +431,7 @@ const discord_client_id = process.env.DISCORD_CLIENT_ID
 const discordOAuthURL = "https://discord.com/api/oauth2/authorize?client_id=" + discord_client_id + "&redirect_uri=" + redirect_uri + "&response_type=code&scope=identify"
 
 const google_client_id = process.env.GOOGLE_CLIENT_ID + ".apps.googleusercontent.com"
-const googleOAuthURL = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=" + google_client_id + "&redirect_uri=" + redirect_uri + "&scope=email" 
+const googleOAuthURL = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=" + google_client_id + "&redirect_uri=" + redirect_uri + "&scope=openid email" 
 
 if (url.searchParams.has('code') || (process.env.PRODUCTION != 1 && process.env.NODE_ENV !== 'rust')) document.getElementById("signinButtons").hidden = true
 
@@ -461,20 +459,20 @@ document.getElementById("googleSigninButton").addEventListener('click', () => {
     window.location = `${googleOAuthURL}&state=${encodeURIComponent(JSON.stringify(state))}`
 })
 
-const recvAuthorizedUser = (msg) => {
-    if (msg.getStatus() == 1) {
+export const recvAuthorizedUser = async (res) => {
+    if (res.ok) {
+        const msg = await res.json()
         document.getElementById("playerNameRow").hidden = false
-        document.getElementById("discordNameBox").value = msg.getUsername()
-        if (msg.getUsername() == "") { /// Discord Username option not available
+        document.getElementById("discordNameBox").value = msg.username
+        if (!msg.username) { /// Discord Username option not available
             document.getElementById("customNameRow").hidden = false
             document.getElementById("discordNameRow").hidden = true
             document.getElementById("switchDiscord").hidden = true
         }
     } else { //authorization fail - refresh page without access code
-        document.getElementById("authFailMsg").innerHTML = "Authorization Fail: " + msg.getMessage()
+        document.getElementById("authFailMsg").innerHTML = "Authorization Fail: " + await res.text()
         document.getElementById("authFailMsg").hidden = false
-        if (msg.getStatus() == 2) { // refreshing won't help
-        } else {
+        if (res.status !== 403) { // user is banned on HTTP 403, so don't refresh
             document.getElementById("authFailMsg").innerHTML += `<br/> Please Try Again - Auto refreshing in 3 seconds`
             setTimeout(() => {
                 let params = url.searchParams

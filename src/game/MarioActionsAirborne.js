@@ -783,9 +783,10 @@ const check_common_airborne_cancels = (m) => {
         return Mario.drop_and_set_mario_action(m, Mario.ACT_SQUISHED, 0)
     }
 
-    if (m.floor.type === SURFACE_VERTICAL_WIND && (m.action & Mario.ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)) {
-        return Mario.drop_and_set_mario_action(m, Mario.ACT_VERTICAL_WIND, 0)
-    }
+    /// Vertical wind is not implemented yet
+    //if (m.floor.type === SURFACE_VERTICAL_WIND && (m.action & Mario.ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)) {
+    //    return Mario.drop_and_set_mario_action(m, Mario.ACT_VERTICAL_WIND, 0)
+    //}
 
     m.quicksandDepth = 0.0;
     return 0
@@ -821,6 +822,6 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_HARD_FORWARD_AIR_KB: return act_hard_forward_air_kb(m)
         case Mario.ACT_WATER_JUMP: return act_water_jump(m)
         case Mario.ACT_HOLD_WATER_JUMP: return act_hold_water_jump(m)
-        default: throw "unkown action airborne"
+        default: throw "unkown action airborne " + m.action.toString(16)
     }
 }

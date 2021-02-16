@@ -907,10 +907,10 @@ export const execute_mario_action = () => {
                 case ACT_GROUP_AUTOMATIC:
                     inLoop = mario_execute_automatic_action(LevelUpdate.gMarioState); break
 
-                case ACT_GROUP_SUBMERGED:
-                    inLoop = mario_execute_submerged_action(LevelUpdate.gMarioState); break
-
-                default: throw "unkown action group"
+                    case ACT_GROUP_SUBMERGED:
+                        inLoop = mario_execute_submerged_action(LevelUpdate.gMarioState); break
+                  
+                        default: throw "unkown action group"
             }
         }
 
@@ -1291,6 +1291,8 @@ export const init_mario_from_save_file = () => {
         unkB8: 0, unkB0: 0xBD
     })
 
+    LevelUpdate.gHudDisplay.coins = 0;
+    LevelUpdate.gHudDisplay.wedges = 8;
 }
 
 export const set_water_plunge_action = m => {

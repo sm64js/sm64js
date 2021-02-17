@@ -75,8 +75,8 @@ class Hud {
         // Gbi.gDPPipeSync(Game.gDisplayList);
         Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, texture);
         Gbi.gSPDisplayList(Game.gDisplayList, dl_hud_img_load_tex_block);
-        x /= 2.0;
-        y /= 2.0;
+        x = parseInt(x / 2.0)
+        y = parseInt(y / 2.0)
         Gbi.gSPTextureRectangle(Game.gDisplayList, x << 2, y << 2, (x + 15.0 / 2.0) << 2, (y + 15.0 / 2.0) << 2, Gbi.G_TX_RENDERTILE, 0, 0, 8 << 10, 2 << 10);
     }
 

@@ -4,6 +4,9 @@ import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProce
 import { GameInstance as Game } from "./Game"
 import { gSPViewport } from "../include/gbi"
 import { render_screen_transition } from "./ScreenTransition"
+import { HudInstance as Hud } from "./Hud"
+import { PrintInstance as Print } from "./Print"
+import { SCREEN_WIDTH } from "../include/config"
 
 export const WARP_TRANSITION_FADE_FROM_COLOR   = 0x00
 export const WARP_TRANSITION_FADE_INTO_COLOR   = 0x01
@@ -177,7 +180,9 @@ class Area {
             GeoRenderer.geo_process_root(this.gCurrentArea.geometryLayoutData, null, null, null)
 
             gSPViewport(Game.gDisplayList, D_8032CF00)
-
+            Hud.render_hud();
+            Print.render_text_labels();
+            
             if (this.gWarpTransition.isActive) {
                 if (this.gWarpTransDelay == 0) {
 
@@ -194,8 +199,24 @@ class Area {
                     this.gWarpTransDelay--
                 }
             }
+        } else {
+            Print.render_text_labels();
         }
     }
+
+    print_intro_text() {
+        if ((window.gGlobalTimer & 0x1F) < 20) {
+            var noController = false; // gControllerBits == 0
+
+            if (noController) {
+                Print.print_text_centered(SCREEN_WIDTH / 2, 20, "NO CONTROLLER");
+            } else {
+                Print.print_text_centered(60, 38, "PRESS");
+                Print.print_text_centered(60, 20, "START");
+            }
+        }
+    }
+        
 
 }
 

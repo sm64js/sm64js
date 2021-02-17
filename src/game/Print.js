@@ -277,21 +277,6 @@ class Print {
         Gbi.gSPDisplayList(Game.gDisplayList, dl_hud_img_load_tex_block);
     }
 
-    render_textrect(x, y, pos) {
-        var rectBaseX = x + pos * 12;
-        var rectBaseY = 224 - y;
-        var rectX;
-        var rectY;
-
-        var WIDESCREEN = false;
-        if (WIDESCREEN) {
-            // clip_to_bounds(&rectBaseX, &rectBaseY);
-        }
-
-        rectX = rectBaseX;
-        rectY = rectBaseY;
-        Gbi.gSPTextureRectangle(Game.gDisplayList, rectX << 2, rectY << 2, (rectX + 15) << 2, (rectY + 15) << 2, Gbi.G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10);
-    }
 
     render_textrect(x, y, pos) {
         var rectBaseX = x + pos * 12;
@@ -304,8 +289,8 @@ class Print {
             // clip_to_bounds(&rectBaseX, &rectBaseY);
         }
 
-        rectX = rectBaseX / 2;
-        rectY = rectBaseY / 2;
+        rectX = parseInt(rectBaseX / 2)
+        rectY = parseInt(rectBaseY / 2)
         Gbi.gSPTextureRectangle(Game.gDisplayList, rectX << 2, rectY << 2, (rectX + 15.0 / 2.0) << 2, (rectY + 15.0 / 2.0) << 2, Gbi.G_TX_RENDERTILE, 0, 0, 8 << 10, 2 << 10);
     }
 

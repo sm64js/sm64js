@@ -5,6 +5,7 @@ import { approach_number, atan2s } from "../engine/math_util"
 import { oMarioSteepJumpYaw } from "../include/object_constants"
 import { CameraInstance as Camera } from "./Camera"
 import { SURFACE_VERTICAL_WIND } from "../include/surface_terrains"
+import { INT_STATUS_MARIO_DROP_OBJECT } from "./Interaction"
 
 
 const update_air_without_turn = (m) => {
@@ -729,7 +730,7 @@ const act_water_jump = (m) => {
             Mario.set_forward_vel(m, 15.0);
             break;
         case Mario.AIR_STEP_GRABBED_LEDGE:
-            Mario.set_mario_action(m, ACT_LEDGE_GRAB, 0);
+            Mario.set_mario_action(m, Mario.ACT_LEDGE_GRAB, 0);
             //TODO set_camera_mode(m.area.camera, m.area.camera.defMode, 1);
             break;
 
@@ -742,7 +743,7 @@ const act_water_jump = (m) => {
 }
 
 const act_hold_water_jump = (m) => {
-    console.warn("the method act_hold_water_jump is incomplete") //TODO 
+    throw "the method act_hold_water_jump is incomplete" //TODO 
     if (m.marioObj.oInteractStatus & INT_STATUS_MARIO_DROP_OBJECT) {
         return Mario.drop_and_set_mario_action(m, Mario.ACT_FREEFALL, 0);
     }
@@ -752,11 +753,11 @@ const act_hold_water_jump = (m) => {
     }
 
     //TODO play_mario_sound(m, SOUND_ACTION_UNKNOWN432, 0);
-    Mario.set_mario_animation(m, MARIO_ANIM_JUMP_WITH_LIGHT_OBJ);
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_JUMP_WITH_LIGHT_OBJ);
 
     switch (perform_air_step(m, 0)) {
         case Mario.AIR_STEP_LANDED:
-            Mario.set_mario_action(m, ACT_HOLD_JUMP_LAND, 0);
+            Mario.set_mario_action(m, Mario.ACT_HOLD_JUMP_LAND, 0);
             //TODO set_camera_mode(m.area.camera, m.area.camera.defMode, 1);
             break;
 
@@ -782,9 +783,10 @@ const check_common_airborne_cancels = (m) => {
         return Mario.drop_and_set_mario_action(m, Mario.ACT_SQUISHED, 0)
     }
 
-    if (m.floor.type === SURFACE_VERTICAL_WIND && (m.action & Mario.ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)) {
-        return Mario.drop_and_set_mario_action(m, Mario.ACT_VERTICAL_WIND, 0)
-    }
+    /// Vertical wind is not implemented yet
+    //if (m.floor.type === SURFACE_VERTICAL_WIND && (m.action & Mario.ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)) {
+    //    return Mario.drop_and_set_mario_action(m, Mario.ACT_VERTICAL_WIND, 0)
+    //}
 
     m.quicksandDepth = 0.0;
     return 0
@@ -820,6 +822,6 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_HARD_FORWARD_AIR_KB: return act_hard_forward_air_kb(m)
         case Mario.ACT_WATER_JUMP: return act_water_jump(m)
         case Mario.ACT_HOLD_WATER_JUMP: return act_hold_water_jump(m)
-        default: throw "unkown action airborne"
+        default: throw "unkown action airborne " + m.action.toString(16)
     }
 }

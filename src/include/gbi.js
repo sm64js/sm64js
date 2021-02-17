@@ -697,14 +697,15 @@ export const gSPDisplayList = (displaylist, childDisplayList) => {
     })
 }
 
-/*export const gDPSetTextureImage = (displaylist, format, size, width, imageData) => {
+export const gDPSetTextureImage = (displaylist, format, size, width, imageData) => {
     displaylist.push({
-        words: {
+         words: {
             w0: G_SETTIMG,
             w1: { format, size, width, imageData }
-        }
-    })
-}*/
+         }
+     });
+ }
+ 
 
 export const gDPLoadBlockTexture = (displaylist, width, height, format, image) => {
     displaylist.push(

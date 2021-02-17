@@ -10,6 +10,7 @@ import { ACT_FLAG_METAL_WATER, ACT_FLAG_ON_POLE, ACT_FLAG_HANGING, ACT_RIDING_HO
 import { oPosY } from "../include/object_constants"
 import { SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { sins } from "../utils"
+import { HudInstance as Hud } from "./Hud"
 
 const CAM_FOV_DEFAULT = 2
 
@@ -106,6 +107,15 @@ class Camera {
         this.SHAKE_SHOCK          = 10
 
         this.CAM_MOVE_C_UP_MODE = 0x2000
+
+        this.CAM_STATUS_NONE = 0;
+        this.CAM_STATUS_MARIO =  1 << 0;
+        this.CAM_STATUS_LAKITU = 1 << 1;
+        this.CAM_STATUS_FIXED  = 1 << 2;
+        this.CAM_STATUS_C_DOWN = 1 << 3;
+        this.CAM_STATUS_C_UP   = 1 << 4;
+        this.CAM_STATUS_MODE_GROUP = (this.CAM_STATUS_MARIO | this.CAM_STATUS_LAKITU | this.CAM_STATUS_FIXED)
+        this.CAM_STATUS_C_MODE_GROUP = (this.CAM_STATUS_C_DOWN | this.CAM_STATUS_C_UP)
 
         this.floor = null
 
@@ -563,6 +573,7 @@ class Camera {
         }
 
         this.gCamera = c
+        this.update_camera_hud_status(c);
 
         this.sStatusFlags &= ~CAM_FLAG_FRAME_AFTER_CAM_INIT
         if (this.gCameraMovementFlags & CAM_MOVE_INIT_CAMERA) {
@@ -606,6 +617,29 @@ class Camera {
 
         this.gLakituState.lastFrameAction = this.gPlayerCameraState.action
 
+    }
+
+    update_camera_hud_status(c) {
+        status = this.CAM_STATUS_NONE;
+    
+        var isFixedCam = false;
+        // var isFixedCam = c.cutscene != 0 || ((this.gPlayer1Controller.buttonDown & R_TRIG) && cam_select_alt_mode(0) == CAM_SELECTION_FIXED);
+
+        if (isFixedCam) {
+            status |= this.CAM_STATUS_FIXED;
+        // } else if (set_cam_angle(0) == CAM_ANGLE_MARIO) {
+            // status |= this.CAM_STATUS_MARIO;
+        } else {
+            status |= this.CAM_STATUS_LAKITU;
+        }
+        if (this.gCameraMovementFlags & this.CAM_MOVE_ZOOMED_OUT > 0) {
+            status |= this.CAM_STATUS_C_DOWN;
+        }
+        if (this.gCameraMovementFlags & this.CAM_MOVE_C_UP_MODE > 0) {
+            status |= this.CAM_STATUS_C_UP;
+        }
+        Hud.set_hud_camera_status(status);
+        return status;
     }
 
     calc_hor_dist(a, b) {

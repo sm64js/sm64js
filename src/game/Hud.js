@@ -1,7 +1,7 @@
 import { CameraInstance as Camera } from "./Camera"
 import * as Gbi from "../include/gbi"
 import { dl_hud_img_load_tex_block, main_hud_lut, dl_hud_img_begin, dl_hud_img_end, main_hud_camera_lut } from "../common_gfx/segment2"
-import { power_meter_health_segments_lut, dl_power_meter_base, dl_power_meter_health_segments_begin, dl_power_meter_health_segments_end } from "./behaviors/power_meter.inc.js"
+import { power_meter_health_segments_lut, dl_power_meter_base, dl_power_meter_health_segments_begin, dl_power_meter_health_segments_end } from "../actors/power_meter/model.inc"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import * as Mario from "./Mario"
 import * as MathUtil from "../engine/math_util"

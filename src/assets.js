@@ -125,6 +125,18 @@ export const assets = {
 "actors/poundable_pole/poundable_pole_side.rgba16.png": [32,32,2048,{"jp":[1844608,6224],"us":[1851952,6224],"eu":[1723920,6224],"sh":[1700432,6224]}],
 "actors/poundable_pole/poundable_pole_top.rgba16.png": [32,32,2048,{"jp":[1844608,4176],"us":[1851952,4176],"eu":[1723920,4176],"sh":[1700432,4176]}],
 
+"actors/power_meter/power_meter_left_side.rgba16.png": [32,64,4096,{"jp":[2094912,144352],"us":[2102288,144352],"eu":[1974256,144352],"sh":[1950768,144352]}],
+"actors/power_meter/power_meter_right_side.rgba16.png": [32,64,4096,{"jp":[2094912,148448],"us":[2102288,148448],"eu":[1974256,148448],"sh":[1950768,148448]}],
+"actors/power_meter/power_meter_full.rgba16.png": [32,32,2048,{"jp":[2094912,152544],"us":[2102288,152544],"eu":[1974256,152544],"sh":[1950768,152544]}],
+"actors/power_meter/power_meter_seven_segments.rgba16.png": [32,32,2048,{"jp":[2094912,154592],"us":[2102288,154592],"eu":[1974256,154592],"sh":[1950768,154592]}],
+"actors/power_meter/power_meter_six_segments.rgba16.png": [32,32,2048,{"jp":[2094912,156640],"us":[2102288,156640],"eu":[1974256,156640],"sh":[1950768,156640]}],
+"actors/power_meter/power_meter_five_segments.rgba16.png": [32,32,2048,{"jp":[2094912,158688],"us":[2102288,158688],"eu":[1974256,158688],"sh":[1950768,158688]}],
+"actors/power_meter/power_meter_four_segments.rgba16.png": [32,32,2048,{"jp":[2094912,160736],"us":[2102288,160736],"eu":[1974256,160736],"sh":[1950768,160736]}],
+"actors/power_meter/power_meter_three_segments.rgba16.png": [32,32,2048,{"jp":[2094912,162784],"us":[2102288,162784],"eu":[1974256,162784],"sh":[1950768,162784]}],
+"actors/power_meter/power_meter_two_segments.rgba16.png": [32,32,2048,{"jp":[2094912,164832],"us":[2102288,164832],"eu":[1974256,164832],"sh":[1950768,164832]}],
+"actors/power_meter/power_meter_one_segment.rgba16.png": [32,32,2048,{"jp":[2094912,166880],"us":[2102288,166880],"eu":[1974256,166880],"sh":[1950768,166880]}],
+
+
 "textures/intro_raw/mario_face_shine.ia8.png": [32,32,1024,{"jp":[2503888],"us":[2511696],"eu":[2380496],"sh":[2357264]}],
 "textures/intro_raw/red_star_0.rgba16.png": [32,32,2048,{"jp":[2457352],"us":[2465160],"eu":[2333960],"sh":[2310728]}],
 "textures/intro_raw/red_star_1.rgba16.png": [32,32,2048,{"jp":[2459400],"us":[2467208],"eu":[2336008],"sh":[2312776]}],

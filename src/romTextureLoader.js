@@ -11,6 +11,19 @@ import { tree_seg3_texture_0302DE28, tree_seg3_texture_0302EE28, tree_seg3_textu
 import * as segment2 from "./common_gfx/segment2"
 
 import {
+    texture_power_meter_left_side,
+    texture_power_meter_right_side,
+    texture_power_meter_full,
+    texture_power_meter_seven_segments,
+    texture_power_meter_six_segments,
+    texture_power_meter_five_segments,
+    texture_power_meter_four_segments,
+    texture_power_meter_three_segments,
+    texture_power_meter_two_segments,
+    texture_power_meter_one_segments
+} from "./actors/power_meter/model.inc"
+
+import {
     ttm_seg7_texture_07000000,
     ttm_seg7_texture_07000800,
     ttm_seg7_texture_07001000,
@@ -374,7 +387,7 @@ import { bubble_seg4_texture_0401CD60, bubble_seg4_texture_0401D560 } from "./ac
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 31
+const textureVersion = 32
 
 const loadDataIntoGame = (data) => {
 
@@ -641,6 +654,17 @@ const loadDataIntoGame = (data) => {
     mario_texture_eyes_front.push(...data["actors/mario/mario_eyes_center.rgba16.png"].data)
     mario_texture_eyes_half_closed.push(...data["actors/mario/mario_eyes_half_closed.rgba16.png"].data)
     mario_texture_eyes_closed.push(...data["actors/mario/mario_eyes_closed.rgba16.png"].data)
+
+    texture_power_meter_left_side.push(...data["actors/power_meter/power_meter_left_side.rgba16.png"].data)
+    texture_power_meter_right_side.push(...data["actors/power_meter/power_meter_right_side.rgba16.png"].data)
+    texture_power_meter_full.push(...data["actors/power_meter/power_meter_full.rgba16.png"].data)
+    texture_power_meter_seven_segments.push(...data["actors/power_meter/power_meter_seven_segments.rgba16.png"].data)
+    texture_power_meter_six_segments.push(...data["actors/power_meter/power_meter_six_segments.rgba16.png"].data)
+    texture_power_meter_five_segments.push(...data["actors/power_meter/power_meter_five_segments.rgba16.png"].data)
+    texture_power_meter_four_segments.push(...data["actors/power_meter/power_meter_four_segments.rgba16.png"].data)
+    texture_power_meter_three_segments.push(...data["actors/power_meter/power_meter_three_segments.rgba16.png"].data)
+    texture_power_meter_two_segments.push(...data["actors/power_meter/power_meter_two_segments.rgba16.png"].data)
+    texture_power_meter_one_segments.push(...data["actors/power_meter/power_meter_one_segment.rgba16.png"].data)
 
 	yellow_sphere_seg5_texture_05000040.push(...data["actors/yellow_sphere_small/small_yellow_sphere.rgba16.png"].data)
 

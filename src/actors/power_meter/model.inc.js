@@ -1,7 +1,5 @@
 import * as Gbi from "../../include/gbi"
 
-
-
 export const texture_power_meter_left_side = []
 export const texture_power_meter_right_side = []
 export const texture_power_meter_full = []

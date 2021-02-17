@@ -2,7 +2,6 @@
 import { GameInstance as Game } from "./game/Game"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
 import  * as Socket from "./mmo/socket.js"
-//import "./mmo/cosmetics"
 
 window.gameMasterDebug = true
 

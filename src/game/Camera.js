@@ -107,6 +107,15 @@ class Camera {
 
         this.CAM_MOVE_C_UP_MODE = 0x2000
 
+        this.CAM_STATUS_NONE = 0;
+        this.CAM_STATUS_MARIO =  1 << 0;
+        this.CAM_STATUS_LAKITU = 1 << 1;
+        this.CAM_STATUS_FIXED  = 1 << 2;
+        this.CAM_STATUS_C_DOWN = 1 << 3;
+        this.CAM_STATUS_C_UP   = 1 << 4;
+        this.CAM_STATUS_MODE_GROUP = (this.CAM_STATUS_MARIO | this.CAM_STATUS_LAKITU | this.CAM_STATUS_FIXED)
+        this.CAM_STATUS_C_MODE_GROUP = (this.CAM_STATUS_C_DOWN | this.CAM_STATUS_C_UP)
+
         this.floor = null
 
 

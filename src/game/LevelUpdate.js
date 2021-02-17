@@ -2,6 +2,7 @@ import { AreaInstance as Area, WARP_TRANSITION_FADE_FROM_STAR, WARP_TRANSITION_F
 import { COURSE_NONE } from "../levels/course_defines"
 import * as Mario from "./Mario"
 import { CameraInstance as Camera } from "./Camera"
+import * as CourseTable from "../include/course_table"
 
 const PLAY_MODE_NORMAL  =  0
 const PLAY_MODE_PAUSED  =  2
@@ -16,7 +17,8 @@ const WARP_TYPE_SAME_AREA = 3
 
 class LevelUpdate {
     constructor() {
-        this.gMarioState = {
+        
+        this.gMarioState =  {
             unk00: 0, input: 0, flags: 0, particleFlags: 0, action: 0,
             prevAction: 0, terrainsoundAddend: 0, actionState: 0, actionTimer: 0,
             actionArg: 0, intendedMag: 0, intendedYaw: 0, invincTimer: 0,
@@ -82,7 +84,7 @@ class LevelUpdate {
     }
 
     play_mode_normal() {
-
+        
         //lots more here
         Area.area_update_objects()
 
@@ -109,6 +111,7 @@ class LevelUpdate {
         this.sCurrPlayMode = playMode
         this.D_80339ECA = 0
     }
+
 }
 
 export const LevelUpdateInstance = new LevelUpdate()

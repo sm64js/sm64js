@@ -177,7 +177,7 @@ class Area {
             GeoRenderer.geo_process_root(this.gCurrentArea.geometryLayoutData, null, null, null)
 
             gSPViewport(Game.gDisplayList, D_8032CF00)
-
+            
             if (this.gWarpTransition.isActive) {
                 if (this.gWarpTransDelay == 0) {
 
@@ -194,8 +194,10 @@ class Area {
                     this.gWarpTransDelay--
                 }
             }
+        } else {
         }
     }
+        
 
 }
 

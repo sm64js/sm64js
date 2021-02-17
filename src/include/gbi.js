@@ -32,8 +32,8 @@ export const G_RDPLOADSYNC = 29
 export const G_TEXRECT = 30
 
 /// Custom Opcodes
-export const G_SETPLAYERDATA = 30
-export const G_SETFLAGINDEX = 31
+export const G_SETPLAYERDATA = 31
+export const G_SETFLAGINDEX = 32
 
 export const G_ZBUFFER = 0x00000001
 export const G_SHADE = 0x00000004
@@ -705,14 +705,24 @@ export const gSPDisplayList = (displaylist, childDisplayList) => {
     })
 }
 
-/*export const gDPSetTextureImage = (displaylist, format, size, width, imageData) => {
+export const gDPSetTextureImage = (displaylist, format, size, width, imageData) => {
     displaylist.push({
-        words: {
+         words: {
             w0: G_SETTIMG,
             w1: { format, size, width, imageData }
+         }
+     });
+ }
+
+export const gDPLoadBlock = (displaylist, tile, uls, ult, lrs) => { ///dxt skipped
+    displaylist.push({
+        words: {
+            w0: G_LOADBLOCK,
+            w1: { tile, uls, ult, lrs }
         }
     })
-}*/
+}
+
 
 export const gDPLoadBlockTexture = (displaylist, width, height, format, image) => {
     displaylist.push(
@@ -950,14 +960,6 @@ export const gsDPSetTextureImage = (format, size, width, imageData) => {
         words: {
             w0: G_SETTIMG,
             w1: { format, size, width, imageData }
-        }
-    }
-}
-
-export const gsDPLoadSync = () => {
-    return {
-        words: {
-            w0: G_RDPLOADSYNC
         }
     }
 }

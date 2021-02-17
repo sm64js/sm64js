@@ -1,8 +1,11 @@
 import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
+import { AreaInstance as Area } from "../game/Area"
 
 const intro_default = () => {
     //// core implementation is needed here
     //// for now simply just checking to see if start menu is pressed to skip Goddard Renderer
+    //// and press start text
+    Area.print_intro_text();
 
     if (window.playerInput.buttonPressedStart && window.playerNameAccepted) return 1
     else return 0

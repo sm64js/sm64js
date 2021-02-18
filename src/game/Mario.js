@@ -423,7 +423,7 @@ export const init_marios = () => {
         pos: [ ...Area.gMarioSpawnInfo.startPos ],
         vel: [0, 0, 0],
         action: ACT_IDLE,
-        controller: { stickX: 0, stickY: 0, stickMag: 0 },
+        controller_to_server: { stickX: 0, stickY: 0, stickMag: 0 },
         parachuting: Area.gMarioSpawnInfo.parachuteSpawn
     })
 

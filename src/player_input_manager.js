@@ -391,7 +391,7 @@ export const playerInputUpdate = () => {
     if (window.playerInput.buttonPressedMap) window.show_minimap += 1
     if (window.show_minimap > 2) window.show_minimap = 0
 
-    if (gameData.marioState) gameData.marioState.controller = window.playerInput
+    if (gameData.marioState) gameData.marioState.controller_to_server = window.playerInput
 
     if (window.playerInput.buttonPressedStart && keyboardButtonMapping.start != "enter") {
         submitPlayerName()

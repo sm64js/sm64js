@@ -169,11 +169,10 @@ class SpawnObject {
                 this.snap_object_to_floor(obj)
         }
 
-        ObjectListProc.spawnObjectsBySyncID.push(obj)
 
         if (objListIndex == ObjectListProc.OBJ_LIST_POLELIKE) {
+            ObjectListProc.spawnObjectsBySyncID.push(obj)
             obj.rawData[oSyncID] = this.spawnSyncIDCount++
-
         }
 
         if (this.spawnSyncIDCount > 2000) throw "Error - used more than 1000 spawn SyncIDs in SpawnObject"

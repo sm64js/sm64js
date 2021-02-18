@@ -128,7 +128,7 @@ class ObjectListProcessor {
 
         if (networkData.yourMarioUpdate) {
             this.gCurrentObject = LevelUpdate.gMarioState.marioObj
-            updateLocalMarioState(LevelUpdate.gMarioState, networkData.yourMarioUpdate)
+            copyMarioUpdateToState(LevelUpdate.gMarioState, networkData.yourMarioUpdate)
             networkData.yourMarioUpdate = null
             this.copy_mario_state_to_object(LevelUpdate.gMarioState)
         } else {
@@ -257,8 +257,10 @@ class ObjectListProcessor {
 
     bhv_mario_update() {
 
+
         const saveController = this.gCurrentObject.marioState.controller
         if (this.gCurrentObject.localMario) {
+            //console.log(this.gCurrentObject.marioState.controller)
             //this.gCurrentObject.marioState.controller.buttonPressedA = false
             //this.gCurrentObject.marioState.controller.buttonPressedB = false
             //this.gCurrentObject.marioState.controller.buttonPressedZ = false

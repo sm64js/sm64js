@@ -293,14 +293,14 @@ export const createControllerProtoMsg = () => {
     const m = gameData.marioState
     const controllermsg = new ControllerMsg()
     //// fill out controller msg
-    controllermsg.setStickx(m.controller.stickX)
-    controllermsg.setSticky(m.controller.stickY)
-    controllermsg.setStickmag(m.controller.stickMag)
+    controllermsg.setStickx(m.controller_to_server.stickX)
+    controllermsg.setSticky(m.controller_to_server.stickY)
+    controllermsg.setStickmag(m.controller_to_server.stickMag)
     let buttonDown = 0
-    buttonDown |= (m.controller.buttonDownA << 0)
-    buttonDown |= (m.controller.buttonDownB << 1)
-    buttonDown |= (m.controller.buttonDownZ << 2)
-    buttonDown |= (m.controller.buttonDownStart << 3)
+    buttonDown |= (m.controller_to_server.buttonDownA << 0)
+    buttonDown |= (m.controller_to_server.buttonDownB << 1)
+    buttonDown |= (m.controller_to_server.buttonDownZ << 2)
+    buttonDown |= (m.controller_to_server.buttonDownStart << 3)
     controllermsg.setButtondown(buttonDown)
 
 /*    let buttonPressed = 0
@@ -310,7 +310,7 @@ export const createControllerProtoMsg = () => {
     buttonPressed |= (m.controller.buttonPressedStart << 3)
     controllermsg.setButtonpressed(buttonPressed)*/
 
-    controllermsg.setTaunt(m.controller.taunt)
+    controllermsg.setTaunt(m.controller_to_server.taunt)
 
     controllermsg.setCamerayaw(m.area.camera.yaw)
 
@@ -319,10 +319,8 @@ export const createControllerProtoMsg = () => {
     return controllermsg
 }
 
-const applyController = (controllerProto) => {
-    const id = controllerProto.getSocketid()
-    if (networkData.remotePlayers[id] == undefined) return
-    const m = networkData.remotePlayers[id].marioState
+const applyController = (controllerProto, marioState) => {
+    const m = marioState
     const buttonDown = controllerProto.getButtondown()
     m.controller = {
         stickX: controllerProto.getStickx(),
@@ -401,8 +399,8 @@ export const recvMarioData = (marioList) => {
     marioList.forEach(marioProto => {
         const id = marioProto.getSocketid()
         if (id == networkData.mySocketID) {
-            //const controllerProto = marioProto.getController()
-            //applyController(controllerProto)
+            const controllerProto = marioProto.getController()
+            applyController(controllerProto, gameData.marioState)
 
             /// other mario updates
             //if (networkData.yourMarioUpdate != null) console.log("extra update")

@@ -1,4 +1,4 @@
-import { MACRO_GOOMBA, MACRO_GOOMBA_TRIPLET_SPAWNER, MACRO_BOBOMB, MACRO_CHAIN_CHOMP } from "../../../../include/macro_presets"
+import { MACRO_GOOMBA, MACRO_GOOMBA_TRIPLET_SPAWNER, MACRO_BOBOMB, MACRO_CHAIN_CHOMP, MACRO_COIN_LINE_HORIZONTAL } from "../../../../include/macro_presets"
 
 export const bob_seg7_macro_objs = [
     { preset: MACRO_GOOMBA, yaw: 0, pos: [-2713, 152, 5778], param: 0 },
@@ -20,5 +20,9 @@ export const bob_seg7_macro_objs = [
     { preset: MACRO_BOBOMB, yaw: 0, pos: [-1900, 0, 3450], param: 0 },
 
     { preset: MACRO_CHAIN_CHOMP, yaw: 0, pos: [260, 735, 1920], param: 0 },
+
+    { preset: MACRO_COIN_LINE_HORIZONTAL, yaw: 90, pos: [-129, 0, 5668], param: 0 },
+    { preset: MACRO_COIN_LINE_HORIZONTAL, yaw: 75, pos: [1851, 2917, -2234], param: 0 },
+    { preset: MACRO_COIN_LINE_HORIZONTAL, yaw: 120, pos: [4836,  3079, -2707], param: 0 },
 
 ]

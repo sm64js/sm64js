@@ -234,7 +234,7 @@ class Hud {
     render_hud_stars() {
         var showX = 0;
 
-        if (LevelUpdate.gHudFlash == 1 && LevelUpdate.gGlobalTimer & 0x08 > 0) {
+        if (LevelUpdate.gHudFlash == 1 && window.gGlobalTimer & 0x08 > 0) {
             return;
         }
 

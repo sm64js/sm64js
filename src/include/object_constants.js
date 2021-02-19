@@ -239,6 +239,13 @@ export const CHAIN_CHOMP_ACT_UNLOAD_CHAIN = 2
 export const CHAIN_CHOMP_SUB_ACT_TURN = 0
 export const CHAIN_CHOMP_SUB_ACT_LUNGE = 1
 
+/* Moving Yellow Coin */
+    /* oAction */
+    export const MOV_YCOIN_ACT_IDLE = 0
+    export const MOV_YCOIN_ACT_BLINKING = 1
+    export const MOV_YCOIN_ACT_LAVA_DEATH = 100
+    export const MOV_YCOIN_ACT_DEATH_PLANE_DEATH = 101
+
 /* oChainChompReleaseStatus */
 export const CHAIN_CHOMP_NOT_RELEASED = 0
 export const CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE = 1
@@ -304,3 +311,7 @@ export const oWaterObjUnkF4  = 0x1B
 export const oWaterObjUnkF8  = 0x1C
 export const oWaterObjUnkFC  = 0x1D
 export const oWaterObjUnk100 = 0x1E
+
+export const oCoinUnkF4  = 0x1B
+export const oCoinUnkF8  = 0x1C
+export const oCoinUnk110 = 0x22

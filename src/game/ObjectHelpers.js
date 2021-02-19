@@ -1,7 +1,7 @@
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { AreaInstance as Area } from "./Area"
 import { geo_obj_init, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
-import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations, ACTIVE_FLAGS_DEACTIVATED, OBJ_MOVE_ABOVE_DEATH_BARRIER, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oFloorHeight, oFloor, oFloorType, oFloorRoom, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR, oWallHitboxRadius, oWallAngle, oMoveFlags, OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, oBounciness, oBuoyancy, oDragStrength, oAngleVelYaw, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND, OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER, OBJ_MOVE_ENTERED_WATER, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND, OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, oRoom, ACTIVE_FLAG_UNK10, OBJ_MOVE_13, OBJ_MOVE_LANDED, oInteractStatus, oHomeX, oHomeY, oHomeZ, oOpacity, ACTIVE_FLAG_UNK7 } from "../include/object_constants"
+import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations, ACTIVE_FLAGS_DEACTIVATED, OBJ_MOVE_ABOVE_DEATH_BARRIER, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oFloorHeight, oFloor, oFloorType, oFloorRoom, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR, oWallHitboxRadius, oWallAngle, oMoveFlags, OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, oBounciness, oBuoyancy, oDragStrength, oAngleVelYaw, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND, OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER, OBJ_MOVE_ENTERED_WATER, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND, OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, oRoom, ACTIVE_FLAG_UNK10, OBJ_MOVE_13, OBJ_MOVE_LANDED, oInteractStatus, oHomeX, oHomeY, oHomeZ, oOpacity, ACTIVE_FLAG_UNK7, oNumLootCoins, oCoinUnk110, oTimer } from "../include/object_constants"
 
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
@@ -13,6 +13,19 @@ import { ATTACK_PUNCH, INT_STATUS_WAS_ATTACKED, INT_STATUS_INTERACTED, INT_STATU
 import { ACT_GROUND_POUND_LAND } from "./Mario"
 import { gLinker } from "./Linker"
 import * as Gbi from "../include/gbi"
+import { MODEL_YELLOW_COIN } from "../include/model_ids"
+
+export const cur_obj_set_behavior = (behavior) => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.behavior = behavior
+}
+
+export const cur_obj_set_model = (modelID) => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.header.gfx.sharedChild = Area.gLoadedGraphNodes[modelID]
+}
 
 export const cur_obj_set_pos_to_home = () => {
     const o = ObjectListProc.gCurrentObject
@@ -360,6 +373,12 @@ export const cur_obj_update_floor_height_and_get_floor = () => {
     return floorWrapper.floor
 }
 
+export const cur_obj_update_floor_height = () => {
+
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oFloorHeight] = Spawn.SurfaceCollision.find_floor(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], {})
+}
+
 
 export const cur_obj_update_floor = () => {
     const o = ObjectListProc.gCurrentObject
@@ -377,6 +396,14 @@ export const cur_obj_update_floor = () => {
         o.rawData[oFloorRoom] = 0
     }
 
+}
+
+export const cur_obj_if_hit_wall_bounce_away = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.rawData[oMoveFlags] & OBJ_MOVE_HIT_WALL) {
+        o.rawData[oMoveAngleYaw] = o.rawData[oWallAngle]
+    }
 }
 
 export const cur_obj_update_floor_and_resolve_wall_collisions = (steepSlopeDegrees) => {
@@ -964,4 +991,51 @@ export const obj_angle_to_object = (obj1, obj2) => {
     const x2 = obj2.rawData[oPosX], z2 = obj2.rawData[oPosZ]
 
     return atan2s(z2 - z1, x2 - x1)
+}
+
+export const obj_spawn_loot_coins = (obj, numCoins, sp30, coinsBehavior, posJitter, model) => {
+
+    const floorWrapper = {}
+    let spawnHeight = Spawn.SurfaceCollision.find_floor(obj.rawData[oPosX], obj.rawData[oPosY], obj.rawData[oPosZ], floorWrapper)
+
+    if (obj.rawData[oPosY] - spawnHeight > 100) {
+        spawnHeight = obj.rawData[oPosY]
+    }
+
+    for (let i = 0; i < numCoins; i++) {
+        if (obj.rawData[oNumLootCoins] <= 0) break
+
+        obj.rawData[oNumLootCoins]--
+
+        const coin = spawn_object(obj, model, coinsBehavior)
+        obj_translate_xz_random(coin, posJitter)
+        coin.rawData[oPosY] = spawnHeight
+        coin.rawData[oCoinUnk110] = sp30
+    }
+}
+
+export const obj_spawn_loot_yellow_coins = (obj, numCoins, sp28) => {
+    obj_spawn_loot_coins(obj, numCoins, sp28, gLinker.behaviors.bhvSingleCoinGetsSpawned, 0, MODEL_YELLOW_COIN)
+}
+
+export const cur_obj_wait_then_blink = (timeUntilBlinking, numBlinks) => {
+    const o = ObjectListProc.gCurrentObject
+
+    let done = 0
+    let timeBlinking = 0
+
+    if (o.rawData[oTimer] >= timeUntilBlinking) {
+        timeBlinking = o.rawData[oTimer] - timeUntilBlinking
+        if (timeBlinking % 2 != 0) {
+            o.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
+
+            if (timeBlinking / 2 > numBlinks) {
+                done = 1
+            }
+        } else {
+            o.header.gfx.node.flags &= ~ GRAPH_RENDER_INVISIBLE
+        }
+    }
+
+    return done
 }

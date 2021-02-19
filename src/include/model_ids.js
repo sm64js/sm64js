@@ -91,7 +91,7 @@ export const MODEL_CHAIN_CHOMP                 = 0x66        // chain_chomp
 export const MODEL_KOOPA_FLAG                  = 0x6A        // koopa_flag_geo
 export const MODEL_WOODEN_POST = 0x6B        // wooden_post_geo
 
-
+export const MODEL_YELLOW_COIN                = 0x74
 export const MODEL_CANNON_BARREL              = 0x7F        // cannon_barrel_geo
 export const MODEL_CANNON_BASE                = 0x80        // cannon_base_geo
 export const MODEL_BREAKABLE_BOX              = 0x81        // breakable_box_geo

@@ -369,12 +369,18 @@ import { poundable_pole_seg6_texture_06001050, poundable_pole_seg6_texture_06001
 import { dirt_seg3_texture_0302BDF8 } from "./actors/dirt/model.inc"
 import { mist_seg3_texture_03000080 } from "./actors/mist/model.inc"
 import { bubble_seg4_texture_0401CD60, bubble_seg4_texture_0401D560 } from "./actors/bubble/model.inc"
+import { 
+    coin_seg3_texture_03005780,
+    coin_seg3_texture_03005F80,
+    coin_seg3_texture_03006780,
+    coin_seg3_texture_03006F80
+ } from "./actors/coin/model.inc"
 
 
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 31
+const textureVersion = 32
 
 const loadDataIntoGame = (data) => {
 
@@ -822,9 +828,13 @@ const loadDataIntoGame = (data) => {
     segment2.texture_hud_char_arrow_up.push(...data["textures/segment2/segment2.08150.rgba16.png"].data)
     segment2.texture_hud_char_arrow_down.push(...data["textures/segment2/segment2.081D0.rgba16.png"].data)
 
-
     segment2.texture_waterbox_water.push(...data["textures/segment2/segment2.11C58.rgba16.png"].data)
     segment2.texture_waterbox_lava.push(...data["textures/segment2/segment2.13C58.rgba16.png"].data)
+
+    coin_seg3_texture_03005780.push(...data["actors/coin/coin_front.ia16.png"].data)
+    coin_seg3_texture_03005F80.push(...data["actors/coin/coin_tilt_right.ia16.png"].data)
+    coin_seg3_texture_03006780.push(...data["actors/coin/coin_side.ia16.png"].data)
+    coin_seg3_texture_03006F80.push(...data["actors/coin/coin_tilt_left.ia16.png"].data)
 
     checkerboard_platform_seg8_texture_0800C840.push(...data["actors/checkerboard_platform/checkerboard_platform_side.rgba16.png"].data)
     checkerboard_platform_seg8_texture_0800CC40.push(...data["actors/checkerboard_platform/checkerboard_platform.rgba16.png"].data)

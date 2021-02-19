@@ -2,11 +2,12 @@ import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
 import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
 import { level_defines_list } from "./level_defines"
 import { mario_geo } from "../actors/mario/geo.inc"
-import { MODEL_MARIO, MODEL_SMOKE, MODEL_CARTOON_STAR, MODEL_DIRT_ANIMATION, MODEL_MIST, MODEL_BUBBLE } from "../include/model_ids"
+import { MODEL_MARIO, MODEL_SMOKE, MODEL_CARTOON_STAR, MODEL_DIRT_ANIMATION, MODEL_MIST, MODEL_BUBBLE, MODEL_YELLOW_COIN } from "../include/model_ids"
 import { smoke_geo } from "../actors/walk_smoke/geo.inc"
 import { cartoon_star_geo, dirt_animation_geo } from "../actors/dirt/geo.inc"
 import { mist_geo } from "../actors/mist/geo.inc"
 import { bubble_geo } from "../actors/bubble/geo.inc"
+import { yellow_coin_geo } from "../actors/coin/geo.inc"
 
 export const script_exec_level_table = [
     {
@@ -21,6 +22,7 @@ export const level_main_scripts_entry = [
     { command: LevelCommands.load_model_from_geo, args: [MODEL_MARIO, mario_geo] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_SMOKE, smoke_geo] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_BUBBLE, bubble_geo] },
+    { command: LevelCommands.load_model_from_geo, args: [MODEL_YELLOW_COIN, yellow_coin_geo] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_CARTOON_STAR, cartoon_star_geo] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_DIRT_ANIMATION, dirt_animation_geo] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_MIST, mist_geo] },

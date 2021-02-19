@@ -1,5 +1,5 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { is_point_within_radius_of_mario, object_step, obj_return_home_if_safe, obj_check_if_facing_toward_angle, obj_check_floor_death, sObjFloor, OBJ_COL_FLAG_GROUNDED } from "../ObjBehaviors"
+import { is_point_within_radius_of_mario, object_step, obj_return_home_if_safe, obj_check_if_facing_toward_angle, obj_check_floor_death, sObjFloor, OBJ_COL_FLAG_GROUNDED, obj_spawn_yellow_coins } from "../ObjBehaviors"
 import { oPosX, oPosY, oPosZ, oAnimState, oBobombBlinkTimer, oHeldState, HELD_FREE, oBehParams, oBehParams2ndByte, BOBOMB_BP_STYPE_GENERIC, oAction, BOBOMB_ACT_PATROL, BOBOMB_ACT_CHASE_MARIO, BOBOMB_ACT_EXPLODE, oBobombFuseTimer, oForwardVel, oGravity, oFriction, oBuoyancy, oInteractionSubtype, oHomeX, oHomeY, oHomeZ, oMoveAngleYaw, oAngleToMario, oBobombFuseLit, oSmokeTimer, oTimer, ACTIVE_FLAGS_DEACTIVATED, oInteractStatus, oVelY, BOBOMB_ACT_LAUNCHED, oGraphYOffset, oVelX, oVelZ } from "../../include/object_constants"
 import { INT_SUBTYPE_KICKABLE, INTERACT_GRABBABLE, INT_STATUS_INTERACTED, INT_STATUS_MARIO_UNK1, INT_STATUS_TOUCHED_BOB_OMB } from "../Interaction"
 import { obj_turn_toward_object, obj_attack_collided_from_other_object, cur_obj_scale, spawn_object, obj_mark_for_deletion } from "../ObjectHelpers"
@@ -83,6 +83,16 @@ const bobomb_act_chase_mario = () => {
     obj_check_floor_death(collisionFlags, sObjFloor)
 }
 
+const bobomb_spawn_coin = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (((o.rawData[oBehParams] >> 8) & 0x1) == 0) {
+        obj_spawn_yellow_coins(o, 1)
+        o.rawData[oBehParams] = 0x100
+        ObjectListProc.set_object_respawn_info_bits(o, 1)
+    }
+}
+
 const bobomb_act_explode = () => {
     const o = ObjectListProc.gCurrentObject
 
@@ -92,6 +102,7 @@ const bobomb_act_explode = () => {
         const explosion = spawn_object(o, MODEL_EXPLOSION, bhvExplosion)
         explosion.rawData[oGraphYOffset] += 100.0
 
+        bobomb_spawn_coin()
         create_respawner(MODEL_BLACK_BOBOMB, bhvBobomb, 3000)
         o.activeFlags = ACTIVE_FLAGS_DEACTIVATED // unload object
     }

@@ -12,5 +12,6 @@ export const script_exec_level_table = [
 
 export const level_main_scripts_entry = [
     { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_from_save_file, LevelUpdate] },
+    { command: LevelCommands.call, args: [0, LevelUpdate.lvl_set_current_level, LevelUpdate] },
     { command: LevelCommands.jump_link, args: [script_exec_level_table] }
 ]

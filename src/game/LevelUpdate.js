@@ -1,6 +1,7 @@
 import { AreaInstance as Area } from "./Area"
 import { COURSE_NONE } from "../levels/course_defines"
 import * as Mario from "./Mario"
+import { gLevelToCourseNumTable } from "./SaveFile"
 
 const PLAY_MODE_NORMAL  =  0
 const PLAY_MODE_PAUSED  =  2
@@ -44,6 +45,15 @@ class LevelUpdate {
         Mario.init_mario_from_save_file()
 
         return levelNum
+    }
+
+    lvl_set_current_level(arg0, levelNum) {
+        Area.gCurrLevelNum = levelNum
+        Area.gCurrCourseNum = gLevelToCourseNumTable[levelNum - 1]
+
+        // TODO lots of missing code here
+
+        return 1
     }
 
     lvl_init_or_update(initOrUpdate) {

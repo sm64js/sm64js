@@ -58,4 +58,6 @@ export const levelIdToName = {
     10: "Snowman's Land"
 }
 
-export const canvasDims = { width: 640, height: 480 }
+export const random_uint16 = () => {
+    return Math.floor(Math.random() * 65535)
+}

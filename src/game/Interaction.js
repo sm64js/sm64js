@@ -3,12 +3,12 @@ import { AreaInstance as Area } from "./Area"
 import * as MarioConstants from "../include/mario_constants"
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
 import { atan2s, vec3f_dif, vec3f_length } from "../engine/math_util"
-import { networkData, sendPlayerInteraction, sendAttackToServer } from "../mmo/socket"
+import { networkData, sendAttackToServer } from "../mmo/socket"
 import { sins, coss, int16 } from "../utils"
 import { gLinker } from "./Linker"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND } from "../include/surface_terrains"
-import { LEVEL_CCM, LEVEL_TTM, LEVEL_WF, LEVEL_HMC, LEVEL_CTF00 } from "../levels/level_defines_constants"
+import { COURSE_IS_MAIN_COURSE } from "../levels/course_defines"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
 export const INTERACT_GRABBABLE      /* 0x00000002 */ = (1 << 1)
@@ -123,43 +123,6 @@ let sInvulnerable = false
 
 const reset_mario_pitch = (m) => {
     /// TODO: WATER JUMP || SHOT FROM CANNON || ACT_FLYING
-}
-
-const check_death_barrier = (m) => {
-
-    //// the actual code
-    /*    if (m -> pos[1] < m -> floorHeight + 2048.0f) {
-            if (level_trigger_warp(m, WARP_OP_WARP_FLOOR) == 20 && !(m -> flags & MARIO_UNKNOWN_18)) {
-                play_sound(SOUND_MARIO_WAAAOOOW, m -> marioObj -> header.gfx.cameraToObject)
-            }
-        }*/
-
-    /// Temp code because death is not implemented
-    if (m.pos[1] < m.floorHeight + 2048) {
-        switch (Area.gCurrLevelNum) {
-            case LEVEL_CCM:  // CCM
-                m.pos = [-1512, 2560, -2305]
-                break
-
-            case LEVEL_TTM:  // TTM
-                m.pos = [102, -4332, 5734]
-                break
-
-            case LEVEL_WF:  // WF
-                m.pos = [2600, 1256, 5120]
-                break
-
-            case LEVEL_HMC:
-                m.pos = [-7152, 2161, 7181]
-                break
-
-            case LEVEL_CTF00:  // CTF00
-                m.pos = [0, 3461, 0]
-                break
-
-        }
-    }
-
 }
 
 export const mario_handle_special_floors = (m) => {
@@ -309,6 +272,20 @@ const interact_player = (m, o) => {
 
 }
 
+
+const interact_coin = (m, o) => {
+    m.numCoins += o.rawData[oDamageOrCoinValue]
+    m.healCounter += 4 * o.rawData[oDamageOrCoinValue]
+
+    o.rawData[oInteractStatus] = INT_STATUS_INTERACTED
+
+    if (COURSE_IS_MAIN_COURSE(Area.gCurrCourseNum) && m.numCoins - o.rawData[oDamageOrCoinValue] < 100 && m.numCoins >= 100) {
+        /// 100 coin star!
+        /// TODO spawn star
+    }
+
+    return 0
+}
 
 const interact_bounce_top = (m, o) => {
     let interaction 
@@ -739,7 +716,7 @@ const check_kick_or_punch_wall = (m) => {
 }
 
 const sInteractionHandlers = [
-    { interactType: INTERACT_COIN, handler: null },
+    { interactType: INTERACT_COIN, handler: interact_coin },
     { interactType: INTERACT_WATER_RING, handler: null },
     { interactType: INTERACT_STAR_OR_KEY, handler: null },
     { interactType: INTERACT_BBH_ENTRANCE, handler: null },

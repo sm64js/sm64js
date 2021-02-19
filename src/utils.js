@@ -57,3 +57,7 @@ export const levelIdToName = {
     24: "Whomps Fortress",
     10: "Snowman's Land"
 }
+
+export const random_uint16 = () => {
+    return Math.floor(Math.random() * 65535)
+}

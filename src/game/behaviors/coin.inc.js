@@ -5,6 +5,7 @@ import { MODEL_YELLOW_COIN, MODEL_YELLOW_COIN_NO_SHADOW, MODEL_SPARKLES } from "
 import { bhvCoinFormationSpawn, bhvYellowCoin, bhvGoldenCoinSparkles, bhvCoinSparkles } from "../BehaviorData"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { INTERACT_COIN, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "../Interaction"
+import { sins, coss } from "../../utils"
 
 const sYellowCoinHitbox = {
     interactType: INTERACT_COIN,
@@ -57,7 +58,8 @@ const spawn_coin_in_formation = (sp50, sp54) => {
             throw "unimplemented coin formation spawn 1"
             break
         case 2:
-            throw "unimplemented coin formation spawn 2"
+            sp40[0] = sins(sp50 << 13) * 300.0
+            sp40[2] = coss(sp50 << 13) * 300.0
             break
         case 3:
             throw "unimplemented coin formation spawn 3"

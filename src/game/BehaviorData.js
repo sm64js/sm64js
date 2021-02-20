@@ -27,6 +27,7 @@ import { bhv_pound_white_puffs_init } from "./behaviors/ground_particles.inc"
 import { bhv_white_puff_exploding_loop } from "./behaviors/white_puff_explode.inc"
 import { bhv_bubble_wave_init, bhv_small_water_wave_loop } from "./behaviors/water_objs.inc"
 import { bhv_coin_formation_init, bhv_coin_formation_loop, bhv_coin_formation_spawn_loop, bhv_yellow_coin_init, bhv_yellow_coin_loop, bhv_golden_coin_sparkles_loop, bhv_coin_sparkles_loop } from "./behaviors/coin.inc"
+import { bhv_red_coin_init, bhv_red_coin_loop } from "./behaviors/red_coin.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -460,6 +461,20 @@ export const bhvYellowCoin = [
     { command: BhvCmds.call_native, args: { func: bhv_yellow_coin_init } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_yellow_coin_loop } },
+    { command: BhvCmds.end_loop }
+]
+
+export const bhvRedCoin = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oAnimState, value: -1 } },
+    ///{ command: BhvCmds.call_native, args: { func: bhv_init_room } },  TODO init room coin
+    { command: BhvCmds.call_native, args: { func: bhv_red_coin_init } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_red_coin_loop } },
+        { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
     { command: BhvCmds.end_loop }
 ]
 

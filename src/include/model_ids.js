@@ -1,5 +1,10 @@
 export const MODEL_NONE                            = 0x00
-export const MODEL_MARIO                           = 0x01
+export const MODEL_MARIO = 0x01
+
+export const COIN_FORMATION_FLAG_VERTICAL = (1 << 0)
+export const COIN_FORMATION_FLAG_RING = (1 << 1)
+export const COIN_FORMATION_FLAG_ARROW = (1 << 2)
+export const COIN_FORMATION_FLAG_FLYING = (1 << 4)
 
 export const MODEL_LEVEL_GEOMETRY_03               = 0x03
 export const MODEL_LEVEL_GEOMETRY_04               = 0x04
@@ -114,3 +119,18 @@ export const MODEL_BLACK_BOBOMB = 0xBC
 export const MODEL_GOOMBA = 0xC0 
 export const MODEL_CHECKERBOARD_PLATFORM = 0xCA
 export const MODEL_EXPLOSION = 0xCD        // explosion_geo
+
+export const MODEL_1UP                        = 0xD4        // mushroom_1up_geo
+export const MODEL_CASTLE_STAR_DOOR_8_STARS   = 0xD5        // castle_geo_000F00
+export const MODEL_CASTLE_STAR_DOOR_70_STARS  = 0xD6        // castle_geo_000F00
+export const MODEL_RED_COIN                   = 0xD7        // red_coin_geo
+export const MODEL_RED_COIN_NO_SHADOW         = 0xD8        // red_coin_no_shadow_geo
+export const MODEL_METAL_BOX                  = 0xD9        // metal_box_geo
+export const MODEL_METAL_BOX_DL               = 0xDA        // metal_box_dl
+export const MODEL_NUMBER                     = 0xDB        // number_geo
+export const MODEL_FLYGUY                     = 0xDC        // shyguy_geo
+export const MODEL_TOAD                       = 0xDD        // toad_geo
+export const MODEL_PEACH                      = 0xDE        // peach_geo
+export const MODEL_CHUCKYA                    = 0xDF        // chuckya_geo
+export const MODEL_WHITE_PUFF                 = 0xE0        // white_puff_geo
+export const MODEL_TRAJECTORY_MARKER_BALL     = 0xE1        // bowling_ball_track_geo - duplicate used in SSL Pyramid small sized and as a track ball

@@ -34,6 +34,8 @@ export const bhv_yellow_coin_init = () => {
 }
 
 export const bhv_yellow_coin_loop = () => {
+    const o = ObjectListProc.gCurrentObject
+
     bhv_coin_sparkles_init()
     o.rawData[oAnimState]++
 }
@@ -62,7 +64,9 @@ const spawn_coin_in_formation = (sp50, sp54) => {
             sp40[2] = coss(sp50 << 13) * 300.0
             break
         case 3:
-            throw "unimplemented coin formation spawn 3"
+            sp38 = 0  /// flying
+            sp40[0] = sins(sp50 << 13) * 200.0
+            sp40[1] = coss(sp50 << 13) * 200.0 + 200.0
             break
         case 4:
             throw "unimplemented coin formation spawn 4"

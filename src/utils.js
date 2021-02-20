@@ -29,3 +29,7 @@ export const sins = (num) => {
 export const coss = (num) => {
     return Math.cos(num / 0x8000 * Math.PI)
 }
+
+export const random_uint16 = () => {
+    return Math.floor(Math.random() * 65535)
+}

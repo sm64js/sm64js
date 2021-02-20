@@ -1,11 +1,13 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
-import { oPosX, oPosY, oPosZ, oForwardVel, oMoveAngleYaw, oVelY, oFaceAngleYaw, oFriction, oGravity, oGraphYOffset, oAction, OBJ_ACT_LAVA_DEATH, OBJ_ACT_DEATH_PLANE_DEATH, oAngleToMario } from "../include/object_constants"
-import { sins, coss, int32, uint16, int16 } from "../utils"
+import { oPosX, oPosY, oPosZ, oForwardVel, oMoveAngleYaw, oVelY, oFaceAngleYaw, oFriction, oGravity, oGraphYOffset, oAction, OBJ_ACT_LAVA_DEATH, OBJ_ACT_DEATH_PLANE_DEATH, oAngleToMario, oTimer } from "../include/object_constants"
+import { sins, coss, int32, uint16, int16, random_uint16 } from "../utils"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { atan2s, mtxf_align_terrain_normal } from "../engine/math_util"
-import { GRAPH_RENDER_BILLBOARD } from "../engine/graph_node"
-import { approach_symmetric } from "./ObjectHelpers"
+import { GRAPH_RENDER_BILLBOARD, GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
+import { approach_symmetric, spawn_object } from "./ObjectHelpers"
 import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
+import { MODEL_YELLOW_COIN } from "../include/model_ids"
+import { bhvMovingYellowCoin } from "./BehaviorData"
 
 export const OBJ_COL_FLAG_GROUNDED = (1 << 0)
 export const OBJ_COL_FLAG_HIT_WALL = (1 << 1)
@@ -291,4 +293,34 @@ export const obj_check_floor_death = (collisionFlags, floor) => {
                 break
         }
     }
+}
+
+export const obj_spawn_yellow_coins = (obj, nCoins) => {
+    for (let count = 0; count < nCoins; count++) {
+        const coin = spawn_object(obj, MODEL_YELLOW_COIN, bhvMovingYellowCoin)
+        coin.rawData[oForwardVel] = Math.random() * 20
+        coin.rawData[oVelY] = Math.random() * 40 + 20
+        coin.rawData[oMoveAngleYaw] = random_uint16()
+    }
+}
+
+export const obj_flicker_and_disappear = (obj, lifeSpan) => {
+
+    if (obj.rawData[oTimer] < lifeSpan) return 0
+
+    if (obj.rawData[oTimer] < lifeSpan + 40) {
+
+        if (obj.rawData[oTimer] % 2 != 0) {
+            obj.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
+        } else {
+            obj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+        }
+
+    } else {
+        obj.activeFlags = 0
+        return 1
+    }
+
+    return 0
+
 }

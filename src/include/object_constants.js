@@ -304,3 +304,7 @@ export const oWaterObjUnkF4  = 0x1B
 export const oWaterObjUnkF8  = 0x1C
 export const oWaterObjUnkFC  = 0x1D
 export const oWaterObjUnk100 = 0x1E
+
+export const oCoinUnkF4  = 0x1B
+export const oCoinUnkF8  = 0x1C
+export const oCoinUnk110 = 0x22

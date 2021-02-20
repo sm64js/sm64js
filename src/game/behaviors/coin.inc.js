@@ -1,0 +1,149 @@
+import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
+import { oCoinUnkF4, oBehParams, oAction, oDistanceToMario, oBehParams2ndByte, oTimer, oCoinUnkF8, oPosY, oFloorHeight, oAnimState, oInteractStatus } from "../../include/object_constants"
+import { spawn_object_relative, cur_obj_set_behavior, cur_obj_update_floor_height, obj_mark_for_deletion, cur_obj_set_model } from "../ObjectHelpers"
+import { MODEL_YELLOW_COIN, MODEL_YELLOW_COIN_NO_SHADOW } from "../../include/model_ids"
+import { bhvCoinFormationSpawn, bhvYellowCoin } from "../BehaviorData"
+import { obj_set_hitbox } from "../ObjBehaviors2"
+import { INTERACT_COIN, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "../Interaction"
+
+const sYellowCoinHitbox = {
+    interactType: INTERACT_COIN,
+    downOffset: 0,
+    damageOrCoinValue: 1,
+    health: 0,
+    numLootCoins: 0,
+    radius: 100,
+    height: 64,
+    hurtboxRadius: 0,
+    hurtboxHeight: 0
+}
+
+export const bhv_yellow_coin_init = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    cur_obj_set_behavior(bhvYellowCoin)
+    obj_set_hitbox(o, sYellowCoinHitbox)
+    //bhv_init_room()  TODO assign coin to specific room?
+    cur_obj_update_floor_height()
+    if (500.0 < Math.abs(o.rawData[oPosY] - o.rawData[oFloorHeight]))
+        cur_obj_set_model(MODEL_YELLOW_COIN_NO_SHADOW)
+    if (o.rawData[oFloorHeight] < -10000.0)
+        obj_mark_for_deletion(o)
+
+}
+
+export const bhv_yellow_coin_loop = () => {
+    bhv_coin_sparkles_init()
+    o.rawData[oAnimState]++
+}
+
+export const bhv_coin_formation_init = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.rawData[oCoinUnkF4] = (o.rawData[oBehParams] >> 8) & 0xFF
+}
+
+const spawn_coin_in_formation = (sp50, sp54) => {
+    const o = ObjectListProc.gCurrentObject
+    const sp40 = [0, 0, 0]
+    let sp3C = 1, sp38 = 1
+
+    switch (sp54 & 7) {
+        case 0:
+            sp40[2] = 160 * (sp50 - 2)
+            if (sp50 > 4) sp3C = 0
+            break
+        case 1:
+            throw "unimplemented coin formation spawn 1"
+            break
+        case 2:
+            throw "unimplemented coin formation spawn 2"
+            break
+        case 3:
+            throw "unimplemented coin formation spawn 3"
+            break
+        case 4:
+            throw "unimplemented coin formation spawn 4"
+            break
+    }
+    if (sp54 & 0x10) sp38 = 0
+
+    if (sp3C) {
+        const sp4C = spawn_object_relative(sp50, sp40[0], sp40[1], sp40[2], o, MODEL_YELLOW_COIN, bhvCoinFormationSpawn)
+
+        sp4C.rawData[oCoinUnkF4] = sp38
+    }
+}
+
+export const bhv_coin_formation_loop = () => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    switch (o.rawData[oAction]) {
+        case 0:
+            if (o.rawData[oDistanceToMario] < 2000) {
+                for (let bitIndex = 0; bitIndex < 8; bitIndex++) {
+                    if (!(o.rawData[oCoinUnkF4] & (1 << bitIndex)))
+                        spawn_coin_in_formation(bitIndex, o.rawData[oBehParams2ndByte])
+                }
+                o.rawData[oAction]++
+            }
+            break
+
+        case 1:
+            if (o.rawData[oDistanceToMario] > 2100) o.rawData[oAction]++
+            break
+
+        case 2:
+            o.rawData[oAction] = 0
+            break
+    }
+
+    ObjectListProc.set_object_respawn_info_bits(o, o.rawData[oCoinUnkF4] & 0xFF)
+
+}
+
+const bhv_coin_sparkles_init = () => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.rawData[oInteractStatus] & INT_STATUS_INTERACTED && !(o.rawData[oInteractStatus] & INT_STATUS_TOUCHED_BOB_OMB)) {
+        throw "TODO spawn coin sparkles"
+    }
+
+    o.rawData[oInteractStatus] = 0
+    return 0
+
+}
+
+export const bhv_coin_formation_spawn_loop = () => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.rawData[oTimer] == 0) {
+        cur_obj_set_behavior(bhvYellowCoin)
+        obj_set_hitbox(o, sYellowCoinHitbox)
+        //bhv_init_room()  TODO assign coin to specific room?
+        if (o.rawData[oCoinUnkF8]) {
+            o.rawData[oPosY] += 300
+            cur_obj_update_floor_height()
+            if (o.rawData[oPosY] < o.rawData[oFloorHeight] || o.rawData[oFloorHeight] < -10000.0)
+                obj_mark_for_deletion(o)
+            else
+                o.rawData[oPosY] = o.rawData[oFloorHeight]
+        } else {
+            cur_obj_update_floor_height()
+            if (Math.abs(o.rawData[oPosY] - o.rawData[oFloorHeight]) > 250)
+                cur_obj_set_model(MODEL_YELLOW_COIN_NO_SHADOW)
+        }
+    } else {
+        if (bhv_coin_sparkles_init())
+            o.parentObj.rawData[oCoinUnkF4] |= 1 << o.rawData[oBehParams2ndByte]
+        o.rawData[oAnimState]++
+    }
+
+    if (o.parentObj.rawData[oAction] == 2)
+        obj_mark_for_deletion(o)
+
+}
+

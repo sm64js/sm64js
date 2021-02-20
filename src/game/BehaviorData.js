@@ -26,6 +26,7 @@ import { bhv_white_puff_1_loop, bhv_white_puff_2_loop } from "./behaviors/white_
 import { bhv_pound_white_puffs_init } from "./behaviors/ground_particles.inc"
 import { bhv_white_puff_exploding_loop } from "./behaviors/white_puff_explode.inc"
 import { bhv_bubble_wave_init, bhv_small_water_wave_loop } from "./behaviors/water_objs.inc"
+import { bhv_coin_formation_init, bhv_coin_formation_loop, bhv_coin_formation_spawn_loop, bhv_yellow_coin_init, bhv_yellow_coin_loop } from "./behaviors/coin.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -432,6 +433,34 @@ export const bhvBubbleParticleSpawner = [
     { command: BhvCmds.spawn_child_with_param, args: { bhvParam: 0, model: MODEL_BUBBLE, behavior: bhvSmallWaterWave } },
     { command: BhvCmds.parent_bit_clear, args: { field: oActiveParticleFlags, value: ACTIVE_PARTICLE_BUBBLE } },
     { command: BhvCmds.deactivate }
+]
+
+export const bhvCoinFormationSpawn = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_coin_formation_spawn_loop } },
+    { command: BhvCmds.end_loop }
+]
+
+export const bhvCoinFormation = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SPAWNER } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
+    { command: BhvCmds.call_native, args: { func: bhv_coin_formation_loop } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_coin_formation_loop } },
+    { command: BhvCmds.end_loop }
+]
+
+export const bhvYellowCoin = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
+    { command: BhvCmds.call_native, args: { func: bhv_yellow_coin_init } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_yellow_coin_loop } },
+    { command: BhvCmds.end_loop }
 ]
 
 const bhvBowser = []

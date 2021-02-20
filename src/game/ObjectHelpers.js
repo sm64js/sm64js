@@ -14,6 +14,18 @@ import { ACT_GROUND_POUND_LAND } from "./Mario"
 import { gLinker } from "./Linker"
 import * as Gbi from "../include/gbi"
 
+export const cur_obj_set_behavior = (behavior) => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.behavior = behavior
+}
+
+export const cur_obj_set_model = (modelID) => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.header.gfx.sharedChild = Area.gLoadedGraphNodes[modelID]
+}
+
 export const cur_obj_set_pos_to_home = () => {
     const o = ObjectListProc.gCurrentObject
 
@@ -358,6 +370,12 @@ export const cur_obj_update_floor_height_and_get_floor = () => {
     const floorWrapper = {}
     o.rawData[oFloorHeight] = Spawn.SurfaceCollision.find_floor(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], floorWrapper)
     return floorWrapper.floor
+}
+
+export const cur_obj_update_floor_height = () => {
+
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oFloorHeight] = Spawn.SurfaceCollision.find_floor(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], {})
 }
 
 

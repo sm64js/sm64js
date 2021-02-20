@@ -1,5 +1,5 @@
 import { MODEL_GOOMBA, MODEL_NONE, MODEL_BLACK_BOBOMB, MODEL_CHAIN_CHOMP, MODEL_YELLOW_COIN } from "./model_ids"
-import { bhvGoomba, bhvGoombaTripletSpawner, bhvBobomb, bhvChainChomp } from "../game/BehaviorData"
+import { bhvGoomba, bhvGoombaTripletSpawner, bhvBobomb, bhvChainChomp, bhvCoinFormation } from "../game/BehaviorData"
 
 export const MACRO_YELLOW_COIN = 0
 export const MACRO_YELLOW_COIN_2 = 1

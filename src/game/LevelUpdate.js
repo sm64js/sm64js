@@ -3,6 +3,7 @@ import { COURSE_NONE } from "../levels/course_defines"
 import * as Mario from "./Mario"
 import { CameraInstance as Camera } from "./Camera"
 import * as CourseTable from "../include/course_table"
+import { gLevelToCourseNumTable } from "./SaveFile"
 
 const PLAY_MODE_NORMAL  =  0
 const PLAY_MODE_PAUSED  =  2
@@ -71,6 +72,15 @@ class LevelUpdate {
         Camera.select_mario_cam_mode()
 
         return levelNum
+    }
+
+    lvl_set_current_level(arg0, levelNum) {
+        Area.gCurrLevelNum = levelNum
+        Area.gCurrCourseNum = gLevelToCourseNumTable[levelNum - 1]
+
+        // TODO lots of missing code here
+
+        return 1
     }
 
     lvl_init_or_update(initOrUpdate) {

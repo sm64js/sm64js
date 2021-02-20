@@ -29,5 +29,6 @@ export const level_main_scripts_entry = [
     { command: LevelCommands.load_model_from_geo, args: [MODEL_MIST, mist_geo] },
     { command: LevelCommands.free_level_pool },
     { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_from_save_file, LevelUpdate] },
+    { command: LevelCommands.call, args: [0, LevelUpdate.lvl_set_current_level, LevelUpdate] },
     { command: LevelCommands.jump_link, args: [script_exec_level_table] }
 ]

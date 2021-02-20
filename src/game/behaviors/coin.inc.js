@@ -1,8 +1,8 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { oCoinUnkF4, oBehParams, oAction, oDistanceToMario, oBehParams2ndByte, oTimer, oCoinUnkF8, oPosY, oFloorHeight, oAnimState, oInteractStatus } from "../../include/object_constants"
-import { spawn_object_relative, cur_obj_set_behavior, cur_obj_update_floor_height, obj_mark_for_deletion, cur_obj_set_model } from "../ObjectHelpers"
-import { MODEL_YELLOW_COIN, MODEL_YELLOW_COIN_NO_SHADOW } from "../../include/model_ids"
-import { bhvCoinFormationSpawn, bhvYellowCoin } from "../BehaviorData"
+import { oCoinUnkF4, oBehParams, oAction, oDistanceToMario, oBehParams2ndByte, oTimer, oCoinUnkF8, oPosY, oFloorHeight, oAnimState, oInteractStatus, oPosX, oPosZ } from "../../include/object_constants"
+import { spawn_object_relative, cur_obj_set_behavior, cur_obj_update_floor_height, obj_mark_for_deletion, cur_obj_set_model, spawn_object, cur_obj_scale } from "../ObjectHelpers"
+import { MODEL_YELLOW_COIN, MODEL_YELLOW_COIN_NO_SHADOW, MODEL_SPARKLES } from "../../include/model_ids"
+import { bhvCoinFormationSpawn, bhvYellowCoin, bhvGoldenCoinSparkles, bhvCoinSparkles } from "../BehaviorData"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { INTERACT_COIN, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "../Interaction"
 
@@ -108,7 +108,9 @@ const bhv_coin_sparkles_init = () => {
     const o = ObjectListProc.gCurrentObject
 
     if (o.rawData[oInteractStatus] & INT_STATUS_INTERACTED && !(o.rawData[oInteractStatus] & INT_STATUS_TOUCHED_BOB_OMB)) {
-        throw "TODO spawn coin sparkles"
+        spawn_object(o, MODEL_SPARKLES, bhvGoldenCoinSparkles)
+        obj_mark_for_deletion(o)
+        return 1
     }
 
     o.rawData[oInteractStatus] = 0
@@ -146,4 +148,14 @@ export const bhv_coin_formation_spawn_loop = () => {
         obj_mark_for_deletion(o)
 
 }
+
+export const bhv_golden_coin_sparkles_loop = () => {
+    const o = ObjectListProc.gCurrentObject
+    const sp24 = 30.0
+    const sp2C = spawn_object(o, MODEL_SPARKLES, bhvCoinSparkles)
+    sp2C.rawData[oPosX] += (Math.random() * sp24) - (sp24 / 2)
+    sp2C.rawData[oPosZ] += (Math.random() * sp24) - (sp24 / 2)
+}
+
+export const bhv_coin_sparkles_loop = () => { cur_obj_scale(0.6) }
 

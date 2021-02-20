@@ -374,13 +374,22 @@ import {
     coin_seg3_texture_03005F80,
     coin_seg3_texture_03006780,
     coin_seg3_texture_03006F80
- } from "./actors/coin/model.inc"
+} from "./actors/coin/model.inc"
+
+import {
+    sparkles_seg4_texture_04027490,
+    sparkles_seg4_texture_04027C90,
+    sparkles_seg4_texture_04028490,
+    sparkles_seg4_texture_04028C90,
+    sparkles_seg4_texture_04029490,
+    sparkles_seg4_texture_04029C90
+} from "./actors/sparkle/model.inc"
 
 
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 33
+const textureVersion = 34
 
 const loadDataIntoGame = (data) => {
 
@@ -865,6 +874,13 @@ const loadDataIntoGame = (data) => {
     smoke_seg4_texture_0401FEA0.push(...data["actors/walk_smoke/walk_smoke_4.ia16.png"].data)
     smoke_seg4_texture_040206A0.push(...data["actors/walk_smoke/walk_smoke_5.ia16.png"].data)
     smoke_seg4_texture_04020EA0.push(...data["actors/walk_smoke/walk_smoke_6.ia16.png"].data)
+
+    sparkles_seg4_texture_04027490.push(...data["actors/sparkle/sparkle_0.rgba16.png"].data)
+    sparkles_seg4_texture_04027C90.push(...data["actors/sparkle/sparkle_1.rgba16.png"].data)
+    sparkles_seg4_texture_04028490.push(...data["actors/sparkle/sparkle_2.rgba16.png"].data)
+    sparkles_seg4_texture_04028C90.push(...data["actors/sparkle/sparkle_3.rgba16.png"].data)
+    sparkles_seg4_texture_04029490.push(...data["actors/sparkle/sparkle_4.rgba16.png"].data)
+    sparkles_seg4_texture_04029C90.push(...data["actors/sparkle/sparkle_5.rgba16.png"].data)
 
     spooky_09000000.push(...data["textures/spooky/bbh_textures.00000.rgba16.png"].data)
     spooky_09000800.push(...data["textures/spooky/bbh_textures.00800.rgba16.png"].data)

@@ -60,8 +60,6 @@ export const MODEL_WF_TOWER_SQUARE_PLATORM_UNUSED  = 0x2E        // wf_geo_000B3
 export const MODEL_WF_TOWER_SQUARE_PLATORM_ELEVATO = 0x2F        // wf_geo_000B60 - elevator platorm
 export const MODEL_WF_GIANT_POLE                   = MODEL_LEVEL_GEOMETRY_0D        // wf_geo_000B60 - elevator platorm
 
-export const MODEL_YELLOW_SPHERE                   = 0x55        // yellow_sphere_geo
-
 // castle grounds
 export const MODEL_CASTLE_GROUNDS_VCUTM_GRILL       =   0x36
 export const MODEL_CASTLE_GROUNDS_FLAG              =   0x37
@@ -72,6 +70,41 @@ export const MODEL_BOB_CHAIN_CHOMP_GATE             = 0x36        // bob_geo_000
 export const MODEL_BOB_SEESAW_PLATFORM              = 0x37        // bob_geo_000458
 export const MODEL_BOB_BARS_GRILLS = 0x38        // bob_geo_000470
 
+export const MODEL_YELLOW_SPHERE = 0x55        // yellow_sphere_geo
+
+// group 14
+export const MODEL_PIRANHA_PLANT = 0x64        // piranha_plant_geo
+export const MODEL_WHOMP = 0x67        // whomp_geo
+export const MODEL_KOOPA_WITH_SHELL = 0x68        // koopa_with_shell_geo
+export const MODEL_METALLIC_BALL = 0x65        // metallic_ball_geo
+export const MODEL_CHAIN_CHOMP = 0x66        // chain_chomp
+export const MODEL_KOOPA_FLAG = 0x6A        // koopa_flag_geo
+export const MODEL_WOODEN_POST = 0x6B        // wooden_post_geo
+
+export const MODEL_YELLOW_COIN = 0x74
+export const MODEL_YELLOW_COIN_NO_SHADOW = 0x75
+
+export const MODEL_CANNON_BARREL = 0x7F        // cannon_barrel_geo
+export const MODEL_CANNON_BASE = 0x80        // cannon_base_geo
+export const MODEL_BREAKABLE_BOX = 0x81        // breakable_box_geo
+export const MODEL_BREAKABLE_BOX_SMALL = 0x82        // breakable_box_small_geo
+export const MODEL_EXCLAMATION_BOX_OUTLINE = 0x83        // exclamation_box_outline_geo
+export const MODEL_EXCLAMATION_POINT = 0x84        // exclamation_point_seg8_dl_08025F08
+export const MODEL_MARIOS_WINGED_METAL_CAP = 0x85        // marios_winged_metal_cap_geo
+export const MODEL_MARIOS_METAL_CAP = 0x86        // marios_metal_cap_geo
+export const MODEL_MARIOS_WING_CAP = 0x87        // marios_wing_cap_geo
+export const MODEL_MARIOS_CAP = 0x88        // marios_cap_geo
+export const MODEL_EXCLAMATION_BOX = 0x89        // exclamation_box_geo
+export const MODEL_DIRT_ANIMATION = 0x8A        // dirt_animation_geo
+export const MODEL_CARTOON_STAR = 0x8B        // cartoon_star_geo
+export const MODEL_BLUE_COIN_SWITCH = 0x8C        // blue_coin_switch_geo
+
+export const MODEL_MIST = 0x8E        // mist_geo
+export const MODEL_SPARKLES_ANIMATION = 0x8F        // sparkles_animation_geo
+export const MODEL_RED_FLAME = 0x90        // red_flame_geo
+export const MODEL_BLUE_FLAME = 0x91        // blue_flame_geo
+
+export const MODEL_SPARKLES = 0x95
 export const MODEL_SMOKE = 0x96        // smoke_geo
 
 export const MODEL_BUBBLE = 0xA8
@@ -81,35 +114,3 @@ export const MODEL_BLACK_BOBOMB = 0xBC
 export const MODEL_GOOMBA = 0xC0 
 export const MODEL_CHECKERBOARD_PLATFORM = 0xCA
 export const MODEL_EXPLOSION = 0xCD        // explosion_geo
-
-// group 14
-export const MODEL_PIRANHA_PLANT               = 0x64        // piranha_plant_geo
-export const MODEL_WHOMP                       = 0x67        // whomp_geo
-export const MODEL_KOOPA_WITH_SHELL            = 0x68        // koopa_with_shell_geo
-export const MODEL_METALLIC_BALL               = 0x65        // metallic_ball_geo
-export const MODEL_CHAIN_CHOMP                 = 0x66        // chain_chomp
-export const MODEL_KOOPA_FLAG                  = 0x6A        // koopa_flag_geo
-export const MODEL_WOODEN_POST = 0x6B        // wooden_post_geo
-
-export const MODEL_YELLOW_COIN = 0x74
-export const MODEL_YELLOW_COIN_NO_SHADOW = 0x75
-
-export const MODEL_CANNON_BARREL              = 0x7F        // cannon_barrel_geo
-export const MODEL_CANNON_BASE                = 0x80        // cannon_base_geo
-export const MODEL_BREAKABLE_BOX              = 0x81        // breakable_box_geo
-export const MODEL_BREAKABLE_BOX_SMALL        = 0x82        // breakable_box_small_geo
-export const MODEL_EXCLAMATION_BOX_OUTLINE    = 0x83        // exclamation_box_outline_geo
-export const MODEL_EXCLAMATION_POINT          = 0x84        // exclamation_point_seg8_dl_08025F08
-export const MODEL_MARIOS_WINGED_METAL_CAP    = 0x85        // marios_winged_metal_cap_geo
-export const MODEL_MARIOS_METAL_CAP           = 0x86        // marios_metal_cap_geo
-export const MODEL_MARIOS_WING_CAP            = 0x87        // marios_wing_cap_geo
-export const MODEL_MARIOS_CAP                 = 0x88        // marios_cap_geo
-export const MODEL_EXCLAMATION_BOX            = 0x89        // exclamation_box_geo
-export const MODEL_DIRT_ANIMATION             = 0x8A        // dirt_animation_geo
-export const MODEL_CARTOON_STAR               = 0x8B        // cartoon_star_geo
-export const MODEL_BLUE_COIN_SWITCH = 0x8C        // blue_coin_switch_geo
-
-export const MODEL_MIST                       = 0x8E        // mist_geo
-export const MODEL_SPARKLES_ANIMATION         = 0x8F        // sparkles_animation_geo
-export const MODEL_RED_FLAME                  = 0x90        // red_flame_geo
-export const MODEL_BLUE_FLAME                 = 0x91        // blue_flame_geo

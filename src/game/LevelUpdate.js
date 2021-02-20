@@ -153,6 +153,7 @@ class LevelUpdate {
     }
 
     update_hud_values() {
+
         if (this.gCurrCreditsEntry == null) {
             var numHealthWedges = this.gMarioState.health > 0 ? this.gMarioState.health >> 8 : 0;
             var displayCoins = this.gCurrCourseNum >= CourseTable.COURSE_MIN;
@@ -165,16 +166,17 @@ class LevelUpdate {
             }
     
             if (this.gHudDisplay.coins < this.gMarioState.numCoins) {
-                if (this.gGlobalTimer & 0x00000001) {
-                    var coinSound;
-                    if (this.gMarioState.action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER)) {
-                        coinSound = SOUND_GENERAL_COIN_WATER;
+
+                if (window.gGlobalTimer & 0x00000001) {
+                    let coinSound
+                    if (this.gMarioState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
+                        //coinSound = SOUND_GENERAL_COIN_WATER;
                     } else {
-                        coinSound = SOUND_GENERAL_COIN;
+                        //coinSound = SOUND_GENERAL_COIN;
                     }
     
                     this.gHudDisplay.coins += 1;
-                    play_sound(coinSound, this.gMarioState.marioObj.header.gfx.cameraToObject);
+                    //play_sound(coinSound, this.gMarioState.marioObj.header.gfx.cameraToObject)
                 }
             }
     

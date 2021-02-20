@@ -1,6 +1,6 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
-import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins, OBJ_FLAG_ACTIVE_FROM_AFAR, oActiveParticleFlags, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE, ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_BUBBLE, oWaterObjUnkF4, oWaterObjUnkF8, oPosX, oWaterObjUnkFC, oPosY, oPosZ } from "../include/object_constants"
+import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins, OBJ_FLAG_ACTIVE_FROM_AFAR, oActiveParticleFlags, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE, ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_BUBBLE, oWaterObjUnkF4, oWaterObjUnkF8, oPosX, oWaterObjUnkFC, oPosY, oPosZ, oInteractionSubtype } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 import { bhv_pole_init, bhv_giant_pole_loop } from "./behaviors/pole.inc"
@@ -28,6 +28,7 @@ import { bhv_white_puff_exploding_loop } from "./behaviors/white_puff_explode.in
 import { bhv_bubble_wave_init, bhv_small_water_wave_loop } from "./behaviors/water_objs.inc"
 import { bhv_coin_formation_init, bhv_coin_formation_loop, bhv_coin_formation_spawn_loop, bhv_yellow_coin_init, bhv_yellow_coin_loop, bhv_golden_coin_sparkles_loop, bhv_coin_sparkles_loop } from "./behaviors/coin.inc"
 import { bhv_red_coin_init, bhv_red_coin_loop } from "./behaviors/red_coin.inc"
+import { bhv_moving_yellow_coin_init, bhv_moving_yellow_coin_loop } from "./behaviors/moving_coin.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -476,6 +477,22 @@ export const bhvRedCoin = [
         { command: BhvCmds.call_native, args: { func: bhv_red_coin_loop } },
         { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
     { command: BhvCmds.end_loop }
+]
+
+export const bhvMovingYellowCoin = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.set_hitbox, args: { radius: 100, height: 64 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oInteractionSubtype, value: Interact.INTERACT_COIN } },
+    { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oAnimState, value: -1 } },
+    { command: BhvCmds.call_native, args: { func: bhv_moving_yellow_coin_init } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_moving_yellow_coin_loop } },
+        { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
+    { command: BhvCmds.end_loop }
+
 ]
 
 export const bhvGoldenCoinSparkles = [

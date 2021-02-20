@@ -26,7 +26,7 @@ import { bhv_white_puff_1_loop, bhv_white_puff_2_loop } from "./behaviors/white_
 import { bhv_pound_white_puffs_init } from "./behaviors/ground_particles.inc"
 import { bhv_white_puff_exploding_loop } from "./behaviors/white_puff_explode.inc"
 import { bhv_bubble_wave_init, bhv_small_water_wave_loop } from "./behaviors/water_objs.inc"
-import { bhv_coin_formation_init, bhv_coin_formation_loop, bhv_coin_formation_spawn_loop, bhv_yellow_coin_init, bhv_yellow_coin_loop, bhv_golden_coin_sparkles_loop, bhv_coin_sparkles_loop } from "./behaviors/coin.inc"
+import { bhv_coin_formation_init, bhv_coin_formation_loop, bhv_coin_formation_spawn_loop, bhv_yellow_coin_init, bhv_yellow_coin_loop, bhv_golden_coin_sparkles_loop, bhv_coin_sparkles_loop, bhv_coin_init, bhv_coin_loop } from "./behaviors/coin.inc"
 import { bhv_red_coin_init, bhv_red_coin_loop } from "./behaviors/red_coin.inc"
 import { bhv_moving_yellow_coin_init, bhv_moving_yellow_coin_loop } from "./behaviors/moving_coin.inc"
 
@@ -495,6 +495,18 @@ export const bhvMovingYellowCoin = [
 
 ]
 
+export const bhvSingleCoinGetsSpawned = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.call_native, args: { func: bhv_coin_init } },
+    { command: BhvCmds.set_obj_physics, args: { hitboxRadius: 30, gravity: -400, bounciness: -70, dragStrenth: 1000, friction: 1000, buoyancy: 200 } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_coin_loop } },
+        { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
+    { command: BhvCmds.end_loop }
+]
+
 export const bhvGoldenCoinSparkles = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
@@ -530,5 +542,6 @@ gLinker.behaviors = {
     bhvMistParticleSpawner,
     bhvMistCircParticleSpawner,
     bhvWhitePuffExplosion,
-    bhvBubbleParticleSpawner
+    bhvBubbleParticleSpawner,
+    bhvSingleCoinGetsSpawned
 }

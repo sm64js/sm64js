@@ -1,11 +1,12 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { oCoinUnkF4, oBehParams, oAction, oDistanceToMario, oBehParams2ndByte, oTimer, oCoinUnkF8, oPosY, oFloorHeight, oAnimState, oInteractStatus, oPosX, oPosZ } from "../../include/object_constants"
-import { spawn_object_relative, cur_obj_set_behavior, cur_obj_update_floor_height, obj_mark_for_deletion, cur_obj_set_model, spawn_object, cur_obj_scale } from "../ObjectHelpers"
+import { oCoinUnkF4, oBehParams, oAction, oDistanceToMario, oBehParams2ndByte, oTimer, oCoinUnkF8, oPosY, oFloorHeight, oAnimState, oInteractStatus, oPosX, oPosZ, oVelY, oCoinUnk110, oForwardVel, oMoveAngleYaw, oFloor, oMoveFlags, OBJ_MOVE_ON_GROUND, oSubAction, oBounciness, OBJ_MOVE_LANDED, OBJ_MOVE_ABOVE_DEATH_BARRIER, OBJ_MOVE_ABOVE_LAVA } from "../../include/object_constants"
+import { spawn_object_relative, cur_obj_set_behavior, cur_obj_update_floor_height, obj_mark_for_deletion, cur_obj_set_model, spawn_object, cur_obj_scale, cur_obj_become_intangible, cur_obj_update_floor_and_walls, cur_obj_if_hit_wall_bounce_away, cur_obj_move_standard, cur_obj_rotate_yaw_toward, cur_obj_become_tangible, cur_obj_wait_then_blink } from "../ObjectHelpers"
 import { MODEL_YELLOW_COIN, MODEL_YELLOW_COIN_NO_SHADOW, MODEL_SPARKLES } from "../../include/model_ids"
 import { bhvCoinFormationSpawn, bhvYellowCoin, bhvGoldenCoinSparkles, bhvCoinSparkles } from "../BehaviorData"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { INTERACT_COIN, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "../Interaction"
-import { sins, coss } from "../../utils"
+import { sins, coss, random_uint16 } from "../../utils"
+import { atan2s } from "../../engine/math_util"
 
 const sYellowCoinHitbox = {
     interactType: INTERACT_COIN,
@@ -17,6 +18,58 @@ const sYellowCoinHitbox = {
     height: 64,
     hurtboxRadius: 0,
     hurtboxHeight: 0
+}
+
+export const bhv_coin_init = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.rawData[oVelY] = Math.random() * 10.0 + 30 + o.rawData[oCoinUnk110]
+    o.rawData[oForwardVel] = Math.random() * 10.0
+    o.rawData[oMoveAngleYaw] = random_uint16()
+    cur_obj_set_behavior(bhvYellowCoin)
+    obj_set_hitbox(o, sYellowCoinHitbox)
+    cur_obj_become_intangible()
+}
+
+export const bhv_coin_loop = () => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    cur_obj_update_floor_and_walls()
+    cur_obj_if_hit_wall_bounce_away()
+    cur_obj_move_standard(-62)
+
+    const sp1C = o.rawData[oFloor]
+    if (sp1C) {
+        if (o.rawData[oMoveFlags] & OBJ_MOVE_ON_GROUND)
+            o.rawData[oSubAction] = 1
+
+        if (o.rawData[oSubAction] == 1) {
+            o.rawData[oBounciness] = 0
+
+            if (sp1C.normal.y < 0.9) {
+                const sp1A = atan2s(sp1C.normal.z, sp1C.normal.x)
+                cur_obj_rotate_yaw_toward(sp1A, 0x400)
+            }
+        }
+    }
+
+    //if (o.rawData[oTimer] == 0) play_sound()
+
+    if (o.rawData[oVelY] < 0)
+        cur_obj_become_tangible()
+
+    if (o.rawData[oMoveFlags] & OBJ_MOVE_LANDED) {
+        if (o.rawData[oMoveFlags] & (OBJ_MOVE_ABOVE_DEATH_BARRIER | OBJ_MOVE_ABOVE_LAVA))
+            obj_mark_for_deletion(o)
+    }
+
+    /// more on playing sounds
+
+    if (cur_obj_wait_then_blink(400, 20))
+        obj_mark_for_deletion(o)
+
+    bhv_coin_sparkles_init()
 }
 
 export const bhv_yellow_coin_init = () => {

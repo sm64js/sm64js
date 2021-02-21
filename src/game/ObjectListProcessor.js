@@ -6,7 +6,7 @@ import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands
 import * as Mario from "./Mario"
 import { detect_object_collisions } from "./ObjectCollisions"
 import { networkData, gameData as socketGameData, updateNetworkBeforeRender } from "../mmo/socket"
-import { copyMarioUpdateToState } from "../mmo/MultiMarioManager"
+import { copyMarioUpdateToState, applyController } from "../mmo/MultiMarioManager"
 import { vec3f_dif, vec3f_length } from "../engine/math_util"
 import { uint32, uint16 } from "../utils"
 import { MODEL_NONE, MODEL_MIST } from "../include/model_ids"
@@ -118,8 +118,9 @@ class ObjectListProcessor {
                 if (remotePlayer.marioState.ignoreUpdates > 0) {
                     remotePlayer.marioState.ignoreUpdates--
                 } else {
-                    copyMarioUpdateToState(remotePlayer)
-                    this.copy_mario_state_to_object(remotePlayer.marioState)
+                    //copyMarioUpdateToState(remotePlayer)
+                    //this.copy_mario_state_to_object(remotePlayer.marioState)
+                    applyController(remotePlayer.marioUpdate, remotePlayer.marioState)
                 }
             }
         })

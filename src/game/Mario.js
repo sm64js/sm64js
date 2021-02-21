@@ -817,6 +817,8 @@ export const execute_mario_action = (m) => {
     if (m.action) {
 
         m.marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+        //console.log(m.controller.cameraYaw)
+        //m.controller.cameraYaw = 0
         mario_reset_bodystate(m)
         update_mario_inputs(m)
         Interact.mario_handle_special_floors(m)

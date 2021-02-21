@@ -32,11 +32,11 @@ const expandRawDataSubset = (subset, currentRawData) => {
 
 const updateRemoteMarioState = (id, marioProto) => {
 
-    const controllerProto = marioProto.getController()
-    applyController(controllerProto)
+    const controllerProto = marioProto.getControllerToServer()
+    //applyController(controllerProto)
 
     /// other mario updates
-    //networkData.remotePlayers[id].marioUpdate = marioProto.toObject()
+    networkData.remotePlayers[id].marioUpdate = controllerProto //marioProto.toObject()
 
 }
 
@@ -86,6 +86,8 @@ export const createAllMarioMsg = () => {
     Object.values(networkData.remotePlayers).forEach(remoteMario => {
         const mariomsg = new MarioMsg()
 
+        mariomsg.setController(createControllerProtoMsg(remoteMario.marioState))
+
         mariomsg.setActionstate(remoteMario.marioState.actionState)
         mariomsg.setActiontimer(remoteMario.marioState.actionTimer)
 
@@ -105,8 +107,9 @@ export const createAllMarioMsg = () => {
         mariomsg.setSocketid(remoteMario.marioState.socket_id)
         mariomsg.setParachuting(remoteMario.marioState.parachuting)
 
-
-        if (remoteMario.marioState.usedObj) mariomsg.setUsedobjid(remoteMario.marioState.usedObj.rawData[RAW.oSyncID])
+        if (remoteMario.marioState.usedObj) {
+            mariomsg.setUsedobjid(remoteMario.marioState.usedObj.rawData[RAW.oSyncID])
+        }
 
         mariomsg.setRawdataList(getMarioRawDataSubset(remoteMario.marioState.marioObj.rawData))
 
@@ -127,7 +130,7 @@ export const createMarioProtoMsg = () => {
 
     const mariomsg = new MarioMsg()
 
-    mariomsg.setController(createControllerProtoMsg())
+    mariomsg.setController(createControllerProtoMsg(m))
 
     mariomsg.setAction(m.action)
     mariomsg.setPrevaction(m.prevAction)
@@ -234,8 +237,8 @@ const initNewRemoteMarioState = (marioProto) => {
     return newMarioState
 }
 
-export const createControllerProtoMsg = () => {
-    const m = gameData.marioState
+export const createControllerProtoMsg = (m) => {
+    //const m = gameData.marioState
     const controllermsg = new ControllerMsg()
     //// fill out controller msg
     controllermsg.setStickx(m.controller.stickX)
@@ -255,33 +258,36 @@ export const createControllerProtoMsg = () => {
     buttonPressed |= (m.controller.buttonPressedStart << 3)
     controllermsg.setButtonpressed(buttonPressed)
 
-    controllermsg.setCamerayaw(m.area.camera.yaw)
+    controllermsg.setTaunt(m.controller.taunt)
 
-    controllermsg.setSocketid(networkData.mySocketID)
+    controllermsg.setCamerayaw(m.controller.cameraYaw)
+
+    //controllermsg.setSocketid(networkData.mySocketID)
 
     return controllermsg
 }
 
-const applyController = (controllerProto) => {
-    const id = controllerProto.getSocketid()
-    if (networkData.remotePlayers[id] == undefined) return
-    const m = networkData.remotePlayers[id].marioState
+export const applyController = (controllerProto, marioState) => {
+    //const id = controllerProto.getSocketid()
+    //if (networkData.remotePlayers[id] == undefined) return
+    const m = marioState
     const buttonDown = controllerProto.getButtondown()
     m.controller = {
         stickX: controllerProto.getStickx(),
         stickY: controllerProto.getSticky(),
         stickMag: controllerProto.getStickmag(),
-        buttonDownA: buttonDown & 0x1,
-        buttonDownB: buttonDown & 0x2,
-        buttonDownZ: buttonDown & 0x4,
-        buttonDownStart: buttonDown & 0x8,
-        buttonPressedA: (buttonDown & 0x1) && !m.controller.buttonDownA,
-        buttonPressedB: (buttonDown & 0x2) && !m.controller.buttonDownB,
-        buttonPressedZ: (buttonDown & 0x4) && !m.controller.buttonDownZ,
-        buttonPressedStart: (buttonDown & 0x8) && !m.controller.buttonDownStart,
+        buttonDownA: (buttonDown & 0x1) != 0,
+        buttonDownB: (buttonDown & 0x2) != 0,
+        buttonDownZ: (buttonDown & 0x4) != 0,
+        buttonDownStart: (buttonDown & 0x8) != 0,
+        buttonPressedA: ((buttonDown & 0x1) != 0) && !m.controller.buttonDownA,
+        buttonPressedB: ((buttonDown & 0x2) != 0) && !m.controller.buttonDownB,
+        buttonPressedZ: ((buttonDown & 0x4) != 0) && !m.controller.buttonDownZ,
+        buttonPressedStart: ((buttonDown & 0x8) != 0) && !m.controller.buttonDownStart,
         cameraYaw: controllerProto.getCamerayaw(),
         taunt: controllerProto.getTaunt()
     }
+
 }
 
 export const recvControllerUpdate = (controllerbytes) => {

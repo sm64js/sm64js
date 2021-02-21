@@ -182,7 +182,9 @@ export const createMarioProtoMsg = () => {
 
     const mariomsg = new MarioMsg()
 
-    mariomsg.setController(createControllerProtoMsg())
+    const controllerMsg = createControllerProtoMsg()
+    mariomsg.setControllerToServer(controllerMsg)
+    //mariomsg.setController(controllerMsg)
 
     mariomsg.setAction(m.action)
     mariomsg.setPrevaction(m.prevAction)
@@ -322,6 +324,8 @@ export const createControllerProtoMsg = () => {
 const applyController = (controllerProto, marioState) => {
     const m = marioState
     const buttonDown = controllerProto.getButtondown()
+    const buttonPressed = controllerProto.getButtonpressed()
+
     m.controller = {
         stickX: controllerProto.getStickx(),
         stickY: controllerProto.getSticky(),
@@ -330,13 +334,14 @@ const applyController = (controllerProto, marioState) => {
         buttonDownB: buttonDown & 0x2,
         buttonDownZ: buttonDown & 0x4,
         buttonDownStart: buttonDown & 0x8,
-        buttonPressedA: (buttonDown & 0x1) && !m.controller.buttonDownA,
-        buttonPressedB: (buttonDown & 0x2) && !m.controller.buttonDownB,
-        buttonPressedZ: (buttonDown & 0x4) && !m.controller.buttonDownZ,
-        buttonPressedStart: (buttonDown & 0x8) && !m.controller.buttonDownStart,
-        cameraYaw: controllerProto.getCamerayaw(),
-        taunt: controllerProto.getTaunt()
+        buttonPressedA: buttonPressed & 0x1,
+        buttonPressedB: buttonPressed & 0x2,
+        buttonPressedZ: buttonPressed & 0x4,
+        buttonPressedStart: buttonPressed & 0x8,
+        cameraYaw: controllerProto.getCamerayaw()
     }
+
+    //console.log(m.controller.buttonDownZ)
 }
 
 export const recvControllerUpdate = (controllerbytes) => {
@@ -400,7 +405,7 @@ export const recvMarioData = (marioList) => {
         const id = marioProto.getSocketid()
         if (id == networkData.mySocketID) {
             const controllerProto = marioProto.getController()
-            applyController(controllerProto, gameData.marioState)
+            if (controllerProto) applyController(controllerProto, gameData.marioState)
 
             /// other mario updates
             //if (networkData.yourMarioUpdate != null) console.log("extra update")

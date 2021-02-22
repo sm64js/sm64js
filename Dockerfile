@@ -1,4 +1,4 @@
-FROM node:13 as build
+FROM buildkite/puppeteer
 
 RUN mkdir -p /usr/src/app
 
@@ -12,6 +12,6 @@ COPY src/ ./src/
 COPY proto/ ./proto
 RUN npm run build
 
-FROM nginx:stable-alpine
+COPY . ./
 
-COPY --from=build /usr/src/app/dist /usr/share/nginx/html
+CMD ["node", "puppet.js"]

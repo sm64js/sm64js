@@ -30,7 +30,7 @@ const produce_one_frame = () => {
     totalFrameTimeBuffer.push(finished_frame - start_frame)
 
     //if (n_frames > 100000) { throw "Hit max frames" }
-    console.log("new frame: " + n_frames)
+    //console.log("new frame: " + n_frames)
     n_frames++
 }
 

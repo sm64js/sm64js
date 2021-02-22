@@ -104,6 +104,7 @@ const measureLatency = (ping_proto) => {
     const startTime = ping_proto.getTime()
     const endTime = performance.now()
     window.latency = parseInt(endTime - startTime)
+    console.log("Latency to server: ", window.latency)
 }
 
 socket.onopen = () => {

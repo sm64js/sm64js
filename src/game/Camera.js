@@ -1162,6 +1162,27 @@ class Camera {
             graphNode.focus = [...LevelUpdate.gMarioState.pos]
         }
 
+        //if (graphNode.prevPos && graphNode.prevFocus) {
+            //const step = 50
+            //graphNode.pos[0] = MathUtil.approach_number(graphNode.prevPos[0], graphNode.pos[0], step, step)
+            //graphNode.pos[1] = MathUtil.approach_number(graphNode.prevPos[1], graphNode.pos[1], step, step)
+            //graphNode.pos[2] = MathUtil.approach_number(graphNode.prevPos[2], graphNode.pos[2], step, step)
+
+            //graphNode.focus[0] = MathUtil.approach_number(graphNode.prevFocus[0], graphNode.focus[0], step, step)
+            //graphNode.focus[1] = MathUtil.approach_number(graphNode.prevFocus[1], graphNode.focus[1], step, step)
+            //graphNode.focus[2] = MathUtil.approach_number(graphNode.prevFocus[2], graphNode.focus[2], step, step)
+
+
+        //}
+
+        //graphNode.prevPos = [...graphNode.pos]
+        //graphNode.prevFocus = [...graphNode.focus]
+
+        //////// omnicient view castle ground start
+        //graphNode.rollScreen = 0//this.gLakituState.roll
+        //graphNode.pos = [-1000, 2000, 7000]
+        //graphNode.focus = [-2000, 0, 2000]
+
     }
 
     geo_camera_main(callContext, graphNode) {

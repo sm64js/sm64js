@@ -7,12 +7,12 @@ import * as Mario from "./Mario"
 import { detect_object_collisions } from "./ObjectCollisions"
 import { networkData, gameData as socketGameData, updateNetworkBeforeRender } from "../mmo/socket"
 import { copyMarioUpdateToState, updateLocalMarioState, updateLocalMarioState2 } from "../mmo/MultiMarioManager"
-import { vec3f_dif, vec3f_length } from "../engine/math_util"
-import { uint32, uint16 } from "../utils"
+import { vec3f_dif, vec3f_length, approach_number } from "../engine/math_util"
+import { uint32, uint16, int16 } from "../utils"
 import { MODEL_NONE, MODEL_MIST } from "../include/model_ids"
 import * as MarioConstants from "../include/mario_constants"
 import { gLinker } from "./Linker"
-import { spawn_object_at_origin, obj_copy_pos_and_angle, dist_between_objects } from "./ObjectHelpers"
+import { spawn_object_at_origin, obj_copy_pos_and_angle, dist_between_objects, approach_symmetric } from "./ObjectHelpers"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 
 class ObjectListProcessor {
@@ -257,23 +257,46 @@ class ObjectListProcessor {
 
     bhv_mario_update() {
 
+        const marioState = this.gCurrentObject.marioState
 
-        const saveController = this.gCurrentObject.marioState.controller
-        if (this.gCurrentObject.localMario) {
-            //console.log(this.gCurrentObject.marioState.controller)
-            //this.gCurrentObject.marioState.controller.buttonPressedA = false
-            //this.gCurrentObject.marioState.controller.buttonPressedB = false
-            //this.gCurrentObject.marioState.controller.buttonPressedZ = false
-        }
+        //const saveController = marioState.controller
+        //if (this.gCurrentObject.localMario) {
+            //console.log(marioState.controller)
+            //marioState.controller.buttonPressedA = false
+            //marioState.controller.buttonPressedB = false
+            //marioState.controller.buttonPressedZ = false
+        //}
             
         const torsoDiff = [0, 0, 0]
-        vec3f_dif(torsoDiff, this.gCurrentObject.marioState.pos, this.gCurrentObject.marioState.marioBodyState.torsoPos)
+        vec3f_dif(torsoDiff, marioState.pos, marioState.marioBodyState.torsoPos)
         if (vec3f_length(torsoDiff) > 300)
-            this.gCurrentObject.marioState.marioBodyState.torsoPos = [...this.gCurrentObject.marioState.pos]
+            marioState.marioBodyState.torsoPos = [...marioState.pos]
 
-        const particleFlags = Mario.execute_mario_action(this.gCurrentObject.marioState)
+        const particleFlags = Mario.execute_mario_action(marioState)
         this.gCurrentObject.rawData[oMarioParticleFlags] = particleFlags
-        this.copy_mario_state_to_object(this.gCurrentObject.marioState)
+        this.copy_mario_state_to_object(marioState)
+
+        const marioGfx = marioState.marioObj.header.gfx
+
+        if (marioState.prevAngle && marioState.prevPos) {
+
+            const smoothPercent = 0.4
+
+            for (let i = 0; i < 3; i++) {
+                let step = Math.abs(marioState.prevPos[i] - marioGfx.pos[i]) * smoothPercent
+                if (step < 10) step = 10
+                marioGfx.pos[i] = approach_number(marioState.prevPos[i], marioGfx.pos[i], step, step)
+            }
+
+            /// Possibly use find floor to lock marios gfx pos height to ground level (for actions on the ground)
+
+            ///Nice fix for camera stability
+            marioState.statusForCamera.pos = [...marioGfx.pos]
+        }
+
+        /// Save the last rendered gfx pos and angle
+        marioState.prevPos = [...marioGfx.pos]
+        marioState.prevAngle = [...marioGfx.angle]
 
         if (this.sParticleTypes == undefined) this.sParticleTypes = this.sParticleTypesInit()
         this.sParticleTypes.forEach(particleType => {
@@ -286,9 +309,9 @@ class ObjectListProcessor {
             }
         })
 
-        if (this.gCurrentObject.localMario) {
-            this.gCurrentObject.marioState.controller = saveController
-        }
+        //if (this.gCurrentObject.localMario) {
+        //    marioState.controller = saveController
+        //}
 
     }
 

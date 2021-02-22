@@ -7,6 +7,7 @@ import { INTERACT_PLAYER } from "../game/Interaction"
 import { levelIdToName, distance3d } from "../utils"
 import { gLinker } from "../game/Linker"
 import { dist_between_objects, cur_obj_rotate_yaw_toward, approach_symmetric } from "../game/ObjectHelpers"
+import { approach_number } from "../engine/math_util"
 
 const url = new URL(window.location.href)
 
@@ -82,7 +83,7 @@ const constrainNumber = (number, max) => {
 export const updateLocalMarioState = (m, update) => {
 
     const distance = distance3d(m.pos, update.posList)
-    if (distance > 1500.0) {
+    if (distance > 1500000.0) {
         console.log("full sync")
 
         m.actionState = update.actionstate
@@ -112,18 +113,46 @@ export const updateLocalMarioState = (m, update) => {
             m.usedObj = gameData.spawnObjectsBySyncID[update.usedobjid - 1000]
         }
     } else {
-        m.pos[0] += constrainNumber(update.posList[0] - m.pos[0], 6)
-        //m.pos[1] += constrainNumber(update.posList[1] - m.pos[1], 8)
-        m.pos[2] += constrainNumber(update.posList[2] - m.pos[2], 6)
 
-        m.vel[0] += constrainNumber(update.velList[0] - m.vel[0], 2)
+        //m.actionState = (m.action != update.action) ? 0 : update.actionstate
+        //m.actionTimer = (m.action != update.action) ? 0 : update.actiontimer
+
+        //m.action = update.action
+        //m.prevAction = update.prevaction
+        //m.actionArg = update.actionarg
+
+        const smoothPercent = 0.05
+
+        for (let i = 0; i < 3; i++) {
+            let step = Math.abs(update.posList[i] - m.pos[i]) * smoothPercent
+            if (step < 1) step = 1
+            m.pos[i] = approach_number(m.pos[i], update.posList[i], step, step)
+
+            //step = Math.abs(update.velList[i] - m.vel[i]) * smoothPercent
+            //if (step < 1) step = 1
+            //m.vel[i] = approach_number(m.vel[i], update.velList[i], step, step)
+        }
+
+        //let step = Math.abs(update.forwardvel - m.forwardVel) * smoothPercent
+        //if (step < 1) step = 1
+        //m.forwardVel = approach_number(m.forwardVel, update.forwardvel, step, step)
+
+        //m.pos[0] += constrainNumber(update.posList[0] - m.pos[0], 6)
+        //m.pos[1] += constrainNumber(update.posList[1] - m.pos[1], 8)
+        //m.pos[2] += constrainNumber(update.posList[2] - m.pos[2], 6)
+
+        //m.vel[0] += constrainNumber(update.velList[0] - m.vel[0], 2)
         //m.vel[1] += constrainNumber(update.velList[1] - m.vel[1], 2)
-        m.vel[2] += constrainNumber(update.velList[2] - m.vel[2], 2)
-        m.forwardVel += constrainNumber(update.forwardvel - m.forwardVel, 2)
+        //m.vel[2] += constrainNumber(update.velList[2] - m.vel[2], 2)
+        //m.forwardVel += constrainNumber(update.forwardvel - m.forwardVel, 2)
 
         //console.log(update.faceangleList[1] - m.faceAngle[1])
         //cur_obj_rotate_yaw_toward(update.faceangleList[1], 10)
-        m.faceAngle[1] = approach_symmetric(m.faceAngle[1], update.faceangleList[1], 10)
+        //m.faceAngle[1] = approach_symmetric(m.faceAngle[1], update.faceangleList[1], 10)
+        //m.faceAngle = update.faceangleList
+        //m.angleVel = update.anglevelList
+        //m.forwardVel = update.forwardvel
+        //m.vel = update.velList
     }
 
 }

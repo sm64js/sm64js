@@ -67,14 +67,7 @@ window.setSkinSliderValues = () => {
     }
 }
 
-$('[data-toggle="skinCustomizerToggle"]').popover({
-    container: "body",
-    html: true,
-    sanitize: false,
-    content: skinCustomizerHtml,
-})
 
-$('[data-toggle="skinCustomizerToggle"]').on('shown.bs.popover', () => { window.setSkinSliderValues() })
 
 window.toggleCapState = () => {
     window.myMario.skinData.customCapState = window.myMario.skinData.customCapState == 1 ? 0 : 1
@@ -193,14 +186,15 @@ export const shakePlayerNameInput = () => {
     document.getElementById("playerNameResult").style.color = "red"
     document.getElementById("playerNameInput").style.borderColor = "red"
     document.getElementById("playerNameInput").style.borderWidth = "3px"
-    $("#playerNameRow").effect("shake", { direction: "down", times: 3, distance: 3 }, 500)
+    //$("#playerNameRow").effect("shake", { direction: "down", times: 3, distance: 3 }, 500)
 }
 
 export const recvPlayerNameResponse = (msg) => {
 
     const accepted = msg.getAccepted()
     if (!accepted) {
-        shakePlayerNameInput()
+        console.log("ERROR NOT ACCEPTED!")
+        //shakePlayerNameInput()
     } else {
         networkData.mySocketID = msg.getSocketId()
         document.getElementById("playerNameInput").style.borderColor = "blue"

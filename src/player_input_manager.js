@@ -11,50 +11,7 @@ let textboxfocus = false
 //// Prevent scrolling for arrow keys
 window.addEventListener("keydown", (e) => {
 
-    textboxfocus = $("#chatbox").is(':focus') ||
-                    $("#playerNameInput").is(':focus') ||
-                    $("#ccPasteArea").is(':focus') ||
-                    $("#banbox").is(':focus')
-
-    if ($("#chatbox").is(':focus') && e.keyCode == 13) {
-
-        const chatbox = document.getElementById('chatbox')
-
-        if (chatbox.value[0] == '!') {
-            handleTaunt(chatbox.value)
-        } else {
-            sendChat({ message: chatbox.value })
-        }
-
-        chatbox.value = ""
-        chatbox.blur()
-    }
-
-    if ($("#banbox").is(':focus') && e.keyCode == 13) {
-        const message = document.getElementById('banbox').value
-        if (message.split(' ')[0] == '/signin') {
-            window.admin = { token: message.split(' ')[1] }
-        } else {
-            window.banPlayerList.push(message)
-        }
-        document.getElementById('banbox').value = ""
-        document.getElementById('banbox').blur()
-    }
-
-    if (document.getElementById("playerNameRow").hidden && e.keyCode == 13) {
-        $("#signinSection").effect("shake", { direction: "down", times: 3, distance: 3 }, 500)
-    }
-
-    if (!window.playerNameAccepted && e.keyCode == 13 && !document.getElementById("playerNameRow").hidden) {
-        document.getElementById('playerNameInput').blur()
-        submitPlayerName()
-    }
-
-    if (textboxfocus) return
-
-    // space and arrow keys
-    if ([32, 37, 38, 39, 40].includes(e.keyCode)) { e.preventDefault()  }
-
+   
 }, false)
 
 const keyboardButtons = {}
@@ -210,59 +167,13 @@ Array.from(document.getElementsByTagName("select")).forEach(selectElem => {
 const keyboardControlsHtml = $('#keyboardControlsWindow').detach()
 const gamepadControlsHtml = $('#gamepadControlsWindow').detach()
 
-$('[data-toggle="keyboardControlsToggle"]').popover({
-    container: "body",
-    content: keyboardControlsHtml
-})
 
-$('[data-toggle="gamepadControlsToggle"]').popover({
-    container: "body",
-    content: gamepadControlsHtml
-})
 
 let gamepadIndex
 
 window.addEventListener("gamepadconnected", function (e) {
 
-    const gamepad = e.gamepad
-
-    gamepadIndex = gamepad.index
-
-    const numButtons = gamepad.buttons.length
-    const numAxes = gamepad.axes.length
-
-    $('[data-toggle="gamepadControlsToggle"]').popover('show')
-
-    document.getElementById('noGamepadMessage').hidden = true
-    document.getElementById('gamepadMessageDiv').hidden = false
-    document.getElementById('gamepadMessage').innerHTML = `Detected Gamepad: "${gamepad.id.slice(0, 30)}" with ${numButtons} Buttons`
-
-    ///Fillout the select options and set default value
-    const controlsWindowDiv = document.getElementById('gamepadControlsWindow')
-    controlsWindowDiv.querySelectorAll("select").forEach(selectElem => {
-        if (selectElem.options.length == 0) { /// insert options
-            if (selectElem.hasAttribute("gamepadButton")) {
-                for (let i = 0; i < numButtons; i++) {
-                    const option = document.createElement("option")
-                    option.value = i
-                    option.text = i
-                    selectElem.add(option)
-                }
-            }
-            if (selectElem.hasAttribute("gamepadAxes")) {
-                for (let i = 0; i < numAxes; i++) {
-                    const option = document.createElement("option")
-                    option.value = i
-                    option.text = i
-                    selectElem.add(option)
-                }
-            }
-        }
-        selectElem.value = gamepadButtonMapping[selectElem.name]
-    })
-
-    $('[data-toggle="gamepadControlsToggle"]').popover('hide')
-    
+ 
 })
 
 

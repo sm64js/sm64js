@@ -30,7 +30,7 @@ const produce_one_frame = () => {
     totalFrameTimeBuffer.push(finished_frame - start_frame)
 
     //if (n_frames > 100000) { throw "Hit max frames" }
-    //console.log("new frame: " + n_frames)
+    console.log("new frame: " + n_frames)
     n_frames++
 }
 
@@ -69,13 +69,6 @@ const main_func = () => {
 
 
 //////////////////// Some more website stuff
-
-$('[data-toggle="popover"]').popover({
-    container: "body",
-    content: function () {
-        return $('#controlsPopover').clone()
-    },
-})
 
 //const url_hash = new URLSearchParams(window.location.hash.slice(1))
 const url_params = new URLSearchParams(window.location.search)
@@ -161,46 +154,10 @@ const startGame = () => {
 }
 
 window.onload = () => {
-    if (checkForRom() && url_params.has("autostart") && localStorage['rules'] == rulesVersion) startGame()
+    checkForRom()
+    startGame()
     document.getElementById('mainContent').hidden = false
-
-    ///Discord
-/*    if (url_hash.has("access_token")) {
-        const accessToken = url_hash.get("access_token")
-        const tokenType = url_hash.get("token_type")
-
-        const fragment = new URLSearchParams(window.location.hash.slice(1))
-
-        const discordFetch = fetch('https://discord.com/api/users/@me', {
-            headers: { authorization: `${tokenType} ${accessToken}` }
-        })
-
-        discordFetch.then(res => res.json()).then(response => {
-            const { username, discriminator } = response
-            console.log(username, discriminator)
-            //document.getElementById('info').innerText += ` ${username}#${discriminator}`
-        }).catch(console.error)
-    }*/
-/*    if (url_params.has("code")) {
-        const serverFetch = fetch(`http://localhost:3080/discord`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ code: url_params.get("code") })
-        })
-
-    }*/
 
 }
 
-window.addEventListener("keydown", (e) => {
-    if (e.keyCode == 13 && !gameStarted) {
-        if (document.getElementById("startbutton").disabled) {
-            $("#romSelect").effect("shake", { direction: "down", times: 3, distance: 3 }, 500)
-        } else startGame()
-    }
-})
 
-if (localStorage['rules'] != rulesVersion) $('#rules-modal').modal({ backdrop: 'static', keyboard: false })
-$("#rules-modal").on('hide.bs.modal', () => { localStorage['rules'] = rulesVersion })

@@ -51,7 +51,7 @@ const websocketServerPath = process.env.NODE_ENV === 'rust'
     ? `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/` // Tarnadas - Rust Server
     : url.protocol == "https:" // Snuffy - sm64js.com
         ? `wss://server.sm64js.com/websocket/` // production
-        : `ws://${url.hostname}:3000` // local testing
+        : `ws://localhost:3000` // local testing
 
 const socket = new WebSocket(websocketServerPath)
 
@@ -427,7 +427,7 @@ export const submitPlayerName = () => {
         if (name.length >= 3) {
             joinGameMsg.setName(name)
         } else {
-            return Cosmetics.shakePlayerNameInput()
+            //return Cosmetics.shakePlayerNameInput()
         }
     }
 

@@ -19,12 +19,6 @@ const classicSkinDataOffsetMap = {
 // Website related stuff
 const colorCodeWindowHtml = $('#colorCodePasteWindow').detach();
 
-$('[data-toggle="colorCodePasteWindowToggle"]').popover({
-    container: "body",
-    html: true,
-    sanitize: false,
-    content: colorCodeWindowHtml,
-});
 
 window.parseColorCode = (colorcode) => {
     let buffer = new Uint8ClampedArray(0x90);

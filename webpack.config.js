@@ -51,10 +51,6 @@ module.exports = env => ({
             chunkFilename: "[id].css"
         })
     ],
-    output: {
-        publicPath: "/",
-        filename: "[name]-[hash].js"
-    },
     optimization: {
         minimizer: [
             new TerserWebpackPlugin({}),

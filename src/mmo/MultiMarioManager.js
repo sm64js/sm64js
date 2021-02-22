@@ -149,7 +149,7 @@ export const updateLocalMarioState = (m, update) => {
         //console.log(update.faceangleList[1] - m.faceAngle[1])
         //cur_obj_rotate_yaw_toward(update.faceangleList[1], 10)
         //m.faceAngle[1] = approach_symmetric(m.faceAngle[1], update.faceangleList[1], 10)
-        //m.faceAngle = update.faceangleList
+        m.faceAngle = update.faceangleList
         //m.angleVel = update.anglevelList
         //m.forwardVel = update.forwardvel
         //m.vel = update.velList

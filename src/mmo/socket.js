@@ -318,6 +318,12 @@ export const post_main_loop_one_iteration = (frame) => {
             rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
             sendData(rootMsg.serializeBinary())
 
+            const sm64jsMsg2 = new Sm64JsMsg()
+            sm64jsMsg2.setMarioMsg(Multi.createMarioProtoMsg())
+            const rootMsg2 = new RootMsg()
+            rootMsg2.setUncompressedSm64jsMsg(sm64jsMsg2)
+            sendData(rootMsg2.serializeBinary())
+
             networkData.requestedInitData = true
         }
 
@@ -360,7 +366,7 @@ export const post_main_loop_one_iteration = (frame) => {
 
         if (frame % 1 == 0) { /// every frame send mario data
             const sm64jsMsg = new Sm64JsMsg()
-            sm64jsMsg.setMarioMsg(Multi.createMarioProtoMsg())
+            sm64jsMsg.setControllerMsg(Multi.createControllerProtoMsg())
             const rootMsg = new RootMsg()
             rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
             sendData(rootMsg.serializeBinary())

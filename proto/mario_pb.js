@@ -759,7 +759,7 @@ proto.sm64js.RootMsg.prototype.hasCompressedSm64jsMsg = function() {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.sm64js.Sm64JsMsg.oneofGroups_ = [[1,2,3,4,5,6,7,8,9,10]];
+proto.sm64js.Sm64JsMsg.oneofGroups_ = [[1,2,3,4,5,6,7,8,9,10,11]];
 
 /**
  * @enum {number}
@@ -775,7 +775,8 @@ proto.sm64js.Sm64JsMsg.MessageCase = {
   GRAB_MSG: 7,
   CHAT_MSG: 8,
   SKIN_MSG: 9,
-  ANNOUNCEMENT_MSG: 10
+  ANNOUNCEMENT_MSG: 10,
+  CONTROLLER_MSG: 11
 };
 
 /**
@@ -825,7 +826,8 @@ proto.sm64js.Sm64JsMsg.toObject = function(includeInstance, msg) {
     grabMsg: (f = msg.getGrabMsg()) && proto.sm64js.GrabFlagMsg.toObject(includeInstance, f),
     chatMsg: (f = msg.getChatMsg()) && proto.sm64js.ChatMsg.toObject(includeInstance, f),
     skinMsg: (f = msg.getSkinMsg()) && proto.sm64js.SkinMsg.toObject(includeInstance, f),
-    announcementMsg: (f = msg.getAnnouncementMsg()) && proto.sm64js.AnnouncementMsg.toObject(includeInstance, f)
+    announcementMsg: (f = msg.getAnnouncementMsg()) && proto.sm64js.AnnouncementMsg.toObject(includeInstance, f),
+    controllerMsg: (f = msg.getControllerMsg()) && proto.sm64js.ControllerMsg.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -911,6 +913,11 @@ proto.sm64js.Sm64JsMsg.deserializeBinaryFromReader = function(msg, reader) {
       var value = new proto.sm64js.AnnouncementMsg;
       reader.readMessage(value,proto.sm64js.AnnouncementMsg.deserializeBinaryFromReader);
       msg.setAnnouncementMsg(value);
+      break;
+    case 11:
+      var value = new proto.sm64js.ControllerMsg;
+      reader.readMessage(value,proto.sm64js.ControllerMsg.deserializeBinaryFromReader);
+      msg.setControllerMsg(value);
       break;
     default:
       reader.skipField();
@@ -1019,6 +1026,14 @@ proto.sm64js.Sm64JsMsg.serializeBinaryToWriter = function(message, writer) {
       10,
       f,
       proto.sm64js.AnnouncementMsg.serializeBinaryToWriter
+    );
+  }
+  f = message.getControllerMsg();
+  if (f != null) {
+    writer.writeMessage(
+      11,
+      f,
+      proto.sm64js.ControllerMsg.serializeBinaryToWriter
     );
   }
 };
@@ -1391,6 +1406,43 @@ proto.sm64js.Sm64JsMsg.prototype.clearAnnouncementMsg = function() {
  */
 proto.sm64js.Sm64JsMsg.prototype.hasAnnouncementMsg = function() {
   return jspb.Message.getField(this, 10) != null;
+};
+
+
+/**
+ * optional ControllerMsg controller_msg = 11;
+ * @return {?proto.sm64js.ControllerMsg}
+ */
+proto.sm64js.Sm64JsMsg.prototype.getControllerMsg = function() {
+  return /** @type{?proto.sm64js.ControllerMsg} */ (
+    jspb.Message.getWrapperField(this, proto.sm64js.ControllerMsg, 11));
+};
+
+
+/**
+ * @param {?proto.sm64js.ControllerMsg|undefined} value
+ * @return {!proto.sm64js.Sm64JsMsg} returns this
+*/
+proto.sm64js.Sm64JsMsg.prototype.setControllerMsg = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 11, proto.sm64js.Sm64JsMsg.oneofGroups_[0], value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.sm64js.Sm64JsMsg} returns this
+ */
+proto.sm64js.Sm64JsMsg.prototype.clearControllerMsg = function() {
+  return this.setControllerMsg(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.sm64js.Sm64JsMsg.prototype.hasControllerMsg = function() {
+  return jspb.Message.getField(this, 11) != null;
 };
 
 
@@ -3674,6 +3726,7 @@ proto.sm64js.MarioMsg.prototype.toObject = function(opt_includeInstance) {
 proto.sm64js.MarioMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
     controller: (f = msg.getController()) && proto.sm64js.ControllerMsg.toObject(includeInstance, f),
+    controllerToServer: (f = msg.getControllerToServer()) && proto.sm64js.ControllerMsg.toObject(includeInstance, f),
     action: jspb.Message.getFieldWithDefault(msg, 3, 0),
     prevaction: jspb.Message.getFieldWithDefault(msg, 4, 0),
     actionstate: jspb.Message.getFieldWithDefault(msg, 5, 0),
@@ -3733,6 +3786,11 @@ proto.sm64js.MarioMsg.deserializeBinaryFromReader = function(msg, reader) {
       var value = new proto.sm64js.ControllerMsg;
       reader.readMessage(value,proto.sm64js.ControllerMsg.deserializeBinaryFromReader);
       msg.setController(value);
+      break;
+    case 2:
+      var value = new proto.sm64js.ControllerMsg;
+      reader.readMessage(value,proto.sm64js.ControllerMsg.deserializeBinaryFromReader);
+      msg.setControllerToServer(value);
       break;
     case 3:
       var value = /** @type {number} */ (reader.readUint32());
@@ -3843,6 +3901,14 @@ proto.sm64js.MarioMsg.serializeBinaryToWriter = function(message, writer) {
   if (f != null) {
     writer.writeMessage(
       1,
+      f,
+      proto.sm64js.ControllerMsg.serializeBinaryToWriter
+    );
+  }
+  f = message.getControllerToServer();
+  if (f != null) {
+    writer.writeMessage(
+      2,
       f,
       proto.sm64js.ControllerMsg.serializeBinaryToWriter
     );
@@ -4017,6 +4083,43 @@ proto.sm64js.MarioMsg.prototype.clearController = function() {
  */
 proto.sm64js.MarioMsg.prototype.hasController = function() {
   return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional ControllerMsg controller_to_server = 2;
+ * @return {?proto.sm64js.ControllerMsg}
+ */
+proto.sm64js.MarioMsg.prototype.getControllerToServer = function() {
+  return /** @type{?proto.sm64js.ControllerMsg} */ (
+    jspb.Message.getWrapperField(this, proto.sm64js.ControllerMsg, 2));
+};
+
+
+/**
+ * @param {?proto.sm64js.ControllerMsg|undefined} value
+ * @return {!proto.sm64js.MarioMsg} returns this
+*/
+proto.sm64js.MarioMsg.prototype.setControllerToServer = function(value) {
+  return jspb.Message.setWrapperField(this, 2, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.sm64js.MarioMsg} returns this
+ */
+proto.sm64js.MarioMsg.prototype.clearControllerToServer = function() {
+  return this.setControllerToServer(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.sm64js.MarioMsg.prototype.hasControllerToServer = function() {
+  return jspb.Message.getField(this, 2) != null;
 };
 
 
@@ -4493,9 +4596,10 @@ proto.sm64js.ControllerMsg.toObject = function(includeInstance, msg) {
     sticky: jspb.Message.getFloatingPointFieldWithDefault(msg, 2, 0.0),
     stickmag: jspb.Message.getFloatingPointFieldWithDefault(msg, 3, 0.0),
     buttondown: jspb.Message.getFieldWithDefault(msg, 4, 0),
-    taunt: jspb.Message.getFieldWithDefault(msg, 5, 0),
-    camerayaw: jspb.Message.getFieldWithDefault(msg, 6, 0),
-    socketid: jspb.Message.getFieldWithDefault(msg, 7, 0)
+    buttonpressed: jspb.Message.getFieldWithDefault(msg, 5, 0),
+    taunt: jspb.Message.getFieldWithDefault(msg, 6, 0),
+    camerayaw: jspb.Message.getFieldWithDefault(msg, 7, 0),
+    socketid: jspb.Message.getFieldWithDefault(msg, 8, 0)
   };
 
   if (includeInstance) {
@@ -4550,13 +4654,17 @@ proto.sm64js.ControllerMsg.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 5:
       var value = /** @type {number} */ (reader.readUint32());
-      msg.setTaunt(value);
+      msg.setButtonpressed(value);
       break;
     case 6:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setTaunt(value);
+      break;
+    case 7:
       var value = /** @type {number} */ (reader.readSint32());
       msg.setCamerayaw(value);
       break;
-    case 7:
+    case 8:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setSocketid(value);
       break;
@@ -4617,24 +4725,31 @@ proto.sm64js.ControllerMsg.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getTaunt();
+  f = message.getButtonpressed();
   if (f !== 0) {
     writer.writeUint32(
       5,
       f
     );
   }
+  f = message.getTaunt();
+  if (f !== 0) {
+    writer.writeUint32(
+      6,
+      f
+    );
+  }
   f = message.getCamerayaw();
   if (f !== 0) {
     writer.writeSint32(
-      6,
+      7,
       f
     );
   }
   f = message.getSocketid();
   if (f !== 0) {
     writer.writeUint32(
-      7,
+      8,
       f
     );
   }
@@ -4714,10 +4829,10 @@ proto.sm64js.ControllerMsg.prototype.setButtondown = function(value) {
 
 
 /**
- * optional uint32 taunt = 5;
+ * optional uint32 buttonPressed = 5;
  * @return {number}
  */
-proto.sm64js.ControllerMsg.prototype.getTaunt = function() {
+proto.sm64js.ControllerMsg.prototype.getButtonpressed = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
 };
 
@@ -4726,16 +4841,16 @@ proto.sm64js.ControllerMsg.prototype.getTaunt = function() {
  * @param {number} value
  * @return {!proto.sm64js.ControllerMsg} returns this
  */
-proto.sm64js.ControllerMsg.prototype.setTaunt = function(value) {
+proto.sm64js.ControllerMsg.prototype.setButtonpressed = function(value) {
   return jspb.Message.setProto3IntField(this, 5, value);
 };
 
 
 /**
- * optional sint32 cameraYaw = 6;
+ * optional uint32 taunt = 6;
  * @return {number}
  */
-proto.sm64js.ControllerMsg.prototype.getCamerayaw = function() {
+proto.sm64js.ControllerMsg.prototype.getTaunt = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
 };
 
@@ -4744,16 +4859,16 @@ proto.sm64js.ControllerMsg.prototype.getCamerayaw = function() {
  * @param {number} value
  * @return {!proto.sm64js.ControllerMsg} returns this
  */
-proto.sm64js.ControllerMsg.prototype.setCamerayaw = function(value) {
+proto.sm64js.ControllerMsg.prototype.setTaunt = function(value) {
   return jspb.Message.setProto3IntField(this, 6, value);
 };
 
 
 /**
- * optional uint32 socketID = 7;
+ * optional sint32 cameraYaw = 7;
  * @return {number}
  */
-proto.sm64js.ControllerMsg.prototype.getSocketid = function() {
+proto.sm64js.ControllerMsg.prototype.getCamerayaw = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
 };
 
@@ -4762,8 +4877,26 @@ proto.sm64js.ControllerMsg.prototype.getSocketid = function() {
  * @param {number} value
  * @return {!proto.sm64js.ControllerMsg} returns this
  */
-proto.sm64js.ControllerMsg.prototype.setSocketid = function(value) {
+proto.sm64js.ControllerMsg.prototype.setCamerayaw = function(value) {
   return jspb.Message.setProto3IntField(this, 7, value);
+};
+
+
+/**
+ * optional uint32 socketID = 8;
+ * @return {number}
+ */
+proto.sm64js.ControllerMsg.prototype.getSocketid = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.sm64js.ControllerMsg} returns this
+ */
+proto.sm64js.ControllerMsg.prototype.setSocketid = function(value) {
+  return jspb.Message.setProto3IntField(this, 8, value);
 };
 
 

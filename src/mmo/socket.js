@@ -51,7 +51,7 @@ const websocketServerPath = process.env.NODE_ENV === 'rust'
     ? `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/` // Tarnadas - Rust Server
     : url.protocol == "https:" // Snuffy - sm64js.com
         ? `wss://mmo-server-test.sm64js.com/websocket/` // production
-        : `ws://localhost:3000` // local testing
+        : `wss://mmo-server-test.sm64js.com/websocket/` // local testing
 
 const socket = new WebSocket(websocketServerPath)
 

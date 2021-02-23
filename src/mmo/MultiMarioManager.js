@@ -34,7 +34,7 @@ const expandRawDataSubset = (subset, currentRawData) => {
 const updateRemoteMarioState = (id, marioProto) => {
 
     const controllerProto = marioProto.getController()
-    applyController(controllerProto)
+    applyController(controllerProto, networkData.remotePlayers[id].marioState)
 
     /// other mario updates
     networkData.remotePlayers[id].marioUpdate = marioProto.toObject()
@@ -182,8 +182,8 @@ export const createMarioProtoMsg = () => {
 
     const mariomsg = new MarioMsg()
 
-    const controllerMsg = createControllerProtoMsg()
-    mariomsg.setControllerToServer(controllerMsg)
+    //const controllerMsg = createControllerProtoMsg()
+    //mariomsg.setControllerToServer(controllerMsg)
     //mariomsg.setController(controllerMsg)
 
     mariomsg.setAction(m.action)
@@ -420,7 +420,7 @@ export const recvMarioData = (marioList) => {
                 crashCount: 0,
                 skipRender: 0
             }
-            applyController(marioProto.getController())
+            //applyController(marioProto.getController())
         } else {
             updateRemoteMarioState(id, marioProto)
         }

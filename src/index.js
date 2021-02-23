@@ -14,11 +14,15 @@ let n_frames = 0
 let target_time = 0
 let frameSpeed = 0.03
 
+const fasterInputUpdate = setInterval(() => {
+    playerInputUpdate() /// Keyboard buttons / joystick process to game input commands
+    Socket.sendPlayerInput()
+}, 10)
+
 const produce_one_frame = () => {
 
     const start_frame = performance.now()
 
-    playerInputUpdate() /// Keyboard buttons / joystick process to game input commands
     //Socket.send_controller_update(n_frames)
     GFX.start_frame()
     Game.main_loop_one_iteration()

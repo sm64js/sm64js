@@ -280,11 +280,11 @@ class ObjectListProcessor {
 
         if (marioState.prevAngle && marioState.prevPos) {
 
-            const smoothPercent = 0.4
+            const smoothPercent = parseFloat(document.getElementById("smoothness").value)
 
             for (let i = 0; i < 3; i++) {
                 let step = Math.abs(marioState.prevPos[i] - marioGfx.pos[i]) * smoothPercent
-                if (step < 10) step = 10
+                if (step < 1) step = 1
                 marioGfx.pos[i] = approach_number(marioState.prevPos[i], marioGfx.pos[i], step, step)
             }
 

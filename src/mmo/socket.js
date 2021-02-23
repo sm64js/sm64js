@@ -51,7 +51,7 @@ const websocketServerPath = process.env.NODE_ENV === 'rust'
     ? `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/` // Tarnadas - Rust Server
     : url.protocol == "https:" // Snuffy - sm64js.com
         ? `ws://mmo-server-test.web:3000` // production
-        : `ws://mmo-server-test.web:3000` // local testing
+        : `ws://localhost:3000` // local testing
 
 const socket = new WebSocket(websocketServerPath)
 
@@ -134,6 +134,10 @@ socket.onopen = () => {
                     case Sm64JsMsg.MessageCase.PLAYER_LISTS_MSG:
                         Multi.recvPlayerLists(sm64jsMsg.getPlayerListsMsg())
                         break
+                    case Sm64JsMsg.MessageCase.CONTROLLER_MSG:
+                        Multi.updateRemoteMarioController(sm64jsMsg.getControllerMsg()); break
+                    case Sm64JsMsg.MessageCase.MARIO_MSG:
+                        Multi.recvMarioData(sm64jsMsg.getMarioMsg()); break
                     case Sm64JsMsg.MessageCase.PING_MSG:
                         measureLatency(sm64jsMsg.getPingMsg())
                         break
@@ -160,6 +164,7 @@ socket.onopen = () => {
                 }
                 break
             case RootMsg.MessageCase.COMPRESSED_SM64JS_MSG:
+                return
                 if (!multiplayerReady()) return
                 const compressedBytes = rootMsg.getCompressedSm64jsMsg()
                 const buffer = await unzip(compressedBytes)

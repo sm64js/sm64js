@@ -30,13 +30,30 @@ const expandRawDataSubset = (subset, currentRawData) => {
     return rawData
 }
 
-const updateRemoteMarioState = (id, marioProto) => {
+export const updateRemoteMarioController = (controllerProto) => {
 
-    const controllerProto = marioProto.getControllerToServer()
+    const id = controllerProto.getSocketid()
     //applyController(controllerProto)
 
+    if (networkData.remotePlayers[id] == undefined) return
+
+    networkData.remotePlayers[id].controllerUpdateTimestamp = performance.now()
+
+    const controllerUpdate = controllerProto.toObject() //marioProto.toObject()
+
     /// other mario updates
-    networkData.remotePlayers[id].marioUpdate = controllerProto //marioProto.toObject()
+    if (networkData.remotePlayers[id].controllerUpdate != null) {
+        //// potentially overwiting data
+        if (controllerUpdate.buttondown == networkData.remotePlayers[id].controllerUpdate.buttondown &&
+            controllerUpdate.taunt == networkData.remotePlayers[id].controllerUpdate.taunt) {
+            //// overwriting data but the buttons are the same
+        } else {
+            //// overwriting data and the buttons are not the same
+            return 
+        }
+    }
+
+    networkData.remotePlayers[id].controllerUpdate = controllerUpdate
 
 }
 
@@ -267,15 +284,15 @@ export const createControllerProtoMsg = (m) => {
     return controllermsg
 }
 
-export const applyController = (controllerProto, marioState) => {
+export const applyController = (controllerUpdate, marioState) => {
     //const id = controllerProto.getSocketid()
     //if (networkData.remotePlayers[id] == undefined) return
     const m = marioState
-    const buttonDown = controllerProto.getButtondown()
+    const buttonDown = controllerUpdate.buttondown
     m.controller = {
-        stickX: controllerProto.getStickx(),
-        stickY: controllerProto.getSticky(),
-        stickMag: controllerProto.getStickmag(),
+        stickX: controllerUpdate.stickx,
+        stickY: controllerUpdate.sticky,
+        stickMag: controllerUpdate.stickmag,
         buttonDownA: (buttonDown & 0x1) != 0,
         buttonDownB: (buttonDown & 0x2) != 0,
         buttonDownZ: (buttonDown & 0x4) != 0,
@@ -284,13 +301,13 @@ export const applyController = (controllerProto, marioState) => {
         buttonPressedB: ((buttonDown & 0x2) != 0) && !m.controller.buttonDownB,
         buttonPressedZ: ((buttonDown & 0x4) != 0) && !m.controller.buttonDownZ,
         buttonPressedStart: ((buttonDown & 0x8) != 0) && !m.controller.buttonDownStart,
-        cameraYaw: controllerProto.getCamerayaw(),
-        taunt: controllerProto.getTaunt()
+        cameraYaw: controllerUpdate.camerayaw,
+        taunt: controllerUpdate.taunt
     }
 
 }
 
-export const recvControllerUpdate = (controllerbytes) => {
+/*export const recvControllerUpdate = (controllerbytes) => {
     zlib.inflate(controllerbytes, (err, buffer) => {
         if (!err) {
             const controllerListProto = ControllerListMsg.deserializeBinary(buffer).getControllerList()
@@ -299,7 +316,7 @@ export const recvControllerUpdate = (controllerbytes) => {
             })
         }
     })
-}
+}*/
 
 export const recvPlayerLists = (playerListsProto) => {
 
@@ -319,7 +336,8 @@ export const recvPlayerLists = (playerListsProto) => {
         networkData.numOnline = validplayers.length
 
         Object.keys(networkData.remotePlayers).forEach(socket_id => {
-            if (!validplayers.includes(parseInt(socket_id))) {
+            //if (!validplayers.includes(parseInt(socket_id))) {
+            if (performance.now() - networkData.remotePlayers[socket_id].controllerUpdateTimestamp > 10000) {
                 delete networkData.remotePlayers[socket_id]
             }
         })
@@ -346,23 +364,26 @@ export const recvPlayerLists = (playerListsProto) => {
 }
 
 
-export const recvMarioData = (marioList) => {
-    marioList.forEach(marioProto => {
+export const recvMarioData = (marioProto) => {
+
+    //console.log(marioProto)
+
+    //marioList.forEach(marioProto => {
         const id = marioProto.getSocketid()
         if (id == networkData.mySocketID) return
 
-        if (networkData.remotePlayers[id] == undefined) {
+    if (networkData.remotePlayers[id] == undefined) {
             networkData.remotePlayers[id] = { 
                 marioState: initNewRemoteMarioState(marioProto),
                 skinData: defaultSkinData(),
                 crashCount: 0,
                 skipRender: 0,
             }
-            //applyController(marioProto.getController())
         } else {
-            updateRemoteMarioState(id, marioProto)
+            /// already created... do nothing 
+            //updateRemoteMarioState(id, marioProto)
         }
-    })
+    //})
 
 
 }

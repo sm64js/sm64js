@@ -114,14 +114,17 @@ class ObjectListProcessor {
     update_objects() {
 
         Object.values(networkData.remotePlayers).forEach(remotePlayer => {
-            if (remotePlayer.marioUpdate) {
+            if (remotePlayer.controllerUpdate) {
                 if (remotePlayer.marioState.ignoreUpdates > 0) {
                     remotePlayer.marioState.ignoreUpdates--
                 } else {
                     //copyMarioUpdateToState(remotePlayer)
                     //this.copy_mario_state_to_object(remotePlayer.marioState)
-                    applyController(remotePlayer.marioUpdate, remotePlayer.marioState)
+                    applyController(remotePlayer.controllerUpdate, remotePlayer.marioState)
+                    remotePlayer.controllerUpdate = null
                 }
+            } else {
+                //console.log("did not recieve input data fast enough")
             }
         })
 

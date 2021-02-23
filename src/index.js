@@ -13,7 +13,7 @@ const send_display_list = (gfx_list) => { if (window.gameMasterDebug) GFX.run(gf
 
 let n_frames = 0
 let target_time = 0
-let frameSpeed = 0.03
+let frameSpeed = 0.033 //0.03 default higher is faster, lower is slower 33 - frames per ms
 
 const produce_one_frame = () => {
 

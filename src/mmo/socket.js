@@ -53,6 +53,7 @@ const websocketServerPath = process.env.NODE_ENV === 'rust'
         ? `ws://mmo-server-test.web:3000` // production
         : `ws://mmo-server-test.web:3000` // local testing
 
+
 const socket = new WebSocket(websocketServerPath)
 
 export const networkData = {

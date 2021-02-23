@@ -3726,7 +3726,6 @@ proto.sm64js.MarioMsg.prototype.toObject = function(opt_includeInstance) {
 proto.sm64js.MarioMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
     controller: (f = msg.getController()) && proto.sm64js.ControllerMsg.toObject(includeInstance, f),
-    controllerToServer: (f = msg.getControllerToServer()) && proto.sm64js.ControllerMsg.toObject(includeInstance, f),
     action: jspb.Message.getFieldWithDefault(msg, 3, 0),
     prevaction: jspb.Message.getFieldWithDefault(msg, 4, 0),
     actionstate: jspb.Message.getFieldWithDefault(msg, 5, 0),
@@ -3786,11 +3785,6 @@ proto.sm64js.MarioMsg.deserializeBinaryFromReader = function(msg, reader) {
       var value = new proto.sm64js.ControllerMsg;
       reader.readMessage(value,proto.sm64js.ControllerMsg.deserializeBinaryFromReader);
       msg.setController(value);
-      break;
-    case 2:
-      var value = new proto.sm64js.ControllerMsg;
-      reader.readMessage(value,proto.sm64js.ControllerMsg.deserializeBinaryFromReader);
-      msg.setControllerToServer(value);
       break;
     case 3:
       var value = /** @type {number} */ (reader.readUint32());
@@ -3901,14 +3895,6 @@ proto.sm64js.MarioMsg.serializeBinaryToWriter = function(message, writer) {
   if (f != null) {
     writer.writeMessage(
       1,
-      f,
-      proto.sm64js.ControllerMsg.serializeBinaryToWriter
-    );
-  }
-  f = message.getControllerToServer();
-  if (f != null) {
-    writer.writeMessage(
-      2,
       f,
       proto.sm64js.ControllerMsg.serializeBinaryToWriter
     );
@@ -4083,43 +4069,6 @@ proto.sm64js.MarioMsg.prototype.clearController = function() {
  */
 proto.sm64js.MarioMsg.prototype.hasController = function() {
   return jspb.Message.getField(this, 1) != null;
-};
-
-
-/**
- * optional ControllerMsg controller_to_server = 2;
- * @return {?proto.sm64js.ControllerMsg}
- */
-proto.sm64js.MarioMsg.prototype.getControllerToServer = function() {
-  return /** @type{?proto.sm64js.ControllerMsg} */ (
-    jspb.Message.getWrapperField(this, proto.sm64js.ControllerMsg, 2));
-};
-
-
-/**
- * @param {?proto.sm64js.ControllerMsg|undefined} value
- * @return {!proto.sm64js.MarioMsg} returns this
-*/
-proto.sm64js.MarioMsg.prototype.setControllerToServer = function(value) {
-  return jspb.Message.setWrapperField(this, 2, value);
-};
-
-
-/**
- * Clears the message field making it undefined.
- * @return {!proto.sm64js.MarioMsg} returns this
- */
-proto.sm64js.MarioMsg.prototype.clearControllerToServer = function() {
-  return this.setControllerToServer(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {boolean}
- */
-proto.sm64js.MarioMsg.prototype.hasControllerToServer = function() {
-  return jspb.Message.getField(this, 2) != null;
 };
 
 

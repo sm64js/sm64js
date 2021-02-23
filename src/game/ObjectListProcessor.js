@@ -6,7 +6,7 @@ import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands
 import * as Mario from "./Mario"
 import { detect_object_collisions } from "./ObjectCollisions"
 import { networkData, gameData as socketGameData, updateNetworkBeforeRender } from "../mmo/socket"
-import { copyMarioUpdateToState, updateLocalMarioState, updateLocalMarioState2 } from "../mmo/MultiMarioManager"
+import { copyMarioUpdateToState, updateLocalMarioState, updateLocalMarioState2, applyController } from "../mmo/MultiMarioManager"
 import { vec3f_dif, vec3f_length } from "../engine/math_util"
 import { uint32, uint16 } from "../utils"
 import { MODEL_NONE, MODEL_MIST } from "../include/model_ids"
@@ -126,14 +126,20 @@ class ObjectListProcessor {
             }
         })
 
+        const localMarioState = LevelUpdate.gMarioState
+
+        applyController(localMarioState.localControllerUpdate, localMarioState)
+
         if (networkData.yourMarioUpdate) {
-            this.gCurrentObject = LevelUpdate.gMarioState.marioObj
-            updateLocalMarioState(LevelUpdate.gMarioState, networkData.yourMarioUpdate)
-            networkData.yourMarioUpdate = null
-            this.copy_mario_state_to_object(LevelUpdate.gMarioState)
+            this.gCurrentObject = localMarioState.marioObj  /// this line may not be needed
+            updateLocalMarioState(localMarioState, networkData.yourMarioUpdate)
+            this.copy_mario_state_to_object(localMarioState)
         } else {
-            //console.log("skipping an update")
+            //console.log("missing a frame from server -- recieved too slow")
         }
+
+        networkData.yourMarioUpdate = null
+
 
         this.gObjectCounter = 0  /// probaly not used and not needed
 

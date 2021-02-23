@@ -35,7 +35,7 @@ const expandRawDataSubset = (subset, currentRawData) => {
 const updateRemoteMarioState = (id, marioProto) => {
 
     const controllerProto = marioProto.getController()
-    applyController(controllerProto)
+    //applyController(controllerProto, networkData.remotePlayers[id].marioState)  not sure if this should be applied
 
     /// other mario updates
     networkData.remotePlayers[id].marioUpdate = marioProto.toObject()
@@ -114,45 +114,42 @@ export const updateLocalMarioState = (m, update) => {
         }
     } else {
 
-        //m.actionState = (m.action != update.action) ? 0 : update.actionstate
-        //m.actionTimer = (m.action != update.action) ? 0 : update.actiontimer
+        if (document.getElementById("overrideAction").checked) {
+            m.actionState = (m.action != update.action) ? 0 : update.actionstate
+            m.actionTimer = (m.action != update.action) ? 0 : update.actiontimer
 
-        //m.action = update.action
-        //m.prevAction = update.prevaction
-        //m.actionArg = update.actionarg
+            m.angleVel = update.anglevelList
+            m.forwardVel = update.forwardvel
+            m.vel = update.velList
 
-        const smoothPercent = 0.05
+            m.action = update.action
+            m.prevAction = update.prevaction
+            m.actionArg = update.actionarg
+
+            m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
+            m.marioObj.rawData[RAW.oRoom] = -1
+
+            if (update.usedobjid >= 1000 && update.usedobjid <= 2000) {
+                m.usedObj = gameData.spawnObjectsBySyncID[update.usedobjid - 1000]
+            }
+
+        }
+
+        const smoothPercent = parseFloat(document.getElementById("smoothness").value)
 
         for (let i = 0; i < 3; i++) {
             let step = Math.abs(update.posList[i] - m.pos[i]) * smoothPercent
             if (step < 1) step = 1
             m.pos[i] = approach_number(m.pos[i], update.posList[i], step, step)
-
-            //step = Math.abs(update.velList[i] - m.vel[i]) * smoothPercent
-            //if (step < 1) step = 1
-            //m.vel[i] = approach_number(m.vel[i], update.velList[i], step, step)
         }
 
-        //let step = Math.abs(update.forwardvel - m.forwardVel) * smoothPercent
-        //if (step < 1) step = 1
-        //m.forwardVel = approach_number(m.forwardVel, update.forwardvel, step, step)
-
-        //m.pos[0] += constrainNumber(update.posList[0] - m.pos[0], 6)
-        //m.pos[1] += constrainNumber(update.posList[1] - m.pos[1], 8)
-        //m.pos[2] += constrainNumber(update.posList[2] - m.pos[2], 6)
-
-        //m.vel[0] += constrainNumber(update.velList[0] - m.vel[0], 2)
-        //m.vel[1] += constrainNumber(update.velList[1] - m.vel[1], 2)
-        //m.vel[2] += constrainNumber(update.velList[2] - m.vel[2], 2)
-        //m.forwardVel += constrainNumber(update.forwardvel - m.forwardVel, 2)
-
-        //console.log(update.faceangleList[1] - m.faceAngle[1])
-        //cur_obj_rotate_yaw_toward(update.faceangleList[1], 10)
-        //m.faceAngle[1] = approach_symmetric(m.faceAngle[1], update.faceangleList[1], 10)
         m.faceAngle = update.faceangleList
-        //m.angleVel = update.anglevelList
-        //m.forwardVel = update.forwardvel
-        //m.vel = update.velList
+        if (m.action == update.action) {
+            m.angleVel = update.anglevelList
+            m.forwardVel = update.forwardvel
+            m.vel = update.velList
+        }
+
     }
 
 }
@@ -322,55 +319,60 @@ export const createControllerProtoMsg = () => {
     const m = gameData.marioState
     const controllermsg = new ControllerMsg()
     //// fill out controller msg
-    controllermsg.setStickx(m.controller.stickX)
-    controllermsg.setSticky(m.controller.stickY)
-    controllermsg.setStickmag(m.controller.stickMag)
+    controllermsg.setStickx(m.controller_to_server.stickX)
+    controllermsg.setSticky(m.controller_to_server.stickY)
+    controllermsg.setStickmag(m.controller_to_server.stickMag)
     let buttonDown = 0
-    buttonDown |= (m.controller.buttonDownA << 0)
-    buttonDown |= (m.controller.buttonDownB << 1)
-    buttonDown |= (m.controller.buttonDownZ << 2)
-    buttonDown |= (m.controller.buttonDownStart << 3)
+    buttonDown |= (m.controller_to_server.buttonDownA << 0)
+    buttonDown |= (m.controller_to_server.buttonDownB << 1)
+    buttonDown |= (m.controller_to_server.buttonDownZ << 2)
+    buttonDown |= (m.controller_to_server.buttonDownStart << 3)
     controllermsg.setButtondown(buttonDown)
 
-/*    let buttonPressed = 0
-    buttonPressed |= (m.controller.buttonPressedA << 0)
-    buttonPressed |= (m.controller.buttonPressedB << 1)
-    buttonPressed |= (m.controller.buttonPressedZ << 2)
-    buttonPressed |= (m.controller.buttonPressedStart << 3)
-    controllermsg.setButtonpressed(buttonPressed)*/
+    /*    let buttonPressed = 0
+        buttonPressed |= (m.controller.buttonPressedA << 0)
+        buttonPressed |= (m.controller.buttonPressedB << 1)
+        buttonPressed |= (m.controller.buttonPressedZ << 2)
+        buttonPressed |= (m.controller.buttonPressedStart << 3)
+        controllermsg.setButtonpressed(buttonPressed)*/
 
-    controllermsg.setTaunt(m.controller.taunt)
+    controllermsg.setTaunt(m.controller_to_server.taunt)
 
     controllermsg.setCamerayaw(m.area.camera.yaw)
 
     controllermsg.setSocketid(networkData.mySocketID)
 
+    /// set the local update, but also send to server
+    m.localControllerUpdate = controllermsg.toObject()
+
     return controllermsg
 }
 
-const applyController = (controllerProto) => {
-    const id = controllerProto.getSocketid()
-    if (networkData.remotePlayers[id] == undefined) return
-    const m = networkData.remotePlayers[id].marioState
-    const buttonDown = controllerProto.getButtondown()
+export const applyController = (controllerUpdate, marioState) => {
+
+    if (controllerUpdate == undefined) return
+
+    const m = marioState
+    const buttonDown = controllerUpdate.buttondown
     m.controller = {
-        stickX: controllerProto.getStickx(),
-        stickY: controllerProto.getSticky(),
-        stickMag: controllerProto.getStickmag(),
-        buttonDownA: buttonDown & 0x1,
-        buttonDownB: buttonDown & 0x2,
-        buttonDownZ: buttonDown & 0x4,
-        buttonDownStart: buttonDown & 0x8,
-        buttonPressedA: (buttonDown & 0x1) && !m.controller.buttonDownA,
-        buttonPressedB: (buttonDown & 0x2) && !m.controller.buttonDownB,
-        buttonPressedZ: (buttonDown & 0x4) && !m.controller.buttonDownZ,
-        buttonPressedStart: (buttonDown & 0x8) && !m.controller.buttonDownStart,
-        cameraYaw: controllerProto.getCamerayaw(),
-        taunt: controllerProto.getTaunt()
+        stickX: controllerUpdate.stickx,
+        stickY: controllerUpdate.sticky,
+        stickMag: controllerUpdate.stickmag,
+        buttonDownA: (buttonDown & 0x1) != 0,
+        buttonDownB: (buttonDown & 0x2) != 0,
+        buttonDownZ: (buttonDown & 0x4) != 0,
+        buttonDownStart: (buttonDown & 0x8) != 0,
+        buttonPressedA: ((buttonDown & 0x1) != 0) && !m.controller.buttonDownA,
+        buttonPressedB: ((buttonDown & 0x2) != 0) && !m.controller.buttonDownB,
+        buttonPressedZ: ((buttonDown & 0x4) != 0) && !m.controller.buttonDownZ,
+        buttonPressedStart: ((buttonDown & 0x8) != 0) && !m.controller.buttonDownStart,
+        cameraYaw: controllerUpdate.camerayaw,
+        taunt: controllerUpdate.taunt
     }
+
 }
 
-export const recvControllerUpdate = (controllerbytes) => {
+/*export const recvControllerUpdate = (controllerbytes) => {
     zlib.inflate(controllerbytes, (err, buffer) => {
         if (!err) {
             const controllerListProto = ControllerListMsg.deserializeBinary(buffer).getControllerList()
@@ -379,7 +381,7 @@ export const recvControllerUpdate = (controllerbytes) => {
             })
         }
     })
-}
+}*/
 
 export const recvPlayerLists = (playerListsProto) => {
 
@@ -446,7 +448,7 @@ export const recvMarioData = (marioList) => {
                 crashCount: 0,
                 skipRender: 0
             }
-            applyController(marioProto.getController())
+            //applyController(marioProto.getController())
         } else {
             updateRemoteMarioState(id, marioProto)
         }

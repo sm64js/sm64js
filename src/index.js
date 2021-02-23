@@ -12,13 +12,27 @@ const send_display_list = (gfx_list) => { GFX.run(gfx_list) }
 
 let n_frames = 0
 let target_time = 0
-let frameSpeed = 0.03
+let frameSpeed = 0.025 //(frames per ms) 0.03 default higher is faster, lower is slower - 0.03 frames per ms
+document.getElementById('clientGameTps').addEventListener('change', (event) => {
+    frameSpeed = event.target.value / 1000
+})
+
+let inputtps = 10
+document.getElementById('inputTps').addEventListener('change', (event) => {
+    inputtps = 1000 / event.target.value
+})
+
+const inputUpdate = function () {
+    playerInputUpdate() /// Keyboard buttons / joystick process to game input commands
+    Socket.sendPlayerInput()
+    setTimeout(inputUpdate, inputtps)
+}
+setTimeout(inputUpdate, inputtps)
 
 const produce_one_frame = () => {
 
     const start_frame = performance.now()
 
-    playerInputUpdate() /// Keyboard buttons / joystick process to game input commands
     //Socket.send_controller_update(n_frames)
     GFX.start_frame()
     Game.main_loop_one_iteration()

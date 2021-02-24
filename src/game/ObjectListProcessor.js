@@ -126,14 +126,17 @@ class ObjectListProcessor {
             }
         })
 
+        const localMarioState = LevelUpdate.gMarioState
+
         if (networkData.yourMarioUpdate) {
-            this.gCurrentObject = LevelUpdate.gMarioState.marioObj
-            copyMarioUpdateToState(LevelUpdate.gMarioState, networkData.yourMarioUpdate)
-            networkData.yourMarioUpdate = null
-            this.copy_mario_state_to_object(LevelUpdate.gMarioState)
+            this.gCurrentObject = localMarioState.marioObj /// this line may not be needed
+            copyMarioUpdateToState(localMarioState, networkData.yourMarioUpdate)
+            this.copy_mario_state_to_object(localMarioState)
         } else {
             //console.log("skipping an update")
         }
+
+        networkData.yourMarioUpdate = null
 
         this.gObjectCounter = 0  /// probaly not used and not needed
 

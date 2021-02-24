@@ -34,7 +34,7 @@ const expandRawDataSubset = (subset, currentRawData) => {
 const updateRemoteMarioState = (id, marioProto) => {
 
     const controllerProto = marioProto.getController()
-    applyController(controllerProto, networkData.remotePlayers[id].marioState)
+    applyController(controllerProto, networkData.remotePlayers[id].marioState) /// this should be applied in other branch probably
 
     /// other mario updates
     networkData.remotePlayers[id].marioUpdate = marioProto.toObject()
@@ -344,7 +344,7 @@ const applyController = (controllerProto, marioState) => {
     //console.log(m.controller.buttonDownZ)
 }
 
-export const recvControllerUpdate = (controllerbytes) => {
+/*export const recvControllerUpdate = (controllerbytes) => {
     zlib.inflate(controllerbytes, (err, buffer) => {
         if (!err) {
             const controllerListProto = ControllerListMsg.deserializeBinary(buffer).getControllerList()
@@ -353,7 +353,7 @@ export const recvControllerUpdate = (controllerbytes) => {
             })
         }
     })
-}
+}*/
 
 export const recvPlayerLists = (playerListsProto) => {
 

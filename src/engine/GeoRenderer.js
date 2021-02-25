@@ -4,7 +4,6 @@ import { GameInstance as Game } from "../game/Game"
 import * as Gbi from "../include/gbi"
 import { CameraInstance as Camera } from "../game/Camera"
 import * as Mario from "../game/Mario"
-import { create_shadow_below_xyz } from "../game/Shadow"
 import { networkData } from "../mmo/socket"
 import { MarioMiscInstance as MarioMisc } from "../game/MarioMisc"
 
@@ -619,16 +618,7 @@ class GeoRenderer {
 
                 }
             }
-            const shadowList = create_shadow_below_xyz(shadowPos[0], shadowPos[1], shadowPos[2], shadowScale, node.wrapper.shadowSolidity, node.wrapper.shadowType)
 
-            if (shadowList) {
-                const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
-                this.gMatStackIndex++
-                MathUtil.mtxf_translate(mtxf, shadowPos)
-                MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex], mtxf, this.gCurGraphNodeCamera.wrapper.matrixPtr)
-                this.geo_append_display_list(shadowList, 6)
-                this.gMatStackIndex--
-            }
         }
 
         if (node.children[0]) {

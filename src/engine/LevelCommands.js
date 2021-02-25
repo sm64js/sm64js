@@ -278,6 +278,9 @@ class LevelCommands {
     }
 
     terrain(args) {
+
+        console.log(this.sCurrAreaIndex)
+
         if (this.sCurrAreaIndex != -1)
             Area.gAreas[this.sCurrAreaIndex].terrainData = args[0]
 

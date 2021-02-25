@@ -1,5 +1,4 @@
-﻿import { checkForRom } from "./romTextureLoader.js"
-import { GameInstance as Game } from "./game/Game"
+﻿import { GameInstance as Game } from "./game/Game"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
 import  * as Socket from "./mmo/socket.js"
 //import "./mmo/cosmetics"
@@ -38,15 +37,9 @@ const main_func = () => {
 
 
 ///// Start Game
+console.log("Starting Game!")
+main_func()
 
 
-const startGame = () => {
-    console.log("Starting Game!")
-
-    main_func()
-}
-
-checkForRom()
-startGame()
 
 

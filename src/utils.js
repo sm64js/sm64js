@@ -54,3 +54,5 @@ export const levelIdToName = {
     36: "Tall, Tall Mountain",
     24: "Whomps Fortress"
 }
+
+export const canvasDims = { width: 640, height: 480 }

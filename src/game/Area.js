@@ -3,7 +3,6 @@ import { SurfaceLoadInstance as SurfaceLoad } from "./SurfaceLoad"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { GameInstance as Game } from "./Game"
 import { gSPViewport } from "../include/gbi"
-import { render_screen_transition } from "./ScreenTransition"
 
 export const WARP_TRANSITION_FADE_FROM_COLOR   = 0x00
 export const WARP_TRANSITION_FADE_INTO_COLOR   = 0x01
@@ -181,7 +180,7 @@ class Area {
             if (this.gWarpTransition.isActive) {
                 if (this.gWarpTransDelay == 0) {
 
-                    this.gWarpTransition.isActive = !render_screen_transition(0, this.gWarpTransition.type, this.gWarpTransition.time, this.gWarpTransition.data)
+                    this.gWarpTransition.isActive = false //!render_screen_transition(0, this.gWarpTransition.type, this.gWarpTransition.time, this.gWarpTransition.data)
 
                     if (!this.gWarpTransition.isActive) {
                         if (this.gWarpTransition.type & 1) {

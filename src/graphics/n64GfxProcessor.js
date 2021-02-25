@@ -1,6 +1,5 @@
 import { WebGLInstance as WebGL } from "./WebGL"
 import * as Gbi from "../include/gbi"
-import { flagCounter } from "../levels/castle_grounds/areas/1/11/model.inc"
 
 const precomp_shaders = [
     0x01200200,
@@ -1024,9 +1023,6 @@ export class n64GfxProcessor {
                     break
                 case Gbi.G_SETPLAYERDATA:
                     this.custom_set_player_data(args.socket_id)
-                    break
-                case Gbi.G_SETFLAGINDEX:
-                    flagCounter.data = args.flagIndex
                     break
                 case Gbi.G_DL:
                     const displayList = args.childDisplayList.call ? args.childDisplayList(this.customData3D) : args.childDisplayList

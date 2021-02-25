@@ -8,31 +8,34 @@
   "dependencies": {
     "file-url": "^3.0.0",
     "google-protobuf": "^3.13.0",
-    "mathjs": "^7.0.1",
-    "puppeteer": "^7.1.0",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.11.0"
+    "puppeteer": "^7.1.0"
   },
   "scripts": {
-    "serve": "node serveStatic.js",
-    "build": "webpack --mode production",
-    "build:rust": "webpack --mode production --env rust",
-    "start": "webpack-dev-server --host 0.0.0.0 --disable-host-check  --mode development --env development",
-    "protoc": "protoc --js_out=import_style=commonjs,binary:. proto/mario.proto"
+    "buildWebpack": "webpack --mode production",
+    "startWebpack": "webpack-dev-server --host 0.0.0.0 --disable-host-check  --mode development --env development",
+    "startNode": "node dist/index.js",
+    "babelRollup": "./node_modules/.bin/rollup -c"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.13.0",
+    "@babel/core": "^7.13.1",
+    "@babel/preset-env": "^7.13.5",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-commonjs": "^17.1.0",
+    "@rollup/plugin-node-resolve": "^11.2.0",
+    "html-loader": "^1.1.0",
+    "html-webpack-plugin": "^4.3.0",
+    "rollup": "^2.39.1",
+    "rollup-plugin-node-polyfills": "^0.2.1",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.11.0",
+    "webpack-node-externals": "^1.7.2"
   },
   "babel": {
     "presets": [
       "@babel/preset-env"
     ]
-  },
-  "devDependencies": {
-    "@babel/core": "^7.9.6",
-    "@babel/preset-env": "^7.9.6",
-    "babel-loader": "^8.1.0",
-    "html-loader": "^1.1.0",
-    "html-webpack-plugin": "^4.3.0",
-    "webpack-node-externals": "^1.7.2"
   },
   "browserslist": [
     "last 3 and_chr versions",

@@ -1,7 +1,6 @@
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import * as Mario from "./Mario"
 import { atan2s } from "../engine/math_util"
-import { ceil } from "mathjs"
 import { SURFACE_HANGABLE } from "../include/surface_terrains"
 
 const should_strengthen_gravity_for_jump_ascent = (m) => {

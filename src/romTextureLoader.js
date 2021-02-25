@@ -1,6 +1,5 @@
 import * as SkyboxSSL from "./textures/skyboxes/ssl_skybox"
 import * as SkyboxWater from "./textures/skyboxes/water_skybox"
-import { assets } from "./assets"
 
 
 import { castle_grounds_seg7_texture_07000000, castle_grounds_seg7_texture_07001000, castle_grounds_seg7_texture_07002000 } from "./levels/castle_grounds/texture.inc.js"
@@ -18,29 +17,6 @@ import {
     ttm_seg7_texture_07004000,
 } from "./levels/ttm/textures.inc.js"
 
-import {
-    gd_texture_mario_face_shine,
-    gd_texture_red_star_0,
-    gd_texture_red_star_1,
-    gd_texture_red_star_2,
-    gd_texture_red_star_3,
-    gd_texture_red_star_4,
-    gd_texture_red_star_5,
-    gd_texture_red_star_6,
-    gd_texture_red_star_7,
-    gd_texture_white_star_0,
-    gd_texture_white_star_1,
-    gd_texture_white_star_2,
-    gd_texture_white_star_3,
-    gd_texture_white_star_4,
-    gd_texture_white_star_5,
-    gd_texture_white_star_6,
-    gd_texture_white_star_7,
-    gd_texture_sparkle_0,
-    gd_texture_sparkle_1,
-    gd_texture_sparkle_2,
-    gd_texture_sparkle_3,
-    gd_texture_sparkle_4 } from "./goddard/GoddardRenderer"
 
 import { 
     outside_09000000,

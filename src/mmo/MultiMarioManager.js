@@ -2,12 +2,8 @@ import { Sm64JsMsg, MarioMsg, ControllerListMsg, ControllerMsg, MarioListMsg } f
 import zlib from "zlib"
 import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "./socket"
-import { defaultSkinData } from "./cosmetics"
 import { INTERACT_PLAYER } from "../game/Interaction"
-import { levelIdToName } from "../utils"
 import { gLinker } from "../game/Linker"
-
-const url = new URL(window.location.href)
 
 const rawDataMap = {
     0: RAW.oMarioPoleYawVel,
@@ -307,17 +303,6 @@ export const applyController = (controllerUpdate, marioState) => {
 
 }
 
-/*export const recvControllerUpdate = (controllerbytes) => {
-    zlib.inflate(controllerbytes, (err, buffer) => {
-        if (!err) {
-            const controllerListProto = ControllerListMsg.deserializeBinary(buffer).getControllerList()
-            controllerListProto.forEach(proto => {
-                applyController(proto)
-            })
-        }
-    })
-}*/
-
 export const recvPlayerLists = (playerListsProto) => {
 
     const rooms = playerListsProto.getGameList()
@@ -338,14 +323,6 @@ export const recvPlayerLists = (playerListsProto) => {
             }
         })
 
-    } else { /// still in a lobby
-
-        rooms.forEach(roomProto => {
-            const roomKey = roomProto.getLevelId()
-
-
-        })
-
     }
 
 }
@@ -353,24 +330,15 @@ export const recvPlayerLists = (playerListsProto) => {
 
 export const recvMarioData = (marioProto) => {
 
-    //console.log(marioProto)
-
-    //marioList.forEach(marioProto => {
-        const id = marioProto.getSocketid()
-        if (id == networkData.mySocketID) return
+    const id = marioProto.getSocketid()
+    if (id == networkData.mySocketID) return
 
     if (networkData.remotePlayers[id] == undefined) {
-            networkData.remotePlayers[id] = { 
-                marioState: initNewRemoteMarioState(marioProto),
-                skinData: defaultSkinData(),
-                crashCount: 0,
-                skipRender: 0,
-            }
-        } else {
-            /// already created... do nothing 
-            //updateRemoteMarioState(id, marioProto)
+        networkData.remotePlayers[id] = { 
+            marioState: initNewRemoteMarioState(marioProto),
+            crashCount: 0,
+            skipRender: 0,
         }
-    //})
-
+    }
 
 }

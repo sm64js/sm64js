@@ -1,6 +1,5 @@
 import { WebGLInstance as WebGL } from "./WebGL"
 import * as Gbi from "../include/gbi"
-import { getExtraRenderData, defaultSkinData } from "../mmo/cosmetics"
 import { flagCounter } from "../levels/castle_grounds/areas/1/11/model.inc"
 
 const precomp_shaders = [
@@ -948,8 +947,7 @@ export class n64GfxProcessor {
     }
 
     custom_set_player_data(socket_id) { 
-        const data = getExtraRenderData(socket_id)
-        this.customData3D = data.custom3D
+
     }
 
     run_dl(commands) {

@@ -16,42 +16,11 @@ import {
 
 import zlib from "zlib"
 import * as Multi from "./MultiMarioManager"
-import * as Cosmetics from "./cosmetics"
 import { updateFlagData, setInitFlagHeight } from "../game/behaviors/bhv_castle_flag_init.inc"
-import { recvChat, decrementChat } from "./chat"
-
-Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
-
-function myArrayBuffer() {
-    return new Promise((resolve) => {
-        let fr = new FileReader()
-        fr.onload = () => {
-            resolve(fr.result)
-        }
-        fr.readAsArrayBuffer(this)
-    })
-}
-
-const url = new URL(window.location.href)
-
-const getGameIdFromURL = () => {
-    if (url.searchParams.has("gameID")) return url.searchParams.get("gameID")
-    else if (url.searchParams.has("state")) {
-        const state = JSON.parse(decodeURIComponent(url.searchParams.get("state")))
-        return state.gameID
-    }
-
-    //else undefined
-}
-
-const gameID = getGameIdFromURL() 
 
 
-const websocketServerPath = process.env.NODE_ENV === 'rust'
-    ? `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/` // Tarnadas - Rust Server
-    : url.protocol == "https:" // Snuffy - sm64js.com
-        ? `ws://mmo-server-test.web:3000` // production
-        : `ws://localhost:3000` // local testing
+
+const websocketServerPath = `ws://localhost:3000` // local testing
 
 
 const socket = new WebSocket(websocketServerPath)
@@ -59,9 +28,6 @@ const socket = new WebSocket(websocketServerPath)
 export const networkData = {
     playerInteractions: true,
     remotePlayers: {},
-    mySocketID: -1,
-    lastSentSkinData: {},
-    announcement: { message: "", timer: 0 },
     flagData: undefined // defined later
 }
 
@@ -142,22 +108,14 @@ socket.onopen = () => {
                     case Sm64JsMsg.MessageCase.PING_MSG:
                         measureLatency(sm64jsMsg.getPingMsg())
                         break
-                    case Sm64JsMsg.MessageCase.CHAT_MSG:
-                        recvChat(sm64jsMsg.getChatMsg())
-                        break
-                    case Sm64JsMsg.MessageCase.SKIN_MSG:
-                        Cosmetics.recvSkinData(sm64jsMsg.getSkinMsg())
-                        break
-                    case Sm64JsMsg.MessageCase.ANNOUNCEMENT_MSG:
-                        recvAnnouncement(sm64jsMsg.getAnnouncementMsg())
-                        break
                     case Sm64JsMsg.MessageCase.INITIALIZATION_MSG:
                         const initializationMsg = sm64jsMsg.getInitializationMsg()
                         switch (initializationMsg.getMessageCase()) {
                             case InitializationMsg.MessageCase.AUTHORIZED_USER_MSG:
                                 recvAuthorizedUser(initializationMsg.getAuthorizedUserMsg()); break
                             case InitializationMsg.MessageCase.INIT_GAME_DATA_MSG:
-                                Cosmetics.recvPlayerNameResponse(initializationMsg.getInitGameDataMsg()); break
+                                break
+                                //Cosmetics.recvPlayerNameResponse(initializationMsg.getInitGameDataMsg()); break
                             default: throw "unknown case for initialization proto message"
                         }
                         break
@@ -165,14 +123,6 @@ socket.onopen = () => {
                 }
                 break
             case RootMsg.MessageCase.COMPRESSED_SM64JS_MSG:
-                return
-                if (!multiplayerReady()) return
-                const compressedBytes = rootMsg.getCompressedSm64jsMsg()
-                const buffer = await unzip(compressedBytes)
-                sm64jsMsg = Sm64JsMsg.deserializeBinary(buffer)
-                const listMsg = sm64jsMsg.getListMsg()
-                Multi.recvMarioData(listMsg.getMarioList())
-                recvFlagList(listMsg.getFlagList())
                 break
             case RootMsg.MessageCase.MESSAGE_NOT_SET:
             default:
@@ -180,15 +130,9 @@ socket.onopen = () => {
         }
     }
 
-    socket.onclose = () => { window.latency = null }
+    socket.onclose = () => { console.log("LOST connection to server") }
 }
 
-const recvAnnouncement = (announcementMsg) => {
-    networkData.announcement = {
-        message: announcementMsg.getMessage(),
-        timer: announcementMsg.getTimer()
-    }
-}
 
 const recvFlagList = (flaglist) => {
 
@@ -241,16 +185,6 @@ const multiplayerReady = () => {
     return socket && socket.readyState == 1 && gameData.marioState && networkData.mySocketID != -1
 }
 
-const updateConnectedMsg = () => {
-
-}
-
-export const send_controller_update = (frame) => {
-/*    if (multiplayerReady() && frame % 1 == 0) {
-        sendDataWithOpcode(Multi.createControllerProtoMsg().serializeBinary(), 3)
-    }*/
-}
-
 export const updateNetworkBeforeRender = () => {
 
     if (networkData.flagData == undefined) return
@@ -278,46 +212,11 @@ export const updateNetworkBeforeRender = () => {
 
 }
 
-const toSkinValue = (data) => {
-    if (Array.isArray(data)) {
-        let bytes = 0;
-        data.forEach((val, i) => {
-            bytes += (val & 0xff) * Math.pow(2, 8 * i)
-        })
-        const skinValue = new SkinValue()
-        skinValue.setBytes(bytes)
-        return skinValue
-    }
-
-    if (data === "r") {
-        const skinValue = new SkinValue()
-        skinValue.setSpecial(SkinValue.SpecialSkinValues.RAINBOW)
-        return skinValue
-    }
-
-    throw new Error(`Could not create skinValue from ${data}`)
-}
-
 export const post_main_loop_one_iteration = async (frame) => {
 
-	//Update the rainbows colors
-	if (frame % 2 == 0) Cosmetics.updateRainbowSkin()
 	
-    if (frame % 30 == 0) updateConnectedMsg()
-
     if (multiplayerReady()) {
 
-        if (!networkData.requestedInitData) {
-            const initializationMsg = new InitializationMsg()
-            initializationMsg.setRequestCosmeticsMsg(new RequestCosmeticsMsg())
-            const sm64jsMsg = new Sm64JsMsg()
-            sm64jsMsg.setInitializationMsg(initializationMsg)
-            const rootMsg = new RootMsg()
-            rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-            sendData(rootMsg.serializeBinary())
-
-            networkData.requestedInitData = true
-        }
 
         if (frame % 150 == 0) { //every 5 seconds
             /// ping to measure latency
@@ -329,48 +228,18 @@ export const post_main_loop_one_iteration = async (frame) => {
             rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
             sendData(rootMsg.serializeBinary())
 
-            //send skins if updated
-            if (Cosmetics.validSkins()) {
-                if (JSON.stringify(window.myMario.skinData) !== networkData.lastSentSkinData) {
-                    networkData.lastSentSkinData = JSON.stringify(window.myMario.skinData)
-                    const skinData = window.myMario.skinData
-
-                    const skinDataMsg = new SkinData()
-                    skinDataMsg.setOveralls(toSkinValue(skinData.overalls))
-                    skinDataMsg.setHat(toSkinValue(skinData.hat))
-                    skinDataMsg.setShirt(toSkinValue(skinData.shirt))
-                    skinDataMsg.setGloves(toSkinValue(skinData.gloves))
-                    skinDataMsg.setBoots(toSkinValue(skinData.boots))
-                    skinDataMsg.setSkin(toSkinValue(skinData.skin))
-                    skinDataMsg.setHair(toSkinValue(skinData.hair))
-                    skinDataMsg.setCustomcapstate(skinData.customCapState)
-                    const skinMsg = new SkinMsg()
-                    skinMsg.setSkindata(skinDataMsg)
-                    const sm64jsMsg = new Sm64JsMsg()
-                    sm64jsMsg.setSkinMsg(skinMsg)
-                    const rootMsg = new RootMsg()
-                    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-            
-                    socket.send(rootMsg.serializeBinary(), true)
-                }
-            }
         }
 
 
-        //// Do not send Mario
-        if (frame % 1 == 0) { /// every frame send mario data
-            const sm64jsMsg = new Sm64JsMsg()
-            sm64jsMsg.setListMsg(Multi.createAllMarioMsg())
-            const bytes = sm64jsMsg.serializeBinary()
-            const compressedBytes = await zip(bytes)
-            const testbytes = await unzip(compressedBytes)
-            const rootMsg = new RootMsg()
-            rootMsg.setCompressedSm64jsMsg(compressedBytes)
-            sendData(rootMsg.serializeBinary())
-        }
+         /// every frame send ALL mario data
+        const sm64jsMsg = new Sm64JsMsg()
+        sm64jsMsg.setListMsg(Multi.createAllMarioMsg())
+        const bytes = sm64jsMsg.serializeBinary()
+        const compressedBytes = await zip(bytes)
+        const rootMsg = new RootMsg()
+        rootMsg.setCompressedSm64jsMsg(compressedBytes)
+        sendData(rootMsg.serializeBinary())
     }
-
-    decrementChat()
 
     if (gameData.marioState && networkData.flagData != undefined) checkForFlagGrab()
 }
@@ -410,27 +279,6 @@ const checkForFlagGrab = () => {
     
 }
 
-export const sendPlayerInteraction = (socket_id, interaction) => {
-    //socket.emit('playerInteract', { socket_id, interaction }, { reliable: true })
-}
-
-export const submitPlayerName = () => {
-
-
-
-}
-
-export const sendChat = ({ message }) => {
-
-    const chatMsg = new ChatMsg()
-    if (window.admin && window.admin.token) chatMsg.setAdmintoken(window.admin.token)
-    chatMsg.setMessage(message)
-    const sm64jsMsg = new Sm64JsMsg()
-    sm64jsMsg.setChatMsg(chatMsg)
-    const rootMsg = new RootMsg()
-    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-    sendData(rootMsg.serializeBinary())
-}
 
 
 const recvAuthorizedUser = (msg) => {
@@ -451,12 +299,6 @@ const recvAuthorizedUser = (msg) => {
         const rootMsg = new RootMsg()
         rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
         sendData(rootMsg.serializeBinary())
-    } else { //authorization fail - refresh page without access code
-
-        if (msg.getStatus() == 2) { // refreshing won't help
-        } else {
-
-        }
+    } 
     }
-}
 

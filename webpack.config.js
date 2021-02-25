@@ -1,8 +1,5 @@
-const webpack = require("webpack")
 const HtmlWebPackPlugin = require("html-webpack-plugin")
-const MiniCssExtractPlugin = require("mini-css-extract-plugin")
-const OptimizeCSSAssetsWebpackPlugin = require("optimize-css-assets-webpack-plugin")
-const TerserWebpackPlugin = require("terser-webpack-plugin")
+
 const express = require('express')
 const path = require('path')
 
@@ -14,13 +11,6 @@ module.exports = env => ({
                 test: /\.(js)$/,
                 exclude: /node_modules/,
                 use: ['babel-loader']
-            },
-            {
-                test: /\.(css)$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    "css-loader"
-                ]
             },
             {
                 test: /\.html$/,
@@ -38,23 +28,9 @@ module.exports = env => ({
         }
     },
     plugins: [
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify(env || 'development'),
-            'process.env.PRODUCTION': JSON.stringify(process.env.PRODUCTION)
-        }),
         new HtmlWebPackPlugin({
             template: "./src/index.html",
             filename: "./index.html"
-        }),
-        new MiniCssExtractPlugin({
-            filename: "template.css",
-            chunkFilename: "[id].css"
         })
     ],
-    optimization: {
-        minimizer: [
-            new TerserWebpackPlugin({}),
-            new OptimizeCSSAssetsWebpackPlugin({})
-        ]
-    },
 })

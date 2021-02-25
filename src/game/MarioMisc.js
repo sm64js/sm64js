@@ -1,6 +1,4 @@
-import { GoddardRendererInstance as GoddardRenderer } from "../goddard/GoddardRenderer"
-import { GameInstance as Game } from "./Game"
-import { GEO_CONTEXT_RENDER, GEO_CONTEXT_CREATE } from "../engine/graph_node"
+import { GEO_CONTEXT_RENDER } from "../engine/graph_node"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import * as Mario from "./Mario"
 import { get_pos_from_transform_mtx } from "../engine/math_util"
@@ -17,18 +15,7 @@ class MarioMisc {
         this.parachuting = 0
     }
 
-    geo_draw_mario_head_goddard(callContext, node) {
 
-        let gfx = []
-        const asGenerated = node.wrapper
-        if (callContext == GEO_CONTEXT_CREATE) { // Create
-        } else if (callContext == GEO_CONTEXT_RENDER) { // Render
-            gfx = GoddardRenderer.gdm_gettestdl(asGenerated.param)
-            Game.D_8032C6A0_vsyncFunc = GoddardRenderer.gd_vblank
-            Game.D_8032C6A0_classObject = GoddardRenderer
-        }
-        return gfx 
-    }
 
     geo_mario_tilt_torso(callContext, node, mtx) {
 

@@ -487,7 +487,6 @@ class GeoRenderer {
 
             this.gCurGraphNodeObject = object.header.gfx
             MarioMisc.gBodyState = object.marioState.marioBodyState
-            MarioMisc.customCapState = networkData.remotePlayers[remote_socket_id].skinData.customCapState
 
             MarioMisc.parachuting = object.marioState.parachuting && object.marioState.vel[1] < 0.0
             this.geo_process_single_node(object.header.gfx.sharedChild)

@@ -3,7 +3,6 @@ import * as MarioConstants from "../include/mario_constants"
 import { perform_air_step, mario_bonk_reflection } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
 import { oMarioSteepJumpYaw } from "../include/object_constants"
-import { CameraInstance as Camera } from "./Camera"
 
 
 const update_air_without_turn = (m) => {
@@ -621,7 +620,6 @@ const act_ground_pound = (m) => {
             m.particleFlags |= MarioConstants.PARTICLE_MIST_CIRCLE | MarioConstants.PARTICLE_HORIZONTAL_STAR
             Mario.set_mario_action(m, Mario.ACT_GROUND_POUND_LAND, 0)
 
-            Camera.set_camera_shake_from_hit(Camera.SHAKE_GROUND_POUND)
         } else if (stepResult == Mario.AIR_STEP_HIT_WALL) {
             if (m.wall) {
                 if (m.vel[1] > 0.0) m.vel[1] = 0.0

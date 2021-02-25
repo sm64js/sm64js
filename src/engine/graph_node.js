@@ -1,5 +1,4 @@
-import { CameraInstance } from "../game/Camera"
-import { G_CC_DECALRGB } from "../include/gbi"
+import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { GeoLayoutInstance as GeoLayout } from "./GeoLayout"
 import { GeoRendererInstance as GeoRenderer } from "./GeoRenderer"
 import * as Mario from "../game/Mario"
@@ -361,10 +360,6 @@ export const init_graph_node_perspective = (pool, graphNode, fov, near, far, nod
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_PERSPECTIVE)
 
-    if (nodeFunc) {
-        if (nodeFunc != CameraInstance.geo_camera_fov) throw "check to make sure the function apart of the Camera Class"
-        nodeFunc.call(CameraInstance, GEO_CONTEXT_CREATE, graphNode)
-    }
 
   return graphNode
 
@@ -442,10 +437,6 @@ export const init_graph_node_camera = (pool, graphNode, pos, focus, func, mode) 
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_CAMERA)
 
-    if (func) {
-        if (func != CameraInstance.geo_camera_main) throw "check to make sure the function apart of the Camera Class"
-        func.call(CameraInstance, GEO_CONTEXT_CREATE, graphNode)
-    }
 
     return graphNode
 

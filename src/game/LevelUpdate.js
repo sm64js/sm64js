@@ -1,7 +1,6 @@
 import { AreaInstance as Area, WARP_TRANSITION_FADE_FROM_STAR, WARP_TRANSITION_FADE_FROM_COLOR } from "./Area"
 import { COURSE_NONE } from "../levels/course_defines"
 import * as Mario from "./Mario"
-import { CameraInstance as Camera } from "./Camera"
 
 const PLAY_MODE_NORMAL  =  0
 const PLAY_MODE_PAUSED  =  2
@@ -42,7 +41,6 @@ class LevelUpdate {
         Area.gCurrCreditsEntry = null
 
         Mario.init_mario_from_save_file()
-        Camera.select_mario_cam_mode()
 
         return levelNum
     }
@@ -67,7 +65,7 @@ class LevelUpdate {
             }
 
             if (Area.gCurrentArea) {
-                Camera.reset_camera(Area.gCurrentArea.camera)
+                //Camera.reset_camera(Area.gCurrentArea.camera)
             }
 
             if (val4 != 0) {
@@ -87,7 +85,7 @@ class LevelUpdate {
         Area.area_update_objects()
 
         if (Area.gCurrentArea) {
-            Camera.update_camera(Area.gCurrentArea.camera)
+            //Camera.update_camera(Area.gCurrentArea.camera)
         }
 
         return 0

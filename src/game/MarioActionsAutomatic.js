@@ -230,7 +230,7 @@ const act_holding_pole = (m) => {
 
 const act_climbing_pole = (m) => {
     const marioObj = m.marioObj
-    const cameraAngle = m.area.camera.yaw
+    const cameraAngle = m.controller.cameraYaw
 
     if (m.input & Mario.INPUT_A_PRESSED) {
         //add_tree_leaf_particles(m) TODO

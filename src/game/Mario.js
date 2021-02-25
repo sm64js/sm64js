@@ -1,7 +1,6 @@
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { AreaInstance as Area } from "./Area"
 import { MarioMiscInstance as MarioMisc } from "./MarioMisc"
-import { CameraInstance as Camera } from "./Camera"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
 import { GRAPH_RENDER_INVISIBLE, geo_update_animation_frame, retrieve_animation_index } from "../engine/graph_node"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
@@ -1175,14 +1174,6 @@ const update_mario_inputs = (m) => {
 
     if (m.controller && m.controller.taunt && (m.action == ACT_IDLE || m.action == ACT_TAUNT)) m.input |= INPUT_TAUNT
 
-    if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) {
-        if (m.action & ACT_FLAG_ALLOW_FIRST_PERSON) {
-            m.input |= INPUT_FIRST_PERSON;
-        } else {
-            Camera.gCameraMovementFlags &= ~Camera.CAM_MOVE_C_UP_MODE;
-        }
-    }
-
     if (!(m.input & (INPUT_NONZERO_ANALOG | INPUT_A_PRESSED))) {
         m.input |= INPUT_UNKNOWN_5;
     }
@@ -1203,12 +1194,12 @@ const update_mario_inputs = (m) => {
 
 const update_mario_info_for_cam = (m) => {
     m.marioBodyState.action = m.action
-    m.statusForCamera.action = m.action
+    //m.statusForCamera.action = m.action
 
-    m.statusForCamera.faceAngle = [...m.faceAngle]
+    //m.statusForCamera.faceAngle = [...m.faceAngle]
 
     if ((m.flags & MARIO_UNKNOWN_25) == 0) {
-        m.statusForCamera.pos = [...m.pos]
+        //m.statusForCamera.pos = [...m.pos]
     }
 }
 
@@ -1217,7 +1208,6 @@ export const init_mario_from_save_file = () => {
     Object.assign(LevelUpdate.gMarioState, {
         unk00: 0, flags: 0, action: 0,
         spawnInfo: Area.gMarioSpawnInfo,
-        statusForCamera: Camera.gPlayerCameraState,
         marioBodyState: MarioMisc.gBodyState,
         animation: { targetAnim: null },
         numCoins: 0, numStars: 0, numKeys: 0,

@@ -4,14 +4,11 @@ import { SpawnObjectInstance as Spawn } from "../SpawnObject"
 import { cur_obj_scale, spawn_object } from "../ObjectHelpers"
 import { MODEL_SMOKE } from "../../include/model_ids"
 import { bhvBobombBullyDeathSmoke } from "../BehaviorData"
-import { CameraInstance as Camera } from "../Camera"
 
 export const bhv_explosion_init = () => {
 
     //TODO Sound Explosion
     const o = ObjectListProc.gCurrentObject
-
-    Camera.set_environmental_camera_shake(Camera.SHAKE_ENV_EXPLOSION)
 
     o.rawData[oOpacity] = 255
 }

@@ -2,7 +2,6 @@ import * as GraphNode from "./graph_node"
 import * as MathUtil from "./math_util"
 import { GameInstance as Game } from "../game/Game"
 import * as Gbi from "../include/gbi"
-import { CameraInstance as Camera } from "../game/Camera"
 import * as Mario from "../game/Mario"
 import { networkData } from "../mmo/socket"
 import { MarioMiscInstance as MarioMisc } from "../game/MarioMisc"
@@ -110,11 +109,6 @@ class GeoRenderer {
 
     geo_process_perspective(node) {
                 
-        if (node.wrapper.fnNode.func) {
-            if (node.wrapper.fnNode.func != Camera.geo_camera_fov)
-                throw "geo process perspective "
-           node.wrapper.fnNode.func.call(Camera, GraphNode.GEO_CONTEXT_RENDER, node.wrapper)
-        }
 
         if (node.children[0]) {
             const aspect = canvas.width / canvas.height
@@ -135,11 +129,6 @@ class GeoRenderer {
 
     geo_process_camera(node) {
 
-        if (node.wrapper.fnNode.func) {
-            if (node.wrapper.fnNode.func != Camera.geo_camera_main)
-                throw "geo process perspective "
-           node.wrapper.fnNode.func.call(Camera, GraphNode.GEO_CONTEXT_RENDER, node.wrapper)
-        }
 
         const rollMtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const cameraTransform = new Array(4).fill(0).map(() => new Array(4).fill(0))

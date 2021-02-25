@@ -155,6 +155,9 @@ class GeoLayout {
         argIndex += copy3argsToObject(focus, argIndex, args)
 
         const graphNode = GraphNode.init_graph_node_camera(null, null, pos, focus, func, cameraType)
+        graphNode.rollScreen = 0//this.gLakituState.roll
+        graphNode.pos = [-1000, 2000, 7000]
+        graphNode.focus = [-2000, 0, 2000]
 
         GraphNode.register_scene_graph_node(this, graphNode)
 

@@ -1,10 +1,7 @@
 import { WebGLInstance as WebGL } from "./WebGL"
 import * as Gbi from "../include/gbi"
-import { getExtraRenderData } from "../mmo/cosmetics"
+import { getExtraRenderData, defaultSkinData } from "../mmo/cosmetics"
 import { flagCounter } from "../levels/castle_grounds/areas/1/11/model.inc"
-import { customData2D, custom_draw_text, draw2Dpost3Drendering } from "../mmo/graphics/2Dgraphics"
-const canvas2d = document.querySelector('#textCanvas')
-
 
 const precomp_shaders = [
     0x01200200,
@@ -120,35 +117,6 @@ export class n64GfxProcessor {
         })
     }
 
-    start_frame(){
-        const dstCanvas = document.getElementById("fullCanvas")
-
-        if (window.fullWindowMode || document.fullscreenElement) {
-            const dstCtx = dstCanvas.getContext("2d")
-            dstCanvas.hidden = false
-            WebGL.canvas.hidden = true
-            canvas2d.hidden = true
-            if (window.fullWindowMode) {
-                const windowAspect = window.innerWidth / window.innerHeight
-                if (windowAspect > 1.33) { /// wider than tall
-                    dstCanvas.height = window.innerHeight
-                    dstCanvas.width = window.innerHeight * 1.33
-                } else {  /// taller than wide
-                    dstCanvas.width = window.innerWidth
-                    dstCanvas.height = window.innerWidth / 1.33
-                }
-                window.scrollTo(0, 0)
-                document.body.style.overflowY = "hidden"
-            }
-            dstCtx.drawImage(WebGL.canvas, 0, 0, dstCanvas.width, dstCanvas.height)
-            dstCtx.drawImage(canvas2d, 0, 0, dstCanvas.width, dstCanvas.height)
-        } else {  /// normal mode
-            WebGL.canvas.hidden = false
-            dstCanvas.hidden = true
-            canvas2d.hidden = false
-            document.body.style.overflowY = "scroll"
-        }
-    }
 
     sp_reset() {
         this.rsp.modelview_matrix_stack_size = 1
@@ -957,7 +925,7 @@ export class n64GfxProcessor {
             d.u = U; d.v = V
 
             if (v.special == "nameplate" && w < 2000 && !d.clip_rej) {
-                custom_draw_text(x, y, w)
+                //custom_draw_text(x, y, w)
             }
 
             Object.assign(d, { x, y, z, w })
@@ -982,9 +950,6 @@ export class n64GfxProcessor {
     custom_set_player_data(socket_id) { 
         const data = getExtraRenderData(socket_id)
         this.customData3D = data.custom3D
-        customData2D.chat = data.custom2D.chat
-        customData2D.playerName = data.custom2D.playerName
-        customData2D.announcement = data.custom2D.announcement
     }
 
     run_dl(commands) {
@@ -1093,11 +1058,8 @@ export class n64GfxProcessor {
         window.totalTriangles = 0
         this.sp_reset()
         WebGL.start_frame()
-        canvas2d.width = canvas2d.width
         this.run_dl(commands)
         this.flush()
-
-        draw2Dpost3Drendering()
 
     }
 }

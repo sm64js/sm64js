@@ -324,10 +324,6 @@ export const recvPlayerLists = (playerListsProto) => {
 
     if (window.playerNameAccepted) { // joined a game
 
-        if (rooms.length != 1) {
-            console.log("ignoring data ", rooms.length)
-            return
-        }
 
         const roomProto = rooms[0]
         const level = roomProto.getLevelId() 
@@ -347,16 +343,7 @@ export const recvPlayerLists = (playerListsProto) => {
         rooms.forEach(roomProto => {
             const roomKey = roomProto.getLevelId()
 
-            const mapSelecter = document.getElementById("mapSelect")
 
-            for (let i = 0; i < mapSelecter.length; i++) {
-                if (mapSelecter[i].value == roomKey) {
-                    mapSelecter[i].innerHTML =
-                        `<p style="color:blue">${levelIdToName[roomKey]}</p> 
-                     <p style="color:blue"> - Online Players: ${roomProto.getValidplayersList().length}</p>`
-
-                }
-            }
         })
 
     }

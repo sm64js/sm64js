@@ -3,9 +3,7 @@ import * as SkyboxWater from "./textures/skyboxes/water_skybox"
 import { assets } from "./assets"
 
 
-import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_texture_0700B4A0, intro_seg7_texture_0700C4A0 } from "./levels/intro/leveldata"
 import { castle_grounds_seg7_texture_07000000, castle_grounds_seg7_texture_07001000, castle_grounds_seg7_texture_07002000 } from "./levels/castle_grounds/texture.inc.js"
-import { title_texture_0A0001C0, title_texture_0A000E40, title_texture_0A001AC0, title_texture_0A002740 } from "./levels/intro/title_screen_bg"
 import { tree_seg3_texture_0302DE28, tree_seg3_texture_0302EE28, tree_seg3_texture_0302FF60, tree_seg3_texture_03031048, tree_seg3_texture_03032218 } from "./actors/tree/model.inc"
 import { texture_shadow_quarter_circle, texture_waterbox_water, texture_waterbox_lava, texture_transition_star_half } from "./common_gfx/segment2"
 
@@ -321,11 +319,6 @@ const textureVersion = 27
 
 const loadDataIntoGame = (data) => {
 
-    intro_seg7_texture_070086A0.push(...data['levels/intro/1.rgba16.png'].data)
-    intro_seg7_texture_07007EA0.push(...data['levels/intro/0.rgba16.png'].data)
-    intro_seg7_texture_0700B4A0.push(...data['levels/intro/2_copyright.rgba16.png'].data)
-    intro_seg7_texture_0700C4A0.push(...data['levels/intro/3_tm.rgba16.png'].data)
-
     castle_grounds_seg7_texture_07000000.push(...data['levels/castle_grounds/0.rgba16.png'].data)
     castle_grounds_seg7_texture_07001000.push(...data['levels/castle_grounds/1.rgba16.png'].data)
     castle_grounds_seg7_texture_07002000.push(...data['levels/castle_grounds/2.rgba16.png'].data)
@@ -338,29 +331,6 @@ const loadDataIntoGame = (data) => {
 	ttm_seg7_texture_07002800.push(...data['levels/ttm/5.rgba16.png'].data)
 	ttm_seg7_texture_07003000.push(...data['levels/ttm/6.rgba16.png'].data)
 	ttm_seg7_texture_07004000.push(...data['levels/ttm/7.rgba16.png'].data)
-	
-    gd_texture_mario_face_shine.push(...data['textures/intro_raw/mario_face_shine.ia8.png'].data)
-    gd_texture_red_star_0.push(...data['textures/intro_raw/red_star_0.rgba16.png'].data)
-    gd_texture_red_star_1.push(...data['textures/intro_raw/red_star_1.rgba16.png'].data)
-    gd_texture_red_star_2.push(...data['textures/intro_raw/red_star_2.rgba16.png'].data)
-    gd_texture_red_star_3.push(...data['textures/intro_raw/red_star_3.rgba16.png'].data)
-    gd_texture_red_star_4.push(...data['textures/intro_raw/red_star_4.rgba16.png'].data)
-    gd_texture_red_star_5.push(...data['textures/intro_raw/red_star_5.rgba16.png'].data)
-    gd_texture_red_star_6.push(...data['textures/intro_raw/red_star_6.rgba16.png'].data)
-    gd_texture_red_star_7.push(...data['textures/intro_raw/red_star_7.rgba16.png'].data)
-    gd_texture_white_star_0.push(...data['textures/intro_raw/white_star_0.rgba16.png'].data)
-    gd_texture_white_star_1.push(...data['textures/intro_raw/white_star_1.rgba16.png'].data)
-    gd_texture_white_star_2.push(...data['textures/intro_raw/white_star_2.rgba16.png'].data)
-    gd_texture_white_star_3.push(...data['textures/intro_raw/white_star_3.rgba16.png'].data)
-    gd_texture_white_star_4.push(...data['textures/intro_raw/white_star_4.rgba16.png'].data)
-    gd_texture_white_star_5.push(...data['textures/intro_raw/white_star_5.rgba16.png'].data)
-    gd_texture_white_star_6.push(...data['textures/intro_raw/white_star_6.rgba16.png'].data)
-    gd_texture_white_star_7.push(...data['textures/intro_raw/white_star_7.rgba16.png'].data)
-    gd_texture_sparkle_0.push(...data['textures/intro_raw/sparkle_0.rgba16.png'].data)
-    gd_texture_sparkle_1.push(...data['textures/intro_raw/sparkle_1.rgba16.png'].data)
-    gd_texture_sparkle_2.push(...data['textures/intro_raw/sparkle_2.rgba16.png'].data)
-    gd_texture_sparkle_3.push(...data['textures/intro_raw/sparkle_3.rgba16.png'].data)
-    gd_texture_sparkle_4.push(...data['textures/intro_raw/sparkle_4.rgba16.png'].data)
 
     mountain_09000000.push(...data['textures/mountain/ttm_textures.00000.rgba16.png'].data)
     mountain_09000800.push(...data['textures/mountain/ttm_textures.00800.rgba16.png'].data)
@@ -383,11 +353,6 @@ const loadDataIntoGame = (data) => {
     mountain_0900B000.push(...data['textures/mountain/ttm_textures.0B000.rgba16.png'].data)
     mountain_0900B800.push(...data['textures/mountain/ttm_textures.0B800.rgba16.png'].data)
     mountain_0900C000.push(...data['textures/mountain/ttm_textures.0C000.rgba16.png'].data)
-
-    title_texture_0A0001C0.push(...data['textures/title_screen_bg/title_screen_bg.001C0.rgba16.png'].data)
-    title_texture_0A000E40.push(...data['textures/title_screen_bg/title_screen_bg.00E40.rgba16.png'].data)
-    title_texture_0A001AC0.push(...data['textures/title_screen_bg/title_screen_bg.01AC0.rgba16.png'].data)
-    title_texture_0A002740.push(...data['textures/title_screen_bg/title_screen_bg.02740.rgba16.png'].data)
 
     outside_09000000.push(...data['textures/outside/castle_grounds_textures.00000.rgba16.png'].data)
     outside_09001000.push(...data['textures/outside/castle_grounds_textures.01000.rgba16.png'].data)
@@ -758,18 +723,14 @@ const loadDataIntoGame = (data) => {
     SkyboxWater.water_skybox_texture_0003E.push(...data["water_skybox_texture_0003E"].data)
     SkyboxWater.water_skybox_texture_0003F.push(...data["water_skybox_texture_0003F"].data)
 
-    document.getElementById('romSelect').hidden = true
-    msgElement.innerHTML = "Rom Asset Extraction Success"
-    msgElement.style = "color:#00ff00"
-    document.getElementById("startbutton").disabled = false
+
     loadedGameAssets = true
 
 }
 
 const processExtractedResults = (data) => {
     if (data == 'Fail') {
-        msgElement.innerHTML = "Rom Asset Extraction Fail"
-        msgElement.style = "color:red"
+
     } else {  /// Success
         data.textureVersion = textureVersion
         const stringified = JSON.stringify(data)
@@ -927,16 +888,6 @@ const extractAssetsFromRom = (romBufferData) => {
     processExtractedResults(extractedData)
 }
 
-$('#romSelect').submit(
-    (e) => {
-        e.preventDefault()
-        if (loadedGameAssets) return
-        const romFile = document.getElementById('romFile').files[0]
-        const reader = new FileReader()
-        reader.readAsArrayBuffer(romFile)
-        reader.onload = (evt) => { extractAssetsFromRom(evt.target.result) }
-    }
-)
 
 /*        msgElement.innerHTML = "Please wait for ROM to be uploaded and game assets to be sent back to your device..."
         msgElement.style = "color:yellow"

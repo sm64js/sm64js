@@ -45,13 +45,13 @@ const getGameIdFromURL = () => {
 }
 
 const gameID = getGameIdFromURL() 
-if (gameID) { document.getElementById("mapSelect").hidden = true }
+
 
 const websocketServerPath = process.env.NODE_ENV === 'rust'
     ? `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/` // Tarnadas - Rust Server
     : url.protocol == "https:" // Snuffy - sm64js.com
         ? `ws://mmo-server-test.web:3000` // production
-        : `ws://mmo-server-test.web:3000` // local testing
+        : `ws://localhost:3000` // local testing
 
 
 const socket = new WebSocket(websocketServerPath)
@@ -242,15 +242,7 @@ const multiplayerReady = () => {
 }
 
 const updateConnectedMsg = () => {
-    const elem = document.getElementById("connectedMsg")
-    const numPlayers = networkData.numOnline ? networkData.numOnline : "?"
-    if (socket && socket.readyState == 1) {
-        elem.innerHTML = "Connected To Server  -  " + (numPlayers).toString() + " Players Online" 
-        elem.style.color = "lawngreen"
-    } else {
-        elem.innerHTML = "Not connected to server - Refresh the page"
-        elem.style.color = "red"
-    }
+
 }
 
 export const send_controller_update = (frame) => {
@@ -424,30 +416,7 @@ export const sendPlayerInteraction = (socket_id, interaction) => {
 
 export const submitPlayerName = () => {
 
-    const joinGameMsg = new JoinGameMsg()
 
-    if (document.getElementById("customNameRow").hidden) { /// Discord Name Option
-        joinGameMsg.setUseDiscordName(true)
-    } else { // Custom Name Option
-        joinGameMsg.setUseDiscordName(false)
-        const name = document.getElementById("playerNameInput").value
-        if (name.length >= 3) {
-            joinGameMsg.setName(name)
-        } else {
-            //return Cosmetics.shakePlayerNameInput()
-        }
-    }
-
-    const level = gameID ? 0 : parseInt(document.getElementById("mapSelect").value)
-    joinGameMsg.setLevel(level)
-    if (gameID) { joinGameMsg.setGameId(gameID) }
-    const initializationMsg = new InitializationMsg()
-    initializationMsg.setJoinGameMsg(joinGameMsg)
-    const sm64jsMsg = new Sm64JsMsg()
-    sm64jsMsg.setInitializationMsg(initializationMsg)
-    const rootMsg = new RootMsg()
-    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-    sendData(rootMsg.serializeBinary())
 
 }
 
@@ -463,50 +432,11 @@ export const sendChat = ({ message }) => {
     sendData(rootMsg.serializeBinary())
 }
 
-const redirect_uri = encodeURIComponent(url.protocol == "https:" ? 'https://sm64js.com' : 'http://localhost:9300')
-
-const discord_client_id = process.env.DISCORD_CLIENT_ID
-const discordOAuthURL = "https://discord.com/api/oauth2/authorize?client_id=" + discord_client_id + "&redirect_uri=" + redirect_uri + "&response_type=code&scope=identify"
-
-const google_client_id = process.env.GOOGLE_CLIENT_ID + ".apps.googleusercontent.com"
-const googleOAuthURL = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=" + google_client_id + "&redirect_uri=" + redirect_uri + "&scope=email" 
-
-if (url.searchParams.has('code') || process.env.PRODUCTION == undefined) document.getElementById("signinButtons").hidden = true
-
-document.getElementById("switchCustom").addEventListener('click', (e) => {
-    e.preventDefault()
-    document.getElementById("customNameRow").hidden = false
-    document.getElementById("discordNameRow").hidden = true
-})
-
-document.getElementById("switchDiscord").addEventListener('click', (e) => {
-    e.preventDefault()
-    document.getElementById("customNameRow").hidden = true
-    document.getElementById("discordNameRow").hidden = false
-})
-
-document.getElementById("discordSigninButton").addEventListener('click', () => {
-    const state = { type: "discord" }
-    if (gameID) state.gameID = gameID
-    window.location = `${discordOAuthURL}&state=${ encodeURIComponent(JSON.stringify(state)) }`
-})
-
-document.getElementById("googleSigninButton").addEventListener('click', () => {
-    const state = { type: "google" }
-    if (gameID) state.gameID = gameID
-    window.location = `${googleOAuthURL}&state=${encodeURIComponent(JSON.stringify(state))}`
-})
 
 const recvAuthorizedUser = (msg) => {
 
     if (msg.getStatus() == 1) {
-        document.getElementById("playerNameRow").hidden = false
-        document.getElementById("discordNameBox").value = msg.getUsername()
-        if (msg.getUsername() == "") { /// Discord Username option not available
-            document.getElementById("customNameRow").hidden = false
-            document.getElementById("discordNameRow").hidden = true
-            document.getElementById("switchDiscord").hidden = true
-        }
+
 
         const joinGameMsg = new JoinGameMsg()
         joinGameMsg.setName("server2")
@@ -522,16 +452,10 @@ const recvAuthorizedUser = (msg) => {
         rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
         sendData(rootMsg.serializeBinary())
     } else { //authorization fail - refresh page without access code
-        document.getElementById("authFailMsg").innerHTML = "Authorization Fail: " + msg.getMessage()
-        document.getElementById("authFailMsg").hidden = false
+
         if (msg.getStatus() == 2) { // refreshing won't help
         } else {
-            document.getElementById("authFailMsg").innerHTML += `<br/> Please Try Again - Auto refreshing in 3 seconds`
-            setTimeout(() => {
-                let params = url.searchParams
-                params.delete('code')
-                window.location.search = params
-            }, 3000)
+
         }
     }
 }

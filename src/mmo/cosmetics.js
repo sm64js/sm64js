@@ -40,72 +40,11 @@ const hatShirtPresets = [
     [ 0x7f, 0x7f, 0x00, 0xff, 0xff, 0x00 ]
 ]
 
-window.updateSkinID = (skinID) => {
-    window.myMario.skinData = defaultSkinData()
-    window.myMario.skinData.overalls = overallsPresets[skinID]
-    window.myMario.skinData.hat = hatShirtPresets[skinID]
-    window.myMario.skinData.shirt = hatShirtPresets[skinID]
-
-    /// Save all
-    Object.keys(window.myMario.skinData).forEach((skinType) => {
-        localStorage[`skinData-${skinType}`] = JSON.stringify(window.myMario.skinData[skinType])
-    })
-}
-
-const skinCustomizerHtml = $('#skinCustomizerWindow').detach()
-
-window.setSkinSliderValues = () => {
-    /// set default values
-    let skinType = document.getElementById("skinTypes").value
-    for (let i = 0; i < 6; i++) {
-        document.getElementById("skinSliderRangeDisplay" + i).innerHTML = window.myMario.skinData[skinType][i]
-        const slider = document.getElementById("skinSliderValue" + i)
-        slider.value = window.myMario.skinData[skinType][i]
-        const percent = (slider.value / 255) * 100
-        const color = getComputedStyle(slider).borderColor
-        slider.style.background = 'linear-gradient(to right, ' + color + ' 0%, ' + color + ' ' + percent + '%, #fff ' + percent + '%, white 100%)'
-    }
-}
-
-
-
-window.toggleCapState = () => {
-    window.myMario.skinData.customCapState = window.myMario.skinData.customCapState == 1 ? 0 : 1
-    localStorage[`skinData-customCapState`] = JSON.stringify(window.myMario.skinData.customCapState)
-}
-
-window.customSkinUpdate = (slider) => {
-    let color = getComputedStyle(slider).borderColor
-
-    let percent = (slider.value / 255) * 100
-    slider.style.background = 'linear-gradient(to right, ' + color + ' 0%, ' + color + ' ' + percent + '%, #fff ' + percent + '%, white 100%)'
-
-    let index = slider.id.slice(-1)
-    document.getElementById("skinSliderRangeDisplay" + index).innerHTML = slider.value
-
-    let skinType = document.getElementById("skinTypes").value
-    let newValue = parseInt(document.getElementById("skinSliderValue" + index).value)
-    window.myMario.skinData[skinType][index] = newValue
-
-    if (index > 2) {
-        index -= 3
-        newValue = parseInt(newValue / 2)
-        slider = document.getElementById("skinSliderValue" + index)
-        slider.value = newValue
-        color = getComputedStyle(slider).borderColor
-        percent = (slider.value / 255) * 100
-        slider.style.background = 'linear-gradient(to right, ' + color + ' 0%, ' + color + ' ' + percent + '%, #fff ' + percent + '%, white 100%)'
-
-        document.getElementById("skinSliderRangeDisplay" + index).innerHTML = slider.value
-        window.myMario.skinData[skinType][index] = newValue
-    }
-
-    localStorage[`skinData-${skinType}`] = JSON.stringify(window.myMario.skinData[skinType])
-}
 
 
 /// Load all
 window.myMario = { skinData: defaultSkinData() }
+
 Object.keys(window.myMario.skinData).forEach((skinType) => {
     const skinData = localStorage[`skinData-${skinType}`]
     if (skinData) window.myMario.skinData[skinType] = JSON.parse(skinData)
@@ -166,26 +105,14 @@ export const updateRainbowSkin = () => {
 	rainbowLights[5] = parseInt(rainbowLights[5]);
 }
 
-document.getElementById('playerNameForm').onsubmit = (e) => {
-    e.preventDefault()
-    submitPlayerName()
-}
 
-window.updatePlayerName = (name) => {
-    if (name.length < 3) {
-        document.getElementById("playerNameInput").style.borderColor = "red"
-        document.getElementById("playerNameInput").style.borderWidth = "3px"
-    } else {
-        document.getElementById("playerNameInput").style.borderColor = "blue"
-        document.getElementById("playerNameInput").style.borderWidth = "1px"
-    }
-}
+
 
 export const shakePlayerNameInput = () => {
-    document.getElementById("playerNameResult").innerHTML = "Rejected"
-    document.getElementById("playerNameResult").style.color = "red"
-    document.getElementById("playerNameInput").style.borderColor = "red"
-    document.getElementById("playerNameInput").style.borderWidth = "3px"
+    //document.getElementById("playerNameResult").innerHTML = "Rejected"
+    //document.getElementById("playerNameResult").style.color = "red"
+    //document.getElementById("playerNameInput").style.borderColor = "red"
+    //document.getElementById("playerNameInput").style.borderWidth = "3px"
     //$("#playerNameRow").effect("shake", { direction: "down", times: 3, distance: 3 }, 500)
 }
 
@@ -197,7 +124,7 @@ export const recvPlayerNameResponse = (msg) => {
         //shakePlayerNameInput()
     } else {
         networkData.mySocketID = msg.getSocketId()
-        document.getElementById("playerNameInput").style.borderColor = "blue"
+/*        document.getElementById("playerNameInput").style.borderColor = "blue"
         document.getElementById("playerNameInput").disabled = true
         document.getElementById("playerNameInput").style.backgroundColor = "lightgrey"
         document.getElementById("playerNameResult").style.color = "#00ff00"
@@ -205,7 +132,7 @@ export const recvPlayerNameResponse = (msg) => {
         document.getElementById("playerNameButton").hidden = true
         document.getElementById("discordNameRow").hidden = true
         document.getElementById("customNameRow").hidden = true
-        document.getElementById("mapSelect").disabled = true
+        document.getElementById("mapSelect").disabled = true*/
         window.playerNameAccepted = true
         //localStorage['playername'] = msg.getName()
 

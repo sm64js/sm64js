@@ -14,19 +14,7 @@ class Game {
 
     main_loop_init() {
 
-        //setup_game_memory();
-
-        //init_controllers();
-
-        //save_file_load_all();
-
-        //set_vblank_handler(2, &gGameVblankHandler, &gGameVblankQueue, (OSMesg) 1);
-
-        // point levelCommandAddr to the entry point into the level script data.
         LevelCommands.start_new_script(level_script_entry)
-
-        //play_music(SEQ_PLAYER_SFX, SEQUENCE_ARGS(0, SEQ_SOUND_PLAYER), 0);
-        //set_sound_mode(save_file_get_sound_mode());
 
     }
 

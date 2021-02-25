@@ -558,6 +558,8 @@ class Camera {
 
     update_camera(c) {
 
+        return
+
         this.gCamera = c
 
         this.sStatusFlags &= ~CAM_FLAG_FRAME_AFTER_CAM_INIT

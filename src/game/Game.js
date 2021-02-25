@@ -1,6 +1,5 @@
 import { level_script_entry } from "../levels/main_entry/entry"
 import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
-import * as Gbi from "../include/gbi"
 
 class Game {
     constructor() {

@@ -1,8 +1,7 @@
-import { GeoLayoutInstance as GeoLayout } from "./GeoLayout"
+import * as GraphNode from "./graph_node"
 import { AreaInstance as Area } from "../game/Area"
 import { GameInstance as Game } from "../game/Game"
 import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
-import { init_graph_node_start, geo_update_animation_frame } from "./graph_node"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
 import { networkData } from "../mmo/socket"
 
@@ -44,7 +43,7 @@ class LevelCommands {
 
     init_level(args) {
         //console.log("init level")
-        GeoLayout.gObjParentGraphNode = init_graph_node_start(null, GeoLayout.gObjParentGraphNode)
+        //GeoLayout.gObjParentGraphNode = init_graph_node_start(null, GeoLayout.gObjParentGraphNode)
         ObjectListProcessor.clear_objects()
         Area.clear_areas()
         this.sCurrentScript.index++
@@ -324,7 +323,7 @@ class LevelCommands {
 
             try {
                 const node = data.marioState.marioObj.header.gfx.unk38
-                node.animFrame = geo_update_animation_frame(node, node.animFrameAccelAssist)
+                node.animFrame = GraphNode.geo_update_animation_frame(node, node.animFrameAccelAssist)
 
             } catch (error) {
                 console.log("unknown error in 'geo_process_extra_mario' - please report this issue to sm64js devs -- playerName: " + data.marioState.playerName)

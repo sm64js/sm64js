@@ -24,31 +24,6 @@ import {
     special_level_geo_16,
 } from "../include/surface_terrains"
 
-import {
-    MODEL_BOB_BUBBLY_TREE,
-    MODEL_CCM_SNOW_TREE,
-    MODEL_LEVEL_GEOMETRY_03,
-    MODEL_LEVEL_GEOMETRY_04,
-    MODEL_LEVEL_GEOMETRY_05,
-    MODEL_LEVEL_GEOMETRY_06,
-    MODEL_LEVEL_GEOMETRY_07,
-    MODEL_LEVEL_GEOMETRY_08,
-    MODEL_LEVEL_GEOMETRY_09,
-    MODEL_LEVEL_GEOMETRY_0A,
-    MODEL_LEVEL_GEOMETRY_0B,
-    MODEL_LEVEL_GEOMETRY_0C,
-    MODEL_LEVEL_GEOMETRY_0D,
-    MODEL_LEVEL_GEOMETRY_0E,
-    MODEL_LEVEL_GEOMETRY_0F,
-    MODEL_LEVEL_GEOMETRY_10,
-    MODEL_LEVEL_GEOMETRY_11,
-    MODEL_LEVEL_GEOMETRY_12,
-    MODEL_LEVEL_GEOMETRY_13,
-    MODEL_LEVEL_GEOMETRY_14,
-    MODEL_LEVEL_GEOMETRY_15,
-    MODEL_LEVEL_GEOMETRY_16,
-} from "../include/model_ids"
-
 import { bhvTree, bhvStaticObject } from "./BehaviorData"
 import { spawn_object_abs_with_rot } from "./ObjectHelpers"
 import { oBehParams, RESPAWN_INFO_DONT_RESPAWN, oUnk1A8, oBehParams2ndByte, RESPAWN_INFO_TYPE_16 } from "../include/object_constants"
@@ -62,28 +37,28 @@ const SPTYPE_UNKNOWN            = 3 // object is 14-bytes long, has 3 extra shor
 const SPTYPE_DEF_PARAM_AND_YROT = 4 // object is 10-bytes long, has y-rotation and uses the default param
 
 const SpecialObjectPresets = {}
-SpecialObjectPresets[special_bubble_tree] = { type: SPTYPE_NO_YROT_OR_PARAMS, defParam: 0, model: MODEL_BOB_BUBBLY_TREE, behavior: bhvTree }
-SpecialObjectPresets[special_snow_tree] = { type: SPTYPE_NO_YROT_OR_PARAMS, defParam: 0, model: MODEL_CCM_SNOW_TREE, behavior: bhvTree }
-SpecialObjectPresets[special_level_geo_03] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_03, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_04] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_04, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_05] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_05, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_06] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_06, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_07] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_07, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_08] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_08, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_09] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_09, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_0A] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_0A, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_0B] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_0B, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_0C] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_0C, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_0D] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_0D, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_0E] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_0E, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_0F] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_0F, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_10] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_10, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_11] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_11, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_12] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_12, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_13] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_13, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_14] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_14, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_15] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_15, behavior: bhvStaticObject }
-SpecialObjectPresets[special_level_geo_16] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: MODEL_LEVEL_GEOMETRY_16, behavior: bhvStaticObject }
+SpecialObjectPresets[special_bubble_tree] = { type: SPTYPE_NO_YROT_OR_PARAMS, defParam: 0, model: 0, behavior: bhvTree }
+SpecialObjectPresets[special_snow_tree] = { type: SPTYPE_NO_YROT_OR_PARAMS, defParam: 0, model: 0, behavior: bhvTree }
+SpecialObjectPresets[special_level_geo_03] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_04] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_05] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_06] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_07] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_08] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_09] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_0A] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_0B] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_0C] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_0D] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_0E] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_0F] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_10] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_11] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_12] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_13] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_14] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_15] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
+SpecialObjectPresets[special_level_geo_16] = { type: SPTYPE_YROT_NO_PARAMS, defParam: 0, model: 0, behavior: bhvStaticObject }
 
 
 const convert_rotation = (inRotation) => {

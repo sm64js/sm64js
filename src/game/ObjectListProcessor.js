@@ -6,10 +6,9 @@ import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands
 import * as Mario from "./Mario"
 import { detect_object_collisions } from "./ObjectCollisions"
 import { networkData, gameData as socketGameData, updateNetworkBeforeRender } from "../mmo/socket"
-import { copyMarioUpdateToState, applyController } from "../mmo/MultiMarioManager"
+import { applyController } from "../mmo/MultiMarioManager"
 import { vec3f_dif, vec3f_length } from "../engine/math_util"
 import { uint32, uint16 } from "../utils"
-import { MODEL_NONE, MODEL_MIST } from "../include/model_ids"
 import * as MarioConstants from "../include/mario_constants"
 import { gLinker } from "./Linker"
 import { spawn_object_at_origin, obj_copy_pos_and_angle, dist_between_objects } from "./ObjectHelpers"
@@ -21,23 +20,23 @@ class ObjectListProcessor {
         this.sParticleTypesInit = () => {
             return [
                 {
-                    particleFlag: MarioConstants.PARTICLE_HORIZONTAL_STAR, activeParticleFlag: ACTIVE_PARTICLE_H_STAR, model: MODEL_NONE,
+                    particleFlag: MarioConstants.PARTICLE_HORIZONTAL_STAR, activeParticleFlag: ACTIVE_PARTICLE_H_STAR, model: 0,
                     behavior: gLinker.behaviors.bhvHorStarParticleSpawner
                 },
                 {
-                    particleFlag: MarioConstants.PARTICLE_VERTICAL_STAR, activeParticleFlag: ACTIVE_PARTICLE_V_STAR, model: MODEL_NONE,
+                    particleFlag: MarioConstants.PARTICLE_VERTICAL_STAR, activeParticleFlag: ACTIVE_PARTICLE_V_STAR, model: 0,
                     behavior: gLinker.behaviors.bhvVertStarParticleSpawner
                 },
                 {
-                    particleFlag: MarioConstants.PARTICLE_TRIANGLE, activeParticleFlag: ACTIVE_PARTICLE_TRIANGLE, model: MODEL_NONE,
+                    particleFlag: MarioConstants.PARTICLE_TRIANGLE, activeParticleFlag: ACTIVE_PARTICLE_TRIANGLE, model: 0,
                     behavior: gLinker.behaviors.bhvTriangleParticleSpawner
                 },
                 {
-                    particleFlag: MarioConstants.PARTICLE_DUST, activeParticleFlag: ACTIVE_PARTICLE_DUST, model: MODEL_MIST,
+                    particleFlag: MarioConstants.PARTICLE_DUST, activeParticleFlag: ACTIVE_PARTICLE_DUST, model: 0,
                     behavior: gLinker.behaviors.bhvMistParticleSpawner
                 },
                 {
-                    particleFlag: MarioConstants.PARTICLE_MIST_CIRCLE, activeParticleFlag: ACTIVE_PARTICLE_MIST_CIRCLE, model: MODEL_NONE,
+                    particleFlag: MarioConstants.PARTICLE_MIST_CIRCLE, activeParticleFlag: ACTIVE_PARTICLE_MIST_CIRCLE, model: 0,
                     behavior: gLinker.behaviors.bhvMistCircParticleSpawner
                 }
             ]
@@ -329,7 +328,7 @@ class ObjectListProcessor {
                     this.totalMarios++
                     this.gMarioObject = object
                     this.gMarioObject.localMario = true
-                    GraphNode.geo_make_first_child(object.header.gfx.node)
+                    //GraphNode.geo_make_first_child(object.header.gfx.node)
                 }
 
                 GraphNode.geo_obj_init_spawninfo(object.header.gfx, spawnInfo)

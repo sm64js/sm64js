@@ -1,7 +1,5 @@
 import { GEO_CONTEXT_RENDER } from "../engine/graph_node"
-import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
-import * as Mario from "./Mario"
-import { get_pos_from_transform_mtx } from "../engine/math_util"
+import { AreaInstance } from "./Area"
 
 class MarioMisc {
     constructor() {
@@ -23,7 +21,7 @@ class MarioMisc {
         const action = this.gBodyState.action
 
         if (callContext == GEO_CONTEXT_RENDER) {
-            const rotNode = node.next
+/*            const rotNode = node.next
 
             if (![Mario.ACT_WALKING, Mario.ACT_BUTT_SLIDE, Mario.ACT_HOLD_BUTT_SLIDE, Mario.ACT_RIDING_SHELL_GROUND].includes(action)) {
                 this.gBodyState.torsoAngle = [0,0,0]
@@ -37,7 +35,7 @@ class MarioMisc {
             const cameraMtx = GeoRenderer.gCurGraphNodeCamera.wrapper.matrixPtr
 
             ///update torso position
-            if (curTransform && cameraMtx) get_pos_from_transform_mtx(this.gBodyState.torsoPos, curTransform, cameraMtx)
+            if (curTransform && cameraMtx) get_pos_from_transform_mtx(this.gBodyState.torsoPos, curTransform, cameraMtx)*/
         }
         return []
 
@@ -45,11 +43,11 @@ class MarioMisc {
 
     geo_switch_mario_eyes(callContext, switchCase) {
 
-        let marioBlinkAnimation = [ 1, 2, 1, 0, 1, 2, 1 ]
+        let marioBlinkAnimation = [1, 2, 1, 0, 1, 2, 1]
 
         if (callContext == GEO_CONTEXT_RENDER) {
             if (this.gBodyState.eyeState == 0) {
-                let blinkFrame = ((switchCase.numCases * 32 + GeoRenderer.gAreaUpdateCounter) >> 1) & 0x1F
+                let blinkFrame = ((switchCase.numCases * 32 + AreaInstance.gAreaUpdateCounter) >> 1) & 0x1F
                 if (blinkFrame < 7) {
                     switchCase.selectedCase = marioBlinkAnimation[blinkFrame]
                 } else {

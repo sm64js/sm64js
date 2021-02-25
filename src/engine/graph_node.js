@@ -1,7 +1,7 @@
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { GeoLayoutInstance as GeoLayout } from "./GeoLayout"
-import { GeoRendererInstance as GeoRenderer } from "./GeoRenderer"
 import * as Mario from "../game/Mario"
+import { AreaInstance } from "../game/Area"
 
 export const GRAPH_RENDER_ACTIVE = (1 << 0)
 export const GRAPH_RENDER_CHILDREN_FIRST = (1 << 1)
@@ -237,7 +237,7 @@ export const geo_update_animation_frame = (obj, accelAssist) => {
 
     const anim = obj.curAnim
 
-    if (obj.animTimer == GeoRenderer.gAreaUpdateCounter || anim.flags & Mario.ANIM_FLAG_2) {
+    if (obj.animTimer == AreaInstance.gAreaUpdateCounter || anim.flags & Mario.ANIM_FLAG_2) {
 /*        if (accelAssist) {
             accelAssist = obj.animFrameAccelAssist
         }*/

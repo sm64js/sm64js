@@ -64,16 +64,6 @@ class LevelUpdate {
                 Mario.init_marios()
             }
 
-            if (Area.gCurrentArea) {
-                //Camera.reset_camera(Area.gCurrentArea.camera)
-            }
-
-            if (val4 != 0) {
-                Area.play_transition(WARP_TRANSITION_FADE_FROM_COLOR, 0x5A, 0xFF, 0xFF, 0xFF)
-            } else {
-                Area.play_transition(WARP_TRANSITION_FADE_FROM_STAR, 0x10, 0xFF, 0xFF, 0xFF)
-            }
-
         }
         
         return 1
@@ -83,10 +73,6 @@ class LevelUpdate {
 
         //lots more here
         Area.area_update_objects()
-
-        if (Area.gCurrentArea) {
-            //Camera.update_camera(Area.gCurrentArea.camera)
-        }
 
         return 0
     }

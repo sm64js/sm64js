@@ -1,8 +1,5 @@
-import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import { SurfaceLoadInstance as SurfaceLoad } from "./SurfaceLoad"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
-import { GameInstance as Game } from "./Game"
-import { gSPViewport } from "../include/gbi"
 
 export const WARP_TRANSITION_FADE_FROM_COLOR   = 0x00
 export const WARP_TRANSITION_FADE_INTO_COLOR   = 0x01
@@ -14,13 +11,6 @@ export const WARP_TRANSITION_FADE_INTO_MARIO   = 0x11
 export const WARP_TRANSITION_FADE_FROM_BOWSER  = 0x12
 export const WARP_TRANSITION_FADE_INTO_BOWSER = 0x13
 
-const D_8032CF00 = {  /// default view port?
-    vscale: [640, 480, 511, 0],
-    vtrans: [640, 480, 511, 0]
-}
-
-const canvas = document.querySelector('#gameCanvas')
-
 class Area {
 
     constructor() {
@@ -29,7 +19,9 @@ class Area {
         this.gAreas = Array(8).fill(0).map(() => { return { index: 0 } })
         this.gCurAreaIndex = 0
         this.gCurrLevelNum = 0
-        this.gLoadedGraphNodes = new Array(256)
+        //this.gLoadedGraphNodes = new Array(256)
+
+        this.gAreaUpdateCounter = 0
 
         this.gMarioSpawnInfo = {
             startPos: [0, 0, 0],
@@ -72,76 +64,13 @@ class Area {
         if (this.gCurrentArea.index == this.gMarioSpawnInfo.areaIndex) {
             this.gCurrentArea.flags |= 0x01
             ObjectListProc.spawn_objects_from_info(this.gMarioSpawnInfo)
-/*            const marioCloneSpawnInfo = this.gMarioSpawnInfo
-            marioCloneSpawnInfo.startPos[0] -= 500
-            ObjectListProc.spawn_objects_from_info(marioCloneSpawnInfo)*/
+
         }
     }
 
     area_update_objects() {
-        GeoRenderer.gAreaUpdateCounter++
-        ObjectListProc.update_objects(0)
-    }
-
-    set_warp_transition_rgb(red, green, blue) {
-        const warpTransitionRGBA16 = ((red >> 3) << 11) | ((green >> 3) << 6) | ((blue >> 3) << 1) | 1 
-
-        this.gWarpTransFBSetColor = (warpTransitionRGBA16 << 16) | warpTransitionRGBA16
-        this.gWarpTransRed = red
-        this.gWarpTransGreen = green
-        this.gWarpTransBlue = blue
-    }
-
-    play_transition(transType, time, red, green, blue) {
-
-        this.gWarpTransition.isActive = true
-        this.gWarpTransition.type = transType
-        this.gWarpTransition.time = time
-        this.gWarpTransition.pauseRendering = false
-
-        // The lowest bit of transType determines if the transition is fading in or out.
-        if (transType & 1) {
-            this.set_warp_transition_rgb(red, green, blue)
-        } else {
-            red = this.gWarpTransRed; green = this.gWarpTransGreen; blue = this.gWarpTransBlue
-        }
-
-        if (transType < 8) { // if transition is RGB
-            this.gWarpTransition.data.red = red
-            this.gWarpTransition.data.green = green
-            this.gWarpTransition.data.blue = blue
-        } else {
-            this.gWarpTransition.data.red = red
-            this.gWarpTransition.data.green = green
-            this.gWarpTransition.data.blue = blue
-
-            // Both the start and end textured transition are always located in the middle of the screen.
-            // If you really wanted to, you could place the start at one corner and the end at
-            // the opposite corner. This will make the transition image look like it is moving
-            // across the screen.
-            this.gWarpTransition.data.startTexX = canvas.width / 2 / 2
-            this.gWarpTransition.data.startTexY = canvas.height / 2 / 2
-            this.gWarpTransition.data.endTexX = canvas.width / 2 / 2
-            this.gWarpTransition.data.endTexY = canvas.height / 2 / 2
-
-            this.gWarpTransition.data.texTimer = 0
-
-            if (transType & 1) { // fading in
-                this.gWarpTransition.data.startTexRadius = canvas.width / 2
-                if (transType >= 0x0F) {
-                    this.gWarpTransition.data.endTexRadius = 16
-                } else {
-                    this.gWarpTransition.data.endTexRadius = 0
-                }
-            } else { // fading out
-                if (transType >= 0x0E) {
-                    this.gWarpTransition.data.startTexRadius = 16
-                } else {
-                    this.gWarpTransition.data.startTexRadius = 0
-                }
-                this.gWarpTransition.data.endTexRadius = canvas.width / 2
-            }
-        }
+        this.gAreaUpdateCounter++
+        ObjectListProc.update_objects()
     }
 
     clear_areas() {
@@ -169,31 +98,6 @@ class Area {
                 musicParam2: 0
             })
         })
-    }
-
-    render_game() {
-        if (this.gCurrentArea) {
-            GeoRenderer.geo_process_root(this.gCurrentArea.geometryLayoutData, null, null, null)
-
-            gSPViewport(Game.gDisplayList, D_8032CF00)
-
-            if (this.gWarpTransition.isActive) {
-                if (this.gWarpTransDelay == 0) {
-
-                    this.gWarpTransition.isActive = false //!render_screen_transition(0, this.gWarpTransition.type, this.gWarpTransition.time, this.gWarpTransition.data)
-
-                    if (!this.gWarpTransition.isActive) {
-                        if (this.gWarpTransition.type & 1) {
-                            this.gWarpTransition.pauseRendering = true
-                        } else {
-                            this.set_warp_transition_rgb(0, 0, 0)
-                        }
-                    }
-                } else {
-                    this.gWarpTransDelay--
-                }
-            }
-        }
     }
 
 }

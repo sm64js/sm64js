@@ -2,8 +2,9 @@ import { GeoLayoutInstance as GeoLayout } from "./GeoLayout"
 import { AreaInstance as Area } from "../game/Area"
 import { GameInstance as Game } from "../game/Game"
 import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
-import { init_graph_node_start } from "./graph_node"
+import { init_graph_node_start, geo_update_animation_frame } from "./graph_node"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
+import { networkData } from "../mmo/socket"
 
 const SCRIPT_RUNNING = 1
 const SCRIPT_PAUSED = 0
@@ -57,20 +58,11 @@ class LevelCommands {
             areaIndex: 0,
             behaviorArg: args[1],
             behaviorScript: args[2],
-            unk18: Area.gLoadedGraphNodes[args[0]]
+            //unk18: Area.gLoadedGraphNodes[args[0]]
         })
 
         this.sCurrentScript.index++
 
-    }
-
-    load_model_from_geo(args) {
-
-        if (args[0] < 256) {
-            Area.gLoadedGraphNodes[args[0]] = GeoLayout.process_geo_layout(args[1]).node
-        } else throw "invalid gLoadedGraphNodes index - load model from geo"
-
-        this.sCurrentScript.index++
     }
 
     set_mario_pos(args) {
@@ -96,12 +88,6 @@ class LevelCommands {
             Area.gMarioSpawnInfo.startPos[2] += (random * args[7])
         }
 
-        this.sCurrentScript.index++
-    }
-
-    load_mario_head(args) {
-        GoddardRenderer.gdm_setup()
-        GoddardRenderer.gdm_maketestdl(args[0])
         this.sCurrentScript.index++
     }
 
@@ -220,17 +206,9 @@ class LevelCommands {
         const geoLayout = args[1]
 
         if (areaIndex < 8) {
-            const screnArea = GeoLayout.process_geo_layout(geoLayout)
 
             this.sCurrAreaIndex = areaIndex
-            screnArea.areaIndex = areaIndex
-            Area.gAreas[areaIndex].geometryLayoutData = screnArea
 
-            if (screnArea.views[0]) {
-                Area.gAreas[areaIndex].camera = screnArea.views[0].config.camera
-            } else {
-                Area.gAreas[areaIndex].camera = null
-            }
             
         }
         this.sCurrentScript.index++
@@ -249,7 +227,7 @@ class LevelCommands {
                 activeAreaIndex: this.sCurrAreaIndex,
                 behaviorArg: args[8],
                 behaviorScript: args[9],
-                unk18: Area.gLoadedGraphNodes[model],
+                //unk18: Area.gLoadedGraphNodes[model],
                 next: Area.gAreas[this.sCurrAreaIndex].objectSpawnInfos
             }
 
@@ -340,11 +318,18 @@ class LevelCommands {
             cmd.command.call(this, cmd.args)
         }
 
+        const remotePlayerList = Object.values(networkData.remotePlayers)
+        for (let i = 0; i < remotePlayerList.length; i++) {
+            const data = remotePlayerList[i]
 
-        if (window.gameMasterDebug) {
-            Game.init_render_image()
-            Area.render_game()
-            Game.end_master_display_list()
+            try {
+                const node = data.marioState.marioObj.header.gfx.unk38
+                node.animFrame = geo_update_animation_frame(node, node.animFrameAccelAssist)
+
+            } catch (error) {
+                console.log("unknown error in 'geo_process_extra_mario' - please report this issue to sm64js devs -- playerName: " + data.marioState.playerName)
+                console.log(error)
+            }
         }
 
     }

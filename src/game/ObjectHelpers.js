@@ -6,12 +6,10 @@ import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oM
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { atan2s, mtxf_rotate_zxy_and_translate } from "../engine/math_util"
 import { sins, coss, int16 } from "../utils"
-import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { ATTACK_PUNCH, INT_STATUS_WAS_ATTACKED, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "./Interaction"
 import { ACT_GROUND_POUND_LAND } from "./Mario"
 import { gLinker } from "./Linker"
-import * as Gbi from "../include/gbi"
 
 export const cur_obj_set_pos_to_home = () => {
     const o = ObjectListProc.gCurrentObject
@@ -49,7 +47,7 @@ export const cur_obj_extend_animation_if_at_end = () => {
 export const geo_switch_anim_state = (run, node) => {
 
     if (run == 1) {
-        let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
+/*        let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
 
         const switchCase = node
 
@@ -63,7 +61,7 @@ export const geo_switch_anim_state = (run, node) => {
             obj.rawData[oAnimState] = 0
         }
 
-        switchCase.selectedCase = obj.rawData[oAnimState]
+        switchCase.selectedCase = obj.rawData[oAnimState]*/
     }
 }
 
@@ -99,7 +97,7 @@ export const geo_update_layer_transparency = (run, node) => {
     let sp3C = []
 
     if (run == 1) {
-        let sp34 = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
+       /* let sp34 = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
         let sp30 = node
         let sp2C = node
 
@@ -133,7 +131,7 @@ export const geo_update_layer_transparency = (run, node) => {
         }
 
         Gbi.gDPSetEnvColor(sp38, 255, 255, 255, sp28)
-        Gbi.gSPEndDisplayList(sp38)
+        Gbi.gSPEndDisplayList(sp38)*/
 
     }
 
@@ -148,7 +146,7 @@ export const spawn_object_at_origin = (parent, model, behavior) => {
     obj.header.gfx.unk18 = parent.header.gfx.unk18
     obj.header.gfx.unk19 = parent.header.gfx.unk18
 
-    geo_obj_init(obj.header.gfx, Area.gLoadedGraphNodes[model], [0,0,0], [0,0,0])
+    geo_obj_init(obj.header.gfx, null, [0,0,0], [0,0,0])
 
     return obj
 

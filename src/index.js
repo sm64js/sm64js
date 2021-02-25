@@ -1,14 +1,7 @@
 ﻿import { GameInstance as Game } from "./game/Game"
-import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
 import  * as Socket from "./mmo/socket.js"
-//import "./mmo/cosmetics"
-
-window.gameMasterDebug = true
-
-const send_display_list = (gfx_list) => { if (window.gameMasterDebug) GFX.run(gfx_list) }
 
 let n_frames = 0
-let target_time = 0
 let frameSpeed = 30 ///units is ms, so 30 equates to 33fps
 
 const produce_one_frame = () => {
@@ -23,9 +16,6 @@ const produce_one_frame = () => {
 }
 
 const main_func = () => {
-
-    /// WebGL class and n64GfxProcessor class are initialized with their constructor when they are imported
-    Game.attachInterfaceToGfxProcessor(send_display_list)
 
     setInterval(() => {  /// gameMaster main loop
         const startTime = performance.now()

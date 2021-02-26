@@ -2966,7 +2966,7 @@ proto.sm64js.PingMsg.prototype.toObject = function(opt_includeInstance) {
  */
 proto.sm64js.PingMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
-    time: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    time: jspb.Message.getFloatingPointFieldWithDefault(msg, 1, 0.0)
   };
 
   if (includeInstance) {
@@ -3004,7 +3004,7 @@ proto.sm64js.PingMsg.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readUint32());
+      var value = /** @type {number} */ (reader.readFloat());
       msg.setTime(value);
       break;
     default:
@@ -3037,8 +3037,8 @@ proto.sm64js.PingMsg.prototype.serializeBinary = function() {
 proto.sm64js.PingMsg.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getTime();
-  if (f !== 0) {
-    writer.writeUint32(
+  if (f !== 0.0) {
+    writer.writeFloat(
       1,
       f
     );
@@ -3047,11 +3047,11 @@ proto.sm64js.PingMsg.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional uint32 time = 1;
+ * optional float time = 1;
  * @return {number}
  */
 proto.sm64js.PingMsg.prototype.getTime = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 1, 0.0));
 };
 
 
@@ -3060,7 +3060,7 @@ proto.sm64js.PingMsg.prototype.getTime = function() {
  * @return {!proto.sm64js.PingMsg} returns this
  */
 proto.sm64js.PingMsg.prototype.setTime = function(value) {
-  return jspb.Message.setProto3IntField(this, 1, value);
+  return jspb.Message.setProto3FloatField(this, 1, value);
 };
 
 

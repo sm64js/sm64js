@@ -64,8 +64,9 @@ const zip = (bytes) => {
 
 const measureLatency = (ping_proto) => {
     const startTime = ping_proto.getTime()
-    const endTime = Date.now() - 1614000000000
-    window.latency = parseInt(endTime - startTime)
+    const endTime = Date.now() - 1614310000000
+    //console.log(startTime, endTime)
+    window.latency = endTime - startTime
     console.log("Latency to server: ", window.latency)
 }
 
@@ -216,7 +217,8 @@ export const post_main_loop_one_iteration = async (frame) => {
             /// ping to measure latency
             const sm64jsMsg = new Sm64JsMsg()
             const pingmsg = new PingMsg()
-            pingmsg.setTime(Date.now() - 1614000000000)
+            //console.log(Date.now() - 1614310000000)
+            pingmsg.setTime(Date.now() - 1614310000000)
             sm64jsMsg.setPingMsg(pingmsg)
             const rootMsg = new RootMsg()
             rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)

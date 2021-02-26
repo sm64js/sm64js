@@ -460,11 +460,14 @@ document.getElementById("googleSigninButton").addEventListener('click', () => {
 })
 
 document.getElementById("logoutButton").addEventListener('click', async () => {
-    const res = await fetch ('/logout', {
+    const res = await fetch ('/api/logout', {
         method: 'POST'
     })
     if (res.ok) {
-        
+        document.getElementById("playerNameRow").hidden = true
+        document.getElementById("discordNameBox").value = ''
+        document.getElementById("signinButtons").hidden = false
+        document.getElementById("logoutButton").hidden = true
     }
 })
 

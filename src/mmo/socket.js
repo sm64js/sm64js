@@ -15,7 +15,7 @@ import zlib from "zlib"
 import * as Multi from "./MultiMarioManager"
 import { updateFlagData, setInitFlagHeight } from "../game/behaviors/bhv_castle_flag_init.inc"
 
-const websocketServerPath = `ws://localhost:3000` // local testing
+const websocketServerPath = `ws://mmo-server-test.web:3000` // local testing
 
 
 const socket = new WebSocket(websocketServerPath)

@@ -218,8 +218,9 @@ window.onload = async () => {
         if (success && process.env.NODE_ENV === 'rust') {
             const url = new URL(window.location.href)
             url.searchParams.delete('code')
+            url.searchParams.delete('state')
             url.pathname = '/'
-            window.location = url
+            history.replaceState({ state: 'login' }, '', url)
         }
     } else {
         const res = await fetch ('/api/login', {

@@ -459,15 +459,29 @@ document.getElementById("googleSigninButton").addEventListener('click', () => {
     window.location = `${googleOAuthURL}&state=${encodeURIComponent(JSON.stringify(state))}`
 })
 
+document.getElementById("logoutButton").addEventListener('click', async () => {
+    const res = await fetch ('/logout', {
+        method: 'POST'
+    })
+    if (res.ok) {
+        
+    }
+})
+
 export const recvAuthorizedUser = async (res) => {
     if (res.ok) {
-        const msg = await res.json()
-        document.getElementById("playerNameRow").hidden = false
-        document.getElementById("discordNameBox").value = msg.username
-        if (!msg.username) { /// Discord Username option not available
-            document.getElementById("customNameRow").hidden = false
-            document.getElementById("discordNameRow").hidden = true
-            document.getElementById("switchDiscord").hidden = true
+        if (res.status === 200) {
+            const msg = await res.json()
+            document.getElementById("playerNameRow").hidden = false
+            document.getElementById("discordNameBox").value = msg.username
+            document.getElementById("signinButtons").hidden = true
+            document.getElementById("logoutButton").hidden = false
+            if (!msg.username) { /// Discord Username option not available
+                document.getElementById("customNameRow").hidden = false
+                document.getElementById("discordNameRow").hidden = true
+                document.getElementById("switchDiscord").hidden = true
+            }
+            return true
         }
     } else { //authorization fail - refresh page without access code
         document.getElementById("authFailMsg").innerHTML = "Authorization Fail: " + await res.text()
@@ -481,5 +495,6 @@ export const recvAuthorizedUser = async (res) => {
             }, 3000)
         }
     }
+    return false
 }
 

@@ -213,6 +213,18 @@ window.onload = async () => {
             },
             body: JSON.stringify({ code: url_params.get("code") })
         })
+        const success = Socket.recvAuthorizedUser(res)
+
+        if (success && process.env.NODE_ENV === 'rust') {
+            const url = new URL(window.location.href)
+            url.searchParams.delete('code')
+            url.pathname = '/'
+            window.location = url
+        }
+    } else {
+        const res = await fetch ('/login', {
+            method: 'POST'
+        })
         Socket.recvAuthorizedUser(res)
     }
 

@@ -1,4 +1,4 @@
-FROM buildkite/puppeteer
+FROM node:13 as build
 
 RUN mkdir -p /usr/src/app
 
@@ -7,11 +7,9 @@ WORKDIR /usr/src/app
 COPY package.json ./
 RUN npm install
 
-COPY webpack.config.js ./
-COPY src/ ./src/
-COPY proto/ ./proto
-RUN npm run build
 
 COPY . ./
+RUN npm run babelRollup
 
-CMD ["node", "puppet.js"]
+
+CMD ["npm", "run", "startNode"]

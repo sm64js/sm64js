@@ -6,15 +6,10 @@
     "name": "Snuffy"
   },
   "dependencies": {
-    "@rollup/plugin-replace": "^2.4.1",
-    "file-url": "^3.0.0",
     "google-protobuf": "^3.13.0",
-    "puppeteer": "^7.1.0",
     "ws": "^7.4.3"
   },
   "scripts": {
-    "buildWebpack": "webpack --mode production",
-    "startWebpack": "webpack-dev-server --host 0.0.0.0 --disable-host-check  --mode development --env development",
     "startNode": "node dist/index.js",
     "babelRollup": "./node_modules/.bin/rollup -c && node rollup_build_fix.js",
     "buildAndRun": "npm run babelRollup && npm run startNode"
@@ -26,14 +21,8 @@
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^17.1.0",
     "@rollup/plugin-node-resolve": "^11.2.0",
-    "html-loader": "^1.1.0",
-    "html-webpack-plugin": "^4.3.0",
     "rollup": "^2.39.1",
-    "rollup-plugin-node-polyfills": "^0.2.1",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.11.0",
-    "webpack-node-externals": "^1.7.2"
+    "rollup-plugin-node-polyfills": "^0.2.1"
   },
   "babel": {
     "presets": [

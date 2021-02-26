@@ -306,23 +306,22 @@ export const recvPlayerLists = (playerListsProto) => {
 
     const rooms = playerListsProto.getGameList()
 
-    if (window.playerNameAccepted) { // joined a game
 
+    const roomProto = rooms[0]
+    //const level = roomProto.getLevelId() 
+    //if (level != window.selectedMap) throw "error valid player list level does not match loaded level"
 
-        const roomProto = rooms[0]
-        const level = roomProto.getLevelId() 
-        if (level != window.selectedMap) throw "error valid player list level does not match loaded level"
-        const validplayers = roomProto.getValidplayersList()
-        networkData.numOnline = validplayers.length
+    const validplayers = roomProto.getValidplayersList()
+    networkData.numOnline = validplayers.length
 
-        Object.keys(networkData.remotePlayers).forEach(socket_id => {
-            //if (!validplayers.includes(parseInt(socket_id))) {
-            if (Date.now() - networkData.remotePlayers[socket_id].controllerUpdateTimestamp > 10000) {
-                delete networkData.remotePlayers[socket_id]
-            }
-        })
+    Object.keys(networkData.remotePlayers).forEach(socket_id => {
+        //if (!validplayers.includes(parseInt(socket_id))) {
+        if (Date.now() - networkData.remotePlayers[socket_id].controllerUpdateTimestamp > 10000) {
+            delete networkData.remotePlayers[socket_id]
+        }
+    })
 
-    }
+    
 
 }
 

@@ -18,9 +18,9 @@ const produce_one_frame = () => {
 const main_func = () => {
 
     setInterval(() => {  /// gameMaster main loop
-        const startTime = performance.now()
+        const startTime = Date.now()
         produce_one_frame()
-        if (performance.now() - startTime > 30) console.log("WARN - Server frame took longer than 30ms!!")
+        if (Date.now() - startTime > 30) console.log("WARN - Server frame took longer than 30ms!!")
     }, frameSpeed)
 
 }

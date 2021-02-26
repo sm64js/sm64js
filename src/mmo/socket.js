@@ -4,21 +4,16 @@ import {
     GrabFlagMsg,
     AttackMsg,
     PingMsg,
-    ChatMsg,
-    SkinMsg,
-    SkinData,
-    SkinValue,
     InitializationMsg,
     AccessCodeMsg,
     JoinGameMsg,
-    RequestCosmeticsMsg
 } from "../../proto/mario_pb"
+
+import * as WebSocket from 'ws'
 
 import zlib from "zlib"
 import * as Multi from "./MultiMarioManager"
 import { updateFlagData, setInitFlagHeight } from "../game/behaviors/bhv_castle_flag_init.inc"
-
-
 
 const websocketServerPath = `ws://localhost:3000` // local testing
 
@@ -69,7 +64,7 @@ const zip = (bytes) => {
 
 const measureLatency = (ping_proto) => {
     const startTime = ping_proto.getTime()
-    const endTime = performance.now()
+    const endTime = Date.now() - 1614000000000
     window.latency = parseInt(endTime - startTime)
     console.log("Latency to server: ", window.latency)
 }
@@ -89,9 +84,9 @@ socket.onopen = () => {
     rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
     sendData(rootMsg.serializeBinary())
 
-    socket.onmessage = async (message) => {
+    socket.onmessage = (message) => {
         let sm64jsMsg
-        let bytes = new Uint8Array(await message.data.arrayBuffer())
+        let bytes = new Uint8Array(message.data)
         const rootMsg = RootMsg.deserializeBinary(bytes)
 
         switch (rootMsg.getMessageCase()) {
@@ -115,7 +110,6 @@ socket.onopen = () => {
                                 recvAuthorizedUser(initializationMsg.getAuthorizedUserMsg()); break
                             case InitializationMsg.MessageCase.INIT_GAME_DATA_MSG:
                                 break
-                                //Cosmetics.recvPlayerNameResponse(initializationMsg.getInitGameDataMsg()); break
                             default: throw "unknown case for initialization proto message"
                         }
                         break
@@ -222,12 +216,11 @@ export const post_main_loop_one_iteration = async (frame) => {
             /// ping to measure latency
             const sm64jsMsg = new Sm64JsMsg()
             const pingmsg = new PingMsg()
-            pingmsg.setTime(performance.now())
+            pingmsg.setTime(Date.now() - 1614000000000)
             sm64jsMsg.setPingMsg(pingmsg)
             const rootMsg = new RootMsg()
             rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
             sendData(rootMsg.serializeBinary())
-
         }
 
 
@@ -235,7 +228,7 @@ export const post_main_loop_one_iteration = async (frame) => {
         const sm64jsMsg = new Sm64JsMsg()
         sm64jsMsg.setListMsg(Multi.createAllMarioMsg())
         const bytes = sm64jsMsg.serializeBinary()
-        const compressedBytes = await zip(bytes)
+        const compressedBytes = await zip(Buffer.from(bytes))
         const rootMsg = new RootMsg()
         rootMsg.setCompressedSm64jsMsg(compressedBytes)
         sendData(rootMsg.serializeBinary())

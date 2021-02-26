@@ -1,4 +1,3 @@
-import zlib from "zlib"
 import { Sm64JsMsg, MarioMsg, ControllerListMsg, ControllerMsg, MarioListMsg } from "../../proto/mario_pb"
 import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "./socket"
@@ -33,7 +32,7 @@ export const updateRemoteMarioController = (controllerProto) => {
 
     if (networkData.remotePlayers[id] == undefined) return
 
-    networkData.remotePlayers[id].controllerUpdateTimestamp = performance.now()
+    networkData.remotePlayers[id].controllerUpdateTimestamp = Date.now()
 
     const controllerUpdate = controllerProto.toObject() //marioProto.toObject()
 
@@ -318,7 +317,7 @@ export const recvPlayerLists = (playerListsProto) => {
 
         Object.keys(networkData.remotePlayers).forEach(socket_id => {
             //if (!validplayers.includes(parseInt(socket_id))) {
-            if (performance.now() - networkData.remotePlayers[socket_id].controllerUpdateTimestamp > 10000) {
+            if (Date.now() - networkData.remotePlayers[socket_id].controllerUpdateTimestamp > 10000) {
                 delete networkData.remotePlayers[socket_id]
             }
         })

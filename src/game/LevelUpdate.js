@@ -1,4 +1,4 @@
-import { AreaInstance as Area, WARP_TRANSITION_FADE_FROM_STAR, WARP_TRANSITION_FADE_FROM_COLOR } from "./Area"
+import { AreaInstance as Area } from "./Area"
 import { COURSE_NONE } from "../levels/course_defines"
 import * as Mario from "./Mario"
 

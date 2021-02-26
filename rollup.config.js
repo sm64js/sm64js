@@ -11,8 +11,12 @@ export default {
     },
     plugins: [
         babel({ babelHelpers: "bundled" }),
-        commonjs(),
+        commonjs({
+            exclude: ['node_modules/ws/**']
+        }),
         nodePolyfills(),
-        nodeResolve()
+        nodeResolve({
+           // moduleDirectories: ['node_modules']
+        })
     ]
 }

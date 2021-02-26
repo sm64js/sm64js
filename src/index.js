@@ -206,7 +206,7 @@ window.onload = async () => {
 
         /// send access code to server
         const state = JSON.parse(decodeURIComponent(url_params.get("state")))
-        const res = await fetch (`/login/${state.type}`, {
+        const res = await fetch (`/api/login/${state.type}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -222,7 +222,7 @@ window.onload = async () => {
             window.location = url
         }
     } else {
-        const res = await fetch ('/login', {
+        const res = await fetch ('/api/login', {
             method: 'POST'
         })
         Socket.recvAuthorizedUser(res)

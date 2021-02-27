@@ -620,7 +620,6 @@ const determine_knockback_action = (m) => {
 
     if (remainingHealth < 0x100) {
         strengthIndex = 2
-        throw "not implemented yet"
     } else if (m.interactObj.rawData[oDamageOrCoinValue] >= 4) {
         strengthIndex = 2
     } else if (m.interactObj.rawData[oDamageOrCoinValue] >= 2) {
@@ -667,6 +666,25 @@ const determine_knockback_action = (m) => {
 
 }
 
+const take_damage_from_interact_object = (m) => {
+
+    const damage = m.interactObj.rawData[oDamageOrCoinValue]
+
+    if (!(m.flags & Mario.MARIO_CAP_ON_HEAD)) {
+        damage += (damage + 1) / 2
+    }
+
+    if (m.flags & Mario.MARIO_METAL_CAP) {
+        damage = 0
+    }
+
+    m.hurtCounter += 4 * damage
+
+    return damage
+
+}
+
+
 export const take_damage_and_knock_back = (m, o) => {
 
     if (!sInvulnerable && !(m.flags & Mario.MARIO_VANISH_CAP)
@@ -675,7 +693,8 @@ export const take_damage_and_knock_back = (m, o) => {
         o.rawData[oInteractStatus] = INT_STATUS_INTERACTED | INT_STATUS_ATTACKED_MARIO
         m.interactObj = o
 
-        let damage = 1 /// todo
+
+        const damage = take_damage_from_interact_object(m)
 
         if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_BIG_KNOCKBACK) m.forwardVel = 40.0
 

@@ -857,7 +857,8 @@ const check_common_airborne_cancels = (m) => {
         return Mario.set_water_plunge_action(m)
     }
     if (m.input & Mario.INPUT_SQUISHED) {
-        return Mario.drop_and_set_mario_action(m, Mario.ACT_SQUISHED, 0)
+        /// TODO act squish not implemented
+        //return Mario.drop_and_set_mario_action(m, Mario.ACT_SQUISHED, 0)
     }
 
     /// Vertical wind is not implemented yet

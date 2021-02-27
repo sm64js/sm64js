@@ -18,7 +18,7 @@ import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
 import { mario_execute_cutscene_action } from "./MarioActionsCutscene"
 import { gameData as socketGameData } from "../mmo/socket"
 import { int16, sins, coss } from "../utils"
-import { PARTICLE_BUBBLE } from "../include/mario_constants"
+import * as MarioConstants from "../include/mario_constants"
 
 ////// Mario Constants
 export const ANIM_FLAG_NOLOOP = (1 << 0) // 0x01
@@ -931,6 +931,7 @@ export const execute_mario_action = (m) => {
 
 
         set_submerged_cam_preset_and_spawn_bubbles(m)
+        update_mario_health(m)
         update_mario_info_for_cam(m)
         mario_update_hitbox_and_cap_model(m)
 
@@ -942,11 +943,23 @@ export const execute_mario_action = (m) => {
     }
 }
 
+
 const mario_update_hitbox_and_cap_model = (m) => {
 
     const bodyState = m.marioBodyState
     const flags = 0 // TODO update_and_return_cap_flags(m)
 
+    if (flags & MARIO_VANISH_CAP) {
+        bodyState.modelState = MarioConstants.MODEL_STATE_NOISE_ALPHA
+    }
+
+    if (flags & MARIO_METAL_CAP) {
+        bodyState.modelState |= MarioConstants.MODEL_STATE_METAL
+    }
+
+    if (flags & MARIO_METAL_SHOCK) {
+        bodyState.modelState |= MarioConstants.MODEL_STATE_METAL
+    }
 
     if (m.invincTimer >= 3) {
         //! (Pause buffered hitstun) Since the global timer increments while paused,
@@ -958,6 +971,89 @@ const mario_update_hitbox_and_cap_model = (m) => {
         }
     }
 
+    if (flags & MARIO_CAP_IN_HAND) {
+        throw "todo (flags & MARIO_CAP_IN_HAND)"
+        if (flags & MARIO_WING_CAP) {
+            bodyState.handState = MARIO_HAND_HOLDING_WING_CAP
+        } else {
+            bodyState.handState = MARIO_HAND_HOLDING_CAP
+        }
+    }
+
+    if (flags & MARIO_CAP_ON_HEAD) {
+        throw "todo (flags & MARIO_CAP_ON_HEAD)"
+        if (flags & MARIO_WING_CAP) {
+            bodyState.capState = MARIO_HAS_WING_CAP_ON
+        } else {
+            bodyState.capState = MARIO_HAS_DEFAULT_CAP_ON
+        }
+    }
+
+    // Short hitbox for crouching/crawling/etc.
+    if (m.action & ACT_FLAG_SHORT_HITBOX) {
+        m.marioObj.hitboxHeight = 100.0
+    } else {
+        m.marioObj.hitboxHeight = 160.0
+    }
+
+    if ((m.flags & MARIO_TELEPORTING) && (m.fadeWarpOpacity != 0xFF)) {
+        bodyState.modelState &= ~0xFF
+        bodyState.modelState |= (0x100 | m.fadeWarpOpacity)
+    }
+
+}
+
+const update_mario_health = (m) => {
+
+    if (m.health >= 0x100) {
+
+        // When already healing or hurting Mario, Mario's HP is not changed any more here.
+        if ((m.healCounter | m.hurtCounter) == 0) {
+            if ((m.input & INPUT_IN_POISON_GAS) && ((m.action & ACT_FLAG_INTANGIBLE) == 0)) {
+                if (((m.flags & MARIO_METAL_CAP) == 0)) {
+                    m.health -= 4
+                }
+            } else {
+                if ((m.action & ACT_FLAG_SWIMMING) && ((m.action & ACT_FLAG_INTANGIBLE) == 0)) {
+                    const terrainIsSnow = (m.area.terrainType & SurfaceTerrains.TERRAIN_MASK) == SurfaceTerrains.TERRAIN_SNOW
+
+                    // When Mario is near the water surface, recover health (unless in snow),
+                    // when in snow terrains lose 3 health.
+                    // If using the debug level select, do not lose any HP to water.
+                    if ((m.pos[1] >= (m.waterLevel - 140)) && !terrainIsSnow) {
+                        m.health += 0x1A
+                    } else  {
+                        m.health -= (terrainIsSnow ? 3 : 1)
+                    }
+                }
+            }
+        }
+
+
+        if (m.healCounter > 0) {
+            m.health += 0x40
+            m.healCounter--
+        }
+        if (m.hurtCounter > 0) {
+            m.health -= 0x40
+            m.hurtCounter--
+        }
+
+        if (m.health >= 0x881) {
+            m.health = 0x880
+        }
+        if (m.health < 0x100) {
+            m.health = 0xFF
+        }
+
+
+        // TODO // Play a noise to alert the player when Mario is close to drowning.
+
+    }
+
+
+    /// TODO HACK because death is not implemented
+    if (m.health < 0x100) m.health = 0x100
 }
 
 const update_mario_button_inputs = (m) => {
@@ -1320,7 +1416,7 @@ const set_submerged_cam_preset_and_spawn_bubbles = (m) => {
             // of the water with his head out, spawn bubbles.
             if ((m.action & ACT_FLAG_INTANGIBLE) == 0) {
                 if ((m.pos[1] < (m.waterLevel - 160)) || (m.faceAngle[0] < -0x800)) {
-                    m.particleFlags |= PARTICLE_BUBBLE
+                    m.particleFlags |= MarioConstants.PARTICLE_BUBBLE
                 }
             }
         }

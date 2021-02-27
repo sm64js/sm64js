@@ -260,11 +260,14 @@ export const get_pos_from_transform_mtx = (dest, objMtx, camMtx) => {
 }
 
 export const mtxf_rotate_xy = (mtx, angle) => {
-    mtxf_identity(mtx)
-    mtx[0][0] = Math.cos(angle)
-    mtx[0][1] = Math.sin(angle)
-    mtx[1][0] = -mtx[0][1]
-    mtx[1][1] = mtx[0][0]
+    const temp = new Array(4).fill(0).map(() => new Array(4).fill(0))
+    mtxf_identity(temp)
+    temp[0][0] = coss(angle)
+    temp[0][1] = sins(angle)
+    temp[1][0] = -temp[0][1]
+    temp[1][1] = temp[0][0]
+
+    mtxf_to_mtx(mtx, temp)
 }
 
 export const mtxf_scale_vec3f = (dest, mtx, s) => {

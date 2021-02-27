@@ -5,7 +5,7 @@ import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oM
 
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { atan2s, mtxf_rotate_zxy_and_translate } from "../engine/math_util"
-import { sins, coss, int16 } from "../utils"
+import { sins, coss, int16, random_uint16 } from "../utils"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { ATTACK_PUNCH, INT_STATUS_WAS_ATTACKED, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "./Interaction"
@@ -13,6 +13,7 @@ import { ACT_GROUND_POUND_LAND } from "./Mario"
 import { gLinker } from "./Linker"
 import * as Gbi from "../include/gbi"
 import { MODEL_YELLOW_COIN } from "../include/model_ids"
+import { spawn_mist_particles_variable } from "./behaviors/white_puff.inc"
 
 export const cur_obj_set_behavior = (behavior) => {
     const o = ObjectListProc.gCurrentObject
@@ -792,7 +793,7 @@ export const cur_obj_spawn_particles = (info) => {
         const particle = spawn_object(o, info.model, gLinker.behaviors.bhvWhitePuffExplosion)
 
         particle.rawData[oBehParams2ndByte] = info.behParam
-        particle.rawData[oMoveAngleYaw] = Math.floor(Math.random() * 65535)
+        particle.rawData[oMoveAngleYaw] = random_uint16()
         particle.rawData[oGravity] = info.gravity
         particle.rawData[oDragStrength] = info.dragStrength
 
@@ -1038,6 +1039,10 @@ export const obj_spawn_loot_coins = (obj, numCoins, sp30, coinsBehavior, posJitt
 
 export const obj_spawn_loot_yellow_coins = (obj, numCoins, sp28) => {
     obj_spawn_loot_coins(obj, numCoins, sp28, gLinker.behaviors.bhvSingleCoinGetsSpawned, 0, MODEL_YELLOW_COIN)
+}
+
+export const spawn_mist_particles = () => {
+    spawn_mist_particles_variable(0, 0, 46.0)
 }
 
 export const cur_obj_wait_then_blink = (timeUntilBlinking, numBlinks) => {

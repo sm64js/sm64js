@@ -178,7 +178,7 @@ export const oFloorType          = 0x4C
 export const oFloorRoom          = 0x4C
 export const oAngleToHome        = 0x4D
 export const oFloor = 0x4E
-
+export const oDeathSound    =    0x4F
 
 export const oGraphYOffset = 0x15
 export const oActiveParticleFlags = 0x16

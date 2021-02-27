@@ -18,3 +18,6 @@ export const PARTICLE_MIST_CIRCLE          /* 0x00010000 */ = (1 << 16)
 export const PARTICLE_BREATH               /* 0x00020000 */ = (1 << 17)
 export const PARTICLE_TRIANGLE             /* 0x00040000 */ = (1 << 18)
 export const PARTICLE_19                   /* 0x00080000 */ = (1 << 19)
+
+export const MODEL_STATE_NOISE_ALPHA = 0x180
+export const MODEL_STATE_METAL       = 0x200

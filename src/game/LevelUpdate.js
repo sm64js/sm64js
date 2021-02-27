@@ -155,12 +155,9 @@ class LevelUpdate {
     update_hud_values() {
 
         if (this.gCurrCreditsEntry == null) {
-            console.log("health: ", this.gMarioState.health)
-            const numHealthWedges = this.gMarioState.health > 0 ? this.gMarioState.health >> 8 : 0;
-            console.log(this.gCurrCourseNum)
-            const displayCoins = this.gCurrCourseNum >= CourseTable.COURSE_MIN;
+            const numHealthWedges = this.gMarioState.health > 0 ? this.gMarioState.health >> 8 : 0
 
-            if (displayCoins) {
+            if (Area.gCurrCourseNum > 0) {
                 this.gHudDisplay.flags |= this.HUD_DISPLAY_FLAG_COIN_COUNT;
             } else {
                 this.gHudDisplay.flags &= ~this.HUD_DISPLAY_FLAG_COIN_COUNT;
@@ -204,7 +201,6 @@ class LevelUpdate {
             this.gHudDisplay.lives = this.gMarioState.numLives;
             this.gHudDisplay.keys = this.gMarioState.numKeys;
 
-            console.log("wedges: ", numHealthWedges)
             if (numHealthWedges > this.gHudDisplay.wedges) {
                 //play_sound(SOUND_MENU_POWER_METER, gDefaultSoundArgs);
             }

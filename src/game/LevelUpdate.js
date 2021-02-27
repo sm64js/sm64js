@@ -157,10 +157,10 @@ class LevelUpdate {
     update_hud_values() {
 
         if (this.gCurrCreditsEntry == null) {
-            const numHealthWedges = this.gMarioState.health > 0 ? this.gMarioState.health >> 8 : 0;
-            const displayCoins = this.gCurrCourseNum >= CourseTable.COURSE_MIN;
 
-            if (displayCoins) {
+            const numHealthWedges = this.gMarioState.health > 0 ? this.gMarioState.health >> 8 : 0
+
+            if (Area.gCurrCourseNum > 0) {
                 this.gHudDisplay.flags |= this.HUD_DISPLAY_FLAG_COIN_COUNT;
             } else {
                 this.gHudDisplay.flags &= ~this.HUD_DISPLAY_FLAG_COIN_COUNT;

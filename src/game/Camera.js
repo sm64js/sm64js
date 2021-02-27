@@ -6,10 +6,10 @@ import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS } from "../levels
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { atan2s } from "../engine/math_util"
 import * as MathUtil from "../engine/math_util"
-import { ACT_FLAG_METAL_WATER, ACT_FLAG_ON_POLE, ACT_FLAG_HANGING, ACT_RIDING_HOOT, ACT_LONG_JUMP, ACT_TOP_OF_POLE, ACT_SLEEPING, ACT_START_SLEEPING, ACT_DIVE } from "./Mario"
+import * as Mario from "./Mario"
 import { oPosY } from "../include/object_constants"
 import { SURFACE_DEATH_PLANE } from "../include/surface_terrains"
-import { sins } from "../utils"
+import { sins, int16 } from "../utils"
 import { HudInstance as Hud } from "./Hud"
 
 const CAM_FOV_DEFAULT = 2
@@ -159,6 +159,8 @@ class Camera {
 
             shakeMagnitude: [0.0, 0.0, 0.0],
             shakePitchPhase: 0,
+            shakeYawPhase: 0,
+            shakeRollPhase: 0,
 
             mode: 0,
             defMode: 0,
@@ -302,9 +304,7 @@ class Camera {
     }
 
     camera_approach_symmetric_bool(currentWrapper, target, increment) {
-        let dist = target - currentWrapper.current
-        if (dist < -32768) dist += 65536
-        if (dist > 32767) dist -= 65536
+        let dist = int16(target - currentWrapper.current)
 
         if (increment < 0) {
             increment = -1 * increment
@@ -312,14 +312,14 @@ class Camera {
         if (dist > 0) {
             dist -= increment
             if (dist >= 0) {
-                currentWrapper.current = target - dist
+                currentWrapper.current = int16(target - dist)
             } else {
                 currentWrapper.current = target
             }
         } else {
             dist += increment
             if (dist <= 0) {
-                currentWrapper.current = target - dist
+                currentWrapper.current = int16(target - dist)
             } else {
                 currentWrapper.current = target
             }
@@ -652,7 +652,7 @@ class Camera {
         const floorHeight = this.sMarioGeometry.currFloorHeight
         const waterHeight = -99999
 
-        if (!(this.gPlayerCameraState.action & ACT_FLAG_METAL_WATER)) {
+        if (!(this.gPlayerCameraState.action & Mario.ACT_FLAG_METAL_WATER)) {
             if (floorHeight < (waterHeight)) {
                 floorHeight = waterHeight
             }
@@ -660,7 +660,7 @@ class Camera {
 
         const marioObj = LevelUpdate.gMarioState
 
-        if (this.gPlayerCameraState.action & ACT_FLAG_ON_POLE) {
+        if (this.gPlayerCameraState.action & Mario.ACT_FLAG_ON_POLE) {
             const pole = marioObj.usedObj
             const poleHitboxHeight = pole.hitboxHeight
 
@@ -711,8 +711,8 @@ class Camera {
         pan[2] = 0
 
         // If mario is long jumping, or on a flag pole (but not at the top), then pan in the opposite direction
-        if (this.gPlayerCameraState.action == ACT_LONG_JUMP ||
-            (this.gPlayerCameraState.action != ACT_TOP_OF_POLE && (this.gPlayerCameraState.action & ACT_FLAG_ON_POLE))) {
+        if (this.gPlayerCameraState.action == Mario.ACT_LONG_JUMP ||
+            (this.gPlayerCameraState.action != Mario.ACT_TOP_OF_POLE && (this.gPlayerCameraState.action & Mario.ACT_FLAG_ON_POLE))) {
             pan[0] = -pan[0]
         }
 
@@ -1007,11 +1007,11 @@ class Camera {
         ///Poison Gas
 
 
-        if (this.gPlayerCameraState.action & ACT_FLAG_HANGING || this.gPlayerCameraState.action == ACT_RIDING_HOOT) {
+        if (this.gPlayerCameraState.action & Mario.ACT_FLAG_HANGING || this.gPlayerCameraState.action == Mario.ACT_RIDING_HOOT) {
             /// TODO hanging or riding
         }
 
-        if (this.gPlayerCameraState.action & ACT_FLAG_ON_POLE) {
+        if (this.gPlayerCameraState.action & Mario.ACT_FLAG_ON_POLE) {
             camFloorHeight = LevelUpdate.gMarioState.usedObj.rawData[oPosY] + 125
             if (this.gPlayerCameraState.pos[1] - 100 > camFloorHeight) {
                 camFloorHeight = this.gPlayerCameraState.pos[1] - 100
@@ -1158,11 +1158,11 @@ class Camera {
 
             // Apply camera shakes TODO
             this.shake_camera_pitch(this.gLakituState.pos, this.gLakituState.focus)
-            //shake_camera_yaw()
-            //shake_camera_roll()
+            this.shake_camera_yaw(this.gLakituState.pos, this.gLakituState.focus)
+            this.shake_camera_roll(this.gLakituState.roll)
             //shake_camera_handheld()
 
-            if (this.gPlayerCameraState.action == ACT_DIVE && this.gLakituState.lastFrameAction != ACT_DIVE) {
+            if (this.gPlayerCameraState.action == Mario.ACT_DIVE && this.gLakituState.lastFrameAction != Mario.ACT_DIVE) {
                 this.set_camera_shake_from_hit(this.SHAKE_HIT_FROM_BELOW)
             }
 
@@ -1236,7 +1236,7 @@ class Camera {
     fov_default(m) {
         this.sStatusFlags &= ~CAM_FLAG_SLEEPING
 
-        if ((m.action == ACT_SLEEPING) || (m.action == ACT_START_SLEEPING)) {
+        if ((m.action == Mario.ACT_SLEEPING) || (m.action == Mario.ACT_START_SLEEPING)) {
             throw "sleeping"
         } else {
             const wrapper = { current: this.sFOVState.fov }
@@ -1252,6 +1252,48 @@ class Camera {
             case this.SHAKE_HIT_FROM_BELOW:
                 this.gLakituState.focHSpeed = 0.07
                 this.gLakituState.posHSpeed = 0.07
+                break
+            case this.SHAKE_SMALL_DAMAGE:
+                if (this.gPlayerCameraState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
+                    this.set_camera_yaw_shake(0x200, 0x10, 0x1000)
+                    this.set_camera_roll_shake(0x400, 0x20, 0x1000)
+                    this.set_fov_shake(0x100, 0x30, 0x8000)
+                } else {
+                    this.set_camera_yaw_shake(0x80, 0x8, 0x4000)
+                    this.set_camera_roll_shake(0x80, 0x8, 0x4000)
+                    this.set_fov_shake(0x100, 0x30, 0x8000)
+                }
+
+                this.gLakituState.focHSpeed = 0
+                this.gLakituState.posHSpeed = 0
+                break
+            case this.SHAKE_MED_DAMAGE:
+                if (this.gPlayerCameraState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
+                    this.set_camera_yaw_shake(0x400, 0x20, 0x1000)
+                    this.set_camera_roll_shake(0x600, 0x30, 0x1000)
+                    this.set_fov_shake(0x180, 0x40, 0x8000)
+                } else {
+                    this.set_camera_yaw_shake(0x100, 0x10, 0x4000)
+                    this.set_camera_roll_shake(0x100, 0x10, 0x4000)
+                    this.set_fov_shake(0x180, 0x40, 0x8000);
+                }
+
+                this.gLakituState.focHSpeed = 0
+                this.gLakituState.posHSpeed = 0
+                break
+            case this.SHAKE_LARGE_DAMAGE:
+                if (this.gPlayerCameraState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
+                    this.set_camera_yaw_shake(0x600, 0x30, 0x1000)
+                    this.set_camera_roll_shake(0x800, 0x40, 0x1000)
+                    this.set_fov_shake(0x200, 0x50, 0x8000)
+                } else {
+                    this.set_camera_yaw_shake(0x180, 0x20, 0x4000)
+                    this.set_camera_roll_shake(0x200, 0x20, 0x4000)
+                    this.set_fov_shake(0x200, 0x50, 0x8000);
+                }
+
+                this.gLakituState.focHSpeed = 0
+                this.gLakituState.posHSpeed = 0
                 break
             default: throw "unimplemented camera shake from hit - set_camera_shake_from_hit"
         }
@@ -1282,11 +1324,68 @@ class Camera {
         }
     }
 
+    shake_camera_yaw(pos, focus) {
+        if (this.gLakituState.shakeMagnitude[1] != 0) {
+            const output = {}
+            MathUtil.vec3f_get_dist_and_angle(pos, focus, output)
+            output.yaw += this.gLakituState.shakeMagnitude[1] * sins(this.gLakituState.shakeYawPhase)
+            MathUtil.vec3f_set_dist_and_angle(pos, focus, output.dist, output.pitch, output.yaw)
+            const wrapper = { value: this.gLakituState.shakeYawPhase }
+            this.increment_shake_offset(wrapper, this.gLakituState.shakeYawVel)
+            this.gLakituState.shakeYawPhase = wrapper.value
+            const currentWrapper = { current: this.gLakituState.shakeMagnitude[1] }
+            if (this.camera_approach_symmetric_bool(currentWrapper, 0, this.gLakituState.shakeYawDecay) == 0) {
+                this.gLakituState.shakeYawPhase = 0
+            }
+            this.gLakituState.shakeMagnitude[1] = currentWrapper.current
+        }
+    }
+
+    shake_camera_roll() {
+
+        if (this.gLakituState.shakeMagnitude[2] != 0) {
+            const wrapper = { value: this.gLakituState.shakeRollPhase }
+            this.increment_shake_offset(wrapper, this.gLakituState.shakeRollVel)
+            this.gLakituState.shakeRollPhase = wrapper.value
+            this.gLakituState.roll += int16(this.gLakituState.shakeMagnitude[2] * sins(this.gLakituState.shakeRollPhase))
+            const currentWrapper = { current: this.gLakituState.shakeMagnitude[2] }
+            if (this.camera_approach_symmetric_bool(currentWrapper, 0, this.gLakituState.shakeRollDecay) == 0) {
+                this.gLakituState.shakeRollPhase = 0
+            }
+            this.gLakituState.shakeMagnitude[2] = currentWrapper.current
+        }
+
+    }
+
     set_camera_pitch_shake(mag, decay, inc) {
         if (this.gLakituState.shakeMagnitude[0] < mag) {
-            this.gLakituState.shakeMagnitude[0] = mag
-            this.gLakituState.shakePitchDecay = decay
-            this.gLakituState.shakePitchVel = inc
+            this.gLakituState.shakeMagnitude[0] = int16(mag)
+            this.gLakituState.shakePitchDecay = int16(decay)
+            this.gLakituState.shakePitchVel = int16(inc)
+        }
+    }
+
+    set_camera_yaw_shake(mag, decay, inc) {
+        if (Math.abs(mag) > Math.abs(this.gLakituState.shakeMagnitude[1])) {
+            this.gLakituState.shakeMagnitude[1] = int16(mag)
+            this.gLakituState.shakeYawDecay = int16(decay)
+            this.gLakituState.shakeYawVel = int16(inc)
+        }
+    }
+
+    set_camera_roll_shake(mag, decay, inc) {
+        if (this.gLakituState.shakeMagnitude[2] < mag) {
+            this.gLakituState.shakeMagnitude[2] = int16(mag)
+            this.gLakituState.shakeRollDecay = int16(decay)
+            this.gLakituState.shakeRollVel = int16(inc)
+        }
+    }
+
+    set_fov_shake(amplitude, decay, shakeSpeed) {
+        if (amplitude > this.sFOVState.shakeAmplitude) {
+            this.sFOVState.shakeAmplitude = amplitude
+            this.sFOVState.decay = decay
+            this.sFOVState.shakeSpeed = shakeSpeed
         }
     }
 

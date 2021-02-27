@@ -1150,7 +1150,8 @@ const check_common_moving_cancels = (m) => {
     }
 
     if (m.input & Mario.INPUT_SQUISHED) {
-        return Mario.drop_and_set_mario_action(m, Mario.ACT_SQUISHED, 0);
+        /// TODO Squish is not implemented
+        //return Mario.drop_and_set_mario_action(m, Mario.ACT_SQUISHED, 0);
     }
 
     if (!(m.action & Mario.ACT_FLAG_INVULNERABLE)) {

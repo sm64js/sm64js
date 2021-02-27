@@ -119,7 +119,8 @@ class Hud {
     animate_power_meter_emphasized() {
         var hudDisplayFlags = LevelUpdate.gHudDisplay.flags;
 
-        if (!(hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_EMPHASIZE_POWER > 0)) {
+
+        if (!(hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_EMPHASIZE_POWER)) {
             if (this.sPowerMeterVisibleTimer == 45.0) {
                 this.sPowerMeterHUD.animation = this.POWER_METER_DEEMPHASIZING;
             }
@@ -161,9 +162,9 @@ class Hud {
 
     handle_power_meter_actions(numHealthWedges) {
         // Show power meter if health is not full, less than 8
-        if (numHealthWedges < 8 && this.sPowerMeterStoredHealth == 8 && sPowerMeterHUD.animation == this.POWER_METER_HIDDEN) {
-            this.sPowerMeterHUD.animation = this.POWER_METER_EMPHASIZED;
-            this.sPowerMeterHUD.y = 166;
+        if (numHealthWedges < 8 && this.sPowerMeterStoredHealth == 8 && this.sPowerMeterHUD.animation == this.POWER_METER_HIDDEN) {
+            this.sPowerMeterHUD.animation = this.POWER_METER_EMPHASIZED
+            this.sPowerMeterHUD.y = 166
         }
 
         // Show power meter if health is full, has 8
@@ -193,7 +194,7 @@ class Hud {
         const shownHealthWedges = LevelUpdate.gHudDisplay.wedges;
 
         if (this.sPowerMeterHUD.animation != this.POWER_METER_HIDING) {
-            this.handle_power_meter_actions(shownHealthWedges);
+            this.handle_power_meter_actions(shownHealthWedges)
         }
 
         if (this.sPowerMeterHUD.animation == this.POWER_METER_HIDDEN) {
@@ -234,7 +235,7 @@ class Hud {
     render_hud_stars() {
         var showX = 0;
 
-        if (LevelUpdate.gHudFlash == 1 && window.gGlobalTimer & 0x08 > 0) {
+        if (LevelUpdate.gHudFlash == 1 && window.gGlobalTimer & 0x08) {
             return;
         }
 
@@ -342,7 +343,7 @@ class Hud {
                 this.render_hud_stars()
             }
 
-            // if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_KEYS > 0) {
+            // if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_KEYS) {
             //     this.render_hud_keys();
             // }
 
@@ -351,7 +352,7 @@ class Hud {
                 this.render_hud_camera_status()
             }
 
-            // if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_TIMER > 0) {
+            // if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_TIMER) {
             //     this.render_hud_timer();
             // }
         }

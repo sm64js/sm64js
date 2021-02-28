@@ -1,5 +1,6 @@
 ﻿import { GameInstance as Game } from "./game/Game"
-import  * as Socket from "./mmo/socket.js"
+import * as Socket from "./mmo/socket.js"
+import NanoTimer from "nanotimer"
 
 let n_frames = 0
 
@@ -16,13 +17,16 @@ const produce_one_frame = () => {
     n_frames++
 }
 
+
 const main_func = () => {
 
-    setInterval(() => {  /// gameMaster main loop
+    const gameTimer = new NanoTimer()
+
+    gameTimer.setInterval(() => {  /// gameMaster main loop
         const startTime = Date.now()
         produce_one_frame()
         if (Date.now() - startTime > 30) console.log("WARN - Server frame took longer than 30ms!!")
-    }, frameSpeed)
+    }, '', frameSpeed.toString() + 'm')
 
 }
 

@@ -400,22 +400,17 @@ class GeoRenderer {
                 this.geo_set_animation_globals(object.header.gfx.unk38, hasAnimation)
             }
 
-            if (true) { 
+            if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) { 
                 if (object.header.gfx.sharedChild) {
 
-                    if (object.localMario) {
-/*                        MarioMisc.gBodyState = object.marioState.marioBodyState
-                        MarioMisc.parachuting = (object.marioState.parachuting) && object.marioState.vel[1] < 0.0
-                        MarioMisc.customCapState = window.myMario.skinData.customCapState
-                        //// sending my own custom gfx opcode to set skin id
-                        this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.mySocketID)], 1) */
+                    if (!object.localMario) {
+                        this.gCurGraphNodeObject = node.wrapper
+                        object.header.gfx.sharedChild.parent = object.header.gfx.node
+                        this.geo_process_single_node(object.header.gfx.sharedChild)
+                        object.header.gfx.sharedChild.parent = null
+                        this.gCurGraphNodeObject = null
                     }
 
-                    this.gCurGraphNodeObject = node.wrapper
-                    object.header.gfx.sharedChild.parent = object.header.gfx.node
-                    this.geo_process_single_node(object.header.gfx.sharedChild)
-                    object.header.gfx.sharedChild.parent = null
-                    this.gCurGraphNodeObject = null
                 }
 
                 if (object.header.gfx.node.children[0]) {
@@ -437,6 +432,7 @@ class GeoRenderer {
                 const data = remotePlayerList[i]
                 if (data.skipRender > 0) data.skipRender--
                 if (data.crashCount > 0 || data.skipRender > 0) return
+                if (data.marioState.marioObj == object) return
 
                 if (data.marioState.marioObj.header.gfx.unk38.curAnim == 0) {
                     console.log("remote mario not initialized yet or not initialized properly, skipping rendering -- playerName: " + data.marioState.playerName)
@@ -483,6 +479,10 @@ class GeoRenderer {
 
             //// sending my own custom gfx opcode to set skin id and playerName
             const remote_socket_id = object.marioState.socket_id
+
+            MarioMisc.gBodyState = object.marioState.marioBodyState
+            MarioMisc.vel = object.marioState.vel
+            MarioMisc.customCapState = 0
             this.geo_append_display_list([Gbi.gsSetPlayerData(remote_socket_id)], 1)
 
             this.gCurGraphNodeObject = object.header.gfx

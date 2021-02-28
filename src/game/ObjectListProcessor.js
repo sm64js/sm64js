@@ -248,11 +248,6 @@ class ObjectListProcessor {
     bhv_mario_update() {
 
         if (this.gCurrentObject.localMario) return
-            
-        const torsoDiff = [0, 0, 0]
-        vec3f_dif(torsoDiff, this.gCurrentObject.marioState.pos, this.gCurrentObject.marioState.marioBodyState.torsoPos)
-        if (vec3f_length(torsoDiff) > 300)
-            this.gCurrentObject.marioState.marioBodyState.torsoPos = [...this.gCurrentObject.marioState.pos]
 
         const particleFlags = Mario.execute_mario_action(this.gCurrentObject.marioState)
 

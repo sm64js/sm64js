@@ -88,8 +88,8 @@ const detect_player_hitbox_overlap = (local, remote) => {
     if (a.rawData[oIntangibleTimer] != 0) return
     if (b.rawData[oIntangibleTimer] != 0) return
 
-    const aTorso = local.marioState.marioBodyState.torsoPos
-    const bTorso = remote.marioState.marioBodyState.torsoPos
+    const aTorso = local.marioState.pos
+    const bTorso = remote.marioState.pos
 
     const sp3C = aTorso[1] - a.hitboxDownOffset
     const sp38 = bTorso[1] - b.hitboxDownOffset

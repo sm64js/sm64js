@@ -479,12 +479,12 @@ class GeoRenderer {
             const remote_socket_id = object.marioState.socket_id
             if (object.localMario) {
                 MarioMisc.gBodyState = object.marioState.marioBodyState
-                MarioMisc.parachuting = (object.marioState.parachuting) && object.marioState.vel[1] < 0.0
+                MarioMisc.vel = object.marioState.vel
                 MarioMisc.customCapState = window.myMario.skinData.customCapState
                 this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.mySocketID)], 1) 
             } else {
                 MarioMisc.gBodyState = object.marioState.marioBodyState
-                MarioMisc.parachuting = object.marioState.parachuting && object.marioState.vel[1] < 0.0
+                MarioMisc.vel = object.marioState.vel
                 MarioMisc.customCapState = networkData.remotePlayers[remote_socket_id].skinData.customCapState
                 this.geo_append_display_list([Gbi.gsSetPlayerData(remote_socket_id)], 1)
             }

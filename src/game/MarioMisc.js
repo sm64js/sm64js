@@ -4,6 +4,8 @@ import { GEO_CONTEXT_RENDER, GEO_CONTEXT_CREATE } from "../engine/graph_node"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import * as Mario from "./Mario"
 import { get_pos_from_transform_mtx } from "../engine/math_util"
+import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
+import { oVelY } from "../include/object_constants"
 
 class MarioMisc {
     constructor() {
@@ -14,7 +16,6 @@ class MarioMisc {
             heldObjLastPosition: [0, 0, 0]
         }
         this.customCapState = 0
-        this.parachuting = 0
     }
 
     geo_draw_mario_head_goddard(callContext, node) {
@@ -79,7 +80,10 @@ class MarioMisc {
     }
 
     geo_switch_parachuting(callContext, switchCase) {
-        switchCase.selectedCase = this.parachuting ? 1 : 0
+        if (callContext == GEO_CONTEXT_RENDER) {
+            const marioYVel = this.vel[1]
+            switchCase.selectedCase = (this.gBodyState.action == Mario.ACT_PARACHUTING && marioYVel < 0) ? 1 : 0
+        }
     }
 }
 

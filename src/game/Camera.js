@@ -6,7 +6,7 @@ import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS } from "../levels
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { atan2s } from "../engine/math_util"
 import * as MathUtil from "../engine/math_util"
-import { ACT_FLAG_METAL_WATER, ACT_FLAG_ON_POLE, ACT_FLAG_HANGING, ACT_RIDING_HOOT, ACT_LONG_JUMP, ACT_TOP_OF_POLE, ACT_SLEEPING, ACT_START_SLEEPING, ACT_DIVE } from "./Mario"
+import { ACT_FLAG_METAL_WATER, ACT_FLAG_ON_POLE, ACT_FLAG_HANGING, ACT_RIDING_HOOT, ACT_LONG_JUMP, ACT_TOP_OF_POLE, ACT_SLEEPING, ACT_START_SLEEPING, ACT_DIVE, ACT_PARACHUTING } from "./Mario"
 import { oPosY } from "../include/object_constants"
 import { SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { sins } from "../utils"
@@ -1157,7 +1157,7 @@ class Camera {
         graphNode.pos = [...this.gLakituState.pos]
         graphNode.focus = [...this.gLakituState.focus]
 
-        if (LevelUpdate.gMarioState.parachuting) {
+        if (LevelUpdate.gMarioState.action == ACT_PARACHUTING) {
             graphNode.pos[1] = LevelUpdate.gMarioState.pos[1] + 1000
             graphNode.focus = [...LevelUpdate.gMarioState.pos]
         }

@@ -224,7 +224,7 @@ const resolve_player_collision = (m, m2) => {
             if (m2.marioObj.localMario) {
                 m2.squishTimer = Math.max(m2.squishTimer, 4)
             }
-            bounce_off_object(m, m2.marioObj, 60.0)
+            bounce_off_object(m, m2.marioObj, 40.0)
             // queue_rumble_data_mario(m, 5, 80);
             // don't do further interactions if we've hopped on top
             return true

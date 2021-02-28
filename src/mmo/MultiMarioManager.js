@@ -4,6 +4,7 @@ import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "./socket"
 import { INTERACT_PLAYER } from "../game/Interaction"
 import { gLinker } from "../game/Linker"
+import { uint32, uint16, int16 } from "../utils"
 
 const rawDataMap = {
     0: RAW.oMarioPoleYawVel,
@@ -101,17 +102,19 @@ export const createAllMarioMsg = () => {
 
         mariomsg.setController(createControllerProtoMsg(remoteMario.marioState))
 
-        mariomsg.setActionstate(remoteMario.marioState.actionState)
-        mariomsg.setActiontimer(remoteMario.marioState.actionTimer)
+        const m = remoteMario.marioState
 
-        mariomsg.setAction(remoteMario.marioState.action)
-        mariomsg.setPrevaction(remoteMario.marioState.prevAction)
-        mariomsg.setActionarg(remoteMario.marioState.actionArg)
-        mariomsg.setInvinctimer(remoteMario.marioState.invincTimer)
-        mariomsg.setFramessincea(remoteMario.marioState.framesSinceA)
-        mariomsg.setFramessinceb(remoteMario.marioState.framesSinceB)
-        mariomsg.setWallkicktimer(remoteMario.marioState.wallKickTimer)
-        mariomsg.setDoublejumptimer(remoteMario.marioState.doubleJumpTimer)
+        mariomsg.setActionstate(uint16(remoteMario.marioState.actionState))
+        mariomsg.setActiontimer(uint16(remoteMario.marioState.actionTimer))
+
+        mariomsg.setAction(uint32(remoteMario.marioState.action))
+        mariomsg.setPrevaction(uint32(remoteMario.marioState.prevAction))
+        mariomsg.setActionarg(uint32(remoteMario.marioState.actionArg))
+        mariomsg.setInvinctimer(int16(remoteMario.marioState.invincTimer))
+        mariomsg.setFramessincea(uint32(remoteMario.marioState.framesSinceA))
+        mariomsg.setFramessinceb(uint32(remoteMario.marioState.framesSinceB))
+        mariomsg.setWallkicktimer(uint32(remoteMario.marioState.wallKickTimer))
+        mariomsg.setDoublejumptimer(uint32(remoteMario.marioState.doubleJumpTimer))
         mariomsg.setAnglevelList(remoteMario.marioState.angleVel)
         mariomsg.setForwardvel(remoteMario.marioState.forwardVel)
         mariomsg.setVelList(remoteMario.marioState.vel)

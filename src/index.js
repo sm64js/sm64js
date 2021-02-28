@@ -10,7 +10,7 @@ const send_display_list = (gfx_list) => { if (window.gameMasterDebug) GFX.run(gf
 
 let n_frames = 0
 let target_time = 0
-let frameSpeed = 30 ///units is ms, so 30 equates to 33fps
+let frameSpeed = 33 ///units is ms, so 30 equates to 33fps
 
 const produce_one_frame = () => {
 

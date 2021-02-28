@@ -53,13 +53,13 @@ const update_air_with_turn = (m) => {
             if (intendedDYaw < -32768) intendedDYaw += 65536
             intendedMag = m.intendedMag / 32.0;
 
-            if (m.parachuting) intendedMag *= 3.0
+            if (m.action == Mario.ACT_PARACHUTING) intendedMag *= 3.0
 
             m.forwardVel += 1.5 * Math.cos(intendedDYaw / 0x8000 * Math.PI) * intendedMag;
             m.faceAngle[1] += Math.floor(512.0 * Math.sin(intendedDYaw / 0x8000 * Math.PI) * intendedMag)
         }
 
-        if (m.parachuting && m.forwardVel > 65.0) m.forwardVel = 65.0
+        if (m.action == Mario.ACT_PARACHUTING && m.forwardVel > 65.0) m.forwardVel = 65.0
 
 
         //! Uncapped air speed. Net positive when moving forward.
@@ -112,9 +112,9 @@ const act_butt_slide_air = (m) => {
 
 const common_air_action_step = (m, landAction, animation, stepArg) => {
 
-    ///TODO add this, this moves mario slightly while in air by joystick
-    if (m.parachuting) update_air_with_turn(m)
-     else update_air_without_turn(m)
+
+    if (m.action == Mario.ACT_PARACHUTING) update_air_with_turn(m)
+    else update_air_without_turn(m)
 
     const stepResult = perform_air_step(m, stepArg)
 
@@ -234,6 +234,12 @@ const act_jump = (m) => {
     if (m.input & Mario.INPUT_Z_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
     }
+	
+    if (m.input & Mario.INPUT_PARACHUTE) {
+		m.input ^= Mario.INPUT_PARACHUTE
+        m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
+    }
 
     //play sound
     common_air_action_step(m, Mario.ACT_JUMP_LAND, Mario.MARIO_ANIM_SINGLE_JUMP,
@@ -252,12 +258,40 @@ const act_freefall = (m) => {
     if (m.input & Mario.INPUT_Z_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
     }
+	
+    if (m.input & Mario.INPUT_PARACHUTE) {
+		m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
+    }
 
     switch (m.actionArg) {
         case 0: animation = Mario.MARIO_ANIM_GENERAL_FALL; break
         case 1: animation = Mario.MARIO_ANIM_FALL_FROM_SLIDE; break
         case 2: animation = Mario.MARIO_ANIM_FALL_FROM_SLIDE_KICK; break
         default: throw "act freefall unknown action arg: " + m.actionArg
+    }
+
+    common_air_action_step(m, Mario.ACT_FREEFALL_LAND, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
+    return 0
+}
+
+const act_parachuting = (m) => {
+    let animation
+
+    if (m.input & Mario.INPUT_Z_PRESSED) {
+        return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
+    }
+	
+    if (m.input & Mario.INPUT_PARACHUTE) {
+		m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
+    }
+
+    switch (m.actionArg) {
+        case 0: animation = Mario.MARIO_ANIM_GENERAL_FALL; break
+        case 1: animation = Mario.MARIO_ANIM_FALL_FROM_SLIDE; break
+        case 2: animation = Mario.MARIO_ANIM_FALL_FROM_SLIDE_KICK; break
+        default: throw "act parachuting unknown action arg: " + m.actionArg
     }
 
     common_air_action_step(m, Mario.ACT_FREEFALL_LAND, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
@@ -272,6 +306,11 @@ const act_side_flip = (m) => {
 
     if (m.input & Mario.INPUT_Z_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
+    }
+	
+    if (m.input & Mario.INPUT_PARACHUTE) {
+		m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
     }
 
     if (common_air_action_step(m, Mario.ACT_SIDE_FLIP_LAND, Mario.MARIO_ANIM_SLIDEFLIP, Mario.AIR_STEP_CHECK_LEDGE_GRAB) != Mario.AIR_STEP_GRABBED_LEDGE) {
@@ -290,6 +329,11 @@ const act_double_jump = (m) => {
     if (m.input & Mario.INPUT_Z_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
     }
+	
+    if (m.input & Mario.INPUT_PARACHUTE) {
+		m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
+    }
 
     common_air_action_step(m, Mario.ACT_DOUBLE_JUMP_LAND, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB | Mario.AIR_STEP_CHECK_HANG)
 
@@ -304,6 +348,11 @@ const act_triple_jump = (m) => {
 
     if (m.input & Mario.INPUT_Z_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
+    }
+	
+    if (m.input & Mario.INPUT_PARACHUTE) {
+		m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
     }
 
     common_air_action_step(m, Mario.ACT_TRIPLE_JUMP_LAND, Mario.MARIO_ANIM_TRIPLE_JUMP, 0)
@@ -333,6 +382,11 @@ const act_backflip = (m) => {
     if (m.input & Mario.INPUT_Z_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
     }
+	
+    if (m.input & Mario.INPUT_PARACHUTE) {
+		m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
+    }
 
     common_air_action_step(m, Mario.ACT_BACKFLIP_LAND, Mario.MARIO_ANIM_BACKFLIP, 0)
     return 0
@@ -344,6 +398,11 @@ const act_long_jump = (m) => {
         animation = Mario.MARIO_ANIM_FAST_LONGJUMP
     } else {
         animation = Mario.MARIO_ANIM_SLOW_LONGJUMP
+    }
+
+    if (m.input & Mario.INPUT_PARACHUTE) {
+        m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
     }
 
     //play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_YAHOO);
@@ -360,6 +419,11 @@ const act_dive = (m) => {
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_DIVE)
 
     update_air_without_turn(m)
+	
+    if (m.input & Mario.INPUT_PARACHUTE) {
+		m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
+    }
 
     switch (perform_air_step(m, 0)) {
         case Mario.AIR_STEP_NONE:
@@ -697,6 +761,11 @@ const act_steep_jump = (m) => {
     if (m.input & Mario.INPUT_B_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
+	
+    if (m.input & Mario.INPUT_PARACHUTE) {
+		m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
+    }
 
     //play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0);
     Mario.set_forward_vel(m, 0.98 * m.forwardVel)
@@ -722,6 +791,11 @@ const act_steep_jump = (m) => {
 const act_water_jump = (m) => {
     if (m.forwardVel < 15.0) {
         Mario.set_forward_vel(m, 15.0);
+    }
+	
+    if (m.input & Mario.INPUT_PARACHUTE) {
+		m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
     }
 
     //TODO play_mario_sound(m, SOUND_ACTION_UNKNOWN432, 0);
@@ -827,6 +901,7 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_KNOCKED_UP: return act_knocked_up(m)
         case Mario.ACT_WATER_JUMP: return act_water_jump(m)
         case Mario.ACT_HOLD_WATER_JUMP: return act_hold_water_jump(m)
+        case Mario.ACT_PARACHUTING: return act_parachuting(m)
         default: throw "unkown action airborne " + m.action.toString(16)
     }
 }

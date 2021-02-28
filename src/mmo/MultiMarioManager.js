@@ -4,6 +4,8 @@ import { networkData, gameData } from "./socket"
 import { INTERACT_PLAYER } from "../game/Interaction"
 import { gLinker } from "../game/Linker"
 import { uint32, uint16, int16 } from "../utils"
+import { AreaInstance as Area } from "../game/Area"
+import { ACT_PARACHUTING } from "../game/Mario"
 
 const rawDataMap = {
     0: RAW.oMarioPoleYawVel,
@@ -239,7 +241,7 @@ const initNewRemoteMarioState = (marioProto) => {
         angleVel: marioProto.getAnglevelList(),
         pos: marioProto.getPosList(),
         vel: marioProto.getVelList(),
-        action: marioProto.getAction(),
+        action: Area.gMarioSpawnInfo.parachuteSpawn ? ACT_PARACHUTING : ACT_IDLE,
         ignoreUpdates: 0
     }
 

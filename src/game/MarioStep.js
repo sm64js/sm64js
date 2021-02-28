@@ -27,7 +27,7 @@ const apply_gravity = (m) => {
     } else {
         m.vel[1] -= 4.0
         if (m.vel[1] < -75.0) m.vel[1] = -75.0
-        if (m.parachuting && m.action != Mario.ACT_GROUND_POUND) {
+        if (m.action == Mario.ACT_PARACHUTING) {
             if (m.vel[1] < -30.0) m.vel[1] = -30.0
         }
     }
@@ -214,8 +214,6 @@ export const perform_air_step = (m, stepArg) => {
 
     m.marioObj.header.gfx.pos = [...m.pos]
     m.marioObj.header.gfx.angle = [0, m.faceAngle[1], 0]
-
-    if (Mario.AIR_STEP_NONE != stepResult && m.parachuting) m.parachuting = false
 
     return stepResult
 }

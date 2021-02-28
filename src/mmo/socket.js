@@ -17,7 +17,7 @@ import { updateFlagData, setInitFlagHeight } from "../game/behaviors/bhv_castle_
 
 const globalStartTimestamp = Date.now()
 
-const websocketServerPath = `ws://mmo-server-test.web:3000` // local testing
+const websocketServerPath = process.env.PRODUCTION == 1 ? `ws:mmo-server-test.web:3000` : `ws://localhost:3000`
 
 
 const socket = new WebSocket(websocketServerPath)

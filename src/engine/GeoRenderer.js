@@ -403,8 +403,8 @@ class GeoRenderer {
 
                     if (object.localMario) {
                         MarioMisc.gBodyState = object.marioState.marioBodyState
-                        MarioMisc.parachuting = (object.marioState.parachuting) && object.marioState.vel[1] < 0.0
                         MarioMisc.customCapState = window.myMario.skinData.customCapState
+                        MarioMisc.vel = object.marioState.vel
                         //// sending my own custom gfx opcode to set skin id
                         this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.mySocketID)], 1) 
                     }
@@ -486,8 +486,8 @@ class GeoRenderer {
             this.gCurGraphNodeObject = object.header.gfx
             MarioMisc.gBodyState = object.marioState.marioBodyState
             MarioMisc.customCapState = networkData.remotePlayers[remote_socket_id].skinData.customCapState
-
-            MarioMisc.parachuting = object.marioState.parachuting && object.marioState.vel[1] < 0.0
+            MarioMisc.vel = object.marioState.vel
+			
             this.geo_process_single_node(object.header.gfx.sharedChild)
             this.gCurGraphNodeObject = null
         }

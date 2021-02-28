@@ -372,11 +372,11 @@ export const recvPlayerLists = (playerListsProto) => {
         const validplayers = roomProto.getValidplayersList()
         networkData.numOnline = validplayers.length
 
-        Object.keys(networkData.remotePlayers).forEach(socket_id => {
+/*        Object.keys(networkData.remotePlayers).forEach(socket_id => {
             if (!validplayers.includes(parseInt(socket_id))) {
                 delete networkData.remotePlayers[socket_id]
             }
-        })
+        })*/
 
     } else { /// still in a lobby
 
@@ -403,26 +403,28 @@ export const recvPlayerLists = (playerListsProto) => {
 export const recvMarioData = (marioList) => {
     marioList.forEach(marioProto => {
         const id = marioProto.getSocketid()
-        if (id == networkData.mySocketID) {
+        if (id == networkData.mySocketID) {  /// local mario
             const controllerProto = marioProto.getController()
             if (controllerProto) applyController(controllerProto, gameData.marioState)
 
-            /// other mario updates
-            //if (networkData.yourMarioUpdate != null) console.log("extra update")
             networkData.yourMarioUpdate = marioProto.toObject()
             return
         }
 
-        if (networkData.remotePlayers[id] == undefined) {
+        if (networkData.remotePlayers[id] == undefined) { /// init remote mario
             networkData.remotePlayers[id] = { 
                 marioState: initNewRemoteMarioState(marioProto),
                 skinData: defaultSkinData(),
                 crashCount: 0,
                 skipRender: 0
             }
-            //applyController(marioProto.getController())
-        } else {
-            updateRemoteMarioState(id, marioProto)
+        } else {  /// update remote mario
+            const controllerProto = marioProto.getController()
+            if (controllerProto) applyController(controllerProto, networkData.remotePlayers[id].marioState)
+
+            networkData.remotePlayers[id].marioUpdate = marioProto.toObject()
+
+            //updateRemoteMarioState(id, marioProto)
         }
     })
 

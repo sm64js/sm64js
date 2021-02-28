@@ -141,6 +141,7 @@ const check_collision_in_list = (aObj, b, c) => {
 
 const check_player_object_collision = () => {
 
+    //// Local Collisions
     const playerObjectList = ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PLAYER]
     let localMarioObj = playerObjectList.next.wrapperObject
 
@@ -153,9 +154,24 @@ const check_player_object_collision = () => {
     check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR])
     check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE])
 
-    Object.values(networkData.remotePlayers).forEach(remotePlayer => {
-        const remoteMarioObj = remotePlayer.marioState.marioObj
+
+    //// Remote
+    const remotePlayerList = Object.values(networkData.remotePlayers)
+
+    remotePlayerList.forEach(remotePlayer => { ///check remote players with local mario
         detect_player_hitbox_overlap(localMarioObj, remotePlayer)
+    })
+
+    let start = 1
+    for (let i = 0; i < remotePlayerList.length; i++) { ///check remote players with remote players
+        for (let j = start; j < remotePlayerList.length; j++) {
+            detect_player_hitbox_overlap(remotePlayerList[i], remotePlayerList[j])
+        }
+        start++
+    }
+
+    remotePlayerList.forEach(remotePlayer => {  ///check remote players with NPC objects
+        const remoteMarioObj = remotePlayer.marioState.marioObj
         check_collision_in_list(remoteMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE])
         check_collision_in_list(remoteMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE])
         check_collision_in_list(remoteMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE])

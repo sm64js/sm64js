@@ -273,6 +273,8 @@ const perform_ground_quarter_step = (m, nextPos) => {
 
 export const perform_ground_step = (m) => {
 
+    m.groundStep = true
+
     let stepResult
 
     for (let i = 0; i < 4; i++) {

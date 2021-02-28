@@ -114,16 +114,17 @@ class ObjectListProcessor {
 
     update_objects() {
 
+        /// Remote Marios
         Object.values(networkData.remotePlayers).forEach(remotePlayer => {
             if (remotePlayer.marioUpdate) {
                 if (remotePlayer.marioState.ignoreUpdates > 0) {
                     remotePlayer.marioState.ignoreUpdates--
                 } else {
                     copyMarioUpdateToState(remotePlayer.marioState, remotePlayer.marioUpdate)
-                    remotePlayer.marioUpdate = null
                     this.copy_mario_state_to_object(remotePlayer.marioState)
                 }
             }
+            remotePlayer.marioUpdate = null
         })
 
         const localMarioState = LevelUpdate.gMarioState
@@ -287,11 +288,15 @@ class ObjectListProcessor {
 
             for (let i = 0; i < 3; i++) {
                 let step = Math.abs(marioState.prevPos[i] - marioGfx.pos[i]) * smoothPercent
-                if (step < 1) step = 1
-                marioGfx.pos[i] = approach_number(marioState.prevPos[i], marioGfx.pos[i], step, step)
+                let target = marioGfx.pos[i]
+                if (marioState.groundStep && i == 1) {
+                    if (step < 40) step = 40
+                    target = this.SurfaceCollision.find_floor(marioState.prevPos[0], marioState.prevPos[1] + 50, marioState.prevPos[2], {})
+                } else {
+                    if (step < 1) step = 1
+                }
+                marioGfx.pos[i] = approach_number(marioState.prevPos[i], target, step, step)
             }
-
-            /// Possibly use find floor to lock marios gfx pos height to ground level (for actions on the ground)
 
             ///Nice fix for camera stability
             marioState.statusForCamera.pos = [...marioGfx.pos]

@@ -820,6 +820,7 @@ export const execute_mario_action = (m) => {
         update_mario_inputs(m)
         Interact.mario_handle_special_floors(m)
         Interact.mario_process_interactions(m)
+        m.groundStep = null
 
         let inLoop = 1
 

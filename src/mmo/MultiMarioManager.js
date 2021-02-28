@@ -395,6 +395,7 @@ export const recvPlayerLists = (playerListsProto) => {
 
     if (window.playerNameAccepted) { // joined a game
 
+        /*
         if (rooms.length != 1) {
             console.log("ignoring data ", rooms.length)
             return
@@ -406,7 +407,7 @@ export const recvPlayerLists = (playerListsProto) => {
         const validplayers = roomProto.getValidplayersList()
         networkData.numOnline = validplayers.length
 
-/*        Object.keys(networkData.remotePlayers).forEach(socket_id => {
+        Object.keys(networkData.remotePlayers).forEach(socket_id => {
             if (!validplayers.includes(parseInt(socket_id))) {
                 delete networkData.remotePlayers[socket_id]
             }
@@ -435,8 +436,13 @@ export const recvPlayerLists = (playerListsProto) => {
 
 
 export const recvMarioData = (marioList) => {
+    networkData.numOnline = marioList.length
+
+    const valid_player_ids = []
+
     marioList.forEach(marioProto => {
         const id = marioProto.getSocketid()
+        valid_player_ids.push(id)
         if (id == networkData.mySocketID) {  /// local mario
             //const controllerProto = marioProto.getController()
             //applyController(controllerProto)
@@ -458,6 +464,14 @@ export const recvMarioData = (marioList) => {
 
             networkData.remotePlayers[id].marioUpdate = marioProto.toObject()
             //updateRemoteMarioState(id, marioProto)
+        }
+    })
+
+    
+
+    Object.keys(networkData.remotePlayers).forEach(socket_id => {
+        if (!valid_player_ids.includes(parseInt(socket_id))) {
+            delete networkData.remotePlayers[socket_id]
         }
     })
 

@@ -118,8 +118,6 @@ class ObjectListProcessor {
                 if (remotePlayer.marioState.ignoreUpdates > 0) {
                     remotePlayer.marioState.ignoreUpdates--
                 } else {
-                    //copyMarioUpdateToState(remotePlayer)
-                    //this.copy_mario_state_to_object(remotePlayer.marioState)
                     applyController(remotePlayer.controllerUpdate, remotePlayer.marioState)
                     remotePlayer.controllerUpdate = null
                 }

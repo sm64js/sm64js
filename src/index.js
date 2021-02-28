@@ -12,7 +12,7 @@ const send_display_list = (gfx_list) => { GFX.run(gfx_list) }
 
 let n_frames = 0
 let target_time = 0
-let frameSpeed = 0.025 //(frames per ms) 0.03 default higher is faster, lower is slower - 0.03 frames per ms
+let frameSpeed = 0.03 //(frames per ms) 0.03 default higher is faster, lower is slower - 0.03 frames per ms - 30 fps - 33ms
 document.getElementById('clientGameTps').addEventListener('change', (event) => {
     frameSpeed = event.target.value / 1000
 })

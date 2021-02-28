@@ -114,13 +114,19 @@ export const updateLocalMarioState = (m, update) => {
         }
     } else {
 
-        if (document.getElementById("overrideAction").checked) {
+        const replaceActionAndVel = document.getElementById("smartReplace").checked &&
+            update.action != m.action && update.action != m.prevAction && update.prevAction != m.action && m.actionAge > 3
+
+        const alwaysbox = document.getElementById("overrideAction").checked
+
+        if (replaceActionAndVel || alwaysbox) {
             m.actionState = (m.action != update.action) ? 0 : update.actionstate
             m.actionTimer = (m.action != update.action) ? 0 : update.actiontimer
 
             m.angleVel = update.anglevelList
             m.forwardVel = update.forwardvel
             m.vel = update.velList
+            m.faceAngle = update.faceangleList
 
             m.action = update.action
             m.prevAction = update.prevaction
@@ -143,11 +149,11 @@ export const updateLocalMarioState = (m, update) => {
             m.pos[i] = approach_number(m.pos[i], update.posList[i], step, step)
         }
 
-        m.faceAngle = update.faceangleList
         if (m.action == update.action) {
             m.angleVel = update.anglevelList
             m.forwardVel = update.forwardvel
             m.vel = update.velList
+            m.faceAngle = update.faceangleList
         }
 
     }

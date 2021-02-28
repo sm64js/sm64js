@@ -406,6 +406,7 @@ export const init_marios = () => {
 
     Object.assign(LevelUpdate.gMarioState, {
         actionTimer: 0,
+        actionAge: 0,
         framesSinceA: 0xFF,
         framesSinceB: 0xFF,
         invincTimer: 0,
@@ -590,6 +591,7 @@ export const set_mario_action = (m, action, actionArg) => {
     m.actionArg = actionArg
     m.actionState = 0
     m.actionTimer = 0
+    m.actionAge = 0
 
     return 1
 }
@@ -821,6 +823,7 @@ export const execute_mario_action = (m) => {
         update_mario_inputs(m)
         Interact.mario_handle_special_floors(m)
         Interact.mario_process_interactions(m)
+        m.actionAge++
 
         let inLoop = 1
 

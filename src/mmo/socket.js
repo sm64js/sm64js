@@ -108,7 +108,7 @@ socket.onopen = () => {
         const rootMsg = new RootMsg()
         rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
         sendData(rootMsg.serializeBinary())
-    } else if (process.env.PRODUCTION == 0) {
+    } else if (process.env.PRODUCTION != 1) {
         /// send access code to server
         const accessCodeMsg = new AccessCodeMsg()
         accessCodeMsg.setAccessCode("122345")
@@ -474,7 +474,7 @@ const discordOAuthURL = "https://discord.com/api/oauth2/authorize?client_id=" + 
 const google_client_id = process.env.GOOGLE_CLIENT_ID + ".apps.googleusercontent.com"
 const googleOAuthURL = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=" + google_client_id + "&redirect_uri=" + redirect_uri + "&scope=email" 
 
-if (url.searchParams.has('code') || process.env.PRODUCTION == undefined) document.getElementById("signinButtons").hidden = true
+if (url.searchParams.has('code') || process.env.PRODUCTION != 1) document.getElementById("signinButtons").hidden = true
 
 document.getElementById("switchCustom").addEventListener('click', (e) => {
     e.preventDefault()

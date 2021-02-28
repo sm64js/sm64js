@@ -15,6 +15,8 @@ import zlib from "zlib"
 import * as Multi from "./MultiMarioManager"
 import { updateFlagData, setInitFlagHeight } from "../game/behaviors/bhv_castle_flag_init.inc"
 
+const globalStartTimestamp = Date.now()
+
 const websocketServerPath = `ws://mmo-server-test.web:3000` // local testing
 
 
@@ -64,7 +66,7 @@ const zip = (bytes) => {
 
 const measureLatency = (ping_proto) => {
     const startTime = ping_proto.getTime()
-    const endTime = Date.now() - 1614310000000
+    const endTime = Date.now() - globalStartTimestamp
     //console.log(startTime, endTime)
     window.latency = endTime - startTime
     console.log("Latency to server: ", window.latency)
@@ -217,8 +219,7 @@ export const post_main_loop_one_iteration = async (frame) => {
             /// ping to measure latency
             const sm64jsMsg = new Sm64JsMsg()
             const pingmsg = new PingMsg()
-            //console.log(Date.now() - 1614310000000)
-            pingmsg.setTime(Date.now() - 1614310000000)
+            pingmsg.setTime(Date.now() - globalStartTimestamp)
             sm64jsMsg.setPingMsg(pingmsg)
             const rootMsg = new RootMsg()
             rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)

@@ -3691,8 +3691,7 @@ proto.sm64js.MarioMsg.toObject = function(includeInstance, msg) {
     forwardvel: jspb.Message.getFloatingPointFieldWithDefault(msg, 17, 0.0),
     rawdataList: (f = jspb.Message.getRepeatedField(msg, 18)) == null ? undefined : f,
     usedobjid: jspb.Message.getFieldWithDefault(msg, 19, 0),
-    socketid: jspb.Message.getFieldWithDefault(msg, 20, 0),
-    parachuting: jspb.Message.getBooleanFieldWithDefault(msg, 21, false)
+    socketid: jspb.Message.getFieldWithDefault(msg, 20, 0)
   };
 
   if (includeInstance) {
@@ -3805,10 +3804,6 @@ proto.sm64js.MarioMsg.deserializeBinaryFromReader = function(msg, reader) {
     case 20:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setSocketid(value);
-      break;
-    case 21:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setParachuting(value);
       break;
     default:
       reader.skipField();
@@ -3970,13 +3965,6 @@ proto.sm64js.MarioMsg.serializeBinaryToWriter = function(message, writer) {
   if (f !== 0) {
     writer.writeUint32(
       20,
-      f
-    );
-  }
-  f = message.getParachuting();
-  if (f) {
-    writer.writeBool(
-      21,
       f
     );
   }
@@ -4437,25 +4425,6 @@ proto.sm64js.MarioMsg.prototype.getSocketid = function() {
 proto.sm64js.MarioMsg.prototype.setSocketid = function(value) {
   return jspb.Message.setProto3IntField(this, 20, value);
 };
-
-
-/**
- * optional bool parachuting = 21;
- * @return {boolean}
- */
-proto.sm64js.MarioMsg.prototype.getParachuting = function() {
-  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 21, false));
-};
-
-
-/**
- * @param {boolean} value
- * @return {!proto.sm64js.MarioMsg} returns this
- */
-proto.sm64js.MarioMsg.prototype.setParachuting = function(value) {
-  return jspb.Message.setProto3BooleanField(this, 21, value);
-};
-
 
 
 

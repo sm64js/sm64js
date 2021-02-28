@@ -14,7 +14,6 @@ class MarioMisc {
             heldObjLastPosition: [0, 0, 0]
         }
         this.customCapState = 0
-        this.parachuting = 0
     }
 
     geo_draw_mario_head_goddard(callContext, node) {
@@ -79,7 +78,7 @@ class MarioMisc {
     }
 
     geo_switch_parachuting(callContext, switchCase) {
-        switchCase.selectedCase = this.parachuting ? 1 : 0
+        switchCase.selectedCase = (this.gBodyState.action == Mario.ACT_PARACHUTING) ? 1 : 0
     }
 }
 

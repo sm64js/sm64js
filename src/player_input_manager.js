@@ -164,7 +164,8 @@ const defaultKeyboardButtonMapping = {
     cl: 'j',
     cr: 'l',
     map: 'm',
-    taunt: 't'
+    taunt: 't',
+    parachute: 'v'
 }
 const keyboardButtonMapping = { ...defaultKeyboardButtonMapping }
 
@@ -174,6 +175,7 @@ const gamepadButtonMapping = { //works for xbox
     map: 4,
     taunt: 5,
     start: 9,
+    parachute: 7,
     z: 6,
     stickX: 0,
     stickY: 1,
@@ -333,6 +335,7 @@ export const playerInputUpdate = () => {
             z: gamepad.buttons[gamepadButtonMapping['z']].touched,
             map: gamepad.buttons[gamepadButtonMapping['map']].touched,
             taunt: gamepad.buttons[gamepadButtonMapping['taunt']].touched,
+            parachute: gamepad.buttons[gamepadButtonMapping['parachute']].touched,
             cr: gamepad.axes[gamepadButtonMapping['cStickX']] && gamepad.axes[gamepadButtonMapping['cStickX']] > 0.5,
             cl: gamepad.axes[gamepadButtonMapping['cStickX']] && gamepad.axes[gamepadButtonMapping['cStickX']] < -0.5,
             cu: gamepad.axes[gamepadButtonMapping['cStickY']] && gamepad.axes[gamepadButtonMapping['cStickY']] < -0.5,
@@ -366,6 +369,7 @@ export const playerInputUpdate = () => {
     let buttonDownCd = gamepadFinal.cd || keyboardFinal.cd
     let buttonDownMap = gamepadFinal.map || keyboardFinal.map
     let buttonDownTaunt = gamepadFinal.taunt || keyboardFinal.taunt
+    let parachutePressed = gamepadFinal.parachute || keyboardFinal.parachute
 
     window.playerInput = {
         stickX, stickY,
@@ -383,7 +387,9 @@ export const playerInputUpdate = () => {
 
         buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap, buttonDownTaunt,
 
-        taunt: (Object.values(tauntCommands).includes(window.taunt)) ? window.taunt : undefined
+        taunt: (Object.values(tauntCommands).includes(window.taunt)) ? window.taunt : undefined,
+		parachute: parachutePressed && !window.playerInput.parachute
+		
     }
 
     window.taunt = undefined

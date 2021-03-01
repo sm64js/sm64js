@@ -360,6 +360,7 @@ export const applyController = (controllerUpdate, marioState) => {
 
     const m = marioState
     const buttonDown = controllerUpdate.buttondown
+
     m.controller = {
         stickX: controllerUpdate.stickx,
         stickY: controllerUpdate.sticky,
@@ -458,9 +459,9 @@ export const recvMarioData = (marioList) => {
                 crashCount: 0,
                 skipRender: 0
             }
-        } else {
+        } else {  /// update remote mario
             const controllerProto = marioProto.getController()
-            if (controllerProto) applyController(controllerProto, networkData.remotePlayers[id].marioState)
+            if (controllerProto) applyController(controllerProto.toObject(), networkData.remotePlayers[id].marioState)
 
             networkData.remotePlayers[id].marioUpdate = marioProto.toObject()
             //updateRemoteMarioState(id, marioProto)

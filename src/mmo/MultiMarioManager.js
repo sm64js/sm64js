@@ -37,6 +37,8 @@ export const updateRemoteMarioController = (controllerProto) => {
     networkData.remotePlayers[id].controllerUpdateTimestamp = performance.now()
 
     const controllerUpdate = controllerProto.toObject() //marioProto.toObject()
+    if (controllerUpdate.taunt && networkData.remotePlayers[id].marioState.controller.taunt == null)
+        networkData.remotePlayers[id].marioState.controller.taunt = controllerUpdate.taunt
 
     /// other mario updates
     if (networkData.remotePlayers[id].controllerUpdate != null) {
@@ -288,6 +290,7 @@ export const applyController = (controllerUpdate, marioState) => {
     //if (networkData.remotePlayers[id] == undefined) return
     const m = marioState
     const buttonDown = controllerUpdate.buttondown
+
     m.controller = {
         stickX: controllerUpdate.stickx,
         stickY: controllerUpdate.sticky,
@@ -301,7 +304,7 @@ export const applyController = (controllerUpdate, marioState) => {
         buttonPressedZ: ((buttonDown & 0x4) != 0) && !m.controller.buttonDownZ,
         buttonPressedStart: ((buttonDown & 0x8) != 0) && !m.controller.buttonDownStart,
         cameraYaw: controllerUpdate.camerayaw,
-        taunt: controllerUpdate.taunt
+        taunt: m.controller.taunt
     }
 
 }

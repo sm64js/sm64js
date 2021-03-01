@@ -854,6 +854,8 @@ export const execute_mario_action = (m) => {
 
         m.marioObj.rawData[oInteractStatus] = 0
 
+        m.controller.taunt = null
+
         return m.particleFlags
     }
 }

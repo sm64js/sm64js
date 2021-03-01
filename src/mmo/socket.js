@@ -27,6 +27,7 @@ const socket = new WebSocket(websocketServerPath)
 
 export const networkData = {
     playerInteractions: true,
+    gameMasterOutputModulo: process.env.GAME_MASTER_OUTPUT_MODULO ? process.env.GAME_MASTER_OUTPUT_MODULO : 1,
     remotePlayers: {},
     flagData: undefined // defined later
 }
@@ -231,14 +232,17 @@ export const post_main_loop_one_iteration = async (frame) => {
         }
 
 
-         /// every frame send ALL mario data
-        const sm64jsMsg = new Sm64JsMsg()
-        sm64jsMsg.setListMsg(Multi.createAllMarioMsg())
-        const bytes = sm64jsMsg.serializeBinary()
-        const compressedBytes = await zip(bytes)
-        const rootMsg = new RootMsg()
-        rootMsg.setCompressedSm64jsMsg(compressedBytes)
-        sendData(rootMsg.serializeBinary())
+        /// every frame send ALL mario data
+        if (frame % networkData.gameMasterOutputModulo == 0) {
+            const sm64jsMsg = new Sm64JsMsg()
+            sm64jsMsg.setListMsg(Multi.createAllMarioMsg())
+            const bytes = sm64jsMsg.serializeBinary()
+            const compressedBytes = await zip(Buffer.from(bytes))
+            const rootMsg = new RootMsg()
+            rootMsg.setCompressedSm64jsMsg(compressedBytes)
+            sendData(rootMsg.serializeBinary())
+        }
+
     }
 
     if (gameData.marioState && networkData.flagData != undefined) checkForFlagGrab()

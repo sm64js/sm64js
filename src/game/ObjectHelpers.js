@@ -977,3 +977,13 @@ export const obj_angle_to_object = (obj1, obj2) => {
 
     return atan2s(z2 - z1, x2 - x1)
 }
+
+export const cur_obj_angle_to_home = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    const x1 = o.rawData[oPosX], z1 = o.rawData[oPosZ]
+    const x2 = o.rawData[oHomeX], z2 = o.rawData[oHomeZ]
+
+    return atan2s(z2 - z1, x2 - x1)
+}
+

@@ -120,10 +120,10 @@ class ObjectListProcessor {
                     remotePlayer.marioState.ignoreUpdates--
                 } else {
                     copyMarioUpdateToState(remotePlayer.marioState, remotePlayer.marioUpdate)
-                    remotePlayer.marioUpdate = null
                     this.copy_mario_state_to_object(remotePlayer.marioState)
                 }
             }
+            remotePlayer.marioUpdate = null
         })
 
         const localMarioState = LevelUpdate.gMarioState

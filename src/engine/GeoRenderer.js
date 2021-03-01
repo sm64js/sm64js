@@ -400,15 +400,15 @@ class GeoRenderer {
                 this.geo_set_animation_globals(object.header.gfx.unk38, hasAnimation)
             }
 
-            if (false) { 
+            if (true) { 
                 if (object.header.gfx.sharedChild) {
 
                     if (object.localMario) {
-                        MarioMisc.gBodyState = object.marioState.marioBodyState
+/*                        MarioMisc.gBodyState = object.marioState.marioBodyState
                         MarioMisc.parachuting = (object.marioState.parachuting) && object.marioState.vel[1] < 0.0
                         MarioMisc.customCapState = window.myMario.skinData.customCapState
                         //// sending my own custom gfx opcode to set skin id
-                        this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.mySocketID)], 1) 
+                        this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.mySocketID)], 1) */
                     }
 
                     this.gCurGraphNodeObject = node.wrapper
@@ -731,7 +731,6 @@ class GeoRenderer {
     }
 
     geo_process_root(root, b, c, clearColor) {
-        //console.log("processing geo root node")
         if (root.node.flags & GraphNode.GRAPH_RENDER_ACTIVE) {
 
             MathUtil.mtxf_identity(this.gMatStack[this.gMatStackIndex])

@@ -698,7 +698,7 @@ export const take_damage_and_knock_back = (m, o) => {
         o.rawData[oInteractStatus] = INT_STATUS_INTERACTED | INT_STATUS_ATTACKED_MARIO
         m.interactObj = o
 
-        let damage = 0 /// todo
+        let damage = 1 /// todo
 
         if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_BIG_KNOCKBACK) m.forwardVel = 40.0
 
@@ -785,7 +785,6 @@ export const mario_process_interactions = (m) => {
 
     sDelayInvincTimer = 0
     sInvulnerable = (m.action & Mario.ACT_FLAG_INVULNERABLE) || m.invincTimer != 0
-
 
     if (!(m.action & Mario.ACT_FLAG_INTANGIBLE) && m.collidedObjInteractTypes != 0) {
 

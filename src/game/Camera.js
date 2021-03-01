@@ -1156,8 +1156,8 @@ class Camera {
     update_graph_node_camera(graphNode) {
 
         graphNode.rollScreen = 0//this.gLakituState.roll
-        graphNode.pos = [-1000,2000,7000]
-        graphNode.focus = [-2000, 0, 2000]
+        graphNode.pos = [500,2000,6000]
+        graphNode.focus = [-1500, 0, 4500]
 
     }
 

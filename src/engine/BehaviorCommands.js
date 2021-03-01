@@ -24,7 +24,7 @@ class BehaviorCommands {
 
         let distanceFromMario = 999999.0
         ObjListProc.gCurrentObject.closestMarioID = null
-        ObjListProc.gCurrentObject.closestMarioObj = null
+        ObjListProc.closestMarioObj = null
 
         // Calculate the distance from the object to Mario.
         //if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {     always compute distance and use as base for others.
@@ -34,15 +34,15 @@ class BehaviorCommands {
                 if (distance < distanceFromMario) { ///closest mario
                     distanceFromMario = distance
                     ObjListProc.gCurrentObject.closestMarioID = remotePlayer.marioState.socket_id
-                    ObjListProc.gCurrentObject.closestMarioObj = remoteMarioObj
+                    ObjListProc.closestMarioObj = remoteMarioObj
                 }
             })
         //}
         ObjListProc.gCurrentObject.rawData[oDistanceToMario] = distanceFromMario
 
         // Calculate the angle from the object to Mario.
-        if (objFlags & OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO && ObjListProc.gCurrentObject.closestMarioObj) {
-            const remoteMarioObj = ObjListProc.gCurrentObject.closestMarioObj
+        if (objFlags & OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO && ObjListProc.closestMarioObj) {
+            const remoteMarioObj = ObjListProc.closestMarioObj
             ObjListProc.gCurrentObject.rawData[oAngleToMario] = obj_angle_to_object(ObjListProc.gCurrentObject, remoteMarioObj)
         }
 

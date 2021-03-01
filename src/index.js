@@ -1,6 +1,6 @@
 ﻿import { checkForRom } from "./romTextureLoader.js"
 import { GameInstance as Game } from "./game/Game"
-import { playerInputUpdate } from "./player_input_manager"
+import { playerInputUpdate, localInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
 import  * as Socket from "./mmo/socket.js"
 import "./mmo/cosmetics"
@@ -35,6 +35,7 @@ const produce_one_frame = () => {
 
     //Socket.send_controller_update(n_frames)
     GFX.start_frame()
+    localInputUpdate()
     Game.main_loop_one_iteration()
     Socket.post_main_loop_one_iteration(n_frames)
     /// Audio TODO

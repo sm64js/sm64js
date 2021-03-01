@@ -3,6 +3,7 @@ import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphY
 import { GRAPH_RENDER_CYLBOARD, geo_obj_init_animation, GRAPH_RENDER_BILLBOARD, GRAPH_RENDER_ACTIVE } from "./graph_node"
 import { dist_between_objects, obj_angle_to_object, spawn_object_at_origin, obj_copy_pos_and_angle, cur_obj_scale, cur_obj_hide, cur_obj_move_xz_using_fvel_and_yaw } from "../game/ObjectHelpers"
 import { int32 } from "../utils"
+import { networkData } from "../mmo/socket"
 
 const obj_and_int = (object, field, value) => { object.rawData[field] &= int32(value) }
 
@@ -21,17 +22,28 @@ class BehaviorCommands {
 
         let objFlags = ObjListProc.gCurrentObject.rawData[oFlags]
 
-        let distanceFromMario = 0.0
+        let distanceFromMario = 999999.0
+        ObjListProc.gCurrentObject.closestMarioID = null
+        ObjListProc.gCurrentObject.closestMarioObj = null
 
         // Calculate the distance from the object to Mario.
-        if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {
-            ObjListProc.gCurrentObject.rawData[oDistanceToMario] = dist_between_objects(ObjListProc.gCurrentObject, ObjListProc.gMarioObject)
-            distanceFromMario = ObjListProc.gCurrentObject.rawData[oDistanceToMario]
-        }
+        //if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {     always compute distance and use as base for others.
+            Object.values(networkData.remotePlayers).forEach(remotePlayer => {
+                const remoteMarioObj = remotePlayer.marioState.marioObj
+                const distance = dist_between_objects(ObjListProc.gCurrentObject, remoteMarioObj)
+                if (distance < distanceFromMario) { ///closest mario
+                    distanceFromMario = distance
+                    ObjListProc.gCurrentObject.closestMarioID = remotePlayer.marioState.socket_id
+                    ObjListProc.gCurrentObject.closestMarioObj = remoteMarioObj
+                }
+            })
+        //}
+        ObjListProc.gCurrentObject.rawData[oDistanceToMario] = distanceFromMario
 
         // Calculate the angle from the object to Mario.
-        if (objFlags & OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO) {
-            ObjListProc.gCurrentObject.rawData[oAngleToMario] = obj_angle_to_object(ObjListProc.gCurrentObject, ObjListProc.gMarioObject)
+        if (objFlags & OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO && ObjListProc.gCurrentObject.closestMarioObj) {
+            const remoteMarioObj = ObjListProc.gCurrentObject.closestMarioObj
+            ObjListProc.gCurrentObject.rawData[oAngleToMario] = obj_angle_to_object(ObjListProc.gCurrentObject, remoteMarioObj)
         }
 
         // If the object's action has changed, reset the action timer.
@@ -83,7 +95,7 @@ class BehaviorCommands {
         } else if ((objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) && ObjListProc.gCurrentObject.collisionData == null) {
             if (!(objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR)) {
                 // If the object has a render distance, check if it should be shown.
-                if (distanceFromMario > ObjListProc.gCurrentObject.rawData[oDrawingDistance]) {
+                if (distanceFromMario > ObjListProc.gCurrentObject.rawData[oDrawingDistance] && false) { // render everything or nothing in gameMaster
                     // Out of render distance, hide the object.
                     ObjListProc.gCurrentObject.header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE
                     ObjListProc.gCurrentObject.activeFlags |= ACTIVE_FLAG_FAR_AWAY

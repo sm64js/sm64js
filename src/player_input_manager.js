@@ -372,14 +372,8 @@ export const playerInputUpdate = () => {
         stickMag: mag,
 
         buttonPressedA: buttonDownA && !window.playerInput.buttonDownA,
-        buttonPressedStart: buttonDownStart && !window.playerInput.buttonDownStart,
         buttonPressedB: buttonDownB && !window.playerInput.buttonDownB,
         buttonPressedZ: buttonDownZ && !window.playerInput.buttonDownZ,
-        buttonPressedCl: buttonDownCl && !window.playerInput.buttonDownCl && !buttonDownTaunt,
-        buttonPressedCr: buttonDownCr && !window.playerInput.buttonDownCr && !buttonDownTaunt,
-        buttonPressedCu: buttonDownCu && !window.playerInput.buttonDownCu && !buttonDownTaunt,
-        buttonPressedCd: buttonDownCd && !window.playerInput.buttonDownCd && !buttonDownTaunt,
-        buttonPressedMap: buttonDownMap && !window.playerInput.buttonDownMap,
 
         buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap, buttonDownTaunt,
 
@@ -388,13 +382,35 @@ export const playerInputUpdate = () => {
 
     window.taunt = undefined
 
-    if (window.playerInput.buttonPressedMap) window.show_minimap += 1
-    if (window.show_minimap > 2) window.show_minimap = 0
-
     if (gameData.marioState) gameData.marioState.controller_to_server = window.playerInput
 
     if (window.playerInput.buttonPressedStart && keyboardButtonMapping.start != "enter") {
         submitPlayerName()
     }
+
+}
+
+export const localInputUpdate = () => {
+
+    window.playerInput.buttonPressedStart = window.playerInput.buttonDownStart && !window.localInput.buttonDownStart
+    window.playerInput.buttonPressedMap = window.playerInput.buttonDownMap && !window.localInput.buttonDownMap
+    window.playerInput.buttonPressedCl = window.playerInput.buttonDownCl && !window.localInput.buttonDownCl && !window.playerInput.buttonDownTaunt
+    window.playerInput.buttonPressedCr = window.playerInput.buttonDownCr && !window.localInput.buttonDownCr && !window.playerInput.buttonDownTaunt
+    window.playerInput.buttonPressedCu = window.playerInput.buttonDownCu && !window.localInput.buttonDownCu && !window.playerInput.buttonDownTaunt
+    window.playerInput.buttonPressedCd = window.playerInput.buttonDownCd && !window.localInput.buttonDownCd && !window.playerInput.buttonDownTaunt
+
+    window.localInput = {
+        buttonDownStart: window.playerInput.buttonDownStart,
+        buttonDownMap: window.playerInput.buttonDownMap,
+        buttonDownTaunt: window.playerInput.buttonDownTaunt,
+        buttonDownCl: window.playerInput.buttonDownCl,
+        buttonDownCr: window.playerInput.buttonDownCr,
+        buttonDownCu: window.playerInput.buttonDownCu,
+        buttonDownCd: window.playerInput.buttonDownCd,
+
+    }
+
+    if (window.playerInput.buttonPressedMap) window.show_minimap += 1
+    if (window.show_minimap > 2) window.show_minimap = 0
 
 }

@@ -369,7 +369,7 @@ export const playerInputUpdate = () => {
     let buttonDownCd = gamepadFinal.cd || keyboardFinal.cd
     let buttonDownMap = gamepadFinal.map || keyboardFinal.map
     let buttonDownTaunt = gamepadFinal.taunt || keyboardFinal.taunt
-    let parachutePressed = gamepadFinal.parachute || keyboardFinal.parachute
+    let parachuteDown = gamepadFinal.parachute || keyboardFinal.parachute
 
     window.playerInput = {
         stickX, stickY,
@@ -384,11 +384,11 @@ export const playerInputUpdate = () => {
         buttonPressedCu: buttonDownCu && !window.playerInput.buttonDownCu && !buttonDownTaunt,
         buttonPressedCd: buttonDownCd && !window.playerInput.buttonDownCd && !buttonDownTaunt,
         buttonPressedMap: buttonDownMap && !window.playerInput.buttonDownMap,
-
-        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap, buttonDownTaunt,
+		parachute: parachuteDown && !window.playerInput.parachuteDown,
+		
+        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap, buttonDownTaunt, parachuteDown,
 
         taunt: (Object.values(tauntCommands).includes(window.taunt)) ? window.taunt : undefined,
-		parachute: parachutePressed && !window.playerInput.parachute
 		
     }
 

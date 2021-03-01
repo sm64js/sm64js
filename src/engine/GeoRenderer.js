@@ -433,6 +433,9 @@ class GeoRenderer {
             const remotePlayerList = Object.values(networkData.remotePlayers)
             for (let i = 0; i < remotePlayerList.length; i++) {
                 const data = remotePlayerList[i]
+
+                if (data.marioState.marioObj == object) break  /// skip the local Mario here too, because its already being processed
+
                 if (data.skipRender > 0) data.skipRender--
                 if (data.crashCount > 0 || data.skipRender > 0) return
 
@@ -730,7 +733,6 @@ class GeoRenderer {
     }
 
     geo_process_root(root, b, c, clearColor) {
-        //console.log("processing geo root node")
         if (root.node.flags & GraphNode.GRAPH_RENDER_ACTIVE) {
 
             MathUtil.mtxf_identity(this.gMatStack[this.gMatStackIndex])

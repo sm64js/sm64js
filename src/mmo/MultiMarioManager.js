@@ -410,28 +410,25 @@ export const recvMarioData = (marioList) => {
     marioList.forEach(marioProto => {
         const id = marioProto.getSocketid()
         valid_player_ids.push(id)
-        if (id == networkData.mySocketID) {  /// local mario
-            const controllerProto = marioProto.getController()
-            if (controllerProto) applyController(controllerProto, gameData.marioState)
 
-            networkData.yourMarioUpdate = marioProto.toObject()
-            return
-        }
+        if (networkData.remotePlayers[id] == undefined) {  /// not defined local not linkes, or remote not created
 
-        if (networkData.remotePlayers[id] == undefined) { /// init remote mario
-            networkData.remotePlayers[id] = { 
-                marioState: initNewRemoteMarioState(marioProto),
-                skinData: defaultSkinData(),
-                crashCount: 0,
-                skipRender: 0
+            if (id == networkData.mySocketID) {  /// is the local mario, time to link it
+                networkData.remotePlayers[id] = {
+                    marioState: gameData.marioState, skinData: defaultSkinData(), crashCount: 0, skipRender: 0
+                }
+            } else { /// init new remote mario
+                networkData.remotePlayers[id] = {
+                    marioState: initNewRemoteMarioState(marioProto),
+                    skinData: defaultSkinData(),
+                    crashCount: 0,
+                    skipRender: 0
+                }
             }
-        } else {  /// update remote mario
+        } else { /// already defined/initialized, update data
             const controllerProto = marioProto.getController()
             if (controllerProto) applyController(controllerProto, networkData.remotePlayers[id].marioState)
-
             networkData.remotePlayers[id].marioUpdate = marioProto.toObject()
-
-            //updateRemoteMarioState(id, marioProto)
         }
     })
 

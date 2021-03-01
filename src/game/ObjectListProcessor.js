@@ -5,7 +5,7 @@ import * as GraphNode from "../engine/graph_node"
 import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands"
 import * as Mario from "./Mario"
 import { detect_object_collisions } from "./ObjectCollisions"
-import { networkData, gameData as socketGameData, updateNetworkBeforeRender } from "../mmo/socket"
+import { networkData, gameData as socketGameData, updateNetworkBeforeRender, gameData } from "../mmo/socket"
 import { copyMarioUpdateToState, updateLocalMarioState, updateLocalMarioState2 } from "../mmo/MultiMarioManager"
 import { vec3f_dif, vec3f_length, approach_number } from "../engine/math_util"
 import { uint32, uint16, int16 } from "../utils"
@@ -13,7 +13,6 @@ import { MODEL_NONE, MODEL_MIST } from "../include/model_ids"
 import * as MarioConstants from "../include/mario_constants"
 import { gLinker } from "./Linker"
 import { spawn_object_at_origin, obj_copy_pos_and_angle, dist_between_objects, approach_symmetric } from "./ObjectHelpers"
-import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 
 class ObjectListProcessor {
     constructor() {
@@ -114,8 +113,8 @@ class ObjectListProcessor {
 
     update_objects() {
 
-        /// Remote Marios
-        Object.values(networkData.remotePlayers).forEach(remotePlayer => {
+       /// Remote Marios
+       Object.values(networkData.remotePlayers).forEach(remotePlayer => {
             if (remotePlayer.marioUpdate) {
                 if (remotePlayer.marioState.ignoreUpdates > 0) {
                     remotePlayer.marioState.ignoreUpdates--
@@ -126,18 +125,6 @@ class ObjectListProcessor {
             }
             remotePlayer.marioUpdate = null
         })
-
-        const localMarioState = LevelUpdate.gMarioState
-
-        if (networkData.yourMarioUpdate) {
-            this.gCurrentObject = localMarioState.marioObj /// this line may not be needed
-            copyMarioUpdateToState(localMarioState, networkData.yourMarioUpdate)
-            this.copy_mario_state_to_object(localMarioState)
-        } else {
-            //console.log("skipping an update")
-        }
-
-        networkData.yourMarioUpdate = null
 
         this.gObjectCounter = 0  /// probaly not used and not needed
 
@@ -160,7 +147,9 @@ class ObjectListProcessor {
 
     update_remote_marios() {
 
+
         Object.values(networkData.remotePlayers).forEach(remotePlayer => {
+
             this.gCurrentObject = remotePlayer.marioState.marioObj
             this.gCurrentObject.header.gfx.node.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION
 
@@ -187,12 +176,12 @@ class ObjectListProcessor {
 
     update_non_terrain_objects() {
         this.sObjectListUpdateOrder.slice(2).forEach(listIndex => {
+            if (listIndex == this.OBJ_LIST_PLAYER) return 
             this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[listIndex])
         })
     }
 
     update_objects_in_list(objList) {
-
         const firstObj = objList.next
         return this.update_objects_starting_at(objList, firstObj)
     }
@@ -232,6 +221,7 @@ class ObjectListProcessor {
 
     unload_deactivated_objects() {
         this.sObjectListUpdateOrder.forEach(listIndex => {
+            if (listIndex == this.OBJ_LIST_PLAYER) return
             this.unload_deactivated_objects_in_list(this.gObjectLists[listIndex])
         })
     }
@@ -262,14 +252,6 @@ class ObjectListProcessor {
     bhv_mario_update() {
 
         const marioState = this.gCurrentObject.marioState
-
-        //const saveController = marioState.controller
-        //if (this.gCurrentObject.localMario) {
-            //console.log(marioState.controller)
-            //marioState.controller.buttonPressedA = false
-            //marioState.controller.buttonPressedB = false
-            //marioState.controller.buttonPressedZ = false
-        //}
             
         const torsoDiff = [0, 0, 0]
         vec3f_dif(torsoDiff, marioState.pos, marioState.marioBodyState.torsoPos)
@@ -317,9 +299,6 @@ class ObjectListProcessor {
             }
         })
 
-        //if (this.gCurrentObject.localMario) {
-        //    marioState.controller = saveController
-        //}
 
     }
 

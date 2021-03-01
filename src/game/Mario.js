@@ -850,11 +850,30 @@ export const execute_mario_action = (m) => {
         }
 
         update_mario_info_for_cam(m)
+        mario_update_hitbox_and_cap_model(m)
 
         m.marioObj.rawData[oInteractStatus] = 0
 
         return m.particleFlags
     }
+}
+
+const mario_update_hitbox_and_cap_model = (m) => {
+
+    const bodyState = m.marioBodyState
+    const flags = 0 // TODO update_and_return_cap_flags(m)
+
+
+    if (m.invincTimer >= 3) {
+        //! (Pause buffered hitstun) Since the global timer increments while paused,
+        //  this can be paused through to give continual invisibility. This leads to
+        //  no interaction with objects.
+
+        if (window.gGlobalTimer & 1) {
+            m.marioObj.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
+        }
+    }
+
 }
 
 const update_mario_button_inputs = (m) => {

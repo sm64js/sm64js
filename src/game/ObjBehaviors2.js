@@ -142,7 +142,7 @@ export const obj_resolve_object_collisions = (targetYawWrapper) => {
 
     if (o.numCollidedObjs != 0) {
         const otherObject = o.collidedObjs[0]
-        if (otherObject != ObjectListProc.gMarioObject) {
+        if (ObjectListProc.gCurrentObject.closestMarioObj && otherObject != ObjectListProc.gCurrentObject.closestMarioObj) {
             //! If one object moves after collisions are detected and this code
             //  runs, the objects can move toward each other (transport cloning)
 

@@ -141,26 +141,8 @@ const check_collision_in_list = (aObj, b, c) => {
 
 const check_player_object_collision = () => {
 
-    //// Local Collisions
-    const playerObjectList = ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PLAYER]
-    let localMarioObj = playerObjectList.next.wrapperObject
-
-    if (!localMarioObj.localMario) throw "error: this is not right - check_player_object_collision"
-    
-    check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE])
-    check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE])
-    check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_DESTRUCTIVE])
-    check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_LEVEL].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_LEVEL])
-    check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR])
-    check_collision_in_list(localMarioObj, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE].next, ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_SURFACE])
-
-
     //// Remote
     const remotePlayerList = Object.values(networkData.remotePlayers)
-
-    remotePlayerList.forEach(remotePlayer => { ///check remote players with local mario
-        detect_player_hitbox_overlap(localMarioObj, remotePlayer)
-    })
 
     let start = 1
     for (let i = 0; i < remotePlayerList.length; i++) { ///check remote players with remote players
@@ -211,7 +193,7 @@ const check_pushable_object_collision = () => {
 
 export const detect_object_collisions = () => {
     clear_object_collision(ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_POLELIKE])
-    clear_object_collision(ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PLAYER])
+    //clear_object_collision(ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PLAYER])
     clear_object_collision(ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE])
     clear_object_collision(ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_GENACTOR])
     clear_object_collision(ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_LEVEL])

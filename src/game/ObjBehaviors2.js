@@ -142,7 +142,7 @@ export const obj_resolve_object_collisions = (targetYawWrapper) => {
 
     if (o.numCollidedObjs != 0) {
         const otherObject = o.collidedObjs[0]
-        if (ObjectListProc.gCurrentObject.closestMarioObj && otherObject != ObjectListProc.gCurrentObject.closestMarioObj) {
+        if (otherObject.remoteMario == undefined) { /// not a mario object
             //! If one object moves after collisions are detected and this code
             //  runs, the objects can move toward each other (transport cloning)
 
@@ -388,14 +388,20 @@ export const treat_far_home_as_mario = (threshold) => {
     let dz = o.rawData[oHomeZ] - o.rawData[oPosZ]
     let distance = Math.sqrt(dx * dx + dy * dy + dz * dz)
 
-    if (distance > threshold) {
+    if (distance > threshold) {  /// object distance to its home
         o.rawData[oAngleToMario] = atan2s(dz, dx)
         o.rawData[oDistanceToMario] = 25000.0
     } else {
-        dx = o.rawData[oHomeX] - ObjectListProc.gMarioObject.rawData[oPosX]
-        dy = o.rawData[oHomeY] - ObjectListProc.gMarioObject.rawData[oPosY]
-        dz = o.rawData[oHomeZ] - ObjectListProc.gMarioObject.rawData[oPosZ]
-        distance = Math.sqrt(dx * dx + dy * dy + dz * dz)
+        if (ObjectListProc.closestMarioObj) {
+            dx = o.rawData[oHomeX] - ObjectListProc.closestMarioObj.rawData[oPosX]
+            dy = o.rawData[oHomeY] - ObjectListProc.closestMarioObj.rawData[oPosY]
+            dz = o.rawData[oHomeZ] - ObjectListProc.closestMarioObj.rawData[oPosZ]
+            distance = Math.sqrt(dx * dx + dy * dy + dz * dz)
+        } else {
+            distance = 999999
+        }
+
+        
 
         if (distance > threshold) {
             o.rawData[oDistanceToMario] = 20000.0

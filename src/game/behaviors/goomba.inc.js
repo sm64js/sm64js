@@ -87,7 +87,7 @@ export const goomba_act_attacked_mario = () => {
 const goomba_act_walk = () => {
     const o = ObjectListProc.gCurrentObject
 
-    ObjBhvs2.treat_far_home_as_mario(1000.0)
+    ObjBhvs2.treat_far_home_as_mario(500.0)
 
     ObjBhvs2.obj_forward_vel_approach(o.rawData[oGoombaRelativeSpeed] * o.rawData[oGoombaScale], 0.4)
 
@@ -229,7 +229,7 @@ export const bhv_goomba_update = () => {
             mark_goomba_as_dead()
         }
 
-        cur_obj_move_standard(-78)
+        cur_obj_move_standard(-30)
 
     } else {
         o.rawData[oAnimState] = 1

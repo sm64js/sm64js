@@ -419,6 +419,7 @@ export const init_marios = () => {
         area: Area.gCurrentArea,
         marioObj: ObjectListProcessor.gMarioObject,
         faceAngle: [ ...Area.gMarioSpawnInfo.startAngle ],
+        slideYaw: 0,
         angleVel: [0, 0, 0],
         pos: [ ...Area.gMarioSpawnInfo.startPos ],
         vel: [0, 0, 0],

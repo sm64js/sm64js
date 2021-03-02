@@ -401,19 +401,14 @@ class GeoRenderer {
             if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) { 
                 if (object.header.gfx.sharedChild) {
 
-                    if (object.localMario) {
-                        MarioMisc.gBodyState = object.marioState.marioBodyState
-                        MarioMisc.parachuting = (object.marioState.parachuting) && object.marioState.vel[1] < 0.0
-                        MarioMisc.customCapState = window.myMario.skinData.customCapState
-                        //// sending my own custom gfx opcode to set skin id
-                        this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.mySocketID)], 1) 
+                    if (!object.localMario) {
+                        this.gCurGraphNodeObject = node.wrapper
+                        object.header.gfx.sharedChild.parent = object.header.gfx.node
+                        this.geo_process_single_node(object.header.gfx.sharedChild)
+                        object.header.gfx.sharedChild.parent = null
+                        this.gCurGraphNodeObject = null
                     }
 
-                    this.gCurGraphNodeObject = node.wrapper
-                    object.header.gfx.sharedChild.parent = object.header.gfx.node
-                    this.geo_process_single_node(object.header.gfx.sharedChild)
-                    object.header.gfx.sharedChild.parent = null
-                    this.gCurGraphNodeObject = null
                 }
 
                 if (object.header.gfx.node.children[0]) {
@@ -434,8 +429,6 @@ class GeoRenderer {
             for (let i = 0; i < remotePlayerList.length; i++) {
                 const data = remotePlayerList[i]
 
-                if (data.marioState.marioObj == object) break  /// skip the local Mario here too, because its already being processed
-
                 if (data.skipRender > 0) data.skipRender--
                 if (data.crashCount > 0 || data.skipRender > 0) return
 
@@ -445,7 +438,7 @@ class GeoRenderer {
                 }
 
                 try {
-                    this.geo_process_extra_mario(data.marioState.marioObj)
+                    this.geo_process_marios(data.marioState.marioObj)
                 } catch (error) {
                     console.log("unknown error in 'geo_process_extra_mario' - please report this issue to sm64js devs -- playerName: " + data.marioState.playerName)
                     console.log(error)
@@ -458,7 +451,7 @@ class GeoRenderer {
     }
 
 
-    geo_process_extra_mario(object) {
+    geo_process_marios(object) {
 
         const { pos, angle } = object.header.gfx
 
@@ -484,13 +477,20 @@ class GeoRenderer {
 
             //// sending my own custom gfx opcode to set skin id and playerName
             const remote_socket_id = object.marioState.socket_id
-            this.geo_append_display_list([Gbi.gsSetPlayerData(remote_socket_id)], 1)
+            if (object.localMario) {
+                MarioMisc.gBodyState = object.marioState.marioBodyState
+                MarioMisc.parachuting = (object.marioState.parachuting) && object.marioState.vel[1] < 0.0
+                MarioMisc.customCapState = window.myMario.skinData.customCapState
+                this.geo_append_display_list([Gbi.gsSetPlayerData(networkData.mySocketID)], 1) 
+            } else {
+                MarioMisc.gBodyState = object.marioState.marioBodyState
+                MarioMisc.parachuting = object.marioState.parachuting && object.marioState.vel[1] < 0.0
+                MarioMisc.customCapState = networkData.remotePlayers[remote_socket_id].skinData.customCapState
+                this.geo_append_display_list([Gbi.gsSetPlayerData(remote_socket_id)], 1)
+            }
 
             this.gCurGraphNodeObject = object.header.gfx
-            MarioMisc.gBodyState = object.marioState.marioBodyState
-            MarioMisc.customCapState = networkData.remotePlayers[remote_socket_id].skinData.customCapState
 
-            MarioMisc.parachuting = object.marioState.parachuting && object.marioState.vel[1] < 0.0
             this.geo_process_single_node(object.header.gfx.sharedChild)
             this.gCurGraphNodeObject = null
         }

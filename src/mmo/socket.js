@@ -53,7 +53,11 @@ const websocketServerPath = process.env.NODE_ENV === 'rust'
         ? `wss://server.sm64js.com/websocket/` // production
         : `ws://${url.hostname}:3000` // local testing
 
-const socket = new WebSocket(websocketServerPath)
+let socket = new WebSocket(websocketServerPath)
+
+export function reloadSocket() {
+    socket = new WebSocket(websocketServerPath)
+}
 
 export const networkData = {
     playerInteractions: true,

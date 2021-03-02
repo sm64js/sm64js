@@ -236,6 +236,7 @@ const initNewRemoteMarioState = (marioProto) => {
             bhvScript: { commands: gLinker.behaviors.bhvMario, index: 0 }
         },
         faceAngle: marioProto.getFaceangleList(),
+        slideYaw: 0,
         angleVel: marioProto.getAnglevelList(),
         pos: marioProto.getPosList(),
         vel: marioProto.getVelList(),

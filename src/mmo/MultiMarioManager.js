@@ -6,7 +6,7 @@ import { INTERACT_PLAYER } from "../game/Interaction"
 import { gLinker } from "../game/Linker"
 import { uint32, uint16, int16 } from "../utils"
 import { AreaInstance as Area } from "../game/Area"
-import { ACT_PARACHUTING } from "../game/Mario"
+import { ACT_PARACHUTING, ACT_IDLE } from "../game/Mario"
 
 const rawDataMap = {
     0: RAW.oMarioPoleYawVel,
@@ -68,8 +68,6 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     m.prevAction = update.prevaction
     m.actionArg = update.actionarg
     m.invincTimer = update.invinctimer
-    m.framesSinceA = update.framessincea
-    m.framesSinceB = update.framessinceb
     m.wallKickTimer = update.wallkicktimer
     m.doubleJumpTimer = update.doublejumptimer
     m.angleVel = update.anglevelList
@@ -78,7 +76,6 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     m.pos = update.posList
     m.faceAngle = update.faceangleList
     m.socket_id = update.socketid
-    m.parachuting = update.parachuting
 
     m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
     m.marioObj.rawData[RAW.oRoom] = -1
@@ -114,8 +111,6 @@ export const createAllMarioMsg = () => {
         mariomsg.setPrevaction(uint32(remoteMario.marioState.prevAction))
         mariomsg.setActionarg(uint32(remoteMario.marioState.actionArg))
         mariomsg.setInvinctimer(int16(remoteMario.marioState.invincTimer))
-        mariomsg.setFramessincea(uint32(remoteMario.marioState.framesSinceA))
-        mariomsg.setFramessinceb(uint32(remoteMario.marioState.framesSinceB))
         mariomsg.setWallkicktimer(uint32(remoteMario.marioState.wallKickTimer))
         mariomsg.setDoublejumptimer(uint32(remoteMario.marioState.doubleJumpTimer))
         mariomsg.setAnglevelList(remoteMario.marioState.angleVel)
@@ -124,7 +119,6 @@ export const createAllMarioMsg = () => {
         mariomsg.setPosList(remoteMario.marioState.pos)
         mariomsg.setFaceangleList(remoteMario.marioState.faceAngle)
         mariomsg.setSocketid(remoteMario.marioState.socket_id)
-        mariomsg.setParachuting(remoteMario.marioState.parachuting)
 
         if (remoteMario.marioState.usedObj) {
             mariomsg.setUsedobjid(remoteMario.marioState.usedObj.rawData[RAW.oSyncID])
@@ -157,8 +151,6 @@ export const createMarioProtoMsg = () => {
     mariomsg.setActiontimer(m.actionTimer)
     mariomsg.setActionarg(m.actionArg < 0 ? 65536 - m.actionArg : m.actionArg)
     mariomsg.setInvinctimer(m.invincTimer)
-    mariomsg.setFramessincea(m.framesSinceA)
-    mariomsg.setFramessinceb(m.framesSinceB)
     mariomsg.setWallkicktimer(m.wallKickTimer)
     mariomsg.setDoublejumptimer(m.doubleJumpTimer)
     mariomsg.setFaceangleList(m.faceAngle)
@@ -166,7 +158,6 @@ export const createMarioProtoMsg = () => {
     mariomsg.setPosList(m.pos)
     mariomsg.setVelList(m.vel)
     mariomsg.setForwardvel(m.forwardVel)
-    mariomsg.setParachuting(m.parachuting)
 
     if (m.usedObj) mariomsg.setUsedobjid(m.usedObj.rawData[RAW.oSyncID])
 
@@ -269,6 +260,7 @@ export const createControllerProtoMsg = (m) => {
     buttonDown |= (m.controller.buttonDownB << 1)
     buttonDown |= (m.controller.buttonDownZ << 2)
     buttonDown |= (m.controller.buttonDownStart << 3)
+    buttonDown |= (m.controller.parachuteDown << 4)
     controllermsg.setButtondown(buttonDown)
 
     let buttonPressed = 0
@@ -276,9 +268,10 @@ export const createControllerProtoMsg = (m) => {
     buttonPressed |= (m.controller.buttonPressedB << 1)
     buttonPressed |= (m.controller.buttonPressedZ << 2)
     buttonPressed |= (m.controller.buttonPressedStart << 3)
+    buttonPressed |= (m.controller.parachute << 4)
     controllermsg.setButtonpressed(buttonPressed)
 
-    controllermsg.setTaunt(m.controller.taunt)
+    //controllermsg.setTaunt(m.controller.taunt)  //probably not needed... will get the new action
 
     controllermsg.setCamerayaw(m.controller.cameraYaw)
 
@@ -301,10 +294,12 @@ export const applyController = (controllerUpdate, marioState) => {
         buttonDownB: (buttonDown & 0x2) != 0,
         buttonDownZ: (buttonDown & 0x4) != 0,
         buttonDownStart: (buttonDown & 0x8) != 0,
+        parachuteDown: (buttonDown & 0x10) != 0,
         buttonPressedA: ((buttonDown & 0x1) != 0) && !m.controller.buttonDownA,
         buttonPressedB: ((buttonDown & 0x2) != 0) && !m.controller.buttonDownB,
         buttonPressedZ: ((buttonDown & 0x4) != 0) && !m.controller.buttonDownZ,
         buttonPressedStart: ((buttonDown & 0x8) != 0) && !m.controller.buttonDownStart,
+        parachute: ((buttonDown & 0x10) != 0) && !m.controller.parachuteDown,
         cameraYaw: controllerUpdate.camerayaw,
         taunt: m.controller.taunt
     }

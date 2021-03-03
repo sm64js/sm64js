@@ -3692,7 +3692,7 @@ proto.sm64js.AttackMsg.prototype.setFlagId = function(value) {
  * @private {!Array<number>}
  * @const
  */
-proto.sm64js.MarioMsg.repeatedFields_ = [13,14,15,16,18];
+proto.sm64js.MarioMsg.repeatedFields_ = [10,11,12,13,15];
 
 
 
@@ -3726,25 +3726,22 @@ proto.sm64js.MarioMsg.prototype.toObject = function(opt_includeInstance) {
 proto.sm64js.MarioMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
     controller: (f = msg.getController()) && proto.sm64js.ControllerMsg.toObject(includeInstance, f),
-    action: jspb.Message.getFieldWithDefault(msg, 3, 0),
-    prevaction: jspb.Message.getFieldWithDefault(msg, 4, 0),
-    actionstate: jspb.Message.getFieldWithDefault(msg, 5, 0),
-    actiontimer: jspb.Message.getFieldWithDefault(msg, 6, 0),
-    actionarg: jspb.Message.getFieldWithDefault(msg, 7, 0),
-    invinctimer: jspb.Message.getFieldWithDefault(msg, 8, 0),
-    framessincea: jspb.Message.getFieldWithDefault(msg, 9, 0),
-    framessinceb: jspb.Message.getFieldWithDefault(msg, 10, 0),
-    wallkicktimer: jspb.Message.getFieldWithDefault(msg, 11, 0),
-    doublejumptimer: jspb.Message.getFieldWithDefault(msg, 12, 0),
-    faceangleList: (f = jspb.Message.getRepeatedField(msg, 13)) == null ? undefined : f,
-    anglevelList: (f = jspb.Message.getRepeatedField(msg, 14)) == null ? undefined : f,
-    posList: (f = jspb.Message.getRepeatedFloatingPointField(msg, 15)) == null ? undefined : f,
-    velList: (f = jspb.Message.getRepeatedFloatingPointField(msg, 16)) == null ? undefined : f,
-    forwardvel: jspb.Message.getFloatingPointFieldWithDefault(msg, 17, 0.0),
-    rawdataList: (f = jspb.Message.getRepeatedField(msg, 18)) == null ? undefined : f,
-    usedobjid: jspb.Message.getFieldWithDefault(msg, 19, 0),
-    socketid: jspb.Message.getFieldWithDefault(msg, 20, 0),
-    parachuting: jspb.Message.getBooleanFieldWithDefault(msg, 21, false)
+    action: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    prevaction: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    actionstate: jspb.Message.getFieldWithDefault(msg, 4, 0),
+    actiontimer: jspb.Message.getFieldWithDefault(msg, 5, 0),
+    actionarg: jspb.Message.getFieldWithDefault(msg, 6, 0),
+    invinctimer: jspb.Message.getFieldWithDefault(msg, 7, 0),
+    wallkicktimer: jspb.Message.getFieldWithDefault(msg, 8, 0),
+    doublejumptimer: jspb.Message.getFieldWithDefault(msg, 9, 0),
+    faceangleList: (f = jspb.Message.getRepeatedField(msg, 10)) == null ? undefined : f,
+    anglevelList: (f = jspb.Message.getRepeatedField(msg, 11)) == null ? undefined : f,
+    posList: (f = jspb.Message.getRepeatedFloatingPointField(msg, 12)) == null ? undefined : f,
+    velList: (f = jspb.Message.getRepeatedFloatingPointField(msg, 13)) == null ? undefined : f,
+    forwardvel: jspb.Message.getFloatingPointFieldWithDefault(msg, 14, 0.0),
+    rawdataList: (f = jspb.Message.getRepeatedField(msg, 15)) == null ? undefined : f,
+    usedobjid: jspb.Message.getFieldWithDefault(msg, 16, 0),
+    socketid: jspb.Message.getFieldWithDefault(msg, 17, 0)
   };
 
   if (includeInstance) {
@@ -3786,81 +3783,69 @@ proto.sm64js.MarioMsg.deserializeBinaryFromReader = function(msg, reader) {
       reader.readMessage(value,proto.sm64js.ControllerMsg.deserializeBinaryFromReader);
       msg.setController(value);
       break;
-    case 3:
+    case 2:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setAction(value);
       break;
-    case 4:
+    case 3:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setPrevaction(value);
       break;
-    case 5:
+    case 4:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setActionstate(value);
       break;
-    case 6:
+    case 5:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setActiontimer(value);
       break;
-    case 7:
+    case 6:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setActionarg(value);
       break;
-    case 8:
+    case 7:
       var value = /** @type {number} */ (reader.readSint32());
       msg.setInvinctimer(value);
       break;
-    case 9:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setFramessincea(value);
-      break;
-    case 10:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setFramessinceb(value);
-      break;
-    case 11:
+    case 8:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setWallkicktimer(value);
       break;
-    case 12:
+    case 9:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setDoublejumptimer(value);
       break;
-    case 13:
+    case 10:
       var value = /** @type {!Array<number>} */ (reader.readPackedSint32());
       msg.setFaceangleList(value);
       break;
-    case 14:
+    case 11:
       var value = /** @type {!Array<number>} */ (reader.readPackedSint32());
       msg.setAnglevelList(value);
       break;
-    case 15:
+    case 12:
       var value = /** @type {!Array<number>} */ (reader.readPackedFloat());
       msg.setPosList(value);
       break;
-    case 16:
+    case 13:
       var value = /** @type {!Array<number>} */ (reader.readPackedFloat());
       msg.setVelList(value);
       break;
-    case 17:
+    case 14:
       var value = /** @type {number} */ (reader.readFloat());
       msg.setForwardvel(value);
       break;
-    case 18:
+    case 15:
       var value = /** @type {!Array<number>} */ (reader.readPackedSint32());
       msg.setRawdataList(value);
       break;
-    case 19:
+    case 16:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setUsedobjid(value);
       break;
-    case 20:
+    case 17:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setSocketid(value);
-      break;
-    case 21:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setParachuting(value);
       break;
     default:
       reader.skipField();
@@ -3902,133 +3887,112 @@ proto.sm64js.MarioMsg.serializeBinaryToWriter = function(message, writer) {
   f = message.getAction();
   if (f !== 0) {
     writer.writeUint32(
-      3,
+      2,
       f
     );
   }
   f = message.getPrevaction();
   if (f !== 0) {
     writer.writeUint32(
-      4,
+      3,
       f
     );
   }
   f = message.getActionstate();
   if (f !== 0) {
     writer.writeUint32(
-      5,
+      4,
       f
     );
   }
   f = message.getActiontimer();
   if (f !== 0) {
     writer.writeUint32(
-      6,
+      5,
       f
     );
   }
   f = message.getActionarg();
   if (f !== 0) {
     writer.writeUint32(
-      7,
+      6,
       f
     );
   }
   f = message.getInvinctimer();
   if (f !== 0) {
     writer.writeSint32(
-      8,
-      f
-    );
-  }
-  f = message.getFramessincea();
-  if (f !== 0) {
-    writer.writeUint32(
-      9,
-      f
-    );
-  }
-  f = message.getFramessinceb();
-  if (f !== 0) {
-    writer.writeUint32(
-      10,
+      7,
       f
     );
   }
   f = message.getWallkicktimer();
   if (f !== 0) {
     writer.writeUint32(
-      11,
+      8,
       f
     );
   }
   f = message.getDoublejumptimer();
   if (f !== 0) {
     writer.writeUint32(
-      12,
+      9,
       f
     );
   }
   f = message.getFaceangleList();
   if (f.length > 0) {
     writer.writePackedSint32(
-      13,
+      10,
       f
     );
   }
   f = message.getAnglevelList();
   if (f.length > 0) {
     writer.writePackedSint32(
-      14,
+      11,
       f
     );
   }
   f = message.getPosList();
   if (f.length > 0) {
     writer.writePackedFloat(
-      15,
+      12,
       f
     );
   }
   f = message.getVelList();
   if (f.length > 0) {
     writer.writePackedFloat(
-      16,
+      13,
       f
     );
   }
   f = message.getForwardvel();
   if (f !== 0.0) {
     writer.writeFloat(
-      17,
+      14,
       f
     );
   }
   f = message.getRawdataList();
   if (f.length > 0) {
     writer.writePackedSint32(
-      18,
+      15,
       f
     );
   }
   f = message.getUsedobjid();
   if (f !== 0) {
     writer.writeUint32(
-      19,
+      16,
       f
     );
   }
   f = message.getSocketid();
   if (f !== 0) {
     writer.writeUint32(
-      20,
-      f
-    );
-  }
-  f = message.getParachuting();
-  if (f) {
-    writer.writeBool(
-      21,
+      17,
       f
     );
   }
@@ -4073,11 +4037,11 @@ proto.sm64js.MarioMsg.prototype.hasController = function() {
 
 
 /**
- * optional uint32 action = 3;
+ * optional uint32 action = 2;
  * @return {number}
  */
 proto.sm64js.MarioMsg.prototype.getAction = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
@@ -4086,16 +4050,16 @@ proto.sm64js.MarioMsg.prototype.getAction = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setAction = function(value) {
-  return jspb.Message.setProto3IntField(this, 3, value);
+  return jspb.Message.setProto3IntField(this, 2, value);
 };
 
 
 /**
- * optional uint32 prevAction = 4;
+ * optional uint32 prevAction = 3;
  * @return {number}
  */
 proto.sm64js.MarioMsg.prototype.getPrevaction = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
 
@@ -4104,16 +4068,16 @@ proto.sm64js.MarioMsg.prototype.getPrevaction = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setPrevaction = function(value) {
-  return jspb.Message.setProto3IntField(this, 4, value);
+  return jspb.Message.setProto3IntField(this, 3, value);
 };
 
 
 /**
- * optional uint32 actionState = 5;
+ * optional uint32 actionState = 4;
  * @return {number}
  */
 proto.sm64js.MarioMsg.prototype.getActionstate = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
 };
 
 
@@ -4122,16 +4086,16 @@ proto.sm64js.MarioMsg.prototype.getActionstate = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setActionstate = function(value) {
-  return jspb.Message.setProto3IntField(this, 5, value);
+  return jspb.Message.setProto3IntField(this, 4, value);
 };
 
 
 /**
- * optional uint32 actionTimer = 6;
+ * optional uint32 actionTimer = 5;
  * @return {number}
  */
 proto.sm64js.MarioMsg.prototype.getActiontimer = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
 };
 
 
@@ -4140,16 +4104,16 @@ proto.sm64js.MarioMsg.prototype.getActiontimer = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setActiontimer = function(value) {
-  return jspb.Message.setProto3IntField(this, 6, value);
+  return jspb.Message.setProto3IntField(this, 5, value);
 };
 
 
 /**
- * optional uint32 actionArg = 7;
+ * optional uint32 actionArg = 6;
  * @return {number}
  */
 proto.sm64js.MarioMsg.prototype.getActionarg = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
 };
 
 
@@ -4158,16 +4122,16 @@ proto.sm64js.MarioMsg.prototype.getActionarg = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setActionarg = function(value) {
-  return jspb.Message.setProto3IntField(this, 7, value);
+  return jspb.Message.setProto3IntField(this, 6, value);
 };
 
 
 /**
- * optional sint32 invincTimer = 8;
+ * optional sint32 invincTimer = 7;
  * @return {number}
  */
 proto.sm64js.MarioMsg.prototype.getInvinctimer = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
 };
 
 
@@ -4176,52 +4140,16 @@ proto.sm64js.MarioMsg.prototype.getInvinctimer = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setInvinctimer = function(value) {
-  return jspb.Message.setProto3IntField(this, 8, value);
+  return jspb.Message.setProto3IntField(this, 7, value);
 };
 
 
 /**
- * optional uint32 framesSinceA = 9;
- * @return {number}
- */
-proto.sm64js.MarioMsg.prototype.getFramessincea = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.sm64js.MarioMsg} returns this
- */
-proto.sm64js.MarioMsg.prototype.setFramessincea = function(value) {
-  return jspb.Message.setProto3IntField(this, 9, value);
-};
-
-
-/**
- * optional uint32 framesSinceB = 10;
- * @return {number}
- */
-proto.sm64js.MarioMsg.prototype.getFramessinceb = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 10, 0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.sm64js.MarioMsg} returns this
- */
-proto.sm64js.MarioMsg.prototype.setFramessinceb = function(value) {
-  return jspb.Message.setProto3IntField(this, 10, value);
-};
-
-
-/**
- * optional uint32 wallKickTimer = 11;
+ * optional uint32 wallKickTimer = 8;
  * @return {number}
  */
 proto.sm64js.MarioMsg.prototype.getWallkicktimer = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 11, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
 };
 
 
@@ -4230,16 +4158,16 @@ proto.sm64js.MarioMsg.prototype.getWallkicktimer = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setWallkicktimer = function(value) {
-  return jspb.Message.setProto3IntField(this, 11, value);
+  return jspb.Message.setProto3IntField(this, 8, value);
 };
 
 
 /**
- * optional uint32 doubleJumpTimer = 12;
+ * optional uint32 doubleJumpTimer = 9;
  * @return {number}
  */
 proto.sm64js.MarioMsg.prototype.getDoublejumptimer = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 12, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
 };
 
 
@@ -4248,16 +4176,16 @@ proto.sm64js.MarioMsg.prototype.getDoublejumptimer = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setDoublejumptimer = function(value) {
-  return jspb.Message.setProto3IntField(this, 12, value);
+  return jspb.Message.setProto3IntField(this, 9, value);
 };
 
 
 /**
- * repeated sint32 faceAngle = 13;
+ * repeated sint32 faceAngle = 10;
  * @return {!Array<number>}
  */
 proto.sm64js.MarioMsg.prototype.getFaceangleList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 13));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 10));
 };
 
 
@@ -4266,7 +4194,7 @@ proto.sm64js.MarioMsg.prototype.getFaceangleList = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setFaceangleList = function(value) {
-  return jspb.Message.setField(this, 13, value || []);
+  return jspb.Message.setField(this, 10, value || []);
 };
 
 
@@ -4276,7 +4204,7 @@ proto.sm64js.MarioMsg.prototype.setFaceangleList = function(value) {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.addFaceangle = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 13, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 10, value, opt_index);
 };
 
 
@@ -4290,11 +4218,11 @@ proto.sm64js.MarioMsg.prototype.clearFaceangleList = function() {
 
 
 /**
- * repeated sint32 angleVel = 14;
+ * repeated sint32 angleVel = 11;
  * @return {!Array<number>}
  */
 proto.sm64js.MarioMsg.prototype.getAnglevelList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 14));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 11));
 };
 
 
@@ -4303,7 +4231,7 @@ proto.sm64js.MarioMsg.prototype.getAnglevelList = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setAnglevelList = function(value) {
-  return jspb.Message.setField(this, 14, value || []);
+  return jspb.Message.setField(this, 11, value || []);
 };
 
 
@@ -4313,7 +4241,7 @@ proto.sm64js.MarioMsg.prototype.setAnglevelList = function(value) {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.addAnglevel = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 14, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 11, value, opt_index);
 };
 
 
@@ -4327,11 +4255,11 @@ proto.sm64js.MarioMsg.prototype.clearAnglevelList = function() {
 
 
 /**
- * repeated float pos = 15;
+ * repeated float pos = 12;
  * @return {!Array<number>}
  */
 proto.sm64js.MarioMsg.prototype.getPosList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedFloatingPointField(this, 15));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedFloatingPointField(this, 12));
 };
 
 
@@ -4340,7 +4268,7 @@ proto.sm64js.MarioMsg.prototype.getPosList = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setPosList = function(value) {
-  return jspb.Message.setField(this, 15, value || []);
+  return jspb.Message.setField(this, 12, value || []);
 };
 
 
@@ -4350,7 +4278,7 @@ proto.sm64js.MarioMsg.prototype.setPosList = function(value) {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.addPos = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 15, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 12, value, opt_index);
 };
 
 
@@ -4364,11 +4292,11 @@ proto.sm64js.MarioMsg.prototype.clearPosList = function() {
 
 
 /**
- * repeated float vel = 16;
+ * repeated float vel = 13;
  * @return {!Array<number>}
  */
 proto.sm64js.MarioMsg.prototype.getVelList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedFloatingPointField(this, 16));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedFloatingPointField(this, 13));
 };
 
 
@@ -4377,7 +4305,7 @@ proto.sm64js.MarioMsg.prototype.getVelList = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setVelList = function(value) {
-  return jspb.Message.setField(this, 16, value || []);
+  return jspb.Message.setField(this, 13, value || []);
 };
 
 
@@ -4387,7 +4315,7 @@ proto.sm64js.MarioMsg.prototype.setVelList = function(value) {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.addVel = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 16, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 13, value, opt_index);
 };
 
 
@@ -4401,11 +4329,11 @@ proto.sm64js.MarioMsg.prototype.clearVelList = function() {
 
 
 /**
- * optional float forwardVel = 17;
+ * optional float forwardVel = 14;
  * @return {number}
  */
 proto.sm64js.MarioMsg.prototype.getForwardvel = function() {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 17, 0.0));
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 14, 0.0));
 };
 
 
@@ -4414,16 +4342,16 @@ proto.sm64js.MarioMsg.prototype.getForwardvel = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setForwardvel = function(value) {
-  return jspb.Message.setProto3FloatField(this, 17, value);
+  return jspb.Message.setProto3FloatField(this, 14, value);
 };
 
 
 /**
- * repeated sint32 rawData = 18;
+ * repeated sint32 rawData = 15;
  * @return {!Array<number>}
  */
 proto.sm64js.MarioMsg.prototype.getRawdataList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 18));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 15));
 };
 
 
@@ -4432,7 +4360,7 @@ proto.sm64js.MarioMsg.prototype.getRawdataList = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setRawdataList = function(value) {
-  return jspb.Message.setField(this, 18, value || []);
+  return jspb.Message.setField(this, 15, value || []);
 };
 
 
@@ -4442,7 +4370,7 @@ proto.sm64js.MarioMsg.prototype.setRawdataList = function(value) {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.addRawdata = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 18, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 15, value, opt_index);
 };
 
 
@@ -4456,11 +4384,11 @@ proto.sm64js.MarioMsg.prototype.clearRawdataList = function() {
 
 
 /**
- * optional uint32 usedObjID = 19;
+ * optional uint32 usedObjID = 16;
  * @return {number}
  */
 proto.sm64js.MarioMsg.prototype.getUsedobjid = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 19, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 16, 0));
 };
 
 
@@ -4469,16 +4397,16 @@ proto.sm64js.MarioMsg.prototype.getUsedobjid = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setUsedobjid = function(value) {
-  return jspb.Message.setProto3IntField(this, 19, value);
+  return jspb.Message.setProto3IntField(this, 16, value);
 };
 
 
 /**
- * optional uint32 socketID = 20;
+ * optional uint32 socketID = 17;
  * @return {number}
  */
 proto.sm64js.MarioMsg.prototype.getSocketid = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 20, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 17, 0));
 };
 
 
@@ -4487,25 +4415,7 @@ proto.sm64js.MarioMsg.prototype.getSocketid = function() {
  * @return {!proto.sm64js.MarioMsg} returns this
  */
 proto.sm64js.MarioMsg.prototype.setSocketid = function(value) {
-  return jspb.Message.setProto3IntField(this, 20, value);
-};
-
-
-/**
- * optional bool parachuting = 21;
- * @return {boolean}
- */
-proto.sm64js.MarioMsg.prototype.getParachuting = function() {
-  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 21, false));
-};
-
-
-/**
- * @param {boolean} value
- * @return {!proto.sm64js.MarioMsg} returns this
- */
-proto.sm64js.MarioMsg.prototype.setParachuting = function(value) {
-  return jspb.Message.setProto3BooleanField(this, 21, value);
+  return jspb.Message.setProto3IntField(this, 17, value);
 };
 
 

@@ -54,10 +54,7 @@ const websocketServerPath = process.env.NODE_ENV === 'rust'
         : `ws://${url.hostname}:3000` // local testing
 
 let socket = new WebSocket(websocketServerPath)
-
-export function reloadSocket() {
-    socket = new WebSocket(websocketServerPath)
-}
+loadSocket()
 
 export const networkData = {
     playerInteractions: true,
@@ -96,59 +93,63 @@ const measureLatency = (ping_proto) => {
     window.latency = parseInt(endTime - startTime)
 }
 
-socket.onopen = () => {
 
-    socket.onmessage = async (message) => {
-        let sm64jsMsg
-        let bytes = new Uint8Array(await message.data.arrayBuffer())
-        const rootMsg = RootMsg.deserializeBinary(bytes)
-
-        switch (rootMsg.getMessageCase()) {
-            case RootMsg.MessageCase.UNCOMPRESSED_SM64JS_MSG:
-                sm64jsMsg = rootMsg.getUncompressedSm64jsMsg()
-                switch (sm64jsMsg.getMessageCase()) {
-                    case Sm64JsMsg.MessageCase.PLAYER_LISTS_MSG:
-                        Multi.recvPlayerLists(sm64jsMsg.getPlayerListsMsg())
-                        break
-                    case Sm64JsMsg.MessageCase.PING_MSG:
-                        measureLatency(sm64jsMsg.getPingMsg())
-                        break
-                    case Sm64JsMsg.MessageCase.CHAT_MSG:
-                        recvChat(sm64jsMsg.getChatMsg())
-                        break
-                    case Sm64JsMsg.MessageCase.SKIN_MSG:
-                        Cosmetics.recvSkinData(sm64jsMsg.getSkinMsg())
-                        break
-                    case Sm64JsMsg.MessageCase.ANNOUNCEMENT_MSG:
-                        recvAnnouncement(sm64jsMsg.getAnnouncementMsg())
-                        break
-                    case Sm64JsMsg.MessageCase.INITIALIZATION_MSG:
-                        const initializationMsg = sm64jsMsg.getInitializationMsg()
-                        switch (initializationMsg.getMessageCase()) {
-                            case InitializationMsg.MessageCase.INIT_GAME_DATA_MSG:
-                                Cosmetics.recvPlayerNameResponse(initializationMsg.getInitGameDataMsg()); break
-                            default: throw "unknown case for initialization proto message"
-                        }
-                        break
-                    default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
-                }
-                break
-            case RootMsg.MessageCase.COMPRESSED_SM64JS_MSG:
-                if (!multiplayerReady()) return
-                const compressedBytes = rootMsg.getCompressedSm64jsMsg()
-                const buffer = await unzip(compressedBytes)
-                sm64jsMsg = Sm64JsMsg.deserializeBinary(buffer)
-                const listMsg = sm64jsMsg.getListMsg()
-                Multi.recvMarioData(listMsg.getMarioList())
-                recvFlagList(listMsg.getFlagList())
-                break
-            case RootMsg.MessageCase.MESSAGE_NOT_SET:
-            default:
-                throw new Error(`unhandled case in rootMsg switch expression: ${rootMsg.getMessageCase()}`)
+export function loadSocket() {
+    socket = new WebSocket(websocketServerPath)
+    socket.onopen = () => {
+    
+        socket.onmessage = async (message) => {
+            let sm64jsMsg
+            let bytes = new Uint8Array(await message.data.arrayBuffer())
+            const rootMsg = RootMsg.deserializeBinary(bytes)
+    
+            switch (rootMsg.getMessageCase()) {
+                case RootMsg.MessageCase.UNCOMPRESSED_SM64JS_MSG:
+                    sm64jsMsg = rootMsg.getUncompressedSm64jsMsg()
+                    switch (sm64jsMsg.getMessageCase()) {
+                        case Sm64JsMsg.MessageCase.PLAYER_LISTS_MSG:
+                            Multi.recvPlayerLists(sm64jsMsg.getPlayerListsMsg())
+                            break
+                        case Sm64JsMsg.MessageCase.PING_MSG:
+                            measureLatency(sm64jsMsg.getPingMsg())
+                            break
+                        case Sm64JsMsg.MessageCase.CHAT_MSG:
+                            recvChat(sm64jsMsg.getChatMsg())
+                            break
+                        case Sm64JsMsg.MessageCase.SKIN_MSG:
+                            Cosmetics.recvSkinData(sm64jsMsg.getSkinMsg())
+                            break
+                        case Sm64JsMsg.MessageCase.ANNOUNCEMENT_MSG:
+                            recvAnnouncement(sm64jsMsg.getAnnouncementMsg())
+                            break
+                        case Sm64JsMsg.MessageCase.INITIALIZATION_MSG:
+                            const initializationMsg = sm64jsMsg.getInitializationMsg()
+                            switch (initializationMsg.getMessageCase()) {
+                                case InitializationMsg.MessageCase.INIT_GAME_DATA_MSG:
+                                    Cosmetics.recvPlayerNameResponse(initializationMsg.getInitGameDataMsg()); break
+                                default: throw "unknown case for initialization proto message"
+                            }
+                            break
+                        default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
+                    }
+                    break
+                case RootMsg.MessageCase.COMPRESSED_SM64JS_MSG:
+                    if (!multiplayerReady()) return
+                    const compressedBytes = rootMsg.getCompressedSm64jsMsg()
+                    const buffer = await unzip(compressedBytes)
+                    sm64jsMsg = Sm64JsMsg.deserializeBinary(buffer)
+                    const listMsg = sm64jsMsg.getListMsg()
+                    Multi.recvMarioData(listMsg.getMarioList())
+                    recvFlagList(listMsg.getFlagList())
+                    break
+                case RootMsg.MessageCase.MESSAGE_NOT_SET:
+                default:
+                    throw new Error(`unhandled case in rootMsg switch expression: ${rootMsg.getMessageCase()}`)
+            }
         }
+    
+        socket.onclose = () => { window.latency = null }
     }
-
-    socket.onclose = () => { window.latency = null }
 }
 
 const recvAnnouncement = (announcementMsg) => {

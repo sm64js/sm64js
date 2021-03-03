@@ -51,8 +51,6 @@ export const copyMarioUpdateToState = (m, update) => {
     m.prevAction = update.prevaction
     m.actionArg = update.actionarg
     m.invincTimer = update.invinctimer
-    m.framesSinceA = update.framessincea
-    m.framesSinceB = update.framessinceb
     m.wallKickTimer = update.wallkicktimer
     m.doubleJumpTimer = update.doublejumptimer
     m.angleVel = update.anglevelList
@@ -61,7 +59,6 @@ export const copyMarioUpdateToState = (m, update) => {
     m.pos = update.posList
     m.faceAngle = update.faceangleList
     m.socket_id = update.socketid // should not be needed
-    m.parachuting = update.parachuting
 
     m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
     m.marioObj.rawData[RAW.oRoom] = -1
@@ -91,8 +88,6 @@ export const updateLocalMarioState = (m, update) => {
         m.prevAction = update.prevaction
         m.actionArg = update.actionarg
         m.invincTimer = update.invinctimer
-        m.framesSinceA = update.framessincea
-        m.framesSinceB = update.framessinceb
         m.wallKickTimer = update.wallkicktimer
         m.doubleJumpTimer = update.doublejumptimer
         m.angleVel = update.anglevelList
@@ -102,7 +97,6 @@ export const updateLocalMarioState = (m, update) => {
 
         m.faceAngle = update.faceangleList
         m.socket_id = update.socketid  // should not be needed
-        m.parachuting = update.parachuting
 
         m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
         m.marioObj.rawData[RAW.oRoom] = -1
@@ -154,8 +148,6 @@ export const updateLocalMarioState2 = (m, update) => {
     m.prevAction = update.prevaction
     m.actionArg = update.actionarg
     m.invincTimer = update.invinctimer
-    m.framesSinceA = update.framessincea
-    m.framesSinceB = update.framessinceb
     m.wallKickTimer = update.wallkicktimer
     m.doubleJumpTimer = update.doublejumptimer
     m.angleVel = update.anglevelList
@@ -164,7 +156,6 @@ export const updateLocalMarioState2 = (m, update) => {
     //m.pos = update.posList
     //m.faceAngle = update.faceangleList
     m.socket_id = update.socketid // should not be needed
-    m.parachuting = update.parachuting
 
     m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
     m.marioObj.rawData[RAW.oRoom] = -1
@@ -191,8 +182,6 @@ export const createMarioProtoMsg = () => {
     mariomsg.setActiontimer(m.actionTimer)
     mariomsg.setActionarg(m.actionArg < 0 ? 65536 - m.actionArg : m.actionArg)
     mariomsg.setInvinctimer(m.invincTimer)
-    mariomsg.setFramessincea(m.framesSinceA)
-    mariomsg.setFramessinceb(m.framesSinceB)
     mariomsg.setWallkicktimer(m.wallKickTimer)
     mariomsg.setDoublejumptimer(m.doubleJumpTimer)
     mariomsg.setFaceangleList(m.faceAngle)
@@ -200,7 +189,6 @@ export const createMarioProtoMsg = () => {
     mariomsg.setPosList(m.pos)
     mariomsg.setVelList(m.vel)
     mariomsg.setForwardvel(m.forwardVel)
-    mariomsg.setParachuting(m.parachuting)
 
     if (m.usedObj) mariomsg.setUsedobjid(m.usedObj.rawData[RAW.oSyncID])
 
@@ -303,14 +291,9 @@ export const createControllerProtoMsg = () => {
     buttonDown |= (m.controller_to_server.buttonDownB << 1)
     buttonDown |= (m.controller_to_server.buttonDownZ << 2)
     buttonDown |= (m.controller_to_server.buttonDownStart << 3)
-    controllermsg.setButtondown(buttonDown)
+    buttonDown |= (m.controller_to_server.parachuteDown << 4)
 
-/*    let buttonPressed = 0
-    buttonPressed |= (m.controller.buttonPressedA << 0)
-    buttonPressed |= (m.controller.buttonPressedB << 1)
-    buttonPressed |= (m.controller.buttonPressedZ << 2)
-    buttonPressed |= (m.controller.buttonPressedStart << 3)
-    controllermsg.setButtonpressed(buttonPressed)*/
+    controllermsg.setButtondown(buttonDown)
 
     controllermsg.setTaunt(m.controller_to_server.taunt)
 
@@ -334,10 +317,12 @@ const applyController = (controllerProto, marioState) => {
         buttonDownB: buttonDown & 0x2,
         buttonDownZ: buttonDown & 0x4,
         buttonDownStart: buttonDown & 0x8,
+        parachuteDown: buttonDown & 0x10,
         buttonPressedA: buttonPressed & 0x1,
         buttonPressedB: buttonPressed & 0x2,
         buttonPressedZ: buttonPressed & 0x4,
         buttonPressedStart: buttonPressed & 0x8,
+        parachute: buttonPressed & 0x10,
         cameraYaw: controllerProto.getCamerayaw()
     }
 

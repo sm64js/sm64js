@@ -366,7 +366,7 @@ const act_dive = (m) => {
             m.marioObj.header.gfx.angle[0] = -m.faceAngle[0]
             break
         case Mario.AIR_STEP_LANDED:
-            Mario.set_mario_action(m, Mario.ACT_DIVE_SLIDE)
+            Mario.set_mario_action(m, Mario.ACT_DIVE_SLIDE, 0)
             m.faceAngle[0] = 0
             break
         case Mario.AIR_STEP_HIT_WALL:

@@ -1370,7 +1370,7 @@ const update_mario_inputs = (m) => {
     update_mario_geometry_inputs(m)
 
     if (m.controller && m.controller.taunt && (m.action == ACT_IDLE || m.action == ACT_TAUNT)) m.input |= INPUT_TAUNT
-    if (m.controller.parachute && (m.vel[1] <= 0.0)) m.input |= INPUT_PARACHUTE
+    if (m.controller && m.controller.parachute && (m.vel[1] <= 0.0)) m.input |= INPUT_PARACHUTE
 
     if (!(m.input & (INPUT_NONZERO_ANALOG | INPUT_A_PRESSED))) {
         m.input |= INPUT_UNKNOWN_5;

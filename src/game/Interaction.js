@@ -334,7 +334,7 @@ const interact_bounce_top = (m, o) => {
     }
 
     if (interaction & INT_ATTACK_NOT_FROM_BELOW) {
-        attack_object(o, interaction)
+        attack_object(o, interaction, m)
         bounce_back_from_attack(m, interaction)
 
         if (interaction & INT_HIT_FROM_ABOVE) {
@@ -359,6 +359,7 @@ const interact_bounce_top = (m, o) => {
 }
 
 const interact_damage = (m, o) => {
+
     if (take_damage_and_knock_back(m, o)) return 1
 
     if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
@@ -387,7 +388,7 @@ const interact_grabbable = (m, o) => {
     if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_KICKABLE) {
         const interaction = determine_interaction(m, o)
         if (interaction & (INT_KICK | INT_TRIP)) {
-            attack_object(o, interaction)
+            attack_object(o, interaction, m)
             bounce_back_from_attack(m, interaction)
             return 0
         }
@@ -500,7 +501,7 @@ const push_mario_out_of_object = (m, o, padding) => {
     }
 }
 
-const attack_object = (o, interaction) => {
+const attack_object = (o, interaction, m) => {
     let attackType = 0
 
     switch (interaction) {
@@ -527,6 +528,10 @@ const attack_object = (o, interaction) => {
     }
 
     o.rawData[oInteractStatus] = attackType + (INT_STATUS_INTERACTED | INT_STATUS_WAS_ATTACKED)
+
+    if (m == undefined) throw "you need to add m / marioState to the attack_object function"
+
+    o.attackerObj = m.marioObj
     return attackType
 }
 

@@ -1,5 +1,4 @@
-import { Sm64JsMsg, MarioMsg, ControllerListMsg, ControllerMsg, MarioListMsg } from "../../proto/mario_pb"
-import zlib from "zlib"
+import { MarioMsg, ControllerMsg, MarioListMsg } from "../../proto/mario_pb"
 import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "./socket"
 import { INTERACT_PLAYER } from "../game/Interaction"
@@ -18,14 +17,6 @@ const getMarioRawDataSubset = (fullRawData) => {
     return Object.values(rawDataMap).map(valueType => {
         return parseInt(fullRawData[valueType])
     })
-}
-
-const expandRawDataSubset = (subset, currentRawData) => {
-    const rawData = currentRawData ? currentRawData : new Array(0x50).fill(0)
-    Object.entries(rawDataMap).forEach(([subsetIndex, rawDataIndex]) => {
-        rawData[rawDataIndex] = subset[subsetIndex]
-    })
-    return rawData
 }
 
 export const updateRemoteMarioController = (controllerProto) => {
@@ -57,43 +48,9 @@ export const updateRemoteMarioController = (controllerProto) => {
 
 }
 
-export const copyMarioUpdateToState = (remotePlayer) => {
-    const m = remotePlayer.marioState
-    const update = remotePlayer.marioUpdate
-
-    m.actionState = (m.action != update.action) ? 0 : update.actionstate
-    m.actionTimer = (m.action != update.action) ? 0 : update.actiontimer
-
-    m.action = update.action
-    m.prevAction = update.prevaction
-    m.actionArg = update.actionarg
-    m.invincTimer = update.invinctimer
-    m.wallKickTimer = update.wallkicktimer
-    m.doubleJumpTimer = update.doublejumptimer
-    m.angleVel = update.anglevelList
-    m.forwardVel = update.forwardvel
-    m.vel = update.velList
-    m.pos = update.posList
-    m.faceAngle = update.faceangleList
-    m.socket_id = update.socketid
-
-    m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
-    m.marioObj.rawData[RAW.oRoom] = -1
-
-    if (update.usedobjid >= 1000 && update.usedobjid <= 2000) {
-        m.usedObj = gameData.spawnObjectsBySyncID[update.usedobjid - 1000]
-    }
-
-    remotePlayer.marioUpdate = null
-
-}
-
-
 export const createAllMarioMsg = () => {
 
     const marioListMsg = new MarioListMsg()
-
-    //if (networkData.remotePlayers == undefined) return
 
     const marios = []
 
@@ -101,8 +58,6 @@ export const createAllMarioMsg = () => {
         const mariomsg = new MarioMsg()
 
         mariomsg.setController(createControllerProtoMsg(remoteMario.marioState))
-
-        const m = remoteMario.marioState
 
         mariomsg.setActionstate(uint16(remoteMario.marioState.actionState))
         mariomsg.setActiontimer(uint16(remoteMario.marioState.actionTimer))
@@ -137,54 +92,24 @@ export const createAllMarioMsg = () => {
 
 }
 
-export const createMarioProtoMsg = () => {
-
-    const m = gameData.marioState
-
-    const mariomsg = new MarioMsg()
-
-    mariomsg.setController(createControllerProtoMsg(m))
-
-    mariomsg.setAction(m.action)
-    mariomsg.setPrevaction(m.prevAction)
-    mariomsg.setActionstate(m.actionState)
-    mariomsg.setActiontimer(m.actionTimer)
-    mariomsg.setActionarg(m.actionArg < 0 ? 65536 - m.actionArg : m.actionArg)
-    mariomsg.setInvinctimer(m.invincTimer)
-    mariomsg.setWallkicktimer(m.wallKickTimer)
-    mariomsg.setDoublejumptimer(m.doubleJumpTimer)
-    mariomsg.setFaceangleList(m.faceAngle)
-    mariomsg.setAnglevelList(m.angleVel)
-    mariomsg.setPosList(m.pos)
-    mariomsg.setVelList(m.vel)
-    mariomsg.setForwardvel(m.forwardVel)
-
-    if (m.usedObj) mariomsg.setUsedobjid(m.usedObj.rawData[RAW.oSyncID])
-
-    mariomsg.setRawdataList(getMarioRawDataSubset(m.marioObj.rawData))
-    mariomsg.setSocketid(networkData.mySocketID)
-
-    return mariomsg
-}
-
-const initNewRemoteMarioState = (marioProto) => {
+export const initNewRemoteMarioState = (socket_id) => {
 
     const m = gameData.marioState
 
     const newMarioState = {
 
-        controller: { buttonDownStart: 0, buttonDownA: 0, buttonDownB: 0, buttonDownZ: 0 },
+        controller: { buttonDownStart: 0, buttonDownA: 0, buttonDownB: 0, buttonDownZ: 0, parachuteDown: 0 },
 
-        socket_id: marioProto.getSocketid(),
+        socket_id,
 
-        actionTimer: marioProto.getActiontimer(),
-        actionState: marioProto.getActionstate(),
-        actionArg: marioProto.getActionarg(),
+        actionTimer: 0,
+        actionState: 0,
+        actionArg: 0,
         framesSinceA: 0xFF,
         framesSinceB: 0xFF,
         invincTimer: 0,
-        flags: m.flags,
-        forwardVel: marioProto.getForwardvel(),
+        flags: 17, //MARIO_CAP_ON_HEAD | MARIO_NORMAL_CAP
+        forwardVel: 0,
         squishTimer: 0,
         hurtCounter: 0,
         healCounter: 0,
@@ -225,19 +150,19 @@ const initNewRemoteMarioState = (marioProto) => {
             hitboxHeight: 160,
             hitboxRadius: 37,
             collidedObjs: [],
-            rawData: expandRawDataSubset(marioProto.getRawdataList()),
+            rawData: new Array(0x50).fill(0),
             bhvScript: { commands: gLinker.behaviors.bhvMario, index: 0 }
         },
-        faceAngle: marioProto.getFaceangleList(),
+        faceAngle: Area.gMarioSpawnInfo.startAngle,
         slideYaw: 0,
-        angleVel: marioProto.getAnglevelList(),
-        pos: marioProto.getPosList(),
-        vel: marioProto.getVelList(),
+        angleVel: [0, 0, 0],
+        pos: Area.gMarioSpawnInfo.startPos,
+        vel: [0, 0, 0],
         action: Area.gMarioSpawnInfo.parachuteSpawn ? ACT_PARACHUTING : ACT_IDLE,
         prevAction: ACT_IDLE,
         wallKickTimer: 0,
         doubleJumpTimer: 0,
-        ignoreUpdates: 0
+        ignoreUpdates: 0 /// this can probably be removed
     }
 
     newMarioState.marioObj.rawData[RAW.oInteractType] = INTERACT_PLAYER
@@ -248,7 +173,12 @@ const initNewRemoteMarioState = (marioProto) => {
     newMarioState.marioObj.header.gfx.wrapperObjectNode = newMarioState.marioObj.header
     newMarioState.marioObj.header.gfx.node.wrapper = newMarioState.marioObj.header.gfx
 
-    return newMarioState
+    networkData.remotePlayers[socket_id] = {
+        marioState: newMarioState,
+        controllerUpdateTimestamp: performance.now(),
+        crashCount: 0, /// crashCount and skipRender can probably be removed
+        skipRender: 0,
+    }
 }
 
 export const createControllerProtoMsg = (m) => {
@@ -278,14 +208,11 @@ export const createControllerProtoMsg = (m) => {
 
     controllermsg.setCamerayaw(m.controller.cameraYaw)
 
-    //controllermsg.setSocketid(networkData.mySocketID)
-
     return controllermsg
 }
 
 export const applyController = (controllerUpdate, marioState) => {
-    //const id = controllerProto.getSocketid()
-    //if (networkData.remotePlayers[id] == undefined) return
+
     const m = marioState
     const buttonDown = controllerUpdate.buttondown
 
@@ -309,7 +236,7 @@ export const applyController = (controllerUpdate, marioState) => {
 
 }
 
-export const recvPlayerLists = (playerListsProto) => {
+export const recvPlayerLists = () => {
 
     //// unrelated to the message it is recieving... just a taking the oppurtunity to check for AFK players
     Object.keys(networkData.remotePlayers).forEach(socket_id => {
@@ -320,18 +247,3 @@ export const recvPlayerLists = (playerListsProto) => {
 
 }
 
-
-export const recvMarioData = (marioProto) => {
-
-    const id = marioProto.getSocketid()
-    if (id == networkData.mySocketID) return
-
-    if (networkData.remotePlayers[id] == undefined) {
-        networkData.remotePlayers[id] = { 
-            marioState: initNewRemoteMarioState(marioProto),
-            crashCount: 0,
-            skipRender: 0,
-        }
-    }
-
-}

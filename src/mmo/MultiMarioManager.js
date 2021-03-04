@@ -233,6 +233,9 @@ const initNewRemoteMarioState = (marioProto) => {
         pos: marioProto.getPosList(),
         vel: marioProto.getVelList(),
         action: Area.gMarioSpawnInfo.parachuteSpawn ? ACT_PARACHUTING : ACT_IDLE,
+        prevAction: ACT_IDLE,
+        wallKickTimer: 0,
+        doubleJumpTimer: 0,
         ignoreUpdates: 0
     }
 

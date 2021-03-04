@@ -481,27 +481,9 @@ export const sBackwardKnockbackActions = [
 export const init_marios = () => {
 
     Object.assign(LevelUpdate.gMarioState, {
-        actionTimer: 0,
-        framesSinceA: 0xFF,
-        framesSinceB: 0xFF,
-        invincTimer: 0,
-        flags: MARIO_CAP_ON_HEAD | MARIO_NORMAL_CAP,
-        forwardVel: 0.0,
-        squishTimer: 0,
-        hurtCounter: 0,
-        healCounter: 0,
-        capTimer: 0,
-        quicksandDepth: 0.0,
         area: Area.gCurrentArea,
         marioObj: ObjectListProcessor.gMarioObject,
-        faceAngle: [ ...Area.gMarioSpawnInfo.startAngle ],
-        slideYaw: 0,
-        angleVel: [0, 0, 0],
-        pos: [ ...Area.gMarioSpawnInfo.startPos ],
-        vel: [0, 0, 0],
-        action: Area.gMarioSpawnInfo.parachuteSpawn ? ACT_PARACHUTING : ACT_IDLE,
-        controller_to_server: { stickX: 0, stickY: 0, stickMag: 0 },
-        controller: { stickX: 0, stickY: 0, stickMag: 0 }
+        slideYaw: 0
     })
 
     Object.assign(LevelUpdate.gMarioState.marioObj.header.gfx, {
@@ -1136,14 +1118,14 @@ const update_mario_geometry_inputs = (m) => {
             m.input |= INPUT_IN_WATER
         }
 
+        /// bouncepad
+        if (m.floor.type == 0x0004 && !(m.input & INPUT_OFF_FLOOR)) {
+            m.vel[1] = 200
+            set_mario_action(m, ACT_PARACHUTING, 0)
+        }
+
     } else {
         m.input |= INPUT_OFF_FLOOR;
-    }
-
-    /// bouncepad
-    if (m.floor.type == 0x0004 && !(m.input & INPUT_OFF_FLOOR)) {
-        m.vel[1] = 200
-        set_mario_action(m, ACT_PARACHUTING, 0)
     }
 
 }

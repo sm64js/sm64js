@@ -1,12 +1,11 @@
-import { Sm64JsMsg, MarioMsg, ControllerListMsg, ControllerMsg, ValidPlayersMsg } from "../../proto/mario_pb"
-import zlib from "zlib"
+import {  ControllerMsg } from "../../proto/mario_pb"
 import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "./socket"
 import { defaultSkinData } from "./cosmetics"
 import { INTERACT_PLAYER } from "../game/Interaction"
-import { levelIdToName, distance3d } from "../utils"
+import { levelIdToName } from "../utils"
 import { gLinker } from "../game/Linker"
-import { dist_between_objects, cur_obj_rotate_yaw_toward, approach_symmetric } from "../game/ObjectHelpers"
+
 
 const url = new URL(window.location.href)
 
@@ -16,11 +15,6 @@ const rawDataMap = {
     2: RAW.oIntangibleTimer,
 }
 
-const getMarioRawDataSubset = (fullRawData) => {
-    return Object.values(rawDataMap).map(valueType => {
-        return parseInt(fullRawData[valueType])
-    })
-}
 
 const expandRawDataSubset = (subset, currentRawData) => {
     const rawData = currentRawData ? currentRawData : new Array(0x50).fill(0)
@@ -30,19 +24,7 @@ const expandRawDataSubset = (subset, currentRawData) => {
     return rawData
 }
 
-const updateRemoteMarioState = (id, marioProto) => {
-
-    const controllerProto = marioProto.getController()
-    applyController(controllerProto, networkData.remotePlayers[id].marioState) /// this should be applied in other branch probably
-
-    /// other mario updates
-    networkData.remotePlayers[id].marioUpdate = marioProto.toObject()
-
-}
-
 export const copyMarioUpdateToState = (m, update) => {
-    //const m = remotePlayer.marioState
-    //const update = remotePlayer.marioUpdate
 
     m.actionState = (m.action != update.action) ? 0 : update.actionstate
     m.actionTimer = (m.action != update.action) ? 0 : update.actiontimer
@@ -69,150 +51,19 @@ export const copyMarioUpdateToState = (m, update) => {
 
 }
 
-const constrainNumber = (number, max) => {
-    if (number > max) number = max
-    if (number < -max) number = -max
-    return number
-}
-
-export const updateLocalMarioState = (m, update) => {
-
-    const distance = distance3d(m.pos, update.posList)
-    if (distance > 1500.0) {
-        console.log("full sync")
-
-        m.actionState = update.actionstate
-        m.actionTimer = update.actiontimer
-
-        m.action = update.action
-        m.prevAction = update.prevaction
-        m.actionArg = update.actionarg
-        m.invincTimer = update.invinctimer
-        m.wallKickTimer = update.wallkicktimer
-        m.doubleJumpTimer = update.doublejumptimer
-        m.angleVel = update.anglevelList
-        m.forwardVel = update.forwardvel
-        m.pos = update.posList
-        m.vel = update.velList
-
-        m.faceAngle = update.faceangleList
-        m.socket_id = update.socketid  // should not be needed
-
-        m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
-        m.marioObj.rawData[RAW.oRoom] = -1
-
-        if (update.usedobjid >= 1000 && update.usedobjid <= 2000) {
-            m.usedObj = gameData.spawnObjectsBySyncID[update.usedobjid - 1000]
-        }
-    } else {
-        m.pos[0] += constrainNumber(update.posList[0] - m.pos[0], 6)
-        //m.pos[1] += constrainNumber(update.posList[1] - m.pos[1], 8)
-        m.pos[2] += constrainNumber(update.posList[2] - m.pos[2], 6)
-
-        m.vel[0] += constrainNumber(update.velList[0] - m.vel[0], 2)
-        //m.vel[1] += constrainNumber(update.velList[1] - m.vel[1], 2)
-        m.vel[2] += constrainNumber(update.velList[2] - m.vel[2], 2)
-        m.forwardVel += constrainNumber(update.forwardvel - m.forwardVel, 2)
-
-        //console.log(update.faceangleList[1] - m.faceAngle[1])
-        //cur_obj_rotate_yaw_toward(update.faceangleList[1], 10)
-        m.faceAngle[1] = approach_symmetric(m.faceAngle[1], update.faceangleList[1], 10)
-    }
-
-}
-
-export const updateLocalMarioState2 = (m, update) => {
-
-    const distance = distance3d(m.pos, update.posList)
-    if (distance > 1500.0) {
-        console.log("full sync")
-        m.pos = update.posList
-        m.faceAngle = update.faceangleList
-    } else {
-        m.pos[0] += constrainNumber(update.posList[0] - m.pos[0], 8)
-        m.pos[1] += constrainNumber(update.posList[1] - m.pos[1], 8)
-        m.pos[2] += constrainNumber(update.posList[2] - m.pos[2], 8)
-        m.faceAngle[1] = approach_symmetric(m.faceAngle[1], update.faceangleList[1], 10)
-
-    }
-
-    //m.vel[0] += constrainNumber(update.velList[0] - m.vel[0], 0.2)
-    //m.vel[1] += constrainNumber(update.velList[1] - m.vel[1], 0.2)
-    //m.vel[2] += constrainNumber(update.velList[2] - m.vel[2], 0.2)
-    //m.forwardVel += constrainNumber(update.forwardvel - m.forwardVel, 0.2)
-
-    m.actionState = (m.action != update.action) ? 0 : update.actionstate
-    m.actionTimer = (m.action != update.action) ? 0 : update.actiontimer
-
-    m.action = update.action
-    m.prevAction = update.prevaction
-    m.actionArg = update.actionarg
-    m.invincTimer = update.invinctimer
-    m.wallKickTimer = update.wallkicktimer
-    m.doubleJumpTimer = update.doublejumptimer
-    m.angleVel = update.anglevelList
-    m.forwardVel = update.forwardvel
-    m.vel = update.velList
-    //m.pos = update.posList
-    //m.faceAngle = update.faceangleList
-    m.socket_id = update.socketid // should not be needed
-
-    m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
-    m.marioObj.rawData[RAW.oRoom] = -1
-
-    if (update.usedobjid >= 1000 && update.usedobjid <= 2000) {
-        m.usedObj = gameData.spawnObjectsBySyncID[update.usedobjid - 1000]
-    }
-
-}
-
-export const createMarioProtoMsg = () => {
-
-    const m = gameData.marioState
-
-    const mariomsg = new MarioMsg()
-
-    //const controllerMsg = createControllerProtoMsg()
-    //mariomsg.setControllerToServer(controllerMsg)
-    //mariomsg.setController(controllerMsg)
-
-    mariomsg.setAction(m.action)
-    mariomsg.setPrevaction(m.prevAction)
-    mariomsg.setActionstate(m.actionState)
-    mariomsg.setActiontimer(m.actionTimer)
-    mariomsg.setActionarg(m.actionArg < 0 ? 65536 - m.actionArg : m.actionArg)
-    mariomsg.setInvinctimer(m.invincTimer)
-    mariomsg.setWallkicktimer(m.wallKickTimer)
-    mariomsg.setDoublejumptimer(m.doubleJumpTimer)
-    mariomsg.setFaceangleList(m.faceAngle)
-    mariomsg.setAnglevelList(m.angleVel)
-    mariomsg.setPosList(m.pos)
-    mariomsg.setVelList(m.vel)
-    mariomsg.setForwardvel(m.forwardVel)
-
-    if (m.usedObj) mariomsg.setUsedobjid(m.usedObj.rawData[RAW.oSyncID])
-
-    mariomsg.setRawdataList(getMarioRawDataSubset(m.marioObj.rawData))
-    mariomsg.setSocketid(networkData.mySocketID)
-
-    return mariomsg
-}
-
 const initNewRemoteMarioState = (marioProto) => {
 
     const m = gameData.marioState
 
     const newMarioState = {
 
-        controller: { buttonDownStart: 0, buttonDownA: 0, buttonDownB: 0, buttonDownZ: 0 },
+        controller: { buttonDownStart: 0, buttonDownA: 0, buttonDownB: 0, buttonDownZ: 0, parachuteDown: 0 },
 
         socket_id: marioProto.getSocketid(),
 
         actionTimer: marioProto.getActiontimer(),
         actionState: marioProto.getActionstate(),
         actionArg: marioProto.getActionarg(),
-        framesSinceA: 0xFF,
-        framesSinceB: 0xFF,
         invincTimer: 0,
         flags: m.flags,
         forwardVel: marioProto.getForwardvel(),
@@ -256,7 +107,7 @@ const initNewRemoteMarioState = (marioProto) => {
             hitboxHeight: 160,
             hitboxRadius: 37,
             collidedObjs: [],
-            rawData: expandRawDataSubset(marioProto.getRawdataList()),
+            rawData: new Array(0x50).fill(0),
             bhvScript: { commands: gLinker.behaviors.bhvMario, index: 0 }
         },
         faceAngle: marioProto.getFaceangleList(),
@@ -326,19 +177,8 @@ const applyController = (controllerProto, marioState) => {
         cameraYaw: controllerProto.getCamerayaw()
     }
 
-    //console.log(m.controller.buttonDownZ)
 }
 
-/*export const recvControllerUpdate = (controllerbytes) => {
-    zlib.inflate(controllerbytes, (err, buffer) => {
-        if (!err) {
-            const controllerListProto = ControllerListMsg.deserializeBinary(buffer).getControllerList()
-            controllerListProto.forEach(proto => {
-                applyController(proto)
-            })
-        }
-    })
-}*/
 
 export const recvPlayerLists = (playerListsProto) => {
 
@@ -346,23 +186,6 @@ export const recvPlayerLists = (playerListsProto) => {
 
     if (window.playerNameAccepted) { // joined a game
 
-        /*
-        if (rooms.length != 1) {
-            console.log("ignoring data ", rooms.length)
-            return
-        }
-
-        const roomProto = rooms[0]
-        const level = roomProto.getLevelId() 
-        if (level != window.selectedMap) throw "error valid player list level does not match loaded level"
-        const validplayers = roomProto.getValidplayersList()
-        networkData.numOnline = validplayers.length
-
-        Object.keys(networkData.remotePlayers).forEach(socket_id => {
-            if (!validplayers.includes(parseInt(socket_id))) {
-                delete networkData.remotePlayers[socket_id]
-            }
-        })*/
 
     } else { /// still in a lobby
 
@@ -398,6 +221,7 @@ export const recvMarioData = (marioList) => {
         if (networkData.remotePlayers[id] == undefined) {  /// not defined local not linkes, or remote not created
 
             if (id == networkData.mySocketID) {  /// is the local mario, time to link it
+                copyMarioUpdateToState(gameData.marioState, marioProto.toObject())
                 networkData.remotePlayers[id] = {
                     marioState: gameData.marioState, skinData: defaultSkinData(), crashCount: 0, skipRender: 0
                 }

@@ -19,7 +19,6 @@ const checkMarioPosAndPushAway = (m) => {
 }
 
 export const bhv_pole_base_loop = () => {
-    checkMarioPosAndPushAway(ObjectListProc.gMarioObject.marioState)
     Object.values(networkData.remotePlayers).forEach(remotePlayer => {
         checkMarioPosAndPushAway(remotePlayer.marioState)
     })

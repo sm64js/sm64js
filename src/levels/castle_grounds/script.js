@@ -13,7 +13,7 @@ export const level_castle_grounds_entry = [
     { command: LevelCommands.terrain, args: [castle_grounds_seg7_collision_level] },
     { command: LevelCommands.macro_objects, args: [castle_seg7_macro_objs] },
     { command: LevelCommands.end_area },
-    { command: LevelCommands.set_mario_pos, args: [1, 180, -9999, 9999, 9999, true] },
+    { command: LevelCommands.set_mario_pos, args: [1, 180, -1328, 660, 4664] },
     { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_or_update, LevelUpdate] },
     { command: LevelCommands.call_loop, args: [1, LevelUpdate.lvl_init_or_update, LevelUpdate] },
 ]

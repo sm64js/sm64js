@@ -98,12 +98,12 @@ socket.onopen = () => {
                 sm64jsMsg = rootMsg.getUncompressedSm64jsMsg()
                 switch (sm64jsMsg.getMessageCase()) {
                     case Sm64JsMsg.MessageCase.PLAYER_LISTS_MSG:
-                        Multi.recvPlayerLists(sm64jsMsg.getPlayerListsMsg())
+                        Multi.recvPlayerLists()
                         break
                     case Sm64JsMsg.MessageCase.CONTROLLER_MSG:
                         Multi.updateRemoteMarioController(sm64jsMsg.getControllerMsg()); break
-                    case Sm64JsMsg.MessageCase.MARIO_MSG:
-                        Multi.recvMarioData(sm64jsMsg.getMarioMsg()); break
+                    case Sm64JsMsg.MessageCase.INIT_NEW_MARIO_STATE_MSG:
+                        Multi.initNewRemoteMarioState(sm64jsMsg.getInitNewMarioStateMsg().getSocketId()); break
                     case Sm64JsMsg.MessageCase.PING_MSG:
                         measureLatency(sm64jsMsg.getPingMsg())
                         break

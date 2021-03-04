@@ -495,7 +495,7 @@ export const init_marios = () => {
         marioObj: ObjectListProcessor.gMarioObject,
         faceAngle: [ ...Area.gMarioSpawnInfo.startAngle ],
         angleVel: [0, 0, 0],
-        pos: [ 9999, 9999, 9999 ],
+        pos: [ -9999, 9999, 9999 ],
         vel: [0, 0, 0],
         action: ACT_IDLE,
     })
@@ -1135,14 +1135,14 @@ const update_mario_geometry_inputs = (m) => {
             m.input |= INPUT_IN_WATER
         }
 
+        /// bouncepad
+        if (m.floor.type == 0x0004 && !(m.input & INPUT_OFF_FLOOR)) {
+            m.vel[1] = 200
+            set_mario_action(m, ACT_PARACHUTING, 0)
+        }
+
     } else {
         m.input |= INPUT_OFF_FLOOR;
-    }
-
-    /// bouncepad
-    if (m.floor.type == 0x0004 && !(m.input & INPUT_OFF_FLOOR)) {
-        m.vel[1] = 200
-        set_mario_action(m, ACT_PARACHUTING, 0)
     }
 
 }

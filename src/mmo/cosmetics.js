@@ -10,6 +10,7 @@ export const defaultSkinData = () => {
         boots: [0x39, 0x0e, 0x07, 0x72, 0x1c, 0x0e],
         skin: [0x7f, 0x60, 0x3c, 0xfe, 0xc1, 0x79],
         hair: [0x39, 0x03, 0x00, 0x73, 0x06, 0x00],
+        parachute: [0x7f, 0x00, 0x00, 0xff, 0x00, 0x00],
         customCapState: 0
     }
 }
@@ -299,6 +300,7 @@ export const getExtraRenderData = (socket_id) => {
             mario_boots_lights: (window.myMario.skinData.boots == "r" ? rainbowLights : window.myMario.skinData.boots),
             mario_skin_lights: (window.myMario.skinData.skin == "r" ? rainbowLights : window.myMario.skinData.skin),
             mario_hair_lights: (window.myMario.skinData.hair == "r" ? rainbowLights : window.myMario.skinData.hair),
+            mario_parachute_lights: (window.myMario.skinData.parachute == "r" ? rainbowLights : window.myMario.skinData.parachute),
         },
         custom2D: {
             chat: (myChat && myChat.timer > 0) ? myChat.msg : null,
@@ -316,6 +318,7 @@ export const getExtraRenderData = (socket_id) => {
     const boots = remote.skinData.boots
     const skin = remote.skinData.skin
     const hair = remote.skinData.hair
+    const parachute = remote.skinData.parachute
 
     return {
         custom3D: {
@@ -326,6 +329,7 @@ export const getExtraRenderData = (socket_id) => {
             mario_boots_lights: (boots == "r" ? rainbowLights : boots),
             mario_skin_lights: (skin == "r" ? rainbowLights : skin),
             mario_hair_lights: (hair == "r" ? rainbowLights : hair),
+            mario_parachute_lights: (parachute == "r" ? rainbowLights : parachute),
         },
         custom2D: {
             playerName: remote.playerName ? remote.playerName : null,

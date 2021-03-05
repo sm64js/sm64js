@@ -277,9 +277,7 @@ const act_freefall = (m) => {
 }
 
 const act_parachuting = (m) => {
-    let animation
-
-    if (m.input & Mario.INPUT_Z_PRESSED) {
+	if (m.input & Mario.INPUT_Z_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
     }
 	
@@ -288,14 +286,7 @@ const act_parachuting = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
     }
 
-    switch (m.actionArg) {
-        case 0: animation = Mario.MARIO_ANIM_GENERAL_FALL; break
-        case 1: animation = Mario.MARIO_ANIM_FALL_FROM_SLIDE; break
-        case 2: animation = Mario.MARIO_ANIM_FALL_FROM_SLIDE_KICK; break
-        default: throw "act parachuting unknown action arg: " + m.actionArg
-    }
-
-    common_air_action_step(m, Mario.ACT_FREEFALL_LAND, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
+    common_air_action_step(m, Mario.ACT_FREEFALL_LAND, Mario.MARIO_ANIM_DIVE, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
     return 0
 }
 

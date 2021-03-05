@@ -346,6 +346,7 @@ export const post_main_loop_one_iteration = (frame) => {
                     skinDataMsg.setSkin(toSkinValue(skinData.skin))
                     skinDataMsg.setHair(toSkinValue(skinData.hair))
                     skinDataMsg.setCustomcapstate(skinData.customCapState)
+                    skinDataMsg.setParachute(toSkinValue(skinData.parachute))
                     const skinMsg = new SkinMsg()
                     skinMsg.setSkindata(skinDataMsg)
                     const sm64jsMsg = new Sm64JsMsg()

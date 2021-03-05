@@ -1,28 +1,55 @@
-import { MarioMsg, ControllerMsg, MarioListMsg } from "../../proto/mario_pb"
+import { MarioMsg, ControllerMsg, ObjectMsg, GameDataMsg } from "../../proto/mario_pb"
 import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "./socket"
 import { INTERACT_PLAYER } from "../game/Interaction"
 import { gLinker } from "../game/Linker"
-import { uint32, uint16, int16 } from "../utils"
+import { uint32, uint16, int16, int32 } from "../utils"
 import { AreaInstance as Area } from "../game/Area"
 import { ACT_PARACHUTING, ACT_IDLE } from "../game/Mario"
+import { ObjectListProcessorInstance as ObjectListProc } from "../game/ObjectListProcessor"
+import { MODEL_GOOMBA } from "../include/model_ids"
 
-const rawDataMap = {
+///Object Types
+export const NETWORK_OBJ_GOOMBA = 0
+
+const sharedNetObjFields = {
+    0: RAW.oPosX,
+    1: RAW.oPosY,
+    2: RAW.oPosZ,
+    3: RAW.oFaceAnglePitch,
+    4: RAW.oFaceAngleYaw,
+    5: RAW.oFaceAngleRoll
+}
+
+const networkObjectInfo = {}
+
+const networkObjectInfoInit = () => {
+    networkObjectInfo[NETWORK_OBJ_GOOMBA] = {
+        model: MODEL_GOOMBA, behavior: gLinker.behaviors.bhvGoomba,
+        fields: { 0: RAW.oAction, 1: RAW.oGoombaTurningAwayFromWall, 2: RAW.oGoombaWalkTimer, 3: RAW.oVelY, 4: RAW.oForwardVel, 5: RAW.oMoveAngleYaw, 6: RAW.oGoombaTargetYaw, 7: RAW.oInteractStatus }
+    }
+}
+
+/// More goomba fields not necessary?
+///fields: { 0: RAW.oAction, 1: RAW.oGoombaRelativeSpeed, 2: RAW.oGoombaTurningAwayFromWall, 3: RAW.oGoombaWalkTimer, 4: RAW.oVelY, 5: RAW.oVelX, 6: RAW.oVelZ, 7: RAW.oForwardVel, 8: RAW.oMoveAngleYaw, 9: RAW.oGoombaTargetYaw, 10: RAW.oHomeX, 11: RAW.oHomeY, 12: RAW.oHomeZ, 13: RAW.oAngleVelYaw, 14: RAW.oInteractStatus, 15: RAW.oIntangibleTimer }
+networkObjectInfoInit()
+
+const marioRawDataFields = {
     0: RAW.oMarioPoleYawVel,
     1: RAW.oMarioPolePos,
     2: RAW.oIntangibleTimer,
 }
 
-const getMarioRawDataSubset = (fullRawData) => {
-    return Object.values(rawDataMap).map(valueType => {
-        return parseInt(fullRawData[valueType])
+const getRawDataSubset = (fullRawData, fieldsMap) => {
+    return Object.values(fieldsMap).map(valueType => {
+        return int32(fullRawData[valueType])
     })
 }
+
 
 export const updateRemoteMarioController = (controllerProto) => {
 
     const id = controllerProto.getSocketid()
-    //applyController(controllerProto)
 
     if (networkData.remotePlayers[id] == undefined) return
 
@@ -48,12 +75,11 @@ export const updateRemoteMarioController = (controllerProto) => {
 
 }
 
-export const createAllMarioMsg = () => {
+export const createGameDataMsg = () => {
 
-    const marioListMsg = new MarioListMsg()
+    const gameDataMsg = new GameDataMsg()
 
     const marios = []
-
     Object.values(networkData.remotePlayers).forEach(remoteMario => {
         const mariomsg = new MarioMsg()
 
@@ -79,16 +105,46 @@ export const createAllMarioMsg = () => {
             mariomsg.setUsedobjid(remoteMario.marioState.usedObj.rawData[RAW.oSyncID])
         }
 
-        mariomsg.setRawdataList(getMarioRawDataSubset(remoteMario.marioState.marioObj.rawData))
+        mariomsg.setRawdataList(getRawDataSubset(remoteMario.marioState.marioObj.rawData, marioRawDataFields))
 
 
         marios.push(mariomsg)
 
     })
 
-    marioListMsg.setMarioList(marios)
+    gameDataMsg.setMarioList(marios)
 
-    return marioListMsg
+
+    /////////////////////////// Non Mario Objects
+    const networkObjects = []
+    const goombaObjectList = ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE]
+
+    const objListStart = goombaObjectList
+    let iterObj = objListStart.next
+
+    while (objListStart != iterObj) {
+        const o = iterObj.wrapperObject
+        if (o.networkObjType != undefined) {
+            /// is a network object
+            const objectMsg = new ObjectMsg()
+            const objInfo = networkObjectInfo[o.networkObjType]
+            objectMsg.setType(o.networkObjType)
+            objectMsg.setId(o.rawData[RAW.oSyncID])
+            objectMsg.setSharedFieldsList(getRawDataSubset(o.rawData, sharedNetObjFields))
+            objectMsg.setUniqueFieldsList(getRawDataSubset(o.rawData, objInfo.fields))
+            networkObjects.push(objectMsg)
+
+            if (o.attackerId) {
+                objectMsg.setAttackerId(o.attackerId)
+            }
+
+        }
+        iterObj = iterObj.next
+    }
+
+    gameDataMsg.setObjectList(networkObjects)
+
+    return gameDataMsg
 
 }
 
@@ -149,6 +205,7 @@ export const initNewRemoteMarioState = (socket_id) => {
             hitboxDownOffset: 0,
             hitboxHeight: 160,
             hitboxRadius: 37,
+            hurtboxRadius: 0,
             collidedObjs: [],
             rawData: new Array(0x50).fill(0),
             bhvScript: { commands: gLinker.behaviors.bhvMario, index: 0 }

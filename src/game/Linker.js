@@ -1,2 +1,2 @@
 
-export const gLinker = {}
+export const gLinker = { behaviors: {} }

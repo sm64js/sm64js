@@ -532,6 +532,7 @@ const attack_object = (o, interaction, m) => {
     if (m == undefined) throw "you need to add m / marioState to the attack_object function"
 
     o.attackerObj = m.marioObj
+    o.attackerId = m.socket_id
     return attackType
 }
 
@@ -710,7 +711,7 @@ const determine_knockback_action = (m) => {
 
 const take_damage_from_interact_object = (m) => {
 
-    const damage = m.interactObj.rawData[oDamageOrCoinValue]
+    let damage = m.interactObj.rawData[oDamageOrCoinValue]
 
     if (!(m.flags & Mario.MARIO_CAP_ON_HEAD)) {
         damage += (damage + 1) / 2

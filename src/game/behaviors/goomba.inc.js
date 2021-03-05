@@ -1,11 +1,12 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { oGoombaSize, GOOMBA_BP_SIZE_MASK, oBehParams2ndByte, oGoombaScale, oDrawingDistance, oDamageOrCoinValue, oGravity, oForwardVel, oGoombaBlinkTimer, oAnimState, GOOMBA_ACT_ATTACKED_MARIO, oAction, GOOMBA_ACT_WALK, oGoombaRelativeSpeed, oGoombaTurningAwayFromWall, oGoombaTargetYaw, oGoombaWalkTimer, oDistanceToMario, oAngleToMario, oMoveAngleYaw, GOOMBA_ACT_JUMP, oVelY, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, GOOMBA_SIZE_TINY, oNumLootCoins, GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED, GOOMBA_BP_TRIPLET_FLAG_MASK, oBehParams, GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK, GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK, oAngleToHome } from "../../include/object_constants"
+import { oGoombaSize, GOOMBA_BP_SIZE_MASK, oBehParams2ndByte, oGoombaScale, oDrawingDistance, oDamageOrCoinValue, oGravity, oForwardVel, oGoombaBlinkTimer, oAnimState, GOOMBA_ACT_ATTACKED_MARIO, oAction, GOOMBA_ACT_WALK, oGoombaRelativeSpeed, oGoombaTurningAwayFromWall, oGoombaTargetYaw, oGoombaWalkTimer, oDistanceToMario, oAngleToMario, oMoveAngleYaw, GOOMBA_ACT_JUMP, oVelY, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, GOOMBA_SIZE_TINY, oNumLootCoins, GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED, GOOMBA_BP_TRIPLET_FLAG_MASK, oBehParams, GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK, GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK, oAngleToHome, oPosX, oPosZ } from "../../include/object_constants"
 import * as ObjBhvs2 from "../ObjBehaviors2"
 import { INTERACT_BOUNCE_TOP } from "../Interaction"
 import { cur_obj_scale, cur_obj_init_animation_with_accel_and_sound, cur_obj_update_floor_and_walls, cur_obj_move_standard, cur_obj_rotate_yaw_toward, obj_mark_for_deletion, spawn_object_relative, cur_obj_angle_to_home } from "../ObjectHelpers"
 import { coss, sins } from "../../utils"
 import { MODEL_GOOMBA } from "../../include/model_ids"
 import { bhvGoomba } from "../BehaviorData"
+import { NETWORK_OBJ_GOOMBA } from "../../mmo/MultiMarioManager"
 
 const sGoombaProperties = [
     { scale: 1.5, deathSound: null, drawDistance: 4000, damage: 1 },
@@ -163,6 +164,8 @@ const goomba_begin_jump = () => {
 
 export const bhv_goomba_init = () => {
     const o = ObjectListProc.gCurrentObject
+
+    o.networkObjType = NETWORK_OBJ_GOOMBA
 
     o.rawData[oGoombaSize] = o.rawData[oBehParams2ndByte] & GOOMBA_BP_SIZE_MASK
 

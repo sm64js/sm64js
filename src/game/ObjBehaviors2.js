@@ -390,6 +390,7 @@ export const obj_handle_attacks = (hitbox, attackedMarioAction, attackHandlers) 
 
             o.rawData[oInteractStatus] = 0
             o.attackerObj = null
+            o.attackerId = null
             return attackType
         }
     }

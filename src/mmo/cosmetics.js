@@ -282,6 +282,7 @@ export const validSkins = () => {
     if (!isValidSkinEntry(skinData.skin)) return false
     if (!isValidSkinEntry(skinData.hair)) return false
     if (skinData.customCapState !== 0 && skinData.customCapState !== 1) return false
+    if (!isValidSkinEntry(skinData.parachute)) return false
 
     return true
 }

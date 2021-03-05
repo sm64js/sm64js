@@ -6058,6 +6058,16 @@ proto.sm64js.SkinData.prototype.hasHair = function() {
 
 
 /**
+ * optional SkinValue hair = 7;
+ * @return {?proto.sm64js.SkinValue}
+ */
+proto.sm64js.SkinData.prototype.getParachute = function() {
+  return /** @type{?proto.sm64js.SkinValue} */ (
+    jspb.Message.getWrapperField(this, proto.sm64js.SkinValue, 9));
+};
+
+
+/**
  * @param {?proto.sm64js.SkinValue|undefined} value
  * @return {!proto.sm64js.SkinData} returns this
 */

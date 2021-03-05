@@ -251,6 +251,7 @@ const interact_player = (m, o) => {
     // attacked
     let isInCutscene = ((m.action & Mario.ACT_GROUP_MASK) == Mario.ACT_GROUP_CUTSCENE) || ((m2.action & Mario.ACT_GROUP_MASK) == Mario.ACT_GROUP_CUTSCENE)
     isInCutscene = isInCutscene || (m.action == Mario.ACT_IN_CANNON) || (m2.action == Mario.ACT_IN_CANNON)
+
     const isInvulnerable = (m2.action & Mario.ACT_FLAG_INVULNERABLE) || m2.invincTimer != 0 || m2.hurtCounter != 0 || isInCutscene
     const isIgnoredAttack = (m.action == Mario.ACT_JUMP || m.action == Mario.ACT_DOUBLE_JUMP)
 
@@ -732,7 +733,8 @@ const take_damage_from_interact_object = (m) => {
         damage = 0
     }
 
-    m.hurtCounter += 4 * damage
+    /// disabling taking damage in MMO for now
+    //m.hurtCounter += 4 * damage
 
     Camera.set_camera_shake_from_hit(shake)
 

@@ -932,7 +932,6 @@ export const execute_mario_action = (m) => {
 
         set_submerged_cam_preset_and_spawn_bubbles(m)
         update_mario_health(m)
-        update_mario_info_for_cam(m)
         mario_update_hitbox_and_cap_model(m)
 
         m.marioObj.rawData[oInteractStatus] = 0
@@ -1387,17 +1386,6 @@ const update_mario_inputs = (m) => {
 
     if (m.doubleJumpTimer > 0) {
         m.doubleJumpTimer--
-    }
-}
-
-const update_mario_info_for_cam = (m) => {
-    m.marioBodyState.action = m.action
-    //m.statusForCamera.action = m.action
-
-    //m.statusForCamera.faceAngle = [...m.faceAngle]
-
-    if ((m.flags & MARIO_UNKNOWN_25) == 0) {
-        //m.statusForCamera.pos = [...m.pos]
     }
 }
 

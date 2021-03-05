@@ -210,10 +210,10 @@ export const initNewRemoteMarioState = (socket_id) => {
             rawData: new Array(0x50).fill(0),
             bhvScript: { commands: gLinker.behaviors.bhvMario, index: 0 }
         },
-        faceAngle: Area.gMarioSpawnInfo.startAngle,
+        faceAngle: [...Area.gMarioSpawnInfo.startAngle],
         slideYaw: 0,
         angleVel: [0, 0, 0],
-        pos: Area.gMarioSpawnInfo.startPos,
+        pos: [...Area.gMarioSpawnInfo.startPos],
         vel: [0, 0, 0],
         action: Area.gMarioSpawnInfo.parachuteSpawn ? ACT_PARACHUTING : ACT_IDLE,
         prevAction: ACT_IDLE,
@@ -290,7 +290,6 @@ export const applyController = (controllerUpdate, marioState) => {
         cameraYaw: controllerUpdate.camerayaw,
         taunt: m.controller.taunt
     }
-
 }
 
 export const recvPlayerLists = () => {

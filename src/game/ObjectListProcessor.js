@@ -110,8 +110,8 @@ class ObjectListProcessor {
             return blankObj
         })
 
-        this.spawnObjectsBySyncID = []
-        socketGameData.spawnObjectsBySyncID = this.spawnObjectsBySyncID
+        this.staticNetworkObjects = {}
+        socketGameData.staticNetworkObjects = this.staticNetworkObjects
 
     }
 
@@ -119,12 +119,8 @@ class ObjectListProcessor {
 
         Object.values(networkData.remotePlayers).forEach(remotePlayer => {
             if (remotePlayer.controllerUpdate) {
-                if (remotePlayer.marioState.ignoreUpdates > 0) {
-                    remotePlayer.marioState.ignoreUpdates--
-                } else {
-                    applyController(remotePlayer.controllerUpdate, remotePlayer.marioState)
-                    remotePlayer.controllerUpdate = null
-                }
+                applyController(remotePlayer.controllerUpdate, remotePlayer.marioState)
+                remotePlayer.controllerUpdate = null
             } else {
                 //console.log("did not recieve input data fast enough")
             }

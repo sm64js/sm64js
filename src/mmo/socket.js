@@ -229,7 +229,7 @@ export const post_main_loop_one_iteration = async (frame) => {
         /// every frame send ALL mario data
         if (frame % networkData.gameMasterOutputModulo == 0) {
             const sm64jsMsg = new Sm64JsMsg()
-            sm64jsMsg.setListMsg(Multi.createAllMarioMsg())
+            sm64jsMsg.setGameDataMsg(Multi.createGameDataMsg())
             const bytes = sm64jsMsg.serializeBinary()
             const compressedBytes = await zip(Buffer.from(bytes))
             const rootMsg = new RootMsg()

@@ -12,7 +12,7 @@ import { ATTACK_PUNCH, INT_STATUS_WAS_ATTACKED, INT_STATUS_INTERACTED, INT_STATU
 import { ACT_GROUND_POUND_LAND } from "./Mario"
 import { gLinker } from "./Linker"
 import * as Gbi from "../include/gbi"
-import { MODEL_YELLOW_COIN } from "../include/model_ids"
+import { MODEL_YELLOW_COIN, MODEL_NONE } from "../include/model_ids"
 import { spawn_mist_particles_variable } from "./behaviors/white_puff.inc"
 
 export const cur_obj_set_behavior = (behavior) => {
@@ -23,7 +23,6 @@ export const cur_obj_set_behavior = (behavior) => {
 
 export const cur_obj_set_model = (modelID) => {
     const o = ObjectListProc.gCurrentObject
-
     o.header.gfx.sharedChild = Area.gLoadedGraphNodes[modelID]
 }
 
@@ -161,6 +160,8 @@ export const spawn_object_at_origin = (parent, model, behavior) => {
     obj.parentObj = parent
     obj.header.gfx.unk18 = parent.header.gfx.unk18
     obj.header.gfx.unk19 = parent.header.gfx.unk18
+
+    if (model != MODEL_NONE && Area.gLoadedGraphNodes[model] == undefined) throw "error no model data for object found"
 
     geo_obj_init(obj.header.gfx, Area.gLoadedGraphNodes[model], [0,0,0], [0,0,0])
 

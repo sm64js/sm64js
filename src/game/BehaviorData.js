@@ -3,7 +3,6 @@ import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectList
 import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins, OBJ_FLAG_ACTIVE_FROM_AFAR, oActiveParticleFlags, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE, ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_BUBBLE, oWaterObjUnkF4, oWaterObjUnkF8, oPosX, oWaterObjUnkFC, oPosY, oPosZ, oInteractionSubtype } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
-import { bhv_extra_mario_base_loop } from "./behaviors/extra_mario.inc"
 import { bhv_pole_init, bhv_giant_pole_loop } from "./behaviors/pole.inc"
 import { bhv_castle_flag_init } from "./behaviors/bhv_castle_flag_init.inc"
 import { castle_grounds_seg7_anims_flags } from "../levels/castle_grounds/areas/1/11/anim.inc"
@@ -67,17 +66,6 @@ export const bhvMario = [
         { command: BhvCmds.call_native, args: { func: ObjectListProcessor.bhv_mario_update, funcClass: ObjectListProcessor } },
     { command: BhvCmds.end_loop },
 ]
-
-export const bhvExtraMario = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PLAYER } },
-    { command: BhvCmds.set_int, args: { field: oIntangibleTimer, value: 0 } },
-    { command: BhvCmds.set_hitbox, args: { radius: 37, height: 160 } },
-    { command: BhvCmds.begin_loop },
-        { command: BhvCmds.call_native, args: { func: bhv_extra_mario_base_loop } },
-    { command: BhvCmds.end_loop },
-]
-
-window.bhvExtraMario = bhvExtraMario
 
 export const bhvTree = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE } },
@@ -557,5 +545,6 @@ gLinker.behaviors = {
     bhvMistCircParticleSpawner,
     bhvWhitePuffExplosion,
     bhvBubbleParticleSpawner,
-    bhvSingleCoinGetsSpawned
+    bhvSingleCoinGetsSpawned,
+    bhvGoomba
 }

@@ -143,6 +143,7 @@ export const obj_resolve_object_collisions = (targetYawWrapper) => {
     if (o.numCollidedObjs != 0) {
         const otherObject = o.collidedObjs[0]
         if (otherObject.remoteMario == undefined) { /// not a mario object
+
             //! If one object moves after collisions are detected and this code
             //  runs, the objects can move toward each other (transport cloning)
 
@@ -223,7 +224,8 @@ export const obj_die_if_health_non_positive = () => {
         if (parseInt(o.rawData[oNumLootCoins]) < 0) {
             throw "TODO spawn bhvMrIBlueCoin?"
         } else {
-            obj_spawn_loot_yellow_coins(o, o.rawData[oNumLootCoins], 20.0)
+            // disabling client side loot coin spawn
+            //obj_spawn_loot_yellow_coins(o, o.rawData[oNumLootCoins], 20.0)
         }
 
         if (o.rawData[oHealth] < 0) {
@@ -390,6 +392,7 @@ export const obj_handle_attacks = (hitbox, attackedMarioAction, attackHandlers) 
 
             o.rawData[oInteractStatus] = 0
             o.attackerObj = null
+            o.attackerId = null
             return attackType
         }
     }

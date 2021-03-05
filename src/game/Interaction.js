@@ -533,6 +533,7 @@ const attack_object = (o, interaction, m) => {
     if (m == undefined) throw "you need to add m / marioState to the attack_object function"
 
     o.attackerObj = m.marioObj
+    o.attackerId = m.socket_id
     return attackType
 }
 
@@ -711,7 +712,7 @@ const determine_knockback_action = (m) => {
 
 const take_damage_from_interact_object = (m) => {
 
-    const damage = m.interactObj.rawData[oDamageOrCoinValue]
+    let damage = m.interactObj.rawData[oDamageOrCoinValue]
 
     let shake
 
@@ -742,12 +743,12 @@ const take_damage_from_interact_object = (m) => {
 
 export const take_damage_and_knock_back = (m, o) => {
 
+
     if (!sInvulnerable && !(m.flags & Mario.MARIO_VANISH_CAP)
         && !(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
 
         o.rawData[oInteractStatus] = INT_STATUS_INTERACTED | INT_STATUS_ATTACKED_MARIO
         m.interactObj = o
-
 
         const damage = take_damage_from_interact_object(m)
 

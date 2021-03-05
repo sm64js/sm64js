@@ -366,6 +366,26 @@ class GeoRenderer {
         const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const object = node.wrapper.wrapperObjectNode.wrapperObject
 
+        //// Object Smoothing this blankets all objects(except Mario), so possible will cause issues, and maybe want to remove
+        const objGfx = object.header.gfx
+        if (objGfx.prevAngle && objGfx.prevPos && object.remoteMario == undefined) {
+
+            const smoothPercent = parseFloat(document.getElementById("smoothness").value)
+
+            for (let i = 0; i < 3; i++) {
+                let step = Math.abs(objGfx.prevPos[i] - objGfx.pos[i]) * smoothPercent
+                let target = objGfx.pos[i]
+                if (step < 1) step = 1
+                objGfx.pos[i] = MathUtil.approach_number(objGfx.prevPos[i], target, step, step)
+            }
+
+        }
+
+        /// Save the last rendered gfx pos and angle
+        objGfx.prevPos = [...objGfx.pos]
+        objGfx.prevAngle = [...objGfx.angle]
+
+
         if (object.captureableFlagIndex != undefined) {
             this.geo_append_display_list([Gbi.gsSetFlagIndex(object.captureableFlagIndex)], 1)
         }

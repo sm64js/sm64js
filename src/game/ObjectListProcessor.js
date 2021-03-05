@@ -110,8 +110,10 @@ class ObjectListProcessor {
             return blankObj
         })
 
-        this.spawnObjectsBySyncID = []
-        socketGameData.spawnObjectsBySyncID = this.spawnObjectsBySyncID
+        this.staticNetworkObjects = {}
+        this.dynamicNetworkObjects = {}
+        socketGameData.staticNetworkObjects = this.staticNetworkObjects
+        socketGameData.dynamicNetworkObjects = this.dynamicNetworkObjects
 
     }
 
@@ -120,12 +122,8 @@ class ObjectListProcessor {
        /// Remote Marios
        Object.values(networkData.remotePlayers).forEach(remotePlayer => {
             if (remotePlayer.marioUpdate) {
-                if (remotePlayer.marioState.ignoreUpdates > 0) {
-                    remotePlayer.marioState.ignoreUpdates--
-                } else {
-                    copyMarioUpdateToState(remotePlayer.marioState, remotePlayer.marioUpdate)
-                    this.copy_mario_state_to_object(remotePlayer.marioState)
-                }
+                copyMarioUpdateToState(remotePlayer.marioState, remotePlayer.marioUpdate)
+                this.copy_mario_state_to_object(remotePlayer.marioState)
             }
             remotePlayer.marioUpdate = null
         })

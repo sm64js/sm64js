@@ -483,7 +483,8 @@ export const init_marios = () => {
     Object.assign(LevelUpdate.gMarioState, {
         area: Area.gCurrentArea,
         marioObj: ObjectListProcessor.gMarioObject,
-        slideYaw: 0
+        slideYaw: 0,
+        flags: 17, //MARIO_CAP_ON_HEAD | MARIO_NORMAL_CAP
     })
 
     Object.assign(LevelUpdate.gMarioState.marioObj.header.gfx, {

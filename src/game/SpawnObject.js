@@ -7,7 +7,7 @@ import { mtxf_identity } from "../engine/math_util"
 
 class SpawnObject {
     constructor() {
-        this.spawnSyncIDCount = 1000 /// reserving syncIDs 1000 to 2000 for objects spawned in this class
+        this.staticNetworkObjectCount = 1000 /// reserving syncIDs 1000 to 2000 for objects spawned in this class
     }
 
     clear_object_lists() {
@@ -171,11 +171,11 @@ class SpawnObject {
 
 
         if (objListIndex == ObjectListProc.OBJ_LIST_POLELIKE) {
-            ObjectListProc.spawnObjectsBySyncID.push(obj)
-            obj.rawData[oSyncID] = this.spawnSyncIDCount++
+            ObjectListProc.staticNetworkObjects[this.staticNetworkObjectCount] = obj
+            obj.rawData[oSyncID] = this.staticNetworkObjectCount++
         }
 
-        if (this.spawnSyncIDCount > 2000) throw "Error - used more than 1000 spawn SyncIDs in SpawnObject"
+        if (this.staticNetworkObjectCount > 2000) throw "Error - used more than 1000 spawn SyncIDs in SpawnObject"
 
         return obj
     }

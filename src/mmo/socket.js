@@ -164,9 +164,10 @@ socket.onopen = () => {
                 const compressedBytes = rootMsg.getCompressedSm64jsMsg()
                 const buffer = await unzip(compressedBytes)
                 sm64jsMsg = Sm64JsMsg.deserializeBinary(buffer)
-                const listMsg = sm64jsMsg.getListMsg()
-                Multi.recvMarioData(listMsg.getMarioList())
-                recvFlagList(listMsg.getFlagList())
+                const gameDataMsg = sm64jsMsg.getGameDataMsg()
+                Multi.recvMarioData(gameDataMsg.getMarioList())
+                Multi.recvGameObjects(gameDataMsg.getObjectList())
+                recvFlagList(gameDataMsg.getFlagList())
                 break
             case RootMsg.MessageCase.MESSAGE_NOT_SET:
             default:

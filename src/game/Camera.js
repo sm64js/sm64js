@@ -1192,8 +1192,8 @@ class Camera {
         graphNode.focus = [...this.gLakituState.focus]
 
         if (LevelUpdate.gMarioState.action == Mario.ACT_PARACHUTING) {
-            graphNode.pos[1] = LevelUpdate.gMarioState.pos[1] + 1000
-            graphNode.focus = [...LevelUpdate.gMarioState.pos]
+            graphNode.pos[1] = this.gPlayerCameraState.pos[1] + 1000
+            graphNode.focus = [...this.gPlayerCameraState.pos]
         }
 
         //if (graphNode.prevPos && graphNode.prevFocus) {

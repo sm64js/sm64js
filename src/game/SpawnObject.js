@@ -174,7 +174,7 @@ class SpawnObject {
             obj.rawData[oSyncID] = this.staticNetworkObjectCount++
         }
 
-        if (objListIndex == ObjectListProc.OBJ_LIST_PUSHABLE) {
+        if (objListIndex == ObjectListProc.OBJ_LIST_PUSHABLE || objListIndex == ObjectListProc.OBJ_LIST_LEVEL) {
             obj.rawData[oSyncID] = this.dynamicNetworkObjectCount++
         }
 

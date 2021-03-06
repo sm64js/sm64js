@@ -7,6 +7,7 @@ import { obj_set_hitbox } from "../ObjBehaviors2"
 import { INTERACT_COIN, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "../Interaction"
 import { sins, coss, random_uint16 } from "../../utils"
 import { atan2s } from "../../engine/math_util"
+import { NETWORK_OBJ_YELLOW_COIN } from "../../mmo/MultiMarioManager"
 
 const sYellowCoinHitbox = {
     interactType: INTERACT_COIN,
@@ -34,6 +35,8 @@ export const bhv_coin_init = () => {
 export const bhv_coin_loop = () => {
 
     const o = ObjectListProc.gCurrentObject
+
+    o.networkObjType = NETWORK_OBJ_YELLOW_COIN
 
     cur_obj_update_floor_and_walls()
     cur_obj_if_hit_wall_bounce_away()

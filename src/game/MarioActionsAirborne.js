@@ -237,7 +237,6 @@ const act_jump = (m) => {
     }
 	
     if (m.input & Mario.INPUT_PARACHUTE) {
-		m.input ^= Mario.INPUT_PARACHUTE
         m.input ^= Mario.INPUT_PARACHUTE
         return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
     }
@@ -411,11 +410,6 @@ const act_dive = (m) => {
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_DIVE)
 
     update_air_without_turn(m)
-	
-    if (m.input & Mario.INPUT_PARACHUTE) {
-		m.input ^= Mario.INPUT_PARACHUTE
-        return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
-    }
 
     switch (perform_air_step(m, 0)) {
         case Mario.AIR_STEP_NONE:
@@ -443,6 +437,10 @@ const act_dive = (m) => {
 
             break
         default: throw "unimplemented air step case in act dive"
+    }
+    if (m.input & Mario.INPUT_PARACHUTE && m.vel[1] < -0.01) {
+		m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
     }
 
 

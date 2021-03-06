@@ -7,10 +7,11 @@ import { uint32, uint16, int16, int32 } from "../utils"
 import { AreaInstance as Area } from "../game/Area"
 import { ACT_PARACHUTING, ACT_IDLE } from "../game/Mario"
 import { ObjectListProcessorInstance as ObjectListProc } from "../game/ObjectListProcessor"
-import { MODEL_GOOMBA } from "../include/model_ids"
+import { MODEL_GOOMBA, MODEL_YELLOW_COIN } from "../include/model_ids"
 
 ///Object Types
 export const NETWORK_OBJ_GOOMBA = 0
+export const NETWORK_OBJ_YELLOW_COIN = 1
 
 const sharedNetObjFields = {
     0: RAW.oPosX,
@@ -27,6 +28,10 @@ const networkObjectInfoInit = () => {
     networkObjectInfo[NETWORK_OBJ_GOOMBA] = {
         model: MODEL_GOOMBA, behavior: gLinker.behaviors.bhvGoomba,
         fields: { 0: RAW.oAction, 1: RAW.oGoombaTurningAwayFromWall, 2: RAW.oGoombaWalkTimer, 3: RAW.oVelY, 4: RAW.oForwardVel, 5: RAW.oMoveAngleYaw, 6: RAW.oGoombaTargetYaw, 7: RAW.oInteractStatus }
+    },
+    networkObjectInfo[NETWORK_OBJ_YELLOW_COIN] = {
+        model: MODEL_YELLOW_COIN, behavior: gLinker.behaviors.bhvSingleCoinGetsSpawned,
+        fields: { }
     }
 }
 
@@ -118,9 +123,33 @@ export const createGameDataMsg = () => {
     /////////////////////////// Non Mario Objects
     const networkObjects = []
     const goombaObjectList = ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_PUSHABLE]
+    const coinObjectList = ObjectListProc.gObjectLists[ObjectListProc.OBJ_LIST_LEVEL]
 
-    const objListStart = goombaObjectList
+    let objListStart = goombaObjectList
     let iterObj = objListStart.next
+
+    while (objListStart != iterObj) {
+        const o = iterObj.wrapperObject
+        if (o.networkObjType != undefined) {
+            /// is a network object
+            const objectMsg = new ObjectMsg()
+            const objInfo = networkObjectInfo[o.networkObjType]
+            objectMsg.setType(o.networkObjType)
+            objectMsg.setId(o.rawData[RAW.oSyncID])
+            objectMsg.setSharedFieldsList(getRawDataSubset(o.rawData, sharedNetObjFields))
+            objectMsg.setUniqueFieldsList(getRawDataSubset(o.rawData, objInfo.fields))
+            networkObjects.push(objectMsg)
+
+            if (o.attackerId) {
+                objectMsg.setAttackerId(o.attackerId)
+            }
+
+        }
+        iterObj = iterObj.next
+    }
+
+    objListStart = coinObjectList
+    iterObj = objListStart.next
 
     while (objListStart != iterObj) {
         const o = iterObj.wrapperObject

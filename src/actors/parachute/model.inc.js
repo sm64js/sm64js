@@ -9,6 +9,21 @@ const parachute_white = Gbi.gdSPDefLights1(
 	    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
 )
 
+// Should fix crash with parachute by forcing color to still render.
+const dl_empty_vtx_0 = [
+	{pos: [ 0,0,0 ], flag: 0, tc: [ 512,-512 ], color: [ 128,128,128,255]},
+]
+
+export const dl_empty_mesh_0 = (customData) => {
+	return [
+	Gbi.gsSPLight(parachute_color(customData).l[0], 1),
+	Gbi.gsSPLight(parachute_color(customData).a, 2),
+	Gbi.gsSPVertex(dl_empty_vtx_0, 0, 0),
+	Gbi.gsSP1Triangle(0, 0, 0, 0),
+	Gbi.gsSPEndDisplayList(),
+	]
+}
+
 const dl_color_vtx_0 = [
 	{pos: [ 0.000056,350.346069,687.922546 ], flag: 0, tc: [ 512,-512 ], color: [ 128,1,128,255]},
 	{pos: [ -0.000033,350.345886,-339.723053 ], flag: 0, tc: [ 512,-512 ], color: [ 128,1,128,255]},
@@ -374,6 +389,8 @@ export const parachute_DL = (customData) => {
 
 export const parachute_off_DL = (customData) => {
 	return [
-	Gbi.gsSPEndDisplayList(),
+		Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+		Gbi.gsSPDisplayList(dl_empty_mesh_0(customData)),
+		Gbi.gsSPEndDisplayList(),
 	]
 }

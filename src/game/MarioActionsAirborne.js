@@ -237,7 +237,6 @@ const act_jump = (m) => {
     }
 	
     if (m.input & Mario.INPUT_PARACHUTE) {
-		m.input ^= Mario.INPUT_PARACHUTE
         m.input ^= Mario.INPUT_PARACHUTE
         return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
     }
@@ -354,6 +353,7 @@ const act_triple_jump = (m) => {
 const act_wall_kick_air = (m) => {
 
     if (m.input & Mario.INPUT_B_PRESSED) {
+		m.input ^= Mario.INPUT_PARACHUTE
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
 

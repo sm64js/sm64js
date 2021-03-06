@@ -137,28 +137,7 @@ const check_death_barrier = (m) => {
 
     /// Temp code because death is not implemented
     if (m.pos[1] < m.floorHeight + 2048) {
-        switch (Area.gCurrLevelNum) {
-            case LEVEL_CCM:  // CCM
-                m.pos = [-1512, 2560, -2305]
-                break
-
-            case LEVEL_TTM:  // TTM
-                m.pos = [102, -4332, 5734]
-                break
-
-            case LEVEL_WF:  // WF
-                m.pos = [2600, 1256, 5120]
-                break
-
-            case LEVEL_HMC:
-                m.pos = [-7152, 2161, 7181]
-                break
-
-            case LEVEL_CTF00:  // CTF00
-                m.pos = [0, 3461, 0]
-                break
-
-        }
+        m.pos = Area.gMarioSpawnInfo.startPos
     }
 
 }

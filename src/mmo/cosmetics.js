@@ -260,6 +260,7 @@ export const recvSkinData = (skinMsg) => {
         boots: fromSkinValue(skinDataMsg.getBoots()),
         skin: fromSkinValue(skinDataMsg.getSkin()),
         hair: fromSkinValue(skinDataMsg.getHair()),
+        parachute: fromSkinValue(skinDataMsg.getParachute()),
         customCapState: skinDataMsg.getCustomcapstate()
     }
 
@@ -281,8 +282,8 @@ export const validSkins = () => {
     if (!isValidSkinEntry(skinData.boots)) return false
     if (!isValidSkinEntry(skinData.skin)) return false
     if (!isValidSkinEntry(skinData.hair)) return false
-    if (skinData.customCapState !== 0 && skinData.customCapState !== 1) return false
     if (!isValidSkinEntry(skinData.parachute)) return false
+    if (skinData.customCapState !== 0 && skinData.customCapState !== 1) return false
 
     return true
 }
@@ -320,7 +321,6 @@ export const getExtraRenderData = (socket_id) => {
     const skin = remote.skinData.skin
     const hair = remote.skinData.hair
     const parachute = remote.skinData.parachute
-
     return {
         custom3D: {
             mario_overalls_lights: (overalls == "r" ? rainbowLights : overalls),
@@ -331,7 +331,7 @@ export const getExtraRenderData = (socket_id) => {
             mario_skin_lights: (skin == "r" ? rainbowLights : skin),
             mario_hair_lights: (hair == "r" ? rainbowLights : hair),
             mario_parachute_lights: (parachute == "r" ? rainbowLights : parachute),
-        },
+		},
         custom2D: {
             playerName: remote.playerName ? remote.playerName : null,
             chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null,

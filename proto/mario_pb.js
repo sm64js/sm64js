@@ -3692,7 +3692,6 @@ proto.sm64js.MarioMsg.toObject = function(includeInstance, msg) {
     rawdataList: (f = jspb.Message.getRepeatedField(msg, 18)) == null ? undefined : f,
     usedobjid: jspb.Message.getFieldWithDefault(msg, 19, 0),
     socketid: jspb.Message.getFieldWithDefault(msg, 20, 0),
-    parachuting: jspb.Message.getBooleanFieldWithDefault(msg, 21, false)
   };
 
   if (includeInstance) {
@@ -3805,10 +3804,6 @@ proto.sm64js.MarioMsg.deserializeBinaryFromReader = function(msg, reader) {
     case 20:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setSocketid(value);
-      break;
-    case 21:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setParachuting(value);
       break;
     default:
       reader.skipField();
@@ -3970,13 +3965,6 @@ proto.sm64js.MarioMsg.serializeBinaryToWriter = function(message, writer) {
   if (f !== 0) {
     writer.writeUint32(
       20,
-      f
-    );
-  }
-  f = message.getParachuting();
-  if (f) {
-    writer.writeBool(
-      21,
       f
     );
   }
@@ -4437,28 +4425,6 @@ proto.sm64js.MarioMsg.prototype.getSocketid = function() {
 proto.sm64js.MarioMsg.prototype.setSocketid = function(value) {
   return jspb.Message.setProto3IntField(this, 20, value);
 };
-
-
-/**
- * optional bool parachuting = 21;
- * @return {boolean}
- */
-proto.sm64js.MarioMsg.prototype.getParachuting = function() {
-  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 21, false));
-};
-
-
-/**
- * @param {boolean} value
- * @return {!proto.sm64js.MarioMsg} returns this
- */
-proto.sm64js.MarioMsg.prototype.setParachuting = function(value) {
-  return jspb.Message.setProto3BooleanField(this, 21, value);
-};
-
-
-
-
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
 /**
@@ -5613,8 +5579,8 @@ proto.sm64js.SkinData.toObject = function(includeInstance, msg) {
     boots: (f = msg.getBoots()) && proto.sm64js.SkinValue.toObject(includeInstance, f),
     skin: (f = msg.getSkin()) && proto.sm64js.SkinValue.toObject(includeInstance, f),
     hair: (f = msg.getHair()) && proto.sm64js.SkinValue.toObject(includeInstance, f),
-    customcapstate: jspb.Message.getFieldWithDefault(msg, 8, 0),
     parachute: (f = msg.getparachute()) && proto.sm64js.SkinValue.toObject(includeInstance, f),
+    customcapstate: jspb.Message.getFieldWithDefault(msg, 9, 0),
   };
 
   if (includeInstance) {
@@ -5687,13 +5653,14 @@ proto.sm64js.SkinData.deserializeBinaryFromReader = function(msg, reader) {
       msg.setHair(value);
       break;
     case 8:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setCustomcapstate(value);
-      break;
-    case 9:
       var value = new proto.sm64js.SkinValue;
       reader.readMessage(value,proto.sm64js.SkinValue.deserializeBinaryFromReader);
       msg.setParachute(value);
+      break;
+      break;
+    case 9:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setCustomcapstate(value);
       break;
     default:
       reader.skipField();
@@ -5780,19 +5747,19 @@ proto.sm64js.SkinData.serializeBinaryToWriter = function(message, writer) {
       proto.sm64js.SkinValue.serializeBinaryToWriter
     );
   }
-  f = message.getCustomcapstate();
-  if (f !== 0) {
-    writer.writeUint32(
-      8,
-      f
-    );
-  }
   f = message.getParachute();
   if (f != null) {
     writer.writeMessage(
-      9,
+      8,
       f,
       proto.sm64js.SkinValue.serializeBinaryToWriter
+    );
+  }
+  f = message.getCustomcapstate();
+  if (f !== 0) {
+    writer.writeUint32(
+      9,
+      f
     );
   }
 };
@@ -6063,7 +6030,7 @@ proto.sm64js.SkinData.prototype.hasHair = function() {
  */
 proto.sm64js.SkinData.prototype.getParachute = function() {
   return /** @type{?proto.sm64js.SkinValue} */ (
-    jspb.Message.getWrapperField(this, proto.sm64js.SkinValue, 9));
+    jspb.Message.getWrapperField(this, proto.sm64js.SkinValue, 8));
 };
 
 
@@ -6072,7 +6039,7 @@ proto.sm64js.SkinData.prototype.getParachute = function() {
  * @return {!proto.sm64js.SkinData} returns this
 */
 proto.sm64js.SkinData.prototype.setParachute = function(value) {
-  return jspb.Message.setWrapperField(this, 9, value);
+  return jspb.Message.setWrapperField(this, 8, value);
 };
 
 
@@ -6090,7 +6057,7 @@ proto.sm64js.SkinData.prototype.clearParachute = function() {
  * @return {boolean}
  */
 proto.sm64js.SkinData.prototype.hasParachute = function() {
-  return jspb.Message.getField(this, 9) != null;
+  return jspb.Message.getField(this, 8) != null;
 };
 
 /**
@@ -6098,7 +6065,7 @@ proto.sm64js.SkinData.prototype.hasParachute = function() {
  * @return {number}
  */
 proto.sm64js.SkinData.prototype.getCustomcapstate = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
 };
 
 
@@ -6107,7 +6074,7 @@ proto.sm64js.SkinData.prototype.getCustomcapstate = function() {
  * @return {!proto.sm64js.SkinData} returns this
  */
 proto.sm64js.SkinData.prototype.setCustomcapstate = function(value) {
-  return jspb.Message.setProto3IntField(this, 8, value);
+  return jspb.Message.setProto3IntField(this, 9, value);
 };
 
 

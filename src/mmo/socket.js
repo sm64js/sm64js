@@ -345,8 +345,8 @@ export const post_main_loop_one_iteration = (frame) => {
                     skinDataMsg.setBoots(toSkinValue(skinData.boots))
                     skinDataMsg.setSkin(toSkinValue(skinData.skin))
                     skinDataMsg.setHair(toSkinValue(skinData.hair))
-                    skinDataMsg.setCustomcapstate(skinData.customCapState)
                     skinDataMsg.setParachute(toSkinValue(skinData.parachute))
+                    skinDataMsg.setCustomcapstate(skinData.customCapState)
                     const skinMsg = new SkinMsg()
                     skinMsg.setSkindata(skinDataMsg)
                     const sm64jsMsg = new Sm64JsMsg()
@@ -356,7 +356,9 @@ export const post_main_loop_one_iteration = (frame) => {
             
                     socket.send(rootMsg.serializeBinary(), true)
                 }
-            }
+            } else {
+				console.warn("Invalid skin!");
+			}
         }
 
         if (frame % 1 == 0) { /// every frame send mario data

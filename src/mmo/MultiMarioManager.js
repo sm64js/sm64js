@@ -7,11 +7,12 @@ import { levelIdToName } from "../utils"
 import { gLinker } from "../game/Linker"
 import { spawn_object_abs_with_rot, obj_mark_for_deletion } from "../game/ObjectHelpers"
 import { ObjectListProcessorInstance as ObjectListProc } from "../game/ObjectListProcessor"
-import { MODEL_GOOMBA } from "../include/model_ids"
+import { MODEL_GOOMBA, MODEL_YELLOW_COIN } from "../include/model_ids"
 
 
 ///Object Types
 export const NETWORK_OBJ_GOOMBA = 0
+export const NETWORK_OBJ_YELLOW_COIN = 1
 
 const sharedNetObjFields = {
     0: RAW.oPosX,
@@ -28,6 +29,10 @@ const networkObjectInfoInit = () => {
     networkObjectInfo[NETWORK_OBJ_GOOMBA] = {
         model: MODEL_GOOMBA, behavior: gLinker.behaviors.bhvGoomba,
         fields: { 0: RAW.oAction, 1: RAW.oGoombaTurningAwayFromWall, 2: RAW.oGoombaWalkTimer, 3: RAW.oVelY, 4: RAW.oForwardVel, 5: RAW.oMoveAngleYaw, 6: RAW.oGoombaTargetYaw, 7: RAW.oInteractStatus }
+    },
+    networkObjectInfo[NETWORK_OBJ_YELLOW_COIN] = {
+        model: MODEL_YELLOW_COIN, behavior: gLinker.behaviors.bhvSingleCoinGetsSpawned,
+        fields: {}
     }
 }
 

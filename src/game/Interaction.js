@@ -734,7 +734,7 @@ const take_damage_from_interact_object = (m) => {
 
     m.hurtCounter += 4 * damage
 
-    Camera.set_camera_shake_from_hit(shake)
+    if (m.marioObj.localMario) Camera.set_camera_shake_from_hit(shake)
 
     return damage
 

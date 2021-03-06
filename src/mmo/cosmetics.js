@@ -260,6 +260,7 @@ export const recvSkinData = (skinMsg) => {
         boots: fromSkinValue(skinDataMsg.getBoots()),
         skin: fromSkinValue(skinDataMsg.getSkin()),
         hair: fromSkinValue(skinDataMsg.getHair()),
+        parachute: fromSkinValue(skinDataMsg.getParachute()),
         customCapState: skinDataMsg.getCustomcapstate()
     }
 
@@ -281,6 +282,7 @@ export const validSkins = () => {
     if (!isValidSkinEntry(skinData.boots)) return false
     if (!isValidSkinEntry(skinData.skin)) return false
     if (!isValidSkinEntry(skinData.hair)) return false
+    if (!isValidSkinEntry(skinData.parachute)) return false
     if (skinData.customCapState !== 0 && skinData.customCapState !== 1) return false
 
     return true

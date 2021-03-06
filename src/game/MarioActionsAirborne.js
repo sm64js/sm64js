@@ -676,7 +676,7 @@ const act_ground_pound = (m) => {
             m.particleFlags |= MarioConstants.PARTICLE_MIST_CIRCLE | MarioConstants.PARTICLE_HORIZONTAL_STAR
             Mario.set_mario_action(m, Mario.ACT_GROUND_POUND_LAND, 0)
 
-            Camera.set_camera_shake_from_hit(Camera.SHAKE_GROUND_POUND)
+            if (m.marioObj.localMario) Camera.set_camera_shake_from_hit(Camera.SHAKE_GROUND_POUND)
         } else if (stepResult == Mario.AIR_STEP_HIT_WALL) {
             if (m.wall) {
                 if (m.vel[1] > 0.0) m.vel[1] = 0.0

@@ -687,7 +687,7 @@ const act_hold_water_action_end = (m) => {
 const act_water_shocked = (m) => {
     //TODO play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_ACTION_SOUND_PLAYED);
     //TODO play_sound(SOUND_MOVING_SHOCKED, m.marioObj.header.gfx.cameraToObject);
-    Camera.set_camera_shake_from_hit(Camera.SHAKE_SHOCK)
+    if (m.marioObj.localMario) Camera.set_camera_shake_from_hit(Camera.SHAKE_SHOCK)
 
     if (Mario.set_mario_animation(m, Mario.MARIO_ANIM_SHOCKED) == 0) {
         m.actionTimer++

@@ -294,8 +294,13 @@ const act_parachuting = (m) => {
     }
 	
 	if (!(m.input & Mario.INPUT_A_DOWN) && m.actionArg == 2) {
-		if (m.vel[1] < -50.0) { m.vel[1] *= (m.vel[1] < -79 ? -1.0 : -0.8) }
-        m.actionArg = 1
+		if (m.vel[1] < -40.0) { m.vel[3] = (m.vel[1] * -0.75); m.actionArg = 3 }
+    }
+	if (m.actionArg == 3) {
+		m.vel[1] += 16.0
+		m.vel[0] *= 1.025
+		m.vel[2] *= 1.025
+		if (m.vel[1] >= m.vel[3]) {m.vel[1] = m.vel[3];m.actionArg = 1}
     }
 	
     common_air_action_step(m, Mario.ACT_FREEFALL_LAND, Mario.MARIO_ANIM_SLIDE_DIVE, Mario.AIR_STEP_CHECK_LEDGE_GRAB)

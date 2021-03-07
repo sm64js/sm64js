@@ -498,7 +498,7 @@ export const init_marios = () => {
         slideYaw: 0,
         angleVel: [0, 0, 0],
         pos: [ ...Area.gMarioSpawnInfo.startPos ],
-        vel: [0, 0, 0],
+        vel: [0, 0, 0, 0],
         action: Area.gMarioSpawnInfo.parachuteSpawn ? ACT_PARACHUTING : ACT_IDLE,
         controller: { stickX: 0, stickY: 0, stickMag: 0 }
     })

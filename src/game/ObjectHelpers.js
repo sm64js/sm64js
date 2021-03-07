@@ -627,8 +627,9 @@ export const cur_obj_move_y = (gravity, bounciness, buoyancy) => {
 
         const waterLevel = cur_obj_move_y_and_get_water_level(gravity, buoyancy)
         if (o.rawData[oPosY] < waterLevel) {
-            throw "cur_obj_move_y implement underwater"
-            cur_obj_move_update_underwater_flags()
+            //// TODO do nothing underwater
+            //throw "cur_obj_move_y implement underwater"
+            //cur_obj_move_update_underwater_flags()
         } else {
             if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
                 o.rawData[oPosY] = o.rawData[oFloorHeight]

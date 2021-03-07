@@ -313,6 +313,7 @@ const interact_player = (m, o) => {
 
 const interact_coin = (m, o) => {
     m.numCoins += o.rawData[oDamageOrCoinValue]
+    console.log("add ", o.rawData[oDamageOrCoinValue], " coins to socket id: ", m.socket_id)
     m.healCounter += 4 * o.rawData[oDamageOrCoinValue]
 
     o.rawData[oInteractStatus] = INT_STATUS_INTERACTED

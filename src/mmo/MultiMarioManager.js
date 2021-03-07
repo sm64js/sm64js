@@ -170,7 +170,7 @@ export const createGameDataMsg = () => {
         }
         iterObj = iterObj.next
     }
-
+    //console.log(networkObjects.length)
     gameDataMsg.setObjectList(networkObjects)
 
     return gameDataMsg

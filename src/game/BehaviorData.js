@@ -11,7 +11,7 @@ import { checkerboard_platform_seg8_collision_0800D710 } from "../actors/checker
 import { bhv_seesaw_platform_init, bhv_seesaw_platform_update } from "./behaviors/seesaw_platform.inc"
 import { SurfaceLoadInstance as SurfaceLoad } from "./SurfaceLoad"
 import { goomba_seg8_anims_0801DA4C } from "../actors/goomba/anims/table.inc"
-import { bhv_goomba_init, bhv_goomba_update, bhv_goomba_triplet_spawner_update } from "./behaviors/goomba.inc"
+import { bhv_goomba_init, bhv_goomba_update, bhv_goomba_triplet_spawner_update, bhv_network_goomba_spawner } from "./behaviors/goomba.inc"
 import { bobomb_seg8_anims_0802396C } from "../actors/bobomb/anims/table.inc"
 import { bhv_bobomb_loop, bhv_bobomb_init, bhv_bobomb_fuse_smoke_init, bhv_dust_smoke_loop } from "./behaviors/bobomb.inc"
 import { gLinker } from "./Linker"
@@ -183,6 +183,14 @@ export const bhvGoombaTripletSpawner = [
     { command: BhvCmds.drop_to_floor },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_goomba_triplet_spawner_update } },
+    { command: BhvCmds.end_loop }
+]
+
+export const bhvNetworkGoombaSpawner = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SPAWNER } },
+    { command: BhvCmds.drop_to_floor },
+    { command: BhvCmds.begin_loop },
+    { command: BhvCmds.call_native, args: { func: bhv_network_goomba_spawner } },
     { command: BhvCmds.end_loop }
 ]
 

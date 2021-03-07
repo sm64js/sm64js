@@ -131,9 +131,6 @@ socket.onopen = () => {
             case RootMsg.MessageCase.UNCOMPRESSED_SM64JS_MSG:
                 sm64jsMsg = rootMsg.getUncompressedSm64jsMsg()
                 switch (sm64jsMsg.getMessageCase()) {
-                    case Sm64JsMsg.MessageCase.PLAYER_LISTS_MSG:
-                        Multi.recvPlayerLists(sm64jsMsg.getPlayerListsMsg())
-                        break
                     case Sm64JsMsg.MessageCase.PING_MSG:
                         measureLatency(sm64jsMsg.getPingMsg())
                         break

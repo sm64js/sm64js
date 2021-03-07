@@ -372,7 +372,7 @@ const perform_water_full_step = (m, nextPos) => {
 const apply_water_current = (m, step) => {
     let whirlpoolRadius = 2000.0
 
-    if (m.floor.type === SURFACE_FLOWING_WATER) {
+    if (m.floor && m.floor.type === SURFACE_FLOWING_WATER) {
         let currentAngle = m.floor.force << 8
         let currentSpeed = sWaterCurrentSpeed[m.floor.force >> 8]
 

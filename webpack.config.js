@@ -1,5 +1,5 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin")
-
+const webpack = require("webpack")
 const express = require('express')
 const path = require('path')
 
@@ -28,6 +28,10 @@ module.exports = env => ({
         }
     },
     plugins: [
+        new webpack.DefinePlugin({
+            'process.env.GAMEMASTER_KEY': JSON.stringify(process.env.GAMEMASTER_KEY),
+            'process.env.PRODUCTION': JSON.stringify(process.env.PRODUCTION),
+        }),
         new HtmlWebPackPlugin({
             template: "./src/index.html",
             filename: "./index.html"

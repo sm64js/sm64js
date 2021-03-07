@@ -60,7 +60,7 @@ const update_air_with_turn = (m) => {
             m.faceAngle[1] += Math.floor(512.0 * Math.sin(intendedDYaw / 0x8000 * Math.PI) * intendedMag)
         }
 
-        if (m.action == Mario.ACT_PARACHUTING && m.forwardVel > 65.0) m.forwardVel = 65.0
+        if (m.action == Mario.ACT_PARACHUTING && m.forwardVel > 60.0) m.forwardVel = 60.0
 
 
         //! Uncapped air speed. Net positive when moving forward.
@@ -284,8 +284,26 @@ const act_parachuting = (m) => {
 		m.input ^= Mario.INPUT_PARACHUTE
         return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
     }
+	
+	if (m.vel[1] < 0.0 && m.actionArg == 0) {
+        m.actionArg = 1
+    }
+	
+	if ((m.input & Mario.INPUT_A_DOWN) && m.actionArg == 1 && m.vel[1] < 0.0) {
+        m.actionArg = 2
+    }
+	
+	if (!(m.input & Mario.INPUT_A_DOWN) && m.actionArg == 2) {
+		if (m.vel[1] < -50.0) { m.vel[1] *= (m.vel[1] < -79 ? -1.0 : -0.8) }
+        m.actionArg = 1
+    }
+	
+    common_air_action_step(m, Mario.ACT_FREEFALL_LAND, Mario.MARIO_ANIM_SLIDE_DIVE, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
+	
+	if (m.vel[1] < ((m.actionArg == 2) ? -80.0 : -30.0)) m.vel[1] = ((m.actionArg == 2) ? -80.0 : -30.0)
 
-    common_air_action_step(m, Mario.ACT_FREEFALL_LAND, Mario.MARIO_ANIM_DIVE, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
+	m.marioObj.header.gfx.angle[0] = m.vel[1] * -100.0
+	
     return 0
 }
 

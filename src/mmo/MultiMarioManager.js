@@ -321,14 +321,12 @@ export const applyController = (controllerUpdate, marioState) => {
     }
 }
 
-export const recvPlayerLists = () => {
-
+export const checkForAfkPlayers = () => {
     //// unrelated to the message it is recieving... just a taking the oppurtunity to check for AFK players
     Object.keys(networkData.remotePlayers).forEach(socket_id => {
         if (Date.now() - networkData.remotePlayers[socket_id].controllerUpdateTimestamp > 10000) {
             delete networkData.remotePlayers[socket_id]
         }
     })
-
 }
 

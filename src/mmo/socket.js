@@ -14,6 +14,7 @@ import * as WebSocket from 'ws'
 import zlib from "zlib"
 import * as Multi from "./MultiMarioManager"
 import { updateFlagData, setInitFlagHeight } from "../game/behaviors/bhv_castle_flag_init.inc"
+import { setInterval } from "timers"
 
 const globalStartTimestamp = Date.now()
 
@@ -78,8 +79,15 @@ socket.onopen = () => {
 
     /// send access code to server
     const accessCodeMsg = new AccessCodeMsg()
-    accessCodeMsg.setAccessCode("master")
-    accessCodeMsg.setType("discord")
+
+    if (process.env.PRODUCTION == 1) {
+        if (process.env.GAMEMASTER_KEY == undefined) throw "Error can't find game master key"
+        accessCodeMsg.setAccessCode(process.env.GAMEMASTER_KEY)
+    } else { //local testing
+        accessCodeMsg.setAccessCode("master")
+        accessCodeMsg.setType("discord")
+    }
+
     const initializationMsg = new InitializationMsg()
     initializationMsg.setAccessCodeMsg(accessCodeMsg)
     const sm64jsMsg = new Sm64JsMsg()
@@ -88,7 +96,10 @@ socket.onopen = () => {
     rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
     sendData(rootMsg.serializeBinary())
 
-    socket.onmessage = (message) => {
+
+    const checkAfk = setInterval(() => { Multi.checkForAfkPlayers() }, 1000)  // once per second
+
+    socket.onmessage = async (message) => {
         let sm64jsMsg
         let bytes = new Uint8Array(message.data)
         const rootMsg = RootMsg.deserializeBinary(bytes)
@@ -97,25 +108,12 @@ socket.onopen = () => {
             case RootMsg.MessageCase.UNCOMPRESSED_SM64JS_MSG:
                 sm64jsMsg = rootMsg.getUncompressedSm64jsMsg()
                 switch (sm64jsMsg.getMessageCase()) {
-                    case Sm64JsMsg.MessageCase.PLAYER_LISTS_MSG:
-                        Multi.recvPlayerLists()
-                        break
                     case Sm64JsMsg.MessageCase.CONTROLLER_MSG:
                         Multi.updateRemoteMarioController(sm64jsMsg.getControllerMsg()); break
                     case Sm64JsMsg.MessageCase.INIT_NEW_MARIO_STATE_MSG:
                         Multi.initNewRemoteMarioState(sm64jsMsg.getInitNewMarioStateMsg().getSocketId()); break
                     case Sm64JsMsg.MessageCase.PING_MSG:
                         measureLatency(sm64jsMsg.getPingMsg())
-                        break
-                    case Sm64JsMsg.MessageCase.INITIALIZATION_MSG:
-                        const initializationMsg = sm64jsMsg.getInitializationMsg()
-                        switch (initializationMsg.getMessageCase()) {
-                            case InitializationMsg.MessageCase.AUTHORIZED_USER_MSG:
-                                recvAuthorizedUser(initializationMsg.getAuthorizedUserMsg()); break
-                            case InitializationMsg.MessageCase.INIT_GAME_DATA_MSG:
-                                break
-                            default: throw "unknown case for initialization proto message"
-                        }
                         break
                     default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
                 }
@@ -279,26 +277,4 @@ const checkForFlagGrab = () => {
     
 }
 
-
-
-const recvAuthorizedUser = (msg) => {
-
-    if (msg.getStatus() == 1) {
-
-
-        const joinGameMsg = new JoinGameMsg()
-        joinGameMsg.setName("server2")
-        joinGameMsg.setUseDiscordName(false)
-
-        const level = 16
-        joinGameMsg.setLevel(level)
-        const initializationMsg = new InitializationMsg()
-        initializationMsg.setJoinGameMsg(joinGameMsg)
-        const sm64jsMsg = new Sm64JsMsg()
-        sm64jsMsg.setInitializationMsg(initializationMsg)
-        const rootMsg = new RootMsg()
-        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-        sendData(rootMsg.serializeBinary())
-    } 
-    }
 

@@ -6,7 +6,7 @@ import {
     PingMsg,
     InitializationMsg,
     AccessCodeMsg,
-    JoinGameMsg,
+    CollectCoinMsg,
 } from "../../proto/mario_pb"
 
 import zlib from "zlib"
@@ -274,4 +274,13 @@ const checkForFlagGrab = () => {
     
 }
 
-
+export const sendCoinMsg = (numCoins, socket_id) => {
+    const coinMsg = new CollectCoinMsg()
+    coinMsg.setNumCoins(numCoins)
+    coinMsg.setSocketId(socket_id)
+    const sm64jsMsg = new Sm64JsMsg()
+    sm64jsMsg.setCollectCoinMsg(coinMsg)
+    const rootMsg = new RootMsg()
+    rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
+    sendData(rootMsg.serializeBinary()) 
+}

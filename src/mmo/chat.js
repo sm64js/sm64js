@@ -42,8 +42,9 @@ export const recvChat = (chatmsg) => {
     const msg = chatmsg.getMessage()
     const isAdmin = chatmsg.getIsadmin()
 
-    if (socket_id != networkData.mySocketID &&
-        networkData.remotePlayers[socket_id] == undefined) return
+    const playerData = networkData.remotePlayers[socket_id]
+
+    if (playerData == undefined) return
 
     if (window.banPlayerList.includes(sender) || blockChatExtended(sender)) return
 
@@ -68,13 +69,7 @@ export const recvChat = (chatmsg) => {
         return
     }
 
-    let someobject
-    if (socket_id == networkData.mySocketID)
-        someobject = window.myMario
-    else
-        someobject = networkData.remotePlayers[socket_id]
-
-    Object.assign(someobject, { chatData: { msg, timer: 150 } })
+    Object.assign(playerData, { chatData: { msg, timer: 150 } })
 
 }
 

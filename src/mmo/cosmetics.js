@@ -245,13 +245,26 @@ const fromSkinValue = (skinValue) => {
     }
 }
 
+const coinsToAccountLevel = (numCoins) => {
+    let level = 1; let coins = 40
+    while (coins <= numCoins) { coins += (40 + level++ * 8) }
+    return level
+}
+
 export const recvSkinData = (skinMsg) => { 
     const socket_id = skinMsg.getSocketid()
-    if (socket_id === networkData.mySocketID ||
-        networkData.remotePlayers[socket_id] == null) return
+    const playerData = networkData.remotePlayers[socket_id]
+
+    if (playerData == null) return
+
+    playerData.playerName = skinMsg.getPlayername()
+    playerData.accountCoins = skinMsg.getNumCoins()
+    playerData.accountLevel = coinsToAccountLevel(skinMsg.getNumCoins())
+
+    if (socket_id === networkData.mySocketID) return
 
     const skinDataMsg = skinMsg.getSkindata()
-    const skinData = {
+    playerData.skinData = {
         overalls: fromSkinValue(skinDataMsg.getOveralls()),
         hat: fromSkinValue(skinDataMsg.getHat()),
         shirt: fromSkinValue(skinDataMsg.getShirt()),
@@ -262,8 +275,6 @@ export const recvSkinData = (skinMsg) => {
         customCapState: skinDataMsg.getCustomcapstate()
     }
 
-    networkData.remotePlayers[socket_id].skinData = skinData
-    networkData.remotePlayers[socket_id].playerName = skinMsg.getPlayername()
 }
 
 const isValidSkinEntry = (skinEntry) => {
@@ -287,7 +298,9 @@ export const validSkins = () => {
 
 export const getExtraRenderData = (socket_id) => {
 
-    const myChat = window.myMario.chatData
+    const remote = networkData.remotePlayers[socket_id]
+    const remoteChat = remote.chatData
+    const accountLevel = remote.accountLevel
 
     //// Local Mario
     if (socket_id == networkData.mySocketID) return {
@@ -301,14 +314,12 @@ export const getExtraRenderData = (socket_id) => {
             mario_hair_lights: (window.myMario.skinData.hair == "r" ? rainbowLights : window.myMario.skinData.hair),
         },
         custom2D: {
-            chat: (myChat && myChat.timer > 0) ? myChat.msg : null,
+            playerName: remote.playerName ? "Lvl #" + accountLevel.toString() : null,
+            chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null,
             announcement: (networkData.announcement.timer > 0) ? networkData.announcement.message : null
         }
     }
 
-    const remote = networkData.remotePlayers[socket_id]
-
-    const remoteChat = remote.chatData
     const overalls = remote.skinData.overalls
     const hat = remote.skinData.hat
     const shirt = remote.skinData.shirt
@@ -328,7 +339,7 @@ export const getExtraRenderData = (socket_id) => {
             mario_hair_lights: (hair == "r" ? rainbowLights : hair),
         },
         custom2D: {
-            playerName: remote.playerName ? remote.playerName : null,
+            playerName: remote.playerName ? remote.playerName + " Lvl #" + accountLevel.toString() : null,
             chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null,
             announcement: (networkData.announcement.timer > 0) ? networkData.announcement.message : null
         }

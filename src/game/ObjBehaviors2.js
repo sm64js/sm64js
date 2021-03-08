@@ -333,9 +333,10 @@ export const obj_set_knockback_action = (attackType) => {
 
     o.rawData[oFlags] &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW
 
-    if (o.attackerObj == undefined) throw "attackerObj is undefined, it should be set in Interaction attack_object"
+    if (o.attackerObj) {
+        o.rawData[oMoveAngleYaw] = obj_angle_to_object(o.attackerObj, o)
+    }
 
-    o.rawData[oMoveAngleYaw] = obj_angle_to_object(o.attackerObj, o)
 }
 
 export const obj_check_attacks = (hitbox, attackedMarioAction) => {

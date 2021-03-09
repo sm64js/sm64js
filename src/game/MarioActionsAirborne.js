@@ -696,7 +696,6 @@ const act_ground_pound = (m) => {
             /// TODO get stuck in ground
             //play heave landed sound
 
-
             m.particleFlags |= MarioConstants.PARTICLE_MIST_CIRCLE | MarioConstants.PARTICLE_HORIZONTAL_STAR
             Mario.set_mario_action(m, Mario.ACT_GROUND_POUND_LAND, 0)
 
@@ -710,13 +709,15 @@ const act_ground_pound = (m) => {
             }
         }
     }
-        if (m.input & Mario.INPUT_B_PRESSED) {
-			m.faceAngle[1] = m.intendedYaw
-            m.vel[1] = 50.0
-			Mario.set_forward_vel(m, 30.0)
-			m.canGlide = false;
-            return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
-        }
+	
+	if (m.input & Mario.INPUT_B_PRESSED && m.actionTimer > 8) {
+		m.faceAngle[1] = m.intendedYaw
+		m.vel[1] = 45.0
+		Mario.set_forward_vel(m, 30.0)
+		m.canGlide = false;
+		return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
+	}
+	
     return 0
 
 }

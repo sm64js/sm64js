@@ -303,7 +303,7 @@ const act_parachuting = (m) => {
 		if (m.vel[1] >= m.vel[3]) {m.vel[1] = m.vel[3];m.actionArg = 1}
     }
 	
-    common_air_action_step(m, Mario.ACT_FREEFALL_LAND, Mario.MARIO_ANIM_SLIDE_DIVE, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
+    common_air_action_step(m, Mario.ACT_STOMACH_SLIDE, Mario.MARIO_ANIM_SLIDE_DIVE, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
 	
 	if (m.vel[1] < ((m.actionArg == 2) ? -80.0 : -30.0)) m.vel[1] = ((m.actionArg == 2) ? -80.0 : -30.0)
 
@@ -446,6 +446,7 @@ const act_dive = (m) => {
             break
         case Mario.AIR_STEP_LANDED:
             Mario.set_mario_action(m, Mario.ACT_DIVE_SLIDE, 0)
+			m.canGlide = true
             m.faceAngle[0] = 0
             break
         case Mario.AIR_STEP_HIT_WALL:
@@ -461,7 +462,7 @@ const act_dive = (m) => {
             break
         default: throw "unimplemented air step case in act dive"
     }
-    if (m.input & Mario.INPUT_PARACHUTE && m.vel[1] < -0.01) {
+    if (m.input & Mario.INPUT_PARACHUTE && m.vel[1] < -0.01 && m.canGlide) {
 		m.input ^= Mario.INPUT_PARACHUTE
         return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
     }
@@ -709,7 +710,13 @@ const act_ground_pound = (m) => {
             }
         }
     }
-
+        if (m.input & Mario.INPUT_B_PRESSED) {
+			m.faceAngle[1] = m.intendedYaw
+            m.vel[1] = 50.0
+			Mario.set_forward_vel(m, 30.0)
+			m.canGlide = false;
+            return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
+        }
     return 0
 
 }

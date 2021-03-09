@@ -246,8 +246,20 @@ const fromSkinValue = (skinValue) => {
     }
 }
 
+const coinsToAccountLevel = (numCoins) => {
+    let level = 1; let coins = 40
+    while (coins <= numCoins) { coins += (40 + level++ * 8) }
+    return level
+}
+
 export const recvSkinData = (skinMsg) => { 
     const socket_id = skinMsg.getSocketid()
+
+    if (socket_id === networkData.mySocketID) {
+        window.myMario.accountCoins = skinMsg.getNumCoins()
+        window.myMario.accountLevel = coinsToAccountLevel(skinMsg.getNumCoins())
+    }
+
     if (socket_id === networkData.mySocketID ||
         networkData.remotePlayers[socket_id] == null) return
 
@@ -266,6 +278,8 @@ export const recvSkinData = (skinMsg) => {
 
     networkData.remotePlayers[socket_id].skinData = skinData
     networkData.remotePlayers[socket_id].playerName = skinMsg.getPlayername()
+    networkData.remotePlayers[socket_id].accountCoins = skinMsg.getNumCoins()
+    networkData.remotePlayers[socket_id].accountLevel = coinsToAccountLevel(skinMsg.getNumCoins())
 }
 
 const isValidSkinEntry = (skinEntry) => {
@@ -305,12 +319,14 @@ export const getExtraRenderData = (socket_id) => {
             mario_parachute_lights: (window.myMario.skinData.parachute == "r" ? rainbowLights : window.myMario.skinData.parachute),
         },
         custom2D: {
+            playerName: window.myMario.accountLevel ? "Lvl #" + window.myMario.accountLevel.toString() : null,
             chat: (myChat && myChat.timer > 0) ? myChat.msg : null,
             announcement: (networkData.announcement.timer > 0) ? networkData.announcement.message : null
         }
     }
 
     const remote = networkData.remotePlayers[socket_id]
+    const accountLevel = remote.accountLevel
 
     const remoteChat = remote.chatData
     const overalls = remote.skinData.overalls
@@ -334,7 +350,7 @@ export const getExtraRenderData = (socket_id) => {
             mario_parachute_lights: (parachute == "r" ? rainbowLights : parachute),
         },
         custom2D: {
-            playerName: remote.playerName ? remote.playerName : null,
+            playerName: remote.playerName ? remote.playerName + " Lvl #" + accountLevel.toString() : null,
             chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null,
             announcement: (networkData.announcement.timer > 0) ? networkData.announcement.message : null
         }

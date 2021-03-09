@@ -5397,7 +5397,8 @@ proto.sm64js.SkinMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
     socketid: jspb.Message.getFieldWithDefault(msg, 1, 0),
     skindata: (f = msg.getSkindata()) && proto.sm64js.SkinData.toObject(includeInstance, f),
-    playername: jspb.Message.getFieldWithDefault(msg, 3, "")
+    playername: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    numCoins: jspb.Message.getFieldWithDefault(msg, 4, 0)
   };
 
   if (includeInstance) {
@@ -5447,6 +5448,10 @@ proto.sm64js.SkinMsg.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {string} */ (reader.readString());
       msg.setPlayername(value);
       break;
+    case 4:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setNumCoins(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -5495,6 +5500,13 @@ proto.sm64js.SkinMsg.serializeBinaryToWriter = function(message, writer) {
   if (f.length > 0) {
     writer.writeString(
       3,
+      f
+    );
+  }
+  f = message.getNumCoins();
+  if (f !== 0) {
+    writer.writeUint32(
+      4,
       f
     );
   }
@@ -5571,6 +5583,24 @@ proto.sm64js.SkinMsg.prototype.getPlayername = function() {
  */
 proto.sm64js.SkinMsg.prototype.setPlayername = function(value) {
   return jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional uint32 num_coins = 4;
+ * @return {number}
+ */
+proto.sm64js.SkinMsg.prototype.getNumCoins = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.sm64js.SkinMsg} returns this
+ */
+proto.sm64js.SkinMsg.prototype.setNumCoins = function(value) {
+  return jspb.Message.setProto3IntField(this, 4, value);
 };
 
 

@@ -1371,7 +1371,8 @@ const update_mario_inputs = (m) => {
 
     if (m.controller.taunt && (m.action == ACT_IDLE || m.action == ACT_TAUNT)) m.input |= INPUT_TAUNT
     if (m.controller.parachute && (m.vel[1] < 0.0)) m.input |= INPUT_PARACHUTE
-
+	m.canGlide = (m.action == ACT_DIVE ? m.canGlide : true);
+	
     if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) {
         if (m.action & ACT_FLAG_ALLOW_FIRST_PERSON) {
             m.input |= INPUT_FIRST_PERSON;

@@ -192,6 +192,7 @@ const act_holding_pole = (m) => {
     if (m.input & Mario.INPUT_A_PRESSED) {
         //add_tree_leaf_particles(m) TODO
         m.faceAngle[1] += 0x8000
+		m.canGlide = 1
         return Mario.set_mario_action(m, Mario.ACT_WALL_KICK_AIR, 0)
     }
 

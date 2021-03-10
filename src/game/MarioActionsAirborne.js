@@ -253,7 +253,7 @@ const act_freefall = (m) => {
     let animation
 
     if (m.input & Mario.INPUT_B_PRESSED) {
-		m.canGlide = 8
+		m.canGlide = 2
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
 
@@ -317,7 +317,7 @@ const act_parachuting = (m) => {
 const act_side_flip = (m) => {
 
     if (m.input & Mario.INPUT_B_PRESSED) {
-		m.canGlide = 8
+		m.canGlide = 2
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
 
@@ -360,7 +360,7 @@ const act_double_jump = (m) => {
 const act_triple_jump = (m) => {
 
     if (m.input & Mario.INPUT_B_PRESSED) {
-		m.canGlide = 8
+		m.canGlide = 2
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
 
@@ -796,7 +796,7 @@ const act_knocked_up = (m) => {
 
 const act_steep_jump = (m) => {
     if (m.input & Mario.INPUT_B_PRESSED) {
-		m.canGlide = 8
+		m.canGlide = 2
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
 	

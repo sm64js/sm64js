@@ -60,7 +60,7 @@ const update_air_with_turn = (m) => {
             m.faceAngle[1] += Math.floor(512.0 * Math.sin(intendedDYaw / 0x8000 * Math.PI) * intendedMag)
         }
 
-        if (m.action == Mario.ACT_PARACHUTING && m.forwardVel > 65.0) m.forwardVel = 65.0
+        if (m.action == Mario.ACT_PARACHUTING && m.forwardVel > 60.0) m.forwardVel = 60.0
 
 
         //! Uncapped air speed. Net positive when moving forward.
@@ -223,6 +223,7 @@ const act_soft_bonk = (m) => {
 
 const check_kick_or_dive_in_air = (m) => {
     if (m.input & Mario.INPUT_B_PRESSED) {
+		m.canGlide = (m.forwardVel > 28.0 ? 8 : m.canGlide)
         return Mario.set_mario_action(m, m.forwardVel > 28.0 ? Mario.ACT_DIVE : Mario.ACT_JUMP_KICK, 0)
     }
     return 0
@@ -252,6 +253,7 @@ const act_freefall = (m) => {
     let animation
 
     if (m.input & Mario.INPUT_B_PRESSED) {
+		m.canGlide = 2
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
 
@@ -284,14 +286,38 @@ const act_parachuting = (m) => {
 		m.input ^= Mario.INPUT_PARACHUTE
         return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
     }
+	
+	if (m.vel[1] < 0.0 && m.actionArg == 0) {
+        m.actionArg = 1
+    }
+	
+	if ((m.input & Mario.INPUT_A_DOWN) && m.actionArg == 1 && m.vel[1] < 0.0) {
+        m.actionArg = 2
+    }
+	
+	if (!(m.input & Mario.INPUT_A_DOWN) && m.actionArg == 2) {
+		if (m.vel[1] < -40.0) { m.vel[3] = (m.vel[1] * -0.75); m.actionArg = 3 }
+    }
+	if (m.actionArg == 3) {
+		m.vel[1] += 16.0
+		m.vel[0] *= 1.025
+		m.vel[2] *= 1.025
+		if (m.vel[1] >= m.vel[3]) {m.vel[1] = m.vel[3];m.actionArg = 1}
+    }
+	
+    common_air_action_step(m, Mario.ACT_STOMACH_SLIDE, Mario.MARIO_ANIM_SLIDE_DIVE, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
+	
+	if (m.vel[1] < ((m.actionArg == 2) ? -80.0 : -30.0)) m.vel[1] = ((m.actionArg == 2) ? -80.0 : -30.0)
 
-    common_air_action_step(m, Mario.ACT_FREEFALL_LAND, Mario.MARIO_ANIM_DIVE, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
+	m.marioObj.header.gfx.angle[0] = m.vel[1] * -100.0
+	
     return 0
 }
 
 const act_side_flip = (m) => {
 
     if (m.input & Mario.INPUT_B_PRESSED) {
+		m.canGlide = 2
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
 
@@ -334,6 +360,7 @@ const act_double_jump = (m) => {
 const act_triple_jump = (m) => {
 
     if (m.input & Mario.INPUT_B_PRESSED) {
+		m.canGlide = 2
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
 
@@ -353,11 +380,18 @@ const act_triple_jump = (m) => {
 const act_wall_kick_air = (m) => {
 
     if (m.input & Mario.INPUT_B_PRESSED) {
+		m.canGlide = 1
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
 
     if (m.input & Mario.INPUT_Z_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
+    }
+	
+    if (m.input & Mario.INPUT_PARACHUTE && m.vel[1] < 0.0 && m.canGlide > 0) {
+		m.canGlide--
+		m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
     }
 
     common_air_action_step(m, Mario.ACT_JUMP_LAND, Mario.MARIO_ANIM_SLIDEJUMP, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
@@ -365,6 +399,10 @@ const act_wall_kick_air = (m) => {
 }
 
 const act_top_of_pole_jump = (m) => {
+    if (m.input & Mario.INPUT_PARACHUTE) {
+		m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
+    }
     common_air_action_step(m, Mario.ACT_FREEFALL_LAND, Mario.MARIO_ANIM_HANDSTAND_JUMP, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
     return 0
 }
@@ -438,7 +476,8 @@ const act_dive = (m) => {
             break
         default: throw "unimplemented air step case in act dive"
     }
-    if (m.input & Mario.INPUT_PARACHUTE && m.vel[1] < -0.01) {
+    if (m.input & Mario.INPUT_PARACHUTE && m.vel[1] < -0.01 && m.canGlide > 0) {
+		m.canGlide--
 		m.input ^= Mario.INPUT_PARACHUTE
         return Mario.set_mario_action(m, Mario.ACT_PARACHUTING, 0)
     }
@@ -672,7 +711,6 @@ const act_ground_pound = (m) => {
             /// TODO get stuck in ground
             //play heave landed sound
 
-
             m.particleFlags |= MarioConstants.PARTICLE_MIST_CIRCLE | MarioConstants.PARTICLE_HORIZONTAL_STAR
             Mario.set_mario_action(m, Mario.ACT_GROUND_POUND_LAND, 0)
 
@@ -686,7 +724,15 @@ const act_ground_pound = (m) => {
             }
         }
     }
-
+	
+	if (m.input & Mario.INPUT_B_PRESSED && m.actionTimer > 8) {
+		m.faceAngle[1] = m.intendedYaw
+		m.vel[1] = 45.0
+		Mario.set_forward_vel(m, 30.0)
+		if (m.canGlide == -1) {m.canGlide = 2}
+		return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
+	}
+	
     return 0
 
 }
@@ -750,6 +796,7 @@ const act_knocked_up = (m) => {
 
 const act_steep_jump = (m) => {
     if (m.input & Mario.INPUT_B_PRESSED) {
+		m.canGlide = 2
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
 	

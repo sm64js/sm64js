@@ -27,10 +27,7 @@ const apply_gravity = (m) => {
         m.vel[1] /= 4.0
     } else {
         m.vel[1] -= 4.0
-        if (m.vel[1] < -75.0) m.vel[1] = -75.0
-        if (m.action == Mario.ACT_PARACHUTING) {
-            if (m.vel[1] < -30.0) m.vel[1] = -30.0
-        }
+        if (m.action != Mario.ACT_PARACHUTING && m.vel[1] < -75.0) m.vel[1] = -75.0
     }
 }
 

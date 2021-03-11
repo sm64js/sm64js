@@ -365,6 +365,10 @@ export const ACT_FLAG_THROWING = (1 << 31)
 export const ACT_TAUNT = (0x193 | ACT_FLAG_STATIONARY | ACT_FLAG_IDLE)
 export const ACT_PARACHUTING = 0x1100088C
 
+
+//Used by m.canGlide for determining max amount of glider uses per action.
+const PARACHUTE_LIMITERS = [ACT_DIVE, ACT_WALL_KICK_AIR, ACT_PARACHUTING, ACT_GROUND_POUND, ACT_FREEFALL]
+
 export const INPUT_NONZERO_ANALOG = 0x0001
 export const INPUT_A_PRESSED = 0x0002
 export const INPUT_OFF_FLOOR = 0x0004
@@ -498,7 +502,8 @@ export const init_marios = () => {
         slideYaw: 0,
         angleVel: [0, 0, 0],
         pos: [ ...Area.gMarioSpawnInfo.startPos ],
-        vel: [0, 0, 0],
+        vel: [0, 0, 0, 0],
+		canGlide: 0,
         action: Area.gMarioSpawnInfo.parachuteSpawn ? ACT_PARACHUTING : ACT_IDLE,
         controller: { stickX: 0, stickY: 0, stickMag: 0 }
     })
@@ -1370,7 +1375,8 @@ const update_mario_inputs = (m) => {
 
     if (m.controller.taunt && (m.action == ACT_IDLE || m.action == ACT_TAUNT)) m.input |= INPUT_TAUNT
     if (m.controller.parachute && (m.vel[1] < 0.0)) m.input |= INPUT_PARACHUTE
-
+	m.canGlide = (PARACHUTE_LIMITERS.includes(m.action) ? m.canGlide : -1);
+	
     if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) {
         if (m.action & ACT_FLAG_ALLOW_FIRST_PERSON) {
             m.input |= INPUT_FIRST_PERSON;

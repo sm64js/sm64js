@@ -81,8 +81,7 @@ class MarioMisc {
 
     geo_switch_parachuting(callContext, switchCase) {
         if (callContext == GEO_CONTEXT_RENDER) {
-            const marioYVel = this.vel[1]
-            switchCase.selectedCase = (this.gBodyState.action == Mario.ACT_PARACHUTING && marioYVel < 0) ? 1 : 0
+            switchCase.selectedCase = (this.gBodyState.action == Mario.ACT_PARACHUTING) ? 1 : 0
         }
     }
 }

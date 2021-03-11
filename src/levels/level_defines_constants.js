@@ -13,4 +13,5 @@ export const LEVEL_SSL = 8
 export const LEVEL_SL = 10
 export const LEVEL_MBF = 1000
 export const LEVEL_CTF00 = 1001
+export const LEVEL_STARMAN = 1002
 export const LEVEL_CLOUDED = 999

@@ -1379,7 +1379,7 @@ const update_mario_inputs = (m) => {
     update_mario_joystick_inputs(m)
     update_mario_button_inputs(m) 
     update_mario_geometry_inputs(m)
-
+	if (window.reset) {respawn_player(m)}
     if (m.controller.taunt && (m.action == ACT_IDLE || m.action == ACT_TAUNT)) m.input |= INPUT_TAUNT
     if (m.controller.parachute && (m.vel[1] < 0.0)) m.input |= INPUT_PARACHUTE
 	m.canGlide = (PARACHUTE_LIMITERS.includes(m.action) ? m.canGlide : -1);
@@ -1494,13 +1494,13 @@ export const transition_submerged_to_walking = m => {
 }
 
 export const respawn_player = (m) => {
+        set_mario_action(m, ACT_FREEFALL, 0)
         m.pos = [...Area.gMarioSpawnInfo.startPos]
         m.angle = [...Area.gMarioSpawnInfo.startAngle]
         m.vel = [0, 0, 0]
         m.forwardVel = 0
-        m.invincTimer = 5
-		m.healCounter = 0
-		m.hurtCounter = 0
 		m.health = 0x880
-        set_mario_action(m, ACT_IDLE, 0)
+		m.healCounter = 1
+		m.hurtCounter = 1
+        m.invincTimer = 60
 }

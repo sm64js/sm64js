@@ -13,9 +13,17 @@ const send_display_list = (gfx_list) => { GFX.run(gfx_list) }
 let n_frames = 0
 let target_time = 0
 let frameSpeed = 0.03
+let reset_delay = 0
 
 const produce_one_frame = () => {
-
+	let respText = ""
+		if (reset_delay > 0) {
+			window.reset = false;
+			let buff = Math.round(reset_delay / 30)
+			respText = ` (${buff})`
+			reset_delay--
+		}
+	
     const start_frame = performance.now()
 
     playerInputUpdate() /// Keyboard buttons / joystick process to game input commands
@@ -28,9 +36,12 @@ const produce_one_frame = () => {
     const finished_frame = performance.now()
     totalFrameTimeBuffer.push(finished_frame - start_frame)
 
+	if (window.reset == true && reset_delay < 1) reset_delay = 300  /// 10 Seconds
+
     //if (n_frames > 100000) { throw "Hit max frames" }
     //console.log("new frame: " + n_frames)
     n_frames++
+	document.getElementById("respawnButton").innerHTML = `Respawn${respText}`
 }
 
 //// implementation from Emil <3

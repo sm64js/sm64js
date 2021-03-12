@@ -1008,6 +1008,10 @@ const mario_update_hitbox_and_cap_model = (m) => {
 }
 
 const update_mario_health = (m) => {
+	if (m.marioObj.localMario) {
+		window.myMario.readOnlyHealth = m.health > 0 ? m.health >> 8 : 0
+	}
+
 
     if (m.health >= 0x100) {
 
@@ -1056,8 +1060,11 @@ const update_mario_health = (m) => {
     }
 
 
-    /// TODO HACK because death is not implemented
-    if (m.health < 0x100) m.health = 0x100
+    /// TODO HACK because death is not implemented - Delay respawn.
+    if (m.health < 0x100) {
+		m.health--
+		if (m.health < 0xD5) respawn_player(m)
+	}
 }
 
 const update_mario_button_inputs = (m) => {
@@ -1484,4 +1491,16 @@ export const transition_submerged_to_walking = m => {
     } else {
         return set_mario_action(m, ACT_HOLD_WALKING, 0);
     }
+}
+
+export const respawn_player = (m) => {
+        m.pos = [...Area.gMarioSpawnInfo.startPos]
+        m.angle = [...Area.gMarioSpawnInfo.startAngle]
+        m.vel = [0, 0, 0]
+        m.forwardVel = 0
+        m.invincTimer = 5
+		m.healCounter = 0
+		m.hurtCounter = 0
+		m.health = 0x880
+        set_mario_action(m, ACT_IDLE, 0)
 }

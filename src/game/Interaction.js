@@ -10,7 +10,6 @@ import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND } from "../include/surface_terrains"
 import { COURSE_IS_MAIN_COURSE } from "../levels/course_defines"
 import { CameraInstance as Camera } from "./Camera"
-import { LEVEL_CCM, LEVEL_TTM, LEVEL_WF, LEVEL_HMC, LEVEL_CTF00 } from "../levels/level_defines_constants"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
 export const INTERACT_GRABBABLE      /* 0x00000002 */ = (1 << 1)
@@ -138,12 +137,8 @@ const check_death_barrier = (m) => {
 
     /// Temp code because death is not implemented
     if (m.pos[1] < m.floorHeight + 2048) {
-        m.pos = [...Area.gMarioSpawnInfo.startPos]
-        m.angle = [...Area.gMarioSpawnInfo.startAngle]
-        m.vel = [0, 0, 0]
-        m.forwardVel = 0
-        Mario.set_mario_action(m, Mario.ACT_IDLE, 0)
-    }
+			Mario.respawn_player(m)
+	}
 
 }
 

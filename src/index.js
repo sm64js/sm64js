@@ -36,7 +36,7 @@ const produce_one_frame = () => {
     const finished_frame = performance.now()
     totalFrameTimeBuffer.push(finished_frame - start_frame)
 
-	if (window.reset == true && reset_delay < 1) reset_delay = 300  /// 10 Seconds
+	if (window.reset == true && reset_delay < 1) reset_delay = (30 * 45)  /// 45 Seconds
 
     //if (n_frames > 100000) { throw "Hit max frames" }
     //console.log("new frame: " + n_frames)

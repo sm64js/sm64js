@@ -506,6 +506,7 @@ export const init_marios = () => {
         hurtCounter: 0,
         healCounter: 0,
         capTimer: 0,
+		pvp: 1,
         quicksandDepth: 0.0,
         area: Area.gCurrentArea,
         marioObj: ObjectListProcessor.gMarioObject,
@@ -1155,7 +1156,7 @@ const update_mario_geometry_inputs = (m) => {
     }
 
     /// bouncepad
-    if (m.floor.type == 0x0004 && !(m.input & INPUT_OFF_FLOOR)) {
+    if (m.floor.type == 0x0004 && !(m.input & INPUT_OFF_FLOOR && m.health > 0xFF)) {
         m.vel[1] = 200
         set_mario_action(m, ACT_PARACHUTING, 0)
     }

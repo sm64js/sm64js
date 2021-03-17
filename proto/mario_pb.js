@@ -3229,7 +3229,8 @@ proto.sm64js.MarioMsg.toObject = function(includeInstance, msg) {
     forwardvel: +jspb.Message.getFieldWithDefault(msg, 17, 0.0),
     rawdataList: jspb.Message.getRepeatedField(msg, 18),
     usedobjid: jspb.Message.getFieldWithDefault(msg, 19, 0),
-    socketid: jspb.Message.getFieldWithDefault(msg, 20, 0)
+    socketid: jspb.Message.getFieldWithDefault(msg, 20, 0),
+    pvp: jspb.Message.getFieldWithDefault(msg, 21, false)
   };
 
   if (includeInstance) {
@@ -3346,6 +3347,10 @@ proto.sm64js.MarioMsg.deserializeBinaryFromReader = function(msg, reader) {
     case 20:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setSocketid(value);
+      break;
+    case 21:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setPvp(value);
       break;
     default:
       reader.skipField();
@@ -3514,6 +3519,13 @@ proto.sm64js.MarioMsg.serializeBinaryToWriter = function(message, writer) {
   if (f !== 0) {
     writer.writeUint32(
       20,
+      f
+    );
+  }
+  f = message.getPvp();
+  if (f) {
+    writer.writeBool(
+      21,
       f
     );
   }
@@ -3902,6 +3914,23 @@ proto.sm64js.MarioMsg.prototype.getSocketid = function() {
 /** @param {number} value */
 proto.sm64js.MarioMsg.prototype.setSocketid = function(value) {
   jspb.Message.setProto3IntField(this, 20, value);
+};
+
+
+/**
+ * optional bool pvp = 21;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.sm64js.MarioMsg.prototype.getPvp = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 21, false));
+};
+
+
+/** @param {boolean} value */
+proto.sm64js.MarioMsg.prototype.setPvp = function(value) {
+  jspb.Message.setProto3BooleanField(this, 21, value);
 };
 
 

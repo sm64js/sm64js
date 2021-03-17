@@ -112,9 +112,17 @@ export const custom_draw_text = (x, y, w) => {
         context2d.font = "bold 14px verdana, sans-serif"
         context2d.textAlign = "center"
         context2d.fillStyle = "#9400D3"
-        context2d.fillText(customData2D.playerName, pixelX, pixelY)
+        context2d.fillText(customData2D.playerName , pixelX, pixelY)
     }
-
+	
+	if (customData2D.health != null) {
+		const HEALTH = customData2D.health > 0 ? customData2D.health >> 8 : 0
+		if (HEALTH < 8) {
+			context2d.globalAlpha = 0.8
+			context2d.drawImage(marioHealthWedges[HEALTH], pixelX - 32, pixelY - 80, 64, 64)
+		}
+	}
+	
     if (customData2D.chat) {
         custom_draw_message_bubble(customData2D.chat, "16", pixelX, pixelY, "#FFFFFF", 0.8, "#000000")
     }
@@ -170,7 +178,7 @@ export const draw2Dpost3Drendering = () => {
     }
 	if (gameData.marioState && !isNaN(window.myMario.readOnlyHealth)) {
         context2d.globalAlpha = 1.0
-        context2d.drawImage(marioHealthWedges[window.myMario.readOnlyHealth],518,50,128,128)
+        context2d.drawImage(marioHealthWedges[window.myMario.readOnlyHealth],518 + 16,42,96,96)
         context2d.globalAlpha = 0.8
 	}		
     if (window.show_minimap > 0 && gameData.marioState && minimapEnabledLevel()) {

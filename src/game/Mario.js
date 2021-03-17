@@ -154,6 +154,12 @@ export const MARIO_ANIM_WATER_PICK_UP_OBJ = 0xAE
 export const MARIO_ANIM_WATER_GRAB_OBJ_PART2 = 0xAF 
 export const MARIO_ANIM_WATER_GRAB_OBJ_PART1 = 0xB0 
 
+export const MARIO_ANIM_DYING_FALL_OVER 	= 0x32
+export const MARIO_ANIM_DYING_ON_BACK 		= 0x03
+export const MARIO_ANIM_DYING_ON_STOMACH 	= 0x2E
+export const MARIO_ANIM_SUFFOCATING 	= 0x2F
+
+
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -277,6 +283,11 @@ export const ACT_FEET_STUCK_IN_GROUND = 0x0002033C
 export const ACT_VERTICAL_WIND = 0x1008089C
 export const ACT_SQUISHED = 0x00020339
 export const ACT_STANDING_DEATH = 0x00021311
+export const ACT_SUFFOCATION      = 0x00021314 // (0x114 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE)
+export const ACT_DEATH_ON_STOMACH = 0x00021315 // (0x115 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE)
+export const ACT_DEATH_ON_BACK    = 0x00021316 // (0x116 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE)
+
+
 
 
 
@@ -1058,13 +1069,6 @@ const update_mario_health = (m) => {
         // TODO // Play a noise to alert the player when Mario is close to drowning.
 
     }
-
-
-    /// TODO HACK because death is not implemented - Delay respawn.
-    if (m.health < 0x100) {
-		m.health--
-		if (m.health < 0xD5) respawn_player(m)
-	}
 }
 
 const update_mario_button_inputs = (m) => {

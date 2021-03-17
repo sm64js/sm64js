@@ -60,7 +60,7 @@ const update_air_with_turn = (m) => {
             m.faceAngle[1] += Math.floor(512.0 * Math.sin(intendedDYaw / 0x8000 * Math.PI) * intendedMag)
         }
 
-        if (m.action == Mario.ACT_PARACHUTING && m.forwardVel > 60.0) m.forwardVel = 60.0
+        if (m.action == Mario.ACT_PARACHUTING && m.forwardVel > (60.0 + (m.vel[1] < 0 ? 0 : m.vel[1]) * 0.6)) m.forwardVel = (60 + (m.vel[1] < 0 ? 0 : m.vel[1]) * 0.6)
 
 
         //! Uncapped air speed. Net positive when moving forward.
@@ -223,7 +223,7 @@ const act_soft_bonk = (m) => {
 
 const check_kick_or_dive_in_air = (m) => {
     if (m.input & Mario.INPUT_B_PRESSED) {
-		m.canGlide = (m.forwardVel > 28.0 ? 8 : m.canGlide)
+		m.canGlide = (m.forwardVel > 28.0 ? 2 : m.canGlide)
         return Mario.set_mario_action(m, m.forwardVel > 28.0 ? Mario.ACT_DIVE : Mario.ACT_JUMP_KICK, 0)
     }
     return 0
@@ -296,18 +296,21 @@ const act_parachuting = (m) => {
     }
 	
 	if (!(m.input & Mario.INPUT_A_DOWN) && m.actionArg == 2) {
-		if (m.vel[1] < -40.0) { m.vel[3] = (m.vel[1] * -0.75); m.actionArg = 3 }
+		if (m.vel[1] < -35.0) { m.vel[3] = (m.vel[1] * -0.9); m.actionArg = 3 }
     }
 	if (m.actionArg == 3) {
-		m.vel[1] += 16.0
-		m.vel[0] *= 1.025
-		m.vel[2] *= 1.025
-		if (m.vel[1] >= m.vel[3]) {m.vel[1] = m.vel[3];m.actionArg = 1}
+		if (m.vel[1] + 16.0 >= m.vel[3]) {
+			m.vel[1] = (m.vel[3] - 2);m.actionArg = 1
+			} else {
+				m.vel[1] += 16.0
+				m.vel[0] *= 1.025
+				m.vel[2] *= 1.025
+			}
     }
 	
     common_air_action_step(m, Mario.ACT_STOMACH_SLIDE, Mario.MARIO_ANIM_SLIDE_DIVE, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
 	
-	if (m.vel[1] < ((m.actionArg == 2) ? -80.0 : -30.0)) m.vel[1] = ((m.actionArg == 2) ? -80.0 : -30.0)
+	if (m.vel[1] < ((m.actionArg == 2) ? -100.0 : -30.0)) m.vel[1] = ((m.actionArg == 2) ? -100.0 : -30.0)
 
 	m.marioObj.header.gfx.angle[0] = m.vel[1] * -100.0
 	

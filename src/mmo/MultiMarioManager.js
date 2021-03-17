@@ -46,7 +46,7 @@ export const copyMarioUpdateToState = (remotePlayer) => {
 
     m.actionState = (m.action != update.action) ? 0 : update.actionstate
     m.actionTimer = (m.action != update.action) ? 0 : update.actiontimer
-
+    m.health = update.health
     m.action = update.action
     m.prevAction = update.prevaction
     m.actionArg = update.actionarg
@@ -61,7 +61,6 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     m.pos = update.posList
     m.faceAngle = update.faceangleList
     m.socket_id = update.socketid
-    m.parachuting = update.parachuting
 
     m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
     m.marioObj.rawData[RAW.oRoom] = -1
@@ -81,7 +80,7 @@ export const createMarioProtoMsg = () => {
     const mariomsg = new MarioMsg()
 
     mariomsg.setController(createControllerProtoMsg())
-
+    mariomsg.setHealth(m.health)
     mariomsg.setAction(m.action)
     mariomsg.setPrevaction(m.prevAction)
     mariomsg.setActionstate(m.actionState)
@@ -97,7 +96,6 @@ export const createMarioProtoMsg = () => {
     mariomsg.setPosList(m.pos)
     mariomsg.setVelList(m.vel)
     mariomsg.setForwardvel(m.forwardVel)
-    mariomsg.setParachuting(m.parachuting)
 
     if (m.usedObj) mariomsg.setUsedobjid(m.usedObj.rawData[RAW.oSyncID])
 
@@ -123,6 +121,7 @@ const initNewRemoteMarioState = (marioProto) => {
         invincTimer: 0,
         flags: m.flags,
         forwardVel: marioProto.getForwardvel(),
+        health: 0x880,
         squishTimer: 0,
         hurtCounter: 0,
         healCounter: 0,

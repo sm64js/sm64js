@@ -1037,10 +1037,16 @@ export class n64GfxProcessor {
 
     custom_set_player_data(socket_id) { 
         const data = getExtraRenderData(socket_id)
+		const socketData = networkData.remotePlayers[socket_id]
         this.customData3D = data.custom3D
         customData2D.chat = data.custom2D.chat
         customData2D.playerName = data.custom2D.playerName
         customData2D.announcement = data.custom2D.announcement
+		if (socketData == undefined) { 
+			customData2D.health = null
+		} else {
+			customData2D.health = socketData.marioState.health
+		}
     }
 
     run_dl(commands) {

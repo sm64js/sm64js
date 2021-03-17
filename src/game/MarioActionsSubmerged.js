@@ -1,3 +1,4 @@
+import { common_death_handler } from "./MarioActionsCutscene"
 import * as Mario from "./Mario"
 import { atan2s, approach_number } from "../engine/math_util"
 import { SurfaceCollisionInstance as SurfaceCollisions } from "../engine/SurfaceCollision"
@@ -421,17 +422,18 @@ const act_drowning = (m) => {
         case 0:
             Mario.set_mario_animation(m, Mario.MARIO_ANIM_DROWNING_PART1)
             // TODO m.marioBodyState.eyeState = Mario.MARIO_EYES_HALF_CLOSED;
-            if (is_anim_at_end(m)) {
+            if (Mario.is_anim_at_end(m)) {
                 m.actionState = 1
             }
             break
 
         case 1:
-            Mario.set_mario_animation(m, Mario.MARIO_ANIM_DROWNING_PART2)
+            //Mario.set_mario_animation(m, Mario.MARIO_ANIM_DROWNING_PART2)
             // TODO m.marioBodyState.eyeState = Mario.MARIO_EYES_DEAD;
-            if (m.marioObj.header.gfx.animInfo.animFrame == 30) {
+            //if (m.marioObj.header.gfx.animInfo.animFrame == 30) {
                 // TODO level_trigger_warp(m, WARP_OP_DEATH);
-            }
+            //}
+			common_death_handler(m, Mario.MARIO_ANIM_DROWNING_PART2, 30);
             break
     }
 
@@ -734,13 +736,7 @@ const common_water_knockback_step = (m, animation, endAction, arg3) => {
 const act_water_death = (m) => {
     stationary_slow_down(m)
     perform_water_step(m)
-
-    // TODO m.marioBodyState.eyeState = MARIO_EYES_DEAD;
-
-    /* TODO Mario.set_mario_animation(m, Mario.MARIO_ANIM_WATER_DYING);
-    if (Mario.set_mario_animation(m, Mario.MARIO_ANIM_WATER_DYING) == 35) {
-        level_trigger_warp(m, WARP_OP_DEATH);
-    }*/
+    common_death_handler(m, Mario.MARIO_ANIM_WATER_DYING, 35)
 
     return 0
 }

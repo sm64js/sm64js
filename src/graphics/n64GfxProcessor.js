@@ -1,5 +1,6 @@
 import { WebGLInstance as WebGL } from "./WebGL"
 import * as Gbi from "../include/gbi"
+import { gameData as socketGameData, networkData } from "../mmo/socket"
 import { getExtraRenderData } from "../mmo/cosmetics"
 import { flagCounter } from "../levels/castle_grounds/areas/1/11/model.inc"
 import { customData2D, custom_draw_text, draw2Dpost3Drendering } from "../mmo/graphics/2Dgraphics"
@@ -1036,10 +1037,16 @@ export class n64GfxProcessor {
 
     custom_set_player_data(socket_id) { 
         const data = getExtraRenderData(socket_id)
+		const socketData = networkData.remotePlayers[socket_id]
         this.customData3D = data.custom3D
         customData2D.chat = data.custom2D.chat
         customData2D.playerName = data.custom2D.playerName
         customData2D.announcement = data.custom2D.announcement
+		if (socketData == undefined) { 
+			customData2D.health = null
+		} else {
+			customData2D.health = socketData.marioState.health
+		}
     }
 
     run_dl(commands) {

@@ -1098,7 +1098,7 @@ const common_ground_knockback_action = (m, animation, arg2, arg3, arg4) => {
         }
     } else if (Mario.is_anim_at_end(m)) {
         if (m.health < 0x100) {
-            //set_mario_action(m, ACT_STANDING_DEATH, 0)
+            Mario.set_mario_action(m, Mario.ACT_STANDING_DEATH, 0)
         } else {
             if (arg4 > 0) {
                 m.invincTimer = 30
@@ -1133,12 +1133,18 @@ export const act_soft_backward_ground_kb = (m) => {
 
 export const act_hard_backward_ground_kb = (m) => {
     const val04 = common_ground_knockback_action(m, Mario.MARIO_ANIM_FALL_OVER_BACKWARDS, 0x2B, true, m.actionArg)
-    return 0
+    if (val04 == 43 && m.health < 0x100) {
+        Mario.set_mario_action(m, Mario.ACT_DEATH_ON_BACK, 0);
+    }
+	return 0
 }
 
 export const act_hard_forward_ground_kb = (m) => {
     const val04 = common_ground_knockback_action(m, Mario.MARIO_ANIM_LAND_ON_STOMACH, 0x15, true, m.actionArg)
-    return 0
+    if (val04 == 23 && m.health < 0x100) {
+        Mario.set_mario_action(m, Mario.ACT_DEATH_ON_STOMACH, 0);
+    }
+	return 0
 }
 
 const check_common_moving_cancels = (m) => {

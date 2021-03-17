@@ -154,6 +154,12 @@ export const MARIO_ANIM_WATER_PICK_UP_OBJ = 0xAE
 export const MARIO_ANIM_WATER_GRAB_OBJ_PART2 = 0xAF 
 export const MARIO_ANIM_WATER_GRAB_OBJ_PART1 = 0xB0 
 
+export const MARIO_ANIM_DYING_FALL_OVER 	= 0x32
+export const MARIO_ANIM_DYING_ON_BACK 		= 0x03
+export const MARIO_ANIM_DYING_ON_STOMACH 	= 0x2E
+export const MARIO_ANIM_SUFFOCATING 	= 0x2F
+
+
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -277,6 +283,11 @@ export const ACT_FEET_STUCK_IN_GROUND = 0x0002033C
 export const ACT_VERTICAL_WIND = 0x1008089C
 export const ACT_SQUISHED = 0x00020339
 export const ACT_STANDING_DEATH = 0x00021311
+export const ACT_SUFFOCATION      = 0x00021314 // (0x114 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE)
+export const ACT_DEATH_ON_STOMACH = 0x00021315 // (0x115 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE)
+export const ACT_DEATH_ON_BACK    = 0x00021316 // (0x116 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE)
+
+
 
 
 
@@ -1008,6 +1019,10 @@ const mario_update_hitbox_and_cap_model = (m) => {
 }
 
 const update_mario_health = (m) => {
+	if (m.marioObj.localMario) {
+		window.myMario.readOnlyHealth = m.health > 0 ? m.health >> 8 : 0
+	}
+
 
     if (m.health >= 0x100) {
 
@@ -1054,10 +1069,6 @@ const update_mario_health = (m) => {
         // TODO // Play a noise to alert the player when Mario is close to drowning.
 
     }
-
-
-    /// TODO HACK because death is not implemented
-    if (m.health < 0x100) m.health = 0x100
 }
 
 const update_mario_button_inputs = (m) => {
@@ -1372,7 +1383,7 @@ const update_mario_inputs = (m) => {
     update_mario_joystick_inputs(m)
     update_mario_button_inputs(m) 
     update_mario_geometry_inputs(m)
-
+	if (window.reset) {respawn_player(m)}
     if (m.controller.taunt && (m.action == ACT_IDLE || m.action == ACT_TAUNT)) m.input |= INPUT_TAUNT
     if (m.controller.parachute && (m.vel[1] < 0.0)) m.input |= INPUT_PARACHUTE
 	m.canGlide = (PARACHUTE_LIMITERS.includes(m.action) ? m.canGlide : -1);
@@ -1484,4 +1495,16 @@ export const transition_submerged_to_walking = m => {
     } else {
         return set_mario_action(m, ACT_HOLD_WALKING, 0);
     }
+}
+
+export const respawn_player = (m) => {
+        set_mario_action(m, ACT_FREEFALL, 0)
+        m.pos = [...Area.gMarioSpawnInfo.startPos]
+        m.angle = [...Area.gMarioSpawnInfo.startAngle]
+        m.vel = [0, 0, 0]
+        m.forwardVel = 0
+		m.health = 0x880
+		m.healCounter = 1
+		m.hurtCounter = 1
+        m.invincTimer = 60
 }

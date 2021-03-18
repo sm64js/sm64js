@@ -867,9 +867,13 @@ const act_karting = (m) => {
 	
 	let Vel = m.forwardVel // used to prevent jitter when setting forward vel
 	
+	if (m.forwardVel > 16) {
+		m.particleFlags |= MarioConstants.PARTICLE_DUST;	
+	}
+	
 	// Prevents slowdown in air so you maintain speed on land.
 	if (!(m.input & Mario.INPUT_OFF_FLOOR)) {
-		if (m.input & Mario.INPUT_A_DOWN) {
+		if (m.input & Mario.INPUT_A_DOWN && !should_begin_sliding(m)) {
 			if (Vel < 75) {
 				Vel += 2
 			} else {
@@ -880,6 +884,9 @@ const act_karting = (m) => {
 		}
 	}
 	
+	if (should_begin_sliding(m)) {
+		update_sliding(m)
+	}
 	
 	// Need to figure out why this is broken... TODO
     // if (m.input & Mario.INPUT_B_PRESSED && !(m.input & Mario.INPUT_OFF_FLOOR)) {
@@ -892,7 +899,7 @@ const act_karting = (m) => {
 		Mario.set_mario_action(m, Mario.ACT_IDLE, 0)
     }
 
-    if (m.input & Mario.INPUT_NONZERO_ANALOG && !(m.input & Mario.INPUT_OFF_FLOOR)) {
+    if (m.input & Mario.INPUT_NONZERO_ANALOG && !(m.input & Mario.INPUT_OFF_FLOOR) && !should_begin_sliding(m)) {
 		let number16 = parseInt(m.intendedYaw - m.faceAngle[1])
 		let change = Math.round(10 + (Vel*10 < 10 ? 10 : Vel*10))
 		number16 = number16 > 32767 ? number16 - 65536 : number16

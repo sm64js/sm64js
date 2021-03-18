@@ -19,6 +19,7 @@ import * as Multi from "./MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
 import { updateFlagData, setInitFlagHeight } from "../game/behaviors/bhv_castle_flag_init.inc"
 import { recvChat, decrementChat } from "./chat"
+import { GameInstance as Game } from "../game/Game"
 
 Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
 
@@ -374,6 +375,9 @@ export const post_main_loop_one_iteration = (frame) => {
 }
 
 const checkForFlagGrab = () => {
+	//// don't check flag grabs if pvp is disabled
+	if (!Game.pvpEnabled) {return}
+
 
     //// check all flags to see if linked to local mario, and skip this function
     for (let i = 0; i < networkData.flagData.length; i++) {

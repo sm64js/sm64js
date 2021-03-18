@@ -282,7 +282,7 @@ const interact_player = (m, o) => {
             // m.invincTimer = 10 /// one solution that fixes attacking mario knockback on jump kick
             Mario.set_mario_action(m2, Mario.ACT_FREEFALL, 0)
         }
-        if (m.marioObj.localMario) {
+        if (m.marioObj.localMario && Game.pvpEnabled) {
             //m2.ignoreUpdates = 40
             sendAttackToServer(m2.socket_id)
             //sendPlayerInteraction(m2.socket_id, interaction)  /// unused

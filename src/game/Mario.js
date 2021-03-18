@@ -1389,8 +1389,8 @@ const update_mario_inputs = (m) => {
     update_mario_geometry_inputs(m)
 	if (window.reset) {respawn_player(m)}
     if (m.controller.taunt && (m.action == ACT_IDLE || m.action == ACT_TAUNT)) m.input |= INPUT_TAUNT
-    if (m.controller.parachute && (m.vel[1] < 0.0)) m.input |= INPUT_PARACHUTE
-    if (m.controller.parachute && (m.action == ACT_IDLE)) set_mario_action(m, ACT_KARTING, 0)
+    if (m.controller.parachute && ((m.vel[1] < 0.0) || ([ACT_IDLE, ACT_KARTING, ACT_WALKING].includes(m.action) && Math.abs(m.forwardVel) < 16))) m.input |= INPUT_PARACHUTE
+	
 	m.canGlide = (PARACHUTE_LIMITERS.includes(m.action) ? m.canGlide : -1);
 	
     if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) {

@@ -154,6 +154,8 @@ export const MARIO_ANIM_WATER_PICK_UP_OBJ = 0xAE
 export const MARIO_ANIM_WATER_GRAB_OBJ_PART2 = 0xAF 
 export const MARIO_ANIM_WATER_GRAB_OBJ_PART1 = 0xB0 
 
+export const MARIO_ANIM_SLIDING_ON_BOTTOM_WITH_LIGHT_OBJ = 0x45
+
 export const MARIO_ANIM_DYING_FALL_OVER 	= 0x32
 export const MARIO_ANIM_DYING_ON_BACK 		= 0x03
 export const MARIO_ANIM_DYING_ON_STOMACH 	= 0x2E
@@ -375,6 +377,7 @@ export const ACT_FLAGWATER_OR_TEXT = (1 << 29)
 export const ACT_FLAG_THROWING = (1 << 31)
 export const ACT_TAUNT = (0x193 | ACT_FLAG_STATIONARY | ACT_FLAG_IDLE)
 export const ACT_PARACHUTING = 0x1100088C
+export const ACT_KARTING = 0x10840452
 
 
 //Used by m.canGlide for determining max amount of glider uses per action.
@@ -1387,6 +1390,7 @@ const update_mario_inputs = (m) => {
 	if (window.reset) {respawn_player(m)}
     if (m.controller.taunt && (m.action == ACT_IDLE || m.action == ACT_TAUNT)) m.input |= INPUT_TAUNT
     if (m.controller.parachute && (m.vel[1] < 0.0)) m.input |= INPUT_PARACHUTE
+    if (m.controller.parachute && (m.action == ACT_IDLE)) set_mario_action(m, ACT_KARTING, 0)
 	m.canGlide = (PARACHUTE_LIMITERS.includes(m.action) ? m.canGlide : -1);
 	
     if (Camera.gCameraMovementFlags & Camera.CAM_MOVE_C_UP_MODE) {

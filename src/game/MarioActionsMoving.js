@@ -2,7 +2,7 @@ import * as Mario from "./Mario"
 import * as MarioConstants from "../include/mario_constants"
 import { SURFACE_SLOW, SURFACE_CLASS_VERY_SLIPPERY, SURFACE_CLASS_SLIPPERY, SURFACE_CLASS_NOT_SLIPPERY, TERRAIN_MASK, TERRAIN_SLIDE } from "../include/surface_terrains"
 import * as SurfaceTerrains from "../include/surface_terrains"
-import { mario_bonk_reflection, perform_ground_step } from "./MarioStep"
+import { mario_bonk_reflection, perform_ground_step, stationary_ground_step, perform_air_step } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
 import { oMarioWalkingPitch } from "../include/object_constants"
 import { mario_update_punch_sequence } from "./MarioActionsObject"
@@ -860,6 +860,78 @@ const act_butt_slide = (m) => {
     return cancel;
 }
 
+const act_karting = (m) => {
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_SLIDING_ON_BOTTOM_WITH_LIGHT_OBJ, 0)
+    m.marioBodyState.torsoAngle[0] = 0x1000
+    m.marioBodyState.torsoAngle[2] = 0x0000
+	
+	let Vel = m.forwardVel // used to prevent jitter when setting forward vel
+	
+	// Prevents slowdown in air so you maintain speed on land.
+	if (!(m.input & Mario.INPUT_OFF_FLOOR)) {
+		if (m.input & Mario.INPUT_A_DOWN) {
+			if (Vel < 75) {
+				Vel += 2
+			} else {
+				Vel = 75
+			}
+		} else {
+			Vel *= 0.95545
+		}
+	}
+	
+	
+	// Need to figure out why this is broken... TODO
+    // if (m.input & Mario.INPUT_B_PRESSED && !(m.input & Mario.INPUT_OFF_FLOOR)) {
+		// m.input ^= Mario.INPUT_OFF_FLOOR // Prevent crash / infinite loop.
+		// m.vel[1] = 32
+		// return 1
+    // }
+	
+    if ((m.input & Mario.INPUT_Z_PRESSED) && Vel < 16) {
+		Mario.set_mario_action(m, Mario.ACT_IDLE, 0)
+    }
+
+    if (m.input & Mario.INPUT_NONZERO_ANALOG && !(m.input & Mario.INPUT_OFF_FLOOR)) {
+		let number16 = parseInt(m.intendedYaw - m.faceAngle[1])
+		let change = Math.round(10 + (Vel*10 < 10 ? 10 : Vel*10))
+		number16 = number16 > 32767 ? number16 - 65536 : number16
+		number16 = number16 < -32768 ? number16 + 65536 : number16
+		m.faceAngle[1] = m.intendedYaw - approach_number(number16, 0, change, change)
+    }
+	
+	m.forwardVel = Vel
+	
+	if (m.input & Mario.INPUT_OFF_FLOOR) {
+		perform_air_step(m, 1)
+		m.marioObj.header.gfx.angle[2] = 0
+		m.marioObj.header.gfx.angle[0] = m.vel[1] * -100.0 // Same as glider, dynamically rotate pitch based on vel
+	}
+	else
+	{
+		apply_slope_accel(m)
+		switch (perform_ground_step(m)) {
+			case Mario.GROUND_STEP_NONE:
+				break
+			case Mario.GROUND_STEP_LEFT_GROUND:
+				break
+			case Mario.GROUND_STEP_HIT_WALL:
+				m.forwardVel *= -0.5
+				break
+			default: throw "unkown ground step in act_karting"
+		}
+		m.marioObj.header.gfx.angle[2] = Mario.find_floor_slope(m, 0x4000);
+		m.marioObj.header.gfx.angle[0] = -Mario.find_floor_slope(m, 0x0);
+	}
+	
+	//Reposition mario + kart so wheels are on the ground...
+	m.marioObj.header.gfx.pos[1] += 24
+	//... and make mario lean forward a bit so he doesn't clip through the seat.
+	
+    return 0;
+}
+
+
 const act_stomach_slide = (m) => {
     const cancel = stomach_slide_action(m, Mario.ACT_STOMACH_SLIDE_STOP, Mario.ACT_FREEFALL, Mario.MARIO_ANIM_SLIDE_DIVE);
     return cancel;
@@ -1187,6 +1259,7 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_JUMP_LAND: return act_jump_land(m)
         case Mario.ACT_FREEFALL_LAND: return act_freefall_land(m)
         case Mario.ACT_BUTT_SLIDE: return act_butt_slide(m)
+        case Mario.ACT_KARTING: return act_karting(m)
         case Mario.ACT_STOMACH_SLIDE: return act_stomach_slide(m)
         case Mario.ACT_SIDE_FLIP_LAND: return act_side_flip_land(m)
         case Mario.ACT_DOUBLE_JUMP_LAND: return act_double_jump_land(m)

@@ -39,7 +39,7 @@ class MarioMisc {
         if (callContext == GEO_CONTEXT_RENDER) {
             const rotNode = node.next
 
-            if (![Mario.ACT_WALKING, Mario.ACT_BUTT_SLIDE, Mario.ACT_HOLD_BUTT_SLIDE, Mario.ACT_RIDING_SHELL_GROUND].includes(action)) {
+            if (![Mario.ACT_WALKING, Mario.ACT_BUTT_SLIDE, Mario.ACT_HOLD_BUTT_SLIDE, Mario.ACT_RIDING_SHELL_GROUND, Mario.ACT_KARTING].includes(action)) {
                 this.gBodyState.torsoAngle = [0,0,0]
             }
 
@@ -82,6 +82,12 @@ class MarioMisc {
     geo_switch_parachuting(callContext, switchCase) {
         if (callContext == GEO_CONTEXT_RENDER) {
             switchCase.selectedCase = (this.gBodyState.action == Mario.ACT_PARACHUTING) ? 1 : 0
+        }
+    }
+
+    geo_switch_karting(callContext, switchCase) {
+        if (callContext == GEO_CONTEXT_RENDER) {
+            switchCase.selectedCase = (this.gBodyState.action == Mario.ACT_KARTING) ? 1 : 0
         }
     }
 }

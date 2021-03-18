@@ -865,7 +865,38 @@ const act_butt_slide = (m) => {
     return cancel;
 }
 
+//Hacky way to smooth kart.
+const kart_angle_smoothing = (m, speed, angle) => {
+		angle[1] = m.marioObj.header.gfx.angle[1]
+		const targetAngle0 = -Mario.find_floor_slope(m, 0x0)
+		const targetAngle2 = Mario.find_floor_slope(m, 0x4000)
+		if (angle[0] < targetAngle0) {
+			angle[0] += speed
+			if (angle[0] > targetAngle0) {
+				angle[0] = targetAngle0
+			}
+		} else {
+			angle[0] -= speed
+			if (angle[0] < targetAngle0) {
+				angle[0] = targetAngle0
+			}
+		}
+		if (angle[2] < targetAngle2) {
+			angle[2] += speed
+			if (angle[2] > targetAngle2) {
+				angle[2] = targetAngle2
+			}
+		} else {
+			angle[2] -= speed
+			if (angle[2] < targetAngle2) {
+				angle[2] = targetAngle2
+			}
+		}
+		m.marioObj.header.gfx.angle = angle
+}
+
 const act_karting = (m) => {
+	const ANGLE_BUF = [...m.marioObj.header.gfx.angle]
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_SLIDING_ON_BOTTOM_WITH_LIGHT_OBJ, 0)
     m.marioBodyState.torsoAngle[0] = 0x1000
     m.marioBodyState.torsoAngle[2] = 0x0000
@@ -940,8 +971,7 @@ const act_karting = (m) => {
 		}
 		if (m.actionState == 0) {
 			apply_slope_accel(m)
-			m.marioObj.header.gfx.angle[2] = Mario.find_floor_slope(m, 0x4000);
-			m.marioObj.header.gfx.angle[0] = -Mario.find_floor_slope(m, 0x0);
+			kart_angle_smoothing(m, 0x800, ANGLE_BUF)
 		}
 	}
 	m.marioObj.header.gfx.pos[1] += m.actionState == 1 ? 12 : 24

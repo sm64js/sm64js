@@ -924,7 +924,7 @@ const act_karting = (m) => {
 		m.input ^= Mario.INPUT_PARACHUTE
         return Mario.set_mario_action(m, Mario.ACT_IDLE, 0)
     }
-    if (m.input & Mario.INPUT_NONZERO_ANALOG && !(m.input & Mario.INPUT_OFF_FLOOR)) {
+    if (m.input & Mario.INPUT_NONZERO_ANALOG && m.actionState == 0) {
 		let number16 = parseInt(m.intendedYaw - m.faceAngle[1])
 		let change = Math.round(10 + (Vel*10))
 		number16 = number16 > 32767 ? number16 - 65536 : number16
@@ -940,9 +940,15 @@ const act_karting = (m) => {
 				case Mario.AIR_STEP_NONE:
 					break
 				case Mario.AIR_STEP_LANDED:
+					if (m.vel[1] < -16 && !should_begin_sliding(m)) {
+						m.vel[1] *= -0.25
+					} else {
 					m.actionState = 0
+					}
 					break
 				case Mario.AIR_STEP_HIT_WALL:
+					m.forwardVel *= -0.5
+					Mario.set_forward_vel(m, 1.25 * m.forwardVel)
 					break
 				case Mario.AIR_STEP_GRABBED_LEDGE:
 					break

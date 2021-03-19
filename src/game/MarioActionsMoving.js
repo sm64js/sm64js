@@ -931,16 +931,13 @@ const act_karting = (m) => {
 		number16 = number16 < -32768 ? number16 + 65536 : number16
 		m.faceAngle[1] = m.intendedYaw - approach_number(number16, 0, change, change)
     }
-	if (should_begin_sliding(m) && !(m.input & Mario.INPUT_OFF_FLOOR)) {
-		update_sliding(m)
-	}
 	m.forwardVel = Vel
 	if (m.input & Mario.INPUT_OFF_FLOOR || m.actionState == 1) {
 		switch (perform_air_step(m, 1)) {
 				case Mario.AIR_STEP_NONE:
 					break
 				case Mario.AIR_STEP_LANDED:
-					if (m.vel[1] < -16 && !should_begin_sliding(m)) {
+					if (m.vel[1] < -32 && !(m.input & Mario.INPUT_OFF_FLOOR) && !(m.input & Mario.INPUT_ABOVE_SLIDE)) {
 						m.vel[1] *= -0.25
 					} else {
 					m.actionState = 0
@@ -967,7 +964,7 @@ const act_karting = (m) => {
 			case Mario.GROUND_STEP_NONE:
 				break
 			case Mario.GROUND_STEP_LEFT_GROUND:
-				m.pos[1] += 12
+				if (!(m.input & Mario.INPUT_ABOVE_SLIDE)) m.pos[1] += 12
 				m.actionState = 1
 				break
 			case Mario.GROUND_STEP_HIT_WALL:
@@ -979,6 +976,10 @@ const act_karting = (m) => {
 			apply_slope_accel(m)
 			kart_angle_smoothing(m, 0x800, ANGLE_BUF)
 		}
+	}
+	if (should_begin_sliding(m) && !(m.input & Mario.INPUT_OFF_FLOOR)) {
+		update_sliding(m)
+		m.actionState == 0
 	}
 	m.marioObj.header.gfx.pos[1] += m.actionState == 1 ? 12 : 24
     return 0;

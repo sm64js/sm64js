@@ -169,10 +169,6 @@ const startGame = () => {
 
     document.getElementById("connectedMsg").hidden = false
 	
-	
-    document.getElementById("pvpButton").hidden = true
-	Game.load_pvp()
-	
     main_func()
 }
 

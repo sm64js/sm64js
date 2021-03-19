@@ -418,6 +418,9 @@ export const sendPlayerInteraction = (socket_id, interaction) => {
 
 export const submitPlayerName = () => {
 
+    document.getElementById("pvpButton").hidden = true
+	Game.load_pvp()
+
     const joinGameMsg = new JoinGameMsg()
 
     if (document.getElementById("customNameRow").hidden) { /// Discord Name Option

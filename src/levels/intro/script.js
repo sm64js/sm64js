@@ -3,7 +3,7 @@ import { intro_geo_0002D0, intro_geo_00035C } from "./geo"
 import { WARP_TRANSITION_FADE_INTO_COLOR, WARP_TRANSITION_FADE_FROM_STAR } from "../../game/Area"
 import { level_main_scripts_entry } from "../scripts"
 import { lvl_intro_update } from "../../menu/level_select_menu"
-import { LEVEL_CASTLE_GROUNDS, LEVEL_CASTLE, LEVEL_CASTLE_2, LEVEL_CASTLE_COURTYARD, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS, LEVEL_TTM, LEVEL_WF, LEVEL_HMC, LEVEL_BBH, LEVEL_SSL, LEVEL_SL } from "../level_defines_constants"
+import { LEVEL_CASTLE_GROUNDS, LEVEL_CASTLE, LEVEL_CASTLE_2, LEVEL_CASTLE_COURTYARD, LEVEL_BOB, LEVEL_CCM, LEVEL_CCS, LEVEL_PSS, LEVEL_TTM, LEVEL_WF, LEVEL_HMC, LEVEL_BBH, LEVEL_SSL, LEVEL_SL } from "../level_defines_constants"
 
 const getSelectedLevel = () => {
     const mapSelect = document.getElementById("mapSelect").value
@@ -22,6 +22,7 @@ const getSelectedLevel = () => {
         case "Snowman's Land": return LEVEL_SL
         case "Castle Inside First Level": return LEVEL_CASTLE
         case "Castle Inside Second Level": return LEVEL_CASTLE_2
+        case "Cool, Cool Mountain Slide": return LEVEL_CCS
     }
 
     return LEVEL_CASTLE_GROUNDS

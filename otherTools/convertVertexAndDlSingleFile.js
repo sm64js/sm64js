@@ -71,7 +71,7 @@ const convertRenderModeLine = (line) => {
 convert()
 
 function convert(MDTY) {
-	var input = require('os').homedir() + '/Programming/sm64pc/actors/chain_ball/model.inc.c' // directory of each model file
+	var input = require('os').homedir() + '/Programming/sm64pc/actors/sparkle/model.inc.c' // directory of each model file
 	if (!fs.existsSync(input)) {return;}
 	let inputStr = fs.readFileSync(input, 'utf8')
 	inputStr = inputStr.replace(/\r/g, "")

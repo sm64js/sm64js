@@ -4,15 +4,15 @@ const fs = require('fs')
 //You no longer need to touch snum or num, it checks if the files exist.
 
 // Configure these variables to get it to work
-var level = "wf" // level name in sm64ex directory
+var level = "ssl" // level name in sm64ex directory
 var baseGeo = true // whether you're converting the base geo.inc or one within a model directory
 var snum = 1 // used as a counter variable (Keep 1!)
-var num = 32 // number of model.inc.js files there are
+var num = 5 // number of model.inc.js files there are
 var areaNum = 1 // target area number
 var mainDir = __dirname + '/converted/' + level + '/areas/' + areaNum + '/' // directory to put models in
-var inputBase = require('os').homedir() + '/Programming/sm64pc/actors/mist/geo.inc.c' // directory of each model file
+var inputBase = require('os').homedir() + '/Programming/sm64pc/actors/sparkle/geo.inc.c' // directory of each model file
 
-const mydir = require('os').homedir() + '/Programming/sm64pc/actors/mist/'
+const mydir = require('os').homedir() + '/Programming/sm64pc/actors/sparkle/'
 
 //Not sure whether we need to skip commands.
 const skipCommands = [

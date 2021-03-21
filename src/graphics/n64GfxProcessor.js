@@ -757,6 +757,61 @@ export class n64GfxProcessor {
 
     }
 
+    dp_texture_rectangle(ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy, flip) {
+        const saved_combine_mode = this.rdp.combine_mode
+
+        if (this.rdp.other_mode_h[Gbi.G_MDSFT_CYCLETYPE] == Gbi.G_CYC_COPY) {
+            // Per RDP Command Summary Set Tile's shift s and this dsdx should be set to 4 texels
+            // Divide by 4 to get 1 instead
+            dsdx >>= 2
+
+            // Color combiner is turned off in copy mode
+            this.dp_set_combine_mode(this.color_comb(0, 0, 0, Gbi.G_CCMUX_TEXEL0), this.color_comb(0, 0, 0, Gbi.G_ACMUX_TEXEL0))
+
+            // Per documentation one extra pixel is added in this modes to each edge
+            lrx += 1 << 2
+            lry += 1 << 2
+        }
+
+        // uls and ult are S10.5
+        // dsdx and dtdy are S5.10
+        // lrx, lry, ulx, uly are U10.2
+        // lrs, lrt are S10.5
+        if (flip) {
+            dsdx = -dsdx
+            dtdy = -dtdy
+        }
+
+        const width = !flip ? lrx - ulx : lry - uly
+        const height = !flip ? lry - uly : lrx - ulx
+        const lrs = ((uls << 7) + dsdx * width) >> 7
+        const lrt = ((ult << 7) + dtdy * height) >> 7
+
+        const ul = this.rsp.loaded_vertices[MAX_VERTICES + 0]
+        const ll = this.rsp.loaded_vertices[MAX_VERTICES + 1]
+        const lr = this.rsp.loaded_vertices[MAX_VERTICES + 2]
+        const ur = this.rsp.loaded_vertices[MAX_VERTICES + 3]
+
+        ul.u = uls
+        ul.v = ult
+        lr.u = lrs
+        lr.v = lrt
+        if (!flip) {
+            ll.u = uls
+            ll.v = lrt
+            ur.u = lrs
+            ur.v = ult
+        } else {
+            ll.u = lrs
+            ll.v = ult
+            ur.u = uls
+            ur.v = lrt
+        }
+
+        this.draw_rectangle(ulx, uly, lrx, lry)
+        this.rdp.combine_mode = saved_combine_mode
+    }
+
     sp_texture(s, t) {
         this.rsp.texture_scaling_factor = { s, t }
     }
@@ -1038,6 +1093,10 @@ export class n64GfxProcessor {
                     break
                 case Gbi.G_FILLRECT:
                     this.dp_fill_rectangle(args.ulx, args.uly, args.lrx, args.lry)
+                    break
+                case Gbi.G_TEXRECT:
+                case Gbi.G_TEXRECTFLIP:
+                    this.dp_texture_rectangle(args.ulx, args.uly, args.lrx, args.lry, args.tile, args.uls, args.ult, args.dsdx, args.dtdy, opcode == Gbi.G_TEXRECTFLIP)
                     break
                 case Gbi.G_DL:
                     if (args.branch == 0) {

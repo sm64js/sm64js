@@ -29,6 +29,7 @@ export const G_SETSCISSOR = 26
 export const G_SETZIMG = 27
 export const G_SETCIMG = 28
 export const G_RDPLOADSYNC = 29
+export const G_TEXRECT = 30
 
 
 /// Custom Opcodes
@@ -526,6 +527,23 @@ export const gDPFillRectangle = (displaylist, ulx, uly, lrx, lry) => {
     })
 }
 
+export const gSPTextureRectangle = (displaylist, ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy) => {
+    displaylist.push({
+        words: {
+            w0: G_TEXRECT,
+            w1: { ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy }
+        }
+    })
+}
+
+export const gSPTextureRectangleFlip = (displaylist, ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy) => {
+    displaylist.push({
+        words: {
+            w0: G_FILLRECTFLIP,
+            w1: { ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy }
+        }
+    })
+}
 
 export const gSPTexture = (displaylist, s, t, level, tile, on) => {
     displaylist.push({
@@ -679,14 +697,24 @@ export const gSPDisplayList = (displaylist, childDisplayList) => {
     })
 }
 
-/*export const gDPSetTextureImage = (displaylist, format, size, width, imageData) => {
+export const gDPSetTextureImage = (displaylist, format, size, width, imageData) => {
     displaylist.push({
-        words: {
+         words: {
             w0: G_SETTIMG,
             w1: { format, size, width, imageData }
+         }
+     });
+ }
+
+export const gDPLoadBlock = (displaylist, tile, uls, ult, lrs) => { ///dxt skipped
+    displaylist.push({
+        words: {
+            w0: G_LOADBLOCK,
+            w1: { tile, uls, ult, lrs }
         }
     })
-}*/
+}
+
 
 export const gDPLoadBlockTexture = (displaylist, width, height, format, image) => {
     displaylist.push(
@@ -906,14 +934,6 @@ export const gsDPSetTextureImage = (format, size, width, imageData) => {
         words: {
             w0: G_SETTIMG,
             w1: { format, size, width, imageData }
-        }
-    }
-}
-
-export const gsDPLoadSync = () => {
-    return {
-        words: {
-            w0: G_RDPLOADSYNC
         }
     }
 }

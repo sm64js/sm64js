@@ -1,6 +1,6 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
-import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins, OBJ_FLAG_ACTIVE_FROM_AFAR, oActiveParticleFlags, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE, ACTIVE_PARTICLE_DUST } from "../include/object_constants"
+import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins, OBJ_FLAG_ACTIVE_FROM_AFAR, oActiveParticleFlags, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE, ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_BUBBLE, oWaterObjUnkF4, oWaterObjUnkF8, oPosX, oWaterObjUnkFC, oPosY, oPosZ, oInteractionSubtype } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 import { bhv_pole_init, bhv_giant_pole_loop } from "./behaviors/pole.inc"
@@ -17,7 +17,7 @@ import { bhv_bobomb_loop, bhv_bobomb_init, bhv_bobomb_fuse_smoke_init, bhv_dust_
 import { gLinker } from "./Linker"
 import { bhv_explosion_init, bhv_explosion_loop } from "./behaviors/explosion.inc"
 import { bhv_respawner_loop, bhv_bobomb_bully_death_smoke_init } from "./behaviors/corkbox.inc"
-import { MODEL_WOODEN_POST, MODEL_MIST, MODEL_SMOKE } from "../include/model_ids"
+import { MODEL_WOODEN_POST, MODEL_MIST, MODEL_SMOKE, MODEL_BUBBLE } from "../include/model_ids"
 import { poundable_pole_collision_06002490 } from "../actors/poundable_pole/collision.inc"
 import { bhv_wooden_post_update, bhv_chain_chomp_update, bhv_chain_chomp_chain_part_update } from "./behaviors/chain_chomp.inc"
 import { chain_chomp_seg6_anims_06025178 } from "../actors/chain_chomp/anims/table.inc"
@@ -25,6 +25,10 @@ import { bhv_pound_tiny_star_particle_init, bhv_pound_tiny_star_particle_loop, b
 import { bhv_white_puff_1_loop, bhv_white_puff_2_loop } from "./behaviors/white_puff.inc"
 import { bhv_pound_white_puffs_init } from "./behaviors/ground_particles.inc"
 import { bhv_white_puff_exploding_loop } from "./behaviors/white_puff_explode.inc"
+import { bhv_bubble_wave_init, bhv_small_water_wave_loop } from "./behaviors/water_objs.inc"
+import { bhv_coin_formation_init, bhv_coin_formation_loop, bhv_coin_formation_spawn_loop, bhv_yellow_coin_init, bhv_yellow_coin_loop, bhv_golden_coin_sparkles_loop, bhv_coin_sparkles_loop, bhv_coin_init, bhv_coin_loop } from "./behaviors/coin.inc"
+import { bhv_red_coin_init, bhv_red_coin_loop } from "./behaviors/red_coin.inc"
+import { bhv_moving_yellow_coin_init, bhv_moving_yellow_coin_loop } from "./behaviors/moving_coin.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -207,7 +211,7 @@ export const bhvExplosion = [
     { command: BhvCmds.call_native, args: { func: bhv_explosion_init } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_explosion_loop } },
-        { command: BhvCmds.add_int, args: { field: oAnimState, value: 1 } },
+        { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
     { command: BhvCmds.end_loop }
 ]
 
@@ -220,7 +224,7 @@ export const bhvBobombFuseSmoke = [
     { command: BhvCmds.delay, args: { num: 1 } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_dust_smoke_loop } },
-        { command: BhvCmds.add_int, args: { field: oAnimState, value: 1 } },
+        { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
     { command: BhvCmds.end_loop }
 ]
 
@@ -233,7 +237,7 @@ export const bhvBobombBullyDeathSmoke = [
     { command: BhvCmds.delay, args: { num: 1 } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_dust_smoke_loop } },
-        { command: BhvCmds.add_int, args: { field: oAnimState, value: 1 } },
+        { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
     { command: BhvCmds.end_loop }
 ]
 
@@ -360,7 +364,7 @@ export const bhvWhitePuff2 = [
     { command: BhvCmds.set_objectData_value, args: { field: oAnimState, value: -1 } },
     { command: BhvCmds.begin_repeat, args: { count: 7 } },
         { command: BhvCmds.call_native, args: { func: bhv_white_puff_2_loop } },
-        { command: BhvCmds.add_int, args: { field: oAnimState, value: 1 } },
+        { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
     { command: BhvCmds.end_repeat },
     { command: BhvCmds.deactivate }
 ]
@@ -393,6 +397,141 @@ export const bhvWhitePuffExplosion = [
     { command: BhvCmds.end_loop }
 ]
 
+export const bhvSmallWaterWave398 = [
+    { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
+    { command: BhvCmds.add_number, args: { field: oPosY, value: 7 } },
+    { command: BhvCmds.set_random_float, args: { field: oWaterObjUnkF4, minimum: -2, range: 5 } },
+    { command: BhvCmds.set_random_float, args: { field: oWaterObjUnkF8, minimum: -2, range: 5 } },
+    { command: BhvCmds.sum_float, args: { dest: oPosX, value1: oPosX, value2: oWaterObjUnkF4 } },
+    { command: BhvCmds.sum_float, args: { dest: oPosZ, value1: oPosZ, value2: oWaterObjUnkF8 } },
+    { command: BhvCmds.return }
+]
+
+export const bhvSmallWaterWave = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.call_native, args: { func: bhv_bubble_wave_init } },
+    { command: BhvCmds.set_random_float, args: { field: oWaterObjUnkF4, minimum: -50, range: 100 } },
+    { command: BhvCmds.set_random_float, args: { field: oWaterObjUnkF8, minimum: -50, range: 100 } },
+    { command: BhvCmds.sum_float, args: { dest: oPosX, value1: oPosX, value2: oWaterObjUnkF4 } },
+    { command: BhvCmds.sum_float, args: { dest: oPosZ, value1: oPosZ, value2: oWaterObjUnkF8 } },
+    { command: BhvCmds.set_random_float, args: { field: oWaterObjUnkFC, minimum: 0, range: 50 } },
+    { command: BhvCmds.sum_float, args: { dest: oPosY, value1: oPosY, value2: oWaterObjUnkFC } },
+    { command: BhvCmds.set_objectData_value, args: { field: oAnimState, value: -1 } },
+    { command: BhvCmds.call, args: { script: bhvSmallWaterWave398 } },
+    { command: BhvCmds.begin_repeat, args: { count: 60 } },
+        { command: BhvCmds.call, args: { script: bhvSmallWaterWave398 } },
+        { command: BhvCmds.call_native, args: { func: bhv_small_water_wave_loop } },
+    { command: BhvCmds.end_repeat },
+    { command: BhvCmds.deactivate }
+]
+
+export const bhvBubbleParticleSpawner = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.disable_rendering },
+    { command: BhvCmds.set_random_int, args: { field: oWaterObjUnkF4, minimum: 2, range: 9 } },
+    { command: BhvCmds.delay_var, args: { var: oWaterObjUnkF4 } },
+    { command: BhvCmds.spawn_child_with_param, args: { bhvParam: 0, model: MODEL_BUBBLE, behavior: bhvSmallWaterWave } },
+    { command: BhvCmds.parent_bit_clear, args: { field: oActiveParticleFlags, value: ACTIVE_PARTICLE_BUBBLE } },
+    { command: BhvCmds.deactivate }
+]
+
+export const bhvCoinFormationSpawn = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_coin_formation_spawn_loop } },
+    { command: BhvCmds.end_loop }
+]
+
+export const bhvCoinFormation = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SPAWNER } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
+    { command: BhvCmds.call_native, args: { func: bhv_coin_formation_loop } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_coin_formation_loop } },
+    { command: BhvCmds.end_loop }
+]
+
+export const bhvYellowCoin = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
+    { command: BhvCmds.call_native, args: { func: bhv_yellow_coin_init } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_yellow_coin_loop } },
+    { command: BhvCmds.end_loop }
+]
+
+export const bhvRedCoin = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oAnimState, value: -1 } },
+    ///{ command: BhvCmds.call_native, args: { func: bhv_init_room } },  TODO init room coin
+    { command: BhvCmds.call_native, args: { func: bhv_red_coin_init } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_red_coin_loop } },
+        { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
+    { command: BhvCmds.end_loop }
+]
+
+export const bhvMovingYellowCoin = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.set_hitbox, args: { radius: 100, height: 64 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oInteractionSubtype, value: Interact.INTERACT_COIN } },
+    { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oAnimState, value: -1 } },
+    { command: BhvCmds.call_native, args: { func: bhv_moving_yellow_coin_init } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_moving_yellow_coin_loop } },
+        { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
+    { command: BhvCmds.end_loop }
+
+]
+
+export const bhvSingleCoinGetsSpawned = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.call_native, args: { func: bhv_coin_init } },
+    { command: BhvCmds.set_obj_physics, args: { hitboxRadius: 30, gravity: -400, bounciness: -70, dragStrenth: 1000, friction: 1000, buoyancy: 200 } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_coin_loop } },
+        { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
+    { command: BhvCmds.end_loop }
+]
+
+export const bhvGoldenCoinSparkles = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.disable_rendering },
+    { command: BhvCmds.begin_repeat, args: { count: 3 } },
+        { command: BhvCmds.call_native, args: { func: bhv_golden_coin_sparkles_loop } },
+    { command: BhvCmds.end_repeat },
+    { command: BhvCmds.deactivate }
+]
+
+export const bhvCoinSparkles = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.billboard },
+    { command: BhvCmds.set_objectData_value, args: { field: oGraphYOffset, value: 25 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oAnimState, value: -1 } },
+    { command: BhvCmds.begin_repeat, args: { count: 8 } },
+        { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
+    { command: BhvCmds.end_repeat },
+    { command: BhvCmds.begin_repeat, args: { count: 2 } },
+        { command: BhvCmds.call_native, args: { func: bhv_coin_sparkles_loop } },
+    { command: BhvCmds.end_repeat },
+    { command: BhvCmds.deactivate }
+]
+
 const bhvBowser = []
 
 gLinker.behaviors = {
@@ -402,5 +541,7 @@ gLinker.behaviors = {
     bhvTriangleParticleSpawner,
     bhvMistParticleSpawner,
     bhvMistCircParticleSpawner,
-    bhvWhitePuffExplosion
+    bhvWhitePuffExplosion,
+    bhvBubbleParticleSpawner,
+    bhvSingleCoinGetsSpawned
 }

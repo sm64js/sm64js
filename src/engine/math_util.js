@@ -1,5 +1,8 @@
 import { coss, sins } from "../utils"
 
+/**
+ * Unified version of approach_f32 and approach_s32 from the C version
+ */
 export const approach_number = (current, target, inc, dec) => {
     if (current < target) {
         current += inc
@@ -52,6 +55,20 @@ export const vec3f_cross = (dest, a, b) => {
     dest[1] = a[2] * b[0] - b[2] * a[0]
     dest[2] = a[0] * b[1] - b[0] * a[1]
     return dest 
+}
+
+export const vec3f_set = (dest, x, y, z) => {
+    dest[0] = x;
+    dest[1] = y;
+    dest[2] = z;
+    return dest; 
+}
+
+export const vec3s_set = (dest, x, y, z) => {
+    dest[0] = x;
+    dest[1] = y;
+    dest[2] = z;
+    return dest; 
 }
 
 export const mtxf_identity = (mtx) => {
@@ -223,11 +240,14 @@ export const mtxf_rotate_zxy_and_translate = (dest, translate, rotate) => {
 }
 
 export const mtxf_rotate_xy = (mtx, angle) => {
-    mtxf_identity(mtx)
-    mtx[0][0] = Math.cos(angle)
-    mtx[0][1] = Math.sin(angle)
-    mtx[1][0] = -mtx[0][1]
-    mtx[1][1] = mtx[0][0]
+    const temp = new Array(4).fill(0).map(() => new Array(4).fill(0))
+    mtxf_identity(temp)
+    temp[0][0] = coss(angle)
+    temp[0][1] = sins(angle)
+    temp[1][0] = -temp[0][1]
+    temp[1][1] = temp[0][0]
+
+    mtxf_to_mtx(mtx, temp)
 }
 
 export const mtxf_scale_vec3f = (dest, mtx, s) => {

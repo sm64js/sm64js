@@ -96,13 +96,19 @@
                 </div>
                 <div class="col-3">
                     <select id="mapSelect" class="form-control form-control-sm">
-                        <option>Bob-omb Battlefield</option>
                         <option>Castle Grounds</option>
+                        <option>Castle Inside First Level</option>
+                        <option>Castle Inside Second Level</option>
+                        <option>Bob-omb Battlefield</option>
+                        <option>Castle Courtyard</option>
                         <option>Cool, Cool Mountain</option>
                         <option>Princess's Secret Slide</option>
                         <option>Tall, Tall Mountain</option>
                         <option>Whomps Fortress</option>
                         <option>Hazy Maze Cave</option>
+                        <option>Big Boo's Haunt</option>
+                        <option>Shifting Sand Land</option>
+                        <option>Snowman's Land</option>
                     </select>
                 </div>
 
@@ -184,7 +190,8 @@
                     <a style="color:#fdffd4" href="https://sm64js.com">Snuffy</a>,
                     <a style="color:#fdffd4" href="https://github.com/ScottDikowitz">ScottDikowitz</a>,
                     <a style="color:#fdffd4" href="https://luphoria.github.io/">luphoria</a>,
-                    <a style="color:#fdffd4" href="https://github.com/djoslin0">djoslin0</a>
+                    <a style="color:#fdffd4" href="https://github.com/djoslin0">djoslin0</a>,
+                    <a style="color:#fdffd4" href="https://github.com/J4ckr07">J4ckr07</a>
                 </p>
             </div>
             <br />
@@ -316,6 +323,29 @@
                 </form>
             </div>
 
+            <div class="row">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">C-Up:</label>
+                        <select class="form-control" keyboardButton name="cu" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:40px">C-Down:</label>
+                        <select class="form-control" keyboardButton name="cd" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group ">
+                        <!-- mx-sm-3 mb-2 -->
+                        <label class="col-sm-2 col-form-label" style="padding-right:20px">C-Left:</label>
+                        <select class="form-control" keyboardButton name="cl" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">C-Right:</label>
+                        <select class="form-control" keyboardButton name="cr" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                </form>
+            </div>
+
+
             <div class="row" style="justify-content:center;">
                 <button class="btn btn-sm btn-success" style="margin-right:30px" onclick="window.saveControls()">Save Controls</button>
                 <button class="btn btn-sm btn-secondary" onclick="window.loadDefaultControls()">Load Default Controls</button>
@@ -372,10 +402,18 @@
                     </div>
 
                     <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">C-axisX:</label>
+                        <select class="form-control" gamepadAxes name="cStickX" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">C-axisY:</label>
+                        <select class="form-control" gamepadAxes name="cStickY" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+
+                    <div class="form-group mx-sm-3 mb-2">
                         <label class="col-sm-2 col-form-label" style="padding-right:50px">deadZone:</label>
                         <input type="number" style="width:70px;" value="0.08" min="0" max="1" step="0.01" class="form-control" onchange="window.updateDeadZone(this.value)">
                     </div>
-                </form>
 
                 <!--                <div class="mx-sm-3 mb-2">
                                 <button class="btn btn-sm btn-secondary" onclick="window.switchGamepadFunc()">

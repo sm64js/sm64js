@@ -33,3 +33,7 @@ export const outside_09003000 = []
 export const outside_09004800 = []
 
 export const outside_0900A800 = []
+
+export const outside_09000800 = []
+
+export const outside_09008800 = []

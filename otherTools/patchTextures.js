@@ -9,14 +9,15 @@ const fs = require('fs')
 
 // Configure these variables to get it to work
 
-var WorkFolder = "../home/agent11/sm64js-vanilla"
+var WorkFolder = "Documents/sm64js"
 
 //This is where it will get info on missing assets.
-var CWorkFolder = require('os').homedir() + "/sm64ex"
+var CWorkFolder = "sm64ex"
 
 //Levels to check & patch
 var LEVELS = [
-	'ccs',
+	'bbh',
+	//'ccm',
 ]
 
 var srcTextures = [
@@ -27,10 +28,10 @@ var srcTextures = [
 ]
 
 var textureInsertIndexes = [
-	55, //assets.js, both
-	6, //romTextureLoader.js - for import
-	184, //romTextureLoader.js - for push
-	2, //model.inc.js
+	17, //assets.js, both
+	8, //romTextureLoader.js - for import
+	182, //romTextureLoader.js - for push
+	0, //model.inc.js
 ]
 
 var idx = 0;

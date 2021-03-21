@@ -1,0 +1,97 @@
+import * as Gbi from "../../../../../include/gbi"
+import {
+	texture_castle_light,
+} from "../../../texture.inc"
+const dl_castle_aquarium_light_vertex_group_1 = [
+	{ pos: [ 3385, 358, -1631 ], flag: 0, tc: [ 0, 536 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3060, 307, -1305 ], flag: 0, tc: [ 0, 0 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3385, 768, -1631 ], flag: 0, tc: [ 0, 990 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3174, 307, -1279 ], flag: 0, tc: [ 990, 0 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 2355, 768, -1740 ], flag: 0, tc: [ 0, 990 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 2355, 307, -1279 ], flag: 0, tc: [ 0, 0 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3174, 768, -1740 ], flag: 0, tc: [ 990, 990 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3174, 307, -1689 ], flag: 0, tc: [ 990, 422 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3174, 358, -1740 ], flag: 0, tc: [ 990, 536 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 2355, 358, -1740 ], flag: 0, tc: [ 0, 536 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 2355, 307, -1689 ], flag: 0, tc: [ 0, 422 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3784, 307, -581 ], flag: 0, tc: [ 990, 0 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 4109, 768, -907 ], flag: 0, tc: [ 990, 990 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3385, 358, 1171 ], flag: 0, tc: [ 0, 536 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3349, 307, 1135 ], flag: 0, tc: [ 0, 422 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 4073, 307, 411 ], flag: 0, tc: [ 990, 422 ], color: [ 187, 199, 255, 128 ] },
+]
+
+const dl_castle_aquarium_light_vertex_group_2 = [
+	{ pos: [ 3385, 358, -1631 ], flag: 0, tc: [ 0, 536 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3349, 307, -1595 ], flag: 0, tc: [ 0, 422 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3060, 307, -1305 ], flag: 0, tc: [ 0, 0 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 4109, 768, -907 ], flag: 0, tc: [ 990, 990 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3784, 307, -581 ], flag: 0, tc: [ 990, 0 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 4073, 307, -871 ], flag: 0, tc: [ 990, 422 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 4109, 358, -907 ], flag: 0, tc: [ 990, 536 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3385, 358, 1171 ], flag: 0, tc: [ 0, 536 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 4073, 307, 411 ], flag: 0, tc: [ 990, 422 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 4109, 358, 447 ], flag: 0, tc: [ 990, 536 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3784, 307, 121 ], flag: 0, tc: [ 990, 0 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 4109, 768, 447 ], flag: 0, tc: [ 990, 990 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 2355, 307, 1229 ], flag: 0, tc: [ 0, 422 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 2355, 358, 1280 ], flag: 0, tc: [ 0, 536 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 2355, 768, 1280 ], flag: 0, tc: [ 0, 990 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3060, 307, 846 ], flag: 0, tc: [ 0, 0 ], color: [ 187, 199, 255, 128 ] },
+]
+
+const dl_castle_aquarium_light_vertex_group_3 = [
+	{ pos: [ 4109, 768, 447 ], flag: 0, tc: [ 990, 990 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3060, 307, 846 ], flag: 0, tc: [ 0, 0 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3385, 768, 1171 ], flag: 0, tc: [ 0, 990 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3385, 358, 1171 ], flag: 0, tc: [ 0, 536 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3349, 307, 1135 ], flag: 0, tc: [ 0, 422 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3174, 307, 1229 ], flag: 0, tc: [ 990, 422 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3174, 358, 1280 ], flag: 0, tc: [ 990, 536 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 2355, 358, 1280 ], flag: 0, tc: [ 0, 536 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3174, 307, 819 ], flag: 0, tc: [ 990, 0 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 2355, 307, 1229 ], flag: 0, tc: [ 0, 422 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 3174, 768, 1280 ], flag: 0, tc: [ 990, 990 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 2355, 768, 1280 ], flag: 0, tc: [ 0, 990 ], color: [ 187, 199, 255, 128 ] },
+	{ pos: [ 2355, 307, 819 ], flag: 0, tc: [ 0, 0 ], color: [ 187, 199, 255, 128 ] },
+]
+
+export const dl_castle_aquarium_light_model = [
+	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_16b, 1, texture_castle_light),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
+	Gbi.gsSPVertex(dl_castle_aquarium_light_vertex_group_1, 16, 0),
+	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+	...Gbi.gsSP2Triangles( 3,  6,  4, 0x0,  7,  6,  3, 0x0),
+	...Gbi.gsSP2Triangles( 7,  8,  6, 0x0,  5,  4,  9, 0x0),
+	...Gbi.gsSP2Triangles( 5,  9, 10, 0x0, 10,  9,  8, 0x0),
+	...Gbi.gsSP2Triangles(10,  8,  7, 0x0,  2,  1, 11, 0x0),
+	...Gbi.gsSP2Triangles( 2, 11, 12, 0x0, 13, 14, 15, 0x0),
+	Gbi.gsSPVertex(dl_castle_aquarium_light_vertex_group_2, 16, 0),
+	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+	...Gbi.gsSP2Triangles( 3,  5,  6, 0x0,  6,  1,  0, 0x0),
+	...Gbi.gsSP2Triangles( 6,  5,  1, 0x0,  7,  8,  9, 0x0),
+	...Gbi.gsSP2Triangles( 9, 10, 11, 0x0,  9,  8, 10, 0x0),
+	...Gbi.gsSP2Triangles(12, 13, 14, 0x0, 11, 10, 15, 0x0),
+	Gbi.gsSPVertex(dl_castle_aquarium_light_vertex_group_3, 13, 0),
+	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  2,  1,  3, 0x0),
+	...Gbi.gsSP2Triangles( 1,  4,  3, 0x0,  5,  6,  7, 0x0),
+	...Gbi.gsSP2Triangles( 8,  6,  5, 0x0,  5,  7,  9, 0x0),
+	...Gbi.gsSP2Triangles( 8, 10,  6, 0x0,  9, 11, 12, 0x0),
+	...Gbi.gsSP2Triangles(12, 10,  8, 0x0, 12, 11, 10, 0x0),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_castle_aquarium_light = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATEIA),
+	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsSPDisplayList(dl_castle_aquarium_light_model),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
+	Gbi.gsSPEndDisplayList(),
+]
+

@@ -4,6 +4,7 @@ import * as SkyboxWater from "./textures/skyboxes/water_skybox"
 import { assets } from "./assets"
 
 
+
 import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_texture_0700B4A0, intro_seg7_texture_0700C4A0 } from "./levels/intro/leveldata"
 import { castle_grounds_seg7_texture_07000000, castle_grounds_seg7_texture_07001000, castle_grounds_seg7_texture_07002000 } from "./levels/castle_grounds/texture.inc.js"
 import { title_texture_0A0001C0, title_texture_0A000E40, title_texture_0A001AC0, title_texture_0A002740 } from "./levels/intro/title_screen_bg"
@@ -180,6 +181,7 @@ import {
     hmc_seg7_texture_07004800
 } from "./levels/hmc/texture.inc"
 
+
 import {
     texture_castle_light,
     inside_castle_seg7_texture_07000800,
@@ -269,8 +271,8 @@ import {
     snow_09008000,
     snow_09008800,
     snow_09009000,
-    snow_09009800
-} from "./textures/snow"
+    snow_09009800,
+} from "./textures/snow.js"
 
 import {
     grass_09000000,
@@ -360,6 +362,12 @@ import {
 } from "./levels/ssl/texture.inc"
 
 import {
+    ccs_seg7_texture_07003100,
+    ccs_seg7_texture_07003B00,
+    ccs_seg7_texture_07004B00
+} from "./levels/ccs/texture.inc"
+
+import {
     sl_seg7_texture_07000000,
     sl_seg7_texture_07000800,
     sl_seg7_texture_07001000,
@@ -402,7 +410,7 @@ import {
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 34
+const textureVersion = 35
 
 const loadDataIntoGame = (data) => {
 
@@ -656,11 +664,33 @@ const loadDataIntoGame = (data) => {
     snow_09006000.push(...data["textures/snow/ccm_textures.06000.rgba16.png"].data)
     snow_09006800.push(...data["textures/snow/ccm_textures.06800.rgba16.png"].data)
     snow_09007000.push(...data["textures/snow/ccm_textures.07000.rgba16.png"].data)
-    // Why is this here? snow_09007800.push(...data["textures/snow/ccm_textures.07800.rgba16.png"].data)
     snow_09008000.push(...data["textures/snow/ccm_textures.08000.rgba16.png"].data)
     snow_09008800.push(...data["textures/snow/ccm_textures.08800.rgba16.png"].data)
     snow_09009000.push(...data["textures/snow/ccm_textures.09000.ia16.png"].data)
     snow_09009800.push(...data["textures/snow/ccm_textures.09800.ia16.png"].data)
+
+    snow_09000000.push(...data["textures/snow/ccs_textures.00000.rgba16.png"].data)
+    snow_09000800.push(...data["textures/snow/ccs_textures.00800.rgba16.png"].data)
+    snow_09001000.push(...data["textures/snow/ccs_textures.01000.rgba16.png"].data)
+    snow_09002000.push(...data["textures/snow/ccs_textures.02000.rgba16.png"].data)
+    snow_09002800.push(...data["textures/snow/ccs_textures.02800.rgba16.png"].data)
+    snow_09003000.push(...data["textures/snow/ccs_textures.03000.rgba16.png"].data)
+    snow_09003800.push(...data["textures/snow/ccs_textures.03800.rgba16.png"].data)
+    snow_09004000.push(...data["textures/snow/ccs_textures.04000.rgba16.png"].data)
+    snow_09004800.push(...data["textures/snow/ccs_textures.04800.rgba16.png"].data)
+    snow_09005000.push(...data["textures/snow/ccs_textures.05000.rgba16.png"].data)
+    snow_09005800.push(...data["textures/snow/ccs_textures.05800.rgba16.png"].data)
+    snow_09006000.push(...data["textures/snow/ccs_textures.06000.rgba16.png"].data)
+    snow_09006800.push(...data["textures/snow/ccs_textures.06800.rgba16.png"].data)
+    snow_09007000.push(...data["textures/snow/ccs_textures.07000.rgba16.png"].data)
+    snow_09008000.push(...data["textures/snow/ccs_textures.08000.rgba16.png"].data)
+    snow_09008800.push(...data["textures/snow/ccs_textures.08800.rgba16.png"].data)
+    snow_09009000.push(...data["textures/snow/ccs_textures.09000.ia16.png"].data)
+    snow_09009800.push(...data["textures/snow/ccs_textures.09800.ia16.png"].data)
+
+    ccs_seg7_texture_07003100.push(...data["levels/ccs/7.rgba16.png"].data)
+    ccs_seg7_texture_07003B00.push(...data["levels/ccs/9.ia16.png"].data)
+    ccs_seg7_texture_07004B00.push(...data["levels/ccs/11.rgba16.png"].data)
 
     mario_texture_yellow_button.push(...data['actors/mario/mario_overalls_button.rgba16.png'].data)
     mario_texture_m_logo.push(...data['actors/mario/mario_logo.rgba16.png'].data)

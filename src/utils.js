@@ -58,6 +58,7 @@ export const levelIdToName = {
     7: "Hazy Maze Cave",
     4: "Big Boo's Haunt",
     5: "Cool, Cool Mountain",
+    56: "Cool, Cool Mountain Slide",
     27: "Princess's Secret Slide",
     36: "Tall, Tall Mountain",
     24: "Whomps Fortress",

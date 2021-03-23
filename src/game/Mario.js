@@ -2,6 +2,7 @@ import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { AreaInstance as Area } from "./Area"
 import { MarioMiscInstance as MarioMisc } from "./MarioMisc"
 import { CameraInstance as Camera } from "./Camera"
+import { CAMERA_MODE_BEHIND_MARIO, CAMERA_MODE_WATER_SURFACE } from "./Camera"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
 import { GRAPH_RENDER_INVISIBLE, geo_update_animation_frame, retrieve_animation_index } from "../engine/graph_node"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
@@ -1377,8 +1378,13 @@ const set_submerged_cam_preset_and_spawn_bubbles = (m) => {
         if (m.action & ACT_FLAG_METAL_WATER) {
             throw "Todo ACT_FLAG_METAL_WATER - set_submerged_cam_preset_and_spawn_bubbles"
         } else {
+            if ((heightBelowWater > 800) && (camPreset != CAMERA_MODE_BEHIND_MARIO)) {
+                Camera.set_camera_mode(m.area.camera, CAMERA_MODE_BEHIND_MARIO, 1)
+            }
 
-            //// TODO set submerged camera modes  CAMERA_MODE_BEHIND_MARIO, CAMERA_MODE_WATER_SURFACE
+            if ((heightBelowWater < 400) && (camPreset != CAMERA_MODE_WATER_SURFACE)) {
+                Camera.set_camera_mode(m.area.camera, CAMERA_MODE_WATER_SURFACE, 1)
+            }
 
             // As long as Mario isn't drowning or at the top
             // of the water with his head out, spawn bubbles.
@@ -1410,6 +1416,18 @@ export const init_mario_from_save_file = () => {
     LevelUpdate.gHudDisplay.wedges = 8;
 }
 
+export const transition_submerged_to_walking = m => {
+    Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
+
+    m.angleVel = [0, 0, 0]
+
+    if (m.heldObj == null) {
+        return set_mario_action(m, ACT_WALKING, 0)
+    } else {
+        return set_mario_action(m, ACT_HOLD_WALKING, 0)
+}
+}
+
 export const set_water_plunge_action = m => {
   m.forwardVel = m.forwardVel / 4
   m.vel[1] = m.vel[1] / 2
@@ -1424,19 +1442,9 @@ export const set_water_plunge_action = m => {
     m.faceAngle[0] = 0
   }
 
-  //TODO implement camera
+    if (m.area.camera.mode != CAMERA_MODE_WATER_SURFACE) {
+        Camera.set_camera_mode(m.area.camera, CAMERA_MODE_WATER_SURFACE, 1)
+    }
 
   return set_mario_action(m, ACT_WATER_PLUNGE, 0)
-}
-
-export const transition_submerged_to_walking = m => {
-    // TODO set_camera_mode(m.area.camera, m.area.camera.defMode, 1);
-
-    m.angleVel = [0, 0, 0];
-
-    if (m.heldObj == null) {
-        return set_mario_action(m, ACT_WALKING, 0);
-    } else {
-        return set_mario_action(m, ACT_HOLD_WALKING, 0);
-    }
 }

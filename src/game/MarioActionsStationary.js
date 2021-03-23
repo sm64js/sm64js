@@ -39,6 +39,11 @@ const check_common_idle_cancels = (m) => {
 
 const act_idle = (m) => {
 
+    if (m.input & Mario.INPUT_PARACHUTE) {
+		m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_KARTING, 0)
+    }
+	
     if (check_common_idle_cancels(m)) {
         return 1
     }

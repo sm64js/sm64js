@@ -5,7 +5,12 @@ import * as Gbi from "../include/gbi"
 class Game {
     constructor() {
         this.main_loop_init() /// thread5_game_loop_init
+		this.pvpEnabled = true;
         window.gGlobalTimer = 0
+    }
+	
+    load_pvp() { // Used for PvP toggle.
+        this.pvpEnabled = window.pvp
     }
 
     attachInterfaceToGfxProcessor(func) {

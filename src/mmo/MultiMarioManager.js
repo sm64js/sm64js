@@ -1,4 +1,5 @@
 import { Sm64JsMsg, MarioMsg, ControllerListMsg, ControllerMsg, ValidPlayersMsg } from "../../proto/mario_pb"
+import { GameInstance as Game } from "../game/Game"
 import zlib from "zlib"
 import * as RAW from "../include/object_constants"
 import { networkData, gameData } from "./socket"
@@ -61,6 +62,8 @@ export const copyMarioUpdateToState = (remotePlayer) => {
     m.pos = update.posList
     m.faceAngle = update.faceangleList
     m.socket_id = update.socketid
+	const PVP = (update.pvp === true ? 0x1 : 0x0)
+    m.pvp = PVP //; console.log(`PVP_IN:${PVP}`)
 
     m.marioObj.rawData = expandRawDataSubset(update.rawdataList, m.marioObj.rawData)
     m.marioObj.rawData[RAW.oRoom] = -1
@@ -96,6 +99,8 @@ export const createMarioProtoMsg = () => {
     mariomsg.setPosList(m.pos)
     mariomsg.setVelList(m.vel)
     mariomsg.setForwardvel(m.forwardVel)
+	const PVP = (Game.pvpEnabled === true ? 0x1 : 0x0)
+    mariomsg.setPvp(PVP) //; console.log(`PVP_OUT:${PVP}`)
 
     if (m.usedObj) mariomsg.setUsedobjid(m.usedObj.rawData[RAW.oSyncID])
 
@@ -122,6 +127,7 @@ const initNewRemoteMarioState = (marioProto) => {
         flags: m.flags,
         forwardVel: marioProto.getForwardvel(),
         health: 0x880,
+		pvp: 0x1,
         squishTimer: 0,
         hurtCounter: 0,
         healCounter: 0,

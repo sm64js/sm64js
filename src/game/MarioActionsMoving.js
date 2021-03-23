@@ -2,7 +2,7 @@ import * as Mario from "./Mario"
 import * as MarioConstants from "../include/mario_constants"
 import { SURFACE_SLOW, SURFACE_CLASS_VERY_SLIPPERY, SURFACE_CLASS_SLIPPERY, SURFACE_CLASS_NOT_SLIPPERY, TERRAIN_MASK, TERRAIN_SLIDE } from "../include/surface_terrains"
 import * as SurfaceTerrains from "../include/surface_terrains"
-import { mario_bonk_reflection, perform_ground_step } from "./MarioStep"
+import { mario_bonk_reflection, perform_ground_step, stationary_ground_step, perform_air_step } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
 import { oMarioWalkingPitch } from "../include/object_constants"
 import { mario_update_punch_sequence } from "./MarioActionsObject"
@@ -277,6 +277,11 @@ const act_walking = (m) => {
 
     if (should_begin_sliding(m)) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
+    }
+	
+    if (m.input & Mario.INPUT_PARACHUTE) {
+		m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_KARTING, 0)
     }
 
     if (m.input & Mario.INPUT_A_PRESSED) {
@@ -860,6 +865,127 @@ const act_butt_slide = (m) => {
     return cancel;
 }
 
+//Hacky way to smooth kart.
+const kart_angle_smoothing = (m, speed, angle) => {
+		angle[1] = m.marioObj.header.gfx.angle[1]
+		const targetAngle0 = -Mario.find_floor_slope(m, 0x0)
+		const targetAngle2 = Mario.find_floor_slope(m, 0x4000)
+		if (angle[0] < targetAngle0) {
+			angle[0] += speed
+			if (angle[0] > targetAngle0) {
+				angle[0] = targetAngle0
+			}
+		} else {
+			angle[0] -= speed
+			if (angle[0] < targetAngle0) {
+				angle[0] = targetAngle0
+			}
+		}
+		if (angle[2] < targetAngle2) {
+			angle[2] += speed
+			if (angle[2] > targetAngle2) {
+				angle[2] = targetAngle2
+			}
+		} else {
+			angle[2] -= speed
+			if (angle[2] < targetAngle2) {
+				angle[2] = targetAngle2
+			}
+		}
+		m.marioObj.header.gfx.angle = angle
+}
+
+const act_karting = (m) => {
+	const ANGLE_BUF = [...m.marioObj.header.gfx.angle]
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_SLIDING_ON_BOTTOM_WITH_LIGHT_OBJ, 0)
+    m.marioBodyState.torsoAngle[0] = 0x1000
+    m.marioBodyState.torsoAngle[2] = 0x0000
+	let Vel = m.forwardVel
+	if (m.forwardVel > 16) {
+		m.particleFlags |= MarioConstants.PARTICLE_DUST;	
+	}
+	if (!(m.input & Mario.INPUT_OFF_FLOOR)) {
+		//m.actionState = 0
+		if (m.input & Mario.INPUT_A_DOWN && !should_begin_sliding(m)) {
+			Vel += 2 * ((m.input & Mario.INPUT_Z_DOWN) ? -1 : 1)
+		} else {
+			Vel *= 0.95545
+		}
+	}
+			if (Vel < -35) Vel = -35
+			if (Vel > 75) Vel = 75
+    if (m.input & Mario.INPUT_B_PRESSED && !(m.input & Mario.INPUT_OFF_FLOOR) && m.actionState == 0 && m.vel[1] <= 0.0) {
+		m.input |= Mario.INPUT_OFF_FLOOR // Prevent crash / infinite loop.
+		m.actionState = 1
+		m.pos[1] += 12
+		m.vel[1] = 32
+    }
+    if (m.input & Mario.INPUT_PARACHUTE && !(m.input & Mario.INPUT_OFF_FLOOR) && Math.abs(m.forwardVel) < 16) {
+		m.input ^= Mario.INPUT_PARACHUTE
+        return Mario.set_mario_action(m, Mario.ACT_IDLE, 0)
+    }
+    if (m.input & Mario.INPUT_NONZERO_ANALOG && m.actionState == 0) {
+		let number16 = parseInt(m.intendedYaw - m.faceAngle[1])
+		let change = Math.round(10 + (Vel*10))
+		number16 = number16 > 32767 ? number16 - 65536 : number16
+		number16 = number16 < -32768 ? number16 + 65536 : number16
+		m.faceAngle[1] = m.intendedYaw - approach_number(number16, 0, change, change)
+    }
+	m.forwardVel = Vel
+	if (m.input & Mario.INPUT_OFF_FLOOR || m.actionState == 1) {
+		switch (perform_air_step(m, 1)) {
+				case Mario.AIR_STEP_NONE:
+					break
+				case Mario.AIR_STEP_LANDED:
+					if (m.vel[1] < -32 && !(m.input & Mario.INPUT_OFF_FLOOR) && !(m.input & Mario.INPUT_ABOVE_SLIDE)) {
+						m.vel[1] *= -0.25
+					} else {
+					m.actionState = 0
+					}
+					break
+				case Mario.AIR_STEP_HIT_WALL:
+					m.forwardVel *= -0.5
+					Mario.set_forward_vel(m, 1.25 * m.forwardVel)
+					break
+				case Mario.AIR_STEP_GRABBED_LEDGE:
+					break
+				case Mario.AIR_STEP_GRABBED_CEILING:
+					break
+				case Mario.AIR_STEP_HIT_LAVA_WALL:
+					break
+				default: throw "unkown air step in act_karting"
+			}
+		m.marioObj.header.gfx.angle[2] = 0
+		m.marioObj.header.gfx.angle[0] = m.vel[1] * -50.0
+	}
+	else
+	{
+		switch (perform_ground_step(m)) {
+			case Mario.GROUND_STEP_NONE:
+				break
+			case Mario.GROUND_STEP_LEFT_GROUND:
+				if (!(m.input & Mario.INPUT_ABOVE_SLIDE)) m.pos[1] += 12
+				m.actionState = 1
+				break
+			case Mario.GROUND_STEP_HIT_WALL:
+				m.forwardVel *= -0.5
+				break
+			default: throw "unkown ground step in act_karting"
+		}
+		if (m.actionState == 0) {
+			apply_slope_accel(m)
+			kart_angle_smoothing(m, 0x800, ANGLE_BUF)
+		}
+	}
+	if (should_begin_sliding(m) && !(m.input & Mario.INPUT_OFF_FLOOR)) {
+		update_sliding(m)
+		m.actionState == 0
+	}
+	m.marioObj.header.gfx.pos[1] += m.actionState == 1 ? 12 : 24
+    return 0;
+}
+
+
 const act_stomach_slide = (m) => {
     const cancel = stomach_slide_action(m, Mario.ACT_STOMACH_SLIDE_STOP, Mario.ACT_FREEFALL, Mario.MARIO_ANIM_SLIDE_DIVE);
     return cancel;
@@ -1187,6 +1313,7 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_JUMP_LAND: return act_jump_land(m)
         case Mario.ACT_FREEFALL_LAND: return act_freefall_land(m)
         case Mario.ACT_BUTT_SLIDE: return act_butt_slide(m)
+        case Mario.ACT_KARTING: return act_karting(m)
         case Mario.ACT_STOMACH_SLIDE: return act_stomach_slide(m)
         case Mario.ACT_SIDE_FLIP_LAND: return act_side_flip_land(m)
         case Mario.ACT_DOUBLE_JUMP_LAND: return act_double_jump_land(m)

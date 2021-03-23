@@ -98,6 +98,10 @@ import { checkerboard_platform_seg8_texture_0800C840, checkerboard_platform_seg8
 
 import { goomba_seg8_texture_08019530, goomba_seg8_texture_08019D30, goomba_seg8_texture_0801A530 } from "./actors/goomba/model.inc"
 
+import { blue_fish_seg3_texture_0301B5E0 } from "./actors/blue_fish/model.inc"
+
+import { butterfly_seg3_texture_030043A8 } from "./actors/butterfly/model.inc"
+
 import {
     bobomb_seg8_texture_0801DA60,
     bobomb_seg8_texture_0801EA60,
@@ -406,11 +410,35 @@ import {
     sparkles_seg4_texture_04029C90
 } from "./actors/sparkle/model.inc"
 
+import {
+    water_splash_seg4_texture_0402A5C8,
+    water_splash_seg4_texture_0402B5C8,
+    water_splash_seg4_texture_0402C5C8,
+    water_splash_seg4_texture_0402D5C8,
+    water_splash_seg4_texture_0402E5C8,
+    water_splash_seg4_texture_0402F5C8,
+    water_splash_seg4_texture_040305C8,
+    water_splash_seg4_texture_040315C8,
+} from "./actors/water_splash/model.inc"
+
+import {
+    white_particle_small_texture
+} from "./actors/white_particle_small/model.inc"
+
+import {
+    stomp_smoke_seg4_texture_04022148,
+    stomp_smoke_seg4_texture_04022948,
+    stomp_smoke_seg4_texture_04023148,
+    stomp_smoke_seg4_texture_04023948,
+    stomp_smoke_seg4_texture_04024148,
+    stomp_smoke_seg4_texture_04024948,
+} from "./actors/water_splash/model.inc"
+
 
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 35
+const textureVersion = 36
 
 const loadDataIntoGame = (data) => {
 
@@ -906,6 +934,9 @@ const loadDataIntoGame = (data) => {
     goomba_seg8_texture_08019D30.push(...data["actors/goomba/goomba_face.rgba16.png"].data)
     goomba_seg8_texture_0801A530.push(...data["actors/goomba/goomba_face_blink.rgba16.png"].data)
 
+    blue_fish_seg3_texture_0301B5E0.push(...data["actors/blue_fish/blue_fish.rgba16.png"].data)
+    butterfly_seg3_texture_030043A8.push(...data["actors/butterfly/butterfly_wing.rgba16.png"].data)
+
     bobomb_seg8_texture_0801DA60.push(...data["actors/bobomb/bob-omb_left_side.rgba16.png"].data)
     bobomb_seg8_texture_0801EA60.push(...data["actors/bobomb/bob-omb_right_side.rgba16.png"].data)
     bobomb_seg8_texture_0801FA60.push(...data["actors/bobomb/bob-omb_buddy_left_side.rgba16.png"].data)
@@ -1185,6 +1216,25 @@ const loadDataIntoGame = (data) => {
     SkyboxWater.water_skybox_texture_0003E.push(...data["water_skybox_texture_0003E"].data)
     SkyboxWater.water_skybox_texture_0003F.push(...data["water_skybox_texture_0003F"].data)
 
+    water_splash_seg4_texture_0402A5C8.push(...data["actors/water_splash/water_splash_0.rgba16.png"].data)
+    water_splash_seg4_texture_0402B5C8.push(...data["actors/water_splash/water_splash_1.rgba16.png"].data)
+    water_splash_seg4_texture_0402C5C8.push(...data["actors/water_splash/water_splash_2.rgba16.png"].data)
+    water_splash_seg4_texture_0402D5C8.push(...data["actors/water_splash/water_splash_3.rgba16.png"].data)
+    water_splash_seg4_texture_0402E5C8.push(...data["actors/water_splash/water_splash_4.rgba16.png"].data)
+    water_splash_seg4_texture_0402F5C8.push(...data["actors/water_splash/water_splash_5.rgba16.png"].data)
+    water_splash_seg4_texture_040305C8.push(...data["actors/water_splash/water_splash_6.rgba16.png"].data)
+    water_splash_seg4_texture_040315C8.push(...data["actors/water_splash/water_splash_7.rgba16.png"].data)
+
+    white_particle_small_texture.push(...data["actors/white_particle_small/small_snow_particle.rgba16.png"].data)
+
+    stomp_smoke_seg4_texture_04022148.push(...data["actors/stomp_smoke/stomp_smoke_0.ia16.png"].data)
+    stomp_smoke_seg4_texture_04022948.push(...data["actors/stomp_smoke/stomp_smoke_1.ia16.png"].data)
+    stomp_smoke_seg4_texture_04023148.push(...data["actors/stomp_smoke/stomp_smoke_2.ia16.png"].data)
+    stomp_smoke_seg4_texture_04023948.push(...data["actors/stomp_smoke/stomp_smoke_3.ia16.png"].data)
+    stomp_smoke_seg4_texture_04024148.push(...data["actors/stomp_smoke/stomp_smoke_4.ia16.png"].data)
+    stomp_smoke_seg4_texture_04024948.push(...data["actors/stomp_smoke/stomp_smoke_5.ia16.png"].data)
+
+
     document.getElementById('romSelect').hidden = true
     msgElement.innerHTML = "Rom Asset Extraction Success - You may now start the game"
     msgElement.style = "color:#00ff00"
@@ -1207,6 +1257,11 @@ const processExtractedResults = (data) => {
 }
 
 export const checkForRom = () => {   /// happens one time when the page is loaded
+    if (url.searchParams.get("romReset")) {
+        localStorage.removeItem('sm64jsAssets')
+        return false
+    }
+
     if (localStorage['sm64jsAssets']) {
         const data = JSON.parse(localStorage['sm64jsAssets'])
         if (data.textureVersion == textureVersion) loadDataIntoGame(data)

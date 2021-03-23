@@ -4,6 +4,7 @@ export const RESPAWN_INFO_TYPE_NULL = 0
 export const RESPAWN_INFO_TYPE_32   = 1
 export const RESPAWN_INFO_TYPE_16   = 2
 
+export const ACTIVE_FLAG_DEACTIVATED            =  0         // 0x0000
 export const ACTIVE_FLAG_ACTIVE                 =  (1 <<  0) // 0x0001
 export const ACTIVE_FLAG_FAR_AWAY               =  (1 <<  1) // 0x0002
 export const ACTIVE_FLAG_UNK2                   =  (1 <<  2) // 0x0004
@@ -69,28 +70,27 @@ export const OBJ_FLAG_8000                            =  (1 << 15) // 0x00008000
 export const OBJ_FLAG_30 = (1 << 30) // 0x40000000
 
 
-
 /* oActiveParticleFlags */
-export const ACTIVE_PARTICLE_DUST = (1 << 0) // 0x00000001
-export const ACTIVE_PARTICLE_UNUSED_1 = (1 << 1) // 0x00000002
-export const ACTIVE_PARTICLE_UNUSED_2 = (1 << 2) // 0x00000004
-export const ACTIVE_PARTICLE_SPARKLES = (1 << 3) // 0x00000008
-export const ACTIVE_PARTICLE_H_STAR = (1 << 4) // 0x00000010
-export const ACTIVE_PARTICLE_BUBBLE = (1 << 5) // 0x00000020
-export const ACTIVE_PARTICLE_WATER_SPLASH = (1 << 6) // 0x00000040
-export const ACTIVE_PARTICLE_IDLE_WATER_WAVE = (1 << 7) // 0x00000080
-export const ACTIVE_PARTICLE_SHALLOW_WATER_WAVE = (1 << 8) // 0x00000100
-export const ACTIVE_PARTICLE_PLUNGE_BUBBLE = (1 << 9) // 0x00000200
-export const ACTIVE_PARTICLE_WAVE_TRAIL = (1 << 10) // 0x00000400
-export const ACTIVE_PARTICLE_FIRE = (1 << 11) // 0x00000800
-export const ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH = (1 << 12) // 0x00001000
-export const ACTIVE_PARTICLE_LEAF = (1 << 13) // 0x00002000
-export const ACTIVE_PARTICLE_DIRT = (1 << 14) // 0x00004000
-export const ACTIVE_PARTICLE_MIST_CIRCLE = (1 << 15) // 0x00008000
-export const ACTIVE_PARTICLE_SNOW = (1 << 16) // 0x00010000
-export const ACTIVE_PARTICLE_BREATH = (1 << 17) // 0x00020000
-export const ACTIVE_PARTICLE_V_STAR = (1 << 18) // 0x00040000
-export const ACTIVE_PARTICLE_TRIANGLE = (1 << 19) // 0x00080000
+export const ACTIVE_PARTICLE_DUST                  = (1 << 0) // 0x00000001
+export const ACTIVE_PARTICLE_UNUSED_1              = (1 << 1) // 0x00000002
+export const ACTIVE_PARTICLE_UNUSED_2              = (1 << 2) // 0x00000004
+export const ACTIVE_PARTICLE_SPARKLES              = (1 << 3) // 0x00000008
+export const ACTIVE_PARTICLE_H_STAR                = (1 << 4) // 0x00000010
+export const ACTIVE_PARTICLE_BUBBLE                = (1 << 5) // 0x00000020
+export const ACTIVE_PARTICLE_WATER_SPLASH          = (1 << 6) // 0x00000040
+export const ACTIVE_PARTICLE_IDLE_WATER_WAVE       = (1 << 7) // 0x00000080
+export const ACTIVE_PARTICLE_SHALLOW_WATER_WAVE    = (1 << 8) // 0x00000100
+export const ACTIVE_PARTICLE_PLUNGE_BUBBLE         = (1 << 9) // 0x00000200
+export const ACTIVE_PARTICLE_WAVE_TRAIL            = (1 << 10) // 0x00000400
+export const ACTIVE_PARTICLE_FIRE                  = (1 << 11) // 0x00000800
+export const ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH  = (1 << 12) // 0x00001000
+export const ACTIVE_PARTICLE_LEAF                  = (1 << 13) // 0x00002000
+export const ACTIVE_PARTICLE_DIRT                  = (1 << 14) // 0x00004000
+export const ACTIVE_PARTICLE_MIST_CIRCLE           = (1 << 15) // 0x00008000
+export const ACTIVE_PARTICLE_SNOW                  = (1 << 16) // 0x00010000
+export const ACTIVE_PARTICLE_BREATH                = (1 << 17) // 0x00020000
+export const ACTIVE_PARTICLE_V_STAR                = (1 << 18) // 0x00040000
+export const ACTIVE_PARTICLE_TRIANGLE              = (1 << 19) // 0x00080000
 
 /* oHeldState */
 export const HELD_FREE = 0
@@ -217,6 +217,8 @@ export const oWoodenPostPrevAngleToMario = 0x1C
 export const oWoodenPostSpeedY           = 0x1D
 export const oWoodenPostMarioPounding    = 0x1E
 export const oWoodenPostOffsetY = 0x1F
+
+export const oButterflyYPhase = 0x1B
 
 /* Chain Chomp */
 export const oChainChompSegments                     = 0x1B

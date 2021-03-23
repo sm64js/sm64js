@@ -2,10 +2,12 @@ import { GeoLayoutInstance as GeoLayout } from "./GeoLayout"
 import { AreaInstance as Area } from "../game/Area"
 import { GameInstance as Game } from "../game/Game"
 import * as Gbi from "../include/gbi"
+import * as GraphNode from "./graph_node"
 import { GoddardRendererInstance as GoddardRenderer } from "../goddard/GoddardRenderer"
 import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
 import { init_graph_node_start } from "./graph_node"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
+import { CameraInstance as Camera } from "../game/Camera"
 
 const SCRIPT_RUNNING = 1
 const SCRIPT_PAUSED = 0
@@ -43,7 +45,28 @@ class LevelCommands {
         this.sStackTop = []
     }
 
-    init_level(args) {
+    ALLOC_LEVEL_POOL() {return this.alloc_level_pool()}
+    AREA(areaIndex, geoLayout) {return this.begin_area(areaIndex, geoLayout)}
+    CALL(arg, func, funcClass) {return this.call(arg, func, funcClass)}
+    CALL_LOOP(arg, func, funcClass) {return this.call_loop(arg, func, funcClass)}
+    END_AREA() {return this.end_area()}
+    FREE_LEVEL_POOL() {return this.free_level_pool()}
+    GET_AREA(what) {return this.get_area(what)}
+    INIT_LEVEL() {return this.init_level()}
+    JUMP_LINK(script) {return this.jump_link(script)}
+    LOAD_MODEL_FROM_GEO(model, geo) {return this.load_model_from_geo(model, geo)}
+    LOAD_MODEL_FROM_DL(model, dl, layer) {return this.load_model_from_dl(model, dl, layer)}
+    MARIO(model, bharg, bhscript) {return this.init_mario(model, bharg, bhscript)}
+    MARIO_POS(area, yaw, x, y, z) {return this.set_mario_pos(area, yaw, x, y, z)}
+    OBJECT(model, x, y, z, pitch, yaw, rot, bharg, bhscript) {return this.place_object(0x1F, model, x, y, z, pitch, yaw, rot, bharg, bhscript)}
+    RETURN() {return this.return()}  // heh
+    TERRAIN(data) {return this.terrain(data)}
+
+    LOAD_MIO0() {this.sCurrentScript.index++}
+    LOAD_RAW() {this.sCurrentScript.index++}
+
+
+    init_level() {
         //console.log("init level")
         GeoLayout.gObjParentGraphNode = init_graph_node_start(null, GeoLayout.gObjParentGraphNode)
         ObjectListProcessor.clear_objects()
@@ -51,71 +74,73 @@ class LevelCommands {
         this.sCurrentScript.index++
     }
 
-    init_mario(args) {
-
+    init_mario(model, bharg, bhscript) {
         Object.assign(Area.gMarioSpawnInfo, {
             startPos: { x: 0, y: 0, z: 0 },
             startAngle: { x: 0, y: 0, z: 0 },
             areaIndex: 0,
-            behaviorArg: args[1],
-            behaviorScript: args[2],
-            unk18: Area.gLoadedGraphNodes[args[0]]
+            behaviorArg: bharg,
+            behaviorScript: bhscript,
+            unk18: Area.gLoadedGraphNodes[model]
         })
 
         this.sCurrentScript.index++
-
     }
 
-    load_model_from_geo(args) {
-
-        if (args[0] < 256) {
-            Area.gLoadedGraphNodes[args[0]] = GeoLayout.process_geo_layout(args[1]).node
+    load_model_from_geo(model, geo) {
+        if (model < 256) {
+            Area.gLoadedGraphNodes[model] = GeoLayout.process_geo_layout(geo).node
         } else throw "invalid gLoadedGraphNodes index - load model from geo"
 
         this.sCurrentScript.index++
     }
 
-    set_mario_pos(args) {
+    load_model_from_dl(model, dl, layer) {
+        if (model < 256) {
+            Area.gLoadedGraphNodes[model] = GraphNode.init_graph_node_display_list(layer, dl).node
+        } else throw "invalid gLoadedGraphNodes index - load model from dl"
 
-        let yaw = parseInt(args[1] * 0x8000 / 180)
-        yaw = yaw > 32767 ? yaw - 65536 : yaw
-        yaw = yaw < -32768 ? yaw + 65536 : yaw
+        this.sCurrentScript.index++
+    }
+
+    set_mario_pos(area, yaw, x, y, z) {
+        yaw = Camera.DEGREES(yaw)
 
         Object.assign(Area.gMarioSpawnInfo, {
-            areaIndex: args[0],
-            startPos: [ args[2], args[3], args[4] ],
+            areaIndex: area,
+            startPos: [ x, y, z ],
             startAngle: [0, yaw, 0 ]
         })
 
         this.sCurrentScript.index++
     }
 
-    load_mario_head(args) {
+    load_mario_head(id) {
         GoddardRenderer.gdm_setup()
-        GoddardRenderer.gdm_maketestdl(args[0])
+        GoddardRenderer.gdm_maketestdl(id)
         this.sCurrentScript.index++
     }
 
-    sleep(args) {
+    sleep(delay) {
         //console.log("sleep")
         this.sScriptStatus = SCRIPT_PAUSED
 
         if (this.sDelayFrames == 0) {
-            this.sDelayFrames = args[0]
+            this.sDelayFrames = delay
         } else if (--this.sDelayFrames == 0) {
             this.sCurrentScript.index++
             this.sScriptStatus = SCRIPT_RUNNING
         }
     }
 
-    blackout(args) {
+    blackout(bool) {
         //console.log("blackout")
         this.sCurrentScript.index++
     }
 
-    set_register(args) {
+    set_register(value) {
         //console.log("set register")
-        const new_value = args[0].call ? args[0]() : args[0]
+        const new_value = value.call ? value() : value
         this.sRegister = new_value
         this.sCurrentScript.index++
     }
@@ -131,20 +156,15 @@ class LevelCommands {
             case 6: return this.sRegister > arg
             case 7: return this.sRegister >= arg
         }
-
     }
 
-    call(args) {
-        const func = args[1]
-        const funcClass = args[2]
-        this.sRegister = func.call(funcClass, args[0], this.sRegister)
+    call(arg, func, funcClass) {
+        this.sRegister = func.call(funcClass, arg, this.sRegister)
         this.sCurrentScript.index++
     }
 
-    call_loop(args) {
-        const func = args[1]
-        const funcClass = args[2]
-        this.sRegister = func.call(funcClass, args[0], this.sRegister)
+    call_loop(arg, func, funcClass) {
+        this.sRegister = func.call(funcClass, arg, this.sRegister)
         
         if (this.sRegister == 0) {
             this.sScriptStatus = SCRIPT_PAUSED
@@ -154,55 +174,39 @@ class LevelCommands {
         }
     }
 
-    alloc_level_pool(args) {
+    alloc_level_pool() {
         //console.log("alloc level pool")
         this.sCurrentScript.index++
     }
 
-    free_level_pool(args) {
+    free_level_pool() {
         this.sCurrentScript.index++
     }
 
-    get_or_set(args) {
-        if (args[0] == 0) { // SET
-            switch (args[1]) {
-                case 0: Area.gCurrSaveFileNum = this.sRegister; break
-                case 1: Area.gCurrCourseNum = this.sRegister; break
-                case 2: Area.gCurrActNum = this.sRegister; break
-                case 3: Area.gCurrLevelNum = this.sRegister; break
-                case 4: Area.gCurAreaIndex = this.sRegister; break
-                case 5: LevelUpdate.gPressedStart = this.sRegister; break
-            }
-        } else {  // GET
-            switch (args[1]) {
-                case 0: this.sRegister = Area.gCurrSaveFileNum; break
-                case 1: this.sRegister = Area.gCurrCourseNum; break
-                case 2: this.sRegister = Area.gCurrActNum; break
-                case 3: this.sRegister = Area.gCurrLevelNum; break
-                case 4: this.sRegister = Area.gCurAreaIndex; break
-                case 5: this.sRegister = LevelUpdate.gPressedStart; break
-            }
-        }
+    get_area(what) {
+        this.sRegister = Area[what]
         this.sCurrentScript.index++
     }
 
-    load_area(args) {
-        const areaIndex = args[0]
+
+    set_area(what, value) {
+        Area[what] = this.sRegister
+        this.sCurrentScript.index++
+    }
+
+    load_area(areaIndex) {
         Area.load_area(areaIndex)
         this.sCurrentScript.index++
     }
 
-    unload_area(args) {
+    unload_area() {
         Area.clear_areas()
         //clear_area_graph_nodes -- call all node functions with init and clear command
         this.sCurrentScript.index++
     }
 
-    begin_area(args) {
+    begin_area(areaIndex, geoLayout) {
         //console.log("begin area")
-
-        const areaIndex = args[0]
-        const geoLayout = args[1]
 
         if (areaIndex < 8) {
             const screnArea = GeoLayout.process_geo_layout(geoLayout)
@@ -220,93 +224,89 @@ class LevelCommands {
         }
         this.sCurrentScript.index++
     }
-	//  { command: LevelCommands.place_object, args: [ACT, MODEL, X,Y,Z, P,Y,R, BHARG, BHSCRIPT] },
-    place_object(args) {
 
+    place_object(act, model, x, y, z, pitch, yaw, rot, bharg, bhscript) {
         const val7 = 1 << (Area.gCurrActNum - 1)
 
-        if (this.sCurrAreaIndex != -1 && (args[0] & val7 || args[0] == 0x1F)) {
-            const model = args[1]
+        if (this.sCurrAreaIndex != -1 && (act & val7 || act == 0x1F)) {
             const spawnInfo = {
-                startPos: [ args[2], args[3], args[4] ],
-                startAngle: [args[5] * 0x8000 / 180, args[6] * 0x8000 / 180, args[7] * 0x8000 / 180],
+                startPos: [ x, y, z ],
+                startAngle: [Camera.DEGREES(pitch), Camera.DEGREES(yaw), Camera.DEGREES(rot)],
                 areaIndex: this.sCurrAreaIndex,
                 activeAreaIndex: this.sCurrAreaIndex,
-                behaviorArg: args[8],
-                behaviorScript: args[9],
+                behaviorArg: bharg,
+                behaviorScript: bhscript,
                 unk18: Area.gLoadedGraphNodes[model],
                 next: Area.gAreas[this.sCurrAreaIndex].objectSpawnInfos
             }
 
             Area.gAreas[this.sCurrAreaIndex].objectSpawnInfos = spawnInfo
-
         }
 
         this.sCurrentScript.index++
     }
 
-    macro_objects(args) {
+    macro_objects(data) {
         if (this.sCurrAreaIndex != -1) {
-            const data = args[0]
-
             Area.gAreas[this.sCurrAreaIndex].macroObjects = data
         }
 
         this.sCurrentScript.index++
     }
 
-    rooms(args) {
-        if (this.sCurrAreaIndex != -1)
-            Area.gAreas[this.sCurrAreaIndex].surfaceRooms = args[0]
-
-        this.sCurrentScript.index++
-    }
-
-    terrain(args) {
-        if (this.sCurrAreaIndex != -1)
-            Area.gAreas[this.sCurrAreaIndex].terrainData = args[0]
-
-        this.sCurrentScript.index++
-    }
-
-    end_area(args) {
-        this.sCurrAreaIndex = -1
-        this.sCurrentScript.index++
-    }
-
-    transition(args) {
-
-        if (Area.gCurrentArea) {
-            Area.play_transition(args[0], args[1], args[2], args[3], args[4])
+    rooms(rms) {
+        if (this.sCurrAreaIndex != -1) {
+            Area.gAreas[this.sCurrAreaIndex].surfaceRooms = rms
         }
 
         this.sCurrentScript.index++
     }
 
-    cleardemoptr(args) {
+    terrain(data) {
+        if (this.sCurrAreaIndex != -1) {
+            Area.gAreas[this.sCurrAreaIndex].terrainData = data
+        }
+
+        this.sCurrentScript.index++
+    }
+
+    end_area() {
+        this.sCurrAreaIndex = -1
+        this.sCurrentScript.index++
+    }
+
+    transition(transType, time, red, green, blue) {
+        if (Area.gCurrentArea) {
+            Area.play_transition(transType, time, red, green, blue)
+        }
+
+        this.sCurrentScript.index++
+    }
+
+    cleardemoptr() {
         Game.gCurrDemoInput = null
         this.sCurrentScript.index++
     }
 
-    execute(args) {
-        const new_script = args[0].call ? args[0]() : args[0]
+    execute(script) {
+        const new_script = script.call ? script() : script
         this.start_new_script(new_script)
     }
 
-    jump_link(args) {
+    jump_link(script) {
         this.sStackTop.push({ commands: this.sCurrentScript.commands, index: ++this.sCurrentScript.index })
-        this.start_new_script(args[0])
+        this.start_new_script(script)
     }
 
-    jump_if(args) {
-        if (this.eval_script_op(args[0], args[1]) != 0) {
-            this.start_new_script(args[2])
+    jump_if(op, arg, script) {
+        if (this.eval_script_op(op, arg) != 0) {
+            this.start_new_script(script)
         } else {
             this.sCurrentScript.index++
         }
     }
 
-    return(args) {
+    return() {
         this.sCurrentScript = this.sStackTop.pop()
     }
 
@@ -320,16 +320,19 @@ class LevelCommands {
 
         while (this.sScriptStatus == SCRIPT_RUNNING) {
             const cmd = this.sCurrentScript.commands[this.sCurrentScript.index]
-            //console.log("running script command: " + cmd.command.name)
-            cmd.command.call(this, cmd.args)
+            if (Array.isArray(cmd)) {
+                // new style of command: ['name', args, ...]
+                this[cmd[0]].call(this, ...cmd.slice(1))
+            } else {
+                //console.log("running script command: " + cmd.command.name)
+                cmd.command.call(this, ...(cmd.args || []))
+            }
         }
 
         Game.init_render_image()
         Area.render_game()
         Game.end_master_display_list()
-
     }
-
 }
 
 export const LevelCommandsInstance = new LevelCommands()

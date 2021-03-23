@@ -2,6 +2,7 @@ import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { AreaInstance as Area } from "./Area"
 import { MarioMiscInstance as MarioMisc } from "./MarioMisc"
 import { CameraInstance as Camera } from "./Camera"
+import { CAMERA_MODE_BEHIND_MARIO, CAMERA_MODE_WATER_SURFACE } from "./Camera"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
 import { GRAPH_RENDER_INVISIBLE, geo_update_animation_frame, retrieve_animation_index } from "../engine/graph_node"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
@@ -43,41 +44,11 @@ export const ANIM_TYPE_NO_TRANSLATION = 4
 // translation types the type is set to this
 export const ANIM_TYPE_ROTATION = 5
 
-export const MARIO_ANIM_FALL_OVER_BACKWARDS = 0x01
-export const MARIO_ANIM_IDLE_HEAD_LEFT = 0xC3
-export const MARIO_ANIM_IDLE_HEAD_RIGHT = 0xC4
-export const MARIO_ANIM_IDLE_HEAD_CENTER = 0xC5
-export const MARIO_ANIM_BACKWARD_AIR_KB = 0x02
-export const MARIO_ANIM_IDLE_ON_LEDGE = 0x33
-export const MARIO_ANIM_CLIMB_DOWN_LEDGE = 0x1C
-export const MARIO_ANIM_FAST_LEDGE_GRAB = 0x34
 export const MARIO_ANIM_SLOW_LEDGE_GRAB = 0x00
-export const MARIO_ANIM_MOVE_ON_WIRE_NET_RIGHT = 0x5C
-export const MARIO_ANIM_MOVE_ON_WIRE_NET_LEFT = 0x5D
-export const MARIO_ANIM_HANDSTAND_LEFT = 0xC6
-export const MARIO_ANIM_HANDSTAND_RIGHT = 0xC7
-export const MARIO_ANIM_WALKING = 0x48
-export const MARIO_ANIM_RUNNING = 0x72
-export const MARIO_ANIM_SKID_ON_GROUND = 0x0F
-export const MARIO_ANIM_STOP_SKID = 0x10
-export const MARIO_ANIM_TURNING_PART1 = 0xBC
-export const MARIO_ANIM_TURNING_PART2 = 0xBD
-export const MARIO_ANIM_LAND_FROM_SINGLE_JUMP = 0x4E
-export const MARIO_ANIM_SINGLE_JUMP = 0x4D
-export const MARIO_ANIM_GENERAL_FALL = 0x56
-export const MARIO_ANIM_GENERAL_LAND = 0x57
-export const MARIO_ANIM_SLIDEFLIP_LAND = 0xBE
-export const MARIO_ANIM_SLIDEFLIP = 0xBF
-export const MARIO_ANIM_LAND_FROM_DOUBLE_JUMP = 0x4B
-export const MARIO_ANIM_DOUBLE_JUMP_FALL = 0x4C
-export const MARIO_ANIM_DOUBLE_JUMP_RISE = 0x50
-export const MARIO_ANIM_TRIPLE_JUMP_LAND = 0xC0
-export const MARIO_ANIM_TRIPLE_JUMP = 0xC1
-export const MARIO_ANIM_GROUND_KICK = 0x66
-export const MARIO_ANIM_FIRST_PUNCH = 0x67
-export const MARIO_ANIM_SECOND_PUNCH = 0x68
-export const MARIO_ANIM_FIRST_PUNCH_FAST = 0x69
-export const MARIO_ANIM_SECOND_PUNCH_FAST = 0x6A
+export const MARIO_ANIM_FALL_OVER_BACKWARDS = 0x01
+export const MARIO_ANIM_BACKWARD_AIR_KB = 0x02
+export const MARIO_ANIM_DYING_ON_BACK = 0x03
+export const MARIO_ANIM_BACKFLIP = 0x04
 export const MARIO_ANIM_CLIMB_UP_POLE = 0x05
 export const MARIO_ANIM_GRAB_POLE_SHORT = 0x06
 export const MARIO_ANIM_GRAB_POLE_SWING_PART1 = 0x07
@@ -87,68 +58,201 @@ export const MARIO_ANIM_HANDSTAND_JUMP = 0x0A
 export const MARIO_ANIM_START_HANDSTAND = 0x0B
 export const MARIO_ANIM_RETURN_FROM_HANDSTAND = 0x0C
 export const MARIO_ANIM_IDLE_ON_POLE = 0x0D
-export const MARIO_ANIM_SLIDEJUMP = 0xCB
+export const MARIO_ANIM_A_POSE = 0x0E
+export const MARIO_ANIM_SKID_ON_GROUND = 0x0F
+export const MARIO_ANIM_STOP_SKID = 0x10
+export const MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP = 0x11
+export const MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP = 0x12
+export const MARIO_ANIM_FAST_LONGJUMP = 0x13
+export const MARIO_ANIM_SLOW_LONGJUMP = 0x14
+export const MARIO_ANIM_AIRBORNE_ON_STOMACH = 0x15
+export const MARIO_ANIM_WALK_WITH_LIGHT_OBJ = 0x16
+export const MARIO_ANIM_RUN_WITH_LIGHT_OBJ = 0x17
+export const MARIO_ANIM_SLOW_WALK_WITH_LIGHT_OBJ = 0x18
+export const MARIO_ANIM_SHIVERING_WARMING_HAND = 0x19
+export const MARIO_ANIM_SHIVERING_RETURN_TO_IDLE = 0x1A
+export const MARIO_ANIM_SHIVERING = 0x1B
+export const MARIO_ANIM_CLIMB_DOWN_LEDGE = 0x1C
+export const MARIO_ANIM_CREDITS_WAVING = 0x1D
+export const MARIO_ANIM_CREDITS_LOOK_UP = 0x1E
+export const MARIO_ANIM_CREDITS_RETURN_FROM_LOOK_UP = 0x1F
+export const MARIO_ANIM_CREDITS_RAISE_HAND = 0x20
+export const MARIO_ANIM_CREDITS_LOWER_HAND = 0x21
+export const MARIO_ANIM_CREDITS_TAKE_OFF_CAP = 0x22
+export const MARIO_ANIM_CREDITS_START_WALK_LOOK_UP = 0x23
+export const MARIO_ANIM_CREDITS_LOOK_BACK_THEN_RUN = 0x24
+export const MARIO_ANIM_FINAL_BOWSER_RAISE_HAND_SPIN = 0x25
+export const MARIO_ANIM_FINAL_BOWSER_WING_CAP_TAKE_OFF = 0x26
+export const MARIO_ANIM_CREDITS_PEACE_SIGN = 0x27
+export const MARIO_ANIM_STAND_UP_FROM_LAVA_BOOST = 0x28
+export const MARIO_ANIM_FIRE_LAVA_BURN = 0x29
+export const MARIO_ANIM_WING_CAP_FLY = 0x2A
+export const MARIO_ANIM_HANG_ON_OWL = 0x2B
+export const MARIO_ANIM_LAND_ON_STOMACH = 0x2C
+export const MARIO_ANIM_AIR_FORWARD_KB = 0x2D
+export const MARIO_ANIM_DYING_ON_STOMACH = 0x2E
+export const MARIO_ANIM_SUFFOCATING = 0x2F
+export const MARIO_ANIM_COUGHING = 0x30
+export const MARIO_ANIM_THROW_CATCH_KEY = 0x31
+export const MARIO_ANIM_DYING_FALL_OVER = 0x32
+export const MARIO_ANIM_IDLE_ON_LEDGE = 0x33
+export const MARIO_ANIM_FAST_LEDGE_GRAB = 0x34
+export const MARIO_ANIM_HANG_ON_CEILING = 0x35
+export const MARIO_ANIM_PUT_CAP_ON = 0x36
+export const MARIO_ANIM_TAKE_CAP_OFF_THEN_ON = 0x37
+// MARIO_ANIM_QUICKLY_PUT_CAP_ON, // unused = 0x38
+export const MARIO_ANIM_HEAD_STUCK_IN_GROUND = 0x39
+export const MARIO_ANIM_GROUND_POUND_LANDING = 0x3A
+export const MARIO_ANIM_TRIPLE_JUMP_GROUND_POUND = 0x3B
+export const MARIO_ANIM_START_GROUND_POUND = 0x3C
+export const MARIO_ANIM_GROUND_POUND = 0x3D
+export const MARIO_ANIM_BOTTOM_STUCK_IN_GROUND = 0x3E
+export const MARIO_ANIM_IDLE_WITH_LIGHT_OBJ = 0x3F
+export const MARIO_ANIM_JUMP_LAND_WITH_LIGHT_OBJ = 0x40
+export const MARIO_ANIM_JUMP_WITH_LIGHT_OBJ = 0x41
+export const MARIO_ANIM_FALL_LAND_WITH_LIGHT_OBJ = 0x42
+export const MARIO_ANIM_FALL_WITH_LIGHT_OBJ = 0x43
+export const MARIO_ANIM_FALL_FROM_SLIDING_WITH_LIGHT_OBJ = 0x44
+export const MARIO_ANIM_SLIDING_ON_BOTTOM_WITH_LIGHT_OBJ = 0x45
+export const MARIO_ANIM_STAND_UP_FROM_SLIDING_WITH_LIGHT_OBJ = 0x46
+export const MARIO_ANIM_RIDING_SHELL = 0x47
+export const MARIO_ANIM_WALKING = 0x48
+// MARIO_ANIM_FORWARD_FLIP, // unused = 0x49
+export const MARIO_ANIM_JUMP_RIDING_SHELL = 0x4A
+export const MARIO_ANIM_LAND_FROM_DOUBLE_JUMP = 0x4B
+export const MARIO_ANIM_DOUBLE_JUMP_FALL = 0x4C
+export const MARIO_ANIM_SINGLE_JUMP = 0x4D
+export const MARIO_ANIM_LAND_FROM_SINGLE_JUMP = 0x4E
+export const MARIO_ANIM_AIR_KICK = 0x4F
+export const MARIO_ANIM_DOUBLE_JUMP_RISE = 0x50
+// MARIO_ANIM_START_FORWARD_SPINNING, // unused = 0x51
+export const MARIO_ANIM_THROW_LIGHT_OBJECT = 0x52
+export const MARIO_ANIM_FALL_FROM_SLIDE_KICK = 0x53
+// MARIO_ANIM_BEND_KNESS_RIDING_SHELL, // unused = 0x54
+export const MARIO_ANIM_LEGS_STUCK_IN_GROUND = 0x55
+export const MARIO_ANIM_GENERAL_FALL = 0x56
+export const MARIO_ANIM_GENERAL_LAND = 0x57
+export const MARIO_ANIM_BEING_GRABBED = 0x58
+export const MARIO_ANIM_GRAB_HEAVY_OBJECT = 0x59
+export const MARIO_ANIM_SLOW_LAND_FROM_DIVE = 0x5A
+export const MARIO_ANIM_FLY_FROM_CANNON = 0x5B
+export const MARIO_ANIM_MOVE_ON_WIRE_NET_RIGHT = 0x5C
+export const MARIO_ANIM_MOVE_ON_WIRE_NET_LEFT = 0x5D
+export const MARIO_ANIM_MISSING_CAP = 0x5E
+export const MARIO_ANIM_PULL_DOOR_WALK_IN = 0x5F
+export const MARIO_ANIM_PUSH_DOOR_WALK_IN = 0x60
+export const MARIO_ANIM_UNLOCK_DOOR = 0x61
+// MARIO_ANIM_START_REACH_POCKET, // unused, reaching keys maybe? = 0x62
+// MARIO_ANIM_REACH_POCKET, // unused = 0x63
+// MARIO_ANIM_STOP_REACH_POCKET, // unused = 0x64
+export const MARIO_ANIM_GROUND_THROW = 0x65
+export const MARIO_ANIM_GROUND_KICK = 0x66
+export const MARIO_ANIM_FIRST_PUNCH = 0x67
+export const MARIO_ANIM_SECOND_PUNCH = 0x68
+export const MARIO_ANIM_FIRST_PUNCH_FAST = 0x69
+export const MARIO_ANIM_SECOND_PUNCH_FAST = 0x6A
+export const MARIO_ANIM_PICK_UP_LIGHT_OBJ = 0x6B
+export const MARIO_ANIM_PUSHING = 0x6C
+export const MARIO_ANIM_START_RIDING_SHELL = 0x6D
+export const MARIO_ANIM_PLACE_LIGHT_OBJ = 0x6E
+export const MARIO_ANIM_FORWARD_SPINNING = 0x6F
+export const MARIO_ANIM_BACKWARD_SPINNING = 0x70
+export const MARIO_ANIM_BREAKDANCE = 0x71
+export const MARIO_ANIM_RUNNING = 0x72
+// MARIO_ANIM_RUNNING_UNUSED, // unused duplicate, originally part 2? = 0x73
+export const MARIO_ANIM_SOFT_BACK_KB = 0x74
+export const MARIO_ANIM_SOFT_FRONT_KB = 0x75
+export const MARIO_ANIM_DYING_IN_QUICKSAND = 0x76
+export const MARIO_ANIM_IDLE_IN_QUICKSAND = 0x77
+export const MARIO_ANIM_MOVE_IN_QUICKSAND = 0x78
+export const MARIO_ANIM_ELECTROCUTION = 0x79
+export const MARIO_ANIM_SHOCKED = 0x7A
+export const MARIO_ANIM_BACKWARD_KB = 0x7B
+export const MARIO_ANIM_FORWARD_KB = 0x7C
+export const MARIO_ANIM_IDLE_HEAVY_OBJ = 0x7D
+export const MARIO_ANIM_STAND_AGAINST_WALL = 0x7E
+export const MARIO_ANIM_SIDESTEP_LEFT = 0x7F
+export const MARIO_ANIM_SIDESTEP_RIGHT = 0x80
+export const MARIO_ANIM_START_SLEEP_IDLE = 0x81
+export const MARIO_ANIM_START_SLEEP_SCRATCH = 0x82
+export const MARIO_ANIM_START_SLEEP_YAWN = 0x83
+export const MARIO_ANIM_START_SLEEP_SITTING = 0x84
+export const MARIO_ANIM_SLEEP_IDLE = 0x85
+export const MARIO_ANIM_SLEEP_START_LYING = 0x86
+export const MARIO_ANIM_SLEEP_LYING = 0x87
+export const MARIO_ANIM_DIVE = 0x88
+export const MARIO_ANIM_SLIDE_DIVE = 0x89
+export const MARIO_ANIM_GROUND_BONK = 0x8A
+export const MARIO_ANIM_STOP_SLIDE_LIGHT_OBJ = 0x8B
+export const MARIO_ANIM_SLIDE_KICK = 0x8C
+export const MARIO_ANIM_CROUCH_FROM_SLIDE_KICK = 0x8D
+// MARIO_ANIM_SLIDE_MOTIONLESS, // unused = 0x8E
+export const MARIO_ANIM_STOP_SLIDE = 0x8F
+export const MARIO_ANIM_FALL_FROM_SLIDE = 0x90
+export const MARIO_ANIM_SLIDE = 0x91
+export const MARIO_ANIM_TIPTOE = 0x92
+export const MARIO_ANIM_TWIRL_LAND = 0x93
+export const MARIO_ANIM_TWIRL = 0x94
+export const MARIO_ANIM_START_TWIRL = 0x95
 export const MARIO_ANIM_STOP_CROUCHING = 0x96
 export const MARIO_ANIM_START_CROUCHING = 0x97
 export const MARIO_ANIM_CROUCHING = 0x98
 export const MARIO_ANIM_CRAWLING = 0x99
 export const MARIO_ANIM_STOP_CRAWLING = 0x9A
 export const MARIO_ANIM_START_CRAWLING = 0x9B
-export const MARIO_ANIM_BACKFLIP = 0x04
-export const MARIO_ANIM_BREAKDANCE = 0x71
-export const MARIO_ANIM_FAST_LONGJUMP = 0x13
-export const MARIO_ANIM_SLOW_LONGJUMP = 0x14
-export const MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP = 0x11
-export const MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP = 0x12
-export const MARIO_ANIM_DIVE = 0x88
-export const MARIO_ANIM_SLIDE_DIVE = 0x89
-export const MARIO_ANIM_SLOW_LAND_FROM_DIVE = 0x5A
-export const MARIO_ANIM_AIRBORNE_ON_STOMACH = 0x15
-export const MARIO_ANIM_LAND_ON_STOMACH = 0x2C
-export const MARIO_ANIM_STOP_SLIDE = 0x8F
-export const MARIO_ANIM_FALL_FROM_SLIDE = 0x90
-export const MARIO_ANIM_SLIDE = 0x91
-export const MARIO_ANIM_AIR_KICK = 0x4F
-export const MARIO_ANIM_HANG_ON_CEILING = 0x35
-export const MARIO_ANIM_FORWARD_SPINNING = 0x6F
-export const MARIO_ANIM_BACKWARD_SPINNING = 0x70
-export const MARIO_ANIM_START_TIPTOE = 0xCA
-export const MARIO_ANIM_TIPTOE = 0x92
-export const MARIO_ANIM_SLIDE_KICK = 0x8C
-export const MARIO_ANIM_CROUCH_FROM_SLIDE_KICK = 0x8D
-export const MARIO_ANIM_FALL_FROM_SLIDE_KICK = 0x53
-export const MARIO_ANIM_GROUND_POUND_LANDING = 0x3A
-export const MARIO_ANIM_TRIPLE_JUMP_GROUND_POUND = 0x3B
-export const MARIO_ANIM_START_GROUND_POUND = 0x3C
-export const MARIO_ANIM_GROUND_POUND = 0x3D
-export const MARIO_ANIM_SOFT_BACK_KB = 0x74
-export const MARIO_ANIM_SOFT_FRONT_KB = 0x75
-export const MARIO_ANIM_BACKWARD_KB = 0x7B
-export const MARIO_ANIM_FORWARD_KB = 0x7C
-export const MARIO_ANIM_START_WALLKICK = 0xCC
-export const MARIO_ANIM_STAND_AGAINST_WALL = 0x7E
-export const MARIO_ANIM_PUSHING = 0x6C
-export const MARIO_ANIM_SIDESTEP_LEFT = 0x7F
-export const MARIO_ANIM_SIDESTEP_RIGHT = 0x80
+export const MARIO_ANIM_SUMMON_STAR = 0x9C
+export const MARIO_ANIM_RETURN_STAR_APPROACH_DOOR = 0x9D
+export const MARIO_ANIM_BACKWARDS_WATER_KB = 0x9E
+export const MARIO_ANIM_SWIM_WITH_OBJ_PART1 = 0x9F
+export const MARIO_ANIM_SWIM_WITH_OBJ_PART2 = 0xA0
+export const MARIO_ANIM_FLUTTERKICK_WITH_OBJ = 0xA1
+export const MARIO_ANIM_WATER_ACTION_END_WITH_OBJ = 0xA2 // either swimming or flutterkicking
+export const MARIO_ANIM_STOP_GRAB_OBJ_WATER = 0xA3
+export const MARIO_ANIM_WATER_IDLE_WITH_OBJ = 0xA4
 export const MARIO_ANIM_DROWNING_PART1 = 0xA5
 export const MARIO_ANIM_DROWNING_PART2 = 0xA6
-export const MARIO_ANIM_WATER_IDLE_WITH_OBJ = 0xA4
-export const MARIO_ANIM_WATER_IDLE = 0xB2
-export const MARIO_ANIM_WATER_ACTION_END_WITH_OBJ = 0xA2 // either swimming or flutterkicking
-export const MARIO_ANIM_WATER_ACTION_END = 0xAD  // either swimming or flutterkicking
-export const MARIO_ANIM_STOP_GRAB_OBJ_WATER = 0xa3
-export const MARIO_ANIM_BACKWARDS_WATER_KB = 0x9E 
-export const MARIO_ANIM_WATER_FORWARD_KB = 0xA8 
-export const MARIO_ANIM_SHOCKED = 0x7A 
-export const MARIO_ANIM_FLUTTERKICK_WITH_OBJ = 0xA1 
-export const MARIO_ANIM_FLUTTERKICK = 0xAC 
-export const MARIO_ANIM_FALL_WITH_LIGHT_OBJ = 0x43 
-export const MARIO_ANIM_SWIM_PART1 = 0xAA 
-export const MARIO_ANIM_SWIM_PART2 = 0xAB 
+export const MARIO_ANIM_WATER_DYING = 0xA7
+export const MARIO_ANIM_WATER_FORWARD_KB = 0xA8
+export const MARIO_ANIM_FALL_FROM_WATER = 0xA9
+export const MARIO_ANIM_SWIM_PART1 = 0xAA
+export const MARIO_ANIM_SWIM_PART2 = 0xAB
+export const MARIO_ANIM_FLUTTERKICK = 0xAC
+export const MARIO_ANIM_WATER_ACTION_END = 0xAD // either swimming or flutterkicking
 export const MARIO_ANIM_WATER_PICK_UP_OBJ = 0xAE
-export const MARIO_ANIM_WATER_GRAB_OBJ_PART2 = 0xAF 
-export const MARIO_ANIM_WATER_GRAB_OBJ_PART1 = 0xB0 
-
+export const MARIO_ANIM_WATER_GRAB_OBJ_PART2 = 0xAF
+export const MARIO_ANIM_WATER_GRAB_OBJ_PART1 = 0xB0
+export const MARIO_ANIM_WATER_THROW_OBJ = 0xB1
+export const MARIO_ANIM_WATER_IDLE = 0xB2
+export const MARIO_ANIM_WATER_STAR_DANCE = 0xB3
+export const MARIO_ANIM_RETURN_FROM_WATER_STAR_DANCE = 0xB4
+export const MARIO_ANIM_GRAB_BOWSER = 0xB5
+export const MARIO_ANIM_SWINGING_BOWSER = 0xB6
+export const MARIO_ANIM_RELEASE_BOWSER = 0xB7
+export const MARIO_ANIM_HOLDING_BOWSER = 0xB8
+export const MARIO_ANIM_HEAVY_THROW = 0xB9
+export const MARIO_ANIM_WALK_PANTING = 0xBA
+export const MARIO_ANIM_WALK_WITH_HEAVY_OBJ = 0xBB
+export const MARIO_ANIM_TURNING_PART1 = 0xBC
+export const MARIO_ANIM_TURNING_PART2 = 0xBD
+export const MARIO_ANIM_SLIDEFLIP_LAND = 0xBE
+export const MARIO_ANIM_SLIDEFLIP = 0XBF
+export const MARIO_ANIM_TRIPLE_JUMP_LAND = 0xC0
+export const MARIO_ANIM_TRIPLE_JUMP = 0xC1
+export const MARIO_ANIM_FIRST_PERSON = 0xC2
+export const MARIO_ANIM_IDLE_HEAD_LEFT = 0xC3
+export const MARIO_ANIM_IDLE_HEAD_RIGHT = 0xC4
+export const MARIO_ANIM_IDLE_HEAD_CENTER = 0xC5
+export const MARIO_ANIM_HANDSTAND_LEFT = 0xC6
+export const MARIO_ANIM_HANDSTAND_RIGHT = 0xC7
+export const MARIO_ANIM_WAKE_FROM_SLEEP = 0xC8
+export const MARIO_ANIM_WAKE_FROM_LYING = 0xC9
+export const MARIO_ANIM_START_TIPTOE = 0xCA
+export const MARIO_ANIM_SLIDEJUMP = 0xCB // pole jump and wall kick
+export const MARIO_ANIM_START_WALLKICK = 0xCC
+export const MARIO_ANIM_STAR_DANCE = 0xCD
+export const MARIO_ANIM_RETURN_FROM_STAR_DANCE = 0xCE
+export const MARIO_ANIM_FORWARD_SPINNING_FLIP = 0xCF
+export const MARIO_ANIM_TRIPLE_JUMP_FLY = 0xD0
 
 export const MARIO_NORMAL_CAP = 0x00000001
 export const MARIO_VANISH_CAP = 0x00000002
@@ -181,149 +285,254 @@ export const ACT_GROUP_CUTSCENE = (4 << 6)
 export const ACT_GROUP_AUTOMATIC = (5 << 6)
 export const ACT_GROUP_OBJECT = (6 << 6)
 
-export const ACT_IDLE = 0x0C400201
-export const ACT_WALKING = 0x04000440
-export const ACT_DECELERATING = 0x0400044A
-export const ACT_BRAKING = 0x04000445
-export const ACT_STANDING_AGAINST_WALL = 0x0C400209
-export const ACT_BRAKING_STOP = 0x0C00023D
-export const ACT_TURNING_AROUND = 0x00000443
-export const ACT_FINISH_TURNING_AROUND = 0x00000444
-export const ACT_CRAWLING = 0x04008448
-export const ACT_JUMP = 0x03000880
-export const ACT_JUMP_LAND = 0x04000470
-export const ACT_FREEFALL = 0x0100088C
-export const ACT_FREEFALL_LAND = 0x04000471
-export const ACT_FREEFALL_LAND_STOP = 0x0C000232
-export const ACT_DOUBLE_JUMP    = 0x03000881
-export const ACT_JUMP_LAND_STOP = 0x0C000230
-export const ACT_BEGIN_SLIDING = 0x00000050
-export const ACT_LONG_JUMP = 0x03000888
-export const ACT_SIDE_FLIP = 0x01000887
-export const ACT_SIDE_FLIP_LAND = 0x04000473
-export const ACT_SIDE_FLIP_LAND_STOP = 0x0C000233
-export const ACT_DOUBLE_JUMP_LAND = 0x04000472
-export const ACT_DOUBLE_JUMP_LAND_STOP = 0x0C000231
-export const ACT_TRIPLE_JUMP = 0x01000882
-export const ACT_TRIPLE_JUMP_LAND = 0x04000478
-export const ACT_TRIPLE_JUMP_LAND_STOP = 0x0800023A
-export const ACT_PUNCHING = 0x00800380
-export const ACT_GRAB_POLE_SLOW = 0x00100341
-export const ACT_GRAB_POLE_FAST = 0x00100342
-export const ACT_HOLDING_POLE = 0x08100340
-export const ACT_CLIMBING_POLE            =  0x00100343
-export const ACT_TOP_OF_POLE_TRANSITION   =  0x00100344
-export const ACT_TOP_OF_POLE              =  0x00100345
-export const ACT_START_HANGING = 0x08200348
-export const ACT_WALL_KICK_AIR = 0x03000886
-export const ACT_TOP_OF_POLE_JUMP = 0x0300088D
-export const ACT_CROUCHING                =  0x0C008220 
-export const ACT_START_CROUCHING          =  0x0C008221 
-export const ACT_STOP_CROUCHING           =  0x0C008222 
-export const ACT_START_CRAWLING           =  0x0C008223 
-export const ACT_STOP_CRAWLING            =  0x0C008224 
-export const ACT_BACKFLIP                 =  0x01000883
-export const ACT_BACKFLIP_LAND            =  0x0400047A 
-export const ACT_BACKFLIP_LAND_STOP       =  0x0800022F
-export const ACT_CROUCH_SLIDE             =  0x04808459 
-export const ACT_LONG_JUMP_LAND           = 0x00000479
-export const ACT_LONG_JUMP_LAND_STOP      =  0x0800023B 
-export const ACT_BBH_ENTER_SPIN           =  0x00001535
-export const ACT_SLIDE_KICK = 0x018008AA
-export const ACT_DIVE = 0x0188088A
-export const ACT_JUMP_KICK = 0x018008AC
-export const ACT_STOMACH_SLIDE_STOP = 0x00000386
-export const ACT_STOMACH_SLIDE = 0x008C0453
-export const ACT_DIVE_SLIDE = 0x00880456
-export const ACT_FORWARD_ROLLOUT = 0x010008A6
-export const ACT_BACKWARD_ROLLOUT = 0x010008AD
-export const ACT_MOVE_PUNCHING = 0x00800457 
-export const ACT_SLIDE_KICK_SLIDE = 0x0080045A
-export const ACT_SLIDE_KICK_SLIDE_STOP = 0x08000225
-export const ACT_SHOCKWAVE_BOUNCE = 0x00020226
-export const ACT_FIRST_PERSON = 0x0C000227
-export const ACT_GROUND_POUND = 0x008008A9
-export const ACT_GROUND_POUND_LAND = 0x0080023C
-export const ACT_BUTT_SLIDE_STOP = 0x0C00023E
-export const ACT_AIR_HIT_WALL = 0x000008A7
-export const ACT_RIDING_HOOT = 0x000004A8
-export const ACT_SLEEPING = 0x0C000203
-export const ACT_START_SLEEPING = 0x0C400202
-export const ACT_LEDGE_CLIMB_DOWN = 0x0000054E
-export const ACT_LEDGE_CLIMB_SLOW_1 = 0x0000054C
-export const ACT_LEDGE_GRAB = 0x0800034B
-export const ACT_LEDGE_CLIMB_FAST = 0x0000054F
-export const ACT_SOFT_BONK = 0x010208B6
-export const ACT_LEDGE_CLIMB_SLOW_2 = 0x0000054D
-export const ACT_HANG_MOVING = 0x0020054A
-export const ACT_HANGING = 0x00200349
-export const ACT_BUTT_SLIDE = 0x00840452
-export const ACT_HOLD_BUTT_SLIDE = 0x00840454
-export const ACT_RIDING_SHELL_GROUND = 0x20810446
-export const ACT_TWIRL_LAND = 0x18800238
-export const ACT_TWIRLING = 0x108008A4
-export const ACT_IN_CANNON               = 0x00001371
-export const ACT_BUTT_SLIDE_AIR          = 0x0300088E
-export const ACT_HOLD_BUTT_SLIDE_AIR = 0x010008A2
-export const ACT_STEEP_JUMP = 0x03000885
-export const ACT_BUTT_STUCK_IN_GROUND = 0x0002033B
-export const ACT_FEET_STUCK_IN_GROUND = 0x0002033C
-export const ACT_VERTICAL_WIND = 0x1008089C
-export const ACT_SQUISHED = 0x00020339
-export const ACT_STANDING_DEATH = 0x00021311
 
+export const ACT_UNINITIALIZED                   = 0x00000000
 
+// group 0x000: stationary actions
+export const ACT_IDLE                            = 0x0C400201
+export const ACT_START_SLEEPING                  = 0x0C400202
+export const ACT_SLEEPING                        = 0x0C000203
+export const ACT_WAKING_UP                       = 0x0C000204
+export const ACT_PANTING                         = 0x0C400205
+export const ACT_HOLD_PANTING_UNUSED             = 0x08000206
+export const ACT_HOLD_IDLE                       = 0x08000207
+export const ACT_HOLD_HEAVY_IDLE                 = 0x08000208
+export const ACT_STANDING_AGAINST_WALL           = 0x0C400209
+export const ACT_COUGHING                        = 0x0C40020A
+export const ACT_SHIVERING                       = 0x0C40020B
+export const ACT_IN_QUICKSAND                    = 0x0002020D
+export const ACT_UNKNOWN_0002020E                = 0x0002020E
+export const ACT_CROUCHING                       = 0x0C008220
+export const ACT_START_CROUCHING                 = 0x0C008221
+export const ACT_STOP_CROUCHING                  = 0x0C008222
+export const ACT_START_CRAWLING                  = 0x0C008223
+export const ACT_STOP_CRAWLING                   = 0x0C008224
+export const ACT_SLIDE_KICK_SLIDE_STOP           = 0x08000225
+export const ACT_SHOCKWAVE_BOUNCE                = 0x00020226
+export const ACT_FIRST_PERSON                    = 0x0C000227
+export const ACT_BACKFLIP_LAND_STOP              = 0x0800022F
+export const ACT_JUMP_LAND_STOP                  = 0x0C000230
+export const ACT_DOUBLE_JUMP_LAND_STOP           = 0x0C000231
+export const ACT_FREEFALL_LAND_STOP              = 0x0C000232
+export const ACT_SIDE_FLIP_LAND_STOP             = 0x0C000233
+export const ACT_HOLD_JUMP_LAND_STOP             = 0x08000234
+export const ACT_HOLD_FREEFALL_LAND_STOP         = 0x08000235
+export const ACT_AIR_THROW_LAND                  = 0x80000A36
+export const ACT_TWIRL_LAND                      = 0x18800238
+export const ACT_LAVA_BOOST_LAND                 = 0x08000239
+export const ACT_TRIPLE_JUMP_LAND_STOP           = 0x0800023A
+export const ACT_LONG_JUMP_LAND_STOP             = 0x0800023B
+export const ACT_GROUND_POUND_LAND               = 0x0080023C
+export const ACT_BRAKING_STOP                    = 0x0C00023D
+export const ACT_BUTT_SLIDE_STOP                 = 0x0C00023E
+export const ACT_HOLD_BUTT_SLIDE_STOP            = 0x0800043F
 
+// group 0x040: moving (ground) actions
+export const ACT_WALKING                         = 0x04000440
+export const ACT_HOLD_WALKING                    = 0x00000442
+export const ACT_TURNING_AROUND                  = 0x00000443
+export const ACT_FINISH_TURNING_AROUND           = 0x00000444
+export const ACT_BRAKING                         = 0x04000445
+export const ACT_RIDING_SHELL_GROUND             = 0x20810446
+export const ACT_HOLD_HEAVY_WALKING              = 0x00000447
+export const ACT_CRAWLING                        = 0x04008448
+export const ACT_BURNING_GROUND                  = 0x00020449
+export const ACT_DECELERATING                    = 0x0400044A
+export const ACT_HOLD_DECELERATING               = 0x0000044B
+export const ACT_BEGIN_SLIDING                   = 0x00000050
+export const ACT_HOLD_BEGIN_SLIDING              = 0x00000051
+export const ACT_BUTT_SLIDE                      = 0x00840452
+export const ACT_STOMACH_SLIDE                   = 0x008C0453
+export const ACT_HOLD_BUTT_SLIDE                 = 0x00840454
+export const ACT_HOLD_STOMACH_SLIDE              = 0x008C0455
+export const ACT_DIVE_SLIDE                      = 0x00880456
+export const ACT_MOVE_PUNCHING                   = 0x00800457
+export const ACT_CROUCH_SLIDE                    = 0x04808459
+export const ACT_SLIDE_KICK_SLIDE                = 0x0080045A
+export const ACT_HARD_BACKWARD_GROUND_KB         = 0x00020460
+export const ACT_HARD_FORWARD_GROUND_KB          = 0x00020461
+export const ACT_BACKWARD_GROUND_KB              = 0x00020462
+export const ACT_FORWARD_GROUND_KB               = 0x00020463
+export const ACT_SOFT_BACKWARD_GROUND_KB         = 0x00020464
+export const ACT_SOFT_FORWARD_GROUND_KB          = 0x00020465
+export const ACT_GROUND_BONK                     = 0x00020466
+export const ACT_DEATH_EXIT_LAND                 = 0x00020467
+export const ACT_JUMP_LAND                       = 0x04000470
+export const ACT_FREEFALL_LAND                   = 0x04000471
+export const ACT_DOUBLE_JUMP_LAND                = 0x04000472
+export const ACT_SIDE_FLIP_LAND                  = 0x04000473
+export const ACT_HOLD_JUMP_LAND                  = 0x00000474
+export const ACT_HOLD_FREEFALL_LAND              = 0x00000475
+export const ACT_QUICKSAND_JUMP_LAND             = 0x00000476
+export const ACT_HOLD_QUICKSAND_JUMP_LAND        = 0x00000477
+export const ACT_TRIPLE_JUMP_LAND                = 0x04000478
+export const ACT_LONG_JUMP_LAND                  = 0x00000479
+export const ACT_BACKFLIP_LAND                   = 0x0400047A
 
-export const ACT_HARD_BACKWARD_GROUND_KB  =  0x00020460 
-export const ACT_HARD_FORWARD_GROUND_KB   =  0x00020461 
-export const ACT_BACKWARD_GROUND_KB       =  0x00020462 
-export const ACT_FORWARD_GROUND_KB        =  0x00020463 
-export const ACT_SOFT_BACKWARD_GROUND_KB  =  0x00020464 
-export const ACT_SOFT_FORWARD_GROUND_KB = 0x00020465 
-export const ACT_BACKWARD_AIR_KB       =  0x010208B0 
-export const ACT_FORWARD_AIR_KB        =  0x010208B1 
-export const ACT_HARD_FORWARD_AIR_KB   =  0x010208B2 
-export const ACT_HARD_BACKWARD_AIR_KB  =  0x010208B3
+// group 0x080: airborne actions
+export const ACT_JUMP                            = 0x03000880
+export const ACT_DOUBLE_JUMP                     = 0x03000881
+export const ACT_TRIPLE_JUMP                     = 0x01000882
+export const ACT_BACKFLIP                        = 0x01000883
+export const ACT_STEEP_JUMP                      = 0x03000885
+export const ACT_WALL_KICK_AIR                   = 0x03000886
+export const ACT_SIDE_FLIP                       = 0x01000887
+export const ACT_LONG_JUMP                       = 0x03000888
+export const ACT_WATER_JUMP                      = 0x01000889
+export const ACT_DIVE                            = 0x0188088A
+export const ACT_FREEFALL                        = 0x0100088C
+export const ACT_TOP_OF_POLE_JUMP                = 0x0300088D
+export const ACT_BUTT_SLIDE_AIR                  = 0x0300088E
+export const ACT_FLYING_TRIPLE_JUMP              = 0x03000894
+export const ACT_SHOT_FROM_CANNON                = 0x00880898
+export const ACT_FLYING                          = 0x10880899
+export const ACT_RIDING_SHELL_JUMP               = 0x0281089A
+export const ACT_RIDING_SHELL_FALL               = 0x0081089B
+export const ACT_VERTICAL_WIND                   = 0x1008089C
+export const ACT_HOLD_JUMP                       = 0x030008A0
+export const ACT_HOLD_FREEFALL                   = 0x010008A1
+export const ACT_HOLD_BUTT_SLIDE_AIR             = 0x010008A2
+export const ACT_HOLD_WATER_JUMP                 = 0x010008A3
+export const ACT_TWIRLING                        = 0x108008A4
+export const ACT_FORWARD_ROLLOUT                 = 0x010008A6
+export const ACT_AIR_HIT_WALL                    = 0x000008A7
+export const ACT_RIDING_HOOT                     = 0x000004A8
+export const ACT_GROUND_POUND                    = 0x008008A9
+export const ACT_SLIDE_KICK                      = 0x018008AA
+export const ACT_AIR_THROW                       = 0x830008AB
+export const ACT_JUMP_KICK                       = 0x018008AC
+export const ACT_BACKWARD_ROLLOUT                = 0x010008AD
+export const ACT_CRAZY_BOX_BOUNCE                = 0x000008AE
+export const ACT_SPECIAL_TRIPLE_JUMP             = 0x030008AF
+export const ACT_BACKWARD_AIR_KB                 = 0x010208B0
+export const ACT_FORWARD_AIR_KB                  = 0x010208B1
+export const ACT_HARD_FORWARD_AIR_KB             = 0x010208B2
+export const ACT_HARD_BACKWARD_AIR_KB            = 0x010208B3
+export const ACT_BURNING_JUMP                    = 0x010208B4
+export const ACT_BURNING_FALL                    = 0x010208B5
+export const ACT_SOFT_BONK                       = 0x010208B6
+export const ACT_LAVA_BOOST                      = 0x010208B7
+export const ACT_GETTING_BLOWN                   = 0x010208B8
+export const ACT_THROWN_FORWARD                  = 0x010208BD
+export const ACT_THROWN_BACKWARD                 = 0x010208BE
 
 // group 0x0C0: submerged actions
-export const ACT_WATER_IDLE                =0x380022C0 
-export const ACT_HOLD_WATER_IDLE           =0x380022C1 
-export const ACT_WATER_ACTION_END          =0x300022C2 
-export const ACT_HOLD_WATER_ACTION_END     =0x300022C3 
-export const ACT_DROWNING                  =0x300032C4 
-export const ACT_BACKWARD_WATER_KB         =0x300222C5 
-export const ACT_FORWARD_WATER_KB          =0x300222C6 
-export const ACT_WATER_DEATH               =0x300032C7 
-export const ACT_WATER_SHOCKED             =0x300222C8 
-export const ACT_BREASTSTROKE              =0x300024D0 
-export const ACT_SWIMMING_END              =0x300024D1 
-export const ACT_FLUTTER_KICK              =0x300024D2 
-export const ACT_HOLD_BREASTSTROKE         =0x300024D3 
-export const ACT_HOLD_SWIMMING_END         =0x300024D4 
-export const ACT_HOLD_FLUTTER_KICK         =0x300024D5 
-export const ACT_WATER_SHELL_SWIMMING      =0x300024D6 
-export const ACT_WATER_THROW               =0x300024E0 
-export const ACT_WATER_PUNCH               =0x300024E1 
-export const ACT_WATER_PLUNGE              =0x300022E2 
-export const ACT_CAUGHT_IN_WHIRLPOOL       =0x300222E3 
-export const ACT_METAL_WATER_STANDING      =0x080042F0 
-export const ACT_HOLD_METAL_WATER_STANDING =0x080042F1 
-export const ACT_METAL_WATER_WALKING       =0x000044F2 
-export const ACT_HOLD_METAL_WATER_WALKING  =0x000044F3 
-export const ACT_METAL_WATER_FALLING       =0x000042F4 
-export const ACT_HOLD_METAL_WATER_FALLING  =0x000042F5 
-export const ACT_METAL_WATER_FALL_LAND     =0x000042F6 
-export const ACT_HOLD_METAL_WATER_FALL_LAND=0x000042F7 
-export const ACT_METAL_WATER_JUMP          =0x000044F8 
-export const ACT_HOLD_METAL_WATER_JUMP     =0x000044F9 
-export const ACT_METAL_WATER_JUMP_LAND     =0x000044FA 
-export const ACT_HOLD_METAL_WATER_JUMP_LAND=0x000044FB 
+export const ACT_WATER_IDLE                 = 0x380022C0
+export const ACT_HOLD_WATER_IDLE            = 0x380022C1
+export const ACT_WATER_ACTION_END           = 0x300022C2
+export const ACT_HOLD_WATER_ACTION_END      = 0x300022C3
+export const ACT_DROWNING                   = 0x300032C4
+export const ACT_BACKWARD_WATER_KB          = 0x300222C5
+export const ACT_FORWARD_WATER_KB           = 0x300222C6
+export const ACT_WATER_DEATH                = 0x300032C7
+export const ACT_WATER_SHOCKED              = 0x300222C8
+export const ACT_BREASTSTROKE               = 0x300024D0
+export const ACT_SWIMMING_END               = 0x300024D1
+export const ACT_FLUTTER_KICK               = 0x300024D2
+export const ACT_HOLD_BREASTSTROKE          = 0x300024D3
+export const ACT_HOLD_SWIMMING_END          = 0x300024D4
+export const ACT_HOLD_FLUTTER_KICK          = 0x300024D5
+export const ACT_WATER_SHELL_SWIMMING       = 0x300024D6
+export const ACT_WATER_THROW                = 0x300024E0
+export const ACT_WATER_PUNCH                = 0x300024E1
+export const ACT_WATER_PLUNGE               = 0x300022E2
+export const ACT_CAUGHT_IN_WHIRLPOOL        = 0x300222E3
+export const ACT_METAL_WATER_STANDING       = 0x080042F0
+export const ACT_HOLD_METAL_WATER_STANDING  = 0x080042F1
+export const ACT_METAL_WATER_WALKING        = 0x000044F2
+export const ACT_HOLD_METAL_WATER_WALKING   = 0x000044F3
+export const ACT_METAL_WATER_FALLING        = 0x000042F4
+export const ACT_HOLD_METAL_WATER_FALLING   = 0x000042F5
+export const ACT_METAL_WATER_FALL_LAND      = 0x000042F6
+export const ACT_HOLD_METAL_WATER_FALL_LAND = 0x000042F7
+export const ACT_METAL_WATER_JUMP           = 0x000044F8
+export const ACT_HOLD_METAL_WATER_JUMP      = 0x000044F9
+export const ACT_METAL_WATER_JUMP_LAND      = 0x000044FA
+export const ACT_HOLD_METAL_WATER_JUMP_LAND = 0x000044FB
 
-export const ACT_WATER_JUMP       = 0x01000889
-export const ACT_HOLD_WATER_JUMP  = 0x010008A3
+// group 0x100: cutscene actions
+export const ACT_DISAPPEARED                = 0x00001300
+export const ACT_INTRO_CUTSCENE             = 0x04001301
+export const ACT_STAR_DANCE_EXIT            = 0x00001302
+export const ACT_STAR_DANCE_WATER           = 0x00001303
+export const ACT_FALL_AFTER_STAR_GRAB       = 0x00001904
+export const ACT_READING_AUTOMATIC_DIALOG   = 0x20001305
+export const ACT_READING_NPC_DIALOG         = 0x20001306
+export const ACT_STAR_DANCE_NO_EXIT         = 0x00001307
+export const ACT_READING_SIGN               = 0x00001308
+export const ACT_JUMBO_STAR_CUTSCENE        = 0x00001909
+export const ACT_WAITING_FOR_DIALOG         = 0x0000130A
+export const ACT_DEBUG_FREE_MOVE            = 0x0000130F
+export const ACT_STANDING_DEATH             = 0x00021311
+export const ACT_QUICKSAND_DEATH            = 0x00021312
+export const ACT_ELECTROCUTION              = 0x00021313
+export const ACT_SUFFOCATION                = 0x00021314
+export const ACT_DEATH_ON_STOMACH           = 0x00021315
+export const ACT_DEATH_ON_BACK              = 0x00021316
+export const ACT_EATEN_BY_BUBBA             = 0x00021317
+export const ACT_END_PEACH_CUTSCENE         = 0x00001918
+export const ACT_CREDITS_CUTSCENE           = 0x00001319
+export const ACT_END_WAVING_CUTSCENE        = 0x0000131A
+export const ACT_PULLING_DOOR               = 0x00001320
+export const ACT_PUSHING_DOOR               = 0x00001321
+export const ACT_WARP_DOOR_SPAWN            = 0x00001322
+export const ACT_EMERGE_FROM_PIPE           = 0x00001923
+export const ACT_SPAWN_SPIN_AIRBORNE        = 0x00001924
+export const ACT_SPAWN_SPIN_LANDING         = 0x00001325
+export const ACT_EXIT_AIRBORNE              = 0x00001926
+export const ACT_EXIT_LAND_SAVE_DIALOG      = 0x00001327
+export const ACT_DEATH_EXIT                 = 0x00001928
+export const ACT_UNUSED_DEATH_EXIT          = 0x00001929
+export const ACT_FALLING_DEATH_EXIT         = 0x0000192A
+export const ACT_SPECIAL_EXIT_AIRBORNE      = 0x0000192B
+export const ACT_SPECIAL_DEATH_EXIT         = 0x0000192C
+export const ACT_FALLING_EXIT_AIRBORNE      = 0x0000192D
+export const ACT_UNLOCKING_KEY_DOOR         = 0x0000132E
+export const ACT_UNLOCKING_STAR_DOOR        = 0x0000132F
+export const ACT_ENTERING_STAR_DOOR         = 0x00001331
+export const ACT_SPAWN_NO_SPIN_AIRBORNE     = 0x00001932
+export const ACT_SPAWN_NO_SPIN_LANDING      = 0x00001333
+export const ACT_BBH_ENTER_JUMP             = 0x00001934
+export const ACT_BBH_ENTER_SPIN             = 0x00001535
+export const ACT_TELEPORT_FADE_OUT          = 0x00001336
+export const ACT_TELEPORT_FADE_IN           = 0x00001337
+export const ACT_SHOCKED                    = 0x00020338
+export const ACT_SQUISHED                   = 0x00020339
+export const ACT_HEAD_STUCK_IN_GROUND       = 0x0002033A
+export const ACT_BUTT_STUCK_IN_GROUND       = 0x0002033B
+export const ACT_FEET_STUCK_IN_GROUND       = 0x0002033C
+export const ACT_PUTTING_ON_CAP             = 0x0000133D
 
+// group 0x140: "automatic" actions
+export const ACT_HOLDING_POLE               = 0x08100340
+export const ACT_GRAB_POLE_SLOW             = 0x00100341
+export const ACT_GRAB_POLE_FAST             = 0x00100342
+export const ACT_CLIMBING_POLE              = 0x00100343
+export const ACT_TOP_OF_POLE_TRANSITION     = 0x00100344
+export const ACT_TOP_OF_POLE                = 0x00100345
+export const ACT_START_HANGING              = 0x08200348
+export const ACT_HANGING                    = 0x00200349
+export const ACT_HANG_MOVING                = 0x0020054A
+export const ACT_LEDGE_GRAB                 = 0x0800034B
+export const ACT_LEDGE_CLIMB_SLOW_1         = 0x0000054C
+export const ACT_LEDGE_CLIMB_SLOW_2         = 0x0000054D
+export const ACT_LEDGE_CLIMB_DOWN           = 0x0000054E
+export const ACT_LEDGE_CLIMB_FAST           = 0x0000054F
+export const ACT_GRABBED                    = 0x00020370
+export const ACT_IN_CANNON                  = 0x00001371
+export const ACT_TORNADO_TWIRLING           = 0x10020372
 
+// group 0x180: object actions
+export const ACT_PUNCHING                   = 0x00800380
+export const ACT_PICKING_UP                 = 0x00000383
+export const ACT_DIVE_PICKING_UP            = 0x00000385
+export const ACT_STOMACH_SLIDE_STOP         = 0x00000386
+export const ACT_PLACING_DOWN               = 0x00000387
+export const ACT_THROWING                   = 0x80000588
+export const ACT_HEAVY_THROW                = 0x80000589
+export const ACT_PICKING_UP_BOWSER          = 0x00000390
+export const ACT_HOLDING_BOWSER             = 0x00000391
+export const ACT_RELEASING_BOWSER           = 0x00000392
 
 
 export const AIR_STEP_CHECK_LEDGE_GRAB = 0x00000001
@@ -908,10 +1117,10 @@ export const execute_mario_action = () => {
                 case ACT_GROUP_AUTOMATIC:
                     inLoop = mario_execute_automatic_action(LevelUpdate.gMarioState); break
 
-                    case ACT_GROUP_SUBMERGED:
-                        inLoop = mario_execute_submerged_action(LevelUpdate.gMarioState); break
-                  
-                        default: throw "unkown action group"
+                case ACT_GROUP_SUBMERGED:
+                    inLoop = mario_execute_submerged_action(LevelUpdate.gMarioState); break
+              
+                default: throw "unkown action group"
             }
         }
 
@@ -1256,20 +1465,17 @@ export const mario_facing_downhill = (m, turnYaw) => {
     // This is never used in practice, as turnYaw is
     // always passed as zero.
     if (turnYaw && m.forwardVel < 0.0) {
-        faceAngleYaw += 0x8000;
+        faceAngleYaw = int16(faceAngleYaw + 0x8000);
     }
 
-    faceAngleYaw = m.floorAngle - faceAngleYaw;
-    faceAngleYaw = faceAngleYaw > 32767 ? faceAngleYaw - 65536 : faceAngleYaw;
-    faceAngleYaw = faceAngleYaw < -32768 ? faceAngleYaw + 65536 : faceAngleYaw;
+    faceAngleYaw = int16(m.floorAngle - faceAngleYaw);
 
     return (-0x4000 < faceAngleYaw) && (faceAngleYaw < 0x4000);
 }
 
 export const find_floor_height_relative_polar = (m, angleFromMario, distFromMario) => {
-
-    const y = Math.sin((m.faceAngle[1] + angleFromMario) / 0x8000 * Math.PI) * distFromMario
-    const x = Math.cos((m.faceAngle[1] + angleFromMario) / 0x8000 * Math.PI) * distFromMario
+    const y = Math.sin(int16(m.faceAngle[1] + angleFromMario) / 0x8000 * Math.PI) * distFromMario
+    const x = Math.cos(int16(m.faceAngle[1] + angleFromMario) / 0x8000 * Math.PI) * distFromMario
 
     return SurfaceCollision.find_floor(m.pos[0] + y, m.pos[1] + 100.0, m.pos[2] + x, {})
 }
@@ -1280,8 +1486,8 @@ export const find_floor_slope = (m, yawOffset) => {
     let forwardYDelta, backwardYDelta;
     let result;
 
-    let x = Math.sin((m.faceAngle[1] + yawOffset) / 0x8000 * Math.PI) * 5.0;
-    let z = Math.cos((m.faceAngle[1] + yawOffset) / 0x8000 * Math.PI) * 5.0;
+    let x = Math.sin(int16(m.faceAngle[1] + yawOffset) / 0x8000 * Math.PI) * 5.0;
+    let z = Math.cos(int16(m.faceAngle[1] + yawOffset) / 0x8000 * Math.PI) * 5.0;
 
     forwardFloorY = SurfaceCollision.find_floor(m.pos[0] + x, m.pos[1] + 100.0, m.pos[2] + z, floor);
     backwardFloorY = SurfaceCollision.find_floor(m.pos[0] - x, m.pos[1] + 100.0, m.pos[2] - z, floor);
@@ -1377,8 +1583,13 @@ const set_submerged_cam_preset_and_spawn_bubbles = (m) => {
         if (m.action & ACT_FLAG_METAL_WATER) {
             throw "Todo ACT_FLAG_METAL_WATER - set_submerged_cam_preset_and_spawn_bubbles"
         } else {
+            if ((heightBelowWater > 800) && (camPreset != CAMERA_MODE_BEHIND_MARIO)) {
+                Camera.set_camera_mode(m.area.camera, CAMERA_MODE_BEHIND_MARIO, 1)
+            }
 
-            //// TODO set submerged camera modes  CAMERA_MODE_BEHIND_MARIO, CAMERA_MODE_WATER_SURFACE
+            if ((heightBelowWater < 400) && (camPreset != CAMERA_MODE_WATER_SURFACE)) {
+                Camera.set_camera_mode(m.area.camera, CAMERA_MODE_WATER_SURFACE, 1)
+            }
 
             // As long as Mario isn't drowning or at the top
             // of the water with his head out, spawn bubbles.
@@ -1410,33 +1621,35 @@ export const init_mario_from_save_file = () => {
     LevelUpdate.gHudDisplay.wedges = 8;
 }
 
-export const set_water_plunge_action = m => {
-  m.forwardVel = m.forwardVel / 4
-  m.vel[1] = m.vel[1] / 2
-
-  m.pos[1] = m.waterLevel - 100
-
-  m.faceAngle[2] = 0
-
-  vec3s_set(m.angleVel, 0, 0, 0)
-
-  if (!(m.action && ACT_FLAG_DIVING)) {
-    m.faceAngle[0] = 0
-  }
-
-  //TODO implement camera
-
-  return set_mario_action(m, ACT_WATER_PLUNGE, 0)
-}
-
 export const transition_submerged_to_walking = m => {
-    // TODO set_camera_mode(m.area.camera, m.area.camera.defMode, 1);
+    Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
 
-    m.angleVel = [0, 0, 0];
+    m.angleVel = [0, 0, 0]
 
     if (m.heldObj == null) {
-        return set_mario_action(m, ACT_WALKING, 0);
+        return set_mario_action(m, ACT_WALKING, 0)
     } else {
-        return set_mario_action(m, ACT_HOLD_WALKING, 0);
+        return set_mario_action(m, ACT_HOLD_WALKING, 0)
     }
+}
+
+export const set_water_plunge_action = m => {
+    m.forwardVel = m.forwardVel / 4
+    m.vel[1] = m.vel[1] / 2
+
+    m.pos[1] = m.waterLevel - 100
+
+    m.faceAngle[2] = 0
+
+    vec3s_set(m.angleVel, 0, 0, 0)
+
+    if (!(m.action && ACT_FLAG_DIVING)) {
+        m.faceAngle[0] = 0
+    }
+
+    if (m.area.camera.mode != CAMERA_MODE_WATER_SURFACE) {
+        Camera.set_camera_mode(m.area.camera, CAMERA_MODE_WATER_SURFACE, 1)
+    }
+
+  return set_mario_action(m, ACT_WATER_PLUNGE, 0)
 }

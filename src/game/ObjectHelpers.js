@@ -1,12 +1,12 @@
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { AreaInstance as Area } from "./Area"
-import { geo_obj_init, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
+import { geo_obj_init, geo_obj_init_animation, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
 import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations, ACTIVE_FLAGS_DEACTIVATED, OBJ_MOVE_ABOVE_DEATH_BARRIER, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oFloorHeight, oFloor, oFloorType, oFloorRoom, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR, oWallHitboxRadius, oWallAngle, oMoveFlags, OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, oBounciness, oBuoyancy, oDragStrength, oAngleVelYaw, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND, OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER, OBJ_MOVE_ENTERED_WATER, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND, OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, oRoom, ACTIVE_FLAG_UNK10, OBJ_MOVE_13, OBJ_MOVE_LANDED, oInteractStatus, oHomeX, oHomeY, oHomeZ, oOpacity, ACTIVE_FLAG_UNK7, oNumLootCoins, oCoinUnk110, oTimer } from "../include/object_constants"
 
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { atan2s, mtxf_rotate_zxy_and_translate } from "../engine/math_util"
-import { sins, coss, int16, random_uint16 } from "../utils"
+import { sins, coss, int16, random_int16, random_float } from "../utils"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { ATTACK_PUNCH, INT_STATUS_WAS_ATTACKED, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "./Interaction"
@@ -15,6 +15,14 @@ import { gLinker } from "./Linker"
 import * as Gbi from "../include/gbi"
 import { MODEL_YELLOW_COIN } from "../include/model_ids"
 import { spawn_mist_particles_variable } from "./behaviors/white_puff.inc"
+
+export const WATER_DROPLET_FLAG_RAND_ANGLE                = 0x02
+export const WATER_DROPLET_FLAG_RAND_OFFSET_XZ            = 0x04 // Unused
+export const WATER_DROPLET_FLAG_RAND_OFFSET_XYZ           = 0x08 // Unused
+export const WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL      = 0x20
+export const WATER_DROPLET_FLAG_RAND_ANGLE_INCR_PLUS_8000 = 0x40
+export const WATER_DROPLET_FLAG_RAND_ANGLE_INCR           = 0x80 // Unused
+
 
 export const cur_obj_set_behavior = (behavior) => {
     const o = ObjectListProc.gCurrentObject
@@ -110,23 +118,22 @@ export const geo_switch_area = (run, node) => {
 }
 
 export const geo_update_layer_transparency = (run, node) => {
-
     let sp3C = []
 
     if (run == 1) {
-        let sp34 = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
+        let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
         let sp30 = node
         let sp2C = node
 
         if (GeoRenderer.gCurGraphNodeHeldObject) {
-            sp34 = GeoRenderer.gCurGraphNodeHeldObject.objNode
+            obj = GeoRenderer.gCurGraphNodeHeldObject.objNode
         }
 
-        const sp28 = sp34.rawData[oOpacity]
+        const opacity = obj.rawData[oOpacity]
 
         const sp38 = sp3C
 
-        if (sp28 == 0xFF) {
+        if (opacity == 0xFF) {
             console.log(sp30)
             throw "more implementation needed: geo_update_layer_transparency"
             if (sp30.paremeter == 20) {
@@ -139,20 +146,64 @@ export const geo_update_layer_transparency = (run, node) => {
                 sp30.flags = 0x500 | (sp30.flags & 0xFF)
             }
 
-            sp34.rawData[oAnimState] = 1
+            obj.rawData[oAnimState] = 1
 
-            if (sp28 == 0 && gLinker.behaviors.bhvBowser == sp34.behavior) {
-                sp34.rawData[oAnimState] = 2
+            if (opacity == 0 && gLinker.behaviors.bhvBowser == obj.behavior) {
+                obj.rawData[oAnimState] = 2
             }
 
         }
 
-        Gbi.gDPSetEnvColor(sp38, 255, 255, 255, sp28)
+        Gbi.gDPSetEnvColor(sp38, 255, 255, 255, opacity)
         Gbi.gSPEndDisplayList(sp38)
 
     }
 
     return sp3C
+}
+
+export const spawn_water_droplet = (parent, params) => {
+    let randomScale
+    // allow getters
+    if (params.call) {
+        params = params()
+    }
+    const newObj = spawn_object(parent, params.model, params.behavior);
+
+    if (params.flags & WATER_DROPLET_FLAG_RAND_ANGLE) {
+        newObj.rawData[oMoveAngleYaw] = random_int16()
+    }
+
+    if (params.flags & WATER_DROPLET_FLAG_RAND_ANGLE_INCR_PLUS_8000) {
+        newObj.rawData[oMoveAngleYaw] = (int16)(newObj.rawData[oMoveAngleYaw] + 0x8000
+                                + random_f32_around_zero(params.moveAngleRange))
+    }
+
+    if (params.flags & WATER_DROPLET_FLAG_RAND_ANGLE_INCR) {
+        newObj.rawData[oMoveAngleYaw] =
+            (int16)(newObj.rawData[oMoveAngleYaw] + random_f32_around_zero(params.moveAngleRange))
+    }
+
+    if (params.flags & WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL) {
+        newObj.rawData[oPosY] = Spawn.SurfaceCollision.find_water_level(newObj.rawData[oPosX], newObj.rawData[oPosZ])
+    }
+
+    if (params.flags & WATER_DROPLET_FLAG_RAND_OFFSET_XZ) {
+        obj_translate_xz_random(newObj, params.moveRange)
+    }
+
+    if (params.flags & WATER_DROPLET_FLAG_RAND_OFFSET_XYZ) {
+        obj_translate_xyz_random(newObj, params.moveRange)
+    }
+
+    newObj.rawData[oForwardVel] = random_float() * params.randForwardVel[1] + params.randForwardVel[0]
+    newObj.rawData[oVelY] = random_float() * params.randYVel[1] + params.randYVel[0]
+
+    randomScale = random_float() * params.randSize[1] + params.randSize[0]
+    obj_scale(newObj, randomScale)
+
+    newObj.header.gfx.node.bleh = "water droplet"
+    return newObj
 }
 
 export const spawn_object_at_origin = (parent, model, behavior) => {
@@ -267,6 +318,7 @@ export const cur_obj_reflect_move_angle_off_wall = () => {
     return int16(o.rawData[oWallAngle] - (int16(o.rawData[oMoveAngleYaw]) - int16(o.rawData[oWallAngle])) + 0x8000)
 }
 
+
 export const approach_symmetric = (value, target, increment) => {
     const dist = int16(target - value)
 
@@ -285,6 +337,15 @@ export const approach_symmetric = (value, target, increment) => {
     }
 
     return value
+}
+
+export const cur_obj_forward_vel_approach_upward = (target, increment) => {
+    const o = ObjectListProc.gCurrentObject
+    if (o.rawData[oForwardVel] >= target) {
+        o.rawData[oForwardVel] = target
+    } else {
+        o.rawData[oForwardVel] += increment
+    }
 }
 
 export const abs_angle_diff = (x0, x1) => {
@@ -766,10 +827,21 @@ export const spawn_object_relative = (behaviorParam, relativePosX, relativePosY,
     return obj
 }
 
+export const try_to_spawn_object = (offsetY, scale, parent, model, behavior) => {
+    const obj = spawn_object(parent, model, behavior)
+    obj.rawData[oPosY] += offsetY
+    obj_scale(obj, scale)
+    return obj
+}
+
 export const spawn_object = (parent, model, behavior) => {
     const obj = spawn_object_at_origin(parent, model, behavior)
     obj_copy_pos_and_angle(obj, parent)
     return obj
+}
+
+export const random_f32_around_zero = (diameter) => {
+    return random_float() * diameter - diameter / 2
 }
 
 export const cur_obj_spawn_particles = (info) => {
@@ -794,7 +866,7 @@ export const cur_obj_spawn_particles = (info) => {
         const particle = spawn_object(o, info.model, gLinker.behaviors.bhvWhitePuffExplosion)
 
         particle.rawData[oBehParams2ndByte] = info.behParam
-        particle.rawData[oMoveAngleYaw] = random_uint16()
+        particle.rawData[oMoveAngleYaw] = random_int16()
         particle.rawData[oGravity] = info.gravity
         particle.rawData[oDragStrength] = info.dragStrength
 
@@ -892,6 +964,12 @@ export const obj_mark_for_deletion = (obj) => {
     obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED
 }
 
+export const obj_scale = (obj, scale) => {
+    obj.header.gfx.scale[0] = scale
+    obj.header.gfx.scale[1] = scale
+    obj.header.gfx.scale[2] = scale
+}
+
 export const obj_scale_xyz = (obj, xScale, yScale, zScale) => {
     obj.header.gfx.scale[0] = xScale
     obj.header.gfx.scale[1] = yScale
@@ -905,11 +983,29 @@ export const cur_obj_scale = (scale) => {
     o.header.gfx.scale[2] = scale
 }
 
+export const obj_translate_xyz_random = (obj, rangeLength) => {
+    obj.rawData[oPosX] += random_float() * rangeLength - rangeLength * 0.5
+    obj.rawData[oPosY] += random_float() * rangeLength - rangeLength * 0.5
+    obj.rawData[oPosZ] += random_float() * rangeLength - rangeLength * 0.5
+}
+
+export const cur_obj_init_animation = (animIndex) => {
+    const o = ObjectListProc.gCurrentObject
+    const anims = o.rawData[oAnimations]
+    geo_obj_init_animation(o.header.gfx, anims[animIndex]);
+}
+
 export const cur_obj_init_animation_with_accel_and_sound = (animIndex, accel) => {
     const o = ObjectListProc.gCurrentObject
     const anims = o.rawData[oAnimations]
     const animAccel = parseInt(accel * 65536.0)
     geo_obj_init_animation_accel(o.header.gfx, anims[animIndex], animAccel)
+}
+
+export const obj_init_animation_with_sound = (obj, animations, animIndex) => {
+    obj.rawData[oAnimations] = animations
+    geo_obj_init_animation(obj.header.gfx, animations[animIndex])
+    // obj->oSoundStateID = animIndex;
 }
 
 export const cur_obj_compute_vel_xz = () => {

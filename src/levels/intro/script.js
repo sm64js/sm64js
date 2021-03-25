@@ -28,47 +28,45 @@ const getSelectedLevel = () => {
     return LEVEL_CASTLE_GROUNDS
 }
 
-const level_intro_entry_2 = () => {
-    return [
-        { command: LevelCommands.init_level },
-        { command: LevelCommands.blackout, args: [true] },
-        { command: LevelCommands.load_mario_head, args: [LevelCommands.REGULAR_FACE] },
-        { command: LevelCommands.alloc_level_pool },
-        { command: LevelCommands.begin_area, args: [1, intro_geo_00035C] },
-        { command: LevelCommands.end_area },
-        { command: LevelCommands.free_level_pool },
-        { command: LevelCommands.sleep, args: [2] },
-        { command: LevelCommands.blackout, args: [false] },
-        { command: LevelCommands.cleardemoptr },
-        /// Get Set script variable 
-        /// Jump IF
-        { command: LevelCommands.load_area, args: [1] },
-        /// Set Menu Music
-        { command: LevelCommands.transition, args: [WARP_TRANSITION_FADE_FROM_STAR, 20, 0, 0, 0] },
-        { command: LevelCommands.sleep, args: [20] },
-        { command: LevelCommands.call_loop, args: [1, lvl_intro_update, null] },
-        { command: LevelCommands.unload_area, args: [1] },
-        { command: LevelCommands.set_register, args: [getSelectedLevel] },
-        { command: LevelCommands.execute, args: [level_main_scripts_entry] }
-        /// Jump If
-        /// Jump IF
-        /// JUMP
-    ]
-}
+const level_intro_entry_2 = [
+    ['init_level'],
+    ['blackout', true],
+    ['load_mario_head', LevelCommands.REGULAR_FACE],
+    ['alloc_level_pool'],
+    ['begin_area', 1, intro_geo_00035C],
+    ['end_area'],
+    ['free_level_pool'],
+    ['sleep', 2],
+    ['blackout', false],
+    ['cleardemoptr'],
+    /// Get Set script variable 
+    /// Jump IF
+    ['load_area', 1],
+    /// Set Menu Music
+    ['transition', WARP_TRANSITION_FADE_FROM_STAR, 20, 0, 0, 0],
+    ['sleep', 20],
+    ['call_loop', 1, lvl_intro_update, null],
+    ['unload_area', 1],
+    ['set_register', getSelectedLevel],
+    ['execute', level_main_scripts_entry]
+    /// Jump If
+    /// Jump IF
+    /// JUMP
+]
 
 export const level_intro_entry_1 = [
-    { command: LevelCommands.init_level },
-    { command: LevelCommands.alloc_level_pool },
-    { command: LevelCommands.begin_area, args: [1, intro_geo_0002D0] },
-    { command: LevelCommands.end_area },
-    { command: LevelCommands.free_level_pool },
+    ['init_level'],
+    ['alloc_level_pool'],
+    ['begin_area', 1, intro_geo_0002D0],
+    ['end_area'],
+    ['free_level_pool'],
     // Call lvl intro update with var 0 - play sound its a me mario
-    { command: LevelCommands.load_area, args: [1] },
-    { command: LevelCommands.sleep, args: [75] },
-    { command: LevelCommands.transition, args: [WARP_TRANSITION_FADE_INTO_COLOR, 16, 0, 0, 0] }, 
-    { command: LevelCommands.sleep, args: [16] },
-    { command: LevelCommands.unload_area, args: [1] },
-    { command: LevelCommands.sleep, args: [2] },
-    { command: LevelCommands.execute, args: [level_intro_entry_2] }
+    ['load_area', 1],
+    ['sleep', 75],
+    ['transition', WARP_TRANSITION_FADE_INTO_COLOR, 16, 0, 0, 0],
+    ['sleep', 16],
+    ['unload_area', 1],
+    ['sleep', 2],
+    ['execute', level_intro_entry_2]
 ]
 

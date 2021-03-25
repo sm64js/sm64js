@@ -1,4 +1,3 @@
-import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
 import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
 import { level_defines_list } from "./level_defines"
 import { mario_geo } from "../actors/mario/geo.inc"
@@ -11,28 +10,25 @@ import { yellow_coin_geo, yellow_coin_no_shadow_geo, red_coin_geo, red_coin_no_s
 import { sparkles_geo } from "../actors/sparkle/geo.inc"
 
 export const script_exec_level_table = [
-    {
-        command: LevelCommands.get_or_set,
-        args: [ LevelCommands.OP_GET, LevelCommands.VAR_CURR_LEVEL_NUM ]
-    },
+    ['get_area', 'gCurrLevelNum'],
     ...level_defines_list
 ]
 
 export const level_main_scripts_entry = [
-    { command: LevelCommands.alloc_level_pool },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_MARIO, mario_geo] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_SMOKE, smoke_geo] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_SPARKLES, sparkles_geo] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_BUBBLE, bubble_geo] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_YELLOW_COIN, yellow_coin_geo] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_YELLOW_COIN_NO_SHADOW, yellow_coin_no_shadow_geo] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_RED_COIN, red_coin_geo] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_RED_COIN_NO_SHADOW, red_coin_no_shadow_geo] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_CARTOON_STAR, cartoon_star_geo] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_DIRT_ANIMATION, dirt_animation_geo] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_MIST, mist_geo] },
-    { command: LevelCommands.free_level_pool },
-    { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_from_save_file, LevelUpdate] },
-    { command: LevelCommands.call, args: [0, LevelUpdate.lvl_set_current_level, LevelUpdate] },
-    { command: LevelCommands.jump_link, args: [script_exec_level_table] }
+    ['alloc_level_pool'],
+    ['load_model_from_geo', MODEL_MARIO, mario_geo],
+    ['load_model_from_geo', MODEL_SMOKE, smoke_geo],
+    ['load_model_from_geo', MODEL_SPARKLES, sparkles_geo],
+    ['load_model_from_geo', MODEL_BUBBLE, bubble_geo],
+    ['load_model_from_geo', MODEL_YELLOW_COIN, yellow_coin_geo],
+    ['load_model_from_geo', MODEL_YELLOW_COIN_NO_SHADOW, yellow_coin_no_shadow_geo],
+    ['load_model_from_geo', MODEL_RED_COIN, red_coin_geo],
+    ['load_model_from_geo', MODEL_RED_COIN_NO_SHADOW, red_coin_no_shadow_geo],
+    ['load_model_from_geo', MODEL_CARTOON_STAR, cartoon_star_geo],
+    ['load_model_from_geo', MODEL_DIRT_ANIMATION, dirt_animation_geo],
+    ['load_model_from_geo', MODEL_MIST, mist_geo],
+    ['free_level_pool'],
+    ['call', 0, LevelUpdate.lvl_init_from_save_file, LevelUpdate],
+    ['call', 0, LevelUpdate.lvl_set_current_level, LevelUpdate],
+    ['jump_link', script_exec_level_table]
 ]

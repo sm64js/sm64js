@@ -1257,20 +1257,17 @@ export const mario_facing_downhill = (m, turnYaw) => {
     // This is never used in practice, as turnYaw is
     // always passed as zero.
     if (turnYaw && m.forwardVel < 0.0) {
-        faceAngleYaw += 0x8000;
+        faceAngleYaw = int16(faceAngleYaw + 0x8000);
     }
 
-    faceAngleYaw = m.floorAngle - faceAngleYaw;
-    faceAngleYaw = faceAngleYaw > 32767 ? faceAngleYaw - 65536 : faceAngleYaw;
-    faceAngleYaw = faceAngleYaw < -32768 ? faceAngleYaw + 65536 : faceAngleYaw;
+    faceAngleYaw = int16(m.floorAngle - faceAngleYaw);
 
     return (-0x4000 < faceAngleYaw) && (faceAngleYaw < 0x4000);
 }
 
 export const find_floor_height_relative_polar = (m, angleFromMario, distFromMario) => {
-
-    const y = Math.sin((m.faceAngle[1] + angleFromMario) / 0x8000 * Math.PI) * distFromMario
-    const x = Math.cos((m.faceAngle[1] + angleFromMario) / 0x8000 * Math.PI) * distFromMario
+    const y = Math.sin(int16(m.faceAngle[1] + angleFromMario) / 0x8000 * Math.PI) * distFromMario
+    const x = Math.cos(int16(m.faceAngle[1] + angleFromMario) / 0x8000 * Math.PI) * distFromMario
 
     return SurfaceCollision.find_floor(m.pos[0] + y, m.pos[1] + 100.0, m.pos[2] + x, {})
 }
@@ -1281,8 +1278,8 @@ export const find_floor_slope = (m, yawOffset) => {
     let forwardYDelta, backwardYDelta;
     let result;
 
-    let x = Math.sin((m.faceAngle[1] + yawOffset) / 0x8000 * Math.PI) * 5.0;
-    let z = Math.cos((m.faceAngle[1] + yawOffset) / 0x8000 * Math.PI) * 5.0;
+    let x = Math.sin(int16(m.faceAngle[1] + yawOffset) / 0x8000 * Math.PI) * 5.0;
+    let z = Math.cos(int16(m.faceAngle[1] + yawOffset) / 0x8000 * Math.PI) * 5.0;
 
     forwardFloorY = SurfaceCollision.find_floor(m.pos[0] + x, m.pos[1] + 100.0, m.pos[2] + z, floor);
     backwardFloorY = SurfaceCollision.find_floor(m.pos[0] - x, m.pos[1] + 100.0, m.pos[2] - z, floor);
@@ -1425,22 +1422,22 @@ export const transition_submerged_to_walking = m => {
         return set_mario_action(m, ACT_WALKING, 0)
     } else {
         return set_mario_action(m, ACT_HOLD_WALKING, 0)
-}
+    }
 }
 
 export const set_water_plunge_action = m => {
-  m.forwardVel = m.forwardVel / 4
-  m.vel[1] = m.vel[1] / 2
+    m.forwardVel = m.forwardVel / 4
+    m.vel[1] = m.vel[1] / 2
 
-  m.pos[1] = m.waterLevel - 100
+    m.pos[1] = m.waterLevel - 100
 
-  m.faceAngle[2] = 0
+    m.faceAngle[2] = 0
 
-  vec3s_set(m.angleVel, 0, 0, 0)
+    vec3s_set(m.angleVel, 0, 0, 0)
 
-  if (!(m.action && ACT_FLAG_DIVING)) {
-    m.faceAngle[0] = 0
-  }
+    if (!(m.action && ACT_FLAG_DIVING)) {
+        m.faceAngle[0] = 0
+    }
 
     if (m.area.camera.mode != CAMERA_MODE_WATER_SURFACE) {
         Camera.set_camera_mode(m.area.camera, CAMERA_MODE_WATER_SURFACE, 1)

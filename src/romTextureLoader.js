@@ -98,6 +98,8 @@ import { checkerboard_platform_seg8_texture_0800C840, checkerboard_platform_seg8
 
 import { goomba_seg8_texture_08019530, goomba_seg8_texture_08019D30, goomba_seg8_texture_0801A530 } from "./actors/goomba/model.inc"
 
+import { butterfly_seg3_texture_030043A8 } from "./actors/butterfly/model.inc"
+
 import {
     bobomb_seg8_texture_0801DA60,
     bobomb_seg8_texture_0801EA60,
@@ -906,6 +908,8 @@ const loadDataIntoGame = (data) => {
     goomba_seg8_texture_08019D30.push(...data["actors/goomba/goomba_face.rgba16.png"].data)
     goomba_seg8_texture_0801A530.push(...data["actors/goomba/goomba_face_blink.rgba16.png"].data)
 
+    butterfly_seg3_texture_030043A8.push(...data["actors/butterfly/butterfly_wing.rgba16.png"].data)
+
     bobomb_seg8_texture_0801DA60.push(...data["actors/bobomb/bob-omb_left_side.rgba16.png"].data)
     bobomb_seg8_texture_0801EA60.push(...data["actors/bobomb/bob-omb_right_side.rgba16.png"].data)
     bobomb_seg8_texture_0801FA60.push(...data["actors/bobomb/bob-omb_buddy_left_side.rgba16.png"].data)
@@ -1207,6 +1211,11 @@ const processExtractedResults = (data) => {
 }
 
 export const checkForRom = () => {   /// happens one time when the page is loaded
+    if (url.searchParams.get("romReset")) {
+        localStorage.removeItem('sm64jsAssets')
+        return false
+    }
+
     if (localStorage['sm64jsAssets']) {
         const data = JSON.parse(localStorage['sm64jsAssets'])
         if (data.textureVersion == textureVersion) loadDataIntoGame(data)

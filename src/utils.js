@@ -35,5 +35,13 @@ export const coss = (num) => {
 }
 
 export const random_uint16 = () => {
-    return Math.floor(Math.random() * 65535)
+    return Math.floor(Math.random() * 65536)
+}
+
+export const random_int16 = () => {
+    return Math.floor(Math.random() * 65536 - 32768)
+}
+
+export const random_float = () => {
+    return Math.random()
 }

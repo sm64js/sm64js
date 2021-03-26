@@ -397,6 +397,22 @@ export const bhvWhitePuffExplosion = [
     { command: BhvCmds.end_loop }
 ]
 
+// @@@
+import { bhv_butterfly_init, bhv_butterfly_loop } from "./behaviors/butterfly.inc"
+import { butterfly_seg3_anims_030056B0 } from "../actors/butterfly/anims/table.inc"
+
+export const bhvButterfly = [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+    { command: BhvCmds.load_animations, args: { field: oAnimations, anims: butterfly_seg3_anims_030056B0 } },
+    { command: BhvCmds.drop_to_floor },
+    { command: BhvCmds.set_objectData_value, args: { field: oGraphYOffset, value: 5 } },
+    { command: BhvCmds.call_native, args: { func: bhv_butterfly_init } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_butterfly_loop } },
+    { command: BhvCmds.end_loop }
+]
+
 export const bhvSmallWaterWave398 = [
     { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
     { command: BhvCmds.add_number, args: { field: oPosY, value: 7 } },

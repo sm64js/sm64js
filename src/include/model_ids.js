@@ -114,7 +114,8 @@ export const MODEL_SMOKE = 0x96        // smoke_geo
 
 export const MODEL_BUBBLE = 0xA8
 
-export const MODEL_BLACK_BOBOMB = 0xBC
+export const MODEL_BUTTERFLY                  = 0xBB        // butterfly_geo
+export const MODEL_BLACK_BOBOMB               = 0xBC
 
 export const MODEL_GOOMBA = 0xC0 
 export const MODEL_CHECKERBOARD_PLATFORM = 0xCA

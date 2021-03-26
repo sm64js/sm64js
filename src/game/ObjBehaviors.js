@@ -31,6 +31,17 @@ export const is_point_within_radius_of_mario = (x, y, z, dist) => {
 
 }
 
+/**
+ * Sets an object as visible if within a certain distance of Mario's graphical position.
+ */
+export const set_object_visibility = (obj, dist) => {
+    if (is_point_within_radius_of_mario(obj.rawData[oPosX], obj.rawData[oPosY], obj.rawData[oPosZ], dist) == 1) {
+        obj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+    } else {
+        obj.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
+    }
+}
+
 export const turn_obj_away_from_surface = (velX, velZ, nX, nZ, objYawWrapper) => {
     objYawWrapper.x = (nZ * nZ - nX * nX) * velX / (nX * nX + nZ * nZ)
         - 2 * velZ * (nX * nZ) / (nX * nX + nZ * nZ);

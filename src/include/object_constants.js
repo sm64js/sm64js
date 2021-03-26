@@ -218,6 +218,8 @@ export const oWoodenPostSpeedY           = 0x1D
 export const oWoodenPostMarioPounding    = 0x1E
 export const oWoodenPostOffsetY = 0x1F
 
+export const oButterflyYPhase = 0x1B
+
 /* Chain Chomp */
 export const oChainChompSegments                     = 0x1B
 export const oChainChompMaxDistFromPivotPerChainPart = 0x1C
@@ -238,6 +240,12 @@ export const CHAIN_CHOMP_ACT_UNLOAD_CHAIN = 2
 /* oSubAction */
 export const CHAIN_CHOMP_SUB_ACT_TURN = 0
 export const CHAIN_CHOMP_SUB_ACT_LUNGE = 1
+
+/* Butterfly */
+/* oAction */
+export const BUTTERFLY_ACT_RESTING = 0
+export const BUTTERFLY_ACT_FOLLOW_MARIO = 1
+export const BUTTERFLY_ACT_RETURN_HOME = 2
 
 /* Moving Yellow Coin */
     /* oAction */

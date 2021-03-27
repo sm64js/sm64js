@@ -77,6 +77,8 @@ export const MODEL_BOB_BARS_GRILLS = 0x38        // bob_geo_000470
 
 export const MODEL_YELLOW_SPHERE = 0x55        // yellow_sphere_geo
 
+export const MODEL_CYAN_FISH                   = 0x67        // cyan_fish_geo
+
 // group 14
 export const MODEL_PIRANHA_PLANT = 0x64        // piranha_plant_geo
 export const MODEL_WHOMP = 0x67        // whomp_geo
@@ -114,6 +116,7 @@ export const MODEL_SMOKE = 0x96        // smoke_geo
 
 export const MODEL_BUBBLE = 0xA8
 
+export const MODEL_FISH                       = 0xB9        // fish_geo - fish without shadow, used
 export const MODEL_BUTTERFLY                  = 0xBB        // butterfly_geo
 export const MODEL_BLACK_BOBOMB               = 0xBC
 

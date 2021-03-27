@@ -6,7 +6,7 @@ import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oM
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { atan2s, mtxf_rotate_zxy_and_translate } from "../engine/math_util"
-import { sins, coss, int16, random_uint16 } from "../utils"
+import { sins, coss, int16, random_uint16, random_float } from "../utils"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { ATTACK_PUNCH, INT_STATUS_WAS_ATTACKED, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "./Interaction"
@@ -906,6 +906,12 @@ export const cur_obj_scale = (scale) => {
     o.header.gfx.scale[2] = scale
 }
 
+export const obj_translate_xyz_random = (obj, rangeLength) => {
+    obj.rawData[oPosX] += random_float() * rangeLength - rangeLength * 0.5
+    obj.rawData[oPosY] += random_float() * rangeLength - rangeLength * 0.5
+    obj.rawData[oPosZ] += random_float() * rangeLength - rangeLength * 0.5
+}
+
 export const cur_obj_init_animation = (animIndex) => {
     const o = ObjectListProc.gCurrentObject
     const anims = o.rawData[oAnimations]
@@ -917,6 +923,12 @@ export const cur_obj_init_animation_with_accel_and_sound = (animIndex, accel) =>
     const anims = o.rawData[oAnimations]
     const animAccel = parseInt(accel * 65536.0)
     geo_obj_init_animation_accel(o.header.gfx, anims[animIndex], animAccel)
+}
+
+export const obj_init_animation_with_sound = (obj, animations, animIndex) => {
+    obj.rawData[oAnimations] = animations
+    geo_obj_init_animation(obj.header.gfx, animations[animIndex])
+    // obj->oSoundStateID = animIndex;
 }
 
 export const cur_obj_compute_vel_xz = () => {

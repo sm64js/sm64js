@@ -35,6 +35,13 @@ class GeoLayout {
         this.BACKGROUND_PURPLE_SKY      = 9
     }
 
+    GEO_SHADOW(args) {this.node_shadow(args)}
+    GEO_OPEN_NODE(args) {this.open_node(args)}
+    GEO_SCALE(args) {this.node_scale(args)}
+    GEO_ANIMATED_PART(args) {this.node_animated_part(args)}
+    GEO_CLOSE_NODE(args) {this.close_node(args)}
+    GEO_END(args) {this.node_end(args)}
+
     branch(args) {
         if (args[0] == 1) {
             this.sCurrentLayout.index++
@@ -306,8 +313,13 @@ class GeoLayout {
 
         while (this.sCurrentLayout.index < this.sCurrentLayout.layout.length) {
             const cmd = this.sCurrentLayout.layout[this.sCurrentLayout.index]
-            //console.log("processing layout command: " + cmd.command.name)
-            cmd.command.call(this, cmd.args)
+            if (Array.isArray(cmd)) {
+                // new style of command: ['name', args, ...]
+                this[cmd[0]].call(this, cmd.slice(1))
+            } else {
+                //console.log("processing layout command: " + cmd.command.name)
+                cmd.command.call(this, cmd.args)
+            }
         }
 
         //console.log("finshed processing geo layout")

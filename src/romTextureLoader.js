@@ -98,6 +98,8 @@ import { checkerboard_platform_seg8_texture_0800C840, checkerboard_platform_seg8
 
 import { goomba_seg8_texture_08019530, goomba_seg8_texture_08019D30, goomba_seg8_texture_0801A530 } from "./actors/goomba/model.inc"
 
+import { blue_fish_seg3_texture_0301B5E0 } from "./actors/blue_fish/model.inc"
+
 import { butterfly_seg3_texture_030043A8 } from "./actors/butterfly/model.inc"
 
 import {
@@ -908,6 +910,7 @@ const loadDataIntoGame = (data) => {
     goomba_seg8_texture_08019D30.push(...data["actors/goomba/goomba_face.rgba16.png"].data)
     goomba_seg8_texture_0801A530.push(...data["actors/goomba/goomba_face_blink.rgba16.png"].data)
 
+    blue_fish_seg3_texture_0301B5E0.push(...data["actors/blue_fish/blue_fish.rgba16.png"].data)
     butterfly_seg3_texture_030043A8.push(...data["actors/butterfly/butterfly_wing.rgba16.png"].data)
 
     bobomb_seg8_texture_0801DA60.push(...data["actors/bobomb/bob-omb_left_side.rgba16.png"].data)

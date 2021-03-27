@@ -3,6 +3,8 @@ import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphY
 import { GRAPH_RENDER_CYLBOARD, geo_obj_init_animation, GRAPH_RENDER_BILLBOARD, GRAPH_RENDER_ACTIVE } from "./graph_node"
 import { dist_between_objects, obj_angle_to_object, spawn_object_at_origin, obj_copy_pos_and_angle, cur_obj_scale, cur_obj_hide, cur_obj_move_xz_using_fvel_and_yaw } from "../game/ObjectHelpers"
 import { int32 } from "../utils"
+// for GOTOs
+// import { bhvFishSpawner } from "../game/BehaviorData"
 
 const obj_and_int = (object, field, value) => { object.rawData[field] &= int32(value) }
 
@@ -16,6 +18,16 @@ class BehaviorCommands {
     random_sign() {
         return Math.random() > 0.5 ? 1 : -1
     }
+
+    BEGIN(args) {return this.begin()}
+    SET_INT(args) {return this.set_objectData_value({field: args[0], value: args[1]})}
+    GOTO(args) {return this.goto({script: args[0], index: args[1]})}
+    DISABLE_RENDERING(args) {return this.disable_rendering()}
+    OR_INT(args) {return this.or_int({field: args[0], value: args[1]})}
+    BEGIN_LOOP(args) {return this.begin_loop()}
+    CALL_NATIVE(args) {return this.call_native({func: args[0], funcClass: args[1]})}
+    END_LOOP(args) {return this.end_loop()}
+    SET_HOME(args) {return this.set_home()}
 
     cur_obj_update() {
 
@@ -48,7 +60,12 @@ class BehaviorCommands {
 
         while (bhvProcResult == this.BHV_PROC_CONTINUE) {
             const bhvFunc = this.bhvScript.commands[this.bhvScript.index]
-            bhvProcResult = bhvFunc.command.call(this, bhvFunc.args)
+            if (Array.isArray(bhvFunc)) {
+                // new style of command: ['name', args, ...]
+                bhvProcResult = this[bhvFunc[0]].call(this, bhvFunc.slice(1))
+            } else {
+                bhvProcResult = bhvFunc.command.call(this, bhvFunc.args)
+            }
         }
 
         // Increment the object's timer.
@@ -374,6 +391,11 @@ class BehaviorCommands {
         return this.BHV_PROC_CONTINUE
     }
 
+    goto(args) {
+        this.bhvScript.commands = args.script
+        this.bhvScript.index = args.index
+        return this.BHV_PROC_CONTINUE
+    }
 
 }
 

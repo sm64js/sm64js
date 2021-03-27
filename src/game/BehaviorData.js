@@ -1,6 +1,6 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
-import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins, OBJ_FLAG_ACTIVE_FROM_AFAR, oActiveParticleFlags, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE, ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_BUBBLE, oWaterObjUnkF4, oWaterObjUnkF8, oPosX, oWaterObjUnkFC, oPosY, oPosZ, oInteractionSubtype } from "../include/object_constants"
+import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins, OBJ_FLAG_ACTIVE_FROM_AFAR, oActiveParticleFlags, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE, ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_BUBBLE, oWaterObjUnkF4, oWaterObjUnkF8, oPosX, oWaterObjUnkFC, oPosY, oPosZ, oInteractionSubtype, oBehParams2ndByte } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 import { bhv_pole_init, bhv_giant_pole_loop } from "./behaviors/pole.inc"
@@ -397,9 +397,42 @@ export const bhvWhitePuffExplosion = [
     { command: BhvCmds.end_loop }
 ]
 
-// @@@
+
+import { bhv_fish_loop, bhv_fish_spawner_loop } from "./behaviors/fish.inc"
+
+export const bhvFish = [
+    ['BEGIN', OBJ_LIST_DEFAULT],
+    ['OR_INT', oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)],
+    ['SET_HOME'],
+    ['BEGIN_LOOP'],
+        ['CALL_NATIVE', bhv_fish_loop],
+    ['END_LOOP']
+]
+
+export const bhvFishSpawner = [
+    ['BEGIN', OBJ_LIST_DEFAULT],
+    // Fish Spawner - common
+    ['DISABLE_RENDERING'],
+    ['OR_INT', oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)],
+    ['BEGIN_LOOP'],
+        ['CALL_NATIVE', bhv_fish_spawner_loop],
+    ['END_LOOP']
+]
+
+export const bhvManyBlueFishSpawner = [
+    ['BEGIN', OBJ_LIST_DEFAULT],
+    ['SET_INT', oBehParams2ndByte, 0],
+    // ['GOTO', bhvFishSpawner, 1]
+    ['DISABLE_RENDERING'],
+    ['OR_INT', oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)],
+    ['BEGIN_LOOP'],
+        ['CALL_NATIVE', bhv_fish_spawner_loop],
+    ['END_LOOP']
+]
+
+
 import { bhv_butterfly_init, bhv_butterfly_loop } from "./behaviors/butterfly.inc"
-import { butterfly_seg3_anims_030056B0 } from "../actors/butterfly/anims/table.inc"
+import { butterfly_seg3_anims_030056B0 } from "../actors/butterfly/table.inc"
 
 export const bhvButterfly = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },

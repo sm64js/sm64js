@@ -2,19 +2,25 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { is_point_within_radius_of_mario, set_object_visibility } from "../ObjBehaviors"
 import { oPosX, oPosY, oPosZ, oVelX, oVelY, oVelZ, oMoveAngleYaw, oMoveAnglePitch } from "../../include/object_constants"
-import { oAction, oAnimState, oHomeX, oHomeY, oHomeZ, oButterflyYPhase } from "../../include/object_constants"
-import { BUTTERFLY_ACT_RESTING, BUTTERFLY_ACT_FOLLOW_MARIO, BUTTERFLY_ACT_RETURN_HOME } from "../../include/object_constants"
-// import {  } from "../Interaction"
+import { oAction, oAnimState, oHomeX, oHomeY, oHomeZ } from "../../include/object_constants"
 import { cur_obj_init_animation, obj_turn_toward_object, approach_symmetric } from "../ObjectHelpers"
-import { bhvButterfly } from "../BehaviorData"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../../engine/SurfaceCollision"
 import { int16, random_float, sins, coss } from "../../utils"
 import { atan2s } from "../../engine/math_util"
 
+/* Butterfly */
+/* oAction */
+const BUTTERFLY_ACT_RESTING = 0
+const BUTTERFLY_ACT_FOLLOW_MARIO = 1
+const BUTTERFLY_ACT_RETURN_HOME = 2
+
+
 export const bhv_butterfly_init = () => {
     const o = ObjectListProc.gCurrentObject
 
-    o.rawData[oButterflyYPhase] = int16(random_float() * 100)
+    cur_obj_init_animation(1);
+
+    o.oButterflyYPhase = int16(random_float() * 100)
     o.header.gfx.unk38.animFrame = int16(random_float() * 7)
     o.rawData[oHomeX] = o.rawData[oPosX]
     o.rawData[oHomeY] = o.rawData[oPosY]
@@ -25,7 +31,7 @@ const butterfly_step = (speed) => {
     const o = ObjectListProc.gCurrentObject
     let yaw = o.rawData[oMoveAngleYaw]
     let pitch = o.rawData[oMoveAnglePitch]
-    let yPhase = o.rawData[oButterflyYPhase]
+    let yPhase = o.oButterflyYPhase
     let floorY
 
     o.rawData[oVelX] = sins(yaw) * speed
@@ -47,9 +53,9 @@ const butterfly_step = (speed) => {
         o.rawData[oPosY] = floorY + 2
     }
 
-    o.rawData[oButterflyYPhase]++
-    if (o.rawData[oButterflyYPhase] >= 101) {
-        o.rawData[oButterflyYPhase] = 0
+    o.oButterflyYPhase++
+    if (o.oButterflyYPhase >= 101) {
+        o.oButterflyYPhase = 0
     }
 }
 
@@ -58,13 +64,13 @@ const butterfly_calculate_angle = () => {
     const mario = ObjectListProc.gMarioObject
     const sX = mario.rawData[oPosX], sY = mario.rawData[oPosY], sZ = mario.rawData[oPosZ]
 
-    mario.rawData[oPosX] += 5 * o.rawData[oButterflyYPhase] / 4
-    mario.rawData[oPosZ] += 5 * o.rawData[oButterflyYPhase] / 4
+    mario.rawData[oPosX] += 5 * o.oButterflyYPhase / 4
+    mario.rawData[oPosZ] += 5 * o.oButterflyYPhase / 4
     obj_turn_toward_object(o, mario, 16, 0x300)
     mario.rawData[oPosX] = sX
     mario.rawData[oPosZ] = sZ
 
-    mario.rawData[oPosY] += (5 * o.rawData[oButterflyYPhase] + 0x100) / 4
+    mario.rawData[oPosY] += (5 * o.oButterflyYPhase + 0x100) / 4
     obj_turn_toward_object(o, mario, 15, 0x500)
     mario.rawData[oPosY] = sY
 }

@@ -241,12 +241,6 @@ export const CHAIN_CHOMP_ACT_UNLOAD_CHAIN = 2
 export const CHAIN_CHOMP_SUB_ACT_TURN = 0
 export const CHAIN_CHOMP_SUB_ACT_LUNGE = 1
 
-/* Butterfly */
-/* oAction */
-export const BUTTERFLY_ACT_RESTING = 0
-export const BUTTERFLY_ACT_FOLLOW_MARIO = 1
-export const BUTTERFLY_ACT_RETURN_HOME = 2
-
 /* Moving Yellow Coin */
     /* oAction */
     export const MOV_YCOIN_ACT_IDLE = 0

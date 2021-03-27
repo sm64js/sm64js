@@ -8,6 +8,10 @@ export const TERRAIN_LOAD_ENVIRONMENT = 0x0044 // Loads water/HMC gas
 export const LEVEL_BOUNDARY_MAX = 0x4000
 export const CELL_SIZE          = 0x400
 
+export const CELL_HEIGHT_LIMIT      = 20000
+export const FLOOR_LOWER_LIMIT      = -11000
+export const FLOOR_LOWER_LIMIT_MISC = (FLOOR_LOWER_LIMIT + 1000)
+
 // Surface Types
 export const SURFACE_DEFAULT        = 0x0000 // Environment default
 export const SURFACE_BURNING        = 0x0001 // Lava / Frostbite (in SL), but is used mostly for Lava

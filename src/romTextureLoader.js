@@ -410,6 +410,30 @@ import {
     sparkles_seg4_texture_04029C90
 } from "./actors/sparkle/model.inc"
 
+import {
+    water_splash_seg4_texture_0402A5C8,
+    water_splash_seg4_texture_0402B5C8,
+    water_splash_seg4_texture_0402C5C8,
+    water_splash_seg4_texture_0402D5C8,
+    water_splash_seg4_texture_0402E5C8,
+    water_splash_seg4_texture_0402F5C8,
+    water_splash_seg4_texture_040305C8,
+    water_splash_seg4_texture_040315C8,
+} from "./actors/water_splash/model.inc"
+
+import {
+    white_particle_small_texture
+} from "./actors/white_particle_small/model.inc"
+
+import {
+    stomp_smoke_seg4_texture_04022148,
+    stomp_smoke_seg4_texture_04022948,
+    stomp_smoke_seg4_texture_04023148,
+    stomp_smoke_seg4_texture_04023948,
+    stomp_smoke_seg4_texture_04024148,
+    stomp_smoke_seg4_texture_04024948,
+} from "./actors/water_splash/model.inc"
+
 
 const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
@@ -1191,6 +1215,25 @@ const loadDataIntoGame = (data) => {
     SkyboxWater.water_skybox_texture_0003D.push(...data["water_skybox_texture_0003D"].data)
     SkyboxWater.water_skybox_texture_0003E.push(...data["water_skybox_texture_0003E"].data)
     SkyboxWater.water_skybox_texture_0003F.push(...data["water_skybox_texture_0003F"].data)
+
+    water_splash_seg4_texture_0402A5C8.push(...data["actors/water_splash/water_splash_0.rgba16.png"].data)
+    water_splash_seg4_texture_0402B5C8.push(...data["actors/water_splash/water_splash_1.rgba16.png"].data)
+    water_splash_seg4_texture_0402C5C8.push(...data["actors/water_splash/water_splash_2.rgba16.png"].data)
+    water_splash_seg4_texture_0402D5C8.push(...data["actors/water_splash/water_splash_3.rgba16.png"].data)
+    water_splash_seg4_texture_0402E5C8.push(...data["actors/water_splash/water_splash_4.rgba16.png"].data)
+    water_splash_seg4_texture_0402F5C8.push(...data["actors/water_splash/water_splash_5.rgba16.png"].data)
+    water_splash_seg4_texture_040305C8.push(...data["actors/water_splash/water_splash_6.rgba16.png"].data)
+    water_splash_seg4_texture_040315C8.push(...data["actors/water_splash/water_splash_7.rgba16.png"].data)
+
+    white_particle_small_texture.push(...data["actors/white_particle_small/small_snow_particle.rgba16.png"].data)
+
+    stomp_smoke_seg4_texture_04022148.push(...data["actors/stomp_smoke/stomp_smoke_0.ia16.png"].data)
+    stomp_smoke_seg4_texture_04022948.push(...data["actors/stomp_smoke/stomp_smoke_1.ia16.png"].data)
+    stomp_smoke_seg4_texture_04023148.push(...data["actors/stomp_smoke/stomp_smoke_2.ia16.png"].data)
+    stomp_smoke_seg4_texture_04023948.push(...data["actors/stomp_smoke/stomp_smoke_3.ia16.png"].data)
+    stomp_smoke_seg4_texture_04024148.push(...data["actors/stomp_smoke/stomp_smoke_4.ia16.png"].data)
+    stomp_smoke_seg4_texture_04024948.push(...data["actors/stomp_smoke/stomp_smoke_5.ia16.png"].data)
+
 
     document.getElementById('romSelect').hidden = true
     msgElement.innerHTML = "Rom Asset Extraction Success - You may now start the game"

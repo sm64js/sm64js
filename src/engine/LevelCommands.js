@@ -2,6 +2,7 @@ import { GeoLayoutInstance as GeoLayout } from "./GeoLayout"
 import { AreaInstance as Area } from "../game/Area"
 import { GameInstance as Game } from "../game/Game"
 import * as Gbi from "../include/gbi"
+import * as GraphNode from "./graph_node"
 import { GoddardRendererInstance as GoddardRenderer } from "../goddard/GoddardRenderer"
 import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
 import { init_graph_node_start } from "./graph_node"
@@ -44,6 +45,21 @@ class LevelCommands {
         this.sStackTop = []
     }
 
+    AREA(areaIndex, geoLayout) {return this.begin_area(areaIndex, geoLayout)}
+    CALL(arg, func, funcClass) {return this.call(arg, func, funcClass)}
+    CALL_LOOP(arg, func, funcClass) {return this.call_loop(arg, func, funcClass)}
+    END_AREA() {return this.end_area()}
+    INIT_LEVEL() {return this.init_level()}
+    JUMP_LINK(script) {return this.jump_link(script)}
+    LOAD_MODEL_FROM_GEO(model, geo) {return this.load_model_from_geo(model, geo)}
+    LOAD_MODEL_FROM_DL(model, dl, layer) {return this.load_model_from_dl(model, dl, layer)}
+    MARIO(model, bharg, bhscript) {return this.init_mario(model, bharg, bhscript)}
+    MARIO_POS(area, yaw, x, y, z) {return this.set_mario_pos(area, yaw, x, y, z)}
+    OBJECT(act, model, x, y, z, pitch, yaw, rot, bharg, bhscript) {return this.place_object(act, model, x, y, z, pitch, yaw, rot, bharg, bhscript)}
+    RETURN() {return this.return()}  // heh
+    TERRAIN(data) {return this.terrain(data)}
+
+
     init_level() {
         //console.log("init level")
         GeoLayout.gObjParentGraphNode = init_graph_node_start(null, GeoLayout.gObjParentGraphNode)
@@ -69,6 +85,14 @@ class LevelCommands {
         if (model < 256) {
             Area.gLoadedGraphNodes[model] = GeoLayout.process_geo_layout(geo).node
         } else throw "invalid gLoadedGraphNodes index - load model from geo"
+
+        this.sCurrentScript.index++
+    }
+
+    load_model_from_dl(model, dl, layer) {
+        if (model < 256) {
+            Area.gLoadedGraphNodes[model] = GraphNode.init_graph_node_display_list(layer, dl).node
+        } else throw "invalid gLoadedGraphNodes index - load model from dl"
 
         this.sCurrentScript.index++
     }

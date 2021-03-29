@@ -563,7 +563,6 @@ class GeoRenderer {
     }
 
     geo_process_single_node(node) {
-
         switch (node.type) {
 
             case GraphNode.GRAPH_NODE_TYPE_ORTHO_PROJECTION:
@@ -616,7 +615,10 @@ class GeoRenderer {
 
             default:
                 /// remove this check once all types have been added
-                if (node.type != GraphNode.GRAPH_NODE_TYPE_CULLING_RADIUS && node.type != GraphNode.GRAPH_NODE_TYPE_START) throw "unimplemented type in geo renderer "
+                if (node.type != GraphNode.GRAPH_NODE_TYPE_CULLING_RADIUS && node.type != GraphNode.GRAPH_NODE_TYPE_START) {
+                    console.log(node)
+                    throw "unimplemented type in geo renderer"
+                }
                 if (node.children[0]) {
                     this.geo_process_node_and_siblings(node.children)
                 }

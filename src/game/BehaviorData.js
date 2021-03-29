@@ -1,6 +1,6 @@
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor"
-import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins, OBJ_FLAG_ACTIVE_FROM_AFAR, oActiveParticleFlags, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE, ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_BUBBLE, oWaterObjUnkF4, oWaterObjUnkF8, oPosX, oWaterObjUnkFC, oPosY, oPosZ, oInteractionSubtype, oBehParams2ndByte } from "../include/object_constants"
+import { oFlags, oInteractType, oAnimations, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oIntangibleTimer, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, OBJ_FLAG_PERSISTENT_RESPAWN, OBJ_FLAG_HOLDABLE, oDamageOrCoinValue, oAnimState, OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL, OBJ_FLAG_MOVE_XZ_USING_FVEL, oGraphYOffset, oNumLootCoins, OBJ_FLAG_ACTIVE_FROM_AFAR, oActiveParticleFlags, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE, ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_BUBBLE, oWaterObjUnkF4, oWaterObjUnkF8, oPosX, oWaterObjUnkFC, oPosY, oPosZ, oInteractionSubtype, oBehParams2ndByte, ACTIVE_PARTICLE_WATER_SPLASH, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll } from "../include/object_constants"
 import * as Interact from "./Interaction"
 import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
 import { bhv_pole_init, bhv_giant_pole_loop } from "./behaviors/pole.inc"
@@ -398,11 +398,14 @@ export const bhvWhitePuffExplosion = [
 ]
 
 
-import { bhv_fish_loop, bhv_fish_spawner_loop } from "./behaviors/fish.inc"
+import {
+    bhv_fish_loop,
+    bhv_fish_spawner_loop
+} from "./behaviors/fish.inc"
 
 export const bhvFish = [
     ['BEGIN', OBJ_LIST_DEFAULT],
-    ['OR_INT', oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)],
+    ['OR_INT', oFlags, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE],
     ['SET_HOME'],
     ['BEGIN_LOOP'],
         ['CALL_NATIVE', bhv_fish_loop],
@@ -413,7 +416,7 @@ export const bhvFishSpawner = [
     ['BEGIN', OBJ_LIST_DEFAULT],
     // Fish Spawner - common
     ['DISABLE_RENDERING'],
-    ['OR_INT', oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)],
+    ['OR_INT', oFlags, OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE],
     ['BEGIN_LOOP'],
         ['CALL_NATIVE', bhv_fish_spawner_loop],
     ['END_LOOP']
@@ -424,27 +427,102 @@ export const bhvManyBlueFishSpawner = [
     ['SET_INT', oBehParams2ndByte, 0],
     // ['GOTO', bhvFishSpawner, 1]
     ['DISABLE_RENDERING'],
-    ['OR_INT', oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)],
+    ['OR_INT', oFlags, OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE],
     ['BEGIN_LOOP'],
         ['CALL_NATIVE', bhv_fish_spawner_loop],
     ['END_LOOP']
 ]
 
 
-import { bhv_butterfly_init, bhv_butterfly_loop } from "./behaviors/butterfly.inc"
-import { butterfly_seg3_anims_030056B0 } from "../actors/butterfly/table.inc"
+import {
+    butterfly_seg3_anims_030056B0
+} from "../actors/butterfly/anims.inc"
+import {
+    bhv_butterfly_init,
+    bhv_butterfly_loop
+} from "./behaviors/butterfly.inc"
 
 export const bhvButterfly = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
-    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
-    { command: BhvCmds.load_animations, args: { field: oAnimations, anims: butterfly_seg3_anims_030056B0 } },
-    { command: BhvCmds.drop_to_floor },
-    { command: BhvCmds.set_objectData_value, args: { field: oGraphYOffset, value: 5 } },
-    { command: BhvCmds.call_native, args: { func: bhv_butterfly_init } },
-    { command: BhvCmds.begin_loop },
-        { command: BhvCmds.call_native, args: { func: bhv_butterfly_loop } },
-    { command: BhvCmds.end_loop }
+    ['BEGIN', OBJ_LIST_DEFAULT],
+    ['OR_INT', oFlags, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE],
+    ['LOAD_ANIMATIONS', oAnimations, butterfly_seg3_anims_030056B0],
+    ['DROP_TO_FLOOR'],
+    ['SET_FLOAT', oGraphYOffset, 5],
+    ['CALL_NATIVE', bhv_butterfly_init],
+    ['BEGIN_LOOP'],
+        ['CALL_NATIVE', bhv_butterfly_loop],
+    ['END_LOOP']
 ]
+
+
+import {
+    bhv_water_splash_spawn_droplets,
+    bhv_water_droplet_loop,
+    bhv_water_droplet_splash_init,
+    bhv_bubble_splash_init
+} from "./behaviors/water_splashes_and_waves.inc"
+
+// The large splash Mario makes when he jumps into a pool of water.
+export const bhvWaterSplash = [
+    ['BEGIN', OBJ_LIST_DEFAULT],
+    ['OR_INT', oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE],
+    ['BILLBOARD'],
+    ['SET_INT', oAnimState, -1],
+    ['BEGIN_REPEAT', 3],
+        ['ADD_INT', oAnimState, 1],
+        ['CALL_NATIVE', bhv_water_splash_spawn_droplets],
+        ['DELAY', 1],
+        ['CALL_NATIVE', bhv_water_splash_spawn_droplets],
+    ['END_REPEAT'],
+    ['BEGIN_REPEAT', 5],
+        ['ADD_INT', oAnimState, 1],
+        ['DELAY', 1],
+    ['END_REPEAT'],
+    ['PARENT_BIT_CLEAR', oActiveParticleFlags, ACTIVE_PARTICLE_WATER_SPLASH],
+    ['DEACTIVATE'],
+]
+
+// Droplets of water that spawn as a result of various water splashes.
+export const bhvWaterDroplet = [
+    ['BEGIN', OBJ_LIST_UNIMPORTANT],
+    ['OR_INT', oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)],
+    ['BILLBOARD'],
+    ['BEGIN_LOOP'],
+        ['CALL_NATIVE', bhv_water_droplet_loop],
+    ['END_LOOP'],
+]
+
+// Small splashes that are seen when a water droplet lands back into the water.
+export const bhvWaterDropletSplash = [
+    ['BEGIN', OBJ_LIST_DEFAULT],
+    ['OR_INT', oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE],
+    ['SET_INT', oFaceAnglePitch, 0],
+    ['SET_INT', oFaceAngleYaw, 0],
+    ['SET_INT', oFaceAngleRoll, 0],
+    ['CALL_NATIVE', bhv_water_droplet_splash_init],
+    ['ADD_FLOAT', oPosY, 5],
+    ['SET_INT', oAnimState, -1],
+    ['BEGIN_REPEAT', 6],
+        ['ADD_INT', oAnimState, 1],
+    ['END_REPEAT'],
+    ['DEACTIVATE'],
+]
+
+// The splash created when an air bubble hits the surface of the water.
+export const bhvBubbleSplash = [
+    ['BEGIN', OBJ_LIST_DEFAULT],
+    ['OR_INT', oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE],
+    ['SET_INT', oFaceAnglePitch, 0],
+    ['SET_INT', oFaceAngleYaw, 0],
+    ['SET_INT', oFaceAngleRoll, 0],
+    ['SET_INT', oAnimState, -1],
+    ['CALL_NATIVE', bhv_bubble_splash_init],
+    ['BEGIN_REPEAT', 6],
+        ['ADD_INT', oAnimState, 1],
+    ['END_REPEAT'],
+    ['DEACTIVATE'],
+]
+
 
 export const bhvSmallWaterWave398 = [
     { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
@@ -585,12 +663,28 @@ const bhvBowser = []
 
 gLinker.behaviors = {
     bhvBowser,
-    bhvHorStarParticleSpawner,
-    bhvVertStarParticleSpawner,
-    bhvTriangleParticleSpawner,
-    bhvMistParticleSpawner,
-    bhvMistCircParticleSpawner,
     bhvWhitePuffExplosion,
+    bhvSingleCoinGetsSpawned,
+    bhvWaterDroplet,
+    bhvWaterDropletSplash,
+
+    // particles
+    bhvMistParticleSpawner,
+    bhvVertStarParticleSpawner,
+    bhvHorStarParticleSpawner,
+    // bhvSparkleParticleSpawner,
     bhvBubbleParticleSpawner,
-    bhvSingleCoinGetsSpawned
+    bhvWaterSplash,
+    // bhvIdleWaterWave,
+    // bhvPlungeBubble,
+    // bhvWaveTrail,
+    // bhvFireParticleSpawner,
+    // bhvShallowWaterWave,
+    // bhvShallowWaterSplash,
+    // bhvLeafParticleSpawner,
+    // bhvSnowParticleSpawner,
+    // bhvBreathParticleSpawner,
+    // bhvDirtParticleSpawner,
+    bhvMistCircParticleSpawner,
+    bhvTriangleParticleSpawner
 }

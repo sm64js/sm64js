@@ -29,6 +29,7 @@ import { bhv_bubble_wave_init, bhv_small_water_wave_loop } from "./behaviors/wat
 import { bhv_coin_formation_init, bhv_coin_formation_loop, bhv_coin_formation_spawn_loop, bhv_yellow_coin_init, bhv_yellow_coin_loop, bhv_golden_coin_sparkles_loop, bhv_coin_sparkles_loop, bhv_coin_init, bhv_coin_loop } from "./behaviors/coin.inc"
 import { bhv_red_coin_init, bhv_red_coin_loop } from "./behaviors/red_coin.inc"
 import { bhv_moving_yellow_coin_init, bhv_moving_yellow_coin_loop } from "./behaviors/moving_coin.inc"
+import { bhv_water_mist_2_loop } from "./behaviors/water_mist.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -356,7 +357,6 @@ export const bhvWhitePuff1 = [
     { command: BhvCmds.end_loop }
 ]
 
-
 export const bhvWhitePuff2 = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_MOVE_XZ_USING_FVEL } },
@@ -369,15 +369,25 @@ export const bhvWhitePuff2 = [
     { command: BhvCmds.deactivate }
 ]
 
+export const bhvWaterMist2 = [
+    ['BEGIN', OBJ_LIST_DEFAULT],
+    ['OR_INT', oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)],
+    ['SET_HOME'],
+    ['SET_INT', oFaceAnglePitch, 0xC000],
+    ['SCALE', /*Unused*/ 0, /*Field*/ 2100],
+    ['BEGIN_LOOP'],
+        ['CALL_NATIVE', bhv_water_mist_2_loop],
+    ['END_LOOP'],
+]
 
 export const bhvMistParticleSpawner = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
-    { command: BhvCmds.parent_bit_clear, args: { field: oActiveParticleFlags, value: ACTIVE_PARTICLE_DUST } },
-    { command: BhvCmds.disable_rendering },
-    { command: BhvCmds.spawn_child_with_param, args: { bhvParam: 0, model: MODEL_MIST, behavior: bhvWhitePuff1 } },
-    { command: BhvCmds.spawn_child_with_param, args: { bhvParam: 0, model: MODEL_SMOKE, behavior: bhvWhitePuff2 } },
-    { command: BhvCmds.delay, args: { num: 1 } },
-    { command: BhvCmds.deactivate }
+    ['BEGIN', OBJ_LIST_DEFAULT],
+    ['PARENT_BIT_CLEAR', oActiveParticleFlags, ACTIVE_PARTICLE_DUST],
+    ['DISABLE_RENDERING'],
+    ['SPAWN_CHILD', /*Model*/ MODEL_MIST,  /*Behavior*/ bhvWhitePuff1],
+    ['SPAWN_CHILD', /*Model*/ MODEL_SMOKE, /*Behavior*/ bhvWhitePuff2],
+    ['DELAY', 1],
+    ['DEACTIVATE'],
 ]
 
 export const bhvMistCircParticleSpawner = [

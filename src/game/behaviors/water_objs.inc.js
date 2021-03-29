@@ -1,10 +1,11 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { oWaterObjUnkFC, oWaterObjUnk100, oPosX, oPosZ, oWaterObjUnkF4, oWaterObjUnkF8, oPosY, oInteractStatus } from "../../include/object_constants"
+import { oWaterObjUnkFC, oWaterObjUnk100, oPosX, oPosZ, oWaterObjUnkF4, oWaterObjUnkF8, oPosY, oInteractStatus, ACTIVE_FLAG_DEACTIVATED } from "../../include/object_constants"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../../engine/SurfaceCollision"
 import { sins } from "../../utils"
 import { INT_STATUS_INTERACTED } from "../Interaction"
-import { obj_mark_for_deletion } from "../ObjectHelpers"
-
+import { obj_mark_for_deletion, spawn_object_at_origin } from "../ObjectHelpers"
+import { MODEL_SMALL_WATER_SPLASH } from "../../include/model_ids"
+import { bhvBubbleSplash } from "../BehaviorData"
 
 export const bhv_bubble_wave_init = () => {
     const o = ObjectListProc.gCurrentObject
@@ -25,9 +26,12 @@ export const bhv_small_water_wave_loop = () => {
     o.rawData[oWaterObjUnkF8] += o.rawData[oWaterObjUnk100]
 
     if (o.rawData[oPosY] > water_level) { // bubble hits water surface
-        o.activeFlags = 0
-        o.rawData[oPosY] += 5.0
-        ///TODO spawn small water splash (when the bubble hits the surface, this is tiny and super subtle)
+        const bubbleSplash = spawn_object_at_origin(o, MODEL_SMALL_WATER_SPLASH, bhvBubbleSplash)
+        bubbleSplash.rawData[oPosX] = o.rawData[oPosX]
+        bubbleSplash.rawData[oPosY] = o.rawData[oPosY] + 5
+        bubbleSplash.rawData[oPosZ] = o.rawData[oPosZ]
+
+        o.activeFlags = ACTIVE_FLAG_DEACTIVATED
     }
 
     if (o.rawData[oInteractStatus] & INT_STATUS_INTERACTED)

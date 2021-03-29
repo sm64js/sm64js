@@ -1,7 +1,9 @@
 import { GeoLayoutInstance as Geo } from "../../engine/GeoLayout"
 import { SHADOW_CIRCLE_4_VERTS } from "../../game/Shadow"
-
-import { blue_fish_seg3_dl_0301BFB8, blue_fish_seg3_dl_0301C150 } from "./model.inc"
+import {
+   blue_fish_seg3_dl_0301BFB8,
+   blue_fish_seg3_dl_0301C150
+} from "./model.inc"
 
 // 0x16000BEC
 export const fish_shadow_geo = [

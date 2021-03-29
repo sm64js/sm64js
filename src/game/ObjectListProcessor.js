@@ -1,5 +1,11 @@
 import { PlatformDisplacementInstance as PlatformDisplacement } from "./PlatformDisplacement"
-import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte, ACTIVE_FLAG_ACTIVE, RESPAWN_INFO_TYPE_16, oFlags, OBJ_FLAG_PERSISTENT_RESPAWN, oMarioParticleFlags, ACTIVE_PARTICLE_H_STAR, oActiveParticleFlags, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE, ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_MIST_CIRCLE, ACTIVE_PARTICLE_BUBBLE } from "../include/object_constants"
+import {
+    RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte, ACTIVE_FLAG_ACTIVE, RESPAWN_INFO_TYPE_16, oFlags, OBJ_FLAG_PERSISTENT_RESPAWN, oMarioParticleFlags, oActiveParticleFlags,
+    ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_SPARKLES, ACTIVE_PARTICLE_BUBBLE,
+    ACTIVE_PARTICLE_WATER_SPLASH, ACTIVE_PARTICLE_IDLE_WATER_WAVE, ACTIVE_PARTICLE_PLUNGE_BUBBLE, ACTIVE_PARTICLE_WAVE_TRAIL,
+    ACTIVE_PARTICLE_FIRE, ACTIVE_PARTICLE_SHALLOW_WATER_WAVE, ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH, ACTIVE_PARTICLE_LEAF,
+    ACTIVE_PARTICLE_SNOW, ACTIVE_PARTICLE_BREATH, ACTIVE_PARTICLE_DIRT, ACTIVE_PARTICLE_MIST_CIRCLE, ACTIVE_PARTICLE_TRIANGLE
+} from "../include/object_constants"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import * as GraphNode from "../engine/graph_node"
 import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands"
@@ -7,42 +13,47 @@ import * as Mario from "./Mario"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { detect_object_collisions } from "./ObjectCollisions"
 import { uint32, uint16 } from "../utils"
-import { MODEL_NONE, MODEL_MIST, MODEL_BUBBLE } from "../include/model_ids"
-import * as MarioConstants from "../include/mario_constants"
+import {
+    MODEL_MIST, MODEL_NONE, MODEL_SPARKLES, MODEL_BUBBLE, MODEL_WATER_SPLASH, MODEL_IDLE_WATER_WAVE, MODEL_WHITE_PARTICLE_SMALL,
+    MODEL_WAVE_TRAIL, MODEL_RED_FLAME
+} from "../include/model_ids"
+import {
+    PARTICLE_DUST, PARTICLE_VERTICAL_STAR, PARTICLE_HORIZONTAL_STAR, PARTICLE_SPARKLES, PARTICLE_BUBBLE, PARTICLE_WATER_SPLASH,        
+    PARTICLE_IDLE_WATER_WAVE, PARTICLE_PLUNGE_BUBBLE, PARTICLE_WAVE_TRAIL, PARTICLE_FIRE, PARTICLE_SHALLOW_WATER_WAVE,  
+    PARTICLE_SHALLOW_WATER_SPLASH, PARTICLE_LEAF, PARTICLE_SNOW, PARTICLE_BREATH, PARTICLE_DIRT, PARTICLE_MIST_CIRCLE, PARTICLE_TRIANGLE
+} from "../include/mario_constants"
 import { gLinker } from "./Linker"
 import { spawn_object_at_origin, obj_copy_pos_and_angle } from "./ObjectHelpers"
 
 class ObjectListProcessor {
     constructor() {
-
         PlatformDisplacement.ObjectListProc = this
+
         this.sParticleTypesInit = () => {
-            return [
-                {
-                    particleFlag: MarioConstants.PARTICLE_HORIZONTAL_STAR, activeParticleFlag: ACTIVE_PARTICLE_H_STAR, model: MODEL_NONE,
-                    behavior: gLinker.behaviors.bhvHorStarParticleSpawner
-                },
-                {
-                    particleFlag: MarioConstants.PARTICLE_VERTICAL_STAR, activeParticleFlag: ACTIVE_PARTICLE_V_STAR, model: MODEL_NONE,
-                    behavior: gLinker.behaviors.bhvVertStarParticleSpawner
-                },
-                {
-                    particleFlag: MarioConstants.PARTICLE_TRIANGLE, activeParticleFlag: ACTIVE_PARTICLE_TRIANGLE, model: MODEL_NONE,
-                    behavior: gLinker.behaviors.bhvTriangleParticleSpawner
-                },
-                {
-                    particleFlag: MarioConstants.PARTICLE_DUST, activeParticleFlag: ACTIVE_PARTICLE_DUST, model: MODEL_MIST,
-                    behavior: gLinker.behaviors.bhvMistParticleSpawner
-                },
-                {
-                    particleFlag: MarioConstants.PARTICLE_MIST_CIRCLE, activeParticleFlag: ACTIVE_PARTICLE_MIST_CIRCLE, model: MODEL_NONE,
-                    behavior: gLinker.behaviors.bhvMistCircParticleSpawner
-                },
-                {
-                    particleFlag: MarioConstants.PARTICLE_BUBBLE, activeParticleFlag: ACTIVE_PARTICLE_BUBBLE, model: MODEL_BUBBLE,
-                    behavior: gLinker.behaviors.bhvBubbleParticleSpawner
-                }
-            ]
+            this.sParticleTypes = [];
+            [
+                [PARTICLE_DUST,                 ACTIVE_PARTICLE_DUST,                 MODEL_MIST,                 'bhvMistParticleSpawner'],
+                [PARTICLE_VERTICAL_STAR,        ACTIVE_PARTICLE_V_STAR,               MODEL_NONE,                 'bhvVertStarParticleSpawner'],
+                [PARTICLE_HORIZONTAL_STAR,      ACTIVE_PARTICLE_H_STAR,               MODEL_NONE,                 'bhvHorStarParticleSpawner'],
+                [PARTICLE_SPARKLES,             ACTIVE_PARTICLE_SPARKLES,             MODEL_SPARKLES,             'bhvSparkleParticleSpawner'],
+                [PARTICLE_BUBBLE,               ACTIVE_PARTICLE_BUBBLE,               MODEL_BUBBLE,               'bhvBubbleParticleSpawner'],
+                [PARTICLE_WATER_SPLASH,         ACTIVE_PARTICLE_WATER_SPLASH,         MODEL_WATER_SPLASH,         'bhvWaterSplash'],
+                [PARTICLE_IDLE_WATER_WAVE,      ACTIVE_PARTICLE_IDLE_WATER_WAVE,      MODEL_IDLE_WATER_WAVE,      'bhvIdleWaterWave'],
+                [PARTICLE_PLUNGE_BUBBLE,        ACTIVE_PARTICLE_PLUNGE_BUBBLE,        MODEL_WHITE_PARTICLE_SMALL, 'bhvPlungeBubble'],
+                [PARTICLE_WAVE_TRAIL,           ACTIVE_PARTICLE_WAVE_TRAIL,           MODEL_WAVE_TRAIL,           'bhvWaveTrail'],
+                [PARTICLE_FIRE,                 ACTIVE_PARTICLE_FIRE,                 MODEL_RED_FLAME,            'bhvFireParticleSpawner'],
+                [PARTICLE_SHALLOW_WATER_WAVE,   ACTIVE_PARTICLE_SHALLOW_WATER_WAVE,   MODEL_NONE,                 'bhvShallowWaterWave'],
+                [PARTICLE_SHALLOW_WATER_SPLASH, ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH, MODEL_NONE,                 'bhvShallowWaterSplash'],
+                [PARTICLE_LEAF,                 ACTIVE_PARTICLE_LEAF,                 MODEL_NONE,                 'bhvLeafParticleSpawner'],
+                [PARTICLE_SNOW,                 ACTIVE_PARTICLE_SNOW,                 MODEL_NONE,                 'bhvSnowParticleSpawner'],
+                [PARTICLE_BREATH,               ACTIVE_PARTICLE_BREATH,               MODEL_NONE,                 'bhvBreathParticleSpawner'],
+                [PARTICLE_DIRT,                 ACTIVE_PARTICLE_DIRT,                 MODEL_NONE,                 'bhvDirtParticleSpawner'],
+                [PARTICLE_MIST_CIRCLE,          ACTIVE_PARTICLE_MIST_CIRCLE,          MODEL_NONE,                 'bhvMistCircParticleSpawner'],
+                [PARTICLE_TRIANGLE,             ACTIVE_PARTICLE_TRIANGLE,             MODEL_NONE,                 'bhvTriangleParticleSpawner']
+
+            ].forEach(p => {
+                this.sParticleTypes.push({particleFlag: p[0], activeParticleFlag: p[1], model: p[2], behavior: gLinker.behaviors[p[3]]})
+            })
         }
 
         this.TIME_STOP_UNKNOWN_0 = (1 << 0)
@@ -207,18 +218,20 @@ class ObjectListProcessor {
     }
 
     bhv_mario_update() {
-
         const particleFlags = Mario.execute_mario_action()
         this.gCurrentObject.rawData[oMarioParticleFlags] = particleFlags
         this.copy_mario_state_to_object()
 
-        if (this.sParticleTypes == undefined) this.sParticleTypes = this.sParticleTypesInit()
+        if (this.sParticleTypes == undefined) {
+            this.sParticleTypesInit()
+        }
         this.sParticleTypes.forEach(particleType => {
             if (particleFlags & particleType.particleFlag) {
-                this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
+                if (particleType.behavior) {  // during development some particles aren't implemented
+                    this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
+                }
             }
         })
-        
     }
 
     copy_mario_state_to_object() {

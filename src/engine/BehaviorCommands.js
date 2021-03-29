@@ -15,19 +15,30 @@ class BehaviorCommands {
         this.BHV_PROC_BREAK    = 1
     }
 
+    ADD_INT(args) {return this.add_number({field: args[0], value: args[1]})}
+    ADD_FLOAT(args) {return this.add_number({field: args[0], value: args[1]})}
+    BEGIN(args) {return this.begin()}
+    BEGIN_LOOP(args) {return this.begin_loop()}
+    BEGIN_REPEAT(args) {return this.begin_repeat({count: args[0]})}
+    BILLBOARD(args) {return this.billboard()}
+    CALL_NATIVE(args) {return this.call_native({func: args[0], funcClass: args[1]})}
+    DEACTIVATE(args) {return this.deactivate()}
+    DELAY(args) {return this.delay({num: args[0]})}
+    DISABLE_RENDERING(args) {return this.disable_rendering()}
+    DROP_TO_FLOOR(args) {return this.drop_to_floor()}
+    END_LOOP(args) {return this.end_loop()}
+    END_REPEAT(args) {return this.end_repeat()}
+    GOTO(args) {return this.goto({script: args[0], index: args[1]})}
+    LOAD_ANIMATIONS(args) {return this.load_animations({field: args[0], anims: args[1]})}
+    OR_INT(args) {return this.or_int({field: args[0], value: args[1]})}
+    PARENT_BIT_CLEAR(args) {return this.parent_bit_clear({field: args[0], value: args[1]})}
+    SET_FLOAT(args) {return this.set_objectData_value({field: args[0], value: args[1]})}
+    SET_HOME(args) {return this.set_home()}
+    SET_INT(args) {return this.set_objectData_value({field: args[0], value: args[1]})}
+
     random_sign() {
         return Math.random() > 0.5 ? 1 : -1
     }
-
-    BEGIN(args) {return this.begin()}
-    SET_INT(args) {return this.set_objectData_value({field: args[0], value: args[1]})}
-    GOTO(args) {return this.goto({script: args[0], index: args[1]})}
-    DISABLE_RENDERING(args) {return this.disable_rendering()}
-    OR_INT(args) {return this.or_int({field: args[0], value: args[1]})}
-    BEGIN_LOOP(args) {return this.begin_loop()}
-    CALL_NATIVE(args) {return this.call_native({func: args[0], funcClass: args[1]})}
-    END_LOOP(args) {return this.end_loop()}
-    SET_HOME(args) {return this.set_home()}
 
     cur_obj_update() {
 
@@ -62,6 +73,10 @@ class BehaviorCommands {
             const bhvFunc = this.bhvScript.commands[this.bhvScript.index]
             if (Array.isArray(bhvFunc)) {
                 // new style of command: ['name', args, ...]
+                if (!this[bhvFunc[0]]) {
+                    console.log(bhvFunc[0])
+                    throw "behavior command undefined"
+                }
                 bhvProcResult = this[bhvFunc[0]].call(this, bhvFunc.slice(1))
             } else {
                 bhvProcResult = bhvFunc.command.call(this, bhvFunc.args)

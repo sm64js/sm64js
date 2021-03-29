@@ -5,6 +5,11 @@ export const int16 = (num) => {
     return num
 }
 
+// alias
+export const s16 = (num) => {
+    return int16(num)
+}
+
 export const uint16 = (num) => {
     num = parseInt(num)
     num = num > 65535 ? num - 65536 : num
@@ -17,6 +22,11 @@ export const int32 = (num) => {
     num = num > 2147483647 ? num - 4294967296 : num
     num = num < -2147483648 ? num + 4294967296 : num
     return num
+}
+
+// alias
+export const s32 = (num) => {
+    return int32(num)
 }
 
 export const uint32 = (num) => {

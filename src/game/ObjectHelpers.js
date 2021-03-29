@@ -118,23 +118,22 @@ export const geo_switch_area = (run, node) => {
 }
 
 export const geo_update_layer_transparency = (run, node) => {
-
     let sp3C = []
 
     if (run == 1) {
-        let sp34 = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
+        let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
         let sp30 = node
         let sp2C = node
 
         if (GeoRenderer.gCurGraphNodeHeldObject) {
-            sp34 = GeoRenderer.gCurGraphNodeHeldObject.objNode
+            obj = GeoRenderer.gCurGraphNodeHeldObject.objNode
         }
 
-        const sp28 = sp34.rawData[oOpacity]
+        const opacity = obj.rawData[oOpacity]
 
         const sp38 = sp3C
 
-        if (sp28 == 0xFF) {
+        if (opacity == 0xFF) {
             console.log(sp30)
             throw "more implementation needed: geo_update_layer_transparency"
             if (sp30.paremeter == 20) {
@@ -147,15 +146,15 @@ export const geo_update_layer_transparency = (run, node) => {
                 sp30.flags = 0x500 | (sp30.flags & 0xFF)
             }
 
-            sp34.rawData[oAnimState] = 1
+            obj.rawData[oAnimState] = 1
 
-            if (sp28 == 0 && gLinker.behaviors.bhvBowser == sp34.behavior) {
-                sp34.rawData[oAnimState] = 2
+            if (opacity == 0 && gLinker.behaviors.bhvBowser == obj.behavior) {
+                obj.rawData[oAnimState] = 2
             }
 
         }
 
-        Gbi.gDPSetEnvColor(sp38, 255, 255, 255, sp28)
+        Gbi.gDPSetEnvColor(sp38, 255, 255, 255, opacity)
         Gbi.gSPEndDisplayList(sp38)
 
     }

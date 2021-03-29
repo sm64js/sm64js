@@ -2,7 +2,7 @@ import { ObjectListProcessorInstance as ObjListProc } from "../game/ObjectListPr
 import { oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, oPosX, oPosY, oPosZ, oGraphYOffset, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll, oTimer, oPrevAction, oAction, oSubAction, oAnimations, oInteractType, oHomeX, oHomeY, oHomeZ, OBJ_FLAG_COMPUTE_DIST_TO_MARIO, oDistanceToMario, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, oAngleToMario, oMoveAngleYaw, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveFlags, OBJ_MOVE_ON_GROUND, oWallHitboxRadius, oGravity, oBounciness, oDragStrength, oFriction, oBuoyancy, oBehParams2ndByte, oRoom, OBJ_FLAG_ACTIVE_FROM_AFAR, oDrawingDistance, ACTIVE_FLAG_FAR_AWAY, oHeldState, HELD_FREE, OBJ_FLAG_MOVE_XZ_USING_FVEL } from "../include/object_constants"
 import { GRAPH_RENDER_CYLBOARD, geo_obj_init_animation, GRAPH_RENDER_BILLBOARD, GRAPH_RENDER_ACTIVE } from "./graph_node"
 import { dist_between_objects, obj_angle_to_object, spawn_object_at_origin, obj_copy_pos_and_angle, cur_obj_scale, cur_obj_hide, cur_obj_move_xz_using_fvel_and_yaw } from "../game/ObjectHelpers"
-import { int32 } from "../utils"
+import { s16, int32 } from "../utils"
 // for GOTOs
 // import { bhvFishSpawner } from "../game/BehaviorData"
 
@@ -15,7 +15,7 @@ class BehaviorCommands {
         this.BHV_PROC_BREAK    = 1
     }
 
-    ADD_INT(args) {return this.add_number({field: args[0], value: args[1]})}
+    ADD_INT(args) {return this.add_int({field: args[0], value: args[1]})}
     ADD_FLOAT(args) {return this.add_number({field: args[0], value: args[1]})}
     BEGIN(args) {return this.begin()}
     BEGIN_LOOP(args) {return this.begin_loop()}
@@ -32,9 +32,12 @@ class BehaviorCommands {
     LOAD_ANIMATIONS(args) {return this.load_animations({field: args[0], anims: args[1]})}
     OR_INT(args) {return this.or_int({field: args[0], value: args[1]})}
     PARENT_BIT_CLEAR(args) {return this.parent_bit_clear({field: args[0], value: args[1]})}
+    SCALE(args) {return this.scale({percent: args[1]})}
     SET_FLOAT(args) {return this.set_objectData_value({field: args[0], value: args[1]})}
     SET_HOME(args) {return this.set_home()}
-    SET_INT(args) {return this.set_objectData_value({field: args[0], value: args[1]})}
+    SET_INT(args) {return this.set_int({field: args[0], value: args[1]})}
+    SPAWN_CHILD(args) {return this.spawn_child_with_param({model: args[0], behavior: args[1], bhvParam: 0})}
+
 
     random_sign() {
         return Math.random() > 0.5 ? 1 : -1
@@ -176,10 +179,23 @@ class BehaviorCommands {
         return this.BHV_PROC_BREAK
     }
 
+    add_int(args) {
+        ObjListProc.gCurrentObject.rawData[args.field] = s16(ObjListProc.gCurrentObject.rawData[args.field] + s16(args.value))
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
     add_number(args) {
         ObjListProc.gCurrentObject.rawData[args.field] += args.value
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
+    }
+
+    set_int(args) {
+        ObjListProc.gCurrentObject.rawData[args.field] = s16(args.value)
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+
     }
 
     set_objectData_value(args) {

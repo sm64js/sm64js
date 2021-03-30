@@ -11,9 +11,9 @@ import { CameraInstance as Camera } from "./Camera"
 const MIN_SWIM_STRENGTH = 160
 const MIN_SWIM_SPEED = 160
 
-let D_80339FD0
-let D_80339FD2
-let D_80339FD4
+let sBounceAngle = 0
+let sBounceIncrement = 0
+let sBounceMult = 0
 
 let sWasAtSurface = false
 let sSwimStrength = MIN_SWIM_STRENGTH
@@ -225,7 +225,7 @@ const act_water_plunge = (m) => {
                 break
             default: throw "unknown case in act_water_plunge"
         }
-        D_80339FD2 = 0
+        sBounceIncrement = 0
     }
 
     switch (stateFlags) {
@@ -640,21 +640,21 @@ const common_swimming_step = (m, swimStrength) => {
 }
 
 const float_surface_gfx = (m) => {
-    if (D_80339FD2 != 0 && m.pos[1] > m.waterLevel - 85 && m.faceAngle[0] >= 0) {
-        D_80339FD0 = s16(D_80339FD0 + D_80339FD2)
-        if (D_80339FD0 >= 0) {
-            m.marioObj.header.gfx.pos[1] += D_80339FD4 * sins(D_80339FD0)
+    if (sBounceIncrement != 0 && m.pos[1] > m.waterLevel - 85 && m.faceAngle[0] >= 0) {
+        sBounceAngle = s16(sBounceAngle + sBounceIncrement)
+        if (sBounceAngle >= 0) {
+            m.marioObj.header.gfx.pos[1] += sBounceMult * sins(sBounceAngle)
             return
         }
     }
 
-    D_80339FD2 = 0
+    sBounceIncrement = 0
 }
 
 const reset_float_globals = (m) => {
-    D_80339FD0 = 0
-    D_80339FD2 = 0x800
-    D_80339FD4 = m.faceAngle[0] / 256.0 + 20.0
+    sBounceAngle = 0
+    sBounceIncrement = 0x800
+    sBounceMult = m.faceAngle[0] / 256.0 + 20.0
 }
 
 const act_hold_water_action_end = (m) => {

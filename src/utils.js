@@ -17,6 +17,11 @@ export const uint16 = (num) => {
     return num
 }
 
+// alias
+export const u16 = (num) => {
+    return uint16(num)
+}
+
 export const int32 = (num) => {
     num = parseInt(num)
     num = num > 2147483647 ? num - 4294967296 : num
@@ -46,6 +51,11 @@ export const coss = (num) => {
 
 export const random_uint16 = () => {
     return Math.floor(Math.random() * 65536)
+}
+
+// alias
+export const random_u16 = () => {
+    return random_uint16()
 }
 
 export const random_int16 = () => {

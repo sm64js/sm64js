@@ -1,5 +1,5 @@
 import * as Mario from "./Mario"
-import { atan2s, approach_number } from "../engine/math_util"
+import { atan2s, approach_number, vec3s_set, vec3f_copy } from "../engine/math_util"
 import { SurfaceCollisionInstance as SurfaceCollisions } from "../engine/SurfaceCollision"
 import { coss, int16, int32, sins } from "../utils"
 import * as Particles from "../include/mario_constants"
@@ -491,6 +491,9 @@ const act_swimming_end = (m) => {
     if (m.input & Mario.INPUT_B_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_WATER_PUNCH, 0)
     }
+
+    if (m.actionTimer == 14)
+        throw "act_swimming_end - actionTimer == 14"
 
     if (m.actionTimer >= 15) {
         return Mario.set_mario_action(m, Mario.ACT_WATER_ACTION_END, 0)

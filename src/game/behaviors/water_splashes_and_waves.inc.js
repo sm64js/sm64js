@@ -1,62 +1,99 @@
 // water_splashes_and_waves.c.inc
-import { ObjectListProcessorInstance as ObjectListProc      } from "../ObjectListProcessor"
-import { AreaInstance as Area                               } from "../Area"
-import { SurfaceCollisionInstance as SurfaceCollision       } from "../../engine/SurfaceCollision"
+import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
+import { AreaInstance as Area                          } from "../Area"
+import { SurfaceCollisionInstance as SurfaceCollision  } from "../../engine/SurfaceCollision"
+import { LevelUpdateInstance as LevelUpdate            } from "../LevelUpdate"
 
-import { GRAPH_RENDER_BILLBOARD                             } from "../../engine/graph_node"
-import { spawn_water_droplet, obj_mark_for_deletion,
-         try_to_spawn_object, cur_obj_scale,
+import { GRAPH_RENDER_BILLBOARD           } from "../../engine/graph_node"
+import { spawn_water_droplet,
+         obj_mark_for_deletion,
+         obj_init_animation_with_sound,
+         try_to_spawn_object,
+         cur_obj_scale,
          obj_scale_xyz,
+         obj_copy_pos                     } from "../ObjectHelpers"
 
-         WATER_DROPLET_FLAG_RAND_ANGLE,
+import { WATER_DROPLET_FLAG_RAND_ANGLE,
          WATER_DROPLET_FLAG_RAND_OFFSET_XZ,
          WATER_DROPLET_FLAG_RAND_OFFSET_XYZ,
          WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL,
          WATER_DROPLET_FLAG_RAND_ANGLE_INCR_PLUS_8000,
-         WATER_DROPLET_FLAG_RAND_ANGLE_INCR                 } from "../ObjectHelpers"
+         WATER_DROPLET_FLAG_RAND_ANGLE_INCR  } from "../ObjectHelpers"
 
-import { MODEL_WHITE_PARTICLE_SMALL, MODEL_FISH,
-         MODEL_SMALL_WATER_SPLASH                           } from "../../include/model_ids"
+import { MODEL_WHITE_PARTICLE_SMALL,
+         MODEL_FISH,
+         MODEL_SMALL_WATER_SPLASH         } from "../../include/model_ids"
 
-import { FLOOR_LOWER_LIMIT_MISC                             } from "../../include/surface_terrains"
+import { FLOOR_LOWER_LIMIT_MISC           } from "../../include/surface_terrains"
 
-import { oPosX, oPosY, oPosZ, oVelY, oTimer, oAnimState,
-         oFaceAngleYaw                                      } from "../../include/object_constants"
+import { oPosX, oPosY, oPosZ,
+         oVelY,
+         oTimer, oAnimState,
+         oFaceAngleYaw,
+         oMarioParticleFlags,
+         oActiveParticleFlags             } from "../../include/object_constants"
 
-import { bhvWaterDroplet, bhvWaterDropletSplash             } from "../BehaviorData"
+import { ACTIVE_PARTICLE_IDLE_WATER_WAVE,
+         ACTIVE_FLAG_DEACTIVATED          } from "../../include/object_constants"
 
-import { random_int16, random_float                         } from "../../utils"
+import { bhvWaterDroplet,
+         bhvWaterDropletSplash            } from "../BehaviorData"
 
+import { blue_fish_seg3_anims_0301C2B0    } from "../../actors/blue_fish/anims.inc"
+
+import { random_int16,
+         random_float,
+         random_u16,
+         u16                              } from "../../utils"
+
+
+// Water droplets from Mario jumping in a pool of water.
+const sWaterSplashDropletParams = () => {
+    return {
+        flags: WATER_DROPLET_FLAG_RAND_ANGLE,
+        model: MODEL_WHITE_PARTICLE_SMALL,
+        behavior: bhvWaterDroplet,
+        randForwardVel: [5, 3],
+        randYVel: [30, 20],
+        randSize: [0.5, 1]
+    }
+}
 
 // Water droplets from Mario jumping in shallow water.
-export const gShallowWaterSplashDropletParams = {
-    flags: WATER_DROPLET_FLAG_RAND_ANGLE | WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL,
-    model: MODEL_WHITE_PARTICLE_SMALL,
-    // behavior: bhvWaterDroplet,
-    randForwardVel: [2, 3],
-    randYVel: [20, 20],
-    randSize: [0.5, 1]
+export const gShallowWaterSplashDropletParams = () => {
+    return {
+        flags: WATER_DROPLET_FLAG_RAND_ANGLE | WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL,
+        model: MODEL_WHITE_PARTICLE_SMALL,
+        behavior: bhvWaterDroplet,
+        randForwardVel: [2, 3],
+        randYVel: [20, 20],
+        randSize: [0.5, 1]
+    }
 }
 
 // The fish particle easter egg from Mario jumping in shallow water.
-const sWaterDropletFishParams = {
-    flags: WATER_DROPLET_FLAG_RAND_ANGLE | WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL,
-    model: MODEL_FISH,
-    // behavior: bhvWaterDroplet,
-    randForwardVel: [2, 3],
-    randYVel: [20, 20],
-    randSize: [1, 0]
+const sWaterDropletFishParams = () => {
+    return {
+        flags: WATER_DROPLET_FLAG_RAND_ANGLE | WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL,
+        model: MODEL_FISH,
+        behavior: bhvWaterDroplet,
+        randForwardVel: [2, 3],
+        randYVel: [20, 20],
+        randSize: [1, 0]
+    }
 }
 
 // Water droplets from Mario running in shallow water.
-export const gShallowWaterWaveDropletParams = {
-    flags: WATER_DROPLET_FLAG_RAND_ANGLE_INCR_PLUS_8000 | WATER_DROPLET_FLAG_RAND_ANGLE | WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL,
-    model: MODEL_WHITE_PARTICLE_SMALL,
-    // behavior: bhvWaterDroplet,
-    moveAngleRange: 0x6000,
-    randForwardVel: [2, 8],
-    randYVel: [10, 10],
-    randSize: [0.5, 1]
+export const gShallowWaterWaveDropletParams = () => {
+    return {
+        flags: WATER_DROPLET_FLAG_RAND_ANGLE_INCR_PLUS_8000 | WATER_DROPLET_FLAG_RAND_ANGLE | WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL,
+        model: MODEL_WHITE_PARTICLE_SMALL,
+        behavior: bhvWaterDroplet,
+        moveAngleRange: 0x6000,
+        randForwardVel: [2, 8],
+        randYVel: [10, 10],
+        randSize: [0.5, 1]
+    }
 }
 
 
@@ -67,15 +104,6 @@ export const bhv_water_splash_spawn_droplets = () => {
         o.rawData[oPosY] = SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ])
 
     if (o.rawData[oPosY] > FLOOR_LOWER_LIMIT_MISC) { // Make sure it is not at the default water level
-        // Water droplets from Mario jumping in a pool of water.
-        const sWaterSplashDropletParams = {
-            flags: WATER_DROPLET_FLAG_RAND_ANGLE,
-            model: MODEL_WHITE_PARTICLE_SMALL,
-            behavior: bhvWaterDroplet,
-            randForwardVel: [5, 3],
-            randYVel: [30, 20],
-            randSize: [0.5, 1]
-        }
         for (let i = 0; i < 3; i++) {
             spawn_water_droplet(o, sWaterSplashDropletParams)
         }
@@ -110,14 +138,18 @@ export const bhv_water_droplet_loop = () => {
         obj_mark_for_deletion(o)
 }
 
-// void bhv_idle_water_wave_loop(void) {
-//     obj_copy_pos(o, gMarioObject);
-//     o.rawData[oPosY] = gMarioStates[0].waterLevel + 5;
-//     if (!(gMarioObject.rawData[oMarioParticleFlags] & ACTIVE_PARTICLE_IDLE_WATER_WAVE)) {
-//         gMarioObject.rawData[oActiveParticleFlags] &= (u16)~ACTIVE_PARTICLE_IDLE_WATER_WAVE;
-//         o.activeFlags = ACTIVE_FLAG_DEACTIVATED;
-//     }
-// }
+export const bhv_idle_water_wave_loop = () => {
+    const o = ObjectListProc.gCurrentObject
+    const gMarioObject = ObjectListProc.gMarioObject
+    const gMarioState = LevelUpdate.gMarioState
+
+    obj_copy_pos(o, gMarioObject)
+    o.rawData[oPosY] = gMarioState.waterLevel + 5
+    if (!(gMarioObject.rawData[oMarioParticleFlags] & ACTIVE_PARTICLE_IDLE_WATER_WAVE)) {
+        gMarioObject.rawData[oActiveParticleFlags] &= u16(~ACTIVE_PARTICLE_IDLE_WATER_WAVE)
+        o.activeFlags = ACTIVE_FLAG_DEACTIVATED
+    }
+}
 
 export const bhv_water_droplet_splash_init = () => {
     cur_obj_scale(random_float() + 1.5)
@@ -130,32 +162,32 @@ export const bhv_bubble_splash_init = () => {
     o.rawData[oPosY] = waterLevel + 5
 }
 
-// void bhv_shallow_water_splash_init(void) {
-//     struct Object *fishObj;
-//     // Have a 1 in 256 chance to spawn the fish particle easter egg.
-//     if ((random_u16() & 0xFF) <= 0) // Strange
-//     {
-//         fishObj = spawn_water_droplet(o, &sWaterDropletFishParams);
-//         obj_init_animation_with_sound(fishObj, blue_fish_seg3_anims_0301C2B0, 0);
-//     }
-// }
+export const bhv_shallow_water_splash_init = () => {
+    const o = ObjectListProc.gCurrentObject
+    // Have a 1 in 256 chance to spawn the fish particle easter egg.
+    if ((random_u16() & 0xFF) <= 0) { // Strange
+        const fishObj = spawn_water_droplet(o, sWaterDropletFishParams)
+        obj_init_animation_with_sound(fishObj, blue_fish_seg3_anims_0301C2B0, 0)
+    }
+}
 
-// void bhv_wave_trail_shrink(void) {
-//     f32 waterLevel = find_water_level(o.rawData[oPosX], o.rawData[oPosZ]);
-//     // Destroy every other water wave to space them out (this is a terrible way of doing it)
-//     if (o.rawData[oTimer] == 0)
-//         if (gGlobalTimer & 1)
-//             obj_mark_for_deletion(o);
-//     o.rawData[oPosY] = waterLevel + 5;
+export const bhv_wave_trail_shrink = () => {
+    const o = ObjectListProc.gCurrentObject
+    let waterLevel = SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ])
+    // Destroy every other water wave to space them out (this is a terrible way of doing it)
+    if (o.rawData[oTimer] == 0)
+        if (window.gGlobalTimer & 1)
+            obj_mark_for_deletion(o)
+    o.rawData[oPosY] = waterLevel + 5
 
-//     if (o.rawData[oTimer] == 0)
-//         o.rawData[oWaveTrailSize] = o.header.gfx.scale[0];
+    if (o.rawData[oTimer] == 0)
+        o.oWaveTrailSize = o.header.gfx.scale[0]
 
-//     if (o.rawData[oAnimState] > 3) {
-//         o.rawData[oWaveTrailSize] = o.rawData[oWaveTrailSize] - 0.1; // Shrink the wave
-//         if (o.rawData[oWaveTrailSize] < 0)
-//             o.rawData[oWaveTrailSize] = 0;
-//         o.header.gfx.scale[0] = o.rawData[oWaveTrailSize];
-//         o.header.gfx.scale[2] = o.rawData[oWaveTrailSize];
-//     }
-// }
+    if (o.rawData[oAnimState] > 3) {
+        o.oWaveTrailSize = o.oWaveTrailSize - 0.1 // Shrink the wave
+        if (o.oWaveTrailSize < 0)
+            o.oWaveTrailSize = 0
+        o.header.gfx.scale[0] = o.oWaveTrailSize
+        o.header.gfx.scale[2] = o.oWaveTrailSize
+    }
+}

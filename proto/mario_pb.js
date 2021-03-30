@@ -11,10 +11,8 @@ var jspb = require('google-protobuf');
 var goog = jspb;
 var global = Function('return this')();
 
-goog.exportSymbol('proto.sm64js.AccessCodeMsg', null, global);
 goog.exportSymbol('proto.sm64js.AnnouncementMsg', null, global);
 goog.exportSymbol('proto.sm64js.AttackMsg', null, global);
-goog.exportSymbol('proto.sm64js.AuthorizedUserMsg', null, global);
 goog.exportSymbol('proto.sm64js.ChatMsg', null, global);
 goog.exportSymbol('proto.sm64js.ControllerMsg', null, global);
 goog.exportSymbol('proto.sm64js.FlagMsg', null, global);
@@ -1113,15 +1111,13 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.sm64js.InitializationMsg.oneofGroups_ = [[1,2,3,4,5]];
+proto.sm64js.InitializationMsg.oneofGroups_ = [[3,4,5]];
 
 /**
  * @enum {number}
  */
 proto.sm64js.InitializationMsg.MessageCase = {
   MESSAGE_NOT_SET: 0,
-  ACCESS_CODE_MSG: 1,
-  AUTHORIZED_USER_MSG: 2,
   JOIN_GAME_MSG: 3,
   INIT_GAME_DATA_MSG: 4,
   REQUEST_COSMETICS_MSG: 5
@@ -1163,8 +1159,6 @@ proto.sm64js.InitializationMsg.prototype.toObject = function(opt_includeInstance
  */
 proto.sm64js.InitializationMsg.toObject = function(includeInstance, msg) {
   var f, obj = {
-    accessCodeMsg: (f = msg.getAccessCodeMsg()) && proto.sm64js.AccessCodeMsg.toObject(includeInstance, f),
-    authorizedUserMsg: (f = msg.getAuthorizedUserMsg()) && proto.sm64js.AuthorizedUserMsg.toObject(includeInstance, f),
     joinGameMsg: (f = msg.getJoinGameMsg()) && proto.sm64js.JoinGameMsg.toObject(includeInstance, f),
     initGameDataMsg: (f = msg.getInitGameDataMsg()) && proto.sm64js.InitGameDataMsg.toObject(includeInstance, f),
     requestCosmeticsMsg: (f = msg.getRequestCosmeticsMsg()) && proto.sm64js.RequestCosmeticsMsg.toObject(includeInstance, f)
@@ -1204,16 +1198,6 @@ proto.sm64js.InitializationMsg.deserializeBinaryFromReader = function(msg, reade
     }
     var field = reader.getFieldNumber();
     switch (field) {
-    case 1:
-      var value = new proto.sm64js.AccessCodeMsg;
-      reader.readMessage(value,proto.sm64js.AccessCodeMsg.deserializeBinaryFromReader);
-      msg.setAccessCodeMsg(value);
-      break;
-    case 2:
-      var value = new proto.sm64js.AuthorizedUserMsg;
-      reader.readMessage(value,proto.sm64js.AuthorizedUserMsg.deserializeBinaryFromReader);
-      msg.setAuthorizedUserMsg(value);
-      break;
     case 3:
       var value = new proto.sm64js.JoinGameMsg;
       reader.readMessage(value,proto.sm64js.JoinGameMsg.deserializeBinaryFromReader);
@@ -1258,22 +1242,6 @@ proto.sm64js.InitializationMsg.prototype.serializeBinary = function() {
  */
 proto.sm64js.InitializationMsg.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getAccessCodeMsg();
-  if (f != null) {
-    writer.writeMessage(
-      1,
-      f,
-      proto.sm64js.AccessCodeMsg.serializeBinaryToWriter
-    );
-  }
-  f = message.getAuthorizedUserMsg();
-  if (f != null) {
-    writer.writeMessage(
-      2,
-      f,
-      proto.sm64js.AuthorizedUserMsg.serializeBinaryToWriter
-    );
-  }
   f = message.getJoinGameMsg();
   if (f != null) {
     writer.writeMessage(
@@ -1298,66 +1266,6 @@ proto.sm64js.InitializationMsg.serializeBinaryToWriter = function(message, write
       proto.sm64js.RequestCosmeticsMsg.serializeBinaryToWriter
     );
   }
-};
-
-
-/**
- * optional AccessCodeMsg access_code_msg = 1;
- * @return {?proto.sm64js.AccessCodeMsg}
- */
-proto.sm64js.InitializationMsg.prototype.getAccessCodeMsg = function() {
-  return /** @type{?proto.sm64js.AccessCodeMsg} */ (
-    jspb.Message.getWrapperField(this, proto.sm64js.AccessCodeMsg, 1));
-};
-
-
-/** @param {?proto.sm64js.AccessCodeMsg|undefined} value */
-proto.sm64js.InitializationMsg.prototype.setAccessCodeMsg = function(value) {
-  jspb.Message.setOneofWrapperField(this, 1, proto.sm64js.InitializationMsg.oneofGroups_[0], value);
-};
-
-
-proto.sm64js.InitializationMsg.prototype.clearAccessCodeMsg = function() {
-  this.setAccessCodeMsg(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {!boolean}
- */
-proto.sm64js.InitializationMsg.prototype.hasAccessCodeMsg = function() {
-  return jspb.Message.getField(this, 1) != null;
-};
-
-
-/**
- * optional AuthorizedUserMsg authorized_user_msg = 2;
- * @return {?proto.sm64js.AuthorizedUserMsg}
- */
-proto.sm64js.InitializationMsg.prototype.getAuthorizedUserMsg = function() {
-  return /** @type{?proto.sm64js.AuthorizedUserMsg} */ (
-    jspb.Message.getWrapperField(this, proto.sm64js.AuthorizedUserMsg, 2));
-};
-
-
-/** @param {?proto.sm64js.AuthorizedUserMsg|undefined} value */
-proto.sm64js.InitializationMsg.prototype.setAuthorizedUserMsg = function(value) {
-  jspb.Message.setOneofWrapperField(this, 2, proto.sm64js.InitializationMsg.oneofGroups_[0], value);
-};
-
-
-proto.sm64js.InitializationMsg.prototype.clearAuthorizedUserMsg = function() {
-  this.setAuthorizedUserMsg(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {!boolean}
- */
-proto.sm64js.InitializationMsg.prototype.hasAuthorizedUserMsg = function() {
-  return jspb.Message.getField(this, 2) != null;
 };
 
 
@@ -1448,371 +1356,6 @@ proto.sm64js.InitializationMsg.prototype.clearRequestCosmeticsMsg = function() {
  */
 proto.sm64js.InitializationMsg.prototype.hasRequestCosmeticsMsg = function() {
   return jspb.Message.getField(this, 5) != null;
-};
-
-
-
-/**
- * Generated by JsPbCodeGenerator.
- * @param {Array=} opt_data Optional initial data array, typically from a
- * server response, or constructed directly in Javascript. The array is used
- * in place and becomes part of the constructed object. It is not cloned.
- * If no data is provided, the constructed object will be empty, but still
- * valid.
- * @extends {jspb.Message}
- * @constructor
- */
-proto.sm64js.AccessCodeMsg = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
-};
-goog.inherits(proto.sm64js.AccessCodeMsg, jspb.Message);
-if (goog.DEBUG && !COMPILED) {
-  proto.sm64js.AccessCodeMsg.displayName = 'proto.sm64js.AccessCodeMsg';
-}
-
-
-if (jspb.Message.GENERATE_TO_OBJECT) {
-/**
- * Creates an object representation of this proto suitable for use in Soy templates.
- * Field names that are reserved in JavaScript and will be renamed to pb_name.
- * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
- * For the list of reserved names please see:
- *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
- * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
- *     for transitional soy proto support: http://goto/soy-param-migration
- * @return {!Object}
- */
-proto.sm64js.AccessCodeMsg.prototype.toObject = function(opt_includeInstance) {
-  return proto.sm64js.AccessCodeMsg.toObject(opt_includeInstance, this);
-};
-
-
-/**
- * Static version of the {@see toObject} method.
- * @param {boolean|undefined} includeInstance Whether to include the JSPB
- *     instance for transitional soy proto support:
- *     http://goto/soy-param-migration
- * @param {!proto.sm64js.AccessCodeMsg} msg The msg instance to transform.
- * @return {!Object}
- * @suppress {unusedLocalVariables} f is only used for nested messages
- */
-proto.sm64js.AccessCodeMsg.toObject = function(includeInstance, msg) {
-  var f, obj = {
-    accessCode: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    type: jspb.Message.getFieldWithDefault(msg, 2, "")
-  };
-
-  if (includeInstance) {
-    obj.$jspbMessageInstance = msg;
-  }
-  return obj;
-};
-}
-
-
-/**
- * Deserializes binary data (in protobuf wire format).
- * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.sm64js.AccessCodeMsg}
- */
-proto.sm64js.AccessCodeMsg.deserializeBinary = function(bytes) {
-  var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.sm64js.AccessCodeMsg;
-  return proto.sm64js.AccessCodeMsg.deserializeBinaryFromReader(msg, reader);
-};
-
-
-/**
- * Deserializes binary data (in protobuf wire format) from the
- * given reader into the given message object.
- * @param {!proto.sm64js.AccessCodeMsg} msg The message object to deserialize into.
- * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.sm64js.AccessCodeMsg}
- */
-proto.sm64js.AccessCodeMsg.deserializeBinaryFromReader = function(msg, reader) {
-  while (reader.nextField()) {
-    if (reader.isEndGroup()) {
-      break;
-    }
-    var field = reader.getFieldNumber();
-    switch (field) {
-    case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setAccessCode(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setType(value);
-      break;
-    default:
-      reader.skipField();
-      break;
-    }
-  }
-  return msg;
-};
-
-
-/**
- * Serializes the message to binary data (in protobuf wire format).
- * @return {!Uint8Array}
- */
-proto.sm64js.AccessCodeMsg.prototype.serializeBinary = function() {
-  var writer = new jspb.BinaryWriter();
-  proto.sm64js.AccessCodeMsg.serializeBinaryToWriter(this, writer);
-  return writer.getResultBuffer();
-};
-
-
-/**
- * Serializes the given message to binary data (in protobuf wire
- * format), writing to the given BinaryWriter.
- * @param {!proto.sm64js.AccessCodeMsg} message
- * @param {!jspb.BinaryWriter} writer
- * @suppress {unusedLocalVariables} f is only used for nested messages
- */
-proto.sm64js.AccessCodeMsg.serializeBinaryToWriter = function(message, writer) {
-  var f = undefined;
-  f = message.getAccessCode();
-  if (f.length > 0) {
-    writer.writeString(
-      1,
-      f
-    );
-  }
-  f = message.getType();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-};
-
-
-/**
- * optional string access_code = 1;
- * @return {string}
- */
-proto.sm64js.AccessCodeMsg.prototype.getAccessCode = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
-};
-
-
-/** @param {string} value */
-proto.sm64js.AccessCodeMsg.prototype.setAccessCode = function(value) {
-  jspb.Message.setProto3StringField(this, 1, value);
-};
-
-
-/**
- * optional string type = 2;
- * @return {string}
- */
-proto.sm64js.AccessCodeMsg.prototype.getType = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.sm64js.AccessCodeMsg.prototype.setType = function(value) {
-  jspb.Message.setProto3StringField(this, 2, value);
-};
-
-
-
-/**
- * Generated by JsPbCodeGenerator.
- * @param {Array=} opt_data Optional initial data array, typically from a
- * server response, or constructed directly in Javascript. The array is used
- * in place and becomes part of the constructed object. It is not cloned.
- * If no data is provided, the constructed object will be empty, but still
- * valid.
- * @extends {jspb.Message}
- * @constructor
- */
-proto.sm64js.AuthorizedUserMsg = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
-};
-goog.inherits(proto.sm64js.AuthorizedUserMsg, jspb.Message);
-if (goog.DEBUG && !COMPILED) {
-  proto.sm64js.AuthorizedUserMsg.displayName = 'proto.sm64js.AuthorizedUserMsg';
-}
-
-
-if (jspb.Message.GENERATE_TO_OBJECT) {
-/**
- * Creates an object representation of this proto suitable for use in Soy templates.
- * Field names that are reserved in JavaScript and will be renamed to pb_name.
- * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
- * For the list of reserved names please see:
- *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
- * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
- *     for transitional soy proto support: http://goto/soy-param-migration
- * @return {!Object}
- */
-proto.sm64js.AuthorizedUserMsg.prototype.toObject = function(opt_includeInstance) {
-  return proto.sm64js.AuthorizedUserMsg.toObject(opt_includeInstance, this);
-};
-
-
-/**
- * Static version of the {@see toObject} method.
- * @param {boolean|undefined} includeInstance Whether to include the JSPB
- *     instance for transitional soy proto support:
- *     http://goto/soy-param-migration
- * @param {!proto.sm64js.AuthorizedUserMsg} msg The msg instance to transform.
- * @return {!Object}
- * @suppress {unusedLocalVariables} f is only used for nested messages
- */
-proto.sm64js.AuthorizedUserMsg.toObject = function(includeInstance, msg) {
-  var f, obj = {
-    username: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    status: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    message: jspb.Message.getFieldWithDefault(msg, 3, "")
-  };
-
-  if (includeInstance) {
-    obj.$jspbMessageInstance = msg;
-  }
-  return obj;
-};
-}
-
-
-/**
- * Deserializes binary data (in protobuf wire format).
- * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.sm64js.AuthorizedUserMsg}
- */
-proto.sm64js.AuthorizedUserMsg.deserializeBinary = function(bytes) {
-  var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.sm64js.AuthorizedUserMsg;
-  return proto.sm64js.AuthorizedUserMsg.deserializeBinaryFromReader(msg, reader);
-};
-
-
-/**
- * Deserializes binary data (in protobuf wire format) from the
- * given reader into the given message object.
- * @param {!proto.sm64js.AuthorizedUserMsg} msg The message object to deserialize into.
- * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.sm64js.AuthorizedUserMsg}
- */
-proto.sm64js.AuthorizedUserMsg.deserializeBinaryFromReader = function(msg, reader) {
-  while (reader.nextField()) {
-    if (reader.isEndGroup()) {
-      break;
-    }
-    var field = reader.getFieldNumber();
-    switch (field) {
-    case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setUsername(value);
-      break;
-    case 2:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setStatus(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setMessage(value);
-      break;
-    default:
-      reader.skipField();
-      break;
-    }
-  }
-  return msg;
-};
-
-
-/**
- * Serializes the message to binary data (in protobuf wire format).
- * @return {!Uint8Array}
- */
-proto.sm64js.AuthorizedUserMsg.prototype.serializeBinary = function() {
-  var writer = new jspb.BinaryWriter();
-  proto.sm64js.AuthorizedUserMsg.serializeBinaryToWriter(this, writer);
-  return writer.getResultBuffer();
-};
-
-
-/**
- * Serializes the given message to binary data (in protobuf wire
- * format), writing to the given BinaryWriter.
- * @param {!proto.sm64js.AuthorizedUserMsg} message
- * @param {!jspb.BinaryWriter} writer
- * @suppress {unusedLocalVariables} f is only used for nested messages
- */
-proto.sm64js.AuthorizedUserMsg.serializeBinaryToWriter = function(message, writer) {
-  var f = undefined;
-  f = message.getUsername();
-  if (f.length > 0) {
-    writer.writeString(
-      1,
-      f
-    );
-  }
-  f = message.getStatus();
-  if (f !== 0) {
-    writer.writeUint32(
-      2,
-      f
-    );
-  }
-  f = message.getMessage();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
-};
-
-
-/**
- * optional string username = 1;
- * @return {string}
- */
-proto.sm64js.AuthorizedUserMsg.prototype.getUsername = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
-};
-
-
-/** @param {string} value */
-proto.sm64js.AuthorizedUserMsg.prototype.setUsername = function(value) {
-  jspb.Message.setProto3StringField(this, 1, value);
-};
-
-
-/**
- * optional uint32 status = 2;
- * @return {number}
- */
-proto.sm64js.AuthorizedUserMsg.prototype.getStatus = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
-};
-
-
-/** @param {number} value */
-proto.sm64js.AuthorizedUserMsg.prototype.setStatus = function(value) {
-  jspb.Message.setProto3IntField(this, 2, value);
-};
-
-
-/**
- * optional string message = 3;
- * @return {string}
- */
-proto.sm64js.AuthorizedUserMsg.prototype.getMessage = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.sm64js.AuthorizedUserMsg.prototype.setMessage = function(value) {
-  jspb.Message.setProto3StringField(this, 3, value);
 };
 
 
@@ -4647,7 +4190,8 @@ proto.sm64js.ChatMsg.toObject = function(includeInstance, msg) {
     sender: jspb.Message.getFieldWithDefault(msg, 2, ""),
     socketid: jspb.Message.getFieldWithDefault(msg, 3, 0),
     admintoken: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    isadmin: jspb.Message.getFieldWithDefault(msg, 5, false)
+    isadmin: jspb.Message.getFieldWithDefault(msg, 5, false),
+    isserver: jspb.Message.getFieldWithDefault(msg, 6, false)
   };
 
   if (includeInstance) {
@@ -4703,6 +4247,10 @@ proto.sm64js.ChatMsg.deserializeBinaryFromReader = function(msg, reader) {
     case 5:
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setIsadmin(value);
+      break;
+    case 6:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsserver(value);
       break;
     default:
       reader.skipField();
@@ -4765,6 +4313,13 @@ proto.sm64js.ChatMsg.serializeBinaryToWriter = function(message, writer) {
   if (f) {
     writer.writeBool(
       5,
+      f
+    );
+  }
+  f = message.getIsserver();
+  if (f) {
+    writer.writeBool(
+      6,
       f
     );
   }
@@ -4845,6 +4400,23 @@ proto.sm64js.ChatMsg.prototype.getIsadmin = function() {
 /** @param {boolean} value */
 proto.sm64js.ChatMsg.prototype.setIsadmin = function(value) {
   jspb.Message.setProto3BooleanField(this, 5, value);
+};
+
+
+/**
+ * optional bool isServer = 6;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.sm64js.ChatMsg.prototype.getIsserver = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 6, false));
+};
+
+
+/** @param {boolean} value */
+proto.sm64js.ChatMsg.prototype.setIsserver = function(value) {
+  jspb.Message.setProto3BooleanField(this, 6, value);
 };
 
 

@@ -1,16 +1,30 @@
-import { bhvMario, bhvCastleFlagWaving,
-         bhvManyBlueFishSpawner, bhvButterfly,
-         bhvWaterMist2                                 } from "../../game/BehaviorData"
-import { castle_grounds_geo_00073C                     } from "./areas/1/geo"
-import { castle_grounds_geo_0006F4                     } from "./areas/1/3/geo.inc"
-import { castle_grounds_geo_000660                     } from "./areas/1/11/geo.inc"
-import { castle_grounds_seg7_collision_level           } from "./areas/1/collision.inc"
-import { LevelUpdateInstance as LevelUpdate            } from "../../game/LevelUpdate"
-import { bubbly_tree_geo                               } from "../../actors/tree/geo.inc"
-import { MODEL_NONE, MODEL_MARIO,
+import { LevelUpdateInstance as LevelUpdate } from "../../game/LevelUpdate"
+
+import { MODEL_NONE,
+         MODEL_MARIO,
          MODEL_LEVEL_GEOMETRY_03,
-         MODEL_CASTLE_GROUNDS_FLAG, MODEL_BUTTERFLY,
-         MODEL_BOB_BUBBLY_TREE, MODEL_MIST, MODEL_WHITE_PUFF, MODEL_BUBBLE             } from "../../include/model_ids"
+         MODEL_CASTLE_GROUNDS_VCUTM_GRILL,
+         MODEL_CASTLE_GROUNDS_FLAG,
+         MODEL_CASTLE_GROUNDS_CANNON_GRILL,
+         MODEL_BUTTERFLY,
+         MODEL_BUBBLE,
+         MODEL_BOB_BUBBLY_TREE,
+         MODEL_MIST,
+         MODEL_WHITE_PUFF                    } from "../../include/model_ids"
+
+import { bhvMario,
+         bhvCastleFlagWaving,
+         bhvManyBlueFishSpawner,
+         bhvButterfly,
+         bhvWaterMist2,
+         bhvMoatGrills                       } from "../../game/BehaviorData"
+
+import { castle_grounds_geo_00073C           } from "./areas/1/geo"
+import { castle_grounds_geo_0006F4           } from "./areas/1/3/geo.inc"
+import { castle_grounds_geo_000660           } from "./areas/1/11/geo.inc"
+import { bubbly_tree_geo                     } from "../../actors/tree/geo.inc"
+import { castle_grounds_seg7_collision_level } from "./areas/1/collision.inc"
+
 
 
 const script_func_local_1 = [
@@ -44,7 +58,7 @@ const script_func_local_2 = [
     // ['OBJECT', /*model*/ MODEL_NONE,                        /*pos*/   -80, 1500,  5004, /*angle*/ 0,   0, 0, /*behParam*/ 0x00010000, /*beh*/ bhvBirdsSoundLoop],
     // ['OBJECT', /*model*/ MODEL_NONE,                        /*pos*/  7131, 1500, -2989, /*angle*/ 0,   0, 0, /*behParam*/ 0x00020000, /*beh*/ bhvBirdsSoundLoop],
     // ['OBJECT', /*model*/ MODEL_NONE,                        /*pos*/ -7430, 1500, -5937, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvAmbientSounds],
-    // ['OBJECT', /*model*/ MODEL_CASTLE_GROUNDS_VCUTM_GRILL,  /*pos*/     0,    0,     0, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvMoatGrills],
+    ['OBJECT', /*model*/ MODEL_CASTLE_GROUNDS_VCUTM_GRILL,  /*pos*/     0,    0,     0, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvMoatGrills],
     // ['OBJECT', /*model*/ MODEL_NONE,                        /*pos*/     0,    0,     0, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvInvisibleObjectsUnderBridge],
     ['OBJECT', /*model*/ MODEL_MIST,                        /*pos*/ -4878, -787, -5690, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvWaterMist2],
     ['OBJECT', /*model*/ MODEL_MIST,                        /*pos*/ -4996, -787, -5548, /*angle*/ 0,   0, 0, /*behParam*/ 0x00010000, /*beh*/ bhvWaterMist2],

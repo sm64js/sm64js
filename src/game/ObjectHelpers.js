@@ -164,6 +164,10 @@ export const geo_update_layer_transparency = (run, node) => {
 
 export const spawn_water_droplet = (parent, params) => {
     let randomScale
+    // allow getters
+    if (params.call) {
+        params = params()
+    }
     const newObj = spawn_object(parent, params.model, params.behavior);
 
     if (params.flags & WATER_DROPLET_FLAG_RAND_ANGLE) {
@@ -333,6 +337,15 @@ export const approach_symmetric = (value, target, increment) => {
     }
 
     return value
+}
+
+export const cur_obj_forward_vel_approach_upward = (target, increment) => {
+    const o = ObjectListProc.gCurrentObject
+    if (o.rawData[oForwardVel] >= target) {
+        o.rawData[oForwardVel] = target
+    } else {
+        o.rawData[oForwardVel] += increment
+    }
 }
 
 export const abs_angle_diff = (x0, x1) => {

@@ -34,6 +34,12 @@ export const vec3f_set_dist_and_angle = (from, to, dist, pitch, yaw) => {
     to[2] = from[2] + dist * Math.cos(pitch / 0x8000 * Math.PI) * Math.cos(yaw / 0x8000 * Math.PI)
 }
 
+export const vec3f_copy = (dest, src) => {
+    dest[0] = src[0]
+    dest[1] = src[1]
+    dest[2] = src[2]
+}
+
 export const vec3f_add = (dest, a) => {
     dest[0] += a[0]
     dest[1] += a[1]

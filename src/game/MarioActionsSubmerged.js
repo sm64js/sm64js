@@ -1,5 +1,5 @@
 import * as Mario from "./Mario"
-import { atan2s, approach_number } from "../engine/math_util"
+import { atan2s, approach_number, vec3s_set, vec3f_copy } from "../engine/math_util"
 import { SurfaceCollisionInstance as SurfaceCollisions } from "../engine/SurfaceCollision"
 import { coss, int16, int32, sins } from "../utils"
 import * as Particles from "../include/mario_constants"
@@ -301,7 +301,7 @@ const perform_water_step = (m) => {
     let step = [0, 0, 0]
     let marioObj = m.marioObj
 
-    step = [...m.vel]
+    vec3f_copy(step, m.vel)
 
     if (m.action & Mario.ACT_FLAG_SWIMMING) {
         apply_water_current(m, step)
@@ -318,8 +318,8 @@ const perform_water_step = (m) => {
 
     stepResult = perform_water_full_step(m, nextPos)
 
-    marioObj.header.gfx.pos = [...m.pos]
-    marioObj.header.gfx.angle = [-m.faceAngle[0], m.faceAngle[1], m.faceAngle[2]]
+    vec3f_copy(marioObj.header.gfx.pos, m.pos)
+    vec3s_set(marioObj.header.gfx.angle, -m.faceAngle[0], m.faceAngle[1], m.faceAngle[2])
 
     return stepResult
 }
@@ -491,6 +491,9 @@ const act_swimming_end = (m) => {
     if (m.input & Mario.INPUT_B_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_WATER_PUNCH, 0)
     }
+
+    if (m.actionTimer == 14)
+        debugger
 
     if (m.actionTimer >= 15) {
         return Mario.set_mario_action(m, Mario.ACT_WATER_ACTION_END, 0)

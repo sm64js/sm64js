@@ -1,7 +1,7 @@
 import * as Mario from "./Mario"
 import { atan2s, approach_number, vec3s_set, vec3f_copy } from "../engine/math_util"
 import { SurfaceCollisionInstance as SurfaceCollisions } from "../engine/SurfaceCollision"
-import { coss, int16, int32, sins } from "../utils"
+import { coss, s16, s32, sins } from "../utils"
 import * as Particles from "../include/mario_constants"
 import { SURFACE_FLOWING_WATER } from "../include/surface_terrains"
 import { AreaInstance as Area } from "../game/Area"
@@ -61,7 +61,7 @@ const update_swimming_speed = (m, decelThreshold) => {
 }
 
 const update_swimming_yaw = (m) => {
-    let targetYawVel = -int16(10.0 * m.controller.stickX)
+    let targetYawVel = -s16(10.0 * m.controller.stickX)
 
     if (targetYawVel > 0) {
         if (m.angleVel[1] < 0) {
@@ -90,7 +90,7 @@ const update_swimming_yaw = (m) => {
 }
 
 const update_swimming_pitch = (m) => {
-    let targetPitch = -int16(252.0 * m.controller.stickY)
+    let targetPitch = -s16(252.0 * m.controller.stickY)
 
     let pitchVel
     if (m.faceAngle[0] < 0) {
@@ -395,7 +395,7 @@ const apply_water_current = (m, step) => {
             pitchToWhirlpool = atan2s(lateralDist, dy)
             yawToWhirlpool = atan2s(dz, dx)
 
-            yawToWhirlpool -= int16((0x2000 * 1000.0) / (distance + 1000.0))
+            yawToWhirlpool -= s16((0x2000 * 1000.0) / (distance + 1000.0))
 
             if (whirlpool.strength >= 0) {
                 if (gCurrLevelNum === LEVEL_DDD && gCurrAreaIndex === 2) {
@@ -492,9 +492,6 @@ const act_swimming_end = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_WATER_PUNCH, 0)
     }
 
-    if (m.actionTimer == 14)
-        throw "act_swimming_end - actionTimer == 14"
-
     if (m.actionTimer >= 15) {
         return Mario.set_mario_action(m, Mario.ACT_WATER_ACTION_END, 0)
     }
@@ -524,7 +521,7 @@ const act_swimming_end = (m) => {
 }
 
 const check_water_jump = (m) => {
-    let probe = int32(m.pos[1] + 1.5)
+    let probe = s32(m.pos[1] + 1.5)
 
     if (m.input & Mario.INPUT_A_PRESSED) {
         if (probe >= m.waterLevel - 80 && m.faceAngle[0] >= 0 && m.controller.stickY < -60.0) {
@@ -644,7 +641,8 @@ const common_swimming_step = (m, swimStrength) => {
 
 const float_surface_gfx = (m) => {
     if (D_80339FD2 != 0 && m.pos[1] > m.waterLevel - 85 && m.faceAngle[0] >= 0) {
-        if ((D_80339FD0 += D_80339FD2) >= 0) {
+        D_80339FD0 = s16(D_80339FD0 + D_80339FD2)
+        if (D_80339FD0 >= 0) {
             m.marioObj.header.gfx.pos[1] += D_80339FD4 * sins(D_80339FD0)
             return
         }

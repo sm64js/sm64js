@@ -9,7 +9,7 @@ import * as MathUtil from "../engine/math_util"
 import * as Mario from "./Mario"
 import { oPosY } from "../include/object_constants"
 import { SURFACE_DEATH_PLANE } from "../include/surface_terrains"
-import { sins, int16 } from "../utils"
+import { sins, s16, int16 } from "../utils"
 import { HudInstance as Hud } from "./Hud"
 
 const CAM_FOV_DEFAULT = 2
@@ -186,7 +186,7 @@ class Camera {
     }
 
     DEGREES(d) {
-        return int16(d * 0x10000 / 360)
+        return s16(d * 0x10000 / 360)
     }
 
     select_mario_cam_mode() {
@@ -291,9 +291,9 @@ class Camera {
         if (divisor == 0) {
             currentWrapper.current = target
         } else {
-            temp = int16(temp - target)
-            temp = int16(temp - int16(temp / divisor))
-            temp = int16(temp + target)
+            temp = s16(temp - target)
+            temp = s16(temp - s16(temp / divisor))
+            temp = s16(temp + target)
             currentWrapper.current = temp
         }
         if (currentWrapper.current == target) {
@@ -359,22 +359,22 @@ class Camera {
     }
 
     camera_approach_s16_symmetric_bool(currentWrapper, target, increment) {
-        let dist = int16(target - currentWrapper.current)
+        let dist = s16(target - currentWrapper.current)
 
         if (increment < 0) {
             increment = -1 * increment
         }
         if (dist > 0) {
-            dist = int16(dist - increment)
+            dist = s16(dist - increment)
             if (dist >= 0) {
-                currentWrapper.current = int16(target - dist)
+                currentWrapper.current = s16(target - dist)
             } else {
                 currentWrapper.current = target
             }
         } else {
-            dist = int16(dist + increment)
+            dist = s16(dist + increment)
             if (dist <= 0) {
-                currentWrapper.current = int16(target - dist)
+                currentWrapper.current = s16(target - dist)
             } else {
                 currentWrapper.current = target
             }
@@ -1052,7 +1052,7 @@ class Camera {
         let absPitch
         let dist, pitch, yaw
         let goalPitch = this.gPlayerCameraState.faceAngle[0]
-        let marioYaw = int16(this.gPlayerCameraState.faceAngle[1] + this.DEGREES(180))
+        let marioYaw = s16(this.gPlayerCameraState.faceAngle[1] + this.DEGREES(180))
         let goalYawOff = 0
         let yawSpeed
         let pitchInc = 32
@@ -1089,7 +1089,7 @@ class Camera {
         // Determine the yaw speed based on absPitch. A higher absPitch (further away from looking straight)
         // translates to a slower speed
         // Note: Pitch is always within +- 90 degrees or +-0x4000, and 0x4000 / 0x200 = 32
-        yawSpeed = int16(32 - int16(absPitch / 0x200))
+        yawSpeed = s16(32 - s16(absPitch / 0x200))
         if (yawSpeed < 1) {
             yawSpeed = 1
         }
@@ -1183,7 +1183,7 @@ class Camera {
         }
 
         wrapper.current = yaw
-        this.approach_s16_asymptotic_bool(wrapper, int16(marioYaw + goalYawOff), yawSpeed)
+        this.approach_s16_asymptotic_bool(wrapper, s16(marioYaw + goalYawOff), yawSpeed)
         yaw = wrapper.current
 
         wrapper.current = pitch
@@ -1288,7 +1288,7 @@ class Camera {
     update_default_camera(c) {
         let nextYawVel
         let yawVel = 0
-        let yawGoal = int16(this.gPlayerCameraState.faceAngle[1] + this.DEGREES(180))
+        let yawGoal = s16(this.gPlayerCameraState.faceAngle[1] + this.DEGREES(180))
         let closeToMario = 0
         let ceilHeight = 20000
         let dist, pitch, yaw
@@ -1347,10 +1347,10 @@ class Camera {
             }
         } else {
             if (this.sCSideButtonYaw < 0) {
-                yaw = int16(yaw + 0x200)
+                yaw = s16(yaw + 0x200)
             }
             if (this.sCSideButtonYaw > 0) {
-                yaw = int16(yaw - 0x200)
+                yaw = s16(yaw - 0x200)
             }
             const wrapper = { current: this.sCSideButtonYaw }
             this.camera_approach_s16_symmetric_bool(wrapper, 0, 0x100)
@@ -1735,13 +1735,20 @@ class Camera {
 
     set_camera_shake_from_hit(shake) {
         switch (shake) {
+            case this.SHAKE_ATTACK:
+                this.gLakituState.focHSpeed = 0
+                this.gLakituState.posHSpeed = 0
+                break
+
+            case this.SHAKE_FALL_DAMAGE:
+                this.set_camera_pitch_shake(0x60, 0x3, 0x8000)
+                this.set_camera_roll_shake(0x60, 0x3, 0x8000)
+                break
+
             case this.SHAKE_GROUND_POUND:
                 this.set_camera_pitch_shake(0x60, 0xC, 0x8000)
                 break
-            case this.SHAKE_HIT_FROM_BELOW:
-                this.gLakituState.focHSpeed = 0.07
-                this.gLakituState.posHSpeed = 0.07
-                break
+
             case this.SHAKE_SMALL_DAMAGE:
                 if (this.gPlayerCameraState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
                     this.set_camera_yaw_shake(0x200, 0x10, 0x1000)
@@ -1756,6 +1763,7 @@ class Camera {
                 this.gLakituState.focHSpeed = 0
                 this.gLakituState.posHSpeed = 0
                 break
+
             case this.SHAKE_MED_DAMAGE:
                 if (this.gPlayerCameraState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
                     this.set_camera_yaw_shake(0x400, 0x20, 0x1000)
@@ -1784,6 +1792,17 @@ class Camera {
                 this.gLakituState.focHSpeed = 0
                 this.gLakituState.posHSpeed = 0
                 break
+
+            case this.SHAKE_HIT_FROM_BELOW:
+                this.gLakituState.focHSpeed = 0.07
+                this.gLakituState.posHSpeed = 0.07
+                break
+
+            case this.SHAKE_SHOCK:
+                this.set_camera_pitch_shake(random_float() * 64.0, 0x8, 0x8000);
+                this.set_camera_yaw_shake(random_float() * 64.0, 0x8, 0x8000);
+                break;
+
             default: throw "unimplemented camera shake from hit - set_camera_shake_from_hit"
         }
     }
@@ -1835,7 +1854,7 @@ class Camera {
             const wrapper = { value: this.gLakituState.shakeRollPhase }
             this.increment_shake_offset(wrapper, this.gLakituState.shakeRollVel)
             this.gLakituState.shakeRollPhase = wrapper.value
-            this.gLakituState.roll += int16(this.gLakituState.shakeMagnitude[2] * sins(this.gLakituState.shakeRollPhase))
+            this.gLakituState.roll += s16(this.gLakituState.shakeMagnitude[2] * sins(this.gLakituState.shakeRollPhase))
             const currentWrapper = { current: this.gLakituState.shakeMagnitude[2] }
             if (this.camera_approach_s16_symmetric_bool(currentWrapper, 0, this.gLakituState.shakeRollDecay) == 0) {
                 this.gLakituState.shakeRollPhase = 0
@@ -1846,26 +1865,29 @@ class Camera {
     }
 
     set_camera_pitch_shake(mag, decay, inc) {
+        mag = s16(mag)
         if (this.gLakituState.shakeMagnitude[0] < mag) {
-            this.gLakituState.shakeMagnitude[0] = int16(mag)
-            this.gLakituState.shakePitchDecay = int16(decay)
-            this.gLakituState.shakePitchVel = int16(inc)
+            this.gLakituState.shakeMagnitude[0] = mag
+            this.gLakituState.shakePitchDecay = s16(decay)
+            this.gLakituState.shakePitchVel = s16(inc)
         }
     }
 
     set_camera_yaw_shake(mag, decay, inc) {
+        mag = s16(mag)
         if (Math.abs(mag) > Math.abs(this.gLakituState.shakeMagnitude[1])) {
-            this.gLakituState.shakeMagnitude[1] = int16(mag)
-            this.gLakituState.shakeYawDecay = int16(decay)
-            this.gLakituState.shakeYawVel = int16(inc)
+            this.gLakituState.shakeMagnitude[1] = mag
+            this.gLakituState.shakeYawDecay = s16(decay)
+            this.gLakituState.shakeYawVel = s16(inc)
         }
     }
 
     set_camera_roll_shake(mag, decay, inc) {
+        mag = s16(mag)
         if (this.gLakituState.shakeMagnitude[2] < mag) {
-            this.gLakituState.shakeMagnitude[2] = int16(mag)
-            this.gLakituState.shakeRollDecay = int16(decay)
-            this.gLakituState.shakeRollVel = int16(inc)
+            this.gLakituState.shakeMagnitude[2] = mag
+            this.gLakituState.shakeRollDecay = s16(decay)
+            this.gLakituState.shakeRollVel = s16(inc)
         }
     }
 

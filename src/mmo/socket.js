@@ -19,6 +19,7 @@ import * as Multi from "./MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
 import { updateFlagData, setInitFlagHeight } from "../game/behaviors/bhv_castle_flag_init.inc"
 import { recvChat, decrementChat } from "./chat"
+import { GameInstance as Game } from "../game/Game"
 
 Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
 
@@ -53,7 +54,7 @@ const websocketServerPath = process.env.NODE_ENV === 'rust'
         ? `wss://server.sm64js.com/websocket/` // production
         : `ws://${url.hostname}:3000` // local testing
 
-const socket = new WebSocket(websocketServerPath)
+let socket
 
 export const networkData = {
     playerInteractions: true,
@@ -92,89 +93,63 @@ const measureLatency = (ping_proto) => {
     window.latency = parseInt(endTime - startTime)
 }
 
-socket.onopen = () => {
 
-    if (url.searchParams.has('code')) {
-
-        /// send access code to server
-        const state = JSON.parse(decodeURIComponent(url.searchParams.get("state")))
-        const accessCodeMsg = new AccessCodeMsg()
-        accessCodeMsg.setAccessCode(url.searchParams.get('code'))
-        accessCodeMsg.setType(state.type)
-        const initializationMsg = new InitializationMsg()
-        initializationMsg.setAccessCodeMsg(accessCodeMsg)
-        const sm64jsMsg = new Sm64JsMsg()
-        sm64jsMsg.setInitializationMsg(initializationMsg)
-        const rootMsg = new RootMsg()
-        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-        sendData(rootMsg.serializeBinary())
-    } else if (process.env.PRODUCTION != 1) {
-        /// send access code to server
-        const accessCodeMsg = new AccessCodeMsg()
-        accessCodeMsg.setAccessCode("122345")
-        accessCodeMsg.setType("discord")
-        const initializationMsg = new InitializationMsg()
-        initializationMsg.setAccessCodeMsg(accessCodeMsg)
-        const sm64jsMsg = new Sm64JsMsg()
-        sm64jsMsg.setInitializationMsg(initializationMsg)
-        const rootMsg = new RootMsg()
-        rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-        sendData(rootMsg.serializeBinary())
-    }
-
-    socket.onmessage = async (message) => {
-        let sm64jsMsg
-        let bytes = new Uint8Array(await message.data.arrayBuffer())
-        const rootMsg = RootMsg.deserializeBinary(bytes)
-
-        switch (rootMsg.getMessageCase()) {
-            case RootMsg.MessageCase.UNCOMPRESSED_SM64JS_MSG:
-                sm64jsMsg = rootMsg.getUncompressedSm64jsMsg()
-                switch (sm64jsMsg.getMessageCase()) {
-                    case Sm64JsMsg.MessageCase.PLAYER_LISTS_MSG:
-                        Multi.recvPlayerLists(sm64jsMsg.getPlayerListsMsg())
-                        break
-                    case Sm64JsMsg.MessageCase.PING_MSG:
-                        measureLatency(sm64jsMsg.getPingMsg())
-                        break
-                    case Sm64JsMsg.MessageCase.CHAT_MSG:
-                        recvChat(sm64jsMsg.getChatMsg())
-                        break
-                    case Sm64JsMsg.MessageCase.SKIN_MSG:
-                        Cosmetics.recvSkinData(sm64jsMsg.getSkinMsg())
-                        break
-                    case Sm64JsMsg.MessageCase.ANNOUNCEMENT_MSG:
-                        recvAnnouncement(sm64jsMsg.getAnnouncementMsg())
-                        break
-                    case Sm64JsMsg.MessageCase.INITIALIZATION_MSG:
-                        const initializationMsg = sm64jsMsg.getInitializationMsg()
-                        switch (initializationMsg.getMessageCase()) {
-                            case InitializationMsg.MessageCase.AUTHORIZED_USER_MSG:
-                                recvAuthorizedUser(initializationMsg.getAuthorizedUserMsg()); break
-                            case InitializationMsg.MessageCase.INIT_GAME_DATA_MSG:
-                                Cosmetics.recvPlayerNameResponse(initializationMsg.getInitGameDataMsg()); break
-                            default: throw "unknown case for initialization proto message"
-                        }
-                        break
-                    default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
-                }
-                break
-            case RootMsg.MessageCase.COMPRESSED_SM64JS_MSG:
-                if (!multiplayerReady()) return
-                const compressedBytes = rootMsg.getCompressedSm64jsMsg()
-                const buffer = await unzip(compressedBytes)
-                sm64jsMsg = Sm64JsMsg.deserializeBinary(buffer)
-                const listMsg = sm64jsMsg.getListMsg()
-                Multi.recvMarioData(listMsg.getMarioList())
-                recvFlagList(listMsg.getFlagList())
-                break
-            case RootMsg.MessageCase.MESSAGE_NOT_SET:
-            default:
-                throw new Error(`unhandled case in rootMsg switch expression: ${rootMsg.getMessageCase()}`)
+export function loadSocket() {
+    socket = new WebSocket(websocketServerPath)
+    socket.onopen = () => {
+    
+        socket.onmessage = async (message) => {
+            let sm64jsMsg
+            let bytes = new Uint8Array(await message.data.arrayBuffer())
+            const rootMsg = RootMsg.deserializeBinary(bytes)
+    
+            switch (rootMsg.getMessageCase()) {
+                case RootMsg.MessageCase.UNCOMPRESSED_SM64JS_MSG:
+                    sm64jsMsg = rootMsg.getUncompressedSm64jsMsg()
+                    switch (sm64jsMsg.getMessageCase()) {
+                        case Sm64JsMsg.MessageCase.PLAYER_LISTS_MSG:
+                            Multi.recvPlayerLists(sm64jsMsg.getPlayerListsMsg())
+                            break
+                        case Sm64JsMsg.MessageCase.PING_MSG:
+                            measureLatency(sm64jsMsg.getPingMsg())
+                            break
+                        case Sm64JsMsg.MessageCase.CHAT_MSG:
+                            recvChat(sm64jsMsg.getChatMsg())
+                            break
+                        case Sm64JsMsg.MessageCase.SKIN_MSG:
+                            Cosmetics.recvSkinData(sm64jsMsg.getSkinMsg())
+                            break
+                        case Sm64JsMsg.MessageCase.ANNOUNCEMENT_MSG:
+                            recvAnnouncement(sm64jsMsg.getAnnouncementMsg())
+                            break
+                        case Sm64JsMsg.MessageCase.INITIALIZATION_MSG:
+                            const initializationMsg = sm64jsMsg.getInitializationMsg()
+                            switch (initializationMsg.getMessageCase()) {
+                                case InitializationMsg.MessageCase.INIT_GAME_DATA_MSG:
+                                    Cosmetics.recvPlayerNameResponse(initializationMsg.getInitGameDataMsg()); break
+                                default: throw "unknown case for initialization proto message"
+                            }
+                            break
+                        default: throw "unknown case for uncompressed proto message " + sm64jsMsg.getMessageCase()
+                    }
+                    break
+                case RootMsg.MessageCase.COMPRESSED_SM64JS_MSG:
+                    if (!multiplayerReady()) return
+                    const compressedBytes = rootMsg.getCompressedSm64jsMsg()
+                    const buffer = await unzip(compressedBytes)
+                    sm64jsMsg = Sm64JsMsg.deserializeBinary(buffer)
+                    const listMsg = sm64jsMsg.getListMsg()
+                    Multi.recvMarioData(listMsg.getMarioList())
+                    recvFlagList(listMsg.getFlagList())
+                    break
+                case RootMsg.MessageCase.MESSAGE_NOT_SET:
+                default:
+                    throw new Error(`unhandled case in rootMsg switch expression: ${rootMsg.getMessageCase()}`)
+            }
         }
+    
+        socket.onclose = () => { window.latency = null }
     }
-
-    socket.onclose = () => { window.latency = null }
 }
 
 const recvAnnouncement = (announcementMsg) => {
@@ -374,6 +349,9 @@ export const post_main_loop_one_iteration = (frame) => {
 }
 
 const checkForFlagGrab = () => {
+	//// don't check flag grabs if pvp is disabled
+	if (!Game.pvpEnabled) {return}
+
 
     //// check all flags to see if linked to local mario, and skip this function
     for (let i = 0; i < networkData.flagData.length; i++) {
@@ -414,6 +392,9 @@ export const sendPlayerInteraction = (socket_id, interaction) => {
 
 export const submitPlayerName = () => {
 
+    document.getElementById("pvpButton").hidden = true
+	Game.load_pvp()
+
     const joinGameMsg = new JoinGameMsg()
 
     if (document.getElementById("customNameRow").hidden) { /// Discord Name Option
@@ -453,15 +434,17 @@ export const sendChat = ({ message }) => {
     sendData(rootMsg.serializeBinary())
 }
 
-const redirect_uri = encodeURIComponent(url.protocol == "https:" ? 'https://sm64js.com' : 'http://localhost:9300')
+const redirect_uri = encodeURIComponent(process.env.NODE_ENV === 'rust'
+    ? `${url.protocol}//${window.location.host}`
+    : url.protocol == "https:" ? 'https://sm64js.com' : 'http://localhost:9300')
 
-const discord_client_id = process.env.DISCORD_CLIENT_ID
+const discord_client_id = "807123464414429184"
 const discordOAuthURL = "https://discord.com/api/oauth2/authorize?client_id=" + discord_client_id + "&redirect_uri=" + redirect_uri + "&response_type=code&scope=identify"
 
-const google_client_id = process.env.GOOGLE_CLIENT_ID + ".apps.googleusercontent.com"
-const googleOAuthURL = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=" + google_client_id + "&redirect_uri=" + redirect_uri + "&scope=email" 
+const google_client_id = "1000892686951-dkp1vpqohmbq64h7jiiop9v6ic4t1mul.apps.googleusercontent.com"
+const googleOAuthURL = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=" + google_client_id + "&redirect_uri=" + redirect_uri + "&scope=openid email" 
 
-if (url.searchParams.has('code') || process.env.PRODUCTION != 1) document.getElementById("signinButtons").hidden = true
+if (url.searchParams.has('code') || (process.env.PRODUCTION != 1 && process.env.NODE_ENV !== 'rust')) document.getElementById("signinButtons").hidden = true
 
 document.getElementById("switchCustom").addEventListener('click', (e) => {
     e.preventDefault()
@@ -487,20 +470,37 @@ document.getElementById("googleSigninButton").addEventListener('click', () => {
     window.location = `${googleOAuthURL}&state=${encodeURIComponent(JSON.stringify(state))}`
 })
 
-const recvAuthorizedUser = (msg) => {
-    if (msg.getStatus() == 1) {
-        document.getElementById("playerNameRow").hidden = false
-        document.getElementById("discordNameBox").value = msg.getUsername()
-        if (msg.getUsername() == "") { /// Discord Username option not available
-            document.getElementById("customNameRow").hidden = false
-            document.getElementById("discordNameRow").hidden = true
-            document.getElementById("switchDiscord").hidden = true
+document.getElementById("logoutButton").addEventListener('click', async () => {
+    const res = await fetch ('/api/logout', {
+        method: 'POST'
+    })
+    if (res.ok) {
+        document.getElementById("playerNameRow").hidden = true
+        document.getElementById("discordNameBox").value = ''
+        document.getElementById("signinButtons").hidden = false
+        document.getElementById("logoutButton").hidden = true
+    }
+})
+
+export const recvAuthorizedUser = async (res) => {
+    if (res.ok) {
+        if (res.status === 200) {
+            const msg = await res.json()
+            document.getElementById("playerNameRow").hidden = false
+            document.getElementById("discordNameBox").value = msg.username
+            document.getElementById("signinButtons").hidden = true
+            document.getElementById("logoutButton").hidden = false
+            if (!msg.username) { /// Discord Username option not available
+                document.getElementById("customNameRow").hidden = false
+                document.getElementById("discordNameRow").hidden = true
+                document.getElementById("switchDiscord").hidden = true
+            }
+            return true
         }
     } else { //authorization fail - refresh page without access code
-        document.getElementById("authFailMsg").innerHTML = "Authorization Fail: " + msg.getMessage()
+        document.getElementById("authFailMsg").innerHTML = "Authorization Fail: " + await res.text()
         document.getElementById("authFailMsg").hidden = false
-        if (msg.getStatus() == 2) { // refreshing won't help
-        } else {
+        if (res.status !== 403) { // user is banned on HTTP 403, so don't refresh
             document.getElementById("authFailMsg").innerHTML += `<br/> Please Try Again - Auto refreshing in 3 seconds`
             setTimeout(() => {
                 let params = url.searchParams
@@ -509,5 +509,6 @@ const recvAuthorizedUser = (msg) => {
             }, 3000)
         }
     }
+    return false
 }
 

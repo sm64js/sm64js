@@ -3,9 +3,9 @@ const HtmlWebPackPlugin = require("html-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const OptimizeCSSAssetsWebpackPlugin = require("optimize-css-assets-webpack-plugin")
 const TerserWebpackPlugin = require("terser-webpack-plugin")
+const CopyPlugin = require("copy-webpack-plugin")
 const express = require('express')
 const path = require('path')
-
 
 module.exports = env => ({
     module: {
@@ -41,8 +41,6 @@ module.exports = env => ({
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(env || 'development'),
             'process.env.PRODUCTION': JSON.stringify(process.env.PRODUCTION),
-            'process.env.DISCORD_CLIENT_ID': JSON.stringify(process.env.DISCORD_CLIENT_ID),
-            'process.env.GOOGLE_CLIENT_ID': JSON.stringify(process.env.GOOGLE_CLIENT_ID),
         }),
         new HtmlWebPackPlugin({
             template: "./src/index.html",
@@ -51,7 +49,13 @@ module.exports = env => ({
         new MiniCssExtractPlugin({
             filename: "template.css",
             chunkFilename: "[id].css"
-        })
+        }),
+        new CopyPlugin({
+            patterns: [
+                { from: "./src/mmo/assets", to: "./mmo/assets" },
+                { from: "./src/mmo/html", to: "./mmo/html" }
+            ],
+        }),
     ],
     output: {
         publicPath: "/",

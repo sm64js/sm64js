@@ -22,7 +22,7 @@
     "build": "webpack --mode production",
     "build:rust": "webpack --mode production --env rust",
     "start": "webpack-dev-server --host 0.0.0.0 --disable-host-check  --mode development --env development",
-    "protoc": "protoc --js_out=import_style=commonjs,binary:. proto/mario.proto"
+    "protoc": "protoc --proto_path ../proto --js_out=import_style=commonjs,binary:./proto ../proto/mario.proto"
   },
   "babel": {
     "presets": [
@@ -33,6 +33,7 @@
     "@babel/core": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
     "babel-loader": "^8.1.0",
+    "copy-webpack-plugin": "6",
     "html-loader": "^1.1.0",
     "html-webpack-plugin": "^4.3.0",
     "webpack-node-externals": "^1.7.2"

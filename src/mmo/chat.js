@@ -41,11 +41,14 @@ export const recvChat = (chatmsg) => {
     const sender = chatmsg.getSender()
     const msg = chatmsg.getMessage()
     const isAdmin = chatmsg.getIsadmin()
+    const isServer = chatmsg.getIsserver()
 
-    if (socket_id != networkData.mySocketID &&
-        networkData.remotePlayers[socket_id] == undefined) return
-
-    if (window.banPlayerList.includes(sender) || blockChatExtended(sender)) return
+    if (!isServer) {
+        if (socket_id != networkData.mySocketID &&
+            networkData.remotePlayers[socket_id] == undefined) return
+    
+        if (window.banPlayerList.includes(sender) || blockChatExtended(sender)) return
+    }
 
     const chatlog = document.getElementById("chatlog")
     const node = document.createElement("li")

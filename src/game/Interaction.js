@@ -1,4 +1,5 @@
 import * as Mario from "./Mario"
+import { GameInstance as Game } from "./Game"
 import { AreaInstance as Area } from "./Area"
 import * as MarioConstants from "../include/mario_constants"
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
@@ -217,6 +218,10 @@ const resolve_player_collision = (m, m2) => {
         return false
 }
 
+const check_pvp = (m, m2) => {
+	return (m.pvp === 0x1 && m2.pvp === 0x1)
+}	
+
 const interact_player = (m, o) => {
 
     if (!networkData.playerInteractions) return false
@@ -224,7 +229,9 @@ const interact_player = (m, o) => {
     const m2 = o.marioState
 
     if (resolve_player_collision(m, m2)) return false
-
+	
+	if (check_pvp(m, m2) == false) return false
+	
     const interaction = determine_interaction(m, o)
 
     // attacked
@@ -259,7 +266,7 @@ const interact_player = (m, o) => {
         }
 
         m2.interactObj = m.marioObj
-        if (m2.marioObj.localMario) {
+        if (m2.marioObj.localMario && Game.pvpEnabled) {
             m.marioObj.rawData[oDamageOrCoinValue] = determine_player_damage_value(interaction)
         } else {  /// remote mario
             m2.interactObj.rawData[oDamageOrCoinValue] = determine_player_damage_value(interaction)
@@ -275,12 +282,14 @@ const interact_player = (m, o) => {
             // m.invincTimer = 10 /// one solution that fixes attacking mario knockback on jump kick
             Mario.set_mario_action(m2, Mario.ACT_FREEFALL, 0)
         }
-        if (m.marioObj.localMario) {
+        if (m.marioObj.localMario && Game.pvpEnabled) {
             //m2.ignoreUpdates = 40
             sendAttackToServer(m2.socket_id)
             //sendPlayerInteraction(m2.socket_id, interaction)  /// unused
         }
-        take_damage_and_knock_back(m2, m.marioObj)
+		if (m2.marioObj.localMario && Game.pvpEnabled) { 
+			take_damage_and_knock_back(m2, m.marioObj)
+		}
         //bounce_back_from_attack(m, interaction)  //temp disable to fix glitch
         return false
     }

@@ -10,6 +10,8 @@ import "./template.css"
 
 const send_display_list = (gfx_list) => { GFX.run(gfx_list) }
 
+window.pvp = true
+
 let n_frames = 0
 let target_time = 0
 let frameSpeed = 0.03
@@ -166,11 +168,16 @@ const startGame = () => {
     document.getElementById("startbutton").innerHTML = "🔄 Reset Game"
 
     document.getElementById("connectedMsg").hidden = false
-
+	
     main_func()
 }
 
-window.onload = () => {
+window.togglePvp = () => {
+	window.pvp = !window.pvp
+	document.getElementById("pvpButton").innerHTML = ('PvP: ' + (window.pvp ? 'On' : 'Off'))
+}
+
+window.onload = async () => {
     if (checkForRom() && url_params.has("autostart") && localStorage['rules'] == rulesVersion) startGame()
     document.getElementById('mainContent').hidden = false
 
@@ -201,6 +208,34 @@ window.onload = () => {
         })
 
     }*/
+
+    if (url_params.has('code')) {
+
+        /// send access code to server
+        const state = JSON.parse(decodeURIComponent(url_params.get("state")))
+        const res = await fetch (`/api/login/${state.type}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ code: url_params.get("code") })
+        })
+        const success = Socket.recvAuthorizedUser(res)
+
+        if (success && process.env.NODE_ENV === 'rust') {
+            const url = new URL(window.location.href)
+            url.searchParams.delete('code')
+            url.searchParams.delete('state')
+            url.pathname = '/'
+            history.replaceState({ state: 'login' }, '', url)
+        }
+    } else {
+        const res = await fetch ('/api/login', {
+            method: 'POST'
+        })
+        Socket.recvAuthorizedUser(res)
+    }
+    Socket.loadSocket()
 
 }
 

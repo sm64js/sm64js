@@ -6,6 +6,7 @@ import { set_mario_action,
          drop_and_set_mario_action,
          mario_set_forward_vel,
          set_water_plunge_action,
+         mario_floor_is_slippery,
          is_anim_at_end                 } from "./Mario"
 import { mario_drop_held_object         } from "./Interaction"
 import { perform_air_step,

@@ -1833,7 +1833,7 @@ export const set_water_plunge_action = m => {
 
     vec3s_set(m.angleVel, 0, 0, 0)
 
-    if (!(m.action && ACT_FLAG_DIVING)) {
+    if (!(m.action & ACT_FLAG_DIVING)) {
         m.faceAngle[0] = 0
     }
 

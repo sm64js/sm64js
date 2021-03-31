@@ -115,10 +115,6 @@ export const ATTACK_FROM_BELOW            = 6
 let sDelayInvincTimer = false
 let sInvulnerable = false
 
-const reset_mario_pitch = (m) => {
-    /// TODO: WATER JUMP || SHOT FROM CANNON || ACT_FLYING
-}
-
 const check_death_barrier = (m) => {
 
     //// the actual code
@@ -165,6 +161,13 @@ export const mario_handle_special_floors = (m) => {
                 check_death_barrier(m)
                 break
         }
+    }
+}
+
+const reset_mario_pitch = (m) => {
+    if (m.action == ACT_WATER_JUMP || m.action == ACT_SHOT_FROM_CANNON || m.action == ACT_FLYING) {
+        Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
+        m.faceAngle[0] = 0
     }
 }
 
@@ -292,9 +295,8 @@ const interact_pole = (m, o) => {
 
             marioObj.rawData[oMarioPoleYawVel] = parseInt((m.forwardVel * 0x100) + 0x1000)
 
-            reset_mario_pitch(m) /// TODO: WATER JUMP || SHOT FROM CANNON || ACT_FLYING
+            reset_mario_pitch(m)
             return Mario.set_mario_action(m, Mario.ACT_GRAB_POLE_FAST, 0)
-
         }
     }
 
@@ -410,7 +412,7 @@ const bounce_back_from_attack = (m, interaction) => {
             Mario.set_forward_vel(m, -48.0)
         }
 
-        //set_camera_shake_from_hit(SHAKE_ATTACK) TODO
+        Camera.set_camera_shake_from_hit(Camera.SHAKE_ATTACK)
         m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE
     }
 

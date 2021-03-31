@@ -82,6 +82,13 @@ export const TERRAIN_WATER  = 0x0005
 export const TERRAIN_SLIDE  = 0x0006
 export const TERRAIN_MASK = 0x0007
 
+export const SURFACE_IS_QUICKSAND = (cmd) => {
+    return (cmd >= 0x21 && cmd < 0x28)   // Doesn't include SURFACE_INSTANT_MOVING_QUICKSAND
+}
+export const SURFACE_IS_NOT_HARD = (cmd) => {
+    return (cmd != SURFACE_HARD && !(cmd >= 0x35 && cmd <= 0x37))
+}
+
 export const special_level_geo_03 = 101
 export const special_level_geo_04 = 102
 export const special_level_geo_05 = 103

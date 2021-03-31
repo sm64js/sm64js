@@ -1,3 +1,4 @@
+import { raise_background_noise } from "./SoundInit"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { AreaInstance as Area } from "./Area"
 import { MarioMiscInstance as MarioMisc } from "./MarioMisc"
@@ -907,6 +908,28 @@ export const set_jumping_action = (m, action, actionArg) => {
     return 1
 }
 
+
+export const update_mario_sound_and_camera = (m) => {
+    let action = m.action
+    let camPreset = m.area.camera.mode
+
+    if (action == ACT_FIRST_PERSON) {
+        raise_background_noise(2)
+        Camera.gCameraMovementFlags &= ~Camera.CAM_MOVE_C_UP_MODE
+        // Go back to the last camera mode
+        Camera.set_camera_mode(m.area.camera, -1, 1)
+    } else if (action == ACT_SLEEPING) {
+        raise_background_noise(2)
+    }
+
+    if (!(action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER))) {
+        if (camPreset == CAMERA_MODE_BEHIND_MARIO || camPreset == CAMERA_MODE_WATER_SURFACE) {
+            Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
+        }
+    }
+}
+
+
 const set_steep_jump_action = (m) => {
     m.marioObj.rawData[oMarioSteepJumpYaw] = m.faceAngle[1]
 
@@ -1511,6 +1534,23 @@ export const mario_floor_is_steep = (m) => {
     }
 
     return result
+}
+
+/**************************************************
+ *                     ACTIONS                    *
+ **************************************************/
+
+/**
+ * Sets Mario's other velocities from his forward speed.
+ */
+export const mario_set_forward_vel = (m, forwardVel) => {
+    m.forwardVel = forwardVel
+
+    m.slideVelX = sins(m.faceAngle[1]) * m.forwardVel
+    m.slideVelZ = coss(m.faceAngle[1]) * m.forwardVel
+
+    m.vel[0] = m.slideVelX
+    m.vel[2] = m.slideVelZ
 }
 
 export const mario_get_floor_class = (m) => {

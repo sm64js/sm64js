@@ -18,6 +18,10 @@ export const approach_number = (current, target, inc, dec) => {
     return current
 }
 
+// aliases
+export const approach_f32 = approach_number
+export const approach_s32 = approach_number
+
 export const vec3f_get_dist_and_angle = (from, to, output) => {
     const x = to[0] - from[0]
     const y = to[1] - from[1]
@@ -64,17 +68,17 @@ export const vec3f_cross = (dest, a, b) => {
 }
 
 export const vec3f_set = (dest, x, y, z) => {
-    dest[0] = x;
-    dest[1] = y;
-    dest[2] = z;
-    return dest; 
+    dest[0] = x
+    dest[1] = y
+    dest[2] = z
+    return dest
 }
 
 export const vec3s_set = (dest, x, y, z) => {
-    dest[0] = x;
-    dest[1] = y;
-    dest[2] = z;
-    return dest; 
+    dest[0] = x
+    dest[1] = y
+    dest[2] = z
+    return dest
 }
 
 export const mtxf_identity = (mtx) => {
@@ -478,4 +482,8 @@ export const atan2s = (y, x) => {
 
     return parseInt(Math.atan2(x, y) * 10430.5)
 
+}
+
+export const sqrtf = (x) => {
+    return Math.sqrt(x)
 }

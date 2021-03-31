@@ -997,41 +997,90 @@ export const set_mario_action = (m, action, actionArg) => {
 }
 
 export const set_mario_action_airborne = (m, action, actionArg) => {
+    if ((m.squishTimer != 0 || m.quicksandDepth >= 1.0)
+        && (action == ACT_DOUBLE_JUMP || action == ACT_TWIRLING)) {
+        action = ACT_JUMP;
+    }
+
     switch (action) {
-        case ACT_JUMP:
-            m.marioObj.header.gfx.unk38.animID = -1
-            set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
-            m.forwardVel *= 0.8
-            break
-        case ACT_SIDE_FLIP:
-            set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
-            m.forwardVel = 8.0
-            m.faceAngle[1] = m.intendedYaw
-            break
-        case ACT_STEEP_JUMP:
-            m.marioObj.header.gfx.unk38.animID = -1
-            set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
-            m.faceAngle[0] = -0x2000
-            break
         case ACT_DOUBLE_JUMP:
             set_mario_y_vel_based_on_fspeed(m, 52.0, 0.25)
             m.forwardVel *= 0.8
             break
-        case ACT_TRIPLE_JUMP:
-            set_mario_y_vel_based_on_fspeed(m, 69.0, 0.0)
-            m.forwardVel *= 0.8
-            break
-        case ACT_WALL_KICK_AIR:
-        case ACT_TOP_OF_POLE_JUMP:
-            set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
-            if (m.forwardVel < 24.0) m.forwardVel = 24.0
-            m.wallKickTimer = 0
-            break
+
         case ACT_BACKFLIP:
             m.marioObj.header.gfx.unk38.animID = -1
             m.forwardVel = -16.0
             set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
             break
+
+        case ACT_TRIPLE_JUMP:
+            set_mario_y_vel_based_on_fspeed(m, 69.0, 0.0)
+            m.forwardVel *= 0.8
+            break
+
+        case ACT_FLYING_TRIPLE_JUMP:
+            set_mario_y_vel_based_on_fspeed(m, 82.0, 0.0)
+            break
+
+        case ACT_WATER_JUMP:
+        case ACT_HOLD_WATER_JUMP:
+            if (actionArg == 0) {
+                set_mario_y_vel_based_on_fspeed(m, 42.0, 0.0)
+            }
+            break
+
+        case ACT_BURNING_JUMP:
+            m.vel[1] = 31.5
+            m.forwardVel = 8.0
+            break
+
+        case ACT_RIDING_SHELL_JUMP:
+            set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
+            break
+
+        case ACT_JUMP:
+        case ACT_HOLD_JUMP:
+            m.marioObj.header.gfx.unk38.animID = -1
+            set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
+            m.forwardVel *= 0.8
+            break
+
+        case ACT_WALL_KICK_AIR:
+        case ACT_TOP_OF_POLE_JUMP:
+            set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
+            if (m.forwardVel < 24.0) {
+                m.forwardVel = 24.0
+            }
+            m.wallKickTimer = 0
+            break
+
+        case ACT_SIDE_FLIP:
+            set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
+            m.forwardVel = 8.0
+            m.faceAngle[1] = m.intendedYaw
+            break
+
+        case ACT_STEEP_JUMP:
+            m.marioObj.header.gfx.unk38.animID = -1
+            set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
+            m.faceAngle[0] = -0x2000
+            break
+
+        case ACT_LAVA_BOOST:
+            m.vel[1] = 84.0
+            if (actionArg == 0) {
+                m.forwardVel = 0.0
+            }
+            break
+
+        case ACT_DIVE:
+            if ((fowardVel = m.forwardVel + 15.0) > 48.0) {
+                fowardVel = 48.0
+            }
+            mario_set_forward_vel(m, fowardVel)
+            break
+
         case ACT_LONG_JUMP:
             m.marioObj.header.gfx.unk38.animID = -1
             set_mario_y_vel_based_on_fspeed(m, 30.0, 0.0)
@@ -1043,22 +1092,18 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
                 m.forwardVel = 48.0
             }
             break
-        case ACT_JUMP_KICK:
-            m.vel[1] = 20.0
-            break
-        case ACT_DIVE:
-            let forwardVel = m.forwardVel + 15.0
-            if (forwardVel > 48.0) {
-                forwardVel = 48.0
-            }
-            set_forward_vel(m, forwardVel)
-            break
+
         case ACT_SLIDE_KICK:
             m.vel[1] = 12.0
             if (m.forwardVel < 32.0) {
                 m.forwardVel = 32.0
             }
             break
+
+        case ACT_JUMP_KICK:
+            m.vel[1] = 20.0
+            break
+
     }
 
     m.peakHeight = m.pos[1]

@@ -198,15 +198,15 @@ import { INT_STATUS_MARIO_DROP_OBJECT,
 //---------------------------------------------------------------------------
 
 
-export const play_flip_sounds = (m, frame1, frame2, frame3) => {
+const play_flip_sounds = (m, frame1, frame2, frame3) => {
     let animFrame = m.marioObj.header.gfx.unk38.animFrame
     if (animFrame == frame1 || animFrame == frame2 || animFrame == frame3) {
         // play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
     }
 }
 
-export const play_far_fall_sound = (m) => {
-    action = m.action
+const play_far_fall_sound = (m) => {
+    let action = m.action
     if (!(action & ACT_FLAG_INVULNERABLE) && action != ACT_TWIRLING && action != ACT_FLYING
         && !(m.flags & MARIO_UNKNOWN_18)) {
         if (m.peakHeight - m.pos[1] > 1150.0) {
@@ -545,7 +545,7 @@ export const common_air_action_step = (m, landAction, animation, stepArg) => {
 
             if (m.forwardVel > 16.0) {
                 mario_bonk_reflection(m, 0)
-                m.faceAngle[1] = (m.faceAngle[1] + 0x8000)
+                m.faceAngle[1] = s16(m.faceAngle[1] + 0x8000)
 
                 if (m.wall != null) {
                     set_mario_action(m, ACT_AIR_HIT_WALL, 0)
@@ -645,7 +645,7 @@ export const act_triple_jump = (m) => {
     // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
 
     common_air_action_step(m, ACT_TRIPLE_JUMP_LAND, MARIO_ANIM_TRIPLE_JUMP, 0)
-    // play_flip_sounds(m, 2, 8, 20)
+    play_flip_sounds(m, 2, 8, 20)
     return 0
 }
 
@@ -656,7 +656,7 @@ export const act_backflip = (m) => {
 
     // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_YAH_WAH_HOO)
     common_air_action_step(m, ACT_BACKFLIP_LAND, MARIO_ANIM_BACKFLIP, 0)
-    // play_flip_sounds(m, 2, 3, 17)
+    play_flip_sounds(m, 2, 3, 17)
     return 0
 }
 
@@ -1254,7 +1254,7 @@ export const act_backward_air_kb = (m) => {
         return 1
     }
 
-    // play_knockback_sound(m)
+    play_knockback_sound(m)
     common_air_knockback_step(m, ACT_BACKWARD_GROUND_KB, ACT_HARD_BACKWARD_GROUND_KB, 0x0002, -16.0)
     return 0
 }
@@ -1264,20 +1264,20 @@ export const act_forward_air_kb = (m) => {
         return 1
     }
 
-    // play_knockback_sound(m)
+    play_knockback_sound(m)
     common_air_knockback_step(m, ACT_FORWARD_GROUND_KB, ACT_HARD_FORWARD_GROUND_KB, 0x002D, 16.0)
     return 0
 }
 
 export const act_hard_backward_air_kb = (m) => {
-    // play_knockback_sound(m)
+    play_knockback_sound(m)
     common_air_knockback_step(m, ACT_HARD_BACKWARD_GROUND_KB, ACT_HARD_BACKWARD_GROUND_KB, 0x0002,
                               -16.0)
     return 0
 }
 
 export const act_hard_forward_air_kb = (m) => {
-    // play_knockback_sound(m)
+    play_knockback_sound(m)
     common_air_knockback_step(m, ACT_HARD_FORWARD_GROUND_KB, ACT_HARD_FORWARD_GROUND_KB, 0x002D, 16.0)
     return 0
 }
@@ -1329,7 +1329,7 @@ export const act_soft_bonk = (m) => {
         return 1
     }
 
-    // play_knockback_sound(m)
+    play_knockback_sound(m)
 
     common_air_knockback_step(m, ACT_FREEFALL_LAND, ACT_HARD_BACKWARD_GROUND_KB, 0x0056, m.forwardVel)
     return 0
@@ -2086,7 +2086,7 @@ export const mario_execute_airborne_action = (m) => {
         return 1
     }
 
-    // play_far_fall_sound(m)
+    play_far_fall_sound(m)
 
     switch (m.action) {
         case ACT_JUMP:                 cancel = act_jump(m);                 break

@@ -274,6 +274,21 @@ export const playerInputUpdate = () => {
     if (gamepad) {
         stickX = gamepad.axes[gamepadButtonMapping['stickX']]
         stickY = gamepad.axes[gamepadButtonMapping['stickY']] * -1
+
+        // hack to help wonky sticks out
+        stickX *= 1.05
+        if (stickX < -1.0) {
+            stickX = -1.0
+        } else if (stickX > 1.0) {
+            stickX = 1.0
+        }
+
+        stickY *= 1.05
+        if (stickY < -1.0) {
+            stickY = -1.0
+        } else if (stickY > 1.0) {
+            stickY = 1.0
+        }
         Object.assign(gamepadFinal, {
             a: gamepad.buttons[gamepadButtonMapping['a']].touched,
             b: gamepad.buttons[gamepadButtonMapping['b']].touched,

@@ -1,6 +1,7 @@
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import * as Mario from "./Mario"
 import { atan2s } from "../engine/math_util"
+import { int16 } from "../utils"
 import { ceil } from "mathjs"
 import { SURFACE_HANGABLE } from "../include/surface_terrains"
 
@@ -33,10 +34,8 @@ const apply_gravity = (m) => {
 export const mario_bonk_reflection = (m, negateSpeed) => {
     if (m.wall) {
         const wallAngle = atan2s(m.wall.normal.z, m.wall.normal.x)
-        let angleDiff = m.faceAngle[1] - wallAngle
-        angleDiff = angleDiff > 32767 ? angleDiff - 65536 : angleDiff
-        angleDiff = angleDiff < -32768 ? angleDiff + 65536 : angleDiff
-        m.faceAngle[1] = wallAngle - angleDiff
+        let angleDiff = int16(m.faceAngle[1] - wallAngle)
+        m.faceAngle[1] = int16(wallAngle - angleDiff)
         //play sound
     } else {
         //play sound
@@ -116,7 +115,7 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
 
         m.pos[1] = nextPos[1]
         if (window.cheats.bouncyOobWalls) {
-            m.faceAngle[1] += 0x8000
+            m.faceAngle[1] = int16(m.faceAngle[1] + 0x8000)
             Mario.set_forward_vel(m, 1.5 * m.forwardVel)
         }
         return Mario.AIR_STEP_HIT_WALL
@@ -174,9 +173,7 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
     if (upperWall || lowerWall) {
         m.wall = upperWall ? upperWall : lowerWall
 
-        let wallDYaw = atan2s(m.wall.normal.z, m.wall.normal.x) - m.faceAngle[1]
-        if (wallDYaw > 32767) wallDYaw -= 65536
-        if (wallDYaw < -32768) wallDYaw += 65536
+        let wallDYaw = int16(atan2s(m.wall.normal.z, m.wall.normal.x) - m.faceAngle[1])
 
         if (wallDYaw < -0x6000 || wallDYaw > 0x6000) {
             m.flags |= Mario.MARIO_UNKNOWN_30
@@ -188,8 +185,6 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
 }
 
 export const perform_air_step = (m, stepArg) => {
-
-
     let stepResult = Mario.AIR_STEP_NONE
 
     for (let i = 0; i < 4; i++) {

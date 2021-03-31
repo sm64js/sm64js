@@ -65,7 +65,7 @@ const update_swimming_yaw = (m) => {
 
     if (targetYawVel > 0) {
         if (m.angleVel[1] < 0) {
-            m.angleVel[1] += 0x40
+            m.angleVel[1] = s16(m.angleVel[1] + 0x40)
             if (m.angleVel[1] > 0x10) {
                 m.angleVel[1] = 0x10
             }
@@ -74,7 +74,7 @@ const update_swimming_yaw = (m) => {
         }
     } else if (targetYawVel < 0) {
         if (m.angleVel[1] > 0) {
-            m.angleVel[1] -= 0x40
+            m.angleVel[1] = s16(m.angleVel[1] - 0x40)
             if (m.angleVel[1] < -0x10) {
                 m.angleVel[1] = -0x10
             }
@@ -85,12 +85,14 @@ const update_swimming_yaw = (m) => {
         m.angleVel[1] = approach_number(m.angleVel[1], 0, 0x40, 0x40)
     }
 
-    m.faceAngle[1] += m.angleVel[1]
+    m.faceAngle[1] = s16(m.faceAngle[1] + m.angleVel[1])
     m.faceAngle[2] = -m.angleVel[1] * 8
 }
 
 const update_swimming_pitch = (m) => {
-    let targetPitch = -s16(252.0 * m.controller.stickY)
+    let targetPitch = s16(-(252.0 * m.controller.stickY))
+
+// console.log(m.faceAngle[0], targetPitch)
 
     let pitchVel
     if (m.faceAngle[0] < 0) {
@@ -100,11 +102,13 @@ const update_swimming_pitch = (m) => {
     }
 
     if (m.faceAngle[0] < targetPitch) {
-        if ((m.faceAngle[0] += pitchVel) > targetPitch) {
+        m.faceAngle[0] = s16(m.faceAngle[0] + pitchVel)
+        if (m.faceAngle[0] > targetPitch) {
             m.faceAngle[0] = targetPitch
         }
     } else if (m.faceAngle[0] > targetPitch) {
-        if ((m.faceAngle[0] -= pitchVel) < targetPitch) {
+        m.faceAngle[0] = s16(m.faceAngle[0] - pitchVel)
+        if (m.faceAngle[0] < targetPitch) {
             m.faceAngle[0] = targetPitch
         }
     }

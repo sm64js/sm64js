@@ -997,6 +997,8 @@ export const set_mario_action = (m, action, actionArg) => {
 }
 
 export const set_mario_action_airborne = (m, action, actionArg) => {
+    let fowardVel
+
     if ((m.squishTimer != 0 || m.quicksandDepth >= 1.0)
         && (action == ACT_DOUBLE_JUMP || action == ACT_TWIRLING)) {
         action = ACT_JUMP;

@@ -6,9 +6,11 @@ import { set_mario_action,
          drop_and_set_mario_action,
          mario_set_forward_vel,
          set_water_plunge_action,
+         is_anim_past_end,
          mario_floor_is_slippery,
          is_anim_at_end                 } from "./Mario"
-import { mario_drop_held_object         } from "./Interaction"
+import { mario_drop_held_object,
+         mario_check_object_grab        } from "./Interaction"
 import { perform_air_step,
          mario_bonk_reflection          } from "./MarioStep"
 import { approach_number,

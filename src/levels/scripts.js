@@ -22,6 +22,7 @@ import { sparkles_geo               } from "../actors/sparkle/geo.inc"
 import { bubble_geo                 } from "../actors/bubble/geo.inc"
 import { small_water_splash_geo,
          water_splash_geo           } from "../actors/water_splash/geo.inc"
+import { idle_water_wave_geo        } from "../actors/water_wave/geo.inc"
 import { yellow_coin_geo,
          yellow_coin_no_shadow_geo,
          red_coin_geo,
@@ -51,7 +52,7 @@ export const level_main_scripts_entry = [
     ['LOAD_MODEL_FROM_GEO', MODEL_SPARKLES,                sparkles_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_BUBBLE,                  bubble_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_SMALL_WATER_SPLASH,      small_water_splash_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_IDLE_WATER_WAVE,         idle_water_wave_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL_IDLE_WATER_WAVE,         idle_water_wave_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_WATER_SPLASH,            water_splash_geo],
     // ['LOAD_MODEL_FROM_GEO', MODEL_WAVE_TRAIL,              wave_trail_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_YELLOW_COIN,             yellow_coin_geo],

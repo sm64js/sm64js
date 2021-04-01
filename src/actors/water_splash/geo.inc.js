@@ -1,5 +1,5 @@
-import { GeoLayoutInstance as Geo         } from "../../engine/GeoLayout"
-import { geo_switch_anim_state            } from "../../game/ObjectHelpers"
+import { GeoLayoutInstance as Geo } from "../../engine/GeoLayout"
+import { geo_switch_anim_state    } from "../../game/ObjectHelpers"
 
 import { water_splash_seg4_dl_04032640,
          water_splash_seg4_dl_04032658,
@@ -8,7 +8,7 @@ import { water_splash_seg4_dl_04032640,
          water_splash_seg4_dl_040326A0,
          water_splash_seg4_dl_040326B8,
          water_splash_seg4_dl_040326D0,
-         water_splash_seg4_dl_040326E8    } from "./model.inc"
+         water_splash_seg4_dl_040326E8  } from "./model.inc"
 
 export const water_splash_geo = [
    ['GEO_SWITCH_CASE', 8, geo_switch_anim_state],

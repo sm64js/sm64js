@@ -1287,7 +1287,8 @@ const check_common_moving_cancels = (m) => {
 }
 
 export const mario_execute_moving_action = (m) => {
-    
+    let cancel
+
     if (check_common_moving_cancels(m)) {
         return 1;
     }
@@ -1295,31 +1296,39 @@ export const mario_execute_moving_action = (m) => {
     //TODO update quicksand
 
     switch (m.action) {
-        case Mario.ACT_WALKING: return act_walking(m)
-        case Mario.ACT_DECELERATING: return act_decelerating(m)
-        case Mario.ACT_BRAKING: return act_braking(m)
-        case Mario.ACT_TURNING_AROUND: return act_turning_around(m)
-        case Mario.ACT_FINISH_TURNING_AROUND: return act_finish_turning_around(m)
-        case Mario.ACT_JUMP_LAND: return act_jump_land(m)
-        case Mario.ACT_FREEFALL_LAND: return act_freefall_land(m)
-        case Mario.ACT_BUTT_SLIDE: return act_butt_slide(m)
-        case Mario.ACT_STOMACH_SLIDE: return act_stomach_slide(m)
-        case Mario.ACT_SIDE_FLIP_LAND: return act_side_flip_land(m)
-        case Mario.ACT_DOUBLE_JUMP_LAND: return act_double_jump_land(m)
-        case Mario.ACT_TRIPLE_JUMP_LAND: return act_triple_jump_land(m)
-        case Mario.ACT_BACKFLIP_LAND: return act_backflip_land(m)
-        case Mario.ACT_CROUCH_SLIDE: return act_crouch_slide(m)
-        case Mario.ACT_LONG_JUMP_LAND: return act_long_jump_land(m)
-        case Mario.ACT_DIVE_SLIDE: return act_dive_slide(m)
-        case Mario.ACT_CRAWLING: return act_crawling(m)
-        case Mario.ACT_MOVE_PUNCHING: return act_move_punching(m)
-        case Mario.ACT_SLIDE_KICK_SLIDE: return act_slide_kick_slide(m)
-        case Mario.ACT_BACKWARD_GROUND_KB: return act_backward_ground_kb(m)
-        case Mario.ACT_FORWARD_GROUND_KB: return act_forward_ground_kb(m)
-        case Mario.ACT_SOFT_FORWARD_GROUND_KB: return act_soft_forward_ground_kb(m)
-        case Mario.ACT_SOFT_BACKWARD_GROUND_KB: return act_soft_backward_ground_kb(m)
-        case Mario.ACT_HARD_BACKWARD_GROUND_KB: return act_hard_backward_ground_kb(m)
-        case Mario.ACT_HARD_FORWARD_GROUND_KB: return act_hard_forward_ground_kb(m)
-        default: throw "unknown action moving: " + m.action.toString(16)
+        case Mario.ACT_WALKING:                 cancel = act_walking(m);                 break;
+        case Mario.ACT_DECELERATING:            cancel = act_decelerating(m);            break;
+        case Mario.ACT_BRAKING:                 cancel = act_braking(m);                 break;
+        case Mario.ACT_TURNING_AROUND:          cancel = act_turning_around(m);          break;
+        case Mario.ACT_FINISH_TURNING_AROUND:   cancel = act_finish_turning_around(m);   break;
+        case Mario.ACT_JUMP_LAND:               cancel = act_jump_land(m);               break;
+        case Mario.ACT_FREEFALL_LAND:           cancel = act_freefall_land(m);           break;
+        case Mario.ACT_BUTT_SLIDE:              cancel = act_butt_slide(m);              break;
+        case Mario.ACT_STOMACH_SLIDE:           cancel = act_stomach_slide(m);           break;
+        case Mario.ACT_SIDE_FLIP_LAND:          cancel = act_side_flip_land(m);          break;
+        case Mario.ACT_DOUBLE_JUMP_LAND:        cancel = act_double_jump_land(m);        break;
+        case Mario.ACT_TRIPLE_JUMP_LAND:        cancel = act_triple_jump_land(m);        break;
+        case Mario.ACT_BACKFLIP_LAND:           cancel = act_backflip_land(m);           break;
+        case Mario.ACT_CROUCH_SLIDE:            cancel = act_crouch_slide(m);            break;
+        case Mario.ACT_LONG_JUMP_LAND:          cancel = act_long_jump_land(m);          break;
+        case Mario.ACT_DIVE_SLIDE:              cancel = act_dive_slide(m);              break;
+        case Mario.ACT_CRAWLING:                cancel = act_crawling(m);                break;
+        case Mario.ACT_MOVE_PUNCHING:           cancel = act_move_punching(m);           break;
+        case Mario.ACT_SLIDE_KICK_SLIDE:        cancel = act_slide_kick_slide(m);        break;
+        case Mario.ACT_BACKWARD_GROUND_KB:      cancel = act_backward_ground_kb(m);      break;
+        case Mario.ACT_FORWARD_GROUND_KB:       cancel = act_forward_ground_kb(m);       break;
+        case Mario.ACT_SOFT_FORWARD_GROUND_KB:  cancel = act_soft_forward_ground_kb(m);  break;
+        case Mario.ACT_SOFT_BACKWARD_GROUND_KB: cancel = act_soft_backward_ground_kb(m); break;
+        case Mario.ACT_HARD_BACKWARD_GROUND_KB: cancel = act_hard_backward_ground_kb(m); break;
+        case Mario.ACT_HARD_FORWARD_GROUND_KB:  cancel = act_hard_forward_ground_kb(m);  break;
+        default:
+            throw "unknown action moving: " + m.action.toString(16)
     }
+
+    if (!cancel && (m.input & Mario.INPUT_IN_WATER)) {
+        m.particleFlags |= MarioConstants.PARTICLE_WAVE_TRAIL
+        m.particleFlags &= ~MarioConstants.PARTICLE_DUST
+    }
+
+    return cancel
 }

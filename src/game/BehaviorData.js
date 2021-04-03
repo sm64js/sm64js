@@ -64,7 +64,11 @@ import { gShallowWaterWaveDropletParams,
          gShallowWaterSplashDropletParams,
          bhv_shallow_water_splash_init,
          bhv_idle_water_wave_loop,
-         bhv_wave_trail_shrink } from "./behaviors/water_splashes_and_waves.inc"
+         bhv_wave_trail_shrink,
+         bhv_water_splash_spawn_droplets,
+         bhv_water_droplet_loop,
+         bhv_water_droplet_splash_init,
+         bhv_bubble_splash_init } from "./behaviors/water_splashes_and_waves.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -510,13 +514,6 @@ export const bhvButterfly = [
 ]
 
 
-import {
-    bhv_water_splash_spawn_droplets,
-    bhv_water_droplet_loop,
-    bhv_water_droplet_splash_init,
-    bhv_bubble_splash_init
-} from "./behaviors/water_splashes_and_waves.inc"
-
 // The large splash Mario makes when he jumps into a pool of water.
 export const bhvWaterSplash = [
     ['BEGIN', OBJ_LIST_DEFAULT],
@@ -654,7 +651,7 @@ export const bhvWaveTrail = [
     ['BEGIN', OBJ_LIST_DEFAULT],
     ['OR_INT', oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE],
     ['PARENT_BIT_CLEAR', oActiveParticleFlags, ACTIVE_PARTICLE_WAVE_TRAIL],
-    // Wave trail - commo],
+    // Wave trail - common
     ['SET_FLOAT', oFaceAnglePitch, 0],
     ['SET_FLOAT', oFaceAngleYaw, 0],
     ['SET_FLOAT', oFaceAngleRoll, 0],

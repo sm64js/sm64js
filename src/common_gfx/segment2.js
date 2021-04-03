@@ -2,8 +2,6 @@ import * as Gbi from "../include/gbi"
 
 const canvas = document.querySelector('#gameCanvas')
 
-export const texture_shadow_quarter_circle = []
-
 export const matrix_identity = [
     [1.0, 0.0, 0.0, 0.0],
     [0.0, 1.0, 0.0, 0.0],
@@ -37,25 +35,31 @@ export const texture_hud_char_F = []
 export const texture_hud_char_G = []
 export const texture_hud_char_H = []
 export const texture_hud_char_I = []
+export const texture_hud_char_J = []
 export const texture_hud_char_K = []
 export const texture_hud_char_L = []
 export const texture_hud_char_M = []
 export const texture_hud_char_N = []
 export const texture_hud_char_O = []
 export const texture_hud_char_P = []
+export const texture_hud_char_Q = []
 export const texture_hud_char_R = []
 export const texture_hud_char_S = []
 export const texture_hud_char_T = []
 export const texture_hud_char_U = []
+export const texture_hud_char_V = []
 export const texture_hud_char_W = []
+export const texture_hud_char_X = []
 export const texture_hud_char_Y = []
+export const texture_hud_char_Z = []
 export const texture_hud_char_apostrophe = []
 export const texture_hud_char_double_quote = []
-export const texture_hud_char_question = []
 export const texture_hud_char_multiply = []
 export const texture_hud_char_coin = []
 export const texture_hud_char_mario_head = []
 export const texture_hud_char_star = []
+export const texture_hud_char_decimal_point = []
+export const texture_hud_char_beta_key = []
 export const texture_credits_char_3 = []
 export const texture_credits_char_4 = []
 export const texture_credits_char_6 = []
@@ -86,9 +90,6 @@ export const texture_credits_char_X = []
 export const texture_credits_char_Y = []
 export const texture_credits_char_Z = []
 export const texture_credits_char_period = []
-export const texture_font_char_jp_long_vowel = []
-export const texture_font_char_eu_colon = []
-export const texture_font_char_EU_slash = []
 export const texture_font_char_us_0 = []
 export const texture_font_char_us_1 = []
 export const texture_font_char_us_2 = []
@@ -186,7 +187,18 @@ export const texture_hud_char_lakitu = []
 export const texture_hud_char_no_camera = []
 export const texture_hud_char_arrow_up = []
 export const texture_hud_char_arrow_down = []
-
+export const texture_ia8_up_arrow = []
+export const texture_shadow_quarter_circle = []
+export const texture_shadow_quarter_square = []
+export const texture_transition_bowser_half = []
+export const texture_transition_circle_half = []
+export const texture_transition_mario = []
+export const texture_transition_star_half = []
+export const texture_waterbox_jrb_water = []
+export const texture_waterbox_lava = []
+export const texture_waterbox_mist = []
+export const texture_waterbox_unknown_water = []
+export const texture_waterbox_water = []
 
 export const main_hud_camera_lut = [
 	texture_hud_char_camera, texture_hud_char_mario_head, texture_hud_char_lakitu, texture_hud_char_no_camera,
@@ -364,9 +376,3 @@ export const dl_waterbox_end = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
 	Gbi.gsSPEndDisplayList(),
 ]
-
-export const texture_waterbox_water = []
-export const texture_waterbox_lava = []
-
-export const texture_transition_star_half = []
-

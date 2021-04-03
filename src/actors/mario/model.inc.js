@@ -1,5 +1,18 @@
 import * as Gbi from "../../include/gbi"
 
+export const mario_texture_eyes_closed_unused1 = []
+export const mario_texture_eyes_closed_unused2 = []
+export const mario_texture_eyes_dead = []
+export const mario_texture_eyes_down = []
+export const mario_texture_eyes_left = []
+export const mario_texture_eyes_right = []
+export const mario_texture_eyes_up = []
+export const mario_texture_metal = []
+export const mario_texture_metal_wings_half_1 = []
+export const mario_texture_metal_wings_half_2 = []
+export const mario_texture_wings_half_1 = []
+export const mario_texture_wings_half_2 = []
+
 export const mario_texture_yellow_button = []
 
 export const mario_texture_m_logo = []

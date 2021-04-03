@@ -1,9 +1,18 @@
 import { atan2s, guOrtho } from "../engine/math_util"
 import  * as Gbi from "../include/gbi"
 import { dl_skybox_begin, dl_skybox_tile_tex_settings, dl_skybox_end, dl_draw_quad_verts_0123 } from "../common_gfx/segment2"
-import { water_skybox_ptrlist } from "../textures/skyboxes/water_skybox"
-import { ssl_skybox_ptrlist } from "../textures/skyboxes/ssl_skybox"
-import { ccm_skybox_ptrlist } from "../textures/skyboxes/ccm_skybox"
+
+import { bbh_skybox_ptrlist,
+         bidw_skybox_ptrlist,
+         bitfs_skybox_ptrlist,
+         bits_skybox_ptrlist,
+         ccm_skybox_ptrlist,
+         cloud_floor_skybox_ptrlist,
+         clouds_skybox_ptrlist,
+         ssl_skybox_ptrlist,
+         water_skybox_ptrlist,
+         wdw_skybox_ptrlist } from "../textures/skyboxes"
+
 import { make_vertex } from "./GeoMisc"
 
 const canvas = document.querySelector('#gameCanvas')
@@ -23,16 +32,16 @@ class SkyBox {
         }
 
         this.sSkyboxTextures = [
-            water_skybox_ptrlist,
-            null, //bitfs_skybox_ptrlist,
-            null, //wdw_skybox_ptrlist,
-            null, //cloud_floor_skybox_ptrlist,
-            ccm_skybox_ptrlist,
-            ssl_skybox_ptrlist,
-            null, //bbh_skybox_ptrlist,
-            null, //bidw_skybox_ptrlist,
-            null, //clouds_skybox_ptrlist,
-            null, //bits_skybox_ptrlist,
+            water_skybox_ptrlist,        // BACKGROUND_OCEAN_SKY       = 0
+            bitfs_skybox_ptrlist,        // BACKGROUND_FLAMING_SKY     = 1
+            wdw_skybox_ptrlist,          // BACKGROUND_UNDERWATER_CITY = 2
+            cloud_floor_skybox_ptrlist,  // BACKGROUND_BELOW_CLOUDS    = 3
+            ccm_skybox_ptrlist,          // BACKGROUND_SNOW_MOUNTAINS  = 4
+            ssl_skybox_ptrlist,          // BACKGROUND_DESERT          = 5
+            bbh_skybox_ptrlist,          // BACKGROUND_HAUNTED         = 6
+            bidw_skybox_ptrlist,         // BACKGROUND_GREEN_SKY       = 7
+            clouds_skybox_ptrlist,       // BACKGROUND_ABOVE_CLOUDS    = 8
+            bits_skybox_ptrlist,         // BACKGROUND_PURPLE_SKY      = 9
         ]
 
         this.sSkyboxColors = [

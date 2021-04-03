@@ -54,7 +54,7 @@ class BehaviorCommands {
     SET_RANDOM_FLOAT(args) {return this.set_random_float({field: args[0], minimum: args[1], range: args[2]})}
     SUM_FLOAT(args) {return this.sum_float({dest: args[0], value1: args[1], value2: args[2]})}
     SPAWN_CHILD(args) {return this.spawn_child_with_param({model: args[0], behavior: args[1], bhvParam: 0})}
-    SPAWN_WATER_DROPLET(args) {return this.cmd_spawn_water_droplet({params: args[1]})}
+    SPAWN_WATER_DROPLET(args) {return this.cmd_spawn_water_droplet({params: args[0]})}
 
 
     random_sign() {
@@ -162,7 +162,7 @@ class BehaviorCommands {
 
 // cmds
     cmd_spawn_water_droplet(args) {
-        spawn_water_droplet(gCurrentObject, args.params)
+        spawn_water_droplet(ObjListProc.gCurrentObject, args.params)
 
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE

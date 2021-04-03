@@ -1290,7 +1290,7 @@ export const mario_execute_moving_action = (m) => {
     let cancel
 
     if (check_common_moving_cancels(m)) {
-        return 1;
+        return 1
     }
     
     //TODO update quicksand

@@ -1,9 +1,15 @@
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import * as Mario from "./Mario"
-import { atan2s } from "../engine/math_util"
-import { int16 } from "../utils"
+import { atan2s,
+         vec3f_copy,
+         vec3s_set } from "../engine/math_util"
+import { s16 } from "../utils"
 import { ceil } from "mathjs"
 import { SURFACE_HANGABLE } from "../include/surface_terrains"
+import { play_sound } from "../audio/external"
+import { SOUND_ACTION_METAL_BONK,
+         SOUND_ACTION_BONK,
+         SOUND_ACTION_HIT } from "../include/sounds"
 
 const should_strengthen_gravity_for_jump_ascent = (m) => {
 
@@ -34,15 +40,16 @@ const apply_gravity = (m) => {
 export const mario_bonk_reflection = (m, negateSpeed) => {
     if (m.wall) {
         const wallAngle = atan2s(m.wall.normal.z, m.wall.normal.x)
-        let angleDiff = int16(m.faceAngle[1] - wallAngle)
-        m.faceAngle[1] = int16(wallAngle - angleDiff)
-        //play sound
+        let angleDiff = s16(m.faceAngle[1] - wallAngle)
+        m.faceAngle[1] = s16(wallAngle - angleDiff)
+        play_sound((m.flags & Mario.MARIO_METAL_CAP) ? SOUND_ACTION_METAL_BONK : SOUND_ACTION_BONK,
+                   m.marioObj.header.gfx.cameraToObject)
     } else {
-        //play sound
+        play_sound(SOUND_ACTION_HIT, m.marioObj.header.gfx.cameraToObject);
     }
 
     if (negateSpeed) Mario.set_forward_vel(m, -m.forwardVel)
-    else m.faceAngle[1] += 0x8000
+    else m.faceAngle[1] = s16(m.faceAngle[1] + 0x8000)
 }
 
 export const stop_and_set_height_to_floor = (m) => {
@@ -115,7 +122,7 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
 
         m.pos[1] = nextPos[1]
         if (window.cheats.bouncyOobWalls) {
-            m.faceAngle[1] = int16(m.faceAngle[1] + 0x8000)
+            m.faceAngle[1] = s16(m.faceAngle[1] + 0x8000)
             Mario.set_forward_vel(m, 1.5 * m.forwardVel)
         }
         return Mario.AIR_STEP_HIT_WALL
@@ -173,7 +180,7 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
     if (upperWall || lowerWall) {
         m.wall = upperWall ? upperWall : lowerWall
 
-        let wallDYaw = int16(atan2s(m.wall.normal.z, m.wall.normal.x) - m.faceAngle[1])
+        let wallDYaw = s16(atan2s(m.wall.normal.z, m.wall.normal.x) - m.faceAngle[1])
 
         if (wallDYaw < -0x6000 || wallDYaw > 0x6000) {
             m.flags |= Mario.MARIO_UNKNOWN_30
@@ -258,7 +265,7 @@ const perform_ground_quarter_step = (m, nextPos) => {
             return Mario.GROUND_STEP_NONE;
         }
 
-        return Mario.GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS;
+        return Mario.GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS
     }
 
     return Mario.GROUND_STEP_NONE
@@ -266,24 +273,28 @@ const perform_ground_quarter_step = (m, nextPos) => {
 }
 
 export const perform_ground_step = (m) => {
-
+    let i
     let stepResult
+    const intendedPos = []
 
-    for (let i = 0; i < 4; i++) {
-        const intendedPos = [
-            m.pos[0] + m.floor.normal.y * (m.vel[0] / 4.0),
-            m.pos[1],
-            m.pos[2] + m.floor.normal.y * (m.vel[2] / 4.0)
-        ]
+    for (i = 0; i < 4; i++) {
+        intendedPos[0] = m.pos[0] + m.floor.normal.y * (m.vel[0] / 4.0)
+        intendedPos[2] = m.pos[2] + m.floor.normal.y * (m.vel[2] / 4.0)
+        intendedPos[1] = m.pos[1]
 
         stepResult = perform_ground_quarter_step(m, intendedPos)
-        if (stepResult == Mario.GROUND_STEP_LEFT_GROUND || stepResult == Mario.GROUND_STEP_HIT_WALL_STOP_QSTEPS) break
+        if (stepResult == Mario.GROUND_STEP_LEFT_GROUND || stepResult == Mario.GROUND_STEP_HIT_WALL_STOP_QSTEPS) {
+            break
+        }
     }
 
-    m.marioObj.header.gfx.pos = [...m.pos]
-    m.marioObj.header.gfx.angle = [0, m.faceAngle[1], 0]
+    m.terrainSoundAddend = Mario.mario_get_terrain_sound_addend(m)
+    vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
+    vec3s_set(m.marioObj.header.gfx.angle, 0, m.faceAngle[1], 0)
 
-    if (stepResult == Mario.GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS) stepResult = Mario.GROUND_STEP_HIT_WALL
+    if (stepResult == Mario.GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS) {
+        stepResult = Mario.GROUND_STEP_HIT_WALL
+    }
 
     return stepResult
 }

@@ -505,9 +505,9 @@ const act_ledge_climb_fast = (m) => {
 
     update_ledge_climb(m, Mario.MARIO_ANIM_FAST_LEDGE_GRAB, Mario.ACT_IDLE)
 
-    // if (m->marioObj->header.gfx.unk38.animFrame == 8) {
-    //     play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
-    // }
+    if (m.marioObj.header.gfx.unk38.animFrame == 8) {
+        Mario.play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+    }
     update_ledge_climb_camera(m)
 
     return 0

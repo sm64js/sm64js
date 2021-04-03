@@ -8,11 +8,48 @@ import { set_mario_action,
          set_water_plunge_action,
          is_anim_past_end,
          mario_floor_is_slippery,
-         is_anim_at_end                 } from "./Mario"
+         play_mario_sound,
+         play_mario_jump_sound,
+         play_mario_landing_sound,
+         play_mario_heavy_landing_sound,
+         play_sound_if_no_flag,
+         is_anim_at_end,
+         MARIO_MARIO_SOUND_PLAYED       } from "./Mario"
 import { mario_drop_held_object,
          mario_check_object_grab        } from "./Interaction"
 import { perform_air_step,
          mario_bonk_reflection          } from "./MarioStep"
+import { play_sound } from "../audio/external"
+import { SOUND_MARIO_DOH,
+         SOUND_MARIO_UH,
+         SOUND_MARIO_WAH2,
+         SOUND_ACTION_THROW,
+         SOUND_ACTION_TERRAIN_JUMP,
+         SOUND_MARIO_WAAAOOOW,
+         SOUND_MARIO_HOOHOO,
+         SOUND_MARIO_YAHOO,
+         SOUND_MARIO_YAH_WAH_HOO,
+         SOUND_MARIO_PUNCH_HOO,
+         SOUND_MARIO_ON_FIRE,
+         SOUND_ACTION_SPIN,
+         SOUND_MARIO_ATTACKED,
+         SOUND_MARIO_OOOF2,
+         SOUND_ACTION_SIDE_FLIP_UNK,
+         SOUND_MARIO_HERE_WE_GO,
+         SOUND_ACTION_TWIRL,
+         SOUND_ACTION_UNKNOWN432,
+         SOUND_MARIO_GROUND_POUND_WAH,
+         SOUND_ACTION_TERRAIN_HEAVY_LANDING,
+         SOUND_MOVING_LAVA_BURN,
+         SOUND_GENERAL_BOING1,
+         SOUND_GENERAL_BOING2,
+         SOUND_ACTION_METAL_BONK,
+         SOUND_ACTION_BONK,
+         SOUND_ACTION_HIT,
+         SOUND_MOVING_FLYING,
+         SOUND_ACTION_FLYING_FAST,
+         SOUND_MARIO_YAHOO_WAHA_YIPPEE,
+         SOUND_ACTION_TERRAIN_LANDING   } from "../include/sounds"
 import { approach_number,
          atan2s,
          approach_f32,
@@ -204,7 +241,7 @@ import { INT_STATUS_MARIO_DROP_OBJECT,
 const play_flip_sounds = (m, frame1, frame2, frame3) => {
     let animFrame = m.marioObj.header.gfx.unk38.animFrame
     if (animFrame == frame1 || animFrame == frame2 || animFrame == frame3) {
-        // play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
+        play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
     }
 }
 
@@ -213,7 +250,7 @@ const play_far_fall_sound = (m) => {
     if (!(action & ACT_FLAG_INVULNERABLE) && action != ACT_TWIRLING && action != ACT_FLYING
         && !(m.flags & MARIO_UNKNOWN_18)) {
         if (m.peakHeight - m.pos[1] > 1150.0) {
-            // play_sound(SOUND_MARIO_WAAAOOOW, m.marioObj.header.gfx.cameraToObject)
+            play_sound(SOUND_MARIO_WAAAOOOW, m.marioObj.header.gfx.cameraToObject)
             m.flags |= MARIO_UNKNOWN_18
         }
     }
@@ -221,9 +258,9 @@ const play_far_fall_sound = (m) => {
 
 export const play_knockback_sound = (m) => {
     if (m.actionArg == 0 && (m.forwardVel <= -28.0 || m.forwardVel >= 28.0)) {
-        // play_sound_if_no_flag(m, SOUND_MARIO_DOH, MARIO_MARIO_SOUND_PLAYED)
+        play_sound_if_no_flag(m, SOUND_MARIO_DOH, MARIO_MARIO_SOUND_PLAYED)
     } else {
-        // play_sound_if_no_flag(m, SOUND_MARIO_UH, MARIO_MARIO_SOUND_PLAYED)
+        play_sound_if_no_flag(m, SOUND_MARIO_UH, MARIO_MARIO_SOUND_PLAYED)
     }
 }
 
@@ -238,7 +275,7 @@ export const lava_boost_on_wall = (m) => {
         m.hurtCounter += (m.flags & MARIO_CAP_ON_HEAD) ? 12 : 18
     }
 
-    // play_sound(SOUND_MARIO_ON_FIRE, m.marioObj.header.gfx.cameraToObject)
+    play_sound(SOUND_MARIO_ON_FIRE, m.marioObj.header.gfx.cameraToObject)
     update_mario_sound_and_camera(m)
     return drop_and_set_mario_action(m, ACT_LAVA_BOOST, 1)
 }
@@ -261,13 +298,13 @@ export const check_fall_damage = (m, hardFallAction) => {
             if (fallHeight > 3000.0) {
                 m.hurtCounter += (m.flags & MARIO_CAP_ON_HEAD) ? 16 : 24
                 Camera.set_camera_shake_from_hit(Camera.SHAKE_FALL_DAMAGE)
-                // play_sound(SOUND_MARIO_ATTACKED, m.marioObj.header.gfx.cameraToObject)
+                play_sound(SOUND_MARIO_ATTACKED, m.marioObj.header.gfx.cameraToObject)
                 return drop_and_set_mario_action(m, hardFallAction, 4)
             } else if (fallHeight > damageHeight && !mario_floor_is_slippery(m)) {
                 m.hurtCounter += (m.flags & MARIO_CAP_ON_HEAD) ? 8 : 12
                 m.squishTimer = 30
                 Camera.set_camera_shake_from_hit(Camera.SHAKE_FALL_DAMAGE)
-                // play_sound(SOUND_MARIO_ATTACKED, m.marioObj.header.gfx.cameraToObject)
+                play_sound(SOUND_MARIO_ATTACKED, m.marioObj.header.gfx.cameraToObject)
             }
         }
     }
@@ -300,7 +337,7 @@ export const should_get_stuck_in_ground = (m) => {
 
 export const check_fall_damage_or_get_stuck = (m, hardFallAction) => {
     if (should_get_stuck_in_ground(m)) {
-        // play_sound(SOUND_MARIO_OOOF2, m.marioObj.header.gfx.cameraToObject)
+        play_sound(SOUND_MARIO_OOOF2, m.marioObj.header.gfx.cameraToObject)
         m.particleFlags |= PARTICLE_MIST_CIRCLE
         drop_and_set_mario_action(m, ACT_FEET_STUCK_IN_GROUND, 0)
         return 1
@@ -607,7 +644,7 @@ export const act_jump = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 
-    // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
     common_air_action_step(m, ACT_JUMP_LAND, MARIO_ANIM_SINGLE_JUMP,
                            AIR_STEP_CHECK_LEDGE_GRAB | AIR_STEP_CHECK_HANG)
     return 0
@@ -626,7 +663,7 @@ export const act_double_jump = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 
-    // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_HOOHOO)
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_HOOHOO)
     common_air_action_step(m, ACT_DOUBLE_JUMP_LAND, animation,
                            AIR_STEP_CHECK_LEDGE_GRAB | AIR_STEP_CHECK_HANG)
     return 0
@@ -645,7 +682,7 @@ export const act_triple_jump = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 
-    // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
 
     common_air_action_step(m, ACT_TRIPLE_JUMP_LAND, MARIO_ANIM_TRIPLE_JUMP, 0)
     play_flip_sounds(m, 2, 8, 20)
@@ -657,7 +694,7 @@ export const act_backflip = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 
-    // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_YAH_WAH_HOO)
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_YAH_WAH_HOO)
     common_air_action_step(m, ACT_BACKFLIP_LAND, MARIO_ANIM_BACKFLIP, 0)
     play_flip_sounds(m, 2, 3, 17)
     return 0
@@ -703,7 +740,7 @@ export const act_hold_jump = (m) => {
         return drop_and_set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 
-    // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
     common_air_action_step(m, ACT_HOLD_JUMP_LAND, MARIO_ANIM_JUMP_WITH_LIGHT_OBJ,
                            AIR_STEP_CHECK_LEDGE_GRAB)
     return 0
@@ -742,7 +779,7 @@ export const act_side_flip = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 
-    // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
 
     if (common_air_action_step(m, ACT_SIDE_FLIP_LAND, MARIO_ANIM_SLIDEFLIP, AIR_STEP_CHECK_LEDGE_GRAB)
         != AIR_STEP_GRABBED_LEDGE) {
@@ -750,7 +787,7 @@ export const act_side_flip = (m) => {
     }
 
     if (m.marioObj.header.gfx.unk38.animFrame == 6) {
-        // play_sound(SOUND_ACTION_SIDE_FLIP_UNK, m.marioObj.header.gfx.cameraToObject)
+        play_sound(SOUND_ACTION_SIDE_FLIP_UNK, m.marioObj.header.gfx.cameraToObject)
     }
 
     return 0
@@ -765,7 +802,7 @@ export const act_wall_kick_air = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 
-    // play_mario_jump_sound(m)
+    play_mario_jump_sound(m)
     common_air_action_step(m, ACT_JUMP_LAND, MARIO_ANIM_SLIDEJUMP, AIR_STEP_CHECK_LEDGE_GRAB)
     return 0
 }
@@ -778,10 +815,10 @@ export const act_long_jump = (m) => {
         animation = MARIO_ANIM_SLOW_LONGJUMP
     }
 
-    // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_YAHOO)
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_YAHOO)
 
     if (m.floor.type == SURFACE_VERTICAL_WIND && m.actionState == 0) {
-        // play_sound(SOUND_MARIO_HERE_WE_GO, m.marioObj.header.gfx.cameraToObject)
+        play_sound(SOUND_MARIO_HERE_WE_GO, m.marioObj.header.gfx.cameraToObject)
         m.actionState = 1
     }
 
@@ -790,7 +827,7 @@ export const act_long_jump = (m) => {
 }
 
 export const act_riding_shell_air = (m) => {
-    // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
     set_mario_animation(m, MARIO_ANIM_JUMP_RIDING_SHELL)
 
     update_air_without_turn(m)
@@ -832,7 +869,7 @@ export const act_twirling = (m) => {
     }
 
     if (startTwirlYaw > m.twirlYaw) {
-        // play_sound(SOUND_ACTION_TWIRL, m.marioObj.header.gfx.cameraToObject)
+        play_sound(SOUND_ACTION_TWIRL, m.marioObj.header.gfx.cameraToObject)
     }
 
     update_lava_boost_or_twirling(m)
@@ -857,9 +894,9 @@ export const act_twirling = (m) => {
 
 export const act_dive = (m) => {
     if (m.actionArg == 0) {
-        // play_mario_sound(m, SOUND_ACTION_THROW, SOUND_MARIO_HOOHOO)
+        play_mario_sound(m, SOUND_ACTION_THROW, SOUND_MARIO_HOOHOO)
     } else {
-        // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
+        play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
     }
 
     set_mario_animation(m, MARIO_ANIM_DIVE)
@@ -886,7 +923,7 @@ export const act_dive = (m) => {
 
         case AIR_STEP_LANDED:
             if (should_get_stuck_in_ground(m) && m.faceAngle[0] == -0x2AAA) {
-                // play_sound(SOUND_MARIO_OOOF2, m.marioObj.header.gfx.cameraToObject)
+                play_sound(SOUND_MARIO_OOOF2, m.marioObj.header.gfx.cameraToObject)
                 m.particleFlags |= PARTICLE_MIST_CIRCLE
                 drop_and_set_mario_action(m, ACT_HEAD_STUCK_IN_GROUND, 0)
             } else if (!check_fall_damage(m, ACT_HARD_FORWARD_GROUND_KB)) {
@@ -924,7 +961,7 @@ export const act_air_throw = (m) => {
         mario_throw_held_object(m)
     }
 
-    // play_sound_if_no_flag(m, SOUND_MARIO_WAH2, MARIO_MARIO_SOUND_PLAYED)
+    play_sound_if_no_flag(m, SOUND_MARIO_WAH2, MARIO_MARIO_SOUND_PLAYED)
     set_mario_animation(m, MARIO_ANIM_THROW_LIGHT_OBJECT)
     update_air_without_turn(m)
 
@@ -952,7 +989,7 @@ export const act_water_jump = (m) => {
         mario_set_forward_vel(m, 15.0)
     }
 
-    // play_mario_sound(m, SOUND_ACTION_UNKNOWN432, 0)
+    play_mario_sound(m, SOUND_ACTION_UNKNOWN432, 0)
     set_mario_animation(m, MARIO_ANIM_SINGLE_JUMP)
 
     switch (perform_air_step(m, AIR_STEP_CHECK_LEDGE_GRAB)) {
@@ -988,7 +1025,7 @@ export const act_hold_water_jump = (m) => {
         mario_set_forward_vel(m, 15.0)
     }
 
-    // play_mario_sound(m, SOUND_ACTION_UNKNOWN432, 0)
+    play_mario_sound(m, SOUND_ACTION_UNKNOWN432, 0)
     set_mario_animation(m, MARIO_ANIM_JUMP_WITH_LIGHT_OBJ)
 
     switch (perform_air_step(m, 0)) {
@@ -1014,7 +1051,7 @@ export const act_steep_jump = (m) => {
         return set_mario_action(m, ACT_DIVE, 0)
     }
 
-    // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
     mario_set_forward_vel(m, 0.98 * m.forwardVel)
 
     switch (perform_air_step(m, 0)) {
@@ -1043,7 +1080,7 @@ export const act_ground_pound = (m) => {
     let stepResult
     let yOffset
 
-    // play_sound_if_no_flag(m, SOUND_ACTION_THROW, MARIO_ACTION_SOUND_PLAYED)
+    play_sound_if_no_flag(m, SOUND_ACTION_THROW, MARIO_ACTION_SOUND_PLAYED)
 
     if (m.actionState == 0) {
         if (m.actionTimer < 10) {
@@ -1061,12 +1098,12 @@ export const act_ground_pound = (m) => {
         set_mario_animation(m, m.actionArg == 0 ? MARIO_ANIM_START_GROUND_POUND
                                                  : MARIO_ANIM_TRIPLE_JUMP_GROUND_POUND)
         if (m.actionTimer == 0) {
-            // play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
+            play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
         }
 
         m.actionTimer++
         if (m.actionTimer >= m.marioObj.header.gfx.unk38.curAnim.unk08 + 4) {
-            // play_sound(SOUND_MARIO_GROUND_POUND_WAH, m.marioObj.header.gfx.cameraToObject)
+            play_sound(SOUND_MARIO_GROUND_POUND_WAH, m.marioObj.header.gfx.cameraToObject)
             m.actionState = 1
         }
     } else {
@@ -1075,11 +1112,11 @@ export const act_ground_pound = (m) => {
         stepResult = perform_air_step(m, 0)
         if (stepResult == AIR_STEP_LANDED) {
             if (should_get_stuck_in_ground(m)) {
-                // play_sound(SOUND_MARIO_OOOF2, m.marioObj.header.gfx.cameraToObject)
+                play_sound(SOUND_MARIO_OOOF2, m.marioObj.header.gfx.cameraToObject)
                 m.particleFlags |= PARTICLE_MIST_CIRCLE
                 set_mario_action(m, ACT_BUTT_STUCK_IN_GROUND, 0)
             } else {
-                // play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_HEAVY_LANDING)
+                play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_HEAVY_LANDING)
                 if (!check_fall_damage(m, ACT_HARD_BACKWARD_GROUND_KB)) {
                     m.particleFlags |= PARTICLE_MIST_CIRCLE | PARTICLE_HORIZONTAL_STAR
                     set_mario_action(m, ACT_GROUND_POUND_LAND, 0)
@@ -1101,17 +1138,17 @@ export const act_ground_pound = (m) => {
 }
 
 export const act_burning_jump = (m) => {
-    // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, m.actionArg == 0 ? 0 : -1)
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, m.actionArg == 0 ? 0 : -1)
     mario_set_forward_vel(m, m.forwardVel)
 
     if (perform_air_step(m, 0) == AIR_STEP_LANDED) {
-        // play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+        play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
         set_mario_action(m, ACT_BURNING_GROUND, 0)
     }
 
     set_mario_animation(m, m.actionArg == 0 ? MARIO_ANIM_SINGLE_JUMP : MARIO_ANIM_FIRE_LAVA_BURN)
     m.particleFlags |= PARTICLE_FIRE
-    // play_sound(SOUND_MOVING_LAVA_BURN, m.marioObj.header.gfx.cameraToObject)
+    play_sound(SOUND_MOVING_LAVA_BURN, m.marioObj.header.gfx.cameraToObject)
 
     m.marioObj.rawData[oMarioBurnTimer] += 3
 
@@ -1126,7 +1163,7 @@ export const act_burning_fall = (m) => {
     mario_set_forward_vel(m, m.forwardVel)
 
     if (perform_air_step(m, 0) == AIR_STEP_LANDED) {
-        // play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+        play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
         set_mario_action(m, ACT_BURNING_GROUND, 0)
     }
 
@@ -1162,8 +1199,8 @@ export const act_crazy_box_bounce = (m) => {
                 break
         }
 
-        // play_sound(minSpeed < 40.0 ? SOUND_GENERAL_BOING1 : SOUND_GENERAL_BOING2,
-        //            m.marioObj.header.gfx.cameraToObject)
+        play_sound(minSpeed < 40.0 ? SOUND_GENERAL_BOING1 : SOUND_GENERAL_BOING2,
+                   m.marioObj.header.gfx.cameraToObject)
 
         if (m.forwardVel < minSpeed) {
             mario_set_forward_vel(m, minSpeed)
@@ -1172,7 +1209,7 @@ export const act_crazy_box_bounce = (m) => {
         m.actionTimer = 1
     }
 
-    // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
     set_mario_animation(m, MARIO_ANIM_DIVE)
 
     update_air_without_turn(m)
@@ -1293,7 +1330,7 @@ export const act_thrown_backward = (m) => {
         landAction = ACT_BACKWARD_GROUND_KB
     }
 
-    // play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_MARIO_SOUND_PLAYED)
+    play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_MARIO_SOUND_PLAYED)
 
     common_air_knockback_step(m, landAction, ACT_HARD_BACKWARD_GROUND_KB, 0x0002, m.forwardVel)
 
@@ -1311,7 +1348,7 @@ export const act_thrown_forward = (m) => {
         landAction = ACT_FORWARD_GROUND_KB
     }
 
-    // play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_MARIO_SOUND_PLAYED)
+    play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_MARIO_SOUND_PLAYED)
 
     if (common_air_knockback_step(m, landAction, ACT_HARD_FORWARD_GROUND_KB, 0x002D, m.forwardVel)
         == AIR_STEP_NONE) {
@@ -1424,7 +1461,7 @@ export const act_forward_rollout = (m) => {
         m.actionState = 1
     }
 
-    // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
 
     update_air_without_turn(m)
 
@@ -1432,7 +1469,7 @@ export const act_forward_rollout = (m) => {
         case AIR_STEP_NONE:
             if (m.actionState == 1) {
                 if (set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING) == 4) {
-                    // play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
+                    play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
                 }
             } else {
                 set_mario_animation(m, MARIO_ANIM_GENERAL_FALL)
@@ -1441,7 +1478,7 @@ export const act_forward_rollout = (m) => {
 
         case AIR_STEP_LANDED:
             set_mario_action(m, ACT_FREEFALL_LAND_STOP, 0)
-            // play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
             break
 
         case AIR_STEP_HIT_WALL:
@@ -1465,7 +1502,7 @@ export const act_backward_rollout = (m) => {
         m.actionState = 1
     }
 
-    // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
 
     update_air_without_turn(m)
 
@@ -1473,7 +1510,7 @@ export const act_backward_rollout = (m) => {
         case AIR_STEP_NONE:
             if (m.actionState == 1) {
                 if (set_mario_animation(m, MARIO_ANIM_BACKWARD_SPINNING) == 4) {
-                    // play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
+                    play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
                 }
             } else {
                 set_mario_animation(m, MARIO_ANIM_GENERAL_FALL)
@@ -1482,7 +1519,7 @@ export const act_backward_rollout = (m) => {
 
         case AIR_STEP_LANDED:
             set_mario_action(m, ACT_FREEFALL_LAND_STOP, 0)
-            // play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
             break
 
         case AIR_STEP_HIT_WALL:
@@ -1515,7 +1552,7 @@ export const act_butt_slide_air = (m) => {
             } else {
                 set_mario_action(m, ACT_BUTT_SLIDE, 0)
             }
-            // play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
             break
 
         case AIR_STEP_HIT_WALL:
@@ -1554,7 +1591,7 @@ export const act_hold_butt_slide_air = (m) => {
             } else {
                 set_mario_action(m, ACT_HOLD_BUTT_SLIDE, 0)
             }
-            // play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
             break
 
         case AIR_STEP_HIT_WALL:
@@ -1577,7 +1614,7 @@ export const act_hold_butt_slide_air = (m) => {
 }
 
 export const act_lava_boost = (m) => {
-    // play_sound_if_no_flag(m, SOUND_MARIO_ON_FIRE, MARIO_MARIO_SOUND_PLAYED)
+    play_sound_if_no_flag(m, SOUND_MARIO_ON_FIRE, MARIO_MARIO_SOUND_PLAYED)
 
     if (!(m.input & INPUT_NONZERO_ANALOG)) {
         m.forwardVel = approach_f32(m.forwardVel, 0.0, 0.35, 0.35)
@@ -1593,9 +1630,9 @@ export const act_lava_boost = (m) => {
                     m.hurtCounter += (m.flags & MARIO_CAP_ON_HEAD) ? 12 : 18
                 }
                 m.vel[1] = 84.0
-                // play_sound(SOUND_MARIO_ON_FIRE, m.marioObj.header.gfx.cameraToObject)
+                play_sound(SOUND_MARIO_ON_FIRE, m.marioObj.header.gfx.cameraToObject)
             } else {
-                // play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
+                play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
                 if (m.actionState < 2 && m.vel[1] < 0.0) {
                     m.vel[1] = -m.vel[1] * 0.4
                     mario_set_forward_vel(m, m.forwardVel * 0.5)
@@ -1620,7 +1657,7 @@ export const act_lava_boost = (m) => {
         && m.vel[1] > 0.0) {
         m.particleFlags |= PARTICLE_FIRE
         if (m.actionState == 0) {
-            // play_sound(SOUND_MOVING_LAVA_BURN, m.marioObj.header.gfx.cameraToObject)
+            play_sound(SOUND_MOVING_LAVA_BURN, m.marioObj.header.gfx.cameraToObject)
         }
     }
 
@@ -1634,7 +1671,7 @@ export const act_lava_boost = (m) => {
 
 export const act_slide_kick = (m) => {
     if (m.actionState == 0 && m.actionTimer == 0) {
-        // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_HOOHOO)
+        play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_HOOHOO)
         set_mario_animation(m, MARIO_ANIM_SLIDE_KICK)
     }
 
@@ -1662,7 +1699,7 @@ export const act_slide_kick = (m) => {
             } else {
                 set_mario_action(m, ACT_SLIDE_KICK_SLIDE, 0)
             }
-            // play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
             break
 
         case AIR_STEP_HIT_WALL:
@@ -1687,7 +1724,7 @@ export const act_jump_kick = (m) => {
     let animFrame
 
     if (m.actionState == 0) {
-        // play_sound_if_no_flag(m, SOUND_MARIO_PUNCH_HOO, MARIO_ACTION_SOUND_PLAYED)
+        play_sound_if_no_flag(m, SOUND_MARIO_PUNCH_HOO, MARIO_ACTION_SOUND_PLAYED)
         m.marioObj.header.gfx.unk38.animID = -1
         set_mario_animation(m, MARIO_ANIM_AIR_KICK)
         m.actionState = 1
@@ -1725,7 +1762,7 @@ export const act_shot_from_cannon = (m) => {
 
     mario_set_forward_vel(m, m.forwardVel)
 
-    // play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED)
+    play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED)
 
     switch (perform_air_step(m, 0)) {
         case AIR_STEP_NONE:
@@ -1799,7 +1836,7 @@ export const act_flying = (m) => {
         } else {
             set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING_FLIP)
             if (m.marioObj.header.gfx.unk38.animFrame == 1) {
-                // play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
+                play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
             }
         }
 
@@ -1842,16 +1879,16 @@ export const act_flying = (m) => {
                     m.vel[1] = 0.0
                 }
 
-                // play_sound((m.flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_BONK
-                //                                         : SOUND_ACTION_BONK,
-                //            m.marioObj.header.gfx.cameraToObject)
+                play_sound((m.flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_BONK
+                                                       : SOUND_ACTION_BONK,
+                           m.marioObj.header.gfx.cameraToObject)
 
                 m.particleFlags |= PARTICLE_VERTICAL_STAR
                 set_mario_action(m, ACT_BACKWARD_AIR_KB, 0)
                 Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
             } else {
                 if (m.actionTimer++ == 0) {
-                    // play_sound(SOUND_ACTION_HIT, m.marioObj.header.gfx.cameraToObject)
+                    play_sound(SOUND_ACTION_HIT, m.marioObj.header.gfx.cameraToObject)
                 }
 
                 if (m.actionTimer == 30) {
@@ -1878,12 +1915,12 @@ export const act_flying = (m) => {
     }
 
     if (startPitch <= 0 && m.faceAngle[0] > 0 && m.forwardVel >= 48.0) {
-        // play_sound(SOUND_ACTION_FLYING_FAST, m.marioObj.header.gfx.cameraToObject)
-        // play_sound(SOUND_MARIO_YAHOO_WAHA_YIPPEE + ((gAudioRandom % 5) << 16),
-        //            m.marioObj.header.gfx.cameraToObject)
+        play_sound(SOUND_ACTION_FLYING_FAST, m.marioObj.header.gfx.cameraToObject)
+        play_sound(SOUND_MARIO_YAHOO_WAHA_YIPPEE + ((gAudioRandom % 5) << 16),
+                   m.marioObj.header.gfx.cameraToObject)
     }
 
-    // play_sound(SOUND_MOVING_FLYING, m.marioObj.header.gfx.cameraToObject)
+    play_sound(SOUND_MOVING_FLYING, m.marioObj.header.gfx.cameraToObject)
     adjust_sound_for_speed(m)
     return 0
 }
@@ -1893,7 +1930,7 @@ export const act_riding_hoot = (m) => {
         m.usedObj.rawData[oInteractStatus] = 0
         m.usedObj.rawData[oHootMarioReleaseTime] = gGlobalTimer
 
-        // play_sound_if_no_flag(m, SOUND_MARIO_UH, MARIO_MARIO_SOUND_PLAYED)
+        play_sound_if_no_flag(m, SOUND_MARIO_UH, MARIO_MARIO_SOUND_PLAYED)
         return set_mario_action(m, ACT_FREEFALL, 0)
     }
 
@@ -1929,12 +1966,12 @@ export const act_flying_triple_jump = (m) => {
         }
     }
 
-    // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_YAHOO)
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_YAHOO)
     if (m.actionState == 0) {
         set_mario_animation(m, MARIO_ANIM_TRIPLE_JUMP_FLY)
 
         if (m.marioObj.header.gfx.unk38.animFrame == 7) {
-            // play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
+            play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
         }
 
         if (is_anim_past_end(m)) {
@@ -1944,7 +1981,7 @@ export const act_flying_triple_jump = (m) => {
     }
 
     if (m.actionState == 1 && m.marioObj.header.gfx.unk38.animFrame == 1) {
-        // play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
+        play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
     }
 
     if (m.vel[1] < 4.0) {
@@ -1985,7 +2022,7 @@ export const act_flying_triple_jump = (m) => {
 }
 
 export const act_top_of_pole_jump = (m) => {
-    // play_mario_jump_sound(m)
+    play_mario_jump_sound(m)
     common_air_action_step(m, ACT_FREEFALL_LAND, MARIO_ANIM_HANDSTAND_JUMP, AIR_STEP_CHECK_LEDGE_GRAB)
     return 0
 }
@@ -1994,11 +2031,11 @@ export const act_vertical_wind = (m) => {
     let intendedDYaw = s16(m.intendedYaw - m.faceAngle[1])
     let intendedMag = m.intendedMag / 32.0
 
-    // play_sound_if_no_flag(m, SOUND_MARIO_HERE_WE_GO, MARIO_MARIO_SOUND_PLAYED)
+    play_sound_if_no_flag(m, SOUND_MARIO_HERE_WE_GO, MARIO_MARIO_SOUND_PLAYED)
     if (m.actionState == 0) {
         set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING_FLIP)
         if (m.marioObj.header.gfx.unk38.animFrame == 1) {
-            // play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
+            play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
         }
 
         if (is_anim_past_end(m)) {
@@ -2034,7 +2071,7 @@ export const act_special_triple_jump = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 
-    // play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_YAHOO)
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_YAHOO)
 
     update_air_without_turn(m)
 
@@ -2045,7 +2082,7 @@ export const act_special_triple_jump = (m) => {
             } else {
                 set_mario_action(m, ACT_FREEFALL_LAND_STOP, 0)
             }
-            // play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
             break
 
         case AIR_STEP_HIT_WALL:
@@ -2055,7 +2092,7 @@ export const act_special_triple_jump = (m) => {
 
     if (m.actionState == 0 || m.vel[1] > 0.0) {
         if (set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING) == 0) {
-            // play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
+            play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
         }
     } else {
         set_mario_animation(m, MARIO_ANIM_GENERAL_FALL)

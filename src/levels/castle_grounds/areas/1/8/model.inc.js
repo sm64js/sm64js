@@ -1,4 +1,3 @@
-import { castle_grounds_seg7_texture_07001000, castle_grounds_seg7_texture_07002000 } from "./../../../texture.inc"
 import { outside_09005800 } from "../../../../../textures/outside"
 import * as Gbi from "../../../../../include/gbi"
 

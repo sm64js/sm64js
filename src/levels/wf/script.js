@@ -89,7 +89,7 @@ export const level_wf_entry = [
 	{ command: LevelCommands.place_object, args: [0x1F, MODEL_NONE             ,-2495, 1331,  -256, 0,0,0, 0x003D0000, bhvPoleGrabbing] },
     { command: LevelCommands.terrain, args: [wf_seg7_collision_070102D8] },
     { command: LevelCommands.end_area },
-    { command: LevelCommands.set_mario_pos, args: [1, 90, 2600, 1256,  5120] },
+    { command: LevelCommands.set_mario_pos, args: [1, 90, 2600, 1256, 5120] },
     { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_or_update, LevelUpdate] },
     { command: LevelCommands.call_loop, args: [1, LevelUpdate.lvl_init_or_update, LevelUpdate] },
 ]

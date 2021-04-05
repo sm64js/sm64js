@@ -129,8 +129,18 @@ window.enterFullScreenMode = () => {
 let gameStarted = false
 
 document.getElementById("startbutton").addEventListener('click', () => {
-    if (gameStarted) window.location.search = '&autostart=1' /// Refresh page (Reset Game)
-    else startGame()
+    if (gameStarted) {
+        if (!url.searchParams.get("autostart")) {  /// Refresh page (Reset Game)
+            let qora = "&"
+            if (window.location.search == "") {
+                qora = "?"
+            }
+            window.history.replaceState(null, "", window.location.href + qora + "autostart=1")
+        }
+    }
+    else {
+        startGame()
+    }
 })
 
 const startGame = () => {
@@ -146,6 +156,26 @@ const startGame = () => {
 }
 
 window.onload = () => {
+    const map = url.searchParams.get("map")
+    if (map) {
+        const maps = document.getElementById("mapSelect").getElementsByTagName("option")
+        for (const m of maps) {
+            if (m.innerText == map) {
+                m.selected = 'selected'
+                break
+            }
+        }
+    }
+
+    let pos = url.searchParams.get("pos")
+    if (pos) {
+        pos = pos.split(",")
+        window.debugMarioYaw = parseFloat(pos[0])
+        window.debugMarioPosX = parseFloat(pos[1])
+        window.debugMarioPosY = parseFloat(pos[2])
+        window.debugMarioPosZ = parseFloat(pos[3])
+    }
+
     checkForRom().then((data) => {
         if (data && url.searchParams.get("autostart"))
             startGame()

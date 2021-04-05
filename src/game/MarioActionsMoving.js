@@ -2,8 +2,8 @@ import * as Mario from "./Mario"
 import * as MarioConstants from "../include/mario_constants"
 import { SURFACE_SLOW, SURFACE_CLASS_VERY_SLIPPERY, SURFACE_CLASS_SLIPPERY, SURFACE_CLASS_NOT_SLIPPERY, TERRAIN_MASK, TERRAIN_SLIDE } from "../include/surface_terrains"
 import * as SurfaceTerrains from "../include/surface_terrains"
-import { mario_bonk_reflection, perform_ground_step } from "./MarioStep"
-import { approach_number, atan2s, approach_s32 } from "../engine/math_util"
+import { mario_bonk_reflection, perform_ground_step, mario_push_off_steep_floor } from "./MarioStep"
+import { approach_number, atan2s, approach_s32, vec3f_copy } from "../engine/math_util"
 import { oMarioWalkingPitch } from "../include/object_constants"
 import { mario_update_punch_sequence } from "./MarioActionsObject"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
@@ -17,9 +17,11 @@ import { SOUND_ACTION_METAL_STEP_TIPTOE,
          SOUND_MARIO_HAHA,
          SOUND_MARIO_HOOHOO,
          SOUND_MARIO_UH2_2,
+         SOUND_MARIO_MAMA_MIA,
          SOUND_ACTION_TERRAIN_BODY_HIT_GROUND,
          SOUND_MARIO_ATTACKED,
          SOUND_MARIO_OOOF2,
+         SOUND_ACTION_TERRAIN_LANDING,
          SOUND_MOVING_TERRAIN_SLIDE        } from "../include/sounds"
 
 export const tilt_body_running = (m) => {
@@ -448,6 +450,16 @@ const slide_bonk = (m, fastAction, slowAction) => {
     }
 }
 
+const set_triple_jump_action = (m) => {
+    if (m.flags & Mario.MARIO_WING_CAP) {
+        return set_mario_action(m, Mario.ACT_FLYING_TRIPLE_JUMP, 0)
+    } else if (m.forwardVel > 20.0) {
+        return Mario.set_mario_action(m, Mario.ACT_TRIPLE_JUMP, 0)
+    } else {
+        return Mario.set_mario_action(m, Mario.ACT_JUMP, 0)
+    }
+}
+
 const act_braking = (m) => {
 
     if (!(m.input & Mario.INPUT_FIRST_PERSON) && (m.input &
@@ -621,12 +633,36 @@ const act_finish_turning_around = (m) => {
     return 0
 }
 
+const apply_landing_accel = (m, frictionFactor) => {
+    let stopped = false
+
+    apply_slope_accel(m)
+
+    if (!Mario.mario_floor_is_slope(m)) {
+        m.forwardVel *= frictionFactor
+        if (m.forwardVel * m.forwardVel < 1.0) {
+            Mario.set_forward_vel(m, 0.0)
+            stopped = true
+        }
+    }
+
+    return stopped
+}
+
 const common_landing_cancels = (m, landingAction, setAPressAction) => {
+
+    if (m.floor.normal.y < 0.2923717) {
+        return mario_push_off_steep_floor(m, landingAction.verySteepAction, 0)
+    }
 
     m.doubleJumpTimer = landingAction.unk02
 
     if (should_begin_sliding(m)) {
         return Mario.set_mario_action(m, landingAction.slideAction, 0);
+    }
+
+    if (m.input & Mario.INPUT_FIRST_PERSON) {
+        return set_mario_action(m, landingAction.endAction, 0)
     }
 
     if (++m.actionTimer >= landingAction.numFrames) {
@@ -644,73 +680,40 @@ const common_landing_cancels = (m, landingAction, setAPressAction) => {
     return false
 }
 
-const apply_landing_accel = (m, frictionFactor) => {
-    let stopped = false
-
-    apply_slope_accel(m)
-
-    if (!Mario.mario_floor_is_slope(m)) {
-        m.forwardVel *= frictionFactor
-        if (m.forwardVel * m.forwardVel < 1.0) {
-            Mario.set_forward_vel(m, 0.0)
-            stopped = true
-        }
-    }
-
-    return stopped
-}
-
-const common_landing_action = (m, animation, airAction) => {
-    if (m.input & Mario.INPUT_NONZERO_ANALOG) {
-        apply_landing_accel(m, 0.98)
-    } else if (m.forwardVel >= 16.0) {
-        apply_slope_decel(m, 2.0)
-    } else {
-        m.vel[1] = 0.0
-    }
-
-    const stepResult = perform_ground_step(m)
-    switch (stepResult) {
-        case Mario.GROUND_STEP_LEFT_GROUND:
-            Mario.set_mario_action(m, airAction, 0); break
-        case Mario.GROUND_STEP_HIT_WALL:
-            break
-    }
-
-    if (m.forwardVel > 16.0) m.particleFlags |= MarioConstants.PARTICLE_DUST
-
-    Mario.set_mario_animation(m, animation)
-
-    return stepResult
-
-}
-
 const act_jump_land = (m) => {
-    if (common_landing_cancels(m, Mario.sJumpLandAction, Mario.set_jumping_action)) return 1
+    if (common_landing_cancels(m, Mario.sJumpLandAction, Mario.set_jumping_action)) {
+        return 1
+    }
 
     common_landing_action(m, Mario.MARIO_ANIM_LAND_FROM_SINGLE_JUMP, Mario.ACT_FREEFALL)
     return 0
 }
 
 const act_freefall_land = (m) => {
-    if (common_landing_cancels(m, Mario.sFreefallLandAction, Mario.set_jumping_action)) return 1
+    if (common_landing_cancels(m, Mario.sFreefallLandAction, Mario.set_jumping_action)) {
+        return 1
+    }
 
     common_landing_action(m, Mario.MARIO_ANIM_GENERAL_LAND, Mario.ACT_FREEFALL)
     return 0
 }
 
 const act_side_flip_land = (m) => {
-    if (common_landing_cancels(m, Mario.sSideFlipLandAction, Mario.set_jumping_action)) return 1
+    if (common_landing_cancels(m, Mario.sSideFlipLandAction, Mario.set_jumping_action)) {
+        return 1
+    }
 
     if (common_landing_action(m, Mario.MARIO_ANIM_SLIDEFLIP_LAND, Mario.ACT_FREEFALL) != Mario.GROUND_STEP_HIT_WALL) {
-        m.marioObj.header.gfx.angle[1] += 0x8000
+        m.marioObj.header.gfx.angle[1] = s16(m.marioObj.header.gfx.angle[1] + 0x8000)
     }
 
     return 0
 }
 
 const act_double_jump_land = (m) => {
-    if (common_landing_cancels(m, Mario.sDoubleJumpLandAction, set_triple_jump_action)) return 1
+    if (common_landing_cancels(m, Mario.sDoubleJumpLandAction, set_triple_jump_action)) {
+        return 1
+    }
 
     common_landing_action(m, Mario.MARIO_ANIM_LAND_FROM_DOUBLE_JUMP, Mario.ACT_FREEFALL)
     return 0
@@ -719,15 +722,16 @@ const act_double_jump_land = (m) => {
 const act_triple_jump_land = (m) => {
     m.input &= ~Mario.INPUT_A_PRESSED
 
-    if (common_landing_cancels(m, Mario.sTripleJumpLandAction, Mario.set_jumping_action)) return 1
+    if (common_landing_cancels(m, Mario.sTripleJumpLandAction, Mario.set_jumping_action)) {
+        return 1
+    }
+
+    if (!(m.input & INPUT_NONZERO_ANALOG)) {
+        Mario.play_sound_if_no_flag(m, SOUND_MARIO_HAHA, Mario.MARIO_MARIO_SOUND_PLAYED)
+    }
 
     common_landing_action(m, Mario.MARIO_ANIM_TRIPLE_JUMP_LAND, Mario.ACT_FREEFALL)
     return 0
-}
-
-const set_triple_jump_action = (m) => {
-    if (m.forwardVel > 20.0) return Mario.set_mario_action(m, Mario.ACT_TRIPLE_JUMP, 0)
-    else return Mario.set_mario_action(m, Mario.ACT_JUMP, 0)
 }
 
 const act_backflip_land = (m) => {
@@ -871,7 +875,12 @@ const align_with_floor = (m) => {
 }
 
 const common_slide_action = (m, stopAction, airAction, animation) => {
-    const val14 = [ ...m.pos ]
+    const pos = []
+
+    vec3f_copy(pos, m.pos)
+    play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.header.gfx.cameraToObject)
+
+    Mario.adjust_sound_for_speed(m)
 
     switch (perform_ground_step(m)) {
         case Mario.GROUND_STEP_LEFT_GROUND:
@@ -880,15 +889,35 @@ const common_slide_action = (m, stopAction, airAction, animation) => {
                 play_sound(SOUND_MARIO_HOOHOO, m.marioObj.header.gfx.cameraToObject)
             }
             break
+
         case Mario.GROUND_STEP_NONE:
             Mario.set_mario_animation(m, animation)
             align_with_floor(m)
             m.particleFlags |= MarioConstants.PARTICLE_DUST
             break
+
         case Mario.GROUND_STEP_HIT_WALL:
+            if (!Mario.mario_floor_is_slippery(m)) {
+                if (m.forwardVel > 16.0) {
+                    m.particleFlags |= PARTICLE_VERTICAL_STAR
+                }
+                slide_bonk(m, ACT_GROUND_BONK, endAction)
+            } else if (m.wall != null) {
+                let wallAngle = atan2s(m.wall.normal.z, m.wall.normal.x)
+                let slideSpeed = sqrtf(m.slideVelX * m.slideVelX + m.slideVelZ * m.slideVelZ)
+
+                if ((slideSpeed *= 0.9) < 4.0) {
+                    slideSpeed = 4.0;
+                }
+
+                m.slideYaw = s16(wallAngle - s16(s16(m.slideYaw - wallAngle) + 0x8000))
+
+                m.vel[0] = m.slideVelX = slideSpeed * sins(m.slideYaw)
+                m.vel[2] = m.slideVelZ = slideSpeed * coss(m.slideYaw)
+            }
+
             align_with_floor(m)
             break
-        default: throw "common slide action default case"
     }
 }
 
@@ -1254,7 +1283,20 @@ export const act_soft_backward_ground_kb = (m) => {
 }
 
 export const act_hard_backward_ground_kb = (m) => {
-    const val04 = common_ground_knockback_action(m, Mario.MARIO_ANIM_FALL_OVER_BACKWARDS, 0x2B, true, m.actionArg)
+    let animFrame =
+        common_ground_knockback_action(m, Mario.MARIO_ANIM_FALL_OVER_BACKWARDS, 43, true, m.actionArg)
+    if (animFrame == 43 && m.health < 0x100) {
+        set_mario_action(m, Mario.ACT_DEATH_ON_BACK, 0)
+    }
+
+    if (animFrame == 54 && m.prevAction == Mario.ACT_SPECIAL_DEATH_EXIT) {
+        play_sound(SOUND_MARIO_MAMA_MIA, m.marioObj.header.gfx.cameraToObject)
+    }
+
+    if (animFrame == 69) {
+        Mario.play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_LANDING)
+    }
+
     return 0
 }
 
@@ -1263,9 +1305,76 @@ export const act_hard_forward_ground_kb = (m) => {
     return 0
 }
 
+const act_ground_bonk = (m) => {
+    let animFrame =
+        common_ground_knockback_action(m, Mario.MARIO_ANIM_GROUND_BONK, 32, true, m.actionArg)
+    if (animFrame == 32) {
+        play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+    }
+    return 0
+}
+
+const act_death_exit_land = (m) => {
+    let animFrame
+
+    apply_landing_accel(m, 0.9)
+    play_mario_heavy_landing_sound_once(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
+
+    animFrame = Mario.set_mario_animation(m, Mario.MARIO_ANIM_FALL_OVER_BACKWARDS)
+
+    if (animFrame == 54) {
+        play_sound(SOUND_MARIO_MAMA_MIA, m.marioObj.header.gfx.cameraToObject);
+    }
+    if (animFrame == 68) {
+        play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+    }
+
+    if (is_anim_at_end(m)) {
+        set_mario_action(m, Mario.ACT_IDLE, 0)
+    }
+
+    return 0
+}
+
+const common_landing_action = (m, animation, airAction) => {
+    let stepResult
+
+    if (m.input & Mario.INPUT_NONZERO_ANALOG) {
+        apply_landing_accel(m, 0.98)
+    } else if (m.forwardVel >= 16.0) {
+        apply_slope_decel(m, 2.0)
+    } else {
+        m.vel[1] = 0.0
+    }
+
+    stepResult = perform_ground_step(m)
+    switch (stepResult) {
+        case Mario.GROUND_STEP_LEFT_GROUND:
+            Mario.set_mario_action(m, airAction, 0)
+            break
+
+        case Mario.GROUND_STEP_HIT_WALL:
+            set_mario_animation(m, Mario.MARIO_ANIM_PUSHING)
+            break
+    }
+
+    if (m.forwardVel > 16.0) {
+        m.particleFlags |= MarioConstants.PARTICLE_DUST
+    }
+
+    Mario.set_mario_animation(m, animation)
+    Mario.play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_LANDING)
+
+    // if (m->floor->type >= SURFACE_SHALLOW_QUICKSAND && m->floor->type <= SURFACE_MOVING_QUICKSAND) {
+    //     m->quicksandDepth += (4 - m->actionTimer) * 3.5f - 0.5f;
+    // }
+
+    return stepResult
+}
+
 const check_common_moving_cancels = (m) => {
     if (m.pos[1] < m.waterLevel - 100) {
-        return Mario.set_water_plunge_action(m);
+        return Mario.set_water_plunge_action(m)
     }
 
     if (!(m.action & Mario.ACT_FLAG_INVULNERABLE) && (m.input & Mario.INPUT_UNKNOWN_10)) {
@@ -1273,17 +1382,16 @@ const check_common_moving_cancels = (m) => {
     }
 
     if (m.input & Mario.INPUT_SQUISHED) {
-        /// TODO Squish is not implemented
-        //return Mario.drop_and_set_mario_action(m, Mario.ACT_SQUISHED, 0);
+        return Mario.drop_and_set_mario_action(m, Mario.ACT_SQUISHED, 0)
     }
 
     if (!(m.action & Mario.ACT_FLAG_INVULNERABLE)) {
         if (m.health < 0x100) {
-            return Mario.drop_and_set_mario_action(m, Mario.ACT_STANDING_DEATH, 0);
+            return Mario.drop_and_set_mario_action(m, Mario.ACT_STANDING_DEATH, 0)
         }
     }
 
-    return 0;
+    return 0
 }
 
 export const mario_execute_moving_action = (m) => {
@@ -1293,36 +1401,49 @@ export const mario_execute_moving_action = (m) => {
         return 1
     }
     
-    //TODO update quicksand
+    // if (mario_update_quicksand(m, 0.25)) {
+    //     return 1
+    // }
 
     switch (m.action) {
-        case Mario.ACT_WALKING:                 cancel = act_walking(m);                 break;
-        case Mario.ACT_DECELERATING:            cancel = act_decelerating(m);            break;
-        case Mario.ACT_BRAKING:                 cancel = act_braking(m);                 break;
-        case Mario.ACT_TURNING_AROUND:          cancel = act_turning_around(m);          break;
-        case Mario.ACT_FINISH_TURNING_AROUND:   cancel = act_finish_turning_around(m);   break;
-        case Mario.ACT_JUMP_LAND:               cancel = act_jump_land(m);               break;
-        case Mario.ACT_FREEFALL_LAND:           cancel = act_freefall_land(m);           break;
-        case Mario.ACT_BUTT_SLIDE:              cancel = act_butt_slide(m);              break;
-        case Mario.ACT_STOMACH_SLIDE:           cancel = act_stomach_slide(m);           break;
-        case Mario.ACT_SIDE_FLIP_LAND:          cancel = act_side_flip_land(m);          break;
-        case Mario.ACT_DOUBLE_JUMP_LAND:        cancel = act_double_jump_land(m);        break;
-        case Mario.ACT_TRIPLE_JUMP_LAND:        cancel = act_triple_jump_land(m);        break;
-        case Mario.ACT_BACKFLIP_LAND:           cancel = act_backflip_land(m);           break;
-        case Mario.ACT_CROUCH_SLIDE:            cancel = act_crouch_slide(m);            break;
-        case Mario.ACT_LONG_JUMP_LAND:          cancel = act_long_jump_land(m);          break;
-        case Mario.ACT_DIVE_SLIDE:              cancel = act_dive_slide(m);              break;
-        case Mario.ACT_CRAWLING:                cancel = act_crawling(m);                break;
-        case Mario.ACT_MOVE_PUNCHING:           cancel = act_move_punching(m);           break;
-        case Mario.ACT_SLIDE_KICK_SLIDE:        cancel = act_slide_kick_slide(m);        break;
-        case Mario.ACT_BACKWARD_GROUND_KB:      cancel = act_backward_ground_kb(m);      break;
-        case Mario.ACT_FORWARD_GROUND_KB:       cancel = act_forward_ground_kb(m);       break;
-        case Mario.ACT_SOFT_FORWARD_GROUND_KB:  cancel = act_soft_forward_ground_kb(m);  break;
-        case Mario.ACT_SOFT_BACKWARD_GROUND_KB: cancel = act_soft_backward_ground_kb(m); break;
-        case Mario.ACT_HARD_BACKWARD_GROUND_KB: cancel = act_hard_backward_ground_kb(m); break;
-        case Mario.ACT_HARD_FORWARD_GROUND_KB:  cancel = act_hard_forward_ground_kb(m);  break;
-        default:
-            throw "unknown action moving: " + m.action.toString(16)
+        case Mario.ACT_WALKING:                  cancel = act_walking(m);                  break
+        case Mario.ACT_HOLD_WALKING:             cancel = act_hold_walking(m);             break
+        case Mario.ACT_HOLD_HEAVY_WALKING:       cancel = act_hold_heavy_walking(m);       break
+        case Mario.ACT_TURNING_AROUND:           cancel = act_turning_around(m);           break
+        case Mario.ACT_FINISH_TURNING_AROUND:    cancel = act_finish_turning_around(m);    break
+        case Mario.ACT_BRAKING:                  cancel = act_braking(m);                  break
+        case Mario.ACT_RIDING_SHELL_GROUND:      cancel = act_riding_shell_ground(m);      break
+        case Mario.ACT_CRAWLING:                 cancel = act_crawling(m);                 break
+        case Mario.ACT_BURNING_GROUND:           cancel = act_burning_ground(m);           break
+        case Mario.ACT_DECELERATING:             cancel = act_decelerating(m);             break
+        case Mario.ACT_HOLD_DECELERATING:        cancel = act_hold_decelerating(m);        break
+        case Mario.ACT_BUTT_SLIDE:               cancel = act_butt_slide(m);               break
+        case Mario.ACT_STOMACH_SLIDE:            cancel = act_stomach_slide(m);            break
+        case Mario.ACT_HOLD_BUTT_SLIDE:          cancel = act_hold_butt_slide(m);          break
+        case Mario.ACT_HOLD_STOMACH_SLIDE:       cancel = act_hold_stomach_slide(m);       break
+        case Mario.ACT_DIVE_SLIDE:               cancel = act_dive_slide(m);               break
+        case Mario.ACT_MOVE_PUNCHING:            cancel = act_move_punching(m);            break
+        case Mario.ACT_CROUCH_SLIDE:             cancel = act_crouch_slide(m);             break
+        case Mario.ACT_SLIDE_KICK_SLIDE:         cancel = act_slide_kick_slide(m);         break
+        case Mario.ACT_HARD_BACKWARD_GROUND_KB:  cancel = act_hard_backward_ground_kb(m);  break
+        case Mario.ACT_HARD_FORWARD_GROUND_KB:   cancel = act_hard_forward_ground_kb(m);   break
+        case Mario.ACT_BACKWARD_GROUND_KB:       cancel = act_backward_ground_kb(m);       break
+        case Mario.ACT_FORWARD_GROUND_KB:        cancel = act_forward_ground_kb(m);        break
+        case Mario.ACT_SOFT_BACKWARD_GROUND_KB:  cancel = act_soft_backward_ground_kb(m);  break
+        case Mario.ACT_SOFT_FORWARD_GROUND_KB:   cancel = act_soft_forward_ground_kb(m);   break
+        case Mario.ACT_GROUND_BONK:              cancel = act_ground_bonk(m);              break
+        case Mario.ACT_DEATH_EXIT_LAND:          cancel = act_death_exit_land(m);          break
+        case Mario.ACT_JUMP_LAND:                cancel = act_jump_land(m);                break
+        case Mario.ACT_FREEFALL_LAND:            cancel = act_freefall_land(m);            break
+        case Mario.ACT_DOUBLE_JUMP_LAND:         cancel = act_double_jump_land(m);         break
+        case Mario.ACT_SIDE_FLIP_LAND:           cancel = act_side_flip_land(m);           break
+        case Mario.ACT_HOLD_JUMP_LAND:           cancel = act_hold_jump_land(m);           break
+        case Mario.ACT_HOLD_FREEFALL_LAND:       cancel = act_hold_freefall_land(m);       break
+        case Mario.ACT_TRIPLE_JUMP_LAND:         cancel = act_triple_jump_land(m);         break
+        case Mario.ACT_BACKFLIP_LAND:            cancel = act_backflip_land(m);            break
+        case Mario.ACT_QUICKSAND_JUMP_LAND:      cancel = act_quicksand_jump_land(m);      break
+        case Mario.ACT_HOLD_QUICKSAND_JUMP_LAND: cancel = act_hold_quicksand_jump_land(m); break
+        case Mario.ACT_LONG_JUMP_LAND:           cancel = act_long_jump_land(m);           break
     }
 
     if (!cancel && (m.input & Mario.INPUT_IN_WATER)) {

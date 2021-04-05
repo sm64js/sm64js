@@ -1049,7 +1049,6 @@ export const play_mario_sound = (m, actionSound, marioSound) => {
 
 
 export const check_common_action_exits = (m) => {
-
     if (m.input & INPUT_A_PRESSED) {
         return set_mario_action(m, ACT_JUMP, 0)
     }
@@ -1362,7 +1361,6 @@ export const set_mario_action_cutscene = (m, action, actionArg) => {
  * specific function if needed.
  */
 export const set_mario_action = (m, action, actionArg) => {
-
     switch (action & ACT_GROUP_MASK) {
         case ACT_GROUP_MOVING:
             action = set_mario_action_moving(m, action, actionArg)

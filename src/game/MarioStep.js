@@ -5,11 +5,29 @@ import { atan2s,
          vec3s_set } from "../engine/math_util"
 import { s16 } from "../utils"
 import { ceil } from "mathjs"
-import { SURFACE_HANGABLE } from "../include/surface_terrains"
+import { SURFACE_HANGABLE,
+         SURFACE_BURNING,
+         SURFACE_VERTICAL_WIND,
+         SURFACE_VERY_SLIPPERY } from "../include/surface_terrains"
 import { play_sound } from "../audio/external"
 import { SOUND_ACTION_METAL_BONK,
          SOUND_ACTION_BONK,
          SOUND_ACTION_HIT } from "../include/sounds"
+
+const gWaterSurfacePseudoFloor = {
+    type: SURFACE_VERY_SLIPPERY,
+    force: 0,
+    flags: 0,
+    room: 0,
+    lowerY: 0,
+    upperY: 0,
+    vertex1: [0, 0, 0],
+    vertex2: [0, 0, 0],
+    vertex3: [0, 0, 0],
+    normal: {x: 0.0, y: 1.0, z: 0.0},
+    originOffset: 0.0,
+    object: null
+}
 
 const should_strengthen_gravity_for_jump_ascent = (m) => {
 
@@ -51,6 +69,21 @@ export const mario_bonk_reflection = (m, negateSpeed) => {
     if (negateSpeed) Mario.set_forward_vel(m, -m.forwardVel)
     else m.faceAngle[1] = s16(m.faceAngle[1] + 0x8000)
 }
+
+export const mario_push_off_steep_floor = (m, action, actionArg) => {
+    let floorDYaw = s16(m.floorAngle - m.faceAngle[1])
+
+    if (floorDYaw > -0x4000 && floorDYaw < 0x4000) {
+        m.forwardVel = 16.0
+        m.faceAngle[1] = m.floorAngle
+    } else {
+        m.forwardVel = -16.0
+        m.faceAngle[1] = s16(m.floorAngle + 0x8000)
+    }
+
+    return set_mario_action(m, action, actionArg)
+}
+
 
 export const stop_and_set_height_to_floor = (m) => {
     const marioObj = m.marioObj
@@ -100,8 +133,8 @@ const check_ledge_grab = (m, wall, intendedPos, nextPos) => {
 
 
 const perform_air_quarter_step = (m, intendedPos, stepArg) => {
-
-    const nextPos = [...intendedPos]
+    const nextPos = []
+    vec3f_copy(nextPos, intendedPos)
 
     const upperWall = Mario.resolve_and_return_wall_collisions(nextPos, 150.0, 50.0)
     const lowerWall = Mario.resolve_and_return_wall_collisions(nextPos, 30.0, 50.0)
@@ -111,10 +144,11 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
     const ceilWrapper = {}
     const ceilHeight = Mario.vec3_find_ceil(nextPos, floorHeight, ceilWrapper)
 
+    const waterLevel = SurfaceCollision.find_water_level(nextPos[0], nextPos[2])
+
     m.wall = null
 
     if (floorWrapper.floor == null) {
-
         if (nextPos[1] <= m.floorHeight) {
             m.pos[1] = m.floorHeight
             return Mario.AIR_STEP_LANDED
@@ -126,6 +160,12 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
             Mario.set_forward_vel(m, 1.5 * m.forwardVel)
         }
         return Mario.AIR_STEP_HIT_WALL
+    }
+
+    if ((m.action & Mario.ACT_FLAG_RIDING_SHELL) && floorHeight < waterLevel) {
+        floorHeight = waterLevel
+        floorWrapper.floor = gWaterSurfacePseudoFloor
+        floorWrapper.floor.originOffset = floorHeight //! Incorrect origin offset (no effect)
     }
 
     if (nextPos[1] <= floorHeight) {
@@ -167,20 +207,23 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
             return Mario.AIR_STEP_GRABBED_LEDGE
         }
 
-        m.pos = [...nextPos]
+        vec3f_copy(m.pos, nextPos)
         m.floor = floorWrapper.floor
         m.floorHeight = floorHeight
         return Mario.AIR_STEP_NONE
     }
 
-    m.pos = [...nextPos]
-    m.floorHeight = floorHeight
+    vec3f_copy(m.pos, nextPos)
     m.floor = floorWrapper.floor
+    m.floorHeight = floorHeight
 
     if (upperWall || lowerWall) {
         m.wall = upperWall ? upperWall : lowerWall
-
         let wallDYaw = s16(atan2s(m.wall.normal.z, m.wall.normal.x) - m.faceAngle[1])
+
+        if (m.wall.type == SURFACE_BURNING) {
+            return Mario.AIR_STEP_HIT_LAVA_WALL
+        }
 
         if (wallDYaw < -0x6000 || wallDYaw > 0x6000) {
             m.flags |= Mario.MARIO_UNKNOWN_30
@@ -191,8 +234,33 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
     return Mario.AIR_STEP_NONE
 }
 
+const apply_vertical_wind = (m) => {
+    let maxVelY
+    let offsetY
+
+    if (m.action != Mario.ACT_GROUND_POUND) {
+        offsetY = m.pos[1] - -1500.0
+
+        if (m.floor.type == SURFACE_VERTICAL_WIND && -3000.0 < offsetY && offsetY < 2000.0) {
+            if (offsetY >= 0.0) {
+                maxVelY = 10000.0 / (offsetY + 200.0)
+            } else {
+                maxVelY = 50.0
+            }
+
+            if (m.vel[1] < maxVelY) {
+                if ((m.vel[1] += maxVelY / 8.0) > maxVelY) {
+                    m.vel[1] = maxVelY;
+                }
+            }
+        }
+    }
+}
+
 export const perform_air_step = (m, stepArg) => {
     let stepResult = Mario.AIR_STEP_NONE
+
+    m.wall = null
 
     for (let i = 0; i < 4; i++) {
         const intendedPos = [
@@ -203,18 +271,28 @@ export const perform_air_step = (m, stepArg) => {
 
         const quarterStepResult = perform_air_quarter_step(m, intendedPos, stepArg)
 
-        if (quarterStepResult != Mario.AIR_STEP_NONE) stepResult = quarterStepResult
+        if (quarterStepResult != Mario.AIR_STEP_NONE) {
+            stepResult = quarterStepResult
+        }
 
-        if ([Mario.AIR_STEP_LANDED, Mario.AIR_STEP_GRABBED_LEDGE, Mario.AIR_STEP_GRABBED_CEILING, Mario.AIR_STEP_HIT_LAVA_WALL].includes(quarterStepResult)) { break }
-
+        if ([Mario.AIR_STEP_LANDED, Mario.AIR_STEP_GRABBED_LEDGE, Mario.AIR_STEP_GRABBED_CEILING, Mario.AIR_STEP_HIT_LAVA_WALL].includes(quarterStepResult)) {
+            break
+        }
     }
 
-    if (m.vel[1] >= 0.0) m.peakHeight = m.pos[1]
+    if (m.vel[1] >= 0.0) {
+        m.peakHeight = m.pos[1]
+    }
 
-    apply_gravity(m)
+    m.terrainSoundAddend = Mario.mario_get_terrain_sound_addend(m)
 
-    m.marioObj.header.gfx.pos = [...m.pos]
-    m.marioObj.header.gfx.angle = [0, m.faceAngle[1], 0]
+    if (m.action != Mario.ACT_FLYING) {
+        apply_gravity(m)
+    }
+    apply_vertical_wind(m)
+
+    vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
+    vec3s_set(m.marioObj.header.gfx.angle, 0, m.faceAngle[1], 0)
 
     return stepResult
 }

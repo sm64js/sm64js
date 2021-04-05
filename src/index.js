@@ -70,8 +70,6 @@ $('[data-toggle="popover"]').popover({
     },
 })
 
-const url = new URL(window.location.href)
-
 const letterColors = ["#3e51fa", "#fa3e3e", "#00ff00", "yellow"]
 
 const generateRainbowText = (element) => {
@@ -130,6 +128,8 @@ let gameStarted = false
 
 document.getElementById("startbutton").addEventListener('click', () => {
     if (gameStarted) {
+        const url = new URL(window.location.href)
+
         if (!url.searchParams.get("autostart")) {  /// Refresh page (Reset Game)
             let qora = "&"
             if (window.location.search == "") {
@@ -137,6 +137,7 @@ document.getElementById("startbutton").addEventListener('click', () => {
             }
             window.history.replaceState(null, "", window.location.href + qora + "autostart=1")
         }
+        location.reload()
     }
     else {
         startGame()
@@ -156,6 +157,8 @@ const startGame = () => {
 }
 
 window.onload = () => {
+    const url = new URL(window.location.href)
+
     const map = url.searchParams.get("map")
     if (map) {
         const maps = document.getElementById("mapSelect").getElementsByTagName("option")

@@ -538,7 +538,7 @@ const act_decelerating = (m) => {
         Mario.set_mario_animation(m, Mario.MARIO_ANIM_IDLE_HEAD_LEFT)
         play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.header.gfx.cameraToObject)
         Mario.adjust_sound_for_speed(m)
-        m.particleFlags |= PARTICLE_DUST
+        m.particleFlags |= MarioConstants.PARTICLE_DUST
     } else {
         // (Speed Crash) Crashes if speed exceeds 2^17.
         let val0C = s32(m.forwardVel / 4.0 * 0x10000)
@@ -1041,7 +1041,7 @@ const act_dive_slide = (m) => {
         return Mario.set_mario_action(m, m.forwardVel > 0.0 ? Mario.ACT_FORWARD_ROLLOUT : Mario.ACT_BACKWARD_ROLLOUT, 0)
     }
 
-    play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
+    Mario.play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
 
     if (update_sliding(m, 8.0) && Mario.is_anim_at_end(m)) {
         Mario.set_forward_vel(m, 0.0)

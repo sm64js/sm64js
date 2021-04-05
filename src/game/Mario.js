@@ -38,7 +38,8 @@ import { SOUND_BANK_MOVING,
          SOUND_ACTION_TERRAIN_JUMP,
          SOUND_MARIO_YAH_WAH_HOO,
          SOUND_MARIO_YAHOO_WAHA_YIPPEE } from "../include/sounds"
-import { play_sound } from "../audio/external"
+import { play_sound,
+         set_sound_moving_speed } from "../audio/external"
 import { TERRAIN_MASK,
          TERRAIN_SNOW,
          TERRAIN_SAND,

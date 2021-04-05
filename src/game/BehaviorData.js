@@ -69,6 +69,8 @@ import { gShallowWaterWaveDropletParams,
          bhv_water_droplet_loop,
          bhv_water_droplet_splash_init,
          bhv_bubble_splash_init } from "./behaviors/water_splashes_and_waves.inc"
+import { castle_grounds_seg7_collision_cannon_grill } from "../levels/castle_grounds/areas/1/8/collision.inc"
+import { bhv_castle_cannon_grate_init } from "./behaviors/castle_cannon_grate.inc"
 
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
@@ -760,6 +762,19 @@ export const bhvBubbleParticleSpawner = [
     ['PARENT_BIT_CLEAR', oActiveParticleFlags, ACTIVE_PARTICLE_BUBBLE],
     ['DEACTIVATE'],
 ]
+
+export const bhvHiddenAt120Stars = () => {
+    return [
+    ['BEGIN', OBJ_LIST_SURFACE],
+    ['OR_INT', oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE],
+    ['LOAD_COLLISION_DATA', castle_grounds_seg7_collision_cannon_grill],
+    ['SET_FLOAT', oCollisionDistance, 4000],
+    ['CALL_NATIVE', bhv_castle_cannon_grate_init],
+    ['BEGIN_LOOP'],
+        ['CALL_NATIVE', SurfaceLoad.load_object_collision_model, SurfaceLoad],
+    ['END_LOOP'],
+    ]
+}
 
 export const bhvCoinFormationSpawn = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },

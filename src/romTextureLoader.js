@@ -1234,6 +1234,7 @@ import { outside_09000000,
          outside_09003800, 
          outside_09004000, 
          outside_09004800, 
+         outside_09005800,
          outside_09006000,
          outside_09006800, 
          outside_09007800,
@@ -2514,6 +2515,7 @@ const loadDataIntoGame = (data) => {
     outside_09003800.push(...data['textures/outside/castle_grounds_textures.03800.rgba16.png'])
     outside_09004000.push(...data['textures/outside/castle_grounds_textures.04000.rgba16.png'])
     outside_09004800.push(...data['textures/outside/castle_grounds_textures.04800.rgba16.png'])
+    outside_09005800.push(...data['textures/outside/castle_grounds_textures.05800.rgba16.png'])
     outside_09006000.push(...data['textures/outside/castle_grounds_textures.06000.rgba16.png'])
     outside_09006800.push(...data['textures/outside/castle_grounds_textures.06800.rgba16.png'])
     outside_09007800.push(...data['textures/outside/castle_grounds_textures.07800.rgba16.png'])

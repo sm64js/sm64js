@@ -20,8 +20,8 @@ import { mario_geo                  } from "../actors/mario/geo.inc"
 import { smoke_geo                  } from "../actors/walk_smoke/geo.inc"
 import { sparkles_geo               } from "../actors/sparkle/geo.inc"
 import { bubble_geo                 } from "../actors/bubble/geo.inc"
-import { small_water_splash_geo,
-         water_splash_geo           } from "../actors/water_splash/geo.inc"
+import { small_water_splash_geo     } from "../actors/stomp_smoke/geo.inc"
+import { water_splash_geo           } from "../actors/water_splash/geo.inc"
 import { idle_water_wave_geo,
         wave_trail_geo              } from "../actors/water_wave/geo.inc"
 import { yellow_coin_geo,

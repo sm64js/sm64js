@@ -873,7 +873,7 @@ gLinker.behaviors = {
     bhvBubbleParticleSpawner,
     bhvWaterSplash,
     bhvIdleWaterWave,
-    // bhvPlungeBubble,
+    bhvPlungeBubble,
     bhvWaveTrail,
     // bhvFireParticleSpawner,
     bhvShallowWaterWave,

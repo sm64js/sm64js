@@ -1152,32 +1152,15 @@ export const set_jump_from_landing = (m) => {
     return 1
 }
 
-export const set_mario_action = (m, action, actionArg) => {
-
-    switch (action & ACT_GROUP_MASK) {
-        case ACT_GROUP_MOVING:
-            action = set_mario_action_moving(m, action, actionArg); break
-        case ACT_GROUP_AIRBORNE:
-            action = set_mario_action_airborne(m, action, actionArg); break
-    }
-
-    m.flags &= ~(MARIO_ACTION_SOUND_PLAYED | MARIO_MARIO_SOUND_PLAYED)
-
-    m.prevAction = m.action
-    m.action = action
-    m.actionArg = actionArg
-    m.actionState = 0
-    m.actionTimer = 0
-
-    return 1
-}
-
+/**
+ * Transitions for a variety of airborne actions.
+ */
 export const set_mario_action_airborne = (m, action, actionArg) => {
     let fowardVel
 
     if ((m.squishTimer != 0 || m.quicksandDepth >= 1.0)
         && (action == ACT_DOUBLE_JUMP || action == ACT_TWIRLING)) {
-        action = ACT_JUMP;
+        action = ACT_JUMP
     }
 
     switch (action) {
@@ -1290,6 +1273,9 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
     return action
 }
 
+/**
+ * Transitions for a variety of moving actions.
+ */
 export const set_mario_action_moving = (m, action, actionArg) => {
     const floorClass = mario_get_floor_class(m)
     const forwardVel = m.forwardVel
@@ -1305,16 +1291,108 @@ export const set_mario_action_moving = (m, action, actionArg) => {
 
             m.marioObj.rawData[oMarioWalkingPitch] = 0
             break
+
+        case ACT_HOLD_WALKING:
+            if (0.0 <= forwardVel && forwardVel < mag / 2.0) {
+                m.forwardVel = mag / 2.0
+            }
+            break
+
         case ACT_BEGIN_SLIDING:
             if (mario_facing_downhill(m, false)) {
-                action = ACT_BUTT_SLIDE;
+                action = ACT_BUTT_SLIDE
             } else {
-                action = ACT_STOMACH_SLIDE;
+                action = ACT_STOMACH_SLIDE
             }
-            break;
+            break
+
+        case ACT_HOLD_BEGIN_SLIDING:
+            if (mario_facing_downhill(m, FALSE)) {
+                action = ACT_HOLD_BUTT_SLIDE
+            } else {
+                action = ACT_HOLD_STOMACH_SLIDE
+            }
+            break
     }
 
     return action
+}
+
+
+/**
+ * Transition for certain submerged actions, which is actually just the metal jump actions.
+ */
+export const set_mario_action_submerged = (m, action, actionArg) => {
+    if (action == ACT_METAL_WATER_JUMP || action == ACT_HOLD_METAL_WATER_JUMP) {
+        m.vel[1] = 32.0
+    }
+
+    return action
+}
+
+/**
+ * Transitions for a variety of cutscene actions.
+ */
+export const set_mario_action_cutscene = (m, action, actionArg) => {
+    switch (action) {
+        case ACT_EMERGE_FROM_PIPE:
+            m.vel[1] = 52.0
+            break
+
+        case ACT_FALL_AFTER_STAR_GRAB:
+            mario_set_forward_vel(m, 0.0)
+            break
+
+        case ACT_SPAWN_SPIN_AIRBORNE:
+            mario_set_forward_vel(m, 2.0)
+            break
+
+        case ACT_SPECIAL_EXIT_AIRBORNE:
+        case ACT_SPECIAL_DEATH_EXIT:
+            m.vel[1] = 64.0
+            break
+    }
+
+    return action
+}
+
+/**
+ * Puts Mario into a given action, putting Mario through the appropriate
+ * specific function if needed.
+ */
+export const set_mario_action = (m, action, actionArg) => {
+
+    switch (action & ACT_GROUP_MASK) {
+        case ACT_GROUP_MOVING:
+            action = set_mario_action_moving(m, action, actionArg)
+            break
+
+        case ACT_GROUP_AIRBORNE:
+            action = set_mario_action_airborne(m, action, actionArg)
+            break
+
+        case ACT_GROUP_SUBMERGED:
+            action = set_mario_action_submerged(m, action, actionArg)
+            break
+
+        case ACT_GROUP_CUTSCENE:
+            action = set_mario_action_cutscene(m, action, actionArg)
+            break
+    }
+
+    m.flags &= ~(MARIO_ACTION_SOUND_PLAYED | MARIO_MARIO_SOUND_PLAYED)
+
+    if (!(m.action & ACT_FLAG_AIR)) {
+        m.flags &= ~MARIO_UNKNOWN_18
+    }
+
+    m.prevAction = m.action
+    m.action = action
+    m.actionArg = actionArg
+    m.actionState = 0
+    m.actionTimer = 0
+
+    return 1
 }
 
 export const set_mario_animation = (m, targetAnimID) => {

@@ -4,6 +4,7 @@ import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceC
 import { approach_number } from "../engine/math_util"
 import { stop_and_set_height_to_floor } from "./MarioStep"
 import { SURFACE_HANGABLE } from "../include/surface_terrains"
+import { SOUND_ACTION_TERRAIN_LANDING } from "../include/sounds"
 
 const POLE_NONE = 0
 const POLE_TOUCHED_FLOOR = 1

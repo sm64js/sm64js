@@ -227,9 +227,7 @@ class ObjectListProcessor {
         }
         this.sParticleTypes.forEach(particleType => {
             if (particleFlags & particleType.particleFlag) {
-                if (particleType.behavior) {  // during development some particles aren't implemented
-                    this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
-                }
+                this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
             }
         })
     }

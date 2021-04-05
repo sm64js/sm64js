@@ -3,11 +3,11 @@ import * as MarioConstants from "../include/mario_constants"
 import { SURFACE_SLOW, SURFACE_CLASS_VERY_SLIPPERY, SURFACE_CLASS_SLIPPERY, SURFACE_CLASS_NOT_SLIPPERY, TERRAIN_MASK, TERRAIN_SLIDE } from "../include/surface_terrains"
 import * as SurfaceTerrains from "../include/surface_terrains"
 import { mario_bonk_reflection, perform_ground_step, mario_push_off_steep_floor } from "./MarioStep"
-import { approach_number, atan2s, approach_s32, vec3f_copy } from "../engine/math_util"
+import { approach_number, atan2s, approach_s32, vec3f_copy, sqrtf } from "../engine/math_util"
 import { oMarioWalkingPitch } from "../include/object_constants"
 import { mario_update_punch_sequence } from "./MarioActionsObject"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
-import { s16, s32 }  from '../utils';
+import { s16, s32, sins, coss }  from '../utils';
 import { play_sound } from "../audio/external"
 import { SOUND_ACTION_METAL_STEP_TIPTOE,
          SOUND_ACTION_METAL_STEP,
@@ -452,7 +452,7 @@ const slide_bonk = (m, fastAction, slowAction) => {
 
 const set_triple_jump_action = (m) => {
     if (m.flags & Mario.MARIO_WING_CAP) {
-        return set_mario_action(m, Mario.ACT_FLYING_TRIPLE_JUMP, 0)
+        return Mario.set_mario_action(m, Mario.ACT_FLYING_TRIPLE_JUMP, 0)
     } else if (m.forwardVel > 20.0) {
         return Mario.set_mario_action(m, Mario.ACT_TRIPLE_JUMP, 0)
     } else {
@@ -662,7 +662,7 @@ const common_landing_cancels = (m, landingAction, setAPressAction) => {
     }
 
     if (m.input & Mario.INPUT_FIRST_PERSON) {
-        return set_mario_action(m, landingAction.endAction, 0)
+        return Mario.set_mario_action(m, landingAction.endAction, 0)
     }
 
     if (++m.actionTimer >= landingAction.numFrames) {
@@ -874,7 +874,7 @@ const align_with_floor = (m) => {
     // Todo other stuff here
 }
 
-const common_slide_action = (m, stopAction, airAction, animation) => {
+const common_slide_action = (m, endAction, airAction, animation) => {
     const pos = []
 
     vec3f_copy(pos, m.pos)
@@ -899,9 +899,9 @@ const common_slide_action = (m, stopAction, airAction, animation) => {
         case Mario.GROUND_STEP_HIT_WALL:
             if (!Mario.mario_floor_is_slippery(m)) {
                 if (m.forwardVel > 16.0) {
-                    m.particleFlags |= PARTICLE_VERTICAL_STAR
+                    m.particleFlags |= MarioConstants.PARTICLE_VERTICAL_STAR
                 }
-                slide_bonk(m, ACT_GROUND_BONK, endAction)
+                slide_bonk(m, Mario.ACT_GROUND_BONK, endAction)
             } else if (m.wall != null) {
                 let wallAngle = atan2s(m.wall.normal.z, m.wall.normal.x)
                 let slideSpeed = sqrtf(m.slideVelX * m.slideVelX + m.slideVelZ * m.slideVelZ)
@@ -1249,7 +1249,7 @@ const common_ground_knockback_action = (m, animation, arg2, arg3, arg4) => {
         }
     } else if (Mario.is_anim_at_end(m)) {
         if (m.health < 0x100) {
-            //set_mario_action(m, ACT_STANDING_DEATH, 0)
+            Mario.set_mario_action(m, Mario.ACT_STANDING_DEATH, 0)
         } else {
             if (arg4 > 0) {
                 m.invincTimer = 30
@@ -1286,7 +1286,7 @@ export const act_hard_backward_ground_kb = (m) => {
     let animFrame =
         common_ground_knockback_action(m, Mario.MARIO_ANIM_FALL_OVER_BACKWARDS, 43, true, m.actionArg)
     if (animFrame == 43 && m.health < 0x100) {
-        set_mario_action(m, Mario.ACT_DEATH_ON_BACK, 0)
+        Mario.set_mario_action(m, Mario.ACT_DEATH_ON_BACK, 0)
     }
 
     if (animFrame == 54 && m.prevAction == Mario.ACT_SPECIAL_DEATH_EXIT) {
@@ -1309,7 +1309,7 @@ const act_ground_bonk = (m) => {
     let animFrame =
         common_ground_knockback_action(m, Mario.MARIO_ANIM_GROUND_BONK, 32, true, m.actionArg)
     if (animFrame == 32) {
-        play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+        Mario.play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
     }
     return 0
 }
@@ -1326,11 +1326,11 @@ const act_death_exit_land = (m) => {
         play_sound(SOUND_MARIO_MAMA_MIA, m.marioObj.header.gfx.cameraToObject);
     }
     if (animFrame == 68) {
-        play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+        Mario.play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
     }
 
     if (is_anim_at_end(m)) {
-        set_mario_action(m, Mario.ACT_IDLE, 0)
+        Mario.set_mario_action(m, Mario.ACT_IDLE, 0)
     }
 
     return 0
@@ -1354,7 +1354,7 @@ const common_landing_action = (m, animation, airAction) => {
             break
 
         case Mario.GROUND_STEP_HIT_WALL:
-            set_mario_animation(m, Mario.MARIO_ANIM_PUSHING)
+            Mario.set_mario_animation(m, Mario.MARIO_ANIM_PUSHING)
             break
     }
 

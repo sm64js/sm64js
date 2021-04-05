@@ -1,4 +1,4 @@
-import { raise_background_noise } from "./SoundInit"
+import { raise_background_noise, play_infinite_stairs_music } from "./SoundInit"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { AreaInstance as Area } from "./Area"
 import { MarioMiscInstance as MarioMisc } from "./MarioMisc"
@@ -36,6 +36,7 @@ import { SOUND_BANK_MOVING,
          SOUND_ACTION_METAL_HEAVY_LANDING,
          SOUND_ACTION_METAL_JUMP,
          SOUND_ACTION_TERRAIN_JUMP,
+         SOUND_ENV_WIND2,
          SOUND_MARIO_YAH_WAH_HOO,
          SOUND_MARIO_YAHOO_WAHA_YIPPEE } from "../include/sounds"
 import { play_sound,
@@ -1519,7 +1520,6 @@ const mario_reset_bodystate = (m) => {
 
 export const execute_mario_action = () => {
     if (LevelUpdate.gMarioState.action) {
-
         LevelUpdate.gMarioState.marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
         mario_reset_bodystate(LevelUpdate.gMarioState)
         update_mario_inputs(LevelUpdate.gMarioState)
@@ -1531,36 +1531,62 @@ export const execute_mario_action = () => {
         while (inLoop) {
             switch (LevelUpdate.gMarioState.action & ACT_GROUP_MASK) {
                 case ACT_GROUP_STATIONARY:
-                    inLoop = mario_execute_stationary_action(LevelUpdate.gMarioState); break
+                    inLoop = mario_execute_stationary_action(LevelUpdate.gMarioState)
+                    break
 
                 case ACT_GROUP_MOVING:
-                    inLoop = mario_execute_moving_action(LevelUpdate.gMarioState); break
+                    inLoop = mario_execute_moving_action(LevelUpdate.gMarioState)
+                    break
 
                 case ACT_GROUP_AIRBORNE:
-                    inLoop = mario_execute_airborne_action(LevelUpdate.gMarioState); break
-
-                case ACT_GROUP_OBJECT:
-                    inLoop = mario_execute_object_action(LevelUpdate.gMarioState); break
-
-                case ACT_GROUP_AUTOMATIC:
-                    inLoop = mario_execute_automatic_action(LevelUpdate.gMarioState); break
+                    inLoop = mario_execute_airborne_action(LevelUpdate.gMarioState)
+                    break
 
                 case ACT_GROUP_SUBMERGED:
-                    inLoop = mario_execute_submerged_action(LevelUpdate.gMarioState); break
-              
+                    inLoop = mario_execute_submerged_action(LevelUpdate.gMarioState)
+                    break
+
+                // case ACT_GROUP_CUTSCENE:
+                //     inLoop = mario_execute_cutscene_action(LevelUpdate.gMarioState)
+                //     break
+
+                case ACT_GROUP_AUTOMATIC:
+                    inLoop = mario_execute_automatic_action(LevelUpdate.gMarioState)
+                    break
+
+                case ACT_GROUP_OBJECT:
+                    inLoop = mario_execute_object_action(LevelUpdate.gMarioState)
+                    break
+
                 default: throw "unkown action group"
             }
         }
 
+        // sink_mario_in_quicksand(LevelUpdate.gMarioState)
+        // squish_mario_model(LevelUpdate.gMarioState)
         set_submerged_cam_preset_and_spawn_bubbles(LevelUpdate.gMarioState)
         update_mario_health(LevelUpdate.gMarioState)
         update_mario_info_for_cam(LevelUpdate.gMarioState)
         mario_update_hitbox_and_cap_model(LevelUpdate.gMarioState)
 
+        if (LevelUpdate.gMarioState.floor.type == SurfaceTerrains.SURFACE_HORIZONTAL_WIND) {
+            // spawn_wind_particles(0, (LevelUpdate.gMarioState.floor.force << 8))
+            play_sound(SOUND_ENV_WIND2, LevelUpdate.gMarioState.marioObj.header.gfx.cameraToObject);
+        }
+
+        if (LevelUpdate.gMarioState.floor.type == SurfaceTerrains.SURFACE_VERTICAL_WIND) {
+            // spawn_wind_particles(1, 0)
+            play_sound(SOUND_ENV_WIND2, LevelUpdate.gMarioState.marioObj.header.gfx.cameraToObject);
+        }
+
+        play_infinite_stairs_music()
+
         LevelUpdate.gMarioState.marioObj.rawData[oInteractStatus] = 0
 
         return LevelUpdate.gMarioState.particleFlags
     }
+
+    return 0
 }
 
 const mario_update_hitbox_and_cap_model = (m) => {

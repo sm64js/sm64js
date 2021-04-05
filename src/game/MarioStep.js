@@ -81,7 +81,7 @@ export const mario_push_off_steep_floor = (m, action, actionArg) => {
         m.faceAngle[1] = s16(m.floorAngle + 0x8000)
     }
 
-    return set_mario_action(m, action, actionArg)
+    return Mario.set_mario_action(m, action, actionArg)
 }
 
 

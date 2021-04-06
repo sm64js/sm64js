@@ -518,7 +518,7 @@ export const bhvButterfly = [
 //start of import birds in castle grounds
 import {
     birds_seg5_anims_050009E8
-} from "../actors/birds/anims.inc.js"
+} from "../actors/bird/anims.inc.js"
 
 
 // The large splash Mario makes when he jumps into a pool of water.

@@ -1450,9 +1450,13 @@ export const act_air_hit_wall = (m) => {
         return set_mario_action(m, ACT_SOFT_BONK, 0)
     }
 
-    set_mario_animation(m, MARIO_ANIM_START_WALLKICK)
-
-    return 0
+    //! Missing return statement. The returned value is the result of the call
+    // to set_mario_animation. In practice, this value is nonzero.
+    // This results in this action "cancelling" into itself. It is supposed to
+    // execute on two frames, but instead it executes twice on the same frame.
+    // This results in firsties only being possible for a single frame, instead
+    // of two.
+    return set_mario_animation(m, MARIO_ANIM_START_WALLKICK)
 }
 
 export const act_forward_rollout = (m) => {

@@ -26,7 +26,7 @@ import { castle_grounds_geo_000724           } from "./areas/1/8/geo.inc"
 import { castle_grounds_geo_000660           } from "./areas/1/11/geo.inc"
 import { bubbly_tree_geo                     } from "../../actors/tree/geo.inc"
 import { castle_grounds_seg7_collision_level } from "./areas/1/collision.inc"
-
+import { castle_grounds_seg7_macro_objs      } from "./macro.inc"
 
 
 const script_func_local_1 = [
@@ -119,6 +119,7 @@ export const level_castle_grounds_entry = [
         ['JUMP_LINK', script_func_local_3],
         ['JUMP_LINK', script_func_local_4],
         ['TERRAIN', castle_grounds_seg7_collision_level],
+        ['MACRO_OBJECTS', castle_grounds_seg7_macro_objs],
     ['END_AREA'],
     ['MARIO_POS', 1, 180, -1328, 260, 4664],
     ['CALL', 0, LevelUpdate.lvl_init_or_update, LevelUpdate],

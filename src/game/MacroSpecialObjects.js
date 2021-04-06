@@ -151,16 +151,22 @@ export const spawn_macro_objects = (areaIndex, macroObjList) => {
     ObjectListProc.gMacroObjectDefaultParent.header.gfx.unk19 = areaIndex
 
     macroObjList.forEach(objToSpawn => {
-        const presetID = objToSpawn.preset
+        if (Array.isArray(objToSpawn)) {
+            const o = objToSpawn
+            objToSpawn = { preset: o[0], yaw: o[1], pos: [o[2], o[3], o[4]], param: o[5]}
+        }
+
+        const preset = MacroObjectPresets[objToSpawn.preset]
+
+        if (!preset.behavior) {
+            return
+        }
 
         const macroObject = {
             obj_y_rot: objToSpawn.yaw * 2 * 0x10 / 45,
             obj_pos: objToSpawn.pos,
             obj_param: objToSpawn.param
         }
-
-        const preset = MacroObjectPresets[presetID]
-
         macroObject.obj_param = (macroObject.obj_param & 0xFF00) + (preset.param & 0x00FF)
 
         if (((macroObject.obj_param >> 8) & RESPAWN_INFO_DONT_RESPAWN) != RESPAWN_INFO_DONT_RESPAWN) {

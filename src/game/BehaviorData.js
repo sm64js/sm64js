@@ -327,7 +327,7 @@ export const bhvChainChomp = [
 
 export const bhvChainChompChainPart = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_GENACTOR } },
-    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } }, 
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.billboard },
     { command: BhvCmds.set_obj_physics, args: { hitboxRadius: 0, gravity: -400, bounciness: -50, dragStrenth: 1000, friction: 1000, buoyancy: 200 } },
     { command: BhvCmds.set_objectData_value, args: { field: oGraphYOffset, value: 40 } },
@@ -369,7 +369,7 @@ export const bhvTriangleParticleSpawner = [
 
 export const bhvPoundTinyStarParticle = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
-    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } }, 
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.billboard },
     { command: BhvCmds.begin_repeat, args: { count: 10 } },
         { command: BhvCmds.call_native, args: { func: bhv_pound_tiny_star_particle_loop } },
@@ -512,6 +512,11 @@ export const bhvButterfly = [
         ['CALL_NATIVE', bhv_butterfly_loop],
     ['END_LOOP']
 ]
+
+//start of import birds in castle grounds
+import {
+    birds_seg5_anims_050009E8
+} from "../actors/birds/anims.inc.js"
 
 
 // The large splash Mario makes when he jumps into a pool of water.

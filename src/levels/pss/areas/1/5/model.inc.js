@@ -1,5 +1,5 @@
 import * as Gbi from "../../../../../include/gbi"
-import { pss_seg7_texture_07000800 } from "../../../textures.inc.js"
+import { pss_seg7_texture_07000800 } from "../../../texture.inc"
 
 const pss_seg7_vertex_0700D3A8 = [
 	{ pos: [ -6864, -3726, 2608 ], flag: 0, tc: [ 0, 0 ], color: [ 255, 85, 0, 255 ] },

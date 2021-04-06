@@ -726,7 +726,7 @@ const act_triple_jump_land = (m) => {
         return 1
     }
 
-    if (!(m.input & INPUT_NONZERO_ANALOG)) {
+    if (!(m.input & Mario.INPUT_NONZERO_ANALOG)) {
         Mario.play_sound_if_no_flag(m, SOUND_MARIO_HAHA, Mario.MARIO_MARIO_SOUND_PLAYED)
     }
 

@@ -4,11 +4,11 @@ import {
     mountain_09001800,
     mountain_09005800,
     mountain_0900C000,
-} from "../../../../../textures/mountain.js"
+} from "../../../../../textures/mountain"
 
 import {
     pss_seg7_texture_07000000,
-} from "../../../textures.inc.js"
+} from "../../../texture.inc"
 
 const pss_seg7_lights_07001800 = Gbi.gdSPDefLights1(
 	    0x23, 0x23, 0x23,

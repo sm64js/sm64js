@@ -35,14 +35,15 @@ class GeoLayout {
         this.BACKGROUND_PURPLE_SKY      = 9
     }
 
-    GEO_SHADOW(args) {this.node_shadow(args)}
-    GEO_OPEN_NODE(args) {this.open_node(args)}
-    GEO_SCALE(args) {this.node_scale(args)}
     GEO_ANIMATED_PART(args) {this.node_animated_part(args)}
     GEO_CLOSE_NODE(args) {this.close_node(args)}
-    GEO_END(args) {this.node_end(args)}
-    GEO_SWITCH_CASE(args) {this.node_switch_case(args)}
+    GEO_CULLING_RADIUS(args) {this.node_culling_radius(args)}
     GEO_DISPLAY_LIST(args) {this.display_list(args)}
+    GEO_END(args) {this.node_end(args)}
+    GEO_OPEN_NODE(args) {this.open_node(args)}
+    GEO_SCALE(args) {this.node_scale(args)}
+    GEO_SHADOW(args) {this.node_shadow(args)}
+    GEO_SWITCH_CASE(args) {this.node_switch_case(args)}
 
     branch(args) {
         if (args[0] == 1) {

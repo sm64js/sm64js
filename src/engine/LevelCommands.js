@@ -58,6 +58,7 @@ class LevelCommands {
     LOAD_MODEL_FROM_DL(model, dl, layer) {return this.load_model_from_dl(model, dl, layer)}
     MARIO(model, bharg, bhscript) {return this.init_mario(model, bharg, bhscript)}
     MARIO_POS(area, yaw, x, y, z) {return this.set_mario_pos(area, yaw, x, y, z)}
+    MACRO_OBJECTS(data) {return this.macro_objects(data)}
     OBJECT(model, x, y, z, pitch, yaw, rot, bharg, bhscript) {return this.place_object(0x1F, model, x, y, z, pitch, yaw, rot, bharg, bhscript)}
     RETURN() {return this.return()}  // heh
     TERRAIN(data) {return this.terrain(data)}

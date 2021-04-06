@@ -18,14 +18,16 @@ import { bhvMario,
          bhvManyBlueFishSpawner,
          bhvButterfly,
          bhvWaterMist2,
-         bhvMoatGrills                       } from "../../game/BehaviorData"
+         bhvMoatGrills,
+         bhvHiddenAt120Stars                 } from "../../game/BehaviorData"
 
 import { castle_grounds_geo_00073C           } from "./areas/1/geo"
 import { castle_grounds_geo_0006F4           } from "./areas/1/3/geo.inc"
+import { castle_grounds_geo_000724           } from "./areas/1/8/geo.inc"
 import { castle_grounds_geo_000660           } from "./areas/1/11/geo.inc"
 import { bubbly_tree_geo                     } from "../../actors/tree/geo.inc"
 import { castle_grounds_seg7_collision_level } from "./areas/1/collision.inc"
-
+import { castle_grounds_seg7_macro_objs      } from "./macro.inc"
 
 
 const script_func_local_1 = [
@@ -75,7 +77,7 @@ const script_func_local_2 = [
     // ['OBJECT', /*model*/ MODEL_BIRDS,                       /*pos*/ -4711,  742,   433, /*angle*/ 0,   0, 0, /*behParam*/ 0x00010000, /*beh*/ bhvBird],
     // ['OBJECT', /*model*/ MODEL_BIRDS,                       /*pos*/  5774,  913, -1114, /*angle*/ 0,   0, 0, /*behParam*/ 0x00010000, /*beh*/ bhvBird],
     // ['OBJECT', /*model*/ MODEL_NONE,                        /*pos*/ -1328,  260,  4664, /*angle*/ 0, 180, 0, /*behParam*/ 0x00280000, /*beh*/ bhvIntroScene],
-    // ['OBJECT', /*model*/ MODEL_CASTLE_GROUNDS_CANNON_GRILL, /*pos*/     0,    0,     0, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHiddenAt120Stars],
+    ['OBJECT', /*model*/ MODEL_CASTLE_GROUNDS_CANNON_GRILL, /*pos*/     0,    0,     0, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHiddenAt120Stars],
     // ['OBJECT', /*model*/ MODEL_LAKITU,                      /*pos*/    11,  803, -3015, /*angle*/ 0,   0, 0, /*behParam*/ 0x00010000, /*beh*/ bhvCameraLakitu],
     ['RETURN']
 ]
@@ -113,15 +115,17 @@ const script_func_local_4 = [
 export const level_castle_grounds_entry = [
     ['INIT_LEVEL'],
     ['MARIO', MODEL_MARIO, 1, bhvMario],
-    ['LOAD_MODEL_FROM_GEO', MODEL_LEVEL_GEOMETRY_03,    castle_grounds_geo_0006F4],
-    ['LOAD_MODEL_FROM_GEO', MODEL_BOB_BUBBLY_TREE,      bubbly_tree_geo],
-    ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_FLAG,  castle_grounds_geo_000660],
+    ['LOAD_MODEL_FROM_GEO', MODEL_LEVEL_GEOMETRY_03,       castle_grounds_geo_0006F4],
+    ['LOAD_MODEL_FROM_GEO', MODEL_BOB_BUBBLY_TREE,         bubbly_tree_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_FLAG,     castle_grounds_geo_000660],
+    ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_CANNON_GRILL, castle_grounds_geo_000724],
     ['AREA', 1, castle_grounds_geo_00073C],
         ['JUMP_LINK', script_func_local_1],
         ['JUMP_LINK', script_func_local_2],
         ['JUMP_LINK', script_func_local_3],
         ['JUMP_LINK', script_func_local_4],
         ['TERRAIN', castle_grounds_seg7_collision_level],
+        ['MACRO_OBJECTS', castle_grounds_seg7_macro_objs],
     ['END_AREA'],
     ['MARIO_POS', 1, 180, -1328, 260, 4664],
     ['CALL', 0, LevelUpdate.lvl_init_or_update, LevelUpdate],

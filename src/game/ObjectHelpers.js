@@ -284,7 +284,7 @@ export const obj_build_transform_from_pos_and_angle = (obj, posIndex, angleIndex
 
     mtxf_rotate_zxy_and_translate(obj.transform, translate, rotation)
 
-} 
+}
 
 const obj_translate_local = (obj, posIndex, localTranslateIndex) => {
     const dx = obj.rawData[localTranslateIndex + 0]
@@ -515,7 +515,7 @@ export const cur_obj_rotate_yaw_toward = (target, increment) => {
 
     const o = ObjectListProc.gCurrentObject
 
-    const startYaw = parseInt(o.rawData[oMoveAngleYaw]) 
+    const startYaw = parseInt(o.rawData[oMoveAngleYaw])
     o.rawData[oMoveAngleYaw] = approach_symmetric(o.rawData[oMoveAngleYaw], target, increment)
 
     o.rawData[oAngleVelYaw] = parseInt(o.rawData[oMoveAngleYaw] - startYaw)
@@ -612,7 +612,7 @@ export const cur_obj_move_xz = (steepSlopeNormalY, careAboutEdgesAndSteepSlopes)
     const deltaFloorHeight = intendedFloorHeight - o.rawData[oFloorHeight]
 
 
-    o.rawData[oMoveFlags] &= ~OBJ_MOVE_HIT_EDGE 
+    o.rawData[oMoveFlags] &= ~OBJ_MOVE_HIT_EDGE
 
     if (o.rawData[oRoom] != -1 && intendedFloorWrapper.floor) {
         if (intendedFloorWrapper.floor.room != 0 && o.rawData[oRoom] != intendedFloorWrapper.floor.room && intendedFloorWrapper.floor.room != 18) {
@@ -1081,6 +1081,13 @@ export const dist_between_objects = (obj1, obj2) => {
     const dy = obj1.rawData[oPosY] - obj2.rawData[oPosY]
     const dz = obj1.rawData[oPosZ] - obj2.rawData[oPosZ]
     return Math.sqrt(dx * dx + dy * dy + dz * dz)
+}
+
+//lateral? mdelete
+export const lateral_dist_between_objects = (obj1, obj2) => {
+    const dx = obj1.rawData[oPosX] - obj2.rawData[oPosX]
+    const dz = obj1.rawData[oPosZ] - obj2.rawData[oPosZ]
+    return Math.sqrt(dx * dx + dz * dz)
 }
 
 export const obj_angle_to_object = (obj1, obj2) => {

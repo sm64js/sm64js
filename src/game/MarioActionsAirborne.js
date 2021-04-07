@@ -13,6 +13,7 @@ import { set_mario_action,
          play_mario_landing_sound,
          play_mario_heavy_landing_sound,
          play_sound_if_no_flag,
+         adjust_sound_for_speed,
          is_anim_at_end,
          MARIO_MARIO_SOUND_PLAYED       } from "./Mario"
 import { mario_drop_held_object,
@@ -20,6 +21,7 @@ import { mario_drop_held_object,
 import { perform_air_step,
          mario_bonk_reflection          } from "./MarioStep"
 import { play_sound } from "../audio/external"
+import { gAudioRandom } from "../audio/data"
 import { SOUND_MARIO_DOH,
          SOUND_MARIO_UH,
          SOUND_MARIO_WAH2,
@@ -53,6 +55,7 @@ import { SOUND_MARIO_DOH,
 import { approach_number,
          atan2s,
          approach_f32,
+         approach_s32,
          vec3f_copy,
          vec3f_set,
          vec3s_set,
@@ -1799,7 +1802,7 @@ export const act_shot_from_cannon = (m) => {
             break
     }
 
-    if ((m.flags & MARIO_WING_CAP) && m.vel[1] < 0.0) {
+    if (/*(m.flags & MARIO_WING_CAP) &&*/ m.vel[1] < 0.0) {  // JOE DEBUG
         set_mario_action(m, ACT_FLYING, 0)
     }
 
@@ -1823,16 +1826,16 @@ export const act_flying = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 1)
     }
 
-    if (!(m.flags & MARIO_WING_CAP)) {
+    if (false /*!(m.flags & MARIO_WING_CAP)*/) {  // JOE DEBUG
         if (m.area.camera.mode == Camera.CAMERA_MODE_BEHIND_MARIO) {
             Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
         }
         return set_mario_action(m, ACT_FREEFALL, 0)
     }
 
-    if (m.area.camera.mode != Camera.CAMERA_MODE_BEHIND_MARIO) {
-        Camera.set_camera_mode(m.area.camera, Camera.CAMERA_MODE_BEHIND_MARIO, 1)
-    }
+    // if (m.area.camera.mode != Camera.CAMERA_MODE_BEHIND_MARIO) {
+    //     Camera.set_camera_mode(m.area.camera, Camera.CAMERA_MODE_BEHIND_MARIO, 1)
+    // }
 
     if (m.actionState == 0) {
         if (m.actionArg == 0) {

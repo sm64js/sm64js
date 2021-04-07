@@ -32,6 +32,7 @@ class BehaviorCommands {
     CALL(args) {return this.call({script: args[0]})}
     CALL_NATIVE(args) {return this.call_native({func: args[0], funcClass: args[1]})}
     DEACTIVATE(args) {return this.deactivate()}
+    DEBUGGER(args) {return this.debugger()}
     DELAY(args) {return this.delay({num: args[0]})}
     DELAY_VAR(args) {return this.delay_var({var: args[0]})}
     DISABLE_RENDERING(args) {return this.disable_rendering()}
@@ -47,13 +48,15 @@ class BehaviorCommands {
     RETURN(args) {return this.return()}
     SCALE(args) {return this.scale({percent: args[1]})}
     SET_FLOAT(args) {return this.set_objectData_value({field: args[0], value: args[1]})}
+    SET_HITBOX(args) {return this.set_hitbox({radius: args[0], height: args[1]})}
+    SET_HITBOX_WITH_OFFSET(args) {return set_hitbox_with_offset({radius: args[0], height: args[1], downOffset: args[2]})}
     SET_HOME(args) {return this.set_home()}
     SET_INT(args) {return this.set_int({field: args[0], value: args[1]})}
     SET_INTERACT_TYPE(args) {return this.set_interact_type({type: args[0]})}
     SET_RANDOM_INT(args) {return this.set_random_int({field: args[0], minimum: args[1], range: args[2]})}
     SET_RANDOM_FLOAT(args) {return this.set_random_float({field: args[0], minimum: args[1], range: args[2]})}
     SUM_FLOAT(args) {return this.sum_float({dest: args[0], value1: args[1], value2: args[2]})}
-    SPAWN_CHILD(args) {return this.spawn_child_with_param({model: args[0], behavior: args[1], bhvParam: 0})}
+    SPAWN_CHILD(args) {return this.spawn_child_with_param({model: args[0], behavior: args[1], bhvParam: args[2]})}
     SPAWN_WATER_DROPLET(args) {return this.cmd_spawn_water_droplet({params: args[0]})}
 
 
@@ -95,8 +98,7 @@ class BehaviorCommands {
             if (Array.isArray(bhvFunc)) {
                 // new style of command: ['name', args, ...]
                 if (!this[bhvFunc[0]]) {
-                    console.log(bhvFunc[0])
-                    throw "behavior command undefined"
+                    throw "behavior command undefined: " + bhvFunc[0]
                 }
                 bhvProcResult = this[bhvFunc[0]].call(this, bhvFunc.slice(1))
             } else {
@@ -460,6 +462,12 @@ class BehaviorCommands {
         let script = BehaviorData[args.script]
         this.bhvScript.commands = script
         this.bhvScript.index = args.index
+        return this.BHV_PROC_CONTINUE
+    }
+
+    debugger(args) {
+        debugger        
+        this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }
 

@@ -6,7 +6,8 @@ import { gLinker                                            } from "./Linker"
 import { INTERACT_WATER_RING,
          INTERACT_POLE,
          INTERACT_DAMAGE,
-         INTERACT_COIN } from "./Interaction"
+         INTERACT_COIN,
+         INTERACT_CANNON_BASE } from "./Interaction"
 import { oFlags,
             OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, OBJ_FLAG_COMPUTE_DIST_TO_MARIO,
             OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW,
@@ -24,28 +25,45 @@ import { oFlags,
          oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll,
          oWaterObjUnkF4, oWaterObjUnkF8, oWaterObjUnkFC, oBehParams2ndByte      } from "../include/object_constants"
 
-import { MODEL_WOODEN_POST, MODEL_MIST, MODEL_SMOKE, MODEL_BUBBLE } from "../include/model_ids"
+import { MODEL_WOODEN_POST,
+         MODEL_MIST,
+         MODEL_SMOKE,
+         MODEL_BUBBLE,
+         MODEL_CANNON_BARREL                            } from "../include/model_ids"
 
-import { bhv_pole_base_loop } from "./behaviors/pole_base.inc"
-import { bhv_pole_init, bhv_giant_pole_loop } from "./behaviors/pole.inc"
-import { bhv_castle_flag_init } from "./behaviors/bhv_castle_flag_init.inc"
-import { castle_grounds_seg7_anims_flags } from "../levels/castle_grounds/areas/1/11/anim.inc"
-import { bhv_checkerboard_elevator_group_init, bhv_checkerboard_platform_init, bhv_checkerboard_platform_loop } from "./behaviors/checkerboard_platform.inc"
-import { checkerboard_platform_seg8_collision_0800D710 } from "../actors/checkerboard_platform/collision.inc"
-import { bhv_seesaw_platform_init, bhv_seesaw_platform_update } from "./behaviors/seesaw_platform.inc"
-import { goomba_seg8_anims_0801DA4C } from "../actors/goomba/anims/table.inc"
-import { bhv_goomba_init, bhv_goomba_update, bhv_goomba_triplet_spawner_update } from "./behaviors/goomba.inc"
-import { bobomb_seg8_anims_0802396C } from "../actors/bobomb/anims/table.inc"
-import { bhv_bobomb_loop, bhv_bobomb_init, bhv_bobomb_fuse_smoke_init, bhv_dust_smoke_loop } from "./behaviors/bobomb.inc"
-import { bhv_explosion_init, bhv_explosion_loop } from "./behaviors/explosion.inc"
-import { bhv_respawner_loop, bhv_bobomb_bully_death_smoke_init } from "./behaviors/corkbox.inc"
-import { poundable_pole_collision_06002490 } from "../actors/poundable_pole/collision.inc"
-import { bhv_wooden_post_update, bhv_chain_chomp_update, bhv_chain_chomp_chain_part_update } from "./behaviors/chain_chomp.inc"
-import { chain_chomp_seg6_anims_06025178 } from "../actors/chain_chomp/anims/table.inc"
-import { bhv_pound_tiny_star_particle_init, bhv_pound_tiny_star_particle_loop, bhv_tiny_star_particles_init, bhv_wall_tiny_star_particle_loop, bhv_punch_tiny_triangle_loop, bhv_punch_tiny_triangle_init } from "./behaviors/collide_particles.inc"
-import { bhv_white_puff_1_loop, bhv_white_puff_2_loop } from "./behaviors/white_puff.inc"
-import { bhv_pound_white_puffs_init } from "./behaviors/ground_particles.inc"
-import { bhv_white_puff_exploding_loop } from "./behaviors/white_puff_explode.inc"
+import { bhv_pole_base_loop                             } from "./behaviors/pole_base.inc"
+import { bhv_pole_init, bhv_giant_pole_loop             } from "./behaviors/pole.inc"
+import { bhv_castle_flag_init                           } from "./behaviors/bhv_castle_flag_init.inc"
+import { bhv_checkerboard_elevator_group_init,
+         bhv_checkerboard_platform_init,
+         bhv_checkerboard_platform_loop                 } from "./behaviors/checkerboard_platform.inc"
+import { bhv_seesaw_platform_init,
+         bhv_seesaw_platform_update                     } from "./behaviors/seesaw_platform.inc"
+import { bhv_goomba_init,
+         bhv_goomba_update,
+         bhv_goomba_triplet_spawner_update              } from "./behaviors/goomba.inc"
+import { bhv_bobomb_loop,
+         bhv_bobomb_init,
+         bhv_bobomb_fuse_smoke_init,
+         bhv_dust_smoke_loop                            } from "./behaviors/bobomb.inc"
+import { bhv_explosion_init,
+         bhv_explosion_loop                             } from "./behaviors/explosion.inc"
+import { bhv_respawner_loop,
+         bhv_bobomb_bully_death_smoke_init              } from "./behaviors/corkbox.inc"
+import { bhv_wooden_post_update,
+         bhv_chain_chomp_update,
+         bhv_chain_chomp_chain_part_update              } from "./behaviors/chain_chomp.inc"
+import { chain_chomp_seg6_anims_06025178                } from "../actors/chain_chomp/anims/table.inc"
+import { bhv_pound_tiny_star_particle_init,
+         bhv_pound_tiny_star_particle_loop,
+         bhv_tiny_star_particles_init,
+         bhv_wall_tiny_star_particle_loop,
+         bhv_punch_tiny_triangle_loop,
+         bhv_punch_tiny_triangle_init                   } from "./behaviors/collide_particles.inc"
+import { bhv_white_puff_1_loop,
+         bhv_white_puff_2_loop                          } from "./behaviors/white_puff.inc"
+import { bhv_pound_white_puffs_init                     } from "./behaviors/ground_particles.inc"
+import { bhv_white_puff_exploding_loop                  } from "./behaviors/white_puff_explode.inc"
 import { bhv_bubble_wave_init,
          bhv_small_water_wave_loop,
          bhv_water_air_bubble_init,
@@ -53,13 +71,22 @@ import { bhv_bubble_wave_init,
          bhv_particle_init,
          bhv_particle_loop,
          bhv_water_waves_init,
-         bhv_small_bubbles_loop } from "./behaviors/water_objs.inc"
-import { bhv_coin_formation_init, bhv_coin_formation_loop, bhv_coin_formation_spawn_loop, bhv_yellow_coin_init, bhv_yellow_coin_loop, bhv_golden_coin_sparkles_loop, bhv_coin_sparkles_loop, bhv_coin_init, bhv_coin_loop } from "./behaviors/coin.inc"
-import { bhv_red_coin_init, bhv_red_coin_loop } from "./behaviors/red_coin.inc"
-import { bhv_moving_yellow_coin_init, bhv_moving_yellow_coin_loop } from "./behaviors/moving_coin.inc"
-import { bhv_water_mist_2_loop } from "./behaviors/water_mist.inc"
-import { castle_grounds_seg7_collision_moat_grills } from "../levels/castle_grounds/areas/1/7/collision.inc"
-import { bhv_moat_grills_loop } from "./behaviors/moat_grill.inc"
+         bhv_small_bubbles_loop                         } from "./behaviors/water_objs.inc"
+import { bhv_coin_formation_init,
+         bhv_coin_formation_loop,
+         bhv_coin_formation_spawn_loop,
+         bhv_yellow_coin_init,
+         bhv_yellow_coin_loop,
+         bhv_golden_coin_sparkles_loop,
+         bhv_coin_sparkles_loop,
+         bhv_coin_init,
+         bhv_coin_loop                                  } from "./behaviors/coin.inc"
+import { bhv_red_coin_init,
+         bhv_red_coin_loop                              } from "./behaviors/red_coin.inc"
+import { bhv_moving_yellow_coin_init,
+         bhv_moving_yellow_coin_loop                    } from "./behaviors/moving_coin.inc"
+import { bhv_water_mist_2_loop                          } from "./behaviors/water_mist.inc"
+import { bhv_moat_grills_loop                           } from "./behaviors/moat_grill.inc"
 import { gShallowWaterWaveDropletParams,
          gShallowWaterSplashDropletParams,
          bhv_shallow_water_splash_init,
@@ -68,10 +95,20 @@ import { gShallowWaterWaveDropletParams,
          bhv_water_splash_spawn_droplets,
          bhv_water_droplet_loop,
          bhv_water_droplet_splash_init,
-         bhv_bubble_splash_init } from "./behaviors/water_splashes_and_waves.inc"
-import { castle_grounds_seg7_collision_cannon_grill } from "../levels/castle_grounds/areas/1/8/collision.inc"
-import { bhv_castle_cannon_grate_init } from "./behaviors/castle_cannon_grate.inc"
+         bhv_bubble_splash_init                         } from "./behaviors/water_splashes_and_waves.inc"
+import { bhv_castle_cannon_grate_init                   } from "./behaviors/castle_cannon_grate.inc"
+import { bhv_cannon_base_loop,
+         bhv_cannon_barrel_loop                         } from "./behaviors/cannon.inc"
+import { bhv_sound_spawner_init                         } from "./behaviors/sound_spawner.inc"
 
+import { castle_grounds_seg7_anims_flags                } from "../levels/castle_grounds/areas/1/11/anim.inc"
+import { goomba_seg8_anims_0801DA4C                     } from "../actors/goomba/anims/table.inc"
+import { bobomb_seg8_anims_0802396C                     } from "../actors/bobomb/anims/table.inc"
+
+import { checkerboard_platform_seg8_collision_0800D710  } from "../actors/checkerboard_platform/collision.inc"
+import { poundable_pole_collision_06002490              } from "../actors/poundable_pole/collision.inc"
+import { castle_grounds_seg7_collision_moat_grills      } from "../levels/castle_grounds/areas/1/7/collision.inc"
+import { castle_grounds_seg7_collision_cannon_grill     } from "../levels/castle_grounds/areas/1/8/collision.inc"
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
 const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -195,17 +232,15 @@ export const bhvMoatGrills = [
     ['END_LOOP'],
 ]
 
-export const bhvSeesawPlatform = () => {
-    return [
-        { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SURFACE } },
-        { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
-        { command: BhvCmds.call_native, args: { func: bhv_seesaw_platform_init } },
-        { command: BhvCmds.begin_loop },
-            { command: BhvCmds.call_native, args: { func: bhv_seesaw_platform_update } },
-            { command: BhvCmds.call_native, args: { func: SurfaceLoad.load_object_collision_model, funcClass: SurfaceLoad } },
-        { command: BhvCmds.end_loop },
-    ]
-}
+export const bhvSeesawPlatform = () => { return [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SURFACE } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
+    { command: BhvCmds.call_native, args: { func: bhv_seesaw_platform_init } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_seesaw_platform_update } },
+        { command: BhvCmds.call_native, args: { func: SurfaceLoad.load_object_collision_model, funcClass: SurfaceLoad } },
+    { command: BhvCmds.end_loop },
+]}
 
 export const bhvRespawner = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
@@ -293,22 +328,20 @@ export const bhvBobombBullyDeathSmoke = [
     { command: BhvCmds.end_loop }
 ]
 
-export const bhvWoodenPost = () => {
-    return [
-        { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SURFACE } },
-        { command: BhvCmds.load_collision_data, args: { data: poundable_pole_collision_06002490 } },
-        { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
-        { command: BhvCmds.set_obj_physics, args: { hitboxRadius: 0, gravity: -400, bounciness: -50, dragStrenth: 1000, friction: 1000, buoyancy: 200 } },
-        { command: BhvCmds.set_objectData_value, args: { field: oNumLootCoins, value: 5 } },
-        { command: BhvCmds.drop_to_floor },
-        { command: BhvCmds.set_home },
-        { command: BhvCmds.scale, args: { percent: 50 } },
-        { command: BhvCmds.begin_loop },
-            { command: BhvCmds.call_native, args: { func: bhv_wooden_post_update } },
-            { command: BhvCmds.call_native, args: { func: SurfaceLoad.load_object_collision_model, funcClass: SurfaceLoad } },
-        { command: BhvCmds.end_loop }
-    ]
-}
+export const bhvWoodenPost = () => { return [
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SURFACE } },
+    { command: BhvCmds.load_collision_data, args: { data: poundable_pole_collision_06002490 } },
+    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
+    { command: BhvCmds.set_obj_physics, args: { hitboxRadius: 0, gravity: -400, bounciness: -50, dragStrenth: 1000, friction: 1000, buoyancy: 200 } },
+    { command: BhvCmds.set_objectData_value, args: { field: oNumLootCoins, value: 5 } },
+    { command: BhvCmds.drop_to_floor },
+    { command: BhvCmds.set_home },
+    { command: BhvCmds.scale, args: { percent: 50 } },
+    { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_wooden_post_update } },
+        { command: BhvCmds.call_native, args: { func: SurfaceLoad.load_object_collision_model, funcClass: SurfaceLoad } },
+    { command: BhvCmds.end_loop }
+]}
 
 export const bhvChainChomp = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_GENACTOR } },
@@ -781,8 +814,30 @@ export const bhvBubbleParticleSpawner = [
     ['DEACTIVATE'],
 ]
 
-export const bhvHiddenAt120Stars = () => {
-    return [
+export const bhvCannonBarrel = () => { return [
+    ['BEGIN', OBJ_LIST_DEFAULT],
+    ['OR_INT', oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)],
+    ['DROP_TO_FLOOR'],
+    ['BEGIN_LOOP'],
+        ['CALL_NATIVE', bhv_cannon_barrel_loop],
+    ['END_LOOP'],
+]}
+
+export const bhvCannon = [
+    ['BEGIN', OBJ_LIST_LEVEL],
+    ['OR_INT', oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)],
+    ['SPAWN_CHILD', /*Model*/ MODEL_CANNON_BARREL, /*Behavior*/ bhvCannonBarrel],
+    ['SET_INT', oInteractType, INTERACT_CANNON_BASE],
+    ['ADD_FLOAT', oPosY, -340],
+    ['SET_HOME'],
+    ['SET_HITBOX', /*Radius*/ 150, /*Height*/ 150],
+    ['SET_INT', oIntangibleTimer, 0],
+    ['BEGIN_LOOP'],
+        ['CALL_NATIVE', bhv_cannon_base_loop],
+    ['END_LOOP'],
+]
+
+export const bhvHiddenAt120Stars = () => { return [
     ['BEGIN', OBJ_LIST_SURFACE],
     ['OR_INT', oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE],
     ['LOAD_COLLISION_DATA', castle_grounds_seg7_collision_cannon_grill],
@@ -791,8 +846,7 @@ export const bhvHiddenAt120Stars = () => {
     ['BEGIN_LOOP'],
         ['CALL_NATIVE', SurfaceLoad.load_object_collision_model, SurfaceLoad],
     ['END_LOOP'],
-    ]
-}
+]}
 
 export const bhvCoinFormationSpawn = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
@@ -890,6 +944,16 @@ export const bhvCoinSparkles = [
 ]
 
 const bhvBowser = []
+
+export const bhvSoundSpawner = [
+    ['BEGIN', OBJ_LIST_UNIMPORTANT],
+    ['OR_INT', oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE],
+    ['DELAY', 3],
+    ['CALL_NATIVE', bhv_sound_spawner_init],
+    ['DELAY', 30],
+    ['DEACTIVATE'],
+]
+
 
 gLinker.behaviors = {
     bhvBowser,

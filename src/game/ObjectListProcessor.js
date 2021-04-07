@@ -111,6 +111,7 @@ class ObjectListProcessor {
         this.gObjectCounter = 0
         this.gCCMEnteredSlide = 0
         this.gCheckingSurfaceCollisionsForCamera = 0
+        this.gMarioShotFromCannon = 0
         this.gObjectLists = new Array(13).fill(0).map(() => { 
 
             const blankObj = { gfx: {} }

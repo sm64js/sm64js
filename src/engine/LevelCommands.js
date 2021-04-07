@@ -1,6 +1,7 @@
 import { GeoLayoutInstance as GeoLayout } from "./GeoLayout"
 import { AreaInstance as Area } from "../game/Area"
 import { GameInstance as Game } from "../game/Game"
+import * as GlobalScripts from "../levels/global_scripts"
 import * as Gbi from "../include/gbi"
 import * as GraphNode from "./graph_node"
 import { GoddardRendererInstance as GoddardRenderer } from "../goddard/GoddardRenderer"
@@ -62,6 +63,7 @@ class LevelCommands {
     OBJECT(model, x, y, z, pitch, yaw, rot, bharg, bhscript) {return this.place_object(0x1F, model, x, y, z, pitch, yaw, rot, bharg, bhscript)}
     RETURN() {return this.return()}  // heh
     TERRAIN(data) {return this.terrain(data)}
+    TERRAIN_TYPE(data) {return this.terrain_type(data)}
 
     LOAD_MIO0() {this.sCurrentScript.index++}
     LOAD_RAW() {this.sCurrentScript.index++}
@@ -279,6 +281,14 @@ class LevelCommands {
         this.sCurrentScript.index++
     }
 
+    terrain_type(data) {
+        if (this.sCurrAreaIndex != -1) {
+            Area.gAreas[this.sCurrAreaIndex].terrainType = data
+        }
+
+        this.sCurrentScript.index++
+    }
+
     end_area() {
         this.sCurrAreaIndex = -1
         this.sCurrentScript.index++
@@ -303,6 +313,14 @@ class LevelCommands {
     }
 
     jump_link(script) {
+        // allow getters
+        if (typeof script == "string") {
+            script = GlobalScripts[script]
+        }
+        if (script.call) {
+            script = params()
+        }
+
         this.sStackTop.push({ commands: this.sCurrentScript.commands, index: ++this.sCurrentScript.index })
         this.start_new_script(script)
     }
@@ -330,6 +348,9 @@ class LevelCommands {
         while (this.sScriptStatus == SCRIPT_RUNNING) {
             const cmd = this.sCurrentScript.commands[this.sCurrentScript.index]
             if (Array.isArray(cmd)) {
+                if (!this[cmd[0]]) {
+                    throw "undefined level command: " + cmd[0]
+                }
                 // new style of command: ['name', args, ...]
                 this[cmd[0]].call(this, ...cmd.slice(1))
             } else {

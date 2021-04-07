@@ -34,6 +34,7 @@ import { butterfly_geo              } from "../actors/butterfly/geo.inc"
 import { mist_geo                   } from "../actors/mist/geo.inc"
 import { dirt_animation_geo,
          cartoon_star_geo           } from "../actors/dirt/geo.inc"
+import { explosion_geo              } from "../actors/explosion/geo.inc"
 
 
 export const script_exec_level_table = [
@@ -91,7 +92,7 @@ export const level_main_scripts_entry = [
     ['LOAD_MODEL_FROM_GEO', MODEL_RED_COIN,                red_coin_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_RED_COIN_NO_SHADOW,      red_coin_no_shadow_geo],
     // ['LOAD_MODEL_FROM_GEO', MODEL_NUMBER,                  number_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_EXPLOSION,               explosion_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL_EXPLOSION,               explosion_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_DIRT_ANIMATION,          dirt_animation_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_CARTOON_STAR,            cartoon_star_geo],
     ['FREE_LEVEL_POOL', ],

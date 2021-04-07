@@ -19,11 +19,13 @@ import {
          ACT_GROUP_CUTSCENE,
          ACT_GROUP_MASK,
          ACT_ID_MASK,
+         ACT_IN_CANNON,
          ACT_JUMP_KICK,
          ACT_MOVE_PUNCHING,
          ACT_PICKING_UP,
          ACT_PICKING_UP_BOWSER,
          ACT_PUNCHING,
+         ACT_RIDING_HOOT,
          ACT_SHOT_FROM_CANNON,
          ACT_SLIDE_KICK,
          ACT_SLIDE_KICK_SLIDE,
@@ -57,6 +59,7 @@ import { SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND } from "../include/surface_t
 import { LEVEL_CCM, LEVEL_TTM, LEVEL_WF, LEVEL_HMC } from "../levels/level_defines_constants"
 import { COURSE_IS_MAIN_COURSE } from "../levels/course_defines"
 import { CameraInstance as Camera } from "./Camera"
+import { stop_shell_music } from "./SoundInit"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
 export const INTERACT_GRABBABLE      /* 0x00000002 */ = (1 << 1)
@@ -227,6 +230,36 @@ const interact_coin = (m, o) => {
     if (COURSE_IS_MAIN_COURSE(Area.gCurrCourseNum) && m.numCoins - o.rawData[oDamageOrCoinValue] < 100 && m.numCoins >= 100) {
         /// 100 coin star!
         /// TODO spawn star
+    }
+
+    return 0
+}
+
+const mario_stop_riding_object = (m) => {
+    if (m.riddenObj) {
+        m.riddenObj.rawData[oInteractStatus] = INT_STATUS_STOP_RIDING
+        stop_shell_music()
+        m.riddenObj = null
+    }
+}
+
+const mario_stop_riding_and_holding = (m) => {
+    mario_drop_held_object(m)
+    mario_stop_riding_object(m)
+
+    if (m.action == ACT_RIDING_HOOT) {
+        m.usedObj.rawData[oInteractStatus] = 0
+        m.usedObj.rawData[oHootMarioReleaseTime] = window.gGlobalTimer
+    }
+}
+
+const interact_cannon_base = (m, o) => {
+    if (m.action != ACT_IN_CANNON) {
+        mario_stop_riding_and_holding(m)
+        o.rawData[oInteractStatus] = INT_STATUS_INTERACTED
+        m.interactObj = o
+        m.usedObj = o
+        return set_mario_action(m, ACT_IN_CANNON, 0)
     }
 
     return 0
@@ -707,7 +740,7 @@ const sInteractionHandlers = [
     { interactType: INTERACT_WARP, handler: null },
     { interactType: INTERACT_WARP_DOOR, handler: null },
     { interactType: INTERACT_DOOR, handler: null },
-    { interactType: INTERACT_CANNON_BASE, handler: null },
+    { interactType: INTERACT_CANNON_BASE, handler: interact_cannon_base },
     { interactType: INTERACT_IGLOO_BARRIER, handler: null },
     { interactType: INTERACT_TORNADO, handler: null },
     { interactType: INTERACT_WHIRLPOOL, handler: null },
@@ -781,7 +814,7 @@ export const mario_process_interactions = (m) => {
 
     if (!(m.action & ACT_FLAG_INTANGIBLE) && m.collidedObjInteractTypes != 0) {
 
-        for (let i = 0; i < 31; i++) {
+        for (let i = 0; i < sInteractionHandlers.length; i++) {
             const { interactType, handler } = sInteractionHandlers[i]
             if (m.collidedObjInteractTypes & interactType) {
                 if (!handler) throw "need to implement interact handler for type: " + interactType + " all types: " + m.collidedObjInteractTypes

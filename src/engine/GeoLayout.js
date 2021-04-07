@@ -40,6 +40,7 @@ class GeoLayout {
     GEO_CULLING_RADIUS(args) {this.node_culling_radius(args)}
     GEO_DISPLAY_LIST(args) {this.display_list(args)}
     GEO_END(args) {this.node_end(args)}
+    GEO_NODE_START(args) {this.node_start(args)}
     GEO_OPEN_NODE(args) {this.open_node(args)}
     GEO_SCALE(args) {this.node_scale(args)}
     GEO_SHADOW(args) {this.node_shadow(args)}
@@ -279,13 +280,11 @@ class GeoLayout {
     }
 
     node_start(args) {
-
         const graphNode = GraphNode.init_graph_node_start()
 
         GraphNode.register_scene_graph_node(this, graphNode)
 
         this.sCurrentLayout.index++
-
     }
 
     node_end(args) {
@@ -317,6 +316,9 @@ class GeoLayout {
         while (this.sCurrentLayout.index < this.sCurrentLayout.layout.length) {
             const cmd = this.sCurrentLayout.layout[this.sCurrentLayout.index]
             if (Array.isArray(cmd)) {
+                if (!this[cmd[0]]) {
+                    throw "undefined level command: " + cmd[0]
+                }
                 // new style of command: ['name', args, ...]
                 this[cmd[0]].call(this, cmd.slice(1))
             } else {

@@ -121,6 +121,20 @@ class Camera {
         this.CAM_STATUS_MODE_GROUP = (this.CAM_STATUS_MARIO | this.CAM_STATUS_LAKITU | this.CAM_STATUS_FIXED)
         this.CAM_STATUS_C_MODE_GROUP = (this.CAM_STATUS_C_DOWN | this.CAM_STATUS_C_UP)
 
+        this.CAM_EVENT_CANNON              = 1
+        this.CAM_EVENT_SHOT_FROM_CANNON    = 2
+        this.CAM_EVENT_UNUSED_3            = 3
+        this.CAM_EVENT_BOWSER_INIT         = 4
+        this.CAM_EVENT_DOOR_WARP           = 5
+        this.CAM_EVENT_DOOR                = 6
+        this.CAM_EVENT_BOWSER_JUMP         = 7
+        this.CAM_EVENT_BOWSER_THROW_BOUNCE = 8
+        this.CAM_EVENT_START_INTRO         = 9
+        this.CAM_EVENT_START_GRAND_STAR    = 10
+        this.CAM_EVENT_START_ENDING        = 11
+        this.CAM_EVENT_START_END_WAVING    = 12
+        this.CAM_EVENT_START_CREDITS       = 13
+
         this.floor = null
 
 

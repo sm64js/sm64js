@@ -147,7 +147,10 @@ class SpawnObject {
 
         let objListIndex
 
-        if (bhvScript[0].command == BhvCmds.begin) {
+        // peek at first command
+        if (Array.isArray(bhvScript[0]) && bhvScript[0][0] == 'BEGIN') {
+            objListIndex = bhvScript[0][1]
+        }else if (bhvScript[0].command == BhvCmds.begin) {
             objListIndex = bhvScript[0].args.objListIndex
         } else {
             objListIndex =  ObjectListProc.OBJ_LIST_DEFAULT

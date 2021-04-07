@@ -17,4 +17,5 @@ export const castle_grounds_seg7_macro_objs = [
     [/*preset*/ 'macro_cannon_open',         /*yaw*/   0, /*pos*/  2384,    70,  1961, /*behParam*/ 0x40],
     [/*preset*/ 'macro_butterfly_triplet_2', /*yaw*/   0, /*pos*/ -6240,   295,   320],
     [/*preset*/ 'macro_butterfly_triplet_2', /*yaw*/   0, /*pos*/  6330,   710, -3760],
+    // [ 'macro_yellow_coin', 0, -1504,  326,  3196, 0 ],
 ]

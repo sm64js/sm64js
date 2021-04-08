@@ -11,11 +11,11 @@
  import { oPosX, oPosY, oPosZ, oVelX, oVelY, oVelZ, oMoveAngleYaw, oMoveAnglePitch, oDistanceToMario } from "../../include/object_constants"
  import { oAction, oAnimState, oHomeX, oHomeY, oHomeZ, oBehParams2ndByte } from "../../include/object_constants"
  import {
-        spawn_object, cur_obj_unhide, obj_compute_vel_from_move_pitch, obj_mark_for_deletion, obj_angle_to_object,
-        dist_between_objects, cur_obj_move_using_fvel_and_gravity, cur_obj_lateral_dist_to_home
+        spawn_object, cur_obj_unhide, obj_mark_for_deletion, obj_angle_to_object,
+        dist_between_objects, cur_obj_move_using_fvel_and_gravity, cur_obj_lateral_dist_to_home,
         }
     from "../ObjectHelpers"
- import { obj_compute_vel_from_move_pitch } from "../ObjBehaviors2.js"
+ import { obj_compute_vel_from_move_pitch, obj_move_pitch_approach, obj_roll_to_match_yaw_turn } from "../ObjBehaviors2.js"
 
  import { SurfaceCollisionInstance as SurfaceCollision } from "../../engine/SurfaceCollision"
  import { int16, random_float, sins, coss, random_u16 } from "../../utils"

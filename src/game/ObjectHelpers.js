@@ -350,6 +350,26 @@ export const approach_symmetric = (value, target, increment) => {
     return value
 }
 
+export const approach_s16_symmetric = (value, target, increment) =>{
+    let dist = target - value;
+
+    if (dist >= 0) {
+        if (dist > increment) {
+            value += increment;
+        } else {
+            value = target;
+        }
+    } else {
+        if (dist < -increment) {
+            value -= increment;
+        } else {
+            value = target;
+        }
+    }
+
+    return value;
+}
+
 export const cur_obj_forward_vel_approach_upward = (target, increment) => {
     const o = ObjectListProc.gCurrentObject
     if (o.rawData[oForwardVel] >= target) {

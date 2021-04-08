@@ -1,6 +1,6 @@
 import { oFlags, OBJ_FLAG_30, oInteractType, oDamageOrCoinValue, oHealth, oNumLootCoins, oAnimState, oAction, OBJ_ACT_HORIZONTAL_KNOCKBACK, OBJ_ACT_VERTICAL_KNOCKBACK, OBJ_ACT_SQUISHED, oInteractStatus, oTimer, oForwardVel, oVelY, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveAngleYaw, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_HIT_WALL, OBJ_MOVE_ABOVE_LAVA, oHomeX, oHomeY, oHomeZ, oPosX, oPosY, oPosZ, oDistanceToMario, oAngleToMario, OBJ_MOVE_HIT_EDGE, oMoveAnglePitch, oFaceAnglePitch, oDeathSound } from "../include/object_constants"
 
-import { cur_obj_become_tangible, cur_obj_extend_animation_if_at_end, cur_obj_become_intangible, cur_obj_hide, obj_mark_for_deletion, obj_angle_to_object, cur_obj_update_floor_and_walls, cur_obj_move_standard, abs_angle_diff, cur_obj_rotate_yaw_toward, cur_obj_reflect_move_angle_off_wall, approach_symmetric, obj_spawn_loot_yellow_coins, spawn_mist_particles } from "./ObjectHelpers"
+import { cur_obj_become_tangible, cur_obj_extend_animation_if_at_end, cur_obj_become_intangible, cur_obj_hide, obj_mark_for_deletion, obj_angle_to_object, cur_obj_update_floor_and_walls, cur_obj_move_standard, abs_angle_diff, cur_obj_rotate_yaw_toward, cur_obj_reflect_move_angle_off_wall, approach_symmetric, obj_spawn_loot_yellow_coins, spawn_mist_particles, approach_s16_symmetric} from "./ObjectHelpers"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { INT_STATUS_INTERACTED, INT_STATUS_ATTACK_MASK, INT_STATUS_ATTACKED_MARIO, ATTACK_KICK_OR_TRIP, ATTACK_FAST_ATTACK } from "./Interaction"
 import { atan2s } from "../engine/math_util"
@@ -18,9 +18,18 @@ export const ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED = 7
 export const ATTACK_HANDLER_SQUISHED_WITH_BLUE_COIN = 8
 
 
+//this lived above random_linear_offset in the source,
+export const obj_roll_to_match_yaw_turn = (targetYaw, maxRoll, rollSpeed) => {
+    const targetRoll = o.rawData[oMoveAngleYaw] - targetYaw;
+    const clampReturn = clamp_s16(targetRoll, -maxRoll, maxRoll);
+    obj_face_roll_approach(clampReturn, rollSpeed);
+    //unsure if this needs a return, no return in the original C
+}
+
 export const random_linear_offset = (base, range) => {
     return parseInt(base + (range * Math.random()))
 }
+
 
 export const approach_number_ptr = (px, target, delta) => {
     if (px.value > target) delta = -delta
@@ -83,6 +92,17 @@ export const obj_face_pitch_approach = (target, delta) => {
     return 0
 }
 
+export const obj_face_roll_approach = (targetRoll, deltaRoll) => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oFaceAngleRoll] = approach_s16_symmetric(o.rawData[oFaceAngleRoll], targetRoll, deltaRoll);
+
+    if ( o.rawData[oFaceAngleRoll] == targetRoll) {
+        return 1;
+    }
+
+    return 0;
+}
+
 export const obj_get_pitch_from_vel = () => {
     const o = ObjectListProc.gCurrentObject
     return -atan2s(o.rawData[oForwardVel], o.rawData[oVelY])
@@ -93,10 +113,24 @@ export const obj_compute_vel_from_move_pitch = (speed) => {
     const o = ObjectListProc.gCurrentObject
     o.rawData[oForwardVel] = speed * coss(o.rawData[oMoveAnglePitch]);
     o.rawData[oVelY] = speed * -sins(o.rawData[oMoveAnglePitch]);
-    //Hey Joe! I know I need to return SOME value here, but I can't figure out what
+    //Hey Joe! I cab't tell if I need to return some value here... the C had no return
     //I think it has something to do with resolving these two vectors into a single number?
     //I feel like the return should just be something like: return(o.rawData[oForwardVel] + o.rawData[oVelY])
-    return(o.rawData[oForwardVel] + o.rawData[oVelY])
+}
+
+//value was originally called as *value, I'm not sure if
+//there's an equivalent in js (pointer?), but it seemed like
+//something I can ignore based on how it's called in obj_roll_to_match_yaw_turn
+export const clamp_s16 = (value, minimum, maximum) => {
+    if (value <= minimum) {
+        value = minimum;
+    } else if (value >= maximum) {
+        value = maximum;
+    } else {
+        return 0;
+    }
+
+    return 1;
 }
 
 export const obj_random_fixed_turn = (delta) => {

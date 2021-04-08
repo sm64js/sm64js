@@ -31,6 +31,16 @@ export const cur_obj_set_behavior = (behavior) => {
     o.behavior = behavior
 }
 
+export const cur_obj_lateral_dist_to_home = () => {
+    let dist;
+    const o = ObjectListProc.gCurrentObject
+    let dx = o.rawData[oHomeX] - o.rawData[oPosX];
+    let dz = o.rawData[oHomeZ] - o.rawData[oPosZ];
+
+    dist = Math.sqrt(dx * dx + dz * dz);
+    return dist;
+}
+
 export const cur_obj_set_model = (modelID) => {
     const o = ObjectListProc.gCurrentObject
 

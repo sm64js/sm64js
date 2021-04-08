@@ -8,14 +8,14 @@
  * immediately after spawning.
  */
  import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
- import { is_point_within_radius_of_mario, set_object_visibility } from "../ObjBehaviors"
  import { oPosX, oPosY, oPosZ, oVelX, oVelY, oVelZ, oMoveAngleYaw, oMoveAnglePitch, oDistanceToMario } from "../../include/object_constants"
  import { oAction, oAnimState, oHomeX, oHomeY, oHomeZ, oBehParams2ndByte } from "../../include/object_constants"
  import {
         spawn_object, cur_obj_unhide, obj_compute_vel_from_move_pitch, obj_mark_for_deletion, obj_angle_to_object,
-        dist_between_objects, cur_obj_move_using_fvel_and_gravity
+        dist_between_objects, cur_obj_move_using_fvel_and_gravity, cur_obj_lateral_dist_to_home
         }
     from "../ObjectHelpers"
+ import { obj_compute_vel_from_move_pitch } from "../ObjBehaviors2.js"
 
  import { SurfaceCollisionInstance as SurfaceCollision } from "../../engine/SurfaceCollision"
  import { int16, random_float, sins, coss, random_u16 } from "../../utils"
@@ -27,16 +27,16 @@
 const BIRD_ACT_FLY = 1;
 const BIRD_ACT_INACTIVE = 0;
 const BIRD_BP_SPAWNED = 0;
-const BIRD_BP_SPAWNER = 1;
+// const BIRD_BP_SPAWNER = 1;
 
 /**
  * If the object is a spawned bird, start flying; if it's a spawner bird,
  * spawn spawned birds if Mario comes within 2000 units of it.
  */
 
-//can't find BIRD_BP_SPAWNER, but it exists in 
+//can't find BIRD_BP_SPAWNER, but it exists in objject_constant.h and is colloquially referenced in the comments here
 
-// May need to make imports for: cur_obj_lateral_dist_to_home, lateral_dist_between_objects, obj_compute_vel_from_move_pitch
+
  const bird_act_inactive = () => {
     const o = ObjectListProc.gCurrentObject
 

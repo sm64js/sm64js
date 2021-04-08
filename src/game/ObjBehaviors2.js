@@ -86,6 +86,17 @@ export const obj_face_pitch_approach = (target, delta) => {
 export const obj_get_pitch_from_vel = () => {
     const o = ObjectListProc.gCurrentObject
     return -atan2s(o.rawData[oForwardVel], o.rawData[oVelY])
+
+}
+
+export const obj_compute_vel_from_move_pitch = (speed) => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oForwardVel] = speed * coss(o.rawData[oMoveAnglePitch]);
+    o.rawData[oVelY] = speed * -sins(o.rawData[oMoveAnglePitch]);
+    //Hey Joe! I know I need to return SOME value here, but I can't figure out what
+    //I think it has something to do with resolving these two vectors into a single number?
+    //I feel like the return should just be something like: return(o.rawData[oForwardVel] + o.rawData[oVelY])
+    return(o.rawData[oForwardVel] + o.rawData[oVelY])
 }
 
 export const obj_random_fixed_turn = (delta) => {
@@ -157,7 +168,7 @@ export const obj_resolve_object_collisions = (targetYawWrapper) => {
             const newCenterX = o.rawData[oPosX] + dx * relativeRadius
             const newCenterZ = o.rawData[oPosZ] + dz * relativeRadius
 
-            o.rawData[oPosX] = newCenterX - radius * coss(angle) 
+            o.rawData[oPosX] = newCenterX - radius * coss(angle)
             o.rawData[oPosZ] = newCenterZ - radius * sins(angle)
 
             otherObject.rawData[oPosX] = newCenterX + otherRadius * coss(angle)

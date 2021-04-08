@@ -1101,13 +1101,12 @@ export const dist_between_objects = (obj1, obj2) => {
     return Math.sqrt(dx * dx + dy * dy + dz * dz)
 }
 
-//guess at lateral distance, followed dist_between_objects but removed the y coordinate
-//still hunting for these in the C source
-// export const lateral_dist_between_objects = (obj1, obj2) => {
-//     const dx = obj1.rawData[oPosX] - obj2.rawData[oPosX]
-//     const dz = obj1.rawData[oPosZ] - obj2.rawData[oPosZ]
-//     return Math.sqrt(dx * dx + dz * dz)
-// }
+
+export const lateral_dist_between_objects = (obj1, obj2) => {
+    const dx = obj1.rawData[oPosX] - obj2.rawData[oPosX]
+    const dz = obj1.rawData[oPosZ] - obj2.rawData[oPosZ]
+    return Math.sqrt(dx * dx + dz * dz)
+}
 
 export const obj_angle_to_object = (obj1, obj2) => {
     const x1 = obj1.rawData[oPosX], z1 = obj1.rawData[oPosZ]

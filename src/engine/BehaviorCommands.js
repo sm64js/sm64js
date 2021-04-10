@@ -25,6 +25,7 @@ class BehaviorCommands {
 
     ADD_INT(args) {return this.add_int({field: args[0], value: args[1]})}
     ADD_FLOAT(args) {return this.add_number({field: args[0], value: args[1]})}
+    ANIMATE(args) {return this.animate({animIndex: args[0]})}
     BEGIN(args) {return this.begin()}
     BEGIN_LOOP(args) {return this.begin_loop()}
     BEGIN_REPEAT(args) {return this.begin_repeat({count: args[0]})}
@@ -41,6 +42,7 @@ class BehaviorCommands {
     END_REPEAT(args) {return this.end_repeat()}
     END_REPEAT_CONTINUE(args) {return this.end_repeat_continue()}
     GOTO(args) {return this.goto({script: args[0], index: args[1]})}
+    HIDE(args) {return this.hide({})}
     LOAD_ANIMATIONS(args) {return this.load_animations({field: args[0], anims: args[1]})}
     LOAD_COLLISION_DATA(args) {return this.load_collision_data({data: args[0]})}
     OR_INT(args) {return this.or_int({field: args[0], value: args[1]})}

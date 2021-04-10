@@ -134,6 +134,8 @@ const bird_act_fly = () => {
  * Update function for bhvBird.
  */
 export const bhv_bird_update = () => {
+    const o = ObjectListProc.gCurrentObject
+
     switch (o.rawData[oAction]) {
         case BIRD_ACT_INACTIVE:
             bird_act_inactive();

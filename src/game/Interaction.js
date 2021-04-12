@@ -59,6 +59,8 @@ import { SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND } from "../include/surface_t
 import { LEVEL_CCM, LEVEL_TTM, LEVEL_WF, LEVEL_HMC } from "../levels/level_defines_constants"
 import { COURSE_IS_MAIN_COURSE } from "../levels/course_defines"
 import { CameraInstance as Camera } from "./Camera"
+import * as CAMERA from "./Camera"  // for constants
+
 import { stop_shell_music } from "./SoundInit"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
@@ -492,7 +494,7 @@ const bounce_back_from_attack = (m, interaction) => {
             set_forward_vel(m, -48.0)
         }
 
-        Camera.set_camera_shake_from_hit(Camera.SHAKE_ATTACK)
+        Camera.set_camera_shake_from_hit(CAMERA.SHAKE_ATTACK)
         m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE
     }
 
@@ -660,11 +662,11 @@ const take_damage_from_interact_object = (m) => {
     let shake
 
     if (damage >= 4) {
-        shake = Camera.SHAKE_LARGE_DAMAGE
+        shake = CAMERA.SHAKE_LARGE_DAMAGE
     } else if (damage >= 2) {
-        shake = Camera.SHAKE_MED_DAMAGE
+        shake = CAMERA.SHAKE_MED_DAMAGE
     } else {
-        shake = Camera.SHAKE_SMALL_DAMAGE
+        shake = CAMERA.SHAKE_SMALL_DAMAGE
     }
 
     if (!(m.flags & MARIO_CAP_ON_HEAD)) {

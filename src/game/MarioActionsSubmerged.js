@@ -7,6 +7,7 @@ import { SURFACE_FLOWING_WATER } from "../include/surface_terrains"
 import { AreaInstance as Area } from "../game/Area"
 import { INT_STATUS_MARIO_DROP_OBJECT, INT_STATUS_STOP_RIDING, INTERACT_GRABBABLE } from "./Interaction"
 import { CameraInstance as Camera } from "./Camera"
+import * as CAMERA from "./Camera"  // for constants
 
 const MIN_SWIM_STRENGTH = 160
 const MIN_SWIM_SPEED = 160
@@ -692,7 +693,7 @@ const act_hold_water_action_end = (m) => {
 const act_water_shocked = (m) => {
     //TODO play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_ACTION_SOUND_PLAYED);
     //TODO play_sound(SOUND_MOVING_SHOCKED, m.marioObj.header.gfx.cameraToObject);
-    Camera.set_camera_shake_from_hit(Camera.SHAKE_SHOCK)
+    Camera.set_camera_shake_from_hit(CAMERA.SHAKE_SHOCK)
 
     if (Mario.set_mario_animation(m, Mario.MARIO_ANIM_SHOCKED) == 0) {
         m.actionTimer++

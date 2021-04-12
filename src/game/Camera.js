@@ -1960,6 +1960,7 @@ class Camera {
                 this.gLakituState.focHSpeed = 0
                 this.gLakituState.posHSpeed = 0
                 break
+
             case SHAKE_LARGE_DAMAGE:
                 if (this.gPlayerCameraState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
                     this.set_camera_yaw_shake(0x600, 0x30, 0x1000)
@@ -1981,11 +1982,11 @@ class Camera {
                 break
 
             case SHAKE_SHOCK:
-                this.set_camera_pitch_shake(random_float() * 64.0, 0x8, 0x8000);
-                this.set_camera_yaw_shake(random_float() * 64.0, 0x8, 0x8000);
-                break;
+                this.set_camera_pitch_shake(random_float() * 64.0, 0x8, 0x8000)
+                this.set_camera_yaw_shake(random_float() * 64.0, 0x8, 0x8000)
+                break
 
-            default: throw "unimplemented camera shake from hit - set_camera_shake_from_hit"
+            default: throw "unimplemented camera shake - " + shake
         }
     }
 

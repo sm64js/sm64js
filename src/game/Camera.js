@@ -2,7 +2,8 @@ import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { GEO_CONTEXT_RENDER, GEO_CONTEXT_CREATE } from "../engine/graph_node"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { AreaInstance as Area } from "./Area"
-import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM, LEVEL_PSS } from "../levels/level_defines_constants"
+import * as LEVEL from "../levels/level_defines_constants"
+
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { atan2s } from "../engine/math_util"
 import * as MathUtil from "../engine/math_util"
@@ -12,31 +13,97 @@ import { SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { sins, s16, int16 } from "../utils"
 import { HudInstance as Hud } from "./Hud"
 
-const CAM_FOV_DEFAULT = 2
 
-const CAM_ANGLE_MARIO = 1
-const CAM_ANGLE_LAKITU = 2
+export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
+const LEVEL_AREA_INDEX = (levelNum, areaNum) => {return (levelNum << 4) + areaNum}
+
+export const AREA_BBH                = LEVEL_AREA_INDEX(LEVEL.BBH, 1)
+export const AREA_CCM_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL.CCM, 1)
+export const AREA_CCM_SLIDE          = LEVEL_AREA_INDEX(LEVEL.CCM, 2)
+export const AREA_CASTLE_LOBBY       = LEVEL_AREA_INDEX(LEVEL.CASTLE, 1)
+export const AREA_CASTLE_TIPPY       = LEVEL_AREA_INDEX(LEVEL.CASTLE, 2)
+export const AREA_CASTLE_BASEMENT    = LEVEL_AREA_INDEX(LEVEL.CASTLE, 3)
+export const AREA_HMC                = LEVEL_AREA_INDEX(LEVEL.HMC, 1)
+export const AREA_SSL_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL.SSL, 1)
+export const AREA_SSL_PYRAMID        = LEVEL_AREA_INDEX(LEVEL.SSL, 2)
+export const AREA_SSL_EYEROK         = LEVEL_AREA_INDEX(LEVEL.SSL, 3)
+export const AREA_BOB                = LEVEL_AREA_INDEX(LEVEL.BOB, 1)
+export const AREA_SL_OUTSIDE         = LEVEL_AREA_INDEX(LEVEL.SL, 1)
+export const AREA_SL_IGLOO           = LEVEL_AREA_INDEX(LEVEL.SL, 2)
+export const AREA_WDW_MAIN           = LEVEL_AREA_INDEX(LEVEL.WDW, 1)
+export const AREA_WDW_TOWN           = LEVEL_AREA_INDEX(LEVEL.WDW, 2)
+export const AREA_JRB_MAIN           = LEVEL_AREA_INDEX(LEVEL.JRB, 1)
+export const AREA_JRB_SHIP           = LEVEL_AREA_INDEX(LEVEL.JRB, 2)
+export const AREA_THI_HUGE           = LEVEL_AREA_INDEX(LEVEL.THI, 1)
+export const AREA_THI_TINY           = LEVEL_AREA_INDEX(LEVEL.THI, 2)
+export const AREA_THI_WIGGLER        = LEVEL_AREA_INDEX(LEVEL.THI, 3)
+export const AREA_TTC                = LEVEL_AREA_INDEX(LEVEL.TTC, 1)
+export const AREA_RR                 = LEVEL_AREA_INDEX(LEVEL.RR, 1)
+export const AREA_CASTLE_GROUNDS     = LEVEL_AREA_INDEX(LEVEL.CASTLE_GROUNDS, 1)
+export const AREA_BITDW              = LEVEL_AREA_INDEX(LEVEL.BITDW, 1)
+export const AREA_VCUTM              = LEVEL_AREA_INDEX(LEVEL.VCUTM, 1)
+export const AREA_BITFS              = LEVEL_AREA_INDEX(LEVEL.BITFS, 1)
+export const AREA_SA                 = LEVEL_AREA_INDEX(LEVEL.SA, 1)
+export const AREA_BITS               = LEVEL_AREA_INDEX(LEVEL.BITS, 1)
+export const AREA_LLL_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL.LLL, 1)
+export const AREA_LLL_VOLCANO        = LEVEL_AREA_INDEX(LEVEL.LLL, 2)
+export const AREA_DDD_WHIRLPOOL      = LEVEL_AREA_INDEX(LEVEL.DDD, 1)
+export const AREA_DDD_SUB            = LEVEL_AREA_INDEX(LEVEL.DDD, 2)
+export const AREA_WF                 = LEVEL_AREA_INDEX(LEVEL.WF, 1)
+export const AREA_ENDING             = LEVEL_AREA_INDEX(LEVEL.ENDING, 1)
+export const AREA_COURTYARD          = LEVEL_AREA_INDEX(LEVEL.CASTLE_COURTYARD, 1)
+export const AREA_PSS                = LEVEL_AREA_INDEX(LEVEL.PSS, 1)
+export const AREA_COTMC              = LEVEL_AREA_INDEX(LEVEL.COTMC, 1)
+export const AREA_TOTWC              = LEVEL_AREA_INDEX(LEVEL.TOTWC, 1)
+export const AREA_BOWSER_1           = LEVEL_AREA_INDEX(LEVEL.BOWSER_1, 1)
+export const AREA_WMOTR              = LEVEL_AREA_INDEX(LEVEL.WMOTR, 1)
+export const AREA_BOWSER_2           = LEVEL_AREA_INDEX(LEVEL.BOWSER_2, 1)
+export const AREA_BOWSER_3           = LEVEL_AREA_INDEX(LEVEL.BOWSER_3, 1)
+export const AREA_TTM_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL.TTM, 1)
 
 const CAM_MODE_MARIO_ACTIVE          =  0x01
 const CAM_MODE_LAKITU_WAS_ZOOMED_OUT =  0x02
 const CAM_MODE_MARIO_SELECTED        =  0x04
 
-const CAMERA_MODE_NONE              = 0x00
-const CAMERA_MODE_RADIAL            = 0x01
-const CAMERA_MODE_OUTWARD_RADIAL    = 0x02
+const CAM_SELECTION_MARIO = 1
+const CAM_SELECTION_FIXED = 2
+
+const CAM_ANGLE_MARIO  = 1
+const CAM_ANGLE_LAKITU = 2
+
+export const CAMERA_MODE_NONE              = 0x00
+export const CAMERA_MODE_RADIAL            = 0x01
+export const CAMERA_MODE_OUTWARD_RADIAL    = 0x02
 export const CAMERA_MODE_BEHIND_MARIO      = 0x03
-const CAMERA_MODE_CLOSE             = 0x04 // Inside Castle / Big Boo's Haunt
-const CAMERA_MODE_C_UP              = 0x06
+export const CAMERA_MODE_CLOSE             = 0x04 // Inside Castle / Big Boo's Haunt
+export const CAMERA_MODE_C_UP              = 0x06
 export const CAMERA_MODE_WATER_SURFACE     = 0x08
-const CAMERA_MODE_SLIDE_HOOT        = 0x09
-const CAMERA_MODE_INSIDE_CANNON     = 0x0A
-const CAMERA_MODE_BOSS_FIGHT        = 0x0B
-const CAMERA_MODE_PARALLEL_TRACKING = 0x0C
-const CAMERA_MODE_FIXED             = 0x0D
-const CAMERA_MODE_8_DIRECTIONS      = 0x0E // AKA Parallel Camera, Bowser Courses & Rainbow Road
-const CAMERA_MODE_FREE_ROAM         = 0x10
-const CAMERA_MODE_SPIRAL_STAIRS     = 0x11
+export const CAMERA_MODE_SLIDE_HOOT        = 0x09
+export const CAMERA_MODE_INSIDE_CANNON     = 0x0A
+export const CAMERA_MODE_BOSS_FIGHT        = 0x0B
+export const CAMERA_MODE_PARALLEL_TRACKING = 0x0C
+export const CAMERA_MODE_FIXED             = 0x0D
+export const CAMERA_MODE_8_DIRECTIONS      = 0x0E // AKA Parallel Camera, Bowser Courses & Rainbow Road
+export const CAMERA_MODE_FREE_ROAM         = 0x10
+export const CAMERA_MODE_SPIRAL_STAIRS     = 0x11
+
+// EXPERIMENTAL
+export const MODE_NONE              = 0x00
+export const MODE_RADIAL            = 0x01
+export const MODE_OUTWARD_RADIAL    = 0x02
+export const MODE_BEHIND_MARIO      = 0x03
+export const MODE_CLOSE             = 0x04 // Inside Castle / Big Boo's Haunt
+export const MODE_C_UP              = 0x06
+export const MODE_WATER_SURFACE     = 0x08
+export const MODE_SLIDE_HOOT        = 0x09
+export const MODE_INSIDE_CANNON     = 0x0A
+export const MODE_BOSS_FIGHT        = 0x0B
+export const MODE_PARALLEL_TRACKING = 0x0C
+export const MODE_FIXED             = 0x0D
+export const MODE_8_DIRECTIONS      = 0x0E // AKA Parallel Camera, Bowser Courses & Rainbow Road
+export const MODE_FREE_ROAM         = 0x10
+export const MODE_SPIRAL_STAIRS     = 0x11
 
 
 const CAM_MOVE_RETURN_TO_MIDDLE       = 0x0001
@@ -60,6 +127,12 @@ const CAM_MOVE_ROTATE                 = (CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ROTATE
 /// These flags force the camera to move a certain way
 const CAM_MOVE_RESTRICT               = (CAM_MOVE_ENTERED_ROTATE_SURFACE | CAM_MOVE_METAL_BELOW_WATER | CAM_MOVE_FIX_IN_PLACE | CAM_MOVE_UNKNOWN_8)
 
+const CAM_SOUND_C_UP_PLAYED           = 0x01
+const CAM_SOUND_MARIO_ACTIVE          = 0x02
+const CAM_SOUND_NORMAL_ACTIVE         = 0x04
+const CAM_SOUND_UNUSED_SELECT_MARIO   = 0x08
+const CAM_SOUND_UNUSED_SELECT_FIXED   = 0x10
+const CAM_SOUND_FIXED_ACTIVE          = 0x20
 
 const CAM_FLAG_SMOOTH_MOVEMENT        = 0x0001
 const CAM_FLAG_BLOCK_SMOOTH_MOVEMENT  = 0x0002
@@ -78,65 +151,164 @@ const CAM_FLAG_UNUSED_13              = 0x2000
 const CAM_FLAG_UNUSED_CUTSCENE_ACTIVE = 0x4000
 const CAM_FLAG_BEHIND_MARIO_POST_DOOR = 0x8000
 
+const CAM_STATUS_NONE   = 0
+const CAM_STATUS_MARIO  = 1 << 0
+const CAM_STATUS_LAKITU = 1 << 1
+const CAM_STATUS_FIXED  = 1 << 2
+const CAM_STATUS_C_DOWN = 1 << 3
+const CAM_STATUS_C_UP   = 1 << 4
+
+const CAM_STATUS_MODE_GROUP   = (CAM_STATUS_MARIO | CAM_STATUS_LAKITU | CAM_STATUS_FIXED)
+const CAM_STATUS_C_MODE_GROUP = (CAM_STATUS_C_DOWN | CAM_STATUS_C_UP)
+
 const L_CBUTTONS =	0x0002
 const R_CBUTTONS =	0x0001
 const D_CBUTTONS =	0x0004
 const U_CBUTTONS =	0x0008
 
 
+export const CAM_EVENT_CANNON              = 1
+export const CAM_EVENT_SHOT_FROM_CANNON    = 2
+export const CAM_EVENT_UNUSED_3            = 3
+export const CAM_EVENT_BOWSER_INIT         = 4
+export const CAM_EVENT_DOOR_WARP           = 5
+export const CAM_EVENT_DOOR                = 6
+export const CAM_EVENT_BOWSER_JUMP         = 7
+export const CAM_EVENT_BOWSER_THROW_BOUNCE = 8
+export const CAM_EVENT_START_INTRO         = 9
+export const CAM_EVENT_START_GRAND_STAR    = 10
+export const CAM_EVENT_START_ENDING        = 11
+export const CAM_EVENT_START_END_WAVING    = 12
+export const CAM_EVENT_START_CREDITS       = 13
+
+// EXPERIMENTAL, lose "CAMERA" prefix
+export const EVENT_CANNON              = 1
+export const EVENT_SHOT_FROM_CANNON    = 2
+export const EVENT_UNUSED_3            = 3
+export const EVENT_BOWSER_INIT         = 4
+export const EVENT_DOOR_WARP           = 5
+export const EVENT_DOOR                = 6
+export const EVENT_BOWSER_JUMP         = 7
+export const EVENT_BOWSER_THROW_BOUNCE = 8
+export const EVENT_START_INTRO         = 9
+export const EVENT_START_GRAND_STAR    = 10
+export const EVENT_START_ENDING        = 11
+export const EVENT_START_END_WAVING    = 12
+export const EVENT_START_CREDITS       = 13
+
+export const SHAKE_ATTACK         = 1
+export const SHAKE_GROUND_POUND   = 2
+export const SHAKE_SMALL_DAMAGE   = 3
+export const SHAKE_MED_DAMAGE     = 4
+export const SHAKE_LARGE_DAMAGE   = 5
+export const SHAKE_HIT_FROM_BELOW = 8
+export const SHAKE_FALL_DAMAGE    = 9
+export const SHAKE_SHOCK          = 10
+
+export const SHAKE_ENV_EXPLOSION           = 1
+export const SHAKE_ENV_BOWSER_THROW_BOUNCE = 2
+export const SHAKE_ENV_BOWSER_JUMP         = 3
+export const SHAKE_ENV_UNUSED_5            = 5
+export const SHAKE_ENV_UNUSED_6            = 6
+export const SHAKE_ENV_UNUSED_7            = 7
+export const SHAKE_ENV_PYRAMID_EXPLODE     = 8
+export const SHAKE_ENV_JRB_SHIP_DRAIN      = 9
+export const SHAKE_ENV_FALLING_BITS_PLAT   = 10
+
+export const SHAKE_FOV_SMALL     = 1
+export const SHAKE_FOV_UNUSED    = 2
+export const SHAKE_FOV_MEDIUM    = 3
+export const SHAKE_FOV_LARGE     = 4
+
+export const SHAKE_POS_SMALL         = 1
+export const SHAKE_POS_MEDIUM        = 2
+export const SHAKE_POS_LARGE         = 3
+export const SHAKE_POS_BOWLING_BALL  = 4
+
+export const CUTSCENE_DOOR_PULL            = 130
+export const CUTSCENE_DOOR_PUSH            = 131
+export const CUTSCENE_ENTER_CANNON         = 133
+export const CUTSCENE_ENTER_PAINTING       = 134
+export const CUTSCENE_DEATH_EXIT           = 135
+export const CUTSCENE_DOOR_WARP            = 139
+export const CUTSCENE_DOOR_PULL_MODE       = 140
+export const CUTSCENE_DOOR_PUSH_MODE       = 141
+export const CUTSCENE_INTRO_PEACH          = 142
+export const CUTSCENE_DANCE_ROTATE         = 143
+export const CUTSCENE_ENTER_BOWSER_ARENA   = 144
+export const CUTSCENE_0F_UNUSED            = 145 // Never activated, stub cutscene functions
+export const CUTSCENE_UNUSED_EXIT          = 147 // Never activated
+export const CUTSCENE_SLIDING_DOORS_OPEN   = 149
+export const CUTSCENE_PREPARE_CANNON       = 150
+export const CUTSCENE_UNLOCK_KEY_DOOR      = 151
+export const CUTSCENE_STANDING_DEATH       = 152
+export const CUTSCENE_DEATH_ON_STOMACH     = 153
+export const CUTSCENE_DEATH_ON_BACK        = 154
+export const CUTSCENE_QUICKSAND_DEATH      = 155
+export const CUTSCENE_SUFFOCATION_DEATH    = 156
+export const CUTSCENE_EXIT_BOWSER_SUCC     = 157
+export const CUTSCENE_EXIT_BOWSER_DEATH    = 158 // Never activated
+export const CUTSCENE_WATER_DEATH          = 159 // Not in cutscene switch
+export const CUTSCENE_EXIT_PAINTING_SUCC   = 160
+export const CUTSCENE_CAP_SWITCH_PRESS     = 161
+export const CUTSCENE_DIALOG               = 162
+export const CUTSCENE_RACE_DIALOG          = 163
+export const CUTSCENE_ENTER_PYRAMID_TOP    = 164
+export const CUTSCENE_DANCE_FLY_AWAY       = 165
+export const CUTSCENE_DANCE_CLOSEUP        = 166
+export const CUTSCENE_KEY_DANCE            = 167
+export const CUTSCENE_SSL_PYRAMID_EXPLODE  = 168 // Never activated
+export const CUTSCENE_EXIT_SPECIAL_SUCC    = 169
+export const CUTSCENE_NONPAINTING_DEATH    = 170
+export const CUTSCENE_READ_MESSAGE         = 171
+export const CUTSCENE_ENDING               = 172
+export const CUTSCENE_STAR_SPAWN           = 173
+export const CUTSCENE_GRAND_STAR           = 174
+export const CUTSCENE_DANCE_DEFAULT        = 175
+export const CUTSCENE_RED_COIN_STAR_SPAWN  = 176
+export const CUTSCENE_END_WAVING           = 177
+export const CUTSCENE_CREDITS              = 178
+export const CUTSCENE_EXIT_WATERFALL       = 179
+export const CUTSCENE_EXIT_FALL_WMOTR      = 180
+export const CUTSCENE_ENTER_POOL           = 181
+
+/**
+ * Stop the cutscene.
+ */
+export const CUTSCENE_STOP         = 0x8000
+/**
+ * Play the current cutscene shot indefinitely (until canceled).
+ */
+export const CUTSCENE_LOOP         = 0x7FFF
+
+export const HAND_CAM_SHAKE_OFF                  = 0
+export const HAND_CAM_SHAKE_CUTSCENE             = 1
+export const HAND_CAM_SHAKE_UNUSED               = 2
+export const HAND_CAM_SHAKE_HANG_OWL             = 3
+export const HAND_CAM_SHAKE_HIGH                 = 4
+export const HAND_CAM_SHAKE_STAR_DANCE           = 5
+export const HAND_CAM_SHAKE_LOW                  = 6
+
 const DOOR_DEFAULT         = 0
 const DOOR_LEAVING_SPECIAL = 1
 const DOOR_ENTER_LOBBY     = 2
 
+// Might rename these to reflect what they are used for instead "SET_45" etc.
+export const CAM_FOV_SET_45      = 1
+export const CAM_FOV_DEFAULT     = 2
+export const CAM_FOV_APP_45      = 4
+export const CAM_FOV_SET_30      = 5
+export const CAM_FOV_APP_20      = 6
+export const CAM_FOV_BBH         = 7
+export const CAM_FOV_APP_80      = 9
+export const CAM_FOV_APP_30      = 10
+export const CAM_FOV_APP_60      = 11
+export const CAM_FOV_ZOOM_30     = 12
+export const CAM_FOV_SET_29      = 13
+
 class Camera {
     constructor() {
-
-        this.SHAKE_ENV_EXPLOSION           = 1
-        this.SHAKE_ENV_BOWSER_THROW_BOUNCE = 2
-        this.SHAKE_ENV_BOWSER_JUMP         = 3
-        this.SHAKE_ENV_UNUSED_5            = 5
-        this.SHAKE_ENV_UNUSED_6            = 6
-        this.SHAKE_ENV_UNUSED_7            = 7
-        this.SHAKE_ENV_PYRAMID_EXPLODE     = 8
-        this.SHAKE_ENV_JRB_SHIP_DRAIN      = 9
-        this.SHAKE_ENV_FALLING_BITS_PLAT = 10
-
-        this.SHAKE_ATTACK         = 1
-        this.SHAKE_GROUND_POUND   = 2
-        this.SHAKE_SMALL_DAMAGE   = 3
-        this.SHAKE_MED_DAMAGE     = 4
-        this.SHAKE_LARGE_DAMAGE   = 5
-        this.SHAKE_HIT_FROM_BELOW = 8
-        this.SHAKE_FALL_DAMAGE    = 9
-        this.SHAKE_SHOCK          = 10
-
-        this.CAM_MOVE_C_UP_MODE = 0x2000
-
-        this.CAM_STATUS_NONE = 0;
-        this.CAM_STATUS_MARIO =  1 << 0;
-        this.CAM_STATUS_LAKITU = 1 << 1;
-        this.CAM_STATUS_FIXED  = 1 << 2;
-        this.CAM_STATUS_C_DOWN = 1 << 3;
-        this.CAM_STATUS_C_UP   = 1 << 4;
-        this.CAM_STATUS_MODE_GROUP = (this.CAM_STATUS_MARIO | this.CAM_STATUS_LAKITU | this.CAM_STATUS_FIXED)
-        this.CAM_STATUS_C_MODE_GROUP = (this.CAM_STATUS_C_DOWN | this.CAM_STATUS_C_UP)
-
-        this.CAM_EVENT_CANNON              = 1
-        this.CAM_EVENT_SHOT_FROM_CANNON    = 2
-        this.CAM_EVENT_UNUSED_3            = 3
-        this.CAM_EVENT_BOWSER_INIT         = 4
-        this.CAM_EVENT_DOOR_WARP           = 5
-        this.CAM_EVENT_DOOR                = 6
-        this.CAM_EVENT_BOWSER_JUMP         = 7
-        this.CAM_EVENT_BOWSER_THROW_BOUNCE = 8
-        this.CAM_EVENT_START_INTRO         = 9
-        this.CAM_EVENT_START_GRAND_STAR    = 10
-        this.CAM_EVENT_START_ENDING        = 11
-        this.CAM_EVENT_START_END_WAVING    = 12
-        this.CAM_EVENT_START_CREDITS       = 13
-
         this.floor = null
-
 
         this.gCameraMovementFlags = 0
 
@@ -197,10 +369,6 @@ class Camera {
 
         this.sOldPosition = [0, 0, 0]
         this.sOldFocus = [0, 0, 0]
-    }
-
-    DEGREES(d) {
-        return s16(d * 0x10000 / 360)
     }
 
     select_mario_cam_mode() {
@@ -573,20 +741,20 @@ class Camera {
         const marioOffset = [0, 125, 400]
 
         switch (Area.gCurrLevelNum) {
-            case LEVEL_CASTLE_GROUNDS:
+            case LEVEL.CASTLE_GROUNDS:
                 if (this.is_within_100_units_of_mario(-1328, 260, 4646) != 1) {
                     marioOffset[0] = -400
                     marioOffset[2] = -800
                 }
                 this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
                 break
-            case LEVEL_BOB:  /// TODO
+            case LEVEL.BOB:  /// TODO
                 this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
                 break
-            case LEVEL_CCM:  /// TODO
+            case LEVEL.CCM:  /// TODO
                 this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
                 break
-            case LEVEL_PSS:  /// TODO
+            case LEVEL.PSS:  /// TODO
                 this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
             default: this.gLakituState.mode = CAMERA_MODE_FREE_ROAM // throw err 'camera not implemented'
         }
@@ -737,7 +905,7 @@ class Camera {
 
 
     update_mario_camera(c, focus, pos) {
-        let yaw = this.gPlayerCameraState.faceAngle[1] + this.sModeOffsetYaw + this.DEGREES(180)
+        let yaw = this.gPlayerCameraState.faceAngle[1] + this.sModeOffsetYaw + DEGREES(180)
         this.focus_on_mario(focus, pos, 125, 125, this.gCameraZoomDist, 0x05B0, yaw)
 
         return this.gPlayerCameraState.faceAngle[1]
@@ -889,26 +1057,26 @@ class Camera {
     }
 
     update_camera_hud_status(c) {
-        status = this.CAM_STATUS_NONE;
+        status = CAM_STATUS_NONE
     
-        var isFixedCam = false;
-        // var isFixedCam = c.cutscene != 0 || ((this.gPlayer1Controller.buttonDown & R_TRIG) && cam_select_alt_mode(0) == CAM_SELECTION_FIXED);
+        var isFixedCam = false
+        // var isFixedCam = c.cutscene != 0 || ((this.gPlayer1Controller.buttonDown & R_TRIG) && cam_select_alt_mode(0) == CAM_SELECTION_FIXED)
 
         if (isFixedCam) {
-            status |= this.CAM_STATUS_FIXED;
+            status |= CAM_STATUS_FIXED
         // } else if (set_cam_angle(0) == CAM_ANGLE_MARIO) {
-            // status |= this.CAM_STATUS_MARIO;
+            // status |= CAM_STATUS_MARIO
         } else {
-            status |= this.CAM_STATUS_LAKITU;
+            status |= CAM_STATUS_LAKITU
         }
         if (this.gCameraMovementFlags & this.CAM_MOVE_ZOOMED_OUT > 0) {
-            status |= this.CAM_STATUS_C_DOWN;
+            status |= CAM_STATUS_C_DOWN
         }
-        if (this.gCameraMovementFlags & this.CAM_MOVE_C_UP_MODE > 0) {
-            status |= this.CAM_STATUS_C_UP;
+        if (this.gCameraMovementFlags & CAM_MOVE_C_UP_MODE > 0) {
+            status |= CAM_STATUS_C_UP
         }
-        Hud.set_hud_camera_status(status);
-        return status;
+        Hud.set_hud_camera_status(status)
+        return status
     }
 
     calc_hor_dist(a, b) {
@@ -1005,19 +1173,19 @@ class Camera {
 
 
     handle_c_button_movement(c) {
-        let cSideYaw;
+        let cSideYaw
     
         // Zoom in
         if (window.playerInput.buttonPressedCu) {
             if (c.mode != CAMERA_MODE_FIXED && (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT)) {
-                this.gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT;
-                // play_sound_cbutton_up();
+                this.gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT
+                // play_sound_cbutton_up()
             } else {
-                // set_mode_c_up(c);
+                // set_mode_c_up(c)
                 // if (sZeroZoomDist > gCameraZoomDist) {
-                //     sZoomAmount = -gCameraZoomDist;
+                //     sZoomAmount = -gCameraZoomDist
                 // } else {
-                //     sZoomAmount = gCameraZoomDist;
+                //     sZoomAmount = gCameraZoomDist
                 // }
             }
         }
@@ -1025,17 +1193,17 @@ class Camera {
             // Zoom out
             if (window.playerInput.buttonPressedCd) {
                 if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
-                    this.gCameraMovementFlags |= CAM_MOVE_ALREADY_ZOOMED_OUT;
-                    this.sZoomAmount = this.gCameraZoomDist + 400;
+                    this.gCameraMovementFlags |= CAM_MOVE_ALREADY_ZOOMED_OUT
+                    this.sZoomAmount = this.gCameraZoomDist + 400
                 } else {
-                    this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT;
-                    this.sZoomAmount = this.gCameraZoomDist + 400;
-                    // play_sound_cbutton_down();
+                    this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
+                    this.sZoomAmount = this.gCameraZoomDist + 400
+                    // play_sound_cbutton_down()
                 }
             }
     
             // Rotate left or right
-            cSideYaw = 0x1000;
+            cSideYaw = 0x1000
             if (window.playerInput.buttonPressedCr) {
                 if (this.gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT) {
                     this.gCameraMovementFlags &= ~CAM_MOVE_ROTATE_LEFT;
@@ -1066,7 +1234,7 @@ class Camera {
         let absPitch
         let dist, pitch, yaw
         let goalPitch = this.gPlayerCameraState.faceAngle[0]
-        let marioYaw = s16(this.gPlayerCameraState.faceAngle[1] + this.DEGREES(180))
+        let marioYaw = s16(this.gPlayerCameraState.faceAngle[1] + DEGREES(180))
         let goalYawOff = 0
         let yawSpeed
         let pitchInc = 32
@@ -1302,7 +1470,7 @@ class Camera {
     update_default_camera(c) {
         let nextYawVel
         let yawVel = 0
-        let yawGoal = s16(this.gPlayerCameraState.faceAngle[1] + this.DEGREES(180))
+        let yawGoal = s16(this.gPlayerCameraState.faceAngle[1] + DEGREES(180))
         let closeToMario = 0
         let ceilHeight = 20000
         let dist, pitch, yaw
@@ -1505,7 +1673,7 @@ class Camera {
         }
         if ((this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) && (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE)) {
             posHeight = 610
-            /// if pyramid level or LEVEL_CASTLE (indoor?)
+            /// if pyramid level or LEVEL.CASTLE (indoor?)
         }
 
         ///Poison Gas
@@ -1666,7 +1834,7 @@ class Camera {
             //shake_camera_handheld()
 
             if (this.gPlayerCameraState.action == Mario.ACT_DIVE && this.gLakituState.lastFrameAction != Mario.ACT_DIVE) {
-                this.set_camera_shake_from_hit(this.SHAKE_HIT_FROM_BELOW)
+                this.set_camera_shake_from_hit(SHAKE_HIT_FROM_BELOW)
             }
 
             this.gLakituState.roll += this.gLakituState.keyDanceRoll
@@ -1749,21 +1917,21 @@ class Camera {
 
     set_camera_shake_from_hit(shake) {
         switch (shake) {
-            case this.SHAKE_ATTACK:
+            case SHAKE_ATTACK:
                 this.gLakituState.focHSpeed = 0
                 this.gLakituState.posHSpeed = 0
                 break
 
-            case this.SHAKE_FALL_DAMAGE:
+            case SHAKE_FALL_DAMAGE:
                 this.set_camera_pitch_shake(0x60, 0x3, 0x8000)
                 this.set_camera_roll_shake(0x60, 0x3, 0x8000)
                 break
 
-            case this.SHAKE_GROUND_POUND:
+            case SHAKE_GROUND_POUND:
                 this.set_camera_pitch_shake(0x60, 0xC, 0x8000)
                 break
 
-            case this.SHAKE_SMALL_DAMAGE:
+            case SHAKE_SMALL_DAMAGE:
                 if (this.gPlayerCameraState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
                     this.set_camera_yaw_shake(0x200, 0x10, 0x1000)
                     this.set_camera_roll_shake(0x400, 0x20, 0x1000)
@@ -1778,7 +1946,7 @@ class Camera {
                 this.gLakituState.posHSpeed = 0
                 break
 
-            case this.SHAKE_MED_DAMAGE:
+            case SHAKE_MED_DAMAGE:
                 if (this.gPlayerCameraState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
                     this.set_camera_yaw_shake(0x400, 0x20, 0x1000)
                     this.set_camera_roll_shake(0x600, 0x30, 0x1000)
@@ -1792,7 +1960,7 @@ class Camera {
                 this.gLakituState.focHSpeed = 0
                 this.gLakituState.posHSpeed = 0
                 break
-            case this.SHAKE_LARGE_DAMAGE:
+            case SHAKE_LARGE_DAMAGE:
                 if (this.gPlayerCameraState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
                     this.set_camera_yaw_shake(0x600, 0x30, 0x1000)
                     this.set_camera_roll_shake(0x800, 0x40, 0x1000)
@@ -1807,12 +1975,12 @@ class Camera {
                 this.gLakituState.posHSpeed = 0
                 break
 
-            case this.SHAKE_HIT_FROM_BELOW:
+            case SHAKE_HIT_FROM_BELOW:
                 this.gLakituState.focHSpeed = 0.07
                 this.gLakituState.posHSpeed = 0.07
                 break
 
-            case this.SHAKE_SHOCK:
+            case SHAKE_SHOCK:
                 this.set_camera_pitch_shake(random_float() * 64.0, 0x8, 0x8000);
                 this.set_camera_yaw_shake(random_float() * 64.0, 0x8, 0x8000);
                 break;
@@ -1915,7 +2083,7 @@ class Camera {
 
     set_environmental_camera_shake(shake) {
         switch (shake) {
-            case this.SHAKE_ENV_EXPLOSION:
+            case SHAKE_ENV_EXPLOSION:
                 this.set_camera_pitch_shake(0x60, 0x8, 0x4000)
                 break
             default: throw "unimplemented camera shake type " + shake

@@ -1,60 +1,192 @@
-// import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
-import { MODEL_BLACK_BOBOMB,
-         MODEL_CANNON_BARREL,
-         MODEL_CANNON_BASE,
-         MODEL_CHAIN_CHOMP,
-         MODEL_CHECKERBOARD_PLATFORM,
-         MODEL_EXPLOSION,
-         MODEL_GOOMBA,
-         MODEL_METALLIC_BALL,
-         MODEL_WOODEN_POST } from "../include/model_ids"
+import * as MODEL from "../include/model_ids"
+
 
 import { black_bobomb_geo          } from "../actors/bobomb/geo.inc"
 import { cannon_barrel_geo         } from "../actors/cannon_barrel/geo.inc"
 import { cannon_base_geo           } from "../actors/cannon_base/geo.inc"
 import { chain_chomp_geo           } from "../actors/chain_chomp/geo.inc"
 import { checkerboard_platform_geo } from "../actors/checkerboard_platform/geo.inc"
-import { explosion_geo             } from "../actors/explosion/geo.inc"
 import { goomba_geo                } from "../actors/goomba/geo.inc"
 import { metallic_ball_geo         } from "../actors/chain_ball/geo.inc"
 import { wooden_post_geo           } from "../actors/poundable_pole/geo.inc"
 
 export const script_func_global_1 = [
-    // ['LOAD_MODEL_FROM_GEO', MODEL_BLUE_COIN_SWITCH,        blue_coin_switch_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_AMP,                     amp_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_PURPLE_SWITCH,           purple_switch_geo],
-    ['LOAD_MODEL_FROM_GEO', MODEL_CHECKERBOARD_PLATFORM,   checkerboard_platform_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_BREAKABLE_BOX,           breakable_box_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_BREAKABLE_BOX_SMALL,     breakable_box_small_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_EXCLAMATION_BOX_OUTLINE, exclamation_box_outline_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_EXCLAMATION_BOX,         exclamation_box_geo],
-    ['LOAD_MODEL_FROM_GEO', MODEL_GOOMBA,                  goomba_geo],
-    // ['LOAD_MODEL_FROM_DL',  MODEL_EXCLAMATION_POINT,       exclamation_box_outline_seg8_dl_08025F08, LAYER_ALPHA],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_KOOPA_SHELL,             koopa_shell_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_METAL_BOX,               metal_box_geo],
-    // ['LOAD_MODEL_FROM_DL',  MODEL_METAL_BOX_DL,            metal_box_dl,                             LAYER_OPAQUE],
-    ['LOAD_MODEL_FROM_GEO', MODEL_BLACK_BOBOMB,            black_bobomb_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_BOBOMB_BUDDY,            bobomb_buddy_geo],
-    // ['LOAD_MODEL_FROM_DL',  MODEL_DL_CANNON_LID,           cannon_lid_seg8_dl_080048E0,              LAYER_OPAQUE],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_BOWLING_BALL,            bowling_ball_geo],
-    ['LOAD_MODEL_FROM_GEO', MODEL_CANNON_BARREL,           cannon_barrel_geo],
-    ['LOAD_MODEL_FROM_GEO', MODEL_CANNON_BASE,             cannon_base_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_HEART,                   heart_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_FLYGUY,                  flyguy_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_CHUCKYA,                 chuckya_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_TRAJECTORY_MARKER_BALL,  bowling_ball_track_geo],
-    ['RETURN'],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.BLUE_COIN_SWITCH,        blue_coin_switch_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.AMP,                     amp_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.PURPLE_SWITCH,           purple_switch_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.CHECKERBOARD_PLATFORM,   checkerboard_platform_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.BREAKABLE_BOX,           breakable_box_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.BREAKABLE_BOX_SMALL,     breakable_box_small_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.EXCLAMATION_BOX_OUTLINE, exclamation_box_outline_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.EXCLAMATION_BOX,         exclamation_box_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.GOOMBA,                  goomba_geo],
+    // ['LOAD_MODEL_FROM_DL',  MODEL.EXCLAMATION_POINT,       exclamation_box_outline_seg8_dl_08025F08, LAYER_ALPHA],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.KOOPA_SHELL,             koopa_shell_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.METAL_BOX,               metal_box_geo],
+    // ['LOAD_MODEL_FROM_DL',  MODEL.METAL_BOX_DL,            metal_box_dl,                             LAYER_OPAQUE],
+    ['LOAD_MODEL_FROM_GEO', MODEL.BLACK_BOBOMB,            black_bobomb_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.BOBOMB_BUDDY,            bobomb_buddy_geo],
+    // ['LOAD_MODEL_FROM_DL',  MODEL.DL_CANNON_LID,           cannon_lid_seg8_dl_080048E0,              LAYER_OPAQUE],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.BOWLING_BALL,            bowling_ball_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.CANNON_BARREL,           cannon_barrel_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.CANNON_BASE,             cannon_base_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.HEART,                   heart_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.FLYGUY,                  flyguy_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.CHUCKYA,                 chuckya_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.TRAJECTORY_MARKER_BALL,  bowling_ball_track_geo],
+    ['RETURN']
 ]
 
+// export const script_func_global_2 = [
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BULLET_BILL,             bullet_bill_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.YELLOW_SPHERE,           yellow_sphere_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.HOOT,                    hoot_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.YOSHI_EGG,               yoshi_egg_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.THWOMP,                  thwomp_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.HEAVE_HO,                heave_ho_geo],
+//     ['RETURN']
+// ]
+
+// export const script_func_global_3 = [
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BLARGG,                  blargg_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BULLY,                   bully_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BULLY_BOSS,              bully_boss_geo],
+//     ['RETURN']
+// ]
+
+// export const script_func_global_4 = [
+//     ['LOAD_MODEL_FROM_GEO', MODEL.WATER_BOMB,              water_bomb_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.WATER_BOMB_SHADOW,       water_bomb_shadow_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.KING_BOBOMB,             king_bobomb_geo],
+//     ['RETURN']
+// ]
+
+// export const script_func_global_5 = [
+//     ['LOAD_MODEL_FROM_GEO', MODEL.MANTA_RAY,               manta_seg5_geo_05008D14],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.UNAGI,                   unagi_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.SUSHI,                   sushi_geo],
+//     ['LOAD_MODEL_FROM_DL',  MODEL.DL_WHIRLPOOL,            whirlpool_seg5_dl_05013CB8, LAYER_TRANSPARENT],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.CLAM_SHELL,              clam_shell_geo],
+//     ['RETURN']
+// ]
+
+// export const script_func_global_6 = [
+//     ['LOAD_MODEL_FROM_GEO', MODEL.POKEY_HEAD,              pokey_head_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.POKEY_BODY_PART,         pokey_body_part_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.TWEESTER,                tweester_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.KLEPTO,                  klepto_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.EYEROK_LEFT_HAND,        eyerok_left_hand_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.EYEROK_RIGHT_HAND,       eyerok_right_hand_geo],
+//     ['RETURN']
+// ]
+
+// export const script_func_global_7 = [
+//     ['LOAD_MODEL_FROM_DL',  MODEL.DL_MONTY_MOLE_HOLE,      monty_mole_hole_seg5_dl_05000840, LAYER_TRANSPARENT_DECAL],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.MONTY_MOLE,              monty_mole_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.UKIKI,                   ukiki_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.FWOOSH,                  fwoosh_geo],
+//     ['RETURN']
+// ]
+
+// export const script_func_global_8 = [
+//     ['LOAD_MODEL_FROM_GEO', MODEL.SPINDRIFT,               spindrift_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.MR_BLIZZARD_HIDDEN,      mr_blizzard_hidden_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.MR_BLIZZARD,             mr_blizzard_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.PENGUIN,                 penguin_geo],
+//     ['RETURN']
+// ]
+
+// export const script_func_global_9 = [
+//     ['LOAD_MODEL_FROM_DL',  MODEL.CAP_SWITCH_EXCLAMATION,  cap_switch_exclamation_seg5_dl_05002E00, LAYER_ALPHA],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.CAP_SWITCH,              cap_switch_geo],
+//     ['LOAD_MODEL_FROM_DL',  MODEL.CAP_SWITCH_BASE,         cap_switch_base_seg5_dl_05003120,        LAYER_OPAQUE],
+//     ['RETURN']
+// ]
+
+// export const script_func_global_10 = [
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BOO,                     boo_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BETA_BOO_KEY,               small_key_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.HAUNTED_CHAIR,           haunted_chair_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.MAD_PIANO,               mad_piano_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BOOKEND_PART,            bookend_part_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BOOKEND,                 bookend_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.HAUNTED_CAGE,            haunted_cage_geo],
+//     ['RETURN']
+// ]
+
+// export const script_func_global_11 = [
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BIRDS,                   birds_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.PEACH,                   peach_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.YOSHI,                   yoshi_geo],
+//     ['RETURN']
+// ]
+
+// export const script_func_global_12 = [
+//     ['LOAD_MODEL_FROM_GEO', MODEL.ENEMY_LAKITU,            enemy_lakitu_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.SPINY_BALL,              spiny_ball_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.SPINY,                   spiny_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.WIGGLER_HEAD,            wiggler_head_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.WIGGLER_BODY,            wiggler_body_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BUBBA,                   bubba_geo],
+//     ['RETURN']
+// ]
+
+// export const script_func_global_13 = [
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BOWSER,                  bowser_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BOWSER_BOMB_CHILD_OBJ,   bowser_bomb_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BOWSER_BOMB,             bowser_bomb_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BOWSER_SMOKE,            bowser_impact_smoke_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BOWSER_FLAMES,           bowser_flames_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BOWSER_WAVE,             invisible_bowser_accessory_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BOWSER2,                 bowser2_geo],
+//     ['RETURN']
+// ]
+
+// export const script_func_global_14 = [
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BUB,                     bub_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.TREASURE_CHEST_BASE,     treasure_chest_base_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.TREASURE_CHEST_LID,      treasure_chest_lid_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.CYAN_FISH,               cyan_fish_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.WATER_RING,              water_ring_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.WATER_MINE,              water_mine_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.SEAWEED,                 seaweed_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.SKEETER,                 skeeter_geo],
+//     ['RETURN']
+// ]
 
 export const script_func_global_15 = [
-    // ['LOAD_MODEL_FROM_GEO', MODEL_PIRANHA_PLANT,           piranha_plant_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_WHOMP,                   whomp_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_KOOPA_WITH_SHELL,        koopa_with_shell_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_KOOPA_WITHOUT_SHELL,     koopa_without_shell_geo],
-    ['LOAD_MODEL_FROM_GEO', MODEL_METALLIC_BALL,           metallic_ball_geo],
-    ['LOAD_MODEL_FROM_GEO', MODEL_CHAIN_CHOMP,             chain_chomp_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_KOOPA_FLAG,              koopa_flag_geo],
-    ['LOAD_MODEL_FROM_GEO', MODEL_WOODEN_POST,             wooden_post_geo],
-    ['RETURN'],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.PIRANHA_PLANT,           piranha_plant_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.WHOMP,                   whomp_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.KOOPA_WITH_SHELL,        koopa_with_shell_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.KOOPA_WITHOUT_SHELL,     koopa_without_shell_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.METALLIC_BALL,           metallic_ball_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.CHAIN_CHOMP,             chain_chomp_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.KOOPA_FLAG,              koopa_flag_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.WOODEN_POST,             wooden_post_geo],
+    ['RETURN']
 ]
+
+// export const script_func_global_16 = [
+//     ['LOAD_MODEL_FROM_GEO', MODEL.MIPS,                    mips_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BOO_CASTLE,              boo_castle_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.LAKITU,                  lakitu_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.TOAD,                    toad_geo],
+//     ['RETURN']
+// ]
+
+// export const script_func_global_17 = [
+//     ['LOAD_MODEL_FROM_GEO', MODEL.CHILL_BULLY,             chilly_chief_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.BIG_CHILL_BULLY,         chilly_chief_big_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.MONEYBAG,                moneybag_geo],
+//     ['RETURN']
+// ]
+
+// export const script_func_global_18 = [
+//     ['LOAD_MODEL_FROM_GEO', MODEL.SWOOP,                   swoop_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.SCUTTLEBUG,              scuttlebug_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.MR_I_IRIS,               mr_i_iris_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.MR_I,                    mr_i_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.DORRIE,                  dorrie_geo],
+//     ['LOAD_MODEL_FROM_GEO', MODEL.SNUFIT,                  snufit_geo],
+//     ['RETURN']
+// ]

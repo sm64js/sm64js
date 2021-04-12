@@ -264,6 +264,11 @@ export const G_IM_SIZ_16b	= 2
 export const G_IM_SIZ_32b	= 3
 export const G_IM_SIZ_DD = 5
 
+export const G_IM_SIZ_4b_BYTES  = 0
+export const G_IM_SIZ_8b_BYTES  = 1
+export const G_IM_SIZ_16b_BYTES = 2
+export const G_IM_SIZ_32b_BYTES = 4
+
 export const G_IM_SIZ_INCR_TABLE = {
     1: 1,
     2: 0
@@ -320,6 +325,34 @@ export const G_RM_FOG_SHADE_A_AA_ZB_OPA_DECAL2 = 0xc8112d58
 export const G_RM_FOG_SHADE_A_AA_ZB_XLU_SURF2 = 0xc81049d8
 
 
+// These are only used in gsDPSetRenderMode to map to actual values,
+// they're not sent to the renderer.
+export const G_RM_AA_OPA_SURF        = 1
+export const G_RM_AA_OPA_SURF2       = 2
+export const G_RM_AA_XLU_SURF        = 3
+export const G_RM_AA_XLU_SURF2       = 4
+export const G_RM_AA_ZB_OPA_SURF     = 5
+export const G_RM_AA_ZB_OPA_SURF2    = 6
+export const G_RM_AA_ZB_XLU_SURF     = 7
+export const G_RM_AA_ZB_XLU_SURF2    = 8
+export const G_RM_AA_ZB_OPA_DECAL    = 9
+export const G_RM_AA_ZB_OPA_DECAL2   = 10
+export const G_RM_AA_ZB_XLU_DECAL    = 11
+export const G_RM_AA_ZB_XLU_DECAL2   = 12
+export const G_RM_AA_ZB_OPA_INTER    = 13
+export const G_RM_AA_ZB_OPA_INTER2   = 14
+export const G_RM_AA_ZB_XLU_INTER    = 15
+export const G_RM_AA_ZB_XLU_INTER2   = 16
+export const G_RM_AA_ZB_TEX_EDGE     = 17
+export const G_RM_AA_ZB_TEX_EDGE2    = 18
+export const G_RM_FOG_SHADE_A        = 19
+export const G_RM_OPA_SURF           = 20
+export const G_RM_OPA_SURF2          = 21
+export const G_RM_NOOP2              = 22
+export const G_RM_ZB_OPA_SURF        = 23
+export const G_RM_ZB_OPA_SURF2       = 24
+
+
 //G_MOVEWORD types
 export const G_MW_MATRIX = 0x00 /* NOTE: also used by movemem */
 export const G_MW_NUMLIGHT = 0x02
@@ -341,6 +374,8 @@ export const G_MTX_MUL           = 0	/* concat or load */
 export const G_MTX_LOAD          = 2
 export const G_MTX_NOPUSH        = 0	/* push or not */
 export const G_MTX_PUSH = 4
+
+export const G_CC_PASS2 = {}
 
 export const G_CC_PRIMITIVE = {
     alpha: [7, 7, 7, 3],
@@ -763,7 +798,37 @@ export const gsSPEndDisplayList = () => {
     }
 }
 
-export const gsDPSetRenderMode = (mode) => {
+const renderModesMap = [
+    [G_RM_OPA_SURF, G_RM_OPA_SURF2,                 G_RM_OPA_SURF_SURF2],
+    [G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF2,           G_RM_AA_OPA_SURF_SURF2],
+    [G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2,           G_RM_AA_XLU_SURF_SURF2],
+    [G_RM_ZB_OPA_SURF, G_RM_ZB_OPA_SURF2,           G_RM_ZB_OPA_SURF_SURF2],
+    [G_RM_AA_ZB_TEX_EDGE, G_RM_NOOP2,               G_RM_AA_ZB_TEX_EDGE_NOOP2],
+    [G_RM_AA_ZB_OPA_INTER, G_RM_NOOP2,              G_RM_AA_ZB_OPA_INTER_NOOP2],
+    [G_RM_AA_ZB_XLU_DECAL, G_RM_AA_ZB_XLU_DECAL2,   G_RM_AA_ZB_XLU_DECAL_DECAL2],
+    [G_RM_AA_ZB_XLU_SURF, G_RM_AA_ZB_XLU_SURF2,     G_RM_AA_ZB_XLU_SURF_SURF2],
+    [G_RM_AA_ZB_XLU_SURF, G_RM_NOOP2,               G_RM_AA_ZB_XLU_SURF_NOOP2],
+    [G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2,     G_RM_AA_ZB_OPA_SURF_SURF2],
+    [G_RM_AA_ZB_OPA_DECAL, G_RM_AA_ZB_OPA_DECAL2,   G_RM_AA_ZB_OPA_DECAL_DECAL2],
+    [G_RM_AA_ZB_XLU_INTER, G_RM_AA_ZB_XLU_INTER2,   G_RM_AA_ZB_XLU_INTER_INTER2],
+    [G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_SURF2,        G_RM_FOG_SHADE_A_AA_ZB_OPA_SURF2],
+    [G_RM_FOG_SHADE_A, G_RM_AA_ZB_TEX_EDGE2,        G_RM_FOG_SHADE_A_AA_ZB_TEX_EDGE2],
+    [G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_DECAL2,       G_RM_FOG_SHADE_A_AA_ZB_OPA_DECAL2],
+    [G_RM_FOG_SHADE_A, G_RM_AA_ZB_XLU_SURF2,        G_RM_FOG_SHADE_A_AA_ZB_XLU_SURF2],
+    [G_RM_AA_ZB_OPA_SURF, G_RM_NOOP2,               G_RM_AA_ZB_OPA_SURF_NOOP2],
+    [G_RM_AA_ZB_OPA_DECAL, G_RM_NOOP2,              G_RM_AA_ZB_OPA_DECAL_NOOP2],
+]
+
+export const gsDPSetRenderMode = (mode, mode2) => {
+    if (mode2) {
+        const map = renderModesMap.find(m => m[0] == mode && m[1] == mode2)
+        if (map) {
+            mode = map[2]
+        } else {
+            throw "unknown renderMode mapping"
+        }
+    }
+
     return {
         words: {
             w0: G_SETOTHERMODE_L,
@@ -791,6 +856,10 @@ export const gsDPSetCycleType = (newmode) => {
 }
 
 export const gsSPLight = (lightData, index) => {
+    if (Array.isArray(lightData)) {
+        lightData = lightData[0]
+    }
+
     return {
         words: {
             w0: G_MOVEMEM,
@@ -938,6 +1007,8 @@ export const gsDPSetTextureImage = (format, size, width, imageData) => {
     }
 }
 
+export const CALC_DXT = (width, b_txl) => {}
+
 export const gsDPLoadBlock = (tile, uls, ult, lrs) => { ///dxt skipped
     return {
         words: {
@@ -990,3 +1061,17 @@ export const gsDPLoadTextureBlock = (timg, fmt, siz, width, height, pal, cms, cm
         gsDPSetTileSize(G_TX_RENDERTILE, 0, 0, ((width) - 1) << G_TEXTURE_IMAGE_FRAC, ((height) - 1) << G_TEXTURE_IMAGE_FRAC)
     ]
 }
+
+
+// EXPERIMENTAL
+export const gsDPPipeSync = () => {}
+export const gsDPLoadSync = () => {}
+export const gsDPTileSync = () => {}
+export const gsDPSetAlpha = () => {}
+export const gsSPPerspNormalize = () => {}
+export const gDPPipeSync = () => {}
+export const gDPLoadSync = () => {}
+export const gDPTileSync = () => {}
+export const gDPSetAlpha = () => {}
+export const gSPPerspNormalize = () => {}
+export const gsDPSetDepthSource = () => {}

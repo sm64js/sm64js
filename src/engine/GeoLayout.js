@@ -7,6 +7,29 @@ const copy3argsToObject = (pos, argIndex, args) => {
     return 3
 }
 
+// EXPERIMENTAL
+export const GEO_ANIMATED_PART = (...args) => {return ['node_animated_part', ...args]}
+export const GEO_CLOSE_NODE = (...args) => {return ['close_node', ...args]}
+export const GEO_CULLING_RADIUS = (...args) => {return ['node_culling_radius', ...args]}
+export const GEO_DISPLAY_LIST = (...args) => {return ['display_list', ...args]}
+export const GEO_END = (...args) => {return ['node_end', ...args]}
+export const GEO_NODE_START = (...args) => {return ['node_start', ...args]}
+export const GEO_OPEN_NODE = (...args) => {return ['open_node', ...args]}
+export const GEO_SCALE = (...args) => {return ['node_scale', ...args]}
+export const GEO_SHADOW = (...args) => {return ['node_shadow', ...args]}
+export const GEO_SWITCH_CASE = (...args) => {return ['node_switch_case', ...args]}
+
+// EXPERIMENTAL
+export const LAYER_FORCE             = 0
+export const LAYER_OPAQUE            = 1
+export const LAYER_OPAQUE_DECAL      = 2
+export const LAYER_OPAQUE_INTER      = 3
+export const LAYER_ALPHA             = 4
+export const LAYER_TRANSPARENT       = 5
+export const LAYER_TRANSPARENT_DECAL = 6
+export const LAYER_TRANSPARENT_INTER = 7
+
+
 class GeoLayout {
     constructor() {
         this.sCurrentLayout = {}
@@ -321,6 +344,8 @@ class GeoLayout {
                 }
                 // new style of command: ['name', args, ...]
                 this[cmd[0]].call(this, cmd.slice(1))
+            } else if (cmd.call) {
+
             } else {
                 //console.log("processing layout command: " + cmd.command.name)
                 cmd.command.call(this, cmd.args)

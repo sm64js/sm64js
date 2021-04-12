@@ -8,7 +8,7 @@ import { GoddardRendererInstance as GoddardRenderer } from "../goddard/GoddardRe
 import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
 import { init_graph_node_start } from "./graph_node"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
-import { CameraInstance as Camera } from "../game/Camera"
+import { DEGREES } from "../game/Camera"
 
 const SCRIPT_RUNNING = 1
 const SCRIPT_PAUSED = 0
@@ -91,9 +91,7 @@ class LevelCommands {
     }
 
     load_model_from_geo(model, geo) {
-        if (model < 256) {
-            Area.gLoadedGraphNodes[model] = GeoLayout.process_geo_layout(geo).node
-        } else throw "invalid gLoadedGraphNodes index - load model from geo"
+        Area.gLoadedGraphNodes[model] = GeoLayout.process_geo_layout(geo).node
 
         this.sCurrentScript.index++
     }
@@ -107,11 +105,11 @@ class LevelCommands {
     }
 
     set_mario_pos(area, yaw, x, y, z) {
-        yaw = Camera.DEGREES(yaw)
+        yaw = DEGREES(yaw)
 
         // joe debug
         if (window.debugMarioPosX) {
-            yaw = Camera.DEGREES(window.debugMarioYaw)
+            yaw = DEGREES(window.debugMarioYaw)
             x = window.debugMarioPosX
             y = window.debugMarioPosY
             z = window.debugMarioPosZ
@@ -242,7 +240,7 @@ class LevelCommands {
         if (this.sCurrAreaIndex != -1 && (act & val7 || act == 0x1F)) {
             const spawnInfo = {
                 startPos: [ x, y, z ],
-                startAngle: [Camera.DEGREES(pitch), Camera.DEGREES(yaw), Camera.DEGREES(rot)],
+                startAngle: [DEGREES(pitch), DEGREES(yaw), DEGREES(rot)],
                 areaIndex: this.sCurrAreaIndex,
                 activeAreaIndex: this.sCurrAreaIndex,
                 behaviorArg: bharg,

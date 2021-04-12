@@ -1,8 +1,10 @@
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { CameraInstance as Camera           } from "./Camera"
+import * as CAMERA from "./Camera"
 
 import { set_mario_action,
          set_mario_animation,
+         set_anim_to_frame,
          drop_and_set_mario_action,
          mario_set_forward_vel,
          set_water_plunge_action,
@@ -300,13 +302,13 @@ export const check_fall_damage = (m, hardFallAction) => {
         if (m.vel[1] < -55.0) {
             if (fallHeight > 3000.0) {
                 m.hurtCounter += (m.flags & MARIO_CAP_ON_HEAD) ? 16 : 24
-                Camera.set_camera_shake_from_hit(Camera.SHAKE_FALL_DAMAGE)
+                Camera.set_camera_shake_from_hit(CAMERA.SHAKE_FALL_DAMAGE)
                 play_sound(SOUND_MARIO_ATTACKED, m.marioObj.header.gfx.cameraToObject)
                 return drop_and_set_mario_action(m, hardFallAction, 4)
             } else if (fallHeight > damageHeight && !mario_floor_is_slippery(m)) {
                 m.hurtCounter += (m.flags & MARIO_CAP_ON_HEAD) ? 8 : 12
                 m.squishTimer = 30
-                Camera.set_camera_shake_from_hit(Camera.SHAKE_FALL_DAMAGE)
+                Camera.set_camera_shake_from_hit(CAMERA.SHAKE_FALL_DAMAGE)
                 play_sound(SOUND_MARIO_ATTACKED, m.marioObj.header.gfx.cameraToObject)
             }
         }
@@ -1125,7 +1127,7 @@ export const act_ground_pound = (m) => {
                     set_mario_action(m, ACT_GROUND_POUND_LAND, 0)
                 }
             }
-            Camera.set_camera_shake_from_hit(Camera.SHAKE_GROUND_POUND)
+            Camera.set_camera_shake_from_hit(CAMERA.SHAKE_GROUND_POUND)
         } else if (stepResult == AIR_STEP_HIT_WALL) {
             mario_set_forward_vel(m, -16.0)
             if (m.vel[1] > 0.0) {
@@ -1763,8 +1765,8 @@ export const act_jump_kick = (m) => {
 }
 
 export const act_shot_from_cannon = (m) => {
-    if (m.area.camera.mode != Camera.CAMERA_MODE_BEHIND_MARIO) {
-        m.statusForCamera.cameraEvent = Camera.CAM_EVENT_SHOT_FROM_CANNON
+    if (m.area.camera.mode != CAMERA.MODE_BEHIND_MARIO) {
+        m.statusForCamera.cameraEvent = CAMERA.EVENT_SHOT_FROM_CANNON
     }
 
     mario_set_forward_vel(m, m.forwardVel)
@@ -1820,21 +1822,21 @@ export const act_flying = (m) => {
     let startPitch = m.faceAngle[0]
 
     if (m.input & INPUT_Z_PRESSED) {
-        if (m.area.camera.mode == Camera.CAMERA_MODE_BEHIND_MARIO) {
+        if (m.area.camera.mode == CAMERA.MODE_BEHIND_MARIO) {
             Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
         }
         return set_mario_action(m, ACT_GROUND_POUND, 1)
     }
 
     if (false /*!(m.flags & MARIO_WING_CAP)*/) {  // JOE DEBUG
-        if (m.area.camera.mode == Camera.CAMERA_MODE_BEHIND_MARIO) {
+        if (m.area.camera.mode == CAMERA.MODE_BEHIND_MARIO) {
             Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
         }
         return set_mario_action(m, ACT_FREEFALL, 0)
     }
 
-    // if (m.area.camera.mode != Camera.CAMERA_MODE_BEHIND_MARIO) {
-    //     Camera.set_camera_mode(m.area.camera, Camera.CAMERA_MODE_BEHIND_MARIO, 1)
+    // if (m.area.camera.mode != CAMERA.MODE_BEHIND_MARIO) {
+    //     Camera.set_camera_mode(m.area.camera, CAMERA.MODE_BEHIND_MARIO, 1)
     // }
 
     if (m.actionState == 0) {
@@ -1963,7 +1965,7 @@ export const act_riding_hoot = (m) => {
 
 export const act_flying_triple_jump = (m) => {
     if (m.input & (INPUT_B_PRESSED | INPUT_Z_PRESSED)) {
-        if (m.area.camera.mode == Camera.CAMERA_MODE_BEHIND_MARIO) {
+        if (m.area.camera.mode == CAMERA.MODE_BEHIND_MARIO) {
             Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
         }
         if (m.input & INPUT_B_PRESSED) {
@@ -1992,8 +1994,8 @@ export const act_flying_triple_jump = (m) => {
     }
 
     if (m.vel[1] < 4.0) {
-        if (m.area.camera.mode != Camera.CAMERA_MODE_BEHIND_MARIO) {
-            Camera.set_camera_mode(m.area.camera, Camera.CAMERA_MODE_BEHIND_MARIO, 1)
+        if (m.area.camera.mode != CAMERA.MODE_BEHIND_MARIO) {
+            Camera.set_camera_mode(m.area.camera, CAMERA.MODE_BEHIND_MARIO, 1)
         }
 
         if (m.forwardVel < 32.0) {
@@ -2003,8 +2005,8 @@ export const act_flying_triple_jump = (m) => {
         set_mario_action(m, ACT_FLYING, 1)
     }
 
-    if (m.actionTimer++ == 10 && m.area.camera.mode != Camera.CAMERA_MODE_BEHIND_MARIO) {
-        Camera.set_camera_mode(m.area.camera, Camera.CAMERA_MODE_BEHIND_MARIO, 1)
+    if (m.actionTimer++ == 10 && m.area.camera.mode != CAMERA.MODE_BEHIND_MARIO) {
+        Camera.set_camera_mode(m.area.camera, CAMERA.MODE_BEHIND_MARIO, 1)
     }
 
     update_air_without_turn(m)

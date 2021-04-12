@@ -33,7 +33,6 @@ import { bubbly_tree_geo                     } from "../../actors/tree/geo.inc"
 import { castle_grounds_seg7_collision_level } from "./areas/1/collision.inc"
 import { castle_grounds_seg7_macro_objs      } from "./macro.inc"
 
-
 const script_func_local_1 = [
     // ['WARP_NODE', /*id*/ 0x00, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x00, /*flags*/ WARP_NO_CHECKPOINT],
     // ['WARP_NODE', /*id*/ 0x01, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x01, /*flags*/ WARP_NO_CHECKPOINT],

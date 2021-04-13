@@ -77,6 +77,8 @@ export const ANIM_FLAG_5 = (1 << 5) // 0x20
 export const ANIM_FLAG_6 = (1 << 6) // 0x40
 export const ANIM_FLAG_7 = (1 << 7) // 0x80
 
+export const ANIMINDEX_NUMPARTS = (animindex) => {return (animindex.length / 6) - 1}
+
 // after processing an object, the type is reset to this
 export const ANIM_TYPE_NONE = 0
 

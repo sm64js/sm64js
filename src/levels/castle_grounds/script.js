@@ -27,6 +27,7 @@ import { bhvMario,
 
 import { castle_grounds_geo_00073C           } from "./areas/1/geo"
 import { castle_grounds_geo_0006F4           } from "./areas/1/3/geo.inc"
+import { castle_grounds_geo_00070C           } from "./areas/1/7/geo.inc"
 import { castle_grounds_geo_000724           } from "./areas/1/8/geo.inc"
 import { castle_grounds_geo_000660           } from "./areas/1/11/geo.inc"
 import { bubbly_tree_geo                     } from "../../actors/tree/geo.inc"
@@ -126,7 +127,7 @@ export const level_castle_grounds_entry = [
     // LOAD_MODEL_FROM_GEO(MODEL_CASTLE_GROUNDS_WARP_PIPE,    warp_pipe_geo),
     // LOAD_MODEL_FROM_GEO(MODEL_CASTLE_GROUNDS_CASTLE_DOOR,  castle_door_geo),
     // LOAD_MODEL_FROM_GEO(MODEL_CASTLE_GROUNDS_METAL_DOOR,   metal_door_geo),
-    // LOAD_MODEL_FROM_GEO(MODEL_CASTLE_GROUNDS_VCUTM_GRILL,  castle_grounds_geo_00070C),
+    ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_VCUTM_GRILL,  castle_grounds_geo_00070C],
     ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_FLAG,     castle_grounds_geo_000660],
     ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_CANNON_GRILL, castle_grounds_geo_000724],
     ['AREA', 1, castle_grounds_geo_00073C],

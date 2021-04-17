@@ -1041,10 +1041,14 @@ const act_long_jump_land = (m) => {
 
 const act_dive_slide = (m) => {
 
-    if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & (Mario.INPUT_A_PRESSED | Mario.INPUT_B_PRESSED))) {
+    if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & Mario.INPUT_A_PRESSED)) {
         return Mario.set_mario_action(m, m.forwardVel > 0.0 ? Mario.ACT_FORWARD_ROLLOUT : Mario.ACT_BACKWARD_ROLLOUT, 0)
     }
-
+    if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & Mario.INPUT_B_PRESSED)) {
+		m.vel[1] = 16.0
+		Mario.set_forward_vel(m, 30.0)
+        return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
+    }
     //play sound
 
     if (update_sliding(m, 8.0) && Mario.is_anim_at_end(m)) {

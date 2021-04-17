@@ -28,7 +28,7 @@ const castle_grounds_seg7_vertex_0700A8D0 = [
     [[ -6705,    260,   1608], 0, [     0,    990], [0xff, 0xff, 0xff, 0xff]],
     [[ -6300,    260,   1607], 0, [   990,    990], [0xff, 0xff, 0xff, 0xff]],
     [[ -6708,    260,   1202], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
-]
+];
 
 // 0x0700A9C0 - 0x0700AAB0
 const castle_grounds_seg7_vertex_0700A9C0 = [
@@ -47,7 +47,7 @@ const castle_grounds_seg7_vertex_0700A9C0 = [
     [[ -5711,    351,   -446], 0, [     0,    990], [0xff, 0xff, 0xff, 0xff]],
     [[ -5307,    365,   -446], 0, [   990,    990], [0xff, 0xff, 0xff, 0xff]],
     [[ -6064,    411,  -1944], 0, [   990,    990], [0xff, 0xff, 0xff, 0xff]],
-]
+];
 
 // 0x0700AAB0 - 0x0700ABA0
 const castle_grounds_seg7_vertex_0700AAB0 = [
@@ -66,7 +66,7 @@ const castle_grounds_seg7_vertex_0700AAB0 = [
     [[ -2113,    381,   3062], 0, [     0,    990], [0xff, 0xff, 0xff, 0xff]],
     [[ -1704,    368,   3059], 0, [   990,    990], [0xff, 0xff, 0xff, 0xff]],
     [[ -2109,    476,   2676], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
-]
+];
 
 // 0x0700ABA0 - 0x0700AC90
 const castle_grounds_seg7_vertex_0700ABA0 = [
@@ -85,7 +85,7 @@ const castle_grounds_seg7_vertex_0700ABA0 = [
     [[ -1822,    692,   1653], 0, [   990,    990], [0xff, 0xff, 0xff, 0xff]],
     [[ -2203,    577,   1268], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
     [[    43,    701,   3221], 0, [   990,    990], [0xff, 0xff, 0xff, 0xff]],
-]
+];
 
 // 0x0700AC90 - 0x0700AD80
 const castle_grounds_seg7_vertex_0700AC90 = [
@@ -104,7 +104,7 @@ const castle_grounds_seg7_vertex_0700AC90 = [
     [[   937,    415,   2191], 0, [     0,    990], [0xff, 0xff, 0xff, 0xff]],
     [[  1307,    293,   2183], 0, [   990,    990], [0xff, 0xff, 0xff, 0xff]],
     [[   945,    439,   1783], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
-]
+];
 
 // 0x0700AD80 - 0x0700AE70
 const castle_grounds_seg7_vertex_0700AD80 = [
@@ -123,7 +123,7 @@ const castle_grounds_seg7_vertex_0700AD80 = [
     [[  6383,    172,    360], 0, [   990,    990], [0xff, 0xff, 0xff, 0xff]],
     [[  5970,    263,    -22], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
     [[  5572,    396,  -1319], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
-]
+];
 
 // 0x0700AE70 - 0x0700AF60
 const castle_grounds_seg7_vertex_0700AE70 = [
@@ -142,7 +142,7 @@ const castle_grounds_seg7_vertex_0700AE70 = [
     [[  5260,    536,  -3467], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
     [[  5268,    478,  -3066], 0, [     0,    990], [0xff, 0xff, 0xff, 0xff]],
     [[  5672,    526,  -3070], 0, [   990,    990], [0xff, 0xff, 0xff, 0xff]],
-]
+];
 
 // 0x0700AF60 - 0x0700AFD0
 const castle_grounds_seg7_vertex_0700AF60 = [
@@ -153,7 +153,7 @@ const castle_grounds_seg7_vertex_0700AF60 = [
     [[  5665,    661,  -4246], 0, [     0,    990], [0xff, 0xff, 0xff, 0xff]],
     [[  6068,    714,  -4250], 0, [   990,    990], [0xff, 0xff, 0xff, 0xff]],
     [[  6203,    855,  -5512], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
-]
+];
 
 // 0x0700AFD0 - 0x0700B1D0
 const castle_grounds_seg7_dl_0700AFD0 = [
@@ -199,7 +199,7 @@ const castle_grounds_seg7_dl_0700AFD0 = [
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP1Triangle( 0,  6,  1, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
 // 0x0700B1D0 - 0x0700B240
 export const castle_grounds_seg7_dl_0700B1D0 = [
@@ -217,6 +217,6 @@ export const castle_grounds_seg7_dl_0700B1D0 = [
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPSetGeometryMode(G_LIGHTING),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
-// 1618288530 - 2021-04-12 18:35:32 -1000
+// 1618694490 - 2021-04-17 11:21:34 -1000

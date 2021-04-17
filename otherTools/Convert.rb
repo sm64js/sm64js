@@ -44,6 +44,7 @@ class Convert
             else
                 FileUtils.mkdir_p(@js_dir)
                 case bn
+                when "anim.inc.c"       then convert_anim
                 # when "collision.inc.c"  then convert_collision
                 when "geo.inc.c"        then convert_geo
                 # when "macro.inc.c"      then convert_macro
@@ -83,49 +84,50 @@ class Convert
         header = []
         imports = []
         @cons = []
-        @anim = []
-        @anims = {}
+        @anim_text = []
 
         @lines = File.read(@c_dir + "/anim.inc.c").lines.to_a
         @n = 0
         while (@n < @lines.length)
-            if @lines[@n] =~ / static const s16 /
-                cv_animvalue
-            elsif @lines[@n] =~ / static const u16 /
-                cv_animindex
-            elsif @lines[@n] =~ / static const struct Animation /
-                cv_anim
-            elsif @lines[@n] =~ / const struct Animation *const /
-                cv_anims
+
+            if @lines[@n] =~ / const s16 .+_animvalue_/         then cv_animvalue
+            elsif @lines[@n] =~ / const u16 .+_animindex_/      then cv_animindex
+            elsif @lines[@n] =~ / struct Animation .+_anim_/    then cv_anim
+            elsif @lines[@n] =~ / Animation \*const .+_anims_/  then cv_anims
             else
-                @anim.push(@lines[@n].chomp)
+                @anim_text.push(@lines[@n].chomp)
             end
+
             @n += 1
         end
 
         header.push(@title)
-        header.push("")
 
         @cons.push("ANIMINDEX_NUMPARTS")
-        imports_wrap(imports, "game/Mario", @cons)
+        imports_wrap(imports, "include/types", @cons)
 
-        out = [header, "", imports, @anim, @ts].join("\n")
+        out = [header, "", imports, "", @anim_text, @ts].join("\n")
         File.open(@js_dir + "/anim.inc.js", "w") {|f| f.puts(out)}
     end
 
     def cv_animvalue
         while true
             line = @lines[@n]
-            if line =~ /static const s16 (\w+)/    # static const s16 castle_grounds_seg7_animvalue_flags[] = {
-                @anim.push("const #{$1} = [")
 
-            elsif line =~ /^\};/                # };
-                @model.push("]")
+            # static const s16 castle_grounds_seg7_animvalue_flags[] = {
+            if line =~ /static const s16 (\w+)/
+                @anim_text.push("const #{$1} = [")
+
+            # };
+            elsif line =~ /^\};/
+                @anim_text.push("];")
                 break
 
+            #     -5723, -5177, -4309, -2785,  -812,  1339,  3401,  5102,  6174,  6692,  6939,  6952,  6769,  6428,  5967,  5423,
             else
-                @anim.push(line.chomp)
+                @anim_text.push(line.chomp)
             end
+
             @n += 1
         end
     end
@@ -133,34 +135,48 @@ class Convert
     def cv_animindex
         while true
             line = @lines[@n]
-            if line =~ /static const u16 (\w+)/    # static const u16 castle_grounds_seg7_animindex_flags[] = {
-                @anim.push("const #{$1} = [")
 
-            elsif line =~ /^\};/                # };
-                @model.push("]")
+            # static const u16 castle_grounds_seg7_animindex_flags[] = {
+            if line =~ /static const u16 (\w+)/
+                @anim_text.push("const #{$1} = [")
+
+            # };
+            elsif line =~ /^\};/
+                @anim_text.push("];")
                 break
 
+            #     0x0001, 0x0000, 0x0001, 0x0000, 0x001D, 0x0077,
             else
-                @anim.push(line.chomp)
+                @anim_text.push(line.chomp)
             end
+
             @n += 1
         end
     end
 
     def cv_anim
-        a = []
+        @anim_fields ||= %w[flags unk02 unk04 unk06 unk08 unk0A values indices ignore]
         while true
             line = @lines[@n]
-            if line =~ /static const u16 (\w+)/    # static const u16 castle_grounds_seg7_animindex_flags[] = {
-                name = $1
 
-            elsif line =~ /^\};/                # };
-                @anims[name] = a
+            # static const struct Animation castle_grounds_seg7_anim_flags = {
+            if line =~ /static const struct Animation (\w+)/
+                @anim_text.push("const #{$1} = {")
+                f = 0
+
+            # };
+            elsif line =~ /^\};/
+                @anim_text.push("};")
                 break
 
+            # ANIMINDEX_NUMPARTS(castle_grounds_seg7_animindex_flags),
             else
-                a.push(line.strip.delete_suffix(','))
+                field = @anim_fields[f]
+                value = line.strip.delete_suffix(",")
+                @anim_text.push("    #{field}: #{value},")
+                f += 1
             end
+
             @n += 1
         end
     end
@@ -168,26 +184,24 @@ class Convert
     def cv_anims
         while true
             line = @lines[@n]
-            if line =~ /const struct Animation *const (\w+)/    # const struct Animation *const castle_grounds_seg7_anims_flags[] = {
-                @anim.push("export const #{$1} = [")
 
-            elsif line =~ /&(\w),/
-                a = @anims[$1]
-                @anim.push("    {")
-                @anim.push("        flags: #{a[0]}, unk02: #{a[1]}, unk04: #{a[2]}, unk06: #{a[3]}, unk08: #{a[4]},")
-                @anim.push("        unk0A: ANIMINDEX_NUMPARTS(#{a[7]}),")
-                @anim.push("        values: #{a[6]},")
-                @anim.push("        indices: #{a[7]}")
-                @anim.push("    }")
+            # const struct Animation *const castle_grounds_seg7_anims_flags[] = {
+            if line =~ /const struct Animation \*const (\w+)/
+                @anim_text.push("export const #{$1} = [")
 
-            elsif line =~ /^\};/                # };
-                @anim[-1].delete_suffix!(',')
-                @anim.push("]")
+            #    &castle_grounds_seg7_anim_flags, // 0x0700C944
+            elsif line =~ /\&(\w+),(.*)/                            
+                @anim_text.push("    #{$1},#{$2}")
+
+            # };
+            elsif line =~ /^\};/
+                @anim_text.push("];")
                 break
 
             else
-                @anim.push(line.chomp)
+                @anim_text.push(line.chomp)
             end
+
             @n += 1
         end
     end
@@ -197,31 +211,26 @@ class Convert
     def convert_model
         header = []
         imports = []
-        @model = []
         @trefs = []
         @texs = []
         @cmds = []
         @cons = []
+        @model_text = []
 
         @lines = File.read(@c_dir + "/model.inc.c").lines.to_a
         @n = 0
         while (@n < @lines.length)
-            if @lines[@n] =~ / Lights1 /
-                cv_Lights1
-            elsif @lines[@n] =~ / Texture /
-                cv_Texture
-            elsif @lines[@n] =~ / Vtx /
-                cv_Vtx
-            elsif @lines[@n] =~ / Gfx /
-                cv_Gfx
-            elsif @lines[@n] =~ /UNUSED/
-                cv_UNUSED
+            if @lines[@n] =~ / Lights1 /    then cv_Lights1
+            elsif @lines[@n] =~ / Texture / then cv_Texture
+            elsif @lines[@n] =~ / Vtx /     then cv_Vtx
+            elsif @lines[@n] =~ / Gfx /     then cv_Gfx
+            elsif @lines[@n] =~ /UNUSED/    then cv_UNUSED
             else
                 l = @lines[@n].chomp
                 if l != "" && header.empty?
                     header.push(l)
                 else
-                    @model.push(l)
+                    @model_text.push(l)
                 end
             end
             @n += 1
@@ -243,7 +252,7 @@ class Convert
             end
         end
         
-        out = [header, "", imports, @model, @ts].join("\n")
+        out = [header, "", imports, @model_text, @ts].join("\n")
         File.open(@js_dir + "/model.inc.js", "w") {|f| f.puts(out)}
     end
 
@@ -256,17 +265,22 @@ class Convert
 
         while true
             line = @lines[@n]
-            if line =~ /(static )*const Lights1 (\w+)/   # static const Lights1 cannon_barrel_seg8_lights_08005878 = gdSPDefLights1(
-                export = $1 ? "" : "export "
-                @model.push("#{export}const #{$2} = gdSPDefLights1(")
 
-            elsif line =~ /^\);/                            # };
-                @model.push(")")
+            # static const Lights1 cannon_barrel_seg8_lights_08005878 = gdSPDefLights1(
+            if line =~ /(static )*const Lights1 (\w+)/
+                export = $1 ? "" : "export "
+                @model_text.push("#{export}const #{$2} = gdSPDefLights1(")
+
+            # };
+            elsif line =~ /^\);/
+                @model_text.push(");")
                 break
 
+            # 0x4c, 0x4c, 0x4c,
             else
-                @model.push(line.chomp)                     # 0x4c, 0x4c, 0x4c,
+                @model_text.push(line.chomp)
             end
+
             @n += 1
         end
     end
@@ -274,38 +288,45 @@ class Convert
     def cv_Texture
         while true
             line = @lines[@n]
-            if line =~ /const Texture (\w+)/    # ALIGNED8 static const Texture cannon_barrel_seg8_texture_080058A8[] = {
+
+            # ALIGNED8 static const Texture cannon_barrel_seg8_texture_080058A8[] = {
+            if line =~ /const Texture (\w+)/
                 name = $1
                 @texs.push(name)
 
-            elsif line =~ /#include (.+)/       # #include "actors/cannon_barrel/cannon_barrel.rgba16.inc.c"
+            # #include "actors/cannon_barrel/cannon_barrel.rgba16.inc.c"
+            elsif line =~ /#include (.+)/
                 inc = $1
 
-            elsif line =~ /^\};/                # };
-                @model.push("export const #{name} = []  // #{inc}")
+            # };
+            elsif line =~ /^\};/
+                @model_text.push("export const #{name} = []  // #{inc}")
                 break
             end
+
             @n += 1
         end
     end
 
-    # {{{   -22,   1201,   -234}, 0, {   672,    994}, {0xc5, 0x6a, 0xdd, 0xff}}},
-
     def cv_Vtx
         while true
             line = @lines[@n]
-            if line =~ /(static )*const Vtx (\w+)/  # static const Vtx cannon_barrel_seg8_vertex_080060A8[] = {
+
+            # static const Vtx cannon_barrel_seg8_vertex_080060A8[] = {
+            if line =~ /(static )*const Vtx (\w+)/
                 export = $1 ? "" : "export "
-                @model.push("#{export}const #{$2} = [")
+                @model_text.push("#{export}const #{$2} = [")
 
-            elsif line =~ /{{{(.+?)}, (.+?), {(.+?)}, {(.+?)}/     #     {{{   -40,    236,     41}, 0, {   176,    748}, {0x45, 0x5d, 0xcd, 0xff}}},
-                @model.push("    [[#{$1}], #{$2}, [#{$3}], [#{$4}]],")
-                # @model.push("    {pos: [#{$1}], flag: #{$2}, tc: [#{$3}], color: [#{$4}]},")
+            #     {{{   -40,    236,     41}, 0, {   176,    748}, {0x45, 0x5d, 0xcd, 0xff}}},
+            elsif line =~ /{{{(.+?)}, (.+?), {(.+?)}, {(.+?)}/
+                @model_text.push("    [[#{$1}], #{$2}, [#{$3}], [#{$4}]],")
 
-            elsif line =~ /^\};/                    # };
-                @model.push("]")
+            # };
+            elsif line =~ /^\};/
+                @model_text.push("];")
                 break
             end
+
             @n += 1
         end
     end
@@ -313,37 +334,45 @@ class Convert
     def cv_Gfx
         while true
             line = @lines[@n]
-            if line =~ /(static )*const Gfx (\w+)/   # const Gfx cannon_barrel_seg8_dl_08006408[] = {
-                export = $1 ? "" : "export "
-                @model.push("#{export}const #{$2} = [")
 
+            # const Gfx cannon_barrel_seg8_dl_08006408[] = {
+            if line =~ /(static )*const Gfx (\w+)/ 
+                export = $1 ? "" : "export "
+                @model_text.push("#{export}const #{$2} = [")
+
+            # gsSPLight(&birds_seg5_lights_05000000.l, 1),
             elsif line =~ /(\w+)\((.*)\),/
                 cmd, args = $1, $2
 
                 @cmds.push(cmd)
 
                 case cmd
-                when "gsDPLoadBlock"                    # gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+                when "gsDPLoadBlock"
+                    # gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
                     @cons.push("CALC_DXT")
-                when "gsDPSetTextureImage"              # gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, outside_09000000),
+
+                when "gsDPSetTextureImage"
+                    # gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, outside_09000000),
                     t = args.split(",").last.strip      # outside_09000000
                     if !@texs.include?(t)
                         @trefs.push(t)  # needs to be imported
                     end
-                when "gsSPLight"                        # gsSPLight(&birds_seg5_lights_05000000.l, 1),
-                    # remove &
+
+                when "gsSPLight"
+                    # gsSPLight(&birds_seg5_lights_05000000.l, 1),
                     args.gsub!(/&/, "")
                 end
 
                 # collect G_ constants
                 @cons += args.scan(/(^|[^A-Z])(G_\w+)/).collect {|m| m[1]}
 
-                @model.push("    #{cmd}(#{args}),")
+                @model_text.push("    #{cmd}(#{args}),")
 
             elsif line =~ /^\};/                # };
-                @model.push("].filter((obj) => obj).flat()")
+                @model_text.push("].filter((obj) => obj).flat();")
                 break
             end
+
             @n += 1
         end
     end
@@ -420,7 +449,7 @@ class Convert
                 end
                 @geo.push("#{tabs}#{cmd}(#{args}),#{xtra}")
             elsif line =~ /^\};/                                # };
-                @geo.push("]")
+                @geo.push("];")
                 break
             end
             @n += 1
@@ -503,8 +532,7 @@ begin
 
 rescue
     if $!.message == "help"
-        puts "usage: Convert.rb <sm64-C-root> <sm64js-root> -a <actor>"
-        puts "usage: Convert.rb <sm64-C-root> <sm64js-root> -l <level>"
+        puts "usage: Convert.rb <sm64-root> <sm64js-root> [-a <actor> | -l <level>]"
     else
         puts "error: #{$!.inspect}"
         puts $!.backtrace

@@ -16,49 +16,49 @@ import {
 const castle_grounds_seg7_lights_07006ED8 = gdSPDefLights1(
     0x66, 0x66, 0x66,
     0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-)
+);
 
 // 0x07006EF0 - 0x07006F08
 const castle_grounds_seg7_lights_07006EF0 = gdSPDefLights1(
     0x4e, 0x4e, 0x53,
     0xc4, 0xc4, 0xd0, 0x28, 0x28, 0x28
-)
+);
 
 // 0x07006F08 - 0x07006F20
 const castle_grounds_seg7_lights_07006F08 = gdSPDefLights1(
     0x36, 0x36, 0x37,
     0x89, 0x89, 0x8a, 0x28, 0x28, 0x28
-)
+);
 
 // 0x07006F20 - 0x07006F38
 const castle_grounds_seg7_lights_07006F20 = gdSPDefLights1(
     0x2d, 0x2d, 0x38,
     0x72, 0x72, 0x8c, 0x28, 0x28, 0x28
-)
+);
 
 // 0x07006F38 - 0x07006F50
 const castle_grounds_seg7_lights_07006F38 = gdSPDefLights1(
     0x29, 0x29, 0x2a,
     0x67, 0x67, 0x69, 0x28, 0x28, 0x28
-)
+);
 
 // 0x07006F50 - 0x07006F68
 const castle_grounds_seg7_lights_07006F50 = gdSPDefLights1(
     0x56, 0x56, 0x56,
     0xd8, 0xd8, 0xd8, 0x28, 0x28, 0x28
-)
+);
 
 // 0x07006F68 - 0x07006F80
 const castle_grounds_seg7_lights_07006F68 = gdSPDefLights1(
     0x23, 0x23, 0x27,
     0x58, 0x58, 0x62, 0x28, 0x28, 0x28
-)
+);
 
 // 0x07006F80 - 0x07006F98
 const castle_grounds_seg7_lights_07006F80 = gdSPDefLights1(
     0x13, 0x57, 0x00,
     0x30, 0xdb, 0x02, 0x28, 0x28, 0x28
-)
+);
 
 // 0x07006F98 - 0x07006FD8
 const castle_grounds_seg7_vertex_07006F98 = [
@@ -66,7 +66,7 @@ const castle_grounds_seg7_vertex_07006F98 = [
     [[  4791,    343,   -485], 0, [  6518,    479], [0x26, 0xc7, 0x6a, 0xff]],
     [[  3556,    405,    -36], 0, [     0,      0], [0x46, 0x61, 0x28, 0xff]],
     [[  4791,    405,   -485], 0, [  6520,      0], [0xc8, 0x57, 0x48, 0xff]],
-]
+];
 
 // 0x07006FD8 - 0x07007018
 const castle_grounds_seg7_vertex_07006FD8 = [
@@ -74,7 +74,7 @@ const castle_grounds_seg7_vertex_07006FD8 = [
     [[  3362,    405,   -567], 0, [   -38,      0], [0xd8, 0x38, 0x96, 0xff]],
     [[  4597,    343,  -1016], 0, [  6558,    479], [0xe2, 0xa6, 0xad, 0xff]],
     [[  4597,    405,  -1016], 0, [  6550,      0], [0xb6, 0x60, 0xde, 0xff]],
-]
+];
 
 // 0x07007018 - 0x07007118
 const castle_grounds_seg7_vertex_07007018 = [
@@ -94,7 +94,7 @@ const castle_grounds_seg7_vertex_07007018 = [
     [[ -7685,    260,   2269], 0, [ -1050,  -3252], [0x4b, 0x65, 0xf1, 0xff]],
     [[ -4666,    260,   1401], 0, [  2016,  -1166], [0xfe, 0x7e, 0x04, 0xff]],
     [[ -4363,    371,    255], 0, [  3306,  -1982], [0xf9, 0x7e, 0x05, 0xff]],
-]
+];
 
 // 0x07007118 - 0x07007208
 const castle_grounds_seg7_vertex_07007118 = [
@@ -113,7 +113,7 @@ const castle_grounds_seg7_vertex_07007118 = [
     [[ -2317,    518,    929], 0, [   580,   -944], [0xec, 0x7d, 0xf8, 0xff]],
     [[ -3360,    420,   1187], 0, [  -682,   -714], [0xef, 0x7d, 0x01, 0xff]],
     [[ -1112,    801,   1396], 0, [  1890,   -384], [0xf7, 0x7e, 0x02, 0xff]],
-]
+];
 
 // 0x07007208 - 0x07007308
 const castle_grounds_seg7_vertex_07007208 = [
@@ -133,7 +133,7 @@ const castle_grounds_seg7_vertex_07007208 = [
     [[  4997,    545,  -8085], 0, [ -3902,   -874], [0xc8, 0x6a, 0x28, 0xff]],
     [[  4981,    545,  -6167], 0, [ -2524,   -108], [0xeb, 0x7d, 0x00, 0xff]],
     [[  5974,    910,  -7191], 0, [ -2872,  -1332], [0xbe, 0x5d, 0x36, 0xff]],
-]
+];
 
 // 0x07007308 - 0x07007388
 const castle_grounds_seg7_vertex_07007308 = [
@@ -145,7 +145,7 @@ const castle_grounds_seg7_vertex_07007308 = [
     [[  4963,    544,  -3762], 0, [  -794,    852], [0xf6, 0x7e, 0x07, 0xff]],
     [[  6789,   1022,  -5679], 0, [ -1450,  -1384], [0xc6, 0x6d, 0x1a, 0xff]],
     [[  5974,    910,  -7191], 0, [ -2872,  -1332], [0xbe, 0x5d, 0x36, 0xff]],
-]
+];
 
 // 0x07007388 - 0x07007488
 const castle_grounds_seg7_vertex_07007388 = [
@@ -165,7 +165,7 @@ const castle_grounds_seg7_vertex_07007388 = [
     [[   723,    260,   2933], 0, [  4912,   -904], [0x00, 0x7f, 0x00, 0xff]],
     [[   723,    260,   6005], 0, [  6138,   5226], [0x00, 0x7f, 0x00, 0xff]],
     [[ -4666,    260,   1401], 0, [ -6458,  -3962], [0xfe, 0x7e, 0x04, 0xff]],
-]
+];
 
 // 0x07007488 - 0x07007588
 const castle_grounds_seg7_vertex_07007488 = [
@@ -185,7 +185,7 @@ const castle_grounds_seg7_vertex_07007488 = [
     [[  5052,    371,  -2053], 0, [  1044,  -1178], [0xb9, 0x68, 0x0c, 0xff]],
     [[  4963,    544,  -3762], 0, [  1764,  -3782], [0xf6, 0x7e, 0x07, 0xff]],
     [[  4407,    545,  -3689], 0, [   896,  -3950], [0xaa, 0x5a, 0x15, 0xff]],
-]
+];
 
 // 0x07007588 - 0x07007688
 const castle_grounds_seg7_vertex_07007588 = [
@@ -205,7 +205,7 @@ const castle_grounds_seg7_vertex_07007588 = [
     [[  4409,    545,  -5437], 0, [  1770,  -6566], [0xd8, 0x78, 0x00, 0xff]],
     [[  4981,    545,  -6167], 0, [  2992,  -7374], [0xeb, 0x7d, 0x00, 0xff]],
     [[ -1112,    801,   1396], 0, [   632,  -3972], [0xf7, 0x7e, 0x02, 0xff]],
-]
+];
 
 // 0x07007688 - 0x07007788
 const castle_grounds_seg7_vertex_07007688 = [
@@ -225,14 +225,14 @@ const castle_grounds_seg7_vertex_07007688 = [
     [[  3468,    545,  -5438], 0, [   362,  -7036], [0x00, 0x7f, 0x00, 0xff]],
     [[  4981,    545,  -6167], 0, [  2992,  -7374], [0xeb, 0x7d, 0x00, 0xff]],
     [[  4989,    545,  -7072], 0, [  3454,  -8724], [0x00, 0x7f, 0x00, 0xff]],
-]
+];
 
 // 0x07007788 - 0x070077B8
 const castle_grounds_seg7_vertex_07007788 = [
     [[  4065,    545,  -7585], 0, [  2328,  -9954], [0x00, 0x7f, 0x00, 0xff]],
     [[  3484,    545,  -7274], 0, [  1304,  -9776], [0x00, 0x7f, 0x00, 0xff]],
     [[  3468,    545,  -5438], 0, [   362,  -7036], [0x00, 0x7f, 0x00, 0xff]],
-]
+];
 
 // 0x070077B8 - 0x07007858
 const castle_grounds_seg7_vertex_070077B8 = [
@@ -246,7 +246,7 @@ const castle_grounds_seg7_vertex_070077B8 = [
     [[  5385,  -1330,   4964], 0, [   592,    538], [0x33, 0x62, 0x3e, 0xff]],
     [[  5255,  -1125,   4748], 0, [   652,    954], [0x00, 0x7e, 0x09, 0xff]],
     [[  5400,  -1330,   4459], 0, [   -96,   1552], [0x16, 0x6a, 0xc0, 0xff]],
-]
+];
 
 // 0x07007858 - 0x07007928
 const castle_grounds_seg7_vertex_07007858 = [
@@ -263,7 +263,7 @@ const castle_grounds_seg7_vertex_07007858 = [
     [[  3587,  -1330,   4339], 0, [  -966,  -4062], [0x39, 0x65, 0x31, 0xff]],
     [[  4402,  -1330,   3226], 0, [ -2732,  -2850], [0x54, 0x5c, 0x14, 0xff]],
     [[  3362,      0,    725], 0, [ -1556,   2452], [0x54, 0x5c, 0x17, 0xff]],
-]
+];
 
 // 0x07007928 - 0x07007968
 const castle_grounds_seg7_vertex_07007928 = [
@@ -271,7 +271,7 @@ const castle_grounds_seg7_vertex_07007928 = [
     [[  7683,  -1330,    140], 0, [ -3330,   1754], [0x00, 0x7f, 0x00, 0xff]],
     [[  2698,  -1330,    140], 0, [  3300,   2170], [0x00, 0x7f, 0x00, 0xff]],
     [[  7724,  -1330,   5997], 0, [ -4458,  -3372], [0x00, 0x7f, 0x00, 0xff]],
-]
+];
 
 // 0x07007968 - 0x070079C8
 const castle_grounds_seg7_vertex_07007968 = [
@@ -281,7 +281,7 @@ const castle_grounds_seg7_vertex_07007968 = [
     [[  4402,  -1330,   3226], 0, [ -2732,  -2850], [0x54, 0x5c, 0x14, 0xff]],
     [[  3238,    -89,   1787], 0, [ -1000,    760], [0x23, 0x78, 0x10, 0xff]],
     [[  2601,   -101,   2939], 0, [   472,   -660], [0x24, 0x77, 0x18, 0xff]],
-]
+];
 
 // 0x070079C8 - 0x07007A08
 const castle_grounds_seg7_vertex_070079C8 = [
@@ -289,7 +289,7 @@ const castle_grounds_seg7_vertex_070079C8 = [
     [[  3556,    405,    -36], 0, [     0,    990], [0x46, 0x61, 0x28, 0xff]],
     [[  4597,    405,  -1016], 0, [  4068,    -36], [0xb6, 0x60, 0xde, 0xff]],
     [[  4791,    405,   -485], 0, [  4068,    990], [0xc8, 0x57, 0x48, 0xff]],
-]
+];
 
 // 0x07007A08 - 0x07007A48
 const castle_grounds_seg7_vertex_07007A08 = [
@@ -297,7 +297,7 @@ const castle_grounds_seg7_vertex_07007A08 = [
     [[  4597,    343,  -1016], 0, [  4068,    -36], [0xe2, 0xa6, 0xad, 0xff]],
     [[  3555,    343,    -37], 0, [     0,    988], [0x13, 0x8f, 0x34, 0xff]],
     [[  4791,    343,   -485], 0, [  4068,    990], [0x26, 0xc7, 0x6a, 0xff]],
-]
+];
 
 // 0x07007A48 - 0x07007B38
 const castle_grounds_seg7_vertex_07007A48 = [
@@ -316,7 +316,7 @@ const castle_grounds_seg7_vertex_07007A48 = [
     [[  2318,    371,    683], 0, [  1994,   3390], [0x1e, 0x77, 0x1f, 0xff]],
     [[    91,    801,   1396], 0, [  1308,    480], [0x0d, 0x7d, 0x09, 0xff]],
     [[ -1112,    801,   1396], 0, [  1446,  -1200], [0xf7, 0x7e, 0x02, 0xff]],
-]
+];
 
 // 0x07007B38 - 0x07007BC8
 const castle_grounds_seg7_vertex_07007B38 = [
@@ -329,7 +329,7 @@ const castle_grounds_seg7_vertex_07007B38 = [
     [[     0,    727,   2146], 0, [   330,    558], [0x13, 0x7c, 0x0c, 0xff]],
     [[  1062,    558,   3465], 0, [ -1528,   2396], [0x47, 0x64, 0xe3, 0xff]],
     [[  1713,     -7,   3720], 0, [ -1938,   3374], [0x4f, 0x62, 0xf6, 0xff]],
-]
+];
 
 // 0x07007BC8 - 0x07007C98
 const castle_grounds_seg7_vertex_07007BC8 = [
@@ -346,7 +346,7 @@ const castle_grounds_seg7_vertex_07007BC8 = [
     [[  3362,   -665,   -567], 0, [  1986,   1436], [0x77, 0x00, 0xd5, 0xff]],
     [[  3556,    405,    -36], 0, [  1142,      8], [0x46, 0x61, 0x28, 0xff]],
     [[  3363,    343,   -566], 0, [  1864,    332], [0x2b, 0xb6, 0xa3, 0xff]],
-]
+];
 
 // 0x07007C98 - 0x07007D58
 const castle_grounds_seg7_vertex_07007C98 = [
@@ -362,7 +362,7 @@ const castle_grounds_seg7_vertex_07007C98 = [
     [[   554,   -511,   -162], 0, [  1138,    892], [0x00, 0x00, 0x81, 0xff]],
     [[  -553,    811,   -162], 0, [  1776,     40], [0xf1, 0x76, 0xd4, 0xff]],
     [[   554,    811,   -162], 0, [  1316,     40], [0x0e, 0x7a, 0xe4, 0xff]],
-]
+];
 
 // 0x07007D58 - 0x07007D98
 const castle_grounds_seg7_vertex_07007D58 = [
@@ -370,7 +370,7 @@ const castle_grounds_seg7_vertex_07007D58 = [
     [[ -4700,    543,  -3663], 0, [  1870,    164], [0x58, 0x5a, 0xfb, 0xff]],
     [[ -4702,  -1228,  -3663], 0, [  1586,   1428], [0x7a, 0x00, 0xdd, 0xff]],
     [[ -4929,  -1228,  -4194], 0, [  1850,   1428], [0x4f, 0x00, 0x9e, 0xff]],
-]
+];
 
 // 0x07007D98 - 0x07007E78
 const castle_grounds_seg7_vertex_07007D98 = [
@@ -388,7 +388,7 @@ const castle_grounds_seg7_vertex_07007D98 = [
     [[  2630,   -448,   4746], 0, [  8568,    676], [0x68, 0x36, 0xd2, 0xff]],
     [[  1713,     -7,   3720], 0, [  7880,    180], [0x4f, 0x62, 0xf6, 0xff]],
     [[  2816,   -511,   5376], 0, [  8900,    704], [0x4d, 0x3c, 0xb0, 0xff]],
-]
+];
 
 // 0x07007E78 - 0x07007F78
 const castle_grounds_seg7_vertex_07007E78 = [
@@ -408,7 +408,7 @@ const castle_grounds_seg7_vertex_07007E78 = [
     [[ -6230,   1949,  -7009], 0, [   656,    264], [0x27, 0x4a, 0x5f, 0xff]],
     [[ -7463,   2074,  -5749], 0, [  -152,    212], [0x5b, 0x4d, 0x2a, 0xff]],
     [[ -3906,  -1228,  -6149], 0, [  1108,   1256], [0x24, 0x0a, 0x79, 0xff]],
-]
+];
 
 // 0x07007F78 - 0x07008078
 const castle_grounds_seg7_vertex_07007F78 = [
@@ -428,7 +428,7 @@ const castle_grounds_seg7_vertex_07007F78 = [
     [[ -7796,   2569,  -6392], 0, [   -42,     48], [0x4b, 0x61, 0x1d, 0xff]],
     [[ -8191,   3079,  -7570], 0, [   226,   -136], [0x35, 0x5f, 0x3f, 0xff]],
     [[ -6230,   1949,  -7009], 0, [   656,    264], [0x27, 0x4a, 0x5f, 0xff]],
-]
+];
 
 // 0x07008078 - 0x07008178
 const castle_grounds_seg7_vertex_07008078 = [
@@ -448,7 +448,7 @@ const castle_grounds_seg7_vertex_07008078 = [
     [[  7878,   -101,   4665], 0, [  1750,    224], [0xab, 0x50, 0xd0, 0xff]],
     [[  8018,   -101,   3280], 0, [  2482,    344], [0xa8, 0x59, 0x10, 0xff]],
     [[  7245,   -702,   4780], 0, [  1496,   1008], [0xb6, 0x55, 0xc7, 0xff]],
-]
+];
 
 // 0x07008178 - 0x07008268
 const castle_grounds_seg7_vertex_07008178 = [
@@ -467,7 +467,7 @@ const castle_grounds_seg7_vertex_07008178 = [
     [[  2816,   -511,   5376], 0, [  8900,    704], [0x4d, 0x3c, 0xb0, 0xff]],
     [[  3913,  -1330,   5495], 0, [  9464,   1776], [0x19, 0x29, 0x8b, 0xff]],
     [[  5882,  -1330,   5370], 0, [ 10772,   1788], [0xd9, 0x3d, 0x99, 0xff]],
-]
+];
 
 // 0x07008268 - 0x070082C8
 const castle_grounds_seg7_vertex_07008268 = [
@@ -477,7 +477,7 @@ const castle_grounds_seg7_vertex_07008268 = [
     [[ -5786,  -1228,  -4362], 0, [   432,   1340], [0x59, 0x31, 0xb4, 0xff]],
     [[ -4928,    543,  -4193], 0, [   114,    340], [0x3c, 0x52, 0xb5, 0xff]],
     [[ -4929,  -1228,  -4194], 0, [     2,   1292], [0x4f, 0x00, 0x9e, 0xff]],
-]
+];
 
 // 0x070082C8 - 0x07008338
 const castle_grounds_seg7_vertex_070082C8 = [
@@ -488,14 +488,14 @@ const castle_grounds_seg7_vertex_070082C8 = [
     [[  4597,   -665,  -1016], 0, [   208,   1228], [0x89, 0x00, 0x2b, 0xff]],
     [[  4791,    405,   -485], 0, [   756,    -44], [0xc8, 0x57, 0x48, 0xff]],
     [[  5019,  -1330,    140], 0, [  1028,   1604], [0x9b, 0x1a, 0x47, 0xff]],
-]
+];
 
 // 0x07008338 - 0x07008368
 const castle_grounds_seg7_vertex_07008338 = [
     [[  3362,      0,    725], 0, [   346,     12], [0x54, 0x5c, 0x17, 0xff]],
     [[  3784,  -1330,    590], 0, [   528,   1824], [0x7b, 0x19, 0xf3, 0xff]],
     [[  3556,    405,    -36], 0, [  1142,      8], [0x46, 0x61, 0x28, 0xff]],
-]
+];
 
 // 0x07008368 - 0x07008458
 const castle_grounds_seg7_vertex_07008368 = [
@@ -514,7 +514,7 @@ const castle_grounds_seg7_vertex_07008368 = [
     [[  6789,   1022,  -5679], 0, [   134,  -3752], [0xc6, 0x6d, 0x1a, 0xff]],
     [[ -7415,    508,   3183], 0, [   294,  -3548], [0x47, 0x63, 0xde, 0xff]],
     [[ -8191,   1729,   2324], 0, [   712,  -2256], [0x73, 0x34, 0xf4, 0xff]],
-]
+];
 
 // 0x07008458 - 0x07008558
 const castle_grounds_seg7_vertex_07008458 = [
@@ -534,7 +534,7 @@ const castle_grounds_seg7_vertex_07008458 = [
     [[  2155,   1057,   6472], 0, [   720,  -3580], [0x33, 0x6c, 0xd9, 0xff]],
     [[  1536,    718,   4698], 0, [   558,  -2800], [0x3d, 0x69, 0xdd, 0xff]],
     [[   785,    996,   5113], 0, [   656,  -2052], [0xed, 0x78, 0xde, 0xff]],
-]
+];
 
 // 0x07008558 - 0x07008638
 const castle_grounds_seg7_vertex_07008558 = [
@@ -552,7 +552,7 @@ const castle_grounds_seg7_vertex_07008558 = [
     [[  -265,   1126,   6164], 0, [   682,   -936], [0xe5, 0x61, 0xb3, 0xff]],
     [[ -2047,    260,   5792], 0, [   264,   1276], [0x00, 0x5a, 0xa7, 0xff]],
     [[  -829,    260,   5658], 0, [   298,    -64], [0xe8, 0x42, 0x97, 0xff]],
-]
+];
 
 // 0x07008638 - 0x07008738
 const castle_grounds_seg7_vertex_07008638 = [
@@ -572,7 +572,7 @@ const castle_grounds_seg7_vertex_07008638 = [
     [[  1536,    718,   4698], 0, [   608,    536], [0x3d, 0x69, 0xdd, 0xff]],
     [[  1062,    558,   3465], 0, [   452,   -712], [0x47, 0x64, 0xe3, 0xff]],
     [[    48,    260,   3912], 0, [   282,     88], [0xaa, 0x53, 0x28, 0xff]],
-]
+];
 
 // 0x07008738 - 0x07008818
 const castle_grounds_seg7_vertex_07008738 = [
@@ -590,7 +590,7 @@ const castle_grounds_seg7_vertex_07008738 = [
     [[  1062,    558,   3465], 0, [   452,   -712], [0x47, 0x64, 0xe3, 0xff]],
     [[  1536,    718,   4698], 0, [   608,    536], [0x3d, 0x69, 0xdd, 0xff]],
     [[  2048,    236,   4760], 0, [   304,   1080], [0x58, 0x4d, 0xd0, 0xff]],
-]
+];
 
 // 0x07008818 - 0x07008908
 const castle_grounds_seg7_vertex_07008818 = [
@@ -609,7 +609,7 @@ const castle_grounds_seg7_vertex_07008818 = [
     [[  1713,     -7,   3720], 0, [   150,   -324], [0x4f, 0x62, 0xf6, 0xff]],
     [[  1062,    558,   3465], 0, [   452,   -712], [0x47, 0x64, 0xe3, 0xff]],
     [[  2048,    236,   4760], 0, [   304,   1080], [0x58, 0x4d, 0xd0, 0xff]],
-]
+];
 
 // 0x07008908 - 0x070089B8
 const castle_grounds_seg7_vertex_07008908 = [
@@ -624,7 +624,7 @@ const castle_grounds_seg7_vertex_07008908 = [
     [[  4407,    545,  -3689], 0, [  1744,  -4480], [0xaa, 0x5a, 0x15, 0xff]],
     [[  4409,    545,  -5437], 0, [ -6976,  -4480], [0xd8, 0x78, 0x00, 0xff]],
     [[   554,    607,   -162], 0, [   576,  -5610], [0x00, 0x00, 0x81, 0xff]],
-]
+];
 
 // 0x070089B8 - 0x070089F8
 const castle_grounds_seg7_vertex_070089B8 = [
@@ -632,7 +632,7 @@ const castle_grounds_seg7_vertex_070089B8 = [
     [[  5052,    371,  -2053], 0, [  2412,  -3594], [0xb9, 0x68, 0x0c, 0xff]],
     [[  4407,   -511,  -3689], 0, [ -6360,    810], [0x85, 0x00, 0x1f, 0xff]],
     [[  4407,    545,  -3689], 0, [ -6360,  -4462], [0xaa, 0x5a, 0x15, 0xff]],
-]
+];
 
 // 0x070089F8 - 0x07008A68
 const castle_grounds_seg7_dl_070089F8 = [
@@ -648,7 +648,7 @@ const castle_grounds_seg7_dl_070089F8 = [
     gsSPVertex(castle_grounds_seg7_vertex_07006FD8, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  2,  1, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
 // 0x07008A68 - 0x07008BF0
 const castle_grounds_seg7_dl_07008A68 = [
@@ -682,7 +682,7 @@ const castle_grounds_seg7_dl_07008A68 = [
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  3, 0x0,  3,  7,  4, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
 // 0x07008BF0 - 0x07008D70
 const castle_grounds_seg7_dl_07008BF0 = [
@@ -716,7 +716,7 @@ const castle_grounds_seg7_dl_07008BF0 = [
     gsSPVertex(castle_grounds_seg7_vertex_07007788, 3, 0),
     gsSP1Triangle( 0,  1,  2, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
 // 0x07008D70 - 0x07008DE8
 const castle_grounds_seg7_dl_07008D70 = [
@@ -731,7 +731,7 @@ const castle_grounds_seg7_dl_07008D70 = [
     gsSP2Triangles( 4,  5,  2, 0x0,  6,  7,  8, 0x0),
     gsSP2Triangles( 9,  6,  8, 0x0,  7,  9,  8, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
 // 0x07008DE8 - 0x07008EE8
 const castle_grounds_seg7_dl_07008DE8 = [
@@ -758,7 +758,7 @@ const castle_grounds_seg7_dl_07008DE8 = [
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSP2Triangles( 3,  1,  4, 0x0,  3,  4,  5, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
 // 0x07008EE8 - 0x07008F48
 const castle_grounds_seg7_dl_07008EE8 = [
@@ -772,7 +772,7 @@ const castle_grounds_seg7_dl_07008EE8 = [
     gsSPVertex(castle_grounds_seg7_vertex_07007A08, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  2,  1,  3, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
 // 0x07008F48 - 0x07009010
 const castle_grounds_seg7_dl_07008F48 = [
@@ -793,7 +793,7 @@ const castle_grounds_seg7_dl_07008F48 = [
     gsSP2Triangles( 4,  7,  5, 0x0,  6,  7,  4, 0x0),
     gsSP1Triangle( 7,  8,  5, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
 // 0x07009010 - 0x07009330
 const castle_grounds_seg7_dl_07009010 = [
@@ -864,7 +864,7 @@ const castle_grounds_seg7_dl_07009010 = [
     gsSPVertex(castle_grounds_seg7_vertex_07008338, 3, 0),
     gsSP1Triangle( 0,  1,  2, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
 // 0x07009330 - 0x07009568
 const castle_grounds_seg7_dl_07009330 = [
@@ -911,7 +911,7 @@ const castle_grounds_seg7_dl_07009330 = [
     gsSP2Triangles( 8,  9, 10, 0x0,  8, 10, 11, 0x0),
     gsSP1Triangle(12, 13, 14, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
 // 0x07009568 - 0x070095F0
 const castle_grounds_seg7_dl_07009568 = [
@@ -929,7 +929,7 @@ const castle_grounds_seg7_dl_07009568 = [
     gsSPVertex(castle_grounds_seg7_vertex_070089B8, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  2,  1,  3, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
 // 0x070095F0 - 0x070096F8
 export const castle_grounds_seg7_dl_070095F0 = [
@@ -966,6 +966,6 @@ export const castle_grounds_seg7_dl_070095F0 = [
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
-// 1618288530 - 2021-04-12 18:35:32 -1000
+// 1618694490 - 2021-04-17 11:21:34 -1000

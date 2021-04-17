@@ -15,31 +15,31 @@ import {
 const castle_grounds_seg7_lights_0700BCD8 = gdSPDefLights1(
     0x3d, 0x3d, 0x44,
     0x99, 0x99, 0xac, 0x28, 0x28, 0x28
-)
+);
 
 // 0x0700BCF0 - 0x0700BD08
 const castle_grounds_seg7_lights_0700BCF0 = gdSPDefLights1(
     0x58, 0x58, 0x5a,
     0xdc, 0xdc, 0xe3, 0x28, 0x28, 0x28
-)
+);
 
 // 0x0700BD08 - 0x0700BD20
 const castle_grounds_seg7_lights_0700BD08 = gdSPDefLights1(
     0x66, 0x66, 0x66,
     0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-)
+);
 
 // 0x0700BD20 - 0x0700BD38
 const castle_grounds_seg7_lights_0700BD20 = gdSPDefLights1(
     0x4e, 0x4e, 0x53,
     0xc4, 0xc4, 0xd0, 0x28, 0x28, 0x28
-)
+);
 
 // 0x0700BD38 - 0x0700BD50
 const castle_grounds_seg7_lights_0700BD38 = gdSPDefLights1(
     0x45, 0x45, 0x4b,
     0xad, 0xad, 0xbc, 0x28, 0x28, 0x28
-)
+);
 
 // 0x0700BD50 - 0x0700BE10
 const castle_grounds_seg7_vertex_0700BD50 = [
@@ -55,7 +55,7 @@ const castle_grounds_seg7_vertex_0700BD50 = [
     [[  2485,   -422,   2072], 0, [   820,    536], [0x81, 0x00, 0x00, 0xff]],
     [[  2485,     89,   2072], 0, [     0,    536], [0x81, 0x00, 0x00, 0xff]],
     [[  2485,   -422,   1849], 0, [   820,   2012], [0x81, 0x00, 0x00, 0xff]],
-]
+];
 
 // 0x0700BE10 - 0x0700BE90
 const castle_grounds_seg7_vertex_0700BE10 = [
@@ -67,7 +67,7 @@ const castle_grounds_seg7_vertex_0700BE10 = [
     [[  2283,   -422,   1849], 0, [   332,   -232], [0x7f, 0x00, 0x00, 0xff]],
     [[  2283,     89,   1849], 0, [     0,   -204], [0x7f, 0x00, 0x00, 0xff]],
     [[  2283,   -422,   2072], 0, [   332,   1984], [0x7f, 0x00, 0x00, 0xff]],
-]
+];
 
 // 0x0700BE90 - 0x0700BF50
 const castle_grounds_seg7_vertex_0700BE90 = [
@@ -83,7 +83,7 @@ const castle_grounds_seg7_vertex_0700BE90 = [
     [[  2637,     89,   1711], 0, [  4136,      0], [0x66, 0x4a, 0x00, 0xff]],
     [[  2757,    -72,   2338], 0, [   108,    964], [0x66, 0x4a, 0x00, 0xff]],
     [[  2640,     89,   2223], 0, [   856,      0], [0x66, 0x4a, 0x00, 0xff]],
-]
+];
 
 // 0x0700BF50 - 0x0700BFB0
 const castle_grounds_seg7_vertex_0700BF50 = [
@@ -93,7 +93,7 @@ const castle_grounds_seg7_vertex_0700BF50 = [
     [[  2102,     58,   1692], 0, [  3524,    158], [0x00, 0x4a, 0x9a, 0xff]],
     [[  2637,     89,   1711], 0, [     0,      0], [0x00, 0x4a, 0x9a, 0xff]],
     [[  2708,    -10,   1639], 0, [  -504,    582], [0x00, 0x4a, 0x9a, 0xff]],
-]
+];
 
 // 0x0700BFB0 - 0x0700C010
 const castle_grounds_seg7_vertex_0700BFB0 = [
@@ -103,7 +103,7 @@ const castle_grounds_seg7_vertex_0700BFB0 = [
     [[  2076,     15,   2280], 0, [  3540,    424], [0x99, 0x49, 0x00, 0xff]],
     [[  2128,     89,   2226], 0, [  3200,      0], [0x99, 0x49, 0x00, 0xff]],
     [[  2125,     89,   1714], 0, [   -88,      0], [0x99, 0x49, 0x00, 0xff]],
-]
+];
 
 // 0x0700C010 - 0x0700C070
 const castle_grounds_seg7_vertex_0700C010 = [
@@ -113,7 +113,7 @@ const castle_grounds_seg7_vertex_0700C010 = [
     [[  2757,    -72,   2338], 0, [  2752,    964], [0x00, 0x4a, 0x66, 0xff]],
     [[  2128,     89,   2226], 0, [ -1240,    -30], [0x00, 0x4a, 0x66, 0xff]],
     [[  2076,     15,   2280], 0, [ -1576,    424], [0x00, 0x4a, 0x66, 0xff]],
-]
+];
 
 // 0x0700C070 - 0x0700C110
 const castle_grounds_seg7_dl_0700C070 = [
@@ -132,7 +132,7 @@ const castle_grounds_seg7_dl_0700C070 = [
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  7,  5, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
 // 0x0700C110 - 0x0700C210
 const castle_grounds_seg7_dl_0700C110 = [
@@ -160,7 +160,7 @@ const castle_grounds_seg7_dl_0700C110 = [
     gsSPVertex(castle_grounds_seg7_vertex_0700C010, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
 // 0x0700C210 - 0x0700C2A0
 export const castle_grounds_seg7_dl_0700C210 = [
@@ -182,6 +182,6 @@ export const castle_grounds_seg7_dl_0700C210 = [
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPSetGeometryMode(G_SHADING_SMOOTH),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
-// 1618288530 - 2021-04-12 18:35:32 -1000
+// 1618694490 - 2021-04-17 11:21:34 -1000

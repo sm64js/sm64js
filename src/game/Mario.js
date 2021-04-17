@@ -77,8 +77,6 @@ export const ANIM_FLAG_5 = (1 << 5) // 0x20
 export const ANIM_FLAG_6 = (1 << 6) // 0x40
 export const ANIM_FLAG_7 = (1 << 7) // 0x80
 
-export const ANIMINDEX_NUMPARTS = (animindex) => {return (animindex.length / 6) - 1}
-
 // after processing an object, the type is reset to this
 export const ANIM_TYPE_NONE = 0
 
@@ -334,111 +332,6 @@ export const ACT_GROUP_CUTSCENE = (4 << 6)
 export const ACT_GROUP_AUTOMATIC = (5 << 6)
 export const ACT_GROUP_OBJECT = (6 << 6)
 
-// export const ACT_IDLE = 0x0C400201
-// export const ACT_WALKING = 0x04000440
-// export const ACT_DECELERATING = 0x0400044A
-// export const ACT_BRAKING = 0x04000445
-// export const ACT_STANDING_AGAINST_WALL = 0x0C400209
-// export const ACT_BRAKING_STOP = 0x0C00023D
-// export const ACT_TURNING_AROUND = 0x00000443
-// export const ACT_FINISH_TURNING_AROUND = 0x00000444
-// export const ACT_CRAWLING = 0x04008448
-
-// export const ACT_JUMP = 0x03000880
-// export const ACT_JUMP_LAND = 0x04000470
-// export const ACT_FREEFALL = 0x0100088C
-// export const ACT_FREEFALL_LAND = 0x04000471
-// export const ACT_FREEFALL_LAND_STOP = 0x0C000232
-// export const ACT_DOUBLE_JUMP    = 0x03000881
-// export const ACT_JUMP_LAND_STOP = 0x0C000230
-// export const ACT_BEGIN_SLIDING = 0x00000050
-// export const ACT_LONG_JUMP = 0x03000888
-// export const ACT_SIDE_FLIP = 0x01000887
-// export const ACT_SIDE_FLIP_LAND = 0x04000473
-// export const ACT_SIDE_FLIP_LAND_STOP = 0x0C000233
-// export const ACT_DOUBLE_JUMP_LAND = 0x04000472
-// export const ACT_DOUBLE_JUMP_LAND_STOP = 0x0C000231
-// export const ACT_TRIPLE_JUMP = 0x01000882
-// export const ACT_TRIPLE_JUMP_LAND = 0x04000478
-// export const ACT_TRIPLE_JUMP_LAND_STOP = 0x0800023A
-// export const ACT_PUNCHING = 0x00800380
-// export const ACT_GRAB_POLE_SLOW = 0x00100341
-// export const ACT_GRAB_POLE_FAST = 0x00100342
-// export const ACT_HOLDING_POLE = 0x08100340
-// export const ACT_CLIMBING_POLE            =  0x00100343
-// export const ACT_TOP_OF_POLE_TRANSITION   =  0x00100344
-// export const ACT_TOP_OF_POLE              =  0x00100345
-// export const ACT_START_HANGING = 0x08200348
-// export const ACT_WALL_KICK_AIR = 0x03000886
-// export const ACT_TOP_OF_POLE_JUMP = 0x0300088D
-// export const ACT_CROUCHING                =  0x0C008220 
-// export const ACT_START_CROUCHING          =  0x0C008221 
-// export const ACT_STOP_CROUCHING           =  0x0C008222 
-// export const ACT_START_CRAWLING           =  0x0C008223 
-// export const ACT_STOP_CRAWLING            =  0x0C008224 
-// export const ACT_BACKFLIP                 =  0x01000883
-// export const ACT_BACKFLIP_LAND            =  0x0400047A 
-// export const ACT_BACKFLIP_LAND_STOP       =  0x0800022F
-// export const ACT_CROUCH_SLIDE             =  0x04808459 
-// export const ACT_LONG_JUMP_LAND           = 0x00000479
-// export const ACT_LONG_JUMP_LAND_STOP      =  0x0800023B 
-// export const ACT_BBH_ENTER_SPIN           =  0x00001535
-// export const ACT_SLIDE_KICK = 0x018008AA
-// export const ACT_DIVE = 0x0188088A
-// export const ACT_JUMP_KICK = 0x018008AC
-// export const ACT_STOMACH_SLIDE_STOP = 0x00000386
-// export const ACT_STOMACH_SLIDE = 0x008C0453
-// export const ACT_DIVE_SLIDE = 0x00880456
-// export const ACT_FORWARD_ROLLOUT = 0x010008A6
-// export const ACT_BACKWARD_ROLLOUT = 0x010008AD
-// export const ACT_MOVE_PUNCHING = 0x00800457 
-// export const ACT_SLIDE_KICK_SLIDE = 0x0080045A
-// export const ACT_SLIDE_KICK_SLIDE_STOP = 0x08000225
-// export const ACT_SHOCKWAVE_BOUNCE = 0x00020226
-// export const ACT_FIRST_PERSON = 0x0C000227
-// export const ACT_GROUND_POUND = 0x008008A9
-// export const ACT_GROUND_POUND_LAND = 0x0080023C
-// export const ACT_BUTT_SLIDE_STOP = 0x0C00023E
-// export const ACT_AIR_HIT_WALL = 0x000008A7
-// export const ACT_RIDING_HOOT = 0x000004A8
-// export const ACT_SLEEPING = 0x0C000203
-// export const ACT_START_SLEEPING = 0x0C400202
-// export const ACT_LEDGE_CLIMB_DOWN = 0x0000054E
-// export const ACT_LEDGE_CLIMB_SLOW_1 = 0x0000054C
-// export const ACT_LEDGE_GRAB = 0x0800034B
-// export const ACT_LEDGE_CLIMB_FAST = 0x0000054F
-// export const ACT_SOFT_BONK = 0x010208B6
-// export const ACT_LEDGE_CLIMB_SLOW_2 = 0x0000054D
-// export const ACT_HANG_MOVING = 0x0020054A
-// export const ACT_HANGING = 0x00200349
-// export const ACT_BUTT_SLIDE = 0x00840452
-// export const ACT_HOLD_BUTT_SLIDE = 0x00840454
-// export const ACT_RIDING_SHELL_GROUND = 0x20810446
-// export const ACT_TWIRL_LAND = 0x18800238
-// export const ACT_TWIRLING = 0x108008A4
-// export const ACT_IN_CANNON               = 0x00001371
-// export const ACT_BUTT_SLIDE_AIR          = 0x0300088E
-// export const ACT_HOLD_BUTT_SLIDE_AIR = 0x010008A2
-// export const ACT_STEEP_JUMP = 0x03000885
-// export const ACT_BUTT_STUCK_IN_GROUND = 0x0002033B
-// export const ACT_FEET_STUCK_IN_GROUND = 0x0002033C
-// export const ACT_VERTICAL_WIND = 0x1008089C
-// export const ACT_SQUISHED = 0x00020339
-// export const ACT_STANDING_DEATH = 0x00021311
-
-
-
-
-// export const ACT_HARD_BACKWARD_GROUND_KB  =  0x00020460 
-// export const ACT_HARD_FORWARD_GROUND_KB   =  0x00020461 
-// export const ACT_BACKWARD_GROUND_KB       =  0x00020462 
-// export const ACT_FORWARD_GROUND_KB        =  0x00020463 
-// export const ACT_SOFT_BACKWARD_GROUND_KB  =  0x00020464 
-// export const ACT_SOFT_FORWARD_GROUND_KB = 0x00020465 
-// export const ACT_BACKWARD_AIR_KB       =  0x010208B0 
-// export const ACT_FORWARD_AIR_KB        =  0x010208B1 
-// export const ACT_HARD_FORWARD_AIR_KB   =  0x010208B2 
-// export const ACT_HARD_BACKWARD_AIR_KB  =  0x010208B3
 
 export const ACT_UNINITIALIZED                   = 0x00000000
 

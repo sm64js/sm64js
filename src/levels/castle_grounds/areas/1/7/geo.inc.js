@@ -16,6 +16,6 @@ export const castle_grounds_geo_00070C = [
         GEO_DISPLAY_LIST(LAYER_ALPHA, castle_grounds_seg7_dl_0700BB80),
     GEO_CLOSE_NODE(),
     GEO_END(),
-]
+];
 
-// 1618288530 - 2021-04-12 18:35:32 -1000
+// 1618694490 - 2021-04-17 11:21:34 -1000

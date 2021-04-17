@@ -28,7 +28,7 @@ const castle_grounds_seg7_vertex_0700A328 = [
     [[ -4692,    422,  -2546], 0, [ 22390,   2012], [0xff, 0xff, 0xff, 0xff]],
     [[ -4692,    524,  -2546], 0, [ 22168,    -20], [0xff, 0xff, 0xff, 0xff]],
     [[ -4723,    645,  -3663], 0, [  -250,    -20], [0xff, 0xff, 0xff, 0xff]],
-]
+];
 
 // 0x0700A418 - 0x0700A508
 const castle_grounds_seg7_vertex_0700A418 = [
@@ -47,7 +47,7 @@ const castle_grounds_seg7_vertex_0700A418 = [
     [[ -2051,    621,   -142], 0, [ 21430,      0], [0xff, 0xff, 0xff, 0xff]],
     [[ -3098,    547,   -343], 0, [   102,      0], [0xff, 0xff, 0xff, 0xff]],
     [[ -4817,    508,  -1601], 0, [   442,      0], [0xff, 0xff, 0xff, 0xff]],
-]
+];
 
 // 0x0700A508 - 0x0700A5F8
 const castle_grounds_seg7_vertex_0700A508 = [
@@ -66,7 +66,7 @@ const castle_grounds_seg7_vertex_0700A508 = [
     [[  5070,    473,  -2042], 0, [ 22452,      0], [0xff, 0xff, 0xff, 0xff]],
     [[  4617,    507,  -1011], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
     [[  5068,    371,  -2039], 0, [ 22452,   2012], [0xff, 0xff, 0xff, 0xff]],
-]
+];
 
 // 0x0700A5F8 - 0x0700A6E8
 const castle_grounds_seg7_vertex_0700A5F8 = [
@@ -85,7 +85,7 @@ const castle_grounds_seg7_vertex_0700A5F8 = [
     [[  1459,    584,   -141], 0, [ 17566,   2012], [0xff, 0xff, 0xff, 0xff]],
     [[   628,    894,   -141], 0, [   -16,     32], [0xff, 0xff, 0xff, 0xff]],
     [[  2316,    473,   -141], 0, [    16,      0], [0xff, 0xff, 0xff, 0xff]],
-]
+];
 
 // 0x0700A6E8 - 0x0700A728
 const castle_grounds_seg7_vertex_0700A6E8 = [
@@ -93,7 +93,7 @@ const castle_grounds_seg7_vertex_0700A6E8 = [
     [[ -5856,    646,  -4352], 0, [ 18364,      0], [0xff, 0xff, 0xff, 0xff]],
     [[ -6620,    646,  -3837], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
     [[ -6620,    543,  -3837], 0, [     0,   2012], [0xff, 0xff, 0xff, 0xff]],
-]
+];
 
 // 0x0700A728 - 0x0700A860
 const castle_grounds_seg7_dl_0700A728 = [
@@ -123,7 +123,7 @@ const castle_grounds_seg7_dl_0700A728 = [
     gsSPVertex(castle_grounds_seg7_vertex_0700A6E8, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
 // 0x0700A860 - 0x0700A8D0
 export const castle_grounds_seg7_dl_0700A860 = [
@@ -141,6 +141,6 @@ export const castle_grounds_seg7_dl_0700A860 = [
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPSetGeometryMode(G_LIGHTING | G_CULL_BACK),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].filter((obj) => obj).flat();
 
-// 1618288530 - 2021-04-12 18:35:32 -1000
+// 1618694490 - 2021-04-17 11:21:34 -1000

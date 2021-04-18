@@ -91,6 +91,10 @@ class LevelCommands {
     }
 
     load_model_from_geo(model, geo) {
+        if (typeof geo == "function") {
+            geo = geo()
+        }
+
         Area.gLoadedGraphNodes[model] = GeoLayout.process_geo_layout(geo).node
 
         this.sCurrentScript.index++

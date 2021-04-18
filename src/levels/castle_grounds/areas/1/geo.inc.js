@@ -9,14 +9,21 @@ import {
 } from "../../../../engine/GeoLayout"
 
 import {
+    geo_skybox_main, geo_camera_fov, geo_camera_main, geo_movtex_pause_control,
+    geo_movtex_draw_nocolor, geo_movtex_draw_water_regions, geo_envfx_main,
+    geo_cannon_circle_base
+} from "../../../../game/ObjectHelpers"
+
+import {
     castle_grounds_seg7_dl_07006D70, castle_grounds_seg7_dl_070095F0,
     castle_grounds_seg7_dl_0700A860, castle_grounds_seg7_dl_0700B1D0,
     castle_grounds_seg7_dl_0700BA20, castle_grounds_seg7_dl_0700C430,
     castle_grounds_seg7_dl_0700C210
 } from "./model.inc"
 
+
 // 0x0E00073C
-export const castle_grounds_geo_00073C = [
+export const castle_grounds_geo_00073C = () => {return [
     GEO_NODE_SCREEN_AREA(10, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
     GEO_OPEN_NODE(),
         GEO_ZBUFFER(0),
@@ -53,6 +60,6 @@ export const castle_grounds_geo_00073C = [
         GEO_CLOSE_NODE(),
     GEO_CLOSE_NODE(),
     GEO_END(),
-];
+]};
 
-// 1618752565 - 2021-04-18 03:29:27 -1000
+// 1618763470 - 2021-04-18 06:31:12 -1000

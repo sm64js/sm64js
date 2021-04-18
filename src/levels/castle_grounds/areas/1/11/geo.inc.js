@@ -11,8 +11,9 @@ import {
     castle_grounds_seg7_dl_0700C670
 } from "./model.inc"
 
+
 // 0x0E000660
-export const castle_grounds_geo_000660 = [
+export const castle_grounds_geo_000660 = () => {return [
     GEO_CULLING_RADIUS(1000),
     GEO_OPEN_NODE(),
         GEO_SCALE(0x00, 24576),
@@ -37,6 +38,6 @@ export const castle_grounds_geo_000660 = [
     GEO_CLOSE_NODE(),
 GEO_CLOSE_NODE(), //! more close than open nodes
 GEO_END(),
-];
+]};
 
-// 1618752565 - 2021-04-18 03:29:27 -1000
+// 1618763470 - 2021-04-18 06:31:12 -1000

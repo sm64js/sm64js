@@ -1431,4 +1431,4 @@ export const castle_grounds_seg7_collision_level = [
     COL_END(),
 ].flat();
 
-// 1618752565 - 2021-04-18 03:29:27 -1000
+// 1618763470 - 2021-04-18 06:31:12 -1000

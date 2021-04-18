@@ -9,6 +9,7 @@ const copy3argsToObject = (pos, argIndex, args) => {
 
 // EXPERIMENTAL
 export const GEO_ANIMATED_PART = (...args) => {return ['node_animated_part', ...args]}
+export const GEO_BRANCH_AND_LINK = (...args) => {return ['branch_and_link', ...args]}
 export const GEO_CLOSE_NODE = (...args) => {return ['close_node', ...args]}
 export const GEO_CULLING_RADIUS = (...args) => {return ['node_culling_radius', ...args]}
 export const GEO_DISPLAY_LIST = (...args) => {return ['display_list', ...args]}
@@ -59,6 +60,7 @@ class GeoLayout {
     }
 
     GEO_ANIMATED_PART(args) {this.node_animated_part(args)}
+    GEO_BRANCH_AND_LINK(args) {this.branch_and_link(args)}
     GEO_CLOSE_NODE(args) {this.close_node(args)}
     GEO_CULLING_RADIUS(args) {this.node_culling_radius(args)}
     GEO_DISPLAY_LIST(args) {this.display_list(args)}
@@ -68,6 +70,14 @@ class GeoLayout {
     GEO_SCALE(args) {this.node_scale(args)}
     GEO_SHADOW(args) {this.node_shadow(args)}
     GEO_SWITCH_CASE(args) {this.node_switch_case(args)}
+
+    branch_and_link(args) {
+        // this may be buggy
+        this.gGeoLayoutStack.push = this.sCurrentLayout
+        this.gGeoLayoutStack.push = this.gCurGraphNodeIndex
+        this.gGeoLayoutReturnIndex = this.gGeoLayoutStackIndex
+        this.sCurrentLayout = { index: 0, layout: args[0] }
+    }
 
     branch(args) {
         if (args[0] == 1) {

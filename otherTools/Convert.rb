@@ -37,20 +37,24 @@ class Convert
             @js_dir += "/#{f}"
         end
 
-        Dir.glob(@c_dir + "/*") do |f1|
-            bn = File.basename(f1)
-            if File.directory?(f1)
-                convert_dir(bn)
-            else
-                FileUtils.mkdir_p(@js_dir)
-                case bn
-                when "anim.inc.c"       then convert_anim
-                when "collision.inc.c"  then convert_collision
-                when "geo.inc.c"        then convert_geo
-                when "macro.inc.c"      then convert_macro
-                when "model.inc.c"      then convert_model
-                when "movtext.inc.c"    then convert_movtext
-                when "texture.inc.c"    then convert_texture
+        if f == "anims"
+            convert_anims_dir
+        else
+            Dir.glob(@c_dir + "/*") do |f1|
+                bn = File.basename(f1)
+                if File.directory?(f1)
+                    convert_dir(bn)
+                else
+                    FileUtils.mkdir_p(@js_dir)
+                    case bn
+                    when "anim.inc.c"       then convert_anim
+                    when "collision.inc.c"  then convert_collision
+                    when "geo.inc.c"        then convert_geo
+                    when "macro.inc.c"      then convert_macro
+                    when "model.inc.c"      then convert_model
+                    when "movtext.inc.c"    then convert_movtext
+                    when "texture.inc.c"    then convert_texture
+                    end
                 end
             end
         end
@@ -58,6 +62,12 @@ class Convert
         @c_dir, @js_dir = @dirstack.pop
     end
 
+
+    # ---------------------------------------------------------------------------------------------------------
+
+    def convert_anims_dir
+        
+    end
 
     # ---------------------------------------------------------------------------------------------------------
 
@@ -254,16 +264,16 @@ class Convert
         header = []
         imports = []
 
-        @geo_mods = []
         @geo_cmds = []
-        @geo_cons = []
+        @geo_cons = {}
         @text = []
 
-        geolayout_path = "engine/GeoLayout"
-        shadow_path    = "game/Shadow"
-        cons_overrides = {
-            shadow_path => ["SHADOW_CIRCLE_4_VERTS"]
-        }
+        @imps = [
+            [/^(#{@entity}_\w+)/, @js_dir + "/model.inc"],  # dorrie_seg6_dl_0600CFD0
+            [/^(geo_\w+)/, "game/ObjectHelpers"],           # geo_switch_anim_state
+            [/^(SHADOW_\w+)/, "game/Shadow"],               # SHADOW_CIRCLE_4_VERTS
+            [/^([A-Z][A-Z_0-9]+)/, "engine/GeoLayout"],     # LAYER_OPAQUE
+        ]
 
         @lines = File.read(@c_dir + "/geo.inc.c").lines.to_a
         @n = 0
@@ -277,21 +287,15 @@ class Convert
             @n += 1
         end
 
-        a = @entity.split('_').collect(&:capitalize).join(' ')
-        header.push("// #{a}")
-
-        cons = @geo_cons.uniq.group_by do |con|
-            o = cons_overrides.find {|p, f| f.include?(con)}
-            o ? o[0] : geolayout_path
-        end
-
-        imports_wrap(imports, geolayout_path, [@geo_cmds.uniq, cons[geolayout_path]])
-        imports.push("")
-        if cons[shadow_path]
-            imports_wrap(imports, shadow_path, cons[shadow_path])
+        header.push(@title)
+        @geo_cons.each do |file, cons|
+            if file == "engine/GeoLayout"
+                imports_wrap(imports, file, [@geo_cmds.uniq, cons.uniq])
+            else
+                imports_wrap(imports, file, cons.uniq)
+            end
             imports.push("")
         end
-        imports_wrap(imports, @js_dir + "/model.inc", @geo_mods.uniq)
 
         out = [header, "", imports, "", @text, @ts].join("\n")
         File.open(@js_dir + "/geo.inc.js", "w") {|f| f.puts(out)}
@@ -303,23 +307,26 @@ class Convert
 
             # const GeoLayout mad_piano_geo[] = {
             if line =~ /const GeoLayout (\w+)/
-                @text.push("export const #{$1} = [")
+                @text.push("export const #{$1} = () => {return [")
 
             # GEO_SCALE(0x00, 16384),
             elsif line =~ /^(\s*)(\w+)\((.*)\),(.*)$/
                 cmd, args, xtra = $~[2..4]
                 tabs = "    " * ($1.length / 3)
+
                 @geo_cmds.push(cmd)
+
                 if args.length > 0
                     args = args.split(",").collect do |arg|
                         arg.strip!
-                        arg.gsub!("NULL", "null")               # NULL
-                        if arg =~ /^(#{@entity}\w+)/             # dorrie_seg6_dl_0600CFD0
-                            @geo_mods.push($1)
+
+                        if arg == "NULL"
+                            arg = "null"
+                        elsif (imp = @imps.find {|i| arg =~ i[0]})
+                            arr = @geo_cons[imp[1]] ||= []
+                            arr.push($1)
                         end
-                        if arg =~ /^([A-Z][A-Z_0-9]+)/          # LAYER_OPAQUE
-                            @geo_cons.push($1)
-                        end
+
                         arg  # result
                     end.join(", ")
                 end
@@ -327,7 +334,7 @@ class Convert
 
             # };
             elsif line =~ /^\};/
-                @text.push("];")
+                @text.push("]};")
                 break
             end
 

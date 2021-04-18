@@ -45,7 +45,7 @@ class Convert
                 FileUtils.mkdir_p(@js_dir)
                 case bn
                 when "anim.inc.c"       then convert_anim
-                # when "collision.inc.c"  then convert_collision
+                when "collision.inc.c"  then convert_collision
                 when "geo.inc.c"        then convert_geo
                 # when "macro.inc.c"      then convert_macro
                 when "model.inc.c"      then convert_model
@@ -61,6 +61,60 @@ class Convert
 
     # -----------------------------
     def convert_collision
+        header = []
+        imports = []
+        @cmds = []
+        @cons = []
+        @spcs = []
+        @text = []
+
+        @lines = File.read(@c_dir + "/collision.inc.c").lines.to_a
+        @n = 0
+        while (@n < @lines.length)
+
+            if @lines[@n] =~ / Collision / then cv_collision
+            else
+                @text.push(@lines[@n].chomp)
+            end
+
+            @n += 1
+        end
+
+        header.push(@title)
+        imports_wrap(imports, "include/surface_terrains", [@cmds.uniq, @cons.uniq, @spcs.uniq])
+
+        out = [header, "", imports, "", @text, @ts].join("\n")
+        File.open(@js_dir + "/collision.inc.js", "w") {|f| f.puts(out)}
+    end
+
+    def cv_collision
+        while true
+            line = @lines[@n]
+
+            # const Collision castle_grounds_seg7_collision_moat_grills[] = {
+            if line =~ / Collision (\w+)/
+                @text.push("export const #{$1} = [")
+
+            # };
+            elsif line =~ /^\};/
+                @text.push("].flat();")
+                break
+
+            # COL_TRI_INIT(SURFACE_FLOWING_WATER, 4),
+            elsif line =~ /(\w+)\((.*)\),/
+                cmd, args = $1, $2
+
+                @cmds.push(cmd)
+                @spcs += args.scan(/(special_\w+)/).collect {|m| m[0]}
+                @cons += args.scan(/(^| )([A-Z]\w+)/).collect {|m| m[1]}
+                @text.push("    #{cmd}(#{args}),")
+
+            else
+                @text.push(line.chomp)
+            end
+
+            @n += 1
+        end
     end
 
 
@@ -84,7 +138,7 @@ class Convert
         header = []
         imports = []
         @cons = []
-        @anim_text = []
+        @text = []
 
         @lines = File.read(@c_dir + "/anim.inc.c").lines.to_a
         @n = 0
@@ -95,7 +149,7 @@ class Convert
             elsif @lines[@n] =~ / struct Animation .+_anim_/    then cv_anim
             elsif @lines[@n] =~ / Animation \*const .+_anims_/  then cv_anims
             else
-                @anim_text.push(@lines[@n].chomp)
+                @text.push(@lines[@n].chomp)
             end
 
             @n += 1
@@ -106,7 +160,7 @@ class Convert
         @cons.push("ANIMINDEX_NUMPARTS")
         imports_wrap(imports, "include/types", @cons)
 
-        out = [header, "", imports, "", @anim_text, @ts].join("\n")
+        out = [header, "", imports, "", @text, @ts].join("\n")
         File.open(@js_dir + "/anim.inc.js", "w") {|f| f.puts(out)}
     end
 
@@ -116,16 +170,16 @@ class Convert
 
             # static const s16 castle_grounds_seg7_animvalue_flags[] = {
             if line =~ /static const s16 (\w+)/
-                @anim_text.push("const #{$1} = [")
+                @text.push("const #{$1} = [")
 
             # };
             elsif line =~ /^\};/
-                @anim_text.push("];")
+                @text.push("];")
                 break
 
             #     -5723, -5177, -4309, -2785,  -812,  1339,  3401,  5102,  6174,  6692,  6939,  6952,  6769,  6428,  5967,  5423,
             else
-                @anim_text.push(line.chomp)
+                @text.push(line.chomp)
             end
 
             @n += 1
@@ -138,16 +192,16 @@ class Convert
 
             # static const u16 castle_grounds_seg7_animindex_flags[] = {
             if line =~ /static const u16 (\w+)/
-                @anim_text.push("const #{$1} = [")
+                @text.push("const #{$1} = [")
 
             # };
             elsif line =~ /^\};/
-                @anim_text.push("];")
+                @text.push("];")
                 break
 
             #     0x0001, 0x0000, 0x0001, 0x0000, 0x001D, 0x0077,
             else
-                @anim_text.push(line.chomp)
+                @text.push(line.chomp)
             end
 
             @n += 1
@@ -161,19 +215,19 @@ class Convert
 
             # static const struct Animation castle_grounds_seg7_anim_flags = {
             if line =~ /static const struct Animation (\w+)/
-                @anim_text.push("const #{$1} = {")
+                @text.push("const #{$1} = {")
                 f = 0
 
             # };
             elsif line =~ /^\};/
-                @anim_text.push("};")
+                @text.push("};")
                 break
 
             # ANIMINDEX_NUMPARTS(castle_grounds_seg7_animindex_flags),
             else
                 field = @anim_fields[f]
                 value = line.strip.delete_suffix(",")
-                @anim_text.push("    #{field}: #{value},")
+                @text.push("    #{field}: #{value},")
                 f += 1
             end
 
@@ -187,19 +241,19 @@ class Convert
 
             # const struct Animation *const castle_grounds_seg7_anims_flags[] = {
             if line =~ /const struct Animation \*const (\w+)/
-                @anim_text.push("export const #{$1} = [")
+                @text.push("export const #{$1} = [")
 
             #    &castle_grounds_seg7_anim_flags, // 0x0700C944
             elsif line =~ /\&(\w+),(.*)/                            
-                @anim_text.push("    #{$1},#{$2}")
+                @text.push("    #{$1},#{$2}")
 
             # };
             elsif line =~ /^\};/
-                @anim_text.push("];")
+                @text.push("];")
                 break
 
             else
-                @anim_text.push(line.chomp)
+                @text.push(line.chomp)
             end
 
             @n += 1
@@ -215,7 +269,7 @@ class Convert
         @texs = []
         @cmds = []
         @cons = []
-        @model_text = []
+        @text = []
 
         @lines = File.read(@c_dir + "/model.inc.c").lines.to_a
         @n = 0
@@ -230,7 +284,7 @@ class Convert
                 if l != "" && header.empty?
                     header.push(l)
                 else
-                    @model_text.push(l)
+                    @text.push(l)
                 end
             end
             @n += 1
@@ -252,7 +306,7 @@ class Convert
             end
         end
         
-        out = [header, "", imports, @model_text, @ts].join("\n")
+        out = [header, "", imports, @text, @ts].join("\n")
         File.open(@js_dir + "/model.inc.js", "w") {|f| f.puts(out)}
     end
 
@@ -269,16 +323,16 @@ class Convert
             # static const Lights1 cannon_barrel_seg8_lights_08005878 = gdSPDefLights1(
             if line =~ /(static )*const Lights1 (\w+)/
                 export = $1 ? "" : "export "
-                @model_text.push("#{export}const #{$2} = gdSPDefLights1(")
+                @text.push("#{export}const #{$2} = gdSPDefLights1(")
 
             # };
             elsif line =~ /^\);/
-                @model_text.push(");")
+                @text.push(");")
                 break
 
             # 0x4c, 0x4c, 0x4c,
             else
-                @model_text.push(line.chomp)
+                @text.push(line.chomp)
             end
 
             @n += 1
@@ -300,7 +354,7 @@ class Convert
 
             # };
             elsif line =~ /^\};/
-                @model_text.push("export const #{name} = []  // #{inc}")
+                @text.push("export const #{name} = []  // #{inc}")
                 break
             end
 
@@ -315,15 +369,15 @@ class Convert
             # static const Vtx cannon_barrel_seg8_vertex_080060A8[] = {
             if line =~ /(static )*const Vtx (\w+)/
                 export = $1 ? "" : "export "
-                @model_text.push("#{export}const #{$2} = [")
+                @text.push("#{export}const #{$2} = [")
 
             #     {{{   -40,    236,     41}, 0, {   176,    748}, {0x45, 0x5d, 0xcd, 0xff}}},
             elsif line =~ /{{{(.+?)}, (.+?), {(.+?)}, {(.+?)}/
-                @model_text.push("    [[#{$1}], #{$2}, [#{$3}], [#{$4}]],")
+                @text.push("    [[#{$1}], #{$2}, [#{$3}], [#{$4}]],")
 
             # };
             elsif line =~ /^\};/
-                @model_text.push("];")
+                @text.push("];")
                 break
             end
 
@@ -338,7 +392,7 @@ class Convert
             # const Gfx cannon_barrel_seg8_dl_08006408[] = {
             if line =~ /(static )*const Gfx (\w+)/ 
                 export = $1 ? "" : "export "
-                @model_text.push("#{export}const #{$2} = [")
+                @text.push("#{export}const #{$2} = [")
 
             # gsSPLight(&birds_seg5_lights_05000000.l, 1),
             elsif line =~ /(\w+)\((.*)\),/
@@ -366,10 +420,10 @@ class Convert
                 # collect G_ constants
                 @cons += args.scan(/(^|[^A-Z])(G_\w+)/).collect {|m| m[1]}
 
-                @model_text.push("    #{cmd}(#{args}),")
+                @text.push("    #{cmd}(#{args}),")
 
             elsif line =~ /^\};/                # };
-                @model_text.push("].filter((obj) => obj).flat();")
+                @text.push("].filter((obj) => obj).flat();")
                 break
             end
 
@@ -383,7 +437,7 @@ class Convert
         header = []
         imports = []
 
-        @geo = []
+        @text = []
         @mods = []
         @cmds = []
         @cons = []
@@ -395,7 +449,7 @@ class Convert
             if @lines[@n] =~ / GeoLayout /
                 cv_GeoLayout
             else
-                @geo.push(@lines[@n].chomp)
+                @text.push(@lines[@n].chomp)
             end
             @n += 1
         end
@@ -421,7 +475,7 @@ class Convert
         end
         imports_wrap(imports, @js_dir + "/model.inc", @mods.uniq)
 
-        out = [header, "", imports, "", @geo, @ts].join("\n")
+        out = [header, "", imports, "", @text, @ts].join("\n")
         File.open(@js_dir + "/geo.inc.js", "w") {|f| f.puts(out)}
     end
 
@@ -429,7 +483,7 @@ class Convert
         while true
             line = @lines[@n]
             if line =~ /const GeoLayout (\w+)/        # const GeoLayout mad_piano_geo[] = {
-                @geo.push("export const #{$1} = [")
+                @text.push("export const #{$1} = [")
             elsif line =~ /^(\s*)(\w+)\((.*)\),(.*)$/           #    GEO_SCALE(0x00, 16384),
                 cmd, args, xtra = $~[2..4]
                 tabs = "    " * ($1.length / 3)
@@ -447,9 +501,9 @@ class Convert
                         arg  # result
                     end.join(", ")
                 end
-                @geo.push("#{tabs}#{cmd}(#{args}),#{xtra}")
+                @text.push("#{tabs}#{cmd}(#{args}),#{xtra}")
             elsif line =~ /^\};/                                # };
-                @geo.push("];")
+                @text.push("];")
                 break
             end
             @n += 1
@@ -483,7 +537,7 @@ class Convert
                     t = nil
                 end
             end
-            imports.push(t + ",")
+            imports.push(t + ",") if t
         end
         imports[-1].delete_suffix!(",")
         rel = relative_path(@js_dir, @js_root + "/src/" + from)

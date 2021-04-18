@@ -128,8 +128,6 @@ const convert_rotation = (inRotation) => {
 }
 
 const spawn_macro_abs_yrot_2params = (model, behavior, x, y, z, ry, params) => {
-        console.log("spawn_macro_abs_yrot_2params - 0x" + model.toString(16))
-
     if (behavior) {
         const newObj = spawn_object_abs_with_rot(ObjectListProc.gMacroObjectDefaultParent,
             model, behavior, x, y, z, 0, convert_rotation(ry), 0)
@@ -176,7 +174,6 @@ export const spawn_special_objects = (areaIndex, specialObjList, dataIndex) => {
                 yrot = specialObjList[dataIndex++] // Y-rotation
                 spawn_macro_abs_yrot_param1(model, behavior, x, y, z, yrot, defParam)
                 break
-            default: throw "unkown special object type"
         }
 
     }

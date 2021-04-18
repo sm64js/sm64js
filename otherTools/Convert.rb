@@ -49,7 +49,7 @@ class Convert
                 when "geo.inc.c"        then convert_geo
                 # when "macro.inc.c"      then convert_macro
                 when "model.inc.c"      then convert_model
-                # when "movtext.inc.c"    then convert_movtext
+                when "movtext.inc.c"    then convert_movtext
                 # when "texture.inc.c"    then convert_texture
                 end
             end
@@ -125,6 +125,95 @@ class Convert
 
     # -----------------------------
     def convert_movtext
+        header = []
+        imports = []
+        @mov_cmds = []
+        @mov_cons = []
+        @gbi_cmds = []
+        @gbi_cons = []
+        @text = []
+
+        @lines = File.read(@c_dir + "/movtext.inc.c").lines.to_a
+        @n = 0
+        while (@n < @lines.length)
+
+            if @lines[@n] =~ /(^| )Movtex /              then cv_Movtex
+            elsif @lines[@n] =~ / MovtexQuadCollection / then cv_MovtexQuadCollection
+            elsif @lines[@n] =~ / Gfx /                  then cv_Gfx
+            else
+                @text.push(@lines[@n].chomp)
+            end
+
+            @n += 1
+        end
+
+        header.push(@title)
+        imports_wrap(imports, "include/gbi", [@gbi_cmds.uniq, @gbi_cons.uniq])
+        imports.push("")
+        imports_wrap(imports, "include/moving_texture_macros", [@mov_cmds.uniq, @mov_cons.uniq])
+
+        out = [header, "", imports, "", @text, @ts].join("\n")
+        File.open(@js_dir + "/movtext.inc.js", "w") {|f| f.puts(out)}
+    end
+
+    def cv_Movtex
+        while true
+            line = @lines[@n]
+
+            # static Movtex castle_grounds_movtex_moat_water_data[] = {
+            if line =~ /static Movtex (\w+)/
+                @text.push("const #{$1} = [")
+
+            # Movtex castle_grounds_movtex_tris_waterfall[] = {
+            elsif line =~ /^Movtex (\w+)/
+                @text.push("export const #{$1} = [")
+
+            # };
+            elsif line =~ /^\};/
+                @text.push("].flat();")
+                break
+
+            # MOV_TEX_4_BOX_TRIS(-7129, -7222),
+            elsif line =~ /(\w+)\((.*)\),/
+                cmd, args = $1, $2
+
+                @mov_cmds.push(cmd)
+                @mov_cons += args.scan(/(^| )([A-Z]\w+)/).collect {|m| m[1]}
+                @text.push("    #{cmd}(#{args}),")
+
+            else
+                @text.push(line.chomp)
+            end
+
+            @n += 1
+        end
+    end
+
+    def cv_MovtexQuadCollection
+        while true
+            line = @lines[@n]
+
+            # const struct MovtexQuadCollection castle_grounds_movtex_water[] = {
+            if line =~ /struct MovtexQuadCollection (\w+)/
+                @text.push("export const #{$1} = [")
+
+            # {0, castle_grounds_movtex_moat_water_data},
+            elsif line =~ /\{(.+), (.+)\}/
+                id, movtex = $1, $2
+                movtex.gsub!("NULL", "null")
+                @text.push("    {id: #{id}, movtex: #{movtex}},")
+
+            # };
+            elsif line =~ /^\};/
+                @text.push("];")
+                break
+
+            else
+                @text.push(line.chomp)
+            end
+
+            @n += 1
+        end
     end
 
 
@@ -267,8 +356,8 @@ class Convert
         imports = []
         @trefs = []
         @texs = []
-        @cmds = []
-        @cons = []
+        @gbi_cmds = []
+        @gbi_cons = []
         @text = []
 
         @lines = File.read(@c_dir + "/model.inc.c").lines.to_a
@@ -290,7 +379,7 @@ class Convert
             @n += 1
         end
 
-        imports_wrap(imports, "include/gbi", [@cmds.uniq, @cons.uniq])
+        imports_wrap(imports, "include/gbi", [@gbi_cmds.uniq, @gbi_cons.uniq])
 
         # resolve texture references
         # they may be either be in "src/textures" or @entity_dir/texture.inc
@@ -315,7 +404,7 @@ class Convert
     end
 
     def cv_Lights1
-        @cmds.push("gdSPDefLights1")
+        @gbi_cmds.push("gdSPDefLights1")
 
         while true
             line = @lines[@n]
@@ -398,12 +487,12 @@ class Convert
             elsif line =~ /(\w+)\((.*)\),/
                 cmd, args = $1, $2
 
-                @cmds.push(cmd)
+                @gbi_cmds.push(cmd)
 
                 case cmd
                 when "gsDPLoadBlock"
                     # gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-                    @cons.push("CALC_DXT")
+                    @gbi_cons.push("CALC_DXT")
 
                 when "gsDPSetTextureImage"
                     # gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, outside_09000000),
@@ -418,12 +507,12 @@ class Convert
                 end
 
                 # collect G_ constants
-                @cons += args.scan(/(^|[^A-Z])(G_\w+)/).collect {|m| m[1]}
+                @gbi_cons += args.scan(/(^|[^A-Z])(G_\w+)/).collect {|m| m[1]}
 
                 @text.push("    #{cmd}(#{args}),")
 
             elsif line =~ /^\};/                # };
-                @text.push("].filter((obj) => obj).flat();")
+                @text.push("].flat();")
                 break
             end
 

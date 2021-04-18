@@ -46,4 +46,4 @@ export const castle_grounds_seg7_anims_flags = [
     castle_grounds_seg7_anim_flags, // 0x0700C944
 ];
 
-// 1618702415 - 2021-04-17 13:33:37 -1000
+// 1618712075 - 2021-04-17 16:16:02 -1000

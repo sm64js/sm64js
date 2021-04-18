@@ -199,7 +199,7 @@ const castle_grounds_seg7_dl_0700AFD0 = [
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP1Triangle( 0,  6,  1, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat();
+].flat();
 
 // 0x0700B1D0 - 0x0700B240
 export const castle_grounds_seg7_dl_0700B1D0 = [
@@ -217,6 +217,6 @@ export const castle_grounds_seg7_dl_0700B1D0 = [
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPSetGeometryMode(G_LIGHTING),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat();
+].flat();
 
-// 1618702415 - 2021-04-17 13:33:37 -1000
+// 1618712075 - 2021-04-17 16:16:02 -1000

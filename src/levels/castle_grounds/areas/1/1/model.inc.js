@@ -1008,7 +1008,7 @@ const castle_grounds_seg7_dl_07005F60 = [
     gsSP2Triangles( 4,  1,  0, 0x0,  5,  6,  7, 0x0),
     gsSP1Triangle( 6,  8,  7, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat();
+].flat();
 
 // 0x07006090 - 0x070060C8
 const castle_grounds_seg7_dl_07006090 = [
@@ -1018,7 +1018,7 @@ const castle_grounds_seg7_dl_07006090 = [
     gsSPVertex(castle_grounds_seg7_vertex_07003370, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat();
+].flat();
 
 // 0x070060C8 - 0x07006148
 const castle_grounds_seg7_dl_070060C8 = [
@@ -1033,7 +1033,7 @@ const castle_grounds_seg7_dl_070060C8 = [
     gsSPVertex(castle_grounds_seg7_vertex_07003490, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat();
+].flat();
 
 // 0x07006148 - 0x07006378
 const castle_grounds_seg7_dl_07006148 = [
@@ -1081,7 +1081,7 @@ const castle_grounds_seg7_dl_07006148 = [
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  8, 0x0,  9, 10, 11, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat();
+].flat();
 
 // 0x07006378 - 0x070065E0
 const castle_grounds_seg7_dl_07006378 = [
@@ -1133,7 +1133,7 @@ const castle_grounds_seg7_dl_07006378 = [
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  7,  5, 0x0),
     gsSP2Triangles( 7,  8,  9, 0x0,  7, 10,  8, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat();
+].flat();
 
 // 0x070065E0 - 0x07006658
 const castle_grounds_seg7_dl_070065E0 = [
@@ -1147,7 +1147,7 @@ const castle_grounds_seg7_dl_070065E0 = [
     gsSP2Triangles( 6,  4,  7, 0x0,  2,  7,  4, 0x0),
     gsSP2Triangles( 8,  9, 10, 0x0,  8, 10, 11, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat();
+].flat();
 
 // 0x07006658 - 0x07006750
 const castle_grounds_seg7_dl_07006658 = [
@@ -1171,7 +1171,7 @@ const castle_grounds_seg7_dl_07006658 = [
     gsSP2Triangles( 3,  5,  6, 0x0,  7,  8,  9, 0x0),
     gsSP2Triangles(10, 11, 12, 0x0,  7, 13,  8, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat();
+].flat();
 
 // 0x07006750 - 0x070067B8
 const castle_grounds_seg7_dl_07006750 = [
@@ -1184,7 +1184,7 @@ const castle_grounds_seg7_dl_07006750 = [
     gsSP2Triangles( 8,  9, 10, 0x0,  8, 11,  9, 0x0),
     gsSP2Triangles(12, 13, 14, 0x0, 12, 14, 15, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat();
+].flat();
 
 // 0x070067B8 - 0x07006C38
 const castle_grounds_seg7_dl_070067B8 = [
@@ -1275,7 +1275,7 @@ const castle_grounds_seg7_dl_070067B8 = [
     gsSP2Triangles(11, 12,  9, 0x0, 11, 13, 14, 0x0),
     gsSP1Triangle(11, 14, 12, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat();
+].flat();
 
 // 0x07006C38 - 0x07006CD8
 const castle_grounds_seg7_dl_07006C38 = [
@@ -1292,7 +1292,7 @@ const castle_grounds_seg7_dl_07006C38 = [
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  7,  5, 0x0),
     gsSP2Triangles( 8,  9, 10, 0x0,  8, 11,  9, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat();
+].flat();
 
 // 0x07006CD8 - 0x07006D70
 const castle_grounds_seg7_dl_07006CD8 = [
@@ -1308,7 +1308,7 @@ const castle_grounds_seg7_dl_07006CD8 = [
     gsSP2Triangles( 3,  4,  8, 0x0,  9, 10, 11, 0x0),
     gsSP1Triangle( 9, 11, 12, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat();
+].flat();
 
 // 0x07006D70 - 0x07006ED8
 export const castle_grounds_seg7_dl_07006D70 = [
@@ -1357,6 +1357,6 @@ export const castle_grounds_seg7_dl_07006D70 = [
     gsSPDisplayList(castle_grounds_seg7_dl_07006CD8),
     gsSPSetGeometryMode(G_LIGHTING),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat();
+].flat();
 
-// 1618702415 - 2021-04-17 13:33:37 -1000
+// 1618712075 - 2021-04-17 16:16:02 -1000

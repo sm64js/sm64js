@@ -1074,18 +1074,18 @@ export const gsDPLoadTextureBlock = (timg, fmt, siz, width, height, pal, cms, cm
     ]
 }
 
-export const gsDPSetTexturePersp = () => {}  // TO-DO implement me
-export const gsSPTextureRectangle = () => {}  // TO-DO implement me
+export const gsDPSetTexturePersp  = () => {return []}  // TO-DO implement me
+export const gsSPTextureRectangle = () => {return []}  // TO-DO implement me
 
-// EXPERIMENTAL
-export const gsDPPipeSync = () => {}
-export const gsDPLoadSync = () => {}
-export const gsDPTileSync = () => {}
-export const gsDPSetAlpha = () => {}
-export const gsSPPerspNormalize = () => {}
-export const gDPPipeSync = () => {}
-export const gDPLoadSync = () => {}
-export const gDPTileSync = () => {}
-export const gDPSetAlpha = () => {}
-export const gSPPerspNormalize = () => {}
-export const gsDPSetDepthSource = () => {}
+// empty arrays are flattened and disappear
+export const gsDPPipeSync = () => {return []}
+export const gsDPLoadSync = () => {return []}
+export const gsDPTileSync = () => {return []}
+export const gsDPSetAlpha = () => {return []}
+export const gsSPPerspNormalize = () => {return []}
+export const gDPPipeSync = () => {return []}
+export const gDPLoadSync = () => {return []}
+export const gDPTileSync = () => {return []}
+export const gDPSetAlpha = () => {return []}
+export const gSPPerspNormalize = () => {return []}
+export const gsDPSetDepthSource = () => {return []}

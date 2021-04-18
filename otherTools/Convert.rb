@@ -50,7 +50,7 @@ class Convert
                 # when "macro.inc.c"      then convert_macro
                 when "model.inc.c"      then convert_model
                 when "movtext.inc.c"    then convert_movtext
-                # when "texture.inc.c"    then convert_texture
+                when "texture.inc.c"    then convert_texture
                 end
             end
         end
@@ -219,8 +219,26 @@ class Convert
 
     # -----------------------------
     def convert_texture
-    end
+        header = []
+        @text = []
 
+        @lines = File.read(@c_dir + "/texture.inc.c").lines.to_a
+        @n = 0
+        while (@n < @lines.length)
+
+            if @lines[@n] =~ / Texture / then cv_Texture
+            else
+                @text.push(@lines[@n].chomp)
+            end
+
+            @n += 1
+        end
+
+        header.push(@title)
+
+        out = [header, "", @text, @ts].join("\n")
+        File.open(@js_dir + "/texture.inc.js", "w") {|f| f.puts(out)}
+    end
 
     # -----------------------------
     def convert_anim
@@ -435,7 +453,7 @@ class Convert
             # ALIGNED8 static const Texture cannon_barrel_seg8_texture_080058A8[] = {
             if line =~ /const Texture (\w+)/
                 name = $1
-                @texs.push(name)
+                @texs.push(name) if @texs
 
             # #include "actors/cannon_barrel/cannon_barrel.rgba16.inc.c"
             elsif line =~ /#include (.+)/

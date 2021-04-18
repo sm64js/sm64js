@@ -47,7 +47,7 @@ class Convert
                 when "anim.inc.c"       then convert_anim
                 when "collision.inc.c"  then convert_collision
                 when "geo.inc.c"        then convert_geo
-                # when "macro.inc.c"      then convert_macro
+                when "macro.inc.c"      then convert_macro
                 when "model.inc.c"      then convert_model
                 when "movtext.inc.c"    then convert_movtext
                 when "texture.inc.c"    then convert_texture
@@ -60,191 +60,10 @@ class Convert
 
 
     # -----------------------------
-    def convert_collision
-        header = []
-        imports = []
-        @cmds = []
-        @cons = []
-        @spcs = []
-        @text = []
-
-        @lines = File.read(@c_dir + "/collision.inc.c").lines.to_a
-        @n = 0
-        while (@n < @lines.length)
-
-            if @lines[@n] =~ / Collision / then cv_collision
-            else
-                @text.push(@lines[@n].chomp)
-            end
-
-            @n += 1
-        end
-
-        header.push(@title)
-        imports_wrap(imports, "include/surface_terrains", [@cmds.uniq, @cons.uniq, @spcs.uniq])
-
-        out = [header, "", imports, "", @text, @ts].join("\n")
-        File.open(@js_dir + "/collision.inc.js", "w") {|f| f.puts(out)}
-    end
-
-    def cv_collision
-        while true
-            line = @lines[@n]
-
-            # const Collision castle_grounds_seg7_collision_moat_grills[] = {
-            if line =~ / Collision (\w+)/
-                @text.push("export const #{$1} = [")
-
-            # };
-            elsif line =~ /^\};/
-                @text.push("].flat();")
-                break
-
-            # COL_TRI_INIT(SURFACE_FLOWING_WATER, 4),
-            elsif line =~ /(\w+)\((.*)\),/
-                cmd, args = $1, $2
-
-                @cmds.push(cmd)
-                @spcs += args.scan(/(special_\w+)/).collect {|m| m[0]}
-                @cons += args.scan(/(^| )([A-Z]\w+)/).collect {|m| m[1]}
-                @text.push("    #{cmd}(#{args}),")
-
-            else
-                @text.push(line.chomp)
-            end
-
-            @n += 1
-        end
-    end
-
-
-    # -----------------------------
-    def convert_macro
-    end
-
-
-    # -----------------------------
-    def convert_movtext
-        header = []
-        imports = []
-        @mov_cmds = []
-        @mov_cons = []
-        @gbi_cmds = []
-        @gbi_cons = []
-        @text = []
-
-        @lines = File.read(@c_dir + "/movtext.inc.c").lines.to_a
-        @n = 0
-        while (@n < @lines.length)
-
-            if @lines[@n] =~ /(^| )Movtex /              then cv_Movtex
-            elsif @lines[@n] =~ / MovtexQuadCollection / then cv_MovtexQuadCollection
-            elsif @lines[@n] =~ / Gfx /                  then cv_Gfx
-            else
-                @text.push(@lines[@n].chomp)
-            end
-
-            @n += 1
-        end
-
-        header.push(@title)
-        imports_wrap(imports, "include/gbi", [@gbi_cmds.uniq, @gbi_cons.uniq])
-        imports.push("")
-        imports_wrap(imports, "include/moving_texture_macros", [@mov_cmds.uniq, @mov_cons.uniq])
-
-        out = [header, "", imports, "", @text, @ts].join("\n")
-        File.open(@js_dir + "/movtext.inc.js", "w") {|f| f.puts(out)}
-    end
-
-    def cv_Movtex
-        while true
-            line = @lines[@n]
-
-            # static Movtex castle_grounds_movtex_moat_water_data[] = {
-            if line =~ /static Movtex (\w+)/
-                @text.push("const #{$1} = [")
-
-            # Movtex castle_grounds_movtex_tris_waterfall[] = {
-            elsif line =~ /^Movtex (\w+)/
-                @text.push("export const #{$1} = [")
-
-            # };
-            elsif line =~ /^\};/
-                @text.push("].flat();")
-                break
-
-            # MOV_TEX_4_BOX_TRIS(-7129, -7222),
-            elsif line =~ /(\w+)\((.*)\),/
-                cmd, args = $1, $2
-
-                @mov_cmds.push(cmd)
-                @mov_cons += args.scan(/(^| )([A-Z]\w+)/).collect {|m| m[1]}
-                @text.push("    #{cmd}(#{args}),")
-
-            else
-                @text.push(line.chomp)
-            end
-
-            @n += 1
-        end
-    end
-
-    def cv_MovtexQuadCollection
-        while true
-            line = @lines[@n]
-
-            # const struct MovtexQuadCollection castle_grounds_movtex_water[] = {
-            if line =~ /struct MovtexQuadCollection (\w+)/
-                @text.push("export const #{$1} = [")
-
-            # {0, castle_grounds_movtex_moat_water_data},
-            elsif line =~ /\{(.+), (.+)\}/
-                id, movtex = $1, $2
-                movtex.gsub!("NULL", "null")
-                @text.push("    {id: #{id}, movtex: #{movtex}},")
-
-            # };
-            elsif line =~ /^\};/
-                @text.push("];")
-                break
-
-            else
-                @text.push(line.chomp)
-            end
-
-            @n += 1
-        end
-    end
-
-
-    # -----------------------------
-    def convert_texture
-        header = []
-        @text = []
-
-        @lines = File.read(@c_dir + "/texture.inc.c").lines.to_a
-        @n = 0
-        while (@n < @lines.length)
-
-            if @lines[@n] =~ / Texture / then cv_Texture
-            else
-                @text.push(@lines[@n].chomp)
-            end
-
-            @n += 1
-        end
-
-        header.push(@title)
-
-        out = [header, "", @text, @ts].join("\n")
-        File.open(@js_dir + "/texture.inc.js", "w") {|f| f.puts(out)}
-    end
-
-    # -----------------------------
     def convert_anim
         header = []
         imports = []
-        @cons = []
+        @anim_cons = []
         @text = []
 
         @lines = File.read(@c_dir + "/anim.inc.c").lines.to_a
@@ -264,8 +83,8 @@ class Convert
 
         header.push(@title)
 
-        @cons.push("ANIMINDEX_NUMPARTS")
-        imports_wrap(imports, "include/types", @cons)
+        @anim_cons.push("ANIMINDEX_NUMPARTS")
+        imports_wrap(imports, "include/types", @anim_cons)
 
         out = [header, "", imports, "", @text, @ts].join("\n")
         File.open(@js_dir + "/anim.inc.js", "w") {|f| f.puts(out)}
@@ -368,6 +187,234 @@ class Convert
     end
 
 
+    # -----------------------------
+    def convert_collision
+        header = []
+        imports = []
+        @cmds = []
+        @coll_cons = []
+        @spcs = []
+        @text = []
+
+        @lines = File.read(@c_dir + "/collision.inc.c").lines.to_a
+        @n = 0
+        while (@n < @lines.length)
+
+            if @lines[@n] =~ / Collision / then cv_collision
+            else
+                @text.push(@lines[@n].chomp)
+            end
+
+            @n += 1
+        end
+
+        header.push(@title)
+        imports_wrap(imports, "include/surface_terrains", [@cmds.uniq, @coll_cons.uniq, @spcs.uniq])
+
+        out = [header, "", imports, "", @text, @ts].join("\n")
+        File.open(@js_dir + "/collision.inc.js", "w") {|f| f.puts(out)}
+    end
+
+    def cv_collision
+        while true
+            line = @lines[@n]
+
+            # const Collision castle_grounds_seg7_collision_moat_grills[] = {
+            if line =~ / Collision (\w+)/
+                @text.push("export const #{$1} = [")
+
+            # COL_TRI_INIT(SURFACE_FLOWING_WATER, 4),
+            elsif line =~ /(\w+)\((.*)\),/
+                cmd, args = $1, $2
+
+                @cmds.push(cmd)
+                @spcs += args.scan(/(special_\w+)/).collect {|m| m[0]}
+                @coll_cons += args.scan(/(^| )([A-Z]\w+)/).collect {|m| m[1]}
+                @text.push("    #{cmd}(#{args}),")
+
+            # };
+            elsif line =~ /^\};/
+                @text.push("].flat();")
+                break
+
+            else
+                @text.push(line.chomp)
+            end
+
+            @n += 1
+        end
+    end
+
+
+   # -------------
+    def convert_geo
+        header = []
+        imports = []
+
+        @geo_mods = []
+        @geo_cmds = []
+        @geo_cons = []
+        @text = []
+
+        geolayout_path = "engine/GeoLayout"
+        shadow_path    = "game/Shadow"
+        cons_overrides = {
+            shadow_path => ["SHADOW_CIRCLE_4_VERTS"]
+        }
+
+        @lines = File.read(@c_dir + "/geo.inc.c").lines.to_a
+        @n = 0
+        while (@n < @lines.length)
+
+            if @lines[@n] =~ / GeoLayout / then cv_GeoLayout
+            else
+                @text.push(@lines[@n].chomp)
+            end
+
+            @n += 1
+        end
+
+        a = @entity.split('_').collect(&:capitalize).join(' ')
+        header.push("// #{a}")
+
+        cons = @geo_cons.uniq.group_by do |con|
+            o = cons_overrides.find {|p, f| f.include?(con)}
+            o ? o[0] : geolayout_path
+        end
+
+        imports_wrap(imports, geolayout_path, [@geo_cmds.uniq, cons[geolayout_path]])
+        imports.push("")
+        if cons[shadow_path]
+            imports_wrap(imports, shadow_path, cons[shadow_path])
+            imports.push("")
+        end
+        imports_wrap(imports, @js_dir + "/model.inc", @geo_mods.uniq)
+
+        out = [header, "", imports, "", @text, @ts].join("\n")
+        File.open(@js_dir + "/geo.inc.js", "w") {|f| f.puts(out)}
+    end
+
+    def cv_GeoLayout
+        while true
+            line = @lines[@n]
+
+            # const GeoLayout mad_piano_geo[] = {
+            if line =~ /const GeoLayout (\w+)/
+                @text.push("export const #{$1} = [")
+
+            # GEO_SCALE(0x00, 16384),
+            elsif line =~ /^(\s*)(\w+)\((.*)\),(.*)$/
+                cmd, args, xtra = $~[2..4]
+                tabs = "    " * ($1.length / 3)
+                @geo_cmds.push(cmd)
+                if args.length > 0
+                    args = args.split(",").collect do |arg|
+                        arg.strip!
+                        arg.gsub!("NULL", "null")               # NULL
+                        if arg =~ /^(#{@entity}\w+)/             # dorrie_seg6_dl_0600CFD0
+                            @geo_mods.push($1)
+                        end
+                        if arg =~ /^([A-Z][A-Z_0-9]+)/          # LAYER_OPAQUE
+                            @geo_cons.push($1)
+                        end
+                        arg  # result
+                    end.join(", ")
+                end
+                @text.push("#{tabs}#{cmd}(#{args}),#{xtra}")
+
+            # };
+            elsif line =~ /^\};/
+                @text.push("];")
+                break
+            end
+
+            @n += 1
+        end
+    end
+
+
+    # -----------------------------
+    def convert_macro
+        header = []
+        imports = []
+        @macr_cmds = []
+        @macr_imps = {}
+        @text = []
+
+        @lines = File.read(@c_dir + "/macro.inc.c").lines.to_a
+        @n = 0
+        while (@n < @lines.length)
+
+            if @lines[@n] =~ / MacroObject / then cv_MacroObject
+            else
+                @text.push(@lines[@n].chomp)
+            end
+
+            @n += 1
+        end
+
+        header.push(@title)
+        imports_wrap(imports, "game/MacroSpecialObjects", @macr_cmds.uniq)
+        @macr_imps.each do |as, what|
+            imports.push("")
+            imports.push("import { #{what[0]} } from #{relative_import(what[1])}")
+            imports.push("const #{as} = #{what[0]}")
+        end
+
+        out = [header, "", imports, "", @text, @ts].join("\n")
+        File.open(@js_dir + "/macro.inc.js", "w") {|f| f.puts(out)}
+    end
+
+    def cv_MacroObject
+        behp = [
+            [/(DIALOG_\w+)/, ['D', 'DialogTexts', 'text/us/dialogs']]  # DIALOG_050
+        ]
+
+        while true
+            line = @lines[@n]
+
+            # const MacroObject castle_grounds_seg7_macro_objs[] = {
+            if line =~ / MacroObject (\w+)/
+                @text.push("export const #{$1} = [")
+
+            # MACRO_OBJECT(/*preset*/ macro_hidden_1up_in_pole,  /*yaw*/   0, /*pos*/ -6270,   975, -2145),
+            elsif line =~ /(\w+)\((.*)\),/
+                cmd, args = $1, $2
+
+                @macr_cmds.push(cmd)
+                args = args.split(",")
+
+                if args[0]
+                    @macr_imps['P'] ||= ['MacroObjectPresets', 'include/macro_presets']
+                    args[0].gsub!(/(macro_\w+)/, "P.\\1")  # macro_wooden_signpost
+                end
+
+                if cmd == "MACRO_OBJECT_WITH_BEH_PARAM"
+                    behp.each do |keyword, d|
+                        if args[-1] =~ keyword
+                            @macr_imps[d[0]] = [d[1], d[2]]
+                            args[-1].gsub!(keyword, "#{d[0]}.\\1")
+                        end
+                    end
+                end
+
+                args = args.join(",")
+                @text.push("    #{cmd}(#{args}),")
+
+            # };
+            elsif line =~ /^\};/
+                @text.push("];")
+                break
+
+            else
+                @text.push(line.chomp)
+            end
+
+            @n += 1
+        end
+    end
+
+
     # ------------------------------
     def convert_model
         header = []
@@ -452,16 +499,15 @@ class Convert
 
             # ALIGNED8 static const Texture cannon_barrel_seg8_texture_080058A8[] = {
             if line =~ /const Texture (\w+)/
-                name = $1
-                @texs.push(name) if @texs
+                @text.push("export const #{$1} = []")
+                @texs.push($1) if @texs
 
             # #include "actors/cannon_barrel/cannon_barrel.rgba16.inc.c"
-            elsif line =~ /#include (.+)/
-                inc = $1
+            elsif line =~ /#include "(.+)\.inc\.c"/
+                @text.push("// #{$1}.png")
 
             # };
             elsif line =~ /^\};/
-                @text.push("export const #{name} = []  // #{inc}")
                 break
             end
 
@@ -539,83 +585,125 @@ class Convert
     end
 
 
-    # -------------
-    def convert_geo
+    # -----------------------------
+    def convert_movtext
         header = []
         imports = []
-
+        @mov_cmds = []
+        @mov_cons = []
+        @gbi_cmds = []
+        @gbi_cons = []
         @text = []
-        @mods = []
-        @cmds = []
-        @cons = []
-        cons2 = []
 
-        @lines = File.read(@c_dir + "/geo.inc.c").lines.to_a
+        @lines = File.read(@c_dir + "/movtext.inc.c").lines.to_a
         @n = 0
         while (@n < @lines.length)
-            if @lines[@n] =~ / GeoLayout /
-                cv_GeoLayout
+
+            if @lines[@n] =~ /(^| )Movtex /              then cv_Movtex
+            elsif @lines[@n] =~ / MovtexQuadCollection / then cv_MovtexQuadCollection
+            elsif @lines[@n] =~ / Gfx /                  then cv_Gfx
             else
                 @text.push(@lines[@n].chomp)
             end
+
             @n += 1
         end
 
-        a = @entity.split('_').collect(&:capitalize).join(' ')
-        header.push("// #{a}")
-
-        geolayout_path = "engine/GeoLayout"
-        shadow_path    = "game/Shadow"
-        overrides = {
-            shadow_path => ["SHADOW_CIRCLE_4_VERTS"]
-        }
-        @cons = @cons.uniq.group_by do |con|
-            o = overrides.find {|p, f| f.include?(con)}
-            o ? o[0] : geolayout_path
-        end
-
-        imports_wrap(imports, geolayout_path, [@cmds.uniq, @cons[geolayout_path]])
+        header.push(@title)
+        imports_wrap(imports, "include/gbi", [@gbi_cmds.uniq, @gbi_cons.uniq])
         imports.push("")
-        if @cons[shadow_path]
-            imports_wrap(imports, shadow_path, @cons[shadow_path])
-            imports.push("")
-        end
-        imports_wrap(imports, @js_dir + "/model.inc", @mods.uniq)
+        imports_wrap(imports, "include/moving_texture_macros", [@mov_cmds.uniq, @mov_cons.uniq])
 
         out = [header, "", imports, "", @text, @ts].join("\n")
-        File.open(@js_dir + "/geo.inc.js", "w") {|f| f.puts(out)}
+        File.open(@js_dir + "/movtext.inc.js", "w") {|f| f.puts(out)}
     end
 
-    def cv_GeoLayout
+    def cv_Movtex
         while true
             line = @lines[@n]
-            if line =~ /const GeoLayout (\w+)/        # const GeoLayout mad_piano_geo[] = {
+
+            # static Movtex castle_grounds_movtex_moat_water_data[] = {
+            if line =~ /static Movtex (\w+)/
+                @text.push("const #{$1} = [")
+
+            # Movtex castle_grounds_movtex_tris_waterfall[] = {
+            elsif line =~ /^Movtex (\w+)/
                 @text.push("export const #{$1} = [")
-            elsif line =~ /^(\s*)(\w+)\((.*)\),(.*)$/           #    GEO_SCALE(0x00, 16384),
-                cmd, args, xtra = $~[2..4]
-                tabs = "    " * ($1.length / 3)
-                @cmds.push(cmd)
-                if args.length > 0
-                    args = args.split(",").collect do |arg|
-                        arg.strip!
-                        arg.gsub!("NULL", "null")               # NULL
-                        if arg =~ /^(#{@entity}\w+)/             # dorrie_seg6_dl_0600CFD0
-                            @mods.push($1)
-                        end
-                        if arg =~ /^([A-Z][A-Z_0-9]+)/          # LAYER_OPAQUE
-                            @cons.push($1)
-                        end
-                        arg  # result
-                    end.join(", ")
-                end
-                @text.push("#{tabs}#{cmd}(#{args}),#{xtra}")
-            elsif line =~ /^\};/                                # };
-                @text.push("];")
+
+            # MOV_TEX_4_BOX_TRIS(-7129, -7222),
+            elsif line =~ /(\w+)\((.*)\),/
+                cmd, args = $1, $2
+
+                @mov_cmds.push(cmd)
+                @mov_cons += args.scan(/(^| )([A-Z]\w+)/).collect {|m| m[1]}
+                @text.push("    #{cmd}(#{args}),")
+
+            # };
+            elsif line =~ /^\};/
+                @text.push("].flat();")
                 break
+
+            else
+                @text.push(line.chomp)
             end
+
             @n += 1
         end
     end
+
+    def cv_MovtexQuadCollection
+        while true
+            line = @lines[@n]
+
+            # const struct MovtexQuadCollection castle_grounds_movtex_water[] = {
+            if line =~ /struct MovtexQuadCollection (\w+)/
+                @text.push("export const #{$1} = [")
+
+            # {0, castle_grounds_movtex_moat_water_data},
+            elsif line =~ /\{(.+), (.+)\}/
+                id, movtex = $1, $2
+                movtex.gsub!("NULL", "null")
+                @text.push("    {id: #{id}, movtex: #{movtex}},")
+
+            # };
+            elsif line =~ /^\};/
+                @text.push("];")
+                break
+
+            else
+                @text.push(line.chomp)
+            end
+
+            @n += 1
+        end
+    end
+
+
+    # -----------------------------
+    def convert_texture
+        header = []
+        @text = []
+
+        @lines = File.read(@c_dir + "/texture.inc.c").lines.to_a
+        @n = 0
+        while (@n < @lines.length)
+
+            if @lines[@n] =~ / Texture / then cv_Texture
+            else
+                @text.push(@lines[@n].chomp)
+            end
+
+            @n += 1
+        end
+
+        header.push(@title)
+
+        out = [header, "", @text, @ts].join("\n")
+        File.open(@js_dir + "/texture.inc.js", "w") {|f| f.puts(out)}
+    end
+
+
+
 
     def relative_path(from, to)
         from_elements = from.split('/')
@@ -624,6 +712,12 @@ class Convert
         up_count      = from_elements.length - common_root.length
         down_elements = to_elements - common_root
         return '../' * up_count + down_elements.join('/')
+    end
+
+    def relative_import(to)
+        rel = relative_path(@js_dir, @js_root + "/src/" + to)
+        rel = "./" + rel if !rel.start_with?(".")  # import needs this
+        return '"' + rel + '"'
     end
 
     def imports_wrap(imports, from, items_list)
@@ -647,9 +741,7 @@ class Convert
             imports.push(t + ",") if t
         end
         imports[-1].delete_suffix!(",")
-        rel = relative_path(@js_dir, @js_root + "/src/" + from)
-        rel = "./" + rel if !rel.start_with?(".")  # import needs this
-        imports.push("} from \"#{rel}\"")
+        imports.push("} from #{relative_import(from)}")
     end
 
 end

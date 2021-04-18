@@ -28,10 +28,12 @@ const castle_grounds_seg7_vertex_0700C9A8 = [
 ];
 
 // 0x0700C9E8 - 0x0700D9E8
-export const castle_grounds_seg7_texture_0700C9E8 = []  // "levels/castle_grounds/3.rgba16.inc.c"
+export const castle_grounds_seg7_texture_0700C9E8 = []
+// levels/castle_grounds/3.rgba16.png
 
 // 0x0700D9E8 - 0x0700E9E8
-export const castle_grounds_seg7_texture_0700D9E8 = []  // "levels/castle_grounds/4.rgba16.inc.c"
+export const castle_grounds_seg7_texture_0700D9E8 = []
+// levels/castle_grounds/4.rgba16.png
 
 // 0x0700E9E8 - 0x0700EA20
 const castle_grounds_seg7_dl_0700E9E8 = [
@@ -75,4 +77,4 @@ export const castle_grounds_seg7_dl_0700EA58 = [
     gsSPEndDisplayList(),
 ].flat();
 
-// 1618722039 - 2021-04-17 19:00:51 -1000
+// 1618752565 - 2021-04-18 03:29:27 -1000

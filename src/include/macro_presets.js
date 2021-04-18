@@ -1,12 +1,13 @@
-import * as Models from "./model_ids"
-import * as Behaviors from "../game/BehaviorData"
+import * as MODEL from "./model_ids"
+import * as BHV from "../game/BehaviorData"
 
 import { COIN_FORMATION_FLAG_VERTICAL,
          COIN_FORMATION_FLAG_RING,
          COIN_FORMATION_FLAG_ARROW,
          COIN_FORMATION_FLAG_FLYING } from "./model_ids"
 
-const presets = [
+export const MacroObjectPresets = {};
+[
     ['macro_yellow_coin', 'bhvYellowCoin', 'MODEL_YELLOW_COIN', 0],
     ['macro_yellow_coin_2', 'bhvOneCoin', 'MODEL_YELLOW_COIN', 0],
     ['macro_moving_blue_coin', 'bhvMovingBlueCoin', 'MODEL_BLUE_COIN', 0],
@@ -373,12 +374,6 @@ const presets = [
     ['macro_empty_363', 'bhvYellowCoin', 'MODEL_YELLOW_COIN', 0],
     ['macro_empty_364', 'bhvYellowCoin', 'MODEL_YELLOW_COIN', 0],
     ['macro_empty_365', 'bhvYellowCoin', 'MODEL_YELLOW_COIN', 0]
-]
-
-export const MacroObjectPresets = {}
-
-for (let i = 0; i < presets.length; ++i) {
-    let p = presets[i]
-    let n = p[0], b = Behaviors[p[1]], m = Models[p[2]]
-    MacroObjectPresets[n] = {behavior: b, model: m, param: p[3]}
-}
+].forEach(p => {
+    MacroObjectPresets[p[0]] = {behavior: BHV[p[1]], model: MODEL[p[2]], param: p[3]}
+})

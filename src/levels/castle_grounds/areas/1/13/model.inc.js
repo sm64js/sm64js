@@ -10,7 +10,8 @@ import {
     G_TX_RENDERTILE, G_TX_CLAMP, G_TEXTURE_IMAGE_FRAC, CALC_DXT, G_IM_SIZ_16b_BYTES, G_TP_PERSP,
     G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2, G_CC_SHADE, G_OFF, G_TF_BILERP
 } from "../../../../../include/gbi"
-export const castle_grounds_seg7_us_texture_0700EAE8 = []  // "levels/castle_grounds/5.ia8.inc.c"
+export const castle_grounds_seg7_us_texture_0700EAE8 = []
+// levels/castle_grounds/5.ia8.png
 
 export const castle_grounds_seg7_us_dl_0700F2E8 = [
     gsDPPipeSync(),
@@ -36,4 +37,4 @@ export const castle_grounds_seg7_us_dl_0700F2E8 = [
     gsSPEndDisplayList(),
 ].flat();
 
-// 1618722039 - 2021-04-17 19:00:51 -1000
+// 1618752565 - 2021-04-18 03:29:27 -1000

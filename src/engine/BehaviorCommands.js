@@ -8,6 +8,7 @@ import { dist_between_objects,
          cur_obj_scale,
          cur_obj_hide,
          cur_obj_move_xz_using_fvel_and_yaw,
+         cur_obj_has_behavior,
          spawn_water_droplet                 } from "../game/ObjectHelpers"
 import { s16,
          s32,
@@ -456,6 +457,23 @@ class BehaviorCommands {
 
     begin(args) {
         ObjListProc.gCurrentObject.bhvStack = []
+
+    // These objects were likely very early objects, which is why this code is here
+    // instead of in the respective behavior scripts.
+
+    // Initiate the room if the object is a haunted chair or the mad piano.
+    // if (cur_obj_has_behavior(bhvHauntedChair)) {
+    //     bhv_init_room();
+    // }
+    // if (cur_obj_has_behavior(bhvMadPiano)) {
+    //     bhv_init_room();
+    // }
+
+        // Set collision distance if the object is a message panel.
+        // if (cur_obj_has_behavior(bhvMessagePanel)) {
+        //     ObjListProc.gCurrentObject.oCollisionDistance = 150.0
+        // }
+
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }

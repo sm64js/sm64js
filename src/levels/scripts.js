@@ -35,7 +35,7 @@ import { mist_geo                   } from "../actors/mist/geo.inc"
 import { dirt_animation_geo,
          cartoon_star_geo           } from "../actors/dirt/geo.inc"
 import { explosion_geo              } from "../actors/explosion/geo.inc"
-
+import { wooden_signpost_geo        } from "../actors/wooden_signpost/geo.inc"
 
 export const script_exec_level_table = [
     ['GET_AREA', 'gCurrLevelNum'],
@@ -60,7 +60,7 @@ export const level_main_scripts_entry = [
     ['LOAD_MODEL_FROM_GEO', MODEL_YELLOW_COIN,             yellow_coin_geo],
     // ['LOAD_MODEL_FROM_GEO', MODEL_STAR,                    star_geo],
     // ['LOAD_MODEL_FROM_GEO', MODEL_TRANSPARENT_STAR,        transparent_star_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_WOODEN_SIGNPOST,         wooden_signpost_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL_WOODEN_SIGNPOST,         wooden_signpost_geo],
     ['LOAD_MODEL_FROM_DL',  MODEL_WHITE_PARTICLE_SMALL,    white_particle_small_dl,     LAYER_ALPHA],
     // ['LOAD_MODEL_FROM_GEO', MODEL_RED_FLAME,               red_flame_geo],
     // ['LOAD_MODEL_FROM_GEO', MODEL_BLUE_FLAME,              blue_flame_geo],

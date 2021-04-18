@@ -5,6 +5,7 @@ import {
          ACT_FLAG_ATTACKING,
          ACT_FLAG_DIVING,
          ACT_FLAG_HANGING,
+         ACT_FLAG_IDLE,
          ACT_FLAG_INTANGIBLE,
          ACT_FLAG_INVULNERABLE,
          ACT_FLAG_METAL_WATER,
@@ -25,15 +26,19 @@ import {
          ACT_PICKING_UP,
          ACT_PICKING_UP_BOWSER,
          ACT_PUNCHING,
+         ACT_READING_SIGN,
          ACT_RIDING_HOOT,
          ACT_SHOT_FROM_CANNON,
          ACT_SLIDE_KICK,
          ACT_SLIDE_KICK_SLIDE,
          ACT_TWIRL_LAND,
          ACT_TWIRLING,
+         ACT_WALKING,
          ACT_WATER_JUMP,
          ACT_WATER_PUNCH,
          drop_and_set_mario_action,
+         INPUT_A_PRESSED,
+         INPUT_B_PRESSED,
          INPUT_INTERACT_OBJ_GRABBABLE,
          MARIO_CAP_ON_HEAD,
          MARIO_KICKING,
@@ -50,9 +55,10 @@ import {
 
 import { AreaInstance as Area } from "./Area"
 import * as MarioConstants from "../include/mario_constants"
-import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ } from "../include/object_constants"
+import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY,
+    oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ, oMoveAngleYaw } from "../include/object_constants"
 import { atan2s } from "../engine/math_util"
-import { sins, coss, int16 } from "../utils"
+import { sins, coss, int16, s16 } from "../utils"
 import { gLinker } from "./Linker"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND } from "../include/surface_terrains"
@@ -355,6 +361,83 @@ const interact_grabbable = (m, o) => {
     return 0
 }
 
+
+const mario_can_talk = (m, arg) => {
+    let val6
+
+    return 0  // TODO implement ACT_READING_SIGN
+
+    if ((m.action & ACT_FLAG_IDLE) != 0x00000000) {
+        return 1
+    }
+
+    if (m.action == ACT_WALKING) {
+        if (arg) {
+            return 1
+        }
+
+        val6 = m.marioObj.header.gfx.unk38.animID
+
+        if (val6 == 0x0080 || val6 == 0x007F || val6 == 0x006C) {
+            return 1
+        }
+    }
+
+    return 0
+}
+
+const check_read_sign = (m, o) => {
+    if ((m.input & (INPUT_B_PRESSED | INPUT_A_PRESSED)) && mario_can_talk(m, 0) && object_facing_mario(m, o, 0x4000)) {
+        const facingDYaw = s16(s16(o.rawData[oMoveAngleYaw] + 0x8000) - m.faceAngle[1])
+        if (facingDYaw >= -0x4000 && facingDYaw <= 0x4000) {
+            const targetX = o.rawData[oPosX] + 105.0 * sins(o.rawData[oMoveAngleYaw])
+            const targetZ = o.rawData[oPosZ] + 105.0 * coss(o.rawData[oMoveAngleYaw])
+
+            m.marioObj.oMarioReadingSignDYaw = facingDYaw;
+            m.marioObj.oMarioReadingSignDPosX = targetX - m.pos[0]
+            m.marioObj.oMarioReadingSignDPosZ = targetZ - m.pos[2]
+
+            m.interactObj = o
+            m.usedObj = o
+            return set_mario_action(m, ACT_READING_SIGN, 0)
+        }
+    }
+
+    return 0
+}
+
+const check_npc_talk = (m, o) => {
+    if ((m.input & (INPUT_B_PRESSED | INPUT_A_PRESSED)) && mario_can_talk(m, 1)) {
+        const facingDYaw = s16(mario_obj_angle_to_object(m, o) - m.faceAngle[1])
+        if (facingDYaw >= -0x4000 && facingDYaw <= 0x4000) {
+            o.rawData[oInteractStatus] = INT_STATUS_INTERACTED
+
+            m.interactObj = o
+            m.usedObj = o
+
+            push_mario_out_of_object(m, o, -10.0)
+            return set_mario_action(m, ACT_WAITING_FOR_DIALOG, 0)
+        }
+    }
+
+    push_mario_out_of_object(m, o, -10.0)
+    return 0
+}
+
+const interact_text = (m, o) => {
+    let interact = 0
+
+    if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_SIGN) {
+        interact = check_read_sign(m, o)
+    } else if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_NPC) {
+        interact = check_npc_talk(m, o)
+    } else {
+        push_mario_out_of_object(m, o, 2.0)
+    }
+
+    return interact
+}
+
 const interact_pole = (m, o) => {
     const actionId = m.action & ACT_ID_MASK
     if (actionId >= 0x80 && actionId < 0x0A0) {
@@ -502,6 +585,25 @@ const bounce_back_from_attack = (m, interaction) => {
         //play_sound(SOUND_ACTION_HIT_2, m -> marioObj -> header.gfx.cameraToObject)
     }
 }
+
+/**
+ * Returns true if the passed in object has a moving angle yaw
+ * in the angular range given towards Mario.
+ */
+const object_facing_mario = (m, o, angleRange) => {
+    let dx = m.pos[0] - o.rawData[oPosX]
+    let dz = m.pos[2] - o.rawData[oPosZ]
+
+    let angleToMario = atan2s(dz, dx)
+    let dAngle = s16(angleToMario - o.rawData[oMoveAngleYaw])
+
+    if (-angleRange <= dAngle && dAngle <= angleRange) {
+        return 1
+    }
+
+    return 0
+}
+
 
 const determine_interaction = (m, o) => {
     let interaction = 0
@@ -765,7 +867,7 @@ const sInteractionHandlers = [
     { interactType: INTERACT_UNKNOWN_08, handler: null },
     { interactType: INTERACT_CAP, handler: null },
     { interactType: INTERACT_GRABBABLE, handler: interact_grabbable },
-    { interactType: INTERACT_TEXT, handler: null },
+    { interactType: INTERACT_TEXT, handler: interact_text },
 ]
 
 const mario_get_collided_object = (m, interactType) => {

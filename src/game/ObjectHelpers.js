@@ -1195,3 +1195,24 @@ export const cur_obj_wait_then_blink = (timeUntilBlinking, numBlinks) => {
 
     return done
 }
+
+export const obj_set_behavior = (obj, behavior) => {
+    obj.behavior = behavior
+}
+
+export const cur_obj_has_behavior = (behavior) => {
+    const o = ObjectListProc.gCurrentObject
+    if (o.behavior == behavior) {
+        return true
+    } else {
+        return false
+    }
+}
+
+export const obj_has_behavior = (obj, behavior) => {
+    if (obj.behavior == behavior) {
+        return true
+    } else {
+        return false
+    }
+}

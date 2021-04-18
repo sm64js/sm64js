@@ -7,7 +7,10 @@ import { INTERACT_WATER_RING,
          INTERACT_POLE,
          INTERACT_DAMAGE,
          INTERACT_COIN,
+         INTERACT_TEXT,
+         INT_SUBTYPE_SIGN,
          INTERACT_CANNON_BASE } from "./Interaction"
+
 import { oFlags,
             OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, OBJ_FLAG_COMPUTE_DIST_TO_MARIO,
             OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW,
@@ -23,13 +26,14 @@ import { oFlags,
          oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAnimations,
          oIntangibleTimer, oGraphYOffset, oNumLootCoins, oCollisionDistance,
          oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll,
+         oWoodenPostTotalMarioAngle, oInteractStatus,
          oWaterObjUnkF4, oWaterObjUnkF8, oWaterObjUnkFC, oBehParams2ndByte      } from "../include/object_constants"
 
 import { MODEL_WOODEN_POST,
          MODEL_MIST,
          MODEL_SMOKE,
          MODEL_BUBBLE,
-         MODEL_CANNON_BARREL                            } from "../include/model_ids"
+         MODEL_CANNON_BARREL } from "../include/model_ids"
 
 import { bhv_pole_base_loop                             } from "./behaviors/pole_base.inc"
 import { bhv_pole_init, bhv_giant_pole_loop             } from "./behaviors/pole.inc"
@@ -101,14 +105,14 @@ import { bhv_cannon_base_loop,
          bhv_cannon_barrel_loop                         } from "./behaviors/cannon.inc"
 import { bhv_sound_spawner_init                         } from "./behaviors/sound_spawner.inc"
 
-import { castle_grounds_seg7_anims_flags                } from "../levels/castle_grounds/areas/1/11/anim.inc"
-import { goomba_seg8_anims_0801DA4C                     } from "../actors/goomba/anims/table.inc"
-import { bobomb_seg8_anims_0802396C                     } from "../actors/bobomb/anims/table.inc"
+import { castle_grounds_seg7_anims_flags } from "../levels/castle_grounds/areas/1/11/anim.inc"
+import { goomba_seg8_anims_0801DA4C      } from "../actors/goomba/anims/table.inc"
+import { bobomb_seg8_anims_0802396C      } from "../actors/bobomb/anims/table.inc"
 
-import { checkerboard_platform_seg8_collision_0800D710  } from "../actors/checkerboard_platform/collision.inc"
-import { poundable_pole_collision_06002490              } from "../actors/poundable_pole/collision.inc"
-import { castle_grounds_seg7_collision_moat_grills      } from "../levels/castle_grounds/areas/1/7/collision.inc"
-import { castle_grounds_seg7_collision_cannon_grill     } from "../levels/castle_grounds/areas/1/8/collision.inc"
+import { checkerboard_platform_seg8_collision_0800D710 } from "../actors/checkerboard_platform/collision.inc"
+import { poundable_pole_collision_06002490             } from "../actors/poundable_pole/collision.inc"
+import { castle_grounds_seg7_collision_moat_grills     } from "../levels/castle_grounds/areas/1/7/collision.inc"
+import { castle_grounds_seg7_collision_cannon_grill    } from "../levels/castle_grounds/areas/1/8/collision.inc"
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
 const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -313,6 +317,48 @@ export const bhvBobombFuseSmoke = [
         { command: BhvCmds.call_native, args: { func: bhv_dust_smoke_loop } },
         { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
     { command: BhvCmds.end_loop }
+]
+
+// const BehaviorScript bhvBobombBuddy[] = {
+
+// const BehaviorScript bhvBobombBuddyOpensCannon[] = {
+
+// const BehaviorScript bhvCannonClosed[] = {
+
+// const BehaviorScript bhvWhirlpool[] = {
+
+// const BehaviorScript bhvJetStream[] = {
+
+import { wooden_signpost_seg3_collision_0302DD80 } from "../actors/wooden_signpost/collision.inc"
+
+export const bhvMessagePanel = () => { return [
+    ['BEGIN', OBJ_LIST_SURFACE],
+    ['OR_INT', oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE],
+    ['LOAD_COLLISION_DATA', wooden_signpost_seg3_collision_0302DD80],
+    ['SET_FLOAT', oCollisionDistance, 150],  // oCollisionDistance = 150.0 from BehaviorCommands.js
+    ['SET_INTERACT_TYPE', INTERACT_TEXT],
+    ['SET_INT', oInteractionSubtype, INT_SUBTYPE_SIGN],
+    ['DROP_TO_FLOOR'],
+    ['SET_HITBOX', /*Radius*/ 150, /*Height*/ 80],
+    ['SET_INT', oWoodenPostTotalMarioAngle, 0],
+    ['BEGIN_LOOP'],
+        ['SET_INT', oIntangibleTimer, 0],
+        ['CALL_NATIVE', SurfaceLoad.load_object_collision_model, SurfaceLoad],
+        ['SET_INT', oInteractStatus, 0],
+    ['END_LOOP'],
+]}
+
+export const bhvSignOnWall = [
+    ['BEGIN', OBJ_LIST_SURFACE],
+    ['OR_INT', oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE],
+    ['SET_INTERACT_TYPE', INTERACT_TEXT],
+    ['SET_INT', oInteractionSubtype, INT_SUBTYPE_SIGN],
+    ['SET_HITBOX', /*Radius*/ 150, /*Height*/ 80],
+    ['SET_INT', oWoodenPostTotalMarioAngle, 0],
+    ['BEGIN_LOOP'],
+        ['SET_INT', oIntangibleTimer, 0],
+        ['SET_INT', oInteractStatus, 0],
+    ['END_LOOP'],
 ]
 
 export const bhvBobombBullyDeathSmoke = [

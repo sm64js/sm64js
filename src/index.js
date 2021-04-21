@@ -213,7 +213,7 @@ window.onload = async () => {
 
         /// send access code to server
         const state = JSON.parse(decodeURIComponent(url_params.get("state")))
-        const res = await fetch (`/api/login/${state.type}`, {
+        const res = await fetch(`${process.env.BACKEND_URL ?? ''}/api/login/${state.type}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -222,7 +222,7 @@ window.onload = async () => {
         })
         const success = Socket.recvAuthorizedUser(res)
 
-        if (success && process.env.NODE_ENV === 'rust') {
+        if (success) {
             const url = new URL(window.location.href)
             url.searchParams.delete('code')
             url.searchParams.delete('state')
@@ -230,7 +230,7 @@ window.onload = async () => {
             history.replaceState({ state: 'login' }, '', url)
         }
     } else {
-        const res = await fetch ('/api/login', {
+        const res = await fetch(`${process.env.BACKEND_URL ?? ''}/api/login`, {
             method: 'POST'
         })
         Socket.recvAuthorizedUser(res)

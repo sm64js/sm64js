@@ -48,11 +48,9 @@ const getGameIdFromURL = () => {
 const gameID = getGameIdFromURL() 
 if (gameID) { document.getElementById("mapSelect").hidden = true }
 
-const websocketServerPath = process.env.NODE_ENV === 'rust'
-    ? `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/` // Tarnadas - Rust Server
-    : url.protocol == "https:" // Snuffy - sm64js.com
-        ? `wss://server.sm64js.com/websocket/` // production
-        : `ws://${url.hostname}:3000` // local testing
+const websocketServerPath = process.env.BACKEND_URL
+    ? `${process.env.BACKEND_URL}/ws/`
+    : `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/`
 
 let socket
 
@@ -68,11 +66,6 @@ export const networkData = {
 export const gameData = {}
 
 const sendData = (bytes) => { socket.send(bytes) }
-
-const text = {
-    decoder: new TextDecoder(),
-    encoder: new TextEncoder()
-}
 
 const unzip = (bytes) => {
     return new Promise(function (resolve, reject) {
@@ -434,9 +427,7 @@ export const sendChat = ({ message }) => {
     sendData(rootMsg.serializeBinary())
 }
 
-const redirect_uri = encodeURIComponent(process.env.NODE_ENV === 'rust'
-    ? `${url.protocol}//${window.location.host}`
-    : url.protocol == "https:" ? 'https://sm64js.com' : 'http://localhost:9300')
+const redirect_uri = encodeURIComponent(`${url.protocol}//${window.location.host}`)
 
 const discord_client_id = "807123464414429184"
 const discordOAuthURL = "https://discord.com/api/oauth2/authorize?client_id=" + discord_client_id + "&redirect_uri=" + redirect_uri + "&response_type=code&scope=identify"
@@ -444,7 +435,7 @@ const discordOAuthURL = "https://discord.com/api/oauth2/authorize?client_id=" + 
 const google_client_id = "1000892686951-dkp1vpqohmbq64h7jiiop9v6ic4t1mul.apps.googleusercontent.com"
 const googleOAuthURL = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=" + google_client_id + "&redirect_uri=" + redirect_uri + "&scope=openid email" 
 
-if (url.searchParams.has('code') || (process.env.PRODUCTION != 1 && process.env.NODE_ENV !== 'rust')) document.getElementById("signinButtons").hidden = true
+if (url.searchParams.has('code')) document.getElementById("signinButtons").hidden = true
 
 document.getElementById("switchCustom").addEventListener('click', (e) => {
     e.preventDefault()
@@ -471,7 +462,7 @@ document.getElementById("googleSigninButton").addEventListener('click', () => {
 })
 
 document.getElementById("logoutButton").addEventListener('click', async () => {
-    const res = await fetch ('/api/logout', {
+    const res = await fetch(`${process.env.BACKEND_URL ?? ''}/api/logout`, {
         method: 'POST'
     })
     if (res.ok) {

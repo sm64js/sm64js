@@ -1,7 +1,5 @@
 dist
 testdb.json
-*lock.json
-yarn.lock
 node_modules
 testdb.json
 .vs*

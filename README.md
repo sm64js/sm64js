@@ -1,48 +1,68 @@
 # sm64js
 
-### Links
+## Links
+
 [Main Website: sm64js.com](https://sm64js.com)
 
 [Discord Server](https://discord.gg/7UaDnJt)
 
 ## What is this?
-This is an ongoing work-in-progress port of the decompilation of original Nintendo game, Super Mario 64, to native Javascript (no emulation or web assembly). The project involved creating a Javascript WebGL port of N64 Fast 3D Renderer, originally implemented with OpenGL in C.  This project also includes the development of online mass multiplayer versions of sm64js and other custom multiplayer game modes.
 
-## Build instructions - Windows, Mac, or Linux
+This is an ongoing work-in-progress port of the decompilation of original Nintendo game,
+Super Mario 64, to native Javascript (no emulation or web assembly).
+The project involved creating a Javascript WebGL port of N64 Fast 3D Renderer,
+originally implemented with OpenGL in C.
+This project also includes the development of online mass multiplayer versions of sm64js
+and other custom multiplayer game modes.
 
-### First install Docker
-* Windows - [Install Instructions](https://docs.docker.com/docker-for-windows/install-windows-home/)
-* Mac - [Install Instructions](https://docs.docker.com/docker-for-mac/install/)
-* Linux - [Install Instructions](https://docs.docker.com/engine/install/#server)
+## Usage instructions
 
-### Run these commands
-```bash
-# Create and start lightweight docker container with NodeJs
-docker run --name mySm64JsServer -dp 80:80 node:13 tail -f /dev/null
-# Connect to the docker container's shell
-docker exec -it mySm64JsServer /bin/sh
+Install [Node.js](https://nodejs.org/).
 
-# Install additional prerequisites
-apk update && apk add git
-# Clone the source code
-git clone https://github.com/sm64js/sm64js.git && cd sm64js
+### Client-only development
 
-# Install node packages, build, and serve
-npm run build
-npm run serve
+Run the following commands:
+
+- Install dependencies:
+
+```sh
+npm install
 ```
-You should now be able to access the website with the game from a web browser by typing "localhost" into the address bar.
 
+- Build and serve project:
 
-### Related Projects
+```sh
+npm run start
+```
+
+- Go to http://localhost:9300 and start developing in your IDE.
+
+When you do code changes, Webpack-Dev-Server will automatically rebuild and reload the page.
+You can now start developing against a staging environment at https://sm64js-dev.smmdb.net,
+which should be kept up to date.
+This staging environment is only set up for client-only development and logins will only work,
+if accessed from http://localhost:9300.
+
+### Develop against local backend
+
+Do not clone this repository directly.
+Instead cloning should be done from the [server repository](https://github.com/sm64js/sm64js-mmo-server)
+as a Git submodule.
+
+Serving via Webpack-Dev-Server is not yet supported,
+so you will have to do a development build via `npm run build:dev`.
+
+## Related Projects
+
 [Super Mario 64 Decomp](https://github.com/n64decomp/sm64)
- - Team that decompiled the original Super Mario 64 ROMs into C source code
+
+- Team that decompiled the original Super Mario 64 ROMs into C source code
 
 [Super Mario 64 PC Port](https://github.com/sm64-port/sm64-port)
- - Team that ported the decompiled project to PC
+
+- Team that ported the decompiled project to PC
 
 [N64 Fast 3D Renderer](https://github.com/Emill/n64-fast3d-engine)
- - OpenGL Implementation of a 3D renderer for the Nintendo 64's graphics
-(For this project, it was re-implemented in Javascript and WebGL)
 
-
+- OpenGL Implementation of a 3D renderer for the Nintendo 64's graphics
+  (For this project, it was re-implemented in Javascript and WebGL)

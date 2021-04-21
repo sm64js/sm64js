@@ -39,8 +39,9 @@ module.exports = env => ({
     },
     plugins: [
         new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify(env || 'development'),
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
             'process.env.PRODUCTION': JSON.stringify(process.env.PRODUCTION),
+            'process.env.BACKEND_URL': JSON.stringify(env !== 'development' ? env : ''),
         }),
         new HtmlWebPackPlugin({
             template: "./src/index.html",

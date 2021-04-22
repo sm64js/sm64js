@@ -218,7 +218,8 @@ window.onload = async () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ code: url_params.get("code") })
+            body: JSON.stringify({ code: url_params.get("code") }),
+            credentials: 'include'
         })
         const success = Socket.recvAuthorizedUser(res)
 
@@ -231,7 +232,8 @@ window.onload = async () => {
         }
     } else {
         const res = await fetch(`${process.env.BACKEND_URL ?? ''}/api/login`, {
-            method: 'POST'
+            method: 'POST',
+            credentials: 'include'
         })
         Socket.recvAuthorizedUser(res)
     }

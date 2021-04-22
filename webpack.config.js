@@ -6,6 +6,16 @@ const TerserWebpackPlugin = require("terser-webpack-plugin")
 const CopyPlugin = require("copy-webpack-plugin")
 const express = require('express')
 const path = require('path')
+const fs = require('fs')
+
+let https
+if (fs.existsSync('./localhost-key.pem') && fs.existsSync('./localhost.pem')) {
+    https = {
+      key: fs.readFileSync('./localhost-key.pem'),
+      cert: fs.readFileSync('./localhost.pem'),
+      ca: fs.readFileSync('./localhost.pem'),
+    }
+}
 
 module.exports = env => ({
     module: {
@@ -35,7 +45,9 @@ module.exports = env => ({
         port: 9300,
         before(app) {
             app.use('/mmo', express.static(path.resolve('src/mmo')))
-        }
+        },
+        http2: true,
+        https
     },
     plugins: [
         new webpack.DefinePlugin({

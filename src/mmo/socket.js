@@ -48,9 +48,14 @@ const getGameIdFromURL = () => {
 const gameID = getGameIdFromURL() 
 if (gameID) { document.getElementById("mapSelect").hidden = true }
 
-const websocketServerPath = process.env.BACKEND_URL
-    ? `${process.env.BACKEND_URL}/ws/`
-    : `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/`
+let websocketServerPath
+if (process.env.BACKEND_URL) {
+    const backendUrl = new URL(process.env.BACKEND_URL)
+    const isSecure = backendUrl.protocol === "https:"
+    websocketServerPath = `${isSecure ? "wss" : "ws"}://${backendUrl.hostname}${backendUrl.pathname}ws/`
+} else {
+    websocketServerPath = `${url.protocol == "https:" ? "wss" : "ws"}://${window.location.host}/ws/`
+}
 
 let socket
 
@@ -463,7 +468,8 @@ document.getElementById("googleSigninButton").addEventListener('click', () => {
 
 document.getElementById("logoutButton").addEventListener('click', async () => {
     const res = await fetch(`${process.env.BACKEND_URL ?? ''}/api/logout`, {
-        method: 'POST'
+        method: 'POST',
+        credentials: 'include'
     })
     if (res.ok) {
         document.getElementById("playerNameRow").hidden = true

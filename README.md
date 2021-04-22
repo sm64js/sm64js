@@ -35,13 +35,26 @@ npm install
 npm run start
 ```
 
-- Go to http://localhost:9300 and start developing in your IDE.
+- Go to https://localhost:9300 and start developing in your IDE.
 
 When you do code changes, Webpack-Dev-Server will automatically rebuild and reload the page.
 You can now start developing against a staging environment at https://sm64js-dev.smmdb.net,
 which should be kept up to date.
 This staging environment is only set up for client-only development and logins will only work,
-if accessed from http://localhost:9300.
+if accessed from https://localhost:9300.
+
+Since the certificate is self-signed, you will have to accept your browser warning and continue.
+If you want to omit the warning and have a properly signed certificate, please follow these step:
+
+- Install [mkcert](https://github.com/FiloSottile/mkcert)
+- Run this commands:
+
+```sh
+mkcert -install localhost
+```
+
+That's it.
+You should now be able to go to https://localhost:9300 and no longer see the warning from your browser.
 
 ### Develop against local backend
 
@@ -50,7 +63,8 @@ Instead cloning should be done from the [server repository](https://github.com/s
 as a Git submodule.
 
 Serving via Webpack-Dev-Server is not yet supported,
-so you will have to do a development build via `npm run build:dev`.
+so you will have to do a development build via `npm run build:dev`
+every time you do code changes to the client.
 
 ## Related Projects
 

@@ -496,6 +496,15 @@ export const gSPLight = (displaylist, lightData, index) => {
     })
 }
 
+export const NUMLIGHTS_0 = 1
+export const NUMLIGHTS_1 = 1
+export const NUMLIGHTS_2 = 2
+export const NUMLIGHTS_3 = 3
+export const NUMLIGHTS_4 = 4
+export const NUMLIGHTS_5 = 5
+export const NUMLIGHTS_6 = 6
+export const NUMLIGHTS_7 = 7
+
 export const gSPNumLights = (displaylist, num) => {
     displaylist.push({
         words: {

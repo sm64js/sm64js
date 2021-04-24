@@ -1,39 +1,57 @@
 import * as MODEL from "../include/model_ids"
+import { LAYER_ALPHA, LAYER_OPAQUE } from "../engine/GeoLayout"
 
-
-import { black_bobomb_geo          } from "../actors/bobomb/geo.inc"
-import { cannon_barrel_geo         } from "../actors/cannon_barrel/geo.inc"
-import { cannon_base_geo           } from "../actors/cannon_base/geo.inc"
-import { chain_chomp_geo           } from "../actors/chain_chomp/geo.inc"
-import { checkerboard_platform_geo } from "../actors/checkerboard_platform/geo.inc"
-import { goomba_geo                } from "../actors/goomba/geo.inc"
-import { metallic_ball_geo         } from "../actors/chain_ball/geo.inc"
-import { wooden_post_geo           } from "../actors/poundable_pole/geo.inc"
+import { amp_geo                                    } from "../actors/amp/geo.inc"
+import { blue_coin_switch_geo                       } from "../actors/blue_coin_switch/geo.inc"
+import { black_bobomb_geo,
+         bobomb_buddy_geo                           } from "../actors/bobomb/geo.inc"
+import { bowling_ball_geo,
+         bowling_ball_track_geo                     } from "../actors/bowling_ball/geo.inc"
+import { breakable_box_geo,
+         breakable_box_small_geo                    } from "../actors/breakable_box/geo.inc"
+import { cannon_barrel_geo                          } from "../actors/cannon_barrel/geo.inc"
+import { cannon_base_geo                            } from "../actors/cannon_base/geo.inc"
+import { cannon_lid_seg8_dl_080048E0                } from "../actors/cannon_lid/model.inc"
+import { metallic_ball_geo                          } from "../actors/chain_ball/geo.inc"
+import { chain_chomp_geo                            } from "../actors/chain_chomp/geo.inc"
+import { checkerboard_platform_geo                  } from "../actors/checkerboard_platform/geo.inc"
+import { chuckya_geo                                } from "../actors/chuckya/geo.inc"
+import { exclamation_box_geo                        } from "../actors/exclamation_box/geo.inc"
+import { exclamation_box_outline_geo                } from "../actors/exclamation_box_outline/geo.inc"
+import { exclamation_box_outline_seg8_dl_08025F08   } from "../actors/exclamation_box_outline/model.inc"
+import { flyguy_geo                                 } from "../actors/flyguy/geo.inc"
+import { goomba_geo                                 } from "../actors/goomba/geo.inc"
+import { heart_geo                                  } from "../actors/heart/geo.inc"
+import { koopa_shell_geo                            } from "../actors/koopa_shell/geo.inc"
+import { metal_box_geo                              } from "../actors/metal_box/geo.inc"
+import { metal_box_dl                               } from "../actors/metal_box/model.inc"
+import { wooden_post_geo                            } from "../actors/poundable_pole/geo.inc"
+import { purple_switch_geo                          } from "../actors/purple_switch/geo.inc"
 
 export const script_func_global_1 = [
-    // ['LOAD_MODEL_FROM_GEO', MODEL.BLUE_COIN_SWITCH,        blue_coin_switch_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL.AMP,                     amp_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL.PURPLE_SWITCH,           purple_switch_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.BLUE_COIN_SWITCH,        blue_coin_switch_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.AMP,                     amp_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.PURPLE_SWITCH,           purple_switch_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL.CHECKERBOARD_PLATFORM,   checkerboard_platform_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL.BREAKABLE_BOX,           breakable_box_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL.BREAKABLE_BOX_SMALL,     breakable_box_small_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL.EXCLAMATION_BOX_OUTLINE, exclamation_box_outline_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL.EXCLAMATION_BOX,         exclamation_box_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.BREAKABLE_BOX,           breakable_box_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.BREAKABLE_BOX_SMALL,     breakable_box_small_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.EXCLAMATION_BOX_OUTLINE, exclamation_box_outline_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.EXCLAMATION_BOX,         exclamation_box_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL.GOOMBA,                  goomba_geo],
-    // ['LOAD_MODEL_FROM_DL',  MODEL.EXCLAMATION_POINT,       exclamation_box_outline_seg8_dl_08025F08, LAYER_ALPHA],
-    // ['LOAD_MODEL_FROM_GEO', MODEL.KOOPA_SHELL,             koopa_shell_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL.METAL_BOX,               metal_box_geo],
-    // ['LOAD_MODEL_FROM_DL',  MODEL.METAL_BOX_DL,            metal_box_dl,                             LAYER_OPAQUE],
+    ['LOAD_MODEL_FROM_DL',  MODEL.EXCLAMATION_POINT,       exclamation_box_outline_seg8_dl_08025F08, LAYER_ALPHA],
+    ['LOAD_MODEL_FROM_GEO', MODEL.KOOPA_SHELL,             koopa_shell_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.METAL_BOX,               metal_box_geo],
+    ['LOAD_MODEL_FROM_DL',  MODEL.METAL_BOX_DL,            metal_box_dl,                             LAYER_OPAQUE],
     ['LOAD_MODEL_FROM_GEO', MODEL.BLACK_BOBOMB,            black_bobomb_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL.BOBOMB_BUDDY,            bobomb_buddy_geo],
-    // ['LOAD_MODEL_FROM_DL',  MODEL.DL_CANNON_LID,           cannon_lid_seg8_dl_080048E0,              LAYER_OPAQUE],
-    // ['LOAD_MODEL_FROM_GEO', MODEL.BOWLING_BALL,            bowling_ball_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.BOBOMB_BUDDY,            bobomb_buddy_geo],
+    ['LOAD_MODEL_FROM_DL',  MODEL.DL_CANNON_LID,           cannon_lid_seg8_dl_080048E0,              LAYER_OPAQUE],
+    ['LOAD_MODEL_FROM_GEO', MODEL.BOWLING_BALL,            bowling_ball_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL.CANNON_BARREL,           cannon_barrel_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL.CANNON_BASE,             cannon_base_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL.HEART,                   heart_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL.FLYGUY,                  flyguy_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL.CHUCKYA,                 chuckya_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL.TRAJECTORY_MARKER_BALL,  bowling_ball_track_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.HEART,                   heart_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.FLYGUY,                  flyguy_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.CHUCKYA,                 chuckya_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL.TRAJECTORY_MARKER_BALL,  bowling_ball_track_geo],
     ['RETURN']
 ]
 

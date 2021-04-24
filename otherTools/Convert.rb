@@ -3,6 +3,8 @@
 require('pathname')
 require('fileutils')
 
+MANUALLY_MODIFIED = %w[amp bowling_ball bowser_key chuckya number sparkle_animation]
+
 class Convert
     def initialize(c_root, js_root, entity_is, entity)
         @c_root = c_root
@@ -71,31 +73,34 @@ class Convert
     # ---------------------------------------------------------------------------------------------------------
 
     def post_process_anims_dir1
-        header = []
-        imports = []
         @text = []
 
         Dir.glob(@js_dir + "/anim*") do |f1|
             lines = File.read(f1)
             lines.gsub!(@title + "\n\n", '')
             lines.gsub!(/import.+types"\n\n/m, '')
-            lines.gsub!(@ts + "\n", '')
+            lines.gsub!(@ts, '')
             @text.push(lines)
         end
 
         lines = File.read(@js_dir + "/table.inc.js")
-        lines.chomp!
         @text.push(lines)
+
+        out = @text.join
+        File.open(@js_dir + "/anims.inc.js", "w") {|f| f.puts(out)}
+    end
+
+    def post_process_anims_dir2
+        header = []
+        imports = []
+
+        @text = File.read(@js_dir + "/anims/anims.inc.js")
 
         header.push(@title)
         imports_wrap(imports, "include/types", ["ANIMINDEX_NUMPARTS"])
 
         out = [header, "", imports, "", @text, @ts].join("\n")
         File.open(@js_dir + "/anims.inc.js", "w") {|f| f.puts(out)}
-    end
-
-    def post_process_anims_dir2
-        FileUtils.mv(@js_dir + "/anims/anims.inc.js", @js_dir)
         FileUtils.rm_r(@js_dir + "/anims")
     end
 
@@ -215,6 +220,9 @@ class Convert
             #    &castle_grounds_seg7_anim_flags, // 0x0700C944
             elsif line =~ /\&(\w+),(.*)/                            
                 @text.push("    #{$1},#{$2}")
+
+            elsif line =~ /NULL,/
+                # skip
 
             # };
             elsif line =~ /^\};/
@@ -600,19 +608,23 @@ class Convert
                 @gbi_cmds.push(cmd)
 
                 case cmd
+                # gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
                 when "gsDPLoadBlock"
-                    # gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
                     @gbi_cons.push("CALC_DXT")
 
+                # gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, outside_09000000),
                 when "gsDPSetTextureImage"
-                    # gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, outside_09000000),
-                    t = args.split(",").last.strip      # outside_09000000
+                    t = args.split(",").last.strip  # outside_09000000
                     if !@texs.include?(t)
                         @trefs.push(t)  # needs to be imported
                     end
 
+                # gsSPNumLights(NUMLIGHTS_1),
+                when "gsSPNumLights"
+                    @gbi_cons.push(args)
+
+                # gsSPLight(&birds_seg5_lights_05000000.l, 1),
                 when "gsSPLight"
-                    # gsSPLight(&birds_seg5_lights_05000000.l, 1),
                     args.gsub!(/&/, "")
                 end
 
@@ -831,6 +843,13 @@ begin
 
     raise "help" if !entity
 
+    if MANUALLY_MODIFIED.include?(entity)
+        if !ARGV.delete("-f")
+            puts "This entity contains manual modifications! Use -f to convert."
+            raise "exit"
+        end
+    end
+
     c_root = Pathname.new(c_root).realpath
     js_root = Pathname.new(js_root).realpath
 
@@ -855,6 +874,7 @@ begin
 rescue
     if $!.message == "help"
         puts "usage: Convert.rb <sm64-root> <sm64js-root> [-a <actor> | -l <level>]"
+    elsif $!.message == "exit"
     else
         puts "error: #{$!.inspect}"
         puts $!.backtrace

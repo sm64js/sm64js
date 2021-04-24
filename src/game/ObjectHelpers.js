@@ -259,6 +259,16 @@ export const obj_translate_xz_random = (obj, rangeLength) => {
     obj.rawData[oPosZ] += Math.random() * rangeLength - rangeLength * 0.5
 }
 
+export const obj_update_pos_from_parent_transformation = (a0, a1) => {
+    const spC = a1.rawData[oParentRelativePosX]
+    const sp8 = a1.rawData[oParentRelativePosY]
+    const sp4 = a1.rawData[oParentRelativePosZ]
+
+    a1.rawData[oPosX] = spC * a0[0][0] + sp8 * a0[1][0] + sp4 * a0[2][0] + a0[3][0]
+    a1.rawData[oPosY] = spC * a0[0][1] + sp8 * a0[1][1] + sp4 * a0[2][1] + a0[3][1]
+    a1.rawData[oPosZ] = spC * a0[0][2] + sp8 * a0[1][2] + sp4 * a0[2][2] + a0[3][2]
+}
+
 export const obj_apply_scale_to_matrix = (obj, dst, src) => {
     dst[0][0] = src[0][0] * obj.header.gfx.scale[0]
     dst[1][0] = src[1][0] * obj.header.gfx.scale[1]
@@ -279,6 +289,36 @@ export const obj_apply_scale_to_matrix = (obj, dst, src) => {
     dst[1][3] = src[1][3]
     dst[2][3] = src[2][3]
     dst[3][3] = src[3][3]
+}
+
+
+export const create_transformation_from_matrices = (a0, a1, a2) => {
+    let spC, sp8, sp4
+
+    spC = a2[3][0] * a2[0][0] + a2[3][1] * a2[0][1] + a2[3][2] * a2[0][2]
+    sp8 = a2[3][0] * a2[1][0] + a2[3][1] * a2[1][1] + a2[3][2] * a2[1][2]
+    sp4 = a2[3][0] * a2[2][0] + a2[3][1] * a2[2][1] + a2[3][2] * a2[2][2]
+
+    a0[0][0] = a1[0][0] * a2[0][0] + a1[0][1] * a2[0][1] + a1[0][2] * a2[0][2]
+    a0[0][1] = a1[0][0] * a2[1][0] + a1[0][1] * a2[1][1] + a1[0][2] * a2[1][2]
+    a0[0][2] = a1[0][0] * a2[2][0] + a1[0][1] * a2[2][1] + a1[0][2] * a2[2][2]
+
+    a0[1][0] = a1[1][0] * a2[0][0] + a1[1][1] * a2[0][1] + a1[1][2] * a2[0][2]
+    a0[1][1] = a1[1][0] * a2[1][0] + a1[1][1] * a2[1][1] + a1[1][2] * a2[1][2]
+    a0[1][2] = a1[1][0] * a2[2][0] + a1[1][1] * a2[2][1] + a1[1][2] * a2[2][2]
+
+    a0[2][0] = a1[2][0] * a2[0][0] + a1[2][1] * a2[0][1] + a1[2][2] * a2[0][2]
+    a0[2][1] = a1[2][0] * a2[1][0] + a1[2][1] * a2[1][1] + a1[2][2] * a2[1][2]
+    a0[2][2] = a1[2][0] * a2[2][0] + a1[2][1] * a2[2][1] + a1[2][2] * a2[2][2]
+
+    a0[3][0] = a1[3][0] * a2[0][0] + a1[3][1] * a2[0][1] + a1[3][2] * a2[0][2] - spC
+    a0[3][1] = a1[3][0] * a2[1][0] + a1[3][1] * a2[1][1] + a1[3][2] * a2[1][2] - sp8
+    a0[3][2] = a1[3][0] * a2[2][0] + a1[3][1] * a2[2][1] + a1[3][2] * a2[2][2] - sp4
+
+    a0[0][3] = 0
+    a0[1][3] = 0
+    a0[2][3] = 0
+    a0[3][3] = 1.0
 }
 
 export const obj_build_transform_from_pos_and_angle = (obj, posIndex, angleIndex) => {
@@ -1035,6 +1075,12 @@ export const obj_translate_xyz_random = (obj, rangeLength) => {
     obj.rawData[oPosX] += random_float() * rangeLength - rangeLength * 0.5
     obj.rawData[oPosY] += random_float() * rangeLength - rangeLength * 0.5
     obj.rawData[oPosZ] += random_float() * rangeLength - rangeLength * 0.5
+}
+
+export const obj_set_gfx_pos_from_pos = (obj) => {
+    obj.header.gfx.pos[0] = obj.rawData[oPosX]
+    obj.header.gfx.pos[1] = obj.rawData[oPosY]
+    obj.header.gfx.pos[2] = obj.rawData[oPosZ]
 }
 
 export const cur_obj_init_animation = (animIndex) => {

@@ -16,7 +16,7 @@ import {
 
 import {
     geo_scale_bowser_key
-} from "../../game/ObjectHelpers"
+} from "../../game/behaviors/bowser_key_cutscene.inc"
 
 
 // 0x16000A84

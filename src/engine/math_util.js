@@ -487,3 +487,7 @@ export const atan2s = (y, x) => {
 export const sqrtf = (x) => {
     return Math.sqrt(x)
 }
+
+export const Mat4 = () => {
+    return new Array(4).fill(0).map(() => new Array(4).fill(0))
+}

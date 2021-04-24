@@ -107,7 +107,7 @@ import { bhv_sound_spawner_init                         } from "./behaviors/soun
 
 import { castle_grounds_seg7_anims_flags } from "../levels/castle_grounds/areas/1/11/anim.inc"
 import { goomba_seg8_anims_0801DA4C      } from "../actors/goomba/anims/table.inc"
-import { bobomb_seg8_anims_0802396C      } from "../actors/bobomb/anims/table.inc"
+import { bobomb_seg8_anims_0802396C      } from "../actors/bobomb/anims.inc"
 
 import { checkerboard_platform_seg8_collision_0800D710 } from "../actors/checkerboard_platform/collision.inc"
 import { poundable_pole_collision_06002490             } from "../actors/poundable_pole/collision.inc"

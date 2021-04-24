@@ -29,34 +29,39 @@ class Convert
         convert_dir
     end
 
-    def convert_dir(f = nil)
+    def convert_dir(dir = nil)
         @dirstack.push([@c_dir, @js_dir])
 
-        if f
-            @c_dir  += "/#{f}"
-            @js_dir += "/#{f}"
+        if dir
+            @c_dir  += "/#{dir}"
+            @js_dir += "/#{dir}"
         end
 
-        if f == "anims"
-            convert_anims_dir
-        else
-            Dir.glob(@c_dir + "/*") do |f1|
-                bn = File.basename(f1)
-                if File.directory?(f1)
-                    convert_dir(bn)
-                else
-                    FileUtils.mkdir_p(@js_dir)
-                    case bn
-                    when "anim.inc.c"       then convert_anim
-                    when "collision.inc.c"  then convert_collision
-                    when "geo.inc.c"        then convert_geo
-                    when "macro.inc.c"      then convert_macro
-                    when "model.inc.c"      then convert_model
-                    when "movtext.inc.c"    then convert_movtext
-                    when "texture.inc.c"    then convert_texture
-                    end
+        Dir.glob(@c_dir + "/*") do |f|
+            fn = File.basename(f)
+            if File.directory?(f)
+                convert_dir(fn)
+                if fn == "anims"
+                    post_process_anims_dir2
+                end
+            else
+                FileUtils.mkdir_p(@js_dir)
+                case fn
+                when /^anim_.+\.inc\.c/ then convert_anim(fn)
+                when "anim.inc.c"       then convert_anim(fn)
+                when "collision.inc.c"  then convert_collision
+                when "geo.inc.c"        then convert_geo
+                when "macro.inc.c"      then convert_macro
+                when "model.inc.c"      then convert_model
+                when "movtext.inc.c"    then convert_movtext
+                when "table.inc.c"      then convert_table
+                when "texture.inc.c"    then convert_texture
                 end
             end
+        end
+
+        if dir == "anims"
+            post_process_anims_dir1
         end
 
         @c_dir, @js_dir = @dirstack.pop
@@ -65,19 +70,45 @@ class Convert
 
     # ---------------------------------------------------------------------------------------------------------
 
-    def convert_anims_dir
-        
+    def post_process_anims_dir1
+        header = []
+        imports = []
+        @text = []
+
+        Dir.glob(@js_dir + "/anim*") do |f1|
+            lines = File.read(f1)
+            lines.gsub!(@title + "\n\n", '')
+            lines.gsub!(/import.+types"\n\n/m, '')
+            lines.gsub!(@ts + "\n", '')
+            @text.push(lines)
+        end
+
+        lines = File.read(@js_dir + "/table.inc.js")
+        lines.chomp!
+        @text.push(lines)
+
+        header.push(@title)
+        imports_wrap(imports, "include/types", ["ANIMINDEX_NUMPARTS"])
+
+        out = [header, "", imports, "", @text, @ts].join("\n")
+        File.open(@js_dir + "/anims.inc.js", "w") {|f| f.puts(out)}
     end
+
+    def post_process_anims_dir2
+        FileUtils.mv(@js_dir + "/anims/anims.inc.js", @js_dir)
+        FileUtils.rm_r(@js_dir + "/anims")
+    end
+
 
     # ---------------------------------------------------------------------------------------------------------
 
-    def convert_anim
+    def convert_anim(fn)
         header = []
         imports = []
         @anim_cons = []
         @text = []
 
-        @lines = File.read(@c_dir + "/anim.inc.c").lines.to_a
+        @lines = File.read(@c_dir + "/" + fn).lines.to_a
         @n = 0
         while (@n < @lines.length)
 
@@ -98,7 +129,8 @@ class Convert
         imports_wrap(imports, "include/types", @anim_cons)
 
         out = [header, "", imports, "", @text, @ts].join("\n")
-        File.open(@js_dir + "/anim.inc.js", "w") {|f| f.puts(out)}
+        jsfn = fn.delete_suffix(".c") + ".js"
+        File.open(@js_dir + "/" + jsfn, "w") {|f| f.puts(out)}
     end
 
     def cv_animvalue
@@ -258,7 +290,7 @@ class Convert
     end
 
 
-    # ---------------------------------------------------------------------------------------------------------
+   # ---------------------------------------------------------------------------------------------------------
 
     def convert_geo
         header = []
@@ -695,6 +727,27 @@ class Convert
 
 
     # ---------------------------------------------------------------------------------------------------------
+
+    def convert_table
+        @text = []
+
+        @lines = File.read(@c_dir + "/table.inc.c").lines.to_a
+        @n = 0
+        while (@n < @lines.length)
+
+            if @lines[@n] =~ / Animation \*const .+_anims_/  then cv_anims
+            else
+                @text.push(@lines[@n].chomp)
+            end
+
+            @n += 1
+        end
+
+        File.open(@js_dir + "/table.inc.js", "w") {|f| f.puts(@text)}
+    end
+
+
+ # ---------------------------------------------------------------------------------------------------------
 
     def convert_texture
         header = []

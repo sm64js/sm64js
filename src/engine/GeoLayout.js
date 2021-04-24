@@ -9,6 +9,7 @@ const copy3argsToObject = (pos, argIndex, args) => {
 
 // EXPERIMENTAL
 export const GEO_ANIMATED_PART = (...args) => {return ['node_animated_part', ...args]}
+export const GEO_ASM = (...args) => {return ['node_generated', ...args]}
 export const GEO_BRANCH_AND_LINK = (...args) => {return ['branch_and_link', ...args]}
 export const GEO_CLOSE_NODE = (...args) => {return ['close_node', ...args]}
 export const GEO_CULLING_RADIUS = (...args) => {return ['node_culling_radius', ...args]}

@@ -1,5 +1,17 @@
 import * as Gbi from "../include/gbi"
 
+import {
+    gdSPDefLights1, gsSPVertex, gsSP2Triangles, gsSP1Triangle, gsSPEndDisplayList,
+    gsSPDisplayList, gsSPLight, gsDPPipeSync, gsDPSetCombineMode, gsSPClearGeometryMode,
+    gsDPSetTile, gsSPTexture, gsDPTileSync, gsDPSetTileSize, gsSPSetGeometryMode,
+    gsDPSetTextureImage, gsDPLoadSync, gsDPLoadBlock, gsDPSetAlphaCompare, gsDPSetEnvColor,
+    gsDPLoadTextureBlock,
+    G_CC_DECALRGBA, G_LIGHTING, G_CULL_BACK, G_IM_FMT_RGBA, G_IM_SIZ_16b, G_TX_LOADTILE,
+    G_TX_WRAP, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_RENDERTILE, G_ON, G_TX_CLAMP,
+    G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADE, G_CC_BLENDRGBFADEA, CALC_DXT, G_IM_SIZ_16b_BYTES,
+    G_CC_SHADEFADEA, G_AC_NONE, G_TEXTURE_GEN, G_CC_MODULATERGBFADE, G_CC_DECALFADEA
+} from "../include/gbi"
+
 const canvas = document.querySelector('#gameCanvas')
 
 export const matrix_identity = [
@@ -199,6 +211,139 @@ export const texture_waterbox_lava = []
 export const texture_waterbox_mist = []
 export const texture_waterbox_unknown_water = []
 export const texture_waterbox_water = []
+
+
+// 0x0200EFB0 - 0x0200EFF0
+const vertex_billboard_num = [
+    [[   -32,    -32,      0], 0, [     0,   1024], [0xff, 0xff, 0xff, 0xff]],
+    [[    32,    -32,      0], 0, [  1024,   1024], [0xff, 0xff, 0xff, 0xff]],
+    [[    32,     32,      0], 0, [  1024,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[   -32,     32,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+];
+
+// 0x0200EFF0 - 0x0200F038
+export const dl_billboard_num_begin = [
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
+    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
+    gsSPTexture(0x8000, 0x8000, 0, G_TX_RENDERTILE, G_ON),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 4, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 4, G_TX_NOLOD, G_TX_CLAMP, 4, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (16 - 1) << G_TEXTURE_IMAGE_FRAC, (16 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F038 - 0x0200F078
+export const dl_billboard_num_end = [
+    gsSPVertex(vertex_billboard_num, 4, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    gsSPTexture(0x8000, 0x8000, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPSetGeometryMode(G_LIGHTING),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F078 - 0x0200F0A8
+export const dl_billboard_num_0 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_0),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F0A8 - 0x0200F0D8
+export const dl_billboard_num_1 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_1),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F0D8 - 0x0200F108
+export const dl_billboard_num_2 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_2),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F108 - 0x0200F138
+export const dl_billboard_num_3 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_3),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F138 - 0x0200F168
+export const dl_billboard_num_4 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_4),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F168 - 0x0200F198
+export const dl_billboard_num_5 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_5),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F198 - 0x0200F1C8
+export const dl_billboard_num_6 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_6),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F1C8 - 0x0200F1F8
+export const dl_billboard_num_7 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_7),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F1F8 - 0x0200F228
+export const dl_billboard_num_8 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_8),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F228 - 0x0200F258
+export const dl_billboard_num_9 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_9),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
 
 export const main_hud_camera_lut = [
 	texture_hud_char_camera, texture_hud_char_mario_head, texture_hud_char_lakitu, texture_hud_char_no_camera,

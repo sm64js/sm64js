@@ -644,6 +644,7 @@ export const gDPSetRenderMode = (displaylist, mode) => {
         }
     })
 }
+
 export const gDPSetTextureFilter = (displaylist, newmode) => {
     displaylist.push({
         words: {
@@ -808,6 +809,16 @@ export const gsSPEndDisplayList = () => {
         }
     }
 }
+
+export const gsDPSetAlphaCompare = (type) => {
+    return {
+        words: {
+            w0: G_SETOTHERMODE_L,
+            w1: { type }
+        }
+    }
+}
+
 
 const renderModesMap = [
     [G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF2,           G_RM_AA_OPA_SURF_SURF2],

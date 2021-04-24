@@ -23,6 +23,7 @@ import { bhvMario,
          bhvBird,
          bhvWaterMist2,
          bhvMoatGrills,
+         bhvYellowCoin,
          bhvHiddenAt120Stars                 } from "../../game/BehaviorData"
 
 import { castle_grounds_geo_00073C           } from "./areas/1/geo"

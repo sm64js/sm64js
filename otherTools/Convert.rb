@@ -3,7 +3,7 @@
 require('pathname')
 require('fileutils')
 
-MANUALLY_MODIFIED = %w[amp bowling_ball bowser_key chuckya number sparkle_animation]
+MANUALLY_MODIFIED = %w[amp bowling_ball bowser_key chuckya number sparkle_animation bob]
 
 class Convert
     def initialize(c_root, js_root, entity_is, entity)
@@ -11,24 +11,54 @@ class Convert
         @js_root = js_root
         @entity = entity
         @entity_is = entity_is
-        @title = "// " + @entity.split('_').collect(&:capitalize).join(' ')
         @dirstack = []
         @ts = "\n// #{File.mtime(__FILE__).to_i} - #{Time.now}"
     end
 
     def convert
-        if @entity_is == :actor
-            @c_dir  = "#{@c_root}/actors/#{@entity}"
-            @js_dir = "#{@js_root}/src/actors/#{@entity}"
+        if @entity_is == :file
+            dir = File.dirname(@entity)
+            @c_dir  = "#{@c_root}/#{dir}"
+            @js_dir = "#{@js_root}/#{dir}"
+            fn = File.basename(@entity)
 
-        elsif @entity_is == :level
-            @c_dir  = "#{@c_root}/levels/#{@entity}"
-            @js_dir = "#{@js_root}/src/levels/#{@entity}"
+            if @entity =~ %r[actors/(.+?)(/|$)]
+                @entity = $1
+                @entity_is = :actor
+                @entity_dir = "#{@js_root}/actors/#{@entity}"
+
+            elsif @entity =~ %r[levels/(.+?)(/|$)]
+                @entity = $1
+                @entity_is = :level
+                @entity_dir = "#{@js_root}/levels/#{@entity}"
+
+            else
+                raise "help"
+            end
+
+            @depth = @entity.split("/").length - 1
+            set_title
+            convert_file(fn)
+
+        else
+            if @entity_is == :actor
+                @c_dir  = "#{@c_root}/actors/#{@entity}"
+                @js_dir = "#{@js_root}/actors/#{@entity}"
+
+            elsif @entity_is == :level
+                @c_dir  = "#{@c_root}/levels/#{@entity}"
+                @js_dir = "#{@js_root}/levels/#{@entity}"
+            end
+
+            @entity_dir = @js_dir
+            @depth = 2
+            set_title
+            convert_dir
         end
+    end
 
-        @entity_dir = @js_dir
-        @depth = 2
-        convert_dir
+    def set_title
+        @title = "// " + @entity.split('_').collect(&:capitalize).join(' ')
     end
 
     def convert_dir(dir = nil)
@@ -48,17 +78,7 @@ class Convert
                 end
             else
                 FileUtils.mkdir_p(@js_dir)
-                case fn
-                when /^anim_.+\.inc\.c/ then convert_anim(fn)
-                when "anim.inc.c"       then convert_anim(fn)
-                when "collision.inc.c"  then convert_collision
-                when "geo.inc.c"        then convert_geo
-                when "macro.inc.c"      then convert_macro
-                when "model.inc.c"      then convert_model
-                when "movtext.inc.c"    then convert_movtext
-                when "table.inc.c"      then convert_table
-                when "texture.inc.c"    then convert_texture
-                end
+                convert_file(fn)
             end
         end
 
@@ -67,6 +87,20 @@ class Convert
         end
 
         @c_dir, @js_dir = @dirstack.pop
+    end
+
+    def convert_file(fn)
+        case fn
+        when /^anim_.+\.inc\.c/ then convert_anim(fn)
+        when "anim.inc.c"       then convert_anim(fn)
+        when "collision.inc.c"  then convert_collision
+        when "geo.inc.c"        then convert_geo(fn)
+        when "macro.inc.c"      then convert_macro
+        when "model.inc.c"      then convert_model
+        when "movtext.inc.c"    then convert_movtext
+        when "table.inc.c"      then convert_table
+        when "texture.inc.c"    then convert_texture
+        end
     end
 
 
@@ -300,7 +334,23 @@ class Convert
 
    # ---------------------------------------------------------------------------------------------------------
 
-    def convert_geo
+    def find_all_models(list, path)
+        list ||= []
+        Dir.glob(path + "/*") do |f|
+            if File.directory?(f)
+                find_all_models(list, f)
+            elsif File.basename(f) == "model.inc.js"
+                File.read(f).lines.each do |l|
+                    if l =~ /export const (\w+)/
+                        list.push([$1, f])
+                    end
+                end
+            end
+        end
+        return list
+    end
+
+    def convert_geo(fn)
         header = []
         imports = []
 
@@ -309,13 +359,26 @@ class Convert
         @text = []
 
         @imps = [
-            [/^(#{@entity}_\w+)/, @js_dir + "/model.inc"],  # dorrie_seg6_dl_0600CFD0
+            [/^(geo_skybox_\w+)/, "game/LevelGeo"],         # geo_skybox_main
+            [/^(geo_envfx_\w+)/, "game/LevelGeo"],          # geo_envfx_main
+            [/^(geo_camera_\w+)/, "game/Camera"],           # geo_camera_fov
+            [/^(geo_movtex_\w+)/, "game/MovingTexture"],    # geo_movtex_draw_nocolor
             [/^(geo_\w+)/, "game/ObjectHelpers"],           # geo_switch_anim_state
             [/^(SHADOW_\w+)/, "game/Shadow"],               # SHADOW_CIRCLE_4_VERTS
+            [/^(SCREEN_\w+)/, "game/Skybox"],               # SCREEN_WIDTH
             [/^([A-Z][A-Z_0-9]+)/, "engine/GeoLayout"],     # LAYER_OPAQUE
         ]
 
-        @lines = File.read(@c_dir + "/geo.inc.c").lines.to_a
+        if @entity_is == :actor
+            @imps.push([/^(#{@entity}_\w+)/, @js_dir + "/model.inc"])  # dorrie_seg6_dl_0600CFD0
+
+        else
+            find_all_models(nil, @entity_dir).each do |model, file|
+                @imps.push([/^(#{model})/, file.delete_suffix(".js")])
+            end
+        end
+
+        @lines = File.read(@c_dir + "/" + fn).lines.to_a
         @n = 0
         while (@n < @lines.length)
 
@@ -338,7 +401,8 @@ class Convert
         end
 
         out = [header, "", imports, "", @text, @ts].join("\n")
-        File.open(@js_dir + "/geo.inc.js", "w") {|f| f.puts(out)}
+        jsfn = fn.delete_suffix(".c") + ".js"
+        File.open(@js_dir + "/" + jsfn, "w") {|f| f.puts(out)}
     end
 
     def cv_GeoLayout
@@ -789,40 +853,48 @@ class Convert
     def relative_path(from, to)
         from_elements = from.split('/')
         to_elements   = to.split('/')
-        common_root   = from_elements & to_elements
-        up_count      = from_elements.length - common_root.length
-        down_elements = to_elements - common_root
-        return '../' * up_count + down_elements.join('/')
+        while from_elements.first == to_elements.first
+            from_elements.shift
+            to_elements.shift
+        end
+        return "../" * from_elements.length + to_elements.join("/")
     end
 
     def relative_import(to)
-        rel = relative_path(@js_dir, @js_root + "/src/" + to)
+        if !to.start_with?("/")
+            to = @js_root + "/" + to
+        end
+        rel = relative_path(@js_dir, to)
         rel = "./" + rel if !rel.start_with?(".")  # import needs this
         return '"' + rel + '"'
     end
 
     def imports_wrap(imports, from, items_list)
-        imports.push("import {")
         if !items_list[0].is_a?(Array)  # [[list], ...]
             items_list = [items_list]
         end
-        items_list.each do |items|
-            next if !items  # may be nil
-            t = nil
-            while !items.empty?
-                if !t
-                    t = "    #{items.shift}"
-                elsif t.length + items.first.length <= 95
-                    t += ", #{items.shift}"
-                else
-                    imports.push(t + ",")
-                    t = nil
+        if items_list.length == 1 && items_list[0].length == 1
+            imports.push("import { #{items_list[0][0]} } from #{relative_import(from)}")
+        else
+            imports.push("import {")
+            items_list.each do |items|
+                next if !items  # may be nil
+                t = nil
+                while !items.empty?
+                    if !t
+                        t = "    #{items.shift}"
+                    elsif t.length + items.first.length <= 95
+                        t += ", #{items.shift}"
+                    else
+                        imports.push(t + ",")
+                        t = nil
+                    end
                 end
+                imports.push(t + ",") if t
             end
-            imports.push(t + ",") if t
+            imports[-1].delete_suffix!(",")
+            imports.push("} from #{relative_import(from)}")
         end
-        imports[-1].delete_suffix!(",")
-        imports.push("} from #{relative_import(from)}")
     end
 
 end
@@ -834,7 +906,7 @@ begin
     elsif ARGV.delete("-l")
         entity_is = :level
     else
-        raise "help"
+        entity_is = :file
     end
 
     c_root = ARGV[0]
@@ -843,6 +915,40 @@ begin
 
     raise "help" if !entity
 
+
+    c_root = Pathname.new(c_root).realpath
+    js_root = Pathname.new(js_root).realpath
+
+    while !c_root.to_s.end_with?("/sm64-master")
+        raise "help" if c_root.to_s == "/"
+        c_root = c_root.parent.realpath
+    end
+
+    while !js_root.to_s.end_with?("/sm64js/src")
+        raise "help" if js_root.to_s == "/"
+        js_root = js_root.parent.realpath
+    end
+
+    c_root = c_root.to_s
+    js_root = js_root.to_s
+
+    if entity_is == :file
+        entity = Pathname.new(entity).realpath.to_s
+        raise "help" if !File.exist?(entity)
+
+        if entity.end_with?(".c")
+            entity = entity.delete_prefix(c_root + "/")
+        elsif entity.end_with?(".js")
+            entity = entity.delete_prefix(js_root + "/")
+        else
+            raise "help"
+        end
+
+    else
+        raise "help" if entity_is == :actor && !Dir.exist?(c_root + "/actors/#{entity}")
+        raise "help" if entity_is == :level && !Dir.exist?(c_root + "/levels/#{entity}")
+    end
+
     if MANUALLY_MODIFIED.include?(entity)
         if !ARGV.delete("-f")
             puts "This entity contains manual modifications! Use -f to convert."
@@ -850,30 +956,13 @@ begin
         end
     end
 
-    c_root = Pathname.new(c_root).realpath
-    js_root = Pathname.new(js_root).realpath
-
-    while !c_root.basename.to_s.start_with?("sm64")
-        raise "help" if c_root.to_s == "/"
-        c_root = c_root.parent
-    end
-
-    while !js_root.basename.to_s.start_with?("sm64")
-        raise "help" if js_root.to_s == "/"
-        js_root = js_root.parent
-    end
-
-    c_root = c_root.realpath.to_s
-    js_root = js_root.realpath.to_s
-
-    raise "help" if entity_is == :actor && !Dir.exist?(c_root + "/actors/#{entity}")
-    raise "help" if entity_is == :level && !Dir.exist?(c_root + "/levels/#{entity}")
-
     Convert.new(c_root, js_root, entity_is, entity).convert
 
 rescue
     if $!.message == "help"
         puts "usage: Convert.rb <sm64-root> <sm64js-root> [-a <actor> | -l <level>]"
+        puts $!.backtrace
+
     elsif $!.message == "exit"
     else
         puts "error: #{$!.inspect}"

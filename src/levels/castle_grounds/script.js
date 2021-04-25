@@ -1,6 +1,8 @@
 import { LevelUpdateInstance as LevelUpdate } from "../../game/LevelUpdate"
 
-import { script_func_global_1 } from "../global_scripts"
+import { script_func_global_1,
+         script_func_global_11,
+         script_func_global_16 } from "../global_scripts"
 
 import { MODEL_NONE,
          MODEL_MARIO,
@@ -12,10 +14,14 @@ import { MODEL_NONE,
          MODEL_BUTTERFLY,
          MODEL_BUBBLE,
          MODEL_BOB_BUBBLY_TREE,
+         MODEL_CASTLE_GROUNDS_CASTLE_DOOR,
+         MODEL_CASTLE_GROUNDS_METAL_DOOR,
+         MODEL_CASTLE_GROUNDS_WARP_PIPE,
          MODEL_MIST,
          MODEL_WHITE_PUFF                    } from "../../include/model_ids"
 
 import { TERRAIN_GRASS                       } from "../../include/surface_terrains"
+
 import { bhvMario,
          bhvCastleFlagWaving,
          bhvManyBlueFishSpawner,
@@ -23,17 +29,20 @@ import { bhvMario,
          bhvBird,
          bhvWaterMist2,
          bhvMoatGrills,
-         bhvYellowCoin,
          bhvHiddenAt120Stars                 } from "../../game/BehaviorData"
 
-import { castle_grounds_geo_00073C           } from "./areas/1/geo"
+import { castle_grounds_geo_00073C           } from "./areas/1/geo.inc"
 import { castle_grounds_geo_0006F4           } from "./areas/1/3/geo.inc"
 import { castle_grounds_geo_00070C           } from "./areas/1/7/geo.inc"
 import { castle_grounds_geo_000724           } from "./areas/1/8/geo.inc"
 import { castle_grounds_geo_000660           } from "./areas/1/11/geo.inc"
-import { bubbly_tree_geo                     } from "../../actors/tree/geo.inc"
 import { castle_grounds_seg7_collision_level } from "./areas/1/collision.inc"
 import { castle_grounds_seg7_macro_objs      } from "./areas/1/macro.inc"
+
+import { bubbly_tree_geo                     } from "../../actors/tree/geo.inc"
+import { castle_door_geo,
+         metal_door_geo                      } from "../../actors/door/geo.inc"
+import { warp_pipe_geo                       } from "../../actors/warp_pipe/geo.inc"
 
 const script_func_local_1 = [
     // ['WARP_NODE', /*id*/ 0x00, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x00, /*flags*/ WARP_NO_CHECKPOINT],
@@ -121,15 +130,15 @@ export const level_castle_grounds_entry = [
     ['INIT_LEVEL'],
     ['MARIO', MODEL_MARIO, 1, bhvMario],
     ['JUMP_LINK', script_func_global_1],
-    // JUMP_LINK(script_func_global_11),
-    // JUMP_LINK(script_func_global_16),
-    ['LOAD_MODEL_FROM_GEO', MODEL_LEVEL_GEOMETRY_03,       castle_grounds_geo_0006F4],
-    ['LOAD_MODEL_FROM_GEO', MODEL_BOB_BUBBLY_TREE,         bubbly_tree_geo],
-    // LOAD_MODEL_FROM_GEO(MODEL_CASTLE_GROUNDS_WARP_PIPE,    warp_pipe_geo),
-    // LOAD_MODEL_FROM_GEO(MODEL_CASTLE_GROUNDS_CASTLE_DOOR,  castle_door_geo),
-    // LOAD_MODEL_FROM_GEO(MODEL_CASTLE_GROUNDS_METAL_DOOR,   metal_door_geo),
+    ['JUMP_LINK', script_func_global_11],
+    ['JUMP_LINK', script_func_global_16],
+    ['LOAD_MODEL_FROM_GEO', MODEL_LEVEL_GEOMETRY_03,           castle_grounds_geo_0006F4],
+    ['LOAD_MODEL_FROM_GEO', MODEL_BOB_BUBBLY_TREE,             bubbly_tree_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_WARP_PIPE,    warp_pipe_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_CASTLE_DOOR,  castle_door_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_METAL_DOOR,   metal_door_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_VCUTM_GRILL,  castle_grounds_geo_00070C],
-    ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_FLAG,     castle_grounds_geo_000660],
+    ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_FLAG,         castle_grounds_geo_000660],
     ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_CANNON_GRILL, castle_grounds_geo_000724],
     ['AREA', 1, castle_grounds_geo_00073C],
         // WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x03, /*flags*/ WARP_NO_CHECKPOINT),

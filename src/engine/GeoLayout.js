@@ -10,17 +10,27 @@ const copy3argsToObject = (pos, argIndex, args) => {
 // EXPERIMENTAL
 export const GEO_ANIMATED_PART = (...args) => {return ['node_animated_part', ...args]}
 export const GEO_ASM = (...args) => {return ['node_generated', ...args]}
+export const GEO_BACKGROUND = (...args) => {return ['node_background', ...args]}
 export const GEO_BILLBOARD = (...args) => {return ['node_billboard', ...args]}
 export const GEO_BRANCH_AND_LINK = (...args) => {return ['branch_and_link', ...args]}
+export const GEO_CAMERA = (...args) => {return ['node_camera', ...args]}
+export const GEO_CAMERA_FRUSTUM_WITH_FUNC = (...args) => {return ['node_perspective', ...args]}
 export const GEO_CLOSE_NODE = (...args) => {return ['close_node', ...args]}
 export const GEO_CULLING_RADIUS = (...args) => {return ['node_culling_radius', ...args]}
 export const GEO_DISPLAY_LIST = (...args) => {return ['display_list', ...args]}
 export const GEO_END = (...args) => {return ['node_end', ...args]}
+export const GEO_NODE_SCREEN_AREA = (...args) => {return ['node_screen_area', ...args]}
+export const GEO_NODE_ORTHO = (...args) => {return ['node_ortho', ...args]}
 export const GEO_NODE_START = (...args) => {return ['node_start', ...args]}
 export const GEO_OPEN_NODE = (...args) => {return ['open_node', ...args]}
+export const GEO_RENDER_OBJ = (...args) => {return ['node_render_object_parent', ...args]}
+export const GEO_RENDER_RANGE = (...args) => {return ['node_render_range', ...args]}
 export const GEO_SCALE = (...args) => {return ['node_scale', ...args]}
 export const GEO_SHADOW = (...args) => {return ['node_shadow', ...args]}
 export const GEO_SWITCH_CASE = (...args) => {return ['node_switch_case', ...args]}
+export const GEO_TRANSLATE_NODE = (...args) => {return ['node_translate', ...args]}
+export const GEO_ZBUFFER = (...args) => {return ['node_master_list', ...args]}
+
 
 // EXPERIMENTAL
 export const LAYER_FORCE             = 0
@@ -31,6 +41,18 @@ export const LAYER_ALPHA             = 4
 export const LAYER_TRANSPARENT       = 5
 export const LAYER_TRANSPARENT_DECAL = 6
 export const LAYER_TRANSPARENT_INTER = 7
+
+// EXPERIMENTAL
+export const BACKGROUND_OCEAN_SKY       = 0
+export const BACKGROUND_FLAMING_SKY     = 1
+export const BACKGROUND_UNDERWATER_CITY = 2
+export const BACKGROUND_BELOW_CLOUDS    = 3
+export const BACKGROUND_SNOW_MOUNTAINS  = 4
+export const BACKGROUND_DESERT          = 5
+export const BACKGROUND_HAUNTED         = 6
+export const BACKGROUND_GREEN_SKY       = 7
+export const BACKGROUND_ABOVE_CLOUDS    = 8
+export const BACKGROUND_PURPLE_SKY      = 9
 
 
 class GeoLayout {
@@ -126,11 +148,8 @@ class GeoLayout {
     }
 
     node_master_list(args) { //zbuffer?
-
         const graphNode = GraphNode.init_graph_node_master_list(null, null, args[0])
-
         GraphNode.register_scene_graph_node(this, graphNode)
-
         this.sCurrentLayout.index++
     }
 
@@ -155,43 +174,33 @@ class GeoLayout {
     }
 
     node_animated_part(args) {
-
         const drawingLayer = args[0]
         const translation = [ args[1], args[2], args[3] ]
         const displayList = args[4]
 
         const graphNode = GraphNode.init_graph_node_animated_part(drawingLayer, displayList, translation)
-
         GraphNode.register_scene_graph_node(this, graphNode)
-
         this.sCurrentLayout.index++
-
     }
 
     node_ortho(args) {
         const scale = args[0] / 100.0
 
         const graphNode = GraphNode.init_graph_node_ortho(null, null, scale)
-
         GraphNode.register_scene_graph_node(this, graphNode)
-
         this.sCurrentLayout.index++
     }
 
     node_perspective(args) {
-
         if (args[3]) { //optional 4th function argument
 
         }
         const graphNode = GraphNode.init_graph_node_perspective(null, null, args[0], args[1], args[2], args[3], 0)
-
         GraphNode.register_scene_graph_node(this, graphNode)
-
         this.sCurrentLayout.index++
     }
 
     node_camera(args) {
-
         const cameraType = args[0]
         const func = args[7]
         let argIndex = 1
@@ -201,45 +210,36 @@ class GeoLayout {
         argIndex += copy3argsToObject(focus, argIndex, args)
 
         const graphNode = GraphNode.init_graph_node_camera(null, null, pos, focus, func, cameraType)
-
         GraphNode.register_scene_graph_node(this, graphNode)
-
         this.gGeoViews[0] = graphNode
-
         this.sCurrentLayout.index++
     }
 
     node_generated(args) {
         const theFunc = args[1], param = args[0], funcClass = args[2]
 
+        if (!theFunc) {
+            console.log("node_generated: skipping")
+        }
+
         const graphNode = GraphNode.init_graph_node_generated(null, null, theFunc, param, funcClass)
-
         GraphNode.register_scene_graph_node(this, graphNode)
-
         this.sCurrentLayout.index++
     }
 
     node_background(args) {
-
         const graphNode = GraphNode.init_graph_node_background(null, null, args[0], args[1], 0)
-
         GraphNode.register_scene_graph_node(this, graphNode)
-
         this.sCurrentLayout.index++
     }
 
     node_switch_case(args) {
-
         const graphNode = GraphNode.init_graph_node_switch_case(args[0], 0, args[1], args[2])
-
         GraphNode.register_scene_graph_node(this, graphNode)
-
         this.sCurrentLayout.index++
-
     }
 
     node_culling_radius(args) {
-
         const graphNode = GraphNode.init_graph_node_culling_radius(args[0])
         GraphNode.register_scene_graph_node(this, graphNode)
         this.sCurrentLayout.index++
@@ -265,7 +265,6 @@ class GeoLayout {
         let drawingLayer = 0
         let params = args ? args[0] : 0
         const translation = args ? [args[1], args[2], args[3]] : [0, 0, 0]
-
         let displaylist
 
         if (params & 0x80) {
@@ -273,7 +272,6 @@ class GeoLayout {
         }
 
         const graphNode = GraphNode.init_graph_node_billboard(drawingLayer, displaylist, translation)
-
         GraphNode.register_scene_graph_node(this, graphNode)
         this.sCurrentLayout.index++
     }
@@ -282,7 +280,6 @@ class GeoLayout {
         let drawingLayer = 0
         const params = args[0]
         const scale = args[1] / 65536.0
-
         let displaylist
 
         if (params & 0x80) {
@@ -290,11 +287,10 @@ class GeoLayout {
         }
 
         const graphNode = GraphNode.init_graph_node_scale(drawingLayer, displaylist, scale)
-
         GraphNode.register_scene_graph_node(this, graphNode)
-
         this.sCurrentLayout.index++
     }
+
 
     node_rotation(args) {
         let drawingLayer = 0
@@ -307,18 +303,30 @@ class GeoLayout {
         }
 
         const graphNode = GraphNode.init_graph_node_rotation(drawingLayer, displayList, sp2c)
-
         GraphNode.register_scene_graph_node(this, graphNode)
-
         this.sCurrentLayout.index++
-
     }
+
+
+    node_translate(args) {
+        let drawingLayer = 0
+        const params = args[0]
+        const sp2c = [ args[1], args[2], args[3] ]
+        let displayList  // = params & 0x0F ??
+
+        if (params & 0x80) {
+            throw "unimplemented feature in node translate"
+        }
+
+        const graphNode = GraphNode.init_graph_node_translation(drawingLayer, displayList, sp2c)
+        GraphNode.register_scene_graph_node(this, graphNode)
+        this.sCurrentLayout.index++
+    }
+
 
     node_start(args) {
         const graphNode = GraphNode.init_graph_node_start()
-
         GraphNode.register_scene_graph_node(this, graphNode)
-
         this.sCurrentLayout.index++
     }
 
@@ -331,6 +339,10 @@ class GeoLayout {
     }
 
     process_geo_layout(geoLayout) {
+        if (typeof geoLayout == "function") {
+            geoLayout = geoLayout()
+        }
+
         this.sCurrentLayout.layout = geoLayout
         this.sCurrentLayout.index = 0
 
@@ -357,7 +369,7 @@ class GeoLayout {
                 // new style of command: ['name', args, ...]
                 this[cmd[0]].call(this, cmd.slice(1))
             } else if (cmd.call) {
-
+                throw "huh"
             } else {
                 //console.log("processing layout command: " + cmd.command.name)
                 cmd.command.call(this, cmd.args)
@@ -367,7 +379,6 @@ class GeoLayout {
         //console.log("finshed processing geo layout")
         //console.log(this.gCurRootGraphNode)
         return this.gCurRootGraphNode
-
     }
 }
 

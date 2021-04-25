@@ -276,7 +276,7 @@ class SurfaceLoad {
             }
             else if (terrainLoadType == Surfaces.TERRAIN_LOAD_CONTINUE) continue
             else if (terrainLoadType == Surfaces.TERRAIN_LOAD_END) break
-            else if (terrainLoadType > 0x65) { //TERRAIN_LOAD_IS_SURFACE_TYPE_HIGH
+            else if (terrainLoadType >= 0x65) { //TERRAIN_LOAD_IS_SURFACE_TYPE_HIGH
                 dataIndex = this.load_static_surfaces(data, dataIndex, vertexDataIndex, terrainLoadType, surfaceRooms)
                 continue
             }

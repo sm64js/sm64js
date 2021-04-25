@@ -6,7 +6,7 @@ import { bhvTree, bhvStaticObject } from "./BehaviorData"
 import { spawn_object_abs_with_rot } from "./ObjectHelpers"
 import { oBehParams, RESPAWN_INFO_DONT_RESPAWN, oUnk1A8, oBehParams2ndByte, RESPAWN_INFO_TYPE_16 } from "../include/object_constants"
 import { MacroObjectPresets } from "../include/macro_presets"
-import { uint16, int16 } from "../utils"
+import { uint16, int16, s16 } from "../utils"
 
 const SPTYPE_NO_YROT_OR_PARAMS  = 0 // object is 8-bytes long, no y-rotation or any behavior params
 const SPTYPE_YROT_NO_PARAMS     = 1 // object is 10-bytes long, has y-rotation but no params
@@ -205,11 +205,13 @@ export const spawn_macro_objects = (areaIndex, macroObjList) => {
         }
 
         const macroObject = {
-            obj_y_rot: objToSpawn.yaw * 2 * 0x10 / 45,
+            obj_y_rot: s16((objToSpawn.yaw * 0x10 / 45) << 1),
             obj_pos: objToSpawn.pos,
             obj_param: objToSpawn.param
         }
-        macroObject.obj_param = (macroObject.obj_param & 0xFF00) + (preset.param & 0x00FF)
+        if (preset.param != 0) {
+            macroObject.obj_param = (macroObject.obj_param & 0xFF00) + (preset.param & 0x00FF)
+        }
 
         if (((macroObject.obj_param >> 8) & RESPAWN_INFO_DONT_RESPAWN) != RESPAWN_INFO_DONT_RESPAWN) {
             const newObj = spawn_object_abs_with_rot(ObjectListProc.gMacroObjectDefaultParent, preset.model, preset.behavior,

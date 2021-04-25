@@ -26,7 +26,7 @@ import { oFlags,
          oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAnimations,
          oIntangibleTimer, oGraphYOffset, oNumLootCoins, oCollisionDistance,
          oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll,
-         oWoodenPostTotalMarioAngle, oInteractStatus,
+         oWoodenPostTotalMarioAngle, oInteractStatus, oMoveAngleYaw,
          oWaterObjUnkF4, oWaterObjUnkF8, oWaterObjUnkFC, oBehParams2ndByte      } from "../include/object_constants"
 
 import { MODEL_WOODEN_POST,
@@ -323,7 +323,20 @@ export const bhvBobombFuseSmoke = [
 
 // const BehaviorScript bhvBobombBuddyOpensCannon[] = {
 
-// const BehaviorScript bhvCannonClosed[] = {
+import { cannon_lid_seg8_collision_08004950 } from "../actors/cannon_lid/collision.inc"
+import { bhv_cannon_closed_init, bhv_cannon_closed_loop } from "./behaviors/cannon_door.inc"
+
+export const bhvCannonClosed = () => { return [
+    ['BEGIN', OBJ_LIST_SURFACE],
+    ['OR_INT', oFlags, (OBJ_FLAG_PERSISTENT_RESPAWN | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)],
+    ['LOAD_COLLISION_DATA', cannon_lid_seg8_collision_08004950],
+    ['SET_HOME'],
+    ['CALL_NATIVE', bhv_cannon_closed_init],
+    ['BEGIN_LOOP'],
+        ['CALL_NATIVE', bhv_cannon_closed_loop],
+        ['CALL_NATIVE', SurfaceLoad.load_object_collision_model, SurfaceLoad],
+    ['END_LOOP'],
+]}
 
 // const BehaviorScript bhvWhirlpool[] = {
 
@@ -869,7 +882,7 @@ export const bhvCannonBarrel = () => { return [
     ['END_LOOP'],
 ]}
 
-export const bhvCannon = [
+export const bhvCannon = () => { return [
     ['BEGIN', OBJ_LIST_LEVEL],
     ['OR_INT', oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)],
     ['SPAWN_CHILD', /*Model*/ MODEL_CANNON_BARREL, /*Behavior*/ bhvCannonBarrel],
@@ -881,7 +894,7 @@ export const bhvCannon = [
     ['BEGIN_LOOP'],
         ['CALL_NATIVE', bhv_cannon_base_loop],
     ['END_LOOP'],
-]
+]}
 
 export const bhvHiddenAt120Stars = () => { return [
     ['BEGIN', OBJ_LIST_SURFACE],
@@ -990,6 +1003,31 @@ export const bhvCoinSparkles = [
 ]
 
 const bhvBowser = []
+
+import { exclamation_box_outline_seg8_collision_08025F78 } from "../actors/exclamation_box_outline/collision.inc"
+import { bhv_rotating_exclamation_box_loop, bhv_exclamation_box_loop } from "./behaviors/exclamation_box.inc"
+
+export const bhvExclamationBox = [
+    ['BEGIN', OBJ_LIST_SURFACE],
+    ['OR_INT', oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)],
+    ['LOAD_COLLISION_DATA', exclamation_box_outline_seg8_collision_08025F78],
+    ['OR_INT', oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE],
+    ['SET_FLOAT', oCollisionDistance, 300],
+    ['SET_HOME'],
+    ['BEGIN_LOOP'],
+        ['CALL_NATIVE', bhv_exclamation_box_loop],
+    ['END_LOOP'],
+]
+
+export const bhvRotatingExclamationMark = [
+    ['BEGIN', OBJ_LIST_DEFAULT],
+    ['OR_INT', oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)],
+    ['SCALE', /*Unused*/ 0, /*Field*/ 200],
+    ['BEGIN_LOOP'],
+        ['CALL_NATIVE', bhv_rotating_exclamation_box_loop],
+        ['ADD_INT', oMoveAngleYaw, 0x800],
+    ['END_LOOP'],
+]
 
 export const bhvSoundSpawner = [
     ['BEGIN', OBJ_LIST_UNIMPORTANT],

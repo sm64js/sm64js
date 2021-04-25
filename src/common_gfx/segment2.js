@@ -445,9 +445,15 @@ export const dl_shadow_begin = [
 export const dl_shadow_circle = [
 	Gbi.gsSPDisplayList(dl_shadow_begin),
 	...Gbi.gsDPLoadTextureBlock(texture_shadow_quarter_circle, Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_8b, 16, 16, 0,
-		Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, 4, 4, Gbi.G_TX_NOLOD,
-		Gbi.G_TX_NOLOD),
+		Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, 4, 4, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
 	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_shadow_square = [
+    Gbi.gsSPDisplayList(dl_shadow_begin),
+    ...Gbi.gsDPLoadTextureBlock(texture_shadow_quarter_square, Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_8b, 16, 16, 0,
+        Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, 4, 4, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
+    Gbi.gsSPEndDisplayList(),
 ]
 
 export const dl_shadow_9_verts = [

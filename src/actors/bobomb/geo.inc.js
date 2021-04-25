@@ -1,8 +1,6 @@
 // Bobomb
 
-import {
-    SHADOW_CIRCLE_4_VERTS
-} from "../../game/Shadow"
+import { SHADOW_CIRCLE_4_VERTS } from "../../game/Shadow"
 
 import {
     GEO_SHADOW, GEO_OPEN_NODE, GEO_SCALE, GEO_ANIMATED_PART, GEO_BILLBOARD, GEO_DISPLAY_LIST,
@@ -16,9 +14,7 @@ import {
     bobomb_seg8_dl_08022D78
 } from "./model.inc"
 
-import {
-    geo_switch_anim_state
-} from "../../game/ObjectHelpers"
+import { geo_switch_anim_state } from "../../game/ObjectHelpers"
 
 
 // 0x0F0007B8
@@ -121,4 +117,4 @@ export const bobomb_buddy_geo = () => {return [
     GEO_END(),
 ]};
 
-// 1619275558 - 2021-04-24 04:46:00 -1000
+// 1619334742 - 2021-04-24 22:22:19 -1000

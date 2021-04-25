@@ -72,12 +72,12 @@ export const script_func_global_1 = [
 //     ['RETURN']
 // ]
 
-// export const script_func_global_4 = [
-//     ['LOAD_MODEL_FROM_GEO', MODEL.WATER_BOMB,              water_bomb_geo],
-//     ['LOAD_MODEL_FROM_GEO', MODEL.WATER_BOMB_SHADOW,       water_bomb_shadow_geo],
-//     ['LOAD_MODEL_FROM_GEO', MODEL.KING_BOBOMB,             king_bobomb_geo],
-//     ['RETURN']
-// ]
+export const script_func_global_4 = [
+    // ['LOAD_MODEL_FROM_GEO', MODEL.WATER_BOMB,              water_bomb_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.WATER_BOMB_SHADOW,       water_bomb_shadow_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.KING_BOBOMB,             king_bobomb_geo],
+    ['RETURN']
+]
 
 // export const script_func_global_5 = [
 //     ['LOAD_MODEL_FROM_GEO', MODEL.MANTA_RAY,               manta_seg5_geo_05008D14],
@@ -132,12 +132,12 @@ export const script_func_global_1 = [
 //     ['RETURN']
 // ]
 
-// export const script_func_global_11 = [
-//     ['LOAD_MODEL_FROM_GEO', MODEL.BIRDS,                   birds_geo],
-//     ['LOAD_MODEL_FROM_GEO', MODEL.PEACH,                   peach_geo],
-//     ['LOAD_MODEL_FROM_GEO', MODEL.YOSHI,                   yoshi_geo],
-//     ['RETURN']
-// ]
+export const script_func_global_11 = [
+    // ['LOAD_MODEL_FROM_GEO', MODEL.BIRDS,                   birds_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.PEACH,                   peach_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.YOSHI,                   yoshi_geo],
+    ['RETURN']
+]
 
 // export const script_func_global_12 = [
 //     ['LOAD_MODEL_FROM_GEO', MODEL.ENEMY_LAKITU,            enemy_lakitu_geo],
@@ -184,13 +184,13 @@ export const script_func_global_15 = [
     ['RETURN']
 ]
 
-// export const script_func_global_16 = [
-//     ['LOAD_MODEL_FROM_GEO', MODEL.MIPS,                    mips_geo],
-//     ['LOAD_MODEL_FROM_GEO', MODEL.BOO_CASTLE,              boo_castle_geo],
-//     ['LOAD_MODEL_FROM_GEO', MODEL.LAKITU,                  lakitu_geo],
-//     ['LOAD_MODEL_FROM_GEO', MODEL.TOAD,                    toad_geo],
-//     ['RETURN']
-// ]
+export const script_func_global_16 = [
+    // ['LOAD_MODEL_FROM_GEO', MODEL.MIPS,                    mips_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.BOO_CASTLE,              boo_castle_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.LAKITU,                  lakitu_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL.TOAD,                    toad_geo],
+    ['RETURN']
+]
 
 // export const script_func_global_17 = [
 //     ['LOAD_MODEL_FROM_GEO', MODEL.CHILL_BULLY,             chilly_chief_geo],

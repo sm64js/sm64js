@@ -1,8 +1,6 @@
 // Bobomb
 
-import {
-    ANIMINDEX_NUMPARTS
-} from "../../include/types"
+import { ANIMINDEX_NUMPARTS } from "../../include/types"
 
 // 0x08023528
 const bobomb_seg8_animvalue_08023528 = [
@@ -124,4 +122,4 @@ export const bobomb_seg8_anims_0802396C = [
 ];
 
 
-// 1619275558 - 2021-04-24 04:46:00 -1000
+// 1619334742 - 2021-04-24 22:22:19 -1000

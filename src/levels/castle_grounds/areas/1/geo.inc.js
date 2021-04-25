@@ -1,25 +1,43 @@
 // Castle Grounds
 
 import {
+    SCREEN_WIDTH, SCREEN_HEIGHT
+} from "../../../../game/Skybox"
+
+import {
     GEO_NODE_SCREEN_AREA, GEO_OPEN_NODE, GEO_ZBUFFER, GEO_NODE_ORTHO, GEO_BACKGROUND,
     GEO_CLOSE_NODE, GEO_CAMERA_FRUSTUM_WITH_FUNC, GEO_CAMERA, GEO_DISPLAY_LIST, GEO_ASM,
     GEO_RENDER_OBJ, GEO_END,
-    SCREEN_WIDTH, SCREEN_HEIGHT, BACKGROUND_OCEAN_SKY, LAYER_OPAQUE, LAYER_ALPHA,
-    LAYER_TRANSPARENT_DECAL, LAYER_OPAQUE_DECAL
+    BACKGROUND_OCEAN_SKY, LAYER_OPAQUE, LAYER_ALPHA, LAYER_TRANSPARENT_DECAL, LAYER_OPAQUE_DECAL
 } from "../../../../engine/GeoLayout"
 
 import {
-    geo_skybox_main, geo_camera_fov, geo_camera_main, geo_movtex_pause_control,
-    geo_movtex_draw_nocolor, geo_movtex_draw_water_regions, geo_envfx_main,
-    geo_cannon_circle_base
-} from "../../../../game/ObjectHelpers"
+    geo_skybox_main, geo_envfx_main
+} from "../../../../game/LevelGeo"
 
 import {
-    castle_grounds_seg7_dl_07006D70, castle_grounds_seg7_dl_070095F0,
-    castle_grounds_seg7_dl_0700A860, castle_grounds_seg7_dl_0700B1D0,
-    castle_grounds_seg7_dl_0700BA20, castle_grounds_seg7_dl_0700C430,
-    castle_grounds_seg7_dl_0700C210
-} from "./model.inc"
+    geo_camera_fov, geo_camera_main
+} from "../../../../game/Camera"
+
+import { castle_grounds_seg7_dl_07006D70 } from "./1/model.inc"
+
+import { castle_grounds_seg7_dl_070095F0 } from "./2/model.inc"
+
+import { castle_grounds_seg7_dl_0700A860 } from "./4/model.inc"
+
+import { castle_grounds_seg7_dl_0700B1D0 } from "./5/model.inc"
+
+import { castle_grounds_seg7_dl_0700BA20 } from "./6/model.inc"
+
+import { castle_grounds_seg7_dl_0700C430 } from "./10/model.inc"
+
+import { castle_grounds_seg7_dl_0700C210 } from "./9/model.inc"
+
+import {
+    geo_movtex_pause_control, geo_movtex_draw_nocolor, geo_movtex_draw_water_regions
+} from "../../../../game/MovingTexture"
+
+import { geo_cannon_circle_base } from "../../../../game/ObjectHelpers"
 
 
 // 0x0E00073C
@@ -62,4 +80,4 @@ export const castle_grounds_geo_00073C = () => {return [
     GEO_END(),
 ]};
 
-// 1618763470 - 2021-04-18 06:31:12 -1000
+// 1619329860 - 2021-04-24 19:51:09 -1000

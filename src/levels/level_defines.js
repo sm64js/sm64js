@@ -1,10 +1,11 @@
 import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
-import { LEVEL_STARMAN ,LEVEL_CASTLE_GROUNDS, LEVEL_CASTLE_COURTYARD, LEVEL_CLOUDED, LEVEL_BOB, LEVEL_CCM, LEVEL_WF, LEVEL_PSS, LEVEL_TTM, LEVEL_HMC, LEVEL_BBH, LEVEL_SSL, LEVEL_SL, LEVEL_CASTLE, LEVEL_CASTLE_2, LEVEL_MBF, LEVEL_CTF00 } from "./level_defines_constants"
+import { LEVEL_STARMAN ,LEVEL_CASTLE_GROUNDS, LEVEL_CASTLE_COURTYARD, LEVEL_CLOUDED, LEVEL_BOB, LEVEL_CCM, LEVEL_WF, LEVEL_PSS, LEVEL_GJ, LEVEL_TTM, LEVEL_HMC, LEVEL_BBH, LEVEL_SSL, LEVEL_SL, LEVEL_CASTLE, LEVEL_CASTLE_2, LEVEL_MBF, LEVEL_CTF00 } from "./level_defines_constants"
 
 import { level_castle_grounds_entry } from "./castle_grounds/script"
 import { level_bob_entry } from "./bob/script"
 import { level_ccm_entry } from "./ccm/script"
 import { level_pss_entry } from "./pss/script"
+import { level_gj_entry } from "./gj/script"
 import { level_ttm_entry } from "./ttm/script"
 import { level_wf_entry } from "./wf/script"
 import { level_ctf00_entry } from "./ctf00/script"
@@ -47,6 +48,10 @@ export const level_defines_list = [
     {
         command: LevelCommands.jump_if,
         args: [LevelCommands.OP_EQ, LEVEL_PSS, level_pss_entry]
+    },
+    {
+        command: LevelCommands.jump_if,
+        args: [LevelCommands.OP_EQ, LEVEL_GJ, level_gj_entry]
     },
     {
         command: LevelCommands.jump_if,

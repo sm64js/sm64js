@@ -1,3 +1,7 @@
+// Bird
+
+import { ANIMINDEX_NUMPARTS } from "../../include/types"
+
 // 0x050007E0
 const birds_seg5_animvalue_050007E0 = [
     0x0000, 0x0013, 0x0017, 0x001A, 0x001E, 0x0022, 0x0020, 0x001A,
@@ -23,18 +27,17 @@ const birds_seg5_animindex_5000870 = [
 ];
 
 // 0x050008D0
-// copied structure from anims.inc.js for butterfly
-export const birds_seg5_anim_050008D0 = {
+const birds_seg5_anim_050008D0 = {
     flags: 0,
     unk02: 0,
     unk04: 0,
     unk06: 0,
     unk08: 0x07,
-    unk0A: (birds_seg5_animindex_5000870.length /6) -1,
+    unk0A: ANIMINDEX_NUMPARTS(birds_seg5_animindex_5000870),
     values: birds_seg5_animvalue_050007E0,
-    indicies: birds_seg5_animindex_5000870,
+    indices: birds_seg5_animindex_5000870,
+    ignore: 0,
 };
-
 
 // 0x050008E8
 const birds_seg5_animvalue_050008E8 = [
@@ -61,19 +64,23 @@ const birds_seg5_animindex_5000970 = [
 ];
 
 // 0x050009D0
-export const birds_seg5_anim_050009D0 = {
+const birds_seg5_anim_050009D0 = {
     flags: 0,
     unk02: 0,
     unk04: 0,
     unk06: 0,
     unk08: 0x08,
-    unk0A: (birds_seg5_animindex_5000970.length / 6) -1,
+    unk0A: ANIMINDEX_NUMPARTS(birds_seg5_animindex_5000970),
     values: birds_seg5_animvalue_050008E8,
-    indicies: birds_seg5_animindex_5000970,
+    indices: birds_seg5_animindex_5000970,
+    ignore: 0,
 };
 
-
+// 0x050009E8
 export const birds_seg5_anims_050009E8 = [
     birds_seg5_anim_050008D0,
     birds_seg5_anim_050009D0,
 ];
+
+
+// 1619334742 - 2021-04-25 14:44:44 -1000

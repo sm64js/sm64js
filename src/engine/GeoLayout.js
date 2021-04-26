@@ -7,54 +7,6 @@ const copy3argsToObject = (pos, argIndex, args) => {
     return 3
 }
 
-// EXPERIMENTAL
-export const GEO_ANIMATED_PART = (...args) => {return ['node_animated_part', ...args]}
-export const GEO_ASM = (...args) => {return ['node_generated', ...args]}
-export const GEO_BACKGROUND = (...args) => {return ['node_background', ...args]}
-export const GEO_BILLBOARD = (...args) => {return ['node_billboard', ...args]}
-export const GEO_BRANCH_AND_LINK = (...args) => {return ['branch_and_link', ...args]}
-export const GEO_CAMERA = (...args) => {return ['node_camera', ...args]}
-export const GEO_CAMERA_FRUSTUM_WITH_FUNC = (...args) => {return ['node_perspective', ...args]}
-export const GEO_CLOSE_NODE = (...args) => {return ['close_node', ...args]}
-export const GEO_CULLING_RADIUS = (...args) => {return ['node_culling_radius', ...args]}
-export const GEO_DISPLAY_LIST = (...args) => {return ['display_list', ...args]}
-export const GEO_END = (...args) => {return ['node_end', ...args]}
-export const GEO_NODE_SCREEN_AREA = (...args) => {return ['node_screen_area', ...args]}
-export const GEO_NODE_ORTHO = (...args) => {return ['node_ortho', ...args]}
-export const GEO_NODE_START = (...args) => {return ['node_start', ...args]}
-export const GEO_OPEN_NODE = (...args) => {return ['open_node', ...args]}
-export const GEO_RENDER_OBJ = (...args) => {return ['node_render_object_parent', ...args]}
-export const GEO_RENDER_RANGE = (...args) => {return ['node_render_range', ...args]}
-export const GEO_SCALE = (...args) => {return ['node_scale', ...args]}
-export const GEO_SHADOW = (...args) => {return ['node_shadow', ...args]}
-export const GEO_SWITCH_CASE = (...args) => {return ['node_switch_case', ...args]}
-export const GEO_TRANSLATE_NODE = (...args) => {return ['node_translate', ...args]}
-export const GEO_ZBUFFER = (...args) => {return ['node_master_list', ...args]}
-
-
-// EXPERIMENTAL
-export const LAYER_FORCE             = 0
-export const LAYER_OPAQUE            = 1
-export const LAYER_OPAQUE_DECAL      = 2
-export const LAYER_OPAQUE_INTER      = 3
-export const LAYER_ALPHA             = 4
-export const LAYER_TRANSPARENT       = 5
-export const LAYER_TRANSPARENT_DECAL = 6
-export const LAYER_TRANSPARENT_INTER = 7
-
-// EXPERIMENTAL
-export const BACKGROUND_OCEAN_SKY       = 0
-export const BACKGROUND_FLAMING_SKY     = 1
-export const BACKGROUND_UNDERWATER_CITY = 2
-export const BACKGROUND_BELOW_CLOUDS    = 3
-export const BACKGROUND_SNOW_MOUNTAINS  = 4
-export const BACKGROUND_DESERT          = 5
-export const BACKGROUND_HAUNTED         = 6
-export const BACKGROUND_GREEN_SKY       = 7
-export const BACKGROUND_ABOVE_CLOUDS    = 8
-export const BACKGROUND_PURPLE_SKY      = 9
-
-
 class GeoLayout {
     constructor() {
         this.sCurrentLayout = {}
@@ -263,9 +215,17 @@ class GeoLayout {
 
     node_billboard(args) {
         let drawingLayer = 0
-        let params = args ? args[0] : 0
-        const translation = args ? [args[1], args[2], args[3]] : [0, 0, 0]
+        let params
+        let translation
         let displaylist
+
+        if (args && args.length > 0) {
+            params = args[0]
+            translation = [args[1], args[2], args[3]]
+        } else {
+            params = 0
+            translation = [0, 0, 0]           
+        }
 
         if (params & 0x80) {
             throw "more implementation needed in geo node billboard"
@@ -383,3 +343,50 @@ class GeoLayout {
 }
 
 export const GeoLayoutInstance = new GeoLayout()
+
+// EXPERIMENTAL
+const Geo = GeoLayoutInstance;
+export const GEO_ANIMATED_PART = (...args)            => {return {command: Geo.node_animated_part, args: args}}
+export const GEO_ASM = (...args)                      => {return {command: Geo.node_generated, args: args}}
+export const GEO_BACKGROUND = (...args)               => {return {command: Geo.node_background, args: args}}
+export const GEO_BILLBOARD = (...args)                => {return {command: Geo.node_billboard, args: args}}
+export const GEO_BRANCH_AND_LINK = (...args)          => {return {command: Geo.branch_and_link, args: args}}
+export const GEO_CAMERA = (...args)                   => {return {command: Geo.node_camera, args: args}}
+export const GEO_CAMERA_FRUSTUM_WITH_FUNC = (...args) => {return {command: Geo.node_perspective, args: args}}
+export const GEO_CLOSE_NODE = (...args)               => {return {command: Geo.close_node, args: args}}
+export const GEO_CULLING_RADIUS = (...args)           => {return {command: Geo.node_culling_radius, args: args}}
+export const GEO_DISPLAY_LIST = (...args)             => {return {command: Geo.display_list, args: args}}
+export const GEO_END = (...args)                      => {return {command: Geo.node_end, args: args}}
+export const GEO_NODE_SCREEN_AREA = (...args)         => {return {command: Geo.node_screen_area, args: args}}
+export const GEO_NODE_ORTHO = (...args)               => {return {command: Geo.node_ortho, args: args}}
+export const GEO_NODE_START = (...args)               => {return {command: Geo.node_start, args: args}}
+export const GEO_OPEN_NODE = (...args)                => {return {command: Geo.open_node, args: args}}
+export const GEO_RENDER_OBJ = (...args)               => {return {command: Geo.node_render_object_parent, args: args}}
+export const GEO_RENDER_RANGE = (...args)             => {return {command: Geo.node_render_range, args: args}}
+export const GEO_SCALE = (...args)                    => {return {command: Geo.node_scale, args: args}}
+export const GEO_SHADOW = (...args)                   => {return {command: Geo.node_shadow, args: args}}
+export const GEO_SWITCH_CASE = (...args)              => {return {command: Geo.node_switch_case, args: args}}
+export const GEO_TRANSLATE_NODE = (...args)           => {return {command: Geo.node_translate, args: args}}
+export const GEO_ZBUFFER = (...args)                  => {return {command: Geo.node_master_list, args: args}}
+
+// EXPERIMENTAL
+export const LAYER_FORCE                = Geo.LAYER_FORCE
+export const LAYER_OPAQUE               = Geo.LAYER_OPAQUE
+export const LAYER_OPAQUE_DECAL         = Geo.LAYER_OPAQUE_DECAL
+export const LAYER_OPAQUE_INTER         = Geo.LAYER_OPAQUE_INTER
+export const LAYER_ALPHA                = Geo.LAYER_ALPHA
+export const LAYER_TRANSPARENT          = Geo.LAYER_TRANSPARENT
+export const LAYER_TRANSPARENT_DECAL    = Geo.LAYER_TRANSPARENT_DECAL
+export const LAYER_TRANSPARENT_INTER    = Geo.LAYER_TRANSPARENT_INTER
+
+// EXPERIMENTAL
+export const BACKGROUND_OCEAN_SKY       = Geo.BACKGROUND_OCEAN_SKY
+export const BACKGROUND_FLAMING_SKY     = Geo.BACKGROUND_FLAMING_SKY
+export const BACKGROUND_UNDERWATER_CITY = Geo.BACKGROUND_UNDERWATER_CITY
+export const BACKGROUND_BELOW_CLOUDS    = Geo.BACKGROUND_BELOW_CLOUDS
+export const BACKGROUND_SNOW_MOUNTAINS  = Geo.BACKGROUND_SNOW_MOUNTAINS
+export const BACKGROUND_DESERT          = Geo.BACKGROUND_DESERT
+export const BACKGROUND_HAUNTED         = Geo.BACKGROUND_HAUNTED
+export const BACKGROUND_GREEN_SKY       = Geo.BACKGROUND_GREEN_SKY
+export const BACKGROUND_ABOVE_CLOUDS    = Geo.BACKGROUND_ABOVE_CLOUDS
+export const BACKGROUND_PURPLE_SKY      = Geo.BACKGROUND_PURPLE_SKY

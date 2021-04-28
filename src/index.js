@@ -1,4 +1,4 @@
-﻿import "./template.css"
+import "./template.css"
 import { checkForRom } from "./romTextureLoader.js"
 import { GameInstance as Game } from "./game/Game"
 import { playerInputUpdate } from "./player_input_manager"
@@ -70,8 +70,6 @@ $('[data-toggle="popover"]').popover({
     },
 })
 
-const url = new URL(window.location.href)
-
 const letterColors = ["#3e51fa", "#fa3e3e", "#00ff00", "yellow"]
 
 const generateRainbowText = (element) => {
@@ -124,13 +122,35 @@ window.enterFullScreenMode = () => {
     dstCanvas.requestFullscreen()
 }
 
+window.snapshotLocation = () => {
+    if (gameStarted) {
+        let map = "map=" + document.getElementById("mapSelect").value
+        let loc = Game.snapshot_location()
+        let pos = "pos=" + Math.round(loc.yaw) + "," + Math.round(loc.x) + "," + Math.round(loc.y) + "," + Math.round(loc.z)
+        window.history.replaceState(null, "", window.location.origin + "?autostart=1" + "&" + map + "&" + pos)
+    }
+}
+
 ///// Start Game
 
 let gameStarted = false
 
 document.getElementById("startbutton").addEventListener('click', () => {
-    if (gameStarted) window.location.search = '&autostart=1' /// Refresh page (Reset Game)
-    else startGame()
+    if (gameStarted) {
+        const url = new URL(window.location.href)
+
+        if (!url.searchParams.get("autostart")) {  /// Refresh page (Reset Game)
+            let qora = "&"
+            if (window.location.search == "") {
+                qora = "?"
+            }
+            window.history.replaceState(null, "", window.location.href + qora + "autostart=1")
+        }
+        location.reload()
+    }
+    else {
+        startGame()
+    }
 })
 
 const startGame = () => {
@@ -146,7 +166,36 @@ const startGame = () => {
 }
 
 window.onload = () => {
-    if (checkForRom() && url.searchParams.get("autostart")) startGame()
+    const url = new URL(window.location.href)
+
+    const map = url.searchParams.get("map")
+    if (map) {
+        const maps = document.getElementById("mapSelect").getElementsByTagName("option")
+        for (const m of maps) {
+            if (m.innerText == map) {
+                m.selected = 'selected'
+                break
+            }
+        }
+    }
+
+    let pos = url.searchParams.get("pos")
+    if (pos) {
+        pos = pos.split(",")
+        window.debugMarioYaw = parseFloat(pos[0])
+        window.debugMarioPosX = parseFloat(pos[1])
+        window.debugMarioPosY = parseFloat(pos[2])
+        window.debugMarioPosZ = parseFloat(pos[3])
+    }
+
+    checkForRom().then((data) => {
+        if (data && url.searchParams.get("autostart")) {
+            if (url.searchParams.get("fullscreen")) {
+                window.fullWindowMode = true
+            }
+            startGame()
+        }
+    })
     document.getElementById('mainContent').hidden = false
 }
 

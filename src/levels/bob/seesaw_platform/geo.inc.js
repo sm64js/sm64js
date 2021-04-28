@@ -1,10 +1,20 @@
-import { GeoLayoutInstance as Geo } from "../../../engine/GeoLayout"
+// Bob
+
+import {
+    GEO_CULLING_RADIUS, GEO_OPEN_NODE, GEO_DISPLAY_LIST, GEO_CLOSE_NODE, GEO_END,
+    LAYER_OPAQUE
+} from "../../../engine/GeoLayout"
+
 import { bob_seg7_dl_0700E768 } from "./model.inc"
 
-export const bob_geo_000458 = [
-    { command: Geo.node_culling_radius, args: [1200] },
-    { command: Geo.open_node },
-    {    command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bob_seg7_dl_0700E768] },
-    { command: Geo.close_node },
-    { command: Geo.node_end }
-]
+
+// 0x0E000458
+export const bob_geo_000458 = () => {return [
+    GEO_CULLING_RADIUS(1200),
+    GEO_OPEN_NODE(),
+        GEO_DISPLAY_LIST(LAYER_OPAQUE, bob_seg7_dl_0700E768),
+    GEO_CLOSE_NODE(),
+    GEO_END(),
+]};
+
+// 1619334742 - 2021-04-24 21:12:30 -1000

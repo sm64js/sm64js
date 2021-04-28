@@ -1,4 +1,4 @@
-import {ttm_seg7_texture_07001000, } from "../../../textures.inc.js"
+import {ttm_seg7_texture_07001000, } from "../../../texture.inc"
 import * as Gbi from "../../../../../include/gbi"
 const ttm_seg7_vertex_070109F0 = [
 	{ pos: [ 750, -767, -340 ], flag: 0, tc: [ 0, 990 ], color: [ 255, 255, 255, 255 ] },

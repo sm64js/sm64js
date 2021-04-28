@@ -388,16 +388,13 @@ export const init_graph_node_generated = (pool, graphNode, gfxFunc, param, funcC
 }
 
 export const init_graph_node_object_parent = (sharedChild) => {
-
     const graphNode = {
         node: {},
         sharedChild: sharedChild.node
     }
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_OBJECT_PARENT)
-
     return graphNode
-
 }
 
 export const init_graph_node_animated_part = (drawingLayer, displayList, translation) => {
@@ -408,11 +405,8 @@ export const init_graph_node_animated_part = (drawingLayer, displayList, transla
     }
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_ANIMATED_PART)
-
     graphNode.node.flags = (drawingLayer << 8) | (graphNode.node.flags & 0xFF)
-
     return graphNode
-
 }
 
 export const init_graph_node_billboard = (drawingLayer, displayList, translation) => {
@@ -424,7 +418,6 @@ export const init_graph_node_billboard = (drawingLayer, displayList, translation
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_BILLBOARD)
     graphNode.node.flags = (drawingLayer << 8) | (graphNode.node.flags & 0xFF)
-
     return graphNode
 }
 
@@ -500,14 +493,12 @@ export const init_graph_node_shadow = (shadowScale, shadowSolidity, shadowType) 
 export const init_graph_node_scale = (drawingLayer, displayList, scale) => {
     const graphNode = {
         node: {},
-        scale,
-        displayList
+        displayList,
+        scale
     }
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_SCALE)
-
     graphNode.node.flags = (drawingLayer << 8) | (graphNode.node.flags & 0xFF)
-
     return graphNode
 }
 
@@ -519,11 +510,20 @@ export const init_graph_node_rotation = (drawingLayer, displayList, rotation) =>
     }
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_ROTATION)
-
     graphNode.node.flags = (drawingLayer << 8) | (graphNode.node.flags & 0xFF)
-
     return graphNode
+}
 
+export const init_graph_node_translation = (drawingLayer, displayList, translation) => {
+    const graphNode = {
+        node: {},
+        displayList,
+        translation: [...translation]
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_TRANSLATION)
+    graphNode.node.flags = (drawingLayer << 8) | (graphNode.node.flags & 0xFF)
+    return graphNode
 }
 
 export const init_graph_node_ortho = (pool, graphNode, scale) => {
@@ -533,22 +533,21 @@ export const init_graph_node_ortho = (pool, graphNode, scale) => {
     }
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_ORTHO_PROJECTION)
-
     return graphNode
 }
 
 export const init_graph_node_master_list = (pool, graphNode, on) => {
-
     graphNode = {
         node: {},
         listHeads: Array(GFX_NUM_MASTER_LISTS),
     }
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_MASTER_LIST)
 
-    if (on) graphNode.node.flags |= GRAPH_RENDER_Z_BUFFER
+    if (on) {
+        graphNode.node.flags |= GRAPH_RENDER_Z_BUFFER
+    }
 
     return graphNode
-
 }
 
 export const register_scene_graph_node = (g, graphNode) => {

@@ -1,20 +1,35 @@
-import { GeoLayoutInstance as Geo } from "../../engine/GeoLayout"
-import { bubble_seg4_dl_0401DD60 } from "./model.inc"
-import { bubble_seg4_dl_0401DDE0 } from "./model.inc"
-import { geo_switch_anim_state } from "../../game/ObjectHelpers"
+// Bubble
 
-export const bubble_geo = [
-	{ command: Geo.node_switch_case, args: [1, geo_switch_anim_state]},
-	{ command: Geo.open_node },
-	{ command: Geo.display_list, args: [Geo.LAYER_ALPHA, bubble_seg4_dl_0401DD60] },
-	{ command: Geo.close_node },
-	{ command: Geo.node_end },
-]
+import {
+    geo_switch_anim_state
+} from "../../game/ObjectHelpers"
 
-export const purple_marble_geo = [
-	{ command: Geo.node_switch_case, args: [1, geo_switch_anim_state] },
-	{ command: Geo.open_node },
-	{ command: Geo.display_list, args: [Geo.LAYER_ALPHA, bubble_seg4_dl_0401DDE0] },
-	{ command: Geo.close_node },
-	{ command: Geo.node_end },
-]
+import {
+    GEO_SWITCH_CASE, GEO_OPEN_NODE, GEO_DISPLAY_LIST, GEO_CLOSE_NODE, GEO_END,
+    LAYER_ALPHA
+} from "../../engine/GeoLayout"
+
+import {
+    bubble_seg4_dl_0401DD60, bubble_seg4_dl_0401DDE0
+} from "./model.inc"
+
+
+// 0x17000000
+export const bubble_geo = () => {return [
+    GEO_SWITCH_CASE(1, geo_switch_anim_state),
+    GEO_OPEN_NODE(),
+        GEO_DISPLAY_LIST(LAYER_ALPHA, bubble_seg4_dl_0401DD60),
+    GEO_CLOSE_NODE(),
+    GEO_END(),
+]};
+
+// 0x1700001C
+export const purple_marble_geo = () => {return [
+    GEO_SWITCH_CASE(1, geo_switch_anim_state),
+    GEO_OPEN_NODE(),
+        GEO_DISPLAY_LIST(LAYER_ALPHA, bubble_seg4_dl_0401DDE0),
+    GEO_CLOSE_NODE(),
+    GEO_END(),
+]};
+
+// 1619267130 - 2021-04-24 03:12:01 -1000

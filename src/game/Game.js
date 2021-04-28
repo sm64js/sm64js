@@ -91,6 +91,7 @@ class Game {
 
     snapshot_location() {
         return {
+            yaw: LevelUpdate.gMarioState.faceAngle[1] / (0x10000 / 360),
             x: LevelUpdate.gMarioState.pos[0],
             y: LevelUpdate.gMarioState.pos[1],
             z: LevelUpdate.gMarioState.pos[2]

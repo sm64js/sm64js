@@ -124,8 +124,10 @@ window.enterFullScreenMode = () => {
 
 window.snapshotLocation = () => {
     if (gameStarted) {
+        let map = "map=" + document.getElementById("mapSelect").value
         let loc = Game.snapshot_location()
-        console.log("&pos=0," + Math.round(loc.x) + "," + Math.round(loc.y) + "," + Math.round(loc.z))
+        let pos = "pos=" + Math.round(loc.yaw) + "," + Math.round(loc.x) + "," + Math.round(loc.y) + "," + Math.round(loc.z)
+        window.history.replaceState(null, "", window.location.origin + "?autostart=1" + "&" + map + "&" + pos)
     }
 }
 
@@ -188,7 +190,9 @@ window.onload = () => {
 
     checkForRom().then((data) => {
         if (data && url.searchParams.get("autostart")) {
-            window.fullWindowMode = true
+            if (url.searchParams.get("fullscreen")) {
+                window.fullWindowMode = true
+            }
             startGame()
         }
     })

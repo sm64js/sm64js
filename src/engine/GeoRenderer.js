@@ -192,7 +192,7 @@ class GeoRenderer {
             const fnNode = node.wrapper.fnNode
 
             const list = fnNode.func.call(fnNode.funcClass, GraphNode.GEO_CONTEXT_RENDER, node, this.gMatStack[this.gMatStackIndex])
-            if (list.length > 0) {
+            if (list && list.length > 0) {
                 this.geo_append_display_list(list, node.flags >> 8)
             }
         }

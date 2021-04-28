@@ -1,4 +1,5 @@
 import { GEO_CONTEXT_RENDER } from "../engine/graph_node"
+import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { castle_grounds_movtex_water, castle_grounds_movtex_tris_waterfall, castle_grounds_dl_waterfall } from "../levels/castle_grounds/areas/1/movtext.inc"
 import { ccm_movtex_penguin_puddle_water } from "../levels/ccm/areas/1/movtext.inc"
@@ -132,6 +133,24 @@ const movtex_change_texture_format = (quadCollectionId, gfx) => {
         default: Gbi.gSPDisplayList(gfx, dl_waterbox_rgba16_begin)
     }
 }
+
+
+/**
+ * Update moving texture counters that determine when to update the coordinates.
+ * Textures update when gMovtexCounterPrev != gMovtexCounter.
+ * This ensures water / sand flow stops when the game pauses.
+ */
+export const geo_movtex_pause_control = (callContext, node, mtx) => {
+    if (callContext != GEO_CONTEXT_RENDER) {
+        gMovtexCounterPrev = GeoRenderer.gAreaUpdateCounter - 1
+        gMovtexCounter = GeoRenderer.gAreaUpdateCounter
+    } else {
+        gMovtexCounterPrev = gMovtexCounter
+        gMovtexCounter = GeoRenderer.gAreaUpdateCounter
+    }
+    return null
+}
+
 
 const movtex_make_quad_vertex = (verts, index, x, y, z, rot, rotOffset, scale, alpha) => {
     const s = 32.0 * (32.0 * scale - 1.0) * Math.sin((rot + rotOffset) / 0x8000 * Math.PI)

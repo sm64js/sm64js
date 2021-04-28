@@ -167,11 +167,9 @@ class SurfaceLoad {
 
         newNode.next = list.next
         list.next = newNode
-
     }
 
     add_surface(surface, dynamic) {
-
         const minX = Math.min(surface.vertex1[0], surface.vertex2[0], surface.vertex3[0])
         const minZ = Math.min(surface.vertex1[2], surface.vertex2[2], surface.vertex3[2])
         const maxX = Math.max(surface.vertex1[0], surface.vertex2[0], surface.vertex3[0])
@@ -187,7 +185,6 @@ class SurfaceLoad {
                 this.add_surface_to_cell(dynamic, cellX, cellZ, surface)
             }
         }
-
     }
 
     load_static_surfaces(data, dataIndex, vertexDataIndex, surfaceType, surfaceRooms) {
@@ -279,7 +276,7 @@ class SurfaceLoad {
             }
             else if (terrainLoadType == Surfaces.TERRAIN_LOAD_CONTINUE) continue
             else if (terrainLoadType == Surfaces.TERRAIN_LOAD_END) break
-            else if (terrainLoadType > 0x65) { //TERRAIN_LOAD_IS_SURFACE_TYPE_HIGH
+            else if (terrainLoadType >= 0x65) { //TERRAIN_LOAD_IS_SURFACE_TYPE_HIGH
                 dataIndex = this.load_static_surfaces(data, dataIndex, vertexDataIndex, terrainLoadType, surfaceRooms)
                 continue
             }
@@ -365,7 +362,6 @@ class SurfaceLoad {
     }
 
     load_object_collision_model() {
-
         const vertexData = []
 
         let marioDist = ObjectListProc.gCurrentObject.rawData[oDistanceToMario]

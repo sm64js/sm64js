@@ -1,12 +1,12 @@
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { AreaInstance as Area } from "./Area"
 import { geo_obj_init, geo_obj_init_animation, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
-import { oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations, ACTIVE_FLAGS_DEACTIVATED, OBJ_MOVE_ABOVE_DEATH_BARRIER, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oFloorHeight, oFloor, oFloorType, oFloorRoom, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR, oWallHitboxRadius, oWallAngle, oMoveFlags, OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, oBounciness, oBuoyancy, oDragStrength, oAngleVelYaw, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND, OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER, OBJ_MOVE_ENTERED_WATER, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND, OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, oRoom, ACTIVE_FLAG_UNK10, OBJ_MOVE_13, OBJ_MOVE_LANDED, oInteractStatus, oHomeX, oHomeY, oHomeZ, oOpacity, ACTIVE_FLAG_UNK7, oNumLootCoins, oCoinUnk110, oTimer } from "../include/object_constants"
+import { oAngleVelPitch, oAngleVelRoll, oAction, oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations, ACTIVE_FLAGS_DEACTIVATED, OBJ_MOVE_ABOVE_DEATH_BARRIER, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oFloorHeight, oFloor, oFloorType, oFloorRoom, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR, oWallHitboxRadius, oWallAngle, oMoveFlags, OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, oBounciness, oBuoyancy, oDragStrength, oAngleVelYaw, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND, OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER, OBJ_MOVE_ENTERED_WATER, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND, OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, oRoom, ACTIVE_FLAG_UNK10, OBJ_MOVE_13, OBJ_MOVE_LANDED, oInteractStatus, oHomeX, oHomeY, oHomeZ, oOpacity, ACTIVE_FLAG_UNK7, oNumLootCoins, oCoinUnk110, oTimer } from "../include/object_constants"
 
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { atan2s, mtxf_rotate_zxy_and_translate } from "../engine/math_util"
-import { sins, coss, int16, random_int16, random_float } from "../utils"
+import { sins, coss, int16, s16, random_int16, random_float } from "../utils"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { ATTACK_PUNCH, INT_STATUS_WAS_ATTACKED, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "./Interaction"
@@ -15,6 +15,7 @@ import { gLinker } from "./Linker"
 import * as Gbi from "../include/gbi"
 import { MODEL_YELLOW_COIN } from "../include/model_ids"
 import { spawn_mist_particles_variable } from "./behaviors/white_puff.inc"
+import { GRAPH_RENDER_ACTIVE           } from "../engine/graph_node"
 
 export const WATER_DROPLET_FLAG_RAND_ANGLE                = 0x02
 export const WATER_DROPLET_FLAG_RAND_OFFSET_XZ            = 0x04 // Unused
@@ -28,6 +29,16 @@ export const cur_obj_set_behavior = (behavior) => {
     const o = ObjectListProc.gCurrentObject
 
     o.behavior = behavior
+}
+
+export const cur_obj_lateral_dist_to_home = () => {
+    let dist;
+    const o = ObjectListProc.gCurrentObject
+    let dx = o.rawData[oHomeX] - o.rawData[oPosX];
+    let dz = o.rawData[oHomeZ] - o.rawData[oPosZ];
+
+    dist = Math.sqrt(dx * dx + dz * dz);
+    return dist;
 }
 
 export const cur_obj_set_model = (modelID) => {
@@ -118,12 +129,10 @@ export const geo_switch_area = (run, node) => {
 }
 
 export const geo_update_layer_transparency = (run, node) => {
-    let sp3C = []
+    let dlStart = []
 
     if (run == 1) {
         let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
-        let sp30 = node
-        let sp2C = node
 
         if (GeoRenderer.gCurGraphNodeHeldObject) {
             obj = GeoRenderer.gCurGraphNodeHeldObject.objNode
@@ -131,19 +140,22 @@ export const geo_update_layer_transparency = (run, node) => {
 
         const opacity = obj.rawData[oOpacity]
 
-        const sp38 = sp3C
+        const dlHead = dlStart
 
         if (opacity == 0xFF) {
-            console.log(sp30)
-            throw "more implementation needed: geo_update_layer_transparency"
-            if (sp30.paremeter == 20) {
-
-            }
-        } else {
-            if (sp30.wrapper.param == 20) {
-                sp30.flags = 0x600 | (sp30.flags & 0xFF)
+            if (node.wrapper.param == 20) {
+                node.flags = 0x600 | (node.flags & 0xFF)
             } else {
-                sp30.flags = 0x500 | (sp30.flags & 0xFF)
+                node.flags = 0x100 | (node.flags & 0xFF)
+            }
+
+            obj.rawData[oAnimState] = 0
+
+        } else {
+            if (node.wrapper.param == 20) {
+                node.flags = 0x600 | (node.flags & 0xFF)
+            } else {
+                node.flags = 0x500 | (node.flags & 0xFF)
             }
 
             obj.rawData[oAnimState] = 1
@@ -154,12 +166,12 @@ export const geo_update_layer_transparency = (run, node) => {
 
         }
 
-        Gbi.gDPSetEnvColor(sp38, 255, 255, 255, opacity)
-        Gbi.gSPEndDisplayList(sp38)
+        Gbi.gDPSetEnvColor(dlHead, 255, 255, 255, opacity)
+        Gbi.gSPEndDisplayList(dlHead)
 
     }
 
-    return sp3C
+    return dlStart
 }
 
 export const spawn_water_droplet = (parent, params) => {
@@ -181,7 +193,7 @@ export const spawn_water_droplet = (parent, params) => {
 
     if (params.flags & WATER_DROPLET_FLAG_RAND_ANGLE_INCR) {
         newObj.rawData[oMoveAngleYaw] =
-            (int16)(newObj.rawData[oMoveAngleYaw] + random_f32_around_zero(params.moveAngleRange))
+            s16(newObj.rawData[oMoveAngleYaw] + random_f32_around_zero(params.moveAngleRange))
     }
 
     if (params.flags & WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL) {
@@ -248,6 +260,16 @@ export const obj_translate_xz_random = (obj, rangeLength) => {
     obj.rawData[oPosZ] += Math.random() * rangeLength - rangeLength * 0.5
 }
 
+export const obj_update_pos_from_parent_transformation = (a0, a1) => {
+    const spC = a1.rawData[oParentRelativePosX]
+    const sp8 = a1.rawData[oParentRelativePosY]
+    const sp4 = a1.rawData[oParentRelativePosZ]
+
+    a1.rawData[oPosX] = spC * a0[0][0] + sp8 * a0[1][0] + sp4 * a0[2][0] + a0[3][0]
+    a1.rawData[oPosY] = spC * a0[0][1] + sp8 * a0[1][1] + sp4 * a0[2][1] + a0[3][1]
+    a1.rawData[oPosZ] = spC * a0[0][2] + sp8 * a0[1][2] + sp4 * a0[2][2] + a0[3][2]
+}
+
 export const obj_apply_scale_to_matrix = (obj, dst, src) => {
     dst[0][0] = src[0][0] * obj.header.gfx.scale[0]
     dst[1][0] = src[1][0] * obj.header.gfx.scale[1]
@@ -270,6 +292,36 @@ export const obj_apply_scale_to_matrix = (obj, dst, src) => {
     dst[3][3] = src[3][3]
 }
 
+
+export const create_transformation_from_matrices = (a0, a1, a2) => {
+    let spC, sp8, sp4
+
+    spC = a2[3][0] * a2[0][0] + a2[3][1] * a2[0][1] + a2[3][2] * a2[0][2]
+    sp8 = a2[3][0] * a2[1][0] + a2[3][1] * a2[1][1] + a2[3][2] * a2[1][2]
+    sp4 = a2[3][0] * a2[2][0] + a2[3][1] * a2[2][1] + a2[3][2] * a2[2][2]
+
+    a0[0][0] = a1[0][0] * a2[0][0] + a1[0][1] * a2[0][1] + a1[0][2] * a2[0][2]
+    a0[0][1] = a1[0][0] * a2[1][0] + a1[0][1] * a2[1][1] + a1[0][2] * a2[1][2]
+    a0[0][2] = a1[0][0] * a2[2][0] + a1[0][1] * a2[2][1] + a1[0][2] * a2[2][2]
+
+    a0[1][0] = a1[1][0] * a2[0][0] + a1[1][1] * a2[0][1] + a1[1][2] * a2[0][2]
+    a0[1][1] = a1[1][0] * a2[1][0] + a1[1][1] * a2[1][1] + a1[1][2] * a2[1][2]
+    a0[1][2] = a1[1][0] * a2[2][0] + a1[1][1] * a2[2][1] + a1[1][2] * a2[2][2]
+
+    a0[2][0] = a1[2][0] * a2[0][0] + a1[2][1] * a2[0][1] + a1[2][2] * a2[0][2]
+    a0[2][1] = a1[2][0] * a2[1][0] + a1[2][1] * a2[1][1] + a1[2][2] * a2[1][2]
+    a0[2][2] = a1[2][0] * a2[2][0] + a1[2][1] * a2[2][1] + a1[2][2] * a2[2][2]
+
+    a0[3][0] = a1[3][0] * a2[0][0] + a1[3][1] * a2[0][1] + a1[3][2] * a2[0][2] - spC
+    a0[3][1] = a1[3][0] * a2[1][0] + a1[3][1] * a2[1][1] + a1[3][2] * a2[1][2] - sp8
+    a0[3][2] = a1[3][0] * a2[2][0] + a1[3][1] * a2[2][1] + a1[3][2] * a2[2][2] - sp4
+
+    a0[0][3] = 0
+    a0[1][3] = 0
+    a0[2][3] = 0
+    a0[3][3] = 1.0
+}
+
 export const obj_build_transform_from_pos_and_angle = (obj, posIndex, angleIndex) => {
     const translate = new Array(3)
     const rotation = new Array(3)
@@ -284,7 +336,7 @@ export const obj_build_transform_from_pos_and_angle = (obj, posIndex, angleIndex
 
     mtxf_rotate_zxy_and_translate(obj.transform, translate, rotation)
 
-} 
+}
 
 const obj_translate_local = (obj, posIndex, localTranslateIndex) => {
     const dx = obj.rawData[localTranslateIndex + 0]
@@ -315,12 +367,12 @@ export const linear_mtxf_transpose_mul_vec3f = (m, dst, v) => {
 
 export const cur_obj_reflect_move_angle_off_wall = () => {
     const o = ObjectListProc.gCurrentObject
-    return int16(o.rawData[oWallAngle] - (int16(o.rawData[oMoveAngleYaw]) - int16(o.rawData[oWallAngle])) + 0x8000)
+    return s16(o.rawData[oWallAngle] - (s16(o.rawData[oMoveAngleYaw]) - s16(o.rawData[oWallAngle])) + 0x8000)
 }
 
 
 export const approach_symmetric = (value, target, increment) => {
-    const dist = int16(target - value)
+    const dist = s16(target - value)
 
     if (dist >= 0) {
         if (dist > increment) {
@@ -337,6 +389,26 @@ export const approach_symmetric = (value, target, increment) => {
     }
 
     return value
+}
+
+export const approach_s16_symmetric = (value, target, increment) =>{
+    let dist = target - value;
+
+    if (dist >= 0) {
+        if (dist > increment) {
+            value += increment;
+        } else {
+            value = target;
+        }
+    } else {
+        if (dist < -increment) {
+            value -= increment;
+        } else {
+            value = target;
+        }
+    }
+
+    return value;
 }
 
 export const cur_obj_forward_vel_approach_upward = (target, increment) => {
@@ -460,6 +532,13 @@ export const cur_obj_update_floor = () => {
 
 }
 
+export const cur_obj_call_action_function = (actionFunctions) => {
+    const o = ObjectListProc.gCurrentObject
+    const actionFunction = actionFunctions[o.rawData[oAction]]
+    actionFunction()
+}
+
+
 export const cur_obj_if_hit_wall_bounce_away = () => {
     const o = ObjectListProc.gCurrentObject
 
@@ -515,7 +594,7 @@ export const cur_obj_rotate_yaw_toward = (target, increment) => {
 
     const o = ObjectListProc.gCurrentObject
 
-    const startYaw = parseInt(o.rawData[oMoveAngleYaw]) 
+    const startYaw = parseInt(o.rawData[oMoveAngleYaw])
     o.rawData[oMoveAngleYaw] = approach_symmetric(o.rawData[oMoveAngleYaw], target, increment)
 
     o.rawData[oAngleVelYaw] = parseInt(o.rawData[oMoveAngleYaw] - startYaw)
@@ -612,7 +691,7 @@ export const cur_obj_move_xz = (steepSlopeNormalY, careAboutEdgesAndSteepSlopes)
     const deltaFloorHeight = intendedFloorHeight - o.rawData[oFloorHeight]
 
 
-    o.rawData[oMoveFlags] &= ~OBJ_MOVE_HIT_EDGE 
+    o.rawData[oMoveFlags] &= ~OBJ_MOVE_HIT_EDGE
 
     if (o.rawData[oRoom] != -1 && intendedFloorWrapper.floor) {
         if (intendedFloorWrapper.floor.room != 0 && o.rawData[oRoom] != intendedFloorWrapper.floor.room && intendedFloorWrapper.floor.room != 18) {
@@ -765,7 +844,6 @@ export const cur_obj_is_mario_ground_pounding_platform = () => {
 }
 
 export const obj_turn_toward_object = (obj, target, angleIndex, turnAmount) => {
-
     const o = ObjectListProc.gCurrentObject
 
     let targetAngle, a, b, c, d
@@ -793,13 +871,12 @@ export const obj_turn_toward_object = (obj, target, angleIndex, turnAmount) => {
             break
     }
 
-    const startAngle = int16(o.rawData[angleIndex])
+    const startAngle = s16(o.rawData[angleIndex])
     o.rawData[angleIndex] = approach_symmetric(startAngle, targetAngle, turnAmount)
     return targetAngle
 }
 
 export const obj_attack_collided_from_other_object = (obj) => {
-
     if (obj.numCollidedObjs != 0) {
         const other = obj.collidedObjs[0]
 
@@ -810,8 +887,25 @@ export const obj_attack_collided_from_other_object = (obj) => {
     }
 
     return 0
-
 }
+
+export const cur_obj_was_attacked_or_ground_pounded = () => {
+    const o = ObjectListProc.gCurrentObject
+    let attacked = 0
+
+    if ((o.rawData[oInteractStatus] & INT_STATUS_INTERACTED)
+        && (o.rawData[oInteractStatus] & INT_STATUS_WAS_ATTACKED)) {
+        attacked = 1
+    }
+
+    if (cur_obj_is_mario_ground_pounding_platform()) {
+        attacked = 1
+    }
+
+    o.rawData[oInteractStatus] = 0
+    return attacked
+}
+
 
 export const spawn_object_relative = (behaviorParam, relativePosX, relativePosY, relativePosZ, parent, model, behavior) => {
 
@@ -840,12 +934,34 @@ export const spawn_object = (parent, model, behavior) => {
     return obj
 }
 
+
+export const cur_obj_rotate_move_angle_using_vel = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oMoveAnglePitch] = s16(o.rawData[oMoveAnglePitch] + o.rawData[oAngleVelPitch])
+    o.rawData[oMoveAngleYaw]   = s16(o.rawData[oMoveAngleYaw]   + o.rawData[oAngleVelYaw])
+    o.rawData[oMoveAngleRoll]  = s16(o.rawData[oMoveAngleRoll]  + o.rawData[oAngleVelRoll])
+}
+
+export const cur_obj_rotate_face_angle_using_vel = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oFaceAnglePitch] = s16(o.rawData[oFaceAnglePitch] + o.rawData[oAngleVelPitch])
+    o.rawData[oFaceAngleYaw]   = s16(o.rawData[oFaceAngleYaw]   + o.rawData[oAngleVelYaw])
+    o.rawData[oFaceAngleRoll]  = s16(o.rawData[oFaceAngleRoll]  + o.rawData[oAngleVelRoll])
+}
+
+export const cur_obj_set_face_angle_to_move_angle = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oFaceAnglePitch] = o.rawData[oMoveAnglePitch]
+    o.rawData[oFaceAngleYaw]   = o.rawData[oMoveAngleYaw]
+    o.rawData[oFaceAngleRoll]  = o.rawData[oMoveAngleRoll]
+}
+
+
 export const random_f32_around_zero = (diameter) => {
     return random_float() * diameter - diameter / 2
 }
 
 export const cur_obj_spawn_particles = (info) => {
-
     const o = ObjectListProc.gCurrentObject
 
     let numParticles = info.count
@@ -939,6 +1055,16 @@ export const cur_obj_within_12k_bounds = () => {
     return 1
 }
 
+export const cur_obj_enable_rendering = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.header.gfx.node.flags |= GRAPH_RENDER_ACTIVE
+}
+
+export const cur_obj_disable_rendering = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE
+}
+
 export const cur_obj_become_tangible = () => {
     const o = ObjectListProc.gCurrentObject
     o.rawData[oIntangibleTimer] = 0
@@ -987,6 +1113,12 @@ export const obj_translate_xyz_random = (obj, rangeLength) => {
     obj.rawData[oPosX] += random_float() * rangeLength - rangeLength * 0.5
     obj.rawData[oPosY] += random_float() * rangeLength - rangeLength * 0.5
     obj.rawData[oPosZ] += random_float() * rangeLength - rangeLength * 0.5
+}
+
+export const obj_set_gfx_pos_from_pos = (obj) => {
+    obj.header.gfx.pos[0] = obj.rawData[oPosX]
+    obj.header.gfx.pos[1] = obj.rawData[oPosY]
+    obj.header.gfx.pos[2] = obj.rawData[oPosZ]
 }
 
 export const cur_obj_init_animation = (animIndex) => {
@@ -1083,6 +1215,13 @@ export const dist_between_objects = (obj1, obj2) => {
     return Math.sqrt(dx * dx + dy * dy + dz * dz)
 }
 
+
+export const lateral_dist_between_objects = (obj1, obj2) => {
+    const dx = obj1.rawData[oPosX] - obj2.rawData[oPosX]
+    const dz = obj1.rawData[oPosZ] - obj2.rawData[oPosZ]
+    return Math.sqrt(dx * dx + dz * dz)
+}
+
 export const obj_angle_to_object = (obj1, obj2) => {
     const x1 = obj1.rawData[oPosX], z1 = obj1.rawData[oPosZ]
     const x2 = obj2.rawData[oPosX], z2 = obj2.rawData[oPosZ]
@@ -1139,4 +1278,25 @@ export const cur_obj_wait_then_blink = (timeUntilBlinking, numBlinks) => {
     }
 
     return done
+}
+
+export const obj_set_behavior = (obj, behavior) => {
+    obj.behavior = behavior
+}
+
+export const cur_obj_has_behavior = (behavior) => {
+    const o = ObjectListProc.gCurrentObject
+    if (o.behavior == behavior) {
+        return true
+    } else {
+        return false
+    }
+}
+
+export const obj_has_behavior = (obj, behavior) => {
+    if (obj.behavior == behavior) {
+        return true
+    } else {
+        return false
+    }
 }

@@ -111,6 +111,7 @@ class ObjectListProcessor {
         this.gObjectCounter = 0
         this.gCCMEnteredSlide = 0
         this.gCheckingSurfaceCollisionsForCamera = 0
+        this.gMarioShotFromCannon = 0
         this.gObjectLists = new Array(13).fill(0).map(() => { 
 
             const blankObj = { gfx: {} }
@@ -227,9 +228,7 @@ class ObjectListProcessor {
         }
         this.sParticleTypes.forEach(particleType => {
             if (particleFlags & particleType.particleFlag) {
-                if (particleType.behavior) {  // during development some particles aren't implemented
-                    this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
-                }
+                this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
             }
         })
     }

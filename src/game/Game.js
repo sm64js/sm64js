@@ -1,5 +1,6 @@
 import { level_script_entry } from "../levels/main_entry/entry"
 import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
+import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
 import * as Gbi from "../include/gbi"
 
 class Game {
@@ -86,6 +87,14 @@ class Game {
             this.D_8032C6A0_vsyncFunc = null
         }
         window.gGlobalTimer++
+    }
+
+    snapshot_location() {
+        return {
+            x: LevelUpdate.gMarioState.pos[0],
+            y: LevelUpdate.gMarioState.pos[1],
+            z: LevelUpdate.gMarioState.pos[2]
+        }
     }
 }
 

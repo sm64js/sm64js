@@ -1,3 +1,4 @@
+import { raise_background_noise, play_infinite_stairs_music } from "./SoundInit"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { AreaInstance as Area } from "./Area"
 import { MarioMiscInstance as MarioMisc } from "./MarioMisc"
@@ -19,6 +20,52 @@ import * as Interact from "./Interaction"
 import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
 import { int16, sins, coss } from "../utils"
 import * as MarioConstants from "../include/mario_constants"
+import { gAudioRandom } from "../audio/data"
+import { SOUND_BANK_MOVING,
+         SOUND_TERRAIN_WATER,
+         SOUND_TERRAIN_SAND,
+         SOUND_TERRAIN_SNOW,
+         SOUND_ACTION_UNSTUCK_FROM_GROUND,
+         SOUND_MARIO_PUNCH_HOO,
+         SOUND_TERRAIN_DEFAULT,
+         SOUND_TERRAIN_GRASS,
+         SOUND_TERRAIN_ICE,
+         SOUND_TERRAIN_SPOOKY,
+         SOUND_TERRAIN_STONE,
+         SOUND_ACTION_METAL_LANDING,
+         SOUND_ACTION_METAL_HEAVY_LANDING,
+         SOUND_ACTION_METAL_JUMP,
+         SOUND_ACTION_TERRAIN_JUMP,
+         SOUND_ENV_WIND2,
+         SOUND_MARIO_YAH_WAH_HOO,
+         SOUND_MARIO_YAHOO_WAHA_YIPPEE } from "../include/sounds"
+import { play_sound,
+         set_sound_moving_speed } from "../audio/external"
+import { TERRAIN_MASK,
+         TERRAIN_SNOW,
+         TERRAIN_SAND,
+         SURFACE_HARD,
+         SURFACE_HARD_SLIPPERY,
+         SURFACE_IS_NOT_HARD,
+         SURFACE_IS_QUICKSAND,
+         SURFACE_SLIPPERY,
+         SURFACE_NOT_SLIPPERY,
+         SURFACE_HARD_NOT_SLIPPERY,
+         SURFACE_SWITCH,
+         SURFACE_NO_CAM_COL_SLIPPERY,
+         SURFACE_VERY_SLIPPERY,
+         SURFACE_ICE,
+         SURFACE_HARD_VERY_SLIPPERY,
+         SURFACE_NOISE_VERY_SLIPPERY_73,
+         SURFACE_NOISE_VERY_SLIPPERY_74,
+         SURFACE_NOISE_VERY_SLIPPERY,
+         SURFACE_NO_CAM_COL_VERY_SLIPPERY,
+         SURFACE_NOISE_DEFAULT,
+         SURFACE_NOISE_SLIPPERY } from "../include/surface_terrains"
+
+import { LEVEL_LLL
+
+} from "../levels/level_defines_constants"
 
 ////// Mario Constants
 export const ANIM_FLAG_NOLOOP = (1 << 0) // 0x01
@@ -765,8 +812,139 @@ export const return_mario_anim_y_translation = (m) => {
     return translation[1]
 }
 
-export const check_common_action_exits = (m) => {
 
+/**************************************************
+ *                      AUDIO                     *
+ **************************************************/
+
+/**
+ * Plays a sound if if Mario doesn't have the flag being checked.
+ */
+export const play_sound_if_no_flag = (m, soundBits, flags) => {
+    if (!(m.flags & flags)) {
+        play_sound(soundBits, m.marioObj.header.gfx.cameraToObject)
+        m.flags |= flags
+    }
+}
+
+/**
+ * Plays a jump sound if one has not been played since the last action change.
+ */
+export const play_mario_jump_sound = (m) => {
+    if (!(m.flags & MARIO_MARIO_SOUND_PLAYED)) {
+        if (m.action == ACT_TRIPLE_JUMP) {
+            play_sound(SOUND_MARIO_YAHOO_WAHA_YIPPEE + ((gAudioRandom % 5) << 16),
+                       m.marioObj.header.gfx.cameraToObject)
+        } else {
+            play_sound(SOUND_MARIO_YAH_WAH_HOO + ((gAudioRandom % 3) << 16),
+                       m.marioObj.header.gfx.cameraToObject)
+        }
+        m.flags |= MARIO_MARIO_SOUND_PLAYED
+    }
+}
+
+/**
+ * Adjusts the volume/pitch of sounds from Mario's speed.
+ */
+export const adjust_sound_for_speed = (m) => {
+    let absForwardVel = (m.forwardVel > 0.0) ? m.forwardVel : -m.forwardVel
+    set_sound_moving_speed(SOUND_BANK_MOVING, (absForwardVel > 100) ? 100 : absForwardVel)
+}
+
+/**
+ * Spawns particles if the step sound says to, then either plays a step sound or relevant other sound.
+ */
+export const play_sound_and_spawn_particles = (m, soundBits, waveParticleType) => {
+    if (m.terrainSoundAddend == (SOUND_TERRAIN_WATER << 16)) {
+        if (waveParticleType != 0) {
+            m.particleFlags |= MarioConstants.PARTICLE_SHALLOW_WATER_SPLASH
+        } else {
+            m.particleFlags |= MarioConstants.PARTICLE_SHALLOW_WATER_WAVE
+        }
+    } else {
+        if (m.terrainSoundAddend == (SOUND_TERRAIN_SAND << 16)) {
+            m.particleFlags |= MarioConstants.PARTICLE_DIRT
+        } else if (m.terrainSoundAddend == (SOUND_TERRAIN_SNOW << 16)) {
+            m.particleFlags |= MarioConstants.PARTICLE_SNOW
+        }
+    }
+
+    if ((m.flags & MARIO_METAL_CAP) || soundBits == SOUND_ACTION_UNSTUCK_FROM_GROUND
+        || soundBits == SOUND_MARIO_PUNCH_HOO) {
+        play_sound(soundBits, m.marioObj.header.gfx.cameraToObject)
+    } else {
+        play_sound(m.terrainSoundAddend + soundBits, m.marioObj.header.gfx.cameraToObject)
+    }
+}
+
+/**
+ * Plays an environmental sound if one has not been played since the last action change.
+ */
+export const play_mario_action_sound = (m, soundBits, waveParticleType) => {
+    if (!(m.flags & MARIO_ACTION_SOUND_PLAYED)) {
+        play_sound_and_spawn_particles(m, soundBits, waveParticleType)
+        m.flags |= MARIO_ACTION_SOUND_PLAYED
+    }
+}
+
+/**
+ * Plays a landing sound, accounting for metal cap.
+ */
+export const play_mario_landing_sound = (m, soundBits) => {
+    play_sound_and_spawn_particles(
+        m, (m.flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_LANDING : soundBits, 1)
+}
+
+/**
+ * Plays a landing sound, accounting for metal cap. Unlike play_mario_landing_sound,
+ * this function uses play_mario_action_sound, making sure the sound is only
+ * played once per action.
+ */
+export const play_mario_landing_sound_once = (m, soundBits) => {
+    play_mario_action_sound(
+        m, (m.flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_LANDING : soundBits, 1)
+}
+
+/**
+ * Plays a heavy landing (ground pound, etc.) sound, accounting for metal cap.
+ */
+export const play_mario_heavy_landing_sound = (m, soundBits) => {
+    play_sound_and_spawn_particles(
+        m, (m.flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_HEAVY_LANDING : soundBits, 1)
+}
+
+/**
+ * Plays a heavy landing (ground pound, etc.) sound, accounting for metal cap.
+ * Unlike play_mario_heavy_landing_sound, this function uses play_mario_action_sound,
+ * making sure the sound is only played once per action.
+ */
+export const play_mario_heavy_landing_sound_once = (m, soundBits) => {
+    play_mario_action_sound(
+        m, (m.flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_HEAVY_LANDING : soundBits, 1)
+}
+
+/**
+ * Plays action and Mario sounds relevant to what was passed into the function.
+ */
+export const play_mario_sound = (m, actionSound, marioSound) => {
+    if (actionSound == SOUND_ACTION_TERRAIN_JUMP) {
+        play_mario_action_sound(m, (m.flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_JUMP
+                                                                : SOUND_ACTION_TERRAIN_JUMP, 1)
+    } else {
+        play_sound_if_no_flag(m, actionSound, MARIO_ACTION_SOUND_PLAYED)
+    }
+
+    if (marioSound == 0) {
+        play_mario_jump_sound(m)
+    }
+
+    if (marioSound != -1) {
+        play_sound_if_no_flag(m, marioSound, MARIO_MARIO_SOUND_PLAYED)
+    }
+}
+
+
+export const check_common_action_exits = (m) => {
     if (m.input & INPUT_A_PRESSED) {
         return set_mario_action(m, ACT_JUMP, 0)
     }
@@ -801,6 +979,28 @@ export const set_jumping_action = (m, action, actionArg) => {
 
     return 1
 }
+
+
+export const update_mario_sound_and_camera = (m) => {
+    let action = m.action
+    let camPreset = m.area.camera.mode
+
+    if (action == ACT_FIRST_PERSON) {
+        raise_background_noise(2)
+        Camera.gCameraMovementFlags &= ~Camera.CAM_MOVE_C_UP_MODE
+        // Go back to the last camera mode
+        Camera.set_camera_mode(m.area.camera, -1, 1)
+    } else if (action == ACT_SLEEPING) {
+        raise_background_noise(2)
+    }
+
+    if (!(action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER))) {
+        if (camPreset == CAMERA_MODE_BEHIND_MARIO || camPreset == CAMERA_MODE_WATER_SURFACE) {
+            Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
+        }
+    }
+}
+
 
 const set_steep_jump_action = (m) => {
     m.marioObj.rawData[oMarioSteepJumpYaw] = m.faceAngle[1]
@@ -848,62 +1048,96 @@ export const set_jump_from_landing = (m) => {
     return 1
 }
 
-export const set_mario_action = (m, action, actionArg) => {
+/**
+ * Transitions for a variety of airborne actions.
+ */
+export const set_mario_action_airborne = (m, action, actionArg) => {
+    let fowardVel
 
-    switch (action & ACT_GROUP_MASK) {
-        case ACT_GROUP_MOVING:
-            action = set_mario_action_moving(m, action, actionArg); break
-        case ACT_GROUP_AIRBORNE:
-            action = set_mario_action_airborne(m, action, actionArg); break
+    if ((m.squishTimer != 0 || m.quicksandDepth >= 1.0)
+        && (action == ACT_DOUBLE_JUMP || action == ACT_TWIRLING)) {
+        action = ACT_JUMP
     }
 
-    m.flags &= ~(MARIO_ACTION_SOUND_PLAYED | MARIO_MARIO_SOUND_PLAYED)
-
-    m.prevAction = m.action
-    m.action = action
-    m.actionArg = actionArg
-    m.actionState = 0
-    m.actionTimer = 0
-
-    return 1
-}
-
-export const set_mario_action_airborne = (m, action, actionArg) => {
     switch (action) {
-        case ACT_JUMP:
-            m.marioObj.header.gfx.unk38.animID = -1
-            set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
-            m.forwardVel *= 0.8
-            break
-        case ACT_SIDE_FLIP:
-            set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
-            m.forwardVel = 8.0
-            m.faceAngle[1] = m.intendedYaw
-            break
-        case ACT_STEEP_JUMP:
-            m.marioObj.header.gfx.unk38.animID = -1
-            set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
-            m.faceAngle[0] = -0x2000
-            break
         case ACT_DOUBLE_JUMP:
             set_mario_y_vel_based_on_fspeed(m, 52.0, 0.25)
             m.forwardVel *= 0.8
             break
-        case ACT_TRIPLE_JUMP:
-            set_mario_y_vel_based_on_fspeed(m, 69.0, 0.0)
-            m.forwardVel *= 0.8
-            break
-        case ACT_WALL_KICK_AIR:
-        case ACT_TOP_OF_POLE_JUMP:
-            set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
-            if (m.forwardVel < 24.0) m.forwardVel = 24.0
-            m.wallKickTimer = 0
-            break
+
         case ACT_BACKFLIP:
             m.marioObj.header.gfx.unk38.animID = -1
             m.forwardVel = -16.0
             set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
             break
+
+        case ACT_TRIPLE_JUMP:
+            set_mario_y_vel_based_on_fspeed(m, 69.0, 0.0)
+            m.forwardVel *= 0.8
+            break
+
+        case ACT_FLYING_TRIPLE_JUMP:
+            set_mario_y_vel_based_on_fspeed(m, 82.0, 0.0)
+            break
+
+        case ACT_WATER_JUMP:
+        case ACT_HOLD_WATER_JUMP:
+            if (actionArg == 0) {
+                set_mario_y_vel_based_on_fspeed(m, 42.0, 0.0)
+            }
+            break
+
+        case ACT_BURNING_JUMP:
+            m.vel[1] = 31.5
+            m.forwardVel = 8.0
+            break
+
+        case ACT_RIDING_SHELL_JUMP:
+            set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
+            break
+
+        case ACT_JUMP:
+        case ACT_HOLD_JUMP:
+            m.marioObj.header.gfx.unk38.animID = -1
+            set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
+            m.forwardVel *= 0.8
+            break
+
+        case ACT_WALL_KICK_AIR:
+        case ACT_TOP_OF_POLE_JUMP:
+            set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
+            if (m.forwardVel < 24.0) {
+                m.forwardVel = 24.0
+            }
+            m.wallKickTimer = 0
+            break
+
+        case ACT_SIDE_FLIP:
+            set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
+            m.forwardVel = 8.0
+            m.faceAngle[1] = m.intendedYaw
+            break
+
+        case ACT_STEEP_JUMP:
+            m.marioObj.header.gfx.unk38.animID = -1
+            set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
+            m.faceAngle[0] = -0x2000
+            break
+
+        case ACT_LAVA_BOOST:
+            m.vel[1] = 84.0
+            if (actionArg == 0) {
+                m.forwardVel = 0.0
+            }
+            break
+
+        case ACT_DIVE:
+            if ((fowardVel = m.forwardVel + 15.0) > 48.0) {
+                fowardVel = 48.0
+            }
+            mario_set_forward_vel(m, fowardVel)
+            break
+
         case ACT_LONG_JUMP:
             m.marioObj.header.gfx.unk38.animID = -1
             set_mario_y_vel_based_on_fspeed(m, 30.0, 0.0)
@@ -915,22 +1149,18 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
                 m.forwardVel = 48.0
             }
             break
-        case ACT_JUMP_KICK:
-            m.vel[1] = 20.0
-            break
-        case ACT_DIVE:
-            let forwardVel = m.forwardVel + 15.0
-            if (forwardVel > 48.0) {
-                forwardVel = 48.0
-            }
-            set_forward_vel(m, forwardVel)
-            break
+
         case ACT_SLIDE_KICK:
             m.vel[1] = 12.0
             if (m.forwardVel < 32.0) {
                 m.forwardVel = 32.0
             }
             break
+
+        case ACT_JUMP_KICK:
+            m.vel[1] = 20.0
+            break
+
     }
 
     m.peakHeight = m.pos[1]
@@ -939,6 +1169,9 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
     return action
 }
 
+/**
+ * Transitions for a variety of moving actions.
+ */
 export const set_mario_action_moving = (m, action, actionArg) => {
     const floorClass = mario_get_floor_class(m)
     const forwardVel = m.forwardVel
@@ -954,16 +1187,107 @@ export const set_mario_action_moving = (m, action, actionArg) => {
 
             m.marioObj.rawData[oMarioWalkingPitch] = 0
             break
+
+        case ACT_HOLD_WALKING:
+            if (0.0 <= forwardVel && forwardVel < mag / 2.0) {
+                m.forwardVel = mag / 2.0
+            }
+            break
+
         case ACT_BEGIN_SLIDING:
             if (mario_facing_downhill(m, false)) {
-                action = ACT_BUTT_SLIDE;
+                action = ACT_BUTT_SLIDE
             } else {
-                action = ACT_STOMACH_SLIDE;
+                action = ACT_STOMACH_SLIDE
             }
-            break;
+            break
+
+        case ACT_HOLD_BEGIN_SLIDING:
+            if (mario_facing_downhill(m, FALSE)) {
+                action = ACT_HOLD_BUTT_SLIDE
+            } else {
+                action = ACT_HOLD_STOMACH_SLIDE
+            }
+            break
     }
 
     return action
+}
+
+
+/**
+ * Transition for certain submerged actions, which is actually just the metal jump actions.
+ */
+export const set_mario_action_submerged = (m, action, actionArg) => {
+    if (action == ACT_METAL_WATER_JUMP || action == ACT_HOLD_METAL_WATER_JUMP) {
+        m.vel[1] = 32.0
+    }
+
+    return action
+}
+
+/**
+ * Transitions for a variety of cutscene actions.
+ */
+export const set_mario_action_cutscene = (m, action, actionArg) => {
+    switch (action) {
+        case ACT_EMERGE_FROM_PIPE:
+            m.vel[1] = 52.0
+            break
+
+        case ACT_FALL_AFTER_STAR_GRAB:
+            mario_set_forward_vel(m, 0.0)
+            break
+
+        case ACT_SPAWN_SPIN_AIRBORNE:
+            mario_set_forward_vel(m, 2.0)
+            break
+
+        case ACT_SPECIAL_EXIT_AIRBORNE:
+        case ACT_SPECIAL_DEATH_EXIT:
+            m.vel[1] = 64.0
+            break
+    }
+
+    return action
+}
+
+/**
+ * Puts Mario into a given action, putting Mario through the appropriate
+ * specific function if needed.
+ */
+export const set_mario_action = (m, action, actionArg) => {
+    switch (action & ACT_GROUP_MASK) {
+        case ACT_GROUP_MOVING:
+            action = set_mario_action_moving(m, action, actionArg)
+            break
+
+        case ACT_GROUP_AIRBORNE:
+            action = set_mario_action_airborne(m, action, actionArg)
+            break
+
+        case ACT_GROUP_SUBMERGED:
+            action = set_mario_action_submerged(m, action, actionArg)
+            break
+
+        case ACT_GROUP_CUTSCENE:
+            action = set_mario_action_cutscene(m, action, actionArg)
+            break
+    }
+
+    m.flags &= ~(MARIO_ACTION_SOUND_PLAYED | MARIO_MARIO_SOUND_PLAYED)
+
+    if (!(m.action & ACT_FLAG_AIR)) {
+        m.flags &= ~MARIO_UNKNOWN_18
+    }
+
+    m.prevAction = m.action
+    m.action = action
+    m.actionArg = actionArg
+    m.actionState = 0
+    m.actionTimer = 0
+
+    return 1
 }
 
 export const set_mario_animation = (m, targetAnimID) => {
@@ -1091,7 +1415,6 @@ const mario_reset_bodystate = (m) => {
 
 export const execute_mario_action = () => {
     if (LevelUpdate.gMarioState.action) {
-
         LevelUpdate.gMarioState.marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
         mario_reset_bodystate(LevelUpdate.gMarioState)
         update_mario_inputs(LevelUpdate.gMarioState)
@@ -1103,36 +1426,62 @@ export const execute_mario_action = () => {
         while (inLoop) {
             switch (LevelUpdate.gMarioState.action & ACT_GROUP_MASK) {
                 case ACT_GROUP_STATIONARY:
-                    inLoop = mario_execute_stationary_action(LevelUpdate.gMarioState); break
+                    inLoop = mario_execute_stationary_action(LevelUpdate.gMarioState)
+                    break
 
                 case ACT_GROUP_MOVING:
-                    inLoop = mario_execute_moving_action(LevelUpdate.gMarioState); break
+                    inLoop = mario_execute_moving_action(LevelUpdate.gMarioState)
+                    break
 
                 case ACT_GROUP_AIRBORNE:
-                    inLoop = mario_execute_airborne_action(LevelUpdate.gMarioState); break
-
-                case ACT_GROUP_OBJECT:
-                    inLoop = mario_execute_object_action(LevelUpdate.gMarioState); break
-
-                case ACT_GROUP_AUTOMATIC:
-                    inLoop = mario_execute_automatic_action(LevelUpdate.gMarioState); break
+                    inLoop = mario_execute_airborne_action(LevelUpdate.gMarioState)
+                    break
 
                 case ACT_GROUP_SUBMERGED:
-                    inLoop = mario_execute_submerged_action(LevelUpdate.gMarioState); break
-              
+                    inLoop = mario_execute_submerged_action(LevelUpdate.gMarioState)
+                    break
+
+                // case ACT_GROUP_CUTSCENE:
+                //     inLoop = mario_execute_cutscene_action(LevelUpdate.gMarioState)
+                //     break
+
+                case ACT_GROUP_AUTOMATIC:
+                    inLoop = mario_execute_automatic_action(LevelUpdate.gMarioState)
+                    break
+
+                case ACT_GROUP_OBJECT:
+                    inLoop = mario_execute_object_action(LevelUpdate.gMarioState)
+                    break
+
                 default: throw "unkown action group"
             }
         }
 
+        // sink_mario_in_quicksand(LevelUpdate.gMarioState)
+        // squish_mario_model(LevelUpdate.gMarioState)
         set_submerged_cam_preset_and_spawn_bubbles(LevelUpdate.gMarioState)
         update_mario_health(LevelUpdate.gMarioState)
         update_mario_info_for_cam(LevelUpdate.gMarioState)
         mario_update_hitbox_and_cap_model(LevelUpdate.gMarioState)
 
+        if (LevelUpdate.gMarioState.floor.type == SurfaceTerrains.SURFACE_HORIZONTAL_WIND) {
+            // spawn_wind_particles(0, (LevelUpdate.gMarioState.floor.force << 8))
+            play_sound(SOUND_ENV_WIND2, LevelUpdate.gMarioState.marioObj.header.gfx.cameraToObject);
+        }
+
+        if (LevelUpdate.gMarioState.floor.type == SurfaceTerrains.SURFACE_VERTICAL_WIND) {
+            // spawn_wind_particles(1, 0)
+            play_sound(SOUND_ENV_WIND2, LevelUpdate.gMarioState.marioObj.header.gfx.cameraToObject);
+        }
+
+        play_infinite_stairs_music()
+
         LevelUpdate.gMarioState.marioObj.rawData[oInteractStatus] = 0
 
         return LevelUpdate.gMarioState.particleFlags
     }
+
+    return 0
 }
 
 const mario_update_hitbox_and_cap_model = (m) => {
@@ -1408,6 +1757,23 @@ export const mario_floor_is_steep = (m) => {
     return result
 }
 
+/**************************************************
+ *                     ACTIONS                    *
+ **************************************************/
+
+/**
+ * Sets Mario's other velocities from his forward speed.
+ */
+export const mario_set_forward_vel = (m, forwardVel) => {
+    m.forwardVel = forwardVel
+
+    m.slideVelX = sins(m.faceAngle[1]) * m.forwardVel
+    m.slideVelZ = coss(m.faceAngle[1]) * m.forwardVel
+
+    m.vel[0] = m.slideVelX
+    m.vel[2] = m.slideVelZ
+}
+
 export const mario_get_floor_class = (m) => {
     let floorClass
 
@@ -1453,6 +1819,88 @@ export const mario_get_floor_class = (m) => {
     }
 
     return floorClass
+}
+
+const sTerrainSounds = [
+    // default,              hard,                 slippery,
+    // very slippery,        noisy default,        noisy slippery
+    [ SOUND_TERRAIN_DEFAULT, SOUND_TERRAIN_STONE,  SOUND_TERRAIN_GRASS,
+      SOUND_TERRAIN_GRASS,   SOUND_TERRAIN_GRASS,  SOUND_TERRAIN_DEFAULT ], // TERRAIN_GRASS
+    [ SOUND_TERRAIN_STONE,   SOUND_TERRAIN_STONE,  SOUND_TERRAIN_STONE,
+      SOUND_TERRAIN_STONE,   SOUND_TERRAIN_GRASS,  SOUND_TERRAIN_GRASS ], // TERRAIN_STONE
+    [ SOUND_TERRAIN_SNOW,    SOUND_TERRAIN_ICE,    SOUND_TERRAIN_SNOW,
+      SOUND_TERRAIN_ICE,     SOUND_TERRAIN_STONE,  SOUND_TERRAIN_STONE ], // TERRAIN_SNOW
+    [ SOUND_TERRAIN_SAND,    SOUND_TERRAIN_STONE,  SOUND_TERRAIN_SAND,
+      SOUND_TERRAIN_SAND,    SOUND_TERRAIN_STONE,  SOUND_TERRAIN_STONE ], // TERRAIN_SAND
+    [ SOUND_TERRAIN_SPOOKY,  SOUND_TERRAIN_SPOOKY, SOUND_TERRAIN_SPOOKY,
+      SOUND_TERRAIN_SPOOKY,  SOUND_TERRAIN_STONE,  SOUND_TERRAIN_STONE ], // TERRAIN_SPOOKY
+    [ SOUND_TERRAIN_DEFAULT, SOUND_TERRAIN_STONE,  SOUND_TERRAIN_GRASS,
+      SOUND_TERRAIN_ICE,     SOUND_TERRAIN_STONE,  SOUND_TERRAIN_ICE ], // TERRAIN_WATER
+    [ SOUND_TERRAIN_STONE,   SOUND_TERRAIN_STONE,  SOUND_TERRAIN_STONE,
+      SOUND_TERRAIN_STONE,   SOUND_TERRAIN_ICE,    SOUND_TERRAIN_ICE ], // TERRAIN_SLIDE
+]
+
+/**
+ * Computes a value that should be added to terrain sounds before playing them.
+ * This depends on surfaces and terrain.
+ */
+export const mario_get_terrain_sound_addend = (m) => {
+    let floorSoundType
+    let terrainType = m.area.terrainType & TERRAIN_MASK
+    let ret = SOUND_TERRAIN_DEFAULT << 16
+    let floorType
+
+    if (m.floor != null) {
+        floorType = m.floor.type
+
+        if ((Area.gCurrLevelNum != LEVEL_LLL) && (m.floorHeight < (m.waterLevel - 10))) {
+            // Water terrain sound, excluding LLL since it uses water in the volcano.
+            ret = SOUND_TERRAIN_WATER << 16
+        } else if (SURFACE_IS_QUICKSAND(floorType)) {
+            ret = SOUND_TERRAIN_SAND << 16
+        } else {
+            switch (floorType) {
+                default:
+                    floorSoundType = 0
+                    break
+
+                case SURFACE_NOT_SLIPPERY:
+                case SURFACE_HARD:
+                case SURFACE_HARD_NOT_SLIPPERY:
+                case SURFACE_SWITCH:
+                    floorSoundType = 1
+                    break
+
+                case SURFACE_SLIPPERY:
+                case SURFACE_HARD_SLIPPERY:
+                case SURFACE_NO_CAM_COL_SLIPPERY:
+                    floorSoundType = 2
+                    break
+
+                case SURFACE_VERY_SLIPPERY:
+                case SURFACE_ICE:
+                case SURFACE_HARD_VERY_SLIPPERY:
+                case SURFACE_NOISE_VERY_SLIPPERY_73:
+                case SURFACE_NOISE_VERY_SLIPPERY_74:
+                case SURFACE_NOISE_VERY_SLIPPERY:
+                case SURFACE_NO_CAM_COL_VERY_SLIPPERY:
+                    floorSoundType = 3
+                    break
+
+                case SURFACE_NOISE_DEFAULT:
+                    floorSoundType = 4
+                    break
+
+                case SURFACE_NOISE_SLIPPERY:
+                    floorSoundType = 5
+                    break
+            }
+
+            ret = sTerrainSounds[terrainType][floorSoundType] << 16
+        }
+    }
+
+    return ret
 }
 
 export const vec3_find_ceil = (pos, height, ceil) => {
@@ -1643,7 +2091,7 @@ export const set_water_plunge_action = m => {
 
     vec3s_set(m.angleVel, 0, 0, 0)
 
-    if (!(m.action && ACT_FLAG_DIVING)) {
+    if (!(m.action & ACT_FLAG_DIVING)) {
         m.faceAngle[0] = 0
     }
 

@@ -7,6 +7,7 @@ import { SURFACE_FLOWING_WATER } from "../include/surface_terrains"
 import { AreaInstance as Area } from "../game/Area"
 import { INT_STATUS_MARIO_DROP_OBJECT, INT_STATUS_STOP_RIDING, INTERACT_GRABBABLE } from "./Interaction"
 import { CameraInstance as Camera } from "./Camera"
+import * as CAMERA from "./Camera"  // for constants
 
 const MIN_SWIM_STRENGTH = 160
 const MIN_SWIM_SPEED = 160
@@ -65,7 +66,7 @@ const update_swimming_yaw = (m) => {
 
     if (targetYawVel > 0) {
         if (m.angleVel[1] < 0) {
-            m.angleVel[1] += 0x40
+            m.angleVel[1] = s16(m.angleVel[1] + 0x40)
             if (m.angleVel[1] > 0x10) {
                 m.angleVel[1] = 0x10
             }
@@ -74,7 +75,7 @@ const update_swimming_yaw = (m) => {
         }
     } else if (targetYawVel < 0) {
         if (m.angleVel[1] > 0) {
-            m.angleVel[1] -= 0x40
+            m.angleVel[1] = s16(m.angleVel[1] - 0x40)
             if (m.angleVel[1] < -0x10) {
                 m.angleVel[1] = -0x10
             }
@@ -85,12 +86,14 @@ const update_swimming_yaw = (m) => {
         m.angleVel[1] = approach_number(m.angleVel[1], 0, 0x40, 0x40)
     }
 
-    m.faceAngle[1] += m.angleVel[1]
+    m.faceAngle[1] = s16(m.faceAngle[1] + m.angleVel[1])
     m.faceAngle[2] = -m.angleVel[1] * 8
 }
 
 const update_swimming_pitch = (m) => {
-    let targetPitch = -s16(252.0 * m.controller.stickY)
+    let targetPitch = s16(-(252.0 * m.controller.stickY))
+
+// console.log(m.faceAngle[0], targetPitch)
 
     let pitchVel
     if (m.faceAngle[0] < 0) {
@@ -100,11 +103,13 @@ const update_swimming_pitch = (m) => {
     }
 
     if (m.faceAngle[0] < targetPitch) {
-        if ((m.faceAngle[0] += pitchVel) > targetPitch) {
+        m.faceAngle[0] = s16(m.faceAngle[0] + pitchVel)
+        if (m.faceAngle[0] > targetPitch) {
             m.faceAngle[0] = targetPitch
         }
     } else if (m.faceAngle[0] > targetPitch) {
-        if ((m.faceAngle[0] -= pitchVel) < targetPitch) {
+        m.faceAngle[0] = s16(m.faceAngle[0] - pitchVel)
+        if (m.faceAngle[0] < targetPitch) {
             m.faceAngle[0] = targetPitch
         }
     }
@@ -301,7 +306,7 @@ const perform_water_step = (m) => {
     let step = [0, 0, 0]
     let marioObj = m.marioObj
 
-    step = [...m.vel]
+    vec3f_copy(step, m.vel)
 
     if (m.action & Mario.ACT_FLAG_SWIMMING) {
         apply_water_current(m, step)
@@ -318,8 +323,8 @@ const perform_water_step = (m) => {
 
     stepResult = perform_water_full_step(m, nextPos)
 
-    marioObj.header.gfx.pos = [...m.pos]
-    marioObj.header.gfx.angle = [-m.faceAngle[0], m.faceAngle[1], m.faceAngle[2]]
+    vec3f_copy(marioObj.header.gfx.pos, m.pos)
+    vec3s_set(marioObj.header.gfx.angle, -m.faceAngle[0], m.faceAngle[1], m.faceAngle[2])
 
     return stepResult
 }
@@ -688,7 +693,7 @@ const act_hold_water_action_end = (m) => {
 const act_water_shocked = (m) => {
     //TODO play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_ACTION_SOUND_PLAYED);
     //TODO play_sound(SOUND_MOVING_SHOCKED, m.marioObj.header.gfx.cameraToObject);
-    Camera.set_camera_shake_from_hit(Camera.SHAKE_SHOCK)
+    Camera.set_camera_shake_from_hit(CAMERA.SHAKE_SHOCK)
 
     if (Mario.set_mario_animation(m, Mario.MARIO_ANIM_SHOCKED) == 0) {
         m.actionTimer++

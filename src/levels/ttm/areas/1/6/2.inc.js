@@ -1,4 +1,4 @@
-import {ttm_seg7_texture_07000000, } from "../../../textures.inc.js"
+import {ttm_seg7_texture_07000000, } from "../../../texture.inc"
 import * as Gbi from "../../../../../include/gbi"
 const ttm_seg7_lights_0700BB30 = Gbi.gdSPDefLights1(
 	    0x4c, 0x4c, 0x4c,

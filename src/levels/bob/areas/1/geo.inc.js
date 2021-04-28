@@ -1,47 +1,73 @@
-import { GeoLayoutInstance as Geo } from "../../../../engine/GeoLayout"
-import { CameraInstance as Camera } from "../../../../game/Camera"
-import { geo_skybox_main } from "../../../../game/LevelGeo"
+// Bob
+
+import {
+    SCREEN_WIDTH, SCREEN_HEIGHT
+} from "../../../../game/Skybox"
+
+import {
+    GEO_NODE_SCREEN_AREA, GEO_OPEN_NODE, GEO_ZBUFFER, GEO_NODE_ORTHO, GEO_BACKGROUND,
+    GEO_CLOSE_NODE, GEO_CAMERA_FRUSTUM_WITH_FUNC, GEO_CAMERA, GEO_DISPLAY_LIST, GEO_RENDER_OBJ,
+    GEO_ASM, GEO_END,
+    BACKGROUND_OCEAN_SKY, LAYER_OPAQUE, LAYER_TRANSPARENT_DECAL, LAYER_ALPHA
+} from "../../../../engine/GeoLayout"
+
+import {
+    geo_skybox_main, geo_envfx_main
+} from "../../../../game/LevelGeo"
+
+import {
+    geo_camera_fov, geo_camera_main
+} from "../../../../game/Camera"
+
 import { bob_seg7_dl_07004390 } from "./1/model.inc"
-import { bob_seg7_dl_0700DD18 } from "./5/model.inc"
+
 import { bob_seg7_dl_07009D80 } from "./2/model.inc"
-import { bob_seg7_dl_0700A920 } from "./4/model.inc"
+
 import { bob_seg7_dl_0700A470 } from "./3/model.inc"
+
+import { bob_seg7_dl_0700A920 } from "./4/model.inc"
+
+import { bob_seg7_dl_0700DD18 } from "./5/model.inc"
+
 import { bob_seg7_dl_0700E338 } from "./6/model.inc"
 
-const canvas = document.querySelector('#gameCanvas')
+import { geo_cannon_circle_base } from "../../../../game/ScreenTransition"
 
-export const bob_geo_000488 = [
-    {
-        command: Geo.node_screen_area,
-        args: [10, canvas.width / 2, canvas.height / 2, canvas.width / 2, canvas.height / 2]
-    },
-    { command: Geo.open_node },
-        { command: Geo.node_master_list, args: [0] },
-        { command: Geo.open_node },
-            { command: Geo.node_ortho, args: [100] },
-            { command: Geo.open_node },
-                { command: Geo.node_background, args: [Geo.BACKGROUND_OCEAN_SKY, geo_skybox_main] },
-            { command: Geo.close_node },
-        { command: Geo.close_node },
-        { command: Geo.node_master_list, args: [1] },
-        { command: Geo.open_node },
-            { command: Geo.node_perspective, args: [45, 100, 20000, Camera.geo_camera_fov] },
-            { command: Geo.open_node },
-                {
-                    command: Geo.node_camera,
-                    args: [1, 0, 2000, 6000, 3072, 0, -4608, Camera.geo_camera_main]
-                },
-                { command: Geo.open_node },
-                    { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bob_seg7_dl_07004390] },
-                    { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bob_seg7_dl_07009D80] },
-                    { command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT_DECAL, bob_seg7_dl_0700A470] },
-                    { command: Geo.display_list, args: [Geo.LAYER_ALPHA, bob_seg7_dl_0700A920] },
-                    { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bob_seg7_dl_0700DD18] },
-                    { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bob_seg7_dl_0700E338] },
-                    { command: Geo.node_render_object_parent },
-                { command: Geo.close_node },
-            { command: Geo.close_node },
-        { command: Geo.close_node },
-    { command: Geo.close_node },
-    { command: Geo.node_end }
-]
+
+// 0x0E000488
+export const bob_geo_000488 = () => {return [
+    GEO_NODE_SCREEN_AREA(10, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+    GEO_OPEN_NODE(),
+        GEO_ZBUFFER(0),
+        GEO_OPEN_NODE(),
+            GEO_NODE_ORTHO(100),
+            GEO_OPEN_NODE(),
+                GEO_BACKGROUND(BACKGROUND_OCEAN_SKY, geo_skybox_main),
+            GEO_CLOSE_NODE(),
+        GEO_CLOSE_NODE(),
+        GEO_ZBUFFER(1),
+        GEO_OPEN_NODE(),
+            GEO_CAMERA_FRUSTUM_WITH_FUNC(45, 100, 30000, geo_camera_fov),
+            GEO_OPEN_NODE(),
+                GEO_CAMERA(1, 0, 2000, 6000, 3072, 0, -4608, geo_camera_main),
+                GEO_OPEN_NODE(),
+                    GEO_DISPLAY_LIST(LAYER_OPAQUE, bob_seg7_dl_07004390),
+                    GEO_DISPLAY_LIST(LAYER_OPAQUE, bob_seg7_dl_07009D80),
+                    GEO_DISPLAY_LIST(LAYER_TRANSPARENT_DECAL, bob_seg7_dl_0700A470),
+                    GEO_DISPLAY_LIST(LAYER_ALPHA, bob_seg7_dl_0700A920),
+                    GEO_DISPLAY_LIST(LAYER_OPAQUE, bob_seg7_dl_0700DD18),
+                    GEO_DISPLAY_LIST(LAYER_OPAQUE, bob_seg7_dl_0700E338),
+                    GEO_RENDER_OBJ(),
+                    GEO_ASM(0, geo_envfx_main),
+                GEO_CLOSE_NODE(),
+            GEO_CLOSE_NODE(),
+        GEO_CLOSE_NODE(),
+        GEO_ZBUFFER(0),
+        GEO_OPEN_NODE(),
+            GEO_ASM(0, geo_cannon_circle_base),
+        GEO_CLOSE_NODE(),
+    GEO_CLOSE_NODE(),
+    GEO_END(),
+]};
+
+// 1619334742 - 2021-04-24 21:12:30 -1000

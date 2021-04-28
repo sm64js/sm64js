@@ -1,5 +1,14 @@
 import * as Gbi from "../../include/gbi"
 
+export const title_texture_0A0001C0 = []
+export const title_texture_0A000E40 = []
+export const title_texture_0A001AC0 = []
+export const title_texture_0A002740 = []
+export const title_texture_0A0033C0 = []
+export const title_texture_0A004040 = []
+export const title_texture_0A004CC0 = []
+export const title_texture_0A005940 = []
+
 const title_screen_bg_vertex_0A000000 = [
     { pos: [ 0, 60, -1 ], flag: 0, tc: [ 0, 608 ], color: [ 0xff, 0xff, 0xff, 0xff ] },
     { pos: [ 80, 60, -1 ], flag: 0, tc: [ 2528, 608 ], color: [ 0xff, 0xff, 0xff, 0xff ] },
@@ -38,15 +47,6 @@ export const title_screen_bg_dl_0A000118 = [
     Gbi.gsSPVertex(title_screen_bg_vertex_0A000000, 16, 0),
     Gbi.gsSPEndDisplayList()
 ]
-
-export const title_texture_0A0001C0 = []
-
-export const title_texture_0A000E40 = []
-
-export const title_texture_0A001AC0 = []
-
-export const title_texture_0A002740 = []
-
 
 export const title_screen_bg_dl_0A000130 = [
     ...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),

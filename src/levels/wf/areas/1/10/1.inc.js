@@ -1,7 +1,7 @@
-import {grass_09007000, } from "../../../../../textures/grass.js"
-import {grass_09009000, } from "../../../../../textures/grass.js"
-import {grass_09007800, } from "../../../../../textures/grass.js"
-import {wf_seg7_texture_07001800, } from "../../../textures.inc.js"
+import {grass_09007000, } from "../../../../../textures/grass"
+import {grass_09009000, } from "../../../../../textures/grass"
+import {grass_09007800, } from "../../../../../textures/grass"
+import {wf_seg7_texture_07001800, } from "../../../texture.inc"
 import * as Gbi from "../../../../../include/gbi"
 const wf_seg7_lights_07007590 = Gbi.gdSPDefLights1(
 	    0x66, 0x66, 0x66,

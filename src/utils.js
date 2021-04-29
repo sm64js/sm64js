@@ -47,6 +47,7 @@ export const getSelectedLevel = () => {
 export const levelIdToName = {
     1001: "CTF/Race Map",
     1002: "Starman Fortress",
+    1003: "Glider Jungle",
     1000: "Mushroom Battlefield",
     999: "Clouded Ruins",
     16: "Castle Grounds",

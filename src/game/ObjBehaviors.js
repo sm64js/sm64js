@@ -1,13 +1,13 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
-import { oPosX, oPosY, oPosZ, oForwardVel, oMoveAngleYaw, oVelY, oFaceAngleYaw, oFriction, oGravity, oGraphYOffset, oAction, OBJ_ACT_LAVA_DEATH, OBJ_ACT_DEATH_PLANE_DEATH, oAngleToMario, oTimer } from "../include/object_constants"
+import { oPosX, oPosY, oPosZ, oForwardVel, oMoveAngleYaw, oVelY, oFaceAngleYaw, oFriction, oGravity, oGraphYOffset, oAction, OBJ_ACT_LAVA_DEATH, OBJ_ACT_DEATH_PLANE_DEATH, oAngleToMario, oTimer, oAnimState } from "../include/object_constants"
 import { sins, coss, int32, uint16, int16, random_uint16 } from "../utils"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { atan2s, mtxf_align_terrain_normal } from "../engine/math_util"
 import { GRAPH_RENDER_BILLBOARD, GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
-import { approach_symmetric, spawn_object } from "./ObjectHelpers"
+import { approach_symmetric, spawn_object, spawn_object_abs_with_rot } from "./ObjectHelpers"
 import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
-import { MODEL_YELLOW_COIN } from "../include/model_ids"
-import { bhvMovingYellowCoin } from "./BehaviorData"
+import { MODEL_YELLOW_COIN, MODEL_NONE } from "../include/model_ids"
+import { bhvMovingYellowCoin, bhvRespawner } from "./BehaviorData"
 
 export const OBJ_COL_FLAG_GROUNDED = (1 << 0)
 export const OBJ_COL_FLAG_HIT_WALL = (1 << 1)
@@ -32,6 +32,58 @@ export const is_point_within_radius_of_mario = (x, y, z, dist) => {
 }
 
 /**
+ * Checks whether a point is within distance of a given point. Test is exclusive.
+ */
+export const is_point_close_to_object = (obj, x, y, z, dist) => {
+   let /*f32*/objX = obj.rawData[oPosX]
+   let /*f32*/objY = obj.rawData[oPosY]
+   let /*f32*/objZ = obj.rawData[oPosZ]
+
+    if ((x - objX) * (x - objX) + (y - objY) * (y - objY) + (z - objZ) * (z - objZ)
+        < (dist * dist)) {
+        return 1
+    }
+
+    return 0
+}
+
+
+export const create_respawner = (model, behToSpawn, minSpawnDist) => {
+    const o = ObjectListProc.gCurrentObject
+    const respawner = spawn_object_abs_with_rot(o, MODEL_NONE, bhvRespawner, o.rawData[oHomeX], o.rawData[oHomeY], o.rawData[oHomeZ], 0, 0, 0)
+
+    respawner.rawData[oBehParams] = o.rawData[oBehParams]
+    respawner.rawData[oRespawnerModelToRespawn] = model
+    respawner.rawData[oRespawnerMinSpawnDist] = minSpawnDist
+    respawner.rawData[oRespawnerBehaviorToRespawn] = behToSpawn
+}
+
+
+// JS NOTE: The Parameter is a rawData "o" offset, not a pointer nor a wrapper object.
+// Trying this out, maybe it can replace some use cases of wrappers.
+export const curr_obj_random_blink = (blinkTimer) => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.rawData[blinkTimer] == 0) {
+        if (parseInt(Math.random() * 100.0) == 0) {
+            o.rawData[oAnimState] = 1
+            o.rawData[blinkTimer] = 1
+        }
+    } else {
+        o.rawData[blinkTimer]++
+        if (o.rawData[blinkTimer] >= 6)
+            o.rawData[oAnimState] = 0
+        if (o.rawData[blinkTimer] >= 11)
+            o.rawData[oAnimState] = 1
+        if (o.rawData[blinkTimer] >= 16) {
+            o.rawData[oAnimState] = 0
+            o.rawData[blinkTimer] = 0
+        }
+    }
+}
+
+
+/**
  * Sets an object as visible if within a certain distance of Mario's graphical position.
  */
 export const set_object_visibility = (obj, dist) => {
@@ -42,6 +94,9 @@ export const set_object_visibility = (obj, dist) => {
     }
 }
 
+/**
+ * Turns an object away from floors/walls that it runs into.
+ */
 export const turn_obj_away_from_surface = (velX, velZ, nX, nZ, objYawWrapper) => {
     objYawWrapper.x = (nZ * nZ - nX * nX) * velX / (nX * nX + nZ * nZ)
         - 2 * velZ * (nX * nZ) / (nX * nX + nZ * nZ);
@@ -95,6 +150,9 @@ export const obj_update_pos_vel_xz = () => {
     o.rawData[oPosZ] += zVel
 }
 
+/**
+ * Turns an object away from steep floors, similarly to walls.
+ */
 export const turn_obj_away_from_steep_floor = (objFloor, floorY, objVelX, objVelZ) => {
     const o = ObjectListProc.gCurrentObject
 
@@ -230,16 +288,17 @@ export const object_step = () => {
 
     let collisionFlags = 0
 
+    // Find any wall collisions, receive the push, and set the flag.
     if (obj_find_wall(objX + objVelX, objY, objZ + objVelZ, objVelX, objVelZ) == 0) {
         collisionFlags += OBJ_COL_FLAG_HIT_WALL
     }
 
     const sObjFloorWrapper = {}
-    const floorY = SurfaceCollision.find_floor(objX + objVelX, objY, objZ + objVelZ, sObjFloorWrapper)
+    const floorY = gLinker.SurfaceCollision.find_floor(objX + objVelX, objY, objZ + objVelZ, sObjFloorWrapper)
     sObjFloor = sObjFloorWrapper.floor
 
     if (turn_obj_away_from_steep_floor(sObjFloor, floorY, objVelX, objVelZ) == 1) {
-        const waterY = SurfaceCollision.find_water_level(objX + objVelX, objZ + objVelZ)
+        const waterY = gLinker.SurfaceCollision.find_water_level(objX + objVelX, objZ + objVelZ)
         if (waterY > objY) {
             throw "implement object_step underwater"
         } else {
@@ -251,11 +310,11 @@ export const object_step = () => {
     }
 
     obj_update_pos_vel_xz()
-    if (parseInt(o.rawData[oPosY]) == parseInt(floorY)) {
+    if (Math.floor(o.rawData[oPosY]) == Math.floor(floorY)) {
         collisionFlags += OBJ_COL_FLAG_GROUNDED
     }
 
-    if (parseInt(o.rawData[oVelY]) == 0) {
+    if (Math.floor(o.rawData[oVelY]) == 0) {
         collisionFlags += OBJ_COL_FLAG_NO_Y_VEL
     }
 

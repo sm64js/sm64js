@@ -23,14 +23,12 @@ const sChainChompHitbox = {
 const wooden_post_approach_speed = () => {
     const o = ObjectListProc.gCurrentObject
 
-    const wrapper = { value: o.rawData[oWoodenPostSpeedY] }
-    const result = approach_number_ptr(wrapper, 0.0, 25.0)
-    o.rawData[oWoodenPostSpeedY] = wrapper.value
+    const result = approach_number_ptr(o.rawData, oWoodenPostSpeedY, 0.0, 25.0)
 
     return result
 }
 
-export const bhv_wooden_post_update = () => {
+const bhv_wooden_post_update = () => {
     const o = ObjectListProc.gCurrentObject
 
     if (!o.rawData[oWoodenPostMarioPounding]) {
@@ -134,7 +132,7 @@ const chain_chomp_update_chain_segments = () => {
 
 }
 
-export const bhv_chain_chomp_chain_part_update = () => {
+const bhv_chain_chomp_chain_part_update = () => {
     const o = ObjectListProc.gCurrentObject
 
     if (o.parentObj.rawData[oAction] == CHAIN_CHOMP_ACT_UNLOAD_CHAIN) {
@@ -181,9 +179,7 @@ const chain_chomp_act_uninitialized = () => {
 const chain_chomp_restore_normal_chain_lengths = () => {
     const o = ObjectListProc.gCurrentObject
 
-    const wrapper = { value: o.rawData[oChainChompMaxDistFromPivotPerChainPart] }
-    approach_number_ptr(wrapper, 750.0 / 5, 4.0)
-    o.rawData[oChainChompMaxDistFromPivotPerChainPart] = wrapper.value
+    approach_number_ptr(o.rawData, oChainChompMaxDistFromPivotPerChainPart, 750.0 / 5, 4.0)
 
     o.rawData[oChainChompMaxDistBetweenChainParts] = o.rawData[oChainChompMaxDistFromPivotPerChainPart]
 }
@@ -255,9 +251,7 @@ const chain_chomp_sub_act_lunge = () => {
         cur_obj_rotate_yaw_toward(atan2s(o.rawData[oChainChompSegments][0].posZ, o.rawData[oChainChompSegments][0].posX), 0x1000)
 
         if (o.rawData[oChainChompUnk104] != 0.0) {
-            const wrapper = { value: o.rawData[oChainChompUnk104] }
-            approach_number_ptr(wrapper, 0.0, 0.8)
-            o.rawData[oChainChompUnk104] = wrapper.value
+            approach_number_ptr(o.rawData, oChainChompUnk104, 0.0, 0.8)
         } else {
             o.rawData[oSubAction] = CHAIN_CHOMP_SUB_ACT_TURN
         }
@@ -374,7 +368,7 @@ const chain_chomp_act_unload_chain = () => {
 
 }
 
-export const bhv_chain_chomp_update = () => {
+const bhv_chain_chomp_update = () => {
     const o = ObjectListProc.gCurrentObject
 
     switch (o.rawData[oAction]) {
@@ -389,3 +383,7 @@ export const bhv_chain_chomp_update = () => {
             break
     }
 }
+
+gLinker.bhv_wooden_post_update = bhv_wooden_post_update
+gLinker.bhv_chain_chomp_chain_part_update = bhv_chain_chomp_chain_part_update
+gLinker.bhv_chain_chomp_update = bhv_chain_chomp_update

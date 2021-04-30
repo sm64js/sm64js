@@ -119,7 +119,7 @@ const sExclamationBoxContents = (type) => {
     return _sExclamationBoxContents[type]
 }
 
-export const bhv_rotating_exclamation_box_loop = () => {
+const bhv_rotating_exclamation_box_loop = () => {
     const o = O.gCurrentObject
     if (o.parentObj.rawData[oAction] != 1)
         obj_mark_for_deletion(o)
@@ -239,8 +239,12 @@ const sExclamationBoxActions = [ exclamation_box_act_0, exclamation_box_act_1,
                                  exclamation_box_act_2, exclamation_box_act_3,
                                  exclamation_box_act_4, exclamation_box_act_5 ]
 
-export const bhv_exclamation_box_loop = () => {
+const bhv_exclamation_box_loop = () => {
     const o = O.gCurrentObject
     cur_obj_scale(2.0)
     sExclamationBoxActions[o.rawData[oAction]]()
 }
+
+
+gLinker.bhv_rotating_exclamation_box_loop = bhv_rotating_exclamation_box_loop
+gLinker.bhv_exclamation_box_loop = bhv_exclamation_box_loop

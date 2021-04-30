@@ -408,7 +408,7 @@ export const MODEL_UNKNOWN_58                  = 0x58
 // second set of actor bins, (0x64-0x73)
 // group 12
 export const MODEL_BOWSER                      = 0x64        // bowser_geo - 2nd geo loaded is bowser_geo_000424, starts with shadow command
-export const MODEL_BOWSER_BOMB_CHILD_OBJ       = 0x65        // bowser_bomb_geo - Spawns as a chill object in bowser's behavior command, causing an explosion if it touches a bomb
+export const MODEL_BOWSER_BOMB_CHILD_OBJ       = 0x65        // bowser_bomb_geo - Spawns as a child object in bowser's behavior command, causing an explosion if it touches a bomb
 export const MODEL_BOWSER_SMOKE                = 0x66        // bowser_impact_smoke_geo
 export const MODEL_BOWSER_FLAMES               = 0x67        // bowser_flames_geo
 export const MODEL_BOWSER_WAVE                 = 0x68        // invisible_bowser_accessory_geo

@@ -20,7 +20,7 @@ const sYellowCoinHitbox = {
     hurtboxHeight: 0
 }
 
-export const bhv_coin_init = () => {
+const bhv_coin_init = () => {
     const o = ObjectListProc.gCurrentObject
 
     o.rawData[oVelY] = Math.random() * 10.0 + 30 + o.rawData[oCoinUnk110]
@@ -31,7 +31,7 @@ export const bhv_coin_init = () => {
     cur_obj_become_intangible()
 }
 
-export const bhv_coin_loop = () => {
+const bhv_coin_loop = () => {
 
     const o = ObjectListProc.gCurrentObject
 
@@ -72,7 +72,7 @@ export const bhv_coin_loop = () => {
     bhv_coin_sparkles_init()
 }
 
-export const bhv_yellow_coin_init = () => {
+const bhv_yellow_coin_init = () => {
     const o = ObjectListProc.gCurrentObject
 
     cur_obj_set_behavior(bhvYellowCoin)
@@ -86,14 +86,14 @@ export const bhv_yellow_coin_init = () => {
 
 }
 
-export const bhv_yellow_coin_loop = () => {
+const bhv_yellow_coin_loop = () => {
     const o = ObjectListProc.gCurrentObject
 
     bhv_coin_sparkles_init()
     o.rawData[oAnimState]++
 }
 
-export const bhv_coin_formation_init = () => {
+const bhv_coin_formation_init = () => {
     const o = ObjectListProc.gCurrentObject
 
     o.rawData[oCoinUnkF4] = (o.rawData[oBehParams] >> 8) & 0xFF
@@ -134,7 +134,7 @@ const spawn_coin_in_formation = (sp50, sp54) => {
     }
 }
 
-export const bhv_coin_formation_loop = () => {
+const bhv_coin_formation_loop = () => {
 
     const o = ObjectListProc.gCurrentObject
 
@@ -177,7 +177,7 @@ const bhv_coin_sparkles_init = () => {
 
 }
 
-export const bhv_coin_formation_spawn_loop = () => {
+const bhv_coin_formation_spawn_loop = () => {
 
     const o = ObjectListProc.gCurrentObject
 
@@ -208,7 +208,7 @@ export const bhv_coin_formation_spawn_loop = () => {
 
 }
 
-export const bhv_golden_coin_sparkles_loop = () => {
+const bhv_golden_coin_sparkles_loop = () => {
     const o = ObjectListProc.gCurrentObject
     const sp24 = 30.0
     const sp2C = spawn_object(o, MODEL_SPARKLES, bhvCoinSparkles)
@@ -216,5 +216,14 @@ export const bhv_golden_coin_sparkles_loop = () => {
     sp2C.rawData[oPosZ] += (Math.random() * sp24) - (sp24 / 2)
 }
 
-export const bhv_coin_sparkles_loop = () => { cur_obj_scale(0.6) }
+const bhv_coin_sparkles_loop = () => { cur_obj_scale(0.6) }
 
+gLinker.bhv_coin_loop = bhv_coin_loop
+gLinker.bhv_coin_formation_init = bhv_coin_formation_init
+gLinker.bhv_coin_formation_loop = bhv_coin_formation_loop
+gLinker.bhv_coin_formation_spawn_loop = bhv_coin_formation_spawn_loop
+gLinker.bhv_yellow_coin_init = bhv_yellow_coin_init
+gLinker.bhv_yellow_coin_loop = bhv_yellow_coin_loop
+gLinker.bhv_golden_coin_sparkles_loop = bhv_golden_coin_sparkles_loop
+gLinker.bhv_coin_sparkles_loop = bhv_coin_sparkles_loop
+gLinker.bhv_coin_init = bhv_coin_init

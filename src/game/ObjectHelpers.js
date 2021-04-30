@@ -1,21 +1,49 @@
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
+// import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { AreaInstance as Area } from "./Area"
 import { geo_obj_init, geo_obj_init_animation, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
-import { oAngleVelPitch, oAngleVelRoll, oAction, oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel, oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations, ACTIVE_FLAGS_DEACTIVATED, OBJ_MOVE_ABOVE_DEATH_BARRIER, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oFloorHeight, oFloor, oFloorType, oFloorRoom, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR, oWallHitboxRadius, oWallAngle, oMoveFlags, OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, oBounciness, oBuoyancy, oDragStrength, oAngleVelYaw, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND, OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER, OBJ_MOVE_ENTERED_WATER, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND, OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, oRoom, ACTIVE_FLAG_UNK10, OBJ_MOVE_13, OBJ_MOVE_LANDED, oInteractStatus, oHomeX, oHomeY, oHomeZ, oOpacity, ACTIVE_FLAG_UNK7, oNumLootCoins, oCoinUnk110, oTimer } from "../include/object_constants"
+
+import { oAngleVelPitch, oAngleVelRoll, oAction, oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch,
+         oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX,
+         oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel,
+         oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations, oHeldState,
+         oFloorHeight, oFloor, oFloorType, oFloorRoom, oWallHitboxRadius, oWallAngle, oMoveFlags,
+         oBounciness, oBuoyancy, oDragStrength, oAngleVelYaw, oInteractStatus, oHomeX, oHomeY, oHomeZ,
+         oOpacity, oNumLootCoins, oCoinUnk110, oTimer, oUnkC0, oUnkBC, oRoom, oSoundStateID,
+         oPathedPrevWaypointFlags, oPathedPrevWaypoint, oPathedStartWaypoint, oPathedTargetYaw,
+         oPathedTargetPitch,
+
+         ACTIVE_FLAGS_DEACTIVATED, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM,
+         ACTIVE_FLAG_UNK10, ACTIVE_FLAG_UNK7,
+
+         OBJ_MOVE_ABOVE_DEATH_BARRIER, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR,
+         OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND,
+         OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER, OBJ_MOVE_ENTERED_WATER,
+         OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND, OBJ_MOVE_LEFT_GROUND,
+         OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, OBJ_MOVE_13, OBJ_MOVE_LANDED,
+         O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX, OBJ_FLAG_HOLDABLE,
+
+         HELD_HELD, HELD_THROWN, HELD_DROPPED
+ } from "../include/object_constants"
 
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
+
+import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
+import { ATTACK_PUNCH, INT_STATUS_WAS_ATTACKED, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "./Interaction"
+import { ACT_GROUND_POUND_LAND, ACT_FLAG_AIR, ACT_DIVE_SLIDE } from "./Mario"
+
+import { MODEL_YELLOW_COIN } from "../include/model_ids"
+
+import { GRAPH_RENDER_ACTIVE           } from "../engine/graph_node"
+
 import { atan2s, mtxf_rotate_zxy_and_translate } from "../engine/math_util"
 import { sins, coss, int16, s16, random_int16, random_float } from "../utils"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
-import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
-import { ATTACK_PUNCH, INT_STATUS_WAS_ATTACKED, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "./Interaction"
-import { ACT_GROUND_POUND_LAND } from "./Mario"
-import { gLinker } from "./Linker"
+import * as _Linker from "./Linker"
 import * as Gbi from "../include/gbi"
-import { MODEL_YELLOW_COIN } from "../include/model_ids"
 import { spawn_mist_particles_variable } from "./behaviors/white_puff.inc"
-import { GRAPH_RENDER_ACTIVE           } from "../engine/graph_node"
+
 
 export const WATER_DROPLET_FLAG_RAND_ANGLE                = 0x02
 export const WATER_DROPLET_FLAG_RAND_OFFSET_XZ            = 0x04 // Unused
@@ -113,7 +141,7 @@ export const geo_switch_area = (run, node) => {
             const marioObj = ObjectListProc.gMarioObject
 
             const floorWrapper = {}
-            const height = Spawn.SurfaceCollision.find_floor(marioObj.rawData[oPosX], marioObj.rawData[oPosY], marioObj.rawData[oPosZ], floorWrapper)
+            const height = gLinker.SurfaceCollision.find_floor(marioObj.rawData[oPosX], marioObj.rawData[oPosY], marioObj.rawData[oPosZ], floorWrapper)
 
             if (floorWrapper.floor) {
                 ObjectListProc.gMarioCurrentRoom = floorWrapper.floor.room
@@ -197,7 +225,7 @@ export const spawn_water_droplet = (parent, params) => {
     }
 
     if (params.flags & WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL) {
-        newObj.rawData[oPosY] = Spawn.SurfaceCollision.find_water_level(newObj.rawData[oPosX], newObj.rawData[oPosZ])
+        newObj.rawData[oPosY] = gLinker.SurfaceCollision.find_water_level(newObj.rawData[oPosX], newObj.rawData[oPosZ])
     }
 
     if (params.flags & WATER_DROPLET_FLAG_RAND_OFFSET_XZ) {
@@ -219,7 +247,6 @@ export const spawn_water_droplet = (parent, params) => {
 }
 
 export const spawn_object_at_origin = (parent, model, behavior) => {
-
     const obj = Spawn.create_object(behavior)
 
     obj.parentObj = parent
@@ -243,9 +270,131 @@ export const cur_obj_check_anim_frame = (frame) => {
     const o = ObjectListProc.gCurrentObject
 
     const animFrame = o.header.gfx.unk38.animFrame
-    if (animFrame == frame) return 1
-    else return 0
+    if (animFrame == frame) {
+        return 1
+    } else {
+        return 0
+    }
 }
+
+// vvvvvvvvv
+
+export const cur_obj_check_anim_frame_in_range = (startFrame, rangeLength) => {
+    const o = ObjectListProc.gCurrentObject
+    let /*s32*/ animFrame = o.header.gfx.unk38.animFrame
+
+    if (animFrame >= startFrame && animFrame < startFrame + rangeLength) {
+        return 1
+    } else {
+        return 0
+    }
+}
+
+// export const cur_obj_check_frame_prior_current_frame = (a0) => {
+//     const o = ObjectListProc.gCurrentObject
+//     let /*s16*/ sp6 = o.header.gfx.unk38.animFrame
+
+//     while (*a0 != -1) {
+//         if (*a0 == sp6) {
+//             return 1
+//         }
+
+//         a0++
+//     }
+
+//     return 0
+// }
+
+export const mario_is_in_air_action = () => {
+    if (LevelUpdate.gMarioState.action & ACT_FLAG_AIR) {
+        return 1
+    } else {
+        return 0
+    }
+}
+
+export const mario_is_dive_sliding = () => {
+    if (LevelUpdate.gMarioState.action == ACT_DIVE_SLIDE) {
+        return 1
+    } else {
+        return 0
+    }
+}
+
+export const cur_obj_set_y_vel_and_animation = (velY, animIndex) => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oVelY] = velY
+    cur_obj_init_animation_with_sound(animIndex)
+}
+
+export const cur_obj_unrender_and_reset_state = (animIndex, action) => {
+    const o = ObjectListProc.gCurrentObject
+    cur_obj_become_intangible()
+    cur_obj_disable_rendering()
+
+    if (animIndex >= 0) {
+        cur_obj_init_animation_with_sound(animIndex)
+    }
+
+    o.rawData[oAction] = action
+}
+
+const cur_obj_move_after_thrown_or_dropped = (forwardVel, velY) => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oMoveFlags] = 0
+    o.rawData[oFloorHeight] = gLinker.SurfaceCollision.find_floor_height(o.rawData[oPosX], o.rawData[oPosY] + 160.0, o.rawData[oPosZ])
+
+    if (o.rawData[oFloorHeight] > o.rawData[oPosY]) {
+        o.rawData[oPosY] = o.rawData[oFloorHeight]
+    } else if (o.rawData[oFloorHeight] < -10000.0) {
+        //! OoB failsafe
+        obj_copy_pos(o, ObjectListProc.gMarioObject)
+        o.rawData[oFloorHeight] = gLinker.SurfaceCollision.find_floor_height(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
+    }
+
+    o.rawData[oForwardVel] = forwardVel
+    o.rawData[oVelY] = velY
+
+    if (o.rawData[oForwardVel] != 0) {
+        cur_obj_move_y(/*gravity*/ -4.0, /*bounciness*/ -0.1, /*buoyancy*/ 2.0)
+    }
+}
+
+export const cur_obj_get_thrown_or_placed = (forwardVel, velY, thrownAction) => {
+    if (o.behavior == gLinker.behaviors.bhvBowser) {
+          // Interestingly, when bowser is thrown, he is offset slightly to
+          // Mario's right
+        cur_obj_set_pos_relative_to_parent(-41.684, 85.859, 321.577)
+    } else {
+    }
+
+    cur_obj_become_tangible()
+    cur_obj_enable_rendering()
+
+    o.rawData[oHeldState] = HELD_FREE
+
+    if ((o.rawData[oInteractionSubtype] & INT_SUBTYPE_HOLDABLE_NPC) || forwardVel == 0.0) {
+        cur_obj_move_after_thrown_or_dropped(0.0, 0.0)
+    } else {
+        o.rawData[oAction] = thrownAction
+        cur_obj_move_after_thrown_or_dropped(forwardVel, velY)
+    }
+}
+
+export const cur_obj_get_dropped = () => {
+    cur_obj_become_tangible()
+    cur_obj_enable_rendering()
+
+    o.rawData[oHeldState] = HELD_FREE
+    cur_obj_move_after_thrown_or_dropped(0.0, 0.0)
+}
+
+
+
+// ^^^^^^^^
+
+
+
 
 export const cur_obj_reverse_animation = () => {
     const o = ObjectListProc.gCurrentObject
@@ -322,6 +471,28 @@ export const create_transformation_from_matrices = (a0, a1, a2) => {
     a0[3][3] = 1.0
 }
 
+export const obj_set_held_state = (obj, heldBehavior) => {
+    const o = ObjectListProc.gCurrentObject
+    obj.parentObj = o
+
+    if (obj.rawData[oFlags] & OBJ_FLAG_HOLDABLE) {
+        if (heldBehavior == gLinker.behaviors.bhvCarrySomething3) {
+            obj.rawData[oHeldState] = HELD_HELD
+        }
+
+        if (heldBehavior == gLinker.behaviors.bhvCarrySomething5) {
+            obj.rawData[oHeldState] = HELD_THROWN
+        }
+
+        if (heldBehavior == gLinker.behaviors.bhvCarrySomething4) {
+            obj.rawData[oHeldState] = HELD_DROPPED
+        }
+    } else {
+        obj.curBhvCommand = heldBehavior
+        obj.bhvStackIndex = 0
+    }
+}
+
 export const obj_build_transform_from_pos_and_angle = (obj, posIndex, angleIndex) => {
     const translate = new Array(3)
     const rotation = new Array(3)
@@ -365,6 +536,25 @@ export const linear_mtxf_transpose_mul_vec3f = (m, dst, v) => {
     }
 }
 
+const obj_build_vel_from_transform = (a0) => {
+    let spC = a0.rawData[oUnkC0]
+    let sp8 = a0.rawData[oUnkBC]
+    let sp4 = a0.rawData[oForwardVel]
+
+    a0.rawData[oVelX] = a0.transform[0][0] * spC + a0.transform[1][0] * sp8 + a0.transform[2][0] * sp4
+    a0.rawData[oVelY] = a0.transform[0][1] * spC + a0.transform[1][1] * sp8 + a0.transform[2][1] * sp4
+    a0.rawData[oVelZ] = a0.transform[0][2] * spC + a0.transform[1][2] * sp8 + a0.transform[2][2] * sp4
+}
+
+export const cur_obj_set_pos_via_transform = () => {
+    const o = ObjectListProc.gCurrentObject
+    obj_build_transform_from_pos_and_angle(o, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX)
+    obj_build_vel_from_transform(o)
+    o.rawData[oPosX] += o.rawData[oVelX]
+    o.rawData[oPosY] += o.rawData[oVelY]
+    o.rawData[oPosZ] += o.rawData[oVelZ]
+}
+
 export const cur_obj_reflect_move_angle_off_wall = () => {
     const o = ObjectListProc.gCurrentObject
     return s16(o.rawData[oWallAngle] - (s16(o.rawData[oMoveAngleYaw]) - s16(o.rawData[oWallAngle])) + 0x8000)
@@ -392,23 +582,23 @@ export const approach_symmetric = (value, target, increment) => {
 }
 
 export const approach_s16_symmetric = (value, target, increment) =>{
-    let dist = target - value;
+    let dist = s16(target - value)
 
     if (dist >= 0) {
         if (dist > increment) {
-            value += increment;
+            value = s16(value + increment)
         } else {
-            value = target;
+            value = target
         }
     } else {
         if (dist < -increment) {
-            value -= increment;
+            value = s16(value - increment)
         } else {
-            value = target;
+            value = target
         }
     }
 
-    return value;
+    return value
 }
 
 export const cur_obj_forward_vel_approach_upward = (target, increment) => {
@@ -443,7 +633,7 @@ export const cur_obj_detect_steep_floor = (steepAngleDegrees) => {
         const intendedX = o.rawData[oPosX] + o.rawData[oVelX]
         const intendedZ = o.rawData[oPosZ] + o.rawData[oVelZ]
         const intendedFloorWrapper = {}
-        const intendedFloorHeight = Spawn.SurfaceCollision.find_floor(intendedX, o.rawData[oPosY], intendedZ, intendedFloorWrapper)
+        const intendedFloorHeight = gLinker.SurfaceCollision.find_floor(intendedX, o.rawData[oPosY], intendedZ, intendedFloorWrapper)
         const intendedFloor = intendedFloorWrapper.floor
         const deltaFloorHeight = intendedFloorHeight - o.rawData[oFloorHeight]
 
@@ -477,7 +667,7 @@ export const cur_obj_resolve_wall_collisions = () => {
             walls: []
         }
 
-        const numCollisions = Spawn.SurfaceCollision.find_wall_collisions(collisionData)
+        const numCollisions = gLinker.SurfaceCollision.find_wall_collisions(collisionData)
         if (numCollisions != 0) {
             o.rawData[oPosX] = collisionData.x
             o.rawData[oPosY] = collisionData.y
@@ -503,14 +693,14 @@ export const cur_obj_update_floor_height_and_get_floor = () => {
     const o = ObjectListProc.gCurrentObject
 
     const floorWrapper = {}
-    o.rawData[oFloorHeight] = Spawn.SurfaceCollision.find_floor(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], floorWrapper)
+    o.rawData[oFloorHeight] = gLinker.SurfaceCollision.find_floor(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], floorWrapper)
     return floorWrapper.floor
 }
 
 export const cur_obj_update_floor_height = () => {
 
     const o = ObjectListProc.gCurrentObject
-    o.rawData[oFloorHeight] = Spawn.SurfaceCollision.find_floor(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], {})
+    o.rawData[oFloorHeight] = gLinker.SurfaceCollision.find_floor(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], {})
 }
 
 
@@ -663,7 +853,7 @@ export const cur_obj_move_y_and_get_water_level = (gravity, buoyancy) => {
     if (o.activeFlags & ACTIVE_FLAG_UNK10) {
         waterLevel = -11000.0
     } else {
-        waterLevel = Spawn.SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ])
+        waterLevel = gLinker.SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ])
     }
 
     return waterLevel
@@ -687,7 +877,7 @@ export const cur_obj_move_xz = (steepSlopeNormalY, careAboutEdgesAndSteepSlopes)
     const intendedZ = o.rawData[oPosZ] + o.rawData[oVelZ]
 
     const intendedFloorWrapper = {}
-    const intendedFloorHeight = Spawn.SurfaceCollision.find_floor(intendedX, o.rawData[oPosY], intendedZ, intendedFloorWrapper)
+    const intendedFloorHeight = gLinker.SurfaceCollision.find_floor(intendedX, o.rawData[oPosY], intendedZ, intendedFloorWrapper)
     const deltaFloorHeight = intendedFloorHeight - o.rawData[oFloorHeight]
 
 
@@ -956,6 +1146,121 @@ export const cur_obj_set_face_angle_to_move_angle = () => {
     o.rawData[oFaceAngleRoll]  = o.rawData[oMoveAngleRoll]
 }
 
+export const get_object_list_from_behavior = (behavior) => {
+    behavior = Spawn.get_bhv_script(behavior)
+    return Spawn.get_bhv_object_list(behavior)
+}
+
+export const cur_obj_nearest_object_with_behavior = (behavior) => {
+    return cur_obj_find_nearest_object_with_behavior(behavior)
+}
+
+export const cur_obj_dist_to_nearest_object_with_behavior = (behavior) => {
+    let dist = {}
+    let obj = cur_obj_find_nearest_object_with_behavior(behavior, dist)
+    if (!obj) {
+        dist.dist = 15000.0
+    }
+
+    return dist.dist
+}
+
+export const cur_obj_find_nearest_object_with_behavior = (behavior, dist) => {
+    let closestObj = null
+    let obj
+    let listHead
+    let minDist = 0x20000
+
+    listHead = ObjectListProc.gObjectLists[get_object_list_from_behavior(behaviorAddr)]
+    obj = listHead.next
+
+    while (obj != listHead) {
+        // if (obj.behavior == behaviorAddr) {
+        //     if (obj.activeFlags != ACTIVE_FLAG_DEACTIVATED && obj != o) {
+        //         let /*f32*/ objDist = dist_between_objects(o, obj)
+        //         if (objDist < minDist) {
+        //             closestObj = obj
+        //             minDist = objDist
+        //         }
+        //     }
+        // }
+        obj = obj.next
+    }
+
+    if (dist) {
+        dist.dist = minDist
+    }
+    return closestObj
+}
+
+// struct Waypoint
+// {
+//     s16 flags;
+//     Vec3s pos;
+// };
+
+const WAYPOINT_FLAGS_END = -1
+const WAYPOINT_FLAGS_INITIALIZED = 0x8000
+const WAYPOINT_MASK_00FF = 0x00FF
+const WAYPOINT_FLAGS_PLATFORM_ON_TRACK_PAUSE = 3
+
+const PATH_NONE = 0
+const PATH_REACHED_END = -1
+const PATH_REACHED_WAYPOINT = 1
+
+export const cur_obj_follow_path = (unusedArg) => {
+    const o = ObjectListProc.gCurrentObject
+    let trajectory
+    let lastIndex, lastWaypoint
+    let targetIndex, targetWaypoint
+    let prevToNextX, prevToNextY, prevToNextZ
+    let objToNextXZ
+    let objToNextX, objToNextY, objToNextZ
+
+    if (o.rawData[oPathedPrevWaypointFlags] == 0) {
+        o.rawData[oPathedPrevWaypoint] = 0
+        o.rawData[oPathedPrevWaypointFlags] = WAYPOINT_FLAGS_INITIALIZED
+    }
+
+    trajectory = o.rawData[oPathedStartWaypoint]
+    lastIndex  = o.rawData[oPathedPrevWaypoint]
+
+    if (trajectory[lastIndex + 1].flags != WAYPOINT_FLAGS_END) {
+        targetIndex = lastIndex + 1
+    } else {
+        targetIndex = 0
+    }
+
+    lastWaypoint   = trajectory[lastIndex]
+    targetWaypoint = trajectory[targetIndex]
+
+    o.rawData[oPathedPrevWaypointFlags] = lastWaypoint.flags | WAYPOINT_FLAGS_INITIALIZED
+
+    prevToNextX = targetWaypoint.pos[0] - lastWaypoint.pos[0]
+    prevToNextY = targetWaypoint.pos[1] - lastWaypoint.pos[1]
+    prevToNextZ = targetWaypoint.pos[2] - lastWaypoint.pos[2]
+
+    objToNextX = targetWaypoint.pos[0] - o.rawData[oPosX]
+    objToNextY = targetWaypoint.pos[1] - o.rawData[oPosY]
+    objToNextZ = targetWaypoint.pos[2] - o.rawData[oPosZ]
+    objToNextXZ = Math.sqrt(objToNextX * objToNextX + objToNextZ * objToNextZ)
+
+    o.rawData[oPathedTargetYaw] = atan2s(objToNextZ, objToNextX)
+    o.rawData[oPathedTargetPitch] = atan2s(objToNextXZ, -objToNextY)
+
+      // If dot(prevToNext, objToNext) <= 0 (i.e. reached other side of target waypoint)
+    if (prevToNextX * objToNextX + prevToNextY * objToNextY + prevToNextZ * objToNextZ <= 0.0) {
+        o.rawData[oPathedPrevWaypoint] = targetIndex
+        if (trajectory[targetIndex + 1].flags == WAYPOINT_FLAGS_END) {
+            return PATH_REACHED_END
+        } else {
+            return PATH_REACHED_WAYPOINT
+        }
+    }
+
+    return PATH_NONE
+}
+
 
 export const random_f32_around_zero = (diameter) => {
     return random_float() * diameter - diameter / 2
@@ -997,13 +1302,11 @@ export const cur_obj_spawn_particles = (info) => {
 }
 
 export const obj_copy_pos_and_angle = (dst, src) => {
-
     obj_copy_pos(dst, src)
     obj_copy_angle(dst, src)
 }
 
 export const obj_copy_angle = (dst, src) => {
-
     dst.rawData[oFaceAnglePitch] = src.rawData[oFaceAnglePitch]
     dst.rawData[oFaceAngleYaw] = src.rawData[oFaceAngleYaw]
     dst.rawData[oFaceAngleRoll] = src.rawData[oFaceAngleRoll]
@@ -1014,17 +1317,21 @@ export const obj_copy_angle = (dst, src) => {
 }
 
 export const obj_copy_pos = (dst, src) => {
-
     dst.rawData[oPosX] = src.rawData[oPosX]
     dst.rawData[oPosY] = src.rawData[oPosY]
     dst.rawData[oPosZ] = src.rawData[oPosZ]
 }
 
 export const obj_set_pos = (obj, x, y, z) => {
-
     obj.rawData[oPosX] = x
     obj.rawData[oPosY] = y
     obj.rawData[oPosZ] = z
+}
+
+export const obj_copy_scale = (dst, src) => {
+    dst.header.gfx.scale[0] = src.header.gfx.scale[0]
+    dst.header.gfx.scale[1] = src.header.gfx.scale[1]
+    dst.header.gfx.scale[2] = src.header.gfx.scale[2]
 }
 
 export const obj_set_parent_relative_pos = (obj, relX, relY, relZ) => {
@@ -1035,7 +1342,6 @@ export const obj_set_parent_relative_pos = (obj, relX, relY, relZ) => {
 }
 
 export const obj_set_angle = (obj, pitch, yaw, roll) => {
-
     obj.rawData[oFaceAnglePitch] = pitch
     obj.rawData[oFaceAngleYaw] = yaw
     obj.rawData[oFaceAngleRoll] = roll
@@ -1127,6 +1433,13 @@ export const cur_obj_init_animation = (animIndex) => {
     geo_obj_init_animation(o.header.gfx, anims[animIndex]);
 }
 
+export const cur_obj_init_animation_with_sound = (animIndex) => {
+    const o = ObjectListProc.gCurrentObject
+    const anims = o.rawData[oAnimations]
+    geo_obj_init_animation(o.header.gfx, anims[animIndex])
+    o.rawData[oSoundStateID] = animIndex
+}
+
 export const cur_obj_init_animation_with_accel_and_sound = (animIndex, accel) => {
     const o = ObjectListProc.gCurrentObject
     const anims = o.rawData[oAnimations]
@@ -1137,7 +1450,7 @@ export const cur_obj_init_animation_with_accel_and_sound = (animIndex, accel) =>
 export const obj_init_animation_with_sound = (obj, animations, animIndex) => {
     obj.rawData[oAnimations] = animations
     geo_obj_init_animation(obj.header.gfx, animations[animIndex])
-    // obj->oSoundStateID = animIndex;
+    obj.rawData[oSoundStateID] = animIndex
 }
 
 export const cur_obj_compute_vel_xz = () => {
@@ -1208,6 +1521,19 @@ export const cur_obj_push_mario_away = (radius) => {
     }
 }
 
+export const cur_obj_push_mario_away_from_cylinder = (radius, extentY) => {
+    const o = ObjectListProc.gCurrentObject
+    let marioRelY = ObjectListProc.gMarioObject.rawData[oPosY] - o.rawData[oPosY]
+
+    if (marioRelY < 0.0) {
+        marioRelY = -marioRelY
+    }
+
+    if (marioRelY < extentY) {
+        cur_obj_push_mario_away(radius)
+    }
+}
+
 export const dist_between_objects = (obj1, obj2) => {
     const dx = obj1.rawData[oPosX] - obj2.rawData[oPosX]
     const dy = obj1.rawData[oPosY] - obj2.rawData[oPosY]
@@ -1232,7 +1558,7 @@ export const obj_angle_to_object = (obj1, obj2) => {
 export const obj_spawn_loot_coins = (obj, numCoins, sp30, coinsBehavior, posJitter, model) => {
 
     const floorWrapper = {}
-    let spawnHeight = Spawn.SurfaceCollision.find_floor(obj.rawData[oPosX], obj.rawData[oPosY], obj.rawData[oPosZ], floorWrapper)
+    let spawnHeight = gLinker.SurfaceCollision.find_floor(obj.rawData[oPosX], obj.rawData[oPosY], obj.rawData[oPosZ], floorWrapper)
 
     if (obj.rawData[oPosY] - spawnHeight > 100) {
         spawnHeight = obj.rawData[oPosY]

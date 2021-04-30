@@ -400,6 +400,18 @@ class Camera {
         return Math.sqrt(distX * distX + distY * distY + distZ * distZ)
     }
 
+    /**
+     * Calculates the pitch and yaw between two vectors.
+     */
+    calculate_angles(from, to, result) {
+        let /*f32*/ dx = to[0] - from[0]
+        let /*f32*/ dy = to[1] - from[1]
+        let /*f32*/ dz = to[2] - from[2]
+
+        result.pitch = MathUtil.atan2s(MathUtil.sqrtf(dx * dx + dz * dz), dy)
+        result.yaw = MathUtil.atan2s(dz, dx)
+    }
+
     is_within_100_units_of_mario(posX, posY, posZ) {
         const pos = [posX, posY, posZ]
         return this.calc_abs_dist(this.gPlayerCameraState.pos, pos) < 100
@@ -579,6 +591,48 @@ class Camera {
         wrapper.current = dst[2]
         this.set_or_approach_f32_asymptotic(wrapper, goal[2], zMul)
         dst[2] = wrapper.current
+    }
+
+    reduce_by_dist_from_camera(value, maxDist, posX, posY, posZ) {
+        let /*s16*/ res = 0
+          // Direction from pos to (Lakitu's) goalPos
+        let /*f32*/ goalDX = this.gLakituState.goalPos[0] - posX
+        let /*f32*/ goalDY = this.gLakituState.goalPos[1] - posY
+        let /*f32*/ goalDZ = this.gLakituState.goalPos[2] - posZ
+
+        let dist = MathUtil.sqrtf(goalDX * goalDX + goalDY * goalDY + goalDZ * goalDZ)
+        if (maxDist > dist) {
+            const pos = [posX, posY, posZ]
+            const result = {}
+            MathUtil.vec3f_get_dist_and_angle(this.gLakituState.goalPos, pos, result)
+            dist = result.dist
+            let pitch = result.pitch
+            let yaw = result.yaw
+
+            if (dist < maxDist) {
+                const goalResult = {}
+                this.calculate_angles(this.gLakituState.goalPos, this.gLakituState.goalFocus, goalResult)
+                let /*s16*/ goalPitch = goalResult.pitch
+                let /*s16*/ goalYaw = goalResult.yaw
+
+                pitch = s16(pitch - goalPitch)
+                yaw = s16(yaw - goalYaw)
+                dist -= 2000.0
+                if (dist < 0.0) {
+                    dist = 0.0
+                }
+                maxDist -= 2000.0
+                if (maxDist < 2000.0) {
+                    maxDist = 2000.0
+                }
+                res = value * (1.0 - dist / maxDist)
+                if (pitch < -0x1800 || pitch > 0x400 ||
+                    yaw   < -0x1800 || yaw >   0x1800) {
+                    res /= 2
+                }
+            }
+        }
+        return res
     }
 
     scale_along_line(dst, from, to, scale) {
@@ -2090,6 +2144,100 @@ class Camera {
             default: throw "unimplemented camera shake type " + shake
         }
     }
+
+
+    /**
+     * Start shaking the camera's pitch, but reduce `mag` by it's distance from the camera
+     */
+    set_pitch_shake_from_point(mag, decay, inc, maxDist, posX, posY, posZ) {
+        const pos = [posX, posY, posZ]
+        // let /*f32*/ dist
+        // let s16 dummyPitch
+        // let /*s16*/ dummyYaw
+
+        // dist unused!
+        // MathUtil.vec3f_get_dist_and_angle(this.gLakituState.goalPos, pos, &dist, &dummyPitch, &dummyYaw)
+        mag = this.reduce_by_dist_from_camera(mag, maxDist, posX, posY, posZ)
+        if (mag != 0) {
+            this.set_camera_pitch_shake(mag, decay, inc)
+        }
+    }
+
+
+    /**
+     * Starts a camera shake, but scales the amplitude by the point's distance from the camera
+     */
+    set_camera_shake_from_point(shake, posX, posY, posZ) {
+        switch (shake) {
+            case SHAKE_POS_BOWLING_BALL:
+                this.set_pitch_shake_from_point(0x28, 0x8, 0x4000, 2000.0, posX, posY, posZ)
+                break
+
+            case SHAKE_POS_SMALL:
+                this.set_pitch_shake_from_point(0x80, 0x8, 0x4000, 4000.0, posX, posY, posZ)
+                this.set_fov_shake_from_point_preset(SHAKE_FOV_SMALL, posX, posY, posZ)
+                break
+
+            case SHAKE_POS_MEDIUM:
+                this.set_pitch_shake_from_point(0xC0, 0x8, 0x4000, 6000.0, posX, posY, posZ)
+                this.set_fov_shake_from_point_preset(SHAKE_FOV_MEDIUM, posX, posY, posZ)
+                break
+
+            case SHAKE_POS_LARGE:
+                this.set_pitch_shake_from_point(0x100, 0x8, 0x3000, 8000.0, posX, posY, posZ)
+                this.set_fov_shake_from_point_preset(SHAKE_FOV_LARGE, posX, posY, posZ)
+                break
+        }
+    }
+
+    /**
+     * Start a preset fov shake that is reduced by the point's distance from the camera.
+     * Used in set_camera_shake_from_point
+     *
+     * @see set_camera_shake_from_point
+     */
+    set_fov_shake_from_point_preset(preset, posX, posY, posZ) {
+        switch (preset) {
+            case SHAKE_FOV_SMALL:
+                this.set_fov_shake_from_point(0x100, 0x30, 0x8000, 3000.0, posX, posY, posZ)
+                break
+            case SHAKE_FOV_MEDIUM:
+                this.set_fov_shake_from_point(0x200, 0x30, 0x8000, 4000.0, posX, posY, posZ)
+                break
+            case SHAKE_FOV_LARGE:
+                this.set_fov_shake_from_point(0x300, 0x30, 0x8000, 6000.0, posX, posY, posZ)
+                break
+            case SHAKE_FOV_UNUSED:
+                this.set_fov_shake_from_point(0x800, 0x20, 0x4000, 3000.0, posX, posY, posZ)
+                break
+        }
+    }
+
+    /**
+     * Start shaking the camera's field of view.
+     *
+     * @param shakeSpeed How fast the shake should progress through its period. The shake offset is
+     *                   calculated from coss(), so this parameter can be thought of as an angular velocity.
+     */
+    set_fov_shake(amplitude, decay, shakeSpeed) {
+        if (amplitude > this.sFOVState.shakeAmplitude) {
+            this.sFOVState.shakeAmplitude = amplitude
+            this.sFOVState.decay = decay
+            this.sFOVState.shakeSpeed = shakeSpeed
+        }
+    }
+
+    /**
+     * Start shaking the camera's field of view, but reduce `amplitude` by distance from camera
+     */
+    set_fov_shake_from_point(amplitude, decay, shakeSpeed, maxDist, posX, posY, posZ) {
+        amplitude = this.reduce_by_dist_from_camera(amplitude, maxDist, posX, posY, posZ)
+
+        if (amplitude != 0) {
+            this.set_fov_shake(amplitude, decay, shakeSpeed)
+        }
+    }
+
 }
 
 export const CameraInstance = new Camera()

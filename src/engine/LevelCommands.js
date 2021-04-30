@@ -48,26 +48,6 @@ class LevelCommands {
         this.sStackTop = []
     }
 
-    // ALLOC_LEVEL_POOL() {return this.alloc_level_pool()}
-    // AREA(areaIndex, geoLayout) {return this.begin_area(areaIndex, geoLayout)}
-    // CALL(arg, func, funcClass) {return this.call(arg, func, funcClass)}
-    // CALL_LOOP(arg, func, funcClass) {return this.call_loop(arg, func, funcClass)}
-    // END_AREA() {return this.end_area()}
-    // FREE_LEVEL_POOL() {return this.free_level_pool()}
-    // GET_AREA(what) {return this.get_area(what)}
-    // INIT_LEVEL() {return this.init_level()}
-    // JUMP_LINK(script) {return this.jump_link(script)}
-    // LOAD_MODEL_FROM_GEO(model, geo) {return this.load_model_from_geo(model, geo)}
-    // LOAD_MODEL_FROM_DL(model, dl, layer) {return this.load_model_from_dl(model, dl, layer)}
-    // MARIO(model, bharg, bhscript) {return this.init_mario(model, bharg, bhscript)}
-    // MARIO_POS(area, yaw, x, y, z) {return this.set_mario_pos(area, yaw, x, y, z)}
-    // MACRO_OBJECTS(data) {return this.macro_objects(data)}
-    // OBJECT(model, x, y, z, pitch, yaw, rot, bharg, bhscript) {return this.place_object(model, x, y, z, pitch, yaw, rot, bharg, bhscript)}
-    // OBJECT_WITH_ACTS(model, x, y, z, pitch, yaw, rot, bharg, bhscript, acts) {return this.place_object(model, x, y, z, pitch, yaw, rot, bharg, bhscript, acts)}
-    // RETURN() {return this.return()}  // heh
-    // TERRAIN(data) {return this.terrain(data)}
-    // TERRAIN_TYPE(data) {return this.terrain_type(data)}
-
     load_mio0() {
         this.sCurrentScript.index++
     }
@@ -389,7 +369,6 @@ class LevelCommands {
 
 export const LevelCommandsInstance = new LevelCommands()
 
-// EXPERIMENTAL
 const Lev = LevelCommandsInstance;
 export const ALLOC_LEVEL_POOL = (...args)     => {return {command: Lev.alloc_level_pool, args: args}}
 export const AREA = (...args)                 => {return {command: Lev.begin_area, args: args}}

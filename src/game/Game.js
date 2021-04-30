@@ -1,3 +1,4 @@
+import * as _Linker from "./Linker"
 import { level_script_entry } from "../levels/main_entry/entry"
 import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
 import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
@@ -5,6 +6,7 @@ import * as Gbi from "../include/gbi"
 
 class Game {
     constructor() {
+        gLinker.Game = this
         this.main_loop_init() /// thread5_game_loop_init
         window.gGlobalTimer = 0
     }

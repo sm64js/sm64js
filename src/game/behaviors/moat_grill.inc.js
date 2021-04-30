@@ -13,3 +13,5 @@ export const bhv_moat_grills_loop = () => {
         SurfaceLoad.load_object_collision_model()
     }
 }
+
+gLinker.bhv_moat_grills_loop = bhv_moat_grills_loop

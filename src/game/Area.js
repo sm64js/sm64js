@@ -1,6 +1,7 @@
+import * as _Linker from "./Linker"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
-import { SurfaceLoadInstance as SurfaceLoad } from "./SurfaceLoad"
-import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
+// import { SurfaceLoadInstance as SurfaceLoad } from "./SurfaceLoad"
+// import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { GameInstance as Game } from "./Game"
 import { gSPViewport } from "../include/gbi"
 import { render_screen_transition } from "./ScreenTransition"
@@ -28,6 +29,7 @@ const canvas = document.querySelector('#gameCanvas')
 class Area {
 
     constructor() {
+        gLinker.Area = this
 
         this.gCurrentArea = null
         this.gAreas = Array(8).fill(0).map(() => { return { index: 0 } })
@@ -60,11 +62,11 @@ class Area {
             this.gCurAreaIndex = this.gCurrentArea.index
 
             if (this.gCurrentArea.terrainData) {
-                SurfaceLoad.load_area_terrain(index, this.gCurrentArea.terrainData, this.gCurrentArea.surfaceRooms, this.gCurrentArea.macroObjects)
+                gLinker.SurfaceLoad.load_area_terrain(index, this.gCurrentArea.terrainData, this.gCurrentArea.surfaceRooms, this.gCurrentArea.macroObjects)
             }
 
             if (this.gCurrentArea.objectSpawnInfos) {
-                ObjectListProc.spawn_objects_from_info(this.gCurrentArea.objectSpawnInfos)
+                gLinker.ObjectListProcessor.spawn_objects_from_info(this.gCurrentArea.objectSpawnInfos)
             }
         }
 
@@ -75,16 +77,16 @@ class Area {
 
         if (this.gCurrentArea.index == this.gMarioSpawnInfo.areaIndex) {
             this.gCurrentArea.flags |= 0x01
-            ObjectListProc.spawn_objects_from_info(this.gMarioSpawnInfo)
+            gLinker.ObjectListProcessor.spawn_objects_from_info(this.gMarioSpawnInfo)
 /*            const marioCloneSpawnInfo = this.gMarioSpawnInfo
             marioCloneSpawnInfo.startPos[0] -= 500
-            ObjectListProc.spawn_objects_from_info(marioCloneSpawnInfo)*/
+            gLinker.ObjectListProcessor.spawn_objects_from_info(marioCloneSpawnInfo)*/
         }
     }
 
     area_update_objects() {
         GeoRenderer.gAreaUpdateCounter++
-        ObjectListProc.update_objects(0)
+        gLinker.ObjectListProcessor.update_objects(0)
     }
 
     set_warp_transition_rgb(red, green, blue) {

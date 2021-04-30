@@ -4,10 +4,11 @@ import { geo_add_child, GRAPH_RENDER_INVISIBLE, GRAPH_NODE_TYPE_OBJECT, geo_remo
 import { GeoLayoutInstance } from "../engine/GeoLayout"
 import { ACTIVE_FLAG_ACTIVE, ACTIVE_FLAG_UNK8, RESPAWN_INFO_TYPE_NULL, ACTIVE_FLAG_UNIMPORTANT, OBJ_MOVE_ON_GROUND, oIntangibleTimer, oDamageOrCoinValue, oHealth, oCollisionDistance, oDrawingDistance, oDistanceToMario, oRoom, oFloorHeight, oPosX, oPosY, oPosZ, ACTIVE_FLAGS_DEACTIVATED } from "../include/object_constants"
 import { mtxf_identity } from "../engine/math_util"
+import * as _Linker from "./Linker"
 
 class SpawnObject {
     constructor() {
-
+        gLinker.Spawn = this
     }
 
     clear_object_lists() {
@@ -109,7 +110,7 @@ class SpawnObject {
     }
 
     snap_object_to_floor(obj) {
-        obj.rawData[oFloorHeight] = this.SurfaceCollision.find_floor(obj.rawData[oPosX], obj.rawData[oPosY], obj.rawData[oPosZ], {})
+        obj.rawData[oFloorHeight] = gLinker.SurfaceCollision.find_floor(obj.rawData[oPosX], obj.rawData[oPosY], obj.rawData[oPosZ], {})
 
         if (obj.rawData[oFloorHeight] + 2.0 > obj.oPosY && obj.oPosY > obj.oFloorHeight - 10.0) {
             obj.oPosY = obj.oFloorHeight
@@ -140,23 +141,39 @@ class SpawnObject {
         this.deallocate_object(obj.header)
     }
 
-    create_object(bhvScript) {
 
-        /// Some behvior scripts cannot be initialized due to circular dependancies, so are left as functions to be initialized when they are needed
-        if (typeof bhvScript == "function") {
-            bhvScript = bhvScript()
+    // Some behvior scripts cannot be initialized due to circular dependancies,
+    // so are left as functions to be initialized when they are needed
+    get_bhv_script(behavior) {
+        let bhv = behavior
+        if (typeof bhv == "function") {
+            bhv = bhv()
+        } else if (typeof bhv == "string") {
+            bhv = gLinker.behaviors[bhv]
+            if (!bhv) {
+                throw "unlinked bhv script: " + behavior
+            }
         }
 
-        let objListIndex
+        return bhv
+    }
+
+    get_bhv_object_list(bhvScript) {
+        bhvScript = this.get_bhv_script(bhvScript)
 
         // peek at first command
         if (Array.isArray(bhvScript[0]) && bhvScript[0][0] == 'BEGIN') {
-            objListIndex = bhvScript[0][1]
+            return bhvScript[0][1]
         }else if (bhvScript[0].command == BhvCmds.begin) {
-            objListIndex = bhvScript[0].args.objListIndex
+            return bhvScript[0].args.objListIndex
         } else {
-            objListIndex =  ObjectListProc.OBJ_LIST_DEFAULT
+            return ObjectListProc.OBJ_LIST_DEFAULT
         }
+    }
+
+    create_object(bhvScript) {
+        bhvScript = this.get_bhv_script(bhvScript)
+        let objListIndex = this.get_bhv_object_list(bhvScript)
 
         const objList = ObjectListProc.gObjectLists[objListIndex]
 

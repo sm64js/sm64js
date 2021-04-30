@@ -279,17 +279,20 @@ export const special_key_door = 0x8D
 export const special_null_end = 0xFF
 
 
-export const COL_INIT                          = () => { return [TERRAIN_LOAD_VERTICES] }
-export const COL_END                           = () => { return [TERRAIN_LOAD_END] }
-export const COL_TRI_STOP                      = () => { return [TERRAIN_LOAD_CONTINUE] }
-export const COL_VERTEX_INIT                   = (vtxNum) => { return [vtxNum] }
-export const COL_VERTEX                        = (x, y, z) => { return [x, y, z] }
-export const COL_TRI_INIT                      = (surfType, triNum) => { return [surfType, triNum] }
-export const COL_TRI                           = (v1, v2, v3) => { return [v1, v2, v3] }
-export const COL_TRI_SPECIAL                   = (v1, v2, v3, param) => { return [v1, v2, v3, param] }
-export const COL_SPECIAL_INIT                  = (num) => { return [TERRAIN_LOAD_OBJECTS, num] }
-export const SPECIAL_OBJECT                    = (preset, posX, posY, posZ) => { return [preset, posX, posY, posZ] }
-export const SPECIAL_OBJECT_WITH_YAW           = (preset, posX, posY, posZ, yaw) => { return [preset, posX, posY, posZ, yaw] }
-export const SPECIAL_OBJECT_WITH_YAW_AND_PARAM = (preset, posX, posY, posZ, yaw, param) => { return [preset, posX, posY, posZ, yaw, param] }
-export const COL_WATER_BOX_INIT                = (num) => { return [TERRAIN_LOAD_ENVIRONMENT, num] }
-export const COL_WATER_BOX                     = (id, x1, z1, x2, z2, y) => { return [id, x1, z1, x2, z2, y] }
+export const COL_INIT                          = () =>                                      { return [TERRAIN_LOAD_VERTICES] }
+export const COL_END                           = () =>                                      { return [TERRAIN_LOAD_END] }
+export const COL_TRI_STOP                      = () =>                                      { return [TERRAIN_LOAD_CONTINUE] }
+export const COL_VERTEX_INIT                   = (vtxNum) =>                                { return [vtxNum] }
+export const COL_VERTEX                        = (x, y, z) =>                               { return [x, y, z] }
+export const COL_TRI_INIT                      = (surfType, triNum) =>                      { return [surfType, triNum] }
+export const COL_TRI                           = (v1, v2, v3) =>                            { return [v1, v2, v3] }
+export const COL_TRI_SPECIAL                   = (v1, v2, v3, param) =>                     { return [v1, v2, v3, param] }
+export const COL_SPECIAL_INIT                  = (num) =>                                   { return [TERRAIN_LOAD_OBJECTS, num] }
+export const SPECIAL_OBJECT                    = (preset, posX, posY, posZ) =>              { return [preset, posX, posY, posZ] }
+export const SPECIAL_OBJECT_WITH_YAW           = (preset, posX, posY, posZ, yaw) =>         { return [preset, posX, posY, posZ, yaw] }
+export const SPECIAL_OBJECT_WITH_YAW_AND_PARAM = (preset, posX, posY, posZ, yaw, param) =>  { return [preset, posX, posY, posZ, yaw, param] }
+export const COL_WATER_BOX_INIT                = (num) =>                                   { return [TERRAIN_LOAD_ENVIRONMENT, num] }
+export const COL_WATER_BOX                     = (id, x1, z1, x2, z2, y) =>                 { return [id, x1, z1, x2, z2, y] }
+
+export const TRAJECTORY_POS                    = (trajId, x, y, z) =>                       { return {flags: trajId, pos: [x, y, z]} }
+export const TRAJECTORY_END                    = () =>                                      { return {flags: -1} }

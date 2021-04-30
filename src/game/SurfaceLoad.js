@@ -4,12 +4,13 @@ import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProce
 import { oDistanceToMario, oCollisionDistance, oDrawingDistance, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oPosX, oFaceAnglePitch } from "../include/object_constants"
 import { GRAPH_RENDER_ACTIVE } from "../engine/graph_node"
 import { dist_between_objects, obj_build_transform_from_pos_and_angle, obj_apply_scale_to_matrix } from "./ObjectHelpers"
-import { SpawnObjectInstance as Spawn } from "./SpawnObject"
+// import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 
 class SurfaceLoad {
     constructor() {
 
-        Spawn.SurfaceLoad = this
+        // Spawn.SurfaceLoad = this
+        gLinker.SurfaceLoad = this
 
         this.SPATIAL_PARTITION_FLOORS = 0
         this.SPATIAL_PARTITION_CEILS = 1
@@ -283,13 +284,16 @@ class SurfaceLoad {
         }
 
         if (macroObjects) {
-            if (macroObjects[0].preset < 30) throw "spawn objects shortcut method?"
-            else spawn_macro_objects(index, macroObjects)
+            // if (macroObjects[0].preset < 30) {
+            //     throw "spawn objects shortcut method?"
+            // }
+            // else {
+                spawn_macro_objects(index, macroObjects)
+            // }
         } 
 
         this.gNumStaticSurfaceNodes = this.gSurfaceNodesAllocated
         this.gNumStaticSurfaces = this.gSurfacesAllocated
-
     }
 
     clear_dynamic_surfaces() {

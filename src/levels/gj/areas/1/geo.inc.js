@@ -23,6 +23,7 @@ export const gj_area_1_geo = [
 	{ command: Geo.node_camera, args: [1, 0, 2000, 6000, 0, -2200, 0, Camera.geo_camera_main]},
 	{ command: Geo.open_node },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, gj_DL] },
+	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT_DECAL, gj_DL] },
 	{ command: Geo.node_render_object_parent },
 	{ command: Geo.close_node },
 	{ command: Geo.close_node },

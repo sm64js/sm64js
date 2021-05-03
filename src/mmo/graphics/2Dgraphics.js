@@ -27,7 +27,7 @@ const marioHealthWedges = [
 const Minimaps = {
 	'm1000':{'img':defImage(401,401,'mmo/assets/minimaps/maps/bob_mountain.png'),'playerScaler':1.0,'hasFlags':true},
 	'm1002':{'img':defImage(401,401,'mmo/assets/minimaps/maps/starman.png'),'playerScaler':2.15,'hasFlags':false},
-    'm1003':{'img':defImage(401,401,'mmo/assets/minimaps/maps/gj.png'),'playerScaler':1.0,'hasFlags':false},
+    'm1003':{'img':defImage(401,401,'mmo/assets/minimaps/maps/gj.png'),'playerScaler':1.5,'hasFlags':false},
 	'm9':{'img':defImage(401,401,'mmo/assets/minimaps/maps/bob_battlefield.png'),'playerScaler':1.82819,'hasFlags':true},
 	'm16':{'img':defImage(401,401,'mmo/assets/minimaps/maps/castle_grounds.png'),'playerScaler':1.80144,'hasFlags':true},
 	'm36':{'img':defImage(401,401,'mmo/assets/minimaps/maps/ttm.png'),'playerScaler':1.9838,'hasFlags':true},

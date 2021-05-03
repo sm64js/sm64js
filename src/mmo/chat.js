@@ -5,9 +5,7 @@ const emoteImg = {
     mariostyle: 'mariostyle.gif', pogchamp: 'pogchamp.png', 
     strange: 'strange.png', kick: 'kick.gif', 
     shock: 'shock.gif', bup: 'bup.jpg', 
-    blj: 'blj.gif', discord: 'discord.png',
-    troll: 'troll.png', mm: 'mm.png',
-    trollge: 'trollge.png', morphoff: 'morphoff.png'
+    blj: 'blj.gif', discord: 'discord.png'
 }
 
 const createEmote = (type) => {

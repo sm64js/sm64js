@@ -2,6 +2,7 @@ import { GEO_CONTEXT_RENDER } from "../engine/graph_node"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { castle_grounds_movtex_water, castle_grounds_movtex_tris_waterfall, castle_grounds_dl_waterfall } from "../levels/castle_grounds/areas/1/movtext.inc"
 import { ccm_movtex_penguin_puddle_water } from "../levels/ccm/areas/1/movtext.inc"
+import { gj_movtex_water } from "../levels/gj/areas/1/movtext.inc"
 import { wf_movtex_water } from "../levels/wf/areas/1/movtext.inc"
 import { GeoLayoutInstance as GeoLayout } from "../engine/GeoLayout"
 import * as Gbi from "../include/gbi"
@@ -56,6 +57,7 @@ const MOVTEX_AREA_WF = (0x24 << 8)
 const MOVTEX_AREA_CASTLE_COURTYARD = (0x26 << 8)
 const MOVTEX_AREA_COTMC = (0x28 << 8)
 const MOVTEX_AREA_TTM = (0x36 << 8)
+const MOVTEX_AREA_GJ = (0x37 << 8)
 
 // Quad collections
 const BBH_MOVTEX_MERRY_GO_ROUND_WATER_ENTRANCE = (0 | MOVTEX_AREA_BBH)
@@ -82,6 +84,7 @@ const DDD_MOVTEX_AREA2_WATER = (2 | MOVTEX_AREA_DDD)
 const WF_MOVTEX_WATER = (1 | MOVTEX_AREA_WF)
 const CASTLE_COURTYARD_MOVTEX_STAR_STATUE_WATER = (1 | MOVTEX_AREA_CASTLE_COURTYARD)
 const TTM_MOVTEX_PUDDLE = (1 | MOVTEX_AREA_TTM)
+const GJ_MOVTEX_WATER = (1 | MOVTEX_AREA_GJ)
 
 // Non-colored, unique movtex meshes (drawn in level geo)
 const MOVTEX_PYRAMID_SAND_PATHWAY_FRONT = (1 | MOVTEX_AREA_SSL)
@@ -123,6 +126,8 @@ const get_quad_collection_from_id = (id) => {
             return ccm_movtex_penguin_puddle_water
         case WF_MOVTEX_WATER:
             return wf_movtex_water
+        case GJ_MOVTEX_WATER:
+            return gj_movtex_water
         default: throw "unknown case - get quad collection from id"
     }
 }

@@ -1,6 +1,7 @@
 import { GeoLayoutInstance as Geo } from "../../../../engine/GeoLayout"
 import { CameraInstance as Camera } from "../../../../game/Camera"
 import { geo_skybox_main } from "../../../../game/LevelGeo"
+import { geo_movtex_draw_water_regions } from "../../../../game/MovingTexture"
 
 import { gj_DL } from "./1/model.inc"
 
@@ -23,6 +24,8 @@ export const gj_area_1_geo = [
 	{ command: Geo.node_camera, args: [1, 0, 2000, 6000, 0, -2200, 0, Camera.geo_camera_main]},
 	{ command: Geo.open_node },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, gj_DL] },
+	{ command: Geo.display_list, args: [Geo.LAYER_ALPHA, gj_DL] },
+	{ command: Geo.node_generated, args: [0x3701, geo_movtex_draw_water_regions]},
 	{ command: Geo.node_render_object_parent },
 	{ command: Geo.close_node },
 	{ command: Geo.close_node },

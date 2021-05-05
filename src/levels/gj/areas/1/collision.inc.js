@@ -4185,7 +4185,6 @@ export const gj_area_1_collision = [
     ...COL_TRI(1491, 1497, 1496),
     ...COL_TRI_STOP(),
     ...COL_WATER_BOX_INIT(2),
-    ...COL_WATER_BOX(0x00, 2079, -1347, 4572, 1202, -48),
-    ...COL_WATER_BOX(0x00, -5252, 174, 1027, 3507, 2),
+    ...COL_WATER_BOX(0x00, -5322, -1707, 4583, 3464, 2),
     ...COL_END()
 ]

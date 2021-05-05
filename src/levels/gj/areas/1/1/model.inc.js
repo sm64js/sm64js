@@ -5,7 +5,6 @@ import {
 	leaves,
 	wood,
 	concrete,
-	water,
 	sand,
 	rock,
 	granite,
@@ -11971,63 +11970,6 @@ export const dl_concrete_mesh_53 = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-
-const dl_water_vtx_0 = [
-	{pos: [ 4571.654297,-48.313431,1202.325317 ], flag: 0, tc: [ 2625,1601 ], color: [ 128,255,128,255]},
-	{pos: [ 2079.013916,-48.313736,-1346.526489 ], flag: 0, tc: [ -1601,-2625 ], color: [ 128,255,128,255]},
-	{pos: [ 2079.013916,-48.313431,1202.325317 ], flag: 0, tc: [ -1601,1601 ], color: [ 128,255,128,255]},
-	{pos: [ 4571.654297,-48.313431,1202.325317 ], flag: 0, tc: [ 2625,1601 ], color: [ 128,255,128,255]},
-	{pos: [ 4571.654297,-48.313736,-1346.526489 ], flag: 0, tc: [ 2625,-2625 ], color: [ 128,255,128,255]},
-	{pos: [ 2079.013916,-48.313736,-1346.526489 ], flag: 0, tc: [ -1601,-2625 ], color: [ 128,255,128,255]},
-	{pos: [ 2079.014160,-54.806118,1202.325195 ], flag: 0, tc: [ 2399,1375 ], color: [ 128,1,128,255]},
-	{pos: [ 4571.654785,-54.806034,-1346.526367 ], flag: 0, tc: [ -1375,-2399 ], color: [ 128,1,128,255]},
-	{pos: [ 4571.654785,-54.806335,1202.325195 ], flag: 0, tc: [ -1375,1375 ], color: [ 128,1,128,255]},
-	{pos: [ 2079.014160,-54.806118,1202.325195 ], flag: 0, tc: [ 2399,1375 ], color: [ 128,1,128,255]},
-	{pos: [ 2079.014160,-54.805817,-1346.526367 ], flag: 0, tc: [ 2399,-2399 ], color: [ 128,1,128,255]},
-	{pos: [ 4571.654785,-54.806034,-1346.526367 ], flag: 0, tc: [ -1375,-2399 ], color: [ 128,1,128,255]},
-]
-
-//You may need to adjust this to fix any size issues.
-export const dl_water_mesh_0 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, water),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPVertex(dl_water_vtx_0, 0, 0),
-	Gbi.gsSP1Triangle(0, 1, 2, 0),
-	Gbi.gsSP1Triangle(3, 4, 5, 0),
-	Gbi.gsSP1Triangle(6, 7, 8, 0),
-	Gbi.gsSP1Triangle(9, 10, 11, 0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-
-const dl_water_vtx_1 = [
-	{pos: [ 1026.876709,1.666860,3506.974609 ], flag: 0, tc: [ 7598,1702 ], color: [ 128,255,128,255]},
-	{pos: [ -5251.710938,1.666463,173.641724 ], flag: 0, tc: [ -1702,-2926 ], color: [ 128,255,128,255]},
-	{pos: [ -5251.710938,1.666860,3506.974609 ], flag: 0, tc: [ -1702,1702 ], color: [ 128,255,128,255]},
-	{pos: [ 1026.876709,1.666860,3506.974609 ], flag: 0, tc: [ 7598,1702 ], color: [ 128,255,128,255]},
-	{pos: [ 1026.876709,1.666463,173.641724 ], flag: 0, tc: [ 7598,-2926 ], color: [ 128,255,128,255]},
-	{pos: [ -5251.710938,1.666463,173.641724 ], flag: 0, tc: [ -1702,-2926 ], color: [ 128,255,128,255]},
-	{pos: [ -5251.710938,-4.982038,3506.974609 ], flag: 0, tc: [ 2726,1702 ], color: [ 128,1,128,255]},
-	{pos: [ 1026.876953,-4.981092,173.641479 ], flag: 0, tc: [ -1702,-2726 ], color: [ 128,1,128,255]},
-	{pos: [ 1026.876953,-4.981490,3506.974609 ], flag: 0, tc: [ -1702,1702 ], color: [ 128,1,128,255]},
-	{pos: [ -5251.710938,-4.982038,3506.974609 ], flag: 0, tc: [ 2726,1702 ], color: [ 128,1,128,255]},
-	{pos: [ -5251.710938,-4.981641,173.641479 ], flag: 0, tc: [ 2726,-2726 ], color: [ 128,1,128,255]},
-	{pos: [ 1026.876953,-4.981092,173.641479 ], flag: 0, tc: [ -1702,-2726 ], color: [ 128,1,128,255]},
-]
-
-//You may need to adjust this to fix any size issues.
-export const dl_water_mesh_1 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, water),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPVertex(dl_water_vtx_1, 0, 0),
-	Gbi.gsSP1Triangle(0, 1, 2, 0),
-	Gbi.gsSP1Triangle(3, 4, 5, 0),
-	Gbi.gsSP1Triangle(6, 7, 8, 0),
-	Gbi.gsSP1Triangle(9, 10, 11, 0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-
 const dl_boost_pad_vtx_0 = [
 	{pos: [ -531.632690,131.055634,-123.269547 ], flag: 0, tc: [ 104,-919 ], color: [ 128,255,128,255]},
 	{pos: [ -325.610931,131.055634,82.752243 ], flag: 0, tc: [ 919,-104 ], color: [ 128,255,128,255]},
@@ -12462,8 +12404,6 @@ export const gj_DL = [
 	Gbi.gsSPDisplayList(dl_concrete_mesh_51),
 	Gbi.gsSPDisplayList(dl_concrete_mesh_52),
 	Gbi.gsSPDisplayList(dl_concrete_mesh_53),
-	Gbi.gsSPDisplayList(dl_water_mesh_0),
-	Gbi.gsSPDisplayList(dl_water_mesh_1),
 	Gbi.gsSPDisplayList(dl_boost_pad_mesh_0),
 	Gbi.gsSPDisplayList(dl_boost_pad_mesh_1),
 	Gbi.gsSPDisplayList(dl_boost_pad_mesh_2),

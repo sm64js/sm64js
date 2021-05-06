@@ -45,24 +45,25 @@ export const getSelectedLevel = () => {
 }
 
 export const levelIdToName = {
+    4: "Big Boo's Haunt",
+    5: "Cool, Cool Mountain",
+    6: "Castle Inside First Level",
+    7: "Hazy Maze Cave",
+    8: "Shifting Sand Land",
+    9: "Bob-omb Battlefield",
+    10: "Snowman's Land",
+    16: "Castle Grounds",
+    24: "Whomps Fortress",
+    26: "Castle Courtyard",
+    27: "Princess's Secret Slide",
+    36: "Tall, Tall Mountain",
+    56: "Cool, Cool Mountain Slide",
+    602: "Castle Inside Second Level",
+    999: "Clouded Ruins",
+    1000: "Mushroom Battlefield",
     1001: "CTF/Race Map",
     1002: "Starman Fortress",
     1003: "Glider Jungle",
-    1000: "Mushroom Battlefield",
-    999: "Clouded Ruins",
-    16: "Castle Grounds",
-    6: "Castle Inside First Level",
-    602: "Castle Inside Second Level",
-    26: "Castle Courtyard",
-    9: "Bob-omb Battlefield",
-    8: "Shifting Sand Land",
-    7: "Hazy Maze Cave",
-    4: "Big Boo's Haunt",
-    5: "Cool, Cool Mountain",
-    27: "Princess's Secret Slide",
-    36: "Tall, Tall Mountain",
-    24: "Whomps Fortress",
-    10: "Snowman's Land"
 }
 
 export const random_uint16 = () => {

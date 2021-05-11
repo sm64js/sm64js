@@ -1543,5 +1543,10 @@ gLinker.behaviors = {
     bhvPitBowlingBall,
     bhvFreeBowlingBall,
     bhvBowlingBall,
-    bhvBobombBuddy
+    bhvBobombBuddy,
+    bhvWaterBombCannon,
+    bhvCannonClosed,
+    bhvCheckerboardElevatorGroup,
+    bhvSeesawPlatform,
+    bhvMario
 }

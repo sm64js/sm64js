@@ -151,7 +151,7 @@ class SpawnObject {
         } else if (typeof bhv == "string") {
             bhv = gLinker.behaviors[bhv]
             if (!bhv) {
-                throw "unlinked bhv script: " + behavior
+                throw "need to add this to gLinker.behaviors: " + behavior
             }
         }
 

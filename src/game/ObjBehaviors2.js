@@ -1,4 +1,9 @@
-import { oFlags, OBJ_FLAG_30, oInteractType, oDamageOrCoinValue, oHealth, oNumLootCoins, oAnimState, oAction, OBJ_ACT_HORIZONTAL_KNOCKBACK, OBJ_ACT_VERTICAL_KNOCKBACK, OBJ_ACT_SQUISHED, oInteractStatus, oTimer, oForwardVel, oVelY, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveAngleYaw, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_HIT_WALL, OBJ_MOVE_ABOVE_LAVA, oHomeX, oHomeY, oHomeZ, oPosX, oPosY, oPosZ, oDistanceToMario, oAngleToMario, OBJ_MOVE_HIT_EDGE, oMoveAnglePitch, oFaceAnglePitch, oDeathSound } from "../include/object_constants"
+import {
+    oFlags, OBJ_FLAG_30, oInteractType, oDamageOrCoinValue, oHealth, oNumLootCoins, oAnimState,
+    oAction, OBJ_ACT_HORIZONTAL_KNOCKBACK, OBJ_ACT_VERTICAL_KNOCKBACK, OBJ_ACT_SQUISHED, oInteractStatus,
+    oTimer, oForwardVel, oVelY, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveAngleYaw, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND,
+    OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_HIT_WALL, OBJ_MOVE_ABOVE_LAVA, oHomeX, oHomeY, oHomeZ, oPosX, oPosY, oPosZ, oDistanceToMario,
+    oAngleToMario, OBJ_MOVE_HIT_EDGE, oMoveAnglePitch, oFaceAnglePitch, oDeathSound, oFaceAngleRoll } from "../include/object_constants"
 
 import { cur_obj_become_tangible, cur_obj_extend_animation_if_at_end, cur_obj_become_intangible, cur_obj_hide, obj_mark_for_deletion, obj_angle_to_object, cur_obj_update_floor_and_walls, cur_obj_move_standard, abs_angle_diff, cur_obj_rotate_yaw_toward, cur_obj_reflect_move_angle_off_wall, approach_symmetric, obj_spawn_loot_yellow_coins, spawn_mist_particles, approach_s16_symmetric} from "./ObjectHelpers"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
@@ -20,6 +25,9 @@ export const ATTACK_HANDLER_SQUISHED_WITH_BLUE_COIN = 8
 
 //this lived above random_linear_offset in the source,
 export const obj_roll_to_match_yaw_turn = (targetYaw, maxRoll, rollSpeed) => {
+
+    const o = ObjectListProc.gCurrentObject
+
     const targetRoll = o.rawData[oMoveAngleYaw] - targetYaw;
     const clampReturn = clamp_s16(targetRoll, -maxRoll, maxRoll);
     obj_face_roll_approach(clampReturn, rollSpeed);

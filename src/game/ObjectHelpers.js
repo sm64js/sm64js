@@ -338,6 +338,19 @@ export const obj_build_transform_from_pos_and_angle = (obj, posIndex, angleIndex
 
 }
 
+export const cur_obj_angle_to_home = () => {
+
+    const o = ObjectListProc.gCurrentObject
+    
+    let angle;
+
+    let dx = o.rawData[oHomeX] - o.rawData[oPosX];
+    let dz = o.rawData[oHomeZ] - o.rawData[oPosZ];
+
+    angle = atan2s(dz, dx);
+    return angle;
+}
+
 const obj_translate_local = (obj, posIndex, localTranslateIndex) => {
     const dx = obj.rawData[localTranslateIndex + 0]
     const dy = obj.rawData[localTranslateIndex + 1]

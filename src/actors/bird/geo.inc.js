@@ -7,6 +7,8 @@ import {
     LAYER_OPAQUE
 } from "../../engine/GeoLayout"
 
+import {birds_seg5_dl_05000670, birds_seg5_dl_05000528, birds_seg5_dl_05000600, birds_seg5_dl_05000598}
+from "./model.inc"
 
 // 0x0C000000
 export const birds_geo = () => {return [

@@ -37,7 +37,7 @@ import { wooden_post_geo                            } from "../actors/poundable_
 import { purple_switch_geo                          } from "../actors/purple_switch/geo.inc"
 
 export const script_func_global_1 = () => { return [
-    LOAD_MODEL_FROM_GEO(MODEL.BIRDS,                   birds_geo),
+    
     LOAD_MODEL_FROM_GEO(MODEL.BLUE_COIN_SWITCH,        blue_coin_switch_geo),
     LOAD_MODEL_FROM_GEO(MODEL.AMP,                     amp_geo),
     LOAD_MODEL_FROM_GEO(MODEL.PURPLE_SWITCH,           purple_switch_geo),

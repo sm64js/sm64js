@@ -9,6 +9,7 @@ import { ALLOC_LEVEL_POOL, AREA, BLACKOUT, CALL, CALL_LOOP, CLEARDEMOPTR, CLEAR_
 } from "../engine/LevelCommands"
 
 import { amp_geo                                    } from "../actors/amp/geo.inc"
+import { birds_geo                                  } from "../actors/bird/geo.inc"
 import { blue_coin_switch_geo                       } from "../actors/blue_coin_switch/geo.inc"
 import { black_bobomb_geo,
          bobomb_buddy_geo                           } from "../actors/bobomb/geo.inc"
@@ -36,6 +37,7 @@ import { wooden_post_geo                            } from "../actors/poundable_
 import { purple_switch_geo                          } from "../actors/purple_switch/geo.inc"
 
 export const script_func_global_1 = () => { return [
+    
     LOAD_MODEL_FROM_GEO(MODEL.BLUE_COIN_SWITCH,        blue_coin_switch_geo),
     LOAD_MODEL_FROM_GEO(MODEL.AMP,                     amp_geo),
     LOAD_MODEL_FROM_GEO(MODEL.PURPLE_SWITCH,           purple_switch_geo),
@@ -140,7 +142,7 @@ export const script_func_global_4 = () => { return [
 // ]}
 
 export const script_func_global_11 = () => { return [
-    // LOAD_MODEL_FROM_GEO(MODEL.BIRDS,                   birds_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.BIRDS,                   birds_geo),
     // LOAD_MODEL_FROM_GEO(MODEL.PEACH,                   peach_geo),
     // LOAD_MODEL_FROM_GEO(MODEL.YOSHI,                   yoshi_geo),
     RETURN(),

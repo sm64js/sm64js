@@ -9,11 +9,11 @@ import { MODEL_MARIO, MODEL_BIRDS, MODEL_BOB_BUBBLY_TREE, MODEL_BUBBLE, MODEL_BU
          MODEL_CASTLE_GROUNDS_CANNON_GRILL, MODEL_CASTLE_GROUNDS_CASTLE_DOOR,
          MODEL_CASTLE_GROUNDS_FLAG, MODEL_CASTLE_GROUNDS_METAL_DOOR,
          MODEL_CASTLE_GROUNDS_VCUTM_GRILL, MODEL_CASTLE_GROUNDS_WARP_PIPE, MODEL_LEVEL_GEOMETRY_03,
-         MODEL_MIST, MODEL_NONE, MODEL_WHITE_PUFF
+         MODEL_MIST, MODEL_NONE, MODEL_WHITE_PUFF, MODEL_YOSHI
 } from "../../include/model_ids"
 
 import { bhvMario, bhvBird, bhvButterfly,  bhvCastleFlagWaving, bhvHiddenAt120Stars,
-         bhvManyBlueFishSpawner, bhvMoatGrills, bhvWaterMist2
+         bhvManyBlueFishSpawner, bhvMoatGrills, bhvWaterMist2, bhvYoshi
 } from "../../game/BehaviorData"
 
 import { TERRAIN_GRASS                       } from "../../include/surface_terrains"
@@ -108,8 +108,7 @@ const script_func_local_4 = [
     OBJECT(/*model*/ MODEL_BUTTERFLY, /*pos*/ -500,  700,  -500, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvButterfly),
     OBJECT(/*model*/ MODEL_BUTTERFLY, /*pos*/ -500,  700,  -300, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvButterfly),
     OBJECT(/*model*/ MODEL_BUTTERFLY, /*pos*/  500,  700,  -500, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvButterfly),
-
-    // ['OBJECT(/*model*/ MODEL_YOSHI,     /*pos*/     0, 3174, -5625, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvYoshi],
+    OBJECT(/*model*/ MODEL_YOSHI,     /*pos*/     0, 3174, -5625, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvYoshi),
     RETURN(),
 ]
 

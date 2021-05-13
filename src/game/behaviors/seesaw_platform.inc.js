@@ -1,3 +1,4 @@
+import * as _Linker from "../../game/Linker"
 import { oAngleToMario, oBehParams2ndByte, oCollisionDistance, oDistanceToMario, oFaceAnglePitch, oMoveAngleYaw, oSeesawPlatformPitchVel } from "../../include/object_constants"
 import { bob_seg7_collision_bridge } from "../../levels/bob/seesaw_platform/collision.inc"
 import { coss } from "../../utils"
@@ -14,7 +15,6 @@ export const bhv_seesaw_platform_init = () => {
     if (o.rawData[oBehParams2ndByte] == 2) {
         o.rawData[oCollisionDistance] = 2000.0
     }
-
 }
 
 export const bhv_seesaw_platform_update = () => {
@@ -55,3 +55,6 @@ export const bhv_seesaw_platform_update = () => {
     }
 
 }
+
+gLinker.bhv_seesaw_platform_init   = bhv_seesaw_platform_init
+gLinker.bhv_seesaw_platform_update = bhv_seesaw_platform_update

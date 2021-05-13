@@ -50,15 +50,15 @@ import { oPosX,
 import { INTERACT_CAP, INT_STATUS_INTERACTED } from "../Interaction"
 
 const sCapHitbox = {
-     interactType:       INTERACT_CAP,
-     downOffset:         0,
-     damageOrCoinValue:  0,
-     health:             0,
-     numLootCoins:       0,
-     radius:             80,
-     height:             80,
-     hurtboxRadius:      90,
-     hurtboxHeight:      90,
+    interactType:       INTERACT_CAP,
+    downOffset:         0,
+    damageOrCoinValue:  0,
+    health:             0,
+    numLootCoins:       0,
+    radius:             80,
+    height:             80,
+    hurtboxRadius:      90,
+    hurtboxHeight:      90,
 }
 
 const cap_set_hitbox = () => {
@@ -152,7 +152,7 @@ const cap_sink_quicksand = () => {
 //     cap_check_quicksand();
 }
 
-export const bhv_wing_cap_init = () => {
+const bhv_wing_cap_init = () => {
     const o = O.gCurrentObject
     o.rawData[oGravity] = 1.2
     o.rawData[oFriction] = 0.999
@@ -190,7 +190,7 @@ const wing_vanish_cap_act_0 = () => {
     }
 }
 
-export const bhv_wing_vanish_cap_loop = () => {
+const bhv_wing_vanish_cap_loop = () => {
     const o = O.gCurrentObject
     switch (o.rawData[oAction]) {
         case 0:
@@ -210,7 +210,7 @@ export const bhv_wing_vanish_cap_loop = () => {
     cap_set_hitbox()
 }
 
-export const bhv_metal_cap_init = () => {
+const bhv_metal_cap_init = () => {
     o.rawData[oGravity] = 2.4
     o.rawData[oFriction] = 0.999
     o.rawData[oBuoyancy] = 1.5
@@ -226,7 +226,7 @@ export const bhv_metal_cap_init = () => {
 //         cap_check_quicksand();
 // }
 
-export const bhv_metal_cap_loop = () => {
+const bhv_metal_cap_loop = () => {
 //     switch (o.rawData[oAction]) {
 //         case 0:
 //             metal_cap_act_0();
@@ -245,7 +245,7 @@ export const bhv_metal_cap_loop = () => {
 //     cap_despawn();
 }
 
-export const bhv_normal_cap_init = () => {
+const bhv_normal_cap_init = () => {
     o.rawData[oGravity] = 0.7
     o.rawData[oFriction] = 0.89
     o.rawData[oBuoyancy] = 0.9
@@ -296,7 +296,7 @@ export const bhv_normal_cap_init = () => {
 //         cap_scale_vertically();
 // }
 
-export const bhv_normal_cap_loop = () => {
+const bhv_normal_cap_loop = () => {
 //     switch (o.rawData[oAction]) {
 //         case 0:
 //             normal_cap_act_0();
@@ -318,9 +318,18 @@ export const bhv_normal_cap_loop = () => {
 //         save_file_clear_flags(SAVE_FLAG_CAP_ON_GROUND);
 }
 
-export const bhv_vanish_cap_init = () => {
+const bhv_vanish_cap_init = () => {
     o.rawData[oGravity] = 1.2
     o.rawData[oFriction] = 0.999
     o.rawData[oBuoyancy] = 0.9
     o.rawData[oOpacity] = 150
 }
+
+
+gLinker.bhv_metal_cap_init = bhv_metal_cap_init
+gLinker.bhv_metal_cap_loop = bhv_metal_cap_loop
+gLinker.bhv_normal_cap_init = bhv_normal_cap_init
+gLinker.bhv_normal_cap_loop = bhv_normal_cap_loop
+gLinker.bhv_vanish_cap_init = bhv_vanish_cap_init
+gLinker.bhv_wing_cap_init = bhv_wing_cap_init
+gLinker.bhv_wing_vanish_cap_loop = bhv_wing_vanish_cap_loop

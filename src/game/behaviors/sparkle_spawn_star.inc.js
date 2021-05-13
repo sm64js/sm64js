@@ -18,7 +18,7 @@ import { INT_SUBTYPE_NO_EXIT } from "../Interaction"
 //     /* hurtboxHeight: */ 0,
 // };
 
-export const bhv_spawned_star_init = () => {
+const bhv_spawned_star_init = () => {
     const o = O.gCurrentObject
     let /*s32*/sp24
     if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_NO_EXIT))
@@ -60,7 +60,7 @@ export const bhv_spawned_star_init = () => {
 //         o->oAngleVelYaw -= 0x40;
 // }
 
-export const bhv_spawned_star_loop = () => {
+const bhv_spawned_star_loop = () => {
 //     if (o->oAction == 0) {
 //         if (o->oTimer == 0) {
 //             cutscene_object(CUTSCENE_STAR_SPAWN, o);
@@ -123,3 +123,6 @@ export const bhv_spawned_star_loop = () => {
 //     sp1C->oInteractionSubtype = INT_SUBTYPE_NO_EXIT;
 //     obj_set_angle(sp1C, 0, 0, 0);
 // }
+
+gLinker.bhv_spawned_star_init = bhv_spawned_star_init
+gLinker.bhv_spawned_star_loop = bhv_spawned_star_loop

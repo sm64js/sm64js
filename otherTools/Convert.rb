@@ -100,6 +100,7 @@ class Convert
         when "movtext.inc.c"    then convert_movtext
         when "table.inc.c"      then convert_table
         when "texture.inc.c"    then convert_texture
+        when "trajectory.inc.c" then convert_trajectory
         end
     end
 
@@ -845,6 +846,62 @@ class Convert
 
         out = [header, "", @text, @ts].join("\n")
         File.open(@js_dir + "/texture.inc.js", "w") {|f| f.puts(out)}
+    end
+
+
+    # ---------------------------------------------------------------------------------------------------------
+
+    def convert_trajectory
+        header = []
+        imports = []
+        @cmds = []
+        @text = []
+
+        @lines = File.read(@c_dir + "/trajectory.inc.c").lines.to_a
+        @n = 0
+        while (@n < @lines.length)
+
+            if @lines[@n] =~ / Trajectory / then cv_Trajectory
+            else
+                @text.push(@lines[@n].chomp)
+            end
+
+            @n += 1
+        end
+
+        header.push(@title)
+        imports_wrap(imports, "include/surface_terrains", @cmds.uniq)
+
+        out = [header, "", imports, "", @text, @ts].join("\n")
+        File.open(@js_dir + "/trajectory.inc.js", "w") {|f| f.puts(out)}
+    end
+
+    def cv_Trajectory
+        while true
+            line = @lines[@n]
+
+            # const Trajectory bitfs_seg7_trajectory_070159AC[] = {
+            if line =~ / Trajectory (\w+)/
+                @text.push("export const #{$1} = [")
+
+            # TRAJECTORY_POS(0, /*pos*/ -5744, -3072,     0),
+            elsif line =~ /(\w+)\((.*)\),/
+                cmd, args = $1, $2
+
+                @cmds.push(cmd)
+                @text.push("    #{cmd}(#{args}),")
+
+            # };
+            elsif line =~ /^\};/
+                @text.push("]")
+                break
+
+            else
+                @text.push(line.chomp)
+            end
+
+            @n += 1
+        end
     end
 
 

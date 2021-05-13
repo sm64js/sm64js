@@ -60,7 +60,7 @@ const sWaterSplashDropletParams = () => {
 }
 
 // Water droplets from Mario jumping in shallow water.
-export const gShallowWaterSplashDropletParams = () => {
+const gShallowWaterSplashDropletParams = () => {
     return {
         flags: WATER_DROPLET_FLAG_RAND_ANGLE | WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL,
         model: MODEL_WHITE_PARTICLE_SMALL,
@@ -84,7 +84,7 @@ const sWaterDropletFishParams = () => {
 }
 
 // Water droplets from Mario running in shallow water.
-export const gShallowWaterWaveDropletParams = () => {
+const gShallowWaterWaveDropletParams = () => {
     return {
         flags: WATER_DROPLET_FLAG_RAND_ANGLE_INCR_PLUS_8000 | WATER_DROPLET_FLAG_RAND_ANGLE | WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL,
         model: MODEL_WHITE_PARTICLE_SMALL,
@@ -97,7 +97,7 @@ export const gShallowWaterWaveDropletParams = () => {
 }
 
 
-export const bhv_water_splash_spawn_droplets = () => {
+const bhv_water_splash_spawn_droplets = () => {
     const o = ObjectListProc.gCurrentObject
 
     if (o.rawData[oTimer] == 0)
@@ -110,7 +110,7 @@ export const bhv_water_splash_spawn_droplets = () => {
     }
 }
 
-export const bhv_water_droplet_loop = () => {
+const bhv_water_droplet_loop = () => {
     const o = ObjectListProc.gCurrentObject
     const waterLevel = SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ]);
 
@@ -138,7 +138,7 @@ export const bhv_water_droplet_loop = () => {
         obj_mark_for_deletion(o)
 }
 
-export const bhv_idle_water_wave_loop = () => {
+const bhv_idle_water_wave_loop = () => {
     const o = ObjectListProc.gCurrentObject
     const gMarioObject = ObjectListProc.gMarioObject
     const gMarioState = LevelUpdate.gMarioState
@@ -151,18 +151,18 @@ export const bhv_idle_water_wave_loop = () => {
     }
 }
 
-export const bhv_water_droplet_splash_init = () => {
+const bhv_water_droplet_splash_init = () => {
     cur_obj_scale(random_float() + 1.5)
 }
 
-export const bhv_bubble_splash_init = () => {
+const bhv_bubble_splash_init = () => {
     const o = ObjectListProc.gCurrentObject
     let waterLevel = SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ])
     obj_scale_xyz(o, 0.5, 1, 0.5)
     o.rawData[oPosY] = waterLevel + 5
 }
 
-export const bhv_shallow_water_splash_init = () => {
+const bhv_shallow_water_splash_init = () => {
     const o = ObjectListProc.gCurrentObject
     // Have a 1 in 256 chance to spawn the fish particle easter egg.
     if ((random_u16() & 0xFF) <= 0) { // Strange
@@ -171,7 +171,7 @@ export const bhv_shallow_water_splash_init = () => {
     }
 }
 
-export const bhv_wave_trail_shrink = () => {
+const bhv_wave_trail_shrink = () => {
     const o = ObjectListProc.gCurrentObject
     let waterLevel = SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ])
     // Destroy every other water wave to space them out (this is a terrible way of doing it)
@@ -191,3 +191,13 @@ export const bhv_wave_trail_shrink = () => {
         o.header.gfx.scale[2] = o.oWaveTrailSize
     }
 }
+
+gLinker.gShallowWaterWaveDropletParams = gShallowWaterWaveDropletParams
+gLinker.gShallowWaterSplashDropletParams = gShallowWaterSplashDropletParams
+gLinker.bhv_shallow_water_splash_init = bhv_shallow_water_splash_init
+gLinker.bhv_idle_water_wave_loop = bhv_idle_water_wave_loop
+gLinker.bhv_wave_trail_shrink = bhv_wave_trail_shrink
+gLinker.bhv_water_splash_spawn_droplets = bhv_water_splash_spawn_droplets
+gLinker.bhv_water_droplet_loop = bhv_water_droplet_loop
+gLinker.bhv_water_droplet_splash_init = bhv_water_droplet_splash_init
+gLinker.bhv_bubble_splash_init = bhv_bubble_splash_init

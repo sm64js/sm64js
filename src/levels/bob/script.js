@@ -8,12 +8,12 @@ import { LevelUpdateInstance as LevelUpdate } from "../../game/LevelUpdate"
 
 import { MODEL_MARIO, MODEL_BOB_BARS_GRILLS, MODEL_BOB_BUBBLY_TREE, MODEL_BOB_CHAIN_CHOMP_GATE,
          MODEL_BOB_SEESAW_PLATFORM, MODEL_BOBOMB_BUDDY, MODEL_BOWLING_BALL, MODEL_CANNON_BASE,
-         MODEL_CHECKERBOARD_PLATFORM, MODEL_DL_CANNON_LID, MODEL_KING_BOBOMB,
+         MODEL_CHECKERBOARD_PLATFORM, MODEL_DL_CANNON_LID, MODEL_KING_BOBOMB, MODEL_NONE,
          MODEL_KOOPA_WITH_SHELL, MODEL_PURPLE_SWITCH, MODEL_STAR, ALL_ACTS, ACT_1, ACT_2, ACT_3,
          ACT_4, ACT_5, ACT_6
 } from "../../include/model_ids"
 
-import { bhvMario, 
+// import { bhvMario, 
          // bhvOpenableGrill,
          // bhvFloorSwitchGrills,
          // bhvBobBowlingBallSpawner,
@@ -22,7 +22,7 @@ import { bhvMario,
          // bhvBobombBuddy,
          // bhvBobombBuddyOpensCannon,
          // bhvWaterBombCannon,
-         bhvCannonClosed,
+         // bhvCannonClosed,
          // bhvKoopaRaceEndpoint,
          // bhvKoopa,
          // bhvKingBobomb,
@@ -30,8 +30,8 @@ import { bhvMario,
          // bhvHiddenStar,
          // bhvStar,
          // bhvChainChompGate,
-         bhvCheckerboardElevatorGroup,
-         bhvSeesawPlatform              } from "../../game/BehaviorData"
+         // bhvCheckerboardElevatorGroup,
+         // bhvSeesawPlatform              } from "../../game/BehaviorData"
 
 import { DIALOG_000, DIALOG_001, DIALOG_002, DIALOG_003 } from "../../text/us/dialogs"
 
@@ -49,27 +49,27 @@ import { bubbly_tree_geo          } from "../../actors/tree/geo.inc"
 
 const script_func_local_1 = [
     // OBJECT(/*model*/ MODEL_BOB_CHAIN_CHOMP_GATE,  /*pos*/  1456,   768,   446, /*angle*/ 0, 326, 0,  /*behParam*/ 0x00000000, /*beh*/ bhvChainChompGate),
-    OBJECT(/*model*/ MODEL_BOB_SEESAW_PLATFORM,   /*pos*/ -2303,   717,  1024, /*angle*/ 0, 45, 0,   /*behParam*/ 0x00030000, /*beh*/ bhvSeesawPlatform),
+    OBJECT(/*model*/ MODEL_BOB_SEESAW_PLATFORM,   /*pos*/ -2303,   717,  1024, /*angle*/ 0, 45, 0,   /*behParam*/ 0x00030000, /*beh*/ 'bhvSeesawPlatform'),
     // OBJECT(/*model*/ MODEL_NONE,                  /*pos*/ -2050,     0, -3069, /*angle*/ 0, 25, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvOpenableGrill),
     // OBJECT(/*model*/ MODEL_PURPLE_SWITCH,         /*pos*/ -2283,     0, -3682, /*angle*/ 0, 27, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvFloorSwitchGrills),
-    OBJECT(/*model*/ MODEL_CHECKERBOARD_PLATFORM, /*pos*/  1612,   300,  4611, /*angle*/ 0, 0, 0,    /*behParam*/ 0x00280000, /*beh*/ bhvCheckerboardElevatorGroup),
+    OBJECT(/*model*/ MODEL_CHECKERBOARD_PLATFORM, /*pos*/  1612,   300,  4611, /*angle*/ 0, 0, 0,    /*behParam*/ 0x00280000, /*beh*/ 'bhvCheckerboardElevatorGroup'),
     RETURN(),
 ]
 
 const script_func_local_2 = [
-    // OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                  /*pos*/  1535, 3840, -5561, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvBobBowlingBallSpawner,  /*acts*/ ACT_1 | ACT_2),
-    // OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                  /*pos*/  1535, 3840, -5561, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvTtmBowlingBallSpawner,  /*acts*/ ACT_3 | ACT_4 | ACT_5 | ACT_6),
-    // OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                  /*pos*/   524, 2825, -5400, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00020000, /*beh*/ bhvBobBowlingBallSpawner,  /*acts*/ ACT_1 | ACT_2),
-    // OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                  /*pos*/   524, 2825, -5400, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00020000, /*beh*/ bhvTtmBowlingBallSpawner,  /*acts*/ ACT_3 | ACT_4 | ACT_5 | ACT_6),
-    // OBJECT          (/*model*/ MODEL_BOWLING_BALL,          /*pos*/  -993,  886, -3565, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvPitBowlingBall),
-    // OBJECT          (/*model*/ MODEL_BOWLING_BALL,          /*pos*/  -785,  886, -4301, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvPitBowlingBall),
-    // OBJECT_WITH_ACTS(/*model*/ MODEL_BOWLING_BALL,          /*pos*/   -93,  886, -3414, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvPitBowlingBall,         /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
-    // OBJECT_WITH_ACTS(/*model*/ MODEL_BOBOMB_BUDDY,          /*pos*/ -5723,  140,  6017, /*angle*/ 0, 0, 0,   /*behParam*/ DIALOG_002 << 16, /*beh*/ bhvBobombBuddy,            /*acts*/ ACT_1),
-    // OBJECT_WITH_ACTS(/*model*/ MODEL_BOBOMB_BUDDY,          /*pos*/ -6250,    0,  6680, /*angle*/ 0, 0, 0,   /*behParam*/ DIALOG_001 << 16, /*beh*/ bhvBobombBuddy,            /*acts*/ ACT_1),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                  /*pos*/  1535, 3840, -5561, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ 'bhvBobBowlingBallSpawner',  /*acts*/ ACT_1 | ACT_2),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                  /*pos*/  1535, 3840, -5561, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ 'bhvTtmBowlingBallSpawner',  /*acts*/ ACT_3 | ACT_4 | ACT_5 | ACT_6),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                  /*pos*/   524, 2825, -5400, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00020000, /*beh*/ 'bhvBobBowlingBallSpawner',  /*acts*/ ACT_1 | ACT_2),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                  /*pos*/   524, 2825, -5400, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00020000, /*beh*/ 'bhvTtmBowlingBallSpawner',  /*acts*/ ACT_3 | ACT_4 | ACT_5 | ACT_6),
+    OBJECT          (/*model*/ MODEL_BOWLING_BALL,          /*pos*/  -993,  886, -3565, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ 'bhvPitBowlingBall'),
+    OBJECT          (/*model*/ MODEL_BOWLING_BALL,          /*pos*/  -785,  886, -4301, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ 'bhvPitBowlingBall'),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOWLING_BALL,          /*pos*/   -93,  886, -3414, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ 'bhvPitBowlingBall',         /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOBOMB_BUDDY,          /*pos*/ -5723,  140,  6017, /*angle*/ 0, 0, 0,   /*behParam*/ DIALOG_002 << 16, /*beh*/ 'bhvBobombBuddy',            /*acts*/ ACT_1),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOBOMB_BUDDY,          /*pos*/ -6250,    0,  6680, /*angle*/ 0, 0, 0,   /*behParam*/ DIALOG_001 << 16, /*beh*/ 'bhvBobombBuddy',            /*acts*/ ACT_1),
     // OBJECT_WITH_ACTS(/*model*/ MODEL_BOBOMB_BUDDY,          /*pos*/ -5723,  140,  6017, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000,       /*beh*/ bhvBobombBuddyOpensCannon, /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
     // OBJECT_WITH_ACTS(/*model*/ MODEL_BOBOMB_BUDDY,          /*pos*/ -6250,    0,  6680, /*angle*/ 0, 0, 0,   /*behParam*/ DIALOG_003 << 16, /*beh*/ bhvBobombBuddy,            /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
-    // OBJECT_WITH_ACTS(/*model*/ MODEL_CANNON_BASE,           /*pos*/ -5694,  128,  5600, /*angle*/ 0, 135, 0, /*behParam*/ 0x00010000, /*beh*/ bhvWaterBombCannon,        /*acts*/ ACT_1),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_DL_CANNON_LID,         /*pos*/ -5694,  128,  5600, /*angle*/ 0, 180, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCannonClosed,           /*acts*/ ALL_ACTS /*ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_CANNON_BASE,           /*pos*/ -5694,  128,  5600, /*angle*/ 0, 135, 0, /*behParam*/ 0x00010000, /*beh*/ 'bhvWaterBombCannon',        /*acts*/ ACT_1),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_DL_CANNON_LID,         /*pos*/ -5694,  128,  5600, /*angle*/ 0, 180, 0, /*behParam*/ 0x00000000, /*beh*/ 'bhvCannonClosed',           /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
     // OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                  /*pos*/  3304, 4242, -4603, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvKoopaRaceEndpoint,      /*acts*/ ACT_2),
     // OBJECT_WITH_ACTS(/*model*/ MODEL_KOOPA_WITH_SHELL,      /*pos*/  3400,  770,  6500, /*angle*/ 0, 0, 0,   /*behParam*/ 0x00010000, /*beh*/ bhvKoopa,                  /*acts*/ ACT_3 | ACT_4 | ACT_5 | ACT_6),
     RETURN(),
@@ -87,7 +87,7 @@ const script_func_local_3 = [
 
 export const level_bob_entry = [
     INIT_LEVEL(),
-    MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),
+    MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ 'bhvMario'),
     JUMP_LINK(script_func_global_1),
     JUMP_LINK(script_func_global_4),
     JUMP_LINK(script_func_global_15),

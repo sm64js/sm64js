@@ -23,7 +23,9 @@ begin
                 comment = $2
             end
 
-            if l =~ /^(\w+) \**(\w+)\((.+)\) \{$/
+# static void seq_player_play_sequence(u8 player,let /*u8*/seqId,let /*u16*/arg2) {
+
+            if l =~ /^(.+) \**(\w+)\((.+)\) \{$/
                 ret, name, args = $1, $2, $3
                 if ret.include?("static")
                     qual = "const"
@@ -47,7 +49,7 @@ begin
             
             else
                 n = l.chomp.delete_suffix(";")
-                n.gsub!(/ (s32|u32|u16|s16|f32) /, "let /*\\1*/")
+                n.gsub!(/ (u8|s16|u16|s32|u32|f32) /, " let /*\\1*/ ")
                 n.gsub!(/->(o\w+)/, ".rawData[\\1]")
                 n.gsub!(/->/, ".")
                 n.gsub!(/NULL/, "null")

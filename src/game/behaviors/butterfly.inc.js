@@ -15,7 +15,7 @@ const BUTTERFLY_ACT_FOLLOW_MARIO = 1
 const BUTTERFLY_ACT_RETURN_HOME = 2
 
 
-export const bhv_butterfly_init = () => {
+const bhv_butterfly_init = () => {
     const o = ObjectListProc.gCurrentObject
 
     cur_obj_init_animation(1)
@@ -119,7 +119,7 @@ const butterfly_act_return_home = () => {
     }
 }
 
-export const bhv_butterfly_loop = () => {
+const bhv_butterfly_loop = () => {
     const o = ObjectListProc.gCurrentObject
 
     switch (o.rawData[oAction]) {
@@ -138,3 +138,7 @@ export const bhv_butterfly_loop = () => {
 
     set_object_visibility(o, 3000)
 }
+
+
+gLinker.bhv_butterfly_init = bhv_butterfly_init
+gLinker.bhv_butterfly_loop = bhv_butterfly_loop

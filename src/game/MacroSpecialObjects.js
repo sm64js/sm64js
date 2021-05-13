@@ -15,6 +15,7 @@ const SPTYPE_UNKNOWN            = 3 // object is 14-bytes long, has 3 extra shor
 const SPTYPE_DEF_PARAM_AND_YROT = 4 // object is 10-bytes long, has y-rotation and uses the default param
 
 const SpecialObjectPresets = {};
+const SpecialObjectPresets_init = () => {
 [
     [0x00, SPTYPE_YROT_NO_PARAMS    , 0x00, "MODEL_NONE", null],
     [0x01, SPTYPE_NO_YROT_OR_PARAMS , 0x00, "MODEL_YELLOW_COIN", "bhvYellowCoin"],
@@ -102,7 +103,7 @@ const SpecialObjectPresets = {};
 ].forEach(s => {
     SpecialObjectPresets[s[0]] = {type: s[1], defParam: s[2], model: MODEL[s[3]], behavior: BHV[s[4]] }
 })
-
+}
 
 const convert_rotation = (inRotation) => {
     let rotation = uint16(inRotation & 0xFF)
@@ -138,8 +139,8 @@ const spawn_macro_abs_yrot_2params = (model, behavior, x, y, z, ry, params) => {
 }
 
 export const spawn_special_objects = (areaIndex, specialObjList, dataIndex) => {
+    SpecialObjectPresets_init()
     const numOfSpecialObjects = specialObjList[dataIndex++]
-
     ObjectListProc.gMacroObjectDefaultParent = { header: { gfx: { unk18: areaIndex, unk19: areaIndex } } }
 
     for (let i = 0; i < numOfSpecialObjects; i++) {
@@ -185,7 +186,7 @@ export const spawn_macro_objects = (areaIndex, macroObjList) => {
     ObjectListProc.gMacroObjectDefaultParent.header.gfx.unk18 = areaIndex
     ObjectListProc.gMacroObjectDefaultParent.header.gfx.unk19 = areaIndex
 
-    let preset
+    let p, preset
 
     macroObjList.forEach(objToSpawn => {
         if (!objToSpawn) {
@@ -193,11 +194,12 @@ export const spawn_macro_objects = (areaIndex, macroObjList) => {
         }
         if (Array.isArray(objToSpawn)) {
             const o = objToSpawn
-            objToSpawn = { preset: o[0], yaw: o[1], pos: [o[2], o[3], o[4]], param: o[5]}
-            preset = objToSpawn.preset
+            objToSpawn = { yaw: o[1], pos: [o[2], o[3], o[4]], param: o[5]}
+            p = MacroObjectPresets[o[0]]
         } else {
-            preset = MacroObjectPresets[objToSpawn.preset]
+            p = MacroObjectPresets[objToSpawn.preset]
         }
+        preset = {behavior: BHV[p[0]], model: MODEL[p[1]], param: p[2]}
 
         if (!preset.behavior) {
             console.log("no behavior - ", preset)

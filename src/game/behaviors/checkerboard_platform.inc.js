@@ -11,7 +11,7 @@ const checkerPlatformData = [
 	{ unk0: 235, unk1: [1.2, 2.0, 0.7], unk2: 11.6 },
 ]
 
-export const bhv_checkerboard_elevator_group_init = () => {
+const bhv_checkerboard_elevator_group_init = () => {
 	const o = ObjectListProc.gCurrentObject
 
 	if (o.rawData[oBehParams2ndByte] == 0) o.rawData[oBehParams2ndByte] = 65
@@ -28,7 +28,7 @@ export const bhv_checkerboard_elevator_group_init = () => {
 	}
 }
 
-export const bhv_checkerboard_platform_init = () => {
+const bhv_checkerboard_platform_init = () => {
 	const o = ObjectListProc.gCurrentObject
 
 	o.rawData[oCheckerBoardPlatformUnkFC] = o.parentObj.rawData[oBehParams2ndByte]
@@ -60,7 +60,7 @@ const signum_positive = (x) => {
 	else return -1
 }
 
-export const bhv_checkerboard_platform_loop = () => {
+const bhv_checkerboard_platform_loop = () => {
 	const o = ObjectListProc.gCurrentObject
 
 	const sp24 = o.rawData[oCheckerBoardPlatformUnk1AC]
@@ -103,3 +103,8 @@ export const bhv_checkerboard_platform_loop = () => {
 	cur_obj_move_using_fvel_and_gravity()
 	SurfaceLoadInstance.load_object_collision_model()
 }
+
+
+gLinker.bhv_checkerboard_elevator_group_init = bhv_checkerboard_elevator_group_init
+gLinker.bhv_checkerboard_platform_init = bhv_checkerboard_platform_init
+gLinker.bhv_checkerboard_platform_loop = bhv_checkerboard_platform_loop

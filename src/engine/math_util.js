@@ -92,6 +92,15 @@ export const vec3f_to_vec3s = (dest, a) => {
     dest[2] = s16(a[2] + ((a[2] > 0) ? 0.5 : -0.5))
 }
 
+/// Copy matrix 'src' to 'dest'
+export const mtxf_copy = (dest, src) => {
+    for (let i = 0; i < src.length; i++) {
+        for (let j = 0; j < src[i].length; j++) {
+            dest[i][j] = src[i][j]
+        }
+    }
+}
+
 export const mtxf_identity = (mtx) => {
     for (let i = 0; i < mtx.length; i++) {
         for (let j = 0; j < mtx[i].length; j++) {
@@ -502,3 +511,22 @@ export const sqrtf = (x) => {
 export const Mat4 = () => {
     return new Array(4).fill(0).map(() => new Array(4).fill(0))
 }
+
+/**
+ * Extract a position given an object's transformation matrix and a camera matrix.
+ * This is used for determining the world position of the held object: since objMtx
+ * inherits the transformation from both the camera and Mario, it calculates this
+ * by taking the camera matrix and inverting its transformation by first rotating
+ * objMtx back from screen orientation to world orientation, and then subtracting
+ * the camera position.
+ */
+export const get_pos_from_transform_mtx = (dest, objMtx, camMtx) => {
+    let camX = camMtx[3][0] * camMtx[0][0] + camMtx[3][1] * camMtx[0][1] + camMtx[3][2] * camMtx[0][2]
+    let camY = camMtx[3][0] * camMtx[1][0] + camMtx[3][1] * camMtx[1][1] + camMtx[3][2] * camMtx[1][2]
+    let camZ = camMtx[3][0] * camMtx[2][0] + camMtx[3][1] * camMtx[2][1] + camMtx[3][2] * camMtx[2][2]
+
+    dest[0] = objMtx[3][0] * camMtx[0][0] + objMtx[3][1] * camMtx[0][1] + objMtx[3][2] * camMtx[0][2] - camX
+    dest[1] = objMtx[3][0] * camMtx[1][0] + objMtx[3][1] * camMtx[1][1] + objMtx[3][2] * camMtx[1][2] - camY
+    dest[2] = objMtx[3][0] * camMtx[2][0] + objMtx[3][1] * camMtx[2][1] + objMtx[3][2] * camMtx[2][2] - camZ
+}
+

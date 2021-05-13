@@ -413,6 +413,11 @@ export const G_CC_MODULATEIA = {
     rgb: [1, 15, 4, 7]
 }
 
+export const G_CC_MODULATERGBFADEA = {
+    alpha: [1, 7, 5, 7],
+    rgb: [1, 15, 4, 7]
+}
+
 export const G_CC_MODULATEIFADEA = {
     alpha: [1, 7, 5, 7],
     rgb: [1, 15, 4, 7]
@@ -436,6 +441,12 @@ export const G_CC_SHADE = {
 export const G_CC_SHADEFADEA = {
     alpha: [7, 7, 7, 5],
     rgb: [15, 15, 31, 4]
+}
+
+// this is probably wrong
+export const G_CC_BLENDRGBA = {
+    alpha: [7, 7, 7, 1],
+    rgb: [1, 4, 8, 4]
 }
 
 export const G_CC_BLENDRGBFADEA = {
@@ -647,6 +658,15 @@ export const gSPMatrix = (displaylist, matrix, parameters) => {
     })
 }
 
+export const gDPSetAlphaCompare = (displaylist, newmode) => {
+    displaylist.push({
+        words: {
+            w0: G_SETOTHERMODE_H,
+            w1: { category: G_MDSFT_ALPHACOMPARE, newmode }
+        }
+    })
+}
+
 export const gDPSetRenderMode = (displaylist, mode) => {
     displaylist.push({
         words: {
@@ -821,11 +841,11 @@ export const gsSPEndDisplayList = () => {
     }
 }
 
-export const gsDPSetAlphaCompare = (type) => {
+export const gsDPSetAlphaCompare = (newmode) => {
     return {
         words: {
-            w0: G_SETOTHERMODE_L,
-            w1: { type }
+            w0: G_SETOTHERMODE_H,
+            w1: { category: G_MDSFT_ALPHACOMPARE, newmode }
         }
     }
 }

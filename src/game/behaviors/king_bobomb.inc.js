@@ -5,17 +5,6 @@ import { obj_update_pos_from_parent_transformation, create_transformation_from_m
 
 // Copy of geo_update_projectile_pos_from_parent
 export const geo_update_held_mario_pos = (run, node, mtx) => {
-    let sp20 = Mat4()
-
-    if (run == 1) {
-        let sp1C = GeoRenderer.gCurGraphNodeObject
-        if (sp1C.prevObj != null) {
-            create_transformation_from_matrices(sp20, mtx, GeoRenderer.gCurGraphNodeCamera.matrixPtr)
-            obj_update_pos_from_parent_transformation(sp20, sp1C.prevObj)
-            obj_set_gfx_pos_from_pos(sp1C.prevObj)
-        }
-    }
-    return null
 }
 
 // void bhv_bobomb_anchor_mario_loop(void) {

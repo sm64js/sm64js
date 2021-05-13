@@ -1,29 +1,55 @@
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 // import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { AreaInstance as Area } from "./Area"
-import { geo_obj_init, geo_obj_init_animation, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
+import { geo_obj_init, geo_obj_init_animation, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE, GEO_CONTEXT_RENDER } from "../engine/graph_node"
 
-import { oAngleVelPitch, oAngleVelRoll, oAction, oPosX, oPosY, oPosZ, oFaceAngleRoll, oFaceAnglePitch,
-         oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oParentRelativePosX,
-         oParentRelativePosY, oParentRelativePosZ, oBehParams2ndByte, oBehParams, oVelX, oForwardVel,
-         oVelZ, oVelY, oGravity, oAnimState, oIntangibleTimer, oAnimations, oHeldState,
-         oFloorHeight, oFloor, oFloorType, oFloorRoom, oWallHitboxRadius, oWallAngle, oMoveFlags,
-         oBounciness, oBuoyancy, oDragStrength, oAngleVelYaw, oInteractStatus, oHomeX, oHomeY, oHomeZ,
-         oOpacity, oNumLootCoins, oCoinUnk110, oTimer, oUnkC0, oUnkBC, oRoom, oSoundStateID,
-         oPathedPrevWaypointFlags, oPathedPrevWaypoint, oPathedStartWaypoint, oPathedTargetYaw,
-         oPathedTargetPitch,
+import {
+    oAction, oPrevAction, oSubAction, oTimer, oFlags,
+    oBehParams, oBehParams2ndByte,
+    oAnimations, oAnimState, oActiveParticleFlags,
+    oIntangibleTimer, oInteractionSubtype, oInteractStatus, oInteractType,
+    oHealth, oHeldState,
 
-         ACTIVE_FLAGS_DEACTIVATED, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM,
-         ACTIVE_FLAG_UNK10, ACTIVE_FLAG_UNK7,
+    oPosX, oPosY, oPosZ,
+    oHomeX, oHomeY, oHomeZ, oAngleToHome,
+    oVelX, oVelY, oVelZ,
+    oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ,
+    oGraphYOffset,
 
-         OBJ_MOVE_ABOVE_DEATH_BARRIER, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR,
-         OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND,
-         OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER, OBJ_MOVE_ENTERED_WATER,
-         OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND, OBJ_MOVE_LEFT_GROUND,
-         OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, OBJ_MOVE_13, OBJ_MOVE_LANDED,
-         O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX, OBJ_FLAG_HOLDABLE,
+    oAngleVelPitch, oAngleVelRoll, oAngleVelYaw,
+    oForwardVel, oForwardVelS32,
+    oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw,
+    oDrawingDistance, oOpacity,
 
-         HELD_HELD, HELD_THROWN, HELD_DROPPED
+    oBounciness, oBuoyancy, oDragStrength, oFriction, oGravity,
+    oCollisionDistance, oDamageOrCoinValue, oNumLootCoins,
+    oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oMoveFlags,
+    oWallAngle, oWallHitboxRadius,
+
+    oFloor, oFloorHeight, oFloorRoom, oFloorType, oRoom,
+    oAngleToMario, oDistanceToMario,
+
+    oDeathSound, oSoundStateID,
+    oDialogResponse, oDialogState,
+
+    oUnk1A8, oUnk94, oUnkBC, oUnkC0,
+
+    oCoinUnk110,
+
+    oPathedStartWaypoint, oPathedPrevWaypoint, oPathedPrevWaypointFlags, oPathedTargetPitch,
+    oPathedTargetYaw,
+
+    ACTIVE_FLAGS_DEACTIVATED, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM,
+    ACTIVE_FLAG_UNK10, ACTIVE_FLAG_UNK7,
+
+    OBJ_MOVE_ABOVE_DEATH_BARRIER, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR,
+    OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND,
+    OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER,
+    OBJ_MOVE_ENTERED_WATER, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND,
+    OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, OBJ_MOVE_13,
+    OBJ_MOVE_LANDED, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX, OBJ_FLAG_HOLDABLE,
+
+    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED
  } from "../include/object_constants"
 
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
@@ -33,7 +59,7 @@ import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrain
 import { ATTACK_PUNCH, INT_STATUS_WAS_ATTACKED, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "./Interaction"
 import { ACT_GROUND_POUND_LAND, ACT_FLAG_AIR, ACT_DIVE_SLIDE } from "./Mario"
 
-import { MODEL_YELLOW_COIN } from "../include/model_ids"
+import { MODEL_YELLOW_COIN, MODEL_BLUE_COIN } from "../include/model_ids"
 
 import { GRAPH_RENDER_ACTIVE           } from "../engine/graph_node"
 
@@ -43,6 +69,7 @@ import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import * as _Linker from "./Linker"
 import * as Gbi from "../include/gbi"
 import { spawn_mist_particles_variable } from "./behaviors/white_puff.inc"
+import { spawn_triangle_break_particles } from "./behaviors/break_particles.inc"
 
 
 export const WATER_DROPLET_FLAG_RAND_ANGLE                = 0x02
@@ -108,33 +135,30 @@ export const cur_obj_extend_animation_if_at_end = () => {
     if (sp4 == sp0) o.header.gfx.unk38.animFrame--
 }
 
-export const geo_switch_anim_state = (run, node) => {
-
-    if (run == 1) {
+export const geo_switch_anim_state = (callerContext, node) => {
+    if (callerContext == GEO_CONTEXT_RENDER) {
         let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
 
-        const switchCase = node
-
         if (GeoRenderer.gCurGraphNodeHeldObject) {
-            obj = GeoRenderer.gCurGraphNodeHeldObject.objNode
+            obj = GeoRenderer.gCurGraphNodeHeldObject.wrapper.objNode
         }
 
         // if the case is greater than the number of cases, set to 0 to avoid overflowing
         // the switch.
-        if (obj.rawData[oAnimState] >= switchCase.numCases) {
+        if (obj.rawData[oAnimState] >= node.numCases) {
             obj.rawData[oAnimState] = 0
         }
 
-        switchCase.selectedCase = obj.rawData[oAnimState]
+        node.selectedCase = obj.rawData[oAnimState]
     }
+
+    return null
 }
 
-export const geo_switch_area = (run, node) => {
-    const switchCase = node
-    if (run == 1) {
-
+export const geo_switch_area = (callerContext, node) => {
+    if (callerContext == GEO_CONTEXT_RENDER) {
         if (ObjectListProc.gMarioObject == undefined) {
-            switchCase.selectedCase = 0
+            node.selectedCase = 0
         } else {
             ///TODO gFindFloorIncludeSurfaceIntangible = 1
 
@@ -147,43 +171,42 @@ export const geo_switch_area = (run, node) => {
                 ObjectListProc.gMarioCurrentRoom = floorWrapper.floor.room
                 let selectedRoom = floorWrapper.floor.room - 1
 
-                if (selectedRoom >= 0) switchCase.selectedCase = selectedRoom
+                if (selectedRoom >= 0) {
+                    node.selectedCase = selectedRoom
+                }
             }
 
         }
     } else {
-        switchCase.selectedCase = 0
+        node.selectedCase = 0
     }
 }
 
-export const geo_update_layer_transparency = (run, node) => {
-    let dlStart = []
+export const geo_update_layer_transparency = (callerContext, node) => {
+    const dl = []
 
-    if (run == 1) {
+    if (callerContext == GEO_CONTEXT_RENDER) {
         let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
 
         if (GeoRenderer.gCurGraphNodeHeldObject) {
-            obj = GeoRenderer.gCurGraphNodeHeldObject.objNode
+            obj = GeoRenderer.gCurGraphNodeHeldObject.wrapper.objNode
         }
 
         const opacity = obj.rawData[oOpacity]
 
-        const dlHead = dlStart
-
         if (opacity == 0xFF) {
-            if (node.wrapper.param == 20) {
-                node.flags = 0x600 | (node.flags & 0xFF)
+            if (node.parameter == 20) {
+                node.node.flags = 0x600 | (node.node.flags & 0xFF)
             } else {
-                node.flags = 0x100 | (node.flags & 0xFF)
+                node.node.flags = 0x100 | (node.node.flags & 0xFF)
             }
 
             obj.rawData[oAnimState] = 0
-
         } else {
-            if (node.wrapper.param == 20) {
-                node.flags = 0x600 | (node.flags & 0xFF)
+            if (node.parameter == 20) {
+                node.node.flags = 0x600 | (node.node.flags & 0xFF)
             } else {
-                node.flags = 0x500 | (node.flags & 0xFF)
+                node.node.flags = 0x500 | (node.node.flags & 0xFF)
             }
 
             obj.rawData[oAnimState] = 1
@@ -191,15 +214,13 @@ export const geo_update_layer_transparency = (run, node) => {
             if (opacity == 0 && gLinker.behaviors.bhvBowser == obj.behavior) {
                 obj.rawData[oAnimState] = 2
             }
-
         }
 
-        Gbi.gDPSetEnvColor(dlHead, 255, 255, 255, opacity)
-        Gbi.gSPEndDisplayList(dlHead)
-
+        Gbi.gDPSetEnvColor(dl, 255, 255, 255, opacity)
+        Gbi.gSPEndDisplayList(dl)
     }
 
-    return dlStart
+    return dl
 }
 
 export const spawn_water_droplet = (parent, params) => {
@@ -276,8 +297,6 @@ export const cur_obj_check_anim_frame = (frame) => {
         return 0
     }
 }
-
-// vvvvvvvvv
 
 export const cur_obj_check_anim_frame_in_range = (startFrame, rangeLength) => {
     const o = ObjectListProc.gCurrentObject
@@ -361,11 +380,11 @@ const cur_obj_move_after_thrown_or_dropped = (forwardVel, velY) => {
 }
 
 export const cur_obj_get_thrown_or_placed = (forwardVel, velY, thrownAction) => {
+    const o = ObjectListProc.gCurrentObject
     if (o.behavior == gLinker.behaviors.bhvBowser) {
           // Interestingly, when bowser is thrown, he is offset slightly to
           // Mario's right
         cur_obj_set_pos_relative_to_parent(-41.684, 85.859, 321.577)
-    } else {
     }
 
     cur_obj_become_tangible()
@@ -382,19 +401,13 @@ export const cur_obj_get_thrown_or_placed = (forwardVel, velY, thrownAction) => 
 }
 
 export const cur_obj_get_dropped = () => {
+    const o = ObjectListProc.gCurrentObject
     cur_obj_become_tangible()
     cur_obj_enable_rendering()
 
     o.rawData[oHeldState] = HELD_FREE
     cur_obj_move_after_thrown_or_dropped(0.0, 0.0)
 }
-
-
-
-// ^^^^^^^^
-
-
-
 
 export const cur_obj_reverse_animation = () => {
     const o = ObjectListProc.gCurrentObject
@@ -475,6 +488,7 @@ export const obj_set_held_state = (obj, heldBehavior) => {
     const o = ObjectListProc.gCurrentObject
     obj.parentObj = o
 
+    heldBehavior = Spawn.get_bhv_script(heldBehavior)
     if (obj.rawData[oFlags] & OBJ_FLAG_HOLDABLE) {
         if (heldBehavior == gLinker.behaviors.bhvCarrySomething3) {
             obj.rawData[oHeldState] = HELD_HELD
@@ -494,8 +508,8 @@ export const obj_set_held_state = (obj, heldBehavior) => {
 }
 
 export const obj_build_transform_from_pos_and_angle = (obj, posIndex, angleIndex) => {
-    const translate = new Array(3)
-    const rotation = new Array(3)
+    const translate = []
+    const rotation = []
 
     translate[0] = obj.rawData[posIndex + 0]
     translate[1] = obj.rawData[posIndex + 1]
@@ -741,6 +755,18 @@ export const cur_obj_call_action_function = (actionFunctions) => {
     actionFunction()
 }
 
+export const obj_explode_and_spawn_coins = (sp18, sp1C) => {
+    const o = ObjectListProc.gCurrentObject
+    spawn_mist_particles_variable(0, 0, sp18)
+    spawn_triangle_break_particles(30, 138, 3.0, 4)
+    obj_mark_for_deletion(o)
+
+    if (sp1C == 1) {
+        obj_spawn_loot_yellow_coins(o, o.rawData[oNumLootCoins], 20.0)
+    } else if (sp1C == 2) {
+        obj_spawn_loot_blue_coins(o, o.rawData[oNumLootCoins], 20.0, 150)
+    }
+}
 
 export const cur_obj_if_hit_wall_bounce_away = () => {
     const o = ObjectListProc.gCurrentObject
@@ -1589,6 +1615,10 @@ export const obj_spawn_loot_coins = (obj, numCoins, sp30, coinsBehavior, posJitt
     }
 }
 
+export const obj_spawn_loot_blue_coins = (obj, numCoins, sp28, posJitter) => {
+    obj_spawn_loot_coins(obj, numCoins, sp28, gLinker.behaviors.bhvBlueCoinJumping, posJitter, MODEL_BLUE_COIN)
+}
+
 export const obj_spawn_loot_yellow_coins = (obj, numCoins, sp28) => {
     obj_spawn_loot_coins(obj, numCoins, sp28, gLinker.behaviors.bhvSingleCoinGetsSpawned, 0, MODEL_YELLOW_COIN)
 }
@@ -1639,3 +1669,42 @@ export const obj_has_behavior = (obj, behavior) => {
         return false
     }
 }
+
+import { LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC } from "../levels/level_defines_constants"
+const sLevelsWithRooms = [LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC]
+
+export const bhv_init_room = () => {
+    const o = ObjectListProc.gCurrentObject
+    let floor
+    let /*f32*/ floorHeight
+
+    if (sLevelsWithRooms.includes(gLinker.Area.gCurrLevelNum)) {
+        const floorWrapper = {}
+        floorHeight = gLinker.SurfaceCollision.find_floor(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], floorWrapper)
+        floor = floorWrapper.floor
+
+        if (floor != null) {
+            if (floor.room != 0) {
+                o.rawData[oRoom] = floor.room
+            } else {
+                  // Floor probably belongs to a platform object. Try looking
+                  // underneath it
+                const floorWrapper = {}
+                gLinker.SurfaceCollision.find_floor(o.rawData[oPosX], floorHeight - 100.0, o.rawData[oPosZ], floorWrapper)
+                floor = floorWrapper.floor
+                if (floor != null) {
+                      //! Technically possible that the room could still be 0 here
+                    o.rawData[oRoom] = floor.room
+                }
+            }
+        }
+    } else {
+        o.rawData[oRoom] = -1
+    }
+}
+
+
+gLinker.bhv_init_room = bhv_init_room
+
+gLinker.cur_obj_rotate_face_angle_using_vel = cur_obj_rotate_face_angle_using_vel
+gLinker.cur_obj_move_using_fvel_and_gravity = cur_obj_move_using_fvel_and_gravity

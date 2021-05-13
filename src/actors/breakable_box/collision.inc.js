@@ -37,7 +37,4 @@ export const breakable_box_seg8_collision_08012D70 = [
     COL_END(),
 ].flat();
 
-UNUSED static const u32 breakable_box_unused_1 = 0;
-UNUSED static const u64 breakable_box_unused_2 = 0;
-
 // 1619272096 - 2021-04-24 04:08:36 -1000

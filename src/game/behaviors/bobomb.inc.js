@@ -1,25 +1,68 @@
-import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { is_point_within_radius_of_mario, object_step, obj_return_home_if_safe,
-         obj_check_if_facing_toward_angle, obj_check_floor_death, sObjFloor,
-         OBJ_COL_FLAG_GROUNDED, obj_spawn_yellow_coins, curr_obj_random_blink } from "../ObjBehaviors"
-import { oPosX, oPosY, oPosZ, oAnimState, oBobombBlinkTimer, oHeldState, HELD_FREE,
-         oBehParams, oBehParams2ndByte, oBobombBuddyRole, oAction, oBobombBuddyCannonStatus,
-         oBobombBuddyHasTalkedToMario, oDistanceToMario, oBobombBuddyBlinkTimer,
-         oBobombBuddyPosXCopy, oBobombBuddyPosYCopy, oBobombBuddyPosZCopy,
-         BOBOMB_BP_STYPE_GENERIC,
-         BOBOMB_ACT_PATROL, BOBOMB_ACT_CHASE_MARIO, BOBOMB_ACT_EXPLODE, BOBOMB_ACT_LAVA_DEATH, BOBOMB_ACT_DEATH_PLANE_DEATH, oBobombFuseTimer, oForwardVel, oGravity, oFriction, oBuoyancy, oInteractionSubtype, oHomeX, oHomeY, oHomeZ, oMoveAngleYaw, oAngleToMario, oBobombFuseLit, oSmokeTimer, oTimer, ACTIVE_FLAGS_DEACTIVATED, oInteractStatus, oVelY, BOBOMB_ACT_LAUNCHED, oGraphYOffset, oVelX, oVelZ } from "../../include/object_constants"
-import { INT_SUBTYPE_NPC, INT_SUBTYPE_KICKABLE, INTERACT_GRABBABLE, INT_STATUS_INTERACTED, INT_STATUS_MARIO_UNK1, INT_STATUS_TOUCHED_BOB_OMB } from "../Interaction"
-import { obj_turn_toward_object, obj_attack_collided_from_other_object, cur_obj_scale, spawn_object,
-         obj_mark_for_deletion, cur_obj_nearest_object_with_behavior, approach_s16_symmetric } from "../ObjectHelpers"
-import { set_object_visibility } from "../ObjBehaviors"
-import { obj_set_hitbox } from "../ObjBehaviors2"
-import { MODEL_EXPLOSION, MODEL_BLACK_BOBOMB, MODEL_SMOKE } from "../../include/model_ids"
-import { bhvExplosion, bhvBobomb, bhvBobombFuseSmoke } from "../BehaviorData"
-import { create_respawner } from "./corkbox.inc"
-import { int32 } from "../../utils"
+// Bobomb
+import * as _Linker from "../../game/Linker"
 
-import { SOUND_OBJ_BOBOMB_WALK, SOUND_ACTION_READ_SIGN } from "../../include/sounds"
-import { cur_obj_play_sound_2 } from "../SpawnSound"
+import {
+    obj_turn_toward_object, obj_attack_collided_from_other_object, cur_obj_scale, spawn_object,
+    obj_mark_for_deletion, cur_obj_nearest_object_with_behavior, approach_s16_symmetric,
+    cur_obj_init_animation, cur_obj_set_pos_relative, cur_obj_enable_rendering, cur_obj_get_dropped,
+} from "../ObjectHelpers"
+
+import {
+    is_point_within_radius_of_mario, object_step, obj_return_home_if_safe,
+    obj_check_if_facing_toward_angle, obj_check_floor_death, sObjFloor, obj_spawn_yellow_coins,
+    curr_obj_random_blink, set_object_visibility
+} from "../ObjBehaviors"
+
+import {
+    obj_set_hitbox
+} from "../ObjBehaviors2"
+
+import {
+    int32
+} from "../../utils"
+
+import {
+    create_respawner
+} from "./corkbox.inc"
+
+import {
+    cur_obj_play_sound_1, cur_obj_play_sound_2
+} from "../SpawnSound"
+
+import {
+    oPosX, oPosY, oPosZ, oAnimState, oBobombBlinkTimer, oHeldState, oBehParams, oBehParams2ndByte,
+    oBobombBuddyRole, oAction, oBobombBuddyCannonStatus, oBobombBuddyHasTalkedToMario,
+    oDistanceToMario, oBobombBuddyBlinkTimer, oBobombBuddyPosXCopy, oBobombBuddyPosYCopy,
+    oBobombBuddyPosZCopy, oBobombFuseTimer, oForwardVel, oGravity, oFriction, oBuoyancy,
+    oInteractionSubtype, oHomeX, oHomeY, oHomeZ, oMoveAngleYaw, oAngleToMario, oBobombFuseLit,
+    oSmokeTimer, oTimer, oInteractStatus, oVelY, oGraphYOffset, oVelX, oVelZ, oFlags,
+
+    BOBOMB_ACT_LAUNCHED, ACTIVE_FLAGS_DEACTIVATED,  BOBOMB_BP_STYPE_GENERIC, HELD_HELD, HELD_FREE,
+    HELD_THROWN, HELD_DROPPED, BOBOMB_ACT_PATROL, BOBOMB_ACT_CHASE_MARIO, BOBOMB_ACT_EXPLODE,
+    BOBOMB_ACT_LAVA_DEATH, BOBOMB_ACT_DEATH_PLANE_DEATH
+} from "../../include/object_constants"
+
+import {
+    INT_SUBTYPE_NPC, INT_SUBTYPE_KICKABLE, INTERACT_GRABBABLE, INT_STATUS_INTERACTED,
+    INT_STATUS_MARIO_UNK1, INT_STATUS_TOUCHED_BOB_OMB, INT_STATUS_MARIO_DROP_OBJECT
+} from "../Interaction"
+
+import {
+    MODEL_EXPLOSION, MODEL_BLACK_BOBOMB, MODEL_SMOKE
+} from "../../include/model_ids"
+
+import {
+    OBJ_COL_FLAG_GROUNDED
+} from "../ObjBehaviors"
+
+import {
+    GRAPH_RENDER_INVISIBLE
+} from "../../engine/graph_node"
+
+import {
+    SOUND_OBJ_BOBOMB_WALK, SOUND_ACTION_READ_SIGN, SOUND_AIR_BOBOMB_LIT_FUSE
+} from "../../include/sounds"
+
 
 /* Bob-omb Buddy */
     /* oBehParams2ndByte */
@@ -57,7 +100,7 @@ const sBobombHitbox = {
 }
 
 export const bhv_bobomb_init = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     o.rawData[oGravity] = 2.5
     o.rawData[oFriction] = 0.8
@@ -66,7 +109,7 @@ export const bhv_bobomb_init = () => {
 }
 
 const bobomb_act_patrol = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     o.rawData[oForwardVel] = 5.0
 
@@ -80,7 +123,8 @@ const bobomb_act_patrol = () => {
 }
 
 const bobomb_act_chase_mario = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
     const sp1a = ++o.header.gfx.unk38.animFrame
     o.rawData[oForwardVel] = 20.0
@@ -91,38 +135,38 @@ const bobomb_act_chase_mario = () => {
        cur_obj_play_sound_2(SOUND_OBJ_BOBOMB_WALK)
     }
 
-    obj_turn_toward_object(o, ObjectListProc.gMarioObject, 16, 0x800)
+    obj_turn_toward_object(o, gMarioObject, 16, 0x800)
     obj_check_floor_death(collisionFlags, sObjFloor)
 }
 
 const bobomb_spawn_coin = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     if (((o.rawData[oBehParams] >> 8) & 0x1) == 0) {
         obj_spawn_yellow_coins(o, 1)
         o.rawData[oBehParams] = 0x100
-        ObjectListProc.set_object_respawn_info_bits(o, 1)
+        gLinker.ObjectListProcessor.set_object_respawn_info_bits(o, 1)
     }
 }
 
 const bobomb_act_explode = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     if (o.rawData[oTimer] < 5) {
         cur_obj_scale(1.0 + o.rawData[oTimer] / 5.0)
     } else {
-        const explosion = spawn_object(o, MODEL_EXPLOSION, bhvExplosion)
+        const explosion = spawn_object(o, MODEL_EXPLOSION, 'bhvExplosion')
         explosion.rawData[oGraphYOffset] += 100.0
 
         bobomb_spawn_coin()
-        create_respawner(MODEL_BLACK_BOBOMB, bhvBobomb, 3000)
+        create_respawner(MODEL_BLACK_BOBOMB, 'bhvBobomb', 3000)
         o.activeFlags = ACTIVE_FLAGS_DEACTIVATED // unload object
     }
 
 }
 
 const bobomb_act_launched = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     const collisionFlags = object_step()
     if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) == OBJ_COL_FLAG_GROUNDED) {
@@ -131,14 +175,16 @@ const bobomb_act_launched = () => {
 }
 
 const bobomb_check_interactions = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+
     obj_set_hitbox(o, sBobombHitbox)
 
     if ((o.rawData[oInteractStatus] & INT_STATUS_INTERACTED) != 0) {
         if ((o.rawData[oInteractStatus] & INT_STATUS_MARIO_UNK1) != 0) {
-            o.rawData[oMoveAngleYaw] = ObjectListProc.gMarioObject.header.gfx.angle[1]
+            o.rawData[oMoveAngleYaw] = gMarioObject.header.gfx.angle[1]
             o.rawData[oForwardVel] = 25.0
-            o.rawData[oVelY] = 30
+            o.rawData[oVelY] = 30.0
             o.rawData[oAction] = BOBOMB_ACT_LAUNCHED
         }
 
@@ -155,7 +201,7 @@ const bobomb_check_interactions = () => {
 }
 
 const generic_bobomb_free_loop = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     switch (o.rawData[oAction]) {
         case BOBOMB_ACT_PATROL:
@@ -180,7 +226,7 @@ const generic_bobomb_free_loop = () => {
 }
 
 const stationary_bobomb_free_loop = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     switch (o.rawData[oAction]) {
         case BOBOMB_ACT_LAUNCHED:
@@ -209,17 +255,59 @@ const stationary_bobomb_free_loop = () => {
 }
 
 const bobomb_free_loop = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
-    if (o.rawData[oBehParams2ndByte] == BOBOMB_BP_STYPE_GENERIC)
+    if (o.rawData[oBehParams2ndByte] == BOBOMB_BP_STYPE_GENERIC) {
         generic_bobomb_free_loop()
-    else 
+    }
+    else {
         stationary_bobomb_free_loop()
+    }
+}
+
+const bobomb_held_loop = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+
+    o.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
+    cur_obj_init_animation(1)
+    cur_obj_set_pos_relative(gMarioObject, 0, 60.0, 100.0)
+
+    o.rawData[oBobombFuseLit] = 1
+    if (o.rawData[oBobombFuseTimer] >= 151) {
+          //! Although the Bob-omb's action is set to explode when the fuse timer expires,
+          //  bobomb_act_explode() will not execute until the bob-omb's held state changes.
+          //  This allows the Bob-omb to be regrabbed indefinitely.
+        gMarioObject.rawData[oInteractStatus] |= INT_STATUS_MARIO_DROP_OBJECT
+        o.rawData[oAction] = BOBOMB_ACT_EXPLODE
+    }
+}
+
+const bobomb_dropped_loop = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    cur_obj_get_dropped()
+
+    o.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+    cur_obj_init_animation(0)
+
+    o.rawData[oHeldState] = 0
+    o.rawData[oAction] = BOBOMB_ACT_PATROL
+}
+
+const bobomb_thrown_loop = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    cur_obj_enable_rendering()
+
+    o.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+    o.rawData[oHeldState] = 0
+    o.rawData[oFlags] &= ~0x8; /* bit 3 */
+    o.rawData[oForwardVel] = 25.0
+    o.rawData[oVelY] = 20.0
+    o.rawData[oAction] = BOBOMB_ACT_LAUNCHED
 }
 
 export const bhv_bobomb_loop = () => {
-
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     if (is_point_within_radius_of_mario(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], 4000) != 0) {
 
@@ -227,7 +315,18 @@ export const bhv_bobomb_loop = () => {
             case HELD_FREE:
                 bobomb_free_loop()
                 break
-            default: throw "need to implement bobomb held states"
+
+            case HELD_HELD:
+                bobomb_held_loop()
+                break
+
+            case HELD_THROWN:
+                bobomb_thrown_loop()
+                break
+
+            case HELD_DROPPED:
+                bobomb_dropped_loop()
+                break
         }
 
         curr_obj_random_blink(oBobombBlinkTimer)
@@ -240,19 +339,18 @@ export const bhv_bobomb_loop = () => {
                 dustPeriodMinus1 = 7
 
             if ((dustPeriodMinus1 & o.rawData[oBobombFuseTimer]) == 0) {
-                spawn_object(o, MODEL_SMOKE, bhvBobombFuseSmoke)
+                spawn_object(o, MODEL_SMOKE, 'bhvBobombFuseSmoke')
             }
 
-            // TODO Smoke Lit Sound
+            cur_obj_play_sound_1(SOUND_AIR_BOBOMB_LIT_FUSE)
 
             o.rawData[oBobombFuseTimer]++
         }
-        
     }
 }
 
 export const bhv_bobomb_fuse_smoke_init = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     o.rawData[oPosX] += int32(Math.random() * 80) - 40
     o.rawData[oPosY] += int32(Math.random() * 80) + 60
@@ -261,7 +359,7 @@ export const bhv_bobomb_fuse_smoke_init = () => {
 }
 
 export const bhv_dust_smoke_loop = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     o.rawData[oPosX] += o.rawData[oVelX]
     o.rawData[oPosY] += o.rawData[oVelY]
@@ -277,7 +375,7 @@ export const bhv_dust_smoke_loop = () => {
 //--------------------------
 
 const bhv_bobomb_buddy_init = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oGravity] = 2.5
     o.rawData[oFriction] = 0.8
     o.rawData[oBuoyancy] = 1.3
@@ -285,7 +383,7 @@ const bhv_bobomb_buddy_init = () => {
 }
 
 const bobomb_buddy_act_idle = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     let sp1a = o.header.gfx.unk38.animFrame
 
     o.rawData[oBobombBuddyPosXCopy] = o.rawData[oPosX]
@@ -357,7 +455,7 @@ const bobomb_buddy_cannon_dialog = (dialogFirstText, dialogSecondText) => {
 }
 
 const bobomb_buddy_act_talk = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     // DEBUG
     o.rawData[oBobombBuddyHasTalkedToMario] = BOBOMB_BUDDY_HAS_TALKED
@@ -391,7 +489,7 @@ const bobomb_buddy_act_talk = () => {
 }
 
 const bobomb_buddy_act_turn_to_talk = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     let /*s16*/ sp1e = o.header.gfx.unk38.animFrame
     if ((sp1e == 5) || (sp1e == 16)) {
         cur_obj_play_sound_2(SOUND_OBJ_BOBOMB_WALK)
@@ -406,7 +504,7 @@ const bobomb_buddy_act_turn_to_talk = () => {
 }
 
 const bobomb_buddy_actions = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     switch (o.rawData[oAction]) {
         case BOBOMB_BUDDY_ACT_IDLE:
             bobomb_buddy_act_idle()
@@ -425,7 +523,7 @@ const bobomb_buddy_actions = () => {
 }
 
 const bhv_bobomb_buddy_loop = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     bobomb_buddy_actions()
 
     curr_obj_random_blink(oBobombBuddyBlinkTimer)
@@ -433,5 +531,9 @@ const bhv_bobomb_buddy_loop = () => {
     o.rawData[oInteractStatus] = 0
 }
 
+gLinker.bhv_bobomb_init = bhv_bobomb_init
+gLinker.bhv_bobomb_loop = bhv_bobomb_loop
+gLinker.bhv_bobomb_fuse_smoke_init = bhv_bobomb_fuse_smoke_init
 gLinker.bhv_bobomb_buddy_init = bhv_bobomb_buddy_init
 gLinker.bhv_bobomb_buddy_loop = bhv_bobomb_buddy_loop
+gLinker.bhv_dust_smoke_loop = bhv_dust_smoke_loop

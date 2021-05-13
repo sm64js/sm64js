@@ -25,6 +25,9 @@ export const ATTACK_HANDLER_SQUISHED_WITH_BLUE_COIN = 8
 
 //this lived above random_linear_offset in the source,
 export const obj_roll_to_match_yaw_turn = (targetYaw, maxRoll, rollSpeed) => {
+
+    const o = ObjectListProc.gCurrentObject
+
     const targetRoll = o.rawData[oMoveAngleYaw] - targetYaw;
     const clampReturn = clamp_s16(targetRoll, -maxRoll, maxRoll);
     obj_face_roll_approach(clampReturn, rollSpeed);

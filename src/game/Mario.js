@@ -643,15 +643,35 @@ export const WATER_STEP_HIT_CEILING = 2
 export const WATER_STEP_CANCELLED   = 3
 export const WATER_STEP_HIT_WALL    = 4
 
-export const sJumpLandAction = {
-    numFrames: 4,
-    unk02: 5,
-    verySteepAction: ACT_FREEFALL,
-    endAction: ACT_JUMP_LAND_STOP,
-    aPressedAction: ACT_DOUBLE_JUMP,
-    offFloorAction: ACT_FREEFALL,
-    slideAction: ACT_BEGIN_SLIDING
+export const sHoldJumpLandAction = {
+    numFrames:       4,
+    unk02:           5,
+    verySteepAction: ACT_HOLD_FREEFALL,
+    endAction:       ACT_HOLD_JUMP_LAND_STOP,
+    aPressedAction:  ACT_HOLD_JUMP,
+    offFloorAction:  ACT_HOLD_FREEFALL,
+    slideAction:     ACT_HOLD_BEGIN_SLIDING
 }
+
+export const sJumpLandAction = {
+    numFrames:       4,
+    unk02:           5,
+    verySteepAction: ACT_FREEFALL,
+    endAction:       ACT_JUMP_LAND_STOP,
+    aPressedAction:  ACT_DOUBLE_JUMP,
+    offFloorAction:  ACT_FREEFALL,
+    slideAction:     ACT_BEGIN_SLIDING
+}
+
+export const sHoldFreefallLandAction = {
+    numFrames:       4,
+    unk02:           5,
+    verySteepAction: ACT_HOLD_FREEFALL,
+    endAction:       ACT_HOLD_FREEFALL_LAND_STOP,
+    aPressedAction:  ACT_HOLD_JUMP,
+    offFloorAction:  ACT_HOLD_FREEFALL,
+    slideAction:     ACT_HOLD_BEGIN_SLIDING
+};
 
 export const sFreefallLandAction = {
     numFrames: 4,
@@ -963,6 +983,26 @@ export const check_common_action_exits = (m) => {
     return 0
 }
 
+/**
+ * Checks a variety of inputs for common transitions between many different
+ * object holding actions. A holding variant of the above function.
+ */
+export const check_common_hold_action_exits = (m) => {
+    if (m.input & INPUT_A_PRESSED) {
+        return set_mario_action(m, ACT_HOLD_JUMP, 0)
+    }
+    if (m.input & INPUT_OFF_FLOOR) {
+        return set_mario_action(m, ACT_HOLD_FREEFALL, 0)
+    }
+    if (m.input & INPUT_NONZERO_ANALOG) {
+        return set_mario_action(m, ACT_HOLD_WALKING, 0)
+    }
+    if (m.input & INPUT_ABOVE_SLIDE) {
+        return set_mario_action(m, ACT_HOLD_BEGIN_SLIDING, 0)
+    }
+
+    return 0
+}
 
 export const drop_and_set_mario_action = (m, action, actionArg) => {
     //drop item

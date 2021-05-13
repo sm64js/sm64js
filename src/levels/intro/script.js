@@ -67,8 +67,8 @@ const level_intro_entry_2 = [
 
 export const level_intro_entry_1 = [
     // joe debug: short circuit to selected level
-    // SET_REGISTER(getSelectedLevel),
-    // EXECUTE(level_main_scripts_entry),
+    SET_REGISTER(getSelectedLevel),
+    EXECUTE(level_main_scripts_entry),
 
     INIT_LEVEL(),
     ALLOC_LEVEL_POOL(),

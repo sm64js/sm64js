@@ -36,16 +36,13 @@ import { MODEL_WOODEN_POST, MODEL_MIST, MODEL_SMOKE, MODEL_BUBBLE, MODEL_CANNON_
          MODEL_BOWSER_BOMB_CHILD_OBJ, MODEL_NONE
 } from "../include/model_ids"
 
-import {
-    cur_obj_rotate_face_angle_using_vel, cur_obj_move_using_fvel_and_gravity
-} from "./ObjectHelpers"
-
-
 import { bhv_pole_base_loop                             } from "./behaviors/pole_base.inc"
 import { bhv_pole_init, bhv_giant_pole_loop             } from "./behaviors/pole.inc"
 import { bhv_castle_flag_init                           } from "./behaviors/bhv_castle_flag_init.inc"
 
 import * as bowling_ball             from "./behaviors/bowling_ball.inc"
+import * as breakable_box            from "./behaviors/breakable_box.inc"
+import * as breakable_box_small      from "./behaviors/breakable_box_small.inc"
 import * as butterfly                from "./behaviors/butterfly.inc"
 import * as cannon                   from "./behaviors/cannon.inc"
 import * as cannon_door              from "./behaviors/cannon_door.inc"
@@ -60,6 +57,7 @@ import * as moat_grill               from "./behaviors/moat_grill.inc"
 import * as mushroom_1up             from "./behaviors/mushroom_1up.inc"
 import * as seesaw_platform          from "./behaviors/seesaw_platform.inc"
 import * as sparkle_spawn_star       from "./behaviors/sparkle_spawn_star.inc"
+import * as switch_hidden_objects    from "./behaviors/switch_hidden_objects.inc"
 import * as water_bomb               from "./behaviors/water_bomb.inc"
 import * as water_bomb_cannon        from "./behaviors/water_bomb_cannon.inc"
 import * as water_splashes_and_waves from "./behaviors/water_splashes_and_waves.inc"
@@ -110,6 +108,7 @@ import { chain_chomp_seg6_anims_06025178    } from "../actors/chain_chomp/anims/
 import { goomba_seg8_anims_0801DA4C         } from "../actors/goomba/anims/table.inc"
 import { yoshi_seg5_anims_05024100          } from "../actors/yoshi/anims.inc"
 
+import { breakable_box_seg8_collision_08012D70              } from "../actors/breakable_box/collision.inc"
 import { cannon_lid_seg8_collision_08004950                 } from "../actors/cannon_lid/collision.inc"
 import { castle_grounds_seg7_collision_cannon_grill         } from "../levels/castle_grounds/areas/1/8/collision.inc"
 import { castle_grounds_seg7_collision_moat_grills          } from "../levels/castle_grounds/areas/1/7/collision.inc"
@@ -579,8 +578,8 @@ export const bhvBreakBoxTriangle = [
     BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BEGIN_REPEAT(18),
-        CALL_NATIVE(cur_obj_rotate_face_angle_using_vel),
-        CALL_NATIVE(cur_obj_move_using_fvel_and_gravity),
+        CALL_NATIVE('cur_obj_rotate_face_angle_using_vel'),
+        CALL_NATIVE('cur_obj_move_using_fvel_and_gravity'),
     END_REPEAT(),
     DEACTIVATE(),
 ]
@@ -1436,7 +1435,7 @@ export const bhvWaterBombCannon = [
 ]
 
 export const bhvCannonBarrelBubbles = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvCannonBarrelBubbles'),
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_bubble_cannon_barrel_loop'),
@@ -1444,7 +1443,7 @@ export const bhvCannonBarrelBubbles = [
 ]
 
 export const bhvPitBowlingBall = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvPitBowlingBall'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     SET_FLOAT(oGraphYOffset, 130),
@@ -1455,7 +1454,7 @@ export const bhvPitBowlingBall = [
 ]
 
 export const bhvFreeBowlingBall = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvFreeBowlingBall'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     SET_FLOAT(oGraphYOffset, 130),
@@ -1466,7 +1465,7 @@ export const bhvFreeBowlingBall = [
 ]
 
 export const bhvBowlingBall = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvBowlingBall'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     SET_FLOAT(oGraphYOffset, 130),
@@ -1487,7 +1486,7 @@ export const bhvTtmBowlingBallSpawner = [
 ]
 
 export const bhvBobBowlingBallSpawner = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvBobBowlingBallSpawner'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INT(oBBallSpawnerPeriodMinus1, 127),
     CALL_NATIVE('bhv_generic_bowling_ball_spawner_init'),
@@ -1497,56 +1496,89 @@ export const bhvBobBowlingBallSpawner = [
 ]
 
 export const bhvThiBowlingBallSpawner = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvThiBowlingBallSpawner'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_thi_bowling_ball_spawner_loop'),
     END_LOOP(),
 ]
 
+export const bhvBreakableBox = [
+    BEGIN(OBJ_LIST_SURFACE, 'bhvBreakableBox'),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(breakable_box_seg8_collision_08012D70),
+    SET_FLOAT(oCollisionDistance, 500),
+    CALL_NATIVE('bhv_init_room'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_breakable_box_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+    BREAK(),
+]
+
+export const bhvBreakableBoxSmall = [
+    BEGIN(OBJ_LIST_DESTRUCTIVE, 'bhvBreakableBoxSmall'),
+    OR_INT(oFlags, (OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    DROP_TO_FLOOR(),
+    SET_HOME(),
+    CALL_NATIVE('bhv_breakable_box_small_init'),
+    BEGIN_LOOP(),
+        SET_INT(oIntangibleTimer, 0),
+        CALL_NATIVE('bhv_breakable_box_small_loop'),
+    END_LOOP(),
+]
+
+const bhvJumpingBox = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO  | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ -400, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 600, /*Unused*/ 0, 0),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_jumping_box_loop'),
+    END_LOOP(),
+]
 
 
-
-gLinker.behaviors = {
-    bhvBowser,
-    bhvWhitePuffExplosion,
-    bhvSingleCoinGetsSpawned,
-    bhvWaterDroplet,
-    bhvWaterDropletSplash,
-
-    // particles
-    bhvMistParticleSpawner,
-    bhvVertStarParticleSpawner,
-    bhvHorStarParticleSpawner,
-    // bhvSparkleParticleSpawner,
-    bhvBubbleParticleSpawner,
-    bhvWaterSplash,
-    bhvIdleWaterWave,
-    bhvPlungeBubble,
-    bhvWaveTrail,
-    // bhvFireParticleSpawner,
-    bhvShallowWaterWave,
-    bhvShallowWaterSplash,
-    // bhvLeafParticleSpawner,
-    // bhvSnowParticleSpawner,
-    // bhvBreathParticleSpawner,
-    // bhvDirtParticleSpawner,
-    bhvMistCircParticleSpawner,
-    bhvTriangleParticleSpawner,
-    bhvSpawnedStarNoLevelExit,
-    bhvBowserBodyAnchor,
-    bhvBowserFlameSpawn,
-    bhvWoodenPost,
-    bhvBobBowlingBallSpawner,
-    bhvTtmBowlingBallSpawner,
-    bhvThiBowlingBallSpawner,
-    bhvPitBowlingBall,
-    bhvFreeBowlingBall,
-    bhvBowlingBall,
-    bhvBobombBuddy,
-    bhvWaterBombCannon,
-    bhvCannonClosed,
-    bhvCheckerboardElevatorGroup,
-    bhvSeesawPlatform,
-    bhvMario
-}
+gLinker.behaviors.bhvBobBowlingBallSpawner = bhvBobBowlingBallSpawner
+gLinker.behaviors.bhvBobombBuddy = bhvBobombBuddy
+gLinker.behaviors.bhvBowlingBall = bhvBowlingBall
+gLinker.behaviors.bhvBowser = bhvBowser
+gLinker.behaviors.bhvBowserBodyAnchor = bhvBowserBodyAnchor
+gLinker.behaviors.bhvBowserFlameSpawn = bhvBowserFlameSpawn
+gLinker.behaviors.bhvBreakableBox = bhvBreakableBox
+gLinker.behaviors.bhvBubbleParticleSpawner = bhvBubbleParticleSpawner
+gLinker.behaviors.bhvCannonClosed = bhvCannonClosed
+gLinker.behaviors.bhvCarrySomething1 = bhvCarrySomething1
+gLinker.behaviors.bhvCarrySomething2 = bhvCarrySomething2
+gLinker.behaviors.bhvCarrySomething3 = bhvCarrySomething3
+gLinker.behaviors.bhvCarrySomething4 = bhvCarrySomething4
+gLinker.behaviors.bhvCarrySomething5 = bhvCarrySomething5
+gLinker.behaviors.bhvCheckerboardElevatorGroup = bhvCheckerboardElevatorGroup
+gLinker.behaviors.bhvFreeBowlingBall = bhvFreeBowlingBall
+gLinker.behaviors.bhvHorStarParticleSpawner = bhvHorStarParticleSpawner
+gLinker.behaviors.bhvIdleWaterWave = bhvIdleWaterWave
+gLinker.behaviors.bhvJumpingBox = bhvJumpingBox
+gLinker.behaviors.bhvMario = bhvMario
+gLinker.behaviors.bhvMetalCap = bhvMetalCap
+gLinker.behaviors.bhvMistCircParticleSpawner = bhvMistCircParticleSpawner
+gLinker.behaviors.bhvMistParticleSpawner = bhvMistParticleSpawner
+gLinker.behaviors.bhvNormalCap = bhvNormalCap
+gLinker.behaviors.bhvPitBowlingBall = bhvPitBowlingBall
+gLinker.behaviors.bhvPlungeBubble = bhvPlungeBubble
+gLinker.behaviors.bhvSeesawPlatform = bhvSeesawPlatform
+gLinker.behaviors.bhvShallowWaterSplash = bhvShallowWaterSplash
+gLinker.behaviors.bhvShallowWaterWave = bhvShallowWaterWave
+gLinker.behaviors.bhvSingleCoinGetsSpawned = bhvSingleCoinGetsSpawned
+gLinker.behaviors.bhvSpawnedStarNoLevelExit = bhvSpawnedStarNoLevelExit
+gLinker.behaviors.bhvThiBowlingBallSpawner = bhvThiBowlingBallSpawner
+gLinker.behaviors.bhvTriangleParticleSpawner = bhvTriangleParticleSpawner
+gLinker.behaviors.bhvTtmBowlingBallSpawner = bhvTtmBowlingBallSpawner
+gLinker.behaviors.bhvVanishCap = bhvVanishCap
+gLinker.behaviors.bhvVertStarParticleSpawner = bhvVertStarParticleSpawner
+gLinker.behaviors.bhvWaterBombCannon = bhvWaterBombCannon
+gLinker.behaviors.bhvWaterDroplet = bhvWaterDroplet
+gLinker.behaviors.bhvWaterDropletSplash = bhvWaterDropletSplash
+gLinker.behaviors.bhvWaterSplash = bhvWaterSplash
+gLinker.behaviors.bhvWaveTrail = bhvWaveTrail
+gLinker.behaviors.bhvWhitePuffExplosion = bhvWhitePuffExplosion
+gLinker.behaviors.bhvWingCap = bhvWingCap
+gLinker.behaviors.bhvWoodenPost = bhvWoodenPost

@@ -2,40 +2,43 @@
 import { ObjectListProcessorInstance as O } from "../ObjectListProcessor"
 import { SurfaceLoadInstance as SurfaceLoad } from "../SurfaceLoad"
 import { spawn_object, cur_obj_become_intangible, cur_obj_become_tangible, cur_obj_hide,
-    cur_obj_unhide, obj_mark_for_deletion,
-    cur_obj_scale, obj_turn_toward_object, approach_symmetric,
-    cur_obj_move_using_fvel_and_gravity,
-    cur_obj_was_attacked_or_ground_pounded } from "../ObjectHelpers"
+         cur_obj_unhide, obj_mark_for_deletion,
+         cur_obj_scale, obj_turn_toward_object, approach_symmetric,
+         cur_obj_move_using_fvel_and_gravity,
+         cur_obj_was_attacked_or_ground_pounded } from "../ObjectHelpers"
 import { obj_set_hitbox } from "../ObjBehaviors2"
-import { s16,
-         random_float,
-         sins                          } from "../../utils"
+import { s16, random_float, sins } from "../../utils"
 
-import { oPosX,
-         oPosY,
-         oPosZ,
-         oVelY,
-         oFaceAnglePitch,
-         oMoveAngleYaw,
-         oMoveAnglePitch,
-         oForwardVel,
-         oHomeX,
-         oHomeY,
-         oHomeZ,
-         oAction,
-         oAnimState,
-         oTimer,
-         oDistanceToMario,
-         oInteractStatus,
-         oBehParams2ndByte,
-         oExclamationBoxUnkF4,
-         oExclamationBoxUnkF8,
-         oExclamationBoxUnkFC,
+import {
+         oAction, oPrevAction, oSubAction, oTimer, oFlags,
+         oBehParams, oBehParams2ndByte,
+         oAnimations, oAnimState, oActiveParticleFlags,
+         oIntangibleTimer, oInteractionSubtype, oInteractStatus, oInteractType,
+         oHealth, oHeldState,
+
+         oPosX, oPosY, oPosZ,
+         oHomeX, oHomeY, oHomeZ, oAngleToHome,
+         oVelX, oVelY, oVelZ,
+         oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ,
          oGraphYOffset,
-         oGravity,
-         oFloorHeight,
-         oFlags,
-         oBehParams,
+
+         oAngleVelPitch, oAngleVelRoll, oAngleVelYaw,
+         oForwardVel, oForwardVelS32,
+         oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw,
+         oDrawingDistance, oOpacity,
+
+         oBounciness, oBuoyancy, oDragStrength, oFriction, oGravity,
+         oCollisionDistance, oDamageOrCoinValue, oNumLootCoins,
+         oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oMoveFlags,
+         oWallAngle, oWallHitboxRadius,
+
+         oFloor, oFloorHeight, oFloorRoom, oFloorType, oRoom,
+         oAngleToMario, oDistanceToMario,
+
+         oDeathSound, oSoundStateID,
+         oDialogResponse, oDialogState,
+
+         oUnk1A8, oUnk94, oUnkBC, oUnkC0
 } from "../../include/object_constants"
 
 import { MODEL_1UP,

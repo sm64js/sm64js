@@ -610,9 +610,6 @@ export const oHauntedChairUnk104  = 0x1F
 export const oHeaveHoUnk88  = 0x00
 export const oHeaveHoUnkF4  = 0x1B
 
-/* Hidden Object */
-export const oHiddenObjectUnkF4  = 0x1B
-
 /* Hoot */
 export const oHootAvailability      = 0x1B
 export const oHootMarioReleaseTime  = 0x22

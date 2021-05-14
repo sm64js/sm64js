@@ -1,7 +1,7 @@
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 // import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { AreaInstance as Area } from "./Area"
-import { geo_obj_init, geo_obj_init_animation, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
+import { geo_obj_init, geo_obj_init_animation, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE, GEO_CONTEXT_RENDER } from "../engine/graph_node"
 
 import {
     oAction, oPrevAction, oSubAction, oTimer, oFlags,
@@ -49,7 +49,7 @@ import {
     OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, OBJ_MOVE_13,
     OBJ_MOVE_LANDED, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX, OBJ_FLAG_HOLDABLE,
 
-    HELD_HELD, HELD_THROWN, HELD_DROPPED
+    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED
  } from "../include/object_constants"
 
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
@@ -135,33 +135,30 @@ export const cur_obj_extend_animation_if_at_end = () => {
     if (sp4 == sp0) o.header.gfx.unk38.animFrame--
 }
 
-export const geo_switch_anim_state = (run, node) => {
-
-    if (run == 1) {
+export const geo_switch_anim_state = (callerContext, node) => {
+    if (callerContext == GEO_CONTEXT_RENDER) {
         let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
 
-        const switchCase = node
-
         if (GeoRenderer.gCurGraphNodeHeldObject) {
-            obj = GeoRenderer.gCurGraphNodeHeldObject.objNode
+            obj = GeoRenderer.gCurGraphNodeHeldObject.wrapper.objNode
         }
 
         // if the case is greater than the number of cases, set to 0 to avoid overflowing
         // the switch.
-        if (obj.rawData[oAnimState] >= switchCase.numCases) {
+        if (obj.rawData[oAnimState] >= node.numCases) {
             obj.rawData[oAnimState] = 0
         }
 
-        switchCase.selectedCase = obj.rawData[oAnimState]
+        node.selectedCase = obj.rawData[oAnimState]
     }
+
+    return null
 }
 
-export const geo_switch_area = (run, node) => {
-    const switchCase = node
-    if (run == 1) {
-
+export const geo_switch_area = (callerContext, node) => {
+    if (callerContext == GEO_CONTEXT_RENDER) {
         if (ObjectListProc.gMarioObject == undefined) {
-            switchCase.selectedCase = 0
+            node.selectedCase = 0
         } else {
             ///TODO gFindFloorIncludeSurfaceIntangible = 1
 
@@ -174,43 +171,42 @@ export const geo_switch_area = (run, node) => {
                 ObjectListProc.gMarioCurrentRoom = floorWrapper.floor.room
                 let selectedRoom = floorWrapper.floor.room - 1
 
-                if (selectedRoom >= 0) switchCase.selectedCase = selectedRoom
+                if (selectedRoom >= 0) {
+                    node.selectedCase = selectedRoom
+                }
             }
 
         }
     } else {
-        switchCase.selectedCase = 0
+        node.selectedCase = 0
     }
 }
 
-export const geo_update_layer_transparency = (run, node) => {
-    let dlStart = []
+export const geo_update_layer_transparency = (callerContext, node) => {
+    const dl = []
 
-    if (run == 1) {
+    if (callerContext == GEO_CONTEXT_RENDER) {
         let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
 
         if (GeoRenderer.gCurGraphNodeHeldObject) {
-            obj = GeoRenderer.gCurGraphNodeHeldObject.objNode
+            obj = GeoRenderer.gCurGraphNodeHeldObject.wrapper.objNode
         }
 
         const opacity = obj.rawData[oOpacity]
 
-        const dlHead = dlStart
-
         if (opacity == 0xFF) {
-            if (node.wrapper.param == 20) {
-                node.flags = 0x600 | (node.flags & 0xFF)
+            if (node.parameter == 20) {
+                node.node.flags = 0x600 | (node.node.flags & 0xFF)
             } else {
-                node.flags = 0x100 | (node.flags & 0xFF)
+                node.node.flags = 0x100 | (node.node.flags & 0xFF)
             }
 
             obj.rawData[oAnimState] = 0
-
         } else {
-            if (node.wrapper.param == 20) {
-                node.flags = 0x600 | (node.flags & 0xFF)
+            if (node.parameter == 20) {
+                node.node.flags = 0x600 | (node.node.flags & 0xFF)
             } else {
-                node.flags = 0x500 | (node.flags & 0xFF)
+                node.node.flags = 0x500 | (node.node.flags & 0xFF)
             }
 
             obj.rawData[oAnimState] = 1
@@ -218,15 +214,13 @@ export const geo_update_layer_transparency = (run, node) => {
             if (opacity == 0 && gLinker.behaviors.bhvBowser == obj.behavior) {
                 obj.rawData[oAnimState] = 2
             }
-
         }
 
-        Gbi.gDPSetEnvColor(dlHead, 255, 255, 255, opacity)
-        Gbi.gSPEndDisplayList(dlHead)
-
+        Gbi.gDPSetEnvColor(dl, 255, 255, 255, opacity)
+        Gbi.gSPEndDisplayList(dl)
     }
 
-    return dlStart
+    return dl
 }
 
 export const spawn_water_droplet = (parent, params) => {
@@ -303,8 +297,6 @@ export const cur_obj_check_anim_frame = (frame) => {
         return 0
     }
 }
-
-// vvvvvvvvv
 
 export const cur_obj_check_anim_frame_in_range = (startFrame, rangeLength) => {
     const o = ObjectListProc.gCurrentObject
@@ -388,11 +380,11 @@ const cur_obj_move_after_thrown_or_dropped = (forwardVel, velY) => {
 }
 
 export const cur_obj_get_thrown_or_placed = (forwardVel, velY, thrownAction) => {
+    const o = ObjectListProc.gCurrentObject
     if (o.behavior == gLinker.behaviors.bhvBowser) {
           // Interestingly, when bowser is thrown, he is offset slightly to
           // Mario's right
         cur_obj_set_pos_relative_to_parent(-41.684, 85.859, 321.577)
-    } else {
     }
 
     cur_obj_become_tangible()
@@ -409,19 +401,13 @@ export const cur_obj_get_thrown_or_placed = (forwardVel, velY, thrownAction) => 
 }
 
 export const cur_obj_get_dropped = () => {
+    const o = ObjectListProc.gCurrentObject
     cur_obj_become_tangible()
     cur_obj_enable_rendering()
 
     o.rawData[oHeldState] = HELD_FREE
     cur_obj_move_after_thrown_or_dropped(0.0, 0.0)
 }
-
-
-
-// ^^^^^^^^
-
-
-
 
 export const cur_obj_reverse_animation = () => {
     const o = ObjectListProc.gCurrentObject
@@ -522,8 +508,8 @@ export const obj_set_held_state = (obj, heldBehavior) => {
 }
 
 export const obj_build_transform_from_pos_and_angle = (obj, posIndex, angleIndex) => {
-    const translate = new Array(3)
-    const rotation = new Array(3)
+    const translate = []
+    const rotation = []
 
     translate[0] = obj.rawData[posIndex + 0]
     translate[1] = obj.rawData[posIndex + 1]

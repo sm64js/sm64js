@@ -313,46 +313,46 @@ export const bhvGoombaTripletSpawner = [
 ]
 
 export const bhvBobomb = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DESTRUCTIVE } },
-    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_PERSISTENT_RESPAWN | OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_HOLDABLE | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW } },
-    { command: BhvCmds.load_animations, args: { field: oAnimations, anims: bobomb_seg8_anims_0802396C } },
-    { command: BhvCmds.drop_to_floor },
-    { command: BhvCmds.animate, args: { animIndex: 0 } },
-    { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
-    { command: BhvCmds.set_home },
-    { command: BhvCmds.call_native, args: { func: bhv_bobomb_init } },
-    { command: BhvCmds.begin_loop },
-        { command: BhvCmds.call_native, args: { func: bhv_bobomb_loop } },
-    { command: BhvCmds.end_loop }
-]
-
-export const bhvExplosion = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DESTRUCTIVE } },
-    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
-    { command: BhvCmds.billboard },
-    { command: BhvCmds.set_interact_type, args: { type: INTERACT_DAMAGE } },
-    { command: BhvCmds.set_objectData_value, args: { field: oDamageOrCoinValue, value: 2 } },
-    { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
-    { command: BhvCmds.set_hitbox_with_offset, args: { radius: 150, height: 150, downOffset: 150 } },
-    { command: BhvCmds.set_objectData_value, args: { field: oAnimState, value: -1 } },
-    { command: BhvCmds.call_native, args: { func: bhv_explosion_init } },
-    { command: BhvCmds.begin_loop },
-        { command: BhvCmds.call_native, args: { func: bhv_explosion_loop } },
-        { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
-    { command: BhvCmds.end_loop }
+    BEGIN(OBJ_LIST_DESTRUCTIVE, 'bhvBobomb'),
+    OR_INT(oFlags, (OBJ_FLAG_PERSISTENT_RESPAWN | OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, bobomb_seg8_anims_0802396C),
+    DROP_TO_FLOOR(),
+    ANIMATE(0),
+    SET_INT(oIntangibleTimer, 0),
+    SET_HOME(),
+    CALL_NATIVE('bhv_bobomb_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_bobomb_loop'),
+    END_LOOP(),
 ]
 
 export const bhvBobombFuseSmoke = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
-    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
-    { command: BhvCmds.billboard },
-    { command: BhvCmds.set_objectData_value, args: { field: oAnimState, value: -1 } },
-    { command: BhvCmds.call_native, args: { func: bhv_bobomb_fuse_smoke_init } },
-    { command: BhvCmds.delay, args: { num: 1 } },
-    { command: BhvCmds.begin_loop },
-        { command: BhvCmds.call_native, args: { func: bhv_dust_smoke_loop } },
-        { command: BhvCmds.add_number, args: { field: oAnimState, value: 1 } },
-    { command: BhvCmds.end_loop }
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    BILLBOARD(),
+    SET_INT(oAnimState, -1),
+    CALL_NATIVE('bhv_bobomb_fuse_smoke_init'),
+    DELAY(1),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_dust_smoke_loop'),
+        ADD_INT(oAnimState, 1),
+    END_LOOP(),
+]
+
+export const bhvExplosion = [
+    BEGIN(OBJ_LIST_DESTRUCTIVE, 'bhvExplosion'),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BILLBOARD(),
+    SET_INTERACT_TYPE(INTERACT_DAMAGE),
+    SET_INT(oDamageOrCoinValue, 2),
+    SET_INT(oIntangibleTimer, 0),
+    SET_HITBOX_WITH_OFFSET(/*Radius*/ 150, /*Height*/ 150, /*Downwards offset*/ 150),
+    SET_INT(oAnimState, -1),
+    CALL_NATIVE('bhv_explosion_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_explosion_loop'),
+        ADD_INT(oAnimState, 1),
+    END_LOOP(),
 ]
 
 const bhvBobombBuddy = [
@@ -1529,13 +1529,27 @@ export const bhvBreakableBoxSmall = [
 ]
 
 const bhvJumpingBox = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvJumpingBox'),
     OR_INT(oFlags, (OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO  | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ -400, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 600, /*Unused*/ 0, 0),
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_jumping_box_loop'),
     END_LOOP(),
 ]
+
+
+const bhvSmoke = [
+    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvSmoke'),
+    OR_INT(oFlags, (OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BILLBOARD(),
+    SET_INT(oAnimState, -1),
+    DELAY(1),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_dust_smoke_loop'),
+        ADD_INT(oAnimState, 1),
+    END_LOOP(),
+]
+
 
 
 gLinker.behaviors.bhvBobBowlingBallSpawner = bhvBobBowlingBallSpawner
@@ -1582,3 +1596,7 @@ gLinker.behaviors.bhvWaveTrail = bhvWaveTrail
 gLinker.behaviors.bhvWhitePuffExplosion = bhvWhitePuffExplosion
 gLinker.behaviors.bhvWingCap = bhvWingCap
 gLinker.behaviors.bhvWoodenPost = bhvWoodenPost
+gLinker.behaviors.bhvSmoke = bhvSmoke
+gLinker.behaviors.bhvBobombFuseSmoke = bhvBobombFuseSmoke
+gLinker.behaviors.bhvExplosion = bhvExplosion
+gLinker.behaviors.bhvBobomb = bhvBobomb

@@ -2,7 +2,7 @@ import * as _Linker from "./Linker"
 
 import {
     check_common_action_exits, drop_and_set_mario_action, is_anim_at_end, is_anim_past_end,
-    play_sound_if_no_flag, set_forward_vel, set_mario_action, set_mario_animation,
+    play_sound_if_no_flag, set_forward_vel, set_mario_action, set_mario_animation, play_mario_action_sound
 } from "./Mario"
 
 import {

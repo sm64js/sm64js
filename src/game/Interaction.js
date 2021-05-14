@@ -659,7 +659,7 @@ export const mario_throw_held_object = (m) => {
     }
 }
 
-const mario_stop_riding_and_holding = (m) => {
+export const mario_stop_riding_and_holding = (m) => {
     mario_drop_held_object(m)
     mario_stop_riding_object(m)
 

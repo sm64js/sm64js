@@ -38,7 +38,9 @@ import {
          oDeathSound, oSoundStateID,
          oDialogResponse, oDialogState,
 
-         oUnk1A8, oUnk94, oUnkBC, oUnkC0
+         oUnk1A8, oUnk94, oUnkBC, oUnkC0,
+
+         oExclamationBoxUnkF4, oExclamationBoxUnkF8, oExclamationBoxUnkFC
 } from "../../include/object_constants"
 
 import { MODEL_1UP,

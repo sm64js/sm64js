@@ -455,10 +455,6 @@ export const oControllablePlatformUnkF8   = 0x1C
 export const oControllablePlatformUnkFC   = 0x1D
 export const oControllablePlatformUnk100  = 0x1E
 
-/* Breakable Box Small (Small Cork Box) */
-export const oBreakableBoxSmallReleased             = 0x1B
-export const oBreakableBoxSmallFramesSinceReleased  = 0x1D
-
 /* Jumping Box (Crazy Box) */
 export const oJumpingBoxUnkF4  = 0x1B
 export const oJumpingBoxUnkF8  = 0x1C

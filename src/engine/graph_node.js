@@ -38,6 +38,7 @@ export const GRAPH_NODE_TYPE_SHADOW    =              0x028
 export const GRAPH_NODE_TYPE_OBJECT_PARENT     =      0x029
 export const GRAPH_NODE_TYPE_GENERATED_LIST =         0x02A | GRAPH_NODE_TYPE_FUNCTIONAL
 export const GRAPH_NODE_TYPE_BACKGROUND =             0x02C | GRAPH_NODE_TYPE_FUNCTIONAL
+export const GRAPH_NODE_TYPE_HELD_OBJ =               0x02E | GRAPH_NODE_TYPE_FUNCTIONAL
 export const GRAPH_NODE_TYPE_CULLING_RADIUS =         0x02F
 export const GRAPH_NODE_TYPE_SWITCH_CASE         =    0x00C | GRAPH_NODE_TYPE_FUNCTIONAL
 
@@ -171,6 +172,55 @@ export const geo_make_first_child = (newFirstChild) => {
 
     return parent
 }
+
+
+const get_func = (func) => {
+    let funcClass = null
+
+    // allow deferred linking:
+    // GEO_ASM(0, 'MarioMisc.geo_mario_head_rotation')
+    if (typeof func == "string") {
+        let f
+        let parts = func.split('.')
+        if (parts.length == 1) {
+            f = gLinker[func]
+            funcClass = null
+        } else {
+            funcClass = gLinker[parts[0]]
+            f = funcClass[parts[1]]
+        }
+        if (!f) {
+            throw "deferred func not found: " + func
+        }
+        func = f
+    }
+
+    return [func, funcClass]
+}
+
+
+/**
+ * Allocates and returns a newly created held object node
+ */
+export const init_graph_node_held_object = (graphNode, objNode, translation, func) => {
+    let funcClass
+    [func, funcClass] = get_func(func)
+
+    graphNode = {
+        node: {},
+        objNode: objNode,
+        translation: [...translation],
+        fnNode: { func, funcClass }
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_HELD_OBJ)
+    if (func) {
+        func.call(funcClass, GEO_CONTEXT_CREATE, graphNode)
+    }
+
+    return graphNode
+}
+
 
 export const geo_add_child = (parent, childNode) => {
 
@@ -333,55 +383,58 @@ export const init_graph_node_render_range = (minDistance, maxDistance) => {
     return graphNode
 }
 
-export const init_graph_node_switch_case = (numCases, selectedCase, nodeFunc, funcClass) => {
+export const init_graph_node_switch_case = (numCases, selectedCase, func, funcClass) => {
+    [func, funcClass] = get_func(func)
+
     const graphNode = {
         node: {},
         numCases, selectedCase,
-        fnNode: { func: nodeFunc, funcClass }
+        fnNode: { func, funcClass }
     }
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_SWITCH_CASE)
 
-    if (nodeFunc) {
-        nodeFunc.call(funcClass, GEO_CONTEXT_CREATE, graphNode)
+    if (func) {
+        func.call(funcClass, GEO_CONTEXT_CREATE, graphNode)
     }
 
     return graphNode
 }
 
-export const init_graph_node_perspective = (pool, graphNode, fov, near, far, nodeFunc, unused) => {
+export const init_graph_node_perspective = (pool, graphNode, fov, near, far, func, unused) => {
+    let funcClass
+    [func, funcClass] = get_func(func)
 
     graphNode = {
         node: {},
         fov,
         near,
         far,
-        fnNode: { func: nodeFunc }
+        fnNode: { func, funcClass }
     }
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_PERSPECTIVE)
 
-    if (nodeFunc) {
-        if (nodeFunc != CameraInstance.geo_camera_fov) throw "check to make sure the function apart of the Camera Class"
-        nodeFunc.call(CameraInstance, GEO_CONTEXT_CREATE, graphNode)
+    if (func) {
+        if (func != CameraInstance.geo_camera_fov) throw "check to make sure the function apart of the Camera Class"
+        func.call(CameraInstance, GEO_CONTEXT_CREATE, graphNode)
     }
 
   return graphNode
 
 }
 
-export const init_graph_node_generated = (pool, graphNode, gfxFunc, param, funcClass) => {
-
+export const init_graph_node_generated = (pool, graphNode, gfxFunc, parameter, funcClass) => {
     graphNode = {
         node: {},
-        param,
+        parameter,
         fnNode: { func: gfxFunc, funcClass }
     }
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_GENERATED_LIST)
 
     if (gfxFunc) {
-        gfxFunc.call(funcClass, GEO_CONTEXT_CREATE, graphNode.node)
+        gfxFunc.call(funcClass, GEO_CONTEXT_CREATE, graphNode)
     }
 
     return graphNode
@@ -522,6 +575,19 @@ export const init_graph_node_translation = (drawingLayer, displayList, translati
     }
 
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_TRANSLATION)
+    graphNode.node.flags = (drawingLayer << 8) | (graphNode.node.flags & 0xFF)
+    return graphNode
+}
+
+export const init_graph_node_translation_rotation = (drawingLayer, displayList, translation, rotation) => {
+    const graphNode = {
+        node: {},
+        displayList,
+        translation: [...translation],
+        rotation: [...rotation]
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_TRANSLATION_ROTATION)
     graphNode.node.flags = (drawingLayer << 8) | (graphNode.node.flags & 0xFF)
     return graphNode
 }

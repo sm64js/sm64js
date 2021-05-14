@@ -1,4 +1,4 @@
-import { raise_background_noise, play_infinite_stairs_music } from "./SoundInit"
+import { raise_background_noise, play_infinite_stairs_music, stop_cap_music, fadeout_cap_music } from "./SoundInit"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { AreaInstance as Area } from "./Area"
 import { MarioMiscInstance as MarioMisc } from "./MarioMisc"
@@ -15,57 +15,48 @@ import { mario_execute_moving_action } from "./MarioActionsMoving"
 import { mario_execute_airborne_action } from "./MarioActionsAirborne"
 import { mario_execute_object_action } from "./MarioActionsObject"
 import { mario_execute_submerged_action } from "./MarioActionsSubmerged"
-import { oMarioWalkingPitch, oInteractStatus, oPosX, oPosY, oPosZ, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oMarioSteepJumpYaw } from "../include/object_constants"
+
+import {
+   oMarioWalkingPitch, oInteractStatus, oPosX, oPosY, oPosZ, oMoveAnglePitch, oMoveAngleRoll,
+   oMoveAngleYaw, oMarioSteepJumpYaw
+} from "../include/object_constants"
+
 import * as Interact from "./Interaction"
 import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
 import { int16, sins, coss } from "../utils"
 import * as MarioConstants from "../include/mario_constants"
 import { gAudioRandom } from "../audio/data"
-import { SOUND_BANK_MOVING,
-         SOUND_TERRAIN_WATER,
-         SOUND_TERRAIN_SAND,
-         SOUND_TERRAIN_SNOW,
-         SOUND_ACTION_UNSTUCK_FROM_GROUND,
-         SOUND_MARIO_PUNCH_HOO,
-         SOUND_TERRAIN_DEFAULT,
-         SOUND_TERRAIN_GRASS,
-         SOUND_TERRAIN_ICE,
-         SOUND_TERRAIN_SPOOKY,
-         SOUND_TERRAIN_STONE,
-         SOUND_ACTION_METAL_LANDING,
-         SOUND_ACTION_METAL_HEAVY_LANDING,
-         SOUND_ACTION_METAL_JUMP,
-         SOUND_ACTION_TERRAIN_JUMP,
-         SOUND_ENV_WIND2,
-         SOUND_MARIO_YAH_WAH_HOO,
-         SOUND_MARIO_YAHOO_WAHA_YIPPEE } from "../include/sounds"
-import { play_sound,
-         set_sound_moving_speed } from "../audio/external"
-import { TERRAIN_MASK,
-         TERRAIN_SNOW,
-         TERRAIN_SAND,
-         SURFACE_HARD,
-         SURFACE_HARD_SLIPPERY,
-         SURFACE_IS_NOT_HARD,
-         SURFACE_IS_QUICKSAND,
-         SURFACE_SLIPPERY,
-         SURFACE_NOT_SLIPPERY,
-         SURFACE_HARD_NOT_SLIPPERY,
-         SURFACE_SWITCH,
-         SURFACE_NO_CAM_COL_SLIPPERY,
-         SURFACE_VERY_SLIPPERY,
-         SURFACE_ICE,
-         SURFACE_HARD_VERY_SLIPPERY,
-         SURFACE_NOISE_VERY_SLIPPERY_73,
-         SURFACE_NOISE_VERY_SLIPPERY_74,
-         SURFACE_NOISE_VERY_SLIPPERY,
-         SURFACE_NO_CAM_COL_VERY_SLIPPERY,
-         SURFACE_NOISE_DEFAULT,
-         SURFACE_NOISE_SLIPPERY } from "../include/surface_terrains"
 
-import { LEVEL_LLL
+import {
+   SOUND_BANK_MOVING, SOUND_TERRAIN_WATER, SOUND_TERRAIN_SAND, SOUND_TERRAIN_SNOW,
+   SOUND_ACTION_UNSTUCK_FROM_GROUND, SOUND_MARIO_PUNCH_HOO, SOUND_TERRAIN_DEFAULT,
+   SOUND_TERRAIN_GRASS, SOUND_TERRAIN_ICE, SOUND_TERRAIN_SPOOKY, SOUND_TERRAIN_STONE,
+   SOUND_ACTION_METAL_LANDING, SOUND_ACTION_METAL_HEAVY_LANDING, SOUND_ACTION_METAL_JUMP,
+   SOUND_ACTION_TERRAIN_JUMP, SOUND_ENV_WIND2, SOUND_MARIO_YAH_WAH_HOO,
+   SOUND_MARIO_YAHOO_WAHA_YIPPEE
+} from "../include/sounds"
 
+import {
+   play_sound, set_sound_moving_speed
+} from "../audio/external"
+
+import {
+    MARIO_HAND_HOLDING_WING_CAP, MARIO_HAND_HOLDING_CAP, MARIO_HAS_WING_CAP_ON, MARIO_HAS_DEFAULT_CAP_ON
+} from "../include/mario_geo_switch_case_ids"
+
+import {
+   TERRAIN_MASK, TERRAIN_SNOW, TERRAIN_SAND, SURFACE_HARD, SURFACE_HARD_SLIPPERY,
+   SURFACE_IS_NOT_HARD, SURFACE_IS_QUICKSAND, SURFACE_SLIPPERY, SURFACE_NOT_SLIPPERY,
+   SURFACE_HARD_NOT_SLIPPERY, SURFACE_SWITCH, SURFACE_NO_CAM_COL_SLIPPERY, SURFACE_VERY_SLIPPERY,
+   SURFACE_ICE, SURFACE_HARD_VERY_SLIPPERY, SURFACE_NOISE_VERY_SLIPPERY_73,
+   SURFACE_NOISE_VERY_SLIPPERY_74, SURFACE_NOISE_VERY_SLIPPERY, SURFACE_NO_CAM_COL_VERY_SLIPPERY,
+   SURFACE_NOISE_DEFAULT, SURFACE_NOISE_SLIPPERY
+} from "../include/surface_terrains"
+
+import {
+   LEVEL_LLL
 } from "../levels/level_defines_constants"
+
 
 ////// Mario Constants
 export const ANIM_FLAG_NOLOOP = (1 << 0) // 0x01
@@ -320,6 +311,9 @@ export const MARIO_TRIPPING = 0x00400000
 export const MARIO_UNKNOWN_25 = 0x02000000
 export const MARIO_UNKNOWN_30 = 0x40000000
 export const MARIO_UNKNOWN_31 = 0x80000000
+
+export const MARIO_SPECIAL_CAPS = (MARIO_VANISH_CAP | MARIO_METAL_CAP | MARIO_WING_CAP)
+export const MARIO_CAPS = (MARIO_NORMAL_CAP | MARIO_SPECIAL_CAPS)
 
 export const ACT_ID_MASK = 0x000001FF
 
@@ -1005,7 +999,8 @@ export const check_common_hold_action_exits = (m) => {
 }
 
 export const drop_and_set_mario_action = (m, action, actionArg) => {
-    //drop item
+    Interact.mario_stop_riding_and_holding(m)
+
     return set_mario_action(m, action, actionArg)
 }
 
@@ -1524,10 +1519,65 @@ export const execute_mario_action = () => {
     return 0
 }
 
+
+/**
+ * Is a binary representation of the frames to flicker Mario's cap when the timer
+ * is running out.
+ *
+ * Equals [1000]^5 . [100]^8 . [10]^9 . [1] in binary, which is
+ * 100010001000100010001001001001001001001001001010101010101010101.
+ */
+const sCapFlickerFrames = 0x4444449249255555
+
+/**
+ * Updates the cap flags mainly based on the cap timer.
+ */
+const update_and_return_cap_flags = (m) => {
+    let /*u32*/ flags = m.flags
+    let /*u32*/ action
+
+    if (m.capTimer > 0) {
+        action = m.action
+
+        if ((m.capTimer <= 60)
+            || ((action != ACT_READING_AUTOMATIC_DIALOG) && (action != ACT_READING_NPC_DIALOG)
+                && (action != ACT_READING_SIGN) && (action != ACT_IN_CANNON))) {
+            m.capTimer -= 1
+        }
+
+        if (m.capTimer == 0) {
+            stop_cap_music()
+
+            m.flags &= ~MARIO_SPECIAL_CAPS
+            if (!(m.flags & MARIO_CAPS)) {
+                m.flags &= ~MARIO_CAP_ON_HEAD
+            }
+        }
+
+        if (m.capTimer == 60) {
+            fadeout_cap_music()
+        }
+
+          // This code flickers the cap through a long binary string, increasing in how
+          // common it flickers near the end.
+        if ((m.capTimer < 64) && ((1 << m.capTimer) & sCapFlickerFrames)) {
+            flags &= ~MARIO_SPECIAL_CAPS
+            if (!(flags & MARIO_CAPS)) {
+                flags &= ~MARIO_CAP_ON_HEAD
+            }
+        }
+    }
+
+    return flags
+}
+
+/**
+ * Updates the Mario's cap, rendering, and hitbox.
+ */
 const mario_update_hitbox_and_cap_model = (m) => {
 
     const bodyState = m.marioBodyState
-    const flags = 0 // TODO update_and_return_cap_flags(m)
+    const flags = update_and_return_cap_flags(m)
 
     if (flags & MARIO_VANISH_CAP) {
         bodyState.modelState = MarioConstants.MODEL_STATE_NOISE_ALPHA
@@ -1552,7 +1602,6 @@ const mario_update_hitbox_and_cap_model = (m) => {
     }
 
     if (flags & MARIO_CAP_IN_HAND) {
-        throw "todo (flags & MARIO_CAP_IN_HAND)"
         if (flags & MARIO_WING_CAP) {
             bodyState.handState = MARIO_HAND_HOLDING_WING_CAP
         } else {
@@ -1561,7 +1610,6 @@ const mario_update_hitbox_and_cap_model = (m) => {
     }
 
     if (flags & MARIO_CAP_ON_HEAD) {
-        throw "todo (flags & MARIO_CAP_ON_HEAD)"
         if (flags & MARIO_WING_CAP) {
             bodyState.capState = MARIO_HAS_WING_CAP_ON
         } else {
@@ -1580,7 +1628,6 @@ const mario_update_hitbox_and_cap_model = (m) => {
         bodyState.modelState &= ~0xFF
         bodyState.modelState |= (0x100 | m.fadeWarpOpacity)
     }
-
 }
 
 const update_mario_health = (m) => {

@@ -1,7 +1,12 @@
 import * as Surfaces from "../include/surface_terrains"
 import { spawn_special_objects, spawn_macro_objects } from "./MacroSpecialObjects"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
-import { oDistanceToMario, oCollisionDistance, oDrawingDistance, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oPosX, oFaceAnglePitch } from "../include/object_constants"
+
+import {
+    oDistanceToMario, oCollisionDistance, oDrawingDistance, ACTIVE_FLAG_IN_DIFFERENT_ROOM,
+    O_POS_INDEX, O_FACE_ANGLE_INDEX
+} from "../include/object_constants"
+
 import { GRAPH_RENDER_ACTIVE } from "../engine/graph_node"
 import { dist_between_objects, obj_build_transform_from_pos_and_angle, obj_apply_scale_to_matrix } from "./ObjectHelpers"
 // import { SpawnObjectInstance as Spawn } from "./SpawnObject"
@@ -313,7 +318,7 @@ class SurfaceLoad {
 
         if (ObjectListProc.gCurrentObject.header.gfx.throwMatrix == null) {
             ObjectListProc.gCurrentObject.header.gfx.throwMatrix = objectTransform
-            obj_build_transform_from_pos_and_angle(ObjectListProc.gCurrentObject, oPosX, oFaceAnglePitch)
+            obj_build_transform_from_pos_and_angle(ObjectListProc.gCurrentObject, O_POS_INDEX, O_FACE_ANGLE_INDEX)
         }
 
         const m = new Array(4).fill(0).map(() => new Array(4).fill(0))

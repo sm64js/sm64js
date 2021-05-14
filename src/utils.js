@@ -64,6 +64,7 @@ export const levelIdToName = {
     1001: "CTF/Race Map",
     1002: "Starman Fortress",
     1003: "Glider Jungle",
+    1006: "Dolphin Town",
 }
 
 export const random_uint16 = () => {

@@ -2,6 +2,7 @@ import { GeoLayoutInstance as Geo } from "../../../../engine/GeoLayout"
 import { CameraInstance as Camera } from "../../../../game/Camera"
 import { geo_skybox_main } from "../../../../game/LevelGeo"
 import { geo_switch_area } from "../../../../game/ObjectHelpers"
+import { geo_movtex_draw_water_regions } from "../../../../game/MovingTexture"
 
 import { bbh_seg7_dl_070075A8 } from "./1/model.inc"
 import { bbh_seg7_dl_07007940 } from "./2/model.inc"
@@ -151,8 +152,8 @@ export const geo_bbh_000828 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07019EF8] },
 	{ command: Geo.display_list, args: [Geo.LAYER_ALPHA, bbh_seg7_dl_0701A080] },
 //	{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-//	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
-//	{ command: Geo.node_generated, args: [0x0401, geo_movtex_draw_water_regions]},
+	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
+	{ command: Geo.node_generated, args: [0x0401, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
 	{ command: Geo.return },
 ]
@@ -162,7 +163,7 @@ export const geo_bbh_000860 = [
 	{ command: Geo.open_node },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_0701A850] },
 //	{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-//	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
+	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
 	{ command: Geo.return },
 ]
@@ -172,7 +173,7 @@ export const geo_bbh_000888 = [
 	{ command: Geo.open_node },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_0701B6D0] },
 //	{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-//	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
+	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
 	{ command: Geo.return },
 ]
@@ -366,8 +367,8 @@ export const geo_bbh_000C88 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07019EF8] },
 	{ command: Geo.display_list, args: [Geo.LAYER_ALPHA, bbh_seg7_dl_0701A080] },
 //	{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-//	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
-//	{ command: Geo.node_generated, args: [0x0401, geo_movtex_draw_water_regions]},
+	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
+	{ command: Geo.node_generated, args: [0x0401, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
 	{ command: Geo.return },
 ]
@@ -406,8 +407,8 @@ export const geo_bbh_000D68 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_07019EF8] },
 	{ command: Geo.display_list, args: [Geo.LAYER_ALPHA, bbh_seg7_dl_0701A080] },
 //	{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-//	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
-//	{ command: Geo.node_generated, args: [0x0401, geo_movtex_draw_water_regions]},
+	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
+	{ command: Geo.node_generated, args: [0x0401, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
 	{ command: Geo.return },
 ]
@@ -447,8 +448,8 @@ export const geo_bbh_000E40 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_ALPHA, bbh_seg7_dl_0701A080] },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_0701A850] },
 //	{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-//	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
-//	{ command: Geo.node_generated, args: [0x0401, geo_movtex_draw_water_regions]},
+	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
+	{ command: Geo.node_generated, args: [0x0401, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
 	{ command: Geo.return },
 ]
@@ -459,7 +460,7 @@ export const geo_bbh_000E80 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_0701A850] },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_0701B6D0] },
 //	{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-//	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
+	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
 	{ command: Geo.return },
 ]
@@ -474,7 +475,7 @@ export const geo_bbh_000EB0 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, bbh_seg7_dl_0701EEC8] },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, bbh_seg7_dl_0701F070] },
 //	{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-//	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
+	{ command: Geo.node_generated, args: [0x0400, geo_movtex_draw_water_regions]},
 	{ command: Geo.close_node },
 	{ command: Geo.return },
 
@@ -487,7 +488,7 @@ export const geo_bbh_000F00 = [
 	{ command: Geo.open_node },
 	{ command: Geo.node_ortho, args: [100]},
 	{ command: Geo.open_node },
-// 	{ command: GeoLayout.node_background, args: [GeoLayout.BACKGROUND_HAUNTED, geo_skybox_main] },
+ 	{ command: Geo.node_background, args: [Geo.BACKGROUND_HAUNTED, geo_skybox_main] },
 	{ command: Geo.close_node },
 	{ command: Geo.close_node },
 	{ command: Geo.node_master_list, args: [1]},

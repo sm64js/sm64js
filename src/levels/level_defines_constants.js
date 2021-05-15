@@ -36,12 +36,11 @@ export const LEVEL_UNKNOWN_35       = 35
 export const LEVEL_TTM              = 36
 export const LEVEL_UNKNOWN_37       = 37
 export const LEVEL_UNKNOWN_38       = 38
-
-export const LEVEL_CCS              = 56
-export const LEVEL_CCM_2            = 57
+export const LEVEL_CCM_2            = 40
 
 export const LEVEL_CASTLE_2         = 602
-
+export const LEVEL_THI_2            = 39
+export const LEVEL_CASTLE_3         = 41
 
 // Experimental style where module is imported as LEVEL,
 // making possible LEVEL.BBH.
@@ -58,6 +57,7 @@ export const SL               = 10
 export const WDW              = 11
 export const JRB              = 12
 export const THI              = 13
+export const THI_2            = 39
 export const TTC              = 14
 export const RR               = 15
 export const CASTLE_GROUNDS   = 16

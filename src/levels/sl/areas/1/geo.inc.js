@@ -1,6 +1,7 @@
 import { GeoLayoutInstance as Geo } from "../../../../engine/GeoLayout"
 import { CameraInstance as Camera } from "../../../../game/Camera"
 import { geo_skybox_main } from "../../../../game/LevelGeo"
+import { geo_movtex_draw_water_regions } from "../../../../game/MovingTexture"
 
 import { sl_seg7_dl_07005478 } from "./1/model.inc"
 import { sl_seg7_dl_070056B0 } from "./2/model.inc"
@@ -36,7 +37,7 @@ export const sl_geo_0003A8 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT_DECAL, sl_seg7_dl_07008D58] },
 	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, sl_seg7_dl_0700A5A0] },
 //	{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-//	{ command: Geo.node_generated, args: [0x1001, geo_movtex_draw_water_regions]},
+	{ command: Geo.node_generated, args: [0x1001, geo_movtex_draw_water_regions]},
 	{ command: Geo.node_render_object_parent },
 //	{ command: Geo.node_generated, args: [   1, geo_envfx_main]},
 	{ command: Geo.close_node },

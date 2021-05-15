@@ -368,6 +368,8 @@ export const GEO_SHADOW = (...args)                   => {return {command: Geo.n
 export const GEO_SWITCH_CASE = (...args)              => {return {command: Geo.node_switch_case, args: args}}
 export const GEO_TRANSLATE_NODE = (...args)           => {return {command: Geo.node_translate, args: args}}
 export const GEO_ZBUFFER = (...args)                  => {return {command: Geo.node_master_list, args: args}}
+export const GEO_BRANCH = (...args)                   => {return {command: Geo.branch, args: args}}
+export const GEO_RETURN = (...args)                   => {return {command: Geo.return }}
 
 // EXPERIMENTAL
 export const LAYER_FORCE                = Geo.LAYER_FORCE

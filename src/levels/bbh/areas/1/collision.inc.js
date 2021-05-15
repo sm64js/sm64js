@@ -6,6 +6,8 @@ import {
     COL_TRI,
     COL_TRI_STOP,
     COL_END,
+    COL_WATER_BOX,
+    COL_WATER_BOX_INIT,
 
     SURFACE_DEFAULT,
     SURFACE_VERY_SLIPPERY,
@@ -3781,9 +3783,9 @@ export const bbh_seg7_collision_level = [
     ...SPECIAL_OBJECT_WITH_YAW( special_haunted_door,   -767,   819,   640,   64),
     ...SPECIAL_OBJECT_WITH_YAW( special_haunted_door,    -50,     0,   640,   64),
     ...SPECIAL_OBJECT_WITH_YAW( special_haunted_door,    -50,     0,  1459,   64),
+    */
     ...COL_WATER_BOX_INIT(2),
     ...COL_WATER_BOX(0, -4812, 1485, 640, 7270, -2405),
 	...COL_WATER_BOX(1, 1536, -1637, 3789, 2662, -2508),
-	*/
     ...COL_END(),
 ]

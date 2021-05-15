@@ -2355,5 +2355,10 @@ export const ttm_seg7_area_1_collision = [
     ...SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_14, /*pos*/ -1228,  -613, -3071, /*yaw*/  0),
     ...SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_15, /*pos*/ -1740,  -204, -2354, /*yaw*/  0),
     ...SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_16, /*pos*/ -2764, -2661,  3789, /*yaw*/  0),
+    ...COL_WATER_BOX_INIT(4),
+    ...COL_WATER_BOX(0, -2047, 2765, 1946, 5069, -4402),
+    ...COL_WATER_BOX(2, 2358, 2849, 3792, 3474, -3839),
+    ...COL_WATER_BOX(1, 1972, 3481, 3641, 4505, -4095),
+    ...COL_WATER_BOX(3, 1586, 898, 3583, 2751, -1637),
     ...COL_END(),
 ]

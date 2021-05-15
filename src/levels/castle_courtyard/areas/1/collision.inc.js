@@ -19,7 +19,7 @@ import {
     special_level_geo_03,
     special_spiky_tree
 } from "../../../../include/surface_terrains"
-// 0x070059A8 - 0x07006E1E
+
 export const castle_courtyard_seg7_collision = [
     ...COL_INIT(),
     ...COL_VERTEX_INIT(0x127),
@@ -867,31 +867,28 @@ export const castle_courtyard_seg7_collision = [
     ...COL_TRI(136, 150, 138),
     ...COL_TRI(136, 45, 133),
     ...COL_TRI_STOP(),
-    /*
-    ...COL_SPECIAL_INIT(17),
-    // SPECIAL_OBJECT_WITH_YAW( special_null_start,           15,    0,   202,  128), // unused, probably an early way to set intial position
-    SPECIAL_OBJECT_WITH_YAW( special_level_geo_03,          0, 2048,  2662,    0),
-    SPECIAL_OBJECT( special_spiky_tree,         2272, -214, -1432),
-    SPECIAL_OBJECT( special_spiky_tree,          818,   10,   203),
-    SPECIAL_OBJECT( special_spiky_tree,         -820,   10,   201),
-    SPECIAL_OBJECT( special_spiky_tree,         1681, -214,  -132),
-    SPECIAL_OBJECT( special_spiky_tree,         2382, -214,  -843),
-    SPECIAL_OBJECT( special_spiky_tree,         -817,   10, -3630),
-    SPECIAL_OBJECT( special_spiky_tree,         2769, -214, -1523),
-    SPECIAL_OBJECT( special_spiky_tree,         2444, -214, -2330),
-    SPECIAL_OBJECT( special_spiky_tree,         2042, -214, -3032),
-    SPECIAL_OBJECT( special_spiky_tree,          824,   10, -3633),
-    SPECIAL_OBJECT( special_spiky_tree,        -2537, -214,  -759),
-    SPECIAL_OBJECT( special_spiky_tree,        -1640, -214, -3228),
-    SPECIAL_OBJECT( special_spiky_tree,        -2732, -214, -2166),
-    SPECIAL_OBJECT( special_spiky_tree,        -2446, -214, -1786),
-    SPECIAL_OBJECT( special_spiky_tree,        -2820, -214, -1317),
-    SPECIAL_OBJECT( special_spiky_tree,        -1868, -214,   -45),
+    
+    ...COL_SPECIAL_INIT(16),
+    //SPECIAL_OBJECT_WITH_YAW( special_null_start,           15,    0,   202,  128), // unused, probably an early way to set intial position
+    //...SPECIAL_OBJECT_WITH_YAW( special_level_geo_03,          0, 2048,  2662,    0),
+    ...SPECIAL_OBJECT( special_spiky_tree,         2272, -214, -1432),
+    ...SPECIAL_OBJECT( special_spiky_tree,          818,   10,   203),
+    ...SPECIAL_OBJECT( special_spiky_tree,         -820,   10,   201),
+    ...SPECIAL_OBJECT( special_spiky_tree,         1681, -214,  -132),
+    ...SPECIAL_OBJECT( special_spiky_tree,         2382, -214,  -843),
+    ...SPECIAL_OBJECT( special_spiky_tree,         -817,   10, -3630),
+    ...SPECIAL_OBJECT( special_spiky_tree,         2769, -214, -1523),
+    ...SPECIAL_OBJECT( special_spiky_tree,         2444, -214, -2330),
+    ...SPECIAL_OBJECT( special_spiky_tree,         2042, -214, -3032),
+    ...SPECIAL_OBJECT( special_spiky_tree,          824,   10, -3633),
+    ...SPECIAL_OBJECT( special_spiky_tree,        -2537, -214,  -759),
+    ...SPECIAL_OBJECT( special_spiky_tree,        -1640, -214, -3228),
+    ...SPECIAL_OBJECT( special_spiky_tree,        -2732, -214, -2166),
+    ...SPECIAL_OBJECT( special_spiky_tree,        -2446, -214, -1786),
+    ...SPECIAL_OBJECT( special_spiky_tree,        -2820, -214, -1317),
+    ...SPECIAL_OBJECT( special_spiky_tree,        -1868, -214,   -45),
     // SPECIAL_OBJECT_WITH_YAW_AND_PARAM( special_wooden_door_warp,      0,    0,   461,    0,  1),
-    */
-   /*
     ...COL_WATER_BOX_INIT(1),
     ...COL_WATER_BOX(0, -656, -2405, 674, -1074, 51),
-    */
     ...COL_END(),
 ]

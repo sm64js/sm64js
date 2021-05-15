@@ -13,7 +13,7 @@ export const level_castle_inside_entry = [
     { command: LevelCommands.terrain, args: [inside_castle_seg7_area_1_collision] },
     { command: LevelCommands.rooms, args: [inside_castle_seg7_area_1_rooms] },
     { command: LevelCommands.end_area },
-    { command: LevelCommands.set_mario_pos, args: [/*area*/ 1, /*yaw*/ 180, /*pos*/ -1023, 0, 1152] },
+    { command: LevelCommands.set_mario_pos, args: [/*area*/ 1, /*yaw*/ -180, /*pos*/ -1029, 0, 1996] },
     { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_or_update, LevelUpdate] },
     { command: LevelCommands.call_loop, args: [1, LevelUpdate.lvl_init_or_update, LevelUpdate] },
 ]

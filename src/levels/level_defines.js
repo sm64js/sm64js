@@ -1,11 +1,10 @@
 import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
-import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM, LEVEL_CCM_2, LEVEL_CCS, LEVEL_WF, LEVEL_PSS, LEVEL_TTM, LEVEL_HMC, LEVEL_BBH, LEVEL_CASTLE_COURTYARD, LEVEL_SSL, LEVEL_SL, LEVEL_CASTLE, LEVEL_CASTLE_2 } from "./level_defines_constants"
+import { LEVEL_CASTLE_GROUNDS, LEVEL_BOB, LEVEL_CCM, LEVEL_CCM_2, LEVEL_WF, LEVEL_PSS, LEVEL_TTM, LEVEL_HMC, LEVEL_BBH, LEVEL_CASTLE_COURTYARD, LEVEL_SSL, LEVEL_SL, LEVEL_CASTLE, LEVEL_CASTLE_2, LEVEL_THI, LEVEL_THI_2, LEVEL_CASTLE_3 } from "./level_defines_constants"
 
 import { level_castle_grounds_entry } from "./castle_grounds/script"
 import { level_bob_entry } from "./bob/script"
 import { level_ccm_entry } from "./ccm/script_1"
 import { level_ccm_2_entry } from "./ccm/script_2"
-import { level_ccs_entry } from "./ccs/script"
 import { level_pss_entry } from "./pss/script"
 import { level_ttm_entry } from "./ttm/script"
 import { level_wf_entry } from "./wf/script"
@@ -16,6 +15,9 @@ import { level_ssl_entry } from "./ssl/script"
 import { level_sl_entry } from "./sl/script"
 import { level_castle_inside_entry } from "./castle_inside/script_1"
 import { level_castle_inside_2_entry } from "./castle_inside/script_2"
+import { level_thi_entry } from "./thi/script"
+import { level_thi_2_entry } from "./thi/script_2"
+import { level_castle_inside_3_entry } from "./castle_inside/script_3"
 
 export const level_defines_list = [
     {
@@ -37,10 +39,6 @@ export const level_defines_list = [
     {
         command: LevelCommands.jump_if,
         args: [LevelCommands.OP_EQ, LEVEL_CCM_2, level_ccm_2_entry]
-    },
-    {
-        command: LevelCommands.jump_if,
-        args: [LevelCommands.OP_EQ, LEVEL_CCS, level_ccs_entry]
     },
     {
         command: LevelCommands.jump_if,
@@ -77,5 +75,17 @@ export const level_defines_list = [
     {
         command: LevelCommands.jump_if,
         args: [LevelCommands.OP_EQ, LEVEL_CASTLE_2, level_castle_inside_2_entry]
+    },
+    {
+        command: LevelCommands.jump_if,
+        args: [LevelCommands.OP_EQ, LEVEL_THI, level_thi_entry]
+    },
+    {
+        command: LevelCommands.jump_if,
+        args: [LevelCommands.OP_EQ, LEVEL_THI_2, level_thi_2_entry]
+    },
+    {
+        command: LevelCommands.jump_if,
+        args: [LevelCommands.OP_EQ, LEVEL_CASTLE_3, level_castle_inside_3_entry]
     }
 ]

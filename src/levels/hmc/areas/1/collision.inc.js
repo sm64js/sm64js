@@ -18,6 +18,8 @@ import {
     SURFACE_NO_CAM_COLLISION,
     SURFACE_PAINTING_WOBBLE_D0,
     SURFACE_WOBBLING_WARP,
+    COL_WATER_BOX,
+    COL_WATER_BOX_INIT
 } from "../../../../include/surface_terrains"
 export const hmc_seg7_collision_level = [
     ...COL_INIT(),
@@ -3632,11 +3634,10 @@ export const hmc_seg7_collision_level = [
     SPECIAL_OBJECT_WITH_YAW( special_metal_door,   -4863,  1843, -7551,  192),
     SPECIAL_OBJECT_WITH_YAW( special_metal_door,    3328,  -409, -6911,    0),
     SPECIAL_OBJECT_WITH_YAW( special_hmc_door,       358,  2048,  3661,  192),
-    SPECIAL_OBJECT_WITH_YAW( special_hmc_door,     -6553,  1536,  1459,    0),
+    SPECIAL_OBJECT_WITH_YAW( special_hmc_door,     -6553,  1536,  1459,    0),*/
     ...COL_WATER_BOX_INIT(3),
     ...COL_WATER_BOX(0, -7628, -2559, 563, 7654, -4791),
     ...COL_WATER_BOX(50, 1690, -6348, 6298, 819, -818),
     ...COL_WATER_BOX(51, 1690, -6348, 6298, 819, -821),
-    */
     ...COL_END(),
 ]

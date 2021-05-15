@@ -168,10 +168,27 @@ class GeoLayout {
     }
 
     node_generated(args) {
-        const theFunc = args[1], param = args[0], funcClass = args[2]
+        let param = args[0], theFunc = args[1], funcClass = args[2]
 
+        // allow deferred linking:
+        // GEO_ASM(0, 'MarioMisc.geo_mario_head_rotation')
+        if (typeof theFunc == "string") {
+            let func
+            let parts = theFunc.split('.')
+            if (parts.length == 1) {
+                func = gLinker[theFunc]
+                funcClass = null
+            } else {
+                funcClass = gLinker[parts[0]]
+                func = funcClass[parts[1]]
+            }
+            if (!func) {
+                throw "deferred node_generated function not found: " + theFunc
+            }
+            theFunc = func
+        }
         if (!theFunc) {
-            console.log("node_generated: skipping")
+            console.log("node_generated: skipping", theFunc)
         }
 
         const graphNode = GraphNode.init_graph_node_generated(null, null, theFunc, param, funcClass)
@@ -252,33 +269,50 @@ class GeoLayout {
     }
 
 
+    // layer, rx, ry, rz <, dl>
     node_rotation(args) {
-        let drawingLayer = 0
-        const params = args[0]
-        const sp2c = [ args[1], args[2], args[3] ]
-        let displayList
+        const drawingLayer = args[0]
+        const rot = [ args[1], args[2], args[3] ]
+        const displayList = args[4]
 
-        if (params & 0x80) {
-            throw "unimplemented feature in node rotation"
-        }
+        // if (params & 0x80) {
+        //     throw "unimplemented feature in node rotation"
+        // }
 
-        const graphNode = GraphNode.init_graph_node_rotation(drawingLayer, displayList, sp2c)
+        const graphNode = GraphNode.init_graph_node_rotation(drawingLayer, displayList, rot)
         GraphNode.register_scene_graph_node(this, graphNode)
         this.sCurrentLayout.index++
     }
 
 
+    // layer, tx, ty, tz <, dl>
     node_translate(args) {
-        let drawingLayer = 0
-        const params = args[0]
-        const sp2c = [ args[1], args[2], args[3] ]
-        let displayList  // = params & 0x0F ??
+        const drawingLayer = args[0]
+        const trans = [ args[1], args[2], args[3] ]
+        const displayList = args[4]
 
-        if (params & 0x80) {
-            throw "unimplemented feature in node translate"
-        }
+        // if (params & 0x80) {
+        //     throw "unimplemented feature in node translate"
+        // }
 
-        const graphNode = GraphNode.init_graph_node_translation(drawingLayer, displayList, sp2c)
+        const graphNode = GraphNode.init_graph_node_translation(drawingLayer, displayList, trans)
+        GraphNode.register_scene_graph_node(this, graphNode)
+        this.sCurrentLayout.index++
+    }
+
+
+    // layer, tx, ty, tz, rx, ry, rz <, dl>
+    node_translate_rotate(args) {
+        const drawingLayer = args[0]
+        const trans = [ args[1], args[2], args[3] ]
+        const rot   = [ args[4], args[5], args[6] ]
+        const displayList = args[7]
+
+        // if (params & 0x80) {
+        //     throw "unimplemented feature in node translate"
+        // }
+
+        const graphNode = GraphNode.init_graph_node_translation_rotation(drawingLayer, displayList, trans, rot)
         GraphNode.register_scene_graph_node(this, graphNode)
         this.sCurrentLayout.index++
     }
@@ -290,11 +324,23 @@ class GeoLayout {
         this.sCurrentLayout.index++
     }
 
+
     node_end(args) {
         this.gGeoLayoutStackIndex = this.gGeoLayoutReturnIndex
         this.gGeoLayoutReturnIndex = this.gGeoLayoutStack[--this.gGeoLayoutStackIndex] /// ??
         this.gCurGraphNodeIndex = this.gGeoLayoutStack[this.gGeoLayoutStackIndex] // ?
         this.gGeoLayoutCommand = this.gGeoLayoutStack[--this.gGeoLayoutStackIndex]
+        this.sCurrentLayout.index++
+    }
+
+
+    // param, ux, uy, uz, nodeFunc
+    node_held_object(args) {
+        const offset = [ args[1], args[2], args[3] ]
+        const nodeFunc = args[4]
+
+        const graphNode = GraphNode.init_graph_node_held_object(null, null, offset, nodeFunc)
+        GraphNode.register_scene_graph_node(this, graphNode)
         this.sCurrentLayout.index++
     }
 
@@ -344,12 +390,12 @@ class GeoLayout {
 
 export const GeoLayoutInstance = new GeoLayout()
 
-// EXPERIMENTAL
 const Geo = GeoLayoutInstance;
 export const GEO_ANIMATED_PART = (...args)            => {return {command: Geo.node_animated_part, args: args}}
 export const GEO_ASM = (...args)                      => {return {command: Geo.node_generated, args: args}}
 export const GEO_BACKGROUND = (...args)               => {return {command: Geo.node_background, args: args}}
 export const GEO_BILLBOARD = (...args)                => {return {command: Geo.node_billboard, args: args}}
+export const GEO_BRANCH = (...args)                   => {return {command: Geo.branch, args: args}}
 export const GEO_BRANCH_AND_LINK = (...args)          => {return {command: Geo.branch_and_link, args: args}}
 export const GEO_CAMERA = (...args)                   => {return {command: Geo.node_camera, args: args}}
 export const GEO_CAMERA_FRUSTUM_WITH_FUNC = (...args) => {return {command: Geo.node_perspective, args: args}}
@@ -357,19 +403,21 @@ export const GEO_CLOSE_NODE = (...args)               => {return {command: Geo.c
 export const GEO_CULLING_RADIUS = (...args)           => {return {command: Geo.node_culling_radius, args: args}}
 export const GEO_DISPLAY_LIST = (...args)             => {return {command: Geo.display_list, args: args}}
 export const GEO_END = (...args)                      => {return {command: Geo.node_end, args: args}}
+export const GEO_HELD_OBJECT = (...args)              => {return {command: Geo.node_held_object, args: args}}
 export const GEO_NODE_SCREEN_AREA = (...args)         => {return {command: Geo.node_screen_area, args: args}}
 export const GEO_NODE_ORTHO = (...args)               => {return {command: Geo.node_ortho, args: args}}
 export const GEO_NODE_START = (...args)               => {return {command: Geo.node_start, args: args}}
 export const GEO_OPEN_NODE = (...args)                => {return {command: Geo.open_node, args: args}}
 export const GEO_RENDER_OBJ = (...args)               => {return {command: Geo.node_render_object_parent, args: args}}
 export const GEO_RENDER_RANGE = (...args)             => {return {command: Geo.node_render_range, args: args}}
+export const GEO_RETURN = (...args)                   => {return {command: Geo.return, args: args}}
+export const GEO_ROTATION_NODE = (...args)            => {return {command: Geo.node_rotation, args: args}}
 export const GEO_SCALE = (...args)                    => {return {command: Geo.node_scale, args: args}}
 export const GEO_SHADOW = (...args)                   => {return {command: Geo.node_shadow, args: args}}
 export const GEO_SWITCH_CASE = (...args)              => {return {command: Geo.node_switch_case, args: args}}
 export const GEO_TRANSLATE_NODE = (...args)           => {return {command: Geo.node_translate, args: args}}
+export const GEO_TRANSLATE_ROTATE = (...args)         => {return {command: Geo.node_translate_rotate, args: args}}
 export const GEO_ZBUFFER = (...args)                  => {return {command: Geo.node_master_list, args: args}}
-export const GEO_BRANCH = (...args)                   => {return {command: Geo.branch, args: args}}
-export const GEO_RETURN = (...args)                   => {return {command: Geo.return }}
 
 // EXPERIMENTAL
 export const LAYER_FORCE                = Geo.LAYER_FORCE

@@ -6,6 +6,7 @@
     "name": "Snuffy"
   },
   "dependencies": {
+    "circular-dependency-plugin": "^5.2.2",
     "css-loader": "^3.6.0",
     "idb-keyval": "^5.0.4",
     "mathjs": "^7.0.1",

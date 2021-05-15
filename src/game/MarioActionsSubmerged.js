@@ -5,7 +5,7 @@ import { coss, s16, s32, sins } from "../utils"
 import * as Particles from "../include/mario_constants"
 import { SURFACE_FLOWING_WATER } from "../include/surface_terrains"
 import { AreaInstance as Area } from "../game/Area"
-import { INT_STATUS_MARIO_DROP_OBJECT, INT_STATUS_STOP_RIDING, INTERACT_GRABBABLE } from "./Interaction"
+import { mario_grab_used_object, INT_STATUS_MARIO_DROP_OBJECT, INT_STATUS_STOP_RIDING, INTERACT_GRABBABLE } from "./Interaction"
 import { CameraInstance as Camera } from "./Camera"
 import * as CAMERA from "./Camera"  // for constants
 

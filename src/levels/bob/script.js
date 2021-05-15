@@ -13,26 +13,6 @@ import { MODEL_MARIO, MODEL_BOB_BARS_GRILLS, MODEL_BOB_BUBBLY_TREE, MODEL_BOB_CH
          ACT_4, ACT_5, ACT_6
 } from "../../include/model_ids"
 
-// import { bhvMario, 
-         // bhvOpenableGrill,
-         // bhvFloorSwitchGrills,
-         // bhvBobBowlingBallSpawner,
-         // bhvTtmBowlingBallSpawner,
-         // bhvPitBowlingBall,
-         // bhvBobombBuddy,
-         // bhvBobombBuddyOpensCannon,
-         // bhvWaterBombCannon,
-         // bhvCannonClosed,
-         // bhvKoopaRaceEndpoint,
-         // bhvKoopa,
-         // bhvKingBobomb,
-         // bhvHiddenRedCoinStar,
-         // bhvHiddenStar,
-         // bhvStar,
-         // bhvChainChompGate,
-         // bhvCheckerboardElevatorGroup,
-         // bhvSeesawPlatform              } from "../../game/BehaviorData"
-
 import { DIALOG_000, DIALOG_001, DIALOG_002, DIALOG_003 } from "../../text/us/dialogs"
 
 import { TERRAIN_GRASS            } from "../../include/surface_terrains"

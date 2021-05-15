@@ -44,7 +44,6 @@ import { CameraInstance as Camera } from "./Camera"
 import * as CAMERA from "./Camera"  // for constants
 import { obj_set_held_state } from "./ObjectHelpers"
 import { stop_shell_music } from "./SoundInit"
-// import { bhvCarrySomething3, bhvCarrySomething4, bhvCarrySomething5, bhvKoopaShellUnderwater } from "./BehaviorData"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
 export const INTERACT_GRABBABLE      /* 0x00000002 */ = (1 << 1)
@@ -617,17 +616,17 @@ export const mario_stop_riding_object = (m) => {
 export const mario_grab_used_object = (m) => {
     if (!m.heldObj) {
         m.heldObj = m.usedObj
-        obj_set_held_state(m.heldObj, bhvCarrySomething3)
+        obj_set_held_state(m.heldObj, gLinker.behaviors.bhvCarrySomething3)
     }
 }
 
 export const mario_drop_held_object = (m) => {
     if (m.heldObj != null) {
-        if (m.heldObj.behavior == bhvKoopaShellUnderwater) {
+        if (m.heldObj.behavior == gLinker.behaviors.bhvKoopaShellUnderwater) {
             stop_shell_music()
         }
 
-        obj_set_held_state(m.heldObj, bhvCarrySomething4)
+        obj_set_held_state(m.heldObj, gLinker.behaviors.bhvCarrySomething4)
 
         // ! When dropping an object instead of throwing it, it will be put at Mario's
         // y-positon instead of the HOLP's y-position. This fact is often exploited when
@@ -644,11 +643,11 @@ export const mario_drop_held_object = (m) => {
 
 export const mario_throw_held_object = (m) => {
     if (m.heldObj != null) {
-        if (m.heldObj.behavior == bhvKoopaShellUnderwater) {
+        if (m.heldObj.behavior == gLinker.behaviors.bhvKoopaShellUnderwater) {
             stop_shell_music()
         }
 
-        obj_set_held_state(m.heldObj, bhvCarrySomething5)
+        obj_set_held_state(m.heldObj, gLinker.behaviors.bhvCarrySomething5)
 
         m.heldObj.rawData[oPosX] = m.marioBodyState.heldObjLastPosition[0] + 32.0 * sins(m.faceAngle[1])
         m.heldObj.rawData[oPosY] = m.marioBodyState.heldObjLastPosition[1]
@@ -660,7 +659,7 @@ export const mario_throw_held_object = (m) => {
     }
 }
 
-const mario_stop_riding_and_holding = (m) => {
+export const mario_stop_riding_and_holding = (m) => {
     mario_drop_held_object(m)
     mario_stop_riding_object(m)
 
@@ -714,15 +713,15 @@ const bounce_back_from_attack = (m, interaction) => {
 export const get_mario_cap_flag = (capObject) => {
     const script = capObject.behavior
 
-    // if (script == bhvNormalCap) {
-    //     return MARIO_NORMAL_CAP
-    // } else if (script == bhvMetalCap) {
-    //     return MARIO_METAL_CAP
-    // } else if (script == bhvWingCap) {
+    if (script == gLinker.behaviors.bhvNormalCap) {
+        return MARIO_NORMAL_CAP
+    } else if (script == gLinker.behaviors.bhvMetalCap) {
+        return MARIO_METAL_CAP
+    } else if (script == gLinker.behaviors.bhvWingCap) {
         return MARIO_WING_CAP
-    // } else if (script == bhvVanishCap) {
-    //     return MARIO_VANISH_CAP
-    // }
+    } else if (script == gLinker.behaviors.bhvVanishCap) {
+        return MARIO_VANISH_CAP
+    }
 
     return 0
 }

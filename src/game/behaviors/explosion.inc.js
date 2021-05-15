@@ -33,3 +33,6 @@ export const bhv_explosion_loop = () => {
     cur_obj_scale(o.rawData[oTimer] / 9.0  + 1.0)
 
 }
+
+gLinker.bhv_explosion_init = bhv_explosion_init
+gLinker.bhv_explosion_loop = bhv_explosion_loop

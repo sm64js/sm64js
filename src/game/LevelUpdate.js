@@ -32,8 +32,6 @@ class HudDisplay {
 
 class LevelUpdate {
     constructor() {
-        gLinker.LevelUpdate = this
-
         // HUDDisplayFlag enum
         this.HUD_DISPLAY_FLAG_LIVES = 0x0001
         this.HUD_DISPLAY_FLAG_COIN_COUNT = 0x0002
@@ -232,3 +230,4 @@ class LevelUpdate {
 }
 
 export const LevelUpdateInstance = new LevelUpdate()
+gLinker.LevelUpdate = LevelUpdateInstance

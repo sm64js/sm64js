@@ -16,11 +16,16 @@ class Convert
     end
 
     def convert
-        if @entity_is == :file
-            dir = File.dirname(@entity)
-            @c_dir  = "#{@c_root}/#{dir}"
-            @js_dir = "#{@js_root}/#{dir}"
-            fn = File.basename(@entity)
+        if @entity_is == :file || @entity_is == :dir
+            if @entity_is == :file
+                dir = File.dirname(@entity)
+                @c_dir  = "#{@c_root}/#{dir}"
+                @js_dir = "#{@js_root}/#{dir}"
+                fn = File.basename(@entity)
+            else
+                @c_dir  = "#{@c_root}/#{@entity}"
+                @js_dir = "#{@js_root}/#{@entity}"
+            end
 
             if @entity =~ %r[actors/(.+?)(/|$)]
                 @entity = $1
@@ -32,13 +37,22 @@ class Convert
                 @entity_is = :level
                 @entity_dir = "#{@js_root}/levels/#{@entity}"
 
+            elsif @entity_is == :dir && @entity == "assets"  # mario's anims
+                @entity = "mario"
+                @entity_dir = "#{@js_root}/actors/mario"                
+                @js_dir = @entity_dir
+
             else
                 raise "help"
             end
 
             @depth = @entity.split("/").length - 1
             set_title
-            convert_file(fn)
+            if @entity_is == :dir
+                convert_dir
+            else
+                convert_file(fn)
+            end
 
         else
             if @entity_is == :actor
@@ -69,6 +83,8 @@ class Convert
             @js_dir += "/#{dir}"
         end
 
+puts "convert_dir #{@c_dir} -> #{@js_dir}"
+
         Dir.glob(@c_dir + "/*") do |f|
             fn = File.basename(f)
             if File.directory?(f)
@@ -90,6 +106,7 @@ class Convert
     end
 
     def convert_file(fn)
+puts "convert_file #{fn}"
         case fn
         when /^anim_.+\.inc\.c/ then convert_anim(fn)
         when "anim.inc.c"       then convert_anim(fn)
@@ -118,8 +135,8 @@ class Convert
             @text.push(lines)
         end
 
-        lines = File.read(@js_dir + "/table.inc.js")
-        @text.push(lines)
+        lines = File.read(@js_dir + "/table.inc.js") rescue nil
+        @text.push(lines) if lines
 
         out = @text.join
         File.open(@js_dir + "/anims.inc.js", "w") {|f| f.puts(out)}
@@ -152,10 +169,10 @@ class Convert
         @n = 0
         while (@n < @lines.length)
 
-            if @lines[@n] =~ / const s16 .+_animvalue_/         then cv_animvalue
-            elsif @lines[@n] =~ / const u16 .+_animindex_/      then cv_animindex
-            elsif @lines[@n] =~ / struct Animation .+_anim_/    then cv_anim
-            elsif @lines[@n] =~ / Animation \*const .+_anims_/  then cv_anims
+            if @lines[@n] =~ / const s16 .*value/               then cv_animvalue
+            elsif @lines[@n] =~ / const u16 .*ind/              then cv_animindex
+            elsif @lines[@n] =~ / struct Animation .*anim_/     then cv_anim
+            elsif @lines[@n] =~ / Animation \*const .+anims/    then cv_anims
             else
                 @text.push(@lines[@n].chomp)
             end
@@ -963,7 +980,7 @@ begin
     elsif ARGV.delete("-l")
         entity_is = :level
     else
-        entity_is = :file
+        entity_is = :path
     end
 
     c_root = ARGV[0]
@@ -989,18 +1006,18 @@ begin
     c_root = c_root.to_s
     js_root = js_root.to_s
 
-    if entity_is == :file
+    if entity_is == :path
         entity = Pathname.new(entity).realpath.to_s
         raise "help" if !File.exist?(entity)
 
-        if entity.end_with?(".c")
+        entity_is = File.directory?(entity) ? :dir : :file
+        if entity.start_with?(c_root)
             entity = entity.delete_prefix(c_root + "/")
-        elsif entity.end_with?(".js")
+        elsif entity.start_with?(js_root)
             entity = entity.delete_prefix(js_root + "/")
         else
             raise "help"
         end
-
     else
         raise "help" if entity_is == :actor && !Dir.exist?(c_root + "/actors/#{entity}")
         raise "help" if entity_is == :level && !Dir.exist?(c_root + "/levels/#{entity}")

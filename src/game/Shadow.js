@@ -53,9 +53,9 @@ export const SHADOW_SOILDITY_ALREADY_SET = 1
 export const SHADOW_SOLIDITY_NOT_YET_SET = 2
 
 let sSurfaceTypeBelowShadow
-let gShadowAboveWaterOrLava = false
-let gMarioOnIceOrCarpet = false
-let sMarioOnFlyingCarpet = false
+export let gShadowAboveWaterOrLava = false
+export let gMarioOnIceOrCarpet = false
+export let sMarioOnFlyingCarpet = false
 
 const atan2_deg = (a, b) => {
     return atan2s(a, b) / 65535.0 * 360.0

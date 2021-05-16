@@ -27,6 +27,7 @@ const MOVTEX_VTX_COLOR_DEFAULT = 0 // no tint (white vertex colors)
 const MOVTEX_VTX_COLOR_YELLOW = 1  // used for Hazy Maze Cave toxic haze
 const MOVTEX_VTX_COLOR_RED = 2     // used for Shifting Sand Land around the Tox box maze
 
+
 // First entry in array is texture movement speed for both layouts
 const MOVTEX_ATTR_SPEED = 0
 
@@ -140,40 +141,40 @@ const get_quad_collection_from_id = (id) => {
             return ccm_movtex_penguin_puddle_water
         case WF_MOVTEX_WATER:
             return wf_movtex_water
-        case BBH_MOVTEX_MERRY_GO_ROUND_WATER_ENTRANCE:
-            return bbh_movtex_merry_go_round_water_entrance
-        case BBH_MOVTEX_MERRY_GO_ROUND_WATER_SIDE:
-            return bbh_movtex_merry_go_round_water_side
-        case SSL_MOVTEX_PUDDLE_WATER:
-            return ssl_movtex_puddle_water
-        case SSL_MOVTEX_TOXBOX_QUICKSAND_MIST:
-            return ssl_movtex_toxbox_quicksand_mist
-        case TTM_MOVTEX_PUDDLE:
-            return ttm_movtex_puddle
-        case MOVTEX_TTM_BEGIN_PUDDLE_WATERFALL:
-            return ttm_movtex_tris_begin_puddle_waterfall
-        case MOVTEX_TTM_BEGIN_WATERFALL:
-            return ttm_movtex_tris_begin_waterfall
-        case MOVTEX_TTM_END_WATERFALL:
-            return ttm_movtex_tris_end_waterfall
-        case MOVTEX_TTM_END_PUDDLE_WATERFALL:
-            return ttm_movtex_tris_end_puddle_waterfall
-        case MOVTEX_TTM_PUDDLE_WATERFALL:
-            return ttm_movtex_tris_puddle_waterfall
-        case CASTLE_COURTYARD_MOVTEX_STAR_STATUE_WATER:
-            return castle_courtyard_movtex_star_statue_water
-        case SL_MOVTEX_WATER:
-            return sl_movtex_water
-        case HMC_MOVTEX_DORRIE_POOL_WATER:
-            return hmc_movtex_dorrie_pool_water
-        case THI_MOVTEX_AREA1_WATER:
-            return thi_movtex_area1_water
-        case THI_MOVTEX_AREA2_WATER:
-            return thi_movtex_area2_water
-        case INSIDE_CASTLE_MOVTEX_GREEN_ROOM_WATER:
-            return inside_castle_movtex_green_room_water
-        case INSIDE_CASTLE_MOVTEX_MOAT_WATER:
-            return inside_castle_movtex_moat_water
+            case BBH_MOVTEX_MERRY_GO_ROUND_WATER_ENTRANCE:
+                return bbh_movtex_merry_go_round_water_entrance
+            case BBH_MOVTEX_MERRY_GO_ROUND_WATER_SIDE:
+                return bbh_movtex_merry_go_round_water_side
+            case SSL_MOVTEX_PUDDLE_WATER:
+                return ssl_movtex_puddle_water
+            case SSL_MOVTEX_TOXBOX_QUICKSAND_MIST:
+                return ssl_movtex_toxbox_quicksand_mist
+            case TTM_MOVTEX_PUDDLE:
+                return ttm_movtex_puddle
+            case MOVTEX_TTM_BEGIN_PUDDLE_WATERFALL:
+                return ttm_movtex_tris_begin_puddle_waterfall
+            case MOVTEX_TTM_BEGIN_WATERFALL:
+                return ttm_movtex_tris_begin_waterfall
+            case MOVTEX_TTM_END_WATERFALL:
+                return ttm_movtex_tris_end_waterfall
+            case MOVTEX_TTM_END_PUDDLE_WATERFALL:
+                return ttm_movtex_tris_end_puddle_waterfall
+            case MOVTEX_TTM_PUDDLE_WATERFALL:
+                return ttm_movtex_tris_puddle_waterfall
+            case CASTLE_COURTYARD_MOVTEX_STAR_STATUE_WATER:
+                return castle_courtyard_movtex_star_statue_water
+            case SL_MOVTEX_WATER:
+                return sl_movtex_water
+            case HMC_MOVTEX_DORRIE_POOL_WATER:
+                return hmc_movtex_dorrie_pool_water
+            case THI_MOVTEX_AREA1_WATER:
+                return thi_movtex_area1_water
+            case THI_MOVTEX_AREA2_WATER:
+                return thi_movtex_area2_water
+            case INSIDE_CASTLE_MOVTEX_GREEN_ROOM_WATER:
+                return inside_castle_movtex_green_room_water
+            case INSIDE_CASTLE_MOVTEX_MOAT_WATER:
+                return inside_castle_movtex_moat_water
         default: throw "unknown case - get quad collection from id"
     }
 }
@@ -300,8 +301,6 @@ const movtex_gen_quads_id = (id, y, movetexQuadsSegmented) => {
 }
 
 export const geo_movtex_draw_water_regions = (callContext, node) => {
-
-    const asGenerated = node.wrapper
     const gfx = []
 
     if (callContext == GEO_CONTEXT_RENDER) {
@@ -309,19 +308,19 @@ export const geo_movtex_draw_water_regions = (callContext, node) => {
         if (ObjectListProc.gEnvironmentRegions == undefined) return gfx
         const numWaterBoxes = ObjectListProc.gEnvironmentRegions[0]
 
-        if (asGenerated.param == JRB_MOVTEX_INTIAL_MIST) {
+        if (node.parameter == JRB_MOVTEX_INTIAL_MIST) {
             throw "not implemented"
-        } else if (asGenerated.param == HMC_MOVTEX_TOXIC_MAZE_MIST) {
+        } else if (node.parameter == HMC_MOVTEX_TOXIC_MAZE_MIST) {
             gMovtexVtxColor = MOVTEX_VTX_COLOR_YELLOW
-        } else if (asGenerated.param == SSL_MOVTEX_TOXBOX_QUICKSAND_MIST) {
+        } else if (node.parameter == SSL_MOVTEX_TOXBOX_QUICKSAND_MIST) {
             gMovtexVtxColor = MOVTEX_VTX_COLOR_RED
         }
-        const quadCollection = get_quad_collection_from_id(asGenerated.param)
+        const quadCollection = get_quad_collection_from_id(node.parameter)
         if (quadCollection == null) return gfx
 
-        node.flags = (node.flags & 0xFF) | (GeoLayout.LAYER_TRANSPARENT_INTER << 8)
+        node.node.flags = (node.node.flags & 0xFF) | (GeoLayout.LAYER_TRANSPARENT_INTER << 8)
 
-        movtex_change_texture_format(asGenerated.param, gfx)
+        movtex_change_texture_format(node.parameter, gfx)
         gMovetexLastTextureId = -1
 
         for (let i = 0; i < numWaterBoxes; i++) {
@@ -416,15 +415,13 @@ const movtex_gen_list = (movtexVerts, movtexList, attrLayout) => {
 }
 
 export const geo_movtex_draw_nocolor = (callContext, node) => {
-
-    const asGenerated = node.wrapper
     let gfx = []
 
     if (callContext == GEO_CONTEXT_RENDER) {
         let i = 0
         while (gMovtexNonColored[i].movtexVerts != 0) {
-            if (gMovtexNonColored[i].geoId == asGenerated.param) {
-                node.flags = (node.flags & 0xFF) | (gMovtexNonColored[i].layer << 8)
+            if (gMovtexNonColored[i].geoId == node.parameter) {
+                node.node.flags = (node.node.flags & 0xFF) | (gMovtexNonColored[i].layer << 8)
                 const movtexVerts = gMovtexNonColored[i].movtexVerts
                 update_moving_texture_offset(movtexVerts, MOVTEX_ATTR_NOCOLOR_S)
                 gfx = movtex_gen_list(movtexVerts, gMovtexNonColored[i], MOVTEX_LAYOUT_NOCOLOR)

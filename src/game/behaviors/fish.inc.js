@@ -129,7 +129,7 @@ const sFishSpawnerActions = [
     fish_spawner_act_spawn, fish_spawner_act_idle, fish_spawner_act_respawn,
 ]
 
-export const bhv_fish_spawner_loop = () => {
+const bhv_fish_spawner_loop = () => {
     const o = ObjectListProc.gCurrentObject
     sFishSpawnerActions[o.rawData[oAction]]()
 }
@@ -297,7 +297,7 @@ const sFishActions = [
 // /**
 //  * Main loop for fish
 //  */
-export const bhv_fish_loop = () => {
+const bhv_fish_loop = () => {
     const o = ObjectListProc.gCurrentObject
     cur_obj_scale(1)
 
@@ -333,3 +333,7 @@ export const bhv_fish_loop = () => {
         obj_mark_for_deletion(o)
     }
 }
+
+
+gLinker.bhv_fish_loop = bhv_fish_loop
+gLinker.bhv_fish_spawner_loop = bhv_fish_spawner_loop

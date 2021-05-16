@@ -21,7 +21,7 @@ import {
 //     }
 // }
 
-export const bhv_1up_common_init = () => {
+const bhv_1up_common_init = () => {
     const o = O.gCurrentObject
     o.rawData[oMoveAnglePitch] = -0x4000
     o.rawData[oGravity]  = 3.0
@@ -29,7 +29,7 @@ export const bhv_1up_common_init = () => {
     o.rawData[oBuoyancy] = 1.0
 }
 
-export const bhv_1up_init = () => {
+const bhv_1up_init = () => {
     bhv_1up_common_init()
 //     if (o->oBehParams2ndByte == 1) {
 //         if (!(save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_1 | SAVE_FLAG_UNLOCKED_BASEMENT_DOOR))) {
@@ -77,7 +77,7 @@ export const bhv_1up_init = () => {
 //         o->oAction = 2;
 // }
 
-export const bhv_1up_walking_loop = () => {
+const bhv_1up_walking_loop = () => {
 //     object_step();
 
 //     switch (o->oAction) {
@@ -113,7 +113,7 @@ export const bhv_1up_walking_loop = () => {
 //     set_object_visibility(o, 3000);
 }
 
-export const bhv_1up_running_away_loop = () => {
+const bhv_1up_running_away_loop = () => {
 //     s16 sp26;
 
 //     sp26 = object_step();
@@ -166,7 +166,7 @@ export const bhv_1up_running_away_loop = () => {
 //         o->oAction = 2;
 // }
 
-export const bhv_1up_sliding_loop = () => {
+const bhv_1up_sliding_loop = () => {
 //     switch (o->oAction) {
 //         case 0:
 //             set_object_visibility(o, 3000);
@@ -188,13 +188,13 @@ export const bhv_1up_sliding_loop = () => {
 //     spawn_object(o, MODEL_NONE, bhvSparkleSpawn);
 }
 
-export const bhv_1up_loop = () => {
+const bhv_1up_loop = () => {
     const o = O.gCurrentObject;
 //     bhv_1up_interact();
     // set_object_visibility(o, 3000)
 }
 
-export const bhv_1up_jump_on_approach_loop = () => {
+const bhv_1up_jump_on_approach_loop = () => {
 //     s16 sp26;
 
 //     switch (o->oAction) {
@@ -221,7 +221,7 @@ export const bhv_1up_jump_on_approach_loop = () => {
 //     set_object_visibility(o, 3000);
 }
 
-export const bhv_1up_hidden_loop = () => {
+const bhv_1up_hidden_loop = () => {
 //     s16 sp26;
 //     switch (o->oAction) {
 //         case 0:
@@ -262,7 +262,7 @@ export const bhv_1up_hidden_loop = () => {
 //     }
 }
 
-export const bhv_1up_hidden_trigger_loop = () => {
+const bhv_1up_hidden_trigger_loop = () => {
 //     struct Object *sp1C;
 //     if (obj_check_if_collided_with_object(o, gMarioObject) == 1) {
 //         sp1C = cur_obj_nearest_object_with_behavior(bhvHidden1up);
@@ -273,7 +273,7 @@ export const bhv_1up_hidden_trigger_loop = () => {
 //     }
 }
 
-export const bhv_1up_hidden_in_pole_loop = () => {
+const bhv_1up_hidden_in_pole_loop = () => {
 //     UNUSED s16 sp26;
 //     switch (o->oAction) {
 //         case 0:
@@ -307,7 +307,7 @@ export const bhv_1up_hidden_in_pole_loop = () => {
 //     }
 }
 
-export const bhv_1up_hidden_in_pole_trigger_loop = () => {
+const bhv_1up_hidden_in_pole_trigger_loop = () => {
 //     struct Object *sp1C;
 
 //     if (obj_check_if_collided_with_object(o, gMarioObject) == 1) {
@@ -320,7 +320,7 @@ export const bhv_1up_hidden_in_pole_trigger_loop = () => {
 //     }
 }
 
-export const bhv_1up_hidden_in_pole_spawner_loop = () => {
+const bhv_1up_hidden_in_pole_spawner_loop = () => {
 //     s8 sp2F;
 
 //     if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 700)) {
@@ -332,3 +332,16 @@ export const bhv_1up_hidden_in_pole_spawner_loop = () => {
 //         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
 //     }
 }
+
+gLinker.bhv_1up_common_init = bhv_1up_common_init
+gLinker.bhv_1up_hidden_in_pole_loop = bhv_1up_hidden_in_pole_loop
+gLinker.bhv_1up_hidden_in_pole_spawner_loop = bhv_1up_hidden_in_pole_spawner_loop
+gLinker.bhv_1up_hidden_in_pole_trigger_loop = bhv_1up_hidden_in_pole_trigger_loop
+gLinker.bhv_1up_hidden_loop = bhv_1up_hidden_loop
+gLinker.bhv_1up_hidden_trigger_loop = bhv_1up_hidden_trigger_loop
+gLinker.bhv_1up_init = bhv_1up_init
+gLinker.bhv_1up_jump_on_approach_loop = bhv_1up_jump_on_approach_loop
+gLinker.bhv_1up_loop = bhv_1up_loop
+gLinker.bhv_1up_running_away_loop = bhv_1up_running_away_loop
+gLinker.bhv_1up_sliding_loop = bhv_1up_sliding_loop
+gLinker.bhv_1up_walking_loop = bhv_1up_walking_loop

@@ -2,40 +2,45 @@
 import { ObjectListProcessorInstance as O } from "../ObjectListProcessor"
 import { SurfaceLoadInstance as SurfaceLoad } from "../SurfaceLoad"
 import { spawn_object, cur_obj_become_intangible, cur_obj_become_tangible, cur_obj_hide,
-    cur_obj_unhide, obj_mark_for_deletion,
-    cur_obj_scale, obj_turn_toward_object, approach_symmetric,
-    cur_obj_move_using_fvel_and_gravity,
-    cur_obj_was_attacked_or_ground_pounded } from "../ObjectHelpers"
+         cur_obj_unhide, obj_mark_for_deletion,
+         cur_obj_scale, obj_turn_toward_object, approach_symmetric,
+         cur_obj_move_using_fvel_and_gravity,
+         cur_obj_was_attacked_or_ground_pounded } from "../ObjectHelpers"
 import { obj_set_hitbox } from "../ObjBehaviors2"
-import { s16,
-         random_float,
-         sins                          } from "../../utils"
+import { s16, random_float, sins } from "../../utils"
 
-import { oPosX,
-         oPosY,
-         oPosZ,
-         oVelY,
-         oFaceAnglePitch,
-         oMoveAngleYaw,
-         oMoveAnglePitch,
-         oForwardVel,
-         oHomeX,
-         oHomeY,
-         oHomeZ,
-         oAction,
-         oAnimState,
-         oTimer,
-         oDistanceToMario,
-         oInteractStatus,
-         oBehParams2ndByte,
-         oExclamationBoxUnkF4,
-         oExclamationBoxUnkF8,
-         oExclamationBoxUnkFC,
+import {
+         oAction, oPrevAction, oSubAction, oTimer, oFlags,
+         oBehParams, oBehParams2ndByte,
+         oAnimations, oAnimState, oActiveParticleFlags,
+         oIntangibleTimer, oInteractionSubtype, oInteractStatus, oInteractType,
+         oHealth, oHeldState,
+
+         oPosX, oPosY, oPosZ,
+         oHomeX, oHomeY, oHomeZ, oAngleToHome,
+         oVelX, oVelY, oVelZ,
+         oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ,
          oGraphYOffset,
-         oGravity,
-         oFloorHeight,
-         oFlags,
-         oBehParams,
+
+         oAngleVelPitch, oAngleVelRoll, oAngleVelYaw,
+         oForwardVel, oForwardVelS32,
+         oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw,
+         oDrawingDistance, oOpacity,
+
+         oBounciness, oBuoyancy, oDragStrength, oFriction, oGravity,
+         oCollisionDistance, oDamageOrCoinValue, oNumLootCoins,
+         oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oMoveFlags,
+         oWallAngle, oWallHitboxRadius,
+
+         oFloor, oFloorHeight, oFloorRoom, oFloorType, oRoom,
+         oAngleToMario, oDistanceToMario,
+
+         oDeathSound, oSoundStateID,
+         oDialogResponse, oDialogState,
+
+         oUnk1A8, oUnk94, oUnkBC, oUnkC0,
+
+         oExclamationBoxUnkF4, oExclamationBoxUnkF8, oExclamationBoxUnkFC
 } from "../../include/object_constants"
 
 import { MODEL_1UP,
@@ -119,7 +124,7 @@ const sExclamationBoxContents = (type) => {
     return _sExclamationBoxContents[type]
 }
 
-export const bhv_rotating_exclamation_box_loop = () => {
+const bhv_rotating_exclamation_box_loop = () => {
     const o = O.gCurrentObject
     if (o.parentObj.rawData[oAction] != 1)
         obj_mark_for_deletion(o)
@@ -239,8 +244,12 @@ const sExclamationBoxActions = [ exclamation_box_act_0, exclamation_box_act_1,
                                  exclamation_box_act_2, exclamation_box_act_3,
                                  exclamation_box_act_4, exclamation_box_act_5 ]
 
-export const bhv_exclamation_box_loop = () => {
+const bhv_exclamation_box_loop = () => {
     const o = O.gCurrentObject
     cur_obj_scale(2.0)
     sExclamationBoxActions[o.rawData[oAction]]()
 }
+
+
+gLinker.bhv_rotating_exclamation_box_loop = bhv_rotating_exclamation_box_loop
+gLinker.bhv_exclamation_box_loop = bhv_exclamation_box_loop

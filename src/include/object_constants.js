@@ -104,7 +104,7 @@ export const oDialogResponse              = 0x02
 export const oDialogState                 = 0x02
 export const oUnk94                       = 0x03
 export const oIntangibleTimer             = 0x05
-       const O_POS_INDEX                  = 0x06
+export const O_POS_INDEX                  = 0x06
 export const oPosX                        = O_POS_INDEX + 0
 export const oPosY                        = O_POS_INDEX + 1
 export const oPosZ                        = O_POS_INDEX + 2
@@ -115,14 +115,14 @@ export const oForwardVel                  = 0x0C
 export const oForwardVelS32               = 0x0C
 export const oUnkBC                       = 0x0D
 export const oUnkC0                       = 0x0E
-       const O_MOVE_ANGLE_INDEX           = 0x0F
+export const O_MOVE_ANGLE_INDEX           = 0x0F
 export const O_MOVE_ANGLE_PITCH_INDEX     = O_MOVE_ANGLE_INDEX + 0
 export const O_MOVE_ANGLE_YAW_INDEX       = O_MOVE_ANGLE_INDEX + 1
 export const O_MOVE_ANGLE_ROLL_INDEX      = O_MOVE_ANGLE_INDEX + 2
 export const oMoveAnglePitch              = O_MOVE_ANGLE_PITCH_INDEX
 export const oMoveAngleYaw                = O_MOVE_ANGLE_YAW_INDEX
 export const oMoveAngleRoll               = O_MOVE_ANGLE_ROLL_INDEX
-       const O_FACE_ANGLE_INDEX           = 0x12
+export const O_FACE_ANGLE_INDEX           = 0x12
 export const O_FACE_ANGLE_PITCH_INDEX     = O_FACE_ANGLE_INDEX + 0
 export const O_FACE_ANGLE_YAW_INDEX       = O_FACE_ANGLE_INDEX + 1
 export const O_FACE_ANGLE_ROLL_INDEX      = O_FACE_ANGLE_INDEX + 2
@@ -144,7 +144,7 @@ export const oWallHitboxRadius            = 0x28
 export const oDragStrength                = 0x29
 export const oInteractType                = 0x2A
 export const oInteractStatus              = 0x2B
-       const O_PARENT_RELATIVE_POS_INDEX  = 0x2C
+export const O_PARENT_RELATIVE_POS_INDEX  = 0x2C
 export const oParentRelativePosX          = O_PARENT_RELATIVE_POS_INDEX + 0
 export const oParentRelativePosY          = O_PARENT_RELATIVE_POS_INDEX + 1
 export const oParentRelativePosZ          = O_PARENT_RELATIVE_POS_INDEX + 2
@@ -455,10 +455,6 @@ export const oControllablePlatformUnkF8   = 0x1C
 export const oControllablePlatformUnkFC   = 0x1D
 export const oControllablePlatformUnk100  = 0x1E
 
-/* Breakable Box Small (Small Cork Box) */
-export const oBreakableBoxSmallReleased             = 0x1B
-export const oBreakableBoxSmallFramesSinceReleased  = 0x1D
-
 /* Jumping Box (Crazy Box) */
 export const oJumpingBoxUnkF4  = 0x1B
 export const oJumpingBoxUnkF8  = 0x1C
@@ -609,9 +605,6 @@ export const oHauntedChairUnk104  = 0x1F
 /* Heave-Ho */
 export const oHeaveHoUnk88  = 0x00
 export const oHeaveHoUnkF4  = 0x1B
-
-/* Hidden Object */
-export const oHiddenObjectUnkF4  = 0x1B
 
 /* Hoot */
 export const oHootAvailability      = 0x1B
@@ -1114,10 +1107,10 @@ export const oWaterBombSpawnerBombActive   = 0x1B
 export const oWaterBombSpawnerTimeToSpawn  = 0x1C
 
 /* Water Bomb Cannon */
-export const oWaterCannonUnkF4   = 0x1B
-export const oWaterCannonUnkF8   = 0x1C
-export const oWaterCannonUnkFC   = 0x1D
-export const oWaterCannonUnk100  = 0x1E
+export const oWaterCannonWait    = 0x1B
+export const oWaterCannonMove    = 0x1C
+export const oWaterCannonPitch   = 0x1D
+export const oWaterCannonYaw     = 0x1E
 
 /* Cannon Barrel Bubbles */
 export const oCannonBarrelBubblesUnkF4  = 0x1B
@@ -1196,142 +1189,6 @@ export const oWoodenPostOffsetY           = 0x1F
 export const oYoshiBlinkTimer  = 0x1B
 export const oYoshiChosenHome  = 0x1D
 export const oYoshiTargetYaw   = 0x1E
-
-
-// OLD CONSTANTS
-// export const oFlags = 1
-
-// export const oIntangibleTimer = 5
-
-// export const oPosX = 6
-// export const oPosY = 7
-// export const oPosZ = 8
-
-// export const oMoveAnglePitch = 0x0F
-// export const oMoveAngleYaw = 0x10
-// export const oMoveAngleRoll = 0x11
-
-// export const oFaceAnglePitch = 0x12
-// export const oFaceAngleYaw = 0x13
-// export const oFaceAngleRoll = 0x14
-
-// export const oGravity = 0x17
-// export const oFloorHeight = 0x18
-// export const oMoveFlags = 0x19
-
-// export const oAnimState = 0x1A
-
-// export const oVelX = 0x09
-// export const oVelY = 0x0A
-// export const oVelZ = 0x0B
-// export const oForwardVel = 0x0C
-
-// export const oMarioParticleFlags    = 0x1B
-// export const oMarioPoleUnk108       = 0x20
-// export const oMarioReadingSignDYaw  = 0x20
-// export const oMarioPoleYawVel       = 0x21
-// export const oMarioCannonObjectYaw  = 0x21
-// export const oMarioTornadoYawVel    = 0x21
-// export const oMarioReadingSignDPosX = 0x21
-// export const oMarioSteepJumpYaw     = 0x22
-// export const oMarioPolePos          = 0x22
-
-// export const oMarioWalkingPitch = 0x22
-// export const oAngleVelPitch = 0x23
-// export const oAngleVelYaw = 0x24
-// export const oAngleVelRoll = 0x25
-// export const oAnimations = 0x26
-// export const oHeldState = 0x27
-// export const oWallHitboxRadius = 0x28
-// export const oDragStrength = 0x29
-// export const oInteractType = 0x2A
-// export const oInteractStatus = 0x2B
-
-// export const oParentRelativePosX = 0x2C
-// export const oParentRelativePosY = 0x2D
-// export const oParentRelativePosZ = 0x2E
-
-// export const oBehParams2ndByte = 0x2F
-
-// export const oTimer = 0x33
-// export const oBounciness      = 0x34
-// export const oDistanceToMario = 0x35
-// export const oAngleToMario    = 0x36
-// export const oHomeX           = 0x37
-// export const oHomeY           = 0x38
-// export const oHomeZ           = 0x39
-// export const oFriction        = 0x3A
-// export const oBuoyancy = 0x3B
-// export const oOpacity = 0x3D
-
-// export const oDamageOrCoinValue  = 0x3E
-// export const oHealth             = 0x3F
-// export const oBehParams = 0x40
-// export const oPrevAction         = 0x41
-// export const oInteractionSubtype = 0x42
-// export const oCollisionDistance  = 0x43
-// export const oNumLootCoins       = 0x44
-// export const oDrawingDistance    = 0x45
-// export const oRoom = 0x46
-// export const oUnk1A8 = 0x48
-// export const oWallAngle          = 0x4B
-// export const oFloorType          = 0x4C
-// export const oFloorRoom          = 0x4C
-// export const oAngleToHome        = 0x4D
-// export const oFloor = 0x4E
-// export const oDeathSound    =    0x4F
-
-// export const oGraphYOffset = 0x15
-// export const oActiveParticleFlags = 0x16
-
-// export const oAction = 0x31
-// export const oSubAction = 0x32
-
-// /* Checkerboard Platform */
-// export const oCheckerBoardPlatformUnkF8  = 0x1C
-// export const oCheckerBoardPlatformUnkFC  = 0x1D
-// export const oCheckerBoardPlatformUnk1AC = 0x49
-
-// /* Seesaw Platform */
-// export const oSeesawPlatformPitchVel = 0x1B
-
-// /* Collision Particle */
-// export const oCollisionParticleUnkF4 = 0x1B
-
-// /* Goomba */
-// export const oGoombaSize                = 0x1B
-// export const oGoombaScale               = 0x1C
-// export const oGoombaWalkTimer           = 0x1D
-// export const oGoombaTargetYaw           = 0x1E
-// export const oGoombaBlinkTimer          = 0x1F
-// export const oGoombaTurningAwayFromWall = 0x20
-// export const oGoombaRelativeSpeed = 0x21
-
-// /* Bob-omb */
-// export const oBobombBlinkTimer = 0x1B
-// export const oBobombFuseLit = 0x1C
-// export const oBobombFuseTimer = 0x1D
-
-// /* Wooden Post */
-// export const oWoodenPostTotalMarioAngle  = 0x1B
-// export const oWoodenPostPrevAngleToMario = 0x1C
-// export const oWoodenPostSpeedY           = 0x1D
-// export const oWoodenPostMarioPounding    = 0x1E
-// export const oWoodenPostOffsetY = 0x1F
-
-// export const oButterflyYPhase = 0x1B
-
-// /* Chain Chomp */
-// export const oChainChompSegments                     = 0x1B
-// export const oChainChompMaxDistFromPivotPerChainPart = 0x1C
-// export const oChainChompMaxDistBetweenChainParts     = 0x1D
-// export const oChainChompDistToPivot                  = 0x1E
-// export const oChainChompUnk104                       = 0x1F
-// export const oChainChompRestrictedByChain            = 0x20
-// export const oChainChompTargetPitch                  = 0x21
-// export const oChainChompNumLunges                    = 0x22
-// export const oChainChompReleaseStatus                = 0x49
-// export const oChainChompHitGate = 0x4A
 
 
 

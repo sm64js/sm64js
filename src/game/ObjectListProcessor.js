@@ -1,4 +1,11 @@
-import { PlatformDisplacementInstance as PlatformDisplacement } from "./PlatformDisplacement"
+import * as _Linker from "./Linker"
+import * as _PlatformDisplacement from "./PlatformDisplacement"
+import * as _BehaviorCommands from "../engine/BehaviorCommands"
+import * as _LevelUpdate from "./LevelUpdate"
+
+import * as GraphNode from "../engine/graph_node"
+import * as Mario from "./Mario"
+
 import {
     RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte, ACTIVE_FLAG_ACTIVE, RESPAWN_INFO_TYPE_16, oFlags, OBJ_FLAG_PERSISTENT_RESPAWN, oMarioParticleFlags, oActiveParticleFlags,
     ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_SPARKLES, ACTIVE_PARTICLE_BUBBLE,
@@ -6,11 +13,6 @@ import {
     ACTIVE_PARTICLE_FIRE, ACTIVE_PARTICLE_SHALLOW_WATER_WAVE, ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH, ACTIVE_PARTICLE_LEAF,
     ACTIVE_PARTICLE_SNOW, ACTIVE_PARTICLE_BREATH, ACTIVE_PARTICLE_DIRT, ACTIVE_PARTICLE_MIST_CIRCLE, ACTIVE_PARTICLE_TRIANGLE
 } from "../include/object_constants"
-import { SpawnObjectInstance as Spawn } from "./SpawnObject"
-import * as GraphNode from "../engine/graph_node"
-import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands"
-import * as Mario from "./Mario"
-import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { detect_object_collisions } from "./ObjectCollisions"
 import { uint32, uint16 } from "../utils"
 import {
@@ -22,12 +24,12 @@ import {
     PARTICLE_IDLE_WATER_WAVE, PARTICLE_PLUNGE_BUBBLE, PARTICLE_WAVE_TRAIL, PARTICLE_FIRE, PARTICLE_SHALLOW_WATER_WAVE,  
     PARTICLE_SHALLOW_WATER_SPLASH, PARTICLE_LEAF, PARTICLE_SNOW, PARTICLE_BREATH, PARTICLE_DIRT, PARTICLE_MIST_CIRCLE, PARTICLE_TRIANGLE
 } from "../include/mario_constants"
-import { gLinker } from "./Linker"
 import { spawn_object_at_origin, obj_copy_pos_and_angle } from "./ObjectHelpers"
 
 class ObjectListProcessor {
     constructor() {
-        PlatformDisplacement.ObjectListProc = this
+        // PlatformDisplacement.ObjectListProc = this
+        gLinker.ObjectListProcessor = this
 
         this.sParticleTypesInit = () => {
             this.sParticleTypes = [];
@@ -126,17 +128,17 @@ class ObjectListProcessor {
     update_objects() {
         this.gObjectCounter = 0  /// probaly not used and not needed
 
-        Spawn.SurfaceLoad.clear_dynamic_surfaces()
+        gLinker.SurfaceLoad.clear_dynamic_surfaces()
         this.update_terrain_objects()
 
-        PlatformDisplacement.apply_mario_platform_displacement()
+        gLinker.PlatformDisplacement.apply_mario_platform_displacement()
 
         detect_object_collisions()
         this.update_non_terrain_objects()
 
         this.unload_deactivated_objects()
 
-        PlatformDisplacement.update_mario_platform()
+        gLinker.PlatformDisplacement.update_mario_platform()
     }
 
     update_terrain_objects() {
@@ -161,7 +163,7 @@ class ObjectListProcessor {
         while (objList != firstObj) {
             this.gCurrentObject = firstObj.wrapperObject
             this.gCurrentObject.header.gfx.node.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION
-            Behavior.cur_obj_update()
+            gLinker.BehaviorCommands.cur_obj_update()
             firstObj = firstObj.next
             count++
         }
@@ -181,7 +183,7 @@ class ObjectListProcessor {
                     this.set_object_respawn_info_bits(this.gCurrentObject, RESPAWN_INFO_DONT_RESPAWN)
                 }
 
-                Spawn.unload_object(this.gCurrentObject)
+                gLinker.Spawn.unload_object(this.gCurrentObject)
             }
 
         }
@@ -234,10 +236,10 @@ class ObjectListProcessor {
     }
 
     copy_mario_state_to_object() {
-
-        this.gCurrentObject.rawData[oPosX] = LevelUpdate.gMarioState.pos[0]
-        this.gCurrentObject.rawData[oPosY] = LevelUpdate.gMarioState.pos[1]
-        this.gCurrentObject.rawData[oPosZ] = LevelUpdate.gMarioState.pos[2]
+        const gMarioState = gLinker.LevelUpdate.gMarioState
+        this.gCurrentObject.rawData[oPosX] = gMarioState.pos[0]
+        this.gCurrentObject.rawData[oPosY] = gMarioState.pos[1]
+        this.gCurrentObject.rawData[oPosZ] = gMarioState.pos[2]
 
         this.gCurrentObject.rawData[oFaceAnglePitch] = this.gCurrentObject.header.gfx.angle[0]
         this.gCurrentObject.rawData[oFaceAngleYaw] = this.gCurrentObject.header.gfx.angle[1]
@@ -247,24 +249,22 @@ class ObjectListProcessor {
         this.gCurrentObject.rawData[oMoveAngleYaw] = this.gCurrentObject.header.gfx.angle[1]
         this.gCurrentObject.rawData[oMoveAngleRoll] = this.gCurrentObject.header.gfx.angle[2]
 
-        this.gCurrentObject.rawData[oVelX] = LevelUpdate.gMarioState.vel[0]
-        this.gCurrentObject.rawData[oVelY] = LevelUpdate.gMarioState.vel[1]
-        this.gCurrentObject.rawData[oVelZ] = LevelUpdate.gMarioState.vel[2]
+        this.gCurrentObject.rawData[oVelX] = gMarioState.vel[0]
+        this.gCurrentObject.rawData[oVelY] = gMarioState.vel[1]
+        this.gCurrentObject.rawData[oVelZ] = gMarioState.vel[2]
 
-        this.gCurrentObject.rawData[oAngleVelPitch] = LevelUpdate.gMarioState.angleVel[0]
-        this.gCurrentObject.rawData[oAngleVelYaw] = LevelUpdate.gMarioState.angleVel[1]
-        this.gCurrentObject.rawData[oAngleVelRoll] = LevelUpdate.gMarioState.angleVel[2]
+        this.gCurrentObject.rawData[oAngleVelPitch] = gMarioState.angleVel[0]
+        this.gCurrentObject.rawData[oAngleVelYaw] = gMarioState.angleVel[1]
+        this.gCurrentObject.rawData[oAngleVelRoll] = gMarioState.angleVel[2]
     }
 
     spawn_objects_from_info(spawnInfo) {
-
-
         this.gTimeStopState = 0
 
         this.gWDWWaterLevelChanging = false;
         this.gMarioOnMerryGoRound = 0
 
-        PlatformDisplacement.clear_mario_platform()
+        gLinker.PlatformDisplacement.clear_mario_platform()
 
         this.gCCMEnteredSlide |= 1
 
@@ -274,7 +274,7 @@ class ObjectListProcessor {
 
             if ((spawnInfo.behaviorArg & (RESPAWN_INFO_DONT_RESPAWN << 8)) != (RESPAWN_INFO_DONT_RESPAWN << 8)) {
 
-                const object = Spawn.create_object(script)
+                const object = gLinker.Spawn.create_object(script)
 
                 object.rawData[oBehParams] = spawnInfo.behaviorArg
 
@@ -315,9 +315,8 @@ class ObjectListProcessor {
     }
 
     clear_objects() {
-
-        Spawn.clear_object_lists()
-        Spawn.SurfaceLoad.clear_dynamic_surfaces()
+        gLinker.Spawn.clear_object_lists()
+        gLinker.SurfaceLoad.clear_dynamic_surfaces()
     }
 }
 

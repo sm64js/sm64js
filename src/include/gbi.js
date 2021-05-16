@@ -306,7 +306,7 @@ export const G_TX_NOLOD = 0
 //// Render Modes
 export const G_RM_OPA_SURF_SURF2 = 0xf0a4000
 export const G_RM_AA_OPA_SURF_SURF2 = 0x552048
-export const G_RM_XLU_SURF_SURF2 = 0x5041c8  // TO-DO this is wrong
+export const G_RM_XLU_SURF_SURF2 = 0x5041c8  // TODO this is wrong
 export const G_RM_AA_XLU_SURF_SURF2 = 0x5041c8
 
 export const G_RM_ZB_OPA_SURF_SURF2 = 0x552230
@@ -320,6 +320,7 @@ export const G_RM_AA_ZB_OPA_SURF_SURF2 = 0x552078
 export const G_RM_AA_ZB_OPA_DECAL_DECAL2 = 0x552d58
 export const G_RM_AA_ZB_OPA_DECAL_NOOP2 = 0x442d58
 export const G_RM_AA_ZB_XLU_INTER_INTER2 = 0x5045d8
+export const G_RM_CUSTOM_AA_ZB_XLU_SURF_NOOP2 = 0x5041c8  // TODO this is wrong
 export const G_RM_FOG_SHADE_A_AA_ZB_OPA_SURF2 = 0xc8112078
 export const G_RM_FOG_SHADE_A_AA_ZB_TEX_EDGE2 = 0xc8113078
 export const G_RM_FOG_SHADE_A_AA_ZB_OPA_DECAL2 = 0xc8112d58
@@ -328,33 +329,34 @@ export const G_RM_FOG_SHADE_A_AA_ZB_XLU_SURF2 = 0xc81049d8
 
 // These are only used in gsDPSetRenderMode to map to actual values,
 // they're not sent to the renderer.
-export const G_RM_AA_OPA_SURF        = 1
-export const G_RM_AA_OPA_SURF2       = 2
-export const G_RM_XLU_SURF           = 3
-export const G_RM_XLU_SURF2          = 4
-export const G_RM_AA_XLU_SURF        = 5
-export const G_RM_AA_XLU_SURF2       = 6
-export const G_RM_AA_ZB_OPA_SURF     = 7
-export const G_RM_AA_ZB_OPA_SURF2    = 8
-export const G_RM_AA_ZB_XLU_SURF     = 9
-export const G_RM_AA_ZB_XLU_SURF2    = 10
-export const G_RM_AA_ZB_OPA_DECAL    = 11
-export const G_RM_AA_ZB_OPA_DECAL2   = 12
-export const G_RM_AA_ZB_XLU_DECAL    = 13
-export const G_RM_AA_ZB_XLU_DECAL2   = 14
-export const G_RM_AA_ZB_OPA_INTER    = 15
-export const G_RM_AA_ZB_OPA_INTER2   = 16
-export const G_RM_AA_ZB_XLU_INTER    = 17
-export const G_RM_AA_ZB_XLU_INTER2   = 18
-export const G_RM_AA_ZB_TEX_EDGE     = 19
-export const G_RM_AA_ZB_TEX_EDGE2    = 20
-export const G_RM_FOG_SHADE_A        = 21
-export const G_RM_OPA_SURF           = 22
-export const G_RM_OPA_SURF2          = 23
-export const G_RM_NOOP2              = 24
-export const G_RM_ZB_OPA_SURF        = 25
-export const G_RM_ZB_OPA_SURF2       = 26
-
+export const G_RM_AA_OPA_SURF            = 1
+export const G_RM_AA_OPA_SURF2           = 2
+export const G_RM_XLU_SURF               = 3
+export const G_RM_XLU_SURF2              = 4
+export const G_RM_AA_XLU_SURF            = 5
+export const G_RM_AA_XLU_SURF2           = 6
+export const G_RM_AA_ZB_OPA_SURF         = 7
+export const G_RM_AA_ZB_OPA_SURF2        = 8
+export const G_RM_AA_ZB_XLU_SURF         = 9
+export const G_RM_AA_ZB_XLU_SURF2        = 10
+export const G_RM_AA_ZB_OPA_DECAL        = 11
+export const G_RM_AA_ZB_OPA_DECAL2       = 12
+export const G_RM_AA_ZB_XLU_DECAL        = 13
+export const G_RM_AA_ZB_XLU_DECAL2       = 14
+export const G_RM_AA_ZB_OPA_INTER        = 15
+export const G_RM_AA_ZB_OPA_INTER2       = 16
+export const G_RM_AA_ZB_XLU_INTER        = 17
+export const G_RM_AA_ZB_XLU_INTER2       = 18
+export const G_RM_AA_ZB_TEX_EDGE         = 19
+export const G_RM_AA_ZB_TEX_EDGE2        = 20
+export const G_RM_FOG_SHADE_A            = 21
+export const G_RM_OPA_SURF               = 22
+export const G_RM_OPA_SURF2              = 23
+export const G_RM_NOOP2                  = 24
+export const G_RM_ZB_OPA_SURF            = 25
+export const G_RM_ZB_OPA_SURF2           = 26
+export const G_RM_CUSTOM_AA_ZB_XLU_SURF  = 27
+export const G_RM_CUSTOM_AA_ZB_XLU_SURF2 = 28
 
 //G_MOVEWORD types
 export const G_MW_MATRIX = 0x00 /* NOTE: also used by movemem */
@@ -411,6 +413,11 @@ export const G_CC_MODULATEIA = {
     rgb: [1, 15, 4, 7]
 }
 
+export const G_CC_MODULATERGBFADEA = {
+    alpha: [1, 7, 5, 7],
+    rgb: [1, 15, 4, 7]
+}
+
 export const G_CC_MODULATEIFADEA = {
     alpha: [1, 7, 5, 7],
     rgb: [1, 15, 4, 7]
@@ -434,6 +441,12 @@ export const G_CC_SHADE = {
 export const G_CC_SHADEFADEA = {
     alpha: [7, 7, 7, 5],
     rgb: [15, 15, 31, 4]
+}
+
+// this is probably wrong
+export const G_CC_BLENDRGBA = {
+    alpha: [7, 7, 7, 1],
+    rgb: [1, 4, 8, 4]
 }
 
 export const G_CC_BLENDRGBFADEA = {
@@ -645,6 +658,15 @@ export const gSPMatrix = (displaylist, matrix, parameters) => {
     })
 }
 
+export const gDPSetAlphaCompare = (displaylist, newmode) => {
+    displaylist.push({
+        words: {
+            w0: G_SETOTHERMODE_H,
+            w1: { category: G_MDSFT_ALPHACOMPARE, newmode }
+        }
+    })
+}
+
 export const gDPSetRenderMode = (displaylist, mode) => {
     displaylist.push({
         words: {
@@ -819,11 +841,11 @@ export const gsSPEndDisplayList = () => {
     }
 }
 
-export const gsDPSetAlphaCompare = (type) => {
+export const gsDPSetAlphaCompare = (newmode) => {
     return {
         words: {
-            w0: G_SETOTHERMODE_L,
-            w1: { type }
+            w0: G_SETOTHERMODE_H,
+            w1: { category: G_MDSFT_ALPHACOMPARE, newmode }
         }
     }
 }
@@ -849,6 +871,7 @@ const renderModesMap = [
     [G_RM_FOG_SHADE_A, G_RM_AA_ZB_XLU_SURF2,        G_RM_FOG_SHADE_A_AA_ZB_XLU_SURF2],
     [G_RM_OPA_SURF, G_RM_OPA_SURF2,                 G_RM_OPA_SURF_SURF2],
     [G_RM_XLU_SURF, G_RM_XLU_SURF2 ,                G_RM_XLU_SURF_SURF2],  // TO-DO double-check this
+    [G_RM_CUSTOM_AA_ZB_XLU_SURF, G_RM_NOOP2,        G_RM_CUSTOM_AA_ZB_XLU_SURF_NOOP2],
 ]
 
 export const gsDPSetRenderMode = (mode, mode2) => {

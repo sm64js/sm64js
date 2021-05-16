@@ -1,2 +1,3 @@
 
-export const gLinker = {}
+window.gLinker = {}
+window.gLinker.behaviors = {}

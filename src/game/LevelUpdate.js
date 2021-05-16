@@ -1,4 +1,6 @@
-import { AreaInstance as Area, WARP_TRANSITION_FADE_FROM_STAR, WARP_TRANSITION_FADE_FROM_COLOR } from "./Area"
+import * as _Linker from "./Linker"
+import * as _Area from "./Area"
+import { WARP_TRANSITION_FADE_FROM_STAR, WARP_TRANSITION_FADE_FROM_COLOR } from "./Area"
 import { COURSE_NONE } from "../levels/course_defines"
 import * as Mario from "./Mario"
 import { CameraInstance as Camera } from "./Camera"
@@ -18,30 +20,30 @@ const WARP_TYPE_SAME_AREA = 3
 
 class HudDisplay {
     constructor(lives, coins, stars, wedges, keys, flags, timer) {
-        this.lives = lives;
-        this.coins = coins;
-        this.stars = stars;
-        this.wedges = wedges;
-        this.keys = keys;
-        this.flags = flags;
-        this.timer = timer;
+        this.lives = lives
+        this.coins = coins
+        this.stars = stars
+        this.wedges = wedges
+        this.keys = keys
+        this.flags = flags
+        this.timer = timer
     }
-};
+}
 
 class LevelUpdate {
     constructor() {
         // HUDDisplayFlag enum
-        this.HUD_DISPLAY_FLAG_LIVES = 0x0001;
-        this.HUD_DISPLAY_FLAG_COIN_COUNT = 0x0002;
-        this.HUD_DISPLAY_FLAG_STAR_COUNT = 0x0004;
-        this.HUD_DISPLAY_FLAG_CAMERA_AND_POWER = 0x0008;
-        this.HUD_DISPLAY_FLAG_KEYS = 0x0010;
-        this.HUD_DISPLAY_FLAG_UNKNOWN_0020 = 0x0020;
-        this.HUD_DISPLAY_FLAG_TIMER = 0x0040;
-        this.HUD_DISPLAY_FLAG_EMPHASIZE_POWER = 0x8000;
-        this.HUD_DISPLAY_NONE = 0x0000;
-        this.HUD_DISPLAY_DEFAULT = this.HUD_DISPLAY_FLAG_LIVES | this.HUD_DISPLAY_FLAG_COIN_COUNT | this.HUD_DISPLAY_FLAG_STAR_COUNT | this.HUD_DISPLAY_FLAG_CAMERA_AND_POWER | this.HUD_DISPLAY_FLAG_KEYS | this.HUD_DISPLAY_FLAG_UNKNOWN_0020;
-        this.gHudDisplay = new HudDisplay();
+        this.HUD_DISPLAY_FLAG_LIVES = 0x0001
+        this.HUD_DISPLAY_FLAG_COIN_COUNT = 0x0002
+        this.HUD_DISPLAY_FLAG_STAR_COUNT = 0x0004
+        this.HUD_DISPLAY_FLAG_CAMERA_AND_POWER = 0x0008
+        this.HUD_DISPLAY_FLAG_KEYS = 0x0010
+        this.HUD_DISPLAY_FLAG_UNKNOWN_0020 = 0x0020
+        this.HUD_DISPLAY_FLAG_TIMER = 0x0040
+        this.HUD_DISPLAY_FLAG_EMPHASIZE_POWER = 0x8000
+        this.HUD_DISPLAY_NONE = 0x0000
+        this.HUD_DISPLAY_DEFAULT = this.HUD_DISPLAY_FLAG_LIVES | this.HUD_DISPLAY_FLAG_COIN_COUNT | this.HUD_DISPLAY_FLAG_STAR_COUNT | this.HUD_DISPLAY_FLAG_CAMERA_AND_POWER | this.HUD_DISPLAY_FLAG_KEYS | this.HUD_DISPLAY_FLAG_UNKNOWN_0020
+        this.gHudDisplay = new HudDisplay()
         
         this.gMarioState =  {
             unk00: 0, input: 0, flags: 0, particleFlags: 0, action: 0,
@@ -63,10 +65,10 @@ class LevelUpdate {
     }
 
     lvl_init_from_save_file(arg0, levelNum) {
-        Area.gCurrLevelNum = levelNum
-        Area.gCurrCourseNum = COURSE_NONE
-        Area.gSavedCourseNum = COURSE_NONE
-        Area.gCurrCreditsEntry = null
+        gLinker.Area.gCurrLevelNum = levelNum
+        gLinker.Area.gCurrCourseNum = COURSE_NONE
+        gLinker.Area.gSavedCourseNum = COURSE_NONE
+        gLinker.Area.gCurrCreditsEntry = null
 
         Mario.init_mario_from_save_file()
         Camera.select_mario_cam_mode()
@@ -75,8 +77,8 @@ class LevelUpdate {
     }
 
     lvl_set_current_level(arg0, levelNum) {
-        Area.gCurrLevelNum = levelNum
-        Area.gCurrCourseNum = gLevelToCourseNumTable[levelNum - 1]
+        gLinker.Area.gCurrLevelNum = levelNum
+        gLinker.Area.gCurrCourseNum = gLevelToCourseNumTable[levelNum - 1]
 
         // TODO lots of missing code here
 
@@ -102,19 +104,19 @@ class LevelUpdate {
         if (this.sWarpDest.type != WARP_TYPE_NOT_WARPING) {
             throw "init_level - not warping"
         } else {
-            if (Area.gMarioSpawnInfo.areaIndex >= 0) {
-                Area.load_mario_area()
+            if (gLinker.Area.gMarioSpawnInfo.areaIndex >= 0) {
+                gLinker.Area.load_mario_area()
                 Mario.init_marios()
             }
 
-            if (Area.gCurrentArea) {
-                Camera.reset_camera(Area.gCurrentArea.camera)
+            if (gLinker.Area.gCurrentArea) {
+                Camera.reset_camera(gLinker.Area.gCurrentArea.camera)
             }
 
             if (val4 != 0) {
-                Area.play_transition(WARP_TRANSITION_FADE_FROM_COLOR, 0x5A, 0xFF, 0xFF, 0xFF)
+                gLinker.Area.play_transition(WARP_TRANSITION_FADE_FROM_COLOR, 0x5A, 0xFF, 0xFF, 0xFF)
             } else {
-                Area.play_transition(WARP_TRANSITION_FADE_FROM_STAR, 0x10, 0xFF, 0xFF, 0xFF)
+                gLinker.Area.play_transition(WARP_TRANSITION_FADE_FROM_STAR, 0x10, 0xFF, 0xFF, 0xFF)
             }
 
         }
@@ -125,11 +127,11 @@ class LevelUpdate {
     play_mode_normal() {
         
         //lots more here
-        Area.area_update_objects()
+        gLinker.Area.area_update_objects()
         this.update_hud_values();
 
-        if (Area.gCurrentArea) {
-            Camera.update_camera(Area.gCurrentArea.camera)
+        if (gLinker.Area.gCurrentArea) {
+            Camera.update_camera(gLinker.Area.gCurrentArea.camera)
         }
 
         return 0
@@ -169,7 +171,7 @@ class LevelUpdate {
         if (this.gCurrCreditsEntry == null) {
             const numHealthWedges = this.gMarioState.health > 0 ? this.gMarioState.health >> 8 : 0
 
-            if (Area.gCurrCourseNum > 0) {
+            if (gLinker.Area.gCurrCourseNum > 0) {
                 this.gHudDisplay.flags |= this.HUD_DISPLAY_FLAG_COIN_COUNT;
             } else {
                 this.gHudDisplay.flags &= ~this.HUD_DISPLAY_FLAG_COIN_COUNT;
@@ -228,3 +230,4 @@ class LevelUpdate {
 }
 
 export const LevelUpdateInstance = new LevelUpdate()
+gLinker.LevelUpdate = LevelUpdateInstance

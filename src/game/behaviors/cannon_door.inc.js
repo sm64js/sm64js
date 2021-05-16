@@ -14,7 +14,7 @@ const CANNON_TRAP_DOOR_ACT_OPEN = 3
 
 const save_file_is_cannon_unlocked = () => {return 1}
 
-export const bhv_cannon_closed_init = () => {
+const bhv_cannon_closed_init = () => {
     const o = O.gCurrentObject
     let cannon
 
@@ -52,7 +52,7 @@ const cannon_door_act_opening = () => {
     }
 }
 
-export const bhv_cannon_closed_loop = () => {
+const bhv_cannon_closed_loop = () => {
     const o = O.gCurrentObject
     switch (o.rawData[OC.oAction]) {
         case CANNON_TRAP_DOOR_ACT_CLOSED:
@@ -76,3 +76,6 @@ export const bhv_cannon_closed_loop = () => {
             break
     }
 }
+
+gLinker.bhv_cannon_closed_init = bhv_cannon_closed_init
+gLinker.bhv_cannon_closed_loop = bhv_cannon_closed_loop

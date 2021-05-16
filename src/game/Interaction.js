@@ -1,85 +1,48 @@
-import {
-         ACT_DIVE,
-         ACT_DIVE_SLIDE,
+import * as _Linker from "./Linker"
+import * as _Area from "./Area"
 
-         ACT_FLAG_AIR,
-         ACT_FLAG_ATTACKING,
-         ACT_FLAG_DIVING,
-         ACT_FLAG_HANGING,
-         ACT_FLAG_IDLE,
-         ACT_FLAG_INTANGIBLE,
-         ACT_FLAG_INVULNERABLE,
-         ACT_FLAG_METAL_WATER,
-         ACT_FLAG_ON_POLE,
-         ACT_FLAG_RIDING_SHELL,
-         ACT_FLAG_SWIMMING,
+import { ACT_DIVE, ACT_DIVE_SLIDE,
 
-         ACT_FLYING,
-         ACT_GETTING_BLOWN,
+         ACT_FLAG_AIR, ACT_FLAG_ATTACKING, ACT_FLAG_DIVING, ACT_FLAG_HANGING,
+         ACT_FLAG_IDLE, ACT_FLAG_INTANGIBLE, ACT_FLAG_INVULNERABLE, ACT_FLAG_METAL_WATER,
+         ACT_FLAG_ON_POLE, ACT_FLAG_RIDING_SHELL, ACT_FLAG_SWIMMING,
 
-         ACT_GRAB_POLE_FAST,
-         ACT_GRAB_POLE_SLOW,
+         ACT_FLYING, ACT_GETTING_BLOWN,
 
-         ACT_GROUND_POUND,
-         ACT_GROUND_POUND_LAND,
-         ACT_GROUP_CUTSCENE,
-         ACT_GROUP_MASK,
-         ACT_ID_MASK,
-         ACT_IN_CANNON,
-         ACT_JUMP_KICK,
-         ACT_MOVE_PUNCHING,
+         ACT_GRAB_POLE_FAST, ACT_GRAB_POLE_SLOW,
 
-         ACT_PICKING_UP,
-         ACT_PICKING_UP_BOWSER,
-         ACT_PUNCHING,
-         ACT_READING_SIGN,
-         ACT_RIDING_HOOT,
-         ACT_SHOT_FROM_CANNON,
-         ACT_SLIDE_KICK,
-         ACT_SLIDE_KICK_SLIDE,
-         ACT_TWIRL_LAND,
-         ACT_TWIRLING,
-         ACT_WALKING,
-         ACT_WATER_JUMP,
-         ACT_WATER_PUNCH,
+         ACT_GROUND_POUND, ACT_GROUND_POUND_LAND, ACT_GROUP_CUTSCENE, ACT_GROUP_MASK,
+         ACT_ID_MASK, ACT_IN_CANNON, ACT_JUMP_KICK, ACT_MOVE_PUNCHING,
 
-         INPUT_A_PRESSED,
-         INPUT_B_PRESSED,
-         INPUT_INTERACT_OBJ_GRABBABLE,
+         ACT_PICKING_UP, ACT_PICKING_UP_BOWSER, ACT_PUNCHING, ACT_READING_SIGN,
+         ACT_RIDING_HOOT, ACT_SHOT_FROM_CANNON, ACT_SLIDE_KICK, ACT_SLIDE_KICK_SLIDE,
+         ACT_TWIRL_LAND, ACT_TWIRLING, ACT_WALKING, ACT_WATER_JUMP, ACT_WATER_PUNCH,
 
-         MARIO_KICKING,
-         MARIO_PUNCHING,
-         MARIO_TRIPPING,
-         MARIO_UNKNOWN_08,
+         INPUT_A_PRESSED, INPUT_B_PRESSED, INPUT_INTERACT_OBJ_GRABBABLE,
 
-         MARIO_METAL_CAP,
-         MARIO_VANISH_CAP,
-         MARIO_WING_CAP,
-         MARIO_CAP_ON_HEAD,
-         MARIO_CAP_IN_HAND,
-         ACT_PUTTING_ON_CAP,
+         MARIO_KICKING, MARIO_PUNCHING, MARIO_TRIPPING, MARIO_UNKNOWN_08,
 
-         drop_and_set_mario_action,
-         resolve_and_return_wall_collisions,
-         sBackwardKnockbackActions,
-         set_forward_vel,
-         set_mario_action,
-         sForwardKnockbackActions               } from "./Mario"
+         MARIO_METAL_CAP, MARIO_VANISH_CAP, MARIO_WING_CAP, MARIO_CAP_ON_HEAD,
+         MARIO_CAP_IN_HAND, ACT_PUTTING_ON_CAP,
 
-import { AreaInstance as Area } from "./Area"
+         drop_and_set_mario_action, resolve_and_return_wall_collisions, sBackwardKnockbackActions,
+         set_forward_vel, set_mario_action, sForwardKnockbackActions
+} from "./Mario"
+
 import * as MarioConstants from "../include/mario_constants"
-import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY,
-    oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ, oMoveAngleYaw } from "../include/object_constants"
+
+import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos,
+         oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ, oMoveAngleYaw
+} from "../include/object_constants"
+
 import { atan2s } from "../engine/math_util"
 import { sins, coss, int16, s16 } from "../utils"
-import { gLinker } from "./Linker"
-import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND } from "../include/surface_terrains"
 import { LEVEL_CCM, LEVEL_TTM, LEVEL_WF, LEVEL_HMC } from "../levels/level_defines_constants"
 import { COURSE_IS_MAIN_COURSE } from "../levels/course_defines"
 import { CameraInstance as Camera } from "./Camera"
 import * as CAMERA from "./Camera"  // for constants
-
+import { obj_set_held_state } from "./ObjectHelpers"
 import { stop_shell_music } from "./SoundInit"
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
@@ -206,7 +169,7 @@ const check_death_barrier = (m) => {
 
     /// Temp code because death is not implemented
     if (m.pos[1] < m.floorHeight + 2048) {
-        switch (Area.gCurrLevelNum) {
+        switch (gLinker.Area.gCurrLevelNum) {
             case LEVEL_CCM:  // CCM
                 m.pos = [-1512, 2560, -2305]
                 break
@@ -257,30 +220,12 @@ const interact_coin = (m, o) => {
 
     o.rawData[oInteractStatus] = INT_STATUS_INTERACTED
 
-    if (COURSE_IS_MAIN_COURSE(Area.gCurrCourseNum) && m.numCoins - o.rawData[oDamageOrCoinValue] < 100 && m.numCoins >= 100) {
+    if (COURSE_IS_MAIN_COURSE(gLinker.Area.gCurrCourseNum) && m.numCoins - o.rawData[oDamageOrCoinValue] < 100 && m.numCoins >= 100) {
         /// 100 coin star!
         /// TODO spawn star
     }
 
     return 0
-}
-
-const mario_stop_riding_object = (m) => {
-    if (m.riddenObj) {
-        m.riddenObj.rawData[oInteractStatus] = INT_STATUS_STOP_RIDING
-        stop_shell_music()
-        m.riddenObj = null
-    }
-}
-
-const mario_stop_riding_and_holding = (m) => {
-    mario_drop_held_object(m)
-    mario_stop_riding_object(m)
-
-    if (m.action == ACT_RIDING_HOOT) {
-        m.usedObj.rawData[oInteractStatus] = 0
-        m.usedObj.rawData[oHootMarioReleaseTime] = window.gGlobalTimer
-    }
 }
 
 const interact_cannon_base = (m, o) => {
@@ -614,11 +559,11 @@ const push_mario_out_of_object = (m, o, padding) => {
         const newMarioZ = { value: o.rawData[oPosZ] + minDistance * coss(pushAngle) }
         const newMarioY = { value: m.pos[1] }
 
-        Spawn.SurfaceCollision.find_wall_collision(newMarioX, newMarioY, newMarioZ, 60.0, 50.0)
+        gLinker.SurfaceCollision.find_wall_collision(newMarioX, newMarioY, newMarioZ, 60.0, 50.0)
         m.pos[1] = newMarioY.value
 
         const floorWrapper = {}
-        Spawn.SurfaceCollision.find_floor(newMarioX.value, m.pos[1], newMarioZ.value, floorWrapper)
+        gLinker.SurfaceCollision.find_floor(newMarioX.value, m.pos[1], newMarioZ.value, floorWrapper)
         if (floorWrapper.floor != null) {
             //! Doesn't update mario's referenced floor (allows oob death when
             // an object pushes you into a steep slope while in a ground action)
@@ -657,6 +602,74 @@ const attack_object = (o, interaction) => {
     o.rawData[oInteractStatus] = attackType + (INT_STATUS_INTERACTED | INT_STATUS_WAS_ATTACKED)
     return attackType
 }
+
+////////////////////////////////////
+
+export const mario_stop_riding_object = (m) => {
+    if (m.riddenObj) {
+        m.riddenObj.rawData[oInteractStatus] = INT_STATUS_STOP_RIDING
+        stop_shell_music()
+        m.riddenObj = null
+    }
+}
+
+export const mario_grab_used_object = (m) => {
+    if (!m.heldObj) {
+        m.heldObj = m.usedObj
+        obj_set_held_state(m.heldObj, gLinker.behaviors.bhvCarrySomething3)
+    }
+}
+
+export const mario_drop_held_object = (m) => {
+    if (m.heldObj != null) {
+        if (m.heldObj.behavior == gLinker.behaviors.bhvKoopaShellUnderwater) {
+            stop_shell_music()
+        }
+
+        obj_set_held_state(m.heldObj, gLinker.behaviors.bhvCarrySomething4)
+
+        // ! When dropping an object instead of throwing it, it will be put at Mario's
+        // y-positon instead of the HOLP's y-position. This fact is often exploited when
+        // cloning objects.
+        m.heldObj.rawData[oPosX] = m.marioBodyState.heldObjLastPosition[0]
+        m.heldObj.rawData[oPosY] = m.pos[1]
+        m.heldObj.rawData[oPosZ] = m.marioBodyState.heldObjLastPosition[2]
+
+        m.heldObj.rawData[oMoveAngleYaw] = m.faceAngle[1]
+
+        m.heldObj = null
+    }
+}
+
+export const mario_throw_held_object = (m) => {
+    if (m.heldObj != null) {
+        if (m.heldObj.behavior == gLinker.behaviors.bhvKoopaShellUnderwater) {
+            stop_shell_music()
+        }
+
+        obj_set_held_state(m.heldObj, gLinker.behaviors.bhvCarrySomething5)
+
+        m.heldObj.rawData[oPosX] = m.marioBodyState.heldObjLastPosition[0] + 32.0 * sins(m.faceAngle[1])
+        m.heldObj.rawData[oPosY] = m.marioBodyState.heldObjLastPosition[1]
+        m.heldObj.rawData[oPosZ] = m.marioBodyState.heldObjLastPosition[2] + 32.0 * coss(m.faceAngle[1])
+
+        m.heldObj.rawData[oMoveAngleYaw] = m.faceAngle[1]
+
+        m.heldObj = null
+    }
+}
+
+export const mario_stop_riding_and_holding = (m) => {
+    mario_drop_held_object(m)
+    mario_stop_riding_object(m)
+
+    if (m.action == ACT_RIDING_HOOT) {
+        m.usedObj.rawData[oInteractStatus] = 0
+        m.usedObj.rawData[oHootMarioReleaseTime] = window.gGlobalTimer
+    }
+}
+
+////////////////////////////////////////////////////
 
 const bounce_off_object = (m, o, velY) => {
     m.pos[1] = o.rawData[oPosY] + o.hitboxHeight
@@ -700,15 +713,15 @@ const bounce_back_from_attack = (m, interaction) => {
 export const get_mario_cap_flag = (capObject) => {
     const script = capObject.behavior
 
-    // if (script == bhvNormalCap) {
-    //     return MARIO_NORMAL_CAP
-    // } else if (script == bhvMetalCap) {
-    //     return MARIO_METAL_CAP
-    // } else if (script == bhvWingCap) {
+    if (script == gLinker.behaviors.bhvNormalCap) {
+        return MARIO_NORMAL_CAP
+    } else if (script == gLinker.behaviors.bhvMetalCap) {
+        return MARIO_METAL_CAP
+    } else if (script == gLinker.behaviors.bhvWingCap) {
         return MARIO_WING_CAP
-    // } else if (script == bhvVanishCap) {
-    //     return MARIO_VANISH_CAP
-    // }
+    } else if (script == gLinker.behaviors.bhvVanishCap) {
+        return MARIO_VANISH_CAP
+    }
 
     return 0
 }
@@ -811,30 +824,7 @@ const determine_interaction = (m, o) => {
 }
 
 
-export const mario_drop_held_object = (m) => {
-    if (m.heldObj != null) {
-        if (m.heldObj.behavior == bhvKoopaShellUnderwater) {
-            // stop_shell_music()
-        }
-
-        obj_set_held_state(m.heldObj, bhvCarrySomething4)
-
-        // ! When dropping an object instead of throwing it, it will be put at Mario's
-        // y-positon instead of the HOLP's y-position. This fact is often exploited when
-        // cloning objects.
-        m.heldObj.oPosX = m.marioBodyState.heldObjLastPosition[0]
-        m.heldObj.oPosY = m.pos[1]
-        m.heldObj.oPosZ = m.marioBodyState.heldObjLastPosition[2]
-
-        m.heldObj.oMoveAngleYaw = m.faceAngle[1]
-
-        m.heldObj = null
-    }
-}
-
-
 const determine_knockback_action = (m) => {
-
     const angleToObject = mario_obj_angle_to_object(m, m.interactObj)
 
     let facingDYaw = int16( angleToObject - m.faceAngle[1] )

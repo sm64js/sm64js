@@ -1,243 +1,159 @@
+import * as _Linker from "./Linker"
+
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { CameraInstance as Camera           } from "./Camera"
 import * as CAMERA from "./Camera"
 
-import { set_mario_action,
-         set_mario_animation,
-         set_anim_to_frame,
-         drop_and_set_mario_action,
-         mario_set_forward_vel,
-         set_water_plunge_action,
-         is_anim_past_end,
-         mario_floor_is_slippery,
-         play_mario_sound,
-         play_mario_jump_sound,
-         play_mario_landing_sound,
-         play_mario_heavy_landing_sound,
-         play_sound_if_no_flag,
-         adjust_sound_for_speed,
-         is_anim_at_end,
-         MARIO_MARIO_SOUND_PLAYED       } from "./Mario"
-import { mario_drop_held_object,
-         mario_check_object_grab        } from "./Interaction"
-import { perform_air_step,
-         mario_bonk_reflection          } from "./MarioStep"
-import { play_sound } from "../audio/external"
-import { gAudioRandom } from "../audio/data"
-import { SOUND_MARIO_DOH,
-         SOUND_MARIO_UH,
-         SOUND_MARIO_WAH2,
-         SOUND_ACTION_THROW,
-         SOUND_ACTION_TERRAIN_JUMP,
-         SOUND_MARIO_WAAAOOOW,
-         SOUND_MARIO_HOOHOO,
-         SOUND_MARIO_YAHOO,
-         SOUND_MARIO_YAH_WAH_HOO,
-         SOUND_MARIO_PUNCH_HOO,
-         SOUND_MARIO_ON_FIRE,
-         SOUND_ACTION_SPIN,
-         SOUND_MARIO_ATTACKED,
-         SOUND_MARIO_OOOF2,
-         SOUND_ACTION_SIDE_FLIP_UNK,
-         SOUND_MARIO_HERE_WE_GO,
-         SOUND_ACTION_TWIRL,
-         SOUND_ACTION_UNKNOWN432,
-         SOUND_MARIO_GROUND_POUND_WAH,
-         SOUND_ACTION_TERRAIN_HEAVY_LANDING,
-         SOUND_MOVING_LAVA_BURN,
-         SOUND_GENERAL_BOING1,
-         SOUND_GENERAL_BOING2,
-         SOUND_ACTION_METAL_BONK,
-         SOUND_ACTION_BONK,
-         SOUND_ACTION_HIT,
-         SOUND_MOVING_FLYING,
-         SOUND_ACTION_FLYING_FAST,
-         SOUND_MARIO_YAHOO_WAHA_YIPPEE,
-         SOUND_ACTION_TERRAIN_LANDING   } from "../include/sounds"
-import { approach_number,
-         atan2s,
-         approach_f32,
-         approach_s32,
-         vec3f_copy,
-         vec3f_set,
-         vec3s_set,
-         sqrtf                          } from "../engine/math_util"
-import { s16,
-         sins,
-         coss                           } from "../utils"
-import { gSpecialTripleJump             } from "./SaveFile"
+import {
+    set_mario_action, set_mario_animation, set_anim_to_frame, drop_and_set_mario_action,
+    mario_set_forward_vel, set_water_plunge_action, is_anim_past_end, mario_floor_is_slippery,
+    play_mario_sound, play_mario_jump_sound, play_mario_landing_sound,
+    play_mario_heavy_landing_sound, play_sound_if_no_flag, adjust_sound_for_speed, is_anim_at_end,
+} from "./Mario"
 
-import { oMarioSteepJumpYaw             } from "../include/object_constants"
+import {
+    MARIO_MARIO_SOUND_PLAYED       
+} from "./Mario"
 
-import { TERRAIN_MASK,
-         TERRAIN_SNOW,
-         TERRAIN_SAND,
-         SURFACE_IS_NOT_HARD            } from "../include/surface_terrains"
+import {
+    mario_drop_held_object, mario_grab_used_object, mario_check_object_grab,
+    mario_throw_held_object
+ } from "./Interaction"
 
-import { GRAB_POS_LIGHT_OBJ,
-         MARIO_EYES_DEAD                } from "../include/mario_geo_switch_case_ids"
+import {
+    perform_air_step, mario_bonk_reflection
+} from "./MarioStep"
 
-import { ACT_AIR_HIT_WALL,
-         ACT_AIR_THROW,
-         ACT_AIR_THROW_LAND,
-         ACT_BACKFLIP,
-         ACT_BACKFLIP_LAND,
-         ACT_BACKWARD_AIR_KB,
-         ACT_BACKWARD_GROUND_KB,
-         ACT_BACKWARD_ROLLOUT,
-         ACT_BEGIN_SLIDING,
-         ACT_BURNING_FALL,
-         ACT_BURNING_GROUND,
-         ACT_BURNING_JUMP,
-         ACT_BUTT_SLIDE,
-         ACT_BUTT_SLIDE_AIR,
-         ACT_BUTT_STUCK_IN_GROUND,
-         ACT_CRAZY_BOX_BOUNCE,
-         ACT_DIVE,
-         ACT_DIVE_PICKING_UP,
-         ACT_DIVE_SLIDE,
-         ACT_DOUBLE_JUMP,
-         ACT_DOUBLE_JUMP_LAND,
-         ACT_FEET_STUCK_IN_GROUND,
-         ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION,
-         ACT_FLAG_INVULNERABLE,
-         ACT_FLYING,
-         ACT_FLYING_TRIPLE_JUMP,
-         ACT_FORWARD_AIR_KB,
-         ACT_FORWARD_GROUND_KB,
-         ACT_FORWARD_ROLLOUT,
-         ACT_FREEFALL,
-         ACT_FREEFALL_LAND,
-         ACT_FREEFALL_LAND_STOP,
-         ACT_GETTING_BLOWN,
-         ACT_GROUND_POUND,
-         ACT_GROUND_POUND_LAND,
-         ACT_HARD_BACKWARD_AIR_KB,
-         ACT_HARD_BACKWARD_GROUND_KB,
-         ACT_HARD_FORWARD_AIR_KB,
-         ACT_HARD_FORWARD_GROUND_KB,
-         ACT_HEAD_STUCK_IN_GROUND,
-         ACT_HOLD_BUTT_SLIDE,
-         ACT_HOLD_BUTT_SLIDE_AIR,
-         ACT_HOLD_FREEFALL,
-         ACT_HOLD_FREEFALL_LAND,
-         ACT_HOLD_JUMP,
-         ACT_HOLD_JUMP_LAND,
-         ACT_HOLD_WATER_JUMP,
-         ACT_JUMP,
-         ACT_JUMP_KICK,
-         ACT_JUMP_LAND,
-         ACT_LAVA_BOOST,
-         ACT_LAVA_BOOST_LAND,
-         ACT_LEDGE_GRAB,
-         ACT_LONG_JUMP,
-         ACT_LONG_JUMP_LAND,
-         ACT_RIDING_HOOT,
-         ACT_RIDING_SHELL_FALL,
-         ACT_RIDING_SHELL_GROUND,
-         ACT_RIDING_SHELL_JUMP,
-         ACT_SHOT_FROM_CANNON,
-         ACT_SIDE_FLIP,
-         ACT_SIDE_FLIP_LAND,
-         ACT_SLIDE_KICK,
-         ACT_SLIDE_KICK_SLIDE,
-         ACT_SOFT_BONK,
-         ACT_SPECIAL_TRIPLE_JUMP,
-         ACT_SQUISHED,
-         ACT_START_HANGING,
-         ACT_STEEP_JUMP,
-         ACT_STOMACH_SLIDE,
-         ACT_THROWN_BACKWARD,
-         ACT_THROWN_FORWARD,
-         ACT_TOP_OF_POLE_JUMP,
-         ACT_TRIPLE_JUMP,
-         ACT_TRIPLE_JUMP_LAND,
-         ACT_TWIRL_LAND,
-         ACT_TWIRLING,
-         ACT_VERTICAL_WIND,
-         ACT_WALL_KICK_AIR,
-         ACT_WATER_JUMP,
+import {
+    play_sound
+} from "../audio/external"
 
-         MARIO_ACTION_SOUND_PLAYED,
-         MARIO_ANIM_AIR_FORWARD_KB,
-         MARIO_ANIM_AIR_KICK,
-         MARIO_ANIM_AIRBORNE_ON_STOMACH,
-         MARIO_ANIM_BACKFLIP,
-         MARIO_ANIM_BACKWARD_AIR_KB,
-         MARIO_ANIM_BACKWARD_SPINNING,
-         MARIO_ANIM_DIVE,
-         MARIO_ANIM_DOUBLE_JUMP_FALL,
-         MARIO_ANIM_DOUBLE_JUMP_RISE,
-         MARIO_ANIM_FALL_FROM_SLIDE,
-         MARIO_ANIM_FALL_FROM_SLIDE_KICK,
-         MARIO_ANIM_FALL_FROM_SLIDING_WITH_LIGHT_OBJ,
-         MARIO_ANIM_FALL_WITH_LIGHT_OBJ,
-         MARIO_ANIM_FAST_LONGJUMP,
-         MARIO_ANIM_FIRE_LAVA_BURN,
-         MARIO_ANIM_FLY_FROM_CANNON,
-         MARIO_ANIM_FORWARD_SPINNING,
-         MARIO_ANIM_FORWARD_SPINNING_FLIP,
-         MARIO_ANIM_GENERAL_FALL,
-         MARIO_ANIM_GROUND_POUND,
-         MARIO_ANIM_HANDSTAND_JUMP,
-         MARIO_ANIM_HANG_ON_CEILING,
-         MARIO_ANIM_HANG_ON_OWL,
-         MARIO_ANIM_IDLE_ON_LEDGE,
-         MARIO_ANIM_JUMP_RIDING_SHELL,
-         MARIO_ANIM_JUMP_WITH_LIGHT_OBJ,
-         MARIO_ANIM_SINGLE_JUMP,
-         MARIO_ANIM_SLIDE,
-         MARIO_ANIM_SLIDE_KICK,
-         MARIO_ANIM_SLIDEFLIP,
-         MARIO_ANIM_SLIDEJUMP,
-         MARIO_ANIM_SLIDING_ON_BOTTOM_WITH_LIGHT_OBJ,
-         MARIO_ANIM_SLOW_LONGJUMP,
-         MARIO_ANIM_START_GROUND_POUND,
-         MARIO_ANIM_START_TWIRL,
-         MARIO_ANIM_START_WALLKICK,
-         MARIO_ANIM_THROW_LIGHT_OBJECT,
-         MARIO_ANIM_TRIPLE_JUMP,
-         MARIO_ANIM_TRIPLE_JUMP_FLY,
-         MARIO_ANIM_TRIPLE_JUMP_GROUND_POUND,
-         MARIO_ANIM_TWIRL,
-         MARIO_ANIM_WING_CAP_FLY,
-         MARIO_CAP_ON_HEAD,
-         MARIO_KICKING,
-         MARIO_METAL_CAP,
-         MARIO_SOUND_PLAYED,
-         MARIO_UNKNOWN_18,
-         MARIO_WING_CAP,
+import {
+    gAudioRandom
+} from "../audio/data"
 
-         AIR_STEP_CHECK_HANG,
-         AIR_STEP_CHECK_LEDGE_GRAB,
-         AIR_STEP_GRABBED_CEILING,
-         AIR_STEP_GRABBED_LEDGE,
-         AIR_STEP_HIT_LAVA_WALL,
-         AIR_STEP_HIT_WALL,
-         AIR_STEP_LANDED,
-         AIR_STEP_NONE,
+import {
+    approach_f32, approach_number, approach_s32, atan2s, sqrtf, vec3f_copy, vec3f_set, vec3s_set,
+} from "../engine/math_util"
 
-         INPUT_A_PRESSED,
-         INPUT_B_PRESSED,
-         INPUT_Z_PRESSED,
-         INPUT_NONZERO_ANALOG,
-         INPUT_SQUISHED,                } from "./Mario"
+import {
+    coss, s16, sins,
+} from "../utils"
 
-import { PARTICLE_DUST,
-         PARTICLE_VERTICAL_STAR,
-         PARTICLE_SPARKLES,
-         PARTICLE_HORIZONTAL_STAR,
-         PARTICLE_FIRE,
-         PARTICLE_MIST_CIRCLE           } from "../include/mario_constants"
+import {
+    gSpecialTripleJump
+} from "./SaveFile"
 
-import { SURFACE_BURNING,
-         SURFACE_HORIZONTAL_WIND,
-         SURFACE_VERTICAL_WIND          } from "../include/surface_terrains"
+import {
+    oAction, oPrevAction, oSubAction, oTimer, oFlags,
+    oBehParams, oBehParams2ndByte,
+    oAnimations, oAnimState, oActiveParticleFlags,
+    oIntangibleTimer, oInteractionSubtype, oInteractStatus, oInteractType,
+    oHealth, oHeldState,
 
-import { INT_STATUS_MARIO_DROP_OBJECT,
-         INT_STATUS_STOP_RIDING,
-         INT_SUBTYPE_HOLDABLE_NPC,
-         INT_STATUS_MARIO_UNK7          } from "./Interaction"
+    oPosX, oPosY, oPosZ,
+    oHomeX, oHomeY, oHomeZ, oAngleToHome,
+    oVelX, oVelY, oVelZ,
+    oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ,
+    oGraphYOffset,
+
+    oAngleVelPitch, oAngleVelRoll, oAngleVelYaw,
+    oForwardVel, oForwardVelS32,
+    oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw,
+    oDrawingDistance, oOpacity,
+
+    oBounciness, oBuoyancy, oDragStrength, oFriction, oGravity,
+    oCollisionDistance, oDamageOrCoinValue, oNumLootCoins,
+    oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oMoveFlags,
+    oWallAngle, oWallHitboxRadius,
+
+    oFloor, oFloorHeight, oFloorRoom, oFloorType, oRoom,
+    oAngleToMario, oDistanceToMario,
+
+    oDeathSound, oSoundStateID,
+    oDialogResponse, oDialogState,
+
+    oUnk1A8, oUnk94, oUnkBC, oUnkC0
+} from "../include/object_constants"
+
+import {
+    GRAB_POS_LIGHT_OBJ, MARIO_EYES_DEAD
+} from "../include/mario_geo_switch_case_ids"
+
+import {
+    ACT_AIR_HIT_WALL, ACT_AIR_THROW, ACT_AIR_THROW_LAND, ACT_BACKFLIP, ACT_BACKFLIP_LAND,
+    ACT_BACKWARD_AIR_KB, ACT_BACKWARD_GROUND_KB, ACT_BACKWARD_ROLLOUT, ACT_BEGIN_SLIDING,
+    ACT_BURNING_FALL, ACT_BURNING_GROUND, ACT_BURNING_JUMP, ACT_BUTT_SLIDE, ACT_BUTT_SLIDE_AIR,
+    ACT_BUTT_STUCK_IN_GROUND, ACT_CRAZY_BOX_BOUNCE, ACT_DIVE, ACT_DIVE_PICKING_UP, ACT_DIVE_SLIDE,
+    ACT_DOUBLE_JUMP, ACT_DOUBLE_JUMP_LAND, ACT_FEET_STUCK_IN_GROUND,
+    ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION, ACT_FLAG_INVULNERABLE, ACT_FLYING, ACT_FLYING_TRIPLE_JUMP,
+    ACT_FORWARD_AIR_KB, ACT_FORWARD_GROUND_KB, ACT_FORWARD_ROLLOUT, ACT_FREEFALL, ACT_FREEFALL_LAND,
+    ACT_FREEFALL_LAND_STOP, ACT_GETTING_BLOWN, ACT_GROUND_POUND, ACT_GROUND_POUND_LAND,
+    ACT_HARD_BACKWARD_AIR_KB, ACT_HARD_BACKWARD_GROUND_KB, ACT_HARD_FORWARD_AIR_KB,
+    ACT_HARD_FORWARD_GROUND_KB, ACT_HEAD_STUCK_IN_GROUND, ACT_HOLD_BUTT_SLIDE,
+    ACT_HOLD_BUTT_SLIDE_AIR, ACT_HOLD_FREEFALL, ACT_HOLD_FREEFALL_LAND, ACT_HOLD_JUMP,
+    ACT_HOLD_JUMP_LAND, ACT_HOLD_WATER_JUMP, ACT_JUMP, ACT_JUMP_KICK, ACT_JUMP_LAND, ACT_LAVA_BOOST,
+    ACT_LAVA_BOOST_LAND, ACT_LEDGE_GRAB, ACT_LONG_JUMP, ACT_LONG_JUMP_LAND, ACT_RIDING_HOOT,
+    ACT_RIDING_SHELL_FALL, ACT_RIDING_SHELL_GROUND, ACT_RIDING_SHELL_JUMP, ACT_SHOT_FROM_CANNON,
+    ACT_SIDE_FLIP, ACT_SIDE_FLIP_LAND, ACT_SLIDE_KICK, ACT_SLIDE_KICK_SLIDE, ACT_SOFT_BONK,
+    ACT_SPECIAL_TRIPLE_JUMP, ACT_SQUISHED, ACT_START_HANGING, ACT_STEEP_JUMP, ACT_STOMACH_SLIDE,
+    ACT_THROWN_BACKWARD, ACT_THROWN_FORWARD, ACT_TOP_OF_POLE_JUMP, ACT_TRIPLE_JUMP,
+    ACT_TRIPLE_JUMP_LAND, ACT_TWIRL_LAND, ACT_TWIRLING, ACT_VERTICAL_WIND, ACT_WALL_KICK_AIR,
+    ACT_WATER_JUMP,
+
+    MARIO_ACTION_SOUND_PLAYED, MARIO_ANIM_AIR_FORWARD_KB, MARIO_ANIM_AIR_KICK,
+    MARIO_ANIM_AIRBORNE_ON_STOMACH, MARIO_ANIM_BACKFLIP, MARIO_ANIM_BACKWARD_AIR_KB,
+    MARIO_ANIM_BACKWARD_SPINNING, MARIO_ANIM_DIVE, MARIO_ANIM_DOUBLE_JUMP_FALL,
+    MARIO_ANIM_DOUBLE_JUMP_RISE, MARIO_ANIM_FALL_FROM_SLIDE, MARIO_ANIM_FALL_FROM_SLIDE_KICK,
+    MARIO_ANIM_FALL_FROM_SLIDING_WITH_LIGHT_OBJ, MARIO_ANIM_FALL_WITH_LIGHT_OBJ,
+    MARIO_ANIM_FAST_LONGJUMP, MARIO_ANIM_FIRE_LAVA_BURN, MARIO_ANIM_FLY_FROM_CANNON,
+    MARIO_ANIM_FORWARD_SPINNING, MARIO_ANIM_FORWARD_SPINNING_FLIP, MARIO_ANIM_GENERAL_FALL,
+    MARIO_ANIM_GROUND_POUND, MARIO_ANIM_HANDSTAND_JUMP, MARIO_ANIM_HANG_ON_CEILING,
+    MARIO_ANIM_HANG_ON_OWL, MARIO_ANIM_IDLE_ON_LEDGE, MARIO_ANIM_JUMP_RIDING_SHELL,
+    MARIO_ANIM_JUMP_WITH_LIGHT_OBJ, MARIO_ANIM_SINGLE_JUMP, MARIO_ANIM_SLIDE, MARIO_ANIM_SLIDE_KICK,
+    MARIO_ANIM_SLIDEFLIP, MARIO_ANIM_SLIDEJUMP, MARIO_ANIM_SLIDING_ON_BOTTOM_WITH_LIGHT_OBJ,
+    MARIO_ANIM_SLOW_LONGJUMP, MARIO_ANIM_START_GROUND_POUND, MARIO_ANIM_START_TWIRL,
+    MARIO_ANIM_START_WALLKICK, MARIO_ANIM_THROW_LIGHT_OBJECT, MARIO_ANIM_TRIPLE_JUMP,
+    MARIO_ANIM_TRIPLE_JUMP_FLY, MARIO_ANIM_TRIPLE_JUMP_GROUND_POUND, MARIO_ANIM_TWIRL,
+    MARIO_ANIM_WING_CAP_FLY,
+
+    MARIO_CAP_ON_HEAD, MARIO_KICKING, MARIO_METAL_CAP, MARIO_SOUND_PLAYED, MARIO_UNKNOWN_18,
+    MARIO_WING_CAP,
+
+    AIR_STEP_CHECK_HANG, AIR_STEP_CHECK_LEDGE_GRAB, AIR_STEP_GRABBED_CEILING,
+    AIR_STEP_GRABBED_LEDGE, AIR_STEP_HIT_LAVA_WALL, AIR_STEP_HIT_WALL, AIR_STEP_LANDED,
+    AIR_STEP_NONE,
+
+    INPUT_A_PRESSED, INPUT_B_PRESSED, INPUT_Z_PRESSED, INPUT_NONZERO_ANALOG, INPUT_SQUISHED,
+} from "./Mario"
+
+import {
+    PARTICLE_DUST, PARTICLE_VERTICAL_STAR, PARTICLE_SPARKLES, PARTICLE_HORIZONTAL_STAR,
+    PARTICLE_FIRE, PARTICLE_MIST_CIRCLE
+} from "../include/mario_constants"
+
+import {
+    SURFACE_IS_NOT_HARD, TERRAIN_MASK, TERRAIN_SAND, TERRAIN_SNOW, SURFACE_BURNING,
+SURFACE_HORIZONTAL_WIND, SURFACE_VERTICAL_WIND
+} from "../include/surface_terrains"
+
+import {
+    INT_STATUS_MARIO_DROP_OBJECT, INT_STATUS_STOP_RIDING, INT_SUBTYPE_HOLDABLE_NPC,
+    INT_STATUS_MARIO_UNK7
+} from "./Interaction"
+
+import {
+    SOUND_ACTION_BONK, SOUND_ACTION_FLYING_FAST, SOUND_ACTION_HIT, SOUND_ACTION_METAL_BONK,
+    SOUND_ACTION_SIDE_FLIP_UNK, SOUND_ACTION_SPIN, SOUND_ACTION_TERRAIN_HEAVY_LANDING,
+    SOUND_ACTION_TERRAIN_JUMP, SOUND_ACTION_TERRAIN_LANDING, SOUND_ACTION_THROW, SOUND_ACTION_TWIRL,
+    SOUND_ACTION_UNKNOWN432, SOUND_GENERAL_BOING1, SOUND_GENERAL_BOING2, SOUND_MARIO_ATTACKED,
+    SOUND_MARIO_DOH, SOUND_MARIO_GROUND_POUND_WAH, SOUND_MARIO_HERE_WE_GO, SOUND_MARIO_HOOHOO,
+    SOUND_MARIO_ON_FIRE, SOUND_MARIO_OOOF2, SOUND_MARIO_PUNCH_HOO, SOUND_MARIO_UH,
+    SOUND_MARIO_WAAAOOOW, SOUND_MARIO_WAH2, SOUND_MARIO_YAH_WAH_HOO, SOUND_MARIO_YAHOO,
+    SOUND_MARIO_YAHOO_WAHA_YIPPEE, SOUND_MOVING_FLYING, SOUND_MOVING_LAVA_BURN,
+} from "../include/sounds"
+
+import { oMarioSteepJumpYaw } from "../include/object_constants"
 
 
 //---------------------------------------------------------------------------
@@ -1244,8 +1160,7 @@ export const act_crazy_box_bounce = (m) => {
     return 0
 }
 
-export const common_air_knockback_step = (m, landAction, hardFallAction, animation,
-                              speed) => {
+export const common_air_knockback_step = (m, landAction, hardFallAction, animation, speed) => {
     let stepResult
 
     mario_set_forward_vel(m, speed)

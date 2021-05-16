@@ -38,7 +38,7 @@ import { SOUND_OBJ_CANNON1,
 import { GRAPH_RENDER_ACTIVE           } from "../../engine/graph_node"
 
 
-export const bhv_cannon_base_unused_loop = () => {
+const bhv_cannon_base_unused_loop = () => {
     const o = O.gCurrentObject
     o.rawData[OC.oPosY] += o.rawData[OC.oVelY]
 }
@@ -154,7 +154,7 @@ const sOpenedCannonActions = [ opened_cannon_act_0, opened_cannon_act_1, opened_
                                opened_cannon_act_3, opened_cannon_act_4, opened_cannon_act_5,
                                opened_cannon_act_6 ]
 
-export const bhv_cannon_base_loop = () => {
+const bhv_cannon_base_loop = () => {
     const o = O.gCurrentObject
     cur_obj_call_action_function(sOpenedCannonActions)
     if (o.rawData[OC.oCannonUnkF8]) {
@@ -163,7 +163,7 @@ export const bhv_cannon_base_loop = () => {
     o.rawData[OC.oInteractStatus] = 0
 }
 
-export const bhv_cannon_barrel_loop = () => {
+const bhv_cannon_barrel_loop = () => {
     const o = O.gCurrentObject
     const parent = o.parentObj
     if (parent.header.gfx.node.flags & GRAPH_RENDER_ACTIVE) {
@@ -175,3 +175,7 @@ export const bhv_cannon_barrel_loop = () => {
         cur_obj_disable_rendering()
     }
 }
+
+gLinker.bhv_cannon_base_unused_loop = bhv_cannon_base_unused_loop
+gLinker.bhv_cannon_base_loop = bhv_cannon_base_loop
+gLinker.bhv_cannon_barrel_loop = bhv_cannon_barrel_loop

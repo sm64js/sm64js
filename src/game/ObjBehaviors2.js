@@ -1,4 +1,9 @@
-import { oFlags, OBJ_FLAG_30, oInteractType, oDamageOrCoinValue, oHealth, oNumLootCoins, oAnimState, oAction, OBJ_ACT_HORIZONTAL_KNOCKBACK, OBJ_ACT_VERTICAL_KNOCKBACK, OBJ_ACT_SQUISHED, oInteractStatus, oTimer, oForwardVel, oVelY, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveAngleYaw, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_HIT_WALL, OBJ_MOVE_ABOVE_LAVA, oHomeX, oHomeY, oHomeZ, oPosX, oPosY, oPosZ, oDistanceToMario, oAngleToMario, OBJ_MOVE_HIT_EDGE, oMoveAnglePitch, oFaceAnglePitch, oDeathSound } from "../include/object_constants"
+import { oFlags, OBJ_FLAG_30, oInteractType, oDamageOrCoinValue, oHealth, oNumLootCoins, oAnimState,
+         oAction, OBJ_ACT_HORIZONTAL_KNOCKBACK, OBJ_ACT_VERTICAL_KNOCKBACK, OBJ_ACT_SQUISHED, oInteractStatus,
+         oTimer, oForwardVel, oVelY, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveAngleYaw, oMoveFlags,
+         OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_HIT_WALL, OBJ_MOVE_ABOVE_LAVA,
+         oHomeX, oHomeY, oHomeZ, oPosX, oPosY, oPosZ, oDistanceToMario, oAngleToMario, OBJ_MOVE_HIT_EDGE,
+         oMoveAnglePitch, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oDeathSound } from "../include/object_constants"
 
 import { cur_obj_become_tangible, cur_obj_extend_animation_if_at_end, cur_obj_become_intangible, cur_obj_hide, obj_mark_for_deletion, obj_angle_to_object, cur_obj_update_floor_and_walls, cur_obj_move_standard, abs_angle_diff, cur_obj_rotate_yaw_toward, cur_obj_reflect_move_angle_off_wall, approach_symmetric, obj_spawn_loot_yellow_coins, spawn_mist_particles, approach_s16_symmetric} from "./ObjectHelpers"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
@@ -20,6 +25,9 @@ export const ATTACK_HANDLER_SQUISHED_WITH_BLUE_COIN = 8
 
 //this lived above random_linear_offset in the source,
 export const obj_roll_to_match_yaw_turn = (targetYaw, maxRoll, rollSpeed) => {
+
+    const o = ObjectListProc.gCurrentObject
+
     const targetRoll = o.rawData[oMoveAngleYaw] - targetYaw;
     const clampReturn = clamp_s16(targetRoll, -maxRoll, maxRoll);
     obj_face_roll_approach(clampReturn, rollSpeed);
@@ -31,13 +39,15 @@ export const random_linear_offset = (base, range) => {
 }
 
 
-export const approach_number_ptr = (px, target, delta) => {
-    if (px.value > target) delta = -delta
+// JS NOTE: "ptr" is given as an indexed object <o> and an index <px>
+// Try this style out to eliminate the need for a wrapper.
+export const approach_number_ptr = (o, px, target, delta) => {
+    if (o[px] > target) delta = -delta
 
-    px.value += delta
+    o[px] += delta
 
-    if ((px.value - target) * delta >= 0) {
-        px.value = target
+    if ((o[px] - target) * delta >= 0) {
+        o[px] = target
         return 1
     }
     return 0
@@ -96,11 +106,22 @@ export const obj_face_roll_approach = (targetRoll, deltaRoll) => {
     const o = ObjectListProc.gCurrentObject
     o.rawData[oFaceAngleRoll] = approach_s16_symmetric(o.rawData[oFaceAngleRoll], targetRoll, deltaRoll);
 
-    if ( o.rawData[oFaceAngleRoll] == targetRoll) {
-        return 1;
+    if (o.rawData[oFaceAngleRoll] == targetRoll) {
+        return 1
     }
 
-    return 0;
+    return 0
+}
+
+export const obj_face_yaw_approach = (targetYaw, deltaYaw) => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oFaceAngleYaw] = approach_s16_symmetric(o.rawData[oFaceAngleYaw], targetYaw, deltaYaw)
+
+    if (o.rawData[oFaceAngleYaw] == targetYaw) {
+        return 1
+    }
+
+    return 0
 }
 
 export const obj_get_pitch_from_vel = () => {
@@ -141,9 +162,7 @@ export const obj_random_fixed_turn = (delta) => {
 export const obj_forward_vel_approach = (target, delta) => {
     const o = ObjectListProc.gCurrentObject
 
-    const wrapper = { value: o.rawData[oForwardVel] }
-    const result = approach_number_ptr(wrapper, target, delta)
-    o.rawData[oForwardVel] = wrapper.value
+    const result = approach_number_ptr(o.rawData, oForwardVel, target, delta)
 
     return result
 }
@@ -309,9 +328,7 @@ export const obj_act_squished = (baseScale) => {
         cur_obj_extend_animation_if_at_end()
     }
 
-    const wrapper = { value: o.header.gfx.scale[1] }
-    const result = approach_number_ptr(wrapper, targetScaleY, baseScale * 0.14)
-    o.header.gfx.scale[1] = wrapper.value
+    const result = approach_number_ptr(o.header.gfx.scale, 1, targetScaleY, baseScale * 0.14)
     if (result) {
         o.header.gfx.scale[0] = baseScale * 2.0 - o.header.gfx.scale[1]
         o.header.gfx.scale[2] = baseScale * 2.0 - o.header.gfx.scale[1]

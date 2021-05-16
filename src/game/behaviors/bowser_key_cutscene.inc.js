@@ -6,7 +6,7 @@ import { oBowserKeyScale } from "../../include/object_constants"
 export const geo_scale_bowser_key = (run, node) => {
     if (run == 1) {
         let sp4 = GeoRenderer.gCurGraphNodeObject
-        node.next.scale = sp4.rawData[oBowserKeyScale]
+        node.node.next.scale = sp4.rawData[oBowserKeyScale]
     }
     return 0
 }

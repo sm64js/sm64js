@@ -64,10 +64,9 @@ class MarioMisc {
 
     geo_draw_mario_head_goddard(callContext, node) {
         let gfx = []
-        const asGenerated = node.wrapper
         if (callContext == GEO_CONTEXT_CREATE) { // Create
         } else if (callContext == GEO_CONTEXT_RENDER) { // Render
-            gfx = GoddardRenderer.gdm_gettestdl(asGenerated.param)
+            gfx = GoddardRenderer.gdm_gettestdl(node.parameter)
             Game.D_8032C6A0_vsyncFunc = GoddardRenderer.gd_vblank
             Game.D_8032C6A0_classObject = GoddardRenderer
         }

@@ -250,8 +250,6 @@ const movtex_gen_quads_id = (id, y, movetexQuadsSegmented) => {
 }
 
 export const geo_movtex_draw_water_regions = (callContext, node) => {
-
-    const asGenerated = node.wrapper
     const gfx = []
 
     if (callContext == GEO_CONTEXT_RENDER) {
@@ -259,19 +257,19 @@ export const geo_movtex_draw_water_regions = (callContext, node) => {
         if (ObjectListProc.gEnvironmentRegions == undefined) return gfx
         const numWaterBoxes = ObjectListProc.gEnvironmentRegions[0]
 
-        if (asGenerated.param == JRB_MOVTEX_INTIAL_MIST) {
+        if (node.parameter == JRB_MOVTEX_INTIAL_MIST) {
             throw "not implemented"
-        } else if (asGenerated.param == HMC_MOVTEX_TOXIC_MAZE_MIST) {
+        } else if (node.parameter == HMC_MOVTEX_TOXIC_MAZE_MIST) {
             gMovtexVtxColor = MOVTEX_VTX_COLOR_YELLOW
-        } else if (asGenerated.param == SSL_MOVTEX_TOXBOX_QUICKSAND_MIST) {
+        } else if (node.parameter == SSL_MOVTEX_TOXBOX_QUICKSAND_MIST) {
             gMovtexVtxColor = MOVTEX_VTX_COLOR_RED
         }
-        const quadCollection = get_quad_collection_from_id(asGenerated.param)
+        const quadCollection = get_quad_collection_from_id(node.parameter)
         if (quadCollection == null) return gfx
 
-        node.flags = (node.flags & 0xFF) | (GeoLayout.LAYER_TRANSPARENT_INTER << 8)
+        node.node.flags = (node.node.flags & 0xFF) | (GeoLayout.LAYER_TRANSPARENT_INTER << 8)
 
-        movtex_change_texture_format(asGenerated.param, gfx)
+        movtex_change_texture_format(node.parameter, gfx)
         gMovetexLastTextureId = -1
 
         for (let i = 0; i < numWaterBoxes; i++) {
@@ -366,15 +364,13 @@ const movtex_gen_list = (movtexVerts, movtexList, attrLayout) => {
 }
 
 export const geo_movtex_draw_nocolor = (callContext, node) => {
-
-    const asGenerated = node.wrapper
     let gfx = []
 
     if (callContext == GEO_CONTEXT_RENDER) {
         let i = 0
         while (gMovtexNonColored[i].movtexVerts != 0) {
-            if (gMovtexNonColored[i].geoId == asGenerated.param) {
-                node.flags = (node.flags & 0xFF) | (gMovtexNonColored[i].layer << 8)
+            if (gMovtexNonColored[i].geoId == node.parameter) {
+                node.node.flags = (node.node.flags & 0xFF) | (gMovtexNonColored[i].layer << 8)
                 const movtexVerts = gMovtexNonColored[i].movtexVerts
                 update_moving_texture_offset(movtexVerts, MOVTEX_ATTR_NOCOLOR_S)
                 gfx = movtex_gen_list(movtexVerts, gMovtexNonColored[i], MOVTEX_LAYOUT_NOCOLOR)

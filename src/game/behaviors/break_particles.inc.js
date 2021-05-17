@@ -1,25 +1,17 @@
-import { ObjectListProcessorInstance as O } from "../ObjectListProcessor"
-
-import { obj_scale, spawn_object } from "../ObjectHelpers"
-
-import {
-    oAnimState, oPosY, oMoveAngleYaw, oFaceAngleYaw, oFaceAnglePitch, oVelY,
-    oAngleVelPitch, oAngleVelYaw, oForwardVel
-} from "../../include/object_constants"
-
-import { bhvBreakBoxTriangle } from "../BehaviorData"
+import { obj_scale, spawn_object, random_f32_around_zero } from "../ObjectHelpers"
 import { random_u16, random_float, s16 } from "../../utils"
-import { random_f32_around_zero } from "../ObjectHelpers"
+import { oAnimState, oPosY, oMoveAngleYaw, oFaceAngleYaw, oFaceAnglePitch, oVelY, oAngleVelPitch,
+oAngleVelYaw, oForwardVel } from "../../include/object_constants"
 import { MODEL_DIRT_ANIMATION } from "../../include/model_ids"
 
 
 export const spawn_triangle_break_particles = (numTris, triModel, triSize, triAnimState) => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     let triangle
     let i
 
     for (i = 0; i < numTris; i++) {
-        triangle = spawn_object(o, triModel, bhvBreakBoxTriangle)
+        triangle = spawn_object(o, triModel, 'bhvBreakBoxTriangle')
         triangle.rawData[oAnimState] = triAnimState
         triangle.rawData[oPosY] += 100.0
         triangle.rawData[oMoveAngleYaw] = random_u16()

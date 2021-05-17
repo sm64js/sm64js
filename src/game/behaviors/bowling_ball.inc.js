@@ -1,56 +1,30 @@
 // bowling_ball.c.inc
 import * as _Linker from "../../game/Linker"
-import { ObjectListProcessorInstance as O } from "../ObjectListProcessor"
-import { spawn_object, cur_obj_hide, cur_obj_set_pos_via_transform,
-    cur_obj_unhide, obj_mark_for_deletion, obj_copy_pos, obj_copy_scale,
-    cur_obj_push_mario_away_from_cylinder, lateral_dist_between_objects,
-    spawn_object_relative, spawn_mist_particles, approach_s16_symmetric,
-    cur_obj_move_standard, cur_obj_spawn_particles, cur_obj_follow_path,
-    cur_obj_update_floor_and_walls, cur_obj_become_intangible,
-    cur_obj_become_tangible } from "../ObjectHelpers"
-import { is_point_within_radius_of_mario, object_step, 
-         set_object_visibility,
-         OBJ_COL_FLAG_GROUNDED, OBJ_COL_FLAGS_LANDED } from "../ObjBehaviors"
+import { spawn_object, cur_obj_hide, cur_obj_set_pos_via_transform, cur_obj_unhide,
+obj_mark_for_deletion, obj_copy_pos, obj_copy_scale, cur_obj_push_mario_away_from_cylinder,
+lateral_dist_between_objects, spawn_object_relative, spawn_mist_particles, approach_s16_symmetric,
+cur_obj_move_standard, cur_obj_spawn_particles, cur_obj_follow_path, cur_obj_update_floor_and_walls,
+cur_obj_become_intangible, cur_obj_become_tangible } from "../ObjectHelpers"
+import { is_point_within_radius_of_mario, object_step,  set_object_visibility,
+OBJ_COL_FLAG_GROUNDED, OBJ_COL_FLAGS_LANDED } from "../ObjBehaviors"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { random_float } from "../../utils"
 import { spawn_mist_particles_variable } from "./white_puff.inc"
-
-import { oBBallSpawnerMaxSpawnDist,
-         oBBallSpawnerSpawnOdds,
-         oBBallSpawnerPeriodMinus1,
-         oPathedStartWaypoint,
-         oBowlingBallTargetYaw,
-         oPathedTargetYaw,
-         oPosX, oPosY, oPosZ,
-         oMoveAngleYaw,
-         oForwardVel,
-         oVelY,
-         oGraphYOffset,
-         oAction,
-         oTimer,
-         oInteractStatus,
-         oBehParams2ndByte,
-         oGravity, oFriction, oBuoyancy,
-
-         ACTIVE_FLAG_DEACTIVATED
-} from "../../include/object_constants"
-
-import { MODEL_BOWLING_BALL } from "../../include/model_ids"
-import { bhvBowlingBall } from "../BehaviorData"
-
-import { SOUND_GENERAL_QUIET_POUND1_LOWPRIO, SOUND_ENV_UNKNOWN2 } from "../../include/sounds"
 import { cur_obj_play_sound_1, cur_obj_play_sound_2 } from "../SpawnSound"
-
-import { CameraInstance as Camera } from "../Camera"
+import { oBBallSpawnerMaxSpawnDist, oBBallSpawnerSpawnOdds, oBBallSpawnerPeriodMinus1,
+oPathedStartWaypoint, oBowlingBallTargetYaw, oPathedTargetYaw, oPosX, oPosY, oPosZ, oMoveAngleYaw,
+oForwardVel, oVelY, oGraphYOffset, oAction, oTimer, oInteractStatus, oBehParams2ndByte, oGravity,
+oFriction, oBuoyancy,
+ACTIVE_FLAG_DEACTIVATED } from "../../include/object_constants"
+import { MODEL_BOWLING_BALL } from "../../include/model_ids"
+import { SOUND_GENERAL_QUIET_POUND1_LOWPRIO, SOUND_ENV_UNKNOWN2 } from "../../include/sounds"
 import { SHAKE_POS_BOWLING_BALL } from "../Camera"
-
 import { INTERACT_DAMAGE, INT_STATUS_INTERACTED } from "../Interaction"
-
-import { bob_seg7_metal_ball_path0, bob_seg7_metal_ball_path1 } from "../../levels/bob/areas/1/trajectory.inc"
-
 import { GRAPH_RENDER_INVISIBLE } from "../../engine/graph_node"
-
 import { TRAJECTORY_POS, TRAJECTORY_END } from "../../include/surface_terrains"
+import { bob_seg7_metal_ball_path0, bob_seg7_metal_ball_path1 } from
+"../../levels/bob/areas/1/trajectory.inc"
+
 
 /* Bowling Ball */
     /* oAction */
@@ -111,14 +85,14 @@ const sThiTinyMetalBallTraj = [
 ]
 
 const bhv_bowling_ball_init = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oGravity] = 5.5
     o.rawData[oFriction] = 1.0
     o.rawData[oBuoyancy] = 2.0
 }
 
 const bowling_ball_set_hitbox = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     obj_set_hitbox(o, sBowlingBallHitbox)
 
     if (o.rawData[oInteractStatus] & INT_STATUS_INTERACTED) {
@@ -127,7 +101,7 @@ const bowling_ball_set_hitbox = () => {
 }
 
 const bowling_ball_set_waypoints = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     switch (o.rawData[oBehParams2ndByte]) {
         case BBALL_BP_STYPE_BOB_UPPER:
             o.rawData[oPathedStartWaypoint] = bob_seg7_metal_ball_path0
@@ -152,7 +126,7 @@ const bowling_ball_set_waypoints = () => {
 }
 
 const bhv_bowling_ball_roll_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     let /*s16*/ collisionFlags
     let /*s32*/ pathStatus
 
@@ -183,7 +157,7 @@ const bhv_bowling_ball_roll_loop = () => {
 }
 
 const bhv_bowling_ball_initializeLoop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     bowling_ball_set_waypoints()
 
@@ -217,7 +191,7 @@ const bhv_bowling_ball_initializeLoop = () => {
 }
 
 const bhv_bowling_ball_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     switch (o.rawData[oAction]) {
         case BBALL_ACT_INITIALIZE:
             o.rawData[oAction] = BBALL_ACT_ROLL
@@ -230,13 +204,13 @@ const bhv_bowling_ball_loop = () => {
     }
 
     if (o.rawData[oBehParams2ndByte] != BBALL_BP_STYPE_THI_SMALL)
-        Camera.set_camera_shake_from_point(SHAKE_POS_BOWLING_BALL, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
+        gLinker.Camera.set_camera_shake_from_point(SHAKE_POS_BOWLING_BALL, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
 
     set_object_visibility(o, 4000)
 }
 
 const bhv_generic_bowling_ball_spawner_init = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     switch (o.rawData[oBehParams2ndByte]) {
         case BBALL_BP_STYPE_BOB_UPPER:
             o.rawData[oBBallSpawnerMaxSpawnDist] = 7000.0
@@ -256,7 +230,7 @@ const bhv_generic_bowling_ball_spawner_init = () => {
 }
 
 const bhv_generic_bowling_ball_spawner_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
     let bowlingBall
 
@@ -279,7 +253,7 @@ const bhv_generic_bowling_ball_spawner_loop = () => {
 }
 
 const bhv_thi_bowling_ball_spawner_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
     let bowlingBall
 
@@ -301,14 +275,14 @@ const bhv_thi_bowling_ball_spawner_loop = () => {
 }
 
 const bhv_bob_pit_bowling_ball_init = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oGravity] = 12.0
     o.rawData[oFriction] = 1.0
     o.rawData[oBuoyancy] = 2.0
 }
 
 const bhv_bob_pit_bowling_ball_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     object_step()
 
     const floorGeometry = {}
@@ -318,13 +292,13 @@ const bhv_bob_pit_bowling_ball_loop = () => {
     }
 
     bowling_ball_set_hitbox()
-    Camera.set_camera_shake_from_point(SHAKE_POS_BOWLING_BALL, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
+    gLinker.Camera.set_camera_shake_from_point(SHAKE_POS_BOWLING_BALL, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
     cur_obj_play_sound_1(SOUND_ENV_UNKNOWN2)
     set_object_visibility(o, 3000)
 }
 
 const bhv_free_bowling_ball_init = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oGravity] = 5.5
     o.rawData[oFriction] = 1.0
     o.rawData[oBuoyancy] = 2.0
@@ -336,12 +310,12 @@ const bhv_free_bowling_ball_init = () => {
 }
 
 const bhv_free_bowling_ball_roll_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     let /*s16*/ collisionFlags = object_step()
     bowling_ball_set_hitbox()
 
     if (o.rawData[oForwardVel] > 10.0) {
-        Camera.set_camera_shake_from_point(SHAKE_POS_BOWLING_BALL, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
+        gLinker.Camera.set_camera_shake_from_point(SHAKE_POS_BOWLING_BALL, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
         cur_obj_play_sound_1(SOUND_ENV_UNKNOWN2)
     }
 
@@ -361,7 +335,7 @@ const bhv_free_bowling_ball_roll_loop = () => {
 }
 
 const bhv_free_bowling_ball_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oGravity] = 5.5
 
     switch (o.rawData[oAction]) {

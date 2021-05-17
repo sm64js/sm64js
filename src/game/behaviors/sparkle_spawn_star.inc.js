@@ -1,9 +1,6 @@
 // // sparkle_spawn_star.c.inc
-import { ObjectListProcessorInstance as O } from "../ObjectListProcessor"
-import {
-    oInteractionSubtype,
-    oBehParams
-} from "../../include/object_constants"
+import * as _Linker from "../../game/Linker"
+import { oInteractionSubtype, oBehParams } from "../../include/object_constants"
 import { INT_SUBTYPE_NO_EXIT } from "../Interaction"
 
 // struct ObjectHitbox sSparkleSpawnStarHitbox = {
@@ -19,7 +16,7 @@ import { INT_SUBTYPE_NO_EXIT } from "../Interaction"
 // };
 
 const bhv_spawned_star_init = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     let /*s32*/sp24
     if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_NO_EXIT))
         o.rawData[oBehParams] = o.parentObj.rawData[oBehParams]
@@ -123,6 +120,7 @@ const bhv_spawned_star_loop = () => {
 //     sp1C->oInteractionSubtype = INT_SUBTYPE_NO_EXIT;
 //     obj_set_angle(sp1C, 0, 0, 0);
 // }
+
 
 gLinker.bhv_spawned_star_init = bhv_spawned_star_init
 gLinker.bhv_spawned_star_loop = bhv_spawned_star_loop

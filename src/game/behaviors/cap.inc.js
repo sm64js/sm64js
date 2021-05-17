@@ -1,53 +1,19 @@
 // // cap.c.inc
-import { ObjectListProcessorInstance as O } from "../ObjectListProcessor"
+import * as _Linker from "../../game/Linker"
 import { spawn_object, cur_obj_become_intangible, cur_obj_become_tangible, cur_obj_hide,
-    cur_obj_unhide, obj_mark_for_deletion,
-    cur_obj_scale, obj_turn_toward_object, approach_symmetric,
-    cur_obj_move_using_fvel_and_gravity,
-    cur_obj_was_attacked_or_ground_pounded } from "../ObjectHelpers"
-import {
-    object_step,
-    obj_flicker_and_disappear,
-    OBJ_COL_FLAG_GROUNDED
-} from "../ObjBehaviors"
+cur_obj_unhide, obj_mark_for_deletion, cur_obj_scale, obj_turn_toward_object, approach_symmetric,
+cur_obj_move_using_fvel_and_gravity, cur_obj_was_attacked_or_ground_pounded } from
+"../ObjectHelpers"
+import { object_step, obj_flicker_and_disappear, OBJ_COL_FLAG_GROUNDED } from "../ObjBehaviors"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { sins, coss, int16, s16, random_int16, random_float } from "../../utils"
-
-import { oPosX,
-         oPosY,
-         oPosZ,
-         oVelY,
-         oFaceAnglePitch,
-         oFaceAngleYaw,
-         oMoveAngleYaw,
-         oMoveAnglePitch,
-         oForwardVel,
-         oHomeX,
-         oHomeY,
-         oHomeZ,
-         oAction,
-         oAnimState,
-         oTimer,
-         oDistanceToMario,
-         oInteractStatus,
-         oBehParams2ndByte,
-         oExclamationBoxUnkF4,
-         oExclamationBoxUnkF8,
-         oExclamationBoxUnkFC,
-         oGraphYOffset,
-         oGravity,
-         oFloorHeight,
-         oFlags,
-         oBehParams,
-         oFriction,
-         oBuoyancy,
-         oOpacity,
-         oCapUnkF4,
-         oCapUnkF8,
-         ACTIVE_FLAG_DEACTIVATED,
-} from "../../include/object_constants"
-
+import { oPosX, oPosY, oPosZ, oVelY, oFaceAnglePitch, oFaceAngleYaw, oMoveAngleYaw, oMoveAnglePitch,
+oForwardVel, oHomeX, oHomeY, oHomeZ, oAction, oAnimState, oTimer, oDistanceToMario, oInteractStatus,
+oBehParams2ndByte, oExclamationBoxUnkF4, oExclamationBoxUnkF8, oExclamationBoxUnkFC, oGraphYOffset,
+oGravity, oFloorHeight, oFlags, oBehParams, oFriction, oBuoyancy, oOpacity, oCapUnkF4, oCapUnkF8,
+ACTIVE_FLAG_DEACTIVATED, } from "../../include/object_constants"
 import { INTERACT_CAP, INT_STATUS_INTERACTED } from "../Interaction"
+
 
 const sCapHitbox = {
     interactType:       INTERACT_CAP,
@@ -62,7 +28,7 @@ const sCapHitbox = {
 }
 
 const cap_set_hitbox = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     obj_set_hitbox(o, sCapHitbox)
     if (o.rawData[oInteractStatus] & INT_STATUS_INTERACTED) {
         o.activeFlags = ACTIVE_FLAG_DEACTIVATED
@@ -74,7 +40,7 @@ const cap_set_hitbox = () => {
 }
 
 const cap_despawn = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     if (o.rawData[oTimer] > 300) {
         obj_flicker_and_disappear(o, 300)
     }
@@ -153,7 +119,7 @@ const cap_sink_quicksand = () => {
 }
 
 const bhv_wing_cap_init = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oGravity] = 1.2
     o.rawData[oFriction] = 0.999
     o.rawData[oBuoyancy] = 0.9
@@ -162,7 +128,7 @@ const bhv_wing_cap_init = () => {
 }
 
 const cap_scale_vertically = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oCapUnkF8] += 0x2000
     o.header.gfx.scale[1] = coss(o.rawData[oCapUnkF8]) * 0.3 + 0.7
     if (o.rawData[oCapUnkF8] == 0x10000) {
@@ -172,7 +138,7 @@ const cap_scale_vertically = () => {
 }
 
 const wing_vanish_cap_act_0 = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     let collisionFlags
 
     o.rawData[oFaceAngleYaw] += o.rawData[oForwardVel] * 128.0
@@ -191,7 +157,7 @@ const wing_vanish_cap_act_0 = () => {
 }
 
 const bhv_wing_vanish_cap_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     switch (o.rawData[oAction]) {
         case 0:
             wing_vanish_cap_act_0()

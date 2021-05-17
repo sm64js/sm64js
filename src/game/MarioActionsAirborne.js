@@ -73,7 +73,9 @@ import {
     oDeathSound, oSoundStateID,
     oDialogResponse, oDialogState,
 
-    oUnk1A8, oUnk94, oUnkBC, oUnkC0
+    oUnk1A8, oUnk94, oUnkBC, oUnkC0,
+
+    oMarioSteepJumpYaw
 } from "../include/object_constants"
 
 import {
@@ -152,8 +154,6 @@ import {
     SOUND_MARIO_WAAAOOOW, SOUND_MARIO_WAH2, SOUND_MARIO_YAH_WAH_HOO, SOUND_MARIO_YAHOO,
     SOUND_MARIO_YAHOO_WAHA_YIPPEE, SOUND_MOVING_FLYING, SOUND_MOVING_LAVA_BURN,
 } from "../include/sounds"
-
-import { oMarioSteepJumpYaw } from "../include/object_constants"
 
 
 //---------------------------------------------------------------------------

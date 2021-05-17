@@ -1,3 +1,4 @@
+import * as _Linker from "../../game/Linker"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { oPosY, oTimer } from "../../include/object_constants"
 import { LevelUpdateInstance as LevelUpdate } from "../LevelUpdate"
@@ -15,3 +16,6 @@ export const bhv_pole_base_loop = () => {
         }
     }
 }
+
+
+gLinker.bhv_pole_base_loop = bhv_pole_base_loop

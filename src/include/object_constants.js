@@ -1096,25 +1096,6 @@ export const oUnagiUnk1AC  = 0x49
 export const oUnagiUnk1B0  = 0x4A
 export const oUnagiUnk1B2  = 0x4A
 
-/* Water Bomb */
-export const oWaterBombVerticalStretch  = 0x1C
-export const oWaterBombStretchSpeed     = 0x1D
-export const oWaterBombOnGround         = 0x1E
-export const oWaterBombNumBounces       = 0x1F
-
-/* Water Bomb Spawner */
-export const oWaterBombSpawnerBombActive   = 0x1B
-export const oWaterBombSpawnerTimeToSpawn  = 0x1C
-
-/* Water Bomb Cannon */
-export const oWaterCannonWait    = 0x1B
-export const oWaterCannonMove    = 0x1C
-export const oWaterCannonPitch   = 0x1D
-export const oWaterCannonYaw     = 0x1E
-
-/* Cannon Barrel Bubbles */
-export const oCannonBarrelBubblesUnkF4  = 0x1B
-
 /* Water Level Pillar */
 export const oWaterLevelPillarDrained  = 0x1C
 
@@ -1184,12 +1165,6 @@ export const oWoodenPostPrevAngleToMario  = 0x1C
 export const oWoodenPostSpeedY            = 0x1D
 export const oWoodenPostMarioPounding     = 0x1E
 export const oWoodenPostOffsetY           = 0x1F
-
-/* Yoshi */
-export const oYoshiBlinkTimer  = 0x1B
-export const oYoshiChosenHome  = 0x1D
-export const oYoshiTargetYaw   = 0x1E
-
 
 
 /* oAction */

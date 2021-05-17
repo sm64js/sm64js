@@ -1,58 +1,35 @@
 // water_bomb.inc.c
 import * as _Linker from "../../game/Linker"
-import { ObjectListProcessorInstance as O } from "../ObjectListProcessor"
-import { LevelUpdateInstance as LevelUpdate } from "../LevelUpdate"
-import { spawn_object, cur_obj_hide, cur_obj_set_pos_via_transform,
-    cur_obj_unhide, obj_mark_for_deletion, obj_copy_pos, obj_copy_scale,
-    cur_obj_push_mario_away_from_cylinder, lateral_dist_between_objects,
-    spawn_object_relative,
-    cur_obj_move_standard, cur_obj_spawn_particles,
-    cur_obj_update_floor_and_walls } from "../ObjectHelpers"
+import { spawn_object, cur_obj_hide, cur_obj_set_pos_via_transform, cur_obj_unhide,
+obj_mark_for_deletion, obj_copy_pos, obj_copy_scale, cur_obj_push_mario_away_from_cylinder,
+lateral_dist_between_objects, spawn_object_relative, cur_obj_move_standard, cur_obj_spawn_particles,
+cur_obj_update_floor_and_walls } from "../ObjectHelpers"
 import { obj_set_hitbox, random_linear_offset, approach_number_ptr } from "../ObjBehaviors2"
-import { cur_obj_play_sound_2 } from "../SpawnSound"
 import { s16, random_u16, sins, coss } from "../../utils"
-
-import { oPosX,
-         oPosY,
-         oPosZ,
-         oMoveAngleYaw,
-         oForwardVel,
-         oVelY,
-         oGraphYOffset,
-         oFloorHeight,
-         oMoveFlags,
-         oAction,
-         oTimer,
-         oInteractStatus,
-         oAngleToMario,
-         oBehParams,
-         oWaterBombOnGround,
-         oWaterBombNumBounces,
-         oWaterBombStretchSpeed,
-         oWaterBombVerticalStretch,
-         oWaterBombSpawnerBombActive,
-         oWaterBombSpawnerTimeToSpawn,
-         OBJ_MOVE_ENTERED_WATER,
-         OBJ_MOVE_MASK_ON_GROUND,
-} from "../../include/object_constants"
+import { create_sound_spawner, cur_obj_play_sound_2 } from "../SpawnSound"
+import { oPosX, oPosY, oPosZ, oMoveAngleYaw, oForwardVel, oVelY, oGraphYOffset, oFloorHeight,
+oMoveFlags, oAction, oTimer, oInteractStatus, oAngleToMario, oBehParams, OBJ_MOVE_ENTERED_WATER,
+OBJ_MOVE_MASK_ON_GROUND } from "../../include/object_constants"
 import { MODEL_BUBBLE, MODEL_WATER_BOMB, MODEL_WATER_BOMB_SHADOW } from "../../include/model_ids"
-import { bhvWaterBombSpawner, bhvWaterBomb, bhvWaterBombShadow } from "../BehaviorData"
-
-import { SOUND_OBJ_SOMETHING_LANDING, SOUND_OBJ_DIVING_IN_WATER,
-         SOUND_OBJ_WATER_BOMB_BOUNCING } from "../../include/sounds"
-import { create_sound_spawner } from "../SpawnSound"
-
-import { CameraInstance as Cam } from "../Camera"
+import { SOUND_OBJ_SOMETHING_LANDING, SOUND_OBJ_DIVING_IN_WATER, SOUND_OBJ_WATER_BOMB_BOUNCING } from "../../include/sounds"
 import { SHAKE_POS_SMALL } from "../Camera"
-
 import { INTERACT_MR_BLIZZARD, INT_STATUS_INTERACTED } from "../Interaction"
 
-/* Water bomb */
-    /* oAction */
-    const WATER_BOMB_ACT_SHOT_FROM_CANNON = 0
-    const WATER_BOMB_ACT_INIT = 1
-    const WATER_BOMB_ACT_DROP = 2
-    const WATER_BOMB_ACT_EXPLODE = 3
+
+/* Water Bomb */
+const oWaterBombVerticalStretch  = 0x1C
+const oWaterBombStretchSpeed     = 0x1D
+const oWaterBombOnGround         = 0x1E
+const oWaterBombNumBounces       = 0x1F
+
+/* Water Bomb Spawner */
+const oWaterBombSpawnerBombActive   = 0x1B
+const oWaterBombSpawnerTimeToSpawn  = 0x1C
+
+const WATER_BOMB_ACT_SHOT_FROM_CANNON = 0
+const WATER_BOMB_ACT_INIT = 1
+const WATER_BOMB_ACT_DROP = 2
+const WATER_BOMB_ACT_EXPLODE = 3
 
 /**
  * Behaviors for bhvWaterBombSpawner, bhvWaterBomb, and bhvWaterBombShadow.
@@ -84,33 +61,34 @@ const sWaterBombHitbox = {
  * Spawn water bombs targeting mario when he comes in range.
  */
 const bhv_water_bomb_spawner_update = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
     let /*f32*/ latDistToMario
     let /*f32*/ spawnerRadius
 
     spawnerRadius = 50 * (o.rawData[oBehParams] >> 16) + 200.0
-    latDistToMario = lateral_dist_between_objects(o, O.gMarioObject)
+    latDistToMario = lateral_dist_between_objects(o, gMarioObject)
 
     // When mario is in range and a water bomb isn't already active
     if (!o.rawData[oWaterBombSpawnerBombActive] && latDistToMario < spawnerRadius
-        && O.gMarioObject.rawData[oPosY] - o.rawData[oPosY] < 1000.0) {
+        && gMarioObject.rawData[oPosY] - o.rawData[oPosY] < 1000.0) {
         if (o.rawData[oWaterBombSpawnerTimeToSpawn] != 0) {
             o.rawData[oWaterBombSpawnerTimeToSpawn] -= 1
         } else {
             let waterBomb =
-                spawn_object_relative(0, 0, 2000, 0, o, MODEL_WATER_BOMB, bhvWaterBomb)
+                spawn_object_relative(0, 0, 2000, 0, o, MODEL_WATER_BOMB, 'bhvWaterBomb')
 
             // Drop farther ahead of mario when he is moving faster
-            let /*f32*/ waterBombDistToMario = 28.0 * LevelUpdate.gMarioState.forwardVel + 100.0
+            let /*f32*/ waterBombDistToMario = 28.0 * gLinker.LevelUpdate.gMarioState.forwardVel + 100.0
 
             waterBomb.rawData[oAction] = WATER_BOMB_ACT_INIT
 
             waterBomb.rawData[oPosX] =
-                O.gMarioObject.rawData[oPosX] + waterBombDistToMario * sins(O.gMarioObject.rawData[oMoveAngleYaw])
+                gMarioObject.rawData[oPosX] + waterBombDistToMario * sins(gMarioObject.rawData[oMoveAngleYaw])
             waterBomb.rawData[oPosZ] =
-                O.gMarioObject.rawData[oPosZ] + waterBombDistToMario * coss(O.gMarioObject.rawData[oMoveAngleYaw])
+                gMarioObject.rawData[oPosZ] + waterBombDistToMario * coss(gMarioObject.rawData[oMoveAngleYaw])
 
-            spawn_object(waterBomb, MODEL_WATER_BOMB_SHADOW, bhvWaterBombShadow)
+            spawn_object(waterBomb, MODEL_WATER_BOMB_SHADOW, 'bhvWaterBombShadow')
 
             o.rawData[oWaterBombSpawnerBombActive] = 1
             o.rawData[oWaterBombSpawnerTimeToSpawn] = random_linear_offset(0, 50)
@@ -147,7 +125,7 @@ const water_bomb_spawn_explode_particles = (offsetY, forwardVelRange, velYBase) 
  * Enter the drop action with -40 y vel.
  */
 const water_bomb_act_init = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     cur_obj_play_sound_2(SOUND_OBJ_SOMETHING_LANDING)
 
     o.rawData[oAction] = WATER_BOMB_ACT_DROP
@@ -160,7 +138,7 @@ const water_bomb_act_init = () => {
  * explode.
  */
 const water_bomb_act_drop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     let /*f32*/ stretch
 
     obj_set_hitbox(o, sWaterBombHitbox)
@@ -168,7 +146,7 @@ const water_bomb_act_drop = () => {
     // Explode if touched or if hit water
     if ((o.rawData[oInteractStatus] & INT_STATUS_INTERACTED) || (o.rawData[oMoveFlags] & OBJ_MOVE_ENTERED_WATER)) {
         create_sound_spawner(SOUND_OBJ_DIVING_IN_WATER)
-        Cam.set_camera_shake_from_point(SHAKE_POS_SMALL, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
+        gLinker.Camera.set_camera_shake_from_point(SHAKE_POS_SMALL, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
         o.rawData[oAction] = WATER_BOMB_ACT_EXPLODE
     } else if (o.rawData[oMoveFlags] & OBJ_MOVE_MASK_ON_GROUND) {
         // On impact with the ground, begin getting squished
@@ -181,7 +159,7 @@ const water_bomb_act_drop = () => {
                 create_sound_spawner(SOUND_OBJ_DIVING_IN_WATER)
             }
 
-            Cam.set_camera_shake_from_point(SHAKE_POS_SMALL, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
+            gLinker.Camera.set_camera_shake_from_point(SHAKE_POS_SMALL, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
 
             // Move toward mario
             o.rawData[oMoveAngleYaw] = o.rawData[oAngleToMario]
@@ -222,7 +200,7 @@ const water_bomb_act_drop = () => {
  * despawn as well.
  */
 const water_bomb_act_explode = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     water_bomb_spawn_explode_particles(25, 60, 10)
     o.parentObj.rawData[oWaterBombSpawnerBombActive] = 0
     obj_mark_for_deletion(o)
@@ -248,7 +226,7 @@ const sWaterBombCannonParticle = {
  * Despawn after 100 frames.
  */
 const water_bomb_act_shot_from_cannon = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     if (o.rawData[oTimer] > 100) {
         obj_mark_for_deletion(o)
@@ -273,7 +251,7 @@ const water_bomb_act_shot_from_cannon = () => {
  * Update function for bhvWaterBomb.
  */
 const bhv_water_bomb_update = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     if (o.rawData[oAction] == WATER_BOMB_ACT_SHOT_FROM_CANNON) {
         water_bomb_act_shot_from_cannon()
@@ -300,7 +278,7 @@ const bhv_water_bomb_update = () => {
  * Despawn when the parent water bomb does.
  */
 const bhv_water_bomb_shadow_update = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     if (o.parentObj.rawData[oAction] == WATER_BOMB_ACT_EXPLODE) {
         obj_mark_for_deletion(o)
@@ -316,6 +294,7 @@ const bhv_water_bomb_shadow_update = () => {
         obj_copy_scale(o, o.parentObj)
     }
 }
+
 
 gLinker.bhv_water_bomb_spawner_update = bhv_water_bomb_spawner_update
 gLinker.bhv_water_bomb_update = bhv_water_bomb_update

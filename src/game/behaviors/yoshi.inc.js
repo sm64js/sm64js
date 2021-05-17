@@ -1,49 +1,33 @@
 // yoshi.c.inc
-import { ObjectListProcessorInstance as O } from "../ObjectListProcessor"
-import { cur_obj_init_animation,
-         approach_s16_symmetric } from "../ObjectHelpers"
+import * as _Linker from "../../game/Linker"
+import { cur_obj_init_animation, approach_s16_symmetric } from "../ObjectHelpers"
 import { object_step, is_point_close_to_object, create_respawner, curr_obj_random_blink } from "../ObjBehaviors"
 import { cur_obj_play_sound_2 } from "../SpawnSound"
 import { s16, random_float } from "../../utils"
 import { atan2s } from "../../engine/math_util"
-
-import { oYoshiChosenHome,
-         oYoshiBlinkTimer,
-         oPosX,
-         oPosY,
-         oPosZ,
-         oVelY,
-         oMoveAngleYaw,
-         oYoshiTargetYaw,
-         oForwardVel,
-         oHomeX,
-         oHomeY,
-         oHomeZ,
-         oAction,
-         oTimer,
-         oInteractStatus,
-         oInteractionSubtype,
-         oGravity,
-         oFriction,
-         oBuoyancy
-} from "../../include/object_constants"
+import { oPosX, oPosY, oPosZ, oVelY, oMoveAngleYaw, oForwardVel, oHomeX, oHomeY, oHomeZ, oAction,
+oTimer, oInteractStatus, oInteractionSubtype, oGravity, oFriction, oBuoyancy } from "../../include/object_constants"
 import { MODEL_YOSHI } from "../../include/model_ids"
-import { SOUND_GENERAL_YOSHI_WALK,
-         SOUND_GENERAL_ENEMY_ALERT1,
-         SOUND_GENERAL_COLLECT_1UP,
-         SOUND_MENU_YOSHI_GAIN_LIVES } from "../../include/sounds"
+import { SOUND_GENERAL_YOSHI_WALK, SOUND_GENERAL_ENEMY_ALERT1, SOUND_GENERAL_COLLECT_1UP,
+SOUND_MENU_YOSHI_GAIN_LIVES } from "../../include/sounds"
 import { INT_SUBTYPE_NPC, INT_STATUS_INTERACTED } from "../Interaction"
 import { ACTIVE_FLAG_DEACTIVATED } from "../../include/object_constants"
 
+
 /* Yoshi */
-    /* oAction */
-    const YOSHI_ACT_IDLE = 0
-    const YOSHI_ACT_WALK = 1
-    const YOSHI_ACT_TALK = 2
-    const YOSHI_ACT_WALK_JUMP_OFF_ROOF = 3
-    const YOSHI_ACT_FINISH_JUMPING_AND_DESPAWN = 4
-    const YOSHI_ACT_GIVE_PRESENT = 5
-    const YOSHI_ACT_CREDITS = 10
+const oYoshiBlinkTimer  = 0x1B
+const oYoshiChosenHome  = 0x1D
+const oYoshiTargetYaw   = 0x1E
+
+/* oAction */
+const YOSHI_ACT_IDLE = 0
+const YOSHI_ACT_WALK = 1
+const YOSHI_ACT_TALK = 2
+const YOSHI_ACT_WALK_JUMP_OFF_ROOF = 3
+const YOSHI_ACT_FINISH_JUMPING_AND_DESPAWN = 4
+const YOSHI_ACT_GIVE_PRESENT = 5
+const YOSHI_ACT_CREDITS = 10
+
 
 // X/Z coordinates of Yoshi's homes that he switches between.
 // Note that this doesn't contain the Y coordinate since the castle roof is flat,
@@ -51,7 +35,7 @@ import { ACTIVE_FLAG_DEACTIVATED } from "../../include/object_constants"
 const sYoshiHomeLocations = [ 0, -5625, -1364, -5912, -1403, -4609, -1004, -5308 ]
 
 const bhv_yoshi_init = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oGravity] = 2.0
     o.rawData[oFriction] = 0.9
     o.rawData[oBuoyancy] = 1.3
@@ -64,7 +48,7 @@ const bhv_yoshi_init = () => {
 }
 
 const yoshi_walk_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
    let /*s16*/sp24 = o.header.gfx.unk38.animFrame
 
     o.rawData[oForwardVel] = 10.0
@@ -87,7 +71,7 @@ const yoshi_walk_loop = () => {
 }
 
 const yoshi_idle_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     let chosenHome
 
     if (o.rawData[oTimer] > 90) {
@@ -121,7 +105,7 @@ const yoshi_idle_loop = () => {
 
 
 const yoshi_talk_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     if (o.rawData[oMoveAngleYaw] == o.rawData[oAngleToMario]) {
         cur_obj_init_animation(0)
         // if (set_mario_npc_dialog(1) == 2) {
@@ -195,7 +179,7 @@ const yoshi_talk_loop = () => {
 // }
 
 const bhv_yoshi_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     switch (o.rawData[oAction]) {
         case YOSHI_ACT_IDLE:
@@ -229,6 +213,7 @@ const bhv_yoshi_loop = () => {
 
     curr_obj_random_blink(oYoshiBlinkTimer)
 }
+
 
 gLinker.bhv_yoshi_init = bhv_yoshi_init
 gLinker.bhv_yoshi_loop = bhv_yoshi_loop

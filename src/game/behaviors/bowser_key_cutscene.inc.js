@@ -1,11 +1,10 @@
 // bowser_key_cutscene.inc.c
-
-import { GeoRendererInstance as GeoRenderer } from "../../engine/GeoRenderer"
+import * as _Linker from "../../game/Linker"
 import { oBowserKeyScale } from "../../include/object_constants"
 
 export const geo_scale_bowser_key = (run, node) => {
     if (run == 1) {
-        let sp4 = GeoRenderer.gCurGraphNodeObject
+        let sp4 = gLinker.GeoRenderer.gCurGraphNodeObject
         node.node.next.scale = sp4.rawData[oBowserKeyScale]
     }
     return 0

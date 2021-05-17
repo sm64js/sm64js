@@ -1,9 +1,10 @@
 // castle_cannon_grate.inc.c
-import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
+import * as _Linker from "../../game/Linker"
 import { ACTIVE_FLAG_DEACTIVATED } from "../../include/object_constants"
 
+
 export const bhv_castle_cannon_grate_init = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     if (true) {
         o.activeFlags = ACTIVE_FLAG_DEACTIVATED
     }
@@ -11,3 +12,6 @@ export const bhv_castle_cannon_grate_init = () => {
     //     o.activeFlags = ACTIVE_FLAG_DEACTIVATED
     // }
 }
+
+
+gLinker.bhv_castle_cannon_grate_init = bhv_castle_cannon_grate_init

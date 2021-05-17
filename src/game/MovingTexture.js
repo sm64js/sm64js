@@ -18,9 +18,10 @@ import { inside_castle_movtex_green_room_water } from "../levels/castle_inside/a
 import { inside_castle_movtex_moat_water } from "../levels/castle_inside/areas/3/movtext.inc"
 import { GeoLayoutInstance as GeoLayout } from "../engine/GeoLayout"
 import * as Gbi from "../include/gbi"
-import { dl_waterbox_rgba16_begin, dl_waterbox_end, dl_draw_quad_verts_0123, texture_waterbox_water, texture_waterbox_lava, texture_waterbox_jrb_water } from "../common_gfx/segment2"
+import { dl_waterbox_rgba16_begin, dl_waterbox_end, dl_draw_quad_verts_0123, texture_waterbox_water, texture_waterbox_lava } from "../common_gfx/segment2"
 import { ROTATE_CLOCKWISE, TEXTURE_MIST, TEXTURE_WATER } from "../include/moving_texture_macros"
 import { make_vertex } from "./GeoMisc"
+
 
 // Vertex colors for rectangles. Used to give mist a tint
 const MOVTEX_VTX_COLOR_DEFAULT = 0 // no tint (white vertex colors)
@@ -114,16 +115,11 @@ const MOVTEX_TTM_END_PUDDLE_WATERFALL = (4 | MOVTEX_AREA_TTM)
 const MOVTEX_TTM_PUDDLE_WATERFALL = (5 | MOVTEX_AREA_TTM)
 
 const gMovtexIdToTexture = [
-    texture_waterbox_water, texture_waterbox_jrb_water, null, null, texture_waterbox_lava
+    texture_waterbox_water, null, null, null, texture_waterbox_lava
 ]
 
 const gMovtexNonColored = [
-    { geoId: MOVTEX_CASTLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 15, movtexVerts: castle_grounds_movtex_tris_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: castle_grounds_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER },
-    { geoId: MOVTEX_TTM_PUDDLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 15, movtexVerts: ttm_movtex_tris_puddle_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER },
-    { geoId: MOVTEX_TTM_BEGIN_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 15, movtexVerts: ttm_movtex_tris_begin_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER },
-    { geoId: MOVTEX_TTM_END_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 15, movtexVerts: ttm_movtex_tris_end_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER },
-    { geoId: MOVTEX_TTM_BEGIN_PUDDLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 15, movtexVerts: ttm_movtex_tris_begin_puddle_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER },
-    { geoId: MOVTEX_TTM_END_PUDDLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 15, movtexVerts: ttm_movtex_tris_end_puddle_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER },
+    { geoId: MOVTEX_CASTLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 15, movtexVerts: castle_grounds_movtex_tris_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: castle_grounds_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER }
 ]
 
 let gMovtexVtxColor = MOVTEX_VTX_COLOR_DEFAULT

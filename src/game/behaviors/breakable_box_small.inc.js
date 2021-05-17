@@ -1,93 +1,23 @@
 // breakable_box.c.inc
 import * as _Linker from "../../game/Linker"
-
-import {
-    cur_obj_set_model, cur_obj_was_attacked_or_ground_pounded, obj_explode_and_spawn_coins,
-    cur_obj_scale, cur_obj_disable_rendering, cur_obj_enable_rendering, cur_obj_become_intangible,
-    cur_obj_become_tangible, cur_obj_unhide, cur_obj_nearest_object_with_behavior,
-    cur_obj_wait_then_blink, spawn_mist_particles, obj_attack_collided_from_other_object,
-    cur_obj_get_dropped, spawn_object
-} from "../ObjectHelpers"
-
-import {
-    object_step, obj_check_floor_death, sObjFloor, obj_spawn_yellow_coins, create_respawner
-} from "../ObjBehaviors"
-
-import {
-    obj_set_hitbox
-} from "../ObjBehaviors2"
-
-import {
-    create_sound_spawner
-} from "../SpawnSound"
-
-import {
-    spawn_triangle_break_particles
-} from "./break_particles.inc"
-
-import {
-    cur_obj_play_sound_2
-} from "../SpawnSound"
-
-import {
-    random_float
-} from "../../utils"
-
-import {
-    oAction, oPrevAction, oSubAction, oTimer, oFlags,
-    oBehParams, oBehParams2ndByte,
-    oAnimations, oAnimState, oActiveParticleFlags,
-    oIntangibleTimer, oInteractionSubtype, oInteractStatus, oInteractType,
-    oHealth, oHeldState,
-
-    oPosX, oPosY, oPosZ,
-    oHomeX, oHomeY, oHomeZ, oAngleToHome,
-    oVelX, oVelY, oVelZ,
-    oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ,
-    oGraphYOffset,
-
-    oAngleVelPitch, oAngleVelRoll, oAngleVelYaw,
-    oForwardVel, oForwardVelS32,
-    oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw,
-    oDrawingDistance, oOpacity,
-
-    oBounciness, oBuoyancy, oDragStrength, oFriction, oGravity,
-    oCollisionDistance, oDamageOrCoinValue, oNumLootCoins,
-    oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oMoveFlags,
-    oWallAngle, oWallHitboxRadius,
-
-    oFloor, oFloorHeight, oFloorRoom, oFloorType, oRoom,
-    oAngleToMario, oDistanceToMario,
-
-    oDeathSound, oSoundStateID,
-    oDialogResponse, oDialogState,
-
-    oUnk1A8, oUnk94, oUnkBC, oUnkC0
-} from "../../include/object_constants"
-
-import {
-    wdw_seg7_collision_07018528
-} from "../../levels/wdw/hidden_platform/collision.inc"
-
-import {
-    ACTIVE_FLAG_UNK9, ACTIVE_FLAG_DEACTIVATED
-} from "../../include/object_constants"
-
-import {
-    MODEL_BREAKABLE_BOX_SMALL, MODEL_SMOKE
-} from "../../include/model_ids"
-
-import {
-    SOUND_GENERAL_BREAK_BOX, SOUND_GENERAL_BOX_LANDING_2, SOUND_ENV_SLIDING
-} from "../../include/sounds"
-
-import {
-    INTERACT_GRABBABLE
-} from "../Interaction"
-
-import {
-    GRAPH_RENDER_INVISIBLE
-} from "../../engine/graph_node"
+import { cur_obj_set_model, cur_obj_was_attacked_or_ground_pounded, obj_explode_and_spawn_coins,
+cur_obj_scale, cur_obj_disable_rendering, cur_obj_enable_rendering, cur_obj_become_intangible,
+cur_obj_become_tangible, cur_obj_unhide, cur_obj_nearest_object_with_behavior,
+cur_obj_wait_then_blink, spawn_mist_particles, obj_attack_collided_from_other_object,
+cur_obj_get_dropped, spawn_object } from "../ObjectHelpers"
+import { object_step, obj_check_floor_death, sObjFloor, obj_spawn_yellow_coins, create_respawner } from "../ObjBehaviors"
+import { obj_set_hitbox } from "../ObjBehaviors2"
+import { create_sound_spawner, cur_obj_play_sound_2 } from "../SpawnSound"
+import { spawn_triangle_break_particles } from "./break_particles.inc"
+import { random_float } from "../../utils"
+import { oAction,  oAnimState,  oBuoyancy,  oFlags,  oForwardVel,  oFriction,  oGravity, 
+oHeldState,  oInteractStatus,  oPosX,  oPosZ,  oVelY } from "../../include/object_constants"
+import { wdw_seg7_collision_07018528 } from "../../levels/wdw/hidden_platform/collision.inc"
+import { ACTIVE_FLAG_UNK9, ACTIVE_FLAG_DEACTIVATED } from "../../include/object_constants"
+import { MODEL_BREAKABLE_BOX_SMALL, MODEL_SMOKE } from "../../include/model_ids"
+import { SOUND_GENERAL_BREAK_BOX, SOUND_GENERAL_BOX_LANDING_2, SOUND_ENV_SLIDING } from "../../include/sounds"
+import { INTERACT_GRABBABLE } from "../Interaction"
+import { GRAPH_RENDER_INVISIBLE } from "../../engine/graph_node"
 
 
 /* Breakable Box Small (Small Cork Box) */

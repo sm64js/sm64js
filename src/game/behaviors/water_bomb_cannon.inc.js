@@ -1,44 +1,30 @@
 // water_bomb_cannon.inc.c
-import { ObjectListProcessorInstance as O } from "../ObjectListProcessor"
-import { SurfaceLoadInstance as SurfaceLoad } from "../SurfaceLoad"
-import { spawn_object, cur_obj_hide, cur_obj_set_pos_via_transform,
-    cur_obj_unhide, obj_mark_for_deletion, obj_copy_pos,
-    cur_obj_push_mario_away_from_cylinder } from "../ObjectHelpers"
+import * as _Linker from "../../game/Linker"
+import { spawn_object, cur_obj_hide, cur_obj_set_pos_via_transform, cur_obj_unhide,
+obj_mark_for_deletion, obj_copy_pos, cur_obj_push_mario_away_from_cylinder } from "../ObjectHelpers"
 import { object_step, is_point_close_to_object, create_respawner, curr_obj_random_blink } from "../ObjBehaviors"
 import { obj_forward_vel_approach, obj_move_pitch_approach, obj_face_yaw_approach } from "../ObjBehaviors2"
 import { cur_obj_play_sound_2 } from "../SpawnSound"
 import { s16, random_u16 } from "../../utils"
-// import { atan2s } from "../../engine/math_util"
-
-import { oWaterCannonWait,
-         oWaterCannonMove,
-         oWaterCannonPitch,
-         oWaterCannonYaw,
-         oCannonBarrelBubblesUnkF4,
-         oPosX,
-         oPosY,
-         oPosZ,
-         oMoveAnglePitch,
-         oMoveAngleYaw,
-         oFaceAnglePitch,
-         oFaceAngleYaw,
-         oForwardVel,
-         oAction,
-         oBehParams2ndByte,
-         oDistanceToMario,
-} from "../../include/object_constants"
-
+import { oPosX, oPosY, oPosZ, oMoveAnglePitch, oMoveAngleYaw, oFaceAnglePitch, oFaceAngleYaw,
+oForwardVel, oAction, oBehParams2ndByte, oDistanceToMario } from "../../include/object_constants"
 import { MODEL_WATER_BOMB, MODEL_CANNON_BARREL } from "../../include/model_ids"
-import { bhvWaterBomb, bhvCannonBarrelBubbles } from "../BehaviorData"
-
 import { SOUND_OBJ_CANNON4 } from "../../include/sounds"
-
-import { CameraInstance as Cam } from "../Camera"
 import { SHAKE_POS_MEDIUM } from "../Camera"
 
 
+/* Water Bomb Cannon */
+const oWaterCannonWait    = 0x1B
+const oWaterCannonMove    = 0x1C
+const oWaterCannonPitch   = 0x1D
+const oWaterCannonYaw     = 0x1E
+
+/* Cannon Barrel Bubbles */
+const oCannonBarrelBubblesUnkF4  = 0x1B
+
+
 const bhv_bubble_cannon_barrel_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     if (o.parentObj.rawData[oAction] == 2) {
         obj_mark_for_deletion(o)
     } else {
@@ -58,13 +44,13 @@ const bhv_bubble_cannon_barrel_loop = () => {
                 if (o.rawData[oForwardVel] == 0.0) {
                     o.rawData[oForwardVel] = 35.0
 
-                    let val04 = spawn_object(o, MODEL_WATER_BOMB, bhvWaterBomb)
+                    let val04 = spawn_object(o, MODEL_WATER_BOMB, 'bhvWaterBomb')
                     if (val04 != null) {
                         val04.rawData[oForwardVel] = -100.0
                         val04.header.gfx.scale[1] = 1.7
                     }
 
-                    Cam.set_camera_shake_from_point(SHAKE_POS_MEDIUM, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
+                    gLinker.Camera.set_camera_shake_from_point(SHAKE_POS_MEDIUM, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
                 }
             } else {
                 o.rawData[oForwardVel] = 0.0
@@ -74,9 +60,9 @@ const bhv_bubble_cannon_barrel_loop = () => {
 }
 
 const water_bomb_cannon_act_0 = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     if (o.rawData[oDistanceToMario] < 2000.0) {
-        spawn_object(o, MODEL_CANNON_BARREL, bhvCannonBarrelBubbles)
+        spawn_object(o, MODEL_CANNON_BARREL, 'bhvCannonBarrelBubbles')
         cur_obj_unhide()
 
         o.rawData[oAction] = 1
@@ -85,7 +71,7 @@ const water_bomb_cannon_act_0 = () => {
 }
 
 const water_bomb_cannon_act_1 = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     if (o.rawData[oDistanceToMario] > 2500.0) {
         o.rawData[oAction] = 2
     } else if (o.rawData[oBehParams2ndByte] == 0) {
@@ -111,13 +97,13 @@ const water_bomb_cannon_act_1 = () => {
 }
 
 const water_bomb_cannon_act_2 = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     cur_obj_hide()
     o.rawData[oAction] = 0
 }
 
 const bhv_water_bomb_cannon_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     cur_obj_push_mario_away_from_cylinder(220.0, 300.0)
 
     switch (o.rawData[oAction]) {
@@ -132,6 +118,7 @@ const bhv_water_bomb_cannon_loop = () => {
             break
     }
 }
+
 
 gLinker.bhv_bubble_cannon_barrel_loop = bhv_bubble_cannon_barrel_loop
 gLinker.bhv_water_bomb_cannon_loop = bhv_water_bomb_cannon_loop

@@ -1,3 +1,4 @@
+import * as _Linker from "../../game/Linker"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { bhvYellowBall } from "../BehaviorData"
 import { oPosY, oPosX, oPosZ, oTimer, oBehParams} from "../../include/object_constants"
@@ -20,3 +21,7 @@ export const bhv_giant_pole_loop = () => {
 	}
 	bhv_pole_base_loop()
 }
+
+
+gLinker.bhv_pole_init = bhv_pole_init
+gLinker.bhv_giant_pole_loop = bhv_giant_pole_loop

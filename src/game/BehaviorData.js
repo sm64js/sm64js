@@ -1,5 +1,5 @@
 import * as _Linker from "./Linker"
-import { BehaviorCommandsInstance as BhvCmds                } from "../engine/BehaviorCommands"
+import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 
 import { ADD_INT, ADD_FLOAT, ANIMATE, BEGIN, BEGIN_LOOP, BEGIN_REPEAT, BILLBOARD, BREAK,
          CALL, CALL_NATIVE, DEACTIVATE, DEBUGGER, DELAY, DELAY_VAR, DISABLE_RENDERING,
@@ -36,32 +36,34 @@ import { MODEL_WOODEN_POST, MODEL_MIST, MODEL_SMOKE, MODEL_BUBBLE, MODEL_CANNON_
          MODEL_BOWSER_BOMB_CHILD_OBJ, MODEL_NONE
 } from "../include/model_ids"
 
-import { bhv_pole_base_loop                             } from "./behaviors/pole_base.inc"
-import { bhv_pole_init, bhv_giant_pole_loop             } from "./behaviors/pole.inc"
-import { bhv_castle_flag_init                           } from "./behaviors/bhv_castle_flag_init.inc"
-
-import * as bowling_ball             from "./behaviors/bowling_ball.inc"
-import * as breakable_box            from "./behaviors/breakable_box.inc"
-import * as breakable_box_small      from "./behaviors/breakable_box_small.inc"
-import * as butterfly                from "./behaviors/butterfly.inc"
-import * as cannon                   from "./behaviors/cannon.inc"
-import * as cannon_door              from "./behaviors/cannon_door.inc"
-import * as cap                      from "./behaviors/cap.inc"
-import * as chain_chomp              from "./behaviors/chain_chomp.inc"
-import * as checkerboard_platform    from "./behaviors/checkerboard_platform.inc"
-import * as coin                     from "./behaviors/coin.inc"
-import * as exclamation_box          from "./behaviors/exclamation_box.inc"
-import * as fish                     from "./behaviors/fish.inc"
-import * as koopa_shell_underwater   from "./behaviors/koopa_shell_underwater.inc"
-import * as moat_grill               from "./behaviors/moat_grill.inc"
-import * as mushroom_1up             from "./behaviors/mushroom_1up.inc"
-import * as seesaw_platform          from "./behaviors/seesaw_platform.inc"
-import * as sparkle_spawn_star       from "./behaviors/sparkle_spawn_star.inc"
-import * as switch_hidden_objects    from "./behaviors/switch_hidden_objects.inc"
-import * as water_bomb               from "./behaviors/water_bomb.inc"
-import * as water_bomb_cannon        from "./behaviors/water_bomb_cannon.inc"
-import * as water_splashes_and_waves from "./behaviors/water_splashes_and_waves.inc"
-import * as yoshi                    from "./behaviors/yoshi.inc"
+import * as _bird                     from "./behaviors/bird.inc.js"
+import * as _bowling_ball             from "./behaviors/bowling_ball.inc"
+import * as _breakable_box            from "./behaviors/breakable_box.inc"
+import * as _breakable_box_small      from "./behaviors/breakable_box_small.inc"
+import * as _butterfly                from "./behaviors/butterfly.inc"
+import * as _cannon                   from "./behaviors/cannon.inc"
+import * as _cannon_door              from "./behaviors/cannon_door.inc"
+import * as _cap                      from "./behaviors/cap.inc"
+import * as _castle_cannon_grate      from "./behaviors/castle_cannon_grate.inc"
+import * as _castle_flag              from "./behaviors/bhv_castle_flag_init.inc"
+import * as _chain_chomp              from "./behaviors/chain_chomp.inc"
+import * as _checkerboard_platform    from "./behaviors/checkerboard_platform.inc"
+import * as _coin                     from "./behaviors/coin.inc"
+import * as _exclamation_box          from "./behaviors/exclamation_box.inc"
+import * as _fish                     from "./behaviors/fish.inc"
+import * as _koopa_shell_underwater   from "./behaviors/koopa_shell_underwater.inc"
+import * as _moat_grill               from "./behaviors/moat_grill.inc"
+import * as _mushroom_1up             from "./behaviors/mushroom_1up.inc"
+import * as _pole                     from "./behaviors/pole.inc"
+import * as _pole_base                from "./behaviors/pole_base.inc"
+import * as _seesaw_platform          from "./behaviors/seesaw_platform.inc"
+import * as _sound_spawner            from "./behaviors/sound_spawner.inc"
+import * as _sparkle_spawn_star       from "./behaviors/sparkle_spawn_star.inc"
+import * as _switch_hidden_objects    from "./behaviors/switch_hidden_objects.inc"
+import * as _water_bomb               from "./behaviors/water_bomb.inc"
+import * as _water_bomb_cannon        from "./behaviors/water_bomb_cannon.inc"
+import * as _water_splashes_and_waves from "./behaviors/water_splashes_and_waves.inc"
+import * as _yoshi                    from "./behaviors/yoshi.inc"
 
 import { bhv_goomba_init,
          bhv_goomba_update,
@@ -97,25 +99,24 @@ import { bhv_red_coin_init,
 import { bhv_moving_yellow_coin_init,
          bhv_moving_yellow_coin_loop                    } from "./behaviors/moving_coin.inc"
 import { bhv_water_mist_2_loop                          } from "./behaviors/water_mist.inc"
-import { bhv_castle_cannon_grate_init                   } from "./behaviors/castle_cannon_grate.inc"
-import { bhv_sound_spawner_init                         } from "./behaviors/sound_spawner.inc"
 
-import { bobomb_seg8_anims_0802396C         } from "../actors/bobomb/anims.inc"
-import { butterfly_seg3_anims_030056B0      } from "../actors/butterfly/anims.inc"
-import { bowser_seg6_anims_06057690         } from "../actors/bowser/anims.inc"
-import { castle_grounds_seg7_anims_flags    } from "../levels/castle_grounds/areas/1/11/anim.inc"
-import { chain_chomp_seg6_anims_06025178    } from "../actors/chain_chomp/anims/table.inc"
-import { goomba_seg8_anims_0801DA4C         } from "../actors/goomba/anims/table.inc"
-import { yoshi_seg5_anims_05024100          } from "../actors/yoshi/anims.inc"
+import { birds_seg5_anims_050009E8       } from "../actors/bird/anims.inc.js"
+import { bobomb_seg8_anims_0802396C      } from "../actors/bobomb/anims.inc"
+import { butterfly_seg3_anims_030056B0   } from "../actors/butterfly/anims.inc"
+import { bowser_seg6_anims_06057690      } from "../actors/bowser/anims.inc"
+import { castle_grounds_seg7_anims_flags } from "../levels/castle_grounds/areas/1/11/anim.inc"
+import { chain_chomp_seg6_anims_06025178 } from "../actors/chain_chomp/anims/table.inc"
+import { goomba_seg8_anims_0801DA4C      } from "../actors/goomba/anims/table.inc"
+import { yoshi_seg5_anims_05024100       } from "../actors/yoshi/anims.inc"
 
-import { breakable_box_seg8_collision_08012D70              } from "../actors/breakable_box/collision.inc"
-import { cannon_lid_seg8_collision_08004950                 } from "../actors/cannon_lid/collision.inc"
-import { castle_grounds_seg7_collision_cannon_grill         } from "../levels/castle_grounds/areas/1/8/collision.inc"
-import { castle_grounds_seg7_collision_moat_grills          } from "../levels/castle_grounds/areas/1/7/collision.inc"
-import { checkerboard_platform_seg8_collision_0800D710      } from "../actors/checkerboard_platform/collision.inc"
-import { exclamation_box_outline_seg8_collision_08025F78    } from "../actors/exclamation_box_outline/collision.inc"
-import { poundable_pole_collision_06002490                  } from "../actors/poundable_pole/collision.inc"
-import { wooden_signpost_seg3_collision_0302DD80            } from "../actors/wooden_signpost/collision.inc"
+import { breakable_box_seg8_collision_08012D70           } from "../actors/breakable_box/collision.inc"
+import { cannon_lid_seg8_collision_08004950              } from "../actors/cannon_lid/collision.inc"
+import { castle_grounds_seg7_collision_cannon_grill      } from "../levels/castle_grounds/areas/1/8/collision.inc"
+import { castle_grounds_seg7_collision_moat_grills       } from "../levels/castle_grounds/areas/1/7/collision.inc"
+import { checkerboard_platform_seg8_collision_0800D710   } from "../actors/checkerboard_platform/collision.inc"
+import { exclamation_box_outline_seg8_collision_08025F78 } from "../actors/exclamation_box_outline/collision.inc"
+import { poundable_pole_collision_06002490               } from "../actors/poundable_pole/collision.inc"
+import { wooden_signpost_seg3_collision_0302DD80         } from "../actors/wooden_signpost/collision.inc"
 
 const OBJ_LIST_PLAYER = 0     //  (0) mario
 const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -165,7 +166,7 @@ export const bhvTree = [
     { command: BhvCmds.set_hitbox, args: { radius: 80, height: 500 } },
     { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.begin_loop },
-        { command: BhvCmds.call_native, args: { func: bhv_pole_base_loop } },
+        { command: BhvCmds.call_native, args: { func: 'bhv_pole_base_loop' } },
     { command: BhvCmds.end_loop },
 ]
 
@@ -183,7 +184,7 @@ export const bhvGiantPole = [
     { command: BhvCmds.set_hitbox, args: { radius: 80, height: 2100 } },
     { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.begin_loop },
-        { command: BhvCmds.call_native, args: { func: bhv_giant_pole_loop } },
+        { command: BhvCmds.call_native, args: { func: 'bhv_giant_pole_loop' } },
     { command: BhvCmds.end_loop },
 ]
 
@@ -192,10 +193,10 @@ export const bhvPoleGrabbing = [
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.set_objectData_value, args: { field: oInteractType, value: INTERACT_POLE } },
     { command: BhvCmds.set_hitbox, args: { radius: 80, height: 1500 } },
-	{ command: BhvCmds.call_native, args: { func: bhv_pole_init } },
+	{ command: BhvCmds.call_native, args: { func: 'bhv_pole_init' } },
     { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.begin_loop },
-        { command: BhvCmds.call_native, args: { func: bhv_pole_base_loop } },
+        { command: BhvCmds.call_native, args: { func: 'bhv_pole_base_loop' } },
     { command: BhvCmds.end_loop },
 ]
 
@@ -210,7 +211,7 @@ export const bhvCastleFlagWaving = [
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.load_animations, args: { field: oAnimations, anims: castle_grounds_seg7_anims_flags } },
     { command: BhvCmds.animate, args: { animIndex: 0 } },
-    { command: BhvCmds.call_native, args: { func: bhv_castle_flag_init } },
+    { command: BhvCmds.call_native, args: { func: 'bhv_castle_flag_init' } },
     { command: BhvCmds.begin_loop },
     { command: BhvCmds.end_loop },
 ]
@@ -712,15 +713,6 @@ export const bhvCarrySomething6 = [
     BREAK(),
 ]
 
-
-//start of import birds in castle grounds
-import {
-    birds_seg5_anims_050009E8
-} from "../actors/bird/anims.inc.js"
- import {
-    bhv_bird_update
- } from "./behaviors/bird.inc.js"
-
 export const bhvBird = [
     BEGIN(OBJ_LIST_DEFAULT),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -729,7 +721,7 @@ export const bhvBird = [
     HIDE(),
     SCALE(/*Unused*/ 0, /*Field*/ 70),
     BEGIN_LOOP(),
-        CALL_NATIVE(bhv_bird_update),
+        CALL_NATIVE('bhv_bird_update'),
     END_LOOP(),
 ]
 
@@ -1011,17 +1003,16 @@ export const bhvKoopaShellUnderwater = [
     END_LOOP(),
 ]
 
-let _bhvHiddenAt120Stars;
-export const bhvHiddenAt120Stars = () => {return _bhvHiddenAt120Stars ||= [
+export const bhvHiddenAt120Stars = [
     BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     LOAD_COLLISION_DATA(castle_grounds_seg7_collision_cannon_grill),
     SET_FLOAT(oCollisionDistance, 4000),
-    CALL_NATIVE(bhv_castle_cannon_grate_init),
+    CALL_NATIVE('bhv_castle_cannon_grate_init'),
     BEGIN_LOOP(),
         CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
     END_LOOP(),
-]}
+]
 
 export const bhvCoinFormationSpawn = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
@@ -1351,7 +1342,7 @@ export const bhvSoundSpawner = [
     BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     DELAY(3),
-    CALL_NATIVE(bhv_sound_spawner_init),
+    CALL_NATIVE('bhv_sound_spawner_init'),
     DELAY(30),
     DEACTIVATE(),
 ]
@@ -1422,7 +1413,7 @@ export const bhvYoshi = [
 //     LOAD_ANIMATIONS(oAnimations, koopa_flag_seg6_anims_06001028),
 //     ANIMATE(0),
 //     BEGIN_LOOP(),
-//         CALL_NATIVE(bhv_pole_base_loop),
+//         CALL_NATIVE('bhv_pole_base_loop'),
 //     END_LOOP(),
 // ]
 
@@ -1552,14 +1543,20 @@ const bhvSmoke = [
 
 
 
+gLinker.behaviors.bhvBird = bhvBird
 gLinker.behaviors.bhvBobBowlingBallSpawner = bhvBobBowlingBallSpawner
+gLinker.behaviors.bhvBobomb = bhvBobomb
 gLinker.behaviors.bhvBobombBuddy = bhvBobombBuddy
+gLinker.behaviors.bhvBobombFuseSmoke = bhvBobombFuseSmoke
 gLinker.behaviors.bhvBowlingBall = bhvBowlingBall
 gLinker.behaviors.bhvBowser = bhvBowser
 gLinker.behaviors.bhvBowserBodyAnchor = bhvBowserBodyAnchor
 gLinker.behaviors.bhvBowserFlameSpawn = bhvBowserFlameSpawn
 gLinker.behaviors.bhvBreakableBox = bhvBreakableBox
+gLinker.behaviors.bhvBreakBoxTriangle = bhvBreakBoxTriangle
 gLinker.behaviors.bhvBubbleParticleSpawner = bhvBubbleParticleSpawner
+gLinker.behaviors.bhvCannon = bhvCannon
+gLinker.behaviors.bhvCannonBarrelBubbles = bhvCannonBarrelBubbles
 gLinker.behaviors.bhvCannonClosed = bhvCannonClosed
 gLinker.behaviors.bhvCarrySomething1 = bhvCarrySomething1
 gLinker.behaviors.bhvCarrySomething2 = bhvCarrySomething2
@@ -1567,6 +1564,8 @@ gLinker.behaviors.bhvCarrySomething3 = bhvCarrySomething3
 gLinker.behaviors.bhvCarrySomething4 = bhvCarrySomething4
 gLinker.behaviors.bhvCarrySomething5 = bhvCarrySomething5
 gLinker.behaviors.bhvCheckerboardElevatorGroup = bhvCheckerboardElevatorGroup
+gLinker.behaviors.bhvExplosion = bhvExplosion
+gLinker.behaviors.bhvFish = bhvFish
 gLinker.behaviors.bhvFreeBowlingBall = bhvFreeBowlingBall
 gLinker.behaviors.bhvHorStarParticleSpawner = bhvHorStarParticleSpawner
 gLinker.behaviors.bhvIdleWaterWave = bhvIdleWaterWave
@@ -1582,13 +1581,16 @@ gLinker.behaviors.bhvSeesawPlatform = bhvSeesawPlatform
 gLinker.behaviors.bhvShallowWaterSplash = bhvShallowWaterSplash
 gLinker.behaviors.bhvShallowWaterWave = bhvShallowWaterWave
 gLinker.behaviors.bhvSingleCoinGetsSpawned = bhvSingleCoinGetsSpawned
+gLinker.behaviors.bhvSmoke = bhvSmoke
 gLinker.behaviors.bhvSpawnedStarNoLevelExit = bhvSpawnedStarNoLevelExit
 gLinker.behaviors.bhvThiBowlingBallSpawner = bhvThiBowlingBallSpawner
 gLinker.behaviors.bhvTriangleParticleSpawner = bhvTriangleParticleSpawner
 gLinker.behaviors.bhvTtmBowlingBallSpawner = bhvTtmBowlingBallSpawner
 gLinker.behaviors.bhvVanishCap = bhvVanishCap
 gLinker.behaviors.bhvVertStarParticleSpawner = bhvVertStarParticleSpawner
+gLinker.behaviors.bhvWaterBomb = bhvWaterBomb
 gLinker.behaviors.bhvWaterBombCannon = bhvWaterBombCannon
+gLinker.behaviors.bhvWaterBombShadow = bhvWaterBombShadow
 gLinker.behaviors.bhvWaterDroplet = bhvWaterDroplet
 gLinker.behaviors.bhvWaterDropletSplash = bhvWaterDropletSplash
 gLinker.behaviors.bhvWaterSplash = bhvWaterSplash
@@ -1596,7 +1598,3 @@ gLinker.behaviors.bhvWaveTrail = bhvWaveTrail
 gLinker.behaviors.bhvWhitePuffExplosion = bhvWhitePuffExplosion
 gLinker.behaviors.bhvWingCap = bhvWingCap
 gLinker.behaviors.bhvWoodenPost = bhvWoodenPost
-gLinker.behaviors.bhvSmoke = bhvSmoke
-gLinker.behaviors.bhvBobombFuseSmoke = bhvBobombFuseSmoke
-gLinker.behaviors.bhvExplosion = bhvExplosion
-gLinker.behaviors.bhvBobomb = bhvBobomb

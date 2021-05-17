@@ -2241,6 +2241,7 @@ class Camera {
 }
 
 export const CameraInstance = new Camera()
+gLinker.Camera = CameraInstance
 
 export const geo_camera_main = CameraInstance.geo_camera_main
 export const geo_camera_fov = CameraInstance.geo_camera_fov

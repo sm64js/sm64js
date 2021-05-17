@@ -1,67 +1,31 @@
 // Bobomb
 import * as _Linker from "../../game/Linker"
-
-import {
-    obj_turn_toward_object, obj_attack_collided_from_other_object, cur_obj_scale, spawn_object,
-    obj_mark_for_deletion, cur_obj_nearest_object_with_behavior, approach_s16_symmetric,
-    cur_obj_init_animation, cur_obj_set_pos_relative, cur_obj_enable_rendering, cur_obj_get_dropped,
-} from "../ObjectHelpers"
-
-import {
-    is_point_within_radius_of_mario, object_step, obj_return_home_if_safe,
-    obj_check_if_facing_toward_angle, obj_check_floor_death, sObjFloor, obj_spawn_yellow_coins,
-    curr_obj_random_blink, set_object_visibility
-} from "../ObjBehaviors"
-
-import {
-    obj_set_hitbox
-} from "../ObjBehaviors2"
-
-import {
-    int32
-} from "../../utils"
-
-import {
-    create_respawner
-} from "./corkbox.inc"
-
-import {
-    cur_obj_play_sound_1, cur_obj_play_sound_2
-} from "../SpawnSound"
-
-import {
-    oPosX, oPosY, oPosZ, oAnimState, oBobombBlinkTimer, oHeldState, oBehParams, oBehParams2ndByte,
-    oBobombBuddyRole, oAction, oBobombBuddyCannonStatus, oBobombBuddyHasTalkedToMario,
-    oDistanceToMario, oBobombBuddyBlinkTimer, oBobombBuddyPosXCopy, oBobombBuddyPosYCopy,
-    oBobombBuddyPosZCopy, oBobombFuseTimer, oForwardVel, oGravity, oFriction, oBuoyancy,
-    oInteractionSubtype, oHomeX, oHomeY, oHomeZ, oMoveAngleYaw, oAngleToMario, oBobombFuseLit,
-    oSmokeTimer, oTimer, oInteractStatus, oVelY, oGraphYOffset, oVelX, oVelZ, oFlags,
-
-    BOBOMB_ACT_LAUNCHED, ACTIVE_FLAGS_DEACTIVATED,  BOBOMB_BP_STYPE_GENERIC, HELD_HELD, HELD_FREE,
-    HELD_THROWN, HELD_DROPPED, BOBOMB_ACT_PATROL, BOBOMB_ACT_CHASE_MARIO, BOBOMB_ACT_EXPLODE,
-    BOBOMB_ACT_LAVA_DEATH, BOBOMB_ACT_DEATH_PLANE_DEATH
-} from "../../include/object_constants"
-
-import {
-    INT_SUBTYPE_NPC, INT_SUBTYPE_KICKABLE, INTERACT_GRABBABLE, INT_STATUS_INTERACTED,
-    INT_STATUS_MARIO_UNK1, INT_STATUS_TOUCHED_BOB_OMB, INT_STATUS_MARIO_DROP_OBJECT
-} from "../Interaction"
-
-import {
-    MODEL_EXPLOSION, MODEL_BLACK_BOBOMB, MODEL_SMOKE
-} from "../../include/model_ids"
-
-import {
-    OBJ_COL_FLAG_GROUNDED
-} from "../ObjBehaviors"
-
-import {
-    GRAPH_RENDER_INVISIBLE
-} from "../../engine/graph_node"
-
-import {
-    SOUND_OBJ_BOBOMB_WALK, SOUND_ACTION_READ_SIGN, SOUND_AIR_BOBOMB_LIT_FUSE
-} from "../../include/sounds"
+import { obj_turn_toward_object, obj_attack_collided_from_other_object, cur_obj_scale, spawn_object,
+obj_mark_for_deletion, cur_obj_nearest_object_with_behavior, approach_s16_symmetric,
+cur_obj_init_animation, cur_obj_set_pos_relative, cur_obj_enable_rendering, cur_obj_get_dropped, }
+from "../ObjectHelpers"
+import { is_point_within_radius_of_mario, object_step, obj_return_home_if_safe,
+obj_check_if_facing_toward_angle, obj_check_floor_death, sObjFloor, obj_spawn_yellow_coins,
+curr_obj_random_blink, set_object_visibility } from "../ObjBehaviors"
+import { obj_set_hitbox } from "../ObjBehaviors2"
+import { int32 } from "../../utils"
+import { create_respawner } from "./corkbox.inc"
+import { cur_obj_play_sound_1, cur_obj_play_sound_2 } from "../SpawnSound"
+import { oPosX, oPosY, oPosZ, oAnimState, oBobombBlinkTimer, oHeldState, oBehParams,
+oBehParams2ndByte, oBobombBuddyRole, oAction, oBobombBuddyCannonStatus,
+oBobombBuddyHasTalkedToMario, oDistanceToMario, oBobombBuddyBlinkTimer, oBobombBuddyPosXCopy,
+oBobombBuddyPosYCopy, oBobombBuddyPosZCopy, oBobombFuseTimer, oForwardVel, oGravity, oFriction,
+oBuoyancy, oInteractionSubtype, oHomeX, oHomeY, oHomeZ, oMoveAngleYaw, oAngleToMario,
+oBobombFuseLit, oSmokeTimer, oTimer, oInteractStatus, oVelY, oGraphYOffset, oVelX, oVelZ, oFlags,
+BOBOMB_ACT_LAUNCHED, ACTIVE_FLAGS_DEACTIVATED,  BOBOMB_BP_STYPE_GENERIC, HELD_HELD, HELD_FREE,
+HELD_THROWN, HELD_DROPPED, BOBOMB_ACT_PATROL, BOBOMB_ACT_CHASE_MARIO, BOBOMB_ACT_EXPLODE,
+BOBOMB_ACT_LAVA_DEATH, BOBOMB_ACT_DEATH_PLANE_DEATH } from "../../include/object_constants"
+import { INT_SUBTYPE_NPC, INT_SUBTYPE_KICKABLE, INTERACT_GRABBABLE, INT_STATUS_INTERACTED,
+INT_STATUS_MARIO_UNK1, INT_STATUS_TOUCHED_BOB_OMB, INT_STATUS_MARIO_DROP_OBJECT } from "../Interaction"
+import { MODEL_EXPLOSION, MODEL_BLACK_BOBOMB, MODEL_SMOKE } from "../../include/model_ids"
+import { OBJ_COL_FLAG_GROUNDED } from "../ObjBehaviors"
+import { GRAPH_RENDER_INVISIBLE } from "../../engine/graph_node"
+import { SOUND_OBJ_BOBOMB_WALK, SOUND_ACTION_READ_SIGN, SOUND_AIR_BOBOMB_LIT_FUSE } from "../../include/sounds"
 
 
 /* Bob-omb Buddy */

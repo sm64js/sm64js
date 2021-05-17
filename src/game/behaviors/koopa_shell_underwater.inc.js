@@ -1,11 +1,10 @@
 // koopa_shell_underwater.c.inc
-import { ObjectListProcessorInstance as O } from "../ObjectListProcessor"
-import { INTERACT_GRABBABLE, INT_STATUS_STOP_RIDING } from "../Interaction"
-import { oInteractStatus,
-         HELD_FREE, HELD_THROWN, HELD_DROPPED } from "../../include/object_constants"
-
-import { obj_set_hitbox } from "../ObjBehaviors2"
+import * as _Linker from "../../game/Linker"
 import { cur_obj_unrender_and_reset_state, obj_mark_for_deletion, spawn_mist_particles } from "../ObjectHelpers"
+import { obj_set_hitbox } from "../ObjBehaviors2"
+import { INTERACT_GRABBABLE, INT_STATUS_STOP_RIDING } from "../Interaction"
+import { oInteractStatus, HELD_FREE, HELD_THROWN, HELD_DROPPED } from "../../include/object_constants"
+
 
 const sKoopaShellUnderwaterHitbox = {
     interactType:       INTERACT_GRABBABLE,
@@ -20,12 +19,12 @@ const sKoopaShellUnderwaterHitbox = {
 }
 
 const set_koopa_shell_underwater_hitbox = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     obj_set_hitbox(o, sKoopaShellUnderwaterHitbox)
 }
 
 const bhv_koopa_shell_underwater_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     switch (o.rawData[oHeldState]) {
         case HELD_FREE:
             set_koopa_shell_underwater_hitbox()

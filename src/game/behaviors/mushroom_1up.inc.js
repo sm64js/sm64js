@@ -1,12 +1,8 @@
 // // mushroom_1up.c.inc
-import { ObjectListProcessorInstance as O } from "../ObjectListProcessor"
-import {
-    oMoveAnglePitch, oGravity, oFriction, oBuoyancy
-} from "../../include/object_constants"
+import * as _Linker from "../../game/Linker"
+import { set_object_visibility } from "../ObjectHelpers"
+import { oMoveAnglePitch, oGravity, oFriction, oBuoyancy } from "../../include/object_constants"
 
-import {
-    set_object_visibility
-} from "../ObjectHelpers"
 
 // void bhv_1up_interact(void) {
 //     UNUSED s32 sp1C;
@@ -22,7 +18,7 @@ import {
 // }
 
 const bhv_1up_common_init = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oMoveAnglePitch] = -0x4000
     o.rawData[oGravity]  = 3.0
     o.rawData[oFriction] = 1.0
@@ -189,9 +185,8 @@ const bhv_1up_sliding_loop = () => {
 }
 
 const bhv_1up_loop = () => {
-    const o = O.gCurrentObject;
 //     bhv_1up_interact();
-    // set_object_visibility(o, 3000)
+//     set_object_visibility(o, 3000)
 }
 
 const bhv_1up_jump_on_approach_loop = () => {
@@ -332,6 +327,7 @@ const bhv_1up_hidden_in_pole_spawner_loop = () => {
 //         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
 //     }
 }
+
 
 gLinker.bhv_1up_common_init = bhv_1up_common_init
 gLinker.bhv_1up_hidden_in_pole_loop = bhv_1up_hidden_in_pole_loop

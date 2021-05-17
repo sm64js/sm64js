@@ -1,72 +1,24 @@
 // exclamation_box.c.inc
-import { ObjectListProcessorInstance as O } from "../ObjectListProcessor"
-import { SurfaceLoadInstance as SurfaceLoad } from "../SurfaceLoad"
+import * as _Linker from "../../game/Linker"
 import { spawn_object, cur_obj_become_intangible, cur_obj_become_tangible, cur_obj_hide,
-         cur_obj_unhide, obj_mark_for_deletion,
-         cur_obj_scale, obj_turn_toward_object, approach_symmetric,
-         cur_obj_move_using_fvel_and_gravity,
-         cur_obj_was_attacked_or_ground_pounded } from "../ObjectHelpers"
+cur_obj_unhide, obj_mark_for_deletion, cur_obj_scale, obj_turn_toward_object, approach_symmetric,
+cur_obj_move_using_fvel_and_gravity, cur_obj_was_attacked_or_ground_pounded } from "../ObjectHelpers"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { s16, random_float, sins } from "../../utils"
-
-import {
-         oAction, oPrevAction, oSubAction, oTimer, oFlags,
-         oBehParams, oBehParams2ndByte,
-         oAnimations, oAnimState, oActiveParticleFlags,
-         oIntangibleTimer, oInteractionSubtype, oInteractStatus, oInteractType,
-         oHealth, oHeldState,
-
-         oPosX, oPosY, oPosZ,
-         oHomeX, oHomeY, oHomeZ, oAngleToHome,
-         oVelX, oVelY, oVelZ,
-         oParentRelativePosX, oParentRelativePosY, oParentRelativePosZ,
-         oGraphYOffset,
-
-         oAngleVelPitch, oAngleVelRoll, oAngleVelYaw,
-         oForwardVel, oForwardVelS32,
-         oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw,
-         oDrawingDistance, oOpacity,
-
-         oBounciness, oBuoyancy, oDragStrength, oFriction, oGravity,
-         oCollisionDistance, oDamageOrCoinValue, oNumLootCoins,
-         oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oMoveFlags,
-         oWallAngle, oWallHitboxRadius,
-
-         oFloor, oFloorHeight, oFloorRoom, oFloorType, oRoom,
-         oAngleToMario, oDistanceToMario,
-
-         oDeathSound, oSoundStateID,
-         oDialogResponse, oDialogState,
-
-         oUnk1A8, oUnk94, oUnkBC, oUnkC0,
-
-         oExclamationBoxUnkF4, oExclamationBoxUnkF8, oExclamationBoxUnkFC
-} from "../../include/object_constants"
-
-import { MODEL_1UP,
-         MODEL_EXCLAMATION_POINT,
-         MODEL_EXCLAMATION_BOX,
-         MODEL_EXCLAMATION_BOX_OUTLINE,
-         MODEL_KOOPA_SHELL,
-         MODEL_MARIOS_CAP,
-         MODEL_MARIOS_METAL_CAP,
-         MODEL_MARIOS_WING_CAP,
-         MODEL_NONE,
-         MODEL_STAR,
-         MODEL_YELLOW_COIN,
-} from "../../include/model_ids"
-
-import * as BehaviorData from "../BehaviorData"
-
-import { SOUND_GENERAL_BREAK_BOX } from "../../include/sounds"
-import { INTERACT_BREAKABLE } from "../Interaction"
-import { save_file_get_flags, 
-         SAVE_FLAG_HAVE_WING_CAP, SAVE_FLAG_HAVE_METAL_CAP, SAVE_FLAG_HAVE_VANISH_CAP
-} from "../SaveFile"
-
 import { spawn_mist_particles_variable  } from "./white_puff.inc"
 import { spawn_triangle_break_particles } from "./break_particles.inc"
 import { create_sound_spawner } from "../SpawnSound"
+import { oAction,  oAnimState,  oBehParams2ndByte,  oBehParams,  oExclamationBoxUnkF4, 
+oExclamationBoxUnkF8,  oExclamationBoxUnkFC,  oFlags,  oFloorHeight,  oForwardVel,  oGraphYOffset, 
+oGravity,  oHomeY,  oInteractStatus,  oMoveAngleYaw,  oPosY,  oTimer,  oVelY } from "../../include/object_constants"
+import { MODEL_1UP, MODEL_EXCLAMATION_POINT, MODEL_EXCLAMATION_BOX, MODEL_EXCLAMATION_BOX_OUTLINE,
+MODEL_KOOPA_SHELL, MODEL_MARIOS_CAP, MODEL_MARIOS_METAL_CAP, MODEL_MARIOS_WING_CAP, MODEL_NONE,
+MODEL_STAR, MODEL_YELLOW_COIN } from "../../include/model_ids"
+import { SOUND_GENERAL_BREAK_BOX } from "../../include/sounds"
+import { INTERACT_BREAKABLE } from "../Interaction"
+import { save_file_get_flags,  SAVE_FLAG_HAVE_WING_CAP, SAVE_FLAG_HAVE_METAL_CAP,
+SAVE_FLAG_HAVE_VANISH_CAP } from "../SaveFile"
+
 
 const sExclamationBoxHitbox = {
      interactType:  INTERACT_BREAKABLE,
@@ -97,7 +49,7 @@ let _sExclamationBoxContents;
 const sExclamationBoxContents = (type) => {
     if (!_sExclamationBoxContents) {
         let proto = [
-            [  0, 0, 0, MODEL_MARIOS_WING_CAP, 'bhvWingCap' ],
+            [  0, 0, 0, MODEL_MARIOS_WING_CAP,  'bhvWingCap' ],
             [  1, 0, 0, MODEL_MARIOS_METAL_CAP, 'bhvMetalCap' ],
             [  2, 0, 0, MODEL_MARIOS_CAP,       'bhvVanishCap' ],
             [  3, 0, 0, MODEL_KOOPA_SHELL,      'bhvKoopaShell' ],
@@ -116,7 +68,7 @@ const sExclamationBoxContents = (type) => {
         _sExclamationBoxContents = {}
         proto.forEach(c => {
             _sExclamationBoxContents[c[0]] = {
-                unk2: c[2], model: c[3], behavior: BehaviorData[c[4]]
+                unk2: c[2], model: c[3], behavior: c[4]
             }
         })
     }
@@ -125,7 +77,7 @@ const sExclamationBoxContents = (type) => {
 }
 
 const bhv_rotating_exclamation_box_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     if (o.parentObj.rawData[oAction] != 1)
         obj_mark_for_deletion(o)
 }
@@ -136,7 +88,7 @@ const cap_flags = [ SAVE_FLAG_HAVE_WING_CAP, SAVE_FLAG_HAVE_METAL_CAP, SAVE_FLAG
 const DEBUG_HAVE = SAVE_FLAG_HAVE_WING_CAP | SAVE_FLAG_HAVE_METAL_CAP | SAVE_FLAG_HAVE_VANISH_CAP
 
 const exclamation_box_act_0 = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     if (o.rawData[oBehParams2ndByte] < 3) {
         o.rawData[oAnimState] = o.rawData[oBehParams2ndByte]
         if ((save_file_get_flags(DEBUG_HAVE) & cap_flags[o.rawData[oBehParams2ndByte]])
@@ -151,7 +103,7 @@ const exclamation_box_act_0 = () => {
 }
 
 const exclamation_box_act_1 = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     cur_obj_become_intangible()
     if (o.rawData[oTimer] == 0) {
         spawn_object(o, MODEL_EXCLAMATION_POINT, bhvRotatingExclamationMark)
@@ -165,7 +117,7 @@ const exclamation_box_act_1 = () => {
 }
 
 const exclamation_box_act_2 = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     obj_set_hitbox(o, sExclamationBoxHitbox)
     if (o.rawData[oTimer] == 0) {
         cur_obj_unhide()
@@ -182,11 +134,11 @@ const exclamation_box_act_2 = () => {
         o.rawData[oFloorHeight] = o.rawData[oPosY]
         o.rawData[oAction] = 3
     }
-    SurfaceLoad.load_object_collision_model()
+    gLinker.SurfaceLoad.load_object_collision_model()
 }
 
 const exclamation_box_act_3 = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     cur_obj_move_using_fvel_and_gravity()
     if (o.rawData[oVelY] < 0.0) {
@@ -206,14 +158,15 @@ const exclamation_box_act_3 = () => {
 }
 
 const exclamation_box_spawn_contents = (type) => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
     let obj
     const contents = sExclamationBoxContents(type)
 
     obj = spawn_object(o, contents.model, contents.behavior)
     obj.rawData[oVelY] = 20.0
     obj.rawData[oForwardVel] = 3.0
-    obj.rawData[oMoveAngleYaw] = O.gMarioObject.rawData[oMoveAngleYaw]
+    obj.rawData[oMoveAngleYaw] = gMarioObject.rawData[oMoveAngleYaw]
     o.rawData[oBehParams] |= contents.unk2 << 24
     if (contents.model == MODEL_STAR) {
         o.rawData[oFlags] |= 0x4000
@@ -221,7 +174,7 @@ const exclamation_box_spawn_contents = (type) => {
 }
 
 const exclamation_box_act_4 = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     exclamation_box_spawn_contents(o.rawData[oBehParams2ndByte])
     spawn_mist_particles_variable(0, 0, 46.0)
     spawn_triangle_break_particles(20, 139, 0.3, o.rawData[oAnimState])
@@ -235,7 +188,7 @@ const exclamation_box_act_4 = () => {
 }
 
 const exclamation_box_act_5 = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     if (o.rawData[oTimer] > 300)
         o.rawData[oAction] = 2
 }
@@ -245,7 +198,7 @@ const sExclamationBoxActions = [ exclamation_box_act_0, exclamation_box_act_1,
                                  exclamation_box_act_4, exclamation_box_act_5 ]
 
 const bhv_exclamation_box_loop = () => {
-    const o = O.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     cur_obj_scale(2.0)
     sExclamationBoxActions[o.rawData[oAction]]()
 }

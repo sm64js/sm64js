@@ -1,26 +1,19 @@
-import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { AreaInstance as Area } from "../Area"
-import { LEVEL_SA } from "../../levels/level_defines_constants"
-import { FLOOR_LOWER_LIMIT_MISC } from "../../include/surface_terrains"
+import * as _Linker from "../../game/Linker"
+import {  spawn_object, obj_init_animation_with_sound, obj_translate_xyz_random,
+cur_obj_resolve_wall_collisions, obj_mark_for_deletion, cur_obj_move_using_fvel_and_gravity,
+cur_obj_scale, cur_obj_init_animation_with_accel_and_sound, approach_symmetric,
+cur_obj_rotate_yaw_toward } from "../ObjectHelpers"
 import { is_point_within_radius_of_mario, set_object_visibility } from "../ObjBehaviors"
-import {
-    oPosX, oPosY, oPosZ, oVelX, oVelY, oVelZ, oMoveAngleYaw, oMoveAnglePitch,
-    oBehParams2ndByte, oWallHitboxRadius, oDistanceToMario, oAngleToMario,
-    oTimer, oForwardVel,
-    oAction, oAnimState
-} from "../../include/object_constants"
-import { 
-    spawn_object, obj_init_animation_with_sound, obj_translate_xyz_random,
-    cur_obj_resolve_wall_collisions, obj_mark_for_deletion, cur_obj_move_using_fvel_and_gravity,
-    cur_obj_scale, cur_obj_init_animation_with_accel_and_sound, approach_symmetric,
-    cur_obj_rotate_yaw_toward
-} from "../ObjectHelpers"
-import { SurfaceCollisionInstance as SurfaceCollision } from "../../engine/SurfaceCollision"
 import { int16, int32, random_float, sins, coss } from "../../utils"
 import { atan2s } from "../../engine/math_util"
-import { bhvFish } from "../BehaviorData"
+import { oPosX, oPosY, oPosZ, oVelX, oVelY, oVelZ, oMoveAngleYaw, oMoveAnglePitch,
+oBehParams2ndByte, oWallHitboxRadius, oDistanceToMario, oAngleToMario, oTimer, oForwardVel, oAction,
+oAnimState } from "../../include/object_constants"
+import { LEVEL_SA } from "../../levels/level_defines_constants"
+import { FLOOR_LOWER_LIMIT_MISC } from "../../include/surface_terrains"
 import { MODEL_FISH, MODEL_CYAN_FISH } from "../../include/model_ids"
 import { blue_fish_seg3_anims_0301C2B0 } from "../../actors/blue_fish/anims.inc"
+
 
 /* Fish Spawer */
 /* oAction */
@@ -53,7 +46,7 @@ const BLUE_FISH_ACT_DUPLICATE = 2
 
 
 const fish_spawner_act_spawn = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     let schoolQuantity
     let model
     let minDistToMario
@@ -94,9 +87,9 @@ const fish_spawner_act_spawn = () => {
     // Spawn and animate the schoolQuantity of fish if Mario enters render distance
     // or the stage is Secret Aquarium.
     // Fish moves randomly within a range of 700.0f.
-    if (o.rawData[oDistanceToMario] < minDistToMario || Area.gCurrLevelNum == LEVEL_SA) {
+    if (o.rawData[oDistanceToMario] < minDistToMario || gLinker.Area.gCurrLevelNum == LEVEL_SA) {
         for (let i = 0; i < schoolQuantity; i++) {
-            fishObject = spawn_object(o, model, bhvFish)
+            fishObject = spawn_object(o, model, 'bhvFish')
             fishObject.rawData[oBehParams2ndByte] = o.rawData[oBehParams2ndByte]
             obj_init_animation_with_sound(fishObject, fishAnimation, 0)
             obj_translate_xyz_random(fishObject, 700)
@@ -110,9 +103,9 @@ const fish_spawner_act_spawn = () => {
  * Mario is more than 2000 units higher.
  */
 const fish_spawner_act_idle = () => {
-    const o = ObjectListProc.gCurrentObject
-    const gMarioObject = ObjectListProc.gMarioObject
-    if ((Area.gCurrLevelNum != LEVEL_SA) && (gMarioObject.rawData[oPosY] - o.rawData[oPosY] > 2000)) {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+    if ((gLinker.Area.gCurrLevelNum != LEVEL_SA) && (gMarioObject.rawData[oPosY] - o.rawData[oPosY] > 2000)) {
         o.rawData[oAction] = FISH_SPAWNER_ACT_RESPAWN
     }
 }
@@ -121,7 +114,7 @@ const fish_spawner_act_idle = () => {
  * Temp action that sets the action to spawn fish. This triggers the old fish to despawn.
  */
 const fish_spawner_act_respawn = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oAction] = FISH_SPAWNER_ACT_SPAWN
 }
 
@@ -130,7 +123,7 @@ const sFishSpawnerActions = [
 ]
 
 const bhv_fish_spawner_loop = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     sFishSpawnerActions[o.rawData[oAction]]()
 }
 
@@ -139,12 +132,12 @@ const bhv_fish_spawner_loop = () => {
  * Allows the fish to swim vertically.
  */
 const fish_vertical_roam = (speed) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     let parentY = o.parentObj.rawData[oPosY]
 
     // If the stage is Secret Aquarium, the fish can 
     // travel as far vertically as they wish.
-    if (Area.gCurrLevelNum == LEVEL_SA) {
+    if (gLinker.Area.gCurrLevelNum == LEVEL_SA) {
         if (500 < Math.abs(o.rawData[oPosY] - o.oFishGoalY)) {
             speed = 10
         }
@@ -162,8 +155,8 @@ const fish_vertical_roam = (speed) => {
 //  * Fish action that randomly roams within a set range.
 //  */
 const fish_act_roam = () => {
-    const o = ObjectListProc.gCurrentObject
-    const gMarioObject = ObjectListProc.gMarioObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
     let fishY = o.rawData[oPosY] - gMarioObject.rawData[oPosY]
 
     // Alters speed of animation for natural movement.
@@ -176,7 +169,7 @@ const fish_act_roam = () => {
     // Initializes some variables when the fish first begins roaming.
     if (o.rawData[oTimer] == 0) {
         o.rawData[oForwardVel] = random_float() * 2 + 3
-        if (Area.gCurrLevelNum == LEVEL_SA) {
+        if (gLinker.Area.gCurrLevelNum == LEVEL_SA) {
             o.oFishHeightOffset = random_float() * 700
         } else {
             o.oFishHeightOffset = random_float() * 100
@@ -217,8 +210,8 @@ const fish_act_roam = () => {
 //  * Interactively maneuver fish in relation to its distance from other fish and Mario.
 //  */
 const fish_act_flee = () => {
-    const o = ObjectListProc.gCurrentObject
-    const gMarioObject = ObjectListProc.gMarioObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
     let fishY = o.rawData[oPosY] - gMarioObject.rawData[oPosY]
     let distance
     o.oFishGoalY = gMarioObject.rawData[oPosY] + o.oFishHeightOffset
@@ -282,7 +275,7 @@ const fish_act_flee = () => {
 //  * Animate fish and alter scaling at random for a magnifying effect from the water.
 //  */
 const fish_act_init = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     cur_obj_init_animation_with_accel_and_sound(0, 1)
     o.header.gfx.unk38.animFrame = int16(random_float() * 28)
     o.oFishDepthDistance = random_float() * 300
@@ -298,13 +291,13 @@ const sFishActions = [
 //  * Main loop for fish
 //  */
 const bhv_fish_loop = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     cur_obj_scale(1)
 
     // oFishWaterLevel tracks if a fish has roamed out of water.
     // This can't happen in Secret Aquarium, so set it to 0.
-    o.oFishWaterLevel = SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ])
-    if (Area.gCurrLevelNum == LEVEL_SA) {
+    o.oFishWaterLevel = gLinker.SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ])
+    if (gLinker.Area.gCurrLevelNum == LEVEL_SA) {
         o.oFishWaterLevel = 0
     }
 

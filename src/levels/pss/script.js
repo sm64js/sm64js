@@ -14,3 +14,6 @@ export const level_pss_entry = [
     { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_or_update, LevelUpdate] },
     { command: LevelCommands.call_loop, args: [1, LevelUpdate.lvl_init_or_update, LevelUpdate] },
 ]
+
+
+gLinker.level_scripts.level_pss_entry = level_pss_entry

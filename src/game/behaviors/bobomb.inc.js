@@ -233,7 +233,7 @@ const bobomb_held_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
-    o.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
+    o.header.gfx.flags |= GRAPH_RENDER_INVISIBLE
     cur_obj_init_animation(1)
     cur_obj_set_pos_relative(gMarioObject, 0, 60.0, 100.0)
 
@@ -251,7 +251,7 @@ const bobomb_dropped_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     cur_obj_get_dropped()
 
-    o.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+    o.header.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
     cur_obj_init_animation(0)
 
     o.rawData[oHeldState] = 0
@@ -262,7 +262,7 @@ const bobomb_thrown_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     cur_obj_enable_rendering()
 
-    o.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+    o.header.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
     o.rawData[oHeldState] = 0
     o.rawData[oFlags] &= ~0x8; /* bit 3 */
     o.rawData[oForwardVel] = 25.0

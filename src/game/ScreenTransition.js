@@ -1,8 +1,21 @@
-import { WARP_TRANSITION_FADE_INTO_COLOR, WARP_TRANSITION_FADE_FROM_STAR } from "./Area"
+import { 
+WARP_TRANSITION_FADE_FROM_COLOR,
+WARP_TRANSITION_FADE_INTO_COLOR,
+WARP_TRANSITION_FADE_FROM_STAR,
+WARP_TRANSITION_FADE_INTO_STAR,
+WARP_TRANSITION_FADE_FROM_CIRCLE,
+WARP_TRANSITION_FADE_INTO_CIRCLE,
+WARP_TRANSITION_FADE_INTO_MARIO,
+WARP_TRANSITION_FADE_FROM_BOWSER,
+WARP_TRANSITION_FADE_INTO_BOWSER,
+ } from "./Area"
 import { GameInstance as Game } from "./Game"
 import * as Gbi from "../include/gbi"
 import { atan2s } from "../engine/math_util"
-import { dl_proj_mtx_fullscreen, dl_transition_draw_filled_region, texture_transition_star_half, dl_draw_quad_verts_0123, dl_screen_transition_end, matrix_identity, matrix_fullscreen } from "../common_gfx/segment2"
+import { dl_proj_mtx_fullscreen, dl_transition_draw_filled_region,
+	texture_transition_star_half, texture_transition_circle_half,
+	texture_transition_mario, texture_transition_bowser_half,
+	dl_draw_quad_verts_0123, dl_screen_transition_end, matrix_identity, matrix_fullscreen } from "../common_gfx/segment2"
 import { round_float, make_vertex } from "./GeoMisc"
 
 const canvas = document.querySelector('#gameCanvas')
@@ -19,7 +32,10 @@ const sTransitionColorFadeCount = [ 0,0,0,0 ]
 const sTransitionTextureFadeCount = [0, 0]
 
 const sTextureTransitionID = [
-	texture_transition_star_half
+	texture_transition_star_half,
+    texture_transition_circle_half,
+    texture_transition_mario,
+    texture_transition_bowser_half,
 ]
 
 const set_and_reset_transition_fade_timer = (fadeTimer, transTime) => {
@@ -50,7 +66,6 @@ const vertex_transition_color = (transData, alpha) => {
 }
 
 const dl_transition_color = (fadeTimer, transTime, transData, alpha) => {
-
 	const verts = vertex_transition_color(transData, alpha)
 
 	Gbi.gSPDisplayList(Game.gDisplayList, dl_proj_mtx_fullscreen)
@@ -72,9 +87,7 @@ const set_transition_color_fade_alpha = (fadeType, fadeTimer, transTime) => {
 }
 
 const render_fade_transition_into_color = (fadeTimer, transTime, transData) => {
-
 	const alpha = set_transition_color_fade_alpha(0, fadeTimer, transTime)
-
 	return dl_transition_color(fadeTimer, transTime, transData, alpha)
 }
 
@@ -171,7 +184,9 @@ const render_textured_transition = (fadeTimer, transTime, transData, texID, tran
 	Gbi.gDPSetRenderMode(Game.gDisplayList, Gbi.G_RM_AA_XLU_SURF_SURF2)
 	Gbi.gDPSetTextureFilter(Game.gDisplayList, Gbi.G_TF_BILERP)
 
-	if (sTextureTransitionID[texID] == undefined) throw "need to add transition texture"
+	if (sTextureTransitionID[texID] == undefined) {
+		throw "need to add transition texture"
+	}
 
 	switch (transTexType) {
 		case TRANS_TYPE_MIRROR:
@@ -192,12 +207,27 @@ const render_textured_transition = (fadeTimer, transTime, transData, texID, tran
 
 export const render_screen_transition = (fadeTimer, transType, transTime, transData) => {
 	switch (transType) {
-		case WARP_TRANSITION_FADE_INTO_COLOR:
+        case WARP_TRANSITION_FADE_FROM_COLOR:
+            return render_fade_transition_from_color(fadeTimer, transTime, transData);
+        case WARP_TRANSITION_FADE_INTO_COLOR:
 			return render_fade_transition_into_color(fadeTimer, transTime, transData)
-		case WARP_TRANSITION_FADE_FROM_STAR:
+        case WARP_TRANSITION_FADE_FROM_STAR:
 			return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_STAR, TRANS_TYPE_MIRROR)
-		default: throw "unknown transition type"
-	}
+        case WARP_TRANSITION_FADE_INTO_STAR:
+            return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_STAR, TRANS_TYPE_MIRROR);
+        case WARP_TRANSITION_FADE_FROM_CIRCLE:
+            return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_CIRCLE, TRANS_TYPE_MIRROR);
+        case WARP_TRANSITION_FADE_INTO_CIRCLE:
+            return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_CIRCLE, TRANS_TYPE_MIRROR);
+        case WARP_TRANSITION_FADE_FROM_MARIO:
+            return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_MARIO, TRANS_TYPE_CLAMP);
+        case WARP_TRANSITION_FADE_INTO_MARIO:
+            return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_MARIO, TRANS_TYPE_CLAMP);
+        case WARP_TRANSITION_FADE_FROM_BOWSER:
+            return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_BOWSER, TRANS_TYPE_MIRROR);
+        case WARP_TRANSITION_FADE_INTO_BOWSER:
+            return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_BOWSER, TRANS_TYPE_MIRROR);
+    }
 }
 
 export const geo_cannon_circle_base = (callContext, node, mtx) => {

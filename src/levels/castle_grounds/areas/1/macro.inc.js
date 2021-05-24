@@ -4,9 +4,6 @@ import {
     MACRO_OBJECT_WITH_BEH_PARAM, MACRO_OBJECT, MACRO_OBJECT_END
 } from "../../../../game/MacroSpecialObjects"
 
-// import { MacroObjectPresets } from "../../../../include/macro_presets"
-// const P = MacroObjectPresets
-
 import { DIALOG_050, DIALOG_065, DIALOG_167, DIALOG_051 } from "../../../../text/us/dialogs"
 
 // 0x07010D08 - 0x07010DB4

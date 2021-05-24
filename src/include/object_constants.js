@@ -466,12 +466,6 @@ export const oRRCruiserWingUnkF8  = 0x1C
 /* Donut Platform Spawner */
 export const oDonutPlatformSpawnerSpawnedPlatforms  = 0x1B
 
-/* Door */
-export const oDoorUnk88   = 0x00
-export const oDoorUnkF8   = 0x1C
-export const oDoorUnkFC   = 0x1D
-export const oDoorUnk100  = 0x1E
-
 /* Dorrie */
 export const oDorrieDistToHome          = 0x1B
 export const oDorrieOffsetY             = 0x1C

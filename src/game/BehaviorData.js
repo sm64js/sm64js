@@ -11,7 +11,8 @@ import { ADD_INT, ADD_FLOAT, ANIMATE, BEGIN, BEGIN_LOOP, BEGIN_REPEAT, BILLBOARD
 } from "../engine/BehaviorCommands"
 
 import { INTERACT_WATER_RING, INTERACT_POLE, INTERACT_DAMAGE, INTERACT_COIN, INTERACT_TEXT,
-         INT_SUBTYPE_SIGN, INTERACT_CANNON_BASE, INTERACT_GRABBABLE, INT_SUBTYPE_BIG_KNOCKBACK
+         INT_SUBTYPE_SIGN, INTERACT_CANNON_BASE, INTERACT_GRABBABLE, INT_SUBTYPE_BIG_KNOCKBACK,
+         INTERACT_WARP_DOOR, INTERACT_DOOR, INTERACT_WARP
 } from "./Interaction"
 
 import { oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAnimations,
@@ -49,6 +50,7 @@ import * as _castle_flag              from "./behaviors/bhv_castle_flag_init.inc
 import * as _chain_chomp              from "./behaviors/chain_chomp.inc"
 import * as _checkerboard_platform    from "./behaviors/checkerboard_platform.inc"
 import * as _coin                     from "./behaviors/coin.inc"
+import * as _door                     from "./behaviors/door.inc"
 import * as _exclamation_box          from "./behaviors/exclamation_box.inc"
 import * as _fish                     from "./behaviors/fish.inc"
 import * as _koopa_shell_underwater   from "./behaviors/koopa_shell_underwater.inc"
@@ -60,6 +62,7 @@ import * as _seesaw_platform          from "./behaviors/seesaw_platform.inc"
 import * as _sound_spawner            from "./behaviors/sound_spawner.inc"
 import * as _sparkle_spawn_star       from "./behaviors/sparkle_spawn_star.inc"
 import * as _switch_hidden_objects    from "./behaviors/switch_hidden_objects.inc"
+import * as _warp                     from "./behaviors/warp.inc"
 import * as _water_bomb               from "./behaviors/water_bomb.inc"
 import * as _water_bomb_cannon        from "./behaviors/water_bomb_cannon.inc"
 import * as _water_splashes_and_waves from "./behaviors/water_splashes_and_waves.inc"
@@ -106,6 +109,7 @@ import { butterfly_seg3_anims_030056B0   } from "../actors/butterfly/anims.inc"
 import { bowser_seg6_anims_06057690      } from "../actors/bowser/anims.inc"
 import { castle_grounds_seg7_anims_flags } from "../levels/castle_grounds/areas/1/11/anim.inc"
 import { chain_chomp_seg6_anims_06025178 } from "../actors/chain_chomp/anims/table.inc"
+import { door_seg3_anims_030156C0        } from "../actors/door/anims.inc"
 import { goomba_seg8_anims_0801DA4C      } from "../actors/goomba/anims/table.inc"
 import { yoshi_seg5_anims_05024100       } from "../actors/yoshi/anims.inc"
 
@@ -114,39 +118,41 @@ import { cannon_lid_seg8_collision_08004950              } from "../actors/canno
 import { castle_grounds_seg7_collision_cannon_grill      } from "../levels/castle_grounds/areas/1/8/collision.inc"
 import { castle_grounds_seg7_collision_moat_grills       } from "../levels/castle_grounds/areas/1/7/collision.inc"
 import { checkerboard_platform_seg8_collision_0800D710   } from "../actors/checkerboard_platform/collision.inc"
+import { door_seg3_collision_0301CE78                    } from "../actors/warp_collision/collision.inc"
 import { exclamation_box_outline_seg8_collision_08025F78 } from "../actors/exclamation_box_outline/collision.inc"
 import { poundable_pole_collision_06002490               } from "../actors/poundable_pole/collision.inc"
 import { wooden_signpost_seg3_collision_0302DD80         } from "../actors/wooden_signpost/collision.inc"
 
-const OBJ_LIST_PLAYER = 0     //  (0) mario
-const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
-const OBJ_LIST_DESTRUCTIVE = 2 //  (2) things that can be used to destroy other objects, like
+export const OBJ_LIST_PLAYER = 0     //  (0) mario
+export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
+export const OBJ_LIST_DESTRUCTIVE = 2 //  (2) things that can be used to destroy other objects, like
 //      bob-ombs and corkboxes
-const OBJ_LIST_UNUSED_3 = 3   //  (3) (unused)
-const OBJ_LIST_GENACTOR = 4   //  (4) general actors. most normal 'enemies' or actors are
+export const OBJ_LIST_UNUSED_3 = 3   //  (3) (unused)
+export const OBJ_LIST_GENACTOR = 4   //  (4) general actors. most normal 'enemies' or actors are
 //      on this list. (MIPS, bullet bill, bully, etc)
-const OBJ_LIST_PUSHABLE = 5   //  (5) pushable actors. This is a group of objects which
+export const OBJ_LIST_PUSHABLE = 5   //  (5) pushable actors. This is a group of objects which
 //      can push each other around as well as their parent
 //      objects. (goombas, koopas, spinies)
-const OBJ_LIST_LEVEL = 6     //  (6) level objects. general level objects such as heart, star
-const OBJ_LIST_UNUSED_7 = 7  //  (7) (unused)
-const OBJ_LIST_DEFAULT = 8     //  (8) default objects. objects that didnt start with a 00
+export const OBJ_LIST_LEVEL = 6     //  (6) level objects. general level objects such as heart, star
+export const OBJ_LIST_UNUSED_7 = 7  //  (7) (unused)
+export const OBJ_LIST_DEFAULT = 8     //  (8) default objects. objects that didnt start with a 00
 //      command are put here, so this is treated as a default.
-const OBJ_LIST_SURFACE = 9     //  (9) surface objects. objects that specifically have surface
+export const OBJ_LIST_SURFACE = 9     //  (9) surface objects. objects that specifically have surface
 //      collision and not object collision. (thwomp, whomp, etc)
-const OBJ_LIST_POLELIKE = 10    // (10) polelike objects. objects that attract or otherwise
+export const OBJ_LIST_POLELIKE = 10    // (10) polelike objects. objects that attract or otherwise
 //      "cling" mario similar to a pole action. (hoot,
 //      whirlpool, trees/poles, etc)
-const OBJ_LIST_SPAWNER = 11     // (11) spawners
-const OBJ_LIST_UNIMPORTANT = 12 // (12) unimportant objects. objects that will not load
+export const OBJ_LIST_SPAWNER = 11     // (11) spawners
+export const OBJ_LIST_UNIMPORTANT = 12 // (12) unimportant objects. objects that will not load
 //      if there are not enough object slots: they will also
 //      be manually unloaded to make room for slots if the list
 //      gets exhausted.
-const NUM_OBJ_LISTS = 13
+export const NUM_OBJ_LISTS = 13
+
 
 
 export const bhvMario = [
-    BEGIN(OBJ_LIST_PLAYER),
+    BEGIN(OBJ_LIST_PLAYER, 'bhvMario'),
     SET_INT(oIntangibleTimer, 0),
     OR_INT(oFlags, OBJ_FLAG_0100),
     OR_INT(oUnk94, 0x0001),
@@ -159,8 +165,18 @@ export const bhvMario = [
 ]
 
 export const bhvTree = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE } },
-    { command: BhvCmds.cyclboard },
+    // BEGIN(OBJ_LIST_POLELIKE),
+    // BILLBOARD(),
+    // OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    // SET_INT(oInteractType, INTERACT_POLE),
+    // SET_HITBOX(/*Radius*/ 80, /*Height*/ 500),
+    // SET_INT(oIntangibleTimer, 0),
+    // BEGIN_LOOP(),
+    //     CALL_NATIVE('bhv_pole_base_loop'),
+    // END_LOOP(),
+
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE, name: 'bhvTree' } },
+    { command: BhvCmds.cylboard },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.set_objectData_value, args: { field: oInteractType, value: INTERACT_POLE } },
     { command: BhvCmds.set_hitbox, args: { radius: 80, height: 500 } },
@@ -171,14 +187,14 @@ export const bhvTree = [
 ]
 
 export const bhvYellowBall = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT, name: 'bhvYellowBall' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
-    { command: BhvCmds.cyclboard },
+    { command: BhvCmds.cylboard },
     { command: BhvCmds.break },
 ]
 
 export const bhvGiantPole = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE, name: 'bhvGiantPole' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.set_objectData_value, args: { field: oInteractType, value: INTERACT_POLE } },
     { command: BhvCmds.set_hitbox, args: { radius: 80, height: 2100 } },
@@ -189,11 +205,11 @@ export const bhvGiantPole = [
 ]
 
 export const bhvPoleGrabbing = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE, name: 'bhvPoleGrabbing' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.set_objectData_value, args: { field: oInteractType, value: INTERACT_POLE } },
     { command: BhvCmds.set_hitbox, args: { radius: 80, height: 1500 } },
-	{ command: BhvCmds.call_native, args: { func: 'bhv_pole_init' } },
+    { command: BhvCmds.call_native, args: { func: 'bhv_pole_init' } },
     { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: 'bhv_pole_base_loop' } },
@@ -201,13 +217,13 @@ export const bhvPoleGrabbing = [
 ]
 
 export const bhvStaticObject = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT, name: 'bhvStaticObject' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.break },
 ]
 
 export const bhvCastleFlagWaving = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT, name: 'bhvCastleFlagWaving' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.load_animations, args: { field: oAnimations, anims: castle_grounds_seg7_anims_flags } },
     { command: BhvCmds.animate, args: { animIndex: 0 } },
@@ -217,7 +233,7 @@ export const bhvCastleFlagWaving = [
 ]
 
 export const bhvCheckerboardPlatformSub = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SURFACE } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SURFACE, name: 'bhvCheckerboardPlatformSub' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
     { command: BhvCmds.load_collision_data, args: { data: checkerboard_platform_seg8_collision_0800D710 } },
     { command: BhvCmds.call_native, args: { func: 'bhv_checkerboard_platform_init' } },
@@ -227,7 +243,7 @@ export const bhvCheckerboardPlatformSub = [
 ]
 
 export const bhvCheckerboardElevatorGroup = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SPAWNER } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SPAWNER, name: 'bhvCheckerboardElevatorGroup' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.call_native, args: { func: 'bhv_checkerboard_elevator_group_init' } },
     { command: BhvCmds.set_home },
@@ -236,7 +252,7 @@ export const bhvCheckerboardElevatorGroup = [
 ]
 
 export const bhvMoatGrills = [
-    BEGIN(OBJ_LIST_SURFACE),
+    BEGIN(OBJ_LIST_SURFACE, 'bhvMoatGrills'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     LOAD_COLLISION_DATA(castle_grounds_seg7_collision_moat_grills),
     SET_FLOAT(oCollisionDistance, 30000),
@@ -247,7 +263,7 @@ export const bhvMoatGrills = [
 
 
 export const bhvSeesawPlatform = [
-    BEGIN(OBJ_LIST_SURFACE),
+    BEGIN(OBJ_LIST_SURFACE, 'bhvSeesawPlatform'),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     CALL_NATIVE('bhv_seesaw_platform_init'),
     BEGIN_LOOP(),
@@ -257,7 +273,7 @@ export const bhvSeesawPlatform = [
 ]
 
 export const bhvWaterBombSpawner = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvWaterBombSpawner'),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     DROP_TO_FLOOR(),
     BEGIN_LOOP(),
@@ -266,7 +282,7 @@ export const bhvWaterBombSpawner = [
 ]
 
 export const bhvWaterBomb = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvWaterBomb'),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 120, /*Gravity*/ -400, /*Bounciness*/ 0, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
     BEGIN_LOOP(),
@@ -275,7 +291,7 @@ export const bhvWaterBomb = [
 ]
 
 export const bhvWaterBombShadow = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvWaterBombShadow'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SCALE(/*Unused*/ 0, /*Field*/ 150),
     BEGIN_LOOP(),
@@ -284,7 +300,7 @@ export const bhvWaterBombShadow = [
 ]
 
 export const bhvRespawner = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT, name: 'bhvRespawner' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: bhv_respawner_loop } },
@@ -292,7 +308,7 @@ export const bhvRespawner = [
 ]
 
 export const bhvGoomba = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PUSHABLE } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PUSHABLE, name: 'bhvGoomba' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
     { command: BhvCmds.drop_to_floor },
     { command: BhvCmds.load_animations, args: { field: oAnimations, anims: goomba_seg8_anims_0801DA4C } },
@@ -305,7 +321,7 @@ export const bhvGoomba = [
 ]
 
 export const bhvGoombaTripletSpawner = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PUSHABLE } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PUSHABLE, name: 'bhvGoombaTripletSpawner' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
     { command: BhvCmds.drop_to_floor },
     { command: BhvCmds.begin_loop },
@@ -328,7 +344,7 @@ export const bhvBobomb = [
 ]
 
 export const bhvBobombFuseSmoke = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvBobombFuseSmoke'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     SET_INT(oAnimState, -1),
@@ -408,7 +424,7 @@ export const bhvCannonClosed = [
 // const bhvJetStream = [
 
 export const bhvMessagePanel = [
-    BEGIN(OBJ_LIST_SURFACE),
+    BEGIN(OBJ_LIST_SURFACE, 'bhvMessagePanel'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     LOAD_COLLISION_DATA(wooden_signpost_seg3_collision_0302DD80),
     SET_FLOAT(oCollisionDistance, 150),  // oCollisionDistance = 150.0 from BehaviorCommands.
@@ -425,7 +441,7 @@ export const bhvMessagePanel = [
 ]
 
 export const bhvSignOnWall = [
-    BEGIN(OBJ_LIST_SURFACE),
+    BEGIN(OBJ_LIST_SURFACE, 'bhvSignOnWall'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INTERACT_TYPE(INTERACT_TEXT),
     SET_INT(oInteractionSubtype, INT_SUBTYPE_SIGN),
@@ -438,7 +454,7 @@ export const bhvSignOnWall = [
 ]
 
 export const bhvBobombBullyDeathSmoke = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT, name: 'bhvBobombBullyDeathSmoke' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL | OBJ_FLAG_MOVE_XZ_USING_FVEL } },
     { command: BhvCmds.billboard },
     { command: BhvCmds.set_objectData_value, args: { field: oAnimState, value: -1 } },
@@ -451,7 +467,7 @@ export const bhvBobombBullyDeathSmoke = [
 ]
 
 export const bhvWoodenPost = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SURFACE } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SURFACE, name: 'bhvWoodenPost' } },
     { command: BhvCmds.load_collision_data, args: { data: poundable_pole_collision_06002490 } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
     { command: BhvCmds.set_obj_physics, args: { hitboxRadius: 0, gravity: -400, bounciness: -50, dragStrenth: 1000, friction: 1000, buoyancy: 200 } },
@@ -466,7 +482,7 @@ export const bhvWoodenPost = [
 ]
 
 export const bhvChainChomp = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_GENACTOR } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_GENACTOR, name: 'bhvChainChomp' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_ACTIVE_FROM_AFAR } },
     { command: BhvCmds.drop_to_floor },
     { command: BhvCmds.load_animations, args: { field: oAnimations, anims: chain_chomp_seg6_anims_06025178 } },
@@ -483,7 +499,7 @@ export const bhvChainChomp = [
 ]
 
 export const bhvChainChompChainPart = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_GENACTOR } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_GENACTOR, name: 'bhvChainChompChainPart' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.billboard },
     { command: BhvCmds.set_obj_physics, args: { hitboxRadius: 0, gravity: -400, bounciness: -50, dragStrenth: 1000, friction: 1000, buoyancy: 200 } },
@@ -495,7 +511,7 @@ export const bhvChainChompChainPart = [
 ]
 
 export const bhvHorStarParticleSpawner = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT, name: 'bhvHorStarParticleSpawner' } },
     { command: BhvCmds.disable_rendering },
     { command: BhvCmds.parent_bit_clear, args: { field: oActiveParticleFlags, value: ACTIVE_PARTICLE_H_STAR } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
@@ -505,7 +521,7 @@ export const bhvHorStarParticleSpawner = [
 ]
 
 export const bhvVertStarParticleSpawner = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT, name: 'bhvVertStarParticleSpawner' } },
     { command: BhvCmds.disable_rendering },
     { command: BhvCmds.parent_bit_clear, args: { field: oActiveParticleFlags, value: ACTIVE_PARTICLE_V_STAR } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
@@ -515,7 +531,7 @@ export const bhvVertStarParticleSpawner = [
 ]
 
 export const bhvTriangleParticleSpawner = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT, name: 'bhvTriangleParticleSpawner' } },
     { command: BhvCmds.disable_rendering },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.parent_bit_clear, args: { field: oActiveParticleFlags, value: ACTIVE_PARTICLE_TRIANGLE } },
@@ -525,7 +541,7 @@ export const bhvTriangleParticleSpawner = [
 ]
 
 export const bhvPoundTinyStarParticle = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT, name: 'bhvPoundTinyStarParticle' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.billboard },
     { command: BhvCmds.begin_repeat, args: { count: 10 } },
@@ -535,7 +551,7 @@ export const bhvPoundTinyStarParticle = [
 ]
 
 export const bhvWallTinyStarParticle = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT, name: 'bhvWallTinyStarParticle' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.billboard },
     { command: BhvCmds.begin_repeat, args: { count: 10 } },
@@ -545,7 +561,7 @@ export const bhvWallTinyStarParticle = [
 ]
 
 export const bhvPunchTinyTriangle = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT, name: 'bhvPunchTinyTriangle' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.billboard },
     { command: BhvCmds.begin_loop },
@@ -554,7 +570,7 @@ export const bhvPunchTinyTriangle = [
 ]
 
 export const bhvWhitePuff1 = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT, name: 'bhvWhitePuff1' } },
     { command: BhvCmds.parent_bit_clear, args: { field: oActiveParticleFlags, value: ACTIVE_PARTICLE_DUST } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.billboard },
@@ -564,7 +580,7 @@ export const bhvWhitePuff1 = [
 ]
 
 export const bhvWhitePuff2 = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT, name: 'bhvWhitePuff2' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_MOVE_XZ_USING_FVEL } },
     { command: BhvCmds.billboard },
     { command: BhvCmds.set_objectData_value, args: { field: oAnimState, value: -1 } },
@@ -576,7 +592,7 @@ export const bhvWhitePuff2 = [
 ]
 
 export const bhvBreakBoxTriangle = [
-    BEGIN(OBJ_LIST_UNIMPORTANT),
+    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvBreakBoxTriangle'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BEGIN_REPEAT(18),
         CALL_NATIVE('cur_obj_rotate_face_angle_using_vel'),
@@ -586,7 +602,7 @@ export const bhvBreakBoxTriangle = [
 ]
 
 export const bhvWaterMist2 = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvWaterMist2'),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_HOME(),
     SET_INT(oFaceAnglePitch, 0xC000),
@@ -597,7 +613,7 @@ export const bhvWaterMist2 = [
 ]
 
 export const bhvMistParticleSpawner = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvMistParticleSpawner'),
     PARENT_BIT_CLEAR(oActiveParticleFlags, ACTIVE_PARTICLE_DUST),
     DISABLE_RENDERING(),
     SPAWN_CHILD(/*Model*/ MODEL_MIST,  /*Behavior*/ bhvWhitePuff1),
@@ -607,7 +623,7 @@ export const bhvMistParticleSpawner = [
 ]
 
 export const bhvMistCircParticleSpawner = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT, name: 'bhvMistCircParticleSpawner' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
         { command: BhvCmds.call_native, args: { func: bhv_pound_white_puffs_init } },
     { command: BhvCmds.delay, args: { num: 1 } },
@@ -615,7 +631,7 @@ export const bhvMistCircParticleSpawner = [
 ]
 
 export const bhvWhitePuffExplosion = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT, name: 'bhvWhitePuffExplosion' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.billboard },
     { command: BhvCmds.begin_loop },
@@ -642,7 +658,7 @@ export const bhvSpawnedStarNoLevelExit = [
 ]
 
 export const bhvFish = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvFish'),
     OR_INT(oFlags, OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_HOME(),
     BEGIN_LOOP(),
@@ -651,7 +667,7 @@ export const bhvFish = [
 ]
 
 export const bhvFishSpawner = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvFishSpawner'),
     // Fish Spawner - common
     DISABLE_RENDERING(),
     OR_INT(oFlags, OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -661,7 +677,7 @@ export const bhvFishSpawner = [
 ]
 
 export const bhvManyBlueFishSpawner = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvManyBlueFishSpawner'),
     SET_INT(oBehParams2ndByte, 0),
     // GOTO(bhvFishSpawner, )]
     DISABLE_RENDERING(),
@@ -672,7 +688,7 @@ export const bhvManyBlueFishSpawner = [
 ]
 
 export const bhvButterfly = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvButterfly'),
     OR_INT(oFlags, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     LOAD_ANIMATIONS(oAnimations, butterfly_seg3_anims_030056B0),
     DROP_TO_FLOOR(),
@@ -684,37 +700,37 @@ export const bhvButterfly = [
 ]
 
 export const bhvCarrySomething1 = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvCarrySomething1'),
     BREAK(),
 ]
 
 export const bhvCarrySomething2 = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvCarrySomething2'),
     BREAK(),
 ]
 
 export const bhvCarrySomething3 = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvCarrySomething3'),
     BREAK(),
 ]
 
 export const bhvCarrySomething4 = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvCarrySomething4'),
     BREAK(),
 ]
 
 export const bhvCarrySomething5 = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvCarrySomething5'),
     BREAK(),
 ]
 
 export const bhvCarrySomething6 = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvCarrySomething6'),
     BREAK(),
 ]
 
 export const bhvBird = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvBird'),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     LOAD_ANIMATIONS(oAnimations, birds_seg5_anims_050009E8),
     ANIMATE(0),
@@ -727,7 +743,7 @@ export const bhvBird = [
 
 // The large splash Mario makes when he jumps into a pool of water.
 export const bhvWaterSplash = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvWaterSplash'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     SET_INT(oAnimState, -1),
@@ -747,7 +763,7 @@ export const bhvWaterSplash = [
 
 // Droplets of water that spawn as a result of various water splashes.
 export const bhvWaterDroplet = [
-    BEGIN(OBJ_LIST_UNIMPORTANT),
+    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvWaterDroplet'),
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BILLBOARD(),
     BEGIN_LOOP(),
@@ -757,7 +773,7 @@ export const bhvWaterDroplet = [
 
 // Small splashes that are seen when a water droplet lands back into the water.
 export const bhvWaterDropletSplash = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvWaterDropletSplash'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INT(oFaceAnglePitch, 0),
     SET_INT(oFaceAngleYaw, 0),
@@ -773,7 +789,7 @@ export const bhvWaterDropletSplash = [
 
 // The splash created when an air bubble hits the surface of the water.
 export const bhvBubbleSplash = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvBubbleSplash'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INT(oFaceAnglePitch, 0),
     SET_INT(oFaceAngleYaw, 0),
@@ -822,7 +838,7 @@ export const bhvObjectWaterSplash = [
 
 // Waves that are generated when running in shallow water.
 export const bhvShallowWaterWave = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvShallowWaterWave'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     DISABLE_RENDERING(),
     BEGIN_REPEAT(5),
@@ -837,7 +853,7 @@ export const bhvShallowWaterWave = [
 // Unlike the larger water splash it has no visible model of its own.
 // It has a 1 in 256 chance of spawning the fish particle easter egg.
 export const bhvShallowWaterSplash = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvShallowWaterSplash'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     DISABLE_RENDERING(),
     BEGIN_REPEAT(18),
@@ -887,7 +903,7 @@ export const bhvSmallWaterWave398 = [
 ]
 
 export const bhvSmallWaterWave = [
-    BEGIN(OBJ_LIST_UNIMPORTANT),
+    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvSmallWaterWave'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     CALL_NATIVE(bhv_bubble_wave_init),
@@ -907,7 +923,7 @@ export const bhvSmallWaterWave = [
 ]
 
 export const bhvWaterAirBubble = [
-    BEGIN(OBJ_LIST_LEVEL),
+    BEGIN(OBJ_LIST_LEVEL, 'bhvWaterAirBubble'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     SET_HITBOX_WITH_OFFSET(/*Radius*/ 400, /*Height*/ 150, /*Downwards offset*/ -150),
@@ -922,7 +938,7 @@ export const bhvWaterAirBubble = [
 ]
 
 export const bhvSmallParticle = [
-    BEGIN(OBJ_LIST_UNIMPORTANT),
+    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvSmallParticle'),
     BILLBOARD(),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     CALL_NATIVE(bhv_particle_init),
@@ -933,7 +949,7 @@ export const bhvSmallParticle = [
 ]
 
 export const bhvPlungeBubble = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvPlungeBubble'),
     PARENT_BIT_CLEAR(oActiveParticleFlags, ACTIVE_PARTICLE_PLUNGE_BUBBLE),
     DISABLE_RENDERING(),
     CALL_NATIVE(bhv_water_waves_init),
@@ -941,7 +957,7 @@ export const bhvPlungeBubble = [
 ]
 
 export const bhvSmallParticleSnow = [
-    BEGIN(OBJ_LIST_UNIMPORTANT),
+    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvSmallParticleSnow'),
     BILLBOARD(),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     CALL_NATIVE(bhv_particle_init),
@@ -952,7 +968,7 @@ export const bhvSmallParticleSnow = [
 ]
 
 export const bhvSmallParticleBubbles = [
-    BEGIN(OBJ_LIST_UNIMPORTANT),
+    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvSmallParticleBubbles'),
     BILLBOARD(),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     CALL_NATIVE(bhv_particle_init),
@@ -963,7 +979,7 @@ export const bhvSmallParticleBubbles = [
 ]
 
 export const bhvBubbleParticleSpawner = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvBubbleParticleSpawner'),
     DISABLE_RENDERING(),
     SET_RANDOM_INT(oWaterObjUnkF4, /*Minimum*/ 2, /*Range*/ 9),
     DELAY_VAR(oWaterObjUnkF4),
@@ -973,7 +989,7 @@ export const bhvBubbleParticleSpawner = [
 ]
 
 export const bhvCannonBarrel = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvCannonBarrel'),
     OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     DROP_TO_FLOOR(),
     BEGIN_LOOP(),
@@ -982,7 +998,7 @@ export const bhvCannonBarrel = [
 ]
 
 export const bhvCannon = [
-    BEGIN(OBJ_LIST_LEVEL),
+    BEGIN(OBJ_LIST_LEVEL, 'bhvCannon'),
     OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SPAWN_CHILD(/*Model*/ MODEL_CANNON_BARREL, /*Behavior*/ bhvCannonBarrel),
     SET_INT(oInteractType, INTERACT_CANNON_BASE),
@@ -996,7 +1012,7 @@ export const bhvCannon = [
 ]
 
 export const bhvKoopaShellUnderwater = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvKoopaShellUnderwater'),
     OR_INT(oFlags, (OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO  | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_koopa_shell_underwater_loop'),
@@ -1004,7 +1020,7 @@ export const bhvKoopaShellUnderwater = [
 ]
 
 export const bhvHiddenAt120Stars = [
-    BEGIN(OBJ_LIST_SURFACE),
+    BEGIN(OBJ_LIST_SURFACE, 'bhvHiddenAt120Stars'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     LOAD_COLLISION_DATA(castle_grounds_seg7_collision_cannon_grill),
     SET_FLOAT(oCollisionDistance, 4000),
@@ -1015,7 +1031,7 @@ export const bhvHiddenAt120Stars = [
 ]
 
 export const bhvCoinFormationSpawn = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL, name: 'bhvCoinFormationSpawn' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.billboard },
     { command: BhvCmds.begin_loop },
@@ -1024,7 +1040,7 @@ export const bhvCoinFormationSpawn = [
 ]
 
 export const bhvCoinFormation = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SPAWNER } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SPAWNER, name: 'bhvCoinFormation' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
     { command: BhvCmds.call_native, args: { func: 'bhv_coin_formation_loop' } },
     { command: BhvCmds.begin_loop },
@@ -1033,7 +1049,7 @@ export const bhvCoinFormation = [
 ]
 
 export const bhvYellowCoin = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL, name: 'bhvYellowCoin' } },
     { command: BhvCmds.billboard },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
     { command: BhvCmds.call_native, args: { func: 'bhv_yellow_coin_init' } },
@@ -1090,7 +1106,7 @@ export const bhvVanishCap = [
 // ]
 
 export const bhvRedCoin = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL, name: 'bhvRedCoin' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.billboard },
     { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
@@ -1221,7 +1237,7 @@ export const bhvHidden1upInPoleSpawner = [
 ]
 
 export const bhvMovingYellowCoin = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL, name: 'bhvMovingYellowCoin' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.billboard },
     { command: BhvCmds.set_hitbox, args: { radius: 100, height: 64 } },
@@ -1237,7 +1253,7 @@ export const bhvMovingYellowCoin = [
 ]
 
 export const bhvSingleCoinGetsSpawned = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL, name: 'bhvSingleCoinGetsSpawned' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.billboard },
     { command: BhvCmds.call_native, args: { func: 'bhv_coin_init' } },
@@ -1249,7 +1265,7 @@ export const bhvSingleCoinGetsSpawned = [
 ]
 
 export const bhvGoldenCoinSparkles = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT, name: 'bhvGoldenCoinSparkles' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.disable_rendering },
     { command: BhvCmds.begin_repeat, args: { count: 3 } },
@@ -1259,7 +1275,7 @@ export const bhvGoldenCoinSparkles = [
 ]
 
 export const bhvCoinSparkles = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT } },
+    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT, name: 'bhvCoinSparkles' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.billboard },
     { command: BhvCmds.set_objectData_value, args: { field: oGraphYOffset, value: 25 } },
@@ -1294,7 +1310,7 @@ export const bhvBowser = [
 ]
 
 export const bhvBowserBodyAnchor = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvBowserBodyAnchor'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_HITBOX(/*Radius*/ 100, /*Height*/ 300),
     SET_INTERACT_TYPE(INTERACT_DAMAGE),
@@ -1308,7 +1324,7 @@ export const bhvBowserBodyAnchor = [
 ]
 
 export const bhvBowserFlameSpawn = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvBowserFlameSpawn'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_MODEL(MODEL_NONE),
     BEGIN_LOOP(),
@@ -1317,7 +1333,7 @@ export const bhvBowserFlameSpawn = [
 ]
 
 export const bhvExclamationBox = [
-    BEGIN(OBJ_LIST_SURFACE),
+    BEGIN(OBJ_LIST_SURFACE, 'bhvExclamationBox'),
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     LOAD_COLLISION_DATA(exclamation_box_outline_seg8_collision_08025F78),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -1329,7 +1345,7 @@ export const bhvExclamationBox = [
 ]
 
 export const bhvRotatingExclamationMark = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvRotatingExclamationMark'),
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SCALE(/*Unused*/ 0, /*Field*/ 200),
     BEGIN_LOOP(),
@@ -1339,7 +1355,7 @@ export const bhvRotatingExclamationMark = [
 ]
 
 export const bhvSoundSpawner = [
-    BEGIN(OBJ_LIST_UNIMPORTANT),
+    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvSoundSpawner'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     DELAY(3),
     CALL_NATIVE('bhv_sound_spawner_init'),
@@ -1362,7 +1378,7 @@ export const bhvSoundSpawner = [
 // ]
 
 export const bhvYoshi = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvYoshi'),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     LOAD_ANIMATIONS(oAnimations, yoshi_seg5_anims_05024100),
     SET_INTERACT_TYPE(INTERACT_TEXT),
@@ -1418,7 +1434,7 @@ export const bhvYoshi = [
 // ]
 
 export const bhvWaterBombCannon = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvWaterBombCannon'),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_water_bomb_cannon_loop'),
@@ -1467,7 +1483,7 @@ export const bhvBowlingBall = [
 ]
 
 export const bhvTtmBowlingBallSpawner = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvTtmBowlingBallSpawner'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INT(oBBallSpawnerPeriodMinus1, 63),
     CALL_NATIVE('bhv_generic_bowling_ball_spawner_init'),
@@ -1528,7 +1544,6 @@ const bhvJumpingBox = [
     END_LOOP(),
 ]
 
-
 const bhvSmoke = [
     BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvSmoke'),
     OR_INT(oFlags, (OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -1541,8 +1556,43 @@ const bhvSmoke = [
     END_LOOP(),
 ]
 
+const bhvDoorWarp = [
+    BEGIN(OBJ_LIST_SURFACE, 'bhvDoorWarp'),
+    SET_INT(oInteractType, INTERACT_WARP_DOOR),
+    GOTO('bhvDoor', 2),
+]
+
+const bhvDoor = [
+    BEGIN(OBJ_LIST_SURFACE, 'bhvDoor'),
+    SET_INT(oInteractType, INTERACT_DOOR),
+    // Door - common:
+    OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, door_seg3_anims_030156C0),
+    ANIMATE(0),
+    LOAD_COLLISION_DATA(door_seg3_collision_0301CE78),
+    SET_HITBOX(/*Radius*/ 80, /*Height*/ 100),
+    SET_INT(oIntangibleTimer, 0),
+    SET_FLOAT(oCollisionDistance, 1000),
+    SET_HOME(),
+    CALL_NATIVE('bhv_door_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_door_loop'),
+    END_LOOP(),
+]
+
+const bhvWarp = [
+    BEGIN(OBJ_LIST_LEVEL, 'bhvWarp'),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_INT(oInteractType, INTERACT_WARP),
+    SET_INT(oIntangibleTimer, 0),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_warp_loop'),
+    END_LOOP(),
+]
 
 
+gLinker.behaviors.bhvBetaChestBottom = null
+gLinker.behaviors.bhvBigBully = null
 gLinker.behaviors.bhvBird = bhvBird
 gLinker.behaviors.bhvBobBowlingBallSpawner = bhvBobBowlingBallSpawner
 gLinker.behaviors.bhvBobomb = bhvBobomb
@@ -1551,10 +1601,12 @@ gLinker.behaviors.bhvBobombFuseSmoke = bhvBobombFuseSmoke
 gLinker.behaviors.bhvBowlingBall = bhvBowlingBall
 gLinker.behaviors.bhvBowser = bhvBowser
 gLinker.behaviors.bhvBowserBodyAnchor = bhvBowserBodyAnchor
+gLinker.behaviors.bhvBowserBomb = null
 gLinker.behaviors.bhvBowserFlameSpawn = bhvBowserFlameSpawn
 gLinker.behaviors.bhvBreakableBox = bhvBreakableBox
 gLinker.behaviors.bhvBreakBoxTriangle = bhvBreakBoxTriangle
 gLinker.behaviors.bhvBubbleParticleSpawner = bhvBubbleParticleSpawner
+gLinker.behaviors.bhvButterfly = bhvButterfly
 gLinker.behaviors.bhvCannon = bhvCannon
 gLinker.behaviors.bhvCannonBarrelBubbles = bhvCannonBarrelBubbles
 gLinker.behaviors.bhvCannonClosed = bhvCannonClosed
@@ -1563,38 +1615,75 @@ gLinker.behaviors.bhvCarrySomething2 = bhvCarrySomething2
 gLinker.behaviors.bhvCarrySomething3 = bhvCarrySomething3
 gLinker.behaviors.bhvCarrySomething4 = bhvCarrySomething4
 gLinker.behaviors.bhvCarrySomething5 = bhvCarrySomething5
+gLinker.behaviors.bhvCarrySomething6 = bhvCarrySomething6
+gLinker.behaviors.bhvCastleFlagWaving = bhvCastleFlagWaving
+gLinker.behaviors.bhvCastleFloorTrap = null
 gLinker.behaviors.bhvCheckerboardElevatorGroup = bhvCheckerboardElevatorGroup
+gLinker.behaviors.bhvCourtyardBooTriplet = null
+gLinker.behaviors.bhvDoor = bhvDoor
+gLinker.behaviors.bhvDoorWarp = bhvDoorWarp
 gLinker.behaviors.bhvExplosion = bhvExplosion
 gLinker.behaviors.bhvFish = bhvFish
 gLinker.behaviors.bhvFreeBowlingBall = bhvFreeBowlingBall
+gLinker.behaviors.bhvHiddenAt120Stars = bhvHiddenAt120Stars
 gLinker.behaviors.bhvHorStarParticleSpawner = bhvHorStarParticleSpawner
 gLinker.behaviors.bhvIdleWaterWave = bhvIdleWaterWave
+gLinker.behaviors.bhvJetStreamRingSpawner = null
 gLinker.behaviors.bhvJumpingBox = bhvJumpingBox
+gLinker.behaviors.bhvLargeBomp = null
+gLinker.behaviors.bhvLllBowserPuzzle = null
+gLinker.behaviors.bhvLllDrawbridgeSpawner = null
+gLinker.behaviors.bhvLllFloatingWoodBridge = null
+gLinker.behaviors.bhvLllMovingOctagonalMeshPlatform = null
+gLinker.behaviors.bhvLllRotatingBlockWithFireBars = null
+gLinker.behaviors.bhvLllRotatingHexagonalRing = null
+gLinker.behaviors.bhvLllSinkingRectangularPlatform = null
+gLinker.behaviors.bhvLllSinkingSquarePlatforms = null
+gLinker.behaviors.bhvLllTiltingInvertedPyramid = null
+gLinker.behaviors.bhvLllTumblingBridge = null
+gLinker.behaviors.bhvManyBlueFishSpawner = bhvManyBlueFishSpawner
 gLinker.behaviors.bhvMario = bhvMario
 gLinker.behaviors.bhvMetalCap = bhvMetalCap
 gLinker.behaviors.bhvMistCircParticleSpawner = bhvMistCircParticleSpawner
 gLinker.behaviors.bhvMistParticleSpawner = bhvMistParticleSpawner
+gLinker.behaviors.bhvMoatGrills = bhvMoatGrills
+gLinker.behaviors.bhvMovingBlueCoin = null
+gLinker.behaviors.bhvMrI = null
 gLinker.behaviors.bhvNormalCap = bhvNormalCap
 gLinker.behaviors.bhvPitBowlingBall = bhvPitBowlingBall
 gLinker.behaviors.bhvPlungeBubble = bhvPlungeBubble
+gLinker.behaviors.bhvRotatingCounterClockwise = null
 gLinker.behaviors.bhvSeesawPlatform = bhvSeesawPlatform
 gLinker.behaviors.bhvShallowWaterSplash = bhvShallowWaterSplash
 gLinker.behaviors.bhvShallowWaterWave = bhvShallowWaterWave
 gLinker.behaviors.bhvSingleCoinGetsSpawned = bhvSingleCoinGetsSpawned
+gLinker.behaviors.bhvSmallBomp = null
+gLinker.behaviors.bhvSmallBully = null
 gLinker.behaviors.bhvSmoke = bhvSmoke
+gLinker.behaviors.bhvSnowBall = null
 gLinker.behaviors.bhvSpawnedStarNoLevelExit = bhvSpawnedStarNoLevelExit
+gLinker.behaviors.bhvStaticObject = bhvStaticObject
 gLinker.behaviors.bhvThiBowlingBallSpawner = bhvThiBowlingBallSpawner
+gLinker.behaviors.bhvTowerPlatformGroup = null
+gLinker.behaviors.bhvTree = bhvTree
 gLinker.behaviors.bhvTriangleParticleSpawner = bhvTriangleParticleSpawner
 gLinker.behaviors.bhvTtmBowlingBallSpawner = bhvTtmBowlingBallSpawner
 gLinker.behaviors.bhvVanishCap = bhvVanishCap
 gLinker.behaviors.bhvVertStarParticleSpawner = bhvVertStarParticleSpawner
+gLinker.behaviors.bhvWarp = bhvWarp
 gLinker.behaviors.bhvWaterBomb = bhvWaterBomb
 gLinker.behaviors.bhvWaterBombCannon = bhvWaterBombCannon
 gLinker.behaviors.bhvWaterBombShadow = bhvWaterBombShadow
 gLinker.behaviors.bhvWaterDroplet = bhvWaterDroplet
 gLinker.behaviors.bhvWaterDropletSplash = bhvWaterDropletSplash
+gLinker.behaviors.bhvWaterMist2 = bhvWaterMist2
 gLinker.behaviors.bhvWaterSplash = bhvWaterSplash
 gLinker.behaviors.bhvWaveTrail = bhvWaveTrail
+gLinker.behaviors.bhvWfRotatingWoodenPlatform = null
+gLinker.behaviors.bhvWfSlidingPlatform = null
+gLinker.behaviors.bhvWfTumblingBridge = null
 gLinker.behaviors.bhvWhitePuffExplosion = bhvWhitePuffExplosion
 gLinker.behaviors.bhvWingCap = bhvWingCap
 gLinker.behaviors.bhvWoodenPost = bhvWoodenPost
+gLinker.behaviors.bhvYellowCoin = bhvYellowCoin
+gLinker.behaviors.bhvYoshi = bhvYoshi

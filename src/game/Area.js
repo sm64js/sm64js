@@ -1,13 +1,15 @@
 import * as _Linker from "./Linker"
-import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
+// import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 // import { SurfaceLoadInstance as SurfaceLoad } from "./SurfaceLoad"
 // import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
-import { GameInstance as Game } from "./Game"
+// import { GameInstance as Game } from "./Game"
+import { GEO_CONTEXT_AREA_LOAD, GEO_CONTEXT_AREA_UNLOAD, GEO_CONTEXT_AREA_INIT, geo_call_global_function_nodes } from "../engine/graph_node"
 import { gSPViewport } from "../include/gbi"
 import { render_screen_transition } from "./ScreenTransition"
 import { HudInstance as Hud } from "./Hud"
 import { PrintInstance as Print } from "./Print"
 import { SCREEN_WIDTH } from "../include/config"
+import { oBehParams, ACTIVE_FLAG_DEACTIVATED } from "../include/object_constants"
 
 export const WARP_TRANSITION_FADE_FROM_COLOR   = 0x00
 export const WARP_TRANSITION_FADE_INTO_COLOR   = 0x01
@@ -17,7 +19,7 @@ export const WARP_TRANSITION_FADE_FROM_CIRCLE  = 0x0A
 export const WARP_TRANSITION_FADE_INTO_CIRCLE  = 0x0B
 export const WARP_TRANSITION_FADE_INTO_MARIO   = 0x11
 export const WARP_TRANSITION_FADE_FROM_BOWSER  = 0x12
-export const WARP_TRANSITION_FADE_INTO_BOWSER = 0x13
+export const WARP_TRANSITION_FADE_INTO_BOWSER  = 0x13
 
 const D_8032CF00 = {  /// default view port?
     vscale: [640, 480, 511, 0],
@@ -27,10 +29,7 @@ const D_8032CF00 = {  /// default view port?
 const canvas = document.querySelector('#gameCanvas')
 
 class Area {
-
     constructor() {
-        gLinker.Area = this
-
         this.gCurrentArea = null
         this.gAreas = Array(8).fill(0).map(() => { return { index: 0 } })
         this.gCurAreaIndex = 0
@@ -42,7 +41,8 @@ class Area {
             startAngle: [0, 0, 0],
             areaIndex: 0, activeAreaIndex: 0,
             behaviorArg: 0, behaviorScript: null,
-            unk18: null, next: null
+            unk18: null,
+            next: null
         }
 
         this.gWarpTransition = {
@@ -55,8 +55,29 @@ class Area {
 
     }
 
-    load_area(index) {
+    area_get_warp_node(id) {
+        return this.gCurrentArea.warpNodes[id]
+    }
 
+    area_get_warp_node_from_params(o) {
+        let warp_id = (o.rawData[oBehParams] & 0x00FF0000) >> 16
+        return this.area_get_warp_node(warp_id)
+    }
+
+    load_obj_warp_nodes() {
+        for (const node of gLinker.GeoLayout.gObjParentGraphNode.children) {
+            let object = node.wrapperObjectNode.wrapperObject
+
+            if (object.activeFlags != ACTIVE_FLAG_DEACTIVATED && gLinker.LevelUpdate.get_mario_spawn_type(object) != 0) {
+                let warp_node = this.area_get_warp_node_from_params(object)
+                if (warp_node) {
+                    warp_node.object = object
+                }
+            }
+        }
+    }
+
+    load_area(index) {
         if (!this.gCurrentArea && this.gAreas[index]) {
             this.gCurrentArea = this.gAreas[index]
             this.gCurAreaIndex = this.gCurrentArea.index
@@ -68,8 +89,21 @@ class Area {
             if (this.gCurrentArea.objectSpawnInfos) {
                 gLinker.ObjectListProcessor.spawn_objects_from_info(this.gCurrentArea.objectSpawnInfos)
             }
-        }
 
+            this.load_obj_warp_nodes()
+            geo_call_global_function_nodes(this.gCurrentArea.geometryLayoutData, GEO_CONTEXT_AREA_LOAD)
+        }
+    }
+
+    unload_area() {
+        if (this.gCurrentArea) {
+            gLinker.ObjectListProcessor.unload_objects_from_area(0, this.gCurrentArea.index)
+            geo_call_global_function_nodes(this.gCurrentArea.geometryLayoutData, GEO_CONTEXT_AREA_UNLOAD)
+
+            this.gCurrentArea.flags = 0
+            this.gCurrentArea = null
+            this.gWarpTransition.isActive = 0
+        }
     }
 
     load_mario_area() {
@@ -84,8 +118,19 @@ class Area {
         }
     }
 
+    unload_mario_area() {
+        if (this.gCurrentArea && (this.gCurrentArea.flags & 0x01)) {
+            gLinker.ObjectListProcessor.unload_objects_from_area(0, this.gMarioSpawnInfo.activeAreaIndex)
+
+            this.gCurrentArea.flags &= ~0x01
+            if (this.gCurrentArea.flags == 0) {
+                this.unload_area()
+            }
+        }
+    }
+
     area_update_objects() {
-        GeoRenderer.gAreaUpdateCounter++
+        gLinker.GeoRenderer.gAreaUpdateCounter++
         gLinker.ObjectListProcessor.update_objects(0)
     }
 
@@ -99,8 +144,7 @@ class Area {
     }
 
     play_transition(transType, time, red, green, blue) {
-
-        this.gWarpTransition.isActive = true
+        this.gWarpTransition.isActive = 1
         this.gWarpTransition.type = transType
         this.gWarpTransition.time = time
         this.gWarpTransition.pauseRendering = false
@@ -152,6 +196,8 @@ class Area {
 
     clear_areas() {
         this.gCurrentArea = null
+        this.gWarpTransition.isActive = 0
+        this.gWarpTransition.pauseRendering = 0
         this.gMarioSpawnInfo.areaIndex = -1
 
         this.gAreas.forEach((areaData, i) => {
@@ -163,9 +209,9 @@ class Area {
                 terrainData: null,
                 surfaceRooms: null,
                 macroObjects: null,
-                warpNodes: null,
-                paintingWarpNodes: null,
-                instantWarps: null,
+                warpNodes: [],
+                paintingWarpNodes: [],
+                instantWarps: [],
                 objectSpawnInfos: null,
                 camera: null,
                 unused28: null,
@@ -177,11 +223,27 @@ class Area {
         })
     }
 
+
+    clear_area_graph_nodes() {
+        if (this.gCurrentArea) {
+            geo_call_global_function_nodes(this.gCurrentArea.geometryLayoutData, GEO_CONTEXT_AREA_UNLOAD)
+            this.gCurrentArea = null
+            this.gWarpTransition.isActive = 0
+        }
+
+        this.gAreas.forEach((areaData, i) => {
+            if (areaData.geometryLayoutData) {
+                geo_call_global_function_nodes(areaData.geometryLayoutData, GEO_CONTEXT_AREA_INIT)
+                areaData.geometryLayoutData = null
+            }
+        })
+    }
+
     render_game() {
         if (this.gCurrentArea) {
-            GeoRenderer.geo_process_root(this.gCurrentArea.geometryLayoutData, null, null, null)
+            gLinker.GeoRenderer.geo_process_root(this.gCurrentArea.geometryLayoutData, null, null, null)
 
-            gSPViewport(Game.gDisplayList, D_8032CF00)
+            gSPViewport(gLinker.Game.gDisplayList, D_8032CF00)
             Hud.render_hud();
             Print.render_text_labels();
             
@@ -223,3 +285,4 @@ class Area {
 }
 
 export const AreaInstance = new Area()
+gLinker.Area = AreaInstance

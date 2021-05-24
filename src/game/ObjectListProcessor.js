@@ -2,6 +2,7 @@ import * as _Linker from "./Linker"
 import * as _PlatformDisplacement from "./PlatformDisplacement"
 import * as _BehaviorCommands from "../engine/BehaviorCommands"
 import * as _LevelUpdate from "./LevelUpdate"
+import * as _Spawn from "./SpawnObject"
 
 import * as GraphNode from "../engine/graph_node"
 import * as Mario from "./Mario"
@@ -26,11 +27,43 @@ import {
 } from "../include/mario_constants"
 import { spawn_object_at_origin, obj_copy_pos_and_angle } from "./ObjectHelpers"
 
+
+export const TIME_STOP_UNKNOWN_0 = (1 << 0)
+export const TIME_STOP_ENABLED = (1 << 1)
+export const TIME_STOP_DIALOG = (1 << 2)
+export const TIME_STOP_MARIO_AND_DOORS = (1 << 3)
+export const TIME_STOP_ALL_OBJECTS = (1 << 4)
+export const TIME_STOP_MARIO_OPENED_DOOR = (1 << 5)
+export const TIME_STOP_ACTIVE = (1 << 6)
+
+export const OBJ_LIST_PLAYER = 0        //  (0) mario
+export const OBJ_LIST_UNUSED_1 = 1      //  (1) (unused)
+export const OBJ_LIST_DESTRUCTIVE = 2   //  (2) things that can be used to destroy other objects, like
+                                        //      bob-ombs and corkboxes
+export const OBJ_LIST_UNUSED_3 = 3      //  (3) (unused)
+export const OBJ_LIST_GENACTOR = 4      //  (4) general actors. most normal 'enemies' or actors are
+                                        //      on this list. (MIPS, bullet bill, bully, etc)
+export const OBJ_LIST_PUSHABLE = 5      //  (5) pushable actors. This is a group of objects which
+                                        //      can push each other around as well as their parent
+                                        //      objects. (goombas, koopas, spinies)
+export const OBJ_LIST_LEVEL = 6         //  (6) level objects. general level objects such as heart, star
+export const OBJ_LIST_UNUSED_7 = 7      //  (7) (unused)
+export const OBJ_LIST_DEFAULT = 8       //  (8) default objects. objects that didnt start with a 00
+                                        //      command are put here, so this is treated as a default.
+export const OBJ_LIST_SURFACE = 9       //  (9) surface objects. objects that specifically have surface
+                                        //      collision and not object collision. (thwomp, whomp, etc)
+export const OBJ_LIST_POLELIKE = 10     // (10) polelike objects. objects that attract or otherwise
+                                        //      "cling" mario similar to a pole action. (hoot,
+                                        //      whirlpool, trees/poles, etc)
+export const OBJ_LIST_SPAWNER = 11      // (11) spawners
+export const OBJ_LIST_UNIMPORTANT = 12  // (12) unimportant objects. objects that will not load
+                                        //      if there are not enough object slots: they will also
+                                        //      be manually unloaded to make room for slots if the list
+                                        //      gets exhausted.
+export const NUM_OBJ_LISTS = 13
+
 class ObjectListProcessor {
     constructor() {
-        // PlatformDisplacement.ObjectListProc = this
-        gLinker.ObjectListProcessor = this
-
         this.sParticleTypesInit = () => {
             this.sParticleTypes = [];
             [
@@ -58,43 +91,24 @@ class ObjectListProcessor {
             })
         }
 
-        this.TIME_STOP_UNKNOWN_0 = (1 << 0)
-        this.TIME_STOP_ENABLED = (1 << 1)
-        this.TIME_STOP_DIALOG = (1 << 2)
-        this.TIME_STOP_MARIO_AND_DOORS = (1 << 3)
-        this.TIME_STOP_ALL_OBJECTS = (1 << 4)
-        this.TIME_STOP_MARIO_OPENED_DOOR = (1 << 5)
-        this.TIME_STOP_ACTIVE = (1 << 6)
+        // this.OBJECT_POOL_CAPACITY = 240
 
-        this.OBJECT_POOL_CAPACITY = 240
+        this.OBJ_LIST_PLAYER       = OBJ_LIST_PLAYER
+        this.OBJ_LIST_UNUSED_1     = OBJ_LIST_UNUSED_1
+        this.OBJ_LIST_DESTRUCTIVE  = OBJ_LIST_DESTRUCTIVE
+        this.OBJ_LIST_UNUSED_3     = OBJ_LIST_UNUSED_3
+        this.OBJ_LIST_GENACTOR     = OBJ_LIST_GENACTOR
+        this.OBJ_LIST_PUSHABLE     = OBJ_LIST_PUSHABLE
+        this.OBJ_LIST_LEVEL        = OBJ_LIST_LEVEL
+        this.OBJ_LIST_UNUSED_7     = OBJ_LIST_UNUSED_7
+        this.OBJ_LIST_DEFAULT      = OBJ_LIST_DEFAULT
+        this.OBJ_LIST_SURFACE      = OBJ_LIST_SURFACE
+        this.OBJ_LIST_POLELIKE     = OBJ_LIST_POLELIKE
+        this.OBJ_LIST_SPAWNER      = OBJ_LIST_SPAWNER
+        this.OBJ_LIST_UNIMPORTANT  = OBJ_LIST_UNIMPORTANT
+        this.NUM_OBJ_LISTS         = NUM_OBJ_LISTS
 
-        this.OBJ_LIST_PLAYER = 0      //  (0) mario
-        this.OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
-        this.OBJ_LIST_DESTRUCTIVE = 2 //  (2) things that can be used to destroy other objects, like
-                              //      bob-ombs and corkboxes
-        this.OBJ_LIST_UNUSED_3 = 3    //  (3) (unused)
-        this.OBJ_LIST_GENACTOR = 4    //  (4) general actors. most normal 'enemies' or actors are
-                              //      on this list. (MIPS, bullet bill, bully, etc)
-        this.OBJ_LIST_PUSHABLE = 5   //  (5) pushable actors. This is a group of objects which
-                              //      can push each other around as well as their parent
-                              //      objects. (goombas, koopas, spinies)
-        this.OBJ_LIST_LEVEL = 6       //  (6) level objects. general level objects such as heart, star
-        this.OBJ_LIST_UNUSED_7 = 7    //  (7) (unused)
-        this.OBJ_LIST_DEFAULT = 8     //  (8) default objects. objects that didnt start with a 00
-                              //      command are put here, so this is treated as a default.
-        this.OBJ_LIST_SURFACE = 9     //  (9) surface objects. objects that specifically have surface
-                              //      collision and not object collision. (thwomp, whomp, etc)
-        this.OBJ_LIST_POLELIKE = 10    // (10) polelike objects. objects that attract or otherwise
-                              //      "cling" mario similar to a pole action. (hoot,
-                              //      whirlpool, trees/poles, etc)
-        this.OBJ_LIST_SPAWNER = 11     // (11) spawners
-        this.OBJ_LIST_UNIMPORTANT = 12 // (12) unimportant objects. objects that will not load
-                              //      if there are not enough object slots: they will also
-                              //      be manually unloaded to make room for slots if the list
-                              //      gets exhausted.
-        this.NUM_OBJ_LISTS = 13
-
-        this.sObjectListUpdateOrder = [ 
+        this.sObjectListUpdateOrder = [
             this.OBJ_LIST_SPAWNER,
             this.OBJ_LIST_SURFACE,
             this.OBJ_LIST_POLELIKE,
@@ -107,22 +121,25 @@ class ObjectListProcessor {
             this.OBJ_LIST_UNIMPORTANT,
         ]
 
+        this.gTHIWaterDrained = 0
+        this.gTimeStopState = 0
+        this.gMarioObject = null
         this.gEnvironmentLevels = new Array(20)
+        this.gDoorAdjacentRooms = new Array(60).fill(0).map(() => new Array(2).fill(0))
+        this.gMarioCurrentRoom = 0
 
         this.totalMarios = 0
         this.gObjectCounter = 0
         this.gCCMEnteredSlide = 0
         this.gCheckingSurfaceCollisionsForCamera = 0
         this.gMarioShotFromCannon = 0
-        this.gObjectLists = new Array(13).fill(0).map(() => { 
-
-            const blankObj = { gfx: {} }
-            blankObj.prev = blankObj
-            blankObj.next = blankObj
-            return blankObj
-
+        this.gObjectLists = new Array(13).fill(0).map((e, i) => { 
+            const headObj = {}
+            headObj.name = i
+            headObj.prev = headObj
+            headObj.next = headObj
+            return headObj
         })
-
     }
 
     update_objects() {
@@ -162,7 +179,7 @@ class ObjectListProcessor {
         let count = 0
         while (objList != firstObj) {
             this.gCurrentObject = firstObj.wrapperObject
-            this.gCurrentObject.header.gfx.node.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION
+            this.gCurrentObject.header.gfx.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION
             gLinker.BehaviorCommands.cur_obj_update()
             firstObj = firstObj.next
             count++
@@ -258,6 +275,30 @@ class ObjectListProcessor {
         this.gCurrentObject.rawData[oAngleVelRoll] = gMarioState.angleVel[2]
     }
 
+    /**
+     * Unload all objects whose activeAreaIndex is areaIndex.
+     */
+    unload_objects_from_area(unused, areaIndex) {
+        let obj
+        let node
+        let listHead
+        let /*s32*/ i
+
+        for (i = 0; i < this.NUM_OBJ_LISTS; i++) {
+            listHead = this.gObjectLists[i]
+            node = listHead.next
+
+            while (node != listHead) {
+                obj = node.wrapperObject
+                node = node.next
+
+                if (obj.header.gfx.activeAreaIndex == areaIndex) {
+                    gLinker.Spawn.unload_object(obj)
+                }
+            }
+        }
+    }
+
     spawn_objects_from_info(spawnInfo) {
         this.gTimeStopState = 0
 
@@ -269,17 +310,13 @@ class ObjectListProcessor {
         this.gCCMEnteredSlide |= 1
 
         while (spawnInfo) {
-
-            const script = spawnInfo.behaviorScript
+            const script = gLinker.Spawn.get_bhv_script(spawnInfo.behaviorScript)
 
             if ((spawnInfo.behaviorArg & (RESPAWN_INFO_DONT_RESPAWN << 8)) != (RESPAWN_INFO_DONT_RESPAWN << 8)) {
-
                 const object = gLinker.Spawn.create_object(script)
 
                 object.rawData[oBehParams] = spawnInfo.behaviorArg
-
                 object.rawData[oBehParams2ndByte] = ((spawnInfo.behaviorArg) >> 16) & 0xFF
-
                 object.behavior = script
 
                 // Record death/collection in the SpawnInfo
@@ -287,10 +324,12 @@ class ObjectListProcessor {
                 object.respawnInfo = spawnInfo.behaviorArg
 
                 if (spawnInfo.behaviorArg & 0x01) { // Is mario
-                    if (this.totalMarios != 0) throw "ERROR, only 1 mario should be initialized here, and this is vanilla anyways"
-                    this.totalMarios++
+                    // if (this.totalMarios != 0) {
+                    //     throw "ERROR, only 1 mario should be initialized here, and this is vanilla anyways"
+                    // }
+                    // this.totalMarios++
                     this.gMarioObject = object
-                    GraphNode.geo_make_first_child(object.header.gfx.node)
+                    GraphNode.geo_make_first_child(object.header.gfx)
                 }
 
                 GraphNode.geo_obj_init_spawninfo(object.header.gfx, spawnInfo)
@@ -311,13 +350,26 @@ class ObjectListProcessor {
 
             spawnInfo = spawnInfo.next
         }
-
     }
 
     clear_objects() {
+        let i
+
+        this.gTHIWaterDrained = 0
+        this.gTimeStopState = 0
+        this.gMarioObject = null
+        this.gMarioCurrentRoom = 0
+        this.totalMarios = 0
+
+        for (i = 0; i < 60; i++) {
+            this.gDoorAdjacentRooms[i][0] = 0
+            this.gDoorAdjacentRooms[i][1] = 0
+        }
+
         gLinker.Spawn.clear_object_lists()
         gLinker.SurfaceLoad.clear_dynamic_surfaces()
     }
 }
 
 export const ObjectListProcessorInstance = new ObjectListProcessor()
+gLinker.ObjectListProcessor = ObjectListProcessorInstance

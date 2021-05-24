@@ -16,3 +16,6 @@ export const level_bbh_entry = [
     { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_or_update, LevelUpdate] },
     { command: LevelCommands.call_loop, args: [1, LevelUpdate.lvl_init_or_update, LevelUpdate] },
 ]
+
+
+gLinker.level_scripts.level_bbh_entry = level_bbh_entry

@@ -2,7 +2,13 @@ import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { GEO_CONTEXT_RENDER, GEO_CONTEXT_CREATE } from "../engine/graph_node"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { AreaInstance as Area } from "./Area"
-import * as LEVEL from "../levels/level_defines_constants"
+import {
+    LEVEL_NONE, LEVEL_UNKNOWN_1, LEVEL_UNKNOWN_2, LEVEL_UNKNOWN_3, LEVEL_BBH, LEVEL_CCM, LEVEL_CASTLE, LEVEL_HMC,
+    LEVEL_SSL, LEVEL_BOB, LEVEL_SL, LEVEL_WDW, LEVEL_JRB, LEVEL_THI, LEVEL_TTC, LEVEL_RR, LEVEL_CASTLE_GROUNDS,
+    LEVEL_BITDW, LEVEL_VCUTM, LEVEL_BITFS, LEVEL_SA, LEVEL_BITS, LEVEL_LLL, LEVEL_DDD, LEVEL_WF, LEVEL_ENDING,
+    LEVEL_CASTLE_COURTYARD, LEVEL_PSS, LEVEL_COTMC, LEVEL_TOTWC, LEVEL_BOWSER_1, LEVEL_WMOTR, LEVEL_UNKNOWN_32,
+    LEVEL_BOWSER_2, LEVEL_BOWSER_3, LEVEL_UNKNOWN_35, LEVEL_TTM, LEVEL_UNKNOWN_37, LEVEL_UNKNOWN_38
+} from "../levels/level_defines_constants"
 
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { atan2s } from "../engine/math_util"
@@ -18,49 +24,49 @@ export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
 const LEVEL_AREA_INDEX = (levelNum, areaNum) => {return (levelNum << 4) + areaNum}
 
-export const AREA_BBH                = LEVEL_AREA_INDEX(LEVEL.BBH, 1)
-export const AREA_CCM_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL.CCM, 1)
-export const AREA_CCM_SLIDE          = LEVEL_AREA_INDEX(LEVEL.CCM, 2)
-export const AREA_CASTLE_LOBBY       = LEVEL_AREA_INDEX(LEVEL.CASTLE, 1)
-export const AREA_CASTLE_TIPPY       = LEVEL_AREA_INDEX(LEVEL.CASTLE, 2)
-export const AREA_CASTLE_BASEMENT    = LEVEL_AREA_INDEX(LEVEL.CASTLE, 3)
-export const AREA_HMC                = LEVEL_AREA_INDEX(LEVEL.HMC, 1)
-export const AREA_SSL_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL.SSL, 1)
-export const AREA_SSL_PYRAMID        = LEVEL_AREA_INDEX(LEVEL.SSL, 2)
-export const AREA_SSL_EYEROK         = LEVEL_AREA_INDEX(LEVEL.SSL, 3)
-export const AREA_BOB                = LEVEL_AREA_INDEX(LEVEL.BOB, 1)
-export const AREA_SL_OUTSIDE         = LEVEL_AREA_INDEX(LEVEL.SL, 1)
-export const AREA_SL_IGLOO           = LEVEL_AREA_INDEX(LEVEL.SL, 2)
-export const AREA_WDW_MAIN           = LEVEL_AREA_INDEX(LEVEL.WDW, 1)
-export const AREA_WDW_TOWN           = LEVEL_AREA_INDEX(LEVEL.WDW, 2)
-export const AREA_JRB_MAIN           = LEVEL_AREA_INDEX(LEVEL.JRB, 1)
-export const AREA_JRB_SHIP           = LEVEL_AREA_INDEX(LEVEL.JRB, 2)
-export const AREA_THI_HUGE           = LEVEL_AREA_INDEX(LEVEL.THI, 1)
-export const AREA_THI_TINY           = LEVEL_AREA_INDEX(LEVEL.THI, 2)
-export const AREA_THI_WIGGLER        = LEVEL_AREA_INDEX(LEVEL.THI, 3)
-export const AREA_TTC                = LEVEL_AREA_INDEX(LEVEL.TTC, 1)
-export const AREA_RR                 = LEVEL_AREA_INDEX(LEVEL.RR, 1)
-export const AREA_CASTLE_GROUNDS     = LEVEL_AREA_INDEX(LEVEL.CASTLE_GROUNDS, 1)
-export const AREA_BITDW              = LEVEL_AREA_INDEX(LEVEL.BITDW, 1)
-export const AREA_VCUTM              = LEVEL_AREA_INDEX(LEVEL.VCUTM, 1)
-export const AREA_BITFS              = LEVEL_AREA_INDEX(LEVEL.BITFS, 1)
-export const AREA_SA                 = LEVEL_AREA_INDEX(LEVEL.SA, 1)
-export const AREA_BITS               = LEVEL_AREA_INDEX(LEVEL.BITS, 1)
-export const AREA_LLL_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL.LLL, 1)
-export const AREA_LLL_VOLCANO        = LEVEL_AREA_INDEX(LEVEL.LLL, 2)
-export const AREA_DDD_WHIRLPOOL      = LEVEL_AREA_INDEX(LEVEL.DDD, 1)
-export const AREA_DDD_SUB            = LEVEL_AREA_INDEX(LEVEL.DDD, 2)
-export const AREA_WF                 = LEVEL_AREA_INDEX(LEVEL.WF, 1)
-export const AREA_ENDING             = LEVEL_AREA_INDEX(LEVEL.ENDING, 1)
-export const AREA_COURTYARD          = LEVEL_AREA_INDEX(LEVEL.CASTLE_COURTYARD, 1)
-export const AREA_PSS                = LEVEL_AREA_INDEX(LEVEL.PSS, 1)
-export const AREA_COTMC              = LEVEL_AREA_INDEX(LEVEL.COTMC, 1)
-export const AREA_TOTWC              = LEVEL_AREA_INDEX(LEVEL.TOTWC, 1)
-export const AREA_BOWSER_1           = LEVEL_AREA_INDEX(LEVEL.BOWSER_1, 1)
-export const AREA_WMOTR              = LEVEL_AREA_INDEX(LEVEL.WMOTR, 1)
-export const AREA_BOWSER_2           = LEVEL_AREA_INDEX(LEVEL.BOWSER_2, 1)
-export const AREA_BOWSER_3           = LEVEL_AREA_INDEX(LEVEL.BOWSER_3, 1)
-export const AREA_TTM_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL.TTM, 1)
+export const AREA_BBH                = LEVEL_AREA_INDEX(LEVEL_BBH, 1)
+export const AREA_CCM_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL_CCM, 1)
+export const AREA_CCM_SLIDE          = LEVEL_AREA_INDEX(LEVEL_CCM, 2)
+export const AREA_CASTLE_LOBBY       = LEVEL_AREA_INDEX(LEVEL_CASTLE, 1)
+export const AREA_CASTLE_TIPPY       = LEVEL_AREA_INDEX(LEVEL_CASTLE, 2)
+export const AREA_CASTLE_BASEMENT    = LEVEL_AREA_INDEX(LEVEL_CASTLE, 3)
+export const AREA_HMC                = LEVEL_AREA_INDEX(LEVEL_HMC, 1)
+export const AREA_SSL_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL_SSL, 1)
+export const AREA_SSL_PYRAMID        = LEVEL_AREA_INDEX(LEVEL_SSL, 2)
+export const AREA_SSL_EYEROK         = LEVEL_AREA_INDEX(LEVEL_SSL, 3)
+export const AREA_BOB                = LEVEL_AREA_INDEX(LEVEL_BOB, 1)
+export const AREA_SL_OUTSIDE         = LEVEL_AREA_INDEX(LEVEL_SL, 1)
+export const AREA_SL_IGLOO           = LEVEL_AREA_INDEX(LEVEL_SL, 2)
+export const AREA_WDW_MAIN           = LEVEL_AREA_INDEX(LEVEL_WDW, 1)
+export const AREA_WDW_TOWN           = LEVEL_AREA_INDEX(LEVEL_WDW, 2)
+export const AREA_JRB_MAIN           = LEVEL_AREA_INDEX(LEVEL_JRB, 1)
+export const AREA_JRB_SHIP           = LEVEL_AREA_INDEX(LEVEL_JRB, 2)
+export const AREA_THI_HUGE           = LEVEL_AREA_INDEX(LEVEL_THI, 1)
+export const AREA_THI_TINY           = LEVEL_AREA_INDEX(LEVEL_THI, 2)
+export const AREA_THI_WIGGLER        = LEVEL_AREA_INDEX(LEVEL_THI, 3)
+export const AREA_TTC                = LEVEL_AREA_INDEX(LEVEL_TTC, 1)
+export const AREA_RR                 = LEVEL_AREA_INDEX(LEVEL_RR, 1)
+export const AREA_CASTLE_GROUNDS     = LEVEL_AREA_INDEX(LEVEL_CASTLE_GROUNDS, 1)
+export const AREA_BITDW              = LEVEL_AREA_INDEX(LEVEL_BITDW, 1)
+export const AREA_VCUTM              = LEVEL_AREA_INDEX(LEVEL_VCUTM, 1)
+export const AREA_BITFS              = LEVEL_AREA_INDEX(LEVEL_BITFS, 1)
+export const AREA_SA                 = LEVEL_AREA_INDEX(LEVEL_SA, 1)
+export const AREA_BITS               = LEVEL_AREA_INDEX(LEVEL_BITS, 1)
+export const AREA_LLL_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL_LLL, 1)
+export const AREA_LLL_VOLCANO        = LEVEL_AREA_INDEX(LEVEL_LLL, 2)
+export const AREA_DDD_WHIRLPOOL      = LEVEL_AREA_INDEX(LEVEL_DDD, 1)
+export const AREA_DDD_SUB            = LEVEL_AREA_INDEX(LEVEL_DDD, 2)
+export const AREA_WF                 = LEVEL_AREA_INDEX(LEVEL_WF, 1)
+export const AREA_ENDING             = LEVEL_AREA_INDEX(LEVEL_ENDING, 1)
+export const AREA_COURTYARD          = LEVEL_AREA_INDEX(LEVEL_CASTLE_COURTYARD, 1)
+export const AREA_PSS                = LEVEL_AREA_INDEX(LEVEL_PSS, 1)
+export const AREA_COTMC              = LEVEL_AREA_INDEX(LEVEL_COTMC, 1)
+export const AREA_TOTWC              = LEVEL_AREA_INDEX(LEVEL_TOTWC, 1)
+export const AREA_BOWSER_1           = LEVEL_AREA_INDEX(LEVEL_BOWSER_1, 1)
+export const AREA_WMOTR              = LEVEL_AREA_INDEX(LEVEL_WMOTR, 1)
+export const AREA_BOWSER_2           = LEVEL_AREA_INDEX(LEVEL_BOWSER_2, 1)
+export const AREA_BOWSER_3           = LEVEL_AREA_INDEX(LEVEL_BOWSER_3, 1)
+export const AREA_TTM_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL_TTM, 1)
 
 const CAM_MODE_MARIO_ACTIVE          =  0x01
 const CAM_MODE_LAKITU_WAS_ZOOMED_OUT =  0x02
@@ -87,23 +93,6 @@ export const CAMERA_MODE_FIXED             = 0x0D
 export const CAMERA_MODE_8_DIRECTIONS      = 0x0E // AKA Parallel Camera, Bowser Courses & Rainbow Road
 export const CAMERA_MODE_FREE_ROAM         = 0x10
 export const CAMERA_MODE_SPIRAL_STAIRS     = 0x11
-
-// EXPERIMENTAL
-export const MODE_NONE              = 0x00
-export const MODE_RADIAL            = 0x01
-export const MODE_OUTWARD_RADIAL    = 0x02
-export const MODE_BEHIND_MARIO      = 0x03
-export const MODE_CLOSE             = 0x04 // Inside Castle / Big Boo's Haunt
-export const MODE_C_UP              = 0x06
-export const MODE_WATER_SURFACE     = 0x08
-export const MODE_SLIDE_HOOT        = 0x09
-export const MODE_INSIDE_CANNON     = 0x0A
-export const MODE_BOSS_FIGHT        = 0x0B
-export const MODE_PARALLEL_TRACKING = 0x0C
-export const MODE_FIXED             = 0x0D
-export const MODE_8_DIRECTIONS      = 0x0E // AKA Parallel Camera, Bowser Courses & Rainbow Road
-export const MODE_FREE_ROAM         = 0x10
-export const MODE_SPIRAL_STAIRS     = 0x11
 
 
 const CAM_MOVE_RETURN_TO_MIDDLE       = 0x0001
@@ -736,7 +725,6 @@ class Camera {
     }
 
     create_camera(graphNode) {
-
         const mode = graphNode.config.mode
 
         graphNode.config.camera = {
@@ -758,7 +746,6 @@ class Camera {
             myDemoAngle: 0,
             myDemoRadius: 1500
         })*/
-
     }
 
 
@@ -795,20 +782,20 @@ class Camera {
         const marioOffset = [0, 125, 400]
 
         switch (Area.gCurrLevelNum) {
-            case LEVEL.CASTLE_GROUNDS:
-                if (this.is_within_100_units_of_mario(-1328, 260, 4646) != 1) {
-                    marioOffset[0] = -400
-                    marioOffset[2] = -800
-                }
+            case LEVEL_CASTLE_GROUNDS:
+                // if (this.is_within_100_units_of_mario(-1328, 260, 4646) != 1) {
+                //     marioOffset[0] = -400
+                //     marioOffset[2] = -800
+                // }
                 this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
                 break
-            case LEVEL.BOB:  /// TODO
+            case LEVEL_BOB:  /// TODO
                 this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
                 break
-            case LEVEL.CCM:  /// TODO
+            case LEVEL_CCM:  /// TODO
                 this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
                 break
-            case LEVEL.PSS:  /// TODO
+            case LEVEL_PSS:  /// TODO
                 this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
             default: this.gLakituState.mode = CAMERA_MODE_FREE_ROAM // throw err 'camera not implemented'
         }
@@ -1182,7 +1169,6 @@ class Camera {
     }
 
     pan_ahead_of_player(c) {
-
         const pan = [0,0,0]
 
         // Get distance and angle from camera to mario.
@@ -1727,7 +1713,7 @@ class Camera {
         }
         if ((this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) && (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE)) {
             posHeight = 610
-            /// if pyramid level or LEVEL.CASTLE (indoor?)
+            /// if pyramid level or LEVEL_CASTLE (indoor?)
         }
 
         ///Poison Gas

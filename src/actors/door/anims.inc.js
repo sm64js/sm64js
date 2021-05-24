@@ -1,8 +1,6 @@
 // Door
 
-import {
-    ANIMINDEX_NUMPARTS
-} from "../../include/types"
+import { ANIMINDEX_NUMPARTS } from "../../include/types"
 
 // 0x030151C8
 const door_seg3_animvalue_030151C8 = [
@@ -178,4 +176,4 @@ export const door_seg3_anims_030156C0 = [
 ];
 
 
-// 1619277377 - 2021-04-24 05:24:31 -1000
+// 1621039721 - 2021-05-17 08:18:37 -0400

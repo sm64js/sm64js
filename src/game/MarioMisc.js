@@ -77,7 +77,7 @@ class MarioMisc {
         const action = this.gBodyState.action
 
         if (callContext == GEO_CONTEXT_RENDER) {
-            const rotNode = node.node.next.wrapper
+            const rotNode = node.next
 
             if (![ACT_WALKING, ACT_BUTT_SLIDE, ACT_HOLD_BUTT_SLIDE, ACT_RIDING_SHELL_GROUND].includes(action)) {
                 this.gBodyState.torsoAngle = [0,0,0]
@@ -113,18 +113,18 @@ class MarioMisc {
      */
     geo_switch_mario_cap_on_off(callContext, node, c) {
         if (callContext == GEO_CONTEXT_RENDER) {
-            let next = node.node.next.wrapper
+            let next = node.next
             const bodyState = this.gBodyState
             node.selectedCase = bodyState.capState & 1
             while (next != node) {
-                if (next.node.type == GRAPH_NODE_TYPE_TRANSLATION_ROTATION) {
+                if (next.type == GRAPH_NODE_TYPE_TRANSLATION_ROTATION) {
                     if (bodyState.capState & 2) {
-                        next.node.flags |= GRAPH_RENDER_ACTIVE
+                        next.flags |= GRAPH_RENDER_ACTIVE
                     } else {
-                        next.node.flags &= ~GRAPH_RENDER_ACTIVE
+                        next.flags &= ~GRAPH_RENDER_ACTIVE
                     }
                 }
-                next = next.node.next.wrapper
+                next = next.next
             }
         }
         return null
@@ -137,9 +137,9 @@ class MarioMisc {
         const gfx = []
 
         if (alpha == 255) {
-            node.node.flags = (node.node.flags & 0xFF) | (LAYER_OPAQUE << 8)
+            node.flags = (node.flags & 0xFF) | (LAYER_OPAQUE << 8)
         } else {
-            node.node.flags = (node.node.flags & 0xFF) | (LAYER_TRANSPARENT << 8)
+            node.flags = (node.flags & 0xFF) | (LAYER_TRANSPARENT << 8)
             gDPSetAlphaCompare(gfx, G_AC_DITHER)
         }
         gDPSetEnvColor(gfx, 255, 255, 255, alpha)
@@ -157,39 +157,13 @@ class MarioMisc {
             const xfm = Mat4()
 
             if (gCurGraphNodeObject == gMarioObject && gCurGraphNodeObject.prevObj != null) {
-                create_transformation_from_matrices(xfm, mtx, gCurGraphNodeCamera.wrapper.matrixPtr)
+                create_transformation_from_matrices(xfm, mtx, gCurGraphNodeCamera.matrixPtr)
                 obj_update_pos_from_parent_transformation(xfm, gCurGraphNodeObject.prevObj)
                 obj_set_gfx_pos_from_pos(gCurGraphNodeObject.prevObj)
             }
         }
         return null
     }
-
-    /**
-     * Since Mirror Mario has an x scale of -1, the mesh becomes inside out.
-     * This node corrects that by changing the culling mode accordingly.
-     */
-    geo_mirror_mario_backface_culling(callContext, node, c) {
-        if (callContext == GEO_CONTEXT_RENDER &&
-            false /* gLinker.GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject == gMirrorMario */) {  // FIXME
-            const gfx = []
-
-            if (node.parameter == 0) {
-                gSPClearGeometryMode(gfx, G_CULL_BACK)
-                gSPSetGeometryMode(gfx, G_CULL_FRONT)
-                gSPEndDisplayList(gfx)
-            } else {
-                gSPClearGeometryMode(gfx, G_CULL_FRONT)
-                gSPSetGeometryMode(gfx, G_CULL_BACK)
-                gSPEndDisplayList(gfx)
-            }
-            node.node.flags = (node.node.flags & 0xFF) | (LAYER_OPAQUE << 8)
-            return gfx
-        }
-
-        return null
-    }
-
 
     /**
      * Sets the correct blend mode and color for mirror Mario.
@@ -238,8 +212,8 @@ class MarioMisc {
         let action = bodyState.action
 
         if (callContext == GEO_CONTEXT_RENDER) {
-            // const rotNode = node.node.next.wrapper
-            // const camera = gLinker.GeoRenderer.gCurGraphNodeCamera.wrapper.config.camera
+            // const rotNode = node.next
+            // const camera = gLinker.GeoRenderer.gCurGraphNodeCamera.config.camera
 
             // if (camera.mode == CAMERA_MODE_C_UP) {
             //     rotNode.rotation[0] = gPlayerCameraState.headRotation[1]
@@ -267,7 +241,7 @@ class MarioMisc {
         const gAreaUpdateCounter = gLinker.GeoRenderer.gAreaUpdateCounter
 
         if (callContext == GEO_CONTEXT_RENDER) {
-            const rotNode = node.node.next.wrapper
+            const rotNode = node.next
 
             if (!bodyState.wingFlutter) {
                 rotX = (coss((gAreaUpdateCounter & 0xF) << 12) + 1.0) * 4096.0
@@ -318,7 +292,7 @@ class MarioMisc {
      * (such as in the mirror room) results in a faster and desynced punch / kick animation.
      */
     geo_mario_hand_foot_scaler(callContext, node, c) {
-        const scaleNode = node.node.next.wrapper
+        const scaleNode = node.next
         const bodyState = this.gBodyState
         const gAreaUpdateCounter = gLinker.GeoRenderer.gAreaUpdateCounter
 
@@ -369,11 +343,79 @@ class MarioMisc {
               // ! The HOLP is set here, which is why it only updates when the held object is drawn.
               // This is why it won't update during a pause buffered hitstun or when the camera is very far
               // away.
-            get_pos_from_transform_mtx(marioState.marioBodyState.heldObjLastPosition, mtx, gCurGraphNodeCamera.wrapper.matrixPtr)
+            get_pos_from_transform_mtx(marioState.marioBodyState.heldObjLastPosition, mtx, gCurGraphNodeCamera.matrixPtr)
         }
         return null
     }
 
+
+    // X position of the mirror
+    // #define MIRROR_X 4331.53
+
+    /**
+     * Geo node that creates a clone of Mario's geo node and updates it to becomes
+     * a mirror image of the player.
+     */
+    geo_render_mirror_mario(callContext, node, c) {
+        // let /*f32*/ mirroredX
+        // struct Object *mario = gMarioStates[0].marioObj
+
+        // switch (callContext) {
+        //     case GEO_CONTEXT_CREATE:
+        //         init_graph_node_object(null, &gMirrorMario, null, gVec3fZero, gVec3sZero, gVec3fOne)
+        //         break
+        //     case GEO_CONTEXT_AREA_LOAD:
+        //         geo_add_child(node, &gMirrorMario.node)
+        //         break
+        //     case GEO_CONTEXT_AREA_UNLOAD:
+        //         geo_remove_child(&gMirrorMario.node)
+        //         break
+        //     case GEO_CONTEXT_RENDER:
+        //         if (mario.header.gfx.pos[0] > 1700.0) {
+        //               // TODO: Is this a geo layout copy or a graph node copy?
+        //             gMirrorMario.sharedChild = mario.header.gfx.sharedChild
+        //             gMirrorMario.areaIndex = mario.header.gfx.areaIndex
+        //             vec3s_copy(gMirrorMario.angle, mario.header.gfx.angle)
+        //             vec3f_copy(gMirrorMario.pos, mario.header.gfx.pos)
+        //             vec3f_copy(gMirrorMario.scale, mario.header.gfx.scale)
+
+        //             gMirrorMario.animInfo = mario.header.gfx.animInfo
+        //             mirroredX = MIRROR_X - gMirrorMario.pos[0]
+        //             gMirrorMario.pos[0] = mirroredX + MIRROR_X
+        //             gMirrorMario.angle[1] = -gMirrorMario.angle[1]
+        //             gMirrorMario.scale[0] *= -1.0
+        //             ((struct GraphNode *) &gMirrorMario).flags |= 1
+        //         } else {
+        //             ((struct GraphNode *) &gMirrorMario).flags &= ~1
+        //         }
+        //         break
+        // }
+        return null
+    }
+
+    /**
+     * Since Mirror Mario has an x scale of -1, the mesh becomes inside out.
+     * This node corrects that by changing the culling mode accordingly.
+     */
+    geo_mirror_mario_backface_culling(callContext, node, c) {
+        const gfx = []
+
+        // if (callContext == GEO_CONTEXT_RENDER && gCurGraphNodeObject == &gMirrorMario) {
+        //     gfx = alloc_display_list(3 * sizeof(*gfx))
+
+        //     if (node.parameter == 0) {
+        //         gSPClearGeometryMode(&gfx[0], G_CULL_BACK)
+        //         gSPSetGeometryMode(&gfx[1], G_CULL_FRONT)
+        //         gSPEndDisplayList(&gfx[2])
+        //     } else {
+        //         gSPClearGeometryMode(&gfx[0], G_CULL_FRONT)
+        //         gSPSetGeometryMode(&gfx[1], G_CULL_BACK)
+        //         gSPEndDisplayList(&gfx[2])
+        //     }
+        //     node.flags = (node.flags & 0xFF) | (LAYER_OPAQUE << 8)
+        // }
+        return gfx
+    }
 
 }
 

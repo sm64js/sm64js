@@ -9,20 +9,16 @@ import {
 
 import { GRAPH_RENDER_ACTIVE } from "../engine/graph_node"
 import { dist_between_objects, obj_build_transform_from_pos_and_angle, obj_apply_scale_to_matrix } from "./ObjectHelpers"
-// import { SpawnObjectInstance as Spawn } from "./SpawnObject"
+import { TIME_STOP_ACTIVE } from "./ObjectListProcessor"
 
 class SurfaceLoad {
     constructor() {
-
-        // Spawn.SurfaceLoad = this
-        gLinker.SurfaceLoad = this
-
         this.SPATIAL_PARTITION_FLOORS = 0
         this.SPATIAL_PARTITION_CEILS = 1
         this.SPATIAL_PARTITION_WALLS = 2
 
-        this.gStaticSurfacePartition = new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
-        this.gDynamicSurfacePartition = new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
+        // this.gStaticSurfacePartition = new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
+        // this.gDynamicSurfacePartition = new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
 
     }
 
@@ -136,6 +132,19 @@ class SurfaceLoad {
         return index
     }
 
+
+    clear_spatial_partition() {
+        return new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
+    }
+
+    /**
+     * Clears the static (level) surface partitions for new use.
+     */
+    clear_static_surfaces() {
+        this.gStaticSurfacePartition = this.clear_spatial_partition()
+    }
+
+
     add_surface_to_cell(dynamic, cellX, cellZ, surface) {
         this.gSurfaceNodesAllocated++
 
@@ -160,8 +169,11 @@ class SurfaceLoad {
 
         const newNode = { surface }
 
-        if (dynamic) list = this.gDynamicSurfacePartition[cellZ][cellX][listIndex]
-        else list = this.gStaticSurfacePartition[cellZ][cellX][listIndex]
+        if (dynamic) {
+            list = this.gDynamicSurfacePartition[cellZ][cellX][listIndex]
+        } else {
+            list = this.gStaticSurfacePartition[cellZ][cellX][listIndex]
+        }
 
         while (list.next) {
             const priority = list.next.surface.vertex1[1] * sortDir
@@ -262,6 +274,8 @@ class SurfaceLoad {
         this.gSurfaceNodesAllocated = 0
         this.gSurfacesAllocated = 0
 
+        this.clear_static_surfaces()
+
         while (dataIndex < data.length) {
 
             const terrainLoadType = data[dataIndex]
@@ -306,8 +320,7 @@ class SurfaceLoad {
             this.gSurfacesAllocated = this.gNumStaticSurfaces
             this.gSurfaceNodesAllocated = this.gNumStaticSurfaceNodes
 
-            ///clear_spatial_partition
-            this.gDynamicSurfacePartition = new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
+            this.gDynamicSurfacePartition = this.clear_spatial_partition()
         }
     }
 
@@ -405,11 +418,12 @@ class SurfaceLoad {
 
 
         if (marioDist < ObjectListProc.gCurrentObject.rawData[oDrawingDistance]) {
-            ObjectListProc.gCurrentObject.header.gfx.node.flags |= GRAPH_RENDER_ACTIVE
+            ObjectListProc.gCurrentObject.header.gfx.flags |= GRAPH_RENDER_ACTIVE
         } else {
-            ObjectListProc.gCurrentObject.header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE
+            ObjectListProc.gCurrentObject.header.gfx.flags &= ~GRAPH_RENDER_ACTIVE
         }
     }
 }
 
 export const SurfaceLoadInstance = new SurfaceLoad()
+gLinker.SurfaceLoad = SurfaceLoadInstance

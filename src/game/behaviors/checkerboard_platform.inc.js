@@ -4,7 +4,6 @@ import { spawn_object_relative, cur_obj_move_using_fvel_and_gravity } from "../O
 import { MODEL_CHECKERBOARD_PLATFORM } from "../../include/model_ids"
 import { bhvCheckerboardPlatformSub } from "../BehaviorData"
 import { sins, coss } from "../../utils"
-import { SurfaceLoadInstance } from "../SurfaceLoad"
 
 const checkerPlatformData = [
 	{ unk0: 145, unk1: [0.7, 1.5, 0.7], unk2: 7.0 },
@@ -101,7 +100,7 @@ const bhv_checkerboard_platform_loop = () => {
 		o.rawData[oFaceAnglePitch] &= ~0x7FFF
 	}
 	cur_obj_move_using_fvel_and_gravity()
-	SurfaceLoadInstance.load_object_collision_model()
+	gLinker.SurfaceLoad.load_object_collision_model()
 }
 
 

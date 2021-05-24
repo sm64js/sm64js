@@ -1,0 +1,33 @@
+// Castle Inside
+
+import {
+    COL_INIT, COL_VERTEX_INIT, COL_VERTEX, COL_TRI_INIT, COL_TRI, COL_TRI_STOP, COL_END,
+    SURFACE_DEFAULT
+} from "../../../include/surface_terrains"
+
+// 0x07078E14 - 0x07078E80
+export const inside_castle_seg7_collision_star_door = [
+    COL_INIT(),
+    COL_VERTEX_INIT(0x8),
+    COL_VERTEX(-80, 0, -20),
+    COL_VERTEX(-80, 256, 20),
+    COL_VERTEX(-80, 256, -20),
+    COL_VERTEX(80, 256, 20),
+    COL_VERTEX(80, 256, -20),
+    COL_VERTEX(80, 0, -20),
+    COL_VERTEX(-80, 0, 20),
+    COL_VERTEX(80, 0, 20),
+    COL_TRI_INIT(SURFACE_DEFAULT, 8),
+    COL_TRI(2, 3, 4),
+    COL_TRI(2, 1, 3),
+    COL_TRI(5, 2, 4),
+    COL_TRI(5, 0, 2),
+    COL_TRI(6, 3, 1),
+    COL_TRI(6, 7, 3),
+    COL_TRI(5, 6, 0),
+    COL_TRI(5, 7, 6),
+    COL_TRI_STOP(),
+    COL_END(),
+].flat();
+
+// 1621726940 - 2021-05-22 16:42:23 -0700

@@ -55,13 +55,13 @@ export const create_sound_spawner = (soundMagic) => {
  * separate left/right leg functions that went unused.
  */
 export const cur_obj_play_sound_1 = (soundMagic) => {
-    if (ObjectListProc.gCurrentObject.header.gfx.node.flags & GRAPH_RENDER_ACTIVE) {
+    if (ObjectListProc.gCurrentObject.header.gfx.flags & GRAPH_RENDER_ACTIVE) {
         play_sound(soundMagic, ObjectListProc.gCurrentObject.header.gfx.cameraToObject)
     }
 }
 
 export const cur_obj_play_sound_2 = (soundMagic) => {
-    if (ObjectListProc.gCurrentObject.header.gfx.node.flags & GRAPH_RENDER_ACTIVE) {
+    if (ObjectListProc.gCurrentObject.header.gfx.flags & GRAPH_RENDER_ACTIVE) {
         play_sound(soundMagic, ObjectListProc.gCurrentObject.header.gfx.cameraToObject)
     }
 }

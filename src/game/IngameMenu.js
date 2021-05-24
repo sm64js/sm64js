@@ -3,6 +3,33 @@ import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../include/config"
 import * as Gbi from "../include/gbi"
 import { GameInstance as Game } from "./Game"
 
+export const DIALOG_TYPE_ROTATE = 0  // used in NPCs and level messages
+export const DIALOG_TYPE_ZOOM = 1    // used in signposts and wall signs and etc
+
+export let gDialogID = -1
+export let gDialogVariable = 0
+export let gDialogBoxType = 0
+
+export const get_dialog_id = () => {
+    return gDialogID
+}
+
+export const create_dialog_box = (dialog) => {
+    if (gDialogID == -1) {
+        gDialogID = dialog
+        gDialogBoxType = DIALOG_TYPE_ROTATE
+    }
+}
+
+export const create_dialog_box_with_var = (dialog, dialogVar) => {
+    if (gDialogID == -1) {
+        gDialogID = dialog;
+        gDialogVariable = dialogVar
+        gDialogBoxType = DIALOG_TYPE_ROTATE
+    }
+}
+
+
 
 export const create_dl_ortho_matrix = () => {
     const matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))

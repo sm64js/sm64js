@@ -6,7 +6,6 @@ import * as Gbi from "../include/gbi"
 
 class Game {
     constructor() {
-        gLinker.Game = this
         this.main_loop_init() /// thread5_game_loop_init
         window.gGlobalTimer = 0
     }
@@ -23,30 +22,20 @@ class Game {
 
         //save_file_load_all();
 
-        //set_vblank_handler(2, &gGameVblankHandler, &gGameVblankQueue, (OSMesg) 1);
-
         // point levelCommandAddr to the entry point into the level script data.
         LevelCommands.start_new_script(level_script_entry)
 
         //play_music(SEQ_PLAYER_SFX, SEQUENCE_ARGS(0, SEQ_SOUND_PLAYER), 0);
         //set_sound_mode(save_file_get_sound_mode());
-
+        //rendering_init();
     }
 
     main_loop_one_iteration() {
-
-        ///Read Data from Controllers
-
-        // Audio game loop Tick
-
+        //audio_game_loop_tick();
         this.config_gfx_pool()
-
-        // process controller inputs
-
+        //read_controller_inputs();
         LevelCommands.level_script_execute()
-
         this.display_and_vsync()
-
     }
 
     create_task_structure() {
@@ -102,3 +91,4 @@ class Game {
 }
 
 export const GameInstance = new Game()
+gLinker.Game = GameInstance

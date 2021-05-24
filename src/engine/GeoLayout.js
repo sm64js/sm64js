@@ -33,6 +33,11 @@ class GeoLayout {
         this.BACKGROUND_GREEN_SKY       = 7
         this.BACKGROUND_ABOVE_CLOUDS    = 8
         this.BACKGROUND_PURPLE_SKY      = 9
+
+        // Use to properly set a GraphNodeGenerated's parameter to point to the right painting
+        this.PAINTING_ID = (id, grp) => {
+            return id | (grp << 8)
+        }
     }
 
     GEO_ANIMATED_PART(args) {this.node_animated_part(args)}
@@ -52,7 +57,7 @@ class GeoLayout {
         this.gGeoLayoutStack.push = this.sCurrentLayout
         this.gGeoLayoutStack.push = this.gCurGraphNodeIndex
         this.gGeoLayoutReturnIndex = this.gGeoLayoutStackIndex
-        this.sCurrentLayout = { index: 0, layout: args[0] }
+        this.start_new_layout(args[0])
     }
 
     branch(args) {
@@ -61,7 +66,7 @@ class GeoLayout {
             this.gGeoLayoutStack.push(this.sCurrentLayout)
         }
 
-        this.sCurrentLayout = { index: 0, layout: args[1] }
+        this.start_new_layout(args[1])
     }
     
     return(args) {
@@ -69,7 +74,6 @@ class GeoLayout {
     }
 
     node_screen_area(args) {  /// node_root
-
         const x = args[1], y = args[2], width = args[3], height = args[4]
         let i = 0
 
@@ -291,10 +295,6 @@ class GeoLayout {
         const trans = [ args[1], args[2], args[3] ]
         const displayList = args[4]
 
-        // if (params & 0x80) {
-        //     throw "unimplemented feature in node translate"
-        // }
-
         const graphNode = GraphNode.init_graph_node_translation(drawingLayer, displayList, trans)
         GraphNode.register_scene_graph_node(this, graphNode)
         this.sCurrentLayout.index++
@@ -307,10 +307,6 @@ class GeoLayout {
         const trans = [ args[1], args[2], args[3] ]
         const rot   = [ args[4], args[5], args[6] ]
         const displayList = args[7]
-
-        // if (params & 0x80) {
-        //     throw "unimplemented feature in node translate"
-        // }
 
         const graphNode = GraphNode.init_graph_node_translation_rotation(drawingLayer, displayList, trans, rot)
         GraphNode.register_scene_graph_node(this, graphNode)
@@ -344,13 +340,15 @@ class GeoLayout {
         this.sCurrentLayout.index++
     }
 
-    process_geo_layout(geoLayout) {
-        if (typeof geoLayout == "function") {
-            geoLayout = geoLayout()
+    start_new_layout(layout) {
+        if (typeof layout == "function") {
+            layout = layout()
         }
+        this.sCurrentLayout = {layout: layout, index: 0}
+    }
 
-        this.sCurrentLayout.layout = geoLayout
-        this.sCurrentLayout.index = 0
+    process_geo_layout(geoLayout) {
+        this.start_new_layout(geoLayout)
 
         /// set a bunch of other initial globals
         this.gCurRootGraphNode = null
@@ -389,15 +387,18 @@ class GeoLayout {
 }
 
 export const GeoLayoutInstance = new GeoLayout()
+gLinker.GeoLayout = GeoLayoutInstance
 
 const Geo = GeoLayoutInstance;
 export const GEO_ANIMATED_PART = (...args)            => {return {command: Geo.node_animated_part, args: args}}
 export const GEO_ASM = (...args)                      => {return {command: Geo.node_generated, args: args}}
 export const GEO_BACKGROUND = (...args)               => {return {command: Geo.node_background, args: args}}
+export const GEO_BACKGROUND_COLOR = (...args)         => {return {command: Geo.node_background, args: args}}
 export const GEO_BILLBOARD = (...args)                => {return {command: Geo.node_billboard, args: args}}
 export const GEO_BRANCH = (...args)                   => {return {command: Geo.branch, args: args}}
 export const GEO_BRANCH_AND_LINK = (...args)          => {return {command: Geo.branch_and_link, args: args}}
 export const GEO_CAMERA = (...args)                   => {return {command: Geo.node_camera, args: args}}
+export const GEO_CAMERA_FRUSTUM = (...args)           => {return {command: Geo.node_perspective, args: args}}
 export const GEO_CAMERA_FRUSTUM_WITH_FUNC = (...args) => {return {command: Geo.node_perspective, args: args}}
 export const GEO_CLOSE_NODE = (...args)               => {return {command: Geo.close_node, args: args}}
 export const GEO_CULLING_RADIUS = (...args)           => {return {command: Geo.node_culling_radius, args: args}}
@@ -416,10 +417,10 @@ export const GEO_SCALE = (...args)                    => {return {command: Geo.n
 export const GEO_SHADOW = (...args)                   => {return {command: Geo.node_shadow, args: args}}
 export const GEO_SWITCH_CASE = (...args)              => {return {command: Geo.node_switch_case, args: args}}
 export const GEO_TRANSLATE_NODE = (...args)           => {return {command: Geo.node_translate, args: args}}
+export const GEO_TRANSLATE_NODE_WITH_DL = (...args)   => {return {command: Geo.node_translate, args: args}}
 export const GEO_TRANSLATE_ROTATE = (...args)         => {return {command: Geo.node_translate_rotate, args: args}}
 export const GEO_ZBUFFER = (...args)                  => {return {command: Geo.node_master_list, args: args}}
 
-// EXPERIMENTAL
 export const LAYER_FORCE                = Geo.LAYER_FORCE
 export const LAYER_OPAQUE               = Geo.LAYER_OPAQUE
 export const LAYER_OPAQUE_DECAL         = Geo.LAYER_OPAQUE_DECAL
@@ -429,7 +430,6 @@ export const LAYER_TRANSPARENT          = Geo.LAYER_TRANSPARENT
 export const LAYER_TRANSPARENT_DECAL    = Geo.LAYER_TRANSPARENT_DECAL
 export const LAYER_TRANSPARENT_INTER    = Geo.LAYER_TRANSPARENT_INTER
 
-// EXPERIMENTAL
 export const BACKGROUND_OCEAN_SKY       = Geo.BACKGROUND_OCEAN_SKY
 export const BACKGROUND_FLAMING_SKY     = Geo.BACKGROUND_FLAMING_SKY
 export const BACKGROUND_UNDERWATER_CITY = Geo.BACKGROUND_UNDERWATER_CITY
@@ -440,3 +440,5 @@ export const BACKGROUND_HAUNTED         = Geo.BACKGROUND_HAUNTED
 export const BACKGROUND_GREEN_SKY       = Geo.BACKGROUND_GREEN_SKY
 export const BACKGROUND_ABOVE_CLOUDS    = Geo.BACKGROUND_ABOVE_CLOUDS
 export const BACKGROUND_PURPLE_SKY      = Geo.BACKGROUND_PURPLE_SKY
+
+export const PAINTING_ID                = Geo.PAINTING_ID

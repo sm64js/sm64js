@@ -146,15 +146,57 @@ export const SAVE_FLAG_COLLECTED_MIPS_STAR_2  /* 0x10000000 */ = (1 << 28)
 //     /*0x04*/ u8 warpNode;
 // };
 
-export const gWarpCheckpoint = null
+export let gWarpCheckpoint = null
 
-export const gMainMenuDataModified = null
-export const gSaveFileModified = null
+export let gMainMenuDataModified = false
+export let gSaveFileModified = false
+let gDummyFlags = 0
 
 export const save_file_get_flags = (force) => {
-    return force || 0
+    if (force) {
+        return gDummyFlags | force
+    } else {
+        return gDummyFlags
+    }
     // if (gCurrCreditsEntry != NULL || gCurrDemoInput != NULL) {
     //     return 0;
     // }
     // return gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags;
+}
+
+export const save_file_set_flags = (flags) => {
+    gDummyFlags |= (flags | SAVE_FLAG_FILE_EXISTS)
+    gSaveFileModified = true
+}
+
+
+export const save_file_get_course_star_count = (fileIndex, courseIndex) => {
+    let /*s32*/ i
+    let /*s32*/ count = 0
+    let /*u8*/ flag = 1
+    let /*u8*/ starFlags = save_file_get_star_flags(fileIndex, courseIndex)
+
+    for (i = 0; i < 7; i++, flag <<= 1) {
+        if (starFlags & flag) {
+            count++
+        }
+    }
+    return count
+}
+
+/**
+ * Return the bitset of obtained stars in the specified course.
+ * If course is -1, return the bitset of obtained castle secret stars.
+ */
+export const save_file_get_star_flags = (fileIndex, courseIndex) => {
+    let /*u32*/ starFlags
+
+    // if (courseIndex == -1) {
+    //     starFlags = SAVE_FLAG_TO_STAR_FLAG(gSaveBuffer.files[fileIndex][0].flags)
+    // } else {
+    //     starFlags = gSaveBuffer.files[fileIndex][0].courseStars[courseIndex] & 0x7F
+    // }
+    starFlags = 0x7F
+
+    return starFlags
 }

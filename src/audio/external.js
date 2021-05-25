@@ -13,6 +13,7 @@ const TARGET_VOLUME_UNSET = 0x00
 
 const sSoundMovingSpeed = new Array(SOUND_BANK_COUNT)
 let sBackgroundMusicMaxTargetVolume = 0
+export const gGlobalSoundSource = [0.0, 0.0, 0.0]
 
 export const set_sound_moving_speed = (bank, speed) => {
     sSoundMovingSpeed[bank] = speed

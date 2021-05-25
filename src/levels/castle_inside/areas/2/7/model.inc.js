@@ -1,266 +1,271 @@
-import * as Gbi from "../../../../../include/gbi"
+// 0x0704A368 - 0x0704A3E8
+
 import {
-	texture_castle_light,
-	inside_castle_seg7_texture_07000800,
-	inside_castle_seg7_texture_07001000,
-	inside_castle_seg7_texture_07002000,
-	inside_castle_seg7_texture_07003000,
-	inside_castle_seg7_texture_07003800,
-	inside_castle_seg7_texture_07004800,
-	inside_castle_seg7_texture_07005800,
-	inside_castle_seg7_texture_07006000,
-	inside_castle_seg7_texture_07006800,
-	inside_castle_seg7_texture_07007000,
-	inside_castle_seg7_texture_07007800,
-	inside_castle_seg7_texture_07008000,
-	inside_castle_seg7_texture_07008800,
-	inside_castle_seg7_texture_07009000,
-	inside_castle_seg7_texture_07009800,
-	inside_castle_seg7_texture_0700A000,
-	inside_castle_seg7_texture_0700A800,
-	inside_castle_seg7_texture_0700B800,
-	inside_castle_seg7_texture_0700C800,
-	inside_castle_seg7_texture_0700D800,
-	inside_castle_seg7_texture_0700E800,
-	inside_castle_seg7_texture_0700F800,
-	inside_castle_seg7_texture_07010800,
-	inside_castle_seg7_texture_07011800,
-	inside_castle_seg7_texture_07019800,
-	inside_castle_seg7_texture_0701A800
+    gsDPSetTextureImage, gsDPLoadSync, gsDPLoadBlock, gsSPVertex, gsSP2Triangles,
+    gsSPEndDisplayList, gsDPPipeSync, gsDPSetCombineMode, gsSPClearGeometryMode, gsDPSetTile,
+    gsSPTexture, gsDPTileSync, gsDPSetTileSize, gsSPDisplayList, gsSPSetGeometryMode,
+    G_IM_FMT_RGBA, G_IM_SIZ_16b, CALC_DXT, G_TX_LOADTILE, G_IM_SIZ_16b_BYTES, G_CC_MODULATERGB,
+    G_LIGHTING, G_TX_WRAP, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_RENDERTILE, G_ON,
+    G_TX_CLAMP, G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADE
+} from "../../../../../include/gbi"
+import {
+    inside_castle_seg7_texture_0700A800, inside_castle_seg7_texture_0700B800,
+    inside_castle_seg7_texture_0700C800, inside_castle_seg7_texture_0700D800,
+    inside_castle_seg7_texture_0700E800, inside_castle_seg7_texture_0700F800,
+    inside_castle_seg7_texture_07010800, inside_castle_seg7_texture_07011800,
+    inside_castle_seg7_texture_07019800, inside_castle_seg7_texture_0701A800
 } from "../../../texture.inc"
-import {
-	inside_09000000,
-	inside_09001000,
-	inside_09002000,
-	inside_09003000,
-	inside_09003800,
-	inside_09004000,
-	inside_09004800,
-	inside_09005000,
-	inside_09005800,
-	inside_09006000,
-	inside_09007000,
-	inside_09008000,
-	inside_09008800,
-	inside_09009000,
-	inside_0900A000,
-	inside_0900B000,
-	inside_0900B800,
-} from "../../../../../textures/inside"
+
 const inside_castle_seg7_vertex_0704A368 = [
-	{ pos: [ 2755, 1818, 394 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 2755, 1971, 394 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 2755, 1971, 701 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 2755, 1818, 701 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5909, 1818, 701 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5909, 1971, 394 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5909, 1818, 394 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5909, 1971, 701 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-]
+    [[  2755,   1818,    394], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  2755,   1971,    394], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  2755,   1971,    701], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  2755,   1818,    701], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  5909,   1818,    701], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  5909,   1971,    394], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  5909,   1818,    394], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  5909,   1971,    701], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+];
 
+// 0x0704A3E8 - 0x0704A468
 const inside_castle_seg7_vertex_0704A3E8 = [
-	{ pos: [ 5909, 1664, 701 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5909, 1818, 701 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5909, 1818, 394 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5909, 1664, 394 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 2755, 1664, 394 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 2755, 1818, 394 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 2755, 1818, 701 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 2755, 1664, 701 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-]
+    [[  5909,   1664,    701], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  5909,   1818,    701], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  5909,   1818,    394], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  5909,   1664,    394], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  2755,   1664,    394], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  2755,   1818,    394], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  2755,   1818,    701], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  2755,   1664,    701], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+];
 
+// 0x0704A468 - 0x0704A4E8
 const inside_castle_seg7_vertex_0704A468 = [
-	{ pos: [ 3385, 1715, 3917 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 3692, 1562, 3917 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 3385, 1562, 3917 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 3692, 1715, 3917 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5279, 1562, 3917 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 4972, 1715, 3917 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5279, 1715, 3917 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 4972, 1562, 3917 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-]
+    [[  3385,   1715,   3917], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  3692,   1562,   3917], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  3385,   1562,   3917], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  3692,   1715,   3917], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  5279,   1562,   3917], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  4972,   1715,   3917], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  5279,   1715,   3917], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  4972,   1562,   3917], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+];
 
+// 0x0704A4E8 - 0x0704A568
 const inside_castle_seg7_vertex_0704A4E8 = [
-	{ pos: [ 3385, 1869, 3917 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 3692, 1869, 3917 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 3692, 1715, 3917 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 3385, 1715, 3917 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5279, 1715, 3917 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 4972, 1715, 3917 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 4972, 1869, 3917 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5279, 1869, 3917 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-]
+    [[  3385,   1869,   3917], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  3692,   1869,   3917], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  3692,   1715,   3917], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  3385,   1715,   3917], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  5279,   1715,   3917], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  4972,   1715,   3917], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  4972,   1869,   3917], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  5279,   1869,   3917], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+];
 
+// 0x0704A568 - 0x0704A5E8
 const inside_castle_seg7_vertex_0704A568 = [
-	{ pos: [ 1731, 1613, 1674 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 1731, 1766, 1674 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 1731, 1766, 1981 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 1731, 1613, 1981 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 6933, 1613, 1981 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 6933, 1766, 1674 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 6933, 1613, 1674 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 6933, 1766, 1981 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-]
+    [[  1731,   1613,   1674], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  1731,   1766,   1674], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  1731,   1766,   1981], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  1731,   1613,   1981], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  6933,   1613,   1981], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  6933,   1766,   1674], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  6933,   1613,   1674], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  6933,   1766,   1981], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+];
 
+// 0x0704A5E8 - 0x0704A668
 const inside_castle_seg7_vertex_0704A5E8 = [
-	{ pos: [ 1731, 1766, 1674 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 1731, 1920, 1674 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 1731, 1920, 1981 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 1731, 1766, 1981 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 6933, 1766, 1981 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 6933, 1920, 1981 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 6933, 1920, 1674 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 6933, 1766, 1674 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-]
+    [[  1731,   1766,   1674], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  1731,   1920,   1674], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  1731,   1920,   1981], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  1731,   1766,   1981], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  6933,   1766,   1981], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  6933,   1920,   1981], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  6933,   1920,   1674], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  6933,   1766,   1674], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+];
 
+// 0x0704A668 - 0x0704A6E8
 const inside_castle_seg7_vertex_0704A668 = [
-	{ pos: [ 2755, 1715, 2903 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 2755, 1920, 3312 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 2755, 1715, 3312 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 2755, 1920, 2903 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5909, 1715, 3312 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5909, 1920, 3312 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5909, 1920, 2903 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5909, 1715, 2903 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-]
+    [[  2755,   1715,   2903], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  2755,   1920,   3312], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  2755,   1715,   3312], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  2755,   1920,   2903], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  5909,   1715,   3312], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  5909,   1920,   3312], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  5909,   1920,   2903], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  5909,   1715,   2903], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+];
 
+// 0x0704A6E8 - 0x0704A768
 const inside_castle_seg7_vertex_0704A6E8 = [
-	{ pos: [ 2755, 1510, 2903 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 2755, 1715, 2903 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 2755, 1715, 3312 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 2755, 1510, 3312 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5909, 1510, 3312 ], flag: 0, tc: [ 0, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5909, 1715, 2903 ], flag: 0, tc: [ 2012, 0 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5909, 1510, 2903 ], flag: 0, tc: [ 2012, 990 ], color: [ 153, 153, 153, 255 ] },
-	{ pos: [ 5909, 1715, 3312 ], flag: 0, tc: [ 0, 0 ], color: [ 153, 153, 153, 255 ] },
-]
+    [[  2755,   1510,   2903], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  2755,   1715,   2903], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  2755,   1715,   3312], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  2755,   1510,   3312], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  5909,   1510,   3312], 0, [     0,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  5909,   1715,   2903], 0, [  2012,      0], [0x99, 0x99, 0x99, 0xff]],
+    [[  5909,   1510,   2903], 0, [  2012,    990], [0x99, 0x99, 0x99, 0xff]],
+    [[  5909,   1715,   3312], 0, [     0,      0], [0x99, 0x99, 0x99, 0xff]],
+];
 
+// 0x0704A768 - 0x0704A7A8
 const inside_castle_seg7_vertex_0704A768 = [
-	{ pos: [ 5356, 1792, -260 ], flag: 0, tc: [ 0, 0 ], color: [ 221, 221, 221, 255 ] },
-	{ pos: [ 4895, 1792, -260 ], flag: 0, tc: [ 2012, 0 ], color: [ 221, 221, 221, 255 ] },
-	{ pos: [ 4895, 1562, -260 ], flag: 0, tc: [ 2012, 990 ], color: [ 221, 221, 221, 255 ] },
-	{ pos: [ 5356, 1562, -260 ], flag: 0, tc: [ 0, 990 ], color: [ 221, 221, 221, 255 ] },
-]
+    [[  5356,   1792,   -260], 0, [     0,      0], [0xdd, 0xdd, 0xdd, 0xff]],
+    [[  4895,   1792,   -260], 0, [  2012,      0], [0xdd, 0xdd, 0xdd, 0xff]],
+    [[  4895,   1562,   -260], 0, [  2012,    990], [0xdd, 0xdd, 0xdd, 0xff]],
+    [[  5356,   1562,   -260], 0, [     0,    990], [0xdd, 0xdd, 0xdd, 0xff]],
+];
 
+// 0x0704A7A8 - 0x0704A7E8
 const inside_castle_seg7_vertex_0704A7A8 = [
-	{ pos: [ 5356, 2022, -260 ], flag: 0, tc: [ 0, 0 ], color: [ 221, 221, 221, 255 ] },
-	{ pos: [ 4895, 2022, -260 ], flag: 0, tc: [ 2012, 0 ], color: [ 221, 221, 221, 255 ] },
-	{ pos: [ 4895, 1792, -260 ], flag: 0, tc: [ 2012, 990 ], color: [ 221, 221, 221, 255 ] },
-	{ pos: [ 5356, 1792, -260 ], flag: 0, tc: [ 0, 990 ], color: [ 221, 221, 221, 255 ] },
-]
+    [[  5356,   2022,   -260], 0, [     0,      0], [0xdd, 0xdd, 0xdd, 0xff]],
+    [[  4895,   2022,   -260], 0, [  2012,      0], [0xdd, 0xdd, 0xdd, 0xff]],
+    [[  4895,   1792,   -260], 0, [  2012,    990], [0xdd, 0xdd, 0xdd, 0xff]],
+    [[  5356,   1792,   -260], 0, [     0,    990], [0xdd, 0xdd, 0xdd, 0xff]],
+];
 
-export const inside_castle_seg7_dl_0704A7E8 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, inside_castle_seg7_texture_0700A800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 64 * 32 - 1),
-	Gbi.gsSPVertex(inside_castle_seg7_vertex_0704A368, 8, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
-	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  4,  7,  5, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0704A7E8 - 0x0704A830
+const inside_castle_seg7_dl_0704A7E8 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_0700A800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(inside_castle_seg7_vertex_0704A368, 8, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    gsSP2Triangles( 4,  5,  6, 0x0,  4,  7,  5, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
-export const inside_castle_seg7_dl_0704A830 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, inside_castle_seg7_texture_0700B800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 64 * 32 - 1),
-	Gbi.gsSPVertex(inside_castle_seg7_vertex_0704A3E8, 8, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
-	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0704A830 - 0x0704A878
+const inside_castle_seg7_dl_0704A830 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_0700B800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(inside_castle_seg7_vertex_0704A3E8, 8, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
-export const inside_castle_seg7_dl_0704A878 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, inside_castle_seg7_texture_07011800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 64 * 32 - 1),
-	Gbi.gsSPVertex(inside_castle_seg7_vertex_0704A468, 8, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
-	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  4,  7,  5, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0704A878 - 0x0704A8C0
+const inside_castle_seg7_dl_0704A878 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_07011800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(inside_castle_seg7_vertex_0704A468, 8, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
+    gsSP2Triangles( 4,  5,  6, 0x0,  4,  7,  5, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
-export const inside_castle_seg7_dl_0704A8C0 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, inside_castle_seg7_texture_07010800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 64 * 32 - 1),
-	Gbi.gsSPVertex(inside_castle_seg7_vertex_0704A4E8, 8, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
-	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0704A8C0 - 0x0704A908
+const inside_castle_seg7_dl_0704A8C0 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_07010800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(inside_castle_seg7_vertex_0704A4E8, 8, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
-export const inside_castle_seg7_dl_0704A908 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, inside_castle_seg7_texture_0700F800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 64 * 32 - 1),
-	Gbi.gsSPVertex(inside_castle_seg7_vertex_0704A568, 8, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
-	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  4,  7,  5, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0704A908 - 0x0704A950
+const inside_castle_seg7_dl_0704A908 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_0700F800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(inside_castle_seg7_vertex_0704A568, 8, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    gsSP2Triangles( 4,  5,  6, 0x0,  4,  7,  5, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
-export const inside_castle_seg7_dl_0704A950 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, inside_castle_seg7_texture_0700E800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 64 * 32 - 1),
-	Gbi.gsSPVertex(inside_castle_seg7_vertex_0704A5E8, 8, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
-	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0704A950 - 0x0704A998
+const inside_castle_seg7_dl_0704A950 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_0700E800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(inside_castle_seg7_vertex_0704A5E8, 8, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
-export const inside_castle_seg7_dl_0704A998 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, inside_castle_seg7_texture_07019800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 64 * 32 - 1),
-	Gbi.gsSPVertex(inside_castle_seg7_vertex_0704A668, 8, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
-	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0704A998 - 0x0704A9E0
+const inside_castle_seg7_dl_0704A998 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_07019800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(inside_castle_seg7_vertex_0704A668, 8, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
+    gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
-export const inside_castle_seg7_dl_0704A9E0 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, inside_castle_seg7_texture_0701A800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 64 * 32 - 1),
-	Gbi.gsSPVertex(inside_castle_seg7_vertex_0704A6E8, 8, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
-	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  4,  7,  5, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0704A9E0 - 0x0704AA28
+const inside_castle_seg7_dl_0704A9E0 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_0701A800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(inside_castle_seg7_vertex_0704A6E8, 8, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    gsSP2Triangles( 4,  5,  6, 0x0,  4,  7,  5, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
-export const inside_castle_seg7_dl_0704AA28 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, inside_castle_seg7_texture_0700D800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 64 * 32 - 1),
-	Gbi.gsSPVertex(inside_castle_seg7_vertex_0704A768, 4, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0704AA28 - 0x0704AA60
+const inside_castle_seg7_dl_0704AA28 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_0700D800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(inside_castle_seg7_vertex_0704A768, 4, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
-export const inside_castle_seg7_dl_0704AA60 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, inside_castle_seg7_texture_0700C800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 64 * 32 - 1),
-	Gbi.gsSPVertex(inside_castle_seg7_vertex_0704A7A8, 4, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0704AA60 - 0x0704AA98
+const inside_castle_seg7_dl_0704AA60 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_0700C800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(inside_castle_seg7_vertex_0704A7A8, 4, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
+// 0x0704AA98 - 0x0704AB80
 export const inside_castle_seg7_dl_0704AA98 = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGB),
-	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 16, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 6, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (64 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPDisplayList(inside_castle_seg7_dl_0704A7E8),
-	Gbi.gsSPDisplayList(inside_castle_seg7_dl_0704A830),
-	Gbi.gsSPDisplayList(inside_castle_seg7_dl_0704A878),
-	Gbi.gsSPDisplayList(inside_castle_seg7_dl_0704A8C0),
-	Gbi.gsSPDisplayList(inside_castle_seg7_dl_0704A908),
-	Gbi.gsSPDisplayList(inside_castle_seg7_dl_0704A950),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 16, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (64 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPDisplayList(inside_castle_seg7_dl_0704A998),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 16, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 6, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (64 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPDisplayList(inside_castle_seg7_dl_0704A9E0),
-	Gbi.gsSPDisplayList(inside_castle_seg7_dl_0704AA28),
-	Gbi.gsSPDisplayList(inside_castle_seg7_dl_0704AA60),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING),
-	Gbi.gsSPEndDisplayList(),
-]
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_MODULATERGB, G_CC_MODULATERGB),
+    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_CLAMP, 6, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (64 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPDisplayList(inside_castle_seg7_dl_0704A7E8),
+    gsSPDisplayList(inside_castle_seg7_dl_0704A830),
+    gsSPDisplayList(inside_castle_seg7_dl_0704A878),
+    gsSPDisplayList(inside_castle_seg7_dl_0704A8C0),
+    gsSPDisplayList(inside_castle_seg7_dl_0704A908),
+    gsSPDisplayList(inside_castle_seg7_dl_0704A950),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 6, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (64 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPDisplayList(inside_castle_seg7_dl_0704A998),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_CLAMP, 6, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (64 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPDisplayList(inside_castle_seg7_dl_0704A9E0),
+    gsSPDisplayList(inside_castle_seg7_dl_0704AA28),
+    gsSPDisplayList(inside_castle_seg7_dl_0704AA60),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPSetGeometryMode(G_LIGHTING),
+    gsSPEndDisplayList(),
+].flat();
 
+// 1621726940 - 2021-05-22 16:42:23 -0700

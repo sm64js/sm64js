@@ -220,11 +220,11 @@ const bhv_1up_hidden_loop = () => {
 //     s16 sp26;
 //     switch (o->oAction) {
 //         case 0:
-//             o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
+//             o->header.gfx.flags |= GRAPH_RENDER_INVISIBLE;
 //             if (o->o1UpHiddenUnkF4 == o->oBehParams2ndByte) {
 //                 o->oVelY = 40.0f;
 //                 o->oAction = 3;
-//                 o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+//                 o->header.gfx.flags &= ~GRAPH_RENDER_INVISIBLE;
 //                 play_sound(SOUND_GENERAL2_1UP_APPEAR, gGlobalSoundSource);
 //             }
 //             break;
@@ -272,11 +272,11 @@ const bhv_1up_hidden_in_pole_loop = () => {
 //     UNUSED s16 sp26;
 //     switch (o->oAction) {
 //         case 0:
-//             o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
+//             o->header.gfx.flags |= GRAPH_RENDER_INVISIBLE;
 //             if (o->o1UpHiddenUnkF4 == o->oBehParams2ndByte) {
 //                 o->oVelY = 40.0f;
 //                 o->oAction = 3;
-//                 o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+//                 o->header.gfx.flags &= ~GRAPH_RENDER_INVISIBLE;
 //                 play_sound(SOUND_GENERAL2_1UP_APPEAR, gGlobalSoundSource);
 //             }
 //             break;

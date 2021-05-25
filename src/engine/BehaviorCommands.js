@@ -27,8 +27,6 @@ const obj_and_int = (object, field, value) => { object.rawData[field] &= s32(val
 class BehaviorCommands {
 
     constructor() {
-        gLinker.BehaviorCommands = this
-
         this.BHV_PROC_CONTINUE = 0
         this.BHV_PROC_BREAK    = 1
     }
@@ -109,11 +107,11 @@ class BehaviorCommands {
                 // If the object has a render distance, check if it should be shown.
                 if (distanceFromMario > gCurrentObject.rawData[oDrawingDistance]) {
                     // Out of render distance, hide the object.
-                    gCurrentObject.header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE
+                    gCurrentObject.header.gfx.flags &= ~GRAPH_RENDER_ACTIVE
                     gCurrentObject.activeFlags |= ACTIVE_FLAG_FAR_AWAY
                 } else if (gCurrentObject.rawData[oHeldState] == HELD_FREE) {
                     // In render distance (and not being held), show the object.
-                    gCurrentObject.header.gfx.node.flags |= GRAPH_RENDER_ACTIVE
+                    gCurrentObject.header.gfx.flags |= GRAPH_RENDER_ACTIVE
                     gCurrentObject.activeFlags &= ~ACTIVE_FLAG_FAR_AWAY
                 }
             }
@@ -305,7 +303,7 @@ class BehaviorCommands {
 
     disable_rendering(args) {
         const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
-        gCurrentObject.header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE
+        gCurrentObject.header.gfx.flags &= ~GRAPH_RENDER_ACTIVE
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }
@@ -357,16 +355,16 @@ class BehaviorCommands {
         return this.BHV_PROC_CONTINUE
     }
 
-    cyclboard(args) {
+    cylboard(args) {
         const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
-        gCurrentObject.header.gfx.node.flags |= GRAPH_RENDER_CYLBOARD
+        gCurrentObject.header.gfx.flags |= GRAPH_RENDER_CYLBOARD
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }
 
     billboard(args) {
         const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
-        gCurrentObject.header.gfx.node.flags |= GRAPH_RENDER_BILLBOARD
+        gCurrentObject.header.gfx.flags |= GRAPH_RENDER_BILLBOARD
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }
@@ -573,6 +571,7 @@ class BehaviorCommands {
 }
 
 export const BehaviorCommandsInstance = new BehaviorCommands()
+gLinker.BehaviorCommands = BehaviorCommandsInstance
 
 // EXPERIMENTAL
 const Beh = BehaviorCommandsInstance;

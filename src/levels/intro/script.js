@@ -1,86 +1,148 @@
 import { LevelCommandsInstance as LevelCommands } from "../../engine/LevelCommands"
 
 import { ALLOC_LEVEL_POOL, AREA, BLACKOUT, CALL, CALL_LOOP, CLEARDEMOPTR, CLEAR_LEVEL, END_AREA,
-         EXECUTE, EXIT, FREE_LEVEL_POOL, GET_AREA, INIT_LEVEL, JUMP_LINK, LOAD_AREA,
+         EXECUTE, EXIT, FREE_LEVEL_POOL, GET_AREA, INIT_LEVEL, JUMP, JUMP_IF, JUMP_LINK, LOAD_AREA,
          LOAD_MARIO_HEAD, LOAD_MIO0, LOAD_MODEL_FROM_GEO, LOAD_MODEL_FROM_DL, LOAD_RAW,
-         MACRO_OBJECTS, MARIO, MARIO_POS, OBJECT, OBJECT_WITH_ACTS, RETURN, SET_REGISTER, SLEEP,
-         SLEEP_BEFORE_EXIT, TERRAIN, TERRAIN_TYPE, TRANSITION, UNLOAD_AREA
+         MACRO_OBJECTS, MARIO, MARIO_POS, OBJECT, OBJECT_WITH_ACTS, RETURN, SET_REG, SLEEP,
+         SLEEP_BEFORE_EXIT, TERRAIN, TERRAIN_TYPE, TRANSITION, UNLOAD_AREA, EXIT_AND_EXECUTE,
+         OP_EQ
 } from "../../engine/LevelCommands"
 
-import { intro_geo_0002D0, intro_geo_00035C } from "./geo"
-import { WARP_TRANSITION_FADE_INTO_COLOR, WARP_TRANSITION_FADE_FROM_STAR } from "../../game/Area"
+import { intro_geo_0002D0, intro_geo_mario_head_regular, intro_geo_mario_head_dizzy, intro_geo_000414 } from "./geo"
+import { WARP_TRANSITION_FADE_INTO_COLOR, WARP_TRANSITION_FADE_FROM_STAR, WARP_TRANSITION_FADE_FROM_COLOR } from "../../game/Area"
 import { level_main_scripts_entry } from "../scripts"
 import { lvl_intro_update } from "../../menu/level_select_menu"
-import { LEVEL_CASTLE_GROUNDS, LEVEL_CASTLE, LEVEL_CASTLE_2, LEVEL_CASTLE_COURTYARD,
-         LEVEL_BOB, LEVEL_CCM, LEVEL_CCS, LEVEL_PSS, LEVEL_TTM, LEVEL_WF, LEVEL_HMC,
-         LEVEL_BBH, LEVEL_SSL, LEVEL_SL
-} from "../level_defines_constants"
 
-const getSelectedLevel = () => {
-    const mapSelect = document.getElementById("mapSelect").value
 
-    switch (mapSelect) {
-        case "Castle Grounds": return LEVEL_CASTLE_GROUNDS
-        case "Castle Courtyard": return LEVEL_CASTLE_COURTYARD
-        case "Bob-omb Battlefield": return LEVEL_BOB
-        case "Cool, Cool Mountain": return LEVEL_CCM
-        case "Princess's Secret Slide": return LEVEL_PSS
-        case "Tall, Tall Mountain": return LEVEL_TTM
-        case "Whomps Fortress": return LEVEL_WF
-        case "Hazy Maze Cave": return LEVEL_HMC
-        case "Big Boo's Haunt": return LEVEL_BBH
-        case "Shifting Sand Land": return LEVEL_SSL
-        case "Snowman's Land": return LEVEL_SL
-        case "Castle Inside First Level": return LEVEL_CASTLE
-        case "Castle Inside Second Level": return LEVEL_CASTLE_2
-        case "Cool, Cool Mountain Slide": return LEVEL_CCS
-    }
-
-    return LEVEL_CASTLE_GROUNDS
-}
-
-const level_intro_entry_2 = [
-    INIT_LEVEL(),
-    BLACKOUT(true),
-    LOAD_MARIO_HEAD(LevelCommands.REGULAR_FACE),
-    ALLOC_LEVEL_POOL(),
-    AREA(1, intro_geo_00035C),
-    END_AREA(),
-    FREE_LEVEL_POOL(),
-    SLEEP(2),
-    BLACKOUT(false),
-    CLEARDEMOPTR(),
-    /// Get Set script variable 
-    /// Jump IF
-    LOAD_AREA(1),
-    /// Set Menu Music
-    TRANSITION(WARP_TRANSITION_FADE_FROM_STAR, 20, 0, 0, 0),
-    SLEEP(20),
-    CALL_LOOP(1, lvl_intro_update, null),
-    UNLOAD_AREA(1),
-    SET_REGISTER(getSelectedLevel),
-    EXECUTE(level_main_scripts_entry),
-    /// Jump If
-    /// Jump IF
-    /// JUMP
-]
-
-export const level_intro_entry_1 = [
-    // joe debug: short circuit to selected level
-    // SET_REGISTER(getSelectedLevel),
-    // EXECUTE(level_main_scripts_entry),
+export const level_intro_splash_screen = [
+    // JOE DEBUG
+    EXIT_AND_EXECUTE('level_main_scripts_entry'),
 
     INIT_LEVEL(),
-    ALLOC_LEVEL_POOL(),
-    AREA(1, intro_geo_0002D0),
+
+    // Load "Super Mario 64" logo
+    AREA(/*index*/ 1, intro_geo_0002D0),
     END_AREA(),
-    FREE_LEVEL_POOL(),
-    // Call lvl intro update with var 0 - play sound its a me mario
-    LOAD_AREA(1),
-    SLEEP(75),
-    TRANSITION(WARP_TRANSITION_FADE_INTO_COLOR, 16, 0, 0, 0),
-    SLEEP(16),
-    UNLOAD_AREA(1),
-    SLEEP(2),
-    EXECUTE(level_intro_entry_2),
+
+    // Start animation
+    LOAD_AREA(/*area*/ 1),
+
+    CALL(/*arg*/ 0, /*func*/ lvl_intro_update),
+    SLEEP(/*frames*/ 75),
+    TRANSITION(/*transType*/ WARP_TRANSITION_FADE_INTO_COLOR, /*time*/ 16, /*color*/ 0x00, 0x00, 0x00),
+    SLEEP(/*frames*/ 16),
+    // CMD2A(/*unk2*/ 1),
+    CLEAR_LEVEL(),
+    SLEEP(/*frames*/ 2),
+    EXIT_AND_EXECUTE('level_intro_mario_head_regular'),
 ]
+
+
+export const level_intro_mario_head_regular = [
+    INIT_LEVEL(),
+    BLACKOUT(/*active*/ true),
+    LOAD_MARIO_HEAD(/*loadHeadID*/ LevelCommands.REGULAR_FACE),
+
+    AREA(/*index*/ 1, intro_geo_mario_head_regular),
+    END_AREA(),
+
+    SLEEP(/*frames*/ 2),
+    BLACKOUT(/*active*/ false),
+    LOAD_AREA(/*area*/ 1),
+    // SET_MENU_MUSIC(/*seq*/ 0x0002),
+    TRANSITION(/*transType*/ WARP_TRANSITION_FADE_FROM_STAR, /*time*/ 20, /*color*/ 0x00, 0x00, 0x00),
+    SLEEP(/*frames*/ 20),
+    CALL_LOOP(/*arg*/ 1, /*func*/ lvl_intro_update),
+    JUMP_IF(/*op*/ OP_EQ, /*arg*/ 100, 'script_intro_L1'),
+    JUMP_IF(/*op*/ OP_EQ, /*arg*/ 101, 'script_intro_L2'),
+    JUMP('script_intro_L4'),
+]
+
+export const level_intro_mario_head_dizzy = [
+    INIT_LEVEL(),
+    BLACKOUT(/*active*/ true),
+    LOAD_MARIO_HEAD(/*loadHeadID*/ LevelCommands.DIZZY_FACE),
+
+    AREA(/*index*/ 1, intro_geo_mario_head_dizzy),
+    END_AREA(),
+
+    SLEEP(/*frames*/ 2),
+    BLACKOUT(/*active*/ false),
+    LOAD_AREA(/*area*/ 1),
+    // SET_MENU_MUSIC(/*seq*/ 0x0082),
+    TRANSITION(/*transType*/ WARP_TRANSITION_FADE_FROM_STAR, /*time*/ 20, /*color*/ 0x00, 0x00, 0x00),
+    SLEEP(/*frames*/ 20),
+    CALL_LOOP(/*arg*/ 2, /*func*/ lvl_intro_update),
+    JUMP_IF(/*op*/ OP_EQ, /*arg*/ 100, 'script_intro_L1'),
+    JUMP_IF(/*op*/ OP_EQ, /*arg*/ 101, 'script_intro_L2'),
+    JUMP('script_intro_L4'),
+]
+
+const level_intro_entry_4 = [
+    INIT_LEVEL(),
+
+    AREA(/*index*/ 1, intro_geo_000414),
+    END_AREA(),
+
+    LOAD_AREA(/*area*/ 1),
+    // SET_MENU_MUSIC(/*seq*/ 0x0002),
+    TRANSITION(/*transType*/ WARP_TRANSITION_FADE_FROM_COLOR, /*time*/ 16, /*color*/ 0xFF, 0xFF, 0xFF),
+    SLEEP(/*frames*/ 16),
+    CALL_LOOP(/*arg*/ 3, /*func*/ lvl_intro_update),
+    JUMP_IF(/*op*/ OP_EQ, /*arg*/ -1, 'script_intro_L5'),
+    JUMP('script_intro_L3'),
+]
+
+const script_intro_L1 = [
+    // STOP_MUSIC(/*fadeOutTime*/ 0x00BE),
+    TRANSITION(/*transType*/ WARP_TRANSITION_FADE_INTO_COLOR, /*time*/ 16, /*color*/ 0xFF, 0xFF, 0xFF),
+    SLEEP(/*frames*/ 16),
+    CLEAR_LEVEL(),
+    SLEEP(/*frames*/ 2),
+    SET_REG(/*value*/ 16),
+    EXIT_AND_EXECUTE('level_main_menu_entry_1'),
+]
+
+const script_intro_L2 = [
+    TRANSITION(/*transType*/ WARP_TRANSITION_FADE_INTO_COLOR, /*time*/ 16, /*color*/ 0xFF, 0xFF, 0xFF),
+    SLEEP(/*frames*/ 16),
+    CLEAR_LEVEL(),
+    SLEEP(/*frames*/ 2),
+    EXIT_AND_EXECUTE('level_intro_entry_4'),
+]
+
+const script_intro_L3 = [
+    // STOP_MUSIC(/*fadeOutTime*/ 0x00BE),
+    TRANSITION(/*transType*/ WARP_TRANSITION_FADE_INTO_COLOR, /*time*/ 16, /*color*/ 0xFF, 0xFF, 0xFF),
+    SLEEP(/*frames*/ 16),
+    CLEAR_LEVEL(),
+    SLEEP(/*frames*/ 2),
+    EXIT_AND_EXECUTE('level_main_scripts_entry'),
+]
+
+const script_intro_L4 = [
+    TRANSITION(/*transType*/ WARP_TRANSITION_FADE_INTO_COLOR, /*time*/ 16, /*color*/ 0xFF, 0xFF, 0xFF),
+    SLEEP(/*frames*/ 16),
+    CLEAR_LEVEL(),
+    SLEEP(/*frames*/ 2),
+    EXIT_AND_EXECUTE('level_main_scripts_entry'),
+]
+
+const script_intro_L5 = [
+    // STOP_MUSIC(/*fadeOutTime*/ 0x00BE),
+    TRANSITION(/*transType*/ WARP_TRANSITION_FADE_INTO_COLOR, /*time*/ 16, /*color*/ 0x00, 0x00, 0x00),
+    SLEEP(/*frames*/ 16),
+    CLEAR_LEVEL(),
+    SLEEP(/*frames*/ 2),
+    EXIT_AND_EXECUTE('level_intro_splash_screen'),
+]
+
+
+gLinker.level_scripts.level_intro_splash_screen = level_intro_splash_screen
+gLinker.level_scripts.level_intro_mario_head_regular = level_intro_mario_head_regular
+gLinker.level_scripts.level_intro_entry_4 = level_intro_entry_4
+gLinker.level_scripts.script_intro_L1 = script_intro_L1
+gLinker.level_scripts.script_intro_L2 = script_intro_L2
+gLinker.level_scripts.script_intro_L3 = script_intro_L3
+gLinker.level_scripts.script_intro_L4 = script_intro_L4
+gLinker.level_scripts.script_intro_L5 = script_intro_L5

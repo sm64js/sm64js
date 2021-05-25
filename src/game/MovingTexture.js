@@ -267,7 +267,7 @@ export const geo_movtex_draw_water_regions = (callContext, node) => {
         const quadCollection = get_quad_collection_from_id(node.parameter)
         if (quadCollection == null) return gfx
 
-        node.node.flags = (node.node.flags & 0xFF) | (GeoLayout.LAYER_TRANSPARENT_INTER << 8)
+        node.flags = (node.flags & 0xFF) | (GeoLayout.LAYER_TRANSPARENT_INTER << 8)
 
         movtex_change_texture_format(node.parameter, gfx)
         gMovetexLastTextureId = -1
@@ -370,7 +370,7 @@ export const geo_movtex_draw_nocolor = (callContext, node) => {
         let i = 0
         while (gMovtexNonColored[i].movtexVerts != 0) {
             if (gMovtexNonColored[i].geoId == node.parameter) {
-                node.node.flags = (node.node.flags & 0xFF) | (gMovtexNonColored[i].layer << 8)
+                node.flags = (node.flags & 0xFF) | (gMovtexNonColored[i].layer << 8)
                 const movtexVerts = gMovtexNonColored[i].movtexVerts
                 update_moving_texture_offset(movtexVerts, MOVTEX_ATTR_NOCOLOR_S)
                 gfx = movtex_gen_list(movtexVerts, gMovtexNonColored[i], MOVTEX_LAYOUT_NOCOLOR)

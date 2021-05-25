@@ -116,9 +116,9 @@ const bhv_water_droplet_loop = () => {
 
     if (o.rawData[oTimer] == 0) {
         // if (cur_obj_has_model(MODEL_FISH))
-        //     o.header.gfx.node.flags &= ~GRAPH_RENDER_BILLBOARD;
+        //     o.header.gfx.flags &= ~GRAPH_RENDER_BILLBOARD;
         // else
-            o.header.gfx.node.flags |= GRAPH_RENDER_BILLBOARD;
+            o.header.gfx.flags |= GRAPH_RENDER_BILLBOARD;
         o.rawData[oFaceAngleYaw] = random_int16()
     }
     // Apply gravity

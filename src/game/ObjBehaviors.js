@@ -88,9 +88,9 @@ export const curr_obj_random_blink = (blinkTimer) => {
  */
 export const set_object_visibility = (obj, dist) => {
     if (is_point_within_radius_of_mario(obj.rawData[oPosX], obj.rawData[oPosY], obj.rawData[oPosZ], dist) == 1) {
-        obj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+        obj.header.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
     } else {
-        obj.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
+        obj.header.gfx.flags |= GRAPH_RENDER_INVISIBLE
     }
 }
 
@@ -187,7 +187,7 @@ export const obj_orient_graph = (obj, normalX, normalY, normalZ) => {
     if (sOrientObjWithFloor == 0) return
 
     // Passes on orienting billboard objects, i.e. coins, trees, etc.
-    if ((obj.header.gfx.node.flags & GRAPH_RENDER_BILLBOARD) != 0) return
+    if ((obj.header.gfx.flags & GRAPH_RENDER_BILLBOARD) != 0) return
 
     const throwMatrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
 
@@ -381,9 +381,9 @@ export const obj_flicker_and_disappear = (obj, lifeSpan) => {
     if (obj.rawData[oTimer] < lifeSpan + 40) {
 
         if (obj.rawData[oTimer] % 2 != 0) {
-            obj.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
+            obj.header.gfx.flags |= GRAPH_RENDER_INVISIBLE
         } else {
-            obj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+            obj.header.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
         }
 
     } else {

@@ -160,7 +160,7 @@ export const geo_intro_backdrop = (param, graphNode, unused) => {
         // "geo intro backdrop init - do nothing"
         return []
     } else {
-        const index = graphNode.unk18 & 0xff
+        const index = graphNode.areaIndex & 0xff
         const backgroundTable = introBackgroundTables[index]
         const displayList = []
         const aspect = canvas.width / canvas.height
@@ -178,3 +178,5 @@ export const geo_intro_backdrop = (param, graphNode, unused) => {
         return displayList
     }
 }
+
+export const geo_intro_gameover_backdrop = geo_intro_backdrop  // TODO

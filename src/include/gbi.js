@@ -306,7 +306,7 @@ export const G_TX_NOLOD = 0
 //// Render Modes
 export const G_RM_OPA_SURF_SURF2 = 0xf0a4000
 export const G_RM_AA_OPA_SURF_SURF2 = 0x552048
-export const G_RM_XLU_SURF_SURF2 = 0x5041c8  // TODO this is wrong
+export const G_RM_XLU_SURF_SURF2 = 0x00000000  // FIXME
 export const G_RM_AA_XLU_SURF_SURF2 = 0x5041c8
 
 export const G_RM_ZB_OPA_SURF_SURF2 = 0x552230
@@ -320,15 +320,17 @@ export const G_RM_AA_ZB_OPA_SURF_SURF2 = 0x552078
 export const G_RM_AA_ZB_OPA_DECAL_DECAL2 = 0x552d58
 export const G_RM_AA_ZB_OPA_DECAL_NOOP2 = 0x442d58
 export const G_RM_AA_ZB_XLU_INTER_INTER2 = 0x5045d8
-export const G_RM_CUSTOM_AA_ZB_XLU_SURF_NOOP2 = 0x5041c8  // TODO this is wrong
+export const G_RM_CUSTOM_AA_ZB_XLU_SURF_NOOP2 = 0x00000000  // FIXME
 export const G_RM_FOG_SHADE_A_AA_ZB_OPA_SURF2 = 0xc8112078
 export const G_RM_FOG_SHADE_A_AA_ZB_TEX_EDGE2 = 0xc8113078
 export const G_RM_FOG_SHADE_A_AA_ZB_OPA_DECAL2 = 0xc8112d58
 export const G_RM_FOG_SHADE_A_AA_ZB_XLU_SURF2 = 0xc81049d8
+export const G_RM_AA_TEX_EDGE_EDGE2 = 0x00000000  // FIXME
+export const G_RM_PASS_OPA_SURF2 = 0x00000000  // FIXME
 
 
-// These are only used in gsDPSetRenderMode to map to actual values,
-// they're not sent to the renderer.
+// Only used in gsDPSetRenderMode to map to actual values,
+// The values here are not sent to the renderer.
 export const G_RM_AA_OPA_SURF            = 1
 export const G_RM_AA_OPA_SURF2           = 2
 export const G_RM_XLU_SURF               = 3
@@ -357,6 +359,10 @@ export const G_RM_ZB_OPA_SURF            = 25
 export const G_RM_ZB_OPA_SURF2           = 26
 export const G_RM_CUSTOM_AA_ZB_XLU_SURF  = 27
 export const G_RM_CUSTOM_AA_ZB_XLU_SURF2 = 28
+export const G_RM_AA_TEX_EDGE            = 29
+export const G_RM_AA_TEX_EDGE2           = 30
+export const G_RM_PASS                   = 31
+
 
 //G_MOVEWORD types
 export const G_MW_MATRIX = 0x00 /* NOTE: also used by movemem */
@@ -474,12 +480,19 @@ export const G_CC_DECALRGB = {
     rgb: [15, 15, 31, 1]
 }
 
-// #define G_CC_FADEA                  TEXEL0, 0, ENVIRONMENT, 0, TEXEL0, 0, ENVIRONMENT, 0
-// #define G_CC_MODULATEIFADEA         TEXEL0, 0, SHADE,       0, TEXEL0, 0, ENVIRONMENT, 0
-// this is not correct, copied from MODULATEIFADEA
-export const G_CC_FADEA = {
+export const G_CC_DECALRGB2 = {  // FIXME (copied from G_CC_DECALRGB)
+    alpha: [7, 7, 7, 4],
+    rgb: [15, 15, 31, 1]
+}
+
+export const G_CC_FADEA = {  // FIXME (copied from MODULATEIFADEA)
     alpha: [1, 7, 5, 7],
     rgb: [1, 15, 4, 7]
+}
+
+export const G_CC_TRILERP = {  // FIXME
+    alpha: [7, 7, 7, 4],
+    rgb: [15, 15, 31, 1]
 }
 
 export const G_CC_HILITERGBA = {
@@ -622,7 +635,7 @@ export const gSPTexture = (displaylist, s, t, level, tile, on) => {
     })
 }
 
-export const gDPSetCombineMode = (displaylist, mode) => {
+export const gDPSetCombineMode = (displaylist, mode, b) => {
     displaylist.push({
         words: {
             w0: G_SETCOMBINE,
@@ -870,8 +883,10 @@ const renderModesMap = [
     [G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_DECAL2,       G_RM_FOG_SHADE_A_AA_ZB_OPA_DECAL2],
     [G_RM_FOG_SHADE_A, G_RM_AA_ZB_XLU_SURF2,        G_RM_FOG_SHADE_A_AA_ZB_XLU_SURF2],
     [G_RM_OPA_SURF, G_RM_OPA_SURF2,                 G_RM_OPA_SURF_SURF2],
-    [G_RM_XLU_SURF, G_RM_XLU_SURF2 ,                G_RM_XLU_SURF_SURF2],  // TO-DO double-check this
+    [G_RM_XLU_SURF, G_RM_XLU_SURF2 ,                G_RM_XLU_SURF_SURF2],
     [G_RM_CUSTOM_AA_ZB_XLU_SURF, G_RM_NOOP2,        G_RM_CUSTOM_AA_ZB_XLU_SURF_NOOP2],
+    [G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE2,           G_RM_AA_TEX_EDGE_EDGE2],
+    [G_RM_PASS, G_RM_AA_ZB_OPA_SURF2,               G_RM_PASS_OPA_SURF2]
 ]
 
 export const gsDPSetRenderMode = (mode, mode2) => {
@@ -922,6 +937,14 @@ export const gsSPLight = (lightData, index) => {
             // the `index - 1` I don't like and isn't needed, but it makes matching with decomp code easier
         }
     }
+}
+
+export const gsSPSetLights1 = (name) => {
+    return [
+        gsSPNumLights(NUMLIGHTS_1),
+        gsSPLight(name.l,1),
+        gsSPLight(name.a,2)
+    ]
 }
 
 export const gsSPNumLights = (num) => {
@@ -981,7 +1004,7 @@ export const gsSPSetGeometryMode = (mode) => {
     }
 }
 
-export const gsDPSetCombineMode = (mode) => {
+export const gsDPSetCombineMode = (mode, b) => {
     return {
         words: {
             w0: G_SETCOMBINE,
@@ -1117,8 +1140,9 @@ export const gsDPLoadTextureBlock = (timg, fmt, siz, width, height, pal, cms, cm
     ]
 }
 
-export const gsDPSetTexturePersp  = () => {return []}  // TO-DO implement me
-export const gsSPTextureRectangle = () => {return []}  // TO-DO implement me
+export const gsDPSetTexturePersp  = () => {return []}  // FIXME
+export const gsSPTextureRectangle = () => {return []}  // FIXME
+export const gsDPSetTextureLOD = () => {return []}  // FIXME
 
 // empty arrays are flattened and disappear
 export const gsDPPipeSync = () => {return []}

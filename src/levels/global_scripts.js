@@ -4,7 +4,7 @@ import { LAYER_ALPHA, LAYER_OPAQUE } from "../engine/GeoLayout"
 import { ALLOC_LEVEL_POOL, AREA, BLACKOUT, CALL, CALL_LOOP, CLEARDEMOPTR, CLEAR_LEVEL, END_AREA,
          EXECUTE, EXIT, FREE_LEVEL_POOL, GET_AREA, INIT_LEVEL, JUMP_LINK, LOAD_AREA,
          LOAD_MARIO_HEAD, LOAD_MIO0, LOAD_MODEL_FROM_GEO, LOAD_MODEL_FROM_DL, LOAD_RAW,
-         MACRO_OBJECTS, MARIO, MARIO_POS, OBJECT, OBJECT_WITH_ACTS, RETURN, SET_REGISTER, SLEEP,
+         MACRO_OBJECTS, MARIO, MARIO_POS, OBJECT, OBJECT_WITH_ACTS, RETURN, SET_REG, SLEEP,
          SLEEP_BEFORE_EXIT, TERRAIN, TERRAIN_TYPE, TRANSITION, UNLOAD_AREA
 } from "../engine/LevelCommands"
 
@@ -225,3 +225,12 @@ export const script_func_global_16 = () => { return [
 //     LOAD_MODEL_FROM_GEO(MODEL.SNUFIT,                  snufit_geo),
 //     RETURN(),
 // ]}
+
+
+gLinker.level_scripts.script_func_global_1  = script_func_global_1
+gLinker.level_scripts.script_func_global_4  = script_func_global_4
+gLinker.level_scripts.script_func_global_11 = script_func_global_11
+gLinker.level_scripts.script_func_global_15 = script_func_global_15
+gLinker.level_scripts.script_func_global_16 = script_func_global_16
+
+

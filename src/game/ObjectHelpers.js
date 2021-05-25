@@ -1,6 +1,3 @@
-import { SpawnObjectInstance as Spawn } from "./SpawnObject"
-// import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
-import { AreaInstance as Area } from "./Area"
 import { geo_obj_init, geo_obj_init_animation, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE, GEO_CONTEXT_RENDER } from "../engine/graph_node"
 
 import {
@@ -40,7 +37,7 @@ import {
     oPathedTargetYaw,
 
     ACTIVE_FLAGS_DEACTIVATED, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM,
-    ACTIVE_FLAG_UNK10, ACTIVE_FLAG_UNK7,
+    ACTIVE_FLAG_UNK10, ACTIVE_FLAG_UNK7, ACTIVE_FLAG_DEACTIVATED,
 
     OBJ_MOVE_ABOVE_DEATH_BARRIER, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR,
     OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND,
@@ -53,15 +50,19 @@ import {
  } from "../include/object_constants"
 
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
+import { TIME_STOP_ENABLED } from "./ObjectListProcessor"
+
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 
 import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { ATTACK_PUNCH, INT_STATUS_WAS_ATTACKED, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "./Interaction"
-import { ACT_GROUND_POUND_LAND, ACT_FLAG_AIR, ACT_DIVE_SLIDE } from "./Mario"
+import { ACT_GROUND_POUND_LAND, ACT_FLAG_AIR, ACT_DIVE_SLIDE, ANIM_FLAG_NOLOOP } from "./Mario"
 
 import { MODEL_YELLOW_COIN, MODEL_BLUE_COIN } from "../include/model_ids"
 
 import { GRAPH_RENDER_ACTIVE           } from "../engine/graph_node"
+
+import { OBJ_LIST_UNIMPORTANT, OBJ_LIST_GENACTOR } from "./BehaviorData"
 
 import { atan2s, mtxf_rotate_zxy_and_translate } from "../engine/math_util"
 import { sins, coss, int16, s16, random_int16, random_float } from "../utils"
@@ -99,7 +100,17 @@ export const cur_obj_lateral_dist_to_home = () => {
 export const cur_obj_set_model = (modelID) => {
     const o = ObjectListProc.gCurrentObject
 
-    o.header.gfx.sharedChild = Area.gLoadedGraphNodes[modelID]
+    o.header.gfx.sharedChild = gLinker.Area.gLoadedGraphNodes[modelID]
+}
+
+export const cur_obj_has_model = (modelID) => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.header.gfx.sharedChild == gLinker.Area.gLoadedGraphNodes[modelID]) {
+        return 1
+    } else {
+        return 0
+    }
 }
 
 export const cur_obj_set_pos_to_home = () => {
@@ -126,24 +137,15 @@ export const cur_obj_set_pos_relative = (other, dleft, dy, dforward) => {
     o.rawData[oPosZ] = other.rawData[oPosZ] + dz
 }
 
-export const cur_obj_extend_animation_if_at_end = () => {
-    const o = ObjectListProc.gCurrentObject
-
-    const sp4 = o.header.gfx.unk38.animFrame
-    const sp0 = o.header.gfx.unk38.curAnim.unk08 - 2
-
-    if (sp4 == sp0) o.header.gfx.unk38.animFrame--
-}
-
 export const geo_switch_anim_state = (callerContext, node) => {
     if (callerContext == GEO_CONTEXT_RENDER) {
         let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
 
         if (GeoRenderer.gCurGraphNodeHeldObject) {
-            obj = GeoRenderer.gCurGraphNodeHeldObject.wrapper.objNode
+            obj = GeoRenderer.gCurGraphNodeHeldObject.objNode
         }
 
-        // if the case is greater than the number of cases, set to 0 to avoid overflowing
+        // if the case is greater than the number of cases, set to 0 to aexport const ove = rin=> g
         // the switch.
         if (obj.rawData[oAnimState] >= node.numCases) {
             obj.rawData[oAnimState] = 0
@@ -189,24 +191,24 @@ export const geo_update_layer_transparency = (callerContext, node) => {
         let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
 
         if (GeoRenderer.gCurGraphNodeHeldObject) {
-            obj = GeoRenderer.gCurGraphNodeHeldObject.wrapper.objNode
+            obj = GeoRenderer.gCurGraphNodeHeldObject.objNode
         }
 
         const opacity = obj.rawData[oOpacity]
 
         if (opacity == 0xFF) {
             if (node.parameter == 20) {
-                node.node.flags = 0x600 | (node.node.flags & 0xFF)
+                node.flags = 0x600 | (node.flags & 0xFF)
             } else {
-                node.node.flags = 0x100 | (node.node.flags & 0xFF)
+                node.flags = 0x100 | (node.flags & 0xFF)
             }
 
             obj.rawData[oAnimState] = 0
         } else {
             if (node.parameter == 20) {
-                node.node.flags = 0x600 | (node.node.flags & 0xFF)
+                node.flags = 0x600 | (node.flags & 0xFF)
             } else {
-                node.node.flags = 0x500 | (node.node.flags & 0xFF)
+                node.flags = 0x500 | (node.flags & 0xFF)
             }
 
             obj.rawData[oAnimState] = 1
@@ -263,21 +265,20 @@ export const spawn_water_droplet = (parent, params) => {
     randomScale = random_float() * params.randSize[1] + params.randSize[0]
     obj_scale(newObj, randomScale)
 
-    newObj.header.gfx.node.bleh = "water droplet"
+    newObj.header.gfx.bleh = "water droplet"
     return newObj
 }
 
 export const spawn_object_at_origin = (parent, model, behavior) => {
-    const obj = Spawn.create_object(behavior)
+    const obj = gLinker.Spawn.create_object(behavior)
 
     obj.parentObj = parent
-    obj.header.gfx.unk18 = parent.header.gfx.unk18
-    obj.header.gfx.unk19 = parent.header.gfx.unk18
+    obj.header.gfx.areaIndex = parent.header.gfx.areaIndex
+    obj.header.gfx.activeAreaIndex = parent.header.gfx.areaIndex
 
-    geo_obj_init(obj.header.gfx, Area.gLoadedGraphNodes[model], [0,0,0], [0,0,0])
+    geo_obj_init(obj.header.gfx, gLinker.Area.gLoadedGraphNodes[model], [0,0,0], [0,0,0])
 
     return obj
-
 }
 
 export const spawn_object_abs_with_rot = (parent, model, behavior, x, y, z, rx, ry, rz) => {
@@ -286,6 +287,7 @@ export const spawn_object_abs_with_rot = (parent, model, behavior, x, y, z, rx, 
     obj_set_angle(newObj, rx, ry, rz)
     return newObj
 }
+
 
 export const cur_obj_check_anim_frame = (frame) => {
     const o = ObjectListProc.gCurrentObject
@@ -409,14 +411,6 @@ export const cur_obj_get_dropped = () => {
     cur_obj_move_after_thrown_or_dropped(0.0, 0.0)
 }
 
-export const cur_obj_reverse_animation = () => {
-    const o = ObjectListProc.gCurrentObject
-
-    if (o.header.gfx.unk38.animFrame >= 0) {
-        o.header.gfx.unk38.animFrame--
-    }
-}
-
 export const obj_translate_xz_random = (obj, rangeLength) => {
     obj.rawData[oPosX] += Math.random() * rangeLength - rangeLength * 0.5
     obj.rawData[oPosZ] += Math.random() * rangeLength - rangeLength * 0.5
@@ -488,7 +482,7 @@ export const obj_set_held_state = (obj, heldBehavior) => {
     const o = ObjectListProc.gCurrentObject
     obj.parentObj = o
 
-    heldBehavior = Spawn.get_bhv_script(heldBehavior)
+    heldBehavior = gLinker.Spawn.get_bhv_script(heldBehavior)
     if (obj.rawData[oFlags] & OBJ_FLAG_HOLDABLE) {
         if (heldBehavior == gLinker.behaviors.bhvCarrySomething3) {
             obj.rawData[oHeldState] = HELD_HELD
@@ -1030,7 +1024,7 @@ export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
     let negativeSpeed = 0
 
     //! Because some objects allow these active flags to be set but don't
-    //  avoid updating when they are, we end up with "partial" updates, where
+    //  aexport const updating when they are, we end up with "partial" update = ser=> e
     //  an object's internal state will be updated, but it doesn't move.
     //  This allows numerous glitches and is typically referred to as
     //  deactivation (though this term has a different meaning in the code).
@@ -1064,7 +1058,7 @@ export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
 
 export const cur_obj_is_mario_ground_pounding_platform = () => {
     if (ObjectListProc.gMarioObject.platform == ObjectListProc.gCurrentObject) {
-        if (ObjectListProc.gMarioObject.marioState.action == ACT_GROUND_POUND_LAND) {
+        if (LevelUpdate.gMarioState.action == ACT_GROUND_POUND_LAND) {
             return 1
         }
     }
@@ -1186,8 +1180,8 @@ export const cur_obj_set_face_angle_to_move_angle = () => {
 }
 
 export const get_object_list_from_behavior = (behavior) => {
-    behavior = Spawn.get_bhv_script(behavior)
-    return Spawn.get_bhv_object_list(behavior)
+    behavior = gLinker.Spawn.get_bhv_script(behavior)
+    return gLinker.Spawn.get_bhv_object_list(behavior)
 }
 
 export const cur_obj_nearest_object_with_behavior = (behavior) => {
@@ -1206,23 +1200,22 @@ export const cur_obj_dist_to_nearest_object_with_behavior = (behavior) => {
 
 export const cur_obj_find_nearest_object_with_behavior = (behavior, dist) => {
     let closestObj = null
-    let obj
-    let listHead
+    let listHead = ObjectListProc.gObjectLists[get_object_list_from_behavior(behavior)]
     let minDist = 0x20000
+    let obj
 
-    listHead = ObjectListProc.gObjectLists[get_object_list_from_behavior(behaviorAddr)]
     obj = listHead.next
 
     while (obj != listHead) {
-        // if (obj.behavior == behaviorAddr) {
-        //     if (obj.activeFlags != ACTIVE_FLAG_DEACTIVATED && obj != o) {
-        //         let /*f32*/ objDist = dist_between_objects(o, obj)
-        //         if (objDist < minDist) {
-        //             closestObj = obj
-        //             minDist = objDist
-        //         }
-        //     }
-        // }
+        if (obj.behavior == behavior) {
+            if (obj.activeFlags != ACTIVE_FLAG_DEACTIVATED && obj != o) {
+                let objDist = dist_between_objects(o, obj)
+                if (objDist < minDist) {
+                    closestObj = obj
+                    minDist = objDist
+                }
+            }
+        }
         obj = obj.next
     }
 
@@ -1231,6 +1224,150 @@ export const cur_obj_find_nearest_object_with_behavior = (behavior, dist) => {
     }
     return closestObj
 }
+
+export const find_unimportant_object = () => {
+    let listHead = ObjectListProc.gObjectLists[OBJ_LIST_UNIMPORTANT]
+    let obj = listHead.next
+
+    if (listHead == obj) {
+        obj = null
+    }
+
+    return obj
+}
+
+export const count_unimportant_objects = () => {
+    let listHead = ObjectListProc.gObjectLists[OBJ_LIST_UNIMPORTANT]
+    let obj = listHead.next
+    let count = 0
+
+    while (listHead != obj) {
+        count++
+        obj = obj.next
+    }
+
+    return count
+}
+
+export const count_objects_with_behavior = (behavior) => {
+    let listHead = ObjectListProc.gObjectLists[get_object_list_from_behavior(behavior)]
+    let obj = listHead.next
+    let count = 0
+
+    while (listHead != obj) {
+        if (obj.behavior == behavior) {
+            count++
+        }
+
+        obj = obj.next
+    }
+
+    return count
+}
+
+export const cur_obj_find_nearby_held_actor = (behavior, maxDist) => {
+    let listHead
+    let obj
+    let foundObj
+
+    listHead = ObjectListProc.gObjectLists[OBJ_LIST_GENACTOR]
+    obj = listHead.next
+    foundObj = null
+
+    while (listHead != obj) {
+        if (obj.behavior == behavior) {
+            if (obj.activeFlags != ACTIVE_FLAG_DEACTIVATED) {
+                  // This includes the dropped and thrown states. By combining instant
+                  // release, this allows us to activate mama penguin remotely
+                if (obj.rawData[oHeldState] != HELD_FREE) {
+                    if (dist_between_objects(o, obj) < maxDist) {
+                        foundObj = obj
+                        break
+                    }
+                }
+            }
+        }
+
+        obj = obj.header.next
+    }
+
+    return foundObj
+}
+
+const cur_obj_reset_timer_and_subaction = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oTimer] = 0
+    o.rawData[oSubAction] = 0
+}
+
+export const cur_obj_change_action = (action) => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oAction] = action
+    o.rawData[oPrevAction] = action
+    cur_obj_reset_timer_and_subaction()
+}
+
+export const cur_obj_set_vel_from_mario_vel = (f12, f14) => {
+    const o = ObjectListProc.gCurrentObject
+    let /*f32*/ sp4 = gMarioStates[0].forwardVel
+    let /*f32*/ sp0 = f12 * f14
+
+    if (sp4 < sp0) {
+        o.rawData[oForwardVel] = sp0
+    } else {
+        o.rawData[oForwardVel] = sp4 * f14
+    }
+}
+
+export const cur_obj_reverse_animation = () => {
+    const o = ObjectListProc.gCurrentObject
+    if (o.header.gfx.unk38.animFrame >= 0) {
+        o.header.gfx.unk38.animFrame--
+    }
+}
+
+export const cur_obj_extend_animation_if_at_end = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    const sp4 = o.header.gfx.unk38.animFrame
+    const sp0 = o.header.gfx.unk38.curAnim.unk08 - 2
+
+    if (sp4 == sp0) {
+        o.header.gfx.unk38.animFrame--
+    }
+}
+
+
+export const cur_obj_check_if_near_animation_end = () => {
+    const o = ObjectListProc.gCurrentObject
+    let animFlags = o.header.gfx.unk38.curAnim.flags
+    let animFrame = o.header.gfx.unk38.animFrame
+    let nearLoopEnd = o.header.gfx.unk38.curAnim.unk08 - 2
+    let isNearEnd = 0
+
+    if (animFlags & ANIM_FLAG_NOLOOP && nearLoopEnd + 1 == animFrame) {
+        isNearEnd = 1
+    }
+
+    if (animFrame == nearLoopEnd) {
+        isNearEnd = 1
+    }
+
+    return isNearEnd
+}
+
+export const cur_obj_check_if_at_animation_end = () => {
+    const o = ObjectListProc.gCurrentObject
+    let animFrame = o.header.gfx.unk38.animFrame
+    let lastFrame = o.header.gfx.unk38.curAnim.unk08 - 1
+
+    if (animFrame == lastFrame) {
+        return 1
+    } else {
+        return 0
+    }
+}
+
 
 // struct Waypoint
 // {
@@ -1402,12 +1539,12 @@ export const cur_obj_within_12k_bounds = () => {
 
 export const cur_obj_enable_rendering = () => {
     const o = ObjectListProc.gCurrentObject
-    o.header.gfx.node.flags |= GRAPH_RENDER_ACTIVE
+    o.header.gfx.flags |= GRAPH_RENDER_ACTIVE
 }
 
 export const cur_obj_disable_rendering = () => {
     const o = ObjectListProc.gCurrentObject
-    o.header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE
+    o.header.gfx.flags &= ~GRAPH_RENDER_ACTIVE
 }
 
 export const cur_obj_become_tangible = () => {
@@ -1422,14 +1559,22 @@ export const cur_obj_become_intangible = () => {
 
 export const cur_obj_hide = () => {
     const o = ObjectListProc.gCurrentObject
-    o.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
+    o.header.gfx.flags |= GRAPH_RENDER_INVISIBLE
 }
 
 export const cur_obj_unhide = () => {
     const o = ObjectListProc.gCurrentObject
-    o.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+    o.header.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
 }
 
+export const cur_obj_clear_interact_status_flag = (flag) => {
+    const o = ObjectListProc.gCurrentObject
+    if (o.rawData[oInteractStatus] & flag) {
+        o.rawData[oInteractStatus] &= flag ^ ~(0)
+        return 1
+    }
+    return 0
+}
 
 export const obj_mark_for_deletion = (obj) => {
     obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED
@@ -1636,17 +1781,25 @@ export const cur_obj_wait_then_blink = (timeUntilBlinking, numBlinks) => {
     if (o.rawData[oTimer] >= timeUntilBlinking) {
         timeBlinking = o.rawData[oTimer] - timeUntilBlinking
         if (timeBlinking % 2 != 0) {
-            o.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
+            o.header.gfx.flags |= GRAPH_RENDER_INVISIBLE
 
             if (timeBlinking / 2 > numBlinks) {
                 done = 1
             }
         } else {
-            o.header.gfx.node.flags &= ~ GRAPH_RENDER_INVISIBLE
+            o.header.gfx.flags &= ~ GRAPH_RENDER_INVISIBLE
         }
     }
 
     return done
+}
+
+export const enable_time_stop = () => {
+    ObjectListProc.gTimeStopState |= TIME_STOP_ENABLED
+}
+
+export const disable_time_stop = () => {
+    ObjectListProc.gTimeStopState &= ~TIME_STOP_ENABLED
 }
 
 export const obj_set_behavior = (obj, behavior) => {

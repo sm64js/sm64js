@@ -140,7 +140,7 @@ const bhv_cannon_base_loop = () => {
 const bhv_cannon_barrel_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const parent = o.parentObj
-    if (parent.header.gfx.node.flags & GRAPH_RENDER_ACTIVE) {
+    if (parent.header.gfx.flags & GRAPH_RENDER_ACTIVE) {
         cur_obj_enable_rendering()
         obj_copy_pos(o, o.parentObj)
         o.rawData[oMoveAngleYaw] = o.parentObj.rawData[oMoveAngleYaw]

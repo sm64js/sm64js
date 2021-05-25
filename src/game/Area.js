@@ -66,7 +66,7 @@ class Area {
 
     load_obj_warp_nodes() {
         for (const node of gLinker.GeoLayout.gObjParentGraphNode.children) {
-            let object = node.wrapperObjectNode.wrapperObject
+            let object = node.object
 
             if (object.activeFlags != ACTIVE_FLAG_DEACTIVATED && gLinker.LevelUpdate.get_mario_spawn_type(object) != 0) {
                 let warp_node = this.area_get_warp_node_from_params(object)
@@ -97,7 +97,7 @@ class Area {
 
     unload_area() {
         if (this.gCurrentArea) {
-            gLinker.ObjectListProcessor.unload_objects_from_area(0, this.gCurrentArea.index)
+            gLinker.ObjectListProcessor.unload_objects_from_area(this.gCurrentArea.index)
             geo_call_global_function_nodes(this.gCurrentArea.geometryLayoutData, GEO_CONTEXT_AREA_UNLOAD)
 
             this.gCurrentArea.flags = 0
@@ -120,7 +120,7 @@ class Area {
 
     unload_mario_area() {
         if (this.gCurrentArea && (this.gCurrentArea.flags & 0x01)) {
-            gLinker.ObjectListProcessor.unload_objects_from_area(0, this.gMarioSpawnInfo.activeAreaIndex)
+            gLinker.ObjectListProcessor.unload_objects_from_area(this.gMarioSpawnInfo.activeAreaIndex)
 
             this.gCurrentArea.flags &= ~0x01
             if (this.gCurrentArea.flags == 0) {

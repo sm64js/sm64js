@@ -116,9 +116,9 @@ const bhv_water_droplet_loop = () => {
 
     if (o.rawData[oTimer] == 0) {
         // if (cur_obj_has_model(MODEL_FISH))
-        //     o.header.gfx.flags &= ~GRAPH_RENDER_BILLBOARD;
+        //     o.gfx.flags &= ~GRAPH_RENDER_BILLBOARD;
         // else
-            o.header.gfx.flags |= GRAPH_RENDER_BILLBOARD;
+            o.gfx.flags |= GRAPH_RENDER_BILLBOARD;
         o.rawData[oFaceAngleYaw] = random_int16()
     }
     // Apply gravity
@@ -181,14 +181,14 @@ const bhv_wave_trail_shrink = () => {
     o.rawData[oPosY] = waterLevel + 5
 
     if (o.rawData[oTimer] == 0)
-        o.oWaveTrailSize = o.header.gfx.scale[0]
+        o.oWaveTrailSize = o.gfx.scale[0]
 
     if (o.rawData[oAnimState] > 3) {
         o.oWaveTrailSize = o.oWaveTrailSize - 0.1 // Shrink the wave
         if (o.oWaveTrailSize < 0)
             o.oWaveTrailSize = 0
-        o.header.gfx.scale[0] = o.oWaveTrailSize
-        o.header.gfx.scale[2] = o.oWaveTrailSize
+        o.gfx.scale[0] = o.oWaveTrailSize
+        o.gfx.scale[2] = o.oWaveTrailSize
     }
 }
 

@@ -238,7 +238,7 @@ const bhv_generic_bowling_ball_spawner_loop = () => {
         o.rawData[oTimer] = 0
 
     if (is_point_within_radius_of_mario(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], 1000)
-        || (o.rawData[oPosY] < gMarioObject.header.gfx.pos[1]))
+        || (o.rawData[oPosY] < gMarioObject.gfx.pos[1]))
         return
 
     if ((o.rawData[oTimer] & o.rawData[oBBallSpawnerPeriodMinus1]) == 0) /* Modulus */
@@ -261,7 +261,7 @@ const bhv_thi_bowling_ball_spawner_loop = () => {
         o.rawData[oTimer] = 0
 
     if (is_point_within_radius_of_mario(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], 800)
-        || (o.rawData[oPosY] < gMarioObject.header.gfx.pos[1]))
+        || (o.rawData[oPosY] < gMarioObject.gfx.pos[1]))
         return
 
     if ((o.rawData[oTimer] % 64) == 0) {
@@ -323,7 +323,7 @@ const bhv_free_bowling_ball_roll_loop = () => {
         cur_obj_play_sound_2(SOUND_GENERAL_QUIET_POUND1_LOWPRIO)
 
     if (!is_point_within_radius_of_mario(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], 6000)) {
-        o.header.gfx.flags |= GRAPH_RENDER_INVISIBLE
+        o.gfx.flags |= GRAPH_RENDER_INVISIBLE
         cur_obj_become_intangible()
 
         o.rawData[oPosX] = o.rawData[oHomeX]
@@ -342,7 +342,7 @@ const bhv_free_bowling_ball_loop = () => {
         case FREE_BBALL_ACT_IDLE:
             if (is_point_within_radius_of_mario(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], 3000)) {
                 o.rawData[oAction] = FREE_BBALL_ACT_ROLL
-                o.header.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
+                o.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
                 cur_obj_become_tangible()
             }
             break

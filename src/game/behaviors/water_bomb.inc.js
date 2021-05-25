@@ -184,13 +184,13 @@ const water_bomb_act_drop = () => {
         o.rawData[oWaterBombOnGround] = 0
     }
 
-    o.header.gfx.scale[1] = o.rawData[oWaterBombVerticalStretch] + 1.0
+    o.gfx.scale[1] = o.rawData[oWaterBombVerticalStretch] + 1.0
 
     stretch = o.rawData[oWaterBombVerticalStretch]
     if (o.rawData[oWaterBombNumBounces] == 3.0) {
         stretch *= 4.0
     }
-    o.header.gfx.scale[0] = o.header.gfx.scale[2] = 1.0 - stretch
+    o.gfx.scale[0] = o.gfx.scale[2] = 1.0 - stretch
 
     cur_obj_move_standard(78)
 }
@@ -238,11 +238,11 @@ const water_bomb_act_shot_from_cannon = () => {
             cur_obj_spawn_particles(sWaterBombCannonParticle)
         }
 
-        if (o.header.gfx.scale[1] > 1.2) {
-            o.header.gfx.scale[1] -= 0.1
+        if (o.gfx.scale[1] > 1.2) {
+            o.gfx.scale[1] -= 0.1
         }
 
-        o.header.gfx.scale[0] = o.header.gfx.scale[2] = 2.0 - o.header.gfx.scale[1]
+        o.gfx.scale[0] = o.gfx.scale[2] = 2.0 - o.gfx.scale[1]
         cur_obj_set_pos_via_transform()
     }
 }
@@ -256,7 +256,7 @@ const bhv_water_bomb_update = () => {
     if (o.rawData[oAction] == WATER_BOMB_ACT_SHOT_FROM_CANNON) {
         water_bomb_act_shot_from_cannon()
     } else {
-        o.rawData[oGraphYOffset] = 40.0 * o.header.gfx.scale[1]
+        o.rawData[oGraphYOffset] = 40.0 * o.gfx.scale[1]
         cur_obj_update_floor_and_walls()
 
         switch (o.rawData[oAction]) {

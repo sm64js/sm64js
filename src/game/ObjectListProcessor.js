@@ -178,8 +178,8 @@ class ObjectListProcessor {
     update_objects_starting_at(objList, firstObj) {
         let count = 0
         while (objList != firstObj) {
-            this.gCurrentObject = firstObj.wrapperObject
-            this.gCurrentObject.header.gfx.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION
+            this.gCurrentObject = firstObj
+            this.gCurrentObject.gfx.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION
             gLinker.BehaviorCommands.cur_obj_update()
             firstObj = firstObj.next
             count++
@@ -191,7 +191,7 @@ class ObjectListProcessor {
         let obj = objList.next
 
         while (objList != obj) {
-            this.gCurrentObject = obj.wrapperObject
+            this.gCurrentObject = obj
             obj = obj.next
 
             if ((this.gCurrentObject.activeFlags & ACTIVE_FLAG_ACTIVE) != ACTIVE_FLAG_ACTIVE) {
@@ -258,43 +258,35 @@ class ObjectListProcessor {
         this.gCurrentObject.rawData[oPosY] = gMarioState.pos[1]
         this.gCurrentObject.rawData[oPosZ] = gMarioState.pos[2]
 
-        this.gCurrentObject.rawData[oFaceAnglePitch] = this.gCurrentObject.header.gfx.angle[0]
-        this.gCurrentObject.rawData[oFaceAngleYaw] = this.gCurrentObject.header.gfx.angle[1]
-        this.gCurrentObject.rawData[oFaceAngleRoll] = this.gCurrentObject.header.gfx.angle[2]
+        this.gCurrentObject.rawData[oFaceAnglePitch] = this.gCurrentObject.gfx.angle[0]
+        this.gCurrentObject.rawData[oFaceAngleYaw]   = this.gCurrentObject.gfx.angle[1]
+        this.gCurrentObject.rawData[oFaceAngleRoll]  = this.gCurrentObject.gfx.angle[2]
 
-        this.gCurrentObject.rawData[oMoveAnglePitch] = this.gCurrentObject.header.gfx.angle[0]
-        this.gCurrentObject.rawData[oMoveAngleYaw] = this.gCurrentObject.header.gfx.angle[1]
-        this.gCurrentObject.rawData[oMoveAngleRoll] = this.gCurrentObject.header.gfx.angle[2]
+        this.gCurrentObject.rawData[oMoveAnglePitch] = this.gCurrentObject.gfx.angle[0]
+        this.gCurrentObject.rawData[oMoveAngleYaw]   = this.gCurrentObject.gfx.angle[1]
+        this.gCurrentObject.rawData[oMoveAngleRoll]  = this.gCurrentObject.gfx.angle[2]
 
         this.gCurrentObject.rawData[oVelX] = gMarioState.vel[0]
         this.gCurrentObject.rawData[oVelY] = gMarioState.vel[1]
         this.gCurrentObject.rawData[oVelZ] = gMarioState.vel[2]
 
         this.gCurrentObject.rawData[oAngleVelPitch] = gMarioState.angleVel[0]
-        this.gCurrentObject.rawData[oAngleVelYaw] = gMarioState.angleVel[1]
-        this.gCurrentObject.rawData[oAngleVelRoll] = gMarioState.angleVel[2]
+        this.gCurrentObject.rawData[oAngleVelYaw]   = gMarioState.angleVel[1]
+        this.gCurrentObject.rawData[oAngleVelRoll]  = gMarioState.angleVel[2]
     }
 
     /**
      * Unload all objects whose activeAreaIndex is areaIndex.
      */
-    unload_objects_from_area(unused, areaIndex) {
-        let obj
-        let node
-        let listHead
-        let /*s32*/ i
-
-        for (i = 0; i < this.NUM_OBJ_LISTS; i++) {
-            listHead = this.gObjectLists[i]
-            node = listHead.next
-
-            while (node != listHead) {
-                obj = node.wrapperObject
-                node = node.next
-
-                if (obj.header.gfx.activeAreaIndex == areaIndex) {
+    unload_objects_from_area(areaIndex) {
+        for (let i = 0; i < this.NUM_OBJ_LISTS; i++) {
+            let listHead = this.gObjectLists[i]
+            let obj = listHead.next
+            while (obj != listHead) {
+                if (obj.gfx.activeAreaIndex == areaIndex) {
                     gLinker.Spawn.unload_object(obj)
                 }
+                obj = obj.next
             }
         }
     }
@@ -329,10 +321,10 @@ class ObjectListProcessor {
                     // }
                     // this.totalMarios++
                     this.gMarioObject = object
-                    GraphNode.geo_make_first_child(object.header.gfx)
+                    GraphNode.geo_make_first_child(object.gfx)
                 }
 
-                GraphNode.geo_obj_init_spawninfo(object.header.gfx, spawnInfo)
+                GraphNode.geo_obj_init_spawninfo(object.gfx, spawnInfo)
 
                 object.rawData[oPosX] = spawnInfo.startPos[0]
                 object.rawData[oPosY] = spawnInfo.startPos[1]

@@ -10,7 +10,7 @@ export const bhv_white_puff_exploding_loop = () => {
 
     if (o.rawData[oTimer] == 0) {
         cur_obj_compute_vel_xz()
-        o.rawData[oWhitePuffUnkF4] = o.header.gfx.scale[0]
+        o.rawData[oWhitePuffUnkF4] = o.gfx.scale[0]
         switch (o.rawData[oBehParams2ndByte]) {
             case 2:
                 o.rawData[oOpacity] = 254

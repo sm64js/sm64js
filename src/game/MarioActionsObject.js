@@ -112,7 +112,7 @@ export const mario_update_punch_sequence = (m) => {
 
     switch (m.actionArg) {
         case 0:
-            play_sound(SOUND_MARIO_PUNCH_YAH, m.marioObj.header.gfx.cameraToObject)
+            play_sound(SOUND_MARIO_PUNCH_YAH, m.marioObj.gfx.cameraToObject)
             // Fall-through:
         case 1:
             set_mario_animation(m, MARIO_ANIM_FIRST_PUNCH)
@@ -122,7 +122,7 @@ export const mario_update_punch_sequence = (m) => {
                 m.actionArg = 1
             }
 
-            if (m.marioObj.header.gfx.unk38.animFrame >= 2) {
+            if (m.marioObj.gfx.unk38.animFrame >= 2) {
                 if (mario_check_object_grab(m)) {
                    return 1
                 }
@@ -137,7 +137,7 @@ export const mario_update_punch_sequence = (m) => {
         case 2:
             set_mario_animation(m, MARIO_ANIM_FIRST_PUNCH_FAST)
 
-            if (m.marioObj.header.gfx.unk38.animFrame <= 0) {
+            if (m.marioObj.gfx.unk38.animFrame <= 0) {
                 m.flags |= MARIO_PUNCHING
             }
 
@@ -151,7 +151,7 @@ export const mario_update_punch_sequence = (m) => {
             break
 
         case 3:
-            play_sound(SOUND_MARIO_PUNCH_WAH, m.marioObj.header.gfx.cameraToObject)
+            play_sound(SOUND_MARIO_PUNCH_WAH, m.marioObj.gfx.cameraToObject)
             // Fall-through:
         case 4:
             set_mario_animation(m, MARIO_ANIM_SECOND_PUNCH)
@@ -159,7 +159,7 @@ export const mario_update_punch_sequence = (m) => {
                 m.actionArg = 5
             } else { m.actionArg = 4 }
 
-            if (m.marioObj.header.gfx.unk38.animFrame > 0) {
+            if (m.marioObj.gfx.unk38.animFrame > 0) {
                 m.flags |= MARIO_PUNCHING
             }
 
@@ -170,7 +170,7 @@ export const mario_update_punch_sequence = (m) => {
 
         case 5:
             set_mario_animation(m, MARIO_ANIM_SECOND_PUNCH_FAST)
-            if (m.marioObj.header.gfx.unk38.animFrame <= 0) {
+            if (m.marioObj.gfx.unk38.animFrame <= 0) {
                 m.flags |= MARIO_PUNCHING
             }
 
@@ -202,7 +202,7 @@ export const mario_update_punch_sequence = (m) => {
         case 9:
             play_mario_action_sound(m, SOUND_MARIO_PUNCH_HOO, 1)
             set_mario_animation(m, MARIO_ANIM_BREAKDANCE)
-            animFrame = m.marioObj.header.gfx.unk38.animFrame
+            animFrame = m.marioObj.gfx.unk38.animFrame
 
             if (animFrame >= 2 && animFrame < 8) {
                 m.flags |= MARIO_TRIPPING
@@ -381,7 +381,7 @@ const act_picking_up_bowser = (m) => {
         m.angleVel[1] = 0
         m.marioBodyState.grabPos = GRAB_POS_BOWSER
         mario_grab_used_object(m)
-        play_sound(SOUND_MARIO_HRMM, m.marioObj.header.gfx.cameraToObject)
+        play_sound(SOUND_MARIO_HRMM, m.marioObj.gfx.cameraToObject)
     }
 
     set_mario_animation(m, MARIO_ANIM_GRAB_BOWSER)
@@ -398,9 +398,9 @@ const act_holding_bowser = (m) => {
 
     if (m.input & INPUT_B_PRESSED) {
         if (m.angleVel[1] <= -0xE00 || m.angleVel[1] >= 0xE00) {
-            play_sound(SOUND_MARIO_SO_LONGA_BOWSER, m.marioObj.header.gfx.cameraToObject)
+            play_sound(SOUND_MARIO_SO_LONGA_BOWSER, m.marioObj.gfx.cameraToObject)
         } else {
-            play_sound(SOUND_MARIO_HERE_WE_GO, m.marioObj.header.gfx.cameraToObject)
+            play_sound(SOUND_MARIO_HERE_WE_GO, m.marioObj.gfx.cameraToObject)
         }
         return set_mario_action(m, ACT_RELEASING_BOWSER, 0)
     }
@@ -452,17 +452,17 @@ const act_holding_bowser = (m) => {
 
       // play sound on overflow
     if (m.angleVel[1] <= -0x100 && spin < m.faceAngle[1]) {
-        play_sound(SOUND_OBJ_BOWSER_SPINNING, m.marioObj.header.gfx.cameraToObject)
+        play_sound(SOUND_OBJ_BOWSER_SPINNING, m.marioObj.gfx.cameraToObject)
     }
     if (m.angleVel[1] >= 0x100 && spin > m.faceAngle[1]) {
-        play_sound(SOUND_OBJ_BOWSER_SPINNING, m.marioObj.header.gfx.cameraToObject)
+        play_sound(SOUND_OBJ_BOWSER_SPINNING, m.marioObj.gfx.cameraToObject)
     }
 
     stationary_ground_step(m)
     if (m.angleVel[1] >= 0) {
-        m.marioObj.header.gfx.angle[0] = -m.angleVel[1]
+        m.marioObj.gfx.angle[0] = -m.angleVel[1]
     } else {
-        m.marioObj.header.gfx.angle[0] = m.angleVel[1]
+        m.marioObj.gfx.angle[0] = m.angleVel[1]
     }
 
     return 0

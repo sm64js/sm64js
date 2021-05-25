@@ -100,13 +100,13 @@ export const cur_obj_lateral_dist_to_home = () => {
 export const cur_obj_set_model = (modelID) => {
     const o = ObjectListProc.gCurrentObject
 
-    o.header.gfx.sharedChild = gLinker.Area.gLoadedGraphNodes[modelID]
+    o.gfx.sharedChild = gLinker.Area.gLoadedGraphNodes[modelID]
 }
 
 export const cur_obj_has_model = (modelID) => {
     const o = ObjectListProc.gCurrentObject
 
-    if (o.header.gfx.sharedChild == gLinker.Area.gLoadedGraphNodes[modelID]) {
+    if (o.gfx.sharedChild == gLinker.Area.gLoadedGraphNodes[modelID]) {
         return 1
     } else {
         return 0
@@ -139,10 +139,10 @@ export const cur_obj_set_pos_relative = (other, dleft, dy, dforward) => {
 
 export const geo_switch_anim_state = (callerContext, node) => {
     if (callerContext == GEO_CONTEXT_RENDER) {
-        let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
+        let obj = GeoRenderer.gCurGraphNodeObject.object
 
         if (GeoRenderer.gCurGraphNodeHeldObject) {
-            obj = GeoRenderer.gCurGraphNodeHeldObject.objNode
+            obj = GeoRenderer.gCurGraphNodeHeldObject.object
         }
 
         // if the case is greater than the number of cases, set to 0 to aexport const ove = rin=> g
@@ -188,10 +188,10 @@ export const geo_update_layer_transparency = (callerContext, node) => {
     const dl = []
 
     if (callerContext == GEO_CONTEXT_RENDER) {
-        let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
+        let obj = GeoRenderer.gCurGraphNodeObject.object
 
         if (GeoRenderer.gCurGraphNodeHeldObject) {
-            obj = GeoRenderer.gCurGraphNodeHeldObject.objNode
+            obj = GeoRenderer.gCurGraphNodeHeldObject.object
         }
 
         const opacity = obj.rawData[oOpacity]
@@ -265,7 +265,7 @@ export const spawn_water_droplet = (parent, params) => {
     randomScale = random_float() * params.randSize[1] + params.randSize[0]
     obj_scale(newObj, randomScale)
 
-    newObj.header.gfx.bleh = "water droplet"
+    newObj.gfx.bleh = "water droplet"
     return newObj
 }
 
@@ -273,10 +273,10 @@ export const spawn_object_at_origin = (parent, model, behavior) => {
     const obj = gLinker.Spawn.create_object(behavior)
 
     obj.parentObj = parent
-    obj.header.gfx.areaIndex = parent.header.gfx.areaIndex
-    obj.header.gfx.activeAreaIndex = parent.header.gfx.areaIndex
+    obj.gfx.areaIndex = parent.gfx.areaIndex
+    obj.gfx.activeAreaIndex = parent.gfx.areaIndex
 
-    geo_obj_init(obj.header.gfx, gLinker.Area.gLoadedGraphNodes[model], [0,0,0], [0,0,0])
+    geo_obj_init(obj.gfx, gLinker.Area.gLoadedGraphNodes[model], [0,0,0], [0,0,0])
 
     return obj
 }
@@ -292,7 +292,7 @@ export const spawn_object_abs_with_rot = (parent, model, behavior, x, y, z, rx, 
 export const cur_obj_check_anim_frame = (frame) => {
     const o = ObjectListProc.gCurrentObject
 
-    const animFrame = o.header.gfx.unk38.animFrame
+    const animFrame = o.gfx.unk38.animFrame
     if (animFrame == frame) {
         return 1
     } else {
@@ -302,7 +302,7 @@ export const cur_obj_check_anim_frame = (frame) => {
 
 export const cur_obj_check_anim_frame_in_range = (startFrame, rangeLength) => {
     const o = ObjectListProc.gCurrentObject
-    let /*s32*/ animFrame = o.header.gfx.unk38.animFrame
+    let /*s32*/ animFrame = o.gfx.unk38.animFrame
 
     if (animFrame >= startFrame && animFrame < startFrame + rangeLength) {
         return 1
@@ -313,7 +313,7 @@ export const cur_obj_check_anim_frame_in_range = (startFrame, rangeLength) => {
 
 // export const cur_obj_check_frame_prior_current_frame = (a0) => {
 //     const o = ObjectListProc.gCurrentObject
-//     let /*s16*/ sp6 = o.header.gfx.unk38.animFrame
+//     let /*s16*/ sp6 = o.gfx.unk38.animFrame
 
 //     while (*a0 != -1) {
 //         if (*a0 == sp6) {
@@ -427,19 +427,19 @@ export const obj_update_pos_from_parent_transformation = (a0, a1) => {
 }
 
 export const obj_apply_scale_to_matrix = (obj, dst, src) => {
-    dst[0][0] = src[0][0] * obj.header.gfx.scale[0]
-    dst[1][0] = src[1][0] * obj.header.gfx.scale[1]
-    dst[2][0] = src[2][0] * obj.header.gfx.scale[2]
+    dst[0][0] = src[0][0] * obj.gfx.scale[0]
+    dst[1][0] = src[1][0] * obj.gfx.scale[1]
+    dst[2][0] = src[2][0] * obj.gfx.scale[2]
     dst[3][0] = src[3][0]
 
-    dst[0][1] = src[0][1] * obj.header.gfx.scale[0]
-    dst[1][1] = src[1][1] * obj.header.gfx.scale[1]
-    dst[2][1] = src[2][1] * obj.header.gfx.scale[2]
+    dst[0][1] = src[0][1] * obj.gfx.scale[0]
+    dst[1][1] = src[1][1] * obj.gfx.scale[1]
+    dst[2][1] = src[2][1] * obj.gfx.scale[2]
     dst[3][1] = src[3][1]
 
-    dst[0][2] = src[0][2] * obj.header.gfx.scale[0]
-    dst[1][2] = src[1][2] * obj.header.gfx.scale[1]
-    dst[2][2] = src[2][2] * obj.header.gfx.scale[2]
+    dst[0][2] = src[0][2] * obj.gfx.scale[0]
+    dst[1][2] = src[1][2] * obj.gfx.scale[1]
+    dst[2][2] = src[2][2] * obj.gfx.scale[2]
     dst[3][2] = src[3][2]
 
     dst[0][3] = src[0][3]
@@ -1288,7 +1288,7 @@ export const cur_obj_find_nearby_held_actor = (behavior, maxDist) => {
             }
         }
 
-        obj = obj.header.next
+        obj = obj.next
     }
 
     return foundObj
@@ -1321,28 +1321,28 @@ export const cur_obj_set_vel_from_mario_vel = (f12, f14) => {
 
 export const cur_obj_reverse_animation = () => {
     const o = ObjectListProc.gCurrentObject
-    if (o.header.gfx.unk38.animFrame >= 0) {
-        o.header.gfx.unk38.animFrame--
+    if (o.gfx.unk38.animFrame >= 0) {
+        o.gfx.unk38.animFrame--
     }
 }
 
 export const cur_obj_extend_animation_if_at_end = () => {
     const o = ObjectListProc.gCurrentObject
 
-    const sp4 = o.header.gfx.unk38.animFrame
-    const sp0 = o.header.gfx.unk38.curAnim.unk08 - 2
+    const sp4 = o.gfx.unk38.animFrame
+    const sp0 = o.gfx.unk38.curAnim.unk08 - 2
 
     if (sp4 == sp0) {
-        o.header.gfx.unk38.animFrame--
+        o.gfx.unk38.animFrame--
     }
 }
 
 
 export const cur_obj_check_if_near_animation_end = () => {
     const o = ObjectListProc.gCurrentObject
-    let animFlags = o.header.gfx.unk38.curAnim.flags
-    let animFrame = o.header.gfx.unk38.animFrame
-    let nearLoopEnd = o.header.gfx.unk38.curAnim.unk08 - 2
+    let animFlags = o.gfx.unk38.curAnim.flags
+    let animFrame = o.gfx.unk38.animFrame
+    let nearLoopEnd = o.gfx.unk38.curAnim.unk08 - 2
     let isNearEnd = 0
 
     if (animFlags & ANIM_FLAG_NOLOOP && nearLoopEnd + 1 == animFrame) {
@@ -1358,8 +1358,8 @@ export const cur_obj_check_if_near_animation_end = () => {
 
 export const cur_obj_check_if_at_animation_end = () => {
     const o = ObjectListProc.gCurrentObject
-    let animFrame = o.header.gfx.unk38.animFrame
-    let lastFrame = o.header.gfx.unk38.curAnim.unk08 - 1
+    let animFrame = o.gfx.unk38.animFrame
+    let lastFrame = o.gfx.unk38.curAnim.unk08 - 1
 
     if (animFrame == lastFrame) {
         return 1
@@ -1505,9 +1505,9 @@ export const obj_set_pos = (obj, x, y, z) => {
 }
 
 export const obj_copy_scale = (dst, src) => {
-    dst.header.gfx.scale[0] = src.header.gfx.scale[0]
-    dst.header.gfx.scale[1] = src.header.gfx.scale[1]
-    dst.header.gfx.scale[2] = src.header.gfx.scale[2]
+    dst.gfx.scale[0] = src.gfx.scale[0]
+    dst.gfx.scale[1] = src.gfx.scale[1]
+    dst.gfx.scale[2] = src.gfx.scale[2]
 }
 
 export const obj_set_parent_relative_pos = (obj, relX, relY, relZ) => {
@@ -1539,12 +1539,12 @@ export const cur_obj_within_12k_bounds = () => {
 
 export const cur_obj_enable_rendering = () => {
     const o = ObjectListProc.gCurrentObject
-    o.header.gfx.flags |= GRAPH_RENDER_ACTIVE
+    o.gfx.flags |= GRAPH_RENDER_ACTIVE
 }
 
 export const cur_obj_disable_rendering = () => {
     const o = ObjectListProc.gCurrentObject
-    o.header.gfx.flags &= ~GRAPH_RENDER_ACTIVE
+    o.gfx.flags &= ~GRAPH_RENDER_ACTIVE
 }
 
 export const cur_obj_become_tangible = () => {
@@ -1559,12 +1559,12 @@ export const cur_obj_become_intangible = () => {
 
 export const cur_obj_hide = () => {
     const o = ObjectListProc.gCurrentObject
-    o.header.gfx.flags |= GRAPH_RENDER_INVISIBLE
+    o.gfx.flags |= GRAPH_RENDER_INVISIBLE
 }
 
 export const cur_obj_unhide = () => {
     const o = ObjectListProc.gCurrentObject
-    o.header.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
+    o.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
 }
 
 export const cur_obj_clear_interact_status_flag = (flag) => {
@@ -1581,22 +1581,22 @@ export const obj_mark_for_deletion = (obj) => {
 }
 
 export const obj_scale = (obj, scale) => {
-    obj.header.gfx.scale[0] = scale
-    obj.header.gfx.scale[1] = scale
-    obj.header.gfx.scale[2] = scale
+    obj.gfx.scale[0] = scale
+    obj.gfx.scale[1] = scale
+    obj.gfx.scale[2] = scale
 }
 
 export const obj_scale_xyz = (obj, xScale, yScale, zScale) => {
-    obj.header.gfx.scale[0] = xScale
-    obj.header.gfx.scale[1] = yScale
-    obj.header.gfx.scale[2] = zScale
+    obj.gfx.scale[0] = xScale
+    obj.gfx.scale[1] = yScale
+    obj.gfx.scale[2] = zScale
 }
 
 export const cur_obj_scale = (scale) => {
     const o = ObjectListProc.gCurrentObject
-    o.header.gfx.scale[0] = scale
-    o.header.gfx.scale[1] = scale
-    o.header.gfx.scale[2] = scale
+    o.gfx.scale[0] = scale
+    o.gfx.scale[1] = scale
+    o.gfx.scale[2] = scale
 }
 
 export const obj_translate_xyz_random = (obj, rangeLength) => {
@@ -1606,21 +1606,21 @@ export const obj_translate_xyz_random = (obj, rangeLength) => {
 }
 
 export const obj_set_gfx_pos_from_pos = (obj) => {
-    obj.header.gfx.pos[0] = obj.rawData[oPosX]
-    obj.header.gfx.pos[1] = obj.rawData[oPosY]
-    obj.header.gfx.pos[2] = obj.rawData[oPosZ]
+    obj.gfx.pos[0] = obj.rawData[oPosX]
+    obj.gfx.pos[1] = obj.rawData[oPosY]
+    obj.gfx.pos[2] = obj.rawData[oPosZ]
 }
 
 export const cur_obj_init_animation = (animIndex) => {
     const o = ObjectListProc.gCurrentObject
     const anims = o.rawData[oAnimations]
-    geo_obj_init_animation(o.header.gfx, anims[animIndex]);
+    geo_obj_init_animation(o.gfx, anims[animIndex]);
 }
 
 export const cur_obj_init_animation_with_sound = (animIndex) => {
     const o = ObjectListProc.gCurrentObject
     const anims = o.rawData[oAnimations]
-    geo_obj_init_animation(o.header.gfx, anims[animIndex])
+    geo_obj_init_animation(o.gfx, anims[animIndex])
     o.rawData[oSoundStateID] = animIndex
 }
 
@@ -1628,12 +1628,12 @@ export const cur_obj_init_animation_with_accel_and_sound = (animIndex, accel) =>
     const o = ObjectListProc.gCurrentObject
     const anims = o.rawData[oAnimations]
     const animAccel = parseInt(accel * 65536.0)
-    geo_obj_init_animation_accel(o.header.gfx, anims[animIndex], animAccel)
+    geo_obj_init_animation_accel(o.gfx, anims[animIndex], animAccel)
 }
 
 export const obj_init_animation_with_sound = (obj, animations, animIndex) => {
     obj.rawData[oAnimations] = animations
-    geo_obj_init_animation(obj.header.gfx, animations[animIndex])
+    geo_obj_init_animation(obj.gfx, animations[animIndex])
     obj.rawData[oSoundStateID] = animIndex
 }
 
@@ -1666,7 +1666,6 @@ export const apply_drag_to_value = (ptr, dragStrength) => {
 
 
 export const cur_obj_apply_drag_xz = (dragStrength) => {
-
     const o = ObjectListProc.gCurrentObject
 
     const wrapper = { value: o.rawData[oVelX] }
@@ -1781,13 +1780,13 @@ export const cur_obj_wait_then_blink = (timeUntilBlinking, numBlinks) => {
     if (o.rawData[oTimer] >= timeUntilBlinking) {
         timeBlinking = o.rawData[oTimer] - timeUntilBlinking
         if (timeBlinking % 2 != 0) {
-            o.header.gfx.flags |= GRAPH_RENDER_INVISIBLE
+            o.gfx.flags |= GRAPH_RENDER_INVISIBLE
 
             if (timeBlinking / 2 > numBlinks) {
                 done = 1
             }
         } else {
-            o.header.gfx.flags &= ~ GRAPH_RENDER_INVISIBLE
+            o.gfx.flags &= ~ GRAPH_RENDER_INVISIBLE
         }
     }
 

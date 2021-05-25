@@ -23,7 +23,7 @@ const bhv_checkerboard_elevator_group_init = () => {
 
 		const sp2C = spawn_object_relative(i, 0, i * sp3C, sp38, o, MODEL_CHECKERBOARD_PLATFORM, bhvCheckerboardPlatformSub)
 		sp2C.rawData[oCheckerBoardPlatformUnk1AC] = checkerPlatformData[sp34].unk2
-		sp2C.header.gfx.scale = [...checkerPlatformData[sp34].unk1]
+		sp2C.gfx.scale = [...checkerPlatformData[sp34].unk1]
 	}
 }
 

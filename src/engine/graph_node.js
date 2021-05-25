@@ -278,13 +278,12 @@ const get_func = (func, funcClass) => {
 /**
  * Allocates and returns a newly created held object node
  */
-export const init_graph_node_held_object = (graphNode, objNode, translation, func) => {
+export const init_graph_node_held_object = (graphNode, object, translation, func) => {
     let funcClass
     [func, funcClass] = get_func(func)
 
     graphNode = {
-        node: -1,
-        objNode: objNode,
+        object,
         translation: [...translation],
         func: { func, funcClass }
     }
@@ -416,7 +415,6 @@ export const init_graph_node = (graphNode, type) => {
     graphNode.debug = {}
     graphNode.debug.id = gGraphNodeNextID++
     graphNode.debug.type = gGraphNodeTypeNames[type]
-    // graphNode.wrapper = graphNode
 }
 
 export const init_scene_graph_node_links = (graphNode, type) => {
@@ -435,7 +433,6 @@ export const init_graph_node_start = (pool, graphNode) => {
 
 export const init_graph_node_root = (pool, graphNode, areaIndex, x, y, width, height) => {
     graphNode = {
-        node: -1,
         areaIndex, x, y, width, height,
         unk15: 0,
         views: null,
@@ -493,7 +490,6 @@ export const init_graph_node_generated = (pool, graphNode, gfxFunc, parameter, f
 
 export const init_graph_node_object_parent = (sharedChild) => {
     const graphNode = {
-        node: -1,
         sharedChild: sharedChild
     }
 
@@ -503,7 +499,6 @@ export const init_graph_node_object_parent = (sharedChild) => {
 
 export const init_graph_node_animated_part = (drawingLayer, displayList, translation) => {
     const graphNode = {
-        node: -1,
         translation: [ ...translation ],
         displayList
     }
@@ -515,7 +510,6 @@ export const init_graph_node_animated_part = (drawingLayer, displayList, transla
 
 export const init_graph_node_billboard = (drawingLayer, displayList, translation) => {
     const graphNode = {
-        node: -1,
         translation: [...translation],
         displayList
     }
@@ -529,7 +523,6 @@ export const init_graph_node_camera = (pool, graphNode, pos, focus, func, mode) 
     let funcClass
     [func, funcClass] = get_func(func, CameraInstance)
     graphNode = {
-        node: -1,
         roll: 0,
         rollScreen: 0,
         config: { mode: 0, camera: null },
@@ -550,7 +543,6 @@ export const init_graph_node_camera = (pool, graphNode, pos, focus, func, mode) 
 
 export const init_graph_node_display_list = (drawingLayer, displayList) => {
     const graphNode = {
-        node: -1,
         displayList
     }
 
@@ -563,7 +555,6 @@ export const init_graph_node_display_list = (drawingLayer, displayList) => {
 
 export const init_graph_node_background = (pool, graphNode, background, backgroundFunc, zero) => {
     graphNode = {
-        node: -1,
         background,
         backgroundFunc,
         zero
@@ -580,7 +571,6 @@ export const init_graph_node_background = (pool, graphNode, background, backgrou
 
 export const init_graph_node_shadow = (shadowScale, shadowSolidity, shadowType) => {
     const graphNode = {
-        node: -1,
         shadowType,
         shadowScale,
         shadowSolidity
@@ -593,7 +583,6 @@ export const init_graph_node_shadow = (shadowScale, shadowSolidity, shadowType) 
 
 export const init_graph_node_scale = (drawingLayer, displayList, scale) => {
     const graphNode = {
-        node: -1,
         displayList,
         scale
     }
@@ -605,7 +594,6 @@ export const init_graph_node_scale = (drawingLayer, displayList, scale) => {
 
 export const init_graph_node_rotation = (drawingLayer, displayList, rotation) => {
     const graphNode = {
-        node: -1,
         displayList,
         rotation
     }
@@ -617,7 +605,6 @@ export const init_graph_node_rotation = (drawingLayer, displayList, rotation) =>
 
 export const init_graph_node_translation = (drawingLayer, displayList, translation) => {
     const graphNode = {
-        node: -1,
         displayList,
         translation: [...translation]
     }
@@ -629,7 +616,6 @@ export const init_graph_node_translation = (drawingLayer, displayList, translati
 
 export const init_graph_node_translation_rotation = (drawingLayer, displayList, translation, rotation) => {
     const graphNode = {
-        node: -1,
         displayList,
         translation: [...translation],
         rotation: [...rotation]
@@ -642,7 +628,6 @@ export const init_graph_node_translation_rotation = (drawingLayer, displayList, 
 
 export const init_graph_node_ortho = (pool, graphNode, scale) => {
     graphNode = {
-        node: -1,
         scale
     }
 
@@ -652,7 +637,6 @@ export const init_graph_node_ortho = (pool, graphNode, scale) => {
 
 export const init_graph_node_master_list = (pool, graphNode, on) => {
     graphNode = {
-        node: -1,
         listHeads: Array(GFX_NUM_MASTER_LISTS),
     }
     init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_MASTER_LIST)

@@ -107,11 +107,11 @@ class BehaviorCommands {
                 // If the object has a render distance, check if it should be shown.
                 if (distanceFromMario > gCurrentObject.rawData[oDrawingDistance]) {
                     // Out of render distance, hide the object.
-                    gCurrentObject.header.gfx.flags &= ~GRAPH_RENDER_ACTIVE
+                    gCurrentObject.gfx.flags &= ~GRAPH_RENDER_ACTIVE
                     gCurrentObject.activeFlags |= ACTIVE_FLAG_FAR_AWAY
                 } else if (gCurrentObject.rawData[oHeldState] == HELD_FREE) {
                     // In render distance (and not being held), show the object.
-                    gCurrentObject.header.gfx.flags |= GRAPH_RENDER_ACTIVE
+                    gCurrentObject.gfx.flags |= GRAPH_RENDER_ACTIVE
                     gCurrentObject.activeFlags &= ~ACTIVE_FLAG_FAR_AWAY
                 }
             }
@@ -119,13 +119,13 @@ class BehaviorCommands {
     }
 
     obj_update_gfx_pos_and_angle(obj) {
-        obj.header.gfx.pos[0] = obj.rawData[oPosX]
-        obj.header.gfx.pos[1] = obj.rawData[oPosY] + obj.rawData[oGraphYOffset]
-        obj.header.gfx.pos[2] = obj.rawData[oPosZ]
+        obj.gfx.pos[0] = obj.rawData[oPosX]
+        obj.gfx.pos[1] = obj.rawData[oPosY] + obj.rawData[oGraphYOffset]
+        obj.gfx.pos[2] = obj.rawData[oPosZ]
 
-        obj.header.gfx.angle[0] = obj.rawData[oFaceAnglePitch] & 0xFFFF
-        obj.header.gfx.angle[1] = obj.rawData[oFaceAngleYaw] & 0xFFFF
-        obj.header.gfx.angle[2] = obj.rawData[oFaceAngleRoll] & 0xFFFF
+        obj.gfx.angle[0] = obj.rawData[oFaceAnglePitch] & 0xFFFF
+        obj.gfx.angle[1] = obj.rawData[oFaceAngleYaw] & 0xFFFF
+        obj.gfx.angle[2] = obj.rawData[oFaceAngleRoll] & 0xFFFF
     }
 
 
@@ -303,7 +303,7 @@ class BehaviorCommands {
 
     disable_rendering(args) {
         const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
-        gCurrentObject.header.gfx.flags &= ~GRAPH_RENDER_ACTIVE
+        gCurrentObject.gfx.flags &= ~GRAPH_RENDER_ACTIVE
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }
@@ -349,7 +349,7 @@ class BehaviorCommands {
         const animIndex = args.animIndex
         const animations = gCurrentObject.rawData[oAnimations]
 
-        geo_obj_init_animation(gCurrentObject.header.gfx, animations[animIndex])
+        geo_obj_init_animation(gCurrentObject.gfx, animations[animIndex])
 
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
@@ -357,14 +357,14 @@ class BehaviorCommands {
 
     cylboard(args) {
         const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
-        gCurrentObject.header.gfx.flags |= GRAPH_RENDER_CYLBOARD
+        gCurrentObject.gfx.flags |= GRAPH_RENDER_CYLBOARD
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }
 
     billboard(args) {
         const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
-        gCurrentObject.header.gfx.flags |= GRAPH_RENDER_BILLBOARD
+        gCurrentObject.gfx.flags |= GRAPH_RENDER_BILLBOARD
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }

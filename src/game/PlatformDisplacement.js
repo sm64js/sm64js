@@ -4,6 +4,7 @@ import { oPosX, oPosY, oPosZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oVelX
 // import { gLinker.LevelUpdateInstance as gLinker.LevelUpdate } from "./gLinker.LevelUpdate"
 import { mtxf_rotate_zxy_and_translate } from "../engine/math_util"
 import { linear_mtxf_transpose_mul_vec3f, linear_mtxf_mul_vec3f } from "./ObjectHelpers"
+import { TIME_STOP_ACTIVE } from "./ObjectListProcessor"
 
 class PlatformDisplacement {
     constructor() {
@@ -85,7 +86,7 @@ class PlatformDisplacement {
     }
 
     apply_mario_platform_displacement() {
-        if (!(gLinker.ObjectListProcessor.gTimeStopState & gLinker.ObjectListProcessor.TIME_STOP_ACTIVE) &&
+        if (!(gLinker.ObjectListProcessor.gTimeStopState & TIME_STOP_ACTIVE) &&
             gLinker.ObjectListProcessor.gMarioObject && this.gMarioPlatform) {
 
             this.apply_platform_displacement(1, this.gMarioPlatform)

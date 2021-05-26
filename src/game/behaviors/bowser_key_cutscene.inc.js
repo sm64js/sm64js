@@ -4,15 +4,15 @@ import { oBowserKeyScale } from "../../include/object_constants"
 
 export const geo_scale_bowser_key = (run, node) => {
     if (run == 1) {
-        let sp4 = gLinker.GeoRenderer.gCurGraphNodeObject
-        node.node.next.scale = sp4.rawData[oBowserKeyScale]
+        let obj = gLinker.GeoRenderer.gCurGraphNodeObject.object
+        node.next.scale = obj.rawData[oBowserKeyScale]
     }
     return 0
 }
 
 // void bhv_bowser_key_unlock_door_loop(void) {
 //     s32 animTimer;
-//     animTimer = o->header.gfx.animInfo.animFrame;
+//     animTimer = o->.gfx.animInfo.animFrame;
 //     cur_obj_init_animation_with_sound(0);
 //     if (animTimer < 38)
 //         o->oBowserKeyScale = 0.0f;
@@ -31,7 +31,7 @@ export const geo_scale_bowser_key = (run, node) => {
 // }
 
 // void bhv_bowser_key_course_exit_loop(void) {
-//     s32 animTimer = o->header.gfx.animInfo.animFrame;
+//     s32 animTimer = o->.gfx.animInfo.animFrame;
 //     cur_obj_init_animation_with_sound(1);
 //     if (animTimer < 38)
 //         o->oBowserKeyScale = 0.2f;

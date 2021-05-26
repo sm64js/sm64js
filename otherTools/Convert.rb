@@ -6,11 +6,12 @@ require('fileutils')
 MANUALLY_MODIFIED = %w[amp bowling_ball bowser_key chuckya number sparkle_animation bob]
 
 class Convert
-    def initialize(c_root, js_root, entity_is, entity)
+    def initialize(c_root, js_root, entity_is, entity, entity_type)
         @c_root = c_root
         @js_root = js_root
         @entity = entity
         @entity_is = entity_is
+        @entity_type = entity_type && entity_type.to_sym
         @dirstack = []
         @ts = "\n// #{File.mtime(__FILE__).to_i} - #{Time.now}"
     end
@@ -43,7 +44,7 @@ class Convert
                 @js_dir = @entity_dir
 
             else
-                raise "help"
+                @entity_dir = nil
             end
 
             @depth = @entity.split("/").length - 1
@@ -55,6 +56,7 @@ class Convert
             end
 
         else
+            @entity_type = nil
             if @entity_is == :actor
                 @c_dir  = "#{@c_root}/actors/#{@entity}"
                 @js_dir = "#{@js_root}/actors/#{@entity}"
@@ -83,7 +85,7 @@ class Convert
             @js_dir += "/#{dir}"
         end
 
-puts "convert_dir #{@c_dir} -> #{@js_dir}"
+# puts "convert #{@c_dir} -> #{@js_dir}"
 
         Dir.glob(@c_dir + "/*") do |f|
             fn = File.basename(f)
@@ -106,18 +108,40 @@ puts "convert_dir #{@c_dir} -> #{@js_dir}"
     end
 
     def convert_file(fn)
-puts "convert_file #{fn}"
-        case fn
-        when /^anim_.+\.inc\.c/ then convert_anim(fn)
-        when "anim.inc.c"       then convert_anim(fn)
-        when "collision.inc.c"  then convert_collision
-        when "geo.inc.c"        then convert_geo(fn)
-        when "macro.inc.c"      then convert_macro
-        when "model.inc.c"      then convert_model
-        when "movtext.inc.c"    then convert_movtext
-        when "table.inc.c"      then convert_table
-        when "texture.inc.c"    then convert_texture
-        when "trajectory.inc.c" then convert_trajectory
+        if @entity_type
+            file_type = @entity_type
+        else
+            file_type = case fn
+                when /^anim_.+\.inc\.c/ then :anim
+                when "anim.inc.c"       then :anim
+                when "collision.inc.c"  then :collision
+                when "geo.inc.c"        then :geo
+                when "geo.c"            then :geo
+                when "macro.inc.c"      then :macro
+                when "model.inc.c"      then :model
+                when "leveldata.c"      then :model
+                when "movtext.inc.c"    then :movtext
+                when "table.inc.c"      then :table
+                when "texture.inc.c"    then :texture
+                when "trajectory.inc.c" then :trajectory
+                else
+                    :unk
+            end
+        end
+
+        case file_type
+            when :anim then convert_anim(fn)
+            when :collision then convert_collision(fn)
+            when :geo then convert_geo(fn)
+            when :macro then convert_macro(fn)
+            when :model then convert_model(fn)
+            when :movtext then convert_movtext(fn)
+            when :table then convert_table(fn)
+            when :texture then convert_texture(fn)
+            when :trajectory then convert_trajectory(fn)
+            when :unk
+            else
+                raise "help"
         end
     end
 
@@ -292,7 +316,7 @@ puts "convert_file #{fn}"
 
     # ---------------------------------------------------------------------------------------------------------
 
-    def convert_collision
+    def convert_collision(fn)
         header = []
         imports = []
         @cmds = []
@@ -300,7 +324,7 @@ puts "convert_file #{fn}"
         @spcs = []
         @text = []
 
-        @lines = File.read(@c_dir + "/collision.inc.c").lines.to_a
+        @lines = File.read(@c_dir + "/" + fn).lines.to_a
         @n = 0
         while (@n < @lines.length)
 
@@ -316,7 +340,8 @@ puts "convert_file #{fn}"
         imports_wrap(imports, "include/surface_terrains", [@cmds.uniq, @coll_cons.uniq, @spcs.uniq])
 
         out = [header, "", imports, "", @text, @ts].join("\n")
-        File.open(@js_dir + "/collision.inc.js", "w") {|f| f.puts(out)}
+        jsfn = fn.delete_suffix(".c") + ".js"
+        File.open(@js_dir + "/" + jsfn, "w") {|f| f.puts(out)}
     end
 
     def cv_collision
@@ -391,8 +416,10 @@ puts "convert_file #{fn}"
             @imps.push([/^(#{@entity}_\w+)/, @js_dir + "/model.inc"])  # dorrie_seg6_dl_0600CFD0
 
         else
-            find_all_models(nil, @entity_dir).each do |model, file|
-                @imps.push([/^(#{model})/, file.delete_suffix(".js")])
+            if @entity_dir
+                find_all_models(nil, @entity_dir).each do |model, file|
+                    @imps.push([/^(#{model})/, file.delete_suffix(".js")])
+                end
             end
         end
 
@@ -467,14 +494,14 @@ puts "convert_file #{fn}"
 
     # ---------------------------------------------------------------------------------------------------------
 
-    def convert_macro
+    def convert_macro(fn)
         header = []
         imports = []
         @macr_cmds = []
         @macr_imps = {}
         @text = []
 
-        @lines = File.read(@c_dir + "/macro.inc.c").lines.to_a
+        @lines = File.read(@c_dir + "/" + fn).lines.to_a
         @n = 0
         while (@n < @lines.length)
 
@@ -495,7 +522,8 @@ puts "convert_file #{fn}"
         end
 
         out = [header, "", imports, "", @text, @ts].join("\n")
-        File.open(@js_dir + "/macro.inc.js", "w") {|f| f.puts(out)}
+        jsfn = fn.delete_suffix(".c") + ".js"
+        File.open(@js_dir + "/" + jsfn, "w") {|f| f.puts(out)}
     end
 
     def cv_MacroObject
@@ -552,7 +580,7 @@ puts "convert_file #{fn}"
 
     # ---------------------------------------------------------------------------------------------------------
 
-    def convert_model
+    def convert_model(fn)
         header = []
         imports = []
         @trefs = []
@@ -561,7 +589,7 @@ puts "convert_file #{fn}"
         @gbi_cons = []
         @text = []
 
-        @lines = File.read(@c_dir + "/model.inc.c").lines.to_a
+        @lines = File.read(@c_dir + "/" + fn).lines.to_a
         @n = 0
         while (@n < @lines.length)
             if @lines[@n] =~ / Lights1 /    then cv_Lights1
@@ -597,7 +625,8 @@ puts "convert_file #{fn}"
         end
         
         out = [header, "", imports, @text, @ts].join("\n")
-        File.open(@js_dir + "/model.inc.js", "w") {|f| f.puts(out)}
+        jsfn = fn.delete_suffix(".c") + ".js"
+        File.open(@js_dir + "/" + jsfn, "w") {|f| f.puts(out)}
     end
 
     def cv_UNUSED
@@ -609,9 +638,10 @@ puts "convert_file #{fn}"
 
         while true
             line = @lines[@n]
-
+# puts line
             # static const Lights1 cannon_barrel_seg8_lights_08005878 = gdSPDefLights1(
             if line =~ /(static )*const Lights1 (\w+)/
+# puts "*****"
                 export = $1 ? "" : "export "
                 @text.push("#{export}const #{$2} = gdSPDefLights1(")
 
@@ -727,7 +757,7 @@ puts "convert_file #{fn}"
 
     # ---------------------------------------------------------------------------------------------------------
 
-    def convert_movtext
+    def convert_movtext(fn)
         header = []
         imports = []
         @mov_cmds = []
@@ -736,7 +766,7 @@ puts "convert_file #{fn}"
         @gbi_cons = []
         @text = []
 
-        @lines = File.read(@c_dir + "/movtext.inc.c").lines.to_a
+        @lines = File.read(@c_dir + "/" + fn).lines.to_a
         @n = 0
         while (@n < @lines.length)
 
@@ -756,7 +786,8 @@ puts "convert_file #{fn}"
         imports_wrap(imports, "include/moving_texture_macros", [@mov_cmds.uniq, @mov_cons.uniq])
 
         out = [header, "", imports, "", @text, @ts].join("\n")
-        File.open(@js_dir + "/movtext.inc.js", "w") {|f| f.puts(out)}
+        jsfn = fn.delete_suffix(".c") + ".js"
+        File.open(@js_dir + "/" + jsfn, "w") {|f| f.puts(out)}
     end
 
     def cv_Movtex
@@ -822,10 +853,10 @@ puts "convert_file #{fn}"
 
     # ---------------------------------------------------------------------------------------------------------
 
-    def convert_table
+    def convert_table(fn)
         @text = []
 
-        @lines = File.read(@c_dir + "/table.inc.c").lines.to_a
+        @lines = File.read(@c_dir + "/" + fn).lines.to_a
         @n = 0
         while (@n < @lines.length)
 
@@ -837,17 +868,18 @@ puts "convert_file #{fn}"
             @n += 1
         end
 
-        File.open(@js_dir + "/table.inc.js", "w") {|f| f.puts(@text)}
+        jsfn = fn.delete_suffix(".c") + ".js"
+        File.open(@js_dir + "/" + jsfn, "w") {|f| f.puts(@text)}
     end
 
 
  # ---------------------------------------------------------------------------------------------------------
 
-    def convert_texture
+    def convert_texture(fn)
         header = []
         @text = []
 
-        @lines = File.read(@c_dir + "/texture.inc.c").lines.to_a
+        @lines = File.read(@c_dir + "/" + fn).lines.to_a
         @n = 0
         while (@n < @lines.length)
 
@@ -862,19 +894,20 @@ puts "convert_file #{fn}"
         header.push(@title)
 
         out = [header, "", @text, @ts].join("\n")
-        File.open(@js_dir + "/texture.inc.js", "w") {|f| f.puts(out)}
+        jsfn = fn.delete_suffix(".c") + ".js"
+        File.open(@js_dir + "/" + jsfn, "w") {|f| f.puts(out)}
     end
 
 
     # ---------------------------------------------------------------------------------------------------------
 
-    def convert_trajectory
+    def convert_trajectory(fn)
         header = []
         imports = []
         @cmds = []
         @text = []
 
-        @lines = File.read(@c_dir + "/trajectory.inc.c").lines.to_a
+        @lines = File.read(@c_dir + "/" + fn).lines.to_a
         @n = 0
         while (@n < @lines.length)
 
@@ -890,7 +923,8 @@ puts "convert_file #{fn}"
         imports_wrap(imports, "include/surface_terrains", @cmds.uniq)
 
         out = [header, "", imports, "", @text, @ts].join("\n")
-        File.open(@js_dir + "/trajectory.inc.js", "w") {|f| f.puts(out)}
+        jsfn = fn.delete_suffix(".c") + ".js"
+        File.open(@js_dir + "/" + jsfn, "w") {|f| f.puts(out)}
     end
 
     def cv_Trajectory
@@ -981,6 +1015,10 @@ begin
         entity_is = :level
     else
         entity_is = :path
+        if (i = ARGV.index("-t"))
+            ARGV.delete("-t")
+            entity_type = ARGV.delete_at(i)
+        end
     end
 
     c_root = ARGV[0]
@@ -1030,11 +1068,13 @@ begin
         end
     end
 
-    Convert.new(c_root, js_root, entity_is, entity).convert
+    Convert.new(c_root, js_root, entity_is, entity, entity_type).convert
 
 rescue
     if $!.message == "help"
-        puts "usage: Convert.rb <sm64-root> <sm64js-root> [-a <actor> | -l <level>]"
+        puts "usage: Convert.rb <sm64-root> <sm64js-root> [-a <actor> | -l <level> | -t <type> <file>]"
+        puts "<actor> and <level> are directory names like <chain_chomp> and <rr>"
+        puts "<type> is anim, collision, geo, macro, model, movtext, table, texture, or trajectory"
         puts $!.backtrace
 
     elsif $!.message == "exit"

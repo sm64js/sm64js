@@ -8,13 +8,14 @@ import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectList
 import { GRAPH_RENDER_INVISIBLE, geo_update_animation_frame, retrieve_animation_index } from "../engine/graph_node"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import * as SurfaceTerrains from "../include/surface_terrains"
-import { atan2s, vec3s_set } from "../engine/math_util"
-import { mario_execute_stationary_action } from "./MarioActionsStationary"
+import { atan2s, vec3s_set, vec3f_set } from "../engine/math_util"
 import { gMarioAnimData } from "../actors/mario/marioAnimData"
+import { mario_execute_stationary_action } from "./MarioActionsStationary"
 import { mario_execute_moving_action } from "./MarioActionsMoving"
 import { mario_execute_airborne_action } from "./MarioActionsAirborne"
 import { mario_execute_object_action } from "./MarioActionsObject"
 import { mario_execute_submerged_action } from "./MarioActionsSubmerged"
+import { mario_execute_cutscene_action } from "./MarioActionsCutscene"
 
 import {
    oMarioWalkingPitch, oInteractStatus, oPosX, oPosY, oPosZ, oMoveAnglePitch, oMoveAngleRoll,
@@ -740,43 +741,95 @@ export const sBackwardKnockbackActions = [
 ]
 
 export const init_marios = () => {
+    const gMarioState = LevelUpdate.gMarioState
+    const gMarioSpawnInfo = Area.gMarioSpawnInfo
 
-    Object.assign(LevelUpdate.gMarioState, {
-        actionTimer: 0,
-        framesSinceA: 0xFF,
-        framesSinceB: 0xFF,
-        invincTimer: 0,
-        flags: MARIO_CAP_ON_HEAD | MARIO_NORMAL_CAP,
-        forwardVel: 0.0,
-        squishTimer: 0,
-        hurtCounter: 0,
-        healCounter: 0,
-        capTimer: 0,
-        quicksandDepth: 0.0,
-        area: Area.gCurrentArea,
-        marioObj: ObjectListProcessor.gMarioObject,
-        faceAngle: [ ...Area.gMarioSpawnInfo.startAngle ],
-        slideYaw: 0,
-        angleVel: [0, 0, 0],
-        pos: [ ...Area.gMarioSpawnInfo.startPos ],
-        vel: [0, 0, 0],
-        action: ACT_IDLE
-    })
+    gMarioState.actionTimer = 0
+    gMarioState.framesSinceA = 0xFF
+    gMarioState.framesSinceB = 0xFF
 
-    Object.assign(LevelUpdate.gMarioState.marioObj.header.gfx, {
-        unk38: {
-            ...LevelUpdate.gMarioState.marioObj.header.gfx.unk38,
-            animID: -1,
-            animID: 0,
-            animFrame: 0,
-            animFrameAccelAssist: 0,
-            animAccel: 0x10000,
-            animTimer: 0
-        }
-    })
+    gMarioState.invincTimer = 0
 
-    LevelUpdate.gMarioState.marioObj.marioState = LevelUpdate.gMarioState
+    gMarioState.flags = MARIO_CAP_ON_HEAD | MARIO_NORMAL_CAP
 
+    gMarioState.forwardVel = 0.0
+    gMarioState.squishTimer = 0
+
+    gMarioState.hurtCounter = 0
+    gMarioState.healCounter = 0
+
+    gMarioState.capTimer = 0
+    gMarioState.quicksandDepth = 0.0
+
+    gMarioState.heldObj = null
+    gMarioState.riddenObj = null
+    gMarioState.usedObj = null
+
+    gMarioState.waterLevel =
+        SurfaceCollision.find_water_level(gMarioSpawnInfo.startPos[0], gMarioSpawnInfo.startPos[2])
+
+    gMarioState.area = Area.gCurrentArea
+    gMarioState.marioObj = ObjectListProcessor.gMarioObject
+    gMarioState.marioObj.gfx.unk38.animID = -1
+    gMarioState.faceAngle = [...Area.gMarioSpawnInfo.startAngle]
+    gMarioState.angleVel = [0, 0, 0]
+    gMarioState.pos = [...Area.gMarioSpawnInfo.startPos]
+    // gMarioState.slideYaw = 0
+    gMarioState.vel = [0, 0, 0]
+
+    gMarioState.floor = {}
+    gMarioState.floorHeight =
+        SurfaceCollision.find_floor(gMarioState.pos[0], gMarioState.pos[1], gMarioState.pos[2], gMarioState.floor)
+
+    if (gMarioState.pos[1] < gMarioState.floorHeight) {
+        gMarioState.pos[1] = gMarioState.floorHeight
+    }
+
+    gMarioState.marioObj.gfx.pos[1] = gMarioState.pos[1]
+
+    gMarioState.action =
+        (gMarioState.pos[1] <= (gMarioState.waterLevel - 100)) ? ACT_WATER_IDLE : ACT_IDLE
+
+    // Object.assign(LevelUpdate.gMarioState.marioObj.gfx, {
+    //     unk38: {
+    //         ...LevelUpdate.gMarioState.marioObj.gfx.unk38,
+    //         animID: -1,
+    //         animID: 0,
+    //         animFrame: 0,
+    //         animFrameAccelAssist: 0,
+    //         animAccel: 0x10000,
+    //         animTimer: 0
+    //     }
+    // })
+
+    mario_reset_bodystate(gMarioState)
+    update_mario_info_for_cam(gMarioState)
+    gMarioState.marioBodyState.punchState = 0
+
+    gMarioState.marioObj.oPosX = gMarioState.pos[0]
+    gMarioState.marioObj.oPosY = gMarioState.pos[1]
+    gMarioState.marioObj.oPosZ = gMarioState.pos[2]
+
+    gMarioState.marioObj.oMoveAnglePitch = gMarioState.faceAngle[0]
+    gMarioState.marioObj.oMoveAngleYaw   = gMarioState.faceAngle[1]
+    gMarioState.marioObj.oMoveAngleRoll  = gMarioState.faceAngle[2]
+
+    gMarioState.marioObj.gfx.pos = [...gMarioState.pos]
+    gMarioState.marioObj.gfx.angle = [0, gMarioState.faceAngle[1], 0]
+
+    // if (save_file_get_cap_pos(capPos)) {
+    //     capObject = spawn_object(gMarioState.marioObj, MODEL_MARIOS_CAP, bhvNormalCap);
+
+    //     capObject.oPosX = capPos[0]
+    //     capObject.oPosY = capPos[1]
+    //     capObject.oPosZ = capPos[2]
+
+    //     capObject.oForwardVelS32 = 0
+
+    //     capObject.oMoveAngleYaw = 0
+    // }
+
+    // LevelUpdate.gMarioState.marioObj.marioState = LevelUpdate.gMarioState
 }
 
 export const set_forward_vel = (m, forwardVel) => {
@@ -791,6 +844,10 @@ export const set_forward_vel = (m, forwardVel) => {
 
 export const set_mario_y_vel_based_on_fspeed = (m, initialVelY, multiplier) => {
     m.vel[1] = initialVelY + (m.forwardVel * multiplier)
+
+    if (m.squishTimer != 0 || m.quicksandDepth > 1.0) {
+        m.vel[1] *= 0.5
+    }
 }
 
 const read_next_anim_value = (curFrame, attribute, values) => {
@@ -800,8 +857,8 @@ const read_next_anim_value = (curFrame, attribute, values) => {
 }
 
 export const find_mario_anim_flags_and_translation = (obj, yaw, translation) => {
-    const curAnim = obj.header.gfx.unk38.curAnim
-    const animFrame = geo_update_animation_frame(obj.header.gfx.unk38, null)
+    const curAnim = obj.gfx.unk38.curAnim
+    const animFrame = geo_update_animation_frame(obj.gfx.unk38, null)
     const animValues = curAnim.values
 
     const attribute = { indexToIndices: 0, indices: curAnim.indices }
@@ -820,6 +877,25 @@ export const find_mario_anim_flags_and_translation = (obj, yaw, translation) => 
 
 }
 
+/**
+ * Updates Mario's position from his animation's translation.
+ */
+export const update_mario_pos_for_anim = (m) => {
+    const translation = new Array(3)
+    let flags
+
+    flags = find_mario_anim_flags_and_translation(m.marioObj, m.faceAngle[1], translation)
+
+    if (flags & (ANIM_FLAG_HOR_TRANS | ANIM_FLAG_6)) {
+        m.pos[0] += translation[0]
+        m.pos[2] += translation[2]
+    }
+
+    if (flags & (ANIM_FLAG_VERT_TRANS | ANIM_FLAG_6)) {
+        m.pos[1] += translation[1]
+    }
+}
+
 export const return_mario_anim_y_translation = (m) => {
     const translation = new Array(3)
     find_mario_anim_flags_and_translation(m.marioObj, 0, translation)
@@ -836,7 +912,7 @@ export const return_mario_anim_y_translation = (m) => {
  */
 export const play_sound_if_no_flag = (m, soundBits, flags) => {
     if (!(m.flags & flags)) {
-        play_sound(soundBits, m.marioObj.header.gfx.cameraToObject)
+        play_sound(soundBits, m.marioObj.gfx.cameraToObject)
         m.flags |= flags
     }
 }
@@ -848,10 +924,10 @@ export const play_mario_jump_sound = (m) => {
     if (!(m.flags & MARIO_MARIO_SOUND_PLAYED)) {
         if (m.action == ACT_TRIPLE_JUMP) {
             play_sound(SOUND_MARIO_YAHOO_WAHA_YIPPEE + ((gAudioRandom % 5) << 16),
-                       m.marioObj.header.gfx.cameraToObject)
+                       m.marioObj.gfx.cameraToObject)
         } else {
             play_sound(SOUND_MARIO_YAH_WAH_HOO + ((gAudioRandom % 3) << 16),
-                       m.marioObj.header.gfx.cameraToObject)
+                       m.marioObj.gfx.cameraToObject)
         }
         m.flags |= MARIO_MARIO_SOUND_PLAYED
     }
@@ -885,9 +961,9 @@ export const play_sound_and_spawn_particles = (m, soundBits, waveParticleType) =
 
     if ((m.flags & MARIO_METAL_CAP) || soundBits == SOUND_ACTION_UNSTUCK_FROM_GROUND
         || soundBits == SOUND_MARIO_PUNCH_HOO) {
-        play_sound(soundBits, m.marioObj.header.gfx.cameraToObject)
+        play_sound(soundBits, m.marioObj.gfx.cameraToObject)
     } else {
-        play_sound(m.terrainSoundAddend + soundBits, m.marioObj.header.gfx.cameraToObject)
+        play_sound(m.terrainSoundAddend + soundBits, m.marioObj.gfx.cameraToObject)
     }
 }
 
@@ -1056,22 +1132,48 @@ const set_steep_jump_action = (m) => {
 }
 
 export const set_jump_from_landing = (m) => {
+    if (m.quicksandDepth >= 11.0) {
+        if (!m.heldObj) {
+            return set_mario_action(m, ACT_QUICKSAND_JUMP_LAND, 0)
+        } else {
+            return set_mario_action(m, ACT_HOLD_QUICKSAND_JUMP_LAND, 0)
+        }
+    }
 
     if (mario_floor_is_steep(m)) {
         set_steep_jump_action(m)
     } else {
-        if (m.doubleJumpTimer == 0) {
+        if (m.doubleJumpTimer == 0 || m.squishTimer != 0) {
             set_mario_action(m, ACT_JUMP, 0)
         } else {
             switch (m.prevAction) {
-                case ACT_JUMP_LAND: set_mario_action(m, ACT_DOUBLE_JUMP, 0); break
-                case ACT_FREEFALL_LAND: set_mario_action(m, ACT_DOUBLE_JUMP, 0); break
-                case ACT_SIDE_FLIP_LAND_STOP: set_mario_action(m, ACT_DOUBLE_JUMP, 0); break
+                case ACT_JUMP_LAND:
+                  set_mario_action(m, ACT_DOUBLE_JUMP, 0)
+                  break
+
+                case ACT_FREEFALL_LAND:
+                  set_mario_action(m, ACT_DOUBLE_JUMP, 0)
+                  break
+
+                case ACT_SIDE_FLIP_LAND_STOP:
+                  set_mario_action(m, ACT_DOUBLE_JUMP, 0)
+                  break
+
                 case ACT_DOUBLE_JUMP_LAND:
-                    if (m.forwardVel > 20.0) set_mario_action(m, ACT_TRIPLE_JUMP, 0)
-                    else set_mario_action(m, ACT_JUMP, 0)
+                    // If Mario has a wing cap, he ignores the typical speed
+                    // requirement for a triple jump.
+                    if (m.flags & MARIO_WING_CAP) {
+                        set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0)
+                    } else if (m.forwardVel > 20.0) {
+                        set_mario_action(m, ACT_TRIPLE_JUMP, 0)
+                    } else {
+                        set_mario_action(m, ACT_JUMP, 0)
+                    }
                     break
-                default: set_mario_action(m, ACT_JUMP, 0) // throw err "no floor"
+
+                default:
+                  set_mario_action(m, ACT_JUMP, 0)
+                  break
             }
         }
 
@@ -1101,7 +1203,7 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
             break
 
         case ACT_BACKFLIP:
-            m.marioObj.header.gfx.unk38.animID = -1
+            m.marioObj.gfx.unk38.animID = -1
             m.forwardVel = -16.0
             set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
             break
@@ -1133,7 +1235,7 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
 
         case ACT_JUMP:
         case ACT_HOLD_JUMP:
-            m.marioObj.header.gfx.unk38.animID = -1
+            m.marioObj.gfx.unk38.animID = -1
             set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
             m.forwardVel *= 0.8
             break
@@ -1154,7 +1256,7 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
             break
 
         case ACT_STEEP_JUMP:
-            m.marioObj.header.gfx.unk38.animID = -1
+            m.marioObj.gfx.unk38.animID = -1
             set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
             m.faceAngle[0] = -0x2000
             break
@@ -1174,7 +1276,7 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
             break
 
         case ACT_LONG_JUMP:
-            m.marioObj.header.gfx.unk38.animID = -1
+            m.marioObj.gfx.unk38.animID = -1
             set_mario_y_vel_based_on_fspeed(m, 30.0, 0.0)
             m.marioObj.oMarioLongJumpIsSlow = m.forwardVel > 16.0 ? false : true
  
@@ -1331,24 +1433,24 @@ export const set_mario_animation = (m, targetAnimID) => {
 
     if (m.animation.targetAnim == undefined) throw "cant find animation"
 
-    if (o.header.gfx.unk38.animID != targetAnimID) {
-        o.header.gfx.unk38.animID = targetAnimID
-        o.header.gfx.unk38.curAnim = m.animation.targetAnim
-        o.header.gfx.unk38.animAccel = 0
-        o.header.gfx.unk38.animYTrans = m.unkB0
+    if (o.gfx.unk38.animID != targetAnimID) {
+        o.gfx.unk38.animID = targetAnimID
+        o.gfx.unk38.curAnim = m.animation.targetAnim
+        o.gfx.unk38.animAccel = 0
+        o.gfx.unk38.animYTrans = m.unkB0
 
         if (m.animation.targetAnim.flags & ANIM_FLAG_2) {
-            o.header.gfx.unk38.animFrame = m.animation.targetAnim.unk04
+            o.gfx.unk38.animFrame = m.animation.targetAnim.unk04
         } else {
             if (m.animation.targetAnim.flags & ANIM_FLAG_FORWARD) {
-                o.header.gfx.unk38.animFrame = m.animation.targetAnim.unk04 + 1
+                o.gfx.unk38.animFrame = m.animation.targetAnim.unk04 + 1
             } else {
-                o.header.gfx.unk38.animFrame = m.animation.targetAnim.unk04 - 1
+                o.gfx.unk38.animFrame = m.animation.targetAnim.unk04 - 1
             }
         }
     }
 
-    return o.header.gfx.unk38.animFrame
+    return o.gfx.unk38.animFrame
 
 }
 
@@ -1356,63 +1458,63 @@ export const set_mario_anim_with_accel = (m, targetAnimID, accel) => {
     const o = m.marioObj
     m.animation.targetAnim = m.animation.animList[targetAnimID]
 
-    if (o.header.gfx.unk38.animID != targetAnimID) {
-        o.header.gfx.unk38.animID = targetAnimID
-        o.header.gfx.unk38.curAnim = m.animation.targetAnim
-        o.header.gfx.unk38.animYTrans = m.unkB0
+    if (o.gfx.unk38.animID != targetAnimID) {
+        o.gfx.unk38.animID = targetAnimID
+        o.gfx.unk38.curAnim = m.animation.targetAnim
+        o.gfx.unk38.animYTrans = m.unkB0
 
         if (m.animation.targetAnim.flags & ANIM_FLAG_2) {
-            o.header.gfx.unk38.animFrameAccelAssist = (m.animation.targetAnim << 0x10)
+            o.gfx.unk38.animFrameAccelAssist = (m.animation.targetAnim << 0x10)
         } else {
             if (m.animation.targetAnim.flags & ANIM_FLAG_FORWARD) {
-                o.header.gfx.unk38.animFrameAccelAssist = (m.animation.targetAnim << 0x10) + accel
+                o.gfx.unk38.animFrameAccelAssist = (m.animation.targetAnim << 0x10) + accel
             } else {
-                o.header.gfx.unk38.animFrameAccelAssist = (m.animation.targetAnim << 0x10) - accel
+                o.gfx.unk38.animFrameAccelAssist = (m.animation.targetAnim << 0x10) - accel
             }
         }
 
-        o.header.gfx.unk38.animFrame = (o.header.gfx.unk38.animFrameAccelAssist >> 0x10)
+        o.gfx.unk38.animFrame = (o.gfx.unk38.animFrameAccelAssist >> 0x10)
     }
 
-    o.header.gfx.unk38.animAccel = accel
+    o.gfx.unk38.animAccel = accel
 
-    return o.header.gfx.unk38.animFrame
+    return o.gfx.unk38.animFrame
 
 }
 
 export const set_anim_to_frame = (m, animFrame) => {
-    const animInfo = m.marioObj.header.gfx.unk38;
-    const curAnim = animInfo.curAnim;
+    const animInfo = m.marioObj.gfx.unk38
+    const curAnim = animInfo.curAnim
 
     if (animInfo.animAccel) {
         if (curAnim.flags & ANIM_FLAG_FORWARD) {
-            animInfo.animFrameAccelAssist = (animFrame << 0x10) + animInfo.animAccel;
+            animInfo.animFrameAccelAssist = (animFrame << 0x10) + animInfo.animAccel
         } else {
-            animInfo.animFrameAccelAssist = (animFrame << 0x10) - animInfo.animAccel;
+            animInfo.animFrameAccelAssist = (animFrame << 0x10) - animInfo.animAccel
         }
     } else {
         if (curAnim.flags & ANIM_FLAG_FORWARD) {
-            animInfo.animFrame = animFrame + 1;
+            animInfo.animFrame = animFrame + 1
         } else {
-            animInfo.animFrame = animFrame - 1;
+            animInfo.animFrame = animFrame - 1
         }
     }
 }
 
 export const is_anim_at_end = (m) => {
     const o = m.marioObj //TODO fix unk38 as animInfo
-    return (o.header.gfx.unk38.animFrame + 1) == o.header.gfx.unk38.curAnim.unk08
+    return (o.gfx.unk38.animFrame + 1) == o.gfx.unk38.curAnim.unk08
 }
 
 export const is_anim_past_end = (m) => {
     const o = m.marioObj
-    return o.header.gfx.unk38.animFrame >= (o.header.gfx.unk38.curAnim.unk08 - 2)
+    return o.gfx.unk38.animFrame >= (o.gfx.unk38.curAnim.unk08 - 2)
 }
 
 export const is_anim_past_frame = (m, animFrame) => {
     let isPastFrame
     const acceleratedFrame = animFrame << 0x10
-    const animInfo = m.marioObj.header.gfx.unk38
+    const animInfo = m.marioObj.gfx.unk38
     const curAnim = animInfo.curAnim
 
     if (animInfo.animAccel) {
@@ -1450,7 +1552,7 @@ const mario_reset_bodystate = (m) => {
 
 export const execute_mario_action = () => {
     if (LevelUpdate.gMarioState.action) {
-        LevelUpdate.gMarioState.marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+        LevelUpdate.gMarioState.marioObj.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
         mario_reset_bodystate(LevelUpdate.gMarioState)
         update_mario_inputs(LevelUpdate.gMarioState)
         Interact.mario_handle_special_floors(LevelUpdate.gMarioState)
@@ -1476,9 +1578,9 @@ export const execute_mario_action = () => {
                     inLoop = mario_execute_submerged_action(LevelUpdate.gMarioState)
                     break
 
-                // case ACT_GROUP_CUTSCENE:
-                //     inLoop = mario_execute_cutscene_action(LevelUpdate.gMarioState)
-                //     break
+                case ACT_GROUP_CUTSCENE:
+                    inLoop = mario_execute_cutscene_action(LevelUpdate.gMarioState)
+                    break
 
                 case ACT_GROUP_AUTOMATIC:
                     inLoop = mario_execute_automatic_action(LevelUpdate.gMarioState)
@@ -1493,7 +1595,7 @@ export const execute_mario_action = () => {
         }
 
         // sink_mario_in_quicksand(LevelUpdate.gMarioState)
-        // squish_mario_model(LevelUpdate.gMarioState)
+        squish_mario_model(LevelUpdate.gMarioState)
         set_submerged_cam_preset_and_spawn_bubbles(LevelUpdate.gMarioState)
         update_mario_health(LevelUpdate.gMarioState)
         update_mario_info_for_cam(LevelUpdate.gMarioState)
@@ -1501,12 +1603,12 @@ export const execute_mario_action = () => {
 
         if (LevelUpdate.gMarioState.floor.type == SurfaceTerrains.SURFACE_HORIZONTAL_WIND) {
             // spawn_wind_particles(0, (LevelUpdate.gMarioState.floor.force << 8))
-            play_sound(SOUND_ENV_WIND2, LevelUpdate.gMarioState.marioObj.header.gfx.cameraToObject);
+            play_sound(SOUND_ENV_WIND2, LevelUpdate.gMarioState.marioObj.gfx.cameraToObject);
         }
 
         if (LevelUpdate.gMarioState.floor.type == SurfaceTerrains.SURFACE_VERTICAL_WIND) {
             // spawn_wind_particles(1, 0)
-            play_sound(SOUND_ENV_WIND2, LevelUpdate.gMarioState.marioObj.header.gfx.cameraToObject);
+            play_sound(SOUND_ENV_WIND2, LevelUpdate.gMarioState.marioObj.gfx.cameraToObject);
         }
 
         play_infinite_stairs_music()
@@ -1597,7 +1699,7 @@ const mario_update_hitbox_and_cap_model = (m) => {
         //  no interaction with objects.
 
         if (window.gGlobalTimer & 1) {
-            m.marioObj.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
+            m.marioObj.gfx.flags |= GRAPH_RENDER_INVISIBLE
         }
     }
 
@@ -1715,7 +1817,7 @@ const update_mario_geometry_inputs = (m) => {
     m.floorHeight = SurfaceCollision.find_floor(m.pos[0], m.pos[1], m.pos[2], m)
 
     if (!m.floor) {
-        m.pos = [ ...m.marioObj.header.gfx.pos ]
+        m.pos = [ ...m.marioObj.gfx.pos ]
         m.floorHeight = SurfaceCollision.find_floor(m.pos[0], m.pos[1], m.pos[2], m)
     }
 
@@ -2188,3 +2290,39 @@ export const set_water_plunge_action = m => {
 
   return set_mario_action(m, ACT_WATER_PLUNGE, 0)
 }
+
+
+/**
+ * These are the scaling values for the x and z axis for Mario
+ * when he is close to unsquishing.
+ */
+const sSquishScaleOverTime = [ 0x46, 0x32, 0x32, 0x3C, 0x46, 0x50, 0x50, 0x3C,
+                                0x28, 0x14, 0x14, 0x1E, 0x32, 0x3C, 0x3C, 0x28 ]
+
+/**
+ * Applies the squish to Mario's model via scaling.
+ */
+const squish_mario_model = (m) => {
+    if (m.squishTimer != 0xFF) {
+          // If no longer squished, scale back to default.
+        if (m.squishTimer == 0) {
+            vec3f_set(m.marioObj.gfx.scale, 1.0, 1.0, 1.0)
+        }
+          // If timer is less than 16, rubber-band Mario's size scale up and down.
+        else if (m.squishTimer <= 16) {
+            m.squishTimer -= 1
+
+            m.marioObj.gfx.scale[1] =
+                1.0 - ((sSquishScaleOverTime[15 - m.squishTimer] * 0.6) / 100.0)
+            m.marioObj.gfx.scale[0] =
+                ((sSquishScaleOverTime[15 - m.squishTimer] * 0.4) / 100.0) + 1.0
+
+            m.marioObj.gfx.scale[2] = m.marioObj.gfx.scale[0]
+        } else {
+            m.squishTimer -= 1
+
+            vec3f_set(m.marioObj.gfx.scale, 1.4, 0.4, 1.4)
+        }
+    }
+}
+

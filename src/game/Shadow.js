@@ -64,8 +64,8 @@ const atan2_deg = (a, b) => {
 const correct_shadow_solidity_for_animations = (isLuigi, initialSolidity, shadow) => {
     if (ObjectListProc.gMarioObject.length > 1) throw "not implemented multiple mario shadow"
     const player = ObjectListProc.gMarioObject
-    const animFrame = player.header.gfx.unk38.animFrame
-    switch (player.header.gfx.unk38.animID) {
+    const animFrame = player.gfx.unk38.animFrame
+    switch (player.gfx.unk38.animID) {
         default: return SHADOW_SOLIDITY_NOT_YET_SET
     }
 }
@@ -329,7 +329,7 @@ const backRightZ  = 7
  * after a rotation equal to the yaw of the current graph node object.
  */
 const rotate_rectangle = (c, newZ, newX, oldZ, oldX) => {
-    let obj = GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
+    let obj = GeoRenderer.gCurGraphNodeObject.object
     c[newZ] = oldZ * coss(obj.rawData[oFaceAngleYaw]) - oldX * sins(obj.rawData[oFaceAngleYaw]);
     c[newX] = oldZ * sins(obj.rawData[oFaceAngleYaw]) + oldX * coss(obj.rawData[oFaceAngleYaw]);
 }

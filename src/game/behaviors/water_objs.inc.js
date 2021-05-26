@@ -43,8 +43,8 @@ export const bhv_water_air_bubble_loop = () => {
     const o = ObjectListProc.gCurrentObject
     const gMarioObject = ObjectListProc.gMarioObject
 
-    o.header.gfx.scale[0] = sins(o.rawData[oWaterObjUnkF4]) * 0.5 + 4
-    o.header.gfx.scale[1] = -sins(o.rawData[oWaterObjUnkF4]) * 0.5 + 4
+    o.gfx.scale[0] = sins(o.rawData[oWaterObjUnkF4]) * 0.5 + 4
+    o.gfx.scale[1] = -sins(o.rawData[oWaterObjUnkF4]) * 0.5 + 4
     o.rawData[oWaterObjUnkF4] += 0x400
     if (o.rawData[oTimer] < 30) {
         cur_obj_become_intangible()
@@ -86,9 +86,9 @@ export const bhv_bubble_maybe_loop = () => {
     o.rawData[oPosY] += random_float() * 3 + 6
     o.rawData[oPosX] += random_float() * 10 - 5
     o.rawData[oPosZ] += random_float() * 10 - 5
-    o.header.gfx.scale[0] = sins(o.rawData[oWaterObjUnkF4]) * 0.2 + 1.0
+    o.gfx.scale[0] = sins(o.rawData[oWaterObjUnkF4]) * 0.2 + 1.0
     o.rawData[oWaterObjUnkF4] += o.rawData[oWaterObjUnkFC]
-    o.header.gfx.scale[1] = sins(o.rawData[oWaterObjUnkF8]) * 0.2 + 1.0
+    o.gfx.scale[1] = sins(o.rawData[oWaterObjUnkF8]) * 0.2 + 1.0
     o.rawData[oWaterObjUnkF8] += o.rawData[oWaterObjUnk100]
 }
 
@@ -97,9 +97,9 @@ export const bhv_small_water_wave_loop = () => {
 
     const water_level = SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ])
 
-    o.header.gfx.scale[0] = sins(o.rawData[oWaterObjUnkF4]) * 0.2 + 1.0
+    o.gfx.scale[0] = sins(o.rawData[oWaterObjUnkF4]) * 0.2 + 1.0
     o.rawData[oWaterObjUnkF4] += o.rawData[oWaterObjUnkFC]
-    o.header.gfx.scale[1] = sins(o.rawData[oWaterObjUnkF8]) * 0.2 + 1.0
+    o.gfx.scale[1] = sins(o.rawData[oWaterObjUnkF8]) * 0.2 + 1.0
     o.rawData[oWaterObjUnkF8] += o.rawData[oWaterObjUnk100]
 
     if (o.rawData[oPosY] > water_level) { // bubble hits water surface
@@ -117,9 +117,9 @@ export const bhv_small_water_wave_loop = () => {
 
 const scale_bubble_sin = () => {
     const o = ObjectListProc.gCurrentObject
-    o.header.gfx.scale[0] = sins(o.rawData[oWaterObjUnkF4]) * 0.5 + 2.0
+    o.gfx.scale[0] = sins(o.rawData[oWaterObjUnkF4]) * 0.5 + 2.0
     o.rawData[oWaterObjUnkF4] += o.rawData[oWaterObjUnkFC]
-    o.header.gfx.scale[1] = sins(o.rawData[oWaterObjUnkF8]) * 0.5 + 2.0
+    o.gfx.scale[1] = sins(o.rawData[oWaterObjUnkF8]) * 0.5 + 2.0
     o.rawData[oWaterObjUnkF8] += o.rawData[oWaterObjUnk100]
 }
 

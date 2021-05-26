@@ -197,6 +197,11 @@ window.onload = () => {
             startGame()
         }
     })
-    document.getElementById('mainContent').hidden = false
+
+    if (url.searchParams.get("autostart") && url.searchParams.get("fullscreen")) {
+        document.getElementById('mainContent').hidden = true
+    } else {
+        document.getElementById('mainContent').hidden = false
+    }
 }
 

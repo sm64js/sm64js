@@ -34,12 +34,18 @@ const renderModeTable = [
 ]
 
 class GeoRenderer {
-
     constructor() {
 
-        this.gMatStack = new Array(32).fill(0).map(() => new Array(4).fill(0).map(() => new Array(4).fill(0)))
+        this.gMatStack = new Array(32).fill(0).map(() => MathUtil.Mat4())
         this.gMatStackIndex = 0
         this.gAreaUpdateCounter = 0
+
+        this.gCurGraphNodeRoot = null
+        this.gCurGraphNodeMasterList = null
+        this.gCurGraphNodeCamFrustum = null
+        this.gCurGraphNodeCamera = null
+        this.gCurGraphNodeObject = null
+        this.gCurGraphNodeHeldObject = null
 
         this.ANIM_TYPE_NONE                  = 0
 
@@ -64,16 +70,15 @@ class GeoRenderer {
         }
 
         for (let i = 0; i < GraphNode.GFX_NUM_MASTER_LISTS; i++) {
-            if (node.wrapper.listHeads[i]) {
+            if (node.listHeads[i]) {
                 if (modeList[i] == null) throw "need to add render mode - i: " + i
                 Gbi.gDPSetRenderMode(Game.gDisplayList, modeList[i])
-                for (const displayNode of node.wrapper.listHeads[i]) {
+                for (const displayNode of node.listHeads[i]) {
                     Gbi.gSPMatrix(Game.gDisplayList, displayNode.transform, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
                     Gbi.gSPDisplayList(Game.gDisplayList, displayNode.displayList)
 
                 }
             }
-
         }
 
         if (enableZBuffer) {
@@ -82,24 +87,22 @@ class GeoRenderer {
     }
 
     geo_process_master_list(node) {
-
         if (!this.gCurGraphNodeMasterList && node.children[0]) {
             this.gCurGraphNodeMasterList = node
-            node.wrapper.listHeads.fill(null)
+            node.listHeads.fill(null)
             this.geo_process_node_and_siblings(node.children)
             this.geo_process_master_list_sub(node)
             this.gCurGraphNodeMasterList = null
         }
-
     }
 
     geo_process_ortho_projection(node) {
         if (node.children[0]) {
-            const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
-            const left = (this.gCurGraphNodeRoot.wrapper.x - this.gCurGraphNodeRoot.wrapper.width) / 2.0 * node.wrapper.scale
-            const right = (this.gCurGraphNodeRoot.wrapper.x + this.gCurGraphNodeRoot.wrapper.width) / 2.0 * node.wrapper.scale
-            const top = (this.gCurGraphNodeRoot.wrapper.y - this.gCurGraphNodeRoot.wrapper.height) / 2.0 * node.wrapper.scale
-            const bottom = (this.gCurGraphNodeRoot.wrapper.y + this.gCurGraphNodeRoot.wrapper.height) / 2.0 * node.wrapper.scale
+            const mtx = MathUtil.Mat4()
+            const left = (this.gCurGraphNodeRoot.x - this.gCurGraphNodeRoot.width) / 2.0 * node.scale
+            const right = (this.gCurGraphNodeRoot.x + this.gCurGraphNodeRoot.width) / 2.0 * node.scale
+            const top = (this.gCurGraphNodeRoot.y - this.gCurGraphNodeRoot.height) / 2.0 * node.scale
+            const bottom = (this.gCurGraphNodeRoot.y + this.gCurGraphNodeRoot.height) / 2.0 * node.scale
 
             MathUtil.guOrtho(mtx, left, right, bottom, top, -2.0, 2.0, 1.0)
             //Gbi.gSPPerspNormalize(Game.gDisplayList, 0xFFFF)
@@ -110,19 +113,20 @@ class GeoRenderer {
     }
 
     geo_process_perspective(node) {
-        if (node.wrapper.fnNode.func) {
-            if (node.wrapper.fnNode.func != Camera.geo_camera_fov)
+        const f = node.func
+        if (f.func) {
+            if (f.func != Camera.geo_camera_fov)
                 throw "geo process perspective "
-           node.wrapper.fnNode.func.call(Camera, GraphNode.GEO_CONTEXT_RENDER, node.wrapper)
+           f.func.call(Camera, GraphNode.GEO_CONTEXT_RENDER, node)
         }
 
         if (node.children[0]) {
             const aspect = canvas.width / canvas.height
-            const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
+            const mtx = MathUtil.Mat4()
             const perspNorm = {}
 
             MathUtil.guPerspective(mtx, perspNorm,
-                node.wrapper.fov, aspect, node.wrapper.near, node.wrapper.far, 1.0)
+                node.fov, aspect, node.near, node.far, 1.0)
 
             //Gbi.gSPPerspNormalize(Game.gDisplayList, perspNorm.value)
             Gbi.gSPMatrix(Game.gDisplayList, mtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
@@ -134,31 +138,31 @@ class GeoRenderer {
     }
 
     geo_process_camera(node) {
-        if (node.wrapper.fnNode.func) {
-            if (node.wrapper.fnNode.func != Camera.geo_camera_main)
+        const f = node.func
+        if (f.func) {
+            if (f.func != Camera.geo_camera_main)
                 throw "geo process perspective "
-           node.wrapper.fnNode.func.call(Camera, GraphNode.GEO_CONTEXT_RENDER, node.wrapper)
+           f.func.call(Camera, GraphNode.GEO_CONTEXT_RENDER, node)
         }
 
-        const rollMtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
-        const cameraTransform = new Array(4).fill(0).map(() => new Array(4).fill(0))
-        const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        const rollMtx = MathUtil.Mat4()
+        const cameraTransform = MathUtil.Mat4()
+        const mtx = MathUtil.Mat4()
 
-        MathUtil.mtxf_rotate_xy(rollMtx, node.wrapper.rollScreen)
+        MathUtil.mtxf_rotate_xy(rollMtx, node.rollScreen)
 
         Gbi.gSPMatrix(Game.gDisplayList, rollMtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_MUL | Gbi.G_MTX_NOPUSH)
-        MathUtil.mtxf_lookat(cameraTransform, node.wrapper.pos, node.wrapper.focus, node.wrapper.roll)
+        MathUtil.mtxf_lookat(cameraTransform, node.pos, node.focus, node.roll)
         MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], cameraTransform, this.gMatStack[this.gMatStackIndex])
         this.gMatStackIndex++
         if (node.children[0]) {
             this.gCurGraphNodeCamera = node
-            node.wrapper.matrixPtr = this.gMatStack[this.gMatStackIndex]
+            node.matrixPtr = this.gMatStack[this.gMatStackIndex]
             this.geo_process_node_and_siblings(node.children)
             this.gCurGraphNodeCamera = null
         }
         this.gMatStackIndex--
     }
-
 
     /**
      * Process a translation / rotation node. A transformation matrix based
@@ -169,88 +173,93 @@ class GeoRenderer {
     geo_process_translation_rotation(node) {
         let mtxf = MathUtil.Mat4()
 
-        MathUtil.mtxf_rotate_zxy_and_translate(mtxf, node.wrapper.translation, node.wrapper.rotation)
+        MathUtil.mtxf_rotate_zxy_and_translate(mtxf, node.translation, node.rotation)
         MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
         this.gMatStackIndex++
-        if (node.wrapper.displayList != null) {
-            this.geo_append_display_list(node.wrapper.displayList, node.flags >> 8)
+        if (node.displayList) {
+            this.geo_append_display_list(node.displayList, node.flags >> 8)
         }
-        if (node.children != null) {
-            this.geo_process_node_and_siblings(node.children)
-        }
+        this.geo_process_node_and_siblings(node.children)
         this.gMatStackIndex--
     }
 
+    /**
+     * Process a translation node. A transformation matrix based on the node's
+     * translation is created and pushed on both the float and fixed point matrix stacks.
+     * For the rest it acts as a normal display list node.
+     */
+    geo_process_translation(node) {
+        let mtxf = MathUtil.Mat4()
 
-    geo_process_background(node) {
+        MathUtil.mtxf_rotate_zxy_and_translate(mtxf, node.translation, GraphNode.gVec3sZero)
+        MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
+        this.gMatStackIndex++
+        if (node.displayList) {
+            this.geo_append_display_list(node.displayList, node.flags >> 8)
+        }
+        this.geo_process_node_and_siblings(node.children)
+        this.gMatStackIndex--
+    }
 
-        let list = []
-        if (node.wrapper.backgroundFunc) {
-            list = node.wrapper.backgroundFunc(GraphNode.GEO_CONTEXT_RENDER, node.wrapper)
+    /**
+     * Process a rotation node. A transformation matrix based on the node's
+     * rotation is created and pushed on both the float and fixed point matrix stacks.
+     * For the rest it acts as a normal display list node.
+     */
+    geo_process_rotation(node) {
+        let mtxf = MathUtil.Mat4()
+
+        MathUtil.mtxf_rotate_zxy_and_translate(mtxf, [0, 0, 0], node.rotation)
+        MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
+        this.gMatStackIndex++
+        if (node.displayList) {
+            this.geo_append_display_list(node.displayList, node.flags >> 8)
         }
 
-        if (list.length > 0) {
+        this.geo_process_node_and_siblings(node.children)
+        this.gMatStackIndex--
+    }
+
+    geo_process_background(node) {
+        let list
+        if (node.backgroundFunc) {
+            list = node.backgroundFunc(GraphNode.GEO_CONTEXT_RENDER, node)
+        }
+
+        if (list) {
             this.geo_append_display_list(list, node.flags >> 8)
         } else if (this.gCurGraphNodeMasterList) {
             const gfx = []
             Gbi.gDPSetCycleType(gfx, Gbi.G_CYC_FILL)
-            Gbi.gDPSetFillColor(gfx, node.wrapper.background) 
+            Gbi.gDPSetFillColor(gfx, node.background) 
             Gbi.gDPFillRectangle(gfx, 0, 0, canvas.width - 1, canvas.height - 1)
             Gbi.gDPSetCycleType(gfx, Gbi.G_CYC_1CYCLE)
             Gbi.gSPEndDisplayList(gfx)
-
             this.geo_append_display_list(gfx, 0)
         }
-
-        if (node.children[0]) {
-            this.geo_process_node_and_siblings(node.children)
-        }
-
+        this.geo_process_node_and_siblings(node.children)
     }
 
-    // HEY SHOULD THIS BE node.wrapper?
     geo_process_generated_list(node) {
-        if (node.wrapper.fnNode.func) {
-            const fnNode = node.wrapper.fnNode
-
-            const list = fnNode.func.call(fnNode.funcClass, GraphNode.GEO_CONTEXT_RENDER, node.wrapper, this.gMatStack[this.gMatStackIndex])
+        const f = node.func
+        if (f.func) {
+            const list = f.func.call(f.funcClass, GraphNode.GEO_CONTEXT_RENDER, node, this.gMatStack[this.gMatStackIndex])
             if (list && list.length > 0) {
                 this.geo_append_display_list(list, node.flags >> 8)
             }
         }
-        
     }
 
     geo_process_scale(node) {
-
-        const scaleVec = [ node.wrapper.scale, node.wrapper.scale, node.wrapper.scale ]
+        const scaleVec = [ node.scale, node.scale, node.scale ]
         MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex], scaleVec)
         this.gMatStackIndex++
 
-        if (node.wrapper.displayList) {
+        if (node.displayList) {
             throw "more implementation needed in geo process scale"
         }
 
-        if (node.children[0]) {
-            this.geo_process_node_and_siblings(node.children)
-        }
-
-        this.gMatStackIndex--
-
-    }
-
-    geo_process_rotation(node) {
-        const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
-        MathUtil.mtxf_rotate_zxy_and_translate(mtxf, [0, 0, 0], node.wrapper.rotation)
-        MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
-        this.gMatStackIndex++
-        if (node.wrapper.displayList) {
-            this.geo_append_display_list(node.wrapper.displayList, node.flags >> 8)
-        }
-
-        if (node.children[0]) {
-            this.geo_process_node_and_siblings(node.children)
-        }
+        this.geo_process_node_and_siblings(node.children)
         this.gMatStackIndex--
     }
 
@@ -261,10 +270,9 @@ class GeoRenderer {
     }
 
     geo_process_animated_part(node) {
-
-        const matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        const matrix = MathUtil.Mat4()
         const rotation = [ 0, 0, 0 ]
-        const translation = [ ...node.wrapper.translation ]
+        const translation = [ ...node.translation ]
 
         if (this.gCurAnimType == Mario.ANIM_TYPE_TRANSLATION) {
             translation[0] += this.read_next_anim_value() + this.gCurAnimTranslationMultiplier
@@ -300,16 +308,12 @@ class GeoRenderer {
         MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], matrix, this.gMatStack[this.gMatStackIndex])
         this.gMatStackIndex++
         
-        if (node.wrapper.displayList) {
-            this.geo_append_display_list(node.wrapper.displayList, node.flags >> 8)
+        if (node.displayList) {
+            this.geo_append_display_list(node.displayList, node.flags >> 8)
         }
 
-        if (node.children[0]) {
-            this.geo_process_node_and_siblings(node.children)
-        }
-
+        this.geo_process_node_and_siblings(node.children)
         this.gMatStackIndex--
-
     }
 
     geo_set_animation_globals(node, hasAnimation) {
@@ -343,16 +347,16 @@ class GeoRenderer {
     }
 
     obj_is_in_view(node, matrix) {
-        if (node.node.flags & GraphNode.GRAPH_RENDER_INVISIBLE) return false
+        if (node.flags & GraphNode.GRAPH_RENDER_INVISIBLE) return false
 
         const geo = node.sharedChild
-        const halfFov = (this.gCurGraphNodeCamFrustum.wrapper.fov / 2.0 + 1.0) * 32768.0 / 180.0 + 0.5
+        const halfFov = (this.gCurGraphNodeCamFrustum.fov / 2.0 + 1.0) * 32768.0 / 180.0 + 0.5
 
         const hScreenEdge = -matrix[3][2] * Math.sin(halfFov / 0x8000 * Math.PI) / Math.cos(halfFov / 0x8000 * Math.PI)
 
         let cullingRadius
         if (geo != undefined && geo.type == GraphNode.GRAPH_NODE_TYPE_CULLING_RADIUS) {
-            cullingRadius = geo.wrapper.radius
+            cullingRadius = geo.radius
         } else {
             cullingRadius = 300
         }
@@ -374,74 +378,62 @@ class GeoRenderer {
     }
 
     geo_process_object(node) {
+        const mtxf = MathUtil.Mat4()
+        const object = node.object
 
-        const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
-        const object = node.wrapper.wrapperObjectNode.wrapperObject
+        const hasAnimation = (object.gfx.flags & GraphNode.GRAPH_RENDER_HAS_ANIMATION) != 0
 
-        const hasAnimation = (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_HAS_ANIMATION) != 0
+        if (object.gfx.areaIndex == this.gCurGraphNodeRoot.areaIndex) {
 
-        if (object.header.gfx.unk18 == this.gCurGraphNodeRoot.wrapper.areaIndex) {
-
-            if (object.header.gfx.throwMatrix != null) {
-                MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], object.header.gfx.throwMatrix, this.gMatStack[this.gMatStackIndex])
-            } else if (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_CYLBOARD) {
-                MathUtil.mtxf_cylboard(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex], object.header.gfx.pos, this.gCurGraphNodeCamera.wrapper.roll)
-            } else if (object.header.gfx.node.flags & GraphNode.GRAPH_RENDER_BILLBOARD) {
-                MathUtil.mtxf_billboard(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex], object.header.gfx.pos, this.gCurGraphNodeCamera.wrapper.roll)
+            if (object.gfx.throwMatrix) {
+                MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], object.gfx.throwMatrix, this.gMatStack[this.gMatStackIndex])
+            } else if (object.gfx.flags & GraphNode.GRAPH_RENDER_CYLBOARD) {
+                MathUtil.mtxf_cylboard(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex], object.gfx.pos, this.gCurGraphNodeCamera.roll)
+            } else if (object.gfx.flags & GraphNode.GRAPH_RENDER_BILLBOARD) {
+                MathUtil.mtxf_billboard(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex], object.gfx.pos, this.gCurGraphNodeCamera.roll)
             } else {
-                MathUtil.mtxf_rotate_zxy_and_translate(mtxf, object.header.gfx.pos, object.header.gfx.angle)
+                MathUtil.mtxf_rotate_zxy_and_translate(mtxf, object.gfx.pos, object.gfx.angle)
                 MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mtxf, this.gMatStack[this.gMatStackIndex])
             }
 
-            MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex + 1], object.header.gfx.scale)
+            MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex + 1], object.gfx.scale)
 
-            object.header.gfx.throwMatrix = this.gMatStack[++this.gMatStackIndex]
-            object.header.gfx.cameraToObject = [ 
+            object.gfx.throwMatrix = this.gMatStack[++this.gMatStackIndex]
+            object.gfx.cameraToObject = [ 
                 this.gMatStack[this.gMatStackIndex][3][0],
                 this.gMatStack[this.gMatStackIndex][3][1],
                 this.gMatStack[this.gMatStackIndex][3][2]
             ]
 
-            if (object.header.gfx.unk38.curAnim) {
-                this.geo_set_animation_globals(object.header.gfx.unk38, hasAnimation)
+            if (object.gfx.unk38.curAnim) {
+                this.geo_set_animation_globals(object.gfx.unk38, hasAnimation)
             }
 
-            if (this.obj_is_in_view(object.header.gfx, this.gMatStack[this.gMatStackIndex])) { 
-
-                if (object.header.gfx.sharedChild) {
-                    this.gCurGraphNodeObject = node.wrapper
-                    object.header.gfx.sharedChild.parent = object.header.gfx.node
-                    this.geo_process_single_node(object.header.gfx.sharedChild)
-                    object.header.gfx.sharedChild.parent = null
+            if (this.obj_is_in_view(object.gfx, this.gMatStack[this.gMatStackIndex])) { 
+                if (object.gfx.sharedChild) {
+                    this.gCurGraphNodeObject = node
+                    object.gfx.sharedChild.parent = object.gfx
+                    this.geo_process_single_node(object.gfx.sharedChild)
+                    object.gfx.sharedChild.parent = null
                     this.gCurGraphNodeObject = null
                 }
 
-                if (object.header.gfx.node.children[0]) {
+                if (object.gfx.children[0]) {
                     throw "process object has children that need to be processed"
                 }
-
             }
 
             this.gMatStackIndex--
             this.gCurAnimType = this.ANIM_TYPE_NONE
-            object.header.gfx.throwMatrix = null
-
+            object.gfx.throwMatrix = null
         }
-
     }
 
     geo_process_object_parent(node) {
-
-        if (node.wrapper.sharedChild) {
-
-            node.wrapper.sharedChild.parent = node //temparaily assigining itself as parent
-            if (node.wrapper.sharedChild.children[0]) {
-
-                this.geo_process_node_and_siblings(node.wrapper.sharedChild.children)
-
-            }
-            else throw "objectParent sharedChild has no children"
-            node.wrapper.sharedChild.parent = null
+        if (node.sharedChild) {
+            node.sharedChild.parent = node  // temparaily assigining itself as parent
+            this.geo_process_node_and_siblings(node.sharedChild.children)
+            node.sharedChild.parent = null
         }
 
         if (node.children[0]) {
@@ -451,18 +443,14 @@ class GeoRenderer {
     }
 
     geo_process_display_list(node) {
-        if (node.wrapper.displayList) {
-            this.geo_append_display_list(node.wrapper.displayList, node.flags >> 8)
+        if (node.displayList) {
+            this.geo_append_display_list(node.displayList, node.flags >> 8)
         }
-
-        if (node.children[0]) {
-            this.geo_process_node_and_siblings(node.children)
-        }
+        this.geo_process_node_and_siblings(node.children)
     }
 
     geo_append_display_list(displayList, layer) {
-
-        const gMatStackCopy = new Array(4).fill(0).map(() => new Array(4).fill(0))
+        const gMatStackCopy = MathUtil.Mat4()
         MathUtil.mtxf_to_mtx(gMatStackCopy, this.gMatStack[this.gMatStackIndex])
 
         if (this.gCurGraphNodeMasterList) {
@@ -471,24 +459,20 @@ class GeoRenderer {
                 displayList
             }
 
-            if (this.gCurGraphNodeMasterList.wrapper.listHeads[layer]) {
-                this.gCurGraphNodeMasterList.wrapper.listHeads[layer].push(listNode)
+            if (this.gCurGraphNodeMasterList.listHeads[layer]) {
+                this.gCurGraphNodeMasterList.listHeads[layer].push(listNode)
             } else {
-                this.gCurGraphNodeMasterList.wrapper.listHeads[layer] = [ listNode ]
-            }
-            
+                this.gCurGraphNodeMasterList.listHeads[layer] = [ listNode ]
+            }  
         }
-
     }
 
     geo_process_level_of_detail(node) {
         const mtx = this.gMatStack[this.gMatStackIndex]
         const distanceFromCam = -mtx[3][2]
 
-        if (node.wrapper.minDistance <= distanceFromCam && distanceFromCam < node.wrapper.maxDistance) {
-            if (node.children[0]) {
-                this.geo_process_node_and_siblings(node.children)
-            }
+        if (node.minDistance <= distanceFromCam && distanceFromCam < node.maxDistance) {
+            this.geo_process_node_and_siblings(node.children)
         }
     }
 
@@ -500,25 +484,22 @@ class GeoRenderer {
      */
     geo_process_billboard(node) {
         this.gMatStackIndex++
-        const translation = [...node.wrapper.translation]
-        MathUtil.mtxf_billboard(this.gMatStack[this.gMatStackIndex], this.gMatStack[this.gMatStackIndex - 1], translation, this.gCurGraphNodeCamera.wrapper.roll)
+        const translation = [...node.translation]
+        MathUtil.mtxf_billboard(this.gMatStack[this.gMatStackIndex], this.gMatStack[this.gMatStackIndex - 1], translation, this.gCurGraphNodeCamera.roll)
 
         if (this.gCurGraphNodeHeldObject) {
             MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex], this.gMatStack[this.gMatStackIndex],
-                             this.gCurGraphNodeHeldObject.wrapper.objNode.header.gfx.scale)
+                             this.gCurGraphNodeHeldObject.object.gfx.scale)  // scale of the object being held, NOT the heldObject
         } else if (this.gCurGraphNodeObject) {
             MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex], this.gMatStack[this.gMatStackIndex], this.gCurGraphNodeObject.scale)
         }
 
-        if (node.wrapper.displayList) {
-            this.geo_append_display_list(node.wrapper.displayList, node.flags >> 8)
+        if (node.displayList) {
+            this.geo_append_display_list(node.displayList, node.flags >> 8)
         }
 
-        if (node.children[0]) {
-            this.geo_process_node_and_siblings(node.children)
-        }
+        this.geo_process_node_and_siblings(node.children)
         this.gMatStackIndex--
-
     }
 
     geo_process_shadow(node) {
@@ -527,11 +508,11 @@ class GeoRenderer {
         if (this.gCurGraphNodeCamera && this.gCurGraphNodeObject) {
             if (this.gCurGraphNodeHeldObject) {
                 shadowPos = []
-                MathUtil.get_pos_from_transform_mtx(shadowPos, this.gMatStack[this.gMatStackIndex], this.gCurGraphNodeCamera.wrapper.matrixPtr)
-                shadowScale = node.wrapper.shadowScale
+                MathUtil.get_pos_from_transform_mtx(shadowPos, this.gMatStack[this.gMatStackIndex], this.gCurGraphNodeCamera.matrixPtr)
+                shadowScale = node.shadowScale
             } else {
                 shadowPos = [...this.gCurGraphNodeObject.pos]
-                shadowScale = node.wrapper.shadowScale * this.gCurGraphNodeObject.scale[0]
+                shadowScale = node.shadowScale * this.gCurGraphNodeObject.scale[0]
             }
 
             let objScale = 1.0
@@ -540,7 +521,7 @@ class GeoRenderer {
                 if (this.gCurAnimType == this.ANIM_TYPE_TRANSLATION || this.gCurAnimType == this.ANIM_TYPE_LATERAL_TRANSLATION) {
                     const geo = node.children[0]
                     if (geo && geo.type == GraphNode.GRAPH_NODE_TYPE_SCALE) {
-                        objScale = geo.wrapper.scale
+                        objScale = geo.scale
                     }
                     const animOffset = new Array(3)
                     animOffset[0] = this.read_next_anim_value() * this.gCurAnimTranslationMultiplier * objScale
@@ -558,13 +539,13 @@ class GeoRenderer {
                 }
             }
 
-            const shadowList = create_shadow_below_xyz(shadowPos[0], shadowPos[1], shadowPos[2], shadowScale, node.wrapper.shadowSolidity, node.wrapper.shadowType)
+            const shadowList = create_shadow_below_xyz(shadowPos[0], shadowPos[1], shadowPos[2], shadowScale, node.shadowSolidity, node.shadowType)
 
             if (shadowList) {
-                const mtxf = new Array(4).fill(0).map(() => new Array(4).fill(0))
+                const mtxf = MathUtil.Mat4()
                 this.gMatStackIndex++
                 MathUtil.mtxf_translate(mtxf, shadowPos)
-                MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex], mtxf, this.gCurGraphNodeCamera.wrapper.matrixPtr)
+                MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex], mtxf, this.gCurGraphNodeCamera.matrixPtr)
 
                 if (gShadowAboveWaterOrLava) {
                     this.geo_append_display_list(shadowList, 4);
@@ -577,32 +558,28 @@ class GeoRenderer {
             }
         }
 
-        if (node.children[0]) {
-            this.geo_process_node_and_siblings(node.children)
-        }
+        this.geo_process_node_and_siblings(node.children)
     }
-
 
     /**
      * Process a held object node.
      */
     geo_process_held_object(node) {
         const mat = MathUtil.Mat4()
-        const translation = []
-        const mtx = []
+        const translation = [0, 0, 0]
 
-        const fnNode = node.wrapper.fnNode
-        if (fnNode.func) {
-            fnNode.func.call(fnNode.funcClass, GraphNode.GEO_CONTEXT_RENDER, node.wrapper, this.gMatStack[this.gMatStackIndex])
+        const f = node.func
+        if (f.func) {
+            f.func.call(f.funcClass, GraphNode.GEO_CONTEXT_RENDER, node, this.gMatStack[this.gMatStackIndex])
         }
 
-        const objNode = node.wrapper.objNode
-        if (objNode && objNode.header.gfx.sharedChild) {
-            let /*s32*/ hasAnimation = (objNode.header.gfx.node.flags & GraphNode.GRAPH_RENDER_HAS_ANIMATION) != 0
+        const object = node.object
+        if (object && object.gfx.sharedChild) {
+            let /*s32*/ hasAnimation = (object.gfx.flags & GraphNode.GRAPH_RENDER_HAS_ANIMATION) != 0
 
-            translation[0] = node.wrapper.translation[0] / 4.0
-            translation[1] = node.wrapper.translation[1] / 4.0
-            translation[2] = node.wrapper.translation[2] / 4.0
+            translation[0] = node.translation[0] / 4.0
+            translation[1] = node.translation[1] / 4.0
+            translation[2] = node.translation[2] / 4.0
 
             MathUtil.mtxf_translate(mat, translation)
             MathUtil.mtxf_copy(this.gMatStack[this.gMatStackIndex + 1], this.gCurGraphNodeObject.throwMatrix)
@@ -611,9 +588,9 @@ class GeoRenderer {
             this.gMatStack[this.gMatStackIndex + 1][3][2] = this.gMatStack[this.gMatStackIndex][3][2]
             MathUtil.mtxf_mul(this.gMatStack[this.gMatStackIndex + 1], mat, this.gMatStack[this.gMatStackIndex + 1])
             MathUtil.mtxf_scale_vec3f(this.gMatStack[this.gMatStackIndex + 1], this.gMatStack[this.gMatStackIndex + 1],
-                             objNode.header.gfx.scale)
-            if (fnNode.func) {
-                fnNode.func.call(fnNode.funcClass, GraphNode.GEO_CONTEXT_HELD_OBJ, node.wrapper, this.gMatStack[this.gMatStackIndex + 1])
+                             object.gfx.scale)
+            if (f.func) {
+                f.func.call(f.funcClass, GraphNode.GEO_CONTEXT_HELD_OBJ, node, this.gMatStack[this.gMatStackIndex + 1])
             }
             this.gMatStackIndex++
 
@@ -627,11 +604,11 @@ class GeoRenderer {
 
             this.gCurAnimType = 0
             this.gCurGraphNodeHeldObject = node
-            if (objNode.header.gfx.unk38.curAnim) {
-                this.geo_set_animation_globals(objNode.header.gfx.unk38, hasAnimation)
+            if (object.gfx.unk38.curAnim) {
+                this.geo_set_animation_globals(object.gfx.unk38, hasAnimation)
             }
 
-            this.geo_process_single_node(objNode.header.gfx.sharedChild)
+            this.geo_process_single_node(object.gfx.sharedChild)
 
             this.gCurGraphNodeHeldObject = null
             this.gCurAnimType = gGeoTempState.type
@@ -643,79 +620,43 @@ class GeoRenderer {
             this.gMatStackIndex--
         }
 
-        if (node.children) {
-            this.geo_process_node_and_siblings(node.children)
-        }
+        this.geo_process_node_and_siblings(node.children)
     }
 
 
     geo_process_switch_case(node) {
-        const fnNode = node.wrapper.fnNode
-        if (fnNode.func) {
-            fnNode.func.call(fnNode.funcClass, GraphNode.GEO_CONTEXT_RENDER, node.wrapper, this.gMatStack[this.gMatStackIndex])
+        const f = node.func
+        if (f.func) {
+            f.func.call(f.funcClass, GraphNode.GEO_CONTEXT_RENDER, node, this.gMatStack[this.gMatStackIndex])
         }
 
-        if (node.children[node.wrapper.selectedCase]) {
-            this.geo_process_single_node(node.children[node.wrapper.selectedCase])
+        if (node.children[node.selectedCase]) {
+            this.geo_process_single_node(node.children[node.selectedCase])
         }
     }
 
     geo_process_single_node(node) {
         switch (node.type) {
 
-            case GraphNode.GRAPH_NODE_TYPE_ORTHO_PROJECTION:
-                this.geo_process_ortho_projection(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_PERSPECTIVE:
-                this.geo_process_perspective(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_MASTER_LIST:
-                this.geo_process_master_list(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_CAMERA:
-                this.geo_process_camera(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_BACKGROUND:
-                this.geo_process_background(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_GENERATED_LIST:
-                this.geo_process_generated_list(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_DISPLAY_LIST:
-                this.geo_process_display_list(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_OBJECT_PARENT:
-                this.geo_process_object_parent(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_OBJECT:
-                this.geo_process_object(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_SCALE:
-                this.geo_process_scale(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_ANIMATED_PART:
-                this.geo_process_animated_part(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_ROTATION:
-                this.geo_process_rotation(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_SWITCH_CASE:
-                this.geo_process_switch_case(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_SHADOW:
-                this.geo_process_shadow(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_LEVEL_OF_DETAIL:
-                this.geo_process_level_of_detail(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_BILLBOARD:
-                this.geo_process_billboard(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_TRANSLATION_ROTATION:
-                this.geo_process_translation_rotation(node); break
-
-            case GraphNode.GRAPH_NODE_TYPE_HELD_OBJ:
-                this.geo_process_held_object(node); break
+            case GraphNode.GRAPH_NODE_TYPE_ANIMATED_PART:           this.geo_process_animated_part(node);           break
+            case GraphNode.GRAPH_NODE_TYPE_BACKGROUND:              this.geo_process_background(node);              break
+            case GraphNode.GRAPH_NODE_TYPE_BILLBOARD:               this.geo_process_billboard(node);               break
+            case GraphNode.GRAPH_NODE_TYPE_CAMERA:                  this.geo_process_camera(node);                  break
+            case GraphNode.GRAPH_NODE_TYPE_DISPLAY_LIST:            this.geo_process_display_list(node);            break
+            case GraphNode.GRAPH_NODE_TYPE_GENERATED_LIST:          this.geo_process_generated_list(node);          break
+            case GraphNode.GRAPH_NODE_TYPE_HELD_OBJ:                this.geo_process_held_object(node);             break
+            case GraphNode.GRAPH_NODE_TYPE_LEVEL_OF_DETAIL:         this.geo_process_level_of_detail(node);         break
+            case GraphNode.GRAPH_NODE_TYPE_MASTER_LIST:             this.geo_process_master_list(node);             break
+            case GraphNode.GRAPH_NODE_TYPE_OBJECT:                  this.geo_process_object(node);                  break
+            case GraphNode.GRAPH_NODE_TYPE_OBJECT_PARENT:           this.geo_process_object_parent(node);           break
+            case GraphNode.GRAPH_NODE_TYPE_ORTHO_PROJECTION:        this.geo_process_ortho_projection(node);        break
+            case GraphNode.GRAPH_NODE_TYPE_PERSPECTIVE:             this.geo_process_perspective(node);             break
+            case GraphNode.GRAPH_NODE_TYPE_ROTATION:                this.geo_process_rotation(node);                break
+            case GraphNode.GRAPH_NODE_TYPE_SCALE:                   this.geo_process_scale(node);                   break
+            case GraphNode.GRAPH_NODE_TYPE_SHADOW:                  this.geo_process_shadow(node);                  break
+            case GraphNode.GRAPH_NODE_TYPE_SWITCH_CASE:             this.geo_process_switch_case(node);             break
+            case GraphNode.GRAPH_NODE_TYPE_TRANSLATION:             this.geo_process_translation(node);             break
+            case GraphNode.GRAPH_NODE_TYPE_TRANSLATION_ROTATION:    this.geo_process_translation_rotation(node);    break
 
             default:
                 /// remove this check once all types have been added
@@ -723,40 +664,28 @@ class GeoRenderer {
                     console.log(node)
                     throw "unimplemented type in geo renderer"
                 }
-                if (node.children[0]) {
-                    this.geo_process_node_and_siblings(node.children)
-                }
+                this.geo_process_node_and_siblings(node.children)
         }
     }
 
     geo_process_node_and_siblings(children) {
-
         for (const child of children) {
-
             if (!(child.flags & GraphNode.GRAPH_RENDER_ACTIVE)) {
                 if (child.type == GraphNode.GRAPH_NODE_TYPE_OBJECT) {
-                    child.wrapper.throwMatrix = null
+                    child.throwMatrix = null
                 }
                 continue
             }
             this.geo_process_single_node(child)
-
         }
-
     }
 
     geo_process_root(root, b, c, clearColor) {
         //console.log("processing root node to render")
-        if (root.node.flags & GraphNode.GRAPH_RENDER_ACTIVE) {
-
+        if (root.flags & GraphNode.GRAPH_RENDER_ACTIVE) {
             MathUtil.mtxf_identity(this.gMatStack[this.gMatStackIndex])
-
-            this.gCurGraphNodeRoot = root.node
-
-            if (root.node.children[0]) { ///atleast one child
-                this.geo_process_node_and_siblings(root.node.children)
-            }
-
+            this.gCurGraphNodeRoot = root
+            this.geo_process_node_and_siblings(root.children)
             this.gCurGraphNodeRoot = null
         }
     }

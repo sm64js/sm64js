@@ -1,67 +1,39 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
-import { geo_add_child, GRAPH_RENDER_INVISIBLE, GRAPH_NODE_TYPE_OBJECT, geo_remove_child, GRAPH_RENDER_BILLBOARD, GRAPH_RENDER_ACTIVE } from "../engine/graph_node"
-import { GeoLayoutInstance } from "../engine/GeoLayout"
+import { init_graph_node, geo_add_child, GRAPH_RENDER_INVISIBLE, GRAPH_NODE_TYPE_OBJECT, geo_remove_child, GRAPH_RENDER_BILLBOARD, GRAPH_RENDER_ACTIVE } from "../engine/graph_node"
 import { ACTIVE_FLAG_ACTIVE, ACTIVE_FLAG_UNK8, RESPAWN_INFO_TYPE_NULL, ACTIVE_FLAG_UNIMPORTANT, OBJ_MOVE_ON_GROUND, oIntangibleTimer, oDamageOrCoinValue, oHealth, oCollisionDistance, oDrawingDistance, oDistanceToMario, oRoom, oFloorHeight, oPosX, oPosY, oPosZ, ACTIVE_FLAGS_DEACTIVATED } from "../include/object_constants"
 import { mtxf_identity } from "../engine/math_util"
 import * as _Linker from "./Linker"
 
 class SpawnObject {
     constructor() {
-        gLinker.Spawn = this
     }
 
     clear_object_lists() {
+        const gObjectLists = ObjectListProc.gObjectLists
         for (let i = 0; i < ObjectListProc.NUM_OBJ_LISTS; i++) {
-            ObjectListProc.gObjectLists[i].next = ObjectListProc.gObjectLists[i]
-            ObjectListProc.gObjectLists[i].prev = ObjectListProc.gObjectLists[i]
-            ObjectListProc.gObjectLists[i].gfx.wrapperObjectNode = null
+            gObjectLists[i].next = gObjectLists[i]
+            gObjectLists[i].prev = gObjectLists[i]
         }
     }
 
     try_allocate_object(destList) {
-        const nextObj = { //ObjectNode
+        const obj = {
+            gfx: {},
             next: null, prev: null,
-            gfx: { //GraphObjectNode
-                node: { //GraphNode
-                    type: GRAPH_NODE_TYPE_OBJECT,
-                    flags: null,
-                    prev: null,
-                    next: null,
-                    children: [],
-                    wrapper: null
-                }, 
-                sharedChild: { //GraphNode
-                    type: null,
-                    flags: null,
-                    prev: null,
-                    next: null,
-                    children: []
-                },
-                wrapperObjectNode: null
-            },
-            wrapperObject: null
+            activeFlags: 0,
+            rawData: new Array(0x50).fill(0)
         }
+        init_graph_node(obj.gfx, GRAPH_NODE_TYPE_OBJECT)
+        obj.gfx.object = obj
 
-        nextObj.gfx.wrapperObjectNode = nextObj
-        nextObj.gfx.node.wrapper = nextObj.gfx
-        const newObject = { header: nextObj, activeFlags: 0, rawData: new Array(0x50).fill(0) }
-        nextObj.wrapperObject = newObject
+        obj.prev = destList.prev
+        obj.next = destList
+        destList.prev.next = obj
+        destList.prev = obj
 
-        if (!destList.gfx.wrapperObjectNode) { /// no object has been initialized yet
-            Object.assign(destList, nextObj)
-            destList.prev = destList
-            destList.next = destList
-        }
-
-        nextObj.prev = destList.prev
-        nextObj.next = destList
-        destList.prev.next = nextObj
-        destList.prev = nextObj
-        
-
-        geo_add_child(GeoLayoutInstance.gObjParentGraphNode.node, nextObj.gfx.node)
-        return nextObj.wrapperObject
+        geo_add_child(gLinker.GeoLayout.gObjParentGraphNode, obj.gfx)
+        return obj
     }
 
     allocate_object(objList) {
@@ -102,9 +74,9 @@ class SpawnObject {
         obj.rawData[oDistanceToMario] = 19000.0
         obj.rawData[oRoom] = -1
     
-        obj.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
-        obj.header.gfx.pos = [ -10000.0, -10000.0, -10000.0 ]
-        obj.header.gfx.throwMatrix = null
+        obj.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
+        obj.gfx.pos = [ -10000.0, -10000.0, -10000.0 ]
+        obj.gfx.throwMatrix = null
 
         return obj
     }
@@ -128,17 +100,15 @@ class SpawnObject {
         obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED
         obj.prevObj = null
 
-        obj.header.gfx.throwMatrix = null
+        obj.gfx.throwMatrix = null
 
         //func_803206F8 TODO
-        geo_remove_child(obj.header.gfx.node)
+        geo_remove_child(obj.gfx)
 
-        // Don't think this is needed in JS ...? //geo_add_child(GeoLayoutInstance.gObjParentGraphNode.node, obj.header.gfx.node)
+        obj.gfx.flags &= ~GRAPH_RENDER_BILLBOARD
+        obj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
 
-        obj.header.gfx.node.flags &= ~GRAPH_RENDER_BILLBOARD
-        obj.header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE
-
-        this.deallocate_object(obj.header)
+        this.deallocate_object(obj)
     }
 
 
@@ -151,7 +121,8 @@ class SpawnObject {
         } else if (typeof bhv == "string") {
             bhv = gLinker.behaviors[bhv]
             if (!bhv) {
-                throw "need to add this to gLinker.behaviors: " + behavior
+                console.log("need to add this to gLinker.behaviors: " + behavior)
+                bhv = gLinker.behaviors.bhvCarrySomething6
             }
         }
 
@@ -171,16 +142,31 @@ class SpawnObject {
         }
     }
 
+    get_bhv_object_name(bhvScript) {
+        bhvScript = this.get_bhv_script(bhvScript)
+
+        // peek at first command
+        if (Array.isArray(bhvScript[0]) && bhvScript[0][0] == 'BEGIN') {
+            return bhvScript[0][2]
+        }else if (bhvScript[0].command == BhvCmds.begin) {
+            return bhvScript[0].args.name
+        } else {
+            return null
+        }
+    }
+
     create_object(bhvScript) {
         bhvScript = this.get_bhv_script(bhvScript)
+        if (!bhvScript) {
+            return null
+        }
         let objListIndex = this.get_bhv_object_list(bhvScript)
-
         const objList = ObjectListProc.gObjectLists[objListIndex]
-
         const obj = this.allocate_object(objList)
 
-        obj.bhvScript = { commands: bhvScript, index: 0 }
-
+        obj.bhvScript = { commands: bhvScript, index: 0, name: this.get_bhv_object_name(bhvScript) }
+        obj.behavior = bhvScript
+    
         if (objListIndex == ObjectListProc.OBJ_LIST_UNIMPORTANT) {
             obj.activeFlags |= ACTIVE_FLAG_UNIMPORTANT
         }
@@ -196,3 +182,4 @@ class SpawnObject {
 }
 
 export const SpawnObjectInstance = new SpawnObject()
+gLinker.Spawn = SpawnObjectInstance

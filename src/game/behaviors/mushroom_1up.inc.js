@@ -50,9 +50,9 @@ const bhv_1up_init = () => {
 // }
 
 // void pole_1up_move_towards_mario(void) {
-//     f32 sp34 = gMarioObject->header.gfx.pos[0] - o->oPosX;
-//     f32 sp30 = gMarioObject->header.gfx.pos[1] + 120.0f - o->oPosY;
-//     f32 sp2C = gMarioObject->header.gfx.pos[2] - o->oPosZ;
+//     f32 sp34 = gMarioObject->.gfx.pos[0] - o->oPosX;
+//     f32 sp30 = gMarioObject->.gfx.pos[1] + 120.0f - o->oPosY;
+//     f32 sp2C = gMarioObject->.gfx.pos[2] - o->oPosZ;
 //     s16 sp2A = atan2s(sqrtf(sqr(sp34) + sqr(sp2C)), sp30);
 
 //     obj_turn_toward_object(o, gMarioObject, 16, 0x1000);
@@ -220,11 +220,11 @@ const bhv_1up_hidden_loop = () => {
 //     s16 sp26;
 //     switch (o->oAction) {
 //         case 0:
-//             o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
+//             o->.gfx.flags |= GRAPH_RENDER_INVISIBLE;
 //             if (o->o1UpHiddenUnkF4 == o->oBehParams2ndByte) {
 //                 o->oVelY = 40.0f;
 //                 o->oAction = 3;
-//                 o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+//                 o->.gfx.flags &= ~GRAPH_RENDER_INVISIBLE;
 //                 play_sound(SOUND_GENERAL2_1UP_APPEAR, gGlobalSoundSource);
 //             }
 //             break;
@@ -272,11 +272,11 @@ const bhv_1up_hidden_in_pole_loop = () => {
 //     UNUSED s16 sp26;
 //     switch (o->oAction) {
 //         case 0:
-//             o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
+//             o->.gfx.flags |= GRAPH_RENDER_INVISIBLE;
 //             if (o->o1UpHiddenUnkF4 == o->oBehParams2ndByte) {
 //                 o->oVelY = 40.0f;
 //                 o->oAction = 3;
-//                 o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+//                 o->.gfx.flags &= ~GRAPH_RENDER_INVISIBLE;
 //                 play_sound(SOUND_GENERAL2_1UP_APPEAR, gGlobalSoundSource);
 //             }
 //             break;

@@ -1,42 +1,59 @@
-import { GeoLayoutInstance as Geo } from "../../engine/GeoLayout"
-import { tree_seg3_dl_0302FEE8, tree_seg3_dl_03032088, tree_seg3_dl_03033258, tree_seg3_dl_03030FA0, tree_seg3_dl_03032170 } from "./model.inc"
+// Tree
 
-export const bubbly_tree_geo = [
-    { command: Geo.node_culling_radius, args: [800] },
-    { command: Geo.open_node },
-    { command: Geo.display_list, args: [Geo.LAYER_ALPHA, tree_seg3_dl_0302FEE8] },
-    { command: Geo.close_node },
-    { command: Geo.node_end }
-]
+import {
+    GEO_CULLING_RADIUS, GEO_OPEN_NODE, GEO_DISPLAY_LIST, GEO_CLOSE_NODE, GEO_END,
+    LAYER_ALPHA
+} from "../../engine/GeoLayout"
 
-export const snow_tree_geo = [
-    { command: Geo.node_culling_radius, args: [800] },
-    { command: Geo.open_node },
-    { command: Geo.display_list, args: [Geo.LAYER_ALPHA, tree_seg3_dl_03032088] },
-    { command: Geo.close_node },
-    { command: Geo.node_end }
-]
+import {
+    tree_seg3_dl_0302FEE8, tree_seg3_dl_03030FA0, tree_seg3_dl_03032088, tree_seg3_dl_03032170,
+    tree_seg3_dl_03033258
+} from "./model.inc"
 
-export const spiky_tree_geo = [
-    { command: Geo.node_culling_radius, args: [800] },
-    { command: Geo.open_node },
-    { command: Geo.display_list, args: [Geo.LAYER_ALPHA, tree_seg3_dl_03030FA0] },
-    { command: Geo.close_node },
-    { command: Geo.node_end }
-]
 
-export const spiky_tree1_geo = [
-    { command: Geo.node_culling_radius, args: [800] },
-    { command: Geo.open_node },
-    { command: Geo.display_list, args: [Geo.LAYER_ALPHA, tree_seg3_dl_03032170] },
-    { command: Geo.close_node },
-    { command: Geo.node_end }
-]
+// 0x16000FE8
+export const bubbly_tree_geo = () => {return [
+    GEO_CULLING_RADIUS(800),
+    GEO_OPEN_NODE(),
+        GEO_DISPLAY_LIST(LAYER_ALPHA, tree_seg3_dl_0302FEE8),
+    GEO_CLOSE_NODE(),
+    GEO_END(),
+]};
 
-export const palm_tree_geo = [
-    { command: Geo.node_culling_radius, args: [800] },
-    { command: Geo.open_node },
-    { command: Geo.display_list, args: [Geo.LAYER_ALPHA, tree_seg3_dl_03033258] },
-    { command: Geo.close_node },
-    { command: Geo.node_end }
-]
+// 0x16001000
+export const spiky_tree_geo = () => {return [
+    GEO_CULLING_RADIUS(800),
+    GEO_OPEN_NODE(),
+        GEO_DISPLAY_LIST(LAYER_ALPHA, tree_seg3_dl_03030FA0),
+    GEO_CLOSE_NODE(),
+    GEO_END(),
+]};
+
+// 0x16001018
+export const snow_tree_geo = () => {return [
+    GEO_CULLING_RADIUS(800),
+    GEO_OPEN_NODE(),
+        GEO_DISPLAY_LIST(LAYER_ALPHA, tree_seg3_dl_03032088),
+    GEO_CLOSE_NODE(),
+    GEO_END(),
+]};
+
+// 0x16001030
+export const spiky_tree1_geo = () => {return [
+    GEO_CULLING_RADIUS(800),
+    GEO_OPEN_NODE(),
+        GEO_DISPLAY_LIST(LAYER_ALPHA, tree_seg3_dl_03032170),
+    GEO_CLOSE_NODE(),
+    GEO_END(),
+]};
+
+// 0x16001048
+export const palm_tree_geo = () => {return [
+    GEO_CULLING_RADIUS(800),
+    GEO_OPEN_NODE(),
+        GEO_DISPLAY_LIST(LAYER_ALPHA, tree_seg3_dl_03033258),
+    GEO_CLOSE_NODE(),
+    GEO_END(),
+]};
+
+// 1621736686 - 2021-05-23 21:27:03 -0700

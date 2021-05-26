@@ -4,7 +4,7 @@ import { LAYER_ALPHA, LAYER_OPAQUE } from "../engine/GeoLayout"
 import { ALLOC_LEVEL_POOL, AREA, BLACKOUT, CALL, CALL_LOOP, CLEARDEMOPTR, CLEAR_LEVEL, END_AREA,
          EXECUTE, EXIT, FREE_LEVEL_POOL, GET_AREA, INIT_LEVEL, JUMP_LINK, LOAD_AREA,
          LOAD_MARIO_HEAD, LOAD_MIO0, LOAD_MODEL_FROM_GEO, LOAD_MODEL_FROM_DL, LOAD_RAW,
-         MACRO_OBJECTS, MARIO, MARIO_POS, OBJECT, OBJECT_WITH_ACTS, RETURN, SET_REGISTER, SLEEP,
+         MACRO_OBJECTS, MARIO, MARIO_POS, OBJECT, OBJECT_WITH_ACTS, RETURN, SET_REG, SLEEP,
          SLEEP_BEFORE_EXIT, TERRAIN, TERRAIN_TYPE, TRANSITION, UNLOAD_AREA
 } from "../engine/LevelCommands"
 
@@ -37,6 +37,15 @@ import { water_bomb_geo              } from "../actors/water_bubble/geo.inc"
 import { water_bomb_shadow_geo       } from "../actors/water_bubble/geo.inc"
 import { wooden_post_geo             } from "../actors/poundable_pole/geo.inc"
 import { yoshi_geo                   } from "../actors/yoshi/geo.inc"
+
+
+import { boo_geo } from "../actors/boo/geo.inc"
+import { small_key_geo } from "../actors/small_key/geo.inc"
+import { haunted_chair_geo } from "../actors/chair/geo.inc"
+import { mad_piano_geo } from "../actors/mad_piano/geo.inc"
+import { bookend_geo } from "../actors/book/geo.inc"
+import { bookend_part_geo } from "../actors/bookend/geo.inc"
+import { haunted_cage_geo } from "../actors/haunted_cage/geo.inc"
 
 
 // dls
@@ -138,16 +147,16 @@ export const script_func_global_4 = () => { return [
 //     RETURN(),
 // ]}
 
-// export const script_func_global_10 = () => { return [
-//     LOAD_MODEL_FROM_GEO(MODEL.BOO,                     boo_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.BETA_BOO_KEY,            small_key_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.HAUNTED_CHAIR,           haunted_chair_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.MAD_PIANO,               mad_piano_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.BOOKEND_PART,            bookend_part_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.BOOKEND,                 bookend_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.HAUNTED_CAGE,            haunted_cage_geo),
-//     RETURN(),
-// ]}
+export const script_func_global_10 = () => { return [
+    LOAD_MODEL_FROM_GEO(MODEL.BOO,                     boo_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.BETA_BOO_KEY,            small_key_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.HAUNTED_CHAIR,           haunted_chair_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.MAD_PIANO,               mad_piano_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.BOOKEND_PART,            bookend_part_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.BOOKEND,                 bookend_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.HAUNTED_CAGE,            haunted_cage_geo),
+    RETURN(),
+]}
 
 export const script_func_global_11 = () => { return [
     LOAD_MODEL_FROM_GEO(MODEL.BIRDS,                   birds_geo),
@@ -225,3 +234,12 @@ export const script_func_global_16 = () => { return [
 //     LOAD_MODEL_FROM_GEO(MODEL.SNUFIT,                  snufit_geo),
 //     RETURN(),
 // ]}
+
+
+gLinker.level_scripts.script_func_global_1  = script_func_global_1
+gLinker.level_scripts.script_func_global_4  = script_func_global_4
+gLinker.level_scripts.script_func_global_11 = script_func_global_11
+gLinker.level_scripts.script_func_global_15 = script_func_global_15
+gLinker.level_scripts.script_func_global_16 = script_func_global_16
+
+

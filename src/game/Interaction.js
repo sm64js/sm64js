@@ -1,7 +1,9 @@
 import * as _Linker from "./Linker"
 import * as _Area from "./Area"
 
-import { ACT_DIVE, ACT_DIVE_SLIDE,
+import { ACT_IDLE, ACT_PANTING, ACT_STANDING_AGAINST_WALL, ACT_CROUCHING, ACT_DISAPPEARED,
+
+         ACT_DIVE, ACT_DIVE_SLIDE,
 
          ACT_FLAG_AIR, ACT_FLAG_ATTACKING, ACT_FLAG_DIVING, ACT_FLAG_HANGING,
          ACT_FLAG_IDLE, ACT_FLAG_INTANGIBLE, ACT_FLAG_INVULNERABLE, ACT_FLAG_METAL_WATER,
@@ -18,6 +20,12 @@ import { ACT_DIVE, ACT_DIVE_SLIDE,
          ACT_RIDING_HOOT, ACT_SHOT_FROM_CANNON, ACT_SLIDE_KICK, ACT_SLIDE_KICK_SLIDE,
          ACT_TWIRL_LAND, ACT_TWIRLING, ACT_WALKING, ACT_WATER_JUMP, ACT_WATER_PUNCH,
 
+         ACT_DECELERATING, ACT_READING_AUTOMATIC_DIALOG,
+
+         ACT_TELEPORT_FADE_IN, ACT_TELEPORT_FADE_OUT, ACT_EMERGE_FROM_PIPE,
+         ACT_UNLOCKING_KEY_DOOR, ACT_PULLING_DOOR, ACT_PUSHING_DOOR,
+         ACT_ENTERING_STAR_DOOR, ACT_UNLOCKING_STAR_DOOR,
+
          INPUT_A_PRESSED, INPUT_B_PRESSED, INPUT_INTERACT_OBJ_GRABBABLE,
 
          MARIO_KICKING, MARIO_PUNCHING, MARIO_TRIPPING, MARIO_UNKNOWN_08,
@@ -29,10 +37,17 @@ import { ACT_DIVE, ACT_DIVE_SLIDE,
          set_forward_vel, set_mario_action, sForwardKnockbackActions
 } from "./Mario"
 
+import { WARP_OP_WARP_OBJECT } from "./LevelUpdate"
+
+import {
+    DIALOG_022, DIALOG_023, DIALOG_024, DIALOG_025, DIALOG_026, DIALOG_027, DIALOG_028, DIALOG_029
+ } from "../text/us/dialogs"
+
 import * as MarioConstants from "../include/mario_constants"
 
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos,
-         oPosY, oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ, oMoveAngleYaw
+         oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosY, oPosZ, oMoveAngleYaw,
+         oBehParams
 } from "../include/object_constants"
 
 import { atan2s } from "../engine/math_util"
@@ -44,6 +59,17 @@ import { CameraInstance as Camera } from "./Camera"
 import * as CAMERA from "./Camera"  // for constants
 import { obj_set_held_state } from "./ObjectHelpers"
 import { stop_shell_music } from "./SoundInit"
+import { save_file_get_flags, SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR,
+    SAVE_FLAG_UNLOCKED_BASEMENT_DOOR, SAVE_FLAG_HAVE_KEY_1, SAVE_FLAG_HAVE_KEY_2,
+    SAVE_FLAG_UNLOCKED_50_STAR_DOOR,
+    SAVE_FLAG_UNLOCKED_BITDW_DOOR,
+    SAVE_FLAG_UNLOCKED_BITFS_DOOR,
+    SAVE_FLAG_UNLOCKED_CCM_DOOR,
+    SAVE_FLAG_UNLOCKED_JRB_DOOR,
+    SAVE_FLAG_UNLOCKED_PSS_DOOR,
+    SAVE_FLAG_UNLOCKED_WF_DOOR,
+ } from "./SaveFile"
+
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
 export const INTERACT_GRABBABLE      /* 0x00000002 */ = (1 << 1)
@@ -155,15 +181,17 @@ export const ATTACK_GROUND_POUND_OR_TWIRL = 4
 export const ATTACK_FAST_ATTACK           = 5
 export const ATTACK_FROM_BELOW            = 6
 
-let sDelayInvincTimer = false
-let sInvulnerable = false
+let sDelayInvincTimer = 0
+let sInvulnerable = 0
+let sJustTeleported = 0
+let sDisplayingDoorText = 0
 
 const check_death_barrier = (m) => {
 
     //// the actual code
     /*    if (m -> pos[1] < m -> floorHeight + 2048.0f) {
             if (level_trigger_warp(m, WARP_OP_WARP_FLOOR) == 20 && !(m -> flags & MARIO_UNKNOWN_18)) {
-                play_sound(SOUND_MARIO_WAAAOOOW, m -> marioObj -> header.gfx.cameraToObject)
+                play_sound(SOUND_MARIO_WAAAOOOW, m -> marioObj -> .gfx.cameraToObject)
             }
         }*/
 
@@ -223,6 +251,210 @@ const interact_coin = (m, o) => {
     if (COURSE_IS_MAIN_COURSE(gLinker.Area.gCurrCourseNum) && m.numCoins - o.rawData[oDamageOrCoinValue] < 100 && m.numCoins >= 100) {
         /// 100 coin star!
         /// TODO spawn star
+    }
+
+    return 0
+}
+
+export const interact_warp = (m, o) => {
+    let action
+
+    if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_FADING_WARP) {
+        action = m.action
+
+        if (action == ACT_TELEPORT_FADE_IN) {
+            sJustTeleported = 1
+
+        } else if (!sJustTeleported) {
+            if (action == ACT_IDLE || action == ACT_PANTING || action == ACT_STANDING_AGAINST_WALL
+                || action == ACT_CROUCHING) {
+                m.interactObj = o
+                m.usedObj = o
+
+                sJustTeleported = 1
+                return set_mario_action(m, ACT_TELEPORT_FADE_OUT, 0)
+            }
+        }
+    } else {
+        if (m.action != ACT_EMERGE_FROM_PIPE) {
+            o.rawData[oInteractStatus] = INT_STATUS_INTERACTED
+            m.interactObj = o
+            m.usedObj = o
+
+            // play_sound(o.collisionData == warp_pipe_seg3_collision_03009AC8
+            //                ? SOUND_MENU_ENTER_PIPE
+            //                : SOUND_MENU_ENTER_HOLE,
+            //            m.marioObj.gfx.cameraToObject)
+
+            mario_stop_riding_object(m)
+            return set_mario_action(m, ACT_DISAPPEARED, (WARP_OP_WARP_OBJECT << 16) + 2)
+        }
+    }
+
+    return 0
+}
+
+export const interact_warp_door = (m, o) => {
+    let doorAction = 0
+    let saveFlags = save_file_get_flags(
+        SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR | SAVE_FLAG_HAVE_KEY_1 | SAVE_FLAG_HAVE_KEY_2 |
+        SAVE_FLAG_UNLOCKED_BASEMENT_DOOR
+    )  // DEBUG add SAVE_FLAGs here
+    let warpDoorId = o.rawData[oBehParams] >> 24
+    let actionArg
+
+    if (m.action == ACT_WALKING || m.action == ACT_DECELERATING) {
+        if (warpDoorId == 1 && !(saveFlags & SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR)) {
+            if (!(saveFlags & SAVE_FLAG_HAVE_KEY_2)) {
+                if (!sDisplayingDoorText) {
+                    set_mario_action(m, ACT_READING_AUTOMATIC_DIALOG,
+                                     (saveFlags & SAVE_FLAG_HAVE_KEY_1) ? DIALOG_023 : DIALOG_022)
+                }
+                sDisplayingDoorText = 1
+
+                return 0
+            }
+
+            doorAction = ACT_UNLOCKING_KEY_DOOR
+        }
+
+        if (warpDoorId == 2 && !(saveFlags & SAVE_FLAG_UNLOCKED_BASEMENT_DOOR)) {
+            if (!(saveFlags & SAVE_FLAG_HAVE_KEY_1)) {
+                if (!sDisplayingDoorText) {
+                      // Moat door skip was intended confirmed
+                    set_mario_action(m, ACT_READING_AUTOMATIC_DIALOG,
+                                     (saveFlags & SAVE_FLAG_HAVE_KEY_2) ? DIALOG_023 : DIALOG_022)
+                }
+                sDisplayingDoorText = 1
+
+                return 0
+            }
+
+            doorAction = ACT_UNLOCKING_KEY_DOOR
+        }
+
+        if (m.action == ACT_WALKING || m.action == ACT_DECELERATING) {
+            actionArg = should_push_or_pull_door(m, o) + 0x00000004
+
+            if (doorAction == 0) {
+                if (actionArg & 0x00000001) {
+                    doorAction = ACT_PULLING_DOOR
+                } else {
+                    doorAction = ACT_PUSHING_DOOR
+                }
+            }
+
+            m.interactObj = o
+            m.usedObj = o
+            return set_mario_action(m, doorAction, actionArg)
+        }
+    }
+
+    return 0
+}
+
+export const get_door_save_file_flag = (door) => {
+    let saveFileFlag = 0
+    let requiredNumStars = door.rawData[oBehParams] >> 24
+
+    let isCcmDoor = door.rawData[oPosX] < 0.0
+    let isPssDoor = door.rawData[oPosY] > 500.0
+
+    switch (requiredNumStars) {
+        case 1:
+            if (isPssDoor) {
+                saveFileFlag = SAVE_FLAG_UNLOCKED_PSS_DOOR
+            } else {
+                saveFileFlag = SAVE_FLAG_UNLOCKED_WF_DOOR
+            }
+            break
+
+        case 3:
+            if (isCcmDoor) {
+                saveFileFlag = SAVE_FLAG_UNLOCKED_CCM_DOOR
+            } else {
+                saveFileFlag = SAVE_FLAG_UNLOCKED_JRB_DOOR
+            }
+            break
+
+        case 8:
+            saveFileFlag = SAVE_FLAG_UNLOCKED_BITDW_DOOR
+            break
+
+        case 30:
+            saveFileFlag = SAVE_FLAG_UNLOCKED_BITFS_DOOR
+            break
+
+        case 50:
+            saveFileFlag = SAVE_FLAG_UNLOCKED_50_STAR_DOOR
+            break
+    }
+
+    return saveFileFlag
+}
+
+export const interact_door = (m, o) => {
+    let /*s16*/ requiredNumStars = o.rawData[oBehParams] >> 24
+    let /*s16*/ numStars = 120  // save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1)
+
+    if (m.action == ACT_WALKING || m.action == ACT_DECELERATING) {
+        if (numStars >= requiredNumStars) {
+            let /*u32*/ actionArg = should_push_or_pull_door(m, o)
+            let /*u32*/ enterDoorAction
+            let /*u32*/ doorSaveFileFlag
+
+            if (actionArg & 0x00000001) {
+                enterDoorAction = ACT_PULLING_DOOR
+            } else {
+                enterDoorAction = ACT_PUSHING_DOOR
+            }
+
+            doorSaveFileFlag = get_door_save_file_flag(o)
+            m.interactObj = o
+            m.usedObj = o
+
+            if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_STAR_DOOR) {
+                enterDoorAction = ACT_ENTERING_STAR_DOOR
+            }
+
+            if (doorSaveFileFlag != 0 && !(save_file_get_flags() & doorSaveFileFlag)) {
+                enterDoorAction = ACT_UNLOCKING_STAR_DOOR
+            }
+
+            return set_mario_action(m, enterDoorAction, actionArg)
+        } else if (!sDisplayingDoorText) {
+            let /*u32*/ text = DIALOG_022.str
+
+            switch (requiredNumStars) {
+                case 1:
+                    text = DIALOG_024.str
+                    break
+                case 3:
+                    text = DIALOG_025.str
+                    break
+                case 8:
+                    text = DIALOG_026.str
+                    break
+                case 30:
+                    text = DIALOG_027.str
+                    break
+                case 50:
+                    text = DIALOG_028.str
+                    break
+                case 70:
+                    text = DIALOG_029.str
+                    break
+            }
+
+            text += requiredNumStars - numStars
+
+            sDisplayingDoorText = 1
+            return set_mario_action(m, ACT_READING_AUTOMATIC_DIALOG, text)
+        }
+    } else if (m.action == ACT_IDLE && sDisplayingDoorText == 1 && requiredNumStars == 70) {
+        m.interactObj = o
+        m.usedObj = o
+        return set_mario_action(m, ACT_ENTERING_STAR_DOOR, should_push_or_pull_door(m, o))
     }
 
     return 0
@@ -364,8 +596,8 @@ export const interact_cap = (m, o) => {
             m.flags |= MARIO_CAP_ON_HEAD
         }
 
-        // play_sound(SOUND_MENU_STAR_SOUND, m.marioObj.header.gfx.cameraToObject)
-        // play_sound(SOUND_MARIO_HERE_WE_GO, m.marioObj.header.gfx.cameraToObject)
+        // play_sound(SOUND_MENU_STAR_SOUND, m.marioObj.gfx.cameraToObject)
+        // play_sound(SOUND_MARIO_HERE_WE_GO, m.marioObj.gfx.cameraToObject)
 
         if (capMusic != 0) {
             play_cap_music(capMusic)
@@ -424,7 +656,7 @@ const mario_can_talk = (m, arg) => {
             return 1
         }
 
-        val6 = m.marioObj.header.gfx.unk38.animID
+        val6 = m.marioObj.gfx.unk38.animID
 
         if (val6 == 0x0080 || val6 == 0x007F || val6 == 0x006C) {
             return 1
@@ -603,8 +835,6 @@ const attack_object = (o, interaction) => {
     return attackType
 }
 
-////////////////////////////////////
-
 export const mario_stop_riding_object = (m) => {
     if (m.riddenObj) {
         m.riddenObj.rawData[oInteractStatus] = INT_STATUS_STOP_RIDING
@@ -677,7 +907,7 @@ const bounce_off_object = (m, o, velY) => {
 
     m.flags &= ~MARIO_UNKNOWN_08
 
-    //play_sound(SOUND_ACTION_BOUNCE_OFF_OBJECT, m -> marioObj -> header.gfx.cameraToObject)
+    //play_sound(SOUND_ACTION_BOUNCE_OFF_OBJECT, m -> marioObj -> .gfx.cameraToObject)
 }
 
 const hit_object_from_below = (m, o) => {
@@ -703,8 +933,17 @@ const bounce_back_from_attack = (m, interaction) => {
     }
 
     if (interaction & (INT_PUNCH | INT_KICK | INT_TRIP | INT_FAST_ATTACK_OR_SHELL)) {
-        //play_sound(SOUND_ACTION_HIT_2, m -> marioObj -> header.gfx.cameraToObject)
+        //play_sound(SOUND_ACTION_HIT_2, m -> marioObj -> .gfx.cameraToObject)
     }
+}
+
+const should_push_or_pull_door = (m, o) => {
+    let dx = o.rawData[oPosX] - m.pos[0]
+    let dz = o.rawData[oPosZ] - m.pos[2]
+
+    let dYaw = s16(o.rawData[oMoveAngleYaw] - atan2s(dz, dx))
+
+    return (dYaw >= -0x4000 && dYaw <= 0x4000) ? 0x00000001 : 0x00000002
 }
 
 /**
@@ -943,11 +1182,11 @@ const check_kick_or_punch_wall = (m) => {
                 }
 
                 set_forward_vel(m, -48.0);
-                // play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
+                // play_sound(SOUND_ACTION_HIT_2, m->marioObj->.gfx.cameraToObject);
                 m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             } else if (m.action & ACT_FLAG_AIR) {
                 set_forward_vel(m, -16.0);
-                // play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
+                // play_sound(SOUND_ACTION_HIT_2, m->marioObj->.gfx.cameraToObject);
                 m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             }
         }
@@ -959,9 +1198,9 @@ const sInteractionHandlers = [
     { interactType: INTERACT_WATER_RING, handler: null },
     { interactType: INTERACT_STAR_OR_KEY, handler: null },
     { interactType: INTERACT_BBH_ENTRANCE, handler: null },
-    { interactType: INTERACT_WARP, handler: null },
-    { interactType: INTERACT_WARP_DOOR, handler: null },
-    { interactType: INTERACT_DOOR, handler: null },
+    { interactType: INTERACT_WARP, handler: interact_warp },
+    { interactType: INTERACT_WARP_DOOR, handler: interact_warp_door },
+    { interactType: INTERACT_DOOR, handler: interact_door },
     { interactType: INTERACT_CANNON_BASE, handler: interact_cannon_base },
     { interactType: INTERACT_IGLOO_BARRIER, handler: null },
     { interactType: INTERACT_TORNADO, handler: null },
@@ -992,7 +1231,9 @@ const mario_get_collided_object = (m, interactType) => {
     for (let i = 0; i < m.marioObj.collidedObjs.length; i++) {
         const object = m.marioObj.collidedObjs[i]
 
-        if (object.rawData[oInteractType] == interactType) return object
+        if (object.rawData[oInteractType] == interactType) {
+            return object
+        }
     }
 }
 

@@ -143,14 +143,14 @@ export const tilt_body_running = (m) => {
 export const play_step_sound = (m, frame1, frame2) => {
     if (is_anim_past_frame(m, frame1) || is_anim_past_frame(m, frame2)) {
         if (m.flags & MARIO_METAL_CAP) {
-            if (m.marioObj.header.gfx.unk38.animID == MARIO_ANIM_TIPTOE) {
+            if (m.marioObj.gfx.unk38.animID == MARIO_ANIM_TIPTOE) {
                 play_sound_and_spawn_particles(m, SOUND_ACTION_METAL_STEP_TIPTOE, 0)
             } else {
                 play_sound_and_spawn_particles(m, SOUND_ACTION_METAL_STEP, 0)
             }
         } else if (m.quicksandDepth > 50.0) {
-            play_sound(SOUND_ACTION_QUICKSAND_STEP, m.marioObj.header.gfx.cameraToObject)
-        } else if (m.marioObj.header.gfx.unk38.animID == MARIO_ANIM_TIPTOE) {
+            play_sound(SOUND_ACTION_QUICKSAND_STEP, m.marioObj.gfx.cameraToObject)
+        } else if (m.marioObj.gfx.unk38.animID == MARIO_ANIM_TIPTOE) {
             play_sound_and_spawn_particles(m, SOUND_ACTION_TERRAIN_STEP_TIPTOE, 0)
         } else {
             play_sound_and_spawn_particles(m, SOUND_ACTION_TERRAIN_STEP, 0)
@@ -337,7 +337,7 @@ const anim_and_audio_for_walk = (m) => {
         }
         marioObj.rawData[oMarioWalkingPitch] = 
                 s16(approach_s32(marioObj.rawData[oMarioWalkingPitch], targetPitch, 0x800, 0x800))
-        marioObj.header.gfx.angle[0] = marioObj.rawData[oMarioWalkingPitch]
+        marioObj.gfx.angle[0] = marioObj.rawData[oMarioWalkingPitch]
     }
 
 }
@@ -408,7 +408,7 @@ export const anim_and_audio_for_heavy_walk = (m) => {
 
 const tilt_body_walking = (m, startYaw) => {
     const val0C = m.marioBodyState
-    const animID = m.marioObj.header.gfx.unk38.animID
+    const animID = m.marioObj.gfx.unk38.animID
     let dYaw, val02, val00
 
     if (animID == MARIO_ANIM_WALKING || animID == MARIO_ANIM_RUNNING) {
@@ -658,7 +658,7 @@ const act_decelerating = (m) => {
 
     if (slopeClass == SURFACE_CLASS_VERY_SLIPPERY) {
         set_mario_animation(m, MARIO_ANIM_IDLE_HEAD_LEFT)
-        play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.header.gfx.cameraToObject)
+        play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.gfx.cameraToObject)
         adjust_sound_for_speed(m)
         m.particleFlags |= PARTICLE_DUST
     } else {
@@ -725,7 +725,7 @@ export const act_hold_decelerating = (m) => {
 
     if (slopeClass == SURFACE_CLASS_VERY_SLIPPERY) {
         set_mario_animation(m, MARIO_ANIM_IDLE_WITH_LIGHT_OBJ)
-        play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.header.gfx.cameraToObject)
+        play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.gfx.cameraToObject)
         adjust_sound_for_speed(m)
         m.particleFlags |= PARTICLE_DUST
     } else {
@@ -805,7 +805,7 @@ const act_finish_turning_around = (m) => {
     if (is_anim_at_end(m)) 
         set_mario_action(m, ACT_WALKING, 0)
 
-    m.marioObj.header.gfx.angle[1] += 0x8000
+    m.marioObj.gfx.angle[1] += 0x8000
     return 0
 }
 
@@ -880,7 +880,7 @@ const act_side_flip_land = (m) => {
     }
 
     if (common_landing_action(m, MARIO_ANIM_SLIDEFLIP_LAND, ACT_FREEFALL) != GROUND_STEP_HIT_WALL) {
-        m.marioObj.header.gfx.angle[1] = s16(m.marioObj.header.gfx.angle[1] + 0x8000)
+        m.marioObj.gfx.angle[1] = s16(m.marioObj.gfx.angle[1] + 0x8000)
     }
 
     return 0
@@ -1054,7 +1054,7 @@ const common_slide_action = (m, endAction, airAction, animation) => {
     const pos = []
 
     vec3f_copy(pos, m.pos)
-    play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.header.gfx.cameraToObject)
+    play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.gfx.cameraToObject)
 
     adjust_sound_for_speed(m)
 
@@ -1062,7 +1062,7 @@ const common_slide_action = (m, endAction, airAction, animation) => {
         case GROUND_STEP_LEFT_GROUND:
             set_mario_action(m, airAction, 0)
             if (m.forwardVel < -50.0 || 50.0 < m.forwardVel) {
-                play_sound(SOUND_MARIO_HOOHOO, m.marioObj.header.gfx.cameraToObject)
+                play_sound(SOUND_MARIO_HOOHOO, m.marioObj.gfx.cameraToObject)
             }
             break
 
@@ -1171,15 +1171,15 @@ const push_or_sidle_wall = (m, startPos) => {
             set_mario_anim_with_accel(m, MARIO_ANIM_SIDESTEP_LEFT, val04)
         }
 
-        if (m.marioObj.header.gfx.unk38.animFrame < 20) {
-            play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.header.gfx.cameraToObject)
+        if (m.marioObj.gfx.unk38.animFrame < 20) {
+            play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.gfx.cameraToObject)
             m.particleFlags |= PARTICLE_DUST
         }
 
         m.actionState = 1
         m.actionArg = s16(wallAngle + 0x8000)
-        m.marioObj.header.gfx.angle[1] = s16(wallAngle + 0x8000)
-        m.marioObj.header.gfx.angle[2] = find_floor_slope(m, 0x4000)
+        m.marioObj.gfx.angle[1] = s16(wallAngle + 0x8000)
+        m.marioObj.gfx.angle[2] = find_floor_slope(m, 0x4000)
     }
 }
 
@@ -1498,7 +1498,7 @@ const act_slide_kick_slide = (m) => {
             break
     }
 
-    play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.header.gfx.cameraToObject);
+    play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.gfx.cameraToObject);
     m.particleFlags |= PARTICLE_DUST
     return 0
 }
@@ -1579,7 +1579,7 @@ export const act_hard_backward_ground_kb = (m) => {
     }
 
     if (animFrame == 54 && m.prevAction == ACT_SPECIAL_DEATH_EXIT) {
-        play_sound(SOUND_MARIO_MAMA_MIA, m.marioObj.header.gfx.cameraToObject)
+        play_sound(SOUND_MARIO_MAMA_MIA, m.marioObj.gfx.cameraToObject)
     }
 
     if (animFrame == 69) {
@@ -1612,7 +1612,7 @@ const act_death_exit_land = (m) => {
     animFrame = set_mario_animation(m, MARIO_ANIM_FALL_OVER_BACKWARDS)
 
     if (animFrame == 54) {
-        play_sound(SOUND_MARIO_MAMA_MIA, m.marioObj.header.gfx.cameraToObject);
+        play_sound(SOUND_MARIO_MAMA_MIA, m.marioObj.gfx.cameraToObject);
     }
     if (animFrame == 68) {
         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)

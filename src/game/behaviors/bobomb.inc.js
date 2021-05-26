@@ -90,7 +90,7 @@ const bobomb_act_chase_mario = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
-    const sp1a = ++o.header.gfx.unk38.animFrame
+    const sp1a = ++o.gfx.unk38.animFrame
     o.rawData[oForwardVel] = 20.0
 
     const collisionFlags = object_step()
@@ -146,7 +146,7 @@ const bobomb_check_interactions = () => {
 
     if ((o.rawData[oInteractStatus] & INT_STATUS_INTERACTED) != 0) {
         if ((o.rawData[oInteractStatus] & INT_STATUS_MARIO_UNK1) != 0) {
-            o.rawData[oMoveAngleYaw] = gMarioObject.header.gfx.angle[1]
+            o.rawData[oMoveAngleYaw] = gMarioObject.gfx.angle[1]
             o.rawData[oForwardVel] = 25.0
             o.rawData[oVelY] = 30.0
             o.rawData[oAction] = BOBOMB_ACT_LAUNCHED
@@ -233,7 +233,7 @@ const bobomb_held_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
-    o.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
+    o.gfx.flags |= GRAPH_RENDER_INVISIBLE
     cur_obj_init_animation(1)
     cur_obj_set_pos_relative(gMarioObject, 0, 60.0, 100.0)
 
@@ -251,7 +251,7 @@ const bobomb_dropped_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     cur_obj_get_dropped()
 
-    o.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+    o.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
     cur_obj_init_animation(0)
 
     o.rawData[oHeldState] = 0
@@ -262,7 +262,7 @@ const bobomb_thrown_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     cur_obj_enable_rendering()
 
-    o.header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE
+    o.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
     o.rawData[oHeldState] = 0
     o.rawData[oFlags] &= ~0x8; /* bit 3 */
     o.rawData[oForwardVel] = 25.0
@@ -348,7 +348,7 @@ const bhv_bobomb_buddy_init = () => {
 
 const bobomb_buddy_act_idle = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    let sp1a = o.header.gfx.unk38.animFrame
+    let sp1a = o.gfx.unk38.animFrame
 
     o.rawData[oBobombBuddyPosXCopy] = o.rawData[oPosX]
     o.rawData[oBobombBuddyPosYCopy] = o.rawData[oPosY]
@@ -454,7 +454,7 @@ const bobomb_buddy_act_talk = () => {
 
 const bobomb_buddy_act_turn_to_talk = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    let /*s16*/ sp1e = o.header.gfx.unk38.animFrame
+    let /*s16*/ sp1e = o.gfx.unk38.animFrame
     if ((sp1e == 5) || (sp1e == 16)) {
         cur_obj_play_sound_2(SOUND_OBJ_BOBOMB_WALK)
     }

@@ -105,3 +105,6 @@ export const level_bob_entry = [
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 ]
+
+
+gLinker.level_scripts.level_bob_entry = level_bob_entry

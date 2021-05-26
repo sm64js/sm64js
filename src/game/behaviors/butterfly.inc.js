@@ -21,7 +21,7 @@ const bhv_butterfly_init = () => {
     cur_obj_init_animation(1)
 
     o.oButterflyYPhase = int16(random_float() * 100)
-    o.header.gfx.unk38.animFrame = int16(random_float() * 7)
+    o.gfx.unk38.animFrame = int16(random_float() * 7)
     o.rawData[oHomeX] = o.rawData[oPosX]
     o.rawData[oHomeY] = o.rawData[oPosY]
     o.rawData[oHomeZ] = o.rawData[oPosZ]
@@ -82,7 +82,7 @@ const butterfly_act_rest = () => {
         cur_obj_init_animation(0)
 
         o.rawData[oAction] = BUTTERFLY_ACT_FOLLOW_MARIO
-        o.rawData[oMoveAngleYaw] = gMarioObject.header.gfx.angle[1]
+        o.rawData[oMoveAngleYaw] = gMarioObject.gfx.angle[1]
     }
 }
 

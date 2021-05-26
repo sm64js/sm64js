@@ -14,3 +14,6 @@ export const level_ccm_2_entry = [
     { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_or_update, LevelUpdate] },
     { command: LevelCommands.call_loop, args: [1, LevelUpdate.lvl_init_or_update, LevelUpdate] },
 ]
+
+
+gLinker.level_scripts.level_ccm_2_entry = level_ccm_2_entry

@@ -101,7 +101,11 @@ const SpecialObjectPresets_init = () => {
     [0x87, SPTYPE_PARAMS_AND_YROT   , 0x00, "MODEL_UNKNOWN_DOOR_2B", "bhvDoorWarp"],
     [0xFF, SPTYPE_NO_YROT_OR_PARAMS , 0x00, "MODEL_NONE", null],
 ].forEach(s => {
-    SpecialObjectPresets[s[0]] = {type: s[1], defParam: s[2], model: MODEL[s[3]], behavior: BHV[s[4]] }
+    let beh = gLinker.behaviors[s[4]]
+    if (!beh) {
+        // console.log("no behavior for " + s[4])
+    }
+    SpecialObjectPresets[s[0]] = {type: s[1], defParam: s[2], model: MODEL[s[3]], behavior: beh }
 })
 }
 
@@ -138,10 +142,31 @@ const spawn_macro_abs_yrot_2params = (model, behavior, x, y, z, ry, params) => {
     }
 }
 
+/*
+ * Spawns an object at an absolute location with rotation around the y-axis and
+ * a single parameter filling up the upper byte of newObj->oBehParams.
+ * The object will not spawn if 'behavior' is NULL.
+ */
+const spawn_macro_abs_yrot_param1 = (model, behavior, x, y, z, ry, param) => {
+    if (behavior) {
+        const newObj = spawn_object_abs_with_rot(ObjectListProc.gMacroObjectDefaultParent,
+            model, behavior, x, y, z, 0, convert_rotation(ry), 0)
+        newObj.rawData[oBehParams] = param << 24
+    } else {
+        console.log("no behavior - 0x" + model.toString(16))
+    }
+}
+
+
 export const spawn_special_objects = (areaIndex, specialObjList, dataIndex) => {
     SpecialObjectPresets_init()
     const numOfSpecialObjects = specialObjList[dataIndex++]
-    ObjectListProc.gMacroObjectDefaultParent = { header: { gfx: { unk18: areaIndex, unk19: areaIndex } } }
+    ObjectListProc.gMacroObjectDefaultParent = {
+        gfx: {
+            areaIndex: areaIndex,
+            activeAreaIndex: areaIndex
+        }
+    }
 
     for (let i = 0; i < numOfSpecialObjects; i++) {
         const presetID = specialObjList[dataIndex++]
@@ -183,8 +208,8 @@ export const spawn_special_objects = (areaIndex, specialObjList, dataIndex) => {
 }
 
 export const spawn_macro_objects = (areaIndex, macroObjList) => {
-    ObjectListProc.gMacroObjectDefaultParent.header.gfx.unk18 = areaIndex
-    ObjectListProc.gMacroObjectDefaultParent.header.gfx.unk19 = areaIndex
+    ObjectListProc.gMacroObjectDefaultParent.gfx.areaIndex = areaIndex
+    ObjectListProc.gMacroObjectDefaultParent.gfx.activeAreaIndex = areaIndex
 
     let p, preset
 

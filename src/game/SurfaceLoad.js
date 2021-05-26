@@ -9,20 +9,16 @@ import {
 
 import { GRAPH_RENDER_ACTIVE } from "../engine/graph_node"
 import { dist_between_objects, obj_build_transform_from_pos_and_angle, obj_apply_scale_to_matrix } from "./ObjectHelpers"
-// import { SpawnObjectInstance as Spawn } from "./SpawnObject"
+import { TIME_STOP_ACTIVE } from "./ObjectListProcessor"
 
 class SurfaceLoad {
     constructor() {
-
-        // Spawn.SurfaceLoad = this
-        gLinker.SurfaceLoad = this
-
         this.SPATIAL_PARTITION_FLOORS = 0
         this.SPATIAL_PARTITION_CEILS = 1
         this.SPATIAL_PARTITION_WALLS = 2
 
-        this.gStaticSurfacePartition = new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
-        this.gDynamicSurfacePartition = new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
+        // this.gStaticSurfacePartition = new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
+        // this.gDynamicSurfacePartition = new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
 
     }
 
@@ -136,6 +132,19 @@ class SurfaceLoad {
         return index
     }
 
+
+    clear_spatial_partition() {
+        return new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
+    }
+
+    /**
+     * Clears the static (level) surface partitions for new use.
+     */
+    clear_static_surfaces() {
+        this.gStaticSurfacePartition = this.clear_spatial_partition()
+    }
+
+
     add_surface_to_cell(dynamic, cellX, cellZ, surface) {
         this.gSurfaceNodesAllocated++
 
@@ -160,8 +169,11 @@ class SurfaceLoad {
 
         const newNode = { surface }
 
-        if (dynamic) list = this.gDynamicSurfacePartition[cellZ][cellX][listIndex]
-        else list = this.gStaticSurfacePartition[cellZ][cellX][listIndex]
+        if (dynamic) {
+            list = this.gDynamicSurfacePartition[cellZ][cellX][listIndex]
+        } else {
+            list = this.gStaticSurfacePartition[cellZ][cellX][listIndex]
+        }
 
         while (list.next) {
             const priority = list.next.surface.vertex1[1] * sortDir
@@ -262,6 +274,8 @@ class SurfaceLoad {
         this.gSurfaceNodesAllocated = 0
         this.gSurfacesAllocated = 0
 
+        this.clear_static_surfaces()
+
         while (dataIndex < data.length) {
 
             const terrainLoadType = data[dataIndex]
@@ -306,8 +320,7 @@ class SurfaceLoad {
             this.gSurfacesAllocated = this.gNumStaticSurfaces
             this.gSurfaceNodesAllocated = this.gNumStaticSurfaceNodes
 
-            ///clear_spatial_partition
-            this.gDynamicSurfacePartition = new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
+            this.gDynamicSurfacePartition = this.clear_spatial_partition()
         }
     }
 
@@ -316,8 +329,8 @@ class SurfaceLoad {
 
         let numVertices = collisionData.data[collisionData.dataIndex++]
 
-        if (ObjectListProc.gCurrentObject.header.gfx.throwMatrix == null) {
-            ObjectListProc.gCurrentObject.header.gfx.throwMatrix = objectTransform
+        if (ObjectListProc.gCurrentObject.gfx.throwMatrix == null) {
+            ObjectListProc.gCurrentObject.gfx.throwMatrix = objectTransform
             obj_build_transform_from_pos_and_angle(ObjectListProc.gCurrentObject, O_POS_INDEX, O_FACE_ANGLE_INDEX)
         }
 
@@ -372,28 +385,28 @@ class SurfaceLoad {
 
     load_object_collision_model() {
         const vertexData = []
-
-        let marioDist = ObjectListProc.gCurrentObject.rawData[oDistanceToMario]
-        const tangibleDist = ObjectListProc.gCurrentObject.rawData[oCollisionDistance]
+        const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
+        let marioDist = gCurrentObject.rawData[oDistanceToMario]
+        const tangibleDist = gCurrentObject.rawData[oCollisionDistance]
 
         // On an object's first frame, the distance is set to 19000.0f.
         // If the distance hasn't been updated, update it now.
         if (marioDist == 19000.0) {
-            marioDist = dist_between_objects(ObjectListProc.gCurrentObject, ObjectListProc.gMarioObject)
+            marioDist = dist_between_objects(gCurrentObject, ObjectListProc.gMarioObject)
         }
 
         // If the object collision is supposed to be loaded more than the
         // drawing distance of 4000, extend the drawing range.
         if (tangibleDist > 4000.0) {
-            ObjectListProc.gCurrentObject.rawData[oDrawingDistance] = tangibleDist
+            gCurrentObject.rawData[oDrawingDistance] = tangibleDist
         }
 
         if (!(ObjectListProc.gTimeStopState & ObjectListProc.TIME_STOP_ACTIVE) &&
             marioDist < tangibleDist &&
-            !(ObjectListProc.gCurrentObject.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
+            !(gCurrentObject.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
 
             const collisionData = {
-                data: ObjectListProc.gCurrentObject.collisionData,
+                data: gCurrentObject.collisionData,
                 dataIndex: 1
             }
             this.transform_object_vertices(collisionData, vertexData)
@@ -404,12 +417,13 @@ class SurfaceLoad {
         }
 
 
-        if (marioDist < ObjectListProc.gCurrentObject.rawData[oDrawingDistance]) {
-            ObjectListProc.gCurrentObject.header.gfx.node.flags |= GRAPH_RENDER_ACTIVE
+        if (marioDist < gCurrentObject.rawData[oDrawingDistance]) {
+            gCurrentObject.gfx.flags |= GRAPH_RENDER_ACTIVE
         } else {
-            ObjectListProc.gCurrentObject.header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE
+            gCurrentObject.gfx.flags &= ~GRAPH_RENDER_ACTIVE
         }
     }
 }
 
 export const SurfaceLoadInstance = new SurfaceLoad()
+gLinker.SurfaceLoad = SurfaceLoadInstance

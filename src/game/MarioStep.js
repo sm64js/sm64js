@@ -60,9 +60,9 @@ export const mario_bonk_reflection = (m, negateSpeed) => {
         const wallAngle = atan2s(m.wall.normal.z, m.wall.normal.x)
         m.faceAngle[1] = s16(wallAngle - s16(m.faceAngle[1] - wallAngle))
         play_sound((m.flags & Mario.MARIO_METAL_CAP) ? SOUND_ACTION_METAL_BONK : SOUND_ACTION_BONK,
-                   m.marioObj.header.gfx.cameraToObject)
+                   m.marioObj.gfx.cameraToObject)
     } else {
-        play_sound(SOUND_ACTION_HIT, m.marioObj.header.gfx.cameraToObject);
+        play_sound(SOUND_ACTION_HIT, m.marioObj.gfx.cameraToObject);
     }
 
     if (negateSpeed) {
@@ -96,8 +96,8 @@ export const stop_and_set_height_to_floor = (m) => {
 
     m.pos[1] = m.floorHeight
 
-    marioObj.header.gfx.pos = [...m.pos]
-    marioObj.header.gfx.angle = [0, m.faceAngle[1], 0]
+    marioObj.gfx.pos = [...m.pos]
+    marioObj.gfx.angle = [0, m.faceAngle[1], 0]
 }
 
 const check_ledge_grab = (m, wall, intendedPos, nextPos) => {
@@ -294,8 +294,8 @@ export const perform_air_step = (m, stepArg) => {
     }
     apply_vertical_wind(m)
 
-    vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
-    vec3s_set(m.marioObj.header.gfx.angle, 0, m.faceAngle[1], 0)
+    vec3f_copy(m.marioObj.gfx.pos, m.pos)
+    vec3s_set(m.marioObj.gfx.angle, 0, m.faceAngle[1], 0)
 
     return stepResult
 }
@@ -370,8 +370,8 @@ export const perform_ground_step = (m) => {
     }
 
     m.terrainSoundAddend = Mario.mario_get_terrain_sound_addend(m)
-    vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
-    vec3s_set(m.marioObj.header.gfx.angle, 0, m.faceAngle[1], 0)
+    vec3f_copy(m.marioObj.gfx.pos, m.pos)
+    vec3s_set(m.marioObj.gfx.angle, 0, m.faceAngle[1], 0)
 
     if (stepResult == Mario.GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS) {
         stepResult = Mario.GROUND_STEP_HIT_WALL
@@ -386,8 +386,8 @@ export const stationary_ground_step = (m) => {
 
     m.pos[1] = m.floorHeight
 
-    m.marioObj.header.gfx.pos = [...m.pos]
-    m.marioObj.header.gfx.angle = [0, m.faceAngle[1], 0]
+    m.marioObj.gfx.pos = [...m.pos]
+    m.marioObj.gfx.angle = [0, m.faceAngle[1], 0]
 
     return 0
 }

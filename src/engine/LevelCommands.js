@@ -324,7 +324,8 @@ class LevelCommands {
     }
 
     execute(script) {
-        this.sStackTop.push({ commands: this.sCurrentScript.commands, index: this.sCurrentScript.index + 1 })
+        this.sCurrentScript.index++  // return address
+        this.sStackTop.push(this.sCurrentScript)
         this.sStackTop.push(this.sStackBaseIndex)
         this.sStackBaseIndex = this.sStackTop.length
         this.start_new_script(script)
@@ -342,7 +343,8 @@ class LevelCommands {
     }
 
     jump_link(script) {
-        this.sStackTop.push({ commands: this.sCurrentScript.commands, index: ++this.sCurrentScript.index })
+        this.sCurrentScript.index++  // return address
+        this.sStackTop.push(this.sCurrentScript)
         this.start_new_script(script)
     }
 
@@ -367,8 +369,9 @@ class LevelCommands {
     }
 
     loop_begin() {
-        this.sStackTop.push({ commands: this.sCurrentScript.commands, index: this.sCurrentScript.index + 1 })
-        this.sCurrentScript.index++
+        this.sCurrentScript.index++  // top of loop
+        this.sStackTop.push(this.sCurrentScript)
+        this.start_new_script()  // new context, same script and index
     }
 
 
@@ -410,7 +413,7 @@ class LevelCommands {
             this.sStackTop.pop()
             this.sCurrentScript.index++
         } else {
-            this.sCurrentScript = this.sStackTop[this.sStackTop.length - 1]
+            this.sCurrentScript.index = this.sStackTop[this.sStackTop.length - 1].index
         }
     }
 
@@ -496,7 +499,9 @@ class LevelCommands {
 
     }
 
-    start_new_script(level_script, label) {
+    start_new_script(level_script, label, index) {
+        this.sCurrentScript = {commands: this.sCurrentScript.commands, index: this.sCurrentScript.index}
+
         if (level_script) {
             if (typeof level_script == 'string') {
                 if (!gLinker.level_scripts[level_script]) {
@@ -507,12 +512,15 @@ class LevelCommands {
                 level_script = level_script.call()
             }
             this.sCurrentScript.commands = level_script
+            this.sCurrentScript.index = 0
         }
-        this.sCurrentScript.index = 0
-        if (label) {
-            while (this.sCurrentScript.commands[this.sCurrentScript.index].label != label) {
-                this.sCurrentScript.index++
-            }
+
+        if (index) {
+            this.sCurrentScript.index = index
+        }
+
+        while (label && this.sCurrentScript.commands[this.sCurrentScript.index].label != label) {
+            this.sCurrentScript.index++
         }
     }
 

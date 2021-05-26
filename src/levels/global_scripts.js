@@ -39,6 +39,15 @@ import { wooden_post_geo             } from "../actors/poundable_pole/geo.inc"
 import { yoshi_geo                   } from "../actors/yoshi/geo.inc"
 
 
+import { boo_geo } from "../actors/boo/geo.inc"
+import { small_key_geo } from "../actors/small_key/geo.inc"
+import { haunted_chair_geo } from "../actors/chair/geo.inc"
+import { mad_piano_geo } from "../actors/mad_piano/geo.inc"
+import { bookend_geo } from "../actors/book/geo.inc"
+import { bookend_part_geo } from "../actors/bookend/geo.inc"
+import { haunted_cage_geo } from "../actors/haunted_cage/geo.inc"
+
+
 // dls
 import { cannon_lid_seg8_dl_080048E0              } from "../actors/cannon_lid/model.inc"
 import { exclamation_box_outline_seg8_dl_08025F08 } from "../actors/exclamation_box_outline/model.inc"
@@ -138,16 +147,16 @@ export const script_func_global_4 = () => { return [
 //     RETURN(),
 // ]}
 
-// export const script_func_global_10 = () => { return [
-//     LOAD_MODEL_FROM_GEO(MODEL.BOO,                     boo_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.BETA_BOO_KEY,            small_key_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.HAUNTED_CHAIR,           haunted_chair_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.MAD_PIANO,               mad_piano_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.BOOKEND_PART,            bookend_part_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.BOOKEND,                 bookend_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.HAUNTED_CAGE,            haunted_cage_geo),
-//     RETURN(),
-// ]}
+export const script_func_global_10 = () => { return [
+    LOAD_MODEL_FROM_GEO(MODEL.BOO,                     boo_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.BETA_BOO_KEY,            small_key_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.HAUNTED_CHAIR,           haunted_chair_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.MAD_PIANO,               mad_piano_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.BOOKEND_PART,            bookend_part_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.BOOKEND,                 bookend_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.HAUNTED_CAGE,            haunted_cage_geo),
+    RETURN(),
+]}
 
 export const script_func_global_11 = () => { return [
     LOAD_MODEL_FROM_GEO(MODEL.BIRDS,                   birds_geo),

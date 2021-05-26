@@ -385,28 +385,28 @@ class SurfaceLoad {
 
     load_object_collision_model() {
         const vertexData = []
-
-        let marioDist = ObjectListProc.gCurrentObject.rawData[oDistanceToMario]
-        const tangibleDist = ObjectListProc.gCurrentObject.rawData[oCollisionDistance]
+        const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
+        let marioDist = gCurrentObject.rawData[oDistanceToMario]
+        const tangibleDist = gCurrentObject.rawData[oCollisionDistance]
 
         // On an object's first frame, the distance is set to 19000.0f.
         // If the distance hasn't been updated, update it now.
         if (marioDist == 19000.0) {
-            marioDist = dist_between_objects(ObjectListProc.gCurrentObject, ObjectListProc.gMarioObject)
+            marioDist = dist_between_objects(gCurrentObject, ObjectListProc.gMarioObject)
         }
 
         // If the object collision is supposed to be loaded more than the
         // drawing distance of 4000, extend the drawing range.
         if (tangibleDist > 4000.0) {
-            ObjectListProc.gCurrentObject.rawData[oDrawingDistance] = tangibleDist
+            gCurrentObject.rawData[oDrawingDistance] = tangibleDist
         }
 
         if (!(ObjectListProc.gTimeStopState & ObjectListProc.TIME_STOP_ACTIVE) &&
             marioDist < tangibleDist &&
-            !(ObjectListProc.gCurrentObject.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
+            !(gCurrentObject.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
 
             const collisionData = {
-                data: ObjectListProc.gCurrentObject.collisionData,
+                data: gCurrentObject.collisionData,
                 dataIndex: 1
             }
             this.transform_object_vertices(collisionData, vertexData)
@@ -417,10 +417,10 @@ class SurfaceLoad {
         }
 
 
-        if (marioDist < ObjectListProc.gCurrentObject.rawData[oDrawingDistance]) {
-            ObjectListProc.gCurrentObject.gfx.flags |= GRAPH_RENDER_ACTIVE
+        if (marioDist < gCurrentObject.rawData[oDrawingDistance]) {
+            gCurrentObject.gfx.flags |= GRAPH_RENDER_ACTIVE
         } else {
-            ObjectListProc.gCurrentObject.gfx.flags &= ~GRAPH_RENDER_ACTIVE
+            gCurrentObject.gfx.flags &= ~GRAPH_RENDER_ACTIVE
         }
     }
 }

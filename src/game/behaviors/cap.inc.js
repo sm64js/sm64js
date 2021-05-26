@@ -130,7 +130,7 @@ const bhv_wing_cap_init = () => {
 const cap_scale_vertically = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oCapUnkF8] += 0x2000
-    o.header.gfx.scale[1] = coss(o.rawData[oCapUnkF8]) * 0.3 + 0.7
+    o.gfx.scale[1] = coss(o.rawData[oCapUnkF8]) * 0.3 + 0.7
     if (o.rawData[oCapUnkF8] == 0x10000) {
         o.rawData[oCapUnkF8] = 0
         o.rawData[oCapUnkF4] = 2

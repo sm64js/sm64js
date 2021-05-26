@@ -329,8 +329,8 @@ class SurfaceLoad {
 
         let numVertices = collisionData.data[collisionData.dataIndex++]
 
-        if (ObjectListProc.gCurrentObject.header.gfx.throwMatrix == null) {
-            ObjectListProc.gCurrentObject.header.gfx.throwMatrix = objectTransform
+        if (ObjectListProc.gCurrentObject.gfx.throwMatrix == null) {
+            ObjectListProc.gCurrentObject.gfx.throwMatrix = objectTransform
             obj_build_transform_from_pos_and_angle(ObjectListProc.gCurrentObject, O_POS_INDEX, O_FACE_ANGLE_INDEX)
         }
 
@@ -418,9 +418,9 @@ class SurfaceLoad {
 
 
         if (marioDist < ObjectListProc.gCurrentObject.rawData[oDrawingDistance]) {
-            ObjectListProc.gCurrentObject.header.gfx.flags |= GRAPH_RENDER_ACTIVE
+            ObjectListProc.gCurrentObject.gfx.flags |= GRAPH_RENDER_ACTIVE
         } else {
-            ObjectListProc.gCurrentObject.header.gfx.flags &= ~GRAPH_RENDER_ACTIVE
+            ObjectListProc.gCurrentObject.gfx.flags &= ~GRAPH_RENDER_ACTIVE
         }
     }
 }

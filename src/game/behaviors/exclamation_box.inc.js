@@ -149,9 +149,9 @@ const exclamation_box_act_3 = () => {
     o.rawData[oExclamationBoxUnkF4] = (-sins(o.rawData[oExclamationBoxUnkFC]) + 1.0) * 0.5 + 1.0
     o.rawData[oGraphYOffset] = (-sins(o.rawData[oExclamationBoxUnkFC]) + 1.0) * 26.0
     o.rawData[oExclamationBoxUnkFC] = s16(o.rawData[oExclamationBoxUnkFC] + 0x1000)
-    o.header.gfx.scale[0] = o.rawData[oExclamationBoxUnkF4] * 2.0
-    o.header.gfx.scale[1] = o.rawData[oExclamationBoxUnkF8] * 2.0
-    o.header.gfx.scale[2] = o.rawData[oExclamationBoxUnkF4] * 2.0
+    o.gfx.scale[0] = o.rawData[oExclamationBoxUnkF4] * 2.0
+    o.gfx.scale[1] = o.rawData[oExclamationBoxUnkF8] * 2.0
+    o.gfx.scale[2] = o.rawData[oExclamationBoxUnkF4] * 2.0
     if (o.rawData[oTimer] == 7) {
         o.rawData[oAction] = 4
     }

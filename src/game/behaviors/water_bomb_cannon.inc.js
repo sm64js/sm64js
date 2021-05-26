@@ -47,7 +47,7 @@ const bhv_bubble_cannon_barrel_loop = () => {
                     let val04 = spawn_object(o, MODEL_WATER_BOMB, 'bhvWaterBomb')
                     if (val04 != null) {
                         val04.rawData[oForwardVel] = -100.0
-                        val04.header.gfx.scale[1] = 1.7
+                        val04.gfx.scale[1] = 1.7
                     }
 
                     gLinker.Camera.set_camera_shake_from_point(SHAKE_POS_MEDIUM, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])

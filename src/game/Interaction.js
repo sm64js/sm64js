@@ -191,7 +191,7 @@ const check_death_barrier = (m) => {
     //// the actual code
     /*    if (m -> pos[1] < m -> floorHeight + 2048.0f) {
             if (level_trigger_warp(m, WARP_OP_WARP_FLOOR) == 20 && !(m -> flags & MARIO_UNKNOWN_18)) {
-                play_sound(SOUND_MARIO_WAAAOOOW, m -> marioObj -> header.gfx.cameraToObject)
+                play_sound(SOUND_MARIO_WAAAOOOW, m -> marioObj -> .gfx.cameraToObject)
             }
         }*/
 
@@ -284,7 +284,7 @@ export const interact_warp = (m, o) => {
             // play_sound(o.collisionData == warp_pipe_seg3_collision_03009AC8
             //                ? SOUND_MENU_ENTER_PIPE
             //                : SOUND_MENU_ENTER_HOLE,
-            //            m.marioObj.header.gfx.cameraToObject)
+            //            m.marioObj.gfx.cameraToObject)
 
             mario_stop_riding_object(m)
             return set_mario_action(m, ACT_DISAPPEARED, (WARP_OP_WARP_OBJECT << 16) + 2)
@@ -596,8 +596,8 @@ export const interact_cap = (m, o) => {
             m.flags |= MARIO_CAP_ON_HEAD
         }
 
-        // play_sound(SOUND_MENU_STAR_SOUND, m.marioObj.header.gfx.cameraToObject)
-        // play_sound(SOUND_MARIO_HERE_WE_GO, m.marioObj.header.gfx.cameraToObject)
+        // play_sound(SOUND_MENU_STAR_SOUND, m.marioObj.gfx.cameraToObject)
+        // play_sound(SOUND_MARIO_HERE_WE_GO, m.marioObj.gfx.cameraToObject)
 
         if (capMusic != 0) {
             play_cap_music(capMusic)
@@ -656,7 +656,7 @@ const mario_can_talk = (m, arg) => {
             return 1
         }
 
-        val6 = m.marioObj.header.gfx.unk38.animID
+        val6 = m.marioObj.gfx.unk38.animID
 
         if (val6 == 0x0080 || val6 == 0x007F || val6 == 0x006C) {
             return 1
@@ -907,7 +907,7 @@ const bounce_off_object = (m, o, velY) => {
 
     m.flags &= ~MARIO_UNKNOWN_08
 
-    //play_sound(SOUND_ACTION_BOUNCE_OFF_OBJECT, m -> marioObj -> header.gfx.cameraToObject)
+    //play_sound(SOUND_ACTION_BOUNCE_OFF_OBJECT, m -> marioObj -> .gfx.cameraToObject)
 }
 
 const hit_object_from_below = (m, o) => {
@@ -933,7 +933,7 @@ const bounce_back_from_attack = (m, interaction) => {
     }
 
     if (interaction & (INT_PUNCH | INT_KICK | INT_TRIP | INT_FAST_ATTACK_OR_SHELL)) {
-        //play_sound(SOUND_ACTION_HIT_2, m -> marioObj -> header.gfx.cameraToObject)
+        //play_sound(SOUND_ACTION_HIT_2, m -> marioObj -> .gfx.cameraToObject)
     }
 }
 
@@ -1182,11 +1182,11 @@ const check_kick_or_punch_wall = (m) => {
                 }
 
                 set_forward_vel(m, -48.0);
-                // play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
+                // play_sound(SOUND_ACTION_HIT_2, m->marioObj->.gfx.cameraToObject);
                 m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             } else if (m.action & ACT_FLAG_AIR) {
                 set_forward_vel(m, -16.0);
-                // play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
+                // play_sound(SOUND_ACTION_HIT_2, m->marioObj->.gfx.cameraToObject);
                 m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             }
         }

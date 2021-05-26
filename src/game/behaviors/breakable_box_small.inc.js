@@ -88,10 +88,10 @@ const breakable_box_small_released_loop = () => {
       // Begin flashing
     if (o.rawData[oBreakableBoxSmallFramesSinceReleased] > 810) {
         if (o.rawData[oBreakableBoxSmallFramesSinceReleased] & 1) {
-            o.header.gfx.flags |= GRAPH_RENDER_INVISIBLE
+            o.gfx.flags |= GRAPH_RENDER_INVISIBLE
         }
         else {
-            o.header.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
+            o.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
         }
     }
 
@@ -129,7 +129,7 @@ const breakable_box_small_get_dropped = () => {
     cur_obj_become_tangible()
     cur_obj_enable_rendering()
     cur_obj_get_dropped()
-    o.header.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
+    o.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
     o.rawData[oHeldState] = 0
     o.rawData[oBreakableBoxSmallReleased] = 1
     o.rawData[oBreakableBoxSmallFramesSinceReleased] = 0
@@ -139,7 +139,7 @@ const breakable_box_small_get_thrown = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     cur_obj_become_tangible()
     cur_obj_enable_rendering()
-    o.header.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
+    o.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
     o.rawData[oHeldState] = 0
     o.rawData[oFlags] &= ~0x08
     o.rawData[oForwardVel] = 40.0

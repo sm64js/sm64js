@@ -23,16 +23,16 @@ const sWaterCurrentSpeed = [28, 12, 8, 4]
 const update_water_pitch = (m) => {
     const marioObj = m.marioObj
 
-    if (marioObj.header.gfx.angle[0] > 0) {
-        marioObj.header.gfx.pos[1] += 60.0 * sins(marioObj.header.gfx.angle[0]) * sins(marioObj.header.gfx.angle[0])
+    if (marioObj.gfx.angle[0] > 0) {
+        marioObj.gfx.pos[1] += 60.0 * sins(marioObj.gfx.angle[0]) * sins(marioObj.gfx.angle[0])
     }
 
-    if (marioObj.header.gfx.angle[0] < 0) {
-        marioObj.header.gfx.angle[0] = (marioObj.header.gfx.angle[0] * 6) / 10
+    if (marioObj.gfx.angle[0] < 0) {
+        marioObj.gfx.angle[0] = (marioObj.gfx.angle[0] * 6) / 10
     }
 
-    if (marioObj.header.gfx.angle[0] > 0) {
-        marioObj.header.gfx.angle[0] = (marioObj.header.gfx.angle[0] * 10) / 8
+    if (marioObj.gfx.angle[0] > 0) {
+        marioObj.gfx.angle[0] = (marioObj.gfx.angle[0] * 10) / 8
     }
 }
 
@@ -145,7 +145,7 @@ const set_swimming_at_surface_particles = (m, particleFlag) => {
     if (atSurface) {
         m.particleFlags |= particleFlag
         /*TODO if (atSurface ^ sWasAtSurface) {
-            play_sound(SOUND_ACTION_UNKNOWN431, m.marioObj.header.gfx.cameraToObject);
+            play_sound(SOUND_ACTION_UNKNOWN431, m.marioObj.gfx.cameraToObject);
         }*/
     }
 
@@ -199,9 +199,9 @@ const act_water_plunge = (m) => {
     stepResult = perform_water_step(m)
 
     if (m.actionState === 0) {
-        /* TODO play_sound(SOUND_ACTION_UNKNOWN430, m.marioObj.header.gfx.cameraToObject);
+        /* TODO play_sound(SOUND_ACTION_UNKNOWN430, m.marioObj.gfx.cameraToObject);
          if (m.peakHeight - m.pos[1] > 1150.0) {
-            play_sound(SOUND_MARIO_HAHA_2, m.marioObj.header.gfx.cameraToObject);
+            play_sound(SOUND_MARIO_HAHA_2, m.marioObj.gfx.cameraToObject);
         }*/
 
         m.particleFlags |= Particles.PARTICLE_WATER_SPLASH
@@ -323,8 +323,8 @@ const perform_water_step = (m) => {
 
     stepResult = perform_water_full_step(m, nextPos)
 
-    vec3f_copy(marioObj.header.gfx.pos, m.pos)
-    vec3s_set(marioObj.header.gfx.angle, -m.faceAngle[0], m.faceAngle[1], m.faceAngle[2])
+    vec3f_copy(marioObj.gfx.pos, m.pos)
+    vec3s_set(marioObj.gfx.angle, -m.faceAngle[0], m.faceAngle[1], m.faceAngle[2])
 
     return stepResult
 }
@@ -434,7 +434,7 @@ const act_drowning = (m) => {
         case 1:
             Mario.set_mario_animation(m, Mario.MARIO_ANIM_DROWNING_PART2)
             // TODO m.marioBodyState.eyeState = Mario.MARIO_EYES_DEAD;
-            if (m.marioObj.header.gfx.animInfo.animFrame == 30) {
+            if (m.marioObj.gfx.animInfo.animFrame == 30) {
                 // TODO level_trigger_warp(m, WARP_OP_DEATH);
             }
             break
@@ -589,7 +589,7 @@ const act_breaststroke = (m) => {
 
     if (m.actionTimer == 1) {
         /* TODO play_sound(sSwimStrength === MIN_SWIM_STRENGTH ? SOUND_ACTION_SWIM : SOUND_ACTION_SWIM_FAST,
-                   m.marioObj.header.gfx.cameraToObject);*/
+                   m.marioObj.gfx.cameraToObject);*/
         reset_float_globals(m)
     }
 
@@ -648,7 +648,7 @@ const float_surface_gfx = (m) => {
     if (sBounceIncrement != 0 && m.pos[1] > m.waterLevel - 85 && m.faceAngle[0] >= 0) {
         sBounceAngle = s16(sBounceAngle + sBounceIncrement)
         if (sBounceAngle >= 0) {
-            m.marioObj.header.gfx.pos[1] += sBounceMult * sins(sBounceAngle)
+            m.marioObj.gfx.pos[1] += sBounceMult * sins(sBounceAngle)
             return
         }
     }
@@ -692,7 +692,7 @@ const act_hold_water_action_end = (m) => {
 
 const act_water_shocked = (m) => {
     //TODO play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_ACTION_SOUND_PLAYED);
-    //TODO play_sound(SOUND_MOVING_SHOCKED, m.marioObj.header.gfx.cameraToObject);
+    //TODO play_sound(SOUND_MOVING_SHOCKED, m.marioObj.gfx.cameraToObject);
     Camera.set_camera_shake_from_hit(CAMERA.SHAKE_SHOCK)
 
     if (Mario.set_mario_animation(m, Mario.MARIO_ANIM_SHOCKED) == 0) {

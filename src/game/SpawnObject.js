@@ -10,38 +10,29 @@ class SpawnObject {
     }
 
     clear_object_lists() {
+        const gObjectLists = ObjectListProc.gObjectLists
         for (let i = 0; i < ObjectListProc.NUM_OBJ_LISTS; i++) {
-            ObjectListProc.gObjectLists[i].next = ObjectListProc.gObjectLists[i]
-            ObjectListProc.gObjectLists[i].prev = ObjectListProc.gObjectLists[i]
-            // ObjectListProc.gObjectLists[i].gfx.wrapperObjectNode = null
+            gObjectLists[i].next = gObjectLists[i]
+            gObjectLists[i].prev = gObjectLists[i]
         }
     }
 
     try_allocate_object(destList) {
-        const objNode = {
+        const obj = {
             gfx: {},
-            next: null,
-            prev: null
+            next: null, prev: null,
+            activeFlags: 0,
+            rawData: new Array(0x50).fill(0)
         }
-        init_graph_node(objNode.gfx, GRAPH_NODE_TYPE_OBJECT)
+        init_graph_node(obj.gfx, GRAPH_NODE_TYPE_OBJECT)
+        obj.gfx.object = obj
 
-        objNode.gfx.wrapperObjectNode = objNode
-        const obj = { header: objNode, activeFlags: 0, rawData: new Array(0x50).fill(0) }
-        objNode.wrapperObject = obj
+        obj.prev = destList.prev
+        obj.next = destList
+        destList.prev.next = obj
+        destList.prev = obj
 
-        // if (!destList.gfx.wrapperObjectNode) { /// no object has been initialized yet
-        //     Object.assign(destList, objNode)
-        //     destList.prev = destList
-        //     destList.next = destList
-        // }
-
-        objNode.prev = destList.prev
-        objNode.next = destList
-        destList.prev.next = objNode
-        destList.prev = objNode
-
-        // geo_remove_child(objNode.gfx)
-        geo_add_child(gLinker.GeoLayout.gObjParentGraphNode, objNode.gfx)
+        geo_add_child(gLinker.GeoLayout.gObjParentGraphNode, obj.gfx)
         return obj
     }
 
@@ -83,9 +74,9 @@ class SpawnObject {
         obj.rawData[oDistanceToMario] = 19000.0
         obj.rawData[oRoom] = -1
     
-        obj.header.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
-        obj.header.gfx.pos = [ -10000.0, -10000.0, -10000.0 ]
-        obj.header.gfx.throwMatrix = null
+        obj.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
+        obj.gfx.pos = [ -10000.0, -10000.0, -10000.0 ]
+        obj.gfx.throwMatrix = null
 
         return obj
     }
@@ -109,16 +100,15 @@ class SpawnObject {
         obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED
         obj.prevObj = null
 
-        obj.header.gfx.throwMatrix = null
+        obj.gfx.throwMatrix = null
 
         //func_803206F8 TODO
-        geo_remove_child(obj.header.gfx)
-        // geo_add_child(gLinker.GeoLayout.gObjParentGraphNode, obj.header.gfx)
+        geo_remove_child(obj.gfx)
 
-        obj.header.gfx.flags &= ~GRAPH_RENDER_BILLBOARD
-        obj.header.gfx.flags &= ~GRAPH_RENDER_ACTIVE
+        obj.gfx.flags &= ~GRAPH_RENDER_BILLBOARD
+        obj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
 
-        this.deallocate_object(obj.header)
+        this.deallocate_object(obj)
     }
 
 

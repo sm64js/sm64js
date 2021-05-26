@@ -179,11 +179,11 @@ export const obj_set_hitbox = (obj, hitbox) => {
         cur_obj_become_tangible()
     }
 
-    obj.hitboxRadius = obj.header.gfx.scale[0] * hitbox.radius
-    obj.hitboxHeight = obj.header.gfx.scale[1] * hitbox.height
-    obj.hurtboxRadius = obj.header.gfx.scale[0] * hitbox.hurtboxRadius
-    obj.hurtboxHeight = obj.header.gfx.scale[1] * hitbox.hurtboxHeight
-    obj.hitboxDownOffset = obj.header.gfx.scale[1] * hitbox.downOffset
+    obj.hitboxRadius = obj.gfx.scale[0] * hitbox.radius
+    obj.hitboxHeight = obj.gfx.scale[1] * hitbox.height
+    obj.hurtboxRadius = obj.gfx.scale[0] * hitbox.hurtboxRadius
+    obj.hurtboxHeight = obj.gfx.scale[1] * hitbox.hurtboxHeight
+    obj.hitboxDownOffset = obj.gfx.scale[1] * hitbox.downOffset
 }
 
 export const obj_bounce_off_walls_edges_objects = (targetYawWrapper) => {
@@ -304,7 +304,7 @@ export const obj_act_knockback = () => {
 
     cur_obj_update_floor_and_walls()
 
-    if (o.header.gfx.unk38.curAnim) {
+    if (o.gfx.unk38.curAnim) {
         cur_obj_extend_animation_if_at_end()
     }
 
@@ -324,14 +324,14 @@ export const obj_act_squished = (baseScale) => {
 
     const o = ObjectListProc.gCurrentObject
 
-    if (o.header.gfx.unk38.curAnim) {
+    if (o.gfx.unk38.curAnim) {
         cur_obj_extend_animation_if_at_end()
     }
 
-    const result = approach_number_ptr(o.header.gfx.scale, 1, targetScaleY, baseScale * 0.14)
+    const result = approach_number_ptr(o.gfx.scale, 1, targetScaleY, baseScale * 0.14)
     if (result) {
-        o.header.gfx.scale[0] = baseScale * 2.0 - o.header.gfx.scale[1]
-        o.header.gfx.scale[2] = baseScale * 2.0 - o.header.gfx.scale[1]
+        o.gfx.scale[0] = baseScale * 2.0 - o.gfx.scale[1]
+        o.gfx.scale[2] = baseScale * 2.0 - o.gfx.scale[1]
 
         if (o.rawData[oTimer] >= 16) {
             obj_die_if_health_non_positive()

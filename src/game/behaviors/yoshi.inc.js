@@ -49,7 +49,7 @@ const bhv_yoshi_init = () => {
 
 const yoshi_walk_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-   let /*s16*/sp24 = o.header.gfx.unk38.animFrame
+   let /*s16*/sp24 = o.gfx.unk38.animFrame
 
     o.rawData[oForwardVel] = 10.0
     let sp26 = object_step()
@@ -127,7 +127,7 @@ const yoshi_talk_loop = () => {
 }
 
 // void yoshi_walk_and_jump_off_roof_loop(void) {
-//     s16 sp26 = o->header.gfx.unk38.animFrame;
+//     s16 sp26 = o->.gfx.unk38.animFrame;
 
 //     o->oForwardVel = 10.0f;
 //     object_step();

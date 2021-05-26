@@ -162,7 +162,11 @@ export const spawn_special_objects = (areaIndex, specialObjList, dataIndex) => {
     SpecialObjectPresets_init()
     const numOfSpecialObjects = specialObjList[dataIndex++]
     ObjectListProc.gMacroObjectDefaultParent = {
-        header: { gfx: { areaIndex: areaIndex, activeAreaIndex: areaIndex } } }
+        gfx: {
+            areaIndex: areaIndex,
+            activeAreaIndex: areaIndex
+        }
+    }
 
     for (let i = 0; i < numOfSpecialObjects; i++) {
         const presetID = specialObjList[dataIndex++]
@@ -204,8 +208,8 @@ export const spawn_special_objects = (areaIndex, specialObjList, dataIndex) => {
 }
 
 export const spawn_macro_objects = (areaIndex, macroObjList) => {
-    ObjectListProc.gMacroObjectDefaultParent.header.gfx.areaIndex = areaIndex
-    ObjectListProc.gMacroObjectDefaultParent.header.gfx.activeAreaIndex = areaIndex
+    ObjectListProc.gMacroObjectDefaultParent.gfx.areaIndex = areaIndex
+    ObjectListProc.gMacroObjectDefaultParent.gfx.activeAreaIndex = areaIndex
 
     let p, preset
 

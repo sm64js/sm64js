@@ -822,7 +822,7 @@ class LevelUpdate {
 
 //                 Mario.set_mario_action(gMarioState, ACT_DISAPPEARED, 0)
 
-//                 gMarioState.marioObj.header.gfx.flags &= ~GRAPH_RENDER_ACTIVE
+//                 gMarioState.marioObj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
 
 //                 play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource)
 //                 fadeout_music(398)
@@ -1192,7 +1192,7 @@ class LevelUpdate {
                     }
     
                     this.gHudDisplay.coins += 1;
-                    //play_sound(coinSound, this.gMarioState.marioObj.header.gfx.cameraToObject)
+                    //play_sound(coinSound, this.gMarioState.marioObj.gfx.cameraToObject)
                 }
             }
     

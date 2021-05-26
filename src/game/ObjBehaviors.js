@@ -19,9 +19,9 @@ export let sObjFloor
 export let sOrientObjWithFloor = 1
 
 export const is_point_within_radius_of_mario = (x, y, z, dist) => {
-    const mGfxX = ObjectListProc.gMarioObject.header.gfx.pos[0]
-    const mGfxY = ObjectListProc.gMarioObject.header.gfx.pos[1]
-    const mGfxZ = ObjectListProc.gMarioObject.header.gfx.pos[2]
+    const mGfxX = ObjectListProc.gMarioObject.gfx.pos[0]
+    const mGfxY = ObjectListProc.gMarioObject.gfx.pos[1]
+    const mGfxZ = ObjectListProc.gMarioObject.gfx.pos[2]
 
     if ((x - mGfxX) * (x - mGfxX) + (y - mGfxY) * (y - mGfxY) + (z - mGfxZ) * (z - mGfxZ) < dist * dist) {
         return 1
@@ -88,9 +88,9 @@ export const curr_obj_random_blink = (blinkTimer) => {
  */
 export const set_object_visibility = (obj, dist) => {
     if (is_point_within_radius_of_mario(obj.rawData[oPosX], obj.rawData[oPosY], obj.rawData[oPosZ], dist) == 1) {
-        obj.header.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
+        obj.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
     } else {
-        obj.header.gfx.flags |= GRAPH_RENDER_INVISIBLE
+        obj.gfx.flags |= GRAPH_RENDER_INVISIBLE
     }
 }
 
@@ -187,7 +187,7 @@ export const obj_orient_graph = (obj, normalX, normalY, normalZ) => {
     if (sOrientObjWithFloor == 0) return
 
     // Passes on orienting billboard objects, i.e. coins, trees, etc.
-    if ((obj.header.gfx.flags & GRAPH_RENDER_BILLBOARD) != 0) return
+    if ((obj.gfx.flags & GRAPH_RENDER_BILLBOARD) != 0) return
 
     const throwMatrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
 
@@ -200,7 +200,7 @@ export const obj_orient_graph = (obj, normalX, normalY, normalZ) => {
     surfaceNormals[2] = normalZ
 
     mtxf_align_terrain_normal(throwMatrix, surfaceNormals, objVisualPosition, obj.rawData[oFaceAngleYaw])
-    obj.header.gfx.throwMatrix = throwMatrix
+    obj.gfx.throwMatrix = throwMatrix
 }
 
 export const calc_obj_friction = (objFrictionWrapper, floor_nY) => {
@@ -381,9 +381,9 @@ export const obj_flicker_and_disappear = (obj, lifeSpan) => {
     if (obj.rawData[oTimer] < lifeSpan + 40) {
 
         if (obj.rawData[oTimer] % 2 != 0) {
-            obj.header.gfx.flags |= GRAPH_RENDER_INVISIBLE
+            obj.gfx.flags |= GRAPH_RENDER_INVISIBLE
         } else {
-            obj.header.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
+            obj.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
         }
 
     } else {

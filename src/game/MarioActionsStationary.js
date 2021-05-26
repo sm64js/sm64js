@@ -327,7 +327,7 @@ const act_side_flip_land_stop = (m) => {
     if (check_common_landing_cancels(m, 0)) return 1
 
     landing_step(m, MARIO_ANIM_SLIDEFLIP_LAND, ACT_IDLE)
-    m.marioObj.header.gfx.angle[1] += 0x8000
+    m.marioObj.gfx.angle[1] += 0x8000
     return 0
 }
 
@@ -421,7 +421,7 @@ const act_stop_crouching = (m) => {
 }
 
 const act_backflip_land_stop = (m) => {
-    if (!(m.input & INPUT_Z_DOWN) || m.marioObj.header.gfx.unk38.animFrame >= 6) {
+    if (!(m.input & INPUT_Z_DOWN) || m.marioObj.gfx.unk38.animFrame >= 6) {
         m.input &= -3
     }
 
@@ -514,7 +514,7 @@ const act_butt_slide_stop = (m) => {
 
     stopping_step(m, MARIO_ANIM_STOP_SLIDE, ACT_IDLE)
 
-    if (m.marioObj.header.gfx.unk38.animFrame == 6) {
+    if (m.marioObj.gfx.unk38.animFrame == 6) {
         //play landing sound
     }
 

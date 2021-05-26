@@ -152,14 +152,14 @@ class MarioMisc {
     geo_move_mario_part_from_parent(callContext, node, mtx) {
         if (callContext == GEO_CONTEXT_RENDER) {
             const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
-            const gCurGraphNodeObject = gLinker.GeoRenderer.gCurGraphNodeObject.wrapperObjectNode.wrapperObject
             const gCurGraphNodeCamera = gLinker.GeoRenderer.gCurGraphNodeCamera
+            const obj = gLinker.GeoRenderer.gCurGraphNodeObject.object
             const xfm = Mat4()
 
-            if (gCurGraphNodeObject == gMarioObject && gCurGraphNodeObject.prevObj != null) {
+            if (obj == gMarioObject && obj.prevObj) {
                 create_transformation_from_matrices(xfm, mtx, gCurGraphNodeCamera.matrixPtr)
-                obj_update_pos_from_parent_transformation(xfm, gCurGraphNodeObject.prevObj)
-                obj_set_gfx_pos_from_pos(gCurGraphNodeObject.prevObj)
+                obj_update_pos_from_parent_transformation(xfm, obj.prevObj)
+                obj_set_gfx_pos_from_pos(obj.prevObj)
             }
         }
         return null
@@ -315,27 +315,27 @@ class MarioMisc {
     /**
      * Geo node that updates the held object node and the HOLP.
      */
-    geo_switch_mario_hand_grab_pos(callContext, heldObj, mtx) {
+    geo_switch_mario_hand_grab_pos(callContext, node, mtx) {
         const marioState = gLinker.LevelUpdate.gMarioState
         const gCurGraphNodeCamera = gLinker.GeoRenderer.gCurGraphNodeCamera
 
         if (callContext == GEO_CONTEXT_RENDER) {
-            heldObj.objNode = null
+            node.object = null
             if (marioState.heldObj) {
-                heldObj.objNode = marioState.heldObj
+                node.object = marioState.heldObj
                 switch (this.gBodyState.grabPos) {
                     case GRAB_POS_LIGHT_OBJ:
                         if (marioState.action & ACT_FLAG_THROWING) {
-                            vec3s_set(heldObj.translation, 50, 0, 0)
+                            vec3s_set(node.translation, 50, 0, 0)
                         } else {
-                            vec3s_set(heldObj.translation, 50, 0, 110)
+                            vec3s_set(node.translation, 50, 0, 110)
                         }
                         break
                     case GRAB_POS_HEAVY_OBJ:
-                        vec3s_set(heldObj.translation, 145, -173, 180)
+                        vec3s_set(node.translation, 145, -173, 180)
                         break
                     case GRAB_POS_BOWSER:
-                        vec3s_set(heldObj.translation, 80, -270, 1260)
+                        vec3s_set(node.translation, 80, -270, 1260)
                         break
                 }
             }
@@ -371,15 +371,15 @@ class MarioMisc {
         //         geo_remove_child(&gMirrorMario.node)
         //         break
         //     case GEO_CONTEXT_RENDER:
-        //         if (mario.header.gfx.pos[0] > 1700.0) {
+        //         if (mario.gfx.pos[0] > 1700.0) {
         //               // TODO: Is this a geo layout copy or a graph node copy?
-        //             gMirrorMario.sharedChild = mario.header.gfx.sharedChild
-        //             gMirrorMario.areaIndex = mario.header.gfx.areaIndex
-        //             vec3s_copy(gMirrorMario.angle, mario.header.gfx.angle)
-        //             vec3f_copy(gMirrorMario.pos, mario.header.gfx.pos)
-        //             vec3f_copy(gMirrorMario.scale, mario.header.gfx.scale)
+        //             gMirrorMario.sharedChild = mario.gfx.sharedChild
+        //             gMirrorMario.areaIndex = mario.gfx.areaIndex
+        //             vec3s_copy(gMirrorMario.angle, mario.gfx.angle)
+        //             vec3f_copy(gMirrorMario.pos, mario.gfx.pos)
+        //             vec3f_copy(gMirrorMario.scale, mario.gfx.scale)
 
-        //             gMirrorMario.animInfo = mario.header.gfx.animInfo
+        //             gMirrorMario.animInfo = mario.gfx.animInfo
         //             mirroredX = MIRROR_X - gMirrorMario.pos[0]
         //             gMirrorMario.pos[0] = mirroredX + MIRROR_X
         //             gMirrorMario.angle[1] = -gMirrorMario.angle[1]

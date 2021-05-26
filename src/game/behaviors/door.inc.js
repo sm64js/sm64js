@@ -119,8 +119,9 @@ export const bhv_door_loop = () => {
             play_warp_door_open_noise()
             break
     }
-    if (o.rawData[oAction] == 0)
+    if (o.rawData[oAction] == 0) {
         gLinker.SurfaceLoad.load_object_collision_model()
+    }
     bhv_star_door_loop_2()
 }
 

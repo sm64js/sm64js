@@ -4,6 +4,19 @@ import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProce
 import { castle_grounds_movtex_water, castle_grounds_movtex_tris_waterfall, castle_grounds_dl_waterfall } from "../levels/castle_grounds/areas/1/movtext.inc"
 import { ccm_movtex_penguin_puddle_water } from "../levels/ccm/areas/1/movtext.inc"
 import { wf_movtex_water } from "../levels/wf/areas/1/movtext.inc"
+// import { bbh_movtex_merry_go_round_water_entrance, bbh_movtex_merry_go_round_water_side } from "../levels/bbh/areas/1/movtext.inc"
+// import { ttm_movtex_puddle, ttm_movtex_tris_begin_waterfall, ttm_movtex_tris_end_waterfall, ttm_dl_waterfall, ttm_movtex_tris_begin_puddle_waterfall, ttm_movtex_tris_end_puddle_waterfall, ttm_movtex_tris_puddle_waterfall } from "../levels/ttm/areas/1/movtext.inc"
+// import { ssl_movtex_puddle_water } from "../levels/ssl/areas/1/movtext.inc"
+// import { ssl_movtex_toxbox_quicksand_mist } from "../levels/ssl/areas/1/movtext.inc"
+import { castle_courtyard_movtex_star_statue_water } from "../levels/castle_courtyard/areas/1/movtext.inc"
+// import { sl_movtex_water } from "../levels/sl/areas/1/movtext.inc"
+// import { hmc_movtex_dorrie_pool_water } from "../levels/hmc/areas/1/movtext.inc"
+//import { hmc_movtex_toxic_maze_mist } from "../levels/hmc/areas/1/movtext.inc"
+// import { thi_movtex_area1_water } from "../levels/thi/areas/1/movtext.inc"
+// import { thi_movtex_area2_water } from "../levels/thi/areas/2/movtext.inc"
+// import { inside_castle_movtex_green_room_water } from "../levels/castle_inside/areas/3/movtext.inc"
+// import { inside_castle_movtex_moat_water } from "../levels/castle_inside/areas/3/movtext.inc"
+
 import { GeoLayoutInstance as GeoLayout } from "../engine/GeoLayout"
 import * as Gbi from "../include/gbi"
 import { dl_waterbox_rgba16_begin, dl_waterbox_end, dl_draw_quad_verts_0123, texture_waterbox_water, texture_waterbox_lava } from "../common_gfx/segment2"
@@ -124,7 +137,41 @@ const get_quad_collection_from_id = (id) => {
             return ccm_movtex_penguin_puddle_water
         case WF_MOVTEX_WATER:
             return wf_movtex_water
-        default: throw "unknown case - get quad collection from id"
+        case BBH_MOVTEX_MERRY_GO_ROUND_WATER_ENTRANCE:
+            return bbh_movtex_merry_go_round_water_entrance
+        case BBH_MOVTEX_MERRY_GO_ROUND_WATER_SIDE:
+            return bbh_movtex_merry_go_round_water_side
+        case SSL_MOVTEX_PUDDLE_WATER:
+            return ssl_movtex_puddle_water
+        case SSL_MOVTEX_TOXBOX_QUICKSAND_MIST:
+            return ssl_movtex_toxbox_quicksand_mist
+        case TTM_MOVTEX_PUDDLE:
+            return ttm_movtex_puddle
+        case MOVTEX_TTM_BEGIN_PUDDLE_WATERFALL:
+            return ttm_movtex_tris_begin_puddle_waterfall
+        case MOVTEX_TTM_BEGIN_WATERFALL:
+            return ttm_movtex_tris_begin_waterfall
+        case MOVTEX_TTM_END_WATERFALL:
+            return ttm_movtex_tris_end_waterfall
+        case MOVTEX_TTM_END_PUDDLE_WATERFALL:
+            return ttm_movtex_tris_end_puddle_waterfall
+        case MOVTEX_TTM_PUDDLE_WATERFALL:
+            return ttm_movtex_tris_puddle_waterfall
+        case CASTLE_COURTYARD_MOVTEX_STAR_STATUE_WATER:
+            return castle_courtyard_movtex_star_statue_water
+        case SL_MOVTEX_WATER:
+            return sl_movtex_water
+        case HMC_MOVTEX_DORRIE_POOL_WATER:
+            return hmc_movtex_dorrie_pool_water
+        case THI_MOVTEX_AREA1_WATER:
+            return thi_movtex_area1_water
+        case THI_MOVTEX_AREA2_WATER:
+            return thi_movtex_area2_water
+        case INSIDE_CASTLE_MOVTEX_GREEN_ROOM_WATER:
+            return inside_castle_movtex_green_room_water
+        case INSIDE_CASTLE_MOVTEX_MOAT_WATER:
+            return inside_castle_movtex_moat_water
+        default: throw "unknown case - get quad collection from id:" + id
     }
 }
 

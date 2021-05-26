@@ -85,7 +85,7 @@ class Convert
             @js_dir += "/#{dir}"
         end
 
-puts "convert #{@c_dir} -> #{@js_dir}"
+# puts "convert #{@c_dir} -> #{@js_dir}"
 
         Dir.glob(@c_dir + "/*") do |f|
             fn = File.basename(f)
@@ -638,10 +638,10 @@ puts "convert #{@c_dir} -> #{@js_dir}"
 
         while true
             line = @lines[@n]
-puts line
+# puts line
             # static const Lights1 cannon_barrel_seg8_lights_08005878 = gdSPDefLights1(
             if line =~ /(static )*const Lights1 (\w+)/
-puts "*****"
+# puts "*****"
                 export = $1 ? "" : "export "
                 @text.push("#{export}const #{$2} = gdSPDefLights1(")
 
@@ -869,7 +869,7 @@ puts "*****"
         end
 
         jsfn = fn.delete_suffix(".c") + ".js"
-        File.open(@js_dir + "/" + jsfn, "w") {|f| f.puts(out)}
+        File.open(@js_dir + "/" + jsfn, "w") {|f| f.puts(@text)}
     end
 
 

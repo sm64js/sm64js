@@ -237,13 +237,21 @@ class LevelUpdate {
     }
 
     lvl_init_from_save_file(arg0, levelNum) {
+        this.sWarpDest.type = WARP_TYPE_NOT_WARPING
+        this.sDelayedWarpOp = WARP_OP_NONE
+        // this.gNeverEnteredCastle = !save_file_exists(gCurrSaveFileNum - 1)
+
         Area.gCurrLevelNum = levelNum
         Area.gCurrCourseNum = COURSE_NONE
         Area.gSavedCourseNum = COURSE_NONE
         Area.gCurrCreditsEntry = null
+        // this.gSpecialTripleJump = 0
 
         Mario.init_mario_from_save_file()
+        // disable_warp_checkpoint();
+        // save_file_move_cap_to_default_location();
         Camera.select_mario_cam_mode()
+        // set_yoshi_as_not_dead();
 
         return levelNum
     }

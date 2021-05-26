@@ -1,38 +1,64 @@
-import { GeoLayoutInstance as Geo } from "../../../../engine/GeoLayout"
-import { CameraInstance as Camera } from "../../../../game/Camera"
-import { geo_skybox_main } from "../../../../game/LevelGeo"
+// Castle Courtyard
+
+import {
+    SCREEN_WIDTH, SCREEN_HEIGHT
+} from "../../../../game/Skybox"
+
+import {
+    GEO_NODE_SCREEN_AREA, GEO_OPEN_NODE, GEO_ZBUFFER, GEO_NODE_ORTHO, GEO_BACKGROUND,
+    GEO_CLOSE_NODE, GEO_CAMERA_FRUSTUM_WITH_FUNC, GEO_CAMERA, GEO_DISPLAY_LIST, GEO_ASM,
+    GEO_RENDER_OBJ, GEO_END,
+    BACKGROUND_OCEAN_SKY, LAYER_OPAQUE, LAYER_TRANSPARENT_DECAL, LAYER_ALPHA
+} from "../../../../engine/GeoLayout"
+
+import {
+    geo_skybox_main, geo_envfx_main
+} from "../../../../game/LevelGeo"
+
+import {
+    geo_camera_fov, geo_camera_main
+} from "../../../../game/Camera"
 
 import { castle_courtyard_seg7_dl_070048B8 } from "./1/model.inc"
+
 import { castle_courtyard_seg7_dl_07005698 } from "./2/model.inc"
+
 import { castle_courtyard_seg7_dl_07005938 } from "./3/model.inc"
 
-const canvas = document.querySelector('#gameCanvas')
+import {
+    geo_movtex_pause_control, geo_movtex_draw_water_regions
+} from "../../../../game/MovingTexture"
 
-export const castle_courtyard_geo_000218 = [
-	{ command: Geo.node_screen_area, args: [10, canvas.width/2, canvas.height/2, canvas.width/2, canvas.height/2]},
-	{ command: Geo.open_node },
-	{ command: Geo.node_master_list, args: [0]},
-	{ command: Geo.open_node },
-	{ command: Geo.node_ortho, args: [100]},
-	{ command: Geo.open_node },
-	{ command: Geo.node_background, args: [Geo.BACKGROUND_OCEAN_SKY, geo_skybox_main] },
-	{ command: Geo.close_node },
-	{ command: Geo.close_node },
-	{ command: Geo.node_master_list, args: [1]},
-	{ command: Geo.open_node },
-	{ command: Geo.node_perspective, args: [45, 100, 12800, Camera.geo_camera_fov] },
-	{ command: Geo.open_node },
-	{ command: Geo.node_camera, args: [16, 0, 2000, 6000, 0, 0, 0, Camera.geo_camera_main]},
-	{ command: Geo.open_node },
-	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, castle_courtyard_seg7_dl_070048B8] },
-	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT_DECAL, castle_courtyard_seg7_dl_07005698] },
-	{ command: Geo.display_list, args: [Geo.LAYER_ALPHA, castle_courtyard_seg7_dl_07005938] },
-//	{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-//	{ command: Geo.node_generated, args: [0x2601, geo_movtex_draw_water_regions]},
-	{ command: Geo.node_render_object_parent },
-	{ command: Geo.close_node },
-	{ command: Geo.close_node },
-	{ command: Geo.close_node },
-	{ command: Geo.close_node },
-	{ command: Geo.node_end },
-]
+
+// 0x0E000218
+export const castle_courtyard_geo_000218 = () => {return [
+    GEO_NODE_SCREEN_AREA(10, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+    GEO_OPEN_NODE(),
+        GEO_ZBUFFER(0),
+        GEO_OPEN_NODE(),
+            GEO_NODE_ORTHO(100),
+            GEO_OPEN_NODE(),
+                GEO_BACKGROUND(BACKGROUND_OCEAN_SKY, geo_skybox_main),
+            GEO_CLOSE_NODE(),
+        GEO_CLOSE_NODE(),
+        GEO_ZBUFFER(1),
+        GEO_OPEN_NODE(),
+            GEO_CAMERA_FRUSTUM_WITH_FUNC(45, 100, 12800, geo_camera_fov),
+            GEO_OPEN_NODE(),
+                GEO_CAMERA(16, 0, 2000, 6000, 0, 0, 0, geo_camera_main),
+                GEO_OPEN_NODE(),
+                    GEO_DISPLAY_LIST(LAYER_OPAQUE, castle_courtyard_seg7_dl_070048B8),
+                    GEO_DISPLAY_LIST(LAYER_TRANSPARENT_DECAL, castle_courtyard_seg7_dl_07005698),
+                    GEO_DISPLAY_LIST(LAYER_ALPHA, castle_courtyard_seg7_dl_07005938),
+                    GEO_ASM(0, geo_movtex_pause_control),
+                    GEO_ASM(0x2601, geo_movtex_draw_water_regions),
+                    GEO_RENDER_OBJ(),
+                    GEO_ASM(0, geo_envfx_main),
+                GEO_CLOSE_NODE(),
+            GEO_CLOSE_NODE(),
+        GEO_CLOSE_NODE(),
+    GEO_CLOSE_NODE(),
+    GEO_END(),
+]};
+
+// 1621915736 - 2021-05-25 23:20:16 -0700

@@ -2,7 +2,7 @@ import * as IDB from "idb-keyval"
 var msgpack = require("msgpack-lite")
 import { assets } from "./assets"
 
-const textureVersion = 38  // bump this if you change ROM import
+const textureVersion = 39  // bump this if you change ROM import
 
 let loadedGameAssets = false
 const url = new URL(window.location.href)
@@ -125,32 +125,6 @@ import { cannon_lid_seg8_texture_08004058 } from "./actors/cannon_lid/model.inc"
 
 import { capswitch_seg5_texture_05001C48,
          capswitch_seg5_texture_05002C48 } from "./actors/capswitch/model.inc"
-
-
-import {
-    jrb_seg7_texture_07000000,
-    jrb_seg7_texture_07000800,
-    jrb_seg7_texture_07001800,
-    jrb_seg7_texture_07002000
-} from "./levels/jrb/texture.inc"
-
-import {
-    water_09000000,
-    water_09000800,
-    water_09001800,
-    water_09002800,
-    water_09003800,
-    water_09004800,
-    water_09005800,
-    water_09006000,
-    water_09006800,
-    water_09007800,
-    water_09008800,
-    water_09009000,
-    water_0900A000,
-    water_0900A800,
-    water_0900B800
-} from "./textures/water"
 
 import { chain_ball_seg6_texture_06020AE8 } from "./actors/chain_ball/model.inc"
 
@@ -1322,6 +1296,22 @@ import { spooky_09000000,
          spooky_0900A800,
          spooky_0900B000,
          spooky_0900B800 } from "./textures/spooky"
+
+import { water_09000000,
+         water_09000800,
+         water_09001800,
+         water_09002800,
+         water_09003800,
+         water_09004800,
+         water_09005800,
+         water_09006000,
+         water_09006800,
+         water_09007800,
+         water_09008800,
+         water_09009000,
+         water_0900A000,
+         water_0900A800,
+         water_0900B800 } from "./textures/water"
 
 
 const loadDataIntoGame = (data) => {
@@ -2592,6 +2582,22 @@ const loadDataIntoGame = (data) => {
     spooky_0900A800.push(...data["textures/spooky/bbh_textures.0A800.ia16.png"])
     spooky_0900B000.push(...data["textures/spooky/bbh_textures.0B000.ia16.png"])
     spooky_0900B800.push(...data["textures/spooky/bbh_textures.0B800.ia16.png"])
+
+    water_09000000.push(...data["textures/water/jrb_textures.00000.rgba16.png"])
+    water_09000800.push(...data["textures/water/jrb_textures.00800.rgba16.png"])
+    water_09001800.push(...data["textures/water/jrb_textures.01800.rgba16.png"])
+    water_09002800.push(...data["textures/water/jrb_textures.02800.rgba16.png"])
+    water_09003800.push(...data["textures/water/jrb_textures.03800.rgba16.png"])
+    water_09004800.push(...data["textures/water/jrb_textures.04800.rgba16.png"])
+    water_09005800.push(...data["textures/water/jrb_textures.05800.rgba16.png"])
+    water_09006000.push(...data["textures/water/jrb_textures.06000.rgba16.png"])
+    water_09006800.push(...data["textures/water/jrb_textures.06800.rgba16.png"])
+    water_09007800.push(...data["textures/water/jrb_textures.07800.rgba16.png"])
+    water_09008800.push(...data["textures/water/jrb_textures.08800.rgba16.png"])
+    water_09009000.push(...data["textures/water/jrb_textures.09000.rgba16.png"])
+    water_0900A000.push(...data["textures/water/jrb_textures.0A000.rgba16.png"])
+    water_0900A800.push(...data["textures/water/jrb_textures.0A800.rgba16.png"])
+    water_0900B800.push(...data["textures/water/jrb_textures.0B800.rgba16.png"])
 
     const skyboxes = [
         [bbh_skybox_texture,         "bbh_skybox_texture"],

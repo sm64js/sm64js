@@ -527,3 +527,11 @@ export const dl_waterbox_end = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
 	Gbi.gsSPEndDisplayList(),
 ]
+
+export const texture_waterbox_water = []
+export const texture_waterbox_lava = []
+export const texture_waterbox_jrb_water = []
+
+
+export const texture_transition_star_half = []
+

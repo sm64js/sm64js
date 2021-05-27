@@ -126,6 +126,32 @@ import { cannon_lid_seg8_texture_08004058 } from "./actors/cannon_lid/model.inc"
 import { capswitch_seg5_texture_05001C48,
          capswitch_seg5_texture_05002C48 } from "./actors/capswitch/model.inc"
 
+
+import {
+    jrb_seg7_texture_07000000,
+    jrb_seg7_texture_07000800,
+    jrb_seg7_texture_07001800,
+    jrb_seg7_texture_07002000
+} from "./levels/jrb/texture.inc"
+
+import {
+    water_09000000,
+    water_09000800,
+    water_09001800,
+    water_09002800,
+    water_09003800,
+    water_09004800,
+    water_09005800,
+    water_09006000,
+    water_09006800,
+    water_09007800,
+    water_09008800,
+    water_09009000,
+    water_0900A000,
+    water_0900A800,
+    water_0900B800
+} from "./textures/water"
+
 import { chain_ball_seg6_texture_06020AE8 } from "./actors/chain_ball/model.inc"
 
 import { chain_chomp_seg6_texture_060213D0,
@@ -2589,6 +2615,7 @@ const loadDataIntoGame = (data) => {
             sd[i].push(...d)
         }
     }
+
 
     document.getElementById('romSelect').hidden = true
     msgElement.innerHTML = "Rom Asset Extraction Success - You may now start the game"

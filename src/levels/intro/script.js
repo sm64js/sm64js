@@ -13,7 +13,6 @@ import { WARP_TRANSITION_FADE_INTO_COLOR, WARP_TRANSITION_FADE_FROM_STAR, WARP_T
 import { level_main_scripts_entry } from "../scripts"
 import { lvl_intro_update } from "../../menu/level_select_menu"
 
-
 export const level_intro_splash_screen = [
     // JOE DEBUG
     EXIT_AND_EXECUTE('level_main_scripts_entry'),

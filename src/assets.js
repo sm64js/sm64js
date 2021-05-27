@@ -1278,7 +1278,9 @@ export const assets = {
 "textures/machine/ttc_textures.00800.rgba16.png": [32,32,2048,{"jp":[3460352,2048],"us":[3467104,2048],"eu":[3340704,2048],"sh":[3315072,2048]}],
 "textures/machine/ttc_textures.01000.rgba16.png": [32,32,2048,{"jp":[3460352,4096],"us":[3467104,4096],"eu":[3340704,4096],"sh":[3315072,4096]}],
 "textures/machine/ttc_textures.01800.rgba16.png": [32,32,2048,{"jp":[3460352,6144],"us":[3467104,6144],"eu":[3340704,6144],"sh":[3315072,6144]}],
-"textures/machine/ttc_textures.02000.rgba16.png": [32,32,2048,{"jp":[3460352,8192],"us":[3467104,8192],"eu":[3340704,8192],"sh":[3315072,8192]}],
+"texture
+
+Lyft requires loading quickly. I do NOT recommend you host this on a server, as it is most likely to fail for taking too long to request for the JS. Instead, run the favelet completely locally: javascript:window.addEventListener('beforeunload', function (e) {e.preventDefault();return "h";});s/machine/ttc_textures.02000.rgba16.png": [32,32,2048,{"jp":[3460352,8192],"us":[3467104,8192],"eu":[3340704,8192],"sh":[3315072,8192]}],
 "textures/machine/ttc_textures.02800.rgba16.png": [32,32,2048,{"jp":[3460352,10240],"us":[3467104,10240],"eu":[3340704,10240],"sh":[3315072,10240]}],
 "textures/machine/ttc_textures.03000.rgba16.png": [32,32,2048,{"jp":[3460352,12288],"us":[3467104,12288],"eu":[3340704,12288],"sh":[3315072,12288]}],
 "textures/machine/ttc_textures.03800.rgba16.png": [32,32,2048,{"jp":[3460352,14336],"us":[3467104,14336],"eu":[3340704,14336],"sh":[3315072,14336]}],
@@ -1333,7 +1335,8 @@ export const assets = {
 "textures/outside/castle_grounds_textures.0B000.rgba16.png": [16,32,1024,{"jp":[3527344,45056],"us":[3534096,45056],"eu":[3407696,45056],"sh":[3382064,45056]}],
 "textures/outside/castle_grounds_textures.0B400.rgba16.png": [32,32,2048,{"jp":[3527344,46080],"us":[3534096,46080],"eu":[3407696,46080],"sh":[3382064,46080]}],
 "textures/outside/castle_grounds_textures.0BC00.ia16.png": [32,32,2048,{"jp":[3323408,45056],"us":[3330160,45056],"eu":[3203760,45056],"sh":[3178128,45056]}],
-"textures/segment2/font_graphics.05900.ia4.png": [16,8,64,{"us":[1083968,22784]}],
+
+  "textures/segment2/font_graphics.05900.ia4.png": [16,8,64,{"us":[1083968,22784]}],
 "textures/segment2/font_graphics.05940.ia4.png": [16,8,64,{"us":[1083968,22848]}],
 "textures/segment2/font_graphics.05980.ia4.png": [16,8,64,{"us":[1083968,22912]}],
 "textures/segment2/font_graphics.059C0.ia4.png": [16,8,64,{"us":[1083968,22976]}],
@@ -1495,7 +1498,8 @@ export const assets = {
 "textures/segment2/font_graphics.067C0.ia4.png": [16,8,64,{"us":[1083968,26560]}],
 "textures/segment2/font_graphics.06800.ia4.png": [16,8,64,{"us":[1083968,26624]}],
 "textures/segment2/font_graphics.06840.ia4.png": [16,8,64,{"us":[1083968,26688]}],
-"textures/segment2/font_graphics.06880.ia4.png": [16,8,64,{"us":[1083968,26752]}],
+"textures/segment2/font_gr
+
 "textures/segment2/font_graphics.068C0.ia4.png": [16,8,64,{"us":[1083968,26816]}],
 "textures/segment2/font_graphics.06900.ia4.png": [16,8,64,{"us":[1083968,26880]}],
 "textures/segment2/font_graphics.06940.ia4.png": [16,8,64,{"us":[1083968,26944]}],
@@ -1522,6 +1526,7 @@ export const assets = {
 "textures/segment2/font_graphics.06E80.ia4.png": [16,8,64,{"us":[1083968,28288]}],
 "textures/segment2/font_graphics.06EC0.ia4.png": [16,8,64,{"us":[1083968,28352]}],
 "textures/segment2/font_graphics.06F00.ia4.png": [16,8,64,{"us":[1083968,28416]}],
+
 "textures/segment2/font_graphics.06F40.ia4.png": [16,8,64,{"us":[1083968,28480]}],
 "textures/segment2/font_graphics.06F80.ia4.png": [16,8,64,{"us":[1083968,28544]}],
 "textures/segment2/font_graphics.06FC0.ia4.png": [16,8,64,{"us":[1083968,28608]}],
@@ -1802,6 +1807,7 @@ export const assets = {
 "textures/sky/rr_textures.07000.rgba16.png": [32,32,2048,{"jp":[3390640,28672],"us":[3397392,28672],"eu":[3270992,28672],"sh":[3245360,28672]}],
 "textures/sky/rr_textures.07800.rgba16.png": [32,32,2048,{"jp":[3390640,30720],"us":[3397392,30720],"eu":[3270992,30720],"sh":[3245360,30720]}],
 "textures/sky/rr_textures.08000.rgba16.png": [32,32,2048,{"jp":[3390640,32768],"us":[3397392,32768],"eu":[3270992,32768],"sh":[3245360,32768]}],
+
 "textures/snow/ccm_textures.00000.rgba16.png": [32,32,2048,{"jp":[3405536,0],"us":[3412288,0],"eu":[3285888,0],"sh":[3260256,0]}],
 "textures/snow/ccm_textures.00800.rgba16.png": [32,32,2048,{"jp":[3405536,2048],"us":[3412288,2048],"eu":[3285888,2048],"sh":[3260256,2048]}],
 "textures/snow/ccm_textures.01000.rgba16.png": [32,64,4096,{"jp":[3405536,4096],"us":[3412288,4096],"eu":[3285888,4096],"sh":[3260256,4096]}],
@@ -1820,6 +1826,7 @@ export const assets = {
 "textures/snow/ccm_textures.08800.rgba16.png": [32,32,2048,{"jp":[3405536,34816],"us":[3412288,34816],"eu":[3285888,34816],"sh":[3260256,34816]}],
 "textures/snow/ccm_textures.09000.ia16.png": [32,32,2048,{"jp":[3405536,36864],"us":[3412288,36864],"eu":[3285888,36864],"sh":[3260256,36864]}],
 "textures/snow/ccm_textures.09800.ia16.png": [32,32,2048,{"jp":[3405536,38912],"us":[3412288,38912],"eu":[3285888,38912],"sh":[3260256,38912]}],
+
 "textures/spooky/bbh_textures.00000.rgba16.png": [32,32,2048,{"jp":[3298272,0],"us":[3305024,0],"eu":[3178624,0],"sh":[3152992,0]}],
 "textures/spooky/bbh_textures.00800.rgba16.png": [32,64,4096,{"jp":[3298272,2048],"us":[3305024,2048],"eu":[3178624,2048],"sh":[3152992,2048]}],
 "textures/spooky/bbh_textures.01800.rgba16.png": [32,64,4096,{"jp":[3298272,6144],"us":[3305024,6144],"eu":[3178624,6144],"sh":[3152992,6144]}],

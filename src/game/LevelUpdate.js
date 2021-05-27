@@ -197,13 +197,12 @@ class LevelUpdate {
         this.gHudDisplay = new HudDisplay()
 
         this.sCurrPlayMode = 0
-        this.D_80339ECA = 0
         this.sTransitionTimer = 0
         this.sTransitionUpdate = null
         this.sWarpDest = {
             type: 0, levelNum: 0, areaIdx: 0, nodeId: 0, arg: 0
         }
-        this.D_80339EE0 = 0
+        this.warpSpecialLevel = 0
         this.sDelayedWarpOp = 0
         this.sDelayedWarpTimer = 0
         this.sSourceWarpNodeId = 0
@@ -301,7 +300,7 @@ class LevelUpdate {
 
         this.sDelayedWarpOp = WARP_OP_NONE
         this.sTransitionTimer = 0
-        this.D_80339EE0 = 0
+        this.warpSpecialLevel = 0
 
         if (this.gCurrCreditsEntry == undefined) { // Compares to NULL in C code
             this.gHudDisplay.flags = this.HUD_DISPLAY_DEFAULT;
@@ -399,23 +398,22 @@ class LevelUpdate {
         return 0
     }
 
-// export const warp_special = (arg) => {
-//     sCurrPlayMode = PLAY_MODE_CHANGE_LEVEL
-//     D_80339ECA = 0
-//     D_80339EE0 = arg
-// }
+    warp_special(level) {
+        this.sCurrPlayMode = PLAY_MODE_CHANGE_LEVEL
+        this.warpSpecialLevel = level
+    }
 
-// export const fade_into_special_warp = (arg, color) => {
-//     if (color != 0) {
-//         color = 0xFF
-//     }
+    fade_into_special_warp(level, color) {
+        if (color != 0) {
+            color = 0xFF
+        }
 
-//     fadeout_music(190)
-//     Area.play_transition(WARP_TRANSITION_FADE_INTO_COLOR, 0x10, color, color, color)
-//     level_set_transition(30, null)
+        fadeout_music(190)
+        Area.play_transition(WARP_TRANSITION_FADE_INTO_COLOR, 0x10, color, color, color)
+        this.level_set_transition(30, null)
 
-//     warp_special(arg)
-// }
+        this.warp_special(level)
+    }
 
 // export const stub_level_update_1 = () => {
 // }
@@ -1134,7 +1132,7 @@ class LevelUpdate {
             if (this.sWarpDest.type != WARP_TYPE_NOT_WARPING) {
                 return this.sWarpDest.levelNum
             } else {
-                return D_80339EE0
+                return this.warpSpecialLevel
             }
         }
 
@@ -1173,13 +1171,11 @@ class LevelUpdate {
 
     set_play_mode(playMode) {
         this.sCurrPlayMode = playMode
-        this.D_80339ECA = 0
     }
 
     load_level_init_text(arg) {}
 
     update_hud_values() {
-
         if (this.gCurrCreditsEntry == null) {
             const numHealthWedges = this.gMarioState.health > 0 ? this.gMarioState.health >> 8 : 0
 

@@ -9,10 +9,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-178244102-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || []
+        function gtag() { dataLayer.push(arguments) }
+        gtag('js', new Date())
+
+        gtag('config', 'UA-178244102-1')
+    </script>
+
 </head>
 
 <body class="text-center">
-    <canvas hidden id="fullCanvas" width="640" height="480"></canvas>
+    <canvas hidden id="fullCanvas" width="640" height="480" style="cursor:none; padding-bottom: 20px"></canvas>
 
     <div class="cover-container d-flex h-100 mx-auto flex-column">
         <header class="masthead">
@@ -32,126 +42,130 @@
         <main role="main" class="inner cover" hidden id="mainContent">
             <h1 class="cover-heading rainbowText">Super Mario 64 - Javascript Port</h1>
             <h6 style="color:red">This project is currently still being developed. This page may be live from time to time for testing, but there may be glitches and performance issues. The server will go down and restart at random times without warning. If you would like to help with the project or have feedback please contact me.</h6>
-            <form id="romSelect" class="form-group">
-                <h4 style="color:#fa3e3e">Select US sm64 (z64) ROM File from your computer</h4>
-                <input id="romFile" class="btn btn-secondary btn-sm" type="file">
-                <input class="btn btn-primary btn-sm" type="submit">
-            </form>
-            <h6 id="romMessage">This project uses the textures and other game assets from the original game. Due to copyright issues, I cannot host those assets on this site. Please select a sm64 ROM to extract those assets before you can play.</h6>
-
-
-            <div class="row" style="justify-content:center; padding-top:5px">
-                <div class="col-3">
-                    <h5 style="color:skyblue;padding-top:2px"> Select Map: </h5>
-                </div>
-                <div class="col-3">
-                    <select id="mapSelect" class="form-control form-control-sm">
-                        <option>Castle Grounds</option>
-                        <option>Castle Inside</option>
-                        <option>Bob-omb Battlefield</option>
-                        <option>Castle Courtyard</option>
-                        <option>Cool, Cool Mountain</option>
-                        <option>Princess's Secret Slide</option>
-                        <option>Tall, Tall Mountain</option>
-                        <option>Whomps Fortress</option>
-                        <option>Hazy Maze Cave</option>
-                        <option>Big Boo's Haunt</option>
-                        <option>Shifting Sand Land</option>
-                        <option>Snowman's Land</option>
-                        <option>Jolly Roger Bay</option>
-                    </select>
-                </div>
-
+            <div id="rom" hidden>
+                <form id="romSelect" class="form-group">
+                    <h4 style="color:#fa3e3e">Select US sm64 (z64) ROM File from your computer</h4>
+                    <input id="romFile" class="btn btn-secondary btn-sm" type="file">
+                    <input class="btn btn-primary btn-sm" type="submit">
+                </form>
+                <h6 id="romMessage">This project uses the textures and other game assets from the original game. Due to copyright issues, I cannot host those assets on this site. Please select a sm64 ROM to extract those assets before you can play.</h6>
             </div>
 
-            <div class="row" style="justify-content:center">
-                <button id="startbutton" type="button" class="btn btn-success" disabled>Start Game</button>
-            </div>
-
-            <br />
-            <div class="row" style="justify-content:center">
-                <div class="col-3">
-                    <button type="button"
-                            class="btn btn-sm btn-primary"
-                            data-html="true"
-                            data-container="body"
-                            data-toggle="keyboardControlsToggle"
-                            data-placement="bottom">
-                        Customize Keyboard Controls
-                    </button>
-                </div>
-                <div class="col-3">
-                    <button type="button"
-                            class="btn btn-sm btn-primary"
-                            data-html="true"
-                            data-container="body"
-                            data-toggle="gamepadControlsToggle"
-                            data-placement="bottom">
-                        Customize Gamepad Controls
-                    </button>
-                </div>
-                <div class="col-3">
-                    <button type="button"
-                            class="btn btn-sm btn-primary"
-                            onclick="window.enterFullScreenMode()">
-                        Full Screen Mode
-                    </button>
-                </div>
-                <div class="col-3">
-                    <button type="button"
-                            class="btn btn-sm btn-primary"
-                            onclick="window.fullWindowMode = true">
-                        Full Window Mode
-                    </button>
-                </div>
-            </div>
-            <div class="row" style="justify-content:center; padding-top:5px">
-                <div class="col-3">
-                    <h5 style="color:skyblue;padding-top:2px"> Select Map: </h5>
-                </div>
-            </div>
-            <br />
-            <canvas id="gameCanvas" width="640" height="480"></canvas>
-            <br />
-            <br />
-
-            <h6 hidden id="numTriangles"> Total triangles rendered this frame: </h6>
-            <div class="row">
-                <div class="col-5" style="text-align:left">
-                    <h6>Total Frame Time (Avg): </h6>
-                    <h6 hidden>Game Logic (Avg): </h6>
-                    <h6 hidden>Rendering/WebGL (Avg):</h6>
-                </div>
-                <div class="col-1">
-                    <h6 id="timing-total"></h6>
-                    <h6 hidden id="timing-game"></h6>
-                    <h6 hidden id="timing-render"></h6>
-                </div>
-                <div class="col-6" style="text-align:right">
-                    <h6 id="maxFps"></h6>
-                </div>
-            </div>
-            <div hidden class="row" style="justify-content:center;">
-                <h6 style="padding-right:10px"> Adjust Game Speed: </h6>
-                <input id="slider" type="range" style="width:300px" min="1" max="60" value="30">
-                <h6 id="fps" style="padding-left:10px"> 30 fps </h6>
-            </div>
-
-            <div class="row" style="justify-content:center">
-                <div class="col-3">
-                    <a href="https://github.com/sm64js/sm64js/issues" style="margin-right:30px" type="button" class="btn btn-warning">Submit Bug</a>
-                </div>
-                <div class="col-3">
-                    <button type="button"
-                            class="btn btn-sm btn-primary"
-                            onclick="window.snapshotLocation()">
-                        Snapshot Location
-                    </button>
+            <div class="container-fluid">
+                <div class="row" style="padding-top: 50px">
+                    <div class="col-2"></div>
+                    <div class="col-4">
+                        <select id="mapSelect" class="form-control" style="width: 220px">
+                            <option value="16">Castle Grounds</option>
+                            <option value="6" >Castle</option>
+                            <option value="9" >Bob-omb Battlefield</option>
+                            <option value="26">Castle Courtyard</option>
+                            <option value="5" >Cool, Cool Mountain</option>
+                            <option value="27">Princess's Secret Slide</option>
+                            <option value="36">Tall, Tall Mountain</option>
+                            <option value="24">Whomps Fortress</option>
+                            <option value="7" >Hazy Maze Cave</option>
+                            <option value="4" >Big Boo's Haunt</option>
+                            <option value="8" >Shifting Sand Land</option>
+                            <option value="10">Snowman's Land</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <button id="startbutton" type="button" class="btn btn-success" style="width: 220px" enabled>Start Game</button>
+                    </div>
+                    <div class="col-2"></div>
                 </div>
             </div>
 
-            <br />
-            <br />
+            <canvas id="gameCanvas" width="640" height="480" style="cursor:none; padding: 30px 0 5px 0"></canvas>
+
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-2"></div>
+                    <div class="col-4" style="text-align:left">
+                        <h6>Frame time: <span id="timing-total"></span></h6>
+                        <h6 hidden>Game Logic (Avg): </h6>
+                        <h6 hidden>Rendering/WebGL (Avg):</h6>
+                    </div>
+                    <div class="col-4" style="text-align:right">
+                        <h6 id="maxFps"></h6>
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+                <div hidden class="row" style="justify-content:center;">
+                    <h6 style="padding-right:10px"> Adjust Game Speed: </h6>
+                    <input id="slider" type="range" style="width:300px" min="1" max="60" value="30">
+                    <h6 id="fps" style="padding-left:10px"> 30 fps </h6>
+                </div>
+            </div>
+
+            <div class="container-fluid">
+                <div class="row" style="justify-content:center; padding-top: 20px">
+                    <div class="col-2"></div>
+                    <div class="col-2">
+                        <button type="button"
+                                class="btn btn-sm btn-primary"
+                                data-html="true"
+                                data-container="body"
+                                data-toggle="keyboardControlsToggle"
+                                data-placement="bottom">
+                            Keyboard
+                        </button>
+                    </div>
+                    <div class="col-2">
+                        <button type="button"
+                                class="btn btn-sm btn-primary"
+                                data-html="true"
+                                data-container="body"
+                                data-toggle="gamepadControlsToggle"
+                                data-placement="bottom">
+                            Gamepad
+                        </button>
+                    </div>
+                    <div class="col-2">
+                        <button type="button"
+                                class="btn btn-sm btn-primary"
+                                onclick="window.enterFullScreenMode()">
+                            Full Screen
+                        </button>
+                    </div>
+                    <div class="col-2">
+                        <button type="button"
+                                class="btn btn-sm btn-primary"
+                                onclick="window.fullWindowMode = true">
+                            Full Window
+                        </button>
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+            </div>
+
+            <div class="container-fluid">
+                <div class="row" style="justify-content:center; padding-top: 10px">
+                    <div class="col-3"></div>
+                    <div class="col-3">
+                        <button type="button"
+                                class="btn btn-sm btn-primary"
+                                onclick="location.href='https://github.com/sm64js/sm64js/issues'">
+                            Submit Bug
+                        </button>
+
+                        <!-- <a href="https://github.com/sm64js/sm64js/issues" style="margin-right:30px" type="button" class="btn btn-warning">Submit Bug</a> -->
+                    </div>
+                    <div class="col-3">
+                        <button type="button"
+                                class="btn btn-sm btn-primary"
+                                onclick="window.snapshotLocation()">
+                            Save Position
+                        </button>
+                    </div>
+                    <div class="col-3"></div>
+                </div>
+            </div>
+
+            <br>
+            <br>
+            <br>
 
             <a name="What"></a>
             <h4>What is this?</h4>
@@ -200,11 +214,9 @@
                     <a style="color:#fdffd4" href="https://github.com/ScottDikowitz">ScottDikowitz</a>,
                     <a style="color:#fdffd4" href="https://luphoria.github.io/">luphoria</a>,
                     <a style="color:#fdffd4" href="https://github.com/djoslin0">djoslin0</a>,
-                    <a style="color:#fdffd4" href="https://github.com/J4ckr07">J4ckr07</a>
-                    <a style="color:#fdffd4" href="https://github.com/agent-11">Agent 11</a>
-                    <a style="color:#fdffd4" href="https://github.com/joe07734">joe07734</a>
                     <a style="color:#fdffd4" href="https://github.com/J4ckr07">J4ckr07</a>,
-                    <a style="color: #fdffd4" href="https://github.com/AlbertoCentonze">Alberto</a>
+                    <a style="color:#fdffd4" href="https://github.com/agent-11">Agent 11</a>,
+                    <a style="color:#fdffd4" href="https://github.com/joe07734">joe07734</a>
                 </p>
             </div>
             <br />

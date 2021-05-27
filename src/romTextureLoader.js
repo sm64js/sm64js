@@ -2624,6 +2624,7 @@ const loadDataIntoGame = (data) => {
 
 
     document.getElementById('romSelect').hidden = true
+    msgElement.hidden = true
     msgElement.innerHTML = "Rom Asset Extraction Success - You may now start the game"
     msgElement.style = "color:#00ff00"
     document.getElementById("startbutton").disabled = false

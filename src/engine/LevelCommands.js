@@ -102,12 +102,14 @@ class LevelCommands {
     set_mario_pos(area, yaw, x, y, z) {
         yaw = DEGREES(yaw)
 
-        // joe debug
+        // JOE DEBUG
         if (window.debugMarioPosX) {
             yaw = DEGREES(window.debugMarioYaw)
             x = window.debugMarioPosX
             y = window.debugMarioPosY
             z = window.debugMarioPosZ
+
+            window.debugMarioPosX = null  // only use first time
         }
 
         Object.assign(Area.gMarioSpawnInfo, {

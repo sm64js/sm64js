@@ -220,7 +220,7 @@ export class n64GfxProcessor {
     scale_4_8(val) { return Math.floor(val * 0x11) }
 
     dp_set_fill_color(color) {
-        this.rdp.fill_color.r = this.scale_5_8(color >> 11)
+        this.rdp.fill_color.r = this.scale_5_8((color >> 11) & 0x1f)
         this.rdp.fill_color.g = this.scale_5_8((color >> 6) & 0x1f)
         this.rdp.fill_color.b = this.scale_5_8((color >> 1) & 0x1f)
         this.rdp.fill_color.a = (color & 1) * 255
@@ -377,13 +377,12 @@ export class n64GfxProcessor {
     }
 
     import_texture_rgba16(tile) {
-
         const rgba32_buf = []
         for (let i = 0; i < this.rdp.loaded_texture[tile].size_bytes / 2; i++) {
             const col16 = (this.rdp.loaded_texture[tile].textureData[2 * i] << 8) | this.rdp.loaded_texture[tile].textureData[2 * i + 1]
 
             const a = col16 & 1
-            const r = col16 >> 11
+            const r = (col16 >> 11) & 0x1f
             const g = (col16 >> 6) & 0x1f
             const b = (col16 >> 1) & 0x1f
 

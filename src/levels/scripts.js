@@ -149,46 +149,8 @@ export const script_exec_level_table = [
 
 
 const getSelectedLevel = () => {
-    const mapSelect = document.getElementById("mapSelect").value
-
-    switch (mapSelect) {
-        case "Castle Grounds": return LEVEL_CASTLE_GROUNDS
-        case "Castle Courtyard": return LEVEL_CASTLE_COURTYARD
-        case "Bob-omb Battlefield": return LEVEL_BOB
-        case "Cool, Cool Mountain": return LEVEL_CCM
-        case "Princess's Secret Slide": return LEVEL_PSS
-        case "Tall, Tall Mountain": return LEVEL_TTM
-        case "Whomps Fortress": return LEVEL_WF
-        case "Hazy Maze Cave": return LEVEL_HMC
-        case "Big Boo's Haunt": return LEVEL_BBH
-        case "Shifting Sand Land": return LEVEL_SSL
-        case "Snowman's Land": return LEVEL_SL
-        case "Castle Inside": return LEVEL_CASTLE
-        case "Castle Inside Second Level": return LEVEL_CASTLE_2
-        case "Cool, Cool Mountain Slide": return LEVEL_CCS
-    }
-
-    return LEVEL_CASTLE_GROUNDS
+    return parseInt(document.getElementById("mapSelect").value)
 }
-
-
-// export const level_defines_list = [
-//     JUMP_IF(/*op*/ OP_EQ, LEVEL_BBH, level_bbh_entry),
-//     JUMP_IF(/*op*/ OP_EQ, LEVEL_BOB, level_bob_entry),
-//     JUMP_IF(/*op*/ OP_EQ, LEVEL_CASTLE, level_castle_inside_entry),
-//     JUMP_IF(/*op*/ OP_EQ, LEVEL_CASTLE_2, level_castle_inside_2_entry),
-//     JUMP_IF(/*op*/ OP_EQ, LEVEL_CASTLE_COURTYARD, level_castle_courtyard_entry),
-//     JUMP_IF(/*op*/ OP_EQ, LEVEL_CASTLE_GROUNDS, level_castle_grounds_entry),
-//     JUMP_IF(/*op*/ OP_EQ, LEVEL_CCM, level_ccm_entry),
-//     JUMP_IF(/*op*/ OP_EQ, LEVEL_CCM_2, level_ccm_2_entry),
-//     JUMP_IF(/*op*/ OP_EQ, LEVEL_CCS, level_ccs_entry),
-//     JUMP_IF(/*op*/ OP_EQ, LEVEL_HMC, level_hmc_entry),
-//     JUMP_IF(/*op*/ OP_EQ, LEVEL_PSS, level_pss_entry),
-//     JUMP_IF(/*op*/ OP_EQ, LEVEL_SL, level_sl_entry),
-//     JUMP_IF(/*op*/ OP_EQ, LEVEL_SSL, level_ssl_entry),
-//     JUMP_IF(/*op*/ OP_EQ, LEVEL_TTM, level_ttm_entry),
-//     JUMP_IF(/*op*/ OP_EQ, LEVEL_WF, level_wf_entry),
-// ]
 
 
 export const level_main_scripts_entry = [

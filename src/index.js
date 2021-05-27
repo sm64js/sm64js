@@ -108,7 +108,7 @@ const totalFrameTimeBuffer = createRingBuffer(10)
 const setStatsUpdate = setInterval(() => {
     const totalFrameTimeAvg = totalFrameTimeBuffer.getAvg().toFixed(2)
     const maxFps = (1000 / totalFrameTimeAvg).toFixed(2)
-    document.getElementById("maxFps").innerHTML = `Effective Max Fps: ${maxFps}`
+    document.getElementById("maxFps").innerHTML = `Effective max FPS: ${maxFps}`
     document.getElementById("timing-total").innerHTML = `${totalFrameTimeAvg}ms`
 }, 500)
 
@@ -124,11 +124,11 @@ window.enterFullScreenMode = () => {
 
 window.snapshotLocation = () => {
     if (gameStarted) {
-        let map = "&map=" + document.getElementById("mapSelect").value
         let loc = Game.snapshot_location()
+        let level = "&level=" + loc.level
         let pos = "&pos=" + Math.round(loc.yaw) + "," + Math.round(loc.x) + "," + Math.round(loc.y) + "," + Math.round(loc.z)
         let scr = window.fullWindowMode ? "&fullscreen=1" : ""
-        window.history.replaceState(null, "", window.location.origin + "?autostart=1" + map + pos + scr)
+        window.history.replaceState(null, "", window.location.origin + "?autostart=1" + level + pos + scr)
     }
 }
 
@@ -138,19 +138,16 @@ let gameStarted = false
 
 document.getElementById("startbutton").addEventListener('click', () => {
     if (gameStarted) {
-        const url = new URL(window.location.href)
-
-        if (!url.searchParams.get("autostart")) {  /// Refresh page (Reset Game)
-            let qora = "&"
-            if (window.location.search == "") {
-                qora = "?"
-            }
-            window.history.replaceState(null, "", window.location.href + qora + "autostart=1")
-        }
         location.reload()
     }
     else {
         startGame()
+    }
+})
+
+document.getElementById("mapSelect").addEventListener('change', () => {
+    if (gameStarted) {
+        Game.warp_to(document.getElementById("mapSelect").value)
     }
 })
 
@@ -169,11 +166,11 @@ const startGame = () => {
 window.onload = () => {
     const url = new URL(window.location.href)
 
-    const map = url.searchParams.get("map")
-    if (map) {
+    const level = url.searchParams.get("level")
+    if (level) {
         const maps = document.getElementById("mapSelect").getElementsByTagName("option")
         for (const m of maps) {
-            if (m.innerText == map) {
+            if (m.value == level) {
                 m.selected = 'selected'
                 break
             }
@@ -190,11 +187,16 @@ window.onload = () => {
     }
 
     checkForRom().then((data) => {
-        if (data && url.searchParams.get("autostart")) {
-            if (url.searchParams.get("fullscreen")) {
-                window.fullWindowMode = true
+        if (data) {
+            if (url.searchParams.get("autostart")) {
+                if (url.searchParams.get("fullscreen")) {
+                    window.fullWindowMode = true
+                }
+                startGame()
             }
-            startGame()
+        } else {
+            document.getElementById("rom").hidden = false
+            document.getElementById("startbutton").disabled = true
         }
     })
 

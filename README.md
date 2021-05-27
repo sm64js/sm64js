@@ -10,7 +10,7 @@ This is an ongoing work-in-progress port of the decompilation of original Ninten
 
 ## Build instructions - Windows, Mac, or Linux 
 
-### Prerequirements
+### Prerequisites
 * Node.js
 
 ### Run these commands

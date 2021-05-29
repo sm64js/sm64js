@@ -683,7 +683,26 @@ class GeoRenderer {
     geo_process_root(root, b, c, clearColor) {
         //console.log("processing root node to render")
         if (root.flags & GraphNode.GRAPH_RENDER_ACTIVE) {
+
+            this.gMatStackIndex = 0
+            this.gCurAnimType = 0
+            // vec3s_set(viewport->vp.vtrans, node->x * 4, node->y * 4, 511);
+            // vec3s_set(viewport->vp.vscale, node->width * 4, node->height * 4, 511);
+            if (b) {
+                // clear_frame_buffer(clearColor)
+                // make_viewport_clip_rect(b)
+                // *viewport = *b
+            } else if (c) {
+                // clear_frame_buffer(clearColor)
+                // make_viewport_clip_rect(c)
+            }
+
             MathUtil.mtxf_identity(this.gMatStack[this.gMatStackIndex])
+
+            // gSPViewport(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(viewport));
+            // gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(gMatStackFixed[gMatStackIndex]),
+            //           G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+
             this.gCurGraphNodeRoot = root
             this.geo_process_node_and_siblings(root.children)
             this.gCurGraphNodeRoot = null

@@ -177,6 +177,7 @@ const bhv_wing_vanish_cap_loop = () => {
 }
 
 const bhv_metal_cap_init = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oGravity] = 2.4
     o.rawData[oFriction] = 0.999
     o.rawData[oBuoyancy] = 1.5

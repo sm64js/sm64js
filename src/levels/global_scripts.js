@@ -161,42 +161,42 @@ export const script_func_global_10 = () => { return [
 export const script_func_global_11 = () => { return [
     LOAD_MODEL_FROM_GEO(MODEL.BIRDS,                   birds_geo),
     // LOAD_MODEL_FROM_GEO(MODEL.PEACH,                   peach_geo),
-    LOAD_MODEL_FROM_GEO(MODEL.YOSHI,                      yoshi_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.YOSHI,                   yoshi_geo),
     RETURN(),
 ]}
 
-// export const script_func_global_12 = () => { return [
-//     LOAD_MODEL_FROM_GEO(MODEL.ENEMY_LAKITU,            enemy_lakitu_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.SPINY_BALL,              spiny_ball_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.SPINY,                   spiny_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.WIGGLER_HEAD,            wiggler_head_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.WIGGLER_BODY,            wiggler_body_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.BUBBA,                   bubba_geo),
-//     RETURN(),
-// ]}
+export const script_func_global_12 = () => { return [
+    // LOAD_MODEL_FROM_GEO(MODEL.ENEMY_LAKITU,            enemy_lakitu_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.SPINY_BALL,              spiny_ball_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.SPINY,                   spiny_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.WIGGLER_HEAD,            wiggler_head_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.WIGGLER_BODY,            wiggler_body_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.BUBBA,                   bubba_geo),
+    RETURN(),
+]}
 
-// export const script_func_global_13 = () => { return [
-//     LOAD_MODEL_FROM_GEO(MODEL.BOWSER,                  bowser_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.BOWSER_BOMB_CHILD_OBJ,   bowser_bomb_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.BOWSER_BOMB,             bowser_bomb_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.BOWSER_SMOKE,            bowser_impact_smoke_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.BOWSER_FLAMES,           bowser_flames_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.BOWSER_WAVE,             invisible_bowser_accessory_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.BOWSER2,                 bowser2_geo),
-//     RETURN(),
-// ]}
+export const script_func_global_13 = () => { return [
+    // LOAD_MODEL_FROM_GEO(MODEL.BOWSER,                  bowser_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.BOWSER_BOMB_CHILD_OBJ,   bowser_bomb_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.BOWSER_BOMB,             bowser_bomb_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.BOWSER_SMOKE,            bowser_impact_smoke_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.BOWSER_FLAMES,           bowser_flames_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.BOWSER_WAVE,             invisible_bowser_accessory_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.BOWSER2,                 bowser2_geo),
+    RETURN(),
+]}
 
-// export const script_func_global_14 = () => { return [
-//     LOAD_MODEL_FROM_GEO(MODEL.BUB,                     bub_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.TREASURE_CHEST_BASE,     treasure_chest_base_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.TREASURE_CHEST_LID,      treasure_chest_lid_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.CYAN_FISH,               cyan_fish_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.WATER_RING,              water_ring_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.WATER_MINE,              water_mine_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.SEAWEED,                 seaweed_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.SKEETER,                 skeeter_geo),
-//     RETURN(),
-// ]}
+export const script_func_global_14 = () => { return [
+    // LOAD_MODEL_FROM_GEO(MODEL.BUB,                     bub_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.TREASURE_CHEST_BASE,     treasure_chest_base_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.TREASURE_CHEST_LID,      treasure_chest_lid_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.CYAN_FISH,               cyan_fish_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.WATER_RING,              water_ring_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.WATER_MINE,              water_mine_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.SEAWEED,                 seaweed_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.SKEETER,                 skeeter_geo),
+    RETURN(),
+]}
 
 export const script_func_global_15 = () => { return [
     // LOAD_MODEL_FROM_GEO(MODEL.PIRANHA_PLANT,           piranha_plant_geo),
@@ -218,28 +218,31 @@ export const script_func_global_16 = () => { return [
     RETURN(),
 ]}
 
-// export const script_func_global_17 = () => { return [
-//     LOAD_MODEL_FROM_GEO(MODEL.CHILL_BULLY,             chilly_chief_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.BIG_CHILL_BULLY,         chilly_chief_big_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.MONEYBAG,                moneybag_geo),
-//     RETURN(),
-// ]}
+export const script_func_global_17 = () => { return [
+    // LOAD_MODEL_FROM_GEO(MODEL.CHILL_BULLY,             chilly_chief_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.BIG_CHILL_BULLY,         chilly_chief_big_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.MONEYBAG,                moneybag_geo),
+    RETURN(),
+]}
 
-// export const script_func_global_18 = () => { return [
-//     LOAD_MODEL_FROM_GEO(MODEL.SWOOP,                   swoop_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.SCUTTLEBUG,              scuttlebug_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.MR_I_IRIS,               mr_i_iris_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.MR_I,                    mr_i_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.DORRIE,                  dorrie_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.SNUFIT,                  snufit_geo),
-//     RETURN(),
-// ]}
+export const script_func_global_18 = () => { return [
+    // LOAD_MODEL_FROM_GEO(MODEL.SWOOP,                   swoop_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.SCUTTLEBUG,              scuttlebug_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.MR_I_IRIS,               mr_i_iris_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.MR_I,                    mr_i_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.DORRIE,                  dorrie_geo),
+    // LOAD_MODEL_FROM_GEO(MODEL.SNUFIT,                  snufit_geo),
+    RETURN(),
+]}
 
 
 gLinker.level_scripts.script_func_global_1  = script_func_global_1
 gLinker.level_scripts.script_func_global_4  = script_func_global_4
 gLinker.level_scripts.script_func_global_11 = script_func_global_11
+gLinker.level_scripts.script_func_global_12 = script_func_global_12
+gLinker.level_scripts.script_func_global_13 = script_func_global_13
+gLinker.level_scripts.script_func_global_14 = script_func_global_14
 gLinker.level_scripts.script_func_global_15 = script_func_global_15
 gLinker.level_scripts.script_func_global_16 = script_func_global_16
-
-
+gLinker.level_scripts.script_func_global_17 = script_func_global_17
+gLinker.level_scripts.script_func_global_18 = script_func_global_18

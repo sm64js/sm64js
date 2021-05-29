@@ -6,12 +6,13 @@ import {
     check_common_action_exits, check_common_hold_action_exits, drop_and_set_mario_action,
     is_anim_past_end, set_jump_from_landing, set_jumping_action, set_mario_action,
     set_water_plunge_action, update_mario_sound_and_camera, play_sound_if_no_flag,
+    mario_set_forward_vel, play_mario_landing_sound_once
 } from "./Mario"
 
 import { AreaInstance as Area } from "./Area"
 
 import {
-    stop_and_set_height_to_floor,
+    stop_and_set_height_to_floor, perform_air_step,
     stationary_ground_step, perform_ground_step
 } from "./MarioStep"
 
@@ -96,12 +97,11 @@ ACT_SHOCKED,  ACT_SQUISHED,  ACT_HEAD_STUCK_IN_GROUND,  ACT_BUTT_STUCK_IN_GROUND
 ACT_FEET_STUCK_IN_GROUND,  ACT_PUTTING_ON_CAP, 
 
 MARIO_METAL_CAP, MARIO_CAP_ON_HEAD,
-
 MARIO_ANIM_A_POSE, MARIO_ANIM_PULL_DOOR_WALK_IN, MARIO_ANIM_PUSH_DOOR_WALK_IN,
-
+MARIO_ANIM_GENERAL_FALL,
 MARIO_MARIO_SOUND_PLAYED, GROUND_STEP_LEFT_GROUND,
-
 ACT_IDLE,
+AIR_STEP_LANDED,
 
     ACT_AIR_THROW_LAND, ACT_BACKFLIP, ACT_BACKFLIP_LAND_STOP, ACT_BEGIN_SLIDING, ACT_BRAKING_STOP,
     ACT_BUTT_SLIDE_STOP, ACT_COUGHING, ACT_CRAWLING, ACT_CRAZY_BOX_BOUNCE, ACT_CROUCH_SLIDE,
@@ -152,7 +152,9 @@ import { GRAPH_RENDER_ACTIVE } from "../engine/graph_node"
 
 import { WARP_OP_WARP_DOOR, WARP_OP_DEATH } from "./LevelUpdate"
 
-import { SOUND_MARIO_ATTACKED } from "../include/sounds"
+import {
+    SOUND_MARIO_ATTACKED, SOUND_ACTION_TERRAIN_LANDING
+} from "../include/sounds"
 
 
 let sIntroWarpPipeObj = null
@@ -884,18 +886,18 @@ export const act_reading_automatic_dialog = (m) => {
 //     return 0
 // }
 
-// // set animation and forwardVel; when perform_air_step returns AIR_STEP_LANDED,
-// // set the new action
-// export const launch_mario_until_land = (m, endAction, animation, forwardVel) => {
-//     let /*s32*/ airStepLanded
-//     mario_set_forward_vel(m, forwardVel)
-//     set_mario_animation(m, animation)
-//     airStepLanded = (perform_air_step(m, 0) == AIR_STEP_LANDED)
-//     if (airStepLanded) {
-//         set_mario_action(m, endAction, 0)
-//     }
-//     return airStepLanded
-// }
+// set animation and forwardVel; when perform_air_step returns AIR_STEP_LANDED,
+// set the new action
+const launch_mario_until_land = (m, endAction, animation, forwardVel) => {
+    let /*s32*/ airStepLanded
+    mario_set_forward_vel(m, forwardVel)
+    set_mario_animation(m, animation)
+    airStepLanded = (perform_air_step(m, 0) == AIR_STEP_LANDED)
+    if (airStepLanded) {
+        set_mario_action(m, endAction, 0)
+    }
+    return airStepLanded
+}
 
 // export const act_unlocking_key_door = (m) => {
 //     m.faceAngle[1] = m.usedObj.rawData[oMoveAngleYaw]
@@ -1173,8 +1175,8 @@ export const act_warp_door_spawn = (m) => {
 //  * particle flag that generates sparkles.
 //  */
 // export const act_exit_airborne = (m) => {
-//     if (15 < m.actionTimer++
-// export const launch_mario_until_land = (m, ACT_EXIT_LAND_SAVE_DIALOG, MARIO_ANIM_GENERAL_FALL, 0f) => {
+    // if (15 < m.actionTimer++
+    //     && launch_mario_until_land(m, ACT_EXIT_LAND_SAVE_DIALOG, MARIO_ANIM_GENERAL_FALL, -32.0)) {
 //           // heal Mario
 //         m.healCounter = 31
 //     }
@@ -1382,24 +1384,24 @@ export const act_warp_door_spawn = (m) => {
 //     return 0
 // }
 
-// export const act_spawn_no_spin_airborne = (m) => {
-//     launch_mario_until_land(m, ACT_SPAWN_NO_SPIN_LANDING, MARIO_ANIM_GENERAL_FALL, 0.0)
-//     if (m.pos[1] < m.waterLevel - 100) {
-//         set_water_plunge_action(m)
-//     }
-//     return 0
-// }
+const act_spawn_no_spin_airborne = (m) => {
+    launch_mario_until_land(m, ACT_SPAWN_NO_SPIN_LANDING, MARIO_ANIM_GENERAL_FALL, 0.0)
+    if (m.pos[1] < m.waterLevel - 100) {
+        set_water_plunge_action(m)
+    }
+    return 0
+}
 
-// export const act_spawn_no_spin_landing = (m) => {
-//     play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_LANDING)
-//     set_mario_animation(m, MARIO_ANIM_GENERAL_LAND)
-//     stop_and_set_height_to_floor(m)
-//     if (is_anim_at_end(m)) {
-//         load_level_init_text(0)
-//         set_mario_action(m, ACT_IDLE, 0)
-//     }
-//     return 0
-// }
+const act_spawn_no_spin_landing = (m) => {
+    play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_LANDING)
+    set_mario_animation(m, MARIO_ANIM_GENERAL_LAND)
+    stop_and_set_height_to_floor(m)
+    if (is_anim_at_end(m)) {
+        LevelUpdate.load_level_init_text(0)
+        set_mario_action(m, ACT_IDLE, 0)
+    }
+    return 0
+}
 
 // export const act_bbh_enter_spin = (m) => {
 //     let /*f32*/ floorDist

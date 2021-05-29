@@ -113,3 +113,4 @@ export const level_defines = [
     define_level( null,            LEVEL_UNKNOWN_37,       COURSE_NONE,      null,               null,      20000,    0x00, 0x00, 0x00,  null,       null),
     define_level( null,            LEVEL_UNKNOWN_38,       COURSE_NONE,      null,               null,      20000,    0x00, 0x00, 0x00, 'sDynUnk38', null),
 ]
+

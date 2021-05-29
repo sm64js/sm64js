@@ -36,6 +36,9 @@ class Area {
         this.gCurrLevelNum = 0
         this.gLoadedGraphNodes = new Array(256)
 
+        this.D_8032CE74 = null
+        this.D_8032CE78 = null
+
         this.gMarioSpawnInfo = {
             startPos: [0, 0, 0],
             startAngle: [0, 0, 0],
@@ -49,6 +52,8 @@ class Area {
             data: {}
         }
         this.gWarpTransDelay = 0
+        this.gFBSetColor = 0
+        this.gWarpTransFBSetColor = 0
         this.gWarpTransRed = 0
         this.gWarpTransGreen = 0
         this.gWarpTransBlue = 0
@@ -132,6 +137,14 @@ class Area {
     area_update_objects() {
         gLinker.GeoRenderer.gAreaUpdateCounter++
         gLinker.ObjectListProcessor.update_objects(0)
+    }
+
+    override_viewport_and_clip(a, b, c, d, e) {
+        let sp6 = ((c >> 3) << 11) | ((d >> 3) << 6) | ((e >> 3) << 1) | 1
+
+        this.gFBSetColor = (sp6 << 16) | sp6
+        this.D_8032CE74 = a
+        this.D_8032CE78 = b
     }
 
     set_warp_transition_rgb(red, green, blue) {
@@ -240,13 +253,27 @@ class Area {
     }
 
     render_game() {
-        if (this.gCurrentArea) {
-            gLinker.GeoRenderer.geo_process_root(this.gCurrentArea.geometryLayoutData, null, null, null)
+        if (this.gCurrentArea && !this.gWarpTransition.pauseRendering) {
+            gLinker.GeoRenderer.geo_process_root(this.gCurrentArea.geometryLayoutData, this.D_8032CE74, this.D_8032CE78, this.gFBSetColor)
 
             gSPViewport(gLinker.Game.gDisplayList, D_8032CF00)
-            Hud.render_hud();
-            Print.render_text_labels();
-            
+            Hud.render_hud()
+            Print.render_text_labels()
+            // do_cutscene_handler();
+            // print_displaying_credits_entry();
+
+            // gPauseScreenMode = render_menus_and_dialogs();
+
+            // if (gPauseScreenMode != 0) {
+            //     gSaveOptSelectIndex = gPauseScreenMode;
+            // }
+
+            // if (D_8032CE78 != NULL) {
+            //     make_viewport_clip_rect(D_8032CE78);
+            // } else
+            //     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, BORDER_HEIGHT, SCREEN_WIDTH,
+            //                   SCREEN_HEIGHT - BORDER_HEIGHT);
+
             if (this.gWarpTransition.isActive) {
                 if (this.gWarpTransDelay == 0) {
 
@@ -264,8 +291,16 @@ class Area {
                 }
             }
         } else {
-            Print.render_text_labels();
+            Print.render_text_labels()
+            if (this.D_8032CE78) {
+                gLinker.Game.clear_viewport(this.D_8032CE78, this.gWarpTransFBSetColor)
+            } else {
+                gLinker.Game.clear_frame_buffer(this.gWarpTransFBSetColor)
+            }
         }
+
+        this.D_8032CE74 = null
+        this.D_8032CE78 = null
     }
 
     print_intro_text() {

@@ -1599,6 +1599,11 @@ export const cur_obj_scale = (scale) => {
     o.gfx.scale[2] = scale
 }
 
+export const obj_scale_random = (obj, rangeLength, minScale) => {
+    const scale = random_float() * rangeLength + minScale
+    obj_scale_xyz(obj, scale, scale, scale)
+}
+
 export const obj_translate_xyz_random = (obj, rangeLength) => {
     obj.rawData[oPosX] += random_float() * rangeLength - rangeLength * 0.5
     obj.rawData[oPosY] += random_float() * rangeLength - rangeLength * 0.5

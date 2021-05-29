@@ -102,12 +102,14 @@ class LevelCommands {
     set_mario_pos(area, yaw, x, y, z) {
         yaw = DEGREES(yaw)
 
-        // joe debug
+        // JOE DEBUG
         if (window.debugMarioPosX) {
             yaw = DEGREES(window.debugMarioYaw)
             x = window.debugMarioPosX
             y = window.debugMarioPosY
             z = window.debugMarioPosZ
+
+            window.debugMarioPosX = null  // only use first time
         }
 
         Object.assign(Area.gMarioSpawnInfo, {
@@ -149,14 +151,23 @@ class LevelCommands {
     }
 
     blackout(bool) {
-        //console.log("blackout")
+        console.log("ignoring blackout()")
         this.sCurrentScript.index++
     }
 
     set_register(value) {
-        //console.log("set register")
         const new_value = value.call ? value() : value
         this.sRegister = new_value
+        this.sCurrentScript.index++
+    }
+
+    set_background_music(settingsPreset,  seq) {
+        console.log("ignoring set_background_music()")
+        this.sCurrentScript.index++
+    }
+
+    show_dialog(index,  dialog) {
+        console.log("ignoring show_dialog()")
         this.sCurrentScript.index++
     }
 
@@ -585,7 +596,9 @@ export const OBJECT_WITH_ACTS = (...args)     => {return {command: Lev.place_obj
 export const PAINTING_WARP_NODE = (...args)   => {return {command: Lev.painting_warp_node, args: args}}
 export const RETURN = (...args)               => {return {command: Lev.return, args: args}}
 export const ROOMS = (...args)                => {return {command: Lev.rooms, args: args}}
+export const SET_BACKGROUND_MUSIC = (...args) => {return {command: Lev.set_background_music, args: args}}
 export const SET_REG = (...args)              => {return {command: Lev.set_register, args: args}}
+export const SHOW_DIALOG = (...args)          => {return {command: Lev.show_dialog, args: args}}
 export const SLEEP = (...args)                => {return {command: Lev.sleep, args: args}}
 export const SLEEP_BEFORE_EXIT = (...args)    => {return {command: Lev.sleep2, args: args}}
 export const TERRAIN = (...args)              => {return {command: Lev.terrain, args: args}}

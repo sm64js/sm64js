@@ -2,7 +2,10 @@ import * as _Linker from "./Linker"
 import { level_script_entry } from "../levels/main_entry/entry"
 import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
 import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
+import { AreaInstance as Area } from "../game/Area"
 import * as Gbi from "../include/gbi"
+
+const canvas = document.querySelector('#gameCanvas')
 
 class Game {
     constructor() {
@@ -15,11 +18,8 @@ class Game {
     }
 
     main_loop_init() {
-
         //setup_game_memory();
-
         //init_controllers();
-
         //save_file_load_all();
 
         // point levelCommandAddr to the entry point into the level script data.
@@ -38,13 +38,19 @@ class Game {
         this.display_and_vsync()
     }
 
-    create_task_structure() {
-        ////Seems may not be necessary for JS, not creating a task, just sending DisplayList
-    }
-
     end_master_display_list() {
         Gbi.gSPEndDisplayList(this.gDisplayList)
-        this.create_task_structure()
+    }
+
+    /** Clears the framebuffer, allowing it to be overwritten. */
+    clear_frame_buffer(color) {
+        Gbi.gDPSetRenderMode(this.gDisplayList, Gbi.G_RM_OPA_SURF_SURF2)
+        Gbi.gDPSetCycleType(this.gDisplayList, Gbi.G_CYC_FILL)
+
+        Gbi.gDPSetFillColor(this.gDisplayList, color)
+        Gbi.gDPFillRectangle(this.gDisplayList, 0, 0, canvas.width - 1, canvas.height - 1)
+
+        Gbi.gDPSetCycleType(this.gDisplayList, Gbi.G_CYC_1CYCLE)
     }
 
     config_gfx_pool() {
@@ -62,7 +68,7 @@ class Game {
     rdp_init() {
         Gbi.gDPSetCombineMode(this.gDisplayList, Gbi.G_CC_SHADE)
         Gbi.gDPSetTextureFilter(this.gDisplayList, Gbi.G_TF_BILERP)
-        Gbi.gDPSetRenderMode(this.gDisplayList, Gbi.G_RM_OPA_SURF_SURF2);
+        Gbi.gDPSetRenderMode(this.gDisplayList, Gbi.G_RM_OPA_SURF_SURF2)
         Gbi.gDPSetCycleType(this.gDisplayList, Gbi.G_CYC_FILL)
     }
 
@@ -80,8 +86,13 @@ class Game {
         window.gGlobalTimer++
     }
 
+    warp_to(level) {
+        LevelUpdate.fade_into_special_warp(level)
+    }
+
     snapshot_location() {
         return {
+            level: Area.gCurrLevelNum,
             yaw: LevelUpdate.gMarioState.faceAngle[1] / (0x10000 / 360),
             x: LevelUpdate.gMarioState.pos[0],
             y: LevelUpdate.gMarioState.pos[1],

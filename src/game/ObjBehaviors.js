@@ -1,5 +1,9 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
-import { oPosX, oPosY, oPosZ, oForwardVel, oMoveAngleYaw, oVelY, oFaceAngleYaw, oFriction, oGravity, oGraphYOffset, oAction, OBJ_ACT_LAVA_DEATH, OBJ_ACT_DEATH_PLANE_DEATH, oAngleToMario, oTimer, oAnimState } from "../include/object_constants"
+import { oPosX, oPosY, oPosZ, oHomeX, oHomeY, oHomeZ, oForwardVel, oMoveAngleYaw, oVelY,
+    oFaceAngleYaw, oFriction, oGravity, oGraphYOffset, oAction, OBJ_ACT_LAVA_DEATH, OBJ_ACT_DEATH_PLANE_DEATH,
+    oAngleToMario, oTimer, oAnimState,
+    oBehParams, oRespawnerModelToRespawn, oRespawnerMinSpawnDist, oRespawnerBehaviorToRespawn
+     } from "../include/object_constants"
 import { sins, coss, int32, uint16, int16, random_uint16 } from "../utils"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { atan2s, mtxf_align_terrain_normal } from "../engine/math_util"

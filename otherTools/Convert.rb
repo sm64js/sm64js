@@ -13,7 +13,7 @@ class Convert
         @entity_is = entity_is
         @entity_type = entity_type && entity_type.to_sym
         @dirstack = []
-        @ts = "\n// #{File.mtime(__FILE__).to_i} - #{Time.now}"
+        @ts = "\n// #{Time.now} (Convert.rb #{File.mtime(__FILE__)})"
     end
 
     def convert
@@ -121,6 +121,7 @@ class Convert
                 when "model.inc.c"      then :model
                 when "leveldata.c"      then :model
                 when "movtext.inc.c"    then :movtext
+                when "script.c"         then :script
                 when "table.inc.c"      then :table
                 when "texture.inc.c"    then :texture
                 when "trajectory.inc.c" then :trajectory
@@ -136,6 +137,7 @@ class Convert
             when :macro then convert_macro(fn)
             when :model then convert_model(fn)
             when :movtext then convert_movtext(fn)
+            when :script then convert_script(fn)
             when :table then convert_table(fn)
             when :texture then convert_texture(fn)
             when :trajectory then convert_trajectory(fn)
@@ -180,6 +182,31 @@ class Convert
         FileUtils.rm_r(@js_dir + "/anims")
     end
 
+    def find_all_exports(paths, fnmatch, imps)
+        [paths].flatten.compact.each do |p|
+            find_all_exports_in_path(p, fnmatch).each do |exp, file|
+                imps.push([/^(#{exp})/, file.delete_suffix(".js")])
+            end
+        end
+    end
+
+    def find_all_exports_in_path(path, fnmatch, list = nil)
+        list ||= []
+        if File.directory?(path)
+            Dir.glob(path + "/*") do |f|
+                find_all_exports_in_path(f, fnmatch, list)
+            end
+        elsif File.basename(path) =~ fnmatch
+            if File.exist?(path)  # because it was an explicit path
+                File.read(path).lines.each do |l|
+                    if l =~ /export const (\w+)/
+                        list.push([$1, path])
+                    end
+                end
+            end
+        end
+        return list
+    end
 
     # ---------------------------------------------------------------------------------------------------------
 
@@ -491,15 +518,152 @@ class Convert
         end
     end
 
+    # ---------------------------------------------------------------------------------------------------------
+
+    def convert_script(fn)
+        header = []
+        imports = []
+
+        @level_cmds = []
+        @glinks = []
+        @level_cons = {}
+        @text = []
+
+        @imps = [
+            [/^(MODEL_\w+)/, "include/model_ids"],         # MODEL_BITDW_SQUARE_PLATFORM
+            [/^(LEVEL_\w+)/, "levels/level_defines_constants"],         # LEVEL_BITDW
+            [/^(WARP_\w+)/, "engine/LevelCommands"],         # WARP_NO_CHECKPOINT
+            [/^(DIALOG_\d+)/, "text/us/dialogs"],          # DIALOG_090
+            [/^(TERRAIN_\w+)/, "include/surface_terrains"],          # DIALOG_090
+            [/^(SEQ_\w+)/, "include/seq_ids"],          # SEQ_LEVEL_KOOPA_ROAD
+            [/^(script_func_global_\d+)/, "levels/global_scripts"],          # script_func_global_12
+        ]
+        find_all_exports(@entity_dir, /geo|collision|macro/, @imps)
+
+        @lines = File.read(@c_dir + "/" + fn).lines.to_a
+        @n = 0
+        while (@n < @lines.length)
+
+            if @lines[@n] =~ /^#include /
+                  # ignore
+            elsif @lines[@n] =~ / LevelScript / then cv_LevelScript
+            else
+                @text.push(@lines[@n].chomp)
+            end
+
+            @n += 1
+        end
+
+        header.push(@title)
+
+        imports_wrap(imports, "engine/LevelCommands", @level_cmds.uniq)
+            imports.push("")
+        @level_cons.each do |file, cons|
+            imports_wrap(imports, file, cons.uniq)
+            imports.push("")
+        end
+
+        if @glinks.length > 0
+            @text.push("")
+            @text.push("")
+            @glinks.each do |g|
+                @text.push("gLinker.level_scripts.#{g} = #{g}")
+            end
+        end
+
+        out = [header, "", imports, "", @text, @ts].join("\n")
+        jsfn = fn.delete_suffix(".c") + ".js"
+        File.open(@js_dir + "/" + jsfn, "w") {|f| f.puts(out)}
+    end
+
+    IGNORE_LEVEL_COMMANDS = ["LOAD_MIO0", "LOAD_MIO0_TEXTURE", "LOAD_RAW", "ALLOC_LEVEL_POOL", "FREE_LEVEL_POOL"]
+
+    def cv_LevelScript
+        while true
+            line = @lines[@n]
+
+            if line =~ /(static )*const LevelScript (\w+)/
+                if $1
+                    export = ""
+                else
+                    export = "export "
+                    @glinks.push($2)
+                end
+                @text.push("#{export}const #{$2} = [")
+
+            # LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_03,       geo_bitdw_0003C0),
+            elsif line =~ /^(\s*)(\w+)\((.*)\),(.*)$/
+                cmd, args, xtra = $~[2..4]
+                tabs = "    " * ($1.length / 3)
+
+                if !IGNORE_LEVEL_COMMANDS.include?(cmd)
+                    @level_cmds.push(cmd)
+
+                    args = args.split(",").collect do |arg|
+                        if arg =~ /(\s*\/\*.+\*\/\s*)/ || arg =~ /^(\s+)/
+                            comment = $1
+                            arg.gsub!(comment, '')
+                        else
+                            comment = ""
+                        end
+                        arg.strip!
+
+                        if arg =~ /NULL/
+                            arg.gsub!(/NULL/, "null")
+
+                        # bhvMario -> 'bhvMario'
+                        elsif arg =~ /bhv\w+/
+                            arg.gsub!(/(bhv\w+)/, "'\\1'")
+
+                        # any kind of import
+                        elsif (imp = @imps.find {|i| arg =~ i[0]})
+                            arr = @level_cons[imp[1]] ||= []
+                            arr.push($1)
+                        end
+
+                        [comment, arg]  # result
+                    end
+
+                    case cmd
+                    when "CALL", "CALL_LOOP"
+                        a = args[1][1]
+                        if a.start_with?('lvl')
+                            a = "LevelUpdate.#{a}"
+                        end
+                        args[1][1] = "'#{a}'"
+                    end
+
+                    args = args.collect {|a| a[0] + a[1]}.join(", ")
+
+                    @text.push("#{tabs}#{cmd}(#{args}),#{xtra}")
+                end
+
+            # };
+            elsif line =~ /^\};/
+                @text.push("];")
+                break
+
+            else
+                @text.push(line.chomp)
+
+            end
+
+            @n += 1
+        end
+    end
 
     # ---------------------------------------------------------------------------------------------------------
 
     def convert_macro(fn)
         header = []
         imports = []
+        @macr_cons = {}
         @macr_cmds = []
-        @macr_imps = {}
         @text = []
+
+        @imps = [
+            [/(DIALOG_\d+)/, "text/us/dialogs"],          # DIALOG_090
+        ]
 
         @lines = File.read(@c_dir + "/" + fn).lines.to_a
         @n = 0
@@ -515,10 +679,10 @@ class Convert
 
         header.push(@title)
         imports_wrap(imports, "game/MacroSpecialObjects", @macr_cmds.uniq)
-        @macr_imps.each do |as, what|
+
+        @macr_cons.each do |file, cons|
+            imports_wrap(imports, file, cons.uniq)
             imports.push("")
-            imports.push("import { #{what[0]} } from #{relative_import(what[1])}")
-            imports.push("const #{as} = #{what[0]}")
         end
 
         out = [header, "", imports, "", @text, @ts].join("\n")
@@ -527,12 +691,6 @@ class Convert
     end
 
     def cv_MacroObject
-        # add additional matches for behParams
-        behp = [
-            # keyword regex, import prefix, import object, import file
-            [/(DIALOG_\w+)/, ['D', 'DialogTexts', 'text/us/dialogs']]  # DIALOG_050
-        ]
-
         while true
             line = @lines[@n]
 
@@ -548,16 +706,14 @@ class Convert
                 args = args.split(",")
 
                 if args[0]
-                    @macr_imps['P'] ||= ['MacroObjectPresets', 'include/macro_presets']
-                    args[0].gsub!(/(macro_\w+)/, "P.\\1")  # macro_wooden_signpost
+                    args[0].gsub!(/(macro_\w+)/, "'\\1'")  # macro_wooden_signpost -> 'macro_wooden_signpost'
                 end
 
                 if cmd == "MACRO_OBJECT_WITH_BEH_PARAM"
-                    behp.each do |keyword, d|
-                        if args[-1] =~ keyword
-                            @macr_imps[d[0]] = [d[1], d[2]]
-                            args[-1].gsub!(keyword, "#{d[0]}.\\1")
-                        end
+                    # any kind of import in beh
+                    if (imp = @imps.find {|i| args[-1] =~ i[0]})
+                        arr = @macr_cons[imp[1]] ||= []
+                        arr.push($1)
                     end
                 end
 
@@ -589,6 +745,15 @@ class Convert
         @gbi_cons = []
         @text = []
 
+        if !@model_texture_imps
+            @model_texture_imps = []
+            find_all_exports([
+                @js_root + "/bin",
+                @js_root + "/textures",
+                @entity_dir + "/texture.inc.js"
+            ], //, @model_texture_imps)
+        end
+
         @lines = File.read(@c_dir + "/" + fn).lines.to_a
         @n = 0
         while (@n < @lines.length)
@@ -608,21 +773,34 @@ class Convert
             @n += 1
         end
 
-        imports_wrap(imports, "include/gbi", [@gbi_cmds.uniq, @gbi_cons.uniq])
-
         # resolve texture references
-        # they may be either be in "src/textures" or @entity_dir/texture.inc
-        if !@trefs.empty?
-            @trefs = @trefs.group_by {|t| t[/(.+)_\w+$/, 1]}    # outside_09006800, castle_grounds_seg7_texture_07001000
-            @trefs.each do |file, textures|
-                if file.start_with?(@entity)                    # castle_grounds_seg7_texture_07001000
-                    imports_wrap(imports, "#{@entity_dir}/texture.inc", textures.uniq.sort)
-                else
-                    imports_wrap(imports, "textures/#{file}", textures.uniq.sort)
-                end
-                imports.push("")
+        texture_imps = {}
+        @trefs.each do |tref|
+            if (imp = @model_texture_imps.find {|i| tref =~ i[0]})
+                arr = texture_imps[imp[1]] ||= []
+                arr.push($1)
             end
         end
+
+        imports_wrap(imports, "include/gbi", [@gbi_cmds.uniq, @gbi_cons.uniq])
+
+        texture_imps.each do |file, texs|
+            imports_wrap(imports, file, texs.uniq)
+            imports.push("")
+        end
+
+        # # they may be either be in "src/textures" or @entity_dir/texture.inc
+        # if !@trefs.empty?
+        #     @trefs = @trefs.group_by {|t| t[/(.+)_\w+$/, 1]}    # outside_09006800, castle_grounds_seg7_texture_07001000
+        #     @trefs.each do |file, textures|
+        #         if file.start_with?(@entity)                    # castle_grounds_seg7_texture_07001000
+        #             imports_wrap(imports, "#{@entity_dir}/texture.inc", textures.uniq.sort)
+        #         else
+        #             imports_wrap(imports, "textures/#{file}", textures.uniq.sort)
+        #         end
+        #         imports.push("")
+        #     end
+        # end
         
         out = [header, "", imports, @text, @ts].join("\n")
         jsfn = fn.delete_suffix(".c") + ".js"
@@ -638,10 +816,9 @@ class Convert
 
         while true
             line = @lines[@n]
-# puts line
+
             # static const Lights1 cannon_barrel_seg8_lights_08005878 = gdSPDefLights1(
             if line =~ /(static )*const Lights1 (\w+)/
-# puts "*****"
                 export = $1 ? "" : "export "
                 @text.push("#{export}const #{$2} = gdSPDefLights1(")
 

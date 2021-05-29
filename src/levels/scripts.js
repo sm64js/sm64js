@@ -1,7 +1,5 @@
-import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
-import { level_defines_list                 } from "./level_defines"
-import { GeoLayoutInstance as Geo           } from "../engine/GeoLayout"
-const LAYER_ALPHA = Geo.LAYER_ALPHA
+import * as _Linker from "../game/Linker"
+const LAYER_ALPHA = gLinker.GeoLayout.LAYER_ALPHA
 
 import { ALLOC_LEVEL_POOL, AREA, BLACKOUT, CALL, CALL_LOOP, CLEARDEMOPTR, CLEAR_LEVEL, END_AREA,
          EXECUTE, EXIT, FREE_LEVEL_POOL, GET_AREA, INIT_LEVEL, JUMP_IF, JUMP_LINK, LOAD_AREA,
@@ -71,87 +69,12 @@ import { white_particle_small_dl     } from "../actors/white_particle_small/mode
 import { wooden_signpost_geo         } from "../actors/wooden_signpost/geo.inc"
 
 import { level_main_menu_entry_2 } from "./menu/script"
-
-import {
-    LEVEL_BBH, LEVEL_CCM, LEVEL_CASTLE, LEVEL_HMC, LEVEL_SSL, LEVEL_BOB, LEVEL_SL, LEVEL_WDW, LEVEL_JRB, LEVEL_THI,
-    LEVEL_TTC, LEVEL_RR, LEVEL_CASTLE_GROUNDS, LEVEL_BITDW, LEVEL_VCUTM, LEVEL_BITFS, LEVEL_SA, LEVEL_BITS, LEVEL_LLL,
-    LEVEL_DDD, LEVEL_WF, LEVEL_ENDING, LEVEL_CASTLE_COURTYARD, LEVEL_PSS, LEVEL_COTMC, LEVEL_TOTWC, LEVEL_BOWSER_1,
-    LEVEL_WMOTR, LEVEL_BOWSER_2, LEVEL_BOWSER_3, LEVEL_TTM
-} from "./level_defines_constants"
-
-const script_exec_bbh              = [ EXECUTE('level_bbh_entry'),              RETURN() ]
-const script_exec_ccm              = [ EXECUTE('level_ccm_entry'),              RETURN() ]
-const script_exec_castle_inside    = [ EXECUTE('level_castle_inside_entry'),    RETURN() ]
-const script_exec_hmc              = [ EXECUTE('level_hmc_entry'),              RETURN() ]
-const script_exec_ssl              = [ EXECUTE('level_ssl_entry'),              RETURN() ]
-const script_exec_bob              = [ EXECUTE('level_bob_entry'),              RETURN() ]
-const script_exec_sl               = [ EXECUTE('level_sl_entry'),               RETURN() ]
-const script_exec_wdw              = [ EXECUTE('level_wdw_entry'),              RETURN() ]
-const script_exec_jrb              = [ EXECUTE('level_jrb_entry'),              RETURN() ]
-const script_exec_thi              = [ EXECUTE('level_thi_entry'),              RETURN() ]
-const script_exec_ttc              = [ EXECUTE('level_ttc_entry'),              RETURN() ]
-const script_exec_rr               = [ EXECUTE('level_rr_entry'),               RETURN() ]
-const script_exec_castle_grounds   = [ EXECUTE('level_castle_grounds_entry'),   RETURN() ]
-const script_exec_bitdw            = [ EXECUTE('level_bitdw_entry'),            RETURN() ]
-const script_exec_vcutm            = [ EXECUTE('level_vcutm_entry'),            RETURN() ]
-const script_exec_bitfs            = [ EXECUTE('level_bitfs_entry'),            RETURN() ]
-const script_exec_sa               = [ EXECUTE('level_sa_entry'),               RETURN() ]
-const script_exec_bits             = [ EXECUTE('level_bits_entry'),             RETURN() ]
-const script_exec_lll              = [ EXECUTE('level_lll_entry'),              RETURN() ]
-const script_exec_ddd              = [ EXECUTE('level_ddd_entry'),              RETURN() ]
-const script_exec_wf               = [ EXECUTE('level_wf_entry'),               RETURN() ]
-const script_exec_ending           = [ EXECUTE('level_ending_entry'),           RETURN() ]
-const script_exec_castle_courtyard = [ EXECUTE('level_castle_courtyard_entry'), RETURN() ]
-const script_exec_pss              = [ EXECUTE('level_pss_entry'),              RETURN() ]
-const script_exec_cotmc            = [ EXECUTE('level_cotmc_entry'),            RETURN() ]
-const script_exec_totwc            = [ EXECUTE('level_totwc_entry'),            RETURN() ]
-const script_exec_bowser_1         = [ EXECUTE('level_bowser_1_entry'),         RETURN() ]
-const script_exec_wmotr            = [ EXECUTE('level_wmotr_entry'),            RETURN() ]
-const script_exec_bowser_2         = [ EXECUTE('level_bowser_2_entry'),         RETURN() ]
-const script_exec_bowser_3         = [ EXECUTE('level_bowser_3_entry'),         RETURN() ]
-const script_exec_ttm              = [ EXECUTE('level_ttm_entry'),              RETURN() ]
-
-export const script_exec_level_table = [
-    GET_AREA('gCurrLevelNum'),
-    JUMP_IF( OP_EQ, LEVEL_BBH,              script_exec_bbh ),
-    JUMP_IF( OP_EQ, LEVEL_CCM,              script_exec_ccm ),
-    JUMP_IF( OP_EQ, LEVEL_CASTLE,           script_exec_castle_inside ),
-    JUMP_IF( OP_EQ, LEVEL_HMC,              script_exec_hmc ),
-    JUMP_IF( OP_EQ, LEVEL_SSL,              script_exec_ssl ),
-    JUMP_IF( OP_EQ, LEVEL_BOB,              script_exec_bob ),
-    JUMP_IF( OP_EQ, LEVEL_SL,               script_exec_sl ),
-    JUMP_IF( OP_EQ, LEVEL_WDW,              script_exec_wdw ),
-    JUMP_IF( OP_EQ, LEVEL_JRB,              script_exec_jrb ),
-    JUMP_IF( OP_EQ, LEVEL_THI,              script_exec_thi ),
-    JUMP_IF( OP_EQ, LEVEL_TTC,              script_exec_ttc ),
-    JUMP_IF( OP_EQ, LEVEL_RR,               script_exec_rr ),
-    JUMP_IF( OP_EQ, LEVEL_CASTLE_GROUNDS,   script_exec_castle_grounds ),
-    JUMP_IF( OP_EQ, LEVEL_BITDW,            script_exec_bitdw ),
-    JUMP_IF( OP_EQ, LEVEL_VCUTM,            script_exec_vcutm ),
-    JUMP_IF( OP_EQ, LEVEL_BITFS,            script_exec_bitfs ),
-    JUMP_IF( OP_EQ, LEVEL_SA,               script_exec_sa ),
-    JUMP_IF( OP_EQ, LEVEL_BITS,             script_exec_bits ),
-    JUMP_IF( OP_EQ, LEVEL_LLL,              script_exec_lll ),
-    JUMP_IF( OP_EQ, LEVEL_DDD,              script_exec_ddd ),
-    JUMP_IF( OP_EQ, LEVEL_WF,               script_exec_wf ),
-    JUMP_IF( OP_EQ, LEVEL_ENDING,           script_exec_ending ),
-    JUMP_IF( OP_EQ, LEVEL_CASTLE_COURTYARD, script_exec_castle_courtyard ),
-    JUMP_IF( OP_EQ, LEVEL_PSS,              script_exec_pss ),
-    JUMP_IF( OP_EQ, LEVEL_COTMC,            script_exec_cotmc ),
-    JUMP_IF( OP_EQ, LEVEL_TOTWC,            script_exec_totwc ),
-    JUMP_IF( OP_EQ, LEVEL_BOWSER_1,         script_exec_bowser_1 ),
-    JUMP_IF( OP_EQ, LEVEL_WMOTR,            script_exec_wmotr ),
-    JUMP_IF( OP_EQ, LEVEL_BOWSER_2,         script_exec_bowser_2 ),
-    JUMP_IF( OP_EQ, LEVEL_BOWSER_3,         script_exec_bowser_3 ),
-    JUMP_IF( OP_EQ, LEVEL_TTM,              script_exec_ttm ),
-    EXIT(),
-]
+import * as _level_defines from "./level_defines"
 
 
 const getSelectedLevel = () => {
     return parseInt(document.getElementById("mapSelect").value)
 }
-
 
 export const level_main_scripts_entry = [
     ALLOC_LEVEL_POOL(),
@@ -225,4 +148,3 @@ export const level_main_scripts_entry = [
 
 
 gLinker.level_scripts.level_main_scripts_entry = level_main_scripts_entry
-gLinker.level_scripts.script_exec_level_table = script_exec_level_table

@@ -2,12 +2,24 @@ import { GoddardRendererInstance as GoddardRenderer } from "../goddard/GoddardRe
 import { GameInstance as Game } from "./Game"
 
 import {
-    coss
+    sins, coss, s16
 } from "../utils"
 
 import {
     vec3s_set, get_pos_from_transform_mtx, Mat4
 } from "../engine/math_util"
+
+import {
+    obj_scale, cur_obj_hide, obj_mark_for_deletion, spawn_object
+} from "./ObjectHelpers"
+
+import {
+    play_sound
+} from "../audio/external"
+
+import {
+    oMoveAngleYaw, oPosX, oPosY, oPosZ, oUnlockDoorStarState, oUnlockDoorStarTimer, oUnlockDoorStarYawVel
+} from "../include/object_constants"
 
 import {
     gDPSetAlphaCompare, gDPSetEnvColor, 
@@ -36,6 +48,16 @@ import {
 import {
     MARIO_HAND_FISTS, MARIO_HAND_OPEN, GRAB_POS_LIGHT_OBJ, GRAB_POS_HEAVY_OBJ, GRAB_POS_BOWSER
 } from "../include/mario_geo_switch_case_ids"
+
+import {
+    SOUND_MENU_STAR_SOUND, SOUND_GENERAL_SHORT_STAR
+} from "../include/sounds"
+
+
+const UNLOCK_DOOR_STAR_RISING = 0
+const UNLOCK_DOOR_STAR_WAITING = 1
+const UNLOCK_DOOR_STAR_SPAWNING_PARTICLES = 2
+const UNLOCK_DOOR_STAR_DONE = 3
 
 
 class MarioMisc {
@@ -316,16 +338,16 @@ class MarioMisc {
      * Geo node that updates the held object node and the HOLP.
      */
     geo_switch_mario_hand_grab_pos(callContext, node, mtx) {
-        const marioState = gLinker.LevelUpdate.gMarioState
+        const gMarioState = gLinker.LevelUpdate.gMarioState
         const gCurGraphNodeCamera = gLinker.GeoRenderer.gCurGraphNodeCamera
 
         if (callContext == GEO_CONTEXT_RENDER) {
             node.object = null
-            if (marioState.heldObj) {
-                node.object = marioState.heldObj
+            if (gMarioState.heldObj) {
+                node.object = gMarioState.heldObj
                 switch (this.gBodyState.grabPos) {
                     case GRAB_POS_LIGHT_OBJ:
-                        if (marioState.action & ACT_FLAG_THROWING) {
+                        if (gMarioState.action & ACT_FLAG_THROWING) {
                             vec3s_set(node.translation, 50, 0, 0)
                         } else {
                             vec3s_set(node.translation, 50, 0, 110)
@@ -343,7 +365,7 @@ class MarioMisc {
               // ! The HOLP is set here, which is why it only updates when the held object is drawn.
               // This is why it won't update during a pause buffered hitstun or when the camera is very far
               // away.
-            get_pos_from_transform_mtx(marioState.marioBodyState.heldObjLastPosition, mtx, gCurGraphNodeCamera.matrixPtr)
+            get_pos_from_transform_mtx(gMarioState.marioBodyState.heldObjLastPosition, mtx, gCurGraphNodeCamera.matrixPtr)
         }
         return null
     }
@@ -416,6 +438,85 @@ class MarioMisc {
         // }
         return gfx
     }
+
+    star_door_unlock_spawn_particles(angleOffset) {
+        const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
+        const sparkleParticle = spawn_object(gCurrentObject, 0, 'bhvSparkleSpawn')
+
+        sparkleParticle.rawData[oPosX] +=
+            100.0 * sins(s16(gCurrentObject.rawData[oUnlockDoorStarTimer] * 0x2800) + angleOffset)
+        sparkleParticle.rawData[oPosZ] +=
+            100.0 * coss(s16(gCurrentObject.rawData[oUnlockDoorStarTimer] * 0x2800) + angleOffset)
+        // Particles are spawned lower each frame
+        sparkleParticle.rawData[oPosY] -= gCurrentObject.rawData[oUnlockDoorStarTimer] * 10.0
+    }
+
+    bhv_unlock_door_star_init() {
+        const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
+        const gMarioState = gLinker.LevelUpdate.gMarioState
+
+        gCurrentObject.rawData[oUnlockDoorStarState] = UNLOCK_DOOR_STAR_RISING
+        gCurrentObject.rawData[oUnlockDoorStarTimer] = 0
+        gCurrentObject.rawData[oUnlockDoorStarYawVel] = 0x1000
+        gCurrentObject.rawData[oPosX] += 30.0 * sins(s16(gMarioState.faceAngle[1] - 0x4000))
+        gCurrentObject.rawData[oPosY] += 160.0
+        gCurrentObject.rawData[oPosZ] += 30.0 * coss(s16(gMarioState.faceAngle[1] - 0x4000))
+        gCurrentObject.rawData[oMoveAngleYaw] = 0x7800
+        obj_scale(gCurrentObject, 0.5)
+    }
+
+    bhv_unlock_door_star_loop() {
+        const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
+        let prevYaw = gCurrentObject.rawData[oMoveAngleYaw]
+
+        // Speed up the star every frame
+        if (gCurrentObject.rawData[oUnlockDoorStarYawVel] < 0x2400) {
+            gCurrentObject.rawData[oUnlockDoorStarYawVel] += 0x60
+        }
+        switch (gCurrentObject.rawData[oUnlockDoorStarState]) {
+            case UNLOCK_DOOR_STAR_RISING:
+                gCurrentObject.rawData[oPosY] += 3.4   // Raise the star up in the air
+                gCurrentObject.rawData[oMoveAngleYaw] +=
+                    gCurrentObject.rawData[oUnlockDoorStarYawVel]   // Apply yaw velocity
+                obj_scale(gCurrentObject, gCurrentObject.rawData[oUnlockDoorStarTimer] / 50.0 + 0.5)   // Scale the star to be bigger
+                if (++gCurrentObject.rawData[oUnlockDoorStarTimer] == 30) {
+                    gCurrentObject.rawData[oUnlockDoorStarTimer] = 0
+                    gCurrentObject.rawData[oUnlockDoorStarState]++   // Sets state to UNLOCK_DOOR_STAR_WAITING
+                }
+                break
+            case UNLOCK_DOOR_STAR_WAITING:
+                gCurrentObject.rawData[oMoveAngleYaw] +=
+                    gCurrentObject.rawData[oUnlockDoorStarYawVel]   // Apply yaw velocity
+                if (++gCurrentObject.rawData[oUnlockDoorStarTimer] == 30) {
+                    play_sound(SOUND_MENU_STAR_SOUND, gCurrentObject.gfx.cameraToObject)   // Play final sound
+                    cur_obj_hide()                                              // Hide the object
+                    gCurrentObject.rawData[oUnlockDoorStarTimer] = 0
+                    gCurrentObject.rawData[oUnlockDoorStarState]++   // Sets state to UNLOCK_DOOR_STAR_SPAWNING_PARTICLES
+                }
+                break
+            case UNLOCK_DOOR_STAR_SPAWNING_PARTICLES:
+                // Spawn two particles, opposite sides of the star.
+                this.star_door_unlock_spawn_particles(0)
+                this.star_door_unlock_spawn_particles(0x8000)
+                if (gCurrentObject.rawData[oUnlockDoorStarTimer]++ == 20) {
+                    gCurrentObject.rawData[oUnlockDoorStarTimer] = 0
+                    gCurrentObject.rawData[oUnlockDoorStarState]++   // Sets state to UNLOCK_DOOR_STAR_DONE
+                }
+                break
+            case UNLOCK_DOOR_STAR_DONE:   // The object stays loaded for an additional 50 frames so that the
+                                          // sound doesn't immediately stop.
+                if (gCurrentObject.rawData[oUnlockDoorStarTimer]++ == 50) {
+                    obj_mark_for_deletion(gCurrentObject)
+                }
+                break
+        }
+        // Checks if the angle has cycled back to 0.
+        // This means that the code will execute when the star completes a full revolution.
+        if (prevYaw > gCurrentObject.rawData[oMoveAngleYaw]) {
+            play_sound(SOUND_GENERAL_SHORT_STAR, gCurrentObject.gfx.cameraToObject)   // Play a sound every time the star spins once
+        }
+    }
+
 
 }
 

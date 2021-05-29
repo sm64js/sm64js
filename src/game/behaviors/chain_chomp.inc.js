@@ -9,15 +9,15 @@ import { atan2s } from "../../engine/math_util"
 import { INTERACT_MR_BLIZZARD } from "../Interaction"
 
 const sChainChompHitbox = {
-    interactType: INTERACT_MR_BLIZZARD,
-    downOffset: 0,
+    interactType:      INTERACT_MR_BLIZZARD,
+    downOffset:        0,
     damageOrCoinValue: 3,
-    health: 1,
-    numLootCoins: 0,
-    radius: 80,
-    height: 160,
-    hurtboxRadius: 80,
-    hurtboxHeight: 160
+    health:            1,
+    numLootCoins:      0,
+    radius:            80,
+    height:            160,
+    hurtboxRadius:     80,
+    hurtboxHeight:     160
 }
 
 const wooden_post_approach_speed = () => {

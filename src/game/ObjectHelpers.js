@@ -1,4 +1,5 @@
-import { geo_obj_init, geo_obj_init_animation, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE, GEO_CONTEXT_RENDER } from "../engine/graph_node"
+import { geo_obj_init, geo_obj_init_animation, geo_obj_init_animation_accel, GRAPH_RENDER_INVISIBLE,
+    GEO_CONTEXT_RENDER, GRAPH_RENDER_BILLBOARD } from "../engine/graph_node"
 
 import {
     oAction, oPrevAction, oSubAction, oTimer, oFlags,
@@ -1144,6 +1145,16 @@ export const spawn_object_relative = (behaviorParam, relativePosX, relativePosY,
     return obj
 }
 
+
+export const spawn_object_relative_with_scale = (behaviorParam, relativePosX, relativePosY, relativePosZ,
+                                              scale, parent, model, behavior) => {
+    const obj = spawn_object_relative(behaviorParam, relativePosX, relativePosY, relativePosZ,
+                                               parent, model, behavior)
+    obj_scale(obj, scale)
+    return obj
+}
+
+
 export const try_to_spawn_object = (offsetY, scale, parent, model, behavior) => {
     const obj = spawn_object(parent, model, behavior)
     obj.rawData[oPosY] += offsetY
@@ -1742,6 +1753,12 @@ export const obj_angle_to_object = (obj1, obj2) => {
 
     return atan2s(z2 - z1, x2 - x1)
 }
+
+
+export const obj_set_billboard = (obj) => {
+    obj.gfx.flags |= GRAPH_RENDER_BILLBOARD
+}
+
 
 export const obj_spawn_loot_coins = (obj, numCoins, sp30, coinsBehavior, posJitter, model) => {
 

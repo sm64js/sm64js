@@ -1,6 +1,5 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import * as MODEL from "../include/model_ids"
-import * as BHV from "./BehaviorData"
 
 import { bhvTree, bhvStaticObject } from "./BehaviorData"
 import { spawn_object_abs_with_rot } from "./ObjectHelpers"
@@ -224,10 +223,10 @@ export const spawn_macro_objects = (areaIndex, macroObjList) => {
         } else {
             p = MacroObjectPresets[objToSpawn.preset]
         }
-        preset = {behavior: BHV[p[0]], model: MODEL[p[1]], param: p[2]}
+        preset = {behavior: gLinker.behaviors[p[0]], model: MODEL[p[1]], param: p[2]}
 
         if (!preset.behavior) {
-            console.log("no behavior - ", preset)
+            console.log("no behavior - ", p[0]) // , objToSpawn)
             return
         }
 

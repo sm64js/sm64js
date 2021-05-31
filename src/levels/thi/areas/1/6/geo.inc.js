@@ -7,7 +7,6 @@ import {
 
 import { thi_seg7_dl_07007648 } from "./model.inc"
 
-
 // 0x0E0005B0
 export const thi_geo_0005B0 = () => {return [
     GEO_CULLING_RADIUS(300),
@@ -29,4 +28,4 @@ export const thi_geo_0005C8 = () => {return [
     GEO_END(),
 ]};
 
-// 1621007118 - 2021-05-15 11:25:19 -0400
+// 2021-05-31 09:29:31 -0400 (Convert.rb 2021-05-29 17:49:14 -0400)

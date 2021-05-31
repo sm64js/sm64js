@@ -29,8 +29,8 @@ export const COURSE_SA       = 24  // Secret Aquarium
 export const COURSE_CAKE_END = 25  // The End (Cake Scene)
 
 export const COURSE_MIN   = 1
-export const COURSE_MAX   = 25
-export const COURSE_COUNT = 25
+export const COURSE_MAX   = 26
+export const COURSE_COUNT = 26
 
 export const COURSE_STAGES_MAX   = 15
 export const COURSE_STAGES_COUNT = 15

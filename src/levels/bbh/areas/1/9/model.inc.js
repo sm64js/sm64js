@@ -1,86 +1,76 @@
-import * as Gbi from "../../../../../include/gbi"
-import {
-    spooky_09000000,
-    spooky_09000800,
-    spooky_09001800,
-    spooky_09002800,
-    spooky_09003800,
-    spooky_09004800,
-    spooky_09005000,
-    spooky_09006000,
-    spooky_09006800,
-    spooky_09007000,
-    spooky_09008000,
-    spooky_09008800,
-    spooky_09009000,
-    spooky_0900A000,
-    spooky_0900A800,
-    spooky_0900B000,
-    spooky_0900B800
-} from "../../../../../textures/spooky"
+// 0x0700B238 - 0x0700B328
 
 import {
-    bbh_seg7_texture_07000000,
-    bbh_seg7_texture_07001000,
-    bbh_seg7_texture_07001800,
-    bbh_seg7_texture_07002000,
-    bbh_seg7_texture_07003000,
-    bbh_seg7_texture_07003400,
-    bbh_seg7_texture_07004400
-} from "../../../texture.inc"
+    gsDPSetTextureImage, gsDPLoadSync, gsDPLoadBlock, gsSPVertex, gsSP2Triangles, gsSP1Triangle,
+    gsSPEndDisplayList, gsDPPipeSync, gsDPSetCombineMode, gsSPClearGeometryMode, gsDPSetTile,
+    gsSPTexture, gsDPTileSync, gsDPSetTileSize, gsSPDisplayList, gsSPSetGeometryMode,
+    G_IM_FMT_IA, G_IM_SIZ_16b, CALC_DXT, G_TX_LOADTILE, G_IM_SIZ_16b_BYTES, G_CC_MODULATEIA,
+    G_LIGHTING, G_TX_WRAP, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_RENDERTILE, G_ON,
+    G_TX_CLAMP, G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADE
+} from "../../../../../include/gbi"
+import { spooky_0900B800 } from "../../../../../textures/spooky"
+
 const bbh_seg7_vertex_0700B238 = [
-	{ pos: [ 2161, 819, 1638 ], flag: 0, tc: [ 0, 2012 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 1485, 1638 ], flag: 0, tc: [ 0, 0 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 1485, 1997 ], flag: 0, tc: [ 990, 0 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 1741, 307 ], flag: 0, tc: [ 0, 2012 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 2406, 307 ], flag: 0, tc: [ 0, 0 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 2406, 666 ], flag: 0, tc: [ 990, 0 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 1741, 666 ], flag: 0, tc: [ 990, 2012 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 819, 307 ], flag: 0, tc: [ 0, 2012 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 1485, 307 ], flag: 0, tc: [ 0, 0 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 1485, 666 ], flag: 0, tc: [ 990, 0 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 819, 666 ], flag: 0, tc: [ 990, 2012 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 3533, 614, 1137 ], flag: 0, tc: [ 990, 0 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 3174, 0, 1137 ], flag: 0, tc: [ 0, 2012 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 3533, 0, 1137 ], flag: 0, tc: [ 990, 2012 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 3174, 614, 1137 ], flag: 0, tc: [ 0, 0 ], color: [ 255, 87, 0, 154 ] },
-]
+    [[  2161,    819,   1638], 0, [     0,   2012], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,   1485,   1638], 0, [     0,      0], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,   1485,   1997], 0, [   990,      0], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,   1741,    307], 0, [     0,   2012], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,   2406,    307], 0, [     0,      0], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,   2406,    666], 0, [   990,      0], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,   1741,    666], 0, [   990,   2012], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,    819,    307], 0, [     0,   2012], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,   1485,    307], 0, [     0,      0], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,   1485,    666], 0, [   990,      0], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,    819,    666], 0, [   990,   2012], [0xff, 0x57, 0x00, 0x9a]],
+    [[  3533,    614,   1137], 0, [   990,      0], [0xff, 0x57, 0x00, 0x9a]],
+    [[  3174,      0,   1137], 0, [     0,   2012], [0xff, 0x57, 0x00, 0x9a]],
+    [[  3533,      0,   1137], 0, [   990,   2012], [0xff, 0x57, 0x00, 0x9a]],
+    [[  3174,    614,   1137], 0, [     0,      0], [0xff, 0x57, 0x00, 0x9a]],
+];
 
+// 0x0700B328 - 0x0700B398
 const bbh_seg7_vertex_0700B328 = [
-	{ pos: [ 2161, 0, 1280 ], flag: 0, tc: [ 0, 2012 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 666, 1638 ], flag: 0, tc: [ 990, 0 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 0, 1638 ], flag: 0, tc: [ 990, 2012 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 819, 1638 ], flag: 0, tc: [ 0, 2012 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 1485, 1997 ], flag: 0, tc: [ 990, 0 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 819, 1997 ], flag: 0, tc: [ 990, 2012 ], color: [ 255, 87, 0, 154 ] },
-	{ pos: [ 2161, 666, 1280 ], flag: 0, tc: [ 0, 0 ], color: [ 255, 87, 0, 154 ] },
-]
+    [[  2161,      0,   1280], 0, [     0,   2012], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,    666,   1638], 0, [   990,      0], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,      0,   1638], 0, [   990,   2012], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,    819,   1638], 0, [     0,   2012], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,   1485,   1997], 0, [   990,      0], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,    819,   1997], 0, [   990,   2012], [0xff, 0x57, 0x00, 0x9a]],
+    [[  2161,    666,   1280], 0, [     0,      0], [0xff, 0x57, 0x00, 0x9a]],
+];
 
-export const bbh_seg7_dl_0700B398 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_16b, 1, spooky_0900B800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 64 - 1),
-	Gbi.gsSPVertex(bbh_seg7_vertex_0700B238, 15, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-	...Gbi.gsSP2Triangles( 3,  5,  6, 0x0,  7,  8,  9, 0x0),
-	...Gbi.gsSP2Triangles( 7,  9, 10, 0x0, 11, 12, 13, 0x0),
-	Gbi.gsSP1Triangle(11, 14, 12, 0x0),
-	Gbi.gsSPVertex(bbh_seg7_vertex_0700B328, 7, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-	Gbi.gsSP1Triangle( 0,  6,  1, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0700B398 - 0x0700B418
+const bbh_seg7_dl_0700B398 = [
+    gsDPSetTextureImage(G_IM_FMT_IA, G_IM_SIZ_16b, 1, spooky_0900B800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(bbh_seg7_vertex_0700B238, 15, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+    gsSP2Triangles( 3,  5,  6, 0x0,  7,  8,  9, 0x0),
+    gsSP2Triangles( 7,  9, 10, 0x0, 11, 12, 13, 0x0),
+    gsSP1Triangle(11, 14, 12, 0x0),
+    gsSPVertex(bbh_seg7_vertex_0700B328, 7, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+    gsSP1Triangle( 0,  6,  1, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
+// 0x0700B418 - 0x0700B488
 export const bbh_seg7_dl_0700B418 = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATEIA),
-	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 6, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (64 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPDisplayList(bbh_seg7_dl_0700B398),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING),
-	Gbi.gsSPEndDisplayList(),
-]
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_MODULATEIA, G_CC_MODULATEIA),
+    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetTile(G_IM_FMT_IA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_IA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 6, G_TX_NOLOD, G_TX_CLAMP, 5, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (64 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPDisplayList(bbh_seg7_dl_0700B398),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPSetGeometryMode(G_LIGHTING),
+    gsSPEndDisplayList(),
+].flat();
 
+// 2021-05-29 19:32:09 -0400 (Convert.rb 2021-05-29 17:49:14 -0400)

@@ -19,15 +19,20 @@ import {
     geo_camera_fov, geo_camera_main
 } from "../../../../game/Camera"
 
+import { thi_seg7_dl_07005260 } from "../1/1/model.inc"
+
+import { thi_seg7_dl_07006968 } from "../1/2/model.inc"
+
+import { thi_seg7_dl_07007008 } from "../1/3/model.inc"
+
+import { thi_seg7_dl_070072E8 } from "../1/4/model.inc"
+
+import { thi_seg7_dl_07007538 } from "./1/model.inc"
+
 import {
     geo_movtex_pause_control, geo_movtex_draw_water_regions
 } from "../../../../game/MovingTexture"
 
-import { thi_seg7_dl_07005260 } from "../1/1/model.inc"
-import { thi_seg7_dl_07006968 } from "../1/2/model.inc"
-import { thi_seg7_dl_07007008 } from "../1/3/model.inc"
-import { thi_seg7_dl_07007538 } from "./1/model.inc"
-import { thi_seg7_dl_070072E8 } from "../1/4/model.inc"
 
 // SHARE_PATH: [level]/areas/1/1/, [level]/areas/1/2/, [level]/areas/1/3/, [level]/areas/1/4/
 
@@ -67,4 +72,4 @@ export const thi_geo_0006D4 = () => {return [
     GEO_END(),
 ]};
 
-// 1621007118 - 2021-05-15 11:25:19 -0400
+// 2021-05-31 09:29:31 -0400 (Convert.rb 2021-05-29 17:49:14 -0400)

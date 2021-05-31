@@ -1,87 +1,110 @@
-import * as Gbi from "../../../../../include/gbi"
-import { snow_09005800, snow_09007000 } from "../../../../../textures/snow"
+// 0x070106D8 - 0x07010758
+
+import {
+    gsDPSetTextureImage, gsDPLoadSync, gsDPLoadBlock, gsSPVertex, gsSP2Triangles,
+    gsSPEndDisplayList, gsSP1Triangle, gsDPPipeSync, gsDPSetCombineMode, gsSPClearGeometryMode,
+    gsDPSetTile, gsSPTexture, gsDPTileSync, gsDPSetTileSize, gsSPDisplayList, gsSPSetGeometryMode,
+    G_IM_FMT_RGBA, G_IM_SIZ_16b, CALC_DXT, G_TX_LOADTILE, G_IM_SIZ_16b_BYTES, G_CC_DECALRGBA,
+    G_LIGHTING, G_CULL_BACK, G_TX_WRAP, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_RENDERTILE,
+    G_ON, G_TX_CLAMP, G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADE
+} from "../../../../../include/gbi"
+import {
+    snow_09005800, snow_09007000
+} from "../../../../../textures/snow"
 
 const ccm_seg7_vertex_070106D8 = [
-	{ pos: [ -1457, -890, 550 ], flag: 0, tc: [ 23466, 990 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -377, -397, 185 ], flag: 0, tc: [ 11430, 24 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -377, -499, 185 ], flag: 0, tc: [ 11436, 990 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1457, -787, 550 ], flag: 0, tc: [ 23460, 24 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ 703, -6, -178 ], flag: 0, tc: [ -2624, 24 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ 703, -108, -178 ], flag: 0, tc: [ -2618, 990 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -377, -499, 185 ], flag: 0, tc: [ 9410, 990 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -377, -397, 185 ], flag: 0, tc: [ 9404, 24 ], color: [ 255, 255, 255, 255 ] },
-]
+    [[ -1457,   -890,    550], 0, [ 23466,    990], [0xff, 0xff, 0xff, 0xff]],
+    [[  -377,   -397,    185], 0, [ 11430,     24], [0xff, 0xff, 0xff, 0xff]],
+    [[  -377,   -499,    185], 0, [ 11436,    990], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1457,   -787,    550], 0, [ 23460,     24], [0xff, 0xff, 0xff, 0xff]],
+    [[   703,     -6,   -178], 0, [ -2624,     24], [0xff, 0xff, 0xff, 0xff]],
+    [[   703,   -108,   -178], 0, [ -2618,    990], [0xff, 0xff, 0xff, 0xff]],
+    [[  -377,   -499,    185], 0, [  9410,    990], [0xff, 0xff, 0xff, 0xff]],
+    [[  -377,   -397,    185], 0, [  9404,     24], [0xff, 0xff, 0xff, 0xff]],
+];
 
+// 0x07010758 - 0x07010848
 const ccm_seg7_vertex_07010758 = [
-	{ pos: [ -1120, 297, 770 ], flag: 0, tc: [ 3368, 0 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1120, 553, 770 ], flag: 0, tc: [ 3376, 990 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1586, 553, 983 ], flag: 0, tc: [ 0, 990 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1120, 348, 770 ], flag: 0, tc: [ -5376, 0 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -12, 336, 667 ], flag: 0, tc: [ 2028, 0 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1120, 553, 770 ], flag: 0, tc: [ -5392, 990 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -12, 540, 667 ], flag: 0, tc: [ 2012, 990 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -55, 336, 574 ], flag: 0, tc: [ 0, 0 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1163, 348, 677 ], flag: 0, tc: [ 7372, 0 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1163, 553, 677 ], flag: 0, tc: [ 7388, 990 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -55, 540, 574 ], flag: 0, tc: [ -16, 990 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1333, 297, 304 ], flag: 0, tc: [ 0, -34 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1333, 553, 304 ], flag: 0, tc: [ 0, 988 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1120, 553, 770 ], flag: 0, tc: [ 3376, 988 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1120, 297, 770 ], flag: 0, tc: [ 3372, -34 ], color: [ 255, 255, 255, 255 ] },
-]
+    [[ -1120,    297,    770], 0, [  3368,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1120,    553,    770], 0, [  3376,    990], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1586,    553,    983], 0, [     0,    990], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1120,    348,    770], 0, [ -5376,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[   -12,    336,    667], 0, [  2028,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1120,    553,    770], 0, [ -5392,    990], [0xff, 0xff, 0xff, 0xff]],
+    [[   -12,    540,    667], 0, [  2012,    990], [0xff, 0xff, 0xff, 0xff]],
+    [[   -55,    336,    574], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1163,    348,    677], 0, [  7372,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1163,    553,    677], 0, [  7388,    990], [0xff, 0xff, 0xff, 0xff]],
+    [[   -55,    540,    574], 0, [   -16,    990], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1333,    297,    304], 0, [     0,    -34], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1333,    553,    304], 0, [     0,    988], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1120,    553,    770], 0, [  3376,    988], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1120,    297,    770], 0, [  3372,    -34], [0xff, 0xff, 0xff, 0xff]],
+];
 
+// 0x07010848 - 0x070108F8
 const ccm_seg7_vertex_07010848 = [
-	{ pos: [ -1799, 297, 517 ], flag: 0, tc: [ -36, 0 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1799, 553, 517 ], flag: 0, tc: [ 0, 990 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1333, 553, 304 ], flag: 0, tc: [ 3376, 990 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1120, 297, 770 ], flag: 0, tc: [ 3368, 0 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1586, 553, 983 ], flag: 0, tc: [ 0, 990 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1586, 297, 983 ], flag: 0, tc: [ -36, 0 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1586, 297, 982 ], flag: 0, tc: [ 3368, 0 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1586, 553, 982 ], flag: 0, tc: [ 3372, 990 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1799, 553, 516 ], flag: 0, tc: [ 0, 990 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1799, 297, 516 ], flag: 0, tc: [ -36, 0 ], color: [ 255, 255, 255, 255 ] },
-	{ pos: [ -1333, 297, 304 ], flag: 0, tc: [ 3368, 0 ], color: [ 255, 255, 255, 255 ] },
-]
+    [[ -1799,    297,    517], 0, [   -36,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1799,    553,    517], 0, [     0,    990], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1333,    553,    304], 0, [  3376,    990], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1120,    297,    770], 0, [  3368,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1586,    553,    983], 0, [     0,    990], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1586,    297,    983], 0, [   -36,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1586,    297,    982], 0, [  3368,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1586,    553,    982], 0, [  3372,    990], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1799,    553,    516], 0, [     0,    990], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1799,    297,    516], 0, [   -36,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[ -1333,    297,    304], 0, [  3368,      0], [0xff, 0xff, 0xff, 0xff]],
+];
 
-export const ccm_seg7_dl_070108F8 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, snow_09005800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPVertex(ccm_seg7_vertex_070106D8, 8, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
-	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  7,  4,  6, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x070108F8 - 0x07010940
+const ccm_seg7_dl_070108F8 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, snow_09005800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(ccm_seg7_vertex_070106D8, 8, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
+    gsSP2Triangles( 4,  5,  6, 0x0,  7,  4,  6, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
-export const ccm_seg7_dl_07010940 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, snow_09007000),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 64 * 32 - 1),
-	Gbi.gsSPVertex(ccm_seg7_vertex_07010758, 15, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-	...Gbi.gsSP2Triangles( 4,  6,  5, 0x0,  7,  8,  9, 0x0),
-	...Gbi.gsSP2Triangles( 7,  9, 10, 0x0, 11, 12, 13, 0x0),
-	Gbi.gsSP1Triangle(13, 14, 11, 0x0),
-	Gbi.gsSPVertex(ccm_seg7_vertex_07010848, 11, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-	...Gbi.gsSP2Triangles( 6,  7,  8, 0x0,  8,  9,  6, 0x0),
-	Gbi.gsSP1Triangle( 2, 10,  0, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x07010940 - 0x070109D0
+const ccm_seg7_dl_07010940 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, snow_09007000),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(ccm_seg7_vertex_07010758, 15, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+    gsSP2Triangles( 4,  6,  5, 0x0,  7,  8,  9, 0x0),
+    gsSP2Triangles( 7,  9, 10, 0x0, 11, 12, 13, 0x0),
+    gsSP1Triangle(13, 14, 11, 0x0),
+    gsSPVertex(ccm_seg7_vertex_07010848, 11, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+    gsSP2Triangles( 6,  7,  8, 0x0,  8,  9,  6, 0x0),
+    gsSP1Triangle( 2, 10,  0, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
+// 0x070109D0 - 0x07010A60
 export const ccm_seg7_dl_070109D0 = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALRGBA),
-	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPDisplayList(ccm_seg7_dl_070108F8),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 16, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (64 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPDisplayList(ccm_seg7_dl_07010940),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
-	Gbi.gsSPEndDisplayList(),
-]
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
+    gsSPClearGeometryMode(G_LIGHTING | G_CULL_BACK),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPDisplayList(ccm_seg7_dl_070108F8),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 6, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (64 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPDisplayList(ccm_seg7_dl_07010940),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPSetGeometryMode(G_LIGHTING | G_CULL_BACK),
+    gsSPEndDisplayList(),
+].flat();
 
+// 2021-05-31 17:13:37 -0400 (Convert.rb 2021-05-31 17:07:40 -0400)

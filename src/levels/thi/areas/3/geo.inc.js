@@ -1,4 +1,4 @@
-// Thi - uncharted territory, still havent fixed this up for level loading yet. - Agent X
+// Thi
 
 import {
     SCREEN_WIDTH, SCREEN_HEIGHT
@@ -14,6 +14,12 @@ import {
     GEO_ASM, GEO_END,
     LAYER_TRANSPARENT, LAYER_OPAQUE, LAYER_ALPHA
 } from "../../../../engine/GeoLayout"
+
+import { thi_seg7_dl_07007C20 } from "./1/model.inc"
+
+import { thi_seg7_dl_07009670 } from "./2/model.inc"
+
+import { thi_seg7_dl_07009D50 } from "./3/model.inc"
 
 import { thi_seg7_dl_07009F58 } from "./4/model.inc"
 
@@ -50,4 +56,4 @@ export const thi_geo_00079C = () => {return [
     GEO_END(),
 ]};
 
-// 1621007118 - 2021-05-15 11:25:19 -0400
+// 2021-05-31 09:29:31 -0400 (Convert.rb 2021-05-29 17:49:14 -0400)

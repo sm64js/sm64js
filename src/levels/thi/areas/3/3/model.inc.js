@@ -9,7 +9,7 @@ import {
     G_TX_CLAMP, G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADE
 } from "../../../../../include/gbi"
 import {
-    grass_09005800, grass_0900B800
+    grass_0900B800, grass_09005800
 } from "../../../../../textures/grass"
 
 import { thi_seg7_texture_07000000 } from "../../../texture.inc"
@@ -190,4 +190,4 @@ export const thi_seg7_dl_07009D50 = [
     gsSPEndDisplayList(),
 ].flat();
 
-// 1621007118 - 2021-05-15 11:25:19 -0400
+// 2021-05-31 09:29:31 -0400 (Convert.rb 2021-05-29 17:49:14 -0400)

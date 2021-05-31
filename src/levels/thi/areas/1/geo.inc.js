@@ -20,16 +20,20 @@ import {
 } from "../../../../game/Camera"
 
 import { thi_seg7_dl_07005260 } from "./1/model.inc"
+
 import { thi_seg7_dl_07006968 } from "./2/model.inc"
+
 import { thi_seg7_dl_07007008 } from "./3/model.inc"
+
 import { thi_seg7_dl_070072E8 } from "./4/model.inc"
+
 import { thi_seg7_dl_070073C0 } from "./5/model.inc"
 
 import {
     geo_movtex_pause_control, geo_movtex_draw_water_regions
 } from "../../../../game/MovingTexture"
 
-//import { geo_cannon_circle_base } from "../../../../game/ObjectHelpers"
+import { geo_cannon_circle_base } from "../../../../game/ObjectHelpers"
 
 
 // 0x0E000608
@@ -62,11 +66,11 @@ export const thi_geo_000608 = () => {return [
             GEO_CLOSE_NODE(),
         GEO_CLOSE_NODE(),
         GEO_ZBUFFER(0),
-        GEO_OPEN_NODE(),
-            //GEO_ASM(0, geo_cannon_circle_base),
-        GEO_CLOSE_NODE(),
+        /*GEO_OPEN_NODE(),
+            GEO_ASM(0, geo_cannon_circle_base),
+        GEO_CLOSE_NODE(),*/
     GEO_CLOSE_NODE(),
     GEO_END(),
 ]};
 
-// 1621007118 - 2021-05-15 11:25:19 -0400
+// 2021-05-31 09:29:31 -0400 (Convert.rb 2021-05-29 17:49:14 -0400)

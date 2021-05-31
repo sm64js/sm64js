@@ -1,13 +1,23 @@
-import { GeoLayoutInstance as Geo } from "../../../../../engine/GeoLayout"
+// Ccm
+
+import {
+    GEO_CULLING_RADIUS, GEO_OPEN_NODE, GEO_RENDER_RANGE, GEO_DISPLAY_LIST, GEO_CLOSE_NODE,
+    GEO_END,
+    LAYER_OPAQUE
+} from "../../../../../engine/GeoLayout"
+
 import { ccm_seg7_dl_0700FB00 } from "./model.inc"
 
-export const ccm_geo_000494 = [
-    { command: Geo.node_culling_radius, args: [400] },
-    { command: Geo.open_node },
-        { command: Geo.node_render_range, args: [-500, 7000] },
-    { command: Geo.open_node },
-    { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, ccm_seg7_dl_0700FB00] },
-        { command: Geo.close_node },
-    { command: Geo.close_node },
-    { command: Geo.node_end }
-]
+// 0x0E000494
+export const ccm_geo_000494 = () => {return [
+    GEO_CULLING_RADIUS(400),
+    GEO_OPEN_NODE(),
+        GEO_RENDER_RANGE(-500, 7000),
+        GEO_OPEN_NODE(),
+            GEO_DISPLAY_LIST(LAYER_OPAQUE, ccm_seg7_dl_0700FB00),
+        GEO_CLOSE_NODE(),
+    GEO_CLOSE_NODE(),
+    GEO_END(),
+]};
+
+// 2021-05-31 17:13:37 -0400 (Convert.rb 2021-05-31 17:07:40 -0400)

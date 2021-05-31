@@ -226,7 +226,7 @@ export const spawn_macro_objects = (areaIndex, macroObjList) => {
         preset = {behavior: gLinker.behaviors[p[0]], model: MODEL[p[1]], param: p[2]}
 
         if (!preset.behavior) {
-            console.log("no behavior - ", p, objToSpawn)
+            console.log("no behavior - ", p[0]) // , objToSpawn)
             return
         }
 

@@ -6,7 +6,6 @@ cur_obj_init_animation_with_sound, cur_obj_check_if_near_animation_end, cur_obj_
 cur_obj_clear_interact_status_flag, cur_obj_change_action, 
  } from "../ObjectHelpers"
 
-import {  } from "../ObjBehaviors2"
 import { sins, coss } from "../../utils"
 import { cur_obj_play_sound_2 } from "../SpawnSound"
 

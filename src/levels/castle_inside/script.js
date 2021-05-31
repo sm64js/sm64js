@@ -1,7 +1,7 @@
 import {
      AREA, CALL, CALL_LOOP, CLEAR_LEVEL, END_AREA, EXIT, INIT_LEVEL, INSTANT_WARP, JUMP_LINK, LOAD_MODEL_FROM_GEO,
      MACRO_OBJECTS, MARIO, MARIO_POS, OBJECT, PAINTING_WARP_NODE, RETURN, ROOMS, SLEEP_BEFORE_EXIT, TERRAIN,
-     TERRAIN_TYPE, WARP_NO_CHECKPOINT, WARP_NODE
+     TERRAIN_TYPE, WARP_NO_CHECKPOINT, WARP_NODE, SET_BACKGROUND_MUSIC
 } from "../../engine/LevelCommands"
 
 import { script_func_global_16 } from "../global_scripts"
@@ -29,6 +29,10 @@ import {
 import {
     TERRAIN_STONE
 } from "../../include/surface_terrains"
+
+import {
+    SEQ_LEVEL_INSIDE_CASTLE
+} from "../../include/seq_ids"
 
 
 import { inside_castle_seg7_area_1_collision } from "./areas/1/collision.inc"
@@ -306,7 +310,7 @@ export const level_castle_inside_entry = [
         TERRAIN(/*terrainData*/ inside_castle_seg7_area_1_collision),
         ROOMS(/*surfaceRooms*/ inside_castle_seg7_area_1_rooms),
         MACRO_OBJECTS(/*objList*/ inside_castle_seg7_area_1_macro_objs),
-        // SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0001, /*seq*/ SEQ_LEVEL_INSIDE_CASTLE),
+        SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0001, /*seq*/ SEQ_LEVEL_INSIDE_CASTLE),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
     END_AREA(),
 
@@ -324,7 +328,7 @@ export const level_castle_inside_entry = [
         ROOMS(/*surfaceRooms*/ inside_castle_seg7_area_2_rooms),
         MACRO_OBJECTS(/*objList*/ inside_castle_seg7_area_2_macro_objs),
         INSTANT_WARP(/*index*/ 0, /*destArea*/ 2, /*displace*/ 0, -205, 410),
-        // SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0001, /*seq*/ SEQ_LEVEL_INSIDE_CASTLE),
+        SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0001, /*seq*/ SEQ_LEVEL_INSIDE_CASTLE),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
     END_AREA(),
 
@@ -341,7 +345,7 @@ export const level_castle_inside_entry = [
         TERRAIN(/*terrainData*/ inside_castle_seg7_area_3_collision),
         ROOMS(/*surfaceRooms*/ inside_castle_seg7_area_3_rooms),
         MACRO_OBJECTS(/*objList*/ inside_castle_seg7_area_3_macro_objs),
-        // SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0001, /*seq*/ SEQ_LEVEL_INSIDE_CASTLE),
+        SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0001, /*seq*/ SEQ_LEVEL_INSIDE_CASTLE),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
     END_AREA(),
 

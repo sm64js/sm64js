@@ -20,7 +20,7 @@ import { oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAn
          oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleYaw, oFaceAngleRoll,
          oWoodenPostTotalMarioAngle, oInteractStatus, oMoveAngleYaw, oWaterObjUnkF4,
          oWaterObjUnkF8, oWaterObjUnkFC, oBehParams2ndByte, oActiveParticleFlags, oFlags,
-         oUnk94, oBBallSpawnerPeriodMinus1, oBobombBuddyRole,
+         oUnk94, oBBallSpawnerPeriodMinus1, oBobombBuddyRole, oTripletButterflyScale,
 
          OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, OBJ_FLAG_COMPUTE_DIST_TO_MARIO,
          OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW,
@@ -50,6 +50,7 @@ import * as _castle_flag              from "./behaviors/bhv_castle_flag_init.inc
 import * as _chain_chomp              from "./behaviors/chain_chomp.inc"
 import * as _checkerboard_platform    from "./behaviors/checkerboard_platform.inc"
 import * as _coin                     from "./behaviors/coin.inc"
+import * as _ddd_warp                 from "./behaviors/ddd_warp.inc"
 import * as _door                     from "./behaviors/door.inc"
 import * as _exclamation_box          from "./behaviors/exclamation_box.inc"
 import * as _fish                     from "./behaviors/fish.inc"
@@ -63,6 +64,7 @@ import * as _sound_spawner            from "./behaviors/sound_spawner.inc"
 import * as _sparkle_spawn            from "./behaviors/sparkle_spawn.inc"
 import * as _sparkle_spawn_star       from "./behaviors/sparkle_spawn_star.inc"
 import * as _switch_hidden_objects    from "./behaviors/switch_hidden_objects.inc"
+import * as _triplet_butterfly        from "./behaviors/triplet_butterfly.inc"
 import * as _warp                     from "./behaviors/warp.inc"
 import * as _water_bomb               from "./behaviors/water_bomb.inc"
 import * as _water_bomb_cannon        from "./behaviors/water_bomb_cannon.inc"
@@ -1657,7 +1659,7 @@ const bhvSwimmingWarp = [
 ]
 
 const bhvSparkle = [
-    BEGIN(OBJ_LIST_UNIMPORTANT),
+    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvSparkle'),
     BILLBOARD(),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INT(oAnimState, -1),
@@ -1668,22 +1670,44 @@ const bhvSparkle = [
 ]
 
 const bhvSparkleSpawn = [
-    BEGIN(OBJ_LIST_UNIMPORTANT),
+    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvSparkleSpawn'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_sparkle_spawn_loop'),
     END_LOOP(),
 ]
 
+const bhvTripletButterfly = [
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvTripletButterfly'),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, butterfly_seg3_anims_030056B0),
+    ANIMATE(0),
+    HIDE(),
+    SET_HOME(),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 0, /*Gravity*/ 0, /*Bounciness*/ 0, /*Drag strength*/ 0, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    SET_FLOAT(oTripletButterflyScale, 1),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_triplet_butterfly_update'),
+    END_LOOP(),
+]
+
+const bhvDddWarp = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    SET_FLOAT(oCollisionDistance, 30000),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_ddd_warp_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
 
 
 
 
+gLinker.behaviors.bhv1Up = bhv1Up
 gLinker.behaviors.bhvAirborneDeathWarp = bhvAirborneDeathWarp
 gLinker.behaviors.bhvAirborneStarCollectWarp = bhvAirborneStarCollectWarp
 gLinker.behaviors.bhvAirborneWarp = bhvAirborneWarp
-gLinker.behaviors.bhvBetaChestBottom = null
-gLinker.behaviors.bhvBigBully = null
 gLinker.behaviors.bhvBird = bhvBird
 gLinker.behaviors.bhvBobBowlingBallSpawner = bhvBobBowlingBallSpawner
 gLinker.behaviors.bhvBobomb = bhvBobomb
@@ -1692,9 +1716,9 @@ gLinker.behaviors.bhvBobombFuseSmoke = bhvBobombFuseSmoke
 gLinker.behaviors.bhvBowlingBall = bhvBowlingBall
 gLinker.behaviors.bhvBowser = bhvBowser
 gLinker.behaviors.bhvBowserBodyAnchor = bhvBowserBodyAnchor
-gLinker.behaviors.bhvBowserBomb = null
 gLinker.behaviors.bhvBowserFlameSpawn = bhvBowserFlameSpawn
 gLinker.behaviors.bhvBreakableBox = bhvBreakableBox
+gLinker.behaviors.bhvBreakableBoxSmall = bhvBreakableBoxSmall
 gLinker.behaviors.bhvBreakBoxTriangle = bhvBreakBoxTriangle
 gLinker.behaviors.bhvBubbleParticleSpawner = bhvBubbleParticleSpawner
 gLinker.behaviors.bhvButterfly = bhvButterfly
@@ -1708,58 +1732,49 @@ gLinker.behaviors.bhvCarrySomething4 = bhvCarrySomething4
 gLinker.behaviors.bhvCarrySomething5 = bhvCarrySomething5
 gLinker.behaviors.bhvCarrySomething6 = bhvCarrySomething6
 gLinker.behaviors.bhvCastleFlagWaving = bhvCastleFlagWaving
-gLinker.behaviors.bhvCastleFloorTrap = null
+gLinker.behaviors.bhvChainChomp = bhvChainChomp
 gLinker.behaviors.bhvCheckerboardElevatorGroup = bhvCheckerboardElevatorGroup
-gLinker.behaviors.bhvCourtyardBooTriplet = null
+gLinker.behaviors.bhvCoinFormation = bhvCoinFormation
+gLinker.behaviors.bhvDddWarp = bhvDddWarp
 gLinker.behaviors.bhvDeathWarp = bhvDeathWarp
 gLinker.behaviors.bhvDoor = bhvDoor
 gLinker.behaviors.bhvDoorWarp = bhvDoorWarp
+gLinker.behaviors.bhvExclamationBox = bhvExclamationBox
 gLinker.behaviors.bhvExplosion = bhvExplosion
 gLinker.behaviors.bhvFish = bhvFish
 gLinker.behaviors.bhvFlyingWarp = bhvFlyingWarp
 gLinker.behaviors.bhvFreeBowlingBall = bhvFreeBowlingBall
+gLinker.behaviors.bhvGoomba = bhvGoomba
+gLinker.behaviors.bhvGoombaTripletSpawner = bhvGoombaTripletSpawner
 gLinker.behaviors.bhvHardAirKnockBackWarp = bhvHardAirKnockBackWarp
+gLinker.behaviors.bhvHidden1up = bhvHidden1up
+gLinker.behaviors.bhvHidden1upInPoleSpawner = bhvHidden1upInPoleSpawner
+gLinker.behaviors.bhvHidden1upTrigger = bhvHidden1upTrigger
 gLinker.behaviors.bhvHiddenAt120Stars = bhvHiddenAt120Stars
 gLinker.behaviors.bhvHorStarParticleSpawner = bhvHorStarParticleSpawner
 gLinker.behaviors.bhvIdleWaterWave = bhvIdleWaterWave
 gLinker.behaviors.bhvInstantActiveWarp = bhvInstantActiveWarp
-gLinker.behaviors.bhvJetStreamRingSpawner = null
 gLinker.behaviors.bhvJumpingBox = bhvJumpingBox
-gLinker.behaviors.bhvLargeBomp = null
 gLinker.behaviors.bhvLaunchDeathWarp = bhvLaunchDeathWarp
 gLinker.behaviors.bhvLaunchStarCollectWarp = bhvLaunchStarCollectWarp
-gLinker.behaviors.bhvLllBowserPuzzle = null
-gLinker.behaviors.bhvLllDrawbridgeSpawner = null
-gLinker.behaviors.bhvLllFloatingWoodBridge = null
-gLinker.behaviors.bhvLllMovingOctagonalMeshPlatform = null
-gLinker.behaviors.bhvLllRotatingBlockWithFireBars = null
-gLinker.behaviors.bhvLllRotatingHexagonalRing = null
-gLinker.behaviors.bhvLllSinkingRectangularPlatform = null
-gLinker.behaviors.bhvLllSinkingSquarePlatforms = null
-gLinker.behaviors.bhvLllTiltingInvertedPyramid = null
-gLinker.behaviors.bhvLllTumblingBridge = null
 gLinker.behaviors.bhvManyBlueFishSpawner = bhvManyBlueFishSpawner
 gLinker.behaviors.bhvMario = bhvMario
+gLinker.behaviors.bhvMessagePanel = bhvMessagePanel
 gLinker.behaviors.bhvMetalCap = bhvMetalCap
 gLinker.behaviors.bhvMistCircParticleSpawner = bhvMistCircParticleSpawner
 gLinker.behaviors.bhvMistParticleSpawner = bhvMistParticleSpawner
 gLinker.behaviors.bhvMoatGrills = bhvMoatGrills
-gLinker.behaviors.bhvMovingBlueCoin = null
-gLinker.behaviors.bhvMrI = null
 gLinker.behaviors.bhvNormalCap = bhvNormalCap
 gLinker.behaviors.bhvPaintingDeathWarp = bhvPaintingDeathWarp
 gLinker.behaviors.bhvPaintingStarCollectWarp = bhvPaintingStarCollectWarp
 gLinker.behaviors.bhvPitBowlingBall = bhvPitBowlingBall
 gLinker.behaviors.bhvPlungeBubble = bhvPlungeBubble
-gLinker.behaviors.bhvRotatingCounterClockwise = null
+gLinker.behaviors.bhvRedCoin = bhvRedCoin
 gLinker.behaviors.bhvSeesawPlatform = bhvSeesawPlatform
 gLinker.behaviors.bhvShallowWaterSplash = bhvShallowWaterSplash
 gLinker.behaviors.bhvShallowWaterWave = bhvShallowWaterWave
 gLinker.behaviors.bhvSingleCoinGetsSpawned = bhvSingleCoinGetsSpawned
-gLinker.behaviors.bhvSmallBomp = null
-gLinker.behaviors.bhvSmallBully = null
 gLinker.behaviors.bhvSmoke = bhvSmoke
-gLinker.behaviors.bhvSnowBall = null
 gLinker.behaviors.bhvSparkle = bhvSparkle
 gLinker.behaviors.bhvSparkleSpawn = bhvSparkleSpawn
 gLinker.behaviors.bhvSpawnedStarNoLevelExit = bhvSpawnedStarNoLevelExit
@@ -1768,9 +1783,9 @@ gLinker.behaviors.bhvSpinAirborneWarp = bhvSpinAirborneWarp
 gLinker.behaviors.bhvStaticObject = bhvStaticObject
 gLinker.behaviors.bhvSwimmingWarp = bhvSwimmingWarp
 gLinker.behaviors.bhvThiBowlingBallSpawner = bhvThiBowlingBallSpawner
-gLinker.behaviors.bhvTowerPlatformGroup = null
 gLinker.behaviors.bhvTree = bhvTree
 gLinker.behaviors.bhvTriangleParticleSpawner = bhvTriangleParticleSpawner
+gLinker.behaviors.bhvTripletButterfly = bhvTripletButterfly
 gLinker.behaviors.bhvTtmBowlingBallSpawner = bhvTtmBowlingBallSpawner
 gLinker.behaviors.bhvUnlockDoorStar = bhvUnlockDoorStar
 gLinker.behaviors.bhvVanishCap = bhvVanishCap
@@ -1779,14 +1794,12 @@ gLinker.behaviors.bhvWarp = bhvWarp
 gLinker.behaviors.bhvWaterBomb = bhvWaterBomb
 gLinker.behaviors.bhvWaterBombCannon = bhvWaterBombCannon
 gLinker.behaviors.bhvWaterBombShadow = bhvWaterBombShadow
+gLinker.behaviors.bhvWaterBombSpawner = bhvWaterBombSpawner
 gLinker.behaviors.bhvWaterDroplet = bhvWaterDroplet
 gLinker.behaviors.bhvWaterDropletSplash = bhvWaterDropletSplash
 gLinker.behaviors.bhvWaterMist2 = bhvWaterMist2
 gLinker.behaviors.bhvWaterSplash = bhvWaterSplash
 gLinker.behaviors.bhvWaveTrail = bhvWaveTrail
-gLinker.behaviors.bhvWfRotatingWoodenPlatform = null
-gLinker.behaviors.bhvWfSlidingPlatform = null
-gLinker.behaviors.bhvWfTumblingBridge = null
 gLinker.behaviors.bhvWhitePuffExplosion = bhvWhitePuffExplosion
 gLinker.behaviors.bhvWingCap = bhvWingCap
 gLinker.behaviors.bhvWoodenPost = bhvWoodenPost

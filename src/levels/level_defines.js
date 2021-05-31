@@ -9,7 +9,7 @@ import {
 } from "./level_defines_constants"
 
 import { level_bbh_entry } from "./bbh/script"
-// import { level_ccm_entry } from "./ccm/script"
+import { level_ccm_entry } from "./ccm/script_1"
 import { level_castle_inside_entry } from "./castle_inside/script"
 import { level_hmc_entry } from "./hmc/script"
 import { level_ssl_entry } from "./ssl/script"

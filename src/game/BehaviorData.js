@@ -129,6 +129,9 @@ import { jrb_seg7_collision_rock_solid                   } from "../levels/jrb/r
 import { jrb_seg7_collision_pillar_base                  } from "../levels/jrb/falling_pillar_base/collision.inc"
 import { jrb_seg7_collision_floating_platform            } from "../levels/jrb/floating_platform/collision.inc"
 import { inside_castle_seg7_collision_water_level_pillar } from "../levels/castle_inside/water_level_pillar/collision.inc"
+import { bbh_seg7_collision_staircase_step               } from "../levels/bbh/staircase_step/collision.inc"
+import { bbh_seg7_collision_merry_go_round               } from "../levels/bbh/merry_go_round/collision.inc"
+
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -1722,11 +1725,29 @@ const bhvPillarBase = [
         CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
     END_LOOP(),
 ]
-//placeholder bhv
+//placeholder bhvs
 const bhvWaterLevelPillar = [
     BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     LOAD_COLLISION_DATA(inside_castle_seg7_collision_water_level_pillar),
+    BEGIN_LOOP(),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
+const bhvHiddenStaircaseStep = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(bbh_seg7_collision_staircase_step),
+    BEGIN_LOOP(),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
+const bhvMerryGoRound = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA( bbh_seg7_collision_merry_go_round),
     BEGIN_LOOP(),
         CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
     END_LOOP(),
@@ -1837,3 +1858,5 @@ gLinker.behaviors.bhvYoshi = bhvYoshi
 gLinker.behaviors.bhvRockSolid = bhvRockSolid
 gLinker.behaviors.bhvPillarBase = bhvPillarBase
 gLinker.behaviors.bhvWaterLevelPillar = bhvWaterLevelPillar
+gLinker.behaviors.bhvHiddenStaircaseStep = bhvHiddenStaircaseStep
+gLinker.behaviors.bhvMerryGoRound = bhvMerryGoRound

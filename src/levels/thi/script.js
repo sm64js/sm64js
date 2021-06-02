@@ -77,8 +77,8 @@ const script_func_local_3 = [
 const script_func_local_4 = [
     OBJECT_WITH_ACTS(/*model*/ MODEL_KOOPA_WITH_SHELL,  /*pos*/ -1900,   -511,   2400,  /*angle*/ 0,  -30,  0,  /*behParam*/ 0x02030000,  /*beh*/ 'bhvKoopa',              /*acts ACT_3*/),
     OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,              /*pos*/  7400,  -1537,  -6300,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvKoopaRaceEndpoint',  /*acts ACT_3*/),
-    OBJECT(/*model*/ MODEL_NONE,              /*pos*/ -6556,  -2969,   6565,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvGoombaTripletSpawner'),
-    OBJECT(/*model*/ MODEL_GOOMBA,            /*pos*/  6517,  -2559,   4327,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvGoomba'),
+    //OBJECT(/*model*/ MODEL_NONE,              /*pos*/ -6556,  -2969,   6565,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvGoombaTripletSpawner'),
+    //OBJECT(/*model*/ MODEL_GOOMBA,            /*pos*/  6517,  -2559,   4327,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvGoomba'),
     OBJECT(/*model*/ MODEL_PIRANHA_PLANT,     /*pos*/ -6336,  -2047,  -3861,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvFirePiranhaPlant'),
     OBJECT(/*model*/ MODEL_PIRANHA_PLANT,     /*pos*/ -5740,  -2047,  -6578,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvFirePiranhaPlant'),
     OBJECT(/*model*/ MODEL_PIRANHA_PLANT,     /*pos*/ -6481,  -2047,  -5998,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvFirePiranhaPlant'),

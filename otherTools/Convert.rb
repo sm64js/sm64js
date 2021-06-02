@@ -120,6 +120,9 @@ class Convert
                 when "macro.inc.c"      then :macro
                 when "model.inc.c"      then :model
                 when "leveldata.c"      then :model
+                when "1.inc.c"          then :model
+                when "2.inc.c"          then :model
+                when "3.inc.c"          then :model
                 when "movtext.inc.c"    then :movtext
                 when "script.c"         then :script
                 when "table.inc.c"      then :table

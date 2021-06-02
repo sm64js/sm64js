@@ -1,55 +1,74 @@
-import * as Gbi from "../../../../../include/gbi"
+// 0x0700FB78 - 0x0700FB90
+
+import {
+    gdSPDefLights1, gsDPSetTextureImage, gsDPLoadSync, gsDPLoadBlock, gsSPLight, gsSPVertex,
+    gsSP2Triangles, gsSPEndDisplayList, gsDPPipeSync, gsDPSetEnvColor, gsDPSetCombineMode,
+    gsSPClearGeometryMode, gsDPSetTile, gsSPTexture, gsDPTileSync, gsDPSetTileSize,
+    gsSPDisplayList, gsSPSetGeometryMode,
+    G_IM_FMT_RGBA, G_IM_SIZ_16b, CALC_DXT, G_TX_LOADTILE, G_IM_SIZ_16b_BYTES,
+    G_CC_MODULATERGBFADE, G_SHADING_SMOOTH, G_TX_WRAP, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD,
+    G_TX_RENDERTILE, G_ON, G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADE
+} from "../../../../../include/gbi"
 import { snow_09000800 } from "../../../../../textures/snow"
-const ccm_seg7_lights_0700FB78 = Gbi.gdSPDefLights1(
-	    0x7f, 0x7f, 0x7f,
-	    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-)
 
+const ccm_seg7_lights_0700FB78 = gdSPDefLights1(
+    0x7f, 0x7f, 0x7f,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
+
+// 0x0700FB90 - 0x0700FC90
 const ccm_seg7_vertex_0700FB90 = [
-	{ pos: [ -123, -613, 238 ], flag: 0, tc: [ 0, 990 ], color: [ 143, 0, 56, 255 ] },
-	{ pos: [ -283, 666, -85 ], flag: 0, tc: [ 690, 138 ], color: [ 143, 0, 56, 255 ] },
-	{ pos: [ -283, -613, -85 ], flag: 0, tc: [ 690, 990 ], color: [ 143, 0, 56, 255 ] },
-	{ pos: [ 201, -613, 78 ], flag: 0, tc: [ 690, 990 ], color: [ 56, 0, 113, 255 ] },
-	{ pos: [ 201, 666, 78 ], flag: 0, tc: [ 690, -288 ], color: [ 56, 0, 113, 255 ] },
-	{ pos: [ -123, 666, 238 ], flag: 0, tc: [ 0, -288 ], color: [ 56, 0, 113, 255 ] },
-	{ pos: [ -123, -613, 238 ], flag: 0, tc: [ 0, 990 ], color: [ 56, 0, 113, 255 ] },
-	{ pos: [ 41, -613, -246 ], flag: 0, tc: [ 690, 990 ], color: [ 113, 0, 200, 255 ] },
-	{ pos: [ 41, 666, -246 ], flag: 0, tc: [ 690, 138 ], color: [ 113, 0, 200, 255 ] },
-	{ pos: [ 201, 666, 78 ], flag: 0, tc: [ 0, 138 ], color: [ 113, 0, 200, 255 ] },
-	{ pos: [ 201, -613, 78 ], flag: 0, tc: [ 0, 990 ], color: [ 113, 0, 200, 255 ] },
-	{ pos: [ -283, -613, -85 ], flag: 0, tc: [ 690, 1244 ], color: [ 200, 0, 143, 255 ] },
-	{ pos: [ 41, 666, -246 ], flag: 0, tc: [ 0, 0 ], color: [ 200, 0, 143, 255 ] },
-	{ pos: [ 41, -613, -246 ], flag: 0, tc: [ 0, 1244 ], color: [ 200, 0, 143, 255 ] },
-	{ pos: [ -283, 666, -85 ], flag: 0, tc: [ 690, 0 ], color: [ 200, 0, 143, 255 ] },
-	{ pos: [ -123, 666, 238 ], flag: 0, tc: [ 0, 138 ], color: [ 143, 0, 56, 255 ] },
-]
+    [[  -123,   -613,    238], 0, [     0,    990], [0x8f, 0x00, 0x38, 0xff]],
+    [[  -283,    666,    -85], 0, [   690,    138], [0x8f, 0x00, 0x38, 0xff]],
+    [[  -283,   -613,    -85], 0, [   690,    990], [0x8f, 0x00, 0x38, 0xff]],
+    [[   201,   -613,     78], 0, [   690,    990], [0x38, 0x00, 0x71, 0xff]],
+    [[   201,    666,     78], 0, [   690,   -288], [0x38, 0x00, 0x71, 0xff]],
+    [[  -123,    666,    238], 0, [     0,   -288], [0x38, 0x00, 0x71, 0xff]],
+    [[  -123,   -613,    238], 0, [     0,    990], [0x38, 0x00, 0x71, 0xff]],
+    [[    41,   -613,   -246], 0, [   690,    990], [0x71, 0x00, 0xc8, 0xff]],
+    [[    41,    666,   -246], 0, [   690,    138], [0x71, 0x00, 0xc8, 0xff]],
+    [[   201,    666,     78], 0, [     0,    138], [0x71, 0x00, 0xc8, 0xff]],
+    [[   201,   -613,     78], 0, [     0,    990], [0x71, 0x00, 0xc8, 0xff]],
+    [[  -283,   -613,    -85], 0, [   690,   1244], [0xc8, 0x00, 0x8f, 0xff]],
+    [[    41,    666,   -246], 0, [     0,      0], [0xc8, 0x00, 0x8f, 0xff]],
+    [[    41,   -613,   -246], 0, [     0,   1244], [0xc8, 0x00, 0x8f, 0xff]],
+    [[  -283,    666,    -85], 0, [   690,      0], [0xc8, 0x00, 0x8f, 0xff]],
+    [[  -123,    666,    238], 0, [     0,    138], [0x8f, 0x00, 0x38, 0xff]],
+];
 
-export const ccm_seg7_dl_0700FC90 = [ 
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, snow_09000800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(ccm_seg7_lights_0700FB78.l[0], 1),
-	Gbi.gsSPLight(ccm_seg7_lights_0700FB78.a, 2),
-	Gbi.gsSPVertex(ccm_seg7_vertex_0700FB90, 16, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-	...Gbi.gsSP2Triangles( 3,  5,  6, 0x0,  7,  8,  9, 0x0),
-	...Gbi.gsSP2Triangles( 7,  9, 10, 0x0, 11, 12, 13, 0x0),
-	...Gbi.gsSP2Triangles(11, 14, 12, 0x0,  0, 15,  1, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0700FC90 - 0x0700FD08
+const ccm_seg7_dl_0700FC90 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, snow_09000800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsSPLight(ccm_seg7_lights_0700FB78.l, 1),
+    gsSPLight(ccm_seg7_lights_0700FB78.a, 2),
+    gsSPVertex(ccm_seg7_vertex_0700FB90, 16, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+    gsSP2Triangles( 3,  5,  6, 0x0,  7,  8,  9, 0x0),
+    gsSP2Triangles( 7,  9, 10, 0x0, 11, 12, 13, 0x0),
+    gsSP2Triangles(11, 14, 12, 0x0,  0, 15,  1, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
+// 0x0700FD08 - 0x0700FD88
 export const ccm_seg7_dl_0700FD08 = [
-	Gbi.gsDPSetEnvColor(255, 255, 255, 90),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGBFADE),
-	Gbi.gsSPClearGeometryMode(Gbi.G_SHADING_SMOOTH),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPDisplayList(ccm_seg7_dl_0700FC90),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsSPSetGeometryMode(Gbi.G_SHADING_SMOOTH),
-	Gbi.gsDPSetEnvColor(255, 255, 255, 255),
-	Gbi.gsSPEndDisplayList(),
-]
+    gsDPPipeSync(),
+    gsDPSetEnvColor(255, 255, 255, 90),
+    gsDPSetCombineMode(G_CC_MODULATERGBFADE, G_CC_MODULATERGBFADE),
+    gsSPClearGeometryMode(G_SHADING_SMOOTH),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPDisplayList(ccm_seg7_dl_0700FC90),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPSetGeometryMode(G_SHADING_SMOOTH),
+    gsDPSetEnvColor(255, 255, 255, 255),
+    gsSPEndDisplayList(),
+].flat();
 
+// 2021-05-31 17:13:37 -0400 (Convert.rb 2021-05-31 17:07:40 -0400)

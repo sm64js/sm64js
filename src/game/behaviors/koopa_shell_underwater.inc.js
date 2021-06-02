@@ -3,7 +3,7 @@ import * as _Linker from "../../game/Linker"
 import { cur_obj_unrender_and_reset_state, obj_mark_for_deletion, spawn_mist_particles } from "../ObjectHelpers"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { INTERACT_GRABBABLE, INT_STATUS_STOP_RIDING } from "../Interaction"
-import { oInteractStatus, HELD_FREE, HELD_THROWN, HELD_DROPPED } from "../../include/object_constants"
+import { oInteractStatus, HELD_FREE, HELD_THROWN, HELD_DROPPED, oHeldState } from "../../include/object_constants"
 
 
 const sKoopaShellUnderwaterHitbox = {

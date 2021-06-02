@@ -44,15 +44,14 @@ export const LEVEL_TTM              = 36
 export const LEVEL_UNKNOWN_37       = 37
 export const LEVEL_UNKNOWN_38       = 38
 
-export const LEVEL_COUNT            = 39
+export const LEVEL_COUNT            = 40
 export const LEVEL_MIN              = 1
-export const LEVEL_MAX              = 38
+export const LEVEL_MAX              = 40
 
-export const LEVEL_CCS              = 56
 export const LEVEL_CCM_2            = 57
 
 export const LEVEL_CASTLE_2         = 602
-
+export const LEVEL_CASTLE_3         = 41
 
 // Define lists for list of level for macros. Each of the following fields are described:
 // Argument 1: Internal ROM name of the level.

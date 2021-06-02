@@ -33,6 +33,7 @@ import { hmc_seg7_dl_07021760 } from "./30/model.inc"
 import { hmc_seg7_dl_07021BA0 } from "./31/model.inc"
 import { hmc_seg7_dl_070228A0 } from "./32/model.inc"
 import { geo_switch_area } from "../../../../game/ObjectHelpers"
+import { geo_movtex_draw_water_regions } from "../../../../game/MovingTexture"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -69,7 +70,7 @@ export const hmc_geo_000658 = [
     { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, hmc_seg7_dl_07014C00] },
     { command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, hmc_seg7_dl_07014E48] },
     // { command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-    // { command: Geo.node_generated, args: [0x0702, geo_movtex_draw_water_regions]},
+    //{ command: Geo.node_generated, args: [0x0702, geo_movtex_draw_water_regions]},
     { command: Geo.close_node },
     { command: Geo.return }
 ]
@@ -101,7 +102,7 @@ export const hmc_geo_000700 = [
     { command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, hmc_seg7_dl_0701F818] },
     { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, hmc_seg7_dl_0701FD58] },
     //{ command: Geo.node_generated, args: [0, geo_movtex_pause_control]},
-    //{ command: Geo.node_generated, args: [0x0701, geo_movtex_draw_water_regions]},
+    { command: Geo.node_generated, args: [0x0701, geo_movtex_draw_water_regions]},
     { command: Geo.close_node },
     { command: Geo.return }
 ]
@@ -222,7 +223,7 @@ export const hmc_geo_000998 = [
     { command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, hmc_seg7_dl_0701F818] },
     { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, hmc_seg7_dl_0701FD58] },
     //{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-    //{ command: Geo.node_generated, args: [0x0701, geo_movtex_draw_water_regions]},
+    { command: Geo.node_generated, args: [0x0701, geo_movtex_draw_water_regions]},
     //{ command: Geo.node_generated, args: [0x0702, geo_movtex_draw_water_regions]},
     { command: Geo.close_node },
     { command: Geo.return }
@@ -241,7 +242,7 @@ export const hmc_geo_000A18 = [
     { command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, hmc_seg7_dl_0701F818] },
     { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, hmc_seg7_dl_0701FD58] },
     //{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-    //{ command: Geo.node_generated, args: [0x0701, geo_movtex_draw_water_regions]},
+    { command: Geo.node_generated, args: [0x0701, geo_movtex_draw_water_regions]},
     { command: Geo.close_node },
     { command: Geo.return }
 ]
@@ -257,7 +258,7 @@ export const hmc_geo_000A88 = [
     //{ command: Geo.node_generated, args: [   0, geo_painting_update]},
     //{ command: Geo.node_generated, args: [   PAINTING_ID(0, 0]},
     //{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-    //{ command: Geo.node_generated, args: [0x0701, geo_movtex_draw_water_regions]},
+    { command: Geo.node_generated, args: [0x0701, geo_movtex_draw_water_regions]},
     { command: Geo.close_node },
     { command: Geo.return }
 ]
@@ -273,7 +274,7 @@ export const hmc_geo_000AE8 = [
     { command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT, hmc_seg7_dl_07021BA0] },
     { command: Geo.display_list, args: [Geo.LAYER_OPAQUE, hmc_seg7_dl_070228A0] },
     //{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-    //{ command: Geo.node_generated, args: [0x0701, geo_movtex_draw_water_regions]},
+    { command: Geo.node_generated, args: [0x0701, geo_movtex_draw_water_regions]},
     { command: Geo.close_node },
     { command: Geo.return }
 ]

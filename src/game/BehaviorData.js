@@ -125,6 +125,13 @@ import { door_seg3_collision_0301CE78                    } from "../actors/warp_
 import { exclamation_box_outline_seg8_collision_08025F78 } from "../actors/exclamation_box_outline/collision.inc"
 import { poundable_pole_collision_06002490               } from "../actors/poundable_pole/collision.inc"
 import { wooden_signpost_seg3_collision_0302DD80         } from "../actors/wooden_signpost/collision.inc"
+import { jrb_seg7_collision_rock_solid                   } from "../levels/jrb/rock/collision.inc"
+import { jrb_seg7_collision_pillar_base                  } from "../levels/jrb/falling_pillar_base/collision.inc"
+import { jrb_seg7_collision_floating_platform            } from "../levels/jrb/floating_platform/collision.inc"
+import { inside_castle_seg7_collision_water_level_pillar } from "../levels/castle_inside/water_level_pillar/collision.inc"
+import { bbh_seg7_collision_staircase_step               } from "../levels/bbh/staircase_step/collision.inc"
+import { bbh_seg7_collision_merry_go_round               } from "../levels/bbh/merry_go_round/collision.inc"
+
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -1098,15 +1105,15 @@ export const bhvVanishCap = [
     END_LOOP(),
 ]
 
-// export const bhvStar = [
-//     BEGIN(OBJ_LIST_LEVEL),
-//     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-//     CALL_NATIVE(bhv_init_room),
-//     CALL_NATIVE(bhv_collect_star_init),
-//     BEGIN_LOOP(),
-//         CALL_NATIVE(bhv_collect_star_loop),
-//     END_LOOP(),
-// ]
+export const bhvStar = [
+    BEGIN(OBJ_LIST_LEVEL),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    CALL_NATIVE('bhv_init_room'),
+    CALL_NATIVE('bhv_collect_star_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_collect_star_loop'),
+    END_LOOP(),
+]
 
 export const bhvRedCoin = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL, name: 'bhvRedCoin' } },
@@ -1701,8 +1708,50 @@ const bhvDddWarp = [
     END_LOOP(),
 ]
 
+const bhvRockSolid = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(jrb_seg7_collision_rock_solid),
+    BEGIN_LOOP(),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
 
+const bhvPillarBase = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(jrb_seg7_collision_pillar_base),
+    BEGIN_LOOP(),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+//placeholder bhvs
+const bhvWaterLevelPillar = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(inside_castle_seg7_collision_water_level_pillar),
+    BEGIN_LOOP(),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
 
+const bhvHiddenStaircaseStep = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(bbh_seg7_collision_staircase_step),
+    BEGIN_LOOP(),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
+const bhvMerryGoRound = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA( bbh_seg7_collision_merry_go_round),
+    BEGIN_LOOP(),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
 
 gLinker.behaviors.bhv1Up = bhv1Up
 gLinker.behaviors.bhvAirborneDeathWarp = bhvAirborneDeathWarp
@@ -1742,6 +1791,7 @@ gLinker.behaviors.bhvDoorWarp = bhvDoorWarp
 gLinker.behaviors.bhvExclamationBox = bhvExclamationBox
 gLinker.behaviors.bhvExplosion = bhvExplosion
 gLinker.behaviors.bhvFish = bhvFish
+gLinker.behaviors.bhvFishSpawner = bhvFishSpawner
 gLinker.behaviors.bhvFlyingWarp = bhvFlyingWarp
 gLinker.behaviors.bhvFreeBowlingBall = bhvFreeBowlingBall
 gLinker.behaviors.bhvGoomba = bhvGoomba
@@ -1751,6 +1801,7 @@ gLinker.behaviors.bhvHidden1up = bhvHidden1up
 gLinker.behaviors.bhvHidden1upInPoleSpawner = bhvHidden1upInPoleSpawner
 gLinker.behaviors.bhvHidden1upTrigger = bhvHidden1upTrigger
 gLinker.behaviors.bhvHiddenAt120Stars = bhvHiddenAt120Stars
+gLinker.behaviors.bhvHiddenStaircaseStep = bhvHiddenStaircaseStep
 gLinker.behaviors.bhvHorStarParticleSpawner = bhvHorStarParticleSpawner
 gLinker.behaviors.bhvIdleWaterWave = bhvIdleWaterWave
 gLinker.behaviors.bhvInstantActiveWarp = bhvInstantActiveWarp
@@ -1759,6 +1810,7 @@ gLinker.behaviors.bhvLaunchDeathWarp = bhvLaunchDeathWarp
 gLinker.behaviors.bhvLaunchStarCollectWarp = bhvLaunchStarCollectWarp
 gLinker.behaviors.bhvManyBlueFishSpawner = bhvManyBlueFishSpawner
 gLinker.behaviors.bhvMario = bhvMario
+gLinker.behaviors.bhvMerryGoRound = bhvMerryGoRound
 gLinker.behaviors.bhvMessagePanel = bhvMessagePanel
 gLinker.behaviors.bhvMetalCap = bhvMetalCap
 gLinker.behaviors.bhvMistCircParticleSpawner = bhvMistCircParticleSpawner
@@ -1767,9 +1819,11 @@ gLinker.behaviors.bhvMoatGrills = bhvMoatGrills
 gLinker.behaviors.bhvNormalCap = bhvNormalCap
 gLinker.behaviors.bhvPaintingDeathWarp = bhvPaintingDeathWarp
 gLinker.behaviors.bhvPaintingStarCollectWarp = bhvPaintingStarCollectWarp
+gLinker.behaviors.bhvPillarBase = bhvPillarBase
 gLinker.behaviors.bhvPitBowlingBall = bhvPitBowlingBall
 gLinker.behaviors.bhvPlungeBubble = bhvPlungeBubble
 gLinker.behaviors.bhvRedCoin = bhvRedCoin
+gLinker.behaviors.bhvRockSolid = bhvRockSolid
 gLinker.behaviors.bhvSeesawPlatform = bhvSeesawPlatform
 gLinker.behaviors.bhvShallowWaterSplash = bhvShallowWaterSplash
 gLinker.behaviors.bhvShallowWaterWave = bhvShallowWaterWave
@@ -1797,6 +1851,7 @@ gLinker.behaviors.bhvWaterBombShadow = bhvWaterBombShadow
 gLinker.behaviors.bhvWaterBombSpawner = bhvWaterBombSpawner
 gLinker.behaviors.bhvWaterDroplet = bhvWaterDroplet
 gLinker.behaviors.bhvWaterDropletSplash = bhvWaterDropletSplash
+gLinker.behaviors.bhvWaterLevelPillar = bhvWaterLevelPillar
 gLinker.behaviors.bhvWaterMist2 = bhvWaterMist2
 gLinker.behaviors.bhvWaterSplash = bhvWaterSplash
 gLinker.behaviors.bhvWaveTrail = bhvWaveTrail

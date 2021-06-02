@@ -13,6 +13,7 @@ import { LEVEL_SA } from "../../levels/level_defines_constants"
 import { FLOOR_LOWER_LIMIT_MISC } from "../../include/surface_terrains"
 import { MODEL_FISH, MODEL_CYAN_FISH } from "../../include/model_ids"
 import { blue_fish_seg3_anims_0301C2B0 } from "../../actors/blue_fish/anims.inc"
+import { cyan_fish_seg6_anims_0600E264 } from "../../actors/cyan_fish/anims.inc"
 
 
 /* Fish Spawer */

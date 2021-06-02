@@ -1113,7 +1113,7 @@ export const bhvStar = [
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_collect_star_loop'),
     END_LOOP(),
-] //uncommenting this
+]
 
 export const bhvRedCoin = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL, name: 'bhvRedCoin' } },

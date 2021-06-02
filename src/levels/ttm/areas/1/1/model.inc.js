@@ -12,6 +12,7 @@ import {
 import {
     mountain_09004000, mountain_09005000, mountain_09003800
 } from "../../../../../textures/mountain"
+import { ttm_seg7_texture_07002800 } from "../../../texture.inc"
 
 const ttm_seg7_lights_07005000 = gdSPDefLights1(
     0x7f, 0x7f, 0x7f,

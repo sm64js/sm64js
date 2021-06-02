@@ -125,6 +125,10 @@ import { door_seg3_collision_0301CE78                    } from "../actors/warp_
 import { exclamation_box_outline_seg8_collision_08025F78 } from "../actors/exclamation_box_outline/collision.inc"
 import { poundable_pole_collision_06002490               } from "../actors/poundable_pole/collision.inc"
 import { wooden_signpost_seg3_collision_0302DD80         } from "../actors/wooden_signpost/collision.inc"
+import { jrb_seg7_collision_rock_solid                   } from "../levels/jrb/rock/collision.inc"
+import { jrb_seg7_collision_pillar_base                  } from "../levels/jrb/falling_pillar_base/collision.inc"
+import { jrb_seg7_collision_floating_platform            } from "../levels/jrb/floating_platform/collision.inc"
+import { inside_castle_seg7_collision_water_level_pillar } from "../levels/castle_inside/water_level_pillar/collision.inc"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -1106,7 +1110,7 @@ export const bhvStar = [
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_collect_star_loop'),
     END_LOOP(),
-] //commenting out, out of curiosity...
+] //uncommenting this
 
 export const bhvRedCoin = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL, name: 'bhvRedCoin' } },
@@ -1701,8 +1705,32 @@ const bhvDddWarp = [
     END_LOOP(),
 ]
 
+const bhvRockSolid = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(jrb_seg7_collision_rock_solid),
+    BEGIN_LOOP(),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
 
-
+const bhvPillarBase = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(jrb_seg7_collision_pillar_base),
+    BEGIN_LOOP(),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+//placeholder bhv
+const bhvWaterLevelPillar = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(inside_castle_seg7_collision_water_level_pillar),
+    BEGIN_LOOP(),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
 
 gLinker.behaviors.bhv1Up = bhv1Up
 gLinker.behaviors.bhvAirborneDeathWarp = bhvAirborneDeathWarp
@@ -1758,6 +1786,7 @@ gLinker.behaviors.bhvJumpingBox = bhvJumpingBox
 gLinker.behaviors.bhvLaunchDeathWarp = bhvLaunchDeathWarp
 gLinker.behaviors.bhvLaunchStarCollectWarp = bhvLaunchStarCollectWarp
 gLinker.behaviors.bhvManyBlueFishSpawner = bhvManyBlueFishSpawner
+gLinker.behaviors.bhvFishSpawner = bhvFishSpawner
 gLinker.behaviors.bhvMario = bhvMario
 gLinker.behaviors.bhvMessagePanel = bhvMessagePanel
 gLinker.behaviors.bhvMetalCap = bhvMetalCap
@@ -1805,3 +1834,6 @@ gLinker.behaviors.bhvWingCap = bhvWingCap
 gLinker.behaviors.bhvWoodenPost = bhvWoodenPost
 gLinker.behaviors.bhvYellowCoin = bhvYellowCoin
 gLinker.behaviors.bhvYoshi = bhvYoshi
+gLinker.behaviors.bhvRockSolid = bhvRockSolid
+gLinker.behaviors.bhvPillarBase = bhvPillarBase
+gLinker.behaviors.bhvWaterLevelPillar = bhvWaterLevelPillar

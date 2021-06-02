@@ -6,6 +6,7 @@ import {
     LAYER_OPAQUE
 } from "../../../../../engine/GeoLayout"
 
+import { ttm_seg7_dl_0700CD10 } from "./model.inc"
 
 // 0x0E0008A8
 export const ttm_geo_0008A8 = () => {return [

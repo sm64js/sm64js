@@ -114,7 +114,7 @@ export const level_ddd_entry = [
         JUMP_LINK(script_func_local_2),
         INSTANT_WARP(/*index*/ 3,  /*destArea*/ 2,  /*displace*/ -8192,  0,  0),
         TERRAIN(/*terrainData*/ ddd_seg7_area_1_collision),
-        MACRO_OBJECTS(/*objList*/ ddd_seg7_area_1_macro_objs),
+        //MACRO_OBJECTS(/*objList*/ ddd_seg7_area_1_macro_objs),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0003,  /*seq*/ SEQ_LEVEL_WATER),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_WATER),
     END_AREA(),

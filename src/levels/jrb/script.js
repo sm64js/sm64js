@@ -58,12 +58,12 @@ const script_func_local_1 = [
     OBJECT_WITH_ACTS(/*model*/ MODEL_JRB_SHIP_RIGHT_HALF_PART,  /*pos*/  5385,  -5520,   2428,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvSunkenShipPart2',         /*acts ACT_1*/),
     OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                      /*pos*/  5385,  -5520,   2428,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvInSunkenShip',             /*acts ACT_1*/),
     OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                      /*pos*/  5385,  -5520,   2428,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvInSunkenShip2',           /*acts/ACT_1*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_JRB_SHIP_LEFT_HALF_PART,   /*pos*/  4880,    820,   2375,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvShipPart3',                /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_JRB_SHIP_BACK_LEFT_PART,   /*pos*/  4880,    820,   2375,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvShipPart3',                /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_JRB_SHIP_RIGHT_HALF_PART,  /*pos*/  4880,    820,   2375,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvShipPart3',                /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_JRB_SHIP_BACK_RIGHT_PART,  /*pos*/  4880,    820,   2375,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvShipPart3',                /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                      /*pos*/  4880,    820,   2375,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvInSunkenShip3',           /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_JRB_SLIDING_BOX,           /*pos*/  4668,   1434,   2916,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvJrbSlidingBox',            /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_JRB_SHIP_LEFT_HALF_PART,   /*pos*/  4880,    820,   2375,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvShipPart3',                /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_JRB_SHIP_BACK_LEFT_PART,   /*pos*/  4880,    820,   2375,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvShipPart3',                /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_JRB_SHIP_RIGHT_HALF_PART,  /*pos*/  4880,    820,   2375,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvShipPart3',                /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_JRB_SHIP_BACK_RIGHT_PART,  /*pos*/  4880,    820,   2375,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvShipPart3',                /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                      /*pos*/  4880,    820,   2375,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvInSunkenShip3',           /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_JRB_SLIDING_BOX,           /*pos*/  4668,   1434,   2916,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvJrbSlidingBox',            /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
     OBJECT_WITH_ACTS(/*model*/ MODEL_UNAGI,                     /*pos*/  6048,  -5381,   1154,  /*angle*/ 0,  340,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvUnagi',                      /*acts ACT_1*/),
     OBJECT_WITH_ACTS(/*model*/ MODEL_UNAGI,                     /*pos*/  8270,  -3130,   1846,  /*angle*/ 0,  285,  0,  /*behParam*/ 0x01010000,  /*beh*/ 'bhvUnagi',                      /*acts ACT_2*/),
     OBJECT_WITH_ACTS(/*model*/ MODEL_UNAGI,                     /*pos*/  6048,  -5381,   1154,  /*angle*/ 0,  340,  0,  /*behParam*/ 0x02020000,  /*beh*/ 'bhvUnagi',                      /*acts ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
@@ -135,7 +135,7 @@ const script_func_local_3 = [
 //#else
     OBJECT_WITH_ACTS(/*model*/ MODEL_EXCLAMATION_BOX,  /*pos*/ 1540,   2160,   2130,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x04080000,  /*beh*/ 'bhvExclamationBox',       /*acts ALL_ACTS*/),
 //#endif
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,             /*pos*/ 5000,  -4800,   2500,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x05000000,  /*beh*/ 'bhvStar',                  /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,             /*pos*/ 5000,  -4800,   2500,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x05000000,  /*beh*/ 'bhvStar',                  /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
     RETURN(),
 ];
 

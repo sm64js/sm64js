@@ -9,6 +9,7 @@ import {
     G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADE
 } from "../../../../../include/gbi"
 import { mountain_09004800 } from "../../../../../textures/mountain"
+import { ttm_seg7_texture_07000800 } from "../../../texture.inc"
 
 const ttm_seg7_lights_0700A340 = gdSPDefLights1(
     0x7f, 0x7f, 0x7f,

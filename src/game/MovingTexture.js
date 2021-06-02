@@ -6,7 +6,7 @@ import { ccm_movtex_penguin_puddle_water } from "../levels/ccm/areas/1/movtext.i
 import { jrb_movtex_water } from "../levels/jrb/areas/1/movtext.inc"
 import { wf_movtex_water } from "../levels/wf/areas/1/movtext.inc"
 import { bbh_movtex_merry_go_round_water_entrance, bbh_movtex_merry_go_round_water_side } from "../levels/bbh/areas/1/movtext.inc"
-import { ttm_movtex_puddle, ttm_movtex_tris_begin_waterfall, ttm_movtex_tris_end_waterfall, ttm_dl_waterfall, ttm_movtex_tris_begin_puddle_waterfall, ttm_movtex_tris_end_puddle_waterfall, ttm_movtex_tris_puddle_waterfall } from "../levels/ttm/areas/1/movtext.inc"
+import { ttm_movtex_puddle, ttm_movtex_tris_begin_waterfall, ttm_movtex_tris_begin_puddle_waterfall, ttm_movtex_tris_end_waterfall, ttm_movtex_tris_end_puddle_waterfall, ttm_movtex_tris_puddle_waterfall, ttm_dl_waterfall, ttm_dl_bottom_waterfall, ttm_dl_puddle_waterfall } from "../levels/ttm/areas/1/movtext.inc"
 import { ssl_movtex_puddle_water } from "../levels/ssl/areas/1/movtext.inc"
 import { ssl_movtex_toxbox_quicksand_mist } from "../levels/ssl/areas/1/movtext.inc"
 import { castle_courtyard_movtex_star_statue_water } from "../levels/castle_courtyard/areas/1/movtext.inc"
@@ -19,8 +19,9 @@ import { inside_castle_movtex_green_room_water } from "../levels/castle_inside/a
 import { inside_castle_movtex_moat_water } from "../levels/castle_inside/areas/3/movtext.inc"
 import { ddd_movtex_area1_water } from "../levels/ddd/areas/1/movtext.inc"
 import { ddd_movtex_area2_water } from "../levels/ddd/areas/2/movtext.inc"
+//import { cotmc_dl_water_begin, cotmc_dl_water_end, cotmc_movtex_tris_water, cotmc_dl_water } from "../levels/cotmc/movtext.inc"
 
-import { GeoLayoutInstance as GeoLayout } from "../engine/GeoLayout"
+import { GeoLayoutInstance as GeoLayout, LAYER_TRANSPARENT_INTER } from "../engine/GeoLayout"
 import * as Gbi from "../include/gbi"
 import { dl_waterbox_rgba16_begin, dl_waterbox_end, dl_draw_quad_verts_0123, texture_waterbox_water, texture_waterbox_lava, texture_waterbox_jrb_water } from "../common_gfx/segment2"
 import { ROTATE_CLOCKWISE, TEXTURE_MIST, TEXTURE_WATER, TEXTURE_JRB_WATER } from "../include/moving_texture_macros"
@@ -124,6 +125,11 @@ const gMovtexIdToTexture = [
 const gMovtexNonColored = [
     { geoId: MOVTEX_CASTLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 15, movtexVerts: castle_grounds_movtex_tris_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: castle_grounds_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER },
     //{ geoId: MOVTEX_COTMC_WATER, textureId: TEXTURE_WATER, vtx_count: 14, movtexVerts: cotmc_movtex_tris_water, beginDl: cotmc_dl_water_begin, endDl: cotmc_dl_water_end, triDl: cotmc_dl_water, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: LAYER_TRANSPARENT_INTER },
+    { geoId: MOVTEX_TTM_BEGIN_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 6, movtexVerts: ttm_movtex_tris_begin_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: LAYER_TRANSPARENT_INTER }, //originally LAYER_TRANSPARENT
+    { geoId: MOVTEX_TTM_END_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 6, movtexVerts: ttm_movtex_tris_end_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: LAYER_TRANSPARENT_INTER }, //originally LAYER_TRANSPARENT
+    { geoId: MOVTEX_TTM_BEGIN_PUDDLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 4, movtexVerts: ttm_movtex_tris_begin_puddle_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_bottom_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: LAYER_TRANSPARENT_INTER },
+    { geoId: MOVTEX_TTM_END_PUDDLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 4, movtexVerts: ttm_movtex_tris_end_puddle_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_bottom_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: LAYER_TRANSPARENT_INTER },
+    { geoId: MOVTEX_TTM_PUDDLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 8, movtexVerts: ttm_movtex_tris_puddle_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_puddle_waterfall, r: 0xff, g: 0xff, b: 0xff, a:0xb4, layer: LAYER_TRANSPARENT_INTER },
 ]
 
 let gMovtexVtxColor = MOVTEX_VTX_COLOR_DEFAULT
@@ -147,20 +153,8 @@ const get_quad_collection_from_id = (id) => {
             return bbh_movtex_merry_go_round_water_side
         case SSL_MOVTEX_PUDDLE_WATER:
             return ssl_movtex_puddle_water
-        /*case SSL_MOVTEX_TOXBOX_QUICKSAND_MIST:
-            return ssl_movtex_toxbox_quicksand_mist*/
         case TTM_MOVTEX_PUDDLE:
             return ttm_movtex_puddle
-        /*case MOVTEX_TTM_BEGIN_PUDDLE_WATERFALL:
-            return ttm_movtex_tris_begin_puddle_waterfall
-        case MOVTEX_TTM_BEGIN_WATERFALL:
-            return ttm_movtex_tris_begin_waterfall
-        case MOVTEX_TTM_END_WATERFALL:
-            return ttm_movtex_tris_end_waterfall
-        case MOVTEX_TTM_END_PUDDLE_WATERFALL:
-            return ttm_movtex_tris_end_puddle_waterfall
-        case MOVTEX_TTM_PUDDLE_WATERFALL:
-            return ttm_movtex_tris_puddle_waterfall*/
         case CASTLE_COURTYARD_MOVTEX_STAR_STATUE_WATER:
             return castle_courtyard_movtex_star_statue_water
         case SL_MOVTEX_WATER:

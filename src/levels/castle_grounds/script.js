@@ -102,10 +102,6 @@ const script_func_local_4 = [
     OBJECT(/*model*/ MODEL_BUTTERFLY, /*pos*/  5473,  775, -5322, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ 'bhvButterfly'),
     OBJECT(/*model*/ MODEL_BUTTERFLY, /*pos*/ -1504,  326,  3196, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ 'bhvButterfly'),
     OBJECT(/*model*/ MODEL_BUTTERFLY, /*pos*/ -1204,  326,  3296, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ 'bhvButterfly'),
-    //extra butterflies not in SM64, test on bridge
-    OBJECT(/*model*/ MODEL_BUTTERFLY, /*pos*/ -500,  700,  -500, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ 'bhvButterfly'),
-    OBJECT(/*model*/ MODEL_BUTTERFLY, /*pos*/ -500,  700,  -300, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ 'bhvButterfly'),
-    OBJECT(/*model*/ MODEL_BUTTERFLY, /*pos*/  500,  700,  -500, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ 'bhvButterfly'),
     OBJECT(/*model*/ MODEL_YOSHI,     /*pos*/     0, 3174, -5625, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ 'bhvYoshi'),
     RETURN(),
 ]

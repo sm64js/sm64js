@@ -8,6 +8,7 @@ import {
     G_LIGHTING, G_CULL_BACK, G_TX_WRAP, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_RENDERTILE,
     G_ON, G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADE
 } from "../../../../../include/gbi"
+import { ttm_seg7_texture_07001000 } from "../../../texture.inc"
 const ttm_seg7_vertex_070109F0 = [
     [[   750,   -767,   -340], 0, [     0,    990], [0xff, 0xff, 0xff, 0xff]],
     [[  -174,   -767,   1212], 0, [  5980,    990], [0xff, 0xff, 0xff, 0xff]],

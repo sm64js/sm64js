@@ -8,6 +8,7 @@ import {
     G_TX_WRAP, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_RENDERTILE, G_ON, G_TX_CLAMP,
     G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADE
 } from "../../../../../include/gbi"
+import { ttm_seg7_texture_07000000 } from "../../../texture.inc"
 const ttm_seg7_lights_0700BB30 = gdSPDefLights1(
     0x4c, 0x4c, 0x4c,
     0x99, 0x99, 0x99, 0x28, 0x28, 0x28

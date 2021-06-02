@@ -6,6 +6,7 @@ import {
     LAYER_ALPHA
 } from "../../../engine/GeoLayout"
 
+import { ttm_seg7_dl_0702AB90 } from "./model.inc"
 
 // 0x0E000D84
 export const ttm_geo_000D84 = () => {return [

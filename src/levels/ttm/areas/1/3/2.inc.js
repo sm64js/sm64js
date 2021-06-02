@@ -12,6 +12,7 @@ const ttm_seg7_lights_0700A928 = gdSPDefLights1(
     0x7f, 0x7f, 0x7f,
     0xff, 0xff, 0xff, 0x28, 0x28, 0x28
 );
+import { ttm_seg7_texture_07000000 } from "../../../texture.inc"
 
 // 0x0700A940 - 0x0700A9C0
 const ttm_seg7_vertex_0700A940 = [

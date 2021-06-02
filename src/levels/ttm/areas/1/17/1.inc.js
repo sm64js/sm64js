@@ -9,6 +9,7 @@ import {
     G_ON, G_TEXTURE_IMAGE_FRAC, G_TX_CLAMP, G_OFF, G_CC_SHADE
 } from "../../../../../include/gbi"
 import { mountain_0900A000 } from "../../../../../textures/mountain"
+import { ttm_seg7_texture_07001000 } from "../../../texture.inc"
 
 const ttm_seg7_vertex_0700ECC8 = [
     [[   262,    151,   -248], 0, [ -1684,    960], [0xff, 0xff, 0xff, 0xff]],

@@ -20,7 +20,7 @@ import {
 } from "../../include/model_ids"
 
 import {
-    script_func_global_1, script_func_global_7
+    script_func_global_1/*, script_func_global_7*/
 } from "../global_scripts"
 
 import { ttm_geo_000730 } from "./rolling_log/geo.inc"
@@ -107,11 +107,10 @@ import { ttm_seg7_area_4_collision } from "./areas/4/collision.inc"
 
 import { ttm_seg7_area_4_macro_objs } from "./areas/4/macro.inc"
 
-
-
-
-
-
+import { ttm_geo_000DF4 } from "./slide_exit_podium/geo.inc"
+import { ttm_geo_000710 } from "./star_cage/geo.inc"
+import { ttm_geo_000D4C } from "./yellow_smiley/geo.inc"
+import { ttm_geo_000D84 } from "./star_smiley/geo.inc"
 
 const script_func_local_1 = [
     OBJECT(/*model*/ MODEL_TTM_ROLLING_LOG,     /*pos*/  4360,  -1722,   4001,  /*angle*/ 0,   48,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvTtmRollingLog'),
@@ -119,7 +118,7 @@ const script_func_local_1 = [
 ];
 
 const script_func_local_2 = [
-    OBJECT(/*model*/ MODEL_NONE,                /*pos*/ -1639,   1146,  -1742,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvTtmBowlingBallSpawner'),
+    //OBJECT(/*model*/ MODEL_NONE,                /*pos*/ -1639,   1146,  -1742,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvTtmBowlingBallSpawner'),
     OBJECT(/*model*/ MODEL_NONE,                /*pos*/  3295,  -3692,   2928,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvWaterfallSoundLoop'),
     OBJECT(/*model*/ MODEL_NONE,                /*pos*/  2004,  -1580,   1283,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvWaterfallSoundLoop'),
     OBJECT(/*model*/ MODEL_DL_MONTY_MOLE_HOLE,  /*pos*/ -2077,  -1023,  -1969,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvMontyMoleHole'),
@@ -134,18 +133,18 @@ const script_func_local_2 = [
     OBJECT(/*model*/ MODEL_MONTY_MOLE,          /*pos*/     0,      0,      0,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvMontyMole'),
     OBJECT(/*model*/ MODEL_MONTY_MOLE,          /*pos*/     0,      0,      0,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvMontyMole'),
     OBJECT(/*model*/ MODEL_NONE,                /*pos*/  3625,    560,    165,  /*angle*/ 0,  330,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvCloud'),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_UKIKI,               /*pos*/   729,   2307,    335,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvUkiki',        /*acts*/ ACT_2),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_UKIKI,               /*pos*/  1992,  -1548,   2944,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvUkiki',        /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_UKIKI,               /*pos*/   729,   2307,    335,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvUkiki',        /*acts ACT_2*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_UKIKI,               /*pos*/  1992,  -1548,   2944,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvUkiki',        /*acts ALL_ACTS*/),
     RETURN(),
 ];
 
 const script_func_local_3 = [
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/  1200,   2600,    150,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStar',               /*acts*/ ACT_1),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_TTM_STAR_CAGE,   /*pos*/  2496,   1670,   1492,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x01000000,  /*beh*/ 'bhvUkikiCage',          /*acts*/ ACT_2),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,            /*pos*/ -3250,  -2500,  -3700,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x02000000,  /*beh*/ 'bhvHiddenRedCoinStar',  /*acts*/ ALL_ACTS),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/ -2900,  -2700,   3650,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x03000000,  /*beh*/ 'bhvStar',               /*acts*/ ALL_ACTS),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/  1800,   1200,   1050,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x04000000,  /*beh*/ 'bhvStar',               /*acts*/ ALL_ACTS),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/  7300,  -3100,   1300,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x05000000,  /*beh*/ 'bhvStar',               /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/  1200,   2600,    150,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStar',               /*acts ACT_1*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_TTM_STAR_CAGE,   /*pos*/  2496,   1670,   1492,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x01000000,  /*beh*/ 'bhvUkikiCage',          /*acts ACT_2*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,            /*pos*/ -3250,  -2500,  -3700,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x02000000,  /*beh*/ 'bhvHiddenRedCoinStar',  /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/ -2900,  -2700,   3650,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x03000000,  /*beh*/ 'bhvStar',               /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/  1800,   1200,   1050,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x04000000,  /*beh*/ 'bhvStar',               /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/  7300,  -3100,   1300,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x05000000,  /*beh*/ 'bhvStar',               /*acts ALL_ACTS*/),
     RETURN(),
 ];
 
@@ -182,7 +181,7 @@ export const level_ttm_entry = [
     INIT_LEVEL(),
     MARIO(/*model*/ MODEL_MARIO,  /*behParam*/ 0x00000001,  /*beh*/ 'bhvMario'),
     JUMP_LINK(script_func_global_1),
-    JUMP_LINK(script_func_global_7),
+    //JUMP_LINK(script_func_global_7),
     LOAD_MODEL_FROM_GEO(MODEL_TTM_SLIDE_EXIT_PODIUM,  ttm_geo_000DF4),
     LOAD_MODEL_FROM_GEO(MODEL_TTM_ROLLING_LOG,        ttm_geo_000730),
     LOAD_MODEL_FROM_GEO(MODEL_TTM_STAR_CAGE,         ttm_geo_000710),
@@ -228,7 +227,7 @@ export const level_ttm_entry = [
         JUMP_LINK(script_func_local_2),
         JUMP_LINK(script_func_local_3),
         TERRAIN(/*terrainData*/ ttm_seg7_area_1_collision),
-        MACRO_OBJECTS(/*objList*/ ttm_seg7_area_1_macro_objs),
+        MACRO_OBJECTS(/*objList*/ ttm_seg7_area_1_macro_objs), //Bob-ombs aren't ready for TTM yet, they crash the game in certain situations, for example, them walking down a steep hill crashes the game, there is also a mystery Bob-omb that is at the death barrier that also crashes the game. I also commented out the goomba spawner at the beginning of the level because if Goombas enter the water the game also crashes.
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0000,  /*seq*/ SEQ_LEVEL_GRASS),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
     END_AREA(),

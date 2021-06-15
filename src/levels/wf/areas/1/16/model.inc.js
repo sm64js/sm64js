@@ -1,255 +1,293 @@
-import {grass_09002000, } from "../../../../../textures/grass.js"
-import {grass_09002800, } from "../../../../../textures/grass.js"
-import {grass_09005800, } from "../../../../../textures/grass.js"
-import {grass_09005000, } from "../../../../../textures/grass.js"
-import {grass_09004800, } from "../../../../../textures/grass.js"
-import * as Gbi from "../../../../../include/gbi"
-const wf_seg7_lights_0700B028 = Gbi.gdSPDefLights1(
-	    0x66, 0x66, 0x66,
-	    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-)
+// 0x0700B028 - 0x0700B040
 
+import {
+    gdSPDefLights1, gsDPSetTextureImage, gsDPLoadSync, gsDPLoadBlock, gsSPLight, gsSPVertex,
+    gsSP1Triangle, gsSPEndDisplayList, gsSP2Triangles, gsDPPipeSync, gsDPSetCombineMode,
+    gsSPClearGeometryMode, gsDPSetTile, gsSPTexture, gsDPTileSync, gsDPSetTileSize,
+    gsSPDisplayList, gsSPSetGeometryMode,
+    G_IM_FMT_RGBA, G_IM_SIZ_16b, CALC_DXT, G_TX_LOADTILE, G_IM_SIZ_16b_BYTES, G_CC_MODULATERGB,
+    G_SHADING_SMOOTH, G_TX_WRAP, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_RENDERTILE, G_ON,
+    G_TEXTURE_IMAGE_FRAC, G_TX_CLAMP, G_OFF, G_CC_SHADE
+} from "../../../../../include/gbi"
+import {
+    grass_09004800, grass_09005000, grass_09005800, grass_09002800, grass_09002000
+} from "../../../../../textures/grass"
+
+const wf_seg7_lights_0700B028 = gdSPDefLights1(
+    0x66, 0x66, 0x66,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
+
+// 0x0700B040 - 0x0700B070
 const wf_seg7_vertex_0700B040 = [
-	{ pos: [ -511, 256, 2048 ], flag: 0, tc: [ 310, 134 ], color: [ 67, 101, 223, 255 ] },
-	{ pos: [ -127, 0, 2048 ], flag: 0, tc: [ 0, 990 ], color: [ 67, 101, 223, 255 ] },
-	{ pos: [ -511, 0, 1280 ], flag: 0, tc: [ 1682, 990 ], color: [ 67, 101, 223, 255 ] },
-]
+    [[  -511,    256,   2048], 0, [   310,    134], [0x43, 0x65, 0xdf, 0xff]],
+    [[  -127,      0,   2048], 0, [     0,    990], [0x43, 0x65, 0xdf, 0xff]],
+    [[  -511,      0,   1280], 0, [  1682,    990], [0x43, 0x65, 0xdf, 0xff]],
+];
 
+// 0x0700B070 - 0x0700B160
 const wf_seg7_vertex_0700B070 = [
-	{ pos: [ 0, -255, -2303 ], flag: 0, tc: [ 990, 480 ], color: [ 89, 0, 167, 255 ] },
-	{ pos: [ 512, 0, -1791 ], flag: 0, tc: [ -454, 0 ], color: [ 89, 0, 167, 255 ] },
-	{ pos: [ 512, -255, -1791 ], flag: 0, tc: [ -454, 480 ], color: [ 89, 0, 167, 255 ] },
-	{ pos: [ -511, 0, 2304 ], flag: 0, tc: [ 1706, 480 ], color: [ 0, 0, 127, 255 ] },
-	{ pos: [ -127, 0, 2304 ], flag: 0, tc: [ 2472, 480 ], color: [ 0, 0, 127, 255 ] },
-	{ pos: [ -511, 256, 2304 ], flag: 0, tc: [ 1706, 0 ], color: [ 0, 0, 127, 255 ] },
-	{ pos: [ -511, 256, 2048 ], flag: 0, tc: [ 990, 0 ], color: [ 70, 105, 0, 255 ] },
-	{ pos: [ -511, 256, 2304 ], flag: 0, tc: [ 478, 0 ], color: [ 70, 105, 0, 255 ] },
-	{ pos: [ -127, 0, 2304 ], flag: 0, tc: [ 480, 890 ], color: [ 70, 105, 0, 255 ] },
-	{ pos: [ -127, 0, 2048 ], flag: 0, tc: [ 990, 890 ], color: [ 70, 105, 0, 255 ] },
-	{ pos: [ -511, -255, -2303 ], flag: 0, tc: [ 990, 480 ], color: [ 0, 0, 129, 255 ] },
-	{ pos: [ -511, 0, -2303 ], flag: 0, tc: [ 990, 0 ], color: [ 0, 0, 129, 255 ] },
-	{ pos: [ 0, 0, -2303 ], flag: 0, tc: [ 0, 0 ], color: [ 0, 0, 129, 255 ] },
-	{ pos: [ 0, -255, -2303 ], flag: 0, tc: [ 0, 480 ], color: [ 0, 0, 129, 255 ] },
-	{ pos: [ 0, 0, -2303 ], flag: 0, tc: [ 990, 0 ], color: [ 89, 0, 167, 255 ] },
-]
+    [[     0,   -255,  -2303], 0, [   990,    480], [0x59, 0x00, 0xa7, 0xff]],
+    [[   512,      0,  -1791], 0, [  -454,      0], [0x59, 0x00, 0xa7, 0xff]],
+    [[   512,   -255,  -1791], 0, [  -454,    480], [0x59, 0x00, 0xa7, 0xff]],
+    [[  -511,      0,   2304], 0, [  1706,    480], [0x00, 0x00, 0x7f, 0xff]],
+    [[  -127,      0,   2304], 0, [  2472,    480], [0x00, 0x00, 0x7f, 0xff]],
+    [[  -511,    256,   2304], 0, [  1706,      0], [0x00, 0x00, 0x7f, 0xff]],
+    [[  -511,    256,   2048], 0, [   990,      0], [0x46, 0x69, 0x00, 0xff]],
+    [[  -511,    256,   2304], 0, [   478,      0], [0x46, 0x69, 0x00, 0xff]],
+    [[  -127,      0,   2304], 0, [   480,    890], [0x46, 0x69, 0x00, 0xff]],
+    [[  -127,      0,   2048], 0, [   990,    890], [0x46, 0x69, 0x00, 0xff]],
+    [[  -511,   -255,  -2303], 0, [   990,    480], [0x00, 0x00, 0x81, 0xff]],
+    [[  -511,      0,  -2303], 0, [   990,      0], [0x00, 0x00, 0x81, 0xff]],
+    [[     0,      0,  -2303], 0, [     0,      0], [0x00, 0x00, 0x81, 0xff]],
+    [[     0,   -255,  -2303], 0, [     0,    480], [0x00, 0x00, 0x81, 0xff]],
+    [[     0,      0,  -2303], 0, [   990,      0], [0x59, 0x00, 0xa7, 0xff]],
+];
 
+// 0x0700B160 - 0x0700B1A0
 const wf_seg7_vertex_0700B160 = [
-	{ pos: [ 512, -255, -1791 ], flag: 0, tc: [ 990, 478 ], color: [ 127, 0, 0, 255 ] },
-	{ pos: [ 512, 0, 2304 ], flag: 0, tc: [ -7184, 0 ], color: [ 127, 0, 0, 255 ] },
-	{ pos: [ 512, -255, 2304 ], flag: 0, tc: [ -7184, 478 ], color: [ 127, 0, 0, 255 ] },
-	{ pos: [ 512, 0, -1791 ], flag: 0, tc: [ 990, 0 ], color: [ 127, 0, 0, 255 ] },
-]
+    [[   512,   -255,  -1791], 0, [   990,    478], [0x7f, 0x00, 0x00, 0xff]],
+    [[   512,      0,   2304], 0, [ -7184,      0], [0x7f, 0x00, 0x00, 0xff]],
+    [[   512,   -255,   2304], 0, [ -7184,    478], [0x7f, 0x00, 0x00, 0xff]],
+    [[   512,      0,  -1791], 0, [   990,      0], [0x7f, 0x00, 0x00, 0xff]],
+];
 
+// 0x0700B1A0 - 0x0700B210
 const wf_seg7_vertex_0700B1A0 = [
-	{ pos: [ 512, 0, 2304 ], flag: 0, tc: [ 990, 6354 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 512, 0, -1791 ], flag: 0, tc: [ 9166, 6354 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ -127, 0, 2048 ], flag: 0, tc: [ 1502, 5076 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 0, 0, -2303 ], flag: 0, tc: [ 10188, 5332 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ -511, 0, 1280 ], flag: 0, tc: [ 3034, 4310 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ -511, 0, -2303 ], flag: 0, tc: [ 10188, 4310 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ -127, 0, 2304 ], flag: 0, tc: [ 990, 5332 ], color: [ 0, 127, 0, 255 ] },
-]
+    [[   512,      0,   2304], 0, [   990,   6354], [0x00, 0x7f, 0x00, 0xff]],
+    [[   512,      0,  -1791], 0, [  9166,   6354], [0x00, 0x7f, 0x00, 0xff]],
+    [[  -127,      0,   2048], 0, [  1502,   5076], [0x00, 0x7f, 0x00, 0xff]],
+    [[     0,      0,  -2303], 0, [ 10188,   5332], [0x00, 0x7f, 0x00, 0xff]],
+    [[  -511,      0,   1280], 0, [  3034,   4310], [0x00, 0x7f, 0x00, 0xff]],
+    [[  -511,      0,  -2303], 0, [ 10188,   4310], [0x00, 0x7f, 0x00, 0xff]],
+    [[  -127,      0,   2304], 0, [   990,   5332], [0x00, 0x7f, 0x00, 0xff]],
+];
 
+// 0x0700B210 - 0x0700B300
 const wf_seg7_vertex_0700B210 = [
-	{ pos: [ -255, 0, -511 ], flag: 0, tc: [ 25518, 990 ], color: [ 129, 0, 0, 255 ] },
-	{ pos: [ -255, 51, -767 ], flag: 0, tc: [ 20408, 0 ], color: [ 129, 0, 0, 255 ] },
-	{ pos: [ -255, 0, -767 ], flag: 0, tc: [ 20408, 990 ], color: [ 129, 0, 0, 255 ] },
-	{ pos: [ -255, 0, -1535 ], flag: 0, tc: [ 0, 990 ], color: [ 129, 0, 0, 255 ] },
-	{ pos: [ -255, 51, -1535 ], flag: 0, tc: [ 0, 0 ], color: [ 129, 0, 0, 255 ] },
-	{ pos: [ -255, 51, -1791 ], flag: 0, tc: [ 5078, 0 ], color: [ 129, 0, 0, 255 ] },
-	{ pos: [ -255, 0, -1791 ], flag: 0, tc: [ 5078, 990 ], color: [ 129, 0, 0, 255 ] },
-	{ pos: [ 128, 0, -1919 ], flag: 0, tc: [ 4056, 990 ], color: [ 89, 0, 167, 255 ] },
-	{ pos: [ 128, 51, -1919 ], flag: 0, tc: [ 4056, 0 ], color: [ 89, 0, 167, 255 ] },
-	{ pos: [ 256, 51, -1791 ], flag: 0, tc: [ 442, 0 ], color: [ 89, 0, 167, 255 ] },
-	{ pos: [ 256, 0, -1791 ], flag: 0, tc: [ 442, 990 ], color: [ 89, 0, 167, 255 ] },
-	{ pos: [ -127, 0, -1919 ], flag: 0, tc: [ 0, 990 ], color: [ 0, 0, 129, 255 ] },
-	{ pos: [ -127, 51, -1919 ], flag: 0, tc: [ 0, 0 ], color: [ 0, 0, 129, 255 ] },
-	{ pos: [ 128, 51, -1919 ], flag: 0, tc: [ 5078, 0 ], color: [ 0, 0, 129, 255 ] },
-	{ pos: [ 128, 0, -1919 ], flag: 0, tc: [ 5078, 990 ], color: [ 0, 0, 129, 255 ] },
-]
+    [[  -255,      0,   -511], 0, [ 25518,    990], [0x81, 0x00, 0x00, 0xff]],
+    [[  -255,     51,   -767], 0, [ 20408,      0], [0x81, 0x00, 0x00, 0xff]],
+    [[  -255,      0,   -767], 0, [ 20408,    990], [0x81, 0x00, 0x00, 0xff]],
+    [[  -255,      0,  -1535], 0, [     0,    990], [0x81, 0x00, 0x00, 0xff]],
+    [[  -255,     51,  -1535], 0, [     0,      0], [0x81, 0x00, 0x00, 0xff]],
+    [[  -255,     51,  -1791], 0, [  5078,      0], [0x81, 0x00, 0x00, 0xff]],
+    [[  -255,      0,  -1791], 0, [  5078,    990], [0x81, 0x00, 0x00, 0xff]],
+    [[   128,      0,  -1919], 0, [  4056,    990], [0x59, 0x00, 0xa7, 0xff]],
+    [[   128,     51,  -1919], 0, [  4056,      0], [0x59, 0x00, 0xa7, 0xff]],
+    [[   256,     51,  -1791], 0, [   442,      0], [0x59, 0x00, 0xa7, 0xff]],
+    [[   256,      0,  -1791], 0, [   442,    990], [0x59, 0x00, 0xa7, 0xff]],
+    [[  -127,      0,  -1919], 0, [     0,    990], [0x00, 0x00, 0x81, 0xff]],
+    [[  -127,     51,  -1919], 0, [     0,      0], [0x00, 0x00, 0x81, 0xff]],
+    [[   128,     51,  -1919], 0, [  5078,      0], [0x00, 0x00, 0x81, 0xff]],
+    [[   128,      0,  -1919], 0, [  5078,    990], [0x00, 0x00, 0x81, 0xff]],
+];
 
+// 0x0700B300 - 0x0700B3F0
 const wf_seg7_vertex_0700B300 = [
-	{ pos: [ 128, 0, -895 ], flag: 0, tc: [ -11418, 990 ], color: [ 89, 0, 167, 255 ] },
-	{ pos: [ 256, 51, -767 ], flag: 0, tc: [ -15030, 0 ], color: [ 89, 0, 167, 255 ] },
-	{ pos: [ 256, 0, -767 ], flag: 0, tc: [ -15030, 990 ], color: [ 89, 0, 167, 255 ] },
-	{ pos: [ -255, 0, -511 ], flag: 0, tc: [ 25518, 990 ], color: [ 129, 0, 0, 255 ] },
-	{ pos: [ -255, 51, -511 ], flag: 0, tc: [ 25518, 0 ], color: [ 129, 0, 0, 255 ] },
-	{ pos: [ -255, 51, -767 ], flag: 0, tc: [ 20408, 0 ], color: [ 129, 0, 0, 255 ] },
-	{ pos: [ -255, 0, -767 ], flag: 0, tc: [ 18034, 990 ], color: [ 167, 0, 167, 255 ] },
-	{ pos: [ -255, 51, -767 ], flag: 0, tc: [ 18034, 0 ], color: [ 167, 0, 167, 255 ] },
-	{ pos: [ -127, 51, -895 ], flag: 0, tc: [ 14422, 0 ], color: [ 167, 0, 167, 255 ] },
-	{ pos: [ -127, 0, -895 ], flag: 0, tc: [ 14422, 990 ], color: [ 167, 0, 167, 255 ] },
-	{ pos: [ -127, 0, -895 ], flag: 0, tc: [ 5078, 990 ], color: [ 0, 0, 129, 255 ] },
-	{ pos: [ 128, 51, -895 ], flag: 0, tc: [ 0, 0 ], color: [ 0, 0, 129, 255 ] },
-	{ pos: [ 128, 0, -895 ], flag: 0, tc: [ 0, 990 ], color: [ 0, 0, 129, 255 ] },
-	{ pos: [ -127, 51, -895 ], flag: 0, tc: [ 5078, 0 ], color: [ 0, 0, 129, 255 ] },
-	{ pos: [ 128, 51, -895 ], flag: 0, tc: [ -11418, 0 ], color: [ 89, 0, 167, 255 ] },
-]
+    [[   128,      0,   -895], 0, [-11418,    990], [0x59, 0x00, 0xa7, 0xff]],
+    [[   256,     51,   -767], 0, [-15030,      0], [0x59, 0x00, 0xa7, 0xff]],
+    [[   256,      0,   -767], 0, [-15030,    990], [0x59, 0x00, 0xa7, 0xff]],
+    [[  -255,      0,   -511], 0, [ 25518,    990], [0x81, 0x00, 0x00, 0xff]],
+    [[  -255,     51,   -511], 0, [ 25518,      0], [0x81, 0x00, 0x00, 0xff]],
+    [[  -255,     51,   -767], 0, [ 20408,      0], [0x81, 0x00, 0x00, 0xff]],
+    [[  -255,      0,   -767], 0, [ 18034,    990], [0xa7, 0x00, 0xa7, 0xff]],
+    [[  -255,     51,   -767], 0, [ 18034,      0], [0xa7, 0x00, 0xa7, 0xff]],
+    [[  -127,     51,   -895], 0, [ 14422,      0], [0xa7, 0x00, 0xa7, 0xff]],
+    [[  -127,      0,   -895], 0, [ 14422,    990], [0xa7, 0x00, 0xa7, 0xff]],
+    [[  -127,      0,   -895], 0, [  5078,    990], [0x00, 0x00, 0x81, 0xff]],
+    [[   128,     51,   -895], 0, [     0,      0], [0x00, 0x00, 0x81, 0xff]],
+    [[   128,      0,   -895], 0, [     0,    990], [0x00, 0x00, 0x81, 0xff]],
+    [[  -127,     51,   -895], 0, [  5078,      0], [0x00, 0x00, 0x81, 0xff]],
+    [[   128,     51,   -895], 0, [-11418,      0], [0x59, 0x00, 0xa7, 0xff]],
+];
 
+// 0x0700B3F0 - 0x0700B4E0
 const wf_seg7_vertex_0700B3F0 = [
-	{ pos: [ -127, 0, -383 ], flag: 0, tc: [ 3582, 990 ], color: [ 167, 0, 89, 255 ] },
-	{ pos: [ -255, 51, -511 ], flag: 0, tc: [ 0, 0 ], color: [ 167, 0, 89, 255 ] },
-	{ pos: [ -255, 0, -511 ], flag: 0, tc: [ 0, 990 ], color: [ 167, 0, 89, 255 ] },
-	{ pos: [ 256, 0, -767 ], flag: 0, tc: [ 990, 990 ], color: [ 127, 0, 0, 255 ] },
-	{ pos: [ 256, 51, -511 ], flag: 0, tc: [ -4118, 0 ], color: [ 127, 0, 0, 255 ] },
-	{ pos: [ 256, 0, -511 ], flag: 0, tc: [ -4118, 990 ], color: [ 127, 0, 0, 255 ] },
-	{ pos: [ 256, 51, -767 ], flag: 0, tc: [ 990, 0 ], color: [ 127, 0, 0, 255 ] },
-	{ pos: [ 256, 0, -511 ], flag: 0, tc: [ 3034, 990 ], color: [ 89, 0, 89, 255 ] },
-	{ pos: [ 256, 51, -511 ], flag: 0, tc: [ 3034, 0 ], color: [ 89, 0, 89, 255 ] },
-	{ pos: [ 128, 51, -383 ], flag: 0, tc: [ -578, 0 ], color: [ 89, 0, 89, 255 ] },
-	{ pos: [ 128, 0, -383 ], flag: 0, tc: [ -578, 990 ], color: [ 89, 0, 89, 255 ] },
-	{ pos: [ 128, 0, -383 ], flag: 0, tc: [ 5078, 990 ], color: [ 0, 0, 127, 255 ] },
-	{ pos: [ 128, 51, -383 ], flag: 0, tc: [ 5078, 0 ], color: [ 0, 0, 127, 255 ] },
-	{ pos: [ -127, 51, -383 ], flag: 0, tc: [ 0, 0 ], color: [ 0, 0, 127, 255 ] },
-	{ pos: [ -127, 0, -383 ], flag: 0, tc: [ 0, 990 ], color: [ 0, 0, 127, 255 ] },
-]
+    [[  -127,      0,   -383], 0, [  3582,    990], [0xa7, 0x00, 0x59, 0xff]],
+    [[  -255,     51,   -511], 0, [     0,      0], [0xa7, 0x00, 0x59, 0xff]],
+    [[  -255,      0,   -511], 0, [     0,    990], [0xa7, 0x00, 0x59, 0xff]],
+    [[   256,      0,   -767], 0, [   990,    990], [0x7f, 0x00, 0x00, 0xff]],
+    [[   256,     51,   -511], 0, [ -4118,      0], [0x7f, 0x00, 0x00, 0xff]],
+    [[   256,      0,   -511], 0, [ -4118,    990], [0x7f, 0x00, 0x00, 0xff]],
+    [[   256,     51,   -767], 0, [   990,      0], [0x7f, 0x00, 0x00, 0xff]],
+    [[   256,      0,   -511], 0, [  3034,    990], [0x59, 0x00, 0x59, 0xff]],
+    [[   256,     51,   -511], 0, [  3034,      0], [0x59, 0x00, 0x59, 0xff]],
+    [[   128,     51,   -383], 0, [  -578,      0], [0x59, 0x00, 0x59, 0xff]],
+    [[   128,      0,   -383], 0, [  -578,    990], [0x59, 0x00, 0x59, 0xff]],
+    [[   128,      0,   -383], 0, [  5078,    990], [0x00, 0x00, 0x7f, 0xff]],
+    [[   128,     51,   -383], 0, [  5078,      0], [0x00, 0x00, 0x7f, 0xff]],
+    [[  -127,     51,   -383], 0, [     0,      0], [0x00, 0x00, 0x7f, 0xff]],
+    [[  -127,      0,   -383], 0, [     0,    990], [0x00, 0x00, 0x7f, 0xff]],
+];
 
+// 0x0700B4E0 - 0x0700B5D0
 const wf_seg7_vertex_0700B4E0 = [
-	{ pos: [ 256, 0, -1535 ], flag: 0, tc: [ 4056, 990 ], color: [ 89, 0, 89, 255 ] },
-	{ pos: [ 256, 51, -1535 ], flag: 0, tc: [ 4056, 0 ], color: [ 89, 0, 89, 255 ] },
-	{ pos: [ 128, 51, -1407 ], flag: 0, tc: [ 442, 0 ], color: [ 89, 0, 89, 255 ] },
-	{ pos: [ -127, 0, -383 ], flag: 0, tc: [ 3582, 990 ], color: [ 167, 0, 89, 255 ] },
-	{ pos: [ -127, 51, -383 ], flag: 0, tc: [ 3582, 0 ], color: [ 167, 0, 89, 255 ] },
-	{ pos: [ -255, 51, -511 ], flag: 0, tc: [ 0, 0 ], color: [ 167, 0, 89, 255 ] },
-	{ pos: [ -127, 0, -1407 ], flag: 0, tc: [ 442, 990 ], color: [ 167, 0, 89, 255 ] },
-	{ pos: [ -255, 51, -1535 ], flag: 0, tc: [ 4056, 0 ], color: [ 167, 0, 89, 255 ] },
-	{ pos: [ -255, 0, -1535 ], flag: 0, tc: [ 4056, 990 ], color: [ 167, 0, 89, 255 ] },
-	{ pos: [ -127, 51, -1407 ], flag: 0, tc: [ 442, 0 ], color: [ 167, 0, 89, 255 ] },
-	{ pos: [ 128, 0, -1407 ], flag: 0, tc: [ 5078, 990 ], color: [ 0, 0, 127, 255 ] },
-	{ pos: [ 128, 51, -1407 ], flag: 0, tc: [ 5078, 0 ], color: [ 0, 0, 127, 255 ] },
-	{ pos: [ -127, 51, -1407 ], flag: 0, tc: [ 0, 0 ], color: [ 0, 0, 127, 255 ] },
-	{ pos: [ -127, 0, -1407 ], flag: 0, tc: [ 0, 990 ], color: [ 0, 0, 127, 255 ] },
-	{ pos: [ 128, 0, -1407 ], flag: 0, tc: [ 442, 990 ], color: [ 89, 0, 89, 255 ] },
-]
+    [[   256,      0,  -1535], 0, [  4056,    990], [0x59, 0x00, 0x59, 0xff]],
+    [[   256,     51,  -1535], 0, [  4056,      0], [0x59, 0x00, 0x59, 0xff]],
+    [[   128,     51,  -1407], 0, [   442,      0], [0x59, 0x00, 0x59, 0xff]],
+    [[  -127,      0,   -383], 0, [  3582,    990], [0xa7, 0x00, 0x59, 0xff]],
+    [[  -127,     51,   -383], 0, [  3582,      0], [0xa7, 0x00, 0x59, 0xff]],
+    [[  -255,     51,   -511], 0, [     0,      0], [0xa7, 0x00, 0x59, 0xff]],
+    [[  -127,      0,  -1407], 0, [   442,    990], [0xa7, 0x00, 0x59, 0xff]],
+    [[  -255,     51,  -1535], 0, [  4056,      0], [0xa7, 0x00, 0x59, 0xff]],
+    [[  -255,      0,  -1535], 0, [  4056,    990], [0xa7, 0x00, 0x59, 0xff]],
+    [[  -127,     51,  -1407], 0, [   442,      0], [0xa7, 0x00, 0x59, 0xff]],
+    [[   128,      0,  -1407], 0, [  5078,    990], [0x00, 0x00, 0x7f, 0xff]],
+    [[   128,     51,  -1407], 0, [  5078,      0], [0x00, 0x00, 0x7f, 0xff]],
+    [[  -127,     51,  -1407], 0, [     0,      0], [0x00, 0x00, 0x7f, 0xff]],
+    [[  -127,      0,  -1407], 0, [     0,    990], [0x00, 0x00, 0x7f, 0xff]],
+    [[   128,      0,  -1407], 0, [   442,    990], [0x59, 0x00, 0x59, 0xff]],
+];
 
+// 0x0700B5D0 - 0x0700B650
 const wf_seg7_vertex_0700B5D0 = [
-	{ pos: [ 256, 0, -1791 ], flag: 0, tc: [ 5078, 990 ], color: [ 127, 0, 0, 255 ] },
-	{ pos: [ 256, 51, -1791 ], flag: 0, tc: [ 5078, 0 ], color: [ 127, 0, 0, 255 ] },
-	{ pos: [ 256, 51, -1535 ], flag: 0, tc: [ 0, 0 ], color: [ 127, 0, 0, 255 ] },
-	{ pos: [ 256, 0, -1535 ], flag: 0, tc: [ 0, 990 ], color: [ 127, 0, 0, 255 ] },
-	{ pos: [ -255, 0, -1791 ], flag: 0, tc: [ 442, 990 ], color: [ 167, 0, 167, 255 ] },
-	{ pos: [ -255, 51, -1791 ], flag: 0, tc: [ 442, 0 ], color: [ 167, 0, 167, 255 ] },
-	{ pos: [ -127, 51, -1919 ], flag: 0, tc: [ 4056, 0 ], color: [ 167, 0, 167, 255 ] },
-	{ pos: [ -127, 0, -1919 ], flag: 0, tc: [ 4056, 990 ], color: [ 167, 0, 167, 255 ] },
-]
+    [[   256,      0,  -1791], 0, [  5078,    990], [0x7f, 0x00, 0x00, 0xff]],
+    [[   256,     51,  -1791], 0, [  5078,      0], [0x7f, 0x00, 0x00, 0xff]],
+    [[   256,     51,  -1535], 0, [     0,      0], [0x7f, 0x00, 0x00, 0xff]],
+    [[   256,      0,  -1535], 0, [     0,    990], [0x7f, 0x00, 0x00, 0xff]],
+    [[  -255,      0,  -1791], 0, [   442,    990], [0xa7, 0x00, 0xa7, 0xff]],
+    [[  -255,     51,  -1791], 0, [   442,      0], [0xa7, 0x00, 0xa7, 0xff]],
+    [[  -127,     51,  -1919], 0, [  4056,      0], [0xa7, 0x00, 0xa7, 0xff]],
+    [[  -127,      0,  -1919], 0, [  4056,    990], [0xa7, 0x00, 0xa7, 0xff]],
+];
 
+// 0x0700B650 - 0x0700B750
 const wf_seg7_vertex_0700B650 = [
-	{ pos: [ -255, 51, -767 ], flag: 0, tc: [ 3034, -3098 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ -127, 51, -383 ], flag: 0, tc: [ 0, -2076 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 128, 51, -383 ], flag: 0, tc: [ 0, 0 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 128, 51, -895 ], flag: 0, tc: [ 4056, 0 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ -127, 51, -895 ], flag: 0, tc: [ 4056, -2076 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ -255, 51, -511 ], flag: 0, tc: [ 990, -3098 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 256, 51, -511 ], flag: 0, tc: [ 990, 990 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 256, 51, -767 ], flag: 0, tc: [ 3034, 990 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ -255, 51, -1791 ], flag: 0, tc: [ 11210, -3098 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 128, 51, -1919 ], flag: 0, tc: [ 12232, 0 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ -127, 51, -1919 ], flag: 0, tc: [ 12232, -2076 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 256, 51, -1791 ], flag: 0, tc: [ 11210, 990 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ -255, 51, -1535 ], flag: 0, tc: [ 9166, -3098 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ -127, 51, -1407 ], flag: 0, tc: [ 8144, -2076 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 128, 51, -1407 ], flag: 0, tc: [ 8144, 0 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 256, 51, -1535 ], flag: 0, tc: [ 9166, 990 ], color: [ 0, 127, 0, 255 ] },
-]
+    [[  -255,     51,   -767], 0, [  3034,  -3098], [0x00, 0x7f, 0x00, 0xff]],
+    [[  -127,     51,   -383], 0, [     0,  -2076], [0x00, 0x7f, 0x00, 0xff]],
+    [[   128,     51,   -383], 0, [     0,      0], [0x00, 0x7f, 0x00, 0xff]],
+    [[   128,     51,   -895], 0, [  4056,      0], [0x00, 0x7f, 0x00, 0xff]],
+    [[  -127,     51,   -895], 0, [  4056,  -2076], [0x00, 0x7f, 0x00, 0xff]],
+    [[  -255,     51,   -511], 0, [   990,  -3098], [0x00, 0x7f, 0x00, 0xff]],
+    [[   256,     51,   -511], 0, [   990,    990], [0x00, 0x7f, 0x00, 0xff]],
+    [[   256,     51,   -767], 0, [  3034,    990], [0x00, 0x7f, 0x00, 0xff]],
+    [[  -255,     51,  -1791], 0, [ 11210,  -3098], [0x00, 0x7f, 0x00, 0xff]],
+    [[   128,     51,  -1919], 0, [ 12232,      0], [0x00, 0x7f, 0x00, 0xff]],
+    [[  -127,     51,  -1919], 0, [ 12232,  -2076], [0x00, 0x7f, 0x00, 0xff]],
+    [[   256,     51,  -1791], 0, [ 11210,    990], [0x00, 0x7f, 0x00, 0xff]],
+    [[  -255,     51,  -1535], 0, [  9166,  -3098], [0x00, 0x7f, 0x00, 0xff]],
+    [[  -127,     51,  -1407], 0, [  8144,  -2076], [0x00, 0x7f, 0x00, 0xff]],
+    [[   128,     51,  -1407], 0, [  8144,      0], [0x00, 0x7f, 0x00, 0xff]],
+    [[   256,     51,  -1535], 0, [  9166,    990], [0x00, 0x7f, 0x00, 0xff]],
+];
 
-export const wf_seg7_dl_0700B750 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, grass_09004800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(wf_seg7_lights_0700B028.l[0], 1),
-	Gbi.gsSPLight(wf_seg7_lights_0700B028.a, 2),
-	Gbi.gsSPVertex(wf_seg7_vertex_0700B040, 3, 0),
-	Gbi.gsSP1Triangle( 0,  1,  2, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0700B750 - 0x0700B790
+const wf_seg7_dl_0700B750 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, grass_09004800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsSPLight(wf_seg7_lights_0700B028.l, 1),
+    gsSPLight(wf_seg7_lights_0700B028.a, 2),
+    gsSPVertex(wf_seg7_vertex_0700B040, 3, 0),
+    gsSP1Triangle( 0,  1,  2, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
-export const wf_seg7_dl_0700B790 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, grass_09005000),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPVertex(wf_seg7_vertex_0700B070, 15, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-	...Gbi.gsSP2Triangles( 6,  7,  8, 0x0,  6,  8,  9, 0x0),
-	...Gbi.gsSP2Triangles(10, 11, 12, 0x0, 10, 12, 13, 0x0),
-	Gbi.gsSP1Triangle( 0, 14,  1, 0x0),
-	Gbi.gsSPVertex(wf_seg7_vertex_0700B160, 4, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0700B790 - 0x0700B808
+const wf_seg7_dl_0700B790 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, grass_09005000),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(wf_seg7_vertex_0700B070, 15, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+    gsSP2Triangles( 6,  7,  8, 0x0,  6,  8,  9, 0x0),
+    gsSP2Triangles(10, 11, 12, 0x0, 10, 12, 13, 0x0),
+    gsSP1Triangle( 0, 14,  1, 0x0),
+    gsSPVertex(wf_seg7_vertex_0700B160, 4, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
-export const wf_seg7_dl_0700B808 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, grass_09005800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPVertex(wf_seg7_vertex_0700B1A0, 7, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  1, 0x0),
-	...Gbi.gsSP2Triangles( 3,  5,  4, 0x0,  4,  2,  1, 0x0),
-	Gbi.gsSP1Triangle( 0,  2,  6, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0700B808 - 0x0700B858
+const wf_seg7_dl_0700B808 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, grass_09005800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(wf_seg7_vertex_0700B1A0, 7, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  1, 0x0),
+    gsSP2Triangles( 3,  5,  4, 0x0,  4,  2,  1, 0x0),
+    gsSP1Triangle( 0,  2,  6, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
-export const wf_seg7_dl_0700B858 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, grass_09002800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPVertex(wf_seg7_vertex_0700B210, 15, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-	...Gbi.gsSP2Triangles( 3,  5,  6, 0x0,  7,  8,  9, 0x0),
-	...Gbi.gsSP2Triangles( 7,  9, 10, 0x0, 11, 12, 13, 0x0),
-	Gbi.gsSP1Triangle(11, 13, 14, 0x0),
-	Gbi.gsSPVertex(wf_seg7_vertex_0700B300, 15, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-	...Gbi.gsSP2Triangles( 6,  7,  8, 0x0,  6,  8,  9, 0x0),
-	...Gbi.gsSP2Triangles(10, 11, 12, 0x0, 10, 13, 11, 0x0),
-	Gbi.gsSP1Triangle( 0, 14,  1, 0x0),
-	Gbi.gsSPVertex(wf_seg7_vertex_0700B3F0, 15, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-	...Gbi.gsSP2Triangles( 3,  6,  4, 0x0,  7,  8,  9, 0x0),
-	...Gbi.gsSP2Triangles( 7,  9, 10, 0x0, 11, 12, 13, 0x0),
-	Gbi.gsSP1Triangle(11, 13, 14, 0x0),
-	Gbi.gsSPVertex(wf_seg7_vertex_0700B4E0, 15, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-	...Gbi.gsSP2Triangles( 6,  7,  8, 0x0,  6,  9,  7, 0x0),
-	...Gbi.gsSP2Triangles(10, 11, 12, 0x0, 10, 12, 13, 0x0),
-	Gbi.gsSP1Triangle( 0,  2, 14, 0x0),
-	Gbi.gsSPVertex(wf_seg7_vertex_0700B5D0, 8, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
-	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0700B858 - 0x0700B9A0
+const wf_seg7_dl_0700B858 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, grass_09002800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(wf_seg7_vertex_0700B210, 15, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+    gsSP2Triangles( 3,  5,  6, 0x0,  7,  8,  9, 0x0),
+    gsSP2Triangles( 7,  9, 10, 0x0, 11, 12, 13, 0x0),
+    gsSP1Triangle(11, 13, 14, 0x0),
+    gsSPVertex(wf_seg7_vertex_0700B300, 15, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+    gsSP2Triangles( 6,  7,  8, 0x0,  6,  8,  9, 0x0),
+    gsSP2Triangles(10, 11, 12, 0x0, 10, 13, 11, 0x0),
+    gsSP1Triangle( 0, 14,  1, 0x0),
+    gsSPVertex(wf_seg7_vertex_0700B3F0, 15, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+    gsSP2Triangles( 3,  6,  4, 0x0,  7,  8,  9, 0x0),
+    gsSP2Triangles( 7,  9, 10, 0x0, 11, 12, 13, 0x0),
+    gsSP1Triangle(11, 13, 14, 0x0),
+    gsSPVertex(wf_seg7_vertex_0700B4E0, 15, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+    gsSP2Triangles( 6,  7,  8, 0x0,  6,  9,  7, 0x0),
+    gsSP2Triangles(10, 11, 12, 0x0, 10, 12, 13, 0x0),
+    gsSP1Triangle( 0,  2, 14, 0x0),
+    gsSPVertex(wf_seg7_vertex_0700B5D0, 8, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
-export const wf_seg7_dl_0700B9A0 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, grass_09002000),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPVertex(wf_seg7_vertex_0700B650, 16, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  4, 0x0),
-	...Gbi.gsSP2Triangles( 0,  5,  1, 0x0,  0,  2,  6, 0x0),
-	...Gbi.gsSP2Triangles( 0,  6,  7, 0x0,  0,  7,  3, 0x0),
-	...Gbi.gsSP2Triangles( 8,  9, 10, 0x0,  8, 11,  9, 0x0),
-	...Gbi.gsSP2Triangles( 8, 12, 13, 0x0,  8, 13, 14, 0x0),
-	...Gbi.gsSP2Triangles( 8, 15, 11, 0x0,  8, 14, 15, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x0700B9A0 - 0x0700BA28
+const wf_seg7_dl_0700B9A0 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, grass_09002000),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(wf_seg7_vertex_0700B650, 16, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  4, 0x0),
+    gsSP2Triangles( 0,  5,  1, 0x0,  0,  2,  6, 0x0),
+    gsSP2Triangles( 0,  6,  7, 0x0,  0,  7,  3, 0x0),
+    gsSP2Triangles( 8,  9, 10, 0x0,  8, 11,  9, 0x0),
+    gsSP2Triangles( 8, 12, 13, 0x0,  8, 13, 14, 0x0),
+    gsSP2Triangles( 8, 15, 11, 0x0,  8, 14, 15, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
+// 0x0700BA28 - 0x0700BB18
 export const wf_seg7_dl_0700BA28 = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGB),
-	Gbi.gsSPClearGeometryMode(Gbi.G_SHADING_SMOOTH),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPDisplayList(wf_seg7_dl_0700B750),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPDisplayList(wf_seg7_dl_0700B790),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPDisplayList(wf_seg7_dl_0700B808),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPDisplayList(wf_seg7_dl_0700B858),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPDisplayList(wf_seg7_dl_0700B9A0),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsSPSetGeometryMode(Gbi.G_SHADING_SMOOTH),
-	Gbi.gsSPEndDisplayList(),
-]
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_MODULATERGB, G_CC_MODULATERGB),
+    gsSPClearGeometryMode(G_SHADING_SMOOTH),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPDisplayList(wf_seg7_dl_0700B750),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPDisplayList(wf_seg7_dl_0700B790),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPDisplayList(wf_seg7_dl_0700B808),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPDisplayList(wf_seg7_dl_0700B858),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPDisplayList(wf_seg7_dl_0700B9A0),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPSetGeometryMode(G_SHADING_SMOOTH),
+    gsSPEndDisplayList(),
+].flat();
 
+// 2021-06-14 16:16:34 -0400 (Convert.rb 2021-06-14 09:43:28 -0400)

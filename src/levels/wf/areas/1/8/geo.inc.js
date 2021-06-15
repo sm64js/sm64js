@@ -1,10 +1,19 @@
-import { GeoLayoutInstance as Geo } from "../../../../../engine/GeoLayout"
+// Wf
+
+import {
+    GEO_CULLING_RADIUS, GEO_OPEN_NODE, GEO_DISPLAY_LIST, GEO_CLOSE_NODE, GEO_END,
+    LAYER_ALPHA
+} from "../../../../../engine/GeoLayout"
+
 import { wf_seg7_dl_07007220 } from "./model.inc"
 
-export const wf_geo_000878 = [
-{ command: Geo.node_culling_radius, args: [9000] },
-{ command: Geo.open_node },
-{ command: Geo.display_list, args: [Geo.LAYER_ALPHA, wf_seg7_dl_07007220] },
-{ command: Geo.close_node },
-{ command: Geo.node_end },
-]
+// 0x0E000878
+export const wf_geo_000878 = () => {return [
+    GEO_CULLING_RADIUS(9000),
+    GEO_OPEN_NODE(),
+        GEO_DISPLAY_LIST(LAYER_ALPHA, wf_seg7_dl_07007220),
+    GEO_CLOSE_NODE(),
+    GEO_END(),
+]};
+
+// 2021-06-14 16:16:34 -0400 (Convert.rb 2021-06-14 09:43:28 -0400)

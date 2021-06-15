@@ -1,98 +1,252 @@
-import { LevelCommandsInstance as LevelCommands } from "../../engine/LevelCommands"
-import { bhvMario } from "../../game/BehaviorData"
-import { LevelUpdateInstance as LevelUpdate } from "../../game/LevelUpdate"
-import { bubbly_tree_geo } from "../../actors/tree/geo.inc"
-import { yellow_sphere_geo } from "../../actors/yellow_sphere_small/geo.inc"
-import { wf_seg7_collision_070102D8 } from "./areas/1/collision.inc"
-import { wf_geo_000BF8 } from "./areas/1/geo.inc"
-
-import { bhvStaticObject, bhvGiantPole, bhvPoleGrabbing, bhvYellowBall } from "../../game/BehaviorData"
-
-import { wf_geo_0007E0 } from "./areas/1/5/geo.inc"
-import { wf_geo_000820 } from "./areas/1/6/geo.inc"
-import { wf_geo_000860 } from "./areas/1/7/geo.inc"
-import { wf_geo_000878 } from "./areas/1/8/geo.inc"
-import { wf_geo_000890 } from "./areas/1/9/geo.inc"
-import { wf_geo_0008A8 } from "./areas/1/10/geo.inc"
-import { wf_geo_0008E8 } from "./areas/1/11/geo.inc"
-import { wf_geo_000900 } from "./areas/1/12/geo.inc"
-import { wf_geo_000AE0 } from "./areas/1/14/geo.inc"
-import { wf_geo_000940 } from "./areas/1/13/geo.inc"
-import { wf_geo_000958 } from "./areas/1/15/geo.inc"
-import { wf_geo_0009A0 } from "./areas/1/16/geo.inc"
-import { wf_geo_0009D0 } from "./areas/1/18/geo.inc"
-import { wf_geo_0009E8 } from "./areas/1/19/geo.inc"
+// Wf
 
 import {
-    MODEL_LEVEL_GEOMETRY_00,
-    MODEL_LEVEL_GEOMETRY_01,
-    MODEL_LEVEL_GEOMETRY_02,
-    MODEL_LEVEL_GEOMETRY_03,
-    MODEL_LEVEL_GEOMETRY_04,
-    MODEL_LEVEL_GEOMETRY_05,
-    MODEL_LEVEL_GEOMETRY_06,
-    MODEL_LEVEL_GEOMETRY_07,
-    MODEL_LEVEL_GEOMETRY_08,
-    MODEL_LEVEL_GEOMETRY_09,
-    MODEL_LEVEL_GEOMETRY_0A,
-    MODEL_LEVEL_GEOMETRY_0B,
-    MODEL_LEVEL_GEOMETRY_0C,
-    MODEL_LEVEL_GEOMETRY_0D,
-    MODEL_LEVEL_GEOMETRY_0E,
-    MODEL_LEVEL_GEOMETRY_0F,
-    MODEL_LEVEL_GEOMETRY_10,
-    MODEL_LEVEL_GEOMETRY_11,
-    MODEL_LEVEL_GEOMETRY_12,
-    MODEL_LEVEL_GEOMETRY_13,
-    MODEL_LEVEL_GEOMETRY_14,
-    MODEL_LEVEL_GEOMETRY_15,
-    MODEL_LEVEL_GEOMETRY_16,
-	
-	MODEL_BOB_BUBBLY_TREE,
-	
-	MODEL_YELLOW_SPHERE,
-	
-	MODEL_WF_GIANT_POLE,
-	
-	MODEL_NONE,
+    OBJECT, RETURN, OBJECT_WITH_ACTS, INIT_LEVEL, MARIO, JUMP_LINK, LOAD_MODEL_FROM_GEO, AREA,
+    WARP_NODE, TERRAIN, MACRO_OBJECTS, SHOW_DIALOG, SET_BACKGROUND_MUSIC, TERRAIN_TYPE, END_AREA,
+    MARIO_POS, CALL, CALL_LOOP, CLEAR_LEVEL, SLEEP_BEFORE_EXIT, EXIT
+} from "../../engine/LevelCommands"
+
+import {
+    MODEL_LEVEL_GEOMETRY_03, MODEL_LEVEL_GEOMETRY_04, MODEL_LEVEL_GEOMETRY_05,
+    MODEL_LEVEL_GEOMETRY_06, MODEL_LEVEL_GEOMETRY_07, MODEL_LEVEL_GEOMETRY_0A,
+    MODEL_LEVEL_GEOMETRY_0C, MODEL_WF_GIANT_POLE, MODEL_WF_SMALL_BOMP, MODEL_WF_LARGE_BOMP,
+    MODEL_WF_ROTATING_WOODEN_PLATFORM, MODEL_WF_SLIDING_PLATFORM, MODEL_WF_TUMBLING_BRIDGE,
+    MODEL_WF_BREAKABLE_WALL_RIGHT, MODEL_WF_BREAKABLE_WALL_LEFT, MODEL_WF_KICKABLE_BOARD,
+    MODEL_1UP, MODEL_WF_ROTATING_PLATFORM, MODEL_NONE, MODEL_THWOMP, MODEL_PIRANHA_PLANT,
+    MODEL_WHOMP, MODEL_BUTTERFLY, MODEL_BULLET_BILL, MODEL_LEVEL_GEOMETRY_08,
+    MODEL_LEVEL_GEOMETRY_09, MODEL_WF_TOWER_DOOR, MODEL_BOBOMB_BUDDY, MODEL_HOOT, MODEL_STAR,
+    MODEL_MARIO, MODEL_WF_BUBBLY_TREE, MODEL_LEVEL_GEOMETRY_0E, MODEL_LEVEL_GEOMETRY_0F,
+    MODEL_LEVEL_GEOMETRY_11, MODEL_LEVEL_GEOMETRY_12, MODEL_WF_TUMBLING_BRIDGE_PART,
+    MODEL_WF_TOWER_TRAPEZOID_PLATORM, MODEL_WF_TOWER_SQUARE_PLATORM,
+    MODEL_WF_TOWER_SQUARE_PLATORM_UNUSED, MODEL_WF_TOWER_SQUARE_PLATORM_ELEVATOR,
+    MODEL_WF_KICKABLE_BOARD_FELLED
 } from "../../include/model_ids"
 
+import {
+    script_func_global_1, /*script_func_global_2,*/ script_func_global_15
+} from "../global_scripts"
+
+import { wf_geo_0007E0 } from "./areas/1/5/geo.inc"
+
+import { wf_geo_000820 } from "./areas/1/6/geo.inc"
+
+import { wf_geo_000860 } from "./areas/1/7/geo.inc"
+
+import { wf_geo_000878 } from "./areas/1/8/geo.inc"
+
+import { wf_geo_000890 } from "./areas/1/9/geo.inc"
+
+import { wf_geo_0008A8 } from "./areas/1/10/geo.inc"
+
+import { wf_geo_0008E8 } from "./areas/1/11/geo.inc"
+
+import { wf_geo_000900 } from "./areas/1/12/geo.inc"
+
+import { wf_geo_000940 } from "./areas/1/13/geo.inc"
+
+import { wf_geo_000AE0 } from "./areas/1/14/geo.inc"
+
+import { wf_geo_000958 } from "./areas/1/15/geo.inc"
+
+import { wf_geo_0009A0 } from "./areas/1/16/geo.inc"
+
+import { wf_geo_0009B8 } from "./areas/1/17/geo.inc"
+
+import { wf_geo_0009D0 } from "./areas/1/18/geo.inc"
+
+import { wf_geo_0009E8 } from "./areas/1/19/geo.inc"
+
+import { wf_geo_000A40 } from "./large_bomp/geo.inc"
+
+import { wf_geo_000A58 } from "./rotating_wooden_platform/geo.inc"
+
+import { wf_geo_000AF8 } from "./beta_extending_platform/geo.inc"
+
+import {
+    wf_geo_000B10, wf_geo_000B38, wf_geo_000B60
+} from "./extending_platform/geo.inc"
+
+import { wf_geo_000B78 } from "./breakable_wall_right/geo.inc"
+
+import { wf_geo_000B90 } from "./breakable_wall_left/geo.inc"
+
+import {
+    wf_geo_000BA8, wf_geo_000BC8
+} from "./kickable_board/geo.inc"
+
+import { wf_geo_000BF8 } from "./areas/1/geo.inc"
+
+import {
+    LEVEL_WF, LEVEL_CASTLE
+} from "../level_defines_constants"
+
+import { WARP_NO_CHECKPOINT } from "../../engine/LevelCommands"
+
+import { wf_seg7_collision_070102D8 } from "./areas/1/collision.inc"
+
+import { wf_seg7_macro_objs } from "./areas/1/macro.inc"
+
+import { DIALOG_030 } from "../../text/us/dialogs"
+
+import { SEQ_LEVEL_GRASS } from "../../include/seq_ids"
+
+import { TERRAIN_STONE } from "../../include/surface_terrains"
+
+import { bubbly_tree_geo } from "../../actors/tree/geo.inc"
+
+import { wf_geo_000BE0 } from "./tower_door/geo.inc"
+
+import { wf_geo_000A00 } from "./small_bomp/geo.inc"
+
+import { wf_geo_000A98 } from "./sliding_platform/geo.inc"
+
+import { wf_geo_000AC8 } from "./tumbling_bridge_far/geo.inc"
+
+import { wf_geo_000AB0 } from "./tumbling_bridge_near/geo.inc"
+
+// Unlike most levels, some of the level geometry objects in WF are defined as regular objects instead of terrain objects.
+// Some of them are still terrain objects, however.
+const script_func_local_1 = [
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_03,  /*pos*/  2305,  2432,   -255,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStaticObject'),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_04,  /*pos*/  3405,  1664,  -1791,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStaticObject'),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_05,  /*pos*/  3840,     0,  -2303,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStaticObject'),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_05,  /*pos*/  3840,     0,  -1279,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStaticObject'),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_06,  /*pos*/     0,     0,      0,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStaticObject'),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_07,  /*pos*/  1757,  3519,  -3151,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStaticObject'),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_0A,  /*pos*/  3840,   794,   2688,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStaticObject'),
+    OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_0C,  /*pos*/  1408,  2522,   2431,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStaticObject'),
+    OBJECT(/*model*/ MODEL_WF_GIANT_POLE,      /*pos*/ -2560,  2560,   -256,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvGiantPole'),
+    RETURN(),
+];
+
+const script_func_local_2 = [
+    OBJECT(/*model*/ MODEL_WF_SMALL_BOMP,                /*pos*/  3300,  1070,      1,  /*angle*/ 0,   90,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvSmallBomp'),
+    OBJECT(/*model*/ MODEL_WF_SMALL_BOMP,                /*pos*/  3300,  1070,   1281,  /*angle*/ 0,   90,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvSmallBomp'),
+    OBJECT(/*model*/ MODEL_WF_LARGE_BOMP,                /*pos*/  3300,  1070,    641,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvLargeBomp'),
+    OBJECT(/*model*/ MODEL_WF_ROTATING_WOODEN_PLATFORM,  /*pos*/  -255,  2560,   2304,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvWfRotatingWoodenPlatform'),
+    OBJECT(/*model*/ MODEL_WF_SLIDING_PLATFORM,          /*pos*/  3328,  1075,  -1791,  /*angle*/ 0,   90,  0,  /*behParam*/ 0x00020000,  /*beh*/ 'bhvWfSlidingPlatform'),
+    OBJECT(/*model*/ MODEL_WF_SLIDING_PLATFORM,          /*pos*/  3328,  1075,   -767,  /*angle*/ 0,   90,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvWfSlidingPlatform'),
+    OBJECT(/*model*/ MODEL_WF_SLIDING_PLATFORM,          /*pos*/  3328,  1075,  -2815,  /*angle*/ 0,   90,  0,  /*behParam*/ 0x00030000,  /*beh*/ 'bhvWfSlidingPlatform'),
+    OBJECT(/*model*/ MODEL_WF_TUMBLING_BRIDGE,           /*pos*/  1792,  2496,   1600,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvWfTumblingBridge'),
+    OBJECT(/*model*/ MODEL_WF_BREAKABLE_WALL_RIGHT,      /*pos*/   512,  2176,   2944,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvWfBreakableWallRight'),
+    OBJECT(/*model*/ MODEL_WF_BREAKABLE_WALL_LEFT,       /*pos*/ -1023,  2176,   2944,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvWfBreakableWallLeft'),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_WF_KICKABLE_BOARD,            /*pos*/    13,  3584,  -1407,  /*angle*/ 0,  315,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvKickableBoard',  /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_1UP,                          /*pos*/  -384,  3584,      6,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhv1Up',             /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    OBJECT(/*model*/ MODEL_WF_ROTATING_PLATFORM,         /*pos*/  2304,  3584,  -2303,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x08000000,  /*beh*/ 'bhvRotatingPlatform'),
+    OBJECT(/*model*/ MODEL_WF_ROTATING_PLATFORM,         /*pos*/  3200,  3328,  -1791,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x08000000,  /*beh*/ 'bhvRotatingPlatform'),
+    OBJECT(/*model*/ MODEL_WF_ROTATING_PLATFORM,         /*pos*/  2688,  3584,   -895,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x08000000,  /*beh*/ 'bhvRotatingPlatform'),
+    OBJECT(/*model*/ MODEL_NONE,                         /*pos*/ -2495,  1331,   -256,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x003D0000,  /*beh*/ 'bhvPoleGrabbing'),
+    RETURN(),
+];
+
+const script_func_local_3 = [
+    OBJECT(/*model*/ MODEL_THWOMP,             /*pos*/  3462,  1939,  -1545,  /*angle*/ 0,   180,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvThwomp'),
+    OBJECT(/*model*/ MODEL_THWOMP,             /*pos*/  3462,  1075,  -3314,  /*angle*/ 0,    90,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvThwomp2'),
+    OBJECT(/*model*/ MODEL_NONE,               /*pos*/  -856,   922,   3819,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvBetaFishSplashSpawner'),
+    OBJECT(/*model*/ MODEL_PIRANHA_PLANT,      /*pos*/  1822,  2560,   -101,  /*angle*/ 0,    90,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvPiranhaPlant'),
+    OBJECT(/*model*/ MODEL_PIRANHA_PLANT,      /*pos*/  4625,   256,   5017,  /*angle*/ 0,   -90,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvPiranhaPlant'),
+    OBJECT(/*model*/ MODEL_PIRANHA_PLANT,      /*pos*/   689,  2560,   1845,  /*angle*/ 0,    90,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvPiranhaPlant'),
+    OBJECT(/*model*/ MODEL_WHOMP,              /*pos*/ -1545,  2560,   -286,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvSmallWhomp'),
+    OBJECT(/*model*/ MODEL_WHOMP,              /*pos*/   189,  2560,  -1857,  /*angle*/ 0,  -135,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvSmallWhomp'),
+    OBJECT(/*model*/ MODEL_BUTTERFLY,          /*pos*/  4736,   256,   4992,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvButterfly'),
+    OBJECT(/*model*/ MODEL_BUTTERFLY,          /*pos*/  4608,   256,   5120,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvButterfly'),
+    OBJECT(/*model*/ MODEL_BUTTERFLY,          /*pos*/  4608,   256,   4992,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvButterfly'),
+    OBJECT(/*model*/ MODEL_BUTTERFLY,          /*pos*/  4608,   256,   4864,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvButterfly'),
+    OBJECT(/*model*/ MODEL_BUTTERFLY,          /*pos*/  4480,   256,   4992,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvButterfly'),
+    OBJECT(/*model*/ MODEL_BUTTERFLY,          /*pos*/  4608,   256,    256,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvButterfly'),
+    OBJECT(/*model*/ MODEL_BUTTERFLY,          /*pos*/  4736,   256,    128,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvButterfly'),
+    OBJECT(/*model*/ MODEL_BUTTERFLY,          /*pos*/  4480,   256,    128,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvButterfly'),
+    OBJECT(/*model*/ MODEL_BUTTERFLY,          /*pos*/  4608,   256,      0,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvButterfly'),
+    OBJECT(/*model*/ MODEL_BUTTERFLY,          /*pos*/  4608,   256,    128,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvButterfly'),
+    OBJECT(/*model*/ MODEL_NONE,               /*pos*/  1035,  2880,   -900,  /*angle*/ 0,    45,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvCheckerboardElevatorGroup'),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_BULLET_BILL,        /*pos*/  1280,  3712,    968,  /*angle*/ 0,   180,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvBulletBill',                /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_LEVEL_GEOMETRY_08,  /*pos*/     0,  3584,      0,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvTower',                      /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_LEVEL_GEOMETRY_09,  /*pos*/  1280,  3584,    896,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvBulletBillCannon',         /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,               /*pos*/     0,  3483,      0,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvTowerPlatformGroup',       /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_WF_TOWER_DOOR,      /*pos*/  -511,  3584,      0,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvTowerDoor',                 /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_BOBOMB_BUDDY,       /*pos*/ -1700,  1140,   3500,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvBobombBuddyOpensCannon',  /*acts ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_HOOT,               /*pos*/  2560,   700,   4608,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvHoot',                       /*acts ACT_3 | ACT_4 | ACT_5 | ACT_6*/), Commenting out for the sake of parity with ACT_1
+    RETURN(),
+];
+
+const script_func_local_4 = [
+    OBJECT_WITH_ACTS(/*model*/ MODEL_WHOMP,  /*pos*/     0,  3584,     0,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvWhompKingBoss',       /*acts ACT_1*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,   /*pos*/   300,  5550,     0,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x01000000,  /*beh*/ 'bhvStar',                  /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/), Star at the top of the tower
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,   /*pos*/ -2500,  1500,  -750,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x02000000,  /*beh*/ 'bhvStar',                  /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,   /*pos*/  4600,   550,  2500,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x03000000,  /*beh*/ 'bhvHiddenRedCoinStar',  /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,   /*pos*/  2880,  4300,   190,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x04000000,  /*beh*/ 'bhvStar',                  /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,   /*pos*/   590,  2450,  2650,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x05000000,  /*beh*/ 'bhvStar',                  /*acts ALL_ACTS*/),
+    RETURN(),
+];
+
 export const level_wf_entry = [
-    { command: LevelCommands.init_level },
-    { command: LevelCommands.init_mario, args: [1, 1, bhvMario] },
-	{ command: LevelCommands.load_model_from_geo, args: [MODEL_YELLOW_SPHERE, yellow_sphere_geo] },
-	{ command: LevelCommands.load_model_from_geo, args: [MODEL_BOB_BUBBLY_TREE, bubbly_tree_geo] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_03, wf_geo_0007E0] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_04, wf_geo_000820] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_05, wf_geo_000860] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_06, wf_geo_000878] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_07, wf_geo_000890] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_08, wf_geo_0008A8] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_09, wf_geo_0008E8] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_0A, wf_geo_000900] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_0C, wf_geo_000940] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_0D, wf_geo_000AE0] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_0E, wf_geo_000958] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_0F, wf_geo_0009A0] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_11, wf_geo_0009D0] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_12, wf_geo_0009E8] },
-    { command: LevelCommands.begin_area, args: [1, wf_geo_000BF8] },
-	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_03, 2305, 2432,  -255, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_04, 3405, 1664, -1791, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_05, 3840,    0, -2303, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_05, 3840,    0, -1279, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_06,    0,    0,     0, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_07, 1757, 3519, -3151, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_0A, 3840,  794,  2688, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_0C, 1408, 2522,  2431, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [MODEL_WF_GIANT_POLE    ,-2560, 2560,  -256, 0,0,0, 0x00000000, bhvGiantPole   ] },
-	{ command: LevelCommands.place_object, args: [MODEL_NONE             ,-2495, 1331,  -256, 0,0,0, 0x003D0000, bhvPoleGrabbing] },
-    { command: LevelCommands.terrain, args: [wf_seg7_collision_070102D8] },
-    { command: LevelCommands.end_area },
-    { command: LevelCommands.set_mario_pos, args: [1, 90, 2600, 1256, 5120] },
-    { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_or_update, LevelUpdate] },
-    { command: LevelCommands.call_loop, args: [1, LevelUpdate.lvl_init_or_update, LevelUpdate] },
-]
+    INIT_LEVEL(),
+    MARIO(/*model*/ MODEL_MARIO,  /*behParam*/ 0x00000001,  /*beh*/ 'bhvMario'),
+    JUMP_LINK(script_func_global_1),
+    //JUMP_LINK(script_func_global_2),
+    JUMP_LINK(script_func_global_15),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_BUBBLY_TREE,                    bubbly_tree_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_03,                 wf_geo_0007E0),
+    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_04,                 wf_geo_000820),
+    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_05,                 wf_geo_000860),
+    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_06,                 wf_geo_000878),
+    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_07,                 wf_geo_000890),
+    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_08,                 wf_geo_0008A8),
+    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_09,                 wf_geo_0008E8),
+    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_0A,                 wf_geo_000900),
+    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_0C,                 wf_geo_000940),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_GIANT_POLE,                     wf_geo_000AE0),
+    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_0E,                 wf_geo_000958),
+    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_0F,                 wf_geo_0009A0),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_ROTATING_PLATFORM,              wf_geo_0009B8),
+    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_11,                 wf_geo_0009D0),
+    LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_12,                 wf_geo_0009E8),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_SMALL_BOMP,                     wf_geo_000A00),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_LARGE_BOMP,                     wf_geo_000A40),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_ROTATING_WOODEN_PLATFORM,       wf_geo_000A58),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_SLIDING_PLATFORM,               wf_geo_000A98),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_TUMBLING_BRIDGE_PART,           wf_geo_000AB0),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_TUMBLING_BRIDGE,                wf_geo_000AC8),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_TOWER_TRAPEZOID_PLATORM,        wf_geo_000AF8),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_TOWER_SQUARE_PLATORM,           wf_geo_000B10),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_TOWER_SQUARE_PLATORM_UNUSED,    wf_geo_000B38),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_TOWER_SQUARE_PLATORM_ELEVATOR,  wf_geo_000B60),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_BREAKABLE_WALL_RIGHT,           wf_geo_000B78),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_BREAKABLE_WALL_LEFT,            wf_geo_000B90),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_KICKABLE_BOARD,                 wf_geo_000BA8),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_TOWER_DOOR,                     wf_geo_000BE0),
+    LOAD_MODEL_FROM_GEO(MODEL_WF_KICKABLE_BOARD_FELLED,          wf_geo_000BC8),
+
+    AREA(/*index*/ 1,  wf_geo_000BF8),
+        OBJECT(/*model*/ MODEL_NONE,  /*pos*/  2600,  1256,   5120,  /*angle*/ 0,  90,  0,  /*behParam*/ 0x000A0000,  /*beh*/ 'bhvSpinAirborneWarp'),
+        OBJECT(/*model*/ MODEL_NONE,  /*pos*/ -2925,  2560,   -947,  /*angle*/ 0,  19,  0,  /*behParam*/ 0x000B0000,  /*beh*/ 'bhvFadingWarp'),
+        OBJECT(/*model*/ MODEL_NONE,  /*pos*/  2548,  1075,  -3962,  /*angle*/ 0,  51,  0,  /*behParam*/ 0x000C0000,  /*beh*/ 'bhvFadingWarp'),
+        WARP_NODE(/*id*/ 0x0A,  /*destLevel*/ LEVEL_WF,  /*destArea*/ 0x01,  /*destNode*/ 0x0A,  /*flags*/ WARP_NO_CHECKPOINT),
+        WARP_NODE(/*id*/ 0x0B,  /*destLevel*/ LEVEL_WF,  /*destArea*/ 0x01,  /*destNode*/ 0x0C,  /*flags*/ WARP_NO_CHECKPOINT),
+        WARP_NODE(/*id*/ 0x0C,  /*destLevel*/ LEVEL_WF,  /*destArea*/ 0x01,  /*destNode*/ 0x0B,  /*flags*/ WARP_NO_CHECKPOINT),
+        WARP_NODE(/*id*/ 0xF0,  /*destLevel*/ LEVEL_CASTLE,  /*destArea*/ 0x01,  /*destNode*/ 0x34,  /*flags*/ WARP_NO_CHECKPOINT),
+        WARP_NODE(/*id*/ 0xF1,  /*destLevel*/ LEVEL_CASTLE,  /*destArea*/ 0x01,  /*destNode*/ 0x66,  /*flags*/ WARP_NO_CHECKPOINT),
+        JUMP_LINK(script_func_local_1),
+        JUMP_LINK(script_func_local_2),
+        JUMP_LINK(script_func_local_3),
+        JUMP_LINK(script_func_local_4),
+        TERRAIN(/*terrainData*/ wf_seg7_collision_070102D8),
+        MACRO_OBJECTS(/*objList*/ wf_seg7_macro_objs),
+        SHOW_DIALOG(/*index*/ 0x00,  DIALOG_030),
+        SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0005,  /*seq*/ SEQ_LEVEL_GRASS),
+        TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
+    END_AREA(),
+
+    MARIO_POS(/*area*/ 1,  /*yaw*/ 90,  /*pos*/ 2600,  256,  5120),
+    CALL(/*arg*/ 0,  /*func*/ 'LevelUpdate.lvl_init_or_update'),
+    CALL_LOOP(/*arg*/ 1,  /*func*/ 'LevelUpdate.lvl_init_or_update'),
+    CLEAR_LEVEL(),
+    SLEEP_BEFORE_EXIT(/*frames*/ 1),
+    EXIT(),
+];
 
 
 gLinker.level_scripts.level_wf_entry = level_wf_entry
+console.warn("Various unimplemented bhvs present resulting in no collision in certain objects")
+
+// 2021-06-14 16:16:34 -0400 (Convert.rb 2021-06-14 09:43:28 -0400)

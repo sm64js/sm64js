@@ -1074,7 +1074,8 @@ import { ssl_seg7_texture_07000000,
          ssl_seg7_texture_07001800,
          ssl_seg7_texture_07002000,
          ssl_seg7_texture_07002800,
-         ssl_seg7_texture_07003800 } from "./levels/ssl/texture.inc"
+         ssl_seg7_texture_07003800,
+         ssl_pyramid_sand } from "./levels/ssl/texture.inc"
 
 import { ssl_seg7_texture_0700BFA8,
          ssl_seg7_texture_0700C7A8,
@@ -2408,7 +2409,7 @@ const loadDataIntoGame = (data) => {
     ssl_seg7_texture_07002000.push(...data["levels/ssl/4.rgba16.png"])
     ssl_seg7_texture_07002800.push(...data["levels/ssl/5.rgba16.png"])
     ssl_seg7_texture_07003800.push(...data["levels/ssl/6.rgba16.png"])
-
+    ssl_pyramid_sand.push(...data["levels/ssl/7.rgba16.png"])
     ssl_seg7_texture_0700BFA8.push(...data["levels/ssl/8.rgba16.png"])
     ssl_seg7_texture_0700C7A8.push(...data["levels/ssl/9.rgba16.png"])
     ssl_seg7_texture_0700D7A8.push(...data["levels/ssl/10.rgba16.png"])

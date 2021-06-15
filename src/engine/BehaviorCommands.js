@@ -101,7 +101,7 @@ class BehaviorCommands {
         // Handle visibility of object
         if (gCurrentObject.rawData[oRoom] != -1) {
             // If the object is in a room, only show it when Mario is in the room.
-            throw "object is in a room - cur_obj_enable_rendering_if_mario_in_room"
+            //throw "object is in a room - cur_obj_enable_rendering_if_mario_in_room"
         } else if ((objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) && gCurrentObject.collisionData == null) {
             if (!(objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR)) {
                 // If the object has a render distance, check if it should be shown.

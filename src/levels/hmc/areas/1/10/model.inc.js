@@ -1,52 +1,72 @@
-import * as Gbi from "../../../../../include/gbi"
+// 0x0700FF70 - 0x0700FF88
+
 import {
-	cave_09006800
-} from "../../../../../textures/cave"
-const hmc_seg7_lights_0700FF70 = Gbi.gdSPDefLights1(
-	    0x79, 0x79, 0x79,
-	    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-)
+    gdSPDefLights1, gsDPSetTextureImage, gsDPLoadSync, gsDPLoadBlock, gsSPLight, gsSPVertex,
+    gsSP2Triangles, gsSPEndDisplayList, gsDPPipeSync, gsDPSetCycleType, gsDPSetRenderMode,
+    gsDPSetDepthSource, gsDPSetFogColor, gsSPFogPosition, gsSPSetGeometryMode, gsDPSetCombineMode,
+    gsDPSetTile, gsSPTexture, gsDPTileSync, gsDPSetTileSize, gsSPDisplayList,
+    gsSPClearGeometryMode,
+    G_IM_FMT_RGBA, G_IM_SIZ_16b, CALC_DXT, G_TX_LOADTILE, G_IM_SIZ_16b_BYTES, G_CYC_2CYCLE,
+    G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_DECAL2, G_ZS_PIXEL, G_FOG, G_CC_MODULATERGB, G_CC_PASS2,
+    G_TX_WRAP, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_RENDERTILE, G_ON,
+    G_TEXTURE_IMAGE_FRAC, G_OFF, G_CYC_1CYCLE, G_RM_AA_ZB_OPA_DECAL, G_RM_NOOP2, G_CC_SHADE
+} from "../../../../../include/gbi"
+import { cave_09006800 } from "../../../../../textures/cave"
 
+const hmc_seg7_lights_0700FF70 = gdSPDefLights1(
+    0x79, 0x79, 0x79,
+    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
+);
+
+// 0x0700FF88 - 0x07010008
 const hmc_seg7_vertex_0700FF88 = [
-	{ pos: [ 3891, 0, 4608 ], flag: 0, tc: [ 1756, -798 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 4403, 0, 4813 ], flag: 0, tc: [ 2522, 990 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 4198, 0, 4608 ], flag: 0, tc: [ 2522, 0 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 4403, 0, 5120 ], flag: 0, tc: [ 1756, 1754 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 4198, 0, 5325 ], flag: 0, tc: [ 734, 1754 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 3891, 0, 5325 ], flag: 0, tc: [ 0, 990 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 3686, 0, 5120 ], flag: 0, tc: [ 0, 0 ], color: [ 0, 127, 0, 255 ] },
-	{ pos: [ 3686, 0, 4813 ], flag: 0, tc: [ 734, -798 ], color: [ 0, 127, 0, 255 ] },
-]
+    [[  3891,      0,   4608], 0, [  1756,   -798], [0x00, 0x7f, 0x00, 0xff]],
+    [[  4403,      0,   4813], 0, [  2522,    990], [0x00, 0x7f, 0x00, 0xff]],
+    [[  4198,      0,   4608], 0, [  2522,      0], [0x00, 0x7f, 0x00, 0xff]],
+    [[  4403,      0,   5120], 0, [  1756,   1754], [0x00, 0x7f, 0x00, 0xff]],
+    [[  4198,      0,   5325], 0, [   734,   1754], [0x00, 0x7f, 0x00, 0xff]],
+    [[  3891,      0,   5325], 0, [     0,    990], [0x00, 0x7f, 0x00, 0xff]],
+    [[  3686,      0,   5120], 0, [     0,      0], [0x00, 0x7f, 0x00, 0xff]],
+    [[  3686,      0,   4813], 0, [   734,   -798], [0x00, 0x7f, 0x00, 0xff]],
+];
 
-export const hmc_seg7_dl_07010008 = [
-	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, cave_09006800),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1),
-	Gbi.gsSPLight(hmc_seg7_lights_0700FF70.l[0], 1),
-	Gbi.gsSPLight(hmc_seg7_lights_0700FF70.a, 2),
-	Gbi.gsSPVertex(hmc_seg7_vertex_0700FF88, 8, 0),
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
-	...Gbi.gsSP2Triangles( 0,  4,  3, 0x0,  0,  5,  4, 0x0),
-	...Gbi.gsSP2Triangles( 0,  6,  5, 0x0,  0,  7,  6, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
+// 0x07010008 - 0x07010070
+const hmc_seg7_dl_07010008 = [
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cave_09006800),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsSPLight(hmc_seg7_lights_0700FF70.l, 1),
+    gsSPLight(hmc_seg7_lights_0700FF70.a, 2),
+    gsSPVertex(hmc_seg7_vertex_0700FF88, 8, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
+    gsSP2Triangles( 0,  4,  3, 0x0,  0,  5,  4, 0x0),
+    gsSP2Triangles( 0,  6,  5, 0x0,  0,  7,  6, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
+// 0x07010070 - 0x07010118
 export const hmc_seg7_dl_07010070 = [
-	Gbi.gsDPSetCycleType(Gbi.G_CYC_2CYCLE),
-	Gbi.gsDPSetRenderMode(Gbi.G_RM_FOG_SHADE_A_AA_ZB_OPA_DECAL2),
-	Gbi.gsDPSetFogColor(0, 0, 0, 255),
-	Gbi.gsSPFogPosition(960, 1000),
-	Gbi.gsSPSetGeometryMode(Gbi.G_FOG),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGB),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPDisplayList(hmc_seg7_dl_07010008),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetCycleType(Gbi.G_CYC_1CYCLE),
-	Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_DECAL_NOOP2),
-	Gbi.gsSPClearGeometryMode(Gbi.G_FOG),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsSPEndDisplayList(),
-]
+    gsDPPipeSync(),
+    gsDPSetCycleType(G_CYC_2CYCLE),
+    gsDPSetRenderMode(G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_DECAL2),
+    gsDPSetDepthSource(G_ZS_PIXEL),
+    gsDPSetFogColor(0, 0, 0, 255),
+    gsSPFogPosition(960, 1000),
+    gsSPSetGeometryMode(G_FOG),
+    gsDPSetCombineMode(G_CC_MODULATERGB, G_CC_PASS2),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPDisplayList(hmc_seg7_dl_07010008),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
+    gsDPSetCycleType(G_CYC_1CYCLE),
+    gsDPSetRenderMode(G_RM_AA_ZB_OPA_DECAL, G_RM_NOOP2),
+    gsSPClearGeometryMode(G_FOG),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPEndDisplayList(),
+].flat();
 
+// 2021-06-14 16:20:25 -0400 (Convert.rb 2021-06-14 09:43:28 -0400)

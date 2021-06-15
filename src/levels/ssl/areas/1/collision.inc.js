@@ -1,37 +1,17 @@
+// Ssl
+
 import {
-    COL_INIT,
-    COL_VERTEX_INIT,
-    COL_VERTEX,
-    COL_TRI_INIT,
-    COL_TRI,
-    COL_TRI_STOP,
+    COL_INIT, COL_VERTEX_INIT, COL_VERTEX, COL_TRI_INIT, COL_TRI, COL_TRI_SPECIAL, COL_TRI_STOP,
+    COL_SPECIAL_INIT, SPECIAL_OBJECT_WITH_YAW, SPECIAL_OBJECT, COL_WATER_BOX_INIT, COL_WATER_BOX,
     COL_END,
-    COL_SPECIAL_INIT,
-    COL_TRI_SPECIAL,
-    SPECIAL_OBJECT,
-    SPECIAL_OBJECT_WITH_YAW,
-
-    SURFACE_DEFAULT,
-    SURFACE_VERY_SLIPPERY,
-    SURFACE_NOT_SLIPPERY,
-    SURFACE_INSTANT_QUICKSAND,
-    SURFACE_DEEP_MOVING_QUICKSAND,
-    SURFACE_SHALLOW_MOVING_QUICKSAND,
-    SURFACE_QUICKSAND,
-    SURFACE_MOVING_QUICKSAND,
-    SURFACE_WALL_MISC,
-    SURFACE_INSTANT_MOVING_QUICKSAND,
-    SURFACE_HARD,
-    SURFACE_HARD_SLIPPERY,
-    SURFACE_HARD_NOT_SLIPPERY,
-
-    COL_WATER_BOX_INIT,
-    COL_WATER_BOX,
-
-    special_palm_tree
-
+    SURFACE_DEFAULT, SURFACE_VERY_SLIPPERY, SURFACE_NOT_SLIPPERY, SURFACE_INSTANT_QUICKSAND,
+    SURFACE_DEEP_MOVING_QUICKSAND, SURFACE_SHALLOW_MOVING_QUICKSAND, SURFACE_QUICKSAND,
+    SURFACE_MOVING_QUICKSAND, SURFACE_WALL_MISC, SURFACE_INSTANT_MOVING_QUICKSAND, SURFACE_HARD,
+    SURFACE_HARD_SLIPPERY, SURFACE_HARD_NOT_SLIPPERY, SURFACE_CAMERA_MIDDLE,
+    special_null_start, special_level_geo_03, special_palm_tree
 } from "../../../../include/surface_terrains"
 
+// 0x0700FD80 - 0x07012422
 export const ssl_seg7_area_1_collision = [
     COL_INIT(),
     COL_VERTEX_INIT(0x23E),
@@ -1576,7 +1556,7 @@ export const ssl_seg7_area_1_collision = [
     COL_TRI(474, 4, 18),
     COL_TRI(474, 18, 475),
     COL_TRI(475, 18, 22),
-    COL_TRI_INIT(SURFACE_DEFAULT, 8),
+    COL_TRI_INIT(SURFACE_CAMERA_MIDDLE, 8),
     COL_TRI(482, 481, 483),
     COL_TRI(445, 446, 447),
     COL_TRI(445, 442, 446),
@@ -1586,17 +1566,19 @@ export const ssl_seg7_area_1_collision = [
     COL_TRI(478, 479, 480),
     COL_TRI(482, 483, 484),
     COL_TRI_STOP(),
-    COL_SPECIAL_INIT(1),
-//    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_null_start,   /*pos*/   653, 38,  6566, /*yaw*/ 64), // unused, probably an early way to set intial position
-//    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_03, /*pos*/  5760,  0,  5751, /*yaw*/  0),
-//    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_03, /*pos*/ -3583,  0,  2935, /*yaw*/  0),
-//    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_03, /*pos*/  -511,  0,  2935, /*yaw*/  0),
-//    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_03, /*pos*/  1024,  0,  3822, /*yaw*/  0),
-//    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_03, /*pos*/  3072,  0,   375, /*yaw*/  0),
+    COL_SPECIAL_INIT(7),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_null_start,   /*pos*/   653, 38,  6566, /*yaw*/ 64),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_03, /*pos*/  5760,  0,  5751, /*yaw*/  0),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_03, /*pos*/ -3583,  0,  2935, /*yaw*/  0),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_03, /*pos*/  -511,  0,  2935, /*yaw*/  0),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_03, /*pos*/  1024,  0,  3822, /*yaw*/  0),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_level_geo_03, /*pos*/  3072,  0,   375, /*yaw*/  0),
     SPECIAL_OBJECT(/*preset*/ special_palm_tree,    /*pos*/ -5989,  0, -4850),
     COL_WATER_BOX_INIT(3),
     COL_WATER_BOX(51, 1024, -7065, 7578, -716, -50),
     COL_WATER_BOX(52, -3993, -7065, 1024, -4197, -50),
     COL_WATER_BOX(0, -6911, -7167, -4223, -4607, -127),
     COL_END(),
-].flat()
+].flat();
+
+// 2021-06-14 09:53:10 -0400 (Convert.rb 2021-06-14 09:43:28 -0400)

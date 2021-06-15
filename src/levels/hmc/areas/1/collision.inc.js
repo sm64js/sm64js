@@ -1,33 +1,15 @@
-// 0x07025594 - 0x0702AA78
+// Hmc
+
 import {
-    COL_INIT,
-    COL_VERTEX_INIT,
-    COL_VERTEX,
-    COL_TRI_INIT,
-    COL_TRI,
-    COL_TRI_STOP,
-    COL_END,
-    COL_WATER_BOX,
-    COL_WATER_BOX_INIT,
-    COL_SPECIAL_INIT,
-
-    SURFACE_DEFAULT,
-    SURFACE_HANGABLE,
-    SURFACE_SLIPPERY,
-    SURFACE_VERY_SLIPPERY,
-    SURFACE_NOT_SLIPPERY,
-    SURFACE_WALL_MISC,
-    SURFACE_DEATH_PLANE,
-    SURFACE_NO_CAM_COLLISION,
-    SURFACE_PAINTING_WOBBLE_D0,
-    SURFACE_WOBBLING_WARP,
-
-    SPECIAL_OBJECT_WITH_YAW,
-
-    special_metal_door,
-    special_hmc_door,
-    special_wooden_door
+    COL_INIT, COL_VERTEX_INIT, COL_VERTEX, COL_TRI_INIT, COL_TRI, COL_TRI_STOP, COL_SPECIAL_INIT,
+    SPECIAL_OBJECT_WITH_YAW, COL_WATER_BOX_INIT, COL_WATER_BOX, COL_END,
+    SURFACE_DEFAULT, SURFACE_HANGABLE, SURFACE_DEATH_PLANE, SURFACE_VERY_SLIPPERY,
+    SURFACE_SLIPPERY, SURFACE_NOT_SLIPPERY, SURFACE_WALL_MISC, SURFACE_NO_CAM_COLLISION,
+    SURFACE_PAINTING_WOBBLE_D0, SURFACE_WOBBLING_WARP,
+    special_null_start, special_wooden_door, special_metal_door, special_hmc_door
 } from "../../../../include/surface_terrains"
+
+// 0x07025594 - 0x0702AA78
 export const hmc_seg7_collision_level = [
     COL_INIT(),
     COL_VERTEX_INIT(0x5E1),
@@ -3415,7 +3397,7 @@ export const hmc_seg7_collision_level = [
     COL_TRI(182, 189, 187),
     COL_TRI(183, 190, 191),
     COL_TRI(171, 172, 184),
-    COL_TRI_INIT(SURFACE_DEATH_PLANE, 6), // death plane
+    COL_TRI_INIT(SURFACE_DEATH_PLANE, 6),
     COL_TRI(4, 5, 6),
     COL_TRI(4, 7, 5),
     COL_TRI(8, 9, 10),
@@ -3584,7 +3566,7 @@ export const hmc_seg7_collision_level = [
     COL_TRI(45, 54, 53),
     COL_TRI(163, 164, 165),
     COL_TRI(163, 165, 166),
-    COL_TRI_INIT(SURFACE_NO_CAM_COLLISION, 35), // no cam collision
+    COL_TRI_INIT(SURFACE_NO_CAM_COLLISION, 35),
     COL_TRI(66, 69, 70),
     COL_TRI(59, 60, 61),
     COL_TRI(59, 61, 62),
@@ -3620,30 +3602,32 @@ export const hmc_seg7_collision_level = [
     COL_TRI(80, 81, 59),
     COL_TRI(82, 80, 59),
     COL_TRI(64, 82, 59),
-    COL_TRI_INIT(SURFACE_PAINTING_WOBBLE_D0, 2), // SURFACE_PAINTING_WOBBLE_D0
+    COL_TRI_INIT(SURFACE_PAINTING_WOBBLE_D0, 2),
     COL_TRI(0, 1, 2),
     COL_TRI(0, 3, 1),
-    COL_TRI_INIT(SURFACE_WOBBLING_WARP, 2), // SURFACE_WOBBLING_WARP
+    COL_TRI_INIT(SURFACE_WOBBLING_WARP, 2),
     COL_TRI(55, 56, 57),
     COL_TRI(55, 58, 56),
     COL_TRI_STOP(),
-    COL_SPECIAL_INIT(12),
-    //SPECIAL_OBJECT_WITH_YAW( special_null_start,   -7601,  2253,  7630,   96), // unused, probably an early way to set intial position
-    SPECIAL_OBJECT_WITH_YAW( special_wooden_door,    922, -4689,  2330,  192),
-    SPECIAL_OBJECT_WITH_YAW( special_wooden_door,  -3586,  1536,   647,   19),
-    SPECIAL_OBJECT_WITH_YAW( special_wooden_door,   5911,  -204,   870,    0),
-    SPECIAL_OBJECT_WITH_YAW( special_wooden_door,   3817,   205,   870,    0),
-    SPECIAL_OBJECT_WITH_YAW( special_metal_door,    1127,  -409, -4709,   64),
-    SPECIAL_OBJECT_WITH_YAW( special_metal_door,    -468, -4279,  6711,   32),
-    SPECIAL_OBJECT_WITH_YAW( special_metal_door,    -359, -4279,  6602,  160),
-    SPECIAL_OBJECT_WITH_YAW( special_metal_door,   -3634,  2355, -2764,   64),
-    SPECIAL_OBJECT_WITH_YAW( special_metal_door,   -4863,  1843, -7551,  192),
-    SPECIAL_OBJECT_WITH_YAW( special_metal_door,    3328,  -409, -6911,    0),
-    SPECIAL_OBJECT_WITH_YAW( special_hmc_door,       358,  2048,  3661,  192),
-    SPECIAL_OBJECT_WITH_YAW( special_hmc_door,     -6553,  1536,  1459,    0),
+    COL_SPECIAL_INIT(13),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_null_start,  /*pos*/ -7601,  2253,  7630, /*yaw*/  96),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_wooden_door, /*pos*/   922, -4689,  2330, /*yaw*/ 192),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_wooden_door, /*pos*/ -3586,  1536,   647, /*yaw*/  19),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_wooden_door, /*pos*/  5911,  -204,   870, /*yaw*/   0),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_wooden_door, /*pos*/  3817,   205,   870, /*yaw*/   0),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_metal_door,  /*pos*/  1127,  -409, -4709, /*yaw*/  64),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_metal_door,  /*pos*/  -468, -4279,  6711, /*yaw*/  32),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_metal_door,  /*pos*/  -359, -4279,  6602, /*yaw*/ 160),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_metal_door,  /*pos*/ -3634,  2355, -2764, /*yaw*/  64),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_metal_door,  /*pos*/ -4863,  1843, -7551, /*yaw*/ 192),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_metal_door,  /*pos*/  3328,  -409, -6911, /*yaw*/   0),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_hmc_door,    /*pos*/   358,  2048,  3661, /*yaw*/ 192),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_hmc_door,    /*pos*/ -6553,  1536,  1459, /*yaw*/   0),
     COL_WATER_BOX_INIT(3),
     COL_WATER_BOX(0, -7628, -2559, 563, 7654, -4791),
     COL_WATER_BOX(50, 1690, -6348, 6298, 819, -818),
     COL_WATER_BOX(51, 1690, -6348, 6298, 819, -821),
     COL_END(),
-].flat()
+].flat();
+
+// 2021-06-14 16:20:25 -0400 (Convert.rb 2021-06-14 09:43:28 -0400)

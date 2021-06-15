@@ -213,6 +213,10 @@ export const check_fall_damage = (m, hardFallAction) => {
     } else {
         damageHeight = 1150.0
     }
+    if(window.cheats.disableFallDamage) {
+        fallHeight = 0.0
+        damageHeight = 0.0
+    }
 
     if (m.action != ACT_TWIRLING && m.floor.type != SURFACE_BURNING) {
         if (m.vel[1] < -55.0) {

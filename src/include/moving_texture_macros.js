@@ -7,6 +7,7 @@ export const TEXTURE_LAVA             =  4
 export const TEX_QUICKSAND_SSL        =  5
 export const TEX_PYRAMID_SAND_SSL     =  6
 export const TEX_YELLOW_TRI_TTC       =  7
+export const TEXTURE_TEAL_WATER       =  8
 
 // Moving Texture rotations
 export const ROTATE_CLOCKWISE         =  0

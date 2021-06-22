@@ -1,6 +1,7 @@
 import { GeoLayoutInstance as GeoLayout } from "../../../../engine/GeoLayout"
 import { CameraInstance as Camera } from "../../../../game/Camera"
 import { geo_skybox_main } from "../../../../game/LevelGeo"
+import { geo_movtex_draw_nocolor, geo_movtex_draw_water_regions } from "../../../../game/MovingTexture"
 import { ttm_seg7_dl_0700A120 } from "./1/model.inc"
 import { ttm_seg7_dl_0700A2E0 } from "./2/model.inc"
 
@@ -30,6 +31,12 @@ export const ttm_geo_000A70 = [
                 { command: GeoLayout.open_node },
                     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, ttm_seg7_dl_0700A120] },
                     { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, ttm_seg7_dl_0700A2E0] },
+                    { command: GeoLayout.node_generated, args: [0x3601, geo_movtex_draw_nocolor] },
+                    { command: GeoLayout.node_generated, args: [0x3602, geo_movtex_draw_nocolor] },
+                    { command: GeoLayout.node_generated, args: [0x3603, geo_movtex_draw_nocolor] },
+                    { command: GeoLayout.node_generated, args: [0x3604, geo_movtex_draw_nocolor] },
+                    { command: GeoLayout.node_generated, args: [0x3605, geo_movtex_draw_nocolor] },
+                    { command: GeoLayout.node_generated, args: [0x3601, geo_movtex_draw_water_regions] },
                     { command: GeoLayout.node_render_object_parent },
                 { command: GeoLayout.close_node },
             { command: GeoLayout.close_node },

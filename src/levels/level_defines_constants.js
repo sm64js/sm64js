@@ -17,4 +17,5 @@ export const LEVEL_CTF00 = 1001
 export const LEVEL_STARMAN = 1002
 export const LEVEL_CLOUDED = 999
 export const LEVEL_GJ = 1003
+export const LEVEL_RACEWAY = 1004
 export const LEVEL_DOLPHIN = 1006

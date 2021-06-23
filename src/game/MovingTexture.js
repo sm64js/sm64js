@@ -4,6 +4,7 @@ import { castle_grounds_movtex_water, castle_grounds_movtex_tris_waterfall, cast
 import { ccm_movtex_penguin_puddle_water } from "../levels/ccm/areas/1/movtext.inc"
 import { ttm_movtex_puddle, ttm_movtex_tris_begin_waterfall, ttm_movtex_tris_begin_puddle_waterfall, ttm_movtex_tris_end_waterfall, ttm_movtex_tris_end_puddle_waterfall, ttm_movtex_tris_puddle_waterfall, ttm_dl_waterfall, ttm_dl_bottom_waterfall, ttm_dl_puddle_waterfall } from "../levels/ttm/areas/1/movtext.inc"
 import { gj_movtex_water } from "../levels/gj/areas/1/movtext.inc"
+import { raceway_movtex_water } from "../levels/raceway/areas/1/movtext.inc"
 import { wf_movtex_water } from "../levels/wf/areas/1/movtext.inc"
 import { dolphin_movtex_water } from "../levels/dolphin/areas/1/movtext.inc"
 import { GeoLayoutInstance as GeoLayout } from "../engine/GeoLayout"
@@ -61,6 +62,7 @@ const MOVTEX_AREA_COTMC = (0x28 << 8)
 const MOVTEX_AREA_TTM = (0x36 << 8)
 const MOVTEX_AREA_GJ = (0x37 << 8)
 const MOVTEX_AREA_DOLPHIN = (0x38 << 8)
+const MOVTEX_AREA_RACEWAY = (0x39 << 8)
 
 // Quad collections
 const BBH_MOVTEX_MERRY_GO_ROUND_WATER_ENTRANCE = (0 | MOVTEX_AREA_BBH)
@@ -89,6 +91,7 @@ const CASTLE_COURTYARD_MOVTEX_STAR_STATUE_WATER = (1 | MOVTEX_AREA_CASTLE_COURTY
 const TTM_MOVTEX_PUDDLE = (1 | MOVTEX_AREA_TTM)
 const GJ_MOVTEX_WATER = (1 | MOVTEX_AREA_GJ)
 const DOLPHIN_MOVTEX_WATER = (1 | MOVTEX_AREA_DOLPHIN)
+const RACEWAY_MOVTEX_WATER = (1 | MOVTEX_AREA_RACEWAY)
 
 // Non-colored, unique movtex meshes (drawn in level geo)
 const MOVTEX_PYRAMID_SAND_PATHWAY_FRONT = (1 | MOVTEX_AREA_SSL)
@@ -141,6 +144,8 @@ const get_quad_collection_from_id = (id) => {
             return gj_movtex_water
         case DOLPHIN_MOVTEX_WATER:
             return dolphin_movtex_water
+        case RACEWAY_MOVTEX_WATER:
+            return raceway_movtex_water
         default: throw "unknown case - get quad collection from id"
     }
 }

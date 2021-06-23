@@ -53,7 +53,7 @@ export const levelIdToName = {
     9: "Bob-omb Battlefield",
     10: "Snowman's Land",
     16: "Castle Grounds",
-    24: "Whomps Fortress",
+    24: "Whomp's Fortress",
     26: "Castle Courtyard",
     27: "Princess's Secret Slide",
     36: "Tall, Tall Mountain",
@@ -64,6 +64,7 @@ export const levelIdToName = {
     1001: "CTF/Race Map",
     1002: "Starman Fortress",
     1003: "Glider Jungle",
+    1004: "Mushroom Raceway",
     1006: "Dolphin Town",
 }
 

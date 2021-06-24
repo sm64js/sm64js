@@ -18,6 +18,8 @@ import { thi_movtex_area2_water } from "../levels/thi/areas/2/movtext.inc"
 import { inside_castle_movtex_green_room_water, inside_castle_movtex_moat_water } from "../levels/castle_inside/areas/3/movtext.inc"
 import { ddd_movtex_area1_water } from "../levels/ddd/areas/1/movtext.inc"
 import { ddd_movtex_area2_water } from "../levels/ddd/areas/2/movtext.inc"
+import { wdw_movtex_area1_water } from "../levels/wdw/areas/1/movtext.inc"
+import { wdw_movtex_area2_water } from "../levels/wdw/areas/2/movtext.inc"
 //import { cotmc_dl_water_begin, cotmc_dl_water_end, cotmc_movtex_tris_water, cotmc_dl_water } from "../levels/cotmc/movtext.inc"
 
 import { GeoLayoutInstance as GeoLayout, LAYER_TRANSPARENT_INTER, LAYER_OPAQUE } from "../engine/GeoLayout"
@@ -203,6 +205,10 @@ const get_quad_collection_from_id = (id) => {
             return ddd_movtex_area2_water
         case JRB_MOVTEX_WATER:
             return jrb_movtex_water
+        case WDW_MOVTEX_AREA1_WATER:
+            return wdw_movtex_area1_water
+        case WDW_MOVTEX_AREA2_WATER:
+            return wdw_movtex_area2_water
         default: throw "unknown case - get quad collection from id:" + id
 
     }

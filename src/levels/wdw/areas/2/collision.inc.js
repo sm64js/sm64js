@@ -1331,9 +1331,9 @@ export const wdw_seg7_area_2_collision = [
     COL_SPECIAL_INIT(2),
     SPECIAL_OBJECT(/*preset*/ special_bubble_tree, /*pos*/ 1664, -2457,  -946),
     SPECIAL_OBJECT(/*preset*/ special_bubble_tree, /*pos*/ 1664, -2457, -1637),
-    COL_WATER_BOX_INIT(1),
-    COL_WATER_BOX(0, -3839, -3839, 4608, 4608, -127),
+    //COL_WATER_BOX_INIT(1),
+    //COL_WATER_BOX(0, -3839, -3839, 4608, 4608, -127),
     COL_END(),
 ].flat();
 
-// 1620705666 - 2021-05-13 00:28:59 -0400
+// 2021-06-15 11:42:13 -0400 (Convert.rb 2021-06-14 09:43:28 -0400)

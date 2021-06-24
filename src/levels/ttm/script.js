@@ -112,13 +112,15 @@ import { ttm_geo_000710 } from "./star_cage/geo.inc"
 import { ttm_geo_000D4C } from "./yellow_smiley/geo.inc"
 import { ttm_geo_000D84 } from "./star_smiley/geo.inc"
 
+import { ALL_ACTS, ACT_1, ACT_2 } from "../../include/model_ids"
+
 const script_func_local_1 = [
     OBJECT(/*model*/ MODEL_TTM_ROLLING_LOG,     /*pos*/  4360,  -1722,   4001,  /*angle*/ 0,   48,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvTtmRollingLog'),
     RETURN(),
 ];
 
 const script_func_local_2 = [
-    //OBJECT(/*model*/ MODEL_NONE,                /*pos*/ -1639,   1146,  -1742,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvTtmBowlingBallSpawner'),
+    //OBJECT(/*model*/ MODEL_NONE,                /*pos*/ -1639,   1146,  -1742,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvTtmBowlingBallSpawner'), Causes issues
     OBJECT(/*model*/ MODEL_NONE,                /*pos*/  3295,  -3692,   2928,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvWaterfallSoundLoop'),
     OBJECT(/*model*/ MODEL_NONE,                /*pos*/  2004,  -1580,   1283,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvWaterfallSoundLoop'),
     OBJECT(/*model*/ MODEL_DL_MONTY_MOLE_HOLE,  /*pos*/ -2077,  -1023,  -1969,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvMontyMoleHole'),
@@ -133,18 +135,18 @@ const script_func_local_2 = [
     OBJECT(/*model*/ MODEL_MONTY_MOLE,          /*pos*/     0,      0,      0,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvMontyMole'),
     OBJECT(/*model*/ MODEL_MONTY_MOLE,          /*pos*/     0,      0,      0,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvMontyMole'),
     OBJECT(/*model*/ MODEL_NONE,                /*pos*/  3625,    560,    165,  /*angle*/ 0,  330,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvCloud'),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_UKIKI,               /*pos*/   729,   2307,    335,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvUkiki',        /*acts ACT_2*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_UKIKI,               /*pos*/  1992,  -1548,   2944,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvUkiki',        /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_UKIKI,               /*pos*/   729,   2307,    335,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvUkiki',        /*acts*/ ACT_2),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_UKIKI,               /*pos*/  1992,  -1548,   2944,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvUkiki',        /*acts*/ ALL_ACTS),
     RETURN(),
 ];
 
 const script_func_local_3 = [
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/  1200,   2600,    150,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStar',               /*acts ACT_1*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_TTM_STAR_CAGE,   /*pos*/  2496,   1670,   1492,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x01000000,  /*beh*/ 'bhvUkikiCage',          /*acts ACT_2*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,            /*pos*/ -3250,  -2500,  -3700,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x02000000,  /*beh*/ 'bhvHiddenRedCoinStar',  /*acts ALL_ACTS*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/ -2900,  -2700,   3650,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x03000000,  /*beh*/ 'bhvStar',               /*acts ALL_ACTS*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/  1800,   1200,   1050,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x04000000,  /*beh*/ 'bhvStar',               /*acts ALL_ACTS*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/  7300,  -3100,   1300,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x05000000,  /*beh*/ 'bhvStar',               /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/  1200,   2600,    150,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStar',               /*acts*/ ACT_1),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_TTM_STAR_CAGE,   /*pos*/  2496,   1670,   1492,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x01000000,  /*beh*/ 'bhvUkikiCage',          /*acts*/ ACT_2),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,            /*pos*/ -3250,  -2500,  -3700,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x02000000,  /*beh*/ 'bhvHiddenRedCoinStar',  /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/ -2900,  -2700,   3650,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x03000000,  /*beh*/ 'bhvStar',               /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/  1800,   1200,   1050,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x04000000,  /*beh*/ 'bhvStar',               /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,            /*pos*/  7300,  -3100,   1300,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x05000000,  /*beh*/ 'bhvStar',               /*acts*/ ALL_ACTS),
     RETURN(),
 ];
 

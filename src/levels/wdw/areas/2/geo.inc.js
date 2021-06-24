@@ -45,7 +45,7 @@ export const wdw_geo_000724 = () => {return [
                 GEO_OPEN_NODE(),
                     GEO_DISPLAY_LIST(LAYER_OPAQUE, wdw_seg7_dl_07011E48),
                     GEO_DISPLAY_LIST(LAYER_ALPHA, wdw_seg7_dl_07012258),
-                    GEO_DISPLAY_LIST(LAYER_TRANSPARENT_DECAL, wdw_seg7_dl_07012908),
+                    //GEO_DISPLAY_LIST(LAYER_TRANSPARENT_DECAL, wdw_seg7_dl_07012908),
                     GEO_ASM(0, geo_movtex_pause_control),
                     GEO_ASM(0x1102, geo_movtex_draw_water_regions),
                     GEO_RENDER_OBJ(),
@@ -57,4 +57,4 @@ export const wdw_geo_000724 = () => {return [
     GEO_END(),
 ]};
 
-// 1620705666 - 2021-05-13 00:28:59 -0400
+// 2021-06-15 11:42:13 -0400 (Convert.rb 2021-06-14 09:43:28 -0400)

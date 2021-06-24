@@ -69,7 +69,7 @@ import { ssl_geo_000630 } from "./tox_box/geo.inc"
 
 import { ssl_geo_000764 } from "./spindel/geo.inc"
 
-
+import { ALL_ACTS, ACT_1, ACT_2, ACT_3, ACT_4, ACT_5, ACT_6 } from "../../include/model_ids"
 
 const script_func_local_1 = [
     OBJECT(/*model*/ MODEL_SSL_PYRAMID_TOP,  /*pos*/ -2047,  1536,  -1023,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvPyramidTop'),
@@ -81,16 +81,16 @@ const script_func_local_2 = [
     OBJECT(/*model*/ MODEL_SSL_TOX_BOX,      /*pos*/  1283,     0,  -4865,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvToxBox'),
     OBJECT(/*model*/ MODEL_SSL_TOX_BOX,      /*pos*/  4873,     0,  -3335,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00020000,  /*beh*/ 'bhvToxBox'),
     OBJECT(/*model*/ MODEL_TWEESTER,         /*pos*/ -3600,  -200,   2940,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00120000,  /*beh*/ 'bhvTweester'),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_TWEESTER,         /*pos*/  1017,  -200,   3832,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00190000,  /*beh*/ 'bhvTweester',  /*acts ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_TWEESTER,         /*pos*/  3066,  -200,    400,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00190000,  /*beh*/ 'bhvTweester',  /*acts ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_KLEPTO,           /*pos*/  2200,  1174,  -2820,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvKlepto',    /*acts ACT_1*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_KLEPTO,           /*pos*/ -5963,   573,  -4784,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvKlepto',    /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_TWEESTER,         /*pos*/  1017,  -200,   3832,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00190000,  /*beh*/ 'bhvTweester',  /*acts*/ ACT_4 | ACT_5 | ACT_6),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_TWEESTER,         /*pos*/  3066,  -200,    400,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00190000,  /*beh*/ 'bhvTweester',  /*acts*/ ACT_4 | ACT_5 | ACT_6),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_KLEPTO,           /*pos*/  2200,  1174,  -2820,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvKlepto',    /*acts*/ ACT_1),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_KLEPTO,           /*pos*/ -5963,   573,  -4784,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvKlepto',    /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
     RETURN(),
 ];
 
 const script_func_local_3 = [
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/ -2050,  1200,  -580,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x01000000,  /*beh*/ 'bhvStar',                  /*acts ALL_ACTS*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,  /*pos*/  6000,   800,  3500,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x04000000,  /*beh*/ 'bhvHiddenRedCoinStar',  /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/ -2050,  1200,  -580,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x01000000,  /*beh*/ 'bhvStar',                  /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,  /*pos*/  6000,   800,  3500,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x04000000,  /*beh*/ 'bhvHiddenRedCoinStar',  /*acts*/ ALL_ACTS),
     RETURN(),
 ];
 
@@ -113,8 +113,8 @@ const script_func_local_4 = [
 ];
 
 const script_func_local_5 = [
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/ 500,  5050,  -500,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x02000000,  /*beh*/ 'bhvStar',         /*acts ALL_ACTS*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,  /*pos*/ 900,  1400,  2350,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x05040000,  /*beh*/ 'bhvHiddenStar',  /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/ 500,  5050,  -500,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x02000000,  /*beh*/ 'bhvStar',         /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,  /*pos*/ 900,  1400,  2350,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x05040000,  /*beh*/ 'bhvHiddenStar',  /*acts*/ ALL_ACTS),
     RETURN(),
 ];
 

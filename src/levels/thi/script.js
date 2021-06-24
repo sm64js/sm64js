@@ -55,28 +55,26 @@ import { thi_seg7_area_3_macro_objs } from "./areas/3/macro.inc"
 import { bubbly_tree_geo } from "../../actors/tree/geo.inc"
 import { warp_pipe_geo } from "../../actors/warp_pipe/geo.inc"
 
-
-
-
+import { ALL_ACTS, ACT_3 } from "../../include/model_ids"
 
 const script_func_local_1 = [
     RETURN(),
 ];
 
 const script_func_local_2 = [
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,     /*pos*/     0,  -700,  -4500,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x03000000,  /*beh*/ 'bhvHiddenStar',           /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,     /*pos*/     0,  -700,  -4500,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x03000000,  /*beh*/ 'bhvHiddenStar',           /*acts*/ ALL_ACTS),
     RETURN(),
 ];
 
 const script_func_local_3 = [
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,              /*pos*/ -1800,    800,  -1500,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x04000000,  /*beh*/ 'bhvHiddenRedCoinStar',  /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,              /*pos*/ -1800,    800,  -1500,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x04000000,  /*beh*/ 'bhvHiddenRedCoinStar',  /*acts*/ ALL_ACTS),
     OBJECT(/*model*/ MODEL_WIGGLER_HEAD,      /*pos*/    17,   1843,    -62,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x05000000,  /*beh*/ 'bhvWigglerHead'),
     RETURN(),
 ];
 
 const script_func_local_4 = [
-    OBJECT_WITH_ACTS(/*model*/ MODEL_KOOPA_WITH_SHELL,  /*pos*/ -1900,   -511,   2400,  /*angle*/ 0,  -30,  0,  /*behParam*/ 0x02030000,  /*beh*/ 'bhvKoopa',              /*acts ACT_3*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,              /*pos*/  7400,  -1537,  -6300,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvKoopaRaceEndpoint',  /*acts ACT_3*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_KOOPA_WITH_SHELL,  /*pos*/ -1900,   -511,   2400,  /*angle*/ 0,  -30,  0,  /*behParam*/ 0x02030000,  /*beh*/ 'bhvKoopa',              /*acts*/ ACT_3),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,              /*pos*/  7400,  -1537,  -6300,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvKoopaRaceEndpoint',  /*acts*/ ACT_3),
     //OBJECT(/*model*/ MODEL_NONE,              /*pos*/ -6556,  -2969,   6565,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvGoombaTripletSpawner'),
     //OBJECT(/*model*/ MODEL_GOOMBA,            /*pos*/  6517,  -2559,   4327,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvGoomba'),
     OBJECT(/*model*/ MODEL_PIRANHA_PLANT,     /*pos*/ -6336,  -2047,  -3861,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvFirePiranhaPlant'),

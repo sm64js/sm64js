@@ -41,10 +41,12 @@ import { sl_seg7_area_2_collision } from "./areas/2/collision.inc"
 
 import { sl_seg7_area_2_macro_objs } from "./areas/2/macro.inc"
 
+import { ALL_ACTS } from "../../include/model_ids"
+
 const script_func_local_1 = [
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/  700,  4500,   690,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStar',                  /*acts ALL_ACTS*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/ 4350,  1350,  4350,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x02000000,  /*beh*/ 'bhvStar',                  /*acts ALL_ACTS*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,  /*pos*/ 5000,  1200,     0,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x04000000,  /*beh*/ 'bhvHiddenRedCoinStar',  /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/  700,  4500,   690,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStar',                  /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/ 4350,  1350,  4350,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x02000000,  /*beh*/ 'bhvStar',                  /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,  /*pos*/ 5000,  1200,     0,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x04000000,  /*beh*/ 'bhvHiddenRedCoinStar',  /*acts*/ ALL_ACTS),
     RETURN(),
 ];
 
@@ -63,7 +65,7 @@ const script_func_local_3 = [
 ];
 
 const script_func_local_4 = [
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/ 0,  500,  1000,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x05000000,  /*beh*/ 'bhvStar',  /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/ 0,  500,  1000,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x05000000,  /*beh*/ 'bhvStar',  /*acts*/ ALL_ACTS),
     RETURN(),
 ];
 

@@ -10,7 +10,6 @@ import {
     G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADE
 } from "../../../include/gbi"
 import { grass_09006800 } from "../../../textures/grass"
-
 import { wdw_seg7_texture_07000800 } from "../texture.inc"
 
 const wdw_seg7_lights_07013500 = gdSPDefLights1(
@@ -176,4 +175,4 @@ export const wdw_seg7_dl_07013B70 = [
     gsSPEndDisplayList(),
 ].flat();
 
-// 1620705666 - 2021-05-13 00:28:59 -0400
+// 2021-06-15 11:42:13 -0400 (Convert.rb 2021-06-14 09:43:28 -0400)

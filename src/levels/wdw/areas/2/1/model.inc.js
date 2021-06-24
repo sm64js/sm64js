@@ -10,14 +10,11 @@ import {
     G_TEXTURE_IMAGE_FRAC, G_TX_CLAMP, G_OFF, G_CC_SHADE
 } from "../../../../../include/gbi"
 import {
-    grass_09000800, grass_09001000, grass_09002000, grass_09003800, grass_09004000,
-    grass_09005800, grass_09007000, grass_09007800, grass_09008000, grass_09008800,
-    grass_09009000, grass_09009800
+    grass_09007000, grass_09001000, grass_09009000, grass_09000800, grass_09008800,
+    grass_09004000, grass_09007800, grass_09002000, grass_09008000, grass_09009800,
+    grass_09005800, grass_09003800
 } from "../../../../../textures/grass"
-
-import {
-    wdw_seg7_texture_07000000, wdw_seg7_texture_07000800, wdw_seg7_texture_07002000
-} from "../../../texture.inc"
+import { wdw_seg7_texture_07000000, wdw_seg7_texture_07000800, wdw_seg7_texture_07002000 } from "../../../texture.inc"
 
 const wdw_seg7_lights_0700A1B0 = gdSPDefLights1(
     0x99, 0x99, 0x82,
@@ -2690,4 +2687,4 @@ export const wdw_seg7_dl_07011E48 = [
     gsSPEndDisplayList(),
 ].flat();
 
-// 1620705666 - 2021-05-13 00:28:59 -0400
+// 2021-06-15 11:42:13 -0400 (Convert.rb 2021-06-14 09:43:28 -0400)

@@ -2,12 +2,12 @@
 import * as Gbi from "../../../../../include/gbi"
 
 import { snow_09007000 } from "../../../../../textures/snow"
-const ccs_seg7_lights_0701E720 = Gbi.gdSPDefLights1(
+const ccm_seg7_lights_0701E720 = Gbi.gdSPDefLights1(
 	    0x7f, 0x7f, 0x7f,
 	    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
 )
 
-const ccs_seg7_vertex_0701E738 = [
+const ccm_seg7_vertex_0701E738 = [
 	{ pos: [ 6253, -2378, 1700 ], flag: 0, tc: [ 0, 990 ], color: [ 130, 0, 0, 255 ] },
 	{ pos: [ 6253, -2992, 1700 ], flag: 0, tc: [ 0, -30 ], color: [ 130, 0, 0, 255 ] },
 	{ pos: [ 6256, -2764, 5258 ], flag: 0, tc: [ 8144, 990 ], color: [ 130, 0, 246, 255 ] },
@@ -25,7 +25,7 @@ const ccs_seg7_vertex_0701E738 = [
 	{ pos: [ 6255, -1134, -469 ], flag: 0, tc: [ 0, 990 ], color: [ 130, 0, 0, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701E828 = [
+const ccm_seg7_vertex_0701E828 = [
 	{ pos: [ -4610, 2304, -3799 ], flag: 0, tc: [ 2012, 990 ], color: [ 115, 0, 53, 255 ] },
 	{ pos: [ -4829, 2150, -2983 ], flag: 0, tc: [ 0, 990 ], color: [ 126, 0, 245, 255 ] },
 	{ pos: [ -4829, 1536, -2983 ], flag: 0, tc: [ 0, 0 ], color: [ 126, 0, 11, 255 ] },
@@ -43,7 +43,7 @@ const ccs_seg7_vertex_0701E828 = [
 	{ pos: [ -4610, 1690, -3799 ], flag: 0, tc: [ 2012, 0 ], color: [ 103, 0, 73, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701E918 = [
+const ccm_seg7_vertex_0701E918 = [
 	{ pos: [ -4617, 1997, -2191 ], flag: 0, tc: [ 0, 990 ], color: [ 104, 0, 184, 255 ] },
 	{ pos: [ -4617, 1382, -2191 ], flag: 0, tc: [ 0, 0 ], color: [ 115, 0, 203, 255 ] },
 	{ pos: [ -4829, 2150, -2983 ], flag: 0, tc: [ 2012, 990 ], color: [ 126, 0, 245, 255 ] },
@@ -61,7 +61,7 @@ const ccs_seg7_vertex_0701E918 = [
 	{ pos: [ 2598, -255, -4354 ], flag: 0, tc: [ 0, 0 ], color: [ 131, 0, 236, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701EA08 = [
+const ccm_seg7_vertex_0701EA08 = [
 	{ pos: [ -254, 410, -1541 ], flag: 0, tc: [ 0, -34 ], color: [ 239, 0, 131, 255 ] },
 	{ pos: [ -3212, 1126, -1352 ], flag: 0, tc: [ 8144, -34 ], color: [ 22, 0, 131, 255 ] },
 	{ pos: [ -3212, 1741, -1352 ], flag: 0, tc: [ 8144, 990 ], color: [ 6, 0, 130, 255 ] },
@@ -79,7 +79,7 @@ const ccs_seg7_vertex_0701EA08 = [
 	{ pos: [ 2293, 563, -3038 ], flag: 0, tc: [ 4056, 990 ], color: [ 140, 0, 205, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701EAF8 = [
+const ccm_seg7_vertex_0701EAF8 = [
 	{ pos: [ 2625, -171, -5167 ], flag: 0, tc: [ 0, 0 ], color: [ 130, 0, 252, 255 ] },
 	{ pos: [ 2598, -255, -4354 ], flag: 0, tc: [ 2012, 0 ], color: [ 131, 0, 236, 255 ] },
 	{ pos: [ 2598, 358, -4354 ], flag: 0, tc: [ 2012, 990 ], color: [ 130, 0, 244, 255 ] },
@@ -97,7 +97,7 @@ const ccs_seg7_vertex_0701EAF8 = [
 	{ pos: [ 6253, -1738, -870 ], flag: 0, tc: [ 12212, 0 ], color: [ 130, 0, 0, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701EBE8 = [
+const ccm_seg7_vertex_0701EBE8 = [
 	{ pos: [ 6205, -197, -5368 ], flag: 0, tc: [ 1500, 990 ], color: [ 160, 0, 82, 255 ] },
 	{ pos: [ 6205, -811, -5368 ], flag: 0, tc: [ 1500, 0 ], color: [ 147, 0, 64, 255 ] },
 	{ pos: [ 6239, -206, -5279 ], flag: 0, tc: [ 2012, 990 ], color: [ 133, 0, 30, 255 ] },
@@ -114,7 +114,7 @@ const ccs_seg7_vertex_0701EBE8 = [
 	{ pos: [ 3503, -336, -5219 ], flag: 0, tc: [ 0, -28 ], color: [ 87, 0, 92, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701ECC8 = [
+const ccm_seg7_vertex_0701ECC8 = [
 	{ pos: [ 4059, 176, -5372 ], flag: 0, tc: [ 0, 990 ], color: [ 15, 0, 126, 255 ] },
 	{ pos: [ 4059, -437, -5372 ], flag: 0, tc: [ 0, 0 ], color: [ 10, 0, 126, 255 ] },
 	{ pos: [ 5957, -153, -5473 ], flag: 0, tc: [ 4056, 990 ], color: [ 252, 0, 126, 255 ] },
@@ -132,7 +132,7 @@ const ccs_seg7_vertex_0701ECC8 = [
 	{ pos: [ 3606, 263, -5277 ], flag: 0, tc: [ 356, 990 ], color: [ 55, 0, 114, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701EDB8 = [
+const ccm_seg7_vertex_0701EDB8 = [
 	{ pos: [ 3503, -336, -5219 ], flag: 0, tc: [ 336, -36 ], color: [ 87, 0, 92, 255 ] },
 	{ pos: [ 3503, 278, -5219 ], flag: 0, tc: [ 336, 990 ], color: [ 107, 0, 67, 255 ] },
 	{ pos: [ 3466, -327, -5105 ], flag: 0, tc: [ 0, -36 ], color: [ 120, 0, 39, 255 ] },
@@ -150,7 +150,7 @@ const ccs_seg7_vertex_0701EDB8 = [
 	{ pos: [ 4545, 4276, -2227 ], flag: 0, tc: [ 0, 990 ], color: [ 172, 0, 162, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701EEA8 = [
+const ccm_seg7_vertex_0701EEA8 = [
 	{ pos: [ 4545, 3662, -2227 ], flag: 0, tc: [ 4056, -34 ], color: [ 183, 0, 153, 255 ] },
 	{ pos: [ 4545, 4276, -2227 ], flag: 0, tc: [ 4056, 990 ], color: [ 172, 0, 162, 255 ] },
 	{ pos: [ 5839, 3746, -3683 ], flag: 0, tc: [ 0, -34 ], color: [ 150, 0, 187, 255 ] },
@@ -167,7 +167,7 @@ const ccs_seg7_vertex_0701EEA8 = [
 	{ pos: [ 5985, 4453, -5088 ], flag: 0, tc: [ 2012, 990 ], color: [ 152, 0, 71, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701EF88 = [
+const ccm_seg7_vertex_0701EF88 = [
 	{ pos: [ 6128, 3761, -4766 ], flag: 0, tc: [ 988, -48 ], color: [ 135, 0, 35, 255 ] },
 	{ pos: [ 5985, 4453, -5088 ], flag: 0, tc: [ 0, 990 ], color: [ 152, 0, 71, 255 ] },
 	{ pos: [ 5985, 3839, -5088 ], flag: 0, tc: [ 0, -48 ], color: [ 167, 0, 90, 255 ] },
@@ -184,7 +184,7 @@ const ccs_seg7_vertex_0701EF88 = [
 	{ pos: [ -979, -4709, 2171 ], flag: 0, tc: [ 2012, 0 ], color: [ 152, 0, 72, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701F068 = [
+const ccm_seg7_vertex_0701F068 = [
 	{ pos: [ -2206, -4914, 1064 ], flag: 0, tc: [ 0, 0 ], color: [ 193, 0, 110, 255 ] },
 	{ pos: [ -1440, -4812, 1506 ], flag: 0, tc: [ 2012, 0 ], color: [ 164, 0, 86, 255 ] },
 	{ pos: [ -1440, -4197, 1506 ], flag: 0, tc: [ 2012, 990 ], color: [ 178, 0, 99, 255 ] },
@@ -202,7 +202,7 @@ const ccs_seg7_vertex_0701F068 = [
 	{ pos: [ -158, -4709, 1919 ], flag: 0, tc: [ 2012, 0 ], color: [ 116, 0, 207, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701F158 = [
+const ccm_seg7_vertex_0701F158 = [
 	{ pos: [ -448, -3993, 3720 ], flag: 0, tc: [ 0, 990 ], color: [ 126, 0, 13, 255 ] },
 	{ pos: [ -448, -4607, 3720 ], flag: 0, tc: [ 0, -30 ], color: [ 124, 0, 27, 255 ] },
 	{ pos: [ -173, -4095, 2895 ], flag: 0, tc: [ 2012, 990 ], color: [ 123, 0, 27, 255 ] },
@@ -219,7 +219,7 @@ const ccs_seg7_vertex_0701F158 = [
 	{ pos: [ -448, -4505, 4370 ], flag: 0, tc: [ 2012, 0 ], color: [ 125, 0, 236, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701F238 = [
+const ccm_seg7_vertex_0701F238 = [
 	{ pos: [ 342, -3685, 5245 ], flag: 0, tc: [ 0, 990 ], color: [ 43, 0, 137, 255 ] },
 	{ pos: [ 342, -4300, 5245 ], flag: 0, tc: [ 0, 0 ], color: [ 58, 0, 144, 255 ] },
 	{ pos: [ -165, -3788, 4890 ], flag: 0, tc: [ 2012, 990 ], color: [ 87, 0, 165, 255 ] },
@@ -236,7 +236,7 @@ const ccs_seg7_vertex_0701F238 = [
 	{ pos: [ 4303, -3276, 6106 ], flag: 0, tc: [ 2012, 990 ], color: [ 18, 0, 131, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701F318 = [
+const ccm_seg7_vertex_0701F318 = [
 	{ pos: [ 5747, -3040, 6073 ], flag: 0, tc: [ 980, 990 ], color: [ 200, 0, 143, 255 ] },
 	{ pos: [ 5747, -3655, 6073 ], flag: 0, tc: [ 980, -28 ], color: [ 216, 0, 136, 255 ] },
 	{ pos: [ 5112, -3173, 6200 ], flag: 0, tc: [ 3044, 990 ], color: [ 245, 0, 130, 255 ] },
@@ -253,7 +253,7 @@ const ccs_seg7_vertex_0701F318 = [
 	{ pos: [ -1052, 2662, -1208 ], flag: 0, tc: [ 2012, -76 ], color: [ 115, 0, 203, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701F3F8 = [
+const ccm_seg7_vertex_0701F3F8 = [
 	{ pos: [ 6150, -3470, 5664 ], flag: 0, tc: [ 988, -44 ], color: [ 144, 0, 198, 255 ] },
 	{ pos: [ 6150, -2856, 5664 ], flag: 0, tc: [ 988, 990 ], color: [ 138, 0, 211, 255 ] },
 	{ pos: [ 6256, -3378, 5258 ], flag: 0, tc: [ 0, -44 ], color: [ 131, 0, 235, 255 ] },
@@ -271,7 +271,7 @@ const ccs_seg7_vertex_0701F3F8 = [
 	{ pos: [ -752, 2458, -2986 ], flag: 0, tc: [ 4056, 0 ], color: [ 126, 0, 7, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701F4E8 = [
+const ccm_seg7_vertex_0701F4E8 = [
 	{ pos: [ -797, 3379, -840 ], flag: 0, tc: [ 988, 990 ], color: [ 88, 0, 165, 255 ] },
 	{ pos: [ -1052, 2662, -1208 ], flag: 0, tc: [ 2012, -76 ], color: [ 115, 0, 203, 255 ] },
 	{ pos: [ -1052, 3277, -1208 ], flag: 0, tc: [ 2012, 990 ], color: [ 122, 0, 224, 255 ] },
@@ -288,7 +288,7 @@ const ccs_seg7_vertex_0701F4E8 = [
 	{ pos: [ -752, 3072, -2986 ], flag: 0, tc: [ 4056, 990 ], color: [ 126, 0, 251, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701F5C8 = [
+const ccm_seg7_vertex_0701F5C8 = [
 	{ pos: [ -1644, 2355, -3411 ], flag: 0, tc: [ 480, -28 ], color: [ 133, 0, 30, 255 ] },
 	{ pos: [ -1644, 2970, -3411 ], flag: 0, tc: [ 480, 990 ], color: [ 137, 0, 42, 255 ] },
 	{ pos: [ -1822, 2304, -3789 ], flag: 0, tc: [ 0, -28 ], color: [ 149, 0, 66, 255 ] },
@@ -307,7 +307,7 @@ const ccs_seg7_vertex_0701F5C8 = [
 	{ pos: [ -1822, 2918, -3789 ], flag: 0, tc: [ 0, 990 ], color: [ 157, 0, 78, 255 ] },
 ]
 
-const ccs_seg7_vertex_0701F6C8 = [
+const ccm_seg7_vertex_0701F6C8 = [
 	{ pos: [ -2412, 2150, -4379 ], flag: 0, tc: [ 0, 0 ], color: [ 183, 0, 103, 255 ] },
 	{ pos: [ -1822, 2304, -3789 ], flag: 0, tc: [ 2012, 0 ], color: [ 149, 0, 66, 255 ] },
 	{ pos: [ -1822, 2918, -3789 ], flag: 0, tc: [ 2012, 990 ], color: [ 157, 0, 78, 255 ] },
@@ -326,93 +326,93 @@ const ccs_seg7_vertex_0701F6C8 = [
 	{ pos: [ -4610, 2304, -3799 ], flag: 0, tc: [ 0, 990 ], color: [ 115, 0, 53, 255 ] },
 ]
 
-export const ccs_seg7_dl_0701F7C8 = [
+export const ccm_seg7_dl_0701F7C8 = [
 	Gbi.gsDPSetTextureImage(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, snow_09007000),
 	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 64 * 32 - 1),
-	Gbi.gsSPLight(ccs_seg7_lights_0701E720.l[0], 1),
-	Gbi.gsSPLight(ccs_seg7_lights_0701E720.a, 2),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701E738, 15, 0),
+	Gbi.gsSPLight(ccm_seg7_lights_0701E720.l[0], 1),
+	Gbi.gsSPLight(ccm_seg7_lights_0701E720.a, 2),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701E738, 15, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
 	...Gbi.gsSP2Triangles( 4,  6,  5, 0x0,  4,  7,  6, 0x0),
 	...Gbi.gsSP2Triangles( 7,  8,  6, 0x0,  7,  9,  8, 0x0),
 	...Gbi.gsSP2Triangles( 3,  5, 10, 0x0,  9, 11, 12, 0x0),
 	...Gbi.gsSP2Triangles( 9, 12,  8, 0x0, 11, 13, 12, 0x0),
 	Gbi.gsSP1Triangle(11, 14, 13, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701E828, 15, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701E828, 15, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
 	...Gbi.gsSP2Triangles( 6,  7,  8, 0x0,  7,  9,  8, 0x0),
 	...Gbi.gsSP2Triangles(10, 11, 12, 0x0, 11, 13, 12, 0x0),
 	Gbi.gsSP1Triangle(14,  0,  2, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701E918, 15, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701E918, 15, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
 	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  7,  4,  6, 0x0),
 	...Gbi.gsSP2Triangles( 8,  9, 10, 0x0,  9, 11, 10, 0x0),
 	Gbi.gsSP1Triangle(12, 13, 14, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701EA08, 15, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701EA08, 15, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  0,  2, 0x0),
 	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  5,  7,  6, 0x0),
 	...Gbi.gsSP2Triangles( 8,  9, 10, 0x0,  9, 11, 10, 0x0),
 	Gbi.gsSP1Triangle(12, 13, 14, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701EAF8, 15, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701EAF8, 15, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  0,  2, 0x0),
 	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  5,  7,  6, 0x0),
 	...Gbi.gsSP2Triangles( 8,  9, 10, 0x0, 11, 12, 13, 0x0),
 	Gbi.gsSP1Triangle(10, 14,  8, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701EBE8, 14, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701EBE8, 14, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
 	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  7,  4,  6, 0x0),
 	...Gbi.gsSP2Triangles( 8,  9, 10, 0x0, 11, 12, 13, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701ECC8, 15, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701ECC8, 15, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
 	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  7,  6,  5, 0x0),
 	...Gbi.gsSP2Triangles( 8,  9, 10, 0x0, 11, 10,  9, 0x0),
 	Gbi.gsSP1Triangle(12, 13, 14, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701EDB8, 15, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701EDB8, 15, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  2,  1, 0x0),
 	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  7,  6,  5, 0x0),
 	...Gbi.gsSP2Triangles( 8,  9, 10, 0x0, 11, 12, 13, 0x0),
 	Gbi.gsSP1Triangle(14, 10,  9, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701EEA8, 14, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701EEA8, 14, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
 	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  7,  8,  9, 0x0),
 	...Gbi.gsSP2Triangles(10, 11, 12, 0x0, 10, 13, 11, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701EF88, 14, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701EF88, 14, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
 	...Gbi.gsSP2Triangles( 4,  3,  5, 0x0,  4,  6,  3, 0x0),
 	...Gbi.gsSP2Triangles( 7,  8,  9, 0x0, 10, 11, 12, 0x0),
 	Gbi.gsSP1Triangle(11, 13, 12, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701F068, 15, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701F068, 15, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  0,  2, 0x0),
 	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  7,  8,  9, 0x0),
 	...Gbi.gsSP2Triangles( 5, 10,  6, 0x0, 11, 12, 13, 0x0),
 	Gbi.gsSP1Triangle(12, 14, 13, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701F158, 14, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701F158, 14, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
 	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  7,  8,  9, 0x0),
 	...Gbi.gsSP2Triangles(10, 11, 12, 0x0, 11, 13, 12, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701F238, 14, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701F238, 14, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
 	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  7,  4,  6, 0x0),
 	...Gbi.gsSP2Triangles( 8,  9, 10, 0x0, 11, 12, 13, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701F318, 14, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701F318, 14, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
 	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  5,  7,  6, 0x0),
 	...Gbi.gsSP2Triangles( 8,  9, 10, 0x0, 11, 12, 13, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701F3F8, 15, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701F3F8, 15, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  2,  1, 0x0),
 	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  4,  7,  5, 0x0),
 	...Gbi.gsSP2Triangles( 8,  9, 10, 0x0,  8, 11,  9, 0x0),
 	Gbi.gsSP1Triangle(12, 13, 14, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701F4E8, 14, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701F4E8, 14, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
 	...Gbi.gsSP2Triangles( 3,  6,  4, 0x0,  7,  8,  9, 0x0),
 	...Gbi.gsSP2Triangles( 7, 10,  8, 0x0, 11, 12, 13, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701F5C8, 16, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701F5C8, 16, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
 	...Gbi.gsSP2Triangles( 3,  6,  4, 0x0,  7,  8,  9, 0x0),
 	...Gbi.gsSP2Triangles( 8, 10,  9, 0x0, 11, 12, 13, 0x0),
 	...Gbi.gsSP2Triangles(14, 13, 12, 0x0, 15,  2,  1, 0x0),
-	Gbi.gsSPVertex(ccs_seg7_vertex_0701F6C8, 16, 0),
+	Gbi.gsSPVertex(ccm_seg7_vertex_0701F6C8, 16, 0),
 	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  3,  0,  2, 0x0),
 	...Gbi.gsSP2Triangles( 4,  5,  6, 0x0,  7,  6,  5, 0x0),
 	...Gbi.gsSP2Triangles( 8,  9, 10, 0x0, 11, 12, 13, 0x0),
@@ -420,13 +420,13 @@ export const ccs_seg7_dl_0701F7C8 = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
-export const ccs_seg7_dl_0701FC78 = [
+export const ccm_seg7_dl_0701FC78 = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGBA),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
 	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 16, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 6, Gbi.G_TX_NOLOD),
 	Gbi.gsDPSetTileSize(0, 0, 0, (64 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPDisplayList(ccs_seg7_dl_0701F7C8),
+	Gbi.gsSPDisplayList(ccm_seg7_dl_0701F7C8),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
 	Gbi.gsSPEndDisplayList(),

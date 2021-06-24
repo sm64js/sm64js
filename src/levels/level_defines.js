@@ -1,11 +1,10 @@
 import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
-import { LEVEL_STARMAN ,LEVEL_CASTLE_GROUNDS, LEVEL_CASTLE_COURTYARD, LEVEL_CLOUDED, LEVEL_BOB, LEVEL_CCM, LEVEL_WF, LEVEL_PSS, LEVEL_GJ, LEVEL_TTM, LEVEL_HMC, LEVEL_BBH, LEVEL_SSL, LEVEL_SL, LEVEL_CASTLE, LEVEL_CASTLE_2, LEVEL_MBF, LEVEL_CTF00, LEVEL_CCS, LEVEL_CCM_2, LEVEL_DOLPHIN } from "./level_defines_constants"
+import { LEVEL_STARMAN ,LEVEL_CASTLE_GROUNDS, LEVEL_CASTLE_COURTYARD, LEVEL_CLOUDED, LEVEL_BOB, LEVEL_CCM, LEVEL_WF, LEVEL_PSS, LEVEL_GJ, LEVEL_TTM, LEVEL_HMC, LEVEL_BBH, LEVEL_SSL, LEVEL_SL, LEVEL_CASTLE, LEVEL_CASTLE_2, LEVEL_MBF, LEVEL_CTF00, LEVEL_CCM_2, LEVEL_DOLPHIN, LEVEL_RACEWAY } from "./level_defines_constants"
 
 import { level_castle_grounds_entry } from "./castle_grounds/script"
 import { level_bob_entry } from "./bob/script"
 import { level_ccm_entry } from "./ccm/script"
 import { level_ccm_2_entry } from "./ccm/script_2"
-import { level_ccs_entry } from "./ccs/script"
 import { level_pss_entry } from "./pss/script"
 import { level_gj_entry } from "./gj/script"
 import { level_ttm_entry } from "./ttm/script"
@@ -22,6 +21,7 @@ import { level_sl_entry } from "./sl/script"
 import { level_castle_inside_entry } from "./castle_inside/script_1"
 import { level_castle_inside_2_entry } from "./castle_inside/script_2"
 import { level_dolphin_entry } from "./dolphin/script"
+import { level_raceway_entry } from "./raceway/script"
 
 export const level_defines_list = [
     {
@@ -47,10 +47,6 @@ export const level_defines_list = [
     {
         command: LevelCommands.jump_if,
         args: [LevelCommands.OP_EQ, LEVEL_CCM, level_ccm_entry]
-    },
-    {
-        command: LevelCommands.jump_if,
-        args: [LevelCommands.OP_EQ, LEVEL_CCS, level_ccs_entry]
     },
     {
         command: LevelCommands.jump_if,
@@ -107,5 +103,9 @@ export const level_defines_list = [
     {
         command: LevelCommands.jump_if,
         args: [LevelCommands.OP_EQ, LEVEL_DOLPHIN, level_dolphin_entry]
+    },
+    {
+        command: LevelCommands.jump_if,
+        args: [LevelCommands.OP_EQ, LEVEL_RACEWAY, level_raceway_entry]
     }
 ]

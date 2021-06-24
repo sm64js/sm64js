@@ -2,12 +2,14 @@ import { GEO_CONTEXT_RENDER } from "../engine/graph_node"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { castle_grounds_movtex_water, castle_grounds_movtex_tris_waterfall, castle_grounds_dl_waterfall } from "../levels/castle_grounds/areas/1/movtext.inc"
 import { ccm_movtex_penguin_puddle_water } from "../levels/ccm/areas/1/movtext.inc"
+import { ttm_movtex_puddle, ttm_movtex_tris_begin_waterfall, ttm_movtex_tris_begin_puddle_waterfall, ttm_movtex_tris_end_waterfall, ttm_movtex_tris_end_puddle_waterfall, ttm_movtex_tris_puddle_waterfall, ttm_dl_waterfall, ttm_dl_bottom_waterfall, ttm_dl_puddle_waterfall } from "../levels/ttm/areas/1/movtext.inc"
 import { gj_movtex_water } from "../levels/gj/areas/1/movtext.inc"
+import { raceway_movtex_water } from "../levels/raceway/areas/1/movtext.inc"
 import { wf_movtex_water } from "../levels/wf/areas/1/movtext.inc"
 import { dolphin_movtex_water } from "../levels/dolphin/areas/1/movtext.inc"
 import { GeoLayoutInstance as GeoLayout } from "../engine/GeoLayout"
 import * as Gbi from "../include/gbi"
-import { dl_waterbox_rgba16_begin, dl_waterbox_end, dl_draw_quad_verts_0123, texture_waterbox_water, texture_waterbox_lava } from "../common_gfx/segment2"
+import { dl_waterbox_rgba16_begin, dl_waterbox_end, dl_draw_quad_verts_0123, texture_waterbox_water, texture_waterbox_lava, texture_waterbox_tealwater } from "../common_gfx/segment2"
 import { ROTATE_CLOCKWISE, TEXTURE_MIST, TEXTURE_WATER } from "../include/moving_texture_macros"
 import { make_vertex } from "./GeoMisc"
 
@@ -60,6 +62,7 @@ const MOVTEX_AREA_COTMC = (0x28 << 8)
 const MOVTEX_AREA_TTM = (0x36 << 8)
 const MOVTEX_AREA_GJ = (0x37 << 8)
 const MOVTEX_AREA_DOLPHIN = (0x38 << 8)
+const MOVTEX_AREA_RACEWAY = (0x39 << 8)
 
 // Quad collections
 const BBH_MOVTEX_MERRY_GO_ROUND_WATER_ENTRANCE = (0 | MOVTEX_AREA_BBH)
@@ -88,6 +91,7 @@ const CASTLE_COURTYARD_MOVTEX_STAR_STATUE_WATER = (1 | MOVTEX_AREA_CASTLE_COURTY
 const TTM_MOVTEX_PUDDLE = (1 | MOVTEX_AREA_TTM)
 const GJ_MOVTEX_WATER = (1 | MOVTEX_AREA_GJ)
 const DOLPHIN_MOVTEX_WATER = (1 | MOVTEX_AREA_DOLPHIN)
+const RACEWAY_MOVTEX_WATER = (1 | MOVTEX_AREA_RACEWAY)
 
 // Non-colored, unique movtex meshes (drawn in level geo)
 const MOVTEX_PYRAMID_SAND_PATHWAY_FRONT = (1 | MOVTEX_AREA_SSL)
@@ -107,11 +111,16 @@ const MOVTEX_TTM_END_PUDDLE_WATERFALL = (4 | MOVTEX_AREA_TTM)
 const MOVTEX_TTM_PUDDLE_WATERFALL = (5 | MOVTEX_AREA_TTM)
 
 const gMovtexIdToTexture = [
-    texture_waterbox_water, null, null, null, texture_waterbox_lava
+    texture_waterbox_water, null, null, null, texture_waterbox_lava, null, null, null, texture_waterbox_tealwater
 ]
 
 const gMovtexNonColored = [
-    { geoId: MOVTEX_CASTLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 15, movtexVerts: castle_grounds_movtex_tris_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: castle_grounds_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER }
+    { geoId: MOVTEX_CASTLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 15, movtexVerts: castle_grounds_movtex_tris_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: castle_grounds_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER },
+    { geoId: MOVTEX_TTM_BEGIN_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 6, movtexVerts: ttm_movtex_tris_begin_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER }, //originally LAYER_TRANSPARENT
+    { geoId: MOVTEX_TTM_END_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 6, movtexVerts: ttm_movtex_tris_end_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER }, //originally LAYER_TRANSPARENT
+    { geoId: MOVTEX_TTM_BEGIN_PUDDLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 4, movtexVerts: ttm_movtex_tris_begin_puddle_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_bottom_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER },
+    { geoId: MOVTEX_TTM_END_PUDDLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 4, movtexVerts: ttm_movtex_tris_end_puddle_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_bottom_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER },
+    { geoId: MOVTEX_TTM_PUDDLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 8, movtexVerts: ttm_movtex_tris_puddle_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_puddle_waterfall, r: 0xff, g: 0xff, b: 0xff, a:0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER },
 ]
 
 let gMovtexVtxColor = MOVTEX_VTX_COLOR_DEFAULT
@@ -127,12 +136,16 @@ const get_quad_collection_from_id = (id) => {
             return castle_grounds_movtex_water
         case CCM_MOVTEX_PENGUIN_PUDDLE_WATER:
             return ccm_movtex_penguin_puddle_water
+        case TTM_MOVTEX_PUDDLE:
+            return ttm_movtex_puddle
         case WF_MOVTEX_WATER:
             return wf_movtex_water
         case GJ_MOVTEX_WATER:
             return gj_movtex_water
         case DOLPHIN_MOVTEX_WATER:
             return dolphin_movtex_water
+        case RACEWAY_MOVTEX_WATER:
+            return raceway_movtex_water
         default: throw "unknown case - get quad collection from id"
     }
 }

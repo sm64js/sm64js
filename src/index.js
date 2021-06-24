@@ -16,6 +16,7 @@ let n_frames = 0
 let target_time = 0
 let frameSpeed = 0.03
 let reset_delay = 0
+export const textureVersion = 36
 
 const produce_one_frame = () => {
 	let respText = ""
@@ -255,10 +256,15 @@ $("#rules-modal").on('hide.bs.modal', () => { localStorage['rules'] = rulesVersi
 const checkForRom = () => {   /// happens one time when the page is loaded
     if (localStorage['sm64jsAssets']) {
         const data = JSON.parse(localStorage['sm64jsAssets'])
-        if (data.textureVersion == textureVersion) loadDataIntoGame(data)
+        if (data.textureVersion == textureVersion) {
+            loadDataIntoGame(data)
+            return true
+        }
     }
 
-    if (url.searchParams.get("romExternal") && !loadedGameAssets) {
+    const url = new URL(window.location.href)
+    if (url.searchParams.get("romExternal")) {
+        const msgElement = document.getElementById('romMessage')
         msgElement.innerHTML = "Transfering ROM Data..."
         msgElement.style = "color:yellow"
         //TODO transfer ROM to client and extract
@@ -267,5 +273,5 @@ const checkForRom = () => {   /// happens one time when the page is loaded
     }
 
 
-    return loadedGameAssets
+    return false
 }

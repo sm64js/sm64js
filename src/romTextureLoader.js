@@ -2,6 +2,7 @@ import * as SkyboxCCM from "./textures/skyboxes/ccm_skybox"
 import * as SkyboxSSL from "./textures/skyboxes/ssl_skybox"
 import * as SkyboxWater from "./textures/skyboxes/water_skybox"
 import { assets } from "./assets"
+import { textureVersion } from "."
 
 
 import { intro_seg7_texture_070086A0, intro_seg7_texture_07007EA0, intro_seg7_texture_0700B4A0, intro_seg7_texture_0700C4A0 } from "./levels/intro/leveldata"
@@ -405,10 +406,9 @@ import {
 } from "./actors/sparkle/model.inc"
 
 
-const url = new URL(window.location.href)
 const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
-const textureVersion = 36
+
 
 export const loadDataIntoGame = (data) => {
 

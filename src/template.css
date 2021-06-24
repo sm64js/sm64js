@@ -32,6 +32,280 @@ a:hover {
       border-top: 3px solid #000000;
   }
 
+/* Mario Fonts */
+
+@font-face {
+    font-family: "SuperMario64Logo";
+    src: url("/mmo/assets/SuperMario256.ttf");
+}
+
+@font-face {
+    font-family: "TextboxFont";
+    src: url("/mmo/assets/mario-64-textbox-themh.ttf");
+}
+
+.mario-font{
+  font-family: "SuperMario64Logo";
+  letter-spacing: -2px;
+  text-transform: uppercase;
+  -webkit-text-stroke: 2px #e3aa63;
+  text-shadow: 0px 4px #b98a50, 2px 3px #b98a50, -3px 3px #b98a50, -3px -1px #b98a50;
+}
+
+/* Other font related stuff*/
+
+#skinCustomizerWindow{
+    font-size: 17px;
+}
+
+.popover-body{
+    font-family: TextboxFont;
+}
+
+#keyboardControlsWindow .row .form-inline .form-group .col-form-label{
+    color: black;
+}
+
+
+#keyboardControlsWindow .row .form-inline .form-group .form-control{
+    font-size: 21px;
+}
+
+.h6, h6 {
+    font-size: 150% !important;
+    background-color: black;
+    background-color: #00000057;
+}
+
+.btn{
+  font-size: 25px;
+}
+#romFile{
+  font-size: 20px;
+}
+
+
+/* Buttons */
+
+.creditsbutton:hover{
+    color: rgba(255, 255, 255, .5) !important;
+    cursor: pointer !important;
+}
+
+#googleSigninButton:hover{
+    cursor: pointer;
+}
+
+#discordSigninButton:hover{
+    cursor: pointer;
+}
+
+#startbutton{
+  background-image: url("/mmo/assets/btn-stone-edit.png");
+  background-size: 100% 100%;
+  border: none;
+  opacity: 1;
+  font-weight: 348;
+  color: white;
+}
+
+.btn-primary {
+    color: #fff;
+    background-image: url("/mmo/assets/btn-blue-edit.png");
+    background-size: 100% 100%;
+    border: none;
+}
+
+.btn-primary:disabled{
+  color: #00000094;
+  background-image: url("/mmo/assets/btn-stone-edit.png");
+  background-size: 100% 100%;
+  border: none;
+  opacity: 1;
+  text-shadow: none;
+}
+
+.btn-success {
+    color: #fff;
+    background-image: url("/mmo/assets/btn-green-edit.png");
+    background-size: 100% 100%;
+    border: none;
+}
+
+.btn-success:disabled{
+  color: #00000094;
+  background-image: url("/mmo/assets/btn-stone-edit.png");
+  background-size: 100% 100%;
+  border: none;
+  opacity: 1;
+  text-shadow: none;
+}
+
+.btn-warning {
+    color: #fff;
+    background-image: url("/mmo/assets/btn-pink-edit.png");
+    background-size: 100% 100%;
+    border: none;
+}
+
+.btn-warning:disabled{
+  color: #00000094;
+  background-image: url("/mmo/assets/btn-stone-edit.png");
+  background-size: 100% 100%;
+  border: none;
+  opacity: 1;
+  text-shadow: none;
+}
+
+.btn-danger {
+    color: #fff;
+    background-image: url("/mmo/assets/btn-red-edit.png");
+    background-size: 100% 100%;
+    border: none;
+}
+
+.btn-danger:disabled{
+  color: #00000094;
+  background-image: url("/mmo/assets/btn-stone-edit.png");
+  background-size: 100% 100%;
+  border: none;
+  opacity: 1;
+  text-shadow: none;
+}
+
+.btn{
+  border-radius: 1px;
+  line-height: 132%;
+  text-shadow: #00000052 2px 2px 1px;
+}
+
+#logoutButton{
+  background-image: url("/mmo/assets/btn-stone-edit.png");
+  background-size: 100% 100%;
+  border: none;
+  opacity: 1;
+  font-weight: 348;
+}
+
+.btn-secondary{
+  background-image: url("/mmo/assets/btn-stone-edit.png");
+  background-size: 100% 100%;
+  border: none;
+  opacity: 1;
+  font-weight: 348;
+}
+
+/* More stuff */
+
+.signboxBackground{
+  padding: 14px;
+  background-image: url("/mmo/assets/yellow-background-wide.png");
+  background-size: 100% 100%;
+  border: none;
+  opacity: 1;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.form-control-sm {
+    font-size: 20px;
+}
+
+#discordNameBox{
+    font-size: 19px;
+}
+
+/* game canvas and chat changes, probably not the best way to do this */
+.chatboxPos{
+margin-left: 564px;
+width: 409px;
+position: absolute;
+}
+
+.canvasContainerPos{
+overflow: visible;
+margin-left: -164px;
+}
+
+div.row ul#chatlog{
+    height: 420px; /* the funny number  */
+}
+
+#textCanvas{
+    margin-left: 16px;
+    padding-left: 26px;
+    padding-right: 26px;
+    padding-top: 26px;
+    padding-bottom: 26px;
+}
+
+#connectedMsg{
+    position: absolute;
+    margin-left: 36px;
+    margin-top: 26px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.form-group.mb-2{
+font-size: 24px;
+}
+
+.col-form-label{
+    color: white;
+    text-shadow: #00000052 2px 2px 1px;
+}
+
+#mapSelect{
+    margin-top: 4px;
+}
+
+#switchCustom{
+    border: 0px white;
+    color: white;
+}
+
+#switchCustom:active{
+    border: 0px white;
+    color: white;
+    background-color: transparent;
+}
+
+#switchCustom:hover{
+    background-color: transparent;
+    color: #3866dd;
+}
+
+#switchDiscord{
+    border: 0px white;
+    color: white;
+}
+
+#switchDiscord:active{
+    border: 0px white;
+    color: white;
+    background-color: transparent;
+}
+
+#switchDiscord:hover{
+    background-color: transparent;
+    color: #3866dd;
+}
+
+/* i tried changing the map select list font but no luck */
+
+.form-group.mb-2 select option p{
+    font-family: "TextboxFont";
+}
+
+
+/* this is to make the text less blurry, and postition it more centered, 
+just for the look not really necessary */
+body h1, h2, h3, h4, h5, h6, p, a{
+    -webkit-transform: translateZ(0);
+transform: translateZ(0);
+}
+
 /*
  * Base structure
  */
@@ -40,6 +314,9 @@ html,
 body {
     height: 100%;
     background-color: #000000;
+    background-image: url('/mmo/assets/sm64jstitle-final-darker.png');
+    background-size: 18%;
+    background-repeat: repeat;
 }
 
 body {
@@ -50,8 +327,9 @@ body {
     -webkit-box-pack: center;
     justify-content: center;
     color: #fff;
-    text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
-    box-shadow: inset 0 0 5rem rgba(0, 0, 0, .5);
+    font-family: "TextboxFont";
+    -webkit-font-smoothing: none;
+    letter-spacing: -0.2px;
 }
 
 .redtext {
@@ -158,10 +436,18 @@ body {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
 }
 
+#gameCanvas{
+    background-image: url('/mmo/assets/canvasBorder2.png');
+    background-size: 100%;
+    padding-left: 26px;
+    padding-right: 26px;
+    padding-top: 26px;
+    padding-bottom: 26px;
+}
+
 #chatlog {
-    border: 5px solid red;
-    background-color: lightblue;
-    background-color: #e58888;
+    border: 0px solid transparent;
+    background-color: #eae2a7;
     width: 640px;
     height: 200px;
     overflow: scroll;
@@ -169,18 +455,20 @@ body {
     color: black;
     padding-left: 10px;
     font-style: normal;
-    font-size: 14px;
+    font-size: 20px;
+    border-radius: 1px;
 }
 
 .chatbox {
     margin-top: 10px;
-    border: 5px solid blue;
-    background-color: lightblue;
+    border: 0px solid transparent;
+    background-color: #00000070;
     width: 640px;
     text-align: left;
     color: black;
     padding-left: 10px;
     font-style: normal;
+    border-radius: 1px;
 }
 
 .popover {
@@ -223,7 +511,7 @@ body {
     }
 
     .nav-masthead {
-        float: right;
+      font-size: 148%;
     }
 }
 

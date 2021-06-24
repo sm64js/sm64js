@@ -33,7 +33,6 @@ const Minimaps = {
 	'm36':{'img':defImage(401,401,'mmo/assets/minimaps/maps/ttm.png'),'playerScaler':1.9838,'hasFlags':true},
 	'm1001':{'img':defImage(401,401,'mmo/assets/minimaps/maps/ctf00.png'),'playerScaler':1.2,'hasFlags':true},
 	'm999':{'img':defImage(401,401,'mmo/assets/minimaps/maps/clouded.png'),'playerScaler':1.60176,'hasFlags':false},
-	'm56':{'img':defImage(401,401,'mmo/assets/minimaps/maps/ccs.png'),'playerScaler':1.8,'hasFlags':false},
 }
 // Example: Minimaps[`m${window.selectedMap}`].img would return '1000's table on bob mount and '9's table on bob battlefield
 const Player_Img = new Image(14, 14); Player_Img.src = 'mmo/assets/minimaps/player.png'

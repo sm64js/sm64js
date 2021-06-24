@@ -410,7 +410,7 @@ const msgElement = document.getElementById('romMessage')
 let loadedGameAssets = false
 const textureVersion = 36
 
-const loadDataIntoGame = (data) => {
+export const loadDataIntoGame = (data) => {
 
     intro_seg7_texture_070086A0.push(...data['levels/intro/1.rgba16.png'].data)
     intro_seg7_texture_07007EA0.push(...data['levels/intro/0.rgba16.png'].data)
@@ -1183,24 +1183,6 @@ const processExtractedResults = (data) => {
         localStorage['sm64jsAssets'] = stringified
     }
 
-}
-
-export const checkForRom = () => {   /// happens one time when the page is loaded
-    if (localStorage['sm64jsAssets']) {
-        const data = JSON.parse(localStorage['sm64jsAssets'])
-        if (data.textureVersion == textureVersion) loadDataIntoGame(data)
-    }
-
-    if (url.searchParams.get("romExternal") && !loadedGameAssets) {
-        msgElement.innerHTML = "Transfering ROM Data..."
-        msgElement.style = "color:yellow"
-        //TODO transfer ROM to client and extract
-        ///extractAssetsFromRom and url.searchParams.get("romExternal")
-        throw "temporarily unsupported"
-    }
-
-
-    return loadedGameAssets
 }
 
 

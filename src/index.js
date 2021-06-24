@@ -1,4 +1,4 @@
-﻿import { checkForRom } from "./romTextureLoader.js"
+﻿import { loadDataIntoGame } from "./romTextureLoader.js"
 import { GameInstance as Game } from "./game/Game"
 import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
@@ -251,3 +251,21 @@ window.addEventListener("keydown", (e) => {
 
 if (localStorage['rules'] != rulesVersion) $('#rules-modal').modal({ backdrop: 'static', keyboard: false })
 $("#rules-modal").on('hide.bs.modal', () => { localStorage['rules'] = rulesVersion })
+
+const checkForRom = () => {   /// happens one time when the page is loaded
+    if (localStorage['sm64jsAssets']) {
+        const data = JSON.parse(localStorage['sm64jsAssets'])
+        if (data.textureVersion == textureVersion) loadDataIntoGame(data)
+    }
+
+    if (url.searchParams.get("romExternal") && !loadedGameAssets) {
+        msgElement.innerHTML = "Transfering ROM Data..."
+        msgElement.style = "color:yellow"
+        //TODO transfer ROM to client and extract
+        ///extractAssetsFromRom and url.searchParams.get("romExternal")
+        throw "temporarily unsupported"
+    }
+
+
+    return loadedGameAssets
+}

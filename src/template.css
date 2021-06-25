@@ -233,10 +233,7 @@ div.row ul#chatlog{
 
 #textCanvas{
     margin-left: 16px;
-    padding-left: 26px;
-    padding-right: 26px;
-    padding-top: 26px;
-    padding-bottom: 26px;
+    padding: 26px;
 }
 
 #connectedMsg{
@@ -439,10 +436,7 @@ body {
 #gameCanvas{
     background-image: url('/mmo/assets/canvasBorder2.png');
     background-size: 100%;
-    padding-left: 26px;
-    padding-right: 26px;
-    padding-top: 26px;
-    padding-bottom: 26px;
+    padding: 26px;
 }
 
 #chatlog {

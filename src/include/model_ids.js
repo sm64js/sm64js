@@ -37,6 +37,7 @@ export const MODEL_CCM_SNOW_TREE                   = 0x19        // snow_tree_ge
 export const MODEL_SL_SNOW_TREE                    = 0x19        // snow_tree_geo
 export const MODEL_UNKNOWN_TREE_1A                 = 0x1A        // referenced in special presets, undefined
 export const MODEL_SSL_PALM_TREE                   = 0x1B        // palm_tree_geo
+export const MODEL_TROPIC_TREE                     = 0x45        //tropic_tree_geo
 export const MODEL_CASTLE_CASTLE_DOOR_UNUSED       = 0x1C        // castle_door_geo - unused, original id
 export const MODEL_CASTLE_WOODEN_DOOR_UNUSED       = 0x1D        // wooden_door_geo - unused, original id
 export const MODEL_BBH_HAUNTED_DOOR                = 0x1D        // haunted_door_geo

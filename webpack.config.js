@@ -66,7 +66,8 @@ module.exports = env => ({
         new CopyPlugin({
             patterns: [
                 { from: "./src/mmo/assets", to: "./mmo/assets" },
-                { from: "./src/mmo/html", to: "./mmo/html" }
+                { from: "./src/mmo/html", to: "./mmo/html" },
+                { from: "./src/credits.html", to: "./credits.html" }
             ],
         }),
     ],

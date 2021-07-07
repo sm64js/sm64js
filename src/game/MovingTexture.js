@@ -301,12 +301,19 @@ const movtex_gen_quads_id = (id, y, movetexQuadsSegmented) => {
     }
 }
 
+/**
+ * Geo script responsible for drawing quads with a moving texture at the height
+ * of the corresponding water region. The node's parameter determines which quad
+ * collection is drawn, see moving_texture.h.
+ */
 export const geo_movtex_draw_water_regions = (callContext, node) => {
     const gfx = []
 
     if (callContext == GEO_CONTEXT_RENDER) {
         gMovtexVtxColor = MOVTEX_VTX_COLOR_DEFAULT
-        if (ObjectListProc.gEnvironmentRegions == undefined) return gfx
+        if (!ObjectListProc.gEnvironmentRegions) {
+            return gfx
+        }
         const numWaterBoxes = ObjectListProc.gEnvironmentRegions[0]
 
         if (node.parameter == JRB_MOVTEX_INTIAL_MIST) {

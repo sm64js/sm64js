@@ -1,3 +1,4 @@
+import * as _Linker from "./Linker"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
@@ -82,6 +83,23 @@ const dim_shadow_with_distance = (solidity, distFromFloor) => {
     }
 }
 
+/**
+ * Return the water level below a shadow, or 0 if the water level is below
+ * -10,000.
+ */
+const get_water_level_below_shadow = (s) => {
+    let waterLevel = SurfaceCollision.find_water_level(s.parentX, s.parentZ)
+    if (waterLevel < FLOOR_LOWER_LIMIT_SHADOW) {
+        return 0
+    } else if (s.parentY >= waterLevel && s.floorHeight <= waterLevel) {
+        gShadowAboveWaterOrLava = true
+        return waterLevel
+    }
+    //! @bug Missing return statement. This compiles to return `waterLevel`
+    //! incidentally.
+    return waterLevel
+}
+
 const scale_shadow_with_distance = (initial, distFromFloor) => {
     if (distFromFloor <= 0.0) {
         return initial
@@ -100,8 +118,18 @@ const init_shadow = (s, xPos, yPos, zPos, shadowScale, overwriteSolidity) => {
     const floorGeometry = {}
     s.floorHeight = SurfaceCollision.find_floor_height_and_data(s.parentX, s.parentY, s.parentZ, floorGeometry)
 
+    if (gLinker.Area.gEnvironmentRegions) {
+        let waterLevel = get_water_level_below_shadow(s)
+    }
+
     if (gShadowAboveWaterOrLava) {
-        throw "shadow above water or lava not implemented"
+        s.floorHeight = waterLevel
+
+        // Assume that the water is flat.
+        s.floorNormalX = 0
+        s.floorNormalY = 1.0
+        s.floorNormalZ = 0
+        s.floorOriginOffset = -waterLevel
     } else {
         if (s.floorHeight < -10000.0 || floorGeometry.normalY <= 0.0) return 1
 
@@ -377,7 +405,7 @@ const get_shadow_height_solidity = (xPos, yPos, zPos, p) => {  // *shadowHeight,
         waterLevel = SurfaceCollision.find_water_level(xPos, zPos)
 
         if (yPos >= waterLevel && waterLevel >= p.shadowHeight) {
-            gShadowAboveWaterOrLava = 1
+            gShadowAboveWaterOrLava = true
             p.shadowHeight = waterLevel
             p.solidity = 200
         }

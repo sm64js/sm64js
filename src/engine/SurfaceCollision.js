@@ -1,19 +1,16 @@
-import { LEVEL_BOUNDARY_MAX, CELL_SIZE, SURFACE_FLAG_NO_CAM_COLLISION, SURFACE_CAMERA_BOUNDARY, SURFACE_FLAG_X_PROJECTION } from "../include/surface_terrains"
-import { SurfaceLoadInstance as SurfaceLoad } from "../game/SurfaceLoad"
-import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
-// import { SpawnObjectInstance as Spawn } from "../game/SpawnObject"
-
 import * as _Linker from "../game/Linker"
+import * as _SurfaceLoad from "../game/SurfaceLoad"
+
+import {
+    LEVEL_BOUNDARY_MAX, CELL_SIZE, SURFACE_FLAG_NO_CAM_COLLISION, SURFACE_CAMERA_BOUNDARY, SURFACE_FLAG_X_PROJECTION,
+    FLOOR_LOWER_LIMIT
+} from "../include/surface_terrains"
 
 class SurfaceCollision {
-    constructor() {
-        gLinker.SurfaceCollision = this
-    }
-
     find_water_level(x, z) {
-        let waterLevel = -11000.0
+        let waterLevel = FLOOR_LOWER_LIMIT
 
-        const p = ObjectListProcessor.gEnvironmentRegions /// array
+        const p = gLinker.ObjectListProcessor.gEnvironmentRegions /// array
 
         if (p && p[0]) {
             const numRegions = p[0]
@@ -237,7 +234,7 @@ class SurfaceCollision {
 
 
             // Determine if we are checking for the camera or not.
-            if (ObjectListProcessor.gCheckingSurfaceCollisionsForCamera != 0) {
+            if (gLinker.ObjectListProcessor.gCheckingSurfaceCollisionsForCamera != 0) {
                 if (surf.flags & SURFACE_FLAG_NO_CAM_COLLISION) continue 
             }
             // If we are not checking for the camera, ignore camera only floors.
@@ -289,7 +286,7 @@ class SurfaceCollision {
             if ((z3 - z) * (x1 - x3) - (x3 - x) * (z1 - z3) > 0) { continue }
 
             // Determine if we are checking for the camera or not.
-            if (ObjectListProcessor.gCheckingSurfaceCollisionsForCamera != 0) {
+            if (gLinker.ObjectListProcessor.gCheckingSurfaceCollisionsForCamera != 0) {
                 if (surf.flags & SURFACE_FLAG_NO_CAM_COLLISION) { continue }
             }
             // If we are not checking for the camera, ignore camera only floors.
@@ -346,7 +343,7 @@ class SurfaceCollision {
             if ((z3 - z) * (x1 - x3) - (x3 - x) * (z1 - z3) < 0) { continue }
 
             // Determine if we are checking for the camera or not.
-            if (ObjectListProcessor.gCheckingSurfaceCollisionsForCamera != 0) {
+            if (gLinker.ObjectListProcessor.gCheckingSurfaceCollisionsForCamera != 0) {
                 if (surf.flags & SURFACE_FLAG_NO_CAM_COLLISION) { continue }
             }
             // If we are not checking for the camera, ignore camera only floors.
@@ -380,3 +377,4 @@ class SurfaceCollision {
 }
 
 export const SurfaceCollisionInstance = new SurfaceCollision()
+gLinker.SurfaceCollision = SurfaceCollisionInstance

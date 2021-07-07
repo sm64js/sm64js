@@ -82,8 +82,23 @@ class Area {
         }
     }
 
+    clear_area_graph_nodes() {
+        if (this.gCurrentArea) {
+            geo_call_global_function_nodes(this.gCurrentArea.geometryLayoutData, GEO_CONTEXT_AREA_UNLOAD)
+            this.gCurrentArea = null
+            this.gWarpTransition.isActive = 0
+        }
+
+        this.gAreas.forEach((areaData) => {
+            if (areaData.geometryLayoutData) {
+                geo_call_global_function_nodes(areaData.geometryLayoutData, GEO_CONTEXT_AREA_INIT)
+                areaData.geometryLayoutData = null
+            }
+        })
+    }
+
     load_area(index) {
-        if (!this.gCurrentArea && this.gAreas[index]) {
+        if (!this.gCurrentArea && this.gAreas[index].geometryLayoutData) {
             this.gCurrentArea = this.gAreas[index]
             this.gCurAreaIndex = this.gCurrentArea.index
 
@@ -236,21 +251,6 @@ class Area {
         })
     }
 
-
-    clear_area_graph_nodes() {
-        if (this.gCurrentArea) {
-            geo_call_global_function_nodes(this.gCurrentArea.geometryLayoutData, GEO_CONTEXT_AREA_UNLOAD)
-            this.gCurrentArea = null
-            this.gWarpTransition.isActive = 0
-        }
-
-        this.gAreas.forEach((areaData, i) => {
-            if (areaData.geometryLayoutData) {
-                geo_call_global_function_nodes(areaData.geometryLayoutData, GEO_CONTEXT_AREA_INIT)
-                areaData.geometryLayoutData = null
-            }
-        })
-    }
 
     render_game() {
         if (this.gCurrentArea && !this.gWarpTransition.pauseRendering) {

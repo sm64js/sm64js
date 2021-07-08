@@ -1,3 +1,5 @@
+import * as _Linker from "../game/Linker"
+
 import * as Surfaces from "../include/surface_terrains"
 import { spawn_special_objects, spawn_macro_objects } from "./MacroSpecialObjects"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
@@ -42,7 +44,6 @@ class SurfaceLoad {
     }
 
     read_surface_data(vertexData, vertexIndices) {
-
         const offset1 = 3 * vertexIndices[0]
         const offset2 = 3 * vertexIndices[1]
         const offset3 = 3 * vertexIndices[2]
@@ -89,7 +90,6 @@ class SurfaceLoad {
             lowerY: minY - 5,
             upperY: maxY + 5
         }
-
     }
 
     lower_cell_index(coord) {
@@ -240,9 +240,8 @@ class SurfaceLoad {
     }
 
     load_environmental_regions(dataIndex) {
-
-        ObjectListProc.gEnvironmentRegionsIndex = dataIndex
-        ObjectListProc.gEnvironmentRegions = this.gTerrainData.slice(dataIndex)
+        gLinker.ObjectListProcessor.gEnvironmentRegionsIndex = dataIndex
+        gLinker.ObjectListProcessor.gEnvironmentRegions = this.gTerrainData.slice(dataIndex)
         const numRegions = this.gTerrainData[dataIndex++]
 
         for (let i = 0; i < numRegions; i++) {
@@ -253,31 +252,31 @@ class SurfaceLoad {
             loZ = this.gTerrainData[dataIndex++]
             hiZ = this.gTerrainData[dataIndex++]
 
-            let height = loX = this.gTerrainData[dataIndex++]
+            let height = this.gTerrainData[dataIndex++]
 
-            ObjectListProc.gEnvironmentLevels[i] = height
-
+            gLinker.ObjectListProcessor.gEnvironmentLevels[i] = height
         }
 
         return dataIndex
     }
 
     load_area_terrain(index, data, surfaceRooms, macroObjects) {
-
-        if (surfaceRooms) surfaceRooms = { index: 0, surfaceRooms }
+        if (surfaceRooms) {
+            surfaceRooms = {index: 0, surfaceRooms}
+        }
 
         this.gTerrainData = data  /// TODO refactor our function args to data, because we are storing it as a class variable
 
         let dataIndex = 0
         let vertexDataIndex = 0
 
+        gLinker.ObjectListProcessor.gEnvironmentRegions = null
         this.gSurfaceNodesAllocated = 0
         this.gSurfacesAllocated = 0
 
         this.clear_static_surfaces()
 
         while (dataIndex < data.length) {
-
             const terrainLoadType = data[dataIndex]
             dataIndex++
 
@@ -294,8 +293,12 @@ class SurfaceLoad {
             else if (terrainLoadType == Surfaces.TERRAIN_LOAD_ENVIRONMENT) {
                 dataIndex = this.load_environmental_regions(dataIndex)
             }
-            else if (terrainLoadType == Surfaces.TERRAIN_LOAD_CONTINUE) continue
-            else if (terrainLoadType == Surfaces.TERRAIN_LOAD_END) break
+            else if (terrainLoadType == Surfaces.TERRAIN_LOAD_CONTINUE) {
+                continue
+            }
+            else if (terrainLoadType == Surfaces.TERRAIN_LOAD_END) {
+                break
+            }
             else if (terrainLoadType >= 0x65) { //TERRAIN_LOAD_IS_SURFACE_TYPE_HIGH
                 dataIndex = this.load_static_surfaces(data, dataIndex, vertexDataIndex, terrainLoadType, surfaceRooms)
                 continue
@@ -316,7 +319,7 @@ class SurfaceLoad {
     }
 
     clear_dynamic_surfaces() {
-        if (!(ObjectListProc.gTimeStopState & ObjectListProc.TIME_STOP_ACTIVE)) {
+        if (!(gLinker.ObjectListProcessor.gTimeStopState & gLinker.ObjectListProcessor.TIME_STOP_ACTIVE)) {
             this.gSurfacesAllocated = this.gNumStaticSurfaces
             this.gSurfaceNodesAllocated = this.gNumStaticSurfaceNodes
 
@@ -325,18 +328,18 @@ class SurfaceLoad {
     }
 
     transform_object_vertices(collisionData, vertexData) {
-        const objectTransform = ObjectListProc.gCurrentObject.transform
+        const objectTransform = gLinker.ObjectListProcessor.gCurrentObject.transform
 
         let numVertices = collisionData.data[collisionData.dataIndex++]
 
-        if (ObjectListProc.gCurrentObject.gfx.throwMatrix == null) {
-            ObjectListProc.gCurrentObject.gfx.throwMatrix = objectTransform
-            obj_build_transform_from_pos_and_angle(ObjectListProc.gCurrentObject, O_POS_INDEX, O_FACE_ANGLE_INDEX)
+        if (gLinker.ObjectListProcessor.gCurrentObject.gfx.throwMatrix == null) {
+            gLinker.ObjectListProcessor.gCurrentObject.gfx.throwMatrix = objectTransform
+            obj_build_transform_from_pos_and_angle(gLinker.ObjectListProcessor.gCurrentObject, O_POS_INDEX, O_FACE_ANGLE_INDEX)
         }
 
         const m = new Array(4).fill(0).map(() => new Array(4).fill(0))
 
-        obj_apply_scale_to_matrix(ObjectListProc.gCurrentObject, m, objectTransform)
+        obj_apply_scale_to_matrix(gLinker.ObjectListProcessor.gCurrentObject, m, objectTransform)
 
         while (numVertices--) {
             let vx = collisionData.data[collisionData.dataIndex++]
@@ -347,11 +350,9 @@ class SurfaceLoad {
             vertexData.push(vx * m[0][1] + vy * m[1][1] + vz * m[2][1] + m[3][1])
             vertexData.push(vx * m[0][2] + vy * m[1][2] + vz * m[2][2] + m[3][2])
         }
-
     }
 
     load_object_surfaces(collisionData, vertexData) {
-
         const surfaceType = collisionData.data[collisionData.dataIndex++]
         const numSurfaces = collisionData.data[collisionData.dataIndex++]
 
@@ -367,7 +368,7 @@ class SurfaceLoad {
             const surface = this.read_surface_data(vertexData, vertexIndices)
 
             if (surface) {
-                surface.object = ObjectListProc.gCurrentObject
+                surface.object = gLinker.ObjectListProcessor.gCurrentObject
                 surface.type = surfaceType
 
                 if (hasForce) surface.force = collisionData.data[collisionData.dataIndex + 3]
@@ -392,7 +393,7 @@ class SurfaceLoad {
         // On an object's first frame, the distance is set to 19000.0f.
         // If the distance hasn't been updated, update it now.
         if (marioDist == 19000.0) {
-            marioDist = dist_between_objects(gCurrentObject, ObjectListProc.gMarioObject)
+            marioDist = dist_between_objects(gCurrentObject, gLinker.ObjectListProcessor.gMarioObject)
         }
 
         // If the object collision is supposed to be loaded more than the
@@ -401,7 +402,7 @@ class SurfaceLoad {
             gCurrentObject.rawData[oDrawingDistance] = tangibleDist
         }
 
-        if (!(ObjectListProc.gTimeStopState & ObjectListProc.TIME_STOP_ACTIVE) &&
+        if (!(gLinker.ObjectListProcessor.gTimeStopState & gLinker.ObjectListProcessor.TIME_STOP_ACTIVE) &&
             marioDist < tangibleDist &&
             !(gCurrentObject.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
 

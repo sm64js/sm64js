@@ -1,6 +1,5 @@
 import * as _Linker from "./Linker"
 
-import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { CameraInstance as Camera           } from "./Camera"
 import * as CAMERA from "./Camera"
 
@@ -1590,7 +1589,7 @@ export const act_lava_boost = (m) => {
     }
 
     if (m.health < 0x100) {
-        LevelUpdate.level_trigger_warp(m, WARP_OP_DEATH)
+        gLinker.LevelUpdate.level_trigger_warp(m, WARP_OP_DEATH)
     }
 
     m.marioBodyState.eyeState = MARIO_EYES_DEAD

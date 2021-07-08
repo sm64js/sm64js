@@ -1733,7 +1733,6 @@ const mario_update_hitbox_and_cap_model = (m) => {
 }
 
 const update_mario_health = (m) => {
-
     if (m.health >= 0x100) {
 
         // When already healing or hurting Mario, Mario's HP is not changed any more here.
@@ -1794,7 +1793,6 @@ const update_mario_button_inputs = (m, playerInput) => {
 }
 
 const update_mario_joystick_inputs = (m, playerInput) => {
-
     const mag = playerInput.stickMag
 
     m.intendedMag = mag / 2.0
@@ -1813,7 +1811,6 @@ const update_mario_joystick_inputs = (m, playerInput) => {
 }
 
 const update_mario_geometry_inputs = (m) => {
-
     m.floorHeight = SurfaceCollision.find_floor(m.pos[0], m.pos[1], m.pos[2], m)
 
     if (!m.floor) {

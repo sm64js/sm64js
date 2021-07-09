@@ -43,11 +43,7 @@ import { ddd_seg7_area_2_collision } from "./areas/2/collision.inc"
 
 import { ddd_seg7_area_2_macro_objs } from "./areas/2/macro.inc"
 
-
-
-
-
-
+import { ALL_ACTS, ACT_2, ACT_3, ACT_4, ACT_5, ACT_6 } from "../../include/model_ids"
 
 const script_func_local_1 = [
     OBJECT(/*model*/ MODEL_SUSHI,         /*pos*/ -3071,   -270,    0,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvSushiShark'),
@@ -61,8 +57,8 @@ const script_func_local_1 = [
 ];
 
 const script_func_local_2 = [
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,       /*pos*/ -2400,  -4607,  125,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x01000000,  /*beh*/ 'bhvTreasureChests',  /*acts ALL_ACTS*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_MANTA_RAY,  /*pos*/ -4640,  -1380,   40,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x04000000,  /*beh*/ 'bhvMantaRay',        /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,       /*pos*/ -2400,  -4607,  125,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x01000000,  /*beh*/ 'bhvTreasureChests',  /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_MANTA_RAY,  /*pos*/ -4640,  -1380,   40,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x04000000,  /*beh*/ 'bhvMantaRay',        /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
     RETURN(),
 ];
 
@@ -87,10 +83,10 @@ const script_func_local_4 = [
 ];
 
 const script_func_local_5 = [
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/ 3900,    850,   -600,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStar',                     /*acts ALL_ACTS*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,  /*pos*/ 5513,   1200,    900,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x02000000,  /*beh*/ 'bhvHiddenRedCoinStar',     /*acts ALL_ACTS*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,  /*pos*/ 3404,  -3319,   -489,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x03000000,  /*beh*/ 'bhvJetStreamRingSpawner',  /*acts ALL_ACTS*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/ 2030,  -3700,  -2780,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x05000000,  /*beh*/ 'bhvStar',                     /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/ 3900,    850,   -600,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvStar',                     /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,  /*pos*/ 5513,   1200,    900,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x02000000,  /*beh*/ 'bhvHiddenRedCoinStar',     /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,  /*pos*/ 3404,  -3319,   -489,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x03000000,  /*beh*/ 'bhvJetStreamRingSpawner',  /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/ 2030,  -3700,  -2780,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x05000000,  /*beh*/ 'bhvStar',                     /*acts*/ ALL_ACTS),
     RETURN(),
 ];
 

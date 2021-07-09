@@ -56,6 +56,8 @@ import { haunted_door_geo } from "../../actors/door/geo.inc"
 
 import { bbh_seg7_rooms } from "./areas/1/room.inc"
 
+import { ACT_1, ACT_2, ACT_3, ACT_4, ACT_5, ACT_6, ALL_ACTS } from "../../include/model_ids"
+
 const script_func_local_1 = [
     OBJECT(/*model*/ MODEL_RED_FLAME,                   /*pos*/  2089,   1331,  -1125,  /*angle*/ 0,  270,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvFlame'),
     OBJECT(/*model*/ MODEL_RED_FLAME,                   /*pos*/  1331,   1075,  -1330,  /*angle*/ 0,  90,  0,   /*behParam*/ 0x00000000,  /*beh*/ 'bhvFlame'),
@@ -77,24 +79,24 @@ const script_func_local_2 = [
 ];
 
 const script_func_local_3 = [
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/  1000,     50,   1000,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvGhostHuntBigBoo',        /*acts ACT_1*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/    20,    100,   -908,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvGhostHuntBoo',                  /*acts ACT_1*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/  3150,    100,    398,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvGhostHuntBoo',                  /*acts ACT_1*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/ -2000,    150,   -800,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvGhostHuntBoo',                  /*acts ACT_1*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/  2851,    100,   2289,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvGhostHuntBoo',                  /*acts ACT_1*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/ -1551,    100,  -1018,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvGhostHuntBoo',                  /*acts ACT_1*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BBH_STAIRCASE_STEP,          /*pos*/   973,      0,    517,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvHiddenStaircaseStep',  /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BBH_STAIRCASE_STEP,          /*pos*/   973,   -206,    717,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvHiddenStaircaseStep',  /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BBH_STAIRCASE_STEP,          /*pos*/   973,   -412,    917,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvHiddenStaircaseStep',  /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/    20,    100,   -908,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvBoo',                  /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/  3150,    100,    398,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvBoo',                  /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/ -2000,    150,   -800,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvBoo',                  /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/  2851,    100,   2289,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvBoo',                  /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/ -1551,    100,  -1018,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvBoo',                  /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                        /*pos*/   990,  -2146,   -908,  /*angle*/ 0,  -45,  0,  /*behParam*/ 0x00030000,  /*beh*/ 'bhvFlamethrower',           /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                        /*pos*/ -1100,  -2372,   1100,  /*angle*/ 0,  135,  0,  /*behParam*/ 0x01000000,  /*beh*/ 'bhvMerryGoRoundBooManager',          /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/  1030,   1922,   2546,  /*angle*/ 0,  -90,  0,  /*behParam*/ 0x04000000,  /*beh*/ 'bhvBalconyBigBoo',         /*acts ALL_ACTS*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/   581,   1850,   -206,  /*angle*/ 0,  -90,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvBoo',                  /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/  1000,     50,   1000,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvGhostHuntBigBoo',        /*acts*/ ACT_1),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/    20,    100,   -908,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvGhostHuntBoo',                  /*acts*/ ACT_1),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/  3150,    100,    398,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvGhostHuntBoo',                  /*acts*/ ACT_1),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/ -2000,    150,   -800,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvGhostHuntBoo',                  /*acts*/ ACT_1),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/  2851,    100,   2289,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvGhostHuntBoo',                  /*acts*/ ACT_1),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/ -1551,    100,  -1018,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvGhostHuntBoo',                  /*acts*/ ACT_1),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BBH_STAIRCASE_STEP,          /*pos*/   973,      0,    517,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvHiddenStaircaseStep',  /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BBH_STAIRCASE_STEP,          /*pos*/   973,   -206,    717,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvHiddenStaircaseStep',  /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BBH_STAIRCASE_STEP,          /*pos*/   973,   -412,    917,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvHiddenStaircaseStep',  /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/    20,    100,   -908,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvBoo',                  /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/  3150,    100,    398,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvBoo',                  /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/ -2000,    150,   -800,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvBoo',                  /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/  2851,    100,   2289,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvBoo',                  /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/ -1551,    100,  -1018,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00000000,  /*beh*/ 'bhvBoo',                  /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                        /*pos*/   990,  -2146,   -908,  /*angle*/ 0,  -45,  0,  /*behParam*/ 0x00030000,  /*beh*/ 'bhvFlamethrower',           /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,                        /*pos*/ -1100,  -2372,   1100,  /*angle*/ 0,  135,  0,  /*behParam*/ 0x01000000,  /*beh*/ 'bhvMerryGoRoundBooManager',          /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/  1030,   1922,   2546,  /*angle*/ 0,  -90,  0,  /*behParam*/ 0x04000000,  /*beh*/ 'bhvBalconyBigBoo',         /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BOO,                         /*pos*/   581,   1850,   -206,  /*angle*/ 0,  -90,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvBoo',                  /*acts*/ ALL_ACTS),
     OBJECT(/*model*/ MODEL_MAD_PIANO,                   /*pos*/ -1300,      0,   2310,  /*angle*/ 0,  243,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvMadPiano'),
     OBJECT(/*model*/ MODEL_HAUNTED_CHAIR,               /*pos*/ -1530,      0,   2200,  /*angle*/ 0,  66,  0,   /*behParam*/ 0x00000000,  /*beh*/ 'bhvHauntedChair'),
     OBJECT(/*model*/ MODEL_NONE,                        /*pos*/ -1330,    890,    200,  /*angle*/ 0,  90,  0,   /*behParam*/ 0x00000000,  /*beh*/ 'bhvBookendSpawn'),
@@ -109,9 +111,9 @@ const script_func_local_3 = [
 ];
 
 const script_func_local_4 = [
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/ -2030,  1350,   1940,  /*angle*/ 0,  0,  0,   /*behParam*/ 0x02000000,  /*beh*/ 'bhvStar',                     /*acts ALL_ACTS*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,  /*pos*/  -204,  1100,   1576,  /*angle*/ 0,  0,  0,   /*behParam*/ 0x03000000,  /*beh*/ 'bhvHiddenRedCoinStar',     /*acts ALL_ACTS*/),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,  /*pos*/   923,  1741,   -332,  /*angle*/ 0,  18,  0,  /*behParam*/ 0x05010000,  /*beh*/ 'bhvMrI',                     /*acts ALL_ACTS*/),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR,  /*pos*/ -2030,  1350,   1940,  /*angle*/ 0,  0,  0,   /*behParam*/ 0x02000000,  /*beh*/ 'bhvStar',                     /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,  /*pos*/  -204,  1100,   1576,  /*angle*/ 0,  0,  0,   /*behParam*/ 0x03000000,  /*beh*/ 'bhvHiddenRedCoinStar',     /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,  /*pos*/   923,  1741,   -332,  /*angle*/ 0,  18,  0,  /*behParam*/ 0x05010000,  /*beh*/ 'bhvMrI',                     /*acts*/ ALL_ACTS),
     RETURN(),
 ];
 
@@ -141,7 +143,7 @@ export const level_bbh_entry = [
         WARP_NODE(/*id*/ 0xF0,  /*destLevel*/ LEVEL_CASTLE_COURTYARD,  /*destArea*/ 0x01,  /*destNode*/ 0x0A,  /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1,  /*destLevel*/ LEVEL_CASTLE_COURTYARD,  /*destArea*/ 0x01,  /*destNode*/ 0x0B,  /*flags*/ WARP_NO_CHECKPOINT),
         TERRAIN(/*terrainData*/ bbh_seg7_collision_level),
-        //MACRO_OBJECTS(/*objList*/ bbh_seg7_macro_objs),
+        MACRO_OBJECTS(/*objList*/ bbh_seg7_macro_objs),
         ROOMS(/*surfaceRooms*/ bbh_seg7_rooms),
         SHOW_DIALOG(/*index*/ 0x00,  DIALOG_098),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0006,  /*seq*/ SEQ_LEVEL_SPOOKY),

@@ -7,24 +7,25 @@ import { jrb_movtex_water } from "../levels/jrb/areas/1/movtext.inc"
 import { wf_movtex_water } from "../levels/wf/areas/1/movtext.inc"
 import { bbh_movtex_merry_go_round_water_entrance, bbh_movtex_merry_go_round_water_side } from "../levels/bbh/areas/1/movtext.inc"
 import { ttm_movtex_puddle, ttm_movtex_tris_begin_waterfall, ttm_movtex_tris_begin_puddle_waterfall, ttm_movtex_tris_end_waterfall, ttm_movtex_tris_end_puddle_waterfall, ttm_movtex_tris_puddle_waterfall, ttm_dl_waterfall, ttm_dl_bottom_waterfall, ttm_dl_puddle_waterfall } from "../levels/ttm/areas/1/movtext.inc"
-import { ssl_movtex_puddle_water } from "../levels/ssl/areas/1/movtext.inc"
-import { ssl_movtex_toxbox_quicksand_mist } from "../levels/ssl/areas/1/movtext.inc"
+import { ssl_movtex_puddle_water, ssl_movtex_toxbox_quicksand_mist, /*ssl_dl_quicksand_begin,*/ ssl_dl_quicksand_end, ssl_movtex_tris_pyramid_quicksand, ssl_dl_pyramid_quicksand, ssl_movtex_tris_pyramid_corners_quicksand, ssl_movtex_tris_sides_quicksand, ssl_dl_sides_quicksand } from "../levels/ssl/areas/1/movtext.inc"
+//import { ssl_dl_pyramid_sand_pathway_floor_begin, /*ssl_dl_pyramid_sand_pathway_floor_end,*/ ssl_dl_pyramid_sand_pathway_begin, /*ssl_dl_pyramid_sand_pathway_end,*/ ssl_movtex_tris_pyramid_sand_pathway_front, ssl_dl_pyramid_sand_pathway_front_end, ssl_movtex_tris_pyramid_sand_pathway_floor, ssl_movtex_tris_pyramid_sand_pathway_side, ssl_dl_pyramid_sand_pathway_side_end } from "../levels/ssl/areas/2/movtext.inc"
+import { ssl_movtex_tris_quicksand_pit, ssl_movtex_tris_pyramid_quicksand_pit, ssl_dl_quicksand_pit_begin, ssl_dl_quicksand_pit_end, ssl_dl_pyramid_quicksand_pit_begin, ssl_dl_pyramid_quicksand_pit_end, ssl_dl_quicksand_pit } from "../levels/ssl/areas/2/4/model.inc"
 import { castle_courtyard_movtex_star_statue_water } from "../levels/castle_courtyard/areas/1/movtext.inc"
 import { sl_movtex_water } from "../levels/sl/areas/1/movtext.inc"
-import { hmc_movtex_dorrie_pool_water } from "../levels/hmc/areas/1/movtext.inc"
-import { hmc_movtex_toxic_maze_mist } from "../levels/hmc/areas/1/movtext.inc"
+import { hmc_movtex_dorrie_pool_water, hmc_movtex_toxic_maze_mist } from "../levels/hmc/areas/1/movtext.inc"
 import { thi_movtex_area1_water } from "../levels/thi/areas/1/movtext.inc"
 import { thi_movtex_area2_water } from "../levels/thi/areas/2/movtext.inc"
-import { inside_castle_movtex_green_room_water } from "../levels/castle_inside/areas/3/movtext.inc"
-import { inside_castle_movtex_moat_water } from "../levels/castle_inside/areas/3/movtext.inc"
+import { inside_castle_movtex_green_room_water, inside_castle_movtex_moat_water } from "../levels/castle_inside/areas/3/movtext.inc"
 import { ddd_movtex_area1_water } from "../levels/ddd/areas/1/movtext.inc"
 import { ddd_movtex_area2_water } from "../levels/ddd/areas/2/movtext.inc"
+import { wdw_movtex_area1_water } from "../levels/wdw/areas/1/movtext.inc"
+import { wdw_movtex_area2_water } from "../levels/wdw/areas/2/movtext.inc"
 //import { cotmc_dl_water_begin, cotmc_dl_water_end, cotmc_movtex_tris_water, cotmc_dl_water } from "../levels/cotmc/movtext.inc"
 
-import { GeoLayoutInstance as GeoLayout, LAYER_TRANSPARENT_INTER } from "../engine/GeoLayout"
+import { GeoLayoutInstance as GeoLayout, LAYER_TRANSPARENT_INTER, LAYER_OPAQUE } from "../engine/GeoLayout"
 import * as Gbi from "../include/gbi"
-import { dl_waterbox_rgba16_begin, dl_waterbox_end, dl_draw_quad_verts_0123, texture_waterbox_water, texture_waterbox_lava, texture_waterbox_jrb_water } from "../common_gfx/segment2"
-import { ROTATE_CLOCKWISE, TEXTURE_MIST, TEXTURE_WATER, TEXTURE_JRB_WATER } from "../include/moving_texture_macros"
+import { dl_waterbox_rgba16_begin, dl_waterbox_end, dl_draw_quad_verts_0123, texture_waterbox_water, texture_waterbox_lava, texture_waterbox_jrb_water, texture_waterbox_unknown_water, texture_waterbox_mist } from "../common_gfx/segment2"
+import { ROTATE_CLOCKWISE, TEXTURE_MIST, TEXTURE_WATER, TEXTURE_JRB_WATER, TEX_QUICKSAND_SSL, TEX_PYRAMID_SAND_SSL } from "../include/moving_texture_macros"
 import { make_vertex } from "./GeoMisc"
 
 // Vertex colors for rectangles. Used to give mist a tint
@@ -118,18 +119,47 @@ const MOVTEX_TTM_BEGIN_PUDDLE_WATERFALL = (3 | MOVTEX_AREA_TTM)
 const MOVTEX_TTM_END_PUDDLE_WATERFALL = (4 | MOVTEX_AREA_TTM)
 const MOVTEX_TTM_PUDDLE_WATERFALL = (5 | MOVTEX_AREA_TTM)
 
+// Colored, unique movtex meshes (drawn in level geo)
+const MOVTEX_SSL_PYRAMID_SIDE = (1 | MOVTEX_AREA_SSL)
+const MOVTEX_SSL_PYRAMID_CORNER = (2 | MOVTEX_AREA_SSL)
+const MOVTEX_SSL_COURSE_EDGE = (3 | MOVTEX_AREA_SSL)
+
+// Shared movtex meshes (drawn in object geo)
+const MOVTEX_SSL_SAND_PIT_OUTSIDE = (1 | MOVTEX_AREA_SSL)
+const MOVTEX_SSL_SAND_PIT_PYRAMID = (2 | MOVTEX_AREA_SSL)
+
 const gMovtexIdToTexture = [
-    texture_waterbox_water, null, texture_waterbox_jrb_water, null, texture_waterbox_lava
+    texture_waterbox_water, texture_waterbox_mist, texture_waterbox_jrb_water, texture_waterbox_unknown_water, texture_waterbox_lava/*, ssl_quicksand, ssl_pyramid_sand*/
 ]
 
 const gMovtexNonColored = [
     { geoId: MOVTEX_CASTLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 15, movtexVerts: castle_grounds_movtex_tris_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: castle_grounds_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: GeoLayout.LAYER_TRANSPARENT_INTER },
+
+    //commented out due to renderMode error with gbi
     //{ geoId: MOVTEX_COTMC_WATER, textureId: TEXTURE_WATER, vtx_count: 14, movtexVerts: cotmc_movtex_tris_water, beginDl: cotmc_dl_water_begin, endDl: cotmc_dl_water_end, triDl: cotmc_dl_water, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: LAYER_TRANSPARENT_INTER },
+
     { geoId: MOVTEX_TTM_BEGIN_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 6, movtexVerts: ttm_movtex_tris_begin_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: LAYER_TRANSPARENT_INTER }, //originally LAYER_TRANSPARENT
     { geoId: MOVTEX_TTM_END_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 6, movtexVerts: ttm_movtex_tris_end_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: LAYER_TRANSPARENT_INTER }, //originally LAYER_TRANSPARENT
     { geoId: MOVTEX_TTM_BEGIN_PUDDLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 4, movtexVerts: ttm_movtex_tris_begin_puddle_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_bottom_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: LAYER_TRANSPARENT_INTER },
     { geoId: MOVTEX_TTM_END_PUDDLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 4, movtexVerts: ttm_movtex_tris_end_puddle_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_bottom_waterfall, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: LAYER_TRANSPARENT_INTER },
     { geoId: MOVTEX_TTM_PUDDLE_WATERFALL, textureId: TEXTURE_WATER, vtx_count: 8, movtexVerts: ttm_movtex_tris_puddle_waterfall, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: ttm_dl_puddle_waterfall, r: 0xff, g: 0xff, b: 0xff, a:0xb4, layer: LAYER_TRANSPARENT_INTER },
+
+    //commented out due to renderMode error with gbi
+    //{ geoId: MOVTEX_PYRAMID_SAND_PATHWAY_FRONT, textureId: TEX_PYRAMID_SAND_SSL, vtx_count: 8, movtexVerts: ssl_movtex_tris_pyramid_sand_pathway_front, beginDl: ssl_dl_pyramid_sand_pathway_begin, endDl: ssl_dl_pyramid_sand_pathway_end, triDl: ssl_dl_pyramid_sand_pathway_front_end, r: 0xff, g: 0xff, b: 0xff, a: 0xff, layer: LAYER_TRANSPARENT_INTER },
+    //{ geoId: MOVTEX_PYRAMID_SAND_PATHWAY_FLOOR, textureId: TEX_PYRAMID_SAND_SSL, vtx_count: 8, movtexVerts: ssl_movtex_tris_pyramid_sand_pathway_floor, beginDl: ssl_dl_pyramid_sand_pathway_floor_begin, endDl: ssl_dl_pyramid_sand_pathway_floor_end, triDl: ssl_dl_pyramid_sand_pathway_front_end, r: 0xff, g: 0xff, b: 0xff, a: 0xff, layer: LAYER_OPAQUE_INTER },
+    //{ geoId: MOVTEX_PYRAMID_SAND_PATHWAY_SIDE, textureId: TEX_PYRAMID_SAND_SSL, vtx_count: 6, movtexVerts: ssl_movtex_tris_pyramid_sand_pathway_side, beginDl: ssl_dl_pyramid_sand_pathway_begin, endDl: ssl_dl_pyramid_sand_pathway_end, triDl: ssl_dl_pyramid_sand_pathway_side_end, r: 0xff, g: 0xff, b: 0xff, a: 0xff, layer: LAYER_TRANSPARENT_INTER },
+]
+
+const gMovtexColored = [
+    //{ geoId: MOVTEX_SSL_PYRAMID_SIDE, textureId: TEX_QUICKSAND_SSL, vtx_count: 12, movtexVerts: ssl_movtex_tris_pyramid_quicksand, beginDl: ssl_dl_quicksand_begin, endDl: ssl_dl_quicksand_end, triDl: ssl_dl_pyramid_quicksand, r: 0xff, g: 0xff, b: 0xff, a: 0xff, layer: LAYER_OPAQUE },
+    //{ geoId: MOVTEX_SSL_PYRAMID_CORNER, textureId: TEX_QUICKSAND_SSL, vtx_count: 16, movtexVerts: ssl_movtex_tris_pyramid_corners_quicksand, beginDl: ssl_dl_quicksand_begin, endDl: ssl_dl_quicksand_end, triDl: ssl_dl_pyramid_corners_quicksand, r: 0xff, g: 0xff, b: 0xff, a: 0xff, layer: LAYER_OPAQUE },
+    //{ geoId: MOVTEX_SSL_COURSE_EDGE, textureId: TEX_QUICKSAND_SSL, vtx_count: 15, movtexVerts: ssl_movtex_tris_sides_quicksand, beginDl: ssl_dl_quicksand_begin, endDl: ssl_dl_quicksand_end, triDl: ssl_dl_sides_quicksand, r: 0xff, g: 0xff, b: 0xff, a: 0xff, layer: LAYER_OPAQUE },
+]
+
+const gMovtexColored2 = [
+    //{ geoId: MOVTEX_SSL_SAND_PIT_OUTSIDE, textureId: TEX_QUICKSAND_SSL, vtx_count: 8, movtexVerts: ssl_movtex_tris_quicksand_pit, beginDl: ssl_dl_quicksand_pit_begin, endDl: ssl_dl_quicksand_pit_end, triDl: ssl_dl_quicksand_pit, r: 0xff, g: 0xff, b: 0xff, a: 0xff, layer: LAYER_OPAQUE },
+    //{ geoId: MOVTEX_SSL_SAND_PIT_PYRAMID, textureId: TEX_PYRAMID_SAND_SSL, vtx_count: 8, movtexVerts: ssl_movtex_tris_pyramid_quicksand_pit, beginDl: ssl_dl_pyramid_quicksand_pit_begin, endDl: ssl_dl_pyramid_quicksand_pit_end, triDl: ssl_dl_quicksand_pit, r: 0xff, g: 0xff, b: 0xff, a: 0xff, layer: LAYER_OPAQUE },
+    //{ geoId: 0x00000000, textureId: 0x00000000, vtx_count: 0, movtexVerts: null, beginDl: null, endDl: null, triDl: null, r: 0x00, g: 0x00, b: 0x00, a: 0x00, layer: 0x00000000 },
 ]
 
 let gMovtexVtxColor = MOVTEX_VTX_COLOR_DEFAULT
@@ -175,6 +205,10 @@ const get_quad_collection_from_id = (id) => {
             return ddd_movtex_area2_water
         case JRB_MOVTEX_WATER:
             return jrb_movtex_water
+        case WDW_MOVTEX_AREA1_WATER:
+            return wdw_movtex_area1_water
+        case WDW_MOVTEX_AREA2_WATER:
+            return wdw_movtex_area2_water
         default: throw "unknown case - get quad collection from id:" + id
 
     }
@@ -441,4 +475,61 @@ export const geo_movtex_draw_nocolor = (callContext, node) => {
 
 
     return gfx
+}
+
+export const geo_movtex_draw_colored = (callContext, node) => {
+    let gfx = []
+
+    if (callContext == GEO_CONTEXT_RENDER) {
+        let i = 0
+        while (gMovtexColored[i].movtexVerts != 0) {
+            if (gMovtexColored[i].geoId == node.parameter) {
+                node.flags = (node.flags & 0xFF) | (gMovtexColored[i].layer << 8)
+                const movtexVerts = gMovtexColored[i].movtexVerts
+                update_moving_texture_offset(movtexVerts, MOVTEX_ATTR_COLORED_S)
+                gfx = movtex_gen_list(movtexVerts, gMovtexColored[i], MOVTEX_LAYOUT_COLORED)
+                break
+            }
+            i++
+        }
+    }
+    return gfx
+}
+export const geo_movtex_draw_colored_2_no_update = (callContext, node) => {
+    let gfx = []
+
+    if (callContext == GEO_CONTEXT_RENDER) {
+        let i = 0
+        while (gMovtexColored2[i].movtexVerts != 0) {
+            if (gMovtexColored2[i].geoId == node.parameter) {
+                node.flags = (node.flags & 0xFF) | (gMovtexColored2[i].layer << 8)
+                const movtexVerts = gMovtexColored2[i].movtexVerts
+                gfx = movtex_gen_list(movtexVerts, gMovtexColored2[i], MOVTEX_LAYOUT_COLORED)
+                break
+            }
+            i++
+        }
+    }
+    return gfx
+}
+
+export const geo_movtex_update_horizontal = (callContext, node) => {
+    if (callContext == GEO_CONTEXT_RENDER) {
+        switch (node.parameter) {
+            case MOVTEX_SSL_SAND_PIT_OUTSIDE:
+                movtexVerts = ssl_movtex_tris_quicksand_pit
+                break
+            case MOVTEX_SSL_SAND_PIT_PYRAMID:
+                movtexVerts = ssl_movtex_tris_pyramid_quicksand_pit
+                break
+            /*case MOVTEX_TREADMILL_BIG:
+                movtexVerts = ttc_movtex_tris_big_surface_treadmill
+                break
+            case MOVTEX_TREADMILL_SMALL:
+                movtexVerts = ttc_movtex_tris_small_surface_treadmill
+                break*/
+        }
+        update_moving_texture_offset(movtexVerts, MOVTEX_ATTR_COLORED_S)
+    }
+    //return null
 }

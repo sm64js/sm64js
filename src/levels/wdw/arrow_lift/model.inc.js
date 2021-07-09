@@ -9,9 +9,8 @@ import {
     G_SHADING_SMOOTH, G_TX_WRAP, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_RENDERTILE, G_ON,
     G_TX_CLAMP, G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADE
 } from "../../../include/gbi"
-import { wdw_seg7_texture_07001800 } from "../texture.inc"
-
 import { grass_09004000 } from "../../../textures/grass"
+import { wdw_seg7_texture_07001800 } from "../texture.inc"
 
 const wdw_seg7_lights_07012C08 = gdSPDefLights1(
     0x99, 0x99, 0x99,
@@ -106,4 +105,4 @@ export const wdw_seg7_dl_07012E88 = [
     gsSPEndDisplayList(),
 ].flat();
 
-// 1620705666 - 2021-05-13 00:28:59 -0400
+// 2021-06-15 11:42:13 -0400 (Convert.rb 2021-06-14 09:43:28 -0400)

@@ -42,7 +42,7 @@ export const bbh_seg7_macro_objs = [
     MACRO_OBJECT(/*preset*/ 'macro_box_ten_coins',             /*yaw*/   0, /*pos*/   700,    80, -2800),
     MACRO_OBJECT(/*preset*/ 'macro_breakable_box_three_coins', /*yaw*/  45, /*pos*/ -3800,  -204,  4600),
     MACRO_OBJECT(/*preset*/ 'macro_breakable_box_three_coins', /*yaw*/  45, /*pos*/ -3659,  -204,  4459),
-    MACRO_OBJECT(/*preset*/ 'macro_jumping_box',               /*yaw*/   0, /*pos*/  -220,  -220,  6140),
+    //MACRO_OBJECT(/*preset*/ 'macro_jumping_box',               /*yaw*/   0, /*pos*/  -220,  -220,  6140),
     MACRO_OBJECT(/*preset*/ 'macro_1up',                       /*yaw*/   0, /*pos*/ -3040,  1120,  5460),
     MACRO_OBJECT_END(),
 ];

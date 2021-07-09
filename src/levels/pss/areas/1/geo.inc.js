@@ -1,41 +1,68 @@
-import { GeoLayoutInstance as GeoLayout } from "../../../../engine/GeoLayout"
-import { CameraInstance as Camera } from "../../../../game/Camera"
+// Pss
+
+import {
+    SCREEN_WIDTH, SCREEN_HEIGHT
+} from "../../../../game/Skybox"
+
+import {
+    geo_camera_fov, geo_camera_main
+} from "../../../../game/Camera"
+
+import {
+    GEO_NODE_SCREEN_AREA, GEO_OPEN_NODE, GEO_ZBUFFER, GEO_NODE_ORTHO, GEO_BACKGROUND_COLOR,
+    GEO_CLOSE_NODE, GEO_CAMERA_FRUSTUM_WITH_FUNC, GEO_CAMERA, GEO_DISPLAY_LIST, GEO_RENDER_OBJ,
+    GEO_ASM, GEO_END,
+    LAYER_OPAQUE, LAYER_TRANSPARENT, LAYER_OPAQUE_DECAL
+} from "../../../../engine/GeoLayout"
+
 import { pss_seg7_dl_0700A7C0 } from "./1/model.inc"
+
 import { pss_seg7_dl_0700AFA8 } from "./2/model.inc"
+
 import { pss_seg7_dl_0700B3F0 } from "./3/model.inc"
+
 import { pss_seg7_dl_0700D338 } from "./4/model.inc"
+
 import { pss_seg7_dl_0700DAD8 } from "./5/model.inc"
+
 import { pss_seg7_dl_0700E2B0 } from "./6/model.inc"
+
 import { pss_seg7_dl_0700E3E8 } from "./7/model.inc"
 
-const canvas = document.querySelector('#gameCanvas')
+import { geo_envfx_main } from "../../../../game/LevelGeo"
 
-export const pss_geo_000100 = [
-    {
-        command: GeoLayout.node_screen_area,
-        args: [10, canvas.width / 2, canvas.height / 2, canvas.width / 2, canvas.height / 2]
-    },
-    { command: GeoLayout.open_node },
-        { command: GeoLayout.node_master_list, args: [1] },
-        { command: GeoLayout.open_node },
-            { command: GeoLayout.node_perspective, args: [45, 100, 20000, Camera.geo_camera_fov] },
-            { command: GeoLayout.open_node },
-                {
-                    command: GeoLayout.node_camera,
-                    args: [9, 0, 2000, 6000, 0, 0, 0, Camera.geo_camera_main]
-                },
-                { command: GeoLayout.open_node },
-                    { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, pss_seg7_dl_0700A7C0] },
-                    { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, pss_seg7_dl_0700AFA8] },
-                    { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, pss_seg7_dl_0700B3F0] },
-                    { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, pss_seg7_dl_0700D338] },
-                    { command: GeoLayout.display_list, args: [GeoLayout.LAYER_TRANSPARENT, pss_seg7_dl_0700DAD8] },
-                    { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE, pss_seg7_dl_0700E2B0] },
-                    { command: GeoLayout.display_list, args: [GeoLayout.LAYER_OPAQUE_DECAL, pss_seg7_dl_0700E3E8] },
-                    { command: GeoLayout.node_render_object_parent },
-                { command: GeoLayout.close_node },
-            { command: GeoLayout.close_node },
-        { command: GeoLayout.close_node },
-    { command: GeoLayout.close_node },
-    { command: GeoLayout.node_end }
-]
+
+// 0x0E000100
+export const pss_geo_000100 = () => {return [
+    GEO_NODE_SCREEN_AREA(10, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+    GEO_OPEN_NODE(),
+        GEO_ZBUFFER(0),
+        GEO_OPEN_NODE(),
+            GEO_NODE_ORTHO(100),
+            GEO_OPEN_NODE(),
+                GEO_BACKGROUND_COLOR(0x0001),
+            GEO_CLOSE_NODE(),
+        GEO_CLOSE_NODE(),
+        GEO_ZBUFFER(1),
+        GEO_OPEN_NODE(),
+            GEO_CAMERA_FRUSTUM_WITH_FUNC(45, 100, 12800, geo_camera_fov),
+            GEO_OPEN_NODE(),
+                GEO_CAMERA(9, 0, 2000, 6000, 0, 0, 0, geo_camera_main),
+                GEO_OPEN_NODE(),
+                    GEO_DISPLAY_LIST(LAYER_OPAQUE, pss_seg7_dl_0700A7C0),
+                    GEO_DISPLAY_LIST(LAYER_OPAQUE, pss_seg7_dl_0700AFA8),
+                    GEO_DISPLAY_LIST(LAYER_OPAQUE, pss_seg7_dl_0700B3F0),
+                    GEO_DISPLAY_LIST(LAYER_OPAQUE, pss_seg7_dl_0700D338),
+                    GEO_DISPLAY_LIST(LAYER_TRANSPARENT, pss_seg7_dl_0700DAD8),
+                    GEO_DISPLAY_LIST(LAYER_OPAQUE, pss_seg7_dl_0700E2B0),
+                    GEO_DISPLAY_LIST(LAYER_OPAQUE_DECAL, pss_seg7_dl_0700E3E8),
+                    GEO_RENDER_OBJ(),
+                    GEO_ASM(0, geo_envfx_main),
+                GEO_CLOSE_NODE(),
+            GEO_CLOSE_NODE(),
+        GEO_CLOSE_NODE(),
+    GEO_CLOSE_NODE(),
+    GEO_END(),
+]};
+
+// 2021-06-03 16:44:44 -0400 (Convert.rb 2021-05-31 18:22:11 -0400)

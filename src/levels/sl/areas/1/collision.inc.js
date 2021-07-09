@@ -1,35 +1,16 @@
+// Sl
+
 import {
-    COL_INIT,
-    COL_VERTEX_INIT,
-    COL_VERTEX,
-    COL_TRI_INIT,
-    COL_TRI,
-    COL_TRI_STOP,
+    COL_INIT, COL_VERTEX_INIT, COL_VERTEX, COL_TRI_INIT, COL_TRI, COL_TRI_SPECIAL, COL_TRI_STOP,
+    COL_SPECIAL_INIT, SPECIAL_OBJECT_WITH_YAW, SPECIAL_OBJECT, COL_WATER_BOX_INIT, COL_WATER_BOX,
     COL_END,
-    COL_SPECIAL_INIT,
-    COL_TRI_SPECIAL,
-    SPECIAL_OBJECT,
-    SPECIAL_OBJECT_WITH_YAW,
-
-    SURFACE_DEFAULT,
-    SURFACE_BURNING,
-    SURFACE_SLIPPERY,
-    SURFACE_NOT_SLIPPERY,
-    SURFACE_WALL_MISC,
-    SURFACE_HORIZONTAL_WIND,
-    SURFACE_ICE,
-    SURFACE_HARD,
-    SURFACE_HARD_VERY_SLIPPERY,
-    SURFACE_HARD_NOT_SLIPPERY,
-    SURFACE_CAMERA_BOUNDARY,
-
-    COL_WATER_BOX_INIT,
-    COL_WATER_BOX,
-
-    special_snow_tree
-
+    SURFACE_DEFAULT, SURFACE_BURNING, SURFACE_SLIPPERY, SURFACE_NOT_SLIPPERY, SURFACE_WALL_MISC,
+    SURFACE_HORIZONTAL_WIND, SURFACE_ICE, SURFACE_HARD, SURFACE_HARD_VERY_SLIPPERY,
+    SURFACE_HARD_NOT_SLIPPERY, SURFACE_CAMERA_BOUNDARY,
+    special_null_start, special_snow_tree
 } from "../../../../include/surface_terrains"
 
+// 0x0700CBD8 - 0x0700ED92
 export const sl_seg7_area_1_collision = [
     COL_INIT(),
     COL_VERTEX_INIT(0x202),
@@ -1453,8 +1434,8 @@ export const sl_seg7_area_1_collision = [
     COL_TRI(510, 513, 327),
     COL_TRI(510, 327, 321),
     COL_TRI_STOP(),
-    COL_SPECIAL_INIT(9),
-//    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_null_start, /*pos*/  5541,  1024,   443, /*yaw*/ 192), // unused, probably an early way to set intial position
+    COL_SPECIAL_INIT(10),
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_null_start, /*pos*/  5541,  1024,   443, /*yaw*/ 192),
     SPECIAL_OBJECT(/*preset*/ special_snow_tree,  /*pos*/  5395,  1054, -5443),
     SPECIAL_OBJECT(/*preset*/ special_snow_tree,  /*pos*/     0,  4864,     0),
     SPECIAL_OBJECT(/*preset*/ special_snow_tree,  /*pos*/  5666,  1024, -3341),
@@ -1468,4 +1449,4 @@ export const sl_seg7_area_1_collision = [
     COL_WATER_BOX(0, -6194, -409, 154, 4198, 973),
     COL_WATER_BOX(1, -1279, -6143, 1485, -3071, 973),
     COL_END(),
-].flat()
+].flat();

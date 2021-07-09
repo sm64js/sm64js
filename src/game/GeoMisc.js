@@ -1,4 +1,5 @@
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
+import { gSPDisplayList, gSPEndDisplayList } from "../include/gbi"
 
 import {
     save_file_get_flags, SAVE_FLAG_HAVE_WING_CAP,

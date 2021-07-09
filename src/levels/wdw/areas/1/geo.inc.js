@@ -26,9 +26,9 @@ import { wdw_seg7_dl_0700A138 } from "./2/model.inc"
 
 import { wdw_seg7_dl_07012798 } from "./3/model.inc"
 
-import {
+/*import {
     geo_wdw_set_initial_water_level, geo_cannon_circle_base
-} from "../../../../game/ObjectHelpers"
+} from "../../../../game/ObjectHelpers"*/
 
 import {
     geo_movtex_pause_control, geo_movtex_draw_water_regions
@@ -55,8 +55,8 @@ export const wdw_geo_000658 = () => {return [
                     GEO_DISPLAY_LIST(LAYER_OPAQUE, wdw_seg7_dl_07009AB0),
                     GEO_DISPLAY_LIST(LAYER_ALPHA, wdw_seg7_dl_0700A138),
                     GEO_DISPLAY_LIST(LAYER_TRANSPARENT, wdw_seg7_dl_07012798),
-                    GEO_DISPLAY_LIST(LAYER_TRANSPARENT_DECAL, wdw_seg7_dl_07012908),
-                    GEO_ASM(0, geo_wdw_set_initial_water_level),
+                    //GEO_DISPLAY_LIST(LAYER_TRANSPARENT_DECAL, wdw_seg7_dl_07012908),
+                    //GEO_ASM(0, geo_wdw_set_initial_water_level),
                     GEO_ASM(0, geo_movtex_pause_control),
                     GEO_ASM(0x1101, geo_movtex_draw_water_regions),
                     GEO_RENDER_OBJ(),
@@ -65,11 +65,11 @@ export const wdw_geo_000658 = () => {return [
             GEO_CLOSE_NODE(),
         GEO_CLOSE_NODE(),
         GEO_ZBUFFER(0),
-        GEO_OPEN_NODE(),
+        /*GEO_OPEN_NODE(),
             GEO_ASM(0, geo_cannon_circle_base),
-        GEO_CLOSE_NODE(),
+        GEO_CLOSE_NODE(),*/
     GEO_CLOSE_NODE(),
     GEO_END(),
 ]};
 
-// 1620705666 - 2021-05-13 00:28:59 -0400
+// 2021-06-15 11:42:13 -0400 (Convert.rb 2021-06-14 09:43:28 -0400)

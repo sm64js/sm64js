@@ -9,7 +9,7 @@
     <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-	
+
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-178244102-1"></script>
     <script>
@@ -28,38 +28,38 @@
     <div class="cover-container d-flex h-100 mx-auto flex-column">
         <header class="masthead">
             <div class="inner">
-                <h3 class="masthead-brand rainbowText">Super Mario 64 JS</h3>
                 <nav class="nav nav-masthead justify-content-center">
-                    <!--a class="nav-link" href="https://server.sm64js.com/createGame">Custom Game</a-->
+                    <!--<a class="nav-link" href="https://server.sm64js.com/createGame">Custom Game</a>-->
                     <a class="nav-link" href="https://vanilla.sm64js.com">Vanilla</a>
-                    <a class="nav-link" href="https://60fps.sm64js.com">60 FPS</a>
-                    <a class="nav-link" href="#What">About</a>
+                    <a class="nav-link" href="https://60fps.sm64js.com">60fps</a>
+                    <a class="nav-link" href="credits.html">About</a>
                     <a class="nav-link" href="https://github.com/sm64js/sm64js">Source Code</a>
                     <a class="nav-link" href="https://discord.gg/7UaDnJt">Discord Server</a>
-                    <a class="nav-link" href="#Contact">Contact</a>
+                    <a class="nav-link" href="credits.html">Credits</a>
                 </nav>
             </div>
         </header>
 
         <main role="main" class="inner cover" hidden id="mainContent">
-            <h1 class="cover-heading rainbowText">Super Mario 64 - Javascript Port</h1>
-            <h6 style="color:red">This project is currently still being developed. This page may be live from time to time for testing, but there may be glitches and performance issues. The server will go down and restart at random times without warning. If you would like to help with the project or have feedback please contact me.</h6>
+            <h1 class="cover-heading rainbowText mario-font">Super Mario 64 - Javascript</h1>
+            <h6>This project is currently still being developed. This page may be live from time to time for testing, but there may be glitches and performance issues. The server will go down and restart at random times without warning. If you would like to help with the project or have feedback please contact me.</h6>
             <form id="romSelect" class="form-group">
-                <h4 style="color:#fa3e3e">Select US sm64 (z64) ROM File from your computer</h4>
+                <h4 style="color: #fae53e; font-size: 28px; margin-top: 16px; margin-bottom: 12px;">Select US sm64 (z64) ROM File from your computer</h4>
                 <input id="romFile" class="btn btn-secondary btn-sm" type="file">
-                <input class="btn btn-primary btn-sm" type="submit">
+                <input class="btn btn-success btn-sm" type="submit" value="Load ROM">
             </form>
             <h6 id="romMessage">This project uses the textures and other game assets from the original game. Due to copyright issues, I cannot host those assets on this site. Please select a sm64 ROM to extract those assets before you can play.</h6>
-
-            <div class="row" style="justify-content:center">
+            <!-- start sign box -->
+            <div class="signboxBackground">
+            <div style="margin-top: 62px;margin-left: 204px;" class="row" style="justify-content:center">
                 <button id="startbutton" type="button" class="btn btn-success" disabled>Start Game</button>
                 <a href="https://github.com/sm64js/sm64js/issues" style="margin-left:30px" type="button" class="btn btn-warning">Submit Bug</a>
                 <button id="deleteRom" type="button" style="margin-left:30px" class="btn btn-danger">Delete Rom</button>
 
             </div>
 
-            <div class="row" style="justify-content:center; padding-top:10px">
-                <div class="col-3">
+            <div class="row" style="justify-content:center; padding-top:26px;padding-right: 40px;padding-left: 40px;">
+                <div class="col-4">
                     <button type="button"
                             class="btn btn-sm btn-primary"
                             data-html="true"
@@ -69,7 +69,7 @@
                         Customize Keyboard Controls
                     </button>
                 </div>
-                <div class="col-3">
+                <div class="col-4">
                     <button type="button"
                             class="btn btn-sm btn-primary"
                             data-html="true"
@@ -80,7 +80,7 @@
                     </button>
                 </div>
 
-                <div class="col-3">
+                <div class="col-4">
                     <button type="button"
                             class="btn btn-sm btn-primary"
                             data-html="true"
@@ -91,7 +91,26 @@
                     </button>
                 </div>
 
-                <div class="col-3">
+            </div>
+
+            <div class="row" style="justify-content:center; padding-top:10px; padding-bottom: 10px">
+                <div class="col-4">
+                    <button type="button"
+							id="respawnButton"
+                            class="btn btn-sm btn-warning"
+                            onclick="window.reset = true">
+                        Respawn
+                    </button>
+                </div>
+                <div class="col-4">
+                    <button type="button"
+                            class="btn btn-sm btn-primary"
+                            onclick="window.fullWindowMode = true">
+                        Full Window Mode
+                    </button>
+                </div>
+
+                <div class="col-4">
                     <button type="button"
                             class="btn btn-sm btn-primary"
                             data-html="true"
@@ -103,36 +122,11 @@
                 </div>
 
             </div>
-
-            <div class="row" style="justify-content:center; padding-top:10px; padding-bottom: 10px">
-                <div class="col-3">
-                    <button type="button"
-                            class="btn btn-sm btn-primary"
-                            onclick="window.enterFullScreenMode()">
-                        Full Screen Mode
-                    </button>
-                </div>
-                <div class="col-3">
-                    <button type="button"
-							id="respawnButton"
-                            class="btn btn-sm btn-primary"
-                            onclick="window.reset = true">
-                        Respawn
-                    </button>
-                </div>
-                <div class="col-3">
-                    <button type="button"
-                            class="btn btn-sm btn-primary"
-                            onclick="window.fullWindowMode = true">
-                        Full Window Mode
-                    </button>
-                </div>
-            </div>
 			<div class="row" style="justify-content:center; padding-top:10px; padding-bottom: 10px">
                 <div class="col-3">
                     <button type="button"
 							id="pvpButton"
-                            class="btn btn-sm btn-primary"
+                            class="btn btn-sm btn-warning"
                             onclick="window.togglePvp()">
                         PvP: On
                     </button>
@@ -140,43 +134,40 @@
             </div>
             <div id="signinSection">
                 <div id="signinButtons" class="row" style="justify-content:center; margin-top: 10px;">
-                    <button id="discordSigninButton" type="submit" class="btn btn-light" style="height:50px; margin-top: 5px">
-                        <b>Sign In with</b>
-                        <img src="https://discord.com/assets/e4923594e694a21542a489471ecffa50.svg" width="100" />
-                    </button>
+                    <img id="discordSigninButton" src="/mmo/assets/discord_signin.png" width="240" style="margin-left:15px;">
                     <img id="googleSigninButton" src="/mmo/assets/google_signin.png" width="240" style="margin-left:15px;">
                 </div>
                 <button hidden id="logoutButton" type="submit" class="btn btn-secondary" style="height:50px; margin-top: 5px">
                     <b>Sign out</b>
                 </button>
 
-                <div hidden id="playerNameRow" style="margin-top: 10px;">
+                <div hidden id="playerNameRow" style="margin-top: 10px; margin-bottom: 54px;">
                     <form id="playerNameForm">
                         <div id="discordNameRow" class="row" style="justify-content:center;">
                             <div class="form-group mb-2">
-                                <label type="text" readonly class="col-form-label" style="color:skyblue">Discord Name: </label>
+                                <label type="text" readonly class="col-form-label">Discord Name: </label>
                             </div>
                             <div class="form-group mb-2">
                                 <input readonly id="discordNameBox" type="text" style="margin-left: 15px; max-width: 200px" class="form-control-sm" minlength="3" maxlength="20">
                             </div>
                             <div class="form-group mb-2">
-                                <button id="switchCustom" type="button" class="btn btn-sm btn-outline-primary mb-2" style="margin-left:15px;">Switch to Custom Display Name</button>
+                                <button id="switchCustom" type="button" class="btn btn-sm btn-outline-primary mb-2" style="margin-left:15px;">Display Custom Name</button>
                             </div>
                         </div>
                         <div hidden id="customNameRow" class="row" style="justify-content:center;">
                             <div class="form-group mb-2">
-                                <label type="text" readonly class="col-form-label" style="color:skyblue">Custom Display Name: </label>
+                                <label type="text" readonly class="col-form-label">Custom Name: </label>
                             </div>
                             <div class="form-group mb-2">
                                 <input id="playerNameInput" type="text" style="margin-left: 15px; max-width: 120px" class="form-control-sm" minlength="3" maxlength="14" placeholder="enter name" onchange="window.updatePlayerName(this.value)">
                             </div>
                             <div class="form-group mb-2">
-                                <button id="switchDiscord" type="button" class="btn btn-sm btn-outline-primary mb-2" style="margin-left:15px;">Switch to Discord Username</button>
+                                <button id="switchDiscord" type="button" class="btn btn-sm btn-outline-primary mb-2" style="margin-left:15px;">Display Discord Name</button>
                             </div>
                         </div>
                         <div class="row" style="justify-content:center;">
                             <div class="form-group mb-2">
-                                <label type="text" readonly class="col-form-label" style="color:skyblue">Select Map: </label>
+                                <label type="text" readonly class="col-form-label">Select Map: </label>
                             </div>
                             <div class="form-group mb-2" style="margin-left:15px;">
                                 <select id="mapSelect" class="form-control form-control-sm">
@@ -196,7 +187,7 @@
                                     <option value="56"> Cool, Cool Mountain Slide </option>
                                     <option value="27"> Princess's Secret Slide </option>
                                     <option value="36"> Tall, Tall Mountain </option>
-                                    <option value="24"> Whomp's Fortress </option>
+                                    <option value="24"> Whomps Fortress </option>
                                     <option value="7"> Hazy Maze Cave  </option>
                                     <option value="4"> Big Boo's Haunt </option>
                                     <option value="8"> Shifting Sand Land </option>
@@ -215,27 +206,32 @@
                 <h6 hidden id="authFailMsg" style="color:red"></h6>
 
             </div>
-
+<!-- end sign box-->
+</div>
 
             <br />
 
-            <div class="canvasContainer">
+    <div class="row">
+            <div class="canvasContainer col-6 canvasContainerPos">
                 <canvas id="gameCanvas" width="640" height="480"></canvas>
                 <canvas id="textCanvas" width="640" height="480"></canvas>
             </div>
 
-            <h6 hidden id="connectedMsg" style="color:red">Not connected to server - Refresh the page</h6>
-
+        
+            <div class="col-6 chatboxPos">
             <div class="row" style="justify-content:center">
                 <ul style="margin-bottom: 5px !important" id="chatlog"></ul>
             </div>
             <div class="row" style="justify-content:center;">
-                <input id="chatbox" class="chatbox form-control" style="margin-top: 0px !important" type="text" autocomplete="off" maxlength="100" placeholder="Chat box">
-                <input id="banbox" class="chatbox form-control" type="text" autocomplete="off" maxlength="100" placeholder="Block Player Chats - type their player name in here and hit enter">
+                <input id="chatbox" style="font-size: 20px;" class="chatbox form-control" style="margin-top: 0px !important" type="text" autocomplete="off" maxlength="100" placeholder="Chat box">
+                <input id="banbox" style="font-size: 20px;" class="chatbox form-control" type="text" autocomplete="off" maxlength="100" placeholder="Block Player Chats - type their player name in here and hit enter">
+            </div>
             </div>
 
             <br />
             <br />
+            <h6 hidden id="connectedMsg" style="color:red">Not connected to server - Refresh the page</h6>
+    </div>
 
             <h6 hidden id="numTriangles"> Total triangles rendered this frame: </h6>
             <div hidden class="row">
@@ -307,141 +303,9 @@
                 </div>
             </div>
 
-            <br />
-            <br />
-
-            <a name="What"></a>
-            <h4>What is this?</h4>
-            <p>
-                This is an ongoing work-in-progress port of the <a href="https://github.com/n64decomp/sm64">decompilation</a> of original Nintendo game, Super Mario 64, to native JavaScript (No Emulation) (No Web Assembly).
-                This project required creating a JavaScript WebGL port of <a href="https://github.com/Emill/n64-fast3d-engine">N64 Fast 3D Renderer</a> originally implemented with OpenGL in C. This project also includes the development of online mass multiplayer versions of sm64js and other custom multiplayer game modes.
-            </p>
-            <br />
-
-            <a name="Purpose"></a>
-            <h4>What is the purpose of this port?</h4>
-            <ul style="display:inline-block;vertical-align:middle;text-align:left">
-                <li>
-                    <b>Extensibility:</b> More access to more developers to add custom content
-                    <ul style="padding-left:40px">
-                        <li>Rapid Prototyping</li>
-                        <li>More friendly to importing other software modules/packages</li>
-                        <li>More friendly to prototyping multiplayer custom games/mods</li>
-                    </ul>
-                </li>
-                <li><b>Portablity:</b> Sm64 projects can run on any device with a web browser anywhere without needing to download or install anything</li>
-                <li>Opportunity to refactor / rewrite with modern coding style and cleanup</li>
-            </ul>
-            <br />
-            <br />
-
-            <a name="WASM"></a>
-            <h4>What's wrong with Web Assembly / Emscripten</h4>
-            <p>Nothing. However, I believe access to this game's source code in a higher level programming language opens it up to a wider pool of potentially capable developers / modders. And seems to me like a natural next step following in the amazing work done by the Decomp team and PC Port.</p>
-            <br />
-
-            <a name="Credits"></a>
-            <h4>Credits</h4>
-            <br />
-
-
-            <div class="row" style="justify-content:center;">
-                <h5>
-                    <a style="font-weight:bold !important;" href="https://github.com/sm64js/sm64js/graphs/contributors">Developers / Contributors</a>
-                </h5>
-
-            </div>
-            <div class="row" style="justify-content:center;">
-                <p>
-                    <a style="color:#fdffd4" href="https://sm64js.com">Snuffy</a>,
-                    <a style="color:#fdffd4" href="https://github.com/ScottDikowitz">ScottDikowitz</a>,
-                    <a style="color:#fdffd4" href="https://luphoria.github.io/">luphoria</a>,
-                    <a style="color:#fdffd4" href="https://github.com/TERRAERROR">0x2480</a>,
-                    <a style="color:#fdffd4" href="https://github.com/agent-11">Agent 11</a>,
-                    <a style="color:#fdffd4" href="https://github.com/Tarnadas">Mario Reder</a>,
-                    <a style="color:#fdffd4" href="https://github.com/GlitchyPSIX">GlitchyPSI</a>,
-                    <a style="color:#fdffd4" href="https://github.com/AlbertoCentonze">Alberto</a>,
-                    <a style="color:#fdffd4" href="https://github.com/djoslin0">djoslin0</a>,
-                    <a style="color:#fdffd4" href="https://github.com/joe07734">joe07734</a>
-
-                </p>
-            </div>
-            <br />
-
-
-            <div class="row">
-                <div class="col-6">
-                    <h6><a style="font-weight:bold !important" href="https://github.com/n64decomp/sm64">Super Mario 64 Decomp</a></h6>
-                    <p>Team that decompiled the original Super Mario 64 ROMs into C source code</p>
-                </div>
-                <div class="col-6">
-                    <h6><a style="font-weight:bold !important" href="https://github.com/sm64-port/sm64-port">Super Mario 64 PC Port</a></h6>
-                    <p>Team that ported the decompiled project to PC</p>
-                </div>
-
-            </div>
-
-            <div class="row">
-                <div class="col-12">
-                    <h6><a style="font-weight:bold !important" href="https://github.com/Emill/n64-fast3d-engine">N64 Fast 3D Renderer</a></h6>
-                    <p class="mb-0">
-                        OpenGL Implementation of a 3D renderer for the Nintendo 64's graphics
-                    </p>
-                    <small>   (I had to reimplement this in JavaScript and WebGL)   </small>
-                </div>
-            </div>
-
-            <br />
-
-            <div class="row">
-
-                <div class="col">
-                    <h6><a style="font-weight:bold !important" href="https://github.com/djoslin0/sm64ex-coop">Super Mario 64 Coop</a></h6>
-                    <p class="mb-0">
-                        Online cooperative multiplayer mod for SM64, aiming to synchronize all entities and every level for two players.
-
-                    </p>
-                    <small>
-                        (Special thanks to <a href="https://github.com/djoslin0">djoslin0</a>, the developer of this project, for consultation and advice on the implementation of multiplayer for sm64js. I also ported some code to this project directly)
-                    </small>
-                </div>
-            </div>
-
-
-
-            <br />
-            <div class="row" style="justify-content:center;">
-                <h6>Other Libraries</h6>
-            </div>
-            <div class="row" style="justify-content:center;">
-                <p>
-                    <a style="color:#fdffd4" href="https://jeremyckahn.github.io/keydrown/">Keydrown</a>
-                </p>
-            </div>
-
-            <div class="row" style="justify-content:center;">
-                <h6>Special Thanks to</h6>
-            </div>
-            <div class="row" style="justify-content:center;">
-                <p>
-                    <a style="color:#fdffd4" href="https://github.com/djoslin0">djoslin0</a>,
-                    <a style="color:#fdffd4" href="https://github.com/yandeu">Yannick</a>,
-                    <a style="color:#fdffd4" href="https://github.com/josegonzalez">Jose Diaz-Gonzalez</a>,
-                    <a style="color:#fdffd4" href="https://github.com/Emill">Emill</a>
-                </p>
-            </div>
-
-
-            <a name="Contact"></a>
-            <h4>Contact</h4>
-            <p>
-                Questions? Suggestions? Want to help with this project? =)
                 <br />
-                I have a discord server dedicated to sm64js: <a href="https://discord.gg/7UaDnJt"> Join Here </a>
                 <br />
-                Discord: snuffysasa#2779
-            </p>
-            <br />
+
 
         </main>
 

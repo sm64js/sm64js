@@ -212,10 +212,10 @@ const updateConnectedMsg = () => {
     const elem = document.getElementById("connectedMsg")
     const numPlayers = networkData.numOnline ? networkData.numOnline : "?"
     if (socket && socket.readyState == 1) {
-        elem.innerHTML = "Connected To Server  -  " + (numPlayers).toString() + " Players Online" 
+        elem.innerHTML = "Connected to server  -  players online: " + (numPlayers).toString()
         elem.style.color = "lawngreen"
     } else {
-        elem.innerHTML = "Not connected to server - Refresh the page"
+        elem.innerHTML = "Not connected to server - refresh the page"
         elem.style.color = "red"
     }
 }

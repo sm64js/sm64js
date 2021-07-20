@@ -102,6 +102,7 @@ export const special_level_geo_16 = 120
 export const special_bubble_tree = 121
 export const special_spiky_tree = 122
 export const special_snow_tree = 123
+export const special_tropic_tree = 124
 
 export const COL_INIT = () => { return [TERRAIN_LOAD_VERTICES] }
 export const COL_END = () => { return [TERRAIN_LOAD_END] }

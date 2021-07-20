@@ -3,7 +3,7 @@ import {
     COL_TRI_STOP, COL_END, COL_WATER_BOX, COL_WATER_BOX_INIT,
     SURFACE_DEFAULT, SURFACE_NOT_SLIPPERY, SURFACE_0004,
     SURFACE_DEATH_PLANE,
-    SPECIAL_OBJECT, COL_SPECIAL_INIT, special_bubble_tree,
+    SPECIAL_OBJECT, COL_SPECIAL_INIT, special_tropic_tree,
 } from "../../../../include/surface_terrains"
 
 export const dolphin_area_1_collision = [
@@ -1376,10 +1376,10 @@ export const dolphin_area_1_collision = [
 	COL_WATER_BOX_INIT(1),
 	COL_WATER_BOX(0x00, -2112, -5659, 14221, 4735, 225),
     COL_SPECIAL_INIT(5),
-    SPECIAL_OBJECT(special_bubble_tree, 1249, 300, -1619),
-    SPECIAL_OBJECT(special_bubble_tree, 1249, 300, -1010),
-    SPECIAL_OBJECT(special_bubble_tree, 1249, 300, 220),
-    SPECIAL_OBJECT(special_bubble_tree, 1249, 300, 656),
-    SPECIAL_OBJECT(special_bubble_tree, 2156, 300, 299),
+    SPECIAL_OBJECT(special_tropic_tree, 1249, 300, -1619),
+    SPECIAL_OBJECT(special_tropic_tree, 1249, 300, -1010),
+    SPECIAL_OBJECT(special_tropic_tree, 1249, 300, 220),
+    SPECIAL_OBJECT(special_tropic_tree, 1249, 300, 656),
+    SPECIAL_OBJECT(special_tropic_tree, 2156, 300, 299),
 	COL_END()
 ].flat();

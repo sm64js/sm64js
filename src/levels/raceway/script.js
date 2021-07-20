@@ -14,7 +14,7 @@ export const level_raceway_entry = [
     { command: LevelCommands.begin_area, args: [1, raceway_area_1_geo] },
     { command: LevelCommands.terrain, args: [raceway_area_1_collision] },
     { command: LevelCommands.end_area },
-    { command: LevelCommands.set_mario_pos, args: [1, 0, 1088, 138, 1401] },
+    { command: LevelCommands.set_mario_pos, args: [1, 24.5, 1088, 138, 1401] },
     { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_or_update, LevelUpdate] },
     { command: LevelCommands.call_loop, args: [1, LevelUpdate.lvl_init_or_update, LevelUpdate] },
 ]

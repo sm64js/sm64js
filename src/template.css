@@ -52,6 +52,20 @@ a:hover {
   text-shadow: 0px 4px #b98a50, 2px 3px #b98a50, -3px 3px #b98a50, -3px -1px #b98a50;
 }
 
+/* Button focus style */
+
+.btn-primary.focus, .btn-primary:focus {
+    box-shadow: 0px 2px 2px 2px #00000045;
+}
+
+.btn-warning:hover {
+    color: white;
+}
+
+.btn-warning.focus, .btn-warning:focus {
+    color: white;
+}
+
 /* Other font related stuff*/
 
 #skinCustomizerWindow{
@@ -66,10 +80,35 @@ a:hover {
     color: black;
 }
 
+#gamepadControlsWindow .row .form-inline .form-group .col-form-label{
+    color: black;
+}
+
+#skinCustomizerWindow label{
+    color: black;
+}
 
 #keyboardControlsWindow .row .form-inline .form-group .form-control{
     font-size: 21px;
 }
+
+.musicDiv h4{
+    font-size: 28px;
+}
+
+.musicDiv h5{
+    font-size: 24px;
+}
+
+.musicDiv{
+    margin-top: 1em;
+}
+
+/* drop-down list font */
+select{
+    font-family: TextBoxFont;
+}
+
 
 .h6, h6 {
     font-size: 150% !important;

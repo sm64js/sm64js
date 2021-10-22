@@ -640,10 +640,10 @@ export const mario_geo_render_body = [
 			{ command: Geo.node_switch_case, args: [0, MarioMisc.geo_switch_mario_model, MarioMisc] },
 				{ command: Geo.open_node },
 					{ command: Geo.branch, args: [1, mario_geo_low_poly_body ] },
-					{ command: Geo.branch, args: [1, luigi_geo_low_poly_body ] }, //L
-					{ command: Geo.branch, args: [1, mario_geo_low_poly_body ] }, //Y
-					{ command: Geo.branch, args: [1, mario_geo_low_poly_body ] }, //W
-					{ command: Geo.branch, args: [1, mario_geo_low_poly_body ] }, //M
+					{ command: Geo.branch, args: [1, luigi_geo_low_poly_body ] }, 
+					{ command: Geo.branch, args: [1, mario_geo_low_poly_body ] }, 
+					{ command: Geo.branch, args: [1, mario_geo_low_poly_body ] }, 
+					{ command: Geo.branch, args: [1, mario_geo_low_poly_body ] }, //TODO: who?
 				{ command: Geo.close_node },
         { command: Geo.close_node },
     { command: Geo.close_node },

@@ -2,7 +2,7 @@ import * as Mario from "./Mario"
 import { stop_and_set_height_to_floor } from "./MarioStep"
 import * as Particles from "../include/mario_constants"
 
-const common_death_handler = (m, animation, frameToDeathWarp) => {
+export const common_death_handler = (m, animation, frameToDeathWarp) => {
 	const animFrame = Mario.set_mario_animation(m, animation);
     if (animFrame == frameToDeathWarp) {
         Mario.respawn_player(m)

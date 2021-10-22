@@ -552,7 +552,7 @@ export const set_forward_vel = (m, forwardVel) => {
 
 export const get_character_type = (m) => { // todo; make draw from 'm' somehow.
 	if (!m.marioObj.localMario) return 0;
-	return Math.floor(window.myMario.skinData.customCapState/2)%4
+	return Math.floor(window.myMario.skinData.customCapState/2)%2
 }
 
 export const set_mario_y_vel_based_on_fspeed = (m, initialVelY, multiplier) => {

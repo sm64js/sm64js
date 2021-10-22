@@ -201,7 +201,7 @@ document.getElementById('playerNameForm').onsubmit = (e) => {
 }
 
 window.updatePlayerName = (name) => {
-    if (name.length < 3) {
+    if (name.trim().length < 3) {
         document.getElementById("playerNameInput").style.borderColor = "red"
         document.getElementById("playerNameInput").style.borderWidth = "3px"
     } else {

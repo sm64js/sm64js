@@ -67,7 +67,8 @@ module.exports = env => ({
             patterns: [
                 { from: "./src/mmo/assets", to: "./mmo/assets" },
                 { from: "./src/mmo/html", to: "./mmo/html" },
-                { from: "./src/credits.html", to: "./credits.html" }
+                { from: "./src/credits.html", to: "./credits.html" },
+                { from: "./src/favicon.ico", to: "./favicon.ico" }
             ],
         }),
     ],

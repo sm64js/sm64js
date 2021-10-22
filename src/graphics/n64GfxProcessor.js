@@ -35,7 +35,7 @@ const precomp_shaders = [
 
 const MAX_BUFFERED = 256
 const MAX_LIGHTS = 2
-const MAX_VERTICES = 64
+const MAX_VERTICES = 8192
 
 export class n64GfxProcessor {
     constructor() {

@@ -40,7 +40,7 @@ const apply_slope_accel = (m) => {
                 slopeAccel = 0.0;
                 break;
         }
-
+		if (Mario.get_character_type(m) == 1)slopeAccel*=0.5
         if (floorDYaw > -0x4000 && floorDYaw < 0x4000) {
             m.forwardVel += slopeAccel * steepness;
         } else {
@@ -66,7 +66,7 @@ const apply_slope_decel = (m, decelCoef) => {
     switch (Mario.mario_get_floor_class(m)) {
         default: decel = decelCoef * 2.0; break
     }
-
+	if (Mario.get_character_type(m) == 1)decel*=0.5
     m.forwardVel = approach_number(m.forwardVel, 0.0, decel, decel)
     if (m.forwardVel == 0.0) stopped = 1
 
@@ -80,15 +80,15 @@ const update_walking_speed = (m) => {
 
     if (m.floor && m.floor.type == SURFACE_SLOW) maxTargetSpeed = 24
     else maxTargetSpeed = 32
-
+	
     targetSpeed = m.intendedMag < maxTargetSpeed ? m.intendedMag : maxTargetSpeed
 
     if (m.forwardVel <= 0.0) {
-        m.forwardVel += 1.1
+        m.forwardVel += 1.1*((Mario.get_character_type(m)) ? 0.85 : 1.0)
     } else if (m.forwardVel <= targetSpeed) {
-        m.forwardVel += 1.1 - m.forwardVel / 43.0
-    } else if (m.floor.normal.y >= 0.95) {
-        m.forwardVel -= 1.0
+        m.forwardVel += 1.1*((Mario.get_character_type(m)) ? 0.85 : 1.0) - m.forwardVel / 43.0
+    } else if (m.floor && m.floor.normal.y >= 0.95) {
+        m.forwardVel -= 1.0*((Mario.get_character_type(m)) ? 0.85 : 1.0)
     }
 
     if (m.forwardVel > 48.0) m.forwardVel = 48.0

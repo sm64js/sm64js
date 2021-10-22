@@ -230,9 +230,12 @@ const check_kick_or_dive_in_air = (m) => {
 }
 
 const act_jump = (m) => {
-
+	
     if (check_kick_or_dive_in_air(m)) return 1
-
+	
+	if (Mario.get_character_type(m) == 2 && m.vel[3] != 0.0) {m.vel[3] += 0.5}
+	if (m.input & Mario.INPUT_A_PRESSED && Mario.get_character_type(m) == 2 && m.vel[3] >= 0.0) { Mario.set_mario_action(m, Mario.ACT_FLUTTERJUMP, 0) }
+	
     if (m.input & Mario.INPUT_Z_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
     }
@@ -256,6 +259,9 @@ const act_freefall = (m) => {
 		m.canGlide = 2
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
+	
+	if (Mario.get_character_type(m) == 2 && m.vel[3] != 0.0) {m.vel[3] += 0.5}
+	if (m.input & Mario.INPUT_A_PRESSED && Mario.get_character_type(m) == 2 && m.vel[3] >= 0.0) { Mario.set_mario_action(m, Mario.ACT_FLUTTERJUMP, 0) }
 
     if (m.input & Mario.INPUT_Z_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
@@ -319,6 +325,26 @@ const act_parachuting = (m) => {
     return 0
 }
 
+const act_flutterjump = (m) => {
+	if (m.actionArg == 0) {
+        m.vel[3] = 32;
+        m.vel[1] = -48;
+		m.actionArg = 1
+    }
+	if (m.vel[3] > 0.0) {
+		m.vel[1] += 9;m.vel[3] -= 2
+	} else {
+        m.vel[3] = -8.0;
+		return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0);
+	}
+	
+	
+    common_air_action_step(m, Mario.ACT_FREEFALL_LAND, Mario.MARIO_ANIM_RUNNING, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
+
+	m.marioObj.header.gfx.angle[0] = m.vel[1] * -100.0
+	
+    return 0
+}
 const act_side_flip = (m) => {
 
     if (m.input & Mario.INPUT_B_PRESSED) {
@@ -730,7 +756,7 @@ const act_ground_pound = (m) => {
         }
     }
 	
-	if (m.input & Mario.INPUT_B_PRESSED && m.actionTimer > 8) {
+	if (m.input & Mario.INPUT_B_PRESSED && m.actionTimer > 8 && Mario.get_character_type(m) != 2) {
 		m.faceAngle[1] = m.intendedYaw
 		m.vel[1] = 45.0
 		Mario.set_forward_vel(m, 30.0)
@@ -876,11 +902,11 @@ const act_hold_water_jump = (m) => {
     }
 
     //TODO play_mario_sound(m, SOUND_ACTION_UNKNOWN432, 0);
-    Mario.set_mario_animation(m, Mario.MARIO_ANIM_JUMP_WITH_LIGHT_OBJ);
+    //Mario.set_mario_animation(m, Mario.MARIO_ANIM_JUMP_WITH_LIGHT_OBJ);
 
     switch (perform_air_step(m, 0)) {
         case Mario.AIR_STEP_LANDED:
-            Mario.set_mario_action(m, Mario.ACT_HOLD_JUMP_LAND, 0);
+            //Mario.set_mario_action(m, Mario.ACT_HOLD_JUMP_LAND, 0);
             //TODO set_camera_mode(m.area.camera, m.area.camera.defMode, 1);
             break;
 
@@ -949,6 +975,7 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_WATER_JUMP: return act_water_jump(m)
         case Mario.ACT_HOLD_WATER_JUMP: return act_hold_water_jump(m)
         case Mario.ACT_PARACHUTING: return act_parachuting(m)
+        case Mario.ACT_FLUTTERJUMP: return act_flutterjump(m)
         default: throw "unkown action airborne " + m.action.toString(16)
     }
 }

@@ -567,7 +567,7 @@ class Camera {
     }
 
     update_camera(c) {
-
+        if (window.myMario.freezeCamera) return
         this.gCamera = c
         this.update_camera_hud_status(c);
 
@@ -1191,7 +1191,7 @@ class Camera {
         graphNode.pos = [...this.gLakituState.pos]
         graphNode.focus = [...this.gLakituState.focus]
 
-        if (LevelUpdate.gMarioState.action == Mario.ACT_PARACHUTING) {
+        if (LevelUpdate.gMarioState.action == Mario.ACT_PARACHUTING && !window.myMario.freezeCamera) {
             graphNode.pos[1] = LevelUpdate.gMarioState.pos[1] + 600
             graphNode.focus = [...LevelUpdate.gMarioState.pos]
         }

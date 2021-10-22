@@ -78,8 +78,29 @@ $('[data-toggle="skinCustomizerToggle"]').popover({
 $('[data-toggle="skinCustomizerToggle"]').on('shown.bs.popover', () => { window.setSkinSliderValues() })
 
 window.toggleCapState = () => {
-    window.myMario.skinData.customCapState = window.myMario.skinData.customCapState == 1 ? 0 : 1
+	if (Math.floor(window.myMario.skinData.customCapState/2)%4 == 1) {
+		window.myMario.skinData.customCapState = window.myMario.skinData.customCapState%2 == 1 ? 2 : 3
+	} else if (Math.floor(window.myMario.skinData.customCapState/2)%4 == 2) {
+		window.myMario.skinData.customCapState = window.myMario.skinData.customCapState%2 == 1 ? 4 : 5
+	} else if (Math.floor(window.myMario.skinData.customCapState/2)%4 == 3) {
+		window.myMario.skinData.customCapState = window.myMario.skinData.customCapState%2 == 1 ? 6 : 7
+	} else if (Math.floor(window.myMario.skinData.customCapState/2)%4 == 4) {
+		window.myMario.skinData.customCapState = window.myMario.skinData.customCapState%2 == 1 ? 8 : 9
+	} else {
+		window.myMario.skinData.customCapState = window.myMario.skinData.customCapState%2 == 1 ? 0 : 1
+	}
     localStorage[`skinData-customCapState`] = JSON.stringify(window.myMario.skinData.customCapState)
+}
+// window.toggleLuigi = () => {
+	// window.myMario.skinData.customCapState += (window.myMario.skinData.customCapState >= 2 ? -2 : 2)
+    // localStorage[`skinData-customCapState`] = JSON.stringify(window.myMario.skinData.customCapState)
+// }
+window.setCharacter = (index) => {
+	window.myMario.skinData.customCapState = Math.floor(index*2)+window.myMario.skinData.customCapState%2
+    /// Save all
+    Object.keys(window.myMario.skinData).forEach((skinType) => {
+        localStorage[`skinData-${skinType}`] = JSON.stringify(window.myMario.skinData[skinType])
+    })
 }
 
 window.customSkinUpdate = (slider) => {
@@ -180,7 +201,7 @@ document.getElementById('playerNameForm').onsubmit = (e) => {
 }
 
 window.updatePlayerName = (name) => {
-    if (name.length < 3) {
+    if (name.trim().length < 3) {
         document.getElementById("playerNameInput").style.borderColor = "red"
         document.getElementById("playerNameInput").style.borderWidth = "3px"
     } else {
@@ -297,7 +318,7 @@ export const validSkins = () => {
     if (!isValidSkinEntry(skinData.skin)) return false
     if (!isValidSkinEntry(skinData.hair)) return false
     if (!isValidSkinEntry(skinData.parachute)) return false
-    if (skinData.customCapState !== 0 && skinData.customCapState !== 1) return false
+    if (skinData.customCapState < 0 || skinData.customCapState > 3) return false
 
     return true
 }
@@ -358,3 +379,5 @@ export const getExtraRenderData = (socket_id) => {
     }
 
 }
+
+window.myMario.freezeCamera = false

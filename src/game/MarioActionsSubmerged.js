@@ -736,7 +736,7 @@ const common_water_knockback_step = (m, animation, endAction, arg3) => {
 const act_water_death = (m) => {
     stationary_slow_down(m)
     perform_water_step(m)
-    common_death_handler(m, Mario.MARIO_ANIM_WATER_DYING, 35)
+    common_death_handler(m, Mario.MARIO_ANIM_SUFFOCATING, 35)
 
     return 0
 }

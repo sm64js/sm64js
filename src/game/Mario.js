@@ -377,6 +377,7 @@ export const ACT_FLAGWATER_OR_TEXT = (1 << 29)
 export const ACT_FLAG_THROWING = (1 << 31)
 export const ACT_TAUNT = (0x193 | ACT_FLAG_STATIONARY | ACT_FLAG_IDLE)
 export const ACT_PARACHUTING = 0x1100088C
+export const ACT_FLUTTERJUMP = 0x13000880
 export const ACT_KARTING = 0x10840452
 
 
@@ -549,8 +550,13 @@ export const set_forward_vel = (m, forwardVel) => {
     m.vel[2] = m.slideVelZ
 }
 
+export const get_character_type = (m) => { // todo; make draw from 'm' somehow.
+	if (!m.marioObj.localMario) return 0;
+	return Math.floor(window.myMario.skinData.customCapState/2)%2
+}
+
 export const set_mario_y_vel_based_on_fspeed = (m, initialVelY, multiplier) => {
-    m.vel[1] = initialVelY + (m.forwardVel * multiplier)
+    m.vel[1] = initialVelY + (get_character_type(m) == 1 ? 8.0 : 0.0) + (m.forwardVel * multiplier)
 }
 
 const read_next_anim_value = (curFrame, attribute, values) => {
@@ -677,6 +683,10 @@ export const set_mario_action = (m, action, actionArg) => {
         case ACT_GROUP_AIRBORNE:
             action = set_mario_action_airborne(m, action, actionArg); break
     }
+	
+	if (action == ACT_FREEFALL || action == ACT_JUMP) {
+		m.input &= ~INPUT_A_PRESSED
+	}
 
     m.flags &= ~(MARIO_ACTION_SOUND_PLAYED | MARIO_MARIO_SOUND_PLAYED)
 
@@ -1159,9 +1169,11 @@ const update_mario_geometry_inputs = (m) => {
     }
 
     /// bouncepad
-    if (m.floor.type == 0x0004 && !(m.input & INPUT_OFF_FLOOR && m.health > 0xFF)) {
-        m.vel[1] = 200
-        set_mario_action(m, ACT_PARACHUTING, 0)
+    if (m.floor) {
+        if (m.floor.type == 0x0004 && !(m.input & INPUT_OFF_FLOOR && m.health > 0xFF)) {
+            m.vel[1] = 200
+            set_mario_action(m, ACT_PARACHUTING, 0)
+        }
     }
 
 }

@@ -87,10 +87,9 @@ import {
     mario_texture_eyes_front, 
     mario_texture_hair_sideburn, 
     mario_texture_mustache, 
-    mario_texture_m_logo,
     mario_texture_eyes_half_closed,
     mario_texture_eyes_closed
-} from "./actors/mario/model.inc"
+} from "./actors/mario/texture.inc"
 
 import { yellow_sphere_seg5_texture_05000040 } from "./actors/yellow_sphere_small/model.inc"
 
@@ -672,7 +671,6 @@ export const loadDataIntoGame = (data) => {
     ccm_seg7_texture_07004B00.push(...data["levels/ccm/11.rgba16.png"].data)
 
     mario_texture_yellow_button.push(...data['actors/mario/mario_overalls_button.rgba16.png'].data)
-    mario_texture_m_logo.push(...data['actors/mario/mario_logo.rgba16.png'].data)
     mario_texture_mustache.push(...data["actors/mario/mario_mustache.rgba16.png"].data)
     mario_texture_hair_sideburn.push(...data["actors/mario/mario_sideburn.rgba16.png"].data)
     mario_texture_eyes_front.push(...data["actors/mario/mario_eyes_center.rgba16.png"].data)

@@ -104,7 +104,7 @@ const custom_draw_message_bubble = (text, fontsize, pixelX, pixelY, backgroundCo
 
 
 export const custom_draw_text = (x, y, w) => {
-
+    if (window.HUDHidden) return
     context2d.save()
 
     const pixelX = ((x / w) * 0.5 + 0.5) * canvas2d.width
@@ -165,6 +165,7 @@ const drawMinimapIconRotation = (sprite, width, height, X, Z, scale_map, scale_i
 }
 
 export const draw2Dpost3Drendering = () => {
+    if (window.HUDHidden) return
     context2d.globalAlpha = 0.8
     if (window.latency) {
         context2d.font = "bold 14px verdana, sans-serif"

@@ -14,7 +14,7 @@ export const level_dolphin_entry = [
     { command: LevelCommands.begin_area, args: [1, dolphin_area_1_geo] },
     { command: LevelCommands.terrain, args: [dolphin_area_1_collision] },
     { command: LevelCommands.end_area },
-	{ command: LevelCommands.set_mario_pos, args: [1, 90, 789, 433, -47] },
+	{ command: LevelCommands.set_mario_pos, args: [1, 90, -12729, 343, -339] },
     { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_or_update, LevelUpdate] },
     { command: LevelCommands.call_loop, args: [1, LevelUpdate.lvl_init_or_update, LevelUpdate] },
 ]

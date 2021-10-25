@@ -381,3 +381,9 @@ export const getExtraRenderData = (socket_id) => {
 }
 
 window.myMario.freezeCamera = false
+window.HUDHidden = false
+window.hideHUD = (btn) => {
+    window.HUDHidden = !window.HUDHidden
+    btn.textContent = window.HUDHidden ? "Unhide HUD" : "Hide HUD"
+    document.getElementById("connectedMsg").style.display = window.HUDHidden ? "none" : "block"
+}

@@ -1085,6 +1085,18 @@ const update_mario_health = (m) => {
     }
 }
 
+const mario_basic_lava = (m) => {
+    if (m.floor) {
+        if (m.floor.type == 0x0001 && m.pos[1] < m.floorHeight + 4) {
+            m.health -= 0x330
+            if (m.health < 0) { m.health = 0; respawn_player(m) } else { 
+                m.vel[1] = 80
+                set_mario_action(m, ACT_FREEFALL, 0)
+            }
+        }
+    }
+}
+
 const update_mario_button_inputs = (m) => {
 
     if (m.controller == null) return
@@ -1175,6 +1187,8 @@ const update_mario_geometry_inputs = (m) => {
             set_mario_action(m, ACT_PARACHUTING, 0)
         }
     }
+
+    mario_basic_lava(m)
 
 }
 

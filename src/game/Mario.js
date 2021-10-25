@@ -1447,6 +1447,8 @@ const update_mario_inputs = (m) => {
 
 const update_mario_info_for_cam = (m) => {
     m.marioBodyState.action = m.action
+    m.marioBodyState.torsoPos = [...m.pos]
+    m.marioBodyState.torsoPos[1] += 22 // about torso height
     m.statusForCamera.action = m.action
 
     m.statusForCamera.faceAngle = [...m.faceAngle]

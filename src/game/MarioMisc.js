@@ -46,12 +46,6 @@ class MarioMisc {
             rotNode.wrapper.rotation[0] = this.gBodyState.torsoAngle[1]
             rotNode.wrapper.rotation[1] = this.gBodyState.torsoAngle[2]
             rotNode.wrapper.rotation[2] = this.gBodyState.torsoAngle[0]
-
-            const curTransform = mtx
-            const cameraMtx = GeoRenderer.gCurGraphNodeCamera.wrapper.matrixPtr
-
-            ///update torso position
-            if (curTransform && cameraMtx) get_pos_from_transform_mtx(this.gBodyState.torsoPos, curTransform, cameraMtx)
         }
         return []
 

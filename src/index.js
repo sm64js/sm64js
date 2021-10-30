@@ -1,4 +1,6 @@
-﻿import { loadDataIntoGame } from "./romTextureLoader.js"
+﻿import * as IDB from "idb-keyval"
+var msgpack = require("msgpack-lite")
+import { loadDataIntoGame } from "./romTextureLoader.js"
 import { GameInstance as Game } from "./game/Game"
 import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
@@ -16,7 +18,7 @@ let n_frames = 0
 let target_time = 0
 let frameSpeed = 0.03
 let reset_delay = 0
-export const textureVersion = 37
+export const textureVersion = 38
 
 const produce_one_frame = () => {
 	let respText = ""
@@ -156,7 +158,7 @@ document.getElementById("startbutton").addEventListener('click', () => {
 })
 
 document.getElementById("deleteRom").addEventListener('click', () => {
-    localStorage.removeItem('sm64jsAssets')
+    IDB.del('assets')
     window.location.reload()
 })
 
@@ -254,15 +256,24 @@ if (localStorage['rules'] != rulesVersion) $('#rules-modal').modal({ backdrop: '
 $("#rules-modal").on('hide.bs.modal', () => { localStorage['rules'] = rulesVersion })
 
 const checkForRom = () => {   /// happens one time when the page is loaded
-    if (localStorage['sm64jsAssets']) {
-        const data = JSON.parse(localStorage['sm64jsAssets'])
-        if (data.textureVersion == textureVersion) {
-            loadDataIntoGame(data)
-            return true
-        }
+    const url = new URL(window.location.href)
+    if (url.searchParams.get("romReset")) {
+        IDB.del('assets')
+        return false
     }
 
-    const url = new URL(window.location.href)
+    return IDB.get('assets').then((msgdata) => {
+        if (msgdata) {
+            let data = msgpack.decode(msgdata)
+            if (data.textureVersion == textureVersion) {
+               loadDataIntoGame(data)
+            } else {
+               msgdata = null
+            }
+        }
+        return !!msgdata
+    })
+
     if (url.searchParams.get("romExternal")) {
         const msgElement = document.getElementById('romMessage')
         msgElement.innerHTML = "Transfering ROM Data..."
@@ -273,5 +284,5 @@ const checkForRom = () => {   /// happens one time when the page is loaded
     }
 
 
-    return false
+    //return false
 }

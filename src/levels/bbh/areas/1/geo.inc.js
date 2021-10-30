@@ -487,7 +487,7 @@ export const geo_bbh_000F00 = [
 	{ command: Geo.open_node },
 	{ command: Geo.node_ortho, args: [100]},
 	{ command: Geo.open_node },
- 	//{ command: Geo.node_background, args: [Geo.BACKGROUND_HAUNTED, geo_skybox_main] },
+ 	{ command: Geo.node_background, args: [Geo.BACKGROUND_HAUNTED, geo_skybox_main] },
 	{ command: Geo.close_node },
 	{ command: Geo.close_node },
 	{ command: Geo.node_master_list, args: [1]},

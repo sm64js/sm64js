@@ -278,7 +278,7 @@ div.row ul#chatlog{
 #connectedMsg{
     position: absolute;
     margin-left: 36px;
-    margin-top: 26px;
+    /*margin-top: 26px;*/
     padding-left: 8px;
     padding-right: 8px;
 }

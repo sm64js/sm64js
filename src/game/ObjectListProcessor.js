@@ -1,5 +1,11 @@
 import { PlatformDisplacementInstance as PlatformDisplacement } from "./PlatformDisplacement"
-import { RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte, ACTIVE_FLAG_ACTIVE, RESPAWN_INFO_TYPE_16, oFlags, OBJ_FLAG_PERSISTENT_RESPAWN, oMarioParticleFlags, ACTIVE_PARTICLE_H_STAR, oActiveParticleFlags, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_TRIANGLE, ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_MIST_CIRCLE, ACTIVE_PARTICLE_BUBBLE } from "../include/object_constants"
+import {
+    RESPAWN_INFO_DONT_RESPAWN, ACTIVE_FLAGS_DEACTIVATED, RESPAWN_INFO_TYPE_32, oPosX, oPosY, oPosZ, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oVelX, oVelY, oVelZ, oAngleVelPitch, oAngleVelYaw, oAngleVelRoll, oBehParams, oBehParams2ndByte, ACTIVE_FLAG_ACTIVE, RESPAWN_INFO_TYPE_16, oFlags, OBJ_FLAG_PERSISTENT_RESPAWN, oMarioParticleFlags, oActiveParticleFlags,
+    ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_SPARKLES, ACTIVE_PARTICLE_BUBBLE,
+    ACTIVE_PARTICLE_WATER_SPLASH, ACTIVE_PARTICLE_IDLE_WATER_WAVE, ACTIVE_PARTICLE_PLUNGE_BUBBLE, ACTIVE_PARTICLE_WAVE_TRAIL,
+    ACTIVE_PARTICLE_FIRE, ACTIVE_PARTICLE_SHALLOW_WATER_WAVE, ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH, ACTIVE_PARTICLE_LEAF,
+    ACTIVE_PARTICLE_SNOW, ACTIVE_PARTICLE_BREATH, ACTIVE_PARTICLE_DIRT, ACTIVE_PARTICLE_MIST_CIRCLE, ACTIVE_PARTICLE_TRIANGLE
+} from "../include/object_constants"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import * as GraphNode from "../engine/graph_node"
 import { BehaviorCommandsInstance as Behavior } from "../engine/BehaviorCommands"
@@ -9,40 +15,63 @@ import { networkData, gameData as socketGameData, updateNetworkBeforeRender } fr
 import { copyMarioUpdateToState } from "../mmo/MultiMarioManager"
 import { vec3f_dif, vec3f_length } from "../engine/math_util"
 import { uint32, uint16 } from "../utils"
-import { MODEL_NONE, MODEL_MIST, MODEL_BUBBLE } from "../include/model_ids"
+import {
+    MODEL_MIST, MODEL_NONE, MODEL_SPARKLES, MODEL_BUBBLE, MODEL_WATER_SPLASH, MODEL_IDLE_WATER_WAVE, MODEL_WHITE_PARTICLE_SMALL,
+    MODEL_WAVE_TRAIL, MODEL_RED_FLAME
+} from "../include/model_ids"
+import {
+    PARTICLE_DUST, PARTICLE_VERTICAL_STAR, PARTICLE_HORIZONTAL_STAR, PARTICLE_SPARKLES, PARTICLE_BUBBLE, PARTICLE_WATER_SPLASH,        
+    PARTICLE_IDLE_WATER_WAVE, PARTICLE_PLUNGE_BUBBLE, PARTICLE_WAVE_TRAIL, PARTICLE_FIRE, PARTICLE_SHALLOW_WATER_WAVE,  
+    PARTICLE_SHALLOW_WATER_SPLASH, PARTICLE_LEAF, PARTICLE_SNOW, PARTICLE_BREATH, PARTICLE_DIRT, PARTICLE_MIST_CIRCLE, PARTICLE_TRIANGLE
+} from "../include/mario_constants"
 import * as MarioConstants from "../include/mario_constants"
 import { gLinker } from "./Linker"
 import { spawn_object_at_origin, obj_copy_pos_and_angle, dist_between_objects } from "./ObjectHelpers"
 
 class ObjectListProcessor {
     constructor() {
-
         PlatformDisplacement.ObjectListProc = this
         this.sParticleTypesInit = () => {
             return [
                 {
-                    particleFlag: MarioConstants.PARTICLE_HORIZONTAL_STAR, activeParticleFlag: ACTIVE_PARTICLE_H_STAR, model: MODEL_NONE,
+                    particleFlag: PARTICLE_HORIZONTAL_STAR, activeParticleFlag: ACTIVE_PARTICLE_H_STAR, model: MODEL_NONE,
                     behavior: gLinker.behaviors.bhvHorStarParticleSpawner
                 },
                 {
-                    particleFlag: MarioConstants.PARTICLE_VERTICAL_STAR, activeParticleFlag: ACTIVE_PARTICLE_V_STAR, model: MODEL_NONE,
+                    particleFlag: PARTICLE_VERTICAL_STAR, activeParticleFlag: ACTIVE_PARTICLE_V_STAR, model: MODEL_NONE,
                     behavior: gLinker.behaviors.bhvVertStarParticleSpawner
                 },
                 {
-                    particleFlag: MarioConstants.PARTICLE_TRIANGLE, activeParticleFlag: ACTIVE_PARTICLE_TRIANGLE, model: MODEL_NONE,
+                    particleFlag: PARTICLE_TRIANGLE, activeParticleFlag: ACTIVE_PARTICLE_TRIANGLE, model: MODEL_NONE,
                     behavior: gLinker.behaviors.bhvTriangleParticleSpawner
                 },
                 {
-                    particleFlag: MarioConstants.PARTICLE_DUST, activeParticleFlag: ACTIVE_PARTICLE_DUST, model: MODEL_MIST,
+                    particleFlag: PARTICLE_DUST, activeParticleFlag: ACTIVE_PARTICLE_DUST, model: MODEL_MIST,
                     behavior: gLinker.behaviors.bhvMistParticleSpawner
                 },
                 {
-                    particleFlag: MarioConstants.PARTICLE_MIST_CIRCLE, activeParticleFlag: ACTIVE_PARTICLE_MIST_CIRCLE, model: MODEL_NONE,
+                    particleFlag: PARTICLE_MIST_CIRCLE, activeParticleFlag: ACTIVE_PARTICLE_MIST_CIRCLE, model: MODEL_NONE,
                     behavior: gLinker.behaviors.bhvMistCircParticleSpawner
                 },
                 {
-                    particleFlag: MarioConstants.PARTICLE_BUBBLE, activeParticleFlag: ACTIVE_PARTICLE_BUBBLE, model: MODEL_BUBBLE,
+                    particleFlag: PARTICLE_BUBBLE, activeParticleFlag: ACTIVE_PARTICLE_BUBBLE, model: MODEL_BUBBLE,
                     behavior: gLinker.behaviors.bhvBubbleParticleSpawner
+                },
+                {
+                    particleFlag: PARTICLE_WATER_SPLASH, activeParticleFlag: ACTIVE_PARTICLE_WATER_SPLASH, model: MODEL_WATER_SPLASH,
+                    behavior: gLinker.behaviors.bhvWaterSplash
+                },
+                {
+                    particleFlag: PARTICLE_IDLE_WATER_WAVE, activeParticleFlag: ACTIVE_PARTICLE_IDLE_WATER_WAVE, model: MODEL_IDLE_WATER_WAVE,
+                    behavior: gLinker.behaviors.bhvIdleWaterWave
+                },
+                {
+                    particleFlag: PARTICLE_PLUNGE_BUBBLE, activeParticleFlag: ACTIVE_PARTICLE_PLUNGE_BUBBLE, model: MODEL_WHITE_PARTICLE_SMALL,
+                    behavior: gLinker.behaviors.bhvPlungeBubble
+                },
+                {
+                    particleFlag: PARTICLE_WAVE_TRAIL, activeParticleFlag: ACTIVE_PARTICLE_WAVE_TRAIL, model: MODEL_WAVE_TRAIL,
+                    behavior: gLinker.behaviors.bhvWaveTrail
                 }
             ]
         }
@@ -249,7 +278,6 @@ class ObjectListProcessor {
     }
 
     bhv_mario_update() {
-            
         const torsoDiff = [0, 0, 0]
         vec3f_dif(torsoDiff, this.gCurrentObject.marioState.pos, this.gCurrentObject.marioState.marioBodyState.torsoPos)
         if (vec3f_length(torsoDiff) > 300)
@@ -263,12 +291,11 @@ class ObjectListProcessor {
         this.sParticleTypes.forEach(particleType => {
             if (particleFlags & particleType.particleFlag) {
                 const distanceToLocalMario = dist_between_objects(this.gCurrentObject, this.gMarioObject)
-                if (distanceToLocalMario < 1000.0) {
+                if (particleType.behavior && distanceToLocalMario < 1000.0) {  // during development some particles aren't implemented
                     this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
                 }
             }
         })
-
     }
 
     copy_mario_state_to_object(marioState) {

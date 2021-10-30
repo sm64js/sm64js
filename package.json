@@ -18,7 +18,9 @@
   },
   "dependencies": {
     "google-protobuf": "^3.13.0",
-    "mathjs": "^7.0.1"
+    "idb-keyval": "^6.0.3",
+    "mathjs": "^7.0.1",
+    "msgpack-lite": "^0.1.26"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",

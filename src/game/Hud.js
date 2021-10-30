@@ -318,7 +318,8 @@ class Hud {
     }
 
     render_hud() {
-        const hudDisplayFlags = 0 ///Disable for Base MMO //LevelUpdate.gHudDisplay.flags;
+        if (window.HUDHidden) return
+        const hudDisplayFlags = LevelUpdate.gHudDisplay.flags
 
         if (hudDisplayFlags == LevelUpdate.HUD_DISPLAY_NONE) {
             this.sPowerMeterHUD.animation = this.POWER_METER_HIDDEN
@@ -331,7 +332,7 @@ class Hud {
                 this.render_hud_cannon_reticle()
             }
 
-            if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_LIVES) {
+            /*if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_LIVES) {
                 this.render_hud_mario_lives()
             }
 
@@ -341,7 +342,7 @@ class Hud {
 
             if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_STAR_COUNT) {
                 this.render_hud_stars()
-            }
+            }*/
 
             // if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_KEYS) {
             //     this.render_hud_keys();
@@ -349,7 +350,7 @@ class Hud {
 
             if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_CAMERA_AND_POWER) {
                 this.render_hud_power_meter()
-                this.render_hud_camera_status()
+                //this.render_hud_camera_status()
             }
 
             // if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_TIMER) {

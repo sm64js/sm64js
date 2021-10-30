@@ -112,7 +112,7 @@ export const custom_draw_text = (x, y, w) => {
 
     if (customData2D.playerName) {
         context2d.globalAlpha = 0.8
-        context2d.font = "bold 14px verdana, sans-serif"
+        context2d.font = "bold 20px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
         context2d.fillStyle = "#9400D3"
         context2d.fillText(customData2D.playerName , pixelX, pixelY)
@@ -168,21 +168,21 @@ export const draw2Dpost3Drendering = () => {
     if (window.HUDHidden) return
     context2d.globalAlpha = 0.8
     if (window.latency) {
-        context2d.font = "bold 14px verdana, sans-serif"
+        context2d.font = "bold 24px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
         context2d.fillStyle = "#9400D3"
         context2d.fillText(`Ping: ${window.latency}ms`, 580, 20)
     }
     if (!isNaN(window.fps)) {
         context2d.globalAlpha = 0.8
-        context2d.font = "bold 14px verdana, sans-serif"
+        context2d.font = "bold 24px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
         context2d.fillStyle = "#9400D3"
         context2d.fillText(`fps: ${window.fps}`, 580, 40)
     }
 	if (gameData.marioState && !isNaN(window.myMario.readOnlyHealth)) {
         context2d.globalAlpha = 1.0
-        context2d.drawImage(marioHealthWedges[window.myMario.readOnlyHealth],518 + 16,42,96,96)
+        //context2d.drawImage(marioHealthWedges[window.myMario.readOnlyHealth],518 + 16,42,96,96)
         context2d.globalAlpha = 0.8
 	}		
     if (window.show_minimap > 0 && gameData.marioState && minimapEnabledLevel()) {

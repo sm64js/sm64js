@@ -9,8 +9,10 @@ import * as MathUtil from "../engine/math_util"
 import * as Mario from "./Mario"
 import { oPosY } from "../include/object_constants"
 import { SURFACE_DEATH_PLANE } from "../include/surface_terrains"
-import { sins, int16 } from "../utils"
+import { sins, int16, s16 } from "../utils"
 import { HudInstance as Hud } from "./Hud"
+
+export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
 const CAM_FOV_DEFAULT = 2
 
@@ -25,10 +27,10 @@ const CAM_MODE_MARIO_SELECTED        =  0x04
 const CAMERA_MODE_NONE              = 0x00
 const CAMERA_MODE_RADIAL            = 0x01
 const CAMERA_MODE_OUTWARD_RADIAL    = 0x02
-const CAMERA_MODE_BEHIND_MARIO      = 0x03
+export const CAMERA_MODE_BEHIND_MARIO      = 0x03
 const CAMERA_MODE_CLOSE             = 0x04 // Inside Castle / Big Boo's Haunt
 const CAMERA_MODE_C_UP              = 0x06
-const CAMERA_MODE_WATER_SURFACE     = 0x08
+export const CAMERA_MODE_WATER_SURFACE     = 0x08
 const CAMERA_MODE_SLIDE_HOOT        = 0x09
 const CAMERA_MODE_INSIDE_CANNON     = 0x0A
 const CAMERA_MODE_BOSS_FIGHT        = 0x0B

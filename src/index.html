@@ -131,7 +131,7 @@
                             onclick="window.togglePvp()">
                         PvP: On
                     </button>
-                    <button class="btn btn-sm btn-warning" style="justify-content:center; padding-top:10px; padding-bottom: 10px" onclick="window.myMario.freezeCamera = !window.myMario.freezeCamera; this.textContent = window.myMario.freezeCamera ? 'Freeze Camera (ON)' : 'Freeze Camera (OFF)'">Freeze Camera (OFF)</button>
+                    <button class="btn btn-sm btn-warning" style="justify-content:center; padding-top:10px; padding-bottom: 10px" onclick="window.myMario.freezeCamera = !window.myMario.freezeCamera; this.textContent = window.myMario.freezeCamera ? 'Unfreeze Camera' : 'Freeze Camera'">Freeze Camera</button>
                 </div>
             </div>
             <div id="signinSection">
@@ -237,9 +237,8 @@
 
             <br />
             <br />
-            <h6 hidden id="connectedMsg" style="color:red">Not connected to server - Refresh the page</h6>
     </div>
-
+            <h6 hidden id="connectedMsg" style="color:red">Not connected to server - Refresh the page</h6>
             <h6 hidden id="numTriangles"> Total triangles rendered this frame: </h6>
             <div hidden class="row">
                 <div class="col-5" style="text-align:left">

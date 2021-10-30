@@ -1,7 +1,7 @@
 import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
 import { AreaInstance as Area } from "../game/Area"
 
-const intro_default = () => {
+export const intro_default = () => {
     //// core implementation is needed here
     //// for now simply just checking to see if start menu is pressed to skip Goddard Renderer
     //// and press start text

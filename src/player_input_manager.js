@@ -165,7 +165,8 @@ const defaultKeyboardButtonMapping = {
     cr: 'l',
     map: 'm',
     taunt: 't',
-    parachute: 'v'
+    parachute: 'v',
+    chat: 'y'
 }
 const keyboardButtonMapping = { ...defaultKeyboardButtonMapping }
 
@@ -370,6 +371,7 @@ export const playerInputUpdate = () => {
     let buttonDownMap = gamepadFinal.map || keyboardFinal.map
     let buttonDownTaunt = gamepadFinal.taunt || keyboardFinal.taunt
     let parachuteDown = gamepadFinal.parachute || keyboardFinal.parachute
+    let buttonDownChat = keyboardFinal.chat
 
     window.playerInput = {
         stickX, stickY,
@@ -385,8 +387,9 @@ export const playerInputUpdate = () => {
         buttonPressedCd: buttonDownCd && !window.playerInput.buttonDownCd && !buttonDownTaunt,
         buttonPressedMap: buttonDownMap && !window.playerInput.buttonDownMap,
 		parachute: parachuteDown && !window.playerInput.parachuteDown,
+        buttonPressedChat: buttonDownChat && !window.playerInput.buttonDownChat,
 		
-        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap, buttonDownTaunt, parachuteDown,
+        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap, buttonDownTaunt, parachuteDown, buttonDownChat,
 
         taunt: (Object.values(tauntCommands).includes(window.taunt)) ? window.taunt : undefined,
 		
@@ -403,4 +406,10 @@ export const playerInputUpdate = () => {
         submitPlayerName()
     }
 
+    
+    //// Focuses on the chatbox
+
+    if (window.playerInput.buttonPressedChat) {
+        document.getElementById("chatbox").focus();
+    }
 }

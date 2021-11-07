@@ -1372,6 +1372,7 @@ const update_mario_geometry_inputs = (m) => {
 
     } else {
         m.input |= INPUT_OFF_FLOOR;
+        respawn_player(m)
     }
 
     /// bouncepad

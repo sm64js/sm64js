@@ -92,9 +92,6 @@ class SkyBox {
 
         const half_width = (4.0 / 3.0) / ASPECT_RATIO * SCREEN_WIDTH / 2
         const center = (this.sSkyBoxInfo.scaledX + SCREEN_WIDTH / 2)
-        if (half_width < SCREEN_WIDTH / 2) {
-            throw "wide screen - create_skybox_ortho_matrix"
-        }
 
         guOrtho(mtx, left, right, bottom, top, 0.0, 3.0, 1.0)
 

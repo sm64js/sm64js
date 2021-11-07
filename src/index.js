@@ -8,6 +8,8 @@ import  * as Socket from "./mmo/socket.js"
 import "./mmo/cosmetics"
 import "./mmo/cmts_cosmetics"
 import "./template.css"
+import { viewport } from "./game/Area"
+import { settingsHTML } from "./mmo/cosmetics"
 
 
 const send_display_list = (gfx_list) => { GFX.run(gfx_list) }
@@ -138,14 +140,72 @@ const setStatsUpdate = setInterval(() => {
     document.getElementById("timing-total").innerHTML = `${totalFrameTimeAvg}ms`
 }, 500)
 
+// widescreen
+const gameCanvas = document.querySelector('#gameCanvas')
+const textCanvas = document.querySelector('#textCanvas')
+const fullCanvas = document.querySelector('#fullCanvas')
+gameCanvas.width = 640
+gameCanvas.height = 480
+textCanvas.width  = 640
+textCanvas.height = 480
+fullCanvas.width  = 640
+fullCanvas.height = 480
+const customWidth = 1280
+const customHeight = 720
+
+window.toggleWidescreen = () => {
+    if (gameCanvas.width == 640 && gameCanvas.height == 480) {
+        localStorage.setItem("triedWidescreen", 1)
+        document.getElementById("widescreenBtn").innerHTML = "Widescreen Mode"
+        const chat = $(".chatboxPos")
+        chat.detach().appendTo(".canvasContainer")
+        document.getElementById("chatboxP").style = "margin-top: -267px; margin-left: 29px; z-index: 10;"
+        document.getElementById("chatlog").style = "height: 180px; background-color: rgba(0,0,0,0.35);"
+        document.getElementById("justifyChat").style = "justify-content:center; width: 400px;"
+        document.getElementById("chatboxes").style="justify-content:center; margin-top: -20px; width: 400px;"
+        gameCanvas.style = "background-image: url('/mmo/assets/canvasBorder169.png'); background-size: 100%; background-repeat: no-repeat; padding: 26px;"
+
+        gameCanvas.width  = customWidth
+        gameCanvas.height = customHeight
+        textCanvas.width  = customWidth
+        textCanvas.height = customHeight
+        fullCanvas.width  = customWidth
+        fullCanvas.height = customHeight
+
+        viewport.vscale = [customWidth, customHeight, 0, 0]
+        viewport.vtrans = [0, 0, 0, 0]
+    } else {
+        gameCanvas.style = "background-image: url('/mmo/assets/canvasBorder2.png'); background-size: 100%; background-repeat: no-repeat; padding: 26px;"
+        const chat = $(".chatboxPos")
+        chat.detach().appendTo("#chatboxParent")
+        document.getElementById("chatboxP").style = null
+        document.getElementById("chatlog").style = "margin-bottom: 5px !important;"
+        document.getElementById("justifyChat").style = "justify-content:center"
+        document.getElementById("chatboxes").style="justify-content:center;"
+        gameCanvas.width  = 640
+        gameCanvas.height = 480
+        textCanvas.width  = 640
+        textCanvas.height = 480
+        fullCanvas.width  = 640
+        fullCanvas.height = 480
+
+        viewport.vscale = [640, 480, 511, 0]
+        viewport.vtrans = [640, 480, 511, 0]
+    }
+}
 
 window.enterFullScreenMode = () => {
     const dstCanvas = document.getElementById('fullCanvas')
     dstCanvas.requestFullscreen()
+    if (gameCanvas.width != 640 && gameCanvas.height != 480) {
+        dstCanvas.width = window.screen.width/2
+        dstCanvas.height = window.screen.height/2
+        viewport.vscale = [window.screen.width/2, window.screen.height/2, 0, 0]
+    }
 }
 
 ///// Start Game
-const rulesVersion = 11
+const rulesVersion = 12
 let gameStarted = false
 
 document.getElementById("startbutton").addEventListener('click', () => {
@@ -157,13 +217,18 @@ document.getElementById("startbutton").addEventListener('click', () => {
     else startGame()
 })
 
-document.getElementById("deleteRom").addEventListener('click', () => {
+window.deleteRom = () => {
     IDB.del('assets')
     window.location.reload()
-})
+}
+
+if (localStorage.getItem("triedWidescreen")) {
+    if (localStorage.getItem("triedWidescreen") == 1) $(settingsHTML).children("button")[4].innerHTML = "Widescreen Mode"
+}
 
 const startGame = () => {
     console.log("Starting Game!")
+    document.getElementById("startDiv").style = "margin-top: 62px;margin-left: 320px;"
     gameStarted = true
 
     document.getElementById("startbutton").classList.remove('btn-success')

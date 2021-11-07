@@ -75,6 +75,14 @@ $('[data-toggle="skinCustomizerToggle"]').popover({
     content: skinCustomizerHtml,
 })
 
+export const settingsHTML = $('#settingsMenu').detach()
+$('[data-toggle="settingsMenuToggle"]').popover({
+    container: "body",
+    html: true,
+    sanitize: false,
+    content: settingsHTML,
+})
+
 $('[data-toggle="skinCustomizerToggle"]').on('shown.bs.popover', () => { window.setSkinSliderValues() })
 
 window.toggleCapState = () => {

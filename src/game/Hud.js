@@ -102,7 +102,11 @@ class Hud {
 
     render_dl_power_meter(numHealthWedges) {
         const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
-
+        if (document.getElementById("gameCanvas").width == 1280 && document.getElementById("gameCanvas").height == 720) {
+            this.sPowerMeterHUD.x = 191
+        } else {
+            this.sPowerMeterHUD.x = 140
+        }
         MathUtil.guTranslate(mtx, this.sPowerMeterHUD.x, this.sPowerMeterHUD.y, 0);
         Gbi.gSPMatrix(Game.gDisplayList, mtx, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_MUL | Gbi.G_MTX_PUSH);
         Gbi.gSPDisplayList(Game.gDisplayList, dl_power_meter_base);

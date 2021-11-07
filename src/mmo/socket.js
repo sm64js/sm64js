@@ -390,7 +390,8 @@ export const sendPlayerInteraction = (socket_id, interaction) => {
 
 export const submitPlayerName = () => {
 
-    document.getElementById("pvpButton").hidden = true
+    $(Cosmetics.settingsHTML).find("#pvpButton").hide()
+    // document.getElementById("mapDiv").hidden = true
 	Game.load_pvp()
 
     const joinGameMsg = new JoinGameMsg()
@@ -466,7 +467,7 @@ document.getElementById("googleSigninButton").addEventListener('click', () => {
     window.location = `${googleOAuthURL}&state=${encodeURIComponent(JSON.stringify(state))}`
 })
 
-document.getElementById("logoutButton").addEventListener('click', async () => {
+$(Cosmetics.settingsHTML).children("button")[1].addEventListener('click', async () => {
     const res = await fetch(`${process.env.BACKEND_URL ?? ''}/api/logout`, {
         method: 'POST',
         credentials: 'include'
@@ -486,7 +487,7 @@ export const recvAuthorizedUser = async (res) => {
             document.getElementById("playerNameRow").hidden = false
             document.getElementById("discordNameBox").value = msg.username
             document.getElementById("signinButtons").hidden = true
-            document.getElementById("logoutButton").hidden = false
+            $(Cosmetics.settingsHTML).children("button")[1].hidden = false
             if (!msg.username) { /// Discord Username option not available
                 document.getElementById("customNameRow").hidden = false
                 document.getElementById("discordNameRow").hidden = true

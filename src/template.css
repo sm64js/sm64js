@@ -112,8 +112,7 @@ select{
 
 .h6, h6 {
     font-size: 150% !important;
-    background-color: black;
-    background-color: #00000057;
+    background-color: rgba(0,0,0,0.5);
 }
 
 .btn{
@@ -146,6 +145,15 @@ select{
   opacity: 1;
   font-weight: 348;
   color: white;
+}
+
+.btn-stone {
+    background-image: url("/mmo/assets/btn-stone-edit.png");
+    background-size: 100% 100%;
+    border: none;
+    opacity: 1;
+    font-weight: 348;
+    color: white;
 }
 
 .btn-primary {
@@ -226,6 +234,16 @@ select{
   font-weight: 348;
 }
 
+.btn-option{
+    border-radius: 1px;
+    line-height: 132%;
+    text-shadow: #00000052 2px 2px 1px;
+    display: inline-block;
+    font-size: 25px;
+    width: 140px;
+    height: 50px;
+}
+
 .btn-secondary{
   background-image: url("/mmo/assets/btn-stone-edit.png");
   background-size: 100% 100%;
@@ -263,7 +281,7 @@ position: absolute;
 
 .canvasContainerPos{
 overflow: visible;
-margin-left: -164px;
+margin-left: -235px;
 }
 
 div.row ul#chatlog{
@@ -277,10 +295,6 @@ div.row ul#chatlog{
 
 #connectedMsg{
     position: absolute;
-    margin-left: 36px;
-    /*margin-top: 26px;*/
-    padding-left: 8px;
-    padding-right: 8px;
 }
 
 .form-group.mb-2{
@@ -340,6 +354,14 @@ just for the look not really necessary */
 body h1, h2, h3, h4, h5, h6, p, a{
     -webkit-transform: translateZ(0);
 transform: translateZ(0);
+}
+
+p {
+    font-size: 20px;
+}
+
+.modal-footer-rules {
+    text-align: right;
 }
 
 /*

@@ -171,14 +171,22 @@ export const draw2Dpost3Drendering = () => {
         context2d.font = "bold 24px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
         context2d.fillStyle = "#9400D3"
-        context2d.fillText(`Ping: ${window.latency}ms`, 580, 20)
+        if (document.getElementById("gameCanvas").width == 640) {
+            context2d.fillText(`Ping: ${window.latency}ms`, 580, 20)
+        } else {
+            context2d.fillText(`Ping: ${window.latency}ms`, 1220, 20) // can also be done by doing document.getElementById("gameCanvas").width - 60
+        }
     }
     if (!isNaN(window.fps)) {
         context2d.globalAlpha = 0.8
         context2d.font = "bold 24px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
         context2d.fillStyle = "#9400D3"
-        context2d.fillText(`fps: ${window.fps}`, 580, 40)
+        if (document.getElementById("gameCanvas").width == 640) {
+            context2d.fillText(`FPS: ${window.fps}`, 580, 40)
+        } else {
+            context2d.fillText(`FPS: ${window.fps}`, 1220, 40)
+        }
     }
 	if (gameData.marioState && !isNaN(window.myMario.readOnlyHealth)) {
         context2d.globalAlpha = 1.0

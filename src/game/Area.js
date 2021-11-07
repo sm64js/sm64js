@@ -22,6 +22,7 @@ const D_8032CF00 = {  /// default view port?
     vscale: [640, 480, 511, 0],
     vtrans: [640, 480, 511, 0]
 }
+export { D_8032CF00 as viewport }
 
 const canvas = document.querySelector('#gameCanvas')
 

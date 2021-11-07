@@ -534,7 +534,7 @@ export const loadDataIntoGame = (data) => {
     outside_0900B400.push(...data['textures/outside/castle_grounds_textures.0B400.rgba16.png'])
     outside_0900A800.push(...data['textures/outside/castle_grounds_textures.0A800.rgba16.png'])
     outside_09000800.push(...data['textures/outside/castle_grounds_textures.00800.rgba16.png'])
-    outside_09008800.push(...data['textures/outside/castle_grounds_textures.08800.rgba16.png'])
+    // outside_09008800.push(...data['textures/outside/castle_grounds_textures.08800.rgba16.png'])
     outside_0900BC00.push(...data['textures/outside/castle_grounds_textures.0BC00.ia16.png'])
 
 	grass_09000000.push(...data['textures/grass/wf_textures.00000.rgba16.png'])

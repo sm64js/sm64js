@@ -22,6 +22,8 @@ window.addEventListener("keydown", (e) => {
 
         if (chatbox.value[0] == '!') {
             handleTaunt(chatbox.value)
+        } else if (chatbox.value.split(' ')[0] == '/block') { // hacky way to combine chat and ban box
+            window.banPlayerList.push(chatbox.value.split(' ')[1])
         } else {
             sendChat({ message: chatbox.value })
         }

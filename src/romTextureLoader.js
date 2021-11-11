@@ -1461,17 +1461,3 @@ $('#romSelect').submit(
         reader.onload = (evt) => { extractAssetsFromRom(evt.target.result) }
     }
 )
-
-/*        msgElement.innerHTML = "Please wait for ROM to be uploaded and game assets to be sent back to your device..."
-        msgElement.style = "color:yellow"
-        $.ajax({
-            url: '/romUpload',
-            type: 'POST',
-            data: new FormData(e.target),
-            processData: false,
-            contentType: false,
-            success: (extractedData) => {
-                console.log(extractedData)
-                processExtractedResults(extractedData)
-            }
-        })*/

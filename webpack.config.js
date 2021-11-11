@@ -60,7 +60,7 @@ module.exports = env => ({
             filename: "./index.html"
         }),
         new MiniCssExtractPlugin({
-            filename: "template.css",
+            filename: "stylesheet.css",
             chunkFilename: "[id].css"
         }),
         new CopyPlugin({

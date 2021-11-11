@@ -5,7 +5,7 @@ import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
 import  * as Socket from "./mmo/socket.js"
 import "./mmo/cosmetics"
 import "./mmo/cmts_cosmetics"
-import "./template.css"
+import "./stylesheet.css"
 
 
 const send_display_list = (gfx_list) => { GFX.run(gfx_list) }
@@ -164,8 +164,8 @@ const startGame = () => {
     console.log("Starting Game!")
     gameStarted = true
 
-    document.getElementById("startbutton").classList.remove('btn-success')
-    document.getElementById("startbutton").classList.add('btn-light')
+    document.getElementById("startbutton").classList.remove('green-button')
+    document.getElementById("startbutton").classList.add('yellow-button')
     document.getElementById("startbutton").innerHTML = "🔄 Reset Game"
 
     document.getElementById("connectedMsg").hidden = false
@@ -266,7 +266,7 @@ const checkForRom = () => {   /// happens one time when the page is loaded
     if (url.searchParams.get("romExternal")) {
         const msgElement = document.getElementById('romMessage')
         msgElement.innerHTML = "Transfering ROM Data..."
-        msgElement.style = "color:yellow"
+        msgElement.style = "color:#ff0;"
         //TODO transfer ROM to client and extract
         ///extractAssetsFromRom and url.searchParams.get("romExternal")
         throw "temporarily unsupported"

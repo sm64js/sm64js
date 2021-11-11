@@ -1,0 +1,304 @@
+﻿/* HTML, contains background */
+html{
+    height: 100%;
+    background-color: #000000;
+    background-image: url('/mmo/assets/sm64js-background.png');
+    background-size: 14.3%;
+    background-repeat: repeat;
+}
+
+/* Mario Fonts */
+
+@font-face {
+    font-family: "SuperMario64Logo";
+    src: url("/mmo/assets/SuperMario256.ttf");
+}
+
+@font-face {
+    font-family: "TextboxFont";
+    src: url("/mmo/assets/mario-64-textbox-themh.ttf");
+}
+
+.mario-font{
+  font-family: "SuperMario64Logo";
+  letter-spacing: -2px;
+  text-transform: uppercase;
+  -webkit-text-stroke: 2px #e3aa63;
+  text-shadow: 0px 4px #b98a50, 2px 3px #b98a50, -3px 3px #b98a50, -3px -1px #b98a50;
+}
+
+
+/* Body */
+
+body {
+    color: #fff;
+    font-family: "TextboxFont";
+    letter-spacing: -0.2px;
+    text-align: center;
+}
+
+.signboxBackground{
+    padding: 14px;
+    background-image: url("/mmo/assets/yellow-background-wide.png");
+    background-size: 100% 100%;
+    border: none;
+    opacity: 1;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-left: 20%;
+    margin-right: 20%;
+    padding-top: 3.4em;
+    padding-bottom: 3em;
+}
+
+.siteCenter{
+    justify-content: center;
+}
+
+/* Top menu, header, nav */
+
+header {
+    width: 100%;
+}
+
+nav{
+    margin-top: 2.3%;
+    font-size: 120%;
+    color: hsla(0,0%,100%,.5);
+}
+
+header nav a{
+    color: hsla(0,0%,100%,.5);
+    text-decoration: none;
+    font-size: 140%;
+    margin: 0.2em;
+}
+
+nav a:hover, a:focus{
+    border-bottom: 0.15em solid hsla(0,0%,100%,.25);
+    padding-bottom: 0.2em;
+}
+
+/* SM64JS Logo - Title */
+img#title{
+    height: auto;
+    width: 60%;
+}
+
+/* Buttons  */
+
+input{
+    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
+}
+
+.romFileText{
+    background-color: rgba(0,0,0,.3411764705882353);
+    color: white;
+    padding-right: 2em;
+    padding-left: 2em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+.loadRomButton{
+    height: 2em;
+    width: 4em;
+}
+
+.stone-button{
+    background-image: url("/mmo/assets/btn-stone-edit.png");
+    background-size: 100% 100%;
+    border: none;
+    opacity: 1;
+    font-weight: 348;
+    font-family: "TextboxFont";
+    font-size: 140%;
+    background-color: gray;
+    text-decoration: none;
+    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
+    cursor: pointer;
+    padding-left:0.5em;
+    padding-right:0.5em;
+    padding-top:0.3em;
+    padding-bottom:0.3em
+}
+
+.green-button{
+    background-image: url("/mmo/assets/btn-green-edit.png");
+    background-size: 100% 100%;
+    border: none;
+    font-family: "TextboxFont";
+    font-size: 140%;
+    color: white;
+    background-color: green;
+    text-decoration: none;
+    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
+    cursor: pointer;
+    padding-left:0.5em;
+    padding-right:0.5em;
+    padding-top:0.3em;
+    padding-bottom:0.3em;
+}
+
+.red-button{
+    background-image: url("/mmo/assets/btn-red-edit.png");
+    background-size: 100% 100%;
+    border: none;
+    font-family: "TextboxFont";
+    font-size: 140%;
+    color: white;
+    background-color: red;
+    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
+    cursor: pointer;
+    padding-left:0.5em;
+    padding-right:0.5em;
+    padding-top:0.3em;
+    padding-bottom:0.3em
+}
+
+.blue-button{
+    background-image: url("/mmo/assets/btn-blue-edit.png");
+    background-size: 100% 100%;
+    border: none;
+    font-family: "TextboxFont";
+    font-size: 140%;
+    color: white;
+    background-color: blue;
+    text-decoration: none;
+    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
+    cursor: pointer;
+    padding-left:0.5em;
+    padding-right:0.5em;
+    padding-top:0.3em;
+    padding-bottom:0.3em
+}
+
+/*Fix for the <a> button */
+a.pink-button{
+    padding-top: 0.4em;
+    padding-bottom: 0.42em;
+}
+
+/* Fix some buttons so they look nicer / change their padding */
+.fixButtonPadding{
+    padding-left: 1em !important;
+    padding-right: 1em !important;
+}
+
+a.pink-button:focus{
+    padding-top: 0.4em;
+    padding-bottom: 0.42em;
+    border-bottom: 0;
+}
+
+button:disabled{
+    filter: grayscale(100%) brightness(0.7);
+    cursor: not-allowed;
+}
+
+.pink-button{
+    background-image: url("/mmo/assets/btn-pink-edit.png");
+    background-size: 100% 100%;
+    border: none;
+    font-family: "TextboxFont";
+    font-size: 140%;
+    color: white;
+    background-color: purple;
+    text-decoration: none;
+    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
+    cursor: pointer;
+    padding-left:0.5em;
+    padding-right:0.5em;
+    padding-top:0.3em;
+    padding-bottom:0.3em
+}
+
+/* Main */
+main{
+    margin-top: 4%;
+}
+
+h4{
+    font-size: 2em;
+    font-weight: normal;
+}
+
+.removeVerticalMargins{
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+h5{
+    font-size: 1.2em;
+    font-weight: normal;
+}
+
+h6.description{
+    font-size: 150%;
+    font-weight: normal;
+    background-color: rgba(0,0,0,.3411764705882353);
+    padding: 1%;
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+
+.romSelectText{
+    color: #ff0;
+    font-size: 28px;
+    margin-top: 16px;
+    margin-bottom: 12px;
+    animation: blinking 1s linear infinite;
+}
+
+.romMessageText{
+    font-size: 150%;
+    font-weight: normal;
+    background-color: rgba(0,0,0,.3411764705882353);
+    padding: 1%;
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 1%;
+    margin-bottom: 1%;
+}
+
+@keyframes blinking {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* game canvas and chat changes, copied over from the old css */
+/* still wip, if you see this comment please tell eros71#9555 on discord */
+/* this means the styling wasn't finished yet */
+/*
+.chatboxPos{
+margin-left: 564px;
+width: 409px;
+position: absolute;
+}
+
+.canvasContainerPos{
+overflow: visible;
+margin-left: -164px;
+}
+
+div.row ul#chatlog{
+    height: 420px; */ /* the funny number  */
+/*
+}
+*/
+/*
+#textCanvas{
+    margin-left: 16px;
+    padding: 26px;
+}
+
+#connectedMsg{
+    position: absolute;
+    margin-left: 36px;
+    margin-top: 26px;
+    padding-left: 8px;
+    padding-right: 8px;
+}*/

@@ -1,0 +1,683 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>sm64js</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-178244102-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || []
+        function gtag() { dataLayer.push(arguments) }
+        gtag('js', new Date())
+
+        gtag('config', 'UA-178244102-1')
+    </script>
+
+</head>
+
+<body class="text-center">
+    <canvas hidden id="fullCanvas" width="640" height="480" style="background-color: black;"></canvas>
+
+    <div class="cover-container d-flex h-100 mx-auto flex-column">
+        <header class="masthead">
+            <div class="inner">
+                <nav class="nav nav-masthead justify-content-center">
+                    <!--<a class="nav-link" href="https://server.sm64js.com/createGame">Custom Game</a>-->
+                    <a class="nav-link" href="https://vanilla.sm64js.com">Vanilla</a>
+                    <a class="nav-link" href="https://60fps.sm64js.com">60fps</a>
+                    <a class="nav-link" href="credits.html">About</a>
+                    <a class="nav-link" href="https://github.com/sm64js/sm64js">Source Code</a>
+                    <a class="nav-link" href="https://discord.gg/7UaDnJt">Discord Server</a>
+                    <a class="nav-link" href="credits.html">Credits</a>
+                </nav>
+            </div>
+        </header>
+
+        <main role="main" class="inner cover" hidden id="mainContent">
+            <h1 class="cover-heading rainbowText mario-font">Super Mario 64 - Javascript</h1>
+            <h6>This project is currently still being developed. This page may be live from time to time for testing, but there may be glitches and performance issues. The server will go down and restart at random times without warning. If you would like to help with the project or have feedback please contact me.</h6>
+            <form id="romSelect" class="form-group">
+                <h4 style="color: #fae53e; font-size: 28px; margin-top: 16px; margin-bottom: 12px;">Select US sm64 (z64) ROM File from your computer</h4>
+                <input id="romFile" class="btn btn-secondary btn-sm" type="file">
+                <input class="btn btn-success btn-sm" type="submit" value="Load ROM">
+            </form>
+            <h6 id="romMessage">This project uses the textures and other game assets from the original game. Due to copyright issues, I cannot host those assets on this site. Please select a sm64 ROM to extract those assets before you can play.</h6>
+            <!-- start sign box -->
+            <div class="signboxBackground">
+            <div style="margin-top: 62px;margin-left: 204px;" class="row" style="justify-content:center">
+                <button id="startbutton" type="button" class="btn btn-success" disabled>Start Game</button>
+                <a href="https://github.com/sm64js/sm64js/issues" style="margin-left:30px" type="button" class="btn btn-warning">Submit Bug</a>
+                <button id="deleteRom" type="button" style="margin-left:30px" class="btn btn-danger">Delete Rom</button>
+
+            </div>
+
+            <div class="row" style="justify-content:center; padding-top:26px;padding-right: 40px;padding-left: 40px;">
+                <div class="col-4">
+                    <button type="button"
+                            class="btn btn-sm btn-primary"
+                            data-html="true"
+                            data-container="body"
+                            data-toggle="keyboardControlsToggle"
+                            data-placement="bottom">
+                        Customize Keyboard Controls
+                    </button>
+                </div>
+                <div class="col-4">
+                    <button type="button"
+                            class="btn btn-sm btn-primary"
+                            data-html="true"
+                            data-container="body"
+                            data-toggle="gamepadControlsToggle"
+                            data-placement="bottom">
+                        Customize Gamepad Controls
+                    </button>
+                </div>
+
+                <div class="col-4">
+                    <button type="button"
+                            class="btn btn-sm btn-primary"
+                            data-html="true"
+                            data-container="body"
+                            data-toggle="skinCustomizerToggle"
+                            data-placement="bottom">
+                        Customize Character/Skin
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="row" style="justify-content:center; padding-top:10px; padding-bottom: 10px">
+                <div class="col-4">
+                    <button type="button"
+							id="respawnButton"
+                            class="btn btn-sm btn-warning"
+                            onclick="window.reset = true">
+                        Respawn
+                    </button>
+                </div>
+                <div class="col-4">
+                    <button type="button"
+                            class="btn btn-sm btn-primary"
+                            onclick="window.fullWindowMode = true">
+                        Full Window Mode
+                    </button>
+                </div>
+
+                <div class="col-4">
+                    <button type="button"
+                            class="btn btn-sm btn-primary"
+                            data-html="true"
+                            data-container="body"
+                            data-toggle="colorCodePasteWindowToggle"
+                            data-placement="bottom">
+                        Paste Color Code
+                    </button>
+                </div>
+
+            </div>
+			<div class="row" style="justify-content:center; padding-top:10px; padding-bottom: 10px">
+                <div class="col-3">
+                    <button class="btn btn-sm btn-primary" onclick="window.hideHUD(this)">Hide HUD</button>
+                    <button type="button"
+							id="pvpButton"
+                            class="btn btn-sm btn-warning"
+                            onclick="window.togglePvp()">
+                        PvP: On
+                    </button>
+                    <button class="btn btn-sm btn-warning" style="justify-content:center; padding-top:10px; padding-bottom: 10px" onclick="window.myMario.freezeCamera = !window.myMario.freezeCamera; this.textContent = window.myMario.freezeCamera ? 'Freeze Camera (ON)' : 'Freeze Camera (OFF)'">Freeze Camera (OFF)</button>
+                </div>
+            </div>
+            <div id="signinSection">
+                <div id="signinButtons" class="row" style="justify-content:center; margin-top: 10px;">
+                    <img id="discordSigninButton" src="/mmo/assets/discord_signin.png" width="240" style="margin-left:15px;">
+                    <img id="googleSigninButton" src="/mmo/assets/google_signin.png" width="240" style="margin-left:15px;">
+                </div>
+                <button hidden id="logoutButton" type="submit" class="btn btn-secondary" style="height:50px; margin-top: 5px">
+                    <b>Sign out</b>
+                </button>
+
+                <div hidden id="playerNameRow" style="margin-top: 10px; margin-bottom: 54px;">
+                    <form id="playerNameForm">
+                        <div id="discordNameRow" class="row" style="justify-content:center;">
+                            <div class="form-group mb-2">
+                                <label type="text" readonly class="col-form-label">Discord Name: </label>
+                            </div>
+                            <div class="form-group mb-2">
+                                <input readonly id="discordNameBox" type="text" style="margin-left: 15px; max-width: 200px" class="form-control-sm" minlength="3" maxlength="20">
+                            </div>
+                            <div class="form-group mb-2">
+                                <button id="switchCustom" type="button" class="btn btn-sm btn-outline-primary mb-2" style="margin-left:15px;">Display Custom Name</button>
+                            </div>
+                        </div>
+                        <div hidden id="customNameRow" class="row" style="justify-content:center;">
+                            <div class="form-group mb-2">
+                                <label type="text" readonly class="col-form-label">Custom Name: </label>
+                            </div>
+                            <div class="form-group mb-2">
+                                <input id="playerNameInput" type="text" style="margin-left: 15px; max-width: 120px" class="form-control-sm" minlength="3" maxlength="14" placeholder="enter name" onchange="window.updatePlayerName(this.value)">
+                            </div>
+                            <div class="form-group mb-2">
+                                <button id="switchDiscord" type="button" class="btn btn-sm btn-outline-primary mb-2" style="margin-left:15px;">Display Discord Name</button>
+                            </div>
+                        </div>
+                        <div class="row" style="justify-content:center;">
+                            <div class="form-group mb-2">
+                                <label type="text" readonly class="col-form-label">Select Map: </label>
+                            </div>
+                            <!--Map selection list, add newer custom levels in here-->
+                            <div class="form-group mb-2" style="margin-left:15px;">
+                                <select id="mapSelect" class="form-control form-control-sm">
+                                    <optgroup label="Vanilla maps">
+                                        <option value="16"> Castle Grounds </option>
+                                        <option value="6"> Castle Inside First Level </option>
+                                        <option value="602"> Castle Inside Second Level </option>
+                                        <option value="26"> Castle Courtyard </option>
+                                        <option value="9"> Bob-omb Battlefield </option>
+                                        <option value="24"> Whomp's Fortress </option>
+                                        <option value="5"> Cool, Cool Mountain </option>
+                                        <option value="56"> Cool, Cool Mountain Slide </option>
+                                        <option value="27"> Princess's Secret Slide </option>
+                                        <option value="4"> Big Boo's Haunt </option>
+                                        <option value="7"> Hazy Maze Cave </option>
+                                        <option value="8"> Shifting Sand Land </option>
+                                        <option value="36"> Tall, Tall Mountain </option>
+                                        <option value="10"> Snowman's Land </option>
+                                    </optgroup>
+                                    <optgroup label="Custom maps">
+                                        <option value="1000"> Mushroom Battlefield </option>
+                                        <option value="1004"> Mushroom Raceway </option>
+                                        <option value="1006"> Dolphin Town </option>
+                                        <option value="1001"> CTF/Race Map </option>
+                                        <option value="1002"> Starman Fortress </option>
+                                        <option value="1003"> Glider Jungle </option>
+                                        <option value="999"> Clouded Ruins </option>
+                                    </optgroup>  
+                                </select>
+                            </div>
+                            <button id="playerNameButton" type="submit" class="btn btn-success mb-2" style="margin-left:15px;">Submit</button>
+                            <div class="form-group mb-2" style="margin-left:15px;">
+                                <label id="playerNameResult" type="text" readonly class="col-form-label" style="font-weight:bold">Waiting for selection</label>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+                <h6 hidden id="authFailMsg" style="color:red"></h6>
+
+            </div>
+<!-- end sign box-->
+</div>
+
+            <br />
+
+    <div class="row">
+            <div class="canvasContainer col-6 canvasContainerPos">
+                <canvas id="gameCanvas" width="640" height="480"></canvas>
+                <canvas id="textCanvas" width="640" height="480"></canvas>
+            </div>
+
+        
+            <div class="col-6 chatboxPos">
+            <div class="row" style="justify-content:center">
+                <ul style="margin-bottom: 5px !important" id="chatlog"></ul>
+            </div>
+            <div class="row" style="justify-content:center;">
+                <input id="chatbox" style="font-size: 20px;" class="chatbox form-control" style="margin-top: 0px !important" type="text" autocomplete="off" maxlength="100" placeholder="Chat box">
+                <input id="banbox" style="font-size: 20px;" class="chatbox form-control" type="text" autocomplete="off" maxlength="100" placeholder="Block Player Chats - type their player name in here and hit enter">
+            </div>
+            </div>
+
+            <br />
+            <br />
+            <h6 hidden id="connectedMsg" style="color:red">Not connected to server - Refresh the page</h6>
+    </div>
+
+            <h6 hidden id="numTriangles"> Total triangles rendered this frame: </h6>
+            <div hidden class="row">
+                <div class="col-5" style="text-align:left">
+                    <h6>Total Frame Time (Avg): </h6>
+                    <h6 hidden>Game Logic (Avg): </h6>
+                    <h6 hidden>Rendering/WebGL (Avg):</h6>
+                </div>
+                <div class="col-1">
+                    <h6 id="timing-total"></h6>
+                    <h6 hidden id="timing-game"></h6>
+                    <h6 hidden id="timing-render"></h6>
+                </div>
+                <div class="col-6" style="text-align:right">
+                    <h6 id="maxFps"></h6>
+                </div>
+            </div>
+
+            <div hidden class="row" style="justify-content:center;">
+                <h6 style="padding-right:10px"> Adjust Game Speed: </h6>
+                <input id="slider" type="range" style="width:300px" min="1" max="60" value="30">
+                <h6 id="fps" style="padding-left:10px"> 30 fps </h6>
+            </div>
+        <div class="musicDiv">
+            <h4>Music</h4>
+
+            <div class="row">
+                <div class="col-6">
+                    <h5>Snow Mountain DX by eros71</h5>
+                </div>
+                <div class="col-6" style="justify-content:center">
+                    <audio controls loop style="width:400px; height: 30px">
+                        <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Snow%20Mountain%20DX.wav" type="audio/wav">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <h5>Bob-omb Peaceful-Field by eros71</h5>
+                </div>
+                <div class="col-6" style="justify-content:center">
+                    <audio controls loop style="width:400px; height: 30px">
+                        <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Bob-omb%20Peaceful-Field.wav" type="audio/wav">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <h5>Mario Filled Field by Belgium</h5>
+                </div>
+                <div class="col-6" style="justify-content:center">
+                    <audio controls loop style="width:400px; height: 30px">
+                        <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Mario%20Filled%20Field.mp3" type="audio/mp3">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <h5>SM64JS File Select Remix by Subject to Change</h5>
+                </div>
+                <div class="col-6" style="justify-content:center">
+                    <audio controls loop style="width:400px; height: 30px">
+                        <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/SM64JS%20File%20Select%20Remix.wav" type="audio/wav">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+        </div>
+                <br />
+                <br />
+
+
+        </main>
+
+    </div>
+
+    <div id="rules-modal" class="modal fade" role="dialog" >
+        <div class="modal-dialog" style="max-width: 600px !important" >
+
+            <!-- Modal content-->
+            <div class="modal-content" style="height:550px; width:600px;" >
+                <div class="modal-header" style="justify-content:center">
+                    <h4 class="modal-title" style="color:black">Please agree to the rules before playing</h4>
+                </div>
+                <div class="modal-body" style="color:black; text-align:left">
+                    <p>Treat all players with respect</p>
+                    <p>Please keep all chat appropriate and safe for work/school</p>
+                    <p>Inappropriate or offensive behavior may result in temporary or permanent ban</p>
+                    <p>It is strongly recommended to have a strong/stable internet connection, use a fast computer, and use <b>Google Chrome</b></p>
+                    <p>If you have a good connection but are experiencing problems with framerate try going to a part of the map that is less dense with players</p>
+                    <p>For more troubleshooting or issues playing the game or information on the new features, please checkout the <a style="color:Highlight" href="https://discord.gg/7UaDnJt">Discord Server</a> </p>
+
+                    <br />
+                    <div class="row" style="text-align:right">
+                        <div class="col-3">
+                            <input class="form-check-input" type="checkbox" value="" id="defaultCheck1"
+                                   onclick="document.getElementById('rules-footer').hidden = false">
+
+                        </div>
+                        <div class="col-9" style="text-align:left">
+                            <p>I have read and agreed to the rules</p>
+                        </div>
+                    </div>
+
+                </div>
+                <div hidden id="rules-footer" class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Agree</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <div hidden>
+
+        <div class="container" id="skinCustomizerWindow">
+
+            <div class="row" style="justify-content:center; margin-top: 10px;">
+                <div class="col-sm-8 col-form-label" style="justify-content:center">
+                    <label>Select Skin Preset:</label>
+                </div>
+                <div class="col-sm-4" style="justify-content:center; ">
+                    <select class="form-control" onchange="window.updateSkinID(this.value)">
+                        <option>0</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr class="solid">
+
+            <div class="row" style="justify-content:center">
+                <select id="skinTypes" class="form-control" style="width:320px" onchange="window.setSkinSliderValues()">
+                    <option value="overalls">Overalls</option>
+                    <option value="hat">Hat</option>
+                    <option value="shirt">Shirt</option>
+                    <option value="gloves">Gloves</option>
+                    <option value="boots">Boots</option>
+                    <option value="skin">Skin</option>
+                    <option value="hair">Hair</option>
+                    <option value="parachute">Glider</option>
+                </select>
+            </div>
+
+            <br />
+
+            <div class="row redtext" style="width:330px">
+                <div class="col-5" style="text-align:right">
+                    Ambient Red
+                </div>
+                <div class="col-5" style="justify-content:center">
+                    <input class="redslider" oninput="window.customSkinUpdate(this)" type="range" id="skinSliderValue0" min="0" max="255">
+                </div>
+                <div class="col-2" style="text-align:left">
+                    <label id="skinSliderRangeDisplay0">0</label>
+                </div>
+            </div>
+
+            <div class="row redtext" style="width:330px">
+                <div class="col-5" style="text-align:right">
+                    Red
+                </div>
+                <div class="col-5" style="justify-content:center">
+                    <input class="redslider" oninput="window.customSkinUpdate(this)" type="range" id="skinSliderValue3" min="0" max="255">
+                </div>
+                <div class="col-2" style="text-align:left">
+                    <label id="skinSliderRangeDisplay3">0</label>
+                </div>
+            </div>
+
+            <div class="row greentext" style="width:330px">
+                <div class="col-5" style="text-align:right">
+                    Ambient Green
+                </div>
+                <div class="col-5" style="justify-content:center">
+                    <input class="greenslider" oninput="window.customSkinUpdate(this)" type="range" id="skinSliderValue1" min="0" max="255">
+                </div>
+                <div class="col-2" style="text-align:left">
+                    <label id="skinSliderRangeDisplay1">0</label>
+                </div>
+            </div>
+
+            <div class="row greentext" style="width:330px">
+                <div class="col-5" style="text-align:right">
+                    Green
+                </div>
+                <div class="col-5" style="justify-content:center">
+                    <input class="greenslider" oninput="window.customSkinUpdate(this)" type="range" id="skinSliderValue4" min="0" max="255">
+                </div>
+                <div class="col-2" style="text-align:left">
+                    <label id="skinSliderRangeDisplay4">0</label>
+                </div>
+            </div>
+
+            <div class="row bluetext" style="width:330px">
+                <div class="col-5" style="text-align:right">
+                    Ambient Blue
+                </div>
+                <div class="col-5" style="justify-content:center">
+                    <input class="blueslider" oninput="window.customSkinUpdate(this)" type="range" id="skinSliderValue2" min="0" max="255">
+                </div>
+                <div class="col-2" style="text-align:left">
+                    <label id="skinSliderRangeDisplay2">0</label>
+                </div>
+            </div>
+
+            <div class="row bluetext" style="width:330px">
+                <div class="col-5" style="text-align:right">
+                    Blue
+                </div>
+                <div class="col-5" style="justify-content:center">
+                    <input class="blueslider" oninput="window.customSkinUpdate(this)" type="range" id="skinSliderValue5" min="0" max="255">
+                </div>
+                <div class="col-2" style="text-align:left">
+                    <label id="skinSliderRangeDisplay5">0</label>
+                </div>
+            </div>
+
+            <br />
+
+            <div class="row" style="justify-content:center">
+                <button class="btn btn-sm btn-success" onclick="window.toggleCapState()">Toggle Hat</button>
+            </div><br>
+            <div class="row" style="justify-content:center">
+                <select id="characterType" class="form-control" style="width:120px" onchange="window.setCharacter(this.value)">
+                    <option value="0">Mario</option>
+                    <option value="1">Luigi</option>
+                </select>
+            </div>
+
+
+        </div>
+
+        <div class="container" id="colorCodePasteWindow">
+            <div class="row">
+                <textarea class="form-control" id="ccPasteArea" placeholder="Enter your Color Code here..." rows="6"></textarea>
+            </div>
+            <br>
+            <div class="row" style="justify-content:center">
+                <button class="btn btn-sm btn-primary" style="justify-content:center;"
+                        onclick="window.myMario.skinData = window.parseColorCode($(`#ccPasteArea`).val()); $(`#ccPasteArea`).val('')">
+                    Import Color Code
+                </button>
+            </div>
+        </div>
+
+        <div class="container" id="keyboardControlsWindow">
+            <div class="row">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Start:</label>
+                        <select class="form-control" keyboardButton name="start" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">A:</label>
+                        <select class="form-control" keyboardButton name="a" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">B:</label>
+                        <select class="form-control" keyboardButton name="b" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Z:</label>
+                        <select class="form-control" keyboardButton name="z" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Up:</label>
+                        <select class="form-control" keyboardButton name="up" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:40px">Down:</label>
+                        <select class="form-control" keyboardButton name="down" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group ">
+                        <!-- mx-sm-3 mb-2 -->
+                        <label class="col-sm-2 col-form-label" style="padding-right:20px">Left:</label>
+                        <select class="form-control" keyboardButton name="left" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Right:</label>
+                        <select class="form-control" keyboardButton name="right" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">C-Up:</label>
+                        <select class="form-control" keyboardButton name="cu" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:40px">C-Down:</label>
+                        <select class="form-control" keyboardButton name="cd" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group ">
+                        <!-- mx-sm-3 mb-2 -->
+                        <label class="col-sm-2 col-form-label" style="padding-right:20px">C-Left:</label>
+                        <select class="form-control" keyboardButton name="cl" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">C-Right:</label>
+                        <select class="form-control" keyboardButton name="cr" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-2 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Minimap:</label>
+                        <select class="form-control" keyboardButton name="map" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-2 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Taunt Wheel:</label>
+                        <select class="form-control" keyboardButton name="taunt" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-2 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Glider:</label>
+                        <select class="form-control" keyboardButton name="parachute" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-2 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Chat:</label>
+                        <select class="form-control" keyboardButton name="chat" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                </form>
+            </div>
+
+
+            <div class="row" style="justify-content:center;">
+                <button class="btn btn-sm btn-success" style="margin-right:30px" onclick="window.saveControls()">Save Controls</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.loadDefaultControls()">Load Default Controls</button>
+            </div>
+        </div>
+
+        <div class="container" id="gamepadControlsWindow">
+            <div class="row" style="justify-content:center">
+                <h6 style="text-align:center" id="noGamepadMessage">No Gamepad Detected Yet</h6>
+                <div hidden id="gamepadMessageDiv">
+                    <h6 id="gamepadMessage">
+                    </h6>
+                    <h6 style="text-align:center" id="gamepadMessage">
+                        Is your gamepad not working correctly?
+                        <br />
+                        Contact me so I can support more gamepads. Discord: snuffysasa#2779 /
+                        <a href="https://github.com/sm64js/sm64js/issues" style="color:blue;font-weight:bold">Github</a>
+                    </h6>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Start:</label>
+                        <select class="form-control" gamepadButton name="start" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">A:</label>
+                        <select class="form-control" gamepadButton name="a" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">B:</label>
+                        <select class="form-control" gamepadButton name="b" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Z:</label>
+                        <select class="form-control" gamepadButton name="z" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <form class="form-inline">
+
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">axisX:</label>
+                        <select class="form-control" gamepadAxes name="stickX" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">axisY:</label>
+                        <select class="form-control" gamepadAxes name="stickY" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">C-axisX:</label>
+                        <select class="form-control" gamepadAxes name="cStickX" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">C-axisY:</label>
+                        <select class="form-control" gamepadAxes name="cStickY" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:50px">deadZone:</label>
+                        <input type="number" style="width:70px;" value="0.08" min="0" max="1" step="0.01" class="form-control" onchange="window.updateDeadZone(this.value)">
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Minimap:</label>
+                        <select class="form-control" gamepadButton name="map" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Taunt Wheel:</label>
+                        <select class="form-control" gamepadButton name="taunt" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Glider:</label>
+                        <select class="form-control" gamepadButton name="parachute" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                </form>
+
+            </div>
+
+            <div class="row" style="justify-content:center;">
+                <button class="btn btn-sm btn-success" style="margin-right:30px" onclick="window.saveControls()">Save Controls</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.loadDefaultControls()">Load Default Controls</button>
+            </div>
+        </div>
+
+
+    </div>
+
+</body>
+</html>

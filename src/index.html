@@ -279,38 +279,41 @@
         <div style="margin-left: 20%; margin-right: 20%; margin-bottom: 4em;">
             <div class="musicDiv">
                 <h4 class="removeVerticalMargins">Music</h4>
+                    <div style="display: flex;">
+                        <!-- Music titles, make sure to use the musicTitles class if adding new ones -->
+                        <div>
+                            <h5 class="musicTitles">Snow Mountain DX by eros71</h5>
+                            <h5 class="musicTitles">Peaceful Bob-omb Field by eros71</h5>
+                            <h5 class="musicTitles">Mario Filled Field by Belgium</h5>
+                            <h5 class="musicTitles">SM64JS File Select Remix by Subject to Change</h5>
+                        </div>
 
-                <div style="display: flex; height: 3em;">
-                        <h5 style="margin-left: 7em; margin-right: 1em;">Snow Mountain DX by eros71</h5>
-                        <audio controls loop style="width:400px; height: 65px">
-                            <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Snow%20Mountain%20DX.wav" type="audio/wav">
+                        <!-- Audio players -->
+                        <div>
+                            <!-- Snow Mountain DX -->
+                            <audio controls loop style="width:400px; height: 65px">
+                                <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Snow%20Mountain%20DX.wav" type="audio/wav">
                             Your browser does not support the audio element.
-                        </audio>
-                </div>
+                            </audio>
+                            <!-- Bob-omb Peaceful Field (old name of the theme) -->
+                            <audio controls loop style="width:400px; height: 65px">
+                                <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Bob-omb%20Peaceful-Field.wav" type="audio/wav">
+                            Your browser does not support the audio element.
+                            </audio>
+                            <!-- Mario Filled Field -->
+                            <audio controls loop style="width:400px; height: 65px">
+                                <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Mario%20Filled%20Field.mp3" type="audio/mp3">
+                            Your browser does not support the audio element.
+                            </audio>
+                            <!-- File Select Remix -->
+                            <audio controls loop style="width:400px; height: 65px">
+                                <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/SM64JS%20File%20Select%20Remix.wav" type="audio/wav">
+                            Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                    </div>
 
-                <div style="display: flex; height: 3em;">
-                        <h5 style="margin-left: 6em; margin-right: 1em;">Peaceful Bob-omb Field by eros71</h5>
-                        <audio controls loop style="width:400px; height: 65px">
-                            <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Bob-omb%20Peaceful-Field.wav" type="audio/wav">
-                            Your browser does not support the audio element.
-                        </audio>
-                </div>
-
-                <div style="display: flex; height: 3em;">
-                        <h5 style="margin-left: 7em; margin-right: 1em;">Mario Filled Field by Belgium</h5>
-                        <audio controls loop style="width:400px; height: 65px">
-                            <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Mario%20Filled%20Field.mp3" type="audio/mp3">
-                            Your browser does not support the audio element.
-                        </audio>
-                </div>
-
-                <div style="display: flex; height: 3em;">
-                        <h5 style="margin-right: 1em; margin-left: 4em;">SM64JS File Select Remix by Subject to Change</h5>
-                        <audio controls loop style="width:400px; height: 65px">
-                            <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/SM64JS%20File%20Select%20Remix.wav" type="audio/wav">
-                            Your browser does not support the audio element.
-                        </audio>
-                </div>
+                
             </div>
         </div>
         <!-- End of Music section-->
@@ -547,7 +550,7 @@
                         </div>
 
                         <div>
-                            <!-- mx-sm-3 mb-2 -->
+                            
                             <label style="padding-right:20px">Left:</label>
                             <select keyboardButton name="left" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
                         </div>

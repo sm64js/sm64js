@@ -68,7 +68,7 @@ nav{
 }
 
 header nav a{
-    color: hsla(0,0%,100%,.5);
+    color: hsla(0, 0%, 100%, 0.69);
     text-decoration: none;
     font-size: 140%;
     margin: 0.2em;
@@ -81,8 +81,7 @@ nav a:hover, a:focus{
 
 /* SM64JS Logo - Title */
 img#title{
-    height: auto;
-    width: 60%;
+    animation: sm64title 2.2s linear;
 }
 
 /* Buttons  */
@@ -264,9 +263,31 @@ h6.description{
 }
 
 @keyframes blinking {
-  50% {
-    opacity: 0;
-  }
+    50% { opacity: 0; }
+}
+
+@keyframes sm64title{
+    0% { transform: scale(0.2, 0.3); }
+    8% { transform: scale(1.4, 1.3); }
+    10% { transform: scale(0.8, 1.1); }
+    12% { transform: scale(1.1, 1.0); }
+    14% { transform: scale(1.0, 1.0); }
+    15% { transform: scale(0.8, 1.2); }
+    16% { transform: scale(1.0, 1.0); }
+    17% { transform: scale(0.9, 1.1); }
+    18% { transform: scale(1.0, 1.0); }
+    100% { transform: scale(1.0, 1.0); }
+}
+
+/* Music */
+.musicTitles{
+    font-size: 1.4em;
+    margin-top: 0.2em;
+    margin-bottom: 1.95em;
+    vertical-align: middle;
+    top: 1em;
+    position: relative;
+    width: 18em;
 }
 
 /* game canvas and chat changes, copied over from the old css */

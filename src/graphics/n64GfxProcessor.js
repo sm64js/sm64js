@@ -942,7 +942,11 @@ export class n64GfxProcessor {
 
         for (let i = dest_index; i < vertices.length; i++) {
 
-            const v = vertices[i]
+            // const v = vertices[i]
+            let v = vertices[i]
+            if (Array.isArray(v)) {
+                v = {pos: v[0], flag: v[1], tc: v[2], color: v[3]}
+            }
             const normal = [
                 v.color[0] > 127 ? v.color[0] - 256 : v.color[0],
                 v.color[1] > 127 ? v.color[1] - 256 : v.color[1],

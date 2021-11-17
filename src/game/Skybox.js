@@ -15,8 +15,8 @@ import { bbh_skybox_ptrlist,
     wdw_skybox_ptrlist } from "../textures/skyboxes"
 
 const canvas = document.querySelector('#gameCanvas')
-const SCREEN_WIDTH = canvas.width / 2
-const SCREEN_HEIGHT = canvas.height / 2
+export const SCREEN_WIDTH = canvas.width / 2
+export const SCREEN_HEIGHT = canvas.height / 2
 const SKYBOX_WIDTH = SCREEN_WIDTH * 4
 const SKYBOX_HEIGHT = SCREEN_HEIGHT * 4
 const SKYBOX_TILE_WIDTH = SCREEN_WIDTH / 2

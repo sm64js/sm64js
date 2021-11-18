@@ -187,8 +187,8 @@ const gamepadButtonMapping = { //works for xbox
 
 const defaultGamepadButtonMapping = { ...gamepadButtonMapping }
 
-
-let deadzone = 0.08
+// help drifting sticks
+let deadzone = 0.3
 
 if (localStorage['controls']) {
     Object.assign(keyboardButtonMapping, JSON.parse(localStorage['controls']).keyboard)

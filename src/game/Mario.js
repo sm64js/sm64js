@@ -750,7 +750,7 @@ export const get_character_type = (m) => { // todo; make draw from 'm' somehow.
 }
 
 export const set_mario_y_vel_based_on_fspeed = (m, initialVelY, multiplier) => {
-    m.vel[1] = initialVelY + (get_character_type(m) == 1 ? 8.0 : 0.0) + (m.forwardVel * multiplier)
+    m.vel[1] = initialVelY + (get_character_type(m) == 1 ? 5.0 : 0.0) + (m.forwardVel * multiplier)
 }
 
 const read_next_anim_value = (curFrame, attribute, values) => {
@@ -1375,15 +1375,15 @@ const update_mario_geometry_inputs = (m) => {
         respawn_player(m)
     }
 
-    /// bouncepad
+    // custom
     if (m.floor) {
+        mario_basic_lava(m)
+
         if (m.floor.type == 0x0004 && !(m.input & INPUT_OFF_FLOOR && m.health > 0xFF)) {
             m.vel[1] = 200
             set_mario_action(m, ACT_PARACHUTING, 0)
         }
     }
-
-    mario_basic_lava(m)
 
 }
 

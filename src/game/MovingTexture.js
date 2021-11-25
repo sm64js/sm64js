@@ -3,6 +3,7 @@ import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProce
 import { castle_grounds_movtex_water, castle_grounds_movtex_tris_waterfall, castle_grounds_dl_waterfall } from "../levels/castle_grounds/areas/1/movtext.inc"
 import { ccm_movtex_penguin_puddle_water } from "../levels/ccm/areas/1/movtext.inc"
 import { ttm_movtex_puddle, ttm_movtex_tris_begin_waterfall, ttm_movtex_tris_begin_puddle_waterfall, ttm_movtex_tris_end_waterfall, ttm_movtex_tris_end_puddle_waterfall, ttm_movtex_tris_puddle_waterfall, ttm_dl_waterfall, ttm_dl_bottom_waterfall, ttm_dl_puddle_waterfall } from "../levels/ttm/areas/1/movtext.inc"
+import { castle_courtyard_movtex_star_statue_water } from "../levels/castle_courtyard/areas/1/movtext.inc"
 import { gj_movtex_water } from "../levels/gj/areas/1/movtext.inc"
 import { raceway_movtex_water } from "../levels/raceway/areas/1/movtext.inc"
 import { wf_movtex_water } from "../levels/wf/areas/1/movtext.inc"
@@ -136,10 +137,12 @@ const get_quad_collection_from_id = (id) => {
             return castle_grounds_movtex_water
         case CCM_MOVTEX_PENGUIN_PUDDLE_WATER:
             return ccm_movtex_penguin_puddle_water
-        case TTM_MOVTEX_PUDDLE:
-            return ttm_movtex_puddle
         case WF_MOVTEX_WATER:
             return wf_movtex_water
+        case TTM_MOVTEX_PUDDLE:
+            return ttm_movtex_puddle
+        case CASTLE_COURTYARD_MOVTEX_STAR_STATUE_WATER:
+            return castle_courtyard_movtex_star_statue_water
         case GJ_MOVTEX_WATER:
             return gj_movtex_water
         case DOLPHIN_MOVTEX_WATER:
@@ -154,6 +157,22 @@ const movtex_change_texture_format = (quadCollectionId, gfx) => {
     switch (quadCollectionId) {
         default: Gbi.gSPDisplayList(gfx, dl_waterbox_rgba16_begin)
     }
+}
+
+/**
+ * Update moving texture counters that determine when to update the coordinates.
+ * Textures update when gMovtexCounterPrev != gMovtexCounter.
+ * This ensures water / sand flow stops when the game pauses.
+ */
+ export const geo_movtex_pause_control = (callContext, node, mtx) => {
+    /*if (callContext != GEO_CONTEXT_RENDER) {
+        gMovtexCounterPrev = GeoRenderer.gAreaUpdateCounter - 1
+        gMovtexCounter = GeoRenderer.gAreaUpdateCounter
+    } else {
+        gMovtexCounterPrev = gMovtexCounter
+        gMovtexCounter = GeoRenderer.gAreaUpdateCounter
+    }*/
+    return null
 }
 
 const movtex_make_quad_vertex = (verts, index, x, y, z, rot, rotOffset, scale, alpha) => {

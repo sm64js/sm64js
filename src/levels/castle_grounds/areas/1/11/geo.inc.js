@@ -7,7 +7,7 @@ export const castle_grounds_geo_000660 = [
     { command: Geo.node_shadow, args: [SHADOW_CIRCLE_PLAYER, 0xB4, 100] },
     { command: Geo.open_node },
 
-    { command: Geo.node_culling_radius, args: [1000] },
+    { command: Geo.node_culling_radius, args: [1500] },
     { command: Geo.open_node },
     { command: Geo.node_scale, args: [0x00, 10000] },
     { command: Geo.open_node },

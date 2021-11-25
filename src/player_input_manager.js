@@ -8,37 +8,35 @@ window.banPlayerList = []
 window.show_minimap = 0
 let textboxfocus = false
 
+function checkIfFocused(id) {
+    if (document.activeElement === document.getElementById(id)) {
+        return true
+    } else {
+        return false
+    }
+}
+
 //// Prevent scrolling for arrow keys
 window.addEventListener("keydown", (e) => {
 
-    textboxfocus = $("#chatbox").is(':focus') ||
-                    $("#playerNameInput").is(':focus') ||
-                    $("#ccPasteArea").is(':focus') ||
-                    $("#banbox").is(':focus')
+    textboxfocus = checkIfFocused("chatbox") ||
+                    checkIfFocused("playerNameInput") ||
+                    checkIfFocused("ccPasteArea")
 
-    if ($("#chatbox").is(':focus') && e.keyCode == 13) {
+    if (checkIfFocused("chatbox") && e.keyCode == 13) {
 
         const chatbox = document.getElementById('chatbox')
 
         if (chatbox.value[0] == '!') {
             handleTaunt(chatbox.value)
+        } else if (chatbox.value.split(' ')[0] == '/block') { // hacky way to combine chat and ban box
+            window.banPlayerList.push(chatbox.value.split(' ')[1])
         } else {
             sendChat({ message: chatbox.value })
         }
 
         chatbox.value = ""
         chatbox.blur()
-    }
-
-    if ($("#banbox").is(':focus') && e.keyCode == 13) {
-        const message = document.getElementById('banbox').value
-        if (message.split(' ')[0] == '/signin') {
-            window.admin = { token: message.split(' ')[1] }
-        } else {
-            window.banPlayerList.push(message)
-        }
-        document.getElementById('banbox').value = ""
-        document.getElementById('banbox').blur()
     }
 
     if (document.getElementById("playerNameRow").hidden && e.keyCode == 13) {
@@ -165,7 +163,8 @@ const defaultKeyboardButtonMapping = {
     cr: 'l',
     map: 'm',
     taunt: 't',
-    parachute: 'v'
+    parachute: 'v',
+    chat: 'y'
 }
 const keyboardButtonMapping = { ...defaultKeyboardButtonMapping }
 
@@ -185,8 +184,8 @@ const gamepadButtonMapping = { //works for xbox
 
 const defaultGamepadButtonMapping = { ...gamepadButtonMapping }
 
-
-let deadzone = 0.08
+// help drifting sticks
+let deadzone = 0.3
 
 if (localStorage['controls']) {
     Object.assign(keyboardButtonMapping, JSON.parse(localStorage['controls']).keyboard)
@@ -209,19 +208,6 @@ Array.from(document.getElementsByTagName("select")).forEach(selectElem => {
     }
 })
 
-const keyboardControlsHtml = $('#keyboardControlsWindow').detach()
-const gamepadControlsHtml = $('#gamepadControlsWindow').detach()
-
-$('[data-toggle="keyboardControlsToggle"]').popover({
-    container: "body",
-    content: keyboardControlsHtml
-})
-
-$('[data-toggle="gamepadControlsToggle"]').popover({
-    container: "body",
-    content: gamepadControlsHtml
-})
-
 let gamepadIndex
 
 window.addEventListener("gamepadconnected", function (e) {
@@ -232,8 +218,6 @@ window.addEventListener("gamepadconnected", function (e) {
 
     const numButtons = gamepad.buttons.length
     const numAxes = gamepad.axes.length
-
-    $('[data-toggle="gamepadControlsToggle"]').popover('show')
 
     document.getElementById('noGamepadMessage').hidden = true
     document.getElementById('gamepadMessageDiv').hidden = false
@@ -262,8 +246,6 @@ window.addEventListener("gamepadconnected", function (e) {
         }
         selectElem.value = gamepadButtonMapping[selectElem.name]
     })
-
-    $('[data-toggle="gamepadControlsToggle"]').popover('hide')
     
 })
 
@@ -370,6 +352,7 @@ export const playerInputUpdate = () => {
     let buttonDownMap = gamepadFinal.map || keyboardFinal.map
     let buttonDownTaunt = gamepadFinal.taunt || keyboardFinal.taunt
     let parachuteDown = gamepadFinal.parachute || keyboardFinal.parachute
+    let buttonDownChat = keyboardFinal.chat
 
     window.playerInput = {
         stickX, stickY,
@@ -385,8 +368,9 @@ export const playerInputUpdate = () => {
         buttonPressedCd: buttonDownCd && !window.playerInput.buttonDownCd && !buttonDownTaunt,
         buttonPressedMap: buttonDownMap && !window.playerInput.buttonDownMap,
 		parachute: parachuteDown && !window.playerInput.parachuteDown,
+        buttonPressedChat: buttonDownChat && !window.playerInput.buttonDownChat,
 		
-        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap, buttonDownTaunt, parachuteDown,
+        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap, buttonDownTaunt, parachuteDown, buttonDownChat,
 
         taunt: (Object.values(tauntCommands).includes(window.taunt)) ? window.taunt : undefined,
 		
@@ -403,4 +387,7 @@ export const playerInputUpdate = () => {
         submitPlayerName()
     }
 
+    if (window.playerInput.buttonPressedChat) {
+        document.getElementById("chatbox").focus()
+    }
 }

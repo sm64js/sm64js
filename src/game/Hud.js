@@ -102,7 +102,11 @@ class Hud {
 
     render_dl_power_meter(numHealthWedges) {
         const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
-
+        if (document.getElementById("gameCanvas").width == 1280 && document.getElementById("gameCanvas").height == 720) {
+            this.sPowerMeterHUD.x = 191
+        } else {
+            this.sPowerMeterHUD.x = 140
+        }
         MathUtil.guTranslate(mtx, this.sPowerMeterHUD.x, this.sPowerMeterHUD.y, 0);
         Gbi.gSPMatrix(Game.gDisplayList, mtx, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_MUL | Gbi.G_MTX_PUSH);
         Gbi.gSPDisplayList(Game.gDisplayList, dl_power_meter_base);
@@ -318,7 +322,8 @@ class Hud {
     }
 
     render_hud() {
-        const hudDisplayFlags = 0 ///Disable for Base MMO //LevelUpdate.gHudDisplay.flags;
+        if (window.HUDHidden) return
+        const hudDisplayFlags = LevelUpdate.gHudDisplay.flags
 
         if (hudDisplayFlags == LevelUpdate.HUD_DISPLAY_NONE) {
             this.sPowerMeterHUD.animation = this.POWER_METER_HIDDEN
@@ -331,7 +336,7 @@ class Hud {
                 this.render_hud_cannon_reticle()
             }
 
-            if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_LIVES) {
+            /*if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_LIVES) {
                 this.render_hud_mario_lives()
             }
 
@@ -341,7 +346,7 @@ class Hud {
 
             if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_STAR_COUNT) {
                 this.render_hud_stars()
-            }
+            }*/
 
             // if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_KEYS) {
             //     this.render_hud_keys();
@@ -349,7 +354,7 @@ class Hud {
 
             if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_CAMERA_AND_POWER) {
                 this.render_hud_power_meter()
-                this.render_hud_camera_status()
+                //this.render_hud_camera_status()
             }
 
             // if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_TIMER) {

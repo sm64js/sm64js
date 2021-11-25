@@ -6,6 +6,10 @@ import { castle_courtyard_seg7_dl_070048B8 } from "./1/model.inc"
 import { castle_courtyard_seg7_dl_07005698 } from "./2/model.inc"
 import { castle_courtyard_seg7_dl_07005938 } from "./3/model.inc"
 
+import {
+    geo_movtex_pause_control, geo_movtex_draw_water_regions
+} from "../../../../game/MovingTexture"
+
 const canvas = document.querySelector('#gameCanvas')
 
 export const castle_courtyard_geo_000218 = [
@@ -28,7 +32,7 @@ export const castle_courtyard_geo_000218 = [
 	{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT_DECAL, castle_courtyard_seg7_dl_07005698] },
 	{ command: Geo.display_list, args: [Geo.LAYER_ALPHA, castle_courtyard_seg7_dl_07005938] },
 //	{ command: Geo.node_generated, args: [   0, geo_movtex_pause_control]},
-//	{ command: Geo.node_generated, args: [0x2601, geo_movtex_draw_water_regions]},
+	{ command: Geo.node_generated, args: [0x2601, geo_movtex_draw_water_regions]},
 	{ command: Geo.node_render_object_parent },
 	{ command: Geo.close_node },
 	{ command: Geo.close_node },

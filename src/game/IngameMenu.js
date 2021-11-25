@@ -8,8 +8,18 @@ export const create_dl_ortho_matrix = () => {
     const matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
 
     create_dl_identity_matrix()
+    let vw = SCREEN_WIDTH
+    let vh = SCREEN_HEIGHT
 
-    MathUtil.guOrtho(matrix, 0.0, SCREEN_WIDTH, 0.0, SCREEN_HEIGHT, -10.0, 10.0, 1.0)
+    if (document.getElementById("gameCanvas").width == 1280 && document.getElementById("gameCanvas").height == 720) { 
+        vw = 400
+        vh = 235 
+    } else {
+        vw = SCREEN_WIDTH
+        vh = SCREEN_HEIGHT
+    }
+
+    MathUtil.guOrtho(matrix, 0.0, vw, 0.0, vh, -10.0, 10.0, 1.0)
 
     // // Should produce G_RDPHALF_1 in Fast3D
     // gSPPerspNormalize(gDisplayListHead++, 0xFFFF);

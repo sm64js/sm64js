@@ -453,10 +453,21 @@ export class n64GfxProcessor {
     }
 
     calc_and_set_viewport(viewport) {
-        let width = 2.0 * viewport.vscale[0] / 4.0
-        let height = 2.0 * viewport.vscale[1] / 4.0
-        let x = (viewport.vtrans[0] / 4.0) - width / 2.0
-        let y = 240 - ((viewport.vtrans[1] / 4.0) + height / 2.0)
+        let width
+        let height
+        let x
+        let y
+        if (document.getElementById("gameCanvas").width == 640 && document.getElementById("gameCanvas").height == 480) {
+            width = 2.0 * viewport.vscale[0] / 4.0
+            height = 2.0 * viewport.vscale[1] / 4.0
+            x = (viewport.vtrans[0] / 4.0) - width / 2.0
+            y = 240 - ((viewport.vtrans[1] / 4.0) + height / 2.0)
+        } else {
+            width = viewport.vscale[0] / 2.0
+            height = viewport.vscale[1] / 2.0
+            x = viewport.vtrans[0]
+            y = viewport.vtrans[1]
+        }
 
         width *= 2.0
         height *= 2.0
@@ -931,7 +942,11 @@ export class n64GfxProcessor {
 
         for (let i = dest_index; i < vertices.length; i++) {
 
-            const v = vertices[i]
+            // const v = vertices[i]
+            let v = vertices[i]
+            if (Array.isArray(v)) {
+                v = {pos: v[0], flag: v[1], tc: v[2], color: v[3]}
+            }
             const normal = [
                 v.color[0] > 127 ? v.color[0] - 256 : v.color[0],
                 v.color[1] > 127 ? v.color[1] - 256 : v.color[1],

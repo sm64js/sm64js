@@ -132,8 +132,8 @@ const introBackgroundDlRows = [
 ]
 
 const intro_backdrop_one_image = (index, backgroundTable) => {
-    const aspect = canvas.width / canvas.height
-    const num_tiles_h = parseInt(((aspect * canvas.height) + 159) / 160)
+    // const aspect = canvas.width / canvas.height
+    const num_tiles_h = /*parseInt(((aspect * canvas.height) + 159) / 160)*/ 8
 
     const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
 
@@ -164,8 +164,8 @@ export const geo_intro_backdrop = (param, graphNode, unused) => {
         const index = graphNode.unk18 & 0xff
         const backgroundTable = introBackgroundTables[index]
         const displayList = []
-        const aspect = canvas.width / canvas.height
-        const num_tiles_h = parseInt(((aspect * canvas.height) + 159) / 160)
+        // const aspect = canvas.width / canvas.height
+        const num_tiles_h = /*parseInt(((aspect * canvas.height) + 159) / 160)*/ 136
 
         graphNode.flags = (graphNode.flags & 0xFF) | 0x100
         Gbi.gSPDisplayList(displayList, cGFX.dl_proj_mtx_fullscreen)

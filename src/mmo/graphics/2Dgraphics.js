@@ -34,7 +34,7 @@ const Minimaps = {
 	'm1001':{'img':defImage(401,401,'mmo/assets/minimaps/maps/ctf00.png'),'playerScaler':1.2,'hasFlags':true},
 	'm999':{'img':defImage(401,401,'mmo/assets/minimaps/maps/clouded.png'),'playerScaler':1.60176,'hasFlags':false},
 	'm56':{'img':defImage(401,401,'mmo/assets/minimaps/maps/ccs.png'),'playerScaler':1.8,'hasFlags':false},
-  'm1004':{'img':defImage(401,401,'mmo/assets/minimaps/maps/raceway.png'),'playerScaler':0.875,'hasFlags':false},
+  'm1004':{'img':defImage(401,401,'mmo/assets/minimaps/maps/raceway.png'),'playerScaler':0.69,'hasFlags':false},
 }
 // Example: Minimaps[`m${window.selectedMap}`].img would return '1000's table on bob mount and '9's table on bob battlefield
 const Player_Img = new Image(14, 14); Player_Img.src = 'mmo/assets/minimaps/player.png'
@@ -112,7 +112,7 @@ export const custom_draw_text = (x, y, w) => {
 
     if (customData2D.playerName) {
         context2d.globalAlpha = 0.8
-        context2d.font = "bold 14px verdana, sans-serif"
+        context2d.font = "bold 20px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
         context2d.fillStyle = "#9400D3"
         context2d.fillText(customData2D.playerName , pixelX, pixelY)
@@ -168,21 +168,29 @@ export const draw2Dpost3Drendering = () => {
     if (window.HUDHidden) return
     context2d.globalAlpha = 0.8
     if (window.latency) {
-        context2d.font = "bold 14px verdana, sans-serif"
+        context2d.font = "bold 24px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
         context2d.fillStyle = "#9400D3"
-        context2d.fillText(`Ping: ${window.latency}ms`, 580, 20)
+        if (document.getElementById("gameCanvas").width == 640) {
+            context2d.fillText(`Ping: ${window.latency}ms`, 580, 20)
+        } else {
+            context2d.fillText(`Ping: ${window.latency}ms`, 1220, 20) // can also be done by doing document.getElementById("gameCanvas").width - 60
+        }
     }
     if (!isNaN(window.fps)) {
         context2d.globalAlpha = 0.8
-        context2d.font = "bold 14px verdana, sans-serif"
+        context2d.font = "bold 24px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
         context2d.fillStyle = "#9400D3"
-        context2d.fillText(`fps: ${window.fps}`, 580, 40)
+        if (document.getElementById("gameCanvas").width == 640) {
+            context2d.fillText(`FPS: ${window.fps}`, 580, 40)
+        } else {
+            context2d.fillText(`FPS: ${window.fps}`, 1220, 40)
+        }
     }
 	if (gameData.marioState && !isNaN(window.myMario.readOnlyHealth)) {
         context2d.globalAlpha = 1.0
-        context2d.drawImage(marioHealthWedges[window.myMario.readOnlyHealth],518 + 16,42,96,96)
+        //context2d.drawImage(marioHealthWedges[window.myMario.readOnlyHealth],518 + 16,42,96,96)
         context2d.globalAlpha = 0.8
 	}		
     if (window.show_minimap > 0 && gameData.marioState && minimapEnabledLevel()) {

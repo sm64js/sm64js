@@ -18,6 +18,10 @@ export const approach_number = (current, target, inc, dec) => {
     return current
 }
 
+// aliases
+export const approach_f32 = approach_number
+export const approach_s32 = approach_number
+
 export const vec3f_get_dist_and_angle = (from, to, output) => {
     const x = to[0] - from[0]
     const y = to[1] - from[1]
@@ -32,6 +36,12 @@ export const vec3f_set_dist_and_angle = (from, to, dist, pitch, yaw) => {
     to[0] = from[0] + dist * Math.cos(pitch / 0x8000 * Math.PI) * Math.sin(yaw / 0x8000 * Math.PI)
     to[1] = from[1] + dist * Math.sin(pitch / 0x8000 * Math.PI)
     to[2] = from[2] + dist * Math.cos(pitch / 0x8000 * Math.PI) * Math.cos(yaw / 0x8000 * Math.PI)
+}
+
+export const vec3f_copy = (dest, src) => {
+    dest[0] = src[0]
+    dest[1] = src[1]
+    dest[2] = src[2]
 }
 
 export const vec3f_add = (dest, a) => {
@@ -68,17 +78,37 @@ export const vec3f_cross = (dest, a, b) => {
 }
 
 export const vec3f_set = (dest, x, y, z) => {
-    dest[0] = x;
-    dest[1] = y;
-    dest[2] = z;
-    return dest; 
+    dest[0] = x
+    dest[1] = y
+    dest[2] = z
+    return dest
 }
 
 export const vec3s_set = (dest, x, y, z) => {
-    dest[0] = x;
-    dest[1] = y;
-    dest[2] = z;
-    return dest; 
+    dest[0] = x
+    dest[1] = y
+    dest[2] = z
+    return dest
+}
+
+/**
+ * Convert float vector a to a short vector 'dest' by rounding the components
+ * to the nearest integer.
+ */
+export const vec3f_to_vec3s = (dest, a) => {
+    // add/subtract 0.5 in order to round to the nearest s32 instead of truncating
+    dest[0] = s16(a[0] + ((a[0] > 0) ? 0.5 : -0.5))
+    dest[1] = s16(a[1] + ((a[1] > 0) ? 0.5 : -0.5))
+    dest[2] = s16(a[2] + ((a[2] > 0) ? 0.5 : -0.5))
+}
+
+/// Copy matrix 'src' to 'dest'
+export const mtxf_copy = (dest, src) => {
+    for (let i = 0; i < src.length; i++) {
+        for (let j = 0; j < src[i].length; j++) {
+            dest[i][j] = src[i][j]
+        }
+    }
 }
 
 export const mtxf_identity = (mtx) => {
@@ -247,16 +277,6 @@ export const mtxf_rotate_zxy_and_translate = (dest, translate, rotate) => {
     dest[1][3] = 0.0
     dest[2][3] = 0.0
     dest[3][3] = 1.0
-}
-
-export const get_pos_from_transform_mtx = (dest, objMtx, camMtx) => {
-    const camX = camMtx[3][0] * camMtx[0][0] + camMtx[3][1] * camMtx[0][1] + camMtx[3][2] * camMtx[0][2]
-    const camY = camMtx[3][0] * camMtx[1][0] + camMtx[3][1] * camMtx[1][1] + camMtx[3][2] * camMtx[1][2]
-    const camZ = camMtx[3][0] * camMtx[2][0] + camMtx[3][1] * camMtx[2][1] + camMtx[3][2] * camMtx[2][2]
-
-    dest[0] = objMtx[3][0] * camMtx[0][0] + objMtx[3][1] * camMtx[0][1] + objMtx[3][2] * camMtx[0][2] - camX
-    dest[1] = objMtx[3][0] * camMtx[1][0] + objMtx[3][1] * camMtx[1][1] + objMtx[3][2] * camMtx[1][2] - camY
-    dest[2] = objMtx[3][0] * camMtx[2][0] + objMtx[3][1] * camMtx[2][1] + objMtx[3][2] * camMtx[2][2] - camZ
 }
 
 export const mtxf_rotate_xy = (mtx, angle) => {
@@ -492,4 +512,30 @@ export const atan2s = (y, x) => {
 
     return parseInt(Math.atan2(x, y) * 10430.5)
 
+}
+
+export const sqrtf = (x) => {
+    return Math.sqrt(x)
+}
+
+export const Mat4 = () => {
+    return new Array(4).fill(0).map(() => new Array(4).fill(0))
+}
+
+/**
+ * Extract a position given an object's transformation matrix and a camera matrix.
+ * This is used for determining the world position of the held object: since objMtx
+ * inherits the transformation from both the camera and Mario, it calculates this
+ * by taking the camera matrix and inverting its transformation by first rotating
+ * objMtx back from screen orientation to world orientation, and then subtracting
+ * the camera position.
+ */
+export const get_pos_from_transform_mtx = (dest, objMtx, camMtx) => {
+    let camX = camMtx[3][0] * camMtx[0][0] + camMtx[3][1] * camMtx[0][1] + camMtx[3][2] * camMtx[0][2]
+    let camY = camMtx[3][0] * camMtx[1][0] + camMtx[3][1] * camMtx[1][1] + camMtx[3][2] * camMtx[1][2]
+    let camZ = camMtx[3][0] * camMtx[2][0] + camMtx[3][1] * camMtx[2][1] + camMtx[3][2] * camMtx[2][2]
+
+    dest[0] = objMtx[3][0] * camMtx[0][0] + objMtx[3][1] * camMtx[0][1] + objMtx[3][2] * camMtx[0][2] - camX
+    dest[1] = objMtx[3][0] * camMtx[1][0] + objMtx[3][1] * camMtx[1][1] + objMtx[3][2] * camMtx[1][2] - camY
+    dest[2] = objMtx[3][0] * camMtx[2][0] + objMtx[3][1] * camMtx[2][1] + objMtx[3][2] * camMtx[2][2] - camZ
 }

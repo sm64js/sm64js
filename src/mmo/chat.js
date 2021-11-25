@@ -57,7 +57,7 @@ export const recvChat = (chatmsg) => {
     const from = document.createElement('strong')
     if (sender.includes('#')) from.append(createEmote('discord'))
     if (isAdmin) {
-        node.style.color = "blue"
+        node.style.color = "#3B56FF"
         from.append("(Admin)")
     }
     from.append(sender)

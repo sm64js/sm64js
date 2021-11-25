@@ -1,11 +1,14 @@
-﻿import { loadDataIntoGame } from "./romTextureLoader.js"
+﻿import * as IDB from "idb-keyval"
+var msgpack = require("msgpack-lite")
+import { loadDataIntoGame } from "./romTextureLoader.js"
 import { GameInstance as Game } from "./game/Game"
 import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
 import  * as Socket from "./mmo/socket.js"
 import "./mmo/cosmetics"
 import "./mmo/cmts_cosmetics"
-import "./template.css"
+import "./stylesheet.css"
+import { viewport } from "./game/Area"
 
 
 const send_display_list = (gfx_list) => { GFX.run(gfx_list) }
@@ -16,7 +19,7 @@ let n_frames = 0
 let target_time = 0
 let frameSpeed = 0.03
 let reset_delay = 0
-export const textureVersion = 37
+export const textureVersion = 38
 
 const produce_one_frame = () => {
 	let respText = ""
@@ -81,15 +84,6 @@ const main_func = () => {
 }
 
 
-//////////////////// Some more website stuff
-
-$('[data-toggle="popover"]').popover({
-    container: "body",
-    content: function () {
-        return $('#controlsPopover').clone()
-    },
-})
-
 //const url_hash = new URLSearchParams(window.location.hash.slice(1))
 const url_params = new URLSearchParams(window.location.search)
 
@@ -132,22 +126,115 @@ const setStatsUpdate = setInterval(() => {
     const totalFrameTimeAvg = totalFrameTimeBuffer.getAvg().toFixed(2)
     const maxFps = (1000 / totalFrameTimeAvg).toFixed(2)
     window.fps = parseInt(maxFps)
-    document.getElementById("maxFps").innerHTML = `Effective Max Fps: ${maxFps}`
-    document.getElementById("timing-total").innerHTML = `${totalFrameTimeAvg}ms`
 }, 500)
 
+// widescreen
+const gameCanvas = document.querySelector('#gameCanvas')
+const textCanvas = document.querySelector('#textCanvas')
+const fullCanvas = document.querySelector('#fullCanvas')
+gameCanvas.width = 640
+gameCanvas.height = 480
+textCanvas.width  = 640
+textCanvas.height = 480
+fullCanvas.width  = 640
+fullCanvas.height = 480
+const customWidth = 1280
+const customHeight = 720
+
+window.toggleWidescreen = () => {
+    if (gameCanvas.width == 640 && gameCanvas.height == 480) {
+        /* const chat = $(".chatboxPos")
+        chat.detach().appendTo(".canvasContainer")
+        document.getElementById("chatboxP").style = "margin-top: -267px; margin-left: 29px; z-index: 10;"
+        document.getElementById("chatlog").style = "height: 180px; background-color: rgba(0,0,0,0.35);"
+        document.getElementById("justifyChat").style = "justify-content:center; width: 400px;"
+        document.getElementById("chatboxes").style="justify-content:center; margin-top: -20px; width: 400px;"*/
+        gameCanvas.style = "background-image: url('/mmo/assets/canvasBorder169.png'); background-size: 100%; background-repeat: no-repeat; padding: 26px;"
+
+        gameCanvas.width  = customWidth
+        gameCanvas.height = customHeight
+        textCanvas.width  = customWidth
+        textCanvas.height = customHeight
+        fullCanvas.width  = customWidth
+        fullCanvas.height = customHeight
+
+        viewport.vscale = [customWidth, customHeight, 0, 0]
+        viewport.vtrans = [0, 0, 0, 0]
+    } else {
+        gameCanvas.style = "background-image: url('/mmo/assets/canvasBorder2.png'); background-size: 100%; background-repeat: no-repeat; padding: 26px;"
+        /* const chat = $(".chatboxPos")
+        chat.detach().appendTo("#chatboxParent")
+        document.getElementById("chatboxP").style = null
+        document.getElementById("chatlog").style = "margin-bottom: 5px !important;"
+        document.getElementById("justifyChat").style = "justify-content:center"
+        document.getElementById("chatboxes").style="justify-content:center;"*/
+        gameCanvas.width  = 640
+        gameCanvas.height = 480
+        textCanvas.width  = 640
+        textCanvas.height = 480
+        fullCanvas.width  = 640
+        fullCanvas.height = 480
+
+        viewport.vscale = [640, 480, 511, 0]
+        viewport.vtrans = [640, 480, 511, 0]
+    }
+}
+
+// hacky method; probably a better way to do this
+const signbox = document.getElementById("signboxBackground")
+const optionsbox = document.getElementById("optionsBackground")
+const customizebox = document.getElementById("customizeBackground")
+const controlsbox = document.getElementById("controlsBackground")
+window.switchbox = (name) => {
+    switch(name) {
+        case "optionsbox":
+            signbox.hidden = true
+            optionsbox.hidden = false
+            customizebox.hidden = true
+            controlsbox.hidden = true
+            break
+        case "customizebox":
+            signbox.hidden = true
+            optionsbox.hidden = true
+            customizebox.hidden = false
+            controlsbox.hidden = true
+            break
+        case "controlsbox":
+            signbox.hidden = true
+            optionsbox.hidden = true
+            customizebox.hidden = true
+            controlsbox.hidden = false
+            break
+        default:
+            signbox.hidden = false
+            optionsbox.hidden = true
+            customizebox.hidden = true
+            controlsbox.hidden = true
+            break
+    }
+}
 
 window.enterFullScreenMode = () => {
     const dstCanvas = document.getElementById('fullCanvas')
     dstCanvas.requestFullscreen()
+    if (gameCanvas.width != 640 && gameCanvas.height != 480) {
+        dstCanvas.width = window.screen.width/2
+        dstCanvas.height = window.screen.height/2
+        viewport.vscale = [window.screen.width/2, window.screen.height/2, 0, 0]
+    }
 }
 
 ///// Start Game
-const rulesVersion = 11
+const rulesVersion = 13
 let gameStarted = false
 
+if (localStorage['rules'] == rulesVersion) {
+    document.getElementById("rules").hidden = true
+    document.getElementById("signboxBackground").classList.remove("shunned")
+    document.getElementById("signboxBackground").disabled = false
+}
+
 document.getElementById("startbutton").addEventListener('click', () => {
-    if (localStorage['rules'] != rulesVersion) return
     if (gameStarted) {
         url_params.set('autostart', 1)
         window.location.search = url_params /// Refresh page (Reset Game)
@@ -155,17 +242,26 @@ document.getElementById("startbutton").addEventListener('click', () => {
     else startGame()
 })
 
-document.getElementById("deleteRom").addEventListener('click', () => {
-    localStorage.removeItem('sm64jsAssets')
-    window.location.reload()
+document.getElementById("acceptRules").addEventListener('click', () => {
+    localStorage.setItem("rules", rulesVersion)
+    document.getElementById("rules").hidden = true
+    document.getElementById("signboxBackground").classList.remove("shunned")
+    document.getElementById("signboxBackground").disabled = false
 })
 
+window.deleteRom = () => {
+    IDB.del('assets')
+    window.location.reload()
+}
+
 const startGame = () => {
-    console.log("Starting Game!")
+    // console.log("Starting Game!")
+    // document.getElementById("startDiv").style = "margin-top: 62px;margin-left: 320px;"
+    if (localStorage['rules'] != rulesVersion) return
     gameStarted = true
 
     document.getElementById("startbutton").classList.remove('btn-success')
-    document.getElementById("startbutton").classList.add('btn-light')
+    document.getElementById("startbutton").classList.add('btn-stone')
     document.getElementById("startbutton").innerHTML = "🔄 Reset Game"
 
     document.getElementById("connectedMsg").hidden = false
@@ -250,19 +346,28 @@ window.addEventListener("keydown", (e) => {
     }
 })
 
-if (localStorage['rules'] != rulesVersion) $('#rules-modal').modal({ backdrop: 'static', keyboard: false })
-$("#rules-modal").on('hide.bs.modal', () => { localStorage['rules'] = rulesVersion })
+// if (localStorage['rules'] != rulesVersion) $('#rules').modal({ backdrop: 'static', keyboard: false })
+// $("#rules").on('hide.bs.modal', () => { localStorage['rules'] = rulesVersion })
 
 const checkForRom = () => {   /// happens one time when the page is loaded
-    if (localStorage['sm64jsAssets']) {
-        const data = JSON.parse(localStorage['sm64jsAssets'])
-        if (data.textureVersion == textureVersion) {
-            loadDataIntoGame(data)
-            return true
-        }
+    const url = new URL(window.location.href)
+    if (url.searchParams.get("romReset")) {
+        IDB.del('assets')
+        return false
     }
 
-    const url = new URL(window.location.href)
+    return IDB.get('assets').then((msgdata) => {
+        if (msgdata) {
+            let data = msgpack.decode(msgdata)
+            if (data.textureVersion == textureVersion) {
+               loadDataIntoGame(data)
+            } else {
+               msgdata = null
+            }
+        }
+        return !!msgdata
+    })
+
     if (url.searchParams.get("romExternal")) {
         const msgElement = document.getElementById('romMessage')
         msgElement.innerHTML = "Transfering ROM Data..."
@@ -273,5 +378,5 @@ const checkForRom = () => {   /// happens one time when the page is loaded
     }
 
 
-    return false
+    //return false
 }

@@ -17,6 +17,7 @@
     ]
   },
   "dependencies": {
+    "chokidar": "^3.5.2",
     "google-protobuf": "^3.13.0",
     "idb-keyval": "^6.0.3",
     "mathjs": "^7.0.1",

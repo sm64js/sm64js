@@ -260,9 +260,9 @@ const startGame = () => {
     if (localStorage['rules'] != rulesVersion) return
     gameStarted = true
 
-    document.getElementById("startbutton").classList.remove('btn-success')
-    document.getElementById("startbutton").classList.add('btn-stone')
-    document.getElementById("startbutton").innerHTML = "🔄 Reset Game"
+    document.getElementById("startbutton").classList.remove('green-button')
+    document.getElementById("startbutton").classList.add('red-button')
+    document.getElementById("startbutton").innerHTML = "Restart Game"
 
     document.getElementById("connectedMsg").hidden = false
 	

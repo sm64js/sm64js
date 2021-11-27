@@ -392,7 +392,7 @@ export const submitPlayerName = () => {
 
     document.getElementById("pvpButton").hidden = true
     // document.getElementById("mapDiv").hidden = true
-    document.getElementById("yellowControls").style = "justify-content:center; margin-top: 195px;"
+    document.getElementById("yellowControls").style = ""
 	Game.load_pvp()
 
     const joinGameMsg = new JoinGameMsg()

@@ -1,7 +1,11 @@
-﻿/* HTML, contains background */
+﻿/*NOTE: I know the buttons' texture looks stretched, a solution is in the works.
+                            Leave it AS IS for now. 
+                                    -eros*/
+
+/* HTML, contains background */
 html {
     height: 100%;
-    background-color: #000000;
+    background-color: #050413;
     background-image: url('/mmo/assets/sm64js-background.png');
     background-size: 14.3%;
     background-repeat: repeat;
@@ -26,6 +30,20 @@ html {
   text-shadow: 0px 4px #b98a50, 2px 3px #b98a50, -3px 3px #b98a50, -3px -1px #b98a50;
 }
 
+.descriptionContact{
+    color: #d0d2d9;
+    font-family: "TextboxFont";
+    letter-spacing: -0.2px;
+    font-size: inherit;
+}
+
+.descriptionContact:hover{
+    border-bottom: 0.15em solid hsla(0,0%,100%,.25);
+    padding-bottom: 0.2em;
+}
+
+/* Body  */
+
 body {
     color: #fff;
     font-family: "TextboxFont";
@@ -33,98 +51,88 @@ body {
     text-align: center;
 }
 
+button{
+
+}
+
 #select {
     font-family: 'TextboxFont';
 }
 
-.center {
-    padding: 14px;
-    padding-left: 16px;
-    padding-right: 16px;
-    margin-left: 20%;
-    margin-right: 20%;
-    padding-top: 3.4em;
-    padding-bottom: 3em;
-    margin: auto;
-    padding: 10px;
-}
-
 #signboxBackground {
-    padding: 14px;
     background-image: url("/mmo/assets/yellow-background.png");
     background-size: 100% 100%;
-    border: none;
-    opacity: 1;
-    padding-left: 16px;
-    padding-right: 16px;
-    margin-left: 20%;
-    margin-right: 20%;
-    padding-top: 3.4em;
-    padding-bottom: 3em;
-    width: 800px;
-    height: 600px;
-    margin: auto;
-    padding: 10px;
+    margin-left: 10%;
+    margin-right: 10%;
+    padding-top: 3%;
+    padding-bottom: 3%;
 }
+
+/*Separate divs/rows of buttons inside the signbox*/
+#signboxBackground > div{
+    margin-bottom: 1em;
+}
+
+.mapSelectDiv{
+    margin-top: 0.8em;
+}
+
 #optionsBackground {
-    padding: 14px;
     background-image: url("/mmo/assets/blue-background.png");
     background-size: 100% 100%;
-    border: none;
-    opacity: 1;
-    padding-left: 16px;
-    padding-right: 16px;
-    margin-left: 20%;
-    margin-right: 20%;
-    padding-top: 3.4em;
-    padding-bottom: 3em;
-    width: 800px;
-    height: 600px;
-    margin: auto;
-    padding: 10px;
+    margin-left: 10%;
+    margin-right: 10%;
+    padding-top: 3%;
+    padding-bottom: 3%;
 }
+
+#optionsBackground > div{
+    margin-bottom: 1em;
+}
+
 #customizeBackground {
-    padding: 14px;
-    background-image: url("/mmo/assets/pink-background.png");
+    background-image: url("/mmo/assets/blue-background.png");
     background-size: 100% 100%;
-    border: none;
-    opacity: 1;
-    padding-left: 16px;
-    padding-right: 16px;
-    margin-left: 20%;
-    margin-right: 20%;
-    padding-top: 3.4em;
-    padding-bottom: 3em;
-    width: 800px;
-    height: 600px;
-    margin: auto;
-    padding: 10px;
+    margin-left: 10%;
+    margin-right: 10%;
+    padding-top: 3%;
+    padding-bottom: 3%;
 }
+
+#customizeBackground > div{
+    margin-bottom: 1em;
+}
+
 #controlsBackground {
-    padding: 14px;
     background-image: url("/mmo/assets/green-background.png");
     background-size: 100% 100%;
-    border: none;
-    opacity: 1;
-    padding-left: 16px;
-    padding-right: 16px;
-    margin-left: 20%;
-    margin-right: 20%;
-    padding-top: 3.4em;
-    padding-bottom: 3em;
-    width: 800px;
-    height: 600px;
-    margin: auto;
-    padding: 10px;
+    margin-left: 10%;
+    margin-right: 10%;
+    padding-top: 3%;
+    padding-bottom: 3%;
 }
 
 #keyboardControlsWindow {
-    margin-left: -300px;
+    display: flex;
+    width: 35%;
+    margin: auto;
+    margin-bottom: 1em;
 }
 
 #gamepadControlsWindow {
-    margin-left: 300px;
-    margin-top: -350px;
+    display: flex;
+    width: 35%;
+    margin: auto;
+    margin-top: 0.2em;
+    margin-bottom: 1em;
+}
+
+#gamepadMessage{
+    font-size: 1.2em;
+}
+
+.controlButtons{
+    margin-bottom: 1em;
 }
 
 .siteCenter{
@@ -137,27 +145,26 @@ header {
 }
 nav {
     margin-top: 2.3%;
-    font-size: 120%;
+    font-size: 90%;
     color: hsla(0,0%,100%,.5);
 }
 header, nav, a {
     color: hsla(0, 0%, 100%, 0.69);
     text-decoration: none;
-    font-size: 140%;
+    font-size: 120%;
     margin: 0.2em;
+    margin-top: 1.4%;
 }
 nav a:hover, a:focus {
     border-bottom: 0.15em solid hsla(0,0%,100%,.25);
     padding-bottom: 0.2em;
 }
-/* Font size fix for the nav bar */
-nav>a {
-    font-size: 30px;
-}
 
 /* SM64JS Logo - Title */
 img#title {
     animation: sm64title 2.2s linear;
+    width: 64%;
+    height: auto;
 }
 
 /* Buttons */
@@ -165,11 +172,19 @@ input {
     text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
 }
 input[type=text] {
-    margin-top: 8px;
-    width: 800px;
+    width: auto;
     height: 2rem;
     font-family: 'TextboxFont';
-    font-size: 16px;
+    font-size: 124%;
+    text-shadow: none;
+}
+
+select {
+    width: auto;
+    height: 2rem;
+    font-family: 'TextboxFont';
+    font-size: 124%;
+    text-shadow: none;
 }
 
 .romFileText {
@@ -186,15 +201,12 @@ input[type=text] {
     width: 4em;
 }
 
-button {
-    height: 40px;
-}
+/* Buttons */
 
 .stone-button {
     background-image: url("/mmo/assets/btn-stone-edit.png");
     background-size: 100% 100%;
     border: none;
-    opacity: 1;
     font-weight: 348;
     font-family: "TextboxFont";
     font-size: 140%;
@@ -303,20 +315,9 @@ a.pink-button:focus {
     padding-bottom:0.3em
 }
 
-/* Buttons used for switching menus */
-.boxchange {
-    height: 60px;
-    bottom: 600px;
-}
-
 /* Main elements */
 main {
-    margin-top: 4%;
-}
-
-h4 {
-    font-size: 2em;
-    font-weight: normal;
+    margin-top: 2%;
 }
 
 .removeVerticalMargins {
@@ -326,18 +327,23 @@ h4 {
 
 h5 {
     font-size: 1.2em;
-    font-weight: normal;
 }
 
 h6.description {
-    font-size: 150%;
-    font-weight: normal;
+    font-size: 170%;
     background-color: rgba(0,0,0,.3411764705882353);
     padding: 1%;
     margin-left: 20%;
     margin-right: 20%;
     margin-top: 2%;
     margin-bottom: 2%;
+}
+
+/* Sets all h1, h2 and other fonts as normal instead of bold
+because it looks weird in browsers like Firefox, looks decent on chrome but
+I'd prefer to let everyone see it as similar as possible*/
+h1, h2, h3, h4, h5, h6{
+    font-weight: normal;
 }
 
 .romSelectText {
@@ -379,35 +385,56 @@ h6.description {
 /* Music */
 .musicTitles {
     font-size: 1.4em;
-    margin-top: 0.2em;
-    margin-bottom: 1.95em;
-    vertical-align: middle;
-    top: 1em;
-    position: relative;
-    width: 18em;
+    display: inline;
+    margin-right: 1em;
+}
+
+.musicBox{
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 1em;
+}
+
+audio{
+    width: 28em;
+    height: 2em;
+    vertical-align: bottom;
 }
 
 /* Canvases for rendering the game output */
+.relativePositioner{
+    position: relative;
+}
+
+#textCanvas{
+    position: absolute;
+}
+
+.gameCanvasSection{
+    display: flex;
+}
+
 #gameCanvas{
     background-image: url('/mmo/assets/canvasBorder2.png');
     background-size: 100%;
     padding: 26px;
 }
+
 #textCanvas{
     background-color: transparent;
-    position: absolute;
     margin: auto;
-    left: 0px;
-    right: 0px;
-    z-index: 10;
     padding: 26px;
+}
+
+.chatContainer{
+    width: 340%;
 }
 
 .chatbox {
     margin-top: 10px;
     border: 0px solid transparent;
     background-color: #00000070;
-    width: 640px;
+    width: 100% !important;
     text-align: left;
     color: white;
     padding-left: 10px;
@@ -421,45 +448,62 @@ ul {
 
 #chatlog {
     background-color: #eae2a7;
-    width: 790px;
-    height: 400px;
-    overflow: scroll;
+    height: 13em;
+    /*overflow: scroll;*/
     text-align: left;
     color: black;
     font-style: normal;
-    font-size: 20px;
+    font-size: 2em;
+    margin: 0;
+    padding: 1em;
+    margin-bottom: 0.2em;
+    width: 91%;
+    z-index: 200;
+}
 
-    padding: 14px;
-    padding-left: 16px;
-    padding-right: 16px;
-    margin-left: 20%;
-    margin-right: 20%;
-    padding-top: 3.4em;
-    padding-bottom: 3em;
-    margin: auto;
-    padding: 10px;
+.gameCanvasRight{
+    margin-left: 1.5em;
 }
 
 #rules {
     background-color: white;
     border-radius: 10px;
-    border: 2px solid;
-    padding: 14px;
-    padding-left: 16px;
-    padding-right: 16px;
-    margin-left: 20%;
-    margin-right: 20%;
-    padding-top: 3.4em;
-    padding-bottom: 3em;
-    width: 800px;
-    height: 600px;
-    margin: auto;
-    padding: 10px;
+    margin-left: 15%;
+    position: fixed;
+    top: 0;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    z-index: 2;
+    width: 66%;
+    padding: 2%;
+    height: 84%;
+    color: black;
 }
-#rules>p {
-    margin-left: 15px;
+#rules > p {
     text-align: left;
-    font-size: 25px;
+    font-size: 140%;
+}
+
+.rulesLogo{
+    width: 40%;
+    height: auto;
+}
+
+.rulesButton{
+    background-image: url("/mmo/assets/btn-green-edit.png");
+    background-size: 100% 100%;
+    border: none;
+    font-family: "TextboxFont";
+    font-size: 140%;
+    color: white;
+    background-color: green;
+    text-decoration: none;
+    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
+    cursor: pointer;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
 }
 
 .shunned {
@@ -467,8 +511,17 @@ ul {
     pointer-events: none;
 }
 
-#picker, #ambpicker {
+#picker{
     z-index: 100;
+    width: 25.3%;
+    float: left;
+}
+
+#ambpicker {
+    z-index: 100;
+    width: 25.3%;
+    float: right;
+    margin-left: 50%;
 }
 
 label {
@@ -483,20 +536,6 @@ label {
 }
 
 /* Skin customization menu */
-#skinCustomizerWindow {
-    background-color: white;
-    background-size: 100% 100%;
-    border: none;
-    color: black;
-    text-align: center;
-    width: 450px;
-    height: 470px;
-    margin: auto;
-    margin-top: 40px;
-    padding: 10px;
-    border-radius: 5px;
-    border: 2px solid #FFF;
-}
 
 #skinContents {
     display: block;
@@ -508,7 +547,15 @@ label {
     margin-left: 60px;
 }
 
+.colorPickersContainer{
+    margin-left: 30%;
+    margin-right: 30%;
+    display: flex;
+}
+
+/* Connected message */
+
 #connectedMsg {
-    margin-top: 0.1px;
-    font-size: 30px;
+    margin-top: 0.5em;
+    font-size: 1.8em;
 }

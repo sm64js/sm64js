@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en_US" xmlns="https://html.spec.whatwg.org/multipage/">
 <head>
     <meta charset="utf-8" />
     <title>sm64js</title>
@@ -40,8 +40,9 @@
        <img id="title" src="/mmo/assets/title.png">
 
         <!-- Description -->
-       <h6 class="description">This project is currently still being developed. This page may be live from time to time for testing, but there may be glitches and performance issues. The server will go down and restart at random times without warning. If you would like to help with the project or have feedback please contact me.</h6>
-       <h6 class="description">Screen transitions in 4:3 are messed up due to widescreen now being implemented.</h6>
+       <h6 class="description">This project is currently still being developed. This page may be live from time to time for testing, but there may be glitches and performance issues. The server will go down and restart at random times without warning. If you would like to help with the project or have feedback please<a class="descriptionContact" href="/credits.html">contact me.</a></h6>
+       <h6 class="description">Screen transitions in 4:3 are messed up due to widescreen now being implemented. <br> <span style="font-size: 0.94em;">The chat will appear below the game when in widescreen mode, this will get fixed on a future update.</span></h6>
+       
 
        <!-- Submit ROM form -->
        <form id="romSelect">
@@ -53,9 +54,9 @@
         <h6 id="romMessage" class="romMessageText">This project uses the textures and other game assets from the original game. Due to copyright issues, I cannot host those assets on this site. Please select a sm64 ROM to extract those assets before you can play.</h6>
 
         <!-- Pop up -->
-        <div id="rules" style="color: black">
+        <div id="rules">
             <br>
-            <img src="/mmo/assets/sm64js_d.svg" style="width: 350px;" alt="sm64js Logo">
+            <img src="/mmo/assets/sm64js_d.svg" class="rulesLogo" alt="sm64js Logo">
             <br>
             <p style="text-align: center;">Welcome to the multiplayer version of sm64js! To play you have to follow the listed rules below.</p>
             <br>
@@ -64,21 +65,19 @@
             <p>Inappropriate or offensive behavior may result in temporary or permanent mute or ban</p>
             <p>Failure to comply with these rules will result in punishment, including but not limited to a mute or ban of your account.</p>
         
-            <button type="button" class="green-button" id="acceptRules">I have read the rules and will follow them.</button>
+            <button type="button" class="rulesButton" id="acceptRules">I have read the rules and will follow them.</button>
         </div>
 
         <br />
         <br />
         <!-- Start of signboxBackground -->
         <div id="signboxBackground" class="shunned">
-            <!-- Main buttons -->
-            <div style="justify-content:center">
-                <button style="margin-top: 60px;" id="startbutton" type="button" class="green-button" disabled>Start Game</button>
-            </div>
-            <!-- Game settings -->
-            <div style="justify-content:center; padding-top:10px; padding-bottom: 10px">
-                <button class="stone-button" onclick="window.hideHUD(this)">Hide HUD</button>
-                <button class="stone-button fixButtonPadding" style="justify-content:center;" onclick="window.myMario.freezeCamera = !window.myMario.freezeCamera; this.textContent = window.myMario.freezeCamera ? 'Freeze Camera (ON)' : 'Freeze Camera (OFF)'">Freeze Camera (OFF)</button>
+            <!-- Main buttons & settings -->
+            <!-- Divs are used as rows here -->
+            <div>  <!-- This is row 1 for example -->
+                <button id="startbutton" type="button" class="green-button" disabled>Start Game</button>
+                <button class="pink-button" onclick="window.hideHUD(this)">Hide HUD</button>
+                <button class="blue-button fixButtonPadding" onclick="window.myMario.freezeCamera = !window.myMario.freezeCamera; this.textContent = window.myMario.freezeCamera ? 'Freeze Camera (ON)' : 'Freeze Camera (OFF)'">Freeze Camera (OFF)</button>
             </div>
 
             <!-- Sign in / sign out section, Map select-->
@@ -95,52 +94,38 @@
                 </button>
 
                 <!-- Player name section -->
-                <div hidden id="playerNameRow" style="margin-top: 10px; margin-bottom: 54px;">
+                <div hidden id="playerNameRow">
                     <form id="playerNameForm">
 
                         <!-- Discord name -->
-                        <div id="discordNameRow" style="justify-content:center;">
-                            <div>
-                                <label type="text" readonly>Discord Name: </label>
-                            </div>
+                        <div id="discordNameRow">
+                                <label type="text">Discord Name: </label>
 
-                            <div>
-                                <input readonly id="discordNameBox" type="text" style="margin-left: 15px; max-width: 200px" minlength="3" maxlength="20">
-                            </div>
-                            <br>
-                            <div>
-                                <button id="switchCustom" type="button" class="stone-button" style="margin-left:15px;">Custom Display Name</button>
-                            </div>
+                                <input readonly id="discordNameBox" type="text" style="max-width: 200px" minlength="3" maxlength="20">
+
+                                <button id="switchCustom" type="button" class="yellow-button fixButtonPadding">Use Custom Name</button>
+
                         </div>
                         <!-- End discord name -->
 
                         <!-- Custom name -->
-                        <div hidden id="customNameRow" style="justify-content:center;">
+                        <div hidden id="customNameRow">
+                                <label type="text">Custom Name: </label>
 
-                            <div>
-                                <label type="text" readonly>Custom Name: </label>
-                            </div>
+                                <input id="playerNameInput" type="text" minlength="3" maxlength="14" placeholder="Enter name here" onchange="window.updatePlayerName(this.value)">
 
-                            <div>
-                                <input id="playerNameInput" type="text" style="margin-left: 15px; max-width: 120px" class="form-control-sm" minlength="3" maxlength="14" placeholder="enter name" onchange="window.updatePlayerName(this.value)">
-                            </div>
-
-                            <div>
-                                <button id="switchDiscord" type="button" style="margin-left:15px;">Display Discord Name</button>
-                            </div>
+                                <button id="switchDiscord" type="button" class="blue-button fixButtonPadding">Use Discord Name</button>
 
                         </div>
                         <!-- End custom name -->
-                        <br>
-                        <br>
                         <!-- Map select -->
-                        <div style="justify-content:center;">
-                            <div>
+                        <div class="mapSelectDiv">
+
                                 <label type="text" readonly>Select Map: </label>
-                            </div>
+                                <br>
 
                             <!-- Map selection list, add newer custom levels in here -->
-                            <div style="margin-left:15px;">
+                            <div>
 
                                 <select id="mapSelect">
                                     <optgroup label="Vanilla maps">
@@ -172,51 +157,19 @@
 
                                 </select>
 
-                            </div>
-                            <br>
-                            <button id="playerNameButton" type="submit" class="green-button" style="margin-left:15px;">
-                                Submit
-                            </button>
+                                <button id="playerNameButton" type="submit" class="green-button">
+                                    Submit
+                                </button>
 
-                            <div style="margin-left:15px;">
+                            </div>
+
+
+                            <div>
                                 <label id="playerNameResult" type="text" readonly style="display: none;">Waiting for selection</label>
-                            </div>
-                            <br>
-                            <button type="button"
-                                id="pvpButton"
-                                class="pink-button"
-                                onclick="window.togglePvp()"
-                                style="margin-left:15px;">
-                                PvP: On
-                            </button>
-                            <button type="button"
-                                id="respawnButton"
-                                class="stone-button"
-                                style="margin-top:15px;"
-                                onclick="window.reset = true">
-                                Respawn
-                            </button>
-                            <!-- Controls and customization -->
-                            <div id="yellowControls" style="justify-content:center; margin-top: 30px;">
-                                <button type="button"
-                                        class="green-button boxchange"
-                                        data-placement="bottom"
-                                        onclick="window.switchbox('controlsbox')">
-                                    Customize Controls
-                                </button>
-
-                                <button type="button"
-                                        class="blue-button boxchange"
-                                        onclick="window.switchbox('optionsbox')">
-                                    Options & Misc
-                                </button>
-
-                                <button type="button"
-                                    class="pink-button boxchange"
-                                    onclick="window.switchbox('customizebox'); window.updateWheel()">
-                                    Customize Character / Skin
-                                </button>
-                            </div>
+                            </div> <!-- If this isn't even used anymore wiy bother hiding it? Does a js reference it or something? -eros -->
+                            
+                            
+                            
                         </div>
                         <!-- End map select -->
 
@@ -224,20 +177,60 @@
                 </div> <!-- End player name section -->
 
                 <!-- Authentification failed message -->
-                <h6 hidden id="authFailMsg" style="color:red"></h6>
+                <h6 hidden id="authFailMsg" style="color:red"></h6> <!-- This is row 2 and so on -->
             </div>
+
+            <!-- In-game options -->
+                <div>
+                                <button type="button"
+                                    id="pvpButton"
+                                    class="pink-button"
+                                    onclick="window.togglePvp()"
+                                    >
+                                    PvP: On
+                                </button>
+                                <button type="button"
+                                    id="respawnButton"
+                                    class="blue-button"
+                                    onclick="window.reset = true">
+                                    Respawn
+                                </button>
+                            </div>
+
+                <!-- Controls and customization -->
+                <div id="yellowControls">
+                                <button type="button"
+                                        class="green-button fixButtonPadding"
+                                        data-placement="bottom"
+                                        onclick="window.switchbox('controlsbox')">
+                                    Customize Controls
+                                </button>
+
+                                <button type="button"
+                                        class="blue-button fixButtonPadding"
+                                        onclick="window.switchbox('optionsbox')">
+                                    Options & Misc
+                                </button>
+
+                                <button type="button"
+                                    class="pink-button fixButtonPadding"
+                                    onclick="window.switchbox('customizebox'); window.updateWheel()">
+                                    Customize Character / Skin
+                                </button>
+                            </div>
 
         </div>
         <!-- End of signboxBackground -->
         <!-- Start of options box-->
         <div hidden id="optionsBackground">
-            <br>
             <h1>Options & Misc</h1>
             <!-- Miscellaneous -->
-            <div style="justify-content:center;">
+            <!-- Divs are used as rows here -->
+            <div> <!-- This is row 1 for example -->
                 <button id="deleteRom" type="button" class="red-button">Delete Rom</button>
-                <br><br>
+            </div>
             
+            <div>   <!-- This is row 2 and so on -->
                 <button type="button"
                         class="blue-button"
                         onclick="window.fullWindowMode = true">
@@ -251,58 +244,56 @@
                 <button type="button"
                     class="blue-button"
                     onclick="window.toggleWidescreen()">
-                    Widescreen Mode <span style="color: yellow;">(NEW!)</span>
+                    Widescreen Mode
                 </button>
-                <br />
-                <br />
-                <div style="justify-content:center">
-                    <label>Gameshark Color Code Importer:</label>
-                </div>
-                <br>
+            </div>
                 <!-- Color code pop up -->
                 <div id="colorCodePasteWindow">
+                    <label>Gameshark Color Code Importer:</label>
+                    <br>
+                    <br>
                     <div>
                         <textarea id="ccPasteArea" placeholder="Enter your Color Code here..." rows="6" style="resize: none;"></textarea>
                     </div>
                     <br>
-                    <div style="justify-content:center">
-                        <button class="blue-button" style="justify-content:center;"
-                                onclick="window.myMario.skinData = window.parseColorCode(document.getElementById('ccPasteArea').value); document.getElementById('ccPasteArea').value = ''">
+                    <div>
+                        <button class="blue-button"
+                            onclick="window.myMario.skinData = window.parseColorCode(document.getElementById('ccPasteArea').value); document.getElementById('ccPasteArea').value = ''">
                             Import Color Code
                         </button>
                     </div>
                 </div>
-            </div>
+
             <!-- Controls and customization -->
-            <div id="blueControls" style="justify-content:center; padding-top:26px;padding-right: 40px;padding-left: 40px; margin-top: 122px;">
+            <div id="blueControls">
                 <button type="button"
-                        class="green-button boxchange"
+                        class="green-button fixButtonPadding"
                         onclick="window.switchbox('controlsbox')">
                     Customize Controls
                 </button>
                 <button type="button"
-                        class="yellow-button boxchange"
+                        class="yellow-button"
                         onclick="window.switchbox()">
                     Return
                 </button>
                 <button type="button"
-                    class="pink-button boxchange"
+                    class="pink-button fixButtonPadding"
                     onclick="window.switchbox('customizebox'); window.updateWheel()">
                     Customize Character / Skin
                 </button>
             </div>
         </div>
         <!-- End of options -->
+
         <!-- Start of customize skin menu -->
+
         <div hidden id="customizeBackground">
-            <div class="container" id="skinCustomizerWindow">
-                <br>
+            <div id="skinCustomizerWindow">
                 <!-- Skin presets -->
-                <div style="justify-content:center; margin-top: 10px;">
-                    <div style="justify-content:center">
-                        <label>Select Skin Preset & Character:</label>
-                    </div>
-                    <div style="justify-content:center;">
+                <div>
+                    <label>Select Skin Preset & Character:</label>
+
+                    <div>
                         <select class="form-control" id="presetBox" onchange="window.updateSkinID(this.value); localStorage.setItem('presetBox', this.value)" style="font-family: 'TextboxFont'; height: 2rem;">
                             <optgroup label="Main Color Codes">
                                 <option value="0">Mario Colors</option>
@@ -325,10 +316,12 @@
                     </div>
                 </div>
 
-                <hr>
+                <br>
 
-                <!-- Options -->
-                <select id = "skinTypes" style="height: 2rem; font-family: 'TextboxFont'; font-size: 20px;" onchange="window.updateWheel()"> 
+            <!-- Options -->
+                <!-- Player part selector -->
+                <div>
+                <select id = "skinTypes" onchange="window.updateWheel()"> 
                     <option value = "overalls">Overalls</option>
                     <option value="hat">Hat</option> 
                     <option value = "shirt" >Shirt</option>
@@ -338,33 +331,46 @@
                     <option value = "hair">Hair</option>
                     <option value = "parachute">Glider & Kart</option>
                 </select>
+                </div>
+
+                <br>
+
+                <!-- Ambient color checkbox -->
+                <div>
+                    <input type="checkbox" id="updateAmb" checked>
+                    <label>Update ambient color accordingly to main color? </label>
+                </div>
+
                 <br />
-                <br />
-                <input type="checkbox" id="updateAmb" checked>
-                <label>Update ambient color accordingly to main color? </label>
-                <br />
-                <br />
-                <div id="picker" style="justify-content: center;" class="row"></div>
-                <div id="ambpicker" style="justify-content: center; margin-top: -160px; margin-left: 330px;" class="row"></div>
+
                 <!-- Hat toggle -->
-                <button class="green-button" onclick="window.toggleCapState()" style="justify-content: center; position: absolute; margin-top: 80px; margin-left: -50px;">Toggle Hat</button>
+                <div>
+
+                <button class="green-button" onclick="window.toggleCapState()">Toggle Hat</button>
+                </div>
+                <!-- Color pickers -->
+                <div class="colorPickersContainer">
+                    <div id="picker"></div>
+                    <div id="ambpicker"></div>
+                </div>
+
             </div>
                 <!-- Controls and customization -->
-                <div id="pinkControls" style="justify-content:center; padding-top:26px;padding-right: 40px;padding-left: 40px; margin-top: 5px;">
+                <div id="pinkControls">
                     <button type="button"
                             style="margin-top: -800px;"
-                            class="green-button boxchange"
+                            class="green-button"
                             onclick="window.switchbox('controlsbox')">
                         Customize Controls
                     </button>
                     <button type="button"
-                            class="blue-button boxchange"
+                            class="blue-button"
                             style="margin-top: -800px;"
                             onclick="window.switchbox('optionsbox')">
                         Options & Misc
                     </button>
                     <button type="button"
-                        class="yellow-button boxchange"
+                        class="yellow-button"
                         style="margin-top: -800px;"
                         onclick="window.switchbox()">
                         Return
@@ -372,18 +378,17 @@
                 </div>
             </div>
             <!-- End of skin customizer pop up -->
+
         </div>
+
         <!-- End of options box -->
         <!-- Start of controls box -->
         <div hidden id="controlsBackground">
             <h6 style="text-align:center; font-size: 30px;" id="noGamepadMessage">No Gamepad Detected Yet</h6>
-            <div style="justify-content:center; margin-top: -50px;">
-                <button class="green-button" style="margin-right:30px" onclick="window.saveControls()">Save Controls</button>
-                <button class="red-button" onclick="window.loadDefaultControls()">Load Default Controls</button>
-            </div>
             <div id="keyboardControlsWindow">
-                <div>
-                    <form>
+
+                <!-- Keyboard control list -->
+                <div style="float:left;">
                         <div>
                             <label style="padding-right:30px">Start:</label>
                             <select keyboardButton name="start" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
@@ -403,11 +408,7 @@
                             <label style="padding-right:30px">Z:</label>
                             <select keyboardButton name="z" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
                         </div>
-                    </form>
-                </div>
 
-                <div>
-                    <form>
                         <div>
                             <label style="padding-right:30px">Up:</label>
                             <select keyboardButton name="up" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
@@ -428,35 +429,29 @@
                             <label style="padding-right:30px">Right:</label>
                             <select keyboardButton name="right" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
                         </div>
-                    </form>
                 </div>
 
-                <div>
-                    <form>
+                <div style="float: right;">
                         <div>
-                            <label class="col-sm-2 col-form-label" style="padding-right:30px">C-Up:</label>
+                            <label style="padding-right:30px">C-Up:</label>
                             <select keyboardButton name="cu" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
                         </div>
 
                         <div>
                             <label style="padding-right:40px">C-Down:</label>
-                            <select class="form-control" keyboardButton name="cd" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                            <select keyboardButton name="cd" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
                         </div>
 
                         <div>
                             <label style="padding-right:20px">C-Left:</label>
-                            <select class="form-control" keyboardButton name="cl" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                            <select keyboardButton name="cl" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
                         </div>
 
                         <div>
                             <label style="padding-right:30px">C-Right:</label>
                             <select keyboardButton name="cr" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
                         </div>
-                    </form>
-                </div>
 
-                <div>
-                    <form>
                         <div>
                             <label style="padding-right:30px">Minimap:</label>
                             <select keyboardButton name="map" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
@@ -476,13 +471,16 @@
                             <label style="padding-right:30px">Chat:</label>
                             <select keyboardButton name="chat" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
                         </div>
-                    </form>
                 </div>
+
             </div>
+
+            <hr style="width: 50%; color: white; border: 0.2em solid white;">
 
             <!-- Gamepad controls pop up -->
             <div id="gamepadControlsWindow">
-                <div style="justify-content:center">
+                <!-- Gamepad message -->
+                <div>
                     <div hidden id="gamepadMessageDiv">
                         <h6 id="gamepadMessage">
                         </h6>
@@ -490,11 +488,13 @@
                             Is your gamepad not working correctly?
                             <br />
                             Contact me so I can support more gamepads. Discord: snuffysasa#2779 /
-                            <a href="https://github.com/sm64js/sm64js/issues" style="color:blue;font-weight:bold">Github</a>
+                            <a href="https://github.com/sm64js/sm64js/issues" style="color:lightblue;font-weight:bold">Github</a>
                         </h6>
                     </div>
 
                 </div>
+
+                <!-- Gamepad controls list -->
 
                 <div>
                     <form>
@@ -514,11 +514,6 @@
                             <label style="padding-right:30px">Z:</label>
                             <select gamepadButton name="z" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
                         </div>
-                    </form>
-                </div>
-
-                <div>
-                    <form>
                         <div>
                             <label style="padding-right:30px">axisX:</label>
                             <select gamepadAxes name="stickX" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
@@ -528,6 +523,11 @@
                             <label style="padding-right:30px">axisY:</label>
                             <select gamepadAxes name="stickY" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
                         </div>
+                    </form>
+                </div>
+
+                <div>
+                    <form>
 
                         <div>
                             <label style="padding-right:30px">C-axisX:</label>
@@ -562,21 +562,26 @@
 
                 </div>
             </div>
+            <!-- Save & reset controls button -->
+            <div class="controlButtons">
+                <button class="green-button" style="margin-right:30px" onclick="window.saveControls()">Save Controls</button>
+                <button class="red-button fixButtonPadding" onclick="window.loadDefaultControls()">Load Default Controls</button>
+            </div>
             <!-- Controls and customization -->
-            <div id="greenControls" style="justify-content:center; margin-top: 108px;">
+            <div id="greenControls">
                 <button type="button"
-                        class="yellow-button boxchange"
+                        class="yellow-button"
                         data-placement="bottom"
                         onclick="window.switchbox()">
                     Return
                 </button>
                 <button type="button"
-                        class="blue-button boxchange"
+                        class="blue-button"
                         onclick="window.switchbox('optionsbox')">
                     Options & Misc
                 </button>
                 <button type="button"
-                    class="pink-button boxchange"
+                    class="pink-button fixButtonPadding"
                     onclick="window.switchbox('customizebox'); window.updateWheel()">
                     Customize Character / Skin
                 </button>
@@ -585,74 +590,70 @@
 
         <br>
         <!-- Game canvas section -->
-        <div>
-            <!-- The game canvas itself -->
-            <div class="canvasContainer canvasContainerPos">
-                <canvas id="gameCanvas" width="1280" height="720"></canvas>
-                <canvas id="textCanvas"></canvas>
+        <div class="gameCanvasSection">
+            <div style="float:left">
+                <!-- Game canvas -->
+                <div class="relativePositioner">
+                    <canvas id="textCanvas"></canvas>
+                    <canvas id="gameCanvas" width="1280" height="720"></canvas>
+                </div>
             </div>
+            <div class="gameCanvasRight" style="float:right">
+                <!-- Chat container -->
+                <div class="chatContainer">
+                        <ul id="chatlog"></ul>
 
-            <!-- Disconnected from the game/server message -->
-            <h6 hidden id="connectedMsg" style="color:red; animation: blinking 1s linear infinite;">Not connected to server - Refresh the page</h6>
+                        <input id="chatbox" class="chatbox" type="text" autocomplete="off" maxlength="100" placeholder="Chat box, to block someone type '/block username'">
 
-            <!-- Chat -->
-            <div class="row" style="justify-content:center">
-                <ul style="margin-bottom: 5px !important" id="chatlog"></ul>
-            </div>
-            <div class="row" style="justify-content:center;">
-                <input id="chatbox" class="chatbox form-control" style="margin-top: 0px !important" type="text" autocomplete="off" maxlength="100" placeholder="Chat box, to block someone type '/block username'">
-                <!--input id="banbox" class="chatbox form-control" type="text" autocomplete="off" maxlength="100" placeholder="Block Player Chats - type their player name in here and hit enter"-->
+                </div>
             </div>
         </div>
+
+            <!-- Disconnected from the game/server message -->
+            <h6 hidden id="connectedMsg" style="color:red;">Not connected to server - Refresh the page</h6>
+
+        </div>
         <!-- End of game canvas -->
-        <br />
-        <br />
+
         <!-- Music section -->
         <div class="musicDiv">
-            <h4>Music</h4>
+            <h1>Music</h1>
+            <div>
+                <!-- Snow Mountain DX by eros71 -->
+                <div class="musicBox">
+                        <h5 class="musicTitles">Snow Mountain DX by eros71</h5>
 
-            <div class="row">
-                <div class="col-6">
-                    <h5>Snow Mountain DX by eros71</h5>
-                </div>
-                <div class="col-6" height="300" style="justify-content:center">
-                    <audio controls loop style="width:400px; height: 30px">
+                        <audio controls loop>
                         <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Snow%20Mountain%20DX.wav" type="audio/wav">
                         Your browser does not support the audio element.
-                    </audio>
+                        </audio>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-6">
-                    <h5>Bob-omb Peaceful-Field by eros71</h5>
-                </div>
-                <div class="col-6" style="justify-content:center">
-                    <audio controls loop style="width:400px; height: 30px">
+                <!-- Snow Mountain DX by eros71 -->
+                <div class="musicBox">
+                        <h5 class="musicTitles">Peaceful Bob-omb Fields by eros71</h5>
+
+                        <audio controls loop>
                         <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Bob-omb%20Peaceful-Field.wav" type="audio/wav">
                         Your browser does not support the audio element.
-                    </audio>
+                        </audio>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-6">
-                    <h5>Mario Filled Field by Belgium</h5>
-                </div>
-                <div class="col-6" style="justify-content:center">
-                    <audio controls loop style="width:400px; height: 30px">
-                        <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Mario%20Filled%20Field.mp3" type="audio/mp3">
+                <!-- Snow Mountain DX by eros71 -->
+                <div class="musicBox">
+                        <h5 class="musicTitles">Mario Filled Field by Belgium</h5>
+
+                        <audio controls loop>
+                        <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Mario%20Filled%20Field.mp3" type="audio/wav">
                         Your browser does not support the audio element.
-                    </audio>
+                        </audio>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-6">
-                    <h5>SM64JS File Select Remix by Subject to Change</h5>
-                </div>
-                <div class="col-6" style="justify-content:center">
-                    <audio controls loop style="width:400px; height: 30px">
+                <!-- Snow Mountain DX by eros71 -->
+                <div class="musicBox">
+                        <h5 class="musicTitles">SM64JS File Select Remix by Subject to Change</h5>
+
+                        <audio controls loop>
                         <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/SM64JS%20File%20Select%20Remix.wav" type="audio/wav">
                         Your browser does not support the audio element.
-                    </audio>
+                        </audio>
                 </div>
             </div>
         </div>

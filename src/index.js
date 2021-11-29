@@ -47,7 +47,9 @@ const produce_one_frame = () => {
     //if (n_frames > 100000) { throw "Hit max frames" }
     //console.log("new frame: " + n_frames)
     n_frames++
-	document.getElementById("respawnButton").innerHTML = `Respawn${respText}`
+
+    //Updating the respawn button every frame breaks it
+	document.getElementById("respawnButton").innerHTML = '<div class="sm64button">'+`Respawn${respText}`+'</div>'
 }
 
 //// implementation from Emil <3
@@ -161,7 +163,7 @@ window.toggleWidescreen = () => {
         viewport.vscale = [customWidth, customHeight, 0, 0]
         viewport.vtrans = [0, 0, 0, 0]
     } else {
-        gameCanvas.style = "background-image: url('/mmo/assets/canvasBorder2.png'); background-size: 100%; background-repeat: no-repeat; padding: 26px;"
+        gameCanvas.style = "background-image: url('/mmo/assets/canvasBorder.png'); background-size: 100%; background-repeat: no-repeat; padding: 26px;"
         /* const chat = $(".chatboxPos")
         chat.detach().appendTo("#chatboxParent")
         document.getElementById("chatboxP").style = null
@@ -181,35 +183,67 @@ window.toggleWidescreen = () => {
 }
 
 // hacky method; probably a better way to do this
-const signbox = document.getElementById("signboxBackground")
-const optionsbox = document.getElementById("optionsBackground")
-const customizebox = document.getElementById("customizeBackground")
-const controlsbox = document.getElementById("controlsBackground")
+const signbox = document.getElementById("signboxBorder");
+const optionsbox = document.getElementById("optionsBorder");
+const customizebox = document.getElementById("customizeBorder");
+const controlsbox = document.getElementById("controlsBorder");
+const signInside = document.getElementById("signboxBackground");
+const optionsInside = document.getElementById("optionsBackground");
+const customizeInside = document.getElementById("customizeBackground");
+const controlsInside = document.getElementById("controlsBackground");
 window.switchbox = (name) => {
     switch(name) {
         case "optionsbox":
             signbox.hidden = true
+            signInside.hidden = true
+            //
             optionsbox.hidden = false
+            optionsInside.hidden = false
+            //
             customizebox.hidden = true
+            customizeInside.hidden = true
+            //
             controlsbox.hidden = true
+            controlsInside.hidden = true
             break
         case "customizebox":
             signbox.hidden = true
+            signInside.hidden = true
+            //
             optionsbox.hidden = true
+            optionsInside.hidden = true
+            //
             customizebox.hidden = false
+            customizeInside.hidden = false
+            //
             controlsbox.hidden = true
+            controlsInside.hidden = true
             break
         case "controlsbox":
             signbox.hidden = true
+            signInside.hidden = true
+            //
             optionsbox.hidden = true
+            optionsInside.hidden = true
+            //
             customizebox.hidden = true
+            customizeInside.hidden = true
+            //
             controlsbox.hidden = false
+            controlsInside.hidden = false
             break
         default:
             signbox.hidden = false
+            signInside.hidden = false
+            //
             optionsbox.hidden = true
+            optionsInside.hidden = true
+            //
             customizebox.hidden = true
+            customizeInside.hidden = true
+            //
             controlsbox.hidden = true
+            controlsInside.hidden = true
             break
     }
 }
@@ -230,8 +264,8 @@ let gameStarted = false
 
 if (localStorage['rules'] == rulesVersion) {
     document.getElementById("rules").hidden = true
-    document.getElementById("signboxBackground").classList.remove("shunned")
-    document.getElementById("signboxBackground").disabled = false
+    document.getElementById("signboxBorder").classList.remove("shunned")
+    document.getElementById("signboxBorder").disabled = false
 }
 
 document.getElementById("startbutton").addEventListener('click', () => {
@@ -245,13 +279,22 @@ document.getElementById("startbutton").addEventListener('click', () => {
 document.getElementById("acceptRules").addEventListener('click', () => {
     localStorage.setItem("rules", rulesVersion)
     document.getElementById("rules").hidden = true
-    document.getElementById("signboxBackground").classList.remove("shunned")
-    document.getElementById("signboxBackground").disabled = false
+    document.getElementById("signboxBorder").classList.remove("shunned")
+    document.getElementById("signboxBorder").disabled = false
 })
 
 window.deleteRom = () => {
     IDB.del('assets')
     window.location.reload()
+}
+
+window.reloadPage = () => { //Reload the page after a bit so the assets can get extracted first
+
+    setTimeout(
+        function(){
+         window.location.reload()
+        }, 2000);
+    
 }
 
 const startGame = () => {
@@ -262,7 +305,7 @@ const startGame = () => {
 
     document.getElementById("startbutton").classList.remove('green-button')
     document.getElementById("startbutton").classList.add('red-button')
-    document.getElementById("startbutton").innerHTML = "Restart Game"
+    document.getElementById("startbutton").innerHTML = '<div class="sm64button">Restart Game</div>'
 
     document.getElementById("connectedMsg").hidden = false
 	
@@ -271,7 +314,7 @@ const startGame = () => {
 
 window.togglePvp = () => {
 	window.pvp = !window.pvp
-	document.getElementById("pvpButton").innerHTML = ('PvP: ' + (window.pvp ? 'On' : 'Off'))
+	document.getElementById("pvpButton").innerHTML = '<div class="sm64button">'+('PvP: ' + (window.pvp ? 'On' : 'Off'))+'</div>'
 }
 
 window.onload = async () => {

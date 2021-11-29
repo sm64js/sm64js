@@ -1,6 +1,4 @@
-﻿/*NOTE: I know the buttons' texture looks stretched, a solution is in the works.
-                            Leave it AS IS for now. 
-                                    -eros*/
+﻿/*NOTE: Please don't change anything already written here or in the HTML unless STRICTLY necessary if possible*/
 
 /* HTML, contains background */
 html {
@@ -49,23 +47,33 @@ body {
     font-family: "TextboxFont";
     letter-spacing: -0.2px;
     text-align: center;
-}
-
-button{
-
+    margin-left: 10%;
+    margin-right: 10%;
 }
 
 #select {
     font-family: 'TextboxFont';
 }
 
-#signboxBackground {
+#signboxBackground{
     background-image: url("/mmo/assets/yellow-background.png");
     background-size: 100% 100%;
-    margin-left: 10%;
-    margin-right: 10%;
-    padding-top: 3%;
-    padding-bottom: 3%;
+    border-top: solid 20px #202020c7;
+    border-right: solid 20px #202020c7;
+    border-bottom: solid 20px #e3e3e32e;
+    border-left: solid 20px #e3e3e32e;
+    margin: auto;
+    padding: 1em;
+    background-clip: padding-box;
+}
+#signboxBorder{
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding-left: 2em;
+    padding-right: 2em;
+    margin: 0;
+    background-image: url("/mmo/assets/yellow-background.png");
+    background-size: 100% 100%;
 }
 
 /*Separate divs/rows of buttons inside the signbox*/
@@ -80,10 +88,22 @@ button{
 #optionsBackground {
     background-image: url("/mmo/assets/blue-background.png");
     background-size: 100% 100%;
-    margin-left: 10%;
-    margin-right: 10%;
-    padding-top: 3%;
-    padding-bottom: 3%;
+    border-top: solid 20px #202020c7;
+    border-right: solid 20px #202020c7;
+    border-bottom: solid 20px #e3e3e32e;
+    border-left: solid 20px #e3e3e32e;
+    margin: auto;
+    padding: 1em;
+    background-clip: padding-box;
+}
+#optionsBorder{
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding-left: 2em;
+    padding-right: 2em;
+    margin: 0;
+    background-image: url("/mmo/assets/blue-background.png");
+    background-size: 100% 100%;
 }
 
 #optionsBackground > div{
@@ -93,10 +113,22 @@ button{
 #customizeBackground {
     background-image: url("/mmo/assets/pink-background.png");
     background-size: 100% 100%;
-    margin-left: 10%;
-    margin-right: 10%;
-    padding-top: 3%;
-    padding-bottom: 3%;
+    border-top: solid 20px #202020c7;
+    border-right: solid 20px #202020c7;
+    border-bottom: solid 20px #e3e3e32e;
+    border-left: solid 20px #e3e3e32e;
+    margin: auto;
+    padding: 1em;
+    background-clip: padding-box;
+}
+#customizeBorder{
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding-left: 2em;
+    padding-right: 2em;
+    margin: 0;
+    background-image: url("/mmo/assets/pink-background.png");
+    background-size: 100% 100%;
 }
 
 #customizeBackground > div{
@@ -106,10 +138,22 @@ button{
 #controlsBackground {
     background-image: url("/mmo/assets/green-background.png");
     background-size: 100% 100%;
-    margin-left: 10%;
-    margin-right: 10%;
-    padding-top: 3%;
-    padding-bottom: 3%;
+    border-top: solid 20px #202020c7;
+    border-right: solid 20px #202020c7;
+    border-bottom: solid 20px #e3e3e32e;
+    border-left: solid 20px #e3e3e32e;
+    margin: auto;
+    padding: 1em;
+    background-clip: padding-box;
+}
+#controlsBorder{
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding-left: 2em;
+    padding-right: 2em;
+    margin: 0;
+    background-image: url("/mmo/assets/green-background.png");
+    background-size: 100% 100%;
 }
 
 #keyboardControlsWindow {
@@ -172,7 +216,7 @@ input {
     text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
 }
 input[type=text] {
-    width: auto;
+    width: 100%;
     height: 2rem;
     font-family: 'TextboxFont';
     font-size: 124%;
@@ -202,6 +246,18 @@ select {
 }
 
 /* Buttons */
+/*Big thanks to PeraDeFruta64 for helping out with the new button borders*/
+.sm64button {
+    border-top: 5px solid #f0f0f057;
+    border-right: 5px solid #f0f0f057;
+    border-bottom: 5px solid #313131b8;
+    border-left: 5px solid #313131b8; 
+    padding-left:0.5em;
+    padding-right:0.5em;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+    background-clip: padding-box;
+}
 
 .stone-button {
     background-image: url("/mmo/assets/btn-stone-edit.png");
@@ -219,10 +275,13 @@ select {
     padding-top:0.3em;
     padding-bottom:0.3em
 }
-.green-button {
-    background-image: url("/mmo/assets/btn-green-edit.png");
+
+.ROMinput{
+    border-style: none;
+    background: none;
+    margin: 0;
+    background-image: url("/mmo/assets/input-green.png");
     background-size: 100% 100%;
-    border: none;
     font-family: "TextboxFont";
     font-size: 140%;
     color: white;
@@ -230,41 +289,122 @@ select {
     text-decoration: none;
     text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
     cursor: pointer;
-    padding-left:0.5em;
-    padding-right:0.5em;
-    padding-top:0.3em;
-    padding-bottom:0.3em;
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
 }
-.red-button {
-    background-image: url("/mmo/assets/btn-red-edit.png");
+
+.green-button{
+    border-style: none;
+    background: none;
+    margin: 0;
+    background-image: url("/mmo/assets/btn-green-edit.png");
     background-size: 100% 100%;
-    border: none;
     font-family: "TextboxFont";
     font-size: 140%;
     color: white;
-    background-color: red;
-    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
-    cursor: pointer;
-    padding-left:0.5em;
-    padding-right:0.5em;
-    padding-top:0.3em;
-    padding-bottom:0.3em
-}
-.blue-button {
-    background-image: url("/mmo/assets/btn-blue-edit.png");
-    background-size: 100% 100%;
-    border: none;
-    font-family: "TextboxFont";
-    font-size: 140%;
-    color: white;
-    background-color: blue;
+    background-color: green;
     text-decoration: none;
     text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
     cursor: pointer;
-    padding-left:0.5em;
-    padding-right:0.5em;
-    padding-top:0.3em;
-    padding-bottom:0.3em
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+}
+
+.red-button {
+    border-style: none;
+    background: none;
+    margin: 0;
+    background-image: url("/mmo/assets/btn-red-edit.png");
+    background-size: 100% 100%;
+    font-family: "TextboxFont";
+    font-size: 140%;
+    color: white;
+    background-color: green;
+    text-decoration: none;
+    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
+    cursor: pointer;
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+}
+.blue-button {
+    border-style: none;
+    background: none;
+    margin: 0;
+    background-image: url("/mmo/assets/btn-blue-edit.png");
+    background-size: 100% 100%;
+    font-family: "TextboxFont";
+    font-size: 140%;
+    color: white;
+    background-color: green;
+    text-decoration: none;
+    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
+    cursor: pointer;
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+}
+
+.pink-button {
+    border-style: none;
+    background: none;
+    margin: 0;
+    background-image: url("/mmo/assets/btn-pink-edit.png");
+    background-size: 100% 100%;
+    font-family: "TextboxFont";
+    font-size: 140%;
+    color: white;
+    background-color: green;
+    text-decoration: none;
+    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
+    cursor: pointer;
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+}
+.yellow-button {
+    border-style: none;
+    background: none;
+    margin: 0;
+    background-image: url("/mmo/assets/btn-yellow-edit.png");
+    background-size: 100% 100%;
+    font-family: "TextboxFont";
+    font-size: 140%;
+    color: white;
+    background-color: green;
+    text-decoration: none;
+    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
+    cursor: pointer;
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+}
+
+.rulesButton{
+    border-style: none;
+    background: none;
+    margin: 0;
+    background-image: url("/mmo/assets/btn-green-edit.png");
+    background-size: 100% 100%;
+    font-family: "TextboxFont";
+    font-size: 140%;
+    color: white;
+    background-color: green;
+    text-decoration: none;
+    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
+    cursor: pointer;
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
 }
 
 /*Fix for the <a> button */
@@ -273,46 +413,11 @@ a.pink-button {
     padding-bottom: 0.42em;
 }
 /* Fix some buttons so they look nicer / change their padding */
-.fixButtonPadding {
-    padding-left: 1em !important;
-    padding-right: 1em !important;
-}
+
 a.pink-button:focus {
     padding-top: 0.4em;
     padding-bottom: 0.42em;
     border-bottom: 0;
-}
-.pink-button {
-    background-image: url("/mmo/assets/btn-pink-edit.png");
-    background-size: 100% 100%;
-    border: none;
-    font-family: "TextboxFont";
-    font-size: 140%;
-    color: white;
-    background-color: purple;
-    text-decoration: none;
-    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
-    cursor: pointer;
-    padding-left:0.5em;
-    padding-right:0.5em;
-    padding-top:0.3em;
-    padding-bottom:0.3em
-}
-.yellow-button {
-    background-image: url("/mmo/assets/btn-yellow-edit.png");
-    background-size: 100% 100%;
-    border: none;
-    font-family: "TextboxFont";
-    font-size: 140%;
-    color: white;
-    background-color: yellow;
-    text-decoration: none;
-    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
-    cursor: pointer;
-    padding-left:0.5em;
-    padding-right:0.5em;
-    padding-top:0.3em;
-    padding-bottom:0.3em
 }
 
 /* Main elements */
@@ -333,8 +438,6 @@ h6.description {
     font-size: 170%;
     background-color: rgba(0,0,0,.3411764705882353);
     padding: 1%;
-    margin-left: 20%;
-    margin-right: 20%;
     margin-top: 2%;
     margin-bottom: 2%;
 }
@@ -359,8 +462,6 @@ h1, h2, h3, h4, h5, h6{
     font-weight: normal;
     background-color: rgba(0,0,0,.3411764705882353);
     padding: 1%;
-    margin-left: 20%;
-    margin-right: 20%;
     margin-top: 1%;
     margin-bottom: 1%;
 }
@@ -383,40 +484,60 @@ h1, h2, h3, h4, h5, h6{
 }
 
 /* Music */
-.musicTitles {
+.musicDiv h5{
+    margin-top: 0;
+    margin-bottom: 0;
     font-size: 1.4em;
-    display: inline;
-    margin-right: 1em;
 }
 
-.musicBox{
-    margin-left: 20%;
-    margin-right: 20%;
-    margin-top: 1em;
+.musicDiv h4{
+    margin-top: 0.8em;
+    margin-bottom: 0.8em;
+    font-size: 2em;
+}
+
+/* From bootstrap, yes, I know */
+.row{
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
+
+.col-6{
+    flex: 0 0 50%;
+    max-width: 50%;
 }
 
 audio{
     width: 28em;
     height: 2em;
-    vertical-align: bottom;
 }
 
 /* Canvases for rendering the game output */
-.relativePositioner{
+.relativePositioner{ /* Contains both the gameCanvas and the textCanvas */
     position: relative;
 }
 
 #textCanvas{
     position: absolute;
+    z-index: 750;
 }
 
-.gameCanvasSection{
+.gameContainer{
     display: flex;
+    z-index: 700;
+}
+
+.chatContainer{
+    margin-left: 1em;
+    width: 100%;
+    z-index: 800;
 }
 
 #gameCanvas{
-    background-image: url('/mmo/assets/canvasBorder2.png');
-    background-size: 100%;
+    background-image: url('/mmo/assets/canvasBorder.png');
+    background-size: 100% 100%;
     padding: 26px;
 }
 
@@ -426,58 +547,46 @@ audio{
     padding: 26px;
 }
 
-.chatContainer{
-    width: 340%;
-}
-
 .chatbox {
-    margin-top: 10px;
-    border: 0px solid transparent;
+    margin-top: 0.6em;
+    border: none;
     background-color: #00000070;
-    width: 100% !important;
     text-align: left;
     color: white;
-    padding-left: 10px;
     font-style: normal;
-    border-radius: 1px;
+    padding: 0.4em;
+    box-sizing: border-box;
 }
 
-ul {
+ul#chatlog {
     list-style-type: none;
 }
 
 #chatlog {
     background-color: #eae2a7;
-    height: 13em;
-    /*overflow: scroll;*/
+    height: 82%;
     text-align: left;
     color: black;
     font-style: normal;
-    font-size: 2em;
+    font-size: 1.4em;
     margin: 0;
     padding: 1em;
     margin-bottom: 0.2em;
-    width: 91%;
     z-index: 200;
-}
-
-.gameCanvasRight{
-    margin-left: 1.5em;
 }
 
 #rules {
     background-color: white;
     border-radius: 10px;
-    margin-left: 15%;
     position: fixed;
-    top: 0;
-    margin-top: 2%;
-    margin-bottom: 2%;
+    top: 10%;
+    bottom: 10%;
+    left: 10%;
+    right: 10%;
     z-index: 2;
-    width: 66%;
-    padding: 2%;
-    height: 84%;
     color: black;
+    padding: 1%;
+    overflow: hidden;
 }
 #rules > p {
     text-align: left;
@@ -485,25 +594,8 @@ ul {
 }
 
 .rulesLogo{
-    width: 40%;
+    width: 26%;
     height: auto;
-}
-
-.rulesButton{
-    background-image: url("/mmo/assets/btn-green-edit.png");
-    background-size: 100% 100%;
-    border: none;
-    font-family: "TextboxFont";
-    font-size: 140%;
-    color: white;
-    background-color: green;
-    text-decoration: none;
-    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
-    cursor: pointer;
-    padding-left: 1.5em;
-    padding-right: 1.5em;
-    padding-top: 0.3em;
-    padding-bottom: 0.3em;
 }
 
 .shunned {
@@ -550,6 +642,7 @@ label {
 .colorPickersContainer{
     margin-left: 30%;
     margin-right: 30%;
+    margin-bottom: 2em;
     display: flex;
 }
 

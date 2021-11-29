@@ -520,8 +520,8 @@ audio{
 /* Canvases for rendering the game output */
 .relativePositioner{ /* Contains both the gameCanvas and the textCanvas */
     position: relative;
-    width: 50%;
-    float: right;
+    width: auto;
+    margin-left: auto;
 }
 
 #textCanvas{
@@ -535,11 +535,11 @@ audio{
 }
 
 .chatContainer{
-    margin-left: 4%;
-    width: 50%;
+    margin-left: 2%;
+    width: 100%;
     z-index: 800;
     float: right;
-    margin-right: 1%;
+    margin-right: 2%;
 }
 
 #gameCanvas{

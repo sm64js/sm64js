@@ -353,6 +353,25 @@ select {
     padding-left: 0px;
 }
 
+.respawnButton{
+    border-style: none;
+    background: none;
+    margin: 0;
+    background-image: url("/mmo/assets/respawn-blue.png");
+    background-size: 100% 100%;
+    font-family: "TextboxFont";
+    font-size: 140%;
+    color: white;
+    background-color: green;
+    text-decoration: none;
+    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
+    cursor: pointer;
+    padding-top: 0.3em;
+    padding-right: 0.4em;
+    padding-bottom: 0.3em;
+    padding-left:  0.4em;
+}
+
 .green-button{
     border-style: none;
     background: none;

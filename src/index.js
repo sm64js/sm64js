@@ -145,6 +145,8 @@ const customHeight = 720
 const relativePositioner = document.getElementById("relativePositioner");
 const gameContainer = document.getElementById("gameContainer");
 const moveLeft = document.getElementById("moveLeft");
+const chatlog = document.getElementById("chatlog");
+const musicDiv = document.getElementById("musicDiv");
 
 window.toggleWidescreen = () => {
 
@@ -153,6 +155,8 @@ window.toggleWidescreen = () => {
         relativePositioner.style.marginLeft = "0%";
         gameContainer.style.display = "block";
         moveLeft.style.justifyContent = "center";
+        chatlog.style.height = "6em";
+        musicDiv.style.marginTop = "12em";
         /* const chat = $(".chatboxPos")
         chat.detach().appendTo(".canvasContainer")
         document.getElementById("chatboxP").style = "margin-top: -267px; margin-left: 29px; z-index: 10;"
@@ -172,9 +176,11 @@ window.toggleWidescreen = () => {
         viewport.vtrans = [0, 0, 0, 0]
     } else { //if widescreen, do this instead
         relativePositioner.style.width = "50%";
-        relativePositioner.style.marginLeft = "4%";
+        relativePositioner.style.marginLeft = "15%";
         gameContainer.style.display = "flex";
         moveLeft.style.justifyContent = "flex-end";
+        chatlog.style.height = "82%";
+        musicDiv.style.marginTop = "auto";
         gameCanvas.style = "background-image: url('/mmo/assets/canvasBorder.png'); background-size: 100%; background-repeat: no-repeat; padding: 26px;"
         /* const chat = $(".chatboxPos")
         chat.detach().appendTo("#chatboxParent")

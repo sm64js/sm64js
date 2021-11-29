@@ -70,6 +70,7 @@
         <!-- Start of signboxBackground -->
         <div id="signboxBorder" class="shunned">
             <div id="signboxBackground">
+                <div id="signboxMargin">
                 <!-- Main buttons & settings -->
                 <!-- Divs are used as rows here -->
                 <div>  <!-- This is row 1 for example -->
@@ -233,6 +234,7 @@
                                         </div>
                                     </button>
                                 </div>
+                </div>
             </div>
         </div>
         <!-- End of signboxBackground -->
@@ -421,191 +423,190 @@
         <!-- End of customizer box -->
 
         <!-- Start of controls box -->
-        <div hidden id="controlsBorder">
-            <div hidden id="controlsBackground">
-                <h6 style="text-align:center; font-size: 30px;" id="noGamepadMessage">No Gamepad Detected Yet</h6>
-                <div id="keyboardControlsWindow">
+<div hidden id="controlsBorder">
+    <div hidden id="controlsBackground">
+        <div id="controlsMargin">
+        <h6 style="text-align:center; font-size: 30px;" id="noGamepadMessage">No Gamepad Detected Yet</h6>
+            <div id="controlsFlex">
+                    <div id="keyboardControlsWindow">
 
-                    <!-- Keyboard control list -->
-                    <div style="float:left;">
-                            <div>
-                                <label style="padding-right:30px">Start:</label>
-                                <select keyboardButton name="start" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
+                        <!-- Keyboard control list -->
+                        <div style="flex:  1;">
+                                <div>
+                                    <label style="padding-right:30px">Start:</label>
+                                    <select keyboardButton name="start" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
 
-                            <div>
-                                <label style="padding-right:30px">A:</label>
-                                <select keyboardButton name="a" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
+                                <div>
+                                    <label style="padding-right:30px">A:</label>
+                                    <select keyboardButton name="a" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
 
-                            <div>
-                                <label style="padding-right:30px">B:</label>
-                                <select keyboardButton name="b" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
+                                <div>
+                                    <label style="padding-right:30px">B:</label>
+                                    <select keyboardButton name="b" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
 
-                            <div>
-                                <label style="padding-right:30px">Z:</label>
-                                <select keyboardButton name="z" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
+                                <div>
+                                    <label style="padding-right:30px">Z:</label>
+                                    <select keyboardButton name="z" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
+                        </div>
 
-                            <div>
-                                <label style="padding-right:30px">Up:</label>
-                                <select keyboardButton name="up" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
+                        <div style="flex: 2;">
+                                <div>
+                                    <label style="padding-right:30px">Up:</label>
+                                    <select keyboardButton name="up" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
 
-                            <div>
-                                <label style="padding-right:40px">Down:</label>
-                                <select keyboardButton name="down" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
+                                <div>
+                                    <label style="padding-right:40px">Down:</label>
+                                    <select keyboardButton name="down" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
 
-                            <div>
-                                
-                                <label style="padding-right:20px">Left:</label>
-                                <select keyboardButton name="left" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
+                                <div>
+                                    
+                                    <label style="padding-right:20px">Left:</label>
+                                    <select keyboardButton name="left" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
 
-                            <div>
-                                <label style="padding-right:30px">Right:</label>
-                                <select keyboardButton name="right" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
-                    </div>
+                                <div>
+                                    <label style="padding-right:30px">Right:</label>
+                                    <select keyboardButton name="right" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
+                        </div>
 
-                    <div style="float: right;">
-                            <div>
-                                <label style="padding-right:30px">C-Up:</label>
-                                <select keyboardButton name="cu" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
+                        <div style="flex: 3;">
+                                <div>
+                                    <label style="padding-right:30px">C-Up:</label>
+                                    <select keyboardButton name="cu" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
 
-                            <div>
-                                <label style="padding-right:40px">C-Down:</label>
-                                <select keyboardButton name="cd" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
+                                <div>
+                                    <label style="padding-right:40px">C-Down:</label>
+                                    <select keyboardButton name="cd" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
 
-                            <div>
-                                <label style="padding-right:20px">C-Left:</label>
-                                <select keyboardButton name="cl" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
+                                <div>
+                                    <label style="padding-right:20px">C-Left:</label>
+                                    <select keyboardButton name="cl" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
 
-                            <div>
-                                <label style="padding-right:30px">C-Right:</label>
-                                <select keyboardButton name="cr" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
+                                <div>
+                                    <label style="padding-right:30px">C-Right:</label>
+                                    <select keyboardButton name="cr" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
+                        </div>
 
-                            <div>
-                                <label style="padding-right:30px">Minimap:</label>
-                                <select keyboardButton name="map" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
+                        <div style="flex: 4;">
+                                <div>
+                                    <label style="padding-right:30px">Minimap:</label>
+                                    <select keyboardButton name="map" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
 
-                            <div>
-                                <label style="padding-right:30px">Taunt Wheel:</label>
-                                <select keyboardButton name="taunt" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
+                                <div>
+                                    <label style="padding-right:30px">Taunts:</label>
+                                    <select keyboardButton name="taunt" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
 
-                            <div>
-                                <label style="padding-right:30px">Glider:</label>
-                                <select keyboardButton name="parachute" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
+                                <div>
+                                    <label style="padding-right:30px">Glider:</label>
+                                    <select keyboardButton name="parachute" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
 
-                            <div>
-                                <label style="padding-right:30px">Chat:</label>
-                                <select keyboardButton name="chat" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                            </div>
-                    </div>
-
-                </div>
-
-                <hr style="width: 50%; color: white; border: 0.2em solid white;">
-
-                <!-- Gamepad controls pop up -->
-                <div id="gamepadControlsWindow">
-                    <!-- Gamepad message -->
-                    <div>
-                        <div hidden id="gamepadMessageDiv">
-                            <h6 id="gamepadMessage">
-                            </h6>
-                            <h6 style="text-align:center" id="gamepadMessage">
-                                Is your gamepad not working correctly?
-                                <br />
-                                Contact me so I can support more gamepads. Discord: snuffysasa#2779 /
-                                <a href="https://github.com/sm64js/sm64js/issues" style="color:lightblue;font-weight:bold">Github</a>
-                            </h6>
+                                <div>
+                                    <label style="padding-right:30px">Chat:</label>
+                                    <select keyboardButton name="chat" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
                         </div>
 
                     </div>
 
-                    <!-- Gamepad controls list -->
-
-                    <div>
-                        <form>
-                            <div>
-                                <label style="padding-right:30px">Start:</label>
-                                <select gamepadButton name="start" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                            </div>
-                            <div>
-                                <label style="padding-right:30px">A:</label>
-                                <select gamepadButton name="a" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                            </div>
-                            <div>
-                                <label style="padding-right:30px">B:</label>
-                                <select gamepadButton name="b" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                            </div>
-                            <div>
-                                <label style="padding-right:30px">Z:</label>
-                                <select gamepadButton name="z" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                            </div>
-                            <div>
-                                <label style="padding-right:30px">axisX:</label>
-                                <select gamepadAxes name="stickX" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                        <!-- Save & reset controls button -->
+                    <div class="controlButtons">
+                        <button class="green-button" style="margin-right:30px" onclick="window.saveControls()"><div class="sm64button">Save Controls</div></button>
+                        <button class="red-button" onclick="window.loadDefaultControls()"><div class="sm64button">Load Default Controls</div></button>
+                    </div>
+                <!-- Gamepad controls pop up -->
+                
+                <div id="gamepadControlsWindow">
+                        <!-- Gamepad message -->
+                        <div>
+                            <div hidden id="gamepadMessageDiv">
+                                <h6 id="gamepadMessage">
+                                </h6>
+                                <h6 style="text-align:center" id="gamepadMessage">
+                                    Is your gamepad not working correctly?
+                                    <br />
+                                    Contact me so I can support more gamepads. Discord: snuffysasa#2779 /
+                                    <a href="https://github.com/sm64js/sm64js/issues" style="color:lightblue;font-weight:bold">Github</a>
+                                </h6>
                             </div>
 
-                            <div>
-                                <label style="padding-right:30px">axisY:</label>
-                                <select gamepadAxes name="stickY" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                        </div>
+
+                        <!-- Gamepad controls list -->
+
+                     <div id="gamepadFlex">
+                        
+                            <div style="flex: 1;">
+                                <div style="display: flex; width: 5em;">
+                                    <label style="margin-right: 0.2em">Start:</label>
+                                    <select gamepadButton name="start" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                </div>
+                                <div style="width: 5em;">
+                                    <label>A:</label>
+                                    <select gamepadButton name="a" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                </div>
+                                <div style="width: 5em;">
+                                    <label>B:</label>
+                                    <select gamepadButton name="b" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                </div>
+                                <div style="width: 5em;">
+                                    <label>Z:</label>
+                                    <select gamepadButton name="z" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                </div>
+                                <div style="width: 5em;">
+                                    <label>axisX:</label>
+                                    <select gamepadAxes name="stickX" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                </div>
+                                <div style="width: 5em;">
+                                    <label>axisY:</label>
+                                    <select gamepadAxes name="stickY" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                </div>
                             </div>
-                        </form>
+
+                            <div style="flex: 2;">
+                                <div style="width: 5em;">
+                                    <label>C-axisX:</label>
+                                    <select gamepadAxes name="cStickX" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                </div>
+                                <div style="width: 5em;">
+                                    <label>C-axisY:</label>
+                                    <select gamepadAxes name="cStickY" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                </div>
+                                <div style="width: 5em;">
+                                    <label>deadZone:</label>
+                                    <input type="number" style="max-width: 3em;" value="0.3" min="0" max="1" step="0.01" class="form-control" onchange="window.updateDeadZone(this.value)">
+                                </div>
+                                <div style="width: 5em;">
+                                    <label>Minimap:</label>
+                                    <select gamepadButton name="map" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                </div>
+                                <div style="width: 5em;">
+                                    <label>Taunts:</label>
+                                    <select gamepadButton name="taunt" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                </div>
+                                <div style="width: 5em;">
+                                    <label>Glider:</label>
+                                    <select gamepadButton name="parachute" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                </div>
+                            </div>
                     </div>
 
-                    <div>
-                        <form>
 
-                            <div>
-                                <label style="padding-right:30px">C-axisX:</label>
-                                <select gamepadAxes name="cStickX" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                            </div>
-
-                            <div>
-                                <label style="padding-right:30px">C-axisY:</label>
-                                <select gamepadAxes name="cStickY" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                            </div>
-
-                            <div>
-                                <label style="padding-right:50px">deadZone:</label>
-                                <input type="number" style="width:70px;" value="0.3" min="0" max="1" step="0.01" class="form-control" onchange="window.updateDeadZone(this.value)">
-                            </div>
-
-                            <div>
-                                <label style="padding-right:30px">Minimap:</label>
-                                <select gamepadButton name="map" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                            </div>
-
-                            <div>
-                                <label style="padding-right:30px">Taunt Wheel:</label>
-                                <select gamepadButton name="taunt" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                            </div>
-
-                            <div>
-                                <label style="padding-right:30px">Glider:</label>
-                                <select gamepadButton name="parachute" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                            </div>
-                        </form>
-
-                    </div>
                 </div>
-                <!-- Save & reset controls button -->
-                <div class="controlButtons">
-                    <button class="green-button" style="margin-right:30px" onclick="window.saveControls()"><div class="sm64button">Save Controls</div></button>
-                    <button class="red-button" onclick="window.loadDefaultControls()"><div class="sm64button">Load Default Controls</div></button>
-                </div>
+            </div>
                 <!-- Controls and customization -->
                 <div id="greenControls">
                     <button type="button"
@@ -633,9 +634,8 @@
                 </div>
             </div>
         </div>
-
-        <br>
 </div>
+<br>
         <!-- Game canvas container -->
         <div id="gameContainer">           
                 <div id="relativePositioner">
@@ -646,7 +646,7 @@
                 </div>
 
             <!-- Chat container -->
-                <div class="chatContainer">
+                <div id="chatContainer">
                         <ul id="chatlog"></ul>
                         <input id="chatbox" class="chatbox" type="text" autocomplete="off" maxlength="100" placeholder="Chat box, to block someone type '/block username'">
                 </div>
@@ -656,7 +656,7 @@
             <!-- Disconnected from the game/server message -->
             <h6 hidden id="connectedMsg" style="color:red;">Not connected to server - Refresh the page</h6>
         <!-- Music section -->
-        <div class="musicDiv">
+        <div id="musicDiv">
            <h4>Music</h4>
            <div class="row">
               <div class="col-6">

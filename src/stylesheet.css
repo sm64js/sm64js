@@ -68,6 +68,7 @@ body {
     margin: auto;
     padding: 1em;
     background-clip: padding-box;
+    height: 31.2em;
 }
 #signboxBorder{
     padding-top: 1em;
@@ -77,11 +78,24 @@ body {
     margin: 0;
     background-image: url("/mmo/assets/yellow-background.png");
     background-size: 100% 100%;
+    height: 35.5em;
+    width: auto;
 }
 
 /*Separate divs/rows of buttons inside the signbox*/
 #signboxBackground > div{
     margin-bottom: 1em;
+}
+
+#signboxMargin{
+    margin-top: 4em;
+}
+#signboxMargin > div{
+    margin-top: 2em;
+}
+
+#controlsMargin{
+    margin-top: 4em;
 }
 
 .mapSelectDiv{
@@ -98,6 +112,7 @@ body {
     margin: auto;
     padding: 1em;
     background-clip: padding-box;
+    height: 31.2em;
 }
 #optionsBorder{
     padding-top: 1em;
@@ -107,6 +122,8 @@ body {
     margin: 0;
     background-image: url("/mmo/assets/blue-background.png");
     background-size: 100% 100%;
+    height: 35.5em;
+    width: auto;
 }
 
 #optionsBackground > div{
@@ -123,6 +140,7 @@ body {
     margin: auto;
     padding: 1em;
     background-clip: padding-box;
+    height: 31.2em;
 }
 #customizeBorder{
     padding-top: 1em;
@@ -132,6 +150,8 @@ body {
     margin: 0;
     background-image: url("/mmo/assets/pink-background.png");
     background-size: 100% 100%;
+    height: 35.5em;
+    width: auto;
 }
 
 #customizeBackground > div{
@@ -148,6 +168,7 @@ body {
     margin: auto;
     padding: 1em;
     background-clip: padding-box;
+    height: 31.2em;
 }
 #controlsBorder{
     padding-top: 1em;
@@ -157,6 +178,12 @@ body {
     margin: 0;
     background-image: url("/mmo/assets/green-background.png");
     background-size: 100% 100%;
+    height: 35.5em;
+    width: auto;
+}
+
+#controlsFlex{
+    display: flex;
 }
 
 #keyboardControlsWindow {
@@ -168,18 +195,45 @@ body {
 
 #gamepadControlsWindow {
     display: flex;
-    width: 35%;
     margin: auto;
     margin-top: 0.2em;
     margin-bottom: 1em;
+}
+
+#noGamepadMessage{
+    margin: 0;
 }
 
 #gamepadMessage{
     font-size: 1.2em;
 }
 
+#gamepadFlex{
+    display: flex;
+}
+
+#gamepadFlex > div{
+    margin-right: 1em;
+}
+
+#gamepadFlex > div > div{
+    display: flex;
+}
+
+#gamepadFlex > div > div > label{
+    flex: 1;
+}
+
+#gamepadFlex > div > div > select{
+    flex: 1;
+}
+
 .controlButtons{
-    margin-bottom: 1em;
+    display: grid;
+}
+
+.controlButtons > button{
+    margin-top: 1em;
 }
 
 .siteCenter{
@@ -276,7 +330,8 @@ select {
     padding-left:0.5em;
     padding-right:0.5em;
     padding-top:0.3em;
-    padding-bottom:0.3em
+    padding-bottom:0.3em;
+    height: fit-content;
 }
 
 .ROMinput{
@@ -315,6 +370,7 @@ select {
     padding-right: 0px;
     padding-bottom: 0px;
     padding-left: 0px;
+    height: fit-content;
 }
 
 .red-button {
@@ -334,6 +390,7 @@ select {
     padding-right: 0px;
     padding-bottom: 0px;
     padding-left: 0px;
+    height: fit-content;
 }
 .blue-button {
     border-style: none;
@@ -352,6 +409,7 @@ select {
     padding-right: 0px;
     padding-bottom: 0px;
     padding-left: 0px;
+    height: fit-content;
 }
 
 .pink-button {
@@ -371,6 +429,7 @@ select {
     padding-right: 0px;
     padding-bottom: 0px;
     padding-left: 0px;
+    height: fit-content;
 }
 .yellow-button {
     border-style: none;
@@ -389,6 +448,7 @@ select {
     padding-right: 0px;
     padding-bottom: 0px;
     padding-left: 0px;
+    height: fit-content;
 }
 
 .rulesButton{
@@ -487,13 +547,13 @@ h1, h2, h3, h4, h5, h6{
 }
 
 /* Music */
-.musicDiv h5{
+#musicDiv h5{
     margin-top: 0;
     margin-bottom: 0;
     font-size: 1.4em;
 }
 
-.musicDiv h4{
+#musicDiv h4{
     margin-top: 0.8em;
     margin-bottom: 0.8em;
     font-size: 2em;
@@ -521,7 +581,7 @@ audio{
 #relativePositioner{ /* Contains both the gameCanvas and the textCanvas */
     position: relative;
     width: 50%;
-    margin-left: 4%;
+    margin-left: 15%;
 }
 
 #moveLeft{
@@ -539,12 +599,11 @@ audio{
     z-index: 700;
 }
 
-.chatContainer{
+#chatContainer{
     margin-left: 2%;
     width: 50%;
     z-index: 800;
     float: right;
-    margin-right: 2%;
 }
 
 #gameCanvas{

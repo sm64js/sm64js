@@ -47,6 +47,9 @@ body {
     font-family: "TextboxFont";
     letter-spacing: -0.2px;
     text-align: center;
+}
+
+.siteMargins{
     margin-left: 10%;
     margin-right: 10%;
 }
@@ -518,6 +521,7 @@ audio{
 .relativePositioner{ /* Contains both the gameCanvas and the textCanvas */
     position: relative;
     width: 50%;
+    float: right;
 }
 
 #textCanvas{
@@ -531,10 +535,11 @@ audio{
 }
 
 .chatContainer{
-    margin-left: 1em;
+    margin-left: 4%;
     width: 50%;
     z-index: 800;
     float: right;
+    margin-right: 1%;
 }
 
 #gameCanvas{

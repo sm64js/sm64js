@@ -518,10 +518,15 @@ audio{
 }
 
 /* Canvases for rendering the game output */
-.relativePositioner{ /* Contains both the gameCanvas and the textCanvas */
+#relativePositioner{ /* Contains both the gameCanvas and the textCanvas */
     position: relative;
-    width: auto;
-    margin-left: auto;
+    width: 50%;
+    margin-left: 4%;
+}
+
+#moveLeft{
+    justify-content: flex-end;
+    display: flex;
 }
 
 #textCanvas{
@@ -529,14 +534,14 @@ audio{
     z-index: 750;
 }
 
-.gameContainer{
+#gameContainer{
     display: flex;
     z-index: 700;
 }
 
 .chatContainer{
     margin-left: 2%;
-    width: 100%;
+    width: 50%;
     z-index: 800;
     float: right;
     margin-right: 2%;

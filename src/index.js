@@ -142,9 +142,17 @@ fullCanvas.width  = 640
 fullCanvas.height = 480
 const customWidth = 1280
 const customHeight = 720
+const relativePositioner = document.getElementById("relativePositioner");
+const gameContainer = document.getElementById("gameContainer");
+const moveLeft = document.getElementById("moveLeft");
 
 window.toggleWidescreen = () => {
-    if (gameCanvas.width == 640 && gameCanvas.height == 480) {
+
+    if (gameCanvas.width == 640 && gameCanvas.height == 480) { //if not wide-screen, do this
+        relativePositioner.style.width = "100%";
+        relativePositioner.style.marginLeft = "0%";
+        gameContainer.style.display = "block";
+        moveLeft.style.justifyContent = "center";
         /* const chat = $(".chatboxPos")
         chat.detach().appendTo(".canvasContainer")
         document.getElementById("chatboxP").style = "margin-top: -267px; margin-left: 29px; z-index: 10;"
@@ -162,7 +170,11 @@ window.toggleWidescreen = () => {
 
         viewport.vscale = [customWidth, customHeight, 0, 0]
         viewport.vtrans = [0, 0, 0, 0]
-    } else {
+    } else { //if widescreen, do this instead
+        relativePositioner.style.width = "50%";
+        relativePositioner.style.marginLeft = "4%";
+        gameContainer.style.display = "flex";
+        moveLeft.style.justifyContent = "flex-end";
         gameCanvas.style = "background-image: url('/mmo/assets/canvasBorder.png'); background-size: 100%; background-repeat: no-repeat; padding: 26px;"
         /* const chat = $(".chatboxPos")
         chat.detach().appendTo("#chatboxParent")

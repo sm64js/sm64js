@@ -49,7 +49,7 @@ const produce_one_frame = () => {
     n_frames++
 
     //Updating the respawn button every frame breaks it
-	document.getElementById("respawnButton").innerHTML = '<div class="sm64button">'+`Respawn${respText}`+'</div>'
+	//document.getElementById("respawnButton").innerHTML = '<div class="sm64button">'+`Respawn${respText}`+'</div>'
 }
 
 //// implementation from Emil <3

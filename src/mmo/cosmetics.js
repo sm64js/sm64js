@@ -548,7 +548,15 @@ export const getExtraRenderData = (socket_id) => {
 
 window.myMario.freezeCamera = false
 window.HUDHidden = false
+const hudButton = document.getElementById('hudButton')
+const freezeButton = document.getElementById('freezeButton')
+    
 window.hideHUD = (btn) => {
     window.HUDHidden = !window.HUDHidden
-    btn.textContent = window.HUDHidden ? "Unhide HUD" : "Hide HUD"
+    hudButton.innerHTML = ('<div class="sm64button">' + (window.HUDHidden ? "Unhide HUD" : "Hide HUD") +'</div>')
+}
+
+window.freezeCamera = (btn) => {
+    window.myMario.freezeCamera = !window.myMario.freezeCamera; 
+    freezeButton.innerHTML = window.myMario.freezeCamera ? ('<div class="sm64button">' + 'Freeze Camera (ON)' + '</div>') : ('<div class="sm64button">' + 'Freeze Camera (OFF)' + '</div>')
 }

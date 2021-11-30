@@ -29,7 +29,7 @@ export const level_bob_entry = [
     { command: LevelCommands.jump_link, args: [script_func_global_15] }, 
     { command: LevelCommands.load_model_from_geo, args: [MODEL_BOB_BUBBLY_TREE, bubbly_tree_geo] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_CASTLE_GROUNDS_FLAG, castle_grounds_geo_000660] },
-    { command: LevelCommands.load_model_from_geo, args: [MODEL_BOB_SEESAW_PLATFORM, bob_geo_000458] },
+    // { command: LevelCommands.load_model_from_geo, args: [MODEL_BOB_SEESAW_PLATFORM, bob_geo_000458] },
     { command: LevelCommands.begin_area, args: [1, bob_geo_000488] },
     { command: LevelCommands.jump_link, args: [load_one_flag] }, 
     { command: LevelCommands.jump_link, args: [script_func_local_1] }, 

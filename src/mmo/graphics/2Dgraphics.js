@@ -84,7 +84,7 @@ const flagIcons = new Array(4).fill(0).map((unused, i) => {
 })
 
 const custom_draw_message_bubble = (text, fontsize, pixelX, pixelY, backgroundColor, backgroundAlpha, textColor, maxWidth) => {
-    context2d.font = `bold ${fontsize}px verdana, sans-serif`
+    context2d.font = `bold ${fontsize}px TextboxFont, verdana, sans-serif`
     const width = context2d.measureText(text).width
 
     context2d.fillStyle = backgroundColor
@@ -94,7 +94,7 @@ const custom_draw_message_bubble = (text, fontsize, pixelX, pixelY, backgroundCo
     context2d.globalCompositeOperation = 'source-over'
 
     context2d.globalAlpha = 1.0
-    context2d.font = `bold ${fontsize}px verdana, sans-serif`
+    context2d.font = `bold ${fontsize}px TextboxFont, verdana, sans-serif`
     context2d.textAlign = "center"
     context2d.fillStyle = textColor
     if (maxWidth) context2d.fillText(text, pixelX, pixelY - 30, [maxWidth])
@@ -114,7 +114,7 @@ export const custom_draw_text = (x, y, w) => {
         context2d.globalAlpha = 0.8
         context2d.font = "bold 20px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
-        context2d.fillStyle = "#9400D3"
+        context2d.fillStyle = "#fcfcfc"
         context2d.fillText(customData2D.playerName , pixelX, pixelY)
     }
 	
@@ -127,7 +127,7 @@ export const custom_draw_text = (x, y, w) => {
 	}
 	
     if (customData2D.chat) {
-        custom_draw_message_bubble(customData2D.chat, "16", pixelX, pixelY, "#FFFFFF", 0.8, "#000000")
+        custom_draw_message_bubble(customData2D.chat, "18", pixelX, pixelY, "#FFFFFF", 0.8, "#000000")
     }
 
     if (customData2D.announcement) {
@@ -170,7 +170,7 @@ export const draw2Dpost3Drendering = () => {
     if (window.latency) {
         context2d.font = "bold 24px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
-        context2d.fillStyle = "#9400D3"
+        context2d.fillStyle = "#fcfcfc"
         if (document.getElementById("gameCanvas").width == 640) {
             context2d.fillText(`Ping: ${window.latency}ms`, 580, 20)
         } else {
@@ -181,7 +181,7 @@ export const draw2Dpost3Drendering = () => {
         context2d.globalAlpha = 0.8
         context2d.font = "bold 24px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
-        context2d.fillStyle = "#9400D3"
+        context2d.fillStyle = "#fcfcfc"
         if (document.getElementById("gameCanvas").width == 640) {
             context2d.fillText(`FPS: ${window.fps}`, 580, 40)
         } else {

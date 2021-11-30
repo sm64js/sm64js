@@ -390,7 +390,7 @@ export const sendPlayerInteraction = (socket_id, interaction) => {
 
 export const submitPlayerName = () => {
 
-    document.getElementById("pvpButton").hidden = true
+    //document.getElementById("pvpButton").hidden = true //why?
     // document.getElementById("mapDiv").hidden = true
     document.getElementById("yellowControls").style = ""
 	Game.load_pvp()

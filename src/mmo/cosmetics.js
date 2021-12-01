@@ -1,4 +1,4 @@
-import { networkData, submitPlayerName } from "./socket"
+import { networkData, submitPlayerName, pName } from "./socket"
 import { SkinValue } from "../../proto/mario_pb"
 
 export const defaultSkinData = () => {
@@ -506,7 +506,7 @@ export const getExtraRenderData = (socket_id) => {
             mario_parachute_lights: (window.myMario.skinData.parachute == "r" ? rainbowLights : window.myMario.skinData.parachute),
         },
         custom2D: {
-            playerName: window.myMario.accountLevel ? "Lvl #" + window.myMario.accountLevel.toString() : null,
+            playerName: pName ? pName : null,
             chat: (myChat && myChat.timer > 0) ? myChat.msg : null,
             announcement: (networkData.announcement.timer > 0) ? networkData.announcement.message : null
         }
@@ -537,7 +537,7 @@ export const getExtraRenderData = (socket_id) => {
             mario_parachute_lights: (parachute == "r" ? rainbowLights : parachute),
         },
         custom2D: {
-            playerName: remote.playerName ? remote.playerName + " Lvl #" + accountLevel.toString() : null,
+            playerName: remote.playerName ? remote.playerName : null,
             chat: (remoteChat && remoteChat.timer > 0) ? remoteChat.msg : null,
             announcement: (networkData.announcement.timer > 0) ? networkData.announcement.message : null
         }

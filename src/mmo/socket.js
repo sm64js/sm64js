@@ -388,6 +388,9 @@ export const sendPlayerInteraction = (socket_id, interaction) => {
     //socket.emit('playerInteract', { socket_id, interaction }, { reliable: true })
 }
 
+let pName
+export { pName }
+
 export const submitPlayerName = () => {
 
     //document.getElementById("pvpButton").hidden = true //why?
@@ -399,9 +402,11 @@ export const submitPlayerName = () => {
 
     if (document.getElementById("customNameRow").hidden) { /// Discord Name Option
         joinGameMsg.setUseDiscordName(true)
+        pName = document.getElementById("discordNameBox").value
     } else { // Custom Name Option
         joinGameMsg.setUseDiscordName(false)
         const name = document.getElementById("playerNameInput").value
+        pName = name
         if (name.length >= 3) {
             joinGameMsg.setName(name)
         } else {

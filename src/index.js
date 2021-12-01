@@ -284,6 +284,8 @@ if (localStorage['rules'] == rulesVersion) {
     document.getElementById("rules").hidden = true
     document.getElementById("signboxBorder").classList.remove("shunned")
     document.getElementById("signboxBorder").disabled = false
+} else {
+    document.getElementById("rules").hidden = false
 }
 
 document.getElementById("startbutton").addEventListener('click', () => {

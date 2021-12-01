@@ -114,7 +114,7 @@ export const custom_draw_text = (x, y, w) => {
         context2d.globalAlpha = 0.8
         context2d.font = "bold 20px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
-        context2d.fillStyle = "#fcfcfc"
+        context2d.fillStyle = "#9e1bd1" //player name color
         context2d.fillText(customData2D.playerName , pixelX, pixelY)
     }
 	
@@ -127,7 +127,7 @@ export const custom_draw_text = (x, y, w) => {
 	}
 	
     if (customData2D.chat) {
-        custom_draw_message_bubble(customData2D.chat, "18", pixelX, pixelY, "#FFFFFF", 0.8, "#000000")
+        custom_draw_message_bubble(customData2D.chat, "18", pixelX, pixelY, "#FFFFFF", 0.8, "#121212")
     }
 
     if (customData2D.announcement) {
@@ -170,7 +170,7 @@ export const draw2Dpost3Drendering = () => {
     if (window.latency) {
         context2d.font = "bold 24px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
-        context2d.fillStyle = "#fcfcfc"
+        context2d.fillStyle = "#9e1bd1" //ping color?
         if (document.getElementById("gameCanvas").width == 640) {
             context2d.fillText(`Ping: ${window.latency}ms`, 580, 20)
         } else {
@@ -181,7 +181,7 @@ export const draw2Dpost3Drendering = () => {
         context2d.globalAlpha = 0.8
         context2d.font = "bold 24px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
-        context2d.fillStyle = "#fcfcfc"
+        context2d.fillStyle = "#9e1bd1" //fps color
         if (document.getElementById("gameCanvas").width == 640) {
             context2d.fillText(`FPS: ${window.fps}`, 580, 40)
         } else {

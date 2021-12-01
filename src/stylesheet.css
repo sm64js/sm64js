@@ -654,7 +654,8 @@ ul#chatlog {
 
 #chatlog {
     background-color: #eae2a7;
-    height: 82%;
+    height: 20em;
+    max-height: 20em;
     text-align: left;
     color: black;
     font-style: normal;
@@ -663,6 +664,7 @@ ul#chatlog {
     padding: 1em;
     margin-bottom: 0.2em;
     z-index: 200;
+    overflow-y: scroll;
 }
 
 #rules {

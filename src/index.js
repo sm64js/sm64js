@@ -155,7 +155,7 @@ window.toggleWidescreen = () => {
         relativePositioner.style.marginLeft = "0%";
         gameContainer.style.display = "block";
         moveLeft.style.justifyContent = "center";
-        chatlog.style.height = "6em";
+        chatlog.style.height = "7.5em";
         musicDiv.style.marginTop = "12em";
         /* const chat = $(".chatboxPos")
         chat.detach().appendTo(".canvasContainer")

@@ -3,7 +3,7 @@ import * as Gbi from "../include/gbi"
 import { gameData as socketGameData, networkData } from "../mmo/socket"
 import { getExtraRenderData } from "../mmo/cosmetics"
 import { flagCounter } from "../levels/castle_grounds/areas/1/11/model.inc"
-import { customData2D, custom_draw_text, draw2Dpost3Drendering } from "../mmo/graphics/2Dgraphics"
+import { customData2D, custom_draw_text, draw2Dpost3Drendering, drawFX } from "../mmo/graphics/2Dgraphics"
 const canvas2d = document.querySelector('#textCanvas')
 
 
@@ -1179,6 +1179,7 @@ export class n64GfxProcessor {
         this.flush()
 
         draw2Dpost3Drendering()
+        drawFX()
 
     }
 }

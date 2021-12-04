@@ -4,6 +4,9 @@ import * as Taunt from "./taunt"
 const canvas2d = document.querySelector('#textCanvas')
 const context2d = canvas2d.getContext('2d')
 
+const fx2d = document.querySelector('#fxCanvas')
+const contextFX2d = fx2d.getContext('2d')
+
 export const customData2D = { }
 
 //Easier image defines for stuff like taunts.
@@ -34,7 +37,7 @@ const Minimaps = {
 	'm1001':{'img':defImage(401,401,'mmo/assets/minimaps/maps/ctf00.png'),'playerScaler':1.2,'hasFlags':true},
 	'm999':{'img':defImage(401,401,'mmo/assets/minimaps/maps/clouded.png'),'playerScaler':1.60176,'hasFlags':false},
 	'm56':{'img':defImage(401,401,'mmo/assets/minimaps/maps/ccs.png'),'playerScaler':1.8,'hasFlags':false},
-  'm1004':{'img':defImage(401,401,'mmo/assets/minimaps/maps/raceway.png'),'playerScaler':0.69,'hasFlags':false},
+    'm1004':{'img':defImage(401,401,'mmo/assets/minimaps/maps/raceway.png'),'playerScaler':0.69,'hasFlags':false},
 }
 // Example: Minimaps[`m${window.selectedMap}`].img would return '1000's table on bob mount and '9's table on bob battlefield
 const Player_Img = new Image(14, 14); Player_Img.src = 'mmo/assets/minimaps/player.png'
@@ -55,8 +58,10 @@ const Taunts = [
 const TauntWheel = defImage(128, 128, 'mmo/assets/taunts/tauntWheel.png')
 
 const minimapEnabledLevel = () => {
-    return Minimaps.[`m${window.selectedMap}`] != null
+    return Minimaps[`m${window.selectedMap}`] != null
 }
+
+const snow = defImage(1280, 720, "mmo/assets/snow.png")
 
 const getFlagColor = (i) => {
 	switch (i) {
@@ -243,4 +248,20 @@ export const draw2Dpost3Drendering = () => {
 		const TAUNT = Taunt.tauntsMap[Taunt.getSelectedTaunt()]
 		if (TAUNT != -1) window.taunt = TAUNT
 	}
+}
+
+let imgHeight = 0
+
+export const drawFX = () => {
+    if (!window.snow) return
+    contextFX2d.clearRect(0, 0, fx2d.width, fx2d.height)
+    // snow
+    contextFX2d.drawImage(snow, 0, imgHeight)
+    contextFX2d.drawImage(snow, 0, imgHeight - canvas2d.height)
+
+    // update image stats
+    imgHeight += 3
+
+    // reseting the images when the first image entirely exits the screen
+    if (imgHeight == canvas2d.height) { imgHeight = 0 }
 }

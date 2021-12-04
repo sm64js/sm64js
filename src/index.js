@@ -138,10 +138,13 @@ const musicDiv = document.getElementById("musicDiv")
 
 // widescreen
 const gameCanvas = document.querySelector('#gameCanvas')
+const fxCanvas = document.querySelector('#fxCanvas')
 const textCanvas = document.querySelector('#textCanvas')
 const fullCanvas = document.querySelector('#fullCanvas')
 gameCanvas.width = 640
 gameCanvas.height = 480
+fxCanvas.width = 640
+fxCanvas.height = 480
 textCanvas.width  = 640
 textCanvas.height = 480
 fullCanvas.width  = 640
@@ -166,6 +169,8 @@ const widescreenOn = () => {
 
         gameCanvas.width  = customWidth
         gameCanvas.height = customHeight
+        fxCanvas.width = customWidth
+        fxCanvas.height = customHeight
         textCanvas.width  = customWidth
         textCanvas.height = customHeight
         fullCanvas.width  = customWidth
@@ -191,6 +196,8 @@ const widescreenOff = () => {
         document.getElementById("chatboxes").style="justify-content:center;"*/
         gameCanvas.width  = 640
         gameCanvas.height = 480
+        fxCanvas.width = 640
+        fxCanvas.height = 480
         textCanvas.width  = 640
         textCanvas.height = 480
         fullCanvas.width  = 640
@@ -281,6 +288,8 @@ window.switchbox = (name) => {
             break
     }
 }
+
+window.snow = false
 
 window.enterFullScreenMode = () => {
     const dstCanvas = document.getElementById('fullCanvas')

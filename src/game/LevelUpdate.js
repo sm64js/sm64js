@@ -120,6 +120,10 @@ class LevelUpdate {
             }
 
         }
+
+        if (Area.gCurrLevelNum == 1003) {
+            window.snow = true
+        }
         
         return 1
     }

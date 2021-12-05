@@ -130,27 +130,29 @@ const setStatsUpdate = setInterval(() => {
     window.fps = parseInt(maxFps)
 }, 500)
 
+const relativePositioner = document.getElementById("relativePositioner")
+const gameContainer = document.getElementById("gameContainer")
+const moveLeft = document.getElementById("moveLeft")
+const chatlog = document.getElementById("chatlog")
+const musicDiv = document.getElementById("musicDiv")
+
 // widescreen
 const gameCanvas = document.querySelector('#gameCanvas')
+const fxCanvas = document.querySelector('#fxCanvas')
 const textCanvas = document.querySelector('#textCanvas')
 const fullCanvas = document.querySelector('#fullCanvas')
 gameCanvas.width = 640
 gameCanvas.height = 480
+fxCanvas.width = 640
+fxCanvas.height = 480
 textCanvas.width  = 640
 textCanvas.height = 480
 fullCanvas.width  = 640
 fullCanvas.height = 480
 const customWidth = 1280
 const customHeight = 720
-const relativePositioner = document.getElementById("relativePositioner");
-const gameContainer = document.getElementById("gameContainer");
-const moveLeft = document.getElementById("moveLeft");
-const chatlog = document.getElementById("chatlog");
-const musicDiv = document.getElementById("musicDiv");
 
-window.toggleWidescreen = () => {
-
-    if (gameCanvas.width == 640 && gameCanvas.height == 480) { //if not wide-screen, do this
+const widescreenOn = () => {
         relativePositioner.style.width = "100%";
         relativePositioner.style.marginLeft = "0%";
         gameContainer.style.display = "block";
@@ -167,6 +169,8 @@ window.toggleWidescreen = () => {
 
         gameCanvas.width  = customWidth
         gameCanvas.height = customHeight
+        fxCanvas.width = customWidth
+        fxCanvas.height = customHeight
         textCanvas.width  = customWidth
         textCanvas.height = customHeight
         fullCanvas.width  = customWidth
@@ -174,7 +178,9 @@ window.toggleWidescreen = () => {
 
         viewport.vscale = [customWidth, customHeight, 0, 0]
         viewport.vtrans = [0, 0, 0, 0]
-    } else { //if widescreen, do this instead
+}
+
+const widescreenOff = () => {
         relativePositioner.style.width = "50%";
         relativePositioner.style.marginLeft = "15%";
         gameContainer.style.display = "flex";
@@ -190,6 +196,8 @@ window.toggleWidescreen = () => {
         document.getElementById("chatboxes").style="justify-content:center;"*/
         gameCanvas.width  = 640
         gameCanvas.height = 480
+        fxCanvas.width = 640
+        fxCanvas.height = 480
         textCanvas.width  = 640
         textCanvas.height = 480
         fullCanvas.width  = 640
@@ -197,7 +205,22 @@ window.toggleWidescreen = () => {
 
         viewport.vscale = [640, 480, 511, 0]
         viewport.vtrans = [640, 480, 511, 0]
+}
+
+window.toggleWidescreen = () => {
+    if (gameCanvas.width == 640 && gameCanvas.height == 480) { //if not widescreen, do this
+	localStorage.setItem("widescreenOn", 1)
+	widescreenOn()
+    } else {
+	localStorage.setItem("widescreenOn", 0)
+	widescreenOff()
     }
+}
+
+if (localStorage.getItem("widescreenOn") == 0 || !localStorage.getItem("widescreenOn")) {
+	widescreenOff()
+} else {
+	widescreenOn()
 }
 
 // hacky method; probably a better way to do this
@@ -265,6 +288,8 @@ window.switchbox = (name) => {
             break
     }
 }
+
+window.snow = false
 
 window.enterFullScreenMode = () => {
     const dstCanvas = document.getElementById('fullCanvas')

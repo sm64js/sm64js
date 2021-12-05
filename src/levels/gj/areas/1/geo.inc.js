@@ -14,7 +14,7 @@ export const gj_area_1_geo = [
 	{ command: Geo.open_node },
 	{ command: Geo.node_ortho, args: [100.0000]},
 	{ command: Geo.open_node },
-	{ command: Geo.node_background, args: [Geo.BACKGROUND_OCEAN_SKY, geo_skybox_main] },
+	{ command: Geo.node_background, args: [Geo.BACKGROUND_SNOW_MOUNTAINS, geo_skybox_main] },
 	{ command: Geo.close_node },
 	{ command: Geo.close_node },
 	{ command: Geo.node_master_list, args: [1]},

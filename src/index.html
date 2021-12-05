@@ -53,7 +53,7 @@
 
         <!-- Description -->
        <h6 class="description">This project is currently still being developed. This page may be live from time to time for testing, but there may be glitches and performance issues. The server will go down and restart at random times without warning. If you would like to help with the project or have feedback please<a class="descriptionContact" href="/credits.html">contact me.</a></h6>
-       <h6 class="description">Please, be patient while we work on fixing the site, since the rewrite lots of <span style="color: #c60000;">stuff might not work as expected</span>. Feel free to report the problems on <a class="descriptionContact" href="https://github.com/sm64js/sm64js/issues">Github</a>.<br> Screen transitions in 4:3 are messed up due to widescreen now being implemented. <br> <span style="font-size: 0.94em;">The chat will appear on top of the game when in widescreen mode taking up part of the screen, this will get fixed on a future update.</span></h6>
+       <h6 class="description">Please, be patient while we work on fixing the site, since the rewrite lots of <span style="color: #c60000;">stuff might not work as expected</span>. Feel free to report the problems on<a class="descriptionContact" href="https://github.com/sm64js/sm64js/issues">Github</a>.<br> Screen transitions in 4:3 are messed up due to widescreen now being implemented. <br> <span style="font-size: 0.94em;">The chat will appear on top of the game when in widescreen mode taking up part of the screen, this will get fixed on a future update.</span></h6>
        
 
        <!-- Submit ROM form -->
@@ -255,13 +255,13 @@
                         Full Window Mode
                         </div>
                     </button>
-                    <!--<button type="button"
+                    <button type="button"
                         class="blue-button"
-                        onclick="window.toggleFullscreen()">
+                        onclick="window.enterFullScreenMode()">
                         <div class="sm64button">
                         Fullscreen Mode
                         </div>
-                    </button>--> <!-- Haven't found any actual functions that get called from this, is this a stub button or something? -->
+                    </button>
                     <button type="button"
                         class="blue-button"
                         onclick="window.toggleWidescreen()">
@@ -639,6 +639,7 @@
                 <div id="relativePositioner">
                     <div id="moveLeft">
                     <canvas id="textCanvas"></canvas><!-- HUD, NOT CHAT -->
+                    <canvas id="fxCanvas"></canvas>
                     <canvas id="gameCanvas" width="1280" height="720"></canvas>
                     </div>
                 </div>

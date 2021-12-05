@@ -3,7 +3,8 @@ import * as Gbi from "../include/gbi"
 import { gameData as socketGameData, networkData } from "../mmo/socket"
 import { getExtraRenderData } from "../mmo/cosmetics"
 import { flagCounter } from "../levels/castle_grounds/areas/1/11/model.inc"
-import { customData2D, custom_draw_text, draw2Dpost3Drendering } from "../mmo/graphics/2Dgraphics"
+import { customData2D, custom_draw_text, draw2Dpost3Drendering, drawFX } from "../mmo/graphics/2Dgraphics"
+const gcanvas = document.querySelector('#gameCanvas')
 const canvas2d = document.querySelector('#textCanvas')
 
 
@@ -140,6 +141,10 @@ export class n64GfxProcessor {
                 }
                 window.scrollTo(0, 0)
                 document.body.style.overflowY = "hidden"
+                if (gcanvas.width != 640 && gcanvas.height != 480) {
+                    dstCanvas.width = window.innerWidth
+                    dstCanvas.height = window.innerHeight
+                }
             }
             dstCtx.drawImage(WebGL.canvas, 0, 0, dstCanvas.width, dstCanvas.height)
             dstCtx.drawImage(canvas2d, 0, 0, dstCanvas.width, dstCanvas.height)
@@ -1179,6 +1184,7 @@ export class n64GfxProcessor {
         this.flush()
 
         draw2Dpost3Drendering()
+        drawFX()
 
     }
 }

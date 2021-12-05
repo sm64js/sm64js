@@ -608,20 +608,15 @@ audio{
     display: flex;
 }
 
-#textCanvas{
-    position: absolute;
-    z-index: 750;
-}
-
 #gameContainer{
     display: flex;
-    z-index: 700;
+    z-index: 3;
 }
 
 #chatContainer{
     margin-left: 2%;
     width: 50%;
-    z-index: 800;
+    z-index: 4;
     float: right;
 }
 
@@ -631,10 +626,19 @@ audio{
     padding: 26px;
 }
 
-#textCanvas{
+#textCanvas {
+    z-index: 3;
+}
+
+#textCanvas, #fxCanvas {
+    position: absolute;
     background-color: transparent;
     margin: auto;
     padding: 26px;
+}
+
+#fxCanvas {
+    z-index: 2;
 }
 
 .chatbox {
@@ -663,7 +667,7 @@ ul#chatlog {
     margin: 0;
     padding: 1em;
     margin-bottom: 0.2em;
-    z-index: 200;
+    z-index: 4;
     overflow-y: scroll;
 }
 
@@ -675,7 +679,7 @@ ul#chatlog {
     bottom: 10%;
     left: 10%;
     right: 10%;
-    z-index: 2;
+    z-index: 4;
     color: black;
     padding: 1%;
     overflow: hidden;
@@ -696,13 +700,11 @@ ul#chatlog {
 }
 
 #picker{
-    z-index: 100;
     width: 25.3%;
     float: left;
 }
 
 #ambpicker {
-    z-index: 100;
     width: 25.3%;
     float: right;
     margin-left: 50%;

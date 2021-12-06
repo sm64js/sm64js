@@ -89,15 +89,16 @@
                         <img style="cursor: pointer;" id="googleSigninButton" src="/mmo/assets/google_signin.png" width="240" style="margin-left:15px;">
                     </div>
 
-                    <!-- Sign out button -->
-                    <button hidden id="logoutButton" type="submit" class="red-button" style="height:50px; margin-top: 5px">
-                        <div class="sm64button">
-                            <b>Sign out</b>
-                        </div>
-                    </button>
-
                     <!-- Player name section -->
                     <div hidden id="playerNameRow">
+                        <!-- Sign out button -->
+                        <button id="logoutButton" type="submit" class="red-button">
+                            <div class="sm64button">
+                                Sign out
+                            </div>
+                        </button>
+                        <br />
+                        <br />
                         <form id="playerNameForm">
 
                             <!-- Discord name -->
@@ -115,7 +116,7 @@
                             <div hidden id="customNameRow">
                                     <label type="text">Custom Name: </label>
 
-                                    <input id="playerNameInput" type="text" minlength="3" maxlength="14" placeholder="Enter name here" onchange="window.updatePlayerName(this.value)">
+                                    <input id="playerNameInput" type="text" style="max-width: 200px" minlength="3" maxlength="14" placeholder="Enter name here" onchange="window.updatePlayerName(this.value)">
 
                                     <button id="switchDiscord" type="button" class="blue-button"><div class="sm64button">Use Discord Name</div></button>
 

@@ -4,9 +4,6 @@ import * as Taunt from "./taunt"
 const canvas2d = document.querySelector('#textCanvas')
 const context2d = canvas2d.getContext('2d')
 
-const fx2d = document.querySelector('#fxCanvas')
-const contextFX2d = fx2d.getContext('2d')
-
 export const customData2D = { }
 
 //Easier image defines for stuff like taunts.
@@ -30,7 +27,7 @@ const marioHealthWedges = [
 const Minimaps = {
 	'm1000':{'img':defImage(401,401,'mmo/assets/minimaps/maps/bob_mountain.png'),'playerScaler':1.0,'hasFlags':true},
 	'm1002':{'img':defImage(401,401,'mmo/assets/minimaps/maps/starman.png'),'playerScaler':2.15,'hasFlags':false},
-    'm1003':{'img':defImage(401,401,'mmo/assets/minimaps/maps/gj.png'),'playerScaler':1.5,'hasFlags':false},
+    'm1003':{'img':defImage(401,401,'mmo/assets/minimaps/maps/gjxmas.png'),'playerScaler':1.5,'hasFlags':false},
 	'm9':{'img':defImage(401,401,'mmo/assets/minimaps/maps/bob_battlefield.png'),'playerScaler':1.82819,'hasFlags':true},
 	'm16':{'img':defImage(401,401,'mmo/assets/minimaps/maps/castle_grounds.png'),'playerScaler':1.80144,'hasFlags':true},
 	'm36':{'img':defImage(401,401,'mmo/assets/minimaps/maps/ttm.png'),'playerScaler':1.9838,'hasFlags':true},
@@ -254,10 +251,10 @@ let imgHeight = 0
 
 export const drawFX = () => {
     if (!window.snow) return
-    contextFX2d.clearRect(0, 0, fx2d.width, fx2d.height)
+    context2d.clearRect(0, 0, fx2d.width, fx2d.height)
     // snow
-    contextFX2d.drawImage(snow, 0, imgHeight)
-    contextFX2d.drawImage(snow, 0, imgHeight - canvas2d.height)
+    context2d.drawImage(snow, 0, imgHeight)
+    context2d.drawImage(snow, 0, imgHeight - canvas2d.height)
 
     // update image stats
     imgHeight += 3

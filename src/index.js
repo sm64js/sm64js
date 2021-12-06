@@ -171,8 +171,8 @@ const widescreenOn = () => {
         fullCanvas.width  = customWidth
         fullCanvas.height = customHeight
 
-        viewport.vscale = window.vs
-        viewport.vtrans = window.vt
+        viewport.vscale = [customWidth, customHeight, 0, 0]
+        viewport.vtrans = [0, 0, 0, 0]
 }
 
 const widescreenOff = () => {

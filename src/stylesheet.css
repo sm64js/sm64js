@@ -679,7 +679,7 @@ ul#chatlog {
     bottom: 10%;
     left: 10%;
     right: 10%;
-    z-index: 4;
+    z-index: 5;
     color: black;
     padding: 1%;
     overflow: hidden;

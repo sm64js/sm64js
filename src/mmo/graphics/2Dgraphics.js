@@ -2,7 +2,9 @@ import { networkData, gameData } from "../socket"
 import * as Taunt from "./taunt"
 
 const canvas2d = document.querySelector('#textCanvas')
+const fxCanvas2d = document.querySelector('#fxCanvas')
 const context2d = canvas2d.getContext('2d')
+const contextFX = fxCanvas2d.getContext('2d')
 
 export const customData2D = { }
 
@@ -252,10 +254,10 @@ let imgHeight = 0
 export const drawFX = () => {
     if (!window.snow) return
 
-    context2d.clearRect(0, 0, canvas2d.width, canvas2d.height)
+    contextFX.clearRect(0, 0, canvas2d.width, canvas2d.height)
     // snow
-    context2d.drawImage(snow, 0, imgHeight)
-    context2d.drawImage(snow, 0, imgHeight - canvas2d.height)
+    contextFX.drawImage(snow, 0, imgHeight)
+    contextFX.drawImage(snow, 0, imgHeight - canvas2d.height)
 
     // update image stats
     imgHeight += 3

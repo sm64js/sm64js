@@ -121,7 +121,7 @@ class LevelUpdate {
 
         }
 
-        if (Area.gCurrLevelNum == 1003) {
+        if (Area.gCurrLevelNum == 1003 || Area.gCurrLevelNum == 5) {
             window.snow = true
         }
         

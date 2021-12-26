@@ -251,7 +251,8 @@ let imgHeight = 0
 
 export const drawFX = () => {
     if (!window.snow) return
-    context2d.clearRect(0, 0, fx2d.width, fx2d.height)
+
+    context2d.clearRect(0, 0, canvas2d.width, canvas2d.height)
     // snow
     context2d.drawImage(snow, 0, imgHeight)
     context2d.drawImage(snow, 0, imgHeight - canvas2d.height)

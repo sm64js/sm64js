@@ -750,7 +750,7 @@ export const get_character_type = (m) => { // todo; make draw from 'm' somehow.
 }
 
 export const set_mario_y_vel_based_on_fspeed = (m, initialVelY, multiplier) => {
-    m.vel[1] = initialVelY + (get_character_type(m) == 1 ? 5.0 : 0.0) + (m.forwardVel * multiplier)
+    m.vel[1] = initialVelY + (get_character_type(m) == 1 ? 5.5 : 0.0) + (m.forwardVel * multiplier)
 }
 
 const read_next_anim_value = (curFrame, attribute, values) => {
@@ -1150,7 +1150,7 @@ export const execute_mario_action = (m) => {
                 case ACT_GROUP_SUBMERGED:
                     inLoop = mario_execute_submerged_action(m); break
 
-                default: throw "unkown action group"
+                default: throw "unknown action group"
             }
         }
 
@@ -1380,7 +1380,7 @@ const update_mario_geometry_inputs = (m) => {
         mario_basic_lava(m)
 
         if (m.floor.type == 0x0004 && !(m.input & INPUT_OFF_FLOOR && m.health > 0xFF)) {
-            m.vel[1] = 200
+            if (Area.gCurrLevelNum != 1001) { m.vel[1] = 200 } else { m.vel[1] = 240 }
             set_mario_action(m, ACT_PARACHUTING, 0)
         }
     }

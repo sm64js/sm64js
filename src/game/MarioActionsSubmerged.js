@@ -922,6 +922,6 @@ export const mario_execute_submerged_action = (m) => {
         //case Mario.ACT_HOLD_METAL_WATER_JUMP:      return //act_hold_metal_water_jump(m);
         //case Mario.ACT_HOLD_METAL_WATER_JUMP_LAND: return //act_hold_metal_water_jump_land(m);
         default:
-            throw "unkown action submerged"
+            throw "unknown action submerged"
     }
 }

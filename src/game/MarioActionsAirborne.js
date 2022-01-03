@@ -155,7 +155,7 @@ const common_air_action_step = (m, landAction, animation, stepArg) => {
             Mario.set_mario_action(m, Mario.ACT_START_HANGING, 0)
             break
 
-        default: throw "unkown air step result in common_air_action_step"
+        default: throw "unknown air step result in common_air_action_step"
     }
 
     return stepResult
@@ -976,6 +976,6 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_HOLD_WATER_JUMP: return act_hold_water_jump(m)
         case Mario.ACT_PARACHUTING: return act_parachuting(m)
         case Mario.ACT_FLUTTERJUMP: return act_flutterjump(m)
-        default: throw "unkown action airborne " + m.action.toString(16)
+        default: throw "unknown action airborne " + m.action.toString(16)
     }
 }

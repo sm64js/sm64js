@@ -153,7 +153,7 @@ class DynlistProc {
                     this.d_make_vertex(entry.args.vec)
                     break
                 case 58: break /// Stop list
-                default: throw "proc_dynlist(): unkown command"
+                default: throw "proc_dynlist(): unknown command"
             }
         })
 

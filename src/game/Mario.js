@@ -1731,13 +1731,17 @@ export const set_water_plunge_action = m => {
 }
 
 export const respawn_player = (m) => {
-        set_mario_action(m, ACT_FREEFALL, 0)
-        m.pos = [...Area.gMarioSpawnInfo.startPos]
-        m.angle = [...Area.gMarioSpawnInfo.startAngle]
-        m.vel = [0, 0, 0]
-        m.forwardVel = 0
-		m.health = 0x880
-		m.healCounter = 1
-		m.hurtCounter = 1
-        m.invincTimer = 60
+    if (m.floor) {
+        if (m.health == 0x00 || m.floor.type == 0x0A || m.floor.type == 0x01) m.numLives -= 1
+        if (m.numLives < 0) m.numLives = 4
+    }
+    set_mario_action(m, ACT_FREEFALL, 0)
+    m.pos = [...Area.gMarioSpawnInfo.startPos]
+    m.angle = [...Area.gMarioSpawnInfo.startAngle]
+    m.vel = [0, 0, 0]
+    m.forwardVel = 0
+	m.health = 0x880
+	m.healCounter = 1
+	m.hurtCounter = 1
+    m.invincTimer = 60
 }

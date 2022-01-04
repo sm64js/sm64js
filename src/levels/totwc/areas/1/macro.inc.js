@@ -1,0 +1,32 @@
+import { MACRO_YELLOW_COIN, MACRO_RED_COIN, MACRO_COIN_RING_VERTICAL } from "../../../../include/macro_presets"
+
+export const totwc_seg7_macro_objs = [
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [0, -1760,  -600],     param: 0 },// wing cap
+    { preset: MACRO_COIN_RING_VERTICAL, yaw: 90, pos: [0, -1000,  3000],     param: 0 },
+    { preset: MACRO_COIN_RING_VERTICAL, yaw: 0,  pos: [-3500,  -200,  0],    param: 0 }, 
+    { preset: MACRO_COIN_RING_VERTICAL, yaw: 0,  pos: [4500,  1400,  0],     param: 0 }, 
+    { preset: MACRO_COIN_RING_VERTICAL, yaw: 90, pos: [0,   600, -4000],     param: 0 },
+    { preset: MACRO_RED_COIN,           yaw: 0,  pos: [-100,   800, -4000],  param: 0 },
+    { preset: MACRO_RED_COIN,           yaw: 0,  pos: [-3500,     0,   100], param: 0 },
+    { preset: MACRO_RED_COIN,           yaw: 0,  pos: [100,  -800,  3000],   param: 0 },
+    { preset: MACRO_RED_COIN,           yaw: 0,  pos: [4500,  1600,  -100],  param: 0 },
+    { preset: MACRO_RED_COIN,           yaw: 0,  pos: [100,   800, -4000],   param: 0 },
+    { preset: MACRO_RED_COIN,           yaw: 0,  pos: [-3500,     0,  -100], param: 0 },
+    { preset: MACRO_RED_COIN,           yaw: 0,  pos: [-100,  -800,  3000],  param: 0 },
+    { preset: MACRO_RED_COIN,           yaw: 0,  pos: [4500,  1600,   100],  param: 0 },
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [2913,  1200, -2941],  param: 0 },
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [3954,  1400, -1817],  param: 0 },
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [1554,  1000, -3680],  param: 0 },
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [-2657,   400, -2742], param: 0 },
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [-1485,   600, -3628], param: 0 },
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [-3231,   200, -1514], param: 0 },
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [-2197,  -400,  2142], param: 0 },
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [-3056,  -200,  1310], param: 0 },
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [-1144,  -600,  2742], param: 0 },
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [3680,  1800,  1439],  param: 0 },
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [2080,  2000,  2080],  param: 0 },
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [920,  2200,  1920],   param: 0 },
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [-40,  2400,  1520],   param: 0 },
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [-960,  2600,  1040],  param: 0 },
+    { preset: MACRO_YELLOW_COIN,        yaw: 0,  pos: [-1760,  2800,   600], param: 0 },
+]

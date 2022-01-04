@@ -26,7 +26,9 @@ export const COURSE_WMOTR = 23
 export const COURSE_SA = 24
 export const COURSE_CAKE_END = 25
 
-export const COURSE_END = 26
+export const COURSE_CUSTOM = 26
+
+export const COURSE_END = 27
 export const COURSE_MAX = COURSE_END - 1
 export const COURSE_COUNT = COURSE_MAX
 export const COURSE_MIN = COURSE_NONE + 1

@@ -212,8 +212,8 @@ class Area {
             if (noController) {
                 Print.print_text_centered(SCREEN_WIDTH / 2, 20, "NO CONTROLLER");
             } else {
-                Print.print_text_centered(60, 38, "PRESS");
-                Print.print_text_centered(60, 20, "START");
+                Print.print_text_centered(60, window.widescreen ? -62 : 38, "PRESS");
+                Print.print_text_centered(60, window.widescreen ? -80 : 20, "START");
             }
         }
     }

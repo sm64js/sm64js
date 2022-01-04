@@ -263,7 +263,25 @@ import {
     mountain_0900B000,
     mountain_0900B800,
     mountain_0900C000,
-} from "./textures/mountain.js"
+} from "./textures/mountain"
+
+import {
+    sky_09000000,
+    sky_09000800,
+    sky_09001000,
+    sky_09001800,
+    sky_09002000,
+    sky_09003000,
+    sky_09003800,
+    sky_09004800,
+    sky_09005000,
+    sky_09005800,
+    sky_09006000,
+    texture_metal_hole,
+    sky_09007000,
+    sky_09007800,
+    sky_09008000,
+} from "./textures/sky"
 
 import {
     snow_09000000,
@@ -372,6 +390,13 @@ import {
     ssl_seg7_texture_07002800,
     ssl_seg7_texture_07003800
 } from "./levels/ssl/texture.inc"
+
+import {
+    totwc_seg7_texture_07000000,
+    totwc_seg7_texture_07001000,
+    totwc_seg7_texture_07001800,
+    totwc_seg7_texture_07002000
+} from "./levels/totwc/texture.inc"
 
 import {
     ccm_seg7_texture_07003100,
@@ -678,11 +703,32 @@ export const loadDataIntoGame = (data) => {
     ssl_seg7_texture_07002800.push(...data["levels/ssl/4.rgba16.png"])
     ssl_seg7_texture_07003800.push(...data["levels/ssl/5.rgba16.png"])
 
+    totwc_seg7_texture_07000000.push(...data["levels/totwc/0.rgba16.png"])
+    totwc_seg7_texture_07001000.push(...data["levels/totwc/1.rgba16.png"])
+    totwc_seg7_texture_07001800.push(...data["levels/totwc/2.rgba16.png"])
+    totwc_seg7_texture_07002000.push(...data["levels/totwc/3.ia16.png"])
+
     sl_seg7_texture_07000000.push(...data["levels/sl/0.rgba16.png"])
     sl_seg7_texture_07000800.push(...data["levels/sl/1.rgba16.png"])
     sl_seg7_texture_07001000.push(...data["levels/sl/2.rgba16.png"])
     sl_seg7_texture_07001800.push(...data["levels/sl/3.rgba16.png"])
     sl_seg7_texture_07002000.push(...data["levels/sl/4.rgba16.png"])
+
+    sky_09000000.push(...data["textures/sky/rr_textures.00000.rgba16.png"])
+    sky_09000800.push(...data["textures/sky/rr_textures.00800.rgba16.png"])
+    sky_09001000.push(...data["textures/sky/rr_textures.01000.rgba16.png"])
+    sky_09001800.push(...data["textures/sky/rr_textures.01800.rgba16.png"])
+    sky_09002000.push(...data["textures/sky/rr_textures.02000.rgba16.png"])
+    sky_09003000.push(...data["textures/sky/rr_textures.03000.rgba16.png"])
+    sky_09003800.push(...data["textures/sky/rr_textures.03800.rgba16.png"])
+    sky_09004800.push(...data["textures/sky/rr_textures.04800.rgba16.png"])
+    sky_09005000.push(...data["textures/sky/rr_textures.05000.rgba16.png"])
+    sky_09005800.push(...data["textures/sky/rr_textures.05800.rgba16.png"])
+    sky_09006000.push(...data["textures/sky/rr_textures.06000.rgba16.png"])
+    texture_metal_hole.push(...data["textures/sky/metal_hole.rgba16.png"])
+    sky_09007000.push(...data["textures/sky/rr_textures.07000.rgba16.png"])
+    sky_09007800.push(...data["textures/sky/rr_textures.07800.rgba16.png"])
+    sky_09008000.push(...data["textures/sky/rr_textures.08000.rgba16.png"])
 
     snow_09000000.push(...data["textures/snow/ccm_textures.00000.rgba16.png"])
     snow_09000800.push(...data["textures/snow/ccm_textures.00800.rgba16.png"])
@@ -1197,17 +1243,3 @@ document.querySelector('#romSelect').addEventListener('submit', (e) => {
     reader.readAsArrayBuffer(romFile)
     reader.onload = (evt) => { extractAssetsFromRom(evt.target.result) }
 })
-
-/*        msgElement.innerHTML = "Please wait for ROM to be uploaded and game assets to be sent back to your device..."
-        msgElement.style = "color:yellow"
-        $.ajax({
-            url: '/romUpload',
-            type: 'POST',
-            data: new FormData(e.target),
-            processData: false,
-            contentType: false,
-            success: (extractedData) => {
-                console.log(extractedData)
-                processExtractedResults(extractedData)
-            }
-        })*/

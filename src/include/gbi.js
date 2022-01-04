@@ -373,6 +373,11 @@ export const G_CC_MODULATEIA = {
     rgb: [1, 15, 4, 7]
 }
 
+export const G_CC_MODULATERGBFADEA = {
+    alpha: [1, 7, 5, 7],
+    rgb: [1, 15, 4, 7]
+}
+
 export const G_CC_MODULATEIFADEA = {
     alpha: [1, 7, 5, 7],
     rgb: [1, 15, 4, 7]

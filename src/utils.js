@@ -71,6 +71,7 @@ export const levelIdToName = {
     24: "Whomp's Fortress",
     26: "Castle Courtyard",
     27: "Princess's Secret Slide",
+    29: "Tower of the Wing Cap",
     36: "Tall, Tall Mountain",
     56: "Cool, Cool Mountain Slide",
     602: "Castle Inside Second Level",

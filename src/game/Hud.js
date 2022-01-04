@@ -102,11 +102,7 @@ class Hud {
 
     render_dl_power_meter(numHealthWedges) {
         const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
-        if (document.getElementById("gameCanvas").width == 1280 && document.getElementById("gameCanvas").height == 720) {
-            this.sPowerMeterHUD.x = 191
-        } else {
-            this.sPowerMeterHUD.x = 140
-        }
+        this.sPowerMeterHUD.x = window.widescreen ? 191 : 140
         MathUtil.guTranslate(mtx, this.sPowerMeterHUD.x, this.sPowerMeterHUD.y, 0);
         Gbi.gSPMatrix(Game.gDisplayList, mtx, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_MUL | Gbi.G_MTX_PUSH);
         Gbi.gSPDisplayList(Game.gDisplayList, dl_power_meter_base);
@@ -231,9 +227,9 @@ class Hud {
     }
 
     render_hud_coins() {
-        Print.print_text(168, this.HUD_TOP_Y, "+"); // 'Coin' glyph
-        Print.print_text(184, this.HUD_TOP_Y, "*"); // 'X' glyph
-        Print.print_text_fmt_int(198, this.HUD_TOP_Y, "%d", LevelUpdate.gHudDisplay.coins);
+        Print.print_text(window.widescreen ? 368 : 168, this.HUD_TOP_Y, "+") // 'Coin' glyph
+        Print.print_text(window.widescreen ? 184 : 184, this.HUD_TOP_Y, "*") // 'X' glyph
+        Print.print_text_fmt_int(window.widescreen ? 398: 198, this.HUD_TOP_Y, "%d", LevelUpdate.gHudDisplay.coins)
     }
 
     render_hud_stars() {
@@ -285,9 +281,9 @@ class Hud {
     }
 
     render_hud_camera_status() {
-        var cameraLUT = main_hud_camera_lut;
-        var x = GfxDimensions.GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(54);
-        var y = 205;
+        let cameraLUT = main_hud_camera_lut
+        let x = GfxDimensions.GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(54)
+        let y = window.widescreen ? 325 : 205
 
         if (this.sCameraHUD.status == Camera.CAM_STATUS_NONE) {
             return;
@@ -336,7 +332,7 @@ class Hud {
                 this.render_hud_cannon_reticle()
             }
 
-            /*if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_LIVES) {
+            if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_LIVES) {
                 this.render_hud_mario_lives()
             }
 
@@ -346,7 +342,7 @@ class Hud {
 
             if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_STAR_COUNT) {
                 this.render_hud_stars()
-            }*/
+            }
 
             // if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_KEYS) {
             //     this.render_hud_keys();
@@ -354,7 +350,7 @@ class Hud {
 
             if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_CAMERA_AND_POWER) {
                 this.render_hud_power_meter()
-                //this.render_hud_camera_status()
+                this.render_hud_camera_status()
             }
 
             // if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_TIMER) {

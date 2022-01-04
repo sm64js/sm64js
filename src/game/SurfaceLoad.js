@@ -285,8 +285,9 @@ class SurfaceLoad {
         }
 
         if (macroObjects && macroObjects[0]) {
-            if (macroObjects[0].preset < 30) throw "spawn objects shortcut method?"
-            else spawn_macro_objects(index, macroObjects)
+            // if (macroObjects[0].preset < 30) throw "spawn objects shortcut method?"
+            // else 
+            spawn_macro_objects(index, macroObjects)
         } 
 
         this.gNumStaticSurfaceNodes = this.gSurfaceNodesAllocated

@@ -99,18 +99,6 @@ const ssLuigi = {
     customCapState: 0
 }
 
-const rainbowMario = {
-    overalls: "r",
-    hat: "r",
-    shirt: "r",
-    gloves: "r",
-    boots: "r",
-    skin: "r",
-    hair: "r",
-    parachute: "r",
-    customCapState: 0
-}
-
 const skinPresetIndex = [
     defaultSkinData(),
     luigi,
@@ -119,8 +107,7 @@ const skinPresetIndex = [
     waluigi,
     granddad,
     ssMario,
-    ssLuigi,
-    rainbowMario
+    ssLuigi
 ]
 
 // Initialize color and ambient color wheels

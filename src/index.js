@@ -9,6 +9,7 @@ import "./mmo/cosmetics"
 import "./mmo/cmts_cosmetics"
 import "./stylesheet.css"
 import { viewport } from "./game/Area"
+import { set_vp } from "./include/config"
 
 
 const send_display_list = (gfx_list) => { GFX.run(gfx_list) }
@@ -19,7 +20,7 @@ let n_frames = 0
 let target_time = 0
 let frameSpeed = 0.03
 let reset_delay = 0
-export const textureVersion = 38
+export const textureVersion = 39
 
 const produce_one_frame = () => {
 	let respText = ""
@@ -124,10 +125,18 @@ const createRingBuffer = (length) => {
 
 const totalFrameTimeBuffer = createRingBuffer(10)
 
+const fpsMeter = document.getElementById("fpsMeter")
+const pingMeter = document.getElementById("pingMeter")
+
+window.fps = 0
+window.latency = 0
+
 const setStatsUpdate = setInterval(() => {
     const totalFrameTimeAvg = totalFrameTimeBuffer.getAvg().toFixed(2)
     const maxFps = (1000 / totalFrameTimeAvg).toFixed(2)
     window.fps = parseInt(maxFps)
+    if (!isNaN(window.fps)) fpsMeter.textContent = `FPS: ${window.fps}`
+    pingMeter.textContent = `Ping: ${window.latency}ms`
 }, 500)
 
 const relativePositioner = document.getElementById("relativePositioner")
@@ -153,59 +162,65 @@ fullCanvas.height = 480
 const customWidth = 1280
 const customHeight = 720
 
+window.widescreen = false
+
 const widescreenOn = () => {
-        relativePositioner.style.width = "100%";
-        relativePositioner.style.marginLeft = "0%";
-        gameContainer.style.display = "block";
-        moveLeft.style.justifyContent = "center";
-        chatlog.style.height = "7.5em";
-        musicDiv.style.marginTop = "12em";
-        /* const chat = $(".chatboxPos")
-        chat.detach().appendTo(".canvasContainer")
-        document.getElementById("chatboxP").style = "margin-top: -267px; margin-left: 29px; z-index: 10;"
-        document.getElementById("chatlog").style = "height: 180px; background-color: rgba(0,0,0,0.35);"
-        document.getElementById("justifyChat").style = "justify-content:center; width: 400px;"
-        document.getElementById("chatboxes").style="justify-content:center; margin-top: -20px; width: 400px;"*/
-        gameCanvas.style = "background-image: url('/mmo/assets/canvasBorder169.png'); background-size: 100%; background-repeat: no-repeat; padding: 26px;"
+    relativePositioner.style.width = "100%";
+    relativePositioner.style.marginLeft = "0%";
+    gameContainer.style.display = "block";
+    moveLeft.style.justifyContent = "center";
+    chatlog.style.height = "7.5em";
+    musicDiv.style.marginTop = "12em";
+    /* const chat = $(".chatboxPos")
+    chat.detach().appendTo(".canvasContainer")
+    document.getElementById("chatboxP").style = "margin-top: -267px; margin-left: 29px; z-index: 10;"
+    document.getElementById("chatlog").style = "height: 180px; background-color: rgba(0,0,0,0.35);"
+    document.getElementById("justifyChat").style = "justify-content:center; width: 400px;"
+    document.getElementById("chatboxes").style="justify-content:center; margin-top: -20px; width: 400px;"*/
+    gameCanvas.style = "background-image: url('/mmo/assets/canvasBorder169.png'); background-size: 100%; background-repeat: no-repeat; padding: 26px;"
 
-        gameCanvas.width  = customWidth
-        gameCanvas.height = customHeight
-        fxCanvas.width  = customWidth
-        fxCanvas.height = customHeight
-        textCanvas.width  = customWidth
-        textCanvas.height = customHeight
-        fullCanvas.width  = customWidth
-        fullCanvas.height = customHeight
+    gameCanvas.width  = customWidth
+    gameCanvas.height = customHeight
+    fxCanvas.width  = customWidth
+    fxCanvas.height = customHeight
+    textCanvas.width  = customWidth
+    textCanvas.height = customHeight
+    fullCanvas.width  = customWidth
+    fullCanvas.height = customHeight
 
-        viewport.vscale = [customWidth, customHeight, 0, 0]
-        viewport.vtrans = [0, 0, 0, 0]
+    viewport.vscale = [customWidth, customHeight, 0, 0]
+    viewport.vtrans = [0, 0, 0, 0]
+    set_vp(customWidth / 2, customHeight / 2)
+    window.widescreen = true
 }
 
 const widescreenOff = () => {
-        relativePositioner.style.width = "50%";
-        relativePositioner.style.marginLeft = "15%";
-        gameContainer.style.display = "flex";
-        moveLeft.style.justifyContent = "flex-end";
-        chatlog.style.height = "82%";
-        musicDiv.style.marginTop = "auto";
-        gameCanvas.style = "background-image: url('/mmo/assets/canvasBorder.png'); background-size: 100%; background-repeat: no-repeat; padding: 26px;"
-        /* const chat = $(".chatboxPos")
-        chat.detach().appendTo("#chatboxParent")
-        document.getElementById("chatboxP").style = null
-        document.getElementById("chatlog").style = "margin-bottom: 5px !important;"
-        document.getElementById("justifyChat").style = "justify-content:center"
-        document.getElementById("chatboxes").style="justify-content:center;"*/
-        gameCanvas.width  = 640
-        gameCanvas.height = 480
-        fxCanvas.width  = 640
-        fxCanvas.height = 480
-        textCanvas.width  = 640
-        textCanvas.height = 480
-        fullCanvas.width  = 640
-        fullCanvas.height = 480
+    relativePositioner.style.width = "50%";
+    relativePositioner.style.marginLeft = "15%";
+    gameContainer.style.display = "flex";
+    moveLeft.style.justifyContent = "flex-end";
+    chatlog.style.height = "82%";
+    musicDiv.style.marginTop = "auto";
+    gameCanvas.style = "background-image: url('/mmo/assets/canvasBorder.png'); background-size: 100%; background-repeat: no-repeat; padding: 26px;"
+    /* const chat = $(".chatboxPos")
+    chat.detach().appendTo("#chatboxParent")
+    document.getElementById("chatboxP").style = null
+    document.getElementById("chatlog").style = "margin-bottom: 5px !important;"
+    document.getElementById("justifyChat").style = "justify-content:center"
+    document.getElementById("chatboxes").style="justify-content:center;"*/
+    gameCanvas.width  = 640
+    gameCanvas.height = 480
+    fxCanvas.width  = 640
+    fxCanvas.height = 480
+    textCanvas.width  = 640
+    textCanvas.height = 480
+    fullCanvas.width  = 640
+    fullCanvas.height = 480
 
-        viewport.vscale = [640, 480, 511, 0]
-        viewport.vtrans = [640, 480, 511, 0]
+    viewport.vscale = [640, 480, 511, 0]
+    viewport.vtrans = [640, 480, 511, 0]
+    set_vp(320, 240)
+    window.widescreen = false
 }
 
 window.toggleWidescreen = () => {

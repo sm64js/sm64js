@@ -383,6 +383,6 @@ export const mario_execute_stationary_action = (m) => {
         case Mario.ACT_SLIDE_KICK_SLIDE_STOP: return act_slide_kick_slide_stop(m)
         case Mario.ACT_GROUND_POUND_LAND: return act_ground_pound_land(m)
         case Mario.ACT_BUTT_SLIDE_STOP: return act_butt_slide_stop(m)
-        default: throw "unkown action stationary"
+        default: throw "unknown action stationary"
     }
 }

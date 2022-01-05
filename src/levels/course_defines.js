@@ -1,6 +1,6 @@
 export const COURSE_NONE = 0
 
-export const COURSE_END = 26
+export const COURSE_END = 27
 
 export const COURSE_MAX = COURSE_END - 1
 export const COURSE_COUNT = COURSE_MAX

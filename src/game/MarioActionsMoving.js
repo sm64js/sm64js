@@ -320,7 +320,7 @@ const act_walking = (m) => {
             push_or_sidle_wall(m, startPos);
             m.actionTimer = 0;
             break
-        default: throw "unkown ground step in act_walking"
+        default: throw "unknown ground step in act_walking"
     }
 
     check_ledge_climb_down(m)
@@ -951,7 +951,7 @@ const act_karting = (m) => {
 					break
 				case Mario.AIR_STEP_HIT_LAVA_WALL:
 					break
-				default: throw "unkown air step in act_karting"
+				default: throw "unknown air step in act_karting"
 			}
 		m.marioObj.header.gfx.angle[2] = 0
 		m.marioObj.header.gfx.angle[0] = m.vel[1] * -50.0
@@ -968,7 +968,7 @@ const act_karting = (m) => {
 			case Mario.GROUND_STEP_HIT_WALL:
 				m.forwardVel *= -0.5
 				break
-			default: throw "unkown ground step in act_karting"
+			default: throw "unknown ground step in act_karting"
 		}
 		if (m.actionState == 0) {
 			apply_slope_accel(m)

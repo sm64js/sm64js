@@ -77,8 +77,11 @@ class LevelUpdate {
 
     lvl_set_current_level(arg0, levelNum) {
         Area.gCurrLevelNum = levelNum
-        Area.gCurrCourseNum = gLevelToCourseNumTable[levelNum - 1]
-
+        if (levelNum < 999) {
+            Area.gCurrCourseNum = gLevelToCourseNumTable[levelNum - 1]
+        } else {
+            Area.gCurrCourseNum = gLevelToCourseNumTable[38]
+        }
         // TODO lots of missing code here
 
         return 1
@@ -186,37 +189,37 @@ class LevelUpdate {
             }
     
             if (this.gMarioState.numLives > 100) {
-                this.gMarioState.numLives = 100;
+                this.gMarioState.numLives = 100
             }
     
-            var BUGFIX_MAX_LIVES = false;
+            let BUGFIX_MAX_LIVES = false;
             if (BUGFIX_MAX_LIVES) {
                 if (this.gMarioState.numCoins > 999) {
-                    this.gMarioState.numCoins = 999;
+                    this.gMarioState.numCoins = 999
                 }
         
                 if (this.gHudDisplay.coins > 999) {
-                    this.gHudDisplay.coins = 999;
+                    this.gHudDisplay.coins = 999
                 }
             } else {
                 if (this.gMarioState.numCoins > 999) {
-                    this.gMarioState.numLives = 999; //! Wrong variable
+                    this.gMarioState.numLives = 999 //! Wrong variable
                 }
             }
     
-            this.gHudDisplay.stars = this.gMarioState.numStars;
-            this.gHudDisplay.lives = this.gMarioState.numLives;
-            this.gHudDisplay.keys = this.gMarioState.numKeys;
+            this.gHudDisplay.stars = this.gMarioState.numStars
+            this.gHudDisplay.lives = this.gMarioState.numLives
+            this.gHudDisplay.keys = this.gMarioState.numKeys
 
             if (numHealthWedges > this.gHudDisplay.wedges) {
-                //play_sound(SOUND_MENU_POWER_METER, gDefaultSoundArgs);
+                //play_sound(SOUND_MENU_POWER_METER, gDefaultSoundArgs)
             }
-            this.gHudDisplay.wedges = numHealthWedges;
+            this.gHudDisplay.wedges = numHealthWedges
     
             if (this.gMarioState.hurtCounter > 0) {
-                this.gHudDisplay.flags |= this.HUD_DISPLAY_FLAG_EMPHASIZE_POWER;
+                this.gHudDisplay.flags |= this.HUD_DISPLAY_FLAG_EMPHASIZE_POWER
             } else {
-                this.gHudDisplay.flags &= ~this.HUD_DISPLAY_FLAG_EMPHASIZE_POWER;
+                this.gHudDisplay.flags &= ~this.HUD_DISPLAY_FLAG_EMPHASIZE_POWER
             }
         }
     }

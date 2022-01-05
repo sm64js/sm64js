@@ -142,6 +142,7 @@
                                             <option value="5"> Cool, Cool Mountain </option>
                                             <option value="56"> Cool, Cool Mountain Slide </option>
                                             <option value="27"> Princess's Secret Slide </option>
+                                            <option value="29"> Tower of the Wing Cap</option>
                                             <option value="4"> Big Boo's Haunt </option>
                                             <option value="7"> Hazy Maze Cave </option>
                                             <option value="8"> Shifting Sand Land </option>
@@ -173,9 +174,8 @@
                                 <div>
                                     <label id="playerNameResult" type="text" readonly style="display: none;">Waiting for selection</label>
                                 </div> <!-- If this isn't even used anymore wiy bother hiding it? Does a js reference it or something? -eros -->
-                                
-                                
-                                
+                                <h1 id="fpsMeter">FPS: 0</h1>
+                                <h1 id="pingMeter">Ping 0ms</h1>
                             </div>
                             <!-- End map select -->
 
@@ -339,7 +339,6 @@
                                     <option value="5">7 GRAND DAD</option>
                                     <option value="6">Super Show Mario</option>
                                     <option value="7">Super Show Luigi</option>
-                                    <option value="8">Rainbow Mario</option>
                                 </optgroup>
                             </select>
                             <select id="characterType" style="width:120px; height: 2rem; font-family: 'TextboxFont';" onchange="window.setCharacter(this.value)">

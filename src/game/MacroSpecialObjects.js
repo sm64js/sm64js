@@ -141,7 +141,7 @@ export const spawn_special_objects = (areaIndex, specialObjList, dataIndex) => {
                 const yaw = specialObjList[dataIndex++]
                 spawn_macro_abs_yrot_2params(model, behavior, x, y, z, yaw, 0)
                 break
-            default: throw "unkown special object type"
+            default: throw "unknown special object type"
         }
 
     }

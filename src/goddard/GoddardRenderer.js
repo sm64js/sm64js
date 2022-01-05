@@ -843,7 +843,7 @@ class GoddardRenderer {
                 this.sLightScaleColours[this.sLightId].b = f3
                 break
             default:
-                throw "unkown property type in gd renderer set property"
+                throw "unknown property type in gd renderer set property"
         }
 
     }

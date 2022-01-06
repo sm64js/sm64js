@@ -1,6 +1,6 @@
 import {grass_09005800, } from "../../../../../textures/grass.js"
-import {wf_seg7_texture_07001000, } from "../../../textures.inc.js"
-import {wf_seg7_texture_07000000, } from "../../../textures.inc.js"
+import {wf_seg7_texture_07001000, } from "../../../texture.inc.js"
+import {wf_seg7_texture_07000000, } from "../../../texture.inc.js"
 import {grass_09006800, } from "../../../../../textures/grass.js"
 import {grass_09008000, } from "../../../../../textures/grass.js"
 import {grass_09008800, } from "../../../../../textures/grass.js"

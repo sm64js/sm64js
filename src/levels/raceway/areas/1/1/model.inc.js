@@ -1,7 +1,7 @@
 import * as Gbi from "../../../../../include/gbi"
 
 import { mountain_09004800 as mushroomtop } from "../../../../../textures/mountain"
-import { ttm_seg7_texture_07000800 as mushroombottom } from "../../../../ttm/textures.inc"
+import { ttm_seg7_texture_07000800 as mushroombottom } from "../../../../ttm/texture.inc"
 
 import {
 	concrete_f3d,

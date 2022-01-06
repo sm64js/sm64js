@@ -1,6 +1,6 @@
 import * as Gbi from "../../../../../include/gbi"
 import { generic_09008800 } from "../../../../../textures/generic"
-import { bob_seg7_texture_07000000 } from "../../../textures.inc"
+import { bob_seg7_texture_07000000 } from "../../../texture.inc"
 
 const bob_seg7_vertex_0700A4E0 = [
 	{ pos: [-993, 1690, -2310], flag: 0, tc: [22656, 0], color: [255, 255, 255, 255] },

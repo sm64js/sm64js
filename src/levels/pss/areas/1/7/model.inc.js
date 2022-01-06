@@ -1,5 +1,5 @@
 import * as Gbi from "../../../../../include/gbi"
-import { pss_seg7_texture_07001000 } from "../../../textures.inc.js"
+import { pss_seg7_texture_07001000 } from "../../../texture.inc"
 
 const pss_seg7_lights_0700E348 = Gbi.gdSPDefLights1(
 	    0x3f, 0x3f, 0x3f,

@@ -1,5 +1,5 @@
-import {mountain_0900A000, } from "../../../../../textures/mountain.js"
-import {ttm_seg7_texture_07001000, } from "../../../textures.inc.js"
+import { mountain_0900A000, } from "../../../../../textures/mountain"
+import { ttm_seg7_texture_07001000, } from "../../../texture.inc"
 import * as Gbi from "../../../../../include/gbi"
 const ttm_seg7_vertex_0700ECC8 = [
 	{ pos: [ 262, 151, -248 ], flag: 0, tc: [ -1684, 960 ], color: [ 255, 255, 255, 255 ] },

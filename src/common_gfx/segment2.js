@@ -1,8 +1,18 @@
 import * as Gbi from "../include/gbi"
 
-const canvas = document.querySelector('#gameCanvas')
+import {
+    gdSPDefLights1, gsSPVertex, gsSP2Triangles, gsSP1Triangle, gsSPEndDisplayList,
+    gsSPDisplayList, gsSPLight, gsDPPipeSync, gsDPSetCombineMode, gsSPClearGeometryMode,
+    gsDPSetTile, gsSPTexture, gsDPTileSync, gsDPSetTileSize, gsSPSetGeometryMode,
+    gsDPSetTextureImage, gsDPLoadSync, gsDPLoadBlock, gsDPSetAlphaCompare, gsDPSetEnvColor,
+    gsDPLoadTextureBlock,
+    G_CC_DECALRGBA, G_LIGHTING, G_CULL_BACK, G_IM_FMT_RGBA, G_IM_SIZ_16b, G_TX_LOADTILE,
+    G_TX_WRAP, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_RENDERTILE, G_ON, G_TX_CLAMP,
+    G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADE, G_CC_BLENDRGBFADEA, CALC_DXT, G_IM_SIZ_16b_BYTES,
+    G_CC_SHADEFADEA, G_AC_NONE, G_TEXTURE_GEN, G_CC_MODULATERGBFADE, G_CC_DECALFADEA
+} from "../include/gbi"
 
-export const texture_shadow_quarter_circle = []
+const canvas = document.querySelector('#gameCanvas')
 
 export const matrix_identity = [
     [1.0, 0.0, 0.0, 0.0],
@@ -37,21 +47,25 @@ export const texture_hud_char_F = []
 export const texture_hud_char_G = []
 export const texture_hud_char_H = []
 export const texture_hud_char_I = []
+export const texture_hud_char_J = []
 export const texture_hud_char_K = []
 export const texture_hud_char_L = []
 export const texture_hud_char_M = []
 export const texture_hud_char_N = []
 export const texture_hud_char_O = []
 export const texture_hud_char_P = []
+export const texture_hud_char_Q = []
 export const texture_hud_char_R = []
 export const texture_hud_char_S = []
 export const texture_hud_char_T = []
 export const texture_hud_char_U = []
+export const texture_hud_char_V = []
 export const texture_hud_char_W = []
+export const texture_hud_char_X = []
 export const texture_hud_char_Y = []
+export const texture_hud_char_Z = []
 export const texture_hud_char_apostrophe = []
 export const texture_hud_char_double_quote = []
-export const texture_hud_char_question = []
 export const texture_hud_char_multiply = []
 export const texture_hud_char_coin = []
 export const texture_hud_char_mario_head = []
@@ -122,6 +136,8 @@ export const texture_hud_char_luigi_head = [
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 ]
 export const texture_hud_char_star = []
+export const texture_hud_char_decimal_point = []
+export const texture_hud_char_beta_key = []
 export const texture_credits_char_3 = []
 export const texture_credits_char_4 = []
 export const texture_credits_char_6 = []
@@ -152,9 +168,6 @@ export const texture_credits_char_X = []
 export const texture_credits_char_Y = []
 export const texture_credits_char_Z = []
 export const texture_credits_char_period = []
-export const texture_font_char_jp_long_vowel = []
-export const texture_font_char_eu_colon = []
-export const texture_font_char_EU_slash = []
 export const texture_font_char_us_0 = []
 export const texture_font_char_us_1 = []
 export const texture_font_char_us_2 = []
@@ -252,186 +265,16 @@ export const texture_hud_char_lakitu = []
 export const texture_hud_char_no_camera = []
 export const texture_hud_char_arrow_up = []
 export const texture_hud_char_arrow_down = []
-
-
-export const main_hud_camera_lut = [
-	texture_hud_char_camera, texture_hud_char_mario_head, texture_hud_char_lakitu, texture_hud_char_no_camera,
-	texture_hud_char_arrow_up, texture_hud_char_arrow_down,
-];
-
-
-export const main_hud_lut = [
-	texture_hud_char_0, texture_hud_char_1, texture_hud_char_2, texture_hud_char_3,
-	texture_hud_char_4, texture_hud_char_5, texture_hud_char_6, texture_hud_char_7,
-	texture_hud_char_8, texture_hud_char_9, texture_hud_char_A, texture_hud_char_B,
-	texture_hud_char_C, texture_hud_char_D, texture_hud_char_E, texture_hud_char_F,
-	texture_hud_char_G, texture_hud_char_H, texture_hud_char_I, 0x0,
-	texture_hud_char_K, texture_hud_char_L, texture_hud_char_M, texture_hud_char_N,
-	texture_hud_char_O, texture_hud_char_P, 0x0, texture_hud_char_R,
-	texture_hud_char_S, texture_hud_char_T, texture_hud_char_U, 0x0,
-	texture_hud_char_W, 0x0, texture_hud_char_Y, 0x0,
-	0x0, 0x0, 0x0, 0x0,
-	0x0, 0x0, 0x0, 0x0,
-	0x0, 0x0, 0x0, 0x0,
-	0x0, 0x0, texture_hud_char_multiply, texture_hud_char_coin,
-	texture_hud_char_mario_head, texture_hud_char_star, 0x0, 0x0,
-	texture_hud_char_apostrophe, texture_hud_char_double_quote,
-	texture_hud_char_luigi_head
-];
-
-
-
-export const dl_hud_img_begin = function () {
-	var result = [
-		// Gbi.gsDPPipeSync(),
-		Gbi.gsDPSetCycleType(Gbi.G_CYC_COPY),
-		// Gbi.gsDPSetTexturePersp(Gbi.G_TP_NONE),
-		// Gbi.gsDPSetAlphaCompare(Gbi.G_AC_THRESHOLD),
-		// Gbi.gsDPSetBlendColor(255, 255, 255, 255),
-	];
-
-	result.push(Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_XLU_SURF_SURF2));
-
-	result.push(Gbi.gsSPEndDisplayList());
-
-	return result;
-}();
-
-export const dl_hud_img_end = function () {
-	var result = [
-		// Gbi.gsDPPipeSync(),
-		// Gbi.gsDPSetTexturePersp(Gbi.G_TP_PERSP),
-		Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF_SURF2),
-		// Gbi.gsDPSetAlphaCompare(Gbi.G_AC_NONE)
-	];
-
-	Gbi.gsDPSetCycleType(Gbi.G_CYC_1CYCLE);
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF);
-
-	result.push(Gbi.gsSPEndDisplayList());
-
-	return result;
-}();
-
-export const dl_hud_img_load_tex_block = [
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 4, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 4, Gbi.G_TX_NOLOD),
-	// Gbi.gsDPLoadSync(),
-	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 16 * 16 - 1),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 4, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 4, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 4, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (16 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (16 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPEndDisplayList(),
-];
-
-export const dl_proj_mtx_fullscreen = [
-    Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING),
-    Gbi.gsSPMatrix(matrix_identity, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH),
-    Gbi.gsSPMatrix(matrix_fullscreen, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_MUL | Gbi.G_MTX_NOPUSH),
-    Gbi.gsSPMatrix(matrix_identity, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH),
-    Gbi.gsSPEndDisplayList()
-]
-
-export const dl_transition_draw_filled_region = [
-	...Gbi.gsSP2Triangles( 0,  4,  1, 0x0,  1,  4,  5, 0x0),
-	...Gbi.gsSP2Triangles( 1,  5,  2, 0x0,  2,  5,  6, 0x0),
-	...Gbi.gsSP2Triangles( 2,  6,  7, 0x0,  2,  7,  3, 0x0),
-	...Gbi.gsSP2Triangles( 3,  4,  0, 0x0,  3,  7,  4, 0x0),
-	Gbi.gsSPEndDisplayList()
-]
-
-export const dl_screen_transition_end = [
-	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsDPSetRenderMode(Gbi.G_RM_OPA_SURF_SURF2),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const dl_shadow_begin = [
-	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATEIA),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsSPEndDisplayList()
-]
-
-export const dl_shadow_circle = [
-	Gbi.gsSPDisplayList(dl_shadow_begin),
-	...Gbi.gsDPLoadTextureBlock(texture_shadow_quarter_circle, Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_8b, 16, 16, 0,
-		Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, 4, 4, Gbi.G_TX_NOLOD,
-		Gbi.G_TX_NOLOD),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const dl_shadow_9_verts = [
-	...Gbi.gsSP2Triangles(0, 3, 4, 0x0, 0, 4, 1, 0x0),
-	...Gbi.gsSP2Triangles(1, 4, 2, 0x0, 2, 4, 5, 0x0),
-	...Gbi.gsSP2Triangles(3, 6, 4, 0x0, 4, 6, 7, 0x0),
-	...Gbi.gsSP2Triangles(4, 7, 8, 0x0, 4, 8, 5, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const dl_shadow_4_verts = [
-	...Gbi.gsSP2Triangles(0, 2, 1, 0x0, 1, 2, 3, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const dl_shadow_end = [
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const dl_draw_quad_verts_0123 = [
-	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const dl_skybox_begin = [
-	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGB),
-	Gbi.gsSPMatrix(matrix_identity, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const dl_skybox_tile_tex_settings = [
-	Gbi.gsSPMatrix(matrix_identity, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const dl_skybox_end = [
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const dl_waterbox_rgba16_begin = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGBA),
-	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const dl_waterbox_ia16_begin = [
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATEIA),
-	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsDPSetTile(Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD),
-	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
-	Gbi.gsSPEndDisplayList(),
-]
-
-export const dl_waterbox_end = [
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsSPEndDisplayList(),
-]
-
+export const texture_ia8_up_arrow = []
+export const texture_shadow_quarter_circle = []
+export const texture_shadow_quarter_square = []
+export const texture_transition_bowser_half = []
+export const texture_transition_circle_half = []
+export const texture_transition_mario = []
+export const texture_transition_star_half = []
+export const texture_waterbox_jrb_water = []
+export const texture_waterbox_mist = []
+export const texture_waterbox_unknown_water = []
 export const texture_waterbox_water = []
 export const texture_waterbox_lava = []
 export const texture_waterbox_tealwater = [
@@ -693,5 +536,318 @@ export const texture_waterbox_tealwater = [
 	0x3e, 0x37, 0x4e, 0xbb, 0x3d, 0xf7, 0x2d, 0xb7, 
 ]
 
-export const texture_transition_star_half = []
+// 0x0200EFB0 - 0x0200EFF0
+const vertex_billboard_num = [
+    [[   -32,    -32,      0], 0, [     0,   1024], [0xff, 0xff, 0xff, 0xff]],
+    [[    32,    -32,      0], 0, [  1024,   1024], [0xff, 0xff, 0xff, 0xff]],
+    [[    32,     32,      0], 0, [  1024,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[   -32,     32,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+];
 
+// 0x0200EFF0 - 0x0200F038
+export const dl_billboard_num_begin = [
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
+    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
+    gsSPTexture(0x8000, 0x8000, 0, G_TX_RENDERTILE, G_ON),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 4, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 4, G_TX_NOLOD, G_TX_CLAMP, 4, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (16 - 1) << G_TEXTURE_IMAGE_FRAC, (16 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F038 - 0x0200F078
+export const dl_billboard_num_end = [
+    gsSPVertex(vertex_billboard_num, 4, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    gsSPTexture(0x8000, 0x8000, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPSetGeometryMode(G_LIGHTING),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F078 - 0x0200F0A8
+export const dl_billboard_num_0 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_0),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F0A8 - 0x0200F0D8
+export const dl_billboard_num_1 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_1),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F0D8 - 0x0200F108
+export const dl_billboard_num_2 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_2),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F108 - 0x0200F138
+export const dl_billboard_num_3 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_3),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F138 - 0x0200F168
+export const dl_billboard_num_4 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_4),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F168 - 0x0200F198
+export const dl_billboard_num_5 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_5),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F198 - 0x0200F1C8
+export const dl_billboard_num_6 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_6),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F1C8 - 0x0200F1F8
+export const dl_billboard_num_7 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_7),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F1F8 - 0x0200F228
+export const dl_billboard_num_8 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_8),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+// 0x0200F228 - 0x0200F258
+export const dl_billboard_num_9 = [
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_9),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+];
+
+export const main_hud_camera_lut = [
+	texture_hud_char_camera, texture_hud_char_mario_head, texture_hud_char_lakitu, texture_hud_char_no_camera,
+	texture_hud_char_arrow_up, texture_hud_char_arrow_down,
+];
+
+
+export const main_hud_lut = [
+	texture_hud_char_0, texture_hud_char_1, texture_hud_char_2, texture_hud_char_3,
+	texture_hud_char_4, texture_hud_char_5, texture_hud_char_6, texture_hud_char_7,
+	texture_hud_char_8, texture_hud_char_9, texture_hud_char_A, texture_hud_char_B,
+	texture_hud_char_C, texture_hud_char_D, texture_hud_char_E, texture_hud_char_F,
+	texture_hud_char_G, texture_hud_char_H, texture_hud_char_I, 0x0,
+	texture_hud_char_K, texture_hud_char_L, texture_hud_char_M, texture_hud_char_N,
+	texture_hud_char_O, texture_hud_char_P, 0x0, texture_hud_char_R,
+	texture_hud_char_S, texture_hud_char_T, texture_hud_char_U, 0x0,
+	texture_hud_char_W, 0x0, texture_hud_char_Y, 0x0,
+	0x0, 0x0, 0x0, 0x0,
+	0x0, 0x0, 0x0, 0x0,
+	0x0, 0x0, 0x0, 0x0,
+	0x0, 0x0, texture_hud_char_multiply, texture_hud_char_coin,
+	texture_hud_char_mario_head, texture_hud_char_star, 0x0, 0x0,
+	texture_hud_char_apostrophe, texture_hud_char_double_quote,
+	texture_hud_char_luigi_head
+];
+
+
+
+export const dl_hud_img_begin = function () {
+	var result = [
+		// Gbi.gsDPPipeSync(),
+		Gbi.gsDPSetCycleType(Gbi.G_CYC_COPY),
+		// Gbi.gsDPSetTexturePersp(Gbi.G_TP_NONE),
+		// Gbi.gsDPSetAlphaCompare(Gbi.G_AC_THRESHOLD),
+		// Gbi.gsDPSetBlendColor(255, 255, 255, 255),
+	];
+
+	result.push(Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_XLU_SURF_SURF2));
+
+	result.push(Gbi.gsSPEndDisplayList());
+
+	return result;
+}();
+
+export const dl_hud_img_end = function () {
+	var result = [
+		// Gbi.gsDPPipeSync(),
+		// Gbi.gsDPSetTexturePersp(Gbi.G_TP_PERSP),
+		Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF_SURF2),
+		// Gbi.gsDPSetAlphaCompare(Gbi.G_AC_NONE)
+	];
+
+	Gbi.gsDPSetCycleType(Gbi.G_CYC_1CYCLE);
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF);
+
+	result.push(Gbi.gsSPEndDisplayList());
+
+	return result;
+}();
+
+export const dl_hud_img_load_tex_block = [
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 4, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 4, Gbi.G_TX_NOLOD),
+	// Gbi.gsDPLoadSync(),
+	Gbi.gsDPLoadBlock(Gbi.G_TX_LOADTILE, 0, 0, 16 * 16 - 1),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 4, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 4, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 4, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (16 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (16 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsSPEndDisplayList(),
+];
+
+export const dl_proj_mtx_fullscreen = [
+    Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING),
+    Gbi.gsSPMatrix(matrix_identity, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH),
+    Gbi.gsSPMatrix(matrix_fullscreen, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_MUL | Gbi.G_MTX_NOPUSH),
+    Gbi.gsSPMatrix(matrix_identity, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH),
+    Gbi.gsSPEndDisplayList()
+]
+
+export const dl_transition_draw_filled_region = [
+	...Gbi.gsSP2Triangles( 0,  4,  1, 0x0,  1,  4,  5, 0x0),
+	...Gbi.gsSP2Triangles( 1,  5,  2, 0x0,  2,  5,  6, 0x0),
+	...Gbi.gsSP2Triangles( 2,  6,  7, 0x0,  2,  7,  3, 0x0),
+	...Gbi.gsSP2Triangles( 3,  4,  0, 0x0,  3,  7,  4, 0x0),
+	Gbi.gsSPEndDisplayList()
+]
+
+export const dl_screen_transition_end = [
+	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+	Gbi.gsDPSetRenderMode(Gbi.G_RM_OPA_SURF_SURF2),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_shadow_begin = [
+	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATEIA),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsSPEndDisplayList()
+]
+
+export const dl_shadow_circle = [
+	Gbi.gsSPDisplayList(dl_shadow_begin),
+	...Gbi.gsDPLoadTextureBlock(texture_shadow_quarter_circle, Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_8b, 16, 16, 0,
+		Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, 4, 4, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_shadow_square = [
+    Gbi.gsSPDisplayList(dl_shadow_begin),
+    ...Gbi.gsDPLoadTextureBlock(texture_shadow_quarter_square, Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_8b, 16, 16, 0,
+        Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, 4, 4, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
+    Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_shadow_9_verts = [
+	...Gbi.gsSP2Triangles(0, 3, 4, 0x0, 0, 4, 1, 0x0),
+	...Gbi.gsSP2Triangles(1, 4, 2, 0x0, 2, 4, 5, 0x0),
+	...Gbi.gsSP2Triangles(3, 6, 4, 0x0, 4, 6, 7, 0x0),
+	...Gbi.gsSP2Triangles(4, 7, 8, 0x0, 4, 8, 5, 0x0),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_shadow_4_verts = [
+	...Gbi.gsSP2Triangles(0, 2, 1, 0x0, 1, 2, 3, 0x0),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_shadow_end = [
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_draw_quad_verts_0123 = [
+	...Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_skybox_begin = [
+	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGB),
+	Gbi.gsSPMatrix(matrix_identity, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_skybox_tile_tex_settings = [
+	Gbi.gsSPMatrix(matrix_identity, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_skybox_end = [
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_waterbox_rgba16_begin = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATERGBA),
+	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_waterbox_ia16_begin = [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_MODULATEIA),
+	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
+	Gbi.gsDPSetTile(Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_16b, 8, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, 5, Gbi.G_TX_NOLOD),
+	Gbi.gsDPSetTileSize(0, 0, 0, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (32 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC),
+	Gbi.gsSPEndDisplayList(),
+]
+
+export const dl_waterbox_end = [
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
+	Gbi.gsSPEndDisplayList(),
+]

@@ -1,5 +1,5 @@
-import {ttm_seg7_texture_07000800, } from "../../../textures.inc.js"
-import {mountain_09004800, } from "../../../../../textures/mountain.js"
+import { ttm_seg7_texture_07000800, } from "../../../texture.inc"
+import { mountain_09004800, } from "../../../../../textures/mountain"
 import * as Gbi from "../../../../../include/gbi"
 const ttm_seg7_lights_0700A340 = Gbi.gdSPDefLights1(
 	    0x7f, 0x7f, 0x7f,

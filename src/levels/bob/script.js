@@ -8,7 +8,7 @@ import { MODEL_BOB_BUBBLY_TREE, MODEL_CASTLE_GROUNDS_FLAG, MODEL_BOB_SEESAW_PLAT
 import { script_func_global_1, script_func_global_15 } from "../global_scripts"
 import { bob_geo_000458 } from "./seesaw_platform/geo.inc"
 import { castle_grounds_geo_000660 } from "../castle_grounds/areas/1/11/geo.inc"
-import { bob_seg7_macro_objs } from "./areas/1/macro.inc"
+// import { bob_seg7_macro_objs } from "./areas/1/macro.inc"
 
 const load_one_flag = [
     { command: LevelCommands.place_object, args: [/*acts?*/ 0x1F, /*model*/ MODEL_CASTLE_GROUNDS_FLAG, /*pos*/ -3213, 3348, -3011, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving] },
@@ -34,7 +34,7 @@ export const level_bob_entry = [
     { command: LevelCommands.jump_link, args: [load_one_flag] }, 
     { command: LevelCommands.jump_link, args: [script_func_local_1] }, 
     { command: LevelCommands.terrain, args: [bob_seg7_collision_level] },
-    { command: LevelCommands.macro_objects, args: [bob_seg7_macro_objs] },
+    // { command: LevelCommands.macro_objects, args: [bob_seg7_macro_objs] },
     { command: LevelCommands.end_area },
     { command: LevelCommands.set_mario_pos, args: [1, 135, -6558, 0, 6464] },
     { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_or_update, LevelUpdate] },

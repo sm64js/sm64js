@@ -228,7 +228,7 @@ class Hud {
 
     render_hud_coins() {
         Print.print_text(window.widescreen ? 368 : 168, this.HUD_TOP_Y, "+") // 'Coin' glyph
-        Print.print_text(window.widescreen ? 184 : 184, this.HUD_TOP_Y, "*") // 'X' glyph
+        Print.print_text(window.widescreen ? 384 : 184, this.HUD_TOP_Y, "*") // 'X' glyph
         Print.print_text_fmt_int(window.widescreen ? 398: 198, this.HUD_TOP_Y, "%d", LevelUpdate.gHudDisplay.coins)
     }
 

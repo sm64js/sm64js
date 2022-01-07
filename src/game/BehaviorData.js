@@ -878,6 +878,17 @@ export const bhvCoinSparkles = [
     { command: BhvCmds.deactivate }
 ]
 
+export const bhvCollisionObj = (col) => {
+    return [
+        { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SURFACE } },
+        { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
+        { command: BhvCmds.load_collision_data, args: { data: col } },
+        { command: BhvCmds.begin_loop },
+            { command: BhvCmds.call_native, args: { func: SurfaceLoad.load_object_collision_model, funcClass: SurfaceLoad } },
+        { command: BhvCmds.end_loop },
+    ]
+}
+
 const bhvBowser = []
 
 gLinker.behaviors = {

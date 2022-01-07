@@ -1293,8 +1293,26 @@ import { spooky_09000000,
     spooky_0900A000,
     spooky_0900A800,
     spooky_0900B000,
-    spooky_0900B800 } from "./textures/spooky"
+    spooky_0900B800 
+} from "./textures/spooky"
 
+import { 
+    sky_09000000,
+    sky_09000800,
+    sky_09001000,
+    sky_09001800,
+    sky_09002000,
+    sky_09003000,
+    sky_09003800,
+    sky_09004800,
+    sky_09005000,
+    sky_09005800,
+    sky_09006000,
+    texture_metal_hole,
+    sky_09007000,
+    sky_09007800,
+    sky_09008000
+} from "./textures/sky"
 
 export const loadDataIntoGame = (data) => {
 
@@ -2565,6 +2583,22 @@ export const loadDataIntoGame = (data) => {
     spooky_0900B000.push(...data["textures/spooky/bbh_textures.0B000.ia16.png"])
     spooky_0900B800.push(...data["textures/spooky/bbh_textures.0B800.ia16.png"])
 
+    sky_09000000.push(...data["textures/sky/rr_textures.00000.rgba16.png"])
+    sky_09000800.push(...data["textures/sky/rr_textures.00800.rgba16.png"])
+    sky_09001000.push(...data["textures/sky/rr_textures.01000.rgba16.png"])
+    sky_09001800.push(...data["textures/sky/rr_textures.01800.rgba16.png"])
+    sky_09002000.push(...data["textures/sky/rr_textures.02000.rgba16.png"])
+    sky_09003000.push(...data["textures/sky/rr_textures.03000.rgba16.png"])
+    sky_09003800.push(...data["textures/sky/rr_textures.03800.rgba16.png"])
+    sky_09004800.push(...data["textures/sky/rr_textures.04800.rgba16.png"])
+    sky_09005000.push(...data["textures/sky/rr_textures.05000.rgba16.png"])
+    sky_09005800.push(...data["textures/sky/rr_textures.05800.rgba16.png"])
+    sky_09006000.push(...data["textures/sky/rr_textures.06000.rgba16.png"])
+    texture_metal_hole.push(...data["textures/sky/metal_hole.rgba16.png"])
+    sky_09007000.push(...data["textures/sky/rr_textures.07000.rgba16.png"])
+    sky_09007800.push(...data["textures/sky/rr_textures.07800.rgba16.png"])
+    sky_09008000.push(...data["textures/sky/rr_textures.08000.rgba16.png"])
+
     const skyboxes = [
         [bbh_skybox_texture,         "bbh_skybox_texture"],
         [bidw_skybox_texture,        "bidw_skybox_texture"],
@@ -2589,7 +2623,7 @@ export const loadDataIntoGame = (data) => {
     }
 
     document.getElementById('romSelect').hidden = true
-    msgElement.innerHTML = "Rom Asset Extraction Success - You may now start the game"
+    msgElement.innerHTML = "Rom Asset Extraction Success"
     msgElement.style = "color:#00ff00"
     document.getElementById("startbutton").disabled = false
     loadedGameAssets = true

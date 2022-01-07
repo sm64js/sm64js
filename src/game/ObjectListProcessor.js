@@ -352,7 +352,7 @@ class ObjectListProcessor {
                 object.respawnInfo = spawnInfo.behaviorArg
 
                 if (spawnInfo.behaviorArg & 0x01) { // Is mario
-                    if (this.totalMarios != 0) throw "ERROR, only 1 mario should be initialized here"
+                    if (this.totalMarios != 0) console.log("ERROR, only 1 mario should be initialized here")
                     this.totalMarios++
                     this.gMarioObject = object
                     this.gMarioObject.localMario = true

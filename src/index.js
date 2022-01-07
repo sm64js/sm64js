@@ -346,7 +346,7 @@ document.getElementById("acceptRules").addEventListener('click', () => {
 
 window.deleteRom = () => {
     IDB.del('assets')
-    window.location.reload()
+    window.location.href = window.location.href.replace("?autostart=1", "")
 }
 
 window.reloadPage = () => { //Reload the page after a bit so the assets can get extracted first

@@ -1380,7 +1380,7 @@ const update_mario_geometry_inputs = (m) => {
         mario_basic_lava(m)
 
         if (m.floor.type == 0x0004 && !(m.input & INPUT_OFF_FLOOR && m.health > 0xFF)) {
-            if (Area.gCurrLevelNum != 1001) { m.vel[1] = 200 } else { m.vel[1] = 240 }
+            if (Area.gCurrLevelNum != 29) { m.vel[1] = 200 } else { m.vel[1] = 240 }
             set_mario_action(m, ACT_PARACHUTING, 0)
         }
     }

@@ -176,6 +176,11 @@ class LevelCommands {
         }
     }
 
+    reset_call_loop(args) {
+        this.callLoopFrameCounter = 0
+        this.sCurrentScript.index++
+    }
+
     alloc_level_pool() {
         //console.log("alloc level pool")
         this.sCurrentScript.index++

@@ -11,19 +11,24 @@ import { MODEL_NONE,
     MODEL_BUBBLE,
     MODEL_BOB_BUBBLY_TREE,
     MODEL_MIST,
-    MODEL_WHITE_PUFF                    } from "../../include/model_ids"
+    MODEL_WHITE_PUFF,                    
+    MODEL_CASTLE_GROUNDS_CASTLE_DOOR,
+    MODEL_CASTLE_GROUNDS_METAL_DOOR} from "../../include/model_ids"
 
 import { bhvMario,
     bhvCastleFlagWaving,
     bhvManyBlueFishSpawner,
     bhvButterfly,
     bhvWaterMist2,
-    bhvMoatGrills                       } from "../../game/BehaviorData"
+    bhvMoatGrills,
+    bhvCollisionObj                          } from "../../game/BehaviorData"
 
 import { castle_grounds_geo_00073C           } from "./areas/1/geo"
 import { castle_grounds_geo_0006F4           } from "./areas/1/3/geo.inc"
 import { castle_grounds_geo_000660           } from "./areas/1/11/geo.inc"
 import { bubbly_tree_geo                     } from "../../actors/tree/geo.inc"
+import { castle_door_geo, metal_door_geo                     } from "../../actors/door/geo.inc"
+import { door_seg3_collision_0301CE78        } from "../../actors/warp_collision/collision.inc"
 import { castle_grounds_seg7_collision_level } from "./areas/1/collision.inc"
 
 const script_func_local_2 = [
@@ -78,17 +83,29 @@ const script_func_local_4 = [
     ['RETURN']
 ]
 
+// doors
+const script_func_local_5 = [
+    ['OBJECT', /*model*/ MODEL_CASTLE_GROUNDS_METAL_DOOR, /*pos*/ 3292, -506, -2931, /*angle*/ 0, 225, 0, /*behParam*/ 0x0002000, /*beh*/ bhvCollisionObj(door_seg3_collision_0301CE78)],
+    ['OBJECT', /*model*/ MODEL_CASTLE_GROUNDS_CASTLE_DOOR, /*pos*/ -76, 803, -3155, /*angle*/ 0, 0, 0, /*behParam*/ 0x0000000, /*beh*/ bhvCollisionObj(door_seg3_collision_0301CE78)],
+    ['OBJECT', /*model*/ MODEL_CASTLE_GROUNDS_CASTLE_DOOR, /*pos*/ 77, 803, -3155, /*angle*/ 0, 180, 0, /*behParam*/ 0x0001000, /*beh*/ bhvCollisionObj(door_seg3_collision_0301CE78)],
+    ['RETURN']
+]
+
 export const level_castle_grounds_entry = [
     ['INIT_LEVEL'],
     ['MARIO', MODEL_MARIO, 1, bhvMario],
     ['LOAD_MODEL_FROM_GEO', MODEL_LEVEL_GEOMETRY_03,    castle_grounds_geo_0006F4],
     ['LOAD_MODEL_FROM_GEO', MODEL_BOB_BUBBLY_TREE,      bubbly_tree_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_FLAG,  castle_grounds_geo_000660],
+    ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_CASTLE_DOOR, castle_door_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_METAL_DOOR, metal_door_geo],
+    // ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_VCUTM_GRILL, castle_grounds_geo_00070C]
     ['AREA', 1, castle_grounds_geo_00073C],
         //['JUMP_LINK', script_func_local_1],
         ['JUMP_LINK', script_func_local_2],
         ['JUMP_LINK', script_func_local_3],
         ['JUMP_LINK', script_func_local_4],
+        ['JUMP_LINK', script_func_local_5],
         ['TERRAIN', castle_grounds_seg7_collision_level],
     ['END_AREA'],
     ['MARIO_POS', 1, 180, -1328, 260, 4664],

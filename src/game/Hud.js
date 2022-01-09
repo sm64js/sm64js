@@ -304,7 +304,7 @@ class Hud {
                 this.render_hud_tex_lut(x + 16, y, cameraLUT[this.GLYPH_CAM_FIXED]);
                 break;
         }
-
+        this.render_hud_tex_lut(x + 16, y, cameraLUT[this.GLYPH_CAM_LAKITU_HEAD]); // temp fix
         switch (this.sCameraHUD.status & Camera.CAM_STATUS_C_MODE_GROUP) {
             case Camera.CAM_STATUS_C_DOWN:
                 this.render_hud_small_tex_lut(x + 4, y + 16, cameraLUT[this.GLYPH_CAM_ARROW_DOWN]);

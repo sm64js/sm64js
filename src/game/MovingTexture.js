@@ -1,4 +1,5 @@
 import { GEO_CONTEXT_RENDER } from "../engine/graph_node"
+import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { castle_grounds_movtex_water, castle_grounds_movtex_tris_waterfall, castle_grounds_dl_waterfall } from "../levels/castle_grounds/areas/1/movtext.inc"
 import { ccm_movtex_penguin_puddle_water } from "../levels/ccm/areas/1/movtext.inc"

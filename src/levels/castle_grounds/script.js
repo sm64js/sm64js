@@ -25,11 +25,13 @@ import { bhvMario,
 
 import { castle_grounds_geo_00073C           } from "./areas/1/geo"
 import { castle_grounds_geo_0006F4           } from "./areas/1/3/geo.inc"
+import { castle_grounds_geo_00070C           } from "./areas/1/7/geo.inc"
 import { castle_grounds_geo_000660           } from "./areas/1/11/geo.inc"
 import { bubbly_tree_geo                     } from "../../actors/tree/geo.inc"
 import { castle_door_geo, metal_door_geo                     } from "../../actors/door/geo.inc"
 import { door_seg3_collision_0301CE78        } from "../../actors/warp_collision/collision.inc"
 import { castle_grounds_seg7_collision_level } from "./areas/1/collision.inc"
+import { castle_grounds_seg7_macro_objs      } from "./areas/1/macro.inc"
 
 const script_func_local_2 = [
     // ['OBJECT', /*model*/ MODEL_NONE,                        /*pos*/ -5812,  100, -5937, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvWaterfallSoundLoop],
@@ -99,7 +101,7 @@ export const level_castle_grounds_entry = [
     ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_FLAG,  castle_grounds_geo_000660],
     ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_CASTLE_DOOR, castle_door_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_METAL_DOOR, metal_door_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_VCUTM_GRILL, castle_grounds_geo_00070C]
+    ['LOAD_MODEL_FROM_GEO', MODEL_CASTLE_GROUNDS_VCUTM_GRILL, castle_grounds_geo_00070C],
     ['AREA', 1, castle_grounds_geo_00073C],
         //['JUMP_LINK', script_func_local_1],
         ['JUMP_LINK', script_func_local_2],
@@ -107,6 +109,7 @@ export const level_castle_grounds_entry = [
         ['JUMP_LINK', script_func_local_4],
         ['JUMP_LINK', script_func_local_5],
         ['TERRAIN', castle_grounds_seg7_collision_level],
+        ['MACRO_OBJECTS', castle_grounds_seg7_macro_objs],
     ['END_AREA'],
     ['MARIO_POS', 1, 180, -1328, 260, 4664],
     ['CALL', 0, LevelUpdate.lvl_init_or_update, LevelUpdate],

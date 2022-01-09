@@ -62,6 +62,7 @@ class LevelCommands {
     OBJECT(model, x, y, z, pitch, yaw, rot, bharg, bhscript) {return this.place_object(0x1F, model, x, y, z, pitch, yaw, rot, bharg, bhscript)}
     RETURN() {return this.return()}  // heh
     TERRAIN(data) {return this.terrain(data)}
+    MACRO_OBJECTS(data) {return this.macro_objects(data)}
 
     LOAD_MIO0() {this.sCurrentScript.index++}
     LOAD_RAW() {this.sCurrentScript.index++}

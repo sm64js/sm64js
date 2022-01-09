@@ -8,11 +8,12 @@ import { dist_between_objects,
     cur_obj_scale,
     cur_obj_hide,
     cur_obj_move_xz_using_fvel_and_yaw,
+    cur_obj_has_behavior,
     spawn_water_droplet                 } from "../game/ObjectHelpers"
 import { s16,
     s32,
     random_float } from "../utils"
-// import * as BehaviorData from "../game/BehaviorData"
+import { gLinker } from "../game/Linker"
 
 const obj_and_int = (object, field, value) => { object.rawData[field] &= s32(value) }
 
@@ -23,39 +24,6 @@ class BehaviorCommands {
         this.BHV_PROC_BREAK    = 1
     }
 
-    ADD_INT(args) {return this.add_int({field: args[0], value: args[1]})}
-    ADD_FLOAT(args) {return this.add_number({field: args[0], value: args[1]})}
-    BEGIN(args) {return this.begin()}
-    BEGIN_LOOP(args) {return this.begin_loop()}
-    BEGIN_REPEAT(args) {return this.begin_repeat({count: args[0]})}
-    BILLBOARD(args) {return this.billboard()}
-    CALL(args) {return this.call({script: args[0]})}
-    CALL_NATIVE(args) {return this.call_native({func: args[0], funcClass: args[1]})}
-    DEACTIVATE(args) {return this.deactivate()}
-    DELAY(args) {return this.delay({num: args[0]})}
-    DELAY_VAR(args) {return this.delay_var({var: args[0]})}
-    DISABLE_RENDERING(args) {return this.disable_rendering()}
-    DROP_TO_FLOOR(args) {return this.drop_to_floor()}
-    END_LOOP(args) {return this.end_loop()}
-    END_REPEAT(args) {return this.end_repeat()}
-    END_REPEAT_CONTINUE(args) {return this.end_repeat_continue()}
-    GOTO(args) {return this.goto({script: args[0], index: args[1]})}
-    LOAD_ANIMATIONS(args) {return this.load_animations({field: args[0], anims: args[1]})}
-    LOAD_COLLISION_DATA(args) {return this.load_collision_data({data: args[0]})}
-    OR_INT(args) {return this.or_int({field: args[0], value: args[1]})}
-    PARENT_BIT_CLEAR(args) {return this.parent_bit_clear({field: args[0], value: args[1]})}
-    RETURN(args) {return this.return()}
-    SCALE(args) {return this.scale({percent: args[1]})}
-    SET_FLOAT(args) {return this.set_objectData_value({field: args[0], value: args[1]})}
-    SET_HOME(args) {return this.set_home()}
-    SET_INT(args) {return this.set_int({field: args[0], value: args[1]})}
-    SET_INTERACT_TYPE(args) {return this.set_interact_type({type: args[0]})}
-    SET_RANDOM_INT(args) {return this.set_random_int({field: args[0], minimum: args[1], range: args[2]})}
-    SET_RANDOM_FLOAT(args) {return this.set_random_float({field: args[0], minimum: args[1], range: args[2]})}
-    SUM_FLOAT(args) {return this.sum_float({dest: args[0], value1: args[1], value2: args[2]})}
-    SPAWN_CHILD(args) {return this.spawn_child_with_param({model: args[0], behavior: args[1], bhvParam: 0})}
-    SPAWN_WATER_DROPLET(args) {return this.cmd_spawn_water_droplet({params: args[1]})}
-
     random_sign() {
         return Math.random() > 0.5 ? 1 : -1
     }
@@ -63,7 +31,6 @@ class BehaviorCommands {
     cur_obj_update() {
 
         let objFlags = ObjListProc.gCurrentObject.rawData[oFlags]
-
         let distanceFromMario = 0.0
 
         // Calculate the distance from the object to Mario.
@@ -92,12 +59,7 @@ class BehaviorCommands {
         while (bhvProcResult == this.BHV_PROC_CONTINUE) {
             const bhvFunc = this.bhvScript.commands[this.bhvScript.index]
             if (Array.isArray(bhvFunc)) {
-                // new style of command: ['name', args, ...]
-                if (!this[bhvFunc[0]]) {
-                    console.log(bhvFunc[0])
-                    throw "behavior command undefined"
-                }
-                bhvProcResult = this[bhvFunc[0]].call(this, bhvFunc.slice(1))
+                throw "deprecated behavior format: " + bhvFunc[0]
             } else {
                 bhvProcResult = bhvFunc.command.call(this, bhvFunc.args)
             }
@@ -162,13 +124,18 @@ class BehaviorCommands {
 
     // cmds
     cmd_spawn_water_droplet(args) {
-        spawn_water_droplet(gCurrentObject, args.params)
+        spawn_water_droplet(ObjListProc.gCurrentObject, args.params)
 
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }
 
     call_native(args) {
+        if (!args.func) {
+            console.log("in " + this.bhvScript.name + " index " + this.bhvScript.index)
+            throw("unimplemented native function")
+        }
+
         args.func.call(args.funcClass)
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
@@ -451,16 +418,90 @@ class BehaviorCommands {
 
     begin(args) {
         ObjListProc.gCurrentObject.bhvStack = []
+
+        // These objects were likely very early objects, which is why this code is here
+        // instead of in the respective behavior scripts.
+
+        // Initiate the room if the object is a haunted chair or the mad piano.
+        // if (cur_obj_has_behavior(bhvHauntedChair)) {
+        //     bhv_init_room();
+        // }
+        // if (cur_obj_has_behavior(bhvMadPiano)) {
+        //     bhv_init_room();
+        // }
+
+        // Set collision distance if the object is a message panel.
+        // if (cur_obj_has_behavior(bhvMessagePanel)) {
+        //     ObjListProc.gCurrentObject.oCollisionDistance = 150.0
+        // }
+
+        this.bhvScript.name = args.name  // optional
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }
 
     goto(args) {
-        let script = BehaviorData[args.script]
+        let script
+        if (typeof args.script == "function") {
+            script = args.script()
+        } else {
+            script = gLinker.behaviors[args.script]
+            if (!script) {
+                throw "unlinked goto script: " + args.script
+            }
+        }
+
         this.bhvScript.commands = script
         this.bhvScript.index = args.index
         return this.BHV_PROC_CONTINUE
     }
+
+    debugger(args) {
+        debugger        
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
 }
 
 export const BehaviorCommandsInstance = new BehaviorCommands()
+
+// EXPERIMENTAL
+const Beh = BehaviorCommandsInstance;
+export const ADD_INT = (...args)                   => {return {command: Beh.add_int, args: {field: args[0], value: args[1]}}}
+export const ADD_FLOAT = (...args)                 => {return {command: Beh.add_number, args: {field: args[0], value: args[1]}}}
+export const ANIMATE = (...args)                   => {return {command: Beh.animate, args: {animIndex: args[0]}}}
+export const BEGIN = (...args)                     => {return {command: Beh.begin, args: {objListIndex: args[0], name: args[1]}}}
+export const BEGIN_LOOP = (...args)                => {return {command: Beh.begin_loop}}
+export const BEGIN_REPEAT = (...args)              => {return {command: Beh.begin_repeat, args: {count: args[0]}}}
+export const BILLBOARD = (...args)                 => {return {command: Beh.billboard}}
+export const CALL = (...args)                      => {return {command: Beh.call, args: {script: args[0]}}}
+export const CALL_NATIVE = (...args)               => {return {command: Beh.call_native, args: {func: args[0], funcClass: args[1]}}}
+export const DEACTIVATE = (...args)                => {return {command: Beh.deactivate}}
+export const DEBUGGER = (...args)                  => {return {command: Beh.debugger}}
+export const DELAY = (...args)                     => {return {command: Beh.delay, args: {num: args[0]}}}
+export const DELAY_VAR = (...args)                 => {return {command: Beh.delay_var, args: {var: args[0]}}}
+export const DISABLE_RENDERING = (...args)         => {return {command: Beh.disable_rendering}}
+export const DROP_TO_FLOOR = (...args)             => {return {command: Beh.drop_to_floor}}
+export const END_LOOP = (...args)                  => {return {command: Beh.end_loop}}
+export const END_REPEAT = (...args)                => {return {command: Beh.end_repeat}}
+export const END_REPEAT_CONTINUE = (...args)       => {return {command: Beh.end_repeat_continue}}
+export const GOTO = (...args)                      => {return {command: Beh.goto, args: {script: args[0], index: args[1]}}}
+export const HIDE = (...args)                      => {return {command: Beh.hide}}
+export const LOAD_ANIMATIONS = (...args)           => {return {command: Beh.load_animations, args: {field: args[0], anims: args[1]}}}
+export const LOAD_COLLISION_DATA = (...args)       => {return {command: Beh.load_collision_data, args: {data: args[0]}}}
+export const OR_INT = (...args)                    => {return {command: Beh.or_int, args: {field: args[0], value: args[1]}}}
+export const PARENT_BIT_CLEAR = (...args)          => {return {command: Beh.parent_bit_clear, args: {field: args[0], value: args[1]}}}
+export const RETURN = (...args)                    => {return {command: Beh.return}}
+export const SCALE = (...args)                     => {return {command: Beh.scale, args: {percent: args[1]}}}
+export const SET_FLOAT = (...args)                 => {return {command: Beh.set_objectData_value, args: {field: args[0], value: args[1]}}}
+export const SET_HITBOX = (...args)                => {return {command: Beh.set_hitbox, args: {radius: args[0], height: args[1]}}}
+export const SET_HITBOX_WITH_OFFSET = (...args)    => {return {command: Beh.set_hitbox_with_offset, args: {radius: args[0], height: args[1], downOffset: args[2]}}}
+export const SET_HOME = (...args)                  => {return {command: Beh.set_home}}
+export const SET_INT = (...args)                   => {return {command: Beh.set_int, args: {field: args[0], value: args[1]}}}
+export const SET_INTERACT_TYPE = (...args)         => {return {command: Beh.set_interact_type, args: {type: args[0]}}}
+export const SET_RANDOM_INT = (...args)            => {return {command: Beh.set_random_int, args: {field: args[0], minimum: args[1], range: args[2]}}}
+export const SET_RANDOM_FLOAT = (...args)          => {return {command: Beh.set_random_float, args: {field: args[0], minimum: args[1], range: args[2]}}}
+export const SUM_FLOAT = (...args)                 => {return {command: Beh.sum_float, args: {dest: args[0], value1: args[1], value2: args[2]}}}
+export const SPAWN_CHILD = (...args)               => {return {command: Beh.spawn_child_with_param, args: {model: args[0], behavior: args[1], bhvParam: args[2]}}}
+export const SPAWN_WATER_DROPLET = (...args)       => {return {command: Beh.cmd_spawn_water_droplet, args: {params: args[0]}}}

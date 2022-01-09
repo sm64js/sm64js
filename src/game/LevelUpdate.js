@@ -161,6 +161,17 @@ class LevelUpdate {
         this.D_80339ECA = 0
     }
 
+    load_level_init_text(arg) {}
+
+    /**
+     * If there is not already a delayed warp, schedule one. The source node is
+     * based on the warp operation and sometimes Mario's used object.
+     * Return the time left until the delayed warp is initiated.
+     */
+    level_trigger_warp(m, warpOp) {
+        throw "level_trigger_warp not implemented"
+    }
+
     update_hud_values() {
 
         if (this.gCurrCreditsEntry == null) {

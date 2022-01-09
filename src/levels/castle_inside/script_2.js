@@ -12,7 +12,7 @@ import { wooden_door_geo, castle_door_0_star_geo } from "../../actors/door/geo.i
 const script_func_local_1 = [
     ['OBJECT', /*model*/ MODEL_CASTLE_WOODEN_DOOR, /*pos*/ -997, 1203, 1178, /*angle*/ 0, 0, 0, /*behParam*/ 0x0000000, /*beh*/ bhvStaticObject],
     ['OBJECT', /*model*/ MODEL_CASTLE_DOOR_0_STARS, /*pos*/ -2695, 1203, 1828, /*angle*/ 0, 90, 0, /*behParam*/ 0x0000000, /*beh*/ bhvStaticObject],
-    ['OBJECT', /*model*/ MODEL_CASTLE_DOOR_0_STARS, /*pos*/ -6994, 1203, 1828, /*angle*/ 0, 90, 0, /*behParam*/ 0x0000000, /*beh*/ bhvStaticObject],
+    ['OBJECT', /*model*/ MODEL_CASTLE_DOOR_0_STARS, /*pos*/ 6994, 1203, 1828, /*angle*/ 0, 90, 0, /*behParam*/ 0x0000000, /*beh*/ bhvStaticObject],
     ['OBJECT', /*model*/ MODEL_CASTLE_DOOR_0_STARS, /*pos*/ 1670, 1203, 1828, /*angle*/ 0, -90, 0, /*behParam*/ 0x0000000, /*beh*/ bhvStaticObject],
     ['RETURN']
 ]

@@ -1,5 +1,62 @@
 import { COURSE_BBH, COURSE_CCM, COURSE_NONE, COURSE_HMC, COURSE_SSL, COURSE_BOB, COURSE_SL, COURSE_WDW, COURSE_JRB, COURSE_THI, COURSE_TTC, COURSE_RR, COURSE_BITDW, COURSE_VCUTM, COURSE_BITFS, COURSE_SA, COURSE_BITS, COURSE_LLL, COURSE_DDD, COURSE_CAKE_END, COURSE_PSS, COURSE_COTMC, COURSE_TOTWC, COURSE_WMOTR, COURSE_TTM, COURSE_CUSTOM } from "../include/course_table"
 
+// struct SaveFile
+// {
+//     // Location of lost cap.
+//     // Note: the coordinates get set, but are never actually used, since the
+//     // cap can always be found in a fixed spot within the course
+//     u8 capLevel;
+//     u8 capArea;
+//     Vec3s capPos;
+
+//     u32 flags;
+
+//     // Star flags for each course.
+//     // The most significant bit of the byte *following* each course is set if the
+//     // cannon is open.
+//     u8 courseStars[COURSE_COUNT];
+
+//     u8 courseCoinScores[COURSE_STAGES_COUNT];
+
+//     struct SaveBlockSignature signature;
+// };
+
+// enum SaveFileIndex {
+//     SAVE_FILE_A,
+//     SAVE_FILE_B,
+//     SAVE_FILE_C,
+//     SAVE_FILE_D
+// };
+
+// struct MainMenuSaveData
+// {
+//     // Each save file has a 2 bit "age" for each course. The higher this value,
+//     // the older the high score is. This is used for tie-breaking when displaying
+//     // on the high score screen.
+//     u32 coinScoreAges[NUM_SAVE_FILES];
+//     u16 soundMode;
+
+// #ifdef VERSION_EU
+//     u16 language;
+// #define SUBTRAHEND 8
+// #else
+// #define SUBTRAHEND 6
+// #endif
+
+//     // Pad to match the EEPROM size of 0x200 (10 bytes on JP/US, 8 bytes on EU)
+//     u8 filler[EEPROM_SIZE / 2 - SUBTRAHEND - NUM_SAVE_FILES * (4 + sizeof(struct SaveFile))];
+
+//     struct SaveBlockSignature signature;
+// };
+
+// struct SaveBuffer
+// {
+//     // Each of the four save files has two copies. If one is bad, the other is used as a backup.
+//     struct SaveFile files[NUM_SAVE_FILES][2];
+//     // The main menu data has two copies. If one is bad, the other is used as a backup.
+//     struct MainMenuSaveData menuData[2];
+// };
+
 export const gLastCompletedCourseNum = null
 export const gLastCompletedStarNum = null
 export const sUnusedGotGlobalCoinHiScore = null

@@ -20,18 +20,22 @@ import { mario_geo                  } from "../actors/mario/geo.inc"
 import { smoke_geo                  } from "../actors/walk_smoke/geo.inc"
 import { sparkles_geo               } from "../actors/sparkle/geo.inc"
 import { bubble_geo                 } from "../actors/bubble/geo.inc"
-import { small_water_splash_geo,
-         water_splash_geo           } from "../actors/water_splash/geo.inc"
+import { water_splash_geo           } from "../actors/water_splash/geo.inc"
+import { small_water_splash_geo     } from "../actors/stomp_smoke/geo.inc"
+import { idle_water_wave_geo,
+         wave_trail_geo             } from "../actors/water_wave/geo.inc"
 import { yellow_coin_geo,
          yellow_coin_no_shadow_geo,
          red_coin_geo,
          red_coin_no_shadow_geo     } from "../actors/coin/geo.inc"
 import { white_particle_small_dl    } from "../actors/white_particle_small/model.inc"
-import { fish_geo                   } from "../actors/blue_fish/geo.inc"
+import { fish_geo, fish_shadow_geo  } from "../actors/blue_fish/geo.inc"
 import { butterfly_geo              } from "../actors/butterfly/geo.inc"
 import { mist_geo                   } from "../actors/mist/geo.inc"
 import { dirt_animation_geo,
          cartoon_star_geo           } from "../actors/dirt/geo.inc"
+import { leaves_geo                 } from "../actors/leaves/geo.inc"
+import { wooden_signpost_geo        } from "../actors/wooden_signpost/geo.inc"
 
 
 export const script_exec_level_table = [
@@ -51,21 +55,21 @@ export const level_main_scripts_entry = [
     ['LOAD_MODEL_FROM_GEO', MODEL_SPARKLES,                sparkles_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_BUBBLE,                  bubble_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_SMALL_WATER_SPLASH,      small_water_splash_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_IDLE_WATER_WAVE,         idle_water_wave_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL_IDLE_WATER_WAVE,         idle_water_wave_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_WATER_SPLASH,            water_splash_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_WAVE_TRAIL,              wave_trail_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL_WAVE_TRAIL,              wave_trail_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_YELLOW_COIN,             yellow_coin_geo],
     // ['LOAD_MODEL_FROM_GEO', MODEL_STAR,                    star_geo],
     // ['LOAD_MODEL_FROM_GEO', MODEL_TRANSPARENT_STAR,        transparent_star_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_WOODEN_SIGNPOST,         wooden_signpost_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL_WOODEN_SIGNPOST,         wooden_signpost_geo],
     ['LOAD_MODEL_FROM_DL',  MODEL_WHITE_PARTICLE_SMALL,    white_particle_small_dl,     LAYER_ALPHA],
     // ['LOAD_MODEL_FROM_GEO', MODEL_RED_FLAME,               red_flame_geo],
     // ['LOAD_MODEL_FROM_GEO', MODEL_BLUE_FLAME,              blue_flame_geo],
     // ['LOAD_MODEL_FROM_GEO', MODEL_BURN_SMOKE,              burn_smoke_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_LEAVES,                  leaves_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL_LEAVES,                  leaves_geo],
     // ['LOAD_MODEL_FROM_GEO', MODEL_PURPLE_MARBLE,           purple_marble_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_FISH,                    fish_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_FISH_SHADOW,             fish_shadow_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL_FISH_SHADOW,             fish_shadow_geo],
     // ['LOAD_MODEL_FROM_GEO', MODEL_SPARKLES_ANIMATION,      sparkles_animation_geo],
     // ['LOAD_MODEL_FROM_DL',  MODEL_SAND_DUST,               sand_seg3_dl_0302BCD0,       LAYER_ALPHA],
     ['LOAD_MODEL_FROM_GEO', MODEL_BUTTERFLY,               butterfly_geo],

@@ -1,5 +1,9 @@
 import { level_script_entry } from "../levels/main_entry/entry"
 import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
+/*import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
+import { level_main_scripts_entry } from "../levels/scripts"
+import * as Mario from "./Mario"
+import { networkData } from "../mmo/socket"*/
 import * as Gbi from "../include/gbi"
 
 class Game {
@@ -93,5 +97,15 @@ class Game {
         window.gGlobalTimer++
     }
 }
+
+/*window.warp_to = (id) => {
+    // LevelCommands.transition(WARP_TRANSITION_FADE_FROM_STAR, 20, 0, 0, 0)
+    LevelCommands.reset_call_loop()
+    LevelCommands.unload_area(1)
+    LevelCommands.set_register(id)
+    LevelCommands.execute(level_main_scripts_entry)
+    networkData.requestedInitData = false
+    Mario.set_mario_action(LevelUpdate.gMarioState, Mario.ACT_IDLE, 0)
+}*/
 
 export const GameInstance = new Game()

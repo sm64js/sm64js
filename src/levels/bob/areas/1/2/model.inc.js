@@ -8,7 +8,7 @@ import {
 	generic_09005000,
 	generic_09006000
 } from "../../../../../textures/generic"
-import { bob_seg7_texture_07000800, bob_seg7_texture_07001000, bob_seg7_texture_07001800 } from "../../../textures.inc"
+import { bob_seg7_texture_07000800, bob_seg7_texture_07001000, bob_seg7_texture_07001800 } from "../../../texture.inc"
 
 const bob_seg7_lights_07004478 = Gbi.gdSPDefLights1(
 	0x66, 0x66, 0x66,

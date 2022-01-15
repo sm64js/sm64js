@@ -18,7 +18,7 @@ const BUTTERFLY_ACT_RETURN_HOME = 2
 export const bhv_butterfly_init = () => {
     const o = ObjectListProc.gCurrentObject
 
-    cur_obj_init_animation(1);
+    cur_obj_init_animation(1)
 
     o.oButterflyYPhase = int16(random_float() * 100)
     o.header.gfx.unk38.animFrame = int16(random_float() * 7)

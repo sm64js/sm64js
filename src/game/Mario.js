@@ -1370,21 +1370,16 @@ const update_mario_geometry_inputs = (m) => {
             m.input |= INPUT_IN_WATER
         }
 
+        mario_basic_lava(m)
+        if (m.floor.type == 0x0004 && !(m.input & INPUT_OFF_FLOOR && m.health > 0xFF)) {
+            if (Area.gCurrLevelNum != 29) { m.vel[1] = 200 } else { m.vel[1] = 240 }
+            set_mario_action(m, ACT_PARACHUTING, 0)
+        }
     } else {
         m.input |= INPUT_OFF_FLOOR;
         respawn_player(m)
     }
-
-    // custom
-    if (m.floor) {
-        mario_basic_lava(m)
-
-        if (m.floor.type == 0x0004 && !(m.input & INPUT_OFF_FLOOR && m.health > 0xFF)) {
-            if (Area.gCurrLevelNum != 1001) { m.vel[1] = 200 } else { m.vel[1] = 240 }
-            set_mario_action(m, ACT_PARACHUTING, 0)
-        }
-    }
-
+    window.pos = m.pos
 }
 
 export const mario_floor_is_slippery = (m) => {

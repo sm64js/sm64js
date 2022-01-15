@@ -21,7 +21,7 @@ export const MODEL_NONE                        = 0x00
 /* Global models that are loaded for every level */
 
 export const MODEL_MARIO                       = 0x01        // mario_geo
-export const MODEL_LUIGI                       = 0x02        // unused
+export const MODEL_LUIGI                       = 0x02        // used
 
 /* Various static level geometry, the geo layout differs but terrain object presets treat them the same.*/
 

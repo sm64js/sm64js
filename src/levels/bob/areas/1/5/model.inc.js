@@ -1,6 +1,6 @@
 import * as Gbi from "../../../../../include/gbi"
 import { generic_09005800, generic_09006000, generic_09009000, generic_09009800, generic_0900A000 } from "../../../../../textures/generic"
-import { bob_seg7_texture_07002000 } from "../../../textures.inc"
+import { bob_seg7_texture_07002000 } from "../../../texture.inc"
 
 const bob_seg7_lights_0700A9E0 = Gbi.gdSPDefLights1(
 	0x33, 0x33, 0x33,

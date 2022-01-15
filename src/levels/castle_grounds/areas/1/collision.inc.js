@@ -24,8 +24,10 @@ import {
 
     SPECIAL_OBJECT,
     SPECIAL_OBJECT_WITH_YAW,
+    SPECIAL_OBJECT_WITH_YAW_AND_PARAM,
     special_bubble_tree,
-    special_level_geo_03
+    special_level_geo_03,
+    special_castle_door_warp
 } from "../../../../include/surface_terrains"
 
 export const castle_grounds_seg7_collision_level = [
@@ -1440,8 +1442,8 @@ export const castle_grounds_seg7_collision_level = [
     SPECIAL_OBJECT(special_bubble_tree,  5954, 526, -2846),
     SPECIAL_OBJECT(special_bubble_tree, -5204, 296, 811),
     //SPECIAL_OBJECT_WITH_YAW_AND_PARAM(*//*preset*//* special_metal_door_warp,  *//*pos*//*  3292, -511, -2931, *//*yaw*//* 160, *//*behParam2*//* 2),
-    //SPECIAL_OBJECT_WITH_YAW_AND_PARAM(*//*preset*//* special_castle_door_warp, *//*pos*//*   -76, 803, -3155, *//*yaw*//*   0, *//*behParam2*//* 0),
-    //SPECIAL_OBJECT_WITH_YAW_AND_PARAM(*//*preset*//* special_castle_door_warp, *//*pos*//*    77, 803, -3155, *//*yaw*//* 128, *//*behParam2*/ 1),
+    //SPECIAL_OBJECT_WITH_YAW_AND_PARAM(/*preset*/ special_castle_door_warp, /*pos*/ -76, 803, -3155, /*yaw*/ 0, /*behParam2*/ 0),
+    //SPECIAL_OBJECT_WITH_YAW_AND_PARAM(/*preset*/ special_castle_door_warp, /*pos*/ 77, 803, -3155, /*yaw*/ 128, /*behParam2*/ 1),
     COL_WATER_BOX_INIT(2),
     COL_WATER_BOX(0, -7129, -7222, 8253, -58, -81),
     COL_WATER_BOX(1, 1024, -58, 8230, 8137, -81),

@@ -1,6 +1,7 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { is_point_within_radius_of_mario, object_step, obj_return_home_if_safe, obj_check_if_facing_toward_angle, obj_check_floor_death, sObjFloor, OBJ_COL_FLAG_GROUNDED, obj_spawn_yellow_coins } from "../ObjBehaviors"
-import { oPosX, oPosY, oPosZ, oAnimState, oBobombBlinkTimer, oHeldState, HELD_FREE, oBehParams, oBehParams2ndByte, BOBOMB_BP_STYPE_GENERIC, oAction, BOBOMB_ACT_PATROL, BOBOMB_ACT_CHASE_MARIO, BOBOMB_ACT_EXPLODE, oBobombFuseTimer, oForwardVel, oGravity, oFriction, oBuoyancy, oInteractionSubtype, oHomeX, oHomeY, oHomeZ, oMoveAngleYaw, oAngleToMario, oBobombFuseLit, oSmokeTimer, oTimer, ACTIVE_FLAGS_DEACTIVATED, oInteractStatus, oVelY, BOBOMB_ACT_LAUNCHED, oGraphYOffset, oVelX, oVelZ } from "../../include/object_constants"
+import { oPosX, oPosY, oPosZ, oAnimState, oBobombBlinkTimer, oHeldState, HELD_FREE, oBehParams, oBehParams2ndByte, BOBOMB_BP_STYPE_GENERIC, oAction,
+         BOBOMB_ACT_PATROL, BOBOMB_ACT_CHASE_MARIO, BOBOMB_ACT_EXPLODE, BOBOMB_ACT_LAVA_DEATH, BOBOMB_ACT_DEATH_PLANE_DEATH, oBobombFuseTimer, oForwardVel, oGravity, oFriction, oBuoyancy, oInteractionSubtype, oHomeX, oHomeY, oHomeZ, oMoveAngleYaw, oAngleToMario, oBobombFuseLit, oSmokeTimer, oTimer, ACTIVE_FLAGS_DEACTIVATED, oInteractStatus, oVelY, BOBOMB_ACT_LAUNCHED, oGraphYOffset, oVelX, oVelZ } from "../../include/object_constants"
 import { INT_SUBTYPE_KICKABLE, INTERACT_GRABBABLE, INT_STATUS_INTERACTED, INT_STATUS_MARIO_UNK1, INT_STATUS_TOUCHED_BOB_OMB } from "../Interaction"
 import { obj_turn_toward_object, obj_attack_collided_from_other_object, cur_obj_scale, spawn_object, obj_mark_for_deletion } from "../ObjectHelpers"
 import { obj_set_hitbox } from "../ObjBehaviors2"
@@ -22,7 +23,6 @@ const sBobombHitbox = {
 }
 
 const curr_obj_random_blink = (blinkTimer) => {
-
     const o = ObjectListProc.gCurrentObject
 
     if (blinkTimer.value == 0) {
@@ -67,7 +67,6 @@ const bobomb_act_patrol = () => {
 }
 
 const bobomb_act_chase_mario = () => {
-
     const o = ObjectListProc.gCurrentObject
 
     const sp1a = ++o.header.gfx.unk38.animFrame
@@ -143,7 +142,6 @@ const bobomb_check_interactions = () => {
 }
 
 const generic_bobomb_free_loop = () => {
-
     const o = ObjectListProc.gCurrentObject
 
     switch (o.rawData[oAction]) {
@@ -164,8 +162,37 @@ const generic_bobomb_free_loop = () => {
 
     bobomb_check_interactions()
 
-    if (o.rawData[oBobombFuseTimer] >= 151) o.rawData[oAction] = 3
+    if (o.rawData[oBobombFuseTimer] >= 151)
+        o.rawData[oAction] = 3
+}
 
+const stationary_bobomb_free_loop = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    switch (o.rawData[oAction]) {
+        case BOBOMB_ACT_LAUNCHED:
+            bobomb_act_launched()
+            break;
+
+        case BOBOMB_ACT_EXPLODE:
+            bobomb_act_explode()
+            break;
+
+        case BOBOMB_ACT_LAVA_DEATH:
+            // if (obj_lava_death() == 1)
+            //     create_respawner(MODEL_BLACK_BOBOMB, bhvBobomb, 3000);
+            break;
+
+        case BOBOMB_ACT_DEATH_PLANE_DEATH:
+            // o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+            // create_respawner(MODEL_BLACK_BOBOMB, bhvBobomb, 3000);
+            break;
+    }
+
+    bobomb_check_interactions()
+
+    if (o.rawData[oBobombFuseTimer] >= 151)
+        o.rawData[oAction] = 3
 }
 
 const bobomb_free_loop = () => {
@@ -174,7 +201,7 @@ const bobomb_free_loop = () => {
     if (o.rawData[oBehParams2ndByte] == BOBOMB_BP_STYPE_GENERIC)
         generic_bobomb_free_loop()
     else 
-        throw "implement stationary bobomb"
+        stationary_bobomb_free_loop()
 }
 
 export const bhv_bobomb_loop = () => {

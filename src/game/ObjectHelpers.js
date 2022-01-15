@@ -14,6 +14,7 @@ import { gLinker } from "./Linker"
 import * as Gbi from "../include/gbi"
 import { MODEL_YELLOW_COIN } from "../include/model_ids"
 import { spawn_mist_particles_variable } from "./behaviors/white_puff.inc"
+import { LevelUpdateInstance } from "./LevelUpdate"
 
 export const WATER_DROPLET_FLAG_RAND_ANGLE                = 0x02
 export const WATER_DROPLET_FLAG_RAND_OFFSET_XZ            = 0x04 // Unused
@@ -26,6 +27,16 @@ export const cur_obj_set_behavior = (behavior) => {
     const o = ObjectListProc.gCurrentObject
 
     o.behavior = behavior
+}
+
+export const cur_obj_lateral_dist_to_home = () => {
+    let dist;
+    const o = ObjectListProc.gCurrentObject
+    let dx = o.rawData[oHomeX] - o.rawData[oPosX];
+    let dz = o.rawData[oHomeZ] - o.rawData[oPosZ];
+
+    dist = Math.sqrt(dx * dx + dz * dz);
+    return dist;
 }
 
 export const cur_obj_set_model = (modelID) => {
@@ -337,6 +348,26 @@ export const approach_symmetric = (value, target, increment) => {
     return value
 }
 
+export const approach_s16_symmetric = (value, target, increment) =>{
+    let dist = s16(target - value)
+
+    if (dist >= 0) {
+        if (dist > increment) {
+            value = s16(value + increment)
+        } else {
+            value = target
+        }
+    } else {
+        if (dist < -increment) {
+            value = s16(value - increment)
+        } else {
+            value = target
+        }
+    }
+
+    return value
+}
+
 export const cur_obj_forward_vel_approach_upward = (target, increment) => {
     const o = ObjectListProc.gCurrentObject
     if (o.rawData[oForwardVel] >= target) {
@@ -456,6 +487,12 @@ export const cur_obj_update_floor = () => {
         o.rawData[oFloorRoom] = 0
     }
 
+}
+
+export const cur_obj_call_action_function = (actionFunctions) => {
+    const o = ObjectListProc.gCurrentObject
+    const actionFunction = actionFunctions[o.rawData[oAction]]
+    actionFunction()
 }
 
 export const cur_obj_if_hit_wall_bounce_away = () => {
@@ -811,6 +848,23 @@ export const obj_attack_collided_from_other_object = (obj) => {
 
 }
 
+export const cur_obj_was_attacked_or_ground_pounded = () => {
+    const o = ObjectListProc.gCurrentObject
+    let attacked = 0
+
+    if ((o.rawData[oInteractStatus] & INT_STATUS_INTERACTED)
+        && (o.rawData[oInteractStatus] & INT_STATUS_WAS_ATTACKED)) {
+        attacked = 1
+    }
+
+    if (cur_obj_is_mario_ground_pounding_platform()) {
+        attacked = 1
+    }
+
+    o.rawData[oInteractStatus] = 0
+    return attacked
+}
+
 export const spawn_object_relative = (behaviorParam, relativePosX, relativePosY, relativePosZ, parent, model, behavior) => {
 
     const obj = spawn_object_at_origin(parent, model, behavior)
@@ -836,6 +890,13 @@ export const spawn_object = (parent, model, behavior) => {
     const obj = spawn_object_at_origin(parent, model, behavior)
     obj_copy_pos_and_angle(obj, parent)
     return obj
+}
+
+export const cur_obj_rotate_face_angle_using_vel = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oFaceAnglePitch] = s16(o.rawData[oFaceAnglePitch] + o.rawData[oAngleVelPitch])
+    o.rawData[oFaceAngleYaw]   = s16(o.rawData[oFaceAngleYaw]   + o.rawData[oAngleVelYaw])
+    o.rawData[oFaceAngleRoll]  = s16(o.rawData[oFaceAngleRoll]  + o.rawData[oAngleVelRoll])
 }
 
 export const random_f32_around_zero = (diameter) => {
@@ -935,6 +996,16 @@ export const cur_obj_within_12k_bounds = () => {
     if (o.rawData[oPosZ] < -12000 || 12000 < o.rawData[oPosZ]) return 0
 
     return 1
+}
+
+export const cur_obj_enable_rendering = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.gfx.flags |= GRAPH_RENDER_ACTIVE
+}
+
+export const cur_obj_disable_rendering = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.gfx.flags &= ~GRAPH_RENDER_ACTIVE
 }
 
 export const cur_obj_become_tangible = () => {
@@ -1062,8 +1133,9 @@ export const cur_obj_move_using_fvel_and_gravity = () => {
     cur_obj_move_using_vel_and_gravity()
 }
 
-export const cur_obj_push_mario_away = (radius, m) => {
+export const cur_obj_push_mario_away = (radius) => {
     const o = ObjectListProc.gCurrentObject
+    const m = LevelUpdateInstance.gMarioState
     const marioRelX = m.marioObj.rawData[oPosX] - o.rawData[oPosX]
     const marioRelZ = m.marioObj.rawData[oPosZ] - o.rawData[oPosZ]
     const marioDist = Math.sqrt(Math.pow(marioRelX, 2) + Math.pow(marioRelZ, 2))

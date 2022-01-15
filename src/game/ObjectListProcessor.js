@@ -131,6 +131,7 @@ class ObjectListProcessor {
         this.gObjectCounter = 0
         this.gCCMEnteredSlide = 0
         this.gCheckingSurfaceCollisionsForCamera = 0
+        this.gMarioShotFromCannon = 0
         this.gObjectLists = new Array(13).fill(0).map(() => { 
 
             const blankObj = { gfx: {} }
@@ -290,10 +291,7 @@ class ObjectListProcessor {
         if (this.sParticleTypes == undefined) this.sParticleTypes = this.sParticleTypesInit()
         this.sParticleTypes.forEach(particleType => {
             if (particleFlags & particleType.particleFlag) {
-                const distanceToLocalMario = dist_between_objects(this.gCurrentObject, this.gMarioObject)
-                if (particleType.behavior && distanceToLocalMario < 1000.0) {  // during development some particles aren't implemented
-                    this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
-                }
+                this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
             }
         })
     }
@@ -352,7 +350,7 @@ class ObjectListProcessor {
                 object.respawnInfo = spawnInfo.behaviorArg
 
                 if (spawnInfo.behaviorArg & 0x01) { // Is mario
-                    if (this.totalMarios != 0) throw "ERROR, only 1 mario should be initialized here"
+                    if (this.totalMarios != 0) console.log("ERROR, only 1 mario should be initialized here")
                     this.totalMarios++
                     this.gMarioObject = object
                     this.gMarioObject.localMario = true

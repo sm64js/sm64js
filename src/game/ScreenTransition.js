@@ -199,3 +199,15 @@ export const render_screen_transition = (fadeTimer, transType, transTime, transD
 		default: throw "unknown transition type"
 	}
 }
+
+export const geo_cannon_circle_base = (callContext, node, mtx) => {
+    // let dlist = null
+
+    // if (callContext == GEO_CONTEXT_RENDER && gCurrentArea != null
+    //     && gCurrentArea.camera.mode == CAMERA_MODE_INSIDE_CANNON) {
+    //     graphNode.fnNode.node.flags = (graphNode.fnNode.node.flags & 0xFF) | 0x500
+    //     dlist = render_cannon_circle_base()
+    // }
+    // return dlist
+    return []
+}

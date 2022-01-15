@@ -72,6 +72,9 @@ export const SURFACE_FLAG_DYNAMIC          = (1 << 0)
 export const SURFACE_FLAG_NO_CAM_COLLISION = (1 << 1)
 export const SURFACE_FLAG_X_PROJECTION     = (1 << 3)
 
+export const TERRAIN_LOAD_IS_SURFACE_TYPE_LOW  = (cmd) => { return (cmd < 0x40) }
+export const TERRAIN_LOAD_IS_SURFACE_TYPE_HIGH = (cmd) => { return (cmd >= 0x65) }
+
 // Terrain types defined by the level script command terrain_type (cmd_31)
 export const TERRAIN_GRASS  = 0x0000
 export const TERRAIN_STONE  = 0x0001
@@ -81,6 +84,49 @@ export const TERRAIN_SPOOKY = 0x0004
 export const TERRAIN_WATER  = 0x0005
 export const TERRAIN_SLIDE  = 0x0006
 export const TERRAIN_MASK = 0x0007
+
+// enum SpecialPresets
+export const special_null_start = 0x0
+export const special_yellow_coin = 0x1
+export const special_yellow_coin_2 = 0x2
+export const special_unknown_3 = 0x3
+export const special_boo = 0x4
+export const special_unknown_5 = 0x5
+export const special_lll_moving_octagonal_mesh_platform = 0x6
+export const special_snow_ball = 0x7
+export const special_lll_drawbridge_spawner = 0x8
+export const special_empty_9 = 0x9
+export const special_lll_rotating_block_with_fire_bars = 0xA
+export const special_lll_floating_wood_bridge = 0xB
+export const special_tumbling_platform = 0xC
+export const special_lll_rotating_hexagonal_ring = 0xD
+export const special_lll_sinking_rectangular_platform = 0xE
+export const special_lll_sinking_square_platforms = 0xF
+export const special_lll_tilting_square_platform = 0x10
+export const special_lll_bowser_puzzle = 0x11
+export const special_mr_i = 0x12
+export const special_small_bully = 0x13
+export const special_big_bully = 0x14
+export const special_empty_21 = 0x15
+export const special_empty_22 = 0x16
+export const special_empty_23 = 0x17
+export const special_empty_24 = 0x18
+export const special_empty_25 = 0x19
+export const special_moving_blue_coin = 0x1A
+export const special_jrb_chest = 0x1B
+export const special_water_ring = 0x1C
+export const special_mine = 0x1D
+export const special_empty_30 = 0x1E
+export const special_empty_31 = 0x1F
+export const special_butterfly = 0x20
+export const special_bowser = 0x21
+export const special_wf_rotating_wooden_platform = 0x22
+export const special_small_bomp = 0x23
+export const special_wf_sliding_platform = 0x24
+export const special_tower_platform_group = 0x25
+export const special_rotating_counter_clockwise = 0x26
+export const special_wf_tumbling_bridge = 0x27
+export const special_large_bomp = 0x28
 
 export const special_level_geo_03 = 101
 export const special_level_geo_04 = 102
@@ -102,11 +148,31 @@ export const special_level_geo_13 = 117
 export const special_level_geo_14 = 118
 export const special_level_geo_15 = 119
 export const special_level_geo_16 = 120
-
-export const special_bubble_tree = 121
-export const special_spiky_tree = 122
-export const special_snow_tree = 123
+export const special_bubble_tree = 0x79
+export const special_spiky_tree = 0x7A
+export const special_snow_tree = 0x7B
+export const special_unknown_tree = 0x7C
+export const special_palm_tree = 0x7D
 export const special_tropic_tree = 124
+export const special_wooden_door = 0x7E
+export const special_haunted_door = special_wooden_door
+export const special_unknown_door = 0x7F
+export const special_metal_door = 0x80
+export const special_hmc_door = 0x81
+export const special_unknown2_door = 0x82
+export const special_wooden_door_warp = 0x83
+export const special_unknown1_door_warp = 0x84
+export const special_metal_door_warp = 0x85
+export const special_unknown2_door_warp = 0x86
+export const special_unknown3_door_warp = 0x87
+export const special_castle_door_warp = 0x88
+export const special_castle_door = 0x89
+export const special_0stars_door = 0x8A
+export const special_1star_door = 0x8B
+export const special_3star_door = 0x8C
+export const special_key_door = 0x8D
+
+export const special_null_end = 0xFF
 
 export const COL_INIT = () => { return [TERRAIN_LOAD_VERTICES] }
 export const COL_END = () => { return [TERRAIN_LOAD_END] }
@@ -121,6 +187,7 @@ export const SPECIAL_OBJECT = (preset, posX, posY, posZ) => { return [preset, po
 export const SPECIAL_OBJECT_WITH_YAW = (preset, posX, posY, posZ, yaw) => {
     return [preset, posX, posY, posZ, yaw]
 }
+export const SPECIAL_OBJECT_WITH_YAW_AND_PARAM = (preset, posX, posY, posZ, yaw, param) =>  { return [preset, posX, posY, posZ, yaw, param] }
 export const COL_WATER_BOX_INIT = (num) => { return [TERRAIN_LOAD_ENVIRONMENT, num] }
 export const COL_WATER_BOX = (id, x1, z1, x2, z2, y) => {
     return [id, x1, z1, x2, z2, y]

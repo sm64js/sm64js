@@ -20,7 +20,7 @@ let n_frames = 0
 let target_time = 0
 let frameSpeed = 0.03
 let reset_delay = 0
-export const textureVersion = 39
+export const textureVersion = 40
 
 const produce_one_frame = () => {
 	let respText = ""
@@ -346,7 +346,7 @@ document.getElementById("acceptRules").addEventListener('click', () => {
 
 window.deleteRom = () => {
     IDB.del('assets')
-    window.location.reload()
+    window.location.href = window.location.href.replace("?autostart=1", "")
 }
 
 window.reloadPage = () => { //Reload the page after a bit so the assets can get extracted first

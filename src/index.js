@@ -149,7 +149,6 @@ const musicDiv = document.getElementById("musicDiv")
 const gameCanvas = document.querySelector('#gameCanvas')
 const fxCanvas = document.querySelector('#fxCanvas')
 const textCanvas = document.querySelector('#textCanvas')
-const fxCanvas = document.querySelector('#fxCanvas')
 const fullCanvas = document.querySelector('#fullCanvas')
 
 gameCanvas.width = 640

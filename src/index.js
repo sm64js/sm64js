@@ -147,8 +147,8 @@ const musicDiv = document.getElementById("musicDiv")
 
 // widescreen
 const gameCanvas = document.querySelector('#gameCanvas')
-const textCanvas = document.querySelector('#textCanvas')
 const fxCanvas = document.querySelector('#fxCanvas')
+const textCanvas = document.querySelector('#textCanvas')
 const fullCanvas = document.querySelector('#fullCanvas')
 
 gameCanvas.width = 640

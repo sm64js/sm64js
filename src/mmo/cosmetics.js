@@ -434,7 +434,7 @@ export const recvSkinData = (skinMsg) => {
     }
 
     if (socket_id === networkData.mySocketID ||
-        networkData.remotePlayers[socket_id] == null) { console.log(`socket ${socket_id} does not exist, skipping network data loading.`); return }
+        networkData.remotePlayers[socket_id] == null) return
 
     const skinDataMsg = skinMsg.getSkindata()
     const skinData = {

@@ -70,7 +70,8 @@ import {
     sBackwardKnockbackActions,
     set_forward_vel,
     set_mario_action,
-    sForwardKnockbackActions               } from "./Mario"
+    sForwardKnockbackActions,
+    respawn_player               } from "./Mario"
 import { GameInstance as Game } from "./Game"
 import { AreaInstance as Area } from "./Area"
 import * as MarioConstants from "../include/mario_constants"
@@ -215,7 +216,7 @@ const check_death_barrier = (m) => {
 
     /// Temp code because death is not implemented
     if (m.pos[1] < m.floorHeight + 2048) {
-		Mario.respawn_player(m)
+		respawn_player(m)
 	}
 
 }

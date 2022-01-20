@@ -85,7 +85,7 @@ export const bob_seg7_macro_objs = [
     MACRO_OBJECT(/*preset*/ P.macro_hidden_star_trigger,       /*yaw*/   0, /*pos*/  1000,  3600,  1250),
     MACRO_OBJECT(/*preset*/ P.macro_hidden_star_trigger,       /*yaw*/   0, /*pos*/  2000,  3600,  1250),
     MACRO_OBJECT(/*preset*/ P.macro_hidden_star_trigger,       /*yaw*/   0, /*pos*/  3000,  3600,  1250),
-    MACRO_OBJECT(/*preset*/ P.macro_bobomb_still,              /*yaw*/   0, /*pos*/  1127,  2897, -2495),
+    // MACRO_OBJECT(/*preset*/ P.macro_bobomb_still,              /*yaw*/   0, /*pos*/  1127,  2897, -2495),
     MACRO_OBJECT(/*preset*/ P.macro_coin_line_horizontal,      /*yaw*/ 120, /*pos*/  4836,  3079, -2707),
     MACRO_OBJECT_WITH_BEH_PARAM(/*preset*/ P.macro_wooden_signpost,           /*yaw*/  45, /*pos*/ -3530,  1415,   430, /*behParam*/ DIALOG_050),
     MACRO_OBJECT_WITH_BEH_PARAM(/*preset*/ P.macro_wooden_signpost,           /*yaw*/   0, /*pos*/  5053,  3073,  2180, /*behParam*/ DIALOG_053),

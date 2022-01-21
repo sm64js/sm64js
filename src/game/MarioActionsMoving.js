@@ -28,13 +28,13 @@ const apply_slope_accel = (m) => {
 
         switch (slopeClass) {
             case SurfaceTerrains.SURFACE_CLASS_VERY_SLIPPERY:
-                slopeAccel = 5.3;
+                slopeAccel = 5.1;
                 break;
             case SurfaceTerrains.SURFACE_CLASS_SLIPPERY:
-                slopeAccel = 2.7;
+                slopeAccel = 2.5;
                 break;
             default:
-                slopeAccel = 1.7;
+                slopeAccel = 1.5;
                 break;
             case SurfaceTerrains.SURFACE_CLASS_NOT_SLIPPERY:
                 slopeAccel = 0.0;
@@ -868,24 +868,26 @@ const kart_angle_smoothing = (m, speed, angle) => {
 		angle[1] = m.marioObj.header.gfx.angle[1]
 		const targetAngle0 = -Mario.find_floor_slope(m, 0x0)
 		const targetAngle2 = Mario.find_floor_slope(m, 0x4000)
+        const kartAngleMultiplier0 = 0.65
+        const kartAngleMultiplier2 = 0.8
 		if (angle[0] < targetAngle0) {
-			angle[0] += speed
+			angle[0] += speed*kartAngleMultiplier0
 			if (angle[0] > targetAngle0) {
 				angle[0] = targetAngle0
 			}
 		} else {
-			angle[0] -= speed
+			angle[0] -= speed*kartAngleMultiplier0
 			if (angle[0] < targetAngle0) {
 				angle[0] = targetAngle0
 			}
 		}
 		if (angle[2] < targetAngle2) {
-			angle[2] += speed
+			angle[2] += speed*kartAngleMultiplier2
 			if (angle[2] > targetAngle2) {
 				angle[2] = targetAngle2
 			}
 		} else {
-			angle[2] -= speed
+			angle[2] -= speed*kartAngleMultiplier2
 			if (angle[2] < targetAngle2) {
 				angle[2] = targetAngle2
 			}
@@ -905,13 +907,13 @@ const act_karting = (m) => {
 	if (!(m.input & Mario.INPUT_OFF_FLOOR)) {
 		//m.actionState = 0
 		if (m.input & Mario.INPUT_A_DOWN && !should_begin_sliding(m)) {
-			Vel += 2 * ((m.input & Mario.INPUT_Z_DOWN) ? -1 : 1)
+			Vel += 1.3 * ((m.input & Mario.INPUT_Z_DOWN) ? -1 : 1)
 		} else {
 			Vel *= 0.95545
 		}
 	}
 			if (Vel < -35) Vel = -35
-			if (Vel > 75) Vel = 75
+			if (Vel > 70) Vel = 70
     if (m.input & Mario.INPUT_B_PRESSED && !(m.input & Mario.INPUT_OFF_FLOOR) && m.actionState == 0 && m.vel[1] <= 0.0) {
 		m.input |= Mario.INPUT_OFF_FLOOR // Prevent crash / infinite loop.
 		m.actionState = 1
@@ -942,7 +944,7 @@ const act_karting = (m) => {
 					}
 					break
 				case Mario.AIR_STEP_HIT_WALL:
-					m.forwardVel *= -0.5
+					m.forwardVel *= -0.2
 					Mario.set_forward_vel(m, 1.25 * m.forwardVel)
 					break
 				case Mario.AIR_STEP_GRABBED_LEDGE:
@@ -966,7 +968,7 @@ const act_karting = (m) => {
 				m.actionState = 1
 				break
 			case Mario.GROUND_STEP_HIT_WALL:
-				m.forwardVel *= -0.5
+				m.forwardVel *= 0.75
 				break
 			default: throw "unknown ground step in act_karting"
 		}

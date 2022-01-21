@@ -52,8 +52,7 @@
        <img id="title" src="/mmo/assets/title.png">
 
         <!-- Description -->
-       <h6 class="description">This project is currently still being developed. This page may be live from time to time for testing, but there may be glitches and performance issues. The server will go down and restart at random times without warning. If you would like to help with the project or have feedback please<a class="descriptionContact" href="/credits.html">contact me.</a></h6>
-       <h6 class="description">Please, be patient while we work on fixing the site, since the rewrite lots of <span style="color: #c60000;">stuff might not work as expected</span>. Feel free to report the problems on<a class="descriptionContact" href="https://github.com/sm64js/sm64js/issues">Github</a>.<br> Screen transitions in 4:3 are messed up due to widescreen now being implemented. <br> <span style="font-size: 0.94em;">The chat will appear on top of the game when in widescreen mode taking up part of the screen, this will get fixed on a future update.</span></h6>
+       <h6 class="description">This project is currently still being developed. This page may be live from time to time for testing, but there may be glitches and performance issues. The server will go down and restart at random times without warning. If you would like to help with the project or have feedback please <a class="descriptionContact" href="/credits.html">contact me</a> or report a problem on <a class="descriptionContact" href="https://github.com/sm64js/sm64js/issues">Github</a>.</h6>
        
 
        <!-- Submit ROM form -->
@@ -105,7 +104,7 @@
                             <div id="discordNameRow">
                                     <label type="text">Discord Name: </label>
 
-                                    <input readonly id="discordNameBox" type="text" style="max-width: 200px" minlength="3" maxlength="20">
+                                    <input class="textInput nameInput" readonly id="discordNameBox" type="text" minlength="3" maxlength="20">
 
                                     <button id="switchCustom" type="button" class="yellow-button"><div class="sm64button">Use Custom Name</div></button>
 
@@ -116,7 +115,7 @@
                             <div hidden id="customNameRow">
                                     <label type="text">Custom Name: </label>
 
-                                    <input id="playerNameInput" type="text" style="max-width: 200px" minlength="3" maxlength="14" placeholder="Enter name here" onchange="window.updatePlayerName(this.value)">
+                                    <input class="textInput nameInput" id="playerNameInput" type="text" minlength="3" maxlength="14" placeholder="Enter name here" onchange="window.updatePlayerName(this.value)">
 
                                     <button id="switchDiscord" type="button" class="blue-button"><div class="sm64button">Use Discord Name</div></button>
 
@@ -173,9 +172,7 @@
 
                                 <div>
                                     <label id="playerNameResult" type="text" readonly style="display: none;">Waiting for selection</label>
-                                </div> <!-- If this isn't even used anymore wiy bother hiding it? Does a js reference it or something? -eros -->
-                                <h1 id="fpsMeter">FPS: 0</h1>
-                                <h1 id="pingMeter">Ping 0ms</h1>
+                                </div>
                             </div>
                             <!-- End map select -->
 
@@ -188,7 +185,6 @@
 
                 <!-- In-game options -->
                     <div>
-                        <!-- Why is this button being rewritten over every frame? -->
                                     <button type="button"
                                         id="pvpButton"
                                         class="pink-button"
@@ -244,8 +240,10 @@
                 <h1>Options & Misc</h1>
                 <!-- Miscellaneous -->
                 <!-- Divs are used as rows here -->
-                <div> <!-- This is row 1 for example -->
+                <div class="deleteDiv"> <!-- This is row 1 for example -->
                     <button id="deleteRom" onclick="window.deleteRom()" type="button" class="red-button"><div class="sm64button">Delete Rom</div></button>
+                    <h2 id="fpsMeter">FPS: 0</h2>
+                    <h2 id="pingMeter">Ping 0ms</h2>
                 </div>
                 
                 <div>   <!-- This is row 2 and so on -->

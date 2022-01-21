@@ -29,10 +29,11 @@ html {
 }
 
 .descriptionContact{
-    color: #d0d2d9;
+    color: #bac9ff;
     font-family: "TextboxFont";
     letter-spacing: -0.2px;
     font-size: inherit;
+    margin: 0;
 }
 
 .descriptionContact:hover{
@@ -82,7 +83,7 @@ body {
     width: auto;
 }
 
-/*Separate divs/rows of buttons inside the signbox*/
+/*Menus*/
 #signboxBackground > div{
     margin-bottom: 1em;
 }
@@ -240,6 +241,20 @@ body {
     justify-content: center;
 }
 
+#fpsMeter, #pingMeter{
+    font-size: 1.8em;
+    margin-top: 0;
+}
+
+.deleteDiv{
+    display: flex;
+    justify-content: center;
+}
+
+.deleteDiv h2{
+    margin-left: 1em;
+}
+
 /* Top menu, header, nav */
 header {
     width: 100%;
@@ -272,12 +287,16 @@ img#title {
 input {
     text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
 }
-input[type=text] {
+.textInput{
     width: 100%;
     height: 2rem;
     font-family: 'TextboxFont';
     font-size: 124%;
     text-shadow: none;
+}
+
+.nameInput{
+    max-width: 10em;
 }
 
 select {
@@ -651,6 +670,11 @@ audio{
     font-style: normal;
     padding: 0.4em;
     box-sizing: border-box;
+    width: 100%;
+    height: 2rem;
+    font-family: 'TextboxFont';
+    font-size: 124%;
+    text-shadow: none;
 }
 
 ul#chatlog {

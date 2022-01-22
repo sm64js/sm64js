@@ -577,61 +577,61 @@ h1, h2, h3, h4, h5, h6{
 }
 
 /* Music */
-#musicDiv h5{
+#musicDiv h5 {
     margin-top: 0;
     margin-bottom: 0;
     font-size: 1.4em;
 }
 
-#musicDiv h4{
+#musicDiv h4 {
     margin-top: 0.8em;
     margin-bottom: 0.8em;
     font-size: 2em;
 }
 
 /* From bootstrap, yes, I know */
-.row{
+.row {
     display: -ms-flexbox;
     display: flex;
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
 }
 
-.col-6{
+.col-6 {
     flex: 0 0 50%;
     max-width: 50%;
 }
 
-audio{
+audio {
     width: 28em;
     height: 2em;
 }
 
 /* Canvases for rendering the game output */
-#relativePositioner{ /* Contains both the gameCanvas and the textCanvas */
+#relativePositioner { /* Contains both the gameCanvas and the textCanvas */
     position: relative;
     width: 50%;
     margin-left: 15%;
 }
 
-#moveLeft{
+#moveLeft {
     justify-content: flex-end;
     display: flex;
 }
 
-#gameContainer{
+#gameContainer {
     display: flex;
     z-index: 3;
 }
 
-#chatContainer{
+#chatContainer {
     margin-left: 2%;
     width: 50%;
     z-index: 4;
     float: right;
 }
 
-#gameCanvas{
+#gameCanvas {
     background-image: url('/mmo/assets/canvasBorder.png');
     background-size: 100% 100%;
     padding: 26px;
@@ -667,6 +667,7 @@ audio{
     font-family: 'TextboxFont';
     font-size: 124%;
     text-shadow: none;
+    z-index: 1;
 }
 
 ul#chatlog {
@@ -681,7 +682,6 @@ ul#chatlog {
     color: black;
     font-style: normal;
     font-size: 1.4em;
-    margin: 0;
     padding: 1em;
     margin-bottom: 0.2em;
     z-index: 4;

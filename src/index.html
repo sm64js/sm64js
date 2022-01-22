@@ -422,6 +422,11 @@
 <div hidden id="controlsBorder">
     <div hidden id="controlsBackground">
         <div id="controlsMargin">
+        <!-- Save & reset controls button -->
+        <div class="controlButtons">
+            <button class="green-button" onclick="window.saveControls()"><div class="sm64button">Save Controls</div></button>
+            <button class="red-button" onclick="window.loadDefaultControls()"><div class="sm64button">Load Default Controls</div></button>
+        </div>
         <h6 style="text-align:center; font-size: 30px;" id="noGamepadMessage">No Gamepad Detected Yet</h6>
             <div id="controlsFlex">
                     <div id="keyboardControlsWindow">
@@ -516,12 +521,6 @@
                                 </div>
                         </div>
 
-                    </div>
-
-                                        <!-- Save & reset controls button -->
-                    <div class="controlButtons">
-                        <button class="green-button" style="margin-right:30px" onclick="window.saveControls()"><div class="sm64button">Save Controls</div></button>
-                        <button class="red-button" onclick="window.loadDefaultControls()"><div class="sm64button">Load Default Controls</div></button>
                     </div>
                 <!-- Gamepad controls pop up -->
                 

@@ -229,14 +229,6 @@ body {
     flex: 1;
 }
 
-.controlButtons{
-    display: grid;
-}
-
-.controlButtons > button{
-    margin-top: 1em;
-}
-
 .siteCenter{
     justify-content: center;
 }

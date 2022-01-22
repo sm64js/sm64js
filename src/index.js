@@ -20,7 +20,7 @@ let n_frames = 0
 let target_time = 0
 let frameSpeed = 0.03
 let reset_delay = 0
-export const textureVersion = 40
+export const textureVersion = 41
 
 const produce_one_frame = () => {
 	let respText = ""
@@ -139,13 +139,14 @@ const setStatsUpdate = setInterval(() => {
     pingMeter.textContent = `Ping: ${window.latency}ms`
 }, 500)
 
+// widescreen
 const relativePositioner = document.getElementById("relativePositioner")
 const gameContainer = document.getElementById("gameContainer")
 const moveLeft = document.getElementById("moveLeft")
 const chatlog = document.getElementById("chatlog")
+const chatbox = document.getElementById("chatbox")
 const musicDiv = document.getElementById("musicDiv")
-
-// widescreen
+const canvasContainer = document.getElementById("canvasContainer")
 const gameCanvas = document.querySelector('#gameCanvas')
 const fxCanvas = document.querySelector('#fxCanvas')
 const textCanvas = document.querySelector('#textCanvas')
@@ -171,6 +172,12 @@ const widescreenOn = () => {
     moveLeft.style.justifyContent = "center";
     chatlog.style.height = "7.5em";
     musicDiv.style.marginTop = "12em";
+
+    canvasContainer.hidden = false
+    canvasContainer.appendChild(chatlog)
+    canvasContainer.appendChild(chatbox)
+    chatlog.style = "margin-left: -315px; width: 400px; height: 180px;"
+    chatbox.style = "margin-left: -320px; width: 440px;"
     /* const chat = $(".chatboxPos")
     chat.detach().appendTo(".canvasContainer")
     document.getElementById("chatboxP").style = "margin-top: -267px; margin-left: 29px; z-index: 10;"
@@ -190,7 +197,7 @@ const widescreenOn = () => {
 
     viewport.vscale = [customWidth, customHeight, 0, 0]
     viewport.vtrans = [0, 0, 0, 0]
-    set_vp(customWidth / 2, customHeight / 2)
+    set_vp(customWidth / 2, customHeight / 2) // SCREEN_WIDTH and SCREEN_HEIGHT
     window.widescreen = true
 }
 
@@ -202,12 +209,11 @@ const widescreenOff = () => {
     chatlog.style.height = "82%";
     musicDiv.style.marginTop = "auto";
     gameCanvas.style = "background-image: url('/mmo/assets/canvasBorder.png'); background-size: 100%; background-repeat: no-repeat; padding: 26px;"
-    /* const chat = $(".chatboxPos")
-    chat.detach().appendTo("#chatboxParent")
-    document.getElementById("chatboxP").style = null
-    document.getElementById("chatlog").style = "margin-bottom: 5px !important;"
-    document.getElementById("justifyChat").style = "justify-content:center"
-    document.getElementById("chatboxes").style="justify-content:center;"*/
+    document.getElementById("chatContainer").appendChild(chatlog)
+    document.getElementById("chatContainer").appendChild(chatbox)
+    chatlog.style = null
+    chatbox.style = null
+    canvasContainer.hidden = true
     gameCanvas.width  = 640
     gameCanvas.height = 480
     fxCanvas.width  = 640
@@ -219,17 +225,17 @@ const widescreenOff = () => {
 
     viewport.vscale = [640, 480, 511, 0]
     viewport.vtrans = [640, 480, 511, 0]
-    set_vp(320, 240)
+    set_vp(320, 240) // SCREEN_WIDTH and SCREEN_HEIGHT
     window.widescreen = false
 }
 
 window.toggleWidescreen = () => {
     if (gameCanvas.width == 640 && gameCanvas.height == 480) { //if not widescreen, do this
-	localStorage.setItem("widescreenOn", 1)
-	widescreenOn()
+	    localStorage.setItem("widescreenOn", 1)
+	    widescreenOn()
     } else {
-	localStorage.setItem("widescreenOn", 0)
-	widescreenOff()
+	    localStorage.setItem("widescreenOn", 0)
+	    widescreenOff()
     }
 }
 
@@ -347,15 +353,6 @@ document.getElementById("acceptRules").addEventListener('click', () => {
 window.deleteRom = () => {
     IDB.del('assets')
     window.location.href = window.location.href.replace("?autostart=1", "")
-}
-
-window.reloadPage = () => { //Reload the page after a bit so the assets can get extracted first
-
-    setTimeout(
-        function(){
-         window.location.reload()
-        }, 2000);
-    
 }
 
 const startGame = () => {

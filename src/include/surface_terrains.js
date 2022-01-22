@@ -153,7 +153,6 @@ export const special_spiky_tree = 0x7A
 export const special_snow_tree = 0x7B
 export const special_unknown_tree = 0x7C
 export const special_palm_tree = 0x7D
-export const special_tropic_tree = 124
 export const special_wooden_door = 0x7E
 export const special_haunted_door = special_wooden_door
 export const special_unknown_door = 0x7F

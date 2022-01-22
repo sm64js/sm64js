@@ -135,8 +135,8 @@ export const custom_draw_text = (x, y, w) => {
     }
 
     if (customData2D.announcement) {
-        custom_draw_message_bubble("Server Announcement:", "20", 320, 60, "#FFFFFF", 1.0, "#9400D3")
-        custom_draw_message_bubble(customData2D.announcement, "18", 320, 90, "#FFFFFF", 1.0, "#9400D3", 640)
+        custom_draw_message_bubble("Server Announcement:", "20", window.widescreen ? 640 : 320, 60, "#FFFFFF", 1.0, "#9400D3")
+        custom_draw_message_bubble(customData2D.announcement, "18", window.widescreen ? 640 : 320, 90, "#FFFFFF", 1.0, "#9400D3", 640)
     }
 
     context2d.restore()

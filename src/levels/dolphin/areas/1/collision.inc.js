@@ -4,7 +4,7 @@ import {
     SURFACE_DEFAULT, SURFACE_NOT_SLIPPERY, SURFACE_0004,
     SURFACE_BURNING, SURFACE_NOISE_DEFAULT, SURFACE_HARD,
 	SURFACE_HARD_NOT_SLIPPERY, SPECIAL_OBJECT, COL_SPECIAL_INIT, 
-	special_tropic_tree
+	special_palm_tree
 } from "../../../../include/surface_terrains"
 
 export const dolphin_area_1_collision = [
@@ -1926,11 +1926,11 @@ export const dolphin_area_1_collision = [
 	COL_TRI(561, 725, 726),
 	COL_TRI_STOP(),
 	COL_SPECIAL_INIT(5),
-	SPECIAL_OBJECT(special_tropic_tree, -10937, 268, -2027),
-	SPECIAL_OBJECT(special_tropic_tree, -10937, 268, -1296),
-	SPECIAL_OBJECT(special_tropic_tree, -10937, 268, 556),
-	SPECIAL_OBJECT(special_tropic_tree, -10937, 268, 946),
-	SPECIAL_OBJECT(special_tropic_tree, -9590, 268, 456),
+	SPECIAL_OBJECT(special_palm_tree, -10937, 268, -2027),
+	SPECIAL_OBJECT(special_palm_tree, -10937, 268, -1296),
+	SPECIAL_OBJECT(special_palm_tree, -10937, 268, 556),
+	SPECIAL_OBJECT(special_palm_tree, -10937, 268, 946),
+	SPECIAL_OBJECT(special_palm_tree, -9590, 268, 456),
 	COL_WATER_BOX_INIT(1),
 	COL_WATER_BOX(0x00, -13281, -5636, 2422, 4779, 259),
 	COL_END()

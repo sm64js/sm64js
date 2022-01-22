@@ -14,21 +14,20 @@
         gtag('config', 'UA-178244102-1')
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
-
 </head>
 
 <body>
-        <!-- Rules pop up -->
-        <div id="rules" hidden>
-            <img src="/mmo/assets/sm64js_d.svg" class="rulesLogo" alt="sm64js Logo">
-            <p style="text-align: center;">Welcome to the multiplayer version of sm64js! To play you have to follow the listed rules below.</p>
-            <br>
-            <p>Treat all users with respect.</p>
-            <p>Keep chat messages appropriate, no swearing or slurs. Make sure to keep conversations safe/appropriate for work/school.</p>
-            <p>Inappropriate or offensive behavior may result in temporary or permanent mute or ban</p>
-            <p>Failure to comply with these rules will result in punishment, including but not limited to a mute or ban of your account.</p>
-            <button type="button" class="rulesButton" id="acceptRules"><div class="sm64button">I have read the rules and will follow them.</div></button>
-        </div>
+    <!-- Rules pop up -->
+    <div id="rules" hidden>
+        <img src="/mmo/assets/sm64js_d.svg" class="rulesLogo" alt="sm64js Logo">
+        <p style="text-align: center;">Welcome to the multiplayer version of sm64js! To play you have to follow the listed rules below.</p>
+        <br>
+        <p>Treat all users with respect.</p>
+        <p>Keep chat messages appropriate, no swearing or slurs. Make sure to keep conversations safe/appropriate for work/school.</p>
+        <p>Inappropriate or offensive behavior may result in temporary or permanent mute or ban</p>
+        <p>Failure to comply with these rules will result in punishment, including but not limited to a mute or ban of your account.</p>
+        <button type="button" class="rulesButton" id="acceptRules"><div class="sm64button">I have read the rules and will follow them.</div></button>
+    </div>
 
     <canvas hidden id="fullCanvas" width="1280" height="720" style="background-color: black;"></canvas>
 
@@ -47,7 +46,7 @@
 
     <!-- Main content of the site-->
     <main hidden id="mainContent">
-<div class="siteMargins">
+    <div class="siteMargins">
         <!-- Title -->
        <img id="title" src="/mmo/assets/title.png">
 
@@ -57,15 +56,16 @@
 
        <!-- Submit ROM form -->
        <form id="romSelect">
-                <h4 class="romSelectText">Select US sm64 (z64) ROM File from your computer</h4>
-                <input id="romFile" class="romFileText" type="file">
-                <input class="ROMinput loadRomButton" onclick="window.reloadPage()" type="submit" value="Load ROM">
-            </form>
+            <h4 class="romSelectText">Select US sm64 (z64) ROM File from your computer</h4>
+            <input id="romFile" class="romFileText" type="file">
+            <input class="ROMinput loadRomButton" type="submit" value="Load ROM">
+        </form>
 
         <h6 id="romMessage" class="romMessageText">This project uses the textures and other game assets from the original game. Due to copyright issues, I cannot host those assets on this site. Please select a sm64 ROM to extract those assets before you can play.</h6>
 
         <br />
         <br />
+        
         <!-- Start of signboxBackground -->
         <div id="signboxBorder" class="shunned">
             <div id="signboxBackground">
@@ -422,6 +422,11 @@
 <div hidden id="controlsBorder">
     <div hidden id="controlsBackground">
         <div id="controlsMargin">
+        <!-- Save & reset controls button -->
+        <div class="controlButtons">
+            <button class="green-button" onclick="window.saveControls()"><div class="sm64button">Save Controls</div></button>
+            <button class="red-button" onclick="window.loadDefaultControls()"><div class="sm64button">Load Default Controls</div></button>
+        </div>
         <h6 style="text-align:center; font-size: 30px;" id="noGamepadMessage">No Gamepad Detected Yet</h6>
             <div id="controlsFlex">
                     <div id="keyboardControlsWindow">
@@ -516,12 +521,6 @@
                                 </div>
                         </div>
 
-                    </div>
-
-                                        <!-- Save & reset controls button -->
-                    <div class="controlButtons">
-                        <button class="green-button" style="margin-right:30px" onclick="window.saveControls()"><div class="sm64button">Save Controls</div></button>
-                        <button class="red-button" onclick="window.loadDefaultControls()"><div class="sm64button">Load Default Controls</div></button>
                     </div>
                 <!-- Gamepad controls pop up -->
                 
@@ -636,16 +635,17 @@
         <div id="gameContainer">           
                 <div id="relativePositioner">
                     <div id="moveLeft">
-                    <canvas id="textCanvas"></canvas><!-- HUD, NOT CHAT -->
-                    <canvas id="fxCanvas"></canvas><!-- Snow -->
-                    <canvas id="gameCanvas" width="1280" height="720"></canvas>
+                        <canvas id="textCanvas"></canvas><!-- HUD, NOT CHAT -->
+                        <canvas id="fxCanvas"></canvas><!-- Snow -->
+                        <div hidden id="canvasContainer" style="position: absolute;margin-top: 450px; margin-left: -500px; z-index: 10;"></div>
+                        <canvas id="gameCanvas" width="1280" height="720"></canvas>
                     </div>
                 </div>
 
-            <!-- Chat container -->
+                <!-- Chat container -->
                 <div id="chatContainer">
-                        <ul id="chatlog"></ul>
-                        <input id="chatbox" class="chatbox" type="text" autocomplete="off" maxlength="100" placeholder="Chat box, to block someone type '/block username'">
+                    <ul id="chatlog"></ul>
+                    <input id="chatbox" class="chatbox" type="text" autocomplete="off" maxlength="100" placeholder="Chat box, to block someone type '/block username'">
                 </div>
         </div>
         <!-- End of game canvas -->

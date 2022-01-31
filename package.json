@@ -17,8 +17,10 @@
     ]
   },
   "dependencies": {
+    "@jaames/iro": "^5.5.2",
     "chokidar": "^3.5.2",
     "google-protobuf": "^3.13.0",
+    "howler": "^2.2.3",
     "idb-keyval": "^6.0.3",
     "mathjs": "^7.0.1",
     "msgpack-lite": "^0.1.26"

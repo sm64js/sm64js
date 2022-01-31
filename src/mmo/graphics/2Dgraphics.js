@@ -28,13 +28,13 @@ const marioHealthWedges = [
 // Minimap Images - First number is the selected map and the table contains the image and player scale.
 const Minimaps = {
 	'm1000':{'img':defImage(401,401,'mmo/assets/minimaps/maps/bob_mountain.png'),'playerScaler':1.0,'hasFlags':true},
-	'm1002':{'img':defImage(401,401,'mmo/assets/minimaps/maps/starman.png'),'playerScaler':2.15,'hasFlags':false},
-    'm1003':{'img':defImage(401,401,'mmo/assets/minimaps/maps/gjxmas.png'),'playerScaler':1.5,'hasFlags':false},
+	'm1002':{'img':defImage(401,401,'mmo/assets/minimaps/maps/starman.png'),'playerScaler':2.15,'hasFlags':true},
+    'm1003':{'img':defImage(401,401,'mmo/assets/minimaps/maps/gjxmas.png'),'playerScaler':1.5,'hasFlags':true},
 	'm9':{'img':defImage(401,401,'mmo/assets/minimaps/maps/bob_battlefield.png'),'playerScaler':1.82819,'hasFlags':true},
 	'm16':{'img':defImage(401,401,'mmo/assets/minimaps/maps/castle_grounds.png'),'playerScaler':1.80144,'hasFlags':true},
 	'm36':{'img':defImage(401,401,'mmo/assets/minimaps/maps/ttm.png'),'playerScaler':1.9838,'hasFlags':true},
 	'm1001':{'img':defImage(401,401,'mmo/assets/minimaps/maps/ctf00.png'),'playerScaler':1.2,'hasFlags':true},
-	'm999':{'img':defImage(401,401,'mmo/assets/minimaps/maps/clouded.png'),'playerScaler':1.60176,'hasFlags':false},
+	'm999':{'img':defImage(401,401,'mmo/assets/minimaps/maps/clouded.png'),'playerScaler':1.60176,'hasFlags':true},
 	'm56':{'img':defImage(401,401,'mmo/assets/minimaps/maps/ccs.png'),'playerScaler':1.8,'hasFlags':false},
     'm1004':{'img':defImage(401,401,'mmo/assets/minimaps/maps/raceway.png'),'playerScaler':0.69,'hasFlags':false},
 }
@@ -44,7 +44,6 @@ const PlayerRemote_Img = new Image(14, 14); PlayerRemote_Img.src = 'mmo/assets/m
 const PlayerRemote_lower_Img = new Image(14, 14); PlayerRemote_lower_Img.src = 'mmo/assets/minimaps/player_remote_lower.png'
 const PlayerRemote_upper_Img = new Image(14, 14); PlayerRemote_upper_Img.src = 'mmo/assets/minimaps/player_remote_upper.png'
 const flag_outline = new Image(14, 14); flag_outline.src = "mmo/assets/minimaps/flag0.png"
-const flag_base = new Image(14, 14); flag_base.src = "mmo/assets/minimaps/flag1.png"
 
 const Taunts = [
     { 'img': defImage(32, 32,'mmo/assets/taunts/skull.png'),'taunt':'!taunt-die'},
@@ -150,9 +149,9 @@ const drawMinimapIcon = (sprite, width, height, X, Z, scale_map, scale_icon) => 
 }
 
 const drawFlag = (sprite, width, height, X, Z, scale_map, scale_icon) => {
-	context2d.filter = `hue-rotate(${sprite[0]}deg) saturate(${sprite[1]}) brightness(${sprite[2]})`;
+	/*context2d.filter = `hue-rotate(${sprite[0]}deg) saturate(${sprite[1]}) brightness(${sprite[2]})`;
     context2d.drawImage(flag_base, (-(width / 2) * (scale_map)) + parseInt((16 + ((128 * scale_map) / 2)) + X * (scale_icon * scale_map)),
-        (-(height / 2) * (scale_map)) + parseInt((16 + ((128 * scale_map) / 2)) + Z * (scale_icon * scale_map)), width * scale_map, height * scale_map)
+        (-(height / 2) * (scale_map)) + parseInt((16 + ((128 * scale_map) / 2)) + Z * (scale_icon * scale_map)), width * scale_map, height * scale_map)*/
 	context2d.filter = "none"
     context2d.drawImage(flag_outline, (-(width / 2) * (scale_map)) + parseInt((16 + ((128 * scale_map) / 2)) + X * (scale_icon * scale_map)),
         (-(height / 2) * (scale_map)) + parseInt((16 + ((128 * scale_map) / 2)) + Z * (scale_icon * scale_map)), width * scale_map, height * scale_map)

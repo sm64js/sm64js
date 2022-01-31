@@ -45,7 +45,7 @@ import { MODEL_WOODEN_POST,
 
 import { bhv_pole_base_loop                             } from "./behaviors/pole_base.inc"
 import { bhv_pole_init, bhv_giant_pole_loop             } from "./behaviors/pole.inc"
-import { bhv_castle_flag_init                           } from "./behaviors/bhv_castle_flag_init.inc"
+import { bhv_castle_flag_init, bhv_castle_flag_loop     } from "./behaviors/bhv_castle_flag_init.inc"
 import { bhv_checkerboard_elevator_group_init,
          bhv_checkerboard_platform_init,
          bhv_checkerboard_platform_loop                 } from "./behaviors/checkerboard_platform.inc"
@@ -226,6 +226,7 @@ export const bhvCastleFlagWaving = [
     { command: BhvCmds.animate, args: { animIndex: 0 } },
     { command: BhvCmds.call_native, args: { func: bhv_castle_flag_init } },
     { command: BhvCmds.begin_loop },
+        { command: BhvCmds.call_native, args: { func: bhv_castle_flag_loop } },
     { command: BhvCmds.end_loop },
 ]
 

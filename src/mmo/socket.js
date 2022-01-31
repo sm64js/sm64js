@@ -21,6 +21,8 @@ import { updateFlagData, setInitFlagHeight } from "../game/behaviors/bhv_castle_
 import { recvChat, decrementChat } from "./chat"
 import { GameInstance as Game } from "../game/Game"
 
+import { Howl, Howler } from "howler"
+
 Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
 
 function myArrayBuffer() {
@@ -184,6 +186,18 @@ const recvFlagList = (flaglist) => {
 
 }
 
+let flagSound
+let playing = false
+
+const playFlagSound = (sound) => {
+    if (playing) return
+    
+    flagSound = new Howl({src: [sound]})
+    flagSound.play()
+    playing = true
+    flagSound.on("end", function() { playing = false })
+}
+
 export const sendAttackToServer = (targetMarioID) => {
 
     for (let i = 0; i < networkData.flagData.length; i++) {
@@ -197,7 +211,8 @@ export const sendAttackToServer = (targetMarioID) => {
             sm64jsMsg.setAttackMsg(attackMsg)
             const rootMsg = new RootMsg()
             rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
-            sendData(rootMsg.serializeBinary()) 
+            sendData(rootMsg.serializeBinary())
+            playFlagSound("/mmo/assets/sound/flag_taken.mp3")
         }
     }
 
@@ -236,17 +251,19 @@ export const updateNetworkBeforeRender = () => {
 
         if (networkData.flagData[i].linkedToPlayer) { /// someone has the flag
             let newflagpos, angleForFlag
+            const m = gameData.marioState
             if (flagSocketId == networkData.mySocketID) { /// I have the flag
-                const m = gameData.marioState
                 newflagpos = [...m.pos]
                 angleForFlag = m.faceAngle[1]
+                m.numStars = 1
             } else { /// someone else has the flag
                 let socketData = networkData.remotePlayers[flagSocketId]
                 if (socketData == undefined) return
                 newflagpos = [...socketData.marioState.pos]
                 angleForFlag = socketData.marioState.faceAngle[1]
+                m.numStars = 0
             }
-            newflagpos[1] += 150 // adjust so its above mario head
+            newflagpos[1] += 50 // adjust so its above mario head
             networkData.flagData[i].pos = newflagpos
             updateFlagData(newflagpos, angleForFlag, i)
         } else updateFlagData(networkData.flagData[i].pos, 0, i) /// no one has the flag
@@ -378,7 +395,7 @@ const checkForFlagGrab = () => {
                 const rootMsg = new RootMsg()
                 rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
                 sendData(rootMsg.serializeBinary())
-
+                playFlagSound("/mmo/assets/sound/flag_collect.mp3")
             }
         }
     }

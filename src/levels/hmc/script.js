@@ -1,14 +1,16 @@
 import { LevelCommandsInstance as LevelCommands } from "../../engine/LevelCommands"
-import { bhvMario } from "../../game/BehaviorData"
+import { bhvMario, bhvCastleFlagWaving } from "../../game/BehaviorData"
 import { LevelUpdateInstance as LevelUpdate } from "../../game/LevelUpdate"
 import { hmc_seg7_collision_level } from "./areas/1/collision.inc"
 import { hmc_seg7_rooms } from "./areas/1/room.inc"
 import { hmc_geo_000B90 } from "./areas/1/geo.inc"
+import { MODEL_STAR } from "../../include/model_ids"
 
 export const level_hmc_entry = [
     { command: LevelCommands.init_level },
     { command: LevelCommands.init_mario, args: [1, 1, bhvMario] },
     { command: LevelCommands.begin_area, args: [1, hmc_geo_000B90] },
+    { command: LevelCommands.place_object, args: [/*acts?*/ 0x1F, /*model*/ MODEL_STAR, /*pos*/ 0, 0, 0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving] },
     { command: LevelCommands.terrain, args: [hmc_seg7_collision_level] },
     { command: LevelCommands.rooms, args: [hmc_seg7_rooms] },
     { command: LevelCommands.end_area },

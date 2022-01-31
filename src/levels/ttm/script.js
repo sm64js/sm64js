@@ -1,5 +1,5 @@
 import { LevelCommandsInstance as LevelCommands } from "../../engine/LevelCommands"
-import { bhvMario } from "../../game/BehaviorData"
+import { bhvMario, bhvCastleFlagWaving } from "../../game/BehaviorData"
 import { LevelUpdateInstance as LevelUpdate } from "../../game/LevelUpdate"
 import { ttm_geo_000A70 } from "./areas/1/geo.inc"
 import { ttm_geo_000880 } from "./areas/1/10/geo.inc"
@@ -47,6 +47,7 @@ import {
     MODEL_LEVEL_GEOMETRY_14,
     MODEL_LEVEL_GEOMETRY_15,
     MODEL_LEVEL_GEOMETRY_16,
+    MODEL_STAR
 } from "../../include/model_ids"
 
 export const level_ttm_entry = [
@@ -72,6 +73,7 @@ export const level_ttm_entry = [
     { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_15, ttm_geo_000A18] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_16, ttm_geo_000A40] },
     { command: LevelCommands.begin_area, args: [1, ttm_geo_000A70] },
+    { command: LevelCommands.place_object, args: [/*acts?*/ 0x1F, /*model*/ MODEL_STAR, /*pos*/ 0, 0, 0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving] },
     { command: LevelCommands.terrain, args: [ttm_seg7_area_1_collision] },
     { command: LevelCommands.end_area },
     { command: LevelCommands.set_mario_pos, args: [1, 45, 102, -4332, 5734] },

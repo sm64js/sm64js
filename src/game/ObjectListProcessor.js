@@ -291,7 +291,10 @@ class ObjectListProcessor {
         if (this.sParticleTypes == undefined) this.sParticleTypes = this.sParticleTypesInit()
         this.sParticleTypes.forEach(particleType => {
             if (particleFlags & particleType.particleFlag) {
-                this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
+                const distanceToLocalMario = dist_between_objects(this.gCurrentObject, this.gMarioObject)
+                if (distanceToLocalMario < 1000.0) {
+                    this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
+                }
             }
         })
     }

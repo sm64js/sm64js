@@ -6,7 +6,7 @@ import { yellow_sphere_geo } from "../../actors/yellow_sphere_small/geo.inc"
 import { wf_seg7_collision_070102D8 } from "./areas/1/collision.inc"
 import { wf_geo_000BF8 } from "./areas/1/geo.inc"
 
-import { bhvStaticObject, bhvGiantPole, bhvPoleGrabbing, bhvYellowBall } from "../../game/BehaviorData"
+import { bhvStaticObject, bhvGiantPole, bhvPoleGrabbing, bhvYellowBall, bhvCastleFlagWaving } from "../../game/BehaviorData"
 
 import { wf_geo_0007E0 } from "./areas/1/5/geo.inc"
 import { wf_geo_000820 } from "./areas/1/6/geo.inc"
@@ -49,12 +49,10 @@ import {
     MODEL_LEVEL_GEOMETRY_16,
 	
 	MODEL_BOB_BUBBLY_TREE,
-	
 	MODEL_YELLOW_SPHERE,
-	
 	MODEL_WF_GIANT_POLE,
-	
 	MODEL_NONE,
+    MODEL_STAR
 } from "../../include/model_ids"
 
 export const level_wf_entry = [
@@ -87,6 +85,7 @@ export const level_wf_entry = [
 	{ command: LevelCommands.place_object, args: [0x1F, MODEL_LEVEL_GEOMETRY_0C, 1408, 2522,  2431, 0,0,0, 0x00000000, bhvStaticObject] },
 	{ command: LevelCommands.place_object, args: [0x1F, MODEL_WF_GIANT_POLE    ,-2560, 2560,  -256, 0,0,0, 0x00000000, bhvGiantPole   ] },
 	{ command: LevelCommands.place_object, args: [0x1F, MODEL_NONE             ,-2495, 1331,  -256, 0,0,0, 0x003D0000, bhvPoleGrabbing] },
+    { command: LevelCommands.place_object, args: [/*acts?*/ 0x1F, /*model*/ MODEL_STAR, /*pos*/ 0, 0, 0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving] },
     { command: LevelCommands.terrain, args: [wf_seg7_collision_070102D8] },
     { command: LevelCommands.end_area },
     { command: LevelCommands.set_mario_pos, args: [1, 90, 2600, 1256,  5120] },

@@ -1,4 +1,3 @@
-import { LevelCommandsInstance as LevelCommands } from "../../engine/LevelCommands"
 import { LevelUpdateInstance as LevelUpdate } from "../../game/LevelUpdate"
 
 import { MODEL_NONE,
@@ -6,6 +5,7 @@ import { MODEL_NONE,
     MODEL_LEVEL_GEOMETRY_03,
     MODEL_CASTLE_GROUNDS_VCUTM_GRILL,
     MODEL_CASTLE_GROUNDS_FLAG,
+    MODEL_STAR,
     MODEL_CASTLE_GROUNDS_CANNON_GRILL,
     MODEL_BUTTERFLY,
     MODEL_BUBBLE,
@@ -61,10 +61,10 @@ const script_func_local_2 = [
 ]
 
 const script_func_local_3 = [
-    ['OBJECT', /*model*/ MODEL_CASTLE_GROUNDS_FLAG, /*pos*/ -3213, 3348, -3011, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving],
-    ['OBJECT', /*model*/ MODEL_CASTLE_GROUNDS_FLAG, /*pos*/  3213, 3348, -3011, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving],
-    ['OBJECT', /*model*/ MODEL_CASTLE_GROUNDS_FLAG, /*pos*/ -3835, 3348, -6647, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving],
-    ['OBJECT', /*model*/ MODEL_CASTLE_GROUNDS_FLAG, /*pos*/  3835, 3348, -6647, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving],
+    // ['OBJECT', /*model*/ MODEL_STAR, /*pos*/ -3213, 3348, -3011, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving],
+    // ['OBJECT', /*model*/ MODEL_STAR, /*pos*/  3213, 3348, -3011, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving],
+    ['OBJECT', /*model*/ MODEL_STAR, /*pos*/ -3835, 3348, -6647, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving],
+    ['OBJECT', /*model*/ MODEL_STAR, /*pos*/  3835, 3348, -6647, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving],
     ['RETURN']
 ]
 

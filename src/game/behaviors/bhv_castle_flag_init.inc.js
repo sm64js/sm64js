@@ -15,7 +15,7 @@ export const setInitFlagHeight = (initHeight, i) => {
 
     if (flagObjects[i] == undefined) return
 
-    flagObjects[i].prevHeight = initHeight
+    flagObjects[i].prevHeight = initHeight + 100
 }
 
 export const updateFlagData = (pos, angle, i) => {
@@ -28,8 +28,15 @@ export const updateFlagData = (pos, angle, i) => {
     flagObjects[i].rawData[oPosX] = pos[0]
     flagObjects[i].rawData[oPosY] = Math.max(minHeight, pos[1])
     flagObjects[i].rawData[oPosZ] = pos[2]
-    flagObjects[i].rawData[oFaceAngleYaw] = angle + 0x6000
+    // flagObjects[i].rawData[oFaceAngleYaw] = angle + 0x6000
 
     pos[1] = flagObjects[i].rawData[oPosY]
     flagObjects[i].prevHeight = flagObjects[i].rawData[oPosY]
+    flagObjects[i].header.gfx.pos[1] += 260
+}
+
+export const bhv_castle_flag_loop = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.rawData[oFaceAngleYaw] += 0x800
 }

@@ -36,6 +36,7 @@ import { dirt_animation_geo,
          cartoon_star_geo           } from "../actors/dirt/geo.inc"
 import { leaves_geo                 } from "../actors/leaves/geo.inc"
 import { wooden_signpost_geo        } from "../actors/wooden_signpost/geo.inc"
+import { star_geo } from "../actors/star/geo.inc"
 
 
 export const script_exec_level_table = [
@@ -59,7 +60,7 @@ export const level_main_scripts_entry = [
     ['LOAD_MODEL_FROM_GEO', MODEL_WATER_SPLASH,            water_splash_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_WAVE_TRAIL,              wave_trail_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_YELLOW_COIN,             yellow_coin_geo],
-    // ['LOAD_MODEL_FROM_GEO', MODEL_STAR,                    star_geo],
+    ['LOAD_MODEL_FROM_GEO', MODEL_STAR,                    star_geo],
     // ['LOAD_MODEL_FROM_GEO', MODEL_TRANSPARENT_STAR,        transparent_star_geo],
     ['LOAD_MODEL_FROM_GEO', MODEL_WOODEN_SIGNPOST,         wooden_signpost_geo],
     ['LOAD_MODEL_FROM_DL',  MODEL_WHITE_PARTICLE_SMALL,    white_particle_small_dl,     LAYER_ALPHA],

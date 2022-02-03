@@ -1,6 +1,5 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { oPosY, oTimer } from "../../include/object_constants"
-import { MARIO_PUNCHING, ACT_GROUP_MASK, ACT_GROUP_AIRBORNE } from "../Mario"
+import { ACT_GROUP_MASK, ACT_GROUP_AIRBORNE } from "../Mario"
 import { cur_obj_push_mario_away, dist_between_objects } from "../ObjectHelpers"
 import { networkData } from "../../mmo/socket"
 

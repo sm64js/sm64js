@@ -1364,6 +1364,14 @@ const mat_skin = (customData) => {
 	Gbi.gsSPEndDisplayList(),
 	]
 }
+const mat_hair = (customData) => {
+	return [
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPLight(mario_brown2_lights_group(customData).l[0], 1),
+	Gbi.gsSPLight(mario_brown2_lights_group(customData).a, 2),
+	Gbi.gsSPEndDisplayList(),
+	]
+}
 
 export const wario_head_cap_on_DL = (customData) => {
 	return [
@@ -1399,10 +1407,6 @@ export const wario_head_cap_off_DL = (customData) => {
 	Gbi.gsSPLight(pink_lights.l[0], 1),
 	Gbi.gsSPLight(pink_lights.a, 2),
 	Gbi.gsSPDisplayList(capless_wario_head_mesh_layer_1_tri_0),
-	Gbi.gsSPLight(mario_hat_lights_group(customData).l[0], 1),
-	Gbi.gsSPLight(mario_hat_lights_group(customData).a, 2),
-	Gbi.gsSPDisplayList(mat_cap_emblem),
-	Gbi.gsSPDisplayList(capless_wario_head_mesh_layer_1_tri_5),
 	Gbi.gsSPLight(mario_beige_lights_group(customData).l[0], 1),
 	Gbi.gsSPLight(mario_beige_lights_group(customData).a, 2),
 	Gbi.gsSPDisplayList(mat_eye_open),
@@ -1412,10 +1416,11 @@ export const wario_head_cap_off_DL = (customData) => {
 	Gbi.gsSPDisplayList(capless_wario_head_mesh_layer_1_tri_2),
 	Gbi.gsSPDisplayList(capless_wario_head_mesh_layer_1_tri_3),
 	Gbi.gsSPDisplayList(mat_sideburn),
-	Gbi.gsSPDisplayList(capless_wario_head_mesh_layer_1_tri_4),
+	Gbi.gsSPDisplayList(capless_wario_head_mesh_layer_1_tri_5),
 	Gbi.gsSPLight(mario_brown2_lights_group(customData).l[0], 1),
 	Gbi.gsSPLight(mario_brown2_lights_group(customData).a, 2),
-	Gbi.gsSPDisplayList(capless_wario_head_mesh_layer_1_tri_6),
+	Gbi.gsSPDisplayList(mat_hair(customData)),
+	Gbi.gsSPDisplayList(capless_wario_head_mesh_layer_1_tri_4),
 	Gbi.gsSPEndDisplayList(),
 	]
 }

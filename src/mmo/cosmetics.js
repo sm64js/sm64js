@@ -172,15 +172,36 @@ window.ambientPicker = new iro.ColorPicker('#ambpicker', {
     width: 120
 })
 window.colorPicker.on('input:move', function(color) {
-    updateColors(color)
+    window.updateColors(color)
 })
 window.ambientPicker.on('input:move', function(color) {
-    updateAmbientColors(color)
+    window.updateAmbientColors(color)
 })
+
+const componentToHex = (col) => {
+    let hex = col.toString(16)
+    return hex.length == 1 ? "0" + hex : hex
+}
+const rgb2hex = (r,g,b) => { return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b) }
+window.hex2ambient = (hex) => {
+    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    let colors = result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null
+    colors.r /= 2
+    colors.g /= 2
+    colors.b /= 2
+    return rgb2hex(Math.floor(colors.r), Math.floor(colors.g), Math.floor(colors.b))
+}
 
 const get_char = () => {
 	return Math.floor(window.myMario.skinData.customCapState/2)%3
 }
+
+const colorInput = document.getElementById("colorInput")
+const ambientInput = document.getElementById("ambientInput")
 
 // Update the colors on the wheel
 window.updateWheel = () => {
@@ -198,14 +219,16 @@ window.updateWheel = () => {
     window.colorPicker.color.red = window.myMario.skinData[skinType][3]
     window.colorPicker.color.green = window.myMario.skinData[skinType][4]
     window.colorPicker.color.blue = window.myMario.skinData[skinType][5]
+    colorInput.value = window.colorPicker.color.hexString
 
     window.ambientPicker.color.red = window.myMario.skinData[skinType][0]
     window.ambientPicker.color.green = window.myMario.skinData[skinType][1]
     window.ambientPicker.color.blue = window.myMario.skinData[skinType][2]
+    ambientInput.value = window.ambientPicker.color.hexString
 }
 
 // Update colors from color wheel data
-const updateColors = (color) => {
+window.updateColors = (color) => {
     let skinType = document.getElementById("skinTypes").value
     if (window.myMario.skinData[skinType].includes("r")) return
 
@@ -225,7 +248,7 @@ const updateColors = (color) => {
     localStorage[`skinData-${skinType}`] = JSON.stringify(window.myMario.skinData[skinType])
 }
 // Update ambient colors from color wheel data
-const updateAmbientColors = (color) => {
+window.updateAmbientColors = (color) => {
     let skinType = document.getElementById("skinTypes").value
     if (window.myMario.skinData[skinType].includes("r")) return
 

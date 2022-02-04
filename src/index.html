@@ -388,24 +388,24 @@
                         <div id="ambpicker"></div>
                     </div>
 
-                    <!-- Hex input -->
-                    <input type="text" id="hex" placeholder="Main color picker hex" 
-                        onchange="window.colorPicker.color.hexString = this.value
-                        if (document.getElementById('updateAmb').checked) {
-                            const c = window.colorPicker
-                            const a = window.ambientPicker
-                            a.color.red = c.color.red / 2
-                            a.color.green = c.color.green / 2
-                            a.color.blue = c.color.blue / 2
-                        }">
-                    <input type="text" id="hexAmb" placeholder="Ambient color picker hex" onchange="window.ambientPicker.color.hexString = this.value">
-                    <button class="green-button" onclick="alert(`Color:\n${window.colorPicker.color.hexString}\nAmbient color:\n${window.ambientPicker.color.hexString}`)"><div class="sm64button">Print hex codes</div></button>
-                
-                    <br />
-                    <br />
-                    <br />
-                    <br />
+                    <!-- RGB input -->
+                    <h2>Alternate color input:</h2>
+                    <label>Color:</label>
+                    <input type="color" id="colorInput" onchange="
+                    window.colorPicker.color.hexString = this.value
+                    if (document.getElementById('updateAmb').checked) {
+                        document.getElementById('ambientInput').value = window.hex2ambient(this.value)
+                        window.ambientPicker.color.hexString = document.getElementById('ambientInput').value
 
+                        window.updateAmbientColors(window.ambientPicker.color)
+                    }
+                    window.updateColors(window.colorPicker.color)
+                    window.myMario.saveSkin()">
+                    <label> Ambient color:</label>
+                    <input type="color" id="ambientInput" onchange="window.ambientPicker.color.hexString = this.value; window.updateAmbientColors(window.ambientPicker.color); window.myMario.saveSkin()">
+                    <br />
+                    <br />
+                    <br />
                     <!-- Controls and customization -->
                     <div id="pinkControls">
                         <button type="button"
@@ -539,6 +539,11 @@
                                 <div>
                                     <label style="padding-right:30px">Chat:</label>
                                     <select keyboardButton name="chat" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
+
+                                <div>
+                                    <label style="padding-right:30px">Freeze Camera:</label>
+                                    <select keyboardButton name="freezeCam" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
                                 </div>
                         </div>
 

@@ -1176,7 +1176,7 @@ export class n64GfxProcessor {
     }
 
     run(commands) {
-        window.totalTriangles = 0
+        window.sm64js.totalTriangles = 0
         this.sp_reset()
         WebGL.start_frame()
         canvas2d.width = canvas2d.width

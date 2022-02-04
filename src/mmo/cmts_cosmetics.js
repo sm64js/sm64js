@@ -30,6 +30,7 @@ window.parseColorCode = (colorcode) => {
     let buffer = new Uint8ClampedArray(0x90);
     let gamesharkLines = colorcode.split(/[\n| ]/);
     let data = defaultSkinData();
+    let cap = window.myMario.skinData.customCapState
 
     // Parse Gameshark
     for (let i = 0; i < gamesharkLines.length/2; i++) {
@@ -53,5 +54,7 @@ window.parseColorCode = (colorcode) => {
         }
     });
     console.log("Skin data loaded from color code");
+    data.parachute = data.hat
+    data.customCapState = cap
     return data;
 }

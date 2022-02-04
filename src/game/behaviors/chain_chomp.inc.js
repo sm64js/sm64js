@@ -264,7 +264,7 @@ const chain_chomp_sub_act_lunge = () => {
 
         o.rawData[oChainChompMaxDistBetweenChainParts] = o.rawData[oChainChompUnk104]
 
-        if (window.gGlobalTimer % 2 != 0) {
+        if (window.sm64js.gGlobalTimer % 2 != 0) {
             o.rawData[oChainChompMaxDistBetweenChainParts] = -o.rawData[oChainChompUnk104]
         }
     }

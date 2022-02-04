@@ -90,7 +90,7 @@ const unzip = (bytes) => {
 const measureLatency = (ping_proto) => {
     const startTime = ping_proto.getTime()
     const endTime = performance.now()
-    window.latency = parseInt(endTime - startTime)
+    window.sm64js.latency = parseInt(endTime - startTime)
 }
 
 
@@ -148,7 +148,7 @@ export function loadSocket() {
             }
         }
     
-        socket.onclose = () => { window.latency = null }
+        socket.onclose = () => { window.sm64js.latency = null }
     }
 }
 
@@ -232,7 +232,7 @@ const updateConnectedMsg = () => {
     } else {
         elem.innerHTML = "Not connected to server - refresh the page"
         elem.style.color = "red"
-        window.latency = 0
+        window.sm64js.latency = 0
     }
 }
 
@@ -255,13 +255,11 @@ export const updateNetworkBeforeRender = () => {
             if (flagSocketId == networkData.mySocketID) { /// I have the flag
                 newflagpos = [...m.pos]
                 angleForFlag = m.faceAngle[1]
-                m.numStars = 1
             } else { /// someone else has the flag
                 let socketData = networkData.remotePlayers[flagSocketId]
                 if (socketData == undefined) return
                 newflagpos = [...socketData.marioState.pos]
                 angleForFlag = socketData.marioState.faceAngle[1]
-                m.numStars = 0
             }
             newflagpos[1] += 50 // adjust so its above mario head
             networkData.flagData[i].pos = newflagpos
@@ -396,6 +394,7 @@ const checkForFlagGrab = () => {
                 rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
                 sendData(rootMsg.serializeBinary())
                 playFlagSound("/mmo/assets/sound/flag_collect.mp3")
+                m.numStars++
             }
         }
     }

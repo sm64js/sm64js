@@ -11,7 +11,7 @@ import { wf_movtex_water } from "../levels/wf/areas/1/movtext.inc"
 import { dolphin_movtex_water } from "../levels/dolphin/areas/1/movtext.inc"
 import { GeoLayoutInstance as GeoLayout } from "../engine/GeoLayout"
 import * as Gbi from "../include/gbi"
-import { dl_waterbox_rgba16_begin, dl_waterbox_end, dl_draw_quad_verts_0123, texture_waterbox_water, texture_waterbox_lava, texture_waterbox_tealwater } from "../common_gfx/segment2"
+import { dl_waterbox_rgba16_begin, dl_waterbox_end, dl_draw_quad_verts_0123, texture_waterbox_water, texture_waterbox_lava, texture_waterbox_tealwater } from "../textures/segment2"
 import { ROTATE_CLOCKWISE, TEXTURE_MIST, TEXTURE_WATER } from "../include/moving_texture_macros"
 import { make_vertex } from "./GeoMisc"
 

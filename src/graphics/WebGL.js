@@ -406,7 +406,7 @@ export class WebGL {
     }
 
     draw_triangles(buf_vbo, buf_vbo_num_tris) {
-        window.totalTriangles += buf_vbo_num_tris
+        window.sm64js.totalTriangles += buf_vbo_num_tris
         //console.log(`Flushing ${buf_vbo_num_tris} tris, total buf length ${buf_vbo.length}`)
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(buf_vbo), this.gl.STREAM_DRAW)
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 3 * buf_vbo_num_tris)

@@ -125,7 +125,7 @@ class LevelUpdate {
         }
 
         if (Area.gCurrLevelNum == 1003 || Area.gCurrLevelNum == 5) {
-            window.snow = true
+            window.sm64js.snow = true
         }
         
         return 1
@@ -186,7 +186,7 @@ class LevelUpdate {
     
             if (this.gHudDisplay.coins < this.gMarioState.numCoins) {
 
-                if (window.gGlobalTimer & 0x00000001) {
+                if (window.sm64js.gGlobalTimer & 0x00000001) {
                     let coinSound
                     if (this.gMarioState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
                         //coinSound = SOUND_GENERAL_COIN_WATER;

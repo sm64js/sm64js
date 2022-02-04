@@ -17,7 +17,6 @@
     ]
   },
   "dependencies": {
-    "@jaames/iro": "^5.5.2",
     "chokidar": "^3.5.2",
     "google-protobuf": "^3.13.0",
     "howler": "^2.2.3",

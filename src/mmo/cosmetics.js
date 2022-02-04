@@ -1,6 +1,6 @@
-import { networkData, submitPlayerName, pName } from "./socket"
+import { networkData, submitPlayerName } from "./socket"
 import { SkinValue } from "../../proto/mario_pb"
-import iro from "@jaames/iro"
+import iro from "./iro.min"
 
 export const defaultSkinData = () => {
     return {
@@ -27,6 +27,19 @@ const luigi = {
     parachute: [0,127,0,0,255,0],
     customCapState: 2
 }
+
+const wario = {
+    overalls: [78,17,125,156,35,251],
+    hat: [127,127,0,255,255,0],
+    shirt: [127,127,0,255,255,0],
+    gloves: [127,127,127,255,255,255],
+    boots: [11,67,1,23,135,2],
+    skin: [127,87,61,255,175,123],
+    hair: [73,32,11,146,65,23],
+    parachute: [127,127,0,255,255,0],
+    customCapState: 4
+}
+
 
 const smb3Mario = {
     overalls: [0,0,0,0,0,0],
@@ -89,72 +102,112 @@ const ssMario = {
 }
 
 const ssLuigi = {
-    overalls: [0,96,0,0,255,0],
-    hat: [0,96,0,0,255,0],
+    overalls: [0,127,0,0,255,0],
+    hat: [0,127,0,0,255,0],
     shirt: [0,0,127,0,0,255],
     gloves: [127,127,127,255,255,255],
     boots: [57,14,7,114,28,14],
     skin: [127,96,60,254,193,121],
     hair: [22,0,3,37,0,6],
-    parachute: [0,96,0,0,255,0],
+    parachute: [0,127,0,0,255,0],
+    customCapState: 2
+}
+
+const rMario = {
+    overalls: "r",
+    hat: "r",
+    shirt: "r",
+    gloves: "r",
+    boots: "r",
+    skin: "r",
+    hair: "r",
+    parachute: "r",
     customCapState: 0
+}
+
+const rLuigi = {
+    overalls: "r",
+    hat: "r",
+    shirt: "r",
+    gloves: "r",
+    boots: "r",
+    skin: "r",
+    hair: "r",
+    parachute: "r",
+    customCapState: 2
+}
+
+const rWario = {
+    overalls: "r",
+    hat: "r",
+    shirt: "r",
+    gloves: "r",
+    boots: "r",
+    skin: "r",
+    hair: "r",
+    parachute: "r",
+    customCapState: 4
 }
 
 const skinPresetIndex = [
     defaultSkinData(),
     luigi,
+    wario,
     smb3Mario,
     smb3Luigi,
     waluigi,
     granddad,
     ssMario,
-    ssLuigi
+    ssLuigi,
+    rMario,
+    rLuigi,
+    rWario
 ]
 
 // Initialize color and ambient color wheels
-const colorPicker = new iro.ColorPicker('#picker', {
+window.colorPicker = new iro.ColorPicker('#picker', {
     width: 120
 })
-const ambientPicker = new iro.ColorPicker('#ambpicker', {
+window.ambientPicker = new iro.ColorPicker('#ambpicker', {
     width: 120
 })
-colorPicker.on('input:move', function(color) {
+window.colorPicker.on('input:move', function(color) {
     updateColors(color)
 })
-ambientPicker.on('input:move', function(color) {
+window.ambientPicker.on('input:move', function(color) {
     updateAmbientColors(color)
 })
+
+const get_char = () => {
+	return Math.floor(window.myMario.skinData.customCapState/2)%3
+}
 
 // Update the colors on the wheel
 window.updateWheel = () => {
     // update types too because why not
-    if (window.myMario.skinData.customCapState == 0 || window.myMario.customCapState == 1) {
-        document.getElementById("characterType").value = 0
-    } else {
-        document.getElementById("characterType").value = 1
-    }
+    document.getElementById("characterType").value = get_char()
     for (let i = 0; i < skinPresetIndex.length; i++) {
         if (window.myMario.skinData == skinPresetIndex[i]) {
             document.getElementById("presetBox").value = i
         }
     }
 
-
     let skinType = document.getElementById("skinTypes").value
     if (window.myMario.skinData[skinType].includes("r")) return
 
-    colorPicker.color.red = window.myMario.skinData[skinType][3]
-    colorPicker.color.green = window.myMario.skinData[skinType][4]
-    colorPicker.color.blue = window.myMario.skinData[skinType][5]
+    window.colorPicker.color.red = window.myMario.skinData[skinType][3]
+    window.colorPicker.color.green = window.myMario.skinData[skinType][4]
+    window.colorPicker.color.blue = window.myMario.skinData[skinType][5]
 
-    ambientPicker.color.red = window.myMario.skinData[skinType][0]
-    ambientPicker.color.green = window.myMario.skinData[skinType][1]
-    ambientPicker.color.blue = window.myMario.skinData[skinType][2]
+    window.ambientPicker.color.red = window.myMario.skinData[skinType][0]
+    window.ambientPicker.color.green = window.myMario.skinData[skinType][1]
+    window.ambientPicker.color.blue = window.myMario.skinData[skinType][2]
 }
 
 // Update colors from color wheel data
 const updateColors = (color) => {
     let skinType = document.getElementById("skinTypes").value
+    if (window.myMario.skinData[skinType].includes("r")) return
 
     window.myMario.skinData[skinType][3] = Math.floor(color.red)
     window.myMario.skinData[skinType][4] = Math.floor(color.green)
@@ -164,9 +217,9 @@ const updateColors = (color) => {
         window.myMario.skinData[skinType][1] = Math.floor(color.green/2)
         window.myMario.skinData[skinType][2] = Math.floor(color.blue/2)
 
-        ambientPicker.color.red = window.myMario.skinData[skinType][0]
-        ambientPicker.color.green = window.myMario.skinData[skinType][1]
-        ambientPicker.color.blue = window.myMario.skinData[skinType][2]
+        window.ambientPicker.color.red = window.myMario.skinData[skinType][0]
+        window.ambientPicker.color.green = window.myMario.skinData[skinType][1]
+        window.ambientPicker.color.blue = window.myMario.skinData[skinType][2]
     }
 
     localStorage[`skinData-${skinType}`] = JSON.stringify(window.myMario.skinData[skinType])
@@ -174,31 +227,13 @@ const updateColors = (color) => {
 // Update ambient colors from color wheel data
 const updateAmbientColors = (color) => {
     let skinType = document.getElementById("skinTypes").value
+    if (window.myMario.skinData[skinType].includes("r")) return
 
     window.myMario.skinData[skinType][0] = Math.floor(color.red)
     window.myMario.skinData[skinType][1] = Math.floor(color.green)
     window.myMario.skinData[skinType][2] = Math.floor(color.blue)
     
     localStorage[`skinData-${skinType}`] = JSON.stringify(window.myMario.skinData[skinType])
-}
-
-window.setWheelHex = (val) => {
-    if (val === null || undefined || NaN || "" || " ") return
-    let final = val
-    final = final.replace("#", "")
-    final = `#${val}`
-    colorPicker.color.hexString = final
-    window.updateColors()
-    // document.getElementById("hex").value = ""
-}
-window.setAmbientWheelHex = (val) => {
-    if (val === null || undefined || NaN || "" || " ") return
-    let final = val
-    final = final.replace("#", "")
-    final = `#${val}`
-    ambientPicker.color.hexString = final
-    window.updateAmbientColors()
-    // document.getElementById("hexAmb").value = ""
 }
 
 // Set skin to a preset
@@ -471,7 +506,7 @@ export const validSkins = () => {
     if (!isValidSkinEntry(skinData.skin)) return false
     if (!isValidSkinEntry(skinData.hair)) return false
     if (!isValidSkinEntry(skinData.parachute)) return false
-    if (skinData.customCapState < 0 || skinData.customCapState > 3) return false
+    if (skinData.customCapState < 0 || skinData.customCapState > 5) return false
 
     return true
 }
@@ -493,7 +528,7 @@ export const getExtraRenderData = (socket_id) => {
             mario_parachute_lights: (window.myMario.skinData.parachute == "r" ? rainbowLights : window.myMario.skinData.parachute),
         },
         custom2D: {
-            playerName: pName ? pName : null,
+            playerName: "", // pName ? pName : null,
             chat: (myChat && myChat.timer > 0) ? myChat.msg : null,
             announcement: (networkData.announcement.timer > 0) ? networkData.announcement.message : null
         }
@@ -534,16 +569,15 @@ export const getExtraRenderData = (socket_id) => {
 }
 
 window.myMario.freezeCamera = false
-window.HUDHidden = false
 const hudButton = document.getElementById('hudButton')
 const freezeButton = document.getElementById('freezeButton')
     
 window.hideHUD = () => {
-    window.HUDHidden = !window.HUDHidden
-    hudButton.innerHTML = ('<div class="sm64button">' + (window.HUDHidden ? "Unhide HUD" : "Hide HUD") +'</div>')
+    window.sm64js.HUDHidden = !window.sm64js.HUDHidden
+    hudButton.innerHTML = ('<div class="sm64button">' + (window.sm64js.HUDHidden ? "Unhide HUD" : "Hide HUD") +'</div>')
 }
 
 window.freezeCamera = () => {
-    window.myMario.freezeCamera = !window.myMario.freezeCamera; 
+    window.myMario.freezeCamera = !window.myMario.freezeCamera
     freezeButton.innerHTML = window.myMario.freezeCamera ? ('<div class="sm64button">' + 'Freeze Camera (ON)' + '</div>') : ('<div class="sm64button">' + 'Freeze Camera (OFF)' + '</div>')
 }

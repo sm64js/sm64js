@@ -279,6 +279,11 @@ img#title {
 input {
     text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
 }
+input[type=text] {
+    font-family: "TextboxFont";
+    font-size: 20px;
+    height: 1.8rem;
+}
 .textInput{
     width: 100%;
     height: 2rem;

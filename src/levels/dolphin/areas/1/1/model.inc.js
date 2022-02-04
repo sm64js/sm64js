@@ -9,7 +9,7 @@ import { grass_09004800 as orangerock } from "../../../../../textures/grass"
 import { grass_09003000 as rock } from "../../../../../textures/grass" 
 import { grass_09005800 as leaves } from "../../../../../textures/grass"
 import { ttm_seg7_texture_07001000 as vine } from "../../../../ttm/texture.inc"
-import { texture_waterbox_lava as lava } from "../../../../../common_gfx/segment2"
+import { texture_waterbox_lava as lava } from "../../../../../textures/segment2"
 import { redbrick, bluebrick, greenbrick, window, boost_pad, cloud, black } from "../../../texture.inc"
 
 const dolphin_dl_default_lights = Gbi.gdSPDefLights1(

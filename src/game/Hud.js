@@ -1,6 +1,6 @@
 import { CameraInstance as Camera } from "./Camera"
 import * as Gbi from "../include/gbi"
-import { dl_hud_img_load_tex_block, main_hud_lut, dl_hud_img_begin, dl_hud_img_end, main_hud_camera_lut } from "../common_gfx/segment2"
+import { dl_hud_img_load_tex_block, main_hud_lut, dl_hud_img_begin, dl_hud_img_end, main_hud_camera_lut } from "../textures/segment2"
 import { power_meter_health_segments_lut, dl_power_meter_base, dl_power_meter_health_segments_begin, dl_power_meter_health_segments_end } from "../actors/power_meter/model.inc"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import * as Mario from "./Mario"
@@ -102,7 +102,7 @@ class Hud {
 
     render_dl_power_meter(numHealthWedges) {
         const mtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
-        this.sPowerMeterHUD.x = window.widescreen ? 191 : 140
+        this.sPowerMeterHUD.x = window.sm64js.widescreen ? 191 : 140
         MathUtil.guTranslate(mtx, this.sPowerMeterHUD.x, this.sPowerMeterHUD.y, 0);
         Gbi.gSPMatrix(Game.gDisplayList, mtx, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_MUL | Gbi.G_MTX_PUSH);
         Gbi.gSPDisplayList(Game.gDisplayList, dl_power_meter_base);
@@ -227,15 +227,15 @@ class Hud {
     }
 
     render_hud_coins() {
-        Print.print_text(window.widescreen ? 368 : 168, this.HUD_TOP_Y, "+") // 'Coin' glyph
-        Print.print_text(window.widescreen ? 384 : 184, this.HUD_TOP_Y, "*") // 'X' glyph
-        Print.print_text_fmt_int(window.widescreen ? 398: 198, this.HUD_TOP_Y, "%d", LevelUpdate.gHudDisplay.coins)
+        Print.print_text(window.sm64js.widescreen ? 368 : 168, this.HUD_TOP_Y, "+") // 'Coin' glyph
+        Print.print_text(window.sm64js.widescreen ? 384 : 184, this.HUD_TOP_Y, "*") // 'X' glyph
+        Print.print_text_fmt_int(window.sm64js.widescreen ? 398: 198, this.HUD_TOP_Y, "%d", LevelUpdate.gHudDisplay.coins)
     }
 
     render_hud_stars() {
         var showX = 0;
 
-        if (LevelUpdate.gHudFlash == 1 && window.gGlobalTimer & 0x08) {
+        if (LevelUpdate.gHudFlash == 1 && window.sm64js.gGlobalTimer & 0x08) {
             return;
         }
 
@@ -283,7 +283,7 @@ class Hud {
     render_hud_camera_status() {
         let cameraLUT = main_hud_camera_lut
         let x = GfxDimensions.GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(54)
-        let y = window.widescreen ? 325 : 205
+        let y = window.sm64js.widescreen ? 325 : 205
 
         if (this.sCameraHUD.status == Camera.CAM_STATUS_NONE) {
             return;
@@ -318,7 +318,7 @@ class Hud {
     }
 
     render_hud() {
-        if (window.HUDHidden) return
+        if (window.sm64js.HUDHidden) return
         const hudDisplayFlags = LevelUpdate.gHudDisplay.flags
 
         if (hudDisplayFlags == LevelUpdate.HUD_DISPLAY_NONE) {

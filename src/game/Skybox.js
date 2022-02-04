@@ -1,6 +1,6 @@
 import { atan2s, guOrtho } from "../engine/math_util"
 import  * as Gbi from "../include/gbi"
-import { dl_skybox_begin, dl_skybox_tile_tex_settings, dl_skybox_end, dl_draw_quad_verts_0123 } from "../common_gfx/segment2"
+import { dl_skybox_begin, dl_skybox_tile_tex_settings, dl_skybox_end, dl_draw_quad_verts_0123 } from "../textures/segment2"
 import { make_vertex } from "./GeoMisc"
 
 import { bbh_skybox_ptrlist,

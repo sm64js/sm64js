@@ -10,7 +10,6 @@ class Game {
     constructor() {
         this.main_loop_init() /// thread5_game_loop_init
 		this.pvpEnabled = true;
-        window.gGlobalTimer = 0
     }
 	
     load_pvp() { // Used for PvP toggle.
@@ -94,7 +93,7 @@ class Game {
             this.D_8032C6A0_vsyncFunc.call(this.D_8032C6A0_classObject)
             this.D_8032C6A0_vsyncFunc = null
         }
-        window.gGlobalTimer++
+        window.sm64js.gGlobalTimer++
     }
 }
 

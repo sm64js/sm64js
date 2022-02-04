@@ -153,7 +153,7 @@ export const bhv_small_bubbles_loop = () => {
 export const bhv_fish_group_loop = () => {
     const o = ObjectListProc.gCurrentObject
     if (ObjectListProc.gMarioCurrentRoom == 15 || ObjectListProc.gMarioCurrentRoom == 7)
-        if (window.gGlobalTimer & 1)
+        if (window.sm64js.gGlobalTimer & 1)
             spawn_object(o, MODEL_WHITE_PARTICLE_SMALL, bhvSmallParticleBubbles);
 }
 

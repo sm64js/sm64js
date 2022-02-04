@@ -176,7 +176,7 @@ export const bhv_wave_trail_shrink = () => {
     let waterLevel = SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ])
     // Destroy every other water wave to space them out (this is a terrible way of doing it)
     if (o.rawData[oTimer] == 0)
-        if (window.gGlobalTimer & 1)
+        if (window.sm64js.gGlobalTimer & 1)
             obj_mark_for_deletion(o)
     o.rawData[oPosY] = waterLevel + 5
 

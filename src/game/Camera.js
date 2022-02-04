@@ -722,34 +722,34 @@ class Camera {
         // buttonsPressed &= CBUTTON_MASK
         // buttonsDown &= CBUTTON_MASK
     
-        if (window.playerInput.buttonPressedCl) {
+        if (window.sm64js.playerInput.buttonPressedCl) {
             currentState |= L_CBUTTONS
             currentState &= ~R_CBUTTONS
         }
-        if (!(window.playerInput.buttonDownCl)) {
+        if (!(window.sm64js.playerInput.buttonDownCl)) {
             currentState &= ~L_CBUTTONS
         }
     
-        if (window.playerInput.buttonPressedCr) {
+        if (window.sm64js.playerInput.buttonPressedCr) {
             currentState |= R_CBUTTONS
             currentState &= ~L_CBUTTONS
         }
-        if (!(window.playerInput.buttonDownCr)) {
+        if (!(window.sm64js.playerInput.buttonDownCr)) {
             currentState &= ~R_CBUTTONS
         }
 
-        if (window.playerInput.buttonPressedCu) {
+        if (window.sm64js.playerInput.buttonPressedCu) {
             currentState |= U_CBUTTONS
             currentState &= ~D_CBUTTONS
         }
-        if (!(window.playerInput.buttonDownCu)) {
+        if (!(window.sm64js.playerInput.buttonDownCu)) {
             currentState &= ~U_CBUTTONS
         }
-        if (window.playerInput.buttonPressedCd) {
+        if (window.sm64js.playerInput.buttonPressedCd) {
             currentState |= D_CBUTTONS
             currentState &= ~U_CBUTTONS
         }
-        if (!(window.playerInput.buttonDownCd)) {
+        if (!(window.sm64js.playerInput.buttonDownCd)) {
             currentState &= ~D_CBUTTONS
         }
     
@@ -925,7 +925,7 @@ class Camera {
         let cSideYaw
     
         // Zoom in
-        if (window.playerInput.buttonPressedCu) {
+        if (window.sm64js.playerInput.buttonPressedCu) {
             if (c.mode != CAMERA_MODE_FIXED && (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT)) {
                 this.gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT
                 // play_sound_cbutton_up()
@@ -940,7 +940,7 @@ class Camera {
         }
         if (c.mode != CAMERA_MODE_FIXED) {
             // Zoom out
-            if (window.playerInput.buttonPressedCd) {
+            if (window.sm64js.playerInput.buttonPressedCd) {
                 if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
                     this.gCameraMovementFlags |= CAM_MOVE_ALREADY_ZOOMED_OUT
                     this.sZoomAmount = this.gCameraZoomDist + 400
@@ -953,7 +953,7 @@ class Camera {
     
             // Rotate left or right
             cSideYaw = 0x1000
-            if (window.playerInput.buttonPressedCr) {
+            if (window.sm64js.playerInput.buttonPressedCr) {
                 if (this.gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT) {
                     this.gCameraMovementFlags &= ~CAM_MOVE_ROTATE_LEFT
                 } else {
@@ -964,7 +964,7 @@ class Camera {
                     this.sCSideButtonYaw = -cSideYaw
                 }
             }
-            if (window.playerInput.buttonPressedCl) {
+            if (window.sm64js.playerInput.buttonPressedCl) {
                 if (this.gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT) {
                     this.gCameraMovementFlags &= ~CAM_MOVE_ROTATE_RIGHT
                 } else {
@@ -1038,7 +1038,7 @@ class Camera {
             } else {
                 nextYawVel = 0x100
             }
-            if ((window.playerInput.stickX != 0 || window.playerInput.stickY != 0) != 0) {
+            if ((window.sm64js.playerInput.stickX != 0 || window.sm64js.playerInput.stickY != 0) != 0) {
                 nextYawVel = 0x20
             }
         } else {
@@ -1074,7 +1074,7 @@ class Camera {
             closeToMario |= 1
         }
 
-        if (-16 < window.playerInput.stickY) c.yaw = yaw
+        if (-16 < window.sm64js.playerInput.stickY) c.yaw = yaw
 
         const posHeightWrapper = {}, focHeightWrapper = {}
         this.calc_y_to_curr_floor(posHeightWrapper, 1, 200, focHeightWrapper, 0.9, 200)

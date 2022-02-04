@@ -7,7 +7,7 @@ export const intro_default = () => {
     //// and press start text
     Area.print_intro_text();
 
-    if (window.playerInput.buttonPressedStart && window.playerNameAccepted) return 1
+    if (window.sm64js.playerInput.buttonPressedStart && window.playerNameAccepted) return 1
     else return 0
 }
 

@@ -3,7 +3,6 @@ import { gameData, sendChat, submitPlayerName } from "./mmo/socket"
 import { tauntCommands, handleTaunt } from "./mmo/graphics/taunt"
 
 /////// Keyboard / Gamepad Input ////////
-window.playerInput = {}
 window.banPlayerList = []
 window.show_minimap = 0
 let textboxfocus = false
@@ -354,21 +353,21 @@ export const playerInputUpdate = () => {
     let parachuteDown = gamepadFinal.parachute || keyboardFinal.parachute
     let buttonDownChat = keyboardFinal.chat
 
-    window.playerInput = {
+    window.sm64js.playerInput = {
         stickX, stickY,
         stickMag: mag,
 
-        buttonPressedA: buttonDownA && !window.playerInput.buttonDownA,
-        buttonPressedStart: buttonDownStart && !window.playerInput.buttonDownStart,
-        buttonPressedB: buttonDownB && !window.playerInput.buttonDownB,
-        buttonPressedZ: buttonDownZ && !window.playerInput.buttonDownZ,
-        buttonPressedCl: buttonDownCl && !window.playerInput.buttonDownCl && !buttonDownTaunt,
-        buttonPressedCr: buttonDownCr && !window.playerInput.buttonDownCr && !buttonDownTaunt,
-        buttonPressedCu: buttonDownCu && !window.playerInput.buttonDownCu && !buttonDownTaunt,
-        buttonPressedCd: buttonDownCd && !window.playerInput.buttonDownCd && !buttonDownTaunt,
-        buttonPressedMap: buttonDownMap && !window.playerInput.buttonDownMap,
-		parachute: parachuteDown && !window.playerInput.parachuteDown,
-        buttonPressedChat: buttonDownChat && !window.playerInput.buttonDownChat,
+        buttonPressedA: buttonDownA && !window.sm64js.playerInput.buttonDownA,
+        buttonPressedStart: buttonDownStart && !window.sm64js.playerInput.buttonDownStart,
+        buttonPressedB: buttonDownB && !window.sm64js.playerInput.buttonDownB,
+        buttonPressedZ: buttonDownZ && !window.sm64js.playerInput.buttonDownZ,
+        buttonPressedCl: buttonDownCl && !window.sm64js.playerInput.buttonDownCl && !buttonDownTaunt,
+        buttonPressedCr: buttonDownCr && !window.sm64js.playerInput.buttonDownCr && !buttonDownTaunt,
+        buttonPressedCu: buttonDownCu && !window.sm64js.playerInput.buttonDownCu && !buttonDownTaunt,
+        buttonPressedCd: buttonDownCd && !window.sm64js.playerInput.buttonDownCd && !buttonDownTaunt,
+        buttonPressedMap: buttonDownMap && !window.sm64js.playerInput.buttonDownMap,
+		parachute: parachuteDown && !window.sm64js.playerInput.parachuteDown,
+        buttonPressedChat: buttonDownChat && !window.sm64js.playerInput.buttonDownChat,
 		
         buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap, buttonDownTaunt, parachuteDown, buttonDownChat,
 
@@ -378,16 +377,16 @@ export const playerInputUpdate = () => {
 
     window.taunt = undefined
 
-    if (window.playerInput.buttonPressedMap) window.show_minimap += 1
+    if (window.sm64js.playerInput.buttonPressedMap) window.show_minimap += 1
     if (window.show_minimap > 2) window.show_minimap = 0
 
-    if (gameData.marioState) gameData.marioState.controller = window.playerInput
+    if (gameData.marioState) gameData.marioState.controller = window.sm64js.playerInput
 
-    if (window.playerInput.buttonPressedStart && keyboardButtonMapping.start != "enter") {
+    if (window.sm64js.playerInput.buttonPressedStart && keyboardButtonMapping.start != "enter") {
         submitPlayerName()
     }
 
-    if (window.playerInput.buttonPressedChat) {
+    if (window.sm64js.playerInput.buttonPressedChat) {
         document.getElementById("chatbox").focus()
     }
 }

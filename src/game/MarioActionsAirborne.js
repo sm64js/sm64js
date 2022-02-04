@@ -233,8 +233,8 @@ const act_jump = (m) => {
 	
     if (check_kick_or_dive_in_air(m)) return 1
 	
-	if (Mario.get_character_type(m) == 2 && m.vel[3] != 0.0) {m.vel[3] += 0.5}
-	if (m.input & Mario.INPUT_A_PRESSED && Mario.get_character_type(m) == 2 && m.vel[3] >= 0.0) { Mario.set_mario_action(m, Mario.ACT_FLUTTERJUMP, 0) }
+	if (Mario.get_character_type(m) == 3 && m.vel[3] != 0.0) {m.vel[3] += 0.5}
+	if (m.input & Mario.INPUT_A_PRESSED && Mario.get_character_type(m) == 3 && m.vel[3] >= 0.0) { Mario.set_mario_action(m, Mario.ACT_FLUTTERJUMP, 0) }
 	
     if (m.input & Mario.INPUT_Z_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
@@ -260,8 +260,8 @@ const act_freefall = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
 	
-	if (Mario.get_character_type(m) == 2 && m.vel[3] != 0.0) {m.vel[3] += 0.5}
-	if (m.input & Mario.INPUT_A_PRESSED && Mario.get_character_type(m) == 2 && m.vel[3] >= 0.0) { Mario.set_mario_action(m, Mario.ACT_FLUTTERJUMP, 0) }
+	if (Mario.get_character_type(m) == 3 && m.vel[3] != 0.0) {m.vel[3] += 0.5}
+	if (m.input & Mario.INPUT_A_PRESSED && Mario.get_character_type(m) == 3 && m.vel[3] >= 0.0) { Mario.set_mario_action(m, Mario.ACT_FLUTTERJUMP, 0) }
 
     if (m.input & Mario.INPUT_Z_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
@@ -756,7 +756,7 @@ const act_ground_pound = (m) => {
         }
     }
 	
-	if (m.input & Mario.INPUT_B_PRESSED && m.actionTimer > 8 && Mario.get_character_type(m) != 2) {
+	if (m.input & Mario.INPUT_B_PRESSED && m.actionTimer > 8 && Mario.get_character_type(m) != 3) {
 		m.faceAngle[1] = m.intendedYaw
 		m.vel[1] = 45.0
 		Mario.set_forward_vel(m, 30.0)

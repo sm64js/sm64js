@@ -2,7 +2,7 @@ import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../include/config"
 import * as Gbi from "../include/gbi"
 import { guOrtho } from "../engine/math_util"
 import { GameInstance as Game } from "./Game"
-import { dl_hud_img_load_tex_block, dl_hud_img_begin, dl_hud_img_end, main_hud_lut } from "../common_gfx/segment2"
+import { dl_hud_img_load_tex_block, dl_hud_img_begin, dl_hud_img_end, main_hud_lut } from "../textures/segment2"
 import * as Mario from "./Mario"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 
@@ -33,6 +33,7 @@ class Print {
         this.GLYPH_APOSTROPHE = 56;
         this.GLYPH_DOUBLE_QUOTE = 57;
         this.GLYPH_UMLAUT = 58;
+        this.GLYPH_WARIO_HEAD = 59
 
         this.sTextLabels = [];
         for (var i = 0; i < 52; i++) {
@@ -247,10 +248,19 @@ class Print {
         }
 
         if (c == ',') {
-            if (Mario.get_character_type(LevelUpdate.gMarioState) != 1) {
-                return this.GLYPH_MARIO_HEAD
-            } else {
-                return this.GLYPH_UMLAUT
+            switch(Mario.get_character_type(LevelUpdate.gMarioState)) {
+                case 0:
+                    return this.GLYPH_MARIO_HEAD
+                    break
+                case 1:
+                    return this.GLYPH_UMLAUT
+                    break
+                case 2:
+                    return this.GLYPH_WARIO_HEAD
+                    break
+                default:
+                    return this.GLYPH_MARIO_HEAD
+                    break
             }
         }
 

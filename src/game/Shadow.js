@@ -6,7 +6,7 @@ import { atan2s } from "../engine/math_util"
 import { coss, sins } from "../utils"
 import { make_vertex, round_float } from "./GeoMisc"
 import * as Gbi from "../include/gbi"
-import { dl_shadow_circle, dl_shadow_9_verts, dl_shadow_end, dl_shadow_4_verts } from "../common_gfx/segment2"
+import { dl_shadow_circle, dl_shadow_9_verts, dl_shadow_end, dl_shadow_4_verts } from "../textures/segment2"
 
 export const SHADOW_CIRCLE_9_VERTS = 0
 export const SHADOW_CIRCLE_4_VERTS = 1

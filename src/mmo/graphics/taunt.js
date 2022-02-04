@@ -56,25 +56,25 @@ export const tauntsMap = [
 export const getSelectedTaunt = () => {
 	let IDXb = 0
 	let IDX = 0
-	if (window.playerInput.buttonDownCu) {IDXb = 1}
-	if (window.playerInput.buttonDownCd) {IDXb = -1}
+	if (window.sm64js.playerInput.buttonDownCu) {IDXb = 1}
+	if (window.sm64js.playerInput.buttonDownCd) {IDXb = -1}
 	switch (IDXb) {
 		case (0) : {
 			IDX = 0;
-			if (window.playerInput.buttonDownCr) IDX = 3
-			if (window.playerInput.buttonDownCl) IDX = 7
+			if (window.sm64js.playerInput.buttonDownCr) IDX = 3
+			if (window.sm64js.playerInput.buttonDownCl) IDX = 7
 			break;
 		}
 		case (1) : {
 			IDX = 1;
-			if (window.playerInput.buttonDownCr) IDX = 2
-			if (window.playerInput.buttonDownCl) IDX = 8
+			if (window.sm64js.playerInput.buttonDownCr) IDX = 2
+			if (window.sm64js.playerInput.buttonDownCl) IDX = 8
 			break;
 		}
 		case (-1) : {
 			IDX = 5;
-			if (window.playerInput.buttonDownCr) IDX = 4
-			if (window.playerInput.buttonDownCl) IDX = 6
+			if (window.sm64js.playerInput.buttonDownCr) IDX = 4
+			if (window.sm64js.playerInput.buttonDownCl) IDX = 6
 			break;
 		}
 	}

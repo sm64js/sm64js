@@ -206,14 +206,14 @@ class Area {
     }
 
     print_intro_text() {
-        if ((window.gGlobalTimer & 0x1F) < 20) {
+        if ((window.sm64js.gGlobalTimer & 0x1F) < 20) {
             var noController = false; // gControllerBits == 0
 
             if (noController) {
                 Print.print_text_centered(SCREEN_WIDTH / 2, 20, "NO CONTROLLER");
             } else {
-                Print.print_text_centered(60, window.widescreen ? -62 : 38, "PRESS");
-                Print.print_text_centered(60, window.widescreen ? -80 : 20, "START");
+                Print.print_text_centered(60, window.sm64js.widescreen ? -62 : 38, "PRESS");
+                Print.print_text_centered(60, window.sm64js.widescreen ? -80 : 20, "START");
             }
         }
     }

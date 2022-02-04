@@ -15,6 +15,16 @@ import { set_vp } from "./include/config"
 const send_display_list = (gfx_list) => { GFX.run(gfx_list) }
 
 window.pvp = true
+window.sm64js = {
+    fps: 0,
+    latency: 0,
+    totalTrianges: 0,
+    playerInput: {},
+    gGlobalTimer: 0,
+    snow: false,
+    HUDHidden: false,
+    widescreen: false
+}
 
 let n_frames = 0
 let target_time = 0
@@ -128,15 +138,15 @@ const totalFrameTimeBuffer = createRingBuffer(10)
 const fpsMeter = document.getElementById("fpsMeter")
 const pingMeter = document.getElementById("pingMeter")
 
-window.fps = 0
-window.latency = 0
+window.sm64js.fps = 0
+window.sm64js.latency = 0
 
 const setStatsUpdate = setInterval(() => {
     const totalFrameTimeAvg = totalFrameTimeBuffer.getAvg().toFixed(2)
     const maxFps = (1000 / totalFrameTimeAvg).toFixed(2)
-    window.fps = parseInt(maxFps)
-    if (!isNaN(window.fps)) fpsMeter.textContent = `FPS: ${window.fps}`
-    pingMeter.textContent = `Ping: ${window.latency}ms`
+    window.sm64js.fps = parseInt(maxFps)
+    if (!isNaN(window.sm64js.fps)) fpsMeter.textContent = `FPS: ${window.sm64js.fps}`
+    pingMeter.textContent = `Ping: ${window.sm64js.latency}ms`
 }, 500)
 
 // widescreen
@@ -163,7 +173,7 @@ fullCanvas.height = 480
 const customWidth = 1280
 const customHeight = 720
 
-window.widescreen = false
+window.sm64js.widescreen = false
 
 const widescreenOn = () => {
     relativePositioner.style.width = "100%";
@@ -198,7 +208,7 @@ const widescreenOn = () => {
     viewport.vscale = [customWidth, customHeight, 0, 0]
     viewport.vtrans = [0, 0, 0, 0]
     set_vp(customWidth / 2, customHeight / 2) // SCREEN_WIDTH and SCREEN_HEIGHT
-    window.widescreen = true
+    window.sm64js.widescreen = true
 }
 
 const widescreenOff = () => {
@@ -226,7 +236,7 @@ const widescreenOff = () => {
     viewport.vscale = [640, 480, 511, 0]
     viewport.vtrans = [640, 480, 511, 0]
     set_vp(320, 240) // SCREEN_WIDTH and SCREEN_HEIGHT
-    window.widescreen = false
+    window.sm64js.widescreen = false
 }
 
 window.toggleWidescreen = () => {
@@ -259,59 +269,59 @@ window.switchbox = (name) => {
         case "optionsbox":
             signbox.hidden = true
             signInside.hidden = true
-            //
+
             optionsbox.hidden = false
             optionsInside.hidden = false
-            //
+
             customizebox.hidden = true
             customizeInside.hidden = true
-            //
+
             controlsbox.hidden = true
             controlsInside.hidden = true
             break
         case "customizebox":
             signbox.hidden = true
             signInside.hidden = true
-            //
+
             optionsbox.hidden = true
             optionsInside.hidden = true
-            //
+
             customizebox.hidden = false
             customizeInside.hidden = false
-            //
+
             controlsbox.hidden = true
             controlsInside.hidden = true
             break
         case "controlsbox":
             signbox.hidden = true
             signInside.hidden = true
-            //
+
             optionsbox.hidden = true
             optionsInside.hidden = true
-            //
+
             customizebox.hidden = true
             customizeInside.hidden = true
-            //
+
             controlsbox.hidden = false
             controlsInside.hidden = false
             break
         default:
             signbox.hidden = false
             signInside.hidden = false
-            //
+
             optionsbox.hidden = true
             optionsInside.hidden = true
-            //
+
             customizebox.hidden = true
             customizeInside.hidden = true
-            //
+
             controlsbox.hidden = true
             controlsInside.hidden = true
             break
     }
 }
 
-window.snow = false
+window.sm64js.snow = false
 
 window.enterFullScreenMode = () => {
     const dstCanvas = document.getElementById('fullCanvas')

@@ -79,6 +79,9 @@ const update_walking_speed = (m) => {
     if (m.floor && m.floor.type == SURFACE_SLOW) maxTargetSpeed = 24
     else maxTargetSpeed = 32
 	
+    if (Mario.get_character_type(m) == 1) maxTargetSpeed = 48
+    if (Mario.get_character_type(m) == 2) maxTargetSpeed = 24
+
     targetSpeed = m.intendedMag < maxTargetSpeed ? m.intendedMag : maxTargetSpeed
 
     if (m.forwardVel <= 0.0) {

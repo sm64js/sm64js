@@ -107,7 +107,7 @@ const custom_draw_message_bubble = (text, fontsize, pixelX, pixelY, backgroundCo
 
 
 export const custom_draw_text = (x, y, w) => {
-    if (window.HUDHidden) return
+    if (window.sm64js.HUDHidden) return
     context2d.save()
 
     const pixelX = ((x / w) * 0.5 + 0.5) * canvas2d.width
@@ -134,8 +134,8 @@ export const custom_draw_text = (x, y, w) => {
     }
 
     if (customData2D.announcement) {
-        custom_draw_message_bubble("Server Announcement:", "20", window.widescreen ? 640 : 320, 60, "#FFFFFF", 1.0, "#9400D3")
-        custom_draw_message_bubble(customData2D.announcement, "18", window.widescreen ? 640 : 320, 90, "#FFFFFF", 1.0, "#9400D3", 640)
+        custom_draw_message_bubble("Server Announcement:", "20", window.sm64js.widescreen ? 640 : 320, 60, "#FFFFFF", 1.0, "#9400D3")
+        custom_draw_message_bubble(customData2D.announcement, "18", window.sm64js.widescreen ? 640 : 320, 90, "#FFFFFF", 1.0, "#9400D3", 640)
     }
 
     context2d.restore()
@@ -168,27 +168,27 @@ const drawMinimapIconRotation = (sprite, width, height, X, Z, scale_map, scale_i
 }
 
 export const draw2Dpost3Drendering = () => {
-    if (window.HUDHidden) return
+    if (window.sm64js.HUDHidden) return
     context2d.globalAlpha = 0.8
-    /*if (window.latency) {
+    /*if (window.sm64js.latency) {
         context2d.font = "bold 24px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
         context2d.fillStyle = "#9e1bd1" //ping color?
         if (document.getElementById("gameCanvas").width == 640) {
-            context2d.fillText(`Ping: ${window.latency}ms`, 580, 20)
+            context2d.fillText(`Ping: ${window.sm64js.latency}ms`, 580, 20)
         } else {
-            context2d.fillText(`Ping: ${window.latency}ms`, 1220, 20) // can also be done by doing document.getElementById("gameCanvas").width - 60
+            context2d.fillText(`Ping: ${window.sm64js.latency}ms`, 1220, 20) // can also be done by doing document.getElementById("gameCanvas").width - 60
         }
     }
-    if (!isNaN(window.fps)) {
+    if (!isNaN(window.sm64js.fps)) {
         context2d.globalAlpha = 0.8
         context2d.font = "bold 24px TextboxFont, verdana, sans-serif"
         context2d.textAlign = "center"
         context2d.fillStyle = "#9e1bd1" //fps color
         if (document.getElementById("gameCanvas").width == 640) {
-            context2d.fillText(`FPS: ${window.fps}`, 580, 40)
+            context2d.fillText(`FPS: ${window.sm64js.fps}`, 580, 40)
         } else {
-            context2d.fillText(`FPS: ${window.fps}`, 1220, 40)
+            context2d.fillText(`FPS: ${window.sm64js.fps}`, 1220, 40)
         }
     }*/
 	if (gameData.marioState && !isNaN(window.myMario.readOnlyHealth)) {
@@ -227,7 +227,7 @@ export const draw2Dpost3Drendering = () => {
         }
     }
 
-    if (gameData.marioState && window.playerInput.buttonDownTaunt) {
+    if (gameData.marioState && window.sm64js.playerInput.buttonDownTaunt) {
         window.tauntOpened = true
         const SELECTED = Taunt.getSelectedTaunt()
         const wheelPos = Taunt.tauntsPosWheel[SELECTED]
@@ -241,7 +241,7 @@ export const draw2Dpost3Drendering = () => {
         context2d.drawImage(TauntWheel,wheelPos[0],wheelPos[1],(Taunt.gfxTscaleICO*1.1),(Taunt.gfxTscaleICO*1.1))
     }
 
-    if (gameData.marioState && !window.playerInput.buttonDownTaunt && window.tauntOpened) {
+    if (gameData.marioState && !window.sm64js.playerInput.buttonDownTaunt && window.tauntOpened) {
 		window.tauntOpened = false
 		const TAUNT = Taunt.tauntsMap[Taunt.getSelectedTaunt()]
 		if (TAUNT != -1) window.taunt = TAUNT
@@ -251,7 +251,7 @@ export const draw2Dpost3Drendering = () => {
 let imgHeight = 0
 
 export const drawFX = () => {
-    if (!window.snow) return
+    if (!window.sm64js.snow) return
 
     contextFX.clearRect(0, 0, canvas2d.width, canvas2d.height)
     // snow

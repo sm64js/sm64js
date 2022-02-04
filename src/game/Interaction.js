@@ -72,7 +72,8 @@ import {
     set_forward_vel,
     set_mario_action,
     sForwardKnockbackActions,
-    respawn_player               } from "./Mario"
+    respawn_player,
+    get_character_type               } from "./Mario"
 import { GameInstance as Game } from "./Game"
 import { AreaInstance as Area } from "./Area"
 import * as MarioConstants from "../include/mario_constants"
@@ -385,7 +386,7 @@ const reset_mario_pitch = (m) => {
 }
 
 const interact_coin = (m, o) => {
-    m.numCoins += o.rawData[oDamageOrCoinValue]
+    m.numCoins += o.rawData[oDamageOrCoinValue] *= get_character_type(m) == 2 ? 2 : 1
     m.healCounter += 4 * o.rawData[oDamageOrCoinValue]
 
     o.rawData[oInteractStatus] = INT_STATUS_INTERACTED
@@ -412,7 +413,7 @@ const mario_stop_riding_and_holding = (m) => {
 
     if (m.action == ACT_RIDING_HOOT) {
         m.usedObj.rawData[oInteractStatus] = 0
-        m.usedObj.rawData[oHootMarioReleaseTime] = window.gGlobalTimer
+        m.usedObj.rawData[oHootMarioReleaseTime] = window.sm64js.gGlobalTimer
     }
 }
 

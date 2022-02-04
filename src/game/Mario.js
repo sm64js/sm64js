@@ -22,6 +22,8 @@ import { gameData as socketGameData } from "../mmo/socket"
 import { int16, sins, coss } from "../utils"
 import * as MarioConstants from "../include/mario_constants"
 
+import { Howl, Howler } from "howler"
+
 ////// Mario Constants
 export const ANIM_FLAG_NOLOOP = (1 << 0) // 0x01
 export const ANIM_FLAG_FORWARD = (1 << 1) // 0x02
@@ -691,9 +693,125 @@ export const sBackwardKnockbackActions = [
     [ACT_BACKWARD_WATER_KB, ACT_BACKWARD_WATER_KB, ACT_BACKWARD_WATER_KB]
 ]
 
+/*const rand = (max) => { return Math.floor(Math.random() * max) }
+
+class MarioAudioTable {
+    constructor() {
+        this.chan1_table = {
+            hoo:  "https://agent-11.github.io/assets/pcport2mp3/hoo.mp3",
+            hoohoo: "https://agent-11.github.io/assets/pcport2mp3/hoohoo.mp3",
+            yah1: "https://agent-11.github.io/assets/pcport2mp3/yah1.mp3",
+            yah2: "https://agent-11.github.io/assets/pcport2mp3/yah2.mp3",
+            yahoo: "https://agent-11.github.io/assets/pcport2mp3/yahoo.mp3",
+            yipee: "https://agent-11.github.io/assets/pcport2mp3/yipee.mp3",
+            wah: "https://agent-11.github.io/assets/pcport2mp3/wah.mp3",
+            waha: "https://agent-11.github.io/assets/pcport2mp3/waha.mp3",
+            woo: "https://agent-11.github.io/assets/pcport2mp3/woo.mp3"
+        }
+
+        this.chan1 = new Howl({src: [this.chan1_table[this.chan1_table["yahoo"]]]}) // mario, placeholder
+        this.chan2 = new Howl({src: [this.chan1_table[this.chan1_table["yahoo"]]]}) // footsteps, plaveholder
+        this.chan3 = new Howl({src: [this.chan1_table[this.chan1_table["yahoo"]]]}) // misc, placeholder
+    }
+
+    play_chan1(name, vol = 1, speed = 1, playAnyway = true) {
+        if (!playAnyway && this.chan1.playing()) return
+        this.chan1 = new Howl({src: [this.chan1_table[name]], autoplay: true, volume: vol})
+        this.chan1.rate(speed)
+    }
+    play_chan2(name, vol = 1, speed = 1, playAnyway = true) {
+        if (!playAnyway && this.chan2.playing()) return
+        this.chan2 = new Howl({src: [this.chan1_table[name]], autoplay: true, volume: vol})
+        this.chan2.rate(speed)
+    }
+    play_chan3(name, vol = 1, speed = 1, playAnyway = true) {
+        if (!playAnyway && this.chan3.playing()) return
+        this.chan3 = new Howl({src: [this.chan1_table[name]], autoplay: true, volume: vol})
+        this.chan3.rate(speed)
+    }
+
+    play_jump_snd(vol = 1) {
+        switch(rand(4)) {
+            case 0:
+                this.play_chan1("woo", vol)
+                break
+            case 1:
+                this.play_chan1("yah1", vol)
+                break
+            case 2:
+                this.play_chan1("yah2", vol)
+                break
+            default:
+                this.play_chan1("wah", vol)
+                break
+        }
+    }
+
+    play_triple_jump_snd(vol = 1) {
+        switch (rand(3)) {
+            case 0:
+                this.play_chan1("yahoo", vol)
+                break
+            case 1:
+                this.play_chan1("waha", vol)
+                break
+            default:
+                this.play_chan1("yipee", vol)
+                break
+        }
+    }
+
+    actionHandler(action, actionArg, input) {
+        switch (action) {
+            case ACT_DIVE: {
+                if ((input & INPUT_OFF_FLOOR)) {
+                    this.play_chan1("woohoo")
+                } else {
+                    this.play_jump_snd()
+                }
+                break;
+            }
+            case ACT_JUMP:
+                this.play_jump_snd()
+                break
+            case ACT_DOUBLE_JUMP:
+                this.play_chan1("hoohoo")
+                break
+            case ACT_TRIPLE_JUMP:
+                this.play_triple_jump_snd()
+                break
+            case ACT_LONG_JUMP:
+                this.play_chan1("yahoo")
+                break
+            case ACT_PUNCHING:
+                switch (actionArg) {
+                    case 1:
+                        this.play_chan1("yah")
+                        break
+                    case 4:
+                        this.play_chan1("wah")
+                        break
+                    case 6:
+                        this.play_chan1("hoo")
+                        break
+                    case 9:
+                        this.play_chan1("hoo")
+                        break
+                }
+                break
+            case ACT_JUMP_KICK:
+                this.play_chan1("hoo")
+            case ACT_BACKFLIP:
+                this.play_chan1("yah")
+
+        }
+    }
+}*/
+
 export const init_marios = () => {
 
     Object.assign(LevelUpdate.gMarioState, {
+        // snd: new MarioAudioTable(),
         actionTimer: 0,
         framesSinceA: 0xFF,
         framesSinceB: 0xFF,
@@ -746,11 +864,12 @@ export const set_forward_vel = (m, forwardVel) => {
 
 export const get_character_type = (m) => { // todo; make draw from 'm' somehow.
 	if (!m.marioObj.localMario) return 0;
-	return Math.floor(window.myMario.skinData.customCapState/2)%2
+	return Math.floor(window.myMario.skinData.customCapState/2)%3
 }
 
+const y_vel = [0, 5.5, -3.5]
 export const set_mario_y_vel_based_on_fspeed = (m, initialVelY, multiplier) => {
-    m.vel[1] = initialVelY + (get_character_type(m) == 1 ? 5.5 : 0.0) + (m.forwardVel * multiplier)
+    m.vel[1] = initialVelY + (y_vel[get_character_type(m)] + (m.forwardVel * multiplier))
 }
 
 const read_next_anim_value = (curFrame, attribute, values) => {
@@ -889,6 +1008,8 @@ export const set_mario_action = (m, action, actionArg) => {
     m.actionArg = actionArg
     m.actionState = 0
     m.actionTimer = 0
+
+    // if (m.marioObj.localMario) { m.snd.actionHandler(m.action, m.actionArg, m.input) }
 
     return 1
 }
@@ -1189,7 +1310,7 @@ const mario_update_hitbox_and_cap_model = (m) => {
         //  this can be paused through to give continual invisibility. This leads to
         //  no interaction with objects.
 
-        if (window.gGlobalTimer & 1) {
+        if (window.sm64js.gGlobalTimer & 1) {
             m.marioObj.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
         }
     }

@@ -57,7 +57,7 @@ export const recvChat = (chatmsg) => {
     const from = document.createElement('strong')
     if (sender.includes('#')) from.append(createEmote('discord'))
     if (isAdmin) {
-        node.style.color = "#3B56FF"
+        node.style.color = "blue"
         from.append("(Mod)")
     }
     from.append(sender)
@@ -67,10 +67,10 @@ export const recvChat = (chatmsg) => {
     chatlog.appendChild(node)
     chatlog.scrollTop = document.getElementById("chatlog").scrollHeight
 
-    if (sender == "Server") {
-        node.style.color = "#D3D3D3"
+    /*if (sender == "[Server]") {
+        node.style.color = "blue"
         return
-    }
+    }*/
 
     let someobject
     if (socket_id == networkData.mySocketID)

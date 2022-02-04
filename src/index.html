@@ -253,13 +253,13 @@
                         Full Window Mode
                         </div>
                     </button>
-                    <button type="button"
+                    <!--button type="button"
                         class="blue-button"
                         onclick="window.enterFullScreenMode()">
                         <div class="sm64button">
                         Fullscreen Mode
                         </div>
-                    </button>
+                    </button-->
                     <button type="button"
                         class="blue-button"
                         onclick="window.toggleWidescreen()">
@@ -279,7 +279,7 @@
                         <br>
                         <div>
                             <button class="blue-button"
-                                onclick="window.myMario.skinData = window.parseColorCode(document.getElementById('ccPasteArea').value); document.getElementById('ccPasteArea').value = ''">
+                                onclick="window.myMario.skinData = window.parseColorCode(document.getElementById('ccPasteArea').value); document.getElementById('ccPasteArea').value = ''; window.myMario.saveSkin()">
                                 <div class="sm64button">
                                 Import Color Code
                                 </div>
@@ -328,19 +328,24 @@
                                 <optgroup label="Main Color Codes">
                                     <option value="0">Mario Colors</option>
                                     <option value="1">Luigi Colors</option>
+                                    <option value="2">Wario Colors</option>
                                 </optgroup>
                                 <optgroup label="Other Color Codes">
-                                    <option value="2">SMB3 Mario</option>
-                                    <option value="3">SMB3 Luigi</option>
-                                    <option value="4">Waluigi</option>
-                                    <option value="5">7 GRAND DAD</option>
-                                    <option value="6">Super Show Mario</option>
-                                    <option value="7">Super Show Luigi</option>
+                                    <option value="3">SMB3 Mario</option>
+                                    <option value="4">SMB3 Luigi</option>
+                                    <option value="5">Waluigi</option>
+                                    <option value="6">7 GRAND DAD</option>
+                                    <option value="7">Super Show Mario</option>
+                                    <option value="8">Super Show Luigi</option>
+                                    <option value="9">Rainbow Mario</option>
+                                    <option value="10">Rainbow Luigi</option>
+                                    <option value="11">Rainbow Wario</option>
                                 </optgroup>
                             </select>
                             <select id="characterType" style="width:120px; height: 2rem; font-family: 'TextboxFont';" onchange="window.setCharacter(this.value)">
                                 <option value="0">Mario</option>
                                 <option value="1">Luigi</option>
+                                <option value="2">Wario</option>
                             </select>
                         </div>
                     </div>
@@ -383,7 +388,24 @@
                         <div id="ambpicker"></div>
                     </div>
 
+                    <!-- Hex input -->
+                    <input type="text" id="hex" placeholder="Main color picker hex" 
+                        onchange="window.colorPicker.color.hexString = this.value
+                        if (document.getElementById('updateAmb').checked) {
+                            const c = window.colorPicker
+                            const a = window.ambientPicker
+                            a.color.red = c.color.red / 2
+                            a.color.green = c.color.green / 2
+                            a.color.blue = c.color.blue / 2
+                        }">
+                    <input type="text" id="hexAmb" placeholder="Ambient color picker hex" onchange="window.ambientPicker.color.hexString = this.value">
+                    <button class="green-button" onclick="alert(`Color:\n${window.colorPicker.color.hexString}\nAmbient color:\n${window.ambientPicker.color.hexString}`)"><div class="sm64button">Print hex codes</div></button>
                 
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+
                     <!-- Controls and customization -->
                     <div id="pinkControls">
                         <button type="button"

@@ -74,7 +74,7 @@ class MarioMisc {
     }
 
     geo_switch_mario_model(callContext, switchCase) {
-        switchCase.selectedCase = this.customCapState > 0 ? Math.floor(this.customCapState/2)%2 : 0
+        switchCase.selectedCase = this.customCapState > 0 ? Math.floor(this.customCapState/2)%3 : 0
     }
 
     geo_switch_parachuting(callContext, switchCase) {

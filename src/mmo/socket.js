@@ -188,7 +188,6 @@ const recvFlagList = (flaglist) => {
 
 let flagSound
 let playing = false
-
 const playFlagSound = (sound) => {
     if (playing) return
     
@@ -394,15 +393,11 @@ const checkForFlagGrab = () => {
                 rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
                 sendData(rootMsg.serializeBinary())
                 playFlagSound("/mmo/assets/sound/flag_collect.mp3")
-                m.numStars++
+                // m.numStars++
             }
         }
     }
     
-}
-
-export const sendPlayerInteraction = (socket_id, interaction) => {
-    //socket.emit('playerInteract', { socket_id, interaction }, { reliable: true })
 }
 
 let pName

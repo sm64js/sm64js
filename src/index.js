@@ -334,7 +334,7 @@ window.enterFullScreenMode = () => {
 }
 
 ///// Start Game
-const rulesVersion = 13
+const rulesVersion = 14
 let gameStarted = false
 
 if (localStorage['rules'] == rulesVersion) {
@@ -374,6 +374,7 @@ const startGame = () => {
     document.getElementById("startbutton").classList.remove('green-button')
     document.getElementById("startbutton").classList.add('red-button')
     document.getElementById("startbutton").innerHTML = '<div class="sm64button">Restart Game</div>'
+    document.getElementById("pvpButton").hidden = true
 
     document.getElementById("connectedMsg").hidden = false
 	
@@ -381,7 +382,7 @@ const startGame = () => {
 }
 
 window.togglePvp = () => {
-	window.pvp = !window.pvp
+	if (!gameStarted) window.pvp = !window.pvp
 	document.getElementById("pvpButton").innerHTML = '<div class="sm64button">'+('PvP: ' + (window.pvp ? 'On' : 'Off'))+'</div>'
 }
 

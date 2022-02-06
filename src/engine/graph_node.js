@@ -3,6 +3,7 @@ import { G_CC_DECALRGB } from "../include/gbi"
 import { GeoLayoutInstance as GeoLayout } from "./GeoLayout"
 import { GeoRendererInstance as GeoRenderer } from "./GeoRenderer"
 import * as Mario from "../game/Mario"
+import { gLinker } from "../game/Linker"
 
 export const GRAPH_RENDER_ACTIVE = (1 << 0)
 export const GRAPH_RENDER_CHILDREN_FIRST = (1 << 1)
@@ -38,6 +39,7 @@ export const GRAPH_NODE_TYPE_SHADOW    =              0x028
 export const GRAPH_NODE_TYPE_OBJECT_PARENT     =      0x029
 export const GRAPH_NODE_TYPE_GENERATED_LIST =         0x02A | GRAPH_NODE_TYPE_FUNCTIONAL
 export const GRAPH_NODE_TYPE_BACKGROUND =             0x02C | GRAPH_NODE_TYPE_FUNCTIONAL
+export const GRAPH_NODE_TYPE_HELD_OBJ               = 0x02E | GRAPH_NODE_TYPE_FUNCTIONAL
 export const GRAPH_NODE_TYPE_CULLING_RADIUS =         0x02F
 export const GRAPH_NODE_TYPE_SWITCH_CASE         =    0x00C | GRAPH_NODE_TYPE_FUNCTIONAL
 
@@ -170,6 +172,46 @@ export const geo_make_first_child = (newFirstChild) => {
     }
 
     return parent
+}
+
+const get_func = (func, funcClass) => {
+    // allow deferred linking:
+    // GEO_ASM(0, 'MarioMisc.geo_mario_head_rotation')
+    if (typeof func == "string") {
+        let f
+        let parts = func.split('.')
+        if (parts.length == 1) {
+            f = gLinker[func]
+            funcClass = null
+        } else {
+            funcClass = gLinker[parts[0]]
+            f = funcClass[parts[1]]
+        }
+        if (!f) {
+            throw "deferred func not found: " + func
+        }
+        func = f
+    }
+
+    return [func, funcClass]
+}
+
+export const init_graph_node_held_object = (graphNode, object, translation, func) => {
+    let funcClass
+    [func, funcClass] = get_func(func)
+
+    graphNode = {
+        object,
+        translation: [...translation],
+        func: { func, funcClass }
+    }
+
+    init_scene_graph_node_links(graphNode, GRAPH_NODE_TYPE_HELD_OBJ)
+    if (func) {
+        func.call(funcClass, GEO_CONTEXT_CREATE, graphNode)
+    }
+
+    return graphNode
 }
 
 export const geo_add_child = (parent, childNode) => {

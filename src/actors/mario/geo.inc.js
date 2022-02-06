@@ -1,4 +1,5 @@
 import { GeoLayoutInstance as Geo } from "../../engine/GeoLayout"
+import { GEO_ANIMATED_PART, GEO_OPEN_NODE, GEO_ASM, GEO_ROTATION_NODE, GEO_CLOSE_NODE, GEO_BRANCH, GEO_RETURN, LAYER_OPAQUE, GEO_SCALE, GEO_DISPLAY_LIST } from "../../engine/GeoLayout"
 import { 
     mario_nameplate,
     mario_butt, 
@@ -55,22 +56,26 @@ import {
     mario_low_poly_cap_off_eyes_front,
     mario_low_poly_cap_off_eyes_half_closed,
     mario_low_poly_cap_off_eyes_closed,
-    luigi_low_poly_cap_on_eyes_front,
-    luigi_low_poly_cap_on_eyes_half_closed,
-    luigi_low_poly_cap_on_eyes_closed,
-    luigi_low_poly_cap_off_eyes_front,
-    luigi_low_poly_cap_off_eyes_half_closed,
-    luigi_low_poly_cap_off_eyes_closed,
- } from "./mario.inc"
-import { 
-	/*Head*/
-	luigi_head_cap_on_DL, luigi_head_cap_off_DL,
-	tluigi_capped_eyes_open, tluigi_capped_eyes_half, tluigi_capped_eyes_shut,
-	tluigi_uncapped_eyes_open, tluigi_uncapped_eyes_half, tluigi_uncapped_eyes_shut,
-	/*Body*/
-	luigi_torso_dl, tluigi_buttons_dl, luigi_butt_dl,
-	luigi_left_leg_dl,luigi_left_thigh_dl,luigi_left_arm_dl,luigi_left_forearm_dl,
-	luigi_right_leg_dl,luigi_right_thigh_dl,luigi_right_arm_dl,luigi_right_forearm_dl
+} from "./mario.inc"
+import {
+	luigi_cap_on_eyes_front, luigi_cap_on_eyes_half_closed, luigi_cap_on_eyes_closed,
+	luigi_cap_off_eyes_front, luigi_cap_off_eyes_half_closed, luigi_cap_off_eyes_closed,
+
+	luigi_torso,
+    luigi_low_poly_cap_on_eyes_front, luigi_low_poly_cap_on_eyes_half_closed, 
+    luigi_low_poly_cap_on_eyes_closed, luigi_low_poly_cap_off_eyes_front, 
+    luigi_low_poly_cap_off_eyes_half_closed, luigi_low_poly_cap_off_eyes_closed, 
+    luigi_low_poly_butt, luigi_low_poly_torso, luigi_low_poly_left_arm, 
+    luigi_low_poly_left_forearm_shared_dl, luigi_low_poly_left_hand_closed, 
+    luigi_low_poly_right_arm, luigi_low_poly_right_forearm_shared_dl, 
+    luigi_low_poly_right_hand_closed, luigi_low_poly_left_thigh,
+    luigi_low_poly_left_leg_shared_dl, luigi_low_poly_left_foot,
+    luigi_low_poly_right_thigh, luigi_low_poly_right_leg_shared_dl,
+    luigi_low_poly_right_foot, 
+    luigi_butt, luigi_left_arm, luigi_left_forearm_shared_dl, 
+    luigi_left_hand_closed, luigi_right_thigh, luigi_right_leg_shared_dl, luigi_right_foot, 
+    luigi_left_foot, luigi_left_leg_shared_dl, luigi_right_arm, luigi_right_forearm_shared_dl, 
+    luigi_right_hand_closed, luigi_left_thigh, luigi_left_hand_open, luigi_right_hand_open, luigi_right_hand_peace, luigi_right_hand_cap, luigi_right_hand_cap_wings
 } from "./luigi.inc"
 import {
 	wario_head_cap_on_DL, wario_head_cap_off_DL, wario_mustache
@@ -79,7 +84,6 @@ import { parachute_DL, parachute_off_DL } from "../parachute/model.inc"
 import { kart_DL, kart_off_DL } from "../kart/model.inc"
 import { MarioMiscInstance as MarioMisc } from "../../game/MarioMisc"
 import { SHADOW_CIRCLE_PLAYER } from "../../game/Shadow"
-
 /*Mario*/
 
 
@@ -255,7 +259,7 @@ const mario_geo_body = [
     { command: Geo.open_node },
         { command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, mario_butt] },
         { command: Geo.open_node },
-            // { command: Geo.node_generated, args: [ 0, geo_move_mario_part_from_parent ] },
+            // { command: Geo.node_generated, args: [ 0, MarioMisc.geo_move_mario_part_from_parent, MarioMisc] },
             { command: Geo.node_generated, args: [0, MarioMisc.geo_mario_tilt_torso, MarioMisc] },
             { command: Geo.node_rotation, args: [ 0x00, 0, 0, 0 ] },
             { command: Geo.open_node },
@@ -312,72 +316,7 @@ const mario_geo_body = [
     { command: Geo.return }
 ]
 
-/* Luigi - Sadly, had to take a hacky route for doing the textures on him ): */
-
-const luigi_face_capped_eyes_open = [
-	{ command: Geo.node_start },
-		{ command: Geo.open_node },
-			{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, luigi_head_cap_on_DL] },
-			{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT_DECAL, tluigi_capped_eyes_open] },
-		{ command: Geo.close_node },
-	{ command: Geo.return }
-]
-
-const luigi_face_capped_eyes_half = [
-	{ command: Geo.node_start },
-		{ command: Geo.open_node },
-			{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, luigi_head_cap_on_DL] },
-			{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT_DECAL, tluigi_capped_eyes_half] },
-		{ command: Geo.close_node },
-	{ command: Geo.return }
-]
-
-const luigi_face_capped_eyes_shut = [
-	{ command: Geo.node_start },
-		{ command: Geo.open_node },
-			{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, luigi_head_cap_on_DL] },
-			{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT_DECAL, tluigi_capped_eyes_shut] },
-		{ command: Geo.close_node },
-	{ command: Geo.return }
-]
-
-const luigi_face_uncapped_eyes_open = [
-	{ command: Geo.node_start },
-		{ command: Geo.open_node },
-			{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, luigi_head_cap_off_DL] },
-			{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT_DECAL, tluigi_uncapped_eyes_open] },
-		{ command: Geo.close_node },
-	{ command: Geo.return }
-]
-
-const luigi_face_uncapped_eyes_half = [
-	{ command: Geo.node_start },
-		{ command: Geo.open_node },
-			{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, luigi_head_cap_off_DL] },
-			{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT_DECAL, tluigi_uncapped_eyes_half] },
-		{ command: Geo.close_node },
-	{ command: Geo.return }
-]
-
-const luigi_face_uncapped_eyes_shut = [
-	{ command: Geo.node_start },
-		{ command: Geo.open_node },
-			{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, luigi_head_cap_off_DL] },
-			{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT_DECAL, tluigi_uncapped_eyes_shut] },
-		{ command: Geo.close_node },
-	{ command: Geo.return }
-]
-
-const luigi_torso = [
-	{ command: Geo.node_start },
-		{ command: Geo.open_node },
-			{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, luigi_torso_dl] },
-			{ command: Geo.display_list, args: [Geo.LAYER_TRANSPARENT_DECAL, tluigi_buttons_dl] },
-		{ command: Geo.close_node },
-	{ command: Geo.return }
-]
-
-const luigi_geo_low_poly_face_and_wings = [ // just use marios.
+const luigi_geo_low_poly_face_and_wings = [
 	{ command: Geo.node_rotation, args: [0x00, 0, 0, 0] },
 	{ command: Geo.open_node },
 	{ command: Geo.node_switch_case, args: [0, MarioMisc.geo_switch_mario_cap_on_off, MarioMisc] },
@@ -406,15 +345,15 @@ const luigi_geo_face_and_wings = [
 	{ command: Geo.open_node },
 	{ command: Geo.node_switch_case, args: [0, MarioMisc.geo_switch_mario_eyes, MarioMisc] },
 	{ command: Geo.open_node },
-	{ command: Geo.branch, args: [ 1, luigi_face_capped_eyes_open ]},
-	{ command: Geo.branch, args: [ 1, luigi_face_capped_eyes_half ]},
-	{ command: Geo.branch, args: [ 1, luigi_face_capped_eyes_shut ]},
+	{ command: Geo.display_list, args: [ 1, luigi_cap_on_eyes_front ]},
+	{ command: Geo.display_list, args: [ 1, luigi_cap_on_eyes_half_closed ]},
+	{ command: Geo.display_list, args: [ 1, luigi_cap_on_eyes_closed ]},
 	{ command: Geo.close_node },
 	{ command: Geo.node_switch_case, args: [0, MarioMisc.geo_switch_mario_eyes, MarioMisc] },
 	{ command: Geo.open_node },
-	{ command: Geo.branch, args: [ 1, luigi_face_uncapped_eyes_open ]},
-	{ command: Geo.branch, args: [ 1, luigi_face_uncapped_eyes_half ]},
-	{ command: Geo.branch, args: [ 1, luigi_face_uncapped_eyes_shut ]},
+	{ command: Geo.display_list, args: [ 1, luigi_cap_off_eyes_front ]},
+	{ command: Geo.display_list, args: [ 1, luigi_cap_off_eyes_half_closed ]},
+	{ command: Geo.display_list, args: [ 1, luigi_cap_off_eyes_closed ]},
 	{ command: Geo.close_node },
 	{ command: Geo.close_node },
 	{ command: Geo.close_node },
@@ -424,57 +363,57 @@ const luigi_geo_face_and_wings = [
 const luigi_geo_low_poly_body = [
 	{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 64, 0, null] },
 	{ command: Geo.open_node },
-		{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, mario_low_poly_butt] },
+		{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, luigi_low_poly_butt] },
 		{ command: Geo.open_node },
 			// { command: Geo.node_generated, args: [ 0, geo_move_mario_part_from_parent ] },
 			// { command: Geo.node_generated, args: [ 0, MarioMisc.geo_mario_tilt_torso, MarioMisc ] },
 			{ command: Geo.node_rotation, args: [ 0x00, 0, 0, 0 ] },
 			{ command: Geo.open_node },
-				{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 33, 0, 0, mario_low_poly_torso] },
+				{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 33, 0, 0, luigi_low_poly_torso] },
 				{ command: Geo.open_node },
 					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 91, 0, 0, null] },
 					{ command: Geo.open_node },
 						{ command: Geo.branch, args: [ 1, luigi_geo_low_poly_face_and_wings ]},
 					{ command: Geo.close_node },
-					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 63, -10, 65, null] },  /// open mario left arm
+					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 63, -10, 65, null] },  /// open luigi left arm
 					{ command: Geo.open_node },
-						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, mario_low_poly_left_arm] },
+						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, luigi_low_poly_left_arm] },
 						{ command: Geo.open_node },
-							{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 63, 0, 0, mario_low_poly_left_forearm_shared_dl] },
+							{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 63, 0, 0, luigi_low_poly_left_forearm_shared_dl] },
 							{ command: Geo.open_node },
-								{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 71, 0, 0, mario_low_poly_left_hand_closed] },
+								{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 71, 0, 0, luigi_low_poly_left_hand_closed] },
 							{ command: Geo.close_node },
 						{ command: Geo.close_node },
-					{ command: Geo.close_node },    /// close mario left arm
-					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 60, -10, -63, null] },  /// open mario left arm
+					{ command: Geo.close_node },    /// close luigi left arm
+					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 60, -10, -63, null] },  /// open luigi left arm
 					{ command: Geo.open_node },
-						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, mario_low_poly_right_arm] },
+						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, luigi_low_poly_right_arm] },
 						{ command: Geo.open_node },
-							{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 62, 0, 0, mario_low_poly_right_forearm_shared_dl] },
+							{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 62, 0, 0, luigi_low_poly_right_forearm_shared_dl] },
 							{ command: Geo.open_node },
-								{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 66, 0, 0, mario_low_poly_right_hand_closed] },
+								{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 66, 0, 0, luigi_low_poly_right_hand_closed] },
 							{ command: Geo.close_node },
 						{ command: Geo.close_node },
-					{ command: Geo.close_node },    /// close mario left arm
+					{ command: Geo.close_node },    /// close luigi left arm
 				{ command: Geo.close_node },
 			{ command: Geo.close_node },
 			{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, -34, -9, 39, null] },  /// open left leg stuff
 			{ command: Geo.open_node }, 
-				{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, mario_low_poly_left_thigh] }, 
+				{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, luigi_low_poly_left_thigh] }, 
 				{ command: Geo.open_node },
-					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 98, 0, 0, mario_low_poly_left_leg_shared_dl] }, 
+					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 98, 0, 0, luigi_low_poly_left_leg_shared_dl] }, 
 					{ command: Geo.open_node },
-						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 81, 0, 0, mario_low_poly_left_foot] }, 
+						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 81, 0, 0, luigi_low_poly_left_foot] }, 
 					{ command: Geo.close_node },
 				{ command: Geo.close_node },
 			{ command: Geo.close_node },  /// end left leg stuff
 			{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, -34, -9, -40, null] },  /// open right leg stuff
 			{ command: Geo.open_node }, 
-				{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, mario_low_poly_right_thigh] }, 
+				{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, luigi_low_poly_right_thigh] }, 
 				{ command: Geo.open_node },
-					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 98, 0, 0, mario_low_poly_right_leg_shared_dl] }, 
+					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 98, 0, 0, luigi_low_poly_right_leg_shared_dl] }, 
 					{ command: Geo.open_node },
-						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 81, 0, 0, mario_low_poly_right_foot] }, 
+						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 81, 0, 0, luigi_low_poly_right_foot] }, 
 					{ command: Geo.close_node },
 				{ command: Geo.close_node },
 			{ command: Geo.close_node },  /// end right leg stuff
@@ -484,133 +423,127 @@ const luigi_geo_low_poly_body = [
 ]
 
 const luigi_geo_medium_poly_body = [
-	{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 64, 0, null] },
-	{ command: Geo.open_node },
-		{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, luigi_butt_dl] },
-		{ command: Geo.open_node },
-			// { command: Geo.node_generated, args: [ 0, geo_move_mario_part_from_parent ] },
-			// { command: Geo.node_generated, args: [ 0, MarioMisc.geo_mario_tilt_torso, MarioMisc ] },
-			{ command: Geo.node_rotation, args: [ 0x00, 0, 0, 0 ] },
-			{ command: Geo.open_node },
-				{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 33, 0, 0, null] },
-					{ command: Geo.open_node },
-						{ command: Geo.branch, args: [ 1, luigi_torso ]},
-					{ command: Geo.close_node },
-				{ command: Geo.open_node },
-					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 91, 0, 0, null] },
-					{ command: Geo.open_node },
-						{ command: Geo.branch, args: [ 1, luigi_geo_face_and_wings ]},
-					{ command: Geo.close_node },
-					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 63, -10, 65, null] },  /// open mario left arm
-					{ command: Geo.open_node },
-						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, luigi_left_arm_dl] },
-						{ command: Geo.open_node },
-							{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 63, 0, 0, luigi_left_forearm_dl] },
-							{ command: Geo.open_node },
-								{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 71, 0, 0, mario_left_hand_closed] },
-							{ command: Geo.close_node },
-						{ command: Geo.close_node },
-					{ command: Geo.close_node },    /// close mario left arm
-					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 60, -10, -63, null] },  /// open mario left arm
-					{ command: Geo.open_node },
-						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, luigi_right_arm_dl] },
-						{ command: Geo.open_node },
-							{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 62, 0, 0, luigi_right_forearm_dl] },
-							{ command: Geo.open_node },
-								{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 66, 0, 0, mario_right_hand_closed] },
-							{ command: Geo.close_node },
-						{ command: Geo.close_node },
-					{ command: Geo.close_node },    /// close mario left arm
-				{ command: Geo.close_node },
-			{ command: Geo.close_node },
-			{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, -34, -9, 39, null] },  /// open left leg stuff
-			{ command: Geo.open_node }, 
-				{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, luigi_left_thigh_dl] }, 
-				{ command: Geo.open_node },
-					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 98, 0, 0, luigi_left_leg_dl] }, 
-					{ command: Geo.open_node },
-						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 81, 0, 0, mario_left_foot] }, 
-					{ command: Geo.close_node },
-				{ command: Geo.close_node },
-			{ command: Geo.close_node },  /// end left leg stuff
-			{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, -34, -9, -40, null] },  /// open right leg stuff
-			{ command: Geo.open_node }, 
-				{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, luigi_right_thigh_dl] }, 
-				{ command: Geo.open_node },
-					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 98, 0, 0, luigi_right_leg_dl] }, 
-					{ command: Geo.open_node },
-						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 81, 0, 0, mario_right_foot] }, 
-					{ command: Geo.close_node },
-				{ command: Geo.close_node },
-			{ command: Geo.close_node },  /// end right leg stuff
-		{ command: Geo.close_node },
-	{ command: Geo.close_node },
-	{ command: Geo.return }
+    GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 15, 0, null),
+    GEO_OPEN_NODE(),
+        GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, luigi_butt), // starts sharing solid color with luigi_torso (blue)
+        GEO_OPEN_NODE(),
+            // GEO_ASM(0, MarioMisc.geo_move_mario_part_from_parent, MarioMisc),
+            GEO_ASM(0, MarioMisc.geo_mario_tilt_torso, MarioMisc),
+            GEO_ROTATION_NODE(0x00, 0, 0, 0),
+            GEO_OPEN_NODE(),
+                GEO_ANIMATED_PART(LAYER_OPAQUE, 81, 0, 0, luigi_torso),
+                GEO_OPEN_NODE(),
+                    GEO_ANIMATED_PART(LAYER_OPAQUE, 90, 0, 0, null),
+                    GEO_OPEN_NODE(),
+                        GEO_BRANCH(LAYER_OPAQUE, luigi_geo_face_and_wings), // stops sharing because faces has its own dl
+                    GEO_CLOSE_NODE(),
+                    GEO_ANIMATED_PART(LAYER_OPAQUE, 55, -10, 65, null),
+                    GEO_OPEN_NODE(),
+                        GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, luigi_left_arm), // starts sharing solid color with luigi_left_forearm_shared_dl (red)
+                        GEO_OPEN_NODE(),
+                            GEO_ANIMATED_PART(LAYER_OPAQUE, 63, 0, 0, luigi_left_forearm_shared_dl),
+                            GEO_OPEN_NODE(),
+                                GEO_ANIMATED_PART(LAYER_OPAQUE, 71, 0, 0, luigi_left_hand_closed), // stops sharing because hand has its solid color (white)
+                            GEO_CLOSE_NODE(),
+                        GEO_CLOSE_NODE(),
+					GEO_CLOSE_NODE(),    /// close mario left arm
+                    GEO_ANIMATED_PART(LAYER_OPAQUE, 56, -10, -65, null),
+                    GEO_OPEN_NODE(),
+                        GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, luigi_right_arm), // starts sharing solid color of his dl with luigi_right_forearm_shared_dl (red)
+                        GEO_OPEN_NODE(),
+                            GEO_ANIMATED_PART(LAYER_OPAQUE, 63, 0, 0, luigi_right_forearm_shared_dl),
+                            GEO_OPEN_NODE(),
+                                GEO_ANIMATED_PART(LAYER_OPAQUE, 71, 0, 0, luigi_right_hand_closed), // stops sharing because hand has its solid color (white)
+                            GEO_CLOSE_NODE(),
+                        GEO_CLOSE_NODE(),
+                    GEO_CLOSE_NODE(),
+                GEO_CLOSE_NODE(),
+            GEO_CLOSE_NODE(),
+            GEO_ANIMATED_PART(LAYER_OPAQUE, 15, -9, 40, null),
+            GEO_OPEN_NODE(),
+                GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, luigi_left_thigh), // starts sharing solid color of his dl with luigi_left_leg_shared_dl (blue)
+                GEO_OPEN_NODE(),
+                    GEO_ANIMATED_PART(LAYER_OPAQUE, 97, 0, 0, luigi_left_leg_shared_dl),
+                    GEO_OPEN_NODE(),
+                        GEO_ANIMATED_PART(LAYER_OPAQUE, 81, 0, 0, luigi_left_foot), // stops sharing because foot has its solid color (brown)
+                    GEO_CLOSE_NODE(),
+                GEO_CLOSE_NODE(),
+            GEO_CLOSE_NODE(),
+            GEO_ANIMATED_PART(LAYER_OPAQUE, 15, -9, -40, null),
+            GEO_OPEN_NODE(),
+                GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, luigi_right_thigh), // starts sharing solid color of his dl with luigi_left_leg_shared_dl (blue)
+                GEO_OPEN_NODE(),
+                    GEO_ANIMATED_PART(LAYER_OPAQUE, 97, 0, 0, luigi_right_leg_shared_dl),
+                    GEO_OPEN_NODE(),
+                        GEO_ANIMATED_PART(LAYER_OPAQUE, 81, 0, 0, luigi_right_foot),
+                    GEO_CLOSE_NODE(),
+                GEO_CLOSE_NODE(),
+            GEO_CLOSE_NODE(),  /// end right leg stuff
+        GEO_CLOSE_NODE(),
+    GEO_CLOSE_NODE(),
+	GEO_RETURN(),
 ]
 
 const luigi_geo_body = [
-	{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 64, 0, null] },
-	{ command: Geo.open_node },
-		{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, luigi_butt_dl] },
-		{ command: Geo.open_node },
-			// { command: Geo.node_generated, args: [ 0, geo_move_mario_part_from_parent ] },
-			// { command: Geo.node_generated, args: [ 0, MarioMisc.geo_mario_tilt_torso, MarioMisc ] },
-			{ command: Geo.node_rotation, args: [ 0x00, 0, 0, 0 ] },
-			{ command: Geo.open_node },
-				{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 33, 0, 0, null] },
-					{ command: Geo.open_node },
-						{ command: Geo.branch, args: [ 1, luigi_torso ]},
-					{ command: Geo.close_node },
-				{ command: Geo.open_node },
-					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 91, 0, 0, null] },
-					{ command: Geo.open_node },
-						{ command: Geo.branch, args: [ 1, luigi_geo_face_and_wings ]},
-					{ command: Geo.close_node },
-					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 63, -10, 65, null] },  /// open mario left arm
-					{ command: Geo.open_node },
-						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, luigi_left_arm_dl] },
-						{ command: Geo.open_node },
-							{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 63, 0, 0, luigi_left_forearm_dl] },
-							{ command: Geo.open_node },
-								{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 71, 0, 0, mario_left_hand_closed] },
-							{ command: Geo.close_node },
-						{ command: Geo.close_node },
-					{ command: Geo.close_node },    /// close mario left arm
-					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 60, -10, -63, null] },  /// open mario left arm
-					{ command: Geo.open_node },
-						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, luigi_right_arm_dl] },
-						{ command: Geo.open_node },
-							{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 62, 0, 0, luigi_right_forearm_dl] },
-							{ command: Geo.open_node },
-								{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 66, 0, 0, mario_right_hand_closed] },
-							{ command: Geo.close_node },
-						{ command: Geo.close_node },
-					{ command: Geo.close_node },    /// close mario left arm
-				{ command: Geo.close_node },
-			{ command: Geo.close_node },
-			{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, -34, -9, 39, null] },  /// open left leg stuff
-			{ command: Geo.open_node }, 
-				{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, luigi_left_thigh_dl] }, 
-				{ command: Geo.open_node },
-					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 98, 0, 0, luigi_left_leg_dl] }, 
-					{ command: Geo.open_node },
-						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 81, 0, 0, mario_left_foot] }, 
-					{ command: Geo.close_node },
-				{ command: Geo.close_node },
-			{ command: Geo.close_node },  /// end left leg stuff
-			{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, -34, -9, -40, null] },  /// open right leg stuff
-			{ command: Geo.open_node }, 
-				{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 0, 0, 0, luigi_right_thigh_dl] }, 
-				{ command: Geo.open_node },
-					{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 98, 0, 0, luigi_right_leg_dl] }, 
-					{ command: Geo.open_node },
-						{ command: Geo.node_animated_part, args: [Geo.LAYER_OPAQUE, 81, 0, 0, mario_right_foot] }, 
-					{ command: Geo.close_node },
-				{ command: Geo.close_node },
-			{ command: Geo.close_node },  /// end right leg stuff
-		{ command: Geo.close_node },
-	{ command: Geo.close_node },
-	{ command: Geo.return }
+    GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 15, 0, null),
+    GEO_OPEN_NODE(),
+        GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, luigi_butt), // starts sharing solid color with luigi_torso (blue)
+        GEO_OPEN_NODE(),
+            // GEO_ASM(0, MarioMisc.geo_move_mario_part_from_parent, MarioMisc),
+            GEO_ASM(0, MarioMisc.geo_mario_tilt_torso, MarioMisc),
+            GEO_ROTATION_NODE(0x00, 0, 0, 0),
+            GEO_OPEN_NODE(),
+                GEO_ANIMATED_PART(LAYER_OPAQUE, 81, 0, 0, luigi_torso),
+                GEO_OPEN_NODE(),
+                    GEO_ANIMATED_PART(LAYER_OPAQUE, 90, 0, 0, null),
+                    GEO_OPEN_NODE(),
+                        GEO_BRANCH(LAYER_OPAQUE, luigi_geo_face_and_wings), // stops sharing because faces has its own dl
+                    GEO_CLOSE_NODE(),
+                    GEO_ANIMATED_PART(LAYER_OPAQUE, 55, -10, 65, null),
+                    GEO_OPEN_NODE(),
+                        GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, luigi_left_arm), // starts sharing solid color with luigi_left_forearm_shared_dl (red)
+                        GEO_OPEN_NODE(),
+                            GEO_ANIMATED_PART(LAYER_OPAQUE, 63, 0, 0, luigi_left_forearm_shared_dl),
+                            GEO_OPEN_NODE(),
+                                GEO_ANIMATED_PART(LAYER_OPAQUE, 71, 0, 0, luigi_left_hand_closed), // stops sharing because hand has its solid color (white)
+                            GEO_CLOSE_NODE(),
+                        GEO_CLOSE_NODE(),
+					GEO_CLOSE_NODE(),    /// close mario left arm
+                    GEO_ANIMATED_PART(LAYER_OPAQUE, 56, -10, -65, null),
+                    GEO_OPEN_NODE(),
+                        GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, luigi_right_arm), // starts sharing solid color of his dl with luigi_right_forearm_shared_dl (red)
+                        GEO_OPEN_NODE(),
+                            GEO_ANIMATED_PART(LAYER_OPAQUE, 63, 0, 0, luigi_right_forearm_shared_dl),
+                            GEO_OPEN_NODE(),
+                                GEO_ANIMATED_PART(LAYER_OPAQUE, 71, 0, 0, luigi_right_hand_closed), // stops sharing because hand has its solid color (white)
+                            GEO_CLOSE_NODE(),
+                        GEO_CLOSE_NODE(),
+                    GEO_CLOSE_NODE(),
+                GEO_CLOSE_NODE(),
+            GEO_CLOSE_NODE(),
+            GEO_ANIMATED_PART(LAYER_OPAQUE, 15, -9, 40, null),
+            GEO_OPEN_NODE(),
+                GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, luigi_left_thigh), // starts sharing solid color of his dl with luigi_left_leg_shared_dl (blue)
+                GEO_OPEN_NODE(),
+                    GEO_ANIMATED_PART(LAYER_OPAQUE, 97, 0, 0, luigi_left_leg_shared_dl),
+                    GEO_OPEN_NODE(),
+                        GEO_ANIMATED_PART(LAYER_OPAQUE, 81, 0, 0, luigi_left_foot), // stops sharing because foot has its solid color (brown)
+                    GEO_CLOSE_NODE(),
+                GEO_CLOSE_NODE(),
+            GEO_CLOSE_NODE(),
+            GEO_ANIMATED_PART(LAYER_OPAQUE, 15, -9, -40, null),
+            GEO_OPEN_NODE(),
+                GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, luigi_right_thigh), // starts sharing solid color of his dl with luigi_left_leg_shared_dl (blue)
+                GEO_OPEN_NODE(),
+                    GEO_ANIMATED_PART(LAYER_OPAQUE, 97, 0, 0, luigi_right_leg_shared_dl),
+                    GEO_OPEN_NODE(),
+                        GEO_ANIMATED_PART(LAYER_OPAQUE, 81, 0, 0, luigi_right_foot),
+                    GEO_CLOSE_NODE(),
+                GEO_CLOSE_NODE(),
+            GEO_CLOSE_NODE(),  /// end right leg stuff
+        GEO_CLOSE_NODE(),
+    GEO_CLOSE_NODE(),
+	GEO_RETURN(),
 ]
 
 const wario_face_capped_eyes_open = [

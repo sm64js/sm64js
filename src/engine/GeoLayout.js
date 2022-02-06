@@ -296,6 +296,15 @@ class GeoLayout {
         this.sCurrentLayout.index++
     }
 
+    node_held_object(args) {
+        const offset = [ args[1], args[2], args[3] ]
+        const nodeFunc = args[4]
+
+        const graphNode = GraphNode.init_graph_node_held_object(null, null, offset, nodeFunc)
+        GraphNode.register_scene_graph_node(this, graphNode)
+        this.sCurrentLayout.index++
+    }
+
     process_geo_layout(geoLayout) {
         if (typeof geoLayout == "function") {
             geoLayout = geoLayout()
@@ -347,6 +356,7 @@ export const GEO_ANIMATED_PART = (...args)            => {return {command: Geo.n
 export const GEO_ASM = (...args)                      => {return {command: Geo.node_generated, args: args}}
 export const GEO_BACKGROUND = (...args)               => {return {command: Geo.node_background, args: args}}
 export const GEO_BILLBOARD = (...args)                => {return {command: Geo.node_billboard, args: args}}
+export const GEO_BRANCH = (...args)                   => {return {command: Geo.branch, args: args}}
 export const GEO_BRANCH_AND_LINK = (...args)          => {return {command: Geo.branch_and_link, args: args}}
 export const GEO_CAMERA = (...args)                   => {return {command: Geo.node_camera, args: args}}
 export const GEO_CAMERA_FRUSTUM_WITH_FUNC = (...args) => {return {command: Geo.node_perspective, args: args}}
@@ -354,12 +364,15 @@ export const GEO_CLOSE_NODE = (...args)               => {return {command: Geo.c
 export const GEO_CULLING_RADIUS = (...args)           => {return {command: Geo.node_culling_radius, args: args}}
 export const GEO_DISPLAY_LIST = (...args)             => {return {command: Geo.display_list, args: args}}
 export const GEO_END = (...args)                      => {return {command: Geo.node_end, args: args}}
+export const GEO_HELD_OBJECT = (...args)              => {return {command: Geo.node_held_object, args: args}}
 export const GEO_NODE_SCREEN_AREA = (...args)         => {return {command: Geo.node_screen_area, args: args}}
 export const GEO_NODE_ORTHO = (...args)               => {return {command: Geo.node_ortho, args: args}}
 export const GEO_NODE_START = (...args)               => {return {command: Geo.node_start, args: args}}
 export const GEO_OPEN_NODE = (...args)                => {return {command: Geo.open_node, args: args}}
 export const GEO_RENDER_OBJ = (...args)               => {return {command: Geo.node_render_object_parent, args: args}}
 export const GEO_RENDER_RANGE = (...args)             => {return {command: Geo.node_render_range, args: args}}
+export const GEO_RETURN = (...args)                   => {return {command: Geo.return, args: args}}
+export const GEO_ROTATION_NODE = (...args)            => {return {command: Geo.node_rotation, args: args}}
 export const GEO_SCALE = (...args)                    => {return {command: Geo.node_scale, args: args}}
 export const GEO_SHADOW = (...args)                   => {return {command: Geo.node_shadow, args: args}}
 export const GEO_SWITCH_CASE = (...args)              => {return {command: Geo.node_switch_case, args: args}}

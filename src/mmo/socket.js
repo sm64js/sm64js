@@ -254,11 +254,13 @@ export const updateNetworkBeforeRender = () => {
             if (flagSocketId == networkData.mySocketID) { /// I have the flag
                 newflagpos = [...m.pos]
                 angleForFlag = m.faceAngle[1]
+                m.numStars = 1
             } else { /// someone else has the flag
                 let socketData = networkData.remotePlayers[flagSocketId]
                 if (socketData == undefined) return
                 newflagpos = [...socketData.marioState.pos]
                 angleForFlag = socketData.marioState.faceAngle[1]
+                m.numStars = 0
             }
             newflagpos[1] += 50 // adjust so its above mario head
             networkData.flagData[i].pos = newflagpos

@@ -706,9 +706,9 @@ ul#chatlog {
     padding: 1%;
     overflow: hidden;
 }
-#rules > p {
+#rules > p, a {
     text-align: left;
-    font-size: 140%;
+    font-size: 30px;
 }
 
 .rulesLogo{

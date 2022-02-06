@@ -22,9 +22,13 @@
         <p style="text-align: center;">Welcome to the multiplayer version of sm64js! To play you have to follow the listed rules below.</p>
         <br>
         <p>Treat all users with respect.</p>
-        <p>Keep chat messages appropriate, no swearing or slurs. Make sure to keep conversations safe/appropriate for work/school.</p>
+        <p>Keep chat messages appropriate, no swearing, slurs or vulgar language. Make sure to keep conversations safe/appropriate for work/school.</p>
         <p>Inappropriate or offensive behavior may result in temporary or permanent mute or ban</p>
         <p>Failure to comply with these rules will result in punishment, including but not limited to a mute or ban of your account.</p>
+        <br>
+        <br>
+        <p>If you are looking for a more completed version of sm64js without MMO or custom features, check out<a style="color: blue;" href="https://vanilla.sm64js.com">vanilla</a>.</p>
+        <p>A further updated version of vanilla can be found<a style="color: blue;" href="https://Agent-11.github.io/projects/sm64js">here</a>.</p>
         <button type="button" class="rulesButton" id="acceptRules"><div class="sm64button">I have read the rules and will follow them.</div></button>
     </div>
 
@@ -388,24 +392,24 @@
                         <div id="ambpicker"></div>
                     </div>
 
-                    <!-- Hex input -->
-                    <input type="text" id="hex" placeholder="Main color picker hex" 
-                        onchange="window.colorPicker.color.hexString = this.value
-                        if (document.getElementById('updateAmb').checked) {
-                            const c = window.colorPicker
-                            const a = window.ambientPicker
-                            a.color.red = c.color.red / 2
-                            a.color.green = c.color.green / 2
-                            a.color.blue = c.color.blue / 2
-                        }">
-                    <input type="text" id="hexAmb" placeholder="Ambient color picker hex" onchange="window.ambientPicker.color.hexString = this.value">
-                    <button class="green-button" onclick="alert(`Color:\n${window.colorPicker.color.hexString}\nAmbient color:\n${window.ambientPicker.color.hexString}`)"><div class="sm64button">Print hex codes</div></button>
-                
-                    <br />
-                    <br />
-                    <br />
-                    <br />
+                    <!-- RGB input -->
+                    <h2>Alternate color input:</h2>
+                    <label>Color:</label>
+                    <input type="color" id="colorInput" onchange="
+                    window.colorPicker.color.hexString = this.value
+                    if (document.getElementById('updateAmb').checked) {
+                        document.getElementById('ambientInput').value = window.hex2ambient(this.value)
+                        window.ambientPicker.color.hexString = document.getElementById('ambientInput').value
 
+                        window.updateAmbientColors(window.ambientPicker.color)
+                    }
+                    window.updateColors(window.colorPicker.color)
+                    window.myMario.saveSkin()">
+                    <label> Ambient color:</label>
+                    <input type="color" id="ambientInput" onchange="window.ambientPicker.color.hexString = this.value; window.updateAmbientColors(window.ambientPicker.color); window.myMario.saveSkin()">
+                    <br />
+                    <br />
+                    <br />
                     <!-- Controls and customization -->
                     <div id="pinkControls">
                         <button type="button"
@@ -539,6 +543,11 @@
                                 <div>
                                     <label style="padding-right:30px">Chat:</label>
                                     <select keyboardButton name="chat" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                </div>
+
+                                <div>
+                                    <label style="padding-right:30px">Freeze Camera:</label>
+                                    <select keyboardButton name="freezeCam" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
                                 </div>
                         </div>
 

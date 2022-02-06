@@ -188,7 +188,6 @@ const recvFlagList = (flaglist) => {
 
 let flagSound
 let playing = false
-
 const playFlagSound = (sound) => {
     if (playing) return
     
@@ -255,11 +254,13 @@ export const updateNetworkBeforeRender = () => {
             if (flagSocketId == networkData.mySocketID) { /// I have the flag
                 newflagpos = [...m.pos]
                 angleForFlag = m.faceAngle[1]
+                m.numStars = 1
             } else { /// someone else has the flag
                 let socketData = networkData.remotePlayers[flagSocketId]
                 if (socketData == undefined) return
                 newflagpos = [...socketData.marioState.pos]
                 angleForFlag = socketData.marioState.faceAngle[1]
+                m.numStars = 0
             }
             newflagpos[1] += 50 // adjust so its above mario head
             networkData.flagData[i].pos = newflagpos
@@ -394,15 +395,11 @@ const checkForFlagGrab = () => {
                 rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
                 sendData(rootMsg.serializeBinary())
                 playFlagSound("/mmo/assets/sound/flag_collect.mp3")
-                m.numStars++
+                // m.numStars++
             }
         }
     }
     
-}
-
-export const sendPlayerInteraction = (socket_id, interaction) => {
-    //socket.emit('playerInteract', { socket_id, interaction }, { reliable: true })
 }
 
 let pName

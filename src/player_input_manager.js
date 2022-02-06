@@ -163,7 +163,8 @@ const defaultKeyboardButtonMapping = {
     map: 'm',
     taunt: 't',
     parachute: 'v',
-    chat: 'y'
+    chat: 'y',
+    freezeCam: 'f'
 }
 const keyboardButtonMapping = { ...defaultKeyboardButtonMapping }
 
@@ -352,6 +353,7 @@ export const playerInputUpdate = () => {
     let buttonDownTaunt = gamepadFinal.taunt || keyboardFinal.taunt
     let parachuteDown = gamepadFinal.parachute || keyboardFinal.parachute
     let buttonDownChat = keyboardFinal.chat
+    let buttonDownFreezeCam = keyboardFinal.freezeCam
 
     window.sm64js.playerInput = {
         stickX, stickY,
@@ -368,8 +370,9 @@ export const playerInputUpdate = () => {
         buttonPressedMap: buttonDownMap && !window.sm64js.playerInput.buttonDownMap,
 		parachute: parachuteDown && !window.sm64js.playerInput.parachuteDown,
         buttonPressedChat: buttonDownChat && !window.sm64js.playerInput.buttonDownChat,
-		
-        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap, buttonDownTaunt, parachuteDown, buttonDownChat,
+		buttonPressedFreezeCam: buttonDownFreezeCam && !window.sm64js.playerInput.buttonDownFreezeCam,
+
+        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownMap, buttonDownTaunt, parachuteDown, buttonDownChat, buttonDownFreezeCam,
 
         taunt: (Object.values(tauntCommands).includes(window.taunt)) ? window.taunt : undefined,
 		
@@ -389,4 +392,5 @@ export const playerInputUpdate = () => {
     if (window.sm64js.playerInput.buttonPressedChat) {
         document.getElementById("chatbox").focus()
     }
+    if (window.sm64js.playerInput.buttonPressedFreezeCam) { window.freezeCamera() }
 }

@@ -24,6 +24,7 @@
         <br>
         <p>Treat all users with respect.</p>
         <p>Keep chat messages appropriate, no swearing, slurs or vulgar language. Make sure to keep conversations safe/appropriate for work/school.</p>
+        <p>Don't share information on how to illegally obtain any copyrighted material such as ROMs or ROM assets</p>
         <p>Inappropriate or offensive behavior may result in temporary or permanent mute or ban</p>
         <p>Failure to comply with these rules will result in punishment, including but not limited to a mute or ban of your account.</p>
         <br>
@@ -272,24 +273,40 @@
                         </div>
                     </button>
                 </div>
-                    <!-- Color code pop up -->
-                    <div id="colorCodePasteWindow">
-                        <label>Gameshark Color Code Importer:</label>
-                        <br>
-                        <br>
-                        <div>
-                            <textarea id="ccPasteArea" placeholder="Enter your Color Code here..." rows="6" style="resize: none;"></textarea>
-                        </div>
-                        <br>
-                        <div>
-                            <button class="blue-button"
-                                onclick="window.myMario.skinData = window.parseColorCode(document.getElementById('ccPasteArea').value); document.getElementById('ccPasteArea').value = ''; window.myMario.saveSkin()">
-                                <div class="sm64button">
-                                Import Color Code
-                                </div>
-                            </button>
-                        </div>
+
+                <!-- Color code pop up -->
+                <div id="colorCodePasteWindow">
+                    <label>Gameshark Color Code Importer:</label>
+                    <br>
+                    <br>
+                    <div>
+                        <textarea id="ccPasteArea" placeholder="Enter your Color Code here..." rows="6" style="resize: none;"></textarea>
                     </div>
+                    <br>
+                    <div>
+                        <button class="blue-button"
+                            onclick="window.myMario.skinData = window.parseColorCode(document.getElementById('ccPasteArea').value); document.getElementById('ccPasteArea').value = ''; window.myMario.saveSkin()">
+                            <div class="sm64button">
+                            Import Color Code
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                <h1>Emote menu</h1>
+                <div>
+                    <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':blj:'" src="/mmo/assets/emotes/blj.gif" alt="BLJ">
+                    <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':bup:'" src="/mmo/assets/emotes/bup.jpg" alt="Bup">
+                    <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':discord:'" src="/mmo/assets/emotes/discord.png" alt="Discord logo">
+                    <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':facepalm:'" src="/mmo/assets/emotes/facepalm.png" alt="Facepalm">
+                    <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':kappa:'" src="/mmo/assets/emotes/kappa.png" alt="Kappa">
+                    <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':kick:'" src="/mmo/assets/emotes/kick.gif" alt="Kick">
+                    <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':mariostyle:'" src="/mmo/assets/emotes/mariostyle.gif" alt="Mario Gangnam Style">
+                    <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':pogchamp:'" src="/mmo/assets/emotes/pogchamp.png" alt="Mario Poggard">
+                    <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':shock:'" src="/mmo/assets/emotes/shock.gif" alt="Shock">
+                    <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':strange:'" src="/mmo/assets/emotes/strange.png" alt="Strange">
+                    <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':tpose:'" src="/mmo/assets/emotes/tpose.png" alt="T-Pose">
+                    <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':troll:'" src="/mmo/assets/emotes/trollio.png" alt="Troll">
+                </div>
 
                 <!-- Controls and customization -->
                 <div id="blueControls">
@@ -382,10 +399,8 @@
                     <br />
 
                     <!-- Hat toggle -->
-                    <div>
-
                     <button class="green-button" onclick="window.toggleCapState()"><div class="sm64button">Toggle Hat</div></button>
-                    </div>
+
                     <!-- Color pickers -->
                     <div class="colorPickersContainer">
                         <div id="picker"></div>
@@ -393,7 +408,7 @@
                     </div>
 
                     <!-- RGB input -->
-                    <h2>Alternate color input:</h2>
+                    <h2>Direct color input:</h2>
                     <label>Color:</label>
                     <input type="color" id="colorInput" onchange="
                     window.colorPicker.color.hexString = this.value

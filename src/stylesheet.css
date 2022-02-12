@@ -465,25 +465,6 @@ select {
     height: fit-content;
 }
 
-.rulesButton{
-    border-style: none;
-    background: none;
-    margin: 0;
-    background-image: url("/mmo/assets/btn-green-edit.png");
-    background-size: 100% 100%;
-    font-family: "TextboxFont";
-    font-size: 140%;
-    color: white;
-    background-color: green;
-    text-decoration: none;
-    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
-    cursor: pointer;
-    padding-top: 0px;
-    padding-right: 0px;
-    padding-bottom: 0px;
-    padding-left: 0px;
-}
-
 /*Fix for the <a> button */
 a.pink-button {
     padding-top: 0.4em;
@@ -683,16 +664,40 @@ ul#chatlog {
     z-index: 5;
     color: black;
     padding: 1%;
-    overflow: scroll;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
+
+#rules > hr{
+    width: 37em;
+    color: #0000006b;
+    margin-top: 2em;
+}
+
 #rules > p, a {
-    text-align: left;
     font-size: 30px;
 }
 
 .rulesLogo{
     width: 26%;
     height: auto;
+}
+
+.rulesButton{
+    border-style: none;
+    background: none;
+    margin: 0;
+    background-image: url("/mmo/assets/btn-green-edit.png");
+    background-size: 100% 100%;
+    font-family: "TextboxFont";
+    font-size: 140%;
+    color: white;
+    background-color: green;
+    text-decoration: none;
+    text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
+    cursor: pointer;
+    padding: 0px;
+    margin-top: 1em;
 }
 
 .shunned {

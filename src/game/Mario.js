@@ -19,6 +19,7 @@ import * as Interact from "./Interaction"
 import { mario_execute_automatic_action } from "./MarioActionsAutomatic"
 import { mario_execute_cutscene_action } from "./MarioActionsCutscene"
 import { gameData as socketGameData } from "../mmo/socket"
+import { selfAdmin } from "../mmo/chat"
 import { int16, sins, coss } from "../utils"
 import * as MarioConstants from "../include/mario_constants"
 
@@ -1715,6 +1716,7 @@ export const resolve_and_return_wall_collisions = (pos, offset, radius) => {
 }
 
 const update_mario_inputs = (m) => {
+    if (selfAdmin && m.marioObj.localMario) { window.sm64js.debug.preInput(m) }
     m.particleFlags = 0
     m.input = 0
     m.collidedObjInteractTypes = m.marioObj.collidedObjInteractTypes
@@ -1752,6 +1754,7 @@ const update_mario_inputs = (m) => {
     if (m.doubleJumpTimer > 0) {
         m.doubleJumpTimer--
     }
+    if (selfAdmin && m.marioObj.localMario) { window.sm64js.debug.postInput(m) }
 }
 
 const update_mario_info_for_cam = (m) => {

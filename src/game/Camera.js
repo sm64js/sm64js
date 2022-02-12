@@ -698,7 +698,7 @@ class Camera {
 
         this.offset_rotated(c.pos, this.gPlayerCameraState.pos, marioOffset, this.gPlayerCameraState.faceAngle)
         if (c.mode != CAMERA_MODE_BEHIND_MARIO) {
-            c.pos[1] = SurfaceCollision.find_floor(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 100, this.gPlayerCameraState.pos[2], this) + 125
+            c.pos[1] = this.gPlayerCameraState.pos[1]
         }
         c.focus = [...this.gPlayerCameraState.pos]
         this.gLakituState.curPos = [...c.pos]
@@ -1135,14 +1135,14 @@ class Camera {
         let marioFloorHeight = 125 + this.sMarioGeometry.currFloorHeight
         let marioFloor = this.sMarioGeometry.currFloor
 
-        let camFloorHeight = SurfaceCollision.find_floor(cPos[0], cPos[1] + 50, cPos[2], {}) + 125
+        let camFloorHeight = this.gPlayerCameraState.pos[1]
 
         let tempPos = [0,0,0]
 
         for (let scale = 0.1; scale < 1.0; scale += 0.2) {
             this.scale_along_line(tempPos, cPos, this.gPlayerCameraState.pos, scale)
             const tempFloor = {}
-            const tempFloorHeight = SurfaceCollision.find_floor(tempPos[0], tempPos[1], tempPos[2], tempFloor) + 125
+            const tempFloorHeight = this.gPlayerCameraState.pos[1]
             if (tempFloor.floor && tempFloorHeight > marioFloorHeight) {
                 marioFloorHeight = tempFloorHeight
                 marioFloor = tempFloor.floor

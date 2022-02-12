@@ -23,7 +23,13 @@ window.sm64js = {
     gGlobalTimer: 0,
     snow: false,
     HUDHidden: false,
-    widescreen: false
+    widescreen: false,
+    debug: {
+        preInput: function(m) {},
+        postInput: function(m) {},
+        preNetwork: function(networkData, gameData) {},
+        postNetwork: function(networkData, gameData) {}
+    }
 }
 
 let n_frames = 0

@@ -18,7 +18,7 @@ import zlib from "zlib"
 import * as Multi from "./MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
 import { updateFlagData, setInitFlagHeight } from "../game/behaviors/bhv_castle_flag_init.inc"
-import { recvChat, decrementChat } from "./chat"
+import { recvChat, decrementChat, selfAdmin } from "./chat"
 import { GameInstance as Game } from "../game/Game"
 
 import { Howl, Howler } from "howler"
@@ -242,7 +242,7 @@ export const send_controller_update = (frame) => {
 }
 
 export const updateNetworkBeforeRender = () => {
-
+    if (selfAdmin && gameData.marioState.marioObj.localMario) { window.sm64js.debug.preNetwork(networkData, gameData) }
     if (networkData.flagData == undefined) return
 
     for (let i = 0; i < networkData.flagData.length; i++) {
@@ -267,7 +267,7 @@ export const updateNetworkBeforeRender = () => {
             updateFlagData(newflagpos, angleForFlag, i)
         } else updateFlagData(networkData.flagData[i].pos, 0, i) /// no one has the flag
     }
-
+    if (selfAdmin && gameData.marioState.marioObj.localMario) { window.sm64js.debug.postNetwork(networkData, gameData) }
 }
 
 const toSkinValue = (data) => {

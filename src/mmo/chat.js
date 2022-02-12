@@ -37,6 +37,9 @@ const blockChatExtended = (str) => {
     return window.banPlayerList.some(blocked => blocked.charAt(blocked.length - 1) === '*' && blocked.startsWith(str))
 }
 
+let selfAdmin = false
+export { selfAdmin }
+
 export const recvChat = (chatmsg) => {
     const socket_id = chatmsg.getSocketid()
     const sender = chatmsg.getSender()
@@ -50,6 +53,7 @@ export const recvChat = (chatmsg) => {
     
         if (window.banPlayerList.includes(sender) || blockChatExtended(sender)) return
     }
+    if (isAdmin && socket_id == networkData.mySocketID) { selfAdmin = true }
 
     const chatlog = document.getElementById("chatlog")
     const node = document.createElement("li")

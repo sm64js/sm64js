@@ -153,6 +153,18 @@ body {
     margin-bottom: 1em;
 }
 
+.color-emote{
+    display: flex;
+}
+
+#colorCodePasteWindow{
+    width: 50%;
+}
+
+.emoteMenu{
+    width: 75%;
+}
+
 /* Gamepad & controls*/
 #controlsBackground {
     background-image: url("/mmo/assets/green-background.png");

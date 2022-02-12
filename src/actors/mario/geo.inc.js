@@ -490,7 +490,7 @@ const luigi_geo_body = [
         GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, luigi_butt), // starts sharing solid color with luigi_torso (blue)
         GEO_OPEN_NODE(),
             // GEO_ASM(0, MarioMisc.geo_move_mario_part_from_parent, MarioMisc),
-            GEO_ASM(0, MarioMisc.geo_mario_tilt_torso, MarioMisc),
+            // GEO_ASM(0, MarioMisc.geo_mario_tilt_torso, MarioMisc),
             GEO_ROTATION_NODE(0x00, 0, 0, 0),
             GEO_OPEN_NODE(),
                 GEO_ANIMATED_PART(LAYER_OPAQUE, 81, 0, 0, luigi_torso),

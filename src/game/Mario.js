@@ -698,15 +698,15 @@ export const sBackwardKnockbackActions = [
 class MarioAudioTable {
     constructor() {
         this.chan1_table = {
-            hoo:  "https://agent-11.github.io/assets/pcport2mp3/hoo.mp3",
-            hoohoo: "https://agent-11.github.io/assets/pcport2mp3/hoohoo.mp3",
-            yah1: "https://agent-11.github.io/assets/pcport2mp3/yah1.mp3",
-            yah2: "https://agent-11.github.io/assets/pcport2mp3/yah2.mp3",
-            yahoo: "https://agent-11.github.io/assets/pcport2mp3/yahoo.mp3",
-            yipee: "https://agent-11.github.io/assets/pcport2mp3/yipee.mp3",
-            wah: "https://agent-11.github.io/assets/pcport2mp3/wah.mp3",
-            waha: "https://agent-11.github.io/assets/pcport2mp3/waha.mp3",
-            woo: "https://agent-11.github.io/assets/pcport2mp3/woo.mp3"
+            hoo:  "this is a ninten ninja moment waiting to happen"
+            hoohoo: "this is a ninten ninja moment waiting to happen"
+            yah1: "this is a ninten ninja moment waiting to happen"
+            yah2: "this is a ninten ninja moment waiting to happen"
+            yahoo: "this is a ninten ninja moment waiting to happen"
+            yipee: "this is a ninten ninja moment waiting to happen"
+            wah: "this is a ninten ninja moment waiting to happen"
+            waha: "this is a ninten ninja moment waiting to happen"
+            woo: "this is a ninten ninja moment waiting to happen"
         }
 
         this.chan1 = new Howl({src: [this.chan1_table[this.chan1_table["yahoo"]]]}) // mario, placeholder

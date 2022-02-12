@@ -1,6 +1,4 @@
-﻿/*NOTE: Please don't change anything already written here or in the HTML unless STRICTLY necessary if possible*/
-
-/* HTML, contains background */
+﻿/* HTML, contains background */
 html {
     height: 100%;
     background-color: #050413;
@@ -20,7 +18,7 @@ html {
     src: url("/mmo/assets/mario-64-textbox-themh.ttf");
 }
 
-.mario-font{
+.mario-font {
   font-family: "SuperMario64Logo";
   letter-spacing: -2px;
   text-transform: uppercase;
@@ -28,7 +26,7 @@ html {
   text-shadow: 0px 4px #b98a50, 2px 3px #b98a50, -3px 3px #b98a50, -3px -1px #b98a50;
 }
 
-.descriptionContact{
+.descriptionContact {
     color: #bac9ff;
     font-family: "TextboxFont";
     letter-spacing: -0.2px;
@@ -36,13 +34,12 @@ html {
     margin: 0;
 }
 
-.descriptionContact:hover{
+.descriptionContact:hover {
     border-bottom: 0.15em solid hsla(0,0%,100%,.25);
     padding-bottom: 0.2em;
 }
 
 /* Body  */
-
 body {
     color: #fff;
     font-family: "TextboxFont";
@@ -59,7 +56,8 @@ body {
     font-family: 'TextboxFont';
 }
 
-#signboxBackground{
+/*Menus*/
+#signboxBackground {
     background-image: url("/mmo/assets/yellow-background.png");
     background-size: 100% 100%;
     border-top: solid 20px #202020c7;
@@ -71,7 +69,7 @@ body {
     background-clip: padding-box;
     height: 31.2em;
 }
-#signboxBorder{
+#signboxBorder {
     padding-top: 1em;
     padding-bottom: 1em;
     padding-left: 2em;
@@ -82,27 +80,25 @@ body {
     height: 35.5em;
     width: auto;
 }
-
-/*Menus*/
-#signboxBackground > div{
+#signboxBackground > div {
     margin-bottom: 1em;
 }
 
-#signboxMargin{
+#signboxMargin {
     margin-top: 4em;
 }
-#signboxMargin > div{
+#signboxMargin > div {
     margin-top: 2em;
 }
 
-#controlsMargin{
+#controlsMargin {
     margin-top: 4em;
 }
 
-.mapSelectDiv{
+.mapSelectDiv {
     margin-top: 0.8em;
 }
-
+/* Misc menu things */
 #optionsBackground {
     background-image: url("/mmo/assets/blue-background.png");
     background-size: 100% 100%;
@@ -115,7 +111,7 @@ body {
     background-clip: padding-box;
     height: 31.2em;
 }
-#optionsBorder{
+#optionsBorder {
     padding-top: 1em;
     padding-bottom: 1em;
     padding-left: 2em;
@@ -126,11 +122,9 @@ body {
     height: 35.5em;
     width: auto;
 }
-
-#optionsBackground > div{
+#optionsBackground > div {
     margin-bottom: 1em;
 }
-
 #customizeBackground {
     background-image: url("/mmo/assets/pink-background.png");
     background-size: 100% 100%;
@@ -143,7 +137,7 @@ body {
     background-clip: padding-box;
     height: 31.2em;
 }
-#customizeBorder{
+#customizeBorder {
     padding-top: 1em;
     padding-bottom: 1em;
     padding-left: 2em;
@@ -155,10 +149,11 @@ body {
     width: auto;
 }
 
-#customizeBackground > div{
+#customizeBackground > div {
     margin-bottom: 1em;
 }
 
+/* Gamepad & controls*/
 #controlsBackground {
     background-image: url("/mmo/assets/green-background.png");
     background-size: 100% 100%;
@@ -171,7 +166,7 @@ body {
     background-clip: padding-box;
     height: 31.2em;
 }
-#controlsBorder{
+#controlsBorder {
     padding-top: 1em;
     padding-bottom: 1em;
     padding-left: 2em;
@@ -182,68 +177,58 @@ body {
     height: 35.5em;
     width: auto;
 }
-
-#controlsFlex{
+#controlsFlex {
     display: flex;
 }
-
 #keyboardControlsWindow {
     display: flex;
     width: 35%;
     margin: auto;
     margin-bottom: 1em;
 }
-
 #gamepadControlsWindow {
     display: flex;
     margin: auto;
     margin-top: 0.2em;
     margin-bottom: 1em;
 }
-
-#noGamepadMessage{
+#noGamepadMessage {
     margin: 0;
 }
-
-#gamepadMessage{
+#gamepadMessage {
     font-size: 1.2em;
 }
-
-#gamepadFlex{
+#gamepadFlex {
     display: flex;
 }
-
-#gamepadFlex > div{
+#gamepadFlex > div {
     margin-right: 1em;
 }
-
-#gamepadFlex > div > div{
+#gamepadFlex > div > div {
     display: flex;
 }
-
-#gamepadFlex > div > div > label{
+#gamepadFlex > div > div > label {
     flex: 1;
 }
-
 #gamepadFlex > div > div > select{
     flex: 1;
 }
 
-.siteCenter{
+.siteCenter {
     justify-content: center;
 }
 
-#fpsMeter, #pingMeter{
+#fpsMeter, #pingMeter {
     font-size: 1.8em;
     margin-top: 0;
 }
 
-.deleteDiv{
+.deleteDiv {
     display: flex;
     justify-content: center;
 }
 
-.deleteDiv h2{
+.deleteDiv h2 {
     margin-left: 1em;
 }
 
@@ -279,20 +264,14 @@ img#title {
 input {
     text-shadow: rgba(0,0,0,.3215686274509804) 2px 2px 1px;
 }
-input[type=text] {
-    font-family: "TextboxFont";
-    font-size: 20px;
-    height: 1.8rem;
-}
-.textInput{
+.textInput {
     width: 100%;
     height: 2rem;
     font-family: 'TextboxFont';
     font-size: 124%;
     text-shadow: none;
 }
-
-.nameInput{
+.nameInput {
     max-width: 10em;
 }
 
@@ -704,7 +683,7 @@ ul#chatlog {
     z-index: 5;
     color: black;
     padding: 1%;
-    overflow: hidden;
+    overflow: scroll;
 }
 #rules > p, a {
     text-align: left;

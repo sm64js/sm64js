@@ -321,8 +321,6 @@ window.switchbox = (name) => {
     }
 }
 
-window.sm64js.snow = false
-
 window.enterFullScreenMode = () => {
     const dstCanvas = document.getElementById('fullCanvas')
     dstCanvas.requestFullscreen()
@@ -334,7 +332,7 @@ window.enterFullScreenMode = () => {
 }
 
 ///// Start Game
-const rulesVersion = 14
+const rulesVersion = 15
 let gameStarted = false
 
 if (localStorage['rules'] == rulesVersion) {

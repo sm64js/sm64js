@@ -43,8 +43,6 @@ import { W_CAP, L_SIDEBURN, W_MUSTACHE, W_MOUTH, W_EYE_OPEN } from "./texture.in
 	for the people who are
 	still playing.
 
-	One last thing:
-
 	Go ahead and leave me.
 	I think I prefer to stay inside.
 	Maybe you'll find something else
@@ -62,18 +60,16 @@ import { W_CAP, L_SIDEBURN, W_MUSTACHE, W_MOUTH, W_EYE_OPEN } from "./texture.in
 	For the people who are
 	still playing.
 
-	PS: And believe me I am
+	And believe me I am
 	still playing
-	PPS: When doing Development and I'm
+	When doing Development and I'm
 	still playing
-	PPPS: I feel FANTASTIC and I'm
+	I feel FANTASTIC and I'm
 	still playing
 
-	FINAL THOUGHT:
 	While you're leaving I'll be
 	still playing
 
-	FINAL THOUGHT PS:
 	And when you're gone I will be
 	still playing
 
@@ -1316,6 +1312,8 @@ export const capless_wario_head_mesh_layer_5_tri_0 = [
 	Gbi.gsSPEndDisplayList(),
 ]
 
+
+
 const mat_cap_emblem = [
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_BLENDRGBFADEA),
 	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
@@ -1372,6 +1370,20 @@ const mat_hair = (customData) => {
 	Gbi.gsSPEndDisplayList(),
 	]
 }
+
+const mat_wario_overalls = (customData) => {
+	
+}
+
+/*export const wario_torso = (customData) => {
+	return [
+	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
+	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADEFADEA),
+	Gbi.gsSPDisplayList(mat_wario_overalls(customData)),
+	Gbi.gsSPDisplayList(wario_wario_torso_mesh_layer_1_tri_0),
+	Gbi.gsSPEndDisplayList(),
+	]
+}*/
 
 export const wario_head_cap_on_DL = (customData) => {
 	return [

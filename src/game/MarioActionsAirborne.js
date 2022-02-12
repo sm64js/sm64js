@@ -288,8 +288,6 @@ const act_parachuting = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
     }
 	
-	if (m.forwardVel < -45) {m.forwardVel = -45}
-	
     if (m.input & Mario.INPUT_PARACHUTE) {
 		m.input ^= Mario.INPUT_PARACHUTE
         return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)

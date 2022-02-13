@@ -13,6 +13,7 @@ import { SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { sins, int16, s16 } from "../utils"
 import { HudInstance as Hud } from "./Hud"
 
+import { selfAdmin } from "../mmo/chat"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -757,6 +758,8 @@ class Camera {
     }
 
     update_camera(c) {
+        const m = LevelUpdate.gMarioState
+        if (selfAdmin && m.marioObj.localMario) { window.sm64js.debug.preCamera(c, m) }
         if (window.myMario.freezeCamera) return
         this.gCamera = c
         this.update_camera_hud_status(c)
@@ -802,6 +805,7 @@ class Camera {
         this.update_lakitu(c) 
 
         this.gLakituState.lastFrameAction = this.gPlayerCameraState.action
+        if (selfAdmin && m.marioObj.localMario) { window.sm64js.debug.postCamera(c, m) }
 
     }
 

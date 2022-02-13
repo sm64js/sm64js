@@ -242,7 +242,7 @@ export const send_controller_update = (frame) => {
 }
 
 export const updateNetworkBeforeRender = () => {
-    if (selfAdmin && gameData.marioState.marioObj.localMario) { window.sm64js.debug.preNetwork(networkData, gameData) }
+    if (selfAdmin && gameData.marioState.marioObj.localMario) { window.sm64js.debug.preNetworkRender(networkData, gameData) }
     if (networkData.flagData == undefined) return
 
     for (let i = 0; i < networkData.flagData.length; i++) {
@@ -267,7 +267,7 @@ export const updateNetworkBeforeRender = () => {
             updateFlagData(newflagpos, angleForFlag, i)
         } else updateFlagData(networkData.flagData[i].pos, 0, i) /// no one has the flag
     }
-    if (selfAdmin && gameData.marioState.marioObj.localMario) { window.sm64js.debug.postNetwork(networkData, gameData) }
+    if (selfAdmin && gameData.marioState.marioObj.localMario) { window.sm64js.debug.postNetworkRender(networkData, gameData) }
 }
 
 const toSkinValue = (data) => {

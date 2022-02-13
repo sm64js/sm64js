@@ -2,6 +2,7 @@
 var msgpack = require("msgpack-lite")
 import { loadDataIntoGame } from "./romTextureLoader.js"
 import { GameInstance as Game } from "./game/Game"
+import { PrintInstance } from "./game/Print.js"
 import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
 import  * as Socket from "./mmo/socket.js"
@@ -25,10 +26,17 @@ window.sm64js = {
     HUDHidden: false,
     widescreen: false,
     debug: {
+        marioList: [],
+        print: PrintInstance,
         preInput: function(m) {},
         postInput: function(m) {},
-        preNetwork: function(networkData, gameData) {},
-        postNetwork: function(networkData, gameData) {}
+        preNetworkRender: function(networkData, gameData) {},
+        postNetworkRender: function(networkData, gameData) {},
+        preMultiMario: function(m, mariomsg) {},
+        postMultiMario: function(m, mariomsg) {},
+        preCamera: function(c, m) {},
+        postCamera: function(c, m) {},
+        customCanvas: function(context2d, gameData, networkData) {}
     }
 }
 

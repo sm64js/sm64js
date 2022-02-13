@@ -276,7 +276,7 @@ const act_freefall = (m) => {
         case 0: animation = Mario.MARIO_ANIM_GENERAL_FALL; break
         case 1: animation = Mario.MARIO_ANIM_FALL_FROM_SLIDE; break
         case 2: animation = Mario.MARIO_ANIM_FALL_FROM_SLIDE_KICK; break
-        default: throw "act freefall unknown action arg: " + m.actionArg
+        default: animation = Mario.MARIO_ANIM_GENERAL_FALL; break //throw "act freefall unknown action arg: " + m.actionArg
     }
 
     common_air_action_step(m, Mario.ACT_FREEFALL_LAND, animation, Mario.AIR_STEP_CHECK_LEDGE_GRAB)

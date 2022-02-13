@@ -246,6 +246,8 @@ export const draw2Dpost3Drendering = () => {
 		const TAUNT = Taunt.tauntsMap[Taunt.getSelectedTaunt()]
 		if (TAUNT != -1) window.taunt = TAUNT
 	}
+
+    window.sm64js.debug.customCanvas(context2d, gameData, networkData)
 }
 
 let imgHeight = 0

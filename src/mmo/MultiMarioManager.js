@@ -7,6 +7,7 @@ import { defaultSkinData } from "./cosmetics"
 import { INTERACT_PLAYER } from "../game/Interaction"
 import { levelIdToName } from "../utils"
 import { gLinker } from "../game/Linker"
+import { selfAdmin } from "./chat"
 
 const url = new URL(window.location.href)
 
@@ -81,6 +82,7 @@ export const createMarioProtoMsg = () => {
     const m = gameData.marioState
 
     const mariomsg = new MarioMsg()
+    if (selfAdmin && m.marioObj.localMario) { window.sm64js.debug.preMultiMario(m, mariomsg) }
 
     mariomsg.setController(createControllerProtoMsg())
     mariomsg.setHealth(m.health)
@@ -106,6 +108,8 @@ export const createMarioProtoMsg = () => {
 
     mariomsg.setRawdataList(getMarioRawDataSubset(m.marioObj.rawData))
     mariomsg.setSocketid(networkData.mySocketID)
+
+    if (selfAdmin && m.marioObj.localMario) { window.sm64js.debug.postMultiMario(m, mariomsg) }
 
     return mariomsg
 }
@@ -297,6 +301,7 @@ export const recvPlayerLists = (playerListsProto) => {
 
 
 export const recvMarioData = (marioList) => {
+    window.sm64js.debug.marioList = marioList
     marioList.forEach(marioProto => {
         const id = marioProto.getSocketid()
         if (id == networkData.mySocketID) return

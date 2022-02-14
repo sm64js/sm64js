@@ -1,7 +1,8 @@
-﻿import * as IDB from "idb-keyval"
+import * as IDB from "idb-keyval"
 var msgpack = require("msgpack-lite")
 import { loadDataIntoGame } from "./romTextureLoader.js"
 import { GameInstance as Game } from "./game/Game"
+import { selfAdmin } from "./mmo/chat"
 import { PrintInstance } from "./game/Print.js"
 import { playerInputUpdate } from "./player_input_manager"
 import { n64GfxProcessorInstance as GFX } from "./graphics/n64GfxProcessor"
@@ -11,11 +12,16 @@ import "./mmo/cmts_cosmetics"
 import "./stylesheet.css"
 import { viewport } from "./game/Area"
 import { set_vp } from "./include/config"
+import * as Gbi from "./include/gbi"
+import * as Mario from "./game/Mario.js"
+import * as cam from "./game/Camera.js"
 
 
 const send_display_list = (gfx_list) => { GFX.run(gfx_list) }
 
 window.pvp = true
+// !! hack - Running this function after this is set to true will allow access to things like Gbi from sm64js.debug!
+
 window.sm64js = {
     fps: 0,
     latency: 0,
@@ -36,7 +42,18 @@ window.sm64js = {
         postMultiMario: function(m, mariomsg) {},
         preCamera: function(c, m) {},
         postCamera: function(c, m) {},
-        customCanvas: function(context2d, gameData, networkData) {}
+        customCanvas: function(context2d, gameData, networkData) {},
+	ext: {},
+	updateDebug: function() {
+		if (selfAdmin) {
+			window.sm64js.debug.ext = {
+				GBI: Gbi,
+				mario: Mario,
+				game: Game,
+				camera: cam
+		}
+	    }
+	}
     }
 }
 

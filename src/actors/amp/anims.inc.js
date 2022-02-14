@@ -2,7 +2,7 @@
 
 import {
     ANIMINDEX_NUMPARTS
-} from "../../../include/types"
+} from "../../include/types"
 
 // 0x08003E30
 const amp_seg8_animvalue_08003E30 = [

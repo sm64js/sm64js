@@ -85,7 +85,7 @@ const detect_object_hurtbox_overlap = (a, b) => {
 
 const check_collision_in_list = (aObj, listHead, bObj) => {
     if (aObj.rawData[oIntangibleTimer] == 0) {
-        bObj ||= listHead.next
+        bObj = bObj || listHead.next
         while (bObj != listHead) {
             if (bObj.rawData[oIntangibleTimer] == 0) {
                 if (detect_object_hitbox_overlap(aObj, bObj) && bObj.hurtboxRadius != 0.0) {

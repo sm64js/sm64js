@@ -1195,8 +1195,8 @@ export const get_object_list_from_behavior = (behavior) => {
     return gLinker.Spawn.get_bhv_object_list(behavior)
 }
 
-export const cur_obj_nearest_object_with_behavior = (behavior) => {
-    return cur_obj_find_nearest_object_with_behavior(behavior)
+export const cur_obj_nearest_object_with_behavior = (o, behavior) => {
+    return cur_obj_find_nearest_object_with_behavior(o, behavior)
 }
 
 export const cur_obj_dist_to_nearest_object_with_behavior = (behavior) => {
@@ -1209,7 +1209,7 @@ export const cur_obj_dist_to_nearest_object_with_behavior = (behavior) => {
     return dist.dist
 }
 
-export const cur_obj_find_nearest_object_with_behavior = (behavior, dist) => {
+export const cur_obj_find_nearest_object_with_behavior = (o, behavior, dist) => {
     let closestObj = null
     let listHead = ObjectListProc.gObjectLists[get_object_list_from_behavior(behavior)]
     let minDist = 0x20000

@@ -2924,16 +2924,14 @@ const extractAssetsFromRom = (romBufferData) => {
     processExtractedResults(extractedData)
 }
 
-$('#romSelect').submit(
-    (e) => {
-        e.preventDefault()
-        if (loadedGameAssets) return
-        const romFile = document.getElementById('romFile').files[0]
-        const reader = new FileReader()
-        reader.readAsArrayBuffer(romFile)
-        reader.onload = (evt) => { extractAssetsFromRom(evt.target.result) }
-    }
-)
+document.getElementById('romSelect').addEventListener('submit', (e) => {
+    e.preventDefault()
+    if (loadedGameAssets) return
+    const romFile = document.getElementById('romFile').files[0]
+    const reader = new FileReader()
+    reader.readAsArrayBuffer(romFile)
+    reader.onload = (evt) => { extractAssetsFromRom(evt.target.result) }
+})
 
 /*        msgElement.innerHTML = "Please wait for ROM to be uploaded and game assets to be sent back to your device..."
         msgElement.style = "color:yellow"

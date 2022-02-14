@@ -264,7 +264,7 @@ class LevelCommands {
 
     place_object(model, x, y, z, pitch, yaw, rot, bharg, bhscript, act) {
         const val7 = 1 << (Area.gCurrActNum - 1)
-        act ||= 0x1F
+        act = act || 0x1F
 
         if (this.sCurrAreaIndex != -1 && (act & val7 || act == 0x1F)) {
             const spawnInfo = {

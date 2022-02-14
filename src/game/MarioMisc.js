@@ -123,7 +123,7 @@ class MarioMisc {
                     switchCase.selectedCase = 0
                 }
             } else {
-                throw "never here - geo_switch_mario_eyes"
+                switchCase.selectedCase = this.gBodyState.eyeState - 1
             }
         }
         return null

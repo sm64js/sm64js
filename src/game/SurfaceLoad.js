@@ -266,6 +266,7 @@ class SurfaceLoad {
         }
 
         this.gTerrainData = data  /// TODO refactor our function args to data, because we are storing it as a class variable
+        gLinker.ObjectListProcessor.gEnvironmentRegions = null
 
         let dataIndex = 0
         let vertexDataIndex = 0

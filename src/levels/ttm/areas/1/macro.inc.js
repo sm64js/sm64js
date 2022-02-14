@@ -45,7 +45,7 @@ export const ttm_seg7_area_1_macro_objs = [
     MACRO_OBJECT(/*preset*/ 'macro_hidden_box',                  /*yaw*/  55, /*pos*/  -900,  1540,   580),
     MACRO_OBJECT(/*preset*/ 'macro_chuckya',                     /*yaw*/ 270, /*pos*/ -2676, -2145,  2923),
     MACRO_OBJECT(/*preset*/ 'macro_red_coin',                    /*yaw*/   0, /*pos*/  1840, -2880, -3600),
-    //MACRO_OBJECT(/*preset*/ 'macro_coin_line_vertical',          /*yaw*/   0, /*pos*/  -880,  1750,   580),
+    MACRO_OBJECT(/*preset*/ 'macro_coin_line_vertical',          /*yaw*/   0, /*pos*/  -880,  1750,   580),
     MACRO_OBJECT(/*preset*/ 'macro_fire_fly_guy',                /*yaw*/   0, /*pos*/  2300, -1384,  3753),
     MACRO_OBJECT(/*preset*/ 'macro_butterfly_triplet',           /*yaw*/   0, /*pos*/  -606,  1186, -1290),
     //MACRO_OBJECT(/*preset*/ 'macro_jumping_box',                 /*yaw*/   0, /*pos*/  4980, -4607,  2680),

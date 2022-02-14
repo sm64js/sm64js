@@ -22,7 +22,7 @@ export const ccm_seg7_area_1_macro_objs = [
     MACRO_OBJECT_WITH_BEH_PARAM(/*preset*/ 'macro_cannon_closed',             /*yaw*/   0, /*pos*/ -5045, -1740,  4615, /*behParam*/ 0x00),
     MACRO_OBJECT_WITH_BEH_PARAM(/*preset*/ 'macro_cannon_closed',             /*yaw*/   0, /*pos*/  1090, -4607,  5729, /*behParam*/ 0x80),
     MACRO_OBJECT_WITH_BEH_PARAM(/*preset*/ 'macro_wooden_signpost',           /*yaw*/ 270, /*pos*/ -1060,  2560, -1840, /*behParam*/ DIALOG_087),
-    //MACRO_OBJECT(/*preset*/ 'macro_coin_line_vertical',        /*yaw*/   0, /*pos*/  -180,  3100, -1480),
+    MACRO_OBJECT(/*preset*/ 'macro_coin_line_vertical',        /*yaw*/   0, /*pos*/  -180,  3100, -1480),
     MACRO_OBJECT(/*preset*/ 'macro_coin_line_horizontal',      /*yaw*/   0, /*pos*/  3560,  2100,  -280),
     MACRO_OBJECT(/*preset*/ 'macro_coin_line_horizontal',      /*yaw*/  77, /*pos*/ -1942,  1334,  1678),
     MACRO_OBJECT(/*preset*/ 'macro_coin_line_horizontal',      /*yaw*/  90, /*pos*/ -1020,   646, -2706),

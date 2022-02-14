@@ -247,6 +247,5 @@ export const level_wf_entry = [
 
 
 gLinker.level_scripts.level_wf_entry = level_wf_entry
-console.warn("Various unimplemented bhvs present resulting in no collision in certain objects")
 
 // 2021-06-14 16:16:34 -0400 (Convert.rb 2021-06-14 09:43:28 -0400)

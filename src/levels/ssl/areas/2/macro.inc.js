@@ -45,7 +45,7 @@ export const ssl_seg7_area_2_macro_objs = [
     MACRO_OBJECT(/*preset*/ 'macro_hidden_star_trigger',         /*yaw*/   0, /*pos*/   260,  1967,  -600),
     MACRO_OBJECT(/*preset*/ 'macro_hidden_star_trigger',         /*yaw*/   0, /*pos*/ -1940,  1229,  -600),
     MACRO_OBJECT(/*preset*/ 'macro_hidden_star_trigger',         /*yaw*/   0, /*pos*/ -1940,  1229,  2320),
-    //MACRO_OBJECT(/*preset*/ 'macro_coin_line_vertical',          /*yaw*/   0, /*pos*/   290,  4479,  -940),
+    MACRO_OBJECT(/*preset*/ 'macro_coin_line_vertical',          /*yaw*/   0, /*pos*/   290,  4479,  -940),
     MACRO_OBJECT_WITH_BEH_PARAM(/*preset*/ 'macro_wooden_signpost',             /*yaw*/   0, /*pos*/ -3560,     0, -4065, /*behParam*/ DIALOG_103),
     MACRO_OBJECT(/*preset*/ 'macro_hidden_star_trigger',         /*yaw*/   0, /*pos*/   260,  3913,  -600),
     MACRO_OBJECT(/*preset*/ 'macro_yellow_coin',                 /*yaw*/   0, /*pos*/  -260,  2950,  -600),

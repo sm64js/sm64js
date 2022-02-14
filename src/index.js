@@ -40,8 +40,8 @@ window.sm64js = {
         postNetworkRender: function(networkData, gameData) {},
         preMultiMario: function(m, mariomsg) {},
         postMultiMario: function(m, mariomsg) {},
-        preCamera: function(c, m) {},
-        postCamera: function(c, m) {},
+        preCamera: function(c, g, m) {},
+        postCamera: function(c, g, m) {},
         customCanvas: function(context2d, gameData, networkData) {},
 	ext: {},
 	updateDebug: function() {

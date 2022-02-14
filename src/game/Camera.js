@@ -759,7 +759,6 @@ class Camera {
 
     update_camera(c) {
         const m = LevelUpdate.gMarioState
-        if (selfAdmin && m.marioObj.localMario) { window.sm64js.debug.preCamera(c, m) }
         if (window.myMario.freezeCamera) return
         this.gCamera = c
         this.update_camera_hud_status(c)
@@ -805,7 +804,6 @@ class Camera {
         this.update_lakitu(c) 
 
         this.gLakituState.lastFrameAction = this.gPlayerCameraState.action
-        if (selfAdmin && m.marioObj.localMario) { window.sm64js.debug.postCamera(c, m) }
 
     }
 
@@ -1381,6 +1379,7 @@ class Camera {
 
     update_graph_node_camera(graphNode) {
 
+        if (selfAdmin && m.marioObj.localMario) { window.sm64js.debug.preCamera(this.gLakituState, graphNode, m) }
         graphNode.rollScreen = this.gLakituState.roll
         graphNode.pos = [...this.gLakituState.pos]
         graphNode.focus = [...this.gLakituState.focus]
@@ -1389,6 +1388,7 @@ class Camera {
             graphNode.pos[1] = LevelUpdate.gMarioState.pos[1] + 600
             graphNode.focus = [...LevelUpdate.gMarioState.pos]
         }
+        if (selfAdmin && m.marioObj.localMario) { window.sm64js.debug.postCamera(this.gLakituState, graphNode, m) }
 
     }
 

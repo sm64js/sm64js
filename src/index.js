@@ -15,6 +15,7 @@ import { set_vp } from "./include/config"
 import * as Gbi from "./include/gbi"
 import * as Mario from "./game/Mario.js"
 import * as cam from "./game/Camera.js"
+import * as inp from "./player_input_manager.js"
 
 
 const send_display_list = (gfx_list) => { GFX.run(gfx_list) }
@@ -50,7 +51,8 @@ window.sm64js = {
 				GBI: Gbi,
 				mario: Mario,
 				game: Game,
-				camera: cam
+				camera: cam,
+				input: inp
 		}
 	    }
 	}

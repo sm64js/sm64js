@@ -1378,7 +1378,7 @@ class Camera {
     }
 
     update_graph_node_camera(graphNode) {
-
+        let m = LevelUpdate.gMarioState;
         if (selfAdmin && m.marioObj.localMario) { window.sm64js.debug.preCamera(this.gLakituState, graphNode, m) }
         graphNode.rollScreen = this.gLakituState.roll
         graphNode.pos = [...this.gLakituState.pos]

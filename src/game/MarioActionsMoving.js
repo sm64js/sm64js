@@ -62,9 +62,24 @@ const apply_slope_accel = (m) => {
 const apply_slope_decel = (m, decelCoef) => {
     let stopped = 0
     let decel
-    switch (Mario.mario_get_floor_class(m)) {
-        default: decel = decelCoef * 2.0; break
+    if (Mario.get_character_type(m) == 0) {
+        switch (Mario.mario_get_floor_class(m)) {
+            default: decel = decelCoef * 1.5; break
+        }
     }
+
+    if (Mario.get_character_type(m) == 1) {
+        switch (Mario.mario_get_floor_class(m)) {
+            default: decel = decelCoef * 0.5; break
+        }
+    }
+
+    if (Mario.get_character_type(m) == 2) {
+        switch (Mario.mario_get_floor_class(m)) {
+            default: decel = decelCoef * 3.0; break
+        }
+    }
+
     m.forwardVel = approach_number(m.forwardVel, 0.0, decel, decel)
     if (m.forwardVel == 0.0) stopped = 1
 
@@ -79,7 +94,7 @@ const update_walking_speed = (m) => {
     if (m.floor && m.floor.type == SURFACE_SLOW) maxTargetSpeed = 24
     else maxTargetSpeed = 32
 	
-    if (Mario.get_character_type(m) == 1) maxTargetSpeed = 48
+    if (Mario.get_character_type(m) == 1) maxTargetSpeed = 50
     if (Mario.get_character_type(m) == 2) maxTargetSpeed = 24
 
     targetSpeed = m.intendedMag < maxTargetSpeed ? m.intendedMag : maxTargetSpeed
@@ -375,6 +390,7 @@ const act_braking = (m) => {
 const update_decelerating_speed = (m) => {
     let stopped = 0
 
+    
     m.forwardVel = approach_number(m.forwardVel, 0.0, 1.0, 1.0)
 
     if (m.forwardVel == 0.0) stopped = 1
@@ -1150,14 +1166,39 @@ const act_move_punching = (m) => {
 
     mario_update_punch_sequence(m)
 
-    if (m.forwardVel >= 0.0) {
-        apply_slope_decel(m, 0.5)
-    } else {
-        if ((m.forwardVel += 8.0) >= 0.0) {
-            m.forwardVel = 0.0
+    if (Mario.get_character_type(m) == 0) {
+        if (m.forwardVel >= 0.0) {
+            apply_slope_decel(m, 0.5)
+        } else {
+            if ((m.forwardVel += 8.0) >= 0.0) {
+                m.forwardVel = 0.0
+            }
+            apply_slope_accel(m)
         }
-        apply_slope_accel(m)
     }
+
+    if (Mario.get_character_type(m) == 1) {
+        if (m.forwardVel >= 0.0) {
+            apply_slope_decel(m, 0.0)
+        } else {
+            if ((m.forwardVel += 8.0) >= 0.0) {
+                m.forwardVel = 100.0
+            }
+            apply_slope_accel(m)
+        }
+    }
+
+    if (Mario.get_character_type(m) == 2) {
+        if (m.forwardVel >= 0.0) {
+            apply_slope_decel(m, -3.0)
+        } else {
+            if ((m.forwardVel += 8.0) >= 0.0) {
+                m.forwardVel = 0.0
+            }
+            apply_slope_accel(m)
+        }
+    }
+    
 
     switch (perform_ground_step(m)) {
         case Mario.GROUND_STEP_LEFT_GROUND:

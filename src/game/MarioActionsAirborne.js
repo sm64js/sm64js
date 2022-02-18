@@ -717,9 +717,24 @@ const act_ground_pound = (m) => {
             }
         }
 
-        m.vel[1] = -50.0
+        if (Mario.get_character_type(m) == 0) {
+            m.vel[1] = -50.0
 
-        Mario.set_forward_vel(m, 0.0)
+            Mario.set_forward_vel(m, 0.0)
+        }
+
+        if (Mario.get_character_type(m) == 1) {
+            m.vel[1] = 50.0
+
+            Mario.set_forward_vel(m, 30.0)
+        }
+
+        if (Mario.get_character_type(m) == 2) {
+            m.vel[1] = -100.0
+
+            Mario.set_forward_vel(m, 3.0)
+        }
+
 
         Mario.set_mario_animation(m, m.actionArg == 0 ? Mario.MARIO_ANIM_START_GROUND_POUND : Mario.MARIO_ANIM_TRIPLE_JUMP_GROUND_POUND)
 

@@ -703,6 +703,8 @@ const act_slide_kick = (m) => {
     return 0
 }
 
+const ground_pound_values = [-50, 50, -100]
+
 const act_ground_pound = (m) => {
 
     //play sound
@@ -717,9 +719,10 @@ const act_ground_pound = (m) => {
             }
         }
 
-        m.vel[1] = -50.0
+        m.vel[1] = ground_pound_values[Mario.get_character_type(m)]
 
         Mario.set_forward_vel(m, 0.0)
+
 
         Mario.set_mario_animation(m, m.actionArg == 0 ? Mario.MARIO_ANIM_START_GROUND_POUND : Mario.MARIO_ANIM_TRIPLE_JUMP_GROUND_POUND)
 

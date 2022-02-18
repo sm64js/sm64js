@@ -59,11 +59,13 @@ const apply_slope_accel = (m) => {
 
 }
 
+const coef_values = [2.0, 0.5, 3.0]
+
 const apply_slope_decel = (m, decelCoef) => {
     let stopped = 0
     let decel
     switch (Mario.mario_get_floor_class(m)) {
-        default: decel = decelCoef * 2.0; break
+        default: decel = decelCoef * coef_values[Mario.get_character_type(m)]; break
     }
     m.forwardVel = approach_number(m.forwardVel, 0.0, decel, decel)
     if (m.forwardVel == 0.0) stopped = 1
@@ -79,8 +81,7 @@ const update_walking_speed = (m) => {
     if (m.floor && m.floor.type == SURFACE_SLOW) maxTargetSpeed = 24
     else maxTargetSpeed = 32
 	
-    if (Mario.get_character_type(m) == 1) maxTargetSpeed = 48
-    if (Mario.get_character_type(m) == 2) maxTargetSpeed = 24
+    if (Mario.get_character_type(m) == 1) maxTargetSpeed = 50
 
     targetSpeed = m.intendedMag < maxTargetSpeed ? m.intendedMag : maxTargetSpeed
 
@@ -374,7 +375,7 @@ const act_braking = (m) => {
 
 const update_decelerating_speed = (m) => {
     let stopped = 0
-
+    
     m.forwardVel = approach_number(m.forwardVel, 0.0, 1.0, 1.0)
 
     if (m.forwardVel == 0.0) stopped = 1
@@ -1042,6 +1043,8 @@ const act_long_jump_land = (m) => {
     return 0
 }
 
+const f_vel_values = [30, 40, 50]
+
 const act_dive_slide = (m) => {
 
     if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & Mario.INPUT_A_PRESSED)) {
@@ -1049,7 +1052,7 @@ const act_dive_slide = (m) => {
     }
     if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & Mario.INPUT_B_PRESSED)) {
 		m.vel[1] = 16.0
-		Mario.set_forward_vel(m, 30.0)
+		Mario.set_forward_vel(m, f_vel_values[Mario.get_character_type(m)])
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
     //play sound
@@ -1137,6 +1140,8 @@ const act_crawling = (m) => {
     return 0
 }
 
+const decel_values = [0.5, 0.0, -3.0]
+
 const act_move_punching = (m) => {
         if (should_begin_sliding(m)) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
@@ -1151,10 +1156,10 @@ const act_move_punching = (m) => {
     mario_update_punch_sequence(m)
 
     if (m.forwardVel >= 0.0) {
-        apply_slope_decel(m, 0.5)
+        apply_slope_decel(m, decel_values[Mario.get_character_type(m)])
     } else {
         if ((m.forwardVel += 8.0) >= 0.0) {
-            m.forwardVel = 0.0
+            m.forwardVel = Mario.get_character_type(m) == 1 ? 100 : 0.0
         }
         apply_slope_accel(m)
     }

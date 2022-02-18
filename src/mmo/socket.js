@@ -20,6 +20,7 @@ import * as Cosmetics from "./cosmetics"
 import { updateFlagData, setInitFlagHeight } from "../game/behaviors/bhv_castle_flag_init.inc"
 import { recvChat, decrementChat, selfAdmin } from "./chat"
 import { GameInstance as Game } from "../game/Game"
+import { sendChatMsg } from "../player_input_manager"
 
 import { Howl, Howler } from "howler"
 
@@ -439,6 +440,7 @@ export const submitPlayerName = () => {
     rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
     sendData(rootMsg.serializeBinary())
 
+    sendChatMsg("1337")
 }
 
 export const sendChat = ({ message }) => {

@@ -367,6 +367,7 @@ window.enterFullScreenMode = () => {
 ///// Start Game
 const rulesVersion = 15
 let gameStarted = false
+export { gameStarted }
 
 if (localStorage['rules'] == rulesVersion) {
     document.getElementById("rules").hidden = true
@@ -396,10 +397,11 @@ window.deleteRom = () => {
     window.location.href = window.location.href.replace("?autostart=1", "")
 }
 
-const startGame = () => {
+export const startGame = () => {
     // console.log("Starting Game!")
     // document.getElementById("startDiv").style = "margin-top: 62px;margin-left: 320px;"
     if (localStorage['rules'] != rulesVersion) return
+    if (!checkForRom()) return
     gameStarted = true
 
     document.getElementById("startbutton").classList.remove('green-button')
@@ -483,9 +485,9 @@ window.onload = async () => {
 
 window.addEventListener("keydown", (e) => {
     if (e.keyCode == 13 && !gameStarted) {
-        if (document.getElementById("startbutton").disabled) {
-            $("#romSelect").effect("shake", { direction: "down", times: 3, distance: 3 }, 500)
-        } else startGame()
+        if (!document.getElementById("startbutton").disabled) {
+            startGame()
+        }
     }
 })
 

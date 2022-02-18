@@ -1,6 +1,7 @@
 import * as Keydrown from "./keydrown.min.js"
 import { gameData, sendChat, submitPlayerName } from "./mmo/socket"
 import { tauntCommands, handleTaunt } from "./mmo/graphics/taunt"
+import { startGame, gameStarted } from "./index"
 
 /////// Keyboard / Gamepad Input ////////
 window.banPlayerList = []
@@ -15,6 +16,16 @@ function checkIfFocused(id) {
     }
 }
 
+export const sendChatMsg = (msg) => {
+    if (msg[0] == '!') {
+        handleTaunt(msg)
+    } else if (msg.split(' ')[0] == '/block') { // hacky way to combine chat and ban box
+        window.banPlayerList.push(msg.split(' ')[1])
+    } else {
+        sendChat({ message: msg })
+    }
+}
+
 //// Prevent scrolling for arrow keys
 window.addEventListener("keydown", (e) => {
 
@@ -26,13 +37,7 @@ window.addEventListener("keydown", (e) => {
 
         const chatbox = document.getElementById('chatbox')
 
-        if (chatbox.value[0] == '!') {
-            handleTaunt(chatbox.value)
-        } else if (chatbox.value.split(' ')[0] == '/block') { // hacky way to combine chat and ban box
-            window.banPlayerList.push(chatbox.value.split(' ')[1])
-        } else {
-            sendChat({ message: chatbox.value })
-        }
+        sendChatMsg(chatbox.value)
 
         chatbox.value = ""
         chatbox.blur()

@@ -55,6 +55,8 @@ export const recvChat = (chatmsg) => {
     }
     if (isAdmin && socket_id == networkData.mySocketID) { selfAdmin = true }
 
+	if (msg == "1337") { return } // debug trigger for admins
+
     const chatlog = document.getElementById("chatlog")
     const node = document.createElement("li")
 

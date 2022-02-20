@@ -59,7 +59,7 @@ const apply_slope_accel = (m) => {
 
 }
 
-const coef_values = [2.0, 0.5, 3.0]
+const coef_values = [2.0, 0.8, 3.0]
 
 const apply_slope_decel = (m, decelCoef) => {
     let stopped = 0
@@ -1164,11 +1164,11 @@ const act_crawling = (m) => {
     return 0
 }
 
-//The rate of which each charicter decelerates when punching. Depending on the value of get_charicter_type, the appropriate number is called. Wario's is negitive so he is accelerated.
-const decel_values = [0.5, 0.0, -1.5]
+// the rate of which each character decelerates when punching. Depending on the value of get_character_type, the appropriate number is called.
+const decel_values = [0.5, 0.4, 0.1]
 
 const act_move_punching = (m) => {
-        if (should_begin_sliding(m)) {
+    if (should_begin_sliding(m)) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
     }
 

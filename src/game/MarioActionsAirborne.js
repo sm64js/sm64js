@@ -703,8 +703,6 @@ const act_slide_kick = (m) => {
     return 0
 }
 
-const ground_pound_values = [-50, 50, -100]
-
 const act_ground_pound = (m) => {
 
     //play sound
@@ -719,7 +717,7 @@ const act_ground_pound = (m) => {
             }
         }
 
-        m.vel[1] = ground_pound_values[Mario.get_character_type(m)]
+        m.vel[1] = Mario.get_character_type(m) == 2 ? -100 : -50
 
         Mario.set_forward_vel(m, 0.0)
 

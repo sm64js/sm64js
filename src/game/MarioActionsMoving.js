@@ -59,7 +59,7 @@ const apply_slope_accel = (m) => {
 
 }
 
-const coef_values = [2.0, 0.5, 3.0]
+const coef_values = [2.0, 0.8, 3.0]
 
 const apply_slope_decel = (m, decelCoef) => {
     let stopped = 0
@@ -1066,6 +1066,27 @@ const act_dive_slide = (m) => {
     return 0
 }
 
+const act_pound_roll = (m) => {
+
+    if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & Mario.INPUT_A_PRESSED)) {
+        return Mario.set_mario_action(m, m.forwardVel > 0.0 ? Mario.ACT_FORWARD_ROLLOUT : Mario.ACT_BACKWARD_ROLLOUT, 0)
+    }
+    if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & Mario.INPUT_B_PRESSED)) {
+		m.vel[1] = 16.0
+		Mario.set_forward_vel(m, f_vel_values[Mario.get_character_type(m)])
+        return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
+    }
+    //play sound
+
+    if (update_sliding(m, 8.0) && Mario.is_anim_at_end(m)) {
+        Mario.set_forward_vel(m, 5.0)
+        Mario.set_mario_action(m, Mario.ACT_STOMACH_SLIDE_STOP, 0)
+    }
+
+    common_slide_action(m, Mario.ACT_STOMACH_SLIDE_STOP, Mario.ACT_FREEFALL, Mario.MARIO_ANIM_FORWARD_SPINNING)
+    return 0
+}
+
 const should_begin_sliding = (m) => {
 
     //return 0 /// cheat disable sliding on slopes
@@ -1084,9 +1105,12 @@ const should_begin_sliding = (m) => {
 
 const check_ground_dive_or_punch = (m) => {
     if (m.input & Mario.INPUT_B_PRESSED) {
-        if (m.forwardVel >= 29.0 && m.controller.stickMag > 48.0) {
+        if (m.forwardVel >= 29.0  && Mario.get_character_type(m) != 2 && m.controller.stickMag > 48.0) {
             m.vel[1] = 20.0
             return Mario.set_mario_action(m, Mario.ACT_DIVE, 1)
+        }
+        else {
+            return Mario.set_mario_action(m, Mario.ACT_MOVE_PUNCHING, 0)
         }
 
         return Mario.set_mario_action(m, Mario.ACT_MOVE_PUNCHING, 0)
@@ -1140,10 +1164,11 @@ const act_crawling = (m) => {
     return 0
 }
 
-const decel_values = [0.5, 0.0, -3.0]
+// the rate of which each character decelerates when punching. Depending on the value of get_character_type, the appropriate number is called.
+const decel_values = [0.5, 0.4, 0.1]
 
 const act_move_punching = (m) => {
-        if (should_begin_sliding(m)) {
+    if (should_begin_sliding(m)) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
     }
 
@@ -1334,6 +1359,7 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_CROUCH_SLIDE: return act_crouch_slide(m)
         case Mario.ACT_LONG_JUMP_LAND: return act_long_jump_land(m)
         case Mario.ACT_DIVE_SLIDE: return act_dive_slide(m)
+        case Mario.ACT_POUND_ROLL: return act_pound_roll(m)
         case Mario.ACT_CRAWLING: return act_crawling(m)
         case Mario.ACT_MOVE_PUNCHING: return act_move_punching(m)
         case Mario.ACT_SLIDE_KICK_SLIDE: return act_slide_kick_slide(m)

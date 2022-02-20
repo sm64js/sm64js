@@ -343,6 +343,12 @@ const act_ground_pound_land = (m) => {
 		Mario.set_forward_vel(m, 20.0)
 		return Mario.set_mario_action(m, Mario.ACT_TRIPLE_JUMP, 0)
 	}
+    if (m.input & Mario.INPUT_Z_DOWN && Mario.get_character_type(m) == 2) {
+        if (m.input & Mario.INPUT_A_DOWN) return
+        
+        Mario.set_forward_vel(m, 200.0)
+        return Mario.set_mario_action(m, Mario.ACT_POUND_ROLL, 0)
+    }
 
     landing_step(m, Mario.MARIO_ANIM_GROUND_POUND_LANDING, Mario.ACT_BUTT_SLIDE_STOP)
     return 0

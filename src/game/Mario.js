@@ -331,6 +331,7 @@ export const ACT_GROUND_POUND_LAND               = 0x0080023C
 export const ACT_BRAKING_STOP                    = 0x0C00023D
 export const ACT_BUTT_SLIDE_STOP                 = 0x0C00023E
 export const ACT_HOLD_BUTT_SLIDE_STOP            = 0x0800043F
+export const ACT_POUND_ROLL                      = 0x08000441
 
 // group 0x040: moving (ground) actions
 export const ACT_WALKING                         = 0x04000440

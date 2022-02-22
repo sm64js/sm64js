@@ -233,8 +233,10 @@ const act_jump = (m) => {
 	
     if (check_kick_or_dive_in_air(m)) return 1
 	
-	if (Mario.get_character_type(m) == 3 && m.vel[3] != 0.0) {m.vel[3] += 0.5}
-	if (m.input & Mario.INPUT_A_PRESSED && Mario.get_character_type(m) == 3 && m.vel[3] >= 0.0) { Mario.set_mario_action(m, Mario.ACT_FLUTTERJUMP, 0) }
+	if (Mario.get_character_type(m) == 2 && m.vel[3] != 0.0) {m.vel[3] += 0.5}
+	if (m.input & Mario.INPUT_A_PRESSED && Mario.get_character_type(m) == 1 && m.vel[3] <= 0.0) { 
+        Mario.set_mario_action(m, Mario.ACT_FLUTTERJUMP, 0) 
+    }
 	
     if (m.input & Mario.INPUT_Z_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
@@ -261,7 +263,9 @@ const act_freefall = (m) => {
     }
 	
 	if (Mario.get_character_type(m) == 3 && m.vel[3] != 0.0) {m.vel[3] += 0.5}
-	if (m.input & Mario.INPUT_A_PRESSED && Mario.get_character_type(m) == 3 && m.vel[3] >= 0.0) { Mario.set_mario_action(m, Mario.ACT_FLUTTERJUMP, 0) }
+	if (m.input & Mario.INPUT_A_PRESSED && Mario.get_character_type(m) == 1 && m.vel[3] <= 0.0) { 
+        Mario.set_mario_action(m, Mario.ACT_FLUTTERJUMP, 0) 
+    }
 
     if (m.input & Mario.INPUT_Z_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)
@@ -337,7 +341,7 @@ const act_flutterjump = (m) => {
 	}
 	
 	
-    common_air_action_step(m, Mario.ACT_FREEFALL_LAND, Mario.MARIO_ANIM_RUNNING, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
+    common_air_action_step(m, Mario.ACT_FREEFALL_LAND, Mario.MARIO_ANIM_WALKING, Mario.AIR_STEP_CHECK_LEDGE_GRAB)
 
 	m.marioObj.header.gfx.angle[0] = m.vel[1] * -100.0
 	
@@ -371,6 +375,10 @@ const act_double_jump = (m) => {
     let animation = (m.vel[1] >= 0.0) ? Mario.MARIO_ANIM_DOUBLE_JUMP_RISE : Mario.MARIO_ANIM_DOUBLE_JUMP_FALL
 
     if (check_kick_or_dive_in_air(m)) return 1
+
+    if (m.input & Mario.INPUT_A_PRESSED && Mario.get_character_type(m) == 1 && m.vel[3] <= 0.0) { 
+        Mario.set_mario_action(m, Mario.ACT_FLUTTERJUMP, 0) 
+    }
 
     if (m.input & Mario.INPUT_Z_PRESSED) {
         return Mario.set_mario_action(m, Mario.ACT_GROUND_POUND, 0)

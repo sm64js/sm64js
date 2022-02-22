@@ -73,7 +73,8 @@ import {
     set_mario_action,
     sForwardKnockbackActions,
     respawn_player,
-    get_character_type               } from "./Mario"
+    get_character_type,               
+    ACT_POUND_ROLL} from "./Mario"
 import { GameInstance as Game } from "./Game"
 import { AreaInstance as Area } from "./Area"
 import * as MarioConstants from "../include/mario_constants"
@@ -164,19 +165,20 @@ export const INT_SLIDE_KICK  = (1 << 4) // 0x10
 export const INT_FAST_ATTACK_OR_SHELL  = (1 << 5) // 0x20
 export const INT_HIT_FROM_ABOVE  = (1 << 6) // 0x40
 export const INT_HIT_FROM_BELOW = (1 << 7) // 0x80
+export const INT_ROLL = (1 << 8)
 
 export const INT_ATTACK_NOT_FROM_BELOW =
     (INT_GROUND_POUND_OR_TWIRL | INT_PUNCH | INT_KICK | INT_TRIP | INT_SLIDE_KICK
-     | INT_FAST_ATTACK_OR_SHELL | INT_HIT_FROM_ABOVE)
+     | INT_FAST_ATTACK_OR_SHELL | INT_HIT_FROM_ABOVE | INT_ROLL)
 
 export const INT_ANY_ATTACK =
     (INT_GROUND_POUND_OR_TWIRL | INT_PUNCH | INT_KICK | INT_TRIP | INT_SLIDE_KICK 
-     | INT_FAST_ATTACK_OR_SHELL | INT_HIT_FROM_ABOVE | INT_HIT_FROM_BELOW)
+     | INT_FAST_ATTACK_OR_SHELL | INT_HIT_FROM_ABOVE | INT_HIT_FROM_BELOW | INT_ROLL)
 
 export const INT_ATTACK_NOT_WEAK_FROM_ABOVE =
-    (INT_GROUND_POUND_OR_TWIRL | INT_PUNCH | INT_KICK | INT_TRIP | INT_HIT_FROM_BELOW)
+    (INT_GROUND_POUND_OR_TWIRL | INT_PUNCH | INT_KICK | INT_TRIP | INT_HIT_FROM_BELOW | INT_ROLL)
 
-export const INT_ATTACK_SLIDE = INT_SLIDE_KICK | INT_FAST_ATTACK_OR_SHELL
+export const INT_ATTACK_SLIDE = INT_SLIDE_KICK | INT_FAST_ATTACK_OR_SHELL | INT_ROLL
 
 export const INT_STATUS_ATTACK_MASK = 0x000000FF
 
@@ -241,7 +243,7 @@ export const mario_handle_special_floors = (m) => {
 }
 
 const determine_player_damage_value = (interaction) => {
-    if (interaction & INT_GROUND_POUND_OR_TWIRL || interaction & INT_FAST_ATTACK_OR_SHELL || interaction & INT_SLIDE_KICK) { return 3 }
+    if (interaction & INT_GROUND_POUND_OR_TWIRL || interaction & INT_FAST_ATTACK_OR_SHELL || interaction & INT_SLIDE_KICK || interaction & INT_ROLL) { return 3 }
     if (interaction & INT_KICK) { return 2 }
     return 1
 }
@@ -920,6 +922,8 @@ const determine_interaction = (m, o) => {
             interaction = INT_FAST_ATTACK_OR_SHELL
         } else if (m.forwardVel <= -26.0 || 26.0 <= m.forwardVel) {
             interaction = INT_FAST_ATTACK_OR_SHELL
+        } else if (m.action == ACT_POUND_ROLL) {
+            interaction = INT_ROLL
         }
 
     }

@@ -546,7 +546,7 @@ const common_landing_action = (m, animation, airAction) => {
     if (m.input & Mario.INPUT_NONZERO_ANALOG) {
         apply_landing_accel(m, 0.98)
     } else if (m.forwardVel >= 16.0) {
-        apply_slope_decel(m, 2.0)
+        apply_slope_decel(m, decel_values[Mario.get_character_type(m)])
     } else {
         m.vel[1] = 0.0
     }
@@ -1072,15 +1072,15 @@ const act_pound_roll = (m) => {
         return Mario.set_mario_action(m, m.forwardVel > 0.0 ? Mario.ACT_FORWARD_ROLLOUT : Mario.ACT_BACKWARD_ROLLOUT, 0)
     }
     if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & Mario.INPUT_B_PRESSED)) {
-		m.vel[1] = 16.0
+		m.vel[1] = 15.0
 		Mario.set_forward_vel(m, f_vel_values[Mario.get_character_type(m)])
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }
     //play sound
 
-    if (update_sliding(m, 8.0) && Mario.is_anim_at_end(m)) {
-        Mario.set_forward_vel(m, 5.0)
-        Mario.set_mario_action(m, Mario.ACT_STOMACH_SLIDE_STOP, 0)
+    if (update_sliding(m, 10.0) && Mario.is_anim_at_end(m)) {
+        Mario.set_forward_vel(m, 50.0)
+        Mario.set_mario_action(m, Mario.ACT_FORWARD_ROLLOUT, 0)
     }
 
     common_slide_action(m, Mario.ACT_STOMACH_SLIDE_STOP, Mario.ACT_FREEFALL, Mario.MARIO_ANIM_FORWARD_SPINNING)

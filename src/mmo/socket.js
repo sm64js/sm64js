@@ -149,7 +149,7 @@ export function loadSocket() {
             }
         }
     
-        socket.onclose = () => { window.sm64js.latency = null }
+        socket.onclose = () => { window.sm64js.latency = 0 }
     }
 }
 

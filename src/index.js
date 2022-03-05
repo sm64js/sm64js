@@ -152,7 +152,6 @@ document.getElementById("mapSelect").addEventListener('change', () => {
 })
 
 const startGame = () => {
-    console.log("Starting Game!")
     gameStarted = true
     window.cheats = {}
 

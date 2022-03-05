@@ -34,7 +34,7 @@ const intro_default = () => {
         // buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd
 
 
-const gameOverNotPlayed = 1
+let gameOverNotPlayed = 1
 window.gDebugLevelSelect = 1
 
 const intro_game_over = () => {
@@ -45,9 +45,9 @@ const intro_game_over = () => {
         gameOverNotPlayed = 0
     }
 
-    print_intro_text()
+    Area.print_intro_text()
 
-    if (gPlayer1Controller.buttonPressed.buttonPressedStart) {
+    if (window.playerInput.buttonPressedStart) {
         // play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource)
         sp1C = 100 + gDebugLevelSelect
         gameOverNotPlayed = 1
@@ -61,7 +61,8 @@ const intro_game_over = () => {
 // pressed.
 
 export const level_select_input_loop = () => {
-    let /*s32*/ stageChanged = 0
+    return Area.gCurrLevelNum
+    /*let stageChanged = 0
 
       // perform the ID updates per each button press.
     if (window.playerInput.buttonPressedA) {
@@ -120,7 +121,7 @@ export const level_select_input_loop = () => {
         // play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource)
         return Area.gCurrLevelNum
     }
-    return 0
+    return 0*/
 }
 
 // run the demo timer on the PRESS START screen.

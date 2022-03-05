@@ -225,9 +225,23 @@ export const oActivatedBackAndForthPlatformFlipRotation  = 0x21
 export const oAmpRadiusOfRotation  = 0x1B
 export const oAmpYPhase            = 0x1C
 
+export const AMP_BP_ROT_RADIUS_200 = 0
+export const AMP_BP_ROT_RADIUS_300 = 1
+export const AMP_BP_ROT_RADIUS_400 = 2
+export const AMP_BP_ROT_RADIUS_0 = 3
+
+export const AMP_ACT_IDLE = 2
+export const AMP_ACT_ATTACK_COOLDOWN = 4
+
 /* Homing Amp */
 export const oHomingAmpLockedOn  = 0x1B
 export const oHomingAmpAvgY      = 0x1D
+
+export const HOMING_AMP_ACT_INACTIVE = 0
+export const HOMING_AMP_ACT_APPEAR = 1
+export const HOMING_AMP_ACT_CHASE = 2
+export const HOMING_AMP_ACT_GIVE_UP = 3
+export const HOMING_AMP_ACT_ATTACK_COOLDOWN = 4
 
 /* Arrow Lift */
 export const oArrowLiftDisplacement        = 0x1B

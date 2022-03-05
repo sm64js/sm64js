@@ -3,6 +3,7 @@ import * as Gbi from "../../include/gbi"
 import * as LevelData from "./leveldata"
 import * as cGFX from "../../common_gfx/segment2"
 import * as TitleScreenBG from "./title_screen_bg"
+import { LAYER_OPAQUE } from "../../engine/GeoLayout"
 
 const canvas = document.querySelector('#gameCanvas')
 
@@ -48,6 +49,9 @@ const intro_seg7_table_0700C880 = [
     0.048600, 0.048600, 0.012800, 0.012800,
     0.012800, 0.000000, 0.000000, 0.000000,
 ]
+
+let sGameOverFrameCounter
+let sGameOverTableIndex
 
 export const geo_title_screen = (param, graphNode, unused) => {
     const displayList = []
@@ -157,8 +161,9 @@ const intro_backdrop_one_image = (index, backgroundTable) => {
 
 export const geo_intro_backdrop = (param, graphNode, unused) => {
     if (param == 0) {
-        // "geo intro backdrop init - do nothing"
-        return []
+        for (let i = 0; i < gameOverBackgroundTable.length; i++) {
+            gameOverBackgroundTable[i] = INTRO_BACKGROUND_GAME_OVER
+        }
     } else {
         const index = graphNode.areaIndex & 0xff
         const backgroundTable = introBackgroundTables[index]
@@ -179,4 +184,57 @@ export const geo_intro_backdrop = (param, graphNode, unused) => {
     }
 }
 
-export const geo_intro_gameover_backdrop = geo_intro_backdrop  // TODO
+const gameOverBackgroundTable = [
+    INTRO_BACKGROUND_GAME_OVER, INTRO_BACKGROUND_GAME_OVER, INTRO_BACKGROUND_GAME_OVER,
+    INTRO_BACKGROUND_GAME_OVER, INTRO_BACKGROUND_GAME_OVER, INTRO_BACKGROUND_GAME_OVER,
+    INTRO_BACKGROUND_GAME_OVER, INTRO_BACKGROUND_GAME_OVER, INTRO_BACKGROUND_GAME_OVER,
+    INTRO_BACKGROUND_GAME_OVER, INTRO_BACKGROUND_GAME_OVER, INTRO_BACKGROUND_GAME_OVER,
+]
+
+export const geo_intro_gameover_backdrop = (param, graphNode, unused) => {
+    let j
+    let i
+    if (param == 0) {  // reset
+        sGameOverFrameCounter = 0
+        sGameOverTableIndex = -2
+        for (let p = 0; p < gameOverBackgroundTable.length; p++) {
+            gameOverBackgroundTable[p] = INTRO_BACKGROUND_GAME_OVER
+        }
+    } else {  // draw
+        const displayList = []
+        const aspect = canvas.width / canvas.height
+        const num_tiles_h = parseInt(((aspect * canvas.height) + 159) / 160)
+
+        if (sGameOverTableIndex == -2) {
+            if (sGameOverFrameCounter == 180) {
+                sGameOverTableIndex++
+                sGameOverFrameCounter = 0
+            }
+        } else {
+            // transition tile from "Game Over" to "Super Mario 64"
+            if (sGameOverTableIndex != 11 && !(sGameOverFrameCounter & 0x1)) {
+                // order of tiles that are flipped from "Game Over" to "Super Mario 64"
+                const flipOrder = [ 0, 1, 2, 3, 7, 11, 10, 9, 8, 4, 5, 6 ]
+
+                sGameOverTableIndex++
+                gameOverBackgroundTable[flipOrder[sGameOverTableIndex]] =
+                    INTRO_BACKGROUND_SUPER_MARIO
+            }
+        }
+        if (sGameOverTableIndex != 11) {
+            sGameOverFrameCounter++
+        }
+        graphNode.flags = (graphNode.flags & 0xFF) | (LAYER_OPAQUE << 8)
+
+        // draw all the tiles
+        Gbi.gSPDisplayList(displayList, cGFX.dl_proj_mtx_fullscreen)
+        Gbi.gSPDisplayList(displayList, TitleScreenBG.title_screen_bg_dl_0A000100)
+        for (j = 0; j < num_tiles_h * 3; ++j) {
+            Gbi.gSPDisplayList(displayList, intro_backdrop_one_image(j, gameOverBackgroundTable))
+        }
+        Gbi.gSPDisplayList(displayList, TitleScreenBG.title_screen_bg_dl_0A000190)
+        Gbi.gSPEndDisplayList(displayList)
+
+        return displayList
+    }
+}

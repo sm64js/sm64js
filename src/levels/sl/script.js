@@ -99,7 +99,7 @@ export const level_sl_entry = [
         TERRAIN(/*terrainData*/ sl_seg7_area_1_collision),
         MACRO_OBJECTS(/*objList*/ sl_seg7_area_1_macro_objs),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0000,  /*seq*/ SEQ_LEVEL_SNOW),
-        //TERRAIN_TYPE(/*terrainType*/ TERRAIN_SNOW),
+        TERRAIN_TYPE(/*terrainType*/ TERRAIN_SNOW),
     END_AREA(),
 
     AREA(/*index*/ 2,  sl_geo_000484),
@@ -113,7 +113,7 @@ export const level_sl_entry = [
         TERRAIN(/*terrainData*/ sl_seg7_area_2_collision),
         MACRO_OBJECTS(/*objList*/ sl_seg7_area_2_macro_objs),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0004,  /*seq*/ SEQ_LEVEL_UNDERGROUND),
-        //TERRAIN_TYPE(/*terrainType*/ TERRAIN_SNOW),
+        TERRAIN_TYPE(/*terrainType*/ TERRAIN_SNOW),
     END_AREA(),
 
     MARIO_POS(/*area*/ 1,  /*yaw*/ 270,  /*pos*/ 5541,  1024,  443),

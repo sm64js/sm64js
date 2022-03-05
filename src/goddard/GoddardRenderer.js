@@ -1038,6 +1038,14 @@ class GoddardRenderer {
                 }
                 this.sMSceneView = this.make_view_withgrp("mscene", this.sMarioSceneGrp)
                 break
+            case 3:
+                if (this.sMarioSceneGrp == null) {
+                    Shapes.load_mario_head(Shapes.animate_mario_head_gameover)
+                    this.sMarioSceneGrp = Shapes.gMarioFaceGrp
+                    //this.gd_setup_cursor() TODO
+                }
+                this.sMSceneView = this.make_view_withgrp("mscene", this.sMarioSceneGrp)
+                break
             default:
                 throw "unimplemented mario head"
         }

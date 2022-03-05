@@ -21,11 +21,13 @@ import { ddd_movtex_area2_water } from "../levels/ddd/areas/2/movtext.inc"
 import { wdw_movtex_area1_water } from "../levels/wdw/areas/1/movtext.inc"
 import { wdw_movtex_area2_water } from "../levels/wdw/areas/2/movtext.inc"
 //import { cotmc_dl_water_begin, cotmc_dl_water_end, cotmc_movtex_tris_water, cotmc_dl_water } from "../levels/cotmc/movtext.inc"
+import { lll_movtex_tris_lava_floor, lll_dl_lava_floor, lll_movtex_volcano_floor_lava, lll_movtex_tris_lavafall_volcano, lll_dl_lavafall_volcano } from "../levels/lll/areas/2/movtext.inc"
+import { bitfs_movtex_tris_lava_first_section, bitfs_movtex_tris_lava_second_section, bitfs_movtex_tris_lava_floor, bitfs_dl_lava_sections, bitfs_dl_lava_floor } from "../levels/bitfs/areas/1/movtext.inc"
 
-import { GeoLayoutInstance as GeoLayout, LAYER_TRANSPARENT_INTER, LAYER_OPAQUE } from "../engine/GeoLayout"
+import { GeoLayoutInstance as GeoLayout, LAYER_TRANSPARENT_INTER, LAYER_OPAQUE, LAYER_TRANSPARENT } from "../engine/GeoLayout"
 import * as Gbi from "../include/gbi"
 import { dl_waterbox_rgba16_begin, dl_waterbox_end, dl_draw_quad_verts_0123, texture_waterbox_water, texture_waterbox_lava, texture_waterbox_jrb_water, texture_waterbox_unknown_water, texture_waterbox_mist } from "../common_gfx/segment2"
-import { ROTATE_CLOCKWISE, TEXTURE_MIST, TEXTURE_WATER, TEXTURE_JRB_WATER, TEX_QUICKSAND_SSL, TEX_PYRAMID_SAND_SSL } from "../include/moving_texture_macros"
+import { ROTATE_CLOCKWISE, TEXTURE_MIST, TEXTURE_WATER, TEXTURE_JRB_WATER, TEX_QUICKSAND_SSL, TEX_PYRAMID_SAND_SSL, TEXTURE_LAVA } from "../include/moving_texture_macros"
 import { make_vertex } from "./GeoMisc"
 
 // Vertex colors for rectangles. Used to give mist a tint
@@ -148,6 +150,13 @@ const gMovtexNonColored = [
     //{ geoId: MOVTEX_PYRAMID_SAND_PATHWAY_FRONT, textureId: TEX_PYRAMID_SAND_SSL, vtx_count: 8, movtexVerts: ssl_movtex_tris_pyramid_sand_pathway_front, beginDl: ssl_dl_pyramid_sand_pathway_begin, endDl: ssl_dl_pyramid_sand_pathway_end, triDl: ssl_dl_pyramid_sand_pathway_front_end, r: 0xff, g: 0xff, b: 0xff, a: 0xff, layer: LAYER_TRANSPARENT_INTER },
     //{ geoId: MOVTEX_PYRAMID_SAND_PATHWAY_FLOOR, textureId: TEX_PYRAMID_SAND_SSL, vtx_count: 8, movtexVerts: ssl_movtex_tris_pyramid_sand_pathway_floor, beginDl: ssl_dl_pyramid_sand_pathway_floor_begin, endDl: ssl_dl_pyramid_sand_pathway_floor_end, triDl: ssl_dl_pyramid_sand_pathway_front_end, r: 0xff, g: 0xff, b: 0xff, a: 0xff, layer: LAYER_OPAQUE_INTER },
     //{ geoId: MOVTEX_PYRAMID_SAND_PATHWAY_SIDE, textureId: TEX_PYRAMID_SAND_SSL, vtx_count: 6, movtexVerts: ssl_movtex_tris_pyramid_sand_pathway_side, beginDl: ssl_dl_pyramid_sand_pathway_begin, endDl: ssl_dl_pyramid_sand_pathway_end, triDl: ssl_dl_pyramid_sand_pathway_side_end, r: 0xff, g: 0xff, b: 0xff, a: 0xff, layer: LAYER_TRANSPARENT_INTER },
+
+    { geoId: MOVTEX_BITFS_LAVA_FIRST, textureId: TEXTURE_LAVA, vtx_count: 4, movtexVerts: bitfs_movtex_tris_lava_first_section, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: bitfs_dl_lava_sections, r: 0xff, g: 0xff, b: 0xff, a: 0xff, layer: LAYER_OPAQUE },
+    { geoId: MOVTEX_BITFS_LAVA_SECOND, textureId: TEXTURE_LAVA, vtx_count: 4, movtexVerts: bitfs_movtex_tris_lava_second_section, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: bitfs_dl_lava_sections, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: LAYER_TRANSPARENT },
+    { geoId: MOVTEX_BITFS_LAVA_FLOOR, textureId: TEXTURE_LAVA, vtx_count: 9, movtexVerts: bitfs_movtex_tris_lava_floor, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: bitfs_dl_lava_floor, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: LAYER_TRANSPARENT },
+
+    { geoId: MOVTEX_LLL_LAVA_FLOOR, textureId: TEXTURE_LAVA, vtx_count: 9, movtexVerts: lll_movtex_tris_lava_floor, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: lll_dl_lava_floor, r: 0xff, g: 0xff, b: 0xff, a: 0xc8, layer: LAYER_TRANSPARENT },
+    { geoId: MOVTEX_VOLCANO_LAVA_FALL, textureId: TEXTURE_LAVA, vtx_count: 16, movtexVerts: lll_movtex_tris_lavafall_volcano, beginDl: dl_waterbox_rgba16_begin, endDl: dl_waterbox_end, triDl: lll_dl_lavafall_volcano, r: 0xff, g: 0xff, b: 0xff, a: 0xb4, layer: LAYER_TRANSPARENT_INTER },
 ]
 
 const gMovtexColored = [
@@ -209,7 +218,17 @@ const get_quad_collection_from_id = (id) => {
             return wdw_movtex_area1_water
         case WDW_MOVTEX_AREA2_WATER:
             return wdw_movtex_area2_water
-        default: throw "unknown case - get quad collection from id:" + id
+        case LLL_MOVTEX_VOLCANO_FLOOR_LAVA:
+            return lll_movtex_volcano_floor_lava
+        case MOVTEX_BITFS_LAVA_FLOOR:
+            return bitfs_movtex_tris_lava_floor
+        case MOVTEX_BITFS_LAVA_FIRST:
+            return bitfs_movtex_tris_lava_first_section
+        case MOVTEX_BITFS_LAVA_SECOND:
+            return bitfs_movtex_tris_lava_second_section
+        default:
+            throw "unknown case - get quad collection from id:" + id
+            return null
 
     }
 }

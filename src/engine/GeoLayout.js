@@ -191,9 +191,9 @@ class GeoLayout {
             }
             theFunc = func
         }
-        if (!theFunc) {
+        /*if (!theFunc) {
             console.log("node_generated: skipping", theFunc)
-        }
+        }*/
 
         const graphNode = GraphNode.init_graph_node_generated(null, null, theFunc, param, funcClass)
         GraphNode.register_scene_graph_node(this, graphNode)

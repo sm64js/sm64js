@@ -83,8 +83,15 @@ const set_transition_color_fade_alpha = (fadeType, fadeTimer, transTime) => {
 	switch (fadeType) {
 		case 0:
 			return sTransitionColorFadeCount[fadeTimer] * 255.0 / (transTime - 1) + 0.5
+		case 1:
+			return (1.0 - sTransitionColorFadeCount[fadeTimer] / (transTime - 1)) * 255.0 + 0.5
 		default: throw "unknown alpha fade type"
     }
+}
+
+const render_fade_transition_from_color = (fadeTimer, transTime, transData) => {
+    const alpha = set_transition_color_fade_alpha(1, fadeTimer, transTime)
+    return dl_transition_color(fadeTimer, transTime, transData, alpha)
 }
 
 const render_fade_transition_into_color = (fadeTimer, transTime, transData) => {

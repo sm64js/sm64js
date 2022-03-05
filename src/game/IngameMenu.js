@@ -29,6 +29,12 @@ export const create_dialog_box_with_var = (dialog, dialogVar) => {
     }
 }
 
+export const create_dialog_inverted_box = (dialog) => {
+    if (gDialogID == -1) {
+        gDialogID = dialog
+        gDialogBoxType = DIALOG_TYPE_ZOOM
+    }
+}
 
 
 export const create_dl_ortho_matrix = () => {

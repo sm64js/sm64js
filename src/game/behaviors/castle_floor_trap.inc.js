@@ -37,9 +37,8 @@ const bhv_castle_floor_trap_open_detect = () => {
 
 const bhv_castle_floor_trap_open = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    if (o.rawData[oTimer] == 0)
-        //cur_obj_play_sound_2(SOUND_GENERAL_CASTLE_TRAP_OPEN);
-        console.log("ignoring cur_obj_play_sound_2")
+    /*if (o.rawData[oTimer] == 0)
+        cur_obj_play_sound_2(SOUND_GENERAL_CASTLE_TRAP_OPEN);*/
     o.rawData[oAngleVelRoll] -= 0x100
     o.rawData[oFaceAngleRoll] += o.rawData[oAngleVelRoll]
     if (o.rawData[oFaceAngleRoll] < -0x4000) {

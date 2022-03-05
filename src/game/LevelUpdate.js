@@ -354,7 +354,6 @@ class LevelUpdate {
         // if (gMarioState.action == ACT_INTRO_CUTSCENE) {
         //     sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_DISABLED_DURING_INTRO_CUTSCENE)
         // }
-
         return 1
     }
 
@@ -973,28 +972,28 @@ class LevelUpdate {
             // reset_dialog_render_state()
 
             if (false) {  // gDebugLevelSelect && (this.sDelayedWarpOp & WARP_OP_TRIGGERS_LEVEL_SELECT)) {
-                warp_special(-9)
+                this.warp_special(-9)
             } else if (false) {  // gCurrDemoInput != null) {
                 if (this.sDelayedWarpOp == WARP_OP_DEMO_END) {
-                    warp_special(-8)
+                    this.warp_special(-8)
                 } else {
-                    warp_special(-2)
+                    this.warp_special(-2)
                 }
             } else {
                 switch (this.sDelayedWarpOp) {
                     case WARP_OP_GAME_OVER:
-                        save_file_reload()
-                        warp_special(-3)
+                        // save_file_reload()
+                        this.warp_special(-3)
                         break
 
                     case WARP_OP_CREDITS_END:
-                        warp_special(-1)
+                        this.warp_special(-1)
                         sound_banks_enable(SEQ_PLAYER_SFX,
                                            SOUND_BANKS_ALL & ~SOUND_BANKS_DISABLED_AFTER_CREDITS)
                         break
 
                     case WARP_OP_DEMO_NEXT:
-                        warp_special(-2)
+                        this.warp_special(-2)
                         break
 
                     case WARP_OP_CREDITS_START:
@@ -1239,3 +1238,5 @@ class LevelUpdate {
 
 export const LevelUpdateInstance = new LevelUpdate()
 gLinker.LevelUpdate = LevelUpdateInstance
+
+export const level_trigger_warp = (m, warpOp) => { LevelUpdateInstance.level_trigger_warp(m, warpOp) }

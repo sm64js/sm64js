@@ -7,6 +7,7 @@ import { ALLOC_LEVEL_POOL, AREA, BLACKOUT, CALL, CALL_LOOP, CLEARDEMOPTR, CLEAR_
          MACRO_OBJECTS, MARIO, MARIO_POS, OBJECT, OBJECT_WITH_ACTS, RETURN, SET_REG, SLEEP,
          SLEEP_BEFORE_EXIT, TERRAIN, TERRAIN_TYPE, TRANSITION, UNLOAD_AREA,
          LOOP_BEGIN, LOOP_UNTIL, OP_AND, OP_NAND, OP_EQ, OP_NEQ, OP_LT, OP_LEQ, OP_GT, OP_GEQ,
+         EXIT_AND_EXECUTE
 } from "../engine/LevelCommands"
 
 import { MODEL_MARIO, MODEL_SMOKE, MODEL_SPARKLES, MODEL_BUBBLE, MODEL_SMALL_WATER_SPLASH,
@@ -76,6 +77,26 @@ const getSelectedLevel = () => {
     return parseInt(document.getElementById("mapSelect").value)
 }
 
+const script_L1 = [
+    EXIT_AND_EXECUTE('level_intro_splash_screen'),
+]
+
+const script_L2 = [
+    EXIT_AND_EXECUTE('level_ending_entry'),
+]
+
+const goto_mario_head_regular = [
+    EXIT_AND_EXECUTE('level_intro_mario_head_regular'),
+]
+
+const goto_mario_head_dizzy = [
+    EXIT_AND_EXECUTE('level_intro_mario_head_dizzy'),
+]
+
+const script_L5 = [
+    EXIT_AND_EXECUTE('level_intro_entry_4'),
+]
+
 export const level_main_scripts_entry = [
     ALLOC_LEVEL_POOL(),
     LOAD_MODEL_FROM_GEO(MODEL_MARIO,                   mario_geo),
@@ -126,24 +147,17 @@ export const level_main_scripts_entry = [
     LOAD_MODEL_FROM_GEO(MODEL_CARTOON_STAR,            cartoon_star_geo),
     FREE_LEVEL_POOL(),
     CALL(/*arg*/ 0, /*func*/ 'LevelUpdate.lvl_init_from_save_file'),
-
     SET_REG(getSelectedLevel),  // DEBUG
     LOOP_BEGIN(),
         EXECUTE('level_main_menu_entry_2'),
         JUMP_LINK('script_exec_level_table'),
         SLEEP(/*frames*/ 1),
     LOOP_UNTIL(/*op*/ OP_LT, /*arg*/ 0),
-
-    // LOOP_BEGIN(),
-    //     EXECUTE(/*seg*/ 0x14, _menuSegmentRomStart, _menuSegmentRomEnd, level_main_menu_entry_2),
-    //     JUMP_LINK(script_exec_level_table),
-    //     SLEEP(/*frames*/ 1),
-    // LOOP_UNTIL(/*op*/ OP_LT, /*arg*/ 0),
-    // JUMP_IF(/*op*/ OP_EQ, /*arg*/ -1, script_L2),
-    // JUMP_IF(/*op*/ OP_EQ, /*arg*/ -2, goto_mario_head_regular),
-    // JUMP_IF(/*op*/ OP_EQ, /*arg*/ -3, goto_mario_head_dizzy),
-    // JUMP_IF(/*op*/ OP_EQ, /*arg*/ -8, script_L1),
-    // JUMP_IF(/*op*/ OP_EQ, /*arg*/ -9, script_L5),
+    JUMP_IF(/*op*/ OP_EQ, /*arg*/ -1, script_L2),
+    JUMP_IF(/*op*/ OP_EQ, /*arg*/ -2, goto_mario_head_regular),
+    JUMP_IF(/*op*/ OP_EQ, /*arg*/ -3, goto_mario_head_dizzy),
+    JUMP_IF(/*op*/ OP_EQ, /*arg*/ -8, script_L1),
+    JUMP_IF(/*op*/ OP_EQ, /*arg*/ -9, script_L5),
 ]
 
 

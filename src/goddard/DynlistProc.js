@@ -369,7 +369,7 @@ class DynlistProc {
         this.sGdDynObjList.push({})
 
         if (id) {
-            if (this.get_dynobj_info(id)) throw "fail object with same id exists"
+            if (this.get_dynobj_info(id)) this.sGdDynObjList.shift()//throw "fail object with same id exists"
             this.sGdDynObjList[this.sLoadedDynObjs].name = id.toString()
         } else {
             this.sGdDynObjList[this.sLoadedDynObjs].name = idbuf

@@ -1,6 +1,6 @@
 import { oFlags, OBJ_FLAG_30, oInteractType, oDamageOrCoinValue, oHealth, oNumLootCoins, oAnimState,
          oAction, OBJ_ACT_HORIZONTAL_KNOCKBACK, OBJ_ACT_VERTICAL_KNOCKBACK, OBJ_ACT_SQUISHED, oInteractStatus,
-         oTimer, oForwardVel, oVelY, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveAngleYaw, oMoveFlags,
+         oTimer, oForwardVel, oVelX, oVelY, oVelZ, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveAngleYaw, oMoveFlags,
          OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_HIT_WALL, OBJ_MOVE_ABOVE_LAVA,
          oHomeX, oHomeY, oHomeZ, oPosX, oPosY, oPosZ, oDistanceToMario, oAngleToMario, OBJ_MOVE_HIT_EDGE,
          oMoveAnglePitch, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oDeathSound } from "../include/object_constants"
@@ -22,6 +22,9 @@ export const ATTACK_HANDLER_SPECIAL_WIGGLER_JUMPED_ON = 6
 export const ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED = 7
 export const ATTACK_HANDLER_SQUISHED_WITH_BLUE_COIN = 8
 
+let sObjSavedPosX
+let sObjSavedPosY
+let sObjSavedPosZ
 
 //this lived above random_linear_offset in the source,
 export const obj_roll_to_match_yaw_turn = (targetYaw, maxRoll, rollSpeed) => {
@@ -130,6 +133,28 @@ export const obj_get_pitch_from_vel = () => {
 
 }
 
+export const obj_perform_position_op = (o, op) => {
+    switch (op) {
+        case 'POS_OP_SAVE_POSITION':
+            sObjSavedPosX = o.rawData[oPosX]
+            sObjSavedPosY = o.rawData[oPosY]
+            sObjSavedPosZ = o.rawData[oPosZ]
+            break
+
+        case 'POS_OP_COMPUTE_VELOCITY':
+            o.rawData[oVelX] = o.rawData[oPosX] - sObjSavedPosX
+            o.rawData[oVelY] = o.rawData[oPosY] - sObjSavedPosY
+            o.rawData[oVelZ] = o.rawData[oPosZ] - sObjSavedPosZ
+            break
+
+        case 'POS_OP_RESTORE_POSITION':
+            o.rawData[oPosX] = sObjSavedPosX
+            o.rawData[oPosY] = sObjSavedPosY
+            o.rawData[oPosZ] = sObjSavedPosZ
+            break
+    }
+}
+
 export const obj_compute_vel_from_move_pitch = (speed) => {
     const o = ObjectListProc.gCurrentObject
     o.rawData[oForwardVel] = speed * coss(o.rawData[oMoveAnglePitch]);
@@ -152,6 +177,18 @@ export const clamp_s16 = (value, minimum, maximum) => {
     }
 
     return 1;
+}
+
+export const clamp_f32 = (value, minimum, maximum) => {
+    if (value <= minimum) {
+        value = minimum
+    } else if (value >= maximum) {
+        value = maximum
+    } else {
+        return false
+    }
+
+    return true
 }
 
 export const obj_random_fixed_turn = (delta) => {

@@ -25,9 +25,7 @@ const bhv_sliding_plat_2_init = () => {
     let val04
 
     val04 = ((u16)(o.rawData[oBehParams] >> 16) & 0x0380) >> 7
-    console.log(val04)
     o.collisionData = D_80331A24[val04]
-    console.log(val04)
     o.oBackAndForthPlatformUnkF8 = 50.0 * ((u16)(o.rawData[oBehParams] >> 16) & 0x003F)
 
     if (val04 < 5 || val04 > 6) {

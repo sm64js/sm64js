@@ -21,6 +21,25 @@ class ShapeHelper {
         Draw.gGdLightGroup = Objects.make_group(0)
     }
 
+    animate_mario_head_gameover(self) {
+        switch (self.unk4C) {
+            case 0:
+                self.unk28 = 1
+                self.unk20 = 1
+                self.unk4C = 1
+                break
+            case 1:
+                self.unk28 += 1
+                if (self.unk28 == 166) {
+                    self.unk28 = 69
+                    self.unk4C = 4
+                    self.fn48 = this.animate_mario_head_normal
+                    self.unk20 = 0
+                }
+                break
+        }
+    }
+
     animate_mario_head_normal(self) {
 
         const aBtnPressed = false

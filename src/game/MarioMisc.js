@@ -60,6 +60,7 @@ const UNLOCK_DOOR_STAR_SPAWNING_PARTICLES = 2
 const UNLOCK_DOOR_STAR_DONE = 3
 
 
+
 class MarioMisc {
     constructor() {
         this.gBodyState = {
@@ -68,6 +69,11 @@ class MarioMisc {
             torsoAngle: [0, 0, 0], headAngle: [0, 0, 0],
             heldObjLastPosition: [0, 0, 0]
         }
+        /*this.gMirrorMario = {
+            node: 0, sharedChild: 0, areaIndex: 0, activeAreaIndex: 0,
+            angle: [0, 0, 0], pos: [0, 0, 0], scale: [0, 0, 0], animInfo: 0,
+            spawnInfo: 0, throwMatrix: 0, cameraToObject: [0, 0, 0]
+        }*/
 
         this.sMarioAttackAnimCounter = 0
 
@@ -380,21 +386,21 @@ class MarioMisc {
      */
     geo_render_mirror_mario(callContext, node, c) {
         // let /*f32*/ mirroredX
-        // struct Object *mario = gMarioStates[0].marioObj
+        // const mario = gLinker.ObjectListProcessor.gMarioObject
 
         // switch (callContext) {
         //     case GEO_CONTEXT_CREATE:
-        //         init_graph_node_object(null, &gMirrorMario, null, gVec3fZero, gVec3sZero, gVec3fOne)
+        //         init_graph_node_object(null, gMirrorMario, null, gVec3fZero, gVec3sZero, gVec3fOne)
         //         break
         //     case GEO_CONTEXT_AREA_LOAD:
-        //         geo_add_child(node, &gMirrorMario.node)
+        //         geo_add_child(node, gMirrorMario.node)
         //         break
         //     case GEO_CONTEXT_AREA_UNLOAD:
-        //         geo_remove_child(&gMirrorMario.node)
+        //         geo_remove_child(gMirrorMario.node)
         //         break
         //     case GEO_CONTEXT_RENDER:
         //         if (mario.gfx.pos[0] > 1700.0) {
-        //               // TODO: Is this a geo layout copy or a graph node copy?
+        //             // TODO: Is this a geo layout copy or a graph node copy?
         //             gMirrorMario.sharedChild = mario.gfx.sharedChild
         //             gMirrorMario.areaIndex = mario.gfx.areaIndex
         //             vec3s_copy(gMirrorMario.angle, mario.gfx.angle)
@@ -406,9 +412,9 @@ class MarioMisc {
         //             gMirrorMario.pos[0] = mirroredX + MIRROR_X
         //             gMirrorMario.angle[1] = -gMirrorMario.angle[1]
         //             gMirrorMario.scale[0] *= -1.0
-        //             ((struct GraphNode *) &gMirrorMario).flags |= 1
+        //             gMirrorMario.flags |= 1
         //         } else {
-        //             ((struct GraphNode *) &gMirrorMario).flags &= ~1
+        //             gMirrorMario.flags &= ~1
         //         }
         //         break
         // }
@@ -422,7 +428,7 @@ class MarioMisc {
     geo_mirror_mario_backface_culling(callContext, node, c) {
         const gfx = []
 
-        // if (callContext == GEO_CONTEXT_RENDER && gCurGraphNodeObject == &gMirrorMario) {
+        // if (callContext == GEO_CONTEXT_RENDER && gCurGraphNodeObject == gMirrorMario) {
         //     gfx = alloc_display_list(3 * sizeof(*gfx))
 
         //     if (node.parameter == 0) {

@@ -34,10 +34,16 @@ import { ACT_IDLE, ACT_PANTING, ACT_STANDING_AGAINST_WALL, ACT_CROUCHING, ACT_DI
          MARIO_CAP_IN_HAND, ACT_PUTTING_ON_CAP,
 
          drop_and_set_mario_action, resolve_and_return_wall_collisions, sBackwardKnockbackActions,
-         set_forward_vel, set_mario_action, sForwardKnockbackActions
+         set_forward_vel, set_mario_action, sForwardKnockbackActions,
+
+         ACT_SHOCKED, ACT_WATER_SHOCKED, ACT_LAVA_BOOST, ACT_BURNING_JUMP, ACT_BURNING_FALL,
+
+         MARIO_UNKNOWN_18
 } from "./Mario"
 
-import { WARP_OP_WARP_OBJECT } from "./LevelUpdate"
+import { WARP_OP_WARP_OBJECT, WARP_OP_WARP_FLOOR } from "./LevelUpdate"
+
+import { SOUND_MARIO_WAAAOOOW } from "../include/sounds"
 
 import {
     DIALOG_022, DIALOG_023, DIALOG_024, DIALOG_025, DIALOG_026, DIALOG_027, DIALOG_028, DIALOG_029
@@ -52,13 +58,14 @@ import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMa
 
 import { atan2s } from "../engine/math_util"
 import { sins, coss, int16, s16 } from "../utils"
-import { SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND } from "../include/surface_terrains"
-import { LEVEL_CCM, LEVEL_TTM, LEVEL_WF, LEVEL_HMC } from "../levels/level_defines_constants"
+import { SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND, SURFACE_BURNING } from "../include/surface_terrains"
+import { level_trigger_warp } from "./LevelUpdate"
 import { COURSE_IS_MAIN_COURSE } from "../levels/course_defines"
 import { CameraInstance as Camera } from "./Camera"
 import * as CAMERA from "./Camera"  // for constants
 import { obj_set_held_state } from "./ObjectHelpers"
 import { stop_shell_music } from "./SoundInit"
+import { play_sound } from "../audio/external"
 import { save_file_get_flags, SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR,
     SAVE_FLAG_UNLOCKED_BASEMENT_DOOR, SAVE_FLAG_HAVE_KEY_1, SAVE_FLAG_HAVE_KEY_2,
     SAVE_FLAG_UNLOCKED_50_STAR_DOOR,
@@ -187,35 +194,23 @@ let sJustTeleported = 0
 let sDisplayingDoorText = 0
 
 const check_death_barrier = (m) => {
-
-    //// the actual code
-    /*    if (m -> pos[1] < m -> floorHeight + 2048.0f) {
-            if (level_trigger_warp(m, WARP_OP_WARP_FLOOR) == 20 && !(m -> flags & MARIO_UNKNOWN_18)) {
-                play_sound(SOUND_MARIO_WAAAOOOW, m -> marioObj -> .gfx.cameraToObject)
-            }
-        }*/
-
-    /// Temp code because death is not implemented
     if (m.pos[1] < m.floorHeight + 2048) {
-        switch (gLinker.Area.gCurrLevelNum) {
-            case LEVEL_CCM:  // CCM
-                m.pos = [-1512, 2560, -2305]
-                break
-
-            case LEVEL_TTM:  // TTM
-                m.pos = [102, -4332, 5734]
-                break
-
-            case LEVEL_WF:  // WF
-                m.pos = [2600, 1256, 5120]
-                break
-
-            case LEVEL_HMC:
-                m.pos = [-7152, 2161, 7181]
-                break
+        if (level_trigger_warp(m, WARP_OP_WARP_FLOOR) == 20 && !(m.flags & MARIO_UNKNOWN_18)) {
+            play_sound(SOUND_MARIO_WAAAOOOW, m.marioObj.gfx.cameraToObject)
         }
     }
 
+}
+
+const check_lava_boost = (m) => {
+    if (!(m.action & ACT_FLAG_RIDING_SHELL) && m.pos[1] < m.floorHeight + 10.0) {
+        if (!(m.flags & MARIO_METAL_CAP)) {
+            m.hurtCounter += (m.flags & MARIO_CAP_ON_HEAD) ? 12 : 18
+        }
+
+        //update_mario_sound_and_camera(m)
+        drop_and_set_mario_action(m, ACT_LAVA_BOOST, 0)
+    }
 }
 
 export const mario_handle_special_floors = (m) => {
@@ -231,6 +226,14 @@ export const mario_handle_special_floors = (m) => {
             case SURFACE_VERTICAL_WIND:
                 check_death_barrier(m)
                 break
+        }
+
+        if (!(m.action & ACT_FLAG_AIR) && !(m.action & ACT_FLAG_SWIMMING)) {
+            switch (floorType) {
+                case SURFACE_BURNING:
+                    check_lava_boost(m)
+                    break
+            }
         }
     }
 }
@@ -748,6 +751,61 @@ const interact_pole = (m, o) => {
     return 0
 }
 
+const interact_flame = (m, o) => {
+    let burningAction = ACT_BURNING_JUMP
+
+    if (!sInvulnerable && !(m.flags & MARIO_METAL_CAP) && !(m.flags & MARIO_VANISH_CAP)
+        && !(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+        //queue_rumble_data(5, 80)
+        
+        o.rawData[oInteractStatus] = INT_STATUS_INTERACTED
+        m.interactObj = o
+
+        if ((m.action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER))
+            || m.waterLevel - m.pos[1] > 50.0) {
+            //play_sound(SOUND_GENERAL_FLAME_OUT, m->marioObj->header.gfx.cameraToObject);
+        } else {
+            m.marioObj.oMarioBurnTimer = 0
+            //update_mario_sound_and_camera(m)
+            //play_sound(SOUND_MARIO_ON_FIRE, m->marioObj->header.gfx.cameraToObject);
+
+            if ((m.action & ACT_FLAG_AIR) && m.vel[1] <= 0.0) {
+                burningAction = ACT_BURNING_FALL
+            }
+
+            return drop_and_set_mario_action(m, burningAction, 1)
+        }
+    }
+
+    return false
+}
+
+const interact_shock = (m, o) => {
+    if (!sInvulnerable && !(m.flags & MARIO_VANISH_CAP)
+        && !(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+        const actionArg = (m.action & (ACT_FLAG_AIR | ACT_FLAG_ON_POLE | ACT_FLAG_HANGING)) == 0
+
+        o.rawData[oInteractStatus] = INT_STATUS_INTERACTED | INT_STATUS_ATTACKED_MARIO
+        m.interactObj = o
+
+        take_damage_from_interact_object(m)
+        //play_sound(SOUND_MARIO_ATTACKED, m->marioObj->header.gfx.cameraToObject);
+        //queue_rumble_data(70, 60)
+
+        if (m.action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER)) {
+            return drop_and_set_mario_action(m, ACT_WATER_SHOCKED, 0)
+        } else {
+            //update_mario_sound_and_camera(m)
+            return drop_and_set_mario_action(m, ACT_SHOCKED, actionArg)
+        }
+    }
+
+    if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+        sDelayInvincTimer = true
+    }
+    return false
+}
+
 const able_to_grab_object = (m, o) => {
     const action = m.action
 
@@ -1206,11 +1264,11 @@ const sInteractionHandlers = [
     { interactType: INTERACT_TORNADO, handler: null },
     { interactType: INTERACT_WHIRLPOOL, handler: null },
     { interactType: INTERACT_STRONG_WIND, handler: null },
-    { interactType: INTERACT_FLAME, handler: null },
+    { interactType: INTERACT_FLAME, handler: interact_flame },
     { interactType: INTERACT_SNUFIT_BULLET, handler: null },
     { interactType: INTERACT_CLAM_OR_BUBBA, handler: null },
     { interactType: INTERACT_BULLY, handler: null },
-    { interactType: INTERACT_SHOCK, handler: null },
+    { interactType: INTERACT_SHOCK, handler: interact_shock },
     { interactType: INTERACT_BOUNCE_TOP2, handler: null },
     { interactType: INTERACT_MR_BLIZZARD, handler: interact_mr_blizzard },
     { interactType: INTERACT_HIT_FROM_BELOW, handler: null },

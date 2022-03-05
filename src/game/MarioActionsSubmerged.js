@@ -1,11 +1,14 @@
 import * as Mario from "./Mario"
+import { level_trigger_warp, WARP_OP_DEATH } from "./LevelUpdate"
 import { atan2s, approach_number, vec3s_set, vec3f_copy } from "../engine/math_util"
+import { geo_update_animation_frame } from "../engine/graph_node"
 import { SurfaceCollisionInstance as SurfaceCollisions } from "../engine/SurfaceCollision"
 import { coss, s16, s32, sins } from "../utils"
 import * as Particles from "../include/mario_constants"
 import { SURFACE_FLOWING_WATER } from "../include/surface_terrains"
 import { AreaInstance as Area } from "../game/Area"
 import { mario_grab_used_object, INT_STATUS_MARIO_DROP_OBJECT, INT_STATUS_STOP_RIDING, INTERACT_GRABBABLE } from "./Interaction"
+import { MARIO_EYES_HALF_CLOSED, MARIO_EYES_DEAD } from "../include/mario_geo_switch_case_ids"
 import { CameraInstance as Camera } from "./Camera"
 import * as CAMERA from "./Camera"  // for constants
 
@@ -92,8 +95,6 @@ const update_swimming_yaw = (m) => {
 
 const update_swimming_pitch = (m) => {
     let targetPitch = s16(-(252.0 * m.controller.stickY))
-
-// console.log(m.faceAngle[0], targetPitch)
 
     let pitchVel
     if (m.faceAngle[0] < 0) {
@@ -377,7 +378,7 @@ const perform_water_full_step = (m, nextPos) => {
 const apply_water_current = (m, step) => {
     let whirlpoolRadius = 2000.0
 
-    if (m.floor.type === SURFACE_FLOWING_WATER) {
+    if (m.floor && m.floor.type === SURFACE_FLOWING_WATER) {
         let currentAngle = m.floor.force << 8
         let currentSpeed = sWaterCurrentSpeed[m.floor.force >> 8]
 
@@ -425,17 +426,18 @@ const act_drowning = (m) => {
     switch (m.actionState) {
         case 0:
             Mario.set_mario_animation(m, Mario.MARIO_ANIM_DROWNING_PART1)
-            // TODO m.marioBodyState.eyeState = Mario.MARIO_EYES_HALF_CLOSED;
-            if (is_anim_at_end(m)) {
+            m.marioBodyState.eyeState = MARIO_EYES_HALF_CLOSED;
+            if (Mario.is_anim_at_end(m)) {
                 m.actionState = 1
             }
             break
 
         case 1:
             Mario.set_mario_animation(m, Mario.MARIO_ANIM_DROWNING_PART2)
-            // TODO m.marioBodyState.eyeState = Mario.MARIO_EYES_DEAD;
-            if (m.marioObj.gfx.animInfo.animFrame == 30) {
-                // TODO level_trigger_warp(m, WARP_OP_DEATH);
+            m.marioBodyState.eyeState = MARIO_EYES_DEAD
+            const animFrame = geo_update_animation_frame(m.marioObj.gfx.unk38, null)
+            if (animFrame == 30) {
+                level_trigger_warp(m, WARP_OP_DEATH)
             }
             break
     }

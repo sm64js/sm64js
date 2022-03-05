@@ -72,7 +72,7 @@ import {
     MARIO_ANIM_LAND_FROM_SINGLE_JUMP, MARIO_ANIM_SLIDEFLIP_LAND, MARIO_ANIM_STAND_AGAINST_WALL,
     MARIO_ANIM_START_CRAWLING, MARIO_ANIM_START_CROUCHING, MARIO_ANIM_STOP_CRAWLING,
     MARIO_ANIM_STOP_CROUCHING, MARIO_ANIM_STOP_SKID, MARIO_ANIM_STOP_SLIDE,
-    MARIO_ANIM_THROW_LIGHT_OBJECT, MARIO_ANIM_TRIPLE_JUMP_LAND
+    MARIO_ANIM_THROW_LIGHT_OBJECT, MARIO_ANIM_TRIPLE_JUMP_LAND, MARIO_ANIM_STAND_UP_FROM_LAVA_BOOST
 } from "./Mario"
 
 import {
@@ -430,6 +430,17 @@ const act_backflip_land_stop = (m) => {
     }
 
     landing_step(m, MARIO_ANIM_TRIPLE_JUMP_LAND, ACT_IDLE)
+    return 0
+}
+
+const act_lava_boost_land = (m) => {
+    m.input &= -0x2011
+
+    if (check_common_landing_cancels(m, 0)) {
+        return 1
+    }
+
+    landing_step(m, MARIO_ANIM_STAND_UP_FROM_LAVA_BOOST, ACT_IDLE)
     return 0
 }
 

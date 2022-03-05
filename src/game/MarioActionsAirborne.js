@@ -74,8 +74,10 @@ import {
 
     oUnk1A8, oUnk94, oUnkBC, oUnkC0,
 
-    oMarioSteepJumpYaw
+    oMarioSteepJumpYaw, oMarioBurnTimer
 } from "../include/object_constants"
+
+import { WARP_OP_DEATH, level_trigger_warp } from "./LevelUpdate"
 
 import {
     GRAB_POS_LIGHT_OBJ, MARIO_EYES_DEAD
@@ -1559,7 +1561,7 @@ export const act_lava_boost = (m) => {
                 m.vel[1] = 84.0
                 play_sound(SOUND_MARIO_ON_FIRE, m.marioObj.gfx.cameraToObject)
             } else {
-                play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
+                //play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
                 if (m.actionState < 2 && m.vel[1] < 0.0) {
                     m.vel[1] = -m.vel[1] * 0.4
                     mario_set_forward_vel(m, m.forwardVel * 0.5)
@@ -1589,7 +1591,7 @@ export const act_lava_boost = (m) => {
     }
 
     if (m.health < 0x100) {
-        gLinker.LevelUpdate.level_trigger_warp(m, WARP_OP_DEATH)
+        level_trigger_warp(m, WARP_OP_DEATH)
     }
 
     m.marioBodyState.eyeState = MARIO_EYES_DEAD

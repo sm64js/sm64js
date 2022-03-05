@@ -1,5 +1,7 @@
 import { raise_background_noise, play_infinite_stairs_music, stop_cap_music, fadeout_cap_music } from "./SoundInit"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
+import { level_trigger_warp } from "./LevelUpdate"
+import { WARP_OP_DEATH } from "./LevelUpdate"
 import { AreaInstance as Area } from "./Area"
 import { MarioMiscInstance as MarioMisc } from "./MarioMisc"
 import { CameraInstance as Camera } from "./Camera"
@@ -790,17 +792,17 @@ export const init_marios = () => {
     gMarioState.action =
         (gMarioState.pos[1] <= (gMarioState.waterLevel - 100)) ? ACT_WATER_IDLE : ACT_IDLE
 
-    // Object.assign(LevelUpdate.gMarioState.marioObj.gfx, {
-    //     unk38: {
-    //         ...LevelUpdate.gMarioState.marioObj.gfx.unk38,
-    //         animID: -1,
-    //         animID: 0,
-    //         animFrame: 0,
-    //         animFrameAccelAssist: 0,
-    //         animAccel: 0x10000,
-    //         animTimer: 0
-    //     }
-    // })
+    Object.assign(LevelUpdate.gMarioState.marioObj.gfx, {
+        unk38: {
+            ...LevelUpdate.gMarioState.marioObj.gfx.unk38,
+            animID: -1,
+            animID: 0,
+            animFrame: 0,
+            animFrameAccelAssist: 0,
+            animAccel: 0x10000,
+            animTimer: 0
+        }
+    })
 
     mario_reset_bodystate(gMarioState)
     update_mario_info_for_cam(gMarioState)
@@ -1601,14 +1603,18 @@ export const execute_mario_action = () => {
         update_mario_info_for_cam(LevelUpdate.gMarioState)
         mario_update_hitbox_and_cap_model(LevelUpdate.gMarioState)
 
-        if (LevelUpdate.gMarioState.floor.type == SurfaceTerrains.SURFACE_HORIZONTAL_WIND) {
-            // spawn_wind_particles(0, (LevelUpdate.gMarioState.floor.force << 8))
-            play_sound(SOUND_ENV_WIND2, LevelUpdate.gMarioState.marioObj.gfx.cameraToObject);
+        if (LevelUpdate.gMarioState.floor) {
+            if (LevelUpdate.gMarioState.floor.type == SurfaceTerrains.SURFACE_HORIZONTAL_WIND) {
+                // spawn_wind_particles(0, (LevelUpdate.gMarioState.floor.force << 8))
+                play_sound(SOUND_ENV_WIND2, LevelUpdate.gMarioState.marioObj.gfx.cameraToObject)
+            }
         }
 
-        if (LevelUpdate.gMarioState.floor.type == SurfaceTerrains.SURFACE_VERTICAL_WIND) {
-            // spawn_wind_particles(1, 0)
-            play_sound(SOUND_ENV_WIND2, LevelUpdate.gMarioState.marioObj.gfx.cameraToObject);
+        if (LevelUpdate.gMarioState.floor) {
+            if (LevelUpdate.gMarioState.floor.type == SurfaceTerrains.SURFACE_VERTICAL_WIND) {
+                // spawn_wind_particles(1, 0)
+                play_sound(SOUND_ENV_WIND2, LevelUpdate.gMarioState.marioObj.gfx.cameraToObject);
+            }
         }
 
         play_infinite_stairs_music()
@@ -1778,10 +1784,6 @@ const update_mario_health = (m) => {
         // TODO // Play a noise to alert the player when Mario is close to drowning.
 
     }
-
-
-    /// TODO HACK because death is not implemented
-    if (m.health < 0x100) m.health = 0x100
 }
 
 const update_mario_button_inputs = (m, playerInput) => {
@@ -1847,7 +1849,7 @@ const update_mario_geometry_inputs = (m) => {
         }
 
     } else {
-        m.input |= INPUT_OFF_FLOOR;
+        level_trigger_warp(m, WARP_OP_DEATH);
     }
 
 }
@@ -1879,7 +1881,7 @@ export const mario_floor_is_slippery = (m) => {
             break
     }
 
-    return m.floor.normal.y <= normY
+    if (m.floor) return m.floor.normal.y <= normY
 }
 
 export const mario_floor_is_slope = (m) => {
@@ -1909,7 +1911,7 @@ export const mario_floor_is_slope = (m) => {
             break
     }
 
-    return m.floor.normal.y <= normY
+    if (m.floor) return m.floor.normal.y <= normY
 }
 
 export const mario_floor_is_steep = (m) => {

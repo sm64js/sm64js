@@ -6,7 +6,7 @@ import {
     check_common_action_exits, check_common_hold_action_exits, drop_and_set_mario_action,
     is_anim_past_end, set_jump_from_landing, set_jumping_action, set_mario_action,
     set_water_plunge_action, update_mario_sound_and_camera, play_sound_if_no_flag,
-    mario_set_forward_vel, play_mario_landing_sound_once
+    mario_set_forward_vel, play_mario_landing_sound_once, set_mario_anim_with_accel
 } from "./Mario"
 
 import { AreaInstance as Area } from "./Area"
@@ -25,8 +25,12 @@ import {
 } from "./IngameMenu"
 
 import {
-    s16
+    s16, sins, coss
 } from "../utils"
+
+import { 
+    atan2s
+} from "../engine/math_util"
 
 import {
     vec3f_set
@@ -41,6 +45,7 @@ import {
 } from "./SaveFile"
 
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
+import { level_trigger_warp } from "./LevelUpdate"
 
 import {
     oInteractStatus, oMoveAngleYaw,
@@ -76,33 +81,31 @@ import {
 
     oUnk1A8, oUnk94, oUnkBC, oUnkC0,
 
-    oMarioReadingSignDPosX, oMarioReadingSignDPosZ
+    oMarioReadingSignDPosX, oMarioReadingSignDPosZ, oMarioPoleUnk108
 } from "../include/object_constants"
 
 import {
+    ACT_DISAPPEARED,  ACT_INTRO_CUTSCENE,  ACT_STAR_DANCE_EXIT,  ACT_STAR_DANCE_NO_EXIT, 
+    ACT_STAR_DANCE_WATER,  ACT_FALL_AFTER_STAR_GRAB,  ACT_READING_AUTOMATIC_DIALOG, 
+    ACT_READING_NPC_DIALOG,  ACT_DEBUG_FREE_MOVE,  ACT_READING_SIGN,  ACT_JUMBO_STAR_CUTSCENE, 
+    ACT_WAITING_FOR_DIALOG,  ACT_STANDING_DEATH,  ACT_QUICKSAND_DEATH,  ACT_ELECTROCUTION, 
+    ACT_SUFFOCATION,  ACT_DEATH_ON_STOMACH,  ACT_DEATH_ON_BACK,  ACT_EATEN_BY_BUBBA, 
+    ACT_END_PEACH_CUTSCENE,  ACT_CREDITS_CUTSCENE,  ACT_END_WAVING_CUTSCENE,  ACT_PULLING_DOOR, 
+    ACT_PUSHING_DOOR,  ACT_WARP_DOOR_SPAWN,  ACT_EMERGE_FROM_PIPE,  ACT_SPAWN_SPIN_AIRBORNE, 
+    ACT_SPAWN_SPIN_LANDING,  ACT_EXIT_AIRBORNE,  ACT_EXIT_LAND_SAVE_DIALOG,  ACT_DEATH_EXIT, 
+    ACT_UNUSED_DEATH_EXIT,  ACT_FALLING_DEATH_EXIT,  ACT_SPECIAL_EXIT_AIRBORNE,  ACT_SPECIAL_DEATH_EXIT,
+    ACT_FALLING_EXIT_AIRBORNE,  ACT_UNLOCKING_KEY_DOOR,  ACT_UNLOCKING_STAR_DOOR, 
+    ACT_ENTERING_STAR_DOOR,  ACT_SPAWN_NO_SPIN_AIRBORNE,  ACT_SPAWN_NO_SPIN_LANDING, 
+    ACT_BBH_ENTER_JUMP,  ACT_BBH_ENTER_SPIN,  ACT_TELEPORT_FADE_OUT,  ACT_TELEPORT_FADE_IN, 
+    ACT_SHOCKED,  ACT_SQUISHED,  ACT_HEAD_STUCK_IN_GROUND,  ACT_BUTT_STUCK_IN_GROUND, 
+    ACT_FEET_STUCK_IN_GROUND, ACT_PUTTING_ON_CAP,
 
-ACT_DISAPPEARED,  ACT_INTRO_CUTSCENE,  ACT_STAR_DANCE_EXIT,  ACT_STAR_DANCE_NO_EXIT, 
-ACT_STAR_DANCE_WATER,  ACT_FALL_AFTER_STAR_GRAB,  ACT_READING_AUTOMATIC_DIALOG, 
-ACT_READING_NPC_DIALOG,  ACT_DEBUG_FREE_MOVE,  ACT_READING_SIGN,  ACT_JUMBO_STAR_CUTSCENE, 
-ACT_WAITING_FOR_DIALOG,  ACT_STANDING_DEATH,  ACT_QUICKSAND_DEATH,  ACT_ELECTROCUTION, 
-ACT_SUFFOCATION,  ACT_DEATH_ON_STOMACH,  ACT_DEATH_ON_BACK,  ACT_EATEN_BY_BUBBA, 
-ACT_END_PEACH_CUTSCENE,  ACT_CREDITS_CUTSCENE,  ACT_END_WAVING_CUTSCENE,  ACT_PULLING_DOOR, 
-ACT_PUSHING_DOOR,  ACT_WARP_DOOR_SPAWN,  ACT_EMERGE_FROM_PIPE,  ACT_SPAWN_SPIN_AIRBORNE, 
-ACT_SPAWN_SPIN_LANDING,  ACT_EXIT_AIRBORNE,  ACT_EXIT_LAND_SAVE_DIALOG,  ACT_DEATH_EXIT, 
-ACT_UNUSED_DEATH_EXIT,  ACT_FALLING_DEATH_EXIT,  ACT_SPECIAL_EXIT_AIRBORNE,  ACT_SPECIAL_DEATH_EXIT,
- ACT_FALLING_EXIT_AIRBORNE,  ACT_UNLOCKING_KEY_DOOR,  ACT_UNLOCKING_STAR_DOOR, 
-ACT_ENTERING_STAR_DOOR,  ACT_SPAWN_NO_SPIN_AIRBORNE,  ACT_SPAWN_NO_SPIN_LANDING, 
-ACT_BBH_ENTER_JUMP,  ACT_BBH_ENTER_SPIN,  ACT_TELEPORT_FADE_OUT,  ACT_TELEPORT_FADE_IN, 
-ACT_SHOCKED,  ACT_SQUISHED,  ACT_HEAD_STUCK_IN_GROUND,  ACT_BUTT_STUCK_IN_GROUND, 
-ACT_FEET_STUCK_IN_GROUND,  ACT_PUTTING_ON_CAP, 
+    MARIO_METAL_CAP, MARIO_METAL_SHOCK, MARIO_CAP_ON_HEAD,
+    MARIO_ANIM_A_POSE, MARIO_ANIM_PULL_DOOR_WALK_IN, MARIO_ANIM_PUSH_DOOR_WALK_IN,
+    MARIO_ANIM_GENERAL_FALL, MARIO_MARIO_SOUND_PLAYED, GROUND_STEP_LEFT_GROUND,
+    MARIO_ACTION_SOUND_PLAYED,
 
-MARIO_METAL_CAP, MARIO_CAP_ON_HEAD,
-MARIO_ANIM_A_POSE, MARIO_ANIM_PULL_DOOR_WALK_IN, MARIO_ANIM_PUSH_DOOR_WALK_IN,
-MARIO_ANIM_GENERAL_FALL,
-MARIO_MARIO_SOUND_PLAYED, GROUND_STEP_LEFT_GROUND,
-ACT_IDLE,
-AIR_STEP_LANDED,
-
+    ACT_IDLE, AIR_STEP_LANDED,
     ACT_AIR_THROW_LAND, ACT_BACKFLIP, ACT_BACKFLIP_LAND_STOP, ACT_BEGIN_SLIDING, ACT_BRAKING_STOP,
     ACT_BUTT_SLIDE_STOP, ACT_COUGHING, ACT_CRAWLING, ACT_CRAZY_BOX_BOUNCE, ACT_CROUCH_SLIDE,
     ACT_CROUCHING, ACT_DOUBLE_JUMP_LAND_STOP, MARIO_ANIM_FALL_LAND_WITH_LIGHT_OBJ, ACT_FIRST_PERSON,
@@ -115,7 +118,7 @@ AIR_STEP_LANDED,
     ACT_SLIDE_KICK_SLIDE_STOP, ACT_STANDING_AGAINST_WALL,
     ACT_START_CRAWLING, ACT_START_CROUCHING, ACT_START_SLEEPING,
     ACT_STOP_CRAWLING, ACT_STOP_CROUCHING, ACT_THROWING, ACT_TRIPLE_JUMP_LAND_STOP, ACT_TWIRL_LAND,
-    ACT_UNKNOWN_0002020E, ACT_WAKING_UP, ACT_WALKING,
+    ACT_UNKNOWN_0002020E, ACT_WAKING_UP, ACT_WALKING, ACT_DEATH_EXIT_LAND, ACT_HARD_BACKWARD_GROUND_KB,
 
     INPUT_A_PRESSED, INPUT_ABOVE_SLIDE, INPUT_B_PRESSED, INPUT_FIRST_PERSON, INPUT_IN_WATER,
     INPUT_NONZERO_ANALOG, INPUT_OFF_FLOOR, INPUT_SQUISHED, INPUT_UNKNOWN_10, INPUT_Z_DOWN,
@@ -129,8 +132,16 @@ AIR_STEP_LANDED,
     MARIO_ANIM_START_CRAWLING, MARIO_ANIM_START_CROUCHING, MARIO_ANIM_STOP_CRAWLING,
     MARIO_ANIM_STOP_CROUCHING, MARIO_ANIM_STOP_SKID, MARIO_ANIM_STOP_SLIDE,
     MARIO_ANIM_THROW_LIGHT_OBJECT, MARIO_ANIM_TRIPLE_JUMP_LAND, MARIO_ANIM_FIRST_PERSON,
-    MARIO_ANIM_WATER_IDLE, MARIO_ANIM_SUMMON_STAR, MARIO_ANIM_RETURN_STAR_APPROACH_DOOR
+    MARIO_ANIM_WATER_IDLE, MARIO_ANIM_SUMMON_STAR, MARIO_ANIM_RETURN_STAR_APPROACH_DOOR,
+    MARIO_ANIM_SHOCKED, MARIO_ANIM_FORWARD_SPINNING, MARIO_ANIM_WALKING, MARIO_ANIM_DYING_ON_BACK,
+    MARIO_ANIM_DYING_FALL_OVER, MARIO_ANIM_BACKWARD_AIR_KB,
+
+    INPUT_IN_POISON_GAS,
+
+    play_mario_landing_sound
 } from "./Mario"
+
+import { MARIO_EYES_DEAD } from "../include/mario_geo_switch_case_ids"
 
 import {
     MODEL_STAR
@@ -148,14 +159,19 @@ import {
     PARTICLE_IDLE_WATER_WAVE
 } from "../include/mario_constants"
 
-import { GRAPH_RENDER_ACTIVE } from "../engine/graph_node"
+import { GRAPH_RENDER_ACTIVE, geo_update_animation_frame } from "../engine/graph_node"
 
 import { WARP_OP_WARP_DOOR, WARP_OP_DEATH } from "./LevelUpdate"
 
 import {
-    SOUND_MARIO_ATTACKED, SOUND_ACTION_TERRAIN_LANDING
+    SOUND_MARIO_ATTACKED, SOUND_ACTION_TERRAIN_LANDING, SOUND_MARIO_HERE_WE_GO, SOUND_MARIO_WAAAOOOW, 
+    SOUND_MARIO_DYING, SOUND_MARIO_YAHOO, SOUND_MARIO_OOOF, SOUND_MARIO_OOOF2, SOUND_MARIO_HAHA, 
+    SOUND_MARIO_YAH_WAH_HOO, SOUND_MARIO_HOOHOO,
+
+    SOUND_ACTION_TERRAIN_BODY_HIT_GROUND
 } from "../include/sounds"
 
+import { create_dialog_inverted_box } from "./IngameMenu"
 
 let sIntroWarpPipeObj = null
 let sEndPeachObj = null
@@ -561,7 +577,7 @@ export const act_disappeared = (m) => {
     if (m.actionArg) {
         m.actionArg--
         if ((m.actionArg & 0xFFFF) == 0) {
-            LevelUpdate.level_trigger_warp(m, m.actionArg >> 16)
+            level_trigger_warp(m, m.actionArg >> 16)
         }
     }
     return 0
@@ -620,45 +636,41 @@ export const act_reading_automatic_dialog = (m) => {
     return 0
 }
 
-// export const act_reading_sign = (m) => {
-//     struct Object *marioObj = m.marioObj
+export const act_reading_sign = (m) => {
+    const marioObj = m.marioObj
 
-//     play_sound_if_no_flag(m, SOUND_ACTION_READ_SIGN, MARIO_ACTION_SOUND_PLAYED)
+    play_sound_if_no_flag(m, SOUND_ACTION_READ_SIGN, MARIO_ACTION_SOUND_PLAYED)
 
-//     switch (m.actionState) {
-//           // start dialog
-//         case 0:
-//             trigger_cutscene_dialog(1)
-//             enable_time_stop()
-//               // reading sign
-//             set_mario_animation(m, MARIO_ANIM_FIRST_PERSON)
-//             m.actionState = 1
-//               // intentional fall through
-//           // turn toward sign
-//         case 1:
-//             m.faceAngle[1] += marioObj.rawData[oMarioPoleUnk108] / 11
-//             m.pos[0] += marioObj.rawData[oMarioReadingSignDPosX] / 11.0
-//             m.pos[2] += marioObj.rawData[oMarioReadingSignDPosZ] / 11.0
-//               // create the text box
-//             if (m.actionTimer++ == 10) {
-//                 create_dialog_inverted_box(m.usedObj.rawData[oBehParams2ndByte])
-//                 m.actionState = 2
-//             }
-//             break
-//           // in dialog
-//         case 2:
-//               // dialog finished
-//             if (gCamera.cutscene == 0) {
-//                 disable_time_stop()
-//                 set_mario_action(m, ACT_IDLE, 0)
-//             }
-//             break
-//     }
-
-//     vec3f_copy(marioObj.gfx.pos, m.pos)
-//     vec3s_set(marioObj.gfx.angle, 0, m.faceAngle[1], 0)
-//     return 0
-// }
+    switch (m.actionState) {
+        // start dialog
+        case 0:
+            trigger_cutscene_dialog(1)
+            enable_time_stop()
+            // reading sign
+            set_mario_animation(m, MARIO_ANIM_FIRST_PERSON)
+            m.actionState = 1
+            // intentional fall through
+            // turn toward sign
+        case 1:
+            m.faceAngle[1] += marioObj.rawData[oMarioPoleUnk108] / 11
+            m.pos[0] += marioObj.rawData[oMarioReadingSignDPosX] / 11.0
+            m.pos[2] += marioObj.rawData[oMarioReadingSignDPosZ] / 11.0
+            // create the text box
+            if (m.actionTimer++ == 10) {
+                create_dialog_inverted_box(m.usedObj.rawData[oBehParams2ndByte])
+                m.actionState = 2
+            }
+            break
+            // in dialog
+        case 2:
+            // dialog finished
+            if (gCamera.cutscene == 0) {
+                disable_time_stop()
+                set_mario_action(m, ACT_IDLE, 0)
+            }
+            break
+    }
+}
 
 // export const act_debug_free_move = (m) => {
 //     struct Surface *surf
@@ -738,7 +750,7 @@ export const act_reading_automatic_dialog = (m) => {
 
 //             case 80:
 //                 if ((m.actionArg & 1) == 0) {
-//                     LevelUpdate.level_trigger_warp(m, WARP_OP_STAR_EXIT)
+//                     level_trigger_warp(m, WARP_OP_STAR_EXIT)
 //                 } else {
 //                     enable_time_stop()
 //                     create_dialog_box_with_response(gLastCompletedStarNum == 7 ? DIALOG_013 : DIALOG_014)
@@ -764,116 +776,118 @@ export const act_reading_automatic_dialog = (m) => {
 //     }
 // }
 
-// export const act_star_dance = (m) => {
-//     m.faceAngle[1] = m.area.camera.yaw
-//     set_mario_animation(m, m.actionState == 2 ? MARIO_ANIM_RETURN_FROM_STAR_DANCE
-//                                                : MARIO_ANIM_STAR_DANCE)
-//     general_star_dance_handler(m, 0)
-//     if (m.actionState != 2 && m.actionTimer >= 40) {
-//         m.marioBodyState.handState = MARIO_HAND_PEACE_SIGN
-//     }
-//     stop_and_set_height_to_floor(m)
-//     return 0
-// }
+export const act_star_dance = (m) => {
+    m.faceAngle[1] = m.area.camera.yaw
+    set_mario_animation(m, m.actionState == 2 ? MARIO_ANIM_RETURN_FROM_STAR_DANCE
+                                               : MARIO_ANIM_STAR_DANCE)
+    general_star_dance_handler(m, 0)
+    if (m.actionState != 2 && m.actionTimer >= 40) {
+        m.marioBodyState.handState = MARIO_HAND_PEACE_SIGN
+    }
+    stop_and_set_height_to_floor(m)
+    return 0
+}
 
-// export const act_star_dance_water = (m) => {
-//     m.faceAngle[1] = m.area.camera.yaw
-//     set_mario_animation(m, m.actionState == 2 ? MARIO_ANIM_RETURN_FROM_WATER_STAR_DANCE
-//                                                : MARIO_ANIM_WATER_STAR_DANCE)
-//     vec3f_copy(m.marioObj.gfx.pos, m.pos)
-//     vec3s_set(m.marioObj.gfx.angle, 0, m.faceAngle[1], 0)
-//     general_star_dance_handler(m, 1)
-//     if (m.actionState != 2 && m.actionTimer >= 62) {
-//         m.marioBodyState.handState = MARIO_HAND_PEACE_SIGN
-//     }
-//     return 0
-// }
+export const act_star_dance_water = (m) => {
+    m.faceAngle[1] = m.area.camera.yaw
+    set_mario_animation(m, m.actionState == 2 ? MARIO_ANIM_RETURN_FROM_WATER_STAR_DANCE
+                                               : MARIO_ANIM_WATER_STAR_DANCE)
+    vec3f_copy(m.marioObj.gfx.pos, m.pos)
+    vec3s_set(m.marioObj.gfx.angle, 0, m.faceAngle[1], 0)
+    general_star_dance_handler(m, 1)
+    if (m.actionState != 2 && m.actionTimer >= 62) {
+        m.marioBodyState.handState = MARIO_HAND_PEACE_SIGN
+    }
+    return 0
+}
 
-// export const act_fall_after_star_grab = (m) => {
-//     if (m.pos[1] < m.waterLevel - 130) {
-//         play_sound(SOUND_ACTION_UNKNOWN430, m.marioObj.gfx.cameraToObject)
-//         m.particleFlags |= PARTICLE_WATER_SPLASH
-//         return set_mario_action(m, ACT_STAR_DANCE_WATER, m.actionArg)
-//     }
-//     if (perform_air_step(m, 1) == AIR_STEP_LANDED) {
-//         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
-//         set_mario_action(m, m.actionArg & 1 ? ACT_STAR_DANCE_NO_EXIT : ACT_STAR_DANCE_EXIT,
-//                          m.actionArg)
-//     }
-//     set_mario_animation(m, MARIO_ANIM_GENERAL_FALL)
-//     return 0
-// }
+export const act_fall_after_star_grab = (m) => {
+    if (m.pos[1] < m.waterLevel - 130) {
+        play_sound(SOUND_ACTION_UNKNOWN430, m.marioObj.gfx.cameraToObject)
+        m.particleFlags |= PARTICLE_WATER_SPLASH
+        return set_mario_action(m, ACT_STAR_DANCE_WATER, m.actionArg)
+    }
+    if (perform_air_step(m, 1) == AIR_STEP_LANDED) {
+        play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+        set_mario_action(m, m.actionArg & 1 ? ACT_STAR_DANCE_NO_EXIT : ACT_STAR_DANCE_EXIT,
+                         m.actionArg)
+    }
+    set_mario_animation(m, MARIO_ANIM_GENERAL_FALL)
+    return 0
+}
 
-// export const common_death_handler = (m, animation, frameToDeathWarp) => {
-//     let /*s32*/ animFrame = set_mario_animation(m, animation)
-//     if (animFrame == frameToDeathWarp) {
-//         LevelUpdate.level_trigger_warp(m, WARP_OP_DEATH)
-//     }
-//     m.marioBodyState.eyeState = MARIO_EYES_DEAD
-//     stop_and_set_height_to_floor(m)
-//     return animFrame
-// }
+export const common_death_handler = (m, animation, frameToDeathWarp) => {
+    let /*s32*/ animFrame = set_mario_animation(m, animation)
+    if (animFrame == frameToDeathWarp) {
+        level_trigger_warp(m, WARP_OP_DEATH)
+    }
+    m.marioBodyState.eyeState = MARIO_EYES_DEAD
+    stop_and_set_height_to_floor(m)
+    return animFrame
+}
 
-// export const act_standing_death = (m) => {
-//     if (m.input & INPUT_IN_POISON_GAS) {
-//         return set_mario_action(m, ACT_SUFFOCATION, 0)
-//     }
+export const act_standing_death = (m) => {
+    if (m.input & INPUT_IN_POISON_GAS) {
+        return set_mario_action(m, ACT_SUFFOCATION, 0)
+    }
 
-//     play_sound_if_no_flag(m, SOUND_MARIO_DYING, MARIO_ACTION_SOUND_PLAYED)
-//     common_death_handler(m, MARIO_ANIM_DYING_FALL_OVER, 80)
-//     if (m.marioObj.gfx.animInfo.animFrame == 77) {
-//         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
-//     }
-//     return 0
-// }
+    play_sound_if_no_flag(m, SOUND_MARIO_DYING, MARIO_ACTION_SOUND_PLAYED)
+    common_death_handler(m, MARIO_ANIM_DYING_FALL_OVER, 80)
+    // const animFrame = geo_update_animation_frame(m.gfx.unk38, null)
+    // if (animFrame == 77) {
+    play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
+    // }
+    set_mario_action(m, ACT_IDLE, 0)
+    return 0
+}
 
-// export const act_electrocution = (m) => {
-//     play_sound_if_no_flag(m, SOUND_MARIO_DYING, MARIO_ACTION_SOUND_PLAYED)
-//     common_death_handler(m, MARIO_ANIM_ELECTROCUTION, 43)
-//     return 0
-// }
+export const act_electrocution = (m) => {
+    //play_sound_if_no_flag(m, SOUND_MARIO_DYING, MARIO_ACTION_SOUND_PLAYED)
+    //common_death_handler(m, MARIO_ANIM_ELECTROCUTION, 43)
+    return 0
+}
 
-// export const act_suffocation = (m) => {
-//     play_sound_if_no_flag(m, SOUND_MARIO_DYING, MARIO_ACTION_SOUND_PLAYED)
-//     common_death_handler(m, MARIO_ANIM_SUFFOCATING, 86)
-//     return 0
-// }
+export const act_suffocation = (m) => {
+    play_sound_if_no_flag(m, SOUND_MARIO_DYING, MARIO_ACTION_SOUND_PLAYED)
+    common_death_handler(m, MARIO_ANIM_SUFFOCATING, 86)
+    return 0
+}
 
-// export const act_death_on_back = (m) => {
-//     play_sound_if_no_flag(m, SOUND_MARIO_DYING, MARIO_ACTION_SOUND_PLAYED)
-//     if (common_death_handler(m, MARIO_ANIM_DYING_ON_BACK, 54) == 40) {
-//         play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
-//     }
-//     return 0
-// }
+export const act_death_on_back = (m) => {
+    play_sound_if_no_flag(m, SOUND_MARIO_DYING, MARIO_ACTION_SOUND_PLAYED)
+    if (common_death_handler(m, MARIO_ANIM_DYING_ON_BACK, 54) == 40) {
+        play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
+    }
+    return 0
+}
 
-// export const act_death_on_stomach = (m) => {
-//     play_sound_if_no_flag(m, SOUND_MARIO_DYING, MARIO_ACTION_SOUND_PLAYED)
-//     if (common_death_handler(m, MARIO_ANIM_DYING_ON_STOMACH, 37) == 37) {
-//         play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
-//     }
-//     return 0
-// }
+export const act_death_on_stomach = (m) => {
+    play_sound_if_no_flag(m, SOUND_MARIO_DYING, MARIO_ACTION_SOUND_PLAYED)
+    if (common_death_handler(m, MARIO_ANIM_DYING_ON_STOMACH, 37) == 37) {
+        play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
+    }
+    return 0
+}
 
-// export const act_quicksand_death = (m) => {
-//     if (m.actionState == 0) {
-//         set_mario_animation(m, MARIO_ANIM_DYING_IN_QUICKSAND)
-//         set_anim_to_frame(m, 60)
-//         m.actionState = 1
-//     }
-//     if (m.actionState == 1) {
-//         if (m.quicksandDepth >= 100.0) {
-//             play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_ACTION_SOUND_PLAYED)
-//         }
-//         if ((m.quicksandDepth += 5.0) >= 180.0) {
-//             LevelUpdate.level_trigger_warp(m, WARP_OP_DEATH)
-//             m.actionState = 2
-//         }
-//     }
-//     stationary_ground_step(m)
-//     play_sound(SOUND_MOVING_QUICKSAND_DEATH, m.marioObj.gfx.cameraToObject)
-//     return 0
-// }
+export const act_quicksand_death = (m) => {
+    if (m.actionState == 0) {
+        set_mario_animation(m, MARIO_ANIM_DYING_IN_QUICKSAND)
+        set_anim_to_frame(m, 60)
+        m.actionState = 1
+    }
+    if (m.actionState == 1) {
+        if (m.quicksandDepth >= 100.0) {
+            play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_ACTION_SOUND_PLAYED)
+        }
+        if ((m.quicksandDepth += 5.0) >= 180.0) {
+            level_trigger_warp(m, WARP_OP_DEATH)
+            m.actionState = 2
+        }
+    }
+    stationary_ground_step(m)
+    play_sound(SOUND_MOVING_QUICKSAND_DEATH, m.marioObj.gfx.cameraToObject)
+    return 0
+}
 
 // export const act_eaten_by_bubba = (m) => {
 //     play_sound_if_no_flag(m, SOUND_MARIO_DYING, MARIO_ACTION_SOUND_PLAYED)
@@ -881,7 +895,7 @@ export const act_reading_automatic_dialog = (m) => {
 //     m.marioObj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
 //     m.health = 0xFF
 //     if (m.actionTimer++ == 60) {
-//         LevelUpdate.level_trigger_warp(m, WARP_OP_DEATH)
+//         level_trigger_warp(m, WARP_OP_DEATH)
 //     }
 //     return 0
 // }
@@ -982,66 +996,66 @@ export const act_unlocking_star_door = (m) => {
     return 0
 }
 
-// export const act_entering_star_door = (m) => {
-//     let /*f32*/ targetDX
-//     let /*f32*/ targetDZ
-//     let /*s16*/ targetAngle
+export const act_entering_star_door = (m) => {
+    let /*f32*/ targetDX
+    let /*f32*/ targetDZ
+    let /*s16*/ targetAngle
 
-//     if (m.actionTimer++ == 0) {
-//         m.interactObj.rawData[oInteractStatus] = 0x00010000
+    if (m.actionTimer++ == 0) {
+        m.interactObj.rawData[oInteractStatus] = 0x00010000
 
-//           // ~30 degrees / 1/12 rot
-//         targetAngle = m.usedObj.rawData[oMoveAngleYaw] + 0x1555
-//         if (m.actionArg & 2) {
-//             targetAngle += 0x5556;   // ~120 degrees / 1/3 rot (total 150d / 5/12)
-//         }
+          // ~30 degrees / 1/12 rot
+        targetAngle = m.usedObj.rawData[oMoveAngleYaw] + 0x1555
+        if (m.actionArg & 2) {
+            targetAngle += 0x5556   // ~120 degrees / 1/3 rot (total 150d / 5/12)
+        }
 
-//           // targetDX and targetDZ are the offsets to add to Mario's position to
-//           // have Mario stand 150 units in front of the door
+          // targetDX and targetDZ are the offsets to add to Mario's position to
+          // have Mario stand 150 units in front of the door
 
-//         targetDX = m.usedObj.rawData[oPosX] + 150.0 * sins(targetAngle) - m.pos[0]
-//         targetDZ = m.usedObj.rawData[oPosZ] + 150.0 * coss(targetAngle) - m.pos[2]
+        targetDX = m.usedObj.rawData[oPosX] + 150.0 * sins(targetAngle) - m.pos[0]
+        targetDZ = m.usedObj.rawData[oPosZ] + 150.0 * coss(targetAngle) - m.pos[2]
 
-//         m.marioObj.rawData[oMarioReadingSignDPosX] = targetDX / 20.0
-//         m.marioObj.rawData[oMarioReadingSignDPosZ] = targetDZ / 20.0
+        m.marioObj.rawData[oMarioReadingSignDPosX] = targetDX / 20.0
+        m.marioObj.rawData[oMarioReadingSignDPosZ] = targetDZ / 20.0
 
-//         m.faceAngle[1] = atan2s(targetDZ, targetDX)
-//     }
+        m.faceAngle[1] = atan2s(targetDZ, targetDX)
+    }
 
-//       // set Mario's animation
-//     if (m.actionTimer < 15) {
-//         set_mario_animation(m, MARIO_ANIM_FIRST_PERSON)
-//     }
+      // set Mario's animation
+    if (m.actionTimer < 15) {
+        set_mario_animation(m, MARIO_ANIM_FIRST_PERSON)
+    }
 
-//       // go through door? for 20 frames
-//     else if (m.actionTimer < 35) {
-//         m.pos[0] += m.marioObj.rawData[oMarioReadingSignDPosX]
-//         m.pos[2] += m.marioObj.rawData[oMarioReadingSignDPosZ]
+      // go through door? for 20 frames
+    else if (m.actionTimer < 35) {
+        m.pos[0] += m.marioObj.rawData[oMarioReadingSignDPosX]
+        m.pos[2] += m.marioObj.rawData[oMarioReadingSignDPosZ]
 
-//         set_mario_anim_with_accel(m, MARIO_ANIM_WALKING, 0x00028000)
-//     }
+        set_mario_anim_with_accel(m, MARIO_ANIM_WALKING, 0x00028000)
+    }
 
-//     else {
-//         m.faceAngle[1] = m.usedObj.rawData[oMoveAngleYaw]
+    else {
+        m.faceAngle[1] = m.usedObj.rawData[oMoveAngleYaw]
 
-//         if (m.actionArg & 2) {
-//             m.faceAngle[1] += 0x8000
-//         }
+        if (m.actionArg & 2) {
+            m.faceAngle[1] += 0x8000
+        }
 
-//         m.pos[0] += 12.0 * sins(m.faceAngle[1])
-//         m.pos[2] += 12.0 * coss(m.faceAngle[1])
+        m.pos[0] += 12.0 * sins(m.faceAngle[1])
+        m.pos[2] += 12.0 * coss(m.faceAngle[1])
 
-//         set_mario_anim_with_accel(m, MARIO_ANIM_WALKING, 0x00028000)
-//     }
+        set_mario_anim_with_accel(m, MARIO_ANIM_WALKING, 0x00028000)
+    }
 
-//     stop_and_set_height_to_floor(m)
+    stop_and_set_height_to_floor(m)
 
-//     if (m.actionTimer == 48) {
-//         set_mario_action(m, ACT_IDLE, 0)
-//     }
+    if (m.actionTimer == 48) {
+        set_mario_action(m, ACT_IDLE, 0)
+    }
 
-//     return 0
-// }
+    return 0
+}
 
 export const act_going_through_door = (m) => {
     if (m.actionTimer == 0) {
@@ -1062,7 +1076,7 @@ export const act_going_through_door = (m) => {
 
     if (m.actionArg & 4) {
         if (m.actionTimer == 16) {
-            LevelUpdate.level_trigger_warp(m, WARP_OP_WARP_DOOR)
+            level_trigger_warp(m, WARP_OP_WARP_DOOR)
         }
     } else if (is_anim_at_end(m)) {
         if (m.actionArg & 2) {
@@ -1122,47 +1136,47 @@ export const act_warp_door_spawn = (m) => {
 //     return 0
 // }
 
-// export const act_spawn_spin_airborne = (m) => {
-//       // entered water, exit action
-//     if (m.pos[1] < m.waterLevel - 100) {
-//         load_level_init_text(0)
-//         return set_water_plunge_action(m)
-//     }
+export const act_spawn_spin_airborne = (m) => {
+    // entered water, exit action
+    if (m.pos[1] < m.waterLevel - 100) {
+        LevelUpdate.load_level_init_text(0)
+        return set_water_plunge_action(m)
+    }
 
-//       // updates all velocity variables based on m->forwardVel
-//     mario_set_forward_vel(m, m.forwardVel)
+      // updates all velocity variables based on m->forwardVel
+    mario_set_forward_vel(m, m.forwardVel)
 
-//       // landed on floor, play spawn land animation
-//     if (perform_air_step(m, 0.0) == AIR_STEP_LANDED) {
-//         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
-//         set_mario_action(m, ACT_SPAWN_SPIN_LANDING, 0)
-//     }
+      // landed on floor, play spawn land animation
+    if (perform_air_step(m, 0.0) == AIR_STEP_LANDED) {
+        //play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+        set_mario_action(m, ACT_SPAWN_SPIN_LANDING, 0)
+    }
 
-//       // is 300 units above floor, spin and play woosh sounds
-//     if (m.actionState == 0 && m.pos[1] - m.floorHeight > 300.0) {
-//         if (set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING) == 0) {   // first anim frame
-//             play_sound(SOUND_ACTION_SPIN, m.marioObj.gfx.cameraToObject)
-//         }
-//     }
+      // is 300 units above floor, spin and play woosh sounds
+    if (m.actionState == 0 && m.pos[1] - m.floorHeight > 300.0) {
+        if (set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING) == 0) {   // first anim frame
+            //play_sound(SOUND_ACTION_SPIN, m.marioObj.gfx.cameraToObject)
+        }
+    }
 
-//       // under 300 units above floor, enter freefall animation
-//     else {
-//         m.actionState = 1
-//         set_mario_animation(m, MARIO_ANIM_GENERAL_FALL)
-//     }
+      // under 300 units above floor, enter freefall animation
+    else {
+        m.actionState = 1
+        set_mario_animation(m, MARIO_ANIM_GENERAL_FALL)
+    }
 
-//     return 0
-// }
+    return 0
+}
 
-// export const act_spawn_spin_landing = (m) => {
-//     stop_and_set_height_to_floor(m)
-//     set_mario_animation(m, MARIO_ANIM_GENERAL_LAND)
-//     if (is_anim_at_end(m)) {
-//         load_level_init_text(0)
-//         set_mario_action(m, ACT_IDLE, 0)
-//     }
-//     return 0
-// }
+export const act_spawn_spin_landing = (m) => {
+    stop_and_set_height_to_floor(m)
+    set_mario_animation(m, MARIO_ANIM_GENERAL_LAND)
+    if (is_anim_at_end(m)) {
+        LevelUpdate.load_level_init_text(0)
+        set_mario_action(m, ACT_IDLE, 0)
+    }
+    return 0
+}
 
 // /**
 //  * act_exit_airborne: Jump out of a level after collecting a Power Star (no
@@ -1280,25 +1294,25 @@ export const act_warp_door_spawn = (m) => {
 //     return 0
 // }
 
-// export const act_death_exit = (m) => {
-//     if (15 < m.actionTimer++
-// export const launch_mario_until_land = (m, ACT_DEATH_EXIT_LAND, MARIO_ANIM_GENERAL_FALL, 0f) => {
-// #ifdef VERSION_JP
-//         play_sound(SOUND_MARIO_OOOF, m.marioObj.gfx.cameraToObject)
-// #else
-//         play_sound(SOUND_MARIO_OOOF2, m.marioObj.gfx.cameraToObject)
-// #endif
-// #ifdef VERSION_SH
-//         queue_rumble_data(5, 80)
-// #endif
-//         m.numLives--
-//           // restore 7.75 units of health
-//         m.healCounter = 31
-//     }
-//       // one unit of health
-//     m.health = 0x0100
-//     return 0
-// }
+export const act_death_exit = (m) => {
+     if (15 < m.actionTimer++ 
+         && launch_mario_until_land(m, ACT_DEATH_EXIT_LAND, MARIO_ANIM_GENERAL_FALL, -32)) {
+/*#ifdef VERSION_JP
+    play_sound(SOUND_MARIO_OOOF, m.marioObj.gfx.cameraToObject)
+#else
+    play_sound(SOUND_MARIO_OOOF2, m.marioObj.gfx.cameraToObject)
+#endif
+#ifdef VERSION_SH
+    queue_rumble_data(5, 80)
+#endif*/
+        m.numLives--
+        // restore 7.75 units of health
+        m.healCounter = 31
+    }
+    // one unit of health
+    m.health = 0x0100
+    return 0
+}
 
 // export const act_unused_death_exit = (m) => {
 //     if (launch_mario_until_land(m, ACT_FREEFALL_LAND_STOP, MARIO_ANIM_GENERAL_FALL, 0.0)) {
@@ -1316,8 +1330,8 @@ export const act_warp_door_spawn = (m) => {
 //     return 0
 // }
 
-// export const act_falling_death_exit = (m) => {
-//     if (launch_mario_until_land(m, ACT_DEATH_EXIT_LAND, MARIO_ANIM_GENERAL_FALL, 0.0)) {
+export const act_falling_death_exit = (m) => {
+    if (launch_mario_until_land(m, ACT_DEATH_EXIT_LAND, MARIO_ANIM_GENERAL_FALL, 0.0)) {
 // #ifdef VERSION_JP
 //         play_sound(SOUND_MARIO_OOOF, m.marioObj.gfx.cameraToObject)
 // #else
@@ -1326,63 +1340,63 @@ export const act_warp_door_spawn = (m) => {
 // #ifdef VERSION_SH
 //         queue_rumble_data(5, 80)
 // #endif
-//         m.numLives--
-//           // restore 7.75 units of health
-//         m.healCounter = 31
-//     }
-//       // one unit of health
-//     m.health = 0x0100
-//     return 0
-// }
+        m.numLives--
+          // restore 7.75 units of health
+        m.healCounter = 31
+    }
+      // one unit of health
+    m.health = 0x0100
+    return 0
+}
 
 // // waits 11 frames before actually executing, also has reduced fvel
-// export const act_special_exit_airborne = (m) => {
-//     struct Object *marioObj = m.marioObj
+export const act_special_exit_airborne = (m) => {
+    const marioObj = m.marioObj
 
-//     play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED)
+    play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED)
 
-//     if (m.actionTimer++ < 11) {
-//         marioObj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
-//         return 0
-//     }
+    if (m.actionTimer++ < 11) {
+        marioObj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
+        return 0
+    }
 
-//     if (launch_mario_until_land(m, ACT_EXIT_LAND_SAVE_DIALOG, MARIO_ANIM_SINGLE_JUMP, -24.0)) {
-//           // heal Mario
-//         m.healCounter = 31
-//         m.actionArg = 1
-//     }
+    if (launch_mario_until_land(m, ACT_EXIT_LAND_SAVE_DIALOG, MARIO_ANIM_SINGLE_JUMP, -24.0)) {
+          // heal Mario
+        m.healCounter = 31
+        m.actionArg = 1
+    }
 
-//     m.particleFlags |= PARTICLE_SPARKLES
-//       // rotate Mario to face away from the entrance
-//     marioObj.gfx.angle[1] += 0x8000
-//       // show Mario
-//     marioObj.gfx.flags |= GRAPH_RENDER_ACTIVE
+    m.particleFlags |= PARTICLE_SPARKLES
+    // rotate Mario to face away from the entrance
+    marioObj.gfx.angle[1] += 0x8000
+    // show Mario
+    marioObj.gfx.flags |= GRAPH_RENDER_ACTIVE
 
-//     return 0
-// }
+    return 0
+}
 
-// export const act_special_death_exit = (m) => {
-//     struct Object *marioObj = m.marioObj
+export const act_special_death_exit = (m) => {
+    const marioObj = m.marioObj
 
-//     if (m.actionTimer++ < 11) {
-//         marioObj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
-//         return 0
-//     }
+    if (m.actionTimer++ < 11) {
+        marioObj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
+        return 0
+    }
 
-//     if (launch_mario_until_land(m, ACT_HARD_BACKWARD_GROUND_KB, MARIO_ANIM_BACKWARD_AIR_KB, -24.0)) {
+    if (launch_mario_until_land(m, ACT_HARD_BACKWARD_GROUND_KB, MARIO_ANIM_BACKWARD_AIR_KB, -24.0)) {
 // #ifdef VERSION_SH
 //         queue_rumble_data(5, 80)
 // #endif
-//         m.numLives--
-//         m.healCounter = 31
-//     }
-//       // show Mario
-//     marioObj.gfx.flags |= GRAPH_RENDER_ACTIVE
-//       // one unit of health
-//     m.health = 0x0100
+        m.numLives--
+        m.healCounter = 31
+    }
+    // show Mario
+    marioObj.gfx.flags |= GRAPH_RENDER_ACTIVE
+    // one unit of health
+    m.health = 0x0100
 
-//     return 0
-// }
+    return 0
+}
 
 const act_spawn_no_spin_airborne = (m) => {
     launch_mario_until_land(m, ACT_SPAWN_NO_SPIN_LANDING, MARIO_ANIM_GENERAL_FALL, 0.0)
@@ -1455,7 +1469,7 @@ const act_spawn_no_spin_landing = (m) => {
 //             mario_set_forward_vel(m, forwardVel)
 //             m.flags &= ~MARIO_UNKNOWN_08
 //             if (perform_air_step(m, 0) == AIR_STEP_LANDED) {
-//                 LevelUpdate.level_trigger_warp(m, WARP_OP_UNKNOWN_02)
+//                 level_trigger_warp(m, WARP_OP_UNKNOWN_02)
 // #ifdef VERSION_SH
 //                 queue_rumble_data(15, 80)
 // #endif
@@ -1538,7 +1552,7 @@ const act_spawn_no_spin_landing = (m) => {
 //     }
 
 //     if (m.actionTimer++ == 20) {
-//         LevelUpdate.level_trigger_warp(m, WARP_OP_TELEPORT)
+//         level_trigger_warp(m, WARP_OP_TELEPORT)
 //     }
 
 //     stop_and_set_height_to_floor(m)
@@ -1581,32 +1595,32 @@ const act_spawn_no_spin_landing = (m) => {
 //     return 0
 // }
 
-// export const act_shocked = (m) => {
-//     play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_ACTION_SOUND_PLAYED)
-//     play_sound(SOUND_MOVING_SHOCKED, m.marioObj.gfx.cameraToObject)
-//     set_camera_shake_from_hit(SHAKE_SHOCK)
+ export const act_shocked = (m) => {
+    //play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_ACTION_SOUND_PLAYED)
+    //play_sound(SOUND_MOVING_SHOCKED, m.marioObj.gfx.cameraToObject)
+    //set_camera_shake_from_hit(SHAKE_SHOCK)
 
-//     if (set_mario_animation(m, MARIO_ANIM_SHOCKED) == 0) {
-//         m.actionTimer++
-//         m.flags |= MARIO_METAL_SHOCK
-//     }
+    if (set_mario_animation(m, MARIO_ANIM_SHOCKED) == 0) {
+        m.actionTimer++
+        m.flags |= MARIO_METAL_SHOCK
+    }
 
-//     if (m.actionArg == 0) {
-//         mario_set_forward_vel(m, 0.0)
-//         if (perform_air_step(m, 1) == AIR_STEP_LANDED) {
-//             play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
-//             m.actionArg = 1
-//         }
-//     } else {
-//         if (m.actionTimer >= 6) {
-//             m.invincTimer = 30
-//             set_mario_action(m, m.health < 0x0100 ? ACT_ELECTROCUTION : ACT_IDLE, 0)
-//         }
-//         stop_and_set_height_to_floor(m)
-//     }
+    if (m.actionArg == 0) {
+        mario_set_forward_vel(m, 0.0)
+        if (perform_air_step(m, 1) == AIR_STEP_LANDED) {
+            //play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+            m.actionArg = 1
+        }
+    } else {
+        if (m.actionTimer >= 6) {
+            m.invincTimer = 30
+            set_mario_action(m, m.health < 0x0100 ? ACT_ELECTROCUTION : ACT_IDLE, 0)
+        }
+        stop_and_set_height_to_floor(m)
+    }
 
-//     return 0
-// }
+    return 0
+}
 
 const act_squished = (m) => {
     let /*f32*/ squishAmount
@@ -1655,7 +1669,7 @@ const act_squished = (m) => {
             if (m.actionTimer >= 15) {
                   // 1 unit of health
                 if (m.health < 0x0100) {
-                    LevelUpdate.level_trigger_warp(m, WARP_OP_DEATH)
+                    level_trigger_warp(m, WARP_OP_DEATH)
                       // woosh, he's gone!
                     set_mario_action(m, ACT_DISAPPEARED, 0)
                 } else if (m.hurtCounter == 0) {
@@ -1697,7 +1711,7 @@ const act_squished = (m) => {
           // 0 units of health
         m.health = 0x00FF
         m.hurtCounter = 0
-        LevelUpdate.level_trigger_warp(m, WARP_OP_DEATH)
+        level_trigger_warp(m, WARP_OP_DEATH)
           // woosh, he's gone!
         set_mario_action(m, ACT_DISAPPEARED, 0)
     }
@@ -2053,7 +2067,7 @@ const act_intro_cutscene = (m) => {
 //     m.particleFlags |= PARTICLE_SPARKLES
 
 //     if (m.actionTimer++ == 500) {
-//         LevelUpdate.level_trigger_warp(m, WARP_OP_CREDITS_START)
+//         level_trigger_warp(m, WARP_OP_CREDITS_START)
 //     }
 
 //     return 0
@@ -2610,7 +2624,7 @@ const act_intro_cutscene = (m) => {
 
 // const end_peach_cutscene_fade_out = (m) => {
 //     if (m.actionState == 0) {
-//         LevelUpdate.level_trigger_warp(m, WARP_OP_CREDITS_NEXT)
+//         level_trigger_warp(m, WARP_OP_CREDITS_NEXT)
 //         gPaintingMarioYEntry = 1500.0;   // ensure medium water level in WDW credits cutscene
 //         m.actionState = 1
 //     }
@@ -2749,7 +2763,7 @@ const act_intro_cutscene = (m) => {
 //     }
 
 //     if (m.actionTimer++ == TIMER_CREDITS_WARP) {
-//         LevelUpdate.level_trigger_warp(m, WARP_OP_CREDITS_NEXT)
+//         level_trigger_warp(m, WARP_OP_CREDITS_NEXT)
 //     }
 
 //     m.marioObj.gfx.angle[1] += (gCurrCreditsEntry.unk02 & 0xC0) << 8
@@ -2789,7 +2803,7 @@ const act_intro_cutscene = (m) => {
 //     m.marioBodyState.handState = MARIO_HAND_RIGHT_OPEN
 
 //     if (m.actionTimer++ == 300) {
-//         LevelUpdate.level_trigger_warp(m, WARP_OP_CREDITS_END)
+//         level_trigger_warp(m, WARP_OP_CREDITS_END)
 //     }
 
 //     return 0

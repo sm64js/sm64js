@@ -15,7 +15,7 @@ import {
 } from "./MarioStep"
 
 import {
-    approach_number, atan2s, approach_s32, vec3f_copy, sqrtf
+    approach_number, approach_f32, atan2s, approach_s32, vec3f_copy, sqrtf
 } from "../engine/math_util"
 
 import {
@@ -87,7 +87,7 @@ import {
     ACT_SOFT_BACKWARD_GROUND_KB, ACT_SOFT_FORWARD_GROUND_KB, ACT_SPECIAL_DEATH_EXIT, ACT_SQUISHED,
     ACT_STANDING_AGAINST_WALL, ACT_STANDING_DEATH, ACT_STOMACH_SLIDE, ACT_STOMACH_SLIDE_STOP,
     ACT_STOP_CRAWLING, ACT_THROWING, ACT_TRIPLE_JUMP, ACT_TRIPLE_JUMP_LAND, ACT_TURNING_AROUND,
-    ACT_WALKING,
+    ACT_WALKING, ACT_BURNING_FALL, ACT_BURNING_JUMP,
 
     GROUND_STEP_HIT_WALL, GROUND_STEP_LEFT_GROUND, GROUND_STEP_NONE,
 
@@ -123,7 +123,7 @@ import {
 } from "./Interaction"
 
 import {
-    PARTICLE_DUST, PARTICLE_VERTICAL_STAR, PARTICLE_WAVE_TRAIL
+    PARTICLE_DUST, PARTICLE_VERTICAL_STAR, PARTICLE_WAVE_TRAIL, PARTICLE_FIRE
 } from "../include/mario_constants"
 
 import {
@@ -165,7 +165,8 @@ const apply_slope_accel = (m) => {
         let floorDYaw = s16(m.floorAngle - m.faceAngle[1])
 
         const floor = m.floor
-        const steepness = Math.sqrt(floor.normal.x * floor.normal.x + floor.normal.z * floor.normal.z)
+        let steepness
+        if (floor) { steepness = Math.sqrt(floor.normal.x * floor.normal.x + floor.normal.z * floor.normal.z) }
 
         if (mario_floor_is_slope(m)) {
             let slopeClass = 0
@@ -235,7 +236,7 @@ const update_walking_speed = (m) => {
         m.forwardVel += 1.1
     } else if (m.forwardVel <= targetSpeed) {
         m.forwardVel += 1.1 - m.forwardVel / 43.0
-    } else if (m.floor.normal.y >= 0.95) {
+    } else if (m.floor && m.floor.normal.y >= 0.95) {
         m.forwardVel -= 1.0
     }
 
@@ -1115,6 +1116,58 @@ const common_slide_action_with_jump = (m, stopAction, jumpAction, airAction, ani
 
 }
 
+const act_burning_ground = (m) => {
+    if (m.input & INPUT_A_PRESSED) {
+        return set_mario_action(m, ACT_BURNING_JUMP, 0)
+    }
+
+    m.marioObj.oMarioBurnTimer += 2
+    if (m.marioObj.oMarioBurnTimer > 160) {
+        return set_mario_action(m, ACT_WALKING, 0)
+    }
+
+    if (m.waterLevel - m.floorHeight > 50.0) {
+        //play_sound(SOUND_GENERAL_FLAME_OUT, m.marioObj.header.gfx.cameraToObject);
+        return set_mario_action(m, ACT_WALKING, 0)
+    }
+
+    if (m.forwardVel < 8.0) {
+        m.forwardVel = 8.0
+    }
+    if (m.forwardVel > 48.0) {
+        m.forwardVel = 48.0
+    }
+
+    m.forwardVel = approach_f32(m.forwardVel, 32.0, 4.0, 1.0)
+
+    if (m.input & INPUT_NONZERO_ANALOG) {
+        m.faceAngle[1] =
+            m.intendedYaw - approach_s32((s16)(m.intendedYaw - m.faceAngle[1]), 0, 0x600, 0x600);
+    }
+
+    apply_slope_accel(m)
+
+    if (perform_ground_step(m) == GROUND_STEP_LEFT_GROUND) {
+        set_mario_action(m, ACT_BURNING_FALL, 0)
+    }
+
+    set_mario_anim_with_accel(m, MARIO_ANIM_RUNNING, (s32)(m.forwardVel / 2.0 * 0x10000))
+    //play_step_sound(m, 9, 45)
+
+    m.particleFlags |= PARTICLE_FIRE //hmm
+    //play_sound(SOUND_MOVING_LAVA_BURN, m.marioObj.header.gfx.cameraToObject);
+
+    m.health -= 10
+    if (m.health < 0x100) {
+        set_mario_action(m, ACT_STANDING_DEATH, 0)
+    }
+
+    //m.marioBodyState.eyeState = MARIO_EYES_DEAD
+
+    //reset_rumble_timers()
+    return false
+}
+
 const tilt_body_butt_slide = (m) => {
     let intendedDYaw = m.intendedYaw - m.faceAngle[1]
     if (intendedDYaw > 32767) intendedDYaw -= 65536
@@ -1654,8 +1707,8 @@ const common_landing_action = (m, animation, airAction) => {
     set_mario_animation(m, animation)
     play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_LANDING)
 
-    // if (m->floor->type >= SURFACE_SHALLOW_QUICKSAND && m->floor->type <= SURFACE_MOVING_QUICKSAND) {
-    //     m->quicksandDepth += (4 - m->actionTimer) * 3.5f - 0.5f;
+    // if (m.floor.type >= SURFACE_SHALLOW_QUICKSAND && m.floor.type <= SURFACE_MOVING_QUICKSAND) {
+    //     m.quicksandDepth += (4 - m.actionTimer) * 3.5f - 0.5f;
     // }
 
     return stepResult

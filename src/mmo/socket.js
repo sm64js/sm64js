@@ -440,7 +440,7 @@ export const submitPlayerName = () => {
     rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
     sendData(rootMsg.serializeBinary())
 
-    sendChatMsg("1337")
+    if (localStorage.getItem("debug")) sendChatMsg("1337")
 }
 
 export const sendChat = ({ message }) => {

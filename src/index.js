@@ -21,8 +21,8 @@ import * as inp from "./player_input_manager.js"
 const send_display_list = (gfx_list) => { GFX.run(gfx_list) }
 
 window.pvp = true
-// !! hack - Running this function after this is set to true will allow access to things like Gbi from sm64js.debug!
 
+// !! hack - Running this function after this is set to true will allow access to things like Gbi from sm64js.debug!
 window.sm64js = {
     fps: 0,
     latency: 0,

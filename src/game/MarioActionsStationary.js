@@ -1,4 +1,5 @@
 import * as Mario from "./Mario"
+import * as MarioConstants from "../include/mario_constants"
 import { stationary_ground_step } from "./MarioStep"
 
 const check_common_idle_cancels = (m) => {
@@ -368,27 +369,62 @@ const act_butt_slide_stop = (m) => {
     return 0
 }
 
+const check_common_stationary_cancels = (m) => {
+    if (m.pos[1] < m.waterLevel - 100) {
+        if (m.action == Mario.ACT_SPAWN_SPIN_LANDING) {
+            load_level_init_text(0)
+        }
+        Mario.update_mario_sound_and_camera(m)
+        return Mario.set_water_plunge_action(m)
+    }
+
+    if (m.input & Mario.INPUT_SQUISHED) {
+        Mario.update_mario_sound_and_camera(m)
+        return Mario.drop_and_set_mario_action(m, Mario.ACT_SQUISHED, 0)
+    }
+
+    if (m.action != Mario.ACT_UNKNOWN_0002020E) {
+        if (m.health < 0x100) {
+            Mario.update_mario_sound_and_camera(m)
+            return Mario.drop_and_set_mario_action(m, Mario.ACT_STANDING_DEATH, 0)
+        }
+    }
+    return 0
+}
+
 export const mario_execute_stationary_action = (m) => {
+    let cancel
+
+    if (check_common_stationary_cancels(m)) {
+        return 1
+    }
 
     switch (m.action) {
-        case Mario.ACT_IDLE: return act_idle(m)
-        case Mario.ACT_BRAKING_STOP: return act_braking_stop(m)
-        case Mario.ACT_JUMP_LAND_STOP: return act_jump_land_stop(m)
-        case Mario.ACT_STANDING_AGAINST_WALL: return act_standing_against_wall(m)
-        case Mario.ACT_FREEFALL_LAND_STOP: return act_freefall_land_stop(m)
-        case Mario.ACT_SIDE_FLIP_LAND_STOP: return act_side_flip_land_stop(m)
-        case Mario.ACT_DOUBLE_JUMP_LAND_STOP: return act_double_jump_land_stop(m)
-        case Mario.ACT_TRIPLE_JUMP_LAND_STOP: return act_triple_jump_land_stop(m)
-        case Mario.ACT_START_CROUCHING: return act_start_crouching(m)
-        case Mario.ACT_CROUCHING: return act_crouching(m)
-        case Mario.ACT_STOP_CROUCHING: return act_stop_crouching(m)
-        case Mario.ACT_BACKFLIP_LAND_STOP: return act_backflip_land_stop(m)
-        case Mario.ACT_LONG_JUMP_LAND_STOP: return act_long_jump_land_stop(m)
-        case Mario.ACT_START_CRAWLING: return act_start_crawling(m)
-        case Mario.ACT_STOP_CRAWLING: return act_stop_crawling(m)
-        case Mario.ACT_SLIDE_KICK_SLIDE_STOP: return act_slide_kick_slide_stop(m)
-        case Mario.ACT_GROUND_POUND_LAND: return act_ground_pound_land(m)
-        case Mario.ACT_BUTT_SLIDE_STOP: return act_butt_slide_stop(m)
-        default: throw "unknown action stationary"
+        case Mario.ACT_IDLE:                  cancel = act_idle(m);                  break;
+        case Mario.ACT_BRAKING_STOP:          cancel = act_braking_stop(m);          break;
+        case Mario.ACT_JUMP_LAND_STOP:        cancel = act_jump_land_stop(m);        break;
+        case Mario.ACT_STANDING_AGAINST_WALL: cancel = act_standing_against_wall(m); break;
+        case Mario.ACT_FREEFALL_LAND_STOP:    cancel = act_freefall_land_stop(m);    break;
+        case Mario.ACT_SIDE_FLIP_LAND_STOP:   cancel = act_side_flip_land_stop(m);   break;
+        case Mario.ACT_DOUBLE_JUMP_LAND_STOP: cancel = act_double_jump_land_stop(m); break;
+        case Mario.ACT_TRIPLE_JUMP_LAND_STOP: cancel = act_triple_jump_land_stop(m); break;
+        case Mario.ACT_START_CROUCHING:       cancel = act_start_crouching(m);       break;
+        case Mario.ACT_CROUCHING:             cancel = act_crouching(m);             break;
+        case Mario.ACT_STOP_CROUCHING:        cancel = act_stop_crouching(m);        break;
+        case Mario.ACT_BACKFLIP_LAND_STOP:    cancel = act_backflip_land_stop(m);    break;
+        case Mario.ACT_LONG_JUMP_LAND_STOP:   cancel = act_long_jump_land_stop(m);   break;
+        case Mario.ACT_START_CRAWLING:        cancel = act_start_crawling(m);        break;
+        case Mario.ACT_STOP_CRAWLING:         cancel = act_stop_crawling(m);         break;
+        case Mario.ACT_SLIDE_KICK_SLIDE_STOP: cancel = act_slide_kick_slide_stop(m); break;
+        case Mario.ACT_GROUND_POUND_LAND:     cancel = act_ground_pound_land(m);     break;
+        case Mario.ACT_BUTT_SLIDE_STOP:       cancel = act_butt_slide_stop(m);       break;
+        default:
+            throw "unkown action stationary"
     }
+
+    if (!cancel && (m.input & Mario.INPUT_IN_WATER)) {
+        m.particleFlags |= MarioConstants.PARTICLE_IDLE_WATER_WAVE
+    }
+
+    return cancel
 }

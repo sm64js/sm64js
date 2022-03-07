@@ -49,10 +49,12 @@ import {
     ACT_BUTT_SLIDE_AIR,
     ACT_HOLD_BUTT_SLIDE_AIR,
     ACT_FREEFALL,
+    ACT_PARACHUTING,
 
     INPUT_A_PRESSED,
     INPUT_B_PRESSED,
     INPUT_INTERACT_OBJ_GRABBABLE,
+    INPUT_OFF_FLOOR,
 
     MARIO_KICKING,
     MARIO_PUNCHING,
@@ -85,7 +87,7 @@ import { sins, coss, int16, s16 } from "../utils"
 import { networkData, sendAttackToServer } from "../mmo/socket"
 import { gLinker } from "./Linker"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
-import { SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND } from "../include/surface_terrains"
+import { SURFACE_0004, SURFACE_BURNING, SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND } from "../include/surface_terrains"
 import { COURSE_IS_MAIN_COURSE } from "../levels/course_defines"
 import { CameraInstance as Camera } from "./Camera"
 import * as CAMERA from "./Camera"  // for constants
@@ -225,6 +227,16 @@ const check_death_barrier = (m) => {
 
 }
 
+const check_basic_lava = (m) => {
+    if (m.pos[1] < m.floorHeight + 4) {
+        m.health -= 0x330
+        if (m.health < 0) { m.health = 0; respawn_player(m) } else { 
+            m.vel[1] = 80
+            set_mario_action(m, ACT_FREEFALL, 0)
+        }
+    }
+}
+
 export const mario_handle_special_floors = (m) => {
     if ((m.action & ACT_GROUP_MASK) == ACT_GROUP_CUTSCENE) {
         return
@@ -234,9 +246,18 @@ export const mario_handle_special_floors = (m) => {
         const floorType = m.floor.type
 
         switch (floorType) {
+            case SURFACE_BURNING:
+                check_basic_lava(m)
+                break
             case SURFACE_DEATH_PLANE:
             case SURFACE_VERTICAL_WIND:
                 check_death_barrier(m)
+                break
+            case SURFACE_0004:
+                if (!(m.input & INPUT_OFF_FLOOR && m.health > 0xFF)) {
+                    if (Area.gCurrLevelNum != 29) { m.vel[1] = 200 } else { m.vel[1] = 240 }
+                    set_mario_action(m, ACT_PARACHUTING, 0)
+                }
                 break
         }
     }

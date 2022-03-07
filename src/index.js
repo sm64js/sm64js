@@ -29,9 +29,11 @@ window.sm64js = {
     totalTrianges: 0,
     playerInput: {},
     gGlobalTimer: 0,
+    reset: false,
     snow: false,
     HUDHidden: false,
     widescreen: false,
+    redive: true,
     debug: {
         marioList: [],
         print: PrintInstance,
@@ -68,7 +70,7 @@ export const textureVersion = 41
 const produce_one_frame = () => {
 	let respText = ""
 		if (reset_delay > 0) {
-			window.reset = false;
+			window.sm64js.reset = false;
 			let buff = Math.round(reset_delay / 30)
 			respText = ` (${buff})`
 			reset_delay--
@@ -86,13 +88,12 @@ const produce_one_frame = () => {
     const finished_frame = performance.now()
     totalFrameTimeBuffer.push(finished_frame - start_frame)
 
-	if (window.reset == true && reset_delay < 1) reset_delay = (30 * 45)  /// 45 Seconds
+	if (window.sm64js.reset && reset_delay < 1) reset_delay = (30 * 45)  /// 45 Seconds
 
     //if (n_frames > 100000) { throw "Hit max frames" }
     //console.log("new frame: " + n_frames)
     n_frames++
 
-    //Updating the respawn button every frame breaks it if using the div method, resorted to the old method for the css
 	document.getElementById("respawnButton").innerHTML = `Respawn${respText}`
 }
 
@@ -132,23 +133,6 @@ const main_func = () => {
 
 //const url_hash = new URLSearchParams(window.location.hash.slice(1))
 const url_params = new URLSearchParams(window.location.search)
-
-const letterColors = ["#3e51fa", "#fa3e3e", "#00ff00", "yellow"]
-
-const generateRainbowText = (element) => {
-    var text = element.innerText
-    element.innerHTML = ""
-    for (let i = 0; i < text.length; i++) {
-        let charElem = document.createElement("span")
-        charElem.style.color = letterColors[i % 4]
-        charElem.innerHTML = text[i]
-        element.appendChild(charElem)
-    }
-}
-
-Array.from(document.getElementsByClassName("rainbowText")).forEach((element) => {
-    generateRainbowText(element)
-})
 
 const createRingBuffer = (length) => {
     let index = 0

@@ -64,9 +64,12 @@ export const SURFACE_ICE                           = 0x002E // Slippery Ice, in 
 export const SURFACE_NO_CAM_COL_VERY_SLIPPERY     = 0x0078 // Surface with no cam collision flag, very slippery with noise (THI)
 export const SURFACE_NO_CAM_COL_SLIPPERY          = 0x0079 // Surface with no cam collision flag, slippery with noise (CCM, PSS and TTM slides)
 export const SURFACE_SWITCH = 0x007A // Surface with no cam collision flag, non-slippery with noise, used by switches and Dorrie
-
 export const SURFACE_PAINTING_WOBBLE_D0 = 0x00D0 // Painting wobble (HMC & COTMC - Left), makes the painting wobble if touched
 export const SURFACE_WOBBLING_WARP = 0x00FD
+
+export const SURFACE_IS_QUICKSAND     = (cmd) => { return (cmd >= 0x21 && cmd < 0x28) }  // Doesn't include SURFACE_INSTANT_MOVING_QUICKSAND
+export const SURFACE_IS_NOT_HARD      = (cmd) => { return (cmd != SURFACE_HARD && !(cmd >= 0x35 && cmd <= 0x37)) }
+export const SURFACE_IS_PAINTING_WARP = (cmd) => { return (cmd >= 0xD3 && cmd < 0xFD) }
 
 export const SURFACE_FLAG_DYNAMIC          = (1 << 0)
 export const SURFACE_FLAG_NO_CAM_COLLISION = (1 << 1)

@@ -577,6 +577,7 @@ const act_in_cannon = (m) => {
     switch (m.actionState) {
         case 0:
             m.marioObj.header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE
+            if (!m.usedObj) { m.actionState = 1; break; }
             m.usedObj.rawData[oInteractStatus] = INT_STATUS_INTERACTED
 
             m.statusForCamera.cameraEvent = Camera.CAM_EVENT_CANNON
@@ -594,7 +595,7 @@ const act_in_cannon = (m) => {
             break
 
         case 1:
-            if (!m.usedObj) { m.actionState = 2 }
+            if (!m.usedObj) { m.actionState = 2; break; }
             if (m.usedObj.rawData[oAction] == 1) {
                 m.faceAngle[0] = m.usedObj.rawData[oMoveAnglePitch]
                 m.faceAngle[1] = m.usedObj.rawData[oMoveAngleYaw]

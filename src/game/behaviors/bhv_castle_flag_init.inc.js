@@ -1,5 +1,6 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { oPosY, oPosX, oPosZ, oFaceAngleYaw } from "../../include/object_constants"
+import { AreaInstance as Area } from "../Area"
 
 const flagObjects = []
 
@@ -36,6 +37,8 @@ export const updateFlagData = (pos, angle, i) => {
 }
 
 export const bhv_castle_flag_loop = () => {
+    if (Area.gCurrLevelNum == 16) return
+    
     const o = ObjectListProc.gCurrentObject
 
     o.rawData[oFaceAngleYaw] += 0x800

@@ -10,8 +10,8 @@ import { totwc_seg7_macro_objs } from "./areas/1/macro.inc"
 
 const script_func_local_1 = [
     { command: LevelCommands.load_model_from_geo, args: [MODEL_CAP_SWITCH, cap_switch_geo] },
-    { command: LevelCommands.place_object, args: [/*acts?*/ 0x1F, /*model*/ MODEL_CAP_SWITCH, /*pos*/ 0, -2047, 10, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCollisionObj(capswitch_collision_05003448)] },
-    { command: LevelCommands.place_object, args: [/*acts?*/ 0x1F, /*model*/ MODEL_CAP_SWITCH, /*pos*/ 0, -2047, 10, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCollisionObj(capswitch_collision_050033D0)] },
+    { command: LevelCommands.place_object, args: [/*model*/ MODEL_CAP_SWITCH, /*pos*/ 0, -2047, 10, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCollisionObj(capswitch_collision_05003448)] },
+    { command: LevelCommands.place_object, args: [/*model*/ MODEL_CAP_SWITCH, /*pos*/ 0, -2047, 10, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCollisionObj(capswitch_collision_050033D0)] },
     { command: LevelCommands.return }
 ]
 

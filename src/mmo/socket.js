@@ -212,7 +212,7 @@ export const sendAttackToServer = (targetMarioID) => {
             const rootMsg = new RootMsg()
             rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
             sendData(rootMsg.serializeBinary())
-            playFlagSound("/mmo/assets/sound/flag_taken.mp3")
+            playFlagSound("/mmo/assets/audio/flag_taken.mp3")
         }
     }
 
@@ -230,7 +230,7 @@ const updateConnectedMsg = () => {
         elem.innerHTML = "Connected to server  -  players online: " + (numPlayers).toString()
         elem.style.color = "lawngreen"
     } else {
-        elem.innerHTML = "Not connected to server - refresh the page"
+        elem.innerHTML = "Not connected to server; most likely kicked because of AFK timeout - refresh the page"
         elem.style.color = "red"
         window.sm64js.latency = 0
     }
@@ -395,7 +395,7 @@ const checkForFlagGrab = () => {
                 const rootMsg = new RootMsg()
                 rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
                 sendData(rootMsg.serializeBinary())
-                playFlagSound("/mmo/assets/sound/flag_collect.mp3")
+                playFlagSound("/mmo/assets/audio/flag_collect.mp3")
                 // m.numStars++
             }
         }
@@ -407,9 +407,6 @@ let pName
 export { pName }
 
 export const submitPlayerName = () => {
-
-    //document.getElementById("pvpButton").hidden = true //why?
-    // document.getElementById("mapDiv").hidden = true
     document.getElementById("yellowControls").style = ""
 	Game.load_pvp()
 
@@ -429,7 +426,11 @@ export const submitPlayerName = () => {
         }
     }
 
-    const level = gameID ? 0 : parseInt(document.getElementById("mapSelect").value)
+    let select = document.getElementById("mapSelect")
+    select.onchange = () => {
+        console.log("TODO warp to " + select.value)
+    }
+    const level = gameID ? 0 : parseInt(select.value)
     joinGameMsg.setLevel(level)
     if (gameID) { joinGameMsg.setGameId(gameID) }
     const initializationMsg = new InitializationMsg()
@@ -440,7 +441,7 @@ export const submitPlayerName = () => {
     rootMsg.setUncompressedSm64jsMsg(sm64jsMsg)
     sendData(rootMsg.serializeBinary())
 
-    if (localStorage.getItem("debug")) sendChatMsg("1337")
+    if (localStorage.getItem("debug")) { sendChatMsg("1337"); window.sm64js.updateDebug() }
 }
 
 export const sendChat = ({ message }) => {

@@ -97,7 +97,7 @@ const apply_slope_accel = (m) => {
 
 }
 
-const coef_values = [2.0, 0.8, 3.0]
+const coef_values = [2.0, 1.0, 2.0]
 
 const apply_slope_decel = (m, decelCoef) => {
     let stopped = 0
@@ -448,7 +448,7 @@ const act_walking = (m) => {
 
 const slide_bonk = (m, fastAction, slowAction) => {
     if (m.forwardVel > 16.0) {
-        mario_bonk_reflection(m, true)
+        mario_bonk_reflection(m, 1)
         Mario.drop_and_set_mario_action(m, fastAction, 0)
     } else {
         Mario.set_forward_vel(m, 0.0)
@@ -904,6 +904,8 @@ const common_slide_action = (m, endAction, airAction, animation) => {
 
         case Mario.GROUND_STEP_HIT_WALL:
             if (!Mario.mario_floor_is_slippery(m)) {
+                if (!m.wall) break
+
                 if (m.forwardVel > 16.0) {
                     m.particleFlags |= MarioConstants.PARTICLE_VERTICAL_STAR
                 }
@@ -1317,9 +1319,6 @@ const act_crawling = (m) => {
     return 0
 }
 
-// the rate of which each character decelerates when punching. Depending on the value of get_character_type, the appropriate number is called.
-const decel_values = [0.5, 0.4, 0.1]
-
 const act_move_punching = (m) => {
     if (should_begin_sliding(m)) {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
@@ -1334,7 +1333,7 @@ const act_move_punching = (m) => {
     mario_update_punch_sequence(m)
 
     if (m.forwardVel >= 0.0) {
-        apply_slope_decel(m, decel_values[Mario.get_character_type(m)])
+        apply_slope_decel(m, 0.5)
     } else {
         if ((m.forwardVel += 8.0) >= 0.0) {
             m.forwardVel = Mario.get_character_type(m) == 1 ? 100 : 0.0
@@ -1613,6 +1612,7 @@ export const mario_execute_moving_action = (m) => {
         case Mario.ACT_QUICKSAND_JUMP_LAND:      cancel = act_quicksand_jump_land(m);      break
         case Mario.ACT_HOLD_QUICKSAND_JUMP_LAND: cancel = act_hold_quicksand_jump_land(m); break
         case Mario.ACT_LONG_JUMP_LAND:           cancel = act_long_jump_land(m);           break
+        case Mario.ACT_POUND_ROLL:               cancel = act_pound_roll(m);               break
     }
 
     if (!cancel && (m.input & Mario.INPUT_IN_WATER)) {

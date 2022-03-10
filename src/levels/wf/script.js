@@ -1,4 +1,5 @@
-import { LevelCommandsInstance as LevelCommands } from "../../engine/LevelCommands"
+import { LevelCommandsInstance as LevelCommands, SET_BACKGROUND_MUSIC } from "../../engine/LevelCommands"
+import { SEQ_LEVEL_GRASS } from "../../include/seq_ids"
 import { bhvMario } from "../../game/BehaviorData"
 import { LevelUpdateInstance as LevelUpdate } from "../../game/LevelUpdate"
 import { bubbly_tree_geo } from "../../actors/tree/geo.inc"
@@ -75,18 +76,19 @@ export const level_wf_entry = [
     { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_11, wf_geo_0009D0] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_12, wf_geo_0009E8] },
     { command: LevelCommands.begin_area, args: [1, wf_geo_000BF8] },
-	{ command: LevelCommands.place_object, args: [0x1F, MODEL_LEVEL_GEOMETRY_03, 2305, 2432,  -255, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [0x1F, MODEL_LEVEL_GEOMETRY_04, 3405, 1664, -1791, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [0x1F, MODEL_LEVEL_GEOMETRY_05, 3840,    0, -2303, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [0x1F, MODEL_LEVEL_GEOMETRY_05, 3840,    0, -1279, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [0x1F, MODEL_LEVEL_GEOMETRY_06,    0,    0,     0, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [0x1F, MODEL_LEVEL_GEOMETRY_07, 1757, 3519, -3151, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [0x1F, MODEL_LEVEL_GEOMETRY_0A, 3840,  794,  2688, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [0x1F, MODEL_LEVEL_GEOMETRY_0C, 1408, 2522,  2431, 0,0,0, 0x00000000, bhvStaticObject] },
-	{ command: LevelCommands.place_object, args: [0x1F, MODEL_WF_GIANT_POLE    ,-2560, 2560,  -256, 0,0,0, 0x00000000, bhvGiantPole   ] },
-	{ command: LevelCommands.place_object, args: [0x1F, MODEL_NONE             ,-2495, 1331,  -256, 0,0,0, 0x003D0000, bhvPoleGrabbing] },
-    { command: LevelCommands.place_object, args: [/*acts?*/ 0x1F, /*model*/ MODEL_STAR, /*pos*/ 0, 0, 0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving] },
+	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_03, 2305, 2432,  -255, 0,0,0, 0x00000000, bhvStaticObject] },
+	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_04, 3405, 1664, -1791, 0,0,0, 0x00000000, bhvStaticObject] },
+	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_05, 3840,    0, -2303, 0,0,0, 0x00000000, bhvStaticObject] },
+	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_05, 3840,    0, -1279, 0,0,0, 0x00000000, bhvStaticObject] },
+	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_06,    0,    0,     0, 0,0,0, 0x00000000, bhvStaticObject] },
+	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_07, 1757, 3519, -3151, 0,0,0, 0x00000000, bhvStaticObject] },
+	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_0A, 3840,  794,  2688, 0,0,0, 0x00000000, bhvStaticObject] },
+	{ command: LevelCommands.place_object, args: [MODEL_LEVEL_GEOMETRY_0C, 1408, 2522,  2431, 0,0,0, 0x00000000, bhvStaticObject] },
+	{ command: LevelCommands.place_object, args: [MODEL_WF_GIANT_POLE    ,-2560, 2560,  -256, 0,0,0, 0x00000000, bhvGiantPole   ] },
+	{ command: LevelCommands.place_object, args: [MODEL_NONE             ,-2495, 1331,  -256, 0,0,0, 0x003D0000, bhvPoleGrabbing] },
+    { command: LevelCommands.place_object, args: [/*model*/ MODEL_STAR, /*pos*/ 0, 0, 0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving] },
     { command: LevelCommands.terrain, args: [wf_seg7_collision_070102D8] },
+    SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0000, /*seq*/ SEQ_LEVEL_GRASS),
     { command: LevelCommands.end_area },
     { command: LevelCommands.set_mario_pos, args: [1, 90, 2600, 1256,  5120] },
     { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_or_update, LevelUpdate] },

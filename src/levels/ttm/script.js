@@ -1,4 +1,5 @@
-import { LevelCommandsInstance as LevelCommands } from "../../engine/LevelCommands"
+import { LevelCommandsInstance as LevelCommands, SET_BACKGROUND_MUSIC } from "../../engine/LevelCommands"
+import { SEQ_LEVEL_GRASS } from "../../include/seq_ids"
 import { bhvMario, bhvCastleFlagWaving } from "../../game/BehaviorData"
 import { LevelUpdateInstance as LevelUpdate } from "../../game/LevelUpdate"
 import { ttm_geo_000A70 } from "./areas/1/geo.inc"
@@ -73,8 +74,9 @@ export const level_ttm_entry = [
     { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_15, ttm_geo_000A18] },
     { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_16, ttm_geo_000A40] },
     { command: LevelCommands.begin_area, args: [1, ttm_geo_000A70] },
-    { command: LevelCommands.place_object, args: [/*acts?*/ 0x1F, /*model*/ MODEL_STAR, /*pos*/ 0, 0, 0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving] },
+    { command: LevelCommands.place_object, args: [/*model*/ MODEL_STAR, /*pos*/ 0, 0, 0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving] },
     { command: LevelCommands.terrain, args: [ttm_seg7_area_1_collision] },
+    SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0000, /*seq*/ SEQ_LEVEL_GRASS),
     { command: LevelCommands.end_area },
     { command: LevelCommands.set_mario_pos, args: [1, 45, 102, -4332, 5734] },
     { command: LevelCommands.call, args: [0, LevelUpdate.lvl_init_or_update, LevelUpdate] },

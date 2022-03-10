@@ -1,4 +1,4 @@
-import {wf_seg7_texture_07000800, } from "../../../texture.inc.js"
+import {wf_seg7_texture_07000800, } from "../../../texture.inc"
 import * as Gbi from "../../../../../include/gbi"
 const wf_seg7_lights_070051C8 = Gbi.gdSPDefLights1(
 	    0x66, 0x66, 0x66,

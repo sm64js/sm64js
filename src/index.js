@@ -403,6 +403,10 @@ window.togglePvp = () => {
 	document.getElementById("pvpButton").innerHTML = '<div class="sm64button">'+('PvP: ' + (window.pvp ? 'On' : 'Off'))+'</div>'
 }
 
+export const loadSocket = () => {
+    Socket.loadSocket()
+}
+
 window.onload = async () => {
     if (checkForRom() && url_params.has("autostart") && localStorage['rules'] == rulesVersion) startGame()
     document.getElementById('mainContent').hidden = false
@@ -463,8 +467,7 @@ window.onload = async () => {
         })
         Socket.recvAuthorizedUser(res)
     }
-    Socket.loadSocket()
-
+    loadSocket()
 }
 
 window.addEventListener("keydown", (e) => {
@@ -474,9 +477,6 @@ window.addEventListener("keydown", (e) => {
         }
     }
 })
-
-// if (localStorage['rules'] != rulesVersion) $('#rules').modal({ backdrop: 'static', keyboard: false })
-// $("#rules").on('hide.bs.modal', () => { localStorage['rules'] = rulesVersion })
 
 const checkForRom = () => {   /// happens one time when the page is loaded
     const url = new URL(window.location.href)

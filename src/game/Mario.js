@@ -1466,9 +1466,9 @@ export const execute_mario_action = (m) => {
                     inLoop = mario_execute_submerged_action(m)
                     break
 
-                // case ACT_GROUP_CUTSCENE:
-                //     inLoop = mario_execute_cutscene_action(m)
-                //     break
+                case ACT_GROUP_CUTSCENE:
+                    inLoop = mario_execute_cutscene_action(m)
+                    break
 
                 case ACT_GROUP_AUTOMATIC:
                     inLoop = mario_execute_automatic_action(m)
@@ -1478,7 +1478,7 @@ export const execute_mario_action = (m) => {
                     inLoop = mario_execute_object_action(m)
                     break
 
-                default: throw "unkown action group"
+                default: throw "unknown action group " + m.action
             }
         }
 

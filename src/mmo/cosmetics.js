@@ -444,7 +444,7 @@ export const recvPlayerNameResponse = (msg) => {
         document.getElementById("playerNameButton").hidden = true
         document.getElementById("discordNameRow").hidden = true
         document.getElementById("customNameRow").hidden = true
-        document.getElementById("mapSelect").disabled = true
+        // document.getElementById("mapSelect").disabled = true
         window.playerNameAccepted = true
         //localStorage['playername'] = msg.getName()
 

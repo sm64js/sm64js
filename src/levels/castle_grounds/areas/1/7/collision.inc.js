@@ -1,9 +1,11 @@
-import { COL_INIT, COL_END,
-         COL_VERTEX_INIT, COL_VERTEX,
-         COL_TRI_INIT, COL_TRI_SPECIAL, COL_TRI_STOP,
-         SURFACE_FLOWING_WATER                           } from "../../../../../include/surface_terrains"
+// Castle Grounds
 
+import {
+    COL_INIT, COL_VERTEX_INIT, COL_VERTEX, COL_TRI_INIT, COL_TRI_SPECIAL, COL_TRI_STOP, COL_END,
+    SURFACE_FLOWING_WATER
+} from "../../../../../include/surface_terrains"
 
+// 0x07010DB4 - 0x07010E10
 export const castle_grounds_seg7_collision_moat_grills = [
     COL_INIT(),
     COL_VERTEX_INIT(0x8),
@@ -23,3 +25,5 @@ export const castle_grounds_seg7_collision_moat_grills = [
     COL_TRI_STOP(),
     COL_END(),
 ].flat();
+
+// 1618763470 - 2021-04-18 06:31:12 -1000

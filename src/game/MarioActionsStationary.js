@@ -339,14 +339,15 @@ const act_ground_pound_land = (m) => {
     if (m.input & Mario.INPUT_ABOVE_SLIDE) {
         return Mario.set_mario_action(m, Mario.ACT_CROUCH_SLIDE, 0) /// TODO act butt slide
     }
+
+    // odyssey
 	if (m.input & Mario.INPUT_A_PRESSED) {
 		m.vel[1] = 50.0
 		Mario.set_forward_vel(m, 20.0)
 		return Mario.set_mario_action(m, Mario.ACT_TRIPLE_JUMP, 0)
 	}
-    if (m.input & Mario.INPUT_Z_DOWN && Mario.get_character_type(m) == 2) {
-        if (m.input & Mario.INPUT_A_DOWN) return
-        
+    
+    if ((m.input & Mario.INPUT_Z_DOWN) && !(m.input & Mario.INPUT_A_DOWN) && Mario.get_character_type(m) == 2) {
         Mario.set_forward_vel(m, 100.0)
         return Mario.set_mario_action(m, Mario.ACT_POUND_ROLL, 0)
     }

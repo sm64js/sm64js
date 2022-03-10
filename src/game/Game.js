@@ -3,7 +3,8 @@ import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
 /*import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { level_main_scripts_entry } from "../levels/scripts"
 import * as Mario from "./Mario"
-import { networkData } from "../mmo/socket"*/
+import { networkData, submitPlayerName } from "../mmo/socket"
+import { loadSocket } from "../index"*/
 import * as Gbi from "../include/gbi"
 
 class Game {
@@ -97,7 +98,9 @@ class Game {
     }
 }
 
-/*window.warp_to = (id) => {
+/*window.resubmit = submitPlayerName
+window.loadSocket = loadSocket
+window.warp_to = (id) => {
     // LevelCommands.transition(WARP_TRANSITION_FADE_FROM_STAR, 20, 0, 0, 0)
     LevelCommands.reset_call_loop()
     LevelCommands.unload_area(1)

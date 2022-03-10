@@ -2,7 +2,14 @@ import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { GEO_CONTEXT_RENDER, GEO_CONTEXT_CREATE } from "../engine/graph_node"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { AreaInstance as Area } from "./Area"
-import * as LEVEL from "../levels/level_defines_constants"
+import { gLinker } from "./Linker"
+import {
+    LEVEL_NONE, LEVEL_UNKNOWN_1, LEVEL_UNKNOWN_2, LEVEL_UNKNOWN_3, LEVEL_BBH, LEVEL_CCM, LEVEL_CASTLE, LEVEL_HMC,
+    LEVEL_SSL, LEVEL_BOB, LEVEL_SL, LEVEL_WDW, LEVEL_JRB, LEVEL_THI, LEVEL_TTC, LEVEL_RR, LEVEL_CASTLE_GROUNDS,
+    LEVEL_BITDW, LEVEL_VCUTM, LEVEL_BITFS, LEVEL_SA, LEVEL_BITS, LEVEL_LLL, LEVEL_DDD, LEVEL_WF, LEVEL_ENDING,
+    LEVEL_CASTLE_COURTYARD, LEVEL_PSS, LEVEL_COTMC, LEVEL_TOTWC, LEVEL_BOWSER_1, LEVEL_WMOTR, LEVEL_UNKNOWN_32,
+    LEVEL_BOWSER_2, LEVEL_BOWSER_3, LEVEL_UNKNOWN_35, LEVEL_TTM, LEVEL_UNKNOWN_37, LEVEL_UNKNOWN_38
+} from "../levels/level_defines_constants"
 
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { atan2s } from "../engine/math_util"
@@ -10,58 +17,57 @@ import * as MathUtil from "../engine/math_util"
 import * as Mario from "./Mario"
 import { oPosY } from "../include/object_constants"
 import { SURFACE_DEATH_PLANE } from "../include/surface_terrains"
-import { sins, int16, s16 } from "../utils"
+import { sins, s16, int16 } from "../utils"
 import { HudInstance as Hud } from "./Hud"
-
 import { selfAdmin } from "../mmo/chat"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
 const LEVEL_AREA_INDEX = (levelNum, areaNum) => {return (levelNum << 4) + areaNum}
 
-export const AREA_BBH                = LEVEL_AREA_INDEX(LEVEL.LEVEL_BBH, 1)
-export const AREA_CCM_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL.LEVEL_CCM, 1)
-export const AREA_CCM_SLIDE          = LEVEL_AREA_INDEX(LEVEL.LEVEL_CCM, 2)
-export const AREA_CASTLE_LOBBY       = LEVEL_AREA_INDEX(LEVEL.LEVEL_CASTLE, 1)
-export const AREA_CASTLE_TIPPY       = LEVEL_AREA_INDEX(LEVEL.LEVEL_CASTLE, 2)
-export const AREA_CASTLE_BASEMENT    = LEVEL_AREA_INDEX(LEVEL.LEVEL_CASTLE, 3)
-export const AREA_HMC                = LEVEL_AREA_INDEX(LEVEL.LEVEL_HMC, 1)
-export const AREA_SSL_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL.LEVEL_SSL, 1)
-export const AREA_SSL_PYRAMID        = LEVEL_AREA_INDEX(LEVEL.LEVEL_SSL, 2)
-export const AREA_SSL_EYEROK         = LEVEL_AREA_INDEX(LEVEL.LEVEL_SSL, 3)
-export const AREA_BOB                = LEVEL_AREA_INDEX(LEVEL.LEVEL_BOB, 1)
-export const AREA_SL_OUTSIDE         = LEVEL_AREA_INDEX(LEVEL.LEVEL_SL, 1)
-export const AREA_SL_IGLOO           = LEVEL_AREA_INDEX(LEVEL.LEVEL_SL, 2)
-export const AREA_WDW_MAIN           = LEVEL_AREA_INDEX(LEVEL.LEVEL_WDW, 1)
-export const AREA_WDW_TOWN           = LEVEL_AREA_INDEX(LEVEL.LEVEL_WDW, 2)
-export const AREA_JRB_MAIN           = LEVEL_AREA_INDEX(LEVEL.LEVEL_JRB, 1)
-export const AREA_JRB_SHIP           = LEVEL_AREA_INDEX(LEVEL.LEVEL_JRB, 2)
-export const AREA_THI_HUGE           = LEVEL_AREA_INDEX(LEVEL.LEVEL_THI, 1)
-export const AREA_THI_TINY           = LEVEL_AREA_INDEX(LEVEL.LEVEL_THI, 2)
-export const AREA_THI_WIGGLER        = LEVEL_AREA_INDEX(LEVEL.LEVEL_THI, 3)
-export const AREA_TTC                = LEVEL_AREA_INDEX(LEVEL.LEVEL_TTC, 1)
-export const AREA_RR                 = LEVEL_AREA_INDEX(LEVEL.LEVEL_RR, 1)
-export const AREA_CASTLE_GROUNDS     = LEVEL_AREA_INDEX(LEVEL.LEVEL_CASTLE_GROUNDS, 1)
-export const AREA_BITDW              = LEVEL_AREA_INDEX(LEVEL.LEVEL_BITDW, 1)
-export const AREA_VCUTM              = LEVEL_AREA_INDEX(LEVEL.LEVEL_VCUTM, 1)
-export const AREA_BITFS              = LEVEL_AREA_INDEX(LEVEL.LEVEL_BITFS, 1)
-export const AREA_SA                 = LEVEL_AREA_INDEX(LEVEL.LEVEL_SA, 1)
-export const AREA_BITS               = LEVEL_AREA_INDEX(LEVEL.LEVEL_BITS, 1)
-export const AREA_LLL_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL.LEVEL_LLL, 1)
-export const AREA_LLL_VOLCANO        = LEVEL_AREA_INDEX(LEVEL.LEVEL_LLL, 2)
-export const AREA_DDD_WHIRLPOOL      = LEVEL_AREA_INDEX(LEVEL.LEVEL_DDD, 1)
-export const AREA_DDD_SUB            = LEVEL_AREA_INDEX(LEVEL.LEVEL_DDD, 2)
-export const AREA_WF                 = LEVEL_AREA_INDEX(LEVEL.LEVEL_WF, 1)
-export const AREA_ENDING             = LEVEL_AREA_INDEX(LEVEL.LEVEL_ENDING, 1)
-export const AREA_COURTYARD          = LEVEL_AREA_INDEX(LEVEL.LEVEL_CASTLE_COURTYARD, 1)
-export const AREA_PSS                = LEVEL_AREA_INDEX(LEVEL.LEVEL_PSS, 1)
-export const AREA_COTMC              = LEVEL_AREA_INDEX(LEVEL.LEVEL_COTMC, 1)
-export const AREA_TOTWC              = LEVEL_AREA_INDEX(LEVEL.LEVEL_TOTWC, 1)
-export const AREA_BOWSER_1           = LEVEL_AREA_INDEX(LEVEL.LEVEL_BOWSER_1, 1)
-export const AREA_WMOTR              = LEVEL_AREA_INDEX(LEVEL.LEVEL_WMOTR, 1)
-export const AREA_BOWSER_2           = LEVEL_AREA_INDEX(LEVEL.LEVEL_BOWSER_2, 1)
-export const AREA_BOWSER_3           = LEVEL_AREA_INDEX(LEVEL.LEVEL_BOWSER_3, 1)
-export const AREA_TTM_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL.LEVEL_TTM, 1)
+export const AREA_BBH                = LEVEL_AREA_INDEX(LEVEL_BBH, 1)
+export const AREA_CCM_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL_CCM, 1)
+export const AREA_CCM_SLIDE          = LEVEL_AREA_INDEX(LEVEL_CCM, 2)
+export const AREA_CASTLE_LOBBY       = LEVEL_AREA_INDEX(LEVEL_CASTLE, 1)
+export const AREA_CASTLE_TIPPY       = LEVEL_AREA_INDEX(LEVEL_CASTLE, 2)
+export const AREA_CASTLE_BASEMENT    = LEVEL_AREA_INDEX(LEVEL_CASTLE, 3)
+export const AREA_HMC                = LEVEL_AREA_INDEX(LEVEL_HMC, 1)
+export const AREA_SSL_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL_SSL, 1)
+export const AREA_SSL_PYRAMID        = LEVEL_AREA_INDEX(LEVEL_SSL, 2)
+export const AREA_SSL_EYEROK         = LEVEL_AREA_INDEX(LEVEL_SSL, 3)
+export const AREA_BOB                = LEVEL_AREA_INDEX(LEVEL_BOB, 1)
+export const AREA_SL_OUTSIDE         = LEVEL_AREA_INDEX(LEVEL_SL, 1)
+export const AREA_SL_IGLOO           = LEVEL_AREA_INDEX(LEVEL_SL, 2)
+export const AREA_WDW_MAIN           = LEVEL_AREA_INDEX(LEVEL_WDW, 1)
+export const AREA_WDW_TOWN           = LEVEL_AREA_INDEX(LEVEL_WDW, 2)
+export const AREA_JRB_MAIN           = LEVEL_AREA_INDEX(LEVEL_JRB, 1)
+export const AREA_JRB_SHIP           = LEVEL_AREA_INDEX(LEVEL_JRB, 2)
+export const AREA_THI_HUGE           = LEVEL_AREA_INDEX(LEVEL_THI, 1)
+export const AREA_THI_TINY           = LEVEL_AREA_INDEX(LEVEL_THI, 2)
+export const AREA_THI_WIGGLER        = LEVEL_AREA_INDEX(LEVEL_THI, 3)
+export const AREA_TTC                = LEVEL_AREA_INDEX(LEVEL_TTC, 1)
+export const AREA_RR                 = LEVEL_AREA_INDEX(LEVEL_RR, 1)
+export const AREA_CASTLE_GROUNDS     = LEVEL_AREA_INDEX(LEVEL_CASTLE_GROUNDS, 1)
+export const AREA_BITDW              = LEVEL_AREA_INDEX(LEVEL_BITDW, 1)
+export const AREA_VCUTM              = LEVEL_AREA_INDEX(LEVEL_VCUTM, 1)
+export const AREA_BITFS              = LEVEL_AREA_INDEX(LEVEL_BITFS, 1)
+export const AREA_SA                 = LEVEL_AREA_INDEX(LEVEL_SA, 1)
+export const AREA_BITS               = LEVEL_AREA_INDEX(LEVEL_BITS, 1)
+export const AREA_LLL_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL_LLL, 1)
+export const AREA_LLL_VOLCANO        = LEVEL_AREA_INDEX(LEVEL_LLL, 2)
+export const AREA_DDD_WHIRLPOOL      = LEVEL_AREA_INDEX(LEVEL_DDD, 1)
+export const AREA_DDD_SUB            = LEVEL_AREA_INDEX(LEVEL_DDD, 2)
+export const AREA_WF                 = LEVEL_AREA_INDEX(LEVEL_WF, 1)
+export const AREA_ENDING             = LEVEL_AREA_INDEX(LEVEL_ENDING, 1)
+export const AREA_COURTYARD          = LEVEL_AREA_INDEX(LEVEL_CASTLE_COURTYARD, 1)
+export const AREA_PSS                = LEVEL_AREA_INDEX(LEVEL_PSS, 1)
+export const AREA_COTMC              = LEVEL_AREA_INDEX(LEVEL_COTMC, 1)
+export const AREA_TOTWC              = LEVEL_AREA_INDEX(LEVEL_TOTWC, 1)
+export const AREA_BOWSER_1           = LEVEL_AREA_INDEX(LEVEL_BOWSER_1, 1)
+export const AREA_WMOTR              = LEVEL_AREA_INDEX(LEVEL_WMOTR, 1)
+export const AREA_BOWSER_2           = LEVEL_AREA_INDEX(LEVEL_BOWSER_2, 1)
+export const AREA_BOWSER_3           = LEVEL_AREA_INDEX(LEVEL_BOWSER_3, 1)
+export const AREA_TTM_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL_TTM, 1)
 
 const CAM_MODE_MARIO_ACTIVE          =  0x01
 const CAM_MODE_LAKITU_WAS_ZOOMED_OUT =  0x02
@@ -88,23 +94,6 @@ export const CAMERA_MODE_FIXED             = 0x0D
 export const CAMERA_MODE_8_DIRECTIONS      = 0x0E // AKA Parallel Camera, Bowser Courses & Rainbow Road
 export const CAMERA_MODE_FREE_ROAM         = 0x10
 export const CAMERA_MODE_SPIRAL_STAIRS     = 0x11
-
-// EXPERIMENTAL
-export const MODE_NONE              = 0x00
-export const MODE_RADIAL            = 0x01
-export const MODE_OUTWARD_RADIAL    = 0x02
-export const MODE_BEHIND_MARIO      = 0x03
-export const MODE_CLOSE             = 0x04 // Inside Castle / Big Boo's Haunt
-export const MODE_C_UP              = 0x06
-export const MODE_WATER_SURFACE     = 0x08
-export const MODE_SLIDE_HOOT        = 0x09
-export const MODE_INSIDE_CANNON     = 0x0A
-export const MODE_BOSS_FIGHT        = 0x0B
-export const MODE_PARALLEL_TRACKING = 0x0C
-export const MODE_FIXED             = 0x0D
-export const MODE_8_DIRECTIONS      = 0x0E // AKA Parallel Camera, Bowser Courses & Rainbow Road
-export const MODE_FREE_ROAM         = 0x10
-export const MODE_SPIRAL_STAIRS     = 0x11
 
 
 const CAM_MOVE_RETURN_TO_MIDDLE       = 0x0001
@@ -401,6 +390,18 @@ class Camera {
         return Math.sqrt(distX * distX + distY * distY + distZ * distZ)
     }
 
+    /**
+     * Calculates the pitch and yaw between two vectors.
+     */
+    calculate_angles(from, to, result) {
+        let /*f32*/ dx = to[0] - from[0]
+        let /*f32*/ dy = to[1] - from[1]
+        let /*f32*/ dz = to[2] - from[2]
+
+        result.pitch = MathUtil.atan2s(MathUtil.sqrtf(dx * dx + dz * dz), dy)
+        result.yaw = MathUtil.atan2s(dz, dx)
+    }
+
     is_within_100_units_of_mario(posX, posY, posZ) {
         const pos = [posX, posY, posZ]
         return this.calc_abs_dist(this.gPlayerCameraState.pos, pos) < 100
@@ -456,7 +457,7 @@ class Camera {
         ObjectListProc.gCheckingSurfaceCollisionsForCamera = tempCheckingSurfaceCollisionsForCamera
     }
 
-    approach_asymptotic_bool(currentWrapper, target, multiplier) {
+    approach_f32_asymptotic_bool(currentWrapper, target, multiplier) {
         if (multiplier > 1) {
             multiplier = 1
         }
@@ -468,9 +469,27 @@ class Camera {
         }
     }
 
-    set_or_approach_symmetric(currentWrapper, target, increment) {
+    approach_s16_asymptotic_bool(currentWrapper, target, divisor) {
+        let temp = currentWrapper.current
+
+        if (divisor == 0) {
+            currentWrapper.current = target
+        } else {
+            temp = s16(temp - target)
+            temp = s16(temp - s16(temp / divisor))
+            temp = s16(temp + target)
+            currentWrapper.current = temp
+        }
+        if (currentWrapper.current == target) {
+            return false
+        } else {
+            return true
+        }
+    }
+
+    set_or_approach_s16_symmetric(currentWrapper, target, increment) {
         if (this.sStatusFlags & CAM_FLAG_SMOOTH_MOVEMENT) {
-            this.camera_approach_symmetric_bool(currentWrapper, target, increment)
+            this.camera_approach_s16_symmetric_bool(currentWrapper, target, increment)
         } else {
             currentWrapper.current = target
         }
@@ -481,9 +500,9 @@ class Camera {
         }
     }
 
-    set_or_approach_asymptotic(currentWrapper, goal, scale) {
+    set_or_approach_f32_asymptotic(currentWrapper, goal, scale) {
         if (this.sStatusFlags & CAM_FLAG_SMOOTH_MOVEMENT) {
-            this.approach_asymptotic_bool(currentWrapper, goal, scale)
+            this.approach_f32_asymptotic_bool(currentWrapper, goal, scale)
         } else {
             currentWrapper.current = goal
         }
@@ -494,8 +513,8 @@ class Camera {
         }
     }
 
-    camera_approach_symmetric_bool(currentWrapper, target, increment) {
-        let dist = s16(target - currentWrapper.current)
+    camera_approach_f32_symmetric_bool(currentWrapper, target, increment) {
+        let dist = target - currentWrapper.current
 
         if (increment < 0) {
             increment = -1 * increment
@@ -503,12 +522,41 @@ class Camera {
         if (dist > 0) {
             dist -= increment
             if (dist >= 0) {
-                currentWrapper.current = s16(target - dist)
+                currentWrapper.current = target - dist
             } else {
                 currentWrapper.current = target
             }
         } else {
             dist += increment
+            if (dist <= 0) {
+                currentWrapper.current = target - dist
+            } else {
+                currentWrapper.current = target
+            }
+        }
+
+        if (currentWrapper.current == target) {
+            return false
+        } else {
+            return true
+        }
+    }
+
+    camera_approach_s16_symmetric_bool(currentWrapper, target, increment) {
+        let dist = s16(target - currentWrapper.current)
+
+        if (increment < 0) {
+            increment = -1 * increment
+        }
+        if (dist > 0) {
+            dist = s16(dist - increment)
+            if (dist >= 0) {
+                currentWrapper.current = s16(target - dist)
+            } else {
+                currentWrapper.current = target
+            }
+        } else {
+            dist = s16(dist + increment)
             if (dist <= 0) {
                 currentWrapper.current = s16(target - dist)
             } else {
@@ -523,16 +571,58 @@ class Camera {
         }
     }
 
-    set_or_approach_vec3_asymptotic(dst, goal, xMul, yMul, zMul) {
+    set_or_approach_vec3f_asymptotic(dst, goal, xMul, yMul, zMul) {
         let wrapper = { current: dst[0] }
-        this.set_or_approach_asymptotic(wrapper, goal[0], xMul)
+        this.set_or_approach_f32_asymptotic(wrapper, goal[0], xMul)
         dst[0] = wrapper.current
         wrapper.current = dst[1]
-        this.set_or_approach_asymptotic(wrapper, goal[1], yMul)
+        this.set_or_approach_f32_asymptotic(wrapper, goal[1], yMul)
         dst[1] = wrapper.current
         wrapper.current = dst[2]
-        this.set_or_approach_asymptotic(wrapper, goal[2], zMul)
+        this.set_or_approach_f32_asymptotic(wrapper, goal[2], zMul)
         dst[2] = wrapper.current
+    }
+
+    reduce_by_dist_from_camera(value, maxDist, posX, posY, posZ) {
+        let /*s16*/ res = 0
+          // Direction from pos to (Lakitu's) goalPos
+        let /*f32*/ goalDX = this.gLakituState.goalPos[0] - posX
+        let /*f32*/ goalDY = this.gLakituState.goalPos[1] - posY
+        let /*f32*/ goalDZ = this.gLakituState.goalPos[2] - posZ
+
+        let dist = MathUtil.sqrtf(goalDX * goalDX + goalDY * goalDY + goalDZ * goalDZ)
+        if (maxDist > dist) {
+            const pos = [posX, posY, posZ]
+            const result = {}
+            MathUtil.vec3f_get_dist_and_angle(this.gLakituState.goalPos, pos, result)
+            dist = result.dist
+            let pitch = result.pitch
+            let yaw = result.yaw
+
+            if (dist < maxDist) {
+                const goalResult = {}
+                this.calculate_angles(this.gLakituState.goalPos, this.gLakituState.goalFocus, goalResult)
+                let /*s16*/ goalPitch = goalResult.pitch
+                let /*s16*/ goalYaw = goalResult.yaw
+
+                pitch = s16(pitch - goalPitch)
+                yaw = s16(yaw - goalYaw)
+                dist -= 2000.0
+                if (dist < 0.0) {
+                    dist = 0.0
+                }
+                maxDist -= 2000.0
+                if (maxDist < 2000.0) {
+                    maxDist = 2000.0
+                }
+                res = value * (1.0 - dist / maxDist)
+                if (pitch < -0x1800 || pitch > 0x400 ||
+                    yaw   < -0x1800 || yaw >   0x1800) {
+                    res /= 2
+                }
+            }
+        }
+        return res
     }
 
     scale_along_line(dst, from, to, scale) {
@@ -564,7 +654,6 @@ class Camera {
     }
 
     reset_camera(c) {
-
         this.gCamera = c
         this.gCameraMovementFlags = 0
         this.s2ndRotateFlags = 0
@@ -597,6 +686,27 @@ class Camera {
         this.sZoomAmount = 0
         this.sZeroZoomDist = 0
 
+        this.sModeInfo = {
+            newMode: 0,
+            lastMode: 0,
+            max: 0,
+            frame: 0,
+            transitionStart: {
+                focus: [0, 0, 0],
+                pos: [0, 0, 0],
+                dist: 0,
+                pitch: 0,
+                yaw: 0
+            },
+            transitionEnd: {
+                focus: [0, 0, 0],
+                pos: [0, 0, 0],
+                dist: 0,
+                pitch: 0,
+                yaw: 0
+            }
+        }
+
         this.sBehindMarioSoundTimer = 0
         this.sCSideButtonYaw = 0
         this.s8DirModeBaseYaw = 0
@@ -616,7 +726,6 @@ class Camera {
     }
 
     create_camera(graphNode) {
-
         const mode = graphNode.config.mode
 
         graphNode.config.camera = {
@@ -638,7 +747,6 @@ class Camera {
             myDemoAngle: 0,
             myDemoRadius: 1500
         })*/
-
     }
 
 
@@ -675,20 +783,20 @@ class Camera {
         const marioOffset = [0, 125, 400]
 
         switch (Area.gCurrLevelNum) {
-            case LEVEL.LEVEL_CASTLE_GROUNDS:
-                if (this.is_within_100_units_of_mario(-1328, 260, 4646) != 1) {
-                    marioOffset[0] = -400
-                    marioOffset[2] = -800
-                }
+            case LEVEL_CASTLE_GROUNDS:
+                // if (this.is_within_100_units_of_mario(-1328, 260, 4646) != 1) {
+                //     marioOffset[0] = -400
+                //     marioOffset[2] = -800
+                // }
                 this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
                 break
-            case LEVEL.LEVEL_BOB:  /// TODO
+            case LEVEL_BOB:  /// TODO
                 this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
                 break
-            case LEVEL.LEVEL_CCM:  /// TODO
+            case LEVEL_CCM:  /// TODO
                 this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
                 break
-            case LEVEL.LEVEL_PSS:  /// TODO
+            case LEVEL_PSS:  /// TODO
                 this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
             default: this.gLakituState.mode = CAMERA_MODE_FREE_ROAM // throw err 'camera not implemented'
         }
@@ -699,7 +807,7 @@ class Camera {
 
         this.offset_rotated(c.pos, this.gPlayerCameraState.pos, marioOffset, this.gPlayerCameraState.faceAngle)
         if (c.mode != CAMERA_MODE_BEHIND_MARIO) {
-            c.pos[1] = this.gPlayerCameraState.pos[1]
+            c.pos[1] = SurfaceCollision.find_floor(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 100, this.gPlayerCameraState.pos[2], this) + 125
         }
         c.focus = [...this.gPlayerCameraState.pos]
         this.gLakituState.curPos = [...c.pos]
@@ -720,46 +828,153 @@ class Camera {
     }
 
     find_c_buttons_pressed(currentState) {
-        // buttonsPressed &= CBUTTON_MASK
-        // buttonsDown &= CBUTTON_MASK
+        // buttonsPressed &= CBUTTON_MASK;
+        // buttonsDown &= CBUTTON_MASK;
     
         if (window.sm64js.playerInput.buttonPressedCl) {
-            currentState |= L_CBUTTONS
-            currentState &= ~R_CBUTTONS
+            currentState |= L_CBUTTONS;
+            currentState &= ~R_CBUTTONS;
         }
         if (!(window.sm64js.playerInput.buttonDownCl)) {
-            currentState &= ~L_CBUTTONS
+            currentState &= ~L_CBUTTONS;
         }
     
         if (window.sm64js.playerInput.buttonPressedCr) {
-            currentState |= R_CBUTTONS
-            currentState &= ~L_CBUTTONS
+            currentState |= R_CBUTTONS;
+            currentState &= ~L_CBUTTONS;
         }
         if (!(window.sm64js.playerInput.buttonDownCr)) {
-            currentState &= ~R_CBUTTONS
+            currentState &= ~R_CBUTTONS;
         }
 
         if (window.sm64js.playerInput.buttonPressedCu) {
-            currentState |= U_CBUTTONS
-            currentState &= ~D_CBUTTONS
+            currentState |= U_CBUTTONS;
+            currentState &= ~D_CBUTTONS;
         }
         if (!(window.sm64js.playerInput.buttonDownCu)) {
-            currentState &= ~U_CBUTTONS
+            currentState &= ~U_CBUTTONS;
         }
         if (window.sm64js.playerInput.buttonPressedCd) {
-            currentState |= D_CBUTTONS
-            currentState &= ~U_CBUTTONS
+            currentState |= D_CBUTTONS;
+            currentState &= ~U_CBUTTONS;
         }
         if (!(window.sm64js.playerInput.buttonDownCd)) {
-            currentState &= ~D_CBUTTONS
+            currentState &= ~D_CBUTTONS;
         }
     
-        return currentState
+        return currentState;
+    }
+
+
+    set_camera_mode(c, mode, frames) {
+        const start = this.sModeInfo.transitionStart
+        const end = this.sModeInfo.transitionEnd
+
+        if (false) {  // mode == CAMERA_MODE_WATER_SURFACE && gCurrLevelArea == AREA_TTM_OUTSIDE) {
+        } else {
+            // Clear movement flags that would affect the transition
+            this.gCameraMovementFlags &= ~(CAM_MOVE_RESTRICT | CAM_MOVE_ROTATE)
+            this.gCameraMovementFlags |= CAM_MOVING_INTO_MODE
+            if (mode == CAMERA_MODE_NONE) {
+                mode = CAMERA_MODE_CLOSE
+            }
+            this.sCUpCameraPitch = 0
+            this.sModeOffsetYaw = 0
+            this.sLakituDist = 0
+            this.sLakituPitch = 0
+            this.sAreaYawChange = 0
+
+            this.sModeInfo.newMode = (mode != -1) ? mode : this.sModeInfo.lastMode
+            this.sModeInfo.lastMode = c.mode
+            this.sModeInfo.max = frames
+            this.sModeInfo.frame = 1
+
+            c.mode = this.sModeInfo.newMode
+            this.gLakituState.mode = c.mode
+
+            this.vec3f_copy(end.focus, c.focus)
+            this.vec3f_sub(end.focus, this.gPlayerCameraState.pos);
+
+            this.vec3f_copy(end.pos, c.pos)
+            this.vec3f_sub(end.pos, this.gPlayerCameraState.pos)
+
+            // sModeTransitions
+            switch (this.sModeInfo.newMode) {
+                case CAMERA_MODE_BEHIND_MARIO:
+                    this.sAreaYaw = this.update_behind_mario_camera(c, end.focus, end.pos)
+                    break
+
+                case CAMERA_MODE_WATER_SURFACE:
+                    // nop_update_water_camera
+                    break
+
+                case CAMERA_MODE_CLOSE:
+                case CAMERA_MODE_FREE_ROAM:
+                    this.sAreaYaw = this.update_mario_camera(c, end.focus, end.pos)
+                    break
+
+                default: throw "unknown camera case"
+            }
+
+            // End was updated by sModeTransitions
+            this.vec3f_sub(end.focus, this.gPlayerCameraState.pos);
+            this.vec3f_sub(end.pos, this.gPlayerCameraState.pos);
+
+            this.vec3f_copy(start.focus, this.gLakituState.curFocus);
+            this.vec3f_sub(start.focus, this.gPlayerCameraState.pos);
+
+            this.vec3f_copy(start.pos, this.gLakituState.curPos);
+            this.vec3f_sub(start.pos, this.gPlayerCameraState.pos);
+
+            MathUtil.vec3f_get_dist_and_angle(start.focus, start.pos, start)
+            MathUtil.vec3f_get_dist_and_angle(end.focus, end.pos, end)
+        }
+    }
+
+    focus_on_mario(focus, pos, posYOff, focYOff, dist, pitch, yaw) {
+        let marioPos = [0, 0, 0]
+
+        marioPos[0] = this.gPlayerCameraState.pos[0]
+        marioPos[1] = this.gPlayerCameraState.pos[1] + posYOff
+        marioPos[2] = this.gPlayerCameraState.pos[2]
+
+        MathUtil.vec3f_set_dist_and_angle(marioPos, pos, dist, pitch + this.sLakituPitch, yaw)
+
+        focus[0] = this.gPlayerCameraState.pos[0]
+        focus[1] = this.gPlayerCameraState.pos[1] + focYOff
+        focus[2] = this.gPlayerCameraState.pos[2]
+    }
+
+
+    update_mario_camera(c, focus, pos) {
+        let yaw = this.gPlayerCameraState.faceAngle[1] + this.sModeOffsetYaw + DEGREES(180)
+        this.focus_on_mario(focus, pos, 125, 125, this.gCameraZoomDist, 0x05B0, yaw)
+
+        return this.gPlayerCameraState.faceAngle[1]
+    }
+
+    mode_mario_camera(c) {
+        this.gCameraZoomDist = 350
+        this.mode_default_camera(c)
+    }
+
+    vec3f_copy(dest, src) {
+        dest[0] = src[0]
+        dest[1] = src[1]
+        dest[2] = src[2]
+    }
+
+    vec3f_sub(dst, src) {
+        dst[0] -= src[0]
+        dst[1] -= src[1]
+        dst[2] -= src[2]
     }
 
     update_camera(c) {
-        const m = LevelUpdate.gMarioState
-        if (window.myMario.freezeCamera) return
+        if (window.myMario.freezeCamera) {
+            return
+        }
+
         this.gCamera = c
         this.update_camera_hud_status(c)
 
@@ -788,15 +1003,91 @@ class Camera {
         c.mode = this.gLakituState.mode
         c.defMode = this.gLakituState.defMode
 
-        c.sCButtonsPressed = this.find_c_buttons_pressed(c.sCButtonsPressed)
+        c.sCButtonsPressed = this.find_c_buttons_pressed(c.sCButtonsPressed);
 
         this.sYawSpeed = 0x400
 
+        if (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
         switch (c.mode) {
+                case CAMERA_MODE_BEHIND_MARIO:
+                    this.mode_behind_mario_camera(c)
+                    break
+
+                // case CAMERA_MODE_C_UP:
+                //     this.mode_c_up_camera(c)
+                //     break
+
+                case CAMERA_MODE_WATER_SURFACE:
+                    this.mode_water_surface_camera(c)
+                    break
+
+                // case CAMERA_MODE_INSIDE_CANNON:
+                //     this.mode_cannon_camera(c)
+                //     break
+
+                default:
+                    this.mode_mario_camera(c)
+            }
+        } else {
+            switch (c.mode) {
+                case CAMERA_MODE_BEHIND_MARIO:
+                    this.mode_behind_mario_camera(c)
+                    break
+
+                // case CAMERA_MODE_C_UP:
+                //     mode_c_up_camera(c);
+                //     break;
+
+                case CAMERA_MODE_WATER_SURFACE:
+                    this.mode_water_surface_camera(c)
+                    break
+
+                // case CAMERA_MODE_INSIDE_CANNON:
+                //     mode_cannon_camera(c);
+                //     break;
+
+                // case CAMERA_MODE_8_DIRECTIONS:
+                //     mode_8_directions_camera(c);
+                //     break;
+
+                // case CAMERA_MODE_RADIAL:
+                //     mode_radial_camera(c);
+                //     break;
+
+                // case CAMERA_MODE_OUTWARD_RADIAL:
+                //     mode_outward_radial_camera(c);
+                //     break;
+
+                case CAMERA_MODE_CLOSE:
+                    this.mode_lakitu_camera(c)
+                    break
+
             case CAMERA_MODE_FREE_ROAM:
                 this.mode_lakitu_camera(c)
                 break
+
+                // case CAMERA_MODE_BOSS_FIGHT:
+                //     mode_boss_fight_camera(c);
+                //     break;
+
+                // case CAMERA_MODE_PARALLEL_TRACKING:
+                //     mode_parallel_tracking_camera(c);
+                //     break;
+
+                // case CAMERA_MODE_SLIDE_HOOT:
+                //     mode_slide_camera(c);
+                //     break;
+
+                // case CAMERA_MODE_FIXED:
+                //     mode_fixed_camera(c);
+                //     break;
+
+                // case CAMERA_MODE_SPIRAL_STAIRS:
+                //     mode_spiral_stairs_camera(c);
+                //     break;
+
             default: throw "unknown camera case"
+            }
         }
 
         ObjectListProc.gCheckingSurfaceCollisionsForCamera = false
@@ -823,7 +1114,7 @@ class Camera {
         if (this.gCameraMovementFlags & this.CAM_MOVE_ZOOMED_OUT > 0) {
             status |= CAM_STATUS_C_DOWN
         }
-        if (this.gCameraMovementFlags & this.CAM_MOVE_C_UP_MODE > 0) {
+        if (this.gCameraMovementFlags & CAM_MOVE_C_UP_MODE > 0) {
             status |= CAM_STATUS_C_UP
         }
         Hud.set_hud_camera_status(status)
@@ -879,7 +1170,6 @@ class Camera {
     }
 
     pan_ahead_of_player(c) {
-
         const pan = [0,0,0]
 
         // Get distance and angle from camera to mario.
@@ -908,9 +1198,9 @@ class Camera {
         // If mario is sleeping, then don't pan
         const wrapper = { current: this.sPanDistance }
         if (this.sStatusFlags & CAM_FLAG_SLEEPING) {
-            this.approach_asymptotic_bool(wrapper, 0, 0.025)
+            this.approach_f32_asymptotic_bool(wrapper, 0, 0.025)
         } else {
-            this.approach_asymptotic_bool(wrapper, pan[0], 0.025)
+            this.approach_f32_asymptotic_bool(wrapper, pan[0], 0.025)
         }
 
         this.sPanDistance = wrapper.current
@@ -957,58 +1247,293 @@ class Camera {
             cSideYaw = 0x1000
             if (window.sm64js.playerInput.buttonPressedCr) {
                 if (this.gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT) {
-                    this.gCameraMovementFlags &= ~CAM_MOVE_ROTATE_LEFT
+                    this.gCameraMovementFlags &= ~CAM_MOVE_ROTATE_LEFT;
                 } else {
-                    this.gCameraMovementFlags |= CAM_MOVE_ROTATE_RIGHT
+                    this.gCameraMovementFlags |= CAM_MOVE_ROTATE_RIGHT;
                     // if (sCSideButtonYaw == 0) {
-                    //     play_sound_cbutton_side()
+                    //     play_sound_cbutton_side();
                     // }
-                    this.sCSideButtonYaw = -cSideYaw
+                    this.sCSideButtonYaw = -cSideYaw;
                 }
             }
             if (window.sm64js.playerInput.buttonPressedCl) {
                 if (this.gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT) {
-                    this.gCameraMovementFlags &= ~CAM_MOVE_ROTATE_RIGHT
+                    this.gCameraMovementFlags &= ~CAM_MOVE_ROTATE_RIGHT;
                 } else {
-                    this.gCameraMovementFlags |= CAM_MOVE_ROTATE_LEFT
+                    this.gCameraMovementFlags |= CAM_MOVE_ROTATE_LEFT;
                     // if (sCSideButtonYaw == 0) {
-                    //     play_sound_cbutton_side()
+                    //     play_sound_cbutton_side();
                     // }
-                    this.sCSideButtonYaw = cSideYaw
+                    this.sCSideButtonYaw = cSideYaw;
                 }
             }
         }
     }
 
+
+    update_behind_mario_camera(c, focus, pos) {
+        let absPitch
+        let dist, pitch, yaw
+        let goalPitch = this.gPlayerCameraState.faceAngle[0]
+        let marioYaw = s16(this.gPlayerCameraState.faceAngle[1] + DEGREES(180))
+        let goalYawOff = 0
+        let yawSpeed
+        let pitchInc = 32
+        let maxDist = 800
+        let focYOff = 125
+        let wrapper = {}
+        let distPitchYaw = {}
+
+        // Zoom in when Mario R_TRIG mode is active
+        if (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
+            maxDist = 350
+            focYOff = 120
+        }
+        if (!(this.gPlayerCameraState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER))) {
+            pitchInc = 128
+        }
+
+        // Focus on Mario
+        this.vec3f_copy(focus, this.gPlayerCameraState.pos)
+        c.focus[1] += focYOff
+        //! @bug unnecessary
+        // dist = calc_abs_dist(focus, pos);
+        //! @bug unnecessary
+        // pitch = calculate_pitch(focus, pos);
+        MathUtil.vec3f_get_dist_and_angle(focus, pos, distPitchYaw);
+        ({dist, pitch, yaw} = distPitchYaw)
+        if (dist > maxDist) {
+            dist = maxDist
+        }
+        if ((absPitch = pitch) < 0) {
+            absPitch = -absPitch
+        }
+
+        // Determine the yaw speed based on absPitch. A higher absPitch (further away from looking straight)
+        // translates to a slower speed
+        // Note: Pitch is always within +- 90 degrees or +-0x4000, and 0x4000 / 0x200 = 32
+        yawSpeed = s16(32 - s16(absPitch / 0x200))
+        if (yawSpeed < 1) {
+            yawSpeed = 1
+        }
+        if (yawSpeed > 32) {
+            yawSpeed = 32
+        }
+
+        if (this.sCSideButtonYaw != 0) {
+            wrapper.current = this.sCSideButtonYaw
+            this.camera_approach_s16_symmetric_bool(wrapper, 0, 1)
+            this.sCSideButtonYaw = wrapper.current
+            yawSpeed = 8
+        }
+        if (this.sBehindMarioSoundTimer != 0) {
+            goalPitch = 0
+            wrapper.current = this.sBehindMarioSoundTimer
+            this.camera_approach_s16_symmetric_bool(wrapper, 0, 1)
+            this.sBehindMarioSoundTimer = wrapper.current
+            pitchInc = 0x800
+        }
+
+        if (this.sBehindMarioSoundTimer == 28) {
+            if (this.sCSideButtonYaw < 5 || this.sCSideButtonYaw > 28) {
+                // play_sound_cbutton_up();
+            }
+        }
+        if (this.sCSideButtonYaw == 28) {
+            if (this.sBehindMarioSoundTimer < 5 || this.sBehindMarioSoundTimer > 28) {
+                // play_sound_cbutton_up();
+            }
+        }
+
+        // C-Button input. Note: Camera rotates in the opposite direction of the button (airplane controls)
+        //! @bug C-Right and C-Up take precedence due to the way input is handled here
+
+        // Rotate right
+        if (this.sCButtonsPressed & L_CBUTTONS) {
+            if (window.sm64js.playerInput.buttonPressedCl) {
+                // play_sound_cbutton_side();
+            }
+            if (dist < maxDist) {
+                wrapper.current = dist
+                this.camera_approach_f32_symmetric_bool(wrapper, maxDist, 5)
+                dist = wrapper.current
+            }
+            goalYawOff = -0x3FF8
+            this.sCSideButtonYaw = 30
+            yawSpeed = 2
+        }
+        // Rotate left
+        if (this.sCButtonsPressed & R_CBUTTONS) {
+            if (window.sm64js.playerInput.buttonPressedCr) {
+                // play_sound_cbutton_side();
+            }
+            if (dist < maxDist) {
+                wrapper.current = dist
+                this.camera_approach_f32_symmetric_bool(wrapper, maxDist, 5)
+                dist = wrapper.current
+            }
+            goalYawOff = 0x3FF8
+            this.sCSideButtonYaw = 30
+            yawSpeed = 2
+        }
+        // Rotate up
+        if (this.sCButtonsPressed & D_CBUTTONS) {
+            if (window.sm64js.playerInput.buttonPressedCu || window.sm64js.playerInput.buttonPressedCd) {
+                // play_sound_cbutton_side();
+            }
+            if (dist < maxDist) {
+                wrapper.current = dist
+                this.camera_approach_f32_symmetric_bool(wrapper, maxDist, 5)
+                dist = wrapper.current                
+            }
+            goalPitch = -0x3000
+            this.sBehindMarioSoundTimer = 30
+            pitchInc = 0x800
+        }
+        // Rotate down
+        if (this.sCButtonsPressed & U_CBUTTONS) {
+            if (window.sm64js.playerInput.buttonPressedCu || window.sm64js.playerInput.buttonPressedCd) {
+                // play_sound_cbutton_side();
+            }
+            if (dist < maxDist) {
+                wrapper.current = dist
+                this.camera_approach_f32_symmetric_bool(wrapper, maxDist, 5)
+                dist = wrapper.current                
+            }
+            goalPitch = 0x3000
+            this.sBehindMarioSoundTimer = 30
+            pitchInc = 0x800
+        }
+
+        wrapper.current = yaw
+        this.approach_s16_asymptotic_bool(wrapper, s16(marioYaw + goalYawOff), yawSpeed)
+        yaw = wrapper.current
+
+        wrapper.current = pitch
+        this.camera_approach_s16_symmetric_bool(wrapper, goalPitch, pitchInc)
+        pitch = wrapper.current
+        if (dist < 300) {
+            dist = 300
+        }
+        MathUtil.vec3f_set_dist_and_angle(focus, pos, dist, pitch, yaw)
+        // if (this.gCurrLevelArea == AREA_WDW_MAIN) {
+        //     yaw = this.clamp_positions_and_find_yaw(pos, focus, 4508, -3739, 4508, -3739)
+        // }
+        // if (this.gCurrLevelArea == AREA_THI_HUGE) {
+        //     yaw = this.clamp_positions_and_find_yaw(pos, focus, 8192, -8192, 8192, -8192)
+        // }
+        // if (this.gCurrLevelArea == AREA_THI_TINY) {
+        //     yaw = this.clamp_positions_and_find_yaw(pos, focus, 2458, -2458, 2458, -2458)
+        // }
+
+        return yaw
+    }
+
+    clamp_positions_and_find_yaw(pos, origin, xMax, xMin, zMax, zMin) {
+        let yaw = this.gCamera.nextYaw
+
+        if (pos[0] >= xMax) {
+            pos[0] = xMax
+        }
+        if (pos[0] <= xMin) {
+            pos[0] = xMin
+        }
+        if (pos[2] >= zMax) {
+            pos[2] = zMax
+        }
+        if (pos[2] <= zMin) {
+            pos[2] = zMin
+        }
+        yaw = this.calculate_yaw(origin, pos)
+        return yaw
+    }
+
+
+    mode_behind_mario(c) {
+        const marioState = LevelUpdate.gMarioState
+        let newPos = [], oldPos = []
+        let waterHeight, floorHeight
+        const distPitchYaw = {}
+        let yaw
+
+        this.vec3f_copy(oldPos, c.pos)
+        this.gCameraMovementFlags &= ~CAM_MOVING_INTO_MODE
+        this.vec3f_copy(newPos, c.pos)
+        yaw = this.update_behind_mario_camera(c, c.focus, newPos)
+        c.pos[0] = newPos[0]
+        c.pos[2] = newPos[2]
+
+        // Keep the camera above the water surface if swimming
+        if (c.mode == CAMERA_MODE_WATER_SURFACE) {
+            floorHeight = SurfaceCollision.find_floor(c.pos[0], c.pos[1], c.pos[2], {})
+            newPos[1] = marioState.waterLevel + 120
+            if (newPos[1] < (floorHeight += 120)) {
+                newPos[1] = floorHeight
+            }
+        }
+        this.approach_camera_height(c, newPos[1], 50)
+        waterHeight = SurfaceCollision.find_water_level(c.pos[0], c.pos[2]) + 100
+        if (c.pos[1] <= waterHeight) {
+            this.gCameraMovementFlags |= CAM_MOVE_SUBMERGED
+        } else {
+            this.gCameraMovementFlags &= ~CAM_MOVE_SUBMERGED
+        }
+
+        this.resolve_geometry_collisions(c.pos, oldPos)
+        // Prevent camera getting too far away
+        MathUtil.vec3f_get_dist_and_angle(c.focus, c.pos, distPitchYaw)
+        if (distPitchYaw.dist > 800) {
+            distPitchYaw.dist = 800
+            MathUtil.vec3f_set_dist_and_angle(c.focus, c.pos, distPitchYaw.dist, distPitchYaw.pitch, distPitchYaw.yaw);
+                }
+        this.pan_ahead_of_player(c)
+
+        return yaw
+            }
+
+
+    resolve_geometry_collisions(pos, lastGood) {
+        // TODO
+        }
+
+    mode_behind_mario_camera(c) {
+        c.nextYaw = this.mode_behind_mario(c)
+    }
+
+    /**
+     * Exactly the same as BEHIND_MARIO
+     */
+    mode_water_surface_camera(c) {
+        c.nextYaw = this.mode_behind_mario(c)
+    }
+
+
     update_default_camera(c) {
-
-
         let nextYawVel
         let yawVel = 0
-        let yawGoal = parseInt(this.gPlayerCameraState.faceAngle[1] + (180 * 0x10000 / 360))
-        if (yawGoal > 32767) yawGoal -= 65536
-
+        let yawGoal = s16(this.gPlayerCameraState.faceAngle[1] + DEGREES(180))
         let closeToMario = 0
         let ceilHeight = 20000
+        let dist, pitch, yaw
+        let distPitchYaw = {}
 
-        const distPitchYaw = {}
-        MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, distPitchYaw)
-        let { dist, pitch, yaw } = distPitchYaw
+        MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, distPitchYaw);
+        ({dist, pitch, yaw} = distPitchYaw)
 
         let zoomDist = this.gCameraZoomDist
 
-        this.handle_c_button_movement(c)
+        this.handle_c_button_movement(c);
 
         // If C-Down is active, determine what distance the camera should be from mario
         if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
             //! In Mario mode, the camera is zoomed out further than in lakitu mode (1400 vs 1200)
             // if (set_cam_angle(0) == CAM_ANGLE_MARIO) {
-            //     zoomDist = gCameraZoomDist + 1050
+            //     zoomDist = gCameraZoomDist + 1050;
             // } else {
-                zoomDist = this.gCameraZoomDist + 400
+                zoomDist = this.gCameraZoomDist + 400;
             // }
         } else {
-            zoomDist = this.gCameraZoomDist
+            zoomDist = this.gCameraZoomDist;
         }
         
         if (this.sZoomAmount == 0.0) {
@@ -1045,13 +1570,13 @@ class Camera {
             }
         } else {
             if (this.sCSideButtonYaw < 0) {
-                yaw += 0x200
+                yaw = s16(yaw + 0x200)
             }
             if (this.sCSideButtonYaw > 0) {
-                yaw -= 0x200
+                yaw = s16(yaw - 0x200)
             }
             const wrapper = { current: this.sCSideButtonYaw }
-            this.camera_approach_symmetric_bool(wrapper, 0, 0x100)
+            this.camera_approach_s16_symmetric_bool(wrapper, 0, 0x100)
             this.sCSideButtonYaw = wrapper.current
             nextYawVel = 0
         }
@@ -1068,15 +1593,15 @@ class Camera {
             if (this.sCSideButtonYaw == 0) {
                 nextYawVel = 0x1000
                 this.sYawSpeed = 0
-                MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, distPitchYaw)
-                dist = distPitchYaw.dist
-                pitch = distPitchYaw.pitch
-                yaw = distPitchYaw.yaw
+                MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, distPitchYaw);
+                ({dist, pitch, yaw} = distPitchYaw)
             }
             closeToMario |= 1
         }
 
-        if (-16 < window.sm64js.playerInput.stickY) c.yaw = yaw
+        if (-16 < window.sm64js.playerInput.stickY) {
+            c.yaw = yaw
+        }
 
         const posHeightWrapper = {}, focHeightWrapper = {}
         this.calc_y_to_curr_floor(posHeightWrapper, 1, 200, focHeightWrapper, 0.9, 200)
@@ -1108,8 +1633,8 @@ class Camera {
                 yawVel = 0
             }
             if (yawVel != 0) {
-                const yawWrapper = { current: parseInt(yaw) }
-                this.camera_approach_symmetric_bool(yawWrapper, yawGoal, parseInt(yawVel))
+                const yawWrapper = { current: yaw }
+                this.camera_approach_s16_symmetric_bool(yawWrapper, yawGoal, yawVel)
                 yaw = yawWrapper.current
             }
         }
@@ -1117,7 +1642,7 @@ class Camera {
         // Only zoom out if not obstructed by walls and lakitu hasn't collided with any
         if (avoidStatus == 0 && !(this.sStatusFlags & CAM_FLAG_COLLIDED_WITH_WALL)) {
             const distWrapper = { current: dist }
-            this.approach_asymptotic_bool(distWrapper, zoomDist - 100, 0.05)
+            this.approach_f32_asymptotic_bool(distWrapper, zoomDist - 100, 0.05)
             dist = distWrapper.current
         }
 
@@ -1137,14 +1662,14 @@ class Camera {
         let marioFloorHeight = 125 + this.sMarioGeometry.currFloorHeight
         let marioFloor = this.sMarioGeometry.currFloor
 
-        let camFloorHeight = this.gPlayerCameraState.pos[1]
+        let camFloorHeight = SurfaceCollision.find_floor(cPos[0], cPos[1] + 50, cPos[2], {}) + 125
 
         let tempPos = [0,0,0]
 
         for (let scale = 0.1; scale < 1.0; scale += 0.2) {
             this.scale_along_line(tempPos, cPos, this.gPlayerCameraState.pos, scale)
             const tempFloor = {}
-            const tempFloorHeight = this.gPlayerCameraState.pos[1]
+            const tempFloorHeight = SurfaceCollision.find_floor(tempPos[0], tempPos[1], tempPos[2], tempFloor) + 125
             if (tempFloor.floor && tempFloorHeight > marioFloorHeight) {
                 marioFloorHeight = tempFloorHeight
                 marioFloor = tempFloor.floor
@@ -1282,15 +1807,14 @@ class Camera {
     }
 
     update_lakitu(c) {
-
         let newPos = [0,0,0], newFoc = [0,0,0]
 
-        if (this.gCameraMovementFlags & CAM_MOVE_PAUSE_SCREEN) { }
-        else {
+        if (this.gCameraMovementFlags & CAM_MOVE_PAUSE_SCREEN) {
+        } else {
             const newYaw = this.next_lakitu_state(newPos, newFoc, c.pos, c.focus, this.sOldPosition, this.sOldFocus, c.nextYaw)
 
-            let wrapper = { current: parseInt(c.yaw) }
-            this.set_or_approach_symmetric(wrapper, parseInt(newYaw), parseInt(this.sYawSpeed))
+            let wrapper = { current: c.yaw }
+            this.set_or_approach_s16_symmetric(wrapper, newYaw, this.sYawSpeed)
             c.yaw = wrapper.current
             this.sStatusFlags &= ~CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
 
@@ -1304,26 +1828,26 @@ class Camera {
             this.gLakituState.goalFocus = [...c.focus]
 
             // Simulate lakitu flying to the new position and turning towards the new focus
-            this.set_or_approach_vec3_asymptotic(this.gLakituState.curPos, newPos,
+            this.set_or_approach_vec3f_asymptotic(this.gLakituState.curPos, newPos,
                                                  this.gLakituState.posHSpeed, this.gLakituState.posVSpeed,
                                                  this.gLakituState.posHSpeed)
-            this.set_or_approach_vec3_asymptotic(this.gLakituState.curFocus, newFoc,
+            this.set_or_approach_vec3f_asymptotic(this.gLakituState.curFocus, newFoc,
                                                  this.gLakituState.focHSpeed, this.gLakituState.focVSpeed,
                                                  this.gLakituState.focHSpeed)
 
 
             // Adjust lakitu's speed back to normal --- so gross
             wrapper = { current: this.gLakituState.focHSpeed }
-            this.set_or_approach_asymptotic(wrapper, 0.8, 0.05)
+            this.set_or_approach_f32_asymptotic(wrapper, 0.8, 0.05)
             this.gLakituState.focHSpeed = wrapper.current
             wrapper.current = this.gLakituState.focVSpeed
-            this.set_or_approach_asymptotic(wrapper, 0.3, 0.05)
+            this.set_or_approach_f32_asymptotic(wrapper, 0.3, 0.05)
             this.gLakituState.focVSpeed = wrapper.current
             wrapper.current = this.gLakituState.posHSpeed
-            this.set_or_approach_asymptotic(wrapper, 0.3, 0.05)
+            this.set_or_approach_f32_asymptotic(wrapper, 0.3, 0.05)
             this.gLakituState.posHSpeed = wrapper.current
             wrapper.current = this.gLakituState.posVSpeed
-            this.set_or_approach_asymptotic(wrapper, 0.3, 0.05)
+            this.set_or_approach_f32_asymptotic(wrapper, 0.3, 0.05)
             this.gLakituState.posVSpeed = wrapper.current
 
             // Turn on smooth movement when it hasn't been blocked for 2 frames
@@ -1384,7 +1908,9 @@ class Camera {
         graphNode.pos = [...this.gLakituState.pos]
         graphNode.focus = [...this.gLakituState.focus]
 
-        if (LevelUpdate.gMarioState.action == Mario.ACT_PARACHUTING && !window.myMario.freezeCamera) {
+        if (m.action == Mario.ACT_PARACHUTING ||
+            m.action == Mario.ACT_FLYING ||
+            m.action == Mario.ACT_SHOT_FROM_CANNON) {
             graphNode.pos[1] = LevelUpdate.gMarioState.pos[1] + 600
             graphNode.focus = [...LevelUpdate.gMarioState.pos]
         }
@@ -1430,19 +1956,26 @@ class Camera {
             throw "sleeping"
         } else {
             const wrapper = { current: this.sFOVState.fov }
-            this.camera_approach_symmetric_bool(wrapper, 45, (45 - this.sFOVState.fov) / 30)
+            this.camera_approach_f32_symmetric_bool(wrapper, 45, (45 - this.sFOVState.fov) / 30)
         }
     }
 
     set_camera_shake_from_hit(shake) {
         switch (shake) {
+            case SHAKE_ATTACK:
+                this.gLakituState.focHSpeed = 0
+                this.gLakituState.posHSpeed = 0
+                break
+
+            case SHAKE_FALL_DAMAGE:
+                this.set_camera_pitch_shake(0x60, 0x3, 0x8000)
+                this.set_camera_roll_shake(0x60, 0x3, 0x8000)
+                break
+
             case SHAKE_GROUND_POUND:
                 this.set_camera_pitch_shake(0x60, 0xC, 0x8000)
                 break
-            case SHAKE_HIT_FROM_BELOW:
-                this.gLakituState.focHSpeed = 0.07
-                this.gLakituState.posHSpeed = 0.07
-                break
+
             case SHAKE_SMALL_DAMAGE:
                 if (this.gPlayerCameraState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
                     this.set_camera_yaw_shake(0x200, 0x10, 0x1000)
@@ -1457,6 +1990,7 @@ class Camera {
                 this.gLakituState.focHSpeed = 0
                 this.gLakituState.posHSpeed = 0
                 break
+
             case SHAKE_MED_DAMAGE:
                 if (this.gPlayerCameraState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
                     this.set_camera_yaw_shake(0x400, 0x20, 0x1000)
@@ -1465,12 +1999,13 @@ class Camera {
                 } else {
                     this.set_camera_yaw_shake(0x100, 0x10, 0x4000)
                     this.set_camera_roll_shake(0x100, 0x10, 0x4000)
-                    this.set_fov_shake(0x180, 0x40, 0x8000)
+                    this.set_fov_shake(0x180, 0x40, 0x8000);
                 }
 
                 this.gLakituState.focHSpeed = 0
                 this.gLakituState.posHSpeed = 0
                 break
+
             case SHAKE_LARGE_DAMAGE:
                 if (this.gPlayerCameraState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
                     this.set_camera_yaw_shake(0x600, 0x30, 0x1000)
@@ -1479,14 +2014,24 @@ class Camera {
                 } else {
                     this.set_camera_yaw_shake(0x180, 0x20, 0x4000)
                     this.set_camera_roll_shake(0x200, 0x20, 0x4000)
-                    this.set_fov_shake(0x200, 0x50, 0x8000)
+                    this.set_fov_shake(0x200, 0x50, 0x8000);
                 }
 
                 this.gLakituState.focHSpeed = 0
                 this.gLakituState.posHSpeed = 0
                 break
-            default:
-                this.set_camera_pitch_shake(0x60, 0xC, 0x8000)
+
+            case SHAKE_HIT_FROM_BELOW:
+                this.gLakituState.focHSpeed = 0.07
+                this.gLakituState.posHSpeed = 0.07
+                break
+
+            case SHAKE_SHOCK:
+                this.set_camera_pitch_shake(random_float() * 64.0, 0x8, 0x8000)
+                this.set_camera_yaw_shake(random_float() * 64.0, 0x8, 0x8000)
+                break
+
+            default: this.set_camera_pitch_shake(0x60, 0xC, 0x8000)
         }
     }
 
@@ -1508,7 +2053,7 @@ class Camera {
             this.increment_shake_offset(wrapper, this.gLakituState.shakePitchVel)
             this.gLakituState.shakePitchPhase = wrapper.value
             const currentWrapper = { current: this.gLakituState.shakeMagnitude[0] }
-            if (this.camera_approach_symmetric_bool(currentWrapper, 0, this.gLakituState.shakePitchDecay) == 0) {
+            if (this.camera_approach_s16_symmetric_bool(currentWrapper, 0, this.gLakituState.shakePitchDecay) == 0) {
                 this.gLakituState.shakePitchPhase = 0
             }
             this.gLakituState.shakeMagnitude[0] = currentWrapper.current
@@ -1525,7 +2070,7 @@ class Camera {
             this.increment_shake_offset(wrapper, this.gLakituState.shakeYawVel)
             this.gLakituState.shakeYawPhase = wrapper.value
             const currentWrapper = { current: this.gLakituState.shakeMagnitude[1] }
-            if (this.camera_approach_symmetric_bool(currentWrapper, 0, this.gLakituState.shakeYawDecay) == 0) {
+            if (this.camera_approach_s16_symmetric_bool(currentWrapper, 0, this.gLakituState.shakeYawDecay) == 0) {
                 this.gLakituState.shakeYawPhase = 0
             }
             this.gLakituState.shakeMagnitude[1] = currentWrapper.current
@@ -1533,14 +2078,13 @@ class Camera {
     }
 
     shake_camera_roll() {
-
         if (this.gLakituState.shakeMagnitude[2] != 0) {
             const wrapper = { value: this.gLakituState.shakeRollPhase }
             this.increment_shake_offset(wrapper, this.gLakituState.shakeRollVel)
             this.gLakituState.shakeRollPhase = wrapper.value
             this.gLakituState.roll += s16(this.gLakituState.shakeMagnitude[2] * sins(this.gLakituState.shakeRollPhase))
             const currentWrapper = { current: this.gLakituState.shakeMagnitude[2] }
-            if (this.camera_approach_symmetric_bool(currentWrapper, 0, this.gLakituState.shakeRollDecay) == 0) {
+            if (this.camera_approach_s16_symmetric_bool(currentWrapper, 0, this.gLakituState.shakeRollDecay) == 0) {
                 this.gLakituState.shakeRollPhase = 0
             }
             this.gLakituState.shakeMagnitude[2] = currentWrapper.current
@@ -1549,24 +2093,27 @@ class Camera {
     }
 
     set_camera_pitch_shake(mag, decay, inc) {
+        mag = s16(mag)
         if (this.gLakituState.shakeMagnitude[0] < mag) {
-            this.gLakituState.shakeMagnitude[0] = s16(mag)
+            this.gLakituState.shakeMagnitude[0] = mag
             this.gLakituState.shakePitchDecay = s16(decay)
             this.gLakituState.shakePitchVel = s16(inc)
         }
     }
 
     set_camera_yaw_shake(mag, decay, inc) {
+        mag = s16(mag)
         if (Math.abs(mag) > Math.abs(this.gLakituState.shakeMagnitude[1])) {
-            this.gLakituState.shakeMagnitude[1] = s16(mag)
+            this.gLakituState.shakeMagnitude[1] = mag
             this.gLakituState.shakeYawDecay = s16(decay)
             this.gLakituState.shakeYawVel = s16(inc)
         }
     }
 
     set_camera_roll_shake(mag, decay, inc) {
+        mag = s16(mag)
         if (this.gLakituState.shakeMagnitude[2] < mag) {
-            this.gLakituState.shakeMagnitude[2] = s16(mag)
+            this.gLakituState.shakeMagnitude[2] = mag
             this.gLakituState.shakeRollDecay = s16(decay)
             this.gLakituState.shakeRollVel = s16(inc)
         }
@@ -1588,6 +2135,104 @@ class Camera {
             default: throw "unimplemented camera shake type " + shake
         }
     }
+
+
+    /**
+     * Start shaking the camera's pitch, but reduce `mag` by it's distance from the camera
+     */
+    set_pitch_shake_from_point(mag, decay, inc, maxDist, posX, posY, posZ) {
+        const pos = [posX, posY, posZ]
+        // let /*f32*/ dist
+        // let s16 dummyPitch
+        // let /*s16*/ dummyYaw
+
+        // dist unused!
+        // MathUtil.vec3f_get_dist_and_angle(this.gLakituState.goalPos, pos, &dist, &dummyPitch, &dummyYaw)
+        mag = this.reduce_by_dist_from_camera(mag, maxDist, posX, posY, posZ)
+        if (mag != 0) {
+            this.set_camera_pitch_shake(mag, decay, inc)
+        }
+    }
+
+
+    /**
+     * Starts a camera shake, but scales the amplitude by the point's distance from the camera
+     */
+    set_camera_shake_from_point(shake, posX, posY, posZ) {
+        switch (shake) {
+            case SHAKE_POS_BOWLING_BALL:
+                this.set_pitch_shake_from_point(0x28, 0x8, 0x4000, 2000.0, posX, posY, posZ)
+                break
+
+            case SHAKE_POS_SMALL:
+                this.set_pitch_shake_from_point(0x80, 0x8, 0x4000, 4000.0, posX, posY, posZ)
+                this.set_fov_shake_from_point_preset(SHAKE_FOV_SMALL, posX, posY, posZ)
+                break
+
+            case SHAKE_POS_MEDIUM:
+                this.set_pitch_shake_from_point(0xC0, 0x8, 0x4000, 6000.0, posX, posY, posZ)
+                this.set_fov_shake_from_point_preset(SHAKE_FOV_MEDIUM, posX, posY, posZ)
+                break
+
+            case SHAKE_POS_LARGE:
+                this.set_pitch_shake_from_point(0x100, 0x8, 0x3000, 8000.0, posX, posY, posZ)
+                this.set_fov_shake_from_point_preset(SHAKE_FOV_LARGE, posX, posY, posZ)
+                break
+        }
+    }
+
+    /**
+     * Start a preset fov shake that is reduced by the point's distance from the camera.
+     * Used in set_camera_shake_from_point
+     *
+     * @see set_camera_shake_from_point
+     */
+    set_fov_shake_from_point_preset(preset, posX, posY, posZ) {
+        switch (preset) {
+            case SHAKE_FOV_SMALL:
+                this.set_fov_shake_from_point(0x100, 0x30, 0x8000, 3000.0, posX, posY, posZ)
+                break
+            case SHAKE_FOV_MEDIUM:
+                this.set_fov_shake_from_point(0x200, 0x30, 0x8000, 4000.0, posX, posY, posZ)
+                break
+            case SHAKE_FOV_LARGE:
+                this.set_fov_shake_from_point(0x300, 0x30, 0x8000, 6000.0, posX, posY, posZ)
+                break
+            case SHAKE_FOV_UNUSED:
+                this.set_fov_shake_from_point(0x800, 0x20, 0x4000, 3000.0, posX, posY, posZ)
+                break
+        }
+    }
+
+    /**
+     * Start shaking the camera's field of view.
+     *
+     * @param shakeSpeed How fast the shake should progress through its period. The shake offset is
+     *                   calculated from coss(), so this parameter can be thought of as an angular velocity.
+     */
+    set_fov_shake(amplitude, decay, shakeSpeed) {
+        if (amplitude > this.sFOVState.shakeAmplitude) {
+            this.sFOVState.shakeAmplitude = amplitude
+            this.sFOVState.decay = decay
+            this.sFOVState.shakeSpeed = shakeSpeed
+        }
+    }
+
+    /**
+     * Start shaking the camera's field of view, but reduce `amplitude` by distance from camera
+     */
+    set_fov_shake_from_point(amplitude, decay, shakeSpeed, maxDist, posX, posY, posZ) {
+        amplitude = this.reduce_by_dist_from_camera(amplitude, maxDist, posX, posY, posZ)
+
+        if (amplitude != 0) {
+            this.set_fov_shake(amplitude, decay, shakeSpeed)
+        }
+    }
+
 }
 
 export const CameraInstance = new Camera()
+gLinker.Camera = CameraInstance
+
+export const geo_camera_main = CameraInstance.geo_camera_main
+export const geo_camera_fov = CameraInstance.geo_camera_fov

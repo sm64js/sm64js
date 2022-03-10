@@ -1,13 +1,13 @@
 import { GeoLayoutInstance as GeoLayout } from "./GeoLayout"
 import { AreaInstance as Area } from "../game/Area"
 import { GameInstance as Game } from "../game/Game"
+import * as GlobalScripts from "../levels/global_scripts"
 import * as Gbi from "../include/gbi"
 import * as GraphNode from "./graph_node"
 import { GoddardRendererInstance as GoddardRenderer } from "../goddard/GoddardRenderer"
 import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
 import { init_graph_node_start } from "./graph_node"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
-import { CameraInstance as Camera } from "../game/Camera"
 import { DEGREES } from "../game/Camera"
 
 const SCRIPT_RUNNING = 1
@@ -19,6 +19,8 @@ class LevelCommands {
     constructor() {
         this.sScriptStatus = SCRIPT_PAUSED
         this.sDelayFrames = 0
+        this.sDelayFrames2 = 0
+
         this.sCurrentScript = {}
         this.sRegister = null
 
@@ -46,26 +48,33 @@ class LevelCommands {
         this.sStackTop = []
     }
 
-    ALLOC_LEVEL_POOL() {return this.alloc_level_pool()}
-    AREA(areaIndex, geoLayout) {return this.begin_area(areaIndex, geoLayout)}
-    CALL(arg, func, funcClass) {return this.call(arg, func, funcClass)}
-    CALL_LOOP(arg, func, funcClass) {return this.call_loop(arg, func, funcClass)}
-    END_AREA() {return this.end_area()}
-    FREE_LEVEL_POOL() {return this.free_level_pool()}
-    GET_AREA(what) {return this.get_area(what)}
-    INIT_LEVEL() {return this.init_level()}
-    JUMP_LINK(script) {return this.jump_link(script)}
-    LOAD_MODEL_FROM_GEO(model, geo) {return this.load_model_from_geo(model, geo)}
-    LOAD_MODEL_FROM_DL(model, dl, layer) {return this.load_model_from_dl(model, dl, layer)}
-    MARIO(model, bharg, bhscript) {return this.init_mario(model, bharg, bhscript)}
-    MARIO_POS(area, yaw, x, y, z) {return this.set_mario_pos(area, yaw, x, y, z)}
-    OBJECT(model, x, y, z, pitch, yaw, rot, bharg, bhscript) {return this.place_object(0x1F, model, x, y, z, pitch, yaw, rot, bharg, bhscript)}
-    RETURN() {return this.return()}  // heh
-    TERRAIN(data) {return this.terrain(data)}
-    MACRO_OBJECTS(data) {return this.macro_objects(data)}
+    // ALLOC_LEVEL_POOL() {return this.alloc_level_pool()}
+    // AREA(areaIndex, geoLayout) {return this.begin_area(areaIndex, geoLayout)}
+    // CALL(arg, func, funcClass) {return this.call(arg, func, funcClass)}
+    // CALL_LOOP(arg, func, funcClass) {return this.call_loop(arg, func, funcClass)}
+    // END_AREA() {return this.end_area()}
+    // FREE_LEVEL_POOL() {return this.free_level_pool()}
+    // GET_AREA(what) {return this.get_area(what)}
+    // INIT_LEVEL() {return this.init_level()}
+    // JUMP_LINK(script) {return this.jump_link(script)}
+    // LOAD_MODEL_FROM_GEO(model, geo) {return this.load_model_from_geo(model, geo)}
+    // LOAD_MODEL_FROM_DL(model, dl, layer) {return this.load_model_from_dl(model, dl, layer)}
+    // MARIO(model, bharg, bhscript) {return this.init_mario(model, bharg, bhscript)}
+    // MARIO_POS(area, yaw, x, y, z) {return this.set_mario_pos(area, yaw, x, y, z)}
+    // MACRO_OBJECTS(data) {return this.macro_objects(data)}
+    // OBJECT(model, x, y, z, pitch, yaw, rot, bharg, bhscript) {return this.place_object(model, x, y, z, pitch, yaw, rot, bharg, bhscript)}
+    // OBJECT_WITH_ACTS(model, x, y, z, pitch, yaw, rot, bharg, bhscript, acts) {return this.place_object(model, x, y, z, pitch, yaw, rot, bharg, bhscript, acts)}
+    // RETURN() {return this.return()}  // heh
+    // TERRAIN(data) {return this.terrain(data)}
+    // TERRAIN_TYPE(data) {return this.terrain_type(data)}
 
-    LOAD_MIO0() {this.sCurrentScript.index++}
-    LOAD_RAW() {this.sCurrentScript.index++}
+    load_mio0() {
+        this.sCurrentScript.index++
+    }
+
+    load_raw() {
+        this.sCurrentScript.index++
+    }
 
 
     init_level() {
@@ -90,9 +99,11 @@ class LevelCommands {
     }
 
     load_model_from_geo(model, geo) {
-        if (model < 256) {
-            Area.gLoadedGraphNodes[model] = GeoLayout.process_geo_layout(geo).node
-        } else throw "invalid gLoadedGraphNodes index - load model from geo"
+        if (typeof geo == "function") {
+            geo = geo()
+        }
+
+        Area.gLoadedGraphNodes[model] = GeoLayout.process_geo_layout(geo).node
 
         this.sCurrentScript.index++
     }
@@ -124,6 +135,12 @@ class LevelCommands {
         this.sCurrentScript.index++
     }
 
+    exit() {
+        // sStackTop = sStackBase;
+        // sStackBase = (uintptr_t *) *(--sStackTop);
+        // sCurrentCmd = (struct LevelCommand *) *(--sStackTop);
+    }
+
     sleep(delay) {
         //console.log("sleep")
         this.sScriptStatus = SCRIPT_PAUSED
@@ -131,6 +148,17 @@ class LevelCommands {
         if (this.sDelayFrames == 0) {
             this.sDelayFrames = delay
         } else if (--this.sDelayFrames == 0) {
+            this.sCurrentScript.index++
+            this.sScriptStatus = SCRIPT_RUNNING
+        }
+    }
+
+    sleep2(delay) {
+        this.sScriptStatus = SCRIPT_PAUSED2
+
+        if (this.sDelayFrames2 == 0) {
+            this.sDelayFrames2 = delay
+        } else if (--this.sDelayFrames2 == 0) {
             this.sCurrentScript.index++
             this.sScriptStatus = SCRIPT_RUNNING
         }
@@ -145,6 +173,28 @@ class LevelCommands {
         //console.log("set register")
         const new_value = value.call ? value() : value
         this.sRegister = new_value
+        this.sCurrentScript.index++
+    }
+
+    set_background_music(settingsPreset, seq) {
+        let m
+        switch(seq) {
+            case 3:
+                m = document.getElementById("grass")
+                m.loop = true
+                m.play()
+                break
+            case 8:
+                m = document.getElementById("snow")
+                m.loop = true
+                m.play()
+                break
+            case 19:
+                m = document.getElementById("jungle")
+                m.loop = true
+                m.play()
+                break
+        }
         this.sCurrentScript.index++
     }
 
@@ -233,8 +283,9 @@ class LevelCommands {
         this.sCurrentScript.index++
     }
 
-    place_object(act, model, x, y, z, pitch, yaw, rot, bharg, bhscript) {
+    place_object(model, x, y, z, pitch, yaw, rot, bharg, bhscript, act) {
         const val7 = 1 << (Area.gCurrActNum - 1)
+        act = act || 0x1F
 
         if (this.sCurrAreaIndex != -1 && (act & val7 || act == 0x1F)) {
             const spawnInfo = {
@@ -278,6 +329,14 @@ class LevelCommands {
         this.sCurrentScript.index++
     }
 
+    terrain_type(data) {
+        if (this.sCurrAreaIndex != -1) {
+            Area.gAreas[this.sCurrAreaIndex].terrainType = data
+        }
+
+        this.sCurrentScript.index++
+    }
+
     end_area() {
         this.sCurrAreaIndex = -1
         this.sCurrentScript.index++
@@ -302,6 +361,13 @@ class LevelCommands {
     }
 
     jump_link(script) {
+        // allow getters
+        if (typeof script == "string") {
+            script = GlobalScripts[script]
+        } else if (typeof script == "function") {
+            script = script()
+        }
+
         this.sStackTop.push({ commands: this.sCurrentScript.commands, index: ++this.sCurrentScript.index })
         this.start_new_script(script)
     }
@@ -329,8 +395,7 @@ class LevelCommands {
         while (this.sScriptStatus == SCRIPT_RUNNING) {
             const cmd = this.sCurrentScript.commands[this.sCurrentScript.index]
             if (Array.isArray(cmd)) {
-                // new style of command: ['name', args, ...]
-                this[cmd[0]].call(this, ...cmd.slice(1))
+                throw "deprecated level script format: " + cmd[0]
             } else {
                 //console.log("running script command: " + cmd.command.name)
                 cmd.command.call(this, ...(cmd.args || []))
@@ -344,3 +409,39 @@ class LevelCommands {
 }
 
 export const LevelCommandsInstance = new LevelCommands()
+
+// EXPERIMENTAL
+const Lev = LevelCommandsInstance;
+export const ALLOC_LEVEL_POOL = (...args)     => {return {command: Lev.alloc_level_pool, args: args}}
+export const AREA = (...args)                 => {return {command: Lev.begin_area, args: args}}
+export const BLACKOUT = (...args)             => {return {command: Lev.blackout, args: args}}
+export const CALL = (...args)                 => {return {command: Lev.call, args: args}}
+export const CALL_LOOP = (...args)            => {return {command: Lev.call_loop, args: args}}
+export const CLEARDEMOPTR = (...args)         => {return {command: Lev.cleardemoptr, args: args}}
+export const END_AREA = (...args)             => {return {command: Lev.end_area, args: args}}
+export const EXECUTE = (...args)              => {return {command: Lev.execute, args: args}}
+export const EXIT = (...args)                 => {return {command: Lev.exit, args: args}}
+export const FREE_LEVEL_POOL = (...args)      => {return {command: Lev.free_level_pool, args: args}}
+export const GET_AREA = (...args)             => {return {command: Lev.get_area, args: args}}
+export const INIT_LEVEL = (...args)           => {return {command: Lev.init_level, args: args}}
+export const JUMP_LINK = (...args)            => {return {command: Lev.jump_link, args: args}}
+export const LOAD_AREA = (...args)            => {return {command: Lev.load_area, args: args}}
+export const LOAD_MARIO_HEAD = (...args)      => {return {command: Lev.load_mario_head, args: args}}
+export const LOAD_MIO0 = (...args)            => {return {command: Lev.load_mio0, args: args}}
+export const LOAD_MODEL_FROM_GEO = (...args)  => {return {command: Lev.load_model_from_geo, args: args}}
+export const LOAD_RAW = (...args)             => {return {command: Lev.load_raw, args: args}}
+export const LOAD_MODEL_FROM_DL = (...args)   => {return {command: Lev.load_model_from_dl, args: args}}
+export const MARIO = (...args)                => {return {command: Lev.init_mario, args: args}}
+export const MARIO_POS = (...args)            => {return {command: Lev.set_mario_pos, args: args}}
+export const MACRO_OBJECTS = (...args)        => {return {command: Lev.macro_objects, args: args}}
+export const OBJECT = (...args)               => {return {command: Lev.place_object, args: args}}
+export const OBJECT_WITH_ACTS = (...args)     => {return {command: Lev.place_object, args: args}}
+export const RETURN = (...args)               => {return {command: Lev.return, args: args}}  // heh
+export const SET_BACKGROUND_MUSIC = (...args) => {return {command: Lev.set_background_music, args: args}}
+export const SET_REGISTER = (...args)         => {return {command: Lev.set_register, args: args}}
+export const SLEEP = (...args)                => {return {command: Lev.sleep, args: args}}
+export const SLEEP_BEFORE_EXIT = (...args)    => {return {command: Lev.sleep2, args: args}}
+export const TERRAIN = (...args)              => {return {command: Lev.terrain, args: args}}
+export const TERRAIN_TYPE = (...args)         => {return {command: Lev.terrain_type, args: args}}
+export const TRANSITION = (...args)           => {return {command: Lev.transition, args: args}}
+export const UNLOAD_AREA = (...args)          => {return {command: Lev.unload_area, args: args}}

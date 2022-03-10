@@ -6,7 +6,9 @@ import { atan2s } from "../engine/math_util"
 import { coss, sins } from "../utils"
 import { make_vertex, round_float } from "./GeoMisc"
 import * as Gbi from "../include/gbi"
-import { dl_shadow_circle, dl_shadow_9_verts, dl_shadow_end, dl_shadow_4_verts } from "../textures/segment2"
+import { dl_shadow_circle, dl_shadow_square, dl_shadow_9_verts, dl_shadow_end, dl_shadow_4_verts } from "../textures/segment2"
+import { FLOOR_LOWER_LIMIT_SHADOW } from "../include/surface_terrains"
+import { oFaceAngleYaw } from "../include/object_constants"
 
 export const SHADOW_CIRCLE_9_VERTS = 0
 export const SHADOW_CIRCLE_4_VERTS = 1
@@ -60,6 +62,7 @@ const atan2_deg = (a, b) => {
 }
 
 const correct_shadow_solidity_for_animations = (isLuigi, initialSolidity, shadow) => {
+    if (ObjectListProc.gMarioObject.length > 1) throw "not implemented multiple mario shadow"
     const player = ObjectListProc.gMarioObject
     const animFrame = player.header.gfx.unk38.animFrame
     switch (player.header.gfx.unk38.animID) {
@@ -272,7 +275,7 @@ const create_shadow_player = (xPos, yPos, zPos, shadowScale, solidity, isLuigi) 
 /**
  * Create a circular shadow composed of 9 vertices.
  */
- const create_shadow_circle_9_verts = (xPos, yPos, zPos, shadowScale, solidity) => {
+const create_shadow_circle_9_verts = (xPos, yPos, zPos, shadowScale, solidity) => {
     const shadow = {}
 
     if (init_shadow(shadow, xPos, yPos, zPos, shadowScale, solidity) != 0) {
@@ -295,7 +298,9 @@ const create_shadow_player = (xPos, yPos, zPos, shadowScale, solidity, isLuigi) 
 const create_shadow_circle_4_verts = (xPos, yPos, zPos, shadowScale, solidity) => {
     const shadow = {}
 
-    if (init_shadow(shadow, xPos, yPos, zPos, shadowScale, solidity) != 0) return
+    if (init_shadow(shadow, xPos, yPos, zPos, shadowScale, solidity) != 0) {
+        return
+    }
 
     const verts = new Array(4)
     const displayList = []
@@ -306,6 +311,7 @@ const create_shadow_circle_4_verts = (xPos, yPos, zPos, shadowScale, solidity) =
     add_shadow_to_display_list(displayList, verts, SHADOW_WITH_4_VERTS, SHADOW_SHAPE_CIRCLE)
     return displayList
 }
+
 
 const frontLeftX  = 0
 const frontLeftZ  = 1
@@ -455,7 +461,6 @@ const create_shadow_hardcoded_rectangle = (xPos, yPos, zPos, shadowScale, solidi
  * Return a pointer to the display list representing the shadow.
  */
 export const create_shadow_below_xyz = (xPos, yPos, zPos, shadowScale, shadowSolidity, shadowType) => {
-
     const floorWrapper = {}
     SurfaceCollision.find_floor(xPos, yPos, zPos, floorWrapper)
 
@@ -466,8 +471,10 @@ export const create_shadow_below_xyz = (xPos, yPos, zPos, shadowScale, shadowSol
     switch (shadowType) {
         case SHADOW_CIRCLE_9_VERTS:
             return create_shadow_circle_9_verts(xPos, yPos, zPos, shadowScale, shadowSolidity)
+
         case SHADOW_CIRCLE_4_VERTS:
             return create_shadow_circle_4_verts(xPos, yPos, zPos, shadowScale, shadowSolidity)
+
         case SHADOW_CIRCLE_4_VERTS_FLAT_UNUSED: // unused shadow type
             return create_shadow_circle_assuming_flat_ground(xPos, yPos, zPos, shadowScale, shadowSolidity)
 
@@ -487,5 +494,4 @@ export const create_shadow_below_xyz = (xPos, yPos, zPos, shadowScale, shadowSol
         default:
             return create_shadow_hardcoded_rectangle(xPos, yPos, zPos, shadowScale, shadowSolidity, shadowType)
     }
-
 }

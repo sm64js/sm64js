@@ -68,7 +68,7 @@ export const bhv_checkerboard_platform_loop = () => {
 
 	/// TODO play elevator sound
 
-	switch (o.rawData[oAction]) {
+	/*switch (o.rawData[oAction]) {
 		case 0:
 			if (o.rawData[oBehParams2ndByte] == 0)
 				o.rawData[oAction] = 1
@@ -100,6 +100,6 @@ export const bhv_checkerboard_platform_loop = () => {
 		o.rawData[oAngleVelPitch] = 0
 		o.rawData[oFaceAnglePitch] &= ~0x7FFF
 	}
-	cur_obj_move_using_fvel_and_gravity()
+	cur_obj_move_using_fvel_and_gravity()*/
 	SurfaceLoadInstance.load_object_collision_model()
 }

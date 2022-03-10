@@ -72,7 +72,7 @@ const opened_cannon_act_0 = () => {
         }
     } else {
         cur_obj_become_intangible()
-        cur_obj_disable_rendering()
+        // cur_obj_disable_rendering()
         o.rawData[OC.oCannonUnk10C] = 0
     }
 }
@@ -133,7 +133,7 @@ const opened_cannon_act_5 = () => {
 const opened_cannon_act_1 = () => {
     const o = O.gCurrentObject
     cur_obj_become_intangible()
-    cur_obj_disable_rendering()
+    // cur_obj_disable_rendering()
     o.rawData[OC.oCannonUnk10C] = 0
     O.gMarioShotFromCannon = 1
 }
@@ -171,7 +171,7 @@ export const bhv_cannon_barrel_loop = () => {
         obj_copy_pos(o, o.parentObj)
         o.rawData[OC.oMoveAngleYaw] = o.parentObj.rawData[OC.oMoveAngleYaw]
         o.rawData[OC.oFaceAnglePitch] = o.parentObj.rawData[OC.oMoveAnglePitch]
-    } else {
+    }/* else {
         cur_obj_disable_rendering()
-    }
+    }*/
 }

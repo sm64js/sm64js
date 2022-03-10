@@ -2,8 +2,8 @@ import * as Gbi from "../../../../../include/gbi"
 import { concrete, ice, wood, sand, grasssnow, granite, carpet, rock, leavesnow, boost_pad } from "../../../texture.inc"
 
 const gj_dl_default_lights = Gbi.gdSPDefLights1(
-	    0x7F, 0x7F, 0x7F,
-		0xFE, 0xFE, 0xFE, 0x28, 0x28, 0x28
+        0x96, 0x96, 0x96,
+		0xFF, 0xFF, 0xFF, 0x28, 0x28, 0x28
 )
 
 const gj_dl_dark_lights = Gbi.gdSPDefLights1(

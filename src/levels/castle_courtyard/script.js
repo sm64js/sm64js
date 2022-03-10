@@ -3,13 +3,15 @@ import { bhvMario } from "../../game/BehaviorData"
 import { LevelUpdateInstance as LevelUpdate } from "../../game/LevelUpdate"
 import { castle_courtyard_seg7_collision } from "./areas/1/collision.inc"
 import { castle_courtyard_geo_000218 } from "./areas/1/geo.inc"
-
+import { MODEL_COURTYARD_SPIKY_TREE, MODEL_CASTLE_GROUNDS_BUBBLY_TREE } from "../../include/model_ids"
+import { spiky_tree_geo, bubbly_tree_geo } from "../../actors/tree/geo.inc"
 
 export const level_castle_courtyard_entry = [
     { command: LevelCommands.init_level },
     { command: LevelCommands.init_mario, args: [1, 1, bhvMario] },
 //    { command: LevelCommands.load_model_from_geo, args: [MODEL_LEVEL_GEOMETRY_03, special_level_geo_03] },
-//    { command: LevelCommands.load_model_from_geo, args: [MODEL_CASTLE_GROUNDS_BUBBLY_TREE, bubbly_tree_geo] },
+    { command: LevelCommands.load_model_from_geo, args: [MODEL_CASTLE_GROUNDS_BUBBLY_TREE, bubbly_tree_geo] },
+    { command: LevelCommands.load_model_from_geo, args: [MODEL_COURTYARD_SPIKY_TREE, spiky_tree_geo] },
     { command: LevelCommands.begin_area, args: [1, castle_courtyard_geo_000218] },
     { command: LevelCommands.terrain, args: [castle_courtyard_seg7_collision] },
     { command: LevelCommands.end_area },

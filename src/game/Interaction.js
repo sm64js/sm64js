@@ -51,6 +51,8 @@ import {
     ACT_FREEFALL,
     ACT_PARACHUTING,
 
+    MARIO_ANIM_FIRE_LAVA_BURN,
+
     INPUT_A_PRESSED,
     INPUT_B_PRESSED,
     INPUT_INTERACT_OBJ_GRABBABLE,
@@ -73,6 +75,7 @@ import {
     sBackwardKnockbackActions,
     set_forward_vel,
     set_mario_action,
+    set_mario_animation,
     sForwardKnockbackActions,
     respawn_player,
     get_character_type,               
@@ -233,6 +236,7 @@ const check_basic_lava = (m) => {
         if (m.health < 0) { m.health = 0; respawn_player(m) } else { 
             m.vel[1] = 80
             set_mario_action(m, ACT_FREEFALL, 0)
+            set_mario_animation(m, MARIO_ANIM_FIRE_LAVA_BURN)
         }
     }
 }
@@ -410,6 +414,9 @@ const reset_mario_pitch = (m) => {
 
 const interact_coin = (m, o) => {
     m.numCoins += o.rawData[oDamageOrCoinValue] *= get_character_type(m) == 2 ? 2 : 1
+    if (m.numCoins == 100) {
+        alert("congratulations on getting 100 coins - the sm64js developer")
+    }
     m.healCounter += 4 * o.rawData[oDamageOrCoinValue]
 
     o.rawData[oInteractStatus] = INT_STATUS_INTERACTED
@@ -821,6 +828,31 @@ const bounce_off_object = (m, o, velY) => {
     m.flags &= ~MARIO_UNKNOWN_08
 
     //play_sound(SOUND_ACTION_BOUNCE_OFF_OBJECT, m -> marioObj -> header.gfx.cameraToObject)
+}
+
+export const mario_grab_used_object = (m) => {
+    if (!m.heldObj) {
+        m.heldObj = m.usedObj
+        obj_set_held_state(m.heldObj, gLinker.behaviors.bhvCarrySomething3)
+    }
+}
+
+export const mario_throw_held_object = (m) => {
+    if (m.heldObj != null) {
+        if (m.heldObj.behavior == gLinker.behaviors.bhvKoopaShellUnderwater) {
+            stop_shell_music()
+        }
+
+        obj_set_held_state(m.heldObj, gLinker.behaviors.bhvCarrySomething5)
+
+        m.heldObj.rawData[oPosX] = m.marioBodyState.heldObjLastPosition[0] + 32.0 * sins(m.faceAngle[1])
+        m.heldObj.rawData[oPosY] = m.marioBodyState.heldObjLastPosition[1]
+        m.heldObj.rawData[oPosZ] = m.marioBodyState.heldObjLastPosition[2] + 32.0 * coss(m.faceAngle[1])
+
+        m.heldObj.rawData[oMoveAngleYaw] = m.faceAngle[1]
+
+        m.heldObj = null
+    }
 }
 
 const hit_object_from_below = (m, o) => {

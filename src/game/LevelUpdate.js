@@ -5,6 +5,24 @@ import { CameraInstance as Camera } from "./Camera"
 import * as CourseTable from "../include/course_table"
 import { gLevelToCourseNumTable } from "./SaveFile"
 
+export const WARP_OP_NONE          = 0x00
+export const WARP_OP_UNKNOWN_01    = 0x01
+export const WARP_OP_UNKNOWN_02    = 0x02
+export const WARP_OP_WARP_DOOR     = 0x03
+export const WARP_OP_WARP_OBJECT   = 0x04
+export const WARP_OP_TELEPORT      = 0x05
+export const WARP_OP_STAR_EXIT     = 0x11
+export const WARP_OP_DEATH         = 0x12
+export const WARP_OP_WARP_FLOOR    = 0x13
+export const WARP_OP_GAME_OVER     = 0x14
+export const WARP_OP_CREDITS_END   = 0x15
+export const WARP_OP_DEMO_NEXT     = 0x16
+export const WARP_OP_CREDITS_START = 0x17
+export const WARP_OP_CREDITS_NEXT  = 0x18
+export const WARP_OP_DEMO_END      = 0x19
+
+export const WARP_OP_TRIGGERS_LEVEL_SELECT = 0x10
+
 const PLAY_MODE_NORMAL  =  0
 const PLAY_MODE_PAUSED  =  2
 const PLAY_MODE_CHANGE_AREA  =  3
@@ -124,7 +142,7 @@ class LevelUpdate {
 
         }
 
-        if (Area.gCurrLevelNum == 1003 || Area.gCurrLevelNum == 5) {
+        if (Area.gCurrLevelNum == 5) {
             window.sm64js.snow = true
         }
         
@@ -169,7 +187,7 @@ class LevelUpdate {
      * Return the time left until the delayed warp is initiated.
      */
     level_trigger_warp(m, warpOp) {
-        throw "level_trigger_warp not implemented"
+        console.log("level_trigger_warp not implemented")
     }
 
     update_hud_values() {

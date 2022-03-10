@@ -10,7 +10,7 @@ export const level_bbh_entry = [
     { command: LevelCommands.init_level },
     { command: LevelCommands.init_mario, args: [1, 1, bhvMario] },
     { command: LevelCommands.begin_area, args: [1, geo_bbh_000F00] },
-    { command: LevelCommands.place_object, args: [/*acts?*/ 0x1F, /*model*/ MODEL_STAR, /*pos*/ 0, 0, 0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving] },
+    { command: LevelCommands.place_object, args: [/*model*/ MODEL_STAR, /*pos*/ 0, 0, 0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCastleFlagWaving] },
     { command: LevelCommands.terrain, args: [bbh_seg7_collision_level] },
     { command: LevelCommands.rooms, args: [bbh_seg7_rooms] },
     { command: LevelCommands.end_area },

@@ -8,9 +8,10 @@ export const TERRAIN_LOAD_ENVIRONMENT = 0x0044 // Loads water/HMC gas
 export const LEVEL_BOUNDARY_MAX = 0x2000
 export const CELL_SIZE          = 0x400
 
-export const CELL_HEIGHT_LIMIT      = 20000
-export const FLOOR_LOWER_LIMIT      = -11000
-export const FLOOR_LOWER_LIMIT_MISC = (FLOOR_LOWER_LIMIT + 1000)
+export const CELL_HEIGHT_LIMIT        = 20000
+export const FLOOR_LOWER_LIMIT        = -11000
+export const FLOOR_LOWER_LIMIT_MISC   = FLOOR_LOWER_LIMIT + 1000.0
+export const FLOOR_LOWER_LIMIT_SHADOW = FLOOR_LOWER_LIMIT + 1000.0
 
 // Surface Types
 export const SURFACE_DEFAULT        = 0x0000 // Environment default

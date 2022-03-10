@@ -1,4 +1,4 @@
-import { ttm_seg7_texture_07001800, } from "../../../texture.inc.js"
+import { ttm_seg7_texture_07001800, } from "../../../texture.inc"
 import { mountain_09003800, } from "../../../../../textures/mountain"
 import { mountain_09004000, } from "../../../../../textures/mountain"
 import * as Gbi from "../../../../../include/gbi"

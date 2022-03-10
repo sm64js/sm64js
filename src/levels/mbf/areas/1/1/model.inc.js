@@ -11,10 +11,10 @@ import {generic_09006000, } from "../../../../../textures/generic.js"
 import {generic_09009800, } from "../../../../../textures/generic.js"
 import { 
 	ttm_seg7_texture_07000800,
-} from "../../../../ttm/texture.inc.js"
+} from "../../../../ttm/texture.inc"
 import { 
 	bob_seg7_texture_07000800,
-} from "../../../../bob/texture.inc.js"
+} from "../../../../bob/texture.inc"
 import {
 	mountain_09005000, 
 	mountain_0900B800, 

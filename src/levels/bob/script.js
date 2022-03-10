@@ -33,7 +33,7 @@ import { bhvMario,
          /* bhvStar,*/ bhvCastleFlagWaving,
          // bhvChainChompGate,
          bhvCheckerboardElevatorGroup,
-         bhvSeesawPlatform              } from "../../game/BehaviorData"
+         /*bhvSeesawPlatform*/bhvCollisionObj } from "../../game/BehaviorData"
 
 import { DIALOG_000, DIALOG_001, DIALOG_002, DIALOG_003 } from "../../text/us/dialogs"
 
@@ -43,6 +43,7 @@ import { bob_seg7_collision_level } from "./areas/1/collision.inc"
 import { bob_geo_000488           } from "./areas/1/geo.inc"
 import { bob_seg7_macro_objs      } from "./areas/1/macro.inc"
 import { bob_geo_000458           } from "./seesaw_platform/geo.inc"
+import { bob_seg7_collision_bridge} from "./seesaw_platform/collision.inc"
 import { bob_geo_000440           } from "./chain_chomp_gate/geo.inc"
 import { bob_geo_000470           } from "./grate_door/geo.inc"
 
@@ -53,7 +54,7 @@ import { star_geo                 } from "../../actors/star/geo.inc"
 
 const script_func_local_1 = [
     // OBJECT(/*model*/ MODEL_BOB_CHAIN_CHOMP_GATE,  /*pos*/  1456,   768,   446, /*angle*/ 0, 326, 0,  /*behParam*/ 0x00000000, /*beh*/ bhvChainChompGate),
-    OBJECT(/*model*/ MODEL_BOB_SEESAW_PLATFORM,   /*pos*/ -2303,   717,  1024, /*angle*/ 0, 45, 0,   /*behParam*/ 0x00030000, /*beh*/ bhvSeesawPlatform),
+    OBJECT(/*model*/ MODEL_BOB_SEESAW_PLATFORM,   /*pos*/ -2303,   717,  1024, /*angle*/ 0, 45, 0,   /*behParam*/ 0x00030000, /*beh*/ bhvCollisionObj(bob_seg7_collision_bridge)),
     // OBJECT(/*model*/ MODEL_NONE,                  /*pos*/ -2050,     0, -3069, /*angle*/ 0, 25, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvOpenableGrill),
     // OBJECT(/*model*/ MODEL_PURPLE_SWITCH,         /*pos*/ -2283,     0, -3682, /*angle*/ 0, 27, 0,   /*behParam*/ 0x00000000, /*beh*/ bhvFloorSwitchGrills),
     OBJECT(/*model*/ MODEL_CHECKERBOARD_PLATFORM, /*pos*/  1612,   300,  4611, /*angle*/ 0, 0, 0,    /*behParam*/ 0x00280000, /*beh*/ bhvCheckerboardElevatorGroup),

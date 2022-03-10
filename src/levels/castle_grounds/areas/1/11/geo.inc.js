@@ -16,7 +16,7 @@ import {
 export const castle_grounds_geo_000660 = () => {return [
     GEO_CULLING_RADIUS(3000),
     GEO_OPEN_NODE(),
-        GEO_SCALE(0x00, 24576),
+        GEO_SCALE(0x00, /*24576*/10000),
         GEO_OPEN_NODE(),
             GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, null),
             GEO_OPEN_NODE(),

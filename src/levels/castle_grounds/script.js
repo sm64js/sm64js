@@ -13,7 +13,7 @@ import { MODEL_MARIO, MODEL_BIRDS, MODEL_BOB_BUBBLY_TREE, MODEL_BUBBLE, MODEL_BU
 } from "../../include/model_ids"
 
 import { bhvMario, bhvBird, bhvButterfly,  bhvCastleFlagWaving, bhvHiddenAt120Stars,
-         bhvManyBlueFishSpawner, bhvMoatGrills, bhvWaterMist2
+         bhvManyBlueFishSpawner, bhvMoatGrills, bhvWaterMist2, bhvCollisionObj
 } from "../../game/BehaviorData"
 
 import { TERRAIN_GRASS                       } from "../../include/surface_terrains"
@@ -29,6 +29,7 @@ import { castle_grounds_seg7_macro_objs      } from "./areas/1/macro.inc"
 import { bubbly_tree_geo                     } from "../../actors/tree/geo.inc"
 import { castle_door_geo,
             metal_door_geo                   } from "../../actors/door/geo.inc"
+import { door_seg3_collision_0301CE78        } from "../../actors/warp_collision/collision.inc"
 import { warp_pipe_geo                       } from "../../actors/warp_pipe/geo.inc"
 
 const script_func_local_1 = [
@@ -109,6 +110,14 @@ const script_func_local_4 = [
     RETURN(),
 ]
 
+// doors
+const script_func_local_5 = [
+    OBJECT(/*model*/ MODEL_CASTLE_GROUNDS_METAL_DOOR, /*pos*/ 3292, -506, -2931, /*angle*/ 0, 225, 0, /*behParam*/ 0x0002000, /*beh*/ bhvCollisionObj(door_seg3_collision_0301CE78)),
+    OBJECT(/*model*/ MODEL_CASTLE_GROUNDS_CASTLE_DOOR, /*pos*/ -76, 803, -3155, /*angle*/ 0, 0, 0, /*behParam*/ 0x0000000, /*beh*/ bhvCollisionObj(door_seg3_collision_0301CE78)),
+    OBJECT(/*model*/ MODEL_CASTLE_GROUNDS_CASTLE_DOOR, /*pos*/ 77, 803, -3155, /*angle*/ 0, 180, 0, /*behParam*/ 0x0001000, /*beh*/ bhvCollisionObj(door_seg3_collision_0301CE78)),
+    RETURN(),
+]
+
 export const level_castle_grounds_entry = [
     INIT_LEVEL(),
     MARIO(MODEL_MARIO, 1, bhvMario),
@@ -129,6 +138,7 @@ export const level_castle_grounds_entry = [
         JUMP_LINK(script_func_local_2),
         JUMP_LINK(script_func_local_3),
         JUMP_LINK(script_func_local_4),
+        JUMP_LINK(script_func_local_5),
         TERRAIN(castle_grounds_seg7_collision_level),
         MACRO_OBJECTS(castle_grounds_seg7_macro_objs),
         // SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0000, /*seq*/ SEQ_SOUND_PLAYER),

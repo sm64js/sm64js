@@ -184,6 +184,11 @@ class LevelCommands {
                 m.loop = true
                 m.play()
                 break
+            case 5:
+                m = document.getElementById("clouded")
+                m.loop = true
+                m.play()
+                break
             case 8:
                 m = document.getElementById("snow")
                 m.loop = true

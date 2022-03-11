@@ -111,6 +111,7 @@ import { ACT_AIR_HIT_WALL,
          ACT_FORWARD_GROUND_KB,
          ACT_FORWARD_ROLLOUT,
          ACT_FREEFALL,
+         ACT_FREEFALL_ROLLING,
          ACT_FREEFALL_LAND,
          ACT_FREEFALL_LAND_STOP,
          ACT_GETTING_BLOWN,
@@ -1002,6 +1003,27 @@ const act_freefall = (m) => {
     return 0
 }
 
+const act_freefall_rolling = (m) => {
+    let animation
+
+    if (m.input & INPUT_Z_PRESSED) {
+        return set_mario_action(m, ACT_GROUND_POUND, 0)
+    }
+	
+    if (m.input & INPUT_PARACHUTE) {
+		m.input ^= INPUT_PARACHUTE
+        return set_mario_action(m, ACT_PARACHUTING, 0)
+    }
+
+    switch (m.actionArg) {
+        case 0: animation = MARIO_ANIM_FORWARD_SPINNING_FLIP; break
+        default: animation = MARIO_ANIM_FORWARD_SPINNING_FLIP; break //throw "act freefall unknown action arg: " + m.actionArg
+    }
+
+    common_air_action_step(m, ACT_FREEFALL_LAND, animation, AIR_STEP_CHECK_LEDGE_GRAB)
+    return 0
+}
+
 const act_hold_jump = (m) => {
     if (m.marioObj.rawData[oInteractStatus] & INT_STATUS_MARIO_DROP_OBJECT) {
         return drop_and_set_mario_action(m, ACT_FREEFALL, 0)
@@ -1504,6 +1526,13 @@ export const act_flying = (m) => {
             Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
         }
         return set_mario_action(m, ACT_GROUND_POUND, 1)
+    }
+
+    if (m.input & INPUT_B_PRESSED) {
+        if (m.area.camera.mode == CAMERA_MODE_BEHIND_MARIO) {
+            Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
+        }
+        return set_mario_action(m, ACT_FREEFALL_ROLLING, 1)
     }
 
     if (false /*!(m.flags & MARIO_WING_CAP)*/) {  // JOE DEBUG
@@ -2183,6 +2212,7 @@ export const mario_execute_airborne_action = (m) => {
         case ACT_JUMP:                 cancel = act_jump(m);                 break
         case ACT_DOUBLE_JUMP:          cancel = act_double_jump(m);          break
         case ACT_FREEFALL:             cancel = act_freefall(m);             break
+        case ACT_FREEFALL_ROLLING:     cancel = act_freefall_rolling(m);     break
         case ACT_HOLD_JUMP:            cancel = act_hold_jump(m);            break
         case ACT_HOLD_FREEFALL:        cancel = act_hold_freefall(m);        break
         case ACT_SIDE_FLIP:            cancel = act_side_flip(m);            break

@@ -434,6 +434,7 @@ export const ACT_LONG_JUMP                       = 0x03000888
 export const ACT_WATER_JUMP                      = 0x01000889
 export const ACT_DIVE                            = 0x0188088A
 export const ACT_FREEFALL                        = 0x0100088C
+export const ACT_FREEFALL_ROLLING                = 0x0100088D
 export const ACT_TOP_OF_POLE_JUMP                = 0x0300088D
 export const ACT_BUTT_SLIDE_AIR                  = 0x0300088E
 export const ACT_FLYING_TRIPLE_JUMP              = 0x03000894

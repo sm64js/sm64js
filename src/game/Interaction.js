@@ -79,7 +79,7 @@ import {
     sForwardKnockbackActions,
     respawn_player,
     get_character_type,               
-    ACT_POUND_ROLL} from "./Mario"
+    ACT_POUND_ROLL } from "./Mario"
 import { GameInstance as Game } from "./Game"
 import { AreaInstance as Area } from "./Area"
 import * as MarioConstants from "../include/mario_constants"
@@ -170,7 +170,7 @@ export const INT_SLIDE_KICK  = (1 << 4) // 0x10
 export const INT_FAST_ATTACK_OR_SHELL  = (1 << 5) // 0x20
 export const INT_HIT_FROM_ABOVE  = (1 << 6) // 0x40
 export const INT_HIT_FROM_BELOW = (1 << 7) // 0x80
-export const INT_ROLL = (1 << 8)
+export const INT_ROLL = (1 << 8) // 0x160?
 
 export const INT_ATTACK_NOT_FROM_BELOW =
     (INT_GROUND_POUND_OR_TWIRL | INT_PUNCH | INT_KICK | INT_TRIP | INT_SLIDE_KICK
@@ -407,7 +407,7 @@ const interact_player = (m, o) => {
 
 const reset_mario_pitch = (m) => {
     if (m.action == ACT_WATER_JUMP || m.action == ACT_SHOT_FROM_CANNON || m.action == ACT_FLYING) {
-        Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
+        // Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
         m.faceAngle[0] = 0
     }
 }

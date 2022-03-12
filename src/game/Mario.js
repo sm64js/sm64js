@@ -1215,10 +1215,10 @@ export const set_jump_from_landing = (m) => {
  export const set_mario_action_airborne = (m, action, actionArg) => {
     let fowardVel
 
-    if ((m.squishTimer != 0 || m.quicksandDepth >= 1.0)
+    /*if ((m.squishTimer != 0 || m.quicksandDepth >= 1.0)
         && (action == ACT_DOUBLE_JUMP || action == ACT_TWIRLING)) {
         action = ACT_JUMP
-    }
+    }*/
 
     switch (action) {
         case ACT_DOUBLE_JUMP:
@@ -2282,6 +2282,8 @@ export const set_water_plunge_action = m => {
 }
 
 export const respawn_player = (m) => {
+    if (m.action == ACT_IN_CANNON) return
+
     if (m.floor) {
         if (m.health == 0x00 || m.floor.type == 0x0A || m.floor.type == 0x01) m.numLives -= 1
         if (m.numLives < 0) m.numLives = 4

@@ -87,7 +87,7 @@ import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMa
     oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ, oMoveAngleYaw } from "../include/object_constants"
 import { atan2s, vec3f_dif, vec3f_length } from "../engine/math_util"
 import { sins, coss, int16, s16 } from "../utils"
-import { networkData, sendAttackToServer } from "../mmo/socket"
+import { networkData, sendAttackToServer, hasFlag } from "../mmo/socket"
 import { gLinker } from "./Linker"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
 import { SURFACE_0004, SURFACE_BURNING, SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND } from "../include/surface_terrains"
@@ -448,7 +448,7 @@ const mario_stop_riding_and_holding = (m) => {
 }
 
 const interact_cannon_base = (m, o) => {
-    if (m.action != ACT_IN_CANNON) {
+    if (m.action != ACT_IN_CANNON && !hasFlag) {
         mario_stop_riding_and_holding(m)
         o.rawData[oInteractStatus] = INT_STATUS_INTERACTED
         m.interactObj = o

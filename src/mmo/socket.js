@@ -242,6 +242,9 @@ export const send_controller_update = (frame) => {
     }*/
 }
 
+let hasFlag = false
+export { hasFlag }
+
 export const updateNetworkBeforeRender = () => {
     if (selfAdmin && gameData.marioState.marioObj.localMario) { window.sm64js.debug.preNetworkRender(networkData, gameData) }
     if (networkData.flagData == undefined) return
@@ -255,12 +258,14 @@ export const updateNetworkBeforeRender = () => {
             if (flagSocketId == networkData.mySocketID) { /// I have the flag
                 newflagpos = [...m.pos]
                 angleForFlag = m.faceAngle[1]
+                hasFlag = true
                 m.numStars = 1
             } else { /// someone else has the flag
                 let socketData = networkData.remotePlayers[flagSocketId]
                 if (socketData == undefined) return
                 newflagpos = [...socketData.marioState.pos]
                 angleForFlag = socketData.marioState.faceAngle[1]
+                hasFlag = false
                 m.numStars = 0
             }
             newflagpos[1] += 50 // adjust so its above mario head

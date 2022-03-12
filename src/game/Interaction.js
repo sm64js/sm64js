@@ -415,7 +415,7 @@ const reset_mario_pitch = (m) => {
 const interact_coin = (m, o) => {
     m.numCoins += o.rawData[oDamageOrCoinValue] *= get_character_type(m) == 2 ? 2 : 1
     if (m.numCoins == 100) {
-        alert("congratulations on getting 100 coins - the sm64js developer")
+        alert("congratulations on getting 100 coins - agent x")
     }
     m.healCounter += 4 * o.rawData[oDamageOrCoinValue]
 
@@ -448,12 +448,18 @@ const mario_stop_riding_and_holding = (m) => {
 }
 
 const interact_cannon_base = (m, o) => {
-    if (m.action != ACT_IN_CANNON && !hasFlag) {
-        mario_stop_riding_and_holding(m)
-        o.rawData[oInteractStatus] = INT_STATUS_INTERACTED
-        m.interactObj = o
-        m.usedObj = o
-        return set_mario_action(m, ACT_IN_CANNON, 0)
+    if (m.action != ACT_IN_CANNON) {
+        if (!hasFlag && m.health > 0x00) {
+            mario_stop_riding_and_holding(m)
+            o.rawData[oInteractStatus] = INT_STATUS_INTERACTED
+            m.interactObj = o
+            m.usedObj = o
+            return set_mario_action(m, ACT_IN_CANNON, 0)
+        } else {
+            m.vel[1] = 30
+            m.forwardVel = -30
+            set_mario_action(m, ACT_SOFT_BONK, 0)
+        }
     }
 
     return 0

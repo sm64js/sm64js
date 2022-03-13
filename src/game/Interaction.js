@@ -456,9 +456,9 @@ const interact_cannon_base = (m, o) => {
             m.usedObj = o
             return set_mario_action(m, ACT_IN_CANNON, 0)
         } else {
-            m.vel[1] = 30
-            m.forwardVel = -30
-            set_mario_action(m, ACT_SOFT_BONK, 0)
+	    set_mario_action(m, ACT_FREEFALL, 0)
+            m.vel[1] = 80
+            m.forwardVel = -80
         }
     }
 

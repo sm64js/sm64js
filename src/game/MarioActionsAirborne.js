@@ -312,7 +312,7 @@ const lava_boost_on_wall = (m) => {
 
 const check_fall_damage = (m, hardFallAction) => {
     return 0
-    let fallHeight
+    /*let fallHeight
     let damageHeight
 
     fallHeight = m.peakHeight - m.pos[1]
@@ -340,7 +340,7 @@ const check_fall_damage = (m, hardFallAction) => {
         }
     }
 
-    return 0
+    return 0*/
 }
 
 const update_air_without_turn = (m) => {
@@ -1145,14 +1145,15 @@ const should_get_stuck_in_ground = (m) => {
 }
 
 const check_fall_damage_or_get_stuck = (m, hardFallAction) => {
-    if (should_get_stuck_in_ground(m)) {
+    return 0
+    /*if (should_get_stuck_in_ground(m)) {
         play_sound(SOUND_MARIO_OOOF2, m.marioObj.header.gfx.cameraToObject)
         m.particleFlags |= PARTICLE_MIST_CIRCLE
         drop_and_set_mario_action(m, ACT_FEET_STUCK_IN_GROUND, 0)
         return 1
     }
 
-    return check_fall_damage(m, hardFallAction)
+    return check_fall_damage(m, hardFallAction)*/
 }
 
 const act_side_flip = (m) => {
@@ -1480,7 +1481,7 @@ export const act_shot_from_cannon = (m) => {
         case AIR_STEP_LANDED:
             set_mario_action(m, ACT_DIVE_SLIDE, 0)
             m.faceAngle[0] = 0
-            Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
+            // Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
             break
 
         case AIR_STEP_HIT_WALL:
@@ -1493,7 +1494,7 @@ export const act_shot_from_cannon = (m) => {
 
             m.particleFlags |= PARTICLE_VERTICAL_STAR
             set_mario_action(m, ACT_BACKWARD_AIR_KB, 0)
-            Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
+            // Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
             break
 
         case AIR_STEP_HIT_LAVA_WALL:
@@ -1523,7 +1524,7 @@ export const act_flying = (m) => {
 
     if (m.input & INPUT_Z_PRESSED) {
         if (m.area.camera.mode == CAMERA_MODE_BEHIND_MARIO) {
-            Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
+            // Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
         }
         return set_mario_action(m, ACT_GROUND_POUND, 1)
     }
@@ -1537,13 +1538,13 @@ export const act_flying = (m) => {
 
     if (false /*!(m.flags & MARIO_WING_CAP)*/) {  // JOE DEBUG
         if (m.area.camera.mode == CAMERA_MODE_BEHIND_MARIO) {
-            Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
+            // Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
         }
         return set_mario_action(m, ACT_FREEFALL, 0)
     }
 
     // if (m.area.camera.mode != CAMERA_MODE_BEHIND_MARIO) {
-    //     Camera.set_camera_mode(m.area.camera, CAMERA_MODE_BEHIND_MARIO, 1)
+    //     // Camera.set_camera_mode(m.area.camera, CAMERA_MODE_BEHIND_MARIO, 1)
     // }
 
     if (m.actionState == 0) {
@@ -1583,7 +1584,7 @@ export const act_flying = (m) => {
             set_anim_to_frame(m, 7)
 
             m.faceAngle[0] = 0
-            Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
+            // Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
             break
 
         case AIR_STEP_HIT_WALL:
@@ -1601,7 +1602,7 @@ export const act_flying = (m) => {
 
                 m.particleFlags |= PARTICLE_VERTICAL_STAR
                 set_mario_action(m, ACT_BACKWARD_AIR_KB, 0)
-                Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
+                // Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
             } else {
                 if (m.actionTimer++ == 0) {
                     play_sound(SOUND_ACTION_HIT, m.marioObj.header.gfx.cameraToObject)
@@ -1673,7 +1674,7 @@ export const act_riding_hoot = (m) => {
 export const act_flying_triple_jump = (m) => {
     if (m.input & (INPUT_B_PRESSED | INPUT_Z_PRESSED)) {
         if (m.area.camera.mode == CAMERA_MODE_BEHIND_MARIO) {
-            Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
+            // Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
         }
         if (m.input & INPUT_B_PRESSED) {
             return set_mario_action(m, ACT_DIVE, 0)
@@ -1702,7 +1703,7 @@ export const act_flying_triple_jump = (m) => {
 
     if (m.vel[1] < 4.0) {
         if (m.area.camera.mode != CAMERA_MODE_BEHIND_MARIO) {
-            Camera.set_camera_mode(m.area.camera, CAMERA_MODE_BEHIND_MARIO, 1)
+            // Camera.set_camera_mode(m.area.camera, CAMERA_MODE_BEHIND_MARIO, 1)
         }
 
         if (m.forwardVel < 32.0) {
@@ -1713,16 +1714,16 @@ export const act_flying_triple_jump = (m) => {
     }
 
     if (m.actionTimer++ == 10 && m.area.camera.mode != CAMERA_MODE_BEHIND_MARIO) {
-        Camera.set_camera_mode(m.area.camera, CAMERA_MODE_BEHIND_MARIO, 1)
+        // Camera.set_camera_mode(m.area.camera, CAMERA_MODE_BEHIND_MARIO, 1)
     }
 
     update_air_without_turn(m)
 
     switch (perform_air_step(m, 0)) {
         case AIR_STEP_LANDED:
-            if (!check_fall_damage_or_get_stuck(m, ACT_HARD_BACKWARD_GROUND_KB)) {
+            // if (!check_fall_damage_or_get_stuck(m, ACT_HARD_BACKWARD_GROUND_KB)) {
                 set_mario_action(m, ACT_DOUBLE_JUMP_LAND, 0)
-            }
+            // }
             break
 
         case AIR_STEP_HIT_WALL:
@@ -2023,9 +2024,9 @@ export const act_air_throw = (m) => {
 
     switch (perform_air_step(m, 0)) {
         case AIR_STEP_LANDED:
-            if (!check_fall_damage_or_get_stuck(m, ACT_HARD_BACKWARD_GROUND_KB)) {
+            // if (!check_fall_damage_or_get_stuck(m, ACT_HARD_BACKWARD_GROUND_KB)) {
                 m.action = ACT_AIR_THROW_LAND
-            }
+            // }
             break
 
         case AIR_STEP_HIT_WALL:

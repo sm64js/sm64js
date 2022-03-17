@@ -743,10 +743,146 @@ export const sBackwardKnockbackActions = [
     [ACT_BACKWARD_WATER_KB, ACT_BACKWARD_WATER_KB, ACT_BACKWARD_WATER_KB]
 ]
 
+// const rand = (max) => { return Math.floor(Math.random() * max) }
+// class AudioTable {
+//     constructor() {
+//         this.luigi_table = {
+//             hoo: "/mmo/assets/audio/luigi/hoo.mp3",
+//             hoohoo: "/mmo/assets/audio/luigi/hoohoo.mp3",
+//             yah1: "/mmo/assets/audio/luigi/yah.mp3",
+//             yah2: "/mmo/assets/audio/luigi/yah.mp3",
+//             yahoo: "/mmo/assets/audio/luigi/yahoo.mp3",
+//             yipee: "/mmo/assets/audio/luigi/yah.mp3",
+//             wah: "/mmo/assets/audio/luigi/wah.mp3",
+//             waha: "/mmo/assets/audio/luigi/waha.mp3",
+//             woo: "/mmo/assets/audio/luigi/yah.mp3"
+//         }
+//         this.chan1 = new Howl({src: [this.luigi_table[this.luigi_table["yahoo"]]]}) // voice, placeholder
+//         this.chan2 = new Howl({src: [this.luigi_table[this.luigi_table["yahoo"]]]}) // footsteps, plaveholder
+//         this.chan3 = new Howl({src: [this.luigi_table[this.luigi_table["yahoo"]]]}) // misc, placeholder
+//     }
+// 
+//     get_char_table() {
+//         let char = Math.floor(window.myMario.skinData.customCapState/2)%3
+//         switch(char) {
+//             case 0:
+//                 return this./*mario*/luigi_table
+//             case 1:
+//                 return this.luigi_table
+//             case 2:
+//                 return this./*wario*/luigi_table
+//             default:
+//                 return this.luigi_table
+//         }
+//     }
+// 
+//     play_chan1(name, vol = 1, speed = 1, playAnyway = true, override = false) {
+//         if (!playAnyway && this.chan1.playing()) { return }
+// 
+//         if (override) {
+//             this.chan1.stop()
+//         }
+//         this.chan1 = new Howl({src: [this.luigi_table[name]], autoplay: true, volume: vol})
+//         this.chan1.rate(speed)
+//     }
+//     play_chan2(name, vol = 1, speed = 1, playAnyway = true, override = false) {
+//         if (!playAnyway && this.chan2.playing()) { return }
+// 
+//         if (override) {
+//             this.chan2.stop()
+//         }
+//         this.chan2 = new Howl({src: [this.luigi_table[name]], autoplay: true, volume: vol})
+//         this.chan2.rate(speed)
+//     }
+//     play_chan3(name, vol = 1, speed = 1, playAnyway = true, override = false) {
+//         if (!playAnyway && this.chan3.playing()) { return }
+// 
+//         if (override) {
+//             this.chan3.stop()
+//         }
+//         this.chan3 = new Howl({src: [this.luigi_table[name]], autoplay: true, volume: vol})
+//         this.chan3.rate(speed)
+//     }
+// 
+//     play_jump_snd(vol = 1) {
+//         switch(rand(4)) {
+//             case 0:
+//                 this.play_chan1("woo", vol)
+//                 break
+//             case 1:
+//                 this.play_chan1("yah1", vol)
+//                 break
+//             case 2:
+//                 this.play_chan1("yah2", vol)
+//                 break
+//             default:
+//                 this.play_chan1("wah", vol)
+//                 break
+//         }
+//     }
+//     play_triple_jump_snd(vol = 1) {
+//         switch (rand(3)) {
+//             case 0:
+//                 this.play_chan1("yahoo", vol, 1, true, true)
+//                 break
+//             case 1:
+//                 this.play_chan1("waha", vol)
+//                 break
+//             default:
+//                 this.play_chan1("yipee", vol)
+//                 break
+//         }
+//     }
+//     actionHandler(action, actionArg, input) {
+//         switch (action) {
+//             case ACT_DIVE: {
+//                 if ((input & INPUT_OFF_FLOOR)) {
+//                     this.play_chan1("woohoo")
+//                 } else {
+//                     this.play_jump_snd()
+//                 }
+//                 break;
+//             }
+//             case ACT_JUMP:
+//                 this.play_jump_snd()
+//                 break
+//             case ACT_DOUBLE_JUMP:
+//                 this.play_chan1("hoohoo")
+//                 break
+//             case ACT_TRIPLE_JUMP:
+//                 this.play_triple_jump_snd()
+//                 break
+//             case ACT_LONG_JUMP:
+//                 this.play_chan1("yahoo", 1, 1, true, true)
+//                 break
+//             case ACT_PUNCHING:
+//                 switch (actionArg) {
+//                     case 1:
+//                         this.play_chan1("yah")
+//                         break
+//                     case 4:
+//                         this.play_chan1("wah")
+//                         break
+//                     case 6:
+//                         this.play_chan1("hoo")
+//                         break
+//                     case 9:
+//                         this.play_chan1("hoo")
+//                         break
+//                 }
+//                 break
+//             case ACT_JUMP_KICK:
+//                 this.play_chan1("hoo")
+//             case ACT_BACKFLIP:
+//                 this.play_chan1("yah")
+//         }
+//     }
+// }
+
 export const init_marios = () => {
 
     Object.assign(LevelUpdate.gMarioState, {
-        // snd: new MarioAudioTable(),
+        // snd: new AudioTable(),
         actionTimer: 0,
         framesSinceA: 0xFF,
         framesSinceB: 0xFF,
@@ -1016,14 +1152,14 @@ export const update_mario_sound_and_camera = (m) => {
         raise_background_noise(2)
         Camera.gCameraMovementFlags &= ~Camera.CAM_MOVE_C_UP_MODE
         // Go back to the last camera mode
-        Camera.set_camera_mode(m.area.camera, -1, 1)
+        // Camera.set_camera_mode(m.area.camera, -1, 1)
     } else if (action == ACT_SLEEPING) {
         raise_background_noise(2)
     }
 
     if (!(action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER))) {
         if (camPreset == CAMERA_MODE_BEHIND_MARIO || camPreset == CAMERA_MODE_WATER_SURFACE) {
-            Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
+            // Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
         }
     }
 }
@@ -1080,10 +1216,10 @@ export const set_jump_from_landing = (m) => {
  export const set_mario_action_airborne = (m, action, actionArg) => {
     let fowardVel
 
-    if ((m.squishTimer != 0 || m.quicksandDepth >= 1.0)
+    /*if ((m.squishTimer != 0 || m.quicksandDepth >= 1.0)
         && (action == ACT_DOUBLE_JUMP || action == ACT_TWIRLING)) {
         action = ACT_JUMP
-    }
+    }*/
 
     switch (action) {
         case ACT_DOUBLE_JUMP:
@@ -1312,6 +1448,8 @@ export const set_mario_action = (m, action, actionArg) => {
     m.actionArg = actionArg
     m.actionState = 0
     m.actionTimer = 0
+
+    // if (m.marioObj.localMario && get_character_type(m) == 1) { m.snd.actionHandler(m.action, m.actionArg, m.input) }
 
     return 1
 }
@@ -2075,11 +2213,11 @@ const set_submerged_cam_preset_and_spawn_bubbles = (m) => {
             throw "Todo ACT_FLAG_METAL_WATER - set_submerged_cam_preset_and_spawn_bubbles"
         } else {
             /*if ((heightBelowWater > 800) && (camPreset != CAMERA_MODE_BEHIND_MARIO)) {
-                Camera.set_camera_mode(m.area.camera, CAMERA_MODE_BEHIND_MARIO, 1)
+                // Camera.set_camera_mode(m.area.camera, CAMERA_MODE_BEHIND_MARIO, 1)
             }
 
             if ((heightBelowWater < 400) && (camPreset != CAMERA_MODE_WATER_SURFACE)) {
-                Camera.set_camera_mode(m.area.camera, CAMERA_MODE_WATER_SURFACE, 1)
+                // Camera.set_camera_mode(m.area.camera, CAMERA_MODE_WATER_SURFACE, 1)
             }*/
 
             // As long as Mario isn't drowning or at the top
@@ -2112,7 +2250,7 @@ export const init_mario_from_save_file = () => {
 }
 
 export const transition_submerged_to_walking = m => {
-    // Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
+    // // Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
 
     m.angleVel = [0, 0, 0]
 
@@ -2138,13 +2276,15 @@ export const set_water_plunge_action = m => {
     }
 
     /*if (m.area.camera.mode != CAMERA_MODE_WATER_SURFACE) {
-        Camera.set_camera_mode(m.area.camera, CAMERA_MODE_WATER_SURFACE, 1)
+        // Camera.set_camera_mode(m.area.camera, CAMERA_MODE_WATER_SURFACE, 1)
     }*/
 
   return set_mario_action(m, ACT_WATER_PLUNGE, 0)
 }
 
 export const respawn_player = (m) => {
+    if (m.action == ACT_IN_CANNON) return
+
     if (m.floor) {
         if (m.health == 0x00 || m.floor.type == 0x0A || m.floor.type == 0x01) m.numLives -= 1
         if (m.numLives < 0) m.numLives = 4

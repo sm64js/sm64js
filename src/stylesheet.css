@@ -111,6 +111,7 @@ body {
     background-clip: padding-box;
     height: 31.2em;
 }
+
 #optionsBorder {
     padding-top: 1em;
     padding-bottom: 1em;
@@ -122,9 +123,11 @@ body {
     height: 35.5em;
     width: auto;
 }
+
 #optionsBackground > div {
     margin-bottom: 1em;
 }
+
 #customizeBackground {
     background-image: url("/mmo/assets/pink-background.png");
     background-size: 100% 100%;
@@ -137,6 +140,7 @@ body {
     background-clip: padding-box;
     height: 31.2em;
 }
+
 #customizeBorder {
     padding-top: 1em;
     padding-bottom: 1em;
@@ -153,8 +157,30 @@ body {
     margin-bottom: 1em;
 }
 
-.color-emote{
+.direct-color-input-div{
+    margin-bottom: 3em;
+}
+
+.settings-flex{
     display: flex;
+}
+
+.settings-flex button{
+    margin-right: 1em;
+}
+
+.settings-flex h2{
+    margin-top: 0.2em;
+}
+
+.settings-flex input{
+    margin-top: 0;
+    margin-bottom: 0.7em;
+    margin-left: 0.4em;
+}
+
+.settings-options{
+    display: inline-flex;
 }
 
 #colorCodePasteWindow{
@@ -238,6 +264,7 @@ body {
 .deleteDiv {
     display: flex;
     justify-content: center;
+    margin-bottom: 0em !important;
 }
 
 .deleteDiv h2 {

@@ -251,7 +251,7 @@
                     <h2 id="pingMeter">Ping 0ms</h2>
                 </div>
                 
-                <div>   <!-- This is row 2 and so on -->
+                <div class="settings-flex settings-options">   <!-- This is row 2 and so on -->
                     <button type="button"
                             class="blue-button"
                             onclick="window.fullWindowMode = true">
@@ -259,13 +259,6 @@
                         Full Window Mode
                         </div>
                     </button>
-                    <!--button type="button"
-                        class="blue-button"
-                        onclick="window.enterFullScreenMode()">
-                        <div class="sm64button">
-                        Fullscreen Mode
-                        </div>
-                    </button-->
                     <button type="button"
                         class="blue-button"
                         onclick="window.toggleWidescreen()">
@@ -278,7 +271,7 @@
                     <h2>Super Mario Sunshine Redive</h2>
                     <input type="checkbox" checked onchange="window.sm64js.redive = this.checked"></input>
                 </div>
-            <div class="color-emote">
+            <div class="settings-flex">
                 <!-- Color code pop up -->
                 <div id="colorCodePasteWindow">
                     <label>Gameshark Color Code Importer:</label>
@@ -352,7 +345,6 @@
                     <div>
                         <label>Select Skin Preset & Character:</label>
 
-                        <div>
                             <select class="form-control" id="presetBox" onchange="window.updateSkinID(this.value); localStorage.setItem('presetBox', this.value)" style="font-family: 'TextboxFont'; height: 2rem;">
                                 <optgroup label="Main Color Codes">
                                     <option value="0">Mario Colors</option>
@@ -376,28 +368,23 @@
                                 <option value="1">Luigi</option>
                                 <option value="2">Wario</option>
                             </select>
-                        </div>
+        
+                        <!-- Player part selector -->
+                        <select id = "skinTypes" onchange="window.updateWheel()"> 
+                            <option value = "overalls">Overalls</option>
+                            <option value="hat">Hat</option> 
+                            <option value = "shirt" >Shirt</option>
+                            <option value="gloves">Gloves</option >
+                            <option value = "boots">Boots</option>
+                            <option value="skin">Skin</option>
+                            <option value = "hair">Hair</option>
+                            <option value = "parachute">Glider & Kart</option>
+                        </select>
                     </div>
 
                     <br>
 
                 <!-- Options -->
-                    <!-- Player part selector -->
-                    <div>
-                    <select id = "skinTypes" onchange="window.updateWheel()"> 
-                        <option value = "overalls">Overalls</option>
-                        <option value="hat">Hat</option> 
-                        <option value = "shirt" >Shirt</option>
-                        <option value="gloves">Gloves</option >
-                        <option value = "boots">Boots</option>
-                        <option value="skin">Skin</option>
-                        <option value = "hair">Hair</option>
-                        <option value = "parachute">Glider & Kart</option>
-                    </select>
-                    </div>
-
-                    <br>
-
                     <!-- Ambient color checkbox -->
                     <div>
                         <input type="checkbox" id="updateAmb" checked>
@@ -416,23 +403,22 @@
                     </div>
 
                     <!-- RGB input -->
-                    <h2>Direct color input:</h2>
-                    <label>Color:</label>
-                    <input type="color" id="colorInput" onchange="
-                    window.colorPicker.color.hexString = this.value
-                    if (document.getElementById('updateAmb').checked) {
-                        document.getElementById('ambientInput').value = window.hex2ambient(this.value)
-                        window.ambientPicker.color.hexString = document.getElementById('ambientInput').value
+                    <div class="direct-color-input-div">
+                        <h2>Direct color input:</h2>
+                        <label>Color:</label>
+                        <input type="color" id="colorInput" onchange="
+                        window.colorPicker.color.hexString = this.value
+                        if (document.getElementById('updateAmb').checked) {
+                            document.getElementById('ambientInput').value = window.hex2ambient(this.value)
+                            window.ambientPicker.color.hexString = document.getElementById('ambientInput').value
 
-                        window.updateAmbientColors(window.ambientPicker.color)
-                    }
-                    window.updateColors(window.colorPicker.color)
-                    window.myMario.saveSkin()">
-                    <label> Ambient color:</label>
-                    <input type="color" id="ambientInput" onchange="window.ambientPicker.color.hexString = this.value; window.updateAmbientColors(window.ambientPicker.color); window.myMario.saveSkin()">
-                    <br />
-                    <br />
-                    <br />
+                            window.updateAmbientColors(window.ambientPicker.color)
+                        }
+                        window.updateColors(window.colorPicker.color)
+                        window.myMario.saveSkin()">
+                        <label> Ambient color:</label>
+                        <input type="color" id="ambientInput" onchange="window.ambientPicker.color.hexString = this.value; window.updateAmbientColors(window.ambientPicker.color); window.myMario.saveSkin()">
+                    </div>
                     <!-- Controls and customization -->
                     <div id="pinkControls">
                         <button type="button"

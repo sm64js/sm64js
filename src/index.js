@@ -25,6 +25,7 @@ window.pvp = true
 // !! hack - Running this function after this is set to true will allow access to things like Gbi from sm64js.debug!
 window.sm64js = {
     fps: 0,
+    fov: 45,
     latency: 0,
     totalTrianges: 0,
     playerInput: {},

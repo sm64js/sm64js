@@ -123,7 +123,7 @@ class GeoRenderer {
             const perspNorm = {}
 
             MathUtil.guPerspective(mtx, perspNorm,
-                node.wrapper.fov, aspect, node.wrapper.near, node.wrapper.far, 1.0)
+                window.sm64js.fov, aspect, node.wrapper.near, node.wrapper.far, 1.0)
 
             //Gbi.gSPPerspNormalize(Game.gDisplayList, perspNorm.value)
             Gbi.gSPMatrix(Game.gDisplayList, mtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)

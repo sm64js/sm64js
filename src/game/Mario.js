@@ -1670,7 +1670,7 @@ const mario_update_hitbox_and_cap_model = (m) => {
         //  this can be paused through to give continual invisibility. This leads to
         //  no interaction with objects.
 
-        if (window.gGlobalTimer & 1) {
+        if (window.sm64js.gGlobalTimer & 1) {
             m.marioObj.header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE
         }
     }

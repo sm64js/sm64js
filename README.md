@@ -52,6 +52,21 @@ npm run serve
 ```
 You should now be able to access the website with the game from a web browser by typing "localhost" into the address bar.
 
+## Neat gLinker commands you can run in the console
+Because of a good portion of the game existing under the gLinker object within the window object, you can manipulate these portions of code to make certain things happen.
+
+Drain the Castle Grounds moat:
+```js
+const gEnvironmentRegions = gLinker.ObjectListProcessor.gEnvironmentRegions
+gEnvironmentRegions[6] = -800
+gEnvironmentRegions[12] = -800
+```
+
+Access Mario's state:
+```js
+gLinker.LevelUpdate.gMarioState.key = value
+```
+With this, you can make Mario fly, go fast, and a lot of other things.
 
 ### Related Projects
 [Super Mario 64 Decomp](https://github.com/n64decomp/sm64)

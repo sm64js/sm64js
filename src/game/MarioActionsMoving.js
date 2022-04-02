@@ -1227,7 +1227,7 @@ const act_pound_roll = (m) => {
         return Mario.set_mario_action(m, m.forwardVel > 0.0 ? Mario.ACT_FORWARD_ROLLOUT : Mario.ACT_BACKWARD_ROLLOUT, 0)
     }
     if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & Mario.INPUT_B_PRESSED)) {
-		m.vel[1] = 15.0
+		m.vel[1] = 5.0
 		Mario.set_forward_vel(m, f_vel_values[Mario.get_character_type(m)])
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
     }

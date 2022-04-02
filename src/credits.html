@@ -2,7 +2,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>sm64js</title>
+    <title>sm64ts</title>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-178244102-1"></script>
@@ -13,17 +13,10 @@
 
         gtag('config', 'UA-178244102-1')
     </script>
-    <style type="text/css">
-        div{
-            margin-bottom: 0.1em;
-        }
-        h1,h2,h3,h4,h5,h6{
-            font-size: 1.2em;
-        }
-    </style>
 </head>
 
-<body class="text-center">
+<body class="text-center credits">
+    
     <!-- Nav bar -->
     <header>
         <nav>
@@ -40,6 +33,7 @@
 
 
     <!-- Main content of the site-->
+    <div class="siteMargins">
     <main>
 
         <!-- Title -->
@@ -51,18 +45,18 @@
 
         <a name="About"></a>
             <h4>What is this?</h4>
-            <p style="margin-left: 20%; margin-right: 20%;">
-                This is an ongoing work-in-progress port of the <a href="https://github.com/n64decomp/sm64">decompilation</a> of original Nintendo game, Super Mario 64, to native Javascript (No Emulation) (No WebAssembly).
-                This project required creating a Javascript WebGL port of <a href="https://github.com/Emill/n64-fast3d-engine">N64 Fast 3D Renderer</a> originally implemented with OpenGL in C. This project also includes the development of online mass multiplayer versions of sm64js and other custom multiplayer game modes.
+            <p>
+                This is an ongoing work-in-progress port of the <a href="https://github.com/n64decomp/sm64">decompilation</a> of original Nintendo game, Super Mario 64, to native Typescript (No Emulation) (No WebAssembly).
+                This project required creating a Typescript WebGL port of <a href="https://github.com/Emill/n64-fast3d-engine">N64 Fast 3D Renderer</a> originally implemented with OpenGL in C. This project also includes the development of online mass multiplayer versions of sm64js and other custom multiplayer game modes.
             </p>
-            <br />
+
 
             <a name="Purpose"></a>
             <h4>What is the purpose of this port?</h4>
-            <ul style="display:inline-block;vertical-align:middle;text-align:left">
+            <ul class="listCredits">
                 <li>
                     <b>Extensibility:</b> More access to more developers to add custom content
-                    <ul style="padding-left:40px">
+                    <ul class="listPadding">
                         <li>Rapid Prototyping</li>
                         <li>More friendly to importing other software modules/packages</li>
                         <li>More friendly to prototyping multiplayer custom games/mods</li>
@@ -71,8 +65,7 @@
                 <li><b>Portablity:</b> Sm64 projects can run on any device with a web browser anywhere without needing to download or install anything</li>
                 <li>Opportunity to refactor / rewrite with modern coding style and cleanup</li>
             </ul>
-            <br />
-            <br />
+
 
             <a name="WASM"></a>
             <h4>What's wrong with WebAssembly / Emscripten</h4>
@@ -81,30 +74,25 @@
 
             <a name="Credits"></a>
             <h4>Credits</h4>
-            <br />
-
-
-            <div class="row" style="justify-content:center;">
+            <div class="creditsCenter">
                 <h5>
-                    <a style="font-size: 24px;" style="font-weight:bold !important;" href="https://github.com/sm64js/sm64js/graphs/contributors">Developers / Contributors</a>
+                    <a href="https://github.com/sm64js/sm64js/graphs/contributors">Developers / Contributors</a>
                 </h5>
-
             </div>
-            <div style="justify-content:center;">
-                <p style="margin-left: 74px;">
+            <div class="creditsCenter">
+                <p>
                     <a style="color:#fdffd4" href="https://sm64js.com">Snuffy</a>,
                     <a style="color:#fdffd4" href="https://github.com/ScottDikowitz">ScottDikowitz</a>,
-                    <a style="color:#fdffd4" href="https://luphoria.github.io/">luphoria</a>,
+                    <a style="color:#fdffd4" href="https://github.com/luphoria">luphoria</a>,
                     <a style="color:#fdffd4" href="https://github.com/TERRAERROR">0x2480</a>,
                     <a style="color:#fdffd4" href="https://github.com/agent-11">Agent-11</a>,
-                    <a style="color:#fdffd4" href="https://github.com/GamePainter06">gp</a>,
                     <a style="color:#fdffd4" href="https://github.com/Tarnadas">Mario Reder</a>,
                     <a style="color:#fdffd4" href="https://github.com/GlitchyPSIX">GlitchyPSI</a>,
                     <a style="color:#fdffd4" href="https://github.com/AlbertoCentonze">Alberto</a>,
                     <a style="color:#fdffd4" href="https://github.com/djoslin0">djoslin0</a>,
                     <a style="color:#fdffd4" href="https://github.com/joe07734">joe07734</a>,
-                    <a style="color:#fdffd4;" href="https://github.com/eros71-dev">eros71</a>.
-
+                    <a style="color:#fdffd4;" href="https://github.com/eros71-dev">eros71</a>,
+                    <a style="color:#fdffd4;" href="https://www.youtube.com/watch?v=2DQpAHyiqrg">Michael Jackson</a>.
                 </p>
             </div>
             <br />
@@ -112,11 +100,11 @@
 
             <div>
                 <div>
-                    <h6><a style="font-weight:bold !important" href="https://github.com/n64decomp/sm64">Super Mario 64 Decomp</a></h6>
+                    <h6><a href="https://github.com/n64decomp/sm64">Super Mario 64 Decomp</a></h6>
                     <p>Team that decompiled the original Super Mario 64 ROMs into C source code</p>
                 </div>
                 <div>
-                    <h6><a style="font-weight:bold !important" href="https://github.com/sm64-port/sm64-port">Super Mario 64 PC Port</a></h6>
+                    <h6><a href="https://github.com/sm64-port/sm64-port">Super Mario 64 PC Port</a></h6>
                     <p>Team that ported the decompiled project to PC</p>
                 </div>
 
@@ -124,46 +112,41 @@
 
             <div>
                 <div>
-                    <h6><a style="font-weight:bold !important" href="https://github.com/Emill/n64-fast3d-engine">N64 Fast 3D Renderer</a></h6>
-                    <p class="mb-0">
-                        OpenGL Implementation of a 3D renderer for the Nintendo 64's graphics
-                    </p>
-                    <small>   (I had to reimplement this in Javascript and WebGL)   </small>
+                    <h6><a href="https://github.com/Emill/n64-fast3d-engine">N64 Fast 3D Renderer</a></h6>
+                    <p>OpenGL Implementation of a 3D renderer for the Nintendo 64's graphics</p>
+                    <p>(Snuffy had to reimplement this in Typescript and WebGL)</p>
                 </div>
             </div>
-
-            <br />
 
             <div>
 
                 <div>
-                    <h6><a style="font-weight:bold !important" href="https://github.com/djoslin0/sm64ex-coop">Super Mario 64 Coop</a></h6>
-                    <p class="mb-0">
+                    <h6><a href="https://github.com/djoslin0/sm64ex-coop">Super Mario 64 Coop</a></h6>
+                    <p>
                         Online cooperative multiplayer mod for SM64, aiming to synchronize all entities and every level for two players.
 
                     </p>
-                    <small style="font-size: 15px;">
+                    <p>
                         (Special thanks to <a href="https://github.com/djoslin0">djoslin0</a>, the developer of this project, for consultation and advice on the implementation of multiplayer for sm64js. I also ported some  code from this project directly)
-                    </small>
+                    </p>
                 </div>
             </div>
 
-
-
             <br />
-            <div  style="justify-content:center;">
+
+            <div class="creditsCenter">
                 <h6>Other Libraries</h6>
             </div>
-            <div style="justify-content:center;">
+            <div class="creditsCenter">
                 <p>
                     <a style="color:#fdffd4" href="https://jeremyckahn.github.io/keydrown/">Keydrown</a>
                 </p>
             </div>
 
-            <div style="justify-content:center;">
+            <div class="creditsCenter">
                 <h6>Special Thanks to</h6>
             </div>
-            <div style="justify-content:center;">
+            <div class="creditsCenter">
                 <p>
                     <a style="color:#fdffd4" href="https://github.com/djoslin0">djoslin0</a>,
                     <a style="color:#fdffd4" href="https://github.com/yandeu">Yannick</a>,
@@ -176,10 +159,8 @@
                     <a style="color:#fdffd4" href="https://fontstruct.com/fontstructions/show/866471/mario_64_textbox">TheMH</a>,
                     <!-- Mario troll emoji -->
                     <a style="color:#fdffd4" href="https://maly.io/@Troll/733515">Troll</a>,
-                    <!-- Glider Jungle -->
-                    <a style="color:#fdffd4" href="https://youtu.be/oNs_QW-zinQ">Glider Jungle Theme</a>
-                    <!-- TWVybGluJ3MgbW9kZWwgdXNlZCBhcyBhIGJhc2U=
-                    <a style="color:#fdffd4" href="https://twitter.com/YinyangGio14">YinyangGio</a>.-->
+                    <!-- TmljZSBvZiB0aGUgcHJpbmNlc3MgdG8gaW52aXRlIHVzIG92ZXIgZm9yIGEgcGljbmljLCBlaCBMdWlnaT8= -->
+                    <a style="color:#fdffd4" href="https://twitter.com/YinyangGio14">YinyangGio</a>.
                 </p>
             </div>
 
@@ -189,11 +170,12 @@
             <p>
                 Questions? Suggestions? Want to help with this project? =)
                 <br />
-                I have a discord server dedicated to sm64js: <a href="https://discord.gg/7UaDnJt"> Join Here </a>
+                I have a discord server dedicated to sm64ts: <a href="https://discord.gg/7UaDnJt"> Join Here </a>
                 <br />
                 Discord: snuffysasa#2779
             </p>
             <br />
+        </div>
     </main>
 
 </body>

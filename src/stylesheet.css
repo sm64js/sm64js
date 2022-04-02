@@ -111,7 +111,6 @@ body {
     background-clip: padding-box;
     height: 31.2em;
 }
-
 #optionsBorder {
     padding-top: 1em;
     padding-bottom: 1em;
@@ -123,11 +122,21 @@ body {
     height: 35.5em;
     width: auto;
 }
-
+.settings-flex{
+    display: flex;
+    justify-content: center;
+}
+.settings-options{
+    margin-top: 0.2em;
+    column-gap: 0.2em;
+}
+.settings-options label{
+    margin-top: 0.2em;
+    margin-left: 1em;
+}
 #optionsBackground > div {
     margin-bottom: 1em;
 }
-
 #customizeBackground {
     background-image: url("/mmo/assets/pink-background.png");
     background-size: 100% 100%;
@@ -140,7 +149,6 @@ body {
     background-clip: padding-box;
     height: 31.2em;
 }
-
 #customizeBorder {
     padding-top: 1em;
     padding-bottom: 1em;
@@ -157,38 +165,20 @@ body {
     margin-bottom: 1em;
 }
 
-.direct-color-input-div{
-    margin-bottom: 3em;
-}
-
-.settings-flex{
+.color-emote{
     display: flex;
 }
 
-.settings-flex button{
-    margin-right: 1em;
-}
-
-.settings-flex h2{
-    margin-top: 0.2em;
-}
-
-.settings-flex input{
-    margin-top: 0;
-    margin-bottom: 0.7em;
-    margin-left: 0.4em;
-}
-
-.settings-options{
-    display: inline-flex;
-}
-
 #colorCodePasteWindow{
-    width: 50%;
+    width: fit-content;
 }
 
 .emoteMenu{
-    width: 75%;
+    width: fit-content;
+}
+
+#pinkControls{
+    margin-top: 2.3em;
 }
 
 /* Gamepad & controls*/
@@ -264,7 +254,6 @@ body {
 .deleteDiv {
     display: flex;
     justify-content: center;
-    margin-bottom: 0em !important;
 }
 
 .deleteDiv h2 {
@@ -678,6 +667,17 @@ ul#chatlog {
     list-style-type: none;
 }
 
+ul#creditsList {
+    display:inline-block;
+    vertical-align:middle;
+    text-align:left;
+    font-size: 1em;
+}
+
+ul#creditsList li{
+    font-size: 1em;
+}
+
 #chatlog {
     background-color: #eae2a7;
     height: 20em;
@@ -790,4 +790,48 @@ label {
 #connectedMsg {
     margin-top: 0.5em;
     font-size: 1.8em;
+}
+
+/* Credits */
+
+.credits p {
+    font-size: 1.8em;
+}
+
+.credits h1, h2, h3, h4, h5, h6 {
+    font-size: 2em;
+    margin-bottom: 0;
+}
+
+.credits .siteMargins{
+    margin-left: 8%;
+    margin-right: 8%;
+}
+
+.creditsCenter{
+    justify-content: center;
+}
+
+.creditsCenter h6, .creditsCenter h5{
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+h5 a{
+    font-weight: bold !important;
+}
+
+h6 a{
+    font-weight: bold !important;
+}
+
+.listPadding{
+    padding-left: 1em;
+}
+
+.listCredits{
+    text-align: left;
+    margin-left: 20%;
+    margin-right: 20%;
+    font-size: 1.5em;
 }

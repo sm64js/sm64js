@@ -49,6 +49,7 @@ import {
     ACT_BUTT_SLIDE_AIR,
     ACT_HOLD_BUTT_SLIDE_AIR,
     ACT_FREEFALL,
+    ACT_FREEFALL_ROLLING,
     ACT_PARACHUTING,
 
     MARIO_ANIM_FIRE_LAVA_BURN,
@@ -982,6 +983,8 @@ const determine_interaction = (m, o) => {
         } else if (m.forwardVel <= -26.0 || 26.0 <= m.forwardVel) {
             interaction = INT_FAST_ATTACK_OR_SHELL
         } else if (m.action == ACT_POUND_ROLL) {
+            interaction = INT_ROLL
+        } else if (m.action == ACT_FREEFALL_ROLLING) {
             interaction = INT_ROLL
         }
 

@@ -1201,6 +1201,8 @@ const act_double_jump = (m) => {
 
 const act_triple_jump = (m) => {
 
+    m.doLavaorTwirlcheck = false
+
     if (m.input & INPUT_B_PRESSED) {
 		m.canGlide = 2
         return set_mario_action(m, ACT_DIVE, 0)
@@ -1215,7 +1217,15 @@ const act_triple_jump = (m) => {
         return set_mario_action(m, ACT_PARACHUTING, 0)
     }
 
-    common_air_action_step(m, ACT_TRIPLE_JUMP_LAND, MARIO_ANIM_TRIPLE_JUMP, 0)
+    if (window.sm64js.betatj) {
+        common_air_action_step(m, ACT_TRIPLE_JUMP_LAND, MARIO_ANIM_TRIPLE_JUMP, 0)
+    } else {
+        common_air_action_step(m, ACT_FREEFALL_LAND, MARIO_ANIM_FORWARD_SPINNING, 0)
+        if (is_anim_at_end(m)) {
+            set_mario_animation(m, MARIO_ANIM_START_TWIRL, 0)
+            return set_mario_action (m, ACT_TWIRLING, 0)
+        }
+    }
     play_flip_sounds(m, 2, 8, 20)
     return 0
 }
@@ -1275,11 +1285,11 @@ const act_twirling = (m) => {
         yawVelTarget = 0x1800
     }
 
-    m.angleVel[1] = approach_s32(m.angleVel[1], yawVelTarget, 0x200, 0x200)
+    m.angleVel[1] = approach_s32(m.angleVel[1], yawVelTarget, 0x1800, 0x1800)
     m.twirlYaw += m.angleVel[1]
 
-    set_mario_animation(m, m.actionArg == 0 ? MARIO_ANIM_START_TWIRL : MARIO_ANIM_TWIRL)
-    if (is_anim_past_end(m)) {
+    set_mario_animation(m, m.actionArg == 0 ? MARIO_ANIM_TWIRL : MARIO_ANIM_TWIRL)
+    if (is_anim_at_end(m)) {
         m.actionArg = 1
     }
 
@@ -1287,11 +1297,13 @@ const act_twirling = (m) => {
         play_sound(SOUND_ACTION_TWIRL, m.marioObj.header.gfx.cameraToObject)
     }
 
-    update_lava_boost_or_twirling(m)
+    if (!(m.doLavaorTwirlcheck == false)) {
+        update_lava_boost_or_twirling(m)
+    }
 
     switch (perform_air_step(m, 0)) {
         case AIR_STEP_LANDED:
-            set_mario_action(m, ACT_TWIRL_LAND, 0)
+            set_mario_action(m, ACT_FREEFALL_LAND, 0)
             break
 
         case AIR_STEP_HIT_WALL:

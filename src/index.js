@@ -34,6 +34,7 @@ window.sm64js = {
     HUDHidden: false,
     widescreen: false,
     redive: true,
+    betatj: true,
     debug: {
         marioList: [],
         print: PrintInstance,

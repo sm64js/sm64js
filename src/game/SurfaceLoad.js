@@ -6,6 +6,7 @@ import { oDistanceToMario, oCollisionDistance, oDrawingDistance, ACTIVE_FLAG_IN_
 import { GRAPH_RENDER_ACTIVE } from "../engine/graph_node"
 import { dist_between_objects, obj_build_transform_from_pos_and_angle, obj_apply_scale_to_matrix } from "./ObjectHelpers"
 import { SpawnObjectInstance as Spawn } from "./SpawnObject"
+import { AreaInstance as Area } from "./Area"
 
 class SurfaceLoad {
     constructor() {
@@ -239,6 +240,11 @@ class SurfaceLoad {
 
             ObjectListProc.gEnvironmentLevels[i] = height
 
+        }
+        // experiment
+        if (Area.gCurrLevelNum == 16) {
+            ObjectListProc.gEnvironmentRegions[6] = -800
+            ObjectListProc.gEnvironmentRegions[12] = -800
         }
 
         return dataIndex

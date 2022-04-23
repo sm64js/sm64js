@@ -8,18 +8,18 @@ import {
     set_object_visibility
 } from "../ObjectHelpers"
 
-// void bhv_1up_interact(void) {
-//     UNUSED s32 sp1C;
+import { LevelUpdateInstance as LevelUpdate } from "../LevelUpdate"
 
-//     if (obj_check_if_collided_with_object(o, gMarioObject) == 1) {
-//         play_sound(SOUND_GENERAL_COLLECT_1UP, gGlobalSoundSource);
-//         gMarioState->numLives++;
-//         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
-// #ifdef VERSION_SH
-//         queue_rumble_data(5, 80);
-// #endif
-//     }
-// }
+const bhv_1up_interact = () => {
+    // UNUSED s32 sp1
+    // const o = O.gCurrentObject
+
+    // if (obj_check_if_collided_with_object(o, LevelUpdate.gMarioState.marioObj) == 1) {
+    //     // play_sound(SOUND_GENERAL_COLLECT_1UP, gGlobalSoundSource)
+    //     LevelUpdate.gMarioState.numLives++
+    //     o.activeFlags = ACTIVE_FLAG_DEACTIVATED
+    // }
+}
 
 export const bhv_1up_common_init = () => {
     const o = O.gCurrentObject
@@ -190,7 +190,7 @@ export const bhv_1up_sliding_loop = () => {
 
 export const bhv_1up_loop = () => {
     const o = O.gCurrentObject;
-//     bhv_1up_interact();
+    bhv_1up_interact();
     // set_object_visibility(o, 3000)
 }
 

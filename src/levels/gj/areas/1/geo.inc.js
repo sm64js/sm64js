@@ -1,45 +1,68 @@
-import { GeoLayoutInstance as Geo } from "../../../../engine/GeoLayout"
-import { CameraInstance as Camera } from "../../../../game/Camera"
-import { geo_skybox_main } from "../../../../game/LevelGeo"
-import { geo_movtex_draw_water_regions } from "../../../../game/MovingTexture"
+// Glider Jungle
 
-import { gj_dl_fountain_mesh_layer_1, gj_dl_hut_mesh_layer_1, gj_dl_jungle_mesh_layer_1,
-	gj_dl_ice_mesh_layer_1, gj_dl_trees_mesh_layer_1, gj_dl_launch2_mesh, gj_dl_launch3_mesh,
-	gj_dl_launch4_mesh, gj_dl_launch5_mesh
+import {
+    SCREEN_WIDTH, SCREEN_HEIGHT
+} from "../../../../game/Skybox"
+
+import {
+    GEO_NODE_SCREEN_AREA, GEO_OPEN_NODE, GEO_ZBUFFER, GEO_NODE_ORTHO, GEO_BACKGROUND,
+    GEO_CLOSE_NODE, GEO_CAMERA_FRUSTUM_WITH_FUNC, GEO_CAMERA, GEO_DISPLAY_LIST, GEO_ASM,
+    GEO_RENDER_OBJ, GEO_END,
+    BACKGROUND_OCEAN_SKY, LAYER_OPAQUE, LAYER_ALPHA, LAYER_TRANSPARENT_DECAL, LAYER_OPAQUE_DECAL
+} from "../../../../engine/GeoLayout"
+
+import {
+    geo_skybox_main, geo_envfx_main
+} from "../../../../game/LevelGeo"
+
+import {
+    geo_camera_fov, geo_camera_main
+} from "../../../../game/Camera"
+
+import {
+    gj_dl_jungle_mesh_layer_1,
+	gj_dl_trees_mesh_layer_1,
+    gj_dl_vines_mesh_layer_4,
+    gj_dl_launch2_mesh,
+    gj_dl_launch3_mesh,
+	gj_dl_launch4_mesh,
+    gj_dl_launch5_mesh,
+    gj_dl_ring9_mesh_layer_1
 } from "./1/model.inc"
 
-const canvas = document.querySelector('#gameCanvas')
+import { geo_movtex_draw_water_regions } from "../../../../game/MovingTexture"
 
-export const gj_area_1_geo = [
-	{ command: Geo.node_screen_area, args: [10, canvas.width/2, canvas.height/2, canvas.width/2, canvas.height/2]},
-	{ command: Geo.open_node },
-	{ command: Geo.node_master_list, args: [0]},
-	{ command: Geo.open_node },
-	{ command: Geo.node_ortho, args: [100.0000]},
-	{ command: Geo.open_node },
-	{ command: Geo.node_background, args: [Geo.BACKGROUND_SNOW_MOUNTAINS, geo_skybox_main] },
-	{ command: Geo.close_node },
-	{ command: Geo.close_node },
-	{ command: Geo.node_master_list, args: [1]},
-	{ command: Geo.open_node },
-	{ command: Geo.node_perspective, args: [45.0000, 100, 30000, Camera.geo_camera_fov] },
-	{ command: Geo.open_node },
-	{ command: Geo.node_camera, args: [1, 0, 2000, 6000, 0, -2200, 0, Camera.geo_camera_main]},
-	{ command: Geo.open_node },
-	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, gj_dl_fountain_mesh_layer_1] },
-	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, gj_dl_hut_mesh_layer_1] },
-	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, gj_dl_jungle_mesh_layer_1] },
-	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, gj_dl_ice_mesh_layer_1] },
-	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, gj_dl_trees_mesh_layer_1] },
-	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, gj_dl_launch2_mesh] },
-	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, gj_dl_launch3_mesh] },
-	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, gj_dl_launch4_mesh] },
-	{ command: Geo.display_list, args: [Geo.LAYER_OPAQUE, gj_dl_launch5_mesh] },
-	// { command: Geo.node_generated, args: [0x3701, geo_movtex_draw_water_regions]},
-	{ command: Geo.node_render_object_parent },
-	{ command: Geo.close_node },
-	{ command: Geo.close_node },
-	{ command: Geo.close_node },
-	{ command: Geo.close_node },
-	{ command: Geo.node_end },
-]
+export const gj_area_1_geo = () => {return [
+    GEO_NODE_SCREEN_AREA(10, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+    GEO_OPEN_NODE(),
+        GEO_ZBUFFER(0),
+        GEO_OPEN_NODE(),
+            GEO_NODE_ORTHO(100),
+            GEO_OPEN_NODE(),
+                GEO_BACKGROUND(BACKGROUND_OCEAN_SKY, geo_skybox_main),
+            GEO_CLOSE_NODE(),
+        GEO_CLOSE_NODE(),
+        GEO_ZBUFFER(1),
+        GEO_OPEN_NODE(),
+            GEO_CAMERA_FRUSTUM_WITH_FUNC(45, 100, 20000, geo_camera_fov),
+            GEO_OPEN_NODE(),
+                GEO_CAMERA(16, 0, 1500, 2500, 0, 1500, -12000, geo_camera_main),
+                GEO_OPEN_NODE(),
+	                GEO_DISPLAY_LIST(LAYER_OPAQUE, gj_dl_jungle_mesh_layer_1),
+	                GEO_DISPLAY_LIST(LAYER_OPAQUE, gj_dl_trees_mesh_layer_1),
+                    // GEO_DISPLAY_LIST(LAYER_OPAQUE, gj_dl_vines_mesh_layer_4),
+	                GEO_DISPLAY_LIST(LAYER_OPAQUE, gj_dl_launch2_mesh),
+	                GEO_DISPLAY_LIST(LAYER_OPAQUE, gj_dl_launch3_mesh),
+	                GEO_DISPLAY_LIST(LAYER_OPAQUE, gj_dl_launch4_mesh),
+	                GEO_DISPLAY_LIST(LAYER_OPAQUE, gj_dl_launch5_mesh),
+                    GEO_DISPLAY_LIST(LAYER_OPAQUE, gj_dl_ring9_mesh_layer_1),
+	                GEO_ASM(0x3701, geo_movtex_draw_water_regions),
+                    GEO_RENDER_OBJ(),
+                    GEO_ASM(0, geo_envfx_main),
+                GEO_CLOSE_NODE(),
+            GEO_CLOSE_NODE(),
+        GEO_CLOSE_NODE(),
+        GEO_ZBUFFER(0),
+    GEO_CLOSE_NODE(),
+    GEO_END(),
+]};

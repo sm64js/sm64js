@@ -182,21 +182,25 @@ class LevelCommands {
             case 3:
                 m = document.getElementById("grass")
                 m.loop = true
+                m.volume = 0.5
                 m.play()
                 break
             case 5:
                 m = document.getElementById("clouded")
                 m.loop = true
+                m.volume = 0.5
                 m.play()
                 break
             case 8:
                 m = document.getElementById("snow")
                 m.loop = true
+                m.volume = 0.5
                 m.play()
                 break
             case 19:
                 m = document.getElementById("jungle")
                 m.loop = true
+                m.volume = 0.5
                 m.play()
                 break
         }

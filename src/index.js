@@ -199,7 +199,6 @@ const widescreenOn = () => {
     gameContainer.style.display = "block";
     moveLeft.style.justifyContent = "center";
     chatlog.style.height = "7.5em";
-    musicDiv.style.marginTop = "12em";
 
     canvasContainer.hidden = false
     canvasContainer.appendChild(chatlog)

@@ -1050,6 +1050,10 @@ const act_crouch_slide = (m) => {
         return Mario.set_jumping_action(m, Mario.ACT_JUMP, 0)
     }
 
+    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
+        return Mario.set_mario_action(m, Mario.ACT_BUTT_SLIDE, 0)
+    }
+
     return common_slide_action_with_jump(m, Mario.ACT_CROUCHING, Mario.ACT_JUMP, Mario.ACT_FREEFALL,
         Mario.MARIO_ANIM_START_CROUCHING)
 }

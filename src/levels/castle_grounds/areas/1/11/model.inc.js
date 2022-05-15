@@ -22,12 +22,14 @@ const flagColors = [
 export const flagCounter = { data: 0 }
 
 const castle_grounds_seg7_lights_0700C4C8 = () => {
+    if (flagCounter.data > 3) flagCounter.data = 0
 	return Gbi.gdSPDefLights1(
 		...flagColors[flagCounter.data].bigSection, 0x28, 0x28, 0x28
 	)
 }
 
 const castle_grounds_seg7_lights_0700C4E0 = () => {
+    if (flagCounter.data > 3) flagCounter.data = 0
 	return Gbi.gdSPDefLights1(
 		...flagColors[flagCounter.data].smallSection, 0x28, 0x28, 0x28
 	)

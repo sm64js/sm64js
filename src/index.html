@@ -18,7 +18,7 @@
 <body>
     <!-- Rules pop up -->
     <div id="rules" hidden>
-        <img src="/mmo/assets/sm64js_d.svg" class="rulesLogo" alt="sm64js Logo">
+        <img src="/mmo/assets/logo_colored.png" class="rulesLogo" alt="sm64js Logo">
         <p style="text-align: center;">Welcome to the multiplayer version of sm64js! To play you have to follow the listed rules below.</p>
         <hr>
         <p>Treat all users with respect.</p>
@@ -30,8 +30,7 @@
         <button type="button" class="rulesButton" id="acceptRules"><div class="sm64button">I have read the rules and will follow them.</div></button>
         <br>
         <hr>
-        <p>If you are looking for a more completed version of sm64js without MMO or custom features, check out<a style="color: blue;" href="https://vanilla.sm64js.com">vanilla</a>.</p>
-        <p>A further updated version of vanilla made by Agent-11 can be found<a style="color: blue;" href="https://Agent-11.github.io/projects/sm64js">here</a>.</p>
+        <p>If you are looking for a more completed version of sm64js without MMO or custom features, check out<a style="color: blue;" href="https://Agent-11.github.io/projects/sm64js">vanilla</a>.</p>
     </div>
 
     <canvas hidden id="fullCanvas" width="1280" height="720" style="background-color: black;"></canvas>
@@ -45,6 +44,7 @@
             <a href="https://github.com/sm64js/sm64js">Source Code</a>
             <a href="https://github.com/sm64js/sm64js/issues">Report Bug/Issue</a>
             <a href="https://discord.gg/7UaDnJt">Discord Server</a>
+            <a onclick="localStorage.setItem('rules', 0);window.location.reload()">Reprompt Rules</a>
         </nav>
     </header>
 
@@ -54,6 +54,7 @@
     <div class="siteMargins">
         <!-- Title -->
        <img id="title" src="/mmo/assets/title.png">
+       <h1 style="color: yellow;">2 Year Anniversary!</h1>
 
         <!-- Description -->
        <h6 class="description">This project is currently still being developed. This page may be live from time to time for testing, but there may be glitches and performance issues. The server will go down and restart at random times without warning. If you would like to help with the project or have feedback please <a class="descriptionContact" href="/credits.html">contact me</a> or report a problem on <a class="descriptionContact" href="https://github.com/sm64js/sm64js/issues">Github</a>.</h6>
@@ -268,6 +269,10 @@
                     </button>
                     <label>Super Mario Sunshine Redive</label>
                     <input type="checkbox" checked onchange="window.sm64js.redive = this.checked"></input>
+                    <select onchange="window.sm64js.filter = this.value">
+                        <option value="2">Linear Texture Filtering</option>
+                        <option value="0">Point / Nearest Texture Filtering</option>
+                    </select>
                 </div>
             <div class="settings-flex">
                 <!-- Color code pop up -->
@@ -694,6 +699,17 @@
         <br />
         <div id="musicDiv">
            <h4>Music</h4>
+           <div class="row">
+            <div class="col-6">
+               <h5>Bob-omb Battlefield Anniversary by eros71</h5>
+            </div>
+            <div class="col-6" style="justify-content:center">
+               <audio controls="" loop="" style="width:400px;height:30px" id="anniversary">
+                  <source src="/mmo/assets/audio/anniversary.mp3" type="audio/mp3">
+                  Your browser does not support the audio element.
+               </audio>
+            </div>
+         </div>
            <div class="row">
               <div class="col-6">
                  <h5>Snow Mountain DX by eros71</h5>

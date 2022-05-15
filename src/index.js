@@ -35,6 +35,7 @@ window.sm64js = {
     HUDHidden: false,
     widescreen: false,
     redive: true,
+    filter: 2,
     debug: {
         marioList: [],
         print: PrintInstance,
@@ -349,7 +350,7 @@ window.enterFullScreenMode = () => {
 }
 
 ///// Start Game
-const rulesVersion = 15
+const rulesVersion = 16
 let gameStarted = false
 export { gameStarted }
 
@@ -374,6 +375,8 @@ document.getElementById("acceptRules").addEventListener('click', () => {
     document.getElementById("rules").hidden = true
     document.getElementById("signboxBorder").classList.remove("shunned")
     document.getElementById("signboxBorder").disabled = false
+    document.getElementById("anniversary").play()
+    document.getElementById("anniversary").loop = true
 })
 
 window.deleteRom = () => {
@@ -394,6 +397,9 @@ export const startGame = () => {
     document.getElementById("pvpButton").hidden = true
 
     document.getElementById("connectedMsg").hidden = false
+
+    document.getElementById("anniversary").play()
+    document.getElementById("anniversary").loop = true
 	
     main_func()
 }

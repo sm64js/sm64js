@@ -2,7 +2,7 @@ import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProc
 import { oPosY, oPosX, oPosZ, oFaceAngleYaw } from "../../include/object_constants"
 import { AreaInstance as Area } from "../Area"
 
-const flagObjects = []
+export const flagObjects = []
 
 export const bhv_castle_flag_init = () => {
     const o = ObjectListProc.gCurrentObject

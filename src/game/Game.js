@@ -1,11 +1,15 @@
 import { level_script_entry } from "../levels/main_entry/entry"
 import { LevelCommandsInstance as LevelCommands } from "../engine/LevelCommands"
-/*import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
+import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
+import { SurfaceLoadInstance as SurfaceLoad } from "./SurfaceLoad"
+import { ObjectListProcessorInstance as ObjectListProcessor } from "./ObjectListProcessor" 
 import { level_main_scripts_entry } from "../levels/scripts"
 import * as Mario from "./Mario"
 import { networkData, submitPlayerName } from "../mmo/socket"
-import { loadSocket } from "../index"*/
+import { loadSocket } from "../index"
 import * as Gbi from "../include/gbi"
+import { AreaInstance as Area, WARP_TRANSITION_FADE_INTO_COLOR } from "./Area"
+import { flagObjects } from "./behaviors/bhv_castle_flag_init.inc"
 
 class Game {
     constructor() {
@@ -78,7 +82,7 @@ class Game {
 
     rdp_init() {
         Gbi.gDPSetCombineMode(this.gDisplayList, Gbi.G_CC_SHADE)
-        Gbi.gDPSetTextureFilter(this.gDisplayList, Gbi.G_TF_BILERP)
+        Gbi.gDPSetTextureFilter(this.gDisplayList, window.sm64js.filter)
         Gbi.gDPSetRenderMode(this.gDisplayList, Gbi.G_RM_OPA_SURF_SURF2);
         Gbi.gDPSetCycleType(this.gDisplayList, Gbi.G_CYC_FILL)
     }
@@ -98,16 +102,40 @@ class Game {
     }
 }
 
-/*window.resubmit = submitPlayerName
-window.loadSocket = loadSocket
+let warping = false
+export { warping }
 window.warp_to = (id) => {
-    // LevelCommands.transition(WARP_TRANSITION_FADE_FROM_STAR, 20, 0, 0, 0)
-    LevelCommands.reset_call_loop()
-    LevelCommands.unload_area(1)
-    LevelCommands.set_register(id)
-    LevelCommands.execute(level_main_scripts_entry)
-    networkData.requestedInitData = false
-    Mario.set_mario_action(LevelUpdate.gMarioState, Mario.ACT_IDLE, 0)
-}*/
+    if (!window.playerNameAccepted || !LevelUpdate.gLevelLoaded) return
+
+    Area.play_transition(WARP_TRANSITION_FADE_INTO_COLOR, 30, 255, 255, 255)
+    setTimeout(() => {
+        LevelCommands.reset_call_loop()
+        LevelCommands.unload_area(1)
+        LevelCommands.set_register(id)
+        ObjectListProcessor.clear_objects()
+        SurfaceLoad.gSurfacesAllocated = 0
+        SurfaceLoad.gSurfaceNodesAllocated = 0
+        SurfaceLoad.gNumStaticSurfaceNodes = 0
+        SurfaceLoad.gNumStaticSurfaces = 0
+        SurfaceLoad.gStaticSurfacePartition = new Array(16).fill(0).map(() => new Array(16).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
+        SurfaceLoad.gDynamicSurfacePartition = new Array(32).fill(0).map(() => new Array(32).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
+        flagObjects.shift() // this probably isn't a good idea
+        flagObjects.shift()
+        flagObjects.shift()
+        flagObjects.shift()
+        Area.clear_areas()
+        LevelCommands.execute(level_main_scripts_entry)
+        ObjectListProcessor.totalMarios = 0
+        networkData.requestedInitData = false
+        Mario.set_mario_action(LevelUpdate.gMarioState, Mario.ACT_IDLE, 0)
+        loadSocket()
+        warping = true
+        setTimeout(() => {
+            submitPlayerName()
+            warping = false
+        }, 2500) // maybe base this off of ping somehow?
+        // window.selectedMap = id
+    }, 1000)
+}
 
 export const GameInstance = new Game()

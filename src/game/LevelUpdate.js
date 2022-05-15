@@ -79,6 +79,8 @@ class LevelUpdate {
         this.sWarpDest = {
             type: 0, levelNum: 0, areaIdx: 0, nodeId: 0, arg: 0
         }
+
+        this.gLevelLoaded = false
     }
 
     lvl_init_from_save_file(arg0, levelNum) {
@@ -89,6 +91,8 @@ class LevelUpdate {
 
         Mario.init_mario_from_save_file()
         Camera.select_mario_cam_mode()
+
+        this.gLevelLoaded = true
 
         return levelNum
     }

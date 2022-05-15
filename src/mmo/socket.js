@@ -19,10 +19,11 @@ import * as Multi from "./MultiMarioManager"
 import * as Cosmetics from "./cosmetics"
 import { updateFlagData, setInitFlagHeight } from "../game/behaviors/bhv_castle_flag_init.inc"
 import { recvChat, decrementChat, selfAdmin } from "./chat"
-import { GameInstance as Game } from "../game/Game"
+import { GameInstance as Game, warping } from "../game/Game"
 import { sendChatMsg } from "../player_input_manager"
 
 import { Howl, Howler } from "howler"
+import { gameStarted } from "../index"
 
 Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
 
@@ -234,6 +235,10 @@ const updateConnectedMsg = () => {
         elem.style.color = "red"
         window.sm64js.latency = 0
     }
+    if (warping) {
+        elem.innerHTML = "Reconnecting to new map..."
+        elem.style.color = "yellow"
+    }
 }
 
 export const send_controller_update = (frame) => {
@@ -433,7 +438,9 @@ export const submitPlayerName = () => {
 
     let select = document.getElementById("mapSelect")
     select.onchange = () => {
-        console.log("TODO warp to " + select.value)
+        if (gameStarted) {
+            window.warp_to(select.value)
+        }
     }
     const level = gameID ? 0 : parseInt(select.value)
     joinGameMsg.setLevel(level)

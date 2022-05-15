@@ -124,6 +124,7 @@ window.warp_to = (id) => {
         flagObjects.shift()
         flagObjects.shift()
         Area.clear_areas()
+	ObjectListProcessor.gEnvironmentRegions = null
         LevelCommands.execute(level_main_scripts_entry)
         ObjectListProcessor.totalMarios = 0
         networkData.requestedInitData = false

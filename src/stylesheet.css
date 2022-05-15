@@ -1,4 +1,9 @@
-﻿/* HTML, contains background */
+﻿/* Happy 2 year anniversary! */
+.anniversaryText{
+   animation: sm64title 2.2s linear;
+   color: #f3e107;
+}
+/* HTML, contains background */
 html {
     height: 100%;
     background-color: #050413;
@@ -219,6 +224,10 @@ body {
     margin: auto;
     margin-top: 0.2em;
     margin-bottom: 1em;
+}
+#gamepadMessageDiv{
+    margin-right: 2em;
+    margin-left: 3em;
 }
 #noGamepadMessage {
     margin: 0;

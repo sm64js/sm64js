@@ -81,15 +81,15 @@ export const script_func_global_1 = () => { return [
     RETURN(),
 ]}
 
-// export const script_func_global_2 = () => { return [
-//     LOAD_MODEL_FROM_GEO(MODEL.BULLET_BILL,             bullet_bill_geo),
+export const script_func_global_2 = () => { return [
+    LOAD_MODEL_FROM_GEO(MODEL.BULLET_BILL,             bullet_bill_geo),
 //     LOAD_MODEL_FROM_GEO(MODEL.YELLOW_SPHERE,           yellow_sphere_geo),
 //     LOAD_MODEL_FROM_GEO(MODEL.HOOT,                    hoot_geo),
 //     LOAD_MODEL_FROM_GEO(MODEL.YOSHI_EGG,               yoshi_egg_geo),
 //     LOAD_MODEL_FROM_GEO(MODEL.THWOMP,                  thwomp_geo),
 //     LOAD_MODEL_FROM_GEO(MODEL.HEAVE_HO,                heave_ho_geo),
 //     RETURN(),
-// ]}
+]}
 
 export const script_func_global_3 = () => { return [
     LOAD_MODEL_FROM_GEO(MODEL.BLARGG,                  blargg_geo),

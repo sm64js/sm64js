@@ -92,12 +92,12 @@ export const script_func_global_2 = () => { return [
 //     RETURN(),
 ]}
 
-// export const script_func_global_3 = () => { return [
-//     LOAD_MODEL_FROM_GEO(MODEL.BLARGG,                  blargg_geo),
+export const script_func_global_3 = () => { return [
+    LOAD_MODEL_FROM_GEO(MODEL.BLARGG,                  blargg_geo),
 //     LOAD_MODEL_FROM_GEO(MODEL.BULLY,                   bully_geo),
 //     LOAD_MODEL_FROM_GEO(MODEL.BULLY_BOSS,              bully_boss_geo),
 //     RETURN(),
-// ]}
+]}
 
 export const script_func_global_4 = () => { return [
     LOAD_MODEL_FROM_GEO(MODEL.WATER_BOMB,              water_bomb_geo),

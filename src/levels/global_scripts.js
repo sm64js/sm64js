@@ -179,7 +179,7 @@ export const script_func_global_12 = () => { return [
 export const script_func_global_13 = () => { return [
     // LOAD_MODEL_FROM_GEO(MODEL.BOWSER,                  bowser_geo),
     // LOAD_MODEL_FROM_GEO(MODEL.BOWSER_BOMB_CHILD_OBJ,   bowser_bomb_geo),
-    // LOAD_MODEL_FROM_GEO(MODEL.BOWSER_BOMB,             bowser_bomb_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.BOWSER_BOMB,             bowser_bomb_geo),
     // LOAD_MODEL_FROM_GEO(MODEL.BOWSER_SMOKE,            bowser_impact_smoke_geo),
     // LOAD_MODEL_FROM_GEO(MODEL.BOWSER_FLAMES,           bowser_flames_geo),
     // LOAD_MODEL_FROM_GEO(MODEL.BOWSER_WAVE,             invisible_bowser_accessory_geo),

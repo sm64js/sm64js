@@ -23,7 +23,7 @@ import {
 } from "../../include/model_ids"
 
 import {
-    script_func_global_1, script_func_global_2, script_func_global_15
+    script_func_global_1, /*script_func_global_2,*/ script_func_global_15
 } from "../global_scripts"
 
 import { wf_geo_0007E0 } from "./areas/1/5/geo.inc"
@@ -159,7 +159,7 @@ const script_func_local_3 = [
     OBJECT(/*model*/ MODEL_BUTTERFLY,          /*pos*/  4608,   256,      0,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvButterfly'),
     OBJECT(/*model*/ MODEL_BUTTERFLY,          /*pos*/  4608,   256,    128,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvButterfly'),
     OBJECT(/*model*/ MODEL_NONE,               /*pos*/  1035,  2880,   -900,  /*angle*/ 0,    45,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvCheckerboardElevatorGroup'),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_BULLET_BILL,        /*pos*/  1280,  3712,    968,  /*angle*/ 0,   180,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvBulletBill',                /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
+    //OBJECT_WITH_ACTS(/*model*/ MODEL_BULLET_BILL,        /*pos*/  1280,  3712,    968,  /*angle*/ 0,   180,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvBulletBill',                /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
     //OBJECT_WITH_ACTS(/*model*/ MODEL_LEVEL_GEOMETRY_08,  /*pos*/     0,  3584,      0,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvTower',                      /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
     //OBJECT_WITH_ACTS(/*model*/ MODEL_LEVEL_GEOMETRY_09,  /*pos*/  1280,  3584,    896,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvBulletBillCannon',         /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
     //OBJECT_WITH_ACTS(/*model*/ MODEL_NONE,               /*pos*/     0,  3483,      0,  /*angle*/ 0,     0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvTowerPlatformGroup',       /*acts ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6*/),
@@ -183,7 +183,7 @@ export const level_wf_entry = [
     INIT_LEVEL(),
     MARIO(/*model*/ MODEL_MARIO,  /*behParam*/ 0x00000001,  /*beh*/ 'bhvMario'),
     JUMP_LINK(script_func_global_1),
-    JUMP_LINK(script_func_global_2),
+    //JUMP_LINK(script_func_global_2),
     JUMP_LINK(script_func_global_15),
     LOAD_MODEL_FROM_GEO(MODEL_WF_BUBBLY_TREE,                    bubbly_tree_geo),
     LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_03,                 wf_geo_0007E0),

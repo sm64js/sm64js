@@ -1961,7 +1961,7 @@ const bhvMerryGoRound = [
     END_LOOP(),
 ]
 
-const bhvWhitePuffSmoke = [
+const bhvBulletBill = [
     BEGIN(OBJ_LIST_GENACTOR),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_HOME(),
@@ -1975,6 +1975,19 @@ const bhvWhitePuffSmoke = [
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_bullet_bill_loop),
     END_LOOP(),
+]
+
+const bhvWhitePuffSmoke = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    BILLBOARD(),
+    ADD_FLOAT(oPosY, -100),
+    CALL_NATIVE(bhv_white_puff_smoke_init),
+    SET_INT(oAnimState, -1),
+    BEGIN_REPEAT(10),
+        ADD_INT(oAnimState, 1),
+    END_REPEAT(),
+    DEACTIVATE(),
 ]
 
 gLinker.behaviors.bhv1Up = bhv1Up
@@ -2100,4 +2113,5 @@ gLinker.behaviors.bhvWoodenPost = bhvWoodenPost
 gLinker.behaviors.bhvYellowBackgroundInMenu = bhvYellowBackgroundInMenu
 gLinker.behaviors.bhvYellowCoin = bhvYellowCoin
 gLinker.behaviors.bhvYoshi = bhvYoshi
+gLinker.behaviors.bhvBulletBill = bhvBulletBill
 gLinker.behaviors.bhvWhitePuffSmoke = bhvWhitePuffSmoke

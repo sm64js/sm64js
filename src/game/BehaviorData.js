@@ -1961,6 +1961,16 @@ const bhvMerryGoRound = [
     END_LOOP(),
 ]
 
+const bhvBulletBillCannon = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(wf_seg7_collision_bullet_bill_cannon),
+    SET_FLOAT(oCollisionDistance, 300),
+    BEGIN_LOOP(),
+        CALL_NATIVE(load_object_collision_model),
+    END_LOOP(),
+];
+
 const bhvBulletBill = [
     BEGIN(OBJ_LIST_GENACTOR),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -2115,3 +2125,4 @@ gLinker.behaviors.bhvYellowCoin = bhvYellowCoin
 gLinker.behaviors.bhvYoshi = bhvYoshi
 gLinker.behaviors.bhvBulletBill = bhvBulletBill
 gLinker.behaviors.bhvWhitePuffSmoke = bhvWhitePuffSmoke
+gLinker.behaviors.bhvBulletBillCannon = bhvBulletBillCannon

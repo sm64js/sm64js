@@ -1,6 +1,6 @@
 // ** actors/bullet_bill/model
 import {
-    gdSPDefLights1, gsSPVertex, gsSP2Triangles, gsSPEndDisplayList, gsSP1Triangle, gsDPSetTextureImage, gsDPTileSync, gsDPSetTile, gsDPLoadSync, gsDPLoadBlock, gsDPPipeSync, gsDPSetCombineMode, gsSPLight, gsSPNumLights, gsSPTexture, gsDPSetTileSize, gsSPDisplayList, gsSPDisplayList
+    gdSPDefLights1, gsSPVertex, gsSP2Triangles, gsSPEndDisplayList, gsSP1Triangle, gsDPSetTextureImage, gsDPTileSync, gsDPSetTile, gsDPLoadSync, gsDPLoadBlock, gsDPPipeSync, gsDPSetCombineMode, gsSPLight, gsSPNumLights, gsSPTexture, gsDPSetTileSize, gsSPDisplayList
 } from "../../include/gbi"
 
 // 0x0500BA90

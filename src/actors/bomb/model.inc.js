@@ -1,6 +1,9 @@
 // ** actors/bomb/model
 import {
-    gdSPDefLights1, gsSPLight, gsSPVertex, gsSP2Triangles, gsSPEndDisplayList, gsSP1Triangle, gsDPSetTextureImage, gsDPLoadSync, gsDPLoadBlock, gsDPPipeSync, gsDPSetCombineMode, gsSPClearGeometryMode, gsDPSetTile, gsSPTexture, gsDPTileSync, gsDPSetTileSize, gsSPDisplayList, gsSPSetGeometryMode
+    gdSPDefLights1, gsSPLight, gsSPVertex, gsSP2Triangles, gsSPEndDisplayList, gsSP1Triangle, gsDPSetTextureImage, gsDPLoadSync, gsDPLoadBlock, gsDPPipeSync, gsDPSetCombineMode, gsSPClearGeometryMode, gsDPSetTile, gsSPTexture, gsDPTileSync, gsDPSetTileSize, gsSPDisplayList, gsSPSetGeometryMode,
+    G_IM_FMT_RGBA, G_IM_SIZ_16b, CALC_DXT, G_TX_LOADTILE, G_IM_SIZ_16b_BYTES,
+    G_LIGHTING, G_TX_WRAP, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_RENDERTILE,
+    G_ON, G_TX_CLAMP, G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADE
 } from "../../include/gbi"
 
 const bomb_seg6_lights_06057AA8 = gdSPDefLights1(

@@ -44,10 +44,10 @@ import {
     OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND,
     OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER,
     OBJ_MOVE_ENTERED_WATER, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND,
-    OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, OBJ_MOVE_13,
+    OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33,
     OBJ_MOVE_LANDED, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX, OBJ_FLAG_HOLDABLE,
 
-    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED
+    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED, OBJ_MOVE_BOUNCE
  } from "../include/object_constants"
 
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
@@ -833,7 +833,7 @@ export const cur_obj_move_update_ground_air_flags = (gravity, bounciness) => {
 
     const o = ObjectListProc.gCurrentObject
 
-    o.rawData[oMoveFlags] &= ~OBJ_MOVE_13
+    o.rawData[oMoveFlags] &= ~OBJ_MOVE_BOUNCE
 
     if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
         // On the first frame that we touch the ground, set OBJ_MOVE_LANDED.
@@ -858,7 +858,7 @@ export const cur_obj_move_update_ground_air_flags = (gravity, bounciness) => {
         if (o.rawData[oVelY] > 5.0) {
             //! If OBJ_MOVE_13 tracks bouncing, it overestimates, since velY
             // could be > 5 here without bounce (e.g. jump into misa)
-            o.rawData[oMoveFlags] |= OBJ_MOVE_13
+            o.rawData[oMoveFlags] |= OBJ_MOVE_BOUNCE
         }
     } else {
         o.rawData[oMoveFlags] &= ~OBJ_MOVE_LANDED
@@ -1130,6 +1130,10 @@ export const cur_obj_was_attacked_or_ground_pounded = () => {
     return attacked
 }
 
+export const obj_copy_behavior_params = (dst, src) => {
+    dst.rawData[oBehParams] = src.rawData[oBehParams]
+    dst.rawData[oBehParams2ndByte] = src.rawData[oBehParams2ndByte]
+}
 
 export const spawn_object_relative = (behaviorParam, relativePosX, relativePosY, relativePosZ, parent, model, behavior) => {
 

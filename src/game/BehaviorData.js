@@ -1156,7 +1156,7 @@ export const bhvCoinInsideBoo = [
     BILLBOARD(),
     CALL_NATIVE('bhv_init_room'),
     BEGIN_LOOP(),
-        //CALL_NATIVE('bhv_coin_inside_boo_loop'),
+        CALL_NATIVE('bhv_coin_inside_boo_loop'),
         ADD_INT(oAnimState, 1),
     END_LOOP(),
 ]
@@ -1187,6 +1187,16 @@ export const bhvCourtyardBooTriplet = [
     DISABLE_RENDERING(),
     CALL_NATIVE('bhv_courtyard_boo_triplet_init'),
     DEACTIVATE(),
+]
+
+export const bhvBooCage = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_FLOAT(oGraphYOffset, 10),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ -400, /*Bounciness*/ -50, /*Drag strength*/ 0, /*Friction*/ 0, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_boo_cage_loop'),
+    END_LOOP(),
 ]
 
 export const bhvGhostHuntBoo = [
@@ -2041,6 +2051,7 @@ gLinker.behaviors.bhvBobBowlingBallSpawner = bhvBobBowlingBallSpawner
 gLinker.behaviors.bhvBobomb = bhvBobomb
 gLinker.behaviors.bhvBobombBuddy = bhvBobombBuddy
 gLinker.behaviors.bhvBobombFuseSmoke = bhvBobombFuseSmoke
+gLinker.behaviors.bhvBooCage = bhvBooCage
 gLinker.behaviors.bhvBowlingBall = bhvBowlingBall
 gLinker.behaviors.bhvBowser = bhvBowser
 gLinker.behaviors.bhvBowserBodyAnchor = bhvBowserBodyAnchor

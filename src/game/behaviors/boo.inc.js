@@ -1,18 +1,20 @@
 import {
     cur_obj_has_behavior, spawn_object_relative, cur_obj_update_floor_and_walls,
-    cur_obj_call_action_function, cur_obj_move_standard, obj_has_behavior, obj_scale
+    cur_obj_call_action_function, cur_obj_move_standard, obj_has_behavior, obj_scale, 
+    obj_copy_behavior_params, cur_obj_hide
 } from "../ObjectHelpers"
 
 import {
     oForwardVel, oVelY, oGravity, oBooInitialMoveYaw, oMoveAngleYaw, oRoom, oDistanceToMario,
     oBooTargetOpacity, oOpacity, oBooBaseScale, oBooOscillationTimer, oAngleToMario, oFaceAngleYaw,
-    oMerryGoRoundBooManagerNumBoosKilled, oInteractStatus, oGraphYOffset,
+    oMerryGoRoundBooManagerNumBoosKilled, oInteractStatus, oGraphYOffset, oBehParams, oAction,
+    oMerryGoRoundBooManagerNumBoosSpawned, oHomeX, oHomeY, oHomeZ, oBehParams2ndByte, oPosY, oTimer,
 
     ACTIVE_FLAG_IN_DIFFERENT_ROOM, ACTIVE_FLAG_DEACTIVATED
 } from "../../include/object_constants"
 
-import { MODEL_BOO } from "../../include/model_ids"
-import { SOUND_OBJ_BOO_LAUGH_LONG } from "../../include/sounds"
+import { MODEL_BOO, MODEL_HAUNTED_CAGE } from "../../include/model_ids"
+import { SOUND_OBJ_BOO_LAUGH_LONG, SOUND_ENV_ELEVATOR2, SOUND_GENERAL_UNKNOWN4_LOWPRIO } from "../../include/sounds"
 import { TIME_STOP_MARIO_OPENED_DOOR } from "../ObjectListProcessor"
 import { bhvGhostHuntBoo, bhvMerryGoRoundBooManager } from "../BehaviorData"
 import { LevelUpdateInstance as LevelUpdate } from "../LevelUpdate"
@@ -313,7 +315,221 @@ export const bhv_big_boo_loop = () => {
     o.rawData[oInteractStatus] = 0
 }
 
+const boo_with_cage_act_0 = () => {
+
+}
+
+const boo_with_cage_act_1 = () => {
+    
+}
+
+const boo_with_cage_act_2 = () => {
+    
+}
+
+const boo_with_cage_act_3 = () => {
+    
+}
+
+export const bhv_boo_with_cage_init = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    if (gHudDisplay.stars < SPAWN_CASTLE_BOO_STAR_REQUIREMENT) {
+        obj_mark_for_deletion(o);
+    } else {
+        let cage = spawn_object(o, MODEL_HAUNTED_CAGE, bhvBooCage);
+        cage.oBehParams = o.rawData[oBehParams]
+    }
+}
+
+const sBooWithCageActions = [
+    boo_with_cage_act_0,
+    boo_with_cage_act_1,
+    boo_with_cage_act_2,
+    boo_with_cage_act_3,
+]
+
+export const bhv_boo_with_cage_loop = () => {
+    //PARTIAL_UPDATE
+
+    cur_obj_update_floor_and_walls();
+    cur_obj_call_action_function(sBooWithCageActions);
+    cur_obj_move_standard(78);
+
+    boo_approach_target_opacity_and_update_scale();
+
+    o.rawData[oInteractStatus] = 0
+}
+
+export const bhv_merry_go_round_boo_manager_loop = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    switch (o.rawData[oAction]) {
+        case 0:
+            if (o.rawData[oDistanceToMario] < 1000.0) {
+                if (o.rawData[oMerryGoRoundBooManagerNumBoosKilled] < 5) {
+                    if (o.rawData[oMerryGoRoundBooManagerNumBoosSpawned] != 5) {
+                        if (o.rawData[oMerryGoRoundBooManagerNumBoosSpawned] - o.rawData[oMerryGoRoundBooManagerNumBoosKilled] < 2) {
+                            spawn_object(o, MODEL_BOO, bhvMerryGoRoundBoo);
+                            o.rawData[oMerryGoRoundBooManagerNumBoosSpawned]++;
+                        }
+                    }
+
+                    o.rawData[oAction]++
+                }
+
+                if (o.rawData[oMerryGoRoundBooManagerNumBoosKilled] >= 5) {
+                    let boo = spawn_object(o, MODEL_BOO, bhvMerryGoRoundBigBoo);
+                    obj_copy_behavior_params(boo, o);
+
+                    o.rawData[oAction] = 2
+
+                    play_sound(SOUND_GENERAL2_RIGHT_ANSWER, gGlobalSoundSource);
+                }
+            }
+
+            break
+
+        case 1:
+            if (o.rawData[oTimer] > 60) {
+                o.rawData[oAction] = 0
+            }
+
+            break
+
+        case 2:
+            break
+    }
+}
+
+export const obj_set_secondary_camera_focus = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    gSecondCameraFocus = o
+}
+
+export const bhv_animated_texture_loop = () => {
+    cur_obj_set_pos_to_home_with_debug()
+}
+
+export const bhv_boo_in_castle_loop = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    o.rawData[oBooBaseScale] = 2.0
+
+    if (o.rawData[oAction] == 0) {
+        cur_obj_hide()
+
+        if (gHudDisplay.stars < SPAWN_CASTLE_BOO_STAR_REQUIREMENT) {
+            obj_mark_for_deletion(o);
+        }
+
+        if (gMarioCurrentRoom == 1) {
+            o.rawData[oAction]++
+        }
+    } else if (o.rawData[oAction] == 1) {
+        cur_obj_unhide();
+
+        o.rawData[oOpacity] = 180;
+
+        if (o.rawData[oTimer] == 0) {
+            cur_obj_scale(o.rawData[oBooBaseScale]);
+        }
+
+        if (o.rawData[oDistanceToMario] < 1000.0) {
+            o.rawData[oAction++]
+            cur_obj_play_sound_2(SOUND_OBJ_BOO_LAUGH_LONG);
+        }
+
+        o.rawData[oForwardVel] = 0.0;
+        let targetAngle = o.rawData[oAngleToMario]
+    } else {
+        cur_obj_forward_vel_approach_upward(32.0, 1.0);
+
+        o.rawData[oHomeX] = -1000.0
+        o.rawData[oHomeZ] = -9000.0
+
+        targetAngle = cur_obj_angle_to_home();
+
+        if (o.rawData[oPosZ] < -5000.0) {
+            if (o.rawData[oOpacity] > 0) {
+                o.rawData[oOpacity] -= 20
+            } else {
+                o.rawData[oOpacity] = 0
+            }
+        }
+
+        if (o.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM) {
+            o.rawData[oAction] = 1
+        }
+    }
+
+    o.rawData[oVelY] = 0.0;
+
+    targetAngle = cur_obj_angle_to_home()
+
+    cur_obj_rotate_yaw_toward(targetAngle, 0x5A8)
+    boo_oscillate(TRUE)
+    cur_obj_move_using_fvel_and_gravity()
+}
+
+export const bhv_boo_staircase = () => {
+    let targetY
+
+    switch (o.rawData[oBehParams2ndByte]) {
+        case 1:
+            targetY = 0.0;
+            break;
+        case 0:
+            targetY = -206.0;
+            break;
+        case 2:
+            targetY = -413.0;
+            break;
+    }
+
+    switch (o.rawData[oAction]) {
+        case 0:
+            o.rawData[oPosY] = o.rawData[oHomeY] - 620.0;
+            o.rawData[oAction]++;
+            // fallthrough
+        case 1:
+            o.rawData[oPosY] += 8.0;
+            cur_obj_play_sound_1(SOUND_ENV_ELEVATOR2);
+
+            if (o.rawData[oPosY] > targetY) {
+                o.rawData[oPosY] = targetY;
+                o.rawData[oAction]++;
+            }
+
+            break;
+
+        case 2:
+            if (o.rawData[oTimer] == 0) {
+                cur_obj_play_sound_2(SOUND_GENERAL_UNKNOWN4_LOWPRIO);
+            }
+
+            if (jiggle_bbh_stair(o.rawData[oTimer])) {
+                o.rawData[oAction]++;
+            }
+
+            break;
+
+        case 3:
+            if (o.rawData[oTimer] == 0 && o.rawData[oBehParams2ndByte] == 1) {
+                play_puzzle_jingle();
+            }
+
+            break;
+    }
+}
+
 gLinker.bhv_boo_init = bhv_boo_init
 gLinker.bhv_courtyard_boo_triplet_init = bhv_courtyard_boo_triplet_init
 gLinker.bhv_boo_loop = bhv_boo_loop
 gLinker.bhv_big_boo_loop = bhv_big_boo_loop
+gLinker.bhv_boo_with_cage_init = bhv_boo_with_cage_init
+gLinker.bhv_boo_with_cage_loop = bhv_boo_with_cage_loop
+gLinker.bhv_merry_go_round_boo_manager_loop = bhv_merry_go_round_boo_manager_loop
+gLinker.obj_set_secondary_camera_focus = obj_set_secondary_camera_focus
+gLinker.bhv_animated_texture_loop = bhv_animated_texture_loop
+gLinker.bhv_boo_in_castle_loop = bhv_boo_in_castle_loop

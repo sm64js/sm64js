@@ -251,6 +251,15 @@ class BehaviorCommands {
         return this.BHV_PROC_CONTINUE
     }
 
+    set_hurtbox(args) {
+        const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
+        gCurrentObject.hurtboxRadius = args.radius;
+        gCurrentObject.hurtboxHeight = args.height;
+
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
     set_interact_type(args) {
         const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
         gCurrentObject.rawData[oInteractType] = args.type
@@ -605,6 +614,7 @@ export const SCALE = (...args)                     => {return {command: Beh.scal
 export const SET_FLOAT = (...args)                 => {return {command: Beh.set_objectData_value, args: {field: args[0], value: args[1]}}}
 export const SET_HITBOX = (...args)                => {return {command: Beh.set_hitbox, args: {radius: args[0], height: args[1]}}}
 export const SET_HITBOX_WITH_OFFSET = (...args)    => {return {command: Beh.set_hitbox_with_offset, args: {radius: args[0], height: args[1], downOffset: args[2]}}}
+export const SET_HURTBOX = (...args)               => {return {command: Beh.set_hurtbox, args: {radius: args[0], height: args[1]}}}
 export const SET_HOME = (...args)                  => {return {command: Beh.set_home}}
 export const SET_INT = (...args)                   => {return {command: Beh.set_int, args: {field: args[0], value: args[1]}}}
 export const SET_INTERACT_TYPE = (...args)         => {return {command: Beh.set_interact_type, args: {type: args[0]}}}

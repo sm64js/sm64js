@@ -253,12 +253,12 @@ void coin_inside_boo_act_0(void) {
         o->oVelY = 35.0f;
     }
 }
+*/
+const sCoinInsideBooActions = [ coin_inside_boo_act_0, coin_inside_boo_act_1 ]
 
-void (*sCoinInsideBooActions[])(void) = { coin_inside_boo_act_0, coin_inside_boo_act_1 };
-
-void bhv_coin_inside_boo_loop(void) {
+export const bhv_coin_inside_boo_loop = () => {
     cur_obj_call_action_function(sCoinInsideBooActions);
-}*/
+}
 
 const bhv_coin_sparkles_loop = () => { cur_obj_scale(0.6) }
 
@@ -279,3 +279,4 @@ gLinker.bhv_yellow_coin_loop = bhv_yellow_coin_loop
 gLinker.bhv_golden_coin_sparkles_loop = bhv_golden_coin_sparkles_loop
 gLinker.bhv_coin_sparkles_loop = bhv_coin_sparkles_loop
 gLinker.bhv_coin_init = bhv_coin_init
+gLinker.bhv_coin_inside_boo_loop = bhv_coin_inside_boo_loop

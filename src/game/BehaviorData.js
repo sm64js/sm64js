@@ -5,7 +5,7 @@ import { ADD_INT, ADD_FLOAT, ANIMATE, BEGIN, BEGIN_LOOP, BEGIN_REPEAT, BILLBOARD
          CALL, CALL_NATIVE, DEACTIVATE, DEBUGGER, DELAY, DELAY_VAR, DISABLE_RENDERING,
          DROP_TO_FLOOR, END_LOOP, END_REPEAT, END_REPEAT_CONTINUE, GOTO, HIDE,
          LOAD_ANIMATIONS, LOAD_COLLISION_DATA, OR_INT, PARENT_BIT_CLEAR, RETURN, SCALE,
-         SET_FLOAT, SET_HITBOX, SET_HITBOX_WITH_OFFSET, SET_HOME, SET_INT, SET_INTERACT_TYPE,
+         SET_FLOAT, SET_HITBOX, SET_HITBOX_WITH_OFFSET, SET_HURTBOX, SET_HOME, SET_INT, SET_INTERACT_TYPE,
          SET_MODEL, SET_OBJ_PHYSICS, SET_RANDOM_INT, SET_RANDOM_FLOAT, SUM_FLOAT, SPAWN_CHILD,
          SPAWN_OBJ, SPAWN_WATER_DROPLET
 } from "../engine/BehaviorCommands"
@@ -21,6 +21,7 @@ import { oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAn
          oWoodenPostTotalMarioAngle, oInteractStatus, oMoveAngleYaw, oWaterObjUnkF4,
          oWaterObjUnkF8, oWaterObjUnkFC, oBehParams2ndByte, oActiveParticleFlags, oFlags,
          oUnk94, oBBallSpawnerPeriodMinus1, oBobombBuddyRole, oTripletButterflyScale,
+         oBigBooNumMinionBoosKilled,
 
          OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, OBJ_FLAG_COMPUTE_DIST_TO_MARIO,
          OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW,
@@ -35,11 +36,12 @@ import { oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAn
 } from "../include/object_constants"
 
 import { MODEL_WOODEN_POST, MODEL_MIST, MODEL_SMOKE, MODEL_BUBBLE, MODEL_CANNON_BARREL,
-         MODEL_BOWSER_BOMB_CHILD_OBJ, MODEL_NONE
+         MODEL_BOWSER_BOMB_CHILD_OBJ, MODEL_NONE, MODEL_YELLOW_COIN
 } from "../include/model_ids"
 
 import * as _amp                      from "./behaviors/amp.inc"
 import * as _bird                     from "./behaviors/bird.inc"
+import * as _boo                      from "./behaviors/boo.inc"
 import * as _bowling_ball             from "./behaviors/bowling_ball.inc"
 import * as _breakable_box            from "./behaviors/breakable_box.inc"
 import * as _breakable_box_small      from "./behaviors/breakable_box_small.inc"
@@ -1145,6 +1147,75 @@ export const bhvBubbleParticleSpawner = [
     DEACTIVATE(),
 ]
 
+export const bhvCoinInsideBoo = [
+    BEGIN(OBJ_LIST_LEVEL),
+    SET_HITBOX(/*Radius*/ 100, /*Height*/ 64),
+    SET_INT(oInteractType, INTERACT_COIN),
+    OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ -400, /*Bounciness*/ -70, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    BILLBOARD(),
+    CALL_NATIVE('bhv_init_room'),
+    BEGIN_LOOP(),
+        //CALL_NATIVE('bhv_coin_inside_boo_loop'),
+        ADD_INT(oAnimState, 1),
+    END_LOOP(),
+]
+
+export const bhvMerryGoRoundBigBoo = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    SET_INT(oBehParams2ndByte, 1),
+    // Set number of minion boos killed to 10, which is greater than 5 so that the boo always loads without needing to kill any boos.
+    SET_INT(oBigBooNumMinionBoosKilled, 10),
+    GOTO('bhvGhostHuntBigBoo', 1),
+]
+
+export const bhvGhostHuntBigBoo = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    // Big boo - common:
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_HOME(),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ 0, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    CALL_NATIVE('bhv_init_room'),
+    CALL_NATIVE('bhv_boo_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_big_boo_loop'),
+    END_LOOP(),
+]
+
+export const bhvCourtyardBooTriplet = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    DISABLE_RENDERING(),
+    CALL_NATIVE('bhv_courtyard_boo_triplet_init'),
+    DEACTIVATE(),
+]
+
+export const bhvGhostHuntBoo = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    // Boo - common:
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_INT(oIntangibleTimer, 0),
+    SET_HOME(),
+    SET_INT(oDamageOrCoinValue, 2),
+    SET_HITBOX(/*Radius*/ 140, /*Height*/ 80),
+    SET_HURTBOX(/*Radius*/ 40, /*Height*/ 60),
+    SET_FLOAT(oGraphYOffset, 30),
+    CALL_NATIVE('bhv_init_room'),
+    SPAWN_CHILD(/*Model*/ MODEL_YELLOW_COIN, /*Behavior*/ bhvCoinInsideBoo),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ 0, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    CALL_NATIVE('bhv_boo_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_boo_loop'),
+    END_LOOP(),
+]
+
+export const bhvMerryGoRoundBooManager = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_merry_go_round_boo_manager_loop'),
+    END_LOOP(),
+]
+
 export const bhvCannonBarrel = [
     BEGIN(OBJ_LIST_DEFAULT, 'bhvCannonBarrel'),
     OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -1979,8 +2050,10 @@ gLinker.behaviors.bhvBreakableBoxSmall = bhvBreakableBoxSmall
 gLinker.behaviors.bhvBreakBoxTriangle = bhvBreakBoxTriangle
 gLinker.behaviors.bhvBubbleParticleSpawner = bhvBubbleParticleSpawner
 gLinker.behaviors.bhvButterfly = bhvButterfly
+gLinker.behaviors.bhvCourtyardBooTriplet = bhvCourtyardBooTriplet
 gLinker.behaviors.bhvCannon = bhvCannon
 gLinker.behaviors.bhvCannonBarrelBubbles = bhvCannonBarrelBubbles
+gLinker.behaviors.bhvCoinInsideBoo = bhvCoinInsideBoo
 gLinker.behaviors.bhvCannonClosed = bhvCannonClosed
 gLinker.behaviors.bhvCarrySomething1 = bhvCarrySomething1
 gLinker.behaviors.bhvCarrySomething2 = bhvCarrySomething2
@@ -2008,6 +2081,8 @@ gLinker.behaviors.bhvFlamethrower = bhvFlamethrower
 gLinker.behaviors.bhvFloorTrapInCastle = bhvFloorTrapInCastle
 gLinker.behaviors.bhvFlyingWarp = bhvFlyingWarp
 gLinker.behaviors.bhvFreeBowlingBall = bhvFreeBowlingBall
+gLinker.behaviors.bhvGhostHuntBigBoo = bhvGhostHuntBigBoo
+gLinker.behaviors.bhvGhostHuntBoo = bhvGhostHuntBoo
 gLinker.behaviors.bhvGoomba = bhvGoomba
 gLinker.behaviors.bhvGoombaTripletSpawner = bhvGoombaTripletSpawner
 gLinker.behaviors.bhvHardAirKnockBackWarp = bhvHardAirKnockBackWarp
@@ -2027,6 +2102,8 @@ gLinker.behaviors.bhvManyBlueFishSpawner = bhvManyBlueFishSpawner
 gLinker.behaviors.bhvMario = bhvMario
 gLinker.behaviors.bhvMenuButtonManager = bhvMenuButtonManager
 gLinker.behaviors.bhvMerryGoRound = bhvMerryGoRound
+gLinker.behaviors.bhvMerryGoRoundBigBoo = bhvMerryGoRoundBigBoo
+gLinker.behaviors.bhvMerryGoRoundBooManager = bhvMerryGoRoundBooManager
 gLinker.behaviors.bhvMessagePanel = bhvMessagePanel
 gLinker.behaviors.bhvMetalCap = bhvMetalCap
 gLinker.behaviors.bhvMistCircParticleSpawner = bhvMistCircParticleSpawner

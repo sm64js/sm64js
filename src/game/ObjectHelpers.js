@@ -81,6 +81,15 @@ export const WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL      = 0x20
 export const WATER_DROPLET_FLAG_RAND_ANGLE_INCR_PLUS_8000 = 0x40
 export const WATER_DROPLET_FLAG_RAND_ANGLE_INCR           = 0x80 // Unused
 
+export const DebugPage = {
+    DEBUG_PAGE_OBJECTINFO:       0,
+    DEBUG_PAGE_CHECKSURFACEINFO: 1,
+    DEBUG_PAGE_MAPINFO:          2,
+    DEBUG_PAGE_STAGEINFO:        3,
+    DEBUG_PAGE_EFFECTINFO:       4,
+    DEBUG_PAGE_ENEMYINFO:        5,
+}
+
 export const increment_velocity_toward_range = (value, center, zeroThreshold, increment) => {
     let relative;
     if ((relative = value - center) > 0) {
@@ -768,6 +777,15 @@ export const cur_obj_update_floor = () => {
         o.rawData[oFloorRoom] = 0
     }
 
+}
+
+export const cur_obj_set_pos_to_home_with_debug = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.rawData[oPosX] = o.rawData[oHomeX] + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][0];
+    o.rawData[oPosY] = o.rawData[oHomeZ] + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][1];
+    o.rawData[oPosZ] = o.rawData[oHomeZ] + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][2];
+    cur_obj_scale(gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][3] / 100.0 + 1.0);
 }
 
 export const cur_obj_call_action_function = (actionFunctions) => {
@@ -1621,6 +1639,12 @@ export const obj_mark_for_deletion = (obj) => {
     obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED
 }
 
+export const cur_obj_disable = () => {
+    cur_obj_disable_rendering();
+    cur_obj_hide();
+    cur_obj_become_intangible();
+}
+
 export const obj_scale = (obj, scale) => {
     obj.gfx.scale[0] = scale
     obj.gfx.scale[1] = scale
@@ -1872,6 +1896,16 @@ export const obj_has_behavior = (obj, behavior) => {
     } else {
         return false
     }
+}
+
+export const cur_obj_lateral_dist_from_mario_to_home = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    let dx = o.rawData[oHomeX] - ObjectListProc.gMarioObject.rawData[oPosX];
+    let dz = o.rawData[oHomeZ] - ObjectListProc.gMarioObject.rawData[oPosZ];
+
+    dist = sqrtf(dx * dx + dz * dz);
+    return dist;
 }
 
 import { LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC } from "../levels/level_defines_constants"

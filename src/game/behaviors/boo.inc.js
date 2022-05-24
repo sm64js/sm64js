@@ -4,7 +4,11 @@ import {
     obj_copy_behavior_params, cur_obj_hide, spawn_mist_particles, cur_obj_become_tangible,
     obj_set_angle, cur_obj_nearest_object_with_behavior, cur_obj_unhide, cur_obj_set_pos_to_home,
     cur_obj_become_intangible, cur_obj_scale, obj_mark_for_deletion, spawn_object, cur_obj_angle_to_home,
-    cur_obj_rotate_yaw_toward, cur_obj_move_using_fvel_and_gravity, abs_angle_diff
+    cur_obj_rotate_yaw_toward, cur_obj_move_using_fvel_and_gravity, abs_angle_diff,
+    cur_obj_lateral_dist_from_mario_to_home, mario_is_in_air_action, increment_velocity_toward_range,
+    cur_obj_set_vel_from_mario_vel, cur_obj_disable, cur_obj_set_pos_to_home_with_debug,
+    cur_obj_forward_vel_approach_upward
+
 } from "../ObjectHelpers"
 
 import {
@@ -14,14 +18,14 @@ import {
     oMerryGoRoundBooManagerNumBoosSpawned, oHomeX, oHomeY, oHomeZ, oBehParams2ndByte, oPosY, oTimer,
     oFlags, oBooMoveYawBeforeHit, oBooMoveYawDuringHit, oBooDeathStatus, oFaceAngleRoll,
     oMerryGoRoundStopped, oBooParentBigBoo, oBigBooNumMinionBoosKilled, oHealth, oInteractType,
-    oBooNegatedAggressiveness,
+    oBooNegatedAggressiveness, oBooTurningSpeed,
 
     ACTIVE_FLAG_IN_DIFFERENT_ROOM, ACTIVE_FLAG_DEACTIVATED, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveFlags, OBJ_MOVE_HIT_WALL, ACTIVE_FLAG_MOVE_THROUGH_GRATE
 } from "../../include/object_constants"
 
 import {
     bhvGhostHuntBoo, bhvMerryGoRoundBooManager, bhvBalconyBigBoo, bhvMerryGoRoundBigBoo,
-    bhvMerryGoRoundBoo, bhvGhostHuntBigBoo, bhvBooCage, bhvBooWithCage
+    bhvMerryGoRoundBoo, bhvGhostHuntBigBoo, bhvBooCage
 } from "../BehaviorData"
 
 import {
@@ -33,7 +37,7 @@ import { MODEL_BOO, MODEL_HAUNTED_CAGE } from "../../include/model_ids"
 import { TIME_STOP_MARIO_OPENED_DOOR } from "../ObjectListProcessor"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { LevelUpdateInstance as LevelUpdate } from "../LevelUpdate"
-import { random_u16, coss, sins } from "../../utils"
+import { random_u16, coss, sins, random_float } from "../../utils"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { play_puzzle_jingle } from "../../audio/external"
 import { create_sound_spawner } from "../SpawnSound"
@@ -102,7 +106,7 @@ const boo_should_be_stopped = () => {
             return true
         }
 
-        if (o.rawData[oRoom] == 10 && (gTimeStopState & TIME_STOP_MARIO_OPENED_DOOR)) {
+        if (o.rawData[oRoom] == 10 && (gLinker.ObjectListProcessor.gTimeStopState & TIME_STOP_MARIO_OPENED_DOOR)) {
             return true
         }
     }
@@ -440,19 +444,73 @@ const boo_act_5 = () => {
 }
 
 const boo_act_1 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
+    if (o.rawData[oTimer] == 0) {
+        o.rawData[oBooNegatedAggressiveness] = -random_float() * 5.0;
+        o.rawData[oBooTurningSpeed] = random_float() * 128.0;
+    }
+
+    boo_chase_mario(-100.0, o.rawData[oBooTurningSpeed] + 0x180, 0.5);
+
+    let attackStatus = boo_get_attack_status();
+
+    if (boo_should_be_stopped()) {
+        o.rawData[oAction] = 0;
+    }
+
+    if (attackStatus == BOO_BOUNCED_ON) {
+        o.rawData[oAction] = 2;
+    }
+
+    if (attackStatus == BOO_ATTACKED) {
+        o.rawData[oAction] = 3;
+    }
+
+    if (attackStatus == BOO_ATTACKED) {
+        create_sound_spawner(SOUND_OBJ_DYING_ENEMY1);
+    }
 }
 
 const boo_act_2 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
+    if (boo_update_after_bounced_on(20.0)) {
+        o.rawData[oAction] = 1;
+    }
 }
 
 const boo_act_3 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
+    if (boo_update_during_death()) {
+        if (o.rawData[oBehParams2ndByte] != 0) {
+            obj_mark_for_deletion(o);
+        } else {
+            o.rawData[oAction] = 4;
+            cur_obj_disable();
+        }
+    }
 }
 
 const boo_act_4 = () => {
+    let dialogID;
 
+    // If there are no remaining "minion" boos, show the dialog of the Big Boo
+    if (cur_obj_nearest_object_with_behavior(bhvGhostHuntBoo) == NULL) {
+        dialogID = DIALOG_108;
+    } else {
+        dialogID = DIALOG_107;
+    }
+
+    if (cur_obj_update_dialog(MARIO_DIALOG_LOOK_UP, DIALOG_FLAG_TEXT_DEFAULT, dialogID, 0)) {
+        create_sound_spawner(SOUND_OBJ_DYING_ENEMY1);
+        obj_mark_for_deletion(o);
+
+        if (dialogID == DIALOG_108) { // If the Big Boo should spawn, play the jingle
+            play_puzzle_jingle();
+        }
+    }
 }
 
 const sBooActions = [
@@ -474,7 +532,7 @@ export const bhv_boo_loop = () => {
     boo_approach_target_opacity_and_update_scale()
 
     if (obj_has_behavior(o.parentObj, bhvMerryGoRoundBooManager) && o.activeFlags == ACTIVE_FLAG_DEACTIVATED) {
-        o.parentObj.oMerryGoRoundBooManagerNumBoosKilled++
+        o.parentObj.rawData[oMerryGoRoundBooManagerNumBoosKilled]++
     }
 
     o.rawData[oInteractStatus] = 0

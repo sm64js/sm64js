@@ -3,7 +3,8 @@ import {
     cur_obj_call_action_function, cur_obj_move_standard, obj_has_behavior, obj_scale, 
     obj_copy_behavior_params, cur_obj_hide, spawn_mist_particles, cur_obj_become_tangible,
     obj_set_angle, cur_obj_nearest_object_with_behavior, cur_obj_unhide, cur_obj_set_pos_to_home,
-    cur_obj_become_intangible, cur_obj_scale, obj_mark_for_deletion, spawn_object
+    cur_obj_become_intangible, cur_obj_scale, obj_mark_for_deletion, spawn_object, cur_obj_angle_to_home,
+    cur_obj_rotate_yaw_toward, cur_obj_move_using_fvel_and_gravity, abs_angle_diff
 } from "../ObjectHelpers"
 
 import {
@@ -12,7 +13,8 @@ import {
     oMerryGoRoundBooManagerNumBoosKilled, oInteractStatus, oGraphYOffset, oBehParams, oAction,
     oMerryGoRoundBooManagerNumBoosSpawned, oHomeX, oHomeY, oHomeZ, oBehParams2ndByte, oPosY, oTimer,
     oFlags, oBooMoveYawBeforeHit, oBooMoveYawDuringHit, oBooDeathStatus, oFaceAngleRoll,
-    oMerryGoRoundStopped, oBooParentBigBoo, oBigBooNumMinionBoosKilled, oHealth,
+    oMerryGoRoundStopped, oBooParentBigBoo, oBigBooNumMinionBoosKilled, oHealth, oInteractType,
+    oBooNegatedAggressiveness,
 
     ACTIVE_FLAG_IN_DIFFERENT_ROOM, ACTIVE_FLAG_DEACTIVATED, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveFlags, OBJ_MOVE_HIT_WALL, ACTIVE_FLAG_MOVE_THROUGH_GRATE
 } from "../../include/object_constants"
@@ -22,8 +24,12 @@ import {
     bhvMerryGoRoundBoo, bhvGhostHuntBigBoo, bhvBooCage, bhvBooWithCage
 } from "../BehaviorData"
 
+import {
+    SOUND_OBJ_BOO_LAUGH_LONG, SOUND_ENV_ELEVATOR2, SOUND_GENERAL_UNKNOWN4_LOWPRIO,
+    SOUND_OBJ_BOO_LAUGH_SHORT, SOUND_OBJ_BOO_BOUNCE_TOP
+} from "../../include/sounds"
+
 import { MODEL_BOO, MODEL_HAUNTED_CAGE } from "../../include/model_ids"
-import { SOUND_OBJ_BOO_LAUGH_LONG, SOUND_ENV_ELEVATOR2, SOUND_GENERAL_UNKNOWN4_LOWPRIO } from "../../include/sounds"
 import { TIME_STOP_MARIO_OPENED_DOOR } from "../ObjectListProcessor"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { LevelUpdateInstance as LevelUpdate } from "../LevelUpdate"
@@ -32,6 +38,9 @@ import { obj_set_hitbox } from "../ObjBehaviors2"
 import { play_puzzle_jingle } from "../../audio/external"
 import { create_sound_spawner } from "../SpawnSound"
 import { CameraInstance as Camera } from "../Camera"
+import {
+    INTERACT_BOUNCE_TOP, INT_STATUS_INTERACTED, INT_STATUS_WAS_ATTACKED, ATTACK_FROM_ABOVE
+} from "../Interaction"
 
 export const SPAWN_CASTLE_BOO_STAR_REQUIREMENT = 12
 
@@ -162,9 +171,9 @@ const boo_oscillate = (ignoreOpacity) => {
     o.oFaceAnglePitch = sins(o.rawData[oBooOscillationTimer]) * 0x400
 
     if (o.rawData[oOpacity] == 255 || ignoreOpacity == true) {
-        o.header.gfx.scale[0] = sins(o.rawData[oBooOscillationTimer]) * 0.08 + o.rawData[oBooBaseScale]
-        o.header.gfx.scale[1] = -sins(o.rawData[oBooOscillationTimer]) * 0.08 + o.rawData[oBooBaseScale]
-        o.header.gfx.scale[2] = o.header.gfx.scale[0];
+        o.gfx.scale[0] = sins(o.rawData[oBooOscillationTimer]) * 0.08 + o.rawData[oBooBaseScale]
+        o.gfx.scale[1] = -sins(o.rawData[oBooOscillationTimer]) * 0.08 + o.rawData[oBooBaseScale]
+        o.gfx.scale[2] = o.gfx.scale[0];
         o.rawData[oGravity] = sins(o.rawData[oBooOscillationTimer]) * o.rawData[oBooBaseScale];
         o.rawData[oBooOscillationTimer] += 0x400;
     }
@@ -272,11 +281,11 @@ const big_boo_update_during_nonlethal_hit = (a0) => {
 
     boo_stop()
     if (o.rawData[oTimer] == 0) {
-        boo_set_move_yaw_for_during_hit(TRUE)
+        boo_set_move_yaw_for_during_hit(true)
     }
 
     if (o.rawData[oTimer] < 32) {
-        boo_move_during_hit(TRUE, sBooHitRotations[o.rawData[oTimer]] / 5000.0 * a0);
+        boo_move_during_hit(true, sBooHitRotations[o.rawData[oTimer]] / 5000.0 * a0);
     } else if (o.rawData[oTimer] < 48) {
         big_boo_shake_after_hit();
     } else {
@@ -284,10 +293,10 @@ const big_boo_update_during_nonlethal_hit = (a0) => {
         boo_reset_after_hit();
         o.rawData[oAction] = 1;
 
-        return TRUE;
+        return true;
     }
 
-    return FALSE;
+    return false;
 }
 
 const boo_update_during_death = () => {
@@ -326,15 +335,76 @@ const boo_update_during_death = () => {
 }
 
 const obj_has_attack_type = (attackType) => {
-
+    if ((o.rawData[oInteractStatus] & INT_STATUS_ATTACK_MASK) == attackType) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 const boo_get_attack_status = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    
+    let attackStatus = BOO_NOT_ATTACKED;
 
+    if (o.rawData[oInteractStatus] & INT_STATUS_INTERACTED) {
+        if ((o.rawData[oInteractStatus] & INT_STATUS_WAS_ATTACKED) && !obj_has_attack_type(ATTACK_FROM_ABOVE)) {
+            cur_obj_become_intangible();
+
+            o.rawData[oInteractStatus] = 0;
+
+            cur_obj_play_sound_2(SOUND_OBJ_BOO_LAUGH_SHORT);
+
+            attackStatus = BOO_ATTACKED;
+        } else {
+            cur_obj_play_sound_2(SOUND_OBJ_BOO_BOUNCE_TOP);
+
+            o.rawData[oInteractStatus] = 0;
+
+            attackStatus = BOO_BOUNCED_ON;
+        }
+    }
+
+    return attackStatus;
 }
 
 const boo_chase_mario = (a0, a1, a2) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
+    let sp1A
+
+    if (boo_vanish_or_appear()) {
+        o.rawData[oInteractType] = INTERACT_BOUNCE_TOP;
+
+        if (cur_obj_lateral_dist_from_mario_to_home() > 1500.0) {
+            sp1A = cur_obj_angle_to_home();
+        } else {
+            sp1A = o.rawData[oAngleToMario];
+        }
+
+        cur_obj_rotate_yaw_toward(sp1A, a1);
+        o.rawData[oVelY] = 0;
+
+        if (!mario_is_in_air_action()) {
+            let sp1C = o.rawData[oPosY] - gMarioObject.rawData[oPosY];
+            if (a0 < sp1C && sp1C < 500.0) {
+                o.rawData[oVelY] = increment_velocity_toward_range(o.rawData[oPosY], gMarioObject.rawData[oPosY] + 50.0, 10.0, 2.0);
+            }
+        }
+
+        cur_obj_set_vel_from_mario_vel(10.0 - o.rawData[oBooNegatedAggressiveness], a2);
+
+        if (o.rawData[oForwardVel] != 0) {
+            boo_oscillate(false);
+        }
+    } else {
+        o.rawData[oInteractType] = 0;
+        // why is boo_stop not used here
+        o.rawData[oForwardVel] = 0;
+        o.rawData[oVelY] = 0;
+        o.rawData[oGravity] = 0;
+    }
 }
 
 const boo_act_0 = () => {
@@ -506,7 +576,7 @@ const big_boo_spawn_merry_go_round_star = () => {
     let merryGoRound = cur_obj_nearest_object_with_behavior(bhvMerryGoRound);
 
     if (merryGoRound != null) {
-        merryGoRound.rawData[oMerryGoRoundStopped] = TRUE;
+        merryGoRound.rawData[oMerryGoRoundStopped] = true;
     }
 }
 
@@ -741,6 +811,8 @@ export const bhv_boo_in_castle_loop = () => {
 
     o.rawData[oBooBaseScale] = 2.0
 
+    let targetAngle
+
     if (o.rawData[oAction] == 0) {
         cur_obj_hide()
 
@@ -766,7 +838,7 @@ export const bhv_boo_in_castle_loop = () => {
         }
 
         o.rawData[oForwardVel] = 0.0;
-        let targetAngle = o.rawData[oAngleToMario]
+        targetAngle = o.rawData[oAngleToMario]
     } else {
         cur_obj_forward_vel_approach_upward(32.0, 1.0);
 
@@ -793,7 +865,7 @@ export const bhv_boo_in_castle_loop = () => {
     targetAngle = cur_obj_angle_to_home()
 
     cur_obj_rotate_yaw_toward(targetAngle, 0x5A8)
-    boo_oscillate(TRUE)
+    boo_oscillate(true)
     cur_obj_move_using_fvel_and_gravity()
 }
 

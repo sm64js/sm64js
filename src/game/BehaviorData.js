@@ -42,6 +42,7 @@ import { MODEL_WOODEN_POST, MODEL_MIST, MODEL_SMOKE, MODEL_BUBBLE, MODEL_CANNON_
 import * as _amp                      from "./behaviors/amp.inc"
 import * as _bird                     from "./behaviors/bird.inc"
 import * as _boo                      from "./behaviors/boo.inc"
+import * as _boo_cage                 from "./behaviors/boo_cage.inc"
 import * as _bowling_ball             from "./behaviors/bowling_ball.inc"
 import * as _breakable_box            from "./behaviors/breakable_box.inc"
 import * as _breakable_box_small      from "./behaviors/breakable_box_small.inc"
@@ -1174,6 +1175,18 @@ export const bhvGhostHuntBigBoo = [
     END_LOOP(),
 ]
 
+export const bhvBooInCastle = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_HOME(),
+    SET_FLOAT(oGraphYOffset, 60),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ 0, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    CALL_NATIVE('bhv_init_room'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_boo_in_castle_loop'),
+    END_LOOP(),
+]
+
 export const bhvBooWithCage = [
     BEGIN(OBJ_LIST_GENACTOR),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -1990,7 +2003,7 @@ const bhvSparkle = [
     DEACTIVATE(),
 ]
 
-const bhvSparkleSpawn = [
+export const bhvSparkleSpawn = [
     BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvSparkleSpawn'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BEGIN_LOOP(),
@@ -2089,6 +2102,7 @@ gLinker.behaviors.bhvBobombBuddy = bhvBobombBuddy
 gLinker.behaviors.bhvBobombFuseSmoke = bhvBobombFuseSmoke
 gLinker.behaviors.bhvBoo = bhvBoo
 gLinker.behaviors.bhvBooCage = bhvBooCage
+gLinker.behaviors.bhvBooInCastle = bhvBooInCastle
 gLinker.behaviors.bhvBooWithCage = bhvBooWithCage
 gLinker.behaviors.bhvBowlingBall = bhvBowlingBall
 gLinker.behaviors.bhvBowser = bhvBowser
@@ -2179,6 +2193,7 @@ gLinker.behaviors.bhvSparkle = bhvSparkle
 gLinker.behaviors.bhvSparkleSpawn = bhvSparkleSpawn
 gLinker.behaviors.bhvSpawnedStarNoLevelExit = bhvSpawnedStarNoLevelExit
 gLinker.behaviors.bhvSpinAirborneCircleWarp = bhvSpinAirborneCircleWarp
+gLinker.behaviors.bhvSparkleSpawn = bhvSparkleSpawn
 gLinker.behaviors.bhvSpinAirborneWarp = bhvSpinAirborneWarp
 gLinker.behaviors.bhvSquarishPathMoving = bhvSquarishPathMoving
 gLinker.behaviors.bhvStar = bhvStar

@@ -81,6 +81,32 @@ export const WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL      = 0x20
 export const WATER_DROPLET_FLAG_RAND_ANGLE_INCR_PLUS_8000 = 0x40
 export const WATER_DROPLET_FLAG_RAND_ANGLE_INCR           = 0x80 // Unused
 
+export const increment_velocity_toward_range = (value, center, zeroThreshold, increment) => {
+    let relative;
+    if ((relative = value - center) > 0) {
+        if (relative < zeroThreshold) {
+            return 0;
+        } else {
+            return -increment;
+        }
+    } else {
+        if (relative > -zeroThreshold) {
+            return 0;
+        } else {
+            return increment;
+        }
+    }
+}
+
+export const obj_check_if_collided_with_object = (obj1, obj2) => {
+    for (let i = 0; i < obj1.numCollidedObjs; i++) {
+        if (obj1.collidedObjs[i] == obj2) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
 
 export const cur_obj_set_behavior = (behavior) => {
     const o = ObjectListProc.gCurrentObject

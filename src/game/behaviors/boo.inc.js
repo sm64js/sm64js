@@ -40,7 +40,7 @@ import { LevelUpdateInstance as LevelUpdate } from "../LevelUpdate"
 import { random_u16, coss, sins, random_float } from "../../utils"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { play_puzzle_jingle } from "../../audio/external"
-import { create_sound_spawner } from "../SpawnSound"
+import { create_sound_spawner, cur_obj_play_sound_2 } from "../SpawnSound"
 import { CameraInstance as Camera } from "../Camera"
 import {
     INTERACT_BOUNCE_TOP, INT_STATUS_INTERACTED, INT_STATUS_WAS_ATTACKED, ATTACK_FROM_ABOVE
@@ -202,7 +202,7 @@ const boo_vanish_or_appear = () => {
 //        }
 
 //        if (o.rawData[oOpacity] > 180) {
-            doneAppearing = true
+            let doneAppearing = true
 //        }
 //    } else if (o.rawData[oOpacity] == 255) {
 //        o.rawData[oBooTargetOpacity] = 40
@@ -339,6 +339,8 @@ const boo_update_during_death = () => {
 }
 
 const obj_has_attack_type = (attackType) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    
     if ((o.rawData[oInteractStatus] & INT_STATUS_ATTACK_MASK) == attackType) {
         return true;
     } else {

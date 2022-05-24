@@ -65,7 +65,7 @@ import { GRAPH_RENDER_ACTIVE           } from "../engine/graph_node"
 
 import { OBJ_LIST_UNIMPORTANT, OBJ_LIST_GENACTOR } from "./BehaviorData"
 
-import { atan2s, mtxf_rotate_zxy_and_translate } from "../engine/math_util"
+import { atan2s, mtxf_rotate_zxy_and_translate, sqrtf } from "../engine/math_util"
 import { sins, coss, int16, s16, random_int16, random_float } from "../utils"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import * as _Linker from "./Linker"
@@ -1368,7 +1368,8 @@ export const cur_obj_change_action = (action) => {
 
 export const cur_obj_set_vel_from_mario_vel = (f12, f14) => {
     const o = ObjectListProc.gCurrentObject
-    let /*f32*/ sp4 = gMarioStates[0].forwardVel
+    const gMarioStates = gLinker.ObjectListProcessor.gMarioObject
+    let /*f32*/ sp4 = gMarioStates.forwardVel
     let /*f32*/ sp0 = f12 * f14
 
     if (sp4 < sp0) {
@@ -1904,7 +1905,7 @@ export const cur_obj_lateral_dist_from_mario_to_home = () => {
     let dx = o.rawData[oHomeX] - ObjectListProc.gMarioObject.rawData[oPosX];
     let dz = o.rawData[oHomeZ] - ObjectListProc.gMarioObject.rawData[oPosZ];
 
-    dist = sqrtf(dx * dx + dz * dz);
+    let dist = sqrtf(dx * dx + dz * dz);
     return dist;
 }
 

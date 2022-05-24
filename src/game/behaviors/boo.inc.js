@@ -183,33 +183,33 @@ const boo_oscillate = (ignoreOpacity) => {
     }
 }
 
-const boo_vanish_or_appear = () => {
-    const o = gLinker.ObjectListProcessor.gCurrentObject
-    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+//const boo_vanish_or_appear = () => {
+//    const o = gLinker.ObjectListProcessor.gCurrentObject
+//    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+//
+//    let relativeAngleToMario = abs_angle_diff(o.rawData[oAngleToMario], o.rawData[oMoveAngleYaw])
+//    let relativeMarioFaceAngle = abs_angle_diff(o.rawData[oMoveAngleYaw], gMarioObject.rawData[oFaceAngleYaw])
+//    let relativeAngleToMarioThreshhold = 0x1568
+//    let relativeMarioFaceAngleThreshhold = 0x6B58
+//    let doneAppearing = false
 
-    let relativeAngleToMario = abs_angle_diff(o.rawData[oAngleToMario], o.rawData[oMoveAngleYaw])
-    let relativeMarioFaceAngle = abs_angle_diff(o.rawData[oMoveAngleYaw], gMarioObject.rawData[oFaceAngleYaw])
-    let relativeAngleToMarioThreshhold = 0x1568
-    let relativeMarioFaceAngleThreshhold = 0x6B58
-    let doneAppearing = false
+//    o.rawData[oVelY] = 0
 
-    o.rawData[oVelY] = 0
+//    if (relativeAngleToMario > relativeAngleToMarioThreshhold || relativeMarioFaceAngle < relativeMarioFaceAngleThreshhold) {
+//        if (o.rawData[oOpacity] == 40) {
+//            o.rawData[oBooTargetOpacity] == 255
+//            cur_obj_play_sound_2(SOUND_OBJ_BOO_LAUGH_LONG)
+//        }
 
-    if (relativeAngleToMario > relativeAngleToMarioThreshhold || relativeMarioFaceAngle < relativeMarioFaceAngleThreshhold) {
-        if (o.rawData[oOpacity] == 40) {
-            o.rawData[oBooTargetOpacity] == 255
-            cur_obj_play_sound_2(SOUND_OBJ_BOO_LAUGH_LONG)
-        }
-
-        if (o.rawData[oOpacity] > 180) {
+//        if (o.rawData[oOpacity] > 180) {
             doneAppearing = true
-        }
-    } else if (o.rawData[oOpacity] == 255) {
-        o.rawData[oBooTargetOpacity] = 40
-    }
+//        }
+//    } else if (o.rawData[oOpacity] == 255) {
+//        o.rawData[oBooTargetOpacity] = 40
+//    }
 
     return doneAppearing
-}
+//}
 
 const boo_set_move_yaw_for_during_hit = (hurt) => {
     const o = gLinker.ObjectListProcessor.gCurrentObject

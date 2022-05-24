@@ -183,7 +183,7 @@ const boo_oscillate = (ignoreOpacity) => {
     }
 }
 
-//const boo_vanish_or_appear = () => {
+const boo_vanish_or_appear = () => {
 //    const o = gLinker.ObjectListProcessor.gCurrentObject
 //    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 //
@@ -209,7 +209,7 @@ const boo_oscillate = (ignoreOpacity) => {
 //    }
 
     return doneAppearing
-//}
+}
 
 const boo_set_move_yaw_for_during_hit = (hurt) => {
     const o = gLinker.ObjectListProcessor.gCurrentObject

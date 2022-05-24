@@ -2089,6 +2089,7 @@ gLinker.behaviors.bhvBobombBuddy = bhvBobombBuddy
 gLinker.behaviors.bhvBobombFuseSmoke = bhvBobombFuseSmoke
 gLinker.behaviors.bhvBoo = bhvBoo
 gLinker.behaviors.bhvBooCage = bhvBooCage
+gLinker.behaviors.bhvBooWithCage = bhvBooWithCage
 gLinker.behaviors.bhvBowlingBall = bhvBowlingBall
 gLinker.behaviors.bhvBowser = bhvBowser
 gLinker.behaviors.bhvBowserBodyAnchor = bhvBowserBodyAnchor

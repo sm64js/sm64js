@@ -3,7 +3,7 @@ import {
     cur_obj_call_action_function, cur_obj_move_standard, obj_has_behavior, obj_scale, 
     obj_copy_behavior_params, cur_obj_hide, spawn_mist_particles, cur_obj_become_tangible,
     obj_set_angle, cur_obj_nearest_object_with_behavior, cur_obj_unhide, cur_obj_set_pos_to_home,
-    cur_obj_become_intangible
+    cur_obj_become_intangible, cur_obj_scale, obj_mark_for_deletion, spawn_object
 } from "../ObjectHelpers"
 
 import {
@@ -19,7 +19,7 @@ import {
 
 import {
     bhvGhostHuntBoo, bhvMerryGoRoundBooManager, bhvBalconyBigBoo, bhvMerryGoRoundBigBoo,
-    bhvMerryGoRoundBoo, bhvGhostHuntBigBoo
+    bhvMerryGoRoundBoo, bhvGhostHuntBigBoo, bhvBooCage, bhvBooWithCage
 } from "../BehaviorData"
 
 import { MODEL_BOO, MODEL_HAUNTED_CAGE } from "../../include/model_ids"
@@ -422,7 +422,7 @@ const big_boo_act_0 = () => {
 
     o.rawData[oBooParentBigBoo] = null;
 
-    if (boo_should_be_active() && o.rawData[oBigBooNumMinionBoosKilled] >= ObjectListProc.gDebugInfo[DEBUG_PAGE_ENEMYINFO][0] + 5) {
+    if (boo_should_be_active() && o.rawData[oBigBooNumMinionBoosKilled] >= /* ObjectListProc.gDebugInfo[DEBUG_PAGE_ENEMYINFO][0] + */ 5) {
         o.rawData[oAction] = 1;
 
         cur_obj_set_pos_to_home();
@@ -444,6 +444,8 @@ const big_boo_act_0 = () => {
 }
 
 const big_boo_act_1 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    
     let sp22;
     let sp1C;
 
@@ -602,6 +604,8 @@ export const bhv_big_boo_loop = () => {
 }
 
 const boo_with_cage_act_0 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
     o.rawData[oBooParentBigBoo] = null;
     o.rawData[oBooTargetOpacity] = 255;
     o.rawData[oBooBaseScale] = 2.0;
@@ -615,6 +619,8 @@ const boo_with_cage_act_0 = () => {
 }
 
 const boo_with_cage_act_1 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
     boo_chase_mario(100.0, 512, 0.5);
 
     let attackStatus = boo_get_attack_status();
@@ -633,6 +639,8 @@ const boo_with_cage_act_1 = () => {
 }
 
 const boo_with_cage_act_2 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
     if (boo_update_after_bounced_on(20.0)) {
         o.rawData[oAction] = 1
     }
@@ -649,7 +657,7 @@ const boo_with_cage_act_3 = () => {
 export const bhv_boo_with_cage_init = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
 
-    if (gHudDisplay.stars < SPAWN_CASTLE_BOO_STAR_REQUIREMENT) {
+    if (LevelUpdate.gHudDisplay.stars < SPAWN_CASTLE_BOO_STAR_REQUIREMENT) {
         obj_mark_for_deletion(o);
     } else {
         let cage = spawn_object(o, MODEL_HAUNTED_CAGE, bhvBooCage);
@@ -665,6 +673,8 @@ const sBooWithCageActions = [
 ]
 
 export const bhv_boo_with_cage_loop = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
     //PARTIAL_UPDATE
 
     cur_obj_update_floor_and_walls();
@@ -734,7 +744,7 @@ export const bhv_boo_in_castle_loop = () => {
     if (o.rawData[oAction] == 0) {
         cur_obj_hide()
 
-        if (gHudDisplay.stars < SPAWN_CASTLE_BOO_STAR_REQUIREMENT) {
+        if (LevelUpdate.gHudDisplay.stars < SPAWN_CASTLE_BOO_STAR_REQUIREMENT) {
             obj_mark_for_deletion(o);
         }
 

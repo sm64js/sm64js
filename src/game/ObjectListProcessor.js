@@ -27,6 +27,7 @@ import {
 } from "../include/mario_constants"
 import { spawn_object_at_origin, obj_copy_pos_and_angle } from "./ObjectHelpers"
 
+export const gDebugInfo = new Array(16).fill(0).map(() => new Array(8).fill(0))
 
 export const TIME_STOP_UNKNOWN_0 = (1 << 0)
 export const TIME_STOP_ENABLED = (1 << 1)

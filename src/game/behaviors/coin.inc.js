@@ -9,8 +9,7 @@ import { sins, coss, random_uint16 } from "../../utils"
 import { atan2s } from "../../engine/math_util"
 import { SOUND_GENERAL_COIN_DROP } from "../../include/sounds"
 import { LEVEL_BBH } from "../../levels/level_defines_constants"
-
-const BOO_DEATH_STATUS_DYING = 1
+import { BOO_DEATH_STATUS_DYING } from "./boo.inc"
 
 const sYellowCoinHitbox = {
     interactType: INTERACT_COIN,

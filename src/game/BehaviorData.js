@@ -1161,14 +1161,6 @@ export const bhvCoinInsideBoo = [
     END_LOOP(),
 ]
 
-export const bhvMerryGoRoundBigBoo = [
-    BEGIN(OBJ_LIST_GENACTOR),
-    SET_INT(oBehParams2ndByte, 1),
-    // Set number of minion boos killed to 10, which is greater than 5 so that the boo always loads without needing to kill any boos.
-    SET_INT(oBigBooNumMinionBoosKilled, 10),
-    GOTO('bhvGhostHuntBigBoo', 1),
-]
-
 export const bhvGhostHuntBigBoo = [
     BEGIN(OBJ_LIST_GENACTOR),
     // Big boo - common:
@@ -1180,6 +1172,37 @@ export const bhvGhostHuntBigBoo = [
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_big_boo_loop'),
     END_LOOP(),
+]
+
+export const bhvBooWithCage = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_HOME(),
+    SET_INT(oDamageOrCoinValue, 3),
+    SET_HURTBOX(/*Radius*/ 80, /*Height*/ 120),
+    SET_HITBOX(/*Radius*/ 180, /*Height*/ 140),
+    SET_FLOAT(oGraphYOffset, 60),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ 0, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    CALL_NATIVE('bhv_boo_with_cage_init'),
+    CALL_NATIVE('bhv_init_room'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_boo_with_cage_loop'),
+    END_LOOP(),
+]
+
+export const bhvBalconyBigBoo = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    SET_INT(oBehParams2ndByte, 2),
+    SET_INT(oBigBooNumMinionBoosKilled, 10),
+    GOTO('bhvGhostHuntBigBoo', 1),
+]
+
+export const bhvMerryGoRoundBigBoo = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    SET_INT(oBehParams2ndByte, 1),
+    // Set number of minion boos killed to 10, which is greater than 5 so that the boo always loads without needing to kill any boos.
+    SET_INT(oBigBooNumMinionBoosKilled, 10),
+    GOTO('bhvGhostHuntBigBoo', 1),
 ]
 
 export const bhvCourtyardBooTriplet = [
@@ -1216,6 +1239,18 @@ export const bhvGhostHuntBoo = [
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_boo_loop'),
     END_LOOP(),
+]
+
+export const bhvMerryGoRoundBoo = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    SET_INT(oBehParams2ndByte, 2),
+    GOTO('bhvGhostHuntBoo', 1),
+]
+
+export const bhvBoo = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    SET_INT(oBehParams2ndByte, 1),
+    GOTO('bhvGhostHuntBoo', 1),
 ]
 
 export const bhvMerryGoRoundBooManager = [
@@ -2033,10 +2068,10 @@ const bhvMenuButtonManager = [
     END_LOOP(),
 ]
 
-const bhvMerryGoRound = [
+export const bhvMerryGoRound = [
     BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    LOAD_COLLISION_DATA( bbh_seg7_collision_merry_go_round),
+    LOAD_COLLISION_DATA(bbh_seg7_collision_merry_go_round),
     BEGIN_LOOP(),
         CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
     END_LOOP(),
@@ -2046,11 +2081,13 @@ gLinker.behaviors.bhv1Up = bhv1Up
 gLinker.behaviors.bhvAirborneDeathWarp = bhvAirborneDeathWarp
 gLinker.behaviors.bhvAirborneStarCollectWarp = bhvAirborneStarCollectWarp
 gLinker.behaviors.bhvAirborneWarp = bhvAirborneWarp
+gLinker.behaviors.bhvBalconyBigBoo = bhvBalconyBigBoo
 gLinker.behaviors.bhvBird = bhvBird
 gLinker.behaviors.bhvBobBowlingBallSpawner = bhvBobBowlingBallSpawner
 gLinker.behaviors.bhvBobomb = bhvBobomb
 gLinker.behaviors.bhvBobombBuddy = bhvBobombBuddy
 gLinker.behaviors.bhvBobombFuseSmoke = bhvBobombFuseSmoke
+gLinker.behaviors.bhvBoo = bhvBoo
 gLinker.behaviors.bhvBooCage = bhvBooCage
 gLinker.behaviors.bhvBowlingBall = bhvBowlingBall
 gLinker.behaviors.bhvBowser = bhvBowser
@@ -2114,6 +2151,7 @@ gLinker.behaviors.bhvMario = bhvMario
 gLinker.behaviors.bhvMenuButtonManager = bhvMenuButtonManager
 gLinker.behaviors.bhvMerryGoRound = bhvMerryGoRound
 gLinker.behaviors.bhvMerryGoRoundBigBoo = bhvMerryGoRoundBigBoo
+gLinker.behaviors.bhvMerryGoRoundBoo = bhvMerryGoRoundBoo
 gLinker.behaviors.bhvMerryGoRoundBooManager = bhvMerryGoRoundBooManager
 gLinker.behaviors.bhvMessagePanel = bhvMessagePanel
 gLinker.behaviors.bhvMetalCap = bhvMetalCap

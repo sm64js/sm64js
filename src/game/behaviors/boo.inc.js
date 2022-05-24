@@ -1,7 +1,9 @@
 import {
     cur_obj_has_behavior, spawn_object_relative, cur_obj_update_floor_and_walls,
     cur_obj_call_action_function, cur_obj_move_standard, obj_has_behavior, obj_scale, 
-    obj_copy_behavior_params, cur_obj_hide
+    obj_copy_behavior_params, cur_obj_hide, spawn_mist_particles, cur_obj_become_tangible,
+    obj_set_angle, cur_obj_nearest_object_with_behavior, cur_obj_unhide, cur_obj_set_pos_to_home,
+    cur_obj_become_intangible
 } from "../ObjectHelpers"
 
 import {
@@ -9,19 +11,38 @@ import {
     oBooTargetOpacity, oOpacity, oBooBaseScale, oBooOscillationTimer, oAngleToMario, oFaceAngleYaw,
     oMerryGoRoundBooManagerNumBoosKilled, oInteractStatus, oGraphYOffset, oBehParams, oAction,
     oMerryGoRoundBooManagerNumBoosSpawned, oHomeX, oHomeY, oHomeZ, oBehParams2ndByte, oPosY, oTimer,
+    oFlags, oBooMoveYawBeforeHit, oBooMoveYawDuringHit, oBooDeathStatus, oFaceAngleRoll,
+    oMerryGoRoundStopped, oBooParentBigBoo, oBigBooNumMinionBoosKilled, oHealth,
 
-    ACTIVE_FLAG_IN_DIFFERENT_ROOM, ACTIVE_FLAG_DEACTIVATED
+    ACTIVE_FLAG_IN_DIFFERENT_ROOM, ACTIVE_FLAG_DEACTIVATED, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveFlags, OBJ_MOVE_HIT_WALL, ACTIVE_FLAG_MOVE_THROUGH_GRATE
 } from "../../include/object_constants"
+
+import {
+    bhvGhostHuntBoo, bhvMerryGoRoundBooManager, bhvBalconyBigBoo, bhvMerryGoRoundBigBoo,
+    bhvMerryGoRoundBoo, bhvGhostHuntBigBoo
+} from "../BehaviorData"
 
 import { MODEL_BOO, MODEL_HAUNTED_CAGE } from "../../include/model_ids"
 import { SOUND_OBJ_BOO_LAUGH_LONG, SOUND_ENV_ELEVATOR2, SOUND_GENERAL_UNKNOWN4_LOWPRIO } from "../../include/sounds"
 import { TIME_STOP_MARIO_OPENED_DOOR } from "../ObjectListProcessor"
-import { bhvGhostHuntBoo, bhvMerryGoRoundBooManager } from "../BehaviorData"
+import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { LevelUpdateInstance as LevelUpdate } from "../LevelUpdate"
-import { random_u16 } from "../../utils"
+import { random_u16, coss, sins } from "../../utils"
 import { obj_set_hitbox } from "../ObjBehaviors2"
+import { play_puzzle_jingle } from "../../audio/external"
+import { create_sound_spawner } from "../SpawnSound"
+import { CameraInstance as Camera } from "../Camera"
 
 export const SPAWN_CASTLE_BOO_STAR_REQUIREMENT = 12
+
+// Boo obj const
+export const BOO_DEATH_STATUS_ALIVE = 0
+export const BOO_DEATH_STATUS_DYING = 1
+export const BOO_DEATH_STATUS_DEAD =  2
+
+const BOO_NOT_ATTACKED =       0
+const BOO_ATTACKED =           1
+const BOO_BOUNCED_ON =        -1
 
 const sBooGivingStarHitbox = {
     interactType:       0,
@@ -34,6 +55,12 @@ const sBooGivingStarHitbox = {
     hurtboxRadius:      40,
     hurtboxHeight:      60,
 }
+
+const sBooHitRotations = [
+    6047, 5664, 5292, 4934, 4587, 4254, 3933, 3624, 3329, 3046, 2775,
+    2517, 2271, 2039, 1818, 1611, 1416, 1233, 1063, 906,  761,  629,
+    509,  402,  308,  226,  157,  100,  56,   25,   4,    0,
+]
 
 const sCourtyardBooTripletPositions = [
     [ 0, 50, 0 ],
@@ -62,7 +89,7 @@ const boo_should_be_stopped = () => {
             return false
         }
     } else {
-        if (o.rawData[activeFlags] & ACTIVE_FLAG_IN_DIFFERENT_ROOM) {
+        if (o.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM) {
             return true
         }
 
@@ -85,7 +112,7 @@ const boo_should_be_active = () => {
             return true
         }
     } else if (!boo_should_be_stopped()) {
-        if (o.rawData[oDistanceToMario] < activationRadius && (o.rawData[oRoom] == gMarioCurrentRoom || gMarioCurrentRoom == 0)) {
+        if (o.rawData[oDistanceToMario] < activationRadius && (o.rawData[oRoom] == ObjectListProc.gMarioCurrentRoom || ObjectListProc.gMarioCurrentRoom == 0)) {
             return true
         }
     }
@@ -172,31 +199,130 @@ const boo_vanish_or_appear = () => {
 }
 
 const boo_set_move_yaw_for_during_hit = (hurt) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
+    cur_obj_become_intangible()
+
+    o.rawData[oFlags] &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW
+    o.rawData[oBooMoveYawBeforeHit] = o.rawData[oMoveAngleYaw]
+
+    if (hurt) {
+        o.rawData[oBooMoveYawDuringHit] = gMarioObject.rawData[oMoveAngleYaw]
+    } else if (coss(o.rawData[oMoveAngleYaw] - o.rawData[oAngleToMario]) < 0) {
+        o.rawData[oBooMoveYawDuringHit] = o.rawData[oMoveAngleYaw]
+    } else {
+        o.rawData[oBooMoveYawDuringHit] = (o.rawData[oMoveAngleYaw] + 0x8000)
+    }
 }
 
 const boo_move_during_hit = (roll, fVel) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
+    let oscillationVel = o.rawData[oTimer] * 0x800 + 0x800
+
+    o.rawData[oForwardVel] = fVel
+    o.rawData[oVelY] = coss(oscillationVel)
+    o.rawData[oMoveAngleYaw] = o.rawData[oBooMoveYawBeforeHit]
+
+    if (roll) {
+        o.rawData[oFaceAngleYaw]  += sBooHitRotations[o.rawData[oTimer]]
+        o.rawData[oFaceAngleRoll] += sBooHitRotations[o.rawData[oTimer]]
+    }
 }
 
 const big_boo_shake_after_hit = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
+    let oscillationVel = o.rawData[oTimer] * 0x2000 - 0x3E000;
+    o.rawData[oFaceAngleYaw] += coss(oscillationVel) * 0x400
 }
 
 const boo_reset_after_hit = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
+    o.rawData[oMoveAngleYaw] = o.rawData[oBooMoveYawBeforeHit]
+    o.rawData[oFlags] |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW
+    o.rawData[oInteractStatus] = 0
 }
 
 const boo_update_after_bounced_on = (a0) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
+    boo_stop()
+
+    if (o.rawData[oTimer] == 0) {
+        boo_set_move_yaw_for_during_hit(false)
+    }
+
+    if (o.rawData[oTimer] < 32) {
+        boo_move_during_hit(false, sBooHitRotations[o.rawData[oTimer] / 5000.0 * a0])
+    } else {
+        cur_obj_become_tangible()
+        boo_reset_after_hit()
+        o.rawData[oAction] = 1
+        return true
+    }
+
+    return false
 }
 
 const big_boo_update_during_nonlethal_hit = (a0) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
+    boo_stop()
+    if (o.rawData[oTimer] == 0) {
+        boo_set_move_yaw_for_during_hit(TRUE)
+    }
+
+    if (o.rawData[oTimer] < 32) {
+        boo_move_during_hit(TRUE, sBooHitRotations[o.rawData[oTimer]] / 5000.0 * a0);
+    } else if (o.rawData[oTimer] < 48) {
+        big_boo_shake_after_hit();
+    } else {
+        cur_obj_become_tangible();
+        boo_reset_after_hit();
+        o.rawData[oAction] = 1;
+
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 const boo_update_during_death = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
+    let parentBigBoo
+
+    if (o.rawData[oTimer] == 0) {
+        o.rawData[oForwardVel] = 40.0
+        o.rawData[oMoveAngleYaw] = gMarioObject.rawData[oMoveAngleYaw]
+        o.rawData[oBooDeathStatus] = BOO_DEATH_STATUS_DYING
+        o.rawData[oFlags] &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW
+    } else {
+        if (o.rawData[oTimer] == 5) {
+            o.rawData[oBooTargetOpacity] = 0
+        }
+
+        if (o.rawData[oTimer] > 30 || o.rawData[oMoveFlags] & OBJ_MOVE_HIT_WALL) {
+            spawn_mist_particles()
+            o.rawData[oBooDeathStatus] = BOO_DEATH_STATUS_DEAD
+
+            if (o.rawData[oBooParentBigBoo != null]) {
+                parentBigBoo = o.rawData[oBooParentBigBoo]
+                if (!cur_obj_has_behavior(bhvBoo)) {
+                    parentBigBoo.rawData[oBigBooNumMinionBoosKilled]++
+                }
+            }
+            
+            return true
+        }
+    }
+
+    o.rawData[oVelY] = 5.0
+    o.rawData[oFaceAngleRoll]
 }
 
 const obj_has_attack_type = (attackType) => {
@@ -212,7 +338,31 @@ const boo_chase_mario = (a0, a1, a2) => {
 }
 
 const boo_act_0 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
+    o.activeFlags |= ACTIVE_FLAG_MOVE_THROUGH_GRATE;
+
+    if (o.rawData[oBehParams2ndByte] == 2) {
+        o.rawData[oRoom] = 10;
+    }
+
+    cur_obj_set_pos_to_home();
+    o.rawData[oMoveAngleYaw] = o.rawData[oBooInitialMoveYaw];
+    boo_stop();
+
+    o.rawData[oBooParentBigBoo] = cur_obj_nearest_object_with_behavior(o, bhvGhostHuntBigBoo);
+    o.rawData[oBooBaseScale] = 1.0;
+    o.rawData[oBooTargetOpacity] = 255;
+
+    if (boo_should_be_active()) {
+        // Condition is met if the object is bhvBalconyBigBoo or bhvMerryGoRoundBoo
+        if (o.rawData[oBehParams2ndByte] == 2) {
+            o.rawData[oBooParentBigBoo] = null;
+            o.rawData[oAction] = 5;
+        } else {
+            o.rawData[oAction] = 1;
+        }
+    }
 }
 
 const boo_act_5 = () => {
@@ -253,7 +403,7 @@ export const bhv_boo_loop = () => {
     cur_obj_move_standard(78)
     boo_approach_target_opacity_and_update_scale()
 
-    if (obj_has_behavior(o.parentObj, bhvMerryGoRoundBooManager) && o.rawData[activeFlags] == ACTIVE_FLAG_DEACTIVATED) {
+    if (obj_has_behavior(o.parentObj, bhvMerryGoRoundBooManager) && o.activeFlags == ACTIVE_FLAG_DEACTIVATED) {
         o.parentObj.oMerryGoRoundBooManagerNumBoosKilled++
     }
 
@@ -261,35 +411,171 @@ export const bhv_boo_loop = () => {
 }
 
 const big_boo_act_0 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
+    if (cur_obj_has_behavior(bhvBalconyBigBoo)) {
+        obj_set_secondary_camera_focus();
+        // number of killed boos set > 5 so that boo always loads
+        // redundant? this is also done in behavior_data.s
+        o.rawData[oBigBooNumMinionBoosKilled] = 10;
+    }
+
+    o.rawData[oBooParentBigBoo] = null;
+
+    if (boo_should_be_active() && o.rawData[oBigBooNumMinionBoosKilled] >= ObjectListProc.gDebugInfo[DEBUG_PAGE_ENEMYINFO][0] + 5) {
+        o.rawData[oAction] = 1;
+
+        cur_obj_set_pos_to_home();
+        o.rawData[oMoveAngleYaw] = o.rawData[oBooInitialMoveYaw];
+
+        cur_obj_unhide();
+
+        o.rawData[oBooTargetOpacity] = 255;
+        o.rawData[oBooBaseScale] = 3.0;
+        o.rawData[oHealth] = 3;
+
+        cur_obj_scale(3.0);
+        cur_obj_become_tangible();
+    } else {
+        cur_obj_hide();
+        cur_obj_become_intangible();
+        boo_stop();
+    }
 }
 
 const big_boo_act_1 = () => {
-    
+    let sp22;
+    let sp1C;
+
+    if (o.rawData[oHealth] == 3) {
+        sp22 = 0x180; sp1C = 0.5;
+    } else if (o.rawData[oHealth] == 2) {
+        sp22 = 0x240; sp1C = 0.6;
+    } else {
+        sp22 = 0x300; sp1C = 0.8;
+    }
+
+    boo_chase_mario(-100.0, sp22, sp1C);
+
+    let attackStatus = boo_get_attack_status();
+
+    // redundant; this check is in boo_should_be_stopped
+    if (cur_obj_has_behavior(bhvMerryGoRoundBigBoo)) {
+        if (!gMarioOnMerryGoRound) {
+            o.rawData[oAction] = 0;
+        }
+    } else if (boo_should_be_stopped()) {
+        o.rawData[oAction] = 0;
+    }
+
+    if (attackStatus == BOO_BOUNCED_ON) {
+        o.rawData[oAction] = 2;
+    }
+
+    if (attackStatus == BOO_ATTACKED) {
+        o.rawData[oAction] = 3;
+    }
+
+    if (attackStatus == BOO_ATTACKED) {
+        create_sound_spawner(SOUND_OBJ_THWOMP);
+    }
 }
 
 const big_boo_act_2 = () => {
-    
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    if (boo_update_after_bounced_on(20.0)) {
+        o.rawData[oAction] = 1;
+    }
 }
 
 const big_boo_spawn_ghost_hunt_star = () => {
-
+    //spawn_default_star(980.0, 1100.0, 250.0)
 }
 
 const big_boo_spawn_balcony_star = () => {
-
+    //spawn_default_star(700.0, 3200.0, 1900.0)
 }
 
 const big_boo_spawn_merry_go_round_star = () => {
 
+    spawn_default_star(-1600.0, -2100.0, 205.0)
+
+    let merryGoRound = cur_obj_nearest_object_with_behavior(bhvMerryGoRound);
+
+    if (merryGoRound != null) {
+        merryGoRound.rawData[oMerryGoRoundStopped] = TRUE;
+    }
 }
 
 const big_boo_act_3 = () => {
-    
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    if (o.rawData[oTimer] == 0) {
+        o.rawData[oHealth]--
+    }
+
+    if (o.rawData[oHealth] == 0) {
+        if (boo_update_during_death()) {
+            cur_obj_disable();
+
+            o.rawData[oAction] = 4;
+
+            obj_set_angle(o, 0, 0, 0);
+
+            if (o.rawData[oBehParams2ndByte] == 0) {
+                big_boo_spawn_ghost_hunt_star();
+            } else if (o.rawData[oBehParams2ndByte] == 1) {
+                big_boo_spawn_merry_go_round_star();
+            } else {
+                big_boo_spawn_balcony_star();
+            }
+        }
+    } else {
+        if (o.rawData[oTimer] == 0) {
+            spawn_mist_particles();
+            o.rawData[oBooBaseScale] -= 0.5;
+        }
+
+        if (big_boo_update_during_nonlethal_hit(40.0)) {
+            o.rawData[oAction] = 1;
+        }
+    }
 }
 
 const big_boo_act_4 = () => {
-    
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    if (o.rawData[oTimer] == 0) {
+        o.rawData[oHealth]--;
+    }
+
+    if (o.rawData[oHealth] == 0) {
+        if (boo_update_during_death()) {
+            cur_obj_disable();
+
+            o.rawData[oAction] = 4;
+
+            obj_set_angle(o, 0, 0, 0);
+
+            if (o.rawData[oBehParams2ndByte] == 0) {
+                big_boo_spawn_ghost_hunt_star();
+            } else if (o.rawData[oBehParams2ndByte] == 1) {
+                big_boo_spawn_merry_go_round_star();
+            } else {
+                big_boo_spawn_balcony_star();
+            }
+        }
+    } else {
+        if (o.rawData[oTimer] == 0) {
+            spawn_mist_particles();
+            o.rawData[oBooBaseScale] -= 0.5;
+        }
+
+        if (big_boo_update_during_nonlethal_hit(40.0)) {
+            o.rawData[oAction] = 1;
+        }
+    }
 }
 
 const sBooGivingStarActions = [
@@ -316,19 +602,48 @@ export const bhv_big_boo_loop = () => {
 }
 
 const boo_with_cage_act_0 = () => {
+    o.rawData[oBooParentBigBoo] = null;
+    o.rawData[oBooTargetOpacity] = 255;
+    o.rawData[oBooBaseScale] = 2.0;
 
+    cur_obj_scale(2.0);
+    cur_obj_become_tangible();
+
+    if (boo_should_be_active()) {
+        o.rawData[oAction] = 1;
+    }
 }
 
 const boo_with_cage_act_1 = () => {
-    
+    boo_chase_mario(100.0, 512, 0.5);
+
+    let attackStatus = boo_get_attack_status();
+
+    if (boo_should_be_stopped()) {
+        o.rawData[oAction] = 0;
+    }
+
+    if (attackStatus == BOO_BOUNCED_ON) {
+        o.rawData[oAction] = 2;
+    }
+
+    if (attackStatus == BOO_ATTACKED) {
+        o.rawData[oAction] = 3;
+    }
 }
 
 const boo_with_cage_act_2 = () => {
-    
+    if (boo_update_after_bounced_on(20.0)) {
+        o.rawData[oAction] = 1
+    }
 }
 
 const boo_with_cage_act_3 = () => {
-    
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    if (boo_update_during_death()) {
+        obj_mark_for_deletion(o)
+    }
 }
 
 export const bhv_boo_with_cage_init = () => {
@@ -384,7 +699,7 @@ export const bhv_merry_go_round_boo_manager_loop = () => {
 
                     o.rawData[oAction] = 2
 
-                    play_sound(SOUND_GENERAL2_RIGHT_ANSWER, gGlobalSoundSource);
+                    play_puzzle_jingle();
                 }
             }
 
@@ -404,7 +719,7 @@ export const bhv_merry_go_round_boo_manager_loop = () => {
 
 export const obj_set_secondary_camera_focus = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    gSecondCameraFocus = o
+    Camera.gSecondCameraFocus = o
 }
 
 export const bhv_animated_texture_loop = () => {
@@ -423,7 +738,7 @@ export const bhv_boo_in_castle_loop = () => {
             obj_mark_for_deletion(o);
         }
 
-        if (gMarioCurrentRoom == 1) {
+        if (ObjectListProc.gMarioCurrentRoom == 1) {
             o.rawData[oAction]++
         }
     } else if (o.rawData[oAction] == 1) {

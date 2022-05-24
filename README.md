@@ -23,6 +23,14 @@ npm install
 npm run start
 ```
 
+### To update your project
+```bash
+# update folder (be inside sm64js)
+git pull
+# Launch server
+npm run start
+```
+
 You should now be able to access the website with the game from a web browser by typing "localhost" into the address bar.
 
 ## Neat gLinker commands you can run in the console

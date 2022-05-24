@@ -43,7 +43,7 @@ import { play_puzzle_jingle } from "../../audio/external"
 import { create_sound_spawner, cur_obj_play_sound_2 } from "../SpawnSound"
 import { CameraInstance as Camera } from "../Camera"
 import {
-    INTERACT_BOUNCE_TOP, INT_STATUS_INTERACTED, INT_STATUS_WAS_ATTACKED, ATTACK_FROM_ABOVE
+    INTERACT_BOUNCE_TOP, INT_STATUS_INTERACTED, INT_STATUS_WAS_ATTACKED, ATTACK_FROM_ABOVE, INT_STATUS_ATTACK_MAS
 } from "../Interaction"
 
 export const SPAWN_CASTLE_BOO_STAR_REQUIREMENT = 12
@@ -340,7 +340,7 @@ const boo_update_during_death = () => {
 
 const obj_has_attack_type = (attackType) => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    
+
     if ((o.rawData[oInteractStatus] & INT_STATUS_ATTACK_MASK) == attackType) {
         return true;
     } else {

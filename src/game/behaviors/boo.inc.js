@@ -18,7 +18,7 @@ import {
     oMerryGoRoundBooManagerNumBoosSpawned, oHomeX, oHomeY, oHomeZ, oBehParams2ndByte, oPosY, oTimer,
     oFlags, oBooMoveYawBeforeHit, oBooMoveYawDuringHit, oBooDeathStatus, oFaceAngleRoll,
     oMerryGoRoundStopped, oBooParentBigBoo, oBigBooNumMinionBoosKilled, oHealth, oInteractType,
-    oBooNegatedAggressiveness, oBooTurningSpeed,
+    oBooNegatedAggressiveness, oBooTurningSpeed, oWallHitboxRadius,
 
     ACTIVE_FLAG_IN_DIFFERENT_ROOM, ACTIVE_FLAG_DEACTIVATED, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveFlags, OBJ_MOVE_HIT_WALL, ACTIVE_FLAG_MOVE_THROUGH_GRATE
 } from "../../include/object_constants"
@@ -30,7 +30,7 @@ import {
 
 import {
     SOUND_OBJ_BOO_LAUGH_LONG, SOUND_ENV_ELEVATOR2, SOUND_GENERAL_UNKNOWN4_LOWPRIO,
-    SOUND_OBJ_BOO_LAUGH_SHORT, SOUND_OBJ_BOO_BOUNCE_TOP
+    SOUND_OBJ_BOO_LAUGH_SHORT, SOUND_OBJ_BOO_BOUNCE_TOP, SOUND_OBJ_DYING_ENEMY1, SOUND_OBJ_THWOMP
 } from "../../include/sounds"
 
 import { MODEL_BOO, MODEL_HAUNTED_CAGE } from "../../include/model_ids"
@@ -43,7 +43,7 @@ import { play_puzzle_jingle } from "../../audio/external"
 import { create_sound_spawner, cur_obj_play_sound_2 } from "../SpawnSound"
 import { CameraInstance as Camera } from "../Camera"
 import {
-    INTERACT_BOUNCE_TOP, INT_STATUS_INTERACTED, INT_STATUS_WAS_ATTACKED, ATTACK_FROM_ABOVE, INT_STATUS_ATTACK_MAS
+    INTERACT_BOUNCE_TOP, INT_STATUS_INTERACTED, INT_STATUS_WAS_ATTACKED, ATTACK_FROM_ABOVE, INT_STATUS_ATTACK_MASK
 } from "../Interaction"
 
 export const SPAWN_CASTLE_BOO_STAR_REQUIREMENT = 12
@@ -96,7 +96,7 @@ export const bhv_boo_init = () => {
 const boo_should_be_stopped = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     if (cur_obj_has_behavior(bhvMerryGoRoundBigBoo) || cur_obj_has_behavior(bhvMerryGoRoundBoo)) {
-        if (!gMarioOnMerryGoRound) {
+        if (!ObjectListProc.gMarioOnMerryGoRound) {
             return true
         } else {
             return false
@@ -119,7 +119,7 @@ const boo_should_be_active = () => {
     let activationRadius = cur_obj_has_behavior(bhvBalconyBigBoo)?5000.0:1500.0
 
     if (cur_obj_has_behavior(bhvMerryGoRoundBigBoo) || cur_obj_has_behavior(bhvMerryGoRoundBoo)) {
-        return gMarioOnMerryGoRound
+        return ObjectListProc.gMarioOnMerryGoRound
     } else if (o.rawData[oRoom] == -1) {
         if (o.rawData[oDistanceToMario] < activationRadius) {
             return true
@@ -184,30 +184,28 @@ const boo_oscillate = (ignoreOpacity) => {
 }
 
 const boo_vanish_or_appear = () => {
-//    const o = gLinker.ObjectListProcessor.gCurrentObject
-//    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
-//
-//    let relativeAngleToMario = abs_angle_diff(o.rawData[oAngleToMario], o.rawData[oMoveAngleYaw])
-//    let relativeMarioFaceAngle = abs_angle_diff(o.rawData[oMoveAngleYaw], gMarioObject.rawData[oFaceAngleYaw])
-//    let relativeAngleToMarioThreshhold = 0x1568
-//    let relativeMarioFaceAngleThreshhold = 0x6B58
-//    let doneAppearing = false
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
-//    o.rawData[oVelY] = 0
-
-//    if (relativeAngleToMario > relativeAngleToMarioThreshhold || relativeMarioFaceAngle < relativeMarioFaceAngleThreshhold) {
-//        if (o.rawData[oOpacity] == 40) {
-//            o.rawData[oBooTargetOpacity] == 255
-//            cur_obj_play_sound_2(SOUND_OBJ_BOO_LAUGH_LONG)
-//        }
-
-//        if (o.rawData[oOpacity] > 180) {
-            let doneAppearing = true
-//        }
-//    } else if (o.rawData[oOpacity] == 255) {
-//        o.rawData[oBooTargetOpacity] = 40
-//    }
-
+    let relativeAngleToMario = abs_angle_diff(o.rawData[oAngleToMario], o.rawData[oFaceAngleYaw])
+    let relativeMarioFaceAngle = abs_angle_diff(o.rawData[oMoveAngleYaw], gMarioObject.rawData[oFaceAngleYaw])
+    let relativeAngleToMarioThreshhold = 0x1568
+    let relativeMarioFaceAngleThreshhold = 0x6B58
+    let doneAppearing = /* false */ true
+    // boos break when this is true and i dont know why.
+    o.rawData[oVelY] = 0
+     if (relativeAngleToMario > relativeAngleToMarioThreshhold || relativeMarioFaceAngle <  relativeMarioFaceAngleThreshhold) {
+        if (o.rawData[oOpacity] == 40) {
+            o.rawData[oBooTargetOpacity] = 255
+            cur_obj_play_sound_2(SOUND_OBJ_BOO_LAUGH_LONG)
+        }
+        
+        if (o.rawData[oOpacity] > 180) {
+            doneAppearing = true
+        }
+     } else if (o.rawData[oOpacity] == 255) {
+        o.rawData[oBooTargetOpacity] = 40
+     }
     return doneAppearing
 }
 
@@ -289,7 +287,7 @@ const big_boo_update_during_nonlethal_hit = (a0) => {
     }
 
     if (o.rawData[oTimer] < 32) {
-        boo_move_during_hit(true, sBooHitRotations[o.rawData[oTimer]] / 5000.0 * a0);
+        boo_move_during_hit(true, sBooHitRotations[o.rawData[oTimer] / 5000.0 * a0]);
     } else if (o.rawData[oTimer] < 48) {
         big_boo_shake_after_hit();
     } else {
@@ -442,7 +440,15 @@ const boo_act_0 = () => {
 }
 
 const boo_act_5 = () => {
-
+    if (o.rawData[oTimer] < 30) {
+        o.rawData[oVelY] = 0;
+        o.rawData[oForwardVel] = 13.0;
+        boo_oscillate(FALSE);
+        o.rawData[oWallHitboxRadius] = 0;
+    } else {
+        o.rawData[oAction] = 1;
+        o.rawData[oWallHitboxRadius] = 30.0;
+    }
 }
 
 const boo_act_1 = () => {
@@ -496,23 +502,25 @@ const boo_act_3 = () => {
 }
 
 const boo_act_4 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
     let dialogID;
 
     // If there are no remaining "minion" boos, show the dialog of the Big Boo
-    if (cur_obj_nearest_object_with_behavior(bhvGhostHuntBoo) == NULL) {
-        dialogID = DIALOG_108;
-    } else {
-        dialogID = DIALOG_107;
-    }
+    //if (cur_obj_nearest_object_with_behavior(o, bhvGhostHuntBoo) == null) {
+    //    dialogID = DIALOG_108;
+    //} else {
+    //    dialogID = DIALOG_107;
+    //}
 
-    if (cur_obj_update_dialog(MARIO_DIALOG_LOOK_UP, DIALOG_FLAG_TEXT_DEFAULT, dialogID, 0)) {
+    //if (cur_obj_update_dialog(MARIO_DIALOG_LOOK_UP, DIALOG_FLAG_TEXT_DEFAULT, dialogID, 0)) {
         create_sound_spawner(SOUND_OBJ_DYING_ENEMY1);
         obj_mark_for_deletion(o);
 
-        if (dialogID == DIALOG_108) { // If the Big Boo should spawn, play the jingle
-            play_puzzle_jingle();
-        }
-    }
+    //    if (dialogID == DIALOG_108) { // If the Big Boo should spawn, play the jingle
+    //        play_puzzle_jingle();
+    //    }
+    //}
 }
 
 const sBooActions = [
@@ -551,8 +559,7 @@ const big_boo_act_0 = () => {
     }
 
     o.rawData[oBooParentBigBoo] = null;
-
-    if (boo_should_be_active() && o.rawData[oBigBooNumMinionBoosKilled] >= /* ObjectListProc.gDebugInfo[DEBUG_PAGE_ENEMYINFO][0] + */ 5) {
+    if (boo_should_be_active() && o.rawData[oBigBooNumMinionBoosKilled] >= /*ObjectListProc.gDebugInfo[5][0]*/ + 5) {
         o.rawData[oAction] = 1;
 
         cur_obj_set_pos_to_home();
@@ -593,7 +600,7 @@ const big_boo_act_1 = () => {
 
     // redundant; this check is in boo_should_be_stopped
     if (cur_obj_has_behavior(bhvMerryGoRoundBigBoo)) {
-        if (!gMarioOnMerryGoRound) {
+        if (!ObjectListProc.gMarioOnMerryGoRound) {
             o.rawData[oAction] = 0;
         }
     } else if (boo_should_be_stopped()) {
@@ -630,10 +637,11 @@ const big_boo_spawn_balcony_star = () => {
 }
 
 const big_boo_spawn_merry_go_round_star = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
-    spawn_default_star(-1600.0, -2100.0, 205.0)
+    //spawn_default_star(-1600.0, -2100.0, 205.0)
 
-    let merryGoRound = cur_obj_nearest_object_with_behavior(bhvMerryGoRound);
+    let merryGoRound = cur_obj_nearest_object_with_behavior(o, bhvMerryGoRound);
 
     if (merryGoRound != null) {
         merryGoRound.rawData[oMerryGoRoundStopped] = true;

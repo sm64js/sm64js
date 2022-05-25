@@ -1,6 +1,12 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { oCoinUnkF4, oBehParams, oAction, oDistanceToMario, oBehParams2ndByte, oTimer, oCoinUnkF8, oVelX, oPosY, oVelZ, oFloorHeight, oAnimState, oInteractStatus, oPosX, oPosZ, oVelY, oCoinUnk110, oForwardVel, oMoveAngleYaw, oFloor, oMoveFlags, OBJ_MOVE_ON_GROUND, oSubAction, oBounciness, oDamageOrCoinValue, oBooDeathStatus, OBJ_MOVE_LANDED, OBJ_MOVE_ABOVE_DEATH_BARRIER, OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_BOUNCE } from "../../include/object_constants"
-import { spawn_object_relative, cur_obj_set_behavior, cur_obj_update_floor_height, obj_mark_for_deletion, cur_obj_set_model, spawn_object, cur_obj_scale, cur_obj_become_intangible, cur_obj_update_floor_and_walls, cur_obj_if_hit_wall_bounce_away, cur_obj_move_standard, cur_obj_rotate_yaw_toward, cur_obj_become_tangible, cur_obj_wait_then_blink, cur_obj_call_action_function, obj_copy_pos} from "../ObjectHelpers"
+import {
+    spawn_object_relative, cur_obj_set_behavior, cur_obj_update_floor_height, obj_mark_for_deletion,
+    cur_obj_set_model, spawn_object, cur_obj_scale, cur_obj_become_intangible,
+    cur_obj_update_floor_and_walls, cur_obj_if_hit_wall_bounce_away, cur_obj_move_standard,
+    cur_obj_rotate_yaw_toward, cur_obj_become_tangible, cur_obj_wait_then_blink,
+    cur_obj_call_action_function, obj_copy_pos, cur_obj_has_model
+} from "../ObjectHelpers"
 import { MODEL_YELLOW_COIN, MODEL_YELLOW_COIN_NO_SHADOW, MODEL_SPARKLES, MODEL_BLUE_COIN } from "../../include/model_ids"
 import { bhvCoinFormationSpawn, bhvYellowCoin, bhvGoldenCoinSparkles, bhvCoinSparkles } from "../BehaviorData"
 import { obj_set_hitbox } from "../ObjBehaviors2"
@@ -10,6 +16,7 @@ import { atan2s } from "../../engine/math_util"
 import { SOUND_GENERAL_COIN_DROP } from "../../include/sounds"
 import { LEVEL_BBH } from "../../levels/level_defines_constants"
 import { BOO_DEATH_STATUS_DYING } from "./boo.inc"
+import { cur_obj_play_sound_2 } from "../SpawnSound"
 
 const sYellowCoinHitbox = {
     interactType: INTERACT_COIN,
@@ -241,6 +248,7 @@ const coin_inside_boo_act_1 = () => {
 const coin_inside_boo_act_0 = () => {
     const o = ObjectListProc.gCurrentObject
     let parent = o.parentObj
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
     cur_obj_become_intangible();
     if (o.rawData[oTimer] == 0 && gLinker.Area.gCurrLevelNum == LEVEL_BBH) {
@@ -250,8 +258,10 @@ const coin_inside_boo_act_0 = () => {
     obj_copy_pos(o, parent);
     if (parent.rawData[oBooDeathStatus] == BOO_DEATH_STATUS_DYING) {
         o.rawData[oAction] = 1;
-        o.rawData[oVelX] = sins(sp26) * gMarioObject.rawData[oMoveAngleYaw]
-        o.rawData[oVelZ] = coss(sp26) * 3.0
+        let sp26 = gMarioObject.rawData[oMoveAngleYaw];
+        let sp20 = 3.0;
+        o.rawData[oVelX] = sins(sp26) * sp20
+        o.rawData[oVelZ] = coss(sp26) * sp20
         o.rawData[oVelY] = 35.0
     }
 }

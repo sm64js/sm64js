@@ -90,7 +90,7 @@ const boo_stop = () => {
 
 export const bhv_boo_init = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    o.rawData[oBooInitialMoveYaw] = o.oMoveAngleYaw
+    o.rawData[oBooInitialMoveYaw] = o.rawData[oMoveAngleYaw]
 }
 
 const boo_should_be_stopped = () => {
@@ -172,7 +172,7 @@ const boo_approach_target_opacity_and_update_scale = () => {
 
 const boo_oscillate = (ignoreOpacity) => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    o.oFaceAnglePitch = sins(o.rawData[oBooOscillationTimer]) * 0x400
+    o.rawData[oFaceAnglePitch] = sins(o.rawData[oBooOscillationTimer]) * 0x400
 
     if (o.rawData[oOpacity] == 255 || ignoreOpacity == true) {
         o.gfx.scale[0] = sins(o.rawData[oBooOscillationTimer]) * 0.08 + o.rawData[oBooBaseScale]
@@ -191,7 +191,7 @@ const boo_vanish_or_appear = () => {
     let relativeMarioFaceAngle = abs_angle_diff(o.rawData[oMoveAngleYaw], gMarioObject.rawData[oFaceAngleYaw])
     let relativeAngleToMarioThreshhold = 0x1568
     let relativeMarioFaceAngleThreshhold = 0x6B58
-    let doneAppearing = /* false */ true
+    let doneAppearing = false
     // boos break when this is true and i dont know why.
     o.rawData[oVelY] = 0
      if (relativeAngleToMario > relativeAngleToMarioThreshhold || relativeMarioFaceAngle <  relativeMarioFaceAngleThreshhold) {

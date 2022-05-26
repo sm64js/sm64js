@@ -44,10 +44,10 @@ import {
     OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND,
     OBJ_MOVE_AT_WATER_SURFACE, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_LEAVING_WATER,
     OBJ_MOVE_ENTERED_WATER, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_UNDERWATER_ON_GROUND,
-    OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33, OBJ_MOVE_13,
+    OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33,
     OBJ_MOVE_LANDED, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX, OBJ_FLAG_HOLDABLE,
 
-    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED
+    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED, OBJ_MOVE_BOUNCE
  } from "../include/object_constants"
 
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
@@ -65,7 +65,7 @@ import { GRAPH_RENDER_ACTIVE           } from "../engine/graph_node"
 
 import { OBJ_LIST_UNIMPORTANT, OBJ_LIST_GENACTOR } from "./BehaviorData"
 
-import { atan2s, mtxf_rotate_zxy_and_translate } from "../engine/math_util"
+import { atan2s, mtxf_rotate_zxy_and_translate, sqrtf } from "../engine/math_util"
 import { sins, coss, int16, s16, random_int16, random_float } from "../utils"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import * as _Linker from "./Linker"
@@ -81,6 +81,41 @@ export const WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL      = 0x20
 export const WATER_DROPLET_FLAG_RAND_ANGLE_INCR_PLUS_8000 = 0x40
 export const WATER_DROPLET_FLAG_RAND_ANGLE_INCR           = 0x80 // Unused
 
+export const DebugPage = {
+    DEBUG_PAGE_OBJECTINFO:       0,
+    DEBUG_PAGE_CHECKSURFACEINFO: 1,
+    DEBUG_PAGE_MAPINFO:          2,
+    DEBUG_PAGE_STAGEINFO:        3,
+    DEBUG_PAGE_EFFECTINFO:       4,
+    DEBUG_PAGE_ENEMYINFO:        5,
+}
+
+export const increment_velocity_toward_range = (value, center, zeroThreshold, increment) => {
+    let relative = value - center;
+    if (relative > 0) {
+        if (relative < zeroThreshold) {
+            return 0;
+        } else {
+            return -increment;
+        }
+    } else {
+        if (relative > -zeroThreshold) {
+            return 0;
+        } else {
+            return increment;
+        }
+    }
+}
+
+export const obj_check_if_collided_with_object = (obj1, obj2) => {
+    for (let i = 0; i < obj1.numCollidedObjs; i++) {
+        if (obj1.collidedObjs[i] == obj2) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 export const cur_obj_set_behavior = (behavior) => {
     const o = ObjectListProc.gCurrentObject
@@ -744,6 +779,15 @@ export const cur_obj_update_floor = () => {
 
 }
 
+export const cur_obj_set_pos_to_home_with_debug = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.rawData[oPosX] = o.rawData[oHomeX] + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][0];
+    o.rawData[oPosY] = o.rawData[oHomeZ] + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][1];
+    o.rawData[oPosZ] = o.rawData[oHomeZ] + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][2];
+    cur_obj_scale(gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][3] / 100.0 + 1.0);
+}
+
 export const cur_obj_call_action_function = (actionFunctions) => {
     const o = ObjectListProc.gCurrentObject
     const actionFunction = actionFunctions[o.rawData[oAction]]
@@ -833,7 +877,7 @@ export const cur_obj_move_update_ground_air_flags = (gravity, bounciness) => {
 
     const o = ObjectListProc.gCurrentObject
 
-    o.rawData[oMoveFlags] &= ~OBJ_MOVE_13
+    o.rawData[oMoveFlags] &= ~OBJ_MOVE_BOUNCE
 
     if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
         // On the first frame that we touch the ground, set OBJ_MOVE_LANDED.
@@ -858,7 +902,7 @@ export const cur_obj_move_update_ground_air_flags = (gravity, bounciness) => {
         if (o.rawData[oVelY] > 5.0) {
             //! If OBJ_MOVE_13 tracks bouncing, it overestimates, since velY
             // could be > 5 here without bounce (e.g. jump into misa)
-            o.rawData[oMoveFlags] |= OBJ_MOVE_13
+            o.rawData[oMoveFlags] |= OBJ_MOVE_BOUNCE
         }
     } else {
         o.rawData[oMoveFlags] &= ~OBJ_MOVE_LANDED
@@ -991,7 +1035,7 @@ export const cur_obj_move_y = (gravity, bounciness, buoyancy) => {
 
         const waterLevel = cur_obj_move_y_and_get_water_level(gravity, buoyancy)
         if (o.rawData[oPosY] < waterLevel) {
-            throw "cur_obj_move_y implement underwater"
+            // throw "cur_obj_move_y implement underwater"
             cur_obj_move_update_underwater_flags()
         } else {
             if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
@@ -1013,6 +1057,24 @@ export const cur_obj_move_y = (gravity, bounciness, buoyancy) => {
     }
 }
 
+export const cur_obj_move_update_underwater_flags = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    let decelY = sqrtf(o.rawData[oVelY] * o.rawData[oVelY]) * (o.rawData[oDragStrength] * 7.0) / 100.0
+
+    if (o.rawData[oVelY] > 0) {
+        o.rawData[oVelY] -= decelY
+    } else {
+        o.rawData[oVelY] += decelY
+    }
+
+    if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
+        o.rawData[oPosY] = o.rawData[oFloorHeight]
+        o.rawData[oMoveFlags] |= OBJ_MOVE_UNDERWATER_ON_GROUND
+    } else {
+        o.rawData[oMoveFlags] |= OBJ_MOVE_UNDERWATER_OFF_GROUND
+    }
+}
 
 export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
     const o = ObjectListProc.gCurrentObject
@@ -1021,8 +1083,8 @@ export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
     const bouyancy = o.rawData[oBuoyancy]
     const dragStrength = o.rawData[oDragStrength]
     let steepSlopeNormalY
-    let careAboutEdgesAndSteepSlopes = 0
-    let negativeSpeed = 0
+    let careAboutEdgesAndSteepSlopes = false
+    let negativeSpeed = false
 
     //! Because some objects allow these active flags to be set but don't
     //  aexport const updating when they are, we end up with "partial" update = ser=> e
@@ -1130,6 +1192,10 @@ export const cur_obj_was_attacked_or_ground_pounded = () => {
     return attacked
 }
 
+export const obj_copy_behavior_params = (dst, src) => {
+    dst.rawData[oBehParams] = src.rawData[oBehParams]
+    dst.rawData[oBehParams2ndByte] = src.rawData[oBehParams2ndByte]
+}
 
 export const spawn_object_relative = (behaviorParam, relativePosX, relativePosY, relativePosZ, parent, model, behavior) => {
 
@@ -1320,7 +1386,8 @@ export const cur_obj_change_action = (action) => {
 
 export const cur_obj_set_vel_from_mario_vel = (f12, f14) => {
     const o = ObjectListProc.gCurrentObject
-    let /*f32*/ sp4 = gMarioStates[0].forwardVel
+    const gMarioStates = gLinker.ObjectListProcessor.gMarioObject
+    let /*f32*/ sp4 = gMarioStates.rawData[oForwardVel]
     let /*f32*/ sp0 = f12 * f14
 
     if (sp4 < sp0) {
@@ -1591,6 +1658,12 @@ export const obj_mark_for_deletion = (obj) => {
     obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED
 }
 
+export const cur_obj_disable = () => {
+    cur_obj_disable_rendering();
+    cur_obj_hide();
+    cur_obj_become_intangible();
+}
+
 export const obj_scale = (obj, scale) => {
     obj.gfx.scale[0] = scale
     obj.gfx.scale[1] = scale
@@ -1842,6 +1915,16 @@ export const obj_has_behavior = (obj, behavior) => {
     } else {
         return false
     }
+}
+
+export const cur_obj_lateral_dist_from_mario_to_home = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    let dx = o.rawData[oHomeX] - ObjectListProc.gMarioObject.rawData[oPosX];
+    let dz = o.rawData[oHomeZ] - ObjectListProc.gMarioObject.rawData[oPosZ];
+
+    let dist = sqrtf(dx * dx + dz * dz);
+    return dist;
 }
 
 import { LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC } from "../levels/level_defines_constants"

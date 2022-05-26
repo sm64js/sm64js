@@ -41,7 +41,7 @@ export const OBJ_MOVE_HIT_WALL  = (1 << 9) // 0x0200
 export const OBJ_MOVE_HIT_EDGE  = (1 << 10) // 0x0400
 export const OBJ_MOVE_ABOVE_LAVA  = (1 << 11) // 0x0800
 export const OBJ_MOVE_LEAVING_WATER  = (1 << 12) // 0x1000
-export const OBJ_MOVE_13  = (1 << 13) // 0x2000
+export const OBJ_MOVE_BOUNCE  = (1 << 13) // 0x2000
 export const OBJ_MOVE_ABOVE_DEATH_BARRIER = (1 << 14) // 0x4000
 
 export const OBJ_MOVE_MASK_ON_GROUND = (OBJ_MOVE_LANDED | OBJ_MOVE_ON_GROUND)

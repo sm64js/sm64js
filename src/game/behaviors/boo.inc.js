@@ -18,14 +18,14 @@ import {
     oMerryGoRoundBooManagerNumBoosSpawned, oHomeX, oHomeY, oHomeZ, oBehParams2ndByte, oPosY, oTimer,
     oFlags, oBooMoveYawBeforeHit, oBooMoveYawDuringHit, oBooDeathStatus, oFaceAngleRoll,
     oMerryGoRoundStopped, oBooParentBigBoo, oBigBooNumMinionBoosKilled, oHealth, oInteractType,
-    oBooNegatedAggressiveness, oBooTurningSpeed, oWallHitboxRadius,
+    oBooNegatedAggressiveness, oBooTurningSpeed, oWallHitboxRadius, oFaceAnglePitch, oPosZ, 
 
     ACTIVE_FLAG_IN_DIFFERENT_ROOM, ACTIVE_FLAG_DEACTIVATED, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveFlags, OBJ_MOVE_HIT_WALL, ACTIVE_FLAG_MOVE_THROUGH_GRATE
 } from "../../include/object_constants"
 
 import {
     bhvGhostHuntBoo, bhvMerryGoRoundBooManager, bhvBalconyBigBoo, bhvMerryGoRoundBigBoo,
-    bhvMerryGoRoundBoo, bhvGhostHuntBigBoo, bhvBooCage
+    bhvMerryGoRoundBoo, bhvGhostHuntBigBoo, bhvBooCage, bhvBoo
 } from "../BehaviorData"
 
 import {
@@ -34,7 +34,7 @@ import {
 } from "../../include/sounds"
 
 import { MODEL_BOO, MODEL_HAUNTED_CAGE } from "../../include/model_ids"
-import { TIME_STOP_MARIO_OPENED_DOOR } from "../ObjectListProcessor"
+import { TIME_STOP_MARIO_OPENED_DOOR, gDebugInfo } from "../ObjectListProcessor"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { LevelUpdateInstance as LevelUpdate } from "../LevelUpdate"
 import { random_u16, coss, sins, random_float } from "../../utils"
@@ -46,8 +46,6 @@ import {
     INTERACT_BOUNCE_TOP, INT_STATUS_INTERACTED, INT_STATUS_WAS_ATTACKED, ATTACK_FROM_ABOVE, INT_STATUS_ATTACK_MASK
 } from "../Interaction"
 
-export const SPAWN_CASTLE_BOO_STAR_REQUIREMENT = 12
-
 // Boo obj const
 export const BOO_DEATH_STATUS_ALIVE = 0
 export const BOO_DEATH_STATUS_DYING = 1
@@ -56,6 +54,8 @@ export const BOO_DEATH_STATUS_DEAD =  2
 const BOO_NOT_ATTACKED =       0
 const BOO_ATTACKED =           1
 const BOO_BOUNCED_ON =        -1
+
+const SPAWN_CASTLE_BOO_STAR_REQUIREMENT = 12
 
 const sBooGivingStarHitbox = {
     interactType:       0,
@@ -83,9 +83,9 @@ const sCourtyardBooTripletPositions = [
 
 const boo_stop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    o.rawData[oForwardVel] = 0
-    o.rawData[oVelY] = 0
-    o.rawData[oGravity] = 0
+    o.rawData[oForwardVel] = 0.0
+    o.rawData[oVelY] = 0.0
+    o.rawData[oGravity] = 0.0
 }
 
 export const bhv_boo_init = () => {
@@ -106,7 +106,7 @@ const boo_should_be_stopped = () => {
             return true
         }
 
-        if (o.rawData[oRoom] == 10 && (gLinker.ObjectListProcessor.gTimeStopState & TIME_STOP_MARIO_OPENED_DOOR)) {
+        if (o.rawData[oRoom] == 10 && (ObjectListProc.gTimeStopState & TIME_STOP_MARIO_OPENED_DOOR)) {
             return true
         }
     }
@@ -119,7 +119,7 @@ const boo_should_be_active = () => {
     let activationRadius = cur_obj_has_behavior(bhvBalconyBigBoo)?5000.0:1500.0
 
     if (cur_obj_has_behavior(bhvMerryGoRoundBigBoo) || cur_obj_has_behavior(bhvMerryGoRoundBoo)) {
-        return ObjectListProc.gMarioOnMerryGoRound
+        return Boolean(ObjectListProc.gMarioOnMerryGoRound)
     } else if (o.rawData[oRoom] == -1) {
         if (o.rawData[oDistanceToMario] < activationRadius) {
             return true
@@ -135,6 +135,7 @@ const boo_should_be_active = () => {
 
 export const bhv_courtyard_boo_triplet_init = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
+
     if (LevelUpdate.gHudDisplay.stars < SPAWN_CASTLE_BOO_STAR_REQUIREMENT) {
         obj_mark_for_deletion(o);
     } else {
@@ -192,8 +193,9 @@ const boo_vanish_or_appear = () => {
     let relativeAngleToMarioThreshhold = 0x1568
     let relativeMarioFaceAngleThreshhold = 0x6B58
     let doneAppearing = false
-    // boos break when this is true and i dont know why.
-    o.rawData[oVelY] = 0
+
+    o.rawData[oVelY] = 0.0
+
      if (relativeAngleToMario > relativeAngleToMarioThreshhold || relativeMarioFaceAngle <  relativeMarioFaceAngleThreshhold) {
         if (o.rawData[oOpacity] == 40) {
             o.rawData[oBooTargetOpacity] = 255
@@ -267,7 +269,7 @@ const boo_update_after_bounced_on = (a0) => {
     }
 
     if (o.rawData[oTimer] < 32) {
-        boo_move_during_hit(false, sBooHitRotations[o.rawData[oTimer] / 5000.0 * a0])
+        boo_move_during_hit(false, sBooHitRotations[o.rawData[oTimer]] / 5000.0 * a0)
     } else {
         cur_obj_become_tangible()
         boo_reset_after_hit()
@@ -287,7 +289,7 @@ const big_boo_update_during_nonlethal_hit = (a0) => {
     }
 
     if (o.rawData[oTimer] < 32) {
-        boo_move_during_hit(true, sBooHitRotations[o.rawData[oTimer] / 5000.0 * a0]);
+        boo_move_during_hit(true, sBooHitRotations[o.rawData[oTimer]] / 5000.0 * a0);
     } else if (o.rawData[oTimer] < 48) {
         big_boo_shake_after_hit();
     } else {
@@ -443,7 +445,7 @@ const boo_act_5 = () => {
     if (o.rawData[oTimer] < 30) {
         o.rawData[oVelY] = 0;
         o.rawData[oForwardVel] = 13.0;
-        boo_oscillate(FALSE);
+        boo_oscillate(false);
         o.rawData[oWallHitboxRadius] = 0;
     } else {
         o.rawData[oAction] = 1;
@@ -534,7 +536,6 @@ const sBooActions = [
 
 export const bhv_boo_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    const parent = o.parentObj
 
     cur_obj_update_floor_and_walls()
     cur_obj_call_action_function(sBooActions)
@@ -559,7 +560,7 @@ const big_boo_act_0 = () => {
     }
 
     o.rawData[oBooParentBigBoo] = null;
-    if (boo_should_be_active() && o.rawData[oBigBooNumMinionBoosKilled] >= /*ObjectListProc.gDebugInfo[5][0]*/ + 5) {
+    if (boo_should_be_active() && o.rawData[oBigBooNumMinionBoosKilled] >= gDebugInfo[5][0] + 5) {
         o.rawData[oAction] = 1;
 
         cur_obj_set_pos_to_home();

@@ -1035,7 +1035,6 @@ export const cur_obj_move_y = (gravity, bounciness, buoyancy) => {
 
         const waterLevel = cur_obj_move_y_and_get_water_level(gravity, buoyancy)
         if (o.rawData[oPosY] < waterLevel) {
-            throw "cur_obj_move_y implement underwater"
             cur_obj_move_update_underwater_flags()
         } else {
             if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
@@ -1057,6 +1056,24 @@ export const cur_obj_move_y = (gravity, bounciness, buoyancy) => {
     }
 }
 
+export const cur_obj_move_update_underwater_flags = () => {
+    const o = ObjectListProc.gCurrentObject
+    
+    let decelY = sqrtf(o.rawData[oVelY] * o.rawData[oVelY]) * (o.rawData[oDragStrength] * 7.0) / 100.0
+
+    if (o.rawData[oVelY] > 0) {
+        o.rawData[oVelY] -= decelY
+    } else {
+        o.rawData[oVelY] += decelY
+    }
+
+    if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
+        o.rawData[oPosY] = o.rawData[oFloorHeight]
+        o.rawData[oMoveFlags] |= OBJ_MOVE_UNDERWATER_ON_GROUND
+    } else {
+        o.rawData[oMoveFlags] |= OBJ_MOVE_UNDERWATER_OFF_GROUND
+    }
+}
 
 export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
     const o = ObjectListProc.gCurrentObject
@@ -1065,8 +1082,8 @@ export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
     const bouyancy = o.rawData[oBuoyancy]
     const dragStrength = o.rawData[oDragStrength]
     let steepSlopeNormalY
-    let careAboutEdgesAndSteepSlopes = 0
-    let negativeSpeed = 0
+    let careAboutEdgesAndSteepSlopes = false
+    let negativeSpeed = false
 
     //! Because some objects allow these active flags to be set but don't
     //  aexport const updating when they are, we end up with "partial" update = ser=> e

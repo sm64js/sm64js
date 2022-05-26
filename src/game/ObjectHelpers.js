@@ -91,8 +91,8 @@ export const DebugPage = {
 }
 
 export const increment_velocity_toward_range = (value, center, zeroThreshold, increment) => {
-    let relative;
-    if ((relative = value - center) > 0) {
+    let relative = value - center;
+    if (relative > 0) {
         if (relative < zeroThreshold) {
             return 0;
         } else {
@@ -1369,7 +1369,7 @@ export const cur_obj_change_action = (action) => {
 export const cur_obj_set_vel_from_mario_vel = (f12, f14) => {
     const o = ObjectListProc.gCurrentObject
     const gMarioStates = gLinker.ObjectListProcessor.gMarioObject
-    let /*f32*/ sp4 = gMarioStates.forwardVel
+    let /*f32*/ sp4 = gMarioStates.rawData[oForwardVel]
     let /*f32*/ sp0 = f12 * f14
 
     if (sp4 < sp0) {

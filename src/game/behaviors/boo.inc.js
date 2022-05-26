@@ -335,7 +335,8 @@ const boo_update_during_death = () => {
     }
 
     o.rawData[oVelY] = 5.0
-    o.rawData[oFaceAngleRoll]
+    o.rawData[oFaceAngleRoll] += 0x800;
+    o.rawData[oFaceAngleYaw] += 0x800;
 }
 
 const obj_has_attack_type = (attackType) => {
@@ -406,10 +407,7 @@ const boo_chase_mario = (a0, a1, a2) => {
         }
     } else {
         o.rawData[oInteractType] = 0;
-        // why is boo_stop not used here
-        o.rawData[oForwardVel] = 0;
-        o.rawData[oVelY] = 0;
-        o.rawData[oGravity] = 0;
+        boo_stop();
     }
 }
 

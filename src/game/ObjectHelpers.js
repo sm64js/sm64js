@@ -110,11 +110,11 @@ export const increment_velocity_toward_range = (value, center, zeroThreshold, in
 export const obj_check_if_collided_with_object = (obj1, obj2) => {
     for (let i = 0; i < obj1.numCollidedObjs; i++) {
         if (obj1.collidedObjs[i] == obj2) {
-            return TRUE;
+            return true;
         }
     }
 
-    return FALSE;
+    return false;
 }
 
 export const cur_obj_set_behavior = (behavior) => {
@@ -1058,7 +1058,7 @@ export const cur_obj_move_y = (gravity, bounciness, buoyancy) => {
 
 export const cur_obj_move_update_underwater_flags = () => {
     const o = ObjectListProc.gCurrentObject
-    
+
     let decelY = sqrtf(o.rawData[oVelY] * o.rawData[oVelY]) * (o.rawData[oDragStrength] * 7.0) / 100.0
 
     if (o.rawData[oVelY] > 0) {

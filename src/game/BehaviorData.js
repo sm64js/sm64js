@@ -79,6 +79,7 @@ import * as _star_door                from "./behaviors/star_door.inc"
 import * as _sliding_platform_2       from "./behaviors/sliding_platform_2.inc"
 import * as _square_platform_cycle    from "./behaviors/square_platform_cycle.inc"
 import * as _switch_hidden_objects    from "./behaviors/switch_hidden_objects.inc"
+import * as _tilting_inverted_pyramid from "./behaviors/tilting_inverted_pyramid.inc"
 import * as _triplet_butterfly        from "./behaviors/triplet_butterfly.inc"
 import * as _warp                     from "./behaviors/warp.inc"
 import * as _water_bomb               from "./behaviors/water_bomb.inc"
@@ -167,7 +168,7 @@ import { inside_castle_seg7_collision_water_level_pillar } from "../levels/castl
 import { bbh_seg7_collision_staircase_step               } from "../levels/bbh/staircase_step/collision.inc"
 import { bbh_seg7_collision_merry_go_round               } from "../levels/bbh/merry_go_round/collision.inc"
 import { bitdw_seg7_collision_moving_pyramid             } from "../levels/bitdw/square_platform/collision.inc"
-
+import { bitfs_seg7_collision_inverted_pyramid        } from "../levels/bitfs/tilting_square_platform/collision.inc"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -1872,6 +1873,18 @@ export const bhvBreakableBoxSmall = [
     END_LOOP(),
 ]
 
+export const bhvBitfsTiltingInvertedPyramid = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_COLLISION_DATA(bitfs_seg7_collision_inverted_pyramid),
+    SET_HOME(),
+    CALL_NATIVE('bhv_platform_normals_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_tilting_inverted_pyramid_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
 const bhvFlamethrower = [
     BEGIN(OBJ_LIST_DEFAULT),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -2132,6 +2145,7 @@ gLinker.behaviors.bhvAirborneStarCollectWarp = bhvAirborneStarCollectWarp
 gLinker.behaviors.bhvAirborneWarp = bhvAirborneWarp
 gLinker.behaviors.bhvBalconyBigBoo = bhvBalconyBigBoo
 gLinker.behaviors.bhvBird = bhvBird
+gLinker.behaviors.bhvBitfsTiltingInvertedPyramid = bhvBitfsTiltingInvertedPyramid
 gLinker.behaviors.bhvBobBowlingBallSpawner = bhvBobBowlingBallSpawner
 gLinker.behaviors.bhvBobomb = bhvBobomb
 gLinker.behaviors.bhvBobombBuddy = bhvBobombBuddy

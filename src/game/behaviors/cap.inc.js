@@ -4,7 +4,7 @@ import { spawn_object, cur_obj_become_intangible, cur_obj_become_tangible, cur_o
 cur_obj_unhide, obj_mark_for_deletion, cur_obj_scale, obj_turn_toward_object, approach_symmetric,
 cur_obj_move_using_fvel_and_gravity, cur_obj_was_attacked_or_ground_pounded } from
 "../ObjectHelpers"
-import { object_step, obj_flicker_and_disappear, OBJ_COL_FLAG_GROUNDED } from "../ObjBehaviors"
+import { object_step, obj_flicker_and_disappear, OBJ_COL_FLAG_GROUNDED, sObjFloor } from "../ObjBehaviors"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { sins, coss, int16, s16, random_int16, random_float } from "../../utils"
 import { oPosX, oPosY, oPosZ, oVelY, oFaceAnglePitch, oFaceAngleYaw, oMoveAngleYaw, oMoveAnglePitch,
@@ -13,6 +13,7 @@ oBehParams2ndByte, oExclamationBoxUnkF4, oExclamationBoxUnkF8, oExclamationBoxUn
 oGravity, oFloorHeight, oFlags, oBehParams, oFriction, oBuoyancy, oOpacity, oCapUnkF4, oCapUnkF8,
 ACTIVE_FLAG_DEACTIVATED, } from "../../include/object_constants"
 import { INTERACT_CAP, INT_STATUS_INTERACTED } from "../Interaction"
+import { SURFACE_DEATH_PLANE, SURFACE_DEEP_MOVING_QUICKSAND, SURFACE_DEEP_QUICKSAND, SURFACE_INSTANT_MOVING_QUICKSAND, SURFACE_INSTANT_QUICKSAND, SURFACE_MOVING_QUICKSAND, SURFACE_QUICKSAND, SURFACE_SHALLOW_MOVING_QUICKSAND, SURFACE_SHALLOW_QUICKSAND } from "../../include/surface_terrains"
 
 
 const sCapHitbox = {
@@ -47,40 +48,40 @@ const cap_despawn = () => {
 }
 
 const cap_check_quicksand = () => {
-//     if (sObjFloor == NULL)
-//         return;
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
-//     switch (sObjFloor.type) {
-//         case SURFACE_DEATH_PLANE:
-//             o.activeFlags = ACTIVE_FLAG_DEACTIVATED;
-//             break;
+    if (sObjFloor == null) return
 
-//         case SURFACE_SHALLOW_QUICKSAND:
-//         case SURFACE_DEEP_QUICKSAND:
-//         case SURFACE_QUICKSAND:
-//             o.rawData[oAction] = 10;
-//             o.rawData[oForwardVel] = 0.0f;
-//             break;
+    switch (sObjFloor.type) {
+        case SURFACE_DEATH_PLANE:
+            o.activeFlags = ACTIVE_FLAG_DEACTIVATED
+            break
+        case SURFACE_SHALLOW_QUICKSAND:
+        case SURFACE_DEEP_QUICKSAND:
+        case SURFACE_QUICKSAND:
+            o.rawData[oAction] = 10
+            o.rawData[oForwardVel] = 0.0
+            break
 
-//         case SURFACE_DEEP_MOVING_QUICKSAND:
-//         case SURFACE_SHALLOW_MOVING_QUICKSAND:
-//         case SURFACE_MOVING_QUICKSAND:
-//             o.rawData[oAction] = 11;
-//             o.rawData[oMoveAngleYaw] = (sObjFloor.force & 0xFF) << 8;
-//             o.rawData[oForwardVel] = 8 + 2 * (0 - ((sObjFloor.force & 0xFF00) >> 8));
-//             break;
-
-//         case SURFACE_INSTANT_QUICKSAND:
-//             o.rawData[oAction] = 12;
-//             o.rawData[oForwardVel] = 0.0f;
-//             break;
-
-//         case SURFACE_INSTANT_MOVING_QUICKSAND:
-//             o.rawData[oAction] = 13;
-//             o.rawData[oMoveAngleYaw] = (sObjFloor.force & 0xFF) << 8;
-//             o.rawData[oForwardVel] = 8 + 2 * (0 - ((sObjFloor.force & 0xFF00) >> 8));
-//             break;
-//     }
+        case SURFACE_DEEP_MOVING_QUICKSAND:
+        case SURFACE_SHALLOW_MOVING_QUICKSAND:
+        case SURFACE_MOVING_QUICKSAND:
+            o.rawData[oAction] = 11
+            o.rawData[oMoveAngleYaw] = (sObjFloor.force * 0xFF) << 8
+            o.rawData[oForwardVel] = 8 + 2 * (0 - ((sObjFloor.force & 0xFF00) >> 8))
+            break
+        
+        case SURFACE_INSTANT_QUICKSAND:
+            o.rawData[oAction] = 12
+            o.rawData[oForwardVel] = 0.0
+            break
+        
+        case SURFACE_INSTANT_MOVING_QUICKSAND:
+            o.rawData[oAction] = 13
+            o.rawData[oMoveAngleYaw] = (sObjFloor.force & 0xFF) << 8
+            o.rawData[oForwardVel] = 8 + 2 * (0 - ((sObjFloor.force & 0xFF00) >> 8))
+            break
+    }
 }
 
 const cap_sink_quicksand = () => {
@@ -286,6 +287,7 @@ const bhv_normal_cap_loop = () => {
 }
 
 const bhv_vanish_cap_init = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oGravity] = 1.2
     o.rawData[oFriction] = 0.999
     o.rawData[oBuoyancy] = 0.9

@@ -98,7 +98,6 @@ export const HELD_HELD = 1
 export const HELD_THROWN = 2
 export const HELD_DROPPED = 3
 
-
 export const oFlags                       = 0x01
 export const oDialogResponse              = 0x02
 export const oDialogState                 = 0x02

@@ -22,7 +22,8 @@ class SpawnObject {
             gfx: {},
             next: null, prev: null,
             activeFlags: 0,
-            rawData: new Array(0x50).fill(0)
+            rawData: new Array(0x50).fill(0),
+            ptrData: new Array(0x50).fill(0)
         }
         init_graph_node(obj.gfx, GRAPH_NODE_TYPE_OBJECT)
         obj.gfx.object = obj

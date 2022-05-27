@@ -39,6 +39,7 @@ import { MODEL_WOODEN_POST, MODEL_MIST, MODEL_SMOKE, MODEL_BUBBLE, MODEL_CANNON_
          MODEL_BOWSER_BOMB_CHILD_OBJ, MODEL_NONE, MODEL_YELLOW_COIN
 } from "../include/model_ids"
 
+import * as _activated_bf_plat        from "./behaviors/activated_bf_plat.inc"
 import * as _amp                      from "./behaviors/amp.inc"
 import * as _bird                     from "./behaviors/bird.inc"
 import * as _boo                      from "./behaviors/boo.inc"
@@ -66,6 +67,7 @@ import * as _flamethrower             from "./behaviors/flamethrower.inc"
 import * as _koopa_shell_underwater   from "./behaviors/koopa_shell_underwater.inc"
 import * as _moat_grill               from "./behaviors/moat_grill.inc"
 import * as _mushroom_1up             from "./behaviors/mushroom_1up.inc"
+import * as _platform_on_track        from "./behaviors/platform_on_track.inc"
 import * as _pole                     from "./behaviors/pole.inc"
 import * as _pole_base                from "./behaviors/pole_base.inc"
 import * as _seesaw_platform          from "./behaviors/seesaw_platform.inc"
@@ -342,6 +344,28 @@ export const bhvMoatGrills = [
     END_LOOP(),
 ]
 
+export const bhvPlatformOnTrack = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 50, /*Gravity*/ -100, /*Bounciness*/ -50, /*Drag strength*/ 100, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    CALL_NATIVE('bhv_init_room'),
+    CALL_NATIVE('bhv_platform_on_track_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_platform_on_track_update'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
+export const bhvTrackBall = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    BILLBOARD(),
+    CALL_NATIVE('bhv_init_room'),
+    SCALE(/*Unused*/ 0, /*Field*/ 15),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_track_ball_update'),
+    END_LOOP(),
+]
 
 export const bhvSeesawPlatform = [
     BEGIN(OBJ_LIST_SURFACE, 'bhvSeesawPlatform'),
@@ -1743,6 +1767,17 @@ export const bhvWaterBombCannon = [
     END_LOOP(),
 ]
 
+export const bhvActivatedBackAndForthPlatform = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_HOME(),
+    CALL_NATIVE('bhv_activated_back_and_forth_platform_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_activated_back_and_forth_platform_update'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
 export const bhvCannonBarrelBubbles = [
     BEGIN(OBJ_LIST_DEFAULT, 'bhvCannonBarrelBubbles'),
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -2091,6 +2126,7 @@ export const bhvMerryGoRound = [
 ]
 
 gLinker.behaviors.bhv1Up = bhv1Up
+gLinker.behaviors.bhvActivatedBackAndForthPlatform = bhvActivatedBackAndForthPlatform
 gLinker.behaviors.bhvAirborneDeathWarp = bhvAirborneDeathWarp
 gLinker.behaviors.bhvAirborneStarCollectWarp = bhvAirborneStarCollectWarp
 gLinker.behaviors.bhvAirborneWarp = bhvAirborneWarp
@@ -2179,6 +2215,7 @@ gLinker.behaviors.bhvPaintingDeathWarp = bhvPaintingDeathWarp
 gLinker.behaviors.bhvPaintingStarCollectWarp = bhvPaintingStarCollectWarp
 gLinker.behaviors.bhvPillarBase = bhvPillarBase
 gLinker.behaviors.bhvPitBowlingBall = bhvPitBowlingBall
+gLinker.behaviors.bhvPlatformOnTrack = bhvPlatformOnTrack
 gLinker.behaviors.bhvPlungeBubble = bhvPlungeBubble
 gLinker.behaviors.bhvRedCoin = bhvRedCoin
 gLinker.behaviors.bhvRockSolid = bhvRockSolid
@@ -2202,6 +2239,7 @@ gLinker.behaviors.bhvStaticObject = bhvStaticObject
 gLinker.behaviors.bhvSwimmingWarp = bhvSwimmingWarp
 gLinker.behaviors.bhvThiBowlingBallSpawner = bhvThiBowlingBallSpawner
 gLinker.behaviors.bhvTiltingBowserLavaPlatform = bhvTiltingBowserLavaPlatform
+gLinker.behaviors.bhvTrackBall = bhvTrackBall
 gLinker.behaviors.bhvTree = bhvTree
 gLinker.behaviors.bhvTriangleParticleSpawner = bhvTriangleParticleSpawner
 gLinker.behaviors.bhvTripletButterfly = bhvTripletButterfly

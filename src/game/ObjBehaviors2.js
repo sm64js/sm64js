@@ -3,14 +3,16 @@ import { oFlags, OBJ_FLAG_30, oInteractType, oDamageOrCoinValue, oHealth, oNumLo
          oTimer, oForwardVel, oVelX, oVelY, oVelZ, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveAngleYaw, oMoveFlags,
          OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_HIT_WALL, OBJ_MOVE_ABOVE_LAVA,
          oHomeX, oHomeY, oHomeZ, oPosX, oPosY, oPosZ, oDistanceToMario, oAngleToMario, OBJ_MOVE_HIT_EDGE,
-         oMoveAnglePitch, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oDeathSound } from "../include/object_constants"
+         oMoveAnglePitch, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oDeathSound, oBehParams, oPlatformOnTrackPrevWaypoint, oPlatformOnTrackPrevWaypointFlags, oPlatformOnTrackStartWaypoint, oPlatformOnTrackBaseBallIndex } from "../include/object_constants"
 
-import { cur_obj_become_tangible, cur_obj_extend_animation_if_at_end, cur_obj_become_intangible, cur_obj_hide, obj_mark_for_deletion, obj_angle_to_object, cur_obj_update_floor_and_walls, cur_obj_move_standard, abs_angle_diff, cur_obj_rotate_yaw_toward, cur_obj_reflect_move_angle_off_wall, approach_symmetric, obj_spawn_loot_yellow_coins, spawn_mist_particles, approach_s16_symmetric} from "./ObjectHelpers"
+import { cur_obj_become_tangible, cur_obj_extend_animation_if_at_end, cur_obj_become_intangible, cur_obj_hide, obj_mark_for_deletion, obj_angle_to_object, cur_obj_update_floor_and_walls, cur_obj_move_standard, abs_angle_diff, cur_obj_rotate_yaw_toward, cur_obj_reflect_move_angle_off_wall, approach_symmetric, obj_spawn_loot_yellow_coins, spawn_mist_particles, approach_s16_symmetric, spawn_object_relative} from "./ObjectHelpers"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { INT_STATUS_INTERACTED, INT_STATUS_ATTACK_MASK, INT_STATUS_ATTACKED_MARIO, ATTACK_KICK_OR_TRIP, ATTACK_FAST_ATTACK } from "./Interaction"
-import { atan2s } from "../engine/math_util"
+import { atan2s, sqrtf } from "../engine/math_util"
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { coss, sins, int16 } from "../utils"
+import { PLATFORM_ON_TRACK_BP_RETURN_TO_START } from "./behaviors/platform_on_track.inc"
+import { MODEL_TRAJECTORY_MARKER_BALL } from "../include/model_ids"
 
 export const ATTACK_HANDLER_NOP = 0
 export const ATTACK_HANDLER_DIE_IF_HEALTH_NON_POSITIVE = 1
@@ -22,9 +24,20 @@ export const ATTACK_HANDLER_SPECIAL_WIGGLER_JUMPED_ON = 6
 export const ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED = 7
 export const ATTACK_HANDLER_SQUISHED_WITH_BLUE_COIN = 8
 
+export const POS_OP_SAVE_POSITION    = 0
+export const POS_OP_COMPUTE_VELOCITY = 0
+export const POS_OP_RESTORE_POSITION = 0
+
+export const WAYPOINT_FLAGS_END = -1
+export const WAYPOINT_FLAGS_INITIALIZED = 0x8000
+export const WAYPOINT_MASK_00FF = 0x00FF
+export const WAYPOINT_FLAGS_PLATFORM_ON_TRACK_PAUSE = 3
+
 let sObjSavedPosX
 let sObjSavedPosY
 let sObjSavedPosZ
+
+let trajIndex
 
 //this lived above random_linear_offset in the source,
 export const obj_roll_to_match_yaw_turn = (targetYaw, maxRoll, rollSpeed) => {
@@ -79,6 +92,21 @@ export const oscillate_toward = (valueObj, velObj, target, velCloseToZero, accel
     }
 
     return 0
+}
+
+export const approach_f32_ptr = (px, target, delta) => {
+    if (px > target) {
+        delta = -delta
+    }
+
+    px += delta
+
+    if ((px - target) * delta >= 0) {
+        px = target
+        return true
+    }
+
+    return false
 }
 
 export const obj_move_pitch_approach = (target, delta) => {
@@ -153,6 +181,82 @@ export const obj_perform_position_op = (o, op) => {
             o.rawData[oPosZ] = sObjSavedPosZ
             break
     }
+}
+
+export const platform_on_track_update_pos_or_spawn_ball = (ballIndex, x, y, z) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    let trackBall
+    let nextWaypoint
+    let prevWaypoint
+    let amountToMove
+    let dx
+    let dy
+    let dz
+    let distToNextWaypoint
+
+    if (ballIndex == 0 || ((o.rawData[oBehParams] >> 16) & 0x0080)) {
+        nextWaypoint = o.ptrData[oPlatformOnTrackPrevWaypoint][0]
+
+        if (ballIndex != 0) {
+            amountToMove = 300.0 * ballIndex
+        } else {
+            obj_perform_position_op('POS_OP_SAVE_POSITION')
+            o.rawData[oPlatformOnTrackPrevWaypointFlags] = 0
+            amountToMove = o.rawData[oForwardVel]
+        }
+
+        do {
+            prevWaypoint = nextWaypoint
+            nextWaypoint = o.ptrData[oPlatformOnTrackPrevWaypoint][1]
+
+            if (nextWaypoint.flags == WAYPOINT_FLAGS_END) {
+                if (ballIndex == 0) {
+                    o.rawData[oPlatformOnTrackPrevWaypointFlags] = WAYPOINT_FLAGS_END
+                }
+
+                if ((o.rawData[oBehParams] >> 16) & PLATFORM_ON_TRACK_BP_RETURN_TO_START) {
+                    nextWaypoint = o.ptrData[oPlatformOnTrackStartWaypoint][0]
+                } else {
+                    return
+                }
+            }
+
+            dx = nextWaypoint.pos[0] - x
+            dy = nextWaypoint.pos[1] - y
+            dz = nextWaypoint.pos[2] - z
+
+            distToNextWaypoint = sqrtf(dx * dx + dy * dy + dz * dz)
+
+            // Move directly to the next waypoint, even if it's farther away
+            // than amountToMove
+            amountToMove -= distToNextWaypoint
+            x += dx
+            y += dy
+            z += dz
+        } while (amountToMove > 0.0)
+
+        // If we moved farther than amountToMove, move in the opposite direction
+        // No risk of near-zero division: If distToNextWaypoint is close to
+        // zero, then that means we didn't cross a waypoint this frame (since
+        // otherwise distToNextWaypoint would equal the distance between two
+        // waypoints, which should never be that small). But this implies that
+        // amountToMove - distToNextWaypoint <= 0, and amountToMove is at least
+        // 0.1 (from platform on track behavior)
+        distToNextWaypoint = amountToMove / distToNextWaypoint
+        x += dx * distToNextWaypoint
+        y += dy * distToNextWaypoint
+        z += dz * distToNextWaypoint
+
+        if (ballIndex != 0) {
+            trackBall = spawn_object_relative(o.rawData[oPlatformOnTrackBaseBallIndex] + ballIndex, 0, 0, 0, o, MODEL_TRAJECTORY_MARKER_BALL, bhvTrackBall)
+        }
+    }
+}
+
+export const obj_set_dist_from_home = (distFromHome) => {
+    o.rawData[oPosX] = o.rawData[oHomeX] + distFromHome * coss(o.rawData[oMoveAngleYaw])
+    o.rawData[oPosZ] = o.rawData[oHomeZ] + distFromHome * sins(o.rawData[oMoveAngleYaw])
 }
 
 export const obj_compute_vel_from_move_pitch = (speed) => {

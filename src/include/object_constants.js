@@ -810,6 +810,9 @@ export const oPitouneUnkF4  = 0x1B
 export const oPitouneUnkF8  = 0x1C
 export const oPitouneUnkFC  = 0x1D
 
+/* Falling Rising Bitfs Platform */
+export const oBitfsPlatformTimer = 0x1B
+
 /* Platform */
 export const oPlatformTimer   = 0x1B
 export const oPlatformUnkF8   = 0x1C

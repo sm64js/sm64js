@@ -60,6 +60,7 @@ import * as _coin                     from "./behaviors/coin.inc"
 import * as _ddd_warp                 from "./behaviors/ddd_warp.inc"
 import * as _door                     from "./behaviors/door.inc"
 import * as _exclamation_box          from "./behaviors/exclamation_box.inc"
+import * as _falling_rising_platform  from "./behaviors/falling_rising_platform.inc"
 import * as _ferris_wheel             from "./behaviors/ferris_wheel.inc"
 import * as _fish                     from "./behaviors/fish.inc"
 import * as _file_select              from "./behaviors/file_select.inc"
@@ -168,7 +169,9 @@ import { inside_castle_seg7_collision_water_level_pillar } from "../levels/castl
 import { bbh_seg7_collision_staircase_step               } from "../levels/bbh/staircase_step/collision.inc"
 import { bbh_seg7_collision_merry_go_round               } from "../levels/bbh/merry_go_round/collision.inc"
 import { bitdw_seg7_collision_moving_pyramid             } from "../levels/bitdw/square_platform/collision.inc"
-import { bitfs_seg7_collision_inverted_pyramid        } from "../levels/bitfs/tilting_square_platform/collision.inc"
+import { bitfs_seg7_collision_inverted_pyramid           } from "../levels/bitfs/tilting_square_platform/collision.inc"
+import { bitfs_seg7_collision_sinking_platform           } from "../levels/bitfs/sinking_platforms/collision.inc"
+import { bitfs_seg7_collision_squishable_platform } from "../levels/bitfs/stretching_platform/collision.inc"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -270,15 +273,15 @@ export const bhvGiantPole = [
 ]
 
 export const bhvPoleGrabbing = [
-    { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_POLELIKE, name: 'bhvPoleGrabbing' } },
-    { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
-    { command: BhvCmds.set_objectData_value, args: { field: oInteractType, value: INTERACT_POLE } },
-    { command: BhvCmds.set_hitbox, args: { radius: 80, height: 1500 } },
-    { command: BhvCmds.call_native, args: { func: 'bhv_pole_init' } },
-    { command: BhvCmds.set_objectData_value, args: { field: oIntangibleTimer, value: 0 } },
-    { command: BhvCmds.begin_loop },
-        { command: BhvCmds.call_native, args: { func: 'bhv_pole_base_loop' } },
-    { command: BhvCmds.end_loop },
+    BEGIN(OBJ_LIST_POLELIKE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    SET_INT(oInteractType, INTERACT_POLE),
+    SET_HITBOX(/*Radius*/ 80, /*Height*/ 1500),
+    CALL_NATIVE('bhv_pole_init'),
+    SET_INT(oIntangibleTimer, 0),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_pole_base_loop'),
+    END_LOOP(),
 ]
 
 export const bhvStaticObject = [
@@ -1873,6 +1876,17 @@ export const bhvBreakableBoxSmall = [
     END_LOOP(),
 ]
 
+export const bhvBitfsSinkingPlatforms = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(bitfs_seg7_collision_sinking_platform),
+    SET_HOME(),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_bitfs_sinking_platform_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
 export const bhvBitfsTiltingInvertedPyramid = [
     BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -1885,7 +1899,19 @@ export const bhvBitfsTiltingInvertedPyramid = [
     END_LOOP(),
 ]
 
-const bhvFlamethrower = [
+export const bhvSquishablePlatform = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_COLLISION_DATA(bitfs_seg7_collision_squishable_platform),
+    SET_FLOAT(oCollisionDistance, 10000),
+    CALL_NATIVE('bhv_platform_normals_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_squishable_platform_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
+export const bhvFlamethrower = [
     BEGIN(OBJ_LIST_DEFAULT),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_HOME(),
@@ -2145,6 +2171,7 @@ gLinker.behaviors.bhvAirborneStarCollectWarp = bhvAirborneStarCollectWarp
 gLinker.behaviors.bhvAirborneWarp = bhvAirborneWarp
 gLinker.behaviors.bhvBalconyBigBoo = bhvBalconyBigBoo
 gLinker.behaviors.bhvBird = bhvBird
+gLinker.behaviors.bhvBitfsSinkingPlatforms = bhvBitfsSinkingPlatforms
 gLinker.behaviors.bhvBitfsTiltingInvertedPyramid = bhvBitfsTiltingInvertedPyramid
 gLinker.behaviors.bhvBobBowlingBallSpawner = bhvBobBowlingBallSpawner
 gLinker.behaviors.bhvBobomb = bhvBobomb
@@ -2231,6 +2258,7 @@ gLinker.behaviors.bhvPillarBase = bhvPillarBase
 gLinker.behaviors.bhvPitBowlingBall = bhvPitBowlingBall
 gLinker.behaviors.bhvPlatformOnTrack = bhvPlatformOnTrack
 gLinker.behaviors.bhvPlungeBubble = bhvPlungeBubble
+gLinker.behaviors.bhvPoleGrabbing = bhvPoleGrabbing
 gLinker.behaviors.bhvRedCoin = bhvRedCoin
 gLinker.behaviors.bhvRockSolid = bhvRockSolid
 gLinker.behaviors.bhvSeesawPlatform = bhvSeesawPlatform
@@ -2247,6 +2275,7 @@ gLinker.behaviors.bhvSpinAirborneCircleWarp = bhvSpinAirborneCircleWarp
 gLinker.behaviors.bhvSparkleSpawn = bhvSparkleSpawn
 gLinker.behaviors.bhvSpinAirborneWarp = bhvSpinAirborneWarp
 gLinker.behaviors.bhvSquarishPathMoving = bhvSquarishPathMoving
+gLinker.behaviors.bhvSquishablePlatform = bhvSquishablePlatform
 gLinker.behaviors.bhvStar = bhvStar
 gLinker.behaviors.bhvStarDoor = bhvStarDoor
 gLinker.behaviors.bhvStaticObject = bhvStaticObject

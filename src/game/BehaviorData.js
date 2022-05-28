@@ -439,6 +439,19 @@ export const bhvRespawner = [
     { command: BhvCmds.end_loop },
 ]
 
+export const bhvSmallBully = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, bully_seg5_anims_0500470C),
+    DROP_TO_FLOOR(),
+    SET_HOME(),
+    CALL_NATIVE('bhv_small_bully_init'),
+    BEGIN_LOOP(),
+        SET_INT(oIntangibleTimer, 0),
+        CALL_NATIVE('bhv_bully_loop'),
+    END_LOOP(),
+]
+
 export const bhvGoomba = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PUSHABLE, name: 'bhvGoomba' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO } },
@@ -2015,10 +2028,40 @@ const bhvDoor = [
     END_LOOP(),
 ]
 
+export const bhvTumblingBridgePlatform = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_FLOAT(oCollisionDistance, 300),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_tumbling_bridge_platform_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
 export const bhvWfTumblingBridge = [
     BEGIN(OBJ_LIST_SPAWNER),
     OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_HOME(),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_tumbling_bridge_loop'),
+    END_LOOP(),
+]
+
+export const bhvBbhTumblingBridge = [
+    BEGIN(OBJ_LIST_SPAWNER),
+    OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_HOME(),
+    SET_INT(oBehParams2ndByte, 1),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_tumbling_bridge_loop'),
+    END_LOOP(),
+]
+
+export const bhvLllTumblingBridge = [
+    BEGIN(OBJ_LIST_SPAWNER),
+    OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_HOME(),
+    SET_INT(oBehParams2ndByte, 2),
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_tumbling_bridge_loop'),
     END_LOOP(),
@@ -2214,6 +2257,7 @@ gLinker.behaviors.bhvAirborneDeathWarp = bhvAirborneDeathWarp
 gLinker.behaviors.bhvAirborneStarCollectWarp = bhvAirborneStarCollectWarp
 gLinker.behaviors.bhvAirborneWarp = bhvAirborneWarp
 gLinker.behaviors.bhvBalconyBigBoo = bhvBalconyBigBoo
+gLinker.behaviors.bhvBbhTumblingBridge = bhvBbhTumblingBridge
 gLinker.behaviors.bhvBird = bhvBird
 gLinker.behaviors.bhvBitfsSinkingPlatforms = bhvBitfsSinkingPlatforms
 gLinker.behaviors.bhvBitfsSinkingCagePlatform = bhvBitfsSinkingCagePlatform
@@ -2284,6 +2328,7 @@ gLinker.behaviors.bhvInstantActiveWarp = bhvInstantActiveWarp
 gLinker.behaviors.bhvJumpingBox = bhvJumpingBox
 gLinker.behaviors.bhvLaunchDeathWarp = bhvLaunchDeathWarp
 gLinker.behaviors.bhvLaunchStarCollectWarp = bhvLaunchStarCollectWarp
+gLinker.behaviors.bhvLllTumblingBridge = bhvLllTumblingBridge
 gLinker.behaviors.bhvManyBlueFishSpawner = bhvManyBlueFishSpawner
 gLinker.behaviors.bhvMario = bhvMario
 gLinker.behaviors.bhvMenuButtonManager = bhvMenuButtonManager
@@ -2334,6 +2379,7 @@ gLinker.behaviors.bhvTree = bhvTree
 gLinker.behaviors.bhvTriangleParticleSpawner = bhvTriangleParticleSpawner
 gLinker.behaviors.bhvTripletButterfly = bhvTripletButterfly
 gLinker.behaviors.bhvTtmBowlingBallSpawner = bhvTtmBowlingBallSpawner
+gLinker.behaviors.bhvTumblingBridgePlatform = bhvTumblingBridgePlatform
 gLinker.behaviors.bhvUnlockDoorStar = bhvUnlockDoorStar
 gLinker.behaviors.bhvVanishCap = bhvVanishCap
 gLinker.behaviors.bhvVertStarParticleSpawner = bhvVertStarParticleSpawner
@@ -2348,6 +2394,7 @@ gLinker.behaviors.bhvWaterLevelPillar = bhvWaterLevelPillar
 gLinker.behaviors.bhvWaterMist2 = bhvWaterMist2
 gLinker.behaviors.bhvWaterSplash = bhvWaterSplash
 gLinker.behaviors.bhvWaveTrail = bhvWaveTrail
+gLinker.behaviors.bhvWfTumblingBridge = bhvWfTumblingBridge
 gLinker.behaviors.bhvWhitePuffExplosion = bhvWhitePuffExplosion
 gLinker.behaviors.bhvWingCap = bhvWingCap
 gLinker.behaviors.bhvWoodenPost = bhvWoodenPost

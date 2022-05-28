@@ -1,7 +1,19 @@
-// ** actors/bully/model
-import * as Gbi from "../../include/gbi"
+// Bully
 
-export const bully_seg5_texture_050000E0 = []
-export const bully_seg5_texture_05000468 = []
-export const bully_seg5_texture_05001468 = []
-export const bully_seg5_texture_05002468 = []
+// 0x05000000
+const bully_seg5_vertex_05000000 = [
+    [[   196,     17,    114], 0, [   325,    310], [0xff, 0xff, 0xff, 0xff]],
+    [[   259,      2,    106], 0, [   422,      7], [0xff, 0xff, 0xff, 0xff]],
+    [[   184,    -14,    137], 0, [   399,    416], [0xff, 0xff, 0xff, 0xff]],
+    [[   196,     17,   -113], 0, [   105,    286], [0xff, 0xff, 0xff, 0xff]],
+    [[   259,      2,   -105], 0, [    69,    -34], [0xff, 0xff, 0xff, 0xff]],
+    [[   171,     17,   -157], 0, [  -107,    540], [0xff, 0xff, 0xff, 0xff]],
+    [[   184,    -14,   -136], 0, [   -34,    392], [0xff, 0xff, 0xff, 0xff]],
+    [[    91,     42,   -114], 0, [   236,    784], [0xff, 0xff, 0xff, 0xff]],
+    [[   140,     42,    -34], 0, [   621,    305], [0xff, 0xff, 0xff, 0xff]],
+    [[   116,    -38,    -75], 0, [   344,    489], [0xff, 0xff, 0xff, 0xff]],
+    [[   171,     17,    158], 0, [   417,    557], [0xff, 0xff, 0xff, 0xff]],
+    [[   116,    -38,     76], 0, [   111,    499], [0xff, 0xff, 0xff, 0xff]],
+    [[    91,     42,    115], 0, [   120,    778], [0xff, 0xff, 0xff, 0xff]],
+    [[   140,     42,     35], 0, [   -40,    311], [0xff, 0xff, 0xff, 0xff]],
+]

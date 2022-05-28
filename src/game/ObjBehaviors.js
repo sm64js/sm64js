@@ -352,6 +352,8 @@ export const obj_check_if_facing_toward_angle = (base, goal, range) => {
 }
 
 export const obj_check_floor_death = (collisionFlags, floor) => {
+    const o = ObjectListProc.gCurrentObject
+    
     if (floor == null) return
 
     if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) == 1) {

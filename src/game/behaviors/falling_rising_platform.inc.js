@@ -2,6 +2,7 @@
 
 import { oBehParams2ndByte, oBitfsPlatformTimer, oPosY, oTimer } from "../../include/object_constants"
 import { sins } from "../../utils"
+import { obj_copy_pos_and_angle } from "../ObjectHelpers"
 
 export const bhv_squishable_platform_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject

@@ -36,7 +36,7 @@ import { oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAn
 } from "../include/object_constants"
 
 import { MODEL_WOODEN_POST, MODEL_MIST, MODEL_SMOKE, MODEL_BUBBLE, MODEL_CANNON_BARREL,
-         MODEL_BOWSER_BOMB_CHILD_OBJ, MODEL_NONE, MODEL_YELLOW_COIN
+         MODEL_BOWSER_BOMB_CHILD_OBJ, MODEL_NONE, MODEL_YELLOW_COIN, MODEL_BITFS_BLUE_POLE
 } from "../include/model_ids"
 
 import * as _activated_bf_plat        from "./behaviors/activated_bf_plat.inc"
@@ -71,6 +71,7 @@ import * as _mushroom_1up             from "./behaviors/mushroom_1up.inc"
 import * as _platform_on_track        from "./behaviors/platform_on_track.inc"
 import * as _pole                     from "./behaviors/pole.inc"
 import * as _pole_base                from "./behaviors/pole_base.inc"
+import * as _recovery_heart           from "./behaviors/recovery_heart.inc"
 import * as _seesaw_platform          from "./behaviors/seesaw_platform.inc"
 import * as _sound_spawner            from "./behaviors/sound_spawner.inc"
 import * as _sparkle_spawn            from "./behaviors/sparkle_spawn.inc"
@@ -82,6 +83,7 @@ import * as _square_platform_cycle    from "./behaviors/square_platform_cycle.in
 import * as _switch_hidden_objects    from "./behaviors/switch_hidden_objects.inc"
 import * as _tilting_inverted_pyramid from "./behaviors/tilting_inverted_pyramid.inc"
 import * as _triplet_butterfly        from "./behaviors/triplet_butterfly.inc"
+import * as _tumbling_bridge          from "./behaviors/tumbling_bridge.inc"
 import * as _warp                     from "./behaviors/warp.inc"
 import * as _water_bomb               from "./behaviors/water_bomb.inc"
 import * as _water_bomb_cannon        from "./behaviors/water_bomb_cannon.inc"
@@ -172,6 +174,7 @@ import { bitdw_seg7_collision_moving_pyramid             } from "../levels/bitdw
 import { bitfs_seg7_collision_inverted_pyramid           } from "../levels/bitfs/tilting_square_platform/collision.inc"
 import { bitfs_seg7_collision_sinking_platform           } from "../levels/bitfs/sinking_platforms/collision.inc"
 import { bitfs_seg7_collision_squishable_platform } from "../levels/bitfs/stretching_platform/collision.inc"
+import { bitfs_seg7_collision_sinking_cage_platform } from "../levels/bitfs/sinking_cage_platform/collision.inc"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -906,7 +909,7 @@ export const bhvCarrySomething6 = [
     BREAK(),
 ]
 
-const bhvSlidingPlatform2 = [
+export const bhvSlidingPlatform2 = [
     BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_HOME(),
@@ -1782,6 +1785,14 @@ export const bhvActivatedBackAndForthPlatform = [
     END_LOOP(),
 ]
 
+export const bhvRecoveryHeart = [
+    BEGIN(OBJ_LIST_LEVEL),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_recovery_heart_loop'),
+    END_LOOP(),
+]
+
 export const bhvCannonBarrelBubbles = [
     BEGIN(OBJ_LIST_DEFAULT, 'bhvCannonBarrelBubbles'),
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -1887,6 +1898,30 @@ export const bhvBitfsSinkingPlatforms = [
     END_LOOP(),
 ]
 
+export const bhvDddMovingPole = [
+    BEGIN(OBJ_LIST_POLELIKE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    SET_INT(oInteractType, INTERACT_POLE),
+    SET_HITBOX(/*Radius*/ 80, /*Height*/ 710),
+    SET_INT(oIntangibleTimer, 0),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_ddd_moving_pole_loop'),
+        CALL_NATIVE('bhv_pole_base_loop'),
+    END_LOOP(),
+]
+
+export const bhvBitfsSinkingCagePlatform = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(bitfs_seg7_collision_sinking_cage_platform),
+    SET_HOME(),
+    SPAWN_CHILD(/*Model*/ MODEL_BITFS_BLUE_POLE, /*Behavior*/ bhvDddMovingPole),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_bitfs_sinking_cage_platform_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
 export const bhvBitfsTiltingInvertedPyramid = [
     BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -1977,6 +2012,15 @@ const bhvDoor = [
     CALL_NATIVE('bhv_door_init'),
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_door_loop'),
+    END_LOOP(),
+]
+
+export const bhvWfTumblingBridge = [
+    BEGIN(OBJ_LIST_SPAWNER),
+    OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_HOME(),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_tumbling_bridge_loop'),
     END_LOOP(),
 ]
 
@@ -2172,6 +2216,7 @@ gLinker.behaviors.bhvAirborneWarp = bhvAirborneWarp
 gLinker.behaviors.bhvBalconyBigBoo = bhvBalconyBigBoo
 gLinker.behaviors.bhvBird = bhvBird
 gLinker.behaviors.bhvBitfsSinkingPlatforms = bhvBitfsSinkingPlatforms
+gLinker.behaviors.bhvBitfsSinkingCagePlatform = bhvBitfsSinkingCagePlatform
 gLinker.behaviors.bhvBitfsTiltingInvertedPyramid = bhvBitfsTiltingInvertedPyramid
 gLinker.behaviors.bhvBobBowlingBallSpawner = bhvBobBowlingBallSpawner
 gLinker.behaviors.bhvBobomb = bhvBobomb
@@ -2207,6 +2252,7 @@ gLinker.behaviors.bhvChainChomp = bhvChainChomp
 gLinker.behaviors.bhvCirclingAmp = bhvCirclingAmp
 gLinker.behaviors.bhvCheckerboardElevatorGroup = bhvCheckerboardElevatorGroup
 gLinker.behaviors.bhvCoinFormation = bhvCoinFormation
+gLinker.behaviors.bhvDddMovingPole = bhvDddMovingPole
 gLinker.behaviors.bhvDddWarp = bhvDddWarp
 gLinker.behaviors.bhvDeathWarp = bhvDeathWarp
 gLinker.behaviors.bhvDoor = bhvDoor
@@ -2259,6 +2305,7 @@ gLinker.behaviors.bhvPitBowlingBall = bhvPitBowlingBall
 gLinker.behaviors.bhvPlatformOnTrack = bhvPlatformOnTrack
 gLinker.behaviors.bhvPlungeBubble = bhvPlungeBubble
 gLinker.behaviors.bhvPoleGrabbing = bhvPoleGrabbing
+gLinker.behaviors.bhvRecoveryHeart = bhvRecoveryHeart
 gLinker.behaviors.bhvRedCoin = bhvRedCoin
 gLinker.behaviors.bhvRockSolid = bhvRockSolid
 gLinker.behaviors.bhvSeesawPlatform = bhvSeesawPlatform

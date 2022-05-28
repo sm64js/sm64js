@@ -25,8 +25,8 @@ export const ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED = 7
 export const ATTACK_HANDLER_SQUISHED_WITH_BLUE_COIN = 8
 
 export const POS_OP_SAVE_POSITION    = 0
-export const POS_OP_COMPUTE_VELOCITY = 0
-export const POS_OP_RESTORE_POSITION = 0
+export const POS_OP_COMPUTE_VELOCITY = 1
+export const POS_OP_RESTORE_POSITION = 2
 
 export const WAYPOINT_FLAGS_END = -1
 export const WAYPOINT_FLAGS_INITIALIZED = 0x8000
@@ -36,8 +36,6 @@ export const WAYPOINT_FLAGS_PLATFORM_ON_TRACK_PAUSE = 3
 let sObjSavedPosX
 let sObjSavedPosY
 let sObjSavedPosZ
-
-let trajIndex
 
 //this lived above random_linear_offset in the source,
 export const obj_roll_to_match_yaw_turn = (targetYaw, maxRoll, rollSpeed) => {
@@ -161,21 +159,22 @@ export const obj_get_pitch_from_vel = () => {
 
 }
 
-export const obj_perform_position_op = (o, op) => {
+export const obj_perform_position_op = (op) => {
+    const o = ObjectListProc.gCurrentObject
     switch (op) {
-        case 'POS_OP_SAVE_POSITION':
+        case POS_OP_SAVE_POSITION:
             sObjSavedPosX = o.rawData[oPosX]
             sObjSavedPosY = o.rawData[oPosY]
             sObjSavedPosZ = o.rawData[oPosZ]
             break
 
-        case 'POS_OP_COMPUTE_VELOCITY':
+        case POS_OP_COMPUTE_VELOCITY:
             o.rawData[oVelX] = o.rawData[oPosX] - sObjSavedPosX
             o.rawData[oVelY] = o.rawData[oPosY] - sObjSavedPosY
             o.rawData[oVelZ] = o.rawData[oPosZ] - sObjSavedPosZ
             break
 
-        case 'POS_OP_RESTORE_POSITION':
+        case POS_OP_RESTORE_POSITION:
             o.rawData[oPosX] = sObjSavedPosX
             o.rawData[oPosY] = sObjSavedPosY
             o.rawData[oPosZ] = sObjSavedPosZ
@@ -184,7 +183,7 @@ export const obj_perform_position_op = (o, op) => {
 }
 
 export const platform_on_track_update_pos_or_spawn_ball = (ballIndex, x, y, z) => {
-    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const o = ObjectListProc.gCurrentObject
 
     let trackBall
     let nextWaypoint
@@ -201,7 +200,7 @@ export const platform_on_track_update_pos_or_spawn_ball = (ballIndex, x, y, z) =
         if (ballIndex != 0) {
             amountToMove = 300.0 * ballIndex
         } else {
-            obj_perform_position_op('POS_OP_SAVE_POSITION')
+            obj_perform_position_op(POS_OP_SAVE_POSITION)
             o.rawData[oPlatformOnTrackPrevWaypointFlags] = 0
             amountToMove = o.rawData[oForwardVel]
         }
@@ -255,6 +254,8 @@ export const platform_on_track_update_pos_or_spawn_ball = (ballIndex, x, y, z) =
 }
 
 export const obj_set_dist_from_home = (distFromHome) => {
+    const o = ObjectListProc.gCurrentObject
+
     o.rawData[oPosX] = o.rawData[oHomeX] + distFromHome * coss(o.rawData[oMoveAngleYaw])
     o.rawData[oPosZ] = o.rawData[oHomeZ] + distFromHome * sins(o.rawData[oMoveAngleYaw])
 }
@@ -263,14 +264,8 @@ export const obj_compute_vel_from_move_pitch = (speed) => {
     const o = ObjectListProc.gCurrentObject
     o.rawData[oForwardVel] = speed * coss(o.rawData[oMoveAnglePitch]);
     o.rawData[oVelY] = speed * -sins(o.rawData[oMoveAnglePitch]);
-    //Hey Joe! I cab't tell if I need to return some value here... the C had no return
-    //I think it has something to do with resolving these two vectors into a single number?
-    //I feel like the return should just be something like: return(o.rawData[oForwardVel] + o.rawData[oVelY])
 }
 
-//value was originally called as *value, I'm not sure if
-//there's an equivalent in js (pointer?), but it seemed like
-//something I can ignore based on how it's called in obj_roll_to_match_yaw_turn
 export const clamp_s16 = (value, minimum, maximum) => {
     if (value <= minimum) {
         value = minimum;

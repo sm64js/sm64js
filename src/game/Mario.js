@@ -1763,7 +1763,6 @@ const update_mario_health = (m) => {
             }
         }
 
-
         if (m.healCounter > 0) {
             m.health += 0x40
             m.healCounter--

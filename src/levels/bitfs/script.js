@@ -22,7 +22,7 @@ import {
 } from "../../include/model_ids"
 
 import {
-    /*script_func_global_3, */script_func_global_18, script_func_global_1
+    script_func_global_3, script_func_global_18, script_func_global_1
 } from "../global_scripts"
 
 import { bitfs_geo_0004B0 } from "./areas/1/2/geo.inc"
@@ -133,7 +133,7 @@ const script_func_local_3 = [
 export const level_bitfs_entry = [
     INIT_LEVEL(),
     MARIO(/*model*/ MODEL_MARIO,  /*behParam*/ 0x00000001,  /*beh*/ 'bhvMario'),
-    //JUMP_LINK(script_func_global_3),
+    JUMP_LINK(script_func_global_3),
     JUMP_LINK(script_func_global_18),
     JUMP_LINK(script_func_global_1),
     LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_03,              bitfs_geo_0004B0),

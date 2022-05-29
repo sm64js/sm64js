@@ -47,6 +47,7 @@ import * as _boo_cage                 from "./behaviors/boo_cage.inc"
 import * as _bowling_ball             from "./behaviors/bowling_ball.inc"
 import * as _breakable_box            from "./behaviors/breakable_box.inc"
 import * as _breakable_box_small      from "./behaviors/breakable_box_small.inc"
+import * as _bully                    from "./behaviors/bully.inc"
 import * as _butterfly                from "./behaviors/butterfly.inc"
 import * as _cannon                   from "./behaviors/cannon.inc"
 import * as _cannon_door              from "./behaviors/cannon_door.inc"
@@ -151,6 +152,7 @@ import { chain_chomp_seg6_anims_06025178 } from "../actors/chain_chomp/anims/tab
 import { door_seg3_anims_030156C0        } from "../actors/door/anims.inc"
 import { goomba_seg8_anims_0801DA4C      } from "../actors/goomba/anims/table.inc"
 import { yoshi_seg5_anims_05024100       } from "../actors/yoshi/anims.inc"
+import { bully_seg5_anims_0500470C       } from "../actors/bully/anims.inc"
 
 import { bowser_2_seg7_collision_tilting_platform        } from "../levels/bowser_2/tilting_platform/collision.inc"
 import { breakable_box_seg8_collision_08012D70           } from "../actors/breakable_box/collision.inc"
@@ -451,6 +453,45 @@ export const bhvSmallBully = [
         CALL_NATIVE('bhv_bully_loop'),
     END_LOOP(),
 ]
+
+export const bhvBigBully = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, bully_seg5_anims_0500470C),
+    DROP_TO_FLOOR(),
+    SET_HOME(),
+    CALL_NATIVE('bhv_big_bully_init'),
+    BEGIN_LOOP(),
+        SET_INT(oIntangibleTimer, 0),
+        CALL_NATIVE('bhv_bully_loop'),
+    END_LOOP(),
+]
+
+export const bhvBigBullyWithMinions = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, bully_seg5_anims_0500470C),
+    SET_HOME(),
+    CALL_NATIVE('bhv_big_bully_init'),
+    CALL_NATIVE('bhv_big_bully_with_minions_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_big_bully_with_minions_loop'),
+    END_LOOP(),
+]
+
+/*export const bhvBigChillBully = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, chilly_chief_seg6_anims_06003994),
+    DROP_TO_FLOOR(),
+    SET_HOME(),
+    SET_INT(oBullySubtype, 0x0010),
+    CALL_NATIVE('bhv_big_bully_init'),
+    BEGIN_LOOP(),
+        SET_INT(oIntangibleTimer, 0),
+        CALL_NATIVE('bhv_bully_loop'),
+    END_LOOP(),
+]*/
 
 export const bhvGoomba = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_PUSHABLE, name: 'bhvGoomba' } },
@@ -2258,6 +2299,8 @@ gLinker.behaviors.bhvAirborneStarCollectWarp = bhvAirborneStarCollectWarp
 gLinker.behaviors.bhvAirborneWarp = bhvAirborneWarp
 gLinker.behaviors.bhvBalconyBigBoo = bhvBalconyBigBoo
 gLinker.behaviors.bhvBbhTumblingBridge = bhvBbhTumblingBridge
+gLinker.behaviors.bhvBigBully = bhvBigBully
+gLinker.behaviors.bhvBigBullyWithMinions = bhvBigBullyWithMinions
 gLinker.behaviors.bhvBird = bhvBird
 gLinker.behaviors.bhvBitfsSinkingPlatforms = bhvBitfsSinkingPlatforms
 gLinker.behaviors.bhvBitfsSinkingCagePlatform = bhvBitfsSinkingCagePlatform
@@ -2358,6 +2401,7 @@ gLinker.behaviors.bhvShallowWaterSplash = bhvShallowWaterSplash
 gLinker.behaviors.bhvShallowWaterWave = bhvShallowWaterWave
 gLinker.behaviors.bhvSingleCoinGetsSpawned = bhvSingleCoinGetsSpawned
 gLinker.behaviors.bhvSlidingPlatform2 = bhvSlidingPlatform2
+gLinker.behaviors.bhvSmallBully = bhvSmallBully
 gLinker.behaviors.bhvSmoke = bhvSmoke
 gLinker.behaviors.bhvSnowParticleSpawner = bhvSnowParticleSpawner
 gLinker.behaviors.bhvSparkle = bhvSparkle

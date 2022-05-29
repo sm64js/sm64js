@@ -38,12 +38,17 @@ import { ACT_IDLE, ACT_PANTING, ACT_STANDING_AGAINST_WALL, ACT_CROUCHING, ACT_DI
 
          ACT_SHOCKED, ACT_WATER_SHOCKED, ACT_LAVA_BOOST, ACT_BURNING_JUMP, ACT_BURNING_FALL,
 
-         MARIO_UNKNOWN_18
+         MARIO_UNKNOWN_18,
+         update_mario_sound_and_camera,
+         ACT_BACKWARD_AIR_KB,
+         ACT_SOFT_BACKWARD_GROUND_KB,
+         ACT_FORWARD_AIR_KB,
+         ACT_SOFT_FORWARD_GROUND_KB
 } from "./Mario"
 
 import { WARP_OP_WARP_OBJECT, WARP_OP_WARP_FLOOR } from "./LevelUpdate"
 
-import { SOUND_MARIO_WAAAOOOW } from "../include/sounds"
+import { SOUND_MARIO_EEUH, SOUND_MARIO_WAAAOOOW, SOUND_OBJ_BULLY_METAL } from "../include/sounds"
 
 import {
     DIALOG_022, DIALOG_023, DIALOG_024, DIALOG_025, DIALOG_026, DIALOG_027, DIALOG_028, DIALOG_029
@@ -53,10 +58,11 @@ import * as MarioConstants from "../include/mario_constants"
 
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos,
          oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosY, oPosZ, oMoveAngleYaw,
-         oBehParams
+         oBehParams,
+         oForwardVel
 } from "../include/object_constants"
 
-import { atan2s } from "../engine/math_util"
+import { atan2s, sqrtf } from "../engine/math_util"
 import { sins, coss, int16, s16 } from "../utils"
 import { SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND, SURFACE_BURNING } from "../include/surface_terrains"
 import { level_trigger_warp } from "./LevelUpdate"
@@ -780,6 +786,131 @@ const interact_flame = (m, o) => {
     return false
 }
 
+const init_bully_collision_data = (data, posX, posZ, forwardVel, yaw, conversionRatio, radius) => {
+    if (forwardVel < 0.0) {
+        forwardVel *= -1.0
+        yaw += 0x8000
+    }
+
+    data.radius = radius
+    data.conversionRatio = conversionRatio
+    data.posX = posX
+    data.posZ = posZ
+    data.velX = forwardVel * sins(yaw)
+    data.velZ = forwardVel * coss(yaw)
+}
+
+const transfer_bully_speed = (obj, obj2) => {
+    let rx = obj2.posX - obj.posX
+    let rz = obj2.posX - obj.posZ
+
+    //! Bully NaN crash
+    let projectedV1 = (rx * obj.velX + rz * obj.velZ) / (rx * rx + rz * rz)
+    let projectedV2 = (-rx * obj.velX - rz * obj.velZ) / (rx * rx + rz * rz)
+
+    // Kill speed along r. Convert one object's speed along r and transfer it to
+    // the other object.
+    obj2.velX += obj2.conversionRatio * projectedV1 * rx - projectedV2 * -rx
+    obj2.velZ += obj2.conversionRatio * projectedV1 * rz - projectedV2 * -rz
+
+    obj.velX += -projectedV1 * rx + obj.conversionRatio * projectedV2 * -rx
+    obj.velZ += -projectedV1 * rz + obj.conversionRatio * projectedV2 * -rz
+
+    //! Bully battery
+}
+
+const bully_knock_back_mario = (mario) => {
+    let marioData = {}
+    let bullyData = {}
+    let newMarioYaw
+    let newBullyYaw
+    let bonkAction = 0
+    let bully = mario.interactObj
+    
+    //! Conversion ratios multiply to more than 1 (could allow unbounded speed
+    // with bonk cancel - but this isn't important for regular bully battery)
+    let bullyToMarioRatio = bully.hitboxRadius * 3 / 53
+    let marioToBullyRatio = 53.0 / bully.hitboxRadius
+
+    init_bully_collision_data(marioData, mario.pos[0], mario.pos[2], mario.forwardVel, mario.faceAngle[1], bullyToMarioRatio, 52.0)
+
+    init_bully_collision_data(bullyData, bully.rawData[oPosX], bully.rawData[oPosZ], bully.rawData[oForwardVel], bully.rawData[oMoveAngleYaw], bullyToMarioRatio, bully.hitboxRadius + 2.0)
+
+    if (mario.forwardVel != 0.0) {
+        transfer_bully_speed(marioData, bullyData)
+    } else {
+        transfer_bully_speed(bullyData, marioData)
+    }
+
+    newMarioYaw = atan2s(marioData.velZ, marioData.velX)
+    newBullyYaw = atan2s(bullyData.velZ, bullyData.velX)
+
+    let marioDYaw = newMarioYaw - mario.faceAngle[1]
+    let bullyDYaw = newBullyYaw - bully.rawData[oMoveAngleYaw]
+
+    mario.faceAngle[1] = newMarioYaw
+    mario.forwardVel = sqrtf(marioData.velX * marioData.velX + marioData.velZ * marioData.velZ)
+    mario.pos[0] = marioData.posX
+    mario.pos[2] = marioData.posZ
+
+    if (marioDYaw < -0x4000 || marioDYaw > 0x4000) {
+        mario.faceAngle[1] += 0x8000
+        mario.forwardVel *= -1.0
+
+        if (mario.action & ACT_FLAG_AIR) {
+            bonkAction = ACT_BACKWARD_AIR_KB
+        } else {
+            bonkAction = ACT_SOFT_BACKWARD_GROUND_KB
+        }
+    } else {
+        if (mario.action & ACT_FLAG_AIR) {
+            bonkAction = ACT_FORWARD_AIR_KB
+        } else {
+            bonkAction = ACT_SOFT_FORWARD_GROUND_KB
+        }
+    }
+
+    return bonkAction
+}
+
+const interact_bully = (m, o) => {
+    let interaction
+    if (m.flags & MARIO_METAL_CAP) {
+        interaction = INT_FAST_ATTACK_OR_SHELL
+    } else {
+        interaction = determine_interaction(m, o)
+    }
+
+    m.interactObj = o
+
+    if (interaction & INT_ATTACK_NOT_FROM_BELOW) {
+        push_mario_out_of_object(m, o, 5.0)
+
+        m.forwardVel = -16.0
+        o.rawData[oMoveAngleYaw] = m.faceAngle[1]
+        o.rawData[oForwardVel] = 3392.0 / o.hitboxRadius
+
+        attack_object(o, interaction)
+        bounce_back_from_attack(m, interaction)
+        return true
+    } else if (!sInvulnerable && !(m.flags & MARIO_VANISH_CAP) && !(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+        o.rawData[oInteractStatus] = INT_STATUS_INTERACTED
+        m.invincTimer = 2
+
+        update_mario_sound_and_camera(m)
+        play_sound(SOUND_MARIO_EEUH, m.marioObj.gfx.cameraToObject)
+        play_sound(SOUND_OBJ_BULLY_METAL, m.marioObj.gfx.cameraToObject)
+
+        push_mario_out_of_object(m, o, 5.0)
+        drop_and_set_mario_action(m, bully_knock_back_mario(m), 0)
+        // queue_rumble_data(5, 80)
+        // for if you guys figure out rumble pak :)
+        return true
+    }
+
+    return false
+}
+
 const interact_shock = (m, o) => {
     if (!sInvulnerable && !(m.flags & MARIO_VANISH_CAP)
         && !(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
@@ -1267,7 +1398,7 @@ const sInteractionHandlers = [
     { interactType: INTERACT_FLAME, handler: interact_flame },
     { interactType: INTERACT_SNUFIT_BULLET, handler: null },
     { interactType: INTERACT_CLAM_OR_BUBBA, handler: null },
-    { interactType: INTERACT_BULLY, handler: null },
+    { interactType: INTERACT_BULLY, handler: interact_bully },
     { interactType: INTERACT_SHOCK, handler: interact_shock },
     { interactType: INTERACT_BOUNCE_TOP2, handler: null },
     { interactType: INTERACT_MR_BLIZZARD, handler: interact_mr_blizzard },

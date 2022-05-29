@@ -3,7 +3,7 @@ import * as Mario from "./Mario"
 import { atan2s,
          vec3f_copy,
          vec3s_set } from "../engine/math_util"
-import { s16 } from "../utils"
+import { coss, s16, sins } from "../utils"
 import { ceil } from "mathjs"
 import { SURFACE_HANGABLE,
          SURFACE_BURNING,

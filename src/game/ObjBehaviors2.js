@@ -13,6 +13,7 @@ import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { coss, sins, int16 } from "../utils"
 import { PLATFORM_ON_TRACK_BP_RETURN_TO_START } from "./behaviors/platform_on_track.inc"
 import { MODEL_TRAJECTORY_MARKER_BALL } from "../include/model_ids"
+import { bhvTrackBall } from "./BehaviorData"
 
 export const ATTACK_HANDLER_NOP = 0
 export const ATTACK_HANDLER_DIE_IF_HEALTH_NON_POSITIVE = 1

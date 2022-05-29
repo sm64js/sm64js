@@ -28,7 +28,17 @@ export const bully_seg5_dl_050002E0 = [
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, bully_seg5_texture_050000E0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
-    gsSPVertex(bully_seg5_vertex_05000000, 14, 0)
+    gsSPVertex(bully_seg5_vertex_05000000, 14, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+    gsSP2Triangles( 5,  4,  6, 0x0,  6,  7,  5, 0x0),
+    gsSP2Triangles( 5,  7,  8, 0x0,  5,  8,  3, 0x0),
+    gsSP2Triangles( 3,  8,  9, 0x0,  3,  9,  6, 0x0),
+    gsSP2Triangles( 6,  4,  3, 0x0,  6,  9,  7, 0x0),
+    gsSP2Triangles(10, 11,  2, 0x0,  0, 12, 10, 0x0),
+    gsSP2Triangles(10, 12, 11, 0x0,  2,  1, 10, 0x0),
+    gsSP2Triangles(10,  1,  0, 0x0,  2, 11, 13, 0x0),
+    gsSP2Triangles( 0, 13, 12, 0x0,  2, 13,  0, 0x0),
+    gsSPEndDisplayList(),
 ].flat()
 
 // 0x05000398 - 0x05000408

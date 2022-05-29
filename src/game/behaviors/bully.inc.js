@@ -280,6 +280,11 @@ export const bhv_bully_loop = () => {
             bully_step()
             break
 
+        case BULLY_ACT_KNOCKBACK:
+            bully_act_knockback();
+            bully_step();
+            break
+
         case BULLY_ACT_BACK_UP:
             bully_act_back_up()
             bully_step()

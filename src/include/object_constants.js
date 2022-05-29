@@ -549,6 +549,11 @@ export const oBlueFishRandomVel    = 0x1B
 export const oBlueFishRandomTime   = 0x1C
 export const oBlueFishRandomAngle  = 0x1E
 
+/* Fire spitter */
+    /* oAction */
+export const FIRE_SPITTER_ACT_IDLE      = 0
+export const FIRE_SPITTER_ACT_SPIT_FIRE = 1
+
 /* Fish Group */
 export const oFishWaterLevel      = 0x1B
 export const oFishGoalY           = 0x1C

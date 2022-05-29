@@ -63,6 +63,7 @@ import * as _door                     from "./behaviors/door.inc"
 import * as _exclamation_box          from "./behaviors/exclamation_box.inc"
 import * as _falling_rising_platform  from "./behaviors/falling_rising_platform.inc"
 import * as _ferris_wheel             from "./behaviors/ferris_wheel.inc"
+import * as _fire_spitter             from "./behaviors/fire_spitter.inc"
 import * as _fish                     from "./behaviors/fish.inc"
 import * as _file_select              from "./behaviors/file_select.inc"
 import * as _flamethrower             from "./behaviors/flamethrower.inc"
@@ -971,6 +972,16 @@ export const bhvSlidingPlatform2 = [
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_sliding_plat_2_loop'),
         CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
+export const bhvFireSpitter = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BILLBOARD(),
+    SCALE(/*Unused*/ 0, /*Field*/ 40),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_fire_spitter_update'),
     END_LOOP(),
 ]
 
@@ -2348,6 +2359,7 @@ gLinker.behaviors.bhvExclamationBox = bhvExclamationBox
 gLinker.behaviors.bhvExplosion = bhvExplosion
 gLinker.behaviors.bhvFerrisWheelAxle = bhvFerrisWheelAxle
 gLinker.behaviors.bhvFerrisWheelPlatform = bhvFerrisWheelPlatform
+gLinker.behaviors.bhvFireSpitter = bhvFireSpitter
 gLinker.behaviors.bhvFish = bhvFish
 gLinker.behaviors.bhvFishSpawner = bhvFishSpawner
 gLinker.behaviors.bhvFlamethrower = bhvFlamethrower

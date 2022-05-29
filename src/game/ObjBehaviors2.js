@@ -3,9 +3,9 @@ import { oFlags, OBJ_FLAG_30, oInteractType, oDamageOrCoinValue, oHealth, oNumLo
          oTimer, oForwardVel, oVelX, oVelY, oVelZ, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveAngleYaw, oMoveFlags,
          OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_HIT_WALL, OBJ_MOVE_ABOVE_LAVA,
          oHomeX, oHomeY, oHomeZ, oPosX, oPosY, oPosZ, oDistanceToMario, oAngleToMario, OBJ_MOVE_HIT_EDGE,
-         oMoveAnglePitch, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oDeathSound, oBehParams, oPlatformOnTrackPrevWaypoint, oPlatformOnTrackPrevWaypointFlags, oPlatformOnTrackStartWaypoint, oPlatformOnTrackBaseBallIndex } from "../include/object_constants"
+         oMoveAnglePitch, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oDeathSound, oBehParams, oPlatformOnTrackPrevWaypoint, oPlatformOnTrackPrevWaypointFlags, oPlatformOnTrackStartWaypoint, oPlatformOnTrackBaseBallIndex, oSmallPiranhaFlameStartSpeed, oSmallPiranhaFlameEndSpeed, oSmallPiranhaFlameModel } from "../include/object_constants"
 
-import { cur_obj_become_tangible, cur_obj_extend_animation_if_at_end, cur_obj_become_intangible, cur_obj_hide, obj_mark_for_deletion, obj_angle_to_object, cur_obj_update_floor_and_walls, cur_obj_move_standard, abs_angle_diff, cur_obj_rotate_yaw_toward, cur_obj_reflect_move_angle_off_wall, approach_symmetric, obj_spawn_loot_yellow_coins, spawn_mist_particles, approach_s16_symmetric, spawn_object_relative} from "./ObjectHelpers"
+import { cur_obj_become_tangible, cur_obj_extend_animation_if_at_end, cur_obj_become_intangible, cur_obj_hide, obj_mark_for_deletion, obj_angle_to_object, cur_obj_update_floor_and_walls, cur_obj_move_standard, abs_angle_diff, cur_obj_rotate_yaw_toward, cur_obj_reflect_move_angle_off_wall, approach_symmetric, obj_spawn_loot_yellow_coins, spawn_mist_particles, approach_s16_symmetric, spawn_object_relative, spawn_object_relative_with_scale} from "./ObjectHelpers"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { INT_STATUS_INTERACTED, INT_STATUS_ATTACK_MASK, INT_STATUS_ATTACKED_MARIO, ATTACK_KICK_OR_TRIP, ATTACK_FAST_ATTACK } from "./Interaction"
 import { atan2s, sqrtf } from "../engine/math_util"
@@ -614,5 +614,16 @@ export const treat_far_home_as_mario = (threshold) => {
         if (distance > threshold) {
             o.rawData[oDistanceToMario] = 20000.0
         }
+    }
+}
+
+export const obj_spit_fire = (relativePosX, relativePosY, relativePosZ, scale, model, startSpeed, endSpeed, movePitch) => {
+    obj = spawn_object_relative_with_scale(1, relativePosX, relativePosY, relativePosZ, scale, o, model, bhvSmallPiranhaFlame)
+
+    if (obj != null) {
+        obj.rawData[oSmallPiranhaFlameStartSpeed] = startSpeed
+        obj.rawData[oSmallPiranhaFlameEndSpeed] = endSpeed
+        obj.rawData[oSmallPiranhaFlameModel] = model
+        obj.rawData[oMoveAnglePitch] = movePitch
     }
 }

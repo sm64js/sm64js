@@ -23,6 +23,7 @@ import { dist_between_objects, obj_angle_to_object, spawn_object_at_origin, obj_
 import { s16, s32, random_float } from "../utils"
 
 const obj_and_int = (object, field, value) => { object.rawData[field] &= s32(value) }
+const cur_obj_add_int = (field, value) => { gLinker.ObjectListProcessor.gCurrentObject.rawData[field] += value }
 
 class BehaviorCommands {
 
@@ -326,6 +327,16 @@ class BehaviorCommands {
         return this.BHV_PROC_CONTINUE
     }
 
+    animate_texture(args) {
+
+        if ((window.gGlobalTimerr % args.rate) == 0) {
+            cur_obj_add_int(args.field, 1)
+        }
+
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
     or_int(args) {
         const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
         const objectOffset = args.field
@@ -609,6 +620,7 @@ export const LOAD_ANIMATIONS = (...args)           => {return {command: Beh.load
 export const LOAD_COLLISION_DATA = (...args)       => {return {command: Beh.load_collision_data, args: {data: args[0]}}}
 export const OR_INT = (...args)                    => {return {command: Beh.or_int, args: {field: args[0], value: args[1]}}}
 export const PARENT_BIT_CLEAR = (...args)          => {return {command: Beh.parent_bit_clear, args: {field: args[0], value: args[1]}}}
+export const ANIMATE_TEXTURE = (...args)           => {return {command: Beh.animate_texture, args: {field: args[0], value: args[1]}}}
 export const RETURN = (...args)                    => {return {command: Beh.return}}
 export const SCALE = (...args)                     => {return {command: Beh.scale, args: {percent: args[1]}}}
 export const SET_FLOAT = (...args)                 => {return {command: Beh.set_objectData_value, args: {field: args[0], value: args[1]}}}

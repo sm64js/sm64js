@@ -1192,6 +1192,15 @@ export const cur_obj_was_attacked_or_ground_pounded = () => {
     return attacked
 }
 
+export const spawn_object_with_scale = (parent, model, behavior, scale) => {
+    let obj = spawn_object_at_origin(parent, 0, model, behavior)
+
+    obj_copy_pos_and_angle(obj, parent)
+    obj_scale(obj, scale)
+
+    return obj
+}
+
 export const obj_copy_behavior_params = (dst, src) => {
     dst.rawData[oBehParams] = src.rawData[oBehParams]
     dst.rawData[oBehParams2ndByte] = src.rawData[oBehParams2ndByte]

@@ -63,7 +63,6 @@ import * as _door                     from "./behaviors/door.inc"
 import * as _exclamation_box          from "./behaviors/exclamation_box.inc"
 import * as _falling_rising_platform  from "./behaviors/falling_rising_platform.inc"
 import * as _ferris_wheel             from "./behaviors/ferris_wheel.inc"
-import * as _fire_spitter             from "./behaviors/fire_spitter.inc"
 import * as _fish                     from "./behaviors/fish.inc"
 import * as _file_select              from "./behaviors/file_select.inc"
 import * as _flamethrower             from "./behaviors/flamethrower.inc"
@@ -972,38 +971,6 @@ export const bhvSlidingPlatform2 = [
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_sliding_plat_2_loop'),
         CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
-    END_LOOP(),
-]
-
-export const bhvSmallPiranhaFlame = [
-    BEGIN(OBJ_LIST_GENACTOR),
-    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    BILLBOARD(),
-    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ 0, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
-    BEGIN_LOOP(),
-        CALL_NATIVE('bhv_small_piranha_flame_loop'),
-        ADD_INT(oAnimState, 1),
-    END_LOOP(),
-]
-
-export const bhvFireSpitter = [
-    BEGIN(OBJ_LIST_GENACTOR),
-    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    BILLBOARD(),
-    SCALE(/*Unused*/ 0, /*Field*/ 40),
-    BEGIN_LOOP(),
-        CALL_NATIVE('bhv_fire_spitter_update'),
-    END_LOOP(),
-]
-
-export const bhvFlyguyFlame = [
-    BEGIN(OBJ_LIST_UNIMPORTANT),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    BILLBOARD(),
-    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 0, /*Gravity*/ 200, /*Bounciness*/ 0, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
-    BEGIN_LOOP(),
-        CALL_NATIVE('bhv_fly_guy_flame_loop'),
-        ADD_INT(oAnimState, 1),
     END_LOOP(),
 ]
 
@@ -2397,13 +2364,11 @@ gLinker.behaviors.bhvExclamationBox = bhvExclamationBox
 gLinker.behaviors.bhvExplosion = bhvExplosion
 gLinker.behaviors.bhvFerrisWheelAxle = bhvFerrisWheelAxle
 gLinker.behaviors.bhvFerrisWheelPlatform = bhvFerrisWheelPlatform
-gLinker.behaviors.bhvFireSpitter = bhvFireSpitter
 gLinker.behaviors.bhvFish = bhvFish
 gLinker.behaviors.bhvFishSpawner = bhvFishSpawner
 gLinker.behaviors.bhvFlame = bhvFlame
 gLinker.behaviors.bhvFlamethrower = bhvFlamethrower
 gLinker.behaviors.bhvFloorTrapInCastle = bhvFloorTrapInCastle
-gLinker.behaviors.bhvFlyguyFlame = bhvFlyguyFlame
 gLinker.behaviors.bhvFlyingWarp = bhvFlyingWarp
 gLinker.behaviors.bhvFreeBowlingBall = bhvFreeBowlingBall
 gLinker.behaviors.bhvGhostHuntBigBoo = bhvGhostHuntBigBoo
@@ -2454,7 +2419,6 @@ gLinker.behaviors.bhvShallowWaterWave = bhvShallowWaterWave
 gLinker.behaviors.bhvSingleCoinGetsSpawned = bhvSingleCoinGetsSpawned
 gLinker.behaviors.bhvSlidingPlatform2 = bhvSlidingPlatform2
 gLinker.behaviors.bhvSmallBully = bhvSmallBully
-gLinker.behaviors.bhvSmallPiranhaFlame = bhvSmallPiranhaFlame
 gLinker.behaviors.bhvSmoke = bhvSmoke
 gLinker.behaviors.bhvSnowParticleSpawner = bhvSnowParticleSpawner
 gLinker.behaviors.bhvSparkle = bhvSparkle

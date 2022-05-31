@@ -13,7 +13,7 @@ import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { coss, sins, int16 } from "../utils"
 import { PLATFORM_ON_TRACK_BP_RETURN_TO_START } from "./behaviors/platform_on_track.inc"
 import { MODEL_TRAJECTORY_MARKER_BALL } from "../include/model_ids"
-import { bhvSmallPiranhaFlame, bhvTrackBall } from "./BehaviorData"
+import { bhvTrackBall } from "./BehaviorData"
 
 export const ATTACK_HANDLER_NOP = 0
 export const ATTACK_HANDLER_DIE_IF_HEALTH_NON_POSITIVE = 1
@@ -65,6 +65,30 @@ export const approach_number_ptr = (o, px, target, delta) => {
         o[px] = target
         return 1
     }
+    return 0
+}
+
+export const obj_grow_then_shrink = (scaleVel, shootFireScale, endScale) => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.rawData[oTimer] < 2) {
+
+        o.gfx.scale[0] += scaleVel
+        
+        scaleVel -= 0.01
+        if (scaleVel > -0.03) {
+            o.rawData[oTimer] = 0
+        }
+    } else if (o.rawData[oTimer] > 10) {
+
+        if (approach_f32_ptr(o.gfx.scale[0], endScale, 0.05)) {
+            return -1
+        } else if (scaleVel != 0.0 /*&& o.gfx.scale[0] < shootFireScale*/) {
+            scaleVel = 0.0;
+            return 1
+        }
+    }
+
     return 0
 }
 
@@ -617,8 +641,10 @@ export const treat_far_home_as_mario = (threshold) => {
     }
 }
 
-export const obj_spit_fire = (relativePosX, relativePosY, relativePosZ, scale, model, startSpeed, endSpeed, movePitch) => {
-    obj = spawn_object_relative_with_scale(1, relativePosX, relativePosY, relativePosZ, scale, o, model, bhvSmallPiranhaFlame)
+/*export const obj_spit_fire = (relativePosX, relativePosY, relativePosZ, scale, model, startSpeed, endSpeed, movePitch) => {
+    const o = ObjectListProc.gCurrentObject
+
+    let obj = spawn_object_relative_with_scale(1, relativePosX, relativePosY, relativePosZ, scale, o, model, bhvSmallPiranhaFlame)
 
     if (obj != null) {
         obj.rawData[oSmallPiranhaFlameStartSpeed] = startSpeed
@@ -626,4 +652,4 @@ export const obj_spit_fire = (relativePosX, relativePosY, relativePosZ, scale, m
         obj.rawData[oSmallPiranhaFlameModel] = model
         obj.rawData[oMoveAnglePitch] = movePitch
     }
-}
+}*/

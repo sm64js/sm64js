@@ -21,8 +21,6 @@ export const bhv_tumbling_bridge_platform_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
-    console.log(o.rawData[oAction])
-
     switch (o.rawData[oAction]) {
         case 0:
             if (gMarioObject.platform == o) {

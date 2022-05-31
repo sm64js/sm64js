@@ -52,6 +52,7 @@ import { haunted_cage_geo } from "../actors/haunted_cage/geo.inc"
 // dls
 import { cannon_lid_seg8_dl_080048E0              } from "../actors/cannon_lid/model.inc"
 import { exclamation_box_outline_seg8_dl_08025F08 } from "../actors/exclamation_box_outline/model.inc"
+import { boo_castle_geo } from "../actors/boo_castle/geo.inc"
 
 
 export const script_func_global_1 = () => { return [
@@ -213,7 +214,7 @@ export const script_func_global_15 = () => { return [
 
 export const script_func_global_16 = () => { return [
     // LOAD_MODEL_FROM_GEO(MODEL.MIPS,                    mips_geo),
-    // LOAD_MODEL_FROM_GEO(MODEL.BOO_CASTLE,              boo_castle_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.BOO_CASTLE,              boo_castle_geo),
     // LOAD_MODEL_FROM_GEO(MODEL.LAKITU,                  lakitu_geo),
     // LOAD_MODEL_FROM_GEO(MODEL.TOAD,                    toad_geo),
     RETURN(),

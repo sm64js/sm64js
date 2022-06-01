@@ -10,6 +10,7 @@ import { loadSocket } from "../index"
 import * as Gbi from "../include/gbi"
 import { AreaInstance as Area, WARP_TRANSITION_FADE_INTO_COLOR } from "./Area"
 import { flagObjects } from "./behaviors/bhv_castle_flag_init.inc"
+import { LEVEL_CCM, LEVEL_SL } from "../levels/level_defines_constants"
 
 class Game {
     constructor() {
@@ -134,7 +135,8 @@ window.warp_to = (id) => {
         setTimeout(() => {
             submitPlayerName()
             warping = false
-        }, 2500) // maybe base this off of ping somehow?
+        }, window.sm64js.latency * 50)
+	if (id != LEVEL_CCM || id != LEVEL_SL) { window.sm64js.snow = false }
         // window.selectedMap = id
     }, 1000)
 }

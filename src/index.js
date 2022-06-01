@@ -375,8 +375,6 @@ document.getElementById("acceptRules").addEventListener('click', () => {
     document.getElementById("rules").hidden = true
     document.getElementById("signboxBorder").classList.remove("shunned")
     document.getElementById("signboxBorder").disabled = false
-    document.getElementById("anniversary").play()
-    document.getElementById("anniversary").loop = true
 })
 
 window.deleteRom = () => {
@@ -397,9 +395,6 @@ export const startGame = () => {
     document.getElementById("pvpButton").hidden = true
 
     document.getElementById("connectedMsg").hidden = false
-
-    document.getElementById("anniversary").play()
-    document.getElementById("anniversary").loop = true
 	
     main_func()
 }

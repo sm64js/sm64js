@@ -177,7 +177,7 @@ class LevelCommands {
     }
 
     set_background_music(settingsPreset, seq) {
-        /*let m
+        let m
         switch(seq) {
             case 3:
                 m = document.getElementById("grass")
@@ -203,7 +203,7 @@ class LevelCommands {
                 m.volume = 0.5
                 m.play()
                 break
-        }*/
+        }
         this.sCurrentScript.index++
     }
 

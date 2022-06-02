@@ -242,6 +242,26 @@ export const HOMING_AMP_ACT_CHASE = 2
 export const HOMING_AMP_ACT_GIVE_UP = 3
 export const HOMING_AMP_ACT_ATTACK_COOLDOWN = 4
 
+/* Bully (all variants) */
+    /* oBehParams2ndByte */
+export const BULLY_BP_SIZE_SMALL = 0
+export const BULLY_BP_SIZE_BIG   = 1
+
+    /* oAction */
+export const BULLY_ACT_PATROL              = 0
+export const BULLY_ACT_CHASE_MARIO         = 1
+export const BULLY_ACT_KNOCKBACK           = 2
+export const BULLY_ACT_BACK_UP             = 3
+export const BULLY_ACT_INACTIVE            = 4
+export const BULLY_ACT_ACTIVATE_AND_FALL   = 5
+export const BULLY_ACT_LAVA_DEATH          = 100
+export const BULLY_ACT_DEATH_PLANE_DEATH   = 101
+
+    /* oBullySubtype */
+export const BULLY_STYPE_GENERIC  = 0
+export const BULLY_STYPE_MINION   = 1
+export const BULLY_STYPE_CHILL    = 16
+
 /* Arrow Lift */
 export const oArrowLiftDisplacement        = 0x1B
 export const oArrowLiftUnk100              = 0x1E
@@ -529,6 +549,11 @@ export const oBlueFishRandomVel    = 0x1B
 export const oBlueFishRandomTime   = 0x1C
 export const oBlueFishRandomAngle  = 0x1E
 
+/* Fire spitter */
+    /* oAction */
+export const FIRE_SPITTER_ACT_IDLE      = 0
+export const FIRE_SPITTER_ACT_SPIT_FIRE = 1
+
 /* Fish Group */
 export const oFishWaterLevel      = 0x1B
 export const oFishGoalY           = 0x1C
@@ -809,6 +834,9 @@ export const oFirePiranhaPlantDeathSpinVel    = 0x1F
 export const oPitouneUnkF4  = 0x1B
 export const oPitouneUnkF8  = 0x1C
 export const oPitouneUnkFC  = 0x1D
+
+/* Falling Rising Bitfs Platform */
+export const oBitfsPlatformTimer = 0x1B
 
 /* Platform */
 export const oPlatformTimer   = 0x1B

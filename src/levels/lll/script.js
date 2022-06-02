@@ -26,7 +26,7 @@ import {
 } from "../../include/model_ids"
 
 import {
-    script_func_global_1, /*script_func_global_3,*/ script_func_global_18
+    script_func_global_1, script_func_global_3, script_func_global_18
 } from "../global_scripts"
 
 import { lll_geo_0009E0 } from "./areas/1/4/geo.inc"
@@ -220,7 +220,7 @@ export const level_lll_entry = [
     INIT_LEVEL(),
     MARIO(/*model*/ MODEL_MARIO,  /*behParam*/ 0x00000001,  /*beh*/ 'bhvMario'),
     JUMP_LINK(script_func_global_1),
-    //JUMP_LINK(script_func_global_3),
+    JUMP_LINK(script_func_global_3),
     JUMP_LINK(script_func_global_18),
     LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_03,                   lll_geo_0009E0),
     LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_04,                   lll_geo_0009F8),

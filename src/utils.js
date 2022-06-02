@@ -65,3 +65,11 @@ export const random_int16 = () => {
 export const random_float = () => {
     return Math.random()
 }
+
+export const random_sign = () => {
+    if (random_u16() >= 0x7FFF) {
+        return 1
+    } else {
+        return -1
+    }
+}

@@ -3,9 +3,9 @@ import { oFlags, OBJ_FLAG_30, oInteractType, oDamageOrCoinValue, oHealth, oNumLo
          oTimer, oForwardVel, oVelX, oVelY, oVelZ, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oMoveAngleYaw, oMoveFlags,
          OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_MASK_IN_WATER, OBJ_MOVE_HIT_WALL, OBJ_MOVE_ABOVE_LAVA,
          oHomeX, oHomeY, oHomeZ, oPosX, oPosY, oPosZ, oDistanceToMario, oAngleToMario, OBJ_MOVE_HIT_EDGE,
-         oMoveAnglePitch, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oDeathSound, oBehParams, oPlatformOnTrackPrevWaypoint, oPlatformOnTrackPrevWaypointFlags, oPlatformOnTrackStartWaypoint, oPlatformOnTrackBaseBallIndex } from "../include/object_constants"
+         oMoveAnglePitch, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oDeathSound, oBehParams, oPlatformOnTrackPrevWaypoint, oPlatformOnTrackPrevWaypointFlags, oPlatformOnTrackStartWaypoint, oPlatformOnTrackBaseBallIndex, oSmallPiranhaFlameStartSpeed, oSmallPiranhaFlameEndSpeed, oSmallPiranhaFlameModel } from "../include/object_constants"
 
-import { cur_obj_become_tangible, cur_obj_extend_animation_if_at_end, cur_obj_become_intangible, cur_obj_hide, obj_mark_for_deletion, obj_angle_to_object, cur_obj_update_floor_and_walls, cur_obj_move_standard, abs_angle_diff, cur_obj_rotate_yaw_toward, cur_obj_reflect_move_angle_off_wall, approach_symmetric, obj_spawn_loot_yellow_coins, spawn_mist_particles, approach_s16_symmetric, spawn_object_relative} from "./ObjectHelpers"
+import { cur_obj_become_tangible, cur_obj_extend_animation_if_at_end, cur_obj_become_intangible, cur_obj_hide, obj_mark_for_deletion, obj_angle_to_object, cur_obj_update_floor_and_walls, cur_obj_move_standard, abs_angle_diff, cur_obj_rotate_yaw_toward, cur_obj_reflect_move_angle_off_wall, approach_symmetric, obj_spawn_loot_yellow_coins, spawn_mist_particles, approach_s16_symmetric, spawn_object_relative, spawn_object_relative_with_scale} from "./ObjectHelpers"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { INT_STATUS_INTERACTED, INT_STATUS_ATTACK_MASK, INT_STATUS_ATTACKED_MARIO, ATTACK_KICK_OR_TRIP, ATTACK_FAST_ATTACK } from "./Interaction"
 import { atan2s, sqrtf } from "../engine/math_util"
@@ -13,6 +13,7 @@ import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { coss, sins, int16 } from "../utils"
 import { PLATFORM_ON_TRACK_BP_RETURN_TO_START } from "./behaviors/platform_on_track.inc"
 import { MODEL_TRAJECTORY_MARKER_BALL } from "../include/model_ids"
+import { bhvTrackBall } from "./BehaviorData"
 
 export const ATTACK_HANDLER_NOP = 0
 export const ATTACK_HANDLER_DIE_IF_HEALTH_NON_POSITIVE = 1
@@ -25,8 +26,8 @@ export const ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED = 7
 export const ATTACK_HANDLER_SQUISHED_WITH_BLUE_COIN = 8
 
 export const POS_OP_SAVE_POSITION    = 0
-export const POS_OP_COMPUTE_VELOCITY = 0
-export const POS_OP_RESTORE_POSITION = 0
+export const POS_OP_COMPUTE_VELOCITY = 1
+export const POS_OP_RESTORE_POSITION = 2
 
 export const WAYPOINT_FLAGS_END = -1
 export const WAYPOINT_FLAGS_INITIALIZED = 0x8000
@@ -36,8 +37,6 @@ export const WAYPOINT_FLAGS_PLATFORM_ON_TRACK_PAUSE = 3
 let sObjSavedPosX
 let sObjSavedPosY
 let sObjSavedPosZ
-
-let trajIndex
 
 //this lived above random_linear_offset in the source,
 export const obj_roll_to_match_yaw_turn = (targetYaw, maxRoll, rollSpeed) => {
@@ -66,6 +65,30 @@ export const approach_number_ptr = (o, px, target, delta) => {
         o[px] = target
         return 1
     }
+    return 0
+}
+
+export const obj_grow_then_shrink = (scaleVel, shootFireScale, endScale) => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.rawData[oTimer] < 2) {
+
+        o.gfx.scale[0] += scaleVel
+        
+        scaleVel -= 0.01
+        if (scaleVel > -0.03) {
+            o.rawData[oTimer] = 0
+        }
+    } else if (o.rawData[oTimer] > 10) {
+
+        if (approach_f32_ptr(o.gfx.scale[0], endScale, 0.05)) {
+            return -1
+        } else if (scaleVel != 0.0 /*&& o.gfx.scale[0] < shootFireScale*/) {
+            scaleVel = 0.0;
+            return 1
+        }
+    }
+
     return 0
 }
 
@@ -161,21 +184,22 @@ export const obj_get_pitch_from_vel = () => {
 
 }
 
-export const obj_perform_position_op = (o, op) => {
+export const obj_perform_position_op = (op) => {
+    const o = ObjectListProc.gCurrentObject
     switch (op) {
-        case 'POS_OP_SAVE_POSITION':
+        case POS_OP_SAVE_POSITION:
             sObjSavedPosX = o.rawData[oPosX]
             sObjSavedPosY = o.rawData[oPosY]
             sObjSavedPosZ = o.rawData[oPosZ]
             break
 
-        case 'POS_OP_COMPUTE_VELOCITY':
+        case POS_OP_COMPUTE_VELOCITY:
             o.rawData[oVelX] = o.rawData[oPosX] - sObjSavedPosX
             o.rawData[oVelY] = o.rawData[oPosY] - sObjSavedPosY
             o.rawData[oVelZ] = o.rawData[oPosZ] - sObjSavedPosZ
             break
 
-        case 'POS_OP_RESTORE_POSITION':
+        case POS_OP_RESTORE_POSITION:
             o.rawData[oPosX] = sObjSavedPosX
             o.rawData[oPosY] = sObjSavedPosY
             o.rawData[oPosZ] = sObjSavedPosZ
@@ -184,7 +208,7 @@ export const obj_perform_position_op = (o, op) => {
 }
 
 export const platform_on_track_update_pos_or_spawn_ball = (ballIndex, x, y, z) => {
-    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const o = ObjectListProc.gCurrentObject
 
     let trackBall
     let nextWaypoint
@@ -201,7 +225,7 @@ export const platform_on_track_update_pos_or_spawn_ball = (ballIndex, x, y, z) =
         if (ballIndex != 0) {
             amountToMove = 300.0 * ballIndex
         } else {
-            obj_perform_position_op('POS_OP_SAVE_POSITION')
+            obj_perform_position_op(POS_OP_SAVE_POSITION)
             o.rawData[oPlatformOnTrackPrevWaypointFlags] = 0
             amountToMove = o.rawData[oForwardVel]
         }
@@ -255,6 +279,8 @@ export const platform_on_track_update_pos_or_spawn_ball = (ballIndex, x, y, z) =
 }
 
 export const obj_set_dist_from_home = (distFromHome) => {
+    const o = ObjectListProc.gCurrentObject
+
     o.rawData[oPosX] = o.rawData[oHomeX] + distFromHome * coss(o.rawData[oMoveAngleYaw])
     o.rawData[oPosZ] = o.rawData[oHomeZ] + distFromHome * sins(o.rawData[oMoveAngleYaw])
 }
@@ -263,14 +289,8 @@ export const obj_compute_vel_from_move_pitch = (speed) => {
     const o = ObjectListProc.gCurrentObject
     o.rawData[oForwardVel] = speed * coss(o.rawData[oMoveAnglePitch]);
     o.rawData[oVelY] = speed * -sins(o.rawData[oMoveAnglePitch]);
-    //Hey Joe! I cab't tell if I need to return some value here... the C had no return
-    //I think it has something to do with resolving these two vectors into a single number?
-    //I feel like the return should just be something like: return(o.rawData[oForwardVel] + o.rawData[oVelY])
 }
 
-//value was originally called as *value, I'm not sure if
-//there's an equivalent in js (pointer?), but it seemed like
-//something I can ignore based on how it's called in obj_roll_to_match_yaw_turn
 export const clamp_s16 = (value, minimum, maximum) => {
     if (value <= minimum) {
         value = minimum;
@@ -620,3 +640,16 @@ export const treat_far_home_as_mario = (threshold) => {
         }
     }
 }
+
+/*export const obj_spit_fire = (relativePosX, relativePosY, relativePosZ, scale, model, startSpeed, endSpeed, movePitch) => {
+    const o = ObjectListProc.gCurrentObject
+
+    let obj = spawn_object_relative_with_scale(1, relativePosX, relativePosY, relativePosZ, scale, o, model, bhvSmallPiranhaFlame)
+
+    if (obj != null) {
+        obj.rawData[oSmallPiranhaFlameStartSpeed] = startSpeed
+        obj.rawData[oSmallPiranhaFlameEndSpeed] = endSpeed
+        obj.rawData[oSmallPiranhaFlameModel] = model
+        obj.rawData[oMoveAnglePitch] = movePitch
+    }
+}*/

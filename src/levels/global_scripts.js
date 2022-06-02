@@ -18,6 +18,7 @@ import { bowling_ball_geo            } from "../actors/bowling_ball/geo.inc"
 import { bowling_ball_track_geo      } from "../actors/bowling_ball/geo.inc"
 import { breakable_box_geo           } from "../actors/breakable_box/geo.inc"
 import { breakable_box_small_geo     } from "../actors/breakable_box/geo.inc"
+import { bully_geo                   } from "../actors/bully/geo.inc"
 import { cannon_barrel_geo           } from "../actors/cannon_barrel/geo.inc"
 import { cannon_base_geo             } from "../actors/cannon_base/geo.inc"
 import { chain_chomp_geo             } from "../actors/chain_chomp/geo.inc"
@@ -91,12 +92,12 @@ export const script_func_global_1 = () => { return [
 //     RETURN(),
 // ]}
 
-// export const script_func_global_3 = () => { return [
+export const script_func_global_3 = () => { return [
 //     LOAD_MODEL_FROM_GEO(MODEL.BLARGG,                  blargg_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.BULLY,                   bully_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.BULLY,                   bully_geo),
 //     LOAD_MODEL_FROM_GEO(MODEL.BULLY_BOSS,              bully_boss_geo),
-//     RETURN(),
-// ]}
+    RETURN(),
+]}
 
 export const script_func_global_4 = () => { return [
     LOAD_MODEL_FROM_GEO(MODEL.WATER_BOMB,              water_bomb_geo),

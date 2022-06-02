@@ -2,16 +2,18 @@ import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProce
 import { oPosX, oPosY, oPosZ, oHomeX, oHomeY, oHomeZ, oForwardVel, oMoveAngleYaw, oVelY,
     oFaceAngleYaw, oFriction, oGravity, oGraphYOffset, oAction, OBJ_ACT_LAVA_DEATH, OBJ_ACT_DEATH_PLANE_DEATH,
     oAngleToMario, oTimer, oAnimState,
-    oBehParams, oRespawnerModelToRespawn, oRespawnerMinSpawnDist, oRespawnerBehaviorToRespawn
+    oBehParams, oRespawnerModelToRespawn, oRespawnerMinSpawnDist, oRespawnerBehaviorToRespawn, ACTIVE_FLAG_DEACTIVATED
      } from "../include/object_constants"
-import { sins, coss, int32, uint16, int16, random_uint16 } from "../utils"
+import { sins, coss, int32, uint16, int16, random_uint16, random_float } from "../utils"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { atan2s, mtxf_align_terrain_normal } from "../engine/math_util"
 import { GRAPH_RENDER_BILLBOARD, GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
 import { approach_symmetric, spawn_object, spawn_object_abs_with_rot } from "./ObjectHelpers"
 import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
-import { MODEL_YELLOW_COIN, MODEL_NONE } from "../include/model_ids"
-import { bhvMovingYellowCoin, bhvRespawner } from "./BehaviorData"
+import { MODEL_YELLOW_COIN, MODEL_NONE, MODEL_SMOKE } from "../include/model_ids"
+import { bhvBobombBullyDeathSmoke, bhvMovingYellowCoin, bhvRespawner } from "./BehaviorData"
+import { cur_obj_play_sound_2 } from "./SpawnSound"
+import { SOUND_OBJ_BULLY_EXPLODE_2 } from "../include/sounds"
 
 export const OBJ_COL_FLAG_GROUNDED = (1 << 0)
 export const OBJ_COL_FLAG_HIT_WALL = (1 << 1)
@@ -28,10 +30,10 @@ export const is_point_within_radius_of_mario = (x, y, z, dist) => {
     const mGfxZ = ObjectListProc.gMarioObject.gfx.pos[2]
 
     if ((x - mGfxX) * (x - mGfxX) + (y - mGfxY) * (y - mGfxY) + (z - mGfxZ) * (z - mGfxZ) < dist * dist) {
-        return 1
+        return true
     }
 
-    return 0
+    return false
 
 }
 
@@ -352,6 +354,8 @@ export const obj_check_if_facing_toward_angle = (base, goal, range) => {
 }
 
 export const obj_check_floor_death = (collisionFlags, floor) => {
+    const o = ObjectListProc.gCurrentObject
+    
     if (floor == null) return
 
     if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) == 1) {
@@ -367,6 +371,31 @@ export const obj_check_floor_death = (collisionFlags, floor) => {
                 break
         }
     }
+}
+
+export const obj_lava_death = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    let deathSmoke
+
+    if (o.rawData[oTimer] > 30) {
+        o.activeFlags = ACTIVE_FLAG_DEACTIVATED
+        return true
+    } else {
+        // Sinking effect
+        o.rawData[oPosY] -= 10.0
+    }
+
+    if ((o.rawData[oTimer] % 8) == 0) {
+        cur_obj_play_sound_2(SOUND_OBJ_BULLY_EXPLODE_2)
+        deathSmoke = spawn_object(o, MODEL_SMOKE, bhvBobombBullyDeathSmoke)
+        deathSmoke.rawData[oPosX] += random_float() * 20.0
+        deathSmoke.rawData[oPosY] += random_float() * 20.0
+        deathSmoke.rawData[oPosZ] += random_float() * 20.0
+        deathSmoke.rawData[oForwardVel] = random_float() * 10.0
+    }
+
+    return false
 }
 
 export const obj_spawn_yellow_coins = (obj, nCoins) => {

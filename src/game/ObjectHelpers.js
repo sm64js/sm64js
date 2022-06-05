@@ -779,6 +779,25 @@ export const cur_obj_update_floor = () => {
 
 }
 
+export const cur_obj_scale_over_time = (a0, a1, sp10, sp14) => {
+    const o = ObjectListProc.gCurrentObject
+    
+    let sp4 = sp14 - sp10
+    let sp0 = o.rawData[oTimer] / a1
+
+    if (a0 & 0x01) {
+        o.gfx.scale[0] = sp4 * sp0 + sp10
+    }
+
+    if (a0 & 0x02) {
+        o.gfx.scale[1] = sp4 * sp0 + sp10
+    }
+
+    if (a0 & 0x04) {
+        o.gfx.scale[2] = sp4 * sp0 + sp10
+    }
+}
+
 export const cur_obj_set_pos_to_home_with_debug = () => {
     const o = ObjectListProc.gCurrentObject
 
@@ -786,6 +805,16 @@ export const cur_obj_set_pos_to_home_with_debug = () => {
     o.rawData[oPosY] = o.rawData[oHomeZ] + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][1];
     o.rawData[oPosZ] = o.rawData[oHomeZ] + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][2];
     cur_obj_scale(gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][3] / 100.0 + 1.0);
+}
+
+export const cur_obj_is_mario_on_platform = () => {
+    const gMarioObject = ObjectListProc.gMarioObject
+    
+    if (gMarioObject.platform == o) {
+        return true
+    } else {
+        return false
+    }
 }
 
 export const cur_obj_call_action_function = (actionFunctions) => {
@@ -1160,6 +1189,12 @@ export const obj_turn_toward_object = (obj, target, angleIndex, turnAmount) => {
     const startAngle = s16(o.rawData[angleIndex])
     o.rawData[angleIndex] = approach_symmetric(startAngle, targetAngle, turnAmount)
     return targetAngle
+}
+
+export const cur_obj_shake_screen = (shake) => {
+    const o = ObjectListProc.gCurrentObject
+
+    CameraInstance.set_camera_shake_from_point(shake, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ]);
 }
 
 export const obj_attack_collided_from_other_object = (obj) => {
@@ -1937,6 +1972,7 @@ export const cur_obj_lateral_dist_from_mario_to_home = () => {
 }
 
 import { LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC } from "../levels/level_defines_constants"
+import { CameraInstance } from "./Camera"
 const sLevelsWithRooms = [LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC]
 
 export const bhv_init_room = () => {

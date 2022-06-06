@@ -416,7 +416,7 @@ export class n64GfxProcessor {
 
     import_texture_rgbaTrue(tile) {
 
-        WebGL.upload_texture(this.rdp.loaded_texture[tile].textureData.splice(2), this.rdp.loaded_texture[tile].textureData[0]+1, this.rdp.loaded_texture[tile].textureData[1]+1)
+        WebGL.upload_texture(this.rdp.loaded_texture[tile].textureData.splice(4), ((this.rdp.loaded_texture[tile].textureData[0]<<8)+this.rdp.loaded_texture[tile].textureData[1])+1, ((this.rdp.loaded_texture[tile].textureData[2]<<8)+this.rdp.loaded_texture[tile].textureData[3])+1)
 
     }
 

@@ -94,7 +94,7 @@ export const bhv_purple_switch_loop = () => {
          * unpressed state.
          */
         case PURPLE_SWITCH_WAIT_FOR_MARIO_TO_GET_OFF:
-            if (!cur_obj_is_mario_on_platform) {
+            if (!cur_obj_is_mario_on_platform()) {
                 o.rawData[oAction] = PURPLE_SWITCH_UNPRESSED
             }
             break

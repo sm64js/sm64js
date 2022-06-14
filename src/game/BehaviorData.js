@@ -40,6 +40,7 @@ import { MODEL_WOODEN_POST, MODEL_MIST, MODEL_SMOKE, MODEL_BUBBLE, MODEL_CANNON_
 } from "../include/model_ids"
 
 import * as _activated_bf_plat        from "./behaviors/activated_bf_plat.inc"
+import * as _animated_floor_switch    from "./behaviors/animated_floor_switch.inc"
 import * as _amp                      from "./behaviors/amp.inc"
 import * as _bird                     from "./behaviors/bird.inc"
 import * as _boo                      from "./behaviors/boo.inc"
@@ -72,6 +73,7 @@ import * as _mushroom_1up             from "./behaviors/mushroom_1up.inc"
 import * as _platform_on_track        from "./behaviors/platform_on_track.inc"
 import * as _pole                     from "./behaviors/pole.inc"
 import * as _pole_base                from "./behaviors/pole_base.inc"
+import * as _purple_switch            from "./behaviors/purple_switch.inc"
 import * as _recovery_heart           from "./behaviors/recovery_heart.inc"
 import * as _seesaw_platform          from "./behaviors/seesaw_platform.inc"
 import * as _sound_spawner            from "./behaviors/sound_spawner.inc"
@@ -177,6 +179,7 @@ import { bitfs_seg7_collision_inverted_pyramid           } from "../levels/bitfs
 import { bitfs_seg7_collision_sinking_platform           } from "../levels/bitfs/sinking_platforms/collision.inc"
 import { bitfs_seg7_collision_squishable_platform } from "../levels/bitfs/stretching_platform/collision.inc"
 import { bitfs_seg7_collision_sinking_cage_platform } from "../levels/bitfs/sinking_cage_platform/collision.inc"
+import { purple_switch_seg8_collision_0800C7A8 } from "../actors/purple_switch/collision.inc"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -1828,6 +1831,17 @@ export const bhvWaterBombCannon = [
     END_LOOP(),
 ]
 
+export const bhvAnimatesOnFloorSwitchPress = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_FLOAT(oCollisionDistance, 8000),
+    CALL_NATIVE('bhv_animates_on_floor_switch_press_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_animates_on_floor_switch_press_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
 export const bhvActivatedBackAndForthPlatform = [
     BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -1914,6 +1928,23 @@ export const bhvThiBowlingBallSpawner = [
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_thi_bowling_ball_spawner_loop'),
     END_LOOP(),
+]
+
+const bhvFloorSwitchHardcodedModel = [
+    BEGIN(OBJ_LIST_SURFACE),
+    // Floor switch - common:
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(purple_switch_seg8_collision_0800C7A8),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_purple_switch_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
+export const bhvFloorSwitchAnimatesObject = [
+    BEGIN(OBJ_LIST_SURFACE),
+    SET_INT(oBehParams2ndByte, 1),
+    GOTO('bhvFloorSwitchHardcodedModel', 1),
 ]
 
 export const bhvBreakableBox = [
@@ -2310,6 +2341,7 @@ export const bhvMerryGoRound = [
 
 gLinker.behaviors.bhv1Up = bhv1Up
 gLinker.behaviors.bhvActivatedBackAndForthPlatform = bhvActivatedBackAndForthPlatform
+gLinker.behaviors.bhvAnimatesOnFloorSwitchPress = bhvAnimatesOnFloorSwitchPress
 gLinker.behaviors.bhvAirborneDeathWarp = bhvAirborneDeathWarp
 gLinker.behaviors.bhvAirborneStarCollectWarp = bhvAirborneStarCollectWarp
 gLinker.behaviors.bhvAirborneWarp = bhvAirborneWarp
@@ -2368,6 +2400,8 @@ gLinker.behaviors.bhvFish = bhvFish
 gLinker.behaviors.bhvFishSpawner = bhvFishSpawner
 gLinker.behaviors.bhvFlame = bhvFlame
 gLinker.behaviors.bhvFlamethrower = bhvFlamethrower
+gLinker.behaviors.bhvFloorSwitchHardcodedModel = bhvFloorSwitchHardcodedModel
+gLinker.behaviors.bhvFloorSwitchAnimatesObject = bhvFloorSwitchAnimatesObject
 gLinker.behaviors.bhvFloorTrapInCastle = bhvFloorTrapInCastle
 gLinker.behaviors.bhvFlyingWarp = bhvFlyingWarp
 gLinker.behaviors.bhvFreeBowlingBall = bhvFreeBowlingBall

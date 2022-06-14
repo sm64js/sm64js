@@ -1,5 +1,6 @@
-// ** actors/bowser_flame/model
-import * as Gbi from "../../include/gbi"
+// Bowser Flame
+
+// TODO: These 64x64 textures are referenced as two different texture addresses in the DLs
 
 export const flame_seg6_texture_06000000 = []
 export const flame_seg6_texture_06002000 = []

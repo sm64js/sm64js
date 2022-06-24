@@ -1100,15 +1100,18 @@ const act_karting = (m) => {
 		m.particleFlags |= MarioConstants.PARTICLE_DUST;	
 	}
 	if (!(m.input & Mario.INPUT_OFF_FLOOR)) {
-		//m.actionState = 0
-		if (m.input & Mario.INPUT_A_DOWN && !should_begin_sliding(m)) {
+		
+		if (!should_begin_sliding(m)  &&  m.input & Mario.INPUT_A_DOWN || !should_begin_sliding(m)  &&  m.input & Mario.INPUT_Z_DOWN) {
 			Vel += 1.3 * ((m.input & Mario.INPUT_Z_DOWN) ? -1 : 1)
 		} else {
 			Vel *= 0.95545
 		}
 	}
-			if (Vel < -35) Vel = -35
-			if (Vel > 70) Vel = 70
+
+    //Forward and Backward speed caps.
+	if (Vel < -50) Vel = -50
+	if (Vel > 70) Vel = 70
+
     if (m.input & Mario.INPUT_B_PRESSED && !(m.input & Mario.INPUT_OFF_FLOOR) && m.actionState == 0 && m.vel[1] <= 0.0) {
 		m.input |= Mario.INPUT_OFF_FLOOR // Prevent crash / infinite loop.
 		m.actionState = 1
@@ -1131,13 +1134,14 @@ const act_karting = (m) => {
 		switch (perform_air_step(m, 1)) {
 				case Mario.AIR_STEP_NONE:
 					break
-				case Mario.AIR_STEP_LANDED:
-					if (m.vel[1] < -32 && !(m.input & Mario.INPUT_OFF_FLOOR) && !(m.input & Mario.INPUT_ABOVE_SLIDE)) {
-						m.vel[1] *= -0.25
-					} else {
-					m.actionState = 0
-					}
-					break
+                    case Mario.AIR_STEP_LANDED:
+                        if (m.vel[1] < -32 && !(m.input & Mario.INPUT_OFF_FLOOR) && !(m.input & Mario.INPUT_ABOVE_SLIDE)) {
+                            m.pos[1] += 12
+                            m.vel[1] -= m.vel[1] * 1.3
+                        } else {
+                        m.actionState = 0
+                        }
+                        break
 				case Mario.AIR_STEP_HIT_WALL:
 					m.forwardVel *= -0.2
 					Mario.set_forward_vel(m, 1.25 * m.forwardVel)
@@ -1163,7 +1167,7 @@ const act_karting = (m) => {
 				m.actionState = 1
 				break
 			case Mario.GROUND_STEP_HIT_WALL:
-				m.forwardVel *= 0.75
+				m.forwardVel -= m.forwardVel * 1.3
 				break
 			default: throw "unknown ground step in act_karting"
 		}

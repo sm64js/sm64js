@@ -290,6 +290,7 @@ const platform_on_track_act_fall = () => {
  */
 const platform_on_track_rock_ski_lift = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
     let targetRoll = 0
 

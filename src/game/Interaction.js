@@ -26,6 +26,9 @@ import { ACT_IDLE, ACT_PANTING, ACT_STANDING_AGAINST_WALL, ACT_CROUCHING, ACT_DI
          ACT_UNLOCKING_KEY_DOOR, ACT_PULLING_DOOR, ACT_PUSHING_DOOR,
          ACT_ENTERING_STAR_DOOR, ACT_UNLOCKING_STAR_DOOR,
 
+         ACT_STAR_DANCE_EXIT, ACT_STAR_DANCE_NO_EXIT, ACT_STAR_DANCE_WATER,
+         ACT_FALL_AFTER_STAR_GRAB, ACT_JUMBO_STAR_CUTSCENE,
+
          INPUT_A_PRESSED, INPUT_B_PRESSED, INPUT_INTERACT_OBJ_GRABBABLE,
 
          MARIO_KICKING, MARIO_PUNCHING, MARIO_TRIPPING, MARIO_UNKNOWN_08,
@@ -49,7 +52,7 @@ import { ACT_IDLE, ACT_PANTING, ACT_STANDING_AGAINST_WALL, ACT_CROUCHING, ACT_DI
 
 import { WARP_OP_WARP_OBJECT, WARP_OP_WARP_FLOOR } from "./LevelUpdate"
 
-import { SOUND_MARIO_EEUH, SOUND_MARIO_WAAAOOOW, SOUND_OBJ_BULLY_METAL } from "../include/sounds"
+import { SOUND_MARIO_EEUH, SOUND_MARIO_WAAAOOOW, SOUND_OBJ_BULLY_METAL, SOUND_MENU_STAR_SOUND } from "../include/sounds"
 
 import {
     DIALOG_022, DIALOG_023, DIALOG_024, DIALOG_025, DIALOG_026, DIALOG_027, DIALOG_028, DIALOG_029
@@ -65,6 +68,9 @@ import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMa
 
 import { atan2s, sqrtf } from "../engine/math_util"
 import { sins, coss, int16, s16 } from "../utils"
+// import { spawn_object } from "./ObjectHelpers"
+// import { bhv } from "./BehaviorData"
+// import { MODEL_NONE } from "../include/model_ids"
 import { SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND, SURFACE_BURNING } from "../include/surface_terrains"
 import { level_trigger_warp } from "./LevelUpdate"
 import { COURSE_IS_MAIN_COURSE } from "../levels/course_defines"
@@ -268,6 +274,76 @@ const interact_coin = (m, o) => {
 
     return 0
 }
+
+const interact_star_or_key = (m, /*interactType,*/ o) => {
+    let /*u32*/ starIndex
+    let /*u32*/ starGrabAction = ACT_STAR_DANCE_EXIT
+    let /*u32*/ noExit = (o.rawData[oInteractionSubtype] & INT_SUBTYPE_NO_EXIT) != 0
+    let /*u32*/ grandStar = (o.rawData[oInteractionSubtype] & INT_SUBTYPE_GRAND_STAR) != 0
+
+    if (m.health >= 0x100) {
+        mario_stop_riding_and_holding(m)
+// #if ENABLE_RUMBLE
+//         queue_rumble_data(5, 80);
+// #endif
+
+        if (!noExit) {
+            m.hurtCounter = 0
+            m.healCounter = 0
+            if (m.capTimer > 1) {
+                m.capTimer = 1
+            }
+        }
+
+        if (noExit) {
+            starGrabAction = ACT_STAR_DANCE_NO_EXIT
+        }
+
+        if (m.action & ACT_FLAG_SWIMMING) {
+            starGrabAction = ACT_STAR_DANCE_WATER
+        }
+
+        if (m.action & ACT_FLAG_METAL_WATER) {
+            starGrabAction = ACT_STAR_DANCE_WATER
+        }
+
+        if (m.action & ACT_FLAG_AIR) {
+            starGrabAction = ACT_FALL_AFTER_STAR_GRAB
+        }
+
+        // spawn_object(o, MODEL_NONE, bhvStarKeyCollectionPuffSpawner);
+
+        o.oInteractStatus = INT_STATUS_INTERACTED
+        m.interactObj = o
+        m.usedObj = o
+
+        starIndex = (o.oBehParams >> 24) & 0x1F;
+        // save_file_collect_star_or_key(m.numCoins, starIndex);
+
+        // m.numStars =
+        //     save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
+        m.numStars++
+
+        // if (!noExit) {
+        //     drop_queued_background_music();
+        //     fadeout_level_music(126);
+        // }
+
+        play_sound(SOUND_MENU_STAR_SOUND, m.marioObj.gfx.cameraToObject);
+// #ifndef VERSION_JP
+//         update_mario_sound_and_camera(m);
+// #endif
+
+        if (grandStar) {
+            return set_mario_action(m, ACT_JUMBO_STAR_CUTSCENE, 0)
+        }
+
+        return set_mario_action(m, starGrabAction, noExit + 2 * grandStar)
+    }
+
+    return false
+}
+
 
 export const interact_warp = (m, o) => {
     let action
@@ -771,11 +847,11 @@ const interact_flame = (m, o) => {
 
         if ((m.action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER))
             || m.waterLevel - m.pos[1] > 50.0) {
-            //play_sound(SOUND_GENERAL_FLAME_OUT, m->marioObj->header.gfx.cameraToObject);
+            //play_sound(SOUND_GENERAL_FLAME_OUT, m.marioObj.gfx.cameraToObject);
         } else {
             m.marioObj.oMarioBurnTimer = 0
             //update_mario_sound_and_camera(m)
-            //play_sound(SOUND_MARIO_ON_FIRE, m->marioObj->header.gfx.cameraToObject);
+            //play_sound(SOUND_MARIO_ON_FIRE, m.marioObj.gfx.cameraToObject);
 
             if ((m.action & ACT_FLAG_AIR) && m.vel[1] <= 0.0) {
                 burningAction = ACT_BURNING_FALL
@@ -922,7 +998,7 @@ const interact_shock = (m, o) => {
         m.interactObj = o
 
         take_damage_from_interact_object(m)
-        //play_sound(SOUND_MARIO_ATTACKED, m->marioObj->header.gfx.cameraToObject);
+        //play_sound(SOUND_MARIO_ATTACKED, m.marioObj.gfx.cameraToObject);
         //queue_rumble_data(70, 60)
 
         if (m.action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER)) {
@@ -1107,7 +1183,7 @@ const bounce_off_object = (m, o, velY) => {
 
     m.flags &= ~MARIO_UNKNOWN_08
 
-    //play_sound(SOUND_ACTION_BOUNCE_OFF_OBJECT, m -> marioObj -> .gfx.cameraToObject)
+    //play_sound(SOUND_ACTION_BOUNCE_OFF_OBJECT, m . marioObj . .gfx.cameraToObject)
 }
 
 const hit_object_from_below = (m, o) => {
@@ -1133,7 +1209,7 @@ const bounce_back_from_attack = (m, interaction) => {
     }
 
     if (interaction & (INT_PUNCH | INT_KICK | INT_TRIP | INT_FAST_ATTACK_OR_SHELL)) {
-        //play_sound(SOUND_ACTION_HIT_2, m -> marioObj -> .gfx.cameraToObject)
+        //play_sound(SOUND_ACTION_HIT_2, m . marioObj . .gfx.cameraToObject)
     }
 }
 
@@ -1382,11 +1458,11 @@ const check_kick_or_punch_wall = (m) => {
                 }
 
                 set_forward_vel(m, -48.0);
-                // play_sound(SOUND_ACTION_HIT_2, m->marioObj->.gfx.cameraToObject);
+                // play_sound(SOUND_ACTION_HIT_2, m.marioObj..gfx.cameraToObject);
                 m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             } else if (m.action & ACT_FLAG_AIR) {
                 set_forward_vel(m, -16.0);
-                // play_sound(SOUND_ACTION_HIT_2, m->marioObj->.gfx.cameraToObject);
+                // play_sound(SOUND_ACTION_HIT_2, m.marioObj..gfx.cameraToObject);
                 m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             }
         }
@@ -1396,7 +1472,7 @@ const check_kick_or_punch_wall = (m) => {
 const sInteractionHandlers = [
     { interactType: INTERACT_COIN, handler: interact_coin },
     { interactType: INTERACT_WATER_RING, handler: null },
-    { interactType: INTERACT_STAR_OR_KEY, handler: null },
+    { interactType: INTERACT_STAR_OR_KEY, handler: interact_star_or_key },
     { interactType: INTERACT_BBH_ENTRANCE, handler: null },
     { interactType: INTERACT_WARP, handler: interact_warp },
     { interactType: INTERACT_WARP_DOOR, handler: interact_warp_door },

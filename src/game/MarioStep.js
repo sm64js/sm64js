@@ -41,17 +41,49 @@ const should_strengthen_gravity_for_jump_ascent = (m) => {
 }
 
 const apply_gravity = (m) => {
-    if (m.action == Mario.ACT_LONG_JUMP || m.action == Mario.ACT_SLIDE_KICK || m.action == Mario.ACT_BBH_ENTER_SPIN) {
+    if (m.action == Mario.ACT_TWIRLING && m.vel[1] < 0.0) {
+        // apply_twirl_gravity(m)
+    } else if (m.action == Mario.ACT_SHOT_FROM_CANNON) {
+        m.vel[1] -= 1.0
+        if (m.vel[1] < -75.0) {
+            m.vel[1] = -75.0
+        }
+    } else if (m.action == Mario.ACT_LONG_JUMP || m.action == Mario.ACT_SLIDE_KICK || m.action == Mario.ACT_BBH_ENTER_SPIN) {
         m.vel[1] -= 2.0
         if (m.vel[1] < -75.0) {
             m.vel[1] = -75.0
         }
-    }
-    else if (should_strengthen_gravity_for_jump_ascent(m)) {
+    } else if (m.action == Mario.ACT_LAVA_BOOST || m.action == Mario.ACT_FALL_AFTER_STAR_GRAB) {
+        m.vel[1] -= 3.2
+        if (m.vel[1] < -65.0) {
+            m.vel[1] = -65.0
+        }
+    } else if (m.action == Mario.ACT_GETTING_BLOWN) {
+        m.vel[1] -= m.unkC4
+        if (m.vel[1] < -75.0) {
+            m.vel[1] = -75.0
+        }
+    } else if (should_strengthen_gravity_for_jump_ascent(m)) {
         m.vel[1] /= 4.0
+    } else if (m.action & Mario.ACT_FLAG_METAL_WATER) {
+        m.vel[1] -= 1.6
+        if (m.vel[1] < -16.0) {
+            m.vel[1] = -16.0
+        }
+    } else if ((m.flags & Mario.MARIO_WING_CAP) && m.vel[1] < 0.0 && (m.input & Mario.INPUT_A_DOWN)) {
+        m.marioBodyState.wingFlutter = true
+
+        m.vel[1] -= 2.0
+        if (m.vel[1] < -37.5) {
+            if ((m.vel[1] += 4.0) > -37.5) {
+                m.vel[1] = -37.5
+            }
+        }
     } else {
         m.vel[1] -= 4.0
-        if (m.vel[1] < -75.0) m.vel[1] = -75.0
+        if (m.vel[1] < -75.0) {
+            m.vel[1] = -75.0
+        }
     }
 }
 

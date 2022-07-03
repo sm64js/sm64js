@@ -151,10 +151,7 @@ const make_tex_transition_vertex = (verts, n, fadeTimer, transData, centerTransX
 	make_vertex(verts, n, x, y, -1, tx * 32, ty * 32, r, g, b, 255)
 }
 
-let myCount = 0
-
 const load_tex_transition_vertex = (verts, fadeTimer, transData, centerTransX, centerTransY, texTransRadius, transTexType) => {
-
 	switch (transTexType) {
 		case TRANS_TYPE_MIRROR:
 			make_tex_transition_vertex(verts, 0, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius, -texTransRadius, -31, 63)
@@ -162,6 +159,12 @@ const load_tex_transition_vertex = (verts, fadeTimer, transData, centerTransX, c
 			make_tex_transition_vertex(verts, 2, fadeTimer, transData, centerTransX, centerTransY, texTransRadius, texTransRadius, 31, 0)
 			make_tex_transition_vertex(verts, 3, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius, texTransRadius, -31, 0)
 			break
+        case TRANS_TYPE_CLAMP:
+            make_tex_transition_vertex(verts, 0, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius, -texTransRadius, 0, 63)
+            make_tex_transition_vertex(verts, 1, fadeTimer, transData, centerTransX, centerTransY, texTransRadius, -texTransRadius, 63, 63)
+            make_tex_transition_vertex(verts, 2, fadeTimer, transData, centerTransX, centerTransY, texTransRadius, texTransRadius, 63, 0)
+            make_tex_transition_vertex(verts, 3, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius, texTransRadius, 0, 0)
+            break
 		default: throw "unimplemented transition type"
 	}
 	make_tex_transition_vertex(verts, 4, fadeTimer, transData, centerTransX, centerTransY, -2000, -2000, 0, 0)
@@ -200,6 +203,9 @@ const render_textured_transition = (fadeTimer, transTime, transData, texID, tran
 		case TRANS_TYPE_MIRROR:
 			Gbi.gDPLoadTextureBlock(Game.gDisplayList, sTextureTransitionID[texID], Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_8b, 32, 64, 0, Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, Gbi.G_TX_WRAP | Gbi.G_TX_MIRROR, 5, 6, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD)
 			break
+        case TRANS_TYPE_CLAMP:
+            Gbi.gDPLoadTextureBlock(Game.gDisplayList, sTextureTransitionID[texID], Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_8b, 64, 64, 0, Gbi.G_TX_CLAMP, Gbi.G_TX_CLAMP, 6, 6, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD)
+            break
 		default: throw "unimplemented transition type"
 	}
 

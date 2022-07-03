@@ -2027,7 +2027,7 @@ export const act_special_triple_jump = (m) => {
         set_mario_animation(m, MARIO_ANIM_GENERAL_FALL)
     }
 
-    m.particleFlags |= PARTICLE_SPARKLES
+    // m.particleFlags |= PARTICLE_SPARKLES
     return 0
 }
 

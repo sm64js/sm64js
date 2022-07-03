@@ -169,6 +169,11 @@ export const save_file_set_flags = (flags) => {
     gSaveFileModified = true
 }
 
+export const save_file_clear_flags = (flags) => {
+    gDummyFlags &= ~flags
+    gDummyFlags |= SAVE_FLAG_FILE_EXISTS
+    gSaveFileModified = true
+}
 
 export const save_file_get_course_star_count = (fileIndex, courseIndex) => {
     let /*s32*/ i

@@ -43,7 +43,8 @@ import { ACT_IDLE, ACT_PANTING, ACT_STANDING_AGAINST_WALL, ACT_CROUCHING, ACT_DI
          ACT_BACKWARD_AIR_KB,
          ACT_SOFT_BACKWARD_GROUND_KB,
          ACT_FORWARD_AIR_KB,
-         ACT_SOFT_FORWARD_GROUND_KB
+         ACT_SOFT_FORWARD_GROUND_KB,
+         MARIO_NORMAL_CAP
 } from "./Mario"
 
 import { WARP_OP_WARP_OBJECT, WARP_OP_WARP_FLOOR } from "./LevelUpdate"
@@ -81,6 +82,9 @@ import { save_file_get_flags, SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR,
     SAVE_FLAG_UNLOCKED_JRB_DOOR,
     SAVE_FLAG_UNLOCKED_PSS_DOOR,
     SAVE_FLAG_UNLOCKED_WF_DOOR,
+    save_file_clear_flags,
+    SAVE_FLAG_CAP_ON_KLEPTO,
+    SAVE_FLAG_CAP_ON_UKIKI,
  } from "./SaveFile"
 
 
@@ -567,8 +571,6 @@ export const interact_cap = (m, o) => {
    let /*u32*/capFlag = get_mario_cap_flag(o)
    let /*u16*/capMusic = 0
    let /*u16*/capTime = 0
-
-   return 0  // DEBUG
 
     if (m.action != ACT_GETTING_BLOWN && capFlag != 0) {
         m.interactObj = o
@@ -1086,6 +1088,15 @@ export const mario_stop_riding_and_holding = (m) => {
         m.usedObj.rawData[oInteractStatus] = 0
         m.usedObj.rawData[oHootMarioReleaseTime] = window.gGlobalTimer
     }
+}
+
+export const mario_retrieve_cap = () => {
+    const gMarioState = gLinker.LevelUpdate.gMarioState
+
+    mario_drop_held_object(gMarioState)
+    save_file_clear_flags(SAVE_FLAG_CAP_ON_KLEPTO | SAVE_FLAG_CAP_ON_UKIKI)
+    gMarioState.flags &= ~MARIO_CAP_ON_HEAD
+    gMarioState.flags |= MARIO_NORMAL_CAP | MARIO_CAP_IN_HAND
 }
 
 ////////////////////////////////////////////////////

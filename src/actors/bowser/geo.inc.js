@@ -354,13 +354,11 @@ export const bowser_geo_000770 = () => {return [
     GEO_RETURN(),
 ]};
 
-#ifndef VERSION_JP
-// 0x0D000AB8
-export const bowser_shadow_geo = () => {return [
-    GEO_SHADOW(0x00, 0x9B, 400),
-    GEO_RETURN(),
-]};
-#endif
+// 0x0D000AB8 : FOR JAPAN ONLY
+//export const bowser_shadow_geo = () => {return [
+//    GEO_SHADOW(0x00, 0x9B, 400),
+//    GEO_RETURN(),
+//]};
 
 // 0x0D000AB8 / 0AC4
 export const bowser_geo = () => {return [

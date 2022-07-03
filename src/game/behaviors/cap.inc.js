@@ -85,38 +85,40 @@ const cap_check_quicksand = () => {
 }
 
 const cap_sink_quicksand = () => {
-//     switch (o.rawData[oAction]) {
-//         case 10:
-//             if (o.rawData[oTimer] < 10) {
-//                 o.rawData[oGraphYOffset] += -1.0f;
-//                 o.rawData[oFaceAnglePitch] = 0x2000;
-//             }
-//             break;
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
-//         case 11:
-//             if (o.rawData[oTimer] < 10)
-//                 o.rawData[oGraphYOffset] += -3.0f;
+    switch (o.rawData[oAction]) {
+        case 10:
+            if (o.rawData[oTimer] < 10) {
+                o.rawData[oGraphYOffset] += -1.0;
+                o.rawData[oFaceAnglePitch] = 0x2000;
+            }
+            break;
 
-//             o.rawData[oFaceAnglePitch] = 0x2000;
-//             break;
+        case 11:
+            if (o.rawData[oTimer] < 10) {
+                o.rawData[oGraphYOffset] += -3.0;
+            }
+            o.rawData[oFaceAnglePitch] = 0x2000;
+            break;
 
-//         case 12:
-//             o.rawData[oGraphYOffset] += -1.0f;
-//             if (o.rawData[oTimer] >= 21)
-//                 o.activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        case 12:
+            o.rawData[oGraphYOffset] += -1.0;
+            if (o.rawData[oTimer] >= 21) {
+                o.activeFlags = ACTIVE_FLAG_DEACTIVATED;
+            }
+            break;
 
-//             break;
+        case 13:
+            o.rawData[oGraphYOffset] += -6.0;
+            if (o.rawData[oTimer] >= 21) {
+                o.activeFlags = ACTIVE_FLAG_DEACTIVATED;
+            }
+            o.rawData[oFaceAnglePitch] = 0x2000;
+            break;
+    }
 
-//         case 13:
-//             o.rawData[oGraphYOffset] += -6.0f;
-//             if (o.rawData[oTimer] >= 21)
-//                 o.activeFlags = ACTIVE_FLAG_DEACTIVATED;
-
-//             o.rawData[oFaceAnglePitch] = 0x2000;
-//             break;
-//     }
-
-//     cap_check_quicksand();
+    cap_check_quicksand();
 }
 
 const bhv_wing_cap_init = () => {
@@ -177,7 +179,7 @@ const bhv_wing_vanish_cap_loop = () => {
     cap_set_hitbox()
 }
 
-const bhv_metal_cap_init = () => {
+export const bhv_metal_cap_init = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oGravity] = 2.4
     o.rawData[oFriction] = 0.999
@@ -185,32 +187,36 @@ const bhv_metal_cap_init = () => {
     o.rawData[oOpacity] = 0xFF
 }
 
-// void metal_cap_act_0(void) {
-//     s16 sp1E;
+const metal_cap_act_0 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
-//     o.rawData[oFaceAngleYaw] += o.rawData[oForwardVel] * 128.0f;
-//     sp1E = object_step();
-//     if (sp1E & 0x01)
-//         cap_check_quicksand();
-// }
+    o.rawData[oFaceAngleYaw] += o.rawData[oForwardVel] * 128.0
+    let collisionFlags = object_step()
 
-const bhv_metal_cap_loop = () => {
-//     switch (o.rawData[oAction]) {
-//         case 0:
-//             metal_cap_act_0();
-//             break;
+    if (collisionFlags & OBJ_COL_FLAG_GROUNDED) {
+        cap_check_quicksand()
+    }
+}
 
-//         default:
-//             object_step();
-//             cap_sink_quicksand();
-//             break;
-//     }
+export const bhv_metal_cap_loop = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    
+    switch (o.rawData[oAction]) {
+        case 0:
+            metal_cap_act_0();
+            break;
 
-//     if (o.rawData[oTimer] > 20)
-//         cur_obj_become_tangible();
+        default:
+            object_step();
+            cap_sink_quicksand();
+            break;
+    }
 
-//     cap_set_hitbox();
-//     cap_despawn();
+    if (o.rawData[oTimer] > 20)
+        cur_obj_become_tangible();
+
+    cap_set_hitbox();
+    cap_despawn();
 }
 
 const bhv_normal_cap_init = () => {

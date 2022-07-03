@@ -30,6 +30,7 @@ export const G_SETZIMG = 27
 export const G_SETCIMG = 28
 export const G_RDPLOADSYNC = 29
 export const G_TEXRECT = 30
+export const G_GEOMETRYMODE = 31
 
 
 /// Custom Opcodes
@@ -853,6 +854,15 @@ export const gsSPEndDisplayList = () => {
         }
     }
 }
+
+/* export const gsSPGeometryMode = (c, s) => {
+    return {
+        words: {
+            w0: G_GEOMETRYMODE | ~c,
+            w1: s
+        }
+    }
+} */
 
 export const gsDPSetAlphaCompare = (newmode) => {
     return {

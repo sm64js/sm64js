@@ -51,7 +51,7 @@ export const ssl_dl_pyramid_quicksand_pit_begin = [
     gsDPSetRenderMode(G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_SURF2),
     gsDPSetDepthSource(G_ZS_PIXEL),
     gsDPSetFogColor(0, 0, 0, 255),
-    gsSPFogFactor(0x0E49, 0xF2B7),
+    gsSPFogPosition(0x0E49, 0xF2B7),
     gsSPSetGeometryMode(G_FOG),
     gsDPSetCombineMode(G_CC_MODULATERGB, G_CC_PASS2),
     gsSPLight(ssl_lights_quicksand_pit.l, 1),

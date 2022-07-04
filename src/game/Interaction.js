@@ -331,7 +331,7 @@ const interact_star_or_key = (m, /*interactType,*/ o) => {
 
         play_sound(SOUND_MENU_STAR_SOUND, m.marioObj.gfx.cameraToObject);
 // #ifndef VERSION_JP
-//         update_mario_sound_and_camera(m);
+        update_mario_sound_and_camera(m)
 // #endif
 
         if (grandStar) {

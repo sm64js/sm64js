@@ -169,8 +169,6 @@ const homing_amp_chase_loop = () => {
  */
 const homing_amp_give_up_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    //UNUSED u8 filler[8];
-    //const filler = new Array(8)
 
     // Move forward for 152 frames
     o.rawData[oForwardVel] = 15.0

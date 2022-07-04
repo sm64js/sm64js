@@ -7,6 +7,7 @@ import { bitdw_seg7_collision_0700F898 } from "../../levels/bitdw/ferris_platfor
 import { bhvFerrisWheelPlatform } from "../BehaviorData"
 import { spawn_object_relative, obj_set_parent_relative_pos } from "../ObjectHelpers"
 import { coss, sins } from "../../utils"
+import { POS_OP_COMPUTE_VELOCITY, POS_OP_SAVE_POSITION } from "../ObjBehaviors2"
 
 /**
  * Behaviors for bhvFerrisWheelAxle and bhvFerrisWheelPlatform.
@@ -61,7 +62,7 @@ export const bhv_ferris_wheel_platform_update = () => {
     let offsetXZ
     let offsetAngle
 
-    obj_perform_position_op(o, 'POS_OP_SAVE_POSITION')
+    obj_perform_position_op(POS_OP_SAVE_POSITION)
 
     offsetAngle = o.parentObj.rawData[oFaceAngleRoll] + o.rawData[oBehParams2ndByte] * 0x4000
     offsetXZ = 400.0 * coss(offsetAngle)
@@ -74,7 +75,7 @@ export const bhv_ferris_wheel_platform_update = () => {
     o.rawData[oPosZ] = o.parentObj.rawData[oPosZ] + offsetXZ * coss(o.parentObj.rawData[oMoveAngleYaw])
                + 300.0 * sins(o.parentObj.rawData[oMoveAngleYaw])
 
-    obj_perform_position_op(o, 'POS_OP_COMPUTE_VELOCITY')
+    obj_perform_position_op(POS_OP_COMPUTE_VELOCITY)
 }
 
 gLinker.bhv_ferris_wheel_axle_init = bhv_ferris_wheel_axle_init

@@ -57,7 +57,7 @@ import {
     ACT_STOMACH_SLIDE_STOP, ACT_THROWING, ACT_WALKING,
 
     INPUT_A_DOWN, INPUT_A_PRESSED, INPUT_ABOVE_SLIDE, INPUT_B_PRESSED, INPUT_IN_WATER,
-    INPUT_NONZERO_ANALOG, INPUT_OFF_FLOOR, INPUT_SQUISHED, INPUT_UNKNOWN_10,
+    INPUT_NONZERO_ANALOG, INPUT_OFF_FLOOR, INPUT_SQUISHED, INPUT_STOMPED,
 
     MARIO_ACTION_SOUND_PLAYED, MARIO_ANIM_BREAKDANCE, MARIO_ANIM_FIRST_PUNCH,
     MARIO_ANIM_FIRST_PUNCH_FAST, MARIO_ANIM_GRAB_BOWSER, MARIO_ANIM_GRAB_HEAVY_OBJECT,
@@ -218,7 +218,7 @@ export const mario_update_punch_sequence = (m) => {
 }
 
 const act_punching = (m) => {
-    if (m.input & INPUT_UNKNOWN_10) {
+    if (m.input & INPUT_STOMPED) {
         return drop_and_set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0)
     }
 
@@ -242,7 +242,7 @@ const act_punching = (m) => {
 }
 
 const act_picking_up = (m) => {
-    if (m.input & INPUT_UNKNOWN_10) {
+    if (m.input & INPUT_STOMPED) {
         return drop_and_set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0)
     }
 
@@ -280,7 +280,7 @@ const act_picking_up = (m) => {
 }
 
 const act_dive_picking_up = (m) => {
-    if (m.input & INPUT_UNKNOWN_10) {
+    if (m.input & INPUT_STOMPED) {
         return drop_and_set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0)
     }
 
@@ -300,7 +300,7 @@ const act_dive_picking_up = (m) => {
 }
 
 const act_placing_down = (m) => {
-    if (m.input & INPUT_UNKNOWN_10) {
+    if (m.input & INPUT_STOMPED) {
         return drop_and_set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0)
     }
 
@@ -321,7 +321,7 @@ const act_throwing = (m) => {
         return set_mario_action(m, ACT_PLACING_DOWN, 0)
     }
 
-    if (m.input & INPUT_UNKNOWN_10) {
+    if (m.input & INPUT_STOMPED) {
         return drop_and_set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0)
     }
 
@@ -340,7 +340,7 @@ const act_throwing = (m) => {
 }
 
 const act_heavy_throw = (m) => {
-    if (m.input & INPUT_UNKNOWN_10) {
+    if (m.input & INPUT_STOMPED) {
         return drop_and_set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0)
     }
 
@@ -359,7 +359,7 @@ const act_heavy_throw = (m) => {
 }
 
 const act_stomach_slide_stop = (m) => {
-    if (m.input & INPUT_UNKNOWN_10) {
+    if (m.input & INPUT_STOMPED) {
         return set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0);
     }
 

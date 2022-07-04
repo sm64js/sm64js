@@ -151,7 +151,7 @@ class LevelCommands {
     }
 
     blackout(bool) {
-        console.log("ignoring blackout()")
+        // console.log("ignoring blackout()") // what does this even do?
         this.sCurrentScript.index++
     }
 
@@ -237,8 +237,9 @@ class LevelCommands {
     }
 
     unload_area() {
+        ObjectListProcessor.clear_objects()
+        Area.clear_area_graph_nodes()
         Area.clear_areas()
-        //clear_area_graph_nodes -- call all node functions with init and clear command
         this.sCurrentScript.index++
     }
 

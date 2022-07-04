@@ -300,14 +300,17 @@ const platform_on_track_rock_ski_lift = () => {
     if (gMarioObject.platform == o) {
         targetRoll = o.rawData[oForwardVel] * sins(o.rawData[oMoveAngleYaw]) * -50.0 + (o.rawData[oDistanceToMario] * sins(o.rawData[oAngleToMario] - o.rawData[oFaceAngleYaw]) * 4.0)
     }
+    const valueWrapper = { value: o.rawData[oFaceAngleRoll] }
+    const velWrapper = { value: o.rawData[oPlatformOnTrackSkiLiftRollVel] }
     oscillate_toward(
-        /* value          */ o.rawData[oFaceAngleRoll],
-        /* vel            */ o.rawData[oPlatformOnTrackSkiLiftRollVel],
+        /* value          */ valueWrapper,
+        /* vel            */ velWrapper,
         /* target         */ targetRoll,
         /* velCloseToZero */ 5.0,
         /* accel          */ 6.0,
-        /* slowdown       */ 1.5)
-        clamp_f32(o.rawData[oPlatformOnTrackSkiLiftRollVel], -100.0, 100.0)
+        /* slowdown       */ 1.5
+    )
+    clamp_f32(o.rawData[oPlatformOnTrackSkiLiftRollVel], -100.0, 100.0)
 }
 
 /**

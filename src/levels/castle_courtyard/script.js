@@ -63,7 +63,7 @@ export const level_castle_courtyard_entry = [
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
     END_AREA(),
 
-    MARIO_POS(/*area*/ 1, /*yaw*/ 0, /*pos*/ -14, 0, -201),
+    MARIO_POS(/*area*/ 1, /*yaw*/ 180, /*pos*/ -14, 0, -201),
     CALL(/*arg*/ 0, /*func*/ 'LevelUpdate.lvl_init_or_update'),
     CALL_LOOP(/*arg*/ 1, /*func*/ 'LevelUpdate.lvl_init_or_update'),
     CLEAR_LEVEL(),

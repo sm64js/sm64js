@@ -1256,8 +1256,8 @@ export const WOODEN_POST_BP_NO_COINS_MASK = 0x0000FF00
 
 /* Bob-omb */
     /* oBehParams2ndByte */
-    export const BOBOMB_BP_STYPE_GENERIC =0
-    export const BOBOMB_BP_STYPE_STATIONARY =1
+    export const BOBOMB_BP_STYPE_GENERIC = 0
+    export const BOBOMB_BP_STYPE_STATIONARY = 1
     /* oAction */
     export const BOBOMB_ACT_PATROL = 0
     export const BOBOMB_ACT_LAUNCHED = 1
@@ -1265,3 +1265,34 @@ export const WOODEN_POST_BP_NO_COINS_MASK = 0x0000FF00
     export const BOBOMB_ACT_EXPLODE = 3
     export const BOBOMB_ACT_LAVA_DEATH = 100
     export const BOBOMB_ACT_DEATH_PLANE_DEATH = 101
+
+    /* Evil lakitu */
+    /* oAction */
+    export const ENEMY_LAKITU_ACT_UNINITIALIZED = 0
+    export const ENEMY_LAKITU_ACT_MAIN          = 1
+
+    /* oSubAction */
+    export const ENEMY_LAKITU_SUB_ACT_NO_SPINY    = 0
+    export const ENEMY_LAKITU_SUB_ACT_HOLD_SPINY  = 1
+    export const ENEMY_LAKITU_SUB_ACT_THROW_SPINY = 2
+
+/* Cloud */
+    /* oAction */
+    export const CLOUD_ACT_SPAWN_PARTS   = 0
+    export const CLOUD_ACT_MAIN          = 1
+    export const CLOUD_ACT_UNLOAD        = 2
+    export const CLOUD_ACT_FWOOSH_HIDDEN = 3
+
+    /* oBehParams2ndByte */
+    export const CLOUD_BP_FWOOSH       = 0
+    export const CLOUD_BP_LAKITU_CLOUD = 1
+
+/* Camera lakitu */
+    /* oAction */
+    export const CAMERA_LAKITU_INTRO_ACT_TRIGGER_CUTSCENE = 0
+    export const CAMERA_LAKITU_INTRO_ACT_SPAWN_CLOUD      = 1
+    export const CAMERA_LAKITU_INTRO_ACT_UNK2             = 2
+
+    /* oBehParams2ndByte */
+    export const CAMERA_LAKITU_BP_FOLLOW_CAMERA = 0
+    export const CAMERA_LAKITU_BP_INTRO         = 1

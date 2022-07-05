@@ -1,5 +1,4 @@
-import { dl_ia_text_tex_settings, dl_rgba16_load_tex_block, main_font_lut } from "../bin/segment2"
-import { main_hud_lut } from "../common_gfx/segment2"
+import { dl_ia_text_tex_settings, dl_rgba16_load_tex_block, main_font_lut, main_hud_lut } from "../common_gfx/segment2"
 import * as MathUtil from "../engine/math_util"
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../include/config"
 import * as Gbi from "../include/gbi"

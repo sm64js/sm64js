@@ -25,7 +25,7 @@ export const PURPLE_SWITCH_WAIT_FOR_MARIO_TO_GET_OFF = 4
 export const bhv_purple_switch_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
-    const gMarioStates = gLinker.LevelUpdate.gMarioState
+    const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
 
     switch (o.rawData[oAction]) {
         /**
@@ -35,7 +35,7 @@ export const bhv_purple_switch_loop = () => {
         case PURPLE_SWITCH_IDLE:
             cur_obj_set_model(MODEL_PURPLE_SWITCH)
             cur_obj_scale(1.5)
-            if (gMarioObject.platform == o && !(gMarioStates.action & MARIO_UNKNOWN_13)) {
+            if (gMarioObject.platform == o && !(gMarioStates[0].action & MARIO_UNKNOWN_13)) {
                 if (lateral_dist_between_objects(o, gMarioObject) < 127.5) {
                     o.rawData[oAction] = PURPLE_SWITCH_PRESSED
                 }

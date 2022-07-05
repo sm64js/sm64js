@@ -190,10 +190,6 @@ const perform_air_quarter_step = (m, intendedPos, stepArg) => {
         }
 
         m.pos[1] = nextPos[1]
-        if (window.cheats.bouncyOobWalls) {
-            m.faceAngle[1] = s16(m.faceAngle[1] + 0x8000)
-            Mario.set_forward_vel(m, 1.5 * m.forwardVel)
-        }
         return Mario.AIR_STEP_HIT_WALL
     }
 
@@ -344,11 +340,6 @@ const perform_ground_quarter_step = (m, nextPos) => {
     m.wall = upperWall
 
     if (floorWrapper.floor == null) {
-        if (window.cheats.bouncyOobWalls) {
-            m.faceAngle[1] += 0x8000
-            Mario.set_forward_vel(m, 1.5 * m.forwardVel)
-            return Mario.GROUND_STEP_NONE
-        }
         return Mario.GROUND_STEP_HIT_WALL_STOP_QSTEPS
     }
 

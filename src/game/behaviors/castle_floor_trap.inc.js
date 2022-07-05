@@ -24,9 +24,9 @@ export const bhv_castle_floor_trap_init = () => {
 
 const bhv_castle_floor_trap_open_detect = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    const gMarioStates = gLinker.ObjectListProcessor.gMarioObject
-    if (gMarioStates.action == ACT_SPECIAL_EXIT_AIRBORNE
-        || gMarioStates.action == ACT_SPECIAL_DEATH_EXIT)
+    const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
+    if (gMarioStates[0].action == ACT_SPECIAL_EXIT_AIRBORNE
+        || gMarioStates[0].action == ACT_SPECIAL_DEATH_EXIT)
         o.rawData[oAction] = 4 // rotates trapdoor so it looks always open
     else {
         o.rawData[oAngleVelRoll] = 0x400

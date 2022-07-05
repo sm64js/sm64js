@@ -93,15 +93,15 @@ export const obj_grow_then_shrink = (scaleVel, shootFireScale, endScale) => {
 }
 
 export const oscillate_toward = (valueObj, velObj, target, velCloseToZero, accel, slowdown) => {
-    let startValue = valueObj
-    valueObj += velObj
+    let startValue = valueObj.value
+    valueObj.value += velObj.value
 
 
-    if (valueObj == target
-        || ((valueObj - target) * (startValue - target) < 0 && velObj > -velCloseToZero
-            && velObj < velCloseToZero)) {
-        valueObj = target
-        velObj = 0.0
+    if (valueObj.value == target
+        || ((valueObj.value - target) * (startValue - target) < 0 && velObj.value > -velCloseToZero
+            && velObj.value < velCloseToZero)) {
+        valueObj.value = target
+        velObj.value = 0.0
         return 1
     } else {
         if (valueObj.value >= target) {
@@ -111,7 +111,7 @@ export const oscillate_toward = (valueObj, velObj, target, velCloseToZero, accel
             accel *= slowdown
         }
 
-        velObj += accel
+        velObj.value += accel
     }
 
     return 0

@@ -621,7 +621,7 @@ export const INPUT_SQUISHED = 0x0040
 export const INPUT_A_DOWN = 0x0080
 export const INPUT_IN_POISON_GAS = 0x0100
 export const INPUT_IN_WATER = 0x0200
-export const INPUT_UNKNOWN_10 = 0x0400
+export const INPUT_STOMPED = 0x0400
 export const INPUT_INTERACT_OBJ_GRABBABLE = 0x0800
 export const INPUT_UNKNOWN_12 = 0x1000
 export const INPUT_B_PRESSED = 0x2000
@@ -1342,7 +1342,7 @@ export const set_mario_action_moving = (m, action, actionArg) => {
             break
 
         case ACT_HOLD_BEGIN_SLIDING:
-            if (mario_facing_downhill(m, FALSE)) {
+            if (mario_facing_downhill(m, false)) {
                 action = ACT_HOLD_BUTT_SLIDE
             } else {
                 action = ACT_HOLD_STOMACH_SLIDE
@@ -2186,7 +2186,7 @@ const update_mario_inputs = (m) => {
 
     if (m.marioObj.rawData[oInteractStatus]
         & (Interact.INT_STATUS_HOOT_GRABBED_BY_MARIO | Interact.INT_STATUS_MARIO_UNK1 | Interact.INT_STATUS_MARIO_UNK4)) {
-        m.input |= INPUT_UNKNOWN_10
+        m.input |= INPUT_STOMPED
     }
 
     if (m.wallKickTimer > 0) {

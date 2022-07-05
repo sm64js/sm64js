@@ -1,24 +1,41 @@
-import * as Gbi from "../../include/gbi"
+// Chain Ball
 
+import {
+    gsDPPipeSync, gsSPClearGeometryMode, gsDPSetCombineMode, gsDPLoadTextureBlock, gsSPTexture,
+    gsSPVertex, gsSP2Triangles, gsSPSetGeometryMode, gsSPEndDisplayList,
+    G_LIGHTING, G_CC_DECALRGBA, G_IM_FMT_RGBA, G_IM_SIZ_16b, G_TX_CLAMP, G_TX_NOLOD,
+    G_TX_RENDERTILE, G_ON, G_OFF, G_CC_SHADE
+} from "../../include/gbi"
+
+
+// 0x06020AA0
 const chain_ball_seg6_vertex_06020AA0 = [
-	{ pos: [-26, -26, 0], flag: 0, tc: [0, 992], color: [255, 255, 255, 255] },
-	{ pos: [26, -26, 0], flag: 0, tc: [992, 992], color: [255, 255, 255, 255] },
-	{ pos: [26, 26, 0], flag: 0, tc: [992, 0], color: [255, 255, 255, 255] },
-	{ pos: [-26, 26, 0], flag: 0, tc: [0, 0], color: [255, 255, 255, 255] },
-]
+    [[   -26,    -26,      0], 0, [     0,    992], [0xff, 0xff, 0xff, 0xff]],
+    [[    26,    -26,      0], 0, [   992,    992], [0xff, 0xff, 0xff, 0xff]],
+    [[    26,     26,      0], 0, [   992,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[   -26,     26,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+];
 
+// align? binid?
+
+// 0x06020AE8
 export const chain_ball_seg6_texture_06020AE8 = []
+// actors/chain_ball/chain_ball.rgba16.png
 
+// 0x060212E8 - 0x06021380
 export const chain_ball_seg6_dl_060212E8 = [
-	Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_DECALRGBA),
-	...Gbi.gsDPLoadTextureBlock(chain_ball_seg6_texture_06020AE8, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 32, 32, 0, Gbi.G_TX_CLAMP, Gbi.G_TX_CLAMP, 5, 5, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_ON),
-	Gbi.gsSPVertex(chain_ball_seg6_vertex_06020AA0, 4, 0),
-	...Gbi.gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
-	Gbi.gsSPTexture(0xFFFF, 0xFFFF, 0, Gbi.G_TX_RENDERTILE, Gbi.G_OFF),
-	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
-	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING),
-	Gbi.gsSPEndDisplayList(),
-]
+    gsDPPipeSync(),
+    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
+    gsDPLoadTextureBlock(chain_ball_seg6_texture_06020AE8, G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, 32, 0, G_TX_CLAMP, G_TX_CLAMP, 5, 5, G_TX_NOLOD, G_TX_NOLOD),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsSPVertex(chain_ball_seg6_vertex_06020AA0, 4, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPSetGeometryMode(G_LIGHTING),
+    gsSPEndDisplayList(),
+].flat();
 
+// 2022-07-04 22:16:29 -0400 (Convert.rb 2022-07-03 12:20:08 -0400)

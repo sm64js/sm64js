@@ -8,22 +8,23 @@ import {
     G_IM_FMT_RGBA, G_IM_SIZ_16b, CALC_DXT, G_TX_LOADTILE, G_IM_SIZ_16b_BYTES, G_CC_MODULATERGB,
     G_SHADING_SMOOTH, G_TX_WRAP, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_RENDERTILE, G_ON,
     G_TX_CLAMP, G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADE
-} from '../../include/gbi'
+} from "../../include/gbi"
 
 // 0x08004988
 const cannon_base_seg8_lights_08004988 = gdSPDefLights1(
     0x4c, 0x4c, 0x4c,
     0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-)
+);
 
 // 0x080049A0
 const cannon_base_seg8_lights_080049A0 = gdSPDefLights1(
     0x0e, 0x10, 0x4c,
     0x30, 0x37, 0xff, 0x28, 0x28, 0x28
-)
+);
 
 // 0x080049B8
-export const cannon_base_seg8_texture_080049B8 = []  // "actors/cannon_base/cannon_base.rgba16.inc.c"
+export const cannon_base_seg8_texture_080049B8 = []
+// actors/cannon_base/cannon_base.rgba16.png
 
 // 0x080051B8
 const cannon_base_seg8_vertex_080051B8 = [
@@ -39,7 +40,7 @@ const cannon_base_seg8_vertex_080051B8 = [
     [[  -101,   -101,    -50], 0, [     0,   1754], [0x81, 0x00, 0x00, 0xff]],
     [[  -101,   -101,     51], 0, [   990,   1754], [0x81, 0x00, 0x00, 0xff]],
     [[  -101,     51,     51], 0, [   990,    224], [0x81, 0x00, 0x00, 0xff]],
-]
+];
 
 // 0x08005278
 const cannon_base_seg8_vertex_08005278 = [
@@ -59,7 +60,7 @@ const cannon_base_seg8_vertex_08005278 = [
     [[   102,     51,    -50], 0, [     0,      0], [0x00, 0x58, 0xa5, 0xff]],
     [[    61,     51,    -50], 0, [     0,      0], [0x00, 0x58, 0xa5, 0xff]],
     [[    61,     77,    -25], 0, [     0,      0], [0x00, 0x58, 0xa5, 0xff]],
-]
+];
 
 // 0x08005378
 const cannon_base_seg8_vertex_08005378 = [
@@ -78,7 +79,7 @@ const cannon_base_seg8_vertex_08005378 = [
     [[    61,     51,     51], 0, [     0,      0], [0x00, 0x00, 0x7f, 0xff]],
     [[    61,   -101,     51], 0, [     0,      0], [0x00, 0x00, 0x7f, 0xff]],
     [[   102,   -101,     51], 0, [     0,      0], [0x00, 0x00, 0x7f, 0xff]],
-]
+];
 
 // 0x08005468
 const cannon_base_seg8_vertex_08005468 = [
@@ -97,7 +98,7 @@ const cannon_base_seg8_vertex_08005468 = [
     [[   -60,     51,    -50], 0, [     0,      0], [0x7f, 0x00, 0x00, 0xff]],
     [[   -60,     77,    -25], 0, [     0,      0], [0x00, 0x58, 0xa5, 0xff]],
     [[   -60,     77,    -25], 0, [     0,      0], [0x7f, 0x00, 0x00, 0xff]],
-]
+];
 
 // 0x08005558
 const cannon_base_seg8_vertex_08005558 = [
@@ -117,7 +118,7 @@ const cannon_base_seg8_vertex_08005558 = [
     [[   -60,     77,     26], 0, [     0,      0], [0x00, 0x7f, 0x00, 0xff]],
     [[   -60,     77,    -25], 0, [     0,      0], [0x00, 0x7f, 0x00, 0xff]],
     [[  -101,     77,    -25], 0, [     0,      0], [0x00, 0x7f, 0x00, 0xff]],
-]
+];
 
 // 0x08005658 - 0x080056D0
 export const cannon_base_seg8_dl_08005658 = [
@@ -132,7 +133,7 @@ export const cannon_base_seg8_dl_08005658 = [
     gsSP2Triangles( 6,  7,  8, 0x0,  6,  9, 10, 0x0),
     gsSP2Triangles( 6, 10, 11, 0x0,  6, 11,  7, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].flat();
 
 // 0x080056D0 - 0x080057F8
 export const cannon_base_seg8_dl_080056D0 = [
@@ -159,7 +160,7 @@ export const cannon_base_seg8_dl_080056D0 = [
     gsSP2Triangles( 8,  9, 10, 0x0,  8, 10, 11, 0x0),
     gsSP2Triangles(12, 13, 14, 0x0, 12, 14, 15, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].flat();
 
 // 0x080057F8 - 0x08005870
 export const cannon_base_seg8_dl_080057F8 = [
@@ -178,6 +179,6 @@ export const cannon_base_seg8_dl_080057F8 = [
     gsSPDisplayList(cannon_base_seg8_dl_080056D0),
     gsSPSetGeometryMode(G_SHADING_SMOOTH),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].flat();
 
-// 1618208663 - 2021-04-11 20:48:04 -1000
+// 2022-07-04 22:12:29 -0400 (Convert.rb 2022-07-03 12:20:08 -0400)

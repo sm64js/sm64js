@@ -60,6 +60,13 @@ export const vec3f_normalize = (dest) => {
     return dest
 }
 
+const find_vector_perpendicular_to_plane = (dest, a, b, c) => {
+    dest[0] = (b[1] - a[1]) * (c[2] - b[2]) - (c[1] - b[1]) * (b[2] - a[2])
+    dest[1] = (b[2] - a[2]) * (c[0] - b[0]) - (c[2] - b[2]) * (b[0] - a[0])
+    dest[2] = (b[0] - a[0]) * (c[1] - b[1]) - (c[0] - b[0]) * (b[1] - a[1])
+    return dest //! warning: function returns address of local variable
+}
+
 export const vec3f_cross = (dest, a, b) => {
     dest[0] = a[1] * b[2] - b[1] * a[2]
     dest[1] = a[2] * b[0] - b[2] * a[0]
@@ -287,6 +294,72 @@ export const mtxf_scale_vec3f = (dest, mtx, s) => {
         dest[2][i] = mtx[2][i] * s[2]
         dest[3][i] = mtx[3][i]
     }
+}
+
+export const mtxf_align_terrain_triangle = (mtx, pos, yaw, radius) => {
+    let /*struct Surface*/ sp74 = { floor: null }
+    let /*Vec3f*/ point0 = [0, 0, 0]
+    let /*Vec3f*/ point1 = [0, 0, 0]
+    let /*Vec3f*/ point2 = [0, 0, 0]
+    let /*Vec3f*/ forward = [0, 0, 0]
+    let /*Vec3f*/ xColumn = [0, 0, 0]
+    let /*Vec3f*/ yColumn = [0, 0, 0]
+    let /*Vec3f*/ zColumn = [0, 0, 0]
+    let avgY
+    let minY = -radius * 3
+
+    point0[0] = pos[0] + radius * sins(yaw + 0x2AAA)
+    point0[2] = pos[2] + radius * coss(yaw + 0x2AAA)
+    point1[0] = pos[0] + radius * sins(yaw + 0x8000)
+    point1[2] = pos[2] + radius * coss(yaw + 0x8000)
+    point2[0] = pos[0] + radius * sins(yaw + 0xD555)
+    point2[2] = pos[2] + radius * coss(yaw + 0xD555)
+
+    point0[1] = gLinker.SurfaceCollision.find_floor(point0[0], pos[1] + 150, point0[2], sp74)
+    point1[1] = gLinker.SurfaceCollision.find_floor(point1[0], pos[1] + 150, point1[2], sp74)
+    point2[1] = gLinker.SurfaceCollision.find_floor(point2[0], pos[1] + 150, point2[2], sp74)
+
+    if (point0[1] - pos[1] < minY) {
+        point0[1] = pos[1]
+    }
+
+    if (point1[1] - pos[1] < minY) {
+        point1[1] = pos[1]
+    }
+
+    if (point2[1] - pos[1] < minY) {
+        point2[1] = pos[1]
+    }
+
+    avgY = (point0[1] + point1[1] + point2[1]) / 3
+
+    vec3f_set(forward, sins(yaw), 0, coss(yaw))
+    find_vector_perpendicular_to_plane(yColumn, point0, point1, point2);
+    vec3f_normalize(yColumn)
+    vec3f_cross(xColumn, yColumn, forward)
+    vec3f_normalize(xColumn)
+    vec3f_cross(zColumn, xColumn, yColumn)
+    vec3f_normalize(zColumn)
+
+    mtx[0][0] = xColumn[0]
+    mtx[0][1] = xColumn[1]
+    mtx[0][2] = xColumn[2]
+    mtx[3][0] = pos[0]
+
+    mtx[1][0] = yColumn[0]
+    mtx[1][1] = yColumn[1]
+    mtx[1][2] = yColumn[2]
+    mtx[3][1] = (avgY < pos[1]) ? pos[1] : avgY
+
+    mtx[2][0] = zColumn[0]
+    mtx[2][1] = zColumn[1]
+    mtx[2][2] = zColumn[2]
+    mtx[3][2] = pos[2]
+
+    mtx[0][3] = 0
+    mtx[1][3] = 0
+    mtx[2][3] = 0
+    mtx[3][3] = 1
 }
 
 export const mtxf_mul = (dest, a, b) => {

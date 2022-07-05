@@ -414,7 +414,7 @@ const act_ledge_grab = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_LEDGE_CLIMB_FAST, 0)
     }
 
-    if (m.input & Mario.INPUT_UNKNOWN_10) {
+    if (m.input & Mario.INPUT_STOMPED) {
         if (m.marioObj.rawData[oInteractStatus] & Interact.INT_STATUS_MARIO_UNK1) {
             m.hurtCounter += (m.flags & Mario.MARIO_CAP_ON_HEAD) ? 12 : 18
         }

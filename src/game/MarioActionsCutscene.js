@@ -121,7 +121,7 @@ import {
     ACT_UNKNOWN_0002020E, ACT_WAKING_UP, ACT_WALKING, ACT_DEATH_EXIT_LAND, ACT_HARD_BACKWARD_GROUND_KB,
 
     INPUT_A_PRESSED, INPUT_ABOVE_SLIDE, INPUT_B_PRESSED, INPUT_FIRST_PERSON, INPUT_IN_WATER,
-    INPUT_NONZERO_ANALOG, INPUT_OFF_FLOOR, INPUT_SQUISHED, INPUT_UNKNOWN_10, INPUT_Z_DOWN,
+    INPUT_NONZERO_ANALOG, INPUT_OFF_FLOOR, INPUT_SQUISHED, INPUT_STOMPED, INPUT_Z_DOWN,
 
     MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP, MARIO_ANIM_CROUCH_FROM_SLIDE_KICK,
     MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP, MARIO_ANIM_CROUCHING, MARIO_ANIM_GENERAL_LAND,
@@ -1202,7 +1202,7 @@ export const act_exit_airborne = (m) => {
     }
     // rotate him to face away from the entrance
     m.marioObj.gfx.angle[1] += 0x8000
-    // m.particleFlags |= PARTICLE_SPARKLES
+    m.particleFlags |= PARTICLE_SPARKLES
     return 0
 }
 
@@ -1213,7 +1213,7 @@ export const act_falling_exit_airborne = (m) => {
     }
     // rotate Mario to face away from the entrance
     m.marioObj.gfx.angle[1] += 0x8000
-    // m.particleFlags |= PARTICLE_SPARKLES
+    m.particleFlags |= PARTICLE_SPARKLES
     return 0
 }
 
@@ -1377,7 +1377,7 @@ export const act_special_exit_airborne = (m) => {
         m.actionArg = 1
     }
 
-    // m.particleFlags |= PARTICLE_SPARKLES
+    m.particleFlags |= PARTICLE_SPARKLES
     // rotate Mario to face away from the entrance
     marioObj.gfx.angle[1] += 0x8000
     // show Mario

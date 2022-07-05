@@ -3,7 +3,7 @@ import * as _Linker from "./Linker"
 import {
     check_common_action_exits, check_common_hold_action_exits, drop_and_set_mario_action,
     is_anim_at_end, is_anim_past_end, set_jump_from_landing, set_jumping_action, set_mario_action,
-    set_mario_animation, set_water_plunge_action, update_mario_sound_and_camera,
+    set_mario_animation, set_water_plunge_action, update_mario_sound_and_camera, ACT_BUTT_SLIDE,
 } from "./Mario"
 
 import {
@@ -62,7 +62,7 @@ import {
     ACT_UNKNOWN_0002020E, ACT_WAKING_UP, ACT_WALKING,
 
     INPUT_A_PRESSED, INPUT_ABOVE_SLIDE, INPUT_B_PRESSED, INPUT_FIRST_PERSON, INPUT_IN_WATER,
-    INPUT_NONZERO_ANALOG, INPUT_OFF_FLOOR, INPUT_SQUISHED, INPUT_UNKNOWN_10, INPUT_Z_DOWN,
+    INPUT_NONZERO_ANALOG, INPUT_OFF_FLOOR, INPUT_SQUISHED, INPUT_STOMPED, INPUT_Z_DOWN,
 
     MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP, MARIO_ANIM_CROUCH_FROM_SLIDE_KICK,
     MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP, MARIO_ANIM_CROUCHING, MARIO_ANIM_GENERAL_LAND,
@@ -72,7 +72,8 @@ import {
     MARIO_ANIM_LAND_FROM_SINGLE_JUMP, MARIO_ANIM_SLIDEFLIP_LAND, MARIO_ANIM_STAND_AGAINST_WALL,
     MARIO_ANIM_START_CRAWLING, MARIO_ANIM_START_CROUCHING, MARIO_ANIM_STOP_CRAWLING,
     MARIO_ANIM_STOP_CROUCHING, MARIO_ANIM_STOP_SKID, MARIO_ANIM_STOP_SLIDE,
-    MARIO_ANIM_THROW_LIGHT_OBJECT, MARIO_ANIM_TRIPLE_JUMP_LAND, MARIO_ANIM_STAND_UP_FROM_LAVA_BOOST
+    MARIO_ANIM_THROW_LIGHT_OBJECT, MARIO_ANIM_TRIPLE_JUMP_LAND, MARIO_ANIM_STAND_UP_FROM_LAVA_BOOST,
+    MARIO_ANIM_STAND_UP_FROM_SLIDING_WITH_LIGHT_OBJ
 } from "./Mario"
 
 import {
@@ -126,7 +127,7 @@ const check_common_hold_idle_cancels = (m) => {
         return set_mario_action(m, ACT_PLACING_DOWN, 0)
     }
 
-    if (m.input & INPUT_UNKNOWN_10) {
+    if (m.input & INPUT_STOMPED) {
         return drop_and_set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0)
     }
 
@@ -246,7 +247,7 @@ const act_jump_land_stop = (m) => {
     return 0
 }
 
-export const act_hold_idle = (m) => {
+const act_hold_idle = (m) => {
     if (gLinker.behaviors.bhvJumpingBox == m.heldObj.behavior) {
         return set_mario_action(m, ACT_CRAZY_BOX_BOUNCE, 0)
     }
@@ -268,8 +269,8 @@ export const act_hold_idle = (m) => {
     return 0
 }
 
-export const act_hold_heavy_idle = (m) => {
-    if (m.input & INPUT_UNKNOWN_10) {
+const act_hold_heavy_idle = (m) => {
+    if (m.input & INPUT_STOMPED) {
         return drop_and_set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0)
     }
 
@@ -295,7 +296,7 @@ export const act_hold_heavy_idle = (m) => {
 }
 
 const act_standing_against_wall = (m) => {
-    if (m.input & INPUT_UNKNOWN_10) {
+    if (m.input & INPUT_STOMPED) {
         return set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0)
     }
 
@@ -511,7 +512,7 @@ const act_ground_pound_land = (m) => {
     }
 
     if (m.input & INPUT_ABOVE_SLIDE) {
-        return set_mario_action(m, ACT_CROUCH_SLIDE, 0) /// TODO act butt slide
+        return set_mario_action(m, ACT_BUTT_SLIDE, 0)
     }
 
     landing_step(m, MARIO_ANIM_GROUND_POUND_LANDING, ACT_BUTT_SLIDE_STOP)
@@ -532,12 +533,33 @@ const act_butt_slide_stop = (m) => {
     return 0
 }
 
-export const act_hold_jump_land_stop = (m) => {
+const act_hold_butt_slide_stop = (m) => {
     if (m.marioObj.rawData[oInteractStatus] & INT_STATUS_MARIO_DROP_OBJECT) {
         return drop_and_set_mario_action(m, ACT_IDLE, 0)
     }
 
-    if (m.input & INPUT_UNKNOWN_10) {
+    if (m.input & INPUT_STOMPED) {
+        return drop_and_set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0);
+    }
+
+    if (m.input & (INPUT_NONZERO_ANALOG | INPUT_A_PRESSED | INPUT_OFF_FLOOR | INPUT_ABOVE_SLIDE)) {
+        return check_common_hold_action_exits(m)
+    }
+
+    if (m.input & INPUT_B_PRESSED) {
+        return set_mario_action(m, ACT_THROWING, 0)
+    }
+
+    stopping_step(m, MARIO_ANIM_STAND_UP_FROM_SLIDING_WITH_LIGHT_OBJ, ACT_HOLD_IDLE)
+    return 0
+}
+
+const act_hold_jump_land_stop = (m) => {
+    if (m.marioObj.rawData[oInteractStatus] & INT_STATUS_MARIO_DROP_OBJECT) {
+        return drop_and_set_mario_action(m, ACT_IDLE, 0)
+    }
+
+    if (m.input & INPUT_STOMPED) {
         return drop_and_set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0)
     }
 
@@ -553,12 +575,12 @@ export const act_hold_jump_land_stop = (m) => {
     return 0
 }
 
-export const act_hold_freefall_land_stop = (m) => {
+const act_hold_freefall_land_stop = (m) => {
     if (m.marioObj.rawData[oInteractStatus] & INT_STATUS_MARIO_DROP_OBJECT) {
         return drop_and_set_mario_action(m, ACT_IDLE, 0)
     }
 
-    if (m.input & INPUT_UNKNOWN_10) {
+    if (m.input & INPUT_STOMPED) {
         return drop_and_set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0)
     }
 
@@ -573,8 +595,8 @@ export const act_hold_freefall_land_stop = (m) => {
     return 0
 }
 
-export const act_air_throw_land = (m) => {
-    if (m.input & INPUT_UNKNOWN_10) {
+const act_air_throw_land = (m) => {
+    if (m.input & INPUT_STOMPED) {
         return set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0)
     }
 

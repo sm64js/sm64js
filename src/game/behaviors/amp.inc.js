@@ -1,3 +1,4 @@
+import * as _Linker from "../../game/Linker"
 import { is_point_within_radius_of_mario, object_step } from "../ObjBehaviors"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { atan2s } from "../../engine/math_util"
@@ -169,8 +170,6 @@ const homing_amp_chase_loop = () => {
  */
 const homing_amp_give_up_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    //UNUSED u8 filler[8];
-    //const filler = new Array(8)
 
     // Move forward for 152 frames
     o.rawData[oForwardVel] = 15.0

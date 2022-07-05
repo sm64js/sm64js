@@ -419,6 +419,7 @@ export const GEO_SWITCH_CASE = (...args)              => {return {command: Geo.n
 export const GEO_TRANSLATE_NODE = (...args)           => {return {command: Geo.node_translate, args: args}}
 export const GEO_TRANSLATE_NODE_WITH_DL = (...args)   => {return {command: Geo.node_translate, args: args}}
 export const GEO_TRANSLATE_ROTATE = (...args)         => {return {command: Geo.node_translate_rotate, args: args}}
+export const GEO_TRANSLATE_ROTATE_WITH_DL = (...args) => {return {command: Geo.node_translate_rotate, args: args}}
 export const GEO_ZBUFFER = (...args)                  => {return {command: Geo.node_master_list, args: args}}
 
 export const LAYER_FORCE                = Geo.LAYER_FORCE

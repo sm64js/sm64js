@@ -87,12 +87,13 @@ import {
     ACT_SOFT_BACKWARD_GROUND_KB, ACT_SOFT_FORWARD_GROUND_KB, ACT_SPECIAL_DEATH_EXIT, ACT_SQUISHED,
     ACT_STANDING_AGAINST_WALL, ACT_STANDING_DEATH, ACT_STOMACH_SLIDE, ACT_STOMACH_SLIDE_STOP,
     ACT_STOP_CRAWLING, ACT_THROWING, ACT_TRIPLE_JUMP, ACT_TRIPLE_JUMP_LAND, ACT_TURNING_AROUND,
-    ACT_WALKING, ACT_BURNING_FALL, ACT_BURNING_JUMP,
+    ACT_WALKING, ACT_BURNING_FALL, ACT_BURNING_JUMP, ACT_DIVE_PICKING_UP,
+    ACT_HOLD_BUTT_SLIDE_STOP, ACT_HOLD_BUTT_SLIDE_AIR,
 
     GROUND_STEP_HIT_WALL, GROUND_STEP_LEFT_GROUND, GROUND_STEP_NONE,
 
     INPUT_A_DOWN, INPUT_A_PRESSED, INPUT_ABOVE_SLIDE, INPUT_B_PRESSED, INPUT_FIRST_PERSON,
-    INPUT_IN_WATER, INPUT_NONZERO_ANALOG, INPUT_OFF_FLOOR, INPUT_SQUISHED, INPUT_UNKNOWN_10,
+    INPUT_IN_WATER, INPUT_NONZERO_ANALOG, INPUT_OFF_FLOOR, INPUT_SQUISHED, INPUT_STOMPED,
     INPUT_UNKNOWN_5, INPUT_Z_DOWN, INPUT_Z_PRESSED,
 
     MARIO_ANIM_BACKWARD_KB, MARIO_ANIM_CLIMB_DOWN_LEDGE, MARIO_ANIM_CRAWLING,
@@ -108,7 +109,7 @@ import {
     MARIO_ANIM_SOFT_FRONT_KB, MARIO_ANIM_START_CROUCHING, MARIO_ANIM_START_TIPTOE,
     MARIO_ANIM_TIPTOE, MARIO_ANIM_TRIPLE_JUMP_LAND, MARIO_ANIM_TURNING_PART1,
     MARIO_ANIM_TURNING_PART2, MARIO_ANIM_WALK_WITH_HEAVY_OBJ, MARIO_ANIM_WALK_WITH_LIGHT_OBJ,
-    MARIO_ANIM_WALKING,
+    MARIO_ANIM_WALKING, MARIO_ANIM_SLIDING_ON_BOTTOM_WITH_LIGHT_OBJ,
 
     MARIO_MARIO_SOUND_PLAYED, MARIO_METAL_CAP, MARIO_UNKNOWN_31, MARIO_WING_CAP
 } from "./Mario"
@@ -133,6 +134,9 @@ import {
     SOUND_MARIO_MAMA_MIA, SOUND_MARIO_OOOF2, SOUND_MARIO_UH2_2, SOUND_MOVING_TERRAIN_SLIDE
 } from "../include/sounds"
 
+import { mtxf_align_terrain_triangle } from "../engine/math_util"
+
+let sFloorAlignMatrix = [new Array(4).fill(0).map(() => new Array(4).fill(0)), new Array(4).fill(0).map(() => new Array(4).fill(0))]
 
 export const tilt_body_running = (m) => {
     let pitch = find_floor_slope(m, 0)
@@ -1048,7 +1052,8 @@ const update_sliding = (m, stopSpeed) => {
 
 const align_with_floor = (m) => {
     m.pos[1] = m.floorHeight
-    // Todo other stuff here
+    mtxf_align_terrain_triangle(sFloorAlignMatrix[m.unk00], m.pos, m.faceAngle[1], 40.0)
+    m.marioObj.gfx.throwMatrix = sFloorAlignMatrix[m.unk00]
 }
 
 const common_slide_action = (m, endAction, airAction, animation) => {
@@ -1243,8 +1248,27 @@ const act_butt_slide = (m) => {
     return cancel
 }
 
+const act_hold_butt_slide = (m) => {
+    if (m.marioObj.rawData[oInteractStatus] & INT_STATUS_MARIO_DROP_OBJECT) {
+        return drop_and_set_mario_action(m, ACT_BUTT_SLIDE, 0)
+    }
+
+    const cancel = common_slide_action_with_jump(m, ACT_HOLD_BUTT_SLIDE_STOP, ACT_HOLD_JUMP, ACT_HOLD_BUTT_SLIDE_AIR, MARIO_ANIM_SLIDING_ON_BOTTOM_WITH_LIGHT_OBJ)
+    tilt_body_butt_slide(m)
+    return cancel
+}
+
 const act_stomach_slide = (m) => {
     const cancel = stomach_slide_action(m, ACT_STOMACH_SLIDE_STOP, ACT_FREEFALL, MARIO_ANIM_SLIDE_DIVE)
+    return cancel
+}
+
+const act_hold_stomach_slide = (m) => {
+    if (m.marioObj.rawData[oInteractStatus] & INT_STATUS_MARIO_DROP_OBJECT) {
+        return drop_and_set_mario_action(m, ACT_STOMACH_SLIDE, 0)
+    }
+
+    const cancel = stomach_slide_action(m, ACT_DIVE_PICKING_UP, ACT_HOLD_FREEFALL, MARIO_ANIM_SLIDE_DIVE)
     return cancel
 }
 
@@ -1719,7 +1743,7 @@ const check_common_moving_cancels = (m) => {
         return set_water_plunge_action(m)
     }
 
-    if (!(m.action & ACT_FLAG_INVULNERABLE) && (m.input & INPUT_UNKNOWN_10)) {
+    if (!(m.action & ACT_FLAG_INVULNERABLE) && (m.input & INPUT_STOMPED)) {
         return drop_and_set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0);
     }
 

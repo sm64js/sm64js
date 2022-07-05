@@ -21,7 +21,7 @@ const sRecoveryHeartHitbox = {
 export const bhv_recovery_heart_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
-    const gMarioStates = gLinker.LevelUpdate.gMarioState
+    const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
 
     obj_set_hitbox(o, sRecoveryHeartHitbox)
     if (obj_check_if_collided_with_object(o, gMarioObject)) {
@@ -30,7 +30,7 @@ export const bhv_recovery_heart_loop = () => {
             o.rawData[oSpinningHeartPlayedSound]++
         }
 
-        o.rawData[oAngleVelYaw] = 200.0 * gMarioStates.forwardVel + 1000
+        o.rawData[oAngleVelYaw] = 200.0 * gMarioStates[0].forwardVel + 1000
     } else {
         o.rawData[oSpinningHeartPlayedSound] = 0
         o.rawData[oAngleVelYaw] -= 50
@@ -42,7 +42,7 @@ export const bhv_recovery_heart_loop = () => {
     }
     o.rawData[oSpinningHeartTotalSpin] += o.rawData[oAngleVelYaw]
     if (o.rawData[oSpinningHeartTotalSpin] >= 0x10000) {
-        gMarioStates.healCounter += 4
+        gMarioStates[0].healCounter += 4
         o.rawData[oSpinningHeartTotalSpin] -= 0x10000
     }
 

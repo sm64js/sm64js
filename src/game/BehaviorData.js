@@ -21,7 +21,8 @@ import { oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAn
          oWoodenPostTotalMarioAngle, oInteractStatus, oMoveAngleYaw, oWaterObjUnkF4,
          oWaterObjUnkF8, oWaterObjUnkFC, oBehParams2ndByte, oActiveParticleFlags, oFlags,
          oUnk94, oBBallSpawnerPeriodMinus1, oBobombBuddyRole, oTripletButterflyScale,
-         oBigBooNumMinionBoosKilled,
+         oBigBooNumMinionBoosKilled, oDrawingDistance, oMarioParticleFlags,
+         oOpacity,
 
          OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, OBJ_FLAG_COMPUTE_DIST_TO_MARIO,
          OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW,
@@ -33,6 +34,7 @@ import { oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAn
          ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_BUBBLE, ACTIVE_PARTICLE_WATER_SPLASH,
          ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH, ACTIVE_PARTICLE_SHALLOW_WATER_WAVE,
          ACTIVE_PARTICLE_WAVE_TRAIL, ACTIVE_PARTICLE_PLUNGE_BUBBLE,
+         ACTIVE_PARTICLE_SPARKLES
 } from "../include/object_constants"
 
 import { MODEL_WOODEN_POST, MODEL_MIST, MODEL_SMOKE, MODEL_BUBBLE, MODEL_CANNON_BARREL,
@@ -50,6 +52,7 @@ import * as _breakable_box            from "./behaviors/breakable_box.inc"
 import * as _breakable_box_small      from "./behaviors/breakable_box_small.inc"
 import * as _bully                    from "./behaviors/bully.inc"
 import * as _butterfly                from "./behaviors/butterfly.inc"
+import * as _camera_lakitu            from "./behaviors/camera_lakitu.inc"
 import * as _cannon                   from "./behaviors/cannon.inc"
 import * as _cannon_door              from "./behaviors/cannon_door.inc"
 import * as _cap                      from "./behaviors/cap.inc"
@@ -59,6 +62,7 @@ import * as _castle_floor_trap        from "./behaviors/castle_floor_trap.inc"
 import * as _celebration_star         from "./behaviors/celebration_star.inc"
 import * as _chain_chomp              from "./behaviors/chain_chomp.inc"
 import * as _checkerboard_platform    from "./behaviors/checkerboard_platform.inc"
+import * as _cloud                    from "./behaviors/cloud.inc"
 import * as _coin                     from "./behaviors/coin.inc"
 import * as _ddd_warp                 from "./behaviors/ddd_warp.inc"
 import * as _door                     from "./behaviors/door.inc"
@@ -69,6 +73,7 @@ import * as _fish                     from "./behaviors/fish.inc"
 import * as _file_select              from "./behaviors/file_select.inc"
 import * as _flamethrower             from "./behaviors/flamethrower.inc"
 import * as _koopa_shell_underwater   from "./behaviors/koopa_shell_underwater.inc"
+import * as _moat_drainer             from "./behaviors/moat_drainer.inc"
 import * as _moat_grill               from "./behaviors/moat_grill.inc"
 import * as _mushroom_1up             from "./behaviors/mushroom_1up.inc"
 import * as _platform_on_track        from "./behaviors/platform_on_track.inc"
@@ -148,14 +153,15 @@ import { bhv_water_mist_2_loop                          } from "./behaviors/wate
 import { amp_seg8_anims_08004034         } from "../actors/amp/anims.inc"
 import { birds_seg5_anims_050009E8       } from "../actors/bird/anims.inc"
 import { bobomb_seg8_anims_0802396C      } from "../actors/bobomb/anims.inc"
+import { bully_seg5_anims_0500470C       } from "../actors/bully/anims.inc"
 import { butterfly_seg3_anims_030056B0   } from "../actors/butterfly/anims.inc"
 import { bowser_seg6_anims_06057690      } from "../actors/bowser/anims.inc"
 import { castle_grounds_seg7_anims_flags } from "../levels/castle_grounds/areas/1/11/anim.inc"
-import { chain_chomp_seg6_anims_06025178 } from "../actors/chain_chomp/anims/table.inc"
+import { chain_chomp_seg6_anims_06025178 } from "../actors/chain_chomp/anims.inc"
 import { door_seg3_anims_030156C0        } from "../actors/door/anims.inc"
-import { goomba_seg8_anims_0801DA4C      } from "../actors/goomba/anims/table.inc"
+import { goomba_seg8_anims_0801DA4C      } from "../actors/goomba/anims.inc"
+import { lakitu_seg6_anims_060058F8      } from "../actors/lakitu_cameraman/anims.inc"
 import { yoshi_seg5_anims_05024100       } from "../actors/yoshi/anims.inc"
-import { bully_seg5_anims_0500470C       } from "../actors/bully/anims.inc"
 
 import { bowser_2_seg7_collision_tilting_platform        } from "../levels/bowser_2/tilting_platform/collision.inc"
 import { breakable_box_seg8_collision_08012D70           } from "../actors/breakable_box/collision.inc"
@@ -181,6 +187,7 @@ import { bitfs_seg7_collision_sinking_platform           } from "../levels/bitfs
 import { bitfs_seg7_collision_squishable_platform } from "../levels/bitfs/stretching_platform/collision.inc"
 import { bitfs_seg7_collision_sinking_cage_platform } from "../levels/bitfs/sinking_cage_platform/collision.inc"
 import { purple_switch_seg8_collision_0800C7A8 } from "../actors/purple_switch/collision.inc"
+import { warp_pipe_seg3_collision_03009AC8 } from "../actors/warp_pipe/collision.inc"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -245,6 +252,26 @@ export const bhvTree = [
     { command: BhvCmds.end_loop },
 ]
 
+const bhvSparkleParticleSpawner = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    PARENT_BIT_CLEAR(oActiveParticleFlags, ACTIVE_PARTICLE_SPARKLES),
+    BEGIN(OBJ_LIST_UNIMPORTANT),
+    BILLBOARD(),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    SET_FLOAT(oGraphYOffset, 25),
+    SET_RANDOM_FLOAT(oMarioParticleFlags, /*Minimum*/ -50, /*Range*/ 100),
+    SUM_FLOAT(/*Dest*/ oPosX, /*Value 1*/ oPosX, /*Value 2*/ oMarioParticleFlags),
+    SET_RANDOM_FLOAT(oMarioParticleFlags, /*Minimum*/ -50, /*Range*/ 100),
+    SUM_FLOAT(/*Dest*/ oPosZ, /*Value 1*/ oPosZ, /*Value 2*/ oMarioParticleFlags),
+    SET_RANDOM_FLOAT(oMarioParticleFlags, /*Minimum*/ -50, /*Range*/ 100),
+    SUM_FLOAT(/*Dest*/ oPosY, /*Value 1*/ oPosY, /*Value 2*/ oMarioParticleFlags),
+    SET_INT(oAnimState, -1),
+    BEGIN_REPEAT(12),
+        ADD_INT(oAnimState, 1),
+    END_REPEAT(),
+    DEACTIVATE(),
+]
+
 export const bhvYellowBall = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT, name: 'bhvYellowBall' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
@@ -299,7 +326,7 @@ export const bhvStaticObject = [
     { command: BhvCmds.break },
 ]
 
-export const bhvCastleFloorTrap = [
+const bhvCastleFloorTrap = [
     BEGIN(OBJ_LIST_DEFAULT),
     DISABLE_RENDERING(),
     CALL_NATIVE('bhv_castle_floor_trap_init'),
@@ -318,7 +345,7 @@ export const bhvFloorTrapInCastle = [
     END_LOOP(),
 ]
 
-export const bhvCastleFlagWaving = [
+const bhvCastleFlagWaving = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT, name: 'bhvCastleFlagWaving' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.load_animations, args: { field: oAnimations, anims: castle_grounds_seg7_anims_flags } },
@@ -338,7 +365,7 @@ export const bhvCheckerboardPlatformSub = [
     { command: BhvCmds.end_loop },
 ]
 
-export const bhvCheckerboardElevatorGroup = [
+const bhvCheckerboardElevatorGroup = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_SPAWNER, name: 'bhvCheckerboardElevatorGroup' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
     { command: BhvCmds.call_native, args: { func: 'bhv_checkerboard_elevator_group_init' } },
@@ -347,7 +374,7 @@ export const bhvCheckerboardElevatorGroup = [
     { command: BhvCmds.deactivate }
 ]
 
-export const bhvMoatGrills = [
+const bhvMoatGrills = [
     BEGIN(OBJ_LIST_SURFACE, 'bhvMoatGrills'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     LOAD_COLLISION_DATA(castle_grounds_seg7_collision_moat_grills),
@@ -357,7 +384,7 @@ export const bhvMoatGrills = [
     END_LOOP(),
 ]
 
-export const bhvPlatformOnTrack = [
+const bhvPlatformOnTrack = [
     BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 50, /*Gravity*/ -100, /*Bounciness*/ -50, /*Drag strength*/ 100, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
@@ -366,6 +393,29 @@ export const bhvPlatformOnTrack = [
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_platform_on_track_update'),
         CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
+export const bhvCloud = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BILLBOARD(),
+    SET_HOME(),
+    SET_INT(oOpacity, 240),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_cloud_update'),
+    END_LOOP(),
+]
+
+const bhvCameraLakitu = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, lakitu_seg6_anims_060058F8),
+    ANIMATE(0),
+    CALL_NATIVE('bhv_init_room'),
+    CALL_NATIVE('bhv_camera_lakitu_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_camera_lakitu_update'),
     END_LOOP(),
 ]
 
@@ -380,7 +430,7 @@ export const bhvTrackBall = [
     END_LOOP(),
 ]
 
-export const bhvSeesawPlatform = [
+const bhvSeesawPlatform = [
     BEGIN(OBJ_LIST_SURFACE, 'bhvSeesawPlatform'),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     CALL_NATIVE('bhv_seesaw_platform_init'),
@@ -2211,6 +2261,20 @@ const bhvWarp = [
     END_LOOP(),
 ]
 
+const bhvWarpPipe = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_INT(oInteractType, INTERACT_WARP),
+    LOAD_COLLISION_DATA(warp_pipe_seg3_collision_03009AC8),
+    SET_FLOAT(oDrawingDistance, 16000),
+    SET_INT(oIntangibleTimer, 0),
+    SET_HITBOX(/*Radius*/ 70, /*Height*/ 50),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_warp_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
 const bhvUnlockDoorStar = [
     BEGIN(OBJ_LIST_LEVEL, 'bhvUnlockDoorStar'),
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -2336,7 +2400,13 @@ const bhvPillarBase = [
         CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
     END_LOOP(),
 ]
-//placeholder bhvs
+
+const bhvInvisibleObjectsUnderBridge = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    CALL_NATIVE('bhv_invisible_objects_under_bridge_init'),
+    BREAK(),
+]
+
 const bhvWaterLevelPillar = [
     BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -2374,17 +2444,31 @@ export const bhvMerryGoRound = [
     END_LOOP(),
 ]
 
+const bhvAmbientSounds = [
+    BREAK(),
+]
+
+const bhvBirdsSoundLoop = [
+    BREAK(),
+]
+
+const bhvWaterfallSoundLoop = [
+    BREAK(),
+]
+
 gLinker.behaviors.bhv1Up = bhv1Up
 gLinker.behaviors.bhvActivatedBackAndForthPlatform = bhvActivatedBackAndForthPlatform
 gLinker.behaviors.bhvAnimatesOnFloorSwitchPress = bhvAnimatesOnFloorSwitchPress
 gLinker.behaviors.bhvAirborneDeathWarp = bhvAirborneDeathWarp
 gLinker.behaviors.bhvAirborneStarCollectWarp = bhvAirborneStarCollectWarp
 gLinker.behaviors.bhvAirborneWarp = bhvAirborneWarp
+// gLinker.behaviors.bhvAmbientSounds = bhvAmbientSounds
 gLinker.behaviors.bhvBalconyBigBoo = bhvBalconyBigBoo
 gLinker.behaviors.bhvBbhTumblingBridge = bhvBbhTumblingBridge
 gLinker.behaviors.bhvBigBully = bhvBigBully
 gLinker.behaviors.bhvBigBullyWithMinions = bhvBigBullyWithMinions
 gLinker.behaviors.bhvBird = bhvBird
+// gLinker.behaviors.bhvBirdsSoundLoop = bhvBirdsSoundLoop
 gLinker.behaviors.bhvBitfsSinkingPlatforms = bhvBitfsSinkingPlatforms
 gLinker.behaviors.bhvBitfsSinkingCagePlatform = bhvBitfsSinkingCagePlatform
 gLinker.behaviors.bhvBitfsTiltingInvertedPyramid = bhvBitfsTiltingInvertedPyramid
@@ -2409,6 +2493,7 @@ gLinker.behaviors.bhvCourtyardBooTriplet = bhvCourtyardBooTriplet
 gLinker.behaviors.bhvCannon = bhvCannon
 gLinker.behaviors.bhvCannonBarrelBubbles = bhvCannonBarrelBubbles
 gLinker.behaviors.bhvCoinInsideBoo = bhvCoinInsideBoo
+// gLinker.behaviors.bhvCameraLakitu = bhvCameraLakitu
 gLinker.behaviors.bhvCannonClosed = bhvCannonClosed
 gLinker.behaviors.bhvCarrySomething1 = bhvCarrySomething1
 gLinker.behaviors.bhvCarrySomething2 = bhvCarrySomething2
@@ -2421,6 +2506,7 @@ gLinker.behaviors.bhvCastleFloorTrap = bhvCastleFloorTrap
 gLinker.behaviors.bhvChainChomp = bhvChainChomp
 gLinker.behaviors.bhvCirclingAmp = bhvCirclingAmp
 gLinker.behaviors.bhvCheckerboardElevatorGroup = bhvCheckerboardElevatorGroup
+gLinker.behaviors.bhvCloud = bhvCloud
 gLinker.behaviors.bhvCoinFormation = bhvCoinFormation
 gLinker.behaviors.bhvDddMovingPole = bhvDddMovingPole
 gLinker.behaviors.bhvDddWarp = bhvDddWarp
@@ -2454,6 +2540,7 @@ gLinker.behaviors.bhvHorStarParticleSpawner = bhvHorStarParticleSpawner
 gLinker.behaviors.bhvHomingAmp = bhvHomingAmp
 gLinker.behaviors.bhvIdleWaterWave = bhvIdleWaterWave
 gLinker.behaviors.bhvInstantActiveWarp = bhvInstantActiveWarp
+gLinker.behaviors.bhvInvisibleObjectsUnderBridge = bhvInvisibleObjectsUnderBridge
 gLinker.behaviors.bhvJumpingBox = bhvJumpingBox
 gLinker.behaviors.bhvLaunchDeathWarp = bhvLaunchDeathWarp
 gLinker.behaviors.bhvLaunchStarCollectWarp = bhvLaunchStarCollectWarp
@@ -2492,6 +2579,7 @@ gLinker.behaviors.bhvSmallBully = bhvSmallBully
 gLinker.behaviors.bhvSmoke = bhvSmoke
 gLinker.behaviors.bhvSnowParticleSpawner = bhvSnowParticleSpawner
 gLinker.behaviors.bhvSparkle = bhvSparkle
+gLinker.behaviors.bhvSparkleParticleSpawner = bhvSparkleParticleSpawner
 gLinker.behaviors.bhvSparkleSpawn = bhvSparkleSpawn
 gLinker.behaviors.bhvSpawnedStarNoLevelExit = bhvSpawnedStarNoLevelExit
 gLinker.behaviors.bhvSpinAirborneCircleWarp = bhvSpinAirborneCircleWarp
@@ -2516,12 +2604,14 @@ gLinker.behaviors.bhvUnlockDoorStar = bhvUnlockDoorStar
 gLinker.behaviors.bhvVanishCap = bhvVanishCap
 gLinker.behaviors.bhvVertStarParticleSpawner = bhvVertStarParticleSpawner
 gLinker.behaviors.bhvWarp = bhvWarp
+gLinker.behaviors.bhvWarpPipe = bhvWarpPipe
 gLinker.behaviors.bhvWaterBomb = bhvWaterBomb
 gLinker.behaviors.bhvWaterBombCannon = bhvWaterBombCannon
 gLinker.behaviors.bhvWaterBombShadow = bhvWaterBombShadow
 gLinker.behaviors.bhvWaterBombSpawner = bhvWaterBombSpawner
 gLinker.behaviors.bhvWaterDroplet = bhvWaterDroplet
 gLinker.behaviors.bhvWaterDropletSplash = bhvWaterDropletSplash
+gLinker.behaviors.bhvWaterfallSoundLoop = bhvWaterfallSoundLoop
 gLinker.behaviors.bhvWaterLevelPillar = bhvWaterLevelPillar
 gLinker.behaviors.bhvWaterMist2 = bhvWaterMist2
 gLinker.behaviors.bhvWaterSplash = bhvWaterSplash

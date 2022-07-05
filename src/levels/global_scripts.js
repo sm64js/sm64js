@@ -1,5 +1,5 @@
 import * as MODEL from "../include/model_ids"
-import { LAYER_ALPHA, LAYER_OPAQUE } from "../engine/GeoLayout"
+import { LAYER_ALPHA, LAYER_OPAQUE, LAYER_TRANSPARENT } from "../engine/GeoLayout"
 
 import { ALLOC_LEVEL_POOL, AREA, BLACKOUT, CALL, CALL_LOOP, CLEARDEMOPTR, CLEAR_LEVEL, END_AREA,
          EXECUTE, EXIT, FREE_LEVEL_POOL, GET_AREA, INIT_LEVEL, JUMP_LINK, LOAD_AREA,
@@ -14,6 +14,7 @@ import { birds_geo                   } from "../actors/bird/geo.inc"
 import { blue_coin_switch_geo        } from "../actors/blue_coin_switch/geo.inc"
 import { black_bobomb_geo            } from "../actors/bobomb/geo.inc"
 import { bobomb_buddy_geo            } from "../actors/bobomb/geo.inc"
+import { boo_castle_geo              } from "../actors/boo_castle/geo.inc"
 import { bowling_ball_geo            } from "../actors/bowling_ball/geo.inc"
 import { bowling_ball_track_geo      } from "../actors/bowling_ball/geo.inc"
 import { breakable_box_geo           } from "../actors/breakable_box/geo.inc"
@@ -24,16 +25,20 @@ import { cannon_base_geo             } from "../actors/cannon_base/geo.inc"
 import { chain_chomp_geo             } from "../actors/chain_chomp/geo.inc"
 import { checkerboard_platform_geo   } from "../actors/checkerboard_platform/geo.inc"
 import { chuckya_geo                 } from "../actors/chuckya/geo.inc"
+import { clam_shell_geo              } from "../actors/clam_shell/geo.inc"
 import { exclamation_box_geo         } from "../actors/exclamation_box/geo.inc"
 import { exclamation_box_outline_geo } from "../actors/exclamation_box_outline/geo.inc"
 import { flyguy_geo                  } from "../actors/flyguy/geo.inc"
 import { goomba_geo                  } from "../actors/goomba/geo.inc"
 import { heart_geo                   } from "../actors/heart/geo.inc"
 import { koopa_shell_geo             } from "../actors/koopa_shell/geo.inc"
+import { manta_seg5_geo_05008D14     } from "../actors/manta/geo.inc"
 import { metal_box_geo               } from "../actors/metal_box/geo.inc"
 import { metal_box_dl                } from "../actors/metal_box/model.inc"
 import { metallic_ball_geo           } from "../actors/chain_ball/geo.inc"
 import { purple_switch_geo           } from "../actors/purple_switch/geo.inc"
+import { sushi_geo                   } from "../actors/sushi/geo.inc"
+import { unagi_geo                   } from "../actors/unagi/geo.inc"
 import { water_bomb_geo              } from "../actors/water_bubble/geo.inc"
 import { water_bomb_shadow_geo       } from "../actors/water_bubble/geo.inc"
 import { wooden_post_geo             } from "../actors/poundable_pole/geo.inc"
@@ -52,7 +57,7 @@ import { haunted_cage_geo } from "../actors/haunted_cage/geo.inc"
 // dls
 import { cannon_lid_seg8_dl_080048E0              } from "../actors/cannon_lid/model.inc"
 import { exclamation_box_outline_seg8_dl_08025F08 } from "../actors/exclamation_box_outline/model.inc"
-import { boo_castle_geo } from "../actors/boo_castle/geo.inc"
+import { whirlpool_seg5_dl_05013CB8               } from "../actors/whirlpool/model.inc"
 
 
 export const script_func_global_1 = () => { return [
@@ -107,14 +112,14 @@ export const script_func_global_4 = () => { return [
     RETURN(),
 ]}
 
-// export const script_func_global_5 = () => { return [
-//     LOAD_MODEL_FROM_GEO(MODEL.MANTA_RAY,               manta_seg5_geo_05008D14),
-//     LOAD_MODEL_FROM_GEO(MODEL.UNAGI,                   unagi_geo),
-//     LOAD_MODEL_FROM_GEO(MODEL.SUSHI,                   sushi_geo),
-//     LOAD_MODEL_FROM_DL( MODEL.DL_WHIRLPOOL,            whirlpool_seg5_dl_05013CB8, LAYER_TRANSPARENT),
-//     LOAD_MODEL_FROM_GEO(MODEL.CLAM_SHELL,              clam_shell_geo),
-//     RETURN(),
-// ]}
+export const script_func_global_5 = () => { return [
+    LOAD_MODEL_FROM_GEO(MODEL.MANTA_RAY,               manta_seg5_geo_05008D14),
+    LOAD_MODEL_FROM_GEO(MODEL.UNAGI,                   unagi_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.SUSHI,                   sushi_geo),
+    LOAD_MODEL_FROM_DL( MODEL.DL_WHIRLPOOL,            whirlpool_seg5_dl_05013CB8, LAYER_TRANSPARENT),
+    LOAD_MODEL_FROM_GEO(MODEL.CLAM_SHELL,              clam_shell_geo),
+    RETURN(),
+]}
 
 // export const script_func_global_6 = () => { return [
 //     LOAD_MODEL_FROM_GEO(MODEL.POKEY_HEAD,              pokey_head_geo),
@@ -239,7 +244,9 @@ export const script_func_global_18 = () => { return [
 
 
 gLinker.level_scripts.script_func_global_1  = script_func_global_1
+gLinker.level_scripts.script_func_global_3  = script_func_global_3
 gLinker.level_scripts.script_func_global_4  = script_func_global_4
+gLinker.level_scripts.script_func_global_5  = script_func_global_5
 gLinker.level_scripts.script_func_global_11 = script_func_global_11
 gLinker.level_scripts.script_func_global_12 = script_func_global_12
 gLinker.level_scripts.script_func_global_13 = script_func_global_13

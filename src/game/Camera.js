@@ -974,10 +974,6 @@ class Camera {
     }
 
     update_camera(c) {
-        if (window.cheats.debug_camera_off == true) {
-            return
-        }
-
         this.gCamera = c
         this.update_camera_hud_status(c)
 

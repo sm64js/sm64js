@@ -59,7 +59,7 @@ export const bhv_animates_on_floor_switch_press_loop = () => {
 
     if (o.rawData[oFloorSwitchPressAnimationUnk100] != 0) {
         if (o.parentObj.rawData[oAction] != 2) {
-            o.rawData[oFloorSwitchPressAnimationUnk100]
+            o.rawData[oFloorSwitchPressAnimationUnk100] = 0
         }
 
         if (o.rawData[oFloorSwitchPressAnimationUnkFC] != 0) {
@@ -79,7 +79,7 @@ export const bhv_animates_on_floor_switch_press_loop = () => {
             cur_obj_play_sound_1(SOUND_GENERAL2_SWITCH_TICK_FAST)
         }
 
-        o.rawData[oFloorSwitchPressAnimationUnkF4]--
+        // o.rawData[oFloorSwitchPressAnimationUnkF4]--
 
         if (--o.rawData[oFloorSwitchPressAnimationUnkF4] == 0) {
             o.rawData[oFloorSwitchPressAnimationUnkFC] = 0

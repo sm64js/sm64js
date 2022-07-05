@@ -55,13 +55,10 @@ export const bhv_sliding_plat_2_loop = () => {
             o.rawData[oBackAndForthPlatformVel] = -o.rawData[oBackAndForthPlatformVel]
             o.rawData[oTimer] = 0
         }
-        
-        // i think this function doesnt work because pointer moment.
-        // rewrote what it wanted to do above and it worked
-        //if (clamp_f32(o.rawData[oBackAndForthPlatformDistance], -o.rawData[oBackAndForthPlatformPathLength], 0.0)) {
-        //    o.rawData[oBackAndForthPlatformVel] = -o.rawData[oBackAndForthPlatformVel]
-        //    o.rawData[oTimer] = 0
-        //}
+        /*if (clamp_f32(o.rawData[oBackAndForthPlatformDistance], -o.rawData[oBackAndForthPlatformPathLength], 0.0)) {
+            o.rawData[oBackAndForthPlatformVel] = -o.rawData[oBackAndForthPlatformVel]
+            o.rawData[oTimer] = 0
+        }*/
     }
 
     obj_perform_position_op(0)

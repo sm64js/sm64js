@@ -7,22 +7,23 @@ import {
     G_IM_FMT_RGBA, G_IM_SIZ_16b, CALC_DXT, G_TX_LOADTILE, G_IM_SIZ_16b_BYTES, G_CC_MODULATERGB,
     G_TX_WRAP, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_RENDERTILE, G_ON,
     G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADE
-} from '../../include/gbi'
+} from "../../include/gbi"
 
 // 0x08005878
 const cannon_barrel_seg8_lights_08005878 = gdSPDefLights1(
     0x4c, 0x4c, 0x4c,
     0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-)
+);
 
 // 0x08005890
 const cannon_barrel_seg8_lights_08005890 = gdSPDefLights1(
     0x00, 0x00, 0x0f,
     0x00, 0x00, 0x32, 0x28, 0x28, 0x28
-)
+);
 
 // 0x080058A8
-export const cannon_barrel_seg8_texture_080058A8 = []  // "actors/cannon_barrel/cannon_barrel.rgba16.inc.c"
+export const cannon_barrel_seg8_texture_080058A8 = []
+// actors/cannon_barrel/cannon_barrel.rgba16.png
 
 // 0x080060A8
 const cannon_barrel_seg8_vertex_080060A8 = [
@@ -42,7 +43,7 @@ const cannon_barrel_seg8_vertex_080060A8 = [
     [[    41,    236,     41], 0, [   714,    748], [0xc3, 0x4a, 0xae, 0xff]],
     [[     0,    236,     57], 0, [   444,    860], [0x09, 0x67, 0xb8, 0xff]],
     [[     0,    236,     82], 0, [   444,   1022], [0x0d, 0x49, 0x66, 0xff]],
-]
+];
 
 // 0x080061A8
 const cannon_barrel_seg8_vertex_080061A8 = [
@@ -62,7 +63,7 @@ const cannon_barrel_seg8_vertex_080061A8 = [
     [[    57,    236,      0], 0, [     0,      0], [0xaa, 0x5c, 0xf6, 0xff]],
     [[    41,    236,    -40], 0, [     0,      0], [0xbc, 0x5d, 0x33, 0xff]],
     [[     0,    236,    -56], 0, [     0,      0], [0xf6, 0x5c, 0x56, 0xff]],
-]
+];
 
 // 0x080062A8
 const cannon_barrel_seg8_vertex_080062A8 = [
@@ -82,7 +83,7 @@ const cannon_barrel_seg8_vertex_080062A8 = [
     [[   -57,    -19,    -57], 0, [     0,      0], [0xb6, 0xcf, 0xa6, 0xff]],
     [[   -81,    236,      0], 0, [     0,      0], [0xb8, 0x68, 0x09, 0xff]],
     [[   -57,    236,    -57], 0, [     0,      0], [0xae, 0x49, 0xc2, 0xff]],
-]
+];
 
 // 0x080063A8
 const cannon_barrel_seg8_vertex_080063A8 = [
@@ -92,7 +93,7 @@ const cannon_barrel_seg8_vertex_080063A8 = [
     [[   -57,    236,    -57], 0, [     0,      0], [0xae, 0x49, 0xc2, 0xff]],
     [[   -81,    236,      0], 0, [     0,      0], [0xb8, 0x68, 0x09, 0xff]],
     [[   -57,    -19,     58], 0, [     0,      0], [0xa6, 0xcf, 0x49, 0xff]],
-]
+];
 
 // 0x08006408 - 0x080064C0
 export const cannon_barrel_seg8_dl_08006408 = [
@@ -111,7 +112,7 @@ export const cannon_barrel_seg8_dl_08006408 = [
     gsSP2Triangles(14, 15, 12, 0x0, 14,  3, 15, 0x0),
     gsSP2Triangles(14,  0,  3, 0x0, 14, 12, 13, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].flat();
 
 // 0x080064C0 - 0x08006660
 export const cannon_barrel_seg8_dl_080064C0 = [
@@ -145,7 +146,7 @@ export const cannon_barrel_seg8_dl_080064C0 = [
     gsSP2Triangles( 0,  4,  3, 0x0,  5,  0,  2, 0x0),
     gsSP1Triangle( 5,  4,  0, 0x0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].flat();
 
 // 0x08006660 - 0x080066C8
 export const cannon_barrel_seg8_dl_08006660 = [
@@ -162,6 +163,6 @@ export const cannon_barrel_seg8_dl_08006660 = [
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPDisplayList(cannon_barrel_seg8_dl_080064C0),
     gsSPEndDisplayList(),
-].filter((obj) => obj).flat()
+].flat();
 
-// 1618208663 - 2021-04-11 20:48:00 -1000
+// 2022-07-04 22:12:26 -0400 (Convert.rb 2022-07-03 12:20:08 -0400)

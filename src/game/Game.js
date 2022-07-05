@@ -87,7 +87,7 @@ class Game {
     }
 
     warp_to(level) {
-        LevelUpdate.fade_into_special_warp(level)
+        if (gLinker.Area.gWarpTransition.isActive != 1) LevelUpdate.fade_into_special_warp(level)
     }
 
     snapshot_location() {

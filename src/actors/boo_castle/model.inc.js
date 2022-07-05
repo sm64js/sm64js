@@ -1,18 +1,28 @@
 // Boo (Castle)
 
-import { CALC_DXT, gdSPDefLights1, gsDPLoadBlock, gsDPLoadSync, gsDPPipeSync, gsDPSetCombineMode, gsDPSetEnvColor, gsDPSetTextureImage, gsDPSetTile, gsDPSetTileSize, gsDPTileSync, gsSP1Triangle, gsSP2Triangles, gsSPDisplayList, gsSPEndDisplayList, gsSPLight, gsSPNumLights, gsSPTexture, gsSPVertex, G_CC_BLENDRGBFADEA, G_CC_SHADE, G_CC_SHADEFADEA, G_IM_FMT_RGBA, G_IM_SIZ_16b, G_IM_SIZ_16b_BYTES, G_OFF, G_ON, G_TEXTURE_IMAGE_FRAC, G_TX_CLAMP, G_TX_LOADTILE, G_TX_NOLOD, G_TX_NOMASK, G_TX_NOMIRROR, G_TX_RENDERTILE, G_TX_WRAP, NUMLIGHTS_1 } from "../../include/gbi"
+import {
+    gdSPDefLights1, gsDPSetTextureImage, gsDPTileSync, gsDPSetTile, gsDPLoadSync, gsDPLoadBlock,
+    gsSPLight, gsSPVertex, gsSP2Triangles, gsSPEndDisplayList, gsSP1Triangle, gsDPPipeSync,
+    gsDPSetCombineMode, gsSPNumLights, gsSPTexture, gsDPSetTileSize, gsSPDisplayList,
+    gsDPSetEnvColor,
+    G_IM_FMT_RGBA, G_IM_SIZ_16b, G_TX_LOADTILE, G_TX_WRAP, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD,
+    CALC_DXT, G_IM_SIZ_16b_BYTES, G_CC_BLENDRGBFADEA, NUMLIGHTS_1, G_TX_RENDERTILE, G_ON,
+    G_TX_CLAMP, G_TEXTURE_IMAGE_FRAC, G_OFF, G_CC_SHADEFADEA, G_CC_SHADE
+} from "../../include/gbi"
 
 // 0x06015658
 const boo_castle_seg6_lights_06015658 = gdSPDefLights1(
     0x97, 0x9a, 0xff,
     0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-)
+);
 
 // 0x06015670
 export const boo_castle_seg6_texture_06015670 = []
+// actors/boo_castle/bbh_boo_eyes.rgba16.png
 
 // 0x06016670
 export const boo_castle_seg6_texture_06016670 = []
+// actors/boo_castle/bbh_boo_mouth.rgba16.png
 
 // 0x06016E70
 const boo_castle_seg6_vertex_06016E70 = [
@@ -28,7 +38,7 @@ const boo_castle_seg6_vertex_06016E70 = [
     [[   -86,    -78,    123], 0, [  -176,    684], [0xad, 0xc9, 0x4e, 0x9e]],
     [[     0,    -47,    171], 0, [   458,    168], [0x00, 0xe9, 0x7c, 0x9e]],
     [[  -107,     20,    118], 0, [  -328,   -172], [0xa9, 0x14, 0x59, 0x9e]],
-]
+];
 
 // 0x06016F30
 const boo_castle_seg6_vertex_06016F30 = [
@@ -44,7 +54,7 @@ const boo_castle_seg6_vertex_06016F30 = [
     [[   108,     20,    118], 0, [  2660,    540], [0x57, 0x14, 0x5a, 0x9e]],
     [[    58,    128,    108], 0, [  1852,   -688], [0x35, 0x58, 0x49, 0x9e]],
     [[     0,     60,    166], 0, [   988,    148], [0x00, 0x26, 0x79, 0x9e]],
-]
+];
 
 // 0x06016FF0
 const boo_castle_seg6_vertex_06016FF0 = [
@@ -250,7 +260,7 @@ const boo_castle_seg6_vertex_06017950 = [
     [[   108,     20,    118], 0, [     0,      0], [0x57, 0x14, 0x5a, 0x9e]],
     [[    87,    -78,    123], 0, [     0,      0], [0x53, 0xc9, 0x4e, 0x9e]],
     [[   156,      6,     33], 0, [     0,      0], [0x79, 0x0f, 0x22, 0x9e]],
-]
+];
 
 // 0x06017A10 - 0x06017A78
 export const boo_castle_seg6_dl_06017A10 = [
@@ -351,3 +361,5 @@ export const boo_castle_seg6_dl_06017CE0 = [
     gsDPSetEnvColor(255, 255, 255, 255),
     gsSPEndDisplayList(),
 ].flat();
+
+// 2022-07-04 22:15:03 -0400 (Convert.rb 2022-07-03 12:20:08 -0400)

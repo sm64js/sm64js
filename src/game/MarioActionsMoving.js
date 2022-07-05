@@ -134,6 +134,9 @@ import {
     SOUND_MARIO_MAMA_MIA, SOUND_MARIO_OOOF2, SOUND_MARIO_UH2_2, SOUND_MOVING_TERRAIN_SLIDE
 } from "../include/sounds"
 
+import { mtxf_align_terrain_triangle } from "../engine/math_util"
+
+let sFloorAlignMatrix = [new Array(4).fill(0).map(() => new Array(4).fill(0)), new Array(4).fill(0).map(() => new Array(4).fill(0))]
 
 export const tilt_body_running = (m) => {
     let pitch = find_floor_slope(m, 0)
@@ -1049,7 +1052,8 @@ const update_sliding = (m, stopSpeed) => {
 
 const align_with_floor = (m) => {
     m.pos[1] = m.floorHeight
-    // Todo other stuff here
+    mtxf_align_terrain_triangle(sFloorAlignMatrix[m.unk00], m.pos, m.faceAngle[1], 40.0)
+    m.marioObj.gfx.throwMatrix = sFloorAlignMatrix[m.unk00]
 }
 
 const common_slide_action = (m, endAction, airAction, animation) => {

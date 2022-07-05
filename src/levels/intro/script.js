@@ -14,7 +14,7 @@ import { level_main_scripts_entry } from "../scripts"
 import { lvl_intro_update } from "../../menu/level_select_menu"
 
 export const level_intro_splash_screen = [
-    // EXIT_AND_EXECUTE('level_main_scripts_entry'), // JOE DEBUG
+    // EXIT_AND_EXECUTE('level_main_scripts_entry'), // DEBUG
 
     INIT_LEVEL(),
 

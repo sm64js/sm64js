@@ -1,3 +1,4 @@
+import * as _Linker from "../../game/Linker"
 import { is_point_within_radius_of_mario, object_step } from "../ObjBehaviors"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { atan2s } from "../../engine/math_util"

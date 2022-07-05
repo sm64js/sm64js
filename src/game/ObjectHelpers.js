@@ -1430,8 +1430,8 @@ export const cur_obj_change_action = (action) => {
 
 export const cur_obj_set_vel_from_mario_vel = (f12, f14) => {
     const o = ObjectListProc.gCurrentObject
-    const gMarioStates = gLinker.ObjectListProcessor.gMarioObject
-    let /*f32*/ sp4 = gMarioStates.rawData[oForwardVel]
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+    let /*f32*/ sp4 = gMarioObject.rawData[oForwardVel]
     let /*f32*/ sp0 = f12 * f14
 
     if (sp4 < sp0) {

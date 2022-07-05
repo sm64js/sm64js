@@ -79,4 +79,4 @@ export const course_dance_cutscenes = [
 
 export const COURSE_CAP_COURSES = COURSE_COTMC
 export const COURSE_IS_MAIN_COURSE = (course) => { return course >= COURSE_MIN && course <= COURSE_MAX }
-
+export const COURSE_NUM_TO_INDEX = (course) => {return course - 1}

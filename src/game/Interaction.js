@@ -68,7 +68,6 @@ import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMa
 
 import { atan2s, sqrtf } from "../engine/math_util"
 import { sins, coss, int16, s16 } from "../utils"
-// import { spawn_object } from "./ObjectHelpers"
 // import { bhv } from "./BehaviorData"
 // import { MODEL_NONE } from "../include/model_ids"
 import { SURFACE_DEATH_PLANE, SURFACE_VERTICAL_WIND, SURFACE_BURNING } from "../include/surface_terrains"
@@ -76,7 +75,7 @@ import { level_trigger_warp } from "./LevelUpdate"
 import { COURSE_IS_MAIN_COURSE } from "../levels/course_defines"
 import { CameraInstance as Camera } from "./Camera"
 import * as CAMERA from "./Camera"  // for constants
-import { obj_set_held_state } from "./ObjectHelpers"
+import { obj_set_held_state, spawn_object } from "./ObjectHelpers"
 import { stop_shell_music } from "./SoundInit"
 import { play_sound } from "../audio/external"
 import { save_file_get_flags, SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR,
@@ -91,7 +90,9 @@ import { save_file_get_flags, SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR,
     save_file_clear_flags,
     SAVE_FLAG_CAP_ON_KLEPTO,
     SAVE_FLAG_CAP_ON_UKIKI,
+    save_file_collect_star_or_key,
  } from "./SaveFile"
+import { MODEL_NONE } from "../include/model_ids"
 
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
@@ -311,14 +312,14 @@ const interact_star_or_key = (m, /*interactType,*/ o) => {
             starGrabAction = ACT_FALL_AFTER_STAR_GRAB
         }
 
-        // spawn_object(o, MODEL_NONE, bhvStarKeyCollectionPuffSpawner);
+        spawn_object(o, MODEL_NONE, gLinker.behaviors.bhvStarKeyCollectionPuffSpawner);
 
         o.oInteractStatus = INT_STATUS_INTERACTED
         m.interactObj = o
         m.usedObj = o
 
         starIndex = (o.oBehParams >> 24) & 0x1F;
-        // save_file_collect_star_or_key(m.numCoins, starIndex);
+        save_file_collect_star_or_key(m.numCoins, starIndex);
 
         // m.numStars =
         //     save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
@@ -731,8 +732,6 @@ const interact_grabbable = (m, o) => {
 
 const mario_can_talk = (m, arg) => {
     let val6
-
-    return 0  // TODO implement ACT_READING_SIGN
 
     if ((m.action & ACT_FLAG_IDLE) != 0x00000000) {
         return 1

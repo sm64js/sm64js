@@ -262,6 +262,11 @@ export const BULLY_STYPE_GENERIC  = 0
 export const BULLY_STYPE_MINION   = 1
 export const BULLY_STYPE_CHILL    = 16
 
+/* Celebration Star */
+    /* oAction */
+export const CELEB_STAR_ACT_SPIN_AROUND_MARIO = 0
+export const CELEB_STAR_ACT_FACE_CAMERA       = 1
+
 /* Arrow Lift */
 export const oArrowLiftDisplacement        = 0x1B
 export const oArrowLiftUnk100              = 0x1E

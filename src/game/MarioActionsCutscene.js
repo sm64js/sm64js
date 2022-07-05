@@ -21,7 +21,7 @@ import {
 } from "./Interaction"
 
 import {
-    get_dialog_id, create_dialog_box
+    IngameMenuInstance as IngameMenu
 } from "./IngameMenu"
 
 import {
@@ -29,7 +29,7 @@ import {
 } from "../utils"
 
 import { 
-    atan2s
+    atan2s, vec3f_copy, vec3s_set
 } from "../engine/math_util"
 
 import {
@@ -171,15 +171,15 @@ import {
     SOUND_MARIO_YAH_WAH_HOO, SOUND_MARIO_HOOHOO,
 
     SOUND_ACTION_TERRAIN_BODY_HIT_GROUND, SOUND_ACTION_UNKNOWN43D, SOUND_ACTION_UNKNOWN43E,
-    SOUND_ACTION_BRUSH_HAIR, SOUND_ACTION_KEY_SWISH, SOUND_ACTION_PAT_BACK, SOUND_ACTION_UNKNOWN45C
+    SOUND_ACTION_BRUSH_HAIR, SOUND_ACTION_KEY_SWISH, SOUND_ACTION_PAT_BACK, SOUND_ACTION_UNKNOWN45C, SOUND_ACTION_READ_SIGN
 } from "../include/sounds"
 
 import { LEVEL_BOWSER_1, LEVEL_BOWSER_2 } from "../levels/level_defines_constants"
 import { COURSE_BITDW, COURSE_BITFS } from "../levels/course_defines"
 
-import { create_dialog_inverted_box } from "./IngameMenu"
-
 import { play_sound } from "../audio/external"
+
+import { CameraInstance as Camera } from "./Camera"
 
 let sIntroWarpPipeObj = null
 let sEndPeachObj = null
@@ -568,14 +568,13 @@ export const cutscene_put_cap_on = (m) => {
 //     return 0
 // }
 
-// // puts Mario in a state where he's waiting for (npc) dialog; doesn't do much
-// export const act_waiting_for_dialog = (m) => {
-//     set_mario_animation(m, m.heldObj == null ? MARIO_ANIM_FIRST_PERSON
-//                                               : MARIO_ANIM_IDLE_WITH_LIGHT_OBJ)
-//     vec3f_copy(m.marioObj.gfx.pos, m.pos)
-//     vec3s_set(m.marioObj.gfx.angle, 0, m.faceAngle[1], 0)
-//     return 0
-// }
+// puts Mario in a state where he's waiting for (npc) dialog; doesn't do much
+export const act_waiting_for_dialog = (m) => {
+    set_mario_animation(m, m.heldObj == null ? MARIO_ANIM_FIRST_PERSON : MARIO_ANIM_IDLE_WITH_LIGHT_OBJ)
+    vec3f_copy(m.marioObj.gfx.pos, m.pos)
+    vec3s_set(m.marioObj.gfx.angle, 0, m.faceAngle[1], 0)
+    return 0
+}
 
 // makes Mario disappear and triggers warp
 export const act_disappeared = (m) => {
@@ -607,7 +606,7 @@ export const act_reading_automatic_dialog = (m) => {
           // set Mario dialog
         if (m.actionState == 9) {
             actionArg = m.actionArg
-            create_dialog_box()
+            IngameMenu.create_dialog_box()
             // if (GET_HIGH_U16_OF_32(actionArg) == 0) {
             //     create_dialog_box(GET_LOW_U16_OF_32(actionArg))
             // } else {
@@ -616,7 +615,7 @@ export const act_reading_automatic_dialog = (m) => {
         }
           // wait until dialog is done
         else if (m.actionState == 10) {
-            if (get_dialog_id() >= 0) {
+            if (IngameMenu.get_dialog_id() >= 0) {
                 m.actionState--
             }
         }
@@ -646,26 +645,27 @@ export const act_reading_automatic_dialog = (m) => {
 
 export const act_reading_sign = (m) => {
     const marioObj = m.marioObj
+    const gCamera = gLinker.Camera.gCamera
 
     play_sound_if_no_flag(m, SOUND_ACTION_READ_SIGN, MARIO_ACTION_SOUND_PLAYED)
 
     switch (m.actionState) {
         // start dialog
         case 0:
-            trigger_cutscene_dialog(1)
+            Camera.trigger_cutscene_dialog(1)
             enable_time_stop()
             // reading sign
             set_mario_animation(m, MARIO_ANIM_FIRST_PERSON)
             m.actionState = 1
             // intentional fall through
-            // turn toward sign
+        // turn toward sign
         case 1:
             m.faceAngle[1] += marioObj.rawData[oMarioPoleUnk108] / 11
             m.pos[0] += marioObj.rawData[oMarioReadingSignDPosX] / 11.0
             m.pos[2] += marioObj.rawData[oMarioReadingSignDPosZ] / 11.0
             // create the text box
             if (m.actionTimer++ == 10) {
-                create_dialog_inverted_box(m.usedObj.rawData[oBehParams2ndByte])
+                IngameMenu.create_dialog_inverted_box(m.usedObj.rawData[oBehParams2ndByte])
                 m.actionState = 2
             }
             break
@@ -739,7 +739,7 @@ export const general_star_dance_handler = (m, isInWater) => {
     if (m.actionState == 0) {
         switch (++m.actionTimer) {
             case 1:
-                // spawn_object(m.marioObj, MODEL_STAR, bhvCelebrationStar)
+                // spawn_object(m.marioObj, MODEL_STAR, gLinker.behaviors.bhvCelebrationStar)
                 // disable_background_sound()
                 // if (m.actionArg & 1) {
                 //     play_course_clear()

@@ -538,7 +538,6 @@ export const texture_menu_hud_char_hiragana_mi = []
 // 0x07009DD0
 export const texture_menu_hud_char_hira_dakuten_do = []
 // levels/menu/main_menu_seg7.09DD0.rgba16.png
-
 // 0x07009FD0
 export const texture_menu_hud_char_hiragana_no = []
 // levels/menu/main_menu_seg7.09FD0.rgba16.png
@@ -562,6 +561,16 @@ export const texture_menu_hud_char_katakana_n = []
 // 0x0700A9D0
 export const texture_menu_hud_char_kana_dakuten_do = []
 // levels/menu/main_menu_seg7.0A9D0.rgba16.png
+
+export const menu_hud_lut = [
+    texture_menu_hud_char_katakana_hu, texture_menu_hud_char_katakana_small_a,         texture_menu_hud_char_katakana_i, texture_menu_hud_char_katakana_ru,
+    texture_menu_hud_char_katakana_se,      texture_menu_hud_char_katakana_re,        texture_menu_hud_char_katakana_ku, texture_menu_hud_char_katakana_to,
+    texture_menu_hud_char_hiragana_wo,      texture_menu_hud_char_katakana_ko, texture_menu_hud_char_kana_handakuten_pi, texture_menu_hud_char_choonpu,
+    texture_menu_hud_char_hiragana_su,      texture_menu_hud_char_hiragana_ru,        texture_menu_hud_char_hiragana_ke, texture_menu_hud_char_katakana_ma,
+    texture_menu_hud_char_katakana_ri,       texture_menu_hud_char_katakana_o,        texture_menu_hud_char_katakana_su, texture_menu_hud_char_katakana_a,
+    texture_menu_hud_char_hiragana_mi,  texture_menu_hud_char_hira_dakuten_do,        texture_menu_hud_char_hiragana_no, texture_menu_hud_char_question,
+    texture_menu_hud_char_katakana_sa,       texture_menu_hud_char_katakana_u,         texture_menu_hud_char_katakana_n, texture_menu_hud_char_kana_dakuten_do,
+]
 
 // 0x0700AC40
 export const texture_menu_font_char_0 = []

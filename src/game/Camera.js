@@ -18,6 +18,7 @@ import { oPosY } from "../include/object_constants"
 import { SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { sins, s16, int16 } from "../utils"
 import { HudInstance as Hud } from "./Hud"
+import { DIALOG_RESPONSE_NONE } from "./IngameMenu"
 
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
@@ -358,6 +359,9 @@ class Camera {
 
         this.sOldPosition = [0, 0, 0]
         this.sOldFocus = [0, 0, 0]
+        this.sObjectCutscene = 0
+        this.gRecentCutscene = 0
+        this.sCutsceneDialogResponse = DIALOG_RESPONSE_NONE
     }
 
     select_mario_cam_mode() {
@@ -1207,6 +1211,20 @@ class Camera {
         MathUtil.vec3f_add(c.focus, pan)
     }
 
+    trigger_cutscene_dialog(trigger) {
+        let result = 0
+
+        if (trigger == 1) {
+            this.start_object_cutscene_without_focus(CUTSCENE_READ_MESSAGE)
+        }
+        return result
+    }
+
+    start_object_cutscene_without_focus(cutscene) {
+        this.sObjectCutscene = cutscene
+        this.sCutsceneDialogResponse = DIALOG_RESPONSE_NONE
+        return 0
+    }
 
     handle_c_button_movement(c) {
         let cSideYaw

@@ -5,7 +5,7 @@ import { power_meter_health_segments_lut, dl_power_meter_base, dl_power_meter_he
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import * as Mario from "./Mario"
 import * as MathUtil from "../engine/math_util"
-import * as IngameMenu from "./IngameMenu"
+import { IngameMenuInstance as IngameMenu } from "./IngameMenu"
 import { PrintInstance as Print } from "./Print"
 import * as GfxDimensions from "../include/gfx_dimensions"
 import { GameInstance as Game } from "./Game"

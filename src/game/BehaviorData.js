@@ -59,6 +59,7 @@ import * as _cap                      from "./behaviors/cap.inc"
 import * as _castle_cannon_grate      from "./behaviors/castle_cannon_grate.inc"
 import * as _castle_flag              from "./behaviors/bhv_castle_flag_init.inc"
 import * as _castle_floor_trap        from "./behaviors/castle_floor_trap.inc"
+import * as _celebration_star         from "./behaviors/celebration_star.inc"
 import * as _chain_chomp              from "./behaviors/chain_chomp.inc"
 import * as _checkerboard_platform    from "./behaviors/checkerboard_platform.inc"
 import * as _cloud                    from "./behaviors/cloud.inc"
@@ -680,10 +681,12 @@ export const bhvMessagePanel = [
 ]
 
 export const bhvSignOnWall = [
-    BEGIN(OBJ_LIST_SURFACE, 'bhvSignOnWall'),
+    BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(wooden_signpost_seg3_collision_0302DD80),
     SET_INTERACT_TYPE(INTERACT_TEXT),
     SET_INT(oInteractionSubtype, INT_SUBTYPE_SIGN),
+    DROP_TO_FLOOR(),
     SET_HITBOX(/*Radius*/ 150, /*Height*/ 80),
     SET_INT(oWoodenPostTotalMarioAngle, 0),
     BEGIN_LOOP(),
@@ -1919,6 +1922,37 @@ export const bhvCannonBarrelBubbles = [
     END_LOOP(),
 ]
 
+export const bhvCelebrationStar = [
+    BEGIN(OBJ_LIST_LEVEL),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    CALL_NATIVE('bhv_celebration_star_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_celebration_star_loop'),
+    END_LOOP(),
+]
+
+export const bhvCelebrationStarSparkle = [
+    BEGIN(OBJ_LIST_UNIMPORTANT),
+    BILLBOARD(),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    SET_FLOAT(oGraphYOffset, 25),
+    SET_INT(oAnimState, -1),
+    BEGIN_LOOP(),
+        ADD_INT(oAnimState, 1),
+        CALL_NATIVE('bhv_celebration_star_sparkle_loop'),
+    END_LOOP(),
+]
+
+export const bhvStarKeyCollectionPuffSpawner = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    BILLBOARD(),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    SET_INT(oAnimState, -1),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_star_key_collection_puff_spawner_loop'),
+    END_LOOP(),
+]
+
 export const bhvPitBowlingBall = [
     BEGIN(OBJ_LIST_GENACTOR, 'bhvPitBowlingBall'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -2537,6 +2571,7 @@ gLinker.behaviors.bhvRockSolid = bhvRockSolid
 gLinker.behaviors.bhvSeesawPlatform = bhvSeesawPlatform
 gLinker.behaviors.bhvShallowWaterSplash = bhvShallowWaterSplash
 gLinker.behaviors.bhvShallowWaterWave = bhvShallowWaterWave
+gLinker.behaviors.bhvSignOnWall = bhvSignOnWall
 gLinker.behaviors.bhvSingleCoinGetsSpawned = bhvSingleCoinGetsSpawned
 gLinker.behaviors.bhvSlidingPlatform2 = bhvSlidingPlatform2
 gLinker.behaviors.bhvSmallBully = bhvSmallBully
@@ -2553,6 +2588,7 @@ gLinker.behaviors.bhvSquarishPathMoving = bhvSquarishPathMoving
 gLinker.behaviors.bhvSquishablePlatform = bhvSquishablePlatform
 gLinker.behaviors.bhvStar = bhvStar
 gLinker.behaviors.bhvStarDoor = bhvStarDoor
+gLinker.behaviors.bhvStarKeyCollectionPuffSpawner = bhvStarKeyCollectionPuffSpawner
 gLinker.behaviors.bhvStaticObject = bhvStaticObject
 gLinker.behaviors.bhvSwimmingWarp = bhvSwimmingWarp
 gLinker.behaviors.bhvThiBowlingBallSpawner = bhvThiBowlingBallSpawner

@@ -167,7 +167,11 @@ class LevelCommands {
     }
 
     show_dialog(index,  dialog) {
-        console.log("ignoring show_dialog()")
+        if (this.sCurrAreaIndex != -1) {
+            if (index < 2) {
+                Area.gAreas[this.sCurrAreaIndex].dialog[index] = dialog
+            }
+        }
         this.sCurrentScript.index++
     }
 

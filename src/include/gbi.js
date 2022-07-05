@@ -270,6 +270,16 @@ export const G_IM_SIZ_8b_BYTES  = 1
 export const G_IM_SIZ_16b_BYTES = 2
 export const G_IM_SIZ_32b_BYTES = 4
 
+export const G_IM_SIZ_4b_SHIFT = 2
+export const G_IM_SIZ_8b_SHIFT = 1
+export const G_IM_SIZ_16b_SHIFT = 0
+export const G_IM_SIZ_32b_SHIFT = 0
+
+export const G_IM_SIZ_4b_INCR = 3
+export const G_IM_SIZ_8b_INCR = 1
+export const G_IM_SIZ_16b_INCR = 0
+export const G_IM_SIZ_32b_INCR = 0
+
 export const G_IM_SIZ_INCR_TABLE = {
     1: 1,
     2: 0
@@ -1075,6 +1085,16 @@ export const gsSPTexture = (s, t, level, tile, on) => {
       w1: { s, t }
     }
   }
+}
+
+export const gSPPopMatrix = (pkt, n) => {
+    pkt = pkt.pop()
+    return {
+        words: {
+            w0: G_POPMTX,
+            w1: { pkt, n }
+        }
+    }
 }
 
 export const gsDPSetTileSize = (t, uls, ult, lrs, lrt) => {

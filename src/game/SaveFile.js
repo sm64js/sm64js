@@ -1,4 +1,8 @@
 import { COURSE_BBH, COURSE_CCM, COURSE_NONE, COURSE_HMC, COURSE_SSL, COURSE_BOB, COURSE_SL, COURSE_WDW, COURSE_JRB, COURSE_THI, COURSE_TTC, COURSE_RR, COURSE_BITDW, COURSE_VCUTM, COURSE_BITFS, COURSE_SA, COURSE_BITS, COURSE_LLL, COURSE_DDD, COURSE_CAKE_END, COURSE_PSS, COURSE_COTMC, COURSE_TOTWC, COURSE_WMOTR, COURSE_TTM } from "../include/course_table";
+import { COURSE_MIN, COURSE_NUM_TO_INDEX, COURSE_STAGES_MAX } from "../levels/course_defines";
+import { AreaInstance as Area } from "./Area";
+
+let NUM_SAVE_FILES = 4
 
 // struct SaveFile
 // {
@@ -57,10 +61,10 @@ import { COURSE_BBH, COURSE_CCM, COURSE_NONE, COURSE_HMC, COURSE_SSL, COURSE_BOB
 //     struct MainMenuSaveData menuData[2];
 // };
 
-export const gLastCompletedCourseNum = null
-export const gLastCompletedStarNum = null
-export const sUnusedGotGlobalCoinHiScore = null
-export const gGotFileCoinHiScore = null
+export let gLastCompletedCourseNum = null
+export let gLastCompletedStarNum = null
+export let sUnusedGotGlobalCoinHiScore = null
+export let gGotFileCoinHiScore = null
 export const gCurrCourseStarFlags = null
 export const gSpecialTripleJump = null
 export const gLevelToCourseNumTable = [
@@ -152,6 +156,57 @@ export let gMainMenuDataModified = false
 export let gSaveFileModified = false
 let gDummyFlags = 0
 
+// export const get_coin_score_age = (fileIndex, courseIndex) => {
+//     return (gSaveBuffer.menuData[0].coinScoreAges[fileIndex] >> (2 * courseIndex)) & 0x3;
+// }
+
+/**
+ * Update the current save file after collecting a star or a key.
+ * If coin score is greater than the current high score, update it.
+ */
+export const save_file_collect_star_or_key = (coinScore, starIndex) => {
+    let fileIndex = Area.gCurrFileNum - 1
+    let courseIndex = COURSE_NUM_TO_INDEX(Area.gCurrCourseNum)
+    let starFlag = 1 << starIndex
+
+    gLastCompletedCourseNum = courseIndex + 1
+    gLastCompletedStarNum = starIndex + 1
+    gGotFileCoinHiScore = false
+    // sUnusedGotGlobalCoinHiScore = false;
+
+    if (courseIndex >= COURSE_NUM_TO_INDEX(COURSE_MIN) && courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
+        /* if (coinScore > save_file_get_max_coin_score(courseIndex) & 0xFFFF) {
+            sUnusedGotGlobalCoinHiScore = true;
+        } */
+
+        if (coinScore > save_file_get_max_coin_score(courseIndex)) {
+            // gSaveBuffer.files[fileIndex][0].courseCoinScores[courseIndex] = coinScore;
+            // touch_coin_score_age(fileIndex, courseIndex);
+
+            gGotFileCoinHiScore = true;
+            gSaveFileModified = true;
+        }
+    }
+}
+
+export const save_file_get_max_coin_score = (courseIndex) => {
+    let maxCoinScore = -1
+    let maxScoreAge = -1
+    let maxScoreFileNum = 0
+
+    for (let fileIndex = 0; fileIndex < NUM_SAVE_FILES; fileIndex++) {
+        if (save_file_get_star_flags(fileIndex, courseIndex) != 0) {
+            // let coinScore = save_file_get_course_coin_score(fileIndex, courseIndex);
+            // let scoreAge = get_coin_score_age(fileIndex, courseIndex);
+
+            // if (coinScore > maxCoinScore || (coinScore == maxCoinScore && scoreAge > maxScoreAge)) {
+            //     maxCoinScore = coinScore;
+            //     maxScoreAge = scoreAge;
+            //     maxScoreFileNum = fileIndex + 1;
+        }
+    }
+}
+
 export const save_file_get_flags = (force) => {
     if (force) {
         return gDummyFlags | force
@@ -205,3 +260,7 @@ export const save_file_get_star_flags = (fileIndex, courseIndex) => {
 
     return starFlags
 }
+
+// export const save_file_get_course_coin_score(fileIndex, courseIndex) {
+//     return gSaveBuffer.files[fileIndex][0].courseCoinScores[courseIndex];
+// }

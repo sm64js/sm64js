@@ -691,7 +691,6 @@ export const bhvSignOnWall = [
     SET_INT(oWoodenPostTotalMarioAngle, 0),
     BEGIN_LOOP(),
         SET_INT(oIntangibleTimer, 0),
-        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
         SET_INT(oInteractStatus, 0),
     END_LOOP(),
 ]

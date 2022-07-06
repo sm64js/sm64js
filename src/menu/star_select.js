@@ -1,5 +1,6 @@
 import { AreaInstance as Area } from "../game/Area"
 import { save_file_get_star_flags, save_file_get_course_star_count } from "../game/SaveFile"
+import { GameInstance as Game } from "../game/Game"
 
 
 let sLoadedActNum = 0
@@ -46,7 +47,7 @@ export const lvl_init_act_selector_values_and_stars = () => {
 export const lvl_update_obj_and_load_act_button_actions = () => {
     if (sActSelectorMenuTimer >= 11) {
           // If any of these buttons are pressed, play sound and go to course act
-        if ((gPlayer3Controller.buttonPressed & (A_BUTTON | START_BUTTON | B_BUTTON | Z_TRIG))) {
+        if ((Game.gPlayer3Controller.buttonPressed & (A_BUTTON | START_BUTTON | B_BUTTON | Z_TRIG))) {
             // play_sound(SOUND_MENU_STAR_SOUND_LETS_A_GO, gGlobalSoundSource)
             if (sInitSelectedActNum >= sSelectedActIndex + 1) {
                 sLoadedActNum = sSelectedActIndex + 1

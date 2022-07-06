@@ -443,6 +443,19 @@ export const main_hud_lut = [
     texture_hud_char_apostrophe, texture_hud_char_double_quote,
 ]
 
+export const main_credits_font_lut = [
+    0x0,                    0x0,                    0x0, texture_credits_char_3,
+    texture_credits_char_4,                    0x0, texture_credits_char_6,                    0x0,
+                       0x0,                    0x0, texture_credits_char_A, texture_credits_char_B,
+    texture_credits_char_C, texture_credits_char_D, texture_credits_char_E, texture_credits_char_F,
+    texture_credits_char_G, texture_credits_char_H, texture_credits_char_I, texture_credits_char_J,
+    texture_credits_char_K, texture_credits_char_L, texture_credits_char_M, texture_credits_char_N,
+    texture_credits_char_O, texture_credits_char_P, texture_credits_char_Q, texture_credits_char_R,
+    texture_credits_char_S, texture_credits_char_T, texture_credits_char_U, texture_credits_char_V,
+    texture_credits_char_W, texture_credits_char_X, texture_credits_char_Y, texture_credits_char_Z,
+    texture_credits_char_period,
+]
+
 export const dl_hud_img_begin = function () {
 	var result = [
 		// Gbi.gsDPPipeSync(),
@@ -614,5 +627,22 @@ export const dl_rgba16_load_tex_block = [
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 4, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 4, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 4, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (16 - 1) << G_TEXTURE_IMAGE_FRAC, (16 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPEndDisplayList(),
+].flat()
+
+const vertex_text_bg_box = [
+    [[     0,    -80,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[   130,    -80,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[   130,      0,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[     0,      0,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+]
+
+export const dl_draw_text_bg_box = [
+    gsDPPipeSync(),
+    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetCombineMode(Gbi.G_CC_FADE, Gbi.G_CC_FADE),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_XLU_SURF, Gbi.G_RM_XLU_SURF2),
+    gsSPVertex(vertex_text_bg_box, 4, 0),
+    gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
     gsSPEndDisplayList(),
 ].flat()

@@ -1,9 +1,18 @@
-import { dl_ia_text_tex_settings, dl_rgba16_load_tex_block, main_font_lut, main_hud_lut } from "../common_gfx/segment2"
+import { dl_draw_text_bg_box, dl_ia_text_tex_settings, dl_rgba16_load_tex_block, main_credits_font_lut, main_font_lut, main_hud_lut } from "../common_gfx/segment2"
 import * as MathUtil from "../engine/math_util"
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../include/config"
 import * as Gbi from "../include/gbi"
-import { menu_hud_lut } from "../levels/menu/leveldata"
+import { menu_font_lut, menu_hud_lut } from "../levels/menu/leveldata"
+import { AreaInstance as Area} from "./Area"
 import { GameInstance as Game } from "./Game"
+import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
+import { DialogIdInstance as DialogId } from "../include/dialog_ids"
+import { gGlobalSoundSource, play_sound } from "../audio/external"
+import { SOUND_MENU_PAUSE, SOUND_MENU_PAUSE_2 } from "../include/sounds"
+import { COURSE_BONUS_STAGES, COURSE_MAX, COURSE_MIN, COURSE_NONE, COURSE_NUM_TO_INDEX } from "../levels/course_defines"
+import { ACT_FLAG_PAUSE_EXIT } from "./Mario"
+import { gLastCompletedCourseNum } from "./SaveFile"
+import { GFX_DIMENSIONS_ASPECT_RATIO, GFX_DIMENSIONS_FROM_LEFT_EDGE } from "../include/gfx_dimensions"
 
 export const ASCII_TO_DIALOG = (asc) => {
     return (((asc) >= '0' && (asc) <= '9') ? ((asc) - '0') :
@@ -19,6 +28,14 @@ export const DIALOG_RESPONSE_YES = 1
 export const DIALOG_RESPONSE_NO = 2
 export const DIALOG_RESPONSE_NOT_DEFINED = 3
 
+export const DIALOG_STATE_OPENING = 0
+export const DIALOG_STATE_VERTICAL = 1
+export const DIALOG_STATE_HORIZONTAL = 2
+export const DIALOG_STATE_CLOSING = 3
+
+export const DEFAULT_DIALOG_BOX_ANGLE = 90.0
+export const DEFAULT_DIALOG_BOX_SCALE = 19.0
+
 export const MENU_MTX_PUSH = 1
 export const MENU_MTX_NOPUSH = 2
 
@@ -29,6 +46,13 @@ export const MAX_STRING_WIDTH = 16
 
 export const HUD_LUT_JPMENU = 1
 export const HUD_LUT_GLOBAL = 1
+
+export const X_VAL1 = -7.0
+export const Y_VAL1 = 5.0
+export const Y_VAL2 = 5.0
+
+export const CAM_SELECTION_MARIO = 1
+export const CAM_SELECTION_FIXED = 2
 
 class IngameMenu {
     constructor() {
@@ -51,34 +75,26 @@ class IngameMenu {
             0,  0,  5,  7,  7,  6,  6,  8,  0,  8, 10,  6,  4, 10,  0,  0
         ]
 
-        this.DialogMark = {
-            DIALOG_MARK_NONE: 0,
-            DIALOG_MARK_DAKUTEN: 1,
-            DIALOG_MARK_HANDAKUTEN: 2
-        }
-
-        this.DialogSpecialChars = {
-            DIALOG_CHAR_SLASH: 0xD0,
-            DIALOG_CHAR_MULTI_THE: 0xD1, // 'the'
-            DIALOG_CHAR_MULTI_YOU: 0xD2, // 'you'
-            DIALOG_CHAR_PERIOD:               0x6E,
-            DIALOG_CHAR_COMMA:                0x6F,
-            DIALOG_CHAR_SPACE:                0x9E,
-            DIALOG_CHAR_STAR_COUNT:           0xE0, // number of stars
-            DIALOG_CHAR_UMLAUT:               0xE9,
-            DIALOG_CHAR_MARK_START:           0xEF,
-            DIALOG_CHAR_DAKUTEN:              0xEF + this.DialogMark.DIALOG_MARK_DAKUTEN,
-            DIALOG_CHAR_PERIOD_OR_HANDAKUTEN: 0xEF + this.DialogMark.DIALOG_MARK_HANDAKUTEN,
-            DIALOG_CHAR_STAR_FILLED:          0xFA,
-            DIALOG_CHAR_STAR_OPEN:            0xFD,
-            DIALOG_CHAR_NEWLINE:              0xFE,
-            DIALOG_CHAR_TERMINATOR:           0xFF
-        }
-
-        this.SpecialFontChars = {
-            GLOBAL_CHAR_SPACE: 0x9E,
-            GLOBAL_CHAR_TERMINATOR: 0xFF
-        }
+        this.DIALOG_MARK_NONE = 0
+        this.DIALOG_MARK_DAKUTEN = 1,
+        this.DIALOG_MARK_HANDAKUTEN = 2
+        this.DIALOG_CHAR_SLASH                 = 0xD0
+        this.DIALOG_CHAR_MULTI_THE             = 0xD1 // 'the'
+        this.DIALOG_CHAR_MULTI_YOU             = 0xD2 // 'you'
+        this.DIALOG_CHAR_PERIOD                = 0x6E
+        this.DIALOG_CHAR_COMMA                 = 0x6F
+        this.DIALOG_CHAR_SPACE                 = 0x9E
+        this.DIALOG_CHAR_STAR_COUNT            = 0xE0 // number of stars
+        this.DIALOG_CHAR_UMLAUT                = 0xE9
+        this.DIALOG_CHAR_MARK_START            = 0xEF
+        this.DIALOG_CHAR_DAKUTEN               = 0xEF + this.DIALOG_MARK_DAKUTEN
+        this.DIALOG_CHAR_PERIOD_OR_HANDAKUTEN  = 0xEF + this.DIALOG_MARK_HANDAKUTEN
+        this.DIALOG_CHAR_STAR_FILLED           = 0xFA
+        this.DIALOG_CHAR_STAR_OPEN             = 0xFD
+        this.DIALOG_CHAR_NEWLINE               = 0xFE
+        this.DIALOG_CHAR_TERMINATOR            = 0xFF
+        this.GLOBAL_CHAR_SPACE                 = 0x9E
+        this.GLOBAL_CHAR_TERMINATOR            = 0xFF
 
         this.strPos = 0
         this.lineNum = 1
@@ -93,7 +109,7 @@ class IngameMenu {
             STRING_YOU: 1
         }
 
-        this.CHAR_WIDTH_SPACE   = this.gDialogCharWidths[this.DialogSpecialChars.DIALOG_CHAR_SPACE]
+        this.CHAR_WIDTH_SPACE   = this.gDialogCharWidths[this.DIALOG_CHAR_SPACE]
         this.CHAR_WIDTH_DEFAULT = this.gDialogCharWidths[this.MultiTextEntry.str[this.strPos]]
 
         this.gDialogColorFadeTimer
@@ -104,6 +120,20 @@ class IngameMenu {
         this.gDialogID = -1
         this.gDialogVariable = 0
         this.gDialogBoxType = 0
+        this.gDialogBoxState = DIALOG_STATE_OPENING
+        this.gDialogBoxScale = DEFAULT_DIALOG_BOX_SCALE
+        this.gDialogBoxOpenTimer = DEFAULT_DIALOG_BOX_ANGLE
+        this.gDialogLineNum = 1
+
+        this.gDialogCameraAngleIndex = CAM_SELECTION_MARIO
+
+        this.MENU_MODE_NONE = -1
+        this.MENU_MODE_UNUSED_0 = 0
+        this.MENU_MODE_RENDER_PAUSE_SCREEN = 1
+        this.MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN = 2
+        this.MENU_MODE_UNUSED_3 = 3
+
+        this.gMenuMode = this.MENU_MODE_NONE
     }
 
     // This is probably incorrect. I'm not sure what kind of identity matrix should be created here
@@ -161,8 +191,8 @@ class IngameMenu {
 
         MathUtil.guOrtho(matrix, 0.0, SCREEN_WIDTH, 0.0, SCREEN_HEIGHT, -10.0, 10.0, 1.0)
 
-        // // Should produce G_RDPHALF_1 in Fast3D
-        // gSPPerspNormalize(gDisplayListHead++, 0xFFFF);
+        // Should produce G_RDPHALF_1 in Fast3D
+        Gbi.gSPPerspNormalize(Game.gDisplayList, 0xFFFF);
 
         Gbi.gSPMatrix(Game.gDisplayList, matrix, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_MUL | Gbi.G_MTX_NOPUSH)
     }
@@ -172,8 +202,8 @@ class IngameMenu {
         this.packedTexture = this.fontLUT[c]
 
         Gbi.gDPPipeSync(Game.gDisplayList)
-        Gbi.gDPSetTextureImage(gDisplayList, Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_16b, 1, this.packedTexture)
-        Gbi.gSPDisplayList(gDisplayList, dl_ia_text_tex_settings)
+        Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_16b, 1, this.packedTexture)
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_tex_settings)
     }
 
     render_multi_text_string(multiTextID) {
@@ -196,42 +226,42 @@ class IngameMenu {
         this.create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0.0)
         this.mark = DIALOG_RESPONSE_NONE
 
-        while (str[this.strPos] != DIALOG_CHAR_TERMINATOR) {
+        while (str[this.strPos] != this.DIALOG_CHAR_TERMINATOR) {
             switch (str[this.strPos]) {
-                case DIALOG_CHAR_DAKUTEN:
-                    this.mark = DIALOG_CHAR_DAKUTEN
+                case this.DIALOG_CHAR_DAKUTEN:
+                    this.mark = this.DIALOG_CHAR_DAKUTEN
                     break
-                case DIALOG_CHAR_PERIOD_OR_HANDAKUTEN:
+                case this.DIALOG_CHAR_PERIOD_OR_HANDAKUTEN:
                     this.mark = DIALOG_MARK_HANDAKUTEN
                     break
-                case DIALOG_CHAR_NEWLINE:
-                    Gbi.gSPPopMatrix(gDisplayList, Gbi.G_MTX_MODELVIEW);
+                case this.DIALOG_CHAR_NEWLINE:
+                    Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
                     this.create_dl_translation_matrix(MENU_MTX_PUSH, x, y - (this.lineNum * MAX_STRING_WIDTH), 0.0)
                     lineNum++
                     break
-                case DIALOG_CHAR_PERIOD:
+                case this.DIALOG_CHAR_PERIOD:
                     this.create_dl_translation_matrix(MENU_MTX_PUSH, -2.0, -5.0, 0.0)
-                    this.render_generic_char(DIALOG_CHAR_PERIOD_OR_HANDAKUTEN)
-                    Gbi.gSPPopMatrix(gDisplayList, Gbi.G_MTX_MODELVIEW)
+                    this.render_generic_char(this.DIALOG_CHAR_PERIOD_OR_HANDAKUTEN)
+                    Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW)
                     break
-                case DIALOG_CHAR_SLASH:
-                    this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.gDialogCharWidths[DIALOG_CHAR_SPACE] * 2, 0.0, 0.0)
+                case this.DIALOG_CHAR_SLASH:
+                    this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.gDialogCharWidths[this.DIALOG_CHAR_SPACE] * 2, 0.0, 0.0)
                     break
-                case DIALOG_CHAR_MULTI_THE:
+                case this.DIALOG_CHAR_MULTI_THE:
                     this.render_multi_text_string(STRING_THE)
                     break
-                case DIALOG_CHAR_MULTI_YOU:
+                case this.DIALOG_CHAR_MULTI_YOU:
                     this.render_multi_text_string(STRING_YOU)
                     break
-                case DIALOG_CHAR_SPACE:
+                case this.DIALOG_CHAR_SPACE:
                     this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.CHAR_WIDTH_SPACE, 0.0, 0.0)
                     break
                 default:
                     this.render_generic_char(str[this.strPos])
                     if (this.mark != DIALOG_MARK_NONE) {
                         this.create_dl_translation_matrix(MENU_MTX_PUSH, 5.0, 5.0, 0.0)
-                        this.render_generic_char(DIALOG_CHAR_MARK_START + this.mark)
-                        Gbi.gSPPopMatrix(gDisplayList, Gbi.G_MTX_MODELVIEW)
+                        this.render_generic_char(this.DIALOG_CHAR_MARK_START + this.mark)
+                        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW)
                         mark = DIALOG_MARK_NONE
                     }
 
@@ -242,7 +272,7 @@ class IngameMenu {
             this.strPos++
         }
 
-        Gbi.gSPPopMatrix(gDisplayList, Gbi.G_MTX_MODELVIEW)
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW)
     }
     
     print_hud_lut_string(hudLUT, x, y, str) {
@@ -253,25 +283,116 @@ class IngameMenu {
         this.curY = y
         hudLUT == HUD_LUT_JPMENU ? this.xStride = 16 : this.xStride = 12
 
-        while (str[this.strPos] != GLOBAL_CHAR_TERMINATOR) {
+        while (str[this.strPos] != this.GLOBAL_CHAR_TERMINATOR) {
             switch (str[this.strPos]) {
-                case GLOBAL_CHAR_SPACE:
+                case this.GLOBAL_CHAR_SPACE:
                     this.curX += 8
                     break
                 default:
-                    Gbi.gDPPipeSync(gDisplayList)
+                    Gbi.gDPPipeSync(Game.gDisplayList)
 
-                    hudLUT == HUD_LUT_JPMENU ? Gbi.gDPSetTextureImage(gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, this.hudLUT1[str[this.strPos]])
-                        : Gbi.gDPSetTextureImage(gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, this.hudLUT2[str[this.strPos]])
+                    hudLUT == HUD_LUT_JPMENU ? Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, this.hudLUT1[str[this.strPos]])
+                        : Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, this.hudLUT2[str[this.strPos]])
                     
-                        Gbi.gSPDisplayList(gDisplayList, dl_rgba16_load_tex_block)
-                        Gbi.gSPTextureRectangle(gDisplayList, this.curX << 2, this.curY << 2, (curX + 16) << 2, (curY + 16) << 2, Gbi.G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10)
+                        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_load_tex_block)
+                        Gbi.gSPTextureRectangle(Game.gDisplayList, this.curX << 2, this.curY << 2, (curX + 16) << 2, (curY + 16) << 2, Gbi.G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10)
 
                         this.curX += this.xStride
             }
 
             this.strPos++
         }
+    }
+
+    print_menu_generic_string(x, y, str) {
+        this.mark = DIALOG_MARK_NONE
+        this.strPos = 0
+        this.curX = x
+        this.curY = y
+        this.fontLUT = menu_font_lut
+
+        while (str[this.strPos] != this.DIALOG_CHAR_TERMINATOR) {
+            switch (str[this.strPos]) {
+                case this.DIALOG_CHAR_DAKUTEN:
+                    this.mark = DIALOG_MARK_DAKUTEN;
+                    break;
+                case this.DIALOG_CHAR_PERIOD_OR_HANDAKUTEN:
+                    mark = DIALOG_MARK_HANDAKUTEN;
+                    break;
+                case this.DIALOG_CHAR_SPACE:
+                    curX += 4;
+                    break;
+                default:
+                    if (mark != this.DIALOG_MARK_NONE) {
+                    Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_8b, 1, this.fontLUT[this.DIALOG_CHAR_MARK_START + this.mark])
+                    Gbi.gDPLoadSync(Game.gDisplayList)
+                    Gbi.gDPLoadBlock(Game.gDisplayList, Gbi.G_TX_LOADTILE, 0, 0, 8 * 8 - 1, Gbi.CALC_DXT(8, Gbi.G_IM_SIZ_8b_BYTES))
+                    Gbi.gSPTextureRectangle(Game.gDisplayList, (this.curX + 6) << 2, (this.curY - 7) << 2, (this.curX + 6 + 8) << 2, (this.curY - 7 + 8) << 2, Gbi.G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10)
+
+                    this.mark = this.DIALOG_MARK_NONE
+                    }
+
+                    this.curX += this.gDialogCharWidths[str[this.strPos]]
+            }
+            this.strPos++
+        }
+    }
+
+    print_credits_string(x, y, str) {
+        this.strPos = 0
+        this.fontLUT = main_credits_font_lut
+        this.curX = x
+        this.curY = y
+
+        Gbi.gDPSetTile(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD)
+        Gbi.gDPTileSync(Game.gDisplayList)
+        Gbi.gDPSetTile(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 2, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 3, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 3, Gbi.G_TX_NOLOD)
+        Gbi.gDPSetTileSize(Game.gDisplayList, Gbi.G_TX_RENDERTILE, 0, 0, (8 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (8 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC)
+
+        while (str[this.strPos] != this.GLOBAL_CHAR_TERMINATOR) {
+            switch (str[this.strPos]) {
+                case this.GLOBAL_CHAR_SPACE:
+                    this.curX += 4
+                    break
+                default:
+                    Gbi.gDPPipeSync(Game.gDisplayList)
+                    Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, this.fontLUT[str[this.strPos]])
+                    Gbi.gDPLoadSync(Game.gDisplayList)
+                    Gbi.gDPLoadBlock(Game.gDisplayList, Gbi.G_TX_LOADTILE, 0, 0, 8 * 8 - 1, Gbi.CALC_DXT(8, Gbi.G_IM_SIZ_16b_BYTES))
+                    Gbi.gSPTextureRectangle(Game.gDisplayList, this.curX << 2, this.curY << 2, (this.curX + 8) << 2, (this.curY) << 2, Gbi.G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10)
+                    this.curX += 7
+                    break
+            }
+            this.strPos++
+        }
+    }
+
+    render_dialog_box_type(dialog, linesPerBox) {
+        this.create_dl_translation_matrix(MENU_MTX_NOPUSH, dialog.leftOffset, dialog.width, 0)
+
+        switch (this.gDialogBoxType) {
+            case DIALOG_TYPE_ROTATE: // Renders a dialog black box with zoom and rotation
+                if (this.gDialogBoxState == DIALOG_STATE_OPENING || this.gDialogBoxState == DIALOG_STATE_CLOSING) {
+                    this.create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.0 / this.gDialogBoxScale, 1.0 / this.gDialogBoxScale, 1.0)
+                    // speed -> angle
+                    this.create_dl_rotation_matrix(MENU_MTX_NOPUSH, this.gDialogBoxOpenTimer * 4.0, 0, 0, 1.0)
+                }
+                Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, 150)
+                break
+            case DIALOG_TYPE_ZOOM: // Renders a dialog white box with zoom
+                if (this.gDialogBoxState == DIALOG_STATE_OPENING || this.gDialogBoxState == DIALOG_STATE_CLOSING) {
+                    this.create_dl_translation_matrix(MENU_MTX_NOPUSH, 65.0 - (65.0 / this.gDialogBoxScale), (40.0 / this.gDialogBoxScale) - 40, 0)
+                    this.create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.0 / this.gDialogBoxScale, 1.0 / this.gDialogBoxScale, 1.0)
+                }
+                Gbi.gDPSetEnvColor(gDisplayList, 255, 255, 255, 150)
+                break
+        }
+
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL1, Y_VAL1, 0)
+        this.create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.1, (linesPerBox / Y_VAL2) + 0.1, 1.0)
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_text_bg_box)
+        Gbi.gSPPopMatrix(Game.gDisplayList, 255, 255, 255, 150)
     }
 
     get_dialog_id() {
@@ -297,6 +418,148 @@ class IngameMenu {
         if (this.gDialogID == -1) {
             this.gDialogID = dialog
             this.gDialogBoxType = DIALOG_TYPE_ZOOM
+        }
+    }
+
+    change_dialog_camera_angle() {
+        // waiting on Agent X
+        //
+        // if (cam_select_alt_mode(0) == CAM_SELECTION_MARIO) {
+            this.gDialogCameraAngleIndex = CAM_SELECTION_MARIO
+        // } else {
+        //     gDialogCameraAngleIndex = CAM_SELECTION_FIXED;
+        // }
+    }
+
+    shade_screen() {
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, GFX_DIMENSIONS_FROM_LEFT_EDGE(0), SCREEN_HEIGHT, 0)
+
+        // This is a bit weird. It reuses the dialog text box (width 130, height -80),
+        // so scale to at least fit the screen. (WIDESCREEN OPTION)
+        // this.create_dl_scale_matrix(MENU_MTX_NOPUSH, GFX_DIMENSIONS_ASPECT_RATIO * SCREEN_HEIGHT / 130.0, 3.0, 1.0)
+        this.create_dl_scale_matrix(MENU_MTX_NOPUSH, 2.6, 3.4, 1.0)
+
+        Gbi.gDPSetEnvColor(gDisplayList, 0, 0, 0, 110)
+        Gbi.gSPDisplayList(gDisplayList, dl_draw_text_bg_box)
+        Gbi.gSPPopMatrix(gDisplayList, Gbi.G_MTX_MODELVIEW)
+    }
+
+    highlight_last_course_complete_stars() {
+        this.doneCourseIndex
+
+        if (gLastCompletedCourseNum == COURSE_NONE) {
+            this.doneCourseIndex = 0
+        } else {
+            this.doneCourseIndex = COURSE_NUM_TO_INDEX(gLastCompletedCourseNum)
+
+            if (this.doneCourseIndex >= COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES)) {
+                this.doneCourseIndex = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES)
+            }
+        }
+
+        this.gDialogLineNum = this.doneCourseIndex
+    }
+
+    render_pause_courses_and_castle() {
+        const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
+
+        switch (this.gDialogBoxState) {
+            case DIALOG_STATE_OPENING:
+            this.gDialogLineNum = Area.MENU_OPT_DEFAULT
+            this.gDialogTextAlpha = 0
+            LevelUpdate.level_set_transition(-1, null)
+            play_sound(SOUND_MENU_PAUSE, gGlobalSoundSource)
+
+            if (Area.gCurrCourseNum >= COURSE_MIN && Area.gCurrCourseNum <= COURSE_MAX) {
+                change_dialog_camera_angle()
+                this.gDialogBoxState = DIALOG_STATE_VERTICAL
+            } else {
+                highlight_last_course_complete_stars()
+                this.gDialogBoxState = DIALOG_STATE_HORIZONTAL
+            }
+            break
+            
+            case DIALOG_STATE_VERTICAL:
+                // shade_screen()
+                // render_pause_my_score_coins()
+                // render_pause_red_coins()
+
+                if (gMarioStates[0].action & ACT_FLAG_PAUSE_EXIT) {
+                    // render_pause_course_options(99, 93, gDialogLineNum, 15)
+                }
+
+                if (Game.gPlayer3Controller.buttonPressed & A_BUTTON || Game.gPlayer3Controller.buttonPressed & START_BUTTON) {
+                    LevelUpdate.level_set_transition(0, null)
+                    play_sound(SOUND_MENU_PAUSE_2, gGlobalSoundSource)
+                    this.gDialogBoxState = DIALOG_STATE_OPENING
+                    this.gMenuMode = this.MENU_MODE_NONE
+
+                    if (this.gDialogLineNum == Area.MENU_OPT_EXIT_COURSE) {
+                        this.index = this.gDialogLineNum
+                    } else {
+                        this.index = MENU_OPT_DEFAULT
+                    }
+
+                    return this.index
+                }
+            
+                break
+            case DIALOG_STATE_HORIZONTAL:
+                // shade_screen()
+                // print_hud_pause_colorful_str()
+                // render_pause_castle_menu_box(160, 143)
+                // render_pause_castle_main_strings(104, 60)
+
+                if (Game.gPlayer3Controller.buttonPressed & A_BUTTON || Game.gPlayer3Controller.buttonPressed & START_BUTTON) {
+                    LevelUpdate.level_set_transition(0, null)
+                    play_sound(SOUND_MENU_PAUSE_2, gGlobalSoundSource)
+                    this.gDialogBoxState = DIALOG_STATE_OPENING
+                    this.gMenuMode = this.MENU_MODE_NONE
+
+                    return MENU_OPT_DEFAULT
+                }
+                break
+        }
+
+        if (this.gDialogTextAlpha < 250) {
+            this.gDialogTextAlpha += 25
+        }
+
+        return this.MENU_OPT_NONE
+    }
+
+    // END GOAL!
+    render_menu_and_dialogs() {
+        this.index = Area.MENU_OPT_NONE
+
+        this.create_dl_ortho_matrix()
+
+        if (gMenuMode != this.MENU_MODE_NONE) {
+            switch (gMenuMode) {
+                case this.MENU_MODE_UNUSED_0:
+                    index = render_pause_courses_and_castle();
+                    break;
+                case this.MENU_MODE_RENDER_PAUSE_SCREEN:
+                    //index = render_pause_courses_and_castle();
+                    break;
+                case this.MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN:
+                    //index = render_course_complete_screen();
+                    break;
+                case this.MENU_MODE_UNUSED_3:
+                    //index = render_course_complete_screen();
+                    break;
+            }
+
+            this.gDialogColorFadeTimer += 0x1000
+        } else if (gDialogID != DialogId.DIALOG_NONE) {
+            // The Peach "Dear Mario" message needs to be repositioned separately
+            if (this.gDialogID == DialogId.DIALOG_020) {
+                // print_peach_letter_message();
+                return index;
+            }
+
+            // render_dialog_entries()
+            this.gDialogColorFadeTimer += 0x1000
         }
     }
 }

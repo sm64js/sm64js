@@ -35,6 +35,7 @@ class Area {
         this.gAreas = Array(8).fill(0).map(() => { return { index: 0 } })
         this.gCurAreaIndex = 0
         this.gCurrLevelNum = 0
+        this.gCurrCourseNum
         this.gLoadedGraphNodes = new Array(256)
 
         this.D_8032CE74 = null
@@ -58,6 +59,16 @@ class Area {
         this.gWarpTransRed = 0
         this.gWarpTransGreen = 0
         this.gWarpTransBlue = 0
+
+        this.MENU_OPT_NONE = 0
+        this.MENU_OPT_1 = 1
+        this.MENU_OPT_2 = 2
+        this.MENU_OPT_3 = 3
+        this.MENU_OPT_DEFAULT = this.MENU_OPT_1
+
+        this.MENU_OPT_CONTINUE = this.MENU_OPT_1
+        this.MENU_OPT_EXIT_COURSE = this.MENU_OPT_2
+        this.MENU_OPT_CAMERA_ANGLE_R = this.MENU_OPT_3
 
     }
 

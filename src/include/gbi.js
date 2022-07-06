@@ -496,6 +496,11 @@ export const G_CC_DECALRGB2 = {  // FIXME (copied from G_CC_DECALRGB)
     rgb: [15, 15, 31, 1]
 }
 
+export const G_CC_FADE = { // FIXME (copied from DECALFADE)
+    alpha: [7, 7, 7, 5],
+    rgb: [15, 15, 31, 1]
+}
+
 export const G_CC_FADEA = {  // FIXME (copied from MODULATEIFADEA)
     alpha: [1, 7, 5, 7],
     rgb: [1, 15, 4, 7]
@@ -1089,12 +1094,12 @@ export const gsSPTexture = (s, t, level, tile, on) => {
 
 export const gSPPopMatrix = (pkt, n) => {
     pkt = pkt.pop()
-    return {
+    pkt.push ({
         words: {
             w0: G_POPMTX,
             w1: { pkt, n }
         }
-    }
+    })
 }
 
 export const gsDPSetTileSize = (t, uls, ult, lrs, lrt) => {
@@ -1104,6 +1109,15 @@ export const gsDPSetTileSize = (t, uls, ult, lrs, lrt) => {
       w1: { t, uls, ult, lrs, lrt }
     }
   }
+}
+
+export const gDPSetTile = (pkt, fmt, siz, line, tmem, tile, palette, cmt, maskt, shiftt, cms, masks, shifts) => {
+    pkt.push ({
+        words: {
+            w0: G_SETTILE,
+            w1: { pkt, fmt, siz, line, tmem, tile, palette, cmt, maskt, shiftt, cms, masks, shifts }
+        }
+    })
 }
 
 export const gsDPSetTextureImage = (format, size, width, imageData) => {

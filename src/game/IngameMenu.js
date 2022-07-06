@@ -1,4 +1,4 @@
-import { dl_draw_text_bg_box, dl_ia_text_tex_settings, dl_rgba16_load_tex_block, main_credits_font_lut, main_font_lut, main_hud_lut } from "../common_gfx/segment2"
+import { dl_draw_text_bg_box, dl_ia_text_begin, dl_ia_text_end, dl_ia_text_tex_settings, dl_rgba16_load_tex_block, dl_rgba16_text_begin, dl_rgba16_text_end, main_credits_font_lut, main_font_lut, main_hud_lut } from "../common_gfx/segment2"
 import * as MathUtil from "../engine/math_util"
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../include/config"
 import * as Gbi from "../include/gbi"
@@ -6,13 +6,14 @@ import { menu_font_lut, menu_hud_lut } from "../levels/menu/leveldata"
 import { AreaInstance as Area} from "./Area"
 import { GameInstance as Game } from "./Game"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
-import { DialogIdInstance as DialogId } from "../include/dialog_ids"
+import { DialogIdInstance as DialogId, LANGUAGE_ARRAY } from "../include/dialog_ids"
 import { gGlobalSoundSource, play_sound } from "../audio/external"
 import { SOUND_MENU_PAUSE, SOUND_MENU_PAUSE_2 } from "../include/sounds"
-import { COURSE_BONUS_STAGES, COURSE_MAX, COURSE_MIN, COURSE_NONE, COURSE_NUM_TO_INDEX } from "../levels/course_defines"
+import { COURSE_BONUS_STAGES, COURSE_MAX, COURSE_MIN, COURSE_NONE, COURSE_NUM_TO_INDEX, COURSE_STAGES_MAX } from "../levels/course_defines"
 import { ACT_FLAG_PAUSE_EXIT } from "./Mario"
-import { gLastCompletedCourseNum } from "./SaveFile"
+import { gLastCompletedCourseNum, save_file_get_course_star_count, save_file_get_star_flags } from "./SaveFile"
 import { GFX_DIMENSIONS_ASPECT_RATIO, GFX_DIMENSIONS_FROM_LEFT_EDGE } from "../include/gfx_dimensions"
+import { TEXT_COURSE, TEXT_MY_SCORE, TEXT_STAR, TEXT_UNFILLED_STAR } from "../include/text_strings"
 
 export const ASCII_TO_DIALOG = (asc) => {
     return (((asc) >= '0' && (asc) <= '9') ? ((asc) - '0') :
@@ -53,6 +54,20 @@ export const Y_VAL2 = 5.0
 
 export const CAM_SELECTION_MARIO = 1
 export const CAM_SELECTION_FIXED = 2
+
+export const TXT_COURSE_X      = 63
+export const TXT_STAR_X        = 98
+export const ACT_NAME_X        = 116
+export const LVL_NAME_X        = 117
+export const SECRET_LVL_NAME_X = 94
+export const MYSCORE_X         = 62
+
+export const CRS_NUM_X1 = 100
+
+// move these to a seperate file if needed
+export const seg2_course_name_table = new Array(0)
+export const seg2_act_name_table = new Array(0)
+export const seg2_dialog_table = new Array(0)
 
 class IngameMenu {
     constructor() {
@@ -124,6 +139,7 @@ class IngameMenu {
         this.gDialogBoxScale = DEFAULT_DIALOG_BOX_SCALE
         this.gDialogBoxOpenTimer = DEFAULT_DIALOG_BOX_ANGLE
         this.gDialogLineNum = 1
+        this.gDialogCourseActNum = 1
 
         this.gDialogCameraAngleIndex = CAM_SELECTION_MARIO
 
@@ -444,6 +460,59 @@ class IngameMenu {
         Gbi.gSPPopMatrix(gDisplayList, Gbi.G_MTX_MODELVIEW)
     }
 
+    render_pause_my_score_coins() {
+        this.textCourse = [ TEXT_COURSE ]
+        this.textMyScore = [ TEXT_MY_SCORE ]
+        this.textStar = [ TEXT_STAR ]
+        this.textUnfilledStar = [ TEXT_UNFILLED_STAR ]
+        this.strCourseNum = new Array(4)
+        this.courseNameTbl = seg2_course_name_table
+        this.courseName = seg2_act_name_table
+        this.actNameTbl
+        this.actName
+        this.courseIndex = COURSE_NUM_TO_INDEX(Area.gCurrCourseNum)
+        this.starFlags = save_file_get_star_flags(Area.gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(Area.gCurrCourseNum))
+
+        Gbi.gSPDisplayList(gDisplayList, dl_rgba16_text_begin)
+        Gbi.gDPSetEnvColor(gDisplayList, 255, 255, 255, this.gDialogTextAlpha)
+
+        if (this.courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
+            // print_hud_my_score_coins(1, gCurrSaveFileNum - 1, this.courseIndex, 178, 103)
+            // print_hud_my_score_stars(gCurrSaveFileNum - 1, this.courseIndex, 118, 103)
+        }
+
+        Gbi.gSPDisplayList(gDisplayList, dl_rgba16_text_end)
+        Gbi.gSPDisplayList(gDisplayList, dl_ia_text_begin)
+        Gbi.gDPSetEnvColor(gDisplayList, 255, 255, 255, this.gDialogTextAlpha)
+
+        if (this.courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX) && save_file_get_course_star_count(gCurrSaveFileNum - 1, this.courseIndex) != 0) {
+            this.print_generic_string(MYSCORE_X, 121, LANGUAGE_ARRAY(this.textMyScore))
+        }
+
+        this.courseName = this.courseNameTbl[this.courseIndex]
+
+        if (this.courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
+            this.print_generic_string(TXT_COURSE_X, 157, LANGUAGE_ARRAY(this.textMyScore))
+            int_to_str(gCurrCourseNum, this.strCourseNum)
+            this.print_generic_string(CRS_NUM_X1, 157, this.strCourseNum)
+
+            this.actName = actNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6 + this.gDialogCourseActNum - 1]
+
+            if (this.starFlags & (1 << (this.gDialogCourseActNum - 1))) {
+                this.print_generic_string(TXT_STAR_X, 140, this.textStar)
+            } else {
+                this.print_generic_string(TXT_STAR_X, 140, this.textUnfilledStar)
+            }
+
+            this.print_generic_string(ACT_NAME_X, 140, this.actName)
+            this.print_generic_string(LVL_NAME_X, 157, this.courseName[3])
+        } else {
+            this.print_generic_string(SECRET_LVL_NAME_X, 157, this.courseName[3])
+        }
+        
+        Gbi.gSPDisplayList(gDisplayList, dl_ia_text_end)
+    }
+
     highlight_last_course_complete_stars() {
         this.doneCourseIndex
 
@@ -480,7 +549,7 @@ class IngameMenu {
             break
             
             case DIALOG_STATE_VERTICAL:
-                // shade_screen()
+                shade_screen()
                 // render_pause_my_score_coins()
                 // render_pause_red_coins()
 
@@ -551,7 +620,7 @@ class IngameMenu {
             }
 
             this.gDialogColorFadeTimer += 0x1000
-        } else if (gDialogID != DialogId.DIALOG_NONE) {
+        } else if (this.gDialogID != DialogId.DIALOG_NONE) {
             // The Peach "Dear Mario" message needs to be repositioned separately
             if (this.gDialogID == DialogId.DIALOG_020) {
                 // print_peach_letter_message();

@@ -646,3 +646,45 @@ export const dl_draw_text_bg_box = [
     gsSP2Triangles(0, 1, 2, 0x0, 0, 2, 3, 0x0),
     gsSPEndDisplayList(),
 ].flat()
+
+export const dl_rgba16_text_begin = [
+    gsDPPipeSync(),
+    Gbi.gsDPSetTexturePersp(Gbi.G_TP_NONE),
+    gsDPSetEnvColor(255, 255, 255, 255),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_XLU_SURF, Gbi.G_RM_AA_XLU_SURF2),
+    Gbi.gsDPSetTextureFilter(Gbi.G_TF_POINT),
+    gsSPEndDisplayList()
+].flat()
+
+export const dl_rgba16_text_end = [
+    gsDPPipeSync(),
+    Gbi.gsDPSetTexturePersp(Gbi.G_TP_PERSP),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF, Gbi.G_RM_AA_ZB_OPA_SURF2),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsDPSetEnvColor(255, 255, 255, 255),
+    Gbi.gsDPSetTextureFilter(Gbi.G_TF_BILERP),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
+    gsSPEndDisplayList(),
+].flat()
+
+export const dl_ia_text_begin = [
+    gsDPPipeSync(),
+    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetCombineMode(Gbi.G_CC_FADEA, Gbi.G_CC_FADEA),
+    gsDPSetEnvColor(255, 255, 255, 255),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_XLU_SURF, Gbi.G_RM_XLU_SURF2),
+    Gbi.gsDPSetTextureFilter(Gbi.G_TF_POINT),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsSPEndDisplayList(),
+].flat()
+
+export const dl_ia_text_end = [
+    gsDPPipeSync(),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsDPSetEnvColor(255, 255, 255, 255),
+    gsSPSetGeometryMode(G_LIGHTING + Gbi.G_SHADING_SMOOTH),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF, Gbi.G_RM_AA_ZB_OPA_SURF2),
+    Gbi.gsDPSetTextureFilter(Gbi.G_TF_BILERP),
+    gsSPEndDisplayList(),
+].flat()

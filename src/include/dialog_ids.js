@@ -176,4 +176,6 @@ class DialogId {
     }
 }
 
+export const LANGUAGE_ARRAY = (cmd) => { return cmd }
+
 export const DialogIdInstance = new DialogId()

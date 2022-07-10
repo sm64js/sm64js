@@ -19,6 +19,7 @@ import { SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { sins, s16, int16 } from "../utils"
 import { HudInstance as Hud } from "./Hud"
 import { DIALOG_RESPONSE_NONE } from "./IngameMenu"
+import { DIALOG_001, DIALOG_NONE } from "../text/us/dialogs"
 
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
@@ -1220,10 +1221,42 @@ class Camera {
         return result
     }
 
+    start_object_cutscene(cutscene, o) {
+        this.sObjectCutscene = cutscene
+        this.gRecentCutscene = 0
+        this.gCutsceneFocus = o
+        this.gObjCutsceneDone = false
+    }
+
     start_object_cutscene_without_focus(cutscene) {
         this.sObjectCutscene = cutscene
         this.sCutsceneDialogResponse = DIALOG_RESPONSE_NONE
         return 0
+    }
+
+    cutscene_object_with_dialog(cutscene, o, dialogID) {
+        let response = DIALOG_RESPONSE_NONE
+
+        if ((this.gCamera.cutscene == 0) && (this.sObjectCutscene == 0)) {
+            if (this.gRecentCutscene != cutscene) {
+                this.start_object_cutscene(cutscene, o)
+                if (dialogID != DIALOG_NONE) {
+                    this.sCutsceneDialogID = dialogID
+                } else {
+                    this.sCutsceneDialogID = DIALOG_001
+                }
+            } else {
+                response = this.sCutsceneDialogResponse
+            }
+
+            this.gRecentCutscene = 0
+        }
+        return response
+    }
+
+    cutscene_object_without_dialog(cutscene, o) {
+        let response = this.cutscene_object_with_dialog(cutscene, o, DIALOG_NONE)
+        return response
     }
 
     handle_c_button_movement(c) {

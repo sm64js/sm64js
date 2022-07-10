@@ -1,10 +1,12 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { oFaceAngleYaw, oInteractStatus, oBehParams } from "../../include/object_constants"
+import { oFaceAngleYaw, oInteractStatus, oBehParams, oBehParams2ndByte, oPosX, oPosY, oPosZ, oHomeX, oHomeZ, oHomeY, oFaceAnglePitch, oFaceAngleRoll } from "../../include/object_constants"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { INT_STATUS_INTERACTED, INTERACT_STAR_OR_KEY } from "../Interaction"
 import { save_file_get_star_flags, } from "../SaveFile"
 import { AreaInstance as Area } from "../Area"
 import { MODEL_TRANSPARENT_STAR, MODEL_STAR } from "../../include/model_ids"
+import { spawn_object_abs_with_rot } from "../ObjectHelpers"
+import { bhvStarSpawnCoordinates } from "../BehaviorData"
 
 const sCollectStarHitbox = {
     interactType:      INTERACT_STAR_OR_KEY,
@@ -43,6 +45,24 @@ const bhv_collect_star_loop = () => {
         mark_obj_for_deletion(o)
         o.rawData[oInteractStatus] = 0
     }
+}
+
+const spawn_star = (sp30, sp34, sp38, sp3C) => {
+    const o = ObjectListProc.gCurrentObject
+
+    sp30 = spawn_object_abs_with_rot(o, 0, MODEL_STAR, bhvStarSpawnCoordinates, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], 0, 0, 0)
+    sp30.rawData[oBehParams] = o.rawData[oBehParams]
+    sp30.rawData[oHomeX] = sp34
+    sp30.rawData[oHomeY] = sp38
+    sp30.rawData[oHomeZ] = sp3C
+    sp30.rawData[oFaceAnglePitch] = 0
+    sp30.rawData[oFaceAngleRoll] = 0
+    return sp30
+}
+
+export const spawn_default_star = (sp20, sp24, sp28) => {
+    sp1C = spawn_star(sp1C, sp20, sp24, sp28)
+    sp1C.rawData[oBehParams2ndByte] = 0
 }
 
 gLinker.bhv_collect_star_init = bhv_collect_star_init

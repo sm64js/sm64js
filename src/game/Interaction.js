@@ -47,12 +47,14 @@ import { ACT_IDLE, ACT_PANTING, ACT_STANDING_AGAINST_WALL, ACT_CROUCHING, ACT_DI
          ACT_SOFT_BACKWARD_GROUND_KB,
          ACT_FORWARD_AIR_KB,
          ACT_SOFT_FORWARD_GROUND_KB,
-         MARIO_NORMAL_CAP
+         MARIO_NORMAL_CAP,
+         ACT_WAITING_FOR_DIALOG,
+         ACT_GRABBED
 } from "./Mario"
 
 import { WARP_OP_WARP_OBJECT, WARP_OP_WARP_FLOOR } from "./LevelUpdate"
 
-import { SOUND_MARIO_EEUH, SOUND_MARIO_WAAAOOOW, SOUND_OBJ_BULLY_METAL, SOUND_MENU_STAR_SOUND } from "../include/sounds"
+import { SOUND_MARIO_EEUH, SOUND_MARIO_WAAAOOOW, SOUND_OBJ_BULLY_METAL, SOUND_MENU_STAR_SOUND, SOUND_MARIO_OOOF } from "../include/sounds"
 
 import {
     DIALOG_022, DIALOG_023, DIALOG_024, DIALOG_025, DIALOG_026, DIALOG_027, DIALOG_028, DIALOG_029
@@ -711,7 +713,9 @@ const interact_grabbable = (m, o) => {
     }
 
     if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_GRABS_MARIO) {
-        throw "unimplemented object grabs mario - interact_grabbable"
+        if (check_object_grab_mario(m, o)) {
+            return true
+        }
     }
 
     if (able_to_grab_object(m, o)) {
@@ -802,6 +806,24 @@ const interact_text = (m, o) => {
     }
 
     return interact
+}
+
+const check_object_grab_mario = (m, o) => {
+    if ((!(m.action & (ACT_FLAG_AIR | ACT_FLAG_INVULNERABLE | ACT_FLAG_ATTACKING)) || !sInvulnerable) && (o.rawData[oInteractionSubtype] & INT_SUBTYPE_GRABS_MARIO)) {
+        if (object_facing_mario(m, o, 0x2AAA)) {
+            mario_stop_riding_and_holding(m)
+            o.rawData[oInteractStatus] = INT_STATUS_INTERACTED | INT_STATUS_GRABBED_MARIO
+
+            m.faceAngle[1] = o.rawData[oMoveAngleYaw]
+            m.interactObj = o
+            m.usedObj = o
+
+            update_mario_sound_and_camera(m)
+            play_sound(SOUND_MARIO_OOOF, m.marioObj.gfx.cameraToObject)
+
+            return set_mario_action(m, ACT_GRABBED, 0)
+        }
+    }
 }
 
 const interact_pole = (m, o) => {
@@ -1030,7 +1052,7 @@ const able_to_grab_object = (m, o) => {
     return 0
 }
 
-const mario_obj_angle_to_object = (m, o) => {
+export const mario_obj_angle_to_object = (m, o) => {
     const dx = o.rawData[oPosX] - m.pos[0]
     const dz = o.rawData[oPosZ] - m.pos[2]
 

@@ -98,6 +98,20 @@ export const HELD_HELD = 1
 export const HELD_THROWN = 2
 export const HELD_DROPPED = 3
 
+/* oDialogState */
+export const DIALOG_STATUS_ENABLE_TIME_STOP  = 0
+export const DIALOG_STATUS_INTERRUPT         = 1
+export const DIALOG_STATUS_START_DIALOG      = 2
+export const DIALOG_STATUS_STOP_DIALOG       = 3
+export const DIALOG_STATUS_DISABLE_TIME_STOP = 4
+
+export const DIALOG_FLAG_NONE              = 0
+export const DIALOG_FLAG_TURN_TO_MARIO     = (1 << 0) // 0x01 // cutscene only
+export const DIALOG_FLAG_TEXT_DEFAULT      = (1 << 1) // 0x02
+export const DIALOG_FLAG_TEXT_RESPONSE     = (1 << 2) // 0x04 // non-cutscene only
+export const DIALOG_FLAG_UNK_CAPSWITCH     = (1 << 3) // 0x08 // not defined
+export const DIALOG_FLAG_TIME_STOP_ENABLED = (1 << 4) // 0x10
+
 export const oFlags                       = 0x01
 export const oDialogResponse              = 0x02
 export const oDialogState                 = 0x02

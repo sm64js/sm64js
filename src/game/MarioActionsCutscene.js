@@ -6,7 +6,7 @@ import {
     check_common_action_exits, check_common_hold_action_exits, drop_and_set_mario_action,
     is_anim_past_end, set_jump_from_landing, set_jumping_action, set_mario_action,
     set_water_plunge_action, update_mario_sound_and_camera, play_sound_if_no_flag,
-    mario_set_forward_vel, play_mario_landing_sound_once, set_mario_anim_with_accel
+    mario_set_forward_vel, play_mario_landing_sound_once, set_mario_anim_with_accel, ACT_GROUP_MASK, ACT_GROUP_STATIONARY, ACT_GROUP_MOVING, ACT_FLAG_RIDING_SHELL, ACT_FLAG_INVULNERABLE
 } from "./Mario"
 
 import { AreaInstance as Area } from "./Area"
@@ -17,7 +17,7 @@ import {
 } from "./MarioStep"
 
 import {
-    mario_throw_held_object, get_door_save_file_flag
+    mario_throw_held_object, get_door_save_file_flag, mario_obj_angle_to_object
 } from "./Interaction"
 
 import {
@@ -29,6 +29,7 @@ import {
 } from "../utils"
 
 import { 
+    approach_s32,
     atan2s, vec3f_copy, vec3s_set
 } from "../engine/math_util"
 
@@ -188,6 +189,17 @@ let sEndLeftToadObj = null
 let sEndJumboStarObj = null
 let sEndPeachAnimation = null
 let sEndToadAnims = new Array(2)
+
+// set_mario_npc_dialog
+// actionArg
+export const MARIO_DIALOG_STOP       = 0
+export const MARIO_DIALOG_LOOK_FRONT = 1 // no head turn
+export const MARIO_DIALOG_LOOK_UP    = 2
+export const MARIO_DIALOG_LOOK_DOWN  = 3
+// dialogState
+export const MARIO_DIALOG_STATUS_NONE  = 0
+export const MARIO_DIALOG_STATUS_START = 1
+export const MARIO_DIALOG_STATUS_SPEAK = 2
 
 // static Vp sEndCutsceneVp = { { { 640, 480, 511, 0 }, { 640, 480, 511, 0 } } }
 // static struct CreditsEntry *sDispCreditsEntry = null
@@ -473,100 +485,103 @@ export const cutscene_put_cap_on = (m) => {
 //  * 2: Mario mat not be riding a shell or be invulnerable.
 //  * 3: Mario must not be in first person mode.
 //  */
-// export const mario_ready_to_speak = () => {
-//     let /*u32*/ actionGroup = gMarioState.action & ACT_GROUP_MASK
-//     let /*s32*/ isReadyToSpeak = 0
+export const mario_ready_to_speak = () => {
+    const gMarioState = gLinker.LevelUpdate.gMarioState
 
-//     if ((gMarioState.action == ACT_WAITING_FOR_DIALOG || actionGroup == ACT_GROUP_STATIONARY
-//          || actionGroup == ACT_GROUP_MOVING)
-//         && (!(gMarioState.action & (ACT_FLAG_RIDING_SHELL | ACT_FLAG_INVULNERABLE))
-//             && gMarioState.action != ACT_FIRST_PERSON)) {
-//         isReadyToSpeak = 1
-//     }
+    let /*u32*/ actionGroup = gMarioState.action & ACT_GROUP_MASK
+    let /*s32*/ isReadyToSpeak = 0
 
-//     return isReadyToSpeak
-// }
+    if ((gMarioState.action == ACT_WAITING_FOR_DIALOG || actionGroup == ACT_GROUP_STATIONARY
+         || actionGroup == ACT_GROUP_MOVING)
+        && (!(gMarioState.action & (ACT_FLAG_RIDING_SHELL | ACT_FLAG_INVULNERABLE))
+            && gMarioState.action != ACT_FIRST_PERSON)) {
+        isReadyToSpeak = 1
+    }
 
-// // (can) place Mario in dialog?
-// // initiate dialog?
-// // return values:
-// // 0 = not in dialog
-// // 1 = starting dialog
-// // 2 = speaking
-// export const set_mario_npc_dialog = (actionArg) => {
-//     let /*s32*/ dialogState = 0
+    return isReadyToSpeak
+}
 
-//       // in dialog
-//     if (gMarioState.action == ACT_READING_NPC_DIALOG) {
-//         if (gMarioState.actionState < 8) {
-//             dialogState = 1;   // starting dialog
-//         }
-//         if (gMarioState.actionState == 8) {
-//             if (actionArg == 0) {
-//                 gMarioState.actionState++;   // exit dialog
-//             } else {
-//                 dialogState = 2
-//             }
-//         }
-// export const mario_ready_to_speak = () => {
-//         gMarioState.usedObj = gCurrentObject
-//         set_mario_action(gMarioState, ACT_READING_NPC_DIALOG, actionArg)
-//         dialogState = 1;   // starting dialog
-//     }
+// (can) place Mario in dialog?
+// initiate dialog?
+// return values:
+// 0 = not in dialog
+// 1 = starting dialog
+// 2 = speaking
+export const set_mario_npc_dialog = (actionArg) => {
+    const gMarioState = gLinker.LevelUpdate.gMarioState
+    
+    let /*s32*/ dialogState = MARIO_DIALOG_STATUS_NONE
 
-//     return dialogState
-// }
+      // in dialog
+    if (gMarioState.action == ACT_READING_NPC_DIALOG) {
+        if (gMarioState.actionState < 8) {
+            dialogState = MARIO_DIALOG_STATUS_START;   // starting dialog
+        }
+        if (gMarioState.actionState == 8) {
+            if (actionArg == MARIO_DIALOG_STOP) {
+                gMarioState.actionState++;   // exit dialog
+            } else {
+                dialogState = MARIO_DIALOG_STATUS_SPEAK
+            }
+        }
+    } else if (actionArg != 0 && mario_ready_to_speak()) {
+        gMarioState.usedObj = gLinker.ObjectListProcessor.gCurrentObject
+        set_mario_action(gMarioState, ACT_READING_NPC_DIALOG, actionArg)
+        dialogState = MARIO_DIALOG_STATUS_START
+    }
 
-// // actionargs:
-// // 1 : no head turn
-// // 2 : look up
-// // 3 : look down
-// // actionstate values:
-// // 0 - 7: looking toward npc
-// // 8: in dialog
-// // 9 - 22: looking away from npc
-// // 23: end
-// export const act_reading_npc_dialog = (m) => {
-//     let /*s32*/ headTurnAmount = 0
-//     let /*s16*/ angleToNPC
+    return dialogState
+}
 
-//     if (m.actionArg == 2) {
-//         headTurnAmount = -1024
-//     }
-//     if (m.actionArg == 3) {
-//         headTurnAmount = 384
-//     }
+// actionargs:
+// 1 : no head turn
+// 2 : look up
+// 3 : look down
+// actionstate values:
+// 0 - 7: looking toward npc
+// 8: in dialog
+// 9 - 22: looking away from npc
+// 23: end
+export const act_reading_npc_dialog = (m) => {
+    let /*s32*/ headTurnAmount = 0
+    let /*s16*/ angleToNPC
 
-//     if (m.actionState < 8) {
-//           // turn to NPC
-//         angleToNPC = mario_obj_angle_to_object(m, m.usedObj)
-//         m.faceAngle[1] =
-//             angleToNPC - approach_s32((angleToNPC - m.faceAngle[1]) << 16 >> 16, 0, 2048, 2048)
-//           // turn head to npc
-//         m.actionTimer += headTurnAmount
-//           // set animation
-//         set_mario_animation(m, m.heldObj == null ? MARIO_ANIM_FIRST_PERSON
-//                                                   : MARIO_ANIM_IDLE_WITH_LIGHT_OBJ)
-//     } else if (m.actionState >= 9 && m.actionState < 17) {
-//           // look back from facing NPC
-//         m.actionTimer -= headTurnAmount
-//     } else if (m.actionState == 23) {
-//         if (m.flags & MARIO_CAP_IN_HAND) {
-//             set_mario_action(m, ACT_PUTTING_ON_CAP, 0)
-//         } else {
-//             set_mario_action(m, m.heldObj == null ? ACT_IDLE : ACT_HOLD_IDLE, 0)
-//         }
-//     }
-//     vec3f_copy(m.marioObj.gfx.pos, m.pos)
-//     vec3s_set(m.marioObj.gfx.angle, 0, m.faceAngle[1], 0)
-//     vec3s_set(m.marioBodyState.headAngle, m.actionTimer, 0, 0)
+    if (m.actionArg == MARIO_DIALOG_LOOK_UP) {
+        headTurnAmount = -1024
+    }
+    if (m.actionArg == MARIO_DIALOG_LOOK_DOWN) {
+        headTurnAmount = 384
+    }
 
-//     if (m.actionState != 8) {
-//         m.actionState++
-//     }
+    if (m.actionState < 8) {
+          // turn to NPC
+        angleToNPC = mario_obj_angle_to_object(m, m.usedObj)
+        m.faceAngle[1] =
+            angleToNPC - approach_s32((angleToNPC - m.faceAngle[1]) << 16 >> 16, 0, 2048, 2048)
+          // turn head to npc
+        m.actionTimer += headTurnAmount
+          // set animation
+        set_mario_animation(m, m.heldObj == null ? MARIO_ANIM_FIRST_PERSON
+                                                  : MARIO_ANIM_IDLE_WITH_LIGHT_OBJ)
+    } else if (m.actionState >= 9 && m.actionState < 17) {
+          // look back from facing NPC
+        m.actionTimer -= headTurnAmount
+    } else if (m.actionState == 23) {
+        if (m.flags & MARIO_CAP_IN_HAND) {
+            set_mario_action(m, ACT_PUTTING_ON_CAP, 0)
+        } else {
+            set_mario_action(m, m.heldObj == null ? ACT_IDLE : ACT_HOLD_IDLE, 0)
+        }
+    }
+    vec3f_copy(m.marioObj.gfx.pos, m.pos)
+    vec3s_set(m.marioObj.gfx.angle, 0, m.faceAngle[1], 0)
+    vec3s_set(m.marioBodyState.headAngle, m.actionTimer, 0, 0)
 
-//     return 0
-// }
+    if (m.actionState != 8) {
+        m.actionState++
+    }
+    return 0
+}
 
 // puts Mario in a state where he's waiting for (npc) dialog; doesn't do much
 export const act_waiting_for_dialog = (m) => {

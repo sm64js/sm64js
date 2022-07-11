@@ -1,9 +1,9 @@
 // king_bobomb.c.inc
 import { GeoRendererInstance as GeoRenderer } from "../../engine/GeoRenderer"
 import { Mat4 } from "../../engine/math_util"
-import { DIALOG_FLAG_TURN_TO_MARIO, HELD_DROPPED, HELD_FREE, HELD_HELD, HELD_THROWN, oAction, oAngleToMario, OBJ_FLAG_HOLDABLE, OBJ_MOVE_LANDED, OBJ_MOVE_ON_GROUND, oDistanceToMario, oFlags, oForwardVel, oGravity, oHealth, oHeldState, oHomeX, oHomeY, oInteractionSubtype, oInteractStatus, oInteractType, oKingBobombUnk100, oKingBobombUnk104, oKingBobombUnk108, oKingBobombUnk88, oKingBobombUnkF8, oKingBobombUnkFC, oMoveAngleYaw, oMoveFlags, oPosX, oPosY, oSubAction, oTimer, oVelY } from "../../include/object_constants"
+import { DIALOG_FLAG_TEXT_DEFAULT, DIALOG_FLAG_TURN_TO_MARIO, HELD_DROPPED, HELD_FREE, HELD_HELD, HELD_THROWN, oAction, oAngleToMario, OBJ_FLAG_HOLDABLE, OBJ_MOVE_LANDED, OBJ_MOVE_ON_GROUND, oDistanceToMario, oFlags, oForwardVel, oGravity, oHealth, oHeldState, oHomeX, oHomeY, oInteractionSubtype, oInteractStatus, oInteractType, oKingBobombUnk100, oKingBobombUnk104, oKingBobombUnk108, oKingBobombUnk88, oKingBobombUnkF8, oKingBobombUnkFC, oMoveAngleYaw, oMoveFlags, oPosX, oPosY, oSubAction, oTimer, oVelY } from "../../include/object_constants"
 import { NO_SOUND, SOUND_OBJ2_KING_BOBOMB_DAMAGE, SOUND_OBJ_KING_BOBOMB, SOUND_OBJ_KING_BOBOMB_JUMP, SOUND_OBJ_KING_WHOMP_DEATH, SOUND_OBJ_POUNDING1_HIGHPRIO, SOUND_OBJ_UNKNOWN3, SOUND_OBJ_UNKNOWN4 } from "../../include/sounds"
-import { INTERACT_DAMAGE, INTERACT_GRABBABLE, INT_STATUS_GRABBED_MARIO, INT_SUBTYPE_GRABS_MARIO } from "../Interaction"
+import { INTERACT_DAMAGE, INTERACT_GRABBABLE, INT_STATUS_GRABBED_MARIO, INT_STATUS_MARIO_UNK6, INT_SUBTYPE_GRABS_MARIO } from "../Interaction"
 import { obj_update_pos_from_parent_transformation, create_transformation_from_matrices, obj_set_gfx_pos_from_pos, cur_obj_update_floor_and_walls, cur_obj_move_standard, cur_obj_move_using_fvel_and_gravity, cur_obj_call_action_function, cur_obj_enable_rendering, cur_obj_disable_rendering, cur_obj_become_intangible, cur_obj_init_animation_with_sound, cur_obj_set_pos_to_home, cur_obj_can_mario_activate_textbox_2, cur_obj_update_dialog_with_cutscene, approach_s16_symmetric, cur_obj_become_tangible, cur_obj_check_anim_frame, cur_obj_shake_screen, cur_obj_init_animation_and_check_if_near_end, cur_obj_init_animation_and_anim_frame, cur_obj_rotate_yaw_toward, cur_obj_check_grabbed_mario, player_performed_grab_escape_action, cur_obj_check_if_near_animation_end, cur_obj_init_animation_and_extend_if_at_end, cur_obj_angle_to_home, cur_obj_hide, cur_obj_spawn_star_at_y_offset, cur_obj_unrender_and_reset_state, cur_obj_get_thrown_or_placed } from "../ObjectHelpers"
 import { create_sound_spawner, cur_obj_play_sound_2, exec_anim_sound_state } from "../SpawnSound"
 import { CameraInstance as Camera, CUTSCENE_DIALOG, SHAKE_POS_SMALL } from "../Camera"
@@ -15,22 +15,10 @@ import { arc_to_goal_pos } from "./grand_star.inc"
 import { MARIO_DIALOG_LOOK_UP } from "../MarioActionsCutscene"
 import { spawn_mist_particles_variable } from "./white_puff.inc"
 import { spawn_triangle_break_particles } from "./break_particles.inc"
-
-// Copy of geo_update_projectile_pos_from_parent
-export const geo_update_held_mario_pos = (run, node, mtx) => {
-    if (run == true) {
-        let sp20
-        let sp1C = GeoRenderer.gCurGraphNodeObject
-        if (sp1C.prevObj != null) {
-            create_transformation_from_matrices(sp20, mtx, GeoRenderer.gCurGraphNodeCamera.matrixPtr)
-            obj_update_pos_from_parent_transformation(sp20, sp1C.prevObj)
-            obj_set_gfx_pos_from_pos(sp1C.prevObj)
-        }
-    }
-}
+import { MODEL_DIRT_ANIMATION } from "../../include/model_ids"
 
 export const bhv_bobomb_anchor_mario_loop = () => {
-    common_anchor_mario_behavior(50.0, 50.0, 64);
+    common_anchor_mario_behavior(50.0, 50.0, INT_STATUS_MARIO_UNK6);
 }
 
 const king_bobomb_act_0 = () => {
@@ -71,7 +59,7 @@ export const king_bobomb_act_1 = () => {
     o.rawData[oForwardVel] = 0
     o.rawData[oVelY] = 0
     cur_obj_init_animation_with_sound(11)
-    o.rawData[oMoveAngleYaw] = approach_s16_symmetric(o.rawData[oMoveAngleYaw, o.rawData[oAngleToMario]])
+    o.rawData[oMoveAngleYaw] = approach_s16_symmetric(o.rawData[oMoveAngleYaw, o.rawData[oAngleToMario]], 0x200)
     if (o.rawData[oDistanceToMario] < 2500.0) {
         o.rawData[oAction] = 2
     }
@@ -82,8 +70,9 @@ export const king_bobomb_act_1 = () => {
 }
 
 const king_bobomb_act_2 = () => {
-    cur_obj_become_tangible()
     const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    cur_obj_become_tangible()
 
     if (o.rawData[oPosY] - o.rawData[oHomeY] < -100.0) { // Thrown off hill
         o.rawData[oAction] = 5
@@ -124,14 +113,14 @@ const king_bobomb_act_3 = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
 
     if (o.rawData[oSubAction] == 0) {
-        o.rawData[oForwardVel] = 0
+        o.rawData[oForwardVel] = 0.0
         o.rawData[oKingBobombUnk104] = 0
         o.rawData[oKingBobombUnkFC] = 0
         if (o.rawData[oTimer] == 0) {
             cur_obj_play_sound_2(SOUND_OBJ_UNKNOWN3)
         }
         if (cur_obj_init_animation_and_check_if_near_end(0)) {
-            o.rawData[oSubAction++]
+            o.rawData[oSubAction]++
             cur_obj_init_animation_and_anim_frame(1, 0)
         }
     } else {
@@ -303,12 +292,12 @@ const king_bobomb_act_7 = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
 
     cur_obj_init_animation_with_sound(2)
-    if (cur_obj_update_dialog_with_cutscene(2, 2, CUTSCENE_DIALOG, DIALOG_116)) {
+    if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP, DIALOG_FLAG_TEXT_DEFAULT, CUTSCENE_DIALOG, DIALOG_116)) {
         create_sound_spawner(SOUND_OBJ_KING_WHOMP_DEATH)
         cur_obj_hide()
         cur_obj_become_intangible()
         spawn_mist_particles_variable(0, 0, 200.0)
-        spawn_triangle_break_particles(20, 138, 3.0, 4)
+        spawn_triangle_break_particles(20, MODEL_DIRT_ANIMATION, 3.0, 4)
         cur_obj_shake_screen(SHAKE_POS_SMALL)
         cur_obj_spawn_star_at_y_offset(2000.0, 4500.0, -4500.0, 200.0)
         o.rawData[oAction] = 8

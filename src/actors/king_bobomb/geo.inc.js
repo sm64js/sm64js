@@ -84,7 +84,7 @@ export const king_bobomb_geo = () => {return [
                                   GEO_DISPLAY_LIST(LAYER_ALPHA, king_bobomb_seg5_dl_0500A6C0),
                                GEO_CLOSE_NODE(),
                             GEO_CLOSE_NODE(),
-                            GEO_ASM(0, geo_update_held_mario_pos),
+                            GEO_ASM(0, "MarioMisc.geo_update_held_mario_pos"),
                          GEO_CLOSE_NODE(),
                       GEO_CLOSE_NODE(),
                    GEO_CLOSE_NODE(),

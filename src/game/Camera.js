@@ -358,6 +358,54 @@ class Camera {
             keyDanceRoll: 0
         }
 
+        this.cutsceneShots = [
+            [ CUTSCENE_STAR_SPAWN, sCutsceneStarSpawn ]
+            [ CUTSCENE_RED_COIN_STAR_SPAWN, sCutsceneRedCoinStarSpawn ]
+            [ CUTSCENE_ENDING, sCutsceneEnding ]
+            [ CUTSCENE_GRAND_STAR, sCutsceneGrandStar ]
+            [ CUTSCENE_DOOR_WARP, sCutsceneDoorWarp ]
+            [ CUTSCENE_DOOR_PULL, sCutsceneDoorPull ]
+            [ CUTSCENE_DOOR_PUSH, sCutsceneDoorPush ]
+            [ CUTSCENE_DOOR_PULL_MODE, sCutsceneDoorPullMode ]
+            [ CUTSCENE_DOOR_PUSH_MODE, sCutsceneDoorPushMode ]
+            [ CUTSCENE_ENTER_CANNON, sCutsceneEnterCannon ]
+            [ CUTSCENE_ENTER_PAINTING, sCutsceneEnterPainting ]
+            [ CUTSCENE_DEATH_EXIT, sCutsceneDeathExit ]
+            [ CUTSCENE_EXIT_PAINTING_SUCC, sCutsceneExitPaintingSuccess ]
+            [ CUTSCENE_UNUSED_EXIT, sCutsceneUnusedExit ]
+            [ CUTSCENE_INTRO_PEACH, sCutsceneIntroPeach ]
+            [ CUTSCENE_ENTER_BOWSER_ARENA, sCutsceneEnterBowserArena ]
+            [ CUTSCENE_DANCE_ROTATE, sCutsceneDanceDefaultRotate ]
+            [ CUTSCENE_DANCE_DEFAULT, sCutsceneDanceDefaultRotate ]
+            [ CUTSCENE_DANCE_FLY_AWAY, sCutsceneDanceFlyAway ]
+            [ CUTSCENE_DANCE_CLOSEUP, sCutsceneDanceCloseup ]
+            [ CUTSCENE_KEY_DANCE, sCutsceneKeyDance ]
+            [ CUTSCENE_0F_UNUSED, sCutsceneUnused ]
+            [ CUTSCENE_END_WAVING, sCutsceneEndWaving ]
+            [ CUTSCENE_CREDITS, sCutsceneCredits ]
+            [ CUTSCENE_CAP_SWITCH_PRESS, sCutsceneCapSwitchPress ]
+            [ CUTSCENE_SLIDING_DOORS_OPEN, sCutsceneSlidingDoorsOpen ]
+            [ CUTSCENE_PREPARE_CANNON, sCutscenePrepareCannon ]
+            [ CUTSCENE_UNLOCK_KEY_DOOR, sCutsceneUnlockKeyDoor ]
+            [ CUTSCENE_STANDING_DEATH, sCutsceneStandingDeath ]
+            [ CUTSCENE_ENTER_POOL, sCutsceneEnterPool ]
+            [ CUTSCENE_DEATH_ON_STOMACH, sCutsceneDeathStomach ]
+            [ CUTSCENE_DEATH_ON_BACK, sCutsceneDeathOnBack ]
+            [ CUTSCENE_QUICKSAND_DEATH, sCutsceneQuicksandDeath ]
+            [ CUTSCENE_SUFFOCATION_DEATH, sCutsceneSuffocation ]
+            [ CUTSCENE_EXIT_BOWSER_SUCC, sCutsceneExitBowserSuccess ]
+            [ CUTSCENE_EXIT_BOWSER_DEATH, sCutsceneExitBowserDeath ]
+            [ CUTSCENE_EXIT_SPECIAL_SUCC, sCutsceneExitSpecialSuccess ]
+            [ CUTSCENE_EXIT_WATERFALL, sCutsceneExitWaterfall ]
+            [ CUTSCENE_EXIT_FALL_WMOTR, sCutsceneFallToCastleGrounds ]
+            [ CUTSCENE_NONPAINTING_DEATH, sCutsceneNonPaintingDeath ]
+            [ CUTSCENE_DIALOG, sCutsceneDialog ]
+            [ CUTSCENE_READ_MESSAGE, sCutsceneReadMessage ]
+            [ CUTSCENE_RACE_DIALOG, sCutsceneDialog ]
+            [ CUTSCENE_ENTER_PYRAMID_TOP, sCutsceneEnterPyramidTop ]
+            [ CUTSCENE_SSL_PYRAMID_EXPLODE, sCutscenePyramidTopExplode ]
+        ]
+
         this.sOldPosition = [0, 0, 0]
         this.sOldFocus = [0, 0, 0]
         this.sObjectCutscene = 0
@@ -977,6 +1025,19 @@ class Camera {
     update_camera(c) {
         this.gCamera = c
         this.update_camera_hud_status(c)
+        if (c.cutscene == 0) {
+            // Only process R_TRIG if 'fixed' is not selected in the menu
+            if (this.cam_select_alt_mode(0) == CAM_SELECTION_MARIO) {
+                if (/*window.playerInput.buttonPressedRt*/ false) {
+                    if (this.set_cam_angle(0) == CAM_ANGLE_LAKITU) {
+                        this.set_cam_angle(CAM_ANGLE_MARIO)
+                    } else {
+                        this.set_cam_angle(CAM_ANGLE_LAKITU)
+                    }
+                }
+            }
+            // this.play_sound_if_cam_switched_to_lakitu_or_mario()
+        }
 
         this.sStatusFlags &= ~CAM_FLAG_FRAME_AFTER_CAM_INIT
         if (this.gCameraMovementFlags & CAM_MOVE_INIT_CAMERA) {
@@ -1005,88 +1066,105 @@ class Camera {
 
         c.sCButtonsPressed = this.find_c_buttons_pressed(c.sCButtonsPressed);
 
-        this.sYawSpeed = 0x400
-
-        if (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
-        switch (c.mode) {
-                case CAMERA_MODE_BEHIND_MARIO:
-                    this.mode_behind_mario_camera(c)
-                    break
-
-                // case CAMERA_MODE_C_UP:
-                //     this.mode_c_up_camera(c)
-                //     break
-
-                case CAMERA_MODE_WATER_SURFACE:
-                    this.mode_water_surface_camera(c)
-                    break
-
-                // case CAMERA_MODE_INSIDE_CANNON:
-                //     this.mode_cannon_camera(c)
-                //     break
-
-                default:
-                    this.mode_mario_camera(c)
-            }
+        if (c.cutscene != 0) {
+            this.sYawSpeed = 0
+            this.play_cutscene(c)
+            this.sFramesSinceCutsceneEnded = 0
         } else {
+            // Clear the recent cutscene after 8 frames
+            if (this.gRecentCutscene != 0 && this.sFramesSinceCutsceneEnded < 8) {
+                this.sFramesSinceCutsceneEnded++
+                if (this.sFramesSinceCutsceneEnded >= 8) {
+                    this.gRecentCutscene = 0
+                    this.sFramesSinceCutsceneEnded = 0
+                }
+            }
+        }
+        // If not in a cutscene, do mode processing
+        if (c.cutscene == 0) {
+            this.sYawSpeed = 0x400
+
+            if (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
             switch (c.mode) {
-                case CAMERA_MODE_BEHIND_MARIO:
-                    this.mode_behind_mario_camera(c)
-                    break
+                    case CAMERA_MODE_BEHIND_MARIO:
+                        this.mode_behind_mario_camera(c)
+                        break
 
-                // case CAMERA_MODE_C_UP:
-                //     mode_c_up_camera(c);
-                //     break;
+                    // case CAMERA_MODE_C_UP:
+                    //     this.mode_c_up_camera(c)
+                    //     break
 
-                case CAMERA_MODE_WATER_SURFACE:
-                    this.mode_water_surface_camera(c)
-                    break
+                    case CAMERA_MODE_WATER_SURFACE:
+                        this.mode_water_surface_camera(c)
+                        break
 
-                // case CAMERA_MODE_INSIDE_CANNON:
-                //     mode_cannon_camera(c);
-                //     break;
+                    // case CAMERA_MODE_INSIDE_CANNON:
+                    //     this.mode_cannon_camera(c)
+                    //     break
 
-                // case CAMERA_MODE_8_DIRECTIONS:
-                //     mode_8_directions_camera(c);
-                //     break;
+                    default:
+                        this.mode_mario_camera(c)
+                }
+            } else {
+                switch (c.mode) {
+                    case CAMERA_MODE_BEHIND_MARIO:
+                        this.mode_behind_mario_camera(c)
+                        break
 
-                // case CAMERA_MODE_RADIAL:
-                //     mode_radial_camera(c);
-                //     break;
+                    // case CAMERA_MODE_C_UP:
+                    //     mode_c_up_camera(c);
+                    //     break;
 
-                // case CAMERA_MODE_OUTWARD_RADIAL:
-                //     mode_outward_radial_camera(c);
-                //     break;
+                    case CAMERA_MODE_WATER_SURFACE:
+                        this.mode_water_surface_camera(c)
+                        break
 
-                case CAMERA_MODE_CLOSE:
+                    // case CAMERA_MODE_INSIDE_CANNON:
+                    //     mode_cannon_camera(c);
+                    //     break;
+
+                    // case CAMERA_MODE_8_DIRECTIONS:
+                    //     mode_8_directions_camera(c);
+                    //     break;
+
+                    // case CAMERA_MODE_RADIAL:
+                    //     mode_radial_camera(c);
+                    //     break;
+
+                    // case CAMERA_MODE_OUTWARD_RADIAL:
+                    //     mode_outward_radial_camera(c);
+                    //     break;
+
+                    case CAMERA_MODE_CLOSE:
+                        this.mode_lakitu_camera(c)
+                        break
+
+                case CAMERA_MODE_FREE_ROAM:
                     this.mode_lakitu_camera(c)
                     break
 
-            case CAMERA_MODE_FREE_ROAM:
-                this.mode_lakitu_camera(c)
-                break
+                    // case CAMERA_MODE_BOSS_FIGHT:
+                    //     mode_boss_fight_camera(c);
+                    //     break;
 
-                // case CAMERA_MODE_BOSS_FIGHT:
-                //     mode_boss_fight_camera(c);
-                //     break;
+                    // case CAMERA_MODE_PARALLEL_TRACKING:
+                    //     mode_parallel_tracking_camera(c);
+                    //     break;
 
-                // case CAMERA_MODE_PARALLEL_TRACKING:
-                //     mode_parallel_tracking_camera(c);
-                //     break;
+                    // case CAMERA_MODE_SLIDE_HOOT:
+                    //     mode_slide_camera(c);
+                    //     break;
 
-                // case CAMERA_MODE_SLIDE_HOOT:
-                //     mode_slide_camera(c);
-                //     break;
+                    // case CAMERA_MODE_FIXED:
+                    //     mode_fixed_camera(c);
+                    //     break;
 
-                // case CAMERA_MODE_FIXED:
-                //     mode_fixed_camera(c);
-                //     break;
+                    // case CAMERA_MODE_SPIRAL_STAIRS:
+                    //     mode_spiral_stairs_camera(c);
+                    //     break;
 
-                // case CAMERA_MODE_SPIRAL_STAIRS:
-                //     mode_spiral_stairs_camera(c);
-                //     break;
-
-            default: throw "unknown camera case"
+                    default: throw "unknown camera case"
+                }
             }
         }
 
@@ -1119,6 +1197,60 @@ class Camera {
         }
         Hud.set_hud_camera_status(status)
         return status
+    }
+
+    cam_select_alt_mode(selection) {
+        let mode = CAM_SELECTION_FIXED
+
+        if (selection == CAM_SELECTION_MARIO) {
+            if (!(this.sSelectionFlags & CAM_MODE_MARIO_SELECTED)) {
+                this.sSelectionFlags |= CAM_MODE_MARIO_SELECTED
+            }
+            this.sCameraSoundFlags |= CAM_SOUND_UNUSED_SELECT_MARIO
+        }
+
+        // The alternate mode is up-close, but the player just selected fixed in the pause menu
+        if (selection == CAM_SELECTION_FIXED && (this.sSelectionFlags & CAM_MODE_MARIO_SELECTED)) {
+            // So change to normal mode in case the user paused in up-close mode
+            this.set_cam_angle(CAM_ANGLE_LAKITU)
+            this.sSelectionFlags &= ~CAM_MODE_MARIO_SELECTED
+            this.sCameraSoundFlags |= CAM_SOUND_UNUSED_SELECT_FIXED
+        }
+
+        if (this.sSelectionFlags & CAM_MODE_MARIO_SELECTED) {
+            mode = CAM_SELECTION_MARIO
+        }
+        return mode
+    }
+
+    set_cam_angle(mode) {
+        let curMode = CAM_ANGLE_LAKITU
+        
+        // Switch to Mario mode
+        if (mode == CAM_ANGLE_MARIO && !(this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE)) {
+            this.sSelectionFlags |= CAM_MODE_MARIO_ACTIVE
+            if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
+                this.sSelectionFlags |= CAM_MODE_LAKITU_WAS_ZOOMED_OUT
+                this.gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT
+            }
+            this.sCameraSoundFlags |= CAM_SOUND_MARIO_ACTIVE
+        }
+
+        // Switch back to normal mode
+        if (mode == CAM_ANGLE_LAKITU && (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE)) {
+            this.sSelectionFlags &= ~CAM_MODE_MARIO_ACTIVE
+            if (this.sSelectionFlags & CAM_MODE_LAKITU_WAS_ZOOMED_OUT) {
+                this.sSelectionFlags &= ~CAM_MODE_LAKITU_WAS_ZOOMED_OUT
+                this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
+            } else {
+                this.gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT
+            }
+            this.sCameraSoundFlags |= CAM_SOUND_NORMAL_ACTIVE
+        }
+        if (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
+            curMode = CAM_ANGLE_MARIO
+        }
+        return curMode
     }
 
     calc_hor_dist(a, b) {
@@ -2181,6 +2313,45 @@ class Camera {
             this.sFOVState.shakeAmplitude = amplitude
             this.sFOVState.decay = decay
             this.sFOVState.shakeSpeed = shakeSpeed
+        }
+    }
+
+    play_cutscene(c) {
+        let oldCutscene = c.cutscene
+        let cutsceneDuration
+        this.sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT
+        this.gCameraMovementFlags &= ~CAM_MOVING_INTO_MODE
+        
+        for (let i = 0; i < this.cutsceneShots.length; i++) {
+            if (c.cutscene == this.cutsceneShots[i][0]) {
+                cutsceneDuration = this.cutsceneShots[i][1].duration
+                this.cutsceneShots[i][1].shot(c)
+            }
+        }
+
+        if ((cutsceneDuration != 0) && !(this.gCutsceneTimer & CUTSCENE_STOP)) {
+            //! @bug This should check for 0x7FFF (CUTSCENE_LOOP)
+            //! instead, cutscenes that last longer than 0x3FFF frames will never end on their own
+            if (this.gCutsceneTimer < 0x3FFF) {
+                this.gCutsceneTimer++
+            }
+            //! Because gCutsceneTimer is often set to 0x7FFF (CUTSCENE_LOOP), this conditional can only
+            //! check for == due to overflow
+            if (this.gCutsceneTimer == cutsceneDuration) {
+                this.sCutsceneShot++
+                this.gCutsceneTimer = 0
+            }
+        } else {
+           this.gPlayerCameraState.cameraEvent = 0
+           this.sCutsceneShot = 0
+           this.gCutsceneTimer = 0
+        }
+
+        this.sAreaYawChange = 0
+
+        // The cutscene just ended
+        if ((c.cutscene == 0) && (oldCutscene != 0)) {
+            this.gRecentCutscene = oldCutscene;
         }
     }
 

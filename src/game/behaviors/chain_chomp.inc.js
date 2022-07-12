@@ -1,12 +1,18 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { oWoodenPostMarioPounding, oWoodenPostSpeedY, oWoodenPostOffsetY, oChainChompReleaseStatus, CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE, oPosX, oPosY, oHomeY, oBehParams, WOODEN_POST_BP_NO_COINS_MASK, oDistanceToMario, oTimer, oWoodenPostTotalMarioAngle, oAngleToMario, oWoodenPostPrevAngleToMario, oAction, CHAIN_CHOMP_ACT_UNINITIALIZED, CHAIN_CHOMP_ACT_MOVE, CHAIN_CHOMP_ACT_UNLOAD_CHAIN, oChainChompSegments, CHAIN_CHOMP_CHAIN_PART_BP_PIVOT, oBehParams2ndByte, CHAIN_CHOMP_NOT_RELEASED, oPosZ, oSubAction, CHAIN_CHOMP_SUB_ACT_TURN, CHAIN_CHOMP_SUB_ACT_LUNGE, oGravity, oChainChompDistToPivot, oChainChompMaxDistFromPivotPerChainPart, oChainChompRestrictedByChain, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, oMoveAngleYaw, oForwardVel, oVelY, oChainChompMaxDistBetweenChainParts, oChainChompTargetPitch, oChainChompUnk104 } from "../../include/object_constants"
-import { cur_obj_is_mario_ground_pounding_platform, cur_obj_set_pos_to_home, cur_obj_unhide, spawn_object, obj_mark_for_deletion, cur_obj_update_floor_and_walls, cur_obj_move_standard, spawn_object_relative, cur_obj_rotate_yaw_toward, abs_angle_diff, cur_obj_check_anim_frame, cur_obj_reverse_animation, cur_obj_hide, obj_spawn_loot_yellow_coins } from "../ObjectHelpers"
+import { oWoodenPostMarioPounding, oWoodenPostSpeedY, oWoodenPostOffsetY, oChainChompReleaseStatus, CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE, oPosX, oPosY, oHomeY, oBehParams, WOODEN_POST_BP_NO_COINS_MASK, oDistanceToMario, oTimer, oWoodenPostTotalMarioAngle, oAngleToMario, oWoodenPostPrevAngleToMario, oAction, CHAIN_CHOMP_ACT_UNINITIALIZED, CHAIN_CHOMP_ACT_MOVE, CHAIN_CHOMP_ACT_UNLOAD_CHAIN, oChainChompSegments, CHAIN_CHOMP_CHAIN_PART_BP_PIVOT, oBehParams2ndByte, CHAIN_CHOMP_NOT_RELEASED, oPosZ, oSubAction, CHAIN_CHOMP_SUB_ACT_TURN, CHAIN_CHOMP_SUB_ACT_LUNGE, oGravity, oChainChompDistToPivot, oChainChompMaxDistFromPivotPerChainPart, oChainChompRestrictedByChain, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, oMoveAngleYaw, oForwardVel, oVelY, oChainChompMaxDistBetweenChainParts, oChainChompTargetPitch, oChainChompUnk104, oChainChompHitGate, CHAIN_CHOMP_RELEASED_LUNGE_AROUND, oChainChompNumLunges, oWallHitboxRadius, CHAIN_CHOMP_RELEASED_BREAK_GATE, oHomeX, oHomeZ, OBJ_MOVE_HIT_WALL, CHAIN_CHOMP_RELEASED_JUMP_AWAY, CHAIN_CHOMP_RELEASED_END_CUTSCENE } from "../../include/object_constants"
+import { cur_obj_is_mario_ground_pounding_platform, cur_obj_set_pos_to_home, cur_obj_unhide, spawn_object, obj_mark_for_deletion, cur_obj_update_floor_and_walls, cur_obj_move_standard, spawn_object_relative, cur_obj_rotate_yaw_toward, abs_angle_diff, cur_obj_check_anim_frame, cur_obj_reverse_animation, cur_obj_hide, obj_spawn_loot_yellow_coins, cur_obj_nearest_object_with_behavior, spawn_mist_particles_with_sound, cur_obj_angle_to_home, cur_obj_lateral_dist_to_home, cur_obj_reflect_move_angle_off_wall } from "../ObjectHelpers"
 import { approach_number_ptr, obj_get_pitch_from_vel, obj_move_pitch_approach, obj_face_pitch_approach, obj_check_attacks } from "../ObjBehaviors2"
-import { int16 } from "../../utils"
-import { MODEL_METALLIC_BALL } from "../../include/model_ids"
-import { bhvChainChompChainPart } from "../BehaviorData"
+import { int16, random_sign } from "../../utils"
+import { MODEL_DIRT_ANIMATION, MODEL_METALLIC_BALL } from "../../include/model_ids"
+import { bhvChainChomp, bhvChainChompChainPart } from "../BehaviorData"
 import { atan2s } from "../../engine/math_util"
 import { INTERACT_MR_BLIZZARD } from "../Interaction"
+import { SOUND_GENERAL_CHAIN_CHOMP1, SOUND_GENERAL_POUND_WOOD_POST, SOUND_GENERAL_WALL_EXPLOSION } from "../../include/sounds"
+import { CameraInstance as Camera, CUTSCENE_STAR_SPAWN, SHAKE_POS_SMALL } from "../Camera"
+import { spawn_mist_particles_variable } from "./white_puff.inc"
+import { spawn_triangle_break_particles } from "./break_particles.inc"
+import { cur_obj_play_sound_2 } from "../SpawnSound"
+import { MARIO_DIALOG_LOOK_UP, MARIO_DIALOG_STATUS_SPEAK, MARIO_DIALOG_STOP, set_mario_npc_dialog } from "../MarioActionsCutscene"
 
 const sChainChompHitbox = {
     interactType:      INTERACT_MR_BLIZZARD,
@@ -34,7 +40,7 @@ const bhv_wooden_post_update = () => {
     if (!o.rawData[oWoodenPostMarioPounding]) {
         o.rawData[oWoodenPostMarioPounding] = cur_obj_is_mario_ground_pounding_platform()
         if (o.rawData[oWoodenPostMarioPounding]) {
-            ///play sound
+            cur_obj_play_sound_2(SOUND_GENERAL_POUND_WOOD_POST)
             o.rawData[oWoodenPostSpeedY] = -70
         }
     } else if (wooden_post_approach_speed()) {
@@ -45,7 +51,7 @@ const bhv_wooden_post_update = () => {
         o.rawData[oWoodenPostOffsetY] = -190
         if (o.parentObj != o) {
             ///play puzzle jingle sound
-            //o.parentObj.rawData[oChainChompReleaseStatus] = CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE
+            o.parentObj.rawData[oChainChompReleaseStatus] = CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE
             o.parentObj = o
         }
     }
@@ -269,6 +275,117 @@ const chain_chomp_sub_act_lunge = () => {
 
 }
 
+// Fall to the ground and interrupt mario into a cutscene action.
+const chain_chomp_released_trigger_cutscene = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.rawData[oForwardVel] = 0.0
+    o.rawData[oGravity] = -4.0
+
+    //! Can delay this if we get into a cutscene-unfriendly action after the
+    //  last post ground pound and before this
+    if (set_mario_npc_dialog(MARIO_DIALOG_LOOK_UP) == MARIO_DIALOG_STATUS_SPEAK &&
+        (o.rawData[oMoveFlags] & OBJ_MOVE_MASK_ON_GROUND) && Camera.cutscene_object(CUTSCENE_STAR_SPAWN, o) == 1) {
+            o.rawData[oChainChompReleaseStatus] = CHAIN_CHOMP_RELEASED_LUNGE_AROUND
+            o.rawData[oTimer] = 0
+        }
+}
+
+/**
+ * Lunge 4 times, each time moving toward mario +/- 0x2000 angular units.
+ * Finally, begin a lunge toward x=1450, z=562 (near the gate).
+ */
+const chain_chomp_released_lunge_around = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    chain_chomp_restore_normal_chain_lengths()
+
+    // Finish bounce
+    if (o.rawData[oMoveFlags] & OBJ_MOVE_MASK_ON_GROUND) {
+        // Before first bounce, turn toward mario and wait 2 seconds
+        if (o.rawData[oChainChompNumLunges] == 0) {
+            if (cur_obj_rotate_yaw_toward(o.rawData[oAngleToMario], 800)) {
+                if (o.rawData[oTimer] > 60) {
+                    o.rawData[oChainChompNumLunges]++
+                    // enable wall collision
+                    o.rawData[oWallHitboxRadius] = 200.0
+                }
+            } else {
+                o.rawData[oTimer] = 0
+            }
+        } else {
+            o.rawData[oChainChompNumLunges]++ // idk why this isnt AFTER the if statement to make the
+                                              // number checked equal to the # of lunges but whatever
+            if (o.rawData[oChainChompNumLunges] <= 5) {
+                cur_obj_play_sound_2(SOUND_GENERAL_CHAIN_CHOMP1)
+                o.rawData[oMoveAngleYaw] = o.rawData[oAngleToMario] + random_sign() * 0x2000
+                o.rawData[oForwardVel] = 30.0
+                o.rawData[oVelY] = 50.0
+            } else {
+                o.rawData[oChainChompReleaseStatus] = CHAIN_CHOMP_RELEASED_BREAK_GATE
+                o.rawData[oHomeX] = 1450.0
+                o.rawData[oHomeZ] = 562.0
+                o.rawData[oMoveAngleYaw] = cur_obj_angle_to_home()
+                o.rawData[oForwardVel] = cur_obj_lateral_dist_to_home() / 8
+                o.rawData[oVelY] = 50.0
+            }
+        }
+    }
+}
+
+/**
+ * Continue lunging until a wall collision occurs. Mark the gate as destroyed,
+ * wait for the chain chomp to land, and then begin a jump toward the final
+ * target, x=3288, z=-1770.
+ */
+const chain_chomp_released_break_gate = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (!o.rawData[oChainChompHitGate]) {
+        // If hit wall, assume it's the gate and bounce off of it
+        //! The wall may not be the gate
+        //! If the chain chomp gets stuck, it may never hit a wall, resulting
+        //  in a softlock
+        if (o.rawData[oMoveFlags] & OBJ_MOVE_HIT_WALL) {
+            o.rawData[oChainChompHitGate] = true
+            o.rawData[oMoveAngleYaw] = cur_obj_reflect_move_angle_off_wall()
+            o.rawData[oForwardVel] *= 0.4
+        }
+    } else if (o.rawData[oMoveFlags] & OBJ_MOVE_MASK_ON_GROUND) {
+        o.rawData[oChainChompReleaseStatus] = CHAIN_CHOMP_RELEASED_JUMP_AWAY
+        o.rawData[oHomeX] = 3288.0
+        o.rawData[oHomeZ] = -1770.0
+        o.rawData[oMoveAngleYaw] = cur_obj_angle_to_home()
+        o.rawData[oForwardVel] = cur_obj_lateral_dist_to_home() / 50.0
+        o.rawData[oVelY] = 120.0
+    }
+}
+
+/**
+ * Wait until the chain chomp lands.
+ */
+const chain_chomp_released_jump_away = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.rawData[oMoveFlags] & OBJ_MOVE_MASK_ON_GROUND) {
+        Camera.gObjCutsceneDone = true
+        o.rawData[oChainChompReleaseStatus] = CHAIN_CHOMP_RELEASED_END_CUTSCENE
+    }
+}
+
+/**
+ * Release mario and transition to the unload chain action.
+ */
+const chain_chomp_released_end_cutscene = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    console.log("hi!")
+    if (Camera.cutscene_object(CUTSCENE_STAR_SPAWN, o) == -1) {
+        set_mario_npc_dialog(MARIO_DIALOG_STOP)
+        o.rawData[oAction] = CHAIN_CHOMP_ACT_UNLOAD_CHAIN
+    }
+}
+
 const chain_chomp_act_move = () => {
     const o = ObjectListProc.gCurrentObject
 
@@ -288,7 +405,21 @@ const chain_chomp_act_move = () => {
                         break
                 }
                 break
-            default: throw "todo release chain chomp actions"
+            case CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE:
+                chain_chomp_released_trigger_cutscene();
+                break;
+            case CHAIN_CHOMP_RELEASED_LUNGE_AROUND:
+                chain_chomp_released_lunge_around();
+                break;
+            case CHAIN_CHOMP_RELEASED_BREAK_GATE:
+                chain_chomp_released_break_gate();
+                break;
+            case CHAIN_CHOMP_RELEASED_JUMP_AWAY:
+                chain_chomp_released_jump_away();
+                break;
+            case CHAIN_CHOMP_RELEASED_END_CUTSCENE:
+                chain_chomp_released_end_cutscene();
+                break;
         }
 
         cur_obj_move_standard(78)
@@ -384,6 +515,26 @@ const bhv_chain_chomp_update = () => {
     }
 }
 
+const bhv_chain_chomp_gate_init = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.parentObj = cur_obj_nearest_object_with_behavior(o, bhvChainChomp)
+}
+
+const bhv_chain_chomp_gate_update = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.parentObj.rawData[oChainChompHitGate]) {
+        spawn_mist_particles_with_sound(SOUND_GENERAL_WALL_EXPLOSION)
+        Camera.set_camera_shake_from_point(SHAKE_POS_SMALL, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
+        spawn_mist_particles_variable(0, 0x7F, 200.0)
+        spawn_triangle_break_particles(30, MODEL_DIRT_ANIMATION, 3.0, 4)
+        obj_mark_for_deletion(o)
+    }
+}
+
 gLinker.bhv_wooden_post_update = bhv_wooden_post_update
 gLinker.bhv_chain_chomp_chain_part_update = bhv_chain_chomp_chain_part_update
 gLinker.bhv_chain_chomp_update = bhv_chain_chomp_update
+gLinker.bhv_chain_chomp_gate_init = bhv_chain_chomp_gate_init
+gLinker.bhv_chain_chomp_gate_update = bhv_chain_chomp_gate_update

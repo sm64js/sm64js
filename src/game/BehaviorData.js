@@ -193,6 +193,7 @@ import { bitfs_seg7_collision_sinking_cage_platform } from "../levels/bitfs/sink
 import { purple_switch_seg8_collision_0800C7A8 } from "../actors/purple_switch/collision.inc"
 import { warp_pipe_seg3_collision_03009AC8 } from "../actors/warp_pipe/collision.inc"
 import { king_bobomb_seg5_anims_0500FE30 } from "../actors/king_bobomb/anims.inc"
+import { bob_seg7_collision_chain_chomp_gate } from "../levels/bob/chain_chomp_gate/collision.inc"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -784,6 +785,17 @@ export const bhvChainChompChainPart = [
     { command: BhvCmds.begin_loop },
         { command: BhvCmds.call_native, args: { func: 'bhv_chain_chomp_chain_part_update' } },
     { command: BhvCmds.end_loop }
+]
+
+export const bhvChainChompGate = [
+    BEGIN(OBJ_LIST_SURFACE),
+    LOAD_COLLISION_DATA(bob_seg7_collision_chain_chomp_gate),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    CALL_NATIVE('bhv_chain_chomp_gate_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_chain_chomp_gate_update'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
 ]
 
 export const bhvHorStarParticleSpawner = [
@@ -2548,6 +2560,7 @@ gLinker.behaviors.bhvCarrySomething6 = bhvCarrySomething6
 gLinker.behaviors.bhvCastleFlagWaving = bhvCastleFlagWaving
 gLinker.behaviors.bhvCastleFloorTrap = bhvCastleFloorTrap
 gLinker.behaviors.bhvChainChomp = bhvChainChomp
+gLinker.behaviors.bhvChainChompGate = bhvChainChompGate
 gLinker.behaviors.bhvCirclingAmp = bhvCirclingAmp
 gLinker.behaviors.bhvCheckerboardElevatorGroup = bhvCheckerboardElevatorGroup
 gLinker.behaviors.bhvCloud = bhvCloud

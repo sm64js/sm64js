@@ -279,7 +279,7 @@ class LevelCommands {
                 activeAreaIndex: this.sCurrAreaIndex,
                 behaviorArg: bharg,
                 behaviorScript: bhscript,
-                unk18: Area.gLoadedGraphNodes[model],
+                unk18: Area.gLoadedGraphNodes[model], // model
                 next: Area.gAreas[this.sCurrAreaIndex].objectSpawnInfos
             }
 

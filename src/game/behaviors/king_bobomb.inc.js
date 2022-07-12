@@ -339,7 +339,6 @@ const king_bobomb_move = () => {
     } else {
         cur_obj_move_using_fvel_and_gravity();
     }
-    console.log(o.rawData[oAction], o.rawData[oSubAction])
     cur_obj_call_action_function(sKingBobombActions);
     // exec_anim_sound_state(sKingBobombSoundStates); // errors in SpawnSound.js: playSound is not able to be read
     if (o.rawData[oDistanceToMario] < 5000.0) {

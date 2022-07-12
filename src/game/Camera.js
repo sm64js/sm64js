@@ -14,7 +14,7 @@ import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceC
 import { atan2s } from "../engine/math_util"
 import * as MathUtil from "../engine/math_util"
 import * as Mario from "./Mario"
-import { oPosY } from "../include/object_constants"
+import { oPosX, oPosY, oPosZ } from "../include/object_constants"
 import { SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { sins, s16, int16 } from "../utils"
 import { HudInstance as Hud } from "./Hud"
@@ -372,51 +372,51 @@ class Camera {
         ]
 
         this.cutsceneShots = [
-            [ CUTSCENE_STAR_SPAWN, sCutsceneStarSpawn ]
-            [ CUTSCENE_RED_COIN_STAR_SPAWN, sCutsceneRedCoinStarSpawn ]
-            [ CUTSCENE_ENDING, sCutsceneEnding ]
-            [ CUTSCENE_GRAND_STAR, sCutsceneGrandStar ]
-            [ CUTSCENE_DOOR_WARP, sCutsceneDoorWarp ]
-            [ CUTSCENE_DOOR_PULL, sCutsceneDoorPull ]
-            [ CUTSCENE_DOOR_PUSH, sCutsceneDoorPush ]
-            [ CUTSCENE_DOOR_PULL_MODE, sCutsceneDoorPullMode ]
-            [ CUTSCENE_DOOR_PUSH_MODE, sCutsceneDoorPushMode ]
-            [ CUTSCENE_ENTER_CANNON, sCutsceneEnterCannon ]
-            [ CUTSCENE_ENTER_PAINTING, sCutsceneEnterPainting ]
-            [ CUTSCENE_DEATH_EXIT, sCutsceneDeathExit ]
-            [ CUTSCENE_EXIT_PAINTING_SUCC, sCutsceneExitPaintingSuccess ]
-            [ CUTSCENE_UNUSED_EXIT, sCutsceneUnusedExit ]
-            [ CUTSCENE_INTRO_PEACH, sCutsceneIntroPeach ]
-            [ CUTSCENE_ENTER_BOWSER_ARENA, sCutsceneEnterBowserArena ]
-            [ CUTSCENE_DANCE_ROTATE, sCutsceneDanceDefaultRotate ]
-            [ CUTSCENE_DANCE_DEFAULT, sCutsceneDanceDefaultRotate ]
-            [ CUTSCENE_DANCE_FLY_AWAY, sCutsceneDanceFlyAway ]
-            [ CUTSCENE_DANCE_CLOSEUP, sCutsceneDanceCloseup ]
-            [ CUTSCENE_KEY_DANCE, sCutsceneKeyDance ]
-            [ CUTSCENE_0F_UNUSED, sCutsceneUnused ]
-            [ CUTSCENE_END_WAVING, sCutsceneEndWaving ]
-            [ CUTSCENE_CREDITS, sCutsceneCredits ]
-            [ CUTSCENE_CAP_SWITCH_PRESS, sCutsceneCapSwitchPress ]
-            [ CUTSCENE_SLIDING_DOORS_OPEN, sCutsceneSlidingDoorsOpen ]
-            [ CUTSCENE_PREPARE_CANNON, sCutscenePrepareCannon ]
-            [ CUTSCENE_UNLOCK_KEY_DOOR, sCutsceneUnlockKeyDoor ]
-            [ CUTSCENE_STANDING_DEATH, sCutsceneStandingDeath ]
-            [ CUTSCENE_ENTER_POOL, sCutsceneEnterPool ]
-            [ CUTSCENE_DEATH_ON_STOMACH, sCutsceneDeathStomach ]
-            [ CUTSCENE_DEATH_ON_BACK, sCutsceneDeathOnBack ]
-            [ CUTSCENE_QUICKSAND_DEATH, sCutsceneQuicksandDeath ]
-            [ CUTSCENE_SUFFOCATION_DEATH, sCutsceneSuffocation ]
-            [ CUTSCENE_EXIT_BOWSER_SUCC, sCutsceneExitBowserSuccess ]
-            [ CUTSCENE_EXIT_BOWSER_DEATH, sCutsceneExitBowserDeath ]
-            [ CUTSCENE_EXIT_SPECIAL_SUCC, sCutsceneExitSpecialSuccess ]
-            [ CUTSCENE_EXIT_WATERFALL, sCutsceneExitWaterfall ]
-            [ CUTSCENE_EXIT_FALL_WMOTR, sCutsceneFallToCastleGrounds ]
-            [ CUTSCENE_NONPAINTING_DEATH, sCutsceneNonPaintingDeath ]
-            [ CUTSCENE_DIALOG, sCutsceneDialog ]
-            [ CUTSCENE_READ_MESSAGE, sCutsceneReadMessage ]
-            [ CUTSCENE_RACE_DIALOG, sCutsceneDialog ]
-            [ CUTSCENE_ENTER_PYRAMID_TOP, sCutsceneEnterPyramidTop ]
-            [ CUTSCENE_SSL_PYRAMID_EXPLODE, sCutscenePyramidTopExplode ]
+            [ CUTSCENE_STAR_SPAWN, this.sCutsceneStarSpawn ],
+            // [ CUTSCENE_RED_COIN_STAR_SPAWN, sCutsceneRedCoinStarSpawn ],
+            // [ CUTSCENE_ENDING, sCutsceneEnding ],
+            // [ CUTSCENE_GRAND_STAR, sCutsceneGrandStar ],
+            // [ CUTSCENE_DOOR_WARP, sCutsceneDoorWarp ],
+            // [ CUTSCENE_DOOR_PULL, sCutsceneDoorPull ],
+            // [ CUTSCENE_DOOR_PUSH, sCutsceneDoorPush ],
+            // [ CUTSCENE_DOOR_PULL_MODE, sCutsceneDoorPullMode ],
+            // [ CUTSCENE_DOOR_PUSH_MODE, sCutsceneDoorPushMode ],
+            // [ CUTSCENE_ENTER_CANNON, sCutsceneEnterCannon ],
+            // [ CUTSCENE_ENTER_PAINTING, sCutsceneEnterPainting ],
+            // [ CUTSCENE_DEATH_EXIT, sCutsceneDeathExit ],
+            // [ CUTSCENE_EXIT_PAINTING_SUCC, sCutsceneExitPaintingSuccess ],
+            // [ CUTSCENE_UNUSED_EXIT, sCutsceneUnusedExit ],
+            // [ CUTSCENE_INTRO_PEACH, sCutsceneIntroPeach ],
+            // [ CUTSCENE_ENTER_BOWSER_ARENA, sCutsceneEnterBowserArena ],
+            // [ CUTSCENE_DANCE_ROTATE, sCutsceneDanceDefaultRotate ],
+            // [ CUTSCENE_DANCE_DEFAULT, sCutsceneDanceDefaultRotate ],
+            // [ CUTSCENE_DANCE_FLY_AWAY, sCutsceneDanceFlyAway ],
+            // [ CUTSCENE_DANCE_CLOSEUP, sCutsceneDanceCloseup ],
+            // [ CUTSCENE_KEY_DANCE, sCutsceneKeyDance ],
+            // [ CUTSCENE_0F_UNUSED, sCutsceneUnused ],
+            // [ CUTSCENE_END_WAVING, sCutsceneEndWaving ],
+            // [ CUTSCENE_CREDITS, sCutsceneCredits ],
+            // [ CUTSCENE_CAP_SWITCH_PRESS, sCutsceneCapSwitchPress ],
+            // [ CUTSCENE_SLIDING_DOORS_OPEN, sCutsceneSlidingDoorsOpen ],
+            // [ CUTSCENE_PREPARE_CANNON, sCutscenePrepareCannon ],
+            // [ CUTSCENE_UNLOCK_KEY_DOOR, sCutsceneUnlockKeyDoor ],
+            // [ CUTSCENE_STANDING_DEATH, sCutsceneStandingDeath ],
+            // [ CUTSCENE_ENTER_POOL, sCutsceneEnterPool ],
+            // [ CUTSCENE_DEATH_ON_STOMACH, sCutsceneDeathStomach ],
+            // [ CUTSCENE_DEATH_ON_BACK, sCutsceneDeathOnBack ],
+            // [ CUTSCENE_QUICKSAND_DEATH, sCutsceneQuicksandDeath ],
+            // [ CUTSCENE_SUFFOCATION_DEATH, sCutsceneSuffocation ],
+            // [ CUTSCENE_EXIT_BOWSER_SUCC, sCutsceneExitBowserSuccess ],
+            // [ CUTSCENE_EXIT_BOWSER_DEATH, sCutsceneExitBowserDeath ],
+            // [ CUTSCENE_EXIT_SPECIAL_SUCC, sCutsceneExitSpecialSuccess ],
+            // [ CUTSCENE_EXIT_WATERFALL, sCutsceneExitWaterfall ],
+            // [ CUTSCENE_EXIT_FALL_WMOTR, sCutsceneFallToCastleGrounds ],
+            // [ CUTSCENE_NONPAINTING_DEATH, sCutsceneNonPaintingDeath ],
+            // [ CUTSCENE_DIALOG, sCutsceneDialog ],
+            // [ CUTSCENE_READ_MESSAGE, sCutsceneReadMessage ],
+            // [ CUTSCENE_RACE_DIALOG, sCutsceneDialog ],
+            // [ CUTSCENE_ENTER_PYRAMID_TOP, sCutsceneEnterPyramidTop ],
+            // [ CUTSCENE_SSL_PYRAMID_EXPLODE, sCutscenePyramidTopExplode ],
         ]
 
         this.sOldPosition = [0, 0, 0]
@@ -2132,6 +2132,12 @@ class Camera {
         }
     }
 
+    object_pos_to_vec3f(dst, o) {
+        dst[0] = o.rawData[oPosX]
+        dst[1] = o.rawData[oPosY]
+        dst[2] = o.rawData[oPosZ]
+    }
+
     geo_camera_fov(callContext, graphNode) {
 
         const marioState = LevelUpdate.gMarioState
@@ -2339,6 +2345,14 @@ class Camera {
 
     cutscene_star_spawn_store_info(c) {
         store_info_star(c)
+    }
+
+    cutscene_star_spawn_focus_star(c) {
+        let starPos = new Array(3)
+        if (this.gCutsceneFocus != null) {
+            this.object_pos_to_vec3f(starPos, this.gCutsceneFocus)
+            starPos[1] += this.gCutsceneFocus.hitboxHeight
+        }
     }
 
     cutscene_star_spawn(c) {

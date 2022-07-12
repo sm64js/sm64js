@@ -58,6 +58,7 @@ import { haunted_cage_geo } from "../actors/haunted_cage/geo.inc"
 import { cannon_lid_seg8_dl_080048E0              } from "../actors/cannon_lid/model.inc"
 import { exclamation_box_outline_seg8_dl_08025F08 } from "../actors/exclamation_box_outline/model.inc"
 import { whirlpool_seg5_dl_05013CB8               } from "../actors/whirlpool/model.inc"
+import { king_bobomb_geo } from "../actors/king_bobomb/geo.inc"
 
 
 export const script_func_global_1 = () => { return [
@@ -108,7 +109,7 @@ export const script_func_global_3 = () => { return [
 export const script_func_global_4 = () => { return [
     LOAD_MODEL_FROM_GEO(MODEL.WATER_BOMB,              water_bomb_geo),
     LOAD_MODEL_FROM_GEO(MODEL.WATER_BOMB_SHADOW,       water_bomb_shadow_geo),
-    // LOAD_MODEL_FROM_GEO(MODEL.KING_BOBOMB,             king_bobomb_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.KING_BOBOMB,             king_bobomb_geo),
     RETURN(),
 ]}
 

@@ -22,7 +22,7 @@ import { SOUND_ACTION_TERRAIN_LANDING,
          SOUND_MOVING_AIM_CANNON } from "../include/sounds"
 import { play_sound } from "../audio/external"
 import { GRAPH_RENDER_ACTIVE           } from "../engine/graph_node"
-import { INT_STATUS_INTERACTED         } from "./Interaction"
+import { INT_STATUS_INTERACTED, INT_STATUS_MARIO_UNK2, INT_STATUS_MARIO_UNK6         } from "./Interaction"
 
 
 
@@ -532,6 +532,21 @@ const act_ledge_climb_fast = (m) => {
     update_ledge_climb_camera(m)
 
     return 0
+}
+
+const act_grabbed = (m) => {
+    if (m.marioObj.rawData[oInteractStatus] & INT_STATUS_MARIO_UNK2) {
+        let thrown = (m.marioObj.rawData[oInteractStatus] & INT_STATUS_MARIO_UNK6) == 0
+
+        m.faceAngle[1] = m.usedObj.rawData[oMoveAngleYaw]
+        vec3f_copy(m.pos, m.marioObj.gfx.pos)
+
+        return Mario.set_mario_action(m, (m.forwardVel >= 0.0) ? Mario.ACT_THROWN_FORWARD : Mario.ACT_THROWN_BACKWARD,
+                                    thrown)
+    }
+
+    Mario.set_mario_animation(m, Mario.MARIO_ANIM_BEING_GRABBED)
+    return false
 }
 
 const act_top_of_pole_transition = (m) => {

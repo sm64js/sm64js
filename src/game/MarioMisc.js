@@ -10,7 +10,7 @@ import {
 } from "../engine/math_util"
 
 import {
-    obj_scale, cur_obj_hide, obj_mark_for_deletion, spawn_object
+    obj_scale, cur_obj_hide, obj_mark_for_deletion, spawn_object, obj_set_gfx_pos_from_pos, obj_update_pos_from_parent_transformation, create_transformation_from_matrices
 } from "./ObjectHelpers"
 
 import {
@@ -52,7 +52,6 @@ import {
 import {
     SOUND_MENU_STAR_SOUND, SOUND_GENERAL_SHORT_STAR
 } from "../include/sounds"
-
 
 const UNLOCK_DOOR_STAR_RISING = 0
 const UNLOCK_DOOR_STAR_WAITING = 1
@@ -443,6 +442,19 @@ class MarioMisc {
         //     node.flags = (node.flags & 0xFF) | (LAYER_OPAQUE << 8)
         // }
         return gfx
+    }
+
+    geo_update_held_mario_pos(run, node, mtx) {
+        if (run == true) {
+            let sp20 = Mat4()
+            if (gLinker.GeoRenderer.gCurGraphNodeObject.prevObj != null) {
+                create_transformation_from_matrices(sp20, mtx, gLinker.GeoRenderer.gCurGraphNodeCamera.matrixPtr)
+                obj_update_pos_from_parent_transformation(sp20, gLinker.GeoRenderer.gCurGraphNodeObject.prevObj)
+                obj_set_gfx_pos_from_pos(gLinker.GeoRenderer.gCurGraphNodeObject.prevObj)
+            }
+       }
+
+        return null
     }
 
     star_door_unlock_spawn_particles(angleOffset) {

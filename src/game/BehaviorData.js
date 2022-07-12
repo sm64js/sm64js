@@ -34,7 +34,10 @@ import { oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAn
          ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_BUBBLE, ACTIVE_PARTICLE_WATER_SPLASH,
          ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH, ACTIVE_PARTICLE_SHALLOW_WATER_WAVE,
          ACTIVE_PARTICLE_WAVE_TRAIL, ACTIVE_PARTICLE_PLUNGE_BUBBLE,
-         ACTIVE_PARTICLE_SPARKLES
+         ACTIVE_PARTICLE_SPARKLES,
+         oHealth,
+         oParentRelativePosX,
+         oParentRelativePosZ
 } from "../include/object_constants"
 
 import { MODEL_WOODEN_POST, MODEL_MIST, MODEL_SMOKE, MODEL_BUBBLE, MODEL_CANNON_BARREL,
@@ -72,6 +75,7 @@ import * as _ferris_wheel             from "./behaviors/ferris_wheel.inc"
 import * as _fish                     from "./behaviors/fish.inc"
 import * as _file_select              from "./behaviors/file_select.inc"
 import * as _flamethrower             from "./behaviors/flamethrower.inc"
+import * as _king_bobomb              from "./behaviors/king_bobomb.inc"
 import * as _koopa_shell_underwater   from "./behaviors/koopa_shell_underwater.inc"
 import * as _moat_drainer             from "./behaviors/moat_drainer.inc"
 import * as _moat_grill               from "./behaviors/moat_grill.inc"
@@ -188,6 +192,7 @@ import { bitfs_seg7_collision_squishable_platform } from "../levels/bitfs/stretc
 import { bitfs_seg7_collision_sinking_cage_platform } from "../levels/bitfs/sinking_cage_platform/collision.inc"
 import { purple_switch_seg8_collision_0800C7A8 } from "../actors/purple_switch/collision.inc"
 import { warp_pipe_seg3_collision_03009AC8 } from "../actors/warp_pipe/collision.inc"
+import { king_bobomb_seg5_anims_0500FE30 } from "../actors/king_bobomb/anims.inc"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -317,6 +322,35 @@ export const bhvPoleGrabbing = [
     SET_INT(oIntangibleTimer, 0),
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_pole_base_loop'),
+    END_LOOP(),
+]
+
+export const bhvBobombAnchorMario = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BILLBOARD(),
+    SET_FLOAT(oParentRelativePosX, 100),
+    SET_FLOAT(oParentRelativePosZ, 150),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_bobomb_anchor_mario_loop'),
+    END_LOOP(),
+]
+
+export const bhvKingBobomb = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, king_bobomb_seg5_anims_0500FE30),
+    SET_INT(oInteractType, INTERACT_GRABBABLE),
+    SET_HITBOX(/*Radius*/ 100, /*Height*/ 100),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ -400, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    SET_INT(oIntangibleTimer, 0),
+    DROP_TO_FLOOR(),
+    SET_HOME(),
+    SPAWN_OBJ(/*Model*/ MODEL_NONE, /*Behavior*/ bhvBobombAnchorMario),
+    SET_INT(oHealth, 3),
+    SET_INT(oDamageOrCoinValue, 1),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_king_bobomb_loop'),
     END_LOOP(),
 ]
 
@@ -1538,6 +1572,16 @@ export const bhvStar = [
     END_LOOP(),
 ]
 
+export const bhvStarSpawnCoordinates = [
+    BEGIN(OBJ_LIST_LEVEL),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    CALL_NATIVE('bhv_collect_star_init'),
+    CALL_NATIVE('bhv_star_spawn_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_star_spawn_loop'),
+    END_LOOP(),
+]
+
 export const bhvRedCoin = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_LEVEL, name: 'bhvRedCoin' } },
     { command: BhvCmds.or_int, args: { field: oFlags, value: OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE } },
@@ -2473,6 +2517,7 @@ gLinker.behaviors.bhvBitfsSinkingCagePlatform = bhvBitfsSinkingCagePlatform
 gLinker.behaviors.bhvBitfsTiltingInvertedPyramid = bhvBitfsTiltingInvertedPyramid
 gLinker.behaviors.bhvBobBowlingBallSpawner = bhvBobBowlingBallSpawner
 gLinker.behaviors.bhvBobomb = bhvBobomb
+gLinker.behaviors.bhvBobombAnchorMario = bhvBobombAnchorMario
 gLinker.behaviors.bhvBobombBuddy = bhvBobombBuddy
 gLinker.behaviors.bhvBobombFuseSmoke = bhvBobombFuseSmoke
 gLinker.behaviors.bhvBoo = bhvBoo
@@ -2541,6 +2586,7 @@ gLinker.behaviors.bhvIdleWaterWave = bhvIdleWaterWave
 gLinker.behaviors.bhvInstantActiveWarp = bhvInstantActiveWarp
 gLinker.behaviors.bhvInvisibleObjectsUnderBridge = bhvInvisibleObjectsUnderBridge
 gLinker.behaviors.bhvJumpingBox = bhvJumpingBox
+gLinker.behaviors.bhvKingBobomb = bhvKingBobomb
 gLinker.behaviors.bhvLaunchDeathWarp = bhvLaunchDeathWarp
 gLinker.behaviors.bhvLaunchStarCollectWarp = bhvLaunchStarCollectWarp
 gLinker.behaviors.bhvLllTumblingBridge = bhvLllTumblingBridge
@@ -2589,6 +2635,7 @@ gLinker.behaviors.bhvSquishablePlatform = bhvSquishablePlatform
 gLinker.behaviors.bhvStar = bhvStar
 gLinker.behaviors.bhvStarDoor = bhvStarDoor
 gLinker.behaviors.bhvStarKeyCollectionPuffSpawner = bhvStarKeyCollectionPuffSpawner
+gLinker.behaviors.bhvStarSpawnCoordinates = bhvStarSpawnCoordinates
 gLinker.behaviors.bhvStaticObject = bhvStaticObject
 gLinker.behaviors.bhvSwimmingWarp = bhvSwimmingWarp
 gLinker.behaviors.bhvThiBowlingBallSpawner = bhvThiBowlingBallSpawner

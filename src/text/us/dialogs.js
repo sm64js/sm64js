@@ -4,6 +4,8 @@ const DEFINE_DIALOG = (id, unused, linesPerBox, leftOffset, width, str) => {
     return {str: str, linesPerBox: linesPerBox, leftOffset: leftOffset, width: width}
 }
 
+export const DIALOG_NONE = -1
+
 export const DIALOG_000 = DEFINE_DIALOG('DIALOG_000', 1, 6, 30, 200, ("\
 Wow! You're smack in the\n\
 middle of the battlefield.\n\

@@ -47,17 +47,17 @@ import {
     OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33,
     OBJ_MOVE_LANDED, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX, OBJ_FLAG_HOLDABLE,
 
-    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED, OBJ_MOVE_BOUNCE
+    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED, OBJ_MOVE_BOUNCE, DIALOG_STATUS_ENABLE_TIME_STOP, ACTIVE_FLAG_INITIATED_TIME_STOP, DIALOG_FLAG_TURN_TO_MARIO, DIALOG_STATUS_START_DIALOG, DIALOG_STATUS_STOP_DIALOG, DIALOG_FLAG_TIME_STOP_ENABLED, oKingBobombUnk88, DIALOG_STATUS_INTERRUPT
  } from "../include/object_constants"
 
-import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
+import { gDebugInfo, ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { TIME_STOP_ENABLED } from "./ObjectListProcessor"
 
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 
 import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
-import { ATTACK_PUNCH, INT_STATUS_WAS_ATTACKED, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "./Interaction"
-import { ACT_GROUND_POUND_LAND, ACT_FLAG_AIR, ACT_DIVE_SLIDE, ANIM_FLAG_NOLOOP } from "./Mario"
+import { ATTACK_PUNCH, INT_STATUS_WAS_ATTACKED, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB, INT_STATUS_GRABBED_MARIO, INT_SUBTYPE_HOLDABLE_NPC } from "./Interaction"
+import { ACT_GROUND_POUND_LAND, ACT_FLAG_AIR, ACT_DIVE_SLIDE, ANIM_FLAG_NOLOOP, ACT_READING_NPC_DIALOG } from "./Mario"
 
 import { MODEL_YELLOW_COIN, MODEL_BLUE_COIN } from "../include/model_ids"
 
@@ -566,6 +566,16 @@ export const cur_obj_angle_to_home = () => {
     return angle;
 }
 
+export const obj_set_gfx_pos_at_obj_pos = (obj1, obj2) => {
+    obj1.gfx.pos[0] = obj2.rawData[oPosX]
+    obj1.gfx.pos[1] = obj2.rawData[oPosY] + obj2.rawData[oGraphYOffset]
+    obj1.gfx.pos[2] = obj2.rawData[oPosZ]
+
+    obj1.gfx.angle[0] = obj2.rawData[oMoveAnglePitch] & 0xFFFF
+    obj1.gfx.angle[1] = obj2.rawData[oMoveAngleYaw] & 0xFFFF
+    obj1.gfx.angle[2] = obj2.rawData[oMoveAngleRoll] & 0xFFFF
+}
+
 const obj_translate_local = (obj, posIndex, localTranslateIndex) => {
     const dx = obj.rawData[localTranslateIndex + 0]
     const dy = obj.rawData[localTranslateIndex + 1]
@@ -1049,7 +1059,7 @@ export const cur_obj_move_y = (gravity, bounciness, buoyancy) => {
     }
 
     if (!(o.rawData[oMoveFlags] & OBJ_MOVE_MASK_IN_WATER)) {
-        const waterLevel = cur_obj_move_y_and_get_water_level(gravity, 0.0)
+        let waterLevel = cur_obj_move_y_and_get_water_level(gravity, 0.0)
         if (o.rawData[oPosY] > waterLevel) {
             //! We only handle floor collision if the object does not enter
             //  water. This allows e.g. coins to clip through floors if they
@@ -1064,7 +1074,6 @@ export const cur_obj_move_y = (gravity, bounciness, buoyancy) => {
 
         const waterLevel = cur_obj_move_y_and_get_water_level(gravity, buoyancy)
         if (o.rawData[oPosY] < waterLevel) {
-            // throw "cur_obj_move_y implement underwater"
             cur_obj_move_update_underwater_flags()
         } else {
             if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
@@ -1239,6 +1248,55 @@ export const spawn_object_with_scale = (parent, model, behavior, scale) => {
 export const obj_copy_behavior_params = (dst, src) => {
     dst.rawData[oBehParams] = src.rawData[oBehParams]
     dst.rawData[oBehParams2ndByte] = src.rawData[oBehParams2ndByte]
+}
+
+export const cur_obj_init_animation_and_anim_frame = (animIndex, animFrame) => {
+    const o = ObjectListProc.gCurrentObject
+    
+    cur_obj_init_animation_with_sound(animIndex)
+    // o.gfx.animInfo.animFrame = animFrame
+}
+
+export const cur_obj_init_animation_and_check_if_near_end = (animIndex) => {
+    cur_obj_init_animation_with_sound(animIndex)
+    return cur_obj_check_if_near_animation_end()
+}
+
+export const cur_obj_init_animation_and_extend_if_at_end = (animIndex) => {
+    cur_obj_init_animation_with_sound(animIndex)
+    cur_obj_extend_animation_if_at_end()
+}
+
+export const cur_obj_check_grabbed_mario = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.rawData[oInteractStatus] & INT_STATUS_GRABBED_MARIO) {
+        o.rawData[oKingBobombUnk88] = 1
+        cur_obj_become_intangible()
+        return true
+    }
+
+    return false
+}
+
+export const player_performed_grab_escape_action = () => {
+    let grabReleaseState
+    let result = false
+
+    if (window.playerInput.stickMag > 40.0) {
+        grabReleaseState = 0
+    }
+
+    if (grabReleaseState == 0 && window.playerInput.stickMag > 40.0) {
+        grabReleaseState = 1
+        result = true
+    }
+
+    if (window.playerInput.buttonPressedA) {
+        result = true
+    }
+
+    return result
 }
 
 export const spawn_object_relative = (behaviorParam, relativePosX, relativePosY, relativePosZ, parent, model, behavior) => {
@@ -1940,6 +1998,115 @@ export const disable_time_stop = () => {
     ObjectListProc.gTimeStopState &= ~TIME_STOP_ENABLED
 }
 
+export const set_time_stop_flags = (flags) => {
+    ObjectListProc.gTimeStopState |= flags
+}
+
+export const clear_time_stop_flags = (flags) => {
+    ObjectListProc.gTimeStopState = ObjectListProc.gTimeStopState & (flags ^ 0xFFFFFFFF)
+}
+
+export const cur_obj_can_mario_activate_textbox = (radius, height, unused) => {
+    const o = ObjectListProc.gCurrentObject
+    const gMarioStates = [ LevelUpdate.gMarioState ]
+    const gMarioObject = ObjectListProc.gMarioObject
+
+    if (o.rawData[oDistanceToMario] < 1500.0) {
+        let latDistToMario = lateral_dist_between_objects(o, gMarioObject)
+
+        if (latDistToMario < radius && o.rawData[oPosY] < gMarioObject.rawData[oPosY] + 160.0 &&
+            gMarioObject.rawData[oPosY] < o.rawData[oPosY] + height && !(gMarioStates[0].action & ACT_FLAG_AIR) && mario_ready_to_speak()) {
+                return true
+        }
+    }
+
+    return false
+}
+
+export const cur_obj_can_mario_activate_textbox_2 = (radius, height) => {
+    // The last argument here is unused. When this function is called directly the argument is always set to 0x7FFF.
+    return cur_obj_can_mario_activate_textbox(radius, height, 0x1000)
+}
+
+export const cur_obj_update_dialog_with_cutscene = (actionArg, dialogFlags, cutsceneTable, dialogID) => {
+    const o = ObjectListProc.gCurrentObject
+    const gMarioState = LevelUpdate.gMarioState
+    const gMarioObject = ObjectListProc.gMarioObject
+    
+    let dialogResponse = DIALOG_RESPONSE_NONE
+    let doneTurning = true
+
+    switch (o.rawData[oDialogState]) {
+        case DIALOG_STATUS_ENABLE_TIME_STOP:
+            // Wait for Mario to be ready to speak, and then enable time stop
+            if (mario_ready_to_speak() || gMarioState.action == ACT_READING_NPC_DIALOG) {
+                ObjectListProc.gTimeStopState |= TIME_STOP_ENABLED
+                o.activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP
+                o.rawData[oDialogState]++
+                o.rawData[oDialogResponse] = DIALOG_RESPONSE_NONE
+            } else {
+                break
+            }
+            // Fall through so that Mario's action is interrupted immediately
+            // after time is stopped
+        case DIALOG_STATUS_INTERRUPT:
+            // Additional flag that makes the NPC rotate towards to Mario
+            if (dialogFlags & DIALOG_FLAG_TURN_TO_MARIO) {
+                doneTurning = cur_obj_rotate_yaw_toward(obj_angle_to_object(o, gMarioObject), 0x800)
+                // Failsafe just in case it takes more than 33 frames somehow
+                if (o.rawData[oDialogResponse] >= 33) {
+                    doneTurning = true
+                }
+            }
+            // Interrupt status until Mario is actually speaking with the NPC and if the
+            // object is done turning to Mario
+            if (set_mario_npc_dialog(actionArg) == MARIO_DIALOG_STATUS_SPEAK && doneTurning) {
+                o.rawData[oDialogResponse] = 0
+                o.rawData[oDialogState]++
+            } else {
+                o.rawData[oDialogResponse]++ // treated as a timer for the failsafe
+            }
+            break
+        case DIALOG_STATUS_START_DIALOG:
+            /*// Special check for Cap Switch cutscene since the cutscene itself
+            // handles what dialog should used
+            if (cutsceneTable == CUTSCENE_CAP_SWITCH_PRESS) {
+                o.rawData[oDialogResponse] = CameraInstance.cutscene_object_without_dialog(cutsceneTable, o)
+                if (o.rawData[oDialogResponse]) {
+                    o.rawData[oDialogState]++
+                }
+            } else {
+                // General dialog cutscene function, most of the time
+                // the "CUTSCENE_DIALOG" cutscene is called
+                o.rawData[oDialogResponse] = CameraInstance.cutscene_object_with_dialog(cutsceneTable, o, dialogID)
+                if (o.rawData[oDialogResponse]) {
+                    o.rawData[oDialogState]++
+                }
+            }
+            break*/
+        case DIALOG_STATUS_STOP_DIALOG:
+            // If flag defined, keep time stop enabled until the object
+            // decided to disable it independently
+            if (dialogFlags & DIALOG_FLAG_TIME_STOP_ENABLED) {
+                dialogResponse = o.rawData[oDialogResponse]
+                o.rawData[oDialogState] = DIALOG_STATUS_ENABLE_TIME_STOP
+            } else if (gMarioState.action != ACT_READING_NPC_DIALOG) {
+                // Disable time stop, then enable time stop for a frame
+                // until the set_mario_npc_dialog function disables it
+                ObjectListProc.gTimeStopState &= ~TIME_STOP_ENABLED
+                o.activeFlags &= ~ACTIVE_FLAG_INITIATED_TIME_STOP
+                dialogResponse = o.rawData[oDialogResponse]
+                o.rawData[oDialogState] = DIALOG_STATUS_ENABLE_TIME_STOP
+            } else {
+                // And finally stop Mario dialog status
+                set_mario_npc_dialog(MARIO_DIALOG_STOP)
+            }
+            break
+    }
+
+    return dialogResponse
+}
+
 export const obj_set_behavior = (obj, behavior) => {
     obj.behavior = behavior
 }
@@ -1972,7 +2139,10 @@ export const cur_obj_lateral_dist_from_mario_to_home = () => {
 }
 
 import { LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC } from "../levels/level_defines_constants"
-import { CameraInstance } from "./Camera"
+import { CameraInstance, CUTSCENE_CAP_SWITCH_PRESS } from "./Camera"
+import { MARIO_DIALOG_STATUS_SPEAK, MARIO_DIALOG_STOP, mario_ready_to_speak, set_mario_npc_dialog } from "./MarioActionsCutscene"
+import { DIALOG_RESPONSE_NONE } from "./IngameMenu"
+import { spawn_default_star } from "./behaviors/spawn_star.inc"
 const sLevelsWithRooms = [LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC]
 
 export const bhv_init_room = () => {
@@ -2003,6 +2173,15 @@ export const bhv_init_room = () => {
     } else {
         o.rawData[oRoom] = -1
     }
+}
+
+export const cur_obj_spawn_star_at_y_offset = (targetX, targetY, targetZ, offsetY) => {
+    const o = ObjectListProc.gCurrentObject
+
+    let objectPosY = o.rawData[oPosY]
+    o.rawData[oPosY] += offsetY + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][0]
+    spawn_default_star(targetX, targetY, targetZ)
+    o.rawData[oPosY] = objectPosY
 }
 
 

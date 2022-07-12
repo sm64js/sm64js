@@ -6,7 +6,7 @@ import {
 } from "./Mario"
 
 import {
-    mario_throw_held_object, mario_check_object_grab, mario_grab_used_object,
+    mario_throw_held_object, mario_check_object_grab, mario_grab_used_object, mario_drop_held_object,
 } from "./Interaction"
 
 import {
@@ -73,6 +73,7 @@ import {
 } from "./Interaction"
 
 import {
+    GRAB_POS_HEAVY_OBJ,
     GRAB_POS_LIGHT_OBJ
 } from "../include/mario_geo_switch_case_ids"
 

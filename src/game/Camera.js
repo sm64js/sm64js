@@ -332,6 +332,13 @@ class Camera {
              marioPos: [0,0,0]
         }
 
+        this.sCameraStoreCutscene = {
+            pos: [0, 0, 0],
+            focus: [0, 0, 0],
+            panDist: 0,
+            cannonYOffset: 0
+        }
+
         this.gLakituState = {
             curFocus: [0.0, 0.0, 0.0],
             curPos: [0.0, 0.0, 0.0],
@@ -357,6 +364,12 @@ class Camera {
             posHSpeed: 0, posVSpeed: 0,
             keyDanceRoll: 0
         }
+
+        this.sCutsceneStarSpawn = [
+            { shot: this.cutscene_star_spawn, duration: CUTSCENE_LOOP },
+            { shot: this.cutscene_star_spawn_back, duration: 15 },
+            { shot: this.cutscene_spawn_end, duration: 0 },
+        ]
 
         this.cutsceneShots = [
             [ CUTSCENE_STAR_SPAWN, sCutsceneStarSpawn ]
@@ -2315,6 +2328,29 @@ class Camera {
             this.sFOVState.shakeSpeed = shakeSpeed
         }
     }
+    
+    store_info_star(c) {
+        reset_pan_distance(c)
+        this.vec3f_copy(this.sCameraStoreCutscene.pos, c.pos)
+        this.sCameraStoreCutscene.focus[0] = this.gPlayerCameraState.pos[0]
+        this.sCameraStoreCutscene.focus[1] = c.focus[1]
+        this.sCameraStoreCutscene.focus[2] = this.gPlayerCameraState.pos[2]
+    }
+
+    cutscene_star_spawn_store_info(c) {
+        store_info_star(c)
+    }
+
+    cutscene_star_spawn(c) {
+        cutscene_event(this.cutscene_star_spawn_store_info, c, 0, 0)
+        cutscene_event(this.cutscene_star_spawn_focus_star, c, 0, -1)
+        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
+
+        if (this.gObjCutsceneDone) {
+            // Set the timer to CUTSCENE_LOOP, which start the next shot.
+            this.gCutsceneTimer = CUTSCENE_LOOP
+        }
+    }
 
     play_cutscene(c) {
         let oldCutscene = c.cutscene
@@ -2353,6 +2389,16 @@ class Camera {
         if ((c.cutscene == 0) && (oldCutscene != 0)) {
             this.gRecentCutscene = oldCutscene;
         }
+    }
+
+    cutscene_event(event, c, start, end) {
+        if (start <= this.gCutsceneTimer) {
+            if (end == -1 || end >= this.gCutsceneTimer) {
+                event(c)
+            }
+        }
+
+        return 0
     }
 
     set_environmental_camera_shake(shake) {

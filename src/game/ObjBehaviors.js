@@ -2,7 +2,7 @@ import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProce
 import { oPosX, oPosY, oPosZ, oHomeX, oHomeY, oHomeZ, oForwardVel, oMoveAngleYaw, oVelY,
     oFaceAngleYaw, oFriction, oGravity, oGraphYOffset, oAction, OBJ_ACT_LAVA_DEATH, OBJ_ACT_DEATH_PLANE_DEATH,
     oAngleToMario, oTimer, oAnimState,
-    oBehParams, oRespawnerModelToRespawn, oRespawnerMinSpawnDist, oRespawnerBehaviorToRespawn, ACTIVE_FLAG_DEACTIVATED
+    oBehParams, oRespawnerModelToRespawn, oRespawnerMinSpawnDist, oRespawnerBehaviorToRespawn, ACTIVE_FLAG_DEACTIVATED, oVelX, oVelZ
      } from "../include/object_constants"
 import { sins, coss, int32, uint16, int16, random_uint16, random_float } from "../utils"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
@@ -23,6 +23,17 @@ export const OBJ_COL_FLAGS_LANDED = (OBJ_COL_FLAG_GROUNDED | OBJ_COL_FLAG_NO_Y_V
 
 export let sObjFloor
 export let sOrientObjWithFloor = 1
+
+export const obj_move_xyz_using_fvel_and_yaw = (obj) => {
+    const o = ObjectListProc.gCurrentObject
+    
+    o.rawData[oVelX] = obj.rawData[oForwardVel] * sins(obj.rawData[oMoveAngleYaw])
+    o.rawData[oVelZ] = obj.rawData[oForwardVel] * coss(obj.rawData[oMoveAngleYaw])
+
+    obj.rawData[oPosX] += o.rawData[oVelX]
+    obj.rawData[oPosY] += obj.rawData[oVelY]
+    obj.rawData[oPosZ] += o.rawData[oVelZ]
+}
 
 export const is_point_within_radius_of_mario = (x, y, z, dist) => {
     const mGfxX = ObjectListProc.gMarioObject.gfx.pos[0]

@@ -53,8 +53,6 @@ import {
     SOUND_MENU_STAR_SOUND, SOUND_GENERAL_SHORT_STAR
 } from "../include/sounds"
 
-import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
-
 const UNLOCK_DOOR_STAR_RISING = 0
 const UNLOCK_DOOR_STAR_WAITING = 1
 const UNLOCK_DOOR_STAR_SPAWNING_PARTICLES = 2
@@ -448,13 +446,13 @@ class MarioMisc {
 
     geo_update_held_mario_pos(run, node, mtx) {
         if (run == true) {
-            let sp20 = new Array(4).fill(0).map(() => new Array(4).fill(0))
-            if (GeoRenderer.gCurGraphNodeObject.prevObj != null) {
-                create_transformation_from_matrices(sp20, mtx, GeoRenderer.gCurGraphNodeCamera.matrixPtr)
-                obj_update_pos_from_parent_transformation(sp20, GeoRenderer.gCurGraphNodeObject.prevObj)
-                obj_set_gfx_pos_from_pos(GeoRenderer.gCurGraphNodeObject.prevObj)
+            let sp20 = Mat4()
+            if (gLinker.GeoRenderer.gCurGraphNodeObject.prevObj != null) {
+                create_transformation_from_matrices(sp20, mtx, gLinker.GeoRenderer.gCurGraphNodeCamera.matrixPtr)
+                obj_update_pos_from_parent_transformation(sp20, gLinker.GeoRenderer.gCurGraphNodeObject.prevObj)
+                obj_set_gfx_pos_from_pos(gLinker.GeoRenderer.gCurGraphNodeObject.prevObj)
             }
-        }
+       }
 
         return null
     }

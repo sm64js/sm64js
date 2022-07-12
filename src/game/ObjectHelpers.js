@@ -1254,12 +1254,12 @@ export const cur_obj_init_animation_and_anim_frame = (animIndex, animFrame) => {
     const o = ObjectListProc.gCurrentObject
     
     cur_obj_init_animation_with_sound(animIndex)
-    o.gfx.animInfo.animFrame = animFrame
+    // o.gfx.animInfo.animFrame = animFrame
 }
 
 export const cur_obj_init_animation_and_check_if_near_end = (animIndex) => {
     cur_obj_init_animation_with_sound(animIndex)
-    return cur_obj_extend_animation_if_at_end()
+    return cur_obj_check_if_near_animation_end()
 }
 
 export const cur_obj_init_animation_and_extend_if_at_end = (animIndex) => {
@@ -1998,6 +1998,14 @@ export const disable_time_stop = () => {
     ObjectListProc.gTimeStopState &= ~TIME_STOP_ENABLED
 }
 
+export const set_time_stop_flags = (flags) => {
+    ObjectListProc.gTimeStopState |= flags
+}
+
+export const clear_time_stop_flags = (flags) => {
+    ObjectListProc.gTimeStopState = ObjectListProc.gTimeStopState & (flags ^ 0xFFFFFFFF)
+}
+
 export const cur_obj_can_mario_activate_textbox = (radius, height, unused) => {
     const o = ObjectListProc.gCurrentObject
     const gMarioStates = [ LevelUpdate.gMarioState ]
@@ -2171,7 +2179,7 @@ export const cur_obj_spawn_star_at_y_offset = (targetX, targetY, targetZ, offset
     const o = ObjectListProc.gCurrentObject
 
     let objectPosY = o.rawData[oPosY]
-    o.rawData[oPosY] += offsetY + gDebugInfo[DEBUG_PAGE_ENEMYINFO][0]
+    o.rawData[oPosY] += offsetY + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][0]
     spawn_default_star(targetX, targetY, targetZ)
     o.rawData[oPosY] = objectPosY
 }

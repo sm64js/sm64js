@@ -808,7 +808,7 @@ const interact_text = (m, o) => {
     return interact
 }
 
-const check_object_grab_mario = (m, o) => {
+const check_object_grab_mario = (m, o) => { // commented out because game broke aaa
     if ((!(m.action & (ACT_FLAG_AIR | ACT_FLAG_INVULNERABLE | ACT_FLAG_ATTACKING)) || !sInvulnerable) && (o.rawData[oInteractionSubtype] & INT_SUBTYPE_GRABS_MARIO)) {
         if (object_facing_mario(m, o, 0x2AAA)) {
             mario_stop_riding_and_holding(m)

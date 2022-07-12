@@ -1259,6 +1259,21 @@ class Camera {
         return response
     }
 
+    cutscene_object(cutscene, o) {
+        let status = 0
+
+        if ((this.gCamera.cutscene == 0) && (this.sObjectCutscene == 0)) {
+            if (this.gRecentCutscene != cutscene) {
+                this.start_object_cutscene(cutscene, o)
+                status = 1
+            } else {
+                status = -1
+            }
+        }
+
+        return status
+    }
+
     handle_c_button_movement(c) {
         let cSideYaw
     

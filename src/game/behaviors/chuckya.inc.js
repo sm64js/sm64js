@@ -5,7 +5,7 @@ import { obj_mark_for_deletion, obj_set_gfx_pos_at_obj_pos } from "../ObjectHelp
 export const common_anchor_mario_behavior = (sp28, sp2C, sp30) => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
-    const gMarioStates = [ gLinker.ObjectListProcessor.gMarioStates ]
+    const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
 
     switch (o.parentObj.rawData[oChuckyaUnk88]) {
         case 0:

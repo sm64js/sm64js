@@ -6,6 +6,7 @@
     "name": "Snuffy"
   },
   "dependencies": {
+    "auto-bind": "^5.0.1",
     "circular-dependency-plugin": "^5.2.2",
     "css-loader": "^3.6.0",
     "idb-keyval": "^5.0.4",

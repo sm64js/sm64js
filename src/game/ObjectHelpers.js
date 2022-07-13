@@ -198,7 +198,7 @@ export const geo_switch_area = (callerContext, node) => {
         if (ObjectListProc.gMarioObject == undefined) {
             node.selectedCase = 0
         } else {
-            ///TODO gFindFloorIncludeSurfaceIntangible = 1
+            ObjectListProc.gFindFloorIncludeSurfaceIntangible = 1
 
             const marioObj = ObjectListProc.gMarioObject
 

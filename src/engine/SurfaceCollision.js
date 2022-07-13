@@ -1,12 +1,56 @@
 import * as _Linker from "../game/Linker"
-import * as _SurfaceLoad from "../game/SurfaceLoad"
+import { SurfaceLoadInstance as SurfaceLoad } from "../game/SurfaceLoad"
 
 import {
     LEVEL_BOUNDARY_MAX, CELL_SIZE, SURFACE_FLAG_NO_CAM_COLLISION, SURFACE_CAMERA_BOUNDARY, SURFACE_FLAG_X_PROJECTION,
-    FLOOR_LOWER_LIMIT
+    FLOOR_LOWER_LIMIT,
+    SURFACE_INTANGIBLE
 } from "../include/surface_terrains"
 
+const surfaceObj = {
+    type: 0,
+    force: 0, 
+    flags: 0,
+    room: 0,
+    lowerY: 0,
+    upperY: 0,
+    vertex1: [0, 0, 0],
+    vertex2: [0, 0, 0],
+    vertex3: [0, 0, 0],
+    normal: {x: 0, y: 0, z: 0},
+    originOffset: 0,
+    object: {}
+}
+
 class SurfaceCollision {
+    f32_find_wall_collision(ptrWrapper, offsetY, radius) {
+        let collision = {
+            x: 0,
+            y: 0,
+            z: 0,
+            offsetY: 0,
+            radius: 0,
+            numWalls: 0,
+            walls: [surfaceObj, surfaceObj, surfaceObj, surfaceObj],
+        }
+        let numCollisions = 0
+
+        collision.offsetY = offsetY
+        collision.radius = radius
+
+        collision.x = ptrWrapper.x
+        collision.y = ptrWrapper.y
+        collision.z = ptrWrapper.z
+
+        numCollisions = this.find_wall_collisions(collision)
+
+        ptrWrapper.x = collision.x
+        ptrWrapper.y = collision.y
+        ptrWrapper.z = collision.z
+
+        return numCollisions
+    }
+
     find_water_level(x, z) {
         let waterLevel = FLOOR_LOWER_LIMIT
 

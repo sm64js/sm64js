@@ -371,6 +371,11 @@ class Camera {
             { shot: this.cutscene_star_spawn_back.bind(this), duration: 15 },
             { shot: this.cutscene_star_spawn_end.bind(this), duration: 0 },
         ]
+
+        this.sCutsceneExitPaintingSuccess = [
+            { shot: this.cutscene_exit_painting.bind(this), duration: 180 },
+            //{ shot: this.cutscene_exit_painting_end.bind(this), duration: 0 }
+        ]
         
         this.sCutsceneVars = [
             { point: [0, 0, 0], unusedPoint: [0, 0, 0], angle: [0, 0, 0] },
@@ -398,7 +403,7 @@ class Camera {
             // [ CUTSCENE_ENTER_CANNON, sCutsceneEnterCannon ],
             // [ CUTSCENE_ENTER_PAINTING, sCutsceneEnterPainting ],
             // [ CUTSCENE_DEATH_EXIT, sCutsceneDeathExit ],
-            // [ CUTSCENE_EXIT_PAINTING_SUCC, sCutsceneExitPaintingSuccess ],
+            [ CUTSCENE_EXIT_PAINTING_SUCC, this.sCutsceneExitPaintingSuccess ],
             // [ CUTSCENE_UNUSED_EXIT, sCutsceneUnusedExit ],
             // [ CUTSCENE_INTRO_PEACH, sCutsceneIntroPeach ],
             // [ CUTSCENE_ENTER_BOWSER_ARENA, sCutsceneEnterBowserArena ],
@@ -2495,7 +2500,7 @@ class Camera {
             this.sStatusFlags &= ~CAM_FLAG_TRANSITION_OUT_OF_C_UP
         }
 
-        this.sModeTransition.marioPos = [...this.gPlayerCameraState.pos]
+        this.vec3f_copy(this.sModeTransition.marioPos, this.gPlayerCameraState.pos)
         return yaw
     }
 
@@ -2830,30 +2835,34 @@ class Camera {
      * Store camera info for the star spawn cutscene
      */
     store_info_star(c) {
-        CameraInstance.reset_pan_distance(c)
-        CameraInstance.vec3f_copy(CameraInstance.sCameraStoreCutscene.pos, c.pos)
-        CameraInstance.sCameraStoreCutscene.focus[0] = CameraInstance.gPlayerCameraState.pos[0]
-        CameraInstance.sCameraStoreCutscene.focus[1] = c.focus[1]
-        CameraInstance.sCameraStoreCutscene.focus[2] = CameraInstance.gPlayerCameraState.pos[2]
+        this.reset_pan_distance(c)
+        this.vec3f_copy(this.sCameraStoreCutscene.pos, c.pos)
+        this.sCameraStoreCutscene.focus[0] = this.gPlayerCameraState.pos[0]
+        this.sCameraStoreCutscene.focus[1] = c.focus[1]
+        this.sCameraStoreCutscene.focus[2] = this.gPlayerCameraState.pos[2]
     }
 
     /**
      * Retrieve camera info for the star spawn cutscene
      */
     retrieve_info_star(c) {
-        CameraInstance.vec3f_copy(c.pos, CameraInstance.sCameraStoreCutscene.pos)
-        CameraInstance.vec3f_copy(c.focus, CameraInstance.sCameraStoreCutscene.focus)
+        this.vec3f_copy(c.pos, this.sCameraStoreCutscene.pos)
+        this.vec3f_copy(c.focus, this.sCameraStoreCutscene.focus)
+    }
+
+    cutscene_star_spawn_store_info(c) {
+        this.store_info_star(c)
     }
 
     /**
      * Focus on the top of the star.
      */
     cutscene_star_spawn_focus_star(c) {
-        let starPos = new Array(3)
-        if (CameraInstance.gCutsceneFocus != null) {
-            CameraInstance.object_pos_to_vec3f(starPos, CameraInstance.gCutsceneFocus)
-            starPos[1] += CameraInstance.gCutsceneFocus.hitboxHeight
-            CameraInstance.approach_vec3f_asymptotic(c.focus, starPos, 0.1, 0.1, 0.1)
+        let starPos = {0: 0, 1: 0, 2: 0}
+        if (this.gCutsceneFocus != null) {
+            this.object_pos_to_vec3f(starPos, this.gCutsceneFocus)
+            starPos[1] += this.gCutsceneFocus.hitboxHeight
+            this.approach_vec3f_asymptotic(c.focus, starPos, 0.1, 0.1, 0.1)
         }
     }
 
@@ -2861,7 +2870,8 @@ class Camera {
      * Use boss fight mode's update function to move the focus back.
      */
     cutscene_star_spawn_update_boss_fight(c) {
-        let pos, focus = new Array(3)
+        let pos = [0, 0, 0]
+        let focus = [0, 0, 0]
 
         this.update_boss_fight_camera(c, focus, pos)
         this.approach_vec3f_asymptotic(c.focus, focus, 0.2, 0.2, 0.2)
@@ -2872,15 +2882,17 @@ class Camera {
      * Fly back to the camera's previous pos and focus.
      */
     cutscene_star_spawn_fly_back(c) {
-        CameraInstance.retrieve_info_star(c)
-        CameraInstance.transition_next_state(c, 15)
+        this.retrieve_info_star(c)
+        this.transition_next_state(c, 15)
     }
 
     /**
      * Plays when a star spawns (ie from a box).
      */
     cutscene_star_spawn(c) {
-        this.cutscene_event(this.store_info_star, c, 0, 0)
+        this.cutscene_star_spawn_store_info = this.cutscene_star_spawn_store_info.bind(this)
+        this.cutscene_star_spawn_focus_star = this.cutscene_star_spawn_focus_star.bind(this)
+        this.cutscene_event(this.cutscene_star_spawn_store_info, c, 0, 0)
         this.cutscene_event(this.cutscene_star_spawn_focus_star, c, 0, -1)
         this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
 
@@ -2895,8 +2907,10 @@ class Camera {
      */
     cutscene_star_spawn_back(c) {
         if ((c.mode == CAMERA_MODE_BOSS_FIGHT) && (this.set_cam_angle(0) == CAM_ANGLE_LAKITU)) {
+            this.cutscene_star_spawn_update_boss_fight = this.cutscene_star_spawn_update_boss_fight.bind(this)
             this.cutscene_event(this.cutscene_star_spawn_update_boss_fight, c, 0, -1)
         } else {
+            this.cutscene_star_spawn_fly_back = this.cutscene_star_spawn_fly_back.bind(this)
             this.cutscene_event(this.cutscene_star_spawn_fly_back, c, 0, 0)
         }
 
@@ -2910,46 +2924,55 @@ class Camera {
         c.cutscene = 0
     }
 
+    cutscene_exit_painting(c) {
+        this.cutscene_exit_painting_start = this.cutscene_exit_painting_start.bind(this)
+        this.cutscene_exit_painting_move_to_mario = this.cutscene_exit_painting_move_to_mario.bind(this)
+        this.cutscene_exit_painting_move_to_floor = this.cutscene_exit_painting_move_to_floor.bind(this)
+    }
+
     play_cutscene(c) {
         let oldCutscene = c.cutscene
         let cutsceneDuration
         this.sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT
         this.gCameraMovementFlags &= ~CAM_MOVING_INTO_MODE
 
+        let cutsceneNum
+
         for (let i = 0; i < this.cutsceneShots.length; i++) {
             if (c.cutscene == this.cutsceneShots[i][0]) {
-                cutsceneDuration = this.cutsceneShots[i][1].duration
-                for (let j = 0; j < this.cutsceneShots[i][1].length; j++) {
-                    this.cutsceneShots[i][1][j].shot(c)
-                }
-                break
+                cutsceneNum = i
             }
         }
 
-        if ((cutsceneDuration != 0) && !(this.gCutsceneTimer & CUTSCENE_STOP)) {
-            //! @bug This should check for 0x7FFF (CUTSCENE_LOOP)
-            //! instead, cutscenes that last longer than 0x3FFF frames will never end on their own
-            if (this.gCutsceneTimer < 0x3FFF) {
-                this.gCutsceneTimer++
-            }
-            //! Because gCutsceneTimer is often set to 0x7FFF (CUTSCENE_LOOP), this conditional can only
-            //! check for == due to overflow
-            if (this.gCutsceneTimer == cutsceneDuration) {
-                this.sCutsceneShot++
+        if (c.cutscene != 0 && cutsceneNum != undefined) {
+            cutsceneDuration = this.cutsceneShots[cutsceneNum][1][this.sCutsceneShot].duration
+            this.cutsceneShots[cutsceneNum][1][this.sCutsceneShot].shot(c)
+            if ((cutsceneDuration != 0) && !(this.gCutsceneTimer & CUTSCENE_STOP)) {
+                //! @bug This should check for 0x7FFF (CUTSCENE_LOOP)
+                //! instead, cutscenes that last longer than 0x3FFF frames will never end on their own
+                if (this.gCutsceneTimer < 0x3FFF) {
+                    this.gCutsceneTimer++
+                }
+                //! Because gCutsceneTimer is often set to 0x7FFF (CUTSCENE_LOOP), this conditional can only
+                //! check for == due to overflow
+                if (this.gCutsceneTimer == cutsceneDuration) {
+                    this.sCutsceneShot++
+                    this.gCutsceneTimer = 0
+                }
+            } else {
+                this.gPlayerCameraState.cameraEvent = 0
+                this.sCutsceneShot = 0
                 this.gCutsceneTimer = 0
             }
-        } else {
-           this.gPlayerCameraState.cameraEvent = 0
-           this.sCutsceneShot = 0
-           this.gCutsceneTimer = 0
+    
+            this.sAreaYawChange = 0
+    
+            // The cutscene just ended
+            if ((c.cutscene == 0) && (oldCutscene != 0)) {
+                this.gRecentCutscene = oldCutscene;
+            }
         }
 
-        this.sAreaYawChange = 0
-
-        // The cutscene just ended
-        if ((c.cutscene == 0) && (oldCutscene != 0)) {
-            this.gRecentCutscene = oldCutscene;
-        }
     }
 
     cutscene_event(event, c, start, end) {

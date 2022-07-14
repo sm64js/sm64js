@@ -1,10 +1,13 @@
 import * as _Linker from "../game/Linker"
+import { MARIO_VANISH_CAP } from "../game/Mario"
 import { SurfaceLoadInstance as SurfaceLoad } from "../game/SurfaceLoad"
+import { ACTIVE_FLAG_MOVE_THROUGH_GRATE } from "../include/object_constants"
 
 import {
     LEVEL_BOUNDARY_MAX, CELL_SIZE, SURFACE_FLAG_NO_CAM_COLLISION, SURFACE_CAMERA_BOUNDARY, SURFACE_FLAG_X_PROJECTION,
     FLOOR_LOWER_LIMIT,
-    SURFACE_INTANGIBLE
+    SURFACE_INTANGIBLE,
+    SURFACE_VANISH_CAP_WALLS
 } from "../include/surface_terrains"
 
 const surfaceObj = {
@@ -230,6 +233,9 @@ class SurfaceCollision {
         let radius = data.radius
         let numCols = 0
         const x = data.x, y = data.y + data.offsetY, z = data.z
+        const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
+        const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+        const gMarioState = gLinker.LevelUpdate.gMarioState
 
         if (radius > 200.0) radius = 200.0
 
@@ -286,6 +292,14 @@ class SurfaceCollision {
                 if (surf.type == SURFACE_CAMERA_BOUNDARY) continue 
 
                 //// More Vanish Cap Stuff -- walk through walls
+            }
+
+            // If an object can pass through a vanish cap wall, pass through.
+            if (surf.type == SURFACE_VANISH_CAP_WALLS) {
+                // If an object can pass through a vanish cap wall, pass through.
+                if (gCurrentObject != null && (gCurrentObject.activeFlags & ACTIVE_FLAG_MOVE_THROUGH_GRATE)) continue
+                // If Mario has a vanish cap, pass through the vanish cap wall.
+                if (gCurrentObject != null && gCurrentObject == gMarioObject && (gMarioState.flags & MARIO_VANISH_CAP)) continue
             }
 
             //! (Wall Overlaps) Because this doesn't update the x and z local variables,

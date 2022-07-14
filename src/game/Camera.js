@@ -43,6 +43,30 @@ const surfaceObj = {
     object: {}
 }
 
+const CameraTrigger = {
+    area: 0,
+    event: {
+        mode: 0,
+        defMode: 0,
+        yaw: 0,
+        focus: [0, 0, 0],
+        pos: [0, 0, 0],
+        areaCenX: 0,
+        areaCenZ: 0,
+        cutscene: 0,
+        nextYaw: 0,
+        doorStatus: 0,
+        areaCenY: 0
+    },
+    centerX: 0,
+    centerY: 0,
+    centerZ: 0,
+    boundsX: 0,
+    boundsY: 0,
+    boundsZ: 0,
+    boundsYaw: 0
+}
+
 export const AREA_BBH                = LEVEL_AREA_INDEX(LEVEL_BBH, 1)
 export const AREA_CCM_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL_CCM, 1)
 export const AREA_CCM_SLIDE          = LEVEL_AREA_INDEX(LEVEL_CCM, 2)
@@ -382,13 +406,6 @@ class Camera {
             keyDanceRoll: 0
         }
 
-        this.sCameraTriggers = new Array(LEVEL_COUNT + 1)
-        this.sCameraTriggers = [
-            null,
-            level_defines
-
-        ]
-
         this.sCutsceneStarSpawn = [
             { shot: this.cutscene_star_spawn.bind(this), duration: CUTSCENE_LOOP },
             { shot: this.cutscene_star_spawn_back.bind(this), duration: 15 },
@@ -432,6 +449,11 @@ class Camera {
             { shot: this.cutscene_exit_painting.bind(this), duration: 180 },
             { shot: this.cutscene_exit_painting_end.bind(this), duration: 0 }
         ]
+
+        this.sCutsceneUnlockKeyDoor = [
+            { shot: this.cutscene_unlock_key_door.bind(this), duration: 200 },
+            { shot: this.cutscene_double_doors_end.bind(this), duration: 0 }
+        ]
         
         this.sCutsceneVars = [
             { point: [0, 0, 0], unusedPoint: [0, 0, 0], angle: [0, 0, 0] },
@@ -454,8 +476,8 @@ class Camera {
             [ CUTSCENE_DOOR_WARP, this.sCutsceneDoorWarp ],
             [ CUTSCENE_DOOR_PULL, this.sCutsceneDoorPull ],
             [ CUTSCENE_DOOR_PUSH, this.sCutsceneDoorPush ],
-            [ CUTSCENE_DOOR_PULL_MODE, this.sCutsceneDoorPullMode ],
-            [ CUTSCENE_DOOR_PUSH_MODE, this.sCutsceneDoorPushMode ],
+            // [ CUTSCENE_DOOR_PULL_MODE, this.sCutsceneDoorPullMode ],
+            // [ CUTSCENE_DOOR_PUSH_MODE, this.sCutsceneDoorPushMode ],
             // [ CUTSCENE_ENTER_CANNON, sCutsceneEnterCannon ],
             // [ CUTSCENE_ENTER_PAINTING, sCutsceneEnterPainting ],
             // [ CUTSCENE_DEATH_EXIT, sCutsceneDeathExit ],
@@ -474,7 +496,7 @@ class Camera {
             // [ CUTSCENE_CAP_SWITCH_PRESS, sCutsceneCapSwitchPress ],
             // [ CUTSCENE_SLIDING_DOORS_OPEN, sCutsceneSlidingDoorsOpen ],
             // [ CUTSCENE_PREPARE_CANNON, sCutscenePrepareCannon ],
-            // [ CUTSCENE_UNLOCK_KEY_DOOR, sCutsceneUnlockKeyDoor ],
+            [ CUTSCENE_UNLOCK_KEY_DOOR, this.sCutsceneUnlockKeyDoor ],
             // [ CUTSCENE_STANDING_DEATH, sCutsceneStandingDeath ],
             // [ CUTSCENE_ENTER_POOL, sCutsceneEnterPool ],
             // [ CUTSCENE_DEATH_ON_STOMACH, sCutsceneDeathStomach ],
@@ -498,6 +520,7 @@ class Camera {
         this.sOldFocus = [0, 0, 0]
         this.sObjectCutscene = 0
         this.gRecentCutscene = 0
+        this.sFixedModeBasePosition = [ 646.0, 143.0, -1513.0 ]
         this.sCutsceneDialogResponse = DIALOG_RESPONSE_NONE
         this.sCameraYawAfterDoorCutscene = 0
         this.sDanceCutsceneIndexTable = [ 0x44, 0x44, 0x44, 0x04 ]
@@ -569,8 +592,9 @@ class Camera {
         let yaw = 0
         let focFloorYOff = 0
 
-        let wrapper = { posOff: focFloorYOff, focOff: focFloorYOff }
+        let wrapper = { posOff: focFloorYOff, focOff: this.posOff }
         this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
+
         yaw = this.gPlayerCameraState.faceAngle[1] + yawOff
         c.focus[0] = this.gPlayerCameraState.pos[0] + forwBack * sins(yaw) + leftRight * coss(yaw)
         c.focus[1] = this.gPlayerCameraState.pos[1] + yOff + focFloorYOff
@@ -589,8 +613,13 @@ class Camera {
         dst[2] = from[2] + pitchRotated[2] * Math.cos(rotation[1] / 0x8000 * Math.PI) - pitchRotated[0] * Math.sin(rotation[1] / 0x8000 * Math.PI)
     }
 
-    camera_course_processing(c) {
+    define_camera_triggers() {
+        
+    }
+
+    /* camera_course_processing(c) {
         let level = Area.gCurrLevelNum
+        this.define_camera_triggers()
         let mode = 0
         let area = Area.gCurrentArea.index
         // Bounds iterator
@@ -608,15 +637,15 @@ class Camera {
             level = LEVEL_COUNT + 1
         }
 
-        if (this.sCameraTriggers[level] != null) {
+        if (triggerLevel[level] != null) {
             b = 0
 
             // Process positional triggers.
             // All triggered events are called, not just the first one.
-            while (this.sCameraTriggers[level][b].event != null) {
+            while (triggerLevel[level][b].event != null) {
 
                 // Check only the current area's triggers
-                if (this.sCameraTriggers[level][b].area == area) {
+                if (triggerLevel[level][b].area == area) {
                     // Copy the bounding box into center and bounds
                     MathUtil.vec3f_set(center, sCameraTriggers[level][b].centerX,
                                                sCameraTriggers[level][b].centerY,
@@ -633,7 +662,7 @@ class Camera {
             }
         }
         
-    }
+    } */
 
     find_mario_floor_and_ceil(pg) {
         const surf = {}
@@ -1368,6 +1397,134 @@ class Camera {
         }
         Hud.set_hud_camera_status(status)
         return status
+    }
+
+    update_parallel_tracking_camera(c, focus, pos) {
+        let path = [ [0, 0, 0], [0, 0, 0] ]
+        let parMidPoint = [0, 0, 0]
+        let marioOffset = [0, 0, 0]
+        let camOffset = [0, 0, 0]
+        /// Adjusts the focus to look where Mario is facing. Unused since marioOffset is copied to focus
+        let focOffset = [0, 0, 0]
+        let pathPitch = 0
+        let pathYaw = 0
+        let distThresh = 0
+        let zoom = 0
+        let camParDist = 0
+        let pathLength = 0
+        let parScale = 0.5
+        let marioFloorDist = 0
+        let marioPos = [0, 0, 0]
+        let pathAngle = [0, 0, 0]
+        // Variables for changing to the next/prev path in the list
+        let oldPos = [0, 0, 0]
+        let prevPathPos = [0, 0, 0]
+        let nextPathPos = [0, 0, 0]
+        let distToNext = [0, 0, 0]
+        let distToPrev = [0, 0, 0]
+        let prevPitch = [0, 0, 0]
+        let nextPitch = [0, 0, 0]
+        let prevYaw = [0, 0, 0]
+        let nextYaw = [0, 0, 0]
+        throw "penis. Update Parallel Tracking Camera"
+    }
+
+    update_fixed_camera(c, focus, pos) {
+        let focusFloorOff = 0
+        let goalHeight = 0
+        let ceilHeight = 0
+        let heightOffset = 0
+        let distCamToFocus = 0
+        let scaleToMario = 0.5
+        let pitch = 0
+        let yaw = 0
+        let faceAngle = [0, 0, 0]
+        let ceiling = Object.assign({}, surfaceObj)
+        let basePos = [0, 0, 0]
+
+        // play_camera_buzz_if_c_sideways()
+
+        // Don't move closer to Mario in these areas
+        switch (Area.gCurrLevelArea) {
+            case AREA_RR:
+                scaleToMario = 0.0
+                heightOffset = 0.0
+                break
+            case AREA_CASTLE_LOBBY:
+                scaleToMario = 0.3
+                heightOffset = 0.0
+                break
+            case AREA_BBH:
+                scaleToMario = 0.0
+                heightOffset = 0.0
+                break
+        }
+
+        this.handle_c_button_movement(c)
+        // play_camera_buzz_if_cdown()
+
+        let wrapper = { posOff: focusFloorOff, focOff: this.posOff }
+        this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
+        focusFloorOff = wrapper.posOff
+        console.log(focusFloorOff)
+        this.vec3f_copy(focus, this.gPlayerCameraState.pos)
+        focus[1] += focusFloorOff
+        wrapper = { dist: distCamToFocus, pitch: faceAngle[0], yaw: faceAngle[1] }
+        MathUtil.vec3f_get_dist_and_angle(focus, c.pos, wrapper)
+        distCamToFocus = wrapper.dist
+        faceAngle[0] = wrapper.pitch
+        faceAngle[1] = wrapper.yaw
+        faceAngle[2] = 0
+
+        this.vec3f_copy(basePos, this.sFixedModeBasePosition)
+        MathUtil.vec3f_add(basePos, this.sCastleEntranceOffset)
+
+        if (this.sMarioGeometry.currFloorType != SURFACE_DEATH_PLANE
+            && this.sMarioGeometry.currFloorHeight != FLOOR_LOWER_LIMIT) {
+            goalHeight = this.sMarioGeometry.currFloorHeight + basePos[1] + heightOffset
+        } else {
+            goalHeight = this.gLakituState.goalPos[1]
+        }
+
+        if (300 > distCamToFocus) {
+            goalHeight += 300 - distCamToFocus
+        }
+
+        ceilHeight = SurfaceCollision.find_ceil(c.pos[0], goalHeight - 100.0, c.pos[2], ceiling)
+        if (ceilHeight != CELL_HEIGHT_LIMIT) {
+            ceilHeight -= 125.0
+            if (goalHeight > ceilHeight) {
+                goalHeight = ceilHeight
+            }
+        }
+
+        if (this.sStatusFlags & CAM_FLAG_SMOOTH_MOVEMENT) {
+            wrapper = { current: c.pos[1] }
+            this.camera_approach_f32_symmetric_bool(wrapper, goalHeight, 15.0)
+            c.pos[1] = wrapper.current
+        } else {
+            if (goalHeight < this.gPlayerCameraState.pos[1] - 500.0) {
+                goalHeight = this.gPlayerCameraState.pos[1] - 500.0
+            }
+            c.pos[1] = goalHeight
+        }
+
+        c.pos[0] = basePos[0] + (this.gPlayerCameraState.pos[0] - basePos[0]) * scaleToMario
+        c.pos[2] = basePos[2] + (this.gPlayerCameraState.pos[2] - basePos[2]) * scaleToMario
+
+        if (scaleToMario != 0.0) {
+            wrapper = { dist: distCamToFocus, pitch: pitch, yaw: yaw }
+            MathUtil.vec3f_get_dist_and_angle(c.focus, c.pos, wrapper)
+            distCamToFocus = wrapper.dist
+            pitch = wrapper.pitch
+            yaw = wrapper.yaw
+            if (distCamToFocus > 1000.0) {
+                distCamToFocus = 1000.0
+                MathUtil.vec3f_set_dist_and_angle(c.focus, c.pos, distCamToFocus, pitch, yaw)
+            }
+        }
+
+        return faceAngle[1]
     }
 
     update_boss_fight_camera(c, focus, pos) {
@@ -2982,6 +3139,73 @@ class Camera {
         this.sCameraYawAfterDoorCutscene = this.calculate_yaw(c.focus, c.pos)
     }
 
+    /**
+     * Sets cvars:
+     * cvar0 is the camera's position
+     * cvar1 is the camera's focus
+     * cvar2 is the goal position
+     * cvar3 is the goal focus
+     */
+    cutscene_unlock_key_door_start(c) {
+        let posOff, focusOff = [0, 0, 0]
+
+        this.vec3f_copy(this.sCutsceneVars[0].point, c.pos)
+        this.vec3f_copy(this.sCutsceneVars[1].point, c.focus)
+        MathUtil.vec3f_set(posOff, -206.0, 108.0, 234.0)
+        MathUtil.vec3f_set(focusOff, 48.0, 104.0, -193.0)
+        this.offset_rotated(this.sCutsceneVars[2].point, this.gPlayerCameraState.pos, posOff, this.gPlayerCameraState.faceAngle)
+        this.offset_rotated(this.sCutsceneVars[3].point, this.gPlayerCameraState.pos, focusOff, this.gPlayerCameraState.faceAngle)
+    }
+
+    /**
+     * Move the camera to the cvars position and focus, closer to Mario.
+     * Gives a better view of the key.
+     */
+    cutscene_unlock_key_door_approach_mario(c) {
+        this.approach_vec3f_asymptotic(c.pos, this.sCutsceneVars[2].point, 0.1, 0.1, 0.1)
+        this.approach_vec3f_asymptotic(c.focus, this.sCutsceneVars[3].point, 0.1, 0.1, 0.1)
+    }
+
+    /**
+     * Move back to the previous pos and focus, stored in cvar0 and cvar1.
+     */
+    cutscene_unlock_key_door_fly_back(c) {
+        this.approach_vec3f_asymptotic(c.pos, this.sCutsceneVars[0].point, 0.1, 0.1, 0.1)
+        this.approach_vec3f_asymptotic(c.focus, this.sCutsceneVars[1].point, 0.1, 0.1, 0.1)
+    }
+
+    cutscene_unlock_key_door_fov_shake(c) {
+        this.cutscene_set_fov_shake_preset(1)
+    }
+
+    cutscene_unlock_key_door_focus_lock(c) {
+        
+    }
+
+    /**
+     * Cutscene that plays when Mario unlocks a key door.
+     */
+    cutscene_unlock_key_door(c) {
+        this.cutscene_unlock_key_door_start = this.cutscene_unlock_key_door_start.bind(this)
+        this.cutscene_unlock_key_door_approach_mario = this.cutscene_unlock_key_door_approach_mario.bind(this)
+        this.cutscene_unlock_key_door_fly_back = this.cutscene_unlock_key_door_fly_back.bind(this)
+        this.cutscene_unlock_key_door_fov_shake = this.cutscene_unlock_key_door_fov_shake.bind(this)
+        this.cutscene_unlock_key_door_focus_lock = this.cutscene_unlock_key_door_focus_lock.bind(this)
+        this.cutscene_unlock_key_door_stub = this.cutscene_unlock_key_door_stub.bind(this)
+        cutscene_event(this.cutscene_unlock_key_door_start, c, 0, 0);
+        cutscene_event(this.cutscene_unlock_key_door_approach_mario, c, 0, 123);
+        cutscene_event(this.cutscene_unlock_key_door_fly_back, c, 124, -1);
+        cutscene_event(this.cutscene_unlock_key_door_fov_shake, c, 79, 79);
+        cutscene_event(this.cutscene_unlock_key_door_focus_lock, c, 70, 110);
+        cutscene_event(this.cutscene_unlock_key_door_stub, c, 112, 112);
+    }
+
+    cutscene_double_doors_end(c) {
+        this.set_flag_post_door(c)
+        c.cutscene = 0
+        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
+    }
+
     cutscene_star_spawn_store_info(c) {
         this.store_info_star(c)
     }
@@ -3250,7 +3474,24 @@ class Camera {
 
     cutscene_door_mode(c) {
         this.reset_pan_distance(c)
-        this.camera_course_processing(c)
+        // this.camera_course_processing(c)
+
+        if (c.mode == CAMERA_MODE_FIXED) {
+            c.nextYaw = this.update_fixed_camera(c, c.focus, c.pos)
+        } else if (c.mode == CAMERA_MODE_PARALLEL_TRACKING) {
+            c.nextYaw = this.update_parallel_tracking_camera(c, c.focus, c.pos)
+        }
+
+        c.yaw = c.nextYaw
+
+        // Loop until Mario is no longer using the door
+        if (this.gPlayerCameraState.action != Mario.ACT_ENTERING_STAR_DOOR
+            && this.gPlayerCameraState.action != Mario.ACT_PULLING_DOOR
+            && this.gPlayerCameraState.action != Mario.ACT_PUSHING_DOOR) {
+            
+            this.gCutsceneTimer = CUTSCENE_STOP
+            c.cutscene = 0
+        }
     }
 
     play_cutscene(c) {
@@ -3434,6 +3675,17 @@ class Camera {
             this.sFOVState.shakeAmplitude = amplitude
             this.sFOVState.decay = decay
             this.sFOVState.shakeSpeed = shakeSpeed
+        }
+    }
+
+    cutscene_set_fov_shake_preset(preset) {
+        switch (preset) {
+            case 1:
+                this.set_fov_shake(0x100, 0x30, 0x8000)
+                break
+            case 2:
+                this.set_fov_shake(0x400, 0x20, 0x4000)
+                break
         }
     }
 

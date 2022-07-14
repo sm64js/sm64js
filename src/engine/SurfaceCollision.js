@@ -31,7 +31,7 @@ class SurfaceCollision {
             offsetY: 0,
             radius: 0,
             numWalls: 0,
-            walls: [surfaceObj, surfaceObj, surfaceObj, surfaceObj],
+            walls: [Object.assign({}, surfaceObj), Object.assign({}, surfaceObj), Object.assign({}, surfaceObj), Object.assign({}, surfaceObj)],
         }
         let numCollisions = 0
 

@@ -6,7 +6,7 @@ import {
     check_common_action_exits, check_common_hold_action_exits, drop_and_set_mario_action,
     is_anim_past_end, set_jump_from_landing, set_jumping_action, set_mario_action,
     set_water_plunge_action, update_mario_sound_and_camera, play_sound_if_no_flag,
-    mario_set_forward_vel, play_mario_landing_sound_once, set_mario_anim_with_accel, ACT_GROUP_MASK, ACT_GROUP_STATIONARY, ACT_GROUP_MOVING, ACT_FLAG_RIDING_SHELL, ACT_FLAG_INVULNERABLE
+    mario_set_forward_vel, play_mario_landing_sound_once, set_mario_anim_with_accel, ACT_GROUP_MASK, ACT_GROUP_STATIONARY, ACT_GROUP_MOVING, ACT_FLAG_RIDING_SHELL, ACT_FLAG_INVULNERABLE, MARIO_TELEPORTING
 } from "./Mario"
 
 import { AreaInstance as Area } from "./Area"
@@ -45,7 +45,7 @@ import {
     save_file_set_flags
 } from "./SaveFile"
 
-import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
+import { LevelUpdateInstance as LevelUpdate, WARP_OP_TELEPORT } from "./LevelUpdate"
 import { level_trigger_warp, WARP_OP_STAR_EXIT } from "./LevelUpdate"
 
 import {
@@ -172,7 +172,7 @@ import {
     SOUND_MARIO_YAH_WAH_HOO, SOUND_MARIO_HOOHOO,
 
     SOUND_ACTION_TERRAIN_BODY_HIT_GROUND, SOUND_ACTION_UNKNOWN43D, SOUND_ACTION_UNKNOWN43E,
-    SOUND_ACTION_BRUSH_HAIR, SOUND_ACTION_KEY_SWISH, SOUND_ACTION_PAT_BACK, SOUND_ACTION_UNKNOWN45C, SOUND_ACTION_READ_SIGN
+    SOUND_ACTION_BRUSH_HAIR, SOUND_ACTION_KEY_SWISH, SOUND_ACTION_PAT_BACK, SOUND_ACTION_UNKNOWN45C, SOUND_ACTION_READ_SIGN, SOUND_ACTION_TELEPORT
 } from "../include/sounds"
 
 import { LEVEL_BOWSER_1, LEVEL_BOWSER_2 } from "../levels/level_defines_constants"
@@ -1559,67 +1559,52 @@ const act_spawn_no_spin_landing = (m) => {
 //     return 0
 // }
 
-// export const act_teleport_fade_out = (m) => {
-//     play_sound_if_no_flag(m, SOUND_ACTION_TELEPORT, MARIO_ACTION_SOUND_PLAYED)
-//     set_mario_animation(m, m.prevAction == ACT_CROUCHING ? MARIO_ANIM_CROUCHING
-//                                                           : MARIO_ANIM_FIRST_PERSON)
+export const act_teleport_fade_out = (m) => {
+    play_sound_if_no_flag(m, SOUND_ACTION_TELEPORT, MARIO_ACTION_SOUND_PLAYED)
+    set_mario_animation(m, m.prevAction == ACT_CROUCHING ? MARIO_ANIM_CROUCHING : MARIO_ANIM_FIRST_PERSON)
 
-// #ifdef VERSION_SH
-//     if (m.actionTimer == 0) {
-//         queue_rumble_data(30, 70)
-//         func_sh_8024C89C(2)
-//     }
-// #endif
+    m.flags |= MARIO_TELEPORTING
 
-//     m.flags |= MARIO_TELEPORTING
+    if (m.actionTimer < 32) {
+        m.fadeWarpOpacity = (-m.actionTimer << 3) + 0xF8
+    }
 
-//     if (m.actionTimer < 32) {
-//         m.fadeWarpOpacity = (-m.actionTimer << 3) + 0xF8
-//     }
+    if (m.actionTimer++ == 20) {
+        level_trigger_warp(m, WARP_OP_TELEPORT)
+    }
 
-//     if (m.actionTimer++ == 20) {
-//         level_trigger_warp(m, WARP_OP_TELEPORT)
-//     }
+    stop_and_set_height_to_floor(m)
 
-//     stop_and_set_height_to_floor(m)
+    return 0
+}
 
-//     return 0
-// }
+export const act_teleport_fade_in = (m) => {
+    play_sound_if_no_flag(m, SOUND_ACTION_TELEPORT, MARIO_ACTION_SOUND_PLAYED)
+    set_mario_animation(m, MARIO_ANIM_FIRST_PERSON)
 
-// export const act_teleport_fade_in = (m) => {
-//     play_sound_if_no_flag(m, SOUND_ACTION_TELEPORT, MARIO_ACTION_SOUND_PLAYED)
-//     set_mario_animation(m, MARIO_ANIM_FIRST_PERSON)
+    if (m.actionTimer < 32) {
+        m.flags |= MARIO_TELEPORTING
+        m.fadeWarpOpacity = m.actionTimer << 3
+    } else {
+        m.flags &= ~MARIO_TELEPORTING
+    }
 
-// #ifdef VERSION_SH
-//     if (m.actionTimer == 0) {
-//         queue_rumble_data(30, 70)
-//         func_sh_8024C89C(2)
-//     }
-// #endif
+    if (m.actionTimer++ == 32) {
+        if (m.pos[1] < m.waterLevel - 100) {
+            // Check if the camera is not underwater.
+            if (m.area.camera.mode != CAMERA_MODE_WATER_SURFACE) {
+                set_camera_mode(m.area.camera, CAMERA_MODE_WATER_SURFACE, 1)
+            }
+            set_mario_action(m, ACT_WATER_IDLE, 0)
+        } else {
+            set_mario_action(m, ACT_IDLE, 0)
+        }
+    }
 
-//     if (m.actionTimer < 32) {
-//         m.flags |= MARIO_TELEPORTING
-//         m.fadeWarpOpacity = m.actionTimer << 3
-//     } else {
-//         m.flags &= ~MARIO_TELEPORTING
-//     }
+    stop_and_set_height_to_floor(m)
 
-//     if (m.actionTimer++ == 32) {
-//         if (m.pos[1] < m.waterLevel - 100) {
-//               // Check if the camera is not underwater.
-//             if (m.area.camera.mode != CAMERA_MODE_WATER_SURFACE) {
-//                 set_camera_mode(m.area.camera, CAMERA_MODE_WATER_SURFACE, 1)
-//             }
-//             set_mario_action(m, ACT_WATER_IDLE, 0)
-//         } else {
-//             set_mario_action(m, ACT_IDLE, 0)
-//         }
-//     }
-
-//     stop_and_set_height_to_floor(m)
-
-//     return 0
-// }
+    return 0
+}
 
  export const act_shocked = (m) => {
     //play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_ACTION_SOUND_PLAYED)

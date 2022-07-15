@@ -150,7 +150,13 @@ export const SAVE_FLAG_COLLECTED_MIPS_STAR_2  /* 0x10000000 */ = (1 << 28)
 //     /*0x04*/ u8 warpNode;
 // };
 
-export let gWarpCheckpoint = null
+export let gWarpCheckpoint ={
+    actNum: 0,
+    courseNum: 0,
+    levelID: 0,
+    areaNum: 0,
+    warpNode: 0,
+}
 
 export let gMainMenuDataModified = false
 export let gSaveFileModified = false
@@ -264,3 +270,46 @@ export const save_file_get_star_flags = (fileIndex, courseIndex) => {
 // export const save_file_get_course_coin_score(fileIndex, courseIndex) {
 //     return gSaveBuffer.files[fileIndex][0].courseCoinScores[courseIndex];
 // }
+
+export const disable_warp_checkpoint = () => {
+    // check_warp_checkpoint() checks to see if gWarpCheckpoint.courseNum != COURSE_NONE
+    gWarpCheckpoint.courseNum = COURSE_NONE;
+}
+
+/**
+ * Checks the upper bit of the WarpNode->destLevel byte to see if the
+ * game should set a warp checkpoint.
+ */
+export const check_if_should_set_warp_checkpoint = (warpNode) => {
+    if (warpNode.destLevel & 0x80) {
+        // Overwrite the warp checkpoint variables.
+        gWarpCheckpoint.actNum = Area.gCurrActNum
+        gWarpCheckpoint.courseNum = Area.gCurrCourseNum
+        gWarpCheckpoint.levelID = warpNode.destLevel & 0x7F
+        gWarpCheckpoint.areaNum = warpNode.destArea
+        gWarpCheckpoint.warpNode = warpNode.destNode
+    }
+}
+
+/**
+ * Checks to see if a checkpoint is properly active or not. This will
+ * also update the level, area, and destination node of the input WarpNode.
+ * returns TRUE if input WarpNode was updated, and FALSE if not.
+ */
+export const check_warp_checkpoint = (warpNode) => {
+    let warpCheckpointActive = false
+    let currCourseNum = gLevelToCourseNumTable[(warpNode.destLevel & 0x7F) - 1]
+    
+    // gSavedCourseNum is only used in this function.
+    if (gWarpCheckpoint.courseNum != COURSE_NONE && Area.gSavedCourseNum == currCourseNum && gWarpCheckpoint.actNum == gCurrActNum) {
+        warpNode.destLevel = gWarpCheckpoint.levelID
+        warpNode.destArea = gWarpCheckpoint.areaNum
+        warpNode.destNode = gWarpCheckpoint.warpNode
+        warpCheckpointActive = true
+    } else {
+        // Disable the warp checkpoint just in case the other 2 conditions failed?
+        gWarpCheckpoint.courseNum = COURSE_NONE
+    }
+
+    return warpCheckpointActive
+}

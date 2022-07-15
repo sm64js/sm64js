@@ -12,7 +12,7 @@ import { ADD_INT, ADD_FLOAT, ANIMATE, ANIMATE_TEXTURE, BEGIN, BEGIN_LOOP, BEGIN_
 
 import { INTERACT_WATER_RING, INTERACT_POLE, INTERACT_DAMAGE, INTERACT_COIN, INTERACT_TEXT,
          INT_SUBTYPE_SIGN, INTERACT_CANNON_BASE, INTERACT_GRABBABLE, INT_SUBTYPE_BIG_KNOCKBACK,
-         INTERACT_WARP_DOOR, INTERACT_DOOR, INTERACT_WARP, INT_SUBTYPE_STAR_DOOR, INTERACT_FLAME
+         INTERACT_WARP_DOOR, INTERACT_DOOR, INTERACT_WARP, INT_SUBTYPE_STAR_DOOR, INTERACT_FLAME, INT_SUBTYPE_FADING_WARP
 } from "./Interaction"
 
 import { oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAnimations,
@@ -925,6 +925,17 @@ export const bhvMistCircParticleSpawner = [
     { command: BhvCmds.delay, args: { num: 1 } },
     { command: BhvCmds.deactivate }
 ]
+
+// export const bhvFadingWarp = [
+    // BEGIN(OBJ_LIST_LEVEL),
+    // SET_INT(oInteractionSubtype, INT_SUBTYPE_FADING_WARP),
+    // OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    // SET_INT(oInteractType, INTERACT_WARP),
+    // SET_INT(oIntangibleTimer, 0),
+    // BEGIN_LOOP(),
+    //     CALL_NATIVE('bhv_fading_warp_loop'),
+    // END_LOOP(),
+// ]
 
 export const bhvWhitePuffExplosion = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT, name: 'bhvWhitePuffExplosion' } },
@@ -2572,6 +2583,7 @@ gLinker.behaviors.bhvDoor = bhvDoor
 gLinker.behaviors.bhvDoorWarp = bhvDoorWarp
 gLinker.behaviors.bhvExclamationBox = bhvExclamationBox
 gLinker.behaviors.bhvExplosion = bhvExplosion
+// gLinker.behaviors.bhvFadingWarp = bhvFadingWarp
 gLinker.behaviors.bhvFerrisWheelAxle = bhvFerrisWheelAxle
 gLinker.behaviors.bhvFerrisWheelPlatform = bhvFerrisWheelPlatform
 gLinker.behaviors.bhvFish = bhvFish

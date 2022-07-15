@@ -1,10 +1,10 @@
 import * as _Linker from "./Linker"
 import { AreaInstance as Area } from "./Area"
-import { COURSE_NONE } from "../levels/course_defines"
+import { COURSE_NONE, COURSE_STAGES_MAX } from "../levels/course_defines"
 import * as Mario from "./Mario"
 import { CameraInstance as Camera } from "./Camera"
 import * as CourseTable from "../include/course_table"
-import { gLevelToCourseNumTable } from "./SaveFile"
+import { disable_warp_checkpoint, gLevelToCourseNumTable } from "./SaveFile"
 import { s16, sins, coss } from "../utils"
 
 import { fadeout_music } from "./SoundInit"
@@ -29,6 +29,8 @@ import {
     ACT_WATER_IDLE,
     ACT_INTRO_CUTSCENE,
 } from "./Mario"
+
+import { GameInstance as Game } from "../game/Game"
 
 import {
     oBehParams, oPosX, oPosY, oPosZ, oMoveAngleYaw
@@ -62,6 +64,7 @@ import {
     SOUND_MOVING_AIM_CANNON,
     SOUND_OBJ_POUNDING_CANNON,
 } from "../include/sounds"
+import { SET_BACKGROUND_MUSIC } from "../engine/LevelCommands"
 
 
 export const TIMER_CONTROL_SHOW  = 0
@@ -247,7 +250,7 @@ class LevelUpdate {
         // this.gSpecialTripleJump = 0
 
         Mario.init_mario_from_save_file()
-        // disable_warp_checkpoint();
+        disable_warp_checkpoint();
         // save_file_move_cap_to_default_location();
         Camera.select_mario_cam_mode()
         // set_yoshi_as_not_dead();
@@ -275,12 +278,12 @@ class LevelUpdate {
 
         if (Area.gSavedCourseNum != Area.gCurrCourseNum) {
             Area.gSavedCourseNum = Area.gCurrCourseNum
-            // disable_warp_checkpoint();
+            disable_warp_checkpoint();
         }
 
-        // if (Area.gCurrCourseNum > COURSE_STAGES_MAX || warpCheckpointActive) {
-        //     return 0;
-        // }
+        if (Area.gCurrCourseNum > COURSE_STAGES_MAX || warpCheckpointActive) {
+            return 0;
+        }
 
         // if (gDebugLevelSelect && !gShowProfiler) {
         //     return 0;
@@ -597,7 +600,7 @@ class LevelUpdate {
                 break
         }
 
-        // if (!gCurrDemoInput) {
+        if (Game.gCurrDemoInput == null) {
         //     set_background_music(Area.gCurrentArea.musicParam, Area.gCurrentArea.musicParam2, 0)
 
         //     if (gMarioState.flags & MARIO_METAL_CAP) {
@@ -623,7 +626,7 @@ class LevelUpdate {
         //             || this.sWarpDest.nodeId == 30)) {
         //         play_sound(SOUND_MENU_MARIO_CASTLE_WARP, gGlobalSoundSource)
         //     }
-        // }
+        }
     }
 
 // used for warps inside one level

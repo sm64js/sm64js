@@ -1238,7 +1238,7 @@ const should_push_or_pull_door = (m, o) => {
     let dx = o.rawData[oPosX] - m.pos[0]
     let dz = o.rawData[oPosZ] - m.pos[2]
 
-    let dYaw = s16(o.rawData[oMoveAngleYaw] - atan2s(dz, dx))
+    let dYaw = o.rawData[oMoveAngleYaw] - atan2s(dz, dx)
 
     return (dYaw >= -0x4000 && dYaw <= 0x4000) ? 0x00000001 : 0x00000002
 }

@@ -15,7 +15,7 @@ import { atan2s } from "../engine/math_util"
 import * as MathUtil from "../engine/math_util"
 import * as Mario from "./Mario"
 import { oHeldState, oPosX, oPosY, oPosZ } from "../include/object_constants"
-import { CELL_HEIGHT_LIMIT, FLOOR_LOWER_LIMIT, SURFACE_DEATH_PLANE, SURFACE_IS_PAINTING_WARP } from "../include/surface_terrains"
+import { CELL_HEIGHT_LIMIT, FLOOR_LOWER_LIMIT, SURFACE_DEATH_PLANE, SURFACE_IS_PAINTING_WARP, SURFACE_WALL_MISC } from "../include/surface_terrains"
 import { sins, s16, int16, coss } from "../utils"
 import { HudInstance as Hud } from "./Hud"
 import { DIALOG_RESPONSE_NONE } from "./IngameMenu"
@@ -65,6 +65,14 @@ const CameraTrigger = {
     boundsY: 0,
     boundsZ: 0,
     boundsYaw: 0
+}
+
+const WallColDataObj = {
+    x: 0, y: 0, z: 0,
+    offsetY: 0,
+    radius: 0,
+    numWalls: 0,
+    walls: [Object.assign({}, surfaceObj), Object.assign({}, surfaceObj), Object.assign({}, surfaceObj), Object.assign({}, surfaceObj)]
 }
 
 export const AREA_BBH                = LEVEL_AREA_INDEX(LEVEL_BBH, 1)
@@ -454,6 +462,11 @@ class Camera {
             { shot: this.cutscene_unlock_key_door.bind(this), duration: 200 },
             { shot: this.cutscene_double_doors_end.bind(this), duration: 0 }
         ]
+
+        this.sCutsceneSlidingDoorsOpen = [
+            { shot: this.cutscene_sliding_doors_open.bind(this), duration: 50 },
+            { shot: this.cutscene_double_doors_end.bind(this), duration: 0 }
+        ]
         
         this.sCutsceneVars = [
             { point: [0, 0, 0], unusedPoint: [0, 0, 0], angle: [0, 0, 0] },
@@ -494,7 +507,7 @@ class Camera {
             // [ CUTSCENE_END_WAVING, sCutsceneEndWaving ],
             // [ CUTSCENE_CREDITS, sCutsceneCredits ],
             // [ CUTSCENE_CAP_SWITCH_PRESS, sCutsceneCapSwitchPress ],
-            // [ CUTSCENE_SLIDING_DOORS_OPEN, sCutsceneSlidingDoorsOpen ],
+            [ CUTSCENE_SLIDING_DOORS_OPEN, this.sCutsceneSlidingDoorsOpen ],
             // [ CUTSCENE_PREPARE_CANNON, sCutscenePrepareCannon ],
             [ CUTSCENE_UNLOCK_KEY_DOOR, this.sCutsceneUnlockKeyDoor ],
             // [ CUTSCENE_STANDING_DEATH, sCutsceneStandingDeath ],
@@ -523,6 +536,9 @@ class Camera {
         this.sFixedModeBasePosition = [ 646.0, 143.0, -1513.0 ]
         this.sCutsceneDialogResponse = DIALOG_RESPONSE_NONE
         this.sCameraYawAfterDoorCutscene = 0
+        this.sHandheldShakeMag = 0
+        this.sAvoidYawVel = 0
+        this.sHandheldShakeInc = 0.0
         this.sDanceCutsceneIndexTable = [ 0x44, 0x44, 0x44, 0x04 ]
         this.sDanceCutsceneTable = [CUTSCENE_DANCE_FLY_AWAY, CUTSCENE_DANCE_ROTATE, CUTSCENE_DANCE_CLOSEUP, CUTSCENE_KEY_DANCE, CUTSCENE_DANCE_DEFAULT,
                                     false,                   false,                 false,                  false,              true,]
@@ -617,7 +633,7 @@ class Camera {
         
     }
 
-    /* camera_course_processing(c) {
+    camera_course_processing(c) {
         let level = Area.gCurrLevelNum
         this.define_camera_triggers()
         let mode = 0
@@ -637,15 +653,15 @@ class Camera {
             level = LEVEL_COUNT + 1
         }
 
-        if (triggerLevel[level] != null) {
+        /* if (sCameraTriggers[level] != null) {
             b = 0
 
             // Process positional triggers.
             // All triggered events are called, not just the first one.
-            while (triggerLevel[level][b].event != null) {
+            while (sCameraTriggers[level][b].event != null) {
 
                 // Check only the current area's triggers
-                if (triggerLevel[level][b].area == area) {
+                if (sCameraTriggers[level][b].area == area) {
                     // Copy the bounding box into center and bounds
                     MathUtil.vec3f_set(center, sCameraTriggers[level][b].centerX,
                                                sCameraTriggers[level][b].centerY,
@@ -655,14 +671,103 @@ class Camera {
                                                sCameraTriggers[level][b].boundsZ)
                     
                     // Check if Mario is inside the bounds
-                    if (b == 0) {
-                        throw "mario boundries. it's past midnight rn, but im going to be back on this tomorrow"
+                }
+            }
+        } */
+        
+        // Area-specific camera processing
+    }
+
+    rotate_camera_around_walls(c, cPos, yawWrapper, yawRange) {
+        let colData = Object.assign({}, WallColDataObj)
+        let wall = Object.assign({}, surfaceObj)
+        let dummyDist = 0
+        let checkDist = 0
+        let coarseRadius = 0
+        let fineRadius = 0
+        let wallYaw = 0
+        let horWallNorm = 0
+        let dummyPitch = 0
+        // The yaw of the vector from Mario to the camera.
+        let yawFromMario = 0
+        let status = 0
+        
+        let wrapper = {dist: dummyDist, pitch: dummyPitch, yaw: yawFromMario}
+        MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, cPos, wrapper)
+        dummyDist = wrapper.dist; dummyPitch = wrapper.pitch; yawFromMario = wrapper.yaw
+        this.sStatusFlags &= ~CAM_FLAG_CAM_NEAR_WALL
+        colData.offsetY = 100.0
+        // The distance from Mario to Lakitu
+        checkDist = 0.0
+        /// The radius used to find potential walls to avoid.
+        /// Increases to 250.f, but the max collision radius is 200.f
+        coarseRadius = 150.0
+        /// This only increases when there is a wall collision found in the coarse pass
+        fineRadius = 100.0
+
+        for (let step = 0; step < 8; step++) {
+            // Start at Mario, move backwards to Lakitu's position
+            colData.x = this.gPlayerCameraState.pos[0] + ((cPos[0] - this.gPlayerCameraState.pos[0]) * checkDist)
+            colData.y = this.gPlayerCameraState.pos[1] + ((cPos[1] - this.gPlayerCameraState.pos[0]) * checkDist)
+            colData.z = this.gPlayerCameraState.pos[2] + ((cPos[2] - this.gPlayerCameraState.pos[0]) * checkDist)
+            colData.radius = coarseRadius
+            // Increase the coarse check radius
+            wrapper = { current: coarseRadius }
+            this.camera_approach_f32_symmetric_bool(wrapper, 250.0, 30.0)
+            coarseRadius = wrapper.current
+
+            if (SurfaceCollision.find_wall_collisions(colData) != 0) {
+                wall = colData.walls[colData.numWalls - 1]
+
+                // If we're over halfway from Mario to Lakitu, then there's a wall near the camera, but
+                // not necessarily obstructing Mario
+                if (step >= 5) {
+                    this.sStatusFlags |= CAM_FLAG_CAM_NEAR_WALL
+                    if (status < 1) {
+                        status = 1
+                        wall = colData.walls[colData.numWalls - 1]
+                        // wallYaw is parallel to the wall, not perpendicular
+                        wallYaw = atan2s(wall.normal.z, wall.normal.x) + DEGREES(90)
+                        // Calculate the avoid direction. The function returns the opposite direction so add 180
+                        // degrees.
+                        yawWrapper.yaw = this.calc_avoid_yaw(yawFromMario, wallYaw) + DEGREES(180)
+                    }
+                }
+
+                colData.x = this.gPlayerCameraState.pos[0] + ((cPos[0] - this.gPlayerCameraState.pos[0]) * checkDist)
+                colData.y = this.gPlayerCameraState.pos[1] + ((cPos[1] - this.gPlayerCameraState.pos[0]) * checkDist)
+                colData.z = this.gPlayerCameraState.pos[2] + ((cPos[2] - this.gPlayerCameraState.pos[0]) * checkDist)
+                colData.radius = fineRadius
+                // Increase the fine check radius
+                wrapper = { current: fineRadius }
+                this.camera_approach_f32_symmetric_bool(wrapper, 200.0, 20.0)
+                fineRadius = wrapper.current
+                wrapper.current
+                if (SurfaceCollision.find_wall_collisions(colData) != 0) {
+                    wall = colData.walls[colData.numWalls - 1]
+                    horWallNorm = atan2s(wall.normal.z, wall.normal.x)
+                    wallYaw = horWallNorm + DEGREES(90)
+                    // If Mario would be blocked by the surface, then avoid it
+                    if ((this.is_range_behind_surface(this.gPlayerCameraState.pos, cPos, wall, yawRange, SURFACE_WALL_MISC) == 0)
+                        && (this.is_mario_behind_surface(c, wall) == true)
+                        // Also check if the wall is tall enough to cover Mario
+                        && (this.is_surf_within_bounding_box(wall, -1.0, 150.0, -1.0) == false)) {
+                            // Calculate the avoid direction. The function returns the opposite direction so add 180
+                        // degrees.
+                        yawWrapper.yaw = this.calc_avoid_yaw(yawFromMario, wallYaw) + DEGREES(180)
+                        wrapper = { current: yawWrapper.yaw }
+                        this.camera_approach_s16_symmetric_bool(wrapper, horWallNorm, yawRange)
+                        yawWrapper.yaw = wrapper.current
+                        status = 3
+                        step = 8
                     }
                 }
             }
+            checkDist += 0.125
         }
         
-    } */
+        return status
+    }
 
     find_mario_floor_and_ceil(pg) {
         const surf = {}
@@ -824,6 +929,18 @@ class Camera {
         wrapper.current = dst[2]
         this.set_or_approach_f32_asymptotic(wrapper, goal[2], zMul)
         dst[2] = wrapper.current
+    }
+
+    approach_vec3s_asymptotic(current, target, xMul, yMul, zMul) {
+        let wrapper = { current: current[0] }
+        this.approach_s16_asymptotic_bool(wrapper, target[0], xMul);
+        current[0] = wrapper.current
+        wrapper.current = current[1]
+        this.approach_s16_asymptotic_bool(wrapper, target[1], yMul);
+        current[1] = wrapper.current
+        wrapper.current = current[2]
+        this.approach_s16_asymptotic_bool(wrapper, target[2], zMul);
+        current[2] = wrapper.current
     }
 
     reduce_by_dist_from_camera(value, maxDist, posX, posY, posZ) {
@@ -1008,6 +1125,8 @@ class Camera {
         this.gLakituState.focHSpeed = 0.3 // @bug set focHSpeed back-to-back
         this.gLakituState.roll = 0
         this.gLakituState.keyDanceRoll = 0
+        this.sHandheldShakeMag = 0
+        this.sHandheldShakeInc = 0.0
 
         this.sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT
 
@@ -1106,6 +1225,44 @@ class Camera {
         }
     
         return currentState;
+    }
+
+    collide_with_walls(pos, offsetY, radius) {
+        let collisionData = Object.assign({}, WallColDataObj)
+        let wall = Object.assign({}, surfaceObj)
+        let normX = 0
+        let normY = 0
+        let normZ = 0
+        let originOffset = 0
+        let offset = 0
+        let offsetAbsolute = 0
+        let newPos = [ [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0] ]
+        let numCollisions = 0
+
+        collisionData.x = pos[0]
+        collisionData.y = pos[1]
+        collisionData.z = pos[2]
+        collisionData.radius = radius
+        collisionData.offsetY = offsetY
+        numCollisions = SurfaceCollision.find_wall_collisions(collisionData)
+        if (numCollisions != 0) {
+            for (let i = 0; i < collisionData.numWalls; i++) {
+                wall = collisionData.walls[collisionData.numWalls - 1]
+                this.vec3f_copy(newPos[i], pos)
+                normX = wall.normal.x
+                normY = wall.normal.y
+                normZ = wall.normal.z
+                originOffset = wall.originOffset
+                offset = normX * newPos[i][0] + normY * newPos[i][1] + normZ * newPos[i][2] + originOffset
+                offsetAbsolute = Math.abs(offset)
+                if (offsetAbsolute < radius) {
+                    newPos[i][0] += normX * (radius - offset)
+                    newPos[i][2] += normZ * (radius - offset)
+                    this.vec3f_copy(pos, newPos[i])
+                }
+            }
+        }
+        return numCollisions
     }
 
     transition_next_state(c, frames) {
@@ -1337,9 +1494,9 @@ class Camera {
                         this.mode_lakitu_camera(c)
                         break
 
-                case CAMERA_MODE_FREE_ROAM:
-                    this.mode_lakitu_camera(c)
-                    break
+                    case CAMERA_MODE_FREE_ROAM:
+                        this.mode_lakitu_camera(c)
+                        break
 
                     // case CAMERA_MODE_BOSS_FIGHT:
                     //     mode_boss_fight_camera(c);
@@ -1704,10 +1861,43 @@ class Camera {
         return curMode
     }
 
+    set_handheld_shake(mode) {
+        switch (mode) {
+                // They're not in numerical order because that would be too simple...
+            case HAND_CAM_SHAKE_CUTSCENE: // Lowest increment
+                this.sHandheldShakeMag = 0x600;
+                this.sHandheldShakeInc = 0.04;
+                break;
+            case HAND_CAM_SHAKE_LOW: // Lowest magnitude
+                sHandheldShakeMag = 0x300;
+                sHandheldShakeInc = 0.06;
+                break;
+            case HAND_CAM_SHAKE_HIGH: // Highest mag and inc
+                sHandheldShakeMag = 0x1000;
+                sHandheldShakeInc = 0.1;
+                break;
+            case HAND_CAM_SHAKE_UNUSED: // Never used
+                sHandheldShakeMag = 0x600;
+                sHandheldShakeInc = 0.07;
+                break;
+            case HAND_CAM_SHAKE_HANG_OWL: // exactly the same as UNUSED...
+                sHandheldShakeMag = 0x600;
+                sHandheldShakeInc = 0.07;
+                break;
+            case HAND_CAM_SHAKE_STAR_DANCE: // Slightly steadier than HANG_OWL and UNUSED
+                sHandheldShakeMag = 0x400;
+                sHandheldShakeInc = 0.07;
+                break;
+            default:
+                sHandheldShakeMag = 0x0;
+                sHandheldShakeInc = 0.0;
+        }
+    }
+
     calc_hor_dist(a, b) {
         const distX = b[0] - a[0]
         const distZ = b[2] - a[2]
-        return Math.sqrt(distX * distX + distZ * distZ)
+        return MathUtil.sqrtf(distX * distX + distZ * distZ)
     }
 
     calc_y_to_curr_floor(posOffWrapper, posMul, posBound, focOffWrapper, focMul, focBound) {
@@ -2079,6 +2269,7 @@ class Camera {
                     } else {
                         cutscene = CUTSCENE_DOOR_PULL_MODE;
                     }
+                    break
                 case Mario.ACT_UNLOCKING_KEY_DOOR:
                     cutscene = CUTSCENE_UNLOCK_KEY_DOOR;
                     break;
@@ -2314,6 +2505,127 @@ class Camera {
         return yaw
     }
 
+    calc_avoid_yaw(yawFromMario, wallYaw) {
+        let yawDiff = 0
+
+        yawDiff = wallYaw - yawFromMario + DEGREES(90)
+
+        if (yawDiff < 0) {
+            // Deflect to the right
+            yawFromMario = wallYaw
+        } else {
+            // Note: this favors the left side if the wall is exactly perpendicular to the camera.
+            // Deflect to the left
+            yawFromMario = wallYaw + DEGREES(180)
+        }
+        return yawFromMario
+    }
+
+    is_surf_within_bounding_box(surf, xMax, yMax, zMax) {
+        // Surface vertex coordinates
+        let sx = [0, 0, 0]
+        let sy = [0, 0, 0]
+        let sz = [0, 0, 0]
+        // Max delta between x, y, and z
+        let dxMax = 0
+        let dyMax = 0
+        let dzMax = 0
+        // Current deltas between x, y, and z
+        let dx = 0
+        let dy = 0
+        let dz = 0
+
+        let j = 0
+        let smaller = false
+
+        sx[0] = surf.vertex1[0]
+        sx[1] = surf.vertex2[0]
+        sx[2] = surf.vertex3[0]
+        sy[0] = surf.vertex1[1]
+        sy[1] = surf.vertex2[1]
+        sy[2] = surf.vertex3[1]
+        sz[0] = surf.vertex1[2]
+        sz[1] = surf.vertex2[2]
+        sz[2] = surf.vertex3[2]
+
+        for (let i = 0; i < 3; i++) {
+            j = i + 1
+            if (j >= 3) {
+                j = 0
+            }
+            dx = Math.abs(sx[i] - sx[j])
+            if (dx > dxMax) {
+                dxMax = dx
+            }
+            dy = Math.abs(sy[i] - sy[j])
+            if (dy > dyMax) {
+                dyMax = dy
+            }
+            dz = Math.abs(sz[i] - sz[j])
+            if (dz > dzMax) {
+                dzMax = dz
+            }
+        }
+        if (yMax != -1.0) {
+            if (dyMax < yMax) {
+                smaller = true
+            }
+        }
+        if (xMax != -1.0 && zMax != -1.0) {
+            if (dxMax < xMax && dzMax < zMax) {
+                smaller = true
+            }
+        }
+        return smaller
+    }
+
+    is_behind_surface(pos, surf) {
+        let behindSurface = 0
+        // Surface normal
+        let normX = (surf.vertex2[1] - surf.vertex1[1]) * (surf.vertex3[2] - surf.vertex2[2]) -
+                    (surf.vertex3[1] - surf.vertex2[1]) * (surf.vertex2[2] - surf.vertex1[2])
+        let normY = (surf.vertex2[2] - surf.vertex1[2]) * (surf.vertex3[0] - surf.vertex2[0]) -
+                    (surf.vertex3[2] - surf.vertex2[2]) * (surf.vertex2[0] - surf.vertex1[0])
+        let normZ = (surf.vertex2[0] - surf.vertex1[0]) * (surf.vertex3[1] - surf.vertex2[1]) -
+                    (surf.vertex3[0] - surf.vertex2[0]) * (surf.vertex2[1] - surf.vertex1[1])
+        let dirX = surf.vertex1[0] - pos[0]
+        let dirY = surf.vertex1[1] - pos[1]
+        let dirZ = surf.vertex1[2] - pos[2]
+
+        if (dirX * normX + dirY * normY + dirZ * normZ < 0) {
+            behindSurface = 1
+        }
+        return behindSurface
+        
+    }
+
+    is_range_behind_surface(from, to, surf, range, surfType) {
+        let behindSurface = true
+        let leftBehind = 0
+        let rightBehind = 0
+        let check = { dist: 0, pitch: 0, yaw: 0 }
+        let checkPos = [0, 0, 0]
+
+        if (surf != null) {
+            if (surfType == -1 || surf.type != surfType) {
+                if (range == 0) {
+                    behindSurface = this.is_behind_surface(to, surf)
+                } else {
+                    MathUtil.vec3f_get_dist_and_angle(from, to, check)
+                    MathUtil.vec3f_set_dist_and_angle(from, checkPos, check.dist, check.pitch, check.yaw + range)
+                    leftBehind = this.is_behind_surface(checkPos, surf)
+                    MathUtil.vec3f_set_dist_and_angle(from, checkPos, check.dist, check.pitch, check.yaw - range)
+                    rightBehind = this.is_behind_surface(checkPos, surf)
+                    behindSurface = leftBehind * rightBehind
+                }
+            }
+        }
+        return behindSurface
+    }
+
+    is_mario_behind_surface(c, surf) {
+        return this.is_behind_surface(this.gPlayerCameraState.pos, surf)
+    }
 
     mode_behind_mario(c) {
         const marioState = LevelUpdate.gMarioState
@@ -2375,33 +2687,63 @@ class Camera {
 
 
     update_default_camera(c) {
-        let nextYawVel
+        const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
+
+        let tempPos = [0, 0, 0]
+        let cPos = [0, 0, 0]
+        let marioFloor = Object.assign({}, surfaceObj)
+        let cFloor = Object.assign({}, surfaceObj)
+        let tempFloor = Object.assign({}, surfaceObj)
+        let ceil = Object.assign({}, surfaceObj)
+        let camFloorHeight = 0
+        let tempFloorHeight = 0
+        let marioFloorHeight = 0
+        let dist = 0
+        let zoomDist = 0
+        let waterHeight = 0
+        let gasHeight = 0
+        let avoidYaw = 0
+        let pitch = 0
+        let yaw = 0
+        let yawGoal = this.gPlayerCameraState.faceAngle[1] + DEGREES(180)
+        let posHeight = 0
+        let focHeight = 0
+        let distFromWater = 0
+        let tempPitch = 0
+        let tempYaw = 0
+        let xzDist = 0
+        let nextYawVel = 0
         let yawVel = 0
-        let yawGoal = s16(this.gPlayerCameraState.faceAngle[1] + DEGREES(180))
+        let scale = 0
+        let avoidStatus = 0
         let closeToMario = 0
         let ceilHeight = 20000
-        let dist, pitch, yaw
-        let distPitchYaw = {}
-
-        MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, distPitchYaw);
-        ({dist, pitch, yaw} = distPitchYaw)
-
-        let zoomDist = this.gCameraZoomDist
+        let distPitchYaw = SurfaceCollision.find_ceil(this.gLakituState.goalPos[0], this.gLakituState.goalPos[1], this.gLakituState.goalPos[2], ceil)
+        let yawDir = 0
 
         this.handle_c_button_movement(c);
+        let wrapper = { dist: dist, pitch: pitch, yaw: yaw }
+        MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper);
+        dist = wrapper.dist; pitch = wrapper.pitch; yaw = wrapper.yaw
 
         // If C-Down is active, determine what distance the camera should be from mario
         if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
             //! In Mario mode, the camera is zoomed out further than in lakitu mode (1400 vs 1200)
-            // if (set_cam_angle(0) == CAM_ANGLE_MARIO) {
-            //     zoomDist = gCameraZoomDist + 1050;
-            // } else {
+            if (this.set_cam_angle(0) == CAM_ANGLE_MARIO) {
+                zoomDist = this.gCameraZoomDist + 1050;
+            } else {
                 zoomDist = this.gCameraZoomDist + 400;
-            // }
+            }
         } else {
             zoomDist = this.gCameraZoomDist;
         }
+
+        if (this.gPlayerCameraState.action & Mario.ACT_FLAG_HANGING || this.gPlayerCameraState.action == Mario.ACT_RIDING_HOOT) {
+            zoomDist *= 0.8
+            this.set_handheld_shake(HAND_CAM_SHAKE_HANG_OWL)
+        }
         
+        // If not zooming out, only allow dist to decrease
         if (this.sZoomAmount == 0.0) {
             if (dist > zoomDist) {
                 dist -= 50
@@ -2425,6 +2767,7 @@ class Camera {
             }
         }
 
+        // Determine how fast to rotate the camera
         if (this.sCSideButtonYaw == 0) {
             if (c.mode == CAMERA_MODE_FREE_ROAM) {
                 nextYawVel = 0xC0
@@ -2436,10 +2779,10 @@ class Camera {
             }
         } else {
             if (this.sCSideButtonYaw < 0) {
-                yaw = s16(yaw + 0x200)
+                yaw += 0x200
             }
             if (this.sCSideButtonYaw > 0) {
-                yaw = s16(yaw - 0x200)
+                yaw -= 0x200
             }
             const wrapper = { current: this.sCSideButtonYaw }
             this.camera_approach_s16_symmetric_bool(wrapper, 0, 0x100)
@@ -2448,7 +2791,7 @@ class Camera {
         }
 
         this.sYawSpeed = 0x400
-        const xzDist = this.calc_hor_dist(this.gPlayerCameraState.pos, c.pos)
+        xzDist = this.calc_hor_dist(this.gPlayerCameraState.pos, c.pos)
 
         if (this.sStatusFlags & CAM_FLAG_BEHIND_MARIO_POST_DOOR) {
             if (xzDist >= 250) {
@@ -2462,13 +2805,14 @@ class Camera {
             }
         } else if (xzDist < 250) {
             // Turn rapidly if very close to mario
-            c.pos[0] += (250 - xzDist) * Math.sin(yaw / 0x8000 * Math.PI)
-            c.pos[2] += (250 - xzDist) * Math.cos(yaw / 0x8000 * Math.PI)
+            c.pos[0] += (250 - xzDist) * sins(yaw)
+            c.pos[2] += (250 - xzDist) * coss(yaw)
             if (this.sCSideButtonYaw == 0) {
                 nextYawVel = 0x1000
                 this.sYawSpeed = 0
-                MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, distPitchYaw);
-                ({dist, pitch, yaw} = distPitchYaw)
+                wrapper = { dist: dist, pitch: pitch, yaw: yaw }
+                MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper);
+                dist = wrapper.dist; pitch = wrapper.pitch; yaw = wrapper.yaw
             }
             closeToMario |= 1
         }
@@ -2477,26 +2821,43 @@ class Camera {
             c.yaw = yaw
         }
 
-        const posHeightWrapper = {}, focHeightWrapper = {}
-        this.calc_y_to_curr_floor(posHeightWrapper, 1, 200, focHeightWrapper, 0.9, 200)
-        let posHeight = posHeightWrapper.posOff
-        const focHeight = focHeightWrapper.focOff
-        const cPos = [...c.pos]
-        let avoidStatus = 0 //rotate_camera_around_walls(c, cPos, &avoidYaw, 0x600) TODO
+        wrapper = { posOff: posHeight, focOff: focHeight }
+        this.calc_y_to_curr_floor(wrapper, 1, 200, wrapper, 0.9, 200)
+        posHeight = wrapper.posOff
+        focHeight = wrapper.focOff
+        this.vec3f_copy(cPos, c.pos)
+        wrapper.yaw = avoidYaw
+        this.rotate_camera_around_walls(c, cPos, wrapper, 0x600)
 
-
-        if (avoidStatus == 3) { //TODO
-            throw "implement this"
+        // If a wall is blocking the view of Mario, then rotate in the calculated direction
+        if (avoidStatus == 3) {
+            this.sAvoidYawVel = yaw
+            this.sStatusFlags |= CAM_FLAG_COLLIDED_WITH_WALL
+            // Rotate to avoid the wall
+            wrapper = { current: yaw }
+            this.approach_s16_asymptotic_bool(wrapper, avoidYaw, 10)
+            yaw = wrapper.current
+            this.sAvoidYawVel = (this.sAvoidYawVel - yaw) / 0x100
         } else {
-            if (LevelUpdate.gMarioState.forwardVel == 0) {
-                yawVel = nextYawVel
+            if (gMarioStates[0].forwardVel == 0.0) {
+                if (this.sStatusFlags & CAM_FLAG_COLLIDED_WITH_WALL) {
+                    if ((yawGoal - yaw) / 0x100 >= 0) {
+                        yawDir = -1
+                    } else {
+                        yawDir = 1
+                    }
+                    if ((this.sAvoidYawVel > 0 && yawDir > 0) || (this.sAvoidYawVel < 0 && yawDir < 0)) {
+                        yawVel = nextYawVel
+                    }
+                } else {
+                    yawVel = nextYawVel
+                }
             } else {
                 if (nextYawVel == 0x1000) {
                     yawVel = nextYawVel
                 }
                 this.sStatusFlags &= ~CAM_FLAG_COLLIDED_WITH_WALL
             }
-
 
             // If a wall is near the camera, turn twice as fast
             if (avoidStatus != 0) {
@@ -2506,7 +2867,7 @@ class Camera {
             if ((closeToMario & 1) && avoidStatus != 0) {
                 yawVel = 0
             }
-            if (yawVel != 0) {
+            if (yawVel != 0 /* && get_dialog_id() == DIALOG_NONE */) {
                 const yawWrapper = { current: yaw }
                 this.camera_approach_s16_symmetric_bool(yawWrapper, yawGoal, yawVel)
                 yaw = yawWrapper.current
@@ -2521,9 +2882,9 @@ class Camera {
         }
 
         MathUtil.vec3f_set_dist_and_angle(this.gPlayerCameraState.pos, cPos, dist, pitch, yaw)
-        cPos[1] += posHeight + 125
+        cPos[1] += posHeight + 125.0
 
-        if (false) { //collided with walls TODO
+        if (this.collide_with_walls(cPos, 10.0, 80.0) != 0) {
             this.sStatusFlags |= CAM_FLAG_COLLIDED_WITH_WALL
         }
 
@@ -2533,17 +2894,14 @@ class Camera {
             this.gPlayerCameraState.pos[2]
         ]
 
-        let marioFloorHeight = 125 + this.sMarioGeometry.currFloorHeight
-        let marioFloor = this.sMarioGeometry.currFloor
+        marioFloorHeight = 125 + this.sMarioGeometry.currFloorHeight
+        marioFloor = this.sMarioGeometry.currFloor
 
-        let camFloorHeight = SurfaceCollision.find_floor(cPos[0], cPos[1] + 50, cPos[2], {}) + 125
-
-        let tempPos = [0,0,0]
+        camFloorHeight = SurfaceCollision.find_floor(cPos[0], cPos[1] + 50, cPos[2], cFloor) + 125
 
         for (let scale = 0.1; scale < 1.0; scale += 0.2) {
             this.scale_along_line(tempPos, cPos, this.gPlayerCameraState.pos, scale)
-            const tempFloor = {}
-            const tempFloorHeight = SurfaceCollision.find_floor(tempPos[0], tempPos[1], tempPos[2], tempFloor) + 125
+            tempFloorHeight = SurfaceCollision.find_floor(tempPos[0], tempPos[1], tempPos[2], tempFloor) + 125
             if (tempFloor.floor && tempFloorHeight > marioFloorHeight) {
                 marioFloorHeight = tempFloorHeight
                 marioFloor = tempFloor.floor
@@ -2552,46 +2910,69 @@ class Camera {
 
         // Lower the camera in mario mode
         if (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
-            marioFloorHeight -= 35
-            camFloorHeight -= 35
-            c.focus[1] -= 25
+            marioFloorHeight -= 35.0
+            camFloorHeight -= 35.0
+            c.focus[1] -= 25.0
         }
 
         // If there's water below the camera, decide whether to keep the camera above the water surface
-        const waterHeight = -11000
-        if (waterHeight != -11000) {
-            throw "If there's water below the camera, decide whether to keep the camera above the water surface"
+        waterHeight = SurfaceCollision.find_water_level(cPos[0], cPos[2])
+        if (waterHeight != FLOOR_LOWER_LIMIT) {
+            waterHeight += 125.0
+            distFromWater = waterHeight - marioFloorHeight
+            if (!(this.gCameraMovementFlags & CAM_MOVE_METAL_BELOW_WATER)) {
+                if (distFromWater > 800.0 && (this.gPlayerCameraState.action & Mario.ACT_FLAG_METAL_WATER)) {
+                    this.gCameraMovementFlags |= CAM_MOVE_METAL_BELOW_WATER
+                }
+            } else {
+                if (distFromWater < 400.0 || !(this.gPlayerCameraState.action & Mario.ACT_FLAG_METAL_WATER)) {
+                    this.gCameraMovementFlags &= ~CAM_MOVE_METAL_BELOW_WATER
+                }
+            }
+            // If not wearing the metal cap, always stay above
+            if (!(this.gCameraMovementFlags & CAM_MOVE_METAL_BELOW_WATER) && camFloorHeight < waterHeight) {
+                camFloorHeight = waterHeight
+            }
         } else {
             this.gCameraMovementFlags &= ~CAM_MOVE_METAL_BELOW_WATER
         }
 
         cPos[1] = camFloorHeight
-        tempPos = [...cPos]
-        tempPos[1] -= 125
-        if (marioFloor && camFloorHeight <= marioFloorHeight) {
-            avoidStatus = 0 ////is range behing surface() TODO FIX
+        this.vec3f_copy(tempPos, cPos)
+        tempPos[1] -= 125.0
+        if (marioFloor != null && camFloorHeight <= marioFloorHeight) {
+            avoidStatus = this.is_range_behind_surface(c.focus, tempPos, marioFloor, 0, -1)
             if (avoidStatus != 1 && ceilHeight > marioFloorHeight) {
                 camFloorHeight = marioFloorHeight
-            } else {
-                throw "range behind surface"
             }
         }
 
-        posHeight = 0
+        posHeight = 0.0
         if (c.mode == CAMERA_MODE_FREE_ROAM) {
             if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
                 posHeight = 375
-                /// if pyramin level
+                if (this.gCurrLevelArea == AREA_SSL_PYRAMID) {
+                    posHeight /= 2
+                }
             } else {
-                posHeight = 100
+                posHeight = 100.0
             }
         }
         if ((this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) && (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE)) {
             posHeight = 610
-            /// if pyramid level or LEVEL_CASTLE (indoor?)
+            if (this.gCurrLevelArea == AREA_SSL_PYRAMID || Area.gCurrLevelNum == LEVEL_CASTLE) {
+                posHeight /= 2
+            }
         }
 
-        ///Poison Gas
+        // Make Lakitu fly above the gas
+        gasHeight = SurfaceCollision.find_poison_gas_level(cPos[0], cPos[2])
+        if (gasHeight != FLOOR_LOWER_LIMIT) {
+            gasHeight += 130.0
+            if (gasHeight > c.pos[1]) {
+                c.pos[1] = gasHeight
+            }
+        }
 
 
         if (this.gPlayerCameraState.action & Mario.ACT_FLAG_HANGING || this.gPlayerCameraState.action == Mario.ACT_RIDING_HOOT) {
@@ -2599,45 +2980,49 @@ class Camera {
         }
 
         if (this.gPlayerCameraState.action & Mario.ACT_FLAG_ON_POLE) {
-            camFloorHeight = LevelUpdate.gMarioState.usedObj.rawData[oPosY] + 125
-            if (this.gPlayerCameraState.pos[1] - 100 > camFloorHeight) {
-                camFloorHeight = this.gPlayerCameraState.pos[1] - 100
+            camFloorHeight = LevelUpdate.gMarioState.usedObj.rawData[oPosY] + 125.0
+            if (this.gPlayerCameraState.pos[1] - 100.0 > camFloorHeight) {
+                camFloorHeight = this.gPlayerCameraState.pos[1] - 100.0
             }
-            ceilHeight = 20000
-            c.focus = [...this.gPlayerCameraState.pos]
+            ceilHeight = CELL_HEIGHT_LIMIT
+            this.vec3f_copy(c.focus, this.gPlayerCameraState.pos)
         }
-        if (camFloorHeight != -11000) {
+        if (camFloorHeight != FLOOR_LOWER_LIMIT) {
             camFloorHeight += posHeight
-            this.approach_camera_height(c, camFloorHeight, 20)
+            this.approach_camera_height(c, camFloorHeight, 20.0)
         }
         c.pos[0] = cPos[0]
         c.pos[2] = cPos[2]
         cPos[0] = this.gLakituState.goalPos[0]
         cPos[1] = c.pos[1]
         cPos[2] = this.gLakituState.goalPos[2]
-        const output = {}
-        MathUtil.vec3f_get_dist_and_angle(cPos, c.pos, output)
-        dist = output.dist
+        wrapper = { dist: dist, pitch: tempPitch, yaw: tempYaw }
+        MathUtil.vec3f_get_dist_and_angle(cPos, c.pos, wrapper)
+        dist = wrapper.dist; tempPitch = wrapper.pitch; tempYaw = wrapper.yaw;
         // Prevent the camera from lagging behind too much
-        if (dist > 50) {
-            dist = 50
-            MathUtil.vec3f_set_dist_and_angle(cPos, c.pos, dist, output.pitch, output.yaw)
+        if (dist > 50.0) {
+            dist = 50.0
+            MathUtil.vec3f_set_dist_and_angle(cPos, c.pos, dist, tempPitch, tempYaw)
         }
         if (this.sMarioGeometry.currFloorType != SURFACE_DEATH_PLANE) {
-            MathUtil.vec3f_get_dist_and_angle(c.focus, c.pos, output)
-            dist = output.dist
+            MathUtil.vec3f_get_dist_and_angle(c.focus, c.pos, wrapper)
+            dist = wrapper.dist; tempPitch = wrapper.pitch; tempYaw = wrapper.yaw;
             if (dist > zoomDist) {
                 dist = zoomDist
-                MathUtil.vec3f_set_dist_and_angle(c.focus, c.pos, dist, output.pitch, output.yaw)
+                MathUtil.vec3f_set_dist_and_angle(c.focus, c.pos, dist, tempPitch, tempYaw)
+            }
+        }
+        if (ceilHeight != CELL_HEIGHT_LIMIT) {
+            ceilHeight -= 150.0
+            avoidStatus = SurfaceCollision.is_range_behind_surface(c.pos, this.gPlayerCameraState.pos, ceil, 0, -1)
+            if (c.pos[1] > ceilHeight && avoidStatus == 1) {
+                c.pos[1] = ceilHeight
             }
         }
 
-
-        if (ceilHeight != 20000) {
-            throw "there is a ceiling in update camera"
+        if (this.gCurrLevelArea == AREA_WDW_TOWN) {
+            yaw = this.clamp_positions_and_find_yaw(c.pos, c.focus, 2254.0, -3789.0, 3790.0, -2253.0)
         }
-
-        /// if Level area == AREA_WDW_TOWN
         return yaw
 
     }
@@ -2653,11 +3038,11 @@ class Camera {
         this.mode_default_camera(c)
     }
 
-    determine_pushing_or_pulling_door(w) {
+    determine_pushing_or_pulling_door(currentWrapper) {
         if (this.gPlayerCameraState.action == Mario.ACT_PULLING_DOOR) {
-            w.rotation = 0
+            currentWrapper.current = 0
         } else {
-            w.rotation = DEGREES(-180)
+            currentWrapper.current = DEGREES(-180)
         }
     }
 
@@ -3147,7 +3532,8 @@ class Camera {
      * cvar3 is the goal focus
      */
     cutscene_unlock_key_door_start(c) {
-        let posOff, focusOff = [0, 0, 0]
+        let posOff = [0, 0, 0]
+        let focusOff = [0, 0, 0]
 
         this.vec3f_copy(this.sCutsceneVars[0].point, c.pos)
         this.vec3f_copy(this.sCutsceneVars[1].point, c.focus)
@@ -3179,7 +3565,9 @@ class Camera {
     }
 
     cutscene_unlock_key_door_focus_lock(c) {
-        
+        let wrapper = { current: this.sCutsceneVars[3].point[1] }
+        this.approach_f32_asymptotic_bool(wrapper, this.gPlayerCameraState.pos[1] + 140.0, 0.07)
+        this.sCutsceneVars[3].point[1] = wrapper.current
     }
 
     /**
@@ -3191,13 +3579,98 @@ class Camera {
         this.cutscene_unlock_key_door_fly_back = this.cutscene_unlock_key_door_fly_back.bind(this)
         this.cutscene_unlock_key_door_fov_shake = this.cutscene_unlock_key_door_fov_shake.bind(this)
         this.cutscene_unlock_key_door_focus_lock = this.cutscene_unlock_key_door_focus_lock.bind(this)
-        this.cutscene_unlock_key_door_stub = this.cutscene_unlock_key_door_stub.bind(this)
-        cutscene_event(this.cutscene_unlock_key_door_start, c, 0, 0);
-        cutscene_event(this.cutscene_unlock_key_door_approach_mario, c, 0, 123);
-        cutscene_event(this.cutscene_unlock_key_door_fly_back, c, 124, -1);
-        cutscene_event(this.cutscene_unlock_key_door_fov_shake, c, 79, 79);
-        cutscene_event(this.cutscene_unlock_key_door_focus_lock, c, 70, 110);
-        cutscene_event(this.cutscene_unlock_key_door_stub, c, 112, 112);
+        this.cutscene_event(this.cutscene_unlock_key_door_start, c, 0, 0);
+        this.cutscene_event(this.cutscene_unlock_key_door_approach_mario, c, 0, 123);
+        this.cutscene_event(this.cutscene_unlock_key_door_fly_back, c, 124, -1);
+        this.cutscene_event(this.cutscene_unlock_key_door_fov_shake, c, 79, 79);
+        this.cutscene_event(this.cutscene_unlock_key_door_focus_lock, c, 70, 110);
+    }
+
+    /**
+     * Set the camera pos relative to Mario.
+     */
+    cutscene_sliding_doors_open_start(c) {
+        let wrapper = { dist: 0, pitch: 0, yaw: 0 }
+
+        MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper)
+
+        // If the camera is too close, warp it backwards set it to a better angle.
+        if (wrapper.dist < 500.0) {
+            wrapper.dist = 500.0
+            wrapper.yaw = this.gPlayerCameraState.faceAngle[1] + 0x8800
+            wrapper.pitch = 0x800
+        }
+
+        MathUtil.vec3f_set_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper.dist, wrapper.pitch, wrapper.yaw)
+    }
+
+    /**
+     * cvar1: Mario's position
+     * cvar0.angle: Mario's angle
+     * cvar0.point: offset from Mario
+     */
+    cutscene_sliding_doors_open_set_cvars(c) {
+        this.vec3f_copy(this.sCutsceneVars[1].point, this.gPlayerCameraState.pos)
+        this.vec3f_copy(this.sCutsceneVars[0].angle, this.gPlayerCameraState.faceAngle)
+        MathUtil.vec3f_set(this.sCutsceneVars[0].point, 80.0, 325.0, 200.0)
+    }
+
+    /**
+     * Decrease the cvar0 y offset to 75, which would simulate Lakitu flying under the doorway.
+     * However, the initial y offset is too high for Lakitu to reach 75 in time.
+     */
+    cutscene_sliding_doors_go_under_doorway(c) {
+        let wrapper = { current: this.sCutsceneVars[0].point[1] }
+        this.camera_approach_f32_symmetric_bool(wrapper, 75.0, 10.0)
+        this.sCutsceneVars[0].point[1] = wrapper.current
+    }
+
+    cutscene_sliding_doors_fly_back_up(c) {
+        let wrapper = { current: this.sCutsceneVars[0].point[1] }
+        this.camera_approach_f32_symmetric_bool(wrapper, 125.0, 10.0)
+        this.sCutsceneVars[0].point[1] = wrapper.current
+    }
+    
+    cutscene_sliding_doors_follow_mario(c) {
+        let pos = {0: 0, 1: 0, 2: 0}
+        
+        this.vec3f_copy(pos, c.pos)
+        // Update cvar1 with Mario's position (the y value doesn't change)
+        this.sCutsceneVars[1].point[0] = this.gPlayerCameraState.pos[0]
+        this.sCutsceneVars[1].point[2] = this.gPlayerCameraState.pos[2]
+
+        // Decrease cvar0's offsets, moving the camera behind Mario at his eye height.
+        let wrapper = { current: this.sCutsceneVars[0].point[0] }
+        this.approach_f32_asymptotic_bool(wrapper, 0, 0.1)
+        this.sCutsceneVars[0].point[0] = wrapper.current
+        wrapper.current = this.sCutsceneVars[0].point[2]
+        this.camera_approach_f32_symmetric_bool(wrapper, 125.0, 50.0)
+        this.sCutsceneVars[0].point[2] = wrapper.current
+        // Update cvar0's angle
+        this.approach_vec3s_asymptotic(this.sCutsceneVars[0].angle, this.gPlayerCameraState.faceAngle, 16, 16, 16)
+
+        // Apply the offset to the camera's position
+        this.offset_rotated(pos, this.sCutsceneVars[1].point, this.sCutsceneVars[0].point, this.sCutsceneVars[0].angle)
+        this.approach_vec3f_asymptotic(c.pos, pos, 0.15, 0.05, 0.15)
+
+        // Focus on Mario's eye height
+        this.set_focus_rel_mario(c, 0, 125.0, 0, 0)
+    }
+
+    cutscene_sliding_doors_open(c) {
+        this.reset_pan_distance(c)
+
+        this.cutscene_sliding_doors_open_start = this.cutscene_sliding_doors_open_start.bind(this)
+        this.cutscene_sliding_doors_open_set_cvars = this.cutscene_sliding_doors_open_set_cvars.bind(this)
+        this.cutscene_sliding_doors_go_under_doorway = this.cutscene_sliding_doors_go_under_doorway.bind(this)
+        this.cutscene_sliding_doors_fly_back_up = this.cutscene_sliding_doors_fly_back_up.bind(this)
+        this.cutscene_sliding_doors_follow_mario = this.cutscene_sliding_doors_follow_mario.bind(this)
+        
+        this.cutscene_event(this.cutscene_sliding_doors_open_start, c, 0, 8);
+        this.cutscene_event(this.cutscene_sliding_doors_open_set_cvars, c, 8, 8);
+        this.cutscene_event(this.cutscene_sliding_doors_go_under_doorway, c, 8, 28);
+        this.cutscene_event(this.cutscene_sliding_doors_fly_back_up, c, 29, -1);
+        this.cutscene_event(this.cutscene_sliding_doors_follow_mario, c, 8, -1);
     }
 
     cutscene_double_doors_end(c) {
@@ -3226,8 +3699,8 @@ class Camera {
      * Use boss fight mode's update function to move the focus back.
      */
     cutscene_star_spawn_update_boss_fight(c) {
-        let pos = [0, 0, 0]
-        let focus = [0, 0, 0]
+        let pos = {0: 0, 1: 0, 2: 0}
+        let focus = {0: 0, 1: 0, 2: 0}
 
         this.update_boss_fight_camera(c, focus, pos)
         this.approach_vec3f_asymptotic(c.focus, focus, 0.2, 0.2, 0.2)
@@ -3415,7 +3888,7 @@ class Camera {
      */
     cutscene_door_loop(c) {
         //! bitwise AND instead of boolean
-        if ((this.gPlayerCameraState.action != Mario.ACT_PULLING_DOOR) && (this.gPlayerCameraState.action != Mario.ACT_PUSHING_DOOR)) {
+        if ((this.gPlayerCameraState.action != Mario.ACT_PULLING_DOOR) & (this.gPlayerCameraState.action != Mario.ACT_PUSHING_DOOR)) {
             this.gCutsceneTimer = CUTSCENE_STOP
             c.cutscene = 0
         }
@@ -3425,13 +3898,13 @@ class Camera {
      * Warp the camera behind Mario.
      */
     cutscene_door_move_behind_mario(c) {
-        let camOffset = { 0: 0, 1: 0, 2: 0 }
+        let camOffset = [0, 0, 0]
         let doorRotation = 0
 
         this.reset_pan_distance(c)
-        let wrapper = { rotation: doorRotation }
+        let wrapper = { current: doorRotation }
         this.determine_pushing_or_pulling_door(wrapper)
-        doorRotation = wrapper.rotation
+        doorRotation = wrapper.current
         this.set_focus_rel_mario(c, 0.0, 125.0, 0.0, 0)
         MathUtil.vec3s_set(this.sCutsceneVars[0].angle, 0, this.gPlayerCameraState.faceAngle[1] + doorRotation, 0)
         MathUtil.vec3f_set(camOffset, 0.0, 125.0, 250.0)
@@ -3458,11 +3931,11 @@ class Camera {
      * Ends the door cutscene. Sets the camera mode to close mode unless the default is free roam.
      */
     cutscene_door_end(c) {
-        if (c.defMode == CAMERA_MODE_FREE_ROAM) {
+        // if (c.defMode == CAMERA_MODE_FREE_ROAM) {
             c.mode = CAMERA_MODE_FREE_ROAM
-        } else {
-            c.mode = CAMERA_MODE_CLOSE
-        }
+        // } else {
+        //     c.mode = CAMERA_MODE_CLOSE
+        // }
 
         c.cutscene = 0
         this.gCutsceneTimer = CUTSCENE_STOP
@@ -3474,7 +3947,7 @@ class Camera {
 
     cutscene_door_mode(c) {
         this.reset_pan_distance(c)
-        // this.camera_course_processing(c)
+        this.camera_course_processing(c)
 
         if (c.mode == CAMERA_MODE_FIXED) {
             c.nextYaw = this.update_fixed_camera(c, c.focus, c.pos)

@@ -9,6 +9,7 @@ import {
     SURFACE_INTANGIBLE,
     SURFACE_VANISH_CAP_WALLS
 } from "../include/surface_terrains"
+import { ObjectListProcessorInstance as ObjectListProc } from "../game/ObjectListProcessor"
 
 const surfaceObj = {
     type: 0,
@@ -82,6 +83,42 @@ class SurfaceCollision {
         }
 
         return waterLevel
+    }
+
+    find_poison_gas_level(x, z) {
+
+        let numRegions = 0
+        let val = 0
+        let loX = 0
+        let hiX = 0
+        let loZ = 0
+        let hiZ = 0
+        let gasLevel = FLOOR_LOWER_LIMIT
+
+        if (ObjectListProc.gEnvironmentRegions != null) {
+            numRegions = ObjectListProc.gEnvironmentRegions++
+
+            for (let i = 0; i < numRegions; i++) {
+                if (ObjectListProc.gEnvironmentRegions >= 50) {
+                    loX = ObjectListProc.gEnvironmentRegions[1]
+                    loZ = ObjectListProc.gEnvironmentRegions[2]
+                    hiX = ObjectListProc.gEnvironmentRegions[3]
+                    hiZ = ObjectListProc.gEnvironmentRegions[4]
+
+                    // If the location is within a gas's box and it is a gas box.
+                    // Gas has a value of 50, 60, etc.
+                    if (loX < x && x < hiX && loZ < z && z < hiZ && val % 10 == 0) {
+                        // Set the gas height. Since this breaks, only return the first height.
+                        gasLevel = ObjectListProc.gEnvironmentRegions[5]
+                        break
+                    }
+                }
+
+                ObjectListProc.gEnvironmentRegions += 6
+            }
+        }
+
+        return gasLevel
     }
 
     find_floor_height(x, y, z) {

@@ -12,7 +12,7 @@ import { ADD_INT, ADD_FLOAT, ANIMATE, ANIMATE_TEXTURE, BEGIN, BEGIN_LOOP, BEGIN_
 
 import { INTERACT_WATER_RING, INTERACT_POLE, INTERACT_DAMAGE, INTERACT_COIN, INTERACT_TEXT,
          INT_SUBTYPE_SIGN, INTERACT_CANNON_BASE, INTERACT_GRABBABLE, INT_SUBTYPE_BIG_KNOCKBACK,
-         INTERACT_WARP_DOOR, INTERACT_DOOR, INTERACT_WARP, INT_SUBTYPE_STAR_DOOR, INTERACT_FLAME
+         INTERACT_WARP_DOOR, INTERACT_DOOR, INTERACT_WARP, INT_SUBTYPE_STAR_DOOR, INTERACT_FLAME, INT_SUBTYPE_FADING_WARP
 } from "./Interaction"
 
 import { oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAnimations,
@@ -193,6 +193,7 @@ import { bitfs_seg7_collision_sinking_cage_platform } from "../levels/bitfs/sink
 import { purple_switch_seg8_collision_0800C7A8 } from "../actors/purple_switch/collision.inc"
 import { warp_pipe_seg3_collision_03009AC8 } from "../actors/warp_pipe/collision.inc"
 import { king_bobomb_seg5_anims_0500FE30 } from "../actors/king_bobomb/anims.inc"
+import { bob_seg7_collision_chain_chomp_gate } from "../levels/bob/chain_chomp_gate/collision.inc"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -786,6 +787,17 @@ export const bhvChainChompChainPart = [
     { command: BhvCmds.end_loop }
 ]
 
+export const bhvChainChompGate = [
+    BEGIN(OBJ_LIST_SURFACE),
+    LOAD_COLLISION_DATA(bob_seg7_collision_chain_chomp_gate),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    CALL_NATIVE('bhv_chain_chomp_gate_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_chain_chomp_gate_update'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
 export const bhvHorStarParticleSpawner = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_DEFAULT, name: 'bhvHorStarParticleSpawner' } },
     { command: BhvCmds.disable_rendering },
@@ -913,6 +925,17 @@ export const bhvMistCircParticleSpawner = [
     { command: BhvCmds.delay, args: { num: 1 } },
     { command: BhvCmds.deactivate }
 ]
+
+// export const bhvFadingWarp = [
+    // BEGIN(OBJ_LIST_LEVEL),
+    // SET_INT(oInteractionSubtype, INT_SUBTYPE_FADING_WARP),
+    // OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    // SET_INT(oInteractType, INTERACT_WARP),
+    // SET_INT(oIntangibleTimer, 0),
+    // BEGIN_LOOP(),
+    //     CALL_NATIVE('bhv_fading_warp_loop'),
+    // END_LOOP(),
+// ]
 
 export const bhvWhitePuffExplosion = [
     { command: BhvCmds.begin, args: { objListIndex: OBJ_LIST_UNIMPORTANT, name: 'bhvWhitePuffExplosion' } },
@@ -2548,6 +2571,7 @@ gLinker.behaviors.bhvCarrySomething6 = bhvCarrySomething6
 gLinker.behaviors.bhvCastleFlagWaving = bhvCastleFlagWaving
 gLinker.behaviors.bhvCastleFloorTrap = bhvCastleFloorTrap
 gLinker.behaviors.bhvChainChomp = bhvChainChomp
+gLinker.behaviors.bhvChainChompGate = bhvChainChompGate
 gLinker.behaviors.bhvCirclingAmp = bhvCirclingAmp
 gLinker.behaviors.bhvCheckerboardElevatorGroup = bhvCheckerboardElevatorGroup
 gLinker.behaviors.bhvCloud = bhvCloud
@@ -2559,6 +2583,7 @@ gLinker.behaviors.bhvDoor = bhvDoor
 gLinker.behaviors.bhvDoorWarp = bhvDoorWarp
 gLinker.behaviors.bhvExclamationBox = bhvExclamationBox
 gLinker.behaviors.bhvExplosion = bhvExplosion
+// gLinker.behaviors.bhvFadingWarp = bhvFadingWarp
 gLinker.behaviors.bhvFerrisWheelAxle = bhvFerrisWheelAxle
 gLinker.behaviors.bhvFerrisWheelPlatform = bhvFerrisWheelPlatform
 gLinker.behaviors.bhvFish = bhvFish

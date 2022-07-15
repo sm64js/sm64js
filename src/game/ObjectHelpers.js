@@ -198,7 +198,7 @@ export const geo_switch_area = (callerContext, node) => {
         if (ObjectListProc.gMarioObject == undefined) {
             node.selectedCase = 0
         } else {
-            ///TODO gFindFloorIncludeSurfaceIntangible = 1
+            ObjectListProc.gFindFloorIncludeSurfaceIntangible = 1
 
             const marioObj = ObjectListProc.gMarioObject
 
@@ -1968,6 +1968,11 @@ export const spawn_mist_particles = () => {
     spawn_mist_particles_variable(0, 0, 46.0)
 }
 
+export const spawn_mist_particles_with_sound = (sp18) => {
+    spawn_mist_particles_variable(0, 0, 46.0)
+    create_sound_spawner(sp18)
+}
+
 export const cur_obj_wait_then_blink = (timeUntilBlinking, numBlinks) => {
     const o = ObjectListProc.gCurrentObject
 
@@ -2143,6 +2148,7 @@ import { CameraInstance, CUTSCENE_CAP_SWITCH_PRESS } from "./Camera"
 import { MARIO_DIALOG_STATUS_SPEAK, MARIO_DIALOG_STOP, mario_ready_to_speak, set_mario_npc_dialog } from "./MarioActionsCutscene"
 import { DIALOG_RESPONSE_NONE } from "./IngameMenu"
 import { spawn_default_star } from "./behaviors/spawn_star.inc"
+import { create_sound_spawner } from "./SpawnSound"
 const sLevelsWithRooms = [LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC]
 
 export const bhv_init_room = () => {

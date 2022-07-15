@@ -1,12 +1,60 @@
 import * as _Linker from "../game/Linker"
-import * as _SurfaceLoad from "../game/SurfaceLoad"
+import { MARIO_VANISH_CAP } from "../game/Mario"
+import { SurfaceLoadInstance as SurfaceLoad } from "../game/SurfaceLoad"
+import { ACTIVE_FLAG_MOVE_THROUGH_GRATE } from "../include/object_constants"
 
 import {
     LEVEL_BOUNDARY_MAX, CELL_SIZE, SURFACE_FLAG_NO_CAM_COLLISION, SURFACE_CAMERA_BOUNDARY, SURFACE_FLAG_X_PROJECTION,
-    FLOOR_LOWER_LIMIT
+    FLOOR_LOWER_LIMIT,
+    SURFACE_INTANGIBLE,
+    SURFACE_VANISH_CAP_WALLS
 } from "../include/surface_terrains"
+import { ObjectListProcessorInstance as ObjectListProc } from "../game/ObjectListProcessor"
+
+const surfaceObj = {
+    type: 0,
+    force: 0, 
+    flags: 0,
+    room: 0,
+    lowerY: 0,
+    upperY: 0,
+    vertex1: [0, 0, 0],
+    vertex2: [0, 0, 0],
+    vertex3: [0, 0, 0],
+    normal: {x: 0, y: 0, z: 0},
+    originOffset: 0,
+    object: {}
+}
 
 class SurfaceCollision {
+    f32_find_wall_collision(ptrWrapper, offsetY, radius) {
+        let collision = {
+            x: 0,
+            y: 0,
+            z: 0,
+            offsetY: 0,
+            radius: 0,
+            numWalls: 0,
+            walls: [Object.assign({}, surfaceObj), Object.assign({}, surfaceObj), Object.assign({}, surfaceObj), Object.assign({}, surfaceObj)],
+        }
+        let numCollisions = 0
+
+        collision.offsetY = offsetY
+        collision.radius = radius
+
+        collision.x = ptrWrapper.x
+        collision.y = ptrWrapper.y
+        collision.z = ptrWrapper.z
+
+        numCollisions = this.find_wall_collisions(collision)
+
+        ptrWrapper.x = collision.x
+        ptrWrapper.y = collision.y
+        ptrWrapper.z = collision.z
+
+        return numCollisions
+    }
+
     find_water_level(x, z) {
         let waterLevel = FLOOR_LOWER_LIMIT
 
@@ -35,6 +83,37 @@ class SurfaceCollision {
         }
 
         return waterLevel
+    }
+
+    find_poison_gas_level(x, z) {
+        let gasLevel = FLOOR_LOWER_LIMIT
+
+        const p = gLinker.ObjectListProcessor.gEnvironmentRegions /// array
+
+        if (p && p[0]) {
+            const numRegions = p[0]
+            let dataIndex = 1
+
+            for (let i = 0; i < numRegions; i++) {
+                let val = p[dataIndex++]
+                let loX = p[dataIndex++]
+                let loZ = p[dataIndex++]
+                let hiX = p[dataIndex++]
+                let hiZ = p[dataIndex++]
+
+                // If the location is within a gas's box and it is a gas box.
+                // Gas has a value of 50, 60, etc.
+                if (loX < x && x < hiX && loZ < z && z < hiZ && val % 10 == 0) {
+                    // Set the gas height. Since this breaks, only return the first height.
+                    gasLevel = p[dataIndex]
+                    break
+                }
+
+                dataIndex += 6
+            }
+        }
+
+        return gasLevel
     }
 
     find_floor_height(x, y, z) {
@@ -186,6 +265,9 @@ class SurfaceCollision {
         let radius = data.radius
         let numCols = 0
         const x = data.x, y = data.y + data.offsetY, z = data.z
+        const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
+        const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+        const gMarioState = gLinker.LevelUpdate.gMarioState
 
         if (radius > 200.0) radius = 200.0
 
@@ -242,6 +324,14 @@ class SurfaceCollision {
                 if (surf.type == SURFACE_CAMERA_BOUNDARY) continue 
 
                 //// More Vanish Cap Stuff -- walk through walls
+            }
+
+            // If an object can pass through a vanish cap wall, pass through.
+            if (surf.type == SURFACE_VANISH_CAP_WALLS) {
+                // If an object can pass through a vanish cap wall, pass through.
+                if (gCurrentObject != null && (gCurrentObject.activeFlags & ACTIVE_FLAG_MOVE_THROUGH_GRATE)) continue
+                // If Mario has a vanish cap, pass through the vanish cap wall.
+                if (gCurrentObject != null && gCurrentObject == gMarioObject && (gMarioState.flags & MARIO_VANISH_CAP)) continue
             }
 
             //! (Wall Overlaps) Because this doesn't update the x and z local variables,

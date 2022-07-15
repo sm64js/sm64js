@@ -19,8 +19,11 @@ class SurfaceLoad {
         this.SPATIAL_PARTITION_CEILS = 1
         this.SPATIAL_PARTITION_WALLS = 2
 
-        // this.gStaticSurfacePartition = new Array(16).fill(0).map(() => new Array(16).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
-        // this.gDynamicSurfacePartition = new Array(16).fill(0).map(() => new Array(16).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
+        this.NUM_CELLS = (2 * Surfaces.LEVEL_BOUNDARY_MAX / Surfaces.CELL_SIZE)
+        this.NUM_CELLS_INDEX = (this.NUM_CELLS - 1)
+
+        this.gStaticSurfacePartition = new Array(16).fill(0).map(() => new Array(16).fill(0))
+        this.gDynamicSurfacePartition = new Array(16).fill(0).map(() => new Array(16).fill(0))
 
     }
 

@@ -2216,7 +2216,9 @@ const set_submerged_cam_preset_and_spawn_bubbles = (m) => {
         const camPreset = m.area.camera.mode
 
         if (m.action & ACT_FLAG_METAL_WATER) {
-            throw "Todo ACT_FLAG_METAL_WATER - set_submerged_cam_preset_and_spawn_bubbles"
+            if (camPreset != CAMERA_MODE_CLOSE) {
+                Camera.set_camera_mode(m.area.camera, CAMERA_MODE_CLOSE, 1);
+            }
         } else {
             if ((heightBelowWater > 800) && (camPreset != CAMERA_MODE_BEHIND_MARIO)) {
                 Camera.set_camera_mode(m.area.camera, CAMERA_MODE_BEHIND_MARIO, 1)

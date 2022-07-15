@@ -134,6 +134,13 @@ class ObjectListProcessor {
         this.gCCMEnteredSlide = 0
         this.gCheckingSurfaceCollisionsForCamera = 0
         this.gMarioShotFromCannon = 0
+        this.gFindFloorIncludeSurfaceIntangible
+        this.gNumFindFloorMisses = 0
+        this.gNumCalls = {
+            floor: 0,
+            ceil: 0,
+            wall: 0,
+        }
         this.gObjectLists = new Array(13).fill(0).map((e, i) => { 
             const headObj = {}
             headObj.name = i

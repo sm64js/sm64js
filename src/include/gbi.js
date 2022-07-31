@@ -254,6 +254,7 @@ export const G_IM_FMT_YUV	=  1
 export const G_IM_FMT_CI	= 2
 export const G_IM_FMT_IA =	3
 export const G_IM_FMT_I	=  4
+export const G_IM_FMT_DIRECT = 16
 
 /*
  * G_SETIMG siz: set image pixel size

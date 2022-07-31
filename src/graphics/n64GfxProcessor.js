@@ -414,13 +414,21 @@ export class n64GfxProcessor {
 
     }
 
+    import_texture_rgbaTrue(tile) {
+
+        WebGL.upload_texture(this.rdp.loaded_texture[tile].textureData.splice(4), ((this.rdp.loaded_texture[tile].textureData[0]<<8)+this.rdp.loaded_texture[tile].textureData[1])+1, ((this.rdp.loaded_texture[tile].textureData[2]<<8)+this.rdp.loaded_texture[tile].textureData[3])+1)
+
+    }
+
     import_texture(tile) {
         const fmt = this.rdp.texture_tile.fmt
         const siz = this.rdp.texture_tile.siz
 
         if (this.texture_cache_lookup(tile, this.rdp.loaded_texture[tile].textureData)) return
 
-        if (fmt == Gbi.G_IM_FMT_RGBA) {
+        if (fmt == Gbi.G_IM_FMT_DIRECT) {
+            this.import_texture_rgbaTrue(tile)
+        } else if (fmt == Gbi.G_IM_FMT_RGBA) {
             if (siz == Gbi.G_IM_SIZ_16b) {
                 this.import_texture_rgba16(tile)
             } else {

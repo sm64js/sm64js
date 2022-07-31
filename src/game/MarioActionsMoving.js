@@ -123,6 +123,10 @@ const update_walking_speed = (m) => {
 
     targetSpeed = m.intendedMag < maxTargetSpeed ? m.intendedMag : maxTargetSpeed
 
+    // Players with low deadzones/thresholds can start off with a much slower speed ~ watch?v=9DB2zWmJBgU
+    if (m.forwardVel <= 8.0) {
+        m.forwardVel = Math.min(m.intendedMag, 8.0)
+    }
     if (m.forwardVel <= 0.0) {
         m.forwardVel += 1.1
     } else if (m.forwardVel <= targetSpeed) {

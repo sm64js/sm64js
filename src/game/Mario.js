@@ -1628,12 +1628,12 @@ export const execute_mario_action = (m) => {
         update_mario_info_for_cam(m)
         mario_update_hitbox_and_cap_model(m)
 
-        if (m.floor.type == SurfaceTerrains.SURFACE_HORIZONTAL_WIND) {
+        if (m.floor && m.floor.type == SurfaceTerrains.SURFACE_HORIZONTAL_WIND) {
             // spawn_wind_particles(0, (m.floor.force << 8))
             play_sound(SOUND_ENV_WIND2, m.marioObj.header.gfx.cameraToObject);
         }
 
-        if (m.floor.type == SurfaceTerrains.SURFACE_VERTICAL_WIND) {
+        if (m.floor && m.floor.type == SurfaceTerrains.SURFACE_VERTICAL_WIND) {
             // spawn_wind_particles(1, 0)
             play_sound(SOUND_ENV_WIND2, m.marioObj.header.gfx.cameraToObject);
         }

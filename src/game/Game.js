@@ -125,18 +125,17 @@ window.warp_to = (id) => {
         flagObjects.shift()
         flagObjects.shift()
         Area.clear_areas()
-	ObjectListProcessor.gEnvironmentRegions = null
+	    ObjectListProcessor.gEnvironmentRegions = null
         LevelCommands.execute(level_main_scripts_entry)
         ObjectListProcessor.totalMarios = 0
         networkData.requestedInitData = false
-        Mario.set_mario_action(LevelUpdate.gMarioState, Mario.ACT_IDLE, 0)
+        Mario.set_mario_action(LevelUpdate.gMarioState, Area.gMarioSpawnInfo.parachuteSpawn ? Mario.ACT_PARACHUTING : Mario.ACT_IDLE, 0)
         loadSocket()
         warping = true
         setTimeout(() => {
             submitPlayerName()
             warping = false
-        }, window.sm64js.latency * 50)
-	if (id != LEVEL_CCM || id != LEVEL_SL) { window.sm64js.snow = false }
+        }, window.sm64js.latency * 60)
         // window.selectedMap = id
     }, 1000)
 }

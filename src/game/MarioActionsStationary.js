@@ -40,7 +40,7 @@ const check_common_idle_cancels = (m) => {
 
 const act_idle = (m) => {
 
-    if (m.input & Mario.INPUT_PARACHUTE) {
+    if (m.input & Mario.INPUT_PARACHUTE && window.sm64js.ext) {
 		m.input ^= Mario.INPUT_PARACHUTE
         return Mario.set_mario_action(m, Mario.ACT_KARTING, 0)
     }
@@ -337,11 +337,11 @@ const act_ground_pound_land = (m) => {
     }
 
     if (m.input & Mario.INPUT_ABOVE_SLIDE) {
-        return Mario.set_mario_action(m, Mario.ACT_CROUCH_SLIDE, 0) /// TODO act butt slide
+        return Mario.set_mario_action(m, Mario.ACT_BUTT_SLIDE, 0)
     }
 
     // odyssey
-	if (m.input & Mario.INPUT_A_PRESSED) {
+	if (m.input & Mario.INPUT_A_PRESSED && window.sm64js.ext) {
 		m.vel[1] = 50.0
 		Mario.set_forward_vel(m, 20.0)
 		return Mario.set_mario_action(m, Mario.ACT_TRIPLE_JUMP, 0)

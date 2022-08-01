@@ -34,7 +34,7 @@ window.sm64js = {
     snow: false,
     HUDHidden: false,
     widescreen: false,
-    redive: true,
+    ext: true,
     filter: 2,
     debug: {
         marioList: [],
@@ -380,6 +380,14 @@ document.getElementById("acceptRules").addEventListener('click', () => {
 window.deleteRom = () => {
     IDB.del('assets')
     window.location.href = window.location.href.replace("?autostart=1", "")
+}
+
+
+window.toggleChat = () => {
+    if (window.sm64js.widescreen) {
+        chatlog.hidden = !chatlog.hidden
+        chatbox.hidden = !chatbox.hidden
+    }
 }
 
 export const startGame = () => {

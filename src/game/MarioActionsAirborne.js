@@ -960,7 +960,7 @@ const act_jump = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 	
-    if (m.input & INPUT_PARACHUTE) {
+    if (m.input & INPUT_PARACHUTE && window.sm64js.ext) {
         m.input ^= INPUT_PARACHUTE
         return set_mario_action(m, ACT_PARACHUTING, 0)
     }
@@ -987,7 +987,7 @@ const act_freefall = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 	
-    if (m.input & INPUT_PARACHUTE) {
+    if (m.input & INPUT_PARACHUTE && window.sm64js.ext) {
 		m.input ^= INPUT_PARACHUTE
         return set_mario_action(m, ACT_PARACHUTING, 0)
     }
@@ -1010,7 +1010,7 @@ const act_freefall_rolling = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 	
-    if (m.input & INPUT_PARACHUTE) {
+    if (m.input & INPUT_PARACHUTE && window.sm64js.ext) {
 		m.input ^= INPUT_PARACHUTE
         return set_mario_action(m, ACT_PARACHUTING, 0)
     }
@@ -1167,7 +1167,7 @@ const act_side_flip = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 	
-    if (m.input & INPUT_PARACHUTE) {
+    if (m.input & INPUT_PARACHUTE && window.sm64js.ext) {
 		m.input ^= INPUT_PARACHUTE
         return set_mario_action(m, ACT_PARACHUTING, 0)
     }
@@ -1189,7 +1189,7 @@ const act_double_jump = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 	
-    if (m.input & INPUT_PARACHUTE) {
+    if (m.input & INPUT_PARACHUTE && window.sm64js.ext) {
 		m.input ^= INPUT_PARACHUTE
         return set_mario_action(m, ACT_PARACHUTING, 0)
     }
@@ -1210,7 +1210,7 @@ const act_triple_jump = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 	
-    if (m.input & INPUT_PARACHUTE) {
+    if (m.input & INPUT_PARACHUTE && window.sm64js.ext) {
 		m.input ^= INPUT_PARACHUTE
         return set_mario_action(m, ACT_PARACHUTING, 0)
     }
@@ -1231,7 +1231,7 @@ const act_wall_kick_air = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 	
-    if (m.input & INPUT_PARACHUTE && m.vel[1] < 0.0 && m.canGlide > 0) {
+    if (m.input & INPUT_PARACHUTE && m.vel[1] < 0.0 && m.canGlide > 0 && window.sm64js.ext) {
 		m.canGlide--
 		m.input ^= INPUT_PARACHUTE
         return set_mario_action(m, ACT_PARACHUTING, 0)
@@ -1308,7 +1308,7 @@ const act_twirling = (m) => {
 }
 
 const act_top_of_pole_jump = (m) => {
-    if (m.input & INPUT_PARACHUTE) {
+    if (m.input & INPUT_PARACHUTE && window.sm64js.ext) {
 		m.input ^= INPUT_PARACHUTE
         return set_mario_action(m, ACT_PARACHUTING, 0)
     }
@@ -1321,7 +1321,7 @@ const act_backflip = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 0)
     }
 	
-    if (m.input & INPUT_PARACHUTE) {
+    if (m.input & INPUT_PARACHUTE && window.sm64js.ext) {
 		m.input ^= INPUT_PARACHUTE
         return set_mario_action(m, ACT_PARACHUTING, 0)
     }
@@ -1339,7 +1339,7 @@ const act_long_jump = (m) => {
         animation = MARIO_ANIM_SLOW_LONGJUMP
     }
 
-    if (m.input & INPUT_PARACHUTE) {
+    if (m.input & INPUT_PARACHUTE && window.sm64js.ext) {
         m.input ^= INPUT_PARACHUTE
         return set_mario_action(m, ACT_PARACHUTING, 0)
     }
@@ -1386,7 +1386,7 @@ const act_dive = (m) => {
             break
         default: throw "unimplemented air step case in act dive"
     }
-    if (m.input & INPUT_PARACHUTE && m.vel[1] < -0.01 && m.canGlide > 0) {
+    if (m.input & INPUT_PARACHUTE && m.vel[1] < -0.01 && m.canGlide > 0 && window.sm64js.ext) {
 		m.canGlide--
 		m.input ^= INPUT_PARACHUTE
         return set_mario_action(m, ACT_PARACHUTING, 0)
@@ -1912,7 +1912,7 @@ const act_ground_pound = (m) => {
         }
     }
 	
-	if (m.input & INPUT_B_PRESSED && m.actionTimer > 8 && get_character_type(m) != 3) {
+	if (m.input & INPUT_B_PRESSED && m.actionTimer > 8 && get_character_type(m) != 3 && window.sm64js.ext) {
 		m.faceAngle[1] = m.intendedYaw
 		m.vel[1] = 45.0
 		set_forward_vel(m, 30.0)
@@ -1987,7 +1987,7 @@ const act_steep_jump = (m) => {
         return set_mario_action(m, ACT_DIVE, 0)
     }
 	
-    if (m.input & INPUT_PARACHUTE) {
+    if (m.input & INPUT_PARACHUTE && window.sm64js.ext) {
 		m.input ^= INPUT_PARACHUTE
         return set_mario_action(m, ACT_PARACHUTING, 0)
     }
@@ -2046,7 +2046,7 @@ const act_water_jump = (m) => {
         set_forward_vel(m, 15.0);
     }
 	
-    if (m.input & INPUT_PARACHUTE) {
+    if (m.input & INPUT_PARACHUTE && window.sm64js.ext) {
 		m.input ^= INPUT_PARACHUTE
         m.vel[1] = 50
         return set_mario_action(m, ACT_PARACHUTING, 0)

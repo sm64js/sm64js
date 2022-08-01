@@ -177,6 +177,10 @@ class LevelCommands {
     }
 
     set_background_music(settingsPreset, seq) {
+        document.getElementById("grass").pause()
+        document.getElementById("clouded").pause()
+        document.getElementById("jungle").pause()
+        document.getElementById("snow").pause()
         let m
         switch(seq) {
             case 3:

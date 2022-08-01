@@ -399,7 +399,7 @@ const act_walking = (m) => {
         return Mario.set_mario_action(m, Mario.ACT_BEGIN_SLIDING, 0)
     }
 	
-    if (m.input & Mario.INPUT_PARACHUTE) {
+    if (m.input & Mario.INPUT_PARACHUTE && window.sm64js.ext) {
 		m.input ^= Mario.INPUT_PARACHUTE
         return Mario.set_mario_action(m, Mario.ACT_KARTING, 0)
     }
@@ -1054,10 +1054,6 @@ const act_crouch_slide = (m) => {
         return Mario.set_jumping_action(m, Mario.ACT_JUMP, 0)
     }
 
-    if (m.input & Mario.INPUT_ABOVE_SLIDE) {
-        return Mario.set_mario_action(m, Mario.ACT_BUTT_SLIDE, 0)
-    }
-
     return common_slide_action_with_jump(m, Mario.ACT_CROUCHING, Mario.ACT_JUMP, Mario.ACT_FREEFALL,
         Mario.MARIO_ANIM_START_CROUCHING)
 }
@@ -1105,7 +1101,7 @@ const act_karting = (m) => {
 	}
 	if (!(m.input & Mario.INPUT_OFF_FLOOR)) {
 		//m.actionState = 0
-		if (m.input & Mario.INPUT_A_DOWN && !should_begin_sliding(m)) {
+		if ((m.input & Mario.INPUT_A_DOWN || m.input & Mario.INPUT_Z_DOWN) && !should_begin_sliding(m)) {
 			Vel += 1.3 * ((m.input & Mario.INPUT_Z_DOWN) ? -1 : 1)
 		} else {
 			Vel *= 0.95545
@@ -1208,11 +1204,11 @@ const f_vel_values = [30, 40, 50]
 
 const act_dive_slide = (m) => {
     if (!(m.input & Mario.INPUT_ABOVE_SLIDE)) {
-        if ((m.input & Mario.INPUT_A_PRESSED) || (m.input & Mario.INPUT_B_PRESSED && !window.sm64js.redive)) {
+        if ((m.input & Mario.INPUT_A_PRESSED) || (m.input & Mario.INPUT_B_PRESSED && !window.sm64js.ext)) {
             return Mario.set_mario_action(m, m.forwardVel > 0.0 ? Mario.ACT_FORWARD_ROLLOUT : Mario.ACT_BACKWARD_ROLLOUT, 0)
         }
     }
-    if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & Mario.INPUT_B_PRESSED) && window.sm64js.redive) {
+    if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & Mario.INPUT_B_PRESSED) && window.sm64js.ext) {
 		m.vel[1] = 16.0
 		Mario.set_forward_vel(m, f_vel_values[Mario.get_character_type(m)])
         return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
@@ -1344,7 +1340,7 @@ const act_move_punching = (m) => {
         apply_slope_decel(m, 0.5)
     } else {
         if ((m.forwardVel += 8.0) >= 0.0) {
-            m.forwardVel = Mario.get_character_type(m) == 1 ? 100 : 0.0
+            m.forwardVel = 0.0
         }
         apply_slope_accel(m)
     }

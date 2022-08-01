@@ -146,9 +146,8 @@ class LevelUpdate {
 
         }
 
-        if (Area.gCurrLevelNum == 5) {
-            window.sm64js.snow = true
-        }
+        // if (Area.gCurrLevelNum == 5) { window.sm64js.snow = true }
+        // else { window.sm64js.snow = false }
         
         return 1
     }

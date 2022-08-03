@@ -452,7 +452,7 @@ export const submitPlayerName = () => {
         pName = document.getElementById("discordNameBox").value
     } else { // Custom Name Option
         joinGameMsg.setUseDiscordName(false)
-        const applyValidCharacters(name) = document.getElementById("playerNameInput").value
+        const name = applyValidCharacters(document.getElementById("playerNameInput").value)
         pName = name
         if (name.length >= 3) {
             joinGameMsg.setName(name)

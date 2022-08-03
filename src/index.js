@@ -117,8 +117,7 @@ const on_anim_frame = (time) => {
             target_time = target_time + 1.0
         }
     }
-
-    if (window.kill) throw "stopping game execution"
+	
     requestAnimationFrame(on_anim_frame)
 
 }

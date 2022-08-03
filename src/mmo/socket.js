@@ -25,6 +25,31 @@ import { sendChatMsg } from "../player_input_manager"
 import { Howl, Howler } from "howler"
 import { gameStarted } from "../index"
 
+//Valid characters for usernames.
+const validCharacters = new Set([
+    'a', 'b', 'c', 'd', 'e', 'f', 'g',
+    'h', 'i', 'j', 'k', 'l', 'm', 'n',
+    'o', 'p', 'q', 'r', 's', 't', 'u',
+    'v', 'w', 'y', 'x', 'z', 'A', 'B',
+    'C', 'D', 'E', 'F', 'G', 'H', 'I',
+    'J', 'K', 'L', 'M', 'N', 'O', 'P',
+    'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+    'Y', 'X', 'Z', '1', '2', '3', '4',
+    '5', '6', '7', '8', '9', '0', '!',
+    '@', '$', '^', '*', '(', ')', '{',
+    '}', '[', ']', ';', ':', `'`, '"',
+    `\\`, ',', '.', '/', '?', '🙄', '😫',
+    '🤔', '🔥', '😌', '😍', '🤣', '❤️', '😭',
+    '😂', '⭐', '✨', '🎄', '🎃', '🔺', '🔻',
+    '🎄', '🍬', '🍭', '🍫', ' ',
+    '-', '_', '=', '|', '<', '>', ':', "'"
+]);
+
+
+const applyValidCharacters = (str) => {
+    return str.trim().split('').filter(c => validCharacters.has(c)).join('');
+}
+
 Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || myArrayBuffer
 
 function myArrayBuffer() {
@@ -427,7 +452,7 @@ export const submitPlayerName = () => {
         pName = document.getElementById("discordNameBox").value
     } else { // Custom Name Option
         joinGameMsg.setUseDiscordName(false)
-        const name = document.getElementById("playerNameInput").value
+        const applyValidCharacters(name) = document.getElementById("playerNameInput").value
         pName = name
         if (name.length >= 3) {
             joinGameMsg.setName(name)

@@ -6,7 +6,8 @@ import {
     check_common_action_exits, check_common_hold_action_exits, drop_and_set_mario_action,
     is_anim_past_end, set_jump_from_landing, set_jumping_action, set_mario_action,
     set_water_plunge_action, update_mario_sound_and_camera, play_sound_if_no_flag,
-    mario_set_forward_vel, play_mario_landing_sound_once, set_mario_anim_with_accel, ACT_GROUP_MASK, ACT_GROUP_STATIONARY, ACT_GROUP_MOVING, ACT_FLAG_RIDING_SHELL, ACT_FLAG_INVULNERABLE, MARIO_TELEPORTING
+    mario_set_forward_vel, play_mario_landing_sound_once, set_mario_anim_with_accel, ACT_GROUP_MASK, ACT_GROUP_STATIONARY, ACT_GROUP_MOVING, ACT_FLAG_RIDING_SHELL, ACT_FLAG_INVULNERABLE, MARIO_TELEPORTING,
+    set_anim_to_frame, play_sound_and_spawn_particles
 } from "./Mario"
 
 import { AreaInstance as Area } from "./Area"
@@ -137,7 +138,7 @@ import {
     MARIO_ANIM_SHOCKED, MARIO_ANIM_FORWARD_SPINNING, MARIO_ANIM_WALKING, MARIO_ANIM_DYING_ON_BACK,
     MARIO_ANIM_DYING_FALL_OVER, MARIO_ANIM_BACKWARD_AIR_KB, MARIO_ANIM_PUT_CAP_ON,
     MARIO_ANIM_STAR_DANCE, MARIO_ANIM_TAKE_CAP_OFF_THEN_ON, MARIO_ANIM_THROW_CATCH_KEY,
-    MARIO_ANIM_MISSING_CAP,
+    MARIO_ANIM_MISSING_CAP, MARIO_ANIM_SINGLE_JUMP,
 
     INPUT_IN_POISON_GAS,
 
@@ -1751,50 +1752,49 @@ export const act_putting_on_cap = (m) => {
     return 0
 }
 
-// void stuck_in_ground_handler(struct MarioState *m, let /*s32*/ animation, let /*s32*/ unstuckFrame, let /*s32*/ target2,
-//                              let /*s32*/ target3, let /*s32*/ endAction) {
-//     let /*s32*/ animFrame = set_mario_animation(m, animation)
+const stuck_in_ground_handler = (m, animation, unstuckFrame, target2, target3, endAction) => {
+    let /*s32*/ animFrame = set_mario_animation(m, animation)
 
-//     if (m.input & INPUT_A_PRESSED) {
-//         m.actionTimer++
-//         if (m.actionTimer >= 5 && animFrame < unstuckFrame - 1) {
-//             animFrame = unstuckFrame - 1
-//             set_anim_to_frame(m, animFrame)
-//         }
-//     }
+    if (m.input & INPUT_A_PRESSED) {
+        m.actionTimer++
+        if (m.actionTimer >= 5 && animFrame < unstuckFrame - 1) {
+            animFrame = unstuckFrame - 1
+            set_anim_to_frame(m, animFrame)
+        }
+    }
 
-//     stop_and_set_height_to_floor(m)
+    stop_and_set_height_to_floor(m)
 
-//     if (animFrame == -1) {
-//         play_sound_and_spawn_particles(m, SOUND_ACTION_TERRAIN_STUCK_IN_GROUND, 1)
-//     } else if (animFrame == unstuckFrame) {
+    if (animFrame == -1) {
+        play_sound_and_spawn_particles(m, SOUND_ACTION_TERRAIN_STUCK_IN_GROUND, 1)
+    } else if (animFrame == unstuckFrame) {
 // #ifdef VERSION_SH
 //         queue_rumble_data(5, 80)
 // #endif
-//         play_sound_and_spawn_particles(m, SOUND_ACTION_UNSTUCK_FROM_GROUND, 1)
-//     } else if (animFrame == target2 || animFrame == target3) {
-//         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
-//     }
+        play_sound_and_spawn_particles(m, SOUND_ACTION_UNSTUCK_FROM_GROUND, 1)
+    } else if (animFrame == target2 || animFrame == target3) {
+        play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+    }
 
-//     if (is_anim_at_end(m)) {
-//         set_mario_action(m, endAction, 0)
-//     }
-// }
+    if (is_anim_at_end(m)) {
+        set_mario_action(m, endAction, 0)
+    }
+}
 
-// export const act_head_stuck_in_ground = (m) => {
-//     stuck_in_ground_handler(m, MARIO_ANIM_HEAD_STUCK_IN_GROUND, 96, 105, 135, ACT_IDLE)
-//     return 0
-// }
+export const act_head_stuck_in_ground = (m) => {
+    stuck_in_ground_handler(m, MARIO_ANIM_HEAD_STUCK_IN_GROUND, 96, 105, 135, ACT_IDLE)
+    return 0
+}
 
-// export const act_butt_stuck_in_ground = (m) => {
-//     stuck_in_ground_handler(m, MARIO_ANIM_BOTTOM_STUCK_IN_GROUND, 127, 136, -2, ACT_GROUND_POUND_LAND)
-//     return 0
-// }
+export const act_butt_stuck_in_ground = (m) => {
+    stuck_in_ground_handler(m, MARIO_ANIM_BOTTOM_STUCK_IN_GROUND, 127, 136, -2, ACT_GROUND_POUND_LAND)
+    return 0
+}
 
-// export const act_feet_stuck_in_ground = (m) => {
-//     stuck_in_ground_handler(m, MARIO_ANIM_LEGS_STUCK_IN_GROUND, 116, 129, -2, ACT_IDLE)
-//     return 0
-// }
+export const act_feet_stuck_in_ground = (m) => {
+    stuck_in_ground_handler(m, MARIO_ANIM_LEGS_STUCK_IN_GROUND, 116, 129, -2, ACT_IDLE)
+    return 0
+}
 
 /**
  * advance_cutscene_step: Advances the current step in the current cutscene.

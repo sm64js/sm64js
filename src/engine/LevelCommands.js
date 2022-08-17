@@ -9,6 +9,8 @@ import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
 import { init_graph_node_start } from "./graph_node"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
 import { DEGREES } from "../game/Camera"
+import { MODEL_MARIO } from "../include/model_ids"
+import { mario_geo } from "../actors/mario/geo.inc"
 
 const SCRIPT_RUNNING = 1
 const SCRIPT_PAUSED = 0
@@ -65,10 +67,13 @@ class LevelCommands {
         GeoLayout.gObjParentGraphNode = init_graph_node_start(null, GeoLayout.gObjParentGraphNode)
         ObjectListProcessor.clear_objects()
         Area.clear_areas()
+        Area.gLoadedGraphNodes = new Array(256)
         this.sCurrentScript.index++
     }
 
     init_mario(model, bharg, bhscript) {
+        Area.gLoadedGraphNodes[MODEL_MARIO] = GeoLayout.process_geo_layout(mario_geo)
+        
         Object.assign(Area.gMarioSpawnInfo, {
             startPos: { x: 0, y: 0, z: 0 },
             startAngle: { x: 0, y: 0, z: 0 },

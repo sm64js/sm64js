@@ -85,7 +85,7 @@ import { GameInstance as Game } from "./Game"
 import { AreaInstance as Area } from "./Area"
 import * as MarioConstants from "../include/mario_constants"
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos, oPosY,
-    oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ, oMoveAngleYaw } from "../include/object_constants"
+    oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosZ, oMoveAngleYaw, oAction } from "../include/object_constants"
 import { atan2s, vec3f_dif, vec3f_length } from "../engine/math_util"
 import { sins, coss, int16, s16 } from "../utils"
 import { networkData, sendAttackToServer, hasFlag } from "../mmo/socket"
@@ -444,23 +444,17 @@ const mario_stop_riding_and_holding = (m) => {
 
     if (m.action == ACT_RIDING_HOOT) {
         m.usedObj.rawData[oInteractStatus] = 0
-        m.usedObj.rawData[oHootMarioReleaseTime] = window.sm64js.gGlobalTimer
+        // m.usedObj.rawData[oHootMarioReleaseTime] = window.sm64js.gGlobalTimer
     }
 }
 
 const interact_cannon_base = (m, o) => {
-    if (m.action != ACT_IN_CANNON) {
-        if (!hasFlag && m.health > 0x00) {
-            mario_stop_riding_and_holding(m)
-            o.rawData[oInteractStatus] = INT_STATUS_INTERACTED
-            m.interactObj = o
-            m.usedObj = o
-            return set_mario_action(m, ACT_IN_CANNON, 0)
-        } else {
-	    set_mario_action(m, ACT_FREEFALL, 0)
-            m.vel[1] = 80
-            m.forwardVel = -80
-        }
+    if (m.action != ACT_IN_CANNON && m.health > 0xff && o.rawData[oAction] == 0) {
+        mario_stop_riding_and_holding(m)
+        o.rawData[oInteractStatus] = INT_STATUS_INTERACTED
+        m.interactObj = o
+        m.usedObj = o
+        return set_mario_action(m, ACT_IN_CANNON, 0)
     }
 
     return 0

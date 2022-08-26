@@ -666,8 +666,8 @@ audio {
     box-sizing: border-box;
     width: 100%;
     height: 2rem;
-    font-family: 'TextboxFont';
-    font-size: 124%;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    font-size: 100%;
     text-shadow: none;
     z-index: 1;
 }
@@ -689,12 +689,13 @@ ul#creditsList li{
 
 #chatlog {
     background-color: #eae2a7;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
     height: 20em;
     max-height: 20em;
     text-align: left;
     color: black;
     font-style: normal;
-    font-size: 1.4em;
+    font-size: 1.1em;
     padding: 1em;
     margin-bottom: 0.2em;
     z-index: 4;

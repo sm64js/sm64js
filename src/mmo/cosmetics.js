@@ -305,7 +305,7 @@ Object.keys(window.myMario.skinData).forEach((skinType) => {
 })
 
 window.myMario.exportColors = () => {
-    console.log(JSON.stringify(window.myMario.skinData))
+    console.log("myMario.skinData = " + JSON.stringify(window.myMario.skinData))
 }
 window.myMario.saveSkin = () => {
     /// Save all

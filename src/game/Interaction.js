@@ -54,7 +54,10 @@ import { ACT_IDLE, ACT_PANTING, ACT_STANDING_AGAINST_WALL, ACT_CROUCHING, ACT_DI
 
 import { WARP_OP_WARP_OBJECT, WARP_OP_WARP_FLOOR } from "./LevelUpdate"
 
-import { SOUND_MARIO_EEUH, SOUND_MARIO_WAAAOOOW, SOUND_OBJ_BULLY_METAL, SOUND_MENU_STAR_SOUND, SOUND_MARIO_OOOF } from "../include/sounds"
+import { SOUND_MARIO_EEUH, SOUND_MARIO_WAAAOOOW, SOUND_OBJ_BULLY_METAL,
+         SOUND_MENU_STAR_SOUND, SOUND_MARIO_OOOF, SOUND_MARIO_ON_FIRE,
+         SOUND_MARIO_ATTACKED, SOUND_GENERAL_FLAME_OUT
+} from "../include/sounds"
 
 import {
     DIALOG_022, DIALOG_023, DIALOG_024, DIALOG_025, DIALOG_026, DIALOG_027, DIALOG_028, DIALOG_029
@@ -64,8 +67,7 @@ import * as MarioConstants from "../include/mario_constants"
 
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos,
          oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosY, oPosZ, oMoveAngleYaw,
-         oBehParams,
-         oForwardVel
+         oBehParams, oForwardVel, oMarioBurnTimer
 } from "../include/object_constants"
 
 import { atan2s, sqrtf } from "../engine/math_util"
@@ -93,7 +95,7 @@ import { save_file_get_flags, SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR,
     SAVE_FLAG_CAP_ON_KLEPTO,
     SAVE_FLAG_CAP_ON_UKIKI,
     save_file_collect_star_or_key,
- } from "./SaveFile"
+} from "./SaveFile"
 import { MODEL_NONE } from "../include/model_ids"
 
 
@@ -227,7 +229,7 @@ const check_lava_boost = (m) => {
             m.hurtCounter += (m.flags & MARIO_CAP_ON_HEAD) ? 12 : 18
         }
 
-        //update_mario_sound_and_camera(m)
+        update_mario_sound_and_camera(m)
         drop_and_set_mario_action(m, ACT_LAVA_BOOST, 0)
     }
 }
@@ -868,11 +870,11 @@ const interact_flame = (m, o) => {
 
         if ((m.action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER))
             || m.waterLevel - m.pos[1] > 50.0) {
-            //play_sound(SOUND_GENERAL_FLAME_OUT, m.marioObj.gfx.cameraToObject);
+            play_sound(SOUND_GENERAL_FLAME_OUT, m.marioObj.gfx.cameraToObject);
         } else {
-            m.marioObj.oMarioBurnTimer = 0
-            //update_mario_sound_and_camera(m)
-            //play_sound(SOUND_MARIO_ON_FIRE, m.marioObj.gfx.cameraToObject);
+            m.marioObj.rawData[oMarioBurnTimer] = 0
+            update_mario_sound_and_camera(m)
+            play_sound(SOUND_MARIO_ON_FIRE, m.marioObj.gfx.cameraToObject);
 
             if ((m.action & ACT_FLAG_AIR) && m.vel[1] <= 0.0) {
                 burningAction = ACT_BURNING_FALL
@@ -1019,13 +1021,13 @@ const interact_shock = (m, o) => {
         m.interactObj = o
 
         take_damage_from_interact_object(m)
-        //play_sound(SOUND_MARIO_ATTACKED, m.marioObj.gfx.cameraToObject);
+        play_sound(SOUND_MARIO_ATTACKED, m.marioObj.gfx.cameraToObject)
         //queue_rumble_data(70, 60)
 
         if (m.action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER)) {
             return drop_and_set_mario_action(m, ACT_WATER_SHOCKED, 0)
         } else {
-            //update_mario_sound_and_camera(m)
+            update_mario_sound_and_camera(m)
             return drop_and_set_mario_action(m, ACT_SHOCKED, actionArg)
         }
     }

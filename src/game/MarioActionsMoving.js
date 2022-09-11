@@ -65,7 +65,7 @@ import {
     oDeathSound, oSoundStateID,
     oDialogResponse, oDialogState,
 
-    oUnk1A8, oUnk94, oUnkBC, oUnkC0,
+    oUnk1A8, oUnk94, oUnkBC, oUnkC0, oMarioBurnTimer
 } from "../include/object_constants"
 
 import {
@@ -131,7 +131,8 @@ import {
     SOUND_ACTION_METAL_STEP, SOUND_ACTION_METAL_STEP_TIPTOE, SOUND_ACTION_QUICKSAND_STEP,
     SOUND_ACTION_TERRAIN_BODY_HIT_GROUND, SOUND_ACTION_TERRAIN_LANDING, SOUND_ACTION_TERRAIN_STEP,
     SOUND_ACTION_TERRAIN_STEP_TIPTOE, SOUND_MARIO_ATTACKED, SOUND_MARIO_HAHA, SOUND_MARIO_HOOHOO,
-    SOUND_MARIO_MAMA_MIA, SOUND_MARIO_OOOF2, SOUND_MARIO_UH2_2, SOUND_MOVING_TERRAIN_SLIDE
+    SOUND_MARIO_MAMA_MIA, SOUND_MARIO_OOOF2, SOUND_MARIO_UH2_2, SOUND_MOVING_TERRAIN_SLIDE,
+    SOUND_GENERAL_FLAME_OUT
 } from "../include/sounds"
 
 import { mtxf_align_terrain_triangle } from "../engine/math_util"
@@ -1126,13 +1127,13 @@ const act_burning_ground = (m) => {
         return set_mario_action(m, ACT_BURNING_JUMP, 0)
     }
 
-    m.marioObj.oMarioBurnTimer += 2
-    if (m.marioObj.oMarioBurnTimer > 160) {
+    m.marioObj.rawData[oMarioBurnTimer] += 2
+    if (m.marioObj.rawData[oMarioBurnTimer] > 160) {
         return set_mario_action(m, ACT_WALKING, 0)
     }
 
     if (m.waterLevel - m.floorHeight > 50.0) {
-        //play_sound(SOUND_GENERAL_FLAME_OUT, m.marioObj.header.gfx.cameraToObject);
+        play_sound(SOUND_GENERAL_FLAME_OUT, m.marioObj.header.gfx.cameraToObject);
         return set_mario_action(m, ACT_WALKING, 0)
     }
 

@@ -2,7 +2,7 @@ import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../include/config"
 import * as Gbi from "../include/gbi"
 import { guOrtho } from "../engine/math_util"
 import { GameInstance as Game } from "./Game"
-import { dl_hud_img_load_tex_block, dl_hud_img_begin, dl_hud_img_end, main_hud_lut, } from "../common_gfx/segment2"
+import { dl_hud_img_load_tex_block, dl_hud_img_begin, dl_hud_img_end, main_hud_lut, } from "../bin/segment2"
 
 class TextLabel {
     constructor(x, y, length, buffer) {

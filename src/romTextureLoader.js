@@ -785,7 +785,7 @@ import { texture_hud_char_0,
 
 
 
-          } from "./common_gfx/segment2"
+          } from "./bin/segment2"
 
 import { title_texture_0A0001C0,
          title_texture_0A000E40,

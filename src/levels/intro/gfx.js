@@ -1,7 +1,7 @@
 import * as MathUtil from "../../engine/math_util"
 import * as Gbi from "../../include/gbi"
 import * as LevelData from "./leveldata"
-import * as cGFX from "../../common_gfx/segment2"
+import * as cGFX from "../../bin/segment2"
 import * as TitleScreenBG from "./title_screen_bg"
 import { LAYER_OPAQUE } from "../../engine/GeoLayout"
 

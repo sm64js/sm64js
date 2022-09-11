@@ -12,7 +12,7 @@ import {
 import {
     dl_billboard_num_0, dl_billboard_num_1, dl_billboard_num_2, dl_billboard_num_3, dl_billboard_num_4, 
     dl_billboard_num_5, dl_billboard_num_6, dl_billboard_num_7, dl_billboard_num_8, dl_billboard_num_9
-} from "../../common_gfx/segment2"
+} from "../../bin/segment2"
 
 // 0x16000E14
 export const number_geo = () => {return [

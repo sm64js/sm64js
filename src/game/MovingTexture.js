@@ -26,7 +26,7 @@ import { bitfs_movtex_tris_lava_first_section, bitfs_movtex_tris_lava_second_sec
 
 import { GeoLayoutInstance as GeoLayout, LAYER_TRANSPARENT_INTER, LAYER_OPAQUE, LAYER_TRANSPARENT } from "../engine/GeoLayout"
 import * as Gbi from "../include/gbi"
-import { dl_waterbox_rgba16_begin, dl_waterbox_end, dl_draw_quad_verts_0123, texture_waterbox_water, texture_waterbox_lava, texture_waterbox_jrb_water, texture_waterbox_unknown_water, texture_waterbox_mist } from "../common_gfx/segment2"
+import { dl_waterbox_rgba16_begin, dl_waterbox_end, dl_draw_quad_verts_0123, texture_waterbox_water, texture_waterbox_lava, texture_waterbox_jrb_water, texture_waterbox_unknown_water, texture_waterbox_mist } from "../bin/segment2"
 import { ROTATE_CLOCKWISE, TEXTURE_MIST, TEXTURE_WATER, TEXTURE_JRB_WATER, TEX_QUICKSAND_SSL, TEX_PYRAMID_SAND_SSL, TEXTURE_LAVA } from "../include/moving_texture_macros"
 import { make_vertex } from "./GeoMisc"
 

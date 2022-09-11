@@ -16,7 +16,7 @@ import { atan2s } from "../engine/math_util"
 import { dl_proj_mtx_fullscreen, dl_transition_draw_filled_region,
 	texture_transition_star_half, texture_transition_circle_half,
 	texture_transition_mario, texture_transition_bowser_half,
-	dl_draw_quad_verts_0123, dl_screen_transition_end, matrix_identity, matrix_fullscreen } from "../common_gfx/segment2"
+	dl_draw_quad_verts_0123, dl_screen_transition_end, matrix_identity, matrix_fullscreen } from "../bin/segment2"
 import { round_float, make_vertex } from "./GeoMisc"
 
 const canvas = document.querySelector('#gameCanvas')

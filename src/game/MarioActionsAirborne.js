@@ -1724,7 +1724,7 @@ export const act_shot_from_cannon = (m) => {
             break
     }
 
-    if (/*(m.flags & MARIO_WING_CAP) &&*/ m.vel[1] < 0.0) {  // JOE DEBUG
+    if ((m.flags & MARIO_WING_CAP) && m.vel[1] < 0.0) {
         set_mario_action(m, ACT_FLYING, 0)
     }
 
@@ -1748,16 +1748,16 @@ export const act_flying = (m) => {
         return set_mario_action(m, ACT_GROUND_POUND, 1)
     }
 
-    if (false /*!(m.flags & MARIO_WING_CAP)*/) {  // JOE DEBUG
+    if (!(m.flags & MARIO_WING_CAP)) {
         if (m.area.camera.mode == CAMERA.CAMERA_MODE_BEHIND_MARIO) {
             Camera.set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
         }
         return set_mario_action(m, ACT_FREEFALL, 0)
     }
 
-    // if (m.area.camera.mode != CAMERA.CAMERA_MODE_BEHIND_MARIO) {
-    //     Camera.set_camera_mode(m.area.camera, CAMERA.CAMERA_MODE_BEHIND_MARIO, 1)
-    // }
+    if (m.area.camera.mode != CAMERA.CAMERA_MODE_BEHIND_MARIO) {
+        Camera.set_camera_mode(m.area.camera, CAMERA.CAMERA_MODE_BEHIND_MARIO, 1)
+    }
 
     if (m.actionState == 0) {
         if (m.actionArg == 0) {

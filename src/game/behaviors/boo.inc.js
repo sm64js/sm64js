@@ -900,7 +900,7 @@ export const bhv_boo_in_castle_loop = () => {
         }
 
         if (o.rawData[oDistanceToMario] < 1000.0) {
-            o.rawData[oAction++]
+            o.rawData[oAction]++
             cur_obj_play_sound_2(SOUND_OBJ_BOO_LAUGH_LONG);
         }
 

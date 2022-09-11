@@ -6,10 +6,10 @@ import { cur_obj_play_sound_2 } from "../SpawnSound"
 import { s16, random_float } from "../../utils"
 import { atan2s } from "../../engine/math_util"
 import { oPosX, oPosY, oPosZ, oVelY, oMoveAngleYaw, oForwardVel, oHomeX, oHomeY, oHomeZ, oAction,
-oTimer, oInteractStatus, oInteractionSubtype, oGravity, oFriction, oBuoyancy } from "../../include/object_constants"
+         oTimer, oInteractStatus, oInteractionSubtype, oGravity, oFriction, oBuoyancy, oAngleToMario } from "../../include/object_constants"
 import { MODEL_YOSHI } from "../../include/model_ids"
 import { SOUND_GENERAL_YOSHI_WALK, SOUND_GENERAL_ENEMY_ALERT1, SOUND_GENERAL_COLLECT_1UP,
-SOUND_MENU_YOSHI_GAIN_LIVES } from "../../include/sounds"
+         SOUND_MENU_YOSHI_GAIN_LIVES } from "../../include/sounds"
 import { INT_SUBTYPE_NPC, INT_STATUS_INTERACTED } from "../Interaction"
 import { ACTIVE_FLAG_DEACTIVATED } from "../../include/object_constants"
 

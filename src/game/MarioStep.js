@@ -136,14 +136,14 @@ const check_ledge_grab = (m, wall, intendedPos, nextPos) => {
     const ledgeFloor = {}
     const ledgePos = new Array(3)
 
-    if (m.vel[1] > 0) {  return 0 }
+    if (m.vel[1] > 0) {  return false }
 
     const displacementX = nextPos[0] - intendedPos[0]
     const displacementZ = nextPos[2] - intendedPos[2]
 
     // Only ledge grab if the wall displaced mario in the opposite direction of
     // his velocity.
-    if (displacementX * m.vel[0] + displacementZ * m.vel[2] > 0.0) { return 0 }
+    if (displacementX * m.vel[0] + displacementZ * m.vel[2] > 0.0) { return false }
 
     //! Since the search for floors starts at y + 160, we will sometimes grab
     // a higher ledge than expected (glitchy ledge grab)
@@ -151,9 +151,9 @@ const check_ledge_grab = (m, wall, intendedPos, nextPos) => {
     ledgePos[2] = nextPos[2] - wall.normal.z * 60.0
     ledgePos[1] = SurfaceCollision.find_floor(ledgePos[0], nextPos[1] + 160.0, ledgePos[2], ledgeFloor)
 
-    if (ledgeFloor.floor == null) return 0
+    if (ledgeFloor.floor == null) return false
 
-    if (ledgePos[1] - nextPos[1] <= 100.0) return 0
+    if (ledgePos[1] - nextPos[1] <= 100.0) return false
 
     m.pos = [...ledgePos]
     m.floor = ledgeFloor.floor
@@ -163,7 +163,7 @@ const check_ledge_grab = (m, wall, intendedPos, nextPos) => {
 
     m.faceAngle[0] = 0
     m.faceAngle[1] = atan2s(wall.normal.z, wall.normal.x) + 0x8000
-    return 1
+    return true
 }
 
 
@@ -412,5 +412,5 @@ export const stationary_ground_step = (m) => {
     m.marioObj.gfx.pos = [...m.pos]
     m.marioObj.gfx.angle = [0, m.faceAngle[1], 0]
 
-    return 0
+    return false
 }

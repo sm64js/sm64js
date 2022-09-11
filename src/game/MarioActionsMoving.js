@@ -515,7 +515,7 @@ const act_walking = (m) => {
     }
 
     if (check_ground_dive_or_punch(m)) {
-        return 1
+        return true
     }
 
     if (m.input & INPUT_UNKNOWN_5) {
@@ -553,7 +553,7 @@ const act_walking = (m) => {
 
     check_ledge_climb_down(m)
     tilt_body_walking(m, startYaw)
-    return 0
+    return false
 }
 
 const slide_bonk = (m, fastAction, slowAction) => {
@@ -604,7 +604,7 @@ const act_braking = (m) => {
     }
 
     set_mario_animation(m, MARIO_ANIM_SKID_ON_GROUND)
-    return 0
+    return false
 }
 
 const update_decelerating_speed = (m) => {
@@ -633,7 +633,7 @@ const act_decelerating = (m) => {
         }
 
         if (check_ground_dive_or_punch(m)) {
-            return 1
+            return true
         }
 
         if (m.input & INPUT_NONZERO_ANALOG) {
@@ -678,7 +678,7 @@ const act_decelerating = (m) => {
         play_step_sound(m, 10, 49)
     }
 
-    return 0
+    return false
 }
 
 export const act_hold_decelerating = (m) => {
@@ -744,7 +744,7 @@ export const act_hold_decelerating = (m) => {
         play_step_sound(m, 12, 62)
     }
 
-    return 0
+    return false
 }
 
 const begin_walking_action = (m, forwardVel, action, actionArg) => {
@@ -795,7 +795,7 @@ const act_turning_around = (m) => {
         }
     }
 
-    return 0
+    return false
 }
 
 const act_finish_turning_around = (m) => {
@@ -812,7 +812,7 @@ const act_finish_turning_around = (m) => {
         set_mario_action(m, ACT_WALKING, 0)
 
     m.marioObj.gfx.angle[1] += 0x8000
-    return 0
+    return false
 }
 
 const apply_landing_accel = (m, frictionFactor) => {
@@ -864,48 +864,48 @@ const common_landing_cancels = (m, landingAction, setAPressAction) => {
 
 const act_jump_land = (m) => {
     if (common_landing_cancels(m, sJumpLandAction, set_jumping_action)) {
-        return 1
+        return true
     }
 
     common_landing_action(m, MARIO_ANIM_LAND_FROM_SINGLE_JUMP, ACT_FREEFALL)
-    return 0
+    return false
 }
 
 const act_freefall_land = (m) => {
     if (common_landing_cancels(m, sFreefallLandAction, set_jumping_action)) {
-        return 1
+        return true
     }
 
     common_landing_action(m, MARIO_ANIM_GENERAL_LAND, ACT_FREEFALL)
-    return 0
+    return false
 }
 
 const act_side_flip_land = (m) => {
     if (common_landing_cancels(m, sSideFlipLandAction, set_jumping_action)) {
-        return 1
+        return true
     }
 
     if (common_landing_action(m, MARIO_ANIM_SLIDEFLIP_LAND, ACT_FREEFALL) != GROUND_STEP_HIT_WALL) {
         m.marioObj.gfx.angle[1] = s16(m.marioObj.gfx.angle[1] + 0x8000)
     }
 
-    return 0
+    return false
 }
 
 const act_double_jump_land = (m) => {
     if (common_landing_cancels(m, sDoubleJumpLandAction, set_triple_jump_action)) {
-        return 1
+        return true
     }
 
     common_landing_action(m, MARIO_ANIM_LAND_FROM_DOUBLE_JUMP, ACT_FREEFALL)
-    return 0
+    return false
 }
 
 const act_triple_jump_land = (m) => {
     m.input &= ~INPUT_A_PRESSED
 
     if (common_landing_cancels(m, sTripleJumpLandAction, set_jumping_action)) {
-        return 1
+        return true
     }
 
     if (!(m.input & INPUT_NONZERO_ANALOG)) {
@@ -913,7 +913,7 @@ const act_triple_jump_land = (m) => {
     }
 
     common_landing_action(m, MARIO_ANIM_TRIPLE_JUMP_LAND, ACT_FREEFALL)
-    return 0
+    return false
 }
 
 const act_backflip_land = (m) => {
@@ -922,7 +922,7 @@ const act_backflip_land = (m) => {
     }
 
     if (common_landing_cancels(m, sBackflipLandAction, set_jumping_action)) {
-        return 1
+        return true
     }
 
     if (!(m.input & INPUT_NONZERO_ANALOG)) {
@@ -930,7 +930,7 @@ const act_backflip_land = (m) => {
     }
 
     common_landing_action(m, MARIO_ANIM_TRIPLE_JUMP_LAND, ACT_FREEFALL)
-    return 0
+    return false
 }
 
 const update_sliding_angle = (m, accel, lossFactor) => {
@@ -1118,7 +1118,7 @@ const common_slide_action_with_jump = (m, stopAction, jumpAction, airAction, ani
     }
 
     common_slide_action(m, stopAction, airAction, animation)
-    return 0
+    return false
 
 }
 
@@ -1198,7 +1198,7 @@ const stomach_slide_action = (m, stopAction, airAction, animation) => {
     }
 
     common_slide_action(m, stopAction, airAction, animation);
-    return 0
+    return false
 }
 
 const push_or_sidle_wall = (m, startPos) => {
@@ -1305,11 +1305,11 @@ export const act_hold_jump_land = (m) => {
     }
 
     if (common_landing_cancels(m, sHoldJumpLandAction, set_jumping_action)) {
-        return 1
+        return true
     }
 
     common_landing_action(m, MARIO_ANIM_JUMP_LAND_WITH_LIGHT_OBJ, ACT_HOLD_FREEFALL)
-    return 0
+    return false
 }
 
 export const act_hold_freefall_land = (m) => {
@@ -1318,11 +1318,11 @@ export const act_hold_freefall_land = (m) => {
     }
 
     if (common_landing_cancels(m, sHoldFreefallLandAction, set_jumping_action)) {
-        return 1
+        return true
     }
 
     common_landing_action(m, MARIO_ANIM_FALL_LAND_WITH_LIGHT_OBJ, ACT_HOLD_FREEFALL)
-    return 0
+    return false
 }
 
 const act_long_jump_land = (m) => {
@@ -1331,7 +1331,7 @@ const act_long_jump_land = (m) => {
     }
 
     if (common_landing_cancels(m, sLongJumpLandAction, set_jumping_action)) {
-        return 1
+        return true
     }
 
     if (!(m.input & INPUT_NONZERO_ANALOG)) {
@@ -1342,7 +1342,7 @@ const act_long_jump_land = (m) => {
                           !m.marioObj.oMarioLongJumpIsSlow ? MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP
                                                              : MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP,
                           ACT_FREEFALL)
-    return 0
+    return false
 }
 
 const act_dive_slide = (m) => {
@@ -1358,11 +1358,10 @@ const act_dive_slide = (m) => {
     }
 
     common_slide_action(m, ACT_STOMACH_SLIDE_STOP, ACT_FREEFALL, MARIO_ANIM_DIVE)
-    return 0
+    return false
 }
 
 const should_begin_sliding = (m) => {
-
     if (window.cheats.disableSlopePhysics) return
 
     if (m.input & INPUT_ABOVE_SLIDE) {
@@ -1370,11 +1369,11 @@ const should_begin_sliding = (m) => {
         const movingBackward = m.forwardVel <= -1.0
 
         if (slideLevel || movingBackward || mario_facing_downhill(m, false)) {
-            return 1
+            return true
         }
     }
 
-    return 0
+    return false
 }
 
 const check_ground_dive_or_punch = (m) => {
@@ -1387,7 +1386,7 @@ const check_ground_dive_or_punch = (m) => {
         return set_mario_action(m, ACT_MOVE_PUNCHING, 0)
     }
 
-    return 0
+    return false
 }
 
 const act_crawling = (m) => {
@@ -1400,7 +1399,7 @@ const act_crawling = (m) => {
     }
 
     if (check_ground_dive_or_punch(m)) {
-        return 1
+        return true
     }
 
     if (m.input & INPUT_UNKNOWN_5) {
@@ -1432,7 +1431,7 @@ const act_crawling = (m) => {
     const val04 = parseInt(m.intendedMag * 2.0 * 0x10000)
     set_mario_anim_with_accel(m, MARIO_ANIM_CRAWLING, val04)
     play_step_sound(m, 26, 79)
-    return 0
+    return false
 }
 
 const act_move_punching = (m) => {
@@ -1466,7 +1465,7 @@ const act_move_punching = (m) => {
             break
     }
 
-    return 0
+    return false
 }
 
 export const act_hold_walking = (m) => {
@@ -1520,7 +1519,7 @@ export const act_hold_walking = (m) => {
         m.particleFlags |= PARTICLE_DUST
     }
 
-    return 0
+    return false
 }
 
 export const act_hold_heavy_walking = (m) => {
@@ -1553,7 +1552,7 @@ export const act_hold_heavy_walking = (m) => {
     }
 
     anim_and_audio_for_heavy_walk(m)
-    return 0
+    return false
 }
 
 const act_slide_kick_slide = (m) => {
@@ -1578,7 +1577,7 @@ const act_slide_kick_slide = (m) => {
 
     play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.gfx.cameraToObject);
     m.particleFlags |= PARTICLE_DUST
-    return 0
+    return false
 }
 
 const common_ground_knockback_action = (m, animation, arg2, arg3, arg4) => {
@@ -1631,22 +1630,22 @@ const common_ground_knockback_action = (m, animation, arg2, arg3, arg4) => {
 
 export const act_forward_ground_kb = (m) => {
     common_ground_knockback_action(m, MARIO_ANIM_FORWARD_KB, 0x14, true, m.actionArg)
-    return 0
+    return false
 }
 
 export const act_backward_ground_kb = (m) => {
     common_ground_knockback_action(m, MARIO_ANIM_BACKWARD_KB, 0x16, true, m.actionArg)
-    return 0
+    return false
 }
 
 export const act_soft_forward_ground_kb = (m) => {
     common_ground_knockback_action(m, MARIO_ANIM_SOFT_FRONT_KB, 0x64, false, m.actionArg)
-    return 0
+    return false
 }
 
 export const act_soft_backward_ground_kb = (m) => {
     common_ground_knockback_action(m, MARIO_ANIM_SOFT_BACK_KB, 0x64, false, m.actionArg)
-    return 0
+    return false
 }
 
 export const act_hard_backward_ground_kb = (m) => {
@@ -1664,12 +1663,12 @@ export const act_hard_backward_ground_kb = (m) => {
         play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_LANDING)
     }
 
-    return 0
+    return false
 }
 
 export const act_hard_forward_ground_kb = (m) => {
     const val04 = common_ground_knockback_action(m, MARIO_ANIM_LAND_ON_STOMACH, 0x15, true, m.actionArg)
-    return 0
+    return false
 }
 
 const act_ground_bonk = (m) => {
@@ -1678,7 +1677,7 @@ const act_ground_bonk = (m) => {
     if (animFrame == 32) {
         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
     }
-    return 0
+    return false
 }
 
 const act_death_exit_land = (m) => {
@@ -1700,7 +1699,7 @@ const act_death_exit_land = (m) => {
         set_mario_action(m, ACT_IDLE, 0)
     }
 
-    return 0
+    return false
 }
 
 const common_landing_action = (m, animation, airAction) => {
@@ -1758,18 +1757,18 @@ const check_common_moving_cancels = (m) => {
         }
     }
 
-    return 0
+    return false
 }
 
 export const mario_execute_moving_action = (m) => {
     let cancel
 
     if (check_common_moving_cancels(m)) {
-        return 1
+        return true
     }
     
     // if (mario_update_quicksand(m, 0.25)) {
-    //     return 1
+    //     return true
     // }
 
     switch (m.action) {

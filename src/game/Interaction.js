@@ -277,7 +277,7 @@ const interact_coin = (m, o) => {
         /// TODO spawn star
     }
 
-    return 0
+    return false
 }
 
 const interact_star_or_key = (m, /*interactType,*/ o) => {
@@ -385,7 +385,7 @@ export const interact_warp = (m, o) => {
         }
     }
 
-    return 0
+    return false
 }
 
 export const interact_warp_door = (m, o) => {
@@ -406,7 +406,7 @@ export const interact_warp_door = (m, o) => {
                 }
                 sDisplayingDoorText = 1
 
-                return 0
+                return false
             }
 
             doorAction = ACT_UNLOCKING_KEY_DOOR
@@ -415,13 +415,13 @@ export const interact_warp_door = (m, o) => {
         if (warpDoorId == 2 && !(saveFlags & SAVE_FLAG_UNLOCKED_BASEMENT_DOOR)) {
             if (!(saveFlags & SAVE_FLAG_HAVE_KEY_1)) {
                 if (!sDisplayingDoorText) {
-                      // Moat door skip was intended confirmed
+                    // Moat door skip was intended confirmed
                     set_mario_action(m, ACT_READING_AUTOMATIC_DIALOG,
                                      (saveFlags & SAVE_FLAG_HAVE_KEY_2) ? DIALOG_023 : DIALOG_022)
                 }
                 sDisplayingDoorText = 1
 
-                return 0
+                return false
             }
 
             doorAction = ACT_UNLOCKING_KEY_DOOR
@@ -444,7 +444,7 @@ export const interact_warp_door = (m, o) => {
         }
     }
 
-    return 0
+    return false
 }
 
 export const get_door_save_file_flag = (door) => {
@@ -551,7 +551,7 @@ export const interact_door = (m, o) => {
         return set_mario_action(m, ACT_ENTERING_STAR_DOOR, should_push_or_pull_door(m, o))
     }
 
-    return 0
+    return false
 }
 
 const interact_cannon_base = (m, o) => {
@@ -563,7 +563,7 @@ const interact_cannon_base = (m, o) => {
         return set_mario_action(m, ACT_IN_CANNON, 0)
     }
 
-    return 0
+    return false
 }
 
 const interact_bounce_top = (m, o) => {
@@ -590,24 +590,24 @@ const interact_bounce_top = (m, o) => {
         }
 
     } else if (take_damage_and_knock_back(m, o)) {
-        return 1
+        return true
     }
 
     if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
         sDelayInvincTimer = 1
     }
-    return 0
+    return false
 
 }
 
 const interact_damage = (m, o) => {
-    if (take_damage_and_knock_back(m, o)) return 1
+    if (take_damage_and_knock_back(m, o)) return true
 
     if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
         sDelayInvincTimer = 1
     }
 
-    return 0
+    return false
 }
 
 const interact_breakable = (m, o) => {
@@ -629,22 +629,22 @@ const interact_breakable = (m, o) => {
                 break
         }
 
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 const interact_mr_blizzard = (m, o) => {
     if (take_damage_and_knock_back(m, o)) {
-        return 1
+        return true
     }
 
     if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
         sDelayInvincTimer = 1
     }
 
-    return 0
+    return false
 }
 
 
@@ -695,10 +695,10 @@ export const interact_cap = (m, o) => {
             play_cap_music(capMusic)
         }
 
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 const interact_grabbable = (m, o) => {
@@ -710,7 +710,7 @@ const interact_grabbable = (m, o) => {
         if (interaction & (INT_KICK | INT_TRIP)) {
             attack_object(o, interaction)
             bounce_back_from_attack(m, interaction)
-            return 0
+            return false
         }
     }
 
@@ -724,7 +724,7 @@ const interact_grabbable = (m, o) => {
         if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_NOT_GRABBABLE)) {
             m.interactObj = o
             m.input |= INPUT_INTERACT_OBJ_GRABBABLE
-            return 1
+            return true
         }
     }
 
@@ -732,7 +732,7 @@ const interact_grabbable = (m, o) => {
         push_mario_out_of_object(m, o, -5.0)
     }
 
-    return 0
+    return false
 }
 
 
@@ -740,22 +740,22 @@ const mario_can_talk = (m, arg) => {
     let val6
 
     if ((m.action & ACT_FLAG_IDLE) != 0x00000000) {
-        return 1
+        return true
     }
 
     if (m.action == ACT_WALKING) {
         if (arg) {
-            return 1
+            return true
         }
 
         val6 = m.marioObj.gfx.unk38.animID
 
         if (val6 == 0x0080 || val6 == 0x007F || val6 == 0x006C) {
-            return 1
+            return true
         }
     }
 
-    return 0
+    return false
 }
 
 const check_read_sign = (m, o) => {
@@ -775,7 +775,7 @@ const check_read_sign = (m, o) => {
         }
     }
 
-    return 0
+    return false
 }
 
 const check_npc_talk = (m, o) => {
@@ -793,7 +793,7 @@ const check_npc_talk = (m, o) => {
     }
 
     push_mario_out_of_object(m, o, -10.0)
-    return 0
+    return false
 }
 
 const interact_text = (m, o) => {
@@ -855,7 +855,7 @@ const interact_pole = (m, o) => {
         }
     }
 
-    return 0
+    return false
 }
 
 const interact_flame = (m, o) => {
@@ -1043,15 +1043,15 @@ const able_to_grab_object = (m, o) => {
 
     if (action == ACT_DIVE_SLIDE || action == ACT_DIVE) {
         if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_GRABS_MARIO)) {
-            return 1
+            return true
         }
     } else if (action == ACT_PUNCHING || action == ACT_MOVE_PUNCHING) {
         if (m.actionArg < 2) {
-            return 1
+            return true
         }
     }
 
-    return 0
+    return false
 }
 
 export const mario_obj_angle_to_object = (m, o) => {
@@ -1261,7 +1261,7 @@ export const get_mario_cap_flag = (capObject) => {
         return MARIO_VANISH_CAP
     }
 
-    return 0
+    return false
 }
 
 
@@ -1277,10 +1277,10 @@ const object_facing_mario = (m, o, angleRange) => {
     let dAngle = s16(angleToMario - o.rawData[oMoveAngleYaw])
 
     if (-angleRange <= dAngle && dAngle <= angleRange) {
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 
@@ -1463,7 +1463,7 @@ export const take_damage_and_knock_back = (m, o) => {
 
     }
 
-    return 0
+    return false
 
 }
 

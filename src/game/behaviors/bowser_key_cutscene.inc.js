@@ -7,7 +7,7 @@ export const geo_scale_bowser_key = (run, node) => {
         let obj = gLinker.GeoRenderer.gCurGraphNodeObject.object
         node.next.scale = obj.rawData[oBowserKeyScale]
     }
-    return 0
+    return false
 }
 
 // void bhv_bowser_key_unlock_door_loop(void) {

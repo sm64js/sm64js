@@ -37,6 +37,7 @@ class Area {
         this.gCurrLevelNum = 0
         this.gCurrCourseNum = 0
         this.gSavedCourseNum = 0
+        this.gCurrSaveFileNum = 1
         this.gLoadedGraphNodes = new Array(256)
 
         this.D_8032CE74 = null

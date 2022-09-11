@@ -43,10 +43,10 @@ const coin_step = (collisionFlagsPtr) => {
 
     if ((collisionFlagsPtr.value & 0x1) != 0 && (collisionFlagsPtr.value & 0x8) == 0) {
         ///cur_obj_play_sound_2(SOUND_GENERAL_COIN_DROP)
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 const moving_coin_flicker = () => {

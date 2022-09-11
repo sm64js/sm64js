@@ -36,7 +36,7 @@ export const lvl_init_act_selector_values_and_stars = () => {
         sObtainedStars--
     }
 
-    return 0
+    return false
 }
 
 /**

@@ -125,7 +125,7 @@ export const mario_update_punch_sequence = (m) => {
 
             if (m.marioObj.gfx.unk38.animFrame >= 2) {
                 if (mario_check_object_grab(m)) {
-                   return 1
+                   return true
                 }
 
                 m.flags |= MARIO_PUNCHING
@@ -215,7 +215,7 @@ export const mario_update_punch_sequence = (m) => {
             break
     }
 
-    return 0
+    return false
 }
 
 const act_punching = (m) => {
@@ -239,7 +239,7 @@ const act_punching = (m) => {
 
     mario_update_punch_sequence(m)
     perform_ground_step(m)
-    return 0
+    return false
 }
 
 const act_picking_up = (m) => {
@@ -277,7 +277,7 @@ const act_picking_up = (m) => {
     }
 
     stationary_ground_step(m)
-    return 0
+    return false
 }
 
 const act_dive_picking_up = (m) => {
@@ -297,7 +297,7 @@ const act_dive_picking_up = (m) => {
     }
 
     animated_stationary_ground_step(m, MARIO_ANIM_STOP_SLIDE_LIGHT_OBJ, ACT_HOLD_IDLE)
-    return 0
+    return false
 }
 
 const act_placing_down = (m) => {
@@ -314,7 +314,7 @@ const act_placing_down = (m) => {
     }
 
     animated_stationary_ground_step(m, MARIO_ANIM_PLACE_LIGHT_OBJ, ACT_IDLE)
-    return 0
+    return false
 }
 
 const act_throwing = (m) => {
@@ -337,7 +337,7 @@ const act_throwing = (m) => {
     }
 
     animated_stationary_ground_step(m, MARIO_ANIM_GROUND_THROW, ACT_IDLE)
-    return 0
+    return false
 }
 
 const act_heavy_throw = (m) => {
@@ -356,7 +356,7 @@ const act_heavy_throw = (m) => {
     }
 
     animated_stationary_ground_step(m, MARIO_ANIM_HEAVY_THROW, ACT_IDLE)
-    return 0
+    return false
 }
 
 const act_stomach_slide_stop = (m) => {
@@ -373,7 +373,7 @@ const act_stomach_slide_stop = (m) => {
     }
 
     animated_stationary_ground_step(m, MARIO_ANIM_SLOW_LAND_FROM_DIVE, ACT_IDLE)
-    return 0
+    return false
 }
 
 const act_picking_up_bowser = (m) => {
@@ -391,7 +391,7 @@ const act_picking_up_bowser = (m) => {
     }
 
     stationary_ground_step(m)
-    return 0
+    return false
 }
 
 const act_holding_bowser = (m) => {
@@ -466,7 +466,7 @@ const act_holding_bowser = (m) => {
         m.marioObj.gfx.angle[0] = m.angleVel[1]
     }
 
-    return 0
+    return false
 }
 
 const act_releasing_bowser = (m) => {
@@ -480,7 +480,7 @@ const act_releasing_bowser = (m) => {
 
     m.angleVel[1] = 0
     animated_stationary_ground_step(m, MARIO_ANIM_RELEASE_BOWSER, ACT_IDLE)
-    return 0
+    return false
 }
 
 const check_common_object_cancels = (m) => {
@@ -497,18 +497,18 @@ const check_common_object_cancels = (m) => {
         return drop_and_set_mario_action(m, ACT_STANDING_DEATH, 0)
     }
 
-    return 0
+    return false
 }
 
 export const mario_execute_object_action = (m) => {
     let /*s32*/ cancel
 
     if (check_common_object_cancels(m)) {
-        return 1
+        return true
     }
 
     // if (mario_update_quicksand(m, 0.5)) {
-    //     return 1
+    //     return true
     // }
 
     switch (m.action) {

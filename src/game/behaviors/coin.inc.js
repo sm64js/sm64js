@@ -31,18 +31,16 @@ const sYellowCoinHitbox = {
 }
 
 const bhv_coin_sparkles_init = () => {
-
     const o = ObjectListProc.gCurrentObject
 
     if (o.rawData[oInteractStatus] & INT_STATUS_INTERACTED && !(o.rawData[oInteractStatus] & INT_STATUS_TOUCHED_BOB_OMB)) {
         spawn_object(o, MODEL_SPARKLES, bhvGoldenCoinSparkles)
         obj_mark_for_deletion(o)
-        return 1
+        return true
     }
 
     o.rawData[oInteractStatus] = 0
-    return 0
-
+    return false
 }
 
 const bhv_yellow_coin_init = () => {

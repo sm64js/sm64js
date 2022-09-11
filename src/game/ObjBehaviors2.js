@@ -63,9 +63,9 @@ export const approach_number_ptr = (o, px, target, delta) => {
 
     if ((o[px] - target) * delta >= 0) {
         o[px] = target
-        return 1
+        return true
     }
-    return 0
+    return false
 }
 
 export const obj_grow_then_shrink = (scaleVel, shootFireScale, endScale) => {
@@ -85,11 +85,11 @@ export const obj_grow_then_shrink = (scaleVel, shootFireScale, endScale) => {
             return -1
         } else if (scaleVel != 0.0 /*&& o.gfx.scale[0] < shootFireScale*/) {
             scaleVel = 0.0;
-            return 1
+            return true
         }
     }
 
-    return 0
+    return false
 }
 
 export const oscillate_toward = (valueObj, velObj, target, velCloseToZero, accel, slowdown) => {
@@ -102,7 +102,7 @@ export const oscillate_toward = (valueObj, velObj, target, velCloseToZero, accel
             && velObj.value < velCloseToZero)) {
         valueObj.value = target
         velObj.value = 0.0
-        return 1
+        return true
     } else {
         if (valueObj.value >= target) {
             accel = -accel
@@ -114,7 +114,7 @@ export const oscillate_toward = (valueObj, velObj, target, velCloseToZero, accel
         velObj.value += accel
     }
 
-    return 0
+    return false
 }
 
 export const approach_f32_ptr = (px, target, delta) => {
@@ -138,10 +138,10 @@ export const obj_move_pitch_approach = (target, delta) => {
     o.rawData[oMoveAnglePitch] = approach_symmetric(o.rawData[oMoveAnglePitch], target, delta)
 
     if (int16(o.rawData[oMoveAnglePitch]) == target) {
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 export const obj_face_pitch_approach = (target, delta) => {
@@ -150,10 +150,10 @@ export const obj_face_pitch_approach = (target, delta) => {
     o.rawData[oFaceAnglePitch] = approach_symmetric(o.rawData[oFaceAnglePitch], target, delta)
 
     if (int16(o.rawData[oFaceAnglePitch]) == target) {
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 export const obj_face_roll_approach = (targetRoll, deltaRoll) => {
@@ -161,10 +161,10 @@ export const obj_face_roll_approach = (targetRoll, deltaRoll) => {
     o.rawData[oFaceAngleRoll] = approach_s16_symmetric(o.rawData[oFaceAngleRoll], targetRoll, deltaRoll);
 
     if (o.rawData[oFaceAngleRoll] == targetRoll) {
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 export const obj_face_yaw_approach = (targetYaw, deltaYaw) => {
@@ -172,10 +172,10 @@ export const obj_face_yaw_approach = (targetYaw, deltaYaw) => {
     o.rawData[oFaceAngleYaw] = approach_s16_symmetric(o.rawData[oFaceAngleYaw], targetYaw, deltaYaw)
 
     if (o.rawData[oFaceAngleYaw] == targetYaw) {
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 export const obj_get_pitch_from_vel = () => {
@@ -297,10 +297,10 @@ export const clamp_s16 = (value, minimum, maximum) => {
     } else if (value >= maximum) {
         value = maximum;
     } else {
-        return 0;
+        return 0
     }
 
-    return 1;
+    return true
 }
 
 export const clamp_f32 = (value, minimum, maximum) => {
@@ -355,10 +355,10 @@ export const obj_bounce_off_walls_edges_objects = (targetYawWrapper) => {
     } else if (o.rawData[oMoveFlags] & OBJ_MOVE_HIT_EDGE) {
         targetYawWrapper.value = int16(o.rawData[oMoveAngleYaw] + 0x8000)
     } else if (!obj_resolve_object_collisions(targetYawWrapper)) {
-        return 0
+        return false
     }
 
-    return 1
+    return true
 }
 
 export const obj_resolve_object_collisions = (targetYawWrapper) => {
@@ -392,21 +392,21 @@ export const obj_resolve_object_collisions = (targetYawWrapper) => {
                 // Bounce off object (or it would, if the above atan2s bug
                 // were fixed)
                 targetYawWrapper.value = parseInt(angle - o.rawData[oMoveAngleYaw] + angle + 0x8000)
-                return 1
+                return true
             }
         }
     }
 
-    return 0
+    return false
 }
 
 export const obj_resolve_collisions_and_turn = (targetYaw, turnSpeed) => {
     obj_resolve_object_collisions({})
 
     if (cur_obj_rotate_yaw_toward(targetYaw, turnSpeed)) {
-        return 0
+        return false
     } else {
-        return 1
+        return true
     }
 }
 
@@ -508,7 +508,7 @@ export const obj_act_squished = (baseScale) => {
 export const obj_update_standard_actions = (scale) => {
     const o = ObjectListProc.gCurrentObject
 
-    if (o.rawData[oAction] < 100) return 1
+    if (o.rawData[oAction] < 100) return true
     else {
         cur_obj_become_intangible()
 
@@ -522,8 +522,7 @@ export const obj_update_standard_actions = (scale) => {
                 break
         }
 
-        return 0
-
+        return false
     }
 
 }
@@ -564,7 +563,7 @@ export const obj_check_attacks = (hitbox, attackedMarioAction) => {
 
     //! Dies immediately if above lava
     if (false) {
-        return 1
+        return true
     } else if (o.rawData[oInteractStatus] & INT_STATUS_INTERACTED) {
         if (o.rawData[oInteractStatus] & INT_STATUS_ATTACKED_MARIO) {
             if (o.rawData[oAction] != attackedMarioAction) {
@@ -580,7 +579,7 @@ export const obj_check_attacks = (hitbox, attackedMarioAction) => {
     }
 
     o.rawData[oInteractStatus] = 0
-    return 0
+    return false
 }
 
 export const obj_handle_attacks = (hitbox, attackedMarioAction, attackHandlers) => {
@@ -614,7 +613,7 @@ export const obj_handle_attacks = (hitbox, attackedMarioAction, attackHandlers) 
     }
 
     o.rawData[oInteractStatus] = 0
-    return 0
+    return false
 
 }
 

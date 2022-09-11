@@ -34,10 +34,10 @@ const cap_set_hitbox = () => {
     if (o.rawData[oInteractStatus] & INT_STATUS_INTERACTED) {
         o.activeFlags = ACTIVE_FLAG_DEACTIVATED
         o.rawData[oInteractStatus] = 0
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 const cap_despawn = () => {

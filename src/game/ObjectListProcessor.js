@@ -213,7 +213,7 @@ class ObjectListProcessor {
 
         }
 
-        return 0
+        return false
     }
 
     unload_deactivated_objects() {

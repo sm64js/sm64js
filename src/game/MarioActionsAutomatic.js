@@ -175,7 +175,7 @@ const act_grab_pole_slow = (m) => {
         //add_tree_leaf_particles(m) TODO
     }
 
-    return 0
+    return false
 }
 
 const act_grab_pole_fast = (m) => {
@@ -197,7 +197,7 @@ const act_grab_pole_fast = (m) => {
         //add_tree_leaf_particles(m) TODO
     }
 
-    return 0
+    return false
 
 }
 
@@ -246,7 +246,7 @@ const act_holding_pole = (m) => {
         Mario.set_mario_animation(m, Mario.MARIO_ANIM_IDLE_ON_POLE)
     }
 
-    return 0
+    return false
 }
 
 const act_climbing_pole = (m) => {
@@ -273,7 +273,7 @@ const act_climbing_pole = (m) => {
         //add_tree_leaf_particles(m) TODO
     }
 
-    return 0
+    return false
 }
 
 const act_start_hanging = (m) => {
@@ -304,7 +304,7 @@ const act_start_hanging = (m) => {
         Mario.set_mario_action(m, Mario.ACT_HANGING, 0)
     }
 
-    return 0
+    return false
 
 }
 
@@ -333,7 +333,7 @@ const act_hanging = (m) => {
 
     update_hang_stationary(m)
 
-    return 0
+    return false
 }
 
 const act_hang_moving = (m) => {
@@ -371,7 +371,7 @@ const act_hang_moving = (m) => {
         Mario.set_mario_action(m, Mario.ACT_FREEFALL, 0)
     }
 
-    return 0
+    return false
 }
 
 const let_go_of_ledge = (m) => {
@@ -442,7 +442,7 @@ const act_ledge_grab = (m) => {
     stop_and_set_height_to_floor(m)
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_IDLE_ON_LEDGE)
 
-    return 0
+    return false
 }
 
 
@@ -490,7 +490,7 @@ const act_ledge_climb_down = (m) => {
     update_ledge_climb(m, Mario.MARIO_ANIM_CLIMB_DOWN_LEDGE, Mario.ACT_LEDGE_GRAB)
     m.actionArg = 1
 
-    return 0
+    return false
 }
 
 const act_ledge_climb_slow = (m) => {
@@ -514,7 +514,7 @@ const act_ledge_climb_slow = (m) => {
         m.action = Mario.ACT_LEDGE_CLIMB_SLOW_2
     }
 
-    return 0
+    return false
 }
 
 const act_ledge_climb_fast = (m) => {
@@ -531,7 +531,7 @@ const act_ledge_climb_fast = (m) => {
     }
     update_ledge_climb_camera(m)
 
-    return 0
+    return false
 }
 
 const act_grabbed = (m) => {
@@ -566,7 +566,7 @@ const act_top_of_pole_transition = (m) => {
     }
 
     set_pole_position(m, Mario.return_mario_anim_y_translation(m))
-    return 0
+    return false
 }
 
 const act_top_of_pole = (m) => {
@@ -582,7 +582,7 @@ const act_top_of_pole = (m) => {
 
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_HANDSTAND_IDLE)
     set_pole_position(m, Mario.return_mario_anim_y_translation(m))
-    return 0
+    return false
 }
 
 const act_in_cannon = (m) => {
@@ -656,7 +656,7 @@ const act_in_cannon = (m) => {
 
                 Mario.set_mario_action(m, Mario.ACT_SHOT_FROM_CANNON, 0)
                 m.usedObj.rawData[oAction] = 2
-                return 0
+                return false
             } else {
                 if (m.faceAngle[0] != startFacePitch || m.faceAngle[1] != startFaceYaw) {
                     play_sound(SOUND_MOVING_AIM_CANNON, m.marioObj.gfx.cameraToObject)
@@ -669,7 +669,7 @@ const act_in_cannon = (m) => {
     vec3s_set(m.marioObj.gfx.angle, 0, m.faceAngle[1], 0)
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_DIVE)
 
-    return 0
+    return false
 }
 
 export const mario_execute_automatic_action = (m) => {

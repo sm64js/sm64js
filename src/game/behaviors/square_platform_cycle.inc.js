@@ -7,9 +7,9 @@ const square_plat_set_yaw_until_timer = (yaw, a) => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oMoveAngleYaw] = yaw
     if (a < o.rawData[oTimer])
-        return 1
+        return true
     else
-        return 0
+        return false
 }
 
 export const bhv_squarish_path_moving_loop = () => {

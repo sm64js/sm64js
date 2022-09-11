@@ -47,7 +47,7 @@ export const jrb_movtex_water = [
 ];
 
 // 0x0700D2E4, appears if you enter the course the first time, then it disappears when you grab the first star
-const jrb_movtex_intial_mist_data = [
+const jrb_movtex_initial_mist_data = [
     MOV_TEX_INIT_LOAD(    1),
     MOV_TEX_ROT_SPEED(   20),
     MOV_TEX_ROT_SCALE(   10),
@@ -62,8 +62,8 @@ const jrb_movtex_intial_mist_data = [
 ].flat();
 
 // 0x0700D304
-export const jrb_movtex_intial_mist = [
-    {id: 51, movtex: jrb_movtex_intial_mist_data},
+export const jrb_movtex_initial_mist = [
+    {id: 51, movtex: jrb_movtex_initial_mist_data},
     {id: -1, movtex: null},
 ];
 

@@ -94,13 +94,13 @@ export const increment_velocity_toward_range = (value, center, zeroThreshold, in
     let relative = value - center;
     if (relative > 0) {
         if (relative < zeroThreshold) {
-            return 0;
+            return 0
         } else {
             return -increment;
         }
     } else {
         if (relative > -zeroThreshold) {
-            return 0;
+            return 0
         } else {
             return increment;
         }
@@ -143,9 +143,9 @@ export const cur_obj_has_model = (modelID) => {
     const o = ObjectListProc.gCurrentObject
 
     if (o.gfx.sharedChild == gLinker.Area.gLoadedGraphNodes[modelID]) {
-        return 1
+        return true
     } else {
-        return 0
+        return false
     }
 }
 
@@ -330,9 +330,9 @@ export const cur_obj_check_anim_frame = (frame) => {
 
     const animFrame = o.gfx.unk38.animFrame
     if (animFrame == frame) {
-        return 1
+        return true
     } else {
-        return 0
+        return false
     }
 }
 
@@ -341,9 +341,9 @@ export const cur_obj_check_anim_frame_in_range = (startFrame, rangeLength) => {
     let /*s32*/ animFrame = o.gfx.unk38.animFrame
 
     if (animFrame >= startFrame && animFrame < startFrame + rangeLength) {
-        return 1
+        return true
     } else {
-        return 0
+        return false
     }
 }
 
@@ -353,28 +353,28 @@ export const cur_obj_check_anim_frame_in_range = (startFrame, rangeLength) => {
 
 //     while (*a0 != -1) {
 //         if (*a0 == sp6) {
-//             return 1
+//             return true
 //         }
 
 //         a0++
 //     }
 
-//     return 0
+//     return false
 // }
 
 export const mario_is_in_air_action = () => {
     if (LevelUpdate.gMarioState.action & ACT_FLAG_AIR) {
-        return 1
+        return true
     } else {
-        return 0
+        return false
     }
 }
 
 export const mario_is_dive_sliding = () => {
     if (LevelUpdate.gMarioState.action == ACT_DIVE_SLIDE) {
-        return 1
+        return true
     } else {
-        return 0
+        return false
     }
 }
 
@@ -709,13 +709,13 @@ export const cur_obj_detect_steep_floor = (steepAngleDegrees) => {
             return 2
         } else if (intendedFloor.normal.y < steepNormalY && deltaFloorHeight > 0 && intendedFloorHeight > o.rawData[oPosY]) {
             o.rawData[oWallAngle] = atan2s(intendedFloor.normal.z, intendedFloor.normal.x)
-            return 1
+            return true
         } else {
-            return 0
+            return false
         }
     }
 
-    return 0
+    return false
 }
 
 export const cur_obj_resolve_wall_collisions = () => {
@@ -744,15 +744,15 @@ export const cur_obj_resolve_wall_collisions = () => {
 
             o.rawData[oWallAngle] = atan2s(wall.normal.z, wall.normal.x)
             if (abs_angle_diff(o.rawData[oWallAngle], o.rawData[oMoveAngleYaw]) > 0x4000) {
-                return 1
+                return true
             } else {
-                return 0
+                return false
             }
 
         }
     }
 
-    return 0
+    return false
 }
 
 export const cur_obj_update_floor_height_and_get_floor = () => {
@@ -906,9 +906,9 @@ export const cur_obj_rotate_yaw_toward = (target, increment) => {
 
     o.rawData[oAngleVelYaw] = parseInt(o.rawData[oMoveAngleYaw] - startYaw)
     if ((o.rawData[oAngleVelYaw]) == 0) {
-        return 1
+        return true
     } else {
-        return 0
+        return false
     }
 }
 
@@ -1003,33 +1003,33 @@ export const cur_obj_move_xz = (steepSlopeNormalY, careAboutEdgesAndSteepSlopes)
     if (o.rawData[oRoom] != -1 && intendedFloorWrapper.floor) {
         if (intendedFloorWrapper.floor.room != 0 && o.rawData[oRoom] != intendedFloorWrapper.floor.room && intendedFloorWrapper.floor.room != 18) {
             // Don't leave native room
-            return 0
+            return false
         }
     }
 
     if (intendedFloorHeight < -10000.0) {
         // Don't move into OoB
         o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_EDGE
-        return 0
+        return false
     } else if (deltaFloorHeight < 5.0) {
         if (!careAboutEdgesAndSteepSlopes) {
             // If we don't care about edges or steep slopes, okay to move
             o.rawData[oPosX] = intendedX
             o.rawData[oPosZ] = intendedZ
-            return 1
+            return true
         } else if (deltaFloorHeight < -50.0 && (o.rawData[oMoveFlags] & OBJ_MOVE_ON_GROUND)) {
             // Don't walk off an edge
             o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_EDGE
-            return 0
+            return false
         } else if (intendedFloorWrapper.floor.normal.y > steepSlopeNormalY) {
             // Allow movement onto a slope, provided it's not too steep
             o.rawData[oPosX] = intendedX
             o.rawData[oPosZ] = intendedZ
-            return 1
+            return true
         } else {
             // We are likely trying to move onto a steep downward slope
             o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_EDGE
-            return 0
+            return false
         }
     } else if ((intendedFloorWrapper.floor.normal.y) > steepSlopeNormalY || o.rawData[oPosY] > intendedFloorHeight) {
         // Allow movement upward, provided either:
@@ -1042,7 +1042,7 @@ export const cur_obj_move_xz = (steepSlopeNormalY, careAboutEdgesAndSteepSlopes)
     }
 
     // We are likely trying to move onto a steep upward slope
-    return 0
+    return false
 }
 
 export const cur_obj_move_y = (gravity, bounciness, buoyancy) => {
@@ -1160,11 +1160,11 @@ export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
 export const cur_obj_is_mario_ground_pounding_platform = () => {
     if (ObjectListProc.gMarioObject.platform == ObjectListProc.gCurrentObject) {
         if (LevelUpdate.gMarioState.action == ACT_GROUND_POUND_LAND) {
-            return 1
+            return true
         }
     }
 
-    return 0
+    return false
 }
 
 export const obj_turn_toward_object = (obj, target, angleIndex, turnAmount) => {
@@ -1212,11 +1212,11 @@ export const obj_attack_collided_from_other_object = (obj) => {
 
         if (other != ObjectListProc.gMarioObject) {
             other.rawData[oInteractStatus] |= ATTACK_PUNCH | INT_STATUS_WAS_ATTACKED | INT_STATUS_INTERACTED | INT_STATUS_TOUCHED_BOB_OMB
-            return 1
+            return true
         }
     }
 
-    return 0
+    return false
 }
 
 export const cur_obj_was_attacked_or_ground_pounded = () => {
@@ -1542,9 +1542,9 @@ export const cur_obj_check_if_at_animation_end = () => {
     let lastFrame = o.gfx.unk38.curAnim.unk08 - 1
 
     if (animFrame == lastFrame) {
-        return 1
+        return true
     } else {
-        return 0
+        return false
     }
 }
 
@@ -1710,11 +1710,11 @@ export const obj_set_angle = (obj, pitch, yaw, roll) => {
 export const cur_obj_within_12k_bounds = () => {
     const o = ObjectListProc.gCurrentObject
 
-    if (o.rawData[oPosX] < -12000 || 12000 < o.rawData[oPosX]) return 0
-    if (o.rawData[oPosY] < -12000 || 12000 < o.rawData[oPosY]) return 0
-    if (o.rawData[oPosZ] < -12000 || 12000 < o.rawData[oPosZ]) return 0
+    if (o.rawData[oPosX] < -12000 || 12000 < o.rawData[oPosX]) return false
+    if (o.rawData[oPosY] < -12000 || 12000 < o.rawData[oPosY]) return false
+    if (o.rawData[oPosZ] < -12000 || 12000 < o.rawData[oPosZ]) return false
 
-    return 1
+    return true
 }
 
 export const cur_obj_enable_rendering = () => {
@@ -1751,9 +1751,9 @@ export const cur_obj_clear_interact_status_flag = (flag) => {
     const o = ObjectListProc.gCurrentObject
     if (o.rawData[oInteractStatus] & flag) {
         o.rawData[oInteractStatus] &= flag ^ ~(0)
-        return 1
+        return true
     }
-    return 0
+    return false
 }
 
 export const obj_mark_for_deletion = (obj) => {

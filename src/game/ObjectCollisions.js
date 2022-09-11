@@ -34,10 +34,10 @@ const detect_object_hitbox_overlap = (a, b) => {
         let sp20 = a.hitboxHeight + sp3C
         let sp1C = b.hitboxHeight + sp38
 
-        if (sp3C > sp1C) return 0
-        if (sp20 < sp38) return 0
-        if (a.numCollidedObjs >= 4) return 0
-        if (b.numCollidedObjs >= 4) return 0
+        if (sp3C > sp1C) return false
+        if (sp20 < sp38) return false
+        if (a.numCollidedObjs >= 4) return false
+        if (b.numCollidedObjs >= 4) return false
 
         a.collidedObjs.push(b)
         b.collidedObjs.push(a)
@@ -48,8 +48,7 @@ const detect_object_hitbox_overlap = (a, b) => {
         a.collidedObjInteractTypes |= b.rawData[oInteractType]
         b.collidedObjInteractTypes |= a.rawData[oInteractType]
 
-        return 1
-
+        return true
     }
 }
 
@@ -69,15 +68,14 @@ const detect_object_hurtbox_overlap = (a, b) => {
         let sp20 = a.hitboxHeight + sp3C
         let sp1C = b.hurtboxHeight + sp38
 
-        if (sp3C > sp1C) return 0
-        if (sp20 < sp38) return 0
+        if (sp3C > sp1C) return false
+        if (sp20 < sp38) return false
 
         if (a == ObjectListProc.gMarioObject) {
             b.rawData[oInteractionSubtype] &= ~INT_SUBTYPE_DELAY_INVINCIBILITY
         }
 
-        return 1
-
+        return true
     }
 }
 

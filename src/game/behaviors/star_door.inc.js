@@ -27,7 +27,7 @@ export const bhv_star_door_loop = () => {
                 o.rawData[oAction] = 1
             break
         case 1:
-            if (o.rawData[oTimer] == 0 && (s16)(o.rawData[oMoveAngleYaw]) >= 0) {
+            if (o.rawData[oTimer] == 0 && s16(o.rawData[oMoveAngleYaw]) >= 0) {
                 //cur_obj_play_sound_2(SOUND_GENERAL_STAR_DOOR_OPEN);
                 //queue_rumble_data(35, 30);
             }
@@ -42,7 +42,7 @@ export const bhv_star_door_loop = () => {
                 o.rawData[oAction]++
             break
         case 3:
-            if (o.rawData[oTimer] == 0 && (s16)(o.rawData[oMoveAngleYaw]) >= 0) {
+            if (o.rawData[oTimer] == 0 && s16(o.rawData[oMoveAngleYaw]) >= 0) {
                 //cur_obj_play_sound_2(SOUND_GENERAL_STAR_DOOR_CLOSE);
                 //queue_rumble_data(35, 30);
             }

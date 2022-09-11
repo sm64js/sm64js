@@ -15,14 +15,14 @@ const CANNON_TRAP_DOOR_ACT_OPEN = 3
 
 
 const save_file_is_cannon_unlocked = () => {
-    return 1
+    return true
 }
 
 const bhv_cannon_closed_init = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     let cannon
 
-    if (save_file_is_cannon_unlocked() == 1) {
+    if (save_file_is_cannon_unlocked()) {
         // If the cannon is open, spawn a cannon and despawn the object.
         cannon = spawn_object(o, MODEL_CANNON_BASE, 'bhvCannon')
         cannon.rawData[oBehParams2ndByte] = o.rawData[oBehParams2ndByte]

@@ -51,7 +51,7 @@ import {
 
     mario_butt_dl,  mario_cap_unused_base_bottom_dl,  mario_cap_unused_base_dl, 
     mario_cap_unused_base_top_dl,  mario_cap_unused_dl,  mario_cap_unused_m_logo_dl, 
-    mario_cap_wings_unused_end_dl,  mario_cap_wings_unused_intial_dl,  mario_eyes_cap_off_dl, 
+    mario_cap_wings_unused_end_dl,  mario_cap_wings_unused_initial_dl,  mario_eyes_cap_off_dl, 
     mario_eyes_cap_on_dl,  mario_face_back_hair_cap_on_dl,  mario_face_cap_dl, 
     mario_face_cap_off_dl,  mario_face_cap_on_dl,  mario_face_hair_cap_off_dl, 
     mario_face_part_cap_off_dl,  mario_face_part_cap_on_dl,  mario_hair_sideburn_cap_off_dl, 
@@ -88,7 +88,7 @@ import {
     mario_right_hand_cap_hand_position_dl,  mario_right_hand_cap_m_logo_dl, 
     mario_right_hand_cap_top_dl,  mario_right_hand_cap_wings_end_dl, 
     mario_right_hand_cap_wings_half_1_dl,  mario_right_hand_cap_wings_half_2_dl, 
-    mario_right_hand_cap_wings_intial_dl,  mario_right_hand_closed_dl,  mario_right_hand_open_dl, 
+    mario_right_hand_cap_wings_initial_dl,  mario_right_hand_closed_dl,  mario_right_hand_open_dl, 
     mario_right_hand_peace_shared_dl,  mario_right_leg_shared_dl,  mario_right_thigh_shared_dl, 
     mario_torso_dl,  mario_tshirt_shared_dl,  mario_wings_half_1_dl,  mario_wings_half_1_unused_dl, 
     mario_wings_half_2_dl,  mario_wings_half_2_unused_dl,  mario_yellow_button_dl, 

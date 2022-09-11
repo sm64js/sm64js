@@ -613,7 +613,7 @@ class Camera {
 
         yaw = this.gPlayerCameraState.faceAngle[1] + yawOff
         c.focus[0] = this.gPlayerCameraState.pos[0] + forwBack * sins(yaw) + leftRight * coss(yaw)
-        c.focus[1] = this.gPlayerCameraState.pos[1] + yOff + focFloorYOff
+        c.focus[1] = LevelUpdate.gMarioState.floorHeight + yOff + focFloorYOff // hack
         c.focus[2] = this.gPlayerCameraState.pos[2] + forwBack * coss(yaw) + leftRight * sins(yaw)
     }
 
@@ -2038,7 +2038,7 @@ class Camera {
     start_object_cutscene_without_focus(cutscene) {
         this.sObjectCutscene = cutscene
         this.sCutsceneDialogResponse = DIALOG_RESPONSE_NONE
-        return 0
+        return false
     }
 
     cutscene_object_with_dialog(cutscene, o, dialogID) {
@@ -3931,11 +3931,11 @@ class Camera {
      * Ends the door cutscene. Sets the camera mode to close mode unless the default is free roam.
      */
     cutscene_door_end(c) {
-        // if (c.defMode == CAMERA_MODE_FREE_ROAM) {
+        if (c.defMode == CAMERA_MODE_FREE_ROAM) {
             c.mode = CAMERA_MODE_FREE_ROAM
-        // } else {
-        //     c.mode = CAMERA_MODE_CLOSE
-        // }
+        } else {
+            c.mode = CAMERA_MODE_CLOSE
+        }
 
         c.cutscene = 0
         this.gCutsceneTimer = CUTSCENE_STOP
@@ -4026,7 +4026,7 @@ class Camera {
             }
         }
 
-        return 0
+        return false
     }
 
     set_environmental_camera_shake(shake) {

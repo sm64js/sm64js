@@ -63,6 +63,7 @@ import {
 
     INPUT_A_PRESSED, INPUT_ABOVE_SLIDE, INPUT_B_PRESSED, INPUT_FIRST_PERSON, INPUT_IN_WATER,
     INPUT_NONZERO_ANALOG, INPUT_OFF_FLOOR, INPUT_SQUISHED, INPUT_STOMPED, INPUT_Z_DOWN,
+    INPUT_IN_POISON_GAS,
 
     MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP, MARIO_ANIM_CROUCH_FROM_SLIDE_KICK,
     MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP, MARIO_ANIM_CROUCHING, MARIO_ANIM_GENERAL_LAND,
@@ -113,7 +114,7 @@ const check_common_idle_cancels = (m) => {
         return set_mario_action(m, ACT_START_CROUCHING, 0)
     }
 
-    return 0
+    return false
 }
 
 const check_common_hold_idle_cancels = (m) => {
@@ -156,13 +157,16 @@ const check_common_hold_idle_cancels = (m) => {
         return drop_and_set_mario_action(m, ACT_START_CROUCHING, 0)
     }
 
-    return 0
+    return false
 }
 
 const act_idle = (m) => {
+    if (m.input & INPUT_IN_POISON_GAS) {
+        return set_mario_action(m, ACT_COUGHING, 0)
+    }
 
     if (check_common_idle_cancels(m)) {
-        return 1
+        return true
     }
 
     if (m.actionArg & 1) {
@@ -183,7 +187,7 @@ const act_idle = (m) => {
 
     stationary_ground_step(m)
 
-    return 0
+    return false
 }
 
 const stopping_step = (m, animId, action) => {
@@ -208,7 +212,7 @@ const act_braking_stop = (m) => {
     }
 
     stopping_step(m, MARIO_ANIM_STOP_SKID, ACT_IDLE)
-    return 0
+    return false
 }
 
 
@@ -216,7 +220,7 @@ const landing_step = (m, arg1, action) => {
     stationary_ground_step(m)
     set_mario_animation(m, arg1)
     if (is_anim_at_end(m)) return set_mario_action(m, action, 0)
-    return 0
+    return false
 }
 
 const check_common_landing_cancels = (m, action) => {
@@ -237,14 +241,14 @@ const check_common_landing_cancels = (m, action) => {
         return set_mario_action(m, ACT_PUNCHING, 0)
     }
 
-    return 0
+    return false
 }
 
 const act_jump_land_stop = (m) => {
-    if (check_common_landing_cancels(m, 0)) return 1
+    if (check_common_landing_cancels(m, 0)) return true
 
     landing_step(m, MARIO_ANIM_LAND_FROM_SINGLE_JUMP, ACT_IDLE)
-    return 0
+    return false
 }
 
 const act_hold_idle = (m) => {
@@ -261,12 +265,12 @@ const act_hold_idle = (m) => {
     }
 
     if (check_common_hold_idle_cancels(m)) {
-        return 1
+        return true
     }
 
     stationary_ground_step(m)
     set_mario_animation(m, MARIO_ANIM_IDLE_WITH_LIGHT_OBJ)
-    return 0
+    return false
 }
 
 const act_hold_heavy_idle = (m) => {
@@ -292,7 +296,7 @@ const act_hold_heavy_idle = (m) => {
 
     stationary_ground_step(m)
     set_mario_animation(m, MARIO_ANIM_IDLE_HEAVY_OBJ)
-    return 0
+    return false
 }
 
 const act_standing_against_wall = (m) => {
@@ -314,36 +318,36 @@ const act_standing_against_wall = (m) => {
 
     set_mario_animation(m, MARIO_ANIM_STAND_AGAINST_WALL)
     stationary_ground_step(m)
-    return 0
+    return false
 }
 
 const act_freefall_land_stop = (m) => {
-    if (check_common_landing_cancels(m, 0)) return 1
+    if (check_common_landing_cancels(m, 0)) return true
 
     landing_step(m, MARIO_ANIM_GENERAL_LAND, ACT_IDLE)
-    return 0
+    return false
 }
 
 const act_side_flip_land_stop = (m) => {
-    if (check_common_landing_cancels(m, 0)) return 1
+    if (check_common_landing_cancels(m, 0)) return true
 
     landing_step(m, MARIO_ANIM_SLIDEFLIP_LAND, ACT_IDLE)
     m.marioObj.gfx.angle[1] += 0x8000
-    return 0
+    return false
 }
 
 const act_double_jump_land_stop = (m) => {
-    if (check_common_landing_cancels(m, 0)) return 1
+    if (check_common_landing_cancels(m, 0)) return true
 
     landing_step(m, MARIO_ANIM_LAND_FROM_DOUBLE_JUMP, ACT_IDLE)
-    return 0
+    return false
 }
 
 const act_triple_jump_land_stop = (m) => {
-    if (check_common_landing_cancels(m, ACT_JUMP)) return 1
+    if (check_common_landing_cancels(m, ACT_JUMP)) return true
 
     landing_step(m, MARIO_ANIM_TRIPLE_JUMP_LAND, ACT_IDLE)
-    return 0
+    return false
 }
 
 const act_start_crouching = (m) => {
@@ -365,7 +369,7 @@ const act_start_crouching = (m) => {
     if (is_anim_past_end(m)) {
         set_mario_action(m, ACT_CROUCHING, 0)
     }
-    return 0
+    return false
 }
 
 const act_crouching = (m) => {
@@ -396,7 +400,7 @@ const act_crouching = (m) => {
 
     stationary_ground_step(m)
     set_mario_animation(m, MARIO_ANIM_CROUCHING)
-    return 0
+    return false
 }
 
 const act_stop_crouching = (m) => {
@@ -418,7 +422,7 @@ const act_stop_crouching = (m) => {
     if (is_anim_past_end(m)) {
         set_mario_action(m, ACT_IDLE, 0)
     }
-    return 0
+    return false
 }
 
 const act_backflip_land_stop = (m) => {
@@ -427,35 +431,35 @@ const act_backflip_land_stop = (m) => {
     }
 
     if (check_common_landing_cancels(m, ACT_BACKFLIP)) {
-        return 1
+        return true
     }
 
     landing_step(m, MARIO_ANIM_TRIPLE_JUMP_LAND, ACT_IDLE)
-    return 0
+    return false
 }
 
 const act_lava_boost_land = (m) => {
     m.input &= -0x2011
 
     if (check_common_landing_cancels(m, 0)) {
-        return 1
+        return true
     }
 
     landing_step(m, MARIO_ANIM_STAND_UP_FROM_LAVA_BOOST, ACT_IDLE)
-    return 0
+    return false
 }
 
 const act_long_jump_land_stop = (m) => {
     m.input &= -0x2001
     if (check_common_landing_cancels(m, ACT_JUMP)) {
-        return 1
+        return true
     }
 
     landing_step(m,
                   !m.marioObj.oMarioLongJumpIsSlow ? MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP
                                                      : MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP,
                   ACT_CROUCHING)
-    return 0
+    return false
 }
 
 const act_start_crawling = (m) => {
@@ -472,7 +476,7 @@ const act_start_crawling = (m) => {
     if (is_anim_past_end(m)) {
         set_mario_action(m, ACT_CRAWLING, 0)
     }
-    return 0
+    return false
 }
 
 const act_stop_crawling = (m) => {
@@ -490,7 +494,7 @@ const act_stop_crawling = (m) => {
     if (is_anim_past_end(m)) {
         set_mario_action(m, ACT_CROUCHING, 0)
     }
-    return 0
+    return false
 
 }
 
@@ -501,7 +505,7 @@ const act_slide_kick_slide_stop = (m) => {
     }
 
     stopping_step(m, MARIO_ANIM_CROUCH_FROM_SLIDE_KICK, ACT_CROUCHING)
-    return 0
+    return false
 }
 
 const act_ground_pound_land = (m) => {
@@ -516,7 +520,7 @@ const act_ground_pound_land = (m) => {
     }
 
     landing_step(m, MARIO_ANIM_GROUND_POUND_LANDING, ACT_BUTT_SLIDE_STOP)
-    return 0
+    return false
 }
 
 const act_butt_slide_stop = (m) => {
@@ -530,7 +534,7 @@ const act_butt_slide_stop = (m) => {
         //play landing sound
     }
 
-    return 0
+    return false
 }
 
 const act_hold_butt_slide_stop = (m) => {
@@ -551,7 +555,7 @@ const act_hold_butt_slide_stop = (m) => {
     }
 
     stopping_step(m, MARIO_ANIM_STAND_UP_FROM_SLIDING_WITH_LIGHT_OBJ, ACT_HOLD_IDLE)
-    return 0
+    return false
 }
 
 const act_hold_jump_land_stop = (m) => {
@@ -572,7 +576,7 @@ const act_hold_jump_land_stop = (m) => {
     }
 
     landing_step(m, MARIO_ANIM_JUMP_LAND_WITH_LIGHT_OBJ, ACT_HOLD_IDLE)
-    return 0
+    return false
 }
 
 const act_hold_freefall_land_stop = (m) => {
@@ -592,7 +596,7 @@ const act_hold_freefall_land_stop = (m) => {
         return set_mario_action(m, ACT_THROWING, 0)
     }
     landing_step(m, MARIO_ANIM_FALL_LAND_WITH_LIGHT_OBJ, ACT_HOLD_IDLE)
-    return 0
+    return false
 }
 
 const act_air_throw_land = (m) => {
@@ -609,7 +613,7 @@ const act_air_throw_land = (m) => {
     }
 
     landing_step(m, MARIO_ANIM_THROW_LIGHT_OBJECT, ACT_IDLE)
-    return 0
+    return false
 }
 
 const check_common_stationary_cancels = (m) => {
@@ -632,18 +636,18 @@ const check_common_stationary_cancels = (m) => {
             return drop_and_set_mario_action(m, ACT_STANDING_DEATH, 0)
         }
     }
-    return 0
+    return false
 }
 
 export const mario_execute_stationary_action = (m) => {
     let cancel
 
     if (check_common_stationary_cancels(m)) {
-        return 1
+        return true
     }
 
-    // if (mario_update_quicksand(m, 0.5f)) {
-    //     return TRUE;
+    // if (mario_update_quicksand(m, 0.5)) {
+    //     return true
     // }
 
     switch (m.action) {

@@ -235,7 +235,7 @@ class LevelUpdate {
                 return this.sWarpBhvSpawnType[i][1]
             }
         }
-        return 0
+        return false
     }
 
     lvl_init_from_save_file(arg0, levelNum) {
@@ -266,7 +266,7 @@ class LevelUpdate {
         Area.gCurrCourseNum = gLevelToCourseNumTable[levelNum - 1]
 
         // if (gCurrDemoInput != NULL || gCurrCreditsEntry != NULL || gCurrCourseNum == COURSE_NONE) {
-        //     return 0;
+        //     return false;
         // }
 
         if (Area.gCurrLevelNum != LEVEL_BOWSER_1 && Area.gCurrLevelNum != LEVEL_BOWSER_2
@@ -282,14 +282,14 @@ class LevelUpdate {
         }
 
         if (Area.gCurrCourseNum > COURSE_STAGES_MAX || warpCheckpointActive) {
-            return 0;
+            return false;
         }
 
         // if (gDebugLevelSelect && !gShowProfiler) {
-        //     return 0;
+        //     return false;
         // }
 
-        return 1
+        return true
     }
 
     lvl_init_or_update(initOrUpdate) {
@@ -357,7 +357,7 @@ class LevelUpdate {
         // if (gMarioState.action == ACT_INTRO_CUTSCENE) {
         //     sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_DISABLED_DURING_INTRO_CUTSCENE)
         // }
-        return 1
+        return true
     }
 
 
@@ -394,10 +394,10 @@ class LevelUpdate {
 
         // if (!intangible && !val4 && !Area.gWarpTransition.isActive && this.sDelayedWarpOp == WARP_OP_NONE
         //     && (gPlayer1Controller.buttonPressed & START_BUTTON)) {
-        //     return 1
+        //     return true
         // }
 
-        return 0
+        return false
     }
 
     warp_special(level) {
@@ -1080,7 +1080,7 @@ class LevelUpdate {
             }
         }
 
-        return 0
+        return false
     }
 
 
@@ -1115,7 +1115,7 @@ class LevelUpdate {
             this.set_play_mode(PLAY_MODE_NORMAL)
         }
 
-        return 0
+        return false
     }
 
     /**
@@ -1138,7 +1138,7 @@ class LevelUpdate {
             }
         }
 
-        return 0
+        return false
     }
 
 

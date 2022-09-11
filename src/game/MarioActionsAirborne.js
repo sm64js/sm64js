@@ -235,14 +235,14 @@ export const check_fall_damage = (m, hardFallAction) => {
         }
     }
 
-    return 0
+    return false
 }
 
 export const check_kick_or_dive_in_air = (m) => {
     if (m.input & INPUT_B_PRESSED) {
         return set_mario_action(m, m.forwardVel > 28.0 ? ACT_DIVE : ACT_JUMP_KICK, 0)
     }
-    return 0
+    return false
 }
 
 export const should_get_stuck_in_ground = (m) => {
@@ -254,11 +254,11 @@ export const should_get_stuck_in_ground = (m) => {
     if (floor != null && (terrainType == TERRAIN_SNOW || terrainType == TERRAIN_SAND)
         && type != SURFACE_BURNING && SURFACE_IS_NOT_HARD(type)) {
         if (!(flags & 0x01) && m.peakHeight - m.pos[1] > 1000.0 && floor.normal.y >= 0.8660254) {
-            return 1
+            return true
         }
     }
 
-    return 0
+    return false
 }
 
 export const check_fall_damage_or_get_stuck = (m, hardFallAction) => {
@@ -266,7 +266,7 @@ export const check_fall_damage_or_get_stuck = (m, hardFallAction) => {
         play_sound(SOUND_MARIO_OOOF2, m.marioObj.gfx.cameraToObject)
         m.particleFlags |= PARTICLE_MIST_CIRCLE
         drop_and_set_mario_action(m, ACT_FEET_STUCK_IN_GROUND, 0)
-        return 1
+        return true
     }
 
     return check_fall_damage(m, hardFallAction)
@@ -300,10 +300,10 @@ export const check_horizontal_wind = (m) => {
         m.slideYaw = atan2s(m.slideVelZ, m.slideVelX)
         m.forwardVel = speed * coss(m.faceAngle[1] - m.slideYaw)
 
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 export const update_air_with_turn = (m) => {
@@ -563,7 +563,7 @@ export const common_air_action_step = (m, landAction, animation, stepArg) => {
 
 export const act_jump = (m) => {
     if (check_kick_or_dive_in_air(m)) {
-        return 1
+        return true
     }
 
     if (m.input & INPUT_Z_PRESSED) {
@@ -573,7 +573,7 @@ export const act_jump = (m) => {
     play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
     common_air_action_step(m, ACT_JUMP_LAND, MARIO_ANIM_SINGLE_JUMP,
                            AIR_STEP_CHECK_LEDGE_GRAB | AIR_STEP_CHECK_HANG)
-    return 0
+    return false
 }
 
 export const act_double_jump = (m) => {
@@ -582,7 +582,7 @@ export const act_double_jump = (m) => {
         : MARIO_ANIM_DOUBLE_JUMP_FALL
 
     if (check_kick_or_dive_in_air(m)) {
-        return 1
+        return true
     }
 
     if (m.input & INPUT_Z_PRESSED) {
@@ -592,7 +592,7 @@ export const act_double_jump = (m) => {
     play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_HOOHOO)
     common_air_action_step(m, ACT_DOUBLE_JUMP_LAND, animation,
                            AIR_STEP_CHECK_LEDGE_GRAB | AIR_STEP_CHECK_HANG)
-    return 0
+    return false
 }
 
 export const act_triple_jump = (m) => {
@@ -612,7 +612,7 @@ export const act_triple_jump = (m) => {
 
     common_air_action_step(m, ACT_TRIPLE_JUMP_LAND, MARIO_ANIM_TRIPLE_JUMP, 0)
     play_flip_sounds(m, 2, 8, 20)
-    return 0
+    return false
 }
 
 export const act_backflip = (m) => {
@@ -623,7 +623,7 @@ export const act_backflip = (m) => {
     play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_YAH_WAH_HOO)
     common_air_action_step(m, ACT_BACKFLIP_LAND, MARIO_ANIM_BACKFLIP, 0)
     play_flip_sounds(m, 2, 3, 17)
-    return 0
+    return false
 }
 
 export const act_freefall = (m) => {
@@ -650,7 +650,7 @@ export const act_freefall = (m) => {
     }
 
     common_air_action_step(m, ACT_FREEFALL_LAND, animation, AIR_STEP_CHECK_LEDGE_GRAB)
-    return 0
+    return false
 }
 
 export const act_hold_jump = (m) => {
@@ -669,7 +669,7 @@ export const act_hold_jump = (m) => {
     play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
     common_air_action_step(m, ACT_HOLD_JUMP_LAND, MARIO_ANIM_JUMP_WITH_LIGHT_OBJ,
                            AIR_STEP_CHECK_LEDGE_GRAB)
-    return 0
+    return false
 }
 
 export const act_hold_freefall = (m) => {
@@ -693,7 +693,7 @@ export const act_hold_freefall = (m) => {
     }
 
     common_air_action_step(m, ACT_HOLD_FREEFALL_LAND, animation, AIR_STEP_CHECK_LEDGE_GRAB)
-    return 0
+    return false
 }
 
 export const act_side_flip = (m) => {
@@ -716,7 +716,7 @@ export const act_side_flip = (m) => {
         play_sound(SOUND_ACTION_SIDE_FLIP_UNK, m.marioObj.gfx.cameraToObject)
     }
 
-    return 0
+    return false
 }
 
 export const act_wall_kick_air = (m) => {
@@ -730,7 +730,7 @@ export const act_wall_kick_air = (m) => {
 
     play_mario_jump_sound(m)
     common_air_action_step(m, ACT_JUMP_LAND, MARIO_ANIM_SLIDEJUMP, AIR_STEP_CHECK_LEDGE_GRAB)
-    return 0
+    return false
 }
 
 export const act_long_jump = (m) => {
@@ -749,7 +749,7 @@ export const act_long_jump = (m) => {
     }
 
     common_air_action_step(m, ACT_LONG_JUMP_LAND, animation, AIR_STEP_CHECK_LEDGE_GRAB)
-    return 0
+    return false
 }
 
 export const act_riding_shell_air = (m) => {
@@ -773,7 +773,7 @@ export const act_riding_shell_air = (m) => {
     }
 
     m.marioObj.gfx.pos[1] += 42.0
-    return 0
+    return false
 }
 
 export const act_twirling = (m) => {
@@ -815,7 +815,7 @@ export const act_twirling = (m) => {
     }
 
     m.marioObj.gfx.angle[1] = s16(m.marioObj.gfx.angle[1] + m.twirlYaw)
-    return 0
+    return false
 }
 
 export const act_dive = (m) => {
@@ -830,7 +830,7 @@ export const act_dive = (m) => {
         mario_grab_used_object(m)
         m.marioBodyState.grabPos = GRAB_POS_LIGHT_OBJ
         if (m.action != ACT_DIVE) {
-            return 1
+            return true
         }
     }
 
@@ -879,7 +879,7 @@ export const act_dive = (m) => {
             break
     }
 
-    return 0
+    return false
 }
 
 export const act_air_throw = (m) => {
@@ -907,7 +907,7 @@ export const act_air_throw = (m) => {
             break
     }
 
-    return 0
+    return false
 }
 
 export const act_water_jump = (m) => {
@@ -939,7 +939,7 @@ export const act_water_jump = (m) => {
             break
     }
 
-    return 0
+    return false
 }
 
 export const act_hold_water_jump = (m) => {
@@ -969,7 +969,7 @@ export const act_hold_water_jump = (m) => {
             break
     }
 
-    return 0
+    return false
 }
 
 export const act_steep_jump = (m) => {
@@ -999,7 +999,7 @@ export const act_steep_jump = (m) => {
 
     set_mario_animation(m, MARIO_ANIM_SINGLE_JUMP)
     m.marioObj.gfx.angle[1] = m.marioObj.rawData[oMarioSteepJumpYaw]
-    return 0
+    return false
 }
 
 export const act_ground_pound = (m) => {
@@ -1060,7 +1060,7 @@ export const act_ground_pound = (m) => {
         }
     }
 
-    return 0
+    return false
 }
 
 export const act_burning_jump = (m) => {
@@ -1082,7 +1082,7 @@ export const act_burning_jump = (m) => {
     if (m.health < 0x100) {
         m.health = 0xFF
     }
-    return 0
+    return false
 }
 
 export const act_burning_fall = (m) => {
@@ -1101,7 +1101,7 @@ export const act_burning_fall = (m) => {
     if (m.health < 0x100) {
         m.health = 0xFF
     }
-    return 0
+    return false
 }
 
 export const act_crazy_box_bounce = (m) => {
@@ -1162,7 +1162,7 @@ export const act_crazy_box_bounce = (m) => {
     }
 
     m.marioObj.gfx.angle[0] = atan2s(m.forwardVel, -m.vel[1])
-    return 0
+    return false
 }
 
 export const common_air_knockback_step = (m, landAction, hardFallAction, animation, speed) => {
@@ -1211,40 +1211,40 @@ export const check_wall_kick = (m) => {
         return set_mario_action(m, ACT_WALL_KICK_AIR, 0)
     }
 
-    return 0
+    return false
 }
 
 export const act_backward_air_kb = (m) => {
     if (check_wall_kick(m)) {
-        return 1
+        return true
     }
 
     play_knockback_sound(m)
     common_air_knockback_step(m, ACT_BACKWARD_GROUND_KB, ACT_HARD_BACKWARD_GROUND_KB, 0x0002, -16.0)
-    return 0
+    return false
 }
 
 export const act_forward_air_kb = (m) => {
     if (check_wall_kick(m)) {
-        return 1
+        return true
     }
 
     play_knockback_sound(m)
     common_air_knockback_step(m, ACT_FORWARD_GROUND_KB, ACT_HARD_FORWARD_GROUND_KB, 0x002D, 16.0)
-    return 0
+    return false
 }
 
 export const act_hard_backward_air_kb = (m) => {
     play_knockback_sound(m)
     common_air_knockback_step(m, ACT_HARD_BACKWARD_GROUND_KB, ACT_HARD_BACKWARD_GROUND_KB, 0x0002,
                               -16.0)
-    return 0
+    return false
 }
 
 export const act_hard_forward_air_kb = (m) => {
     play_knockback_sound(m)
     common_air_knockback_step(m, ACT_HARD_FORWARD_GROUND_KB, ACT_HARD_FORWARD_GROUND_KB, 0x002D, 16.0)
-    return 0
+    return false
 }
 
 export const act_thrown_backward = (m) => {
@@ -1260,7 +1260,7 @@ export const act_thrown_backward = (m) => {
     common_air_knockback_step(m, landAction, ACT_HARD_BACKWARD_GROUND_KB, 0x0002, m.forwardVel)
 
     m.forwardVel *= 0.98
-    return 0
+    return false
 }
 
 export const act_thrown_forward = (m) => {
@@ -1286,18 +1286,18 @@ export const act_thrown_forward = (m) => {
     }
 
     m.forwardVel *= 0.98
-    return 0
+    return false
 }
 
 export const act_soft_bonk = (m) => {
     if (check_wall_kick(m)) {
-        return 1
+        return true
     }
 
     play_knockback_sound(m)
 
     common_air_knockback_step(m, ACT_FREEFALL_LAND, ACT_HARD_BACKWARD_GROUND_KB, 0x0056, m.forwardVel)
-    return 0
+    return false
 }
 
 export const act_getting_blown = (m) => {
@@ -1341,7 +1341,7 @@ export const act_getting_blown = (m) => {
             break
     }
 
-    return 0
+    return false
 }
 
 export const act_air_hit_wall = (m) => {
@@ -1422,7 +1422,7 @@ export const act_forward_rollout = (m) => {
     if (m.actionState == 1 && is_anim_past_end(m)) {
         m.actionState = 2
     }
-    return 0
+    return false
 }
 
 export const act_backward_rollout = (m) => {
@@ -1463,7 +1463,7 @@ export const act_backward_rollout = (m) => {
     if (m.actionState == 1 && m.marioObj.gfx.unk38.animFrame == 2) {
         m.actionState = 2
     }
-    return 0
+    return false
 }
 
 export const act_butt_slide_air = (m) => {
@@ -1498,7 +1498,7 @@ export const act_butt_slide_air = (m) => {
     }
 
     set_mario_animation(m, MARIO_ANIM_SLIDE)
-    return 0
+    return false
 }
 
 export const act_hold_butt_slide_air = (m) => {
@@ -1539,7 +1539,7 @@ export const act_hold_butt_slide_air = (m) => {
     }
 
     set_mario_animation(m, MARIO_ANIM_SLIDING_ON_BOTTOM_WITH_LIGHT_OBJ)
-    return 0
+    return false
 }
 
 export const act_lava_boost = (m) => {
@@ -1595,7 +1595,7 @@ export const act_lava_boost = (m) => {
     }
 
     m.marioBodyState.eyeState = MARIO_EYES_DEAD
-    return 0
+    return false
 }
 
 export const act_slide_kick = (m) => {
@@ -1646,7 +1646,7 @@ export const act_slide_kick = (m) => {
             break
     }
 
-    return 0
+    return false
 }
 
 export const act_jump_kick = (m) => {
@@ -1681,7 +1681,7 @@ export const act_jump_kick = (m) => {
             break
     }
 
-    return 0
+    return false
 }
 
 export const act_shot_from_cannon = (m) => {
@@ -1735,7 +1735,7 @@ export const act_shot_from_cannon = (m) => {
     if (m.vel[1] > 0.0) {
         m.particleFlags |= PARTICLE_DUST
     }
-    return 0
+    return false
 }
 
 export const act_flying = (m) => {
@@ -1851,7 +1851,7 @@ export const act_flying = (m) => {
 
     play_sound(SOUND_MOVING_FLYING, m.marioObj.gfx.cameraToObject)
     adjust_sound_for_speed(m)
-    return 0
+    return false
 }
 
 export const act_riding_hoot = (m) => {
@@ -1880,7 +1880,7 @@ export const act_riding_hoot = (m) => {
     vec3f_set(m.vel, 0.0, 0.0, 0.0)
     vec3f_set(m.marioObj.gfx.pos, m.pos[0], m.pos[1], m.pos[2])
     vec3s_set(m.marioObj.gfx.angle, 0, s16(0x4000 - m.faceAngle[1]), 0)
-    return 0
+    return false
 }
 
 export const act_flying_triple_jump = (m) => {
@@ -1947,13 +1947,13 @@ export const act_flying_triple_jump = (m) => {
             break
     }
 
-    return 0
+    return false
 }
 
 export const act_top_of_pole_jump = (m) => {
     play_mario_jump_sound(m)
     common_air_action_step(m, ACT_FREEFALL_LAND, MARIO_ANIM_HANDSTAND_JUMP, AIR_STEP_CHECK_LEDGE_GRAB)
-    return 0
+    return false
 }
 
 export const act_vertical_wind = (m) => {
@@ -1988,7 +1988,7 @@ export const act_vertical_wind = (m) => {
 
     m.marioObj.gfx.angle[0] = s16(6144.0 * intendedMag * coss(intendedDYaw))
     m.marioObj.gfx.angle[2] = s16(-4096.0 * intendedMag * sins(intendedDYaw))
-    return 0
+    return false
 }
 
 export const act_special_triple_jump = (m) => {
@@ -2027,8 +2027,8 @@ export const act_special_triple_jump = (m) => {
         set_mario_animation(m, MARIO_ANIM_GENERAL_FALL)
     }
 
-    // m.particleFlags |= PARTICLE_SPARKLES
-    return 0
+    m.particleFlags |= PARTICLE_SPARKLES
+    return false
 }
 
 export const check_common_airborne_cancels = (m) => {
@@ -2045,14 +2045,14 @@ export const check_common_airborne_cancels = (m) => {
     }
 
     m.quicksandDepth = 0.0
-    return 0
+    return false
 }
 
 export const mario_execute_airborne_action = (m) => {
     let cancel
 
     if (check_common_airborne_cancels(m)) {
-        return 1
+        return true
     }
 
     play_far_fall_sound(m)

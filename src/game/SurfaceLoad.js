@@ -43,7 +43,7 @@ class SurfaceLoad {
     surf_has_no_cam_collision(surfaceType) {
         if (surfaceType == Surfaces.SURFACE_NO_CAM_COLLISION || surfaceType == Surfaces.SURFACE_NO_CAM_COL_VERY_SLIPPERY || surfaceType == Surfaces.SURFACE_SWITCH) {
             return Surfaces.SURFACE_FLAG_NO_CAM_COLLISION
-        } else return 0
+        } else return false
     }
 
     read_surface_data(vertexData, vertexIndices) {

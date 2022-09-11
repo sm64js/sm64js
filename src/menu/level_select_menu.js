@@ -5,16 +5,16 @@ import { LEVEL_MAX, LEVEL_MIN, level_defines } from "../levels/level_defines_con
 const intro_play_its_a_me_mario = () => {
     // set_background_music(0, SEQ_SOUND_PLAYER, 0)
     // play_sound(SOUND_MENU_COIN_ITS_A_ME_MARIO, gGlobalSoundSource)
-    return 1
+    return true
 }
 
 const intro_default = () => {
     Area.print_intro_text()
 
     if (window.playerInput.buttonPressedStart) {
-        return 1
+        return true
     } else {
-        return 0
+        return false
     }
 }
 
@@ -121,7 +121,7 @@ export const level_select_input_loop = () => {
         // play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource)
         return Area.gCurrLevelNum
     }
-    return 0*/
+    return false*/
 }
 
 // run the demo timer on the PRESS START screen.

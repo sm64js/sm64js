@@ -645,7 +645,7 @@ class GoddardRenderer {
         this.sCurrentGdDl.light.push(newLight)
         Gbi.gSPEndDisplayList(this.sCurrentGdDl.gfx)
 
-        return 0
+        return false
     }
 
     cpy_remaining_gddl(child, parent) {

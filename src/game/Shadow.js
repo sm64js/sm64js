@@ -90,7 +90,7 @@ const dim_shadow_with_distance = (solidity, distFromFloor) => {
 const get_water_level_below_shadow = (s) => {
     let waterLevel = SurfaceCollision.find_water_level(s.parentX, s.parentZ)
     if (waterLevel < FLOOR_LOWER_LIMIT_SHADOW) {
-        return 0
+        return false
     } else if (s.parentY >= waterLevel && s.floorHeight <= waterLevel) {
         gShadowAboveWaterOrLava = true
         return waterLevel
@@ -131,7 +131,7 @@ const init_shadow = (s, xPos, yPos, zPos, shadowScale, overwriteSolidity) => {
         s.floorNormalZ = 0
         s.floorOriginOffset = -waterLevel
     } else {
-        if (s.floorHeight < -10000.0 || floorGeometry.normalY <= 0.0) return 1
+        if (s.floorHeight < -10000.0 || floorGeometry.normalY <= 0.0) return true
 
         s.floorNormalX = floorGeometry.normalX
         s.floorNormalY = floorGeometry.normalY
@@ -155,7 +155,7 @@ const init_shadow = (s, xPos, yPos, zPos, shadowScale, overwriteSolidity) => {
         s.floorTilt = 90.0 - atan2_deg(floorSteepness, s.floorNormalY)
     }
 
-    return 0
+    return false
 }
 
 const get_vertex_coords = (index, shadowVertexType, coords) => {
@@ -400,7 +400,7 @@ const get_shadow_height_solidity = (xPos, yPos, zPos, p) => {  // *shadowHeight,
     p.shadowHeight = SurfaceCollision.find_floor_height_and_data(xPos, yPos, zPos, {})
 
     if (p.shadowHeight < FLOOR_LOWER_LIMIT_SHADOW) {
-        return 1
+        return true
     } else {
         waterLevel = SurfaceCollision.find_water_level(xPos, zPos)
 
@@ -410,7 +410,7 @@ const get_shadow_height_solidity = (xPos, yPos, zPos, p) => {  // *shadowHeight,
             p.solidity = 200
         }
     }
-    return 0
+    return false
 }
 
 /**

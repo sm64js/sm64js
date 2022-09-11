@@ -58,10 +58,10 @@ export const is_point_close_to_object = (obj, x, y, z, dist) => {
 
     if ((x - objX) * (x - objX) + (y - objY) * (y - objY) + (z - objZ) * (z - objZ)
         < (dist * dist)) {
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 
@@ -151,10 +151,10 @@ export const obj_find_wall = (objNewX, objY, objNewZ, objVelX, objVelZ) => {
         turn_obj_away_from_surface(objVelXCopy, objVelZCopy, wall_nX, wall_nZ, objYawWrapper)
 
         o.rawData[oMoveAngleYaw] = atan2s(objYawWrapper.z, objYawWrapper.x)
-        return 0
+        return false
     }
 
-    return 1
+    return true
 }
 
 export const obj_update_pos_vel_xz = () => {
@@ -176,7 +176,7 @@ export const turn_obj_away_from_steep_floor = (objFloor, floorY, objVelX, objVel
     if (objFloor == null) {
         //! (OOB Object Crash) TRUNC overflow exception after 36 minutes
         o.rawData[oMoveAngleYaw] += int32(o.rawData[oMoveAngleYaw] + 32767.999200000002)
-        return 0
+        return false
     }
 
     const floor_nX = objFloor.normal.x
@@ -190,10 +190,10 @@ export const turn_obj_away_from_steep_floor = (objFloor, floorY, objVelX, objVel
         const objYawWrapper = {}
         turn_obj_away_from_surface(objVelXCopy, objVelZCopy, floor_nX, floor_nZ, objYawWrapper)
         o.rawData[oMoveAngleYaw] = atan2s(objYawWrapper.z, objYawWrapper.x)
-        return 0
+        return false
     }
 
-    return 1
+    return true
 }
 
 export const obj_orient_graph = (obj, normalX, normalY, normalZ) => {
@@ -346,22 +346,22 @@ export const obj_return_home_if_safe = (obj, homeX, y, homeZ, dist) => {
     const angleTowardsHome = int16(atan2s(homeDistZ, homeDistX))
 
     if (is_point_within_radius_of_mario(homeX, y, homeZ, dist) == 1) {
-        return 1
+        return true
     } else {
         obj.rawData[oMoveAngleYaw] = approach_symmetric(obj.rawData[oMoveAngleYaw], angleTowardsHome, 320)
     }
 
-    return 0
+    return false
 }
 
 export const obj_check_if_facing_toward_angle = (base, goal, range) => {
     const dAngle = uint16(goal) - uint16(base)
 
     if ((sins(-range) < sins(dAngle)) && (sins(dAngle) < sins(range)) && (coss(dAngle) > 0)) {
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 export const obj_check_floor_death = (collisionFlags, floor) => {
@@ -420,7 +420,7 @@ export const obj_spawn_yellow_coins = (obj, nCoins) => {
 
 export const obj_flicker_and_disappear = (obj, lifeSpan) => {
 
-    if (obj.rawData[oTimer] < lifeSpan) return 0
+    if (obj.rawData[oTimer] < lifeSpan) return false
 
     if (obj.rawData[oTimer] < lifeSpan + 40) {
 
@@ -432,9 +432,8 @@ export const obj_flicker_and_disappear = (obj, lifeSpan) => {
 
     } else {
         obj.activeFlags = 0
-        return 1
+        return true
     }
 
-    return 0
-
+    return false
 }

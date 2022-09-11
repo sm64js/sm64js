@@ -1052,7 +1052,7 @@ export const check_common_action_exits = (m) => {
         return set_mario_action(m, ACT_BEGIN_SLIDING, 0);
     }
 
-    return 0
+    return false
 }
 
 /**
@@ -1073,7 +1073,7 @@ export const check_common_hold_action_exits = (m) => {
         return set_mario_action(m, ACT_HOLD_BEGIN_SLIDING, 0)
     }
 
-    return 0
+    return false
 }
 
 export const drop_and_set_mario_action = (m, action, actionArg) => {
@@ -1090,7 +1090,7 @@ export const set_jumping_action = (m, action, actionArg) => {
         set_mario_action(m, action, actionArg)
     }
 
-    return 1
+    return true
 }
 
 
@@ -1184,7 +1184,7 @@ export const set_jump_from_landing = (m) => {
 
     m.doubleJumpTimer = 0
 
-    return 1
+    return true
 }
 
 /**
@@ -1426,7 +1426,7 @@ export const set_mario_action = (m, action, actionArg) => {
     m.actionState = 0
     m.actionTimer = 0
 
-    return 1
+    return true
 }
 
 export const set_mario_animation = (m, targetAnimID) => {
@@ -1624,7 +1624,7 @@ export const execute_mario_action = () => {
         return LevelUpdate.gMarioState.particleFlags
     }
 
-    return 0
+    return false
 }
 
 
@@ -1740,11 +1740,10 @@ const mario_update_hitbox_and_cap_model = (m) => {
 
 const update_mario_health = (m) => {
     if (m.health >= 0x100) {
-
         // When already healing or hurting Mario, Mario's HP is not changed any more here.
         if ((m.healCounter | m.hurtCounter) == 0) {
-            if ((m.input & INPUT_IN_POISON_GAS) && ((m.action & ACT_FLAG_INTANGIBLE) == 0)) {
-                if (((m.flags & MARIO_METAL_CAP) == 0)) {
+            if ((m.input & INPUT_IN_POISON_GAS) && !(m.action & ACT_FLAG_INTANGIBLE)) {
+                if (!(m.flags & MARIO_METAL_CAP)) {
                     m.health -= 4
                 }
             } else {
@@ -1781,7 +1780,6 @@ const update_mario_health = (m) => {
 
 
         // TODO // Play a noise to alert the player when Mario is close to drowning.
-
     }
 }
 
@@ -1820,6 +1818,7 @@ const update_mario_geometry_inputs = (m) => {
     }
 
     m.ceilHeight = vec3_find_ceil(m.pos, m.floorHeight, m)
+    let gasLevel = SurfaceCollision.find_poison_gas_level(m.pos[0], m.pos[2])
     m.waterLevel = SurfaceCollision.find_water_level(m.pos[0], m.pos[2])
 
     if (m.floor) {
@@ -1832,7 +1831,7 @@ const update_mario_geometry_inputs = (m) => {
 
         if ((m.floor.flags & SurfaceTerrains.SURFACE_FLAG_DYNAMIC)
             || (m.ceil && m.ceil.flags & SurfaceTerrains.SURFACE_FLAG_DYNAMIC)) {
-            let ceilToFloorDist = m.ceilHeight - m.floorHeight;
+            let ceilToFloorDist = m.ceilHeight - m.floorHeight
 
             if ((0.0 <= ceilToFloorDist) && (ceilToFloorDist <= 150.0)) {
                 m.input |= INPUT_SQUISHED
@@ -1840,15 +1839,19 @@ const update_mario_geometry_inputs = (m) => {
         }
 
         if (m.pos[1] > m.floorHeight + 100.0) {
-            m.input |= INPUT_OFF_FLOOR;
+            m.input |= INPUT_OFF_FLOOR
         }
 
         if (m.pos[1] < (m.waterLevel - 10)) {
             m.input |= INPUT_IN_WATER
         }
 
+        if (m.pos[1] < (gasLevel - 100.0)) {
+            m.input |= INPUT_IN_POISON_GAS
+        }
+
     } else {
-        level_trigger_warp(m, WARP_OP_DEATH);
+        level_trigger_warp(m, WARP_OP_DEATH)
     }
 
 }

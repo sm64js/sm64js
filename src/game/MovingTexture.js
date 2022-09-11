@@ -24,9 +24,12 @@ import { wdw_movtex_area2_water } from "../levels/wdw/areas/2/movtext.inc"
 import { lll_movtex_tris_lava_floor, lll_dl_lava_floor, lll_movtex_volcano_floor_lava, lll_movtex_tris_lavafall_volcano, lll_dl_lavafall_volcano } from "../levels/lll/areas/2/movtext.inc"
 import { bitfs_movtex_tris_lava_first_section, bitfs_movtex_tris_lava_second_section, bitfs_movtex_tris_lava_floor, bitfs_dl_lava_sections, bitfs_dl_lava_floor } from "../levels/bitfs/areas/1/movtext.inc"
 
+import { COURSE_NUM_TO_INDEX, COURSE_JRB } from "../levels/course_defines"
 import { GeoLayoutInstance as GeoLayout, LAYER_TRANSPARENT_INTER, LAYER_OPAQUE, LAYER_TRANSPARENT } from "../engine/GeoLayout"
+import { CameraInstance as Camera } from "./Camera"
+import { save_file_get_star_flags } from "./SaveFile"
 import * as Gbi from "../include/gbi"
-import { dl_waterbox_rgba16_begin, dl_waterbox_end, dl_draw_quad_verts_0123, texture_waterbox_water, texture_waterbox_lava, texture_waterbox_jrb_water, texture_waterbox_unknown_water, texture_waterbox_mist } from "../bin/segment2"
+import { dl_waterbox_rgba16_begin, dl_waterbox_end, dl_draw_quad_verts_0123, texture_waterbox_water, texture_waterbox_lava, texture_waterbox_jrb_water, texture_waterbox_unknown_water, texture_waterbox_mist, dl_waterbox_ia16_begin } from "../bin/segment2"
 import { ROTATE_CLOCKWISE, TEXTURE_MIST, TEXTURE_WATER, TEXTURE_JRB_WATER, TEX_QUICKSAND_SSL, TEX_PYRAMID_SAND_SSL, TEXTURE_LAVA } from "../include/moving_texture_macros"
 import { make_vertex } from "./GeoMisc"
 
@@ -92,7 +95,7 @@ const SL_MOVTEX_WATER = (1 | MOVTEX_AREA_SL)
 const WDW_MOVTEX_AREA1_WATER = (1 | MOVTEX_AREA_WDW)
 const WDW_MOVTEX_AREA2_WATER = (2 | MOVTEX_AREA_WDW)
 const JRB_MOVTEX_WATER = (1 | MOVTEX_AREA_JRB)
-const JRB_MOVTEX_INTIAL_MIST = (5 | MOVTEX_AREA_JRB)
+const JRB_MOVTEX_INITIAL_MIST = (5 | MOVTEX_AREA_JRB)
 const JRB_MOVTEX_SINKED_BOAT_WATER = (2 | MOVTEX_AREA_JRB)
 const THI_MOVTEX_AREA1_WATER = (1 | MOVTEX_AREA_THI)
 const THI_MOVTEX_AREA2_WATER = (2 | MOVTEX_AREA_THI)
@@ -200,6 +203,8 @@ const get_quad_collection_from_id = (id) => {
             return sl_movtex_water
         case HMC_MOVTEX_DORRIE_POOL_WATER:
             return hmc_movtex_dorrie_pool_water
+        case HMC_MOVTEX_TOXIC_MAZE_MIST:
+            return hmc_movtex_toxic_maze_mist
         case THI_MOVTEX_AREA1_WATER:
             return thi_movtex_area1_water
         case THI_MOVTEX_AREA2_WATER:
@@ -235,7 +240,18 @@ const get_quad_collection_from_id = (id) => {
 
 const movtex_change_texture_format = (quadCollectionId, gfx) => {
     switch (quadCollectionId) {
-        default: Gbi.gSPDisplayList(gfx, dl_waterbox_rgba16_begin)
+        case HMC_MOVTEX_TOXIC_MAZE_MIST:
+            Gbi.gSPDisplayList(gfx, dl_waterbox_ia16_begin)
+            break
+        case SSL_MOVTEX_TOXBOX_QUICKSAND_MIST:
+            Gbi.gSPDisplayList(gfx, dl_waterbox_ia16_begin)
+            break
+        case JRB_MOVTEX_INITIAL_MIST:
+            Gbi.gSPDisplayList(gfx, dl_waterbox_ia16_begin)
+            break
+        default:
+            Gbi.gSPDisplayList(gfx, dl_waterbox_rgba16_begin)
+            break
     }
 }
 
@@ -261,9 +277,13 @@ const movtex_make_quad_vertex = (verts, index, x, y, z, rot, rotOffset, scale, a
     const s = 32.0 * (32.0 * scale - 1.0) * Math.sin((rot + rotOffset) / 0x8000 * Math.PI)
     const t = 32.0 * (32.0 * scale - 1.0) * Math.cos((rot + rotOffset) / 0x8000 * Math.PI)
 
-    if (gMovtexVtxColor == MOVTEX_VTX_COLOR_YELLOW) throw "not implemented water color yellow"
-    else if (gMovtexVtxColor == MOVTEX_VTX_COLOR_RED) throw "not implemented water color red"
-    else make_vertex(verts, index, x, y, z, s, t, 255, 255, 255, alpha)
+    if (gMovtexVtxColor == MOVTEX_VTX_COLOR_YELLOW) {
+        make_vertex(verts, index, x, y, z, s, t, 255, 255, 0, alpha)
+    } else if (gMovtexVtxColor == MOVTEX_VTX_COLOR_RED) {
+        make_vertex(verts, index, x, y, z, s, t, 255, 0, 0, alpha)
+    } else {
+        make_vertex(verts, index, x, y, z, s, t, 255, 255, 255, alpha)
+    }
 }
 
 const movtex_gen_from_quad = (y, quad) => {
@@ -300,15 +320,14 @@ const movtex_gen_from_quad = (y, quad) => {
     }
 
     // Only add commands to change the texture when necessary
-    if (textureId != gMovetexLastTextureId) { // an ia16 texture
-        if (textureId == TEXTURE_MIST) {
-            throw "texture mist"
+    if (textureId != gMovetexLastTextureId) {
+        if (textureId == TEXTURE_MIST) {  // an ia16 texture
+            Gbi.gDPLoadBlockTexture(gfx, 32, 32, Gbi.G_IM_FMT_IA, gMovtexIdToTexture[textureId])
         } else { // any rgba16 texture
             Gbi.gDPLoadBlockTexture(gfx, 32, 32, Gbi.G_IM_FMT_RGBA, gMovtexIdToTexture[textureId])
         }
         gMovetexLastTextureId = textureId
     }
-
     Gbi.gSPVertex(gfx, verts, 4, 0)
     Gbi.gSPDisplayList(gfx, dl_draw_quad_verts_0123)
     Gbi.gSPEndDisplayList(gfx)
@@ -369,8 +388,14 @@ export const geo_movtex_draw_water_regions = (callContext, node) => {
         }
         const numWaterBoxes = ObjectListProc.gEnvironmentRegions[0]
 
-        if (node.parameter == JRB_MOVTEX_INTIAL_MIST) {
-            throw "not implemented"
+        if (node.parameter == JRB_MOVTEX_INITIAL_MIST) {
+            if (Camera.gLakituState.goalPos[1] < 1024.0) { // if camera under water
+                return null
+            }
+            if (save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_JRB))
+            & (1 << 0)) { // the "Plunder in the Sunken Ship" star in JRB is collected
+                return null
+            }
         } else if (node.parameter == HMC_MOVTEX_TOXIC_MAZE_MIST) {
             gMovtexVtxColor = MOVTEX_VTX_COLOR_YELLOW
         } else if (node.parameter == SSL_MOVTEX_TOXBOX_QUICKSAND_MIST) {

@@ -173,7 +173,7 @@ const act_water_idle = (m) => {
     }
 
     common_idle_step(m, Mario.MARIO_ANIM_WATER_IDLE, val)
-    return 0
+    return false
 }
 
 const act_water_plunge = (m) => {
@@ -256,7 +256,7 @@ const act_water_plunge = (m) => {
     }
 
     m.particleFlags |= Particles.PARTICLE_PLUNGE_BUBBLE
-    return 0
+    return false
 }
 
 const stationary_slow_down = (m) => {
@@ -295,7 +295,7 @@ const get_buoyancy = (m) => {
 
 const swimming_near_surface = (m) => {
     if (m.flags & Mario.MARIO_METAL_CAP) {
-        return 0
+        return false
     }
 
     return m.waterLevel - 80 - m.pos[1] < 400.0 ? 1 : 0
@@ -446,7 +446,7 @@ const act_drowning = (m) => {
     stationary_slow_down(m)
     perform_water_step(m)
 
-    return 0
+    return false
 }
 
 const act_hold_water_idle = (m) => {
@@ -467,7 +467,7 @@ const act_hold_water_idle = (m) => {
     }
 
     common_idle_step(m, Mario.MARIO_ANIM_WATER_IDLE_WITH_OBJ, 0)
-    return 0
+    return false
 }
 
 const act_water_action_end = (m) => {
@@ -487,7 +487,7 @@ const act_water_action_end = (m) => {
     if (Mario.is_anim_at_end(m)) {
         Mario.set_mario_action(m, Mario.ACT_WATER_IDLE, 0)
     }
-    return 0
+    return false
 }
 
 const act_swimming_end = (m) => {
@@ -504,7 +504,7 @@ const act_swimming_end = (m) => {
     }
 
     if (check_water_jump(m)) {
-        return 1
+        return true
     }
 
     if (m.input & Mario.INPUT_A_DOWN && m.actionTimer >= 7) {
@@ -524,7 +524,7 @@ const act_swimming_end = (m) => {
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_SWIM_PART2)
     common_swimming_step(m, sSwimStrength)
 
-    return 0
+    return false
 }
 
 const check_water_jump = (m) => {
@@ -544,7 +544,7 @@ const check_water_jump = (m) => {
         }
     }
 
-    return 0
+    return false
 }
 
 const act_breaststroke = (m) => {
@@ -565,7 +565,7 @@ const act_breaststroke = (m) => {
     }
 
     if (check_water_jump(m)) {
-        return 1
+        return true
     }
 
     if (m.actionTimer < 6) {
@@ -598,7 +598,7 @@ const act_breaststroke = (m) => {
     Mario.set_mario_animation(m, Mario.MARIO_ANIM_SWIM_PART1)
     common_swimming_step(m, sSwimStrength)
 
-    return 0
+    return false
 }
 
 const common_swimming_step = (m, swimStrength) => {
@@ -689,7 +689,7 @@ const act_hold_water_action_end = (m) => {
     if (Mario.is_anim_at_end(m)) {
         Mario.set_mario_action(m, Mario.ACT_HOLD_WATER_IDLE, 0)
     }
-    return 0
+    return false
 }
 
 const act_water_shocked = (m) => {
@@ -710,17 +710,17 @@ const act_water_shocked = (m) => {
     stationary_slow_down(m)
     perform_water_step(m)
     m.marioBodyState.headAngle[0] = 0
-    return 0
+    return false
 }
 
 const act_backward_water_kb = (m) => {
     common_water_knockback_step(m, Mario.MARIO_ANIM_BACKWARDS_WATER_KB, Mario.ACT_WATER_IDLE, m.actionArg)
-    return 0
+    return false
 }
 
 const act_forward_water_kb = (m) => {
     common_water_knockback_step(m, Mario.MARIO_ANIM_WATER_FORWARD_KB, Mario.ACT_WATER_IDLE, m.actionArg)
-    return 0
+    return false
 }
 
 const common_water_knockback_step = (m, animation, endAction, arg3) => {
@@ -750,7 +750,7 @@ const act_water_death = (m) => {
         level_trigger_warp(m, WARP_OP_DEATH);
     }*/
 
-    return 0
+    return false
 }
 
 const check_common_submerged_cancels = (m) => {
@@ -776,7 +776,7 @@ const check_common_submerged_cancels = (m) => {
         Mario.set_mario_action(m, Mario.ACT_DROWNING, 0)
     }
 
-    return 0
+    return false
 }
 
 const act_water_punch = (m) => {
@@ -822,7 +822,7 @@ const act_water_punch = (m) => {
             break
     }
 
-    return 0
+    return false
 }
 
 const check_water_grab = (m) => {
@@ -839,11 +839,11 @@ const check_water_grab = (m) => {
             m.usedObj = object
             mario_grab_used_object(m)
             m.marioBodyState.grabPos = GRAB_POS_LIGHT_OBJ
-            return 1
+            return true
         }
     }
 
-    return 0
+    return false
 }
 
 const act_flutter_kick = (m) => {
@@ -872,12 +872,12 @@ const act_flutter_kick = (m) => {
     }
 
     common_swimming_step(m, sSwimStrength)
-    return 0
+    return false
 }
 
 export const mario_execute_submerged_action = (m) => {
     if (check_common_submerged_cancels(m)) {
-        return 1
+        return true
     }
 
     m.quicksandDepth = 0.0

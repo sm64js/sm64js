@@ -128,7 +128,7 @@ export const hmc_geo_000658 = () => {return [
         GEO_DISPLAY_LIST(LAYER_OPAQUE, hmc_seg7_dl_07014C00),
         GEO_DISPLAY_LIST(LAYER_TRANSPARENT, hmc_seg7_dl_07014E48),
         GEO_ASM(0, geo_movtex_pause_control),
-        //GEO_ASM(0x0702, geo_movtex_draw_water_regions),
+        GEO_ASM(0x0702, geo_movtex_draw_water_regions),
     GEO_CLOSE_NODE(),
     GEO_RETURN(),
 ]};
@@ -245,7 +245,7 @@ export const hmc_geo_000850 = () => {return [
         GEO_DISPLAY_LIST(LAYER_OPAQUE, hmc_seg7_dl_07014C00),
         GEO_DISPLAY_LIST(LAYER_TRANSPARENT, hmc_seg7_dl_07014E48),
         GEO_ASM(0, geo_movtex_pause_control),
-        //GEO_ASM(0x0702, geo_movtex_draw_water_regions),
+        GEO_ASM(0x0702, geo_movtex_draw_water_regions),
     GEO_CLOSE_NODE(),
     GEO_RETURN(),
 ]};
@@ -282,7 +282,7 @@ export const hmc_geo_000938 = () => {return [
         GEO_DISPLAY_LIST(LAYER_OPAQUE, hmc_seg7_dl_0701A080),
         GEO_DISPLAY_LIST(LAYER_ALPHA, hmc_seg7_dl_0701A400),
         GEO_ASM(0, geo_movtex_pause_control),
-        //GEO_ASM(0x0702, geo_movtex_draw_water_regions),
+        GEO_ASM(0x0702, geo_movtex_draw_water_regions),
     GEO_CLOSE_NODE(),
     GEO_RETURN(),
 ]};
@@ -304,7 +304,7 @@ export const hmc_geo_000998 = () => {return [
         GEO_DISPLAY_LIST(LAYER_OPAQUE, hmc_seg7_dl_0701FD58),
         GEO_ASM(0, geo_movtex_pause_control),
         GEO_ASM(0x0701, geo_movtex_draw_water_regions),
-        //GEO_ASM(0x0702, geo_movtex_draw_water_regions),
+        GEO_ASM(0x0702, geo_movtex_draw_water_regions),
     GEO_CLOSE_NODE(),
     GEO_RETURN(),
 ]};

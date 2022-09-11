@@ -248,7 +248,7 @@ class ShapeHelper {
         Objects.addto_group(this.gMarioFaceGrp, sp48.header)
         Objects.addto_groupfirst(this.gMarioFaceGrp, sp54.header)
 
-        return 0
+        return false
     }
 
     add_3_vtx_to_face(face, vtx1, vtx2, vtx3) {

@@ -1583,7 +1583,7 @@ class Camera {
         let nextPitch = [0, 0, 0]
         let prevYaw = [0, 0, 0]
         let nextYaw = [0, 0, 0]
-        throw "penis. Update Parallel Tracking Camera"
+        throw "Update Parallel Tracking Camera"
     }
 
     update_fixed_camera(c, focus, pos) {

@@ -613,7 +613,7 @@ class Camera {
 
         yaw = this.gPlayerCameraState.faceAngle[1] + yawOff
         c.focus[0] = this.gPlayerCameraState.pos[0] + forwBack * sins(yaw) + leftRight * coss(yaw)
-        c.focus[1] = LevelUpdate.gMarioState.floorHeight + yOff + focFloorYOff // hack
+        // c.focus[1] = this.gPlayerCameraState.pos[1] + yOff + focFloorYOff
         c.focus[2] = this.gPlayerCameraState.pos[2] + forwBack * coss(yaw) + leftRight * sins(yaw)
     }
 

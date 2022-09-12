@@ -403,6 +403,9 @@ class LevelUpdate {
     warp_special(level) {
         this.sCurrPlayMode = PLAY_MODE_CHANGE_LEVEL
         this.warpSpecialLevel = level
+        this.gMarioState.health = 0x880
+        this.gMarioState.hurtCounter = 0
+        this.gMarioState.healCounter = 0
     }
 
     fade_into_special_warp(level, color) {

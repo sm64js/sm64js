@@ -108,8 +108,7 @@ class SurfaceCollision {
                     gasLevel = p[dataIndex]
                     break
                 }
-
-                dataIndex += 6
+                dataIndex++
             }
         }
 

@@ -32,6 +32,7 @@ const bhv_black_smoke_bowser_loop = () => {
 
 const bhv_black_smoke_mario_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
     if (o.rawData[oTimer] == 0) {
         cur_obj_set_pos_relative(gMarioObject, 0, 0, -30.0)
 

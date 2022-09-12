@@ -153,7 +153,8 @@ document.getElementById("mapSelect").addEventListener('change', () => {
 
 window.cheats = {
     disableFallDamage: false,
-    disableSlopePhysics: false
+    disableSlopePhysics: false,
+    healOnWarp: false
 }
 
 const startGame = () => {

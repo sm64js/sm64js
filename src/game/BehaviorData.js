@@ -2198,7 +2198,7 @@ const bhvSmoke = [
 ]
 
 const bhvFireParticleSpawner = [
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvFireParticleSpawner'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     SET_FLOAT(oGraphYOffset, 70),
@@ -2210,7 +2210,7 @@ const bhvFireParticleSpawner = [
 ]
 
 const bhvBlackSmokeMario = [
-    BEGIN(OBJ_LIST_UNIMPORTANT),
+    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvBlackSmokeMario'),
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BILLBOARD(),
     SET_INT(oAnimState, 4),
@@ -2226,7 +2226,7 @@ const bhvBlackSmokeMario = [
 ]
 
 const bhvBlackSmokeBowser = [
-    BEGIN(OBJ_LIST_UNIMPORTANT),
+    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvBlackSmokeBowser'),
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BILLBOARD(),
     SET_FLOAT(oGraphYOffset, 0),

@@ -241,10 +241,8 @@ class ObjectListProcessor {
         if (!(this.gCurrentObject.rawData[oActiveParticleFlags] & activeParticleFlag)) {
             this.gCurrentObject.rawData[oActiveParticleFlags] |= activeParticleFlag
             let particle
-            if (activeParticleFlag != 2048) {
-                particle = spawn_object_at_origin(this.gCurrentObject, model, behavior)
-                obj_copy_pos_and_angle(particle, this.gCurrentObject)
-            }
+            particle = spawn_object_at_origin(this.gCurrentObject, model, behavior)
+            obj_copy_pos_and_angle(particle, this.gCurrentObject)
         }
     }
 

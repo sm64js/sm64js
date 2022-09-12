@@ -1,5 +1,3 @@
-// recovery_heart.inc.c
-
 import { oAngleVelYaw, oFaceAngleYaw, oSpinningHeartPlayedSound, oSpinningHeartTotalSpin } from "../../include/object_constants"
 import { SOUND_GENERAL_HEART_SPIN } from "../../include/sounds"
 import { obj_set_hitbox } from "../ObjBehaviors2"

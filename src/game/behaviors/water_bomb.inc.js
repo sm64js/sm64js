@@ -1,4 +1,3 @@
-// water_bomb.inc.c
 import * as _Linker from "../../game/Linker"
 import { spawn_object, cur_obj_hide, cur_obj_set_pos_via_transform, cur_obj_unhide,
 obj_mark_for_deletion, obj_copy_pos, obj_copy_scale, cur_obj_push_mario_away_from_cylinder,

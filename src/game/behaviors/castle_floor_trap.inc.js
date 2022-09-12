@@ -1,5 +1,4 @@
 import * as _Linker from "../../game/Linker"
-import { bhvFloorTrapInCastle } from "../BehaviorData"
 import { spawn_object_relative } from "../ObjectHelpers"
 import { oFaceAngleRoll, oMoveAngleYaw,oAction, oAngleVelRoll, oInteractStatus, oTimer, oDistanceToMario } from "../../include/object_constants"
 import { MODEL_CASTLE_BOWSER_TRAP } from "../../include/model_ids"
@@ -17,8 +16,8 @@ export const bhv_floor_trap_in_castle_loop = () => {
 export const bhv_castle_floor_trap_init = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     let sp2C
-    sp2C = spawn_object_relative(0, -358, 0, 0, o, MODEL_CASTLE_BOWSER_TRAP, bhvFloorTrapInCastle)
-    sp2C = spawn_object_relative(0, 358, 0, 0, o, MODEL_CASTLE_BOWSER_TRAP, bhvFloorTrapInCastle)
+    sp2C = spawn_object_relative(0, -358, 0, 0, o, MODEL_CASTLE_BOWSER_TRAP, gLinker.behaviors.bhvFloorTrapInCastle)
+    sp2C = spawn_object_relative(0, 358, 0, 0, o, MODEL_CASTLE_BOWSER_TRAP, gLinker.behaviors.bhvFloorTrapInCastle)
     sp2C.rawData[oMoveAngleYaw] += 0x8000
 }
 

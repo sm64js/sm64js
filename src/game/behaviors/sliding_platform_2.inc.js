@@ -6,8 +6,6 @@ import { bitfs_seg7_collision_07015768 } from "../../levels/bitfs/sliding_platfo
 import { bitfs_seg7_collision_07015714 } from "../../levels/bitfs/moving_square_platform/collision.inc"
 import { bitdw_seg7_collision_0700F688 } from "../../levels/bitdw/sliding_platform/collision.inc"
 
-// sliding_platform_2.inc.c
-
 const sSlidingPlatform2CollisionData = [
     /*bits_seg7_collision_0701A9A0*/null,
     /*bits_seg7_collision_0701AA0C*/null,

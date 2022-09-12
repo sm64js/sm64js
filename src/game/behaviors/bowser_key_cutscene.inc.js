@@ -1,4 +1,3 @@
-// bowser_key_cutscene.inc.c
 import * as _Linker from "../../game/Linker"
 import { oBowserKeyScale } from "../../include/object_constants"
 

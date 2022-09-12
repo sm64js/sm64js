@@ -1202,10 +1202,11 @@ class Camera {
                 this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
                 break
             case AREA_TTM_OUTSIDE:
-                this.gLakituState.mode = CAMERA_MODE_RADIAL
+                // this.gLakituState.mode = CAMERA_MODE_RADIAL
                 break
         }
-        c.mode = CAMERA_MODE_FREE_ROAM
+        if (!this.gLakituState.mode) this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
+        c.mode = this.gLakituState.mode
 
         if (c.mode == CAMERA_MODE_8_DIRECTIONS) {
             this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT

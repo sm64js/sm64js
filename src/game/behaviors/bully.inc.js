@@ -1,5 +1,3 @@
-// bully.inc.c
-
 import { play_puzzle_jingle } from "../../audio/external"
 import { GRAPH_RENDER_INVISIBLE } from "../../engine/graph_node"
 import { MODEL_BULLY, MODEL_YELLOW_COIN } from "../../include/model_ids"

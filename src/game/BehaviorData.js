@@ -74,6 +74,7 @@ import * as _falling_rising_platform  from "./behaviors/falling_rising_platform.
 import * as _ferris_wheel             from "./behaviors/ferris_wheel.inc"
 import * as _fish                     from "./behaviors/fish.inc"
 import * as _file_select              from "./behaviors/file_select.inc"
+import * as _flame_mario              from "./behaviors/flame_mario.inc"
 import * as _flamethrower             from "./behaviors/flamethrower.inc"
 import * as _goomba                   from "./behaviors/goomba.inc"
 import * as _king_bobomb              from "./behaviors/king_bobomb.inc"
@@ -225,14 +226,14 @@ const bhvSparkleParticleSpawner = [
     DEACTIVATE(),
 ]
 
-export const bhvYellowBall = [
+const bhvYellowBall = [
     BEGIN(OBJ_LIST_DEFAULT, 'bhvYellowBall'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     CYLBOARD(),
     BREAK(),
 ]
 
-export const bhvStarDoor = [
+const bhvStarDoor = [
     BEGIN(OBJ_LIST_SURFACE, 'bhvStarDoor'),
     SET_INT(oInteractType, INTERACT_DOOR),
     LOAD_COLLISION_DATA(inside_castle_seg7_collision_star_door),
@@ -317,7 +318,7 @@ const bhvCastleFloorTrap = [
     END_LOOP(),
 ]
 
-export const bhvFloorTrapInCastle = [
+const bhvFloorTrapInCastle = [
     BEGIN(OBJ_LIST_SURFACE, 'bhvFloorTrapInCastle'),
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     LOAD_COLLISION_DATA(inside_castle_seg7_collision_floor_trap),
@@ -2196,6 +2197,46 @@ const bhvSmoke = [
     END_LOOP(),
 ]
 
+const bhvFireParticleSpawner = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    BILLBOARD(),
+    SET_FLOAT(oGraphYOffset, 70),
+    SET_INT(oAnimState, -1),
+    BEGIN_LOOP(),
+        ADD_INT(oAnimState, 1),
+        CALL_NATIVE('bhv_flame_mario_loop'),
+    END_LOOP(),
+]
+
+const bhvBlackSmokeMario = [
+    BEGIN(OBJ_LIST_UNIMPORTANT),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BILLBOARD(),
+    SET_INT(oAnimState, 4),
+    SET_FLOAT(oGraphYOffset, 50),
+    BEGIN_REPEAT(8),
+        CALL_NATIVE('bhv_black_smoke_mario_loop'),
+        DELAY(1),
+        CALL_NATIVE('bhv_black_smoke_mario_loop'),
+        DELAY(1),
+        CALL_NATIVE('bhv_black_smoke_mario_loop'),
+    END_REPEAT(),
+    DEACTIVATE(),
+]
+
+const bhvBlackSmokeBowser = [
+    BEGIN(OBJ_LIST_UNIMPORTANT),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BILLBOARD(),
+    SET_FLOAT(oGraphYOffset, 0),
+    BEGIN_REPEAT(8),
+        CALL_NATIVE('bhv_black_smoke_bowser_loop'),
+        ANIMATE_TEXTURE(oAnimState, 4),
+    END_REPEAT(),
+    DEACTIVATE(),
+]
+
 const bhvDoorWarp = [
     BEGIN(OBJ_LIST_SURFACE, 'bhvDoorWarp'),
     SET_INT(oInteractType, INTERACT_WARP_DOOR),
@@ -2520,6 +2561,8 @@ gLinker.behaviors.bhvBowlingBall = bhvBowlingBall
 gLinker.behaviors.bhvBowser = bhvBowser
 gLinker.behaviors.bhvBowserBodyAnchor = bhvBowserBodyAnchor
 gLinker.behaviors.bhvBowserFlameSpawn = bhvBowserFlameSpawn
+gLinker.behaviors.bhvBlackSmokeBowser = bhvBlackSmokeBowser
+gLinker.behaviors.bhvBlackSmokeMario = bhvBlackSmokeMario
 gLinker.behaviors.bhvBreakableBox = bhvBreakableBox
 gLinker.behaviors.bhvBreakableBoxSmall = bhvBreakableBoxSmall
 gLinker.behaviors.bhvBreakBoxTriangle = bhvBreakBoxTriangle
@@ -2556,6 +2599,7 @@ gLinker.behaviors.bhvExplosion = bhvExplosion
 // gLinker.behaviors.bhvFadingWarp = bhvFadingWarp
 gLinker.behaviors.bhvFerrisWheelAxle = bhvFerrisWheelAxle
 gLinker.behaviors.bhvFerrisWheelPlatform = bhvFerrisWheelPlatform
+gLinker.behaviors.bhvFireParticleSpawner = bhvFireParticleSpawner
 gLinker.behaviors.bhvFish = bhvFish
 gLinker.behaviors.bhvFishSpawner = bhvFishSpawner
 gLinker.behaviors.bhvFlame = bhvFlame
@@ -2567,6 +2611,7 @@ gLinker.behaviors.bhvFlyingWarp = bhvFlyingWarp
 gLinker.behaviors.bhvFreeBowlingBall = bhvFreeBowlingBall
 gLinker.behaviors.bhvGhostHuntBigBoo = bhvGhostHuntBigBoo
 gLinker.behaviors.bhvGhostHuntBoo = bhvGhostHuntBoo
+gLinker.behaviors.bhvGiantPole = bhvGiantPole
 gLinker.behaviors.bhvGoomba = bhvGoomba
 gLinker.behaviors.bhvGoombaTripletSpawner = bhvGoombaTripletSpawner
 gLinker.behaviors.bhvHardAirKnockBackWarp = bhvHardAirKnockBackWarp
@@ -2663,5 +2708,6 @@ gLinker.behaviors.bhvWhitePuffExplosion = bhvWhitePuffExplosion
 gLinker.behaviors.bhvWingCap = bhvWingCap
 gLinker.behaviors.bhvWoodenPost = bhvWoodenPost
 gLinker.behaviors.bhvYellowBackgroundInMenu = bhvYellowBackgroundInMenu
+gLinker.behaviors.bhvYellowBall = bhvYellowBall
 gLinker.behaviors.bhvYellowCoin = bhvYellowCoin
 gLinker.behaviors.bhvYoshi = bhvYoshi

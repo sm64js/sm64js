@@ -1,4 +1,3 @@
-// water_mist_particle.inc.c
 import * as _Linker from "../../game/Linker"
 import { ACTIVE_PARTICLE_BREATH } from "../../include/object_constants"
 import { clear_particle_flags } from "./ground_particles.inc"

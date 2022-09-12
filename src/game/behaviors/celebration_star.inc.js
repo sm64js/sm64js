@@ -1,5 +1,3 @@
-// celebration_star.inc.c
-
 import { MODEL_STAR } from "../../include/model_ids"
 import { ACTIVE_FLAG_DEACTIVATED, CELEB_STAR_ACT_FACE_CAMERA, CELEB_STAR_ACT_SPIN_AROUND_MARIO, oAction, oCelebStarDiameterOfRotation, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oHomeX, oHomeZ, oMoveAngleYaw, oPosX, oPosY, oPosZ, oTimer } from "../../include/object_constants"
 import { coss, sins } from "../../utils"

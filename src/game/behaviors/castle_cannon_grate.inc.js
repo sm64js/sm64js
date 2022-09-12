@@ -1,4 +1,3 @@
-// castle_cannon_grate.inc.c
 import * as _Linker from "../../game/Linker"
 import { ACTIVE_FLAG_DEACTIVATED } from "../../include/object_constants"
 

@@ -1,4 +1,3 @@
-// moat_drainer.inc.c
 import * as _Linker from "../../game/Linker"
 import { save_file_get_flags, SAVE_FLAG_MOAT_DRAINED } from "../SaveFile"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../ObjectListProcessor"

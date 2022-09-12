@@ -1,3 +1,4 @@
+import * as _Linker from "../../game/Linker"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { spawn_object, cur_obj_become_intangible, cur_obj_become_tangible } from "../ObjectHelpers"
 import { MODEL_SPARKLES } from "../../include/model_ids"
@@ -93,3 +94,6 @@ export const bhv_moving_yellow_coin_loop = () => {
     }
 
 }
+
+gLinker.bhv_moving_yellow_coin_init = bhv_moving_yellow_coin_init
+gLinker.bhv_moving_yellow_coin_loop = bhv_moving_yellow_coin_loop

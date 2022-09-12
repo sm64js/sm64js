@@ -90,7 +90,7 @@ const bobomb_act_chase_mario = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
-    const sp1a = ++o.gfx.unk38.animFrame
+    const sp1a = ++o.gfx.animInfo.animFrame
     o.rawData[oForwardVel] = 20.0
 
     const collisionFlags = object_step()
@@ -348,7 +348,7 @@ const bhv_bobomb_buddy_init = () => {
 
 const bobomb_buddy_act_idle = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    let sp1a = o.gfx.unk38.animFrame
+    let sp1a = o.gfx.animInfo.animFrame
 
     o.rawData[oBobombBuddyPosXCopy] = o.rawData[oPosX]
     o.rawData[oBobombBuddyPosYCopy] = o.rawData[oPosY]
@@ -454,7 +454,7 @@ const bobomb_buddy_act_talk = () => {
 
 const bobomb_buddy_act_turn_to_talk = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    let /*s16*/ sp1e = o.gfx.unk38.animFrame
+    let /*s16*/ sp1e = o.gfx.animInfo.animFrame
     if ((sp1e == 5) || (sp1e == 16)) {
         cur_obj_play_sound_2(SOUND_OBJ_BOBOMB_WALK)
     }

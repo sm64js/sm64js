@@ -30,14 +30,14 @@ class Joints {
             for (let link = weightGroup.link1C; link != null; link = link.next) {
                 const curWeight = link.obj
 
-                if (curWeight.unk38 > 0.0) {
+                if (curWeight.animInfo > 0.0) {
 
                     const stackVec = { ...curWeight.vec20 }
 
                     gd_rotate_and_translate_vec3f(stackVec, joint.matE8)
 
                     const connectedVtx = curWeight.unk3C
-                    const scaleFactor = curWeight.unk38
+                    const scaleFactor = curWeight.animInfo
 
                     connectedVtx.pos.x += stackVec.x * scaleFactor
                     connectedVtx.pos.y += stackVec.y * scaleFactor

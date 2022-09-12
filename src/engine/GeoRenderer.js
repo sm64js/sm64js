@@ -405,8 +405,8 @@ class GeoRenderer {
                 this.gMatStack[this.gMatStackIndex][3][2]
             ]
 
-            if (object.gfx.unk38.curAnim) {
-                this.geo_set_animation_globals(object.gfx.unk38, hasAnimation)
+            if (object.gfx.animInfo.curAnim) {
+                this.geo_set_animation_globals(object.gfx.animInfo, hasAnimation)
             }
 
             if (this.obj_is_in_view(object.gfx, this.gMatStack[this.gMatStackIndex])) { 
@@ -604,8 +604,8 @@ class GeoRenderer {
 
             this.gCurAnimType = 0
             this.gCurGraphNodeHeldObject = node
-            if (object.gfx.unk38.curAnim) {
-                this.geo_set_animation_globals(object.gfx.unk38, hasAnimation)
+            if (object.gfx.animInfo.curAnim) {
+                this.geo_set_animation_globals(object.gfx.animInfo, hasAnimation)
             }
 
             this.geo_process_single_node(object.gfx.sharedChild)

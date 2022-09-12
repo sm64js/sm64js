@@ -856,7 +856,7 @@ export const act_standing_death = (m) => {
 
     play_sound_if_no_flag(m, SOUND_MARIO_DYING, MARIO_ACTION_SOUND_PLAYED)
     common_death_handler(m, MARIO_ANIM_DYING_FALL_OVER, 80)
-    // const animFrame = geo_update_animation_frame(m.gfx.unk38, null)
+    // const animFrame = geo_update_animation_frame(m.gfx.animInfo, null)
     // if (animFrame == 77) {
     play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
     // }

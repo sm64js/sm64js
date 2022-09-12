@@ -193,7 +193,7 @@ const homing_amp_give_up_loop = () => {
 const amp_attack_cooldown_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     // Turn intangible and wait for 90 frames before chasing Mario again after hitting him.
-    o./*header.*/gfx.unk38.animFrame += 2
+    o./*header.*/gfx.animInfo.animFrame += 2
     o.rawData[oForwardVel] = 0
 
     cur_obj_become_intangible()

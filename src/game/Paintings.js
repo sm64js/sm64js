@@ -634,7 +634,7 @@ let gLastPaintingUpdateCounter = 0
 //     rippleDistance = distanceToOrigin / dispersionFactor
 //     if (rippleTimer < rippleDistance) {
 //           // if the ripple hasn't reached the point yet, make the point magnitude 0
-//         return 0
+//         return false
 //     } else {
 //           // use a cosine wave to make the ripple go up and down,
 //           // scaled by the painting's ripple magnitude
@@ -647,7 +647,7 @@ let gLastPaintingUpdateCounter = 0
 
 /**
  * If movable, return the ripple function at (posX, posY)
- * else return 0
+ * else return false
  */
 // export const ripple_if_movable = (painting, movable, posX, posY) => {
 //     let /*s16*/ rippleZ = 0
@@ -1240,7 +1240,7 @@ let gLastPaintingUpdateCounter = 0
 
 //           // Update the painting
 //         painting_update_floors(painting)
-//         switch ((s16) painting.pitch) {
+//         switch (s16(painting.pitch)) {
 //               // only paintings with 0 pitch are treated as walls
 //             case 0:
 //                 wall_painting_update(painting, paintingGroup)

@@ -276,7 +276,7 @@ class Objects {
         return {
             header: this.make_object(GDTypes.OBJ_TYPE_WEIGHTS),
             id,
-            unk38: weight,
+            animInfo: weight,
             unk3C: vtx
         }
     }
@@ -563,7 +563,7 @@ class Objects {
 
         Object.assign(newView, {
             unk78: 0,
-            unk38: a2,
+            animInfo: a2,
             clipping: { x: 30.0, y: 5000.0, z: 45.0 },
             upperLeft: { x: ulx, y: uly },
             lowerRight: { x: lrx, y: lry },

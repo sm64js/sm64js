@@ -161,7 +161,7 @@ import {
 
 
 const play_flip_sounds = (m, frame1, frame2, frame3) => {
-    let animFrame = m.marioObj.gfx.unk38.animFrame
+    let animFrame = m.marioObj.gfx.animInfo.animFrame
     if (animFrame == frame1 || animFrame == frame2 || animFrame == frame3) {
         play_sound(SOUND_ACTION_SPIN, m.marioObj.gfx.cameraToObject)
     }
@@ -712,7 +712,7 @@ export const act_side_flip = (m) => {
         m.marioObj.gfx.angle[1] = s16(m.marioObj.gfx.angle[1] + 0x8000)
     }
 
-    if (m.marioObj.gfx.unk38.animFrame == 6) {
+    if (m.marioObj.gfx.animInfo.animFrame == 6) {
         play_sound(SOUND_ACTION_SIDE_FLIP_UNK, m.marioObj.gfx.cameraToObject)
     }
 
@@ -1028,7 +1028,7 @@ export const act_ground_pound = (m) => {
         }
 
         m.actionTimer++
-        if (m.actionTimer >= m.marioObj.gfx.unk38.curAnim.unk08 + 4) {
+        if (m.actionTimer >= m.marioObj.gfx.animInfo.curAnim.unk08 + 4) {
             play_sound(SOUND_MARIO_GROUND_POUND_WAH, m.marioObj.gfx.cameraToObject)
             m.actionState = 1
         }
@@ -1460,7 +1460,7 @@ export const act_backward_rollout = (m) => {
             break
     }
 
-    if (m.actionState == 1 && m.marioObj.gfx.unk38.animFrame == 2) {
+    if (m.actionState == 1 && m.marioObj.gfx.animInfo.animFrame == 2) {
         m.actionState = 2
     }
     return false
@@ -1654,12 +1654,12 @@ export const act_jump_kick = (m) => {
 
     if (m.actionState == 0) {
         play_sound_if_no_flag(m, SOUND_MARIO_PUNCH_HOO, MARIO_ACTION_SOUND_PLAYED)
-        m.marioObj.gfx.unk38.animID = -1
+        m.marioObj.gfx.animInfo.animID = -1
         set_mario_animation(m, MARIO_ANIM_AIR_KICK)
         m.actionState = 1
     }
 
-    animFrame = m.marioObj.gfx.unk38.animFrame
+    animFrame = m.marioObj.gfx.animInfo.animFrame
     if (animFrame == 0) {
         m.marioBodyState.punchState = (2 << 6) | 6
     }
@@ -1764,7 +1764,7 @@ export const act_flying = (m) => {
             set_mario_animation(m, MARIO_ANIM_FLY_FROM_CANNON)
         } else {
             set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING_FLIP)
-            if (m.marioObj.gfx.unk38.animFrame == 1) {
+            if (m.marioObj.gfx.animInfo.animFrame == 1) {
                 play_sound(SOUND_ACTION_SPIN, m.marioObj.gfx.cameraToObject)
             }
         }
@@ -1899,7 +1899,7 @@ export const act_flying_triple_jump = (m) => {
     if (m.actionState == 0) {
         set_mario_animation(m, MARIO_ANIM_TRIPLE_JUMP_FLY)
 
-        if (m.marioObj.gfx.unk38.animFrame == 7) {
+        if (m.marioObj.gfx.animInfo.animFrame == 7) {
             play_sound(SOUND_ACTION_SPIN, m.marioObj.gfx.cameraToObject)
         }
 
@@ -1909,7 +1909,7 @@ export const act_flying_triple_jump = (m) => {
         }
     }
 
-    if (m.actionState == 1 && m.marioObj.gfx.unk38.animFrame == 1) {
+    if (m.actionState == 1 && m.marioObj.gfx.animInfo.animFrame == 1) {
         play_sound(SOUND_ACTION_SPIN, m.marioObj.gfx.cameraToObject)
     }
 
@@ -1963,7 +1963,7 @@ export const act_vertical_wind = (m) => {
     play_sound_if_no_flag(m, SOUND_MARIO_HERE_WE_GO, MARIO_MARIO_SOUND_PLAYED)
     if (m.actionState == 0) {
         set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING_FLIP)
-        if (m.marioObj.gfx.unk38.animFrame == 1) {
+        if (m.marioObj.gfx.animInfo.animFrame == 1) {
             play_sound(SOUND_ACTION_SPIN, m.marioObj.gfx.cameraToObject)
         }
 

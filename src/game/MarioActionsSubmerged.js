@@ -435,7 +435,7 @@ const act_drowning = (m) => {
         case 1:
             Mario.set_mario_animation(m, Mario.MARIO_ANIM_DROWNING_PART2)
             m.marioBodyState.eyeState = MARIO_EYES_DEAD
-            const animFrame = geo_update_animation_frame(m.marioObj.gfx.unk38, null)
+            const animFrame = geo_update_animation_frame(m.marioObj.gfx.animInfo, null)
             if (animFrame == 30) {
                 level_trigger_warp(m, WARP_OP_DEATH)
             }

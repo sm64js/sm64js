@@ -334,10 +334,8 @@ const interact_star_or_key = (m, /*interactType,*/ o) => {
         //     fadeout_level_music(126);
         // }
 
-        play_sound(SOUND_MENU_STAR_SOUND, m.marioObj.gfx.cameraToObject);
-// #ifndef VERSION_JP
+        play_sound(SOUND_MENU_STAR_SOUND, m.marioObj.gfx.cameraToObject)
         update_mario_sound_and_camera(m)
-// #endif
 
         if (grandStar) {
             return set_mario_action(m, ACT_JUMBO_STAR_CUTSCENE, 0)
@@ -748,7 +746,7 @@ const mario_can_talk = (m, arg) => {
             return true
         }
 
-        val6 = m.marioObj.gfx.unk38.animID
+        val6 = m.marioObj.gfx.animInfo.animID
 
         if (val6 == 0x0080 || val6 == 0x007F || val6 == 0x006C) {
             return true

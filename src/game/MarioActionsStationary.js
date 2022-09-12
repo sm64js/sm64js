@@ -61,9 +61,11 @@ import {
     ACT_STOP_CRAWLING, ACT_STOP_CROUCHING, ACT_THROWING, ACT_TRIPLE_JUMP_LAND_STOP, ACT_TWIRL_LAND,
     ACT_UNKNOWN_0002020E, ACT_WAKING_UP, ACT_WALKING,
 
+    MARIO_ACTION_SOUND_PLAYED,
+
     INPUT_A_PRESSED, INPUT_ABOVE_SLIDE, INPUT_B_PRESSED, INPUT_FIRST_PERSON, INPUT_IN_WATER,
     INPUT_NONZERO_ANALOG, INPUT_OFF_FLOOR, INPUT_SQUISHED, INPUT_STOMPED, INPUT_Z_DOWN,
-    INPUT_IN_POISON_GAS,
+    INPUT_IN_POISON_GAS, INPUT_Z_PRESSED,
 
     MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP, MARIO_ANIM_CROUCH_FROM_SLIDE_KICK,
     MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP, MARIO_ANIM_CROUCHING, MARIO_ANIM_GENERAL_LAND,
@@ -74,7 +76,13 @@ import {
     MARIO_ANIM_START_CRAWLING, MARIO_ANIM_START_CROUCHING, MARIO_ANIM_STOP_CRAWLING,
     MARIO_ANIM_STOP_CROUCHING, MARIO_ANIM_STOP_SKID, MARIO_ANIM_STOP_SLIDE,
     MARIO_ANIM_THROW_LIGHT_OBJECT, MARIO_ANIM_TRIPLE_JUMP_LAND, MARIO_ANIM_STAND_UP_FROM_LAVA_BOOST,
-    MARIO_ANIM_STAND_UP_FROM_SLIDING_WITH_LIGHT_OBJ
+    MARIO_ANIM_STAND_UP_FROM_SLIDING_WITH_LIGHT_OBJ, MARIO_ANIM_START_SLEEP_IDLE, MARIO_ANIM_START_SLEEP_SCRATCH,
+    MARIO_ANIM_START_SLEEP_YAWN, MARIO_ANIM_START_SLEEP_SITTING, MARIO_ANIM_COUGHING,
+    MARIO_ANIM_SHIVERING_WARMING_HAND, MARIO_ANIM_SHIVERING, MARIO_ANIM_SHIVERING_RETURN_TO_IDLE,
+    MARIO_ANIM_SLEEP_IDLE, MARIO_ANIM_SLEEP_START_LYING, MARIO_ANIM_SLEEP_LYING,
+    MARIO_ANIM_WAKE_FROM_SLEEP, MARIO_ANIM_WAKE_FROM_LYING, MARIO_ANIM_WALK_PANTING,
+
+    find_floor_height_relative_polar, play_mario_heavy_landing_sound, play_sound_if_no_flag
 } from "./Mario"
 
 import {
@@ -82,9 +90,23 @@ import {
 } from "./Interaction"
 
 import {
-    PARTICLE_IDLE_WATER_WAVE
+    PARTICLE_IDLE_WATER_WAVE, PARTICLE_BREATH
 } from "../include/mario_constants"
 
+import { 
+    SOUND_MARIO_IMA_TIRED, SOUND_MARIO_YAWNING, SOUND_MARIO_COUGHING1, SOUND_MARIO_COUGHING2, SOUND_MARIO_COUGHING3,
+    SOUND_MARIO_PANTING_COLD, SOUND_ACTION_CLAP_HANDS_COLD, SOUND_MARIO_SNORING1, SOUND_MARIO_SNORING2,
+    SOUND_MARIO_SNORING3, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND, SOUND_ACTION_PAT_BACK,
+    SOUND_MARIO_PANTING
+} from "../include/sounds"
+
+import { MARIO_EYES_HALF_CLOSED, MARIO_EYES_CLOSED } from "../include/mario_geo_switch_case_ids"
+
+import { TERRAIN_MASK, TERRAIN_SNOW, SURFACE_FLAG_DYNAMIC } from "../include/surface_terrains"
+
+import { play_sound } from "../audio/external"
+
+import { raise_background_noise } from "./SoundInit"
 
 const check_common_idle_cancels = (m) => {
     if (m.input & INPUT_A_PRESSED) {
@@ -165,8 +187,20 @@ const act_idle = (m) => {
         return set_mario_action(m, ACT_COUGHING, 0)
     }
 
+    if (!(m.actionArg & 1) && m.health < 0x300) {
+        return set_mario_action(m, ACT_PANTING, 0)
+    }
+
     if (check_common_idle_cancels(m)) {
         return true
+    }
+
+    if (m.actionState == 3) {
+        if ((m.area.terrainType & TERRAIN_MASK) == TERRAIN_SNOW) {
+            return set_mario_action(m, ACT_SHIVERING, 0)
+        } else {
+            return set_mario_action(m, ACT_START_SLEEPING, 0)
+        }
     }
 
     if (m.actionArg & 1) {
@@ -179,13 +213,261 @@ const act_idle = (m) => {
         }
 
         if (is_anim_at_end(m)) {
+            // Fall asleep after 10 head turning cycles.
+            // act_start_sleeping is triggered earlier in the function
+            // when actionState == 3. This happens when Mario's done
+            // turning his head back and forth. However, we do some checks
+            // here to make sure that Mario would be able to sleep here,
+            // and that he's gone through 10 cycles before sleeping.
+            // actionTimer is used to track how many cycles have passed.
             if (++m.actionState == 3) {
-                m.actionState = 0
+                let deltaYOfFloorBehindMario = m.pos[1] - find_floor_height_relative_polar(m, -0x8000, 60.0)
+                if (deltaYOfFloorBehindMario < -24.0 || 24.0 < deltaYOfFloorBehindMario || m.floor.flags & SURFACE_FLAG_DYNAMIC) {
+                    m.actionState = 0;
+                } else {
+                    // If Mario hasn't turned his head 10 times yet, stay idle instead of going to sleep.
+                    m.actionTimer++
+                    if (m.actionTimer < 10) {
+                        m.actionState = 0
+                    }
+                }
             }
         }
     }
 
     stationary_ground_step(m)
+
+    return false
+}
+
+const play_anim_sound = (m, actionState, animFrame, sound) => {
+    if (m.actionState == actionState && m.marioObj.gfx.animInfo.animFrame == animFrame) {
+        play_sound(sound, m.marioObj.gfx.cameraToObject)
+    }
+}
+
+const act_start_sleeping = (m) => {
+    let animFrame
+
+    if (check_common_idle_cancels(m)) {
+        return true
+    }
+
+    if (m.quicksandDepth > 30.0) {
+        return set_mario_action(m, ACT_IN_QUICKSAND, 0)
+    }
+
+    if (m.actionState == 4) {
+        return set_mario_action(m, ACT_SLEEPING, 0)
+    }
+
+    switch (m.actionState) {
+        case 0:
+            animFrame = set_mario_animation(m, MARIO_ANIM_START_SLEEP_IDLE)
+            break
+
+        case 1:
+            animFrame = set_mario_animation(m, MARIO_ANIM_START_SLEEP_SCRATCH)
+            break
+
+        case 2:
+            animFrame = set_mario_animation(m, MARIO_ANIM_START_SLEEP_YAWN)
+            m.marioBodyState.eyeState = MARIO_EYES_HALF_CLOSED
+            break
+
+        case 3:
+            animFrame = set_mario_animation(m, MARIO_ANIM_START_SLEEP_SITTING)
+            m.marioBodyState.eyeState = MARIO_EYES_HALF_CLOSED
+            break
+    }
+
+    play_anim_sound(m, 1, 41, SOUND_ACTION_PAT_BACK)
+    play_anim_sound(m, 1, 49, SOUND_ACTION_PAT_BACK)
+    play_anim_sound(m, 3, 15, m.terrainSoundAddend + SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
+
+    if (is_anim_at_end(m)) {
+        m.actionState++
+    }
+
+    if (m.actionState == 2 && animFrame == -1) {
+        play_sound(SOUND_MARIO_YAWNING, m.marioObj.gfx.cameraToObject)
+    }
+
+    if (m.actionState == 1 && animFrame == -1) {
+        play_sound(SOUND_MARIO_IMA_TIRED, m.marioObj.gfx.cameraToObject)
+    }
+
+    stationary_ground_step(m)
+    return false
+}
+
+const act_sleeping = (m) => {
+    let animFrame
+    if (m.input
+        & (INPUT_NONZERO_ANALOG | INPUT_A_PRESSED | INPUT_OFF_FLOOR | INPUT_ABOVE_SLIDE
+           | INPUT_FIRST_PERSON | INPUT_STOMPED | INPUT_B_PRESSED | INPUT_Z_PRESSED)) {
+        return set_mario_action(m, ACT_WAKING_UP, m.actionState)
+    }
+
+    if (m.quicksandDepth > 30.0) {
+        return set_mario_action(m, ACT_WAKING_UP, m.actionState);
+    }
+
+    if (m.pos[1] - find_floor_height_relative_polar(m, -0x8000, 60.0) > 24.0) {
+        return set_mario_action(m, ACT_WAKING_UP, m.actionState)
+    }
+
+    m.marioBodyState.eyeState = MARIO_EYES_CLOSED
+    stationary_ground_step(m)
+    switch (m.actionState) {
+        case 0:
+            animFrame = set_mario_animation(m, MARIO_ANIM_SLEEP_IDLE)
+
+            if (animFrame == -1 && !m.actionTimer) {
+                // lower_background_noise(2)
+            }
+
+            if (animFrame == 2) {
+                play_sound(SOUND_MARIO_SNORING1, m.marioObj.gfx.cameraToObject)
+            }
+
+            if (animFrame == 20) {
+                play_sound(SOUND_MARIO_SNORING2, m.marioObj.gfx.cameraToObject)
+            }
+
+            if (is_anim_at_end(m)) {
+                m.actionTimer++
+                if (m.actionTimer > 45) {
+                    m.actionState++
+                }
+            }
+            break
+
+        case 1:
+            if (set_mario_animation(m, MARIO_ANIM_SLEEP_START_LYING) == 18) {
+                play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
+            }
+
+            if (is_anim_at_end(m)) {
+                m.actionState++
+            }
+            break;
+
+        case 2:
+            animFrame = set_mario_animation(m, MARIO_ANIM_SLEEP_LYING)
+            play_sound_if_no_flag(m, SOUND_MARIO_SNORING3, MARIO_ACTION_SOUND_PLAYED)
+            break
+    }
+    return false
+}
+
+const act_waking_up = (m) => {
+    if (!m.actionTimer) {
+        // stop_sound(SOUND_MARIO_SNORING1, m.marioObj.gfx.cameraToObject)
+        // stop_sound(SOUND_MARIO_SNORING2, m.marioObj.gfx.cameraToObject)
+        // stop_sound(SOUND_MARIO_SNORING3, m.marioObj.gfx.cameraToObject)
+        raise_background_noise(2)
+    }
+
+    if (m.input & INPUT_STOMPED) {
+        return set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0)
+    }
+
+    if (m.input & INPUT_OFF_FLOOR) {
+        return set_mario_action(m, ACT_FREEFALL, 0)
+    }
+
+    if (m.input & INPUT_ABOVE_SLIDE) {
+        return set_mario_action(m, ACT_BEGIN_SLIDING, 0)
+    }
+
+    m.actionTimer++
+
+    if (m.actionTimer > 20) {
+        return set_mario_action(m, ACT_IDLE, 0)
+    }
+
+    stationary_ground_step(m)
+
+    set_mario_animation(m, !m.actionArg ? MARIO_ANIM_WAKE_FROM_SLEEP : MARIO_ANIM_WAKE_FROM_LYING)
+
+    return false
+}
+
+const act_shivering = (m) => {
+    let animFrame
+
+    if (m.input & INPUT_STOMPED) {
+        return set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0)
+    }
+
+    if (m.input & INPUT_OFF_FLOOR) {
+        return set_mario_action(m, ACT_FREEFALL, 0)
+    }
+
+    if (m.input & INPUT_ABOVE_SLIDE) {
+        return set_mario_action(m, ACT_BEGIN_SLIDING, 0)
+    }
+
+    if (m.input
+        & (INPUT_NONZERO_ANALOG | INPUT_A_PRESSED | INPUT_OFF_FLOOR | INPUT_ABOVE_SLIDE
+           | INPUT_FIRST_PERSON | INPUT_STOMPED | INPUT_B_PRESSED | INPUT_Z_PRESSED)) {
+        m.actionState = 2
+    }
+
+    stationary_ground_step(m)
+    switch (m.actionState) {
+        case 0:
+            animFrame = set_mario_animation(m, MARIO_ANIM_SHIVERING_WARMING_HAND)
+            if (animFrame == 49) {
+                m.particleFlags |= PARTICLE_BREATH
+                play_sound(SOUND_MARIO_PANTING_COLD, m.marioObj.gfx.cameraToObject)
+            }
+            if (animFrame == 7 || animFrame == 81) {
+                play_sound(SOUND_ACTION_CLAP_HANDS_COLD, m.marioObj.gfx.cameraToObject)
+            }
+            if (is_anim_past_end(m)) {
+                m.actionState = 1
+            }
+            break
+
+        case 1:
+            animFrame = set_mario_animation(m, MARIO_ANIM_SHIVERING)
+            if (animFrame == 9 || animFrame == 25 || animFrame == 44) {
+                play_sound(SOUND_ACTION_CLAP_HANDS_COLD, m.marioObj.gfx.cameraToObject)
+            }
+            break
+
+        case 2:
+            set_mario_animation(m, MARIO_ANIM_SHIVERING_RETURN_TO_IDLE)
+            if (is_anim_past_end(m)) {
+                set_mario_action(m, ACT_IDLE, 0)
+            }
+            break
+    }
+    return false
+}
+
+const act_coughing = (m) => {
+    let animFrame
+
+    if (check_common_idle_cancels(m)) {
+        return true
+    }
+
+    stationary_ground_step(m)
+    animFrame = set_mario_animation(m, MARIO_ANIM_COUGHING)
+    if (animFrame == 25 || animFrame == 35) {
+        play_sound(SOUND_MARIO_COUGHING3, m.marioObj.gfx.cameraToObject)
+    }
+
+    if (animFrame == 50 || animFrame == 58) {
+        play_sound(SOUND_MARIO_COUGHING2, m.marioObj.gfx.cameraToObject)
+    }
+
+    if (animFrame == 71 || animFrame == 80) {
+        play_sound(SOUND_MARIO_COUGHING1, m.marioObj.gfx.cameraToObject)
+    }
 
     return false
 }
@@ -403,6 +685,29 @@ const act_crouching = (m) => {
     return false
 }
 
+const act_panting = (m) => {
+    if (m.input & INPUT_STOMPED) {
+        return set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0)
+    }
+
+    if (m.health >= 0x500) {
+        return set_mario_action(m, ACT_IDLE, 0)
+    }
+
+    if (check_common_idle_cancels(m)) {
+        return true
+    }
+
+    if (set_mario_animation(m, MARIO_ANIM_WALK_PANTING) == 1) {
+        play_sound(SOUND_MARIO_PANTING /*+ ((gAudioRandom % 3) << 0x10)*/,
+                   m.marioObj.gfx.cameraToObject)
+    }
+
+    stationary_ground_step(m)
+    m.marioBodyState.eyeState = MARIO_EYES_HALF_CLOSED
+    return false
+}
+
 const act_stop_crouching = (m) => {
 
     if (m.input & INPUT_OFF_FLOOR) {
@@ -426,7 +731,7 @@ const act_stop_crouching = (m) => {
 }
 
 const act_backflip_land_stop = (m) => {
-    if (!(m.input & INPUT_Z_DOWN) || m.marioObj.gfx.unk38.animFrame >= 6) {
+    if (!(m.input & INPUT_Z_DOWN) || m.marioObj.gfx.animInfo.animFrame >= 6) {
         m.input &= -3
     }
 
@@ -530,7 +835,7 @@ const act_butt_slide_stop = (m) => {
 
     stopping_step(m, MARIO_ANIM_STOP_SLIDE, ACT_IDLE)
 
-    if (m.marioObj.gfx.unk38.animFrame == 6) {
+    if (m.marioObj.gfx.animInfo.animFrame == 6) {
         //play landing sound
     }
 

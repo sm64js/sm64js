@@ -278,7 +278,7 @@ const fish_act_flee = () => {
 const fish_act_init = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     cur_obj_init_animation_with_accel_and_sound(0, 1)
-    o.gfx.unk38.animFrame = int16(random_float() * 28)
+    o.gfx.animInfo.animFrame = int16(random_float() * 28)
     o.oFishDepthDistance = random_float() * 300
     cur_obj_scale(random_float() * 0.4 + 0.8)
     o.rawData[oAction] = FISH_ACT_ROAM

@@ -1,3 +1,4 @@
+import * as _Linker from "../../game/Linker"
 import { spawn_object, cur_obj_move_using_fvel_and_gravity, cur_obj_scale, cur_obj_set_pos_relative, obj_mark_for_deletion } from "../ObjectHelpers"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { MODEL_CARTOON_STAR, MODEL_DIRT_ANIMATION } from "../../include/model_ids"
@@ -98,3 +99,10 @@ export const bhv_punch_tiny_triangle_loop = () => {
     if (6 < o.rawData[oTimer])
         obj_mark_for_deletion(o)
 }
+
+gLinker.bhv_pound_tiny_star_particle_init = bhv_pound_tiny_star_particle_init
+gLinker.bhv_pound_tiny_star_particle_loop = bhv_pound_tiny_star_particle_loop
+gLinker.bhv_tiny_star_particles_init = bhv_tiny_star_particles_init
+gLinker.bhv_wall_tiny_star_particle_loop = bhv_wall_tiny_star_particle_loop
+gLinker.bhv_punch_tiny_triangle_loop = bhv_punch_tiny_triangle_loop
+gLinker.bhv_punch_tiny_triangle_init = bhv_punch_tiny_triangle_init

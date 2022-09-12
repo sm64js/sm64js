@@ -1,9 +1,8 @@
 import * as _Linker from "../../game/Linker"
 
-
 export const bhv_castle_flag_init = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    o.gfx.unk38.animFrame = Math.floor(Math.random() * 28.0)
+    o.gfx.animInfo.animFrame = Math.floor(Math.random() * 28.0)
 }
 
 

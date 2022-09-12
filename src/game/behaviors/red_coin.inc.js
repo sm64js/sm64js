@@ -1,3 +1,4 @@
+import * as _Linker from "../../game/Linker"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { INTERACT_COIN, INT_STATUS_INTERACTED } from "../Interaction"
@@ -36,3 +37,6 @@ export const bhv_red_coin_loop = () => {
 
     }
 }
+
+gLinker.bhv_red_coin_init = bhv_red_coin_init
+gLinker.bhv_red_coin_loop = bhv_red_coin_loop

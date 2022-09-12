@@ -1,4 +1,4 @@
-// water_mist.c.inc
+import * as _Linker from "../../game/Linker"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { SurfaceCollisionInstance as SurfaceCollision  } from "../../engine/SurfaceCollision"
 
@@ -15,3 +15,5 @@ export const bhv_water_mist_2_loop = () => {
     o.rawData[oPosZ] = o.rawData[oHomeZ] + random_f32_around_zero(150)
     o.rawData[oOpacity] = s32(random_float() * 50 + 200)
 }
+
+gLinker.bhv_water_mist_2_loop = bhv_water_mist_2_loop

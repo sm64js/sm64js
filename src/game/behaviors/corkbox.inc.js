@@ -1,3 +1,4 @@
+import * as _Linker from "../../game/Linker"
 import { spawn_object_abs_with_rot, spawn_object, cur_obj_scale } from "../ObjectHelpers"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { MODEL_NONE } from "../../include/model_ids"
@@ -31,3 +32,6 @@ export const create_respawner = (model, behToSpawn, minSpawnDist) => {
     respawner.rawData[oRespawnerMinSpawnDist] = minSpawnDist
     respawner.rawData[oRespawnerBehaviorToRespawn] = behToSpawn
 }
+
+gLinker.bhv_bobomb_bully_death_smoke_init = bhv_bobomb_bully_death_smoke_init
+gLinker.bhv_respawner_loop = bhv_respawner_loop

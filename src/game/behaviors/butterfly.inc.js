@@ -21,7 +21,7 @@ const bhv_butterfly_init = () => {
     cur_obj_init_animation(1)
 
     o.oButterflyYPhase = int16(random_float() * 100)
-    o.gfx.unk38.animFrame = int16(random_float() * 7)
+    o.gfx.animInfo.animFrame = int16(random_float() * 7)
     o.rawData[oHomeX] = o.rawData[oPosX]
     o.rawData[oHomeY] = o.rawData[oPosY]
     o.rawData[oHomeZ] = o.rawData[oPosZ]

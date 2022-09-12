@@ -39,7 +39,7 @@ export const bhv_squarish_path_moving_loop = () => {
             break
     }
     cur_obj_move_using_fvel_and_gravity()
-    //load_object_collision_model(); BehaviorData.js should already cover this
+    gLinker.SurfaceLoad.load_object_collision_model()
 }
 
 gLinker.bhv_squarish_path_moving_loop = bhv_squarish_path_moving_loop

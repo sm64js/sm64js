@@ -355,7 +355,7 @@ const act_hang_moving = (m) => {
         Mario.set_mario_animation(m, Mario.MARIO_ANIM_MOVE_ON_WIRE_NET_LEFT)
     }
 
-    // if (m.marioObj.gfx.unk38.animFrame == 12) {
+    // if (m.marioObj.gfx.animInfo.animFrame == 12) {
     //     play_sound(SOUND_ACTION_HANGING_STEP, m.marioObj.gfx.cameraToObject)
     //     queue_rumble_data(5, 30)
     // }
@@ -510,7 +510,7 @@ const act_ledge_climb_slow = (m) => {
     update_ledge_climb(m, Mario.MARIO_ANIM_SLOW_LEDGE_GRAB, Mario.ACT_IDLE)
 
     update_ledge_climb_camera(m)
-    if (m.marioObj.gfx.unk38.animFrame == 17) {
+    if (m.marioObj.gfx.animInfo.animFrame == 17) {
         m.action = Mario.ACT_LEDGE_CLIMB_SLOW_2
     }
 
@@ -526,7 +526,7 @@ const act_ledge_climb_fast = (m) => {
 
     update_ledge_climb(m, Mario.MARIO_ANIM_FAST_LEDGE_GRAB, Mario.ACT_IDLE)
 
-    if (m.marioObj.gfx.unk38.animFrame == 8) {
+    if (m.marioObj.gfx.animInfo.animFrame == 8) {
         Mario.play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
     }
     update_ledge_climb_camera(m)
@@ -560,7 +560,7 @@ const act_top_of_pole_transition = (m) => {
         }
     } else {
         Mario.set_mario_animation(m, Mario.MARIO_ANIM_RETURN_FROM_HANDSTAND)
-        if (m.marioObj.gfx.unk38.animFrame == 0) {
+        if (m.marioObj.gfx.animInfo.animFrame == 0) {
             return Mario.set_mario_action(m, Mario.ACT_HOLDING_POLE, 0)
         }
     }

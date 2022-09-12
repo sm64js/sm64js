@@ -127,12 +127,14 @@ import {
     PARTICLE_DUST, PARTICLE_VERTICAL_STAR, PARTICLE_WAVE_TRAIL, PARTICLE_FIRE
 } from "../include/mario_constants"
 
+import { MARIO_EYES_DEAD } from "../include/mario_geo_switch_case_ids"
+
 import {
     SOUND_ACTION_METAL_STEP, SOUND_ACTION_METAL_STEP_TIPTOE, SOUND_ACTION_QUICKSAND_STEP,
     SOUND_ACTION_TERRAIN_BODY_HIT_GROUND, SOUND_ACTION_TERRAIN_LANDING, SOUND_ACTION_TERRAIN_STEP,
     SOUND_ACTION_TERRAIN_STEP_TIPTOE, SOUND_MARIO_ATTACKED, SOUND_MARIO_HAHA, SOUND_MARIO_HOOHOO,
     SOUND_MARIO_MAMA_MIA, SOUND_MARIO_OOOF2, SOUND_MARIO_UH2_2, SOUND_MOVING_TERRAIN_SLIDE,
-    SOUND_GENERAL_FLAME_OUT
+    SOUND_GENERAL_FLAME_OUT, SOUND_MOVING_LAVA_BURN
 } from "../include/sounds"
 
 import { mtxf_align_terrain_triangle } from "../engine/math_util"
@@ -148,14 +150,14 @@ export const tilt_body_running = (m) => {
 export const play_step_sound = (m, frame1, frame2) => {
     if (is_anim_past_frame(m, frame1) || is_anim_past_frame(m, frame2)) {
         if (m.flags & MARIO_METAL_CAP) {
-            if (m.marioObj.gfx.unk38.animID == MARIO_ANIM_TIPTOE) {
+            if (m.marioObj.gfx.animInfo.animID == MARIO_ANIM_TIPTOE) {
                 play_sound_and_spawn_particles(m, SOUND_ACTION_METAL_STEP_TIPTOE, 0)
             } else {
                 play_sound_and_spawn_particles(m, SOUND_ACTION_METAL_STEP, 0)
             }
         } else if (m.quicksandDepth > 50.0) {
             play_sound(SOUND_ACTION_QUICKSAND_STEP, m.marioObj.gfx.cameraToObject)
-        } else if (m.marioObj.gfx.unk38.animID == MARIO_ANIM_TIPTOE) {
+        } else if (m.marioObj.gfx.animInfo.animID == MARIO_ANIM_TIPTOE) {
             play_sound_and_spawn_particles(m, SOUND_ACTION_TERRAIN_STEP_TIPTOE, 0)
         } else {
             play_sound_and_spawn_particles(m, SOUND_ACTION_TERRAIN_STEP, 0)
@@ -414,7 +416,7 @@ export const anim_and_audio_for_heavy_walk = (m) => {
 
 const tilt_body_walking = (m, startYaw) => {
     const val0C = m.marioBodyState
-    const animID = m.marioObj.gfx.unk38.animID
+    const animID = m.marioObj.gfx.animInfo.animID
     let dYaw, val02, val00
 
     if (animID == MARIO_ANIM_WALKING || animID == MARIO_ANIM_RUNNING) {
@@ -1133,7 +1135,7 @@ const act_burning_ground = (m) => {
     }
 
     if (m.waterLevel - m.floorHeight > 50.0) {
-        play_sound(SOUND_GENERAL_FLAME_OUT, m.marioObj.header.gfx.cameraToObject);
+        play_sound(SOUND_GENERAL_FLAME_OUT, m.marioObj.gfx.cameraToObject)
         return set_mario_action(m, ACT_WALKING, 0)
     }
 
@@ -1148,7 +1150,7 @@ const act_burning_ground = (m) => {
 
     if (m.input & INPUT_NONZERO_ANALOG) {
         m.faceAngle[1] =
-            m.intendedYaw - approach_s32((s16)(m.intendedYaw - m.faceAngle[1]), 0, 0x600, 0x600);
+            m.intendedYaw - approach_s32(s16(m.intendedYaw - m.faceAngle[1]), 0, 0x600, 0x600);
     }
 
     apply_slope_accel(m)
@@ -1157,20 +1159,20 @@ const act_burning_ground = (m) => {
         set_mario_action(m, ACT_BURNING_FALL, 0)
     }
 
-    set_mario_anim_with_accel(m, MARIO_ANIM_RUNNING, (s32)(m.forwardVel / 2.0 * 0x10000))
-    //play_step_sound(m, 9, 45)
+    set_mario_anim_with_accel(m, MARIO_ANIM_RUNNING, s32(m.forwardVel / 2.0 * 0x10000))
+    play_step_sound(m, 9, 45)
 
-    m.particleFlags |= PARTICLE_FIRE //hmm
-    //play_sound(SOUND_MOVING_LAVA_BURN, m.marioObj.header.gfx.cameraToObject);
+    m.particleFlags |= PARTICLE_FIRE
+    play_sound(SOUND_MOVING_LAVA_BURN, m.marioObj.gfx.cameraToObject)
 
     m.health -= 10
     if (m.health < 0x100) {
         set_mario_action(m, ACT_STANDING_DEATH, 0)
     }
 
-    //m.marioBodyState.eyeState = MARIO_EYES_DEAD
+    m.marioBodyState.eyeState = MARIO_EYES_DEAD
 
-    //reset_rumble_timers()
+    // reset_rumble_timers()
     return false
 }
 
@@ -1230,7 +1232,7 @@ const push_or_sidle_wall = (m, startPos) => {
             set_mario_anim_with_accel(m, MARIO_ANIM_SIDESTEP_LEFT, val04)
         }
 
-        if (m.marioObj.gfx.unk38.animFrame < 20) {
+        if (m.marioObj.gfx.animInfo.animFrame < 20) {
             play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.gfx.cameraToObject)
             m.particleFlags |= PARTICLE_DUST
         }

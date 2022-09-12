@@ -465,7 +465,7 @@ export const obj_act_knockback = () => {
 
     cur_obj_update_floor_and_walls()
 
-    if (o.gfx.unk38.curAnim) {
+    if (o.gfx.animInfo.curAnim) {
         cur_obj_extend_animation_if_at_end()
     }
 
@@ -485,7 +485,7 @@ export const obj_act_squished = (baseScale) => {
 
     const o = ObjectListProc.gCurrentObject
 
-    if (o.gfx.unk38.curAnim) {
+    if (o.gfx.animInfo.curAnim) {
         cur_obj_extend_animation_if_at_end()
     }
 

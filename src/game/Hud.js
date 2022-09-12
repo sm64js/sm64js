@@ -1,4 +1,14 @@
 import { CameraInstance as Camera } from "./Camera"
+import { 
+    CAM_STATUS_NONE,
+    CAM_STATUS_MARIO,
+    CAM_STATUS_LAKITU,
+    CAM_STATUS_FIXED,
+    CAM_STATUS_C_UP,
+    CAM_STATUS_C_DOWN,
+    CAM_STATUS_MODE_GROUP,
+    CAM_STATUS_C_MODE_GROUP
+} from "./Camera"
 import * as Gbi from "../include/gbi"
 import { dl_hud_img_load_tex_block, main_hud_lut, dl_hud_img_begin, dl_hud_img_end, main_hud_camera_lut } from "../bin/segment2"
 import { power_meter_health_segments_lut, dl_power_meter_base, dl_power_meter_health_segments_begin, dl_power_meter_health_segments_end } from "../actors/power_meter/model.inc"
@@ -285,7 +295,7 @@ class Hud {
         var x = GfxDimensions.GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(54);
         var y = 205;
 
-        if (this.sCameraHUD.status == Camera.CAM_STATUS_NONE) {
+        if (this.sCameraHUD.status == CAM_STATUS_NONE) {
             return;
         }
 
@@ -293,24 +303,23 @@ class Hud {
         this.render_hud_tex_lut(x, y, cameraLUT[this.GLYPH_CAM_CAMERA]);
 
 
-        switch (this.sCameraHUD.status & Camera.CAM_STATUS_MODE_GROUP) {
-            case Camera.CAM_STATUS_MARIO:
+        switch (this.sCameraHUD.status & CAM_STATUS_MODE_GROUP) {
+            case CAM_STATUS_MARIO:
                 this.render_hud_tex_lut(x + 16, y, cameraLUT[this.GLYPH_CAM_MARIO_HEAD]);
                 break;
-            case Camera.CAM_STATUS_LAKITU:
+            case CAM_STATUS_LAKITU:
                 this.render_hud_tex_lut(x + 16, y, cameraLUT[this.GLYPH_CAM_LAKITU_HEAD]);
                 break;
-            case Camera.CAM_STATUS_FIXED:
+            case CAM_STATUS_FIXED:
                 this.render_hud_tex_lut(x + 16, y, cameraLUT[this.GLYPH_CAM_FIXED]);
                 break;
         }
-        this.render_hud_tex_lut(x + 16, y, cameraLUT[this.GLYPH_CAM_LAKITU_HEAD]); // temp fix
 
-        switch (this.sCameraHUD.status & Camera.CAM_STATUS_C_MODE_GROUP) {
-            case Camera.CAM_STATUS_C_DOWN:
+        switch (this.sCameraHUD.status & CAM_STATUS_C_MODE_GROUP) {
+            case CAM_STATUS_C_DOWN:
                 this.render_hud_small_tex_lut(x + 4, y + 16, cameraLUT[this.GLYPH_CAM_ARROW_DOWN]);
                 break;
-            case Camera.CAM_STATUS_C_UP:
+            case CAM_STATUS_C_UP:
                 this.render_hud_small_tex_lut(x + 4, y - 8, cameraLUT[this.GLYPH_CAM_ARROW_UP]);
                 break;
         }
@@ -328,7 +337,7 @@ class Hud {
         } else {
             IngameMenu.create_dl_ortho_matrix();
 
-            if (LevelUpdate.gCurrentArea != null && LevelUpdate.gCurrentArea.camera.mode == Camera.CAMERA_MODE_INSIDE_CANNON) {
+            if (LevelUpdate.gCurrentArea != null && LevelUpdate.gCurrentArea.camera.mode == CAMERA_MODE_INSIDE_CANNON) {
                 this.render_hud_cannon_reticle()
             }
 

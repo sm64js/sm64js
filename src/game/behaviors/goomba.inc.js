@@ -1,3 +1,4 @@
+import * as _Linker from "../../game/Linker"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { oGoombaSize, GOOMBA_BP_SIZE_MASK, oBehParams2ndByte, oGoombaScale, oDrawingDistance, oDamageOrCoinValue, oGravity, oForwardVel, oGoombaBlinkTimer, oAnimState, GOOMBA_ACT_ATTACKED_MARIO, oAction, GOOMBA_ACT_WALK, oGoombaRelativeSpeed, oGoombaTurningAwayFromWall, oGoombaTargetYaw, oGoombaWalkTimer, oDistanceToMario, oAngleToMario, oMoveAngleYaw, GOOMBA_ACT_JUMP, oVelY, oMoveFlags, OBJ_MOVE_MASK_ON_GROUND, GOOMBA_SIZE_TINY, oNumLootCoins, GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED, GOOMBA_BP_TRIPLET_FLAG_MASK, oBehParams, GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK, GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK } from "../../include/object_constants"
 import * as ObjBhvs2 from "../ObjBehaviors2"
@@ -187,7 +188,6 @@ export const mark_goomba_as_dead = () => {
 }
 
 export const bhv_goomba_update = () => {
-
     const o = ObjectListProc.gCurrentObject
 
     if (ObjBhvs2.obj_update_standard_actions(o.rawData[oGoombaScale])) {
@@ -238,7 +238,6 @@ export const bhv_goomba_update = () => {
 }
 
 export const bhv_goomba_triplet_spawner_update = () => {
-
     const o = ObjectListProc.gCurrentObject
 
     // If mario is close enough and the goombas aren't currently loaded, then spawn them
@@ -265,3 +264,7 @@ export const bhv_goomba_triplet_spawner_update = () => {
     }
 
 }
+
+gLinker.bhv_goomba_init = bhv_goomba_init
+gLinker.bhv_goomba_update = bhv_goomba_update
+gLinker.bhv_goomba_triplet_spawner_update = bhv_goomba_triplet_spawner_update

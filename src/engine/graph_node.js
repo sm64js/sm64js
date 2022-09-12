@@ -90,7 +90,7 @@ const init_graph_node_object = (graphNode, sharedChild, pos, angle, scale) => {
         angle: [...angle],
         scale: [...scale],
         sharedChild,
-        unk38: {
+        animInfo: {
             animID: 0,
             animFrame: 0,
             animFrameAccelAssist: 0,
@@ -115,7 +115,7 @@ export const geo_obj_init_spawninfo = (graphNode, spawn) => {
     graphNode.sharedChild = spawn.unk18
     graphNode.unk4C = spawn
     graphNode.throwMatrix = null
-    graphNode.unk38 = { curAnim: 0 }
+    graphNode.animInfo = { curAnim: 0 }
 
     graphNode.flags |= GRAPH_RENDER_ACTIVE
     graphNode.flags &= ~GRAPH_RENDER_INVISIBLE
@@ -131,7 +131,7 @@ export const geo_obj_init = (graphNode, sharedChild, pos, angle) => {
         scale: [1.0, 1.0, 1.0],
         sharedChild,
         throwMatrix: null,
-        unk38: { curAnim: null }
+        animInfo: { curAnim: null }
     })
 
     graphNode.flags |= GRAPH_RENDER_ACTIVE
@@ -143,25 +143,25 @@ export const geo_obj_init = (graphNode, sharedChild, pos, angle) => {
 
 export const geo_obj_init_animation = (graphNode, anim) => {
 
-    if (graphNode.unk38.curAnim != anim) {
-        graphNode.unk38.curAnim = anim
-        graphNode.unk38.animFrame = anim.unk04 + ((anim.flags & Mario.ANIM_FLAG_FORWARD) ? 1 : -1)
-        graphNode.unk38.animAccel = 0
-        graphNode.unk38.animYTrans = 0
+    if (graphNode.animInfo.curAnim != anim) {
+        graphNode.animInfo.curAnim = anim
+        graphNode.animInfo.animFrame = anim.unk04 + ((anim.flags & Mario.ANIM_FLAG_FORWARD) ? 1 : -1)
+        graphNode.animInfo.animAccel = 0
+        graphNode.animInfo.animYTrans = 0
     }
 
 }
 
 export const geo_obj_init_animation_accel = (graphNode, anim, animAccel) => {
 
-    if (graphNode.unk38.curAnim != anim) {
-        graphNode.unk38.curAnim = anim
-        graphNode.unk38.animFrameAccelAssist = (anim.unk04 << 16) + ((anim.flags & Mario.ANIM_FLAG_FORWARD) ? animAccel : -animAccel)
-        graphNode.unk38.animFrame = graphNode.unk38.animFrameAccelAssist >> 16
-        graphNode.unk38.animYTrans = 0
+    if (graphNode.animInfo.curAnim != anim) {
+        graphNode.animInfo.curAnim = anim
+        graphNode.animInfo.animFrameAccelAssist = (anim.unk04 << 16) + ((anim.flags & Mario.ANIM_FLAG_FORWARD) ? animAccel : -animAccel)
+        graphNode.animInfo.animFrame = graphNode.animInfo.animFrameAccelAssist >> 16
+        graphNode.animInfo.animYTrans = 0
     }
 
-    graphNode.unk38.animAccel = animAccel
+    graphNode.animInfo.animAccel = animAccel
 
 }
 

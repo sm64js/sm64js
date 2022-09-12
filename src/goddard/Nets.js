@@ -61,7 +61,7 @@ class Nets {
         const net = {
             header: Objects.make_object(OBJ_TYPE_NETS),
             unk20: { x: 0.0, y: 0.0, z: 0.0 },
-            unk38: ++this.sNetCount,
+            animInfo: ++this.sNetCount,
             unk1AC: { x: 1.0, y: 1.0, z: 1.0 },
             unk68: { x: 0.0, y: 0.0, z: 0.0 },
             unk1A8: shapedata,
@@ -96,7 +96,7 @@ class Nets {
             gd_rotate_and_translate_vec3f(localVec, this.D_801B9EA8)
             this.sSkinNetCurWeight.vec20 = { ...localVec }
 
-            vtx.scaleFactor -= this.sSkinNetCurWeight.unk38
+            vtx.scaleFactor -= this.sSkinNetCurWeight.animInfo
         }
     }
 

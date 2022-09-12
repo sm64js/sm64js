@@ -11,7 +11,7 @@ import {
 } from "../levels/level_defines_constants"
 
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
-import { atan2s } from "../engine/math_util"
+import { atan2s, vec3f_set } from "../engine/math_util"
 import * as MathUtil from "../engine/math_util"
 import * as Mario from "./Mario"
 import { oHeldState, oPosX, oPosY, oPosZ } from "../include/object_constants"
@@ -191,15 +191,15 @@ const CAM_FLAG_UNUSED_13              = 0x2000
 const CAM_FLAG_UNUSED_CUTSCENE_ACTIVE = 0x4000
 const CAM_FLAG_BEHIND_MARIO_POST_DOOR = 0x8000
 
-const CAM_STATUS_NONE   = 0
-const CAM_STATUS_MARIO  = 1 << 0
-const CAM_STATUS_LAKITU = 1 << 1
-const CAM_STATUS_FIXED  = 1 << 2
-const CAM_STATUS_C_DOWN = 1 << 3
-const CAM_STATUS_C_UP   = 1 << 4
+export const CAM_STATUS_NONE   = 0
+export const CAM_STATUS_MARIO  = 1 << 0
+export const CAM_STATUS_LAKITU = 1 << 1
+export const CAM_STATUS_FIXED  = 1 << 2
+export const CAM_STATUS_C_DOWN = 1 << 3
+export const CAM_STATUS_C_UP   = 1 << 4
 
-const CAM_STATUS_MODE_GROUP   = (CAM_STATUS_MARIO | CAM_STATUS_LAKITU | CAM_STATUS_FIXED)
-const CAM_STATUS_C_MODE_GROUP = (CAM_STATUS_C_DOWN | CAM_STATUS_C_UP)
+export const CAM_STATUS_MODE_GROUP   = (CAM_STATUS_MARIO | CAM_STATUS_LAKITU | CAM_STATUS_FIXED)
+export const CAM_STATUS_C_MODE_GROUP = (CAM_STATUS_C_DOWN | CAM_STATUS_C_UP)
 
 const L_CBUTTONS =	0x0002
 const R_CBUTTONS =	0x0001
@@ -608,7 +608,7 @@ class Camera {
         let yaw = 0
         let focFloorYOff = 0
 
-        let wrapper = { posOff: focFloorYOff, focOff: this.posOff }
+        const wrapper = { posOff: focFloorYOff, focOff: this.posOff }
         this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
 
         yaw = this.gPlayerCameraState.faceAngle[1] + yawOff
@@ -692,9 +692,11 @@ class Camera {
         let yawFromMario = 0
         let status = 0
         
-        let wrapper = {dist: dummyDist, pitch: dummyPitch, yaw: yawFromMario}
+        let wrapper = { dist: dummyDist, pitch: dummyPitch, yaw: yawFromMario }
         MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, cPos, wrapper)
-        dummyDist = wrapper.dist; dummyPitch = wrapper.pitch; yawFromMario = wrapper.yaw
+        dummyDist = wrapper.dist
+        dummyPitch = wrapper.pitch
+        yawFromMario = wrapper.yaw
         this.sStatusFlags &= ~CAM_FLAG_CAM_NEAR_WALL
         colData.offsetY = 100.0
         // The distance from Mario to Lakitu
@@ -908,7 +910,7 @@ class Camera {
     }
 
     approach_vec3f_asymptotic(current, target, xMul, yMul, zMul) {
-        let wrapper = { current: current[0] }
+        const wrapper = { current: current[0] }
         this.approach_f32_asymptotic_bool(wrapper, target[0], xMul)
         current[0] = wrapper.current
         wrapper.current = current[1]
@@ -920,7 +922,7 @@ class Camera {
     }
 
     set_or_approach_vec3f_asymptotic(dst, goal, xMul, yMul, zMul) {
-        let wrapper = { current: dst[0] }
+        const wrapper = { current: dst[0] }
         this.set_or_approach_f32_asymptotic(wrapper, goal[0], xMul)
         dst[0] = wrapper.current
         wrapper.current = dst[1]
@@ -932,7 +934,7 @@ class Camera {
     }
 
     approach_vec3s_asymptotic(current, target, xMul, yMul, zMul) {
-        let wrapper = { current: current[0] }
+        const wrapper = { current: current[0] }
         this.approach_s16_asymptotic_bool(wrapper, target[0], xMul);
         current[0] = wrapper.current
         wrapper.current = current[1]
@@ -1089,7 +1091,7 @@ class Camera {
         const mode = graphNode.config.mode
 
         graphNode.config.camera = {
-            mode,
+            mode: mode,
             defMode: mode,
             cutscene: 0,
             doorStatus: DOOR_DEFAULT,
@@ -1100,13 +1102,6 @@ class Camera {
             pos: [...graphNode.pos],
             focus: [...graphNode.focus]
         }
-
-/*        Object.assign(graphNode, {
-            pos: [-1328.0, 1200.0, 6064.0],
-            focus: [-1328.0, 260, 4664.0],
-            myDemoAngle: 0,
-            myDemoRadius: 1500
-        })*/
     }
 
 
@@ -1145,23 +1140,72 @@ class Camera {
         const marioOffset = [0, 125, 400]
 
         switch (Area.gCurrLevelNum) {
+            case LEVEL_BOWSER_1:
+                this.start_cutscene(c, CUTSCENE_ENTER_BOWSER_ARENA)
+                break
+            case LEVEL_BOWSER_2:
+                this.start_cutscene(c, CUTSCENE_ENTER_BOWSER_ARENA)
+                break
+            case LEVEL_BOWSER_3:
+                this.start_cutscene(c, CUTSCENE_ENTER_BOWSER_ARENA)
+                break
+
+            //! Hardcoded position checks determine which cutscene to play when Mario enters castle grounds.
             case LEVEL_CASTLE_GROUNDS:
-                // if (this.is_within_100_units_of_mario(-1328, 260, 4646) != 1) {
-                //     marioOffset[0] = -400
-                //     marioOffset[2] = -800
-                // }
+                if (!this.is_within_100_units_of_mario(-1328, 260, 4646)) {
+                    marioOffset[0] = -400
+                    marioOffset[2] = -800
+                }
+                if (this.is_within_100_units_of_mario(-6901.0, 2376.0, -6509.0)) {
+                    this.start_cutscene(c, CUTSCENE_EXIT_WATERFALL)
+                }
+                if (this.is_within_100_units_of_mario(5408.0, 4500.0, 3637.0)) {
+                    this.start_cutscene(c, CUTSCENE_EXIT_FALL_WMOTR)
+                }
                 this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
                 break
-            case LEVEL_BOB:  /// TODO
-                this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
+            case LEVEL_SA:
+                marioOffset[2] = 200.0
                 break
-            case LEVEL_CCM:  /// TODO
-                this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
+            case LEVEL_CASTLE_COURTYARD:
+                marioOffset[2] = -300.0
                 break
-            case LEVEL_PSS:  /// TODO
-                this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
-            default: this.gLakituState.mode = CAMERA_MODE_FREE_ROAM // throw err 'camera not implemented'
+            case LEVEL_LLL:
+                this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
+                break;
+            case LEVEL_CASTLE:
+                marioOffset[2] = 150.0
+                break
+            case LEVEL_RR:
+                vec3f_set(this.sFixedModeBasePosition, -2985.0, 478.0, -5568.0)
+                break
         }
+        switch (this.gCurrLevelArea) {
+            case AREA_SSL_EYEROK:
+                vec3f_set(marioOffset, 0.0, 500.0, -100.0)
+                break
+            case AREA_CCM_SLIDE:
+                marioOffset[2] = -300.0
+                break
+            case AREA_THI_WIGGLER:
+                marioOffset[2] = -300.0
+                break
+            case AREA_SL_IGLOO:
+                marioOffset[2] = -300.0
+                break
+            case AREA_SL_OUTSIDE:
+                if (this.is_within_100_units_of_mario(257.0, 2150.0, 1399.0)) {
+                    marioOffset[2] = -300.0
+                }
+                break
+            case AREA_CCM_OUTSIDE:
+                this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
+                break
+            case AREA_TTM_OUTSIDE:
+                this.gLakituState.mode = CAMERA_MODE_RADIAL
+                break
+        }
+        c.mode = CAMERA_MODE_FREE_ROAM
 
         if (c.mode == CAMERA_MODE_8_DIRECTIONS) {
             this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
@@ -1178,10 +1222,6 @@ class Camera {
         this.gLakituState.goalFocus = [...c.focus]
         this.gLakituState.pos = [...c.pos]
         this.gLakituState.focus = [...c.focus]
-
-        if (c.mode == CAMERA_MODE_FIXED) {
-            throw "fixed camera case not implemented"
-        }
 
         this.gLakituState.yaw = this.calculate_yaw(c.focus, c.pos)
         this.gLakituState.nextYaw = this.gLakituState.yaw
@@ -1277,7 +1317,8 @@ class Camera {
         const start = this.sModeInfo.transitionStart
         const end = this.sModeInfo.transitionEnd
 
-        if (false) {  // mode == CAMERA_MODE_WATER_SURFACE && gCurrLevelArea == AREA_TTM_OUTSIDE) {
+        if (mode == CAMERA_MODE_WATER_SURFACE && this.gCurrLevelArea == AREA_TTM_OUTSIDE) {
+
         } else {
             // Clear movement flags that would affect the transition
             this.gCameraMovementFlags &= ~(CAM_MOVE_RESTRICT | CAM_MOVE_ROTATE)
@@ -1518,7 +1559,7 @@ class Camera {
                     //     mode_spiral_stairs_camera(c);
                     //     break;
 
-                    default: throw "unknown camera case"
+                    default: throw "unknown camera case " + c.mode
                 }
             }
         }
@@ -1534,15 +1575,14 @@ class Camera {
     }
 
     update_camera_hud_status(c) {
-        status = CAM_STATUS_NONE
+        let status = CAM_STATUS_NONE
     
-        var isFixedCam = false
-        // var isFixedCam = c.cutscene != 0 || ((this.gPlayer1Controller.buttonDown & R_TRIG) && cam_select_alt_mode(0) == CAM_SELECTION_FIXED)
+        let isFixedCam = false // = c.cutscene != 0 || ((this.gPlayer1Controller.buttonDown & R_TRIG) && cam_select_alt_mode(0) == CAM_SELECTION_FIXED)
 
         if (isFixedCam) {
             status |= CAM_STATUS_FIXED
-        // } else if (set_cam_angle(0) == CAM_ANGLE_MARIO) {
-            // status |= CAM_STATUS_MARIO
+        } else if (this.set_cam_angle(0) == CAM_ANGLE_MARIO) {
+            status |= CAM_STATUS_MARIO
         } else {
             status |= CAM_STATUS_LAKITU
         }
@@ -3255,16 +3295,9 @@ class Camera {
     }
 
     update_graph_node_camera(graphNode) {
-        // graphNode.myDemoAngle += 0.02
-/*        graphNode.pos[0] = (Math.sin(graphNode.myDemoAngle) * graphNode.myDemoRadius) + LevelUpdate.gMarioState.pos[0]
-        graphNode.pos[2] = (Math.cos(graphNode.myDemoAngle) * graphNode.myDemoRadius) + LevelUpdate.gMarioState.pos[2]
-
-        graphNode.focus = [ ...LevelUpdate.gMarioState.pos ]*/
-
         graphNode.rollScreen = this.gLakituState.roll
         graphNode.pos = [...this.gLakituState.pos]
         graphNode.focus = [...this.gLakituState.focus]
-
     }
 
     check_blocking_area_processing(mode) {
@@ -3299,6 +3332,18 @@ class Camera {
         dst[2] = o.rawData[oPosZ]
     }
 
+    shake_camera_fov(perspective) {
+        if (this.sFOVState.shakeAmplitude != 0.0) {
+            this.sFOVState.fovOffset = coss(this.sFOVState.shakePhase) * this.sFOVState.shakeAmplitude / 0x100
+            this.sFOVState.shakePhase += this.sFOVState.shakeSpeed
+            const wrapper = { current: this.sFOVState.shakeAmplitude }
+            this.camera_approach_f32_symmetric_bool(wrapper, 0.0, this.sFOVState.decay)
+            perspective.fov += this.sFOVState.fovOffset ? this.sFOVState.fovOffset : 0
+        } else {
+            this.sFOVState.shakePhase = 0
+        }
+    }
+
     geo_camera_fov(callContext, graphNode) {
 
         const marioState = LevelUpdate.gMarioState
@@ -3306,8 +3351,38 @@ class Camera {
 
         if (callContext == GEO_CONTEXT_RENDER) {
             switch (fovFunc) {
+                case CAM_FOV_SET_45:
+                    this.set_fov_45(marioState)
+                    break
+                case CAM_FOV_SET_29:
+                    this.set_fov_29(marioState)
+                    break
+                case CAM_FOV_ZOOM_30:
+                    this.zoom_fov_30(marioState)
+                    break
                 case CAM_FOV_DEFAULT:
                     this.fov_default(marioState)
+                    break
+                case CAM_FOV_BBH:
+                    // this.set_fov_bbh(marioState)
+                    break
+                case CAM_FOV_APP_45:
+                    // this.approach_fov_45(marioState)
+                    break
+                case CAM_FOV_SET_30:
+                    this.set_fov_30(marioState)
+                    break
+                case CAM_FOV_APP_20:
+                    this.approach_fov_20(marioState)
+                    break
+                case CAM_FOV_APP_80:
+                    // this.approach_fov_80(marioState)
+                    break
+                case CAM_FOV_APP_30:
+                    // this.approach_fov_30(marioState)
+                    break
+                case CAM_FOV_APP_60:
+                    // this.approach_fov_60(marioState)
                     break
                 default: throw "default switch case - geo camera fov - " + fovFunc
             }
@@ -3315,18 +3390,47 @@ class Camera {
 
         graphNode.fov = this.sFOVState.fov
 
-        ///this.shake_camera_fov(graphNode)
+        this.shake_camera_fov(graphNode)
     }
 
     fov_default(m) {
         this.sStatusFlags &= ~CAM_FLAG_SLEEPING
 
+        const wrapper = { current: this.sFOVState.fov }
         if ((m.action == Mario.ACT_SLEEPING) || (m.action == Mario.ACT_START_SLEEPING)) {
-            throw "sleeping"
+            this.camera_approach_f32_symmetric_bool(wrapper, 30.0, (30.0 - this.sFOVState.fov) / 30.0)
+            this.sFOVState.fov = wrapper.current
+            this.sStatusFlags |= CAM_FLAG_SLEEPING
         } else {
-            const wrapper = { current: this.sFOVState.fov }
-            this.camera_approach_f32_symmetric_bool(wrapper, 45, (45 - this.sFOVState.fov) / 30)
+            this.camera_approach_f32_symmetric_bool(wrapper, 45.0, (45.0 - this.sFOVState.fov) / 30.0)
+            this.sFOVState.fov = wrapper.current
         }
+    }
+
+    set_fov_30() {
+        this.sFOVState.fov = 30.0
+    }
+    
+    approach_fov_20() {
+        const wrapper = { current: this.sFOVState.fov }
+        this.camera_approach_f32_symmetric_bool(wrapper, 20.0, 0.3)
+        this.sFOVState.fov = wrapper.current
+    }
+    
+    set_fov_45() {
+        this.sFOVState.fov = 45.0
+    }
+    
+    set_fov_29() {
+        this.sFOVState.fov = 29.0
+    }
+    
+    zoom_fov_30() {
+        // Pretty sure approach_f32_asymptotic_bool would do a much nicer job here, but you do you,
+        // Nintendo.
+        const wrapper = { current: this.sFOVState.fov }
+        this.camera_approach_f32_symmetric_bool(wrapper, 30.0, (30.0 - this.sFOVState.fov) / 60.0)
+        this.sFOVState.fov = wrapper.current
     }
 
     set_camera_shake_from_hit(shake) {
@@ -3368,7 +3472,7 @@ class Camera {
                 } else {
                     this.set_camera_yaw_shake(0x100, 0x10, 0x4000)
                     this.set_camera_roll_shake(0x100, 0x10, 0x4000)
-                    this.set_fov_shake(0x180, 0x40, 0x8000);
+                    this.set_fov_shake(0x180, 0x40, 0x8000)
                 }
 
                 this.gLakituState.focHSpeed = 0
@@ -3383,7 +3487,7 @@ class Camera {
                 } else {
                     this.set_camera_yaw_shake(0x180, 0x20, 0x4000)
                     this.set_camera_roll_shake(0x200, 0x20, 0x4000)
-                    this.set_fov_shake(0x200, 0x50, 0x8000);
+                    this.set_fov_shake(0x200, 0x50, 0x8000)
                 }
 
                 this.gLakituState.focHSpeed = 0
@@ -3565,7 +3669,7 @@ class Camera {
     }
 
     cutscene_unlock_key_door_focus_lock(c) {
-        let wrapper = { current: this.sCutsceneVars[3].point[1] }
+        const wrapper = { current: this.sCutsceneVars[3].point[1] }
         this.approach_f32_asymptotic_bool(wrapper, this.gPlayerCameraState.pos[1] + 140.0, 0.07)
         this.sCutsceneVars[3].point[1] = wrapper.current
     }
@@ -3590,7 +3694,7 @@ class Camera {
      * Set the camera pos relative to Mario.
      */
     cutscene_sliding_doors_open_start(c) {
-        let wrapper = { dist: 0, pitch: 0, yaw: 0 }
+        const wrapper = { dist: 0, pitch: 0, yaw: 0 }
 
         MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper)
 
@@ -3620,13 +3724,13 @@ class Camera {
      * However, the initial y offset is too high for Lakitu to reach 75 in time.
      */
     cutscene_sliding_doors_go_under_doorway(c) {
-        let wrapper = { current: this.sCutsceneVars[0].point[1] }
+        const wrapper = { current: this.sCutsceneVars[0].point[1] }
         this.camera_approach_f32_symmetric_bool(wrapper, 75.0, 10.0)
         this.sCutsceneVars[0].point[1] = wrapper.current
     }
 
     cutscene_sliding_doors_fly_back_up(c) {
-        let wrapper = { current: this.sCutsceneVars[0].point[1] }
+        const wrapper = { current: this.sCutsceneVars[0].point[1] }
         this.camera_approach_f32_symmetric_bool(wrapper, 125.0, 10.0)
         this.sCutsceneVars[0].point[1] = wrapper.current
     }
@@ -3640,7 +3744,7 @@ class Camera {
         this.sCutsceneVars[1].point[2] = this.gPlayerCameraState.pos[2]
 
         // Decrease cvar0's offsets, moving the camera behind Mario at his eye height.
-        let wrapper = { current: this.sCutsceneVars[0].point[0] }
+        const wrapper = { current: this.sCutsceneVars[0].point[0] }
         this.approach_f32_asymptotic_bool(wrapper, 0, 0.1)
         this.sCutsceneVars[0].point[0] = wrapper.current
         wrapper.current = this.sCutsceneVars[0].point[2]
@@ -3794,7 +3898,6 @@ class Camera {
      */
     cutscene_exit_painting_move_to_mario(c) {
         let pos = { 0: 0, 0: 1, 0: 2 }
-        let wrapper
 
         //! Tricky math: Since offset_rotated() flips Z offsets, you'd expect a positive Z offset to move
         //! the camera into the wall. However, Mario's faceAngle always points into the painting, so a
@@ -3802,7 +3905,7 @@ class Camera {
         //!
         //! In the success cutscene, when Mario jumps out face-first, only his gfx angle is updated. His
         //! actual face angle isn't updated until after the cutscene.
-        wrapper = { current: this.sCutsceneVars[2].point[0] }
+        const wrapper = { current: this.sCutsceneVars[2].point[0] }
         this.approach_f32_asymptotic_bool(wrapper, 178.0, 0.05)
         this.sCutsceneVars[2].point[0] = wrapper.current
         wrapper.current = this.sCutsceneVars[2].point[2]
@@ -3819,8 +3922,7 @@ class Camera {
      */
     cutscene_exit_painting_move_to_floor(c) {
         let floor = Object.assign({}, surfaceObj)
-        let floorHeight = { 0: 0, 1: 0, 2: 0 }
-        let wrapper
+        let floorHeight = [0, 0, 0]
 
         this.vec3f_copy(floorHeight, this.gPlayerCameraState.pos)
         floorHeight[1] = SurfaceCollision.find_floor(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 10.0, this.gPlayerCameraState.pos[2], floor)
@@ -3830,7 +3932,7 @@ class Camera {
             this.approach_vec3f_asymptotic(c.focus, floorHeight, 0.2, 0.2, 0.2)
 
             if (floorHeight[1] < c.pos[1]) {
-                wrapper = { current: c.pos[1] } 
+                const wrapper = { current: c.pos[1] } 
                 this.approach_f32_asymptotic_bool(wrapper, floorHeight[1], 0.05)
             }
         }
@@ -3902,7 +4004,7 @@ class Camera {
         let doorRotation = 0
 
         this.reset_pan_distance(c)
-        let wrapper = { current: doorRotation }
+        const wrapper = { current: doorRotation }
         this.determine_pushing_or_pulling_door(wrapper)
         doorRotation = wrapper.current
         this.set_focus_rel_mario(c, 0.0, 125.0, 0.0, 0)
@@ -3919,7 +4021,7 @@ class Camera {
      */
     cutscene_door_follow_mario(c) {
         this.set_focus_rel_mario(c, 0.0, 125.0, 0.0, 0)
-        let wrapper = { pitch: 0, yaw: 0, dist: 0 }
+        const wrapper = { pitch: 0, yaw: 0, dist: 0 }
         MathUtil.vec3f_get_dist_and_angle(c.focus, c.pos, wrapper)
         wrapper.current = wrapper.dist
         this.camera_approach_f32_symmetric_bool(wrapper, 150.0, 7.0)

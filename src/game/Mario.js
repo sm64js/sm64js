@@ -772,7 +772,7 @@ export const init_marios = () => {
 
     gMarioState.area = Area.gCurrentArea
     gMarioState.marioObj = ObjectListProcessor.gMarioObject
-    gMarioState.marioObj.gfx.unk38.animID = -1
+    gMarioState.marioObj.gfx.animInfo.animID = -1
     gMarioState.faceAngle = [...Area.gMarioSpawnInfo.startAngle]
     gMarioState.angleVel = [0, 0, 0]
     gMarioState.pos = [...Area.gMarioSpawnInfo.startPos]
@@ -793,8 +793,8 @@ export const init_marios = () => {
         (gMarioState.pos[1] <= (gMarioState.waterLevel - 100)) ? ACT_WATER_IDLE : ACT_IDLE
 
     Object.assign(LevelUpdate.gMarioState.marioObj.gfx, {
-        unk38: {
-            ...LevelUpdate.gMarioState.marioObj.gfx.unk38,
+        animInfo: {
+            ...LevelUpdate.gMarioState.marioObj.gfx.animInfo,
             animID: -1,
             animID: 0,
             animFrame: 0,
@@ -859,8 +859,8 @@ const read_next_anim_value = (curFrame, attribute, values) => {
 }
 
 export const find_mario_anim_flags_and_translation = (obj, yaw, translation) => {
-    const curAnim = obj.gfx.unk38.curAnim
-    const animFrame = geo_update_animation_frame(obj.gfx.unk38, null)
+    const curAnim = obj.gfx.animInfo.curAnim
+    const animFrame = geo_update_animation_frame(obj.gfx.animInfo, null)
     const animValues = curAnim.values
 
     const attribute = { indexToIndices: 0, indices: curAnim.indices }
@@ -1205,7 +1205,7 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
             break
 
         case ACT_BACKFLIP:
-            m.marioObj.gfx.unk38.animID = -1
+            m.marioObj.gfx.animInfo.animID = -1
             m.forwardVel = -16.0
             set_mario_y_vel_based_on_fspeed(m, 62.0, 0.0)
             break
@@ -1237,7 +1237,7 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
 
         case ACT_JUMP:
         case ACT_HOLD_JUMP:
-            m.marioObj.gfx.unk38.animID = -1
+            m.marioObj.gfx.animInfo.animID = -1
             set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
             m.forwardVel *= 0.8
             break
@@ -1258,7 +1258,7 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
             break
 
         case ACT_STEEP_JUMP:
-            m.marioObj.gfx.unk38.animID = -1
+            m.marioObj.gfx.animInfo.animID = -1
             set_mario_y_vel_based_on_fspeed(m, 42.0, 0.25)
             m.faceAngle[0] = -0x2000
             break
@@ -1278,7 +1278,7 @@ export const set_mario_action_airborne = (m, action, actionArg) => {
             break
 
         case ACT_LONG_JUMP:
-            m.marioObj.gfx.unk38.animID = -1
+            m.marioObj.gfx.animInfo.animID = -1
             set_mario_y_vel_based_on_fspeed(m, 30.0, 0.0)
             m.marioObj.oMarioLongJumpIsSlow = m.forwardVel > 16.0 ? false : true
  
@@ -1435,24 +1435,24 @@ export const set_mario_animation = (m, targetAnimID) => {
 
     if (m.animation.targetAnim == undefined) throw "cant find animation"
 
-    if (o.gfx.unk38.animID != targetAnimID) {
-        o.gfx.unk38.animID = targetAnimID
-        o.gfx.unk38.curAnim = m.animation.targetAnim
-        o.gfx.unk38.animAccel = 0
-        o.gfx.unk38.animYTrans = m.unkB0
+    if (o.gfx.animInfo.animID != targetAnimID) {
+        o.gfx.animInfo.animID = targetAnimID
+        o.gfx.animInfo.curAnim = m.animation.targetAnim
+        o.gfx.animInfo.animAccel = 0
+        o.gfx.animInfo.animYTrans = m.unkB0
 
         if (m.animation.targetAnim.flags & ANIM_FLAG_2) {
-            o.gfx.unk38.animFrame = m.animation.targetAnim.unk04
+            o.gfx.animInfo.animFrame = m.animation.targetAnim.unk04
         } else {
             if (m.animation.targetAnim.flags & ANIM_FLAG_FORWARD) {
-                o.gfx.unk38.animFrame = m.animation.targetAnim.unk04 + 1
+                o.gfx.animInfo.animFrame = m.animation.targetAnim.unk04 + 1
             } else {
-                o.gfx.unk38.animFrame = m.animation.targetAnim.unk04 - 1
+                o.gfx.animInfo.animFrame = m.animation.targetAnim.unk04 - 1
             }
         }
     }
 
-    return o.gfx.unk38.animFrame
+    return o.gfx.animInfo.animFrame
 
 }
 
@@ -1460,32 +1460,32 @@ export const set_mario_anim_with_accel = (m, targetAnimID, accel) => {
     const o = m.marioObj
     m.animation.targetAnim = m.animation.animList[targetAnimID]
 
-    if (o.gfx.unk38.animID != targetAnimID) {
-        o.gfx.unk38.animID = targetAnimID
-        o.gfx.unk38.curAnim = m.animation.targetAnim
-        o.gfx.unk38.animYTrans = m.unkB0
+    if (o.gfx.animInfo.animID != targetAnimID) {
+        o.gfx.animInfo.animID = targetAnimID
+        o.gfx.animInfo.curAnim = m.animation.targetAnim
+        o.gfx.animInfo.animYTrans = m.unkB0
 
         if (m.animation.targetAnim.flags & ANIM_FLAG_2) {
-            o.gfx.unk38.animFrameAccelAssist = (m.animation.targetAnim << 0x10)
+            o.gfx.animInfo.animFrameAccelAssist = (m.animation.targetAnim << 0x10)
         } else {
             if (m.animation.targetAnim.flags & ANIM_FLAG_FORWARD) {
-                o.gfx.unk38.animFrameAccelAssist = (m.animation.targetAnim << 0x10) + accel
+                o.gfx.animInfo.animFrameAccelAssist = (m.animation.targetAnim << 0x10) + accel
             } else {
-                o.gfx.unk38.animFrameAccelAssist = (m.animation.targetAnim << 0x10) - accel
+                o.gfx.animInfo.animFrameAccelAssist = (m.animation.targetAnim << 0x10) - accel
             }
         }
 
-        o.gfx.unk38.animFrame = (o.gfx.unk38.animFrameAccelAssist >> 0x10)
+        o.gfx.animInfo.animFrame = (o.gfx.animInfo.animFrameAccelAssist >> 0x10)
     }
 
-    o.gfx.unk38.animAccel = accel
+    o.gfx.animInfo.animAccel = accel
 
-    return o.gfx.unk38.animFrame
+    return o.gfx.animInfo.animFrame
 
 }
 
 export const set_anim_to_frame = (m, animFrame) => {
-    const animInfo = m.marioObj.gfx.unk38
+    const animInfo = m.marioObj.gfx.animInfo
     const curAnim = animInfo.curAnim
 
     if (animInfo.animAccel) {
@@ -1504,19 +1504,19 @@ export const set_anim_to_frame = (m, animFrame) => {
 }
 
 export const is_anim_at_end = (m) => {
-    const o = m.marioObj //TODO fix unk38 as animInfo
-    return (o.gfx.unk38.animFrame + 1) == o.gfx.unk38.curAnim.unk08
+    const o = m.marioObj //TODO fix animInfo as animInfo
+    return (o.gfx.animInfo.animFrame + 1) == o.gfx.animInfo.curAnim.unk08
 }
 
 export const is_anim_past_end = (m) => {
     const o = m.marioObj
-    return o.gfx.unk38.animFrame >= (o.gfx.unk38.curAnim.unk08 - 2)
+    return o.gfx.animInfo.animFrame >= (o.gfx.animInfo.curAnim.unk08 - 2)
 }
 
 export const is_anim_past_frame = (m, animFrame) => {
     let isPastFrame
     const acceleratedFrame = animFrame << 0x10
-    const animInfo = m.marioObj.gfx.unk38
+    const animInfo = m.marioObj.gfx.animInfo
     const curAnim = animInfo.curAnim
 
     if (animInfo.animAccel) {

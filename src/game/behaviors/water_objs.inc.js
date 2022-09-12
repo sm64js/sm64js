@@ -157,9 +157,18 @@ export const bhv_fish_group_loop = () => {
             spawn_object(o, MODEL_WHITE_PARTICLE_SMALL, bhvSmallParticleBubbles);
 }
 
-export const bhv_water_waves_init= () => {
+export const bhv_water_waves_init = () => {
     const o = ObjectListProc.gCurrentObject
     for (let i = 0; i < 3; i++) {
         spawn_object(o, MODEL_WHITE_PARTICLE_SMALL, bhvSmallParticle);
     }
 }
+
+gLinker.bhv_bubble_wave_init = bhv_bubble_wave_init
+gLinker.bhv_small_water_wave_loop = bhv_small_water_wave_loop
+gLinker.bhv_water_air_bubble_init = bhv_water_air_bubble_init
+gLinker.bhv_water_air_bubble_loop = bhv_water_air_bubble_loop
+gLinker.bhv_particle_init = bhv_particle_init
+gLinker.bhv_particle_loop = bhv_particle_loop
+gLinker.bhv_water_waves_init = bhv_water_waves_init
+gLinker.bhv_small_bubbles_loop = bhv_small_bubbles_loop

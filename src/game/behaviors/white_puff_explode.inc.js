@@ -1,3 +1,4 @@
+import * as _Linker from "../../game/Linker"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { oTimer, oWhitePuffUnkF4, oBehParams2ndByte, oOpacity, oWhitePuffUnkF8, oWhitePuffUnkFC, oDragStrength, oVelY } from "../../include/object_constants"
 import { cur_obj_compute_vel_xz, cur_obj_move_using_vel_and_gravity, cur_obj_apply_drag_xz, obj_mark_for_deletion, cur_obj_scale } from "../ObjectHelpers"
@@ -45,3 +46,5 @@ export const bhv_white_puff_exploding_loop = () => {
     }
 
 }
+
+gLinker.bhv_white_puff_exploding_loop = bhv_white_puff_exploding_loop

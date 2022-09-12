@@ -32,7 +32,7 @@ class Draw {
         this.sUpdateViewState.unreadCounter = 0
 
         Renderer.set_gd_mtx_parameters(G_MTX_PROJECTION | G_MTX_MUL | G_MTX_PUSH)
-        if (this.sUpdateViewState.view.unk38 == 1) {
+        if (this.sUpdateViewState.view.animInfo == 1) {
             Renderer.gd_create_perspective_matrix(
                 this.sUpdateViewState.view.clipping.z,
                 this.sUpdateViewState.view.lowerRight.x / this.sUpdateViewState.view.lowerRight.y,

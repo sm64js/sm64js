@@ -67,11 +67,7 @@ class BehaviorCommands {
 
         while (bhvProcResult == this.BHV_PROC_CONTINUE) {
             const bhvFunc = this.bhvScript.commands[this.bhvScript.index]
-            if (Array.isArray(bhvFunc)) {
-                throw "deprecated behavior format: " + bhvFunc[0]
-            } else {
-                bhvProcResult = bhvFunc.command.call(this, bhvFunc.args)
-            }
+            bhvProcResult = bhvFunc.command.call(this, bhvFunc.args)
         }
 
         // Increment the object's timer.
@@ -130,7 +126,7 @@ class BehaviorCommands {
     }
 
 
-// cmds
+    // cmds
     cmd_spawn_water_droplet(args) {
         const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
         let params = args.params
@@ -601,6 +597,8 @@ export const ANIMATE = (...args)                   => {return {command: Beh.anim
 export const BEGIN = (...args)                     => {return {command: Beh.begin, args: {objListIndex: args[0], name: args[1]}}}
 export const BEGIN_LOOP = (...args)                => {return {command: Beh.begin_loop}}
 export const BEGIN_REPEAT = (...args)              => {return {command: Beh.begin_repeat, args: {count: args[0]}}}
+export const CLEAR_BIT_PARENT = (...args)          => {return {command: Beh.parent_bit_clear, args: {field: args[0], value: args[1]}}}
+export const CYLBOARD = (...args)                  => {return {command: Beh.cylboard}}
 export const BILLBOARD = (...args)                 => {return {command: Beh.billboard}}
 export const BREAK = (...args)                     => {return {command: Beh.break}}
 export const CALL = (...args)                      => {return {command: Beh.call, args: {script: args[0]}}}
@@ -636,5 +634,6 @@ export const SET_RANDOM_INT = (...args)            => {return {command: Beh.set_
 export const SET_RANDOM_FLOAT = (...args)          => {return {command: Beh.set_random_float, args: {field: args[0], minimum: args[1], range: args[2]}}}
 export const SUM_FLOAT = (...args)                 => {return {command: Beh.sum_float, args: {dest: args[0], value1: args[1], value2: args[2]}}}
 export const SPAWN_CHILD = (...args)               => {return {command: Beh.spawn_child_with_param, args: {model: args[0], behavior: args[1], bhvParam: args[2]}}}
+export const SPAWN_CHILD_WITH_PARAM = (...args)    => {return {command: Beh.spawn_child_with_param, args: {model: args[0], behavior: args[1], bhvParam: args[2]}}}
 export const SPAWN_OBJ = (...args)                 => {return {command: Beh.spawn_obj, args: {model: args[0], behavior: args[1]}}}
 export const SPAWN_WATER_DROPLET = (...args)       => {return {command: Beh.cmd_spawn_water_droplet, args: {params: args[0]}}}

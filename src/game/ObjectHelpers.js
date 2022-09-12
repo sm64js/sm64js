@@ -328,7 +328,7 @@ export const spawn_object_abs_with_rot = (parent, model, behavior, x, y, z, rx, 
 export const cur_obj_check_anim_frame = (frame) => {
     const o = ObjectListProc.gCurrentObject
 
-    const animFrame = o.gfx.unk38.animFrame
+    const animFrame = o.gfx.animInfo.animFrame
     if (animFrame == frame) {
         return true
     } else {
@@ -338,7 +338,7 @@ export const cur_obj_check_anim_frame = (frame) => {
 
 export const cur_obj_check_anim_frame_in_range = (startFrame, rangeLength) => {
     const o = ObjectListProc.gCurrentObject
-    let /*s32*/ animFrame = o.gfx.unk38.animFrame
+    let /*s32*/ animFrame = o.gfx.animInfo.animFrame
 
     if (animFrame >= startFrame && animFrame < startFrame + rangeLength) {
         return true
@@ -349,7 +349,7 @@ export const cur_obj_check_anim_frame_in_range = (startFrame, rangeLength) => {
 
 // export const cur_obj_check_frame_prior_current_frame = (a0) => {
 //     const o = ObjectListProc.gCurrentObject
-//     let /*s16*/ sp6 = o.gfx.unk38.animFrame
+//     let /*s16*/ sp6 = o.gfx.animInfo.animFrame
 
 //     while (*a0 != -1) {
 //         if (*a0 == sp6) {
@@ -1501,28 +1501,28 @@ export const cur_obj_set_vel_from_mario_vel = (f12, f14) => {
 
 export const cur_obj_reverse_animation = () => {
     const o = ObjectListProc.gCurrentObject
-    if (o.gfx.unk38.animFrame >= 0) {
-        o.gfx.unk38.animFrame--
+    if (o.gfx.animInfo.animFrame >= 0) {
+        o.gfx.animInfo.animFrame--
     }
 }
 
 export const cur_obj_extend_animation_if_at_end = () => {
     const o = ObjectListProc.gCurrentObject
 
-    const sp4 = o.gfx.unk38.animFrame
-    const sp0 = o.gfx.unk38.curAnim.unk08 - 2
+    const sp4 = o.gfx.animInfo.animFrame
+    const sp0 = o.gfx.animInfo.curAnim.unk08 - 2
 
     if (sp4 == sp0) {
-        o.gfx.unk38.animFrame--
+        o.gfx.animInfo.animFrame--
     }
 }
 
 
 export const cur_obj_check_if_near_animation_end = () => {
     const o = ObjectListProc.gCurrentObject
-    let animFlags = o.gfx.unk38.curAnim.flags
-    let animFrame = o.gfx.unk38.animFrame
-    let nearLoopEnd = o.gfx.unk38.curAnim.unk08 - 2
+    let animFlags = o.gfx.animInfo.curAnim.flags
+    let animFrame = o.gfx.animInfo.animFrame
+    let nearLoopEnd = o.gfx.animInfo.curAnim.unk08 - 2
     let isNearEnd = 0
 
     if (animFlags & ANIM_FLAG_NOLOOP && nearLoopEnd + 1 == animFrame) {
@@ -1538,8 +1538,8 @@ export const cur_obj_check_if_near_animation_end = () => {
 
 export const cur_obj_check_if_at_animation_end = () => {
     const o = ObjectListProc.gCurrentObject
-    let animFrame = o.gfx.unk38.animFrame
-    let lastFrame = o.gfx.unk38.curAnim.unk08 - 1
+    let animFrame = o.gfx.animInfo.animFrame
+    let lastFrame = o.gfx.animInfo.curAnim.unk08 - 1
 
     if (animFrame == lastFrame) {
         return true

@@ -220,7 +220,7 @@ export const save_file_get_flags = (force) => {
         return gDummyFlags
     }
     // if (gCurrCreditsEntry != NULL || gCurrDemoInput != NULL) {
-    //     return 0;
+    //     return false;
     // }
     // return gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags;
 }

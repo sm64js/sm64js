@@ -207,6 +207,7 @@ export const SHADER_TEXEL1 = 7
 export const SHADER_OPT_ALPHA = (1 << 24)
 export const SHADER_OPT_FOG = (1 << 25)
 export const SHADER_OPT_TEXTURE_EDGE = (1 << 26)
+export const SHADER_OPT_NOISE = (1 << 27)
 
 /*
  * G_SETCOMBINE: color combine modes

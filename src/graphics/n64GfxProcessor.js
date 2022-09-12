@@ -543,12 +543,14 @@ export class n64GfxProcessor {
         let use_alpha = (this.rdp.other_mode_l & (Gbi.G_BL_A_MEM << 18)) == 0
         const use_fog = (this.rdp.other_mode_l >>> 30) == Gbi.G_BL_CLR_FOG
         const texture_edge = (this.rdp.other_mode_l & Gbi.CVG_X_ALPHA) == Gbi.CVG_X_ALPHA
+        const use_noise = this.rdp.other_mode_h[Gbi.G_MDSFT_ALPHACOMPARE] == Gbi.G_AC_DITHER
 
         if (texture_edge) use_alpha = true
 
         if (use_alpha) cc_id |= Gbi.SHADER_OPT_ALPHA
         if (use_fog) cc_id |= Gbi.SHADER_OPT_FOG
         if (texture_edge) cc_id |= Gbi.SHADER_OPT_TEXTURE_EDGE
+        if (use_noise) cc_id |= Gbi.SHADER_OPT_NOISE
 
         if (!use_alpha) cc_id &= ~0xfff000
 

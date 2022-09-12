@@ -22,10 +22,9 @@ import {
 } from "../include/object_constants"
 
 import {
-    gDPSetAlphaCompare, gDPSetEnvColor, 
-    gSPEndDisplayList, gSPClearGeometryMode, gSPSetGeometryMode,
+    G_AC_DITHER,
 
-    G_AC_DITHER
+    gDPSetAlphaCompare, gDPSetEnvColor, gSPEndDisplayList, gDPSetRenderMode
 } from "../include/gbi"
 
 import {

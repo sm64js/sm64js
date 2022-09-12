@@ -38,7 +38,7 @@ import {
     oPathedTargetYaw,
 
     ACTIVE_FLAGS_DEACTIVATED, ACTIVE_FLAG_FAR_AWAY, ACTIVE_FLAG_IN_DIFFERENT_ROOM,
-    ACTIVE_FLAG_UNK10, ACTIVE_FLAG_UNK7, ACTIVE_FLAG_DEACTIVATED,
+    ACTIVE_FLAG_UNK10, ACTIVE_FLAG_DITHERED_ALPHA, ACTIVE_FLAG_DEACTIVATED,
 
     OBJ_MOVE_ABOVE_DEATH_BARRIER, OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER, OBJ_MOVE_IN_AIR,
     OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_HIT_WALL, OBJ_MOVE_HIT_EDGE, OBJ_MOVE_ON_GROUND,
@@ -72,6 +72,8 @@ import * as _Linker from "./Linker"
 import * as Gbi from "../include/gbi"
 import { spawn_mist_particles_variable } from "./behaviors/white_puff.inc"
 import { spawn_triangle_break_particles } from "./behaviors/break_particles.inc"
+
+import { G_AC_DITHER } from "../include/gbi"
 
 
 export const WATER_DROPLET_FLAG_RAND_ANGLE                = 0x02
@@ -251,6 +253,16 @@ export const geo_update_layer_transparency = (callerContext, node) => {
 
             if (opacity == 0 && gLinker.behaviors.bhvBowser == obj.behavior) {
                 obj.rawData[oAnimState] = 2
+            }
+
+            if (node.parameter != 10) {
+                if (obj.activeFlags & ACTIVE_FLAG_DITHERED_ALPHA) {
+                    Gbi.gDPSetAlphaCompare(dl, G_AC_DITHER)
+                }
+            }
+            // temp fix for vanish cap
+            if (obj.behavior == gLinker.behaviors.bhvVanishCap) {
+                Gbi.gDPSetAlphaCompare(dl, G_AC_DITHER)
             }
         }
 

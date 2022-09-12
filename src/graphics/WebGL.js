@@ -3,6 +3,7 @@ import { G_TX_CLAMP, G_TX_MIRROR } from "../include/gbi"
 const SHADER_OPT_ALPHA = (1 << 24)
 const SHADER_OPT_FOG = (1 << 25)
 const SHADER_OPT_TEXTURE_EDGE = (1 << 26)
+const SHADER_OPT_NOISE = (1 << 27)
 
 const SHADER_0 = 0
 const SHADER_INPUT_1 = 1
@@ -17,6 +18,8 @@ export class WebGL {
 
     constructor(canvas) {
         this.canvas = canvas
+
+        this.frame_count = 0
 
         this.shader_program_pool = []
 
@@ -135,7 +138,9 @@ export class WebGL {
         let opt_alpha = (shader_id & SHADER_OPT_ALPHA) != 0
         let opt_fog = (shader_id & SHADER_OPT_FOG) != 0
         let opt_texture_edge = (shader_id & SHADER_OPT_TEXTURE_EDGE) != 0
+        let opt_noise = (shader_id & SHADER_OPT_NOISE) != 0
         let used_textures = [ false, false ]
+        let used_noise = false
         let num_inputs = 0
 
         for (let i = 0; i < 2; i++) {
@@ -215,6 +220,16 @@ export class WebGL {
         if (used_textures[1]) {
             fs_buf += "uniform sampler2D uTex1;\n"
         }
+
+        if (opt_alpha && opt_noise) {
+            fs_buf += "uniform float frame_count;"
+
+            fs_buf += "float random(in vec3 value) {"
+            fs_buf += "    float random = dot(sin(value), vec3(12.9898, 78.233, 37.719));"
+            fs_buf += "    return fract(sin(random) * 143758.5453);"
+            fs_buf += "}"
+        }
+
         fs_buf += "void main() {\n"
 
         if (used_textures[0]) {
@@ -248,6 +263,9 @@ export class WebGL {
             }
         }
 
+        if (opt_alpha && opt_noise) 
+            fs_buf += "texel.a *= floor(random(floor(vec3(gl_FragCoord.xy, frame_count))) + 0.5);"
+
         if (opt_alpha) {
             fs_buf += "gl_FragColor = texel;\n"
         } else {
@@ -270,8 +288,10 @@ export class WebGL {
             num_inputs,
             num_floats,
             used_textures,
+            used_noise,
             attrib_locations: [],
-            attrib_sizes: []
+            attrib_sizes: [],
+            uniform_locations: []
         }
 
         new_shader_program_obj.attrib_sizes.push(4)
@@ -307,6 +327,13 @@ export class WebGL {
             this.gl.uniform1i(sampler_attrib, 1)
         }
 
+        if (opt_alpha && opt_noise) {
+            new_shader_program_obj.uniform_locations[4] = this.gl.getUniformLocation(shader_program, "frame_count")
+            new_shader_program_obj.used_noise = true
+        } else {
+            new_shader_program_obj.used_noise = false
+        }
+
         return new_shader_program_obj
 
     }
@@ -315,6 +342,7 @@ export class WebGL {
         //console.log("loading new shader: " + new_prg.shader_id)
         this.gl.useProgram(new_prg.opengl_program)
         this.vertex_array_set_attribs(new_prg)
+        this.set_shader_uniforms(new_prg)
     }
 
     vertex_array_set_attribs(prg) {
@@ -326,6 +354,11 @@ export class WebGL {
             this.gl.vertexAttribPointer(prg.attrib_locations[i], prg.attrib_sizes[i], this.gl.FLOAT, false, num_floats * 4, pos * 4)
             pos += prg.attrib_sizes[i]
         }
+    }
+
+    set_shader_uniforms(prg) {
+        if (prg.used_noise)
+            this.gl.uniform1f(prg.uniform_locations[4], this.frame_count)
     }
 
     lookup_shader(shader_id) {
@@ -413,6 +446,7 @@ export class WebGL {
     }
 
     start_frame() {
+        this.frame_count++
         this.gl.disable(this.gl.SCISSOR_TEST)
         this.gl.depthMask(true)
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0)

@@ -75,6 +75,7 @@ export const bhv_arrow_lift_loop = () => {
 
     switch (o.oAction) {
         case ARROW_LIFT_ACT_IDLE:
+            console.log("IDLE")
             // Wait 61 frames before moving.
             if (o.rawdata[oTimer] > 60) {
                 if (gMarioObject.platform == o) {
@@ -84,6 +85,7 @@ export const bhv_arrow_lift_loop = () => {
             break
 
         case ARROW_LIFT_ACT_MOVING_AWAY:
+            console.log("AWAY")
             if (arrow_lift_move_away() == ARROW_LIFT_DONE_MOVING) {
                 o.oAction = o.rawdata[ARROW_LIFT_ACT_MOVING_BACK]
             }
@@ -91,6 +93,7 @@ export const bhv_arrow_lift_loop = () => {
             break
         
         case ARROW_LIFT_ACT_MOVING_BACK:
+            console.log("BACK")
             // Wait 61 frames before moving (after stopping after moving forwards).
             if (o.rawdata[oTimer] > 60) {
                 if (arrow_lift_move_back() == ARROW_LIFT_DONE_MOVING) {

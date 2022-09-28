@@ -34,6 +34,7 @@ import { SOUND_OBJ_DEFAULT_DEATH } from "../../include/sounds"
 import { random_u16 } from "../../utils"
 import { bhvBookSwitch } from "../BehaviorData"
 import { bhvHauntedBookshelf } from "../BehaviorData"
+import { INTERACT_BREAKABLE } from "../Interaction"
 import { ATTACK_FROM_BELOW } from "../Interaction"
 import { ATTACK_KICK_OR_TRIP } from "../Interaction"
 import { ATTACK_PUNCH } from "../Interaction"
@@ -81,6 +82,18 @@ const D_80331B30 = [
     { unk00: 135, unk02: 3 },
     { unk00: -75, unk02: 78 }
 ]
+
+const sBookSwitchHitbox = {
+    interactType: INTERACT_BREAKABLE,
+    downOffset: 0,
+    damageOrCoinValue: 0,
+    health: 99,
+    numLootCoins: 0,
+    radius: 20,
+    height: 30,
+    hurtboxRadius: 20,
+    hurtboxHeight: 30
+}
 
 const flying_bookend_act_0 = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject

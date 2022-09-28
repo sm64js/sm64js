@@ -1184,16 +1184,6 @@ export const oWaterRingMgrLastRingCollected  = 0x1C
 /* Wave Trail */
 export const oWaveTrailSize  = 0x1C
 
-/* WDW Arrow Lift */
-    /* oAction */
-    export const ARROW_LIFT_ACT_IDLE        = 0
-    export const ARROW_LIFT_ACT_MOVING_AWAY = 1
-    export const ARROW_LIFT_ACT_MOVING_BACK = 2
-
-    /* status */
-    export const ARROW_LIFT_NOT_DONE_MOVING = 0
-    export const ARROW_LIFT_DONE_MOVING     = 1
-
 /* Whirlpool */
 export const oWhirlpoolInitFacePitch  = 0x1B
 export const oWhirlpoolInitFaceRoll   = 0x1C
@@ -1324,3 +1314,18 @@ export const WOODEN_POST_BP_NO_COINS_MASK = 0x0000FF00
     /* oBehParams2ndByte */
     export const CAMERA_LAKITU_BP_FOLLOW_CAMERA = 0
     export const CAMERA_LAKITU_BP_INTRO         = 1
+
+/* BBH Haunted Bookshelf */
+    /* oAction */
+    export const HAUNTED_BOOKSHELF_ACT_IDLE   = 0
+    export const HAUNTED_BOOKSHELF_ACT_RECEDE = 1
+
+/* WDW Arrow Lift */
+    /* oAction */
+    export const ARROW_LIFT_ACT_IDLE        = 0
+    export const ARROW_LIFT_ACT_MOVING_AWAY = 1
+    export const ARROW_LIFT_ACT_MOVING_BACK = 2
+
+    /* status */
+    export const ARROW_LIFT_NOT_DONE_MOVING = 0
+    export const ARROW_LIFT_DONE_MOVING     = 1

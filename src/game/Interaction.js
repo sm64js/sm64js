@@ -645,6 +645,44 @@ const interact_mr_blizzard = (m, o) => {
     return false
 }
 
+const interact_hit_from_below = (m, o) => {
+    let interaction
+
+    if (m.flags & MARIO_METAL_CAP) {
+        interaction = INT_FAST_ATTACK_OR_SHELL
+    } else {
+        interaction = determine_interaction(m, o)
+    }
+
+    if (interaction & INT_ANY_ATTACK) {
+        // queue_rumble_data(5, 80)
+        attack_object(o, interaction)
+        bounce_back_from_attack(m, interaction)
+
+        if (interaction & INT_HIT_FROM_BELOW) {
+            hit_object_from_below(m, o)
+        }
+
+        if (interaction & INT_HIT_FROM_ABOVE) {
+            if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_TWIRL_BOUNCE) {
+                bounce_off_object(m, o, 80.0)
+                reset_mario_pitch(m)
+                // play_sound(SOUND_MARIO_TWIRL_BOUNCE, m.marioObj.gfx.cameraToObject)
+                return drop_and_set_mario_action(m, ACT_TWIRLING, 0)
+            } else {
+                bounce_off_object(m, o, 30.0)
+            }
+        }
+    } else if (take_damage_and_knock_back(m, o)) {
+        return true
+    }
+
+    if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+        sDelayInvincTimer = true
+    }
+
+    return false
+}
 
 export const interact_cap = (m, o) => {
    let /*u32*/capFlag = get_mario_cap_flag(o)
@@ -1510,7 +1548,7 @@ const sInteractionHandlers = [
     { interactType: INTERACT_SHOCK, handler: interact_shock },
     { interactType: INTERACT_BOUNCE_TOP2, handler: null },
     { interactType: INTERACT_MR_BLIZZARD, handler: interact_mr_blizzard },
-    { interactType: INTERACT_HIT_FROM_BELOW, handler: null },
+    { interactType: INTERACT_HIT_FROM_BELOW, handler: interact_hit_from_below },
     { interactType: INTERACT_BOUNCE_TOP, handler: interact_bounce_top },
     { interactType: INTERACT_DAMAGE, handler: interact_damage },
     { interactType: INTERACT_POLE, handler: interact_pole },

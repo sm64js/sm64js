@@ -23,7 +23,7 @@ import { oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAn
          oUnk94, oBBallSpawnerPeriodMinus1, oBobombBuddyRole, oTripletButterflyScale,
          oBigBooNumMinionBoosKilled, oDrawingDistance, oMarioParticleFlags,
          oOpacity, oForwardVel, oVelY, oHealth, oParentRelativePosX,
-         oParentRelativePosZ, oArrowLiftUnk100,
+         oParentRelativePosZ, oArrowLiftUnk100, oRoom, oMoveFlags,
 
          OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, OBJ_FLAG_COMPUTE_DIST_TO_MARIO,
          OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW,
@@ -46,6 +46,7 @@ import * as _activated_bf_plat        from "./behaviors/activated_bf_plat.inc"
 import * as _amp                      from "./behaviors/amp.inc"
 import * as _animated_floor_switch    from "./behaviors/animated_floor_switch.inc"
 import * as _arrow_lift               from "./behaviors/arrow_lift.inc"
+import * as _bbh_haunted_bookshelf    from "./behaviors/bbh_haunted_bookshelf.inc"
 import * as _bird                     from "./behaviors/bird.inc"
 import * as _bobomb                   from "./behaviors/bobomb.inc"
 import * as _boo                      from "./behaviors/boo.inc"
@@ -78,6 +79,7 @@ import * as _fish                     from "./behaviors/fish.inc"
 import * as _file_select              from "./behaviors/file_select.inc"
 import * as _flame_mario              from "./behaviors/flame_mario.inc"
 import * as _flamethrower             from "./behaviors/flamethrower.inc"
+import * as _flying_bookend_switch    from "./behaviors/flying_bookend_switch.inc"
 import * as _goomba                   from "./behaviors/goomba.inc"
 import * as _king_bobomb              from "./behaviors/king_bobomb.inc"
 import * as _koopa_shell_underwater   from "./behaviors/koopa_shell_underwater.inc"
@@ -155,6 +157,9 @@ import { warp_pipe_seg3_collision_03009AC8 } from "../actors/warp_pipe/collision
 import { king_bobomb_seg5_anims_0500FE30 } from "../actors/king_bobomb/anims.inc"
 import { bob_seg7_collision_chain_chomp_gate } from "../levels/bob/chain_chomp_gate/collision.inc"
 import { wdw_seg7_collision_arrow_lift } from "../levels/wdw/arrow_lift/collision.inc"
+import { bbh_seg7_collision_haunted_bookshelf } from "../levels/bbh/moving_bookshelf/collision.inc"
+import { bookend_seg5_anims_05002540 } from "../actors/bookend/anims.inc"
+import { oCoinUnk110 } from "../include/object_constants"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -934,6 +939,24 @@ const bhvSpawnedStarNoLevelExit = [
     CALL_NATIVE('bhv_spawned_star_init'),
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_spawned_star_loop'),
+    END_LOOP(),
+]
+
+export const bhvMrIBlueCoin = [
+    BEGIN(OBJ_LIST_LEVEL),
+    SET_INT(oInteractType, INTERACT_COIN),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    BILLBOARD(),
+    SET_INT(oIntangibleTimer, 0),
+    SET_FLOAT(oCoinUnk110, 20),
+    SET_INT(oAnimState, -1),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ -400, /*Bounciness*/ -70, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    CALL_NATIVE('bhv_coin_init'),
+    SET_INT(oDamageOrCoinValue, 5),
+    SET_HITBOX(/*Radius*/ 120, /*Height*/ 64),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_coin_loop'),
+        ADD_INT(oAnimState, 1),
     END_LOOP(),
 ]
 
@@ -2526,6 +2549,62 @@ const bhvMenuButtonManager = [
     END_LOOP(),
 ]
 
+export const bhvHauntedBookshelf = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(bbh_seg7_collision_haunted_bookshelf),
+    SET_HOME(),
+    SET_INT(oRoom, 6),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_haunted_bookshelf_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
+export const bhvFlyingBookend = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, bookend_seg5_anims_05002540),
+    ANIMATE(0),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 60, /*Gravity*/ 0, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    SET_INT(oMoveFlags, 0),
+    SCALE(/*Unused*/ 0, /*Field*/ 70),
+    CALL_NATIVE('bhv_init_room'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_flying_bookend_loop'),
+    END_LOOP(),
+]
+
+export const bhvBookendSpawn = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    CALL_NATIVE('bhv_init_room'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_bookend_spawn_loop'),
+    END_LOOP(),
+]
+
+export const bhvHauntedBookshelfManager = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    CALL_NATIVE('bhv_init_room'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_haunted_bookshelf_manager_loop'),
+    END_LOOP(),
+]
+
+export const bhvBookSwitch = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_HOME(),
+    SET_FLOAT(oGraphYOffset, 30),
+    ADD_INT(oMoveAngleYaw, 0x4000),
+    CALL_NATIVE('bhv_init_room'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_book_switch_loop'),
+    END_LOOP(),
+]
+
 const bhvMerryGoRound = [
     BEGIN(OBJ_LIST_SURFACE, 'bhvMerryGoRound'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -2572,6 +2651,8 @@ gLinker.behaviors.bhvBobombFuseSmoke = bhvBobombFuseSmoke
 gLinker.behaviors.bhvBoo = bhvBoo
 gLinker.behaviors.bhvBooCage = bhvBooCage
 gLinker.behaviors.bhvBooInCastle = bhvBooInCastle
+gLinker.behaviors.bhvBookendSpawn = bhvBookendSpawn
+gLinker.behaviors.bhvBookSwitch = bhvBookSwitch
 gLinker.behaviors.bhvBooWithCage = bhvBooWithCage
 gLinker.behaviors.bhvBowlingBall = bhvBowlingBall
 gLinker.behaviors.bhvBowser = bhvBowser
@@ -2623,6 +2704,7 @@ gLinker.behaviors.bhvFlamethrower = bhvFlamethrower
 gLinker.behaviors.bhvFloorSwitchHardcodedModel = bhvFloorSwitchHardcodedModel
 gLinker.behaviors.bhvFloorSwitchAnimatesObject = bhvFloorSwitchAnimatesObject
 gLinker.behaviors.bhvFloorTrapInCastle = bhvFloorTrapInCastle
+gLinker.behaviors.bhvFlyingBookend = bhvFlyingBookend
 gLinker.behaviors.bhvFlyingWarp = bhvFlyingWarp
 gLinker.behaviors.bhvFreeBowlingBall = bhvFreeBowlingBall
 gLinker.behaviors.bhvGhostHuntBigBoo = bhvGhostHuntBigBoo
@@ -2631,6 +2713,8 @@ gLinker.behaviors.bhvGiantPole = bhvGiantPole
 gLinker.behaviors.bhvGoomba = bhvGoomba
 gLinker.behaviors.bhvGoombaTripletSpawner = bhvGoombaTripletSpawner
 gLinker.behaviors.bhvHardAirKnockBackWarp = bhvHardAirKnockBackWarp
+gLinker.behaviors.bhvHauntedBookshelf = bhvHauntedBookshelf
+gLinker.behaviors.bhvHauntedBookshelfManager = bhvHauntedBookshelfManager
 gLinker.behaviors.bhvHidden1up = bhvHidden1up
 gLinker.behaviors.bhvHidden1upInPoleSpawner = bhvHidden1upInPoleSpawner
 gLinker.behaviors.bhvHidden1upTrigger = bhvHidden1upTrigger
@@ -2657,6 +2741,7 @@ gLinker.behaviors.bhvMessagePanel = bhvMessagePanel
 gLinker.behaviors.bhvMetalCap = bhvMetalCap
 gLinker.behaviors.bhvMistCircParticleSpawner = bhvMistCircParticleSpawner
 gLinker.behaviors.bhvMistParticleSpawner = bhvMistParticleSpawner
+gLinker.behaviors.bhvMrIBlueCoin = bhvMrIBlueCoin
 gLinker.behaviors.bhvOneCoin = bhvOneCoin
 gLinker.behaviors.bhvMoatGrills = bhvMoatGrills
 gLinker.behaviors.bhvNormalCap = bhvNormalCap

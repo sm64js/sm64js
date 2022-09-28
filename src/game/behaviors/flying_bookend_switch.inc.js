@@ -1,68 +1,33 @@
-import { gGlobalSoundSource } from "../../audio/external"
-import { play_puzzle_jingle } from "../../audio/external"
-import { play_sound } from "../../audio/external"
-import { MODEL_BOOKEND_PART } from "../../include/model_ids"
-import { MODEL_BOOKEND } from "../../include/model_ids"
-import { oTimer } from "../../include/object_constants"
-import { ACTIVE_FLAG_IN_DIFFERENT_ROOM } from "../../include/object_constants"
-import { oPosZ } from "../../include/object_constants"
-import { oHomeZ } from "../../include/object_constants"
-import { OBJ_MOVE_MASK_ON_GROUND } from "../../include/object_constants"
-import { oNumLootCoins } from "../../include/object_constants"
-import { oGraphYOffset } from "../../include/object_constants"
-import { oMoveFlags } from "../../include/object_constants"
-import { oMoveAnglePitch } from "../../include/object_constants"
-import { oAngleToMario } from "../../include/object_constants"
-import { oDamageOrCoinValue } from "../../include/object_constants"
-import { OBJ_MOVE_HIT_WALL } from "../../include/object_constants"
-import { oDeathSound } from "../../include/object_constants"
-import { oForwardVel } from "../../include/object_constants"
-import { oPosX } from "../../include/object_constants"
-import { oBookSwitchManagerUnkF8 } from "../../include/object_constants"
-import { oBehParams2ndByte } from "../../include/object_constants"
-import { oDistanceToMario } from "../../include/object_constants"
-import { oBookSwitchManagerUnkF4 } from "../../include/object_constants"
-import { oBookendUnkF4 } from "../../include/object_constants"
-import { oBookendUnkF8 } from "../../include/object_constants"
-import { oFaceAngleRoll } from "../../include/object_constants"
-import { oFaceAnglePitch } from "../../include/object_constants"
-import { oAction } from "../../include/object_constants"
-import { SOUND_OBJ_POUNDING1 } from "../../include/sounds"
-import { SOUND_GENERAL2_RIGHT_ANSWER } from "../../include/sounds"
-import { SOUND_MENU_CAMERA_BUZZ } from "../../include/sounds"
-import { SOUND_OBJ_DEFAULT_DEATH } from "../../include/sounds"
+import { gGlobalSoundSource, play_puzzle_jingle, play_sound } from "../../audio/external"
+import { MODEL_BOOKEND_PART, MODEL_BOOKEND } from "../../include/model_ids"
+import {
+    oTimer, ACTIVE_FLAG_IN_DIFFERENT_ROOM, oPosZ, oHomeZ,
+    OBJ_MOVE_MASK_ON_GROUND, oNumLootCoins, oGraphYOffset, oMoveFlags, oMoveAnglePitch,
+    oAngleToMario, oDamageOrCoinValue, OBJ_MOVE_HIT_WALL, oDeathSound, oForwardVel,
+    oPosX, oBookSwitchManagerUnkF8, oBehParams2ndByte, oDistanceToMario,
+    oBookSwitchManagerUnkF4, oBookendUnkF4, oBookendUnkF8, oFaceAngleRoll,
+    oFaceAnglePitch, oAction
+} from "../../include/object_constants"
+import {
+    SOUND_OBJ_POUNDING1, SOUND_GENERAL2_RIGHT_ANSWER, SOUND_MENU_CAMERA_BUZZ,
+    SOUND_OBJ_DEFAULT_DEATH
+} from "../../include/sounds"
 import { random_u16 } from "../../utils"
-import { bhvBookSwitch } from "../BehaviorData"
-import { bhvHauntedBookshelf } from "../BehaviorData"
-import { INTERACT_BREAKABLE } from "../Interaction"
-import { ATTACK_FROM_BELOW } from "../Interaction"
-import { ATTACK_KICK_OR_TRIP } from "../Interaction"
-import { ATTACK_PUNCH } from "../Interaction"
-import { INTERACT_HIT_FROM_BELOW } from "../Interaction"
-import { obj_forward_vel_approach } from "../ObjBehaviors2"
-import { obj_face_pitch_approach } from "../ObjBehaviors2"
-import { obj_face_roll_approach } from "../ObjBehaviors2"
-import { obj_die_if_health_non_positive } from "../ObjBehaviors2"
-import { approach_f32_ptr } from "../ObjBehaviors2"
-import { obj_turn_pitch_toward_mario } from "../ObjBehaviors2"
-import { obj_compute_vel_from_move_pitch } from "../ObjBehaviors2"
-import { obj_check_attacks } from "../ObjBehaviors2"
-import { obj_is_near_to_and_facing_mario } from "../ObjBehaviors2"
-import { spawn_object_abs_with_rot } from "../ObjectHelpers"
-import { cur_obj_set_model } from "../ObjectHelpers"
-import { cur_obj_move_using_fvel_and_gravity } from "../ObjectHelpers"
-import { cur_obj_init_animation_with_sound } from "../ObjectHelpers"
-import { cur_obj_update_floor_and_walls } from "../ObjectHelpers"
-import { cur_obj_move_standard } from "../ObjectHelpers"
-import { spawn_object } from "../ObjectHelpers"
-import { cur_obj_nearest_object_with_behavior } from "../ObjectHelpers"
-import { cur_obj_rotate_yaw_toward } from "../ObjectHelpers"
-import { cur_obj_init_animation_and_check_if_near_end } from "../ObjectHelpers"
-import { cur_obj_scale } from "../ObjectHelpers"
-import { cur_obj_push_mario_away_from_cylinder } from "../ObjectHelpers"
-import { cur_obj_become_tangible } from "../ObjectHelpers"
-import { cur_obj_become_intangible } from "../ObjectHelpers"
-import { spawn_object_relative, obj_mark_for_deletion } from "../ObjectHelpers"
+import { bhvFlyingBookend, bhvBookSwitch, bhvHauntedBookshelf } from "../BehaviorData"
+import { INTERACT_BREAKABLE, ATTACK_FROM_BELOW, ATTACK_KICK_OR_TRIP, ATTACK_PUNCH, INTERACT_HIT_FROM_BELOW } from "../Interaction"
+import {
+    obj_forward_vel_approach, obj_face_pitch_approach, obj_face_roll_approach,
+    obj_die_if_health_non_positive, approach_f32_ptr, obj_turn_pitch_toward_mario,
+    obj_compute_vel_from_move_pitch, obj_check_attacks, obj_is_near_to_and_facing_mario
+} from "../ObjBehaviors2"
+import {
+    spawn_object_abs_with_rot, cur_obj_set_model, cur_obj_move_using_fvel_and_gravity,
+    cur_obj_init_animation_with_sound, cur_obj_update_floor_and_walls,
+    cur_obj_move_standard, spawn_object, cur_obj_nearest_object_with_behavior,
+    cur_obj_rotate_yaw_toward, cur_obj_init_animation_and_check_if_near_end,
+    cur_obj_scale, cur_obj_push_mario_away_from_cylinder, cur_obj_become_tangible,
+    cur_obj_become_intangible, spawn_object_relative, obj_mark_for_deletion
+} from "../ObjectHelpers"
 import { cur_obj_play_sound_2 } from "../SpawnSound"
 
 const sFlyingBookendHitbox = {
@@ -124,7 +89,6 @@ const flying_bookend_act_1 = () => {
                 if (o.rawData[oTimer] >= 10) {
                     obj_face_roll_approach(o.rawData[oBookendUnkF8], 2000)
                     if (o.rawData[oTimer] >= 20) {
-                        console.log("test")
                         let pxWrapper = { px: o.gfx.scale[0] }
                         approach_f32_ptr(pxWrapper, 3.0, 0.2)
                         o.gfx.scale[0] = pxWrapper.px

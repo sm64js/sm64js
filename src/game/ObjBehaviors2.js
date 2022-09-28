@@ -119,7 +119,8 @@ export const oscillate_toward = (valueObj, velObj, target, velCloseToZero, accel
 
 export const obj_turn_pitch_toward_mario = (targetOffsetY, turnAmount) => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+
     o.rawData[oPosY] -= targetOffsetY
     let targetPitch = obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_PITCH_INDEX, turnAmount)
     o.rawData[oPosY] += targetOffsetY

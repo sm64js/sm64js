@@ -125,7 +125,9 @@ const flying_bookend_act_1 = () => {
                     obj_face_roll_approach(o.rawData[oBookendUnkF8], 2000)
                     if (o.rawData[oTimer] >= 20) {
                         console.log("test")
-                        approach_f32_ptr(o.gfx.scale[0], 3.0, 0.2)
+                        pxWrapper = { px: o.gfx.scale[0] }
+                        approach_f32_ptr(pxWrapper, 3.0, 0.2)
+                        o.gfx.scale[0] = pxWrapper.px
                     }
                 }
             }

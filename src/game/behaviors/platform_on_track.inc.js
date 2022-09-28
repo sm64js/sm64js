@@ -346,7 +346,9 @@ const platform_on_track_rock_ski_lift = () => {
             o.rawData[oPlatformOnTrackWasStoodOn] = true
         }
 
-        approach_f32_ptr(o.rawData[oPlatformOnTrackOffsetY], 0.0, 0.5)
+        pxWrapper = { px: o.rawData[oPlatformOnTrackOffsetY] }
+        approach_f32_ptr(pxWrapper, 0.0, 0.5)
+        o.rawData[oPlatformOnTrackOffsetY] = pxWrapper.px
         o.rawData[oPosY] += o.rawData[oPlatformOnTrackOffsetY]
     }
 }

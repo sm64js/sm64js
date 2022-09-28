@@ -130,15 +130,15 @@ export const obj_turn_pitch_toward_mario = (targetOffsetY, turnAmount) => {
     return targetPitch
 }
 
-export const approach_f32_ptr = (px, target, delta) => {
-    if (px > target) {
+export const approach_f32_ptr = (pxWrapper, target, delta) => {
+    if (pxWrapper.px > target) {
         delta = -delta
     }
 
-    px += delta
+    pxWrapper.px += delta
 
-    if ((px - target) * delta >= 0) {
-        px = target
+    if ((pxWrapper.px - target) * delta >= 0) {
+        pxWrapper.px = target
         return true
     }
 

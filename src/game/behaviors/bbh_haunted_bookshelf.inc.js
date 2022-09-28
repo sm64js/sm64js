@@ -57,3 +57,5 @@ export const bhv_haunted_bookshelf_loop = () => {
             break
     }
 }
+
+gLinker.bhv_haunted_bookshelf_loop = bhv_haunted_bookshelf_loop

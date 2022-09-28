@@ -46,6 +46,7 @@ import * as _activated_bf_plat        from "./behaviors/activated_bf_plat.inc"
 import * as _amp                      from "./behaviors/amp.inc"
 import * as _animated_floor_switch    from "./behaviors/animated_floor_switch.inc"
 import * as _arrow_lift               from "./behaviors/arrow_lift.inc"
+import * as _bbh_haunted_bookshelf    from "./behaviors/bbh_haunted_bookshelf.inc"
 import * as _bird                     from "./behaviors/bird.inc"
 import * as _bobomb                   from "./behaviors/bobomb.inc"
 import * as _boo                      from "./behaviors/boo.inc"
@@ -155,6 +156,7 @@ import { warp_pipe_seg3_collision_03009AC8 } from "../actors/warp_pipe/collision
 import { king_bobomb_seg5_anims_0500FE30 } from "../actors/king_bobomb/anims.inc"
 import { bob_seg7_collision_chain_chomp_gate } from "../levels/bob/chain_chomp_gate/collision.inc"
 import { wdw_seg7_collision_arrow_lift } from "../levels/wdw/arrow_lift/collision.inc"
+import { bbh_seg7_collision_haunted_bookshelf } from "../levels/bbh/moving_bookshelf/collision.inc"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -2526,6 +2528,18 @@ const bhvMenuButtonManager = [
     END_LOOP(),
 ]
 
+const bhvHauntedBookshelf = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(bbh_seg7_collision_haunted_bookshelf),
+    SET_HOME(),
+    SET_INT(oRoom, 6),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_haunted_bookshelf_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
 const bhvMerryGoRound = [
     BEGIN(OBJ_LIST_SURFACE, 'bhvMerryGoRound'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -2631,6 +2645,7 @@ gLinker.behaviors.bhvGiantPole = bhvGiantPole
 gLinker.behaviors.bhvGoomba = bhvGoomba
 gLinker.behaviors.bhvGoombaTripletSpawner = bhvGoombaTripletSpawner
 gLinker.behaviors.bhvHardAirKnockBackWarp = bhvHardAirKnockBackWarp
+gLinker.behaviors.bhvHauntedBookshelf = bhvHauntedBookshelf
 gLinker.behaviors.bhvHidden1up = bhvHidden1up
 gLinker.behaviors.bhvHidden1upInPoleSpawner = bhvHidden1upInPoleSpawner
 gLinker.behaviors.bhvHidden1upTrigger = bhvHidden1upTrigger

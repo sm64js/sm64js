@@ -294,6 +294,8 @@ export const obj_set_dist_from_home = (distFromHome) => {
 }
 
 export const obj_is_near_to_and_facing_mario = (maxDist, maxAngleDiff) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    
     if (o.rawData[oDistanceToMario] < maxDist && abs_angle_diff(o.rawData[oMoveAngleYaw], o.rawData[oAngleToMario]) < maxAngleDiff) {
         return true
     }

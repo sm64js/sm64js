@@ -124,6 +124,7 @@ const flying_bookend_act_1 = () => {
                 if (o.rawData[oTimer] >= 10) {
                     obj_face_roll_approach(o.rawData[oBookendUnkF8], 2000)
                     if (o.rawData[oTimer] >= 20) {
+                        console.log("test")
                         approach_f32_ptr(o.gfx.scale[0], 3.0, 0.2)
                     }
                 }
@@ -171,10 +172,10 @@ const flying_bookend_act_3 = () => {
 export const bhv_flying_bookend_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
 
-    // if (!(o.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
+    if (!(o.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         o.rawData[oDeathSound] = SOUND_OBJ_POUNDING1
         cur_obj_scale(o.gfx.scale[0])
-    // }
+    }
 
     switch (o.rawData[oAction]) {
         case 0:

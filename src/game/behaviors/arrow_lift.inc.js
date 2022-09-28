@@ -73,19 +73,19 @@ export const bhv_arrow_lift_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
-    switch (o.rawdata[oAction]) {
+    switch (o.oAction) {
         case ARROW_LIFT_ACT_IDLE:
             // Wait 61 frames before moving.
             if (o.rawdata[oTimer] > 60) {
                 if (gMarioObject.platform == o) {
-                    o.rawdata[oAction] = ARROW_LIFT_ACT_MOVING_AWAY
+                    o.oAction = ARROW_LIFT_ACT_MOVING_AWAY
                 }
             }
             break
 
         case ARROW_LIFT_ACT_MOVING_AWAY:
             if (arrow_lift_move_away() == ARROW_LIFT_DONE_MOVING) {
-                o.rawdata[oAction] = o.rawdata[ARROW_LIFT_ACT_MOVING_BACK]
+                o.oAction = o.rawdata[ARROW_LIFT_ACT_MOVING_BACK]
             }
 
             break
@@ -94,7 +94,7 @@ export const bhv_arrow_lift_loop = () => {
             // Wait 61 frames before moving (after stopping after moving forwards).
             if (o.rawdata[oTimer] > 60) {
                 if (arrow_lift_move_back() == ARROW_LIFT_DONE_MOVING) {
-                    o.rawdata[oAction] = ARROW_LIFT_ACT_IDLE
+                    o.oAction = ARROW_LIFT_ACT_IDLE
                 }
             }
 

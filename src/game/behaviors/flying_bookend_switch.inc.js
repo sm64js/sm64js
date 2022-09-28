@@ -349,6 +349,7 @@ export const bhv_book_switch_loop = () => {
 
             pxWrapper = {px: o.rawData[oBookSwitchManagerUnkF4]}
             if (approach_f32_ptr(pxWrapper, 0.0, 20.0) && o.rawData[oAction] != 0) {
+                o.rawData[oBookSwitchManagerUnkF4] = pxWrapper.px
                 if (o.parentObj.rawData[oBookSwitchManagerUnkF4] == o.rawData[oBehParams2ndByte]) {
                     play_sound(SOUND_GENERAL2_RIGHT_ANSWER, gGlobalSoundSource)
                     o.parentObj.rawData[oBookSwitchManagerUnkF4]++

@@ -222,7 +222,7 @@ const bookshelf_manager_act_2 = () => {
         } else {
             if (o.rawData[oBookSwitchManagerUnkF4] >= 3) {
                 if (o.rawData[oTimer] > 100) {
-                    o.parentObj = cur_obj_nearest_object_with_behavior(bhvHauntedBookshelf)
+                    o.parentObj = cur_obj_nearest_object_with_behavior(o, bhvHauntedBookshelf)
                     o.parentObj.rawData[oAction] = 1
                     o.rawData[oPosX] = o.parentObj.rawData[oPosX]
                     o.rawData[oAction] = 3

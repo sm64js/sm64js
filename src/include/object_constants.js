@@ -1184,6 +1184,16 @@ export const oWaterRingMgrLastRingCollected  = 0x1C
 /* Wave Trail */
 export const oWaveTrailSize  = 0x1C
 
+/* WDW Arrow Lift */
+    /* oAction */
+    export const ARROW_LIFT_ACT_IDLE        = 0
+    export const ARROW_LIFT_ACT_MOVING_AWAY = 1
+    export const ARROW_LIFT_ACT_MOVING_BACK = 2
+
+    /* status */
+    export const ARROW_LIFT_NOT_DONE_MOVING = 0
+    export const ARROW_LIFT_DONE_MOVING     = 1
+
 /* Whirlpool */
 export const oWhirlpoolInitFacePitch  = 0x1B
 export const oWhirlpoolInitFaceRoll   = 0x1C
@@ -1219,7 +1229,6 @@ export const oWoodenPostPrevAngleToMario  = 0x1C
 export const oWoodenPostSpeedY            = 0x1D
 export const oWoodenPostMarioPounding     = 0x1E
 export const oWoodenPostOffsetY           = 0x1F
-
 
 /* oAction */
 export const CHAIN_CHOMP_ACT_UNINITIALIZED = 0

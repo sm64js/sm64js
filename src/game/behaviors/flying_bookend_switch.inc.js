@@ -341,3 +341,8 @@ export const bhv_book_switch_loop = () => {
         cur_obj_push_mario_away_from_cylinder(70.0, 70.0)
     }
 }
+
+gLinker.bhv_flying_bookend_loop = bhv_flying_bookend_loop
+gLinker.bhv_bookend_spawn_loop = bhv_bookend_spawn_loop
+gLinker.bhv_haunted_bookshelf_manager_loop = bhv_haunted_bookshelf_manager_loop
+gLinker.bhv_book_switch_loop = bhv_book_switch_loop

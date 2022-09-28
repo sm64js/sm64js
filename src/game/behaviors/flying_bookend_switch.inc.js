@@ -171,10 +171,10 @@ const flying_bookend_act_3 = () => {
 export const bhv_flying_bookend_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
 
-    if (!(o.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM == 1)) {
+    // if (!(o.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         o.rawData[oDeathSound] = SOUND_OBJ_POUNDING1
         cur_obj_scale(o.gfx.scale[0])
-    }
+    // }
 
     switch (o.rawData[oAction]) {
         case 0:

@@ -2632,6 +2632,7 @@ gLinker.behaviors.bhvBobombFuseSmoke = bhvBobombFuseSmoke
 gLinker.behaviors.bhvBoo = bhvBoo
 gLinker.behaviors.bhvBooCage = bhvBooCage
 gLinker.behaviors.bhvBooInCastle = bhvBooInCastle
+gLinker.behaviors.bhvBookendSpawn = bhvBookendSpawn
 gLinker.behaviors.bhvBookSwitch = bhvBookSwitch
 gLinker.behaviors.bhvBooWithCage = bhvBooWithCage
 gLinker.behaviors.bhvBowlingBall = bhvBowlingBall

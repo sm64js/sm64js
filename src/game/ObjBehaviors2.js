@@ -5,7 +5,7 @@ import { oFlags, OBJ_FLAG_30, oInteractType, oDamageOrCoinValue, oHealth, oNumLo
          oHomeX, oHomeY, oHomeZ, oPosX, oPosY, oPosZ, oDistanceToMario, oAngleToMario, OBJ_MOVE_HIT_EDGE,
          oMoveAnglePitch, oFaceAnglePitch, oFaceAngleRoll, oFaceAngleYaw, oDeathSound, oBehParams, oPlatformOnTrackPrevWaypoint, oPlatformOnTrackPrevWaypointFlags, oPlatformOnTrackStartWaypoint, oPlatformOnTrackBaseBallIndex, oSmallPiranhaFlameStartSpeed, oSmallPiranhaFlameEndSpeed, oSmallPiranhaFlameModel, O_MOVE_ANGLE_PITCH_INDEX } from "../include/object_constants"
 
-import { cur_obj_become_tangible, cur_obj_extend_animation_if_at_end, cur_obj_become_intangible, cur_obj_hide, obj_mark_for_deletion, obj_angle_to_object, cur_obj_update_floor_and_walls, cur_obj_move_standard, abs_angle_diff, cur_obj_rotate_yaw_toward, cur_obj_reflect_move_angle_off_wall, approach_symmetric, obj_spawn_loot_yellow_coins, spawn_mist_particles, approach_s16_symmetric, spawn_object_relative, spawn_object_relative_with_scale, obj_turn_toward_object} from "./ObjectHelpers"
+import { cur_obj_become_tangible, cur_obj_extend_animation_if_at_end, cur_obj_become_intangible, cur_obj_hide, obj_mark_for_deletion, obj_angle_to_object, cur_obj_update_floor_and_walls, cur_obj_move_standard, abs_angle_diff, cur_obj_rotate_yaw_toward, cur_obj_reflect_move_angle_off_wall, approach_symmetric, obj_spawn_loot_yellow_coins, spawn_mist_particles, approach_s16_symmetric, spawn_object_relative, spawn_object_relative_with_scale, obj_turn_toward_object, spawn_object} from "./ObjectHelpers"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { INT_STATUS_INTERACTED, INT_STATUS_ATTACK_MASK, INT_STATUS_ATTACKED_MARIO, ATTACK_KICK_OR_TRIP, ATTACK_FAST_ATTACK } from "./Interaction"
 import { atan2s, sqrtf } from "../engine/math_util"
@@ -14,6 +14,8 @@ import { coss, sins, int16 } from "../utils"
 import { PLATFORM_ON_TRACK_BP_RETURN_TO_START } from "./behaviors/platform_on_track.inc"
 import { MODEL_TRAJECTORY_MARKER_BALL } from "../include/model_ids"
 import { bhvTrackBall } from "./BehaviorData"
+import { MODEL_BLUE_COIN } from "../include/model_ids"
+import { bhvMrIBlueCoin } from "./BehaviorData"
 
 export const ATTACK_HANDLER_NOP = 0
 export const ATTACK_HANDLER_DIE_IF_HEALTH_NON_POSITIVE = 1
@@ -449,7 +451,7 @@ export const obj_update_blinking = (blinkTimer, baseCycleLength, cycleLengthRang
 
 export const obj_die_if_health_non_positive = () => {
 
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     if (o.rawData[oHealth] <= 0) {
 
@@ -457,16 +459,16 @@ export const obj_die_if_health_non_positive = () => {
         if (o.rawData[oDeathSound] == 0) {
             /// TODO death sound and particles
             ///spawn_mist_particles_with_sound(SOUND_OBJ_DEFAULT_DEATH)
+            spawn_mist_particles()
         } else if (o.rawData[oDeathSound] > 0) {
             //spawn_mist_particles_with_sound(o.rawData[oDeathSound])
+            spawn_mist_particles()
         } else {
-            //spawn_mist_particles()
+            spawn_mist_particles()
         }
 
-        spawn_mist_particles()
-
         if (parseInt(o.rawData[oNumLootCoins]) < 0) {
-            throw "TODO spawn bhvMrIBlueCoin?"
+            spawn_object(o, MODEL_BLUE_COIN, bhvMrIBlueCoin)
         } else {
             obj_spawn_loot_yellow_coins(o, o.rawData[oNumLootCoins], 20.0)
         }

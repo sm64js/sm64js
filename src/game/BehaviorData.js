@@ -159,6 +159,7 @@ import { bob_seg7_collision_chain_chomp_gate } from "../levels/bob/chain_chomp_g
 import { wdw_seg7_collision_arrow_lift } from "../levels/wdw/arrow_lift/collision.inc"
 import { bbh_seg7_collision_haunted_bookshelf } from "../levels/bbh/moving_bookshelf/collision.inc"
 import { bookend_seg5_anims_05002540 } from "../actors/bookend/anims.inc"
+import { oCoinUnk110 } from "../include/object_constants"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -938,6 +939,24 @@ const bhvSpawnedStarNoLevelExit = [
     CALL_NATIVE('bhv_spawned_star_init'),
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_spawned_star_loop'),
+    END_LOOP(),
+]
+
+export const bhvMrIBlueCoin = [
+    BEGIN(OBJ_LIST_LEVEL),
+    SET_INT(oInteractType, INTERACT_COIN),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    BILLBOARD(),
+    SET_INT(oIntangibleTimer, 0),
+    SET_FLOAT(oCoinUnk110, 20),
+    SET_INT(oAnimState, -1),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ -400, /*Bounciness*/ -70, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    CALL_NATIVE('bhv_coin_init'),
+    SET_INT(oDamageOrCoinValue, 5),
+    SET_HITBOX(/*Radius*/ 120, /*Height*/ 64),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_coin_loop'),
+        ADD_INT(oAnimState, 1),
     END_LOOP(),
 ]
 
@@ -2722,6 +2741,7 @@ gLinker.behaviors.bhvMessagePanel = bhvMessagePanel
 gLinker.behaviors.bhvMetalCap = bhvMetalCap
 gLinker.behaviors.bhvMistCircParticleSpawner = bhvMistCircParticleSpawner
 gLinker.behaviors.bhvMistParticleSpawner = bhvMistParticleSpawner
+gLinker.behaviors.bhvMrIBlueCoin = bhvMrIBlueCoin
 gLinker.behaviors.bhvOneCoin = bhvOneCoin
 gLinker.behaviors.bhvMoatGrills = bhvMoatGrills
 gLinker.behaviors.bhvNormalCap = bhvNormalCap

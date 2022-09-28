@@ -333,18 +333,22 @@ export const bhv_book_switch_loop = () => {
                 cur_obj_play_sound_2(SOUND_OBJ_DEFAULT_DEATH)
             }
 
-            if (approach_f32_ptr(o.rawData[oBookSwitchManagerUnkF4], 50.0, 20.0)) {
+            pxWrapper = {px: o.rawData[oBookSwitchManagerUnkF4]}
+            if (approach_f32_ptr(pxWrapper, 50.0, 20.0)) {
+                o.rawData[oBookSwitchManagerUnkF4] = pxWrapper.px
                 if (o.parentObj.rawData[oBookSwitchManagerUnkF4] >= 0 && o.rawData[oTimer] > 60
                     &&  (attackType == ATTACK_PUNCH || attackType == ATTACK_KICK_OR_TRIP || attackType == ATTACK_FROM_BELOW)) {
                     o.rawData[oAction] = 2
                 }
             } else {
                 o.rawData[oTimer] = 0
+                o.rawData[oBookSwitchManagerUnkF4] = pxWrapper.px
             }
         } else {
             cur_obj_become_intangible()
 
-            if (approach_f32_ptr(o.rawData[oBookSwitchManagerUnkF4], 0.0, 20.0) && o.rawData[oAction] != 0) {
+            pxWrapper = {px: o.rawData[oBookSwitchManagerUnkF4]}
+            if (approach_f32_ptr(pxWrapper, 0.0, 20.0) && o.rawData[oAction] != 0) {
                 if (o.parentObj.rawData[oBookSwitchManagerUnkF4] == o.rawData[oBehParams2ndByte]) {
                     play_sound(SOUND_GENERAL2_RIGHT_ANSWER, gGlobalSoundSource)
                     o.parentObj.rawData[oBookSwitchManagerUnkF4]++
@@ -368,6 +372,8 @@ export const bhv_book_switch_loop = () => {
                 }
 
                 o.rawData[oAction] = 0
+            } else {
+                o.rawData[oBookSwitchManagerUnkF4] = pxWrapper.px
             }
         }
 

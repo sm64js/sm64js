@@ -82,6 +82,8 @@ const D_80331B30 = [
 ]
 
 const flying_bookend_act_0 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    
     if (obj_is_near_to_and_facing_mario(400.0, 0x3000)) {
         cur_obj_play_sound_2(SOUND_OBJ_DEFAULT_DEATH)
 
@@ -94,6 +96,8 @@ const flying_bookend_act_0 = () => {
 }
 
 const flying_bookend_act_1 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
     if (obj_forward_vel_approach(3.0, 1.0)) {
         if (cur_obj_init_animation_and_check_if_near_end(2)) {
             o.rawData[oAction] = 2
@@ -117,6 +121,8 @@ const flying_bookend_act_1 = () => {
 }
 
 const flying_bookend_act_2 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
     cur_obj_init_animation_with_sound(1)
     cur_obj_update_floor_and_walls()
 
@@ -134,6 +140,8 @@ const flying_bookend_act_2 = () => {
 }
 
 const flying_bookend_act_3 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
     o.rawData[oDamageOrCoinValue] = 1
     o.rawData[oNumLootCoins] = 0
 
@@ -147,6 +155,8 @@ const flying_bookend_act_3 = () => {
 }
 
 export const bhv_flying_bookend_loop = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
     if (!(o.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         o.rawData[oDeathSound] = SOUND_OBJ_POUNDING1
         cur_obj_scale(o.gfx.scale[0])
@@ -178,6 +188,8 @@ export const bhv_flying_bookend_loop = () => {
 }
 
 export const bhv_bookend_spawn_loop = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
     if (!(o.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         if (o.rawData[oTimer] > 40 && obj_is_near_to_and_facing_mario(600.0, 0x2000)) {
             let sp1C = spawn_object(o, MODEL_BOOKEND, bhvFlyingBookend)
@@ -204,6 +216,8 @@ const bookshelf_manager_act_0 = () => {
 }
 
 const bookshelf_manager_act_1 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
     if (o.rawData[oBookSwitchManagerUnkF8] == 0) {
         if (obj_is_near_to_and_facing_mario(500.0, 0x3000)) {
             o.rawData[oBookSwitchManagerUnkF8] = 1
@@ -215,6 +229,8 @@ const bookshelf_manager_act_1 = () => {
 }
 
 const bookshelf_manager_act_2 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
     if (!(o.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         if (o.rawData[oBookSwitchManagerUnkF4] < 0) {
             if (o.rawData[oTimer] > 30) {
@@ -242,6 +258,8 @@ const bookshelf_manager_act_2 = () => {
 }
 
 const bookshelf_manager_act_3 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
     if (o.rawData[oTimer] > 85) {
         o.rawData[oAction] = 4
     } else {

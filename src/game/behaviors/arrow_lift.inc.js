@@ -25,17 +25,17 @@ const arrow_lift_move_away = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
 
     let status = ARROW_LIFT_NOT_DONE_MOVING
-    o.rawdata[oMoveAngleYaw] = o.rawdata[oFaceAngleYaw] - 0x4000
-    o.rawdata[oVelY] = 0
-    o.rawdata[oForwardVel] = 12
+    o.rawData[oMoveAngleYaw] = o.rawData[oFaceAngleYaw] - 0x4000
+    o.rawData[oVelY] = 0
+    o.rawData[oForwardVel] = 12
     // Cumulative displacement is used to keep track of how far the platform
     // has travelled, so that it can stop.
-    o.rawdata[oArrowLiftDisplacement] += o.rawdata[oForwardVel]
+    o.rawData[oArrowLiftDisplacement] += o.rawData[oForwardVel]
 
     // Stop the platform after moving 384 units.
-    if (o.rawdata[oArrowLiftDisplacement] > 384) {
-        o.rawdata[oForwardVel] = 0
-        o.rawdata[oArrowLiftDisplacement] = 384
+    if (o.rawData[oArrowLiftDisplacement] > 384) {
+        o.rawData[oForwardVel] = 0
+        o.rawData[oArrowLiftDisplacement] = 384
         status = ARROW_LIFT_DONE_MOVING
     }
 
@@ -50,15 +50,15 @@ const arrow_lift_move_back = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
 
     let status = ARROW_LIFT_NOT_DONE_MOVING
-    o.rawdata[oMoveAngleYaw] = o.rawdata[oFaceAngleYaw] + 0x4000
+    o.rawData[oMoveAngleYaw] = o.rawData[oFaceAngleYaw] + 0x4000
 
-    o.rawdata[oVelY] = 0
-    o.rawdata[oArrowLiftDisplacement] = 0
+    o.rawData[oVelY] = 0
+    o.rawData[oArrowLiftDisplacement] = 0
     
     // Stop the platform after returning back to its original position.
-    if (o.rawdata[oArrowLiftDisplacement] < 0) {
-        o.rawdata[oForwardVel] = 0
-        o.rawdata[oArrowLiftDisplacement] = 0
+    if (o.rawData[oArrowLiftDisplacement] < 0) {
+        o.rawData[oForwardVel] = 0
+        o.rawData[oArrowLiftDisplacement] = 0
         status = ARROW_LIFT_DONE_MOVING
     }
 
@@ -72,32 +72,28 @@ const arrow_lift_move_back = () => {
 export const bhv_arrow_lift_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
-    console.log("test")
-    switch (o.oAction) {
+    switch (o.rawData[oAction]) {
         case ARROW_LIFT_ACT_IDLE:
-            console.log("IDLE")
             // Wait 61 frames before moving.
-            if (o.rawdata[oTimer] > 60) {
+            if (o.rawData[oTimer] > 60) {
                 if (gMarioObject.platform == o) {
-                    o.oAction = ARROW_LIFT_ACT_MOVING_AWAY
+                    o.rawData[oAction] = ARROW_LIFT_ACT_MOVING_AWAY
                 }
             }
             break
 
         case ARROW_LIFT_ACT_MOVING_AWAY:
-            console.log("AWAY")
             if (arrow_lift_move_away() == ARROW_LIFT_DONE_MOVING) {
-                o.oAction = o.rawdata[ARROW_LIFT_ACT_MOVING_BACK]
+                o.rawData[oAction] = o.rawData[ARROW_LIFT_ACT_MOVING_BACK]
             }
 
             break
         
         case ARROW_LIFT_ACT_MOVING_BACK:
-            console.log("BACK")
             // Wait 61 frames before moving (after stopping after moving forwards).
-            if (o.rawdata[oTimer] > 60) {
+            if (o.rawData[oTimer] > 60) {
                 if (arrow_lift_move_back() == ARROW_LIFT_DONE_MOVING) {
-                    o.oAction = ARROW_LIFT_ACT_IDLE
+                    o.rawData[oAction] = ARROW_LIFT_ACT_IDLE
                 }
             }
 

@@ -125,7 +125,7 @@ const flying_bookend_act_1 = () => {
                     obj_face_roll_approach(o.rawData[oBookendUnkF8], 2000)
                     if (o.rawData[oTimer] >= 20) {
                         console.log("test")
-                        pxWrapper = { px: o.gfx.scale[0] }
+                        let pxWrapper = { px: o.gfx.scale[0] }
                         approach_f32_ptr(pxWrapper, 3.0, 0.2)
                         o.gfx.scale[0] = pxWrapper.px
                     }
@@ -333,7 +333,7 @@ export const bhv_book_switch_loop = () => {
                 cur_obj_play_sound_2(SOUND_OBJ_DEFAULT_DEATH)
             }
 
-            pxWrapper = {px: o.rawData[oBookSwitchManagerUnkF4]}
+            let pxWrapper = {px: o.rawData[oBookSwitchManagerUnkF4]}
             if (approach_f32_ptr(pxWrapper, 50.0, 20.0)) {
                 o.rawData[oBookSwitchManagerUnkF4] = pxWrapper.px
                 if (o.parentObj.rawData[oBookSwitchManagerUnkF4] >= 0 && o.rawData[oTimer] > 60
@@ -347,7 +347,7 @@ export const bhv_book_switch_loop = () => {
         } else {
             cur_obj_become_intangible()
 
-            pxWrapper = {px: o.rawData[oBookSwitchManagerUnkF4]}
+            let pxWrapper = {px: o.rawData[oBookSwitchManagerUnkF4]}
             if (approach_f32_ptr(pxWrapper, 0.0, 20.0) && o.rawData[oAction] != 0) {
                 o.rawData[oBookSwitchManagerUnkF4] = pxWrapper.px
                 if (o.parentObj.rawData[oBookSwitchManagerUnkF4] == o.rawData[oBehParams2ndByte]) {

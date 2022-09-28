@@ -20,7 +20,7 @@ import { dist_between_objects, obj_angle_to_object, spawn_object_at_origin, obj_
          cur_obj_set_model, spawn_water_droplet
 } from "../game/ObjectHelpers"
 
-import { s16, s32, random_float } from "../utils"
+import { s16, s32, random_float, random_int16 } from "../utils"
 
 const obj_and_int = (object, field, value) => { object.rawData[field] &= s32(value) }
 const cur_obj_add_int = (field, value) => { gLinker.ObjectListProcessor.gCurrentObject.rawData[field] += value }

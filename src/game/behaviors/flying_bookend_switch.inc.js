@@ -249,6 +249,16 @@ const bookshelf_manager_act_3 = () => {
     }
 }
 
+const bookshelf_manager_act_4 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    if (o.rawData[oBookSwitchManagerUnkF4] >= 3) {
+        obj_mark_for_deletion(o)
+    } else {
+        o.rawData[oAction] = 0
+    }
+}
+
 export const bhv_haunted_bookshelf_manager_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
 

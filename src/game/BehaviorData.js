@@ -158,6 +158,7 @@ import { king_bobomb_seg5_anims_0500FE30 } from "../actors/king_bobomb/anims.inc
 import { bob_seg7_collision_chain_chomp_gate } from "../levels/bob/chain_chomp_gate/collision.inc"
 import { wdw_seg7_collision_arrow_lift } from "../levels/wdw/arrow_lift/collision.inc"
 import { bbh_seg7_collision_haunted_bookshelf } from "../levels/bbh/moving_bookshelf/collision.inc"
+import { bookend_seg5_anims_05002540 } from "../actors/bookend/anims.inc"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)

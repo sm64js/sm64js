@@ -248,6 +248,13 @@ class BehaviorCommands {
         return this.BHV_PROC_CONTINUE
     }
 
+    set_int_rand_rshift(args) {
+        const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
+        gCurrentObject.rawData[args.field] = s32(args.range >> random_int16()) + args.minimum
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
     set_hurtbox(args) {
         const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
         gCurrentObject.hurtboxRadius = args.radius;
@@ -632,6 +639,7 @@ export const SET_MODEL = (...args)                 => {return {command: Beh.set_
 export const SET_OBJ_PHYSICS = (...args)           => {return {command: Beh.set_obj_physics, args: {hitboxRadius: args[0], gravity: args[1], bounciness: args[2], dragStrenth: args[3], friction: args[4], buoyancy: args[5]}}}
 export const SET_RANDOM_INT = (...args)            => {return {command: Beh.set_random_int, args: {field: args[0], minimum: args[1], range: args[2]}}}
 export const SET_RANDOM_FLOAT = (...args)          => {return {command: Beh.set_random_float, args: {field: args[0], minimum: args[1], range: args[2]}}}
+export const SET_INT_RAND_RSHIFT = (...args)       => {return {command: Beh.set_int_rand_rshift, args: {field: args[0], minimum: args[1], rshift: args[2]}}}  
 export const SUM_FLOAT = (...args)                 => {return {command: Beh.sum_float, args: {dest: args[0], value1: args[1], value2: args[2]}}}
 export const SPAWN_CHILD = (...args)               => {return {command: Beh.spawn_child_with_param, args: {model: args[0], behavior: args[1], bhvParam: args[2]}}}
 export const SPAWN_CHILD_WITH_PARAM = (...args)    => {return {command: Beh.spawn_child_with_param, args: {model: args[0], behavior: args[1], bhvParam: args[2]}}}

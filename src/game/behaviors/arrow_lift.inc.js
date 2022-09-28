@@ -72,7 +72,7 @@ const arrow_lift_move_back = () => {
 export const bhv_arrow_lift_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
-
+    console.log("test")
     switch (o.oAction) {
         case ARROW_LIFT_ACT_IDLE:
             console.log("IDLE")

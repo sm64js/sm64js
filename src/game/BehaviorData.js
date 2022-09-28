@@ -6,7 +6,8 @@ import { ADD_INT, ADD_FLOAT, ANIMATE, ANIMATE_TEXTURE, BEGIN, BEGIN_LOOP, BEGIN_
          LOAD_ANIMATIONS, LOAD_COLLISION_DATA, OR_INT, PARENT_BIT_CLEAR, RETURN, SCALE,
          SET_FLOAT, SET_HITBOX, SET_HITBOX_WITH_OFFSET, SET_HURTBOX, SET_HOME, SET_INT, SET_INTERACT_TYPE,
          SET_MODEL, SET_OBJ_PHYSICS, SET_RANDOM_INT, SET_RANDOM_FLOAT, SUM_FLOAT, SPAWN_CHILD,
-         SPAWN_OBJ, SPAWN_WATER_DROPLET, CYLBOARD, SPAWN_CHILD_WITH_PARAM, CLEAR_BIT_PARENT
+         SPAWN_OBJ, SPAWN_WATER_DROPLET, CYLBOARD, SPAWN_CHILD_WITH_PARAM, CLEAR_BIT_PARENT,
+         SET_INT_RAND_RSHIFT
 } from "../engine/BehaviorCommands"
 
 import { INTERACT_WATER_RING, INTERACT_POLE, INTERACT_DAMAGE, INTERACT_COIN, INTERACT_TEXT,
@@ -22,7 +23,7 @@ import { oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAn
          oUnk94, oBBallSpawnerPeriodMinus1, oBobombBuddyRole, oTripletButterflyScale,
          oBigBooNumMinionBoosKilled, oDrawingDistance, oMarioParticleFlags,
          oOpacity, oForwardVel, oVelY, oHealth, oParentRelativePosX,
-         oParentRelativePosZ,
+         oParentRelativePosZ, oArrowLiftUnk100,
 
          OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, OBJ_FLAG_COMPUTE_DIST_TO_MARIO,
          OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW,
@@ -42,8 +43,9 @@ import { MODEL_WOODEN_POST, MODEL_MIST, MODEL_SMOKE, MODEL_BUBBLE, MODEL_CANNON_
 } from "../include/model_ids"
 
 import * as _activated_bf_plat        from "./behaviors/activated_bf_plat.inc"
-import * as _animated_floor_switch    from "./behaviors/animated_floor_switch.inc"
 import * as _amp                      from "./behaviors/amp.inc"
+import * as _animated_floor_switch    from "./behaviors/animated_floor_switch.inc"
+import * as _arrow_lift               from "./behaviors/arrow_lift.inc"
 import * as _bird                     from "./behaviors/bird.inc"
 import * as _bobomb                   from "./behaviors/bobomb.inc"
 import * as _boo                      from "./behaviors/boo.inc"
@@ -152,6 +154,7 @@ import { purple_switch_seg8_collision_0800C7A8 } from "../actors/purple_switch/c
 import { warp_pipe_seg3_collision_03009AC8 } from "../actors/warp_pipe/collision.inc"
 import { king_bobomb_seg5_anims_0500FE30 } from "../actors/king_bobomb/anims.inc"
 import { bob_seg7_collision_chain_chomp_gate } from "../levels/bob/chain_chomp_gate/collision.inc"
+import { wdw_seg7_collision_arrow_lift } from "../levels/wdw/arrow_lift/collision.inc"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -2104,6 +2107,18 @@ const bhvBitfsSinkingPlatforms = [
     END_LOOP(),
 ]
 
+const bhvArrowLift = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(wdw_seg7_collision_arrow_lift),
+    SET_INT_RAND_RSHIFT(oArrowLiftUnk100, 1, 32),
+    SET_HOME(),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_arrow_lift_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
 const bhvDddMovingPole = [
     BEGIN(OBJ_LIST_POLELIKE, 'bhvDddMovingPole'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -2539,6 +2554,7 @@ gLinker.behaviors.bhvAirborneDeathWarp = bhvAirborneDeathWarp
 gLinker.behaviors.bhvAirborneStarCollectWarp = bhvAirborneStarCollectWarp
 gLinker.behaviors.bhvAirborneWarp = bhvAirborneWarp
 // gLinker.behaviors.bhvAmbientSounds = bhvAmbientSounds
+gLinker.behaviors.bhvArrowLift = bhvArrowLift
 gLinker.behaviors.bhvBalconyBigBoo = bhvBalconyBigBoo
 gLinker.behaviors.bhvBbhTumblingBridge = bhvBbhTumblingBridge
 gLinker.behaviors.bhvBigBully = bhvBigBully

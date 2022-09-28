@@ -23,7 +23,7 @@ import { oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAn
          oUnk94, oBBallSpawnerPeriodMinus1, oBobombBuddyRole, oTripletButterflyScale,
          oBigBooNumMinionBoosKilled, oDrawingDistance, oMarioParticleFlags,
          oOpacity, oForwardVel, oVelY, oHealth, oParentRelativePosX,
-         oParentRelativePosZ, oArrowLiftUnk100,
+         oParentRelativePosZ, oArrowLiftUnk100, oRoom,
 
          OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, OBJ_FLAG_COMPUTE_DIST_TO_MARIO,
          OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW,

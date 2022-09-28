@@ -327,7 +327,7 @@ export const bhv_book_switch_loop = () => {
                         sp34 = 0
                     }
 
-                    let sp38 = spawn_object_abs_with_rot(o, 0, MODEL_BOOKEND, bhvFlyingBookend, 0x1FC * sp36 - 0x8CA, 890, sp34, 0, 0x8000 * sp36 + 0x4000, 0)
+                    let sp38 = spawn_object_abs_with_rot(o, MODEL_BOOKEND, bhvFlyingBookend, 0x1FC * sp36 - 0x8CA, 890, sp34, 0, 0x8000 * sp36 + 0x4000, 0)
 
                     if (sp38 != null) {
                         sp38.rawData[oAction] = 3

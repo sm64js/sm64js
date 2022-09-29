@@ -34,6 +34,9 @@ import { SOUND_MENU_CAMERA_ZOOM_OUT, SOUND_MENU_CAMERA_ZOOM_IN } from "../includ
 import { ACT_BUTT_STUCK_IN_GROUND } from "./Mario"
 import { ACT_HEAD_STUCK_IN_GROUND } from "./Mario"
 import { ACT_FEET_STUCK_IN_GROUND } from "./Mario"
+import { SURFACE_CAMERA_MIDDLE } from "../include/surface_terrains"
+import { SURFACE_CAMERA_ROTATE_RIGHT } from "../include/surface_terrains"
+import { SURFACE_CAMERA_ROTATE_LEFT } from "../include/surface_terrains"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -420,7 +423,7 @@ class Camera {
             this.update_boss_fight_camera.bind(this),
             null, // this.update_parallel_tracking_camera(c, focus, pos).bind(this),
             null, // this.update_fixed_camera(c, focus, pos).bind(this),
-            null, // this.update_8_directions_camera(c, focus, pos).bind(this),
+            this.update_8_directions_camera.bind(this),
             null, // this.update_slide_or_0f_camera(c, focus, pos).bind(this),
             this.update_mario_camera.bind(this),
             null, // this.update_spiral_stairs_camera(c, focus, pos).bind(this),
@@ -1032,6 +1035,139 @@ class Camera {
 
         return camYaw
     }
+
+    /**
+     * Moves the camera for the radial and outward radial camera modes.
+     *
+     * If sModeOffsetYaw is 0, the camera points directly at the area center point.
+     */
+    radial_camera_move(c) {
+        const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
+        let maxAreaYaw = DEGREES(60)
+        let minAreaYaw = DEGREES(-60)
+        let rotateSpeed = 0x1000
+        let avoidYaw = 0
+        let avoidStatus = 0
+        let areaDistX = this.gPlayerCameraState.pos[0] - c.areaCenX
+        let areaDistZ = this.gPlayerCameraState.pos[2] - c.areaCenZ
+
+        // How much the camera's yaw changed
+        let yawOffset = this.calculate_yaw(this.gPlayerCameraState.pos, c.pos) - atan2s(areaDistZ, areaDistX)
+
+        if (yawOffset > maxAreaYaw) {yawOffset = maxAreaYaw}
+        if (yawOffset < minAreaYaw) {yawOffset = minAreaYaw}
+
+        // Check if Mario stepped on a surface that rotates the camera. For example, when Mario enters the
+        // gate in BoB, the camera turns right to face up the hill path
+        if (!(this.gCameraMovementFlags & CAM_MOVE_ROTATE)) {
+            if (this.sMarioGeometry.currFloorType == SURFACE_CAMERA_MIDDLE && this.sMarioGeometry.prevFloorType != SURFACE_CAMERA_MIDDLE) {
+                this.gCameraMovementFlags |= (CAM_MOVE_RETURN_TO_MIDDLE | CAM_MOVE_ENTERED_ROTATE_SURFACE)
+            }
+            if (this.sMarioGeometry.currFloorType == SURFACE_CAMERA_ROTATE_RIGHT && this.sMarioGeometry.prevFloorType != SURFACE_CAMERA_ROTATE_RIGHT) {
+                this.gCameraMovementFlags |= (CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ENTERED_ROTATE_SURFACE)
+            }
+            if (this.sMarioGeometry.currFloorType == SURFACE_CAMERA_ROTATE_LEFT && this.sMarioGeometry.prevFloorType != SURFACE_CAMERA_ROTATE_LEFT) {
+                this.gCameraMovementFlags |= (CAM_MOVE_ROTATE_LEFT | CAM_MOVE_ENTERED_ROTATE_SURFACE)
+            }
+        }
+
+        if (this.gCameraMovementFlags & CAM_MOVE_ENTERED_ROTATE_SURFACE) {
+            rotateSpeed = 0x200
+        }
+
+        if (c.mode == CAMERA_MODE_OUTWARD_RADIAL) {
+            areaDistX = -areaDistX
+            areaDistZ = -areaDistZ
+        }
+
+        // Avoid obstructing walls
+        yawWrapper = {yaw: avoidYaw}
+        avoidStatus = this.rotate_camera_around_walls(c, c.pos, yawWrapper, 0x400)
+        if (avoidStatus == 3) {
+            if (avoidYaw - atan2s(areaDistZ, areaDistX) + DEGREES(90) < 0) {
+                avoidYaw += DEGREES(180)
+            }
+
+            // We want to change sModeOffsetYaw so that the player is no longer obstructed by the wall.
+            // So, we make avoidYaw relative to the yaw around the area center
+            avoidYaw -= atan2s(areaDistZ, areaDistX)
+
+            // Bound avoid yaw to radial mode constraints
+            if (avoidYaw > DEGREES(105)) {
+                avoidYaw = DEGREES(105)
+            }
+            if (avoidYaw < DEGREES(-105)) {
+                avoidYaw = DEGREES(-105)
+            }
+        }
+
+        if (this.gCameraMovementFlags & CAM_MOVE_RETURN_TO_MIDDLE) {
+            yawWrapper.current = this.sModeOffsetYaw
+            if (this.camera_approach_f32_symmetric_bool(yawWrapper, 0, rotateSpeed) == 0) {
+                this.gCameraMovementFlags &= ~CAM_MOVE_RETURN_TO_MIDDLE
+            }
+            this.sModeOffsetYaw = yawWrapper.current
+        } else {
+            // Prevent the player from rotating into obstructing walls
+            if ((this.gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT) && avoidStatus == 3 && avoidYaw + 0x10 < this.sModeOffsetYaw) {
+                this.sModeOffsetYaw = avoidYaw
+                this.gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ENTERED_ROTATE_SURFACE)
+            }
+            if ((this.gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT) && avoidStatus == 3 && avoidYaw + 0x10 > this.sModeOffsetYaw) {
+                this.sModeOffsetYaw = avoidYaw
+                this.gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_LEFT | CAM_MOVE_ENTERED_ROTATE_SURFACE)
+            }
+            
+            // If it's the first time rotating, just rotate to +-60 degrees
+            yawWrapper.current = this.sModeOffsetYaw
+            if (!(this.s2ndRotateFlags & CAM_MOVE_ROTATE_RIGHT) && (this.gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT) && this.camera_approach_s16_symmetric_bool(yawWrapper, maxAreaYaw, rotateSpeed) == 0) {
+                this.gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ENTERED_ROTATE_SURFACE)
+            }
+            if (!(this.s2ndRotateFlags & CAM_MOVE_ROTATE_LEFT) && (this.gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT) && this.camera_approach_s16_symmetric_bool(yawWrapper, minAreaYaw, rotateSpeed) == 0) {
+                this.gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_LEFT | CAM_MOVE_ENTERED_ROTATE_SURFACE)
+            }
+            this.sModeOffsetYaw = yawWrapper.current
+
+            // If it's the second time rotating, rotate all the way to +-105 degrees.
+            if ((this.s2ndRotateFlags & CAM_MOVE_ROTATE_RIGHT) && (this.gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT) && this.camera_approach_s16_symmetric_bool(yawWrapper, DEGREES(105), rotateSpeed) == 0) {
+                this.gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ENTERED_ROTATE_SURFACE)
+                this.s2ndRotateFlags &= ~CAM_MOVE_ROTATE_RIGHT
+            }
+            if ((this.s2ndRotateFlags & CAM_MOVE_ROTATE_LEFT) && (this.gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT) && this.camera_approach_s16_symmetric_bool(yawWrapper, DEGREES(-105), rotateSpeed) == 0) {
+                this.gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_LEFT | CAM_MOVE_ENTERED_ROTATE_SURFACE)
+                this.s2ndRotateFlags &= ~CAM_MOVE_ROTATE_LEFT
+            }
+            this.sModeOffsetYaw = yawWrapper.current
+        }
+        yawWrapper.current = this.sModeOffsetYaw
+        if (!(this.gCameraMovementFlags & CAM_MOVE_ROTATE)) {
+            // If not rotating, rotate away from walls obscuring Mario from view
+            if (avoidStatus == 3) {
+                this.approach_s16_asymptotic_bool(yawWrapper, avoidYaw, 10)
+                this.sModeOffsetYaw = yawWrapper.current
+            } else {
+                if (c.mode == CAMERA_MODE_RADIAL) {
+                    // sModeOffsetYaw only updates when Mario is moving
+                    rotateSpeed = gMarioStates[0].forwardVel / 32.0 * 128.0
+                    this.camera_approach_s16_symmetric_bool(yawWrapper, yawOffset, rotateSpeed)
+                    this.sModeOffsetYaw = yawWrapper.current
+                }
+                if (c.mode == CAMERA_MODE_OUTWARD_RADIAL) {
+                    this.sModeOffsetYaw = this.offset_yaw_outward_radial(c, atan2s(areaDistZ, areaDistX))
+                }
+            }
+        }
+
+        // Bound sModeOffsetYaw within (-120, 120) degrees
+        if (this.sModeOffsetYaw > 0x5554) {
+            this.sModeOffsetYaw = 0x5554
+        }
+        if (this.sModeOffsetYaw < -0x5554) [
+            this.sModeOffsetYaw = -0x5554
+        ]
+    }
+
+    // ---------------- //
 
     select_mario_cam_mode() {
         this.sSelectionFlags = CAM_MODE_MARIO_SELECTED
@@ -4141,6 +4277,62 @@ class Camera {
             this.gLakituState.shakeMagnitude[2] = currentWrapper.current
         }
 
+    }
+
+    /**
+     * Add an offset to the camera's yaw, used in levels that are inside a rectangular building, like the
+     * pyramid or TTC.
+     */
+    offset_yaw_outward_radial(c, areaYaw) {
+        let yawGoal = DEGREES(60)
+        let yaw = this.sModeOffsetYaw
+        let distFromAreaCenter
+        let areaCenter = [0, 0, 0]
+        let dYaw
+        switch (this.gCurrLevelArea) {
+            case AREA_TTC:
+                areaCenter[0] = c.areaCenX
+                areaCenter[1] = this.gPlayerCameraState.pos[1]
+                areaCenter[2] = c.areaCenZ
+                distFromAreaCenter = this.calc_abs_dist(areaCenter, this.gPlayerCameraState.pos)
+                if (800.0 > distFromAreaCenter) {
+                    yawGoal = 0x3800
+                }
+                break
+            case AREA_SSL_PYRAMID:
+                // This mask splits the 360 degrees of yaw into 4 corners. It adds 45 degrees so that the yaw
+                // offset at the corner will be 0, but the yaw offset near the center will face more towards
+                // the direction Mario is running in.
+                yawGoal = (areaYaw & 0xC000) - areaYaw + DEGREES(45)
+                if (yawGoal < 0) {
+                    yawGoal = -yawGoal
+                }
+                yawGoal = yawGoal / 32 * 48
+                break
+            case AREA_LLL_OUTSIDE:
+                yawGoal = 0
+                break
+        }
+        dYaw = gMarioStates[0].forwardVel / 32.0 * 128.0
+
+        yawWrapper.current = yaw
+        if (this.sAreaYawChange < 0) {
+            this.camera_approach_s16_symmetric_bool(yawWrapper, -yawGoal, dYaw)
+        }
+        if (this.sAreaYawChange > 0) {
+            this.camera_approach_s16_symmetric_bool(yawWrapper, yawGoal, dYaw)
+        }
+        // When the final yaw is out of [-60,60] degrees, approach yawGoal faster than dYaw will ever be,
+        // making the camera lock in one direction until yawGoal drops below 60 (or Mario presses a C button)
+        if (yaw < -DEGREES(60)) {
+            //! Maybe they meant to reverse yawGoal's sign?
+            this.camera_approach_s16_symmetric_bool(yawWrapper, -yawGoal, 0x200)
+        }
+        if (yaw > DEGREES(60)) {
+            //! Maybe they meant to reverse yawGoal's sign?
+            this.camera_approach_s16_symmetric_bool(yawWrapper, yawGoal, 0x200)
+        }
+        return yaw
     }
 
     set_camera_pitch_shake(mag, decay, inc) {

@@ -70,6 +70,8 @@ export const bhv_haunted_chair_init = () => {
 }
 
 const haunted_chair_act_0 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
     if (o.parentObj != o) {
         if (o.rawData[oHauntedChairUnk104] == 0) {
             if (lateral_dist_between_objects(o, o.parentObj) < 250.0) {
@@ -144,6 +146,8 @@ const haunted_chair_act_0 = () => {
 }
 
 const haunted_chair_act_1 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
     cur_obj_update_floor_and_walls()
 
     if (o.rawData[oTimer] < 70) {
@@ -193,6 +197,8 @@ const haunted_chair_act_1 = () => {
 }
 
 export const bhv_haunted_chair_loop = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    
     if (!(o.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         switch (o.rawData[oAction]) {
             case 0:

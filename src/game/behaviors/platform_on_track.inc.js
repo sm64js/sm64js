@@ -203,7 +203,9 @@ const platform_on_track_act_move_along_track = () => {
             }
 
             // Spawn a new track ball if necessary
+            pxWrapper = { px: o.rawData[oPlatformOnTrackDistMovedSinceLastBall] }
             if (approach_f32_ptr(o.rawData[oPlatformOnTrackDistMovedSinceLastBall], 300.0, o.rawData[oForwardVel])) {
+                o.rawData[oPlatformOnTrackDistMovedSinceLastBall] = pxWrapper.px
                 o.rawData[oPlatformOnTrackDistMovedSinceLastBall] -= 300.0
 
                 o.rawData[oHomeX] = o.rawData[oPosX]
@@ -212,6 +214,8 @@ const platform_on_track_act_move_along_track = () => {
                 o.rawData[oPlatformOnTrackBaseBallIndex] = o.rawData[oPlatformOnTrackBaseBallIndex] + 1
 
                 platform_on_track_update_pos_or_spawn_ball(5, o.rawData[oHomeX], o.rawData[oHomeY], o.rawData[oHomeZ])
+            } else {
+                o.rawData[oPlatformOnTrackDistMovedSinceLastBall] = pxWrapper.px
             }
         }
 
@@ -346,7 +350,9 @@ const platform_on_track_rock_ski_lift = () => {
             o.rawData[oPlatformOnTrackWasStoodOn] = true
         }
 
-        approach_f32_ptr(o.rawData[oPlatformOnTrackOffsetY], 0.0, 0.5)
+        pxWrapper = { px: o.rawData[oPlatformOnTrackOffsetY] }
+        approach_f32_ptr(pxWrapper, 0.0, 0.5)
+        o.rawData[oPlatformOnTrackOffsetY] = pxWrapper.px
         o.rawData[oPosY] += o.rawData[oPlatformOnTrackOffsetY]
     }
 }

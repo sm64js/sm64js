@@ -830,7 +830,8 @@ export const cur_obj_set_pos_to_home_with_debug = () => {
 }
 
 export const cur_obj_is_mario_on_platform = () => {
-    const gMarioObject = ObjectListProc.gMarioObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     
     if (gMarioObject.platform == o) {
         return true

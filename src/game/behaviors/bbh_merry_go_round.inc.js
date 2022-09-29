@@ -123,3 +123,5 @@ export const bhv_merry_go_round_loop = () => {
         func_80321080(300)
     }
 }
+
+gLinker.bhv_merry_go_round_loop = bhv_merry_go_round_loop

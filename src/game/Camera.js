@@ -4513,6 +4513,10 @@ class Camera {
         this.cutscene_event(this.cutscene_read_message_start, c, 0, 0)
         this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
 
+        if (window.playerInput.buttonPressedA) {
+            sCutsceneVars[0].angle[0] = 1
+        }
+        
         switch (this.sCutsceneVars[0].angle[0]) {
             // Do nothing until message is gone.
             case 0:

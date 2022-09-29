@@ -323,7 +323,7 @@ export const cur_obj_spin_all_dimensions = (arg0, arg1) => {
     let val00
 
     if (o.rawData[oForwardVel] == 0.0) {
-        val24 = vla20 = val1C = 0.0
+        val24 = val20 = val1C = 0.0
 
         if (o.rawData[oMoveFlags] & OBJ_MOVE_IN_AIR) {
             val20 = 50.0

@@ -1,6 +1,7 @@
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
 import { GEO_CONTEXT_RENDER, GEO_CONTEXT_CREATE } from "../engine/graph_node"
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
+import { TIME_STOP_ENABLED, TIME_STOP_DIALOG } from "./ObjectListProcessor"
 import { AreaInstance as Area } from "./Area"
 import {
     LEVEL_NONE, LEVEL_UNKNOWN_1, LEVEL_UNKNOWN_2, LEVEL_UNKNOWN_3, LEVEL_BBH, LEVEL_CCM, LEVEL_CASTLE, LEVEL_HMC,
@@ -11,7 +12,7 @@ import {
 } from "../levels/level_defines_constants"
 
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
-import { atan2s, vec3f_set } from "../engine/math_util"
+import { atan2s, vec3f_set, sqrtf,vec3f_set_dist_and_angle } from "../engine/math_util"
 import * as MathUtil from "../engine/math_util"
 import * as Mario from "./Mario"
 import { oHeldState, oPosX, oPosY, oPosZ } from "../include/object_constants"
@@ -23,20 +24,13 @@ import { DIALOG_001, DIALOG_NONE } from "../text/us/dialogs"
 import { gLastCompletedStarNum } from "./SaveFile"
 import { COURSE_MAX, COURSE_NONE } from "../levels/course_defines"
 import { level_defines } from "../levels/level_defines_constants"
-import { set_time_stop_flags } from "./ObjectHelpers"
-import { TIME_STOP_ENABLED } from "./ObjectListProcessor"
-import { TIME_STOP_DIALOG } from "./ObjectListProcessor"
-import { sqrtf } from "../engine/math_util"
-import { vec3f_set_dist_and_angle } from "../engine/math_util"
+import { set_time_stop_flags, clear_time_stop_flags } from "./ObjectHelpers"
 import { IngameMenuInstance as IngameMenu } from "./IngameMenu"
-import { clear_time_stop_flags } from "./ObjectHelpers"
-import { seq_player_lower_volume } from "../audio/external"
-import { SEQ_PLAYER_LEVEL } from "../audio/external"
-import { seq_player_unlower_volume } from "../audio/external"
-import { play_sound } from "../audio/external"
-import { SOUND_MENU_CAMERA_ZOOM_OUT } from "../include/sounds"
-import { gGlobalSoundSource } from "../audio/external"
-import { SOUND_MENU_CAMERA_ZOOM_IN } from "../include/sounds"
+import {
+    seq_player_lower_volume, SEQ_PLAYER_LEVEL, seq_player_unlower_volume,
+    play_sound, gGlobalSoundSource
+} from "../audio/external"
+import { SOUND_MENU_CAMERA_ZOOM_OUT, SOUND_MENU_CAMERA_ZOOM_IN } from "../include/sounds"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -2432,6 +2426,9 @@ class Camera {
         c.yaw = c.nextYaw
     }
 
+    /**
+     * Updates the camera based on which C buttons are pressed this frame
+     */
     handle_c_button_movement(c) {
         let cSideYaw
     
@@ -4532,7 +4529,7 @@ class Camera {
 
                 // This could cause softlocks. If a message starts one frame after another one closes, the
                 // cutscene will never end.
-                // if (IngameMenu.get_dialog_id() == DIALOG_NONE) {
+                if (IngameMenu.get_dialog_id() == DIALOG_NONE) {
                     this.gCutsceneTimer = CUTSCENE_LOOP
                     this.retrieve_info_star(c)
                     this.transition_next_state(c, 15)
@@ -4542,7 +4539,7 @@ class Camera {
                     this.sCUpCameraPitch = this.sCutsceneVars[1].angle[0]
                     this.sModeOffsetYaw = this.sCutsceneVars[1].angle[1]
                     this.cutscene_unsoften_music(c)
-                // }
+                }
         }
         this.sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
     }

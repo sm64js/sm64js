@@ -1229,6 +1229,11 @@ export const CHAIN_CHOMP_ACT_UNLOAD_CHAIN = 2
 export const CHAIN_CHOMP_SUB_ACT_TURN = 0
 export const CHAIN_CHOMP_SUB_ACT_LUNGE = 1
 
+/* Mad piano */
+    /* oAction */
+    export const MAD_PIANO_ACT_WAIT   = 0
+    export const MAD_PIANO_ACT_ATTACK = 1
+
 /* Moving Yellow Coin */
     /* oAction */
     export const MOV_YCOIN_ACT_IDLE = 0
@@ -1271,6 +1276,12 @@ export const WOODEN_POST_BP_NO_COINS_MASK = 0x0000FF00
     export const GOOMBA_ACT_WALK = 0
     export const GOOMBA_ACT_ATTACKED_MARIO = 1
     export const GOOMBA_ACT_JUMP = 2
+
+/* BBH Merry-Go-Round */
+    /* gMarioCurrentRoom */
+    export const BBH_NEAR_MERRY_GO_ROUND_ROOM = 10
+    export const BBH_DYNAMIC_SURFACE_ROOM     = 0
+    export const BBH_OUTSIDE_ROOM             = 13
 
 /* Bob-omb */
     /* oBehParams2ndByte */

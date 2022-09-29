@@ -45,17 +45,6 @@ const BOO_CAGE_ACT_ON_GROUND        = 2
 const BOO_CAGE_ACT_MARIO_JUMPING_IN = 3
 const BOO_CAGE_ACT_USELESS          = 4
 
-/* BBH Haunted Bookshelf */
-    /* oAction */
-const HAUNTED_BOOKSHELF_ACT_IDLE   = 0
-const HAUNTED_BOOKSHELF_ACT_RECEDE = 1
-
-/* BBH Merry-Go-Round */
-    /* gMarioCurrentRoom */
-const BBH_NEAR_MERRY_GO_ROUND_ROOM = 10
-const BBH_DYNAMIC_SURFACE_ROOM     = 0
-const BBH_OUTSIDE_ROOM             = 13
-
 export const bhv_boo_cage_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject

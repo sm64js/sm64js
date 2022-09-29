@@ -92,6 +92,9 @@ const handle_merry_go_round_music = () => {
  * Merry-go-round update function.
  */
 export const bhv_merry_go_round_loop = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioCurrentRoom = gLinker.ObjectListProcessor.gMarioCurrentRoom
+    
     // Surprisingly, the merry-go-round is what's responsible
     // for playing the howling wind sound in BBH.
     if (!o.rawData[oMerryGoRoundMarioIsOutside]) {

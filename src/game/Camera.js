@@ -480,6 +480,12 @@ class Camera {
             { shot: this.cutscene_dialog_set_flag.bind(this), duration: 15 },
             { shot: this.cutscene_dialog_end.bind(this), duration: 0 }
         ]
+
+        this.sCutsceneReadMessage = [
+            { shot: this.cutscene_read_message.bind(this), duration: CUTSCENE_LOOP },
+            { shot: this.cutscene_read_message_set_flag.bind(this), duration: 15 },
+            { shot: this.cutscene_read_message_end.bind(this), duration: 0 }
+        ]
         
         this.sCutsceneVars = [
             { point: [0, 0, 0], unusedPoint: [0, 0, 0], angle: [0, 0, 0] },
@@ -535,8 +541,8 @@ class Camera {
             // [ CUTSCENE_EXIT_WATERFALL, sCutsceneExitWaterfall ],
             // [ CUTSCENE_EXIT_FALL_WMOTR, sCutsceneFallToCastleGrounds ],
             // [ CUTSCENE_NONPAINTING_DEATH, sCutsceneNonPaintingDeath ],
-            [ CUTSCENE_DIALOG, this.sCutsceneDialog ],
-            // [ CUTSCENE_READ_MESSAGE, sCutsceneReadMessage ],
+            // [ CUTSCENE_DIALOG, this.sCutsceneDialog ], ; REIMPLEMENT WHEN THIS IS ABLE TO BE USED
+            [ CUTSCENE_READ_MESSAGE, sCutsceneReadMessage ],
             // [ CUTSCENE_RACE_DIALOG, sCutsceneDialog ],
             // [ CUTSCENE_ENTER_PYRAMID_TOP, sCutsceneEnterPyramidTop ],
             // [ CUTSCENE_SSL_PYRAMID_EXPLODE, sCutscenePyramidTopExplode ],
@@ -4203,6 +4209,69 @@ class Camera {
         this.sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
         c.cutscene = 0
         clear_time_stop_flags(TIME_STOP_ENABLED | TIME_STOP_DIALOG)
+    }
+
+    cutscene_read_message_start(c) {
+        cutscene_unsoften_music(c)
+        this.transition_next_state(c, 30)
+        this.reset_pan_distance(c)
+        this.store_info_star(c)
+        
+        this.sCutsceneVars[1].angle[0] = this.sCUpCameraPitch
+        this.sCutsceneVars[1].angle[1] = this.sModeOffsetYaw
+        this.sCUpCameraPitch = -0x830
+        this.sModeOffsetYaw = 0
+        this.sCutsceneVars[0].angle[0] = 0
+    }
+
+    cutscene_read_message(c) {
+        this.cutscene_read_message_start = this.cutscene_read_message_start.bind(this)
+        this.cutscene_event(this.cutscene_read_message_start, c, 0, 0)
+        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
+
+        switch (this.sCutsceneVars[0].angle[0]) {
+            // Do nothing until message is gone.
+            case 0:
+                if (IngameMenu.get_dialog_id() != DIALOG_NONE) {
+                    this.sCutsceneVars[0].angle[0]++
+                    set_time_stop_flags(TIME_STOP_ENABLED | TIME_STOP_DIALOG)
+                }
+                break
+            // Leave the dialog.
+            case 1:
+                this.move_mario_head_c_up(c)
+                update_c_up(c, c.focus, c.pos)
+
+                // This could cause softlocks. If a message starts one frame after another one closes, the
+                // cutscene will never end.
+                if (IngameMenu.get_dialog_id() == DIALOG_NONE) {
+                    this.gCutsceneTimer = CUTSCENE_LOOP
+                    this.retrieve_info_star(c)
+                    this.transition_next_state(c, 15)
+                    this.sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
+                    clear_time_stop_flags(TIME_STOP_ENABLED | TIME_STOP_DIALOG)
+                    // Retrieve previous state
+                    this.sCUpCameraPitch = this.sCutsceneVars[1].angle[0]
+                    this.sModeOffsetYaw = this.sCutsceneVars[1].angle[1]
+                    cutscene_unsoften_music(c)
+                }
+        }
+        this.sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
+    }
+
+    /**
+     * Set CAM_FLAG_UNUSED_CUTSCENE_ACTIVE, which does nothing.
+     */
+    cutscene_read_message_set_flag(c) {
+        this.sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
+    }
+
+    /**
+     * End the message cutscene.
+     */
+    cutscene_read_message_end(c) {
+        this.sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
+        c.cutscene = 0
     }
 
     play_cutscene(c) {

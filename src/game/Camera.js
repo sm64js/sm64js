@@ -30,6 +30,9 @@ import { sqrtf } from "../engine/math_util"
 import { vec3f_set_dist_and_angle } from "../engine/math_util"
 import { IngameMenuInstance as IngameMenu } from "./IngameMenu"
 import { clear_time_stop_flags } from "./ObjectHelpers"
+import { seq_player_lower_volume } from "../audio/external"
+import { SEQ_PLAYER_LEVEL } from "../audio/external"
+import { seq_player_unlower_volume } from "../audio/external"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -3653,6 +3656,14 @@ class Camera {
     set_flag_post_door(c) {
         this.sStatusFlags |= CAM_FLAG_BEHIND_MARIO_POST_DOOR
         this.sCameraYawAfterDoorCutscene = this.calculate_yaw(c.focus, c.pos)
+    }
+
+    cutscene_soften_music(c) {
+        seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40)
+    }
+
+    cutscene_unsoften_music(c) {
+        seq_player_unlower_volume(SEQ_PLAYER_LEVEL, 60)
     }
 
     /**

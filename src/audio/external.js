@@ -47,3 +47,8 @@ const begin_background_music_fade = (fadeDuration) => {
 const seq_player_play_sequence = (player, seqId, arg2) => {
 }
 
+export const seq_player_lower_volume = (player, fadeDuration, percentage) => {
+}
+
+export const seq_player_unlower_volume = (player, fadeDuration) => {
+}

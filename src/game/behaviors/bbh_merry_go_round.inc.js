@@ -47,7 +47,7 @@ const handle_merry_go_round_music = () => {
             o.rawData[oMerryGoRoundMusicShouldPlay]++
         }
     } else {
-        let marioFloor
+        let marioFloor = {}
         let marioFloorType
 
         let floorWrapper = {floor: marioFloor}

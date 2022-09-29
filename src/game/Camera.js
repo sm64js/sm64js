@@ -542,7 +542,7 @@ class Camera {
             // [ CUTSCENE_EXIT_FALL_WMOTR, sCutsceneFallToCastleGrounds ],
             // [ CUTSCENE_NONPAINTING_DEATH, sCutsceneNonPaintingDeath ],
             // [ CUTSCENE_DIALOG, this.sCutsceneDialog ], ; REIMPLEMENT WHEN THIS IS ABLE TO BE USED
-            [ CUTSCENE_READ_MESSAGE, sCutsceneReadMessage ],
+            [ CUTSCENE_READ_MESSAGE, this.sCutsceneReadMessage ],
             // [ CUTSCENE_RACE_DIALOG, sCutsceneDialog ],
             // [ CUTSCENE_ENTER_PYRAMID_TOP, sCutsceneEnterPyramidTop ],
             // [ CUTSCENE_SSL_PYRAMID_EXPLODE, sCutscenePyramidTopExplode ],

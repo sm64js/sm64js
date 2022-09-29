@@ -23,6 +23,13 @@ import { DIALOG_001, DIALOG_NONE } from "../text/us/dialogs"
 import { gLastCompletedStarNum } from "./SaveFile"
 import { COURSE_MAX, COURSE_NONE } from "../levels/course_defines"
 import { level_defines } from "../levels/level_defines_constants"
+import { set_time_stop_flags } from "./ObjectHelpers"
+import { TIME_STOP_ENABLED } from "./ObjectListProcessor"
+import { TIME_STOP_DIALOG } from "./ObjectListProcessor"
+import { sqrtf } from "../engine/math_util"
+import { vec3f_set_dist_and_angle } from "../engine/math_util"
+import { IngameMenuInstance as IngameMenu } from "./IngameMenu"
+import { clear_time_stop_flags } from "./ObjectHelpers"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -467,6 +474,12 @@ class Camera {
             { shot: this.cutscene_sliding_doors_open.bind(this), duration: 50 },
             { shot: this.cutscene_double_doors_end.bind(this), duration: 0 }
         ]
+
+        this.sCutsceneDialog = [
+            { shot: this.cutscene_dialog.bind(this), duration: CUTSCENE_LOOP },
+            { shot: this.cutscene_dialog_set_flag.bind(this), duration: 15 },
+            { shot: this.cutscene_dialog_end.bind(this), duration: 0 }
+        ]
         
         this.sCutsceneVars = [
             { point: [0, 0, 0], unusedPoint: [0, 0, 0], angle: [0, 0, 0] },
@@ -522,7 +535,7 @@ class Camera {
             // [ CUTSCENE_EXIT_WATERFALL, sCutsceneExitWaterfall ],
             // [ CUTSCENE_EXIT_FALL_WMOTR, sCutsceneFallToCastleGrounds ],
             // [ CUTSCENE_NONPAINTING_DEATH, sCutsceneNonPaintingDeath ],
-            // [ CUTSCENE_DIALOG, sCutsceneDialog ],
+            [ CUTSCENE_DIALOG, this.sCutsceneDialog ],
             // [ CUTSCENE_READ_MESSAGE, sCutsceneReadMessage ],
             // [ CUTSCENE_RACE_DIALOG, sCutsceneDialog ],
             // [ CUTSCENE_ENTER_PYRAMID_TOP, sCutsceneEnterPyramidTop ],
@@ -588,6 +601,13 @@ class Camera {
     is_within_100_units_of_mario(posX, posY, posZ) {
         const pos = [posX, posY, posZ]
         return this.calc_abs_dist(this.gPlayerCameraState.pos, pos) < 100
+    }
+
+    calculate_pitch(from, to) {
+        let dx = to[0] - from[0]
+        let dy = to[1] - from[1]
+        let dz = to[2] - from[2]
+        return atan2s(sqrtf(dx * dx + dz * dz), dy)
     }
 
     calculate_yaw(from, to) {
@@ -4068,6 +4088,121 @@ class Camera {
             this.gCutsceneTimer = CUTSCENE_STOP
             c.cutscene = 0
         }
+    }
+
+    /**
+     * cvar8 is Mario's position and faceAngle
+     *
+     * cvar9.point is gCutsceneFocus's position
+     * cvar9.angle[1] is the yaw between Mario and the gCutsceneFocus
+     */
+    cutscene_dialog_start(c) {
+        this.cutscene_soften_music(c)
+        set_time_stop_flags(TIME_STOP_ENABLED | TIME_STOP_DIALOG)
+
+        if (c.mode == CAMERA_MODE_BOSS_FIGHT) {
+            this.vec3f_copy(this.sCameraStoreCutscene.focus, c.focus)
+            this.vec3f_copy(this.sCameraStoreCutscene.pos, c.pos)
+        } else {
+            this.store_info_star(c)
+        }
+
+        // Store Mario's position and faceAngle
+        this.sCutsceneVars[8].angle[0] = 0
+        this.vec3f_copy(this.sCutsceneVars[8].point, this.gPlayerCameraState.pos)
+        this.sCutsceneVars[8].point[1] += 125.0
+
+        // Store gCutsceneFocus's position and yaw
+        this.object_pos_to_vec3f(this.sCutsceneVars[9].point, this.gCutsceneFocus)
+        this.sCutsceneVars[9].point[1] += this.gCutsceneFocus.hitboxHeight + 200.0
+        this.sCutsceneVars[9].angle[1] = this.calculate_yaw(this.sCutsceneVars[8].point, this.sCutsceneVars[9].point)
+
+        let yaw = this.calculate_yaw(this.gPlayerCameraState.pos, this.gLakituState.curPos)
+        if ((yaw - this.sCutsceneVars[9].angle[1]) & 0x8000) {
+            this.sCutsceneVars[9].angle[1] -= 0x6000
+        } else {
+            this.sCutsceneVars[9].angle[1] += 0x6000
+        }
+    }
+
+    /**
+     * Move closer to Mario and the object, adjusting to their difference in height.
+     * The camera's generally ends up looking over Mario's shoulder.
+     */
+    cutscene_dialog_create_dialog_box(c) {
+        let dist, pitch, yaw = 0
+        let focus = [0, 0, 0]
+        let pos = [0, 0, 0]
+
+        this.scale_along_line(focus, this.sCutsceneVars[9].point, this.gPlayerCameraState.pos, 0.7)
+        let wrapper = {dist: dist, pitch: pitch, yaw: yaw}
+        vec3f_get_dist_and_angle(c.pos, focus, wrapper)
+        dist = wrapper.dist; pitch = wrapper.pitch; yaw = wrapper.yaw;
+        pitch = this.calculate_pitch(c.pos, this.sCutsceneVars[9].point)
+        vec3f_set_dist_and_angle(c.pos, pos, dist, pitch, yaw)
+
+        focus[1] += (this.sCutsceneVars[9].point[1] - focus[1]) * 0.1
+        this.approach_vec3f_asymptotic(c.focus, focus, 0.2, 0.2, 0.2)
+
+        this.vec3f_copy(pos, c.pos)
+
+        // Set y pos to cvar8's y (top of focus object)
+        pos[1] = this.sCutsceneVars[8].point[1]
+        wrapper = {dist: dist, pitch: pitch, yaw: yaw}
+        vec3f_get_dist_and_angle(this.sCutsceneVars[8].point, pos, wrapper)
+        dist = wrapper.dist; pitch = wrapper.pitch; yaw = wrapper.yaw;
+        wrapper.current = yaw
+        this.approach_s16_asymptotic_bool(wrapper, this.sCutsceneVars[9].angle[1], 0x10)
+        yaw = wrapper.current
+        wrapper.current = dist
+        this.approach_f32_asymptotic_bool(wrapper, 180.0, 0.05)
+        dist = wrapper.current
+        vec3f_set_dist_and_angle(this.sCutsceneVars[8].point, pos, dist, pitch, yaw)
+
+        // Move up if Mario is below the focus object, down is Mario is above
+        pos[1] = this.sCutsceneVars[8].point[1] + sins(this.calculate_pitch(this.sCutsceneVars[9].point, this.sCutsceneVars[8].point)) * 100.0
+
+        wrapper.current = c.pos[1]
+        this.approach_f32_asymptotic_bool(wrapper, pos[1], 0.05)
+        c.pos[0] = pos[0]
+        c.pos[1] = wrapper.current
+        c.pos[2] = pos[2]
+    }
+
+    /**
+     * Create the dialog with sCutsceneDialogID
+     */
+    cutscene_dialog_create_dialog_box(c) {
+        if (c.cutscene == CUTSCENE_RACE_DIALOG) {
+            IngameMenu.create_dialog_box_with_response(this.sCutsceneDialogID)
+        } else {
+            IngameMenu.create_dialog_box(this.sCutsceneDialogID)
+        }
+    }
+
+    /**
+     * Cutscene that plays when Mario talks to an object.
+     */
+    cutscene_dialog(c) {
+        this.cutscene_dialog_start = this.cutscene_dialog_start.bind(this)
+        this.cutscene_dialog_move_mario_shoulder = this.cutscene_dialog_move_mario_shoulder.bind(this)
+        this.cutscene_dialog_create_dialog_box = this.cutscene_dialog_create_dialog_box.bind(this)
+        this.cutscene_event(this.cutscene_dialog_start, c, 0, 0)
+        this.cutscene_event(this.cutscene_dialog_move_mario_shoulder, c, 0, -1)
+        this.cutscene_event(this.cutscene_dialog_create_dialog_box, c, 10, 10)
+    }
+
+    /**
+     * Sets the CAM_FLAG_UNUSED_CUTSCENE_ACTIVE flag, which does nothing.
+     */
+    cutscene_dialog_set_flag(c) {
+        this.sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
+    }
+
+    cutscene_dialog_end(c) {
+        this.sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
+        c.cutscene = 0
+        clear_time_stop_flags(TIME_STOP_ENABLED | TIME_STOP_DIALOG)
     }
 
     play_cutscene(c) {

@@ -3,25 +3,14 @@
  * This is the merry-go-round in BBH.
  */
 
-import { play_sound } from "../../audio/external"
-import { gGlobalSoundSource } from "../../audio/external"
-import { play_secondary_music } from "../../audio/external"
-import { func_80321080 } from "../../audio/external"
-import { oPosX } from "../../include/object_constants"
-import { oPosZ } from "../../include/object_constants"
-import { oPosY } from "../../include/object_constants"
-import { BBH_DYNAMIC_SURFACE_ROOM } from "../../include/object_constants"
-import { oMerryGoRoundMarioIsOutside } from "../../include/object_constants"
-import { oAngleVelYaw } from "../../include/object_constants"
-import { oFaceAngleYaw } from "../../include/object_constants"
-import { oMoveAngleYaw } from "../../include/object_constants"
-import { oMerryGoRoundStopped } from "../../include/object_constants"
-import { BBH_OUTSIDE_ROOM } from "../../include/object_constants"
-import { BBH_NEAR_MERRY_GO_ROUND_ROOM } from "../../include/object_constants"
-import { oMerryGoRoundMusicShouldPlay } from "../../include/object_constants"
+import { play_sound, gGlobalSoundSource, play_secondary_music, func_80321080 } from "../../audio/external"
+import {
+    oPosX, oPosY, oPosZ, BBH_DYNAMIC_SURFACE_ROOM, oMerryGoRoundMarioIsOutside,
+    oAngleVelYaw, oFaceAngleYaw, oMoveAngleYaw, oMerryGoRoundStopped, BBH_OUTSIDE_ROOM,
+    BBH_NEAR_MERRY_GO_ROUND_ROOM, oMerryGoRoundMusicShouldPlay
+} from "../../include/object_constants"
 import { SEQ_EVENT_MERRY_GO_ROUND } from "../../include/seq_ids"
-import { SOUND_AIR_HOWLING_WIND } from "../../include/sounds"
-import { SOUND_ENV_MERRY_GO_ROUND_CREAKING } from "../../include/sounds"
+import { SOUND_AIR_HOWLING_WIND, SOUND_ENV_MERRY_GO_ROUND_CREAKING } from "../../include/sounds"
 import { SURFACE_MGR_MUSIC } from "../../include/surface_terrains"
 import { cur_obj_is_mario_on_platform } from "../ObjectHelpers"
 import { cur_obj_play_sound_1 } from "../SpawnSound"

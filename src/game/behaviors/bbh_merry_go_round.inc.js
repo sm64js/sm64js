@@ -50,7 +50,7 @@ const handle_merry_go_round_music = () => {
         let marioFloor
         let marioFloorType
 
-        floorWrapper = {floor: marioFloor}
+        let floorWrapper = {floor: marioFloor}
         gLinker.SurfaceCollision.find_floor(gMarioObject.rawData[oPosX], gMarioObject.rawData[oPosY], gMarioObject.rawData[oPosZ], marioFloor)
         marioFloor = floorWrapper.floor
 

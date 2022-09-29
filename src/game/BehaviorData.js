@@ -2605,11 +2605,14 @@ export const bhvBookSwitch = [
     END_LOOP(),
 ]
 
-const bhvMerryGoRound = [
-    BEGIN(OBJ_LIST_SURFACE, 'bhvMerryGoRound'),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+export const bhvMerryGoRound = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     LOAD_COLLISION_DATA(bbh_seg7_collision_merry_go_round),
+    SET_FLOAT(oCollisionDistance, 2000),
+    SET_INT(oRoom, 10),
     BEGIN_LOOP(),
+        CALL_NATIVE('bhv_merry_go_round_loop'),
         CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
     END_LOOP(),
 ]

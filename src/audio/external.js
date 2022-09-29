@@ -22,6 +22,12 @@ export const set_sound_moving_speed = (bank, speed) => {
 export const play_sound = (soundBits, pos) => {
 }
 
+export const play_secondary_music = (seqId, bgMusicVolume, volume, fadeTimer) => {
+}
+
+export const func_80321080 = (fadeTimer) => {
+}
+
 /**
  * Plays the puzzle jingle. Plays the dadada dadada *dadada* jingle
  * that usually plays when you solve a "puzzle", like chests, talking to

@@ -33,6 +33,10 @@ import { clear_time_stop_flags } from "./ObjectHelpers"
 import { seq_player_lower_volume } from "../audio/external"
 import { SEQ_PLAYER_LEVEL } from "../audio/external"
 import { seq_player_unlower_volume } from "../audio/external"
+import { play_sound } from "../audio/external"
+import { SOUND_MENU_CAMERA_ZOOM_OUT } from "../include/sounds"
+import { gGlobalSoundSource } from "../audio/external"
+import { SOUND_MENU_CAMERA_ZOOM_IN } from "../include/sounds"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -392,6 +396,13 @@ class Camera {
         }
 
         this.sCameraStoreCutscene = {
+            pos: [0, 0, 0],
+            focus: [0, 0, 0],
+            panDist: 0,
+            cannonYOffset: 0
+        }
+
+        this.sCameraStoreCUp = {
             pos: [0, 0, 0],
             focus: [0, 0, 0],
             panDist: 0,
@@ -1436,6 +1447,268 @@ class Camera {
         this.mode_default_camera(c)
     }
 
+    play_sound_cbutton_up() {
+        play_sound(SOUND_MENU_CAMERA_ZOOM_IN, gGlobalSoundSource)
+    }
+
+    play_sound_cbutton_down() {
+        play_sound(SOUND_MENU_CAMERA_ZOOM_OUT, gGlobalSoundSource)
+    }
+
+    store_lakitu_cam_info_for_c_up(c) {
+        this.vec3f_copy(this.sCameraStoreCUp.pos, c.pos)
+        this.vec3f_sub(this.sCameraStoreCUp.pos, this.gPlayerCameraState.pos)
+        // Only store the y value, and as an offset from Mario, for some reason
+        vec3f_set(this.sCameraStoreCUp, 0.0, c.focus[1] - this.gPlayerCameraState.pos[1], 0.0)
+    }
+
+    /**
+     * Start C-Up mode. The actual mode change is handled in update_mario_inputs() in mario.c
+     *
+     * @see update_mario_inputs
+     */
+    set_mode_c_up(c) {
+        if (!(this.gCameraMovementFlags & CAM_MOVE_C_UP_MODE)) {
+            this.gCameraMovementFlags |= CAM_MOVE_C_UP_MODE
+            this.store_lakitu_cam_info_for_c_up(c)
+            this.sCameraSoundFlags &= ~CAM_SOUND_C_UP_PLAYED
+            return true
+        }
+        return false
+    }
+
+    /**
+     * Zoom the camera out of C-Up mode, avoiding moving into a wall, if possible, by searching for an open
+     * direction.
+     */
+    exit_c_up(c) {
+        let surface = null
+        let checkFoc = [0, 0, 0]
+        let curPos = [0, 0, 0]
+        // Variables for searching for an open direction
+        let searching = 0
+        /// The current sector of the circle that we are checking
+        let sector
+        let ceilHeight
+        let floorHeight
+        let curDist = 0
+        let curPitch = 0
+        let curYaw = 0
+        let checkYaw = 0
+
+        if ((this.gCameraMovementFlags & CAM_MOVE_C_UP_MODE) && !(this.gCameraMovementFlags & CAM_MOVE_STARTED_EXITING_C_UP)) {
+            this.vec3f_copy(checkFoc, c.focus)
+            checkFoc[0] = this.gPlayerCameraState.pos[0]
+            checkFoc[2] = this.gPlayerCameraState.pos[2]
+            let wrapper = {dist: curDist, pitch: curPitch, yaw: curYaw}
+            vec3f_get_dist_and_angle(checkFoc, c.pos, wrapper)
+            curDist = wrapper.dist; curPitch = wrapper.pitch; curYaw = wrapper.yaw
+            this.vec3f_copy(curPos, c.pos)
+            curDist = 80.0
+
+            // Search for an open direction to zoom out in, if the camera is changing to close, free roam,
+            // or spiral-stairs mode
+            if (this.sModeInfo.lastMode == CAMERA_MODE_SPIRAL_STAIRS || this.sModeInfo.lastMode == CAMERA_MODE_CLOSE || this.sModeInfo.lastMode == CAMERA_MODE_FREE_ROAM) {
+                searching = 1
+                // Check the whole circle around Mario for an open direction to zoom out to
+                for (sector = 0; sector < 16 && searching == 1; sector++) {
+                    vec3f_set_dist_and_angle(checkFoc, curPos, curDist, 0, curYaw + checkYaw)
+
+                    // If there are no walls this way,
+                    wrapper = {x: curPos[0], y: curPos[1], z: curPos[2]}
+                    if (SurfaceCollision.f32_find_wall_collision(wrapper, 20.0, 50.0) == 0) {
+                        curPos[0] = wrapper.x; curPos[1] = wrapper.y; curPos[2] = wrapper.z
+                        // Start close to Mario, check for walls, floors, and ceilings all the way to the
+                        // zoomed out distance
+                        for (let d = curDist; d < this.gCameraZoomDist; d += 20.0) {
+                            vec3f_set_dist_and_angle(checkFoc, curPos, d, 0, curYaw + checkYaw)
+
+                            // Check if we're zooming out into a floor or ceiling
+                            let ceilWrapper = {ceil: surface}
+                            ceilHeight = SurfaceCollision.find_ceil(curPos[0], curPos[1] - 150.0, curPos[2], ceilWrapper) - 10.0
+                            surface = ceilWrapper.ceil
+                            if (surface != null && ceilHeight < curPos[1]) {
+                                break
+                            }
+                            floorHeight = SurfaceColision.find_floor(curPos[0], curPos[1] + 150.0, curPos[2], ceilWrapper) + 10.0
+                            surface = ceilWrapper.ceil
+                            if (surface != null && floorHeight > curPos[1]) {
+                                break
+                            }
+
+                            // Stop checking this direction if there is a wall blocking the way
+                            wrapper = {x: curPos[0], y: curPos[1], z: curPos[2]}
+                            if (SurfaceCollision.f32_find_wall_collision(wrapper, 20.0, 50.0) == 1) {
+                                curPos[0] = wrapper.x; curPos[1] = wrapper.y; curPos[2] = wrapper.z
+                                break
+                            } else {
+                                curPos[0] = wrapper.x; curPos[1] = wrapper.y; curPos[2] = wrapper.z
+                            }
+                        }
+
+                        // If there was no collision found all the way to the max distance, it's an opening
+                        if (d >= this.gCameraZoomDist) {
+                            searching = 0
+                        }
+                    } else {
+                        curPos[0] = wrapper.x; curPos[1] = wrapper.y; curPos[2] = wrapper.z
+                    }
+
+                    // Alternate left and right, checking each 1/16th (22.5 degrees) of the circle
+                    if (searching == 1) {
+                        checkYaw = -checkYaw
+                        if (checkYaw < 0) {
+                            checkYaw -= 0x1000
+                        } else {
+                            checkYaw += 0x1000
+                        }
+                    }
+                }
+
+                // Update the stored focus and pos to the direction found in the search
+                if (searching == 0) {
+                    vec3f_set_dist_and_angle(checkFoc, this.sCameraStoreCUp.pos, this.gCameraZoomDist, 0, curYaw + checkYaw)
+                    this.vec3f_copy(this.sCameraStoreCUp.focus, checkFoc)
+                    this.vec3f_sub(this.sCameraStoreCUp.pos, this.gPlayerCameraState.pos)
+                    this.vec3f_sub(this.sCameraStoreCUp.focus, this.gPlayerCameraState.pos)
+                }
+
+                this.gCameraMovementFlags |= CAM_MOVE_STARTED_EXITING_C_UP
+                this.transition_next_state(c, 15)
+            } else {
+                // Let the next camera mode handle it
+                this.gCameraMovementFlags &= ~(CAM_MOVE_STARTED_EXITING_C_UP | CAM_MOVE_C_UP_MODE)
+                vec3f_set_dist_and_angle(checkFoc, c.pos, curDist, curPitch, curYaw + checkYaw)
+            }
+            play_sound_cbutton_down()
+        }
+        return 0
+    }
+
+    /**
+     * The mode used when C-Up is pressed.
+     */
+    update_c_up(c, focus, pos) {
+        let pitch = this.sCUpCameraPitch
+        let yaw = this.gPlayerCameraState.faceAngle[1] + this.sModeOffsetYaw + DEGREES(180)
+
+        this.focus_on_mario(focus, pos, 125.0, 125.0, 250.0, pitch, yaw)
+        return this.gPlayerCameraState.faceAngle[1]
+    }
+
+    /**
+     * Make Mario's head move in C-Up mode.
+     */
+    move_mario_head_c_up(c) {
+        this.sCUpCameraPitch += window.playerInput.stickX * 10.0
+        this.sModeOffsetYaw -= window.playerInput.stickY * 10.0
+
+        // Bound looking up to nearly 80 degrees.
+        if (this.sCUpCameraPitch > 0x38E3) {
+            this.sCUpCameraPitch = 0x38E3
+        }
+        // Bound looking down to -45 degrees
+        if (this.sCUpCameraPitch < -0x2000) {
+            this.sCUpCameraPitch = -0x2000
+        }
+
+        // Bound the camera yaw to +-120 degrees
+        if (this.sModeOffsetYaw > 0x5555) {
+            this.sModeOffsetYaw = 0x5555
+        }
+        if (this.sModeOffsetYaw < -0x5555) {
+            this.sModeOffsetYaw = -0x5555
+        }
+
+        // Give Mario's neck natural-looking constraints
+        this.gPlayerCameraState.headRotation[0] = this.sCUpCameraPitch * 3 / 4
+        this.gPlayerCameraState.headRotation[1] = this.sModeOffsetYaw * 3 / 4
+    }
+
+    /**
+     * Zooms the camera in for C-Up mode
+     */
+    move_into_c_up(c) {
+        let start = this.sModeInfo.transitionStart
+        let end = this.sModeInfo.transitionEnd
+
+        let dist  = end.dist  - start.dist
+        let pitch = end.pitch - start.pitch
+        let yaw   = end.yaw   - start.yaw
+
+        // Linearly interpolate from start to end position's polar coordinates
+        dist  = start.dist  + dist  * this.sModeInfo.frame / this.sModeInfo.max
+        pitch = start.pitch + pitch * this.sModeInfo.frame / this.sModeInfo.max
+        yaw   = start.yaw   + yaw   * this.sModeInfo.frame / this.sModeInfo.max
+
+        // Linearly interpolate the focus from start to end
+        c.focus[0] = start.focus[0] + (end.focus[0] - start.focus[0]) * this.sModeInfo.frame / this.sModeInfo.max
+        c.focus[1] = start.focus[1] + (end.focus[1] - start.focus[1]) * this.sModeInfo.frame / this.sModeInfo.max
+        c.focus[2] = start.focus[2] + (end.focus[2] - start.focus[2]) * this.sModeInfo.frame / this.sModeInfo.max
+
+        vec3f_add(c.focus, this.gPlayerCameraState.pos)
+        vec3f_set_dist_and_angle(c.focus, c.pos, dist, pitch, yaw)
+
+        this.gPlayerCameraState.headRotation[0] = 0
+        this.gPlayerCameraState.headRotation[1] = 0
+
+        // Finished zooming in
+        this.sModeInfo.frame++
+        if (this.sModeInfo.frame == this.sModeInfo.max) {
+            this.gCameraMovementFlags &= ~CAM_MOVING_INTO_MODE
+        }
+    }
+
+    /**
+     * The main update function for C-Up mode
+     */
+    mode_c_up_camera(c) {
+        // Play a sound when entering C-Up mode
+        if (!(this.sCameraSoundFlags & CAM_SOUND_C_UP_PLAYED)) {
+            this.play_sound_cbutton_up()
+            this.sCameraSoundFlags |= CAM_SOUND_C_UP_PLAYED
+        }
+
+        // Zoom in first
+        if (this.gCameraMovementFlags & CAM_MOVING_INTO_MODE) {
+            this.gCameraMovementFlags |= CAM_MOVE_C_UP_MODE
+            this.move_into_c_up(c)
+            return 1
+        }
+
+        if (!(this.gCameraMovementFlags & CAM_MOVE_STARTED_EXITING_C_UP)) {
+            // Normal update
+            this.move_mario_head_c_up(c)
+            this.update_c_up(c, c.focus, c.pos)
+        } else {
+            // Exiting C-Up
+            if (this.sStatusFlags & CAM_FLAG_TRANSITION_OUT_OF_C_UP) {
+                // Retrieve the previous position and focus
+                this.vec3f_copy(c.pos, this.sCameraStoreCUp.pos)
+                vec3f_add(c.pos, this.gPlayerCameraState.pos)
+                this.vec3f_copy(c.focus, this.sCameraStoreCUp.focus)
+                vec3f_add(c.focus, this.gPlayerCameraState.pos)
+                // Make Mario look forward
+                let wrapper = {current: this.gPlayerCameraState.headRotation[0]}
+                this.camera_approach_s16_symmetric_bool(wrapper, 0, 1024)
+                this.gPlayerCameraState.headRotation[0] = wrapper.current
+                wrapper.current = this.gPlayerCameraState.headRotation[1]
+                this.camera_approach_s16_symmetric_bool(wrapper, 0, 1024)
+                this.gPlayerCameraState.headRotation[1] = wrapper.current
+            } else {
+                // Finished exiting C-Up
+                this.gCameraMovementFlags &= ~(CAM_MOVE_STARTED_EXITING_C_UP | CAM_MOVE_C_UP_MODE)
+            }
+        }
+        this.sPanDistance = 0.0
+
+        // Exit C-Up mode
+        if (window.playerInput.buttonPressedA || window.playerInput.buttonPressedB || window.playerInput.buttonPressedCd || window.playerInput.buttonPressedCl || window.playerInput.buttonPressedCr) {
+            this.exit_c_up(c)
+        }
+        return 0
+    }
+
     vec3f_copy(dest, src) {
         dest[0] = src[0]
         dest[1] = src[1]
@@ -1516,9 +1789,9 @@ class Camera {
                         this.mode_behind_mario_camera(c)
                         break
 
-                    // case CAMERA_MODE_C_UP:
-                    //     this.mode_c_up_camera(c)
-                    //     break
+                    case CAMERA_MODE_C_UP:
+                        this.mode_c_up_camera(c)
+                        break
 
                     case CAMERA_MODE_WATER_SURFACE:
                         this.mode_water_surface_camera(c)
@@ -2185,7 +2458,7 @@ class Camera {
                 } else {
                     this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
                     this.sZoomAmount = this.gCameraZoomDist + 400
-                    // play_sound_cbutton_down()
+                    play_sound_cbutton_down()
                 }
             }
     
@@ -4251,7 +4524,7 @@ class Camera {
             // Leave the dialog.
             case 1:
                 this.move_mario_head_c_up(c)
-                update_c_up(c, c.focus, c.pos)
+                this.update_c_up(c, c.focus, c.pos)
 
                 // This could cause softlocks. If a message starts one frame after another one closes, the
                 // cutscene will never end.

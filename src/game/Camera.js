@@ -4223,7 +4223,7 @@ class Camera {
     }
 
     cutscene_read_message_start(c) {
-        cutscene_unsoften_music(c)
+        this.cutscene_unsoften_music(c)
         this.transition_next_state(c, 30)
         this.reset_pan_distance(c)
         this.store_info_star(c)
@@ -4264,7 +4264,7 @@ class Camera {
                     // Retrieve previous state
                     this.sCUpCameraPitch = this.sCutsceneVars[1].angle[0]
                     this.sModeOffsetYaw = this.sCutsceneVars[1].angle[1]
-                    cutscene_unsoften_music(c)
+                    this.cutscene_unsoften_music(c)
                 }
         }
         this.sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE

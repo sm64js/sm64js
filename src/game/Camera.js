@@ -389,6 +389,27 @@ class Camera {
              marioPos: [0,0,0]
         }
 
+        this.sModeTransitions = [
+            null,
+            null, // this.update_radial_camera(c, focus, pos).bind(this),
+            null, // this.update_outward_radial_camera(c, focus, pos).bind(this),
+            this.update_behind_mario_camera(c, focus, pos).bind(this),
+            this.update_mario_camera(c, focus, pos).bind(this),
+            null,
+            this.update_c_up(c, focus, pos).bind(this),
+            this.update_mario_camera(c, focus, pos).bind(this),
+            null, // this.nop_update_water_camera(c, focus, pos).bind(this),
+            null, // this.update_slide_or_0f_camera(c, focus, pos).bind(this),
+            null, // this.update_in_cannon(c, focus, pos).bind(this),
+            this.update_boss_fight_camera(c, focus, pos).bind(this),
+            null, // this.update_parallel_tracking_camera(c, focus, pos).bind(this),
+            null, // this.update_fixed_camera(c, focus, pos).bind(this),
+            null, // this.update_8_directions_camera(c, focus, pos).bind(this),
+            null, // this.update_slide_or_0f_camera(c, focus, pos).bind(this),
+            this.update_mario_camera(c, focus, pos).bind(this),
+            null, // this.update_spiral_stairs_camera(c, focus, pos).bind(this),
+        ]
+
         this.sCameraStoreCutscene = {
             pos: [0, 0, 0],
             focus: [0, 0, 0],
@@ -1382,25 +1403,10 @@ class Camera {
             this.vec3f_sub(end.pos, this.gPlayerCameraState.pos)
 
             // sModeTransitions
-            switch (this.sModeInfo.newMode) {
-                case CAMERA_MODE_BEHIND_MARIO:
-                    this.sAreaYaw = this.update_behind_mario_camera(c, end.focus, end.pos)
-                    break
-                    
-                case CAMERA_MODE_C_UP:
-                    this.sAreaYaw = this.update_c_up(c, end.focus, end.pos)
-                    break
-
-                case CAMERA_MODE_WATER_SURFACE:
-                    // nop_update_water_camera
-                    break
-
-                case CAMERA_MODE_CLOSE:
-                case CAMERA_MODE_FREE_ROAM:
-                    this.sAreaYaw = this.update_mario_camera(c, end.focus, end.pos)
-                    break
-
-                default: throw "unknown camera case"
+            if (this.sModeTransitions[this.sModeInfo.newMode] == null) {
+                throw "unknown camera case"
+            } else {
+                this.sModeTransitions[this.sModeInfo.newMode](c, end.focus, end.pos)
             }
 
             // End was updated by sModeTransitions

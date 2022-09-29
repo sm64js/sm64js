@@ -1,4 +1,4 @@
-// mad_piano.inc.c
+// mad_piano.inc.js
 
 import { sqrtf } from "../../engine/math_util"
 import { oMoveAngleYaw } from "../../include/object_constants"

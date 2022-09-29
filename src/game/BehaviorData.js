@@ -162,6 +162,7 @@ import { wdw_seg7_collision_arrow_lift } from "../levels/wdw/arrow_lift/collisio
 import { bbh_seg7_collision_haunted_bookshelf } from "../levels/bbh/moving_bookshelf/collision.inc"
 import { bookend_seg5_anims_05002540 } from "../actors/bookend/anims.inc"
 import { mad_piano_seg5_anims_05009B14 } from "../actors/mad_piano/anims.inc"
+import { chair_seg5_anims_05005784 } from "../actors/chair/anims.inc"
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
 export const OBJ_LIST_DESTRUCTIVE = 2 //  (2) things that can be used to destroy other objects, like
@@ -944,7 +945,7 @@ const bhvSpawnedStarNoLevelExit = [
 ]
 
 export const bhvMrIBlueCoin = [
-    BEGIN(OBJ_LIST_LEVEL),
+    BEGIN(OBJ_LIST_LEVEL, 'bhvMrIBlueCoin'),
     SET_INT(oInteractType, INTERACT_COIN),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
@@ -2132,7 +2133,7 @@ const bhvBitfsSinkingPlatforms = [
 ]
 
 const bhvArrowLift = [
-    BEGIN(OBJ_LIST_SURFACE),
+    BEGIN(OBJ_LIST_SURFACE, 'bhvArrowList'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     LOAD_COLLISION_DATA(wdw_seg7_collision_arrow_lift),
     SET_INT_RAND_RSHIFT(oArrowLiftUnk100, 1, 32),
@@ -2550,8 +2551,23 @@ const bhvMenuButtonManager = [
     END_LOOP(),
 ]
 
+export const bhvHauntedChair = [
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvHauntedChair'),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    DROP_TO_FLOOR(),
+    LOAD_ANIMATIONS(oAnimations, chair_seg5_anims_05005784),
+    ANIMATE(0),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 40, /*Gravity*/ 0, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    SET_HOME(),
+    CALL_NATIVE('bhv_init_room'),
+    CALL_NATIVE('bhv_haunted_chair_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_haunted_chair_loop'),
+    END_LOOP(),
+]
+
 export const bhvMadPiano = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvMadPiano'),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     DROP_TO_FLOOR(),
     LOAD_ANIMATIONS(oAnimations, mad_piano_seg5_anims_05009B14),
@@ -2565,7 +2581,7 @@ export const bhvMadPiano = [
 ]
 
 export const bhvHauntedBookshelf = [
-    BEGIN(OBJ_LIST_SURFACE),
+    BEGIN(OBJ_LIST_SURFACE, 'bhvHauntedBookshelf'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     LOAD_COLLISION_DATA(bbh_seg7_collision_haunted_bookshelf),
     SET_HOME(),
@@ -2577,7 +2593,7 @@ export const bhvHauntedBookshelf = [
 ]
 
 export const bhvFlyingBookend = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvFlyingBookend'),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     LOAD_ANIMATIONS(oAnimations, bookend_seg5_anims_05002540),
     ANIMATE(0),
@@ -2591,7 +2607,7 @@ export const bhvFlyingBookend = [
 ]
 
 export const bhvBookendSpawn = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvBookendSpawn'),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     CALL_NATIVE('bhv_init_room'),
     BEGIN_LOOP(),
@@ -2600,7 +2616,7 @@ export const bhvBookendSpawn = [
 ]
 
 export const bhvHauntedBookshelfManager = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvHauntedBookshelfManager'),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     CALL_NATIVE('bhv_init_room'),
     BEGIN_LOOP(),
@@ -2609,7 +2625,7 @@ export const bhvHauntedBookshelfManager = [
 ]
 
 export const bhvBookSwitch = [
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvBookSwitch'),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_HOME(),
     SET_FLOAT(oGraphYOffset, 30),
@@ -2621,7 +2637,7 @@ export const bhvBookSwitch = [
 ]
 
 export const bhvMerryGoRound = [
-    BEGIN(OBJ_LIST_SURFACE),
+    BEGIN(OBJ_LIST_SURFACE, 'bhvMerryGoRound'),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     LOAD_COLLISION_DATA(bbh_seg7_collision_merry_go_round),
     SET_FLOAT(oCollisionDistance, 2000),

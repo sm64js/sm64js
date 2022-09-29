@@ -16,6 +16,8 @@ import { MODEL_TRAJECTORY_MARKER_BALL } from "../include/model_ids"
 import { bhvTrackBall } from "./BehaviorData"
 import { MODEL_BLUE_COIN } from "../include/model_ids"
 import { bhvMrIBlueCoin } from "./BehaviorData"
+import { OBJ_MOVE_IN_AIR } from "../include/object_constants"
+import { oGraphYOffset } from "../include/object_constants"
 
 export const ATTACK_HANDLER_NOP = 0
 export const ATTACK_HANDLER_DIE_IF_HEALTH_NON_POSITIVE = 1
@@ -305,6 +307,53 @@ export const obj_is_near_to_and_facing_mario = (maxDist, maxAngleDiff) => {
         return true
     }
     return false
+}
+
+export const cur_obj_spin_all_dimensions = (arg0, arg1) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    let val24
+    let val20
+    let val1C
+    let c
+    let s
+    let val10
+    let val0C
+    let val08
+    let val04
+    let val00
+
+    if (o.rawData[oForwardVel] == 0.0) {
+        val24 = vla20 = val1C = 0.0
+
+        if (o.rawData[oMoveFlags] & OBJ_MOVE_IN_AIR) {
+            val20 = 50.0
+        } else {
+            val1C = Math.abs(arg0)
+            val24 = Math.abs(arg1)
+        }
+
+        c = coss(o.rawData[oFaceAnglePitch])
+        s = sins(o.rawData[oFaceAnglePitch])
+        val08 = val1C * c + val20 * s
+        val0C = val20 * c - val1C * s
+
+        c = coss(o.rawData[oFaceAngleRoll])
+        s = sins(o.rawData[oFaceAngleRoll])
+        val04 = val24 * c + val0C * s
+        val0C = val0C * c - val24 * s
+
+        c = coss(o.rawData[oFaceAngleYaw])
+        s = sins(o.rawData[oFaceAngleYaw])
+        val10 = val04 * c - val08 * s
+        val08 = val08 * c + val04 * s
+
+        val04 = val24 * c - val1C * s
+        val00 = val1C * c + val24 * s
+
+        o.rawData[oPosX] = o.rawData[oHomeX] - val04 + val10
+        o.rawData[oGraphYOffset] = val20 - val0C
+        o.rawData[oPosZ] = o.rawData[oHomeZ] + val00 - val08
+    }
 }
 
 export const obj_compute_vel_from_move_pitch = (speed) => {

@@ -2439,14 +2439,14 @@ class Camera {
         if (window.playerInput.buttonPressedCu) {
             if (c.mode != CAMERA_MODE_FIXED && (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT)) {
                 this.gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT
-                // play_sound_cbutton_up()
+                play_sound_cbutton_up()
             } else {
-                // set_mode_c_up(c)
-                // if (sZeroZoomDist > gCameraZoomDist) {
-                //     sZoomAmount = -gCameraZoomDist
-                // } else {
-                //     sZoomAmount = gCameraZoomDist
-                // }
+                set_mode_c_up(c)
+                if (this.sZeroZoomDist > this.gCameraZoomDist) {
+                    this.sZoomAmount = -this.gCameraZoomDist
+                } else {
+                    this.sZoomAmount = this.gCameraZoomDist
+                }
             }
         }
         if (c.mode != CAMERA_MODE_FIXED) {
@@ -4532,7 +4532,7 @@ class Camera {
 
                 // This could cause softlocks. If a message starts one frame after another one closes, the
                 // cutscene will never end.
-                if (IngameMenu.get_dialog_id() == DIALOG_NONE) {
+                // if (IngameMenu.get_dialog_id() == DIALOG_NONE) {
                     this.gCutsceneTimer = CUTSCENE_LOOP
                     this.retrieve_info_star(c)
                     this.transition_next_state(c, 15)
@@ -4542,7 +4542,7 @@ class Camera {
                     this.sCUpCameraPitch = this.sCutsceneVars[1].angle[0]
                     this.sModeOffsetYaw = this.sCutsceneVars[1].angle[1]
                     this.cutscene_unsoften_music(c)
-                }
+                // }
         }
         this.sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
     }

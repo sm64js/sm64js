@@ -82,6 +82,7 @@ import * as _flame_mario              from "./behaviors/flame_mario.inc"
 import * as _flamethrower             from "./behaviors/flamethrower.inc"
 import * as _flying_bookend_switch    from "./behaviors/flying_bookend_switch.inc"
 import * as _goomba                   from "./behaviors/goomba.inc"
+import * as _haunted_chair            from "./behaviors/haunted_chair.inc"
 import * as _king_bobomb              from "./behaviors/king_bobomb.inc"
 import * as _koopa_shell_underwater   from "./behaviors/koopa_shell_underwater.inc"
 import * as _mad_piano                from "./behaviors/mad_piano.inc"
@@ -2749,6 +2750,7 @@ gLinker.behaviors.bhvGoombaTripletSpawner = bhvGoombaTripletSpawner
 gLinker.behaviors.bhvHardAirKnockBackWarp = bhvHardAirKnockBackWarp
 gLinker.behaviors.bhvHauntedBookshelf = bhvHauntedBookshelf
 gLinker.behaviors.bhvHauntedBookshelfManager = bhvHauntedBookshelfManager
+gLinker.behaviors.bhvHauntedChair = bhvHauntedChair
 gLinker.behaviors.bhvHidden1up = bhvHidden1up
 gLinker.behaviors.bhvHidden1upInPoleSpawner = bhvHidden1upInPoleSpawner
 gLinker.behaviors.bhvHidden1upTrigger = bhvHidden1upTrigger

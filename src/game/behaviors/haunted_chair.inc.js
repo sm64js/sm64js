@@ -206,3 +206,6 @@ export const bhv_haunted_chair_loop = () => {
         cur_obj_spin_all_dimensions(30.0, 30.0)
     }
 }
+
+gLinker.bhv_haunted_chair_init = bhv_haunted_chair_init
+gLinker.bhv_haunted_chair_loop = bhv_haunted_chair_loop

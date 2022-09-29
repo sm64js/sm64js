@@ -2441,7 +2441,7 @@ class Camera {
                 this.gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT
                 play_sound_cbutton_up()
             } else {
-                set_mode_c_up(c)
+                this.set_mode_c_up(c)
                 if (this.sZeroZoomDist > this.gCameraZoomDist) {
                     this.sZoomAmount = -this.gCameraZoomDist
                 } else {

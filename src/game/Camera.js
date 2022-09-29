@@ -2439,7 +2439,7 @@ class Camera {
         if (window.playerInput.buttonPressedCu) {
             if (c.mode != CAMERA_MODE_FIXED && (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT)) {
                 this.gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT
-                play_sound_cbutton_up()
+                this.play_sound_cbutton_up()
             } else {
                 this.set_mode_c_up(c)
                 if (this.sZeroZoomDist > this.gCameraZoomDist) {
@@ -2458,7 +2458,7 @@ class Camera {
                 } else {
                     this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
                     this.sZoomAmount = this.gCameraZoomDist + 400
-                    play_sound_cbutton_down()
+                    this.play_sound_cbutton_down()
                 }
             }
     

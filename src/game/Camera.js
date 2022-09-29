@@ -1386,6 +1386,10 @@ class Camera {
                 case CAMERA_MODE_BEHIND_MARIO:
                     this.sAreaYaw = this.update_behind_mario_camera(c, end.focus, end.pos)
                     break
+                    
+                case CAMERA_MODE_C_UP:
+                    this.sAreaYaw = this.update_c_up(c, end.focus, end.pos)
+                    break
 
                 case CAMERA_MODE_WATER_SURFACE:
                     // nop_update_water_camera

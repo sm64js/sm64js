@@ -19,6 +19,7 @@ import { OBJ_MOVE_MASK_ON_GROUND } from "../../include/object_constants";
 import { OBJ_MOVE_HIT_WALL } from "../../include/object_constants";
 import { oMoveFlags } from "../../include/object_constants";
 import { ACTIVE_FLAG_IN_DIFFERENT_ROOM } from "../../include/object_constants";
+import { oVelY } from "../../include/object_constants";
 import { oHomeX } from "../../include/object_constants";
 import { oHauntedChairUnkF4 } from "../../include/object_constants";
 import { SOUND_GENERAL_HAUNTED_CHAIR } from "../../include/sounds";

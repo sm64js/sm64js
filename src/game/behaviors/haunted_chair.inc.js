@@ -58,7 +58,7 @@ export const bhv_haunted_chair_init = () => {
     let val04 = {}
     let val00
 
-    distWrapper = { dist: val00 }
+    let distWrapper = { dist: val00 }
     val04 = cur_obj_find_nearest_object_with_behavior(o, bhvMadPiano, distWrapper)
     val00 = distWrapper.dist
 

@@ -1810,9 +1810,9 @@ class Camera {
                         this.mode_behind_mario_camera(c)
                         break
 
-                    // case CAMERA_MODE_C_UP:
-                    //     mode_c_up_camera(c);
-                    //     break;
+                    case CAMERA_MODE_C_UP:
+                        mode_c_up_camera(c);
+                        break;
 
                     case CAMERA_MODE_WATER_SURFACE:
                         this.mode_water_surface_camera(c)

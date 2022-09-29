@@ -23,7 +23,7 @@ import { oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAn
          oUnk94, oBBallSpawnerPeriodMinus1, oBobombBuddyRole, oTripletButterflyScale,
          oBigBooNumMinionBoosKilled, oDrawingDistance, oMarioParticleFlags,
          oOpacity, oForwardVel, oVelY, oHealth, oParentRelativePosX,
-         oParentRelativePosZ, oArrowLiftUnk100, oRoom, oMoveFlags,
+         oParentRelativePosZ, oArrowLiftUnk100, oRoom, oMoveFlags, oCoinUnk110,
 
          OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE, OBJ_FLAG_COMPUTE_DIST_TO_MARIO,
          OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW,
@@ -84,6 +84,7 @@ import * as _flying_bookend_switch    from "./behaviors/flying_bookend_switch.in
 import * as _goomba                   from "./behaviors/goomba.inc"
 import * as _king_bobomb              from "./behaviors/king_bobomb.inc"
 import * as _koopa_shell_underwater   from "./behaviors/koopa_shell_underwater.inc"
+import * as _mad_piano                from "./behaviors/mad_piano.inc"
 import * as _moat_drainer             from "./behaviors/moat_drainer.inc"
 import * as _moat_grill               from "./behaviors/moat_grill.inc"
 import * as _moving_coin              from "./behaviors/moving_coin.inc"
@@ -160,8 +161,7 @@ import { bob_seg7_collision_chain_chomp_gate } from "../levels/bob/chain_chomp_g
 import { wdw_seg7_collision_arrow_lift } from "../levels/wdw/arrow_lift/collision.inc"
 import { bbh_seg7_collision_haunted_bookshelf } from "../levels/bbh/moving_bookshelf/collision.inc"
 import { bookend_seg5_anims_05002540 } from "../actors/bookend/anims.inc"
-import { oCoinUnk110 } from "../include/object_constants"
-
+import { mad_piano_seg5_anims_05009B14 } from "../actors/mad_piano/anims.inc"
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
 export const OBJ_LIST_DESTRUCTIVE = 2 //  (2) things that can be used to destroy other objects, like
@@ -2547,6 +2547,20 @@ const bhvMenuButtonManager = [
     BEGIN_LOOP(),
         SET_INT(oIntangibleTimer, 0),
         CALL_NATIVE('bhv_menu_button_manager_loop'),
+    END_LOOP(),
+]
+
+export const bhvMadPiano = [
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    DROP_TO_FLOOR(),
+    LOAD_ANIMATIONS(oAnimations, mad_piano_seg5_anims_05009B14),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 40, /*Gravity*/ 0, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    SET_HOME(),
+    ADD_INT(oMoveAngleYaw, 0x4000),
+    CALL_NATIVE('bhv_init_room'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_mad_piano_update'),
     END_LOOP(),
 ]
 

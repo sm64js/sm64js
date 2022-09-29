@@ -1229,6 +1229,11 @@ export const CHAIN_CHOMP_ACT_UNLOAD_CHAIN = 2
 export const CHAIN_CHOMP_SUB_ACT_TURN = 0
 export const CHAIN_CHOMP_SUB_ACT_LUNGE = 1
 
+/* Mad piano */
+    /* oAction */
+    export const MAD_PIANO_ACT_WAIT   = 0
+    export const MAD_PIANO_ACT_ATTACK = 1
+
 /* Moving Yellow Coin */
     /* oAction */
     export const MOV_YCOIN_ACT_IDLE = 0

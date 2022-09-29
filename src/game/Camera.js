@@ -1600,8 +1600,8 @@ class Camera {
      * Make Mario's head move in C-Up mode.
      */
     move_mario_head_c_up(c) {
-        this.sCUpCameraPitch += window.playerInput.stickY * 10.0
-        this.sModeOffsetYaw -= window.playerInput.stickX * 10.0
+        this.sCUpCameraPitch -= window.playerInput.stickY * 10.0
+        this.sModeOffsetYaw += window.playerInput.stickX * 10.0
 
         // Bound looking up to nearly 80 degrees.
         if (this.sCUpCameraPitch > 0x38E3) {

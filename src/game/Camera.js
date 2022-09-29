@@ -407,7 +407,7 @@ class Camera {
 
         this.sModeTransitions = [
             null,
-            null, // this.update_radial_camera(c, focus, pos).bind(this),
+            this.update_radial_camera.bind(this),
             null, // this.update_outward_radial_camera(c, focus, pos).bind(this),
             this.update_behind_mario_camera.bind(this),
             this.update_mario_camera.bind(this),
@@ -884,8 +884,153 @@ class Camera {
         }
     }
 
+    /**
+     * Pitch the camera down when the camera is facing down a slope
+     */
     look_down_slopes(camYaw) {
-        
+        let floor = null
+        // Default pitch
+        let pitch = 0x05B0
+        // x and z offsets towards the camera
+        let xOff = this.gPlayerCameraState.pos[0] + sins(camYaw) * 40.0
+        let zOff = this.gPlayerCameraState.pos[2] + coss(camYaw) * 40.0
+
+        floorWrapper = {floor: floor}
+        let floorDY = SurfaceCollision.find_floor(xOff, this.gPlayerCameraState.pos[1], zOff, floorWrapper) - this.gPlayerCameraState.pos[1]
+        floor = floorWrapper.floor
+
+        if (floor != null) {
+            if (floor.type != SURFACE_WALL_MISC && floorDY > 0) {
+                if (floor.normal.z == 0.0 && floorDY < 100.0) {
+                    pitch = 0x05B0
+                } else {
+                    // Add the slope's angle of declination to the pitch
+                    pitch += atan2s(40.0, floorDY)
+                }
+            }
+        }
+
+        return pitch
+    }
+
+    /**
+     * Look ahead to the left or right in the direction the player is facing
+     * The calculation for pan[0] could be simplified to:
+     *      yaw = -yaw;
+     *      pan[0] = sins(sMarioCamState->faceAngle[1] + yaw) * sins(0xC00) * dist;
+     * Perhaps, early in development, the pan used to be calculated for both the x and z directions
+     *
+     * Since this function only affects the camera's focus, Mario's movement direction isn't affected.
+     */
+    pan_ahead_of_player(c) {
+        const pan = [0,0,0]
+
+        // Get distance and angle from camera to mario.
+        const output = {}
+        MathUtil.vec3f_get_dist_and_angle(c.pos, this.gPlayerCameraState.pos, output)
+        const dist = output.dist
+        let yaw = output.yaw
+
+        // The camera will pan ahead up to about 30% of the camera's distance to mario.
+        pan[2] = Math.sin(0xC00 / 0x8000 * Math.PI) * dist
+
+        this.rotate_in_xz(pan, pan, this.gPlayerCameraState.faceAngle[1])
+        // rotate in the opposite direction
+        yaw = -yaw
+        this.rotate_in_xz(pan, pan, yaw)
+        // Only pan left or right
+        pan[2] = 0
+
+        // If mario is long jumping, or on a flag pole (but not at the top), then pan in the opposite direction
+        if (this.gPlayerCameraState.action == Mario.ACT_LONG_JUMP ||
+            (this.gPlayerCameraState.action != Mario.ACT_TOP_OF_POLE && (this.gPlayerCameraState.action & Mario.ACT_FLAG_ON_POLE))) {
+            pan[0] = -pan[0]
+        }
+
+        // Slowly make the actual pan, sPanDistance, approach the calculated pan
+        // If mario is sleeping, then don't pan
+        const wrapper = { current: this.sPanDistance }
+        if (this.sStatusFlags & CAM_FLAG_SLEEPING) {
+            this.approach_f32_asymptotic_bool(wrapper, 0, 0.025)
+        } else {
+            this.approach_f32_asymptotic_bool(wrapper, pan[0], 0.025)
+        }
+
+        this.sPanDistance = wrapper.current
+
+        // Now apply the pan. It's a dir vector to the left or right, rotated by the camera's yaw to mario
+        pan[0] = this.sPanDistance
+        yaw = -yaw
+        this.rotate_in_xz(pan, pan, yaw)
+        MathUtil.vec3f_add(c.focus, pan)
+    }
+
+    find_in_bounds_yaw_wdw_bob_thi(pos, origin, yaw) {
+        switch (this.gCurrLevelArea) {
+            case AREA_WDW_MAIN:
+                yaw = this.clamp_positions_and_find_yaw(pos, origin, 4508.0, -3739.0, 4508.0, -3739.0)
+                break
+            case AREA_BOB:
+                yaw = this.clamp_positions_and_find_yaw(pos, origin, 8000.0, -8000.0, 7050.0, -8000.0)
+                break
+            case AREA_THI_HUGE:
+                yaw = this.clamp_positions_and_find_yaw(pos, origin, 8192.0, -8192.0, 8192.0, -8192.0)
+                break
+            case AREA_THI_TINY:
+                yaw = this.clamp_positions_and_find_yaw(pos, origin, 2458.0, -2458.0, 2458.0, -2458.0)
+                break
+        }
+        return yaw
+    }
+
+    /**
+     * Rotates the camera around the area's center point.
+     */
+    update_radial_camera(c, focus, pos) {
+        let cenDistX = this.gPlayerCameraState.pos[0] - c.areaCenX
+        let cenDistZ = this.gPlayerCameraState.pos[2] - c.areaCenZ
+        let camYaw = atan2s(cenDistZ, cenDistX) + this.sModeOffsetYaw
+        let pitch = this.look_down_slopes(camYaw)
+        let posY = 0
+        let focusY = 0
+        let yOff = 125.0
+        let baseDist = 1000.0
+
+        this.sAreaYaw = camYaw - this.sModeOffsetYaw
+        let wrapper = {posOff: posY, focOff: focusY}
+        this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
+        posY = wrapper.posOff; focusY = wrapper.focOff;
+        this.focus_on_mario(focus, pos, posY + yOff, focusY + yOff, this.sLakituDist + baseDist, pitch, camYaw)
+        this.pan_ahead_of_player(c)
+        if (this.gCurrLevelArea == AREA_DDD_SUB) {
+            camYaw = this.clamp_positions_and_find_yaw(pos, focus, 6839.0, 995.0, 5994.0, -3945.0)
+        }
+
+        return camYaw
+    }
+
+    /**
+     * Update the camera during 8 directional mode
+     */
+    update_8_directions_camera(c, focus, pos) {
+        let camYaw = this.s8DirModeBaseYaw + this.s8DirModeYawOffset
+        let pitch = this.look_down_slopes(camYaw)
+        let posY = 0
+        let focusY = 0
+        let yOff = 125.0
+        let baseDist = 1000.0
+
+        this.sAreaYaw = camYaw
+        let wrapper = {posOff: posY, focOff: focusY}
+        this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
+        posY = wrapper.posOff; focusY = wrapper.focOff;
+        this.focus_on_mario(focus, pos, posY + yOff, this.sLakituDist + baseDist, pitch, camYaw)
+        this.pan_ahead_of_player(c)
+        if (this.gCurrLevelArea == AREA_DDD_SUB) {
+            camYaw = this.clamp_positions_and_find_yaw(pos, focus, 6839.0, 995.0, 5994.0, -3945.0)
+        }
+
+        return camYaw
     }
 
     select_mario_cam_mode() {
@@ -2528,49 +2673,6 @@ class Camera {
         const distX = b[0] - a[0]
         const distZ = b[2] - a[2]
         return MathUtil.sqrtf(distX * distX + distZ * distZ)
-    }
-
-    pan_ahead_of_player(c) {
-        const pan = [0,0,0]
-
-        // Get distance and angle from camera to mario.
-        const output = {}
-        MathUtil.vec3f_get_dist_and_angle(c.pos, this.gPlayerCameraState.pos, output)
-        const dist = output.dist
-        let yaw = output.yaw
-
-        // The camera will pan ahead up to about 30% of the camera's distance to mario.
-        pan[2] = Math.sin(0xC00 / 0x8000 * Math.PI) * dist
-
-        this.rotate_in_xz(pan, pan, this.gPlayerCameraState.faceAngle[1])
-        // rotate in the opposite direction
-        yaw = -yaw
-        this.rotate_in_xz(pan, pan, yaw)
-        // Only pan left or right
-        pan[2] = 0
-
-        // If mario is long jumping, or on a flag pole (but not at the top), then pan in the opposite direction
-        if (this.gPlayerCameraState.action == Mario.ACT_LONG_JUMP ||
-            (this.gPlayerCameraState.action != Mario.ACT_TOP_OF_POLE && (this.gPlayerCameraState.action & Mario.ACT_FLAG_ON_POLE))) {
-            pan[0] = -pan[0]
-        }
-
-        // Slowly make the actual pan, sPanDistance, approach the calculated pan
-        // If mario is sleeping, then don't pan
-        const wrapper = { current: this.sPanDistance }
-        if (this.sStatusFlags & CAM_FLAG_SLEEPING) {
-            this.approach_f32_asymptotic_bool(wrapper, 0, 0.025)
-        } else {
-            this.approach_f32_asymptotic_bool(wrapper, pan[0], 0.025)
-        }
-
-        this.sPanDistance = wrapper.current
-
-        // Now apply the pan. It's a dir vector to the left or right, rotated by the camera's yaw to mario
-        pan[0] = this.sPanDistance
-        yaw = -yaw
-        this.rotate_in_xz(pan, pan, yaw)
-        MathUtil.vec3f_add(c.focus, pan)
     }
 
     lakitu_zoom(rangeDist, rangePitch) {

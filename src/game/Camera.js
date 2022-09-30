@@ -2135,7 +2135,7 @@ class Camera {
 
             // sModeTransitions
             if (this.sModeTransitions[this.sModeInfo.newMode] == null) {
-                throw "unknown camera case"
+                throw "unknown camera case: " + this.sModeInfo.newMode
             } else {
                 this.sModeTransitions[this.sModeInfo.newMode](c, end.focus, end.pos)
             }
@@ -2700,7 +2700,7 @@ class Camera {
                     //     mode_spiral_stairs_camera(c);
                     //     break;
 
-                    default: throw "unknown camera case " + c.mode
+                    default: throw "unknown camera case: " + c.mode
                 }
             }
         }

@@ -173,6 +173,7 @@ class ObjectListProcessor {
 
     update_non_terrain_objects() {
         this.sObjectListUpdateOrder.slice(2).forEach(listIndex => {
+            console.log(this.gObjectLists[listIndex])
             this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[listIndex])
         })
     }

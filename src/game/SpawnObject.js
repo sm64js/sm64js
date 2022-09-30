@@ -158,8 +158,8 @@ class SpawnObject {
 
     create_object(bhvScript) {
         bhvScript = this.get_bhv_script(bhvScript)
+        console.log(bhvScript)
         if (!bhvScript) {
-            console.log("uh oh")
             return null
         }
         let objListIndex = this.get_bhv_object_list(bhvScript)
@@ -178,7 +178,6 @@ class SpawnObject {
             objListIndex == ObjectListProc.OBJ_LIST_PUSHABLE) {
                 this.snap_object_to_floor(obj)
         }
-        console.log(obj)
         return obj
     }
 }

@@ -925,7 +925,7 @@ class Camera {
         let xOff = this.gPlayerCameraState.pos[0] + sins(camYaw) * 40.0
         let zOff = this.gPlayerCameraState.pos[2] + coss(camYaw) * 40.0
 
-        floorWrapper = {floor: floor}
+        let floorWrapper = {floor: floor}
         let floorDY = SurfaceCollision.find_floor(xOff, this.gPlayerCameraState.pos[1], zOff, floorWrapper) - this.gPlayerCameraState.pos[1]
         floor = floorWrapper.floor
 

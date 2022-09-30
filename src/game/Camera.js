@@ -40,6 +40,8 @@ import { SURFACE_CAMERA_ROTATE_LEFT } from "../include/surface_terrains"
 import { SOUND_MENU_CAMERA_BUZZ } from "../include/sounds"
 import { SOUND_MENU_CLICK_CHANGE_VIEW } from "../include/sounds"
 import { ACT_RIDING_HOOT } from "./Mario"
+import { vec3f_copy } from "../engine/math_util"
+import { vec3f_get_dist_and_angle } from "../engine/math_util"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -222,7 +224,7 @@ const L_CBUTTONS =	0x0002
 const R_CBUTTONS =	0x0001
 const D_CBUTTONS =	0x0004
 const U_CBUTTONS =	0x0008
-
+export const CBUTTON_MASK = (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS)
 
 export const CAM_EVENT_CANNON              = 1
 export const CAM_EVENT_SHOT_FROM_CANNON    = 2
@@ -424,8 +426,8 @@ class Camera {
             null, // this.update_slide_or_0f_camera(c, focus, pos).bind(this),
             null, // this.update_in_cannon(c, focus, pos).bind(this),
             this.update_boss_fight_camera.bind(this),
-            null, // this.update_parallel_tracking_camera(c, focus, pos).bind(this),
-            null, // this.update_fixed_camera(c, focus, pos).bind(this),
+            this.update_parallel_tracking_camera.bind(this),
+            this.update_fixed_camera.bind(this),
             this.update_8_directions_camera.bind(this),
             null, // this.update_slide_or_0f_camera(c, focus, pos).bind(this),
             this.update_mario_camera.bind(this),
@@ -470,6 +472,22 @@ class Camera {
             focHSpeed: 0, focVSpeed: 0,
             posHSpeed: 0, posVSpeed: 0,
             keyDanceRoll: 0
+        }
+
+        this.sParTrackPath = {
+            startOfPath: 0,
+            pos: [0, 0, 0],
+            distThresh: 0,
+            zoom: 0
+        }
+
+        this.sParTrackIndex = 0
+
+        this.sParTrackTransOff = {
+            pos: [0, 0, 0],
+            focus: [0, 0, 0],
+            panDist: 0,
+            cannonYOffset: 0,
         }
 
         this.sCutsceneStarSpawn = [
@@ -1321,6 +1339,288 @@ class Camera {
         this.pan_ahead_of_player(c)
     }
 
+    /**
+     * Move the camera in parallel tracking mode
+     *
+     * Uses the line between the next two points in sParTrackPath
+     * The camera can move forward/back and side to side, but it will face perpendicular to that line
+     *
+     * Although, annoyingly, it's not truly parallel, the function returns the yaw from the camera to Mario,
+     * so Mario will run slightly towards the camera.
+     */
+    update_parallel_tracking_camera(c, focus, pos) {
+        let path = [ [0, 0, 0], [0, 0, 0] ]
+        let parMidPoint = [0, 0, 0]
+        let marioOffset = [0, 0, 0]
+        let camOffset = [0, 0, 0]
+        /// Adjusts the focus to look where Mario is facing. Unused since marioOffset is copied to focus
+        let focOffset = [0, 0, 0]
+        let pathPitch = 0
+        let pathYaw = 0
+        let distThresh = 0
+        let zoom = 0
+        let camParDist = 0
+        let pathLength = 0
+        let parScale = 0.5
+        let marioFloorDist = 0
+        let marioPos = [0, 0, 0]
+        let pathAngle = [0, 0, 0]
+        // Variables for changing to the next/prev path in the list
+        let oldPos = [0, 0, 0]
+        let prevPathPos = [0, 0, 0]
+        let nextPathPos = [0, 0, 0]
+        let distToNext = [0, 0, 0]
+        let distToPrev = [0, 0, 0]
+        let prevPitch = [0, 0, 0]
+        let nextPitch = [0, 0, 0]
+        let prevYaw = [0, 0, 0]
+        let nextYaw = [0, 0, 0]
+        
+        // Store camera pos, for changing between paths
+        this.vec3f_copy(oldPos, pos)
+
+        this.vec3f_copy(path[0], this.sParTrackPath[this.sParTrackIndex].pos)
+        this.vec3f_copy(path[1], this.sParTrackPath[this.sParTrackIndex + 1].pos)
+
+        distThresh = this.sParTrackPath[this.sParTrackIndex].distThresh
+        zoom = this.sParTrackPath[this.sParTrackIndex].zoom
+        let wrapper = {posOff: marioFloorDist, focOff: marioFloorDist}
+        this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
+        marioFloorDist = wrapper.posOff
+
+        marioPos[0] = this.gPlayerCameraState.pos[0]
+        // Mario's y pos + ~Mario's height + Mario's height above the floor
+        marioPos[1] = this.gPlayerCameraState.pos[1] + 150.0 + marioFloorDist
+        marioPos[2] = this.gPlayerCameraState.pos[2]
+
+        // Calculate middle of the path (parScale is 0.5f)
+        parMidPoint[0] = path[0][0] + (path[1][0] - path[0][0]) * parScale
+        parMidPoint[1] = path[0][1] + (path[1][1] - path[0][1]) * parScale
+        parMidPoint[2] = path[0][2] + (path[1][2] - path[0][2]) * parScale
+        
+        // Get direction of path
+        wrapper = {dist: pathLength, pitch: pathPitch, yaw: pathYaw}
+        vec3f_get_dist_and_angle(path[0], path[1], wrapper)
+        pathLength = wrapper.dist; pathPitch = wrapper.pitch; pathYaw = wrapper.yaw
+
+        marioOffset[0] = marioPos[0] - parMidPoint[0]
+        marioOffset[1] = marioPos[1] - parMidPoint[1]
+        marioOffset[2] = marioPos[2] - parMidPoint[2]
+
+        // Make marioOffset point from the midpoint -> the start of the path
+        // Rotating by -yaw then -pitch moves the hor dist from the midpoint into marioOffset's z coordinate
+        // marioOffset[0] = the (perpendicular) horizontal distance from the path
+        // marioOffset[1] = the vertical distance from the path
+        // marioOffset[2] = the (parallel) horizontal distance from the path's midpoint
+        pathYaw = -pathYaw
+        this.rotate_in_xz(marioOffset, marioOffset, pathYaw)
+        pathYaw = -pathYaw
+        pathPitch = -pathPitch
+        this.rotate_in_yz(marioOffset, marioOffset, pathPitch)
+        pathPitch = -pathPitch
+        vec3f_copy(focOffset, marioOffset)
+
+        // OK
+        focOffset[0] = -focOffset[0] * 0.0
+        focOffset[1] = focOffset[1] * 0.0
+
+        // Repeat above calcs with camOffset
+        camOffset[0] = pos[0] - parMidPoint[0]
+        camOffset[1] = pos[1] - parMidPoint[1]
+        camOffset[2] = pos[2] - parMidPoint[2]
+        pathYaw = -pathYaw
+        this.rotate_in_xz(camOffset, camOffset, pathYaw)
+        pathYaw = -pathYaw
+        pathPitch = -pathPitch
+        this.rotate_in_yz(camOffset, camOffset, pathPitch)
+        pathPitch = -pathPitch
+        vec3f_copy(focOffset, marioOffset)
+
+        // If Mario is distThresh units away from the camera along the path, move the camera
+        //! When distThresh != 0, it causes Mario to move slightly towards the camera when running sideways
+        //! Set each ParallelTrackingPoint's distThresh to 0 to make Mario truly run parallel to the path
+        if (marioOffset[2] > camOffset[2]) {
+            if (marioOffset[2] - camOffset[2] > distThresh) {
+                camOffset[2] = marioOffset[2] - distThresh
+            }
+        } else {
+            if (marioOffset[2] - camOffset[2] < -distThresh) {
+                camOffset[2] = marioOffset[2] + distThresh
+            }
+        }
+
+        // If zoom != 0.0, the camera will move zoom% closer to Mario
+        marioOffset[0] = -marioOffset[0] * zoom
+        marioOffset[1] = marioOffset[1] * zoom
+        marioOffset[2] = camOffset[2]
+
+        //! Does nothing because focOffset[0] is always 0
+        focOffset[0] *= 0.3
+        //! Does nothing because focOffset[1] is always 0
+        focOffset[1] *= 0.3
+
+        pathAngle[0] = pathPitch
+        pathAngle[1] = pathYaw //! No effect
+
+        // make marioOffset[2] == distance from the start of the path
+        marioOffset[2] = pathLength / 2 - marioOffset[2]
+
+        pathAngle[1] = pathYaw + DEGREES(180)
+        pathAngle[2] = 0
+
+        // Rotate the offset in the direction of the path again
+        offset_rotated(pos, path[0], marioOffset, pathAngle)
+        wrapper = {dist: camParDist, pitch: pathPitch, yaw: pathYaw}
+        vec3f_get_dist_and_angle(path[0], c.pos, wrapper)
+        camParDist = wrapper.dist; pathPitch = wrapper.pitch; pathYaw = wrapper.yaw;
+
+        // Adjust the focus. Does nothing, focus is set to Mario at the end
+        focOffset[2] = pathLength / 2 - focOffset[2]
+        offset_rotated(c.focus, path[0], focOffset, pathAngle)
+
+        // Changing paths, update the stored position offset
+        if (sStatusFlags & CAM_FLAG_CHANGED_PARTRACK_INDEX) {
+            sStatusFlags &= ~CAM_FLAG_CHANGED_PARTRACK_INDEX
+            this.sParTrackTransOff.pos[0] = oldPos[0] - c.pos[0]
+            this.sParTrackTransOff.pos[1] = oldPos[1] - c.pos[1]
+            this.sParTrackTransOff.pos[2] = oldPos[2] - c.pos[2]
+        }
+        // Slowly transition to the next path
+        wrapper = {current: this.sParTrackTransOff.pos[0]}
+        this.approach_f32_asymptotic_bool(wrapper, 0.0, 0.025);
+        this.sParTrackTransOff.pos[0] = wrapper.current; wrapper.current = this.sParTrackTransOff.pos[1]
+        this.approach_f32_asymptotic_bool(wrapper, 0.0, 0.025);
+        this.sParTrackTransOff.pos[1] = wrapper.current; wrapper.current = this.sParTrackTransOff.pos[2]
+        this.approach_f32_asymptotic_bool(wrapper, 0.0, 0.025);
+        this.sParTrackTransOff.pos[2] = wrapper.current
+        vec3f_add(c.pos, this.sParTrackTransOff.pos);
+        
+        // Check if the camera should go to the next path
+        if (this.sParTrackPath[this.sParTrackIndex + 1].startOfPath != 0) {
+            // get Mario's distance to the next path
+            wrapper = {pitch: nextPitch, yaw: nextYaw}
+            this.calculate_angles(this.sParTrackPath[this.sParTrackIndex + 1].pos, this.sParTrackPath[this.sParTrackIndex + 2].pos, wrapper)
+            prevPitch = wrapper.pitch; prevYaw = wrapper.yaw
+            vec3f_set_dist_and_angle(this.sParTrackPath[this.sParTrackIndex].pos, nextPathPos, 400.0, prevPitch, prevYaw)
+            distToPrev = this.calc_abs_dist(marioPos, nextPathPos)
+
+            // get Mario's distance to the previous path
+            wrapper = {pitch: prevPitch, yaw: prevYaw}
+            this.calculate_angles(this.sParTrackPath[this.sParTrackIndex + 1].pos, this.sParTrackPath[this.sParTrackIndex].pos, wrapper)
+            nextPitch = wrapper.pitch; nextYaw = wrapper.yaw
+            vec3f_set_dist_and_angle(this.sParTrackPath[this.sParTrackIndex + 1].pos, nextPathPos, 400.0, nextPitch, nextYaw)
+            distToNext = this.calc_abs_dist(marioPos, prevPathPos)
+
+            if (distToPrev > distToNext) {
+                this.sParTrackIndex--
+                this.sStatusFlags |= CAM_FLAG_CHANGED_PARTRACK_INDEX
+            }
+        }
+        // Update the camera focus and return the camera's yaw
+        vec3f_copy(focus, marioPos)
+        wrapper = {dist: camParDist, pitch: pathPitch, yaw: pathYaw}
+        vec3f_get_dist_and_angle(focus, pos, wrapper)
+        return wrapper.yaw
+    }
+
+    update_fixed_camera(c, focus, pos) {
+        let focusFloorOff = 0
+        let goalHeight = 0
+        let ceilHeight = 0
+        let heightOffset = 0
+        let distCamToFocus = 0
+        let scaleToMario = 0.5
+        let pitch = 0
+        let yaw = 0
+        let faceAngle = [0, 0, 0]
+        let ceiling = Object.assign({}, surfaceObj)
+        let basePos = [0, 0, 0]
+
+        this.play_camera_buzz_if_c_sideways()
+
+        // Don't move closer to Mario in these areas
+        switch (Area.gCurrLevelArea) {
+            case AREA_RR:
+                scaleToMario = 0.0
+                heightOffset = 0.0
+                break
+            case AREA_CASTLE_LOBBY:
+                scaleToMario = 0.3
+                heightOffset = 0.0
+                break
+            case AREA_BBH:
+                scaleToMario = 0.0
+                heightOffset = 0.0
+                break
+        }
+
+        this.handle_c_button_movement(c)
+        this.play_camera_buzz_if_cdown()
+
+        let wrapper = { posOff: focusFloorOff, focOff: this.posOff }
+        this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
+        focusFloorOff = wrapper.posOff
+        console.log(focusFloorOff)
+        this.vec3f_copy(focus, this.gPlayerCameraState.pos)
+        focus[1] += focusFloorOff
+        wrapper = { dist: distCamToFocus, pitch: faceAngle[0], yaw: faceAngle[1] }
+        MathUtil.vec3f_get_dist_and_angle(focus, c.pos, wrapper)
+        distCamToFocus = wrapper.dist
+        faceAngle[0] = wrapper.pitch
+        faceAngle[1] = wrapper.yaw
+        faceAngle[2] = 0
+
+        this.vec3f_copy(basePos, this.sFixedModeBasePosition)
+        MathUtil.vec3f_add(basePos, this.sCastleEntranceOffset)
+
+        if (this.sMarioGeometry.currFloorType != SURFACE_DEATH_PLANE
+            && this.sMarioGeometry.currFloorHeight != FLOOR_LOWER_LIMIT) {
+            goalHeight = this.sMarioGeometry.currFloorHeight + basePos[1] + heightOffset
+        } else {
+            goalHeight = this.gLakituState.goalPos[1]
+        }
+
+        if (300 > distCamToFocus) {
+            goalHeight += 300 - distCamToFocus
+        }
+
+        ceilHeight = SurfaceCollision.find_ceil(c.pos[0], goalHeight - 100.0, c.pos[2], ceiling)
+        if (ceilHeight != CELL_HEIGHT_LIMIT) {
+            ceilHeight -= 125.0
+            if (goalHeight > ceilHeight) {
+                goalHeight = ceilHeight
+            }
+        }
+
+        if (this.sStatusFlags & CAM_FLAG_SMOOTH_MOVEMENT) {
+            wrapper = { current: c.pos[1] }
+            this.camera_approach_f32_symmetric_bool(wrapper, goalHeight, 15.0)
+            c.pos[1] = wrapper.current
+        } else {
+            if (goalHeight < this.gPlayerCameraState.pos[1] - 500.0) {
+                goalHeight = this.gPlayerCameraState.pos[1] - 500.0
+            }
+            c.pos[1] = goalHeight
+        }
+
+        c.pos[0] = basePos[0] + (this.gPlayerCameraState.pos[0] - basePos[0]) * scaleToMario
+        c.pos[2] = basePos[2] + (this.gPlayerCameraState.pos[2] - basePos[2]) * scaleToMario
+
+        if (scaleToMario != 0.0) {
+            wrapper = { dist: distCamToFocus, pitch: pitch, yaw: yaw }
+            MathUtil.vec3f_get_dist_and_angle(c.focus, c.pos, wrapper)
+            distCamToFocus = wrapper.dist
+            pitch = wrapper.pitch
+            yaw = wrapper.yaw
+            if (distCamToFocus > 1000.0) {
+                distCamToFocus = 1000.0
+                MathUtil.vec3f_set_dist_and_angle(c.focus, c.pos, distCamToFocus, pitch, yaw)
+            }
+        }
+
+        return faceAngle[1]
+    }
+
     // ---------------- //
 
     select_mario_cam_mode() {
@@ -1399,7 +1699,7 @@ class Camera {
 
         yaw = this.gPlayerCameraState.faceAngle[1] + yawOff
         c.focus[0] = this.gPlayerCameraState.pos[0] + forwBack * sins(yaw) + leftRight * coss(yaw)
-        // c.focus[1] = this.gPlayerCameraState.pos[1] + yOff + focFloorYOff
+        c.focus[1] = this.gPlayerCameraState.pos[1] + yOff + focFloorYOff
         c.focus[2] = this.gPlayerCameraState.pos[2] + forwBack * coss(yaw) + leftRight * sins(yaw)
     }
 
@@ -2168,6 +2468,24 @@ class Camera {
         this.mode_default_camera(c)
     }
 
+    play_camera_buzz_if_cdown() {
+        if (this.sCButtonsPressed & D_CBUTTONS) {
+            this.play_sound_button_change_blocked()
+        }
+    }
+
+    play_camera_buzz_if_cbutton() {
+        if (this.sCButtonsPressed & CBUTTON_MASK) {
+            this.play_sound_button_change_blocked()
+        }
+    }
+
+    play_camera_buzz_if_c_sideways() {
+        if ((this.sCButtonsPressed & L_CBUTTONS) || (this.sCButtonsPressed & R_CBUTTONS)) {
+            this.play_sound_button_change_blocked()
+        }
+    }
+
     play_sound_cbutton_up() {
         play_sound(SOUND_MENU_CAMERA_ZOOM_IN, gGlobalSoundSource)
     }
@@ -2735,134 +3053,6 @@ class Camera {
         }
         Hud.set_hud_camera_status(status)
         return status
-    }
-
-    update_parallel_tracking_camera(c, focus, pos) {
-        let path = [ [0, 0, 0], [0, 0, 0] ]
-        let parMidPoint = [0, 0, 0]
-        let marioOffset = [0, 0, 0]
-        let camOffset = [0, 0, 0]
-        /// Adjusts the focus to look where Mario is facing. Unused since marioOffset is copied to focus
-        let focOffset = [0, 0, 0]
-        let pathPitch = 0
-        let pathYaw = 0
-        let distThresh = 0
-        let zoom = 0
-        let camParDist = 0
-        let pathLength = 0
-        let parScale = 0.5
-        let marioFloorDist = 0
-        let marioPos = [0, 0, 0]
-        let pathAngle = [0, 0, 0]
-        // Variables for changing to the next/prev path in the list
-        let oldPos = [0, 0, 0]
-        let prevPathPos = [0, 0, 0]
-        let nextPathPos = [0, 0, 0]
-        let distToNext = [0, 0, 0]
-        let distToPrev = [0, 0, 0]
-        let prevPitch = [0, 0, 0]
-        let nextPitch = [0, 0, 0]
-        let prevYaw = [0, 0, 0]
-        let nextYaw = [0, 0, 0]
-        throw "Update Parallel Tracking Camera"
-    }
-
-    update_fixed_camera(c, focus, pos) {
-        let focusFloorOff = 0
-        let goalHeight = 0
-        let ceilHeight = 0
-        let heightOffset = 0
-        let distCamToFocus = 0
-        let scaleToMario = 0.5
-        let pitch = 0
-        let yaw = 0
-        let faceAngle = [0, 0, 0]
-        let ceiling = Object.assign({}, surfaceObj)
-        let basePos = [0, 0, 0]
-
-        // play_camera_buzz_if_c_sideways()
-
-        // Don't move closer to Mario in these areas
-        switch (Area.gCurrLevelArea) {
-            case AREA_RR:
-                scaleToMario = 0.0
-                heightOffset = 0.0
-                break
-            case AREA_CASTLE_LOBBY:
-                scaleToMario = 0.3
-                heightOffset = 0.0
-                break
-            case AREA_BBH:
-                scaleToMario = 0.0
-                heightOffset = 0.0
-                break
-        }
-
-        this.handle_c_button_movement(c)
-        // play_camera_buzz_if_cdown()
-
-        let wrapper = { posOff: focusFloorOff, focOff: this.posOff }
-        this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
-        focusFloorOff = wrapper.posOff
-        console.log(focusFloorOff)
-        this.vec3f_copy(focus, this.gPlayerCameraState.pos)
-        focus[1] += focusFloorOff
-        wrapper = { dist: distCamToFocus, pitch: faceAngle[0], yaw: faceAngle[1] }
-        MathUtil.vec3f_get_dist_and_angle(focus, c.pos, wrapper)
-        distCamToFocus = wrapper.dist
-        faceAngle[0] = wrapper.pitch
-        faceAngle[1] = wrapper.yaw
-        faceAngle[2] = 0
-
-        this.vec3f_copy(basePos, this.sFixedModeBasePosition)
-        MathUtil.vec3f_add(basePos, this.sCastleEntranceOffset)
-
-        if (this.sMarioGeometry.currFloorType != SURFACE_DEATH_PLANE
-            && this.sMarioGeometry.currFloorHeight != FLOOR_LOWER_LIMIT) {
-            goalHeight = this.sMarioGeometry.currFloorHeight + basePos[1] + heightOffset
-        } else {
-            goalHeight = this.gLakituState.goalPos[1]
-        }
-
-        if (300 > distCamToFocus) {
-            goalHeight += 300 - distCamToFocus
-        }
-
-        ceilHeight = SurfaceCollision.find_ceil(c.pos[0], goalHeight - 100.0, c.pos[2], ceiling)
-        if (ceilHeight != CELL_HEIGHT_LIMIT) {
-            ceilHeight -= 125.0
-            if (goalHeight > ceilHeight) {
-                goalHeight = ceilHeight
-            }
-        }
-
-        if (this.sStatusFlags & CAM_FLAG_SMOOTH_MOVEMENT) {
-            wrapper = { current: c.pos[1] }
-            this.camera_approach_f32_symmetric_bool(wrapper, goalHeight, 15.0)
-            c.pos[1] = wrapper.current
-        } else {
-            if (goalHeight < this.gPlayerCameraState.pos[1] - 500.0) {
-                goalHeight = this.gPlayerCameraState.pos[1] - 500.0
-            }
-            c.pos[1] = goalHeight
-        }
-
-        c.pos[0] = basePos[0] + (this.gPlayerCameraState.pos[0] - basePos[0]) * scaleToMario
-        c.pos[2] = basePos[2] + (this.gPlayerCameraState.pos[2] - basePos[2]) * scaleToMario
-
-        if (scaleToMario != 0.0) {
-            wrapper = { dist: distCamToFocus, pitch: pitch, yaw: yaw }
-            MathUtil.vec3f_get_dist_and_angle(c.focus, c.pos, wrapper)
-            distCamToFocus = wrapper.dist
-            pitch = wrapper.pitch
-            yaw = wrapper.yaw
-            if (distCamToFocus > 1000.0) {
-                distCamToFocus = 1000.0
-                MathUtil.vec3f_set_dist_and_angle(c.focus, c.pos, distCamToFocus, pitch, yaw)
-            }
-        }
-
-        return faceAngle[1]
     }
 
     update_boss_fight_camera(c, focus, pos) {

@@ -642,7 +642,7 @@ export const SET_RANDOM_INT = (...args)            => {return {command: Beh.set_
 export const SET_RANDOM_FLOAT = (...args)          => {return {command: Beh.set_random_float, args: {field: args[0], minimum: args[1], range: args[2]}}}
 export const SET_INT_RAND_RSHIFT = (...args)       => {return {command: Beh.set_int_rand_rshift, args: {field: args[0], minimum: args[1], rshift: args[2]}}}  
 export const SUM_FLOAT = (...args)                 => {return {command: Beh.sum_float, args: {dest: args[0], value1: args[1], value2: args[2]}}}
-export const SPAWN_CHILD = (...args)               => {return {command: Beh.spawn_child_with_param, args: {bhvParam: args[0], model: args[1], behavior: args[2]}}}
+export const SPAWN_CHILD = (...args)               => {return {command: Beh.spawn_child_with_param, args: {bhvParam: 0, model: args[0], behavior: args[1]}}}
 export const SPAWN_CHILD_WITH_PARAM = (...args)    => {return {command: Beh.spawn_child_with_param, args: {bhvParam: args[0], model: args[1], behavior: args[2]}}}
 export const SPAWN_OBJ = (...args)                 => {return {command: Beh.spawn_obj, args: {model: args[0], behavior: args[1]}}}
 export const SPAWN_WATER_DROPLET = (...args)       => {return {command: Beh.cmd_spawn_water_droplet, args: {params: args[0]}}}

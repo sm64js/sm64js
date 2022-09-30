@@ -1483,7 +1483,7 @@ const bhvCannonBarrel = [
 const bhvCannon = [
     BEGIN(OBJ_LIST_LEVEL, 'bhvCannon'),
     OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    SPAWN_CHILD(0, /*Model*/ MODEL_CANNON_BARREL, /*Behavior*/ bhvCannonBarrel),
+    SPAWN_CHILD(/*Model*/ MODEL_CANNON_BARREL, /*Behavior*/ bhvCannonBarrel),
     SET_INT(oInteractType, INTERACT_CANNON_BASE),
     ADD_FLOAT(oPosY, -340),
     SET_HOME(),

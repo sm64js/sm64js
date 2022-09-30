@@ -46,6 +46,7 @@ import { approach_f32 } from "../engine/math_util"
 import { SURFACE_CLOSE_CAMERA } from "../include/surface_terrains"
 import { SURFACE_NO_CAM_COL_SLIPPERY } from "../include/surface_terrains"
 import { ACT_GETTING_BLOWN } from "./Mario"
+import { LEVEL_MAX } from "../levels/level_defines_constants"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -369,6 +370,18 @@ export const CAM_FOV_APP_60      = 11
 export const CAM_FOV_ZOOM_30     = 12
 export const CAM_FOV_SET_29      = 13
 
+export const ZOOMOUT_AREA_MASK = (level1Area1, level1Area2, level1Area3, level1Area4,
+                                  level2Area1, level2Area2, level2Area3, level2Area4) => {
+    return ((level2Area4) << 7 |
+            (level2Area3) << 6 |
+            (level2Area2) << 5 |
+            (level2Area1) << 4 |
+            (level1Area4) << 3 |
+            (level1Area3) << 2 |
+            (level1Area2) << 1 |
+            (level1Area1) << 0)
+}
+
 class Camera {
     constructor() {
         this.floor = null
@@ -495,6 +508,29 @@ class Camera {
         }
 
         this.sHandheldShakeRoll = 0
+
+        this.sZoomOutAreaMasks = [
+            ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // Unused         | Unused
+            ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // Unused         | Unused
+            ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // BBH            | CCM
+            ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // CASTLE_INSIDE  | HMC
+            ZOOMOUT_AREA_MASK(1,0,0,0, 1,0,0,0), // SSL            | BOB
+            ZOOMOUT_AREA_MASK(1,0,0,0, 1,0,0,0), // SL             | WDW
+            ZOOMOUT_AREA_MASK(0,0,0,0, 1,1,0,0), // JRB            | THI
+            ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // TTC            | RR
+            ZOOMOUT_AREA_MASK(1,0,0,0, 1,0,0,0), // CASTLE_GROUNDS | BITDW
+            ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // VCUTM          | BITFS
+            ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // SA             | BITS
+            ZOOMOUT_AREA_MASK(1,0,0,0, 0,0,0,0), // LLL            | DDD
+            ZOOMOUT_AREA_MASK(1,0,0,0, 0,0,0,0), // WF             | ENDING
+            ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // COURTYARD      | PSS
+            ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // COTMC          | TOTWC
+            ZOOMOUT_AREA_MASK(1,0,0,0, 1,0,0,0), // BOWSER_1       | WMOTR
+            ZOOMOUT_AREA_MASK(0,0,0,0, 1,0,0,0), // Unused         | BOWSER_2
+            ZOOMOUT_AREA_MASK(1,0,0,0, 0,0,0,0), // BOWSER_3       | Unused
+            ZOOMOUT_AREA_MASK(1,0,0,0, 0,0,0,0), // TTM            | Unused
+            ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // Unused         | Unused
+        ]
 
         this.sBBHLibraryParTrackPath = [
             {startOfPath: 1, pos: [-929.0, 1619.0, -1490.0], distThresh: 50.0, zoom: 0.0},
@@ -3288,11 +3324,294 @@ class Camera {
 
     }
 
-    // ---------------- //
+    /**
+     * Reset all the camera variables to their arcane defaults
+     */
+    reset_camera(c) {
+        this.gCamera = c
+        this.gCameraMovementFlags = 0
+        this.s2ndRotateFlags = 0
+        this.sStatusFlags = 0
+        this.gCutsceneTimer = 0
+        this.sCutsceneShot = 0
+        this.gCutsceneObjSpawn = 0
+        this.gObjCutsceneDone = false
+        this.gCutsceneFocus = null
+
+        this.gSecondCameraFocus = null
+        this.sCButtonsPressed = 0
+        this.sModeTransition.marioPos = [...this.gPlayerCameraState.pos]
+        this.sModeTransition.framesLeft = 0
+
+        this.gCameraMovementFlags = 0
+        this.gCameraMovementFlags |= CAM_MOVE_INIT_CAMERA
+        this.sStatusFlags = 0
+
+        this.sCameraSoundFlags = 0
+        this.sCUpCameraPitch = 0
+        this.sModeOffsetYaw = 0
+        this.sSpiralStairsYawOffset = 0
+        this.sLakituDist = 0
+        this.sLakituPitch = 0
+        this.sAreaYaw = 0
+        this.sAreaYawChange = 0
+        this.sPanDistance = 0
+        this.sCannonYOffset = 0
+        this.sZoomAmount = 0
+        this.sZeroZoomDist = 0
+
+        this.sModeInfo = {
+            newMode: 0,
+            lastMode: 0,
+            max: 0,
+            frame: 0,
+            transitionStart: {
+                focus: [0, 0, 0],
+                pos: [0, 0, 0],
+                dist: 0,
+                pitch: 0,
+                yaw: 0
+            },
+            transitionEnd: {
+                focus: [0, 0, 0],
+                pos: [0, 0, 0],
+                dist: 0,
+                pitch: 0,
+                yaw: 0
+            }
+        }
+
+        this.sBehindMarioSoundTimer = 0
+        this.sCSideButtonYaw = 0
+        this.s8DirModeBaseYaw = 0
+        this.s8DirModeYawOffset = 0
+        c.doorStatus = DOOR_DEFAULT
+
+        this.gPlayerCameraState.headRotation[0] = 0
+        this.gPlayerCameraState.headRotation[1] = 0
+
+        this.gPlayerCameraState.cameraEvent = 0
+        this.gPlayerCameraState.usedObj = null
+
+        this.gLakituState.lastFrameAction = 0
+        this.sFOVState.fovFunc = CAM_FOV_DEFAULT
+        this.sFOVState.fov = 45
+        this.sFOVState.fovOffset = 0
+    }
+
+    init_camera(c) {
+        this.sCreditsPlayer2Pitch = 0
+        this.sCreditsPlayer2Yaw = 0
+        this.gPrevLevel = this.gCurrLevelArea / 16
+        this.gCurrLevelArea = Area.gCurrLevelNum * 16 + Area.gCurrentArea.index
+        this.sSelectionFlags &= CAM_MODE_MARIO_SELECTED
+        this.sFramesPaused = 0
+        this.gLakituState.mode = c.mode
+        this.gLakituState.defMode = c.defMode
+        this.gLakituState.posHSpeed = 0.3
+        this.gLakituState.posVSpeed = 0.3
+        this.gLakituState.focHSpeed = 0.8
+        this.gLakituState.focHSpeed = 0.3 // @bug set focHSpeed back-to-back
+        this.gLakituState.roll = 0
+        this.gLakituState.keyDanceRoll = 0
+        this.sHandheldShakeMag = 0
+        this.sHandheldShakeInc = 0.0
+
+        this.sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT
+
+        this.sCastleEntranceOffset = [0, 0, 0]
+        this.sPlayer2FocusOffset = [0, 0, 0] 
+
+        this.find_mario_floor_and_ceil(this.sMarioGeometry)
+        this.sMarioGeometry.prevFloorHeight = this.sMarioGeometry.currFloorHeight 
+        this.sMarioGeometry.prevCeilHeight = this.sMarioGeometry.currCeilHeight
+        this.sMarioGeometry.prevFloor = this.sMarioGeometry.currFloor
+        this.sMarioGeometry.prevCeil = this.sMarioGeometry.currCeil
+        this.sMarioGeometry.prevFloorType = this.sMarioGeometry.currFloorType
+        this.sMarioGeometry.prevCeilType = this.sMarioGeometry.currCeilType
+
+        c.cutscene = 0
+        const marioOffset = [0, 125, 400]
+
+        switch (Area.gCurrLevelNum) {
+            case LEVEL_BOWSER_1:
+                this.start_cutscene(c, CUTSCENE_ENTER_BOWSER_ARENA)
+                break
+            case LEVEL_BOWSER_2:
+                this.start_cutscene(c, CUTSCENE_ENTER_BOWSER_ARENA)
+                break
+            case LEVEL_BOWSER_3:
+                this.start_cutscene(c, CUTSCENE_ENTER_BOWSER_ARENA)
+                break
+
+            //! Hardcoded position checks determine which cutscene to play when Mario enters castle grounds.
+            case LEVEL_CASTLE_GROUNDS:
+                if (!this.is_within_100_units_of_mario(-1328, 260, 4646)) {
+                    marioOffset[0] = -400
+                    marioOffset[2] = -800
+                }
+                if (this.is_within_100_units_of_mario(-6901.0, 2376.0, -6509.0)) {
+                    this.start_cutscene(c, CUTSCENE_EXIT_WATERFALL)
+                }
+                if (this.is_within_100_units_of_mario(5408.0, 4500.0, 3637.0)) {
+                    this.start_cutscene(c, CUTSCENE_EXIT_FALL_WMOTR)
+                }
+                this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
+                break
+            case LEVEL_SA:
+                marioOffset[2] = 200.0
+                break
+            case LEVEL_CASTLE_COURTYARD:
+                marioOffset[2] = -300.0
+                break
+            case LEVEL_LLL:
+                this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
+                break;
+            case LEVEL_CASTLE:
+                marioOffset[2] = 150.0
+                break
+            case LEVEL_RR:
+                vec3f_set(this.sFixedModeBasePosition, -2985.0, 478.0, -5568.0)
+                break
+        }
+        switch (this.gCurrLevelArea) {
+            case AREA_SSL_EYEROK:
+                vec3f_set(marioOffset, 0.0, 500.0, -100.0)
+                break
+            case AREA_CCM_SLIDE:
+                marioOffset[2] = -300.0
+                break
+            case AREA_THI_WIGGLER:
+                marioOffset[2] = -300.0
+                break
+            case AREA_SL_IGLOO:
+                marioOffset[2] = -300.0
+                break
+            case AREA_SL_OUTSIDE:
+                if (this.is_within_100_units_of_mario(257.0, 2150.0, 1399.0)) {
+                    marioOffset[2] = -300.0
+                }
+                break
+            case AREA_CCM_OUTSIDE:
+                this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
+                break
+            case AREA_TTM_OUTSIDE:
+                this.gLakituState.mode = CAMERA_MODE_RADIAL
+                break
+        }
+        if (!this.gLakituState.mode) this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
+        c.mode = this.gLakituState.mode
+
+        if (c.mode == CAMERA_MODE_8_DIRECTIONS) {
+            this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
+        }
+
+        this.offset_rotated(c.pos, this.gPlayerCameraState.pos, marioOffset, this.gPlayerCameraState.faceAngle)
+        if (c.mode != CAMERA_MODE_BEHIND_MARIO) {
+            c.pos[1] = SurfaceCollision.find_floor(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 100, this.gPlayerCameraState.pos[2], this) + 125
+        }
+        c.focus = [...this.gPlayerCameraState.pos]
+        this.gLakituState.curPos = [...c.pos]
+        this.gLakituState.curFocus = [...c.focus]
+        this.gLakituState.goalPos = [...c.pos]
+        this.gLakituState.goalFocus = [...c.focus]
+        this.gLakituState.pos = [...c.pos]
+        this.gLakituState.focus = [...c.focus]
+
+        this.gLakituState.yaw = this.calculate_yaw(c.focus, c.pos)
+        this.gLakituState.nextYaw = this.gLakituState.yaw
+        c.yaw = this.gLakituState.yaw
+        c.nextYaw = this.gLakituState.yaw
+    }
+
+    /**
+     * Zooms out the camera if paused and the level is 'outside', as determined by sZoomOutAreaMasks.
+     *
+     * Because gCurrLevelArea is assigned gCurrLevelNum * 16 + gCurrentArea->index,
+     * dividing by 32 maps 2 levels to one index.
+     *
+     * areaBit definition:
+     * (gCurrLevelArea & 0x10) / 4):
+     *      This adds 4 to the shift if the level is an odd multiple of 16
+     *
+     * ((gCurrLevelArea & 0xF) - 1) & 3):
+     *      This isolates the lower 16 'area' bits, subtracts 1 because areas are 1-indexed, and effectively
+     *      modulo-4's the result, because each 8-bit mask only has 4 area bits for each level
+     */
+    zoom_out_if_paused_and_outside(c) {
+        let areaMaskIndex = this.gCurrLevelArea / 32
+        let areaBit = 2 << (((this.gCurrLevelArea & 0x10) / 4) + (((this.gCurrLevelArea & 0xF) - 1) & 3))
+
+        if (areaMaskIndex >= LEVEL_MAX / 2) {
+            areaMaskIndex = 0
+            areaBit = 0
+        }
+        if (this.gCameraMovementFlags & CAM_MOVE_PAUSE_SCREEN) {
+            if (this.sFramesPaused >= 2) {
+                if (this.sZoomOutAreaMasks[areaMaskIndex] & areaBit) {
+                    
+                    c.focus[0] = this.gCamera.areaCenX
+                    c.focus[1] = (this.gPlayerCameraState.pos[1] + this.gCamera/areaCenY) / 2
+                    c.focus[2] = this.gCamera.areaCenZ
+                    let wrapper = {}
+                    vec3f_get_dist_and_angle(c.focus, this.gPlayerCameraState.pos, wrapper)
+                    let yaw = wrapper.yaw
+                    vec3f_set_dist_and_angle(this.gPlayerCameraState.pos, c.pos, 6000.0, 0x1000, yaw)
+                    if (Area.gCurrLevelNum != LEVEL_THI) {
+                        this.find_in_bounds_yaw_wdw_bob_thi(c.pos, c.focus, 0)
+                    }
+                }
+            } else {
+                this.sFramesPaused++
+            }
+        } else {
+            this.sFramesPaused = 0
+        }
+    }
 
     select_mario_cam_mode() {
         this.sSelectionFlags = CAM_MODE_MARIO_SELECTED
     }
+
+    /**
+     * Allocate the GraphNodeCamera's config.camera, and copy `c`'s focus to the Camera's area center point.
+     */
+    create_camera(graphNode) {
+        const mode = graphNode.config.mode
+
+        graphNode.config.camera = {
+            mode: mode,
+            defMode: mode,
+            cutscene: 0,
+            doorStatus: DOOR_DEFAULT,
+            areaCenX: graphNode.focus[0],
+            areaCenY: graphNode.focus[1],
+            areaCenZ: graphNode.focus[2],
+            yaw: 0,
+            pos: [...graphNode.pos],
+            focus: [...graphNode.focus]
+        }
+    }
+
+    update_graph_node_camera(graphNode) {
+        graphNode.rollScreen = this.gLakituState.roll
+        graphNode.pos = [...this.gLakituState.pos]
+        graphNode.focus = [...this.gLakituState.focus]
+        this.zoom_out_if_paused_and_outside(graphNode)
+    }
+
+    geo_camera_main(callContext, graphNode) {
+        switch (callContext) {
+            case GEO_CONTEXT_CREATE:
+                this.create_camera(graphNode)
+                break
+            case GEO_CONTEXT_RENDER:
+                this.update_graph_node_camera(graphNode)
+                break
+        }
+    }
+
+    // ---------------- //
 
     clamp_pitch(from, to, maxPitch, minPitch) {
         let outOfRange = 0
@@ -3766,221 +4085,6 @@ class Camera {
         } else {
             c.pos[1] = goal
         }
-    }
-
-    reset_camera(c) {
-        this.gCamera = c
-        this.gCameraMovementFlags = 0
-        this.s2ndRotateFlags = 0
-        this.sStatusFlags = 0
-        this.gCutsceneTimer = 0
-        this.sCutsceneShot = 0
-        this.gCutsceneObjSpawn = 0
-        this.gObjCutsceneDone = false
-        this.gCutsceneFocus = null
-
-        this.gSecondCameraFocus = null
-        this.sCButtonsPressed = 0
-        this.sModeTransition.marioPos = [...this.gPlayerCameraState.pos]
-        this.sModeTransition.framesLeft = 0
-
-        this.gCameraMovementFlags = 0
-        this.gCameraMovementFlags |= CAM_MOVE_INIT_CAMERA
-        this.sStatusFlags = 0
-
-        this.sCameraSoundFlags = 0
-        this.sCUpCameraPitch = 0
-        this.sModeOffsetYaw = 0
-        this.sSpiralStairsYawOffset = 0
-        this.sLakituDist = 0
-        this.sLakituPitch = 0
-        this.sAreaYaw = 0
-        this.sAreaYawChange = 0
-        this.sPanDistance = 0
-        this.sCannonYOffset = 0
-        this.sZoomAmount = 0
-        this.sZeroZoomDist = 0
-
-        this.sModeInfo = {
-            newMode: 0,
-            lastMode: 0,
-            max: 0,
-            frame: 0,
-            transitionStart: {
-                focus: [0, 0, 0],
-                pos: [0, 0, 0],
-                dist: 0,
-                pitch: 0,
-                yaw: 0
-            },
-            transitionEnd: {
-                focus: [0, 0, 0],
-                pos: [0, 0, 0],
-                dist: 0,
-                pitch: 0,
-                yaw: 0
-            }
-        }
-
-        this.sBehindMarioSoundTimer = 0
-        this.sCSideButtonYaw = 0
-        this.s8DirModeBaseYaw = 0
-        this.s8DirModeYawOffset = 0
-        c.doorStatus = DOOR_DEFAULT
-
-        this.gPlayerCameraState.headRotation[0] = 0
-        this.gPlayerCameraState.headRotation[1] = 0
-
-        this.gPlayerCameraState.cameraEvent = 0
-        this.gPlayerCameraState.usedObj = null
-
-        this.gLakituState.lastFrameAction = 0
-        this.sFOVState.fovFunc = CAM_FOV_DEFAULT
-        this.sFOVState.fov = 45
-        this.sFOVState.fovOffset = 0
-    }
-
-    create_camera(graphNode) {
-        const mode = graphNode.config.mode
-
-        graphNode.config.camera = {
-            mode: mode,
-            defMode: mode,
-            cutscene: 0,
-            doorStatus: DOOR_DEFAULT,
-            areaCenX: graphNode.focus[0],
-            areaCenY: graphNode.focus[1],
-            areaCenZ: graphNode.focus[2],
-            yaw: 0,
-            pos: [...graphNode.pos],
-            focus: [...graphNode.focus]
-        }
-    }
-
-
-    init_camera(c) {
-        this.sCreditsPlayer2Pitch = 0
-        this.sCreditsPlayer2Yaw = 0
-        this.gPrevLevel = this.gCurrLevelArea / 16
-        this.gCurrLevelArea = Area.gCurrLevelNum * 16 + Area.gCurrentArea.index
-        this.sSelectionFlags &= CAM_MODE_MARIO_SELECTED
-        this.sFramesPaused = 0
-        this.gLakituState.mode = c.mode
-        this.gLakituState.defMode = c.defMode
-        this.gLakituState.posHSpeed = 0.3
-        this.gLakituState.posVSpeed = 0.3
-        this.gLakituState.focHSpeed = 0.8
-        this.gLakituState.focHSpeed = 0.3 // @bug set focHSpeed back-to-back
-        this.gLakituState.roll = 0
-        this.gLakituState.keyDanceRoll = 0
-        this.sHandheldShakeMag = 0
-        this.sHandheldShakeInc = 0.0
-
-        this.sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT
-
-        this.sCastleEntranceOffset = [0, 0, 0]
-        this.sPlayer2FocusOffset = [0, 0, 0] 
-
-        this.find_mario_floor_and_ceil(this.sMarioGeometry)
-        this.sMarioGeometry.prevFloorHeight = this.sMarioGeometry.currFloorHeight 
-        this.sMarioGeometry.prevCeilHeight = this.sMarioGeometry.currCeilHeight
-        this.sMarioGeometry.prevFloor = this.sMarioGeometry.currFloor
-        this.sMarioGeometry.prevCeil = this.sMarioGeometry.currCeil
-        this.sMarioGeometry.prevFloorType = this.sMarioGeometry.currFloorType
-        this.sMarioGeometry.prevCeilType = this.sMarioGeometry.currCeilType
-
-        c.cutscene = 0
-        const marioOffset = [0, 125, 400]
-
-        switch (Area.gCurrLevelNum) {
-            case LEVEL_BOWSER_1:
-                this.start_cutscene(c, CUTSCENE_ENTER_BOWSER_ARENA)
-                break
-            case LEVEL_BOWSER_2:
-                this.start_cutscene(c, CUTSCENE_ENTER_BOWSER_ARENA)
-                break
-            case LEVEL_BOWSER_3:
-                this.start_cutscene(c, CUTSCENE_ENTER_BOWSER_ARENA)
-                break
-
-            //! Hardcoded position checks determine which cutscene to play when Mario enters castle grounds.
-            case LEVEL_CASTLE_GROUNDS:
-                if (!this.is_within_100_units_of_mario(-1328, 260, 4646)) {
-                    marioOffset[0] = -400
-                    marioOffset[2] = -800
-                }
-                if (this.is_within_100_units_of_mario(-6901.0, 2376.0, -6509.0)) {
-                    this.start_cutscene(c, CUTSCENE_EXIT_WATERFALL)
-                }
-                if (this.is_within_100_units_of_mario(5408.0, 4500.0, 3637.0)) {
-                    this.start_cutscene(c, CUTSCENE_EXIT_FALL_WMOTR)
-                }
-                this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
-                break
-            case LEVEL_SA:
-                marioOffset[2] = 200.0
-                break
-            case LEVEL_CASTLE_COURTYARD:
-                marioOffset[2] = -300.0
-                break
-            case LEVEL_LLL:
-                this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
-                break;
-            case LEVEL_CASTLE:
-                marioOffset[2] = 150.0
-                break
-            case LEVEL_RR:
-                vec3f_set(this.sFixedModeBasePosition, -2985.0, 478.0, -5568.0)
-                break
-        }
-        switch (this.gCurrLevelArea) {
-            case AREA_SSL_EYEROK:
-                vec3f_set(marioOffset, 0.0, 500.0, -100.0)
-                break
-            case AREA_CCM_SLIDE:
-                marioOffset[2] = -300.0
-                break
-            case AREA_THI_WIGGLER:
-                marioOffset[2] = -300.0
-                break
-            case AREA_SL_IGLOO:
-                marioOffset[2] = -300.0
-                break
-            case AREA_SL_OUTSIDE:
-                if (this.is_within_100_units_of_mario(257.0, 2150.0, 1399.0)) {
-                    marioOffset[2] = -300.0
-                }
-                break
-            case AREA_CCM_OUTSIDE:
-                this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
-                break
-            case AREA_TTM_OUTSIDE:
-                this.gLakituState.mode = CAMERA_MODE_RADIAL
-                break
-        }
-        if (!this.gLakituState.mode) this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
-        c.mode = this.gLakituState.mode
-
-        if (c.mode == CAMERA_MODE_8_DIRECTIONS) {
-            this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
-        }
-
-        this.offset_rotated(c.pos, this.gPlayerCameraState.pos, marioOffset, this.gPlayerCameraState.faceAngle)
-        if (c.mode != CAMERA_MODE_BEHIND_MARIO) {
-            c.pos[1] = SurfaceCollision.find_floor(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 100, this.gPlayerCameraState.pos[2], this) + 125
-        }
-        c.focus = [...this.gPlayerCameraState.pos]
-        this.gLakituState.curPos = [...c.pos]
-        this.gLakituState.curFocus = [...c.focus]
-        this.gLakituState.goalPos = [...c.pos]
-        this.gLakituState.goalFocus = [...c.focus]
-        this.gLakituState.pos = [...c.pos]
-        this.gLakituState.focus = [...c.focus]
-
-        this.gLakituState.yaw = this.calculate_yaw(c.focus, c.pos)
-        this.gLakituState.nextYaw = this.gLakituState.yaw
-        c.yaw = this.gLakituState.yaw
-        c.nextYaw = this.gLakituState.yaw
     }
 
     find_c_buttons_pressed(currentState) {
@@ -4921,12 +5025,6 @@ class Camera {
         return yaw
     }
 
-    update_graph_node_camera(graphNode) {
-        graphNode.rollScreen = this.gLakituState.roll
-        graphNode.pos = [...this.gLakituState.pos]
-        graphNode.focus = [...this.gLakituState.focus]
-    }
-
     check_blocking_area_processing(mode) {
         if (this.gPlayerCameraState.action & Mario.ACT_FLAG_METAL_WATER || mode == CAMERA_MODE_BEHIND_MARIO || mode == CAMERA_MODE_WATER_SURFACE) {
             this.sStatusFlags |= CAM_FLAG_BLOCK_AREA_PROCESSING
@@ -4938,18 +5036,6 @@ class Camera {
 
         if ((mode == CAMERA_MODE_BEHIND_MARIO && !(this.gPlayerCameraState.action &(Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER))) || mode == CAMERA_MODE_INSIDE_CANNON) {
             this.sStatusFlags |= CAM_FLAG_BLOCK_AREA_PROCESSING
-        }
-    }
-
-    geo_camera_main(callContext, graphNode) {
-
-        switch (callContext) {
-            case GEO_CONTEXT_CREATE:
-                this.create_camera(graphNode)
-                break
-            case GEO_CONTEXT_RENDER:
-                this.update_graph_node_camera(graphNode)
-                break
         }
     }
 

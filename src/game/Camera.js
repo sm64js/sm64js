@@ -884,7 +884,7 @@ class Camera {
             this.approach_camera_height(c, goalHeight, 5.0)
         } else {
             ceilWrapper.floor = ceilWrapper.ceil
-            camFloorHeight = find_floor(c.pos[0], c.pos[1] + 100.0, c.pos[2], ceilWrapper)
+            camFloorHeight = SurfaceCollision.find_floor(c.pos[0], c.pos[1] + 100.0, c.pos[2], ceilWrapper)
             surface = ceilWrapper.floor
             marioFloorHeight = baseOff + this.sMarioGeometry.currFloorHeight
 

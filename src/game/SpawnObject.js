@@ -177,7 +177,7 @@ class SpawnObject {
             objListIndex == ObjectListProc.OBJ_LIST_PUSHABLE) {
                 this.snap_object_to_floor(obj)
             }
-
+            console.log(obj)
         return obj
     }
 }

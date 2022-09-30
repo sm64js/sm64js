@@ -467,7 +467,7 @@ class BehaviorCommands {
                 throw "unlinked spawn_child behavior: " + args.behavior
             }
         }
-        console.log(args.bhvParam, args,model, args.behavior)
+        console.log(args.bhvParam, args.model, args.behavior)
         const child = spawn_object_at_origin(gCurrentObject, args.model, behavior)
         obj_copy_pos_and_angle(child, gCurrentObject)
         child.rawData[oBehParams2ndByte] = args.bhvParam

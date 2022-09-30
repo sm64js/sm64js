@@ -187,7 +187,6 @@ class ObjectListProcessor {
         let count = 0
         while (objList != firstObj) {
             this.gCurrentObject = firstObj
-            console.log(this.gCurrentObject)
             this.gCurrentObject.gfx.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION
             gLinker.BehaviorCommands.cur_obj_update()
             firstObj = firstObj.next

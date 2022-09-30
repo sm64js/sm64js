@@ -867,7 +867,7 @@ class Camera {
         let camCeilHeight = SurfaceCollision.find_ceil(c.pos[0], this.gLakituState.goalPos[1] - 50.0, c.pos[2], ceilWrapper)
         surface = ceilWrapper.ceil
 
-        if (this.gPlayerCameraState.action & ACT_FLAG_HANGING) {
+        if (this.gPlayerCameraState.action & Mario.ACT_FLAG_HANGING) {
             marioCeilHeight = this.sMarioGeometry.currCeilHeight
             marioFloorHeight = this.sMarioGeometry.currFloorHeight
 
@@ -896,9 +896,9 @@ class Camera {
                 c.pos[1] = goalHeight
             }
             // Warp camera to goalHeight if further than 1000 and Mario is stuck in the ground
-            if (this.gPlayerCameraState.action == ACT_BUTT_STUCK_IN_GROUND ||
-                this.gPlayerCameraState.action == ACT_HEAD_STUCK_IN_GROUND ||
-                this.gPlayerCameraState.action == ACT_FEET_STUCK_IN_GROUND) {
+            if (this.gPlayerCameraState.action == Mario.ACT_BUTT_STUCK_IN_GROUND ||
+                this.gPlayerCameraState.action == Mario.ACT_HEAD_STUCK_IN_GROUND ||
+                this.gPlayerCameraState.action == Mario.ACT_FEET_STUCK_IN_GROUND) {
                 if (Math.abs(c.pos[1] - goalHeight) > 1000.0) {
                     c.pos[1] = goalHeight
                 }

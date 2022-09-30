@@ -51,6 +51,8 @@ import { SEQUENCE_ARGS } from "../audio/external"
 import { SEQ_EVENT_PEACH_MESSAGE } from "../include/seq_ids"
 import { play_music } from "../audio/external"
 import { SEQ_EVENT_CUTSCENE_INTRO } from "../include/seq_ids"
+import { SURFACE_CAMERA_FREE_ROAM } from "../include/surface_terrains"
+import { SURFACE_CAMERA_8_DIR } from "../include/surface_terrains"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -386,6 +388,8 @@ export const ZOOMOUT_AREA_MASK = (level1Area1, level1Area2, level1Area3, level1A
             (level1Area1) << 0)
 }
 
+export const NULL_TRIGGER = [0, null, 0, 0, 0, 0, 0, 0, 0]
+
 class Camera {
     constructor() {
         this.floor = null
@@ -549,6 +553,34 @@ class Camera {
             {startOfPath: 1, pos: [-929.0, 1619.0, -1490.0], distThresh: 50.0, zoom: 0.0},
             {startOfPath: 0, pos: [-2118.0, 1619.0, -1490.0], distThresh: 50.0, zoom: 0.0},
             {startOfPath: 0, pos: [0.0, 0.0, 0.0], distThresh: 0.0, zoom: 0.0},
+        ]
+
+        // {area: , event: , centerX: , centerY: , centerZ: , boundsX: , boundsY: , boundsZ: , boundsYaw: }
+        
+        /**
+         * The SL triggers operate camera behavior in front of the snowman who blows air.
+         * The first sets a 8 direction mode, while the latter (which encompasses the former)
+         * sets free roam mode.
+         *
+         * This behavior is exploitable, since the ranges assume that Mario must pass through the latter on
+         * exit. Using hyperspeed, the earlier area can be directly exited from, keeping the changes it applies.
+         */
+        this.sCamSL = [
+            {area: 1, event: this.cam_sl_snowman_head_8dir.bind(this), centerX: 1119, centerY: 3584, centerZ: 1125, boundsX: 1177, boundsY: 358, boundsZ: 358, boundsYaw: -0x1D27},
+            // This trigger surrounds the previous one
+            {area: 1, event: this.cam_sl_free_roam.bind(this), centerX: 1119, centerY: 3584, centerZ: 1125, boundsX: 4096, boundsY: 4096, boundsZ: 4096, boundsYaw: -0x1D27},
+            NULL_TRIGGER
+        ]
+
+        /**
+         * The THI triggers are specifically for the tunnel near the start of the Huge Island.
+         * The first helps the camera from getting stuck on the starting side, the latter aligns with the
+         * tunnel. Both sides achieve their effect by editing the camera yaw.
+         */
+        this.sCamTHI = [
+            {area: 1, event: this.cam_thi_move_cam_through_tunnel, centerX: -4609, centerY: -2969, centerZ: 6448, boundsX: 100, boundsY: 300, boundsZ: 300, boundsYaw: 0},
+            {area: 1, event: this.cam_thi_look_through_tunnel, centerX: -4809, centerY: -2969, centerZ: 6448, boundsX: 100, boundsY: 300, boundsZ: 300, boundsYaw: 0},
+            NULL_TRIGGER
         ]
 
         this.sCutsceneStarSpawn = [
@@ -5998,8 +6030,74 @@ class Camera {
         this.sStatusFlags &= ~CAM_FLAG_CCM_SLIDE_SHORTCUT
     }
 
+    /**
+     * Apply any modes that are triggered by special floor surface types
+     */
     surface_type_modes(c) {
         let modeChanged = 0
+
+        switch (this.sMarioGeometry.currFloorType) {
+            case SURFACE_CLOSE_CAMERA:
+                this.transition_to_camera_mode(c, CAMERA_MODE_CLOSE, 90)
+                modeChanged++
+                break
+
+            case SURFACE_CAMERA_FREE_ROAM:
+                this.transition_to_camera_mode(c, CAMERA_MODE_FREE_ROAM, 90)
+                modeChanged++
+                break
+
+            case SURFACE_NO_CAM_COL_SLIPPERY:
+                this.transition_to_camera_mode(c, CAMERA_MODE_CLOSE, 90)
+                modeChanged++
+                break
+        }
+        return modeChanged
+    }
+
+    /**
+     * Set the camera mode to `mode` if Mario is not standing on a special surface
+     */
+    set_mode_if_not_set_by_surface(c, mode) {
+        let modeChanged = this.surface_type_modes(c)
+
+        if (modeChanged == 0 && mode != 0) {
+            this.transition_to_camera_mode(c, mode, 90)
+        }
+
+        return modeChanged
+    }
+
+    /**
+     * Used in THI, check if Mario is standing on any of the special surfaces in that area
+     */
+    surface_type_modes_thi(c) {
+        switch (this.sMarioGeometry.currFloorType) {
+            case SURFACE_CLOSE_CAMERA:
+                if (c.mode != CAMERA_MODE_CLOSE) {
+                    this.transition_to_camera_mode(c, CAMERA_MODE_FREE_ROAM, 90)
+                }
+                break
+
+            case SURFACE_CAMERA_FREE_ROAM:
+                if (c.mode != CAMERA_MODE_CLOSE) {
+                    this.transition_to_camera_mode(c, CAMERA_MODE_FREE_ROAM, 90)
+                }
+                break
+
+            case SURFACE_NO_CAM_COL_SLIPPERY:
+                if (c.mode != CAMERA_MODE_CLOSE) {
+                    this.transition_to_camera_mode(c, CAMERA_MODE_FREE_ROAM, 90)
+                }
+                break
+
+            case SURFACE_CAMERA_8_DIR:
+                this.transition_to_camera_mode(c, CAMERA_MODE_8_DIRECTIONS, 90)
+                break
+
+            default:
+                this.transition_to_camera_mode(c, CAMERA_MODE_RADIAL, 90)
+        }
     }
 
     // ---------------- //

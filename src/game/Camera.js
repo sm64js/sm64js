@@ -43,6 +43,8 @@ import { ACT_RIDING_HOOT } from "./Mario"
 import { vec3f_copy } from "../engine/math_util"
 import { vec3f_get_dist_and_angle } from "../engine/math_util"
 import { approach_f32 } from "../engine/math_util"
+import { SURFACE_CLOSE_CAMERA } from "../include/surface_terrains"
+import { SURFACE_NO_CAM_COL_SLIPPERY } from "../include/surface_terrains"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -424,13 +426,13 @@ class Camera {
             this.update_c_up.bind(this),
             this.update_mario_camera.bind(this),
             this.nop_update_water_camera.bind(this),
-            null, // this.update_slide_or_0f_camera(c, focus, pos).bind(this),
+            this.update_slide_or_0f_camera.bind(this),
             null, // this.update_in_cannon(c, focus, pos).bind(this),
             this.update_boss_fight_camera.bind(this),
             this.update_parallel_tracking_camera.bind(this),
             this.update_fixed_camera.bind(this),
             this.update_8_directions_camera.bind(this),
-            null, // this.update_slide_or_0f_camera(c, focus, pos).bind(this),
+            this.update_slide_or_0f_camera.bind(this),
             this.update_mario_camera.bind(this),
             this.update_spiral_stairs_camera.bind(this),
         ]
@@ -2578,6 +2580,28 @@ class Camera {
         c.nextYaw = this.update_spiral_stairs_camera(c, c.focus, c.pos)
     }
 
+    update_slide_or_0f_camera(c, focus, pos) {
+        let yaw = this.gPlayerCameraState.faceAngle[1] + this.sModeOffsetYaw + DEGREES(180)
+        
+        this.focus_on_mario(focus, pos, 125.0, 125.0, 800.0, 5461, yaw)
+        return this.gPlayerCameraState.faceAngle[1]
+    }
+
+    /**
+     * Slide/hoot mode.
+     * In this mode, the camera is always at the back of Mario, because Mario generally only moves forward.
+     */
+    mode_slide_camera(c) {
+        if (this.sMarioGeometry.currFloorType == SURFACE_CLOSE_CAMERA || this.sMarioGeometry.currFloorType == SURFACE_NO_CAM_COL_SLIPPERY) {
+            this.mode_lakitu_camera()
+        } else {
+            if (this.sCButtonsPressed & U_CBUTTONS) {
+                this.gCameraMovementFlags |= CAM_MOVE_C_UP_MODE
+            }
+            c.nextYaw = this.update_slide_camera(c)
+        }
+    }
+
     // ---------------- //
 
     select_mario_cam_mode() {
@@ -3950,9 +3974,9 @@ class Camera {
                         this.mode_parallel_tracking_camera(c);
                         break;
 
-                    // case CAMERA_MODE_SLIDE_HOOT:
-                    //     mode_slide_camera(c);
-                    //     break;
+                    case CAMERA_MODE_SLIDE_HOOT:
+                        mode_slide_camera(c);
+                        break;
 
                     case CAMERA_MODE_FIXED:
                         this.mode_fixed_camera(c);

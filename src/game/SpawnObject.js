@@ -158,7 +158,6 @@ class SpawnObject {
 
     create_object(bhvScript) {
         bhvScript = this.get_bhv_script(bhvScript)
-        console.log(bhvScript)
         if (!bhvScript) {
             return null
         }

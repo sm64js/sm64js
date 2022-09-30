@@ -42,6 +42,7 @@ import { SOUND_MENU_CLICK_CHANGE_VIEW } from "../include/sounds"
 import { ACT_RIDING_HOOT } from "./Mario"
 import { vec3f_copy } from "../engine/math_util"
 import { vec3f_get_dist_and_angle } from "../engine/math_util"
+import { approach_f32 } from "../engine/math_util"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -422,7 +423,7 @@ class Camera {
             null,
             this.update_c_up.bind(this),
             this.update_mario_camera.bind(this),
-            null, // this.nop_update_water_camera(c, focus, pos).bind(this),
+            this.nop_update_water_camera.bind(this),
             null, // this.update_slide_or_0f_camera(c, focus, pos).bind(this),
             null, // this.update_in_cannon(c, focus, pos).bind(this),
             this.update_boss_fight_camera.bind(this),
@@ -431,7 +432,7 @@ class Camera {
             this.update_8_directions_camera.bind(this),
             null, // this.update_slide_or_0f_camera(c, focus, pos).bind(this),
             this.update_mario_camera.bind(this),
-            null, // this.update_spiral_stairs_camera(c, focus, pos).bind(this),
+            this.update_spiral_stairs_camera.bind(this),
         ]
 
         this.sCameraStoreCutscene = {
@@ -1788,6 +1789,795 @@ class Camera {
         vec3f_set(this.sCastleEntranceOffset, 0.0, 0.0, 0.0)
     }
 
+    /**
+     * Updates the camera in BEHIND_MARIO mode.
+     *
+     * The C-Buttons rotate the camera 90 degrees left/right and 67.5 degrees up/down.
+     */
+    update_behind_mario_camera(c, focus, pos) {
+        let absPitch
+        let dist, pitch, yaw
+        let goalPitch = this.gPlayerCameraState.faceAngle[0]
+        let marioYaw = s16(this.gPlayerCameraState.faceAngle[1] + DEGREES(180))
+        let goalYawOff = 0
+        let yawSpeed
+        let pitchInc = 32
+        let maxDist = 800
+        let focYOff = 125
+        let wrapper = {}
+        let distPitchYaw = {}
+
+        // Zoom in when Mario R_TRIG mode is active
+        if (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
+            maxDist = 350
+            focYOff = 120
+        }
+        if (!(this.gPlayerCameraState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER))) {
+            pitchInc = 128
+        }
+
+        // Focus on Mario
+        this.vec3f_copy(focus, this.gPlayerCameraState.pos)
+        c.focus[1] += focYOff
+        //! @bug unnecessary
+        // dist = calc_abs_dist(focus, pos);
+        //! @bug unnecessary
+        // pitch = calculate_pitch(focus, pos);
+        MathUtil.vec3f_get_dist_and_angle(focus, pos, distPitchYaw);
+        ({dist, pitch, yaw} = distPitchYaw)
+        if (dist > maxDist) {
+            dist = maxDist
+        }
+        if ((absPitch = pitch) < 0) {
+            absPitch = -absPitch
+        }
+
+        // Determine the yaw speed based on absPitch. A higher absPitch (further away from looking straight)
+        // translates to a slower speed
+        // Note: Pitch is always within +- 90 degrees or +-0x4000, and 0x4000 / 0x200 = 32
+        yawSpeed = s16(32 - s16(absPitch / 0x200))
+        if (yawSpeed < 1) {
+            yawSpeed = 1
+        }
+        if (yawSpeed > 32) {
+            yawSpeed = 32
+        }
+
+        if (this.sCSideButtonYaw != 0) {
+            wrapper.current = this.sCSideButtonYaw
+            this.camera_approach_s16_symmetric_bool(wrapper, 0, 1)
+            this.sCSideButtonYaw = wrapper.current
+            yawSpeed = 8
+        }
+        if (this.sBehindMarioSoundTimer != 0) {
+            goalPitch = 0
+            wrapper.current = this.sBehindMarioSoundTimer
+            this.camera_approach_s16_symmetric_bool(wrapper, 0, 1)
+            this.sBehindMarioSoundTimer = wrapper.current
+            pitchInc = 0x800
+        }
+
+        if (this.sBehindMarioSoundTimer == 28) {
+            if (this.sCSideButtonYaw < 5 || this.sCSideButtonYaw > 28) {
+                this.play_sound_cbutton_up();
+            }
+        }
+        if (this.sCSideButtonYaw == 28) {
+            if (this.sBehindMarioSoundTimer < 5 || this.sBehindMarioSoundTimer > 28) {
+                this.play_sound_cbutton_up();
+            }
+        }
+
+        // C-Button input. Note: Camera rotates in the opposite direction of the button (airplane controls)
+        //! @bug C-Right and C-Up take precedence due to the way input is handled here
+
+        // Rotate right
+        if (this.sCButtonsPressed & L_CBUTTONS) {
+            if (window.playerInput.buttonPressedCl) {
+                this.play_sound_cbutton_side();
+            }
+            if (dist < maxDist) {
+                wrapper.current = dist
+                this.camera_approach_f32_symmetric_bool(wrapper, maxDist, 5)
+                dist = wrapper.current
+            }
+            goalYawOff = -0x3FF8
+            this.sCSideButtonYaw = 30
+            yawSpeed = 2
+        }
+        // Rotate left
+        if (this.sCButtonsPressed & R_CBUTTONS) {
+            if (window.playerInput.buttonPressedCr) {
+                this.play_sound_cbutton_side();
+            }
+            if (dist < maxDist) {
+                wrapper.current = dist
+                this.camera_approach_f32_symmetric_bool(wrapper, maxDist, 5)
+                dist = wrapper.current
+            }
+            goalYawOff = 0x3FF8
+            this.sCSideButtonYaw = 30
+            yawSpeed = 2
+        }
+        // Rotate up
+        if (this.sCButtonsPressed & D_CBUTTONS) {
+            if (window.playerInput.buttonPressedCu || window.playerInput.buttonPressedCd) {
+                this.play_sound_cbutton_side();
+            }
+            if (dist < maxDist) {
+                wrapper.current = dist
+                this.camera_approach_f32_symmetric_bool(wrapper, maxDist, 5)
+                dist = wrapper.current                
+            }
+            goalPitch = -0x3000
+            this.sBehindMarioSoundTimer = 30
+            pitchInc = 0x800
+        }
+        // Rotate down
+        if (this.sCButtonsPressed & U_CBUTTONS) {
+            if (window.playerInput.buttonPressedCu || window.playerInput.buttonPressedCd) {
+                this.play_sound_cbutton_side();
+            }
+            if (dist < maxDist) {
+                wrapper.current = dist
+                this.camera_approach_f32_symmetric_bool(wrapper, maxDist, 5)
+                dist = wrapper.current                
+            }
+            goalPitch = 0x3000
+            this.sBehindMarioSoundTimer = 30
+            pitchInc = 0x800
+        }
+
+        wrapper.current = yaw
+        this.approach_s16_asymptotic_bool(wrapper, s16(marioYaw + goalYawOff), yawSpeed)
+        yaw = wrapper.current
+
+        wrapper.current = pitch
+        this.camera_approach_s16_symmetric_bool(wrapper, goalPitch, pitchInc)
+        pitch = wrapper.current
+        if (dist < 300) {
+            dist = 300
+        }
+        MathUtil.vec3f_set_dist_and_angle(focus, pos, dist, pitch, yaw)
+        if (this.gCurrLevelArea == AREA_WDW_MAIN) {
+            yaw = this.clamp_positions_and_find_yaw(pos, focus, 4508, -3739, 4508, -3739)
+        }
+        if (this.gCurrLevelArea == AREA_THI_HUGE) {
+            yaw = this.clamp_positions_and_find_yaw(pos, focus, 8192, -8192, 8192, -8192)
+        }
+        if (this.gCurrLevelArea == AREA_THI_TINY) {
+            yaw = this.clamp_positions_and_find_yaw(pos, focus, 2458, -2458, 2458, -2458)
+        }
+
+        return yaw
+    }
+
+    /**
+     * "Behind Mario" mode: used when Mario is flying, on the water's surface, or shot from a cannon
+     */
+    mode_behind_mario(c) {
+        const marioState = LevelUpdate.gMarioState
+        let newPos = [], oldPos = []
+        let waterHeight, floorHeight
+        const distPitchYaw = {}
+        let yaw
+
+        this.vec3f_copy(oldPos, c.pos)
+        this.gCameraMovementFlags &= ~CAM_MOVING_INTO_MODE
+        this.vec3f_copy(newPos, c.pos)
+        yaw = this.update_behind_mario_camera(c, c.focus, newPos)
+        c.pos[0] = newPos[0]
+        c.pos[2] = newPos[2]
+
+        // Keep the camera above the water surface if swimming
+        if (c.mode == CAMERA_MODE_WATER_SURFACE) {
+            floorHeight = SurfaceCollision.find_floor(c.pos[0], c.pos[1], c.pos[2], {})
+            newPos[1] = marioState.waterLevel + 120
+            if (newPos[1] < (floorHeight += 120)) {
+                newPos[1] = floorHeight
+            }
+        }
+        this.approach_camera_height(c, newPos[1], 50)
+        waterHeight = SurfaceCollision.find_water_level(c.pos[0], c.pos[2]) + 100
+        if (c.pos[1] <= waterHeight) {
+            this.gCameraMovementFlags |= CAM_MOVE_SUBMERGED
+        } else {
+            this.gCameraMovementFlags &= ~CAM_MOVE_SUBMERGED
+        }
+
+        this.resolve_geometry_collisions(c.pos, oldPos)
+        // Prevent camera getting too far away
+        MathUtil.vec3f_get_dist_and_angle(c.focus, c.pos, distPitchYaw)
+        if (distPitchYaw.dist > 800) {
+            distPitchYaw.dist = 800
+            MathUtil.vec3f_set_dist_and_angle(c.focus, c.pos, distPitchYaw.dist, distPitchYaw.pitch, distPitchYaw.yaw);
+        }
+        this.pan_ahead_of_player(c)
+
+        return yaw
+    }
+
+    /**
+     * Update the camera in slide and hoot mode.
+     *
+     * In slide mode, keep the camera 800 units from Mario
+     */
+    update_slide_camera(c) {
+        let floor = null
+        let floorHeight
+        let pos = [0, 0, 0]
+        let distCamToFocus
+        let maxCamDist
+        let pitchScale
+        let camPitch
+        let camYaw
+        let goalPitch = 0x1555
+        let goalYaw = this.gPlayerCameraState.faceAngle[1] + DEGREES(180)
+
+        // Zoom in when inside the CCM shortcut
+        if (this.sStatusFlags & CAM_FLAG_CCM_SLIDE_SHORTCUT) {
+            this.sLakituDist = approach_f32(this.sLakituDist, -600.0, 20.0, 20.0)
+        } else {
+            this.sLakituDist = approach_f32(this.sLakituDist, 0.0, 20.0, 20.0)
+        }
+
+        // No C-Button input in this mode, notify the player with a buzzer
+        play_camera_buzz_if_cbutton()
+
+        // Focus on Mario
+        vec3f_copy(c.focus, this.gPlayerCameraState.pos)
+        c.focus[1] += 50.0
+
+        let wrapper = {dist: distCamToFocus, pitch: camPitch, yaw: camYaw}
+        vec3f_get_dist_and_angle(c.focus, c.pos, wrapper)
+        distCamToFocus = wrapper.dist; camPitch = wrapper.pitch; camYaw = wrapper.yaw;
+        maxCamDist = 800.0
+
+        // In hoot mode, zoom further out and rotate faster
+        wrapper.current = camYaw
+        if (this.gPlayerCameraState.action == Mario.ACT_RIDING_HOOT) {
+            maxCamDist = 1000.0
+            goalPitch = 0x2800
+            this.camera_approach_s16_symmetric_bool(wrapper, goalYaw, 0x100)
+        } else {
+            this.camera_approach_s16_symmetric_bool(wrapper, goalYaw, 0x80)
+        }
+        camYaw = wrapper.current; wrapper.current = camPitch
+        this.camera_approach_s16_symmetric_bool(wrapper, goalPitch, 0x100)
+        camPitch = wrapper.current
+
+        // Hoot mode
+        if (this.gPlayerCameraState.action != Mario.ACT_RIDING_HOOT && this.sMarioGeometry.currFloorType == SURFACE_DEATH_PLANE) {
+            wrapper = {}
+            vec3f_set_dist_and_angle(c.focus, pos, maxCamDist + this.sLakituDist, camPitch, camYaw)
+            c.pos[0] = pos[0]
+            c.pos[2] = pos[2]
+            wrapper.current = c.pos[1]
+            this.camera_approach_f32_symmetric_bool(wrapper, c.focus, 30.0)
+            c.pos[1] = wrapper.current; wrapper = {dist: distCamToFocus, pitch: camPitch, yaw: camYaw}
+            vec3f_get_dist_and_angle(c.pos, c.focus, wrapper)
+            distCamToFocus = wrapper.dist; camPitch = wrapper.pitch; camYaw = wrapper.yaw;
+            pitchScale = (distCamToFocus - maxCamDist + this.sLakituDist) / 10000.0
+            if (pitchScale > 1.0) {
+                pitchScale = 1.0
+            }
+            camPitch += 0x1000 * pitchScale
+            vec3f_set_dist_and_angle(c.pos, c.focus, distCamToFocus, camPitch, camYaw)
+        
+        // Slide mode
+        } else {
+            vec3f_set_dist_and_angle(c.focus, c.pos, maxCamDist + this.sLakituDist, camPitch, camYaw)
+            this.sStatusFlags |= CAM_FLAG_BLOCK_SMOOTH_MOVEMENT
+            
+            // Stay above the slide floor
+            wrapper.floor = floor
+            floorHeight = SurfaceCollision.find_floor(c.pos[0], c.pos[1] + 200.0, c.pos[2], wrapper) + 125.0
+            floor = wrapper.floor
+            if (c.pos[1] < floorHeight) {
+                c.pos[1] = floorHeight
+            }
+            // Stay closer than maxCamDist
+            wrapper = {dist: distCamToFocus, pitch: camPitch, yaw: camYaw}
+            vec3f_get_dist_and_angle(c.focus, c.pos, wrapper)
+            distCamToFocus = wrapper.dist; camPitch = wrapper.pitch; camYaw = wrapper.yaw
+            if (distCamToFocus > maxCamDist + this.sLakituDist) {
+                distCamToFocus = maxCamDist + this.sLakituDist
+                vec3f_set_dist_and_angle(c.focus, c.pos, distCamToFocus, camPitch, camYaw)
+            }
+        }
+
+        camYaw = this.calculate_yaw(c.focus, c.pos)
+        return camYaw
+    }
+
+    mode_behind_mario_camera(c) {
+        c.nextYaw = this.mode_behind_mario(c)
+    }
+
+    nop_update_water_camera(c, focus, pos) {
+        return 0
+    }
+
+    /**
+     * Exactly the same as BEHIND_MARIO
+     */
+    mode_water_surface_camera(c) {
+        c.nextYaw = this.mode_behind_mario(c)
+    }
+
+    /**
+     * Used in sModeTransitions for CLOSE and FREE_ROAM mode
+     */
+    update_mario_camera(c, focus, pos) {
+        let yaw = this.gPlayerCameraState.faceAngle[1] + this.sModeOffsetYaw + DEGREES(180)
+        this.focus_on_mario(focus, pos, 125, 125, this.gCameraZoomDist, 0x05B0, yaw)
+
+        return this.gPlayerCameraState.faceAngle[1]
+    }
+
+    /**
+     * Update the camera in default, close, and free roam mode
+     *
+     * The camera moves behind Mario, and can rotate all the way around
+     */
+    update_default_camera(c) {
+        const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
+
+        let tempPos = [0, 0, 0]
+        let cPos = [0, 0, 0]
+        let marioFloor = Object.assign({}, surfaceObj)
+        let cFloor = Object.assign({}, surfaceObj)
+        let tempFloor = Object.assign({}, surfaceObj)
+        let ceil = Object.assign({}, surfaceObj)
+        let camFloorHeight = 0
+        let tempFloorHeight = 0
+        let marioFloorHeight = 0
+        let dist = 0
+        let zoomDist = 0
+        let waterHeight = 0
+        let gasHeight = 0
+        let avoidYaw = 0
+        let pitch = 0
+        let yaw = 0
+        let yawGoal = this.gPlayerCameraState.faceAngle[1] + DEGREES(180)
+        let posHeight = 0
+        let focHeight = 0
+        let distFromWater = 0
+        let tempPitch = 0
+        let tempYaw = 0
+        let xzDist = 0
+        let nextYawVel = 0
+        let yawVel = 0
+        let scale = 0
+        let avoidStatus = 0
+        let closeToMario = 0
+        let ceilHeight = 20000
+        let distPitchYaw = SurfaceCollision.find_ceil(this.gLakituState.goalPos[0], this.gLakituState.goalPos[1], this.gLakituState.goalPos[2], ceil)
+        let yawDir = 0
+
+        this.handle_c_button_movement(c);
+        let wrapper = { dist: dist, pitch: pitch, yaw: yaw }
+        MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper);
+        dist = wrapper.dist; pitch = wrapper.pitch; yaw = wrapper.yaw
+
+        // If C-Down is active, determine what distance the camera should be from mario
+        if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
+            //! In Mario mode, the camera is zoomed out further than in lakitu mode (1400 vs 1200)
+            if (this.set_cam_angle(0) == CAM_ANGLE_MARIO) {
+                zoomDist = this.gCameraZoomDist + 1050;
+            } else {
+                zoomDist = this.gCameraZoomDist + 400;
+            }
+        } else {
+            zoomDist = this.gCameraZoomDist;
+        }
+
+        if (this.gPlayerCameraState.action & Mario.ACT_FLAG_HANGING || this.gPlayerCameraState.action == Mario.ACT_RIDING_HOOT) {
+            zoomDist *= 0.8
+            this.set_handheld_shake(HAND_CAM_SHAKE_HANG_OWL)
+        }
+        
+        // If not zooming out, only allow dist to decrease
+        if (this.sZoomAmount == 0.0) {
+            if (dist > zoomDist) {
+                dist -= 50
+                if (dist < zoomDist) {
+                    dist = zoomDist
+                }
+            }
+        } else {
+            if ((this.sZoomAmount -= 30) < 0) {
+                this.sZoomAmount = 0
+            }
+            if (dist > zoomDist) {
+                if ((dist -= 30) < zoomDist) {
+                    dist = zoomDist
+                }
+            }
+            if (dist < zoomDist) {
+                if ((dist += 30) > zoomDist) {
+                    dist = zoomDist
+                }
+            }
+        }
+
+        // Determine how fast to rotate the camera
+        if (this.sCSideButtonYaw == 0) {
+            if (c.mode == CAMERA_MODE_FREE_ROAM) {
+                nextYawVel = 0xC0
+            } else {
+                nextYawVel = 0x100
+            }
+            if ((window.playerInput.stickX != 0 || window.playerInput.stickY != 0) != 0) {
+                nextYawVel = 0x20
+            }
+        } else {
+            if (this.sCSideButtonYaw < 0) {
+                yaw += 0x200
+            }
+            if (this.sCSideButtonYaw > 0) {
+                yaw -= 0x200
+            }
+            const wrapper = { current: this.sCSideButtonYaw }
+            this.camera_approach_s16_symmetric_bool(wrapper, 0, 0x100)
+            this.sCSideButtonYaw = wrapper.current
+            nextYawVel = 0
+        }
+
+        this.sYawSpeed = 0x400
+        xzDist = this.calc_hor_dist(this.gPlayerCameraState.pos, c.pos)
+
+        if (this.sStatusFlags & CAM_FLAG_BEHIND_MARIO_POST_DOOR) {
+            if (xzDist >= 250) {
+                this.sStatusFlags &= ~CAM_FLAG_BEHIND_MARIO_POST_DOOR
+            }
+            if (Math.abs((this.gPlayerCameraState.faceAngle[1] - yaw) / 2) < 0x1800) {
+                this.sStatusFlags &= ~CAM_FLAG_BEHIND_MARIO_POST_DOOR
+                yaw = this.sCameraYawAfterDoorCutscene + DEGREES(180)
+                dist = 800.0
+                this.sStatusFlags |= CAM_FLAG_BLOCK_SMOOTH_MOVEMENT
+            }
+        } else if (xzDist < 250) {
+            // Turn rapidly if very close to mario
+            c.pos[0] += (250 - xzDist) * sins(yaw)
+            c.pos[2] += (250 - xzDist) * coss(yaw)
+            if (this.sCSideButtonYaw == 0) {
+                nextYawVel = 0x1000
+                this.sYawSpeed = 0
+                wrapper = { dist: dist, pitch: pitch, yaw: yaw }
+                MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper);
+                dist = wrapper.dist; pitch = wrapper.pitch; yaw = wrapper.yaw
+            }
+            closeToMario |= 1
+        }
+
+        if (-16 < window.playerInput.stickY) {
+            c.yaw = yaw
+        }
+
+        wrapper = { posOff: posHeight, focOff: focHeight }
+        this.calc_y_to_curr_floor(wrapper, 1, 200, wrapper, 0.9, 200)
+        posHeight = wrapper.posOff
+        focHeight = wrapper.focOff
+        this.vec3f_copy(cPos, c.pos)
+        wrapper.yaw = avoidYaw
+        this.rotate_camera_around_walls(c, cPos, wrapper, 0x600)
+
+        // If a wall is blocking the view of Mario, then rotate in the calculated direction
+        if (avoidStatus == 3) {
+            this.sAvoidYawVel = yaw
+            this.sStatusFlags |= CAM_FLAG_COLLIDED_WITH_WALL
+            // Rotate to avoid the wall
+            wrapper = { current: yaw }
+            this.approach_s16_asymptotic_bool(wrapper, avoidYaw, 10)
+            yaw = wrapper.current
+            this.sAvoidYawVel = (this.sAvoidYawVel - yaw) / 0x100
+        } else {
+            if (gMarioStates[0].forwardVel == 0.0) {
+                if (this.sStatusFlags & CAM_FLAG_COLLIDED_WITH_WALL) {
+                    if ((yawGoal - yaw) / 0x100 >= 0) {
+                        yawDir = -1
+                    } else {
+                        yawDir = 1
+                    }
+                    if ((this.sAvoidYawVel > 0 && yawDir > 0) || (this.sAvoidYawVel < 0 && yawDir < 0)) {
+                        yawVel = nextYawVel
+                    }
+                } else {
+                    yawVel = nextYawVel
+                }
+            } else {
+                if (nextYawVel == 0x1000) {
+                    yawVel = nextYawVel
+                }
+                this.sStatusFlags &= ~CAM_FLAG_COLLIDED_WITH_WALL
+            }
+
+            // If a wall is near the camera, turn twice as fast
+            if (avoidStatus != 0) {
+                yawVel += yawVel
+            }
+            // ...Unless the camera already rotated from being close to mario
+            if ((closeToMario & 1) && avoidStatus != 0) {
+                yawVel = 0
+            }
+            if (yawVel != 0 /* && get_dialog_id() == DIALOG_NONE */) {
+                const yawWrapper = { current: yaw }
+                this.camera_approach_s16_symmetric_bool(yawWrapper, yawGoal, yawVel)
+                yaw = yawWrapper.current
+            }
+        }
+
+        // Only zoom out if not obstructed by walls and lakitu hasn't collided with any
+        if (avoidStatus == 0 && !(this.sStatusFlags & CAM_FLAG_COLLIDED_WITH_WALL)) {
+            const distWrapper = { current: dist }
+            this.approach_f32_asymptotic_bool(distWrapper, zoomDist - 100, 0.05)
+            dist = distWrapper.current
+        }
+
+        MathUtil.vec3f_set_dist_and_angle(this.gPlayerCameraState.pos, cPos, dist, pitch, yaw)
+        cPos[1] += posHeight + 125.0
+
+        if (this.collide_with_walls(cPos, 10.0, 80.0) != 0) {
+            this.sStatusFlags |= CAM_FLAG_COLLIDED_WITH_WALL
+        }
+
+        c.focus = [
+            this.gPlayerCameraState.pos[0],
+            this.gPlayerCameraState.pos[1] + 125 + focHeight,
+            this.gPlayerCameraState.pos[2]
+        ]
+
+        marioFloorHeight = 125 + this.sMarioGeometry.currFloorHeight
+        marioFloor = this.sMarioGeometry.currFloor
+
+        camFloorHeight = SurfaceCollision.find_floor(cPos[0], cPos[1] + 50, cPos[2], cFloor) + 125
+
+        for (let scale = 0.1; scale < 1.0; scale += 0.2) {
+            this.scale_along_line(tempPos, cPos, this.gPlayerCameraState.pos, scale)
+            tempFloorHeight = SurfaceCollision.find_floor(tempPos[0], tempPos[1], tempPos[2], tempFloor) + 125
+            if (tempFloor.floor && tempFloorHeight > marioFloorHeight) {
+                marioFloorHeight = tempFloorHeight
+                marioFloor = tempFloor.floor
+            }
+        }
+
+        // Lower the camera in mario mode
+        if (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
+            marioFloorHeight -= 35.0
+            camFloorHeight -= 35.0
+            c.focus[1] -= 25.0
+        }
+
+        // If there's water below the camera, decide whether to keep the camera above the water surface
+        waterHeight = SurfaceCollision.find_water_level(cPos[0], cPos[2])
+        if (waterHeight != FLOOR_LOWER_LIMIT) {
+            waterHeight += 125.0
+            distFromWater = waterHeight - marioFloorHeight
+            if (!(this.gCameraMovementFlags & CAM_MOVE_METAL_BELOW_WATER)) {
+                if (distFromWater > 800.0 && (this.gPlayerCameraState.action & Mario.ACT_FLAG_METAL_WATER)) {
+                    this.gCameraMovementFlags |= CAM_MOVE_METAL_BELOW_WATER
+                }
+            } else {
+                if (distFromWater < 400.0 || !(this.gPlayerCameraState.action & Mario.ACT_FLAG_METAL_WATER)) {
+                    this.gCameraMovementFlags &= ~CAM_MOVE_METAL_BELOW_WATER
+                }
+            }
+            // If not wearing the metal cap, always stay above
+            if (!(this.gCameraMovementFlags & CAM_MOVE_METAL_BELOW_WATER) && camFloorHeight < waterHeight) {
+                camFloorHeight = waterHeight
+            }
+        } else {
+            this.gCameraMovementFlags &= ~CAM_MOVE_METAL_BELOW_WATER
+        }
+
+        cPos[1] = camFloorHeight
+        this.vec3f_copy(tempPos, cPos)
+        tempPos[1] -= 125.0
+        if (marioFloor != null && camFloorHeight <= marioFloorHeight) {
+            avoidStatus = this.is_range_behind_surface(c.focus, tempPos, marioFloor, 0, -1)
+            if (avoidStatus != 1 && ceilHeight > marioFloorHeight) {
+                camFloorHeight = marioFloorHeight
+            }
+        }
+
+        posHeight = 0.0
+        if (c.mode == CAMERA_MODE_FREE_ROAM) {
+            if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
+                posHeight = 375
+                if (this.gCurrLevelArea == AREA_SSL_PYRAMID) {
+                    posHeight /= 2
+                }
+            } else {
+                posHeight = 100.0
+            }
+        }
+        if ((this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) && (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE)) {
+            posHeight = 610
+            if (this.gCurrLevelArea == AREA_SSL_PYRAMID || Area.gCurrLevelNum == LEVEL_CASTLE) {
+                posHeight /= 2
+            }
+        }
+
+        // Make Lakitu fly above the gas
+        gasHeight = SurfaceCollision.find_poison_gas_level(cPos[0], cPos[2])
+        if (gasHeight != FLOOR_LOWER_LIMIT) {
+            gasHeight += 130.0
+            if (gasHeight > c.pos[1]) {
+                c.pos[1] = gasHeight
+            }
+        }
+
+
+        if (this.gPlayerCameraState.action & Mario.ACT_FLAG_HANGING || this.gPlayerCameraState.action == Mario.ACT_RIDING_HOOT) {
+            /// TODO hanging or riding
+        }
+
+        if (this.gPlayerCameraState.action & Mario.ACT_FLAG_ON_POLE) {
+            camFloorHeight = LevelUpdate.gMarioState.usedObj.rawData[oPosY] + 125.0
+            if (this.gPlayerCameraState.pos[1] - 100.0 > camFloorHeight) {
+                camFloorHeight = this.gPlayerCameraState.pos[1] - 100.0
+            }
+            ceilHeight = CELL_HEIGHT_LIMIT
+            this.vec3f_copy(c.focus, this.gPlayerCameraState.pos)
+        }
+        if (camFloorHeight != FLOOR_LOWER_LIMIT) {
+            camFloorHeight += posHeight
+            this.approach_camera_height(c, camFloorHeight, 20.0)
+        }
+        c.pos[0] = cPos[0]
+        c.pos[2] = cPos[2]
+        cPos[0] = this.gLakituState.goalPos[0]
+        cPos[1] = c.pos[1]
+        cPos[2] = this.gLakituState.goalPos[2]
+        wrapper = { dist: dist, pitch: tempPitch, yaw: tempYaw }
+        MathUtil.vec3f_get_dist_and_angle(cPos, c.pos, wrapper)
+        dist = wrapper.dist; tempPitch = wrapper.pitch; tempYaw = wrapper.yaw;
+        // Prevent the camera from lagging behind too much
+        if (dist > 50.0) {
+            dist = 50.0
+            MathUtil.vec3f_set_dist_and_angle(cPos, c.pos, dist, tempPitch, tempYaw)
+        }
+        if (this.sMarioGeometry.currFloorType != SURFACE_DEATH_PLANE) {
+            MathUtil.vec3f_get_dist_and_angle(c.focus, c.pos, wrapper)
+            dist = wrapper.dist; tempPitch = wrapper.pitch; tempYaw = wrapper.yaw;
+            if (dist > zoomDist) {
+                dist = zoomDist
+                MathUtil.vec3f_set_dist_and_angle(c.focus, c.pos, dist, tempPitch, tempYaw)
+            }
+        }
+        if (ceilHeight != CELL_HEIGHT_LIMIT) {
+            ceilHeight -= 150.0
+            avoidStatus = SurfaceCollision.is_range_behind_surface(c.pos, this.gPlayerCameraState.pos, ceil, 0, -1)
+            if (c.pos[1] > ceilHeight && avoidStatus == 1) {
+                c.pos[1] = ceilHeight
+            }
+        }
+
+        if (this.gCurrLevelArea == AREA_WDW_TOWN) {
+            yaw = this.clamp_positions_and_find_yaw(c.pos, c.focus, 2254.0, -3789.0, 3790.0, -2253.0)
+        }
+        return yaw
+
+    }
+
+    /**
+     * The default camera mode
+     * Used by close and free roam modes
+     */
+    mode_default_camera(c) {
+        this.sFOVState.fovFunc = CAM_FOV_DEFAULT
+        c.nextYaw = this.update_default_camera(c)
+        this.pan_ahead_of_player(c)
+    }
+
+    /**
+     * The mode used by close and free roam
+     */
+    mode_lakitu_camera(c) {
+        this.gCameraZoomDist = 800
+        this.mode_default_camera(c)
+    }
+
+    /**
+     * When no other mode is active and the current R button mode is Mario
+     */
+    mode_mario_camera(c) {
+        this.gCameraZoomDist = 350
+        this.mode_default_camera(c)
+    }
+
+    /**
+     * Rotates the camera around the spiral staircase.
+     */
+    update_spiral_stairs_camera(c, focus, pos) {
+        /// The returned yaw
+        let camYaw
+        // unused
+        let focPitch = 0
+        /// The focus (Mario)'s yaw around the stairs
+        let focYaw = 0
+        // unused
+        let posPitch = 0
+        /// The camera's yaw around the stairs
+        let posYaw = 0
+        let cPos = [0, 0, 0]
+        let checkPos = [0, 0, 0]
+        let floor = null
+        let dist = 0
+        let focusHeight = 0
+        let floorHeight = 0
+        let focY
+
+        handle_c_button_movement(c)
+        // Set base pos to the center of the staircase
+        vec3f_set(this.sFixedModeBasePosition, -1280.0, 614.0, 1740.0)
+
+        // Focus on Mario, and move the focus up the staircase with him
+        let wrapper = {posOff: focusHeight, focOff: focusHeight}
+        this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
+        focusHeight = wrapper.posOff
+        focus[0] = this.gPlayerCameraState.pos[0]
+        focY = this.gPlayerCameraState.pos[1] + 125.0 + focusHeight
+        focus[2] = this.gPlayerCameraState.pos[2]
+
+        vec3f_copy(cPos, pos)
+        wrapper = {dist: dist, pitch: focPitch, yaw: focYaw}
+        vec3f_get_dist_and_angle(this.sFixedModeBasePosition, focus, wrapper)
+        dist = wrapper.dist; focPitch = wrapper.pitch; focYaw = wrapper.yaw
+        wrapper.pitch = posPitch; wrapper.yaw = posYaw
+        vec3f_get_dist_and_angle(this.sFixedModeBasePosition, cPos, wrapper)
+        dist = wrapper.dist; posPitch = wrapper.pitch; posYaw = wrapper.yaw
+
+        this.sSpiralStairsYawOffset = posYaw - focYaw
+        // posYaw will change if Mario is more than 90 degrees around the stairs, relative to the camera
+        if (this.sSpiralStairsYawOffset < DEGREES(-90)) {
+            this.sSpiralStairsYawOffset = DEGREES(-90)
+        }
+        if (this.sSpiralStairsYawOffset > DEGREES(90)) {
+            this.sSpiralStairsYawOffset = DEGREES(90)
+        }
+        focYaw += this.sSpiralStairsYawOffset
+        posYaw = focYaw
+        //! @bug unnecessary
+        wrapper.current = posYaw
+        this.camera_approach_s16_symmetric_bool(wrapper, focYaw, 0x1000)
+        posYaw = wrapper.current
+
+        vec3f_set_dist_and_angle(this.sFixedModeBasePosition, cPos, 300.0, 0, posYaw)
+
+        // Move the camera's y coord up/down the staircase
+        checkPos[0] = focus[0] + (cPos[0] - focus[0]) * 0.7
+        checkPos[1] = focus[1] + (cPos[1] - focus[1]) * 0.7 + 300.0
+        checkPos[2] = focus[2] + (cPos[2] - focus[2]) * 0.7
+        wrapper.floor = floor
+        floorHeight = find_floor(checkPos[0], checkPos[1] + 50.0, checkPos[2], wrapper)
+        floor = wrapper.floor
+        if (floorHeight != FLOOR_LOWER_LIMIT) {
+            if (floorHeight < this.sMarioGeometry.currFloorHeight) {
+                floorHeight = this.sMarioGeometry.currFloorHeight
+            }
+            floorHeight += 125.0
+            pos[1] = approach_f32(pos[1], floorHeight, 30.0, 30.0)
+        }
+
+        wrapper.current = focus[1]
+        this.camera_approach_f32_symmetric_bool(wrapper, focY, 30.0)
+        focus[1] = wrapper.current
+        pos[0] = cPos[0]
+        pos[2] = cPos[2]
+        camYaw = this.calculate_yaw(focus, pos)
+
+        return camYaw
+    }
+
+    /**
+     * The mode used in the spiral staircase in the castle
+     */
+    mode_spiral_stairs_camera(c) {
+        c.nextYaw = this.update_spiral_stairs_camera(c, c.focus, c.pos)
+    }
+
     // ---------------- //
 
     select_mario_cam_mode() {
@@ -2622,19 +3412,6 @@ class Camera {
         }
     }
 
-
-    update_mario_camera(c, focus, pos) {
-        let yaw = this.gPlayerCameraState.faceAngle[1] + this.sModeOffsetYaw + DEGREES(180)
-        this.focus_on_mario(focus, pos, 125, 125, this.gCameraZoomDist, 0x05B0, yaw)
-
-        return this.gPlayerCameraState.faceAngle[1]
-    }
-
-    mode_mario_camera(c) {
-        this.gCameraZoomDist = 350
-        this.mode_default_camera(c)
-    }
-
     play_camera_buzz_if_cdown() {
         if (this.sCButtonsPressed & D_CBUTTONS) {
             this.play_sound_button_change_blocked()
@@ -3181,9 +3958,9 @@ class Camera {
                         this.mode_fixed_camera(c);
                         break;
 
-                    // case CAMERA_MODE_SPIRAL_STAIRS:
-                    //     mode_spiral_stairs_camera(c);
-                    //     break;
+                    case CAMERA_MODE_SPIRAL_STAIRS:
+                        mode_spiral_stairs_camera(c);
+                        break;
 
                     default: throw "unknown camera case: " + c.mode
                 }
@@ -3627,164 +4404,6 @@ class Camera {
         return cutscene
     }
 
-    update_behind_mario_camera(c, focus, pos) {
-        let absPitch
-        let dist, pitch, yaw
-        let goalPitch = this.gPlayerCameraState.faceAngle[0]
-        let marioYaw = s16(this.gPlayerCameraState.faceAngle[1] + DEGREES(180))
-        let goalYawOff = 0
-        let yawSpeed
-        let pitchInc = 32
-        let maxDist = 800
-        let focYOff = 125
-        let wrapper = {}
-        let distPitchYaw = {}
-
-        // Zoom in when Mario R_TRIG mode is active
-        if (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
-            maxDist = 350
-            focYOff = 120
-        }
-        if (!(this.gPlayerCameraState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER))) {
-            pitchInc = 128
-        }
-
-        // Focus on Mario
-        this.vec3f_copy(focus, this.gPlayerCameraState.pos)
-        c.focus[1] += focYOff
-        //! @bug unnecessary
-        // dist = calc_abs_dist(focus, pos);
-        //! @bug unnecessary
-        // pitch = calculate_pitch(focus, pos);
-        MathUtil.vec3f_get_dist_and_angle(focus, pos, distPitchYaw);
-        ({dist, pitch, yaw} = distPitchYaw)
-        if (dist > maxDist) {
-            dist = maxDist
-        }
-        if ((absPitch = pitch) < 0) {
-            absPitch = -absPitch
-        }
-
-        // Determine the yaw speed based on absPitch. A higher absPitch (further away from looking straight)
-        // translates to a slower speed
-        // Note: Pitch is always within +- 90 degrees or +-0x4000, and 0x4000 / 0x200 = 32
-        yawSpeed = s16(32 - s16(absPitch / 0x200))
-        if (yawSpeed < 1) {
-            yawSpeed = 1
-        }
-        if (yawSpeed > 32) {
-            yawSpeed = 32
-        }
-
-        if (this.sCSideButtonYaw != 0) {
-            wrapper.current = this.sCSideButtonYaw
-            this.camera_approach_s16_symmetric_bool(wrapper, 0, 1)
-            this.sCSideButtonYaw = wrapper.current
-            yawSpeed = 8
-        }
-        if (this.sBehindMarioSoundTimer != 0) {
-            goalPitch = 0
-            wrapper.current = this.sBehindMarioSoundTimer
-            this.camera_approach_s16_symmetric_bool(wrapper, 0, 1)
-            this.sBehindMarioSoundTimer = wrapper.current
-            pitchInc = 0x800
-        }
-
-        if (this.sBehindMarioSoundTimer == 28) {
-            if (this.sCSideButtonYaw < 5 || this.sCSideButtonYaw > 28) {
-                // play_sound_cbutton_up();
-            }
-        }
-        if (this.sCSideButtonYaw == 28) {
-            if (this.sBehindMarioSoundTimer < 5 || this.sBehindMarioSoundTimer > 28) {
-                // play_sound_cbutton_up();
-            }
-        }
-
-        // C-Button input. Note: Camera rotates in the opposite direction of the button (airplane controls)
-        //! @bug C-Right and C-Up take precedence due to the way input is handled here
-
-        // Rotate right
-        if (this.sCButtonsPressed & L_CBUTTONS) {
-            if (window.playerInput.buttonPressedCl) {
-                // play_sound_cbutton_side();
-            }
-            if (dist < maxDist) {
-                wrapper.current = dist
-                this.camera_approach_f32_symmetric_bool(wrapper, maxDist, 5)
-                dist = wrapper.current
-            }
-            goalYawOff = -0x3FF8
-            this.sCSideButtonYaw = 30
-            yawSpeed = 2
-        }
-        // Rotate left
-        if (this.sCButtonsPressed & R_CBUTTONS) {
-            if (window.playerInput.buttonPressedCr) {
-                // play_sound_cbutton_side();
-            }
-            if (dist < maxDist) {
-                wrapper.current = dist
-                this.camera_approach_f32_symmetric_bool(wrapper, maxDist, 5)
-                dist = wrapper.current
-            }
-            goalYawOff = 0x3FF8
-            this.sCSideButtonYaw = 30
-            yawSpeed = 2
-        }
-        // Rotate up
-        if (this.sCButtonsPressed & D_CBUTTONS) {
-            if (window.playerInput.buttonPressedCu || window.playerInput.buttonPressedCd) {
-                // play_sound_cbutton_side();
-            }
-            if (dist < maxDist) {
-                wrapper.current = dist
-                this.camera_approach_f32_symmetric_bool(wrapper, maxDist, 5)
-                dist = wrapper.current                
-            }
-            goalPitch = -0x3000
-            this.sBehindMarioSoundTimer = 30
-            pitchInc = 0x800
-        }
-        // Rotate down
-        if (this.sCButtonsPressed & U_CBUTTONS) {
-            if (window.playerInput.buttonPressedCu || window.playerInput.buttonPressedCd) {
-                // play_sound_cbutton_side();
-            }
-            if (dist < maxDist) {
-                wrapper.current = dist
-                this.camera_approach_f32_symmetric_bool(wrapper, maxDist, 5)
-                dist = wrapper.current                
-            }
-            goalPitch = 0x3000
-            this.sBehindMarioSoundTimer = 30
-            pitchInc = 0x800
-        }
-
-        wrapper.current = yaw
-        this.approach_s16_asymptotic_bool(wrapper, s16(marioYaw + goalYawOff), yawSpeed)
-        yaw = wrapper.current
-
-        wrapper.current = pitch
-        this.camera_approach_s16_symmetric_bool(wrapper, goalPitch, pitchInc)
-        pitch = wrapper.current
-        if (dist < 300) {
-            dist = 300
-        }
-        MathUtil.vec3f_set_dist_and_angle(focus, pos, dist, pitch, yaw)
-        // if (this.gCurrLevelArea == AREA_WDW_MAIN) {
-        //     yaw = this.clamp_positions_and_find_yaw(pos, focus, 4508, -3739, 4508, -3739)
-        // }
-        // if (this.gCurrLevelArea == AREA_THI_HUGE) {
-        //     yaw = this.clamp_positions_and_find_yaw(pos, focus, 8192, -8192, 8192, -8192)
-        // }
-        // if (this.gCurrLevelArea == AREA_THI_TINY) {
-        //     yaw = this.clamp_positions_and_find_yaw(pos, focus, 2458, -2458, 2458, -2458)
-        // }
-
-        return yaw
-    }
-
     clamp_positions_and_find_yaw(pos, origin, xMax, xMin, zMax, zMin) {
         let yaw = this.gCamera.nextYaw
 
@@ -3926,415 +4545,9 @@ class Camera {
         return this.is_behind_surface(this.gPlayerCameraState.pos, surf)
     }
 
-    mode_behind_mario(c) {
-        const marioState = LevelUpdate.gMarioState
-        let newPos = [], oldPos = []
-        let waterHeight, floorHeight
-        const distPitchYaw = {}
-        let yaw
-
-        this.vec3f_copy(oldPos, c.pos)
-        this.gCameraMovementFlags &= ~CAM_MOVING_INTO_MODE
-        this.vec3f_copy(newPos, c.pos)
-        yaw = this.update_behind_mario_camera(c, c.focus, newPos)
-        c.pos[0] = newPos[0]
-        c.pos[2] = newPos[2]
-
-        // Keep the camera above the water surface if swimming
-        if (c.mode == CAMERA_MODE_WATER_SURFACE) {
-            floorHeight = SurfaceCollision.find_floor(c.pos[0], c.pos[1], c.pos[2], {})
-            newPos[1] = marioState.waterLevel + 120
-            if (newPos[1] < (floorHeight += 120)) {
-                newPos[1] = floorHeight
-            }
-        }
-        this.approach_camera_height(c, newPos[1], 50)
-        waterHeight = SurfaceCollision.find_water_level(c.pos[0], c.pos[2]) + 100
-        if (c.pos[1] <= waterHeight) {
-            this.gCameraMovementFlags |= CAM_MOVE_SUBMERGED
-        } else {
-            this.gCameraMovementFlags &= ~CAM_MOVE_SUBMERGED
-        }
-
-        this.resolve_geometry_collisions(c.pos, oldPos)
-        // Prevent camera getting too far away
-        MathUtil.vec3f_get_dist_and_angle(c.focus, c.pos, distPitchYaw)
-        if (distPitchYaw.dist > 800) {
-            distPitchYaw.dist = 800
-            MathUtil.vec3f_set_dist_and_angle(c.focus, c.pos, distPitchYaw.dist, distPitchYaw.pitch, distPitchYaw.yaw);
-                }
-        this.pan_ahead_of_player(c)
-
-        return yaw
-            }
-
 
     resolve_geometry_collisions(pos, lastGood) {
         // TODO
-        }
-
-    mode_behind_mario_camera(c) {
-        c.nextYaw = this.mode_behind_mario(c)
-    }
-
-    /**
-     * Exactly the same as BEHIND_MARIO
-     */
-    mode_water_surface_camera(c) {
-        c.nextYaw = this.mode_behind_mario(c)
-    }
-
-
-    update_default_camera(c) {
-        const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
-
-        let tempPos = [0, 0, 0]
-        let cPos = [0, 0, 0]
-        let marioFloor = Object.assign({}, surfaceObj)
-        let cFloor = Object.assign({}, surfaceObj)
-        let tempFloor = Object.assign({}, surfaceObj)
-        let ceil = Object.assign({}, surfaceObj)
-        let camFloorHeight = 0
-        let tempFloorHeight = 0
-        let marioFloorHeight = 0
-        let dist = 0
-        let zoomDist = 0
-        let waterHeight = 0
-        let gasHeight = 0
-        let avoidYaw = 0
-        let pitch = 0
-        let yaw = 0
-        let yawGoal = this.gPlayerCameraState.faceAngle[1] + DEGREES(180)
-        let posHeight = 0
-        let focHeight = 0
-        let distFromWater = 0
-        let tempPitch = 0
-        let tempYaw = 0
-        let xzDist = 0
-        let nextYawVel = 0
-        let yawVel = 0
-        let scale = 0
-        let avoidStatus = 0
-        let closeToMario = 0
-        let ceilHeight = 20000
-        let distPitchYaw = SurfaceCollision.find_ceil(this.gLakituState.goalPos[0], this.gLakituState.goalPos[1], this.gLakituState.goalPos[2], ceil)
-        let yawDir = 0
-
-        this.handle_c_button_movement(c);
-        let wrapper = { dist: dist, pitch: pitch, yaw: yaw }
-        MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper);
-        dist = wrapper.dist; pitch = wrapper.pitch; yaw = wrapper.yaw
-
-        // If C-Down is active, determine what distance the camera should be from mario
-        if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
-            //! In Mario mode, the camera is zoomed out further than in lakitu mode (1400 vs 1200)
-            if (this.set_cam_angle(0) == CAM_ANGLE_MARIO) {
-                zoomDist = this.gCameraZoomDist + 1050;
-            } else {
-                zoomDist = this.gCameraZoomDist + 400;
-            }
-        } else {
-            zoomDist = this.gCameraZoomDist;
-        }
-
-        if (this.gPlayerCameraState.action & Mario.ACT_FLAG_HANGING || this.gPlayerCameraState.action == Mario.ACT_RIDING_HOOT) {
-            zoomDist *= 0.8
-            this.set_handheld_shake(HAND_CAM_SHAKE_HANG_OWL)
-        }
-        
-        // If not zooming out, only allow dist to decrease
-        if (this.sZoomAmount == 0.0) {
-            if (dist > zoomDist) {
-                dist -= 50
-                if (dist < zoomDist) {
-                    dist = zoomDist
-                }
-            }
-        } else {
-            if ((this.sZoomAmount -= 30) < 0) {
-                this.sZoomAmount = 0
-            }
-            if (dist > zoomDist) {
-                if ((dist -= 30) < zoomDist) {
-                    dist = zoomDist
-                }
-            }
-            if (dist < zoomDist) {
-                if ((dist += 30) > zoomDist) {
-                    dist = zoomDist
-                }
-            }
-        }
-
-        // Determine how fast to rotate the camera
-        if (this.sCSideButtonYaw == 0) {
-            if (c.mode == CAMERA_MODE_FREE_ROAM) {
-                nextYawVel = 0xC0
-            } else {
-                nextYawVel = 0x100
-            }
-            if ((window.playerInput.stickX != 0 || window.playerInput.stickY != 0) != 0) {
-                nextYawVel = 0x20
-            }
-        } else {
-            if (this.sCSideButtonYaw < 0) {
-                yaw += 0x200
-            }
-            if (this.sCSideButtonYaw > 0) {
-                yaw -= 0x200
-            }
-            const wrapper = { current: this.sCSideButtonYaw }
-            this.camera_approach_s16_symmetric_bool(wrapper, 0, 0x100)
-            this.sCSideButtonYaw = wrapper.current
-            nextYawVel = 0
-        }
-
-        this.sYawSpeed = 0x400
-        xzDist = this.calc_hor_dist(this.gPlayerCameraState.pos, c.pos)
-
-        if (this.sStatusFlags & CAM_FLAG_BEHIND_MARIO_POST_DOOR) {
-            if (xzDist >= 250) {
-                this.sStatusFlags &= ~CAM_FLAG_BEHIND_MARIO_POST_DOOR
-            }
-            if (Math.abs((this.gPlayerCameraState.faceAngle[1] - yaw) / 2) < 0x1800) {
-                this.sStatusFlags &= ~CAM_FLAG_BEHIND_MARIO_POST_DOOR
-                yaw = this.sCameraYawAfterDoorCutscene + DEGREES(180)
-                dist = 800.0
-                this.sStatusFlags |= CAM_FLAG_BLOCK_SMOOTH_MOVEMENT
-            }
-        } else if (xzDist < 250) {
-            // Turn rapidly if very close to mario
-            c.pos[0] += (250 - xzDist) * sins(yaw)
-            c.pos[2] += (250 - xzDist) * coss(yaw)
-            if (this.sCSideButtonYaw == 0) {
-                nextYawVel = 0x1000
-                this.sYawSpeed = 0
-                wrapper = { dist: dist, pitch: pitch, yaw: yaw }
-                MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper);
-                dist = wrapper.dist; pitch = wrapper.pitch; yaw = wrapper.yaw
-            }
-            closeToMario |= 1
-        }
-
-        if (-16 < window.playerInput.stickY) {
-            c.yaw = yaw
-        }
-
-        wrapper = { posOff: posHeight, focOff: focHeight }
-        this.calc_y_to_curr_floor(wrapper, 1, 200, wrapper, 0.9, 200)
-        posHeight = wrapper.posOff
-        focHeight = wrapper.focOff
-        this.vec3f_copy(cPos, c.pos)
-        wrapper.yaw = avoidYaw
-        this.rotate_camera_around_walls(c, cPos, wrapper, 0x600)
-
-        // If a wall is blocking the view of Mario, then rotate in the calculated direction
-        if (avoidStatus == 3) {
-            this.sAvoidYawVel = yaw
-            this.sStatusFlags |= CAM_FLAG_COLLIDED_WITH_WALL
-            // Rotate to avoid the wall
-            wrapper = { current: yaw }
-            this.approach_s16_asymptotic_bool(wrapper, avoidYaw, 10)
-            yaw = wrapper.current
-            this.sAvoidYawVel = (this.sAvoidYawVel - yaw) / 0x100
-        } else {
-            if (gMarioStates[0].forwardVel == 0.0) {
-                if (this.sStatusFlags & CAM_FLAG_COLLIDED_WITH_WALL) {
-                    if ((yawGoal - yaw) / 0x100 >= 0) {
-                        yawDir = -1
-                    } else {
-                        yawDir = 1
-                    }
-                    if ((this.sAvoidYawVel > 0 && yawDir > 0) || (this.sAvoidYawVel < 0 && yawDir < 0)) {
-                        yawVel = nextYawVel
-                    }
-                } else {
-                    yawVel = nextYawVel
-                }
-            } else {
-                if (nextYawVel == 0x1000) {
-                    yawVel = nextYawVel
-                }
-                this.sStatusFlags &= ~CAM_FLAG_COLLIDED_WITH_WALL
-            }
-
-            // If a wall is near the camera, turn twice as fast
-            if (avoidStatus != 0) {
-                yawVel += yawVel
-            }
-            // ...Unless the camera already rotated from being close to mario
-            if ((closeToMario & 1) && avoidStatus != 0) {
-                yawVel = 0
-            }
-            if (yawVel != 0 /* && get_dialog_id() == DIALOG_NONE */) {
-                const yawWrapper = { current: yaw }
-                this.camera_approach_s16_symmetric_bool(yawWrapper, yawGoal, yawVel)
-                yaw = yawWrapper.current
-            }
-        }
-
-        // Only zoom out if not obstructed by walls and lakitu hasn't collided with any
-        if (avoidStatus == 0 && !(this.sStatusFlags & CAM_FLAG_COLLIDED_WITH_WALL)) {
-            const distWrapper = { current: dist }
-            this.approach_f32_asymptotic_bool(distWrapper, zoomDist - 100, 0.05)
-            dist = distWrapper.current
-        }
-
-        MathUtil.vec3f_set_dist_and_angle(this.gPlayerCameraState.pos, cPos, dist, pitch, yaw)
-        cPos[1] += posHeight + 125.0
-
-        if (this.collide_with_walls(cPos, 10.0, 80.0) != 0) {
-            this.sStatusFlags |= CAM_FLAG_COLLIDED_WITH_WALL
-        }
-
-        c.focus = [
-            this.gPlayerCameraState.pos[0],
-            this.gPlayerCameraState.pos[1] + 125 + focHeight,
-            this.gPlayerCameraState.pos[2]
-        ]
-
-        marioFloorHeight = 125 + this.sMarioGeometry.currFloorHeight
-        marioFloor = this.sMarioGeometry.currFloor
-
-        camFloorHeight = SurfaceCollision.find_floor(cPos[0], cPos[1] + 50, cPos[2], cFloor) + 125
-
-        for (let scale = 0.1; scale < 1.0; scale += 0.2) {
-            this.scale_along_line(tempPos, cPos, this.gPlayerCameraState.pos, scale)
-            tempFloorHeight = SurfaceCollision.find_floor(tempPos[0], tempPos[1], tempPos[2], tempFloor) + 125
-            if (tempFloor.floor && tempFloorHeight > marioFloorHeight) {
-                marioFloorHeight = tempFloorHeight
-                marioFloor = tempFloor.floor
-            }
-        }
-
-        // Lower the camera in mario mode
-        if (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
-            marioFloorHeight -= 35.0
-            camFloorHeight -= 35.0
-            c.focus[1] -= 25.0
-        }
-
-        // If there's water below the camera, decide whether to keep the camera above the water surface
-        waterHeight = SurfaceCollision.find_water_level(cPos[0], cPos[2])
-        if (waterHeight != FLOOR_LOWER_LIMIT) {
-            waterHeight += 125.0
-            distFromWater = waterHeight - marioFloorHeight
-            if (!(this.gCameraMovementFlags & CAM_MOVE_METAL_BELOW_WATER)) {
-                if (distFromWater > 800.0 && (this.gPlayerCameraState.action & Mario.ACT_FLAG_METAL_WATER)) {
-                    this.gCameraMovementFlags |= CAM_MOVE_METAL_BELOW_WATER
-                }
-            } else {
-                if (distFromWater < 400.0 || !(this.gPlayerCameraState.action & Mario.ACT_FLAG_METAL_WATER)) {
-                    this.gCameraMovementFlags &= ~CAM_MOVE_METAL_BELOW_WATER
-                }
-            }
-            // If not wearing the metal cap, always stay above
-            if (!(this.gCameraMovementFlags & CAM_MOVE_METAL_BELOW_WATER) && camFloorHeight < waterHeight) {
-                camFloorHeight = waterHeight
-            }
-        } else {
-            this.gCameraMovementFlags &= ~CAM_MOVE_METAL_BELOW_WATER
-        }
-
-        cPos[1] = camFloorHeight
-        this.vec3f_copy(tempPos, cPos)
-        tempPos[1] -= 125.0
-        if (marioFloor != null && camFloorHeight <= marioFloorHeight) {
-            avoidStatus = this.is_range_behind_surface(c.focus, tempPos, marioFloor, 0, -1)
-            if (avoidStatus != 1 && ceilHeight > marioFloorHeight) {
-                camFloorHeight = marioFloorHeight
-            }
-        }
-
-        posHeight = 0.0
-        if (c.mode == CAMERA_MODE_FREE_ROAM) {
-            if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
-                posHeight = 375
-                if (this.gCurrLevelArea == AREA_SSL_PYRAMID) {
-                    posHeight /= 2
-                }
-            } else {
-                posHeight = 100.0
-            }
-        }
-        if ((this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) && (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE)) {
-            posHeight = 610
-            if (this.gCurrLevelArea == AREA_SSL_PYRAMID || Area.gCurrLevelNum == LEVEL_CASTLE) {
-                posHeight /= 2
-            }
-        }
-
-        // Make Lakitu fly above the gas
-        gasHeight = SurfaceCollision.find_poison_gas_level(cPos[0], cPos[2])
-        if (gasHeight != FLOOR_LOWER_LIMIT) {
-            gasHeight += 130.0
-            if (gasHeight > c.pos[1]) {
-                c.pos[1] = gasHeight
-            }
-        }
-
-
-        if (this.gPlayerCameraState.action & Mario.ACT_FLAG_HANGING || this.gPlayerCameraState.action == Mario.ACT_RIDING_HOOT) {
-            /// TODO hanging or riding
-        }
-
-        if (this.gPlayerCameraState.action & Mario.ACT_FLAG_ON_POLE) {
-            camFloorHeight = LevelUpdate.gMarioState.usedObj.rawData[oPosY] + 125.0
-            if (this.gPlayerCameraState.pos[1] - 100.0 > camFloorHeight) {
-                camFloorHeight = this.gPlayerCameraState.pos[1] - 100.0
-            }
-            ceilHeight = CELL_HEIGHT_LIMIT
-            this.vec3f_copy(c.focus, this.gPlayerCameraState.pos)
-        }
-        if (camFloorHeight != FLOOR_LOWER_LIMIT) {
-            camFloorHeight += posHeight
-            this.approach_camera_height(c, camFloorHeight, 20.0)
-        }
-        c.pos[0] = cPos[0]
-        c.pos[2] = cPos[2]
-        cPos[0] = this.gLakituState.goalPos[0]
-        cPos[1] = c.pos[1]
-        cPos[2] = this.gLakituState.goalPos[2]
-        wrapper = { dist: dist, pitch: tempPitch, yaw: tempYaw }
-        MathUtil.vec3f_get_dist_and_angle(cPos, c.pos, wrapper)
-        dist = wrapper.dist; tempPitch = wrapper.pitch; tempYaw = wrapper.yaw;
-        // Prevent the camera from lagging behind too much
-        if (dist > 50.0) {
-            dist = 50.0
-            MathUtil.vec3f_set_dist_and_angle(cPos, c.pos, dist, tempPitch, tempYaw)
-        }
-        if (this.sMarioGeometry.currFloorType != SURFACE_DEATH_PLANE) {
-            MathUtil.vec3f_get_dist_and_angle(c.focus, c.pos, wrapper)
-            dist = wrapper.dist; tempPitch = wrapper.pitch; tempYaw = wrapper.yaw;
-            if (dist > zoomDist) {
-                dist = zoomDist
-                MathUtil.vec3f_set_dist_and_angle(c.focus, c.pos, dist, tempPitch, tempYaw)
-            }
-        }
-        if (ceilHeight != CELL_HEIGHT_LIMIT) {
-            ceilHeight -= 150.0
-            avoidStatus = SurfaceCollision.is_range_behind_surface(c.pos, this.gPlayerCameraState.pos, ceil, 0, -1)
-            if (c.pos[1] > ceilHeight && avoidStatus == 1) {
-                c.pos[1] = ceilHeight
-            }
-        }
-
-        if (this.gCurrLevelArea == AREA_WDW_TOWN) {
-            yaw = this.clamp_positions_and_find_yaw(c.pos, c.focus, 2254.0, -3789.0, 3790.0, -2253.0)
-        }
-        return yaw
-
-    }
-
-    mode_default_camera(c) {
-        this.sFOVState.fovFunc = CAM_FOV_DEFAULT
-        c.nextYaw = this.update_default_camera(c)
-        this.pan_ahead_of_player(c)
-    }
-
-    mode_lakitu_camera(c) {
-        this.gCameraZoomDist = 800
-        this.mode_default_camera(c)
     }
 
     determine_pushing_or_pulling_door(currentWrapper) {

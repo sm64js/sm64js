@@ -490,6 +490,12 @@ class Camera {
             cannonYOffset: 0,
         }
 
+        this.sBBHLibraryParTrackPath = [
+            {startOfPath: 1, pos: [-929.0, 1619.0, -1490.0], distThresh: 50.0, zoom: 0.0},
+            {startOfPath: 0, pos: [-2118.0, 1619.0, -1490.0], distThresh: 50.0, zoom: 0.0},
+            {startOfPath: 0, pos: [0.0, 0.0, 0.0], distThresh: 0.0, zoom: 0.0},
+        ]
+
         this.sCutsceneStarSpawn = [
             { shot: this.cutscene_star_spawn.bind(this), duration: CUTSCENE_LOOP },
             { shot: this.cutscene_star_spawn_back.bind(this), duration: 15 },
@@ -1523,6 +1529,9 @@ class Camera {
         return wrapper.yaw
     }
 
+    /**
+     * Updates the camera during fixed mode.
+     */
     update_fixed_camera(c, focus, pos) {
         let focusFloorOff = 0
         let goalHeight = 0
@@ -1619,6 +1628,164 @@ class Camera {
         }
 
         return faceAngle[1]
+    }
+
+    /**
+     * Updates the camera during a boss fight
+     */
+    update_boss_fight_camera(c, focus, pos) {
+        const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
+        let o = {}
+        let focusDistance
+        // Floor normal values
+        let nx
+        let ny
+        let nz
+        /// Floor originOffset
+        let oo
+        let yaw
+        let heldState
+        let floor = Object.assign({}, surfaceObj)
+        let secondFocus = new Array(3)
+        let holdFocOffset = [ 0.0, -150.0, -125.0 ]
+
+        this.handle_c_button_movement(c)
+
+        // Start camera shakes if bowser jumps or gets thrown.
+        if (this.gPlayerCameraState.cameraEvent == CAM_EVENT_BOWSER_JUMP) {
+            this.set_environmental_camera_shake(SHAKE_ENV_BOWSER_JUMP)
+            this.gPlayerCameraState.cameraEvent = 0
+        }
+        if (this.gPlayerCameraState.cameraEvent == CAM_EVENT_BOWSER_THROW_BOUNCE) {
+            this.set_environmental_camera_shake(SHAKE_ENV_BOWSER_THROW_BOUNCE)
+            this.gPlayerCameraState.cameraEvent = 0
+        }
+
+        yaw = this.sModeOffsetYaw + DEGREES(45)
+        // Get boss's position and whether Mario is holding it.
+        o = this.gSecondCameraFocus
+        if (o != null) {
+            this.object_pos_to_vec3f(secondFocus, o)
+            heldState = o.rawData[oHeldState]
+        } else {
+            // If no boss is there, just rotate around the area's center point.
+            secondFocus[0] = c.areaCenX
+            secondFocus[1] = this.gPlayerCameraState.pos[1]
+            secondFocus[2] = c.areaCenZ
+            heldState = 0
+        }
+
+        focusDistance = this.calc_abs_dist(this.gPlayerCameraState.pos, secondFocus) * 1.6
+        if (focusDistance < 800.0) {
+            focusDistance = 800.0
+        } else if (focusDistance > 5000.0) {
+            focusDistance = 5000.0
+        }
+
+        // If holding the boss, add a slight offset to secondFocus so that the spinning is more pronounced.
+        if (heldState == 1) {
+            this.offset_rotated(secondFocus, this.gPlayerCameraState.pos, holdFocOffset, this.gPlayerCameraState.faceAngle)
+        }
+
+        // Set the camera focus to the average of Mario and secondFocus
+        focus[0] = (this.gPlayerCameraState.pos[0] + secondFocus[0]) / 2.0
+        focus[1] = (this.gPlayerCameraState.pos[1] + secondFocus[1]) / 2.0 + 125.0
+        focus[2] = (this.gPlayerCameraState.pos[2] + secondFocus[2]) / 2.0
+        // Calculate the camera's position as an offset from the focus
+        // When C-Down is not active, this
+        MathUtil.vec3f_set_dist_and_angle(focus, pos, focusDistance, 0x1000, yaw)
+        // Find the floor of the arena
+        pos[1] = find_floor(c.areaCenX, CELL_HEIGHT_LIMIT, c.areaCenZ, floor)
+        if (floor != null) {
+            nx = floor.normal.x
+            ny = floor.normal.y
+            nz = floor.normal.z
+            oo = floor.originOffset
+            pos[1] = 300.0 - (nx * pos[0] + nz * pos[2] + oo) / ny
+            switch (this.gCurrLevelArea) {
+                case AREA_BOB:
+                    pos[1] += 125.0
+                    break // bug fix from og game
+                case AREA_WF:
+                    pos[1] += 125.0
+                    break
+            }
+        }
+
+        // Prevent the camera from going to the ground in the outside boss fight
+        if (Area.gCurrLevelNum == LEVEL_BBH) { pos[1] = 2047.0 }
+
+        // Rotate from C-Button input
+        if (this.sCSideButtonYaw < 0) {
+            this.sModeOffsetYaw += 0x200
+            this.sCSideButtonYaw += 0x100
+            if (this.sCSideButtonYaw > 0) {
+                this.sCSideButtonYaw = 0
+            }
+        }
+        if (this.sCSideButtonYaw > 0) {
+            this.sModeOffsetYaw -= 0x200
+            this.sCSideButtonYaw -= 0x100
+            if (this.sCSideButtonYaw < 0) {
+                this.sCSideButtonYaw = 0
+            }
+        }
+
+        focus[1] = (this.gPlayerCameraState.pos[1] + secondFocus[1]) / 2.0 + 100.0
+        if (heldState == 1) {
+            focus[1] += 300.0 * sins((gMarioStates[0].angleVel[1] > 0.0) ?  gMarioStates[0].angleVel[1]
+                                                                         : -gMarioStates[0].angleVel[1])
+        }
+
+        //! Unnecessary conditional, focusDistance is already bounded to 800
+        if (focusDistance < 400.0) {
+            focusDistance = 400.0
+        }
+
+        // Set C-Down distance and pitch.
+        // C-Down will essentially double the distance from the center.
+        // sLakituPitch approaches 33.75 degrees.
+        this.lakitu_zoom(focusDistance, 0x1800)
+
+        // Move the camera position back as sLakituDist and sLakituPitch increase.
+        // This doesn't zoom out of bounds because pos is set above each frame.
+        // The constant 0x1000 doubles the pitch from the center when sLakituPitch is 0
+        // When Lakitu is fully zoomed out, the pitch comes to 0x3800, or 78.75 degrees, up from the focus.
+        MathUtil.vec3f_set_dist_and_angle(pos, pos, this.sLakituDist, this.sLakituPitch + 0x1000, yaw)
+
+        return yaw
+    }
+
+    mode_boss_fight_camera(c) {
+        c.nextYaw = this.update_boss_fight_camera(c, c.focus, c.pos)
+    }
+
+    /**
+     * Parallel tracking mode, the camera faces perpendicular to a line defined by sParTrackPath
+     *
+     * @see update_parallel_tracking_camera
+     */
+
+    mode_parallel_tracking_camera(c) {
+        this.radial_camera_input(c, 0.0)
+        this.set_fov_function(CAM_FOV_DEFAULT)
+        c.nextYaw = this.update_parallel_tracking_camera(c, c.focus, c.pos)
+        this.camera_approach_s16_symmetric_bool({current: null}, 0, 0x0400)
+    }
+
+    /**
+     * Fixed camera mode, the camera rotates around a point and looks and zooms toward Mario.
+     */
+    mode_fixed_camera(c) {
+        if (Area.gCurrLevelNum == LEVEL_BBH) {
+            this.set_fov_function(CAM_FOV_BBH)
+        } else {
+            this.set_fov_function(CAM_FOV_APP_45)
+        }
+        c.nextYaw = this.update_fixed_camera(c, c.focus, c.pos)
+        c.yaw = c.nextYaw
+        this.pan_ahead_of_player(c)
+        vec3f_set(this.sCastleEntranceOffset, 0.0, 0.0, 0.0)
     }
 
     // ---------------- //
@@ -2998,21 +3165,21 @@ class Camera {
                         this.mode_lakitu_camera(c)
                         break
 
-                    // case CAMERA_MODE_BOSS_FIGHT:
-                    //     mode_boss_fight_camera(c);
-                    //     break;
+                    case CAMERA_MODE_BOSS_FIGHT:
+                        mode_boss_fight_camera(c);
+                        break;
 
-                    // case CAMERA_MODE_PARALLEL_TRACKING:
-                    //     mode_parallel_tracking_camera(c);
-                    //     break;
+                    case CAMERA_MODE_PARALLEL_TRACKING:
+                        mode_parallel_tracking_camera(c);
+                        break;
 
                     // case CAMERA_MODE_SLIDE_HOOT:
                     //     mode_slide_camera(c);
                     //     break;
 
-                    // case CAMERA_MODE_FIXED:
-                    //     mode_fixed_camera(c);
-                    //     break;
+                    case CAMERA_MODE_FIXED:
+                        mode_fixed_camera(c);
+                        break;
 
                     // case CAMERA_MODE_SPIRAL_STAIRS:
                     //     mode_spiral_stairs_camera(c);
@@ -3053,129 +3220,6 @@ class Camera {
         }
         Hud.set_hud_camera_status(status)
         return status
-    }
-
-    update_boss_fight_camera(c, focus, pos) {
-        const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
-        let o = {}
-        let focusDistance
-        // Floor normal values
-        let nx
-        let ny
-        let nz
-        /// Floor originOffset
-        let oo
-        let yaw
-        let heldState
-        let floor = Object.assign({}, surfaceObj)
-        let secondFocus = new Array(3)
-        let holdFocOffset = [ 0.0, -150.0, -125.0 ]
-
-        this.handle_c_button_movement(c)
-
-        // Start camera shakes if bowser jumps or gets thrown.
-        if (this.gPlayerCameraState.cameraEvent == CAM_EVENT_BOWSER_JUMP) {
-            this.set_environmental_camera_shake(SHAKE_ENV_BOWSER_JUMP)
-            this.gPlayerCameraState.cameraEvent = 0
-        }
-        if (this.gPlayerCameraState.cameraEvent == CAM_EVENT_BOWSER_THROW_BOUNCE) {
-            this.set_environmental_camera_shake(SHAKE_ENV_BOWSER_THROW_BOUNCE)
-            this.gPlayerCameraState.cameraEvent = 0
-        }
-
-        yaw = this.sModeOffsetYaw + DEGREES(45)
-        // Get boss's position and whether Mario is holding it.
-        o = this.gSecondCameraFocus
-        if (o != null) {
-            this.object_pos_to_vec3f(secondFocus, o)
-            heldState = o.rawData[oHeldState]
-        } else {
-            // If no boss is there, just rotate around the area's center point.
-            secondFocus[0] = c.areaCenX
-            secondFocus[1] = this.gPlayerCameraState.pos[1]
-            secondFocus[2] = c.areaCenZ
-            heldState = 0
-        }
-
-        focusDistance = this.calc_abs_dist(this.gPlayerCameraState.pos, secondFocus) * 1.6
-        if (focusDistance < 800.0) {
-            focusDistance = 800.0
-        } else if (focusDistance > 5000.0) {
-            focusDistance = 5000.0
-        }
-
-        // If holding the boss, add a slight offset to secondFocus so that the spinning is more pronounced.
-        if (heldState == 1) {
-            this.offset_rotated(secondFocus, this.gPlayerCameraState.pos, holdFocOffset, this.gPlayerCameraState.faceAngle)
-        }
-
-        // Set the camera focus to the average of Mario and secondFocus
-        focus[0] = (this.gPlayerCameraState.pos[0] + secondFocus[0]) / 2.0
-        focus[1] = (this.gPlayerCameraState.pos[1] + secondFocus[1]) / 2.0 + 125.0
-        focus[2] = (this.gPlayerCameraState.pos[2] + secondFocus[2]) / 2.0
-        // Calculate the camera's position as an offset from the focus
-        // When C-Down is not active, this
-        MathUtil.vec3f_set_dist_and_angle(focus, pos, focusDistance, 0x1000, yaw)
-        // Find the floor of the arena
-        pos[1] = find_floor(c.areaCenX, CELL_HEIGHT_LIMIT, c.areaCenZ, floor)
-        if (floor != null) {
-            nx = floor.normal.x
-            ny = floor.normal.y
-            nz = floor.normal.z
-            oo = floor.originOffset
-            pos[1] = 300.0 - (nx * pos[0] + nz * pos[2] + oo) / ny
-            switch (this.gCurrLevelArea) {
-                case AREA_BOB:
-                    pos[1] += 125.0
-                    break // bug fix from og game
-                case AREA_WF:
-                    pos[1] += 125.0
-                    break
-            }
-        }
-
-        // Prevent the camera from going to the ground in the outside boss fight
-        if (Area.gCurrLevelNum == LEVEL_BBH) { pos[1] = 2047.0 }
-
-        // Rotate from C-Button input
-        if (this.sCSideButtonYaw < 0) {
-            this.sModeOffsetYaw += 0x200
-            this.sCSideButtonYaw += 0x100
-            if (this.sCSideButtonYaw > 0) {
-                this.sCSideButtonYaw = 0
-            }
-        }
-        if (this.sCSideButtonYaw > 0) {
-            this.sModeOffsetYaw -= 0x200
-            this.sCSideButtonYaw -= 0x100
-            if (this.sCSideButtonYaw < 0) {
-                this.sCSideButtonYaw = 0
-            }
-        }
-
-        focus[1] = (this.gPlayerCameraState.pos[1] + secondFocus[1]) / 2.0 + 100.0
-        if (heldState == 1) {
-            focus[1] += 300.0 * sins((gMarioStates[0].angleVel[1] > 0.0) ?  gMarioStates[0].angleVel[1]
-                                                                         : -gMarioStates[0].angleVel[1])
-        }
-
-        //! Unnecessary conditional, focusDistance is already bounded to 800
-        if (focusDistance < 400.0) {
-            focusDistance = 400.0
-        }
-
-        // Set C-Down distance and pitch.
-        // C-Down will essentially double the distance from the center.
-        // sLakituPitch approaches 33.75 degrees.
-        this.lakitu_zoom(focusDistance, 0x1800)
-
-        // Move the camera position back as sLakituDist and sLakituPitch increase.
-        // This doesn't zoom out of bounds because pos is set above each frame.
-        // The constant 0x1000 doubles the pitch from the center when sLakituPitch is 0
-        // When Lakitu is fully zoomed out, the pitch comes to 0x3800, or 78.75 degrees, up from the focus.
-        MathUtil.vec3f_set_dist_and_angle(pos, pos, this.sLakituDist, this.sLakituPitch + 0x1000, yaw)
-
-        return yaw
     }
 
     cam_select_alt_mode(selection) {
@@ -5569,6 +5613,15 @@ class Camera {
             this.sFOVState.decay = decay
             this.sFOVState.shakeSpeed = shakeSpeed
         }
+    }
+
+    /**
+     * Change the camera's FOV mode.
+     *
+     * @see geo_camera_fov
+     */
+    set_fov_function(func) {
+        this.sFOVState.fovFunc = func
     }
 
     cutscene_set_fov_shake_preset(preset) {

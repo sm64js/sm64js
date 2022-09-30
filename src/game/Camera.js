@@ -37,6 +37,9 @@ import { ACT_FEET_STUCK_IN_GROUND } from "./Mario"
 import { SURFACE_CAMERA_MIDDLE } from "../include/surface_terrains"
 import { SURFACE_CAMERA_ROTATE_RIGHT } from "../include/surface_terrains"
 import { SURFACE_CAMERA_ROTATE_LEFT } from "../include/surface_terrains"
+import { SOUND_MENU_CAMERA_BUZZ } from "../include/sounds"
+import { SOUND_MENU_CLICK_CHANGE_VIEW } from "../include/sounds"
+import { ACT_RIDING_HOOT } from "./Mario"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -1162,9 +1165,92 @@ class Camera {
         if (this.sModeOffsetYaw > 0x5554) {
             this.sModeOffsetYaw = 0x5554
         }
-        if (this.sModeOffsetYaw < -0x5554) [
+        if (this.sModeOffsetYaw < -0x5554) {
             this.sModeOffsetYaw = -0x5554
-        ]
+        }
+    }
+
+    /**
+     * Moves Lakitu from zoomed in to zoomed out and vice versa.
+     * When C-Down mode is not active, sLakituDist and sLakituPitch decrease to 0.
+     */
+    lakitu_zoom(rangeDist, rangePitch) {
+        if (this.sLakituDist < 0) {
+            if (this.sLakituDist + 30 > 0) {
+                this.sLakituDist = 0
+            }
+        } else if (rangeDist < this.sLakituDist) {
+            if (this.sLakituDist - 30 < rangeDist) {
+                this.sLakituDist = rangeDist
+            }
+        } else if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
+            if (this.sLakituDist + 30 > rangeDist) {
+                this.sLakituDist = rangeDist
+            }
+        } else {
+            if (this.sLakituDist - 30 < 0) {
+                this.sLakituDist = 0
+            }
+        }
+
+        if (this.gCurrLevelArea == AREA_SSL_PYRAMID && this.gCamera.mode == CAMERA_MODE_OUTWARD_RADIAL) {
+            rangePitch /= 2
+        }
+
+        if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
+            if (this.sLakituPitch + rangePitch / 13 > rangePitch) {
+                this.sLakituPitch = rangePitch
+            }
+        } else {
+            if (this.sLakituPitch - rangePitch / 13 < 0) {
+                this.sLakituPitch = 0
+            }
+        }
+    }
+
+    radial_camera_input_default(c) {
+        this.radial_camera_input(c, 0.0)
+    }
+
+    /**
+     * Makes Lakitu cam's yaw match the angle turned towards in C-Up mode, and makes Lakitu slowly fly back
+     * to the distance he was at before C-Up
+     */
+    update_yaw_and_dist_from_c_up(c) {
+        let dist = 1000.0
+
+        this.sModeOffsetYaw = this.sModeInfo.transitionStart.yaw - this.sAreaYaw
+        this.sLakituDist = this.sModeInfo.transitionStart.dist - dist
+        // No longer in C-Up
+        this.gCameraMovementFlags &= ~CAM_MOVING_INTO_MODE
+    }
+
+    /**
+     * Handles input and updates for the radial camera mode
+     */
+    mode_radial_camera(c) {
+        let pos = [0, 0, 0]
+        let oldAreaYaw = this.sAreaYaw
+
+        if (this.gCameraMovementFlags & CAM_MOVING_INTO_MODE) {
+            this.update_yaw_and_dist_from_c_up(c)
+        }
+
+        this.radial_camera_input_default(c)
+        this.radial_camera_move(c)
+
+        if (c.mode == CAMERA_MODE_RADIAL) {
+            this.lakitu_zoom(400.0, 0x900)
+        }
+        c.nextYaw = this.update_radial_camera(c, c.focus, pos)
+        c.pos[0] = pos[0]
+        c.pos[2] = pos[2]
+        this.sAreaYawChange = this.sAreaYaw - oldAreaYaw
+        if (this.gPlayerCameraState.action == ACT_RIDING_HOOT) {
+            pos[1] += 500.0
+        }
+        this.set_camera_height(c, pos[1])
+        this.pan_ahead_of_player(c)
     }
 
     // ---------------- //
@@ -1834,7 +1920,7 @@ class Camera {
                 this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
                 break
             case AREA_TTM_OUTSIDE:
-                // this.gLakituState.mode = CAMERA_MODE_RADIAL
+                this.gLakituState.mode = CAMERA_MODE_RADIAL
                 break
         }
         if (!this.gLakituState.mode) this.gLakituState.mode = CAMERA_MODE_FREE_ROAM
@@ -2020,6 +2106,122 @@ class Camera {
 
     play_sound_cbutton_down() {
         play_sound(SOUND_MENU_CAMERA_ZOOM_OUT, gGlobalSoundSource)
+    }
+
+    play_sound_cbutton_side() {
+        play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource)
+    }
+
+    play_sound_button_change_blocked() {
+        play_sound(SOUND_MENU_CLICK_CHANGE_VIEW, gGlobalSoundSource)
+    }
+
+    radial_camera_input(c, unused) {
+        let dummy = 0
+
+        if ((this.gCameraMovementFlags & CAM_MOVE_ENTERED_ROTATE_SURFACE) || !(this.gCameraMovementFlags & CAM_MOVE_ROTATE)) {
+            // If C-L or C-R are pressed, the camera is rotating
+            if (this.sCButtonsPressed & (L_CBUTTONS | R_CBUTTONS)) {
+                this.gCameraMovementFlags &= ~CAM_MOVE_ENTERED_ROTATE_SURFACE
+                //  @bug this does not clear the rotation flags set by the surface. It's possible to set
+                //       both ROTATE_LEFT and ROTATE_RIGHT, locking the camera.
+                //       Ex: If a surface set CAM_MOVE_ROTATE_RIGHT and the user presses C-R, it locks the
+                //       camera until a different mode is activated
+            }
+
+            // Rotate Right and left
+            if (this.sCButtonsPressed & R_CBUTTONS) {
+                if (this.sModeOffsetYaw > -0x800) {
+                    // The camera is now rotating right
+                    if (!(this.gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT)) {
+                        this.gCameraMovementFlags |= CAM_MOVE_ROTATE_RIGHT
+                    }
+
+                    if (c.mode == CAMERA_MODE_RADIAL) {
+                        // if > ~48 degrees, we're rotating for the second time.
+                        if (this.sModeOffsetYaw > 0x22AA) {
+                            this.s2ndRotateFlags |= CAM_MOVE_ROTATE_RIGHT
+                        }
+
+                        if (this.sModeOffsetYaw == DEGREES(105)) {
+                            this.play_sound_button_change_blocked()
+                        } else {
+                            this.play_sound_cbutton_side()
+                        }
+                    } else {
+                        if (this.sModeOffsetYaw == DEGREES(60)) {
+                            this.play_sound_button_change_blocked()
+                        } else {
+                            this.play_sound_cbutton_side()
+                        }
+                    }
+                } else {
+                    this.gCameraMovementFlags |= CAM_MOVE_RETURN_TO_MIDDLE
+                    this.play_sound_cbutton_up()
+                }
+            }
+            if (this.sCButtonsPressed & L_CBUTTONS) {
+                if (this.sModeOffsetYaw < 0x800) {
+                    if (!(this.gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT)) {
+                        this.gCameraMovementFlags |= CAM_MOVE_ROTATE_LEFT
+                    }
+
+                    if (c.mode == CAMERA_MODE_RADIAL) {
+                        // if < ~48 degrees, we're rotating for the second time.
+                        if (this.sModeOffsetYaw < -0x22AA) {
+                            this.s2ndRotateFlags |= CAM_MOVE_ROTATE_LEFT
+                        }
+
+                        if (this.sModeOffsetYaw == DEGREES(-105)) {
+                            this.play_sound_button_change_blocked()
+                        } else {
+                            this.play_sound_cbutton_side()
+                        }
+                    } else {
+                        if (this.sModeOffsetYaw == DEGREES(-60)) {
+                            this.play_sound_button_change_blocked()
+                        } else {
+                            this.play_sound_cbutton_side()
+                        }
+                    }
+                } else {
+                    this.gCameraMovementFlags |= CAM_MOVE_RETURN_TO_MIDDLE
+                    this.play_sound_cbutton_up()
+                }
+            }
+        }
+
+        // Zoom in / enter C-Up
+        if (this.sCButtonsPressed & U_CBUTTONS) {
+            if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
+                this.gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT
+                this.play_sound_cbutton_up()
+            } else {
+                this.set_mode_c_up(c)
+            }
+        }
+
+        // Zoom out
+        if (this.sCButtonsPressed & D_CBUTTONS) {
+            if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
+                this.gCameraMovementFlags |= CAM_MOVE_ALREADY_ZOOMED_OUT
+            } else {
+                this.gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT
+                this.play_sound_cbutton_down()
+            }
+        }
+
+        //! returning uninitialized variable (not)
+        return dummy
+    }
+
+    trigger_cutscene_dialog(trigger) {
+        let result = 0
+
+        if (trigger == 1) {
+            this.start_object_cutscene_without_focus(CUTSCENE_READ_MESSAGE)
+        }
+        return result
     }
 
     store_lakitu_cam_info_for_c_up(c) {
@@ -2394,9 +2596,9 @@ class Camera {
                     //     mode_8_directions_camera(c);
                     //     break;
 
-                    // case CAMERA_MODE_RADIAL:
-                    //     mode_radial_camera(c);
-                    //     break;
+                    case CAMERA_MODE_RADIAL:
+                        mode_radial_camera(c);
+                        break;
 
                     // case CAMERA_MODE_OUTWARD_RADIAL:
                     //     mode_outward_radial_camera(c);
@@ -2809,40 +3011,6 @@ class Camera {
         const distX = b[0] - a[0]
         const distZ = b[2] - a[2]
         return MathUtil.sqrtf(distX * distX + distZ * distZ)
-    }
-
-    lakitu_zoom(rangeDist, rangePitch) {
-        if (this.sLakituDist < 0) {
-            if (this.sLakituDist + 30 > 0) {
-                this.sLakituDist = 0
-            }
-        } else if (rangeDist < this.sLakituDist) {
-            if (this.sLakituDist - 30 < rangeDist) {
-                this.sLakituDist = rangeDist
-            }
-        } else if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
-            if (this.sLakituDist + 30 > rangeDist) {
-                this.sLakituDist = rangeDist
-            }
-        } else {
-            if (this.sLakituDist - 30 < 0) {
-                this.sLakituDist = 0
-            }
-        }
-
-        if (this.gCurrLevelArea == AREA_SSL_PYRAMID && this.gCamera.mode == CAMERA_MODE_OUTWARD_RADIAL) {
-            rangePitch /= 2
-        }
-
-        if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
-            if (this.sLakituPitch + rangePitch / 13 > rangePitch) {
-                this.sLakituPitch = rangePitch
-            }
-        } else {
-            if (this.sLakituPitch - rangePitch / 13 < 0) {
-                this.sLakituPitch = 0
-            }
-        }
     }
 
     trigger_cutscene_dialog(trigger) {

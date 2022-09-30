@@ -319,7 +319,7 @@ export const spawn_water_droplet = (parent, params) => {
 
 export const spawn_object_at_origin = (parent, model, behavior) => {
     const obj = gLinker.Spawn.create_object(behavior)
-
+    console.log(obj)
     obj.parentObj = parent
     obj.gfx.areaIndex = parent.gfx.areaIndex
     obj.gfx.activeAreaIndex = parent.gfx.areaIndex

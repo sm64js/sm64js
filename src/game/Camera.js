@@ -414,7 +414,7 @@ class Camera {
         this.sModeTransitions = [
             null,
             this.update_radial_camera.bind(this),
-            null, // this.update_outward_radial_camera(c, focus, pos).bind(this),
+            this.update_outward_radial_camera.bind(this),
             this.update_behind_mario_camera.bind(this),
             this.update_mario_camera.bind(this),
             null,
@@ -1243,6 +1243,74 @@ class Camera {
             this.lakitu_zoom(400.0, 0x900)
         }
         c.nextYaw = this.update_radial_camera(c, c.focus, pos)
+        c.pos[0] = pos[0]
+        c.pos[2] = pos[2]
+        this.sAreaYawChange = this.sAreaYaw - oldAreaYaw
+        if (this.gPlayerCameraState.action == ACT_RIDING_HOOT) {
+            pos[1] += 500.0
+        }
+        this.set_camera_height(c, pos[1])
+        this.pan_ahead_of_player(c)
+    }
+
+    /**
+     * A mode that only has 8 camera angles, 45 degrees apart
+     */
+    mode_8_directions_camera(c) {
+        let pos = [0, 0, 0]
+        let oldAreaYaw = this.sAreaYaw
+
+        this.radial_camera_input(c, 0.0)
+
+        if (this.sCButtonsPressed & R_CBUTTONS) {
+            this.s8DirModeYawOffset += DEGREES(45)
+            this.play_sound_cbutton_side()
+        }
+        if (this.sCButtonsPressed & L_CBUTTONS) {
+            this.s8DirModeYawOffset -= DEGREES(45)
+            this.play_sound_cbutton_side()
+        }
+
+        this.lakitu_zoom(400.0, 0x900)
+        c.nextYaw = this.update_8_directions_camera(c, c.focus, pos)
+        c.pos[0] = pos[0]
+        c.pos[2] = pos[2]
+        this.sAreaYawChange = this.sAreaYaw - oldAreaYaw
+        this.set_camera_height(c, pos[1])
+    }
+
+    /**
+     * Updates the camera in outward radial mode.
+     * sModeOffsetYaw is calculated in radial_camera_move, which calls offset_yaw_outward_radial
+     */
+    update_outward_radial_camera(c, focus, pos) {
+        let xDistFocToMario = this.gPlayerCameraState.pos[0] - c.areaCenX
+        let zDistFocToMario = this.gPlayerCameraState.pos[2] - c.areaCenZ
+        let camYaw = atan2s(zDistFocToMario, xDistFocToMario) + this.sModeOffsetYaw + DEGREES(180)
+        let pitch = this.look_down_slopes(camYaw)
+        let baseDist = 1000.0
+        // A base offset of 125.f is ~= Mario's eye height
+        let yOff = 125.0
+
+        this.sAreaYaw = camYaw - this.sModeOffsetYaw - DEGREES(180)
+        wrapper = {}
+        this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
+        this.focus_on_mario(focus, pos, wrapper.posOff + yOff, wrapper.focOff + yOff, this.sLakituDist + baseDist, pitch, camYaw)
+        
+        return camYaw
+    }
+
+    mode_outward_radial_camera(c) {
+        let pos = [0, 0, 0]
+        let oldAreaYaw = this.sAreaYaw
+
+        if (this.gCameraMovementFlags & CAM_MOVING_INTO_MODE) {
+            this.update_yaw_and_dist_from_c_up(c)
+        }
+        this.radial_camera_input_default(c)
+        this.radial_camera_move(c)
+        this.lakitu_zoom(400.0, 0x900)
+        c.nextYaw = this.update_outward_radial_camera(c, c.focus, pos)
         c.pos[0] = pos[0]
         c.pos[2] = pos[2]
         this.sAreaYawChange = this.sAreaYaw - oldAreaYaw
@@ -2592,17 +2660,17 @@ class Camera {
                     //     mode_cannon_camera(c);
                     //     break;
 
-                    // case CAMERA_MODE_8_DIRECTIONS:
-                    //     mode_8_directions_camera(c);
-                    //     break;
-
-                    case CAMERA_MODE_RADIAL:
-                        mode_radial_camera(c);
+                    case CAMERA_MODE_8_DIRECTIONS:
+                        this.mode_8_directions_camera(c);
                         break;
 
-                    // case CAMERA_MODE_OUTWARD_RADIAL:
-                    //     mode_outward_radial_camera(c);
-                    //     break;
+                    case CAMERA_MODE_RADIAL:
+                        this.mode_radial_camera(c);
+                        break;
+
+                    case CAMERA_MODE_OUTWARD_RADIAL:
+                        mode_outward_radial_camera(c);
+                        break;
 
                     case CAMERA_MODE_CLOSE:
                         this.mode_lakitu_camera(c)

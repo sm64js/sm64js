@@ -45,6 +45,7 @@ import { vec3f_get_dist_and_angle } from "../engine/math_util"
 import { approach_f32 } from "../engine/math_util"
 import { SURFACE_CLOSE_CAMERA } from "../include/surface_terrains"
 import { SURFACE_NO_CAM_COL_SLIPPERY } from "../include/surface_terrains"
+import { ACT_GETTING_BLOWN } from "./Mario"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -492,6 +493,8 @@ class Camera {
             panDist: 0,
             cannonYOffset: 0,
         }
+
+        this.sHandheldShakeRoll = 0
 
         this.sBBHLibraryParTrackPath = [
             {startOfPath: 1, pos: [-929.0, 1619.0, -1490.0], distThresh: 50.0, zoom: 0.0},
@@ -2884,6 +2887,407 @@ class Camera {
         }
     }
 
+    /**
+     * Cause Lakitu to fly to the next Camera position and focus over a number of frames.
+     *
+     * At the end of each frame, Lakitu's position and focus ("state") are stored.
+     * Calling this function makes next_lakitu_state() fly from the last frame's state to the
+     * current frame's calculated state.
+     *
+     * @see next_lakitu_state()
+     */
+    transition_next_state(c, frames) {
+        if (!(this.sStatusFlags & CAM_FLAG_FRAME_AFTER_CAM_INIT)) {
+            this.sStatusFlags |= (CAM_FLAG_START_TRANSITION | CAM_FLAG_TRANSITION_OUT_OF_C_UP)
+            this.sModeTransition.framesLeft = frames
+        }
+    }
+
+    /**
+     * Sets the camera mode to `newMode` and initializes sModeTransition with `numFrames` frames
+     *
+     * Used to change the camera mode to 'level-oriented' modes
+     *      namely: RADIAL/OUTWARD_RADIAL, 8_DIRECTIONS, FREE_ROAM, CLOSE, SPIRAL_STAIRS, and SLIDE_HOOT
+     */
+    transition_to_camera_mode(c, newMode, numFrames) {
+        if (c.mode != newMode) {
+            this.sModeInfo.newMode = (newMode != -1) ? newMode : this.sModeInfo.lastMode
+            this.sModeInfo.lastMode = c.mode
+            c.mode = this.sModeInfo.newMode
+
+            // Clear movement flags that would affect the transition
+            this.gCameraMovementFlags &= ~(CAM_MOVE_RESTRICT | CAM_MOVE_ROTATE)
+            if (!(this.sStatusFlags & CAM_FLAG_FRAME_AFTER_CAM_INIT)) {
+                this.transition_next_state(c, numFrames)
+                this.sCUpCameraPitch = 0
+                this.sModeOffsetYaw = 0
+                this.sLakituDist = 0
+                this.sLakituPitch = 0
+                this.sAreaYawChange = 0
+                this.sPanDistance = 0.0
+                this.sCannonYOffset = 0.0
+            }
+        }
+    }
+
+    /**
+     * Used to change the camera mode between its default/previous and certain Mario-oriented modes,
+     *      namely: C_UP, WATER_SURFACE, CLOSE, and BEHIND_MARIO
+     *
+     * Stores the current pos and focus in sModeInfo->transitionStart, and
+     * stores the next pos and focus into sModeInfo->transitionEnd. These two fields are used in
+     * move_into_c_up().
+     *
+     * @param mode the mode to change to, or -1 to switch to the previous mode
+     * @param frames number of frames the transition should last, only used when entering C_UP
+     */
+
+     set_camera_mode(c, mode, frames) {
+        const start = this.sModeInfo.transitionStart
+        const end = this.sModeInfo.transitionEnd
+
+        if (mode == CAMERA_MODE_WATER_SURFACE && this.gCurrLevelArea == AREA_TTM_OUTSIDE) {
+
+        } else {
+            // Clear movement flags that would affect the transition
+            this.gCameraMovementFlags &= ~(CAM_MOVE_RESTRICT | CAM_MOVE_ROTATE)
+            this.gCameraMovementFlags |= CAM_MOVING_INTO_MODE
+            if (mode == CAMERA_MODE_NONE) {
+                mode = CAMERA_MODE_CLOSE
+            }
+            this.sCUpCameraPitch = 0
+            this.sModeOffsetYaw = 0
+            this.sLakituDist = 0
+            this.sLakituPitch = 0
+            this.sAreaYawChange = 0
+
+            this.sModeInfo.newMode = (mode != -1) ? mode : this.sModeInfo.lastMode
+            this.sModeInfo.lastMode = c.mode
+            this.sModeInfo.max = frames
+            this.sModeInfo.frame = 1
+
+            c.mode = this.sModeInfo.newMode
+            this.gLakituState.mode = c.mode
+
+            this.vec3f_copy(end.focus, c.focus)
+            this.vec3f_sub(end.focus, this.gPlayerCameraState.pos);
+
+            this.vec3f_copy(end.pos, c.pos)
+            this.vec3f_sub(end.pos, this.gPlayerCameraState.pos)
+
+            // sModeTransitions
+            if (this.sModeTransitions[this.sModeInfo.newMode] == null) {
+                throw "unknown camera case: " + this.sModeInfo.newMode
+            } else {
+                this.sModeTransitions[this.sModeInfo.newMode](c, end.focus, end.pos)
+            }
+
+            // End was updated by sModeTransitions
+            this.vec3f_sub(end.focus, this.gPlayerCameraState.pos);
+            this.vec3f_sub(end.pos, this.gPlayerCameraState.pos);
+
+            this.vec3f_copy(start.focus, this.gLakituState.curFocus);
+            this.vec3f_sub(start.focus, this.gPlayerCameraState.pos);
+
+            this.vec3f_copy(start.pos, this.gLakituState.curPos);
+            this.vec3f_sub(start.pos, this.gPlayerCameraState.pos);
+
+            MathUtil.vec3f_get_dist_and_angle(start.focus, start.pos, start)
+            MathUtil.vec3f_get_dist_and_angle(end.focus, end.pos, end)
+        }
+    }
+
+    /**
+     * Updates Lakitu's position/focus and applies camera shakes.
+     */
+    update_lakitu(c) {
+        let newPos = [0,0,0], newFoc = [0,0,0]
+
+        if (this.gCameraMovementFlags & CAM_MOVE_PAUSE_SCREEN) {
+        } else {
+            const newYaw = this.next_lakitu_state(newPos, newFoc, c.pos, c.focus, this.sOldPosition, this.sOldFocus, c.nextYaw)
+
+            let wrapper = { current: c.yaw }
+            this.set_or_approach_s16_symmetric(wrapper, newYaw, this.sYawSpeed)
+            c.yaw = wrapper.current
+            this.sStatusFlags &= ~CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
+
+            // Update old state
+            this.sOldPosition = [...newPos]
+            this.sOldFocus = [...newFoc]
+
+            this.gLakituState.yaw = c.yaw
+            this.gLakituState.nextYaw = c.nextYaw
+            this.gLakituState.goalPos = [...c.pos]
+            this.gLakituState.goalFocus = [...c.focus]
+
+            // Simulate lakitu flying to the new position and turning towards the new focus
+            this.set_or_approach_vec3f_asymptotic(this.gLakituState.curPos, newPos,
+                                                 this.gLakituState.posHSpeed, this.gLakituState.posVSpeed,
+                                                 this.gLakituState.posHSpeed)
+            this.set_or_approach_vec3f_asymptotic(this.gLakituState.curFocus, newFoc,
+                                                 this.gLakituState.focHSpeed, this.gLakituState.focVSpeed,
+                                                 this.gLakituState.focHSpeed)
+
+
+            // Adjust lakitu's speed back to normal --- so gross
+            wrapper = { current: this.gLakituState.focHSpeed }
+            this.set_or_approach_f32_asymptotic(wrapper, 0.8, 0.05)
+            this.gLakituState.focHSpeed = wrapper.current
+            wrapper.current = this.gLakituState.focVSpeed
+            this.set_or_approach_f32_asymptotic(wrapper, 0.3, 0.05)
+            this.gLakituState.focVSpeed = wrapper.current
+            wrapper.current = this.gLakituState.posHSpeed
+            this.set_or_approach_f32_asymptotic(wrapper, 0.3, 0.05)
+            this.gLakituState.posHSpeed = wrapper.current
+            wrapper.current = this.gLakituState.posVSpeed
+            this.set_or_approach_f32_asymptotic(wrapper, 0.3, 0.05)
+            this.gLakituState.posVSpeed = wrapper.current
+
+            // Turn on smooth movement when it hasn't been blocked for 2 frames
+            if (this.sStatusFlags & CAM_FLAG_BLOCK_SMOOTH_MOVEMENT) {
+                this.sStatusFlags &= ~CAM_FLAG_BLOCK_SMOOTH_MOVEMENT
+            } else {
+                this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
+            }
+
+            this.gLakituState.pos = [...this.gLakituState.curPos]
+            this.gLakituState.focus = [...this.gLakituState.curFocus]
+
+            const output = {}
+            MathUtil.vec3f_get_dist_and_angle(this.gLakituState.pos, this.gLakituState.focus, output)
+            this.gLakituState.focusDistance = output.dist
+            this.gLakituState.oldPitch = output.pitch
+            this.gLakituState.oldYaw = output.yaw
+
+            this.gLakituState.roll = 0
+
+            // Apply camera shakes TODO
+            this.shake_camera_pitch(this.gLakituState.pos, this.gLakituState.focus)
+            this.shake_camera_yaw(this.gLakituState.pos, this.gLakituState.focus)
+            this.shake_camera_roll()
+            // this.shake_camera_handheld(this.gLakituState.pos, this.gLakituState.focus)
+
+            if (this.gPlayerCameraState.action == Mario.ACT_DIVE && this.gLakituState.lastFrameAction != Mario.ACT_DIVE) {
+                this.set_camera_shake_from_hit(SHAKE_HIT_FROM_BELOW)
+            }
+
+            this.gLakituState.roll += this.sHandheldShakeRoll
+            this.gLakituState.roll += this.gLakituState.keyDanceRoll
+
+            if (c.mode != CAMERA_MODE_C_UP && c.cutscene == 0) {
+                ObjectListProc.gCheckingSurfaceCollisionsForCamera = true
+                let distToFloor = SurfaceCollision.find_floor(this.gLakituState.pos[0], this.gLakituState.pos[1] + 20, this.gLakituState.pos[2], {})
+                if (distToFloor != -11000) {
+                    distToFloor += 100
+                    if (this.gLakituState.pos[1] < (distToFloor)) {
+                        this.gLakituState.pos[1] = distToFloor
+                    } else {
+                        ObjectListProc.gCheckingSurfaceCollisionsForCamera = false
+                    }
+                }
+            }
+
+            this.sModeTransition.marioPos = [...this.gPlayerCameraState.pos]
+        }
+
+        this.clamp_pitch(this.gLakituState.pos, this.gLakituState.focus, 0x3E00, -0x3E00)
+        this.gLakituState.mode = c.mode
+        this.gLakituState.defMode = c.defMode
+    }
+
+    /**
+     * The main camera update function.
+     * Gets controller input, checks for cutscenes, handles mode changes, and moves the camera
+     */
+    update_camera(c) {
+        this.gCamera = c
+        this.update_camera_hud_status(c)
+        if (c.cutscene == 0) {
+            // Only process R_TRIG if 'fixed' is not selected in the menu
+            if (this.cam_select_alt_mode(0) == CAM_SELECTION_MARIO) {
+                if (window.playerInput.buttonPressedRt) {
+                    if (this.set_cam_angle(0) == CAM_ANGLE_LAKITU) {
+                        this.set_cam_angle(CAM_ANGLE_MARIO)
+                    } else {
+                        this.set_cam_angle(CAM_ANGLE_LAKITU)
+                    }
+                }
+            }
+            this.play_sound_if_cam_switched_to_lakitu_or_mario()
+        }
+
+        this.sStatusFlags &= ~CAM_FLAG_FRAME_AFTER_CAM_INIT
+        if (this.gCameraMovementFlags & CAM_MOVE_INIT_CAMERA) {
+            this.init_camera(c)
+            this.gCameraMovementFlags &= ~CAM_MOVE_INIT_CAMERA
+            this.sStatusFlags |= CAM_FLAG_FRAME_AFTER_CAM_INIT
+        }
+
+        // Store previous geometry information 
+        this.sMarioGeometry.prevFloorHeight = this.sMarioGeometry.currFloorHeight
+        this.sMarioGeometry.prevCeilHeight = this.sMarioGeometry.currCeilHeight
+        this.sMarioGeometry.prevFloor = this.sMarioGeometry.currFloor
+        this.sMarioGeometry.prevCeil = this.sMarioGeometry.currCeil
+        this.sMarioGeometry.prevFloorType = this.sMarioGeometry.currFloorType
+        this.sMarioGeometry.prevCeilType = this.sMarioGeometry.currCeilType
+
+        this.find_mario_floor_and_ceil(this.sMarioGeometry) 
+        ObjectListProc.gCheckingSurfaceCollisionsForCamera = true
+        c.pos = [...this.gLakituState.goalPos]
+        c.focus = [...this.gLakituState.goalFocus]
+
+        c.yaw = this.gLakituState.yaw
+        c.nextYaw = this.gLakituState.nextYaw
+        c.mode = this.gLakituState.mode
+        c.defMode = this.gLakituState.defMode
+
+        c.sCButtonsPressed = this.find_c_buttons_pressed(c.sCButtonsPressed);
+
+        if (c.cutscene != 0) {
+            this.sYawSpeed = 0
+            this.play_cutscene(c)
+            this.sFramesSinceCutsceneEnded = 0
+        } else {
+            // Clear the recent cutscene after 8 frames
+            if (this.gRecentCutscene != 0 && this.sFramesSinceCutsceneEnded < 8) {
+                this.sFramesSinceCutsceneEnded++
+                if (this.sFramesSinceCutsceneEnded >= 8) {
+                    this.gRecentCutscene = 0
+                    this.sFramesSinceCutsceneEnded = 0
+                }
+            }
+        }
+        // If not in a cutscene, do mode processing
+        if (c.cutscene == 0) {
+            this.sYawSpeed = 0x400
+
+            if (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
+            switch (c.mode) {
+                    case CAMERA_MODE_BEHIND_MARIO:
+                        this.mode_behind_mario_camera(c)
+                        break
+
+                    case CAMERA_MODE_C_UP:
+                        this.mode_c_up_camera(c)
+                        break
+
+                    case CAMERA_MODE_WATER_SURFACE:
+                        this.mode_water_surface_camera(c)
+                        break
+
+                    case CAMERA_MODE_INSIDE_CANNON:
+                        this.mode_cannon_camera(c)
+                        break
+
+                    default:
+                        this.mode_mario_camera(c)
+                }
+            } else {
+                switch (c.mode) {
+                    case CAMERA_MODE_BEHIND_MARIO:
+                        this.mode_behind_mario_camera(c)
+                        break
+
+                    case CAMERA_MODE_C_UP:
+                        mode_c_up_camera(c);
+                        break;
+
+                    case CAMERA_MODE_WATER_SURFACE:
+                        this.mode_water_surface_camera(c)
+                        break
+
+                    case CAMERA_MODE_INSIDE_CANNON:
+                        this.mode_cannon_camera(c);
+                        break;
+
+                    case CAMERA_MODE_8_DIRECTIONS:
+                        this.mode_8_directions_camera(c);
+                        break;
+
+                    case CAMERA_MODE_RADIAL:
+                        this.mode_radial_camera(c);
+                        break;
+
+                    case CAMERA_MODE_OUTWARD_RADIAL:
+                        this.mode_outward_radial_camera(c);
+                        break;
+
+                    case CAMERA_MODE_CLOSE:
+                        this.mode_lakitu_camera(c)
+                        break
+
+                    case CAMERA_MODE_FREE_ROAM:
+                        this.mode_lakitu_camera(c)
+                        break
+
+                    case CAMERA_MODE_BOSS_FIGHT:
+                        this.mode_boss_fight_camera(c);
+                        break;
+
+                    case CAMERA_MODE_PARALLEL_TRACKING:
+                        this.mode_parallel_tracking_camera(c);
+                        break;
+
+                    case CAMERA_MODE_SLIDE_HOOT:
+                        this.mode_slide_camera(c);
+                        break;
+
+                    case CAMERA_MODE_FIXED:
+                        this.mode_fixed_camera(c);
+                        break;
+
+                    case CAMERA_MODE_SPIRAL_STAIRS:
+                        this.mode_spiral_stairs_camera(c);
+                        break;
+
+                    default: throw "unknown camera case: " + c.mode
+                }
+            }
+        }
+
+        this.start_cutscene(c, this.get_cutscene_from_mario_status(c))
+        // this.stub_camera_2(c)
+        ObjectListProc.gCheckingSurfaceCollisionsForCamera = false
+        if (Area.gCurrLevelNum != LEVEL_CASTLE) {
+            // If fixed camera is selected as the alternate mode, then fix the camera as long as the right
+            // trigger is held
+            if ((c.cutscene == 0 && window.playerInput.buttonDownRt && this.cam_select_alt_mode(0) == CAM_SELECTION_FIXED)
+            || (this.gCameraMovementFlags & CAM_MOVE_FIX_IN_PLACE)
+            || (this.gPlayerCameraState.action) == ACT_GETTING_BLOWN) {
+                
+                // If this is the first frame that R_TRIG is held, play the "click" sound
+                if (c.cutscene == 0 && (window.playerInput.buttonPressedRt) && this.cam_select_alt_mode(0) == CAM_SELECTION_FIXED) {
+                    this.sCameraSoundFlags |= CAM_SOUND_FIXED_ACTIVE
+                    this.play_sound_rbutton_changed()
+                }
+
+                // Fixed mode only prevents Lakitu from moving. The camera pos still updates, so
+                // Lakitu will fly to his next position as normal whenever R_TRIG is released.
+                this.gLakituState.posHSpeed = 0.0
+                this.gLakituState.posVSpeed = 0.0
+
+                c.newYaw = this.calculate_yaw(this.gLakituState.focus, this.gLakituState.pos)
+                c.yaw = c.nextYaw
+                this.gCameraMovementFlags &= ~CAM_MOVE_FIX_IN_PLACE
+            } else {
+                if (this.sCameraSoundFlags & CAM_SOUND_FIXED_ACTIVE) {
+                    this.play_sound_rbutton_changed()
+                    this.sCameraSoundFlags &= ~CAM_SOUND_FIXED_ACTIVE
+                }
+            }
+        } else {
+            if ((window.playerInput.buttonPressedRt) && this.cam_select_alt_mode(0) == CAM_SELECTION_FIXED) {
+                this.play_sound_button_change_blocked()
+            }
+        }
+
+        this.update_lakitu(c) 
+
+        this.gLakituState.lastFrameAction = this.gPlayerCameraState.action
+
+    }
+
     // ---------------- //
 
     select_mario_cam_mode() {
@@ -3655,69 +4059,6 @@ class Camera {
         return numCollisions
     }
 
-    transition_next_state(c, frames) {
-        if (!(this.sStatusFlags & CAM_FLAG_FRAME_AFTER_CAM_INIT)) {
-            this.sStatusFlags |= (CAM_FLAG_START_TRANSITION | CAM_FLAG_TRANSITION_OUT_OF_C_UP)
-            this.sModeTransition.framesLeft = frames
-        }
-    }
-
-
-    set_camera_mode(c, mode, frames) {
-        const start = this.sModeInfo.transitionStart
-        const end = this.sModeInfo.transitionEnd
-
-        if (mode == CAMERA_MODE_WATER_SURFACE && this.gCurrLevelArea == AREA_TTM_OUTSIDE) {
-
-        } else {
-            // Clear movement flags that would affect the transition
-            this.gCameraMovementFlags &= ~(CAM_MOVE_RESTRICT | CAM_MOVE_ROTATE)
-            this.gCameraMovementFlags |= CAM_MOVING_INTO_MODE
-            if (mode == CAMERA_MODE_NONE) {
-                mode = CAMERA_MODE_CLOSE
-            }
-            this.sCUpCameraPitch = 0
-            this.sModeOffsetYaw = 0
-            this.sLakituDist = 0
-            this.sLakituPitch = 0
-            this.sAreaYawChange = 0
-
-            this.sModeInfo.newMode = (mode != -1) ? mode : this.sModeInfo.lastMode
-            this.sModeInfo.lastMode = c.mode
-            this.sModeInfo.max = frames
-            this.sModeInfo.frame = 1
-
-            c.mode = this.sModeInfo.newMode
-            this.gLakituState.mode = c.mode
-
-            this.vec3f_copy(end.focus, c.focus)
-            this.vec3f_sub(end.focus, this.gPlayerCameraState.pos);
-
-            this.vec3f_copy(end.pos, c.pos)
-            this.vec3f_sub(end.pos, this.gPlayerCameraState.pos)
-
-            // sModeTransitions
-            if (this.sModeTransitions[this.sModeInfo.newMode] == null) {
-                throw "unknown camera case: " + this.sModeInfo.newMode
-            } else {
-                this.sModeTransitions[this.sModeInfo.newMode](c, end.focus, end.pos)
-            }
-
-            // End was updated by sModeTransitions
-            this.vec3f_sub(end.focus, this.gPlayerCameraState.pos);
-            this.vec3f_sub(end.pos, this.gPlayerCameraState.pos);
-
-            this.vec3f_copy(start.focus, this.gLakituState.curFocus);
-            this.vec3f_sub(start.focus, this.gPlayerCameraState.pos);
-
-            this.vec3f_copy(start.pos, this.gLakituState.curPos);
-            this.vec3f_sub(start.pos, this.gPlayerCameraState.pos);
-
-            MathUtil.vec3f_get_dist_and_angle(start.focus, start.pos, start)
-            MathUtil.vec3f_get_dist_and_angle(end.focus, end.pos, end)
-        }
-    }
-
     play_camera_buzz_if_cdown() {
         if (this.sCButtonsPressed & D_CBUTTONS) {
             this.play_sound_button_change_blocked()
@@ -3750,6 +4091,20 @@ class Camera {
 
     play_sound_button_change_blocked() {
         play_sound(SOUND_MENU_CLICK_CHANGE_VIEW, gGlobalSoundSource)
+    }
+
+    play_sound_rbutton_changed() {
+        play_sound(SOUND_MENU_CLICK_CHANGE_VIEW, gGlobalSoundSource)
+    }
+
+    play_sound_if_cam_switched_to_lakitu_or_mario() {
+        if (this.sCameraSoundFlags & CAM_SOUND_MARIO_ACTIVE) {
+            this.play_sound_rbutton_changed()
+        }
+        if (this.sCameraSoundFlags & CAM_SOUND_NORMAL_ACTIVE) {
+            this.play_sound_rbutton_changed
+        }
+        this.sCameraSoundFlags &= ~(CAM_SOUND_MARIO_ACTIVE | CAM_SOUND_NORMAL_ACTIVE)
     }
 
     radial_camera_input(c, unused) {
@@ -3870,162 +4225,6 @@ class Camera {
         dst[0] -= src[0]
         dst[1] -= src[1]
         dst[2] -= src[2]
-    }
-
-    update_camera(c) {
-        this.gCamera = c
-        this.update_camera_hud_status(c)
-        if (c.cutscene == 0) {
-            // Only process R_TRIG if 'fixed' is not selected in the menu
-            if (this.cam_select_alt_mode(0) == CAM_SELECTION_MARIO) {
-                if (/*window.playerInput.buttonPressedRt*/ false) {
-                    if (this.set_cam_angle(0) == CAM_ANGLE_LAKITU) {
-                        this.set_cam_angle(CAM_ANGLE_MARIO)
-                    } else {
-                        this.set_cam_angle(CAM_ANGLE_LAKITU)
-                    }
-                }
-            }
-            // this.play_sound_if_cam_switched_to_lakitu_or_mario()
-        }
-
-        this.sStatusFlags &= ~CAM_FLAG_FRAME_AFTER_CAM_INIT
-        if (this.gCameraMovementFlags & CAM_MOVE_INIT_CAMERA) {
-            this.init_camera(c)
-            this.gCameraMovementFlags &= ~CAM_MOVE_INIT_CAMERA
-            this.sStatusFlags |= CAM_FLAG_FRAME_AFTER_CAM_INIT
-        }
-
-        // Store previous geometry information 
-        this.sMarioGeometry.prevFloorHeight = this.sMarioGeometry.currFloorHeight
-        this.sMarioGeometry.prevCeilHeight = this.sMarioGeometry.currCeilHeight
-        this.sMarioGeometry.prevFloor = this.sMarioGeometry.currFloor
-        this.sMarioGeometry.prevCeil = this.sMarioGeometry.currCeil
-        this.sMarioGeometry.prevFloorType = this.sMarioGeometry.currFloorType
-        this.sMarioGeometry.prevCeilType = this.sMarioGeometry.currCeilType
-
-        this.find_mario_floor_and_ceil(this.sMarioGeometry) 
-        ObjectListProc.gCheckingSurfaceCollisionsForCamera = true
-        c.pos = [...this.gLakituState.goalPos]
-        c.focus = [...this.gLakituState.goalFocus]
-
-        c.yaw = this.gLakituState.yaw
-        c.nextYaw = this.gLakituState.nextYaw
-        c.mode = this.gLakituState.mode
-        c.defMode = this.gLakituState.defMode
-
-        c.sCButtonsPressed = this.find_c_buttons_pressed(c.sCButtonsPressed);
-
-        if (c.cutscene != 0) {
-            this.sYawSpeed = 0
-            this.play_cutscene(c)
-            this.sFramesSinceCutsceneEnded = 0
-        } else {
-            // Clear the recent cutscene after 8 frames
-            if (this.gRecentCutscene != 0 && this.sFramesSinceCutsceneEnded < 8) {
-                this.sFramesSinceCutsceneEnded++
-                if (this.sFramesSinceCutsceneEnded >= 8) {
-                    this.gRecentCutscene = 0
-                    this.sFramesSinceCutsceneEnded = 0
-                }
-            }
-        }
-        // If not in a cutscene, do mode processing
-        if (c.cutscene == 0) {
-            this.sYawSpeed = 0x400
-
-            if (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
-            switch (c.mode) {
-                    case CAMERA_MODE_BEHIND_MARIO:
-                        this.mode_behind_mario_camera(c)
-                        break
-
-                    case CAMERA_MODE_C_UP:
-                        this.mode_c_up_camera(c)
-                        break
-
-                    case CAMERA_MODE_WATER_SURFACE:
-                        this.mode_water_surface_camera(c)
-                        break
-
-                    case CAMERA_MODE_INSIDE_CANNON:
-                        this.mode_cannon_camera(c)
-                        break
-
-                    default:
-                        this.mode_mario_camera(c)
-                }
-            } else {
-                switch (c.mode) {
-                    case CAMERA_MODE_BEHIND_MARIO:
-                        this.mode_behind_mario_camera(c)
-                        break
-
-                    case CAMERA_MODE_C_UP:
-                        mode_c_up_camera(c);
-                        break;
-
-                    case CAMERA_MODE_WATER_SURFACE:
-                        this.mode_water_surface_camera(c)
-                        break
-
-                    case CAMERA_MODE_INSIDE_CANNON:
-                        this.mode_cannon_camera(c);
-                        break;
-
-                    case CAMERA_MODE_8_DIRECTIONS:
-                        this.mode_8_directions_camera(c);
-                        break;
-
-                    case CAMERA_MODE_RADIAL:
-                        this.mode_radial_camera(c);
-                        break;
-
-                    case CAMERA_MODE_OUTWARD_RADIAL:
-                        this.mode_outward_radial_camera(c);
-                        break;
-
-                    case CAMERA_MODE_CLOSE:
-                        this.mode_lakitu_camera(c)
-                        break
-
-                    case CAMERA_MODE_FREE_ROAM:
-                        this.mode_lakitu_camera(c)
-                        break
-
-                    case CAMERA_MODE_BOSS_FIGHT:
-                        this.mode_boss_fight_camera(c);
-                        break;
-
-                    case CAMERA_MODE_PARALLEL_TRACKING:
-                        this.mode_parallel_tracking_camera(c);
-                        break;
-
-                    case CAMERA_MODE_SLIDE_HOOT:
-                        this.mode_slide_camera(c);
-                        break;
-
-                    case CAMERA_MODE_FIXED:
-                        this.mode_fixed_camera(c);
-                        break;
-
-                    case CAMERA_MODE_SPIRAL_STAIRS:
-                        this.mode_spiral_stairs_camera(c);
-                        break;
-
-                    default: throw "unknown camera case: " + c.mode
-                }
-            }
-        }
-
-        this.start_cutscene(c, this.get_cutscene_from_mario_status(c))
-
-        ObjectListProc.gCheckingSurfaceCollisionsForCamera = false
-
-        this.update_lakitu(c) 
-
-        this.gLakituState.lastFrameAction = this.gPlayerCameraState.action
-
     }
 
     update_camera_hud_status(c) {
@@ -4720,101 +4919,6 @@ class Camera {
 
         this.vec3f_copy(this.sModeTransition.marioPos, this.gPlayerCameraState.pos)
         return yaw
-    }
-
-    update_lakitu(c) {
-        let newPos = [0,0,0], newFoc = [0,0,0]
-
-        if (this.gCameraMovementFlags & CAM_MOVE_PAUSE_SCREEN) {
-        } else {
-            const newYaw = this.next_lakitu_state(newPos, newFoc, c.pos, c.focus, this.sOldPosition, this.sOldFocus, c.nextYaw)
-
-            let wrapper = { current: c.yaw }
-            this.set_or_approach_s16_symmetric(wrapper, newYaw, this.sYawSpeed)
-            c.yaw = wrapper.current
-            this.sStatusFlags &= ~CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
-
-            // Update old state
-            this.sOldPosition = [...newPos]
-            this.sOldFocus = [...newFoc]
-
-            this.gLakituState.yaw = c.yaw
-            this.gLakituState.nextYaw = c.nextYaw
-            this.gLakituState.goalPos = [...c.pos]
-            this.gLakituState.goalFocus = [...c.focus]
-
-            // Simulate lakitu flying to the new position and turning towards the new focus
-            this.set_or_approach_vec3f_asymptotic(this.gLakituState.curPos, newPos,
-                                                 this.gLakituState.posHSpeed, this.gLakituState.posVSpeed,
-                                                 this.gLakituState.posHSpeed)
-            this.set_or_approach_vec3f_asymptotic(this.gLakituState.curFocus, newFoc,
-                                                 this.gLakituState.focHSpeed, this.gLakituState.focVSpeed,
-                                                 this.gLakituState.focHSpeed)
-
-
-            // Adjust lakitu's speed back to normal --- so gross
-            wrapper = { current: this.gLakituState.focHSpeed }
-            this.set_or_approach_f32_asymptotic(wrapper, 0.8, 0.05)
-            this.gLakituState.focHSpeed = wrapper.current
-            wrapper.current = this.gLakituState.focVSpeed
-            this.set_or_approach_f32_asymptotic(wrapper, 0.3, 0.05)
-            this.gLakituState.focVSpeed = wrapper.current
-            wrapper.current = this.gLakituState.posHSpeed
-            this.set_or_approach_f32_asymptotic(wrapper, 0.3, 0.05)
-            this.gLakituState.posHSpeed = wrapper.current
-            wrapper.current = this.gLakituState.posVSpeed
-            this.set_or_approach_f32_asymptotic(wrapper, 0.3, 0.05)
-            this.gLakituState.posVSpeed = wrapper.current
-
-            // Turn on smooth movement when it hasn't been blocked for 2 frames
-            if (this.sStatusFlags & CAM_FLAG_BLOCK_SMOOTH_MOVEMENT) {
-                this.sStatusFlags &= ~CAM_FLAG_BLOCK_SMOOTH_MOVEMENT
-            } else {
-                this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
-            }
-
-            this.gLakituState.pos = [...this.gLakituState.curPos]
-            this.gLakituState.focus = [...this.gLakituState.curFocus]
-
-            const output = {}
-            MathUtil.vec3f_get_dist_and_angle(this.gLakituState.pos, this.gLakituState.focus, output)
-            this.gLakituState.focusDistance = output.dist
-            this.gLakituState.oldPitch = output.pitch
-            this.gLakituState.oldYaw = output.yaw
-
-            this.gLakituState.roll = 0
-
-            // Apply camera shakes TODO
-            this.shake_camera_pitch(this.gLakituState.pos, this.gLakituState.focus)
-            this.shake_camera_yaw(this.gLakituState.pos, this.gLakituState.focus)
-            this.shake_camera_roll(this.gLakituState.roll)
-            //shake_camera_handheld()
-
-            if (this.gPlayerCameraState.action == Mario.ACT_DIVE && this.gLakituState.lastFrameAction != Mario.ACT_DIVE) {
-                this.set_camera_shake_from_hit(SHAKE_HIT_FROM_BELOW)
-            }
-
-            this.gLakituState.roll += this.gLakituState.keyDanceRoll
-
-            if (c.mode != CAMERA_MODE_C_UP && c.cutscene == 0) {
-                ObjectListProc.gCheckingSurfaceCollisionsForCamera = true
-                let distToFloor = SurfaceCollision.find_floor(this.gLakituState.pos[0], this.gLakituState.pos[1] + 20, this.gLakituState.pos[2], {})
-                if (distToFloor != -11000) {
-                    distToFloor += 100
-                    if (this.gLakituState.pos[1] < (distToFloor)) {
-                        this.gLakituState.pos[1] = distToFloor
-                    } else {
-                        ObjectListProc.gCheckingSurfaceCollisionsForCamera = false
-                    }
-                }
-            }
-
-            this.sModeTransition.marioPos = [...this.gPlayerCameraState.pos]
-        }
-
-        this.clamp_pitch(this.gLakituState.pos, this.gLakituState.focus, 0x3E00, -0x3E00)
-        this.gLakituState.mode = c.mode
-        this.gLakituState.defMode = c.defMode
     }
 
     update_graph_node_camera(graphNode) {

@@ -1108,7 +1108,7 @@ class Camera {
         }
 
         // Avoid obstructing walls
-        yawWrapper = {yaw: avoidYaw}
+        let yawWrapper = {yaw: avoidYaw}
         avoidStatus = this.rotate_camera_around_walls(c, c.pos, yawWrapper, 0x400)
         if (avoidStatus == 3) {
             if (avoidYaw - atan2s(areaDistZ, areaDistX) + DEGREES(90) < 0) {
@@ -3166,11 +3166,11 @@ class Camera {
                         break
 
                     case CAMERA_MODE_BOSS_FIGHT:
-                        mode_boss_fight_camera(c);
+                        this.mode_boss_fight_camera(c);
                         break;
 
                     case CAMERA_MODE_PARALLEL_TRACKING:
-                        mode_parallel_tracking_camera(c);
+                        this.mode_parallel_tracking_camera(c);
                         break;
 
                     // case CAMERA_MODE_SLIDE_HOOT:
@@ -3178,7 +3178,7 @@ class Camera {
                     //     break;
 
                     case CAMERA_MODE_FIXED:
-                        mode_fixed_camera(c);
+                        this.mode_fixed_camera(c);
                         break;
 
                     // case CAMERA_MODE_SPIRAL_STAIRS:

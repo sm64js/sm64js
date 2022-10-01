@@ -388,7 +388,7 @@ export const ZOOMOUT_AREA_MASK = (level1Area1, level1Area2, level1Area3, level1A
             (level1Area1) << 0)
 }
 
-export const NULL_TRIGGER = [0, null, 0, 0, 0, 0, 0, 0, 0]
+export const NULL_TRIGGER = {area: 0, event: null, centerX: 0, centerY: 0, centerZ: 0, boundsX: 0, boundsY: 0, boundsZ: 0, boundsYaw: 0}
 
 class Camera {
     constructor() {
@@ -555,7 +555,7 @@ class Camera {
             {startOfPath: 0, pos: [0.0, 0.0, 0.0], distThresh: 0.0, zoom: 0.0},
         ]
 
-        // {area: , event: , centerX: , centerY: , centerZ: , boundsX: , boundsY: , boundsZ: , boundsYaw: }
+        // {area: , event: , centerX: , centerY: , centerZ: , boundsX: , boundsY: , boundsZ: , boundsYaw: },
         
         /**
          * The SL triggers operate camera behavior in front of the snowman who blows air.
@@ -578,8 +578,113 @@ class Camera {
          * tunnel. Both sides achieve their effect by editing the camera yaw.
          */
         this.sCamTHI = [
-            {area: 1, event: this.cam_thi_move_cam_through_tunnel, centerX: -4609, centerY: -2969, centerZ: 6448, boundsX: 100, boundsY: 300, boundsZ: 300, boundsYaw: 0},
-            {area: 1, event: this.cam_thi_look_through_tunnel, centerX: -4809, centerY: -2969, centerZ: 6448, boundsX: 100, boundsY: 300, boundsZ: 300, boundsYaw: 0},
+            {area: 1, event: this.cam_thi_move_cam_through_tunnel.bind(this), centerX: -4609, centerY: -2969, centerZ: 6448, boundsX: 100, boundsY: 300, boundsZ: 300, boundsYaw: 0},
+            {area: 1, event: this.cam_thi_look_through_tunnel.bind(this), centerX: -4809, centerY: -2969, centerZ: 6448, boundsX: 100, boundsY: 300, boundsZ: 300, boundsYaw: 0},
+            NULL_TRIGGER
+        ]
+
+        /**
+         * The HMC triggers are mostly for warping the camera below platforms, but the second trigger is used to
+         * start the cutscene for entering the CotMC pool.
+         */
+        this.sCamHMC = [
+            {area: 1, event: this.cam_hmc_enter_maze.bind(this), centerX: 1996, centerY: 102, centerZ: 0, boundsX: 205, boundsY: 100, boundsZ: 205, boundsYaw: 0},
+            {area: 1, event: this.cam_castle_hmc_start_pool_cutscene.bind(this), centerX: 3350, centerY: -4689, centerZ: 4800, boundsX: 600, boundsY: 50, boundsZ: 600, boundsYaw: 0},
+            {area: 1, event: this.cam_hmc_elevator_black_hole.bind(this), centerX: -3278, centerY: 1236, centerZ: 1379, boundsX: 358, boundsY: 200, boundsZ: 358, boundsYaw: 0},
+            {area: 1, event: this.cam_hmc_elevator_maze_emergency_exit.bind(this), centerX: -2816, centerY: 2055, centerZ: -2560, boundsX: 358, boundsY: 200, boundsZ: 358, boundsYaw: 0},
+            {area: 1, event: this.cam_hmc_elevator_lake, centerX: -3532, centerY: 1543, centerZ: -7040, boundsX: 358, boundsY: 200, boundsZ: 358, boundsYaw: 0},
+            {area: 1, event: this.cam_hmc_elevator_maze, centerX: -972, centerY: 1543, centerZ: -7347, boundsX: 358, boundsY: 200, boundsZ: 358, boundsYaw: 0},
+            NULL_TRIGGER
+        ]
+
+        /**
+         * The SSL triggers are for starting the enter pyramid top cutscene,
+         * setting close mode in the middle of the pyramid, and setting the boss fight camera mode to outward
+         * radial.
+         */
+        this.sCamSSL = [
+            {area: 1, event: this.cam_ssl_enter_pyramid_top.bind(this), centerX: -2048, centerY: 1080, centerZ: -1024, boundsX: 150, boundsY: 150, boundsZ: 150, boundsYaw: 0},
+            {area: 2, event: this.cam_ssl_pyramid_center.bind(this), centerX: 0, centerY: -104, centerZ: -104, boundsX: 1248, boundsY: 1536, boundsZ: 2950, boundsYaw: 0},
+            {area: 2, event: this.cam_ssl_pyramid_center.bind(this), centerX: 0, centerY: 2500, centerZ: 256, boundsX: 515, boundsY: 5000, boundsZ: 515, boundsYaw: 0},
+            {area: 3, event: this.cam_ssl_boss_room.bind(this), centerX: 0, centerY: -1534, centerZ: -2040, boundsX: 1000, boundsY: 800, boundsZ: 1000, boundsYaw: 0},
+            NULL_TRIGGER
+        ]
+
+        /**
+         * The RR triggers are for changing between fixed and 8 direction mode when entering / leaving the building at
+         * the end of the ride.
+         */
+        this.sCamRR = [
+            {area: 1, event: this.cam_rr_exit_building_side.bind(this), centerX: -4197, centerY: 3819, centerZ: -3087, boundsX: 1769, boundsY: 1490, boundsZ: 342, boundsYaw: 0},
+            {area: 1, event: this.cam_rr_enter_building_side.bind(this), centerX: -4197, centerY: 3819, centerZ: -3771, boundsX: 769, boundsY: 490, boundsZ: 342, boundsYaw: 0},
+            {area: 1, event: this.cam_rr_enter_building_window.bind(this), centerX: -5603, centerY: 4834, centerZ: -5209, boundsX: 300, boundsY: 600, boundsZ: 591, boundsYaw: 0},
+            {area: 1, event: this.cam_rr_enter_building.bind(this), centerX: -2609, centerY: 3730, centerZ: -5463, boundsX: 300, boundsY: 650, boundsZ: 577, boundsYaw: 0},
+            {area: 1, event: this.cam_rr_exit_building_top.bind(this), centerX: -4196, centerY: 7343, centerZ: -5155, boundsX: 4500, boundsY: 1000, boundsZ: 4500, boundsYaw: 0},
+            {area: 1, event: this.cam_rr_enter_building.bind(this), centerX: -4196, centerY: 6043, centerZ: -5155, boundsX: 500, boundsY: 300, boundsZ: 500, boundsYaw: 0},
+            NULL_TRIGGER
+        ]
+
+        /**
+         * The CotMC trigger is only used to prevent fix Lakitu in place when Mario exits through the waterfall.
+         */
+        this.sCamCotMC = [
+            {area: 1, event: this.cam_cotmc_exit_waterfall.bind(this), centerX: 0, centerY: 1500, centerZ: 3500, boundsX: 550, boundsY: 10000, boundsZ: 1500, boundsYaw: 0},
+            NULL_TRIGGER
+        ]
+
+        /**
+         * The CCM triggers are used to set the flag that says when Mario is in the slide shortcut.
+         */
+        this.sCamCCM = [
+            {area: 2, event: this.cam_ccm_enter_slide_shortcut.bind(this), centerX: -4846, centerY: 2061, centerZ: 27, boundsX: 1229, boundsY: 1342, boundsZ: 396, boundsYaw: 0},
+            {area: 2, event: this.cam_ccm_leave_slide_shortcut.bind(this), centerX: -6412, centerY: -3917, centerZ: -6246, boundsX: 307, boundsY: 185, boundsZ: 132, boundsYaw: 0},
+            NULL_TRIGGER
+        ]
+
+        /**
+         * The Castle triggers are used to set the camera to fixed mode when entering the lobby, and to set it
+         * to close mode when leaving it. They also set the mode to spiral staircase.
+         *
+         * There are two triggers for looking up and down straight staircases when Mario is at the start,
+         * and one trigger that starts the enter pool cutscene when Mario enters HMC.
+         */
+        this.sCamCastle = [
+            {area: 1, event: this.cam_castle_close_mode.bind(this), centerX: -1100, centerY: 657, centerZ: -1346, boundsX: 300, boundsY: 150, boundsZ: 300, boundsYaw: 0},
+            {area: 1, event: this.cam_castle_enter_lobby.bind(this), centerX: -1099, centerY: 657, centerZ: -803, boundsX: 300, boundsY: 150, boundsZ: 300, boundsYaw: 0},
+            {area: 1, event: this.cam_castle_close_mode.bind(this), centerX: -2304, centerY: -264, centerZ: -4072, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: 0},
+            {area: 1, event: this.cam_castle_close_mode.bind(this), centerX: -2304, centerY: 145, centerZ: -1344, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: 0},
+            {area: 1, event: this.cam_castle_enter_lobby.bind(this), centerX: -2304, centerY: 145, centerZ: -802, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: 0},
+            //! Sets the camera mode when leaving secret aquarium
+            {area: 1, event: this.cam_castle_close_mode.bind(this), centerX: 2816, centerY: 1200, centerZ: -256, boundsX: 100, boundsY: 100, boundsZ: 100, boundsYaw: 0},
+            {area: 1, event: this.cam_castle_close_mode.bind(this), centerX: 256, centerY: -161, centerZ: -4226, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: 0},
+            {area: 1, event: this.cam_castle_close_mode.bind(this), centerX: 256, centerY: 145, centerZ: -1344, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: 0},
+            {area: 1, event: this.cam_castle_enter_lobby.bind(this), centerX: 256, centerY: 145, centerZ: -802, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: 0},
+            {area: 1, event: this.cam_castle_close_mode.bind(this), centerX: -1023, centerY: 44, centerZ: -4870, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: 0},
+            {area: 1, event: this.cam_castle_close_mode.bind(this), centerX: -459, centerY: 145, centerZ: -1020, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: 0x6000},
+            {area: 1, event: this.cam_castle_enter_lobby.bind(this), centerX: -85, centerY: 145, centerZ: -627, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: 0},
+            {area: 1, event: this.cam_castle_close_mode.bind(this), centerX: -1589, centerY: 145, centerZ: -1020, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: -0x6000},
+            {area: 1, event: this.cam_castle_enter_lobby.bind(this), centerX: -1963, centerY: 145, centerZ: -627, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: 0},
+            {area: 1, event: this.cam_castle_leave_lobby_sliding_door.bind(this), centerX: -2838, centerY: 657, centerZ: -1659, boundsX: 200, boundsY: 150, boundsZ: 150, boundsYaw: 0x2000},
+            {area: 1, event: this.cam_castle_enter_lobby_sliding_door.bind(this), centerX: -2319, centerY: 512, centerZ: -1266, boundsX: 300, boundsY: 150, boundsZ: 300, boundsYaw: 0x2000},
+            {area: 1, event: this.cam_castle_close_mode.bind(this), centerX: 844, centerY: 759, centerZ: -1657, boundsX: 40, boundsY: 150, boundsZ: 40, boundsYaw: -0x2000},
+            {area: 1, event: this.cam_castle_enter_lobby.bind(this), centerX: 442, centerY: 759, centerZ: -1292, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: -0x2000},
+            {area: 2, event: this.cam_castle_enter_spiral_stairs.bind(this), centerX: -1000, centerY: 657, centerZ: 1740, boundsX: 200, boundsY: 300, boundsZ: 200, boundsYaw: 0},
+            {area: 2, event: this.cam_castle_enter_spiral_stairs.bind(this), centerX: -996, centerY: 1348, centerZ: 1814, boundsX: 200, boundsY: 300, boundsZ: 200, boundsYaw: 0},
+            {area: 2, event: this.cam_castle_close_mode.bind(this), centerX: -946, centerY: 657, centerZ: 2721, boundsX: 50, boundsY: 150, boundsZ: 50, boundsYaw: 0},
+            {area: 2, event: this.cam_castle_close_mode.bind(this), centerX: -996, centerY: 1348, centerZ: 907, boundsX: 50, boundsY: 150, boundsZ: 50, boundsYaw: 0},
+            {area: 2, event: this.cam_castle_close_mode.bind(this), centerX: -997, centerY: 1348, centerZ: 1450, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: 0},
+            {area: 1, event: this.cam_castle_close_mode.bind(this), centerX: -4942, centerY: 452, centerZ: -461, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: 0x4000},
+            {area: 1, event: this.cam_castle_close_mode.bind(this), centerX: -3393, centerY: 350, centerZ: -793, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: 0x4000},
+            {area: 1, event: this.cam_castle_enter_lobby.bind(this), centerX: -2851, centerY: 350, centerZ: -792, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: 0x4000},
+            {area: 1, event: this.cam_castle_enter_lobby.bind(this), centerX: 803, centerY: 350, centerZ: -228, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: -0x4000},
+            //! Duplicate camera trigger outside JRB door
+            {area: 1, event: this.cam_castle_enter_lobby.bind(this), centerX: 803, centerY: 350, centerZ: -228, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: -0x4000},
+            {area: 1, event: this.cam_castle_close_mode.bind(this), centerX: 1345, centerY: 350, centerZ: -229, boundsX: 140, boundsY: 150, boundsZ: 140, boundsYaw: 0x4000},
+            {area: 1, event: this.cam_castle_close_mode.bind(this), centerX: -946, centerY: -929, centerZ: 622, boundsX: 300, boundsY: 150, boundsZ: 300, boundsYaw: 0},
+            {area: 2, event: this.cam_castle_look_upstairs.bind(this), centerX: -205, centerY: 1456, centerZ: 2508, boundsX: 210, boundsY: 928, boundsZ: 718, boundsYaw: 0},
+            {area: 1, event: this.cam_castle_basement_look_downstairs.bind(this), centerX: -1027, centerY: -587, centerZ: -718, boundsX: 318, boundsY: 486, boundsZ: 577, boundsYaw: 0},
+            {area: 1, event: this.cam_castle_lobby_entrance.bind(this), centerX: -1023, centerY: 376, centerZ: 1830, boundsX: 300, boundsY: 400, boundsZ: 300, boundsYaw: 0},
+            {area: 3, event: this.cam_castle_hmc_start_pool_cutscene.bind(this), centerX: 2485, centerY: -1689, centerZ: -2659, boundsX: 600, boundsY: 50, boundsZ: 600, boundsYaw: 0},
             NULL_TRIGGER
         ]
 

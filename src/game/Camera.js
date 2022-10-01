@@ -3411,7 +3411,6 @@ class Camera {
 
         this.camera_course_processing(c)
         this.stub_camera_3(c)
-
         let wrapper = {}
         c.sCButtonsPressed = this.find_c_buttons_pressed(c.sCButtonsPressed, wrapper);
 
@@ -6034,7 +6033,9 @@ class Camera {
      * every door leaving the lobby and spiral staircase.
      */
     cam_castle_close_mode(c) {
-        this.set_camera_mode_close_cam(c.mode)
+        let wrapper = {mode: c.mode}
+        this.set_camera_mode_close_cam(wrapper)
+        c.mode = wrapper.mode
     }
 
     /**
@@ -6058,11 +6059,15 @@ class Camera {
     }
 
     cam_bbh_fall_off_roof(c) {
-        this.set_camera_mode_close_cam(c.mode)
+        let wrapper = {mode: c.mode}
+        this.set_camera_mode_close_cam(wrapper)
+        c.mode = wrapper.mode
     }
 
     cam_bbh_fall_into_pool(c) {
-        this.set_camera_mode_close_cam(c.mode)
+        let wrapper = {mode: c.mode}
+        this.set_camera_mode_close_cam(wrapper)
+        c.mode = wrapper.mode
         let dir = [0.0, 0.0, 300.0]
         this.offset_rotated(this.gLakituState.goalPos, this.gPlayerCameraState.pos, dir, this.gPlayerCameraState.faceAngle)
         this.gLakituState.goalPos[1] = 2300.0
@@ -6143,16 +6148,22 @@ class Camera {
 
     cam_bbh_elevator_room_lower(c) {
         c.doorStatus = DOOR_LEAVING_SPECIAL
-        this.set_camera_mode_close_cam(c.mode)
+        let wrapper = {mode: c.mode}
+        this.set_camera_mode_close_cam(wrapper)
+        c.mode = wrapper.mode
     }
 
     cam_bbh_room_0_back_entrance(c) {
-        this.set_camera_mode_close_cam(c.mode)
+        let wrapper = {mode: c.mode}
+        this.set_camera_mode_close_cam(wrapper)
+        c.mode = wrapper.mode
     }
 
     cam_bbh_elevator(c) {
         if (c.mode == CAMERA_MODE_FIXED) {
-            this.set_camera_mode_close_cam(c.mode)
+            let wrapper = c.mode
+            this.set_camera_mode_close_cam(wrapper)
+            c.mode = wrapper.mode
             c.pos[1] = -405.0
             this.gLakituState.goalPos[1] = -405.0
         }

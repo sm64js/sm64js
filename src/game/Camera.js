@@ -6164,7 +6164,9 @@ class Camera {
     }
 
     cam_bbh_enter_front_door(c) {
-        this.set_camera_mode_close_cam(c.mode)
+        wrapper = {mode: c.mode}
+        this.set_camera_mode_close_cam(wrapper)
+        c.mode = wrapper.mode
     }
 
     cam_bbh_room_2_library(c) {

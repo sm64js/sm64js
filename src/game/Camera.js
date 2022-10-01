@@ -6289,7 +6289,6 @@ class Camera {
 
     camera_course_processing(c) {
         let level = Area.gCurrLevelNum
-        this.define_camera_triggers()
         let mode = 0
         let area = Area.gCurrentArea.index
         // Bounds iterator

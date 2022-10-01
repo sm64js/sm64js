@@ -1968,7 +1968,7 @@ class Camera {
         // When C-Down is not active, this
         MathUtil.vec3f_set_dist_and_angle(focus, pos, focusDistance, 0x1000, yaw)
         // Find the floor of the arena
-        pos[1] = find_floor(c.areaCenX, CELL_HEIGHT_LIMIT, c.areaCenZ, floor)
+        pos[1] = SurfaceCollision.find_floor(c.areaCenX, CELL_HEIGHT_LIMIT, c.areaCenZ, floor)
         if (floor != null) {
             nx = floor.normal.x
             ny = floor.normal.y
@@ -2823,7 +2823,7 @@ class Camera {
         checkPos[1] = focus[1] + (cPos[1] - focus[1]) * 0.7 + 300.0
         checkPos[2] = focus[2] + (cPos[2] - focus[2]) * 0.7
         wrapper.floor = floor
-        floorHeight = find_floor(checkPos[0], checkPos[1] + 50.0, checkPos[2], wrapper)
+        floorHeight = SurfaceCollision.find_floor(checkPos[0], checkPos[1] + 50.0, checkPos[2], wrapper)
         floor = wrapper.floor
         if (floorHeight != FLOOR_LOWER_LIMIT) {
             if (floorHeight < this.sMarioGeometry.currFloorHeight) {
@@ -5989,7 +5989,7 @@ class Camera {
      * Make the camera look up the stairs from the 2nd to 3rd floor of the castle
      */
     cam_castle_look_upstairs(c) {
-        let floorHeight = find_floor(c.pos[0], c.pos[1], c.pos[2], {})
+        let floorHeight = SurfaceCollision.find_floor(c.pos[0], c.pos[1], c.pos[2], {})
 
         // If Mario is on the first few steps, fix the camera pos, making it look up
         if ((this.sMarioGeometry.currFloorHeight > 1229.0) && (floorHeight < 1229.0) && (this.sCSideButtonYaw == 0)) {
@@ -6001,7 +6001,7 @@ class Camera {
      * Make the camera look down the stairs towards the basement star door
      */
     cam_castle_basement_look_downstairs(c) {
-        let floorHeight = find_floor(c.pos[0], c.pos[1], c.pos[2], {})
+        let floorHeight = SurfaceCollision.find_floor(c.pos[0], c.pos[1], c.pos[2], {})
 
         // Fix the camera pos, making it look downwards. Only active on the top few steps
         if ((floorHeight > -110.0) && (this.sCSideButtonYaw == 0)) {

@@ -6164,7 +6164,7 @@ class Camera {
     }
 
     cam_bbh_enter_front_door(c) {
-        wrapper = {mode: c.mode}
+        let wrapper = {mode: c.mode}
         this.set_camera_mode_close_cam(wrapper)
         c.mode = wrapper.mode
     }

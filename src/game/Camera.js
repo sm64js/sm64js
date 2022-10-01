@@ -53,6 +53,7 @@ import { play_music } from "../audio/external"
 import { SEQ_EVENT_CUTSCENE_INTRO } from "../include/seq_ids"
 import { SURFACE_CAMERA_FREE_ROAM } from "../include/surface_terrains"
 import { SURFACE_CAMERA_8_DIR } from "../include/surface_terrains"
+import { SURFACE_BOSS_FIGHT_CAMERA } from "../include/surface_terrains"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -756,6 +757,14 @@ class Camera {
             {area: 1, event: this.cam_bbh_room_12_upper.bind(this), centerX: -2332, centerY: -204, centerZ: 4714, boundsX: 250, boundsY: 200, boundsZ: 250, boundsYaw: 0x6000},
             {area: 1, event: this.cam_bbh_room_0_back_entrance.bind(this), centerX: -1939, centerY: -204, centerZ: 4340, boundsX: 250, boundsY: 200, boundsZ: 250, boundsYaw: 0x6000},
             NULL_TRIGGER
+        ]
+
+        this.sCameraTriggers = [
+            null, null, null, null, this.sCamBBH, this.sCamCCM,
+            this.sCamCastle, this.sCamHMC, this.sCamSSL, null, this.sCamSL, null,
+            null, this.sCamTHI, null, this.sCamRR, null, null, null, null, null,
+            null, null, null, null, null, null, null, this.sCamCotMC, null, null,
+            null, null, null, null, null, null, null, null, null, null,
         ]
 
         this.sCutsceneStarSpawn = [
@@ -6275,12 +6284,6 @@ class Camera {
         }
     }
 
-    // ---------------- //
-
-    define_camera_triggers() {
-        
-    }
-
     camera_course_processing(c) {
         let level = Area.gCurrLevelNum
         this.define_camera_triggers()
@@ -6301,29 +6304,80 @@ class Camera {
             level = LEVEL_COUNT + 1
         }
 
-        /* if (sCameraTriggers[level] != null) {
+        if (this.sCameraTriggers[level] != null) {
             b = 0
 
             // Process positional triggers.
             // All triggered events are called, not just the first one.
-            while (sCameraTriggers[level][b].event != null) {
+            while (this.sCameraTriggers[level][b].event != null) {
 
                 // Check only the current area's triggers
-                if (sCameraTriggers[level][b].area == area) {
+                if (this.sCameraTriggers[level][b].area == area) {
                     // Copy the bounding box into center and bounds
-                    MathUtil.vec3f_set(center, sCameraTriggers[level][b].centerX,
-                                               sCameraTriggers[level][b].centerY,
-                                               sCameraTriggers[level][b].centerZ)
-                    MathUtil.vec3f_set(bounds, sCameraTriggers[level][b].boundsX,
-                                               sCameraTriggers[level][b].boundsY,
-                                               sCameraTriggers[level][b].boundsZ)
+                    MathUtil.vec3f_set(center, this.sCameraTriggers[level][b].centerX,
+                                               this.sCameraTriggers[level][b].centerY,
+                                               this.sCameraTriggers[level][b].centerZ)
+                    MathUtil.vec3f_set(bounds, this.sCameraTriggers[level][b].boundsX,
+                                               this.sCameraTriggers[level][b].boundsY,
+                                               this.sCameraTriggers[level][b].boundsZ)
                     
                     // Check if Mario is inside the bounds
+                    if (this.is_pos_in_bounds(this.gPlayerCameraState.pos, center, bounds, this.sCameraTriggers[level][b].boundsYaw) == true) {
+                        //! This should be checked before calling is_pos_in_bounds. (It doesn't belong
+                        //! outside the while loop because some events disable area processing)
+                        if (!(this.sStatusFlags & CAM_FLAG_BLOCK_AREA_PROCESSING)) {
+                            this.sCameraTriggers[level][b].event(c)
+                            insideBounds = true
+                        }
+                    }
                 }
+
+                if (this.sCameraTriggers[level][b].area == -1) {
+                    // Default triggers are only active if Mario is not already inside another trigger
+                    if (!insideBounds) {
+                        if (!(this.sStatusFlags & CAM_FLAG_BLOCK_AREA_PROCESSING)) {
+                            this.sCameraTriggers[level][b].event(c)
+                        }
+                    }
+                }
+
+                b++
             }
-        } */
+        }
         
         // Area-specific camera processing
+        if (!(this.sStatusFlags & CAM_FLAG_BLOCK_AREA_PROCESSING)) {
+            switch (this.gCurrLevelArea) {
+                case AREA_WF:
+                    if (this.gPlayerCameraState.action == ACT_RIDING_HOOT) {
+                        this.transition_to_camera_mode(c, CAMERA_MODE_SLIDE_HOOT, 60)
+                    } else {
+                        switch (this.sMarioGeometry.currFloorType) {
+                            case SURFACE_CAMERA_8_DIR:
+                                this.transition_to_camera_mode(c, CAMERA_MODE_8_DIRECTIONS, 90)
+                                this.s8DirModeBaseYaw = DEGREES(90)
+                                break
+
+                            case SURFACE_BOSS_FIGHT_CAMERA:
+                                if (Area.gCurrActNum == 1) {
+                                    this.set_camera_mode_boss_fight(c)
+                                } else {
+                                    this.set_camera_mode_radial(c, 60)
+                                }
+                                break
+                            default:
+                                this.set_camera_mode_radial(c, 60)
+                        }
+                    }
+                    break
+            }
+        }
+    }
+
+    // ---------------- //
+
+    define_camera_triggers() {
+        
     }
 
     rotate_camera_around_walls(c, cPos, yawWrapper, yawRange) {

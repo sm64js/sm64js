@@ -3409,6 +3409,9 @@ class Camera {
         c.mode = this.gLakituState.mode
         c.defMode = this.gLakituState.defMode
 
+        this.camera_course_processing(c)
+        this.stub_camera_3(c)
+
         let wrapper = {}
         c.sCButtonsPressed = this.find_c_buttons_pressed(c.sCButtonsPressed, wrapper);
 

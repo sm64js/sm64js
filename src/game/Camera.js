@@ -6297,7 +6297,6 @@ class Camera {
         // Bounds iterator
         let b = 0
         // Camera trigger's bounding box
-        let center, bounds = Object.assign({}, {0: 0, 1: 0, 2: 0})
         let insideBounds = false
         let oldMode = c.mode
 
@@ -6319,12 +6318,12 @@ class Camera {
                 // Check only the current area's triggers
                 if (this.sCameraTriggers[level][b].area == area) {
                     // Copy the bounding box into center and bounds
-                    MathUtil.vec3f_set(center, this.sCameraTriggers[level][b].centerX,
-                                               this.sCameraTriggers[level][b].centerY,
-                                               this.sCameraTriggers[level][b].centerZ)
-                    MathUtil.vec3f_set(bounds, this.sCameraTriggers[level][b].boundsX,
-                                               this.sCameraTriggers[level][b].boundsY,
-                                               this.sCameraTriggers[level][b].boundsZ)
+                    let center = [this.sCameraTriggers[level][b].centerX,
+                                  this.sCameraTriggers[level][b].centerY,
+                                  this.sCameraTriggers[level][b].centerZ]
+                    let bounds = [this.sCameraTriggers[level][b].boundsX,
+                                  this.sCameraTriggers[level][b].boundsY,
+                                  this.sCameraTriggers[level][b].boundsZ]
                     
                     // Check if Mario is inside the bounds
                     if (this.is_pos_in_bounds(this.gPlayerCameraState.pos, center, bounds, this.sCameraTriggers[level][b].boundsYaw) == true) {

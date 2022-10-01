@@ -54,6 +54,8 @@ import { SEQ_EVENT_CUTSCENE_INTRO } from "../include/seq_ids"
 import { SURFACE_CAMERA_FREE_ROAM } from "../include/surface_terrains"
 import { SURFACE_CAMERA_8_DIR } from "../include/surface_terrains"
 import { SURFACE_BOSS_FIGHT_CAMERA } from "../include/surface_terrains"
+import { SURFACE_INSTANT_WARP_1B } from "../include/surface_terrains"
+import { SURFACE_INSTANT_WARP_1C } from "../include/surface_terrains"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -6370,8 +6372,84 @@ class Camera {
                         }
                     }
                     break
+
+                case AREA_BBH:
+                    // if camera is fixed at bbh_room_13_balcony_camera (but as floats)
+                    if (this.vec3f_compare(this.sFixedModeBasePosition, 210.0, 420.0, 3109.0) == true) {
+                        if (this.gPlayerCameraState.pos[1] < 1800.0) {
+                            this.transition_to_camera_mode(c, CAMERA_MODE_CLOSE, 30)
+                        }
+                    }
+                    break
+
+                case AREA_SSL_PYRAMID:
+                    this.set_mode_if_not_set_by_surface(c, CAMERA_MODE_OUTWARD_RADIAL)
+                    break
+
+                case AREA_SSL_OUTSIDE:
+                    this.set_mode_if_not_set_by_surface(c, CAMERA_MODE_RADIAL)
+                    break
+
+                case AREA_THI_HUGE:
+                    break
+
+                case AREA_THI_TINY:
+                    this.surface_type_modes_thi(c)
+                    break
+
+                case AREA_TTC:
+                    this.set_mode_if_not_set_by_surface(c, CAMERA_MODE_OUTWARD_RADIAL)
+                    break
+
+                case AREA_BOB:
+                    if (this.set_mode_if_not_set_by_surface(c, CAMERA_MODE_NONE) == 0) {
+                        if (this.sMarioGeometry.currFloorType == SURFACE_BOSS_FIGHT_CAMERA) {
+                            this.set_camera_mode_boss_fight(c)
+                        } else {
+                            if (c.mode == CAMERA_MODE_CLOSE) {
+                                this.transition_to_camera_mode(c, CAMERA_MODE_RADIAL, 60)
+                            } else {
+                                this.set_camera_mode_radial(c, 60)
+                            }
+                        }
+                    }
+                    break
+
+                case AREA_WDW_MAIN:
+                    if (this.sMarioGeometry.currFloorType == SURFACE_INSTANT_WARP_1B) {
+                        c.defMode = CAMERA_MODE_RADIAL
+                    }
+                    break
+
+                case AREA_WDW_TOWN:
+                    if (this.sMarioGeometry.currFloorType == SURFACE_INSTANT_WARP_1C) {
+                        c.defMode = CAMERA_MODE_CLOSE
+                    }
+                    break
+
+                case AREA_DDD_WHIRLPOOL:
+                    break
+
+                case AREA_DDD_SUB:
+                    if (c.mode != CAMERA_MODE_BEHIND_MARIO && c.mode != CAMERA_MODE_WATER_SURFACE) {
+                        if ((this.gPlayerCameraState.action & ACT_FLAG_ON_POLE) != 0 || this.sMarioGeometry.currFloorHeight > 800.0) {
+                            this.transition_to_camera_mode(c, CAMERA_MODE_8_DIRECTIONS, 60)
+                        } else {
+                            if (this.gPlayerCameraState.pos[1] < 800.0) {
+                                this.transition_to_camera_mode(c, CAMERA_MODE_FREE_ROAM, 60)
+                            }
+                        }
+                    }
+                    break
             }
         }
+
+        this.sStatusFlags &= ~CAM_FLAG_BLOCK_AREA_PROCESSING
+        if (oldMode == CAMERA_MODE_C_UP) {
+            this.sModeInfo.lastMode = c.mode
+            c.mode = oldMode
+        }
+        return c.mode
     }
 
     // ---------------- //

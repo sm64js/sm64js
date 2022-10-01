@@ -3409,7 +3409,8 @@ class Camera {
         c.mode = this.gLakituState.mode
         c.defMode = this.gLakituState.defMode
 
-        c.sCButtonsPressed = this.find_c_buttons_pressed(c.sCButtonsPressed);
+        wrapper = {}
+        c.sCButtonsPressed = this.find_c_buttons_pressed(c.sCButtonsPressed, wrapper);
 
         if (c.cutscene != 0) {
             this.sYawSpeed = 0

@@ -205,7 +205,7 @@ const platform_on_track_act_move_along_track = () => {
 
             // Spawn a new track ball if necessary
             pxWrapper = { px: o.rawData[oPlatformOnTrackDistMovedSinceLastBall] }
-            if (approach_f32_ptr(o.rawData[oPlatformOnTrackDistMovedSinceLastBall], 300.0, o.rawData[oForwardVel])) {
+            if (approach_f32_ptr(pxWrapper, 300.0, o.rawData[oForwardVel])) {
                 o.rawData[oPlatformOnTrackDistMovedSinceLastBall] = pxWrapper.px
                 o.rawData[oPlatformOnTrackDistMovedSinceLastBall] -= 300.0
 

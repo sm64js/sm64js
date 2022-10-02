@@ -2589,7 +2589,7 @@ class Camera {
             if ((closeToMario & 1) && avoidStatus != 0) {
                 yawVel = 0
             }
-            if (yawVel != 0 && get_dialog_id() == DIALOG_NONE) {
+            if (yawVel != 0 && IngameMenu.get_dialog_id() == DIALOG_NONE) {
                 let yawWrapper = { current: yaw }
                 this.camera_approach_s16_symmetric_bool(yawWrapper, yawGoal, yawVel)
                 yaw = yawWrapper.current

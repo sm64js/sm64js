@@ -1116,7 +1116,7 @@ class Camera {
             posOffWrapper.posOff = -posBound
         }
 
-        focOffWrapper.focOff = (floorHeight - this.gPlayerCameraState.pos[1]) * posMul
+        focOffWrapper.focOff = (floorHeight - this.gPlayerCameraState.pos[1]) * focMul
 
         if (focOffWrapper.focOff > focBound) {
             focOffWrapper.focOff = focBound
@@ -1851,7 +1851,7 @@ class Camera {
 
         let wrapper = {}
         this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
-        let focusFloorOff = wrapper.posOff
+        let focusFloorOff = wrapper.focOff
         focus = [...this.gPlayerCameraState.pos]
         focus[1] += focusFloorOff + 125.0
         wrapper = {}

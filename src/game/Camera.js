@@ -1765,7 +1765,7 @@ class Camera {
         this.sParTrackTransOff.pos[1] = wrapper.current; wrapper.current = this.sParTrackTransOff.pos[2]
         this.approach_f32_asymptotic_bool(wrapper, 0.0, 0.025);
         this.sParTrackTransOff.pos[2] = wrapper.current
-        vec3f_add(c.pos, this.sParTrackTransOff.pos);
+        MathUtil.vec3f_add(c.pos, this.sParTrackTransOff.pos);
         
         // Check if the camera should go to the next path
         if (this.sParTrackPath[this.sParTrackIndex + 1].startOfPath != 0) {
@@ -3069,7 +3069,7 @@ class Camera {
         c.focus[1] = start.focus[1] + (end.focus[1] - start.focus[1]) * this.sModeInfo.frame / this.sModeInfo.max
         c.focus[2] = start.focus[2] + (end.focus[2] - start.focus[2]) * this.sModeInfo.frame / this.sModeInfo.max
 
-        vec3f_add(c.focus, this.gPlayerCameraState.pos)
+        MathUtil.vec3f_add(c.focus, this.gPlayerCameraState.pos)
         vec3f_set_dist_and_angle(c.focus, c.pos, dist, pitch, yaw)
 
         this.gPlayerCameraState.headRotation[0] = 0
@@ -3108,9 +3108,9 @@ class Camera {
             if (this.sStatusFlags & CAM_FLAG_TRANSITION_OUT_OF_C_UP) {
                 // Retrieve the previous position and focus
                 this.vec3f_copy(c.pos, this.sCameraStoreCUp.pos)
-                vec3f_add(c.pos, this.gPlayerCameraState.pos)
+                MathUtil.vec3f_add(c.pos, this.gPlayerCameraState.pos)
                 this.vec3f_copy(c.focus, this.sCameraStoreCUp.focus)
-                vec3f_add(c.focus, this.gPlayerCameraState.pos)
+                MathUtil.vec3f_add(c.focus, this.gPlayerCameraState.pos)
                 // Make Mario look forward
                 let wrapper = {current: this.gPlayerCameraState.headRotation[0]}
                 this.camera_approach_s16_symmetric_bool(wrapper, 0, 1024)
@@ -5492,16 +5492,16 @@ class Camera {
 
         this.gCurrLevelArea = Area.gCurrLevelNum * 16 + Area.gCurrentArea.index
 
-        vec3f_add(this.gLakituState.curPos, displacement)
-        vec3f_add(this.gLakituState.curFocus, displacement)
-        vec3f_add(this.gLakituState.goalPos, displacement)
-        vec3f_add(this.gLakituState.goalFocus, displacement)
+        MathUtil.vec3f_add(this.gLakituState.curPos, displacement)
+        MathUtil.vec3f_add(this.gLakituState.curFocus, displacement)
+        MathUtil.vec3f_add(this.gLakituState.goalPos, displacement)
+        MathUtil.vec3f_add(this.gLakituState.goalFocus, displacement)
         marioStates.waterLevel += displacementY
 
-        vec3f_add(start.focus, displacement)
-        vec3f_add(start.pos, displacement)
-        vec3f_add(end.focus, displacement)
-        vec3f_add(end.pos, displacement)
+        MathUtil.vec3f_add(start.focus, displacement)
+        MathUtil.vec3f_add(start.pos, displacement)
+        MathUtil.vec3f_add(end.focus, displacement)
+        MathUtil.vec3f_add(end.pos, displacement)
     }
 
     approach_camera_height(c, goal, inc) {

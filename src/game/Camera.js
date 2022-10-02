@@ -2118,7 +2118,7 @@ class Camera {
             dist = maxDist
         }
         absPitch = pitch
-        if (abspitch < 0) {
+        if (absPitch < 0) {
             absPitch = -absPitch
         }
 

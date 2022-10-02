@@ -1251,7 +1251,7 @@ class Camera {
         let dist = output.dist; let pitch = output.pitch; let yaw = output.yaw
 
         // The camera will pan ahead up to about 30% of the camera's distance to mario.
-        pan[2] = Math.sins(0xC00) * dist
+        pan[2] = sins(0xC00) * dist
 
         this.rotate_in_xz(pan, pan, this.gPlayerCameraState.faceAngle[1])
         // rotate in the opposite direction
@@ -1821,14 +1821,14 @@ class Camera {
      * Updates the camera during fixed mode.
      */
     update_fixed_camera(c, focus, pos) {
-        let focusFloorOff
-        let goalHeight
-        let ceilHeight
-        let heightOffset
-        let distCamToFocus
+        let focusFloorOff = 0
+        let goalHeight = 0
+        let ceilHeight = 0
+        let heightOffset = 0
+        let distCamToFocus = 0
         let scaleToMario = 0.5
-        let pitch
-        let yaw
+        let pitch = 0
+        let yaw = 0
         let faceAngle = [0, 0, 0]
         let ceiling = {}
 
@@ -1905,9 +1905,7 @@ class Camera {
         if (scaleToMario != 0.0) {
             wrapper = { dist: distCamToFocus, pitch: pitch, yaw: yaw }
             MathUtil.vec3f_get_dist_and_angle(c.focus, c.pos, wrapper)
-            distCamToFocus = wrapper.dist
-            pitch = wrapper.pitch
-            yaw = wrapper.yaw
+            distCamToFocus = wrapper.dist; pitch = wrapper.pitch; yaw = wrapper.yaw
             if (distCamToFocus > 1000.0) {
                 distCamToFocus = 1000.0
                 MathUtil.vec3f_set_dist_and_angle(c.focus, c.pos, distCamToFocus, pitch, yaw)

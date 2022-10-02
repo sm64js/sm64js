@@ -6410,6 +6410,7 @@ class Camera {
                     if (this.vec3f_compare(this.sFixedModeBasePosition, 210.0, 420.0, 3109.0) == true) {
                         if (this.gPlayerCameraState.pos[1] < 1800.0) {
                             this.transition_to_camera_mode(c, CAMERA_MODE_CLOSE, 30)
+                            console.log("Transition")
                         }
                     }
                     break

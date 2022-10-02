@@ -176,8 +176,7 @@ class SpawnObject {
             objListIndex == ObjectListProc.OBJ_LIST_GENACTOR ||
             objListIndex == ObjectListProc.OBJ_LIST_PUSHABLE) {
                 this.snap_object_to_floor(obj)
-            }
-
+        }
         return obj
     }
 }

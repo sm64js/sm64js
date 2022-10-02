@@ -1,44 +1,23 @@
 // haunted_chair.inc.js
 
-import { oHauntedChairUnk104 } from "../../include/object_constants";
-import { oFaceAngleRoll } from "../../include/object_constants";
-import { oHauntedChairUnk100 } from "../../include/object_constants";
-import { oFaceAngleYaw } from "../../include/object_constants";
-import { oFaceAnglePitch } from "../../include/object_constants";
-import { oHauntedChairUnkF8 } from "../../include/object_constants";
-import { oTimer } from "../../include/object_constants";
-import { oDistanceToMario } from "../../include/object_constants";
-import { oHomeZ } from "../../include/object_constants";
-import { oHauntedChairUnkFC } from "../../include/object_constants";
-import { oAction } from "../../include/object_constants";
-import { oGravity } from "../../include/object_constants";
-import { oMoveAnglePitch } from "../../include/object_constants";
-import { oAngleToMario } from "../../include/object_constants";
-import { oMoveAngleYaw } from "../../include/object_constants";
-import { OBJ_MOVE_MASK_ON_GROUND } from "../../include/object_constants";
-import { OBJ_MOVE_HIT_WALL } from "../../include/object_constants";
-import { oMoveFlags } from "../../include/object_constants";
-import { ACTIVE_FLAG_IN_DIFFERENT_ROOM } from "../../include/object_constants";
-import { oVelY } from "../../include/object_constants";
-import { oHomeX } from "../../include/object_constants";
-import { oHauntedChairUnkF4 } from "../../include/object_constants";
-import { SOUND_GENERAL_HAUNTED_CHAIR } from "../../include/sounds";
-import { SOUND_GENERAL_SWISH_AIR_2 } from "../../include/sounds";
-import { SOUND_GENERAL_HAUNTED_CHAIR_MOVE } from "../../include/sounds";
+import {
+    oHauntedChairUnk104, oFaceAngleRoll, oHauntedChairUnk100, oFaceAngleYaw,
+    oFaceAnglePitch, oHauntedChairUnkF8, oTimer, oDistanceToMario, oHomeZ,
+    oHauntedChairUnkFC, oAction, oGravity, oMoveAnglePitch, oAngleToMario,
+    oMoveAngleYaw, OBJ_MOVE_MASK_ON_GROUND, OBJ_MOVE_HIT_WALL, oMoveFlags,
+    ACTIVE_FLAG_IN_DIFFERENT_ROOM, oVelY, oHomeX, oHauntedChairUnkF4
+} from "../../include/object_constants";
+import { SOUND_GENERAL_HAUNTED_CHAIR, SOUND_GENERAL_SWISH_AIR_2, SOUND_GENERAL_HAUNTED_CHAIR_MOVE } from "../../include/sounds";
 import { bhvMadPiano } from "../BehaviorData";
 import { INTERACT_MR_BLIZZARD } from "../Interaction";
-import { obj_die_if_health_non_positive } from "../ObjBehaviors2";
-import { obj_check_attacks } from "../ObjBehaviors2";
-import { cur_obj_spin_all_dimensions } from "../ObjBehaviors2";
-import { obj_compute_vel_from_move_pitch } from "../ObjBehaviors2";
-import { obj_turn_pitch_toward_mario } from "../ObjBehaviors2";
-import { oscillate_toward } from "../ObjBehaviors2";
-import { obj_angle_to_object } from "../ObjectHelpers";
-import { cur_obj_move_standard } from "../ObjectHelpers";
-import { cur_obj_push_mario_away_from_cylinder } from "../ObjectHelpers";
-import { cur_obj_update_floor_and_walls } from "../ObjectHelpers";
-import { lateral_dist_between_objects } from "../ObjectHelpers";
-import { cur_obj_find_nearest_object_with_behavior } from "../ObjectHelpers";
+import {
+    obj_die_if_health_non_positive, obj_check_attacks, cur_obj_spin_all_dimensions,
+    obj_compute_vel_from_move_pitch, obj_turn_pitch_toward_mario, oscillate_toward
+} from "../ObjBehaviors2";
+import {
+    obj_angle_to_object, cur_obj_move_standard, cur_obj_push_mario_away_from_cylinder,
+    cur_obj_update_floor_and_walls, lateral_dist_between_objects, cur_obj_find_nearest_object_with_behavior
+} from "../ObjectHelpers";
 import { cur_obj_play_sound_2 } from "../SpawnSound";
 
 const sHauntedChairHitbox = {

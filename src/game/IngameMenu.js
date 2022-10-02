@@ -3,6 +3,7 @@ import * as MathUtil from "../engine/math_util"
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../include/config"
 import * as Gbi from "../include/gbi"
 import { menu_hud_lut } from "../levels/menu/leveldata"
+import { DIALOG_NONE } from "../text/us/dialogs"
 import { GameInstance as Game } from "./Game"
 
 export const ASCII_TO_DIALOG = (asc) => {
@@ -295,6 +296,13 @@ class IngameMenu {
 
     create_dialog_inverted_box(dialog) {
         if (this.gDialogID == -1) {
+            this.gDialogID = dialog
+            this.gDialogBoxType = DIALOG_TYPE_ZOOM
+        }
+    }
+
+    create_dialog_box_with_response(dialog) {
+        if (this.gDialogID == DIALOG_NONE) {
             this.gDialogID = dialog
             this.gDialogBoxType = DIALOG_TYPE_ZOOM
         }

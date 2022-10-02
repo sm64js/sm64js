@@ -117,7 +117,8 @@ const keyboardButtonMapping = {
     cu: 'i',
     cd: 'k',
     cl: 'j',
-    cr: 'l'
+    cr: 'l',
+    rt: 'o'
 }
 const defaultKeyboardButtonMapping = { ...keyboardButtonMapping }
 
@@ -129,7 +130,8 @@ const gamepadButtonMapping = { //works for xbox
     stickX: 0,
     stickY: 1,
     cStickX: 2,
-    cStickY: 3
+    cStickY: 3,
+    rt: 12,
 }
 
 const defaultGamepadButtonMapping = { ...gamepadButtonMapping }
@@ -298,6 +300,7 @@ export const playerInputUpdate = () => {
             cl: gamepad.axes[2] && gamepad.axes[2] < -0.5,
             cu: gamepad.axes[3] && gamepad.axes[3] < -0.5,
             cd: gamepad.axes[3] && gamepad.axes[3] > 0.5,
+            rt: gamepad.buttons[gamepadButtonMapping['rt']].touched,
         })
     }
 
@@ -325,6 +328,7 @@ export const playerInputUpdate = () => {
     let buttonDownCr = gamepadFinal.cr || keyboardFinal.cr
     let buttonDownCu = gamepadFinal.cu || keyboardFinal.cu
     let buttonDownCd = gamepadFinal.cd || keyboardFinal.cd
+    let buttonDownRt = gamepadFinal.rt || keyboardFinal.rt
 
     window.playerInput = {
         stickX, stickY,
@@ -339,7 +343,7 @@ export const playerInputUpdate = () => {
         buttonPressedCu: buttonDownCu && !window.playerInput.buttonDownCu,
         buttonPressedCd: buttonDownCd && !window.playerInput.buttonDownCd,
 
-        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd
+        buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownRt
     }
 
 }

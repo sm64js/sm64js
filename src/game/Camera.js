@@ -6109,11 +6109,11 @@ class Camera {
     }
 
     cam_bbh_room_4(c) {
-        set_camera_mode_fixed(c, 3529, 340, -1384)
+        this.set_camera_mode_fixed(c, 3529, 340, -1384)
     }
 
     cam_bbh_room_8(c) {
-        set_camera_mode_fixed(c, -500, 740, -1306)
+        this.set_camera_mode_fixed(c, -500, 740, -1306)
     }
 
     /**
@@ -6121,7 +6121,7 @@ class Camera {
      * set the camera mode to fixed and position to (-2172, 200, 675)
      */
     cam_bbh_room_5_library(c) {
-        set_camera_mode_fixed(c, -2172, 200, 675)
+        this.set_camera_mode_fixed(c, -2172, 200, 675)
     }
 
     /**

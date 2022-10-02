@@ -5393,11 +5393,11 @@ class Camera {
                         //! Castle Lobby uses 0 to mean 'no special modes', but BBH uses 1...
                         //   CreateSource: skill issue
                         
-                        // if (c.doorStatus == DOOR_LEAVING_SPECIAL) {
-                        //     cutscene = this.open_door_cutscene(CUTSCENE_DOOR_PULL, CUTSCENE_DOOR_PUSH)
-                        // } else {
+                        if (c.doorStatus == DOOR_LEAVING_SPECIAL) {
+                            cutscene = this.open_door_cutscene(CUTSCENE_DOOR_PULL, CUTSCENE_DOOR_PUSH)
+                        } else {
                             cutscene = this.open_door_cutscene(CUTSCENE_DOOR_PULL_MODE, CUTSCENE_DOOR_PUSH_MODE)
-                        // }
+                        }
                         break
                     default:
                         cutscene = this.open_door_cutscene(CUTSCENE_DOOR_PULL, CUTSCENE_DOOR_PUSH)
@@ -5741,6 +5741,8 @@ class Camera {
             c.mode = CAMERA_MODE_FIXED
             c.pos = [this.sFixedModeBasePosition[0], this.gPlayerCameraState.pos[1], this.sFixedModeBasePosition[2]]
         }
+
+        console.log(x, y, z, this.sFixedModeBasePosition)
         return basePosSet
     }
 
@@ -6362,7 +6364,6 @@ class Camera {
                         if (!(this.sStatusFlags & CAM_FLAG_BLOCK_AREA_PROCESSING)) {
                             this.sCameraTriggers[level][b].event(c)
                             insideBounds = true
-                            console.log(this.sCameraTriggers[level][b].event.name)
                         }
                     }
                 }
@@ -6411,7 +6412,6 @@ class Camera {
                     if (this.vec3f_compare(this.sFixedModeBasePosition, 210.0, 420.0, 3109.0) == true) {
                         if (this.gPlayerCameraState.pos[1] < 1800.0) {
                             this.transition_to_camera_mode(c, CAMERA_MODE_CLOSE, 30)
-                            console.log("Transition")
                         }
                     }
                     break

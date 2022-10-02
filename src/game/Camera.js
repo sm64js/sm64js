@@ -5900,7 +5900,7 @@ class Camera {
 
     cam_hmc_enter_maze(c) {
         if (c.pos[1] > 102.0) {
-            wrapper = {}
+            let wrapper = {}
             vec3f_get_dist_and_angle(c.focus, this.gLakituState.goalPos, wrapper)
             vec3f_set_dist_and_angle(c.focus, this.gLakituState.goalPos, wrapper.pitch, wrapper.yaw)
             this.gLakituState.goalPos[1] = -800.0

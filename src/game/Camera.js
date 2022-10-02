@@ -5595,16 +5595,16 @@ class Camera {
     next_lakitu_state(newPos, newFoc, curPos, curFoc, oldPos, oldFoc, yaw) {
         let startPos = [0, 0, 0]
         let startFoc = [0, 0, 0]
-        let goalDist
-        let goalPitch
-        let goalYaw
-        let yawVelocity
-        let pitchVelocity
-        let distVelocity
-        let wrapper
+        let goalDist = 0
+        let goalPitch = 0
+        let goalYaw = 0
+        let yawVelocity = 0
+        let pitchVelocity = 0
+        let distVelocity = 0
+        let wrapper = {}
         let nextPos = [0, 0, 0]
         let nextFoc = [0, 0, 0]
-        let floorHeight
+        let floorHeight = 0
         let floor = {}
         let distTimer = this.sModeTransition.framesLeft
         let angleTimer = this.sModeTransition.framesLeft

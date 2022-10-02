@@ -3567,7 +3567,7 @@ class Camera {
 
         this.gLakituState.lastFrameAction = this.gPlayerCameraState.action
 
-        console.log(c.pos)
+        console.log(c.focus)
     }
 
     /**

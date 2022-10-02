@@ -4839,7 +4839,7 @@ class Camera {
      * Rotates a vector in the horizontal plane and copies it to a new vector.
      */
     rotate_in_xz(dst, src, yaw) {
-        let tempVec
+        let tempVec = [0, 0, 0]
         vec3f_copy(tempVec, src)
         dst[0] = tempVec[2] * sins(yaw) + tempVec[0] * coss(yaw)
         dst[1] = tempVec[1]
@@ -4853,7 +4853,7 @@ class Camera {
      * space. If possible, use vec3f_set_dist_and_angle()
      */
     rotate_in_yz(dst, src, pitch) {
-        let tempVec
+        let tempVec = [0, 0, 0]
         vec3f_copy(tempVec, src)
         dst[0] = -(tempVec[2] * coss(pitch) - tempVec[0] * sins(pitch))
         dst[1] =   tempVec[2] * coss(pitch) + tempVec[0] * sins(pitch)

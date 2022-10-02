@@ -1875,6 +1875,7 @@ class Camera {
             goalHeight = this.sMarioGeometry.currFloorHeight + basePos[1] + heightOffset
         } else {
             goalHeight = this.gLakituState.goalPos[1]
+            console.log("what?")
         }
 
         if (300 > distCamToFocus) {

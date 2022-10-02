@@ -2786,7 +2786,7 @@ class Camera {
         let floorHeight = 0
         let focY
 
-        handle_c_button_movement(c)
+        this.handle_c_button_movement(c)
         // Set base pos to the center of the staircase
         vec3f_set(this.sFixedModeBasePosition, -1280.0, 614.0, 1740.0)
 

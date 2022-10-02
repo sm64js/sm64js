@@ -5610,8 +5610,8 @@ class Camera {
         let angleTimer = this.sModeTransition.framesLeft
         
         // If not transitioning, just use gCamera's current pos and foc
-        newPos = [...curPos]
-        newFoc = [...curFoc]
+        vec3f_copy(newPos, curPos)
+        vec3f_copy(newFoc, curFoc)
 
         if (this.sStatusFlags & CAM_FLAG_START_TRANSITION) {
             for (let i = 0; i < 3; i++) {

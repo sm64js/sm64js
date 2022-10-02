@@ -1741,14 +1741,14 @@ class Camera {
         pathAngle[2] = 0
 
         // Rotate the offset in the direction of the path again
-        offset_rotated(pos, path[0], marioOffset, pathAngle)
+        this.offset_rotated(pos, path[0], marioOffset, pathAngle)
         wrapper = {}
         vec3f_get_dist_and_angle(path[0], c.pos, wrapper)
         let camParDist = wrapper.dist; pathPitch = wrapper.pitch; pathYaw = wrapper.yaw;
 
         // Adjust the focus. Does nothing, focus is set to Mario at the end
         focOffset[2] = pathLength / 2 - focOffset[2]
-        offset_rotated(c.focus, path[0], focOffset, pathAngle)
+        this.offset_rotated(c.focus, path[0], focOffset, pathAngle)
 
         // Changing paths, update the stored position offset
         if (this.sStatusFlags & CAM_FLAG_CHANGED_PARTRACK_INDEX) {

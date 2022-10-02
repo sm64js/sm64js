@@ -58,6 +58,7 @@ import { SURFACE_INSTANT_WARP_1B } from "../include/surface_terrains"
 import { SURFACE_INSTANT_WARP_1C } from "../include/surface_terrains"
 import { MARIO_DIALOG_STATUS_SPEAK } from "./MarioActionsCutscene"
 import { MARIO_DIALOG_LOOK_FRONT } from "./MarioActionsCutscene"
+import { set_mario_npc_dialog } from "./MarioActionsCutscene"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -1831,8 +1832,7 @@ class Camera {
         let pitch = 0
         let yaw = 0
         let faceAngle = [0, 0, 0]
-        let ceiling = Object.assign({}, surfaceObj)
-        let basePos = [0, 0, 0]
+        let ceiling = {}
 
         this.play_camera_buzz_if_c_sideways()
 
@@ -1855,12 +1855,11 @@ class Camera {
         this.handle_c_button_movement(c)
         this.play_camera_buzz_if_cdown()
 
-        let wrapper = { posOff: focusFloorOff, focOff: this.posOff }
+        let wrapper = {}
         this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
         focusFloorOff = wrapper.posOff
-        console.log(focusFloorOff)
-        this.vec3f_copy(focus, this.gPlayerCameraState.pos)
-        focus[1] += focusFloorOff
+        focus = [...this.gPlayerCameraState.pos]
+        focus[1] += focusFloorOff + 125.0
         wrapper = { dist: distCamToFocus, pitch: faceAngle[0], yaw: faceAngle[1] }
         MathUtil.vec3f_get_dist_and_angle(focus, c.pos, wrapper)
         distCamToFocus = wrapper.dist
@@ -1868,7 +1867,7 @@ class Camera {
         faceAngle[1] = wrapper.yaw
         faceAngle[2] = 0
 
-        this.vec3f_copy(basePos, this.sFixedModeBasePosition)
+        let basePos = [...this.sFixedModeBasePosition]
         MathUtil.vec3f_add(basePos, this.sCastleEntranceOffset)
 
         if (this.sMarioGeometry.currFloorType != SURFACE_DEATH_PLANE
@@ -2074,7 +2073,7 @@ class Camera {
         c.nextYaw = this.update_fixed_camera(c, c.focus, c.pos)
         c.yaw = c.nextYaw
         this.pan_ahead_of_player(c)
-        vec3f_set(this.sCastleEntranceOffset, 0.0, 0.0, 0.0)
+        this.sCastleEntranceOffset = [0.0, 0.0, 0.0]
     }
 
     /**
@@ -2093,7 +2092,6 @@ class Camera {
         let maxDist = 800
         let focYOff = 125
         let wrapper = {}
-        let distPitchYaw = {}
 
         // Zoom in when Mario R_TRIG mode is active
         if (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
@@ -2111,12 +2109,13 @@ class Camera {
         // dist = calc_abs_dist(focus, pos);
         //! @bug unnecessary
         // pitch = calculate_pitch(focus, pos);
-        MathUtil.vec3f_get_dist_and_angle(focus, pos, distPitchYaw);
-        ({dist, pitch, yaw} = distPitchYaw)
+        MathUtil.vec3f_get_dist_and_angle(focus, pos, wrapper);
+        dist = wrapper.dist; pitch = wrapper.pitch; yaw = wrapper.yaw
         if (dist > maxDist) {
             dist = maxDist
         }
-        if ((absPitch = pitch) < 0) {
+        absPitch = pitch
+        if (abspitch < 0) {
             absPitch = -absPitch
         }
 
@@ -2247,7 +2246,7 @@ class Camera {
         const marioState = LevelUpdate.gMarioState
         let newPos = [], oldPos = []
         let waterHeight, floorHeight
-        const distPitchYaw = {}
+        let distPitchYaw = {}
         let yaw
 
         this.vec3f_copy(oldPos, c.pos)
@@ -2437,7 +2436,6 @@ class Camera {
         let avoidStatus = 0
         let closeToMario = 0
         let ceilHeight = 20000
-        let distPitchYaw = SurfaceCollision.find_ceil(this.gLakituState.goalPos[0], this.gLakituState.goalPos[1], this.gLakituState.goalPos[2], ceil)
         let yawDir = 0
 
         this.handle_c_button_movement(c);
@@ -2616,7 +2614,7 @@ class Camera {
             this.gPlayerCameraState.pos[2]
         ]
 
-        marioFloorHeight = 125 + this.sMarioGeometry.currFloorHeight
+        marioFloorHeight = 125.0 + this.sMarioGeometry.currFloorHeight
         marioFloor = this.sMarioGeometry.currFloor
 
         camFloorHeight = SurfaceCollision.find_floor(cPos[0], cPos[1] + 50, cPos[2], cFloor) + 125
@@ -5736,7 +5734,7 @@ class Camera {
         }
         this.sFixedModeBasePosition = [posX, posY, posZ]
         if (c.mode != CAMERA_MODE_FIXED) {
-            this.sStatusFlags &= CAM_FLAG_SMOOTH_MOVEMENT
+            this.sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT
             c.mode = CAMERA_MODE_FIXED
             c.pos = [this.sFixedModeBasePosition[0], this.gPlayerCameraState.pos[1], this.sFixedModeBasePosition[2]]
         }
@@ -6324,7 +6322,7 @@ class Camera {
         let mode = 0
         let area = Area.gCurrentArea.index
         // Bounds iterator
-        let b = 0
+        let b
         // Camera trigger's bounding box
         let insideBounds = false
         let oldMode = c.mode
@@ -6783,7 +6781,7 @@ class Camera {
     cutscene_common_set_dialog_state(state) {
         timer = this.gCutsceneTimer
         // If the dialog ended, return CUTSCENE_LOOP, which would end the cutscene shot
-        if (Mario.set_mario_npc_dialog(state) == MARIO_DIALOG_STATUS_SPEAK) {
+        if (set_mario_npc_dialog(state) == MARIO_DIALOG_STATUS_SPEAK) {
             timer = CUTSCENE_LOOP
         }
         return timer

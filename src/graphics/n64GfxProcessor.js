@@ -577,6 +577,7 @@ export class n64GfxProcessor {
             if (used_textures[i]) {
                 if (this.rdp.textures_changed[i]) {
                     this.flush()
+                    console.log(i)
                     this.import_texture(i)
                     this.rdp.textures_changed[i] = false
                 }

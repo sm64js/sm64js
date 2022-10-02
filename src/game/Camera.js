@@ -1849,6 +1849,7 @@ class Camera {
             case AREA_BBH:
                 scaleToMario = 0.0
                 heightOffset = 0.0
+                console.log("this is working")
                 break
         }
 

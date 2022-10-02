@@ -6361,6 +6361,7 @@ class Camera {
                         if (!(this.sStatusFlags & CAM_FLAG_BLOCK_AREA_PROCESSING)) {
                             this.sCameraTriggers[level][b].event(c)
                             insideBounds = true
+                            console.log(this.sCameraTriggers[level][b].event.name)
                         }
                     }
                 }

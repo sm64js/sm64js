@@ -5599,7 +5599,7 @@ class Camera {
         let nextFoc = [0, 0, 0]
         let distTimer = this.sModeTransition.framesLeft
         let angleTimer = this.sModeTransition.framesLeft
-        let wrapper
+        let wrapper = {}
         
         // If not transitioning, just use gCamera's current pos and foc
         newPos = [...curPos]
@@ -5613,7 +5613,6 @@ class Camera {
                 startFoc[i] = oldFoc[i] + this.gPlayerCameraState.pos[i] - this.sModeTransition.marioPos[i]
             }
 
-            wrapper = {}
             vec3f_get_dist_and_angle(curFoc, startFoc, wrapper)
             this.sModeTransition.focDist = wrapper.dist; this.sModeTransition.focPitch = wrapper.pitch; this.sModeTransition.focYaw = wrapper.yaw
             vec3f_get_dist_and_angle(curFoc, startPos, wrapper)

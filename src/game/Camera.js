@@ -3568,6 +3568,10 @@ class Camera {
         this.update_lakitu(c) 
 
         this.gLakituState.lastFrameAction = this.gPlayerCameraState.action
+
+        if (c.mode == CAMERA_MODE_FIXED) {
+            c.pos = this.sFixedModeBasePosition
+        }
     }
 
     /**

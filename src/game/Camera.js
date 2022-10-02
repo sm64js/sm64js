@@ -5484,20 +5484,18 @@ class Camera {
     warp_camera(displacementX, displacementY, displacementZ) {
         const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
         
-        let displacement = [0,0,0]
-        let marioState = gMarioStates[0]
+        let displacement = [displacementX, displacementY, displacementZ]
+        let marioStates = gMarioStates[0]
         let start = this.sModeInfo.transitionStart
         let end = this.sModeInfo.transitionEnd
 
         this.gCurrLevelArea = Area.gCurrLevelNum * 16 + Area.gCurrentArea.index
-        displacement[0] = displacementX
-        displacement[1] = displacementY
-        displacement[2] = displacementZ
+
         vec3f_add(this.gLakituState.curPos, displacement)
         vec3f_add(this.gLakituState.curFocus, displacement)
         vec3f_add(this.gLakituState.goalPos, displacement)
         vec3f_add(this.gLakituState.goalFocus, displacement)
-        marioState.waterLevel += displacementY
+        marioStates.waterLevel += displacementY
 
         vec3f_add(start.focus, displacement)
         vec3f_add(start.pos, displacement)
@@ -5535,13 +5533,14 @@ class Camera {
         let yaw = 0
         let focFloorYOff = 0
 
-        const wrapper = { posOff: focFloorYOff, focOff: this.posOff }
+        const wrapper = { posOff: focFloorYOff, focOff: focFloorYOff }
         this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
+        focFloorYOff = wrapper.focOff
 
         yaw = this.gPlayerCameraState.faceAngle[1] + yawOff
         c.focus[0] = this.gPlayerCameraState.pos[0] + forwBack * sins(yaw) + leftRight * coss(yaw)
         c.focus[1] = this.gPlayerCameraState.pos[1] + yOff + focFloorYOff
-        c.focus[2] = this.gPlayerCameraState.pos[2] + forwBack * coss(yaw) + leftRight * sins(yaw)
+        c.focus[2] = this.gPlayerCameraState.pos[2] + forwBack * coss(yaw) - leftRight * sins(yaw)
     }
 
     /**

@@ -6405,7 +6405,7 @@ class Camera {
 
                 case AREA_BBH:
                     // if camera is fixed at bbh_room_13_balcony_camera (but as floats)
-                    if (this.vec3f_compare(this.sFixedModeBasePosition, 210.0, 420.0, 3109.0) == true) {
+                    if (this.sFixedModeBasePosition == [210.0, 420.0, 3109.0]) {
                         if (this.gPlayerCameraState.pos[1] < 1800.0) {
                             this.transition_to_camera_mode(c, CAMERA_MODE_CLOSE, 30)
                         }

@@ -1089,8 +1089,8 @@ class Camera {
      *! Doesn't return anything, but required to match on -O2
     */
     calc_y_to_curr_floor(posOffWrapper, posMul, posBound, focOffWrapper, focMul, focBound) {
-        const floorHeight = this.sMarioGeometry.currFloorHeight
-        const waterHeight = SurfaceCollision.find_water_level(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[2])
+        let floorHeight = this.sMarioGeometry.currFloorHeight
+        let waterHeight = SurfaceCollision.find_water_level(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[2])
 
         if (!(this.gPlayerCameraState.action & Mario.ACT_FLAG_METAL_WATER)) {
             if (floorHeight < waterHeight) {

@@ -5605,7 +5605,7 @@ class Camera {
         let nextPos = [0, 0, 0]
         let nextFoc = [0, 0, 0]
         let floorHeight
-        let floor
+        let floor = {}
         let distTimer = this.sModeTransition.framesLeft
         let angleTimer = this.sModeTransition.framesLeft
         

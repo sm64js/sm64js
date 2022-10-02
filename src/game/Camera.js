@@ -1826,7 +1826,7 @@ class Camera {
         let scaleToMario = 0.5
         let pitch
         let yaw
-        let basePos
+        let basePos = [0, 0, 0]
         let faceAngle = [0, 0, 0]
 
         this.play_camera_buzz_if_c_sideways()

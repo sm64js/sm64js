@@ -171,6 +171,7 @@ const platform_on_track_act_move_along_track = () => {
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
     let initialAngle
+    let pxWrapper
 
     if (!o.rawData[oPlatformOnTrackIsNotSkiLift]) {
         cur_obj_play_sound_1(SOUND_ENV_ELEVATOR3)

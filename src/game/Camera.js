@@ -1248,18 +1248,17 @@ class Camera {
         // Get distance and angle from camera to mario.
         const output = {}
         MathUtil.vec3f_get_dist_and_angle(c.pos, this.gPlayerCameraState.pos, output)
-        const dist = output.dist
-        let yaw = output.yaw
+        let dist = output.dist; let pitch = output.pitch; let yaw = output.yaw
 
         // The camera will pan ahead up to about 30% of the camera's distance to mario.
-        pan[2] = Math.sin(0xC00 / 0x8000 * Math.PI) * dist
+        pan[2] = Math.sins(0xC00) * dist
 
         this.rotate_in_xz(pan, pan, this.gPlayerCameraState.faceAngle[1])
         // rotate in the opposite direction
         yaw = -yaw
         this.rotate_in_xz(pan, pan, yaw)
         // Only pan left or right
-        pan[2] = 0
+        pan[2] = 0.0
 
         // If mario is long jumping, or on a flag pole (but not at the top), then pan in the opposite direction
         if (this.gPlayerCameraState.action == Mario.ACT_LONG_JUMP ||
@@ -1269,13 +1268,12 @@ class Camera {
 
         // Slowly make the actual pan, sPanDistance, approach the calculated pan
         // If mario is sleeping, then don't pan
-        const wrapper = { current: this.sPanDistance }
+        let wrapper = { current: this.sPanDistance }
         if (this.sStatusFlags & CAM_FLAG_SLEEPING) {
             this.approach_f32_asymptotic_bool(wrapper, 0, 0.025)
         } else {
             this.approach_f32_asymptotic_bool(wrapper, pan[0], 0.025)
         }
-
         this.sPanDistance = wrapper.current
 
         // Now apply the pan. It's a dir vector to the left or right, rotated by the camera's yaw to mario
@@ -1915,8 +1913,6 @@ class Camera {
                 MathUtil.vec3f_set_dist_and_angle(c.focus, c.pos, distCamToFocus, pitch, yaw)
             }
         }
-
-        // console.log(focus, pos, basePos)
 
         return faceAngle[1]
     }

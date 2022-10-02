@@ -5781,9 +5781,9 @@ class Camera {
         if (c.mode != CAMERA_MODE_PARALLEL_TRACKING) {
             this.sParTrackPath = path
             this.sParTrackIndex = 0
-            sParTrackTransOff.pos[0] = 0.0
-            sParTrackTransOff.pos[1] = 0.0
-            sParTrackTransOff.pos[2] = 0.0
+            this.sParTrackTransOff.pos[0] = 0.0
+            this.sParTrackTransOff.pos[1] = 0.0
+            this.sParTrackTransOff.pos[2] = 0.0
             // Place the camera in the middle of the path
             c.pos[0] = (this.sParTrackPath[0].pos[0] + this.sParTrackPath[1].pos[0]) / 2
             c.pos[1] = (this.sParTrackPath[0].pos[1] + this.sParTrackPath[1].pos[1]) / 2

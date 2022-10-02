@@ -1649,10 +1649,10 @@ class Camera {
         let nextYaw
         
         // Store camera pos, for changing between paths
-        oldPos = [...pos]
+        vec3f_copy(oldPos, pos)
 
-        path[0] = [...this.sParTrackPath[this.sParTrackIndex].pos]
-        path[1] = [...this.sParTrackPath[this.sParTrackIndex + 1].pos]
+        vec3f_copy(path[0], this.sParTrackPath[this.sParTrackIndex].pos)
+        vec3f_copy(path[1], this.sParTrackPath[this.sParTrackIndex + 1].pos)
 
         let distThresh = this.sParTrackPath[this.sParTrackIndex].distThresh
         let zoom = this.sParTrackPath[this.sParTrackIndex].zoom
@@ -1690,7 +1690,7 @@ class Camera {
         pathPitch = -pathPitch
         this.rotate_in_yz(marioOffset, marioOffset, pathPitch)
         pathPitch = -pathPitch
-        focOffset = [...marioOffset]
+        vec3f_copy(focOffset, marioOffset)
 
         // OK
         focOffset[0] = -focOffset[0] * 0.0
@@ -1811,7 +1811,7 @@ class Camera {
         }
 
         // Update the camera focus and return the camera's yaw
-        focus = [...marioPos]
+        vec3f_copy(focus, marioPos)
         wrapper = {dist: camParDist, pitch: pathPitch, yaw: pathYaw}
         vec3f_get_dist_and_angle(focus, pos, wrapper)
         return wrapper.yaw
@@ -1826,6 +1826,7 @@ class Camera {
         let scaleToMario = 0.5
         let pitch
         let yaw
+        let basePos
         let faceAngle = [0, 0, 0]
 
         this.play_camera_buzz_if_c_sideways()
@@ -1852,14 +1853,14 @@ class Camera {
         let wrapper = {}
         this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
         let focusFloorOff = wrapper.focOff
-        focus = [...this.gPlayerCameraState.pos]
+        vec3f_copy(focus, this.gPlayerCameraState.pos)
         focus[1] += focusFloorOff + 125.0
         wrapper = {}
         MathUtil.vec3f_get_dist_and_angle(focus, c.pos, wrapper)
         let distCamToFocus = wrapper.dist; faceAngle[0] = wrapper.pitch; faceAngle[1] = wrapper.yaw
         faceAngle[2] = 0
 
-        let basePos = [...this.sFixedModeBasePosition]
+        vec3f_copy(basePos, this.sFixedModeBasePosition)
         MathUtil.vec3f_add(basePos, this.sCastleEntranceOffset)
 
         if (this.sMarioGeometry.currFloorType != SURFACE_DEATH_PLANE
@@ -2534,7 +2535,7 @@ class Camera {
         this.calc_y_to_curr_floor(wrapper, 1, 200, wrapper, 0.9, 200)
         posHeight = wrapper.posOff
         focHeight = wrapper.focOff
-        cPos = [...c.pos]
+        vec3f_copy(cPos, c.pos)
         wrapper = {}
         avoidStatus = this.rotate_camera_around_walls(c, cPos, wrapper, 0x600)
         wrapper.yaw = avoidYaw
@@ -3284,13 +3285,13 @@ class Camera {
             this.sStatusFlags &= ~CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
 
             // Update old state
-            this.sOldPosition = [...newPos]
-            this.sOldFocus = [...newFoc]
+            vec3f_copy(this.sOldPosition, newPos)
+            vec3f_copy(this.sOldFocus, newFoc)
 
             this.gLakituState.yaw = c.yaw
             this.gLakituState.nextYaw = c.nextYaw
-            this.gLakituState.goalPos = [...c.pos]
-            this.gLakituState.goalFocus = [...c.focus]
+            vec3f_copy(this.gLakituState.goalPos, c.pos)
+            vec3f_copy(this.gLakituState.goalFocus, c.focus)
 
             // Simulate lakitu flying to the new position and turning towards the new focus
             this.set_or_approach_vec3f_asymptotic(this.gLakituState.curPos, newPos,
@@ -3322,8 +3323,8 @@ class Camera {
                 this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
             }
 
-            this.gLakituState.pos = [...this.gLakituState.curPos]
-            this.gLakituState.focus = [...this.gLakituState.curFocus]
+            vec3f_copy(this.gLakituState.pos, this.gLakituState.curPos)
+            vec3f_copy(this.gLakituState.focus, this.gLakituState.curFocus)
 
             const output = {}
             MathUtil.vec3f_get_dist_and_angle(this.gLakituState.pos, this.gLakituState.focus, output)
@@ -3359,7 +3360,7 @@ class Camera {
                 }
             }
 
-            this.sModeTransition.marioPos = [...this.gPlayerCameraState.pos]
+            vec3f_copy(this.sModeTransition.marioPos, this.gPlayerCameraState.pos)
         }
 
         this.clamp_pitch(this.gLakituState.pos, this.gLakituState.focus, 0x3E00, -0x3E00)
@@ -3405,8 +3406,8 @@ class Camera {
 
         this.find_mario_floor_and_ceil(this.sMarioGeometry) 
         ObjectListProc.gCheckingSurfaceCollisionsForCamera = true
-        c.pos = [...this.gLakituState.goalPos]
-        c.focus = [...this.gLakituState.goalFocus]
+        vec3f_copy(c.pos, this.gLakituState.goalPos)
+        vec3f_copy(c.focus, this.gLakituState.goalFocus)
 
         c.yaw = this.gLakituState.yaw
         c.nextYaw = this.gLakituState.nextYaw
@@ -3577,7 +3578,7 @@ class Camera {
 
         this.gSecondCameraFocus = null
         this.sCButtonsPressed = 0
-        this.sModeTransition.marioPos = [...this.gPlayerCameraState.pos]
+        vec3f_copy(this.sModeTransition.marioPos, this.gPlayerCameraState.pos)
         this.sModeTransition.framesLeft = 0
 
         this.gCameraMovementFlags = 0
@@ -3747,13 +3748,13 @@ class Camera {
         if (c.mode != CAMERA_MODE_BEHIND_MARIO) {
             c.pos[1] = SurfaceCollision.find_floor(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 100, this.gPlayerCameraState.pos[2], this) + 125
         }
-        c.focus = [...this.gPlayerCameraState.pos]
-        this.gLakituState.curPos = [...c.pos]
-        this.gLakituState.curFocus = [...c.focus]
-        this.gLakituState.goalPos = [...c.pos]
-        this.gLakituState.goalFocus = [...c.focus]
-        this.gLakituState.pos = [...c.pos]
-        this.gLakituState.focus = [...c.focus]
+        vec3f_copy(c.focus, this.gPlayerCameraState.pos)
+        vec3f_copy(this.gLakituState.curPos, c.pos)
+        vec3f_copy(this.gLakituState.curFocus, c.focus)
+        vec3f_copy(this.gLakituState.goalPos, c.pos)
+        vec3f_copy(this.gLakituState.goalFocus, c.focus)
+        vec3f_copy(this.gLakituState.pos, c.pos)
+        vec3f_copy(this.gLakituState.focus, c.focus)
 
         this.gLakituState.yaw = this.calculate_yaw(c.focus, c.pos)
         this.gLakituState.nextYaw = this.gLakituState.yaw
@@ -3832,8 +3833,8 @@ class Camera {
 
     update_graph_node_camera(graphNode) {
         graphNode.rollScreen = this.gLakituState.roll
-        graphNode.pos = [...this.gLakituState.pos]
-        graphNode.focus = [...this.gLakituState.focus]
+        vec3f_copy(graphNode.pos, this.gLakituState.pos)
+        vec3f_copy(graphNode.focus, this.gLakituState.focus)
         this.zoom_out_if_paused_and_outside(graphNode)
     }
 
@@ -4838,8 +4839,8 @@ class Camera {
      * Rotates a vector in the horizontal plane and copies it to a new vector.
      */
     rotate_in_xz(dst, src, yaw) {
-        const tempVec = [...src]
-
+        let tempVec
+        vec3f_copy(tempVec, src)
         dst[0] = tempVec[2] * sins(yaw) + tempVec[0] * coss(yaw)
         dst[1] = tempVec[1]
         dst[2] = tempVec[2] * coss(yaw) - tempVec[0] * sins(yaw)
@@ -4852,8 +4853,8 @@ class Camera {
      * space. If possible, use vec3f_set_dist_and_angle()
      */
     rotate_in_yz(dst, src, pitch) {
-        const tempVec = [...src]
-
+        let tempVec
+        vec3f_copy(tempVec, src)
         dst[0] = -(tempVec[2] * coss(pitch) - tempVec[0] * sins(pitch))
         dst[1] =   tempVec[2] * coss(pitch) + tempVec[0] * sins(pitch)
         dst[2] =   tempVec[0]
@@ -6715,8 +6716,8 @@ class Camera {
     stop_cutscene_and_retrieve_stored_info(c) {
         this.gCutsceneTimer = CUTSCENE_STOP
         c.cutscene = 0
-        c.focus = [...this.sCameraStoreCutscene.focus]
-        c.pos = [...this.sCameraStoreCutscene.pos]
+        vec3f_copy(c.focus, this.sCameraStoreCutscene.focus)
+        vec3f_copy(c.pos, this.sCameraStoreCutscene.pos)
     }
 
     cap_switch_save(dummy) {
@@ -6726,7 +6727,7 @@ class Camera {
     init_spline_point(splineWrapper, index, speed, point) {
         splineWrapper.spline.index = index
         splineWrapper.spline.speed = speed
-        splineWrapper.spline.point = [...point]
+        vec3f_copy(splineWrapper.spline.point, point)
     }
 
     copy_spline_segment(dst, src) {
@@ -6806,8 +6807,8 @@ class Camera {
      * Store camera info for the cannon opening cutscene
      */
     store_info_cannon(c) {
-        this.sCameraStoreCutscene.pos = [...c.pos]
-        this.sCameraStoreCutscene.focus = [...c.focus]
+        vec3f_copy(this.sCameraStoreCutscene.pos, c.pos)
+        vec3f_copy(this.sCameraStoreCutscene.focus, c.focus)
         this.sCameraStoreCutscene.panDist = this.sPanDistance
         this.sCameraStoreCutscene.cannonYOffset = this.sCannonYOffset
     }
@@ -6816,8 +6817,8 @@ class Camera {
      * Retrieve camera info for the cannon opening cutscene
      */
     retrieve_info_cannon(c) {
-        c.pos = [...this.sCameraStoreCutscene.pos]
-        c.focus = [...this.sCameraStoreCutscene.focus]
+        vec3f_copy(c.pos, this.sCameraStoreCutscene.pos)
+        vec3f_copy(c.focus, this.sCameraStoreCutscene.focus)
         this.sPanDistance = this.sCameraStoreCutscene.panDist
         this.sCannonYOffset = this.sCameraStoreCutscene.cannonYOffset
     }

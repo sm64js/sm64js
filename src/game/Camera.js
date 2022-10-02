@@ -5601,14 +5601,17 @@ class Camera {
         let yawVelocity
         let pitchVelocity
         let distVelocity
-        let wrapper = {}
-        // If not transitioning, just use gCamera's current pos and foc
-        let nextPos = [...curPos]
-        let nextFoc = [...curFoc]
+        let wrapper
+        let nextPos = [0, 0, 0]
+        let nextFoc = [0, 0, 0]
         let floorHeight
         let floor
         let distTimer = this.sModeTransition.framesLeft
         let angleTimer = this.sModeTransition.framesLeft
+        
+        // If not transitioning, just use gCamera's current pos and foc
+        newPos = [...curPos]
+        newFoc = [...curFoc]
 
         if (this.sStatusFlags & CAM_FLAG_START_TRANSITION) {
             for (let i = 0; i < 3; i++) {

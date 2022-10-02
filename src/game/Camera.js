@@ -1823,14 +1823,14 @@ class Camera {
      * Updates the camera during fixed mode.
      */
     update_fixed_camera(c, focus, pos) {
-        let focusFloorOff = 0
-        let goalHeight = 0
-        let ceilHeight = 0
-        let heightOffset = 0
-        let distCamToFocus = 0
+        let focusFloorOff
+        let goalHeight
+        let ceilHeight
+        let heightOffset
+        let distCamToFocus
         let scaleToMario = 0.5
-        let pitch = 0
-        let yaw = 0
+        let pitch
+        let yaw
         let faceAngle = [0, 0, 0]
         let ceiling = {}
 
@@ -1849,6 +1849,7 @@ class Camera {
             case AREA_BBH:
                 scaleToMario = 0.0
                 heightOffset = 0.0
+                console.log("this is working")
                 break
         }
 
@@ -1915,7 +1916,7 @@ class Camera {
             }
         }
 
-        console.log(focus, pos, basePos)
+        // console.log(focus, pos, basePos)
 
         return faceAngle[1]
     }

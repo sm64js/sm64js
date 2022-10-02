@@ -5614,6 +5614,7 @@ class Camera {
             }
 
             vec3f_get_dist_and_angle(curFoc, startFoc, wrapper)
+            console.log(wrapper)
             this.sModeTransition.focDist = wrapper.dist; this.sModeTransition.focPitch = wrapper.pitch; this.sModeTransition.focYaw = wrapper.yaw
             vec3f_get_dist_and_angle(curFoc, startPos, wrapper)
             this.sModeTransition.posDist = wrapper.dist; this.sModeTransition.posPitch = wrapper.pitch; this.sModeTransition.posYaw = wrapper.yaw

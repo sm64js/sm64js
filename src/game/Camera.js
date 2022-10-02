@@ -56,6 +56,8 @@ import { SURFACE_CAMERA_8_DIR } from "../include/surface_terrains"
 import { SURFACE_BOSS_FIGHT_CAMERA } from "../include/surface_terrains"
 import { SURFACE_INSTANT_WARP_1B } from "../include/surface_terrains"
 import { SURFACE_INSTANT_WARP_1C } from "../include/surface_terrains"
+import { MARIO_DIALOG_STATUS_SPEAK } from "./MarioActionsCutscene"
+import { MARIO_DIALOG_LOOK_FRONT } from "./MarioActionsCutscene"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -517,6 +519,9 @@ class Camera {
             panDist: 0,
             cannonYOffset: 0,
         }
+        
+        this.sCutsceneSplineSegment = 0
+        this.sCutsceneSplineSegmentProgress = 0
 
         this.sZoomOutAreaMasks = [
             ZOOMOUT_AREA_MASK(0,0,0,0, 0,0,0,0), // Unused         | Unused
@@ -767,6 +772,17 @@ class Camera {
             null, this.sCamTHI, null, this.sCamRR, null, null, null, null, null,
             null, null, null, null, null, null, null, this.sCamCotMC, null, null,
             null, null, null, null, null, null, null, null, null, null,
+        ]
+
+        /******************************************************************************************************
+         * Cutscenes
+         ******************************************************************************************************/
+
+        /**
+         * Cutscene that plays when Mario beats the game.
+         */
+        this.sCutsceneEnding = [
+            { shot: this.cutscene_ending_mario_fall.bind(this), duration: 170 }
         ]
 
         this.sCutsceneStarSpawn = [
@@ -2397,20 +2413,17 @@ class Camera {
 
         let tempPos = [0, 0, 0]
         let cPos = [0, 0, 0]
-        let marioFloor = Object.assign({}, surfaceObj)
-        let cFloor = Object.assign({}, surfaceObj)
-        let tempFloor = Object.assign({}, surfaceObj)
-        let ceil = Object.assign({}, surfaceObj)
+        let marioFloor = {}
+        let cFloor = {}
+        let tempFloor = {}
+        let ceil = {}
         let camFloorHeight = 0
         let tempFloorHeight = 0
         let marioFloorHeight = 0
-        let dist = 0
-        let zoomDist = 0
+        let zoomDist
         let waterHeight = 0
         let gasHeight = 0
         let avoidYaw = 0
-        let pitch = 0
-        let yaw = 0
         let yawGoal = this.gPlayerCameraState.faceAngle[1] + DEGREES(180)
         let posHeight = 0
         let focHeight = 0
@@ -2428,9 +2441,9 @@ class Camera {
         let yawDir = 0
 
         this.handle_c_button_movement(c);
-        let wrapper = { dist: dist, pitch: pitch, yaw: yaw }
+        let wrapper = {}
         MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper);
-        dist = wrapper.dist; pitch = wrapper.pitch; yaw = wrapper.yaw
+        let dist = wrapper.dist; let pitch = wrapper.pitch; let yaw = wrapper.yaw
 
         // If C-Down is active, determine what distance the camera should be from mario
         if (this.gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
@@ -2462,12 +2475,14 @@ class Camera {
                 this.sZoomAmount = 0
             }
             if (dist > zoomDist) {
-                if ((dist -= 30) < zoomDist) {
+                dist -= 30
+                if (dist < zoomDist) {
                     dist = zoomDist
                 }
             }
             if (dist < zoomDist) {
-                if ((dist += 30) > zoomDist) {
+                dist += 30
+                if (dist > zoomDist) {
                     dist = zoomDist
                 }
             }
@@ -2516,7 +2531,7 @@ class Camera {
             if (this.sCSideButtonYaw == 0) {
                 nextYawVel = 0x1000
                 this.sYawSpeed = 0
-                wrapper = { dist: dist, pitch: pitch, yaw: yaw }
+                wrapper = {}
                 MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper);
                 dist = wrapper.dist; pitch = wrapper.pitch; yaw = wrapper.yaw
             }
@@ -2531,9 +2546,10 @@ class Camera {
         this.calc_y_to_curr_floor(wrapper, 1, 200, wrapper, 0.9, 200)
         posHeight = wrapper.posOff
         focHeight = wrapper.focOff
-        this.vec3f_copy(cPos, c.pos)
+        cPos = [...c.pos]
+        wrapper = {}
+        avoidStatus = this.rotate_camera_around_walls(c, cPos, wrapper, 0x600)
         wrapper.yaw = avoidYaw
-        this.rotate_camera_around_walls(c, cPos, wrapper, 0x600)
 
         // If a wall is blocking the view of Mario, then rotate in the calculated direction
         if (avoidStatus == 3) {
@@ -2573,8 +2589,8 @@ class Camera {
             if ((closeToMario & 1) && avoidStatus != 0) {
                 yawVel = 0
             }
-            if (yawVel != 0 /* && get_dialog_id() == DIALOG_NONE */) {
-                const yawWrapper = { current: yaw }
+            if (yawVel != 0 && get_dialog_id() == DIALOG_NONE) {
+                let yawWrapper = { current: yaw }
                 this.camera_approach_s16_symmetric_bool(yawWrapper, yawGoal, yawVel)
                 yaw = yawWrapper.current
             }
@@ -6467,10 +6483,39 @@ class Camera {
         return c.mode
     }
 
-    // ---------------- //
+    /**
+     * Move `pos` between the nearest floor and ceiling
+     * @param lastGood unused, passed as the last position the camera was in
+     */
+    resolve_geometry_collisions(pos, lastGood) {
+        wrapper = {x: pos[0], y: pos[1], z: pos[2]}
+        SurfaceCollision.f32_find_wall_collision(wrapper, 0.0, 100.0)
+        let floorY = SurfaceCollision.find_floor(wrapper.x, wrapper.y + 50.0, wrapper.z, {})
+        let ceilY = SurfaceCollision.find_ceil(wrapper.x, wrapper.y - 50.0, wrapper.z, {})
+        pos[0] = wrapper.x; pos[1] = wrapper.y; pos[2] = wrapper.z
 
-    define_camera_triggers() {
-        
+        if (FLOOR_LOWER_LIMIT != floorY && CELL_HEIGHT_LIMIT == ceilY) {
+            floorY += 125.0
+            if (pos[1] < floorY) {
+                pos[1] = floorY
+            }
+        }
+
+        if (FLOOR_LOWER_LIMIT == floorY && CELL_HEIGHT_LIMIT != ceilY) {
+            ceilY -= 125.0
+            if (pos[1] > ceilY) {
+                pos[1] = ceilY
+            }
+        }
+
+        if (FLOOR_LOWER_LIMIT != floorY && CELL_HEIGHT_LIMIT != ceilY) {
+            floorY += 125.0
+            ceilY -= 125.0
+
+            if (pos[1] <= floorY && pos[1] < ceilY) { pos[1] = floorY }
+            if (pos[1] > floorY && pos[1] >= ceilY) { pos[1] = ceilY }
+            if (pos[1] <= floorY && pos[1] >= ceilY) { pos[1] = (floorY + ceilY) * 0.5 }
+        }
     }
 
     rotate_camera_around_walls(c, cPos, yawWrapper, yawRange) {
@@ -6566,14 +6611,26 @@ class Camera {
         return status
     }
 
+    /**
+     * Stores type and height of the nearest floor and ceiling to Mario in `pg`
+     *
+     * Note: Also finds the water level, but waterHeight is unused
+     */
     find_mario_floor_and_ceil(pg) {
-        const surf = {}
-        const tempCheckingSurfaceCollisionsForCamera = ObjectListProc.gCheckingSurfaceCollisionsForCamera
+        let surf = {}
+        let tempCheckingSurfaceCollisionsForCamera = ObjectListProc.gCheckingSurfaceCollisionsForCamera
         ObjectListProc.gCheckingSurfaceCollisionsForCamera = true
 
-        if (SurfaceCollision.find_floor(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 10.0, this.gPlayerCameraState.pos[2], surf) != -11000) {
+        if (SurfaceCollision.find_floor(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 10.0, this.gPlayerCameraState.pos[2], surf) != FLOOR_LOWER_LIMIT) {
             pg.currFloorType = surf.floor.type
-            if (isNaN(surf.floor.type)) throw "error in find_mario_floor_and_ceil: " + surf.floor.type
+            if (isNaN(surf.floor.type)) throw "error in finding mario floor: " + surf.floor.type
+        } else {
+            pg.currFloorType = 0
+        }
+
+        if (SurfaceCollision.find_ceil(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] - 10.0, this.gPlayerCameraState.pos[2], surf) != CELL_HEIGHT_LIMIT) {
+            pg.currFloorType = surf.ceil.type
+            if (isNaN(surf.ceil.type)) throw "error in finding mario ceil: " + surf.ceil.type
         } else {
             pg.currFloorType = 0
         }
@@ -6582,12 +6639,301 @@ class Camera {
 
         ObjectListProc.gCheckingSurfaceCollisionsForCamera = false
 
-        const floorWrapper = {}
-        pg.currFloorHeight = SurfaceCollision.find_floor(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 10.0, this.gPlayerCameraState.pos[2], floorWrapper)
-        pg.currFloor = floorWrapper.floor
-        pg.currCeilHeight = 20000
-        pg.waterHeight = -999999
+        let wrapper = {floor: pg.currFloor, ceil: ceil.currCeil}
+        pg.currFloorHeight = SurfaceCollision.find_floor(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 10.0, this.gPlayerCameraState.pos[2], wrapper)
+        pg.currCeilHeight = SurfaceCollision.find_ceil(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] - 10.0, this.gPlayerCameraState.pos[2], wrapper)
+        pg.currFloor = wrapper.floor
+        pg.currCeil = wrapper.ceil
+        pg.waterHeight = SurfaceCollision.find_water_level(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[2])
         ObjectListProc.gCheckingSurfaceCollisionsForCamera = tempCheckingSurfaceCollisionsForCamera
+    }
+
+    /**
+     * Start a cutscene focusing on an object
+     * This will play if nothing else happened in the same frame, like exiting or warping.
+     */
+    start_object_cutscene(cutscene, o) {
+        this.sObjectCutscene = cutscene
+        this.gRecentCutscene = 0
+        this.gCutsceneFocus = o
+        this.gObjCutsceneDone = false
+    }
+
+    /**
+     * Start a low-priority cutscene without focusing on an object
+     * This will play if nothing else happened in the same frame, like exiting or warping.
+     */
+    start_object_cutscene_without_focus(cutscene) {
+        this.sObjectCutscene = cutscene
+        this.sCutsceneDialogResponse = DIALOG_RESPONSE_NONE
+        return 0
+    }
+
+    cutscene_object_with_dialog(cutscene, o, dialogID) {
+        let response = DIALOG_RESPONSE_NONE
+
+        if ((this.gCamera.cutscene == 0) && (this.sObjectCutscene == 0)) {
+            if (this.gRecentCutscene != cutscene) {
+                this.start_object_cutscene(cutscene, o)
+                if (dialogID != DIALOG_NONE) {
+                    this.sCutsceneDialogID = dialogID
+                } else {
+                    this.sCutsceneDialogID = DIALOG_001
+                }
+            } else {
+                response = this.sCutsceneDialogResponse
+            }
+
+            this.gRecentCutscene = 0
+        }
+        return response
+    }
+
+    cutscene_object_without_dialog(cutscene, o) {
+        let response = this.cutscene_object_with_dialog(cutscene, o, DIALOG_NONE)
+        return response
+    }
+
+    /**
+     * @return 0 if not started, 1 if started, and -1 if finished
+     */
+    cutscene_object(cutscene, o) {
+        let status = 0
+
+        if ((this.gCamera.cutscene == 0) && (this.sObjectCutscene == 0)) {
+            if (this.gRecentCutscene != cutscene) {
+                this.start_object_cutscene(cutscene, o)
+                status = 1
+            } else {
+                status = -1
+            }
+        }
+
+        return status
+    }
+
+    /**
+     * Update the camera's yaw and nextYaw. This is called from cutscenes to ignore the camera mode's yaw.
+     */
+    update_camera_yaw(c) {
+        c.nextYaw = this.calculate_yaw(c.focus, c.pos)
+        c.yaw = c.nextYaw
+    }
+
+    cutscene_reset_spline() {
+        this.sCutsceneSplineSegment = 0
+        this.sCutsceneSplineSegmentProgress = 0
+    }
+
+    stop_cutscene_and_retrieve_stored_info(c) {
+        this.gCutsceneTimer = CUTSCENE_STOP
+        c.cutscene = 0
+        c.focus = [...this.sCameraStoreCutscene.focus]
+        c.pos = [...this.sCameraStoreCutscene.pos]
+    }
+
+    cap_switch_save(dummy) {
+        // save_file_do_save(Area.gCurrSaveFileNum - 1)
+    }
+
+    init_spline_point(splineWrapper, index, speed, point) {
+        splineWrapper.spline.index = index
+        splineWrapper.spline.speed = speed
+        splineWrapper.spline.point = [...point]
+    }
+
+    copy_spline_segment(dst, src) {
+        let j = 0
+        let i = 0
+
+        wrapper = {spline: dst[i]}
+        this.init_spline_point(wrapper, src[j].index, src[j].speed, src[j].point)
+        dst[i] = wrapper.spline
+        i++
+        while (j > 16) {
+            while (src[j].index != -1) {
+                wrapper = {spline: dst[i]}
+                this.init_spline_point(wrapper, src[j].index, src[j].speed, src[j].point)
+                dst[i] = wrapper.spline
+                i++
+                j++
+            }
+        }
+
+        // Create the end of the spline by duplicating the last point
+        wrapper.spline = dst[i]
+        this.init_spline_point(wrapper, 0, src[j].speed, src[j].point)
+        dst[i] = wrapper.spline; wrapper.spline = dst[i + 1]
+        this.init_spline_point(wrapper, 0, 0, src[j].point)
+        dst[i + 1] = wrapper.spline; wrapper.spline = dst[i + 2]
+        this.init_spline_point(wrapper, 0, 0, src[j].point)
+        dst[i + 2] = wrapper.spline; wrapper.spline = dst[i + 3]
+        this.init_spline_point(wrapper, -1, 0, src[j].point)
+        dst[i + 3] = wrapper.spline
+    }
+
+    /**
+     * Triggers Mario to enter a dialog state. This is used to make Mario look at the focus of a cutscene,
+     * for example, bowser.
+     * @param state 0 = stop, 1 = start, 2 = start and look up, and 3 = start and look down
+     *
+     * @return if Mario left the dialog state, return CUTSCENE_LOOP, else return gCutsceneTimer
+     */
+    cutscene_common_set_dialog_state(state) {
+        timer = this.gCutsceneTimer
+        // If the dialog ended, return CUTSCENE_LOOP, which would end the cutscene shot
+        if (Mario.set_mario_npc_dialog(state) == MARIO_DIALOG_STATUS_SPEAK) {
+            timer = CUTSCENE_LOOP
+        }
+        return timer
+    }
+
+    /**
+     * Cause Mario to enter the normal dialog state.
+     */
+    cutscene_mario_dialog(c) {
+        this.gCutsceneTimer = this.cutscene_common_set_dialog_state(MARIO_DIALOG_LOOK_FRONT)
+    }
+
+    /**
+     * Lower the volume (US only) and start the peach letter background music
+     */
+    cutscene_intro_peach_start_letter_music(c) {
+        seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40)
+        this.cutscene_intro_peach_play_message_music()
+    }
+
+    /**
+     * Raise the volume (not in JP) and start the flying music.
+     */
+    cutscene_intro_peach_start_flying_music(c) {
+        seq_player_unlower_volume(SEQ_PLAYER_LEVEL, 60)
+        this.cutscene_intro_peach_play_lakitu_flying_music()
+    }
+
+    reset_pan_distance(c) {
+        this.sPanDistance = 0
+    }
+
+    /**
+     * Store camera info for the cannon opening cutscene
+     */
+    store_info_cannon(c) {
+        this.sCameraStoreCutscene.pos = [...c.pos]
+        this.sCameraStoreCutscene.focus = [...c.focus]
+        this.sCameraStoreCutscene.panDist = this.sPanDistance
+        this.sCameraStoreCutscene.cannonYOffset = this.sCannonYOffset
+    }
+
+    /**
+     * Retrieve camera info for the cannon opening cutscene
+     */
+    retrieve_info_cannon(c) {
+        c.pos = [...this.sCameraStoreCutscene.pos]
+        c.focus = [...this.sCameraStoreCutscene.focus]
+        this.sPanDistance = this.sCameraStoreCutscene.panDist
+        this.sCannonYOffset = this.sCameraStoreCutscene.cannonYOffset
+    }
+
+    /**
+     * Store camera info for the star spawn cutscene
+     */
+    store_info_star(c) {
+        this.reset_pan_distance(c)
+        this.vec3f_copy(this.sCameraStoreCutscene.pos, c.pos)
+        this.sCameraStoreCutscene.focus[0] = this.gPlayerCameraState.pos[0]
+        this.sCameraStoreCutscene.focus[1] = c.focus[1]
+        this.sCameraStoreCutscene.focus[2] = this.gPlayerCameraState.pos[2]
+    }
+
+    /**
+     * Retrieve camera info for the star spawn cutscene
+     */
+    retrieve_info_star(c) {
+        this.vec3f_copy(c.pos, this.sCameraStoreCutscene.pos)
+        this.vec3f_copy(c.focus, this.sCameraStoreCutscene.focus)
+    }
+
+    /**
+     * Rotate the camera's focus around the camera's position by incYaw and incPitch
+     */
+    pan_camera(c, incPitch, incYaw) {
+        let wrapper = {}
+        vec3f_get_dist_and_angle(c.pos, c.focus, wrapper)
+        wrapper.pitch += incPitch; wrapper.yaw += incYaw
+        vec3f_set_dist_and_angle(c.pos, c.focus, wrapper.dist, wrapper.pitch, wrapper.yaw)
+    }
+
+    cutscene_shake_explosion(c) {
+        this.set_environmental_camera_shake(SHAKE_ENV_EXPLOSION)
+        this.cutscene_set_fov_shake_preset(1)
+    }
+
+    /**
+     * Change the spherical coordinates of `to` relative to `from` by `incDist`, `incPitch`, and `incYaw`
+     *
+     * @param from    the base position
+     * @param[out] to the destination position
+     */
+    rotate_and_move_vec3f(to, from, incDist, incPitch, incYaw) {
+        let wrapper = {}
+        vec3f_get_dist_and_angle(from, to, wrapper)
+        wrapper.dist += incDist; wrapper.pitch += incPitch; wrapper.yaw += incYaw
+        vec3f_set_dist_and_angle(from, to, wrapper.dist, wrapper.pitch, wrapper.yaw)
+    }
+
+    set_flag_post_door(c) {
+        this.sStatusFlags |= CAM_FLAG_BEHIND_MARIO_POST_DOOR
+        this.sCameraYawAfterDoorCutscene = this.calculate_yaw(c.focus, c.pos)
+    }
+
+    cutscene_soften_music(c) {
+        seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40)
+    }
+
+    cutscene_unsoften_music(c) {
+        seq_player_unlower_volume(SEQ_PLAYER_LEVEL, 60)
+    }
+
+    /**
+     * Set the camera position and focus for when Mario falls from the sky.
+     */
+    cutscene_ending_mario_fall_start(c) {
+        c.focus = [-26.0, 0.0, -137.0]
+        c.pos = [165.0, 4725.0, 324.0]
+    }
+
+    /**
+     * Focus on Mario when he's falling from the sky.
+     */
+    cutscene_ending_mario_fall_focus_mario(c) {
+        let offset = [0.0, 80.0, Math.abs(this.gPlayerCameraState.pos[1] - c.pos[1]) * -0.1]
+        if (offset[2] > -100.0) {
+            offset[2] = -100.0
+        }
+
+        this.offset_rotated(c.focus, this.gPlayerCameraState.pos, offset, gPlayerCameraState.faceAngle)
+    }
+
+    /**
+     * Mario falls from the sky after the grand star cutscene.
+     */
+    cutscene_ending_mario_fall(c) {
+        this.cutscene_ending_mario_fall_start = this.cutscene_ending_mario_fall_start.bind(this)
+        this.cutscene_ending_mario_fall_focus_mario = this.cutscene_ending_mario_fall_focus_mario.bind(this)
+        this.cutscene_event(this.cutscene_ending_mario_fall_start, c, 0, 0)
+        this.cutscene_event(this.cutscene_ending_mario_fall_focus_mario, c, 0, -1)
+    }
+
+    cutscene_ending_mario_land_closeup(c) {
+        c.focus = [85.0, 826.0, 250.0]
+        c.pos = [-51.0, 988.0, -202.0]
+    }
+
+    // ---------------- //
+
+    define_camera_triggers() {
+        
     }
 
     vec3f_copy(dest, src) {
@@ -6633,72 +6979,6 @@ class Camera {
             this.start_object_cutscene_without_focus(CUTSCENE_READ_MESSAGE)
         }
         return result
-    }
-
-    start_object_cutscene(cutscene, o) {
-        this.sObjectCutscene = cutscene
-        this.gRecentCutscene = 0
-        this.gCutsceneFocus = o
-        this.gObjCutsceneDone = false
-    }
-
-    start_object_cutscene_without_focus(cutscene) {
-        this.sObjectCutscene = cutscene
-        this.sCutsceneDialogResponse = DIALOG_RESPONSE_NONE
-        return false
-    }
-
-    cutscene_object_with_dialog(cutscene, o, dialogID) {
-        let response = DIALOG_RESPONSE_NONE
-
-        if ((this.gCamera.cutscene == 0) && (this.sObjectCutscene == 0)) {
-            if (this.gRecentCutscene != cutscene) {
-                this.start_object_cutscene(cutscene, o)
-                if (dialogID != DIALOG_NONE) {
-                    this.sCutsceneDialogID = dialogID
-                } else {
-                    this.sCutsceneDialogID = DIALOG_001
-                }
-            } else {
-                response = this.sCutsceneDialogResponse
-            }
-
-            this.gRecentCutscene = 0
-        }
-        return response
-    }
-
-    cutscene_object_without_dialog(cutscene, o) {
-        let response = this.cutscene_object_with_dialog(cutscene, o, DIALOG_NONE)
-        return response
-    }
-
-    cutscene_object(cutscene, o) {
-        let status = 0
-
-        if ((this.gCamera.cutscene == 0) && (this.sObjectCutscene == 0)) {
-            if (this.gRecentCutscene != cutscene) {
-                this.start_object_cutscene(cutscene, o)
-                status = 1
-            } else {
-                status = -1
-            }
-        }
-
-        return status
-    }
-
-    /**
-     * Update the camera's yaw and nextYaw. This is called from cutscenes to ignore the camera mode's yaw.
-     */
-    update_camera_yaw(c) {
-        c.nextYaw = this.calculate_yaw(c.focus, c.pos)
-        c.yaw = c.nextYaw
-    }
-
-
-    resolve_geometry_collisions(pos, lastGood) {
-        // TODO
     }
 
     shake_camera_fov(perspective) {
@@ -6808,42 +7088,6 @@ class Camera {
             this.sFOVState.decay = decay
             this.sFOVState.shakeSpeed = shakeSpeed
         }
-    }
-
-    reset_pan_distance(c) {
-        this.sPanDistance = 0
-    }
-    
-    /**
-     * Store camera info for the star spawn cutscene
-     */
-    store_info_star(c) {
-        this.reset_pan_distance(c)
-        this.vec3f_copy(this.sCameraStoreCutscene.pos, c.pos)
-        this.sCameraStoreCutscene.focus[0] = this.gPlayerCameraState.pos[0]
-        this.sCameraStoreCutscene.focus[1] = c.focus[1]
-        this.sCameraStoreCutscene.focus[2] = this.gPlayerCameraState.pos[2]
-    }
-
-    /**
-     * Retrieve camera info for the star spawn cutscene
-     */
-    retrieve_info_star(c) {
-        this.vec3f_copy(c.pos, this.sCameraStoreCutscene.pos)
-        this.vec3f_copy(c.focus, this.sCameraStoreCutscene.focus)
-    }
-
-    set_flag_post_door(c) {
-        this.sStatusFlags |= CAM_FLAG_BEHIND_MARIO_POST_DOOR
-        this.sCameraYawAfterDoorCutscene = this.calculate_yaw(c.focus, c.pos)
-    }
-
-    cutscene_soften_music(c) {
-        seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40)
-    }
-
-    cutscene_unsoften_music(c) {
-        seq_player_unlower_volume(SEQ_PLAYER_LEVEL, 60)
     }
 
     /**

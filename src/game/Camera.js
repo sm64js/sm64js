@@ -1875,14 +1875,11 @@ class Camera {
             goalHeight = this.sMarioGeometry.currFloorHeight + basePos[1] + heightOffset
         } else {
             goalHeight = this.gLakituState.goalPos[1]
-            console.log("what?")
         }
 
         if (300 > distCamToFocus) {
             goalHeight += 300 - distCamToFocus
         }
-
-        console.log(focus, pos, basePos)
 
         ceilHeight = SurfaceCollision.find_ceil(c.pos[0], goalHeight - 100.0, c.pos[2], ceiling)
         if (ceilHeight != CELL_HEIGHT_LIMIT) {
@@ -1917,6 +1914,8 @@ class Camera {
                 MathUtil.vec3f_set_dist_and_angle(c.focus, c.pos, distCamToFocus, pitch, yaw)
             }
         }
+
+        console.log(focus, pos, basePos)
 
         return faceAngle[1]
     }

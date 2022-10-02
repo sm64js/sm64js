@@ -5595,15 +5595,23 @@ class Camera {
     next_lakitu_state(newPos, newFoc, curPos, curFoc, oldPos, oldFoc, yaw) {
         let startPos = [0, 0, 0]
         let startFoc = [0, 0, 0]
+        let goalDist = 0
+        let goalPitch = 0
+        let goalYaw = 0
+        let yawVelocity
+        let pitchVelocity
+        let distVelocity
+        let wrapper
         let nextPos = [0, 0, 0]
         let nextFoc = [0, 0, 0]
+        let floorHeight
+        let floor = Object.assign({}, surfaceObj)
         let distTimer = this.sModeTransition.framesLeft
         let angleTimer = this.sModeTransition.framesLeft
-        let wrapper = {}
         
         // If not transitioning, just use gCamera's current pos and foc
-        newPos = [...curPos]
-        newFoc = [...curFoc]
+        this.vec3f_copy(newPos, curPos)
+        this.vec3f_copy(newFoc, curFoc)
 
         if (this.sStatusFlags & CAM_FLAG_START_TRANSITION) {
             for (let i = 0; i < 3; i++) {
@@ -5613,56 +5621,68 @@ class Camera {
                 startFoc[i] = oldFoc[i] + this.gPlayerCameraState.pos[i] - this.sModeTransition.marioPos[i]
             }
 
-            vec3f_get_dist_and_angle(curFoc, startFoc, wrapper)
-            console.log(wrapper)
-            this.sModeTransition.focDist = wrapper.dist; this.sModeTransition.focPitch = wrapper.pitch; this.sModeTransition.focYaw = wrapper.yaw
-            vec3f_get_dist_and_angle(curFoc, startPos, wrapper)
-            this.sModeTransition.posDist = wrapper.dist; this.sModeTransition.posPitch = wrapper.pitch; this.sModeTransition.posYaw = wrapper.yaw
+            this.sModeTransition.focDist = MathUtil.sqrtf((startFoc[0] - curFoc[0]) ** 2 + (startFoc[1] - curFoc[1]) ** 2 + (startFoc[2] - curFoc[2]) ** 2)
+            this.sModeTransition.focPitch = MathUtil.atan2s(MathUtil.sqrtf((startFoc[0] - curFoc[0]) ** 2 + (startFoc[1] - curFoc[1]) ** 2 + (startFoc[2] - curFoc[2]) ** 2))
+            this.sModeTransition.focYaw = MathUtil.atan2s((startFoc[0] - curFoc[0]) ** 2 + (startFoc[1] - curFoc[1]) ** 2 + (startFoc[2] - curFoc[2]) ** 2)
+
+            this.sModeTransition.posDist = MathUtil.sqrtf((startPos[0] - curFoc[0]) ** 2 + (startPos[1] - curFoc[1]) ** 2 + (startPos[2] - curFoc[2]) ** 2)
+            this.sModeTransition.posPitch = MathUtil.atan2s(MathUtil.sqrtf((startPos[0] - curFoc[0]) ** 2 + (startPos[1] - curFoc[1]) ** 2 + (startPos[2] - curFoc[2]) ** 2))
+            this.sModeTransition.posYaw = MathUtil.atan2s((startPos[0] - curFoc[0]) ** 2 + (startPos[1] - curFoc[1]) ** 2 + (startPos[2] - curFoc[2]) ** 2)
+            
             this.sStatusFlags &= ~CAM_FLAG_START_TRANSITION
         }
 
         // Transition from the last mode to the current one
         if (this.sModeTransition.framesLeft > 0) {
-            vec3f_get_dist_and_angle(curFoc, curPos, wrapper)
-            let goalDist = wrapper.dist; let goalPitch = wrapper.pitch; let goalYaw = wrapper.yaw
-            let distVelocity = Math.abs(goalDist - this.sModeTransition.posDist) / distTimer;
-            let pitchVelocity = Math.abs(goalPitch - this.sModeTransition.posPitch) / angleTimer;
-            let yawVelocity = Math.abs(goalYaw - this.sModeTransition.posYaw) / angleTimer;
+            goalDist = MathUtil.sqrtf((curPos[0] - curFoc[0]) ** 2 + (curPos[1] - curFoc[1]) ** 2 + (curPos[2] - curFoc[2]) ** 2)
+            goalPitch = MathUtil.atan2s(MathUtil.sqrtf((curPos[0] - curFoc[0]) ** 2 + (curPos[1] - curFoc[1]) ** 2 + (curPos[2] - curFoc[2]) ** 2))
+            goalYaw = MathUtil.atan2s((curPos[0] - curFoc[0]) ** 2 + (curPos[1] - curFoc[1]) ** 2 + (curPos[2] - curFoc[2]) ** 2)
+            
+            distVelocity = Math.abs(goalDist - this.sModeTransition.posDist) / distTimer;
+            pitchVelocity = Math.abs(goalPitch - this.sModeTransition.posPitch) / angleTimer;
+            yawVelocity = Math.abs(goalYaw - this.sModeTransition.posYaw) / angleTimer;
 
             wrapper = { current: this.sModeTransition.posDist }
             this.camera_approach_f32_symmetric_bool(wrapper, goalDist, distVelocity)
-            this.sModeTransition.posDist = wrapper.current; wrapper.current = this.sModeTransition.posYaw
-            this.camera_approach_s16_symmetric_bool(wrapper, goalYaw, yawVelocity)
-            this.sModeTransition.posYaw = wrapper.current; wrapper.current = this.sModeTransition.posPitch
-            this.camera_approach_s16_symmetric_bool(wrapper, goalPitch, pitchVelocity)
+            this.sModeTransition.posDist = wrapper.current
+            wrapper.current = this.sModeTransition.posYaw
+            this.camera_approach_f32_symmetric_bool(wrapper, goalYaw, yawVelocity)
+            this.sModeTransition.posYaw = wrapper.current
+            wrapper.current = this.sModeTransition.posPitch
+            this.camera_approach_f32_symmetric_bool(wrapper, goalPitch, pitchVelocity)
             this.sModeTransition.posPitch = wrapper.current
 
-            vec3f_get_dist_and_angle(curFoc, nextPos, wrapper)
-            this.sModeTransition.posDist = wrapper.dist; this.sModeTransition.posPitch = wrapper.pitch; this.sModeTransition.posYaw = wrapper.yaw
-            vec3f_get_dist_and_angle(curPos, curFoc, wrapper)
-            goalDist = wrapper.dist; goalPitch = wrapper.pitch; goalYaw = wrapper.yaw
-            
+            this.sModeTransition.posDist = MathUtil.sqrtf((nextPos[0] - curFoc[0]) ** 2 + (nextPos[1] - curFoc[1]) ** 2 + (nextPos[2] - curFoc[2]) ** 2)
+            this.sModeTransition.posPitch = MathUtil.atan2s(MathUtil.sqrtf((nextPos[0] - curFoc[0]) ** 2 + (nextPos[1] - curFoc[1]) ** 2 + (nextPos[2] - curFoc[2]) ** 2))
+            this.sModeTransition.posYaw = MathUtil.atan2s((nextPos[0] - curFoc[0]) ** 2 + (nextPos[1] - curFoc[1]) ** 2 + (nextPos[2] - curFoc[2]) ** 2)
+
+            goalDist = MathUtil.sqrtf((curFoc[0] - curPos[0]) ** 2 + (curFoc[1] - curPos[1]) ** 2 + (curFoc[2] - curPos[2]) ** 2)
+            goalPitch = MathUtil.atan2s(MathUtil.sqrtf((curFoc[0] - curPos[0]) ** 2 + (curFoc[1] - curPos[1]) ** 2 + (curFoc[2] - curPos[2]) ** 2))
+            goalYaw = MathUtil.atan2s((curPos[0] - curPos[0]) ** 2 + (curFoc[1] - curPos[1]) ** 2 + (curFoc[2] - curPos[2]) ** 2)
+        
             pitchVelocity = this.sModeTransition.focPitch / this.sModeTransition.framesLeft
             yawVelocity = this.sModeTransition.focYaw / this.sModeTransition.framesLeft
             distVelocity = this.sModeTransition.focDist / this.sModeTransition.framesLeft
 
-            wrapper = { current: this.sModeTransition.focPitch }
-            this.camera_approach_s16_symmetric_bool(wrapper, goalPitch, pitchVelocity)
-            this.sModeTransition.focPitch = wrapper.current
-            wrapper.current = this.sModeTransition.focYaw
-            this.camera_approach_s16_symmetric_bool(wrapper, goalYaw, yawVelocity)
-            this.sModeTransition.focYaw = wrapper.current
-            wrapper.current = this.sModeTransition.focDist
-            this.camera_approach_f32_symmetric_bool(wrapper, 0, distVelocity)
+            wrapper = { current: this.sModeTransition.focDist }
+            this.camera_approach_f32_symmetric_bool(wrapper, goalDist, distVelocity)
             this.sModeTransition.focDist = wrapper.current
+            wrapper.current = this.sModeTransition.focYaw
+            this.camera_approach_f32_symmetric_bool(wrapper, goalYaw, yawVelocity)
+            this.sModeTransition.focYaw = wrapper.current
+            wrapper.current = this.sModeTransition.focPitch
+            this.camera_approach_f32_symmetric_bool(wrapper, goalPitch, pitchVelocity)
+            this.sModeTransition.focPitch = wrapper.current
 
-            vec3f_set_dist_and_angle(curFoc, nextFoc, this.sModeTransition.focDist, this.sModeTransition.focPitch, this.sModeTransition.focYaw)
-
-            newFoc = [...nextFoc]
-            newPos = [...nextPos]
+            goalDist = MathUtil.sqrtf((curFoc[0] - nextFoc[0]) ** 2 + (curFoc[1] - nextFoc[1]) ** 2 + (curFoc[2] - nextFoc[2]) ** 2)
+            goalPitch = MathUtil.atan2s(MathUtil.sqrtf((curFoc[0] - nextFoc[0]) ** 2 + (curFoc[1] - nextFoc[1]) ** 2 + (curFoc[2] - nextFoc[2]) ** 2))
+            goalYaw = MathUtil.atan2s((curFoc[0] - nextFoc[0]) ** 2 + (curFoc[1] - nextFoc[1]) ** 2 + (curFoc[2] - nextFoc[2]) ** 2)
+        
+            this.vec3f_copy(newFoc, nextFoc)
+            this.vec3f_copy(newPos, nextPos)
 
             if (this.gCamera.cutscene != 0 || !(this.gCameraMovementFlags & CAM_MOVE_C_UP_MODE)) {
-                let floorHeight = SurfaceCollision.find_floor(newPos[0], newPos[1], newPos[2], {})
+                floorHeight = SurfaceCollision.find_floor(newPos[0], newPos[1], newPos[2], floor)
                 if (floorHeight != FLOOR_LOWER_LIMIT) {
                     floorHeight += 125.0
                     if (floorHeight > newPos[1]) {
@@ -5671,7 +5691,6 @@ class Camera {
                 }
                 wrapper = { x: newPos[0], y: newPos[1], z: newPos[2] }
                 SurfaceCollision.f32_find_wall_collision(wrapper, 0.0, 100.0)
-                newPos[0] = wrapper.x; newPos[1] = wrapper.y; newPos[2] = wrapper.z
             }
             this.sModeTransition.framesLeft--
             yaw = this.calculate_yaw(newFoc, newPos)
@@ -5682,7 +5701,7 @@ class Camera {
             this.sStatusFlags &= ~CAM_FLAG_TRANSITION_OUT_OF_C_UP
         }
 
-        this.sModeTransition.marioPos = [...this.gPlayerCameraState.pos]
+        this.vec3f_copy(this.sModeTransition.marioPos, this.gPlayerCameraState.pos)
         return yaw
     }
 

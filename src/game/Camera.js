@@ -2771,19 +2771,18 @@ class Camera {
         /// The returned yaw
         let camYaw
         // unused
-        let focPitch = 0
+        let focPitch
         /// The focus (Mario)'s yaw around the stairs
-        let focYaw = 0
+        let focYaw
         // unused
-        let posPitch = 0
+        let posPitch
         /// The camera's yaw around the stairs
-        let posYaw = 0
+        let posYaw
         let cPos = [0, 0, 0]
         let checkPos = [0, 0, 0]
-        let floor = null
-        let dist = 0
-        let focusHeight = 0
-        let floorHeight = 0
+        let dist
+        let focusHeight
+        let floorHeight
         let focY
 
         this.handle_c_button_movement(c)
@@ -2791,18 +2790,17 @@ class Camera {
         vec3f_set(this.sFixedModeBasePosition, -1280.0, 614.0, 1740.0)
 
         // Focus on Mario, and move the focus up the staircase with him
-        let wrapper = {posOff: focusHeight, focOff: focusHeight}
+        let wrapper = {}
         this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
-        focusHeight = wrapper.posOff
+        focusHeight = wrapper.focOff
         focus[0] = this.gPlayerCameraState.pos[0]
         focY = this.gPlayerCameraState.pos[1] + 125.0 + focusHeight
         focus[2] = this.gPlayerCameraState.pos[2]
 
         vec3f_copy(cPos, pos)
-        wrapper = {dist: dist, pitch: focPitch, yaw: focYaw}
+        wrapper = {}
         vec3f_get_dist_and_angle(this.sFixedModeBasePosition, focus, wrapper)
         dist = wrapper.dist; focPitch = wrapper.pitch; focYaw = wrapper.yaw
-        wrapper.pitch = posPitch; wrapper.yaw = posYaw
         vec3f_get_dist_and_angle(this.sFixedModeBasePosition, cPos, wrapper)
         dist = wrapper.dist; posPitch = wrapper.pitch; posYaw = wrapper.yaw
 
@@ -2827,9 +2825,8 @@ class Camera {
         checkPos[0] = focus[0] + (cPos[0] - focus[0]) * 0.7
         checkPos[1] = focus[1] + (cPos[1] - focus[1]) * 0.7 + 300.0
         checkPos[2] = focus[2] + (cPos[2] - focus[2]) * 0.7
-        wrapper.floor = floor
-        floorHeight = SurfaceCollision.find_floor(checkPos[0], checkPos[1] + 50.0, checkPos[2], wrapper)
-        floor = wrapper.floor
+        
+        floorHeight = SurfaceCollision.find_floor(checkPos[0], checkPos[1] + 50.0, checkPos[2], {})
         if (floorHeight != FLOOR_LOWER_LIMIT) {
             if (floorHeight < this.sMarioGeometry.currFloorHeight) {
                 floorHeight = this.sMarioGeometry.currFloorHeight
@@ -3214,7 +3211,7 @@ class Camera {
      * @param frames number of frames the transition should last, only used when entering C_UP
      */
 
-     set_camera_mode(c, mode, frames) {
+    set_camera_mode(c, mode, frames) {
         const start = this.sModeInfo.transitionStart
         const end = this.sModeInfo.transitionEnd
 

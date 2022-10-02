@@ -5595,23 +5595,20 @@ class Camera {
     next_lakitu_state(newPos, newFoc, curPos, curFoc, oldPos, oldFoc, yaw) {
         let startPos = [0, 0, 0]
         let startFoc = [0, 0, 0]
-        let goalDist = 0
-        let goalPitch = 0
-        let goalYaw = 0
+        let goalDist
+        let goalPitch
+        let goalYaw
         let yawVelocity
         let pitchVelocity
         let distVelocity
-        let wrapper
-        let nextPos = [0, 0, 0]
-        let nextFoc = [0, 0, 0]
+        let wrapper = {}
+        // If not transitioning, just use gCamera's current pos and foc
+        let nextPos = [...curPos]
+        let nextFoc = [...curFoc]
         let floorHeight
-        let floor = Object.assign({}, surfaceObj)
+        let floor
         let distTimer = this.sModeTransition.framesLeft
         let angleTimer = this.sModeTransition.framesLeft
-        
-        // If not transitioning, just use gCamera's current pos and foc
-        this.vec3f_copy(newPos, curPos)
-        this.vec3f_copy(newFoc, curFoc)
 
         if (this.sStatusFlags & CAM_FLAG_START_TRANSITION) {
             for (let i = 0; i < 3; i++) {

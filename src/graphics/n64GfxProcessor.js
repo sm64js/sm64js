@@ -378,23 +378,27 @@ export class n64GfxProcessor {
 
     import_texture_rgba16(tile) {
         const rgba32_buf = []
-        for (let i = 0; i < this.rdp.loaded_texture[tile].size_bytes / 2; i++) {
-            const col16 = (this.rdp.loaded_texture[tile].textureData[2 * i] << 8) | this.rdp.loaded_texture[tile].textureData[2 * i + 1]
-            const a = col16 & 1
-            const r = (col16 >> 11) & 0x1f
-            const g = (col16 >> 6) & 0x1f
-            const b = (col16 >> 1) & 0x1f
+        try {
+            for (let i = 0; i < this.rdp.loaded_texture[tile].size_bytes / 2; i++) {
+                const col16 = (this.rdp.loaded_texture[tile].textureData[2 * i] << 8) | this.rdp.loaded_texture[tile].textureData[2 * i + 1]
+                const a = col16 & 1
+                const r = (col16 >> 11) & 0x1f
+                const g = (col16 >> 6) & 0x1f
+                const b = (col16 >> 1) & 0x1f
 
-            rgba32_buf.push(this.scale_5_8(r))
-            rgba32_buf.push(this.scale_5_8(g))
-            rgba32_buf.push(this.scale_5_8(b))
-            rgba32_buf.push(a ? 255 : 0)
+                rgba32_buf.push(this.scale_5_8(r))
+                rgba32_buf.push(this.scale_5_8(g))
+                rgba32_buf.push(this.scale_5_8(b))
+                rgba32_buf.push(a ? 255 : 0)
+            }
+
+            const width = this.rdp.texture_tile.line_size_bytes / 2
+            const height = this.rdp.loaded_texture[tile].size_bytes / this.rdp.texture_tile.line_size_bytes
+
+            WebGL.upload_texture(rgba32_buf, width, height)
+        } catch (except) {
+            console.log("ERROR: unimported texture:", except)
         }
-
-        const width = this.rdp.texture_tile.line_size_bytes / 2
-        const height = this.rdp.loaded_texture[tile].size_bytes / this.rdp.texture_tile.line_size_bytes
-
-        WebGL.upload_texture(rgba32_buf, width, height)
 
     }
 

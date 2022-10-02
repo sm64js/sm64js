@@ -934,6 +934,7 @@ class Camera {
     set_camera_shake_from_hit(shake) {
         switch (shake) {
             case SHAKE_ATTACK:
+                // Makes the camera stop for a bit
                 this.gLakituState.focHSpeed = 0
                 this.gLakituState.posHSpeed = 0
                 break
@@ -1089,21 +1090,18 @@ class Camera {
     */
     calc_y_to_curr_floor(posOffWrapper, posMul, posBound, focOffWrapper, focMul, focBound) {
         const floorHeight = this.sMarioGeometry.currFloorHeight
-        const waterHeight = -99999
+        const waterHeight = SurfaceCollision.find_water_level(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[2])
 
         if (!(this.gPlayerCameraState.action & Mario.ACT_FLAG_METAL_WATER)) {
-            if (floorHeight < (waterHeight)) {
+            if (floorHeight < waterHeight) {
                 floorHeight = waterHeight
             }
         }
 
-        const marioObj = LevelUpdate.gMarioState
+        const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
 
         if (this.gPlayerCameraState.action & Mario.ACT_FLAG_ON_POLE) {
-            const pole = marioObj.usedObj
-            const poleHitboxHeight = pole.hitboxHeight
-
-            if (this.gPlayerCameraState.currFloorHeight >= pole.rawData[oPosY] && this.gPlayerCameraState.pos[1] < 0.7 * poleHitboxHeight + pole.rawData[oPosY]) {
+            if (this.gPlayerCameraState.currFloorHeight >= gMarioStates[0].usedObj.rawData[oPosY] && this.gPlayerCameraState.pos[1] < 0.7 * gMarioStates[0].usedObj.hitboxHeight + gMarioStates[0].usedObj.rawData[oPosY]) {
                 posBound = 1200
             }
         }
@@ -1147,15 +1145,12 @@ class Camera {
      * Set the camera's y coordinate to goalHeight, respecting floors and ceilings in the way
      */
     set_camera_height(c, goalHeight) {
-        let surface = {}
         let marioFloorHeight
         let marioCeilHeight
         let camFloorHeight
         let baseOff = 125.0
 
-        let ceilWrapper = {ceil: surface}
-        let camCeilHeight = SurfaceCollision.find_ceil(c.pos[0], this.gLakituState.goalPos[1] - 50.0, c.pos[2], ceilWrapper)
-        surface = ceilWrapper.ceil
+        let camCeilHeight = SurfaceCollision.find_ceil(c.pos[0], this.gLakituState.goalPos[1] - 50.0, c.pos[2], {})
 
         if (this.gPlayerCameraState.action & Mario.ACT_FLAG_HANGING) {
             marioCeilHeight = this.sMarioGeometry.currCeilHeight
@@ -1173,9 +1168,7 @@ class Camera {
 
             this.approach_camera_height(c, goalHeight, 5.0)
         } else {
-            ceilWrapper.floor = ceilWrapper.ceil
-            camFloorHeight = SurfaceCollision.find_floor(c.pos[0], c.pos[1] + 100.0, c.pos[2], ceilWrapper)
-            surface = ceilWrapper.floor
+            camFloorHeight = SurfaceCollision.find_floor(c.pos[0], c.pos[1] + 100.0, c.pos[2], {})
             marioFloorHeight = baseOff + this.sMarioGeometry.currFloorHeight
 
             if (camFloorHeight < marioFloorHeight) {
@@ -1208,16 +1201,15 @@ class Camera {
      * Pitch the camera down when the camera is facing down a slope
      */
     look_down_slopes(camYaw) {
-        let floor = null
         // Default pitch
         let pitch = 0x05B0
         // x and z offsets towards the camera
         let xOff = this.gPlayerCameraState.pos[0] + sins(camYaw) * 40.0
         let zOff = this.gPlayerCameraState.pos[2] + coss(camYaw) * 40.0
 
-        let floorWrapper = {floor: floor}
+        let floorWrapper = {}
         let floorDY = SurfaceCollision.find_floor(xOff, this.gPlayerCameraState.pos[1], zOff, floorWrapper) - this.gPlayerCameraState.pos[1]
-        floor = floorWrapper.floor
+        let floor = floorWrapper.floor
 
         if (floor != null) {
             if (floor.type != SURFACE_WALL_MISC && floorDY > 0) {
@@ -1309,21 +1301,16 @@ class Camera {
         let cenDistZ = this.gPlayerCameraState.pos[2] - c.areaCenZ
         let camYaw = atan2s(cenDistZ, cenDistX) + this.sModeOffsetYaw
         let pitch = this.look_down_slopes(camYaw)
-        let posY = 0
-        let focusY = 0
         let yOff = 125.0
         let baseDist = 1000.0
 
         this.sAreaYaw = camYaw - this.sModeOffsetYaw
-        let wrapper = {posOff: posY, focOff: focusY}
+        let wrapper = {}
         this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
-        posY = wrapper.posOff; focusY = wrapper.focOff;
+        let posY = wrapper.posOff; let focusY = wrapper.focOff;
         this.focus_on_mario(focus, pos, posY + yOff, focusY + yOff, this.sLakituDist + baseDist, pitch, camYaw)
-        this.pan_ahead_of_player(c)
-        if (this.gCurrLevelArea == AREA_DDD_SUB) {
-            camYaw = this.clamp_positions_and_find_yaw(pos, focus, 6839.0, 995.0, 5994.0, -3945.0)
-        }
-
+        camYaw = this.find_in_bounds_yaw_wdw_bob_thi(pos, focus, camYaw)
+        
         return camYaw
     }
 
@@ -1333,16 +1320,14 @@ class Camera {
     update_8_directions_camera(c, focus, pos) {
         let camYaw = this.s8DirModeBaseYaw + this.s8DirModeYawOffset
         let pitch = this.look_down_slopes(camYaw)
-        let posY = 0
-        let focusY = 0
         let yOff = 125.0
         let baseDist = 1000.0
 
         this.sAreaYaw = camYaw
-        let wrapper = {posOff: posY, focOff: focusY}
+        let wrapper = {}
         this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
-        posY = wrapper.posOff; focusY = wrapper.focOff;
-        this.focus_on_mario(focus, pos, posY + yOff, this.sLakituDist + baseDist, pitch, camYaw)
+        let posY = wrapper.posOff; let focusY = wrapper.focOff;
+        this.focus_on_mario(focus, pos, posY + yOff, focusY + yOff, this.sLakituDist + baseDist, pitch, camYaw)
         this.pan_ahead_of_player(c)
         if (this.gCurrLevelArea == AREA_DDD_SUB) {
             camYaw = this.clamp_positions_and_find_yaw(pos, focus, 6839.0, 995.0, 5994.0, -3945.0)
@@ -1358,11 +1343,10 @@ class Camera {
      */
     radial_camera_move(c) {
         const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
+
         let maxAreaYaw = DEGREES(60)
         let minAreaYaw = DEGREES(-60)
         let rotateSpeed = 0x1000
-        let avoidYaw = 0
-        let avoidStatus = 0
         let areaDistX = this.gPlayerCameraState.pos[0] - c.areaCenX
         let areaDistZ = this.gPlayerCameraState.pos[2] - c.areaCenZ
 
@@ -1396,8 +1380,9 @@ class Camera {
         }
 
         // Avoid obstructing walls
-        let yawWrapper = {yaw: avoidYaw}
-        avoidStatus = this.rotate_camera_around_walls(c, c.pos, yawWrapper, 0x400)
+        let yawWrapper = {}
+        let avoidStatus = this.rotate_camera_around_walls(c, c.pos, yawWrapper, 0x400)
+        let avoidYaw = wrapper.yaw
         if (avoidStatus == 3) {
             if (avoidYaw - atan2s(areaDistZ, areaDistX) + DEGREES(90) < 0) {
                 avoidYaw += DEGREES(180)
@@ -1408,12 +1393,8 @@ class Camera {
             avoidYaw -= atan2s(areaDistZ, areaDistX)
 
             // Bound avoid yaw to radial mode constraints
-            if (avoidYaw > DEGREES(105)) {
-                avoidYaw = DEGREES(105)
-            }
-            if (avoidYaw < DEGREES(-105)) {
-                avoidYaw = DEGREES(-105)
-            }
+            if (avoidYaw > DEGREES(105)) { avoidYaw = DEGREES(105) }
+            if (avoidYaw < DEGREES(-105)) { avoidYaw = DEGREES(-105) }
         }
 
         if (this.gCameraMovementFlags & CAM_MOVE_RETURN_TO_MIDDLE) {
@@ -1454,16 +1435,17 @@ class Camera {
             }
             this.sModeOffsetYaw = yawWrapper.current
         }
-        yawWrapper.current = this.sModeOffsetYaw
         if (!(this.gCameraMovementFlags & CAM_MOVE_ROTATE)) {
             // If not rotating, rotate away from walls obscuring Mario from view
             if (avoidStatus == 3) {
+                yawWrapper.current = this.sModeOffsetYaw
                 this.approach_s16_asymptotic_bool(yawWrapper, avoidYaw, 10)
                 this.sModeOffsetYaw = yawWrapper.current
             } else {
                 if (c.mode == CAMERA_MODE_RADIAL) {
                     // sModeOffsetYaw only updates when Mario is moving
                     rotateSpeed = gMarioStates[0].forwardVel / 32.0 * 128.0
+                    yawWrapper.current = this.sModeOffsetYaw
                     this.camera_approach_s16_symmetric_bool(yawWrapper, yawOffset, rotateSpeed)
                     this.sModeOffsetYaw = yawWrapper.current
                 }
@@ -1474,12 +1456,8 @@ class Camera {
         }
 
         // Bound sModeOffsetYaw within (-120, 120) degrees
-        if (this.sModeOffsetYaw > 0x5554) {
-            this.sModeOffsetYaw = 0x5554
-        }
-        if (this.sModeOffsetYaw < -0x5554) {
-            this.sModeOffsetYaw = -0x5554
-        }
+        if (this.sModeOffsetYaw > 0x5554) { this.sModeOffsetYaw = 0x5554 }
+        if (this.sModeOffsetYaw < -0x5554) { this.sModeOffsetYaw = -0x5554 }
     }
 
     /**

@@ -6618,6 +6618,7 @@ class Camera {
      */
     find_mario_floor_and_ceil(pg) {
         let surf = {}
+        let ceil = {}
         let tempCheckingSurfaceCollisionsForCamera = ObjectListProc.gCheckingSurfaceCollisionsForCamera
         ObjectListProc.gCheckingSurfaceCollisionsForCamera = true
 

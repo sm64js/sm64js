@@ -4785,9 +4785,11 @@ class Camera {
      */
     is_pos_in_bounds(pos, center, bounds, boundsYaw) {
         let inBound = false
-        let rel = [0,0,0]
-
-        for (let i = 0; i < 3; i++) {rel[i] = center[i] - pos[i]}
+        let rel = [
+            center[0] - pos[0],
+            center[1] - pos[1],
+            center[2] - pos[2]
+        ]
 
         this.rotate_in_xz(rel, rel, boundsYaw)
 
@@ -4849,9 +4851,9 @@ class Camera {
     rotate_in_xz(dst, src, yaw) {
         const tempVec = [...src]
 
-        dst[0] = tempVec[2] * Math.sin(yaw / 0x8000 * Math.PI) + tempVec[0] * Math.cos(yaw / 0x8000 * Math.PI)
+        dst[0] = tempVec[2] * Math.sins(yaw) + tempVec[0] * Math.coss(yaw)
         dst[1] = tempVec[1]
-        dst[2] = tempVec[2] * Math.cos(yaw / 0x8000 * Math.PI) - tempVec[0] * Math.sin(yaw / 0x8000 * Math.PI)
+        dst[2] = tempVec[2] * Math.coss(yaw) - tempVec[0] * Math.sins(yaw)
     }
 
     /**

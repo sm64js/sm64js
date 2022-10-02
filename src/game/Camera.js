@@ -3276,7 +3276,7 @@ class Camera {
 
         if (this.gCameraMovementFlags & CAM_MOVE_PAUSE_SCREEN) {
         } else {
-            const newYaw = this.next_lakitu_state(newPos, newFoc, c.pos, c.focus, this.sOldPosition, this.sOldFocus, c.nextYaw)
+            let newYaw = this.next_lakitu_state(newPos, newFoc, c.pos, c.focus, this.sOldPosition, this.sOldFocus, c.nextYaw)
 
             let wrapper = { current: c.yaw }
             this.set_or_approach_s16_symmetric(wrapper, newYaw, this.sYawSpeed)
@@ -3333,7 +3333,7 @@ class Camera {
 
             this.gLakituState.roll = 0
 
-            // Apply camera shakes TODO
+            // Apply camera shakes
             this.shake_camera_pitch(this.gLakituState.pos, this.gLakituState.focus)
             this.shake_camera_yaw(this.gLakituState.pos, this.gLakituState.focus)
             this.shake_camera_roll()
@@ -3349,7 +3349,7 @@ class Camera {
             if (c.mode != CAMERA_MODE_C_UP && c.cutscene == 0) {
                 ObjectListProc.gCheckingSurfaceCollisionsForCamera = true
                 let distToFloor = SurfaceCollision.find_floor(this.gLakituState.pos[0], this.gLakituState.pos[1] + 20, this.gLakituState.pos[2], {})
-                if (distToFloor != -11000) {
+                if (distToFloor != FLOOR_LOWER_LIMIT) {
                     distToFloor += 100
                     if (this.gLakituState.pos[1] < (distToFloor)) {
                         this.gLakituState.pos[1] = distToFloor
@@ -3437,26 +3437,26 @@ class Camera {
             this.sYawSpeed = 0x400
 
             if (this.sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
-            switch (c.mode) {
-                    case CAMERA_MODE_BEHIND_MARIO:
-                        this.mode_behind_mario_camera(c)
-                        break
+                switch (c.mode) {
+                        case CAMERA_MODE_BEHIND_MARIO:
+                            this.mode_behind_mario_camera(c)
+                            break
 
-                    case CAMERA_MODE_C_UP:
-                        this.mode_c_up_camera(c)
-                        break
+                        case CAMERA_MODE_C_UP:
+                            this.mode_c_up_camera(c)
+                            break
 
-                    case CAMERA_MODE_WATER_SURFACE:
-                        this.mode_water_surface_camera(c)
-                        break
+                        case CAMERA_MODE_WATER_SURFACE:
+                            this.mode_water_surface_camera(c)
+                            break
 
-                    case CAMERA_MODE_INSIDE_CANNON:
-                        this.mode_cannon_camera(c)
-                        break
+                        case CAMERA_MODE_INSIDE_CANNON:
+                            this.mode_cannon_camera(c)
+                            break
 
-                    default:
-                        this.mode_mario_camera(c)
-                }
+                        default:
+                            this.mode_mario_camera(c)
+                    }
             } else {
                 switch (c.mode) {
                     case CAMERA_MODE_BEHIND_MARIO:

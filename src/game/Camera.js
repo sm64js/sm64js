@@ -1349,6 +1349,7 @@ class Camera {
         let rotateSpeed = 0x1000
         let areaDistX = this.gPlayerCameraState.pos[0] - c.areaCenX
         let areaDistZ = this.gPlayerCameraState.pos[2] - c.areaCenZ
+        let wrapper = {}
 
         // How much the camera's yaw changed
         let yawOffset = this.calculate_yaw(this.gPlayerCameraState.pos, c.pos) - atan2s(areaDistZ, areaDistX)

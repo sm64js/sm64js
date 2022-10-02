@@ -6492,7 +6492,7 @@ class Camera {
      * @param lastGood unused, passed as the last position the camera was in
      */
     resolve_geometry_collisions(pos, lastGood) {
-        wrapper = {x: pos[0], y: pos[1], z: pos[2]}
+        let wrapper = {x: pos[0], y: pos[1], z: pos[2]}
         SurfaceCollision.f32_find_wall_collision(wrapper, 0.0, 100.0)
         let floorY = SurfaceCollision.find_floor(wrapper.x, wrapper.y + 50.0, wrapper.z, {})
         let ceilY = SurfaceCollision.find_ceil(wrapper.x, wrapper.y - 50.0, wrapper.z, {})

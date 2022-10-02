@@ -5530,17 +5530,14 @@ class Camera {
      * @param yawOff offset to Mario's faceAngle, changes the direction of `leftRight` and `forwBack`
      */
     set_focus_rel_mario(c, leftRight, yOff, forwBack, yawOff) {
-        let yaw = 0
-        let focFloorYOff = 0
-
-        const wrapper = { posOff: focFloorYOff, focOff: focFloorYOff }
+        let wrapper = {}
         this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
-        focFloorYOff = wrapper.focOff
+        let focFloorYOff = wrapper.focOff
 
-        yaw = this.gPlayerCameraState.faceAngle[1] + yawOff
+        let yaw = this.gPlayerCameraState.faceAngle[1] + yawOff
+        c.focus[2] = this.gPlayerCameraState.pos[2] + forwBack * coss(yaw) - leftRight * sins(yaw)
         c.focus[0] = this.gPlayerCameraState.pos[0] + forwBack * sins(yaw) + leftRight * coss(yaw)
         c.focus[1] = this.gPlayerCameraState.pos[1] + yOff + focFloorYOff
-        c.focus[2] = this.gPlayerCameraState.pos[2] + forwBack * coss(yaw) - leftRight * sins(yaw)
     }
 
     /**

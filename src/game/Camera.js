@@ -5392,11 +5392,12 @@ class Camera {
                     case AREA_BBH:
                         //! Castle Lobby uses 0 to mean 'no special modes', but BBH uses 1...
                         //   CreateSource: skill issue
-                        if (c.doorStatus == DOOR_LEAVING_SPECIAL) {
-                            cutscene = this.open_door_cutscene(CUTSCENE_DOOR_PULL, CUTSCENE_DOOR_PUSH)
-                        } else {
+                        
+                        // if (c.doorStatus == DOOR_LEAVING_SPECIAL) {
+                        //     cutscene = this.open_door_cutscene(CUTSCENE_DOOR_PULL, CUTSCENE_DOOR_PUSH)
+                        // } else {
                             cutscene = this.open_door_cutscene(CUTSCENE_DOOR_PULL_MODE, CUTSCENE_DOOR_PUSH_MODE)
-                        }
+                        // }
                         break
                     default:
                         cutscene = this.open_door_cutscene(CUTSCENE_DOOR_PULL, CUTSCENE_DOOR_PUSH)

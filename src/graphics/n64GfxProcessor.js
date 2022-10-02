@@ -380,7 +380,7 @@ export class n64GfxProcessor {
         const rgba32_buf = []
         for (let i = 0; i < this.rdp.loaded_texture[tile].size_bytes / 2; i++) {
             const col16 = (this.rdp.loaded_texture[tile].textureData[2 * i] << 8) | this.rdp.loaded_texture[tile].textureData[2 * i + 1]
-
+            console.log(col16)
             const a = col16 & 1
             const r = (col16 >> 11) & 0x1f
             const g = (col16 >> 6) & 0x1f
@@ -577,7 +577,6 @@ export class n64GfxProcessor {
             if (used_textures[i]) {
                 if (this.rdp.textures_changed[i]) {
                     this.flush()
-                    console.log(i)
                     this.import_texture(i)
                     this.rdp.textures_changed[i] = false
                 }

@@ -1881,6 +1881,8 @@ class Camera {
             goalHeight += 300 - distCamToFocus
         }
 
+        console.log(focus, pos, basePos)
+
         ceilHeight = SurfaceCollision.find_ceil(c.pos[0], goalHeight - 100.0, c.pos[2], ceiling)
         if (ceilHeight != CELL_HEIGHT_LIMIT) {
             ceilHeight -= 125.0
@@ -5741,8 +5743,6 @@ class Camera {
             c.mode = CAMERA_MODE_FIXED
             c.pos = [this.sFixedModeBasePosition[0], this.gPlayerCameraState.pos[1], this.sFixedModeBasePosition[2]]
         }
-
-        console.log(x, y, z, this.sFixedModeBasePosition)
         return basePosSet
     }
 

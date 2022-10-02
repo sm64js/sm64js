@@ -182,6 +182,7 @@ import { COURSE_BITDW, COURSE_BITFS } from "../levels/course_defines"
 import { play_sound } from "../audio/external"
 
 import { CameraInstance as Camera } from "./Camera"
+import { play_mario_heavy_landing_sound } from "./Mario"
 
 let sIntroWarpPipeObj = null
 let sEndPeachObj = null

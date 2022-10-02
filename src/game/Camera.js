@@ -4851,9 +4851,9 @@ class Camera {
     rotate_in_xz(dst, src, yaw) {
         const tempVec = [...src]
 
-        dst[0] = tempVec[2] * Math.sins(yaw) + tempVec[0] * Math.coss(yaw)
+        dst[0] = tempVec[2] * sins(yaw) + tempVec[0] * coss(yaw)
         dst[1] = tempVec[1]
-        dst[2] = tempVec[2] * Math.coss(yaw) - tempVec[0] * Math.sins(yaw)
+        dst[2] = tempVec[2] * coss(yaw) - tempVec[0] * sins(yaw)
     }
 
     /**

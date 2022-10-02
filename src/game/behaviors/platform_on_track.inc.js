@@ -325,6 +325,8 @@ const platform_on_track_rock_ski_lift = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
+    let pxWrapper
+
     switch (o.rawData[oAction]) {
         case PLATFORM_ON_TRACK_ACT_INIT:
             platform_on_track_act_init()

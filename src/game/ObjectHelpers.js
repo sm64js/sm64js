@@ -319,7 +319,6 @@ export const spawn_water_droplet = (parent, params) => {
 
 export const spawn_object_at_origin = (parent, model, behavior) => {
     const obj = gLinker.Spawn.create_object(behavior)
-
     obj.parentObj = parent
     obj.gfx.areaIndex = parent.gfx.areaIndex
     obj.gfx.activeAreaIndex = parent.gfx.areaIndex
@@ -2093,15 +2092,15 @@ export const cur_obj_update_dialog_with_cutscene = (actionArg, dialogFlags, cuts
                 if (o.rawData[oDialogResponse]) {
                     o.rawData[oDialogState]++
                 }
-            } else {
+            } else {*/
                 // General dialog cutscene function, most of the time
                 // the "CUTSCENE_DIALOG" cutscene is called
                 o.rawData[oDialogResponse] = CameraInstance.cutscene_object_with_dialog(cutsceneTable, o, dialogID)
                 if (o.rawData[oDialogResponse]) {
                     o.rawData[oDialogState]++
                 }
-            }
-            break*/
+            // }
+            break
         case DIALOG_STATUS_STOP_DIALOG:
             // If flag defined, keep time stop enabled until the object
             // decided to disable it independently

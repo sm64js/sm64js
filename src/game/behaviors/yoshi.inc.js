@@ -12,6 +12,7 @@ import { SOUND_GENERAL_YOSHI_WALK, SOUND_GENERAL_ENEMY_ALERT1, SOUND_GENERAL_COL
          SOUND_MENU_YOSHI_GAIN_LIVES } from "../../include/sounds"
 import { INT_SUBTYPE_NPC, INT_STATUS_INTERACTED } from "../Interaction"
 import { ACTIVE_FLAG_DEACTIVATED } from "../../include/object_constants"
+import { play_puzzle_jingle } from "../../audio/external"
 
 
 /* Yoshi */

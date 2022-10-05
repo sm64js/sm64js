@@ -171,6 +171,7 @@ const platform_on_track_act_move_along_track = () => {
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
     let initialAngle
+    let pxWrapper
 
     if (!o.rawData[oPlatformOnTrackIsNotSkiLift]) {
         cur_obj_play_sound_1(SOUND_ENV_ELEVATOR3)
@@ -204,7 +205,7 @@ const platform_on_track_act_move_along_track = () => {
 
             // Spawn a new track ball if necessary
             pxWrapper = { px: o.rawData[oPlatformOnTrackDistMovedSinceLastBall] }
-            if (approach_f32_ptr(o.rawData[oPlatformOnTrackDistMovedSinceLastBall], 300.0, o.rawData[oForwardVel])) {
+            if (approach_f32_ptr(pxWrapper, 300.0, o.rawData[oForwardVel])) {
                 o.rawData[oPlatformOnTrackDistMovedSinceLastBall] = pxWrapper.px
                 o.rawData[oPlatformOnTrackDistMovedSinceLastBall] -= 300.0
 
@@ -323,6 +324,8 @@ const platform_on_track_rock_ski_lift = () => {
  export const bhv_platform_on_track_update = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+
+    let pxWrapper
 
     switch (o.rawData[oAction]) {
         case PLATFORM_ON_TRACK_ACT_INIT:

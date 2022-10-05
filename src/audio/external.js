@@ -11,6 +11,8 @@ const TARGET_VOLUME_IS_PRESENT_FLAG = 0x80
 const TARGET_VOLUME_VALUE_MASK = 0x7f
 const TARGET_VOLUME_UNSET = 0x00
 
+export const SEQUENCE_ARGS = (priority, seqId) => {return (priority << 8) | seqId}
+
 const sSoundMovingSpeed = new Array(SOUND_BANK_COUNT)
 let sBackgroundMusicMaxTargetVolume = 0
 export const gGlobalSoundSource = [0.0, 0.0, 0.0]
@@ -41,9 +43,17 @@ export const play_puzzle_jingle = () => {
     begin_background_music_fade(50)
 }
 
+export const play_music = (player, seqArgs, fadeTimer) => {
+}
+
 const begin_background_music_fade = (fadeDuration) => {
 }
 
 const seq_player_play_sequence = (player, seqId, arg2) => {
 }
 
+export const seq_player_lower_volume = (player, fadeDuration, percentage) => {
+}
+
+export const seq_player_unlower_volume = (player, fadeDuration) => {
+}

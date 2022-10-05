@@ -74,6 +74,7 @@ import * as _corkbox                  from "./behaviors/corkbox.inc"
 import * as _ddd_warp                 from "./behaviors/ddd_warp.inc"
 import * as _door                     from "./behaviors/door.inc"
 import * as _exclamation_box          from "./behaviors/exclamation_box.inc"
+import * as _explosion                from "./behaviors/explosion.inc"
 import * as _falling_rising_platform  from "./behaviors/falling_rising_platform.inc"
 import * as _ferris_wheel             from "./behaviors/ferris_wheel.inc"
 import * as _fish                     from "./behaviors/fish.inc"
@@ -702,7 +703,7 @@ export const bhvBobombBullyDeathSmoke = [
     END_LOOP(),
 ]
 
-const bhvWoodenPost = [
+export const bhvWoodenPost = [
     BEGIN(OBJ_LIST_SURFACE, 'bhvWoodenPost'),
     LOAD_COLLISION_DATA(poundable_pole_collision_06002490),
     OR_INT(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO)),

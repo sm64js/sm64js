@@ -1223,19 +1223,10 @@ const act_dive_slide = (m) => {
 
 const act_pound_roll = (m) => {
 
-    if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & Mario.INPUT_A_PRESSED)) {
-        return Mario.set_mario_action(m, m.forwardVel > 0.0 ? Mario.ACT_FORWARD_ROLLOUT : Mario.ACT_BACKWARD_ROLLOUT, 0)
-    }
-    if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && (m.input & Mario.INPUT_B_PRESSED)) {
-		m.vel[1] = 5.0
-		Mario.set_forward_vel(m, f_vel_values[Mario.get_character_type(m)])
-        return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
-    }
-    //play sound
-
-    if (update_sliding(m, 10.0) && Mario.is_anim_at_end(m)) {
-        Mario.set_forward_vel(m, 50.0)
-        Mario.set_mario_action(m, Mario.ACT_FORWARD_ROLLOUT, 0)
+    if (!(m.input & Mario.INPUT_ABOVE_SLIDE) && !(m.input & Mario.INPUT_A_PRESSED)) {
+		Mario.set_forward_vel(m, 30)
+    } else {
+        Mario.set_mario_action(m, Mario.ACT_BUTT_SLIDE_STOP, 0)
     }
 
     common_slide_action(m, Mario.ACT_STOMACH_SLIDE_STOP, Mario.ACT_FREEFALL, Mario.MARIO_ANIM_FORWARD_SPINNING)

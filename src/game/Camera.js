@@ -15,7 +15,7 @@ import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceC
 import { atan2s, vec3f_set, sqrtf,vec3f_set_dist_and_angle } from "../engine/math_util"
 import * as MathUtil from "../engine/math_util"
 import * as Mario from "./Mario"
-import { oHeldState, oPosX, oPosY, oPosZ } from "../include/object_constants"
+import { oHeldState, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oPosX, oPosY, oPosZ } from "../include/object_constants"
 import { CELL_HEIGHT_LIMIT, FLOOR_LOWER_LIMIT, SURFACE_DEATH_PLANE, SURFACE_IS_PAINTING_WARP, SURFACE_WALL_MISC } from "../include/surface_terrains"
 import { sins, s16, int16, coss } from "../utils"
 import { HudInstance as Hud } from "./Hud"
@@ -59,6 +59,8 @@ import { SURFACE_INSTANT_WARP_1C } from "../include/surface_terrains"
 import { MARIO_DIALOG_STATUS_SPEAK } from "./MarioActionsCutscene"
 import { MARIO_DIALOG_LOOK_FRONT } from "./MarioActionsCutscene"
 import { set_mario_npc_dialog } from "./MarioActionsCutscene"
+import { pitch } from "style-loader"
+import { DROP_TO_FLOOR } from "../engine/BehaviorCommands"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -108,7 +110,7 @@ const WallColDataObj = {
     offsetY: 0,
     radius: 0,
     numWalls: 0,
-    walls: [Object.assign({}, surfaceObj), Object.assign({}, surfaceObj), Object.assign({}, surfaceObj), Object.assign({}, surfaceObj)]
+    walls: [JSON.parse(JSON.stringify(surfaceObj)), JSON.parse(JSON.stringify(surfaceObj)), JSON.parse(JSON.stringify(surfaceObj)), JSON.parse(JSON.stringify(surfaceObj))]
 }
 
 export const AREA_BBH                = LEVEL_AREA_INDEX(LEVEL_BBH, 1)
@@ -395,6 +397,12 @@ export const ZOOMOUT_AREA_MASK = (level1Area1, level1Area2, level1Area3, level1A
 }
 
 export const NULL_TRIGGER = {area: 0, event: null, centerX: 0, centerY: 0, centerZ: 0, boundsX: 0, boundsY: 0, boundsZ: 0, boundsYaw: 0}
+
+export const DROT = (value, index) => {return ((value >> (32 - (index + 1) * 8)) & 0xF0) >> 4 | ((value >> (32 - (index + 1) * 8)) & 0x0F) << 4}
+export const DANCE_ENTRY = (c) => { return [DROT(c, 0), DROT(c, 1), DROT(c, 2)] }
+export const DEFINE_COURSES_END = () => {}
+export const DEFINE_COURSE = (_, cutscenes) => { return DANCE_ENTRY(cutscenes) }
+export const DEFINE_BONUS_COURSE = (_, cutscenes) => { return DANCE_ENTRY(cutscenes) }
 
 class Camera {
     constructor() {
@@ -775,6 +783,358 @@ class Camera {
             null, null, null, null, null, null, null, null, null, null,
         ]
 
+        this.sBobCreditsSplinePositions = [
+            {index: 1, speed: 0, point: [5984, 3255, 4975]},
+            {index: 2, speed: 0, point: [4423, 3315, 1888]},
+            {index: 3, speed: 0, point: [776, 2740, -1825]},
+            {index: 4, speed: 0, point: [-146, 3894, -3167]},
+            {index: -1, speed: 0, point: [741, 4387, -5474]},
+        ]
+
+        this.sBobCreditsSplineFocus = [
+            {index: 0, speed: 30, point: [5817, 3306, 4507]},
+            {index: 0, speed: 40, point: [4025, 3378, 1593]},
+            {index: 0, speed: 50, point: [1088, 2652, -2205]},
+            {index: 0, speed: 60, point: [205, 3959, -3517]},
+            {index: -1, speed: 60, point: [1231, 4400, -5649]},
+        ]
+
+        this.sWfCreditsSplinePositions = [
+            {index: 0, speed: 0, point: [-301, 1399, 2643]},
+            {index: 0, speed: 0, point: [-182, 2374, 4572]},
+            {index: 0, speed: 0, point: [4696, 3864, 413]},
+            {index: 0, speed: 0, point: [1738, 4891, -1516]},
+            {index: -1, speed: 0, point: [1783, 4891, -1516]},
+        ]
+
+        this.sWfCreditsSplineFocus = [
+            {index: 1, speed: 30, point: [-249, 1484, 2153]},
+            {index: 2, speed: 40, point: [-200, 2470, 4082]},
+            {index: 3, speed: 40, point: [4200, 3916, 370]},
+            {index: 4, speed: 40, point: [1523, 4976, -1072]},
+            {index: -1, speed: 50, point: [1523, 4976, -1072]},
+        ]
+
+        this.sJrbCreditsSplinePositions = [
+            {index: 0, speed: 0, point: [5538, -4272, 2376]},
+            {index: 0, speed: 0, point: [5997, -3303, 2261]},
+            {index: 0, speed: 0, point: [6345, -3255, 2179]},
+            {index: 0, speed: 0, point: [6345, -3255, 2179]},
+            {index: -1, speed: 0, point: [6694, -3203, 2116]},
+        ]
+
+        this.sJrbCreditsSplineFocus = [
+            {index: 0, speed: 50, point: [5261, -4683, 2443]},
+            {index: 0, speed: 50, point: [5726, -3675, 2456]},
+            {index: 0, speed: 50, point: [6268, -2817, 2409]},
+            {index: 0, speed: 50, point: [6596, -2866, 2369]},
+            {index: -1, speed: 50, point: [7186, -3153, 2041]},
+        ]
+
+        this.sCcmSlideCreditsSplinePositions = [
+            {index: 1, speed: 0, point: [-6324, 6745, -5626]},
+            {index: 1, speed: 0, point: [-6324, 6745, -5626]},
+            {index: 2, speed: 0, point: [-6108, 6762, -5770]},
+            {index: 3, speed: 0, point: [-5771, 6787, -5962]},
+            {index: -1, speed: 0, point: [-5672, 6790, -5979]},
+        ]
+
+        this.sCcmSlideCreditsSplineFocus = [
+            {index: 0, speed: 50, point: [-5911, 6758, -5908]},
+            {index: 1, speed: 50, point: [-5911, 6758, -5908]},
+            {index: 2, speed: 50, point: [-5652, 6814, -5968]},
+            {index: 3, speed: 50, point: [-5277, 6801, -6043]},
+            {index: -1, speed: 50, point: [-5179, 6804, -6060]},
+        ]
+
+        this.sBbhCreditsSplinePositions = [
+            {index: 1, speed: 0, point: [1088, 341, 2447]},
+            {index: 2, speed: 0, point: [1338, 610, 2808]},
+            {index: 3, speed: 0, point: [2267, 1612, 2966]},
+            {index: -1, speed: 0, point: [2296, 1913, 2990]},
+        ]
+
+        this.sBbhCreditsSplineFocus = [
+            {index: 1, speed: 50, point: [1160, 263, 1958]},
+            {index: 2, speed: 50, point: [1034, 472, 2436]},
+            {index: 3, speed: 50, point: [1915, 1833, 2688]},
+            {index: -1, speed: 50, point: [2134, 2316, 2742]},
+        ]
+
+        this.sHmcCreditsSplinePositions = [
+            {index: 1, speed: 0, point: [-5952, 1807, -5882]},
+            {index: 2, speed: 0, point: [-5623, 1749, -4863]},
+            {index: 3, speed: 0, point: [-5472, 1955, -2520]},
+            {index: 4, speed: 0, point: [-5544, 1187, -1085]},
+            {index: -1, speed: 0, point: [-5547, 391, -721]},
+        ]
+
+        this.sHmcCreditsSplineFocus = [
+            {index: 1, speed: 210, point: [-5952, 1884, -6376]},
+            {index: 2, speed: 58, point: [-5891, 1711, -5283]},
+            {index: 3, speed: 30, point: [-5595, 1699, -2108]},
+            {index: 4, speed: 31, point: [-5546, 794, -777]},
+            {index: -1, speed: 31, point: [-5548, -85, -572]},
+        ]
+
+        this.sThiWigglerCreditsSplinePositions = [
+            {index: 1, speed: 0, point: [-1411, 2474, -1276]},
+            {index: 2, speed: 0, point: [-1606, 2479, -434]},
+            {index: -1, speed: 0, point: [-1170, 2122, 1337]},
+        ]
+
+        this.sThiWigglerCreditsSplineFocus = [
+            {index: 1, speed: 50, point: [-1053, 2512, -928]},
+            {index: 2, speed: 50, point: [-1234, 2377, -114]},
+            {index: -1, speed: 50, point: [-758, 2147, 1054]},
+        ]
+
+        this.sVolcanoCreditsSplinePositions = [
+            {index: 0, speed: 0, point: [-1445, 1094, 1617]},
+            {index: 0, speed: 0, point: [-1509, 649, 871]},
+            {index: 0, speed: 0, point: [-1133, 420, -248]},
+            {index: 0, speed: 0, point: [-778, 359, -1052]},
+            {index: 0, speed: 0, point: [-565, 260, -1730]},
+            {index: -1, speed: 0, point: [1274, 473, -275]},
+        ]
+
+        this.sVolcanoCreditsSplineFocus = [
+            {index: 0, speed: 50, point: [-1500, 757, 1251]},
+            {index: 0, speed: 50, point: [-1401, 439, 431]},
+            {index: 0, speed: 50, point: [-749, 270, -532]},
+            {index: 0, speed: 50, point: [-396, 270, -1363]},
+            {index: 0, speed: 50, point: [-321, 143, -2151]},
+            {index: -1, speed: 50, point: [1002, 460, -694]},
+        ]
+
+        this.sSslCreditsSplinePositions = [
+            {index: 0, speed: 0, point: [-4262, 4658, -5015]},
+            {index: 0, speed: 0, point: [-3274, 2963, -4661]},
+            {index: 0, speed: 0, point: [-2568, 812, -6528]},
+            {index: 0, speed: 0, point: [-414, 660, -7232]},
+            {index: 0, speed: 0, point: [1466, 660, -6898]},
+            {index: -1, speed: 0, point: [2724, 660, -6298]},
+        ]
+
+        this.sSslCreditsSplineFocus = [
+            {index: 0, speed: 50, point: [-4083, 4277, -4745]},
+            {index: 0, speed: 50, point: [-2975, 2574, -4759]},
+            {index: 0, speed: 50, point: [-2343, 736, -6088]},
+            {index: 0, speed: 50, point: [-535, 572, -6755]},
+            {index: 0, speed: 50, point: [1311, 597, -6427]},
+            {index: -1, speed: 50, point: [2448, 612, -5884]},
+        ]
+
+        this.sDddCreditsSplinePositions = [
+            {index: 0, speed: 0, point: [-874, -4933, 366]},
+            {index: 0, speed: 0, point: [-1463, -4782, 963]},
+            {index: 0, speed: 0, point: [-1893, -4684, 1303]},
+            {index: 0, speed: 0, point: [-2818, -4503, 1583]},
+            {index: 0, speed: 0, point: [-4095, -2924, 730]},
+            {index: 0, speed: 0, point: [-4737, -1594, -63]},
+            {index: -1, speed: 0, point: [-4681, -1084, -623]},
+        ]
+
+        this.sDddCreditsSplineFocus = [
+            {index: 0, speed: 50, point: [-1276, -4683, 622]},
+            {index: 0, speed: 50, point: [-1858, -4407, 1097]},
+            {index: 0, speed: 50, point: [-2324, -4332, 1318]},
+            {index: 0, speed: 50, point: [-3138, -4048, 1434]},
+            {index: 0, speed: 50, point: [-4353, -2444, 533]},
+            {index: 0, speed: 50, point: [-4807, -1169, -436]},
+            {index: -1, speed: 50, point: [-4665, -664, -1007]},
+        ]
+
+        this.sSlCreditsSplinePositions = [
+            {index: 0, speed: 0, point: [939, 6654, 6196]},
+            {index: 0, speed: 0, point: [1873, 5160, 3714]},
+            {index: 0, speed: 0, point: [3120, 3564, 1314]},
+            {index: -1, speed: 0, point: [2881, 4231, 573]},
+        ]
+
+        this.sSlCreditsSplineFocus = [
+            {index: 0, speed: 50, point: [875, 6411, 5763]},
+            {index: 0, speed: 50, point: [1659, 4951, 3313]},
+            {index: 0, speed: 50, point: [2630, 3565, 1215]},
+            {index: -1, speed: 50, point: [2417, 4056, 639]},
+        ]
+
+        this.sWdwCreditsSplinePositions = [
+            {index: 0, speed: 0, point: [3927, 2573, 3685]},
+            {index: 0, speed: 0, point: [2389, 2054, 1210]},
+            {index: 0, speed: 0, point: [2309, 2069, 22]},
+            {index: -1, speed: 0, point: [2122, 2271, -979]},
+        ]
+
+        this.sWdwCreditsSplineFocus = [
+            {index: 0, speed: 50, point: [3637, 2460, 3294]},
+            {index: 0, speed: 50, point: [1984, 2067, 918]},
+            {index: 0, speed: 50, point: [1941, 2255, -261]},
+            {index: -1, speed: 50, point: [1779, 2587, -1158]},
+        ]
+
+        this.sTtmCreditsSplinePositions = [
+            {index: 0, speed: 0, point: [386, 2535, 644]},
+            {index: 0, speed: 0, point: [1105, 2576, 918]},
+            {index: 0, speed: 0, point: [3565, 2261, 2098]},
+            {index: 0, speed: 0, point: [6715, -2791, 4554]},
+            {index: 0, speed: 0, point: [3917, -3130, 3656]},
+            {index: -1, speed: 0, point: [3917, -3130, 3656]},
+        ]
+
+        this.sTtmCreditsSplineFocus = [
+            {index: 1, speed: 50, point: [751, 2434, 318]},
+            {index: 2, speed: 50, point: [768, 2382, 603]},
+            {index: 3, speed: 50, point: [3115, 2086, 1969]},
+            {index: 4, speed: 50, point: [6370, -3108, 4727]},
+            {index: 5, speed: 50, point: [4172, -3385, 4001]},
+            {index: -1, speed: 50, point: [4172, -3385, 4001]},
+        ]
+
+        this.sThiHugeCreditsSplinePositions = [
+            {index: 1, speed: 0, point: [6990, -1000, -4858]},
+            {index: 2, speed: 0, point: [7886, -1055, 2878]},
+            {index: 3, speed: 0, point: [1952, -1481, 10920]},
+            {index: 4, speed: 0, point: [-1684, -219, 2819]},
+            {index: 5, speed: 0, point: [-2427, -131, 2755]},
+            {index: 6, speed: 0, point: [-3246, 416, 3286]},
+            {index: -1, speed: 0, point: [-3246, 416, 3286]},
+        ]
+
+        this.sThiHugeCreditsSplineFocus = [
+            {index: 1, speed: 50, point: [7022, -965, -5356]},
+            {index: 2, speed: 50, point: [7799, -915, 2405]},
+            {index: 3, speed: 50, point: [1878, -1137, 10568]},
+            {index: 4, speed: 50, point: [-1931, -308, 2394]},
+            {index: 5, speed: 50, point: [-2066, -386, 2521]},
+            {index: 6, speed: 50, point: [-2875, 182, 3045]},
+            {index: -1, speed: 50, point: [-2875, 182, 3045]},
+        ]
+
+        this.sTtcCreditsSplinePositions = [
+            {index: 1, speed: 0, point: [-1724, 277, -994]},
+            {index: 2, speed: 0, point: [-1720, 456, -995]},
+            {index: 3, speed: 0, point: [-1655, 810, -1014]},
+            {index: -1, speed: 0, point: [-1753, 883, -1009]},
+        ]
+
+        this.sTtcCreditsSplineFocus = [
+            {index: 1, speed: 50, point: [-1554, 742, -1063]},
+            {index: 2, speed: 50, point: [-1245, 571, -1102]},
+            {index: 3, speed: 50, point: [-1220, 603, -1151]},
+            {index: -1, speed: 50, point: [-1412, 520, -1053]},
+        ]
+
+        this.sRrCreditsSplinePositions = [
+            {index: 0, speed: 0, point: [-1818, 4036, 97]},
+            {index: 0, speed: 0, point: [-575, 3460, -505]},
+            {index: 0, speed: 0, point: [1191, 3611, -1134]},
+            {index: -1, speed: 0, point: [2701, 3777, -3686]},
+        ]
+
+        this.sRrCreditsSplineFocus = [
+            {index: 0, speed: 50, point: [-1376, 3885, -81]},
+            {index: 0, speed: 50, point: [-146, 3343, -734]},
+            {index: 0, speed: 50, point: [1570, 3446, -1415]},
+            {index: -1, speed: 50, point: [2794, 3627, -3218]},
+        ]
+
+        this.sSaCreditsSplinePositions = [
+            {index: 0, speed: 0, point: [-295, -396, -585]},
+            {index: 1, speed: 0, point: [-295, -396, -585]},
+            {index: 2, speed: 0, point: [-292, -856, -573]},
+            {index: 3, speed: 0, point: [-312, -856, -541]},
+            {index: -1, speed: 0, point: [175, -856, -654]},
+        ]
+
+        this.sSaCreditsSplineFocus = [
+            {index: 0, speed: 50, point: [-175, -594, -142]},
+            {index: 1, speed: 50, point: [-175, -594, -142]},
+            {index: 2, speed: 50, point: [-195, -956, -92]},
+            {index: 3, speed: 50, point: [-572, -956, -150]},
+            {index: -1, speed: 50, point: [-307, -956, -537]},
+        ]
+
+        this.sCotmcCreditsSplinePositions = [
+            {index: 0, speed: 0, point: [-296, 495, 1607]},
+            {index: 0, speed: 0, point: [-430, 541, 654]},
+            {index: 0, speed: 0, point: [-466, 601, -359]},
+            {index: 0, speed: 0, point: [-217, 433, -1549]},
+            {index: -1, speed: 0, point: [-95, 366, -2922]},
+        ]
+
+        this.sCotmcCreditsSplineFocus = [
+            {index: 0, speed: 50, point: [-176, 483, 2092]},
+            {index: 0, speed: 50, point: [-122, 392, 1019]},
+            {index: 0, speed: 50, point: [-268, 450, -792]},
+            {index: 0, speed: 50, point: [-172, 399, -2046]},
+            {index: -1, speed: 50, point: [-51, 355, -3420]},
+        ]
+
+        this.sDddSubCreditsSplinePositions = [
+            {index: 0, speed: 0, point: [4656, 2171, 5028]},
+            {index: 0, speed: 0, point: [4548, 1182, 4596]},
+            {index: 0, speed: 0, point: [5007, 813, 3257]},
+            {index: 0, speed: 0, point: [5681, 648, 1060]},
+            {index: -1, speed: 0, point: [4644, 774, 113]},
+        ]
+
+        this.sDddSubCreditsSplineFocus = [
+            {index: 0, speed: 50, point: [4512, 2183, 4549]},
+            {index: 0, speed: 50, point: [4327, 838, 4308]},
+            {index: 0, speed: 50, point: [4774, 749, 2819]},
+            {index: 0, speed: 50, point: [5279, 660, 763]},
+            {index: -1, speed: 50, point: [4194, 885, -75]},
+        ]
+
+        this.sCcmOutsideCreditsSplinePositions = [
+            {index: 1, speed: 0, point: [1427, -1387, 5409]},
+            {index: 2, speed: 0, point: [-1646, -1536, 4526]},
+            {index: 3, speed: 0, point: [-3852, -1448, 3913]},
+            {index: -1, speed: 0, point: [-5199, -1366, 1886]},
+        ]
+
+        this.sCcmOutsideCreditsSplineFocus = [
+            {index: 1, speed: 50, point: [958, -1481, 5262]},
+            {index: 2, speed: 50, point: [-2123, -1600, 4391]},
+            {index: 3, speed: 50, point: [-3957, -1401, 3426]},
+            {index: -1, speed: 50, point: [-4730, -1215, 1795]},
+        ]
+
+        this.sIntroPipeToDialogPosition = [
+            {index: 0, speed: 0, point: [-785, 625, 4527]},
+            {index: 1, speed: 0, point: [-785, 625, 4527]},
+            {index: 2, speed: 0, point: [-1286, 644, 4376]},
+            {index: 3, speed: 0, point: [-1286, 623, 4387]},
+            {index: 4, speed: 0, point: [-1286, 388, 3963]},
+            {index: 5, speed: 0, point: [-1286, 358, 4093]},
+            {index: 6, speed: 0, point: [-1386, 354, 4159]},
+            {index: 7, speed: 0, point: [-1477, 306, 4223]},
+            {index: 8, speed: 0, point: [-1540, 299, 4378]},
+            {index: 9, speed: 0, point: [-1473, 316, 4574]},
+            {index: 0, speed: 0, point: [-1328, 485, 5017]},
+            {index: 0, speed: 0, point: [-1328, 485, 5017]},
+            {index: 0, speed: 0, point: [-1328, 485, 5017]},
+            {index: -1, speed: 0, point: [-1328, 485, 5017]},
+        ]
+
+        this.sIntroPipeToDialogFocus = [
+            {index: 0, speed: 20, point: [-1248, 450, 4596]},
+            {index: 1, speed: 59, point: [-1258, 485, 4606]},
+            {index: 2, speed: 59, point: [-1379, 344, 4769]},
+            {index: 3, speed: 20, point: [-1335, 366, 4815]},
+            {index: 4, speed: 23, point: [-1315, 370, 4450]},
+            {index: 5, speed: 40, point: [-1322, 333, 4591]},
+            {index: 6, speed: 25, point: [-1185, 329, 4616]},
+            {index: 7, speed: 21, point: [-1059, 380, 4487]},
+            {index: 8, speed: 14, point: [-1086, 421, 4206]},
+            {index: 9, speed: 21, point: [-1321, 346, 4098]},
+            {index: 0, speed: 0, point: [-1328, 385, 4354]},
+            {index: 0, speed: 0, point: [-1328, 385, 4354]},
+            {index: 0, speed: 0, point: [-1328, 385, 4354]},
+            {index: -1, speed: 0, point: [-1328, 385, 4354]},
+        ]
+
         /******************************************************************************************************
          * Cutscenes
          ******************************************************************************************************/
@@ -784,12 +1144,6 @@ class Camera {
          */
         this.sCutsceneEnding = [
             { shot: this.cutscene_ending_mario_fall.bind(this), duration: 170 }
-        ]
-
-        this.sCutsceneStarSpawn = [
-            { shot: this.cutscene_star_spawn.bind(this), duration: CUTSCENE_LOOP },
-            { shot: this.cutscene_star_spawn_back.bind(this), duration: 15 },
-            { shot: this.cutscene_star_spawn_end.bind(this), duration: 0 },
         ]
 
         this.sCutsceneDoorWarp = [
@@ -825,6 +1179,18 @@ class Camera {
             { shot: this.cutscene_door_mode.bind(this), duration: CUTSCENE_LOOP }
         ]
 
+        this.sCutsceneEnterCannon = [
+            { shot: this.cutscene_enter_cannon_start.bind(this), duration: 1 },
+            { shot: this.cutscene_enter_cannon_raise.bind(this), duration: 121 },
+            { shot: this.cutscene_enter_cannon_end.bind(this), duration: 0 }
+        ]
+
+        this.sCutsceneStarSpawn = [
+            { shot: this.cutscene_star_spawn.bind(this), duration: CUTSCENE_LOOP },
+            { shot: this.cutscene_star_spawn_back.bind(this), duration: 15 },
+            { shot: this.cutscene_star_spawn_end.bind(this), duration: 0 },
+        ]
+
         this.sCutsceneExitPaintingSuccess = [
             { shot: this.cutscene_exit_painting.bind(this), duration: 180 },
             { shot: this.cutscene_exit_painting_end.bind(this), duration: 0 }
@@ -839,6 +1205,34 @@ class Camera {
             { shot: this.cutscene_sliding_doors_open.bind(this), duration: 50 },
             { shot: this.cutscene_double_doors_end.bind(this), duration: 0 }
         ]
+
+        this.sCutsceneIntroPeach = [
+            { shot: this.cutscene_intro_peach_letter.bind(this), duration: CUTSCENE_LOOP },
+            { shot: this.cutscene_intro_peach_reset_fov.bind(this), duration: 35 },
+            { shot: this.cutscene_intro_peach_fly_to_pipe.bind(this), duration: 820 },
+            { shot: this.cutscene_intro_peach_mario_appears.bind(this), duration: 270 },
+            { shot: this.cutscene_intro_peach_dialog.bind(this), duration: CUTSCENE_LOOP }
+        ]
+
+        /* this.sCutsceneExitBowserSuccess = [
+            { shot: this.cutscene_exit_bowser_succ.bind(this), duration: 190 },
+            { shot: this.cutscene_non_painting_end.bind(this), duration: 0 }
+        ] */
+
+        /* this.sCutsceneExitBowserDeath = [
+            { shot: this.cutscene_exit_bowser_death.bind(this), duration: 120 },
+            { shot: this.cutscene_non_painting_end.bind(this), duration: 0 }
+        ] */
+
+        /* this.sCutsceneExitSpecialSuccess = [
+            { shot: this.cutscene_exit_non_painting_succ.bind(this), duration: 163 },
+            { shot: this.cutscene_non_painting_end.bind(this), duration: 0 }
+        ] */
+
+        /* this.sCutsceneNonPaintingDeath = [
+            { shot: this.cutscene_non_painting_death.bind(this), duration: 120 },
+            { shot: this.cutscene_non_painting_end.bind(this), duration: 0 }
+        ] */
 
         this.sCutsceneDialog = [
             { shot: this.cutscene_dialog.bind(this), duration: CUTSCENE_LOOP },
@@ -867,51 +1261,53 @@ class Camera {
 
         this.cutsceneShots = [
             [ CUTSCENE_STAR_SPAWN, this.sCutsceneStarSpawn ],
-            // [ CUTSCENE_RED_COIN_STAR_SPAWN, sCutsceneRedCoinStarSpawn ],
-            // [ CUTSCENE_ENDING, sCutsceneEnding ],
-            // [ CUTSCENE_GRAND_STAR, sCutsceneGrandStar ],
+            // [ CUTSCENE_RED_COIN_STAR_SPAWN, this.sCutsceneRedCoinStarSpawn ],
+            // [ CUTSCENE_ENDING, this.sCutsceneEnding ],
+            // [ CUTSCENE_GRAND_STAR, this.sCutsceneGrandStar ],
             [ CUTSCENE_DOOR_WARP, this.sCutsceneDoorWarp ],
             [ CUTSCENE_DOOR_PULL, this.sCutsceneDoorPull ],
             [ CUTSCENE_DOOR_PUSH, this.sCutsceneDoorPush ],
             // [ CUTSCENE_DOOR_PULL_MODE, this.sCutsceneDoorPullMode ],
             // [ CUTSCENE_DOOR_PUSH_MODE, this.sCutsceneDoorPushMode ],
-            // [ CUTSCENE_ENTER_CANNON, sCutsceneEnterCannon ],
-            // [ CUTSCENE_ENTER_PAINTING, sCutsceneEnterPainting ],
-            // [ CUTSCENE_DEATH_EXIT, sCutsceneDeathExit ],
+            [ CUTSCENE_ENTER_CANNON, this.sCutsceneEnterCannon ],
+            // [ CUTSCENE_ENTER_PAINTING, this.sCutsceneEnterPainting ],
+            // [ CUTSCENE_DEATH_EXIT, this.sCutsceneDeathExit ],
             [ CUTSCENE_EXIT_PAINTING_SUCC, this.sCutsceneExitPaintingSuccess ],
-            // [ CUTSCENE_UNUSED_EXIT, sCutsceneUnusedExit ],
-            // [ CUTSCENE_INTRO_PEACH, sCutsceneIntroPeach ],
-            // [ CUTSCENE_ENTER_BOWSER_ARENA, sCutsceneEnterBowserArena ],
-            // [ CUTSCENE_DANCE_ROTATE, sCutsceneDanceDefaultRotate ],
-            // [ CUTSCENE_DANCE_DEFAULT, sCutsceneDanceDefaultRotate ],
-            // [ CUTSCENE_DANCE_FLY_AWAY, sCutsceneDanceFlyAway ],
-            // [ CUTSCENE_DANCE_CLOSEUP, sCutsceneDanceCloseup ],
-            // [ CUTSCENE_KEY_DANCE, sCutsceneKeyDance ],
-            // [ CUTSCENE_0F_UNUSED, sCutsceneUnused ],
-            // [ CUTSCENE_END_WAVING, sCutsceneEndWaving ],
-            // [ CUTSCENE_CREDITS, sCutsceneCredits ],
-            // [ CUTSCENE_CAP_SWITCH_PRESS, sCutsceneCapSwitchPress ],
+            // [ CUTSCENE_UNUSED_EXIT,  this.sCutsceneUnusedExit ],
+            // [ CUTSCENE_INTRO_PEACH, this.sCutsceneIntroPeach ],
+            // [ CUTSCENE_ENTER_BOWSER_ARENA, this.sCutsceneEnterBowserArena ],
+            // [ CUTSCENE_DANCE_ROTATE, this.sCutsceneDanceDefaultRotate ],
+            // [ CUTSCENE_DANCE_DEFAULT, this.sCutsceneDanceDefaultRotate ],
+            // [ CUTSCENE_DANCE_FLY_AWAY, this.sCutsceneDanceFlyAway ],
+            // [ CUTSCENE_DANCE_CLOSEUP, this.sCutsceneDanceCloseup ],
+            // [ CUTSCENE_KEY_DANCE, this.sCutsceneKeyDance ],
+            // [ CUTSCENE_0F_UNUSED, this.sCutsceneUnused ],
+            // [ CUTSCENE_END_WAVING, this.sCutsceneEndWaving ],
+            // [ CUTSCENE_CREDITS, this.sCutsceneCredits ],
+            // [ CUTSCENE_CAP_SWITCH_PRESS, this.sCutsceneCapSwitchPress ],
             [ CUTSCENE_SLIDING_DOORS_OPEN, this.sCutsceneSlidingDoorsOpen ],
-            // [ CUTSCENE_PREPARE_CANNON, sCutscenePrepareCannon ],
+            // [ CUTSCENE_PREPARE_CANNON, this.sCutscenePrepareCannon ],
             [ CUTSCENE_UNLOCK_KEY_DOOR, this.sCutsceneUnlockKeyDoor ],
-            // [ CUTSCENE_STANDING_DEATH, sCutsceneStandingDeath ],
-            // [ CUTSCENE_ENTER_POOL, sCutsceneEnterPool ],
-            // [ CUTSCENE_DEATH_ON_STOMACH, sCutsceneDeathStomach ],
-            // [ CUTSCENE_DEATH_ON_BACK, sCutsceneDeathOnBack ],
-            // [ CUTSCENE_QUICKSAND_DEATH, sCutsceneQuicksandDeath ],
-            // [ CUTSCENE_SUFFOCATION_DEATH, sCutsceneSuffocation ],
-            // [ CUTSCENE_EXIT_BOWSER_SUCC, sCutsceneExitBowserSuccess ],
-            // [ CUTSCENE_EXIT_BOWSER_DEATH, sCutsceneExitBowserDeath ],
-            // [ CUTSCENE_EXIT_SPECIAL_SUCC, sCutsceneExitSpecialSuccess ],
-            // [ CUTSCENE_EXIT_WATERFALL, sCutsceneExitWaterfall ],
-            // [ CUTSCENE_EXIT_FALL_WMOTR, sCutsceneFallToCastleGrounds ],
-            // [ CUTSCENE_NONPAINTING_DEATH, sCutsceneNonPaintingDeath ],
+            // [ CUTSCENE_STANDING_DEATH, this.sCutsceneStandingDeath ],
+            // [ CUTSCENE_ENTER_POOL, this.sCutsceneEnterPool ],
+            // [ CUTSCENE_DEATH_ON_STOMACH, this.sCutsceneDeathStomach ],
+            // [ CUTSCENE_DEATH_ON_BACK, this.sCutsceneDeathOnBack ],
+            // [ CUTSCENE_QUICKSAND_DEATH, this.sCutsceneQuicksandDeath ],
+            // [ CUTSCENE_SUFFOCATION_DEATH, this.sCutsceneSuffocation ],
+            // [ CUTSCENE_EXIT_BOWSER_SUCC, this.sCutsceneExitBowserSuccess ],
+            // [ CUTSCENE_EXIT_BOWSER_DEATH, this.sCutsceneExitBowserDeath ],
+            // [ CUTSCENE_EXIT_SPECIAL_SUCC, this.sCutsceneExitSpecialSuccess ],
+            // [ CUTSCENE_EXIT_WATERFALL, this.sCutsceneExitWaterfall ],
+            // [ CUTSCENE_EXIT_FALL_WMOTR, this.sCutsceneFallToCastleGrounds ],
+            // [ CUTSCENE_NONPAINTING_DEATH, this.sCutsceneNonPaintingDeath ],
             // [ CUTSCENE_DIALOG, this.sCutsceneDialog ], ; REIMPLEMENT WHEN THIS IS ABLE TO BE USED
             [ CUTSCENE_READ_MESSAGE, this.sCutsceneReadMessage ],
-            // [ CUTSCENE_RACE_DIALOG, sCutsceneDialog ],
-            // [ CUTSCENE_ENTER_PYRAMID_TOP, sCutsceneEnterPyramidTop ],
-            // [ CUTSCENE_SSL_PYRAMID_EXPLODE, sCutscenePyramidTopExplode ],
+            // [ CUTSCENE_RACE_DIALOG, this.sCutsceneDialog ],
+            // [ CUTSCENE_ENTER_PYRAMID_TOP, this.sCutsceneEnterPyramidTop ],
+            // [ CUTSCENE_SSL_PYRAMID_EXPLODE, this.sCutscenePyramidTopExplode ],
         ]
+        this.sCurCreditsSplinePos = Array(32).fill({})
+        this.sCurCreditsSplineFocus = Array(32).fill({})
 
         this.sOldPosition = [0, 0, 0]
         this.sOldFocus = [0, 0, 0]
@@ -1925,7 +2321,7 @@ class Camera {
         let oo
         let yaw
         let heldState
-        let floor = Object.assign({}, surfaceObj)
+        let floor = JSON.parse(JSON.stringify(surfaceObj))
         let secondFocus = new Array(3)
         let holdFocOffset = [ 0.0, -150.0, -125.0 ]
 
@@ -4197,8 +4593,8 @@ class Camera {
      * @return the number of collisions found
      */
     collide_with_walls(pos, offsetY, radius) {
-        let collisionData = Object.assign({}, WallColDataObj)
-        let wall = Object.assign({}, surfaceObj)
+        let collisionData = JSON.parse(JSON.stringify(WallColDataObj))
+        let wall = JSON.parse(JSON.stringify(surfaceObj))
         let normX = 0
         let normY = 0
         let normZ = 0
@@ -6504,8 +6900,8 @@ class Camera {
     }
 
     rotate_camera_around_walls(c, cPos, yawWrapper, yawRange) {
-        let colData = Object.assign({}, WallColDataObj)
-        let wall = Object.assign({}, surfaceObj)
+        let colData = JSON.parse(JSON.stringify(WallColDataObj))
+        let wall = JSON.parse(JSON.stringify(surfaceObj))
         let dummyDist = 0
         let checkDist = 0
         let coarseRadius = 0
@@ -6966,107 +7362,8 @@ class Camera {
         }
         return result
     }
-
-    shake_camera_fov(perspective) {
-        if (this.sFOVState.shakeAmplitude != 0.0) {
-            this.sFOVState.fovOffset = coss(this.sFOVState.shakePhase) * this.sFOVState.shakeAmplitude / 0x100
-            this.sFOVState.shakePhase += this.sFOVState.shakeSpeed
-            const wrapper = { current: this.sFOVState.shakeAmplitude }
-            this.camera_approach_f32_symmetric_bool(wrapper, 0.0, this.sFOVState.decay)
-            perspective.fov += this.sFOVState.fovOffset ? this.sFOVState.fovOffset : 0
-        } else {
-            this.sFOVState.shakePhase = 0
-        }
-    }
-
-    geo_camera_fov(callContext, graphNode) {
-
-        const marioState = LevelUpdate.gMarioState
-        const fovFunc = this.sFOVState.fovFunc
-
-        if (callContext == GEO_CONTEXT_RENDER) {
-            switch (fovFunc) {
-                case CAM_FOV_SET_45:
-                    this.set_fov_45(marioState)
-                    break
-                case CAM_FOV_SET_29:
-                    this.set_fov_29(marioState)
-                    break
-                case CAM_FOV_ZOOM_30:
-                    this.zoom_fov_30(marioState)
-                    break
-                case CAM_FOV_DEFAULT:
-                    this.fov_default(marioState)
-                    break
-                case CAM_FOV_BBH:
-                    // this.set_fov_bbh(marioState)
-                    break
-                case CAM_FOV_APP_45:
-                    // this.approach_fov_45(marioState)
-                    break
-                case CAM_FOV_SET_30:
-                    this.set_fov_30(marioState)
-                    break
-                case CAM_FOV_APP_20:
-                    this.approach_fov_20(marioState)
-                    break
-                case CAM_FOV_APP_80:
-                    // this.approach_fov_80(marioState)
-                    break
-                case CAM_FOV_APP_30:
-                    // this.approach_fov_30(marioState)
-                    break
-                case CAM_FOV_APP_60:
-                    // this.approach_fov_60(marioState)
-                    break
-                default: throw "default switch case - geo camera fov - " + fovFunc
-            }
-        }
-
-        graphNode.fov = this.sFOVState.fov
-
-        this.shake_camera_fov(graphNode)
-    }
-
-    fov_default(m) {
-        this.sStatusFlags &= ~CAM_FLAG_SLEEPING
-
-        const wrapper = { current: this.sFOVState.fov }
-        if ((m.action == Mario.ACT_SLEEPING) || (m.action == Mario.ACT_START_SLEEPING)) {
-            this.camera_approach_f32_symmetric_bool(wrapper, 30.0, (30.0 - this.sFOVState.fov) / 30.0)
-            this.sFOVState.fov = wrapper.current
-            this.sStatusFlags |= CAM_FLAG_SLEEPING
-        } else {
-            this.camera_approach_f32_symmetric_bool(wrapper, 45.0, (45.0 - this.sFOVState.fov) / 30.0)
-            this.sFOVState.fov = wrapper.current
-        }
-    }
-
-    set_fov_30() {
-        this.sFOVState.fov = 30.0
-    }
     
-    approach_fov_20() {
-        const wrapper = { current: this.sFOVState.fov }
-        this.camera_approach_f32_symmetric_bool(wrapper, 20.0, 0.3)
-        this.sFOVState.fov = wrapper.current
-    }
     
-    set_fov_45() {
-        this.sFOVState.fov = 45.0
-    }
-    
-    set_fov_29() {
-        this.sFOVState.fov = 29.0
-    }
-    
-    zoom_fov_30() {
-        // Pretty sure approach_f32_asymptotic_bool would do a much nicer job here, but you do you,
-        // Nintendo.
-        const wrapper = { current: this.sFOVState.fov }
-        this.camera_approach_f32_symmetric_bool(wrapper, 30.0, (30.0 - this.sFOVState.fov) / 60.0)
-        this.sFOVState.fov = wrapper.current
-    }
 
     set_fov_shake(amplitude, decay, shakeSpeed) {
         if (amplitude > this.sFOVState.shakeAmplitude) {
@@ -7136,99 +7433,6 @@ class Camera {
         this.cutscene_event(this.cutscene_unlock_key_door_fly_back, c, 124, -1);
         this.cutscene_event(this.cutscene_unlock_key_door_fov_shake, c, 79, 79);
         this.cutscene_event(this.cutscene_unlock_key_door_focus_lock, c, 70, 110);
-    }
-
-    /**
-     * Set the camera pos relative to Mario.
-     */
-    cutscene_sliding_doors_open_start(c) {
-        const wrapper = { dist: 0, pitch: 0, yaw: 0 }
-
-        MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper)
-
-        // If the camera is too close, warp it backwards set it to a better angle.
-        if (wrapper.dist < 500.0) {
-            wrapper.dist = 500.0
-            wrapper.yaw = this.gPlayerCameraState.faceAngle[1] + 0x8800
-            wrapper.pitch = 0x800
-        }
-
-        MathUtil.vec3f_set_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper.dist, wrapper.pitch, wrapper.yaw)
-    }
-
-    /**
-     * cvar1: Mario's position
-     * cvar0.angle: Mario's angle
-     * cvar0.point: offset from Mario
-     */
-    cutscene_sliding_doors_open_set_cvars(c) {
-        this.vec3f_copy(this.sCutsceneVars[1].point, this.gPlayerCameraState.pos)
-        this.vec3f_copy(this.sCutsceneVars[0].angle, this.gPlayerCameraState.faceAngle)
-        MathUtil.vec3f_set(this.sCutsceneVars[0].point, 80.0, 325.0, 200.0)
-    }
-
-    /**
-     * Decrease the cvar0 y offset to 75, which would simulate Lakitu flying under the doorway.
-     * However, the initial y offset is too high for Lakitu to reach 75 in time.
-     */
-    cutscene_sliding_doors_go_under_doorway(c) {
-        const wrapper = { current: this.sCutsceneVars[0].point[1] }
-        this.camera_approach_f32_symmetric_bool(wrapper, 75.0, 10.0)
-        this.sCutsceneVars[0].point[1] = wrapper.current
-    }
-
-    cutscene_sliding_doors_fly_back_up(c) {
-        const wrapper = { current: this.sCutsceneVars[0].point[1] }
-        this.camera_approach_f32_symmetric_bool(wrapper, 125.0, 10.0)
-        this.sCutsceneVars[0].point[1] = wrapper.current
-    }
-    
-    cutscene_sliding_doors_follow_mario(c) {
-        let pos = {0: 0, 1: 0, 2: 0}
-        
-        this.vec3f_copy(pos, c.pos)
-        // Update cvar1 with Mario's position (the y value doesn't change)
-        this.sCutsceneVars[1].point[0] = this.gPlayerCameraState.pos[0]
-        this.sCutsceneVars[1].point[2] = this.gPlayerCameraState.pos[2]
-
-        // Decrease cvar0's offsets, moving the camera behind Mario at his eye height.
-        const wrapper = { current: this.sCutsceneVars[0].point[0] }
-        this.approach_f32_asymptotic_bool(wrapper, 0, 0.1)
-        this.sCutsceneVars[0].point[0] = wrapper.current
-        wrapper.current = this.sCutsceneVars[0].point[2]
-        this.camera_approach_f32_symmetric_bool(wrapper, 125.0, 50.0)
-        this.sCutsceneVars[0].point[2] = wrapper.current
-        // Update cvar0's angle
-        this.approach_vec3s_asymptotic(this.sCutsceneVars[0].angle, this.gPlayerCameraState.faceAngle, 16, 16, 16)
-
-        // Apply the offset to the camera's position
-        this.offset_rotated(pos, this.sCutsceneVars[1].point, this.sCutsceneVars[0].point, this.sCutsceneVars[0].angle)
-        this.approach_vec3f_asymptotic(c.pos, pos, 0.15, 0.05, 0.15)
-
-        // Focus on Mario's eye height
-        this.set_focus_rel_mario(c, 0, 125.0, 0, 0)
-    }
-
-    cutscene_sliding_doors_open(c) {
-        this.reset_pan_distance(c)
-
-        this.cutscene_sliding_doors_open_start = this.cutscene_sliding_doors_open_start.bind(this)
-        this.cutscene_sliding_doors_open_set_cvars = this.cutscene_sliding_doors_open_set_cvars.bind(this)
-        this.cutscene_sliding_doors_go_under_doorway = this.cutscene_sliding_doors_go_under_doorway.bind(this)
-        this.cutscene_sliding_doors_fly_back_up = this.cutscene_sliding_doors_fly_back_up.bind(this)
-        this.cutscene_sliding_doors_follow_mario = this.cutscene_sliding_doors_follow_mario.bind(this)
-        
-        this.cutscene_event(this.cutscene_sliding_doors_open_start, c, 0, 8);
-        this.cutscene_event(this.cutscene_sliding_doors_open_set_cvars, c, 8, 8);
-        this.cutscene_event(this.cutscene_sliding_doors_go_under_doorway, c, 8, 28);
-        this.cutscene_event(this.cutscene_sliding_doors_fly_back_up, c, 29, -1);
-        this.cutscene_event(this.cutscene_sliding_doors_follow_mario, c, 8, -1);
-    }
-
-    cutscene_double_doors_end(c) {
-        this.set_flag_post_door(c)
-        c.cutscene = 0
-        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
     }
 
     cutscene_star_spawn_store_info(c) {
@@ -7303,218 +7507,6 @@ class Camera {
         this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
         this.gCutsceneTimer = CUTSCENE_STOP
         c.cutscene = 0
-    }
-
-    /**
-     * Warp the camera to Mario, then use his faceAngle to calculate the right relative position.
-     *
-     * cvar0.point is Mario's position
-     * cvar0.angle is Mario's faceAngle
-     *
-     * cvar1 is the camera's position relative to Mario
-     * cvar2 is the camera's focus relative to Mario
-     */
-    cutscene_exit_painting_start(c) {
-        let floor = Object.assign({}, surfaceObj)
-        let floorHeight = 0
-
-        MathUtil.vec3f_set(this.sCutsceneVars[2].point, 258.0, -352.0, 1189.0)
-        MathUtil.vec3f_set(this.sCutsceneVars[1].point, 65.0, -155.0, 444.0)
-
-        if (this.gPrevLevel == LEVEL_TTM) {
-            this.sCutsceneVars[1].point[1] = 0.0
-            this.sCutsceneVars[1].point[2] = 0.0
-        }
-        this.vec3f_copy(this.sCutsceneVars[0].point, this.gPlayerCameraState.pos)
-        this.sCutsceneVars[0].angle[0] = 0
-        this.sCutsceneVars[0].angle[1] = this.gPlayerCameraState.faceAngle[1]
-        this.sCutsceneVars[0].angle[2] = 0
-        this.offset_rotated(c.focus, this.sCutsceneVars[0].point, this.sCutsceneVars[1].point, this.sCutsceneVars[0].angle)
-        this.offset_rotated(c.pos, this.sCutsceneVars[0].point, this.sCutsceneVars[2].point, this.sCutsceneVars[0].angle)
-        floorHeight = SurfaceCollision.find_floor(c.pos[0], c.pos[1] + 10.0, c.pos[2], floor)
-
-        if (floorHeight != FLOOR_LOWER_LIMIT) {
-            floorHeight += 60.0
-            if (c.pos[1] < floorHeight) {
-                c.pos[1] = floorHeight
-            }
-        }
-    }
-
-    /**
-     * Decrease cvar2's x and z offset, moving closer to Mario.
-     */
-    cutscene_exit_painting_move_to_mario(c) {
-        let pos = { 0: 0, 0: 1, 0: 2 }
-
-        //! Tricky math: Since offset_rotated() flips Z offsets, you'd expect a positive Z offset to move
-        //! the camera into the wall. However, Mario's faceAngle always points into the painting, so a
-        //! positive Z offset moves the camera "behind" Mario, away from the painting.
-        //!
-        //! In the success cutscene, when Mario jumps out face-first, only his gfx angle is updated. His
-        //! actual face angle isn't updated until after the cutscene.
-        const wrapper = { current: this.sCutsceneVars[2].point[0] }
-        this.approach_f32_asymptotic_bool(wrapper, 178.0, 0.05)
-        this.sCutsceneVars[2].point[0] = wrapper.current
-        wrapper.current = this.sCutsceneVars[2].point[2]
-        this.approach_f32_asymptotic_bool(wrapper, 880.0, 0.05)
-        this.sCutsceneVars[2].point[2] = wrapper.current
-
-        this.offset_rotated(pos, this.sCutsceneVars[0].point, this.sCutsceneVars[2].point, this.sCutsceneVars[0].angle)
-        c.pos[0] = pos[0]
-        c.pos[2] = pos[2]
-    }
-
-    /**
-     * Move the camera down to the floor Mario lands on.
-     */
-    cutscene_exit_painting_move_to_floor(c) {
-        let floor = Object.assign({}, surfaceObj)
-        let floorHeight = [0, 0, 0]
-
-        this.vec3f_copy(floorHeight, this.gPlayerCameraState.pos)
-        floorHeight[1] = SurfaceCollision.find_floor(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 10.0, this.gPlayerCameraState.pos[2], floor)
-
-        if (floor != null) {
-            floorHeight[1] += (this.gPlayerCameraState.pos[1] - floorHeight[1]) * 0.7 + 125.0
-            this.approach_vec3f_asymptotic(c.focus, floorHeight, 0.2, 0.2, 0.2)
-
-            if (floorHeight[1] < c.pos[1]) {
-                const wrapper = { current: c.pos[1] } 
-                this.approach_f32_asymptotic_bool(wrapper, floorHeight[1], 0.05)
-            }
-        }
-    }
-
-    /**
-     * Cutscene played when Mario leaves a painting, either due to death or collecting a star.
-     */
-    cutscene_exit_painting(c) {
-        this.cutscene_exit_painting_start = this.cutscene_exit_painting_start.bind(this)
-        this.cutscene_exit_painting_move_to_mario = this.cutscene_exit_painting_move_to_mario.bind(this)
-        this.cutscene_exit_painting_move_to_floor = this.cutscene_exit_painting_move_to_floor.bind(this)
-        this.cutscene_event(this.cutscene_exit_painting_start, c, 0, 0);
-        this.cutscene_event(this.cutscene_exit_painting_move_to_mario, c, 5, -1);
-        this.cutscene_event(this.cutscene_exit_painting_move_to_floor, c, 5, -1);
-
-        //! Hardcoded position. TTM's painting is close to an opposite wall, so just fix the pos.
-        if (this.gPrevLevel == LEVEL_TTM) {
-            MathUtil.vec3f_set(c.pos, -296.0, 1261.0, 3521.0)
-        }
-
-        this.update_camera_yaw(c)
-    }
-
-    /**
-     * Give control back to the player.
-     */
-    cutscene_exit_painting_end(c) {
-        c.mode = CAMERA_MODE_CLOSE
-        c.cutscene = 0
-        this.gCutsceneTimer = CUTSCENE_STOP
-        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
-        this.sStatusFlags &= ~CAM_FLAG_BLOCK_SMOOTH_MOVEMENT
-        this.update_camera_yaw(c)
-    }
-
-    /**
-     * Store the camera's pos and focus for the door cutscene
-     */
-    cutscene_door_start(c) {
-        this.vec3f_copy(this.sCutsceneVars[0].point, c.pos)
-        this.vec3f_copy(this.sCutsceneVars[1].point, c.focus)
-    }
-
-    /**
-     * Fix the camera in place while the door opens.
-     */
-    cutscene_door_fix_cam(c) {
-        this.vec3f_copy(c.pos, this.sCutsceneVars[0].point)
-        this.vec3f_copy(c.focus, this.sCutsceneVars[1].point)
-    }
-
-    /**
-     * Loop until Mario is no longer using the door.
-     */
-    cutscene_door_loop(c) {
-        //! bitwise AND instead of boolean
-        if ((this.gPlayerCameraState.action != Mario.ACT_PULLING_DOOR) & (this.gPlayerCameraState.action != Mario.ACT_PUSHING_DOOR)) {
-            this.gCutsceneTimer = CUTSCENE_STOP
-            c.cutscene = 0
-        }
-    }
-
-    /**
-     * Warp the camera behind Mario.
-     */
-    cutscene_door_move_behind_mario(c) {
-        let camOffset = [0, 0, 0]
-        let doorRotation = 0
-
-        this.reset_pan_distance(c)
-        const wrapper = { current: doorRotation }
-        this.determine_pushing_or_pulling_door(wrapper)
-        doorRotation = wrapper.current
-        this.set_focus_rel_mario(c, 0.0, 125.0, 0.0, 0)
-        MathUtil.vec3s_set(this.sCutsceneVars[0].angle, 0, this.gPlayerCameraState.faceAngle[1] + doorRotation, 0)
-        MathUtil.vec3f_set(camOffset, 0.0, 125.0, 250.0)
-
-        camOffset[0] = 0.0
-
-        this.offset_rotated(c.pos, this.gPlayerCameraState.pos, camOffset, this.sCutsceneVars[0].angle)
-    }
-
-    /**
-     * Follow Mario through the door.
-     */
-    cutscene_door_follow_mario(c) {
-        this.set_focus_rel_mario(c, 0.0, 125.0, 0.0, 0)
-        const wrapper = { pitch: 0, yaw: 0, dist: 0 }
-        MathUtil.vec3f_get_dist_and_angle(c.focus, c.pos, wrapper)
-        wrapper.current = wrapper.dist
-        this.camera_approach_f32_symmetric_bool(wrapper, 150.0, 7.0)
-        MathUtil.vec3f_set_dist_and_angle(c.focus, c.pos, wrapper.current, wrapper.pitch, wrapper.yaw)
-        this.update_camera_yaw(c)
-    }
-
-    /**
-     * Ends the door cutscene. Sets the camera mode to close mode unless the default is free roam.
-     */
-    cutscene_door_end(c) {
-        if (c.defMode == CAMERA_MODE_FREE_ROAM) {
-            c.mode = CAMERA_MODE_FREE_ROAM
-        } else {
-            c.mode = CAMERA_MODE_CLOSE
-        }
-
-        c.cutscene = 0
-        this.gCutsceneTimer = CUTSCENE_STOP
-        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
-        this.sStatusFlags &= ~CAM_FLAG_BLOCK_SMOOTH_MOVEMENT
-        this.set_flag_post_door(c)
-        this.update_camera_yaw(c)
-    }
-
-    cutscene_door_mode(c) {
-        this.reset_pan_distance(c)
-        this.camera_course_processing(c)
-
-        if (c.mode == CAMERA_MODE_FIXED) {
-            c.nextYaw = this.update_fixed_camera(c, c.focus, c.pos)
-        } else if (c.mode == CAMERA_MODE_PARALLEL_TRACKING) {
-            c.nextYaw = this.update_parallel_tracking_camera(c, c.focus, c.pos)
-        }
-
-        c.yaw = c.nextYaw
-
-        // Loop until Mario is no longer using the door
-        if (this.gPlayerCameraState.action != Mario.ACT_ENTERING_STAR_DOOR
-            && this.gPlayerCameraState.action != Mario.ACT_PULLING_DOOR
-            && this.gPlayerCameraState.action != Mario.ACT_PUSHING_DOOR) {
-            
-            this.gCutsceneTimer = CUTSCENE_STOP
-            c.cutscene = 0
-        }
     }
 
     /**
@@ -7699,6 +7691,649 @@ class Camera {
         c.cutscene = 0
     }
 
+    /**
+     * Loop the cutscene until Mario exits the dialog.
+     */ 
+    cutscene_intro_peach_dialog(c) {
+        if (get_dialog_id() == DIALOG_NONE) {
+            vec3f_copy(this.gLakituState.goalPos, c.pos)
+            vec3f_copy(this.gLakituState.goalFocus, c.focus);
+            this.sStatusFlags |= (CAM_FLAG_SMOOTH_MOVEMENT | CAM_FLAG_UNUSED_CUTSCENE_ACTIVE)
+            this.gCutsceneTimer = CUTSCENE_STOP
+            c.cutscene = 0;
+        }
+    }
+
+    cutscene_intro_peach_follow_pipe_spline(c) {
+        const wrapper = {splineSegment: this.sCutsceneSplineSegment, progress: this.sCutsceneSplineSegmentProgress}
+        this.move_point_along_spline(c.pos, this.sIntroPipeToDialogPosition, wrapper)
+        this.move_point_along_spline(c.pos, this.sIntroPipeToDialogFocus, wrapper)
+        this.sCutsceneSplineSegment = wrapper.splineSegment; this.sCutsceneSplineSegmentProgress = wrapper.progress
+    }
+    
+    cutscene_intro_peach_clear_cutscene_status(c) { this.gPlayerCameraState.cameraEvent = 0 }
+
+    /**
+     * Set fov to 8 degrees, then zoom out to 30.
+     */
+    cutscene_intro_peach_zoom_fov(c) {
+        this.sFOVState = 8.0
+        this.set_fov_function(CAM_FOV_ZOOM_30);
+    }
+
+    /**
+     * Reset the spline progress, turn on handheld shake.
+     */
+    cutscene_intro_peach_reset_spline(c) {
+        this.sCutsceneSplineSegment = 0;
+        this.sCutsceneSplineSegmentProgress = 0.1;
+        //! @bug since this event is only called for one frame, this handheld shake is turned off on the
+        //! next frame.
+        this.set_handheld_shake(HAND_CAM_SHAKE_HIGH);
+    }
+
+    /**
+     * Turn off handheld shake. This was likely written before handheld shake was changed to turn off every
+     * frame, as it's the only instance of HAND_CAM_SHAKE_OFF.
+     */
+    cutscene_intro_peach_handheld_shake_off(c) { this.set_handheld_shake(HAND_CAM_SHAKE_OFF); }
+
+    intro_pipe_exit_text(c) { create_dialog_box(DIALOG_033); }
+
+    play_sound_intro_turn_on_hud(c) { this.play_sound_rbutton_changed(); }
+
+    /**
+     * Fly to the pipe. Near the end, the camera jumps to Lakitu's position and the hud turns on.
+     */
+    cutscene_intro_peach_fly_to_pipe(c) {
+        this.play_sound_intro_turn_on_hud = this.play_sound_intro_turn_on_hud.bind(this)
+        this.cutscene_intro_peach_start_flying_music = this.cutscene_intro_peach_start_flying_music.bind(this)
+        this.cutscene_intro_peach_start_to_pipe_spline = this.cutscene_intro_peach_start_to_pipe_spline.bind(this)
+        this.cutscene_intro_peach_clear_cutscene_status = this.cutscene_intro_peach_clear_cutscene_status.bind(this)
+        this.cutscene_event(this.play_sound_intro_turn_on_hud, c, 818, 818);
+        this.cutscene_spawn_obj(6, 1)
+        this.cutscene_event(this.cutscene_intro_peach_start_flying_music, c, 0, 0)
+        this.cutscene_event(this.cutscene_intro_peach_start_to_pipe_spline, c, 0, -1)
+        this.cutscene_event(this.cutscene_intro_peach_clear_cutscene_status, c, 717, 717)
+
+        this.clamp_pitch(c.pos, c.focus, 0x3B00, -0x3B00)
+        this.sCutsceneVars[1].point[1] = 400.0
+    }
+
+    /**
+     * Lakitu flies around the warp pipe, then Mario jumps out.
+     */
+    cutscene_intro_peach_mario_appears(c) {
+        this.gPlayerCameraState.cameraEvent = 0;
+
+        this.cutscene_intro_peach_reset_spline = this.cutscene_intro_peach_reset_spline.bind(this)
+        this.cutscene_intro_peach_follow_pipe_spline = this.cutscene_intro_peach_follow_pipe_spline.bind(this)
+        this.cutscene_intro_peach_handheld_shake_off = this.cutscene_intro_peach_handheld_shake_off.bind(this)
+        this.intro_pipe_exit_text = this.intro_pipe_exit_text.bind(this)
+        this.cutscene_event(this.cutscene_intro_peach_reset_spline, c, 0, 0);
+        this.cutscene_event(this.cutscene_intro_peach_follow_pipe_spline, c, 0, -1);
+        this.cutscene_event(this.cutscene_intro_peach_handheld_shake_off, c, 70, 70);
+        this.cutscene_event(this.intro_pipe_exit_text, c, 250, 250);
+
+        const wrapper = {current: this.sCutsceneVars[1].point[1]}
+        this.approach_f32_asymptotic_bool(wrapper, this.sMarioGeometry.currFloorHeight + 80.0 + (this.gPlayerCameraState.pos[1] - this.sMarioGeometry.currFloorHeight) * 1.1, 0.4)
+        this.sCutsceneVars[1].point[1] = wrapper.current
+        
+        // Make the camera look up as Mario jumps out of the pipe
+        if (c.focus[1] < this.sCutsceneVars[1].point[1]) c.focus[1] = this.sCutsceneVars[1].point[1]
+        
+        this.sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE;
+    }
+
+    /**
+     * Reset the fov. This gives the effect of peach zooming out as she fades.
+     */
+    cutscene_intro_peach_reset_fov(c) { this.set_fov_function(CAM_FOV_DEFAULT) }
+
+    cutscene_intro_peach_letter(c) {
+        this.cutscene_spawn_obj(5, 0);
+        this.cutscene_intro_peach_zoom_fov = this.cutscene_intro_peach_zoom_fov.bind(this)
+        this.cutscene_intro_peach_start_letter_music = this.cutscene_intro_peach_start_letter_music.bind(this)
+        this.cutscene_intro_peach_start_to_pipe_spline = this.cutscene_intro_peach_start_to_pipe_spline.bind(this)
+        this.peach_letter_text = this.peach_letter_text.bind(this)
+        this.play_sound_peach_reading_letter = this.play_sound_peach_reading_letter.bind(this)
+        this.cutscene_event(this.cutscene_intro_peach_zoom_fov, c, 0, 0)
+        this.cutscene_event(this.cutscene_intro_peach_start_letter_music, c, 65, 65)
+        this.cutscene_event(this.cutscene_intro_peach_start_to_pipe_spline, c, 0, 0)
+        this.cutscene_event(this.peach_letter_text, c, 65, 65)
+        this.cutscene_event(this.play_sound_peach_reading_letter, c, 83, 83)
+
+        if (this.gCutsceneTimer > 120 && get_dialog_id() == DIALOG_NONE) this.gCutsceneTimer = CUTSCENE_LOOP
+
+        this.clamp_pitch(c.pos, c.focus, 0x3B00, -0x3B00)
+    }
+
+    /**
+     * Follow splines through the courses of the game.
+     */
+    cutscene_credits(c) {
+        let focus = {}
+        let pos = {}
+
+        this.cutscene_reset_spline = this.cutscene_reset_spline.bind(this)
+        this.cutscene_event(this.cutscene_reset_spline, c, 0, 0);
+
+        switch (this.gCurrLevelArea) {
+            case AREA_BOB:
+                pos = this.sBobCreditsSplinePositions
+                focus = this.sBobCreditsSplineFocus
+                break;
+            case AREA_WF:
+                pos = this.sWfCreditsSplinePositions
+                focus = this.sWfCreditsSplineFocus
+                break;
+            case AREA_JRB_MAIN:
+                pos = this.sJrbCreditsSplinePositions
+                focus = this.sJrbCreditsSplineFocus
+                break;
+            case AREA_CCM_SLIDE:
+                pos = this.sCcmSlideCreditsSplinePositions
+                focus = this.sCcmSlideCreditsSplineFocus
+                break;
+            case AREA_BBH:
+                pos = this.sBbhCreditsSplinePositions
+                focus = this.sBbhCreditsSplineFocus
+                break;
+            case AREA_HMC:
+                pos = this.sHmcCreditsSplinePositions
+                focus = this.sHmcCreditsSplineFocus
+                break;
+            case AREA_THI_WIGGLER:
+                pos = this.sThiWigglerCreditsSplinePositions
+                focus = this.sThiWigglerCreditsSplineFocus
+                break;
+            case AREA_LLL_VOLCANO:
+                pos = this.sVolcanoCreditsSplinePositions
+                focus = this.sVolcanoCreditsSplineFocus
+                break;
+            case AREA_SSL_OUTSIDE:
+                pos = this.sSslCreditsSplinePositions
+                focus = this.sSslCreditsSplineFocus
+                break;
+            case AREA_DDD_WHIRLPOOL:
+                pos = this.sDddCreditsSplinePositions
+                focus = this.sDddCreditsSplineFocus
+                break;
+            case AREA_SL_OUTSIDE:
+                pos = this.sSlCreditsSplinePositions
+                focus = this.sSlCreditsSplineFocus
+                break;
+            case AREA_WDW:
+                pos = this.sWdwCreditsSplinePositions
+                focus = this.sWdwCreditsSplineFocus
+                break;
+            case AREA_TTM_OUTSIDE:
+                pos = this.sTtmCreditsSplinePositions
+                focus = this.sTtmCreditsSplineFocus
+                break;
+            case AREA_THI_HUGE:
+                pos = this.sThiHugeCreditsSplinePositions
+                focus = this.sThiHugeCreditsSplineFocus
+                break;
+            case AREA_TTC:
+                pos = this.sTtcCreditsSplinePositions
+                focus = this.sTtcCreditsSplineFocus
+                break;
+            case AREA_RR:
+                pos = this.sRrCreditsSplinePositions
+                focus = this.sRrCreditsSplineFocus
+                break;
+            case AREA_SA:
+                pos = this.sSaCreditsSplinePositions
+                focus = this.sSaCreditsSplineFocus
+                break;
+            case AREA_COTMC:
+                pos = this.sCotmcCreditsSplinePositions
+                focus = this.sCotmcCreditsSplineFocus
+                break;
+            case AREA_DDD_SUB:
+                pos = this.sDddSubCreditsSplinePositions
+                focus = this.sDddSubCreditsSplineFocus
+                break;
+            case AREA_CCM_OUTSIDE:
+                pos = this.sCcmOutsideCreditsSplinePositions
+                focus = this.sCcmOutsideCreditsSplineFocus
+                break;
+            default:
+                pos = sCcmOutsideCreditsSplinePositions;
+                focus = sCcmOutsideCreditsSplineFocus;
+        }
+        this.copy_spline_segment(this.sCurCreditsSplinePos, pos)
+        this.copy_spline_segment(this.sCurCreditsSplineFocus, focus)
+        const wrapper = {splineSegment: this.sCutsceneSplineSegment, progress: this.sCutsceneSplineSegmentProgress}
+        this.move_point_along_spline(c.pos, this.sCurCreditsSplinePos, wrapper)
+        this.move_point_along_spline(c.focus, this.sCurCreditsSplineFocus, wrapper)
+        this.sCutsceneSplineSegment = wrapper.splineSegment; this.sCutsceneSplineSegmentProgress = wrapper.progress
+    }
+
+    /**
+     * Set the camera pos relative to Mario.
+     */
+    cutscene_sliding_doors_open_start(c) {
+        const wrapper = { dist: 0, pitch: 0, yaw: 0 }
+
+        MathUtil.vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper)
+
+        // If the camera is too close, warp it backwards set it to a better angle.
+        if (wrapper.dist < 500.0) {
+            wrapper.dist = 500.0
+            wrapper.yaw = this.gPlayerCameraState.faceAngle[1] + 0x8800
+            wrapper.pitch = 0x800
+        }
+
+        MathUtil.vec3f_set_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper.dist, wrapper.pitch, wrapper.yaw)
+    }
+
+    /**
+     * cvar1: Mario's position
+     * cvar0.angle: Mario's angle
+     * cvar0.point: offset from Mario
+     */
+    cutscene_sliding_doors_open_set_cvars(c) {
+        this.vec3f_copy(this.sCutsceneVars[1].point, this.gPlayerCameraState.pos)
+        this.vec3f_copy(this.sCutsceneVars[0].angle, this.gPlayerCameraState.faceAngle)
+        MathUtil.vec3f_set(this.sCutsceneVars[0].point, 80.0, 325.0, 200.0)
+    }
+
+    /**
+     * Decrease the cvar0 y offset to 75, which would simulate Lakitu flying under the doorway.
+     * However, the initial y offset is too high for Lakitu to reach 75 in time.
+     */
+    cutscene_sliding_doors_go_under_doorway(c) {
+        const wrapper = { current: this.sCutsceneVars[0].point[1] }
+        this.camera_approach_f32_symmetric_bool(wrapper, 75.0, 10.0)
+        this.sCutsceneVars[0].point[1] = wrapper.current
+    }
+
+    /**
+     * Approach a y offset of 125 again.
+     */
+    cutscene_sliding_doors_fly_back_up(c) {
+        const wrapper = { current: this.sCutsceneVars[0].point[1] }
+        this.camera_approach_f32_symmetric_bool(wrapper, 125.0, 10.0)
+        this.sCutsceneVars[0].point[1] = wrapper.current
+    }
+
+    /**
+     * Follow Mario through the door, by approaching cvar1.point.
+     */
+    cutscene_sliding_doors_follow_mario(c) {
+        let pos = {0: 0, 1: 0, 2: 0}
+        
+        this.vec3f_copy(pos, c.pos)
+        // Update cvar1 with Mario's position (the y value doesn't change)
+        this.sCutsceneVars[1].point[0] = this.gPlayerCameraState.pos[0]
+        this.sCutsceneVars[1].point[2] = this.gPlayerCameraState.pos[2]
+
+        // Decrease cvar0's offsets, moving the camera behind Mario at his eye height.
+        const wrapper = { current: this.sCutsceneVars[0].point[0] }
+        this.approach_f32_asymptotic_bool(wrapper, 0, 0.1)
+        this.sCutsceneVars[0].point[0] = wrapper.current
+        wrapper.current = this.sCutsceneVars[0].point[2]
+        this.camera_approach_f32_symmetric_bool(wrapper, 125.0, 50.0)
+        this.sCutsceneVars[0].point[2] = wrapper.current
+        // Update cvar0's angle
+        this.approach_vec3s_asymptotic(this.sCutsceneVars[0].angle, this.gPlayerCameraState.faceAngle, 16, 16, 16)
+
+        // Apply the offset to the camera's position
+        this.offset_rotated(pos, this.sCutsceneVars[1].point, this.sCutsceneVars[0].point, this.sCutsceneVars[0].angle)
+        this.approach_vec3f_asymptotic(c.pos, pos, 0.15, 0.05, 0.15)
+
+        // Focus on Mario's eye height
+        this.set_focus_rel_mario(c, 0, 125.0, 0, 0)
+    }
+
+    /**
+     * Plays when Mario opens the sliding doors.
+     * Note: the star door unlocking event is not a cutscene, it's handled by Mario separately.
+     */
+    cutscene_sliding_doors_open(c) {
+        this.reset_pan_distance(c)
+
+        this.cutscene_sliding_doors_open_start = this.cutscene_sliding_doors_open_start.bind(this)
+        this.cutscene_sliding_doors_open_set_cvars = this.cutscene_sliding_doors_open_set_cvars.bind(this)
+        this.cutscene_sliding_doors_go_under_doorway = this.cutscene_sliding_doors_go_under_doorway.bind(this)
+        this.cutscene_sliding_doors_fly_back_up = this.cutscene_sliding_doors_fly_back_up.bind(this)
+        this.cutscene_sliding_doors_follow_mario = this.cutscene_sliding_doors_follow_mario.bind(this)
+        
+        this.cutscene_event(this.cutscene_sliding_doors_open_start, c, 0, 8);
+        this.cutscene_event(this.cutscene_sliding_doors_open_set_cvars, c, 8, 8);
+        this.cutscene_event(this.cutscene_sliding_doors_go_under_doorway, c, 8, 28);
+        this.cutscene_event(this.cutscene_sliding_doors_fly_back_up, c, 29, -1);
+        this.cutscene_event(this.cutscene_sliding_doors_follow_mario, c, 8, -1);
+    }
+
+    /**
+     * Ends the double door cutscene.
+     */
+    cutscene_double_doors_end(c) {
+        this.set_flag_post_door(c)
+        c.cutscene = 0
+        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
+    }
+
+    /**
+     * Plays when Mario enters a painting. The camera flies up to the painting's center, then it slowly
+     * zooms in until the star select screen appears.
+     */
+    cutscene_enter_painting(c) {
+        let paintingAngle = []
+        this.set_fov_function(CAM_FOV_APP_20);
+        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
+
+        // if (gRipplingPainting != null) {
+        // }
+        c.mode = CAMERA_MODE_CLOSE
+    }
+
+    /**
+     * Warp the camera to Mario, then use his faceAngle to calculate the right relative position.
+     *
+     * cvar0.point is Mario's position
+     * cvar0.angle is Mario's faceAngle
+     *
+     * cvar1 is the camera's position relative to Mario
+     * cvar2 is the camera's focus relative to Mario
+     */
+    cutscene_exit_painting_start(c) {
+        let floor = JSON.parse(JSON.stringify(surfaceObj))
+        let floorHeight = 0
+
+        MathUtil.vec3f_set(this.sCutsceneVars[2].point, 258.0, -352.0, 1189.0)
+        MathUtil.vec3f_set(this.sCutsceneVars[1].point, 65.0, -155.0, 444.0)
+
+        if (this.gPrevLevel == LEVEL_TTM) {
+            this.sCutsceneVars[1].point[1] = 0.0
+            this.sCutsceneVars[1].point[2] = 0.0
+        }
+        this.vec3f_copy(this.sCutsceneVars[0].point, this.gPlayerCameraState.pos)
+        this.sCutsceneVars[0].angle[0] = 0
+        this.sCutsceneVars[0].angle[1] = this.gPlayerCameraState.faceAngle[1]
+        this.sCutsceneVars[0].angle[2] = 0
+        this.offset_rotated(c.focus, this.sCutsceneVars[0].point, this.sCutsceneVars[1].point, this.sCutsceneVars[0].angle)
+        this.offset_rotated(c.pos, this.sCutsceneVars[0].point, this.sCutsceneVars[2].point, this.sCutsceneVars[0].angle)
+        floorHeight = SurfaceCollision.find_floor(c.pos[0], c.pos[1] + 10.0, c.pos[2], floor)
+
+        if (floorHeight != FLOOR_LOWER_LIMIT) {
+            floorHeight += 60.0
+            if (c.pos[1] < floorHeight) {
+                c.pos[1] = floorHeight
+            }
+        }
+    }
+
+    /**
+     * Decrease cvar2's x and z offset, moving closer to Mario.
+     */
+    cutscene_exit_painting_move_to_mario(c) {
+        let pos = { 0: 0, 0: 1, 0: 2 }
+
+        //! Tricky math: Since offset_rotated() flips Z offsets, you'd expect a positive Z offset to move
+        //! the camera into the wall. However, Mario's faceAngle always points into the painting, so a
+        //! positive Z offset moves the camera "behind" Mario, away from the painting.
+        //!
+        //! In the success cutscene, when Mario jumps out face-first, only his gfx angle is updated. His
+        //! actual face angle isn't updated until after the cutscene.
+        const wrapper = { current: this.sCutsceneVars[2].point[0] }
+        this.approach_f32_asymptotic_bool(wrapper, 178.0, 0.05)
+        this.sCutsceneVars[2].point[0] = wrapper.current
+        wrapper.current = this.sCutsceneVars[2].point[2]
+        this.approach_f32_asymptotic_bool(wrapper, 880.0, 0.05)
+        this.sCutsceneVars[2].point[2] = wrapper.current
+
+        this.offset_rotated(pos, this.sCutsceneVars[0].point, this.sCutsceneVars[2].point, this.sCutsceneVars[0].angle)
+        c.pos[0] = pos[0]
+        c.pos[2] = pos[2]
+    }
+
+    /**
+     * Move the camera down to the floor Mario lands on.
+     */
+    cutscene_exit_painting_move_to_floor(c) {
+        let floor = JSON.parse(JSON.stringify(surfaceObj))
+        let floorHeight = [0, 0, 0]
+
+        this.vec3f_copy(floorHeight, this.gPlayerCameraState.pos)
+        floorHeight[1] = SurfaceCollision.find_floor(this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 10.0, this.gPlayerCameraState.pos[2], floor)
+
+        if (floor != null) {
+            floorHeight[1] += (this.gPlayerCameraState.pos[1] - floorHeight[1]) * 0.7 + 125.0
+            this.approach_vec3f_asymptotic(c.focus, floorHeight, 0.2, 0.2, 0.2)
+
+            if (floorHeight[1] < c.pos[1]) {
+                const wrapper = { current: c.pos[1] } 
+                this.approach_f32_asymptotic_bool(wrapper, floorHeight[1], 0.05)
+            }
+        }
+    }
+    
+    /**
+     * Cutscene played when Mario leaves a painting, either due to death or collecting a star.
+     */
+    cutscene_exit_painting(c) {
+        this.cutscene_exit_painting_start = this.cutscene_exit_painting_start.bind(this)
+        this.cutscene_exit_painting_move_to_mario = this.cutscene_exit_painting_move_to_mario.bind(this)
+        this.cutscene_exit_painting_move_to_floor = this.cutscene_exit_painting_move_to_floor.bind(this)
+        this.cutscene_event(this.cutscene_exit_painting_start, c, 0, 0);
+        this.cutscene_event(this.cutscene_exit_painting_move_to_mario, c, 5, -1);
+        this.cutscene_event(this.cutscene_exit_painting_move_to_floor, c, 5, -1);
+
+        //! Hardcoded position. TTM's painting is close to an opposite wall, so just fix the pos.
+        if (this.gPrevLevel == LEVEL_TTM) {
+            MathUtil.vec3f_set(c.pos, -296.0, 1261.0, 3521.0)
+        }
+
+        this.update_camera_yaw(c)
+    }
+
+    /**
+     * Give control back to the player.
+     */
+    cutscene_exit_painting_end(c) {
+        c.mode = CAMERA_MODE_CLOSE
+        c.cutscene = 0
+        this.gCutsceneTimer = CUTSCENE_STOP
+        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
+        this.sStatusFlags &= ~CAM_FLAG_BLOCK_SMOOTH_MOVEMENT
+        this.update_camera_yaw(c)
+    }
+
+    /**
+     * End the cutscene, starting cannon mode.
+     */
+    cutscene_enter_cannon_end(c) {
+        this.sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT
+        this.sStatusFlags |= CAM_FLAG_BLOCK_SMOOTH_MOVEMENT
+        c.mode = CAMERA_MODE_INSIDE_CANNON
+        c.cutscene = 0
+        this.sCannonYOffset = 800.0
+    }
+
+    /**
+     * Rotate around the cannon as it rises out of the hole.
+     */
+    cutscene_enter_cannon_raise(c) {
+        const o = this.gPlayerCameraState.usedObj
+        let floorHeight;
+        let cannonFocus = [0, 0, 0]
+        let cannonAngle = [0, 0, 0]
+
+        // Shake the camera when the cannon is fully raised
+        this.cutscene_shake_explosion = this.cutscene_shake_explosion.bind(this)
+        this.cutscene_event(this.cutscene_shake_explosion, c, 70, 70)
+        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
+        const wrapper = { current: this.sCutsceneVars[1].angle[0] }
+        this.camera_approach_s16_symmetric_bool(wrapper, 0, 0x80)
+        this.sCutsceneVars[1].angle[0] = wrapper.current
+        wrapper.current = this.sCutsceneVars[2].angle[0]
+        this.camera_approach_s16_symmetric_bool(wrapper, 0, 0x80)
+        this.sCutsceneVars[2].angle[0] = wrapper.current
+        // Move the camera around the cannon, gradually rotating and moving closer
+        vec3f_set_dist_and_angle(this.sCutsceneVars[0].point, c.pos, this.sCutsceneVars[1].point[2], this.sCutsceneVars[1].angle[0], this.sCutsceneVars[1].angle[1]);
+        this.sCutsceneVars[1].point[2] = approach_f32(this.sCutsceneVars[1].point[2], 400.0, 5.0, 5.0)
+        this.sCutsceneVars[1].angle[1] += 0x40
+        this.sCutsceneVars[3].point[1] += 2.0
+        c.pos[1] += this.sCutsceneVars[3].point[1]
+
+        if (o != null) {
+            this.sCutsceneVars[0].point[1] = o.rawData[oPosY]
+            cannonAngle[0] = o.rawData[oMoveAnglePitch]
+            cannonAngle[1] = o.rawData[oMoveAngleYaw]
+            cannonAngle[2] = o.rawData[oMoveAngleRoll]
+            c.focus[0] = o.rawData[oPosX]
+            c.focus[1] = o.rawData[oPosY]
+            c.focus[2] = o.rawData[oPosZ]
+            cannonFocus[0] = 0.0
+            cannonFocus[1] = 100.0
+            cannonFocus[2] = 0.0
+            this.offset_rotated(c.focus, c.focus, cannonFocus, cannonAngle)
+        }
+
+        floorHeight = SurfaceCollision.find_floor(c.pos[0], c.pos[1] + 500.0, c.pos[2], {})
+
+        if (c.pos[1] < floorHeight) c.pos[1] = floorHeight;
+    }
+
+    /**
+     * Start the cannon entering cutscene
+     */
+    cutscene_enter_cannon_start(c) {
+        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
+        this.gPlayerCameraState.cameraEvent = 0;
+        const o = this.gPlayerCameraState.usedObj
+        // Store the cannon's position and angle in cvar0
+        if (o != null) {
+            this.sCutsceneVars[0].point[0] = o.rawData[oPosX]
+            this.sCutsceneVars[0].point[1] = o.rawData[oPosY]
+            this.sCutsceneVars[0].point[2] = o.rawData[oPosZ]
+            this.sCutsceneVars[0].angle[0] = o.rawData[oMoveAnglePitch]
+            this.sCutsceneVars[0].angle[1] = o.rawData[oMoveAngleYaw]
+            this.sCutsceneVars[0].angle[2] = o.rawData[oMoveAngleRoll]
+        }
+
+        // Store the camera's polar offset from the cannon in cvar1
+        const wrapper = {dist: this.sCutsceneVars[1].point[2], pitch: this.sCutsceneVars[1].angle[0], yaw: this.sCutsceneVars[1].angle[1]}
+        vec3f_get_dist_and_angle(this.sCutsceneVars[0].point, c.pos, wrapper)
+        this.sCutsceneVars[1].point[2] = wrapper.dist; this.sCutsceneVars[1].angle[0] = wrapper.pitch; this.sCutsceneVars[1].angle[1] = wrapper.yaw;
+        this.sCutsceneVars[3].point[1] = 0.0
+        //! cvar4 is unused in this cutscene
+        this.sCutsceneVars[4].point[1] = 0.0
+    }
+
+    /**
+     * Store the camera's pos and focus for the door cutscene
+     */
+    cutscene_door_start(c) {
+        this.vec3f_copy(this.sCutsceneVars[0].point, c.pos)
+        this.vec3f_copy(this.sCutsceneVars[1].point, c.focus)
+    }
+
+    /**
+     * Fix the camera in place while the door opens.
+     */
+    cutscene_door_fix_cam(c) {
+        this.vec3f_copy(c.pos, this.sCutsceneVars[0].point)
+        this.vec3f_copy(c.focus, this.sCutsceneVars[1].point)
+    }
+
+    /**
+     * Loop until Mario is no longer using the door.
+     */
+    cutscene_door_loop(c) {
+        //! bitwise AND instead of boolean
+        if ((this.gPlayerCameraState.action != Mario.ACT_PULLING_DOOR) & (this.gPlayerCameraState.action != Mario.ACT_PUSHING_DOOR)) {
+            this.gCutsceneTimer = CUTSCENE_STOP
+            c.cutscene = 0
+        }
+    }
+
+    /**
+     * Warp the camera behind Mario.
+     */
+    cutscene_door_move_behind_mario(c) {
+        let camOffset = [0, 0, 0]
+        let doorRotation = 0
+
+        this.reset_pan_distance(c)
+        const wrapper = { current: doorRotation }
+        this.determine_pushing_or_pulling_door(wrapper)
+        doorRotation = wrapper.current
+        this.set_focus_rel_mario(c, 0.0, 125.0, 0.0, 0)
+        MathUtil.vec3s_set(this.sCutsceneVars[0].angle, 0, this.gPlayerCameraState.faceAngle[1] + doorRotation, 0)
+        MathUtil.vec3f_set(camOffset, 0.0, 125.0, 250.0)
+
+        camOffset[0] = 0.0
+
+        this.offset_rotated(c.pos, this.gPlayerCameraState.pos, camOffset, this.sCutsceneVars[0].angle)
+    }
+
+    /**
+     * Follow Mario through the door.
+     */
+    cutscene_door_follow_mario(c) {
+        this.set_focus_rel_mario(c, 0.0, 125.0, 0.0, 0)
+        const wrapper = { pitch: 0, yaw: 0, dist: 0 }
+        MathUtil.vec3f_get_dist_and_angle(c.focus, c.pos, wrapper)
+        wrapper.current = wrapper.dist
+        this.camera_approach_f32_symmetric_bool(wrapper, 150.0, 7.0)
+        MathUtil.vec3f_set_dist_and_angle(c.focus, c.pos, wrapper.current, wrapper.pitch, wrapper.yaw)
+        this.update_camera_yaw(c)
+    }
+
+    /**
+     * Ends the door cutscene. Sets the camera mode to close mode unless the default is free roam.
+     */
+    cutscene_door_end(c) {
+        if (c.defMode == CAMERA_MODE_FREE_ROAM) {
+            c.mode = CAMERA_MODE_FREE_ROAM
+        } else {
+            c.mode = CAMERA_MODE_CLOSE
+        }
+
+        c.cutscene = 0
+        this.gCutsceneTimer = CUTSCENE_STOP
+        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
+        this.sStatusFlags &= ~CAM_FLAG_BLOCK_SMOOTH_MOVEMENT
+        this.set_flag_post_door(c)
+        this.update_camera_yaw(c)
+    }
+
+    /**
+     * Used for entering a room that uses a specific camera mode, like the castle lobby or BBH
+     */
+    cutscene_door_mode(c) {
+        this.reset_pan_distance(c)
+        this.camera_course_processing(c)
+
+        if (c.mode == CAMERA_MODE_FIXED) {
+            c.nextYaw = this.update_fixed_camera(c, c.focus, c.pos)
+        } else if (c.mode == CAMERA_MODE_PARALLEL_TRACKING) {
+            c.nextYaw = this.update_parallel_tracking_camera(c, c.focus, c.pos)
+        }
+
+        c.yaw = c.nextYaw
+
+        // Loop until Mario is no longer using the door
+        if (this.gPlayerCameraState.action != Mario.ACT_ENTERING_STAR_DOOR
+            && this.gPlayerCameraState.action != Mario.ACT_PULLING_DOOR
+            && this.gPlayerCameraState.action != Mario.ACT_PUSHING_DOOR) {
+            
+            this.gCutsceneTimer = CUTSCENE_STOP
+            c.cutscene = 0
+        }
+    }
+
+    /**
+     * Play the current cutscene until either gCutsceneTimer reaches the max time, or c->cutscene is set to 0
+     *
+     * Note that CAM_FLAG_SMOOTH_MOVEMENT is cleared while a cutscene is playing, so cutscenes set it for
+     * the duration they want the flag to be active.
+     */
     play_cutscene(c) {
         let oldCutscene = c.cutscene
         let cutsceneDuration
@@ -7751,6 +8386,10 @@ class Camera {
 
     }
 
+    /**
+     * Call the event while `start` <= gCutsceneTimer <= `end`
+     * If `end` is -1, call for the rest of the shot.
+     */
     cutscene_event(event, c, start, end) {
         if (start <= this.gCutsceneTimer) {
             if (end == -1 || end >= this.gCutsceneTimer) {
@@ -7761,6 +8400,212 @@ class Camera {
         return false
     }
 
+    /**
+     * Set gCutsceneObjSpawn when gCutsceneTimer == `frame`.
+     *
+     * @see intro_scene.inc.c for details on which objects are spawned.
+     */
+    cutscene_spawn_obj(obj, frame) {
+        if (frame == this.gCutsceneTimer) {
+            this.gCutsceneObjSpawn = obj;
+        }
+        return 0;
+    }
+
+    /**
+     * Start shaking the camera's field of view.
+     *
+     * @param shakeSpeed How fast the shake should progress through its period. The shake offset is
+     *                   calculated from coss(), so this parameter can be thought of as an angular velocity.
+     */
+    set_fov_shake(amplitude, decay, shakeSpeed) {
+        if (amplitude > this.sFOVState.shakeAmplitude) {
+            this.sFOVState.shakeAmplitude = amplitude
+            this.sFOVState.decay = decay
+            this.sFOVState.shakeSpeed = shakeSpeed
+        }
+    }
+
+    /**
+     * Start shaking the camera's field of view, but reduce `amplitude` by distance from camera
+     */
+    set_fov_shake_from_point(amplitude, decay, shakeSpeed, maxDist, posX, posY, posZ) {
+        amplitude = this.reduce_by_dist_from_camera(amplitude, maxDist, posX, posY, posZ)
+
+        if (amplitude != 0) {
+            this.set_fov_shake(amplitude, decay, shakeSpeed)
+        }
+    }
+
+    /**
+     * Add a cyclic offset to the camera's field of view based on a cosine wave
+     */
+    shake_camera_fov(perspective) {
+        if (this.sFOVState.shakeAmplitude != 0.0) {
+            this.sFOVState.fovOffset = coss(this.sFOVState.shakePhase) * this.sFOVState.shakeAmplitude / 0x100
+            this.sFOVState.shakePhase += this.sFOVState.shakeSpeed
+            const wrapper = { current: this.sFOVState.shakeAmplitude }
+            this.camera_approach_f32_symmetric_bool(wrapper, 0.0, this.sFOVState.decay)
+            perspective.fov += this.sFOVState.fovOffset ? this.sFOVState.fovOffset : 0
+        } else {
+            this.sFOVState.shakePhase = 0
+        }
+    }
+
+    set_fov_30() {
+        this.sFOVState.fov = 30.0
+    }
+
+    approach_fov_20(m) {
+        const wrapper = { current: this.sFOVState.fov }
+        this.camera_approach_f32_symmetric_bool(wrapper, 20.0, 0.3)
+        this.sFOVState.fov = wrapper.current
+    }
+
+    set_fov_45(m) {
+        this.sFOVState.fov = 45.0
+    }
+
+    set_fov_29(m) {
+        this.sFOVState.fov = 29.0;
+    }
+
+    zoom_fov_30() {
+        // Pretty sure approach_f32_asymptotic_bool would do a much nicer job here, but you do you,
+        // Nintendo.
+        const wrapper = { current: this.sFOVState.fov }
+        this.camera_approach_f32_symmetric_bool(wrapper, 30.0, (30.0 - this.sFOVState.fov) / 60.0)
+        this.sFOVState.fov = wrapper.current
+    }
+
+    /**
+     * This is the default fov function. It makes fov approach 45 degrees, and it handles zooming in when
+     * Mario falls a sleep.
+     */
+    fov_default(m) {
+        this.sStatusFlags &= ~CAM_FLAG_SLEEPING
+
+        const wrapper = { current: this.sFOVState.fov }
+        if ((m.action == Mario.ACT_SLEEPING) || (m.action == Mario.ACT_START_SLEEPING)) {
+            this.camera_approach_f32_symmetric_bool(wrapper, 30.0, (30.0 - this.sFOVState.fov) / 30.0)
+            this.sFOVState.fov = wrapper.current
+            this.sStatusFlags |= CAM_FLAG_SLEEPING
+        } else {
+            this.camera_approach_f32_symmetric_bool(wrapper, 45.0, (45.0 - this.sFOVState.fov) / 30.0)
+            this.sFOVState.fov = wrapper.current
+        }
+    }
+
+    approach_fov_30(m) {
+        const wrapper = {current: this.sFOVState.fov}
+        camera_approach_f32_symmetric_bool(wrapper, 30.0, 1.0);
+        this.sFOVState.fov = wrapper.current
+    }
+
+    approach_fov_60(m) {
+        const wrapper = {current: this.sFOVState.fov}
+        camera_approach_f32_symmetric_bool(wrapper, 60.0, 1.0);
+        this.sFOVState.fov = wrapper.current
+    }
+
+    approach_fov_45(m) {
+        this.sFOVState.fov = approach_f32(this.sFOVState.fov, 45.0, 2.0, 2.0);
+    }
+
+    approach_fov_80(m) {
+        const wrapper = {current: this.sFOVState.fov}
+        camera_approach_f32_symmetric_bool(wrapper, 80.0, 3.5);
+        this.sFOVState.fov = wrapper.current
+    }
+
+    set_fov_bbh(m) {
+        let targetFoV = this.sFOVState.fov;
+
+        if (m.area.camera.mode == CAMERA_MODE_FIXED && m.area.camera.cutscene == 0) {
+            targetFoV = 60.0
+        } else {
+            targetFoV = 45.0
+        }
+
+        this.sFOVState.fov = approach_f32(this.sFOVState.fov, targetFoV, 2.0, 2.0)
+    }
+
+    /**
+     * Sets the field of view for the GraphNodeCamera
+     */
+    geo_camera_fov(callContext, graphNode) {
+
+        const marioState = LevelUpdate.gMarioState
+        const fovFunc = this.sFOVState.fovFunc
+
+        if (callContext == GEO_CONTEXT_RENDER) {
+            switch (fovFunc) {
+                case CAM_FOV_SET_45:
+                    this.set_fov_45(marioState)
+                    break
+                case CAM_FOV_SET_29:
+                    this.set_fov_29(marioState)
+                    break
+                case CAM_FOV_ZOOM_30:
+                    this.zoom_fov_30(marioState)
+                    break
+                case CAM_FOV_DEFAULT:
+                    this.fov_default(marioState)
+                    break
+                case CAM_FOV_BBH:
+                    this.set_fov_bbh(marioState)
+                    break
+                case CAM_FOV_APP_45:
+                    this.approach_fov_45(marioState)
+                    break
+                case CAM_FOV_SET_30:
+                    this.set_fov_30(marioState)
+                    break
+                case CAM_FOV_APP_20:
+                    this.approach_fov_20(marioState)
+                    break
+                case CAM_FOV_APP_80:
+                    this.approach_fov_80(marioState)
+                    break
+                case CAM_FOV_APP_30:
+                    this.approach_fov_30(marioState)
+                    break
+                case CAM_FOV_APP_60:
+                    this.approach_fov_60(marioState)
+                    break
+                default: throw "default switch case - geo camera fov - " + fovFunc
+            }
+        }
+
+        graphNode.fov = this.sFOVState.fov
+
+        this.shake_camera_fov(graphNode)
+    }
+
+    /**
+     * Change the camera's FOV mode.
+     *
+     * @see geo_camera_fov
+     */
+    set_fov_function(func) {
+        this.sFOVState.fovFunc = func
+    }
+
+
+    /**
+     * Start a preset fov shake. Used in cutscenes
+     */
+    cutscene_set_fov_shake_preset(preset) {
+        switch (preset) {
+            case 1:
+                this.set_fov_shake(0x100, 0x30, 0x8000)
+                break
+            case 2:
+                this.set_fov_shake(0x400, 0x20, 0x4000)
+                break
+        }
+    }
+    
     /**
      * Start a preset fov shake that is reduced by the point's distance from the camera.
      * Used in set_camera_shake_from_point
@@ -7785,50 +8630,16 @@ class Camera {
     }
 
     /**
-     * Start shaking the camera's field of view.
-     *
-     * @param shakeSpeed How fast the shake should progress through its period. The shake offset is
-     *                   calculated from coss(), so this parameter can be thought of as an angular velocity.
+     * Rotate the object towards the point `point`.
      */
-    set_fov_shake(amplitude, decay, shakeSpeed) {
-        if (amplitude > this.sFOVState.shakeAmplitude) {
-            this.sFOVState.shakeAmplitude = amplitude
-            this.sFOVState.decay = decay
-            this.sFOVState.shakeSpeed = shakeSpeed
-        }
+    obj_rotate_towards_point(o, point, pitchOff, yawOff, pitchDiv, yawDiv) {
+        let oPos = [0, 0, 0];
+        let wrapper = {};
+        this.object_pos_to_vec3f(oPos, o);
+        vec3f_get_dist_and_angle(oPos, point, wrapper);
+        o.rawData[oMoveAnglePitch] = this.approach_s16_asymptotic(o.rawData[oMoveAnglePitch], pitchOff - pitch, pitchDiv);
+        o.rawData[oMoveAngleYaw] = this.approach_s16_asymptotic(o.rawData[oMoveAngleYaw], yaw + yawOff, yawDiv);
     }
-
-    /**
-     * Change the camera's FOV mode.
-     *
-     * @see geo_camera_fov
-     */
-    set_fov_function(func) {
-        this.sFOVState.fovFunc = func
-    }
-
-    cutscene_set_fov_shake_preset(preset) {
-        switch (preset) {
-            case 1:
-                this.set_fov_shake(0x100, 0x30, 0x8000)
-                break
-            case 2:
-                this.set_fov_shake(0x400, 0x20, 0x4000)
-                break
-        }
-    }
-
-    /**
-     * Start shaking the camera's field of view, but reduce `amplitude` by distance from camera
-     */
-    set_fov_shake_from_point(amplitude, decay, shakeSpeed, maxDist, posX, posY, posZ) {
-        amplitude = this.reduce_by_dist_from_camera(amplitude, maxDist, posX, posY, posZ)
-
-        if (amplitude != 0) {
-            this.set_fov_shake(amplitude, decay, shakeSpeed)
-        }
-    }
-
 }
 
 export const CameraInstance = new Camera()

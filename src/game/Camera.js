@@ -15,7 +15,7 @@ import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceC
 import { atan2s, vec3f_set, sqrtf,vec3f_set_dist_and_angle } from "../engine/math_util"
 import * as MathUtil from "../engine/math_util"
 import * as Mario from "./Mario"
-import { oHeldState, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oPosX, oPosY, oPosZ } from "../include/object_constants"
+import { oBehParams2ndByte, oHeldState, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oPosX, oPosY, oPosZ } from "../include/object_constants"
 import { CELL_HEIGHT_LIMIT, FLOOR_LOWER_LIMIT, SURFACE_DEATH_PLANE, SURFACE_IS_PAINTING_WARP, SURFACE_WALL_MISC } from "../include/surface_terrains"
 import { sins, s16, int16, coss } from "../utils"
 import { HudInstance as Hud } from "./Hud"
@@ -1214,6 +1214,10 @@ class Camera {
             { shot: this.cutscene_intro_peach_dialog.bind(this), duration: CUTSCENE_LOOP }
         ]
 
+        this.sCutsceneCapSwitchPress = [
+            { shot: this.cutscene_cap_switch_press.bind(this), duration: CUTSCENE_LOOP }
+        ]
+
         /* this.sCutsceneExitBowserSuccess = [
             { shot: this.cutscene_exit_bowser_succ.bind(this), duration: 190 },
             { shot: this.cutscene_non_painting_end.bind(this), duration: 0 }
@@ -1284,7 +1288,7 @@ class Camera {
             // [ CUTSCENE_0F_UNUSED, this.sCutsceneUnused ],
             // [ CUTSCENE_END_WAVING, this.sCutsceneEndWaving ],
             // [ CUTSCENE_CREDITS, this.sCutsceneCredits ],
-            // [ CUTSCENE_CAP_SWITCH_PRESS, this.sCutsceneCapSwitchPress ],
+            [ CUTSCENE_CAP_SWITCH_PRESS, this.sCutsceneCapSwitchPress ],
             [ CUTSCENE_SLIDING_DOORS_OPEN, this.sCutsceneSlidingDoorsOpen ],
             // [ CUTSCENE_PREPARE_CANNON, this.sCutscenePrepareCannon ],
             [ CUTSCENE_UNLOCK_KEY_DOOR, this.sCutsceneUnlockKeyDoor ],
@@ -7373,68 +7377,6 @@ class Camera {
         }
     }
 
-    /**
-     * Sets cvars:
-     * cvar0 is the camera's position
-     * cvar1 is the camera's focus
-     * cvar2 is the goal position
-     * cvar3 is the goal focus
-     */
-    cutscene_unlock_key_door_start(c) {
-        let posOff = [0, 0, 0]
-        let focusOff = [0, 0, 0]
-
-        this.vec3f_copy(this.sCutsceneVars[0].point, c.pos)
-        this.vec3f_copy(this.sCutsceneVars[1].point, c.focus)
-        MathUtil.vec3f_set(posOff, -206.0, 108.0, 234.0)
-        MathUtil.vec3f_set(focusOff, 48.0, 104.0, -193.0)
-        this.offset_rotated(this.sCutsceneVars[2].point, this.gPlayerCameraState.pos, posOff, this.gPlayerCameraState.faceAngle)
-        this.offset_rotated(this.sCutsceneVars[3].point, this.gPlayerCameraState.pos, focusOff, this.gPlayerCameraState.faceAngle)
-    }
-
-    /**
-     * Move the camera to the cvars position and focus, closer to Mario.
-     * Gives a better view of the key.
-     */
-    cutscene_unlock_key_door_approach_mario(c) {
-        this.approach_vec3f_asymptotic(c.pos, this.sCutsceneVars[2].point, 0.1, 0.1, 0.1)
-        this.approach_vec3f_asymptotic(c.focus, this.sCutsceneVars[3].point, 0.1, 0.1, 0.1)
-    }
-
-    /**
-     * Move back to the previous pos and focus, stored in cvar0 and cvar1.
-     */
-    cutscene_unlock_key_door_fly_back(c) {
-        this.approach_vec3f_asymptotic(c.pos, this.sCutsceneVars[0].point, 0.1, 0.1, 0.1)
-        this.approach_vec3f_asymptotic(c.focus, this.sCutsceneVars[1].point, 0.1, 0.1, 0.1)
-    }
-
-    cutscene_unlock_key_door_fov_shake(c) {
-        this.cutscene_set_fov_shake_preset(1)
-    }
-
-    cutscene_unlock_key_door_focus_lock(c) {
-        const wrapper = { current: this.sCutsceneVars[3].point[1] }
-        this.approach_f32_asymptotic_bool(wrapper, this.gPlayerCameraState.pos[1] + 140.0, 0.07)
-        this.sCutsceneVars[3].point[1] = wrapper.current
-    }
-
-    /**
-     * Cutscene that plays when Mario unlocks a key door.
-     */
-    cutscene_unlock_key_door(c) {
-        this.cutscene_unlock_key_door_start = this.cutscene_unlock_key_door_start.bind(this)
-        this.cutscene_unlock_key_door_approach_mario = this.cutscene_unlock_key_door_approach_mario.bind(this)
-        this.cutscene_unlock_key_door_fly_back = this.cutscene_unlock_key_door_fly_back.bind(this)
-        this.cutscene_unlock_key_door_fov_shake = this.cutscene_unlock_key_door_fov_shake.bind(this)
-        this.cutscene_unlock_key_door_focus_lock = this.cutscene_unlock_key_door_focus_lock.bind(this)
-        this.cutscene_event(this.cutscene_unlock_key_door_start, c, 0, 0);
-        this.cutscene_event(this.cutscene_unlock_key_door_approach_mario, c, 0, 123);
-        this.cutscene_event(this.cutscene_unlock_key_door_fly_back, c, 124, -1);
-        this.cutscene_event(this.cutscene_unlock_key_door_fov_shake, c, 79, 79);
-        this.cutscene_event(this.cutscene_unlock_key_door_focus_lock, c, 70, 110);
-    }
-
     cutscene_star_spawn_store_info(c) {
         this.store_info_star(c)
     }
@@ -7691,6 +7633,261 @@ class Camera {
         c.cutscene = 0
     }
 
+    /**
+     * Set the camera pos depending on which level Mario exited.
+     */
+    cutscene_non_painting_set_cam_pos(c) {
+        switch (this.gPrevLevel) {
+            case LEVEL_HMC:
+            case LEVEL_COTMC:
+                vec3f_set(c.pos, 3465.0, -1008.0, -2961.0);
+                break;
+            
+            case LEVEL_RR:
+                vec3f_set(c.pos, 3741.0, 3151.0, 6065.0)
+                break
+
+            case LEVEL_WMOTR:
+                vec3f_set(c.pos, 1972.0, 3230.0, 5891.0)
+                break
+
+            default:
+                this.offset_rotated(c.pos, this.sCutsceneVars[7].point, this.sCutsceneVars[5].point, this.sCutsceneVars[7].angle)
+                c.pos[1] = SurfaceCollision.find_floor(c.pos[0], c.pos[1] + 1000.0, c.pos[2], {}) + 125.0
+        }
+    }
+
+    /**
+     * Update the camera focus depending on which level Mario exited.
+     */
+    cutscene_non_painting_set_cam_focus(c) {
+        this.offset_rotated(c.focus, this.sCutsceneVars[7].point, this.sCutsceneVars[6].point, this.sCutsceneVars[7].angle)
+
+        if (this.gPrevLevel == LEVEL_COTMC || this.gPrevLevel == LEVEL_HMC || this.gPrevLevel == LEVEL_RR || this.gPrevLevel == LEVEL_WMOTR) {
+            c.focus[0] = c.pos[0] + (this.gPlayerCameraState.pos[0] - c.pos[0]) * 0.7
+            c.focus[1] = c.pos[1] + (this.gPlayerCameraState.pos[1] - c.pos[1]) * 0.4
+            c.focus[2] = c.pos[2] + (this.gPlayerCameraState.pos[2] - c.pos[2]) * 0.7
+        } else {
+            c.focus[1] = c.pos[1] + (this.gPlayerCameraState.pos[1] - c.pos[1]) * 0.2
+        }
+    }
+
+    // -----
+
+    /**
+     * Set cvar7 to Mario's pos and faceAngle
+     * Set cvar6 to the focus offset from Mario.
+     * set cvar5 to the pos offset from Mario. (This is always overwritten)
+     */
+    cutscene_non_painting_death_start(c) {
+        vec3f_copy(this.sCutsceneVars[7].point, this.gPlayerCameraState.pos)
+        vec3f_copy(this.sCutsceneVars[7].angle, this.gPlayerCameraState.faceAngle)
+        vec3f_set(this.sCutsceneVars[6].point, -42.0, 350.0, 727.0)
+    }
+
+    /**
+     * Set the offset from Mario depending on the course Mario exited.
+     * This overrides cutscene_non_painting_death_start()
+     */
+    cutscene_non_painting_death_override_offset(c) {
+        switch (this.gPrevLevel) {
+            case LEVEL_HMC:
+            case LEVEL_COTMC:
+                vec3f_set(this.sCutsceneVars[5].point, 187.0, 369.0, -197.0)
+                break
+            default:
+                vec3f_set(this.sCutsceneVars[5].point, 107.0, 246.0, 1307.0)
+        }
+    }
+
+    /**
+     * Cutscene played when Mario dies in a non-painting course, like HMC or BBH.
+     */
+    cutscene_non_painting_death(c) {
+        this.cutscene_non_painting_death = this.cutscene_non_painting_death.bind(this)
+        this.cutscene_non_painting_death_override_offset = this.cutscene_non_painting_death_override_offset.bind(this)
+        this.cutscene_non_painting_set_cam_pos = this.cutscene_non_painting_set_cam_pos.bind(this)
+        this.cutscene_non_painting_set_cam_focus = this.cutscene_non_painting_set_cam_focus.bind(this)
+        this.cutscene_event(this.cutscene_non_painting_death, c, 0, 0)
+        this.cutscene_event(this.cutscene_non_painting_death_override_offset, c, 0, 0)
+        this.cutscene_event(this.cutscene_non_painting_set_cam_pos, c, 0, -1)
+        this.cutscene_event(this.cutscene_non_painting_set_cam_focus, c, 0, -1)
+        this.sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
+    }
+
+    /**
+     * Set cvars:
+     * cvar3 is an offset applied to the camera's rotation around Mario. It starts at 0x1200
+     * cvar 1 is more complicated:
+     *      First the yaw from Mario to the camera is calculated. cvar1 is the high byte of the difference
+     *      between that yaw and Mario's faceAngle plus 0x1200. The reason for taking the high byte is
+     *      because cvar1 rotates until is reaches 0, so it's important that it's a multiple of 0x100.
+     */
+    cutscene_cap_switch_press_start(c) {
+        this.store_info_star(c)
+        let yaw = this.calculate_yaw(this.gPlayerCameraState.pos, c.pos)
+        this.sCutsceneVars[3].angle[1] = 0x1200
+        // Basically the amount of rotation to get from behind Mario to in front of Mario
+        this.sCutsceneVars[1].angle[1] = (yaw - (this.gPlayerCameraState.faceAngle[1] + this.sCutsceneVars[3].angle[1])) & 0xFF00
+    }
+
+    /**
+     * Rotate around Mario. As each cvar stops updating, the rotation slows until the camera ends up in
+     * front of Mario.
+     */
+    cutscene_cap_switch_press_rotate_around_mario(c) {
+        const wrapper = {}
+        vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper)
+
+        // cvar3 wraps around until it reaches 0x1000
+        if (this.sCutsceneVars[3].angle[1] != 0x1000) this.sCutsceneVars[3].angle[1] += 0x100
+
+        // cvar1 wraps until 0
+        if (this.sCutsceneVars[1].angle[1] != 0) this.sCutsceneVars[1].angle[1] += 0x100
+
+        wrapper.yaw = this.gPlayerCameraState.faceAngle[1] + this.sCutsceneVars[3].angle[1] + this.sCutsceneVars[1].angle[1]
+        vec3f_set_dist_and_angle(this.gPlayerCameraState.pos, c.pos, wrapper.dist, wrapper.pitch, wrapper.yaw)
+    }
+
+    /**
+     * Move the camera slightly downwards.
+     */
+    cutscene_cap_switch_press_lower_cam(c) { this.rotate_and_move_vec3f(c.pos, this.gPlayerCameraState.pos, 0, -0x20, 0) }
+
+    /**
+     * Move the camera closer to Mario.
+     */
+    cutscene_cap_switch_press_approach_mario(c) {
+        let w = {}
+        vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, w)
+        w.current = w.dist
+        this.approach_f32_asymptotic_bool(w, 195.0, 0.2)
+        w.dist = w.current; w.current = w.pitch
+        this.approach_s16_asymptotic_bool(w, 0, 0x10)
+        w.pitch = w.current
+        vec3f_set_dist_and_angle(this.gPlayerCameraState.pos, c.pos, w.dist, w.pitch, w.yaw)
+
+        w.current = c.focus[0]; this.approach_f32_asymptotic_bool(w, this.gPlayerCameraState.pos[0], 0.1)
+        c.focus[0] = w.current; w.current = c.focus[1]; this.approach_f32_asymptotic_bool(w, this.gPlayerCameraState.pos[1] + 110.0, 0.1)
+        c.focus[1] = w.current; w.current = c.focus[2]; this.approach_f32_asymptotic_bool(w, this.gPlayerCameraState.pos[2], 0.1)
+        c.focus[2] = w.current
+    }
+
+    cutscene_cap_switch_press_pan_left(c) {
+        vec3f_copy(c.focus, this.gPlayerCameraState.pos)
+        c.focus[1] += 110.0
+        const wrapper = {current: this.sCutsceneVars[9].angle[1]}
+        this.camera_approach_s16_symmetric_bool(wrapper, 0x800, 0x20)
+        this.pan_camera(c, this.sCutsceneVars[0].angle[0], this.sCutsceneVars[0].angle[1])
+    }
+
+    /**
+     * Create a dialog box with the cap switch's text.
+     */
+    cutscene_cap_switch_press_create_dialog(c) {
+        create_dialog_box_with_response(this.gCutsceneFocus.rawData[oBehParams2ndByte] + DIALOG_010)
+    }
+
+    /**
+     * Cutscene that plays when Mario presses a cap switch.
+     */
+    cutscene_cap_switch_press(c) {
+        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
+        this.sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
+
+        this.cutscene_cap_switch_press_start = this.cutscene_cap_switch_press_start.bind(this)
+        this.cutscene_cap_switch_press_approach_mario = this.cutscene_cap_switch_press_approach_mario.bind(this)
+        this.cutscene_cap_switch_press_pan_left = this.cutscene_cap_switch_press_pan_left.bind(this)
+        this.cutscene_cap_switch_press_rotate_around_mario = this.cutscene_cap_switch_press_rotate_around_mario.bind(this)
+        this.cutscene_cap_switch_press_lower_cam = this.cutscene_cap_switch_press_lower_cam.bind(this)
+        this.cutscene_cap_switch_press_create_dialog = this.cutscene_cap_switch_press_create_dialog.bind(this)
+        this.cutscene_event(this.cutscene_cap_switch_press_start, c, 0, 0);
+        this.cutscene_event(this.cutscene_cap_switch_press_approach_mario, c, 0, 30);
+        this.cutscene_event(this.cutscene_cap_switch_press_pan_left, c, 0, -1);
+        this.cutscene_event(this.cutscene_cap_switch_press_rotate_around_mario, c, 30, -1);
+        this.cutscene_event(this.cutscene_cap_switch_press_lower_cam, c, 10, 70);
+        this.cutscene_event(this.cutscene_cap_switch_press_create_dialog, c, 10, 10);
+        vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, {})
+
+        if (IngameMenu.gDialogResponse != DIALOG_RESPONSE_NONE) this.sCutsceneVars[4].angle[0] = IngameMenu.gDialogResponse
+
+        if (IngameMenu.get_dialog_id() == DIALOG_NONE && this.sCutsceneVars[4].angle[0] != 0) {
+            this.sCutsceneDialogResponse = this.sCutsceneVars[4].angle[0]
+            if (this.sCutsceneVars[4].angle[0] == 1) this.cap_switch_save(this.gCutsceneFocus.rawData[oBehParams2ndByte])
+            this.stop_cutscene_and_retrieve_stored_info(c)
+            this.transition_next_state(c, 30)
+        }
+    }
+
+    /**
+     * Sets cvars:
+     * cvar0 is the camera's position
+     * cvar1 is the camera's focus
+     * cvar2 is the goal position
+     * cvar3 is the goal focus
+     */
+    cutscene_unlock_key_door_start(c) {
+        let posOff = [0, 0, 0]
+        let focusOff = [0, 0, 0]
+
+        this.vec3f_copy(this.sCutsceneVars[0].point, c.pos)
+        this.vec3f_copy(this.sCutsceneVars[1].point, c.focus)
+        MathUtil.vec3f_set(posOff, -206.0, 108.0, 234.0)
+        MathUtil.vec3f_set(focusOff, 48.0, 104.0, -193.0)
+        this.offset_rotated(this.sCutsceneVars[2].point, this.gPlayerCameraState.pos, posOff, this.gPlayerCameraState.faceAngle)
+        this.offset_rotated(this.sCutsceneVars[3].point, this.gPlayerCameraState.pos, focusOff, this.gPlayerCameraState.faceAngle)
+    }
+
+    /**
+     * Move the camera to the cvars position and focus, closer to Mario.
+     * Gives a better view of the key.
+     */
+    cutscene_unlock_key_door_approach_mario(c) {
+        this.approach_vec3f_asymptotic(c.pos, this.sCutsceneVars[2].point, 0.1, 0.1, 0.1)
+        this.approach_vec3f_asymptotic(c.focus, this.sCutsceneVars[3].point, 0.1, 0.1, 0.1)
+    }
+
+    cutscene_unlock_key_door_focus_lock(c) {
+        const wrapper = { current: this.sCutsceneVars[3].point[1] }
+        this.approach_f32_asymptotic_bool(wrapper, this.gPlayerCameraState.pos[1] + 140.0, 0.07)
+        this.sCutsceneVars[3].point[1] = wrapper.current
+    }
+
+    /**
+     * Move back to the previous pos and focus, stored in cvar0 and cvar1.
+     */
+    cutscene_unlock_key_door_fly_back(c) {
+        this.approach_vec3f_asymptotic(c.pos, this.sCutsceneVars[0].point, 0.1, 0.1, 0.1)
+        this.approach_vec3f_asymptotic(c.focus, this.sCutsceneVars[1].point, 0.1, 0.1, 0.1)
+    }
+
+    /**
+     * Shake the camera's fov when the key is put in the lock.
+     */
+    cutscene_unlock_key_door_fov_shake(c) {
+        this.cutscene_set_fov_shake_preset(1)
+    }
+
+    /**
+     * Cutscene that plays when Mario unlocks a key door.
+     */
+    cutscene_unlock_key_door(c) {
+        this.cutscene_unlock_key_door_start = this.cutscene_unlock_key_door_start.bind(this)
+        this.cutscene_unlock_key_door_approach_mario = this.cutscene_unlock_key_door_approach_mario.bind(this)
+        this.cutscene_unlock_key_door_fly_back = this.cutscene_unlock_key_door_fly_back.bind(this)
+        this.cutscene_unlock_key_door_fov_shake = this.cutscene_unlock_key_door_fov_shake.bind(this)
+        this.cutscene_unlock_key_door_focus_lock = this.cutscene_unlock_key_door_focus_lock.bind(this)
+        this.cutscene_event(this.cutscene_unlock_key_door_start, c, 0, 0);
+        this.cutscene_event(this.cutscene_unlock_key_door_approach_mario, c, 0, 123);
+        this.cutscene_event(this.cutscene_unlock_key_door_fly_back, c, 124, -1);
+        this.cutscene_event(this.cutscene_unlock_key_door_fov_shake, c, 79, 79);
+        this.cutscene_event(this.cutscene_unlock_key_door_focus_lock, c, 70, 110);
+    }
+
+    /**
+     * Move the camera along `positionSpline` and point its focus at the corresponding point along
+     * `focusSpline`. sCutsceneSplineSegmentProgress is updated after pos and focus are calculated.
+     */
     intro_peach_move_camera_start_to_pipe(c, positionSpline, focusSpline) {
         let offset = [0, 0, 0];
         let posReturn = 0;

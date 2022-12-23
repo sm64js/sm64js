@@ -105,6 +105,7 @@ class IngameMenu {
         this.gDialogID = -1
         this.gDialogVariable = 0
         this.gDialogBoxType = 0
+        this.gDialogResponse = DIALOG_RESPONSE_NONE
     }
 
     // This is probably incorrect. I'm not sure what kind of identity matrix should be created here

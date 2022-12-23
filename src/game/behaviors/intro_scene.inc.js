@@ -1,6 +1,6 @@
 // intro_scene.inc.js
 
-import { MODEL_BIRDS, MODEL_LAKITU } from "../../include/model_ids";
+import { MODEL_BIRDS, MODEL_LAKITU, MODEL_PEACH } from "../../include/model_ids";
 import { oEndBirdUnk104, oForwardVel, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oPosX, oPosY, oPosZ } from "../../include/object_constants";
 import { random_float } from "../../utils";
 import { spawn_object } from "../ObjectHelpers";
@@ -72,3 +72,5 @@ export const bhv_intro_scene_loop = () => {
         Camera.gCutsceneObjSpawn = 0;
     }
 }
+
+gLinker.bhv_intro_scene_loop = bhv_intro_scene_loop

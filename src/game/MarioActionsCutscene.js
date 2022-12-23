@@ -39,7 +39,7 @@ import {
 } from "../engine/math_util"
 
 import {
-    enable_time_stop, disable_time_stop, spawn_object
+    enable_time_stop, disable_time_stop, spawn_object, spawn_object_abs_with_rot
 } from "./ObjectHelpers"
 
 import {
@@ -148,6 +148,7 @@ import {
 import { MARIO_EYES_DEAD, MARIO_HAND_PEACE_SIGN, MARIO_HAND_OPEN, MARIO_EYES_HALF_CLOSED } from "../include/mario_geo_switch_case_ids"
 
 import {
+    MODEL_CASTLE_GROUNDS_WARP_PIPE,
     MODEL_STAR
 } from "../include/model_ids"
 
@@ -181,7 +182,7 @@ import { COURSE_BITDW, COURSE_BITFS } from "../levels/course_defines"
 
 import { play_sound } from "../audio/external"
 
-import { CameraInstance as Camera } from "./Camera"
+import { CameraInstance as Camera, CAM_EVENT_START_INTRO } from "./Camera"
 import { play_mario_heavy_landing_sound } from "./Mario"
 
 let sIntroWarpPipeObj = null
@@ -208,8 +209,8 @@ export const MARIO_DIALOG_STATUS_SPEAK = 2
 
 // // related to peach gfx?
 // static s8 D_8032CBE4 = 0
-// static s8 D_8032CBE8 = 0
-// static s8 D_8032CBEC[7] = { 2, 3, 2, 1, 2, 3, 2 }
+let D_8032CBE8 = 0
+let D_8032CBEC = [ 2, 3, 2, 1, 2, 3, 2 ]
 
 // static let /*u8*/ sStarsNeededForDialog[] = { 1, 3, 8, 30, 50, 70 }
 
@@ -357,26 +358,26 @@ export const MARIO_DIALOG_STATUS_SPEAK = 2
 //     }
 // }
 
-// // Geo switch case function for controlling Peach's eye state.
-// export const geo_switch_peach_eyes = (run, node, a2) => {
-//     struct GraphNodeSwitchCase *switchCase = (struct GraphNodeSwitchCase *) node
-//     let /*s16*/ timer
+// Geo switch case function for controlling Peach's eye state.
+export const geo_switch_peach_eyes = (run, node, a2) => {
+    let switchCase = node
+    let /*s16*/ timer
 
-//     if (run == 1) {
-//         if (D_8032CBE4 == 0) {
-//             timer = (gAreaUpdateCounter + 0x20) >> 1 & 0x1F
-//             if (timer < 7) {
-//                 switchCase.selectedCase = D_8032CBE8 * 4 + D_8032CBEC[timer]
-//             } else {
-//                 switchCase.selectedCase = D_8032CBE8 * 4 + 1
-//             }
-//         } else {
-//             switchCase.selectedCase = D_8032CBE8 * 4 + D_8032CBE4 - 1
-//         }
-//     }
+    if (run == 1) {
+        if (D_8032CBE4 == 0) {
+            timer = (gLinker.GeoRenderer.gAreaUpdateCounter + 0x20) >> 1 & 0x1F
+            if (timer < 7) {
+                switchCase.selectedCase = D_8032CBE8 * 4 + D_8032CBEC[timer]
+            } else {
+                switchCase.selectedCase = D_8032CBE8 * 4 + 1
+            }
+        } else {
+            switchCase.selectedCase = D_8032CBE8 * 4 + D_8032CBE4 - 1
+        }
+    }
 
-//     return false
-// }
+    return false
+}
 
 // // unused
 // const stub_is_textbox_active = (a0) => {
@@ -1809,35 +1810,28 @@ const advance_cutscene_step = (m) => {
 }
 
 const intro_cutscene_hide_hud_and_mario = (m) => {
-    gHudDisplay.flags = HUD_DISPLAY_NONE
+    LevelUpdate.gHudDisplay.flags = LevelUpdate.HUD_DISPLAY_NONE
     m.statusForCamera.cameraEvent = CAM_EVENT_START_INTRO
     m.marioObj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
     advance_cutscene_step(m)
 }
 
-// #ifdef VERSION_EU
-//     #define TIMER_SPAWN_PIPE 47
-// #else
-//     #define TIMER_SPAWN_PIPE 37
-// #endif
+const TIMER_SPAWN_PIPE = 37
 
-// const intro_cutscene_peach_lakitu_scene = (m) => {
-//     if (m.statusForCamera.cameraEvent != CAM_EVENT_START_INTRO) {
-//         if (m.actionTimer++ == TIMER_SPAWN_PIPE) {
-//             sIntroWarpPipeObj =
-//                 spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_CASTLE_GROUNDS_WARP_PIPE,
-//                                           bhvStaticObject, -1328, 60, 4664, 0, 180, 0)
-//             advance_cutscene_step(m)
-//         }
-//     }
-// }
-// #undef TIMER_SPAWN_PIPE
+const intro_cutscene_peach_lakitu_scene = (m) => {
+    const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
+    if (m.statusForCamera.cameraEvent != CAM_EVENT_START_INTRO) {
+        if (m.actionTimer == TIMER_SPAWN_PIPE) {
+            sIntroWarpPipeObj =
+                spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_CASTLE_GROUNDS_WARP_PIPE,
+                                          gLinker.behaviors.bhvStaticObject, -1328, 60, 4664, 0, 180, 0)
+            advance_cutscene_step(m)
+        }
+        m.actionTimer++
+    }
+}
 
-// #ifdef VERSION_EU
-//     #define TIMER_RAISE_PIPE 28
-// #else
-//     #define TIMER_RAISE_PIPE 38
-// #endif
+const TIMER_RAISE_PIPE = 38
 
 // const intro_cutscene_raise_pipe = (m) => {
 //     sIntroWarpPipeObj.rawData[oPosY] = camera_approach_f32_symmetric(sIntroWarpPipeObj.rawData[oPosY], 260.0, 10.0)

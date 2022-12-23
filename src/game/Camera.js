@@ -20,7 +20,7 @@ import { CELL_HEIGHT_LIMIT, FLOOR_LOWER_LIMIT, SURFACE_DEATH_PLANE, SURFACE_IS_P
 import { sins, s16, int16, coss } from "../utils"
 import { HudInstance as Hud } from "./Hud"
 import { DIALOG_RESPONSE_NONE } from "./IngameMenu"
-import { DIALOG_001, DIALOG_NONE } from "../text/us/dialogs"
+import { DIALOG_001, DIALOG_020, DIALOG_NONE } from "../text/us/dialogs"
 import { gLastCompletedStarNum } from "./SaveFile"
 import { COURSE_MAX, COURSE_NONE } from "../levels/course_defines"
 import { level_defines } from "../levels/level_defines_constants"
@@ -30,7 +30,7 @@ import {
     seq_player_lower_volume, SEQ_PLAYER_LEVEL, seq_player_unlower_volume,
     play_sound, gGlobalSoundSource
 } from "../audio/external"
-import { SOUND_MENU_CAMERA_ZOOM_OUT, SOUND_MENU_CAMERA_ZOOM_IN } from "../include/sounds"
+import { SOUND_MENU_CAMERA_ZOOM_OUT, SOUND_MENU_CAMERA_ZOOM_IN, SOUND_PEACH_DEAR_MARIO } from "../include/sounds"
 import { ACT_BUTT_STUCK_IN_GROUND } from "./Mario"
 import { ACT_HEAD_STUCK_IN_GROUND } from "./Mario"
 import { ACT_FEET_STUCK_IN_GROUND } from "./Mario"
@@ -1274,7 +1274,7 @@ class Camera {
             // [ CUTSCENE_DEATH_EXIT, this.sCutsceneDeathExit ],
             [ CUTSCENE_EXIT_PAINTING_SUCC, this.sCutsceneExitPaintingSuccess ],
             // [ CUTSCENE_UNUSED_EXIT,  this.sCutsceneUnusedExit ],
-            // [ CUTSCENE_INTRO_PEACH, this.sCutsceneIntroPeach ],
+            [ CUTSCENE_INTRO_PEACH, this.sCutsceneIntroPeach ],
             // [ CUTSCENE_ENTER_BOWSER_ARENA, this.sCutsceneEnterBowserArena ],
             // [ CUTSCENE_DANCE_ROTATE, this.sCutsceneDanceDefaultRotate ],
             // [ CUTSCENE_DANCE_DEFAULT, this.sCutsceneDanceDefaultRotate ],
@@ -3140,7 +3140,7 @@ class Camera {
      * Used by close and free roam modes
      */
     mode_default_camera(c) {
-        this.sFOVState.fovFunc = CAM_FOV_DEFAULT
+        this.set_fov_function(CAM_FOV_DEFAULT);
         c.nextYaw = this.update_default_camera(c)
         this.pan_ahead_of_player(c)
     }
@@ -7691,11 +7691,52 @@ class Camera {
         c.cutscene = 0
     }
 
+    intro_peach_move_camera_start_to_pipe(c, positionSpline, focusSpline) {
+        let offset = [0, 0, 0];
+        let posReturn = 0;
+        let focusReturn = 0;
+
+        /**
+         * The position spline's speed parameters are all 0, so sCutsceneSplineSegmentProgress doesn't get
+         * updated. Otherwise position would move two frames ahead, and c->focus would always be one frame
+         * further along the spline than c->pos.
+         */
+        const wrapper = {splineSegment: this.sCutsceneSplineSegment, progress: this.sCutsceneSplineSegmentProgress}
+        posReturn = this.move_point_along_spline(c.pos, positionSpline, wrapper)
+        focusReturn = this.move_point_along_spline(c.focus, focusSpline, wrapper)
+        this.sCutsceneSplineSegment = wrapper.splineSegment; this.sCutsceneSplineSegmentProgress = wrapper.progress;
+
+        // The two splines used by this function are reflected in the horizontal plane for some reason,
+        // so they are rotated every frame. Why do this, Nintendo?
+        this.rotate_in_xz(c.focus, c.focus, DEGREES(-180));
+        this.rotate_in_xz(c.pos, c.pos, DEGREES(-180));
+        
+        vec3f_set(offset, -1328.0, 260.0, 4664.0)
+        MathUtil.vec3f_add(c.focus, offset)
+        MathUtil.vec3f_add(c.pos, offset)
+        return focusReturn;
+    }
+
+    peach_letter_text(c) {
+        IngameMenu.create_dialog_box(DIALOG_020);
+    }
+
+    play_sound_peach_reading_letter(c) {
+        play_sound(SOUND_PEACH_DEAR_MARIO, gGlobalSoundSource);
+    }
+
+    cutscene_intro_peach_start_to_pipe_spline(c) {
+        if (this.intro_peach_move_camera_start_to_pipe(c, this.sIntroPipeToDialogPosition, this.sIntroPipeToDialogFocus) != 0) {
+            this.gCameraMovementFlags &= ~CAM_MOVE_C_UP_MODE;
+            this.gCutsceneTimer = CUTSCENE_LOOP;
+        }
+    }
+
     /**
      * Loop the cutscene until Mario exits the dialog.
      */ 
     cutscene_intro_peach_dialog(c) {
-        if (get_dialog_id() == DIALOG_NONE) {
+        if (IngameMenu.get_dialog_id() == DIALOG_NONE) {
             vec3f_copy(this.gLakituState.goalPos, c.pos)
             vec3f_copy(this.gLakituState.goalFocus, c.focus);
             this.sStatusFlags |= (CAM_FLAG_SMOOTH_MOVEMENT | CAM_FLAG_UNUSED_CUTSCENE_ACTIVE)
@@ -7717,7 +7758,7 @@ class Camera {
      * Set fov to 8 degrees, then zoom out to 30.
      */
     cutscene_intro_peach_zoom_fov(c) {
-        this.sFOVState = 8.0
+        this.sFOVState.fovFunc = 8.0
         this.set_fov_function(CAM_FOV_ZOOM_30);
     }
 
@@ -7803,7 +7844,7 @@ class Camera {
         this.cutscene_event(this.peach_letter_text, c, 65, 65)
         this.cutscene_event(this.play_sound_peach_reading_letter, c, 83, 83)
 
-        if (this.gCutsceneTimer > 120 && get_dialog_id() == DIALOG_NONE) this.gCutsceneTimer = CUTSCENE_LOOP
+        if (this.gCutsceneTimer > 120 && IngameMenu.get_dialog_id() == DIALOG_NONE) this.gCutsceneTimer = CUTSCENE_LOOP
 
         this.clamp_pitch(c.pos, c.focus, 0x3B00, -0x3B00)
     }

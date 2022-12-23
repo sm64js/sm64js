@@ -35,7 +35,8 @@ import { oDamageOrCoinValue, oAnimState, oInteractType, oInteractionSubtype, oAn
          ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_BUBBLE, ACTIVE_PARTICLE_WATER_SPLASH,
          ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH, ACTIVE_PARTICLE_SHALLOW_WATER_WAVE,
          ACTIVE_PARTICLE_WAVE_TRAIL, ACTIVE_PARTICLE_PLUNGE_BUBBLE,
-         ACTIVE_PARTICLE_SPARKLES
+         ACTIVE_PARTICLE_SPARKLES,
+         OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE
 } from "../include/object_constants"
 
 import { MODEL_WOODEN_POST, MODEL_MIST, MODEL_SMOKE, MODEL_BUBBLE, MODEL_CANNON_BARREL,
@@ -84,6 +85,8 @@ import * as _flamethrower             from "./behaviors/flamethrower.inc"
 import * as _flying_bookend_switch    from "./behaviors/flying_bookend_switch.inc"
 import * as _goomba                   from "./behaviors/goomba.inc"
 import * as _haunted_chair            from "./behaviors/haunted_chair.inc"
+import * as _intro_peach              from "./behaviors/intro_peach.inc"
+import * as _intro_scene              from "./behaviors/intro_scene.inc"
 import * as _king_bobomb              from "./behaviors/king_bobomb.inc"
 import * as _koopa_shell_underwater   from "./behaviors/koopa_shell_underwater.inc"
 import * as _mad_piano                from "./behaviors/mad_piano.inc"
@@ -165,6 +168,7 @@ import { bbh_seg7_collision_haunted_bookshelf } from "../levels/bbh/moving_books
 import { bookend_seg5_anims_05002540 } from "../actors/bookend/anims.inc"
 import { mad_piano_seg5_anims_05009B14 } from "../actors/mad_piano/anims.inc"
 import { chair_seg5_anims_05005784 } from "../actors/chair/anims.inc"
+import { peach_seg5_anims_0501C41C } from "../actors/peach/anims.inc"
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
 export const OBJ_LIST_DESTRUCTIVE = 2 //  (2) things that can be used to destroy other objects, like
@@ -2650,6 +2654,44 @@ export const bhvMerryGoRound = [
     END_LOOP(),
 ]
 
+export const bhvBeginningPeach = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_ANIMATIONS(oAnimations, peach_seg5_anims_0501C41C),
+    ANIMATE(0),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_intro_peach_loop'),
+    END_LOOP(),
+]
+
+export const bhvEndBirds1 = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, birds_seg5_anims_050009E8),
+    ANIMATE(0),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_end_birds_1_loop'),
+    END_LOOP(),
+];
+
+export const bhvEndBirds2 = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, birds_seg5_anims_050009E8),
+    ANIMATE(0),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_end_birds_2_loop'),
+    END_LOOP(),
+];
+
+export const bhvIntroScene = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_intro_scene_loop'),
+    END_LOOP(),
+];
+
 const bhvAmbientSounds = [
     BREAK(),
 ]
@@ -2672,6 +2714,7 @@ gLinker.behaviors.bhvAirborneWarp = bhvAirborneWarp
 gLinker.behaviors.bhvArrowLift = bhvArrowLift
 gLinker.behaviors.bhvBalconyBigBoo = bhvBalconyBigBoo
 gLinker.behaviors.bhvBbhTumblingBridge = bhvBbhTumblingBridge
+gLinker.behaviors.bhvBeginningPeach = bhvBeginningPeach
 gLinker.behaviors.bhvBigBully = bhvBigBully
 gLinker.behaviors.bhvBigBullyWithMinions = bhvBigBullyWithMinions
 gLinker.behaviors.bhvBird = bhvBird
@@ -2727,6 +2770,8 @@ gLinker.behaviors.bhvDddWarp = bhvDddWarp
 gLinker.behaviors.bhvDeathWarp = bhvDeathWarp
 gLinker.behaviors.bhvDoor = bhvDoor
 gLinker.behaviors.bhvDoorWarp = bhvDoorWarp
+gLinker.behaviors.bhvEndBirds1 = bhvEndBirds1
+gLinker.behaviors.bhvEndBirds2 = bhvEndBirds2
 gLinker.behaviors.bhvExclamationBox = bhvExclamationBox
 gLinker.behaviors.bhvExplosion = bhvExplosion
 // gLinker.behaviors.bhvFadingWarp = bhvFadingWarp
@@ -2761,6 +2806,7 @@ gLinker.behaviors.bhvHorStarParticleSpawner = bhvHorStarParticleSpawner
 gLinker.behaviors.bhvHomingAmp = bhvHomingAmp
 gLinker.behaviors.bhvIdleWaterWave = bhvIdleWaterWave
 gLinker.behaviors.bhvInstantActiveWarp = bhvInstantActiveWarp
+gLinker.behaviors.bhvIntroScene = bhvIntroScene
 gLinker.behaviors.bhvInvisibleObjectsUnderBridge = bhvInvisibleObjectsUnderBridge
 gLinker.behaviors.bhvJumpingBox = bhvJumpingBox
 gLinker.behaviors.bhvKingBobomb = bhvKingBobomb

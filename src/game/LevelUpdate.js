@@ -332,7 +332,8 @@ class LevelUpdate {
                     Mario.set_mario_action(this.gMarioState, ACT_IDLE, 0)
                 } else if (true) { // !gDebugLevelSelect) {
                     if (this.gMarioState.action != ACT_UNINITIALIZED) {
-                        if (true) { // save_file_exists(gCurrSaveFileNum - 1)) {
+                        // CHANGE TO FALSE TO TEST INTRO //
+                        if (false) { // save_file_exists(gCurrSaveFileNum - 1)) {
                             Mario.set_mario_action(this.gMarioState, ACT_IDLE, 0)
                         } else {
                             Mario.set_mario_action(this.gMarioState, ACT_INTRO_CUTSCENE, 0)

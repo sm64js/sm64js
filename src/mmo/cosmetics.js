@@ -406,10 +406,10 @@ export const updateRainbowSkin = () => {
 	rainbowLights[5] = parseInt(rainbowLights[5]);
 }
 
-document.getElementById('playerNameForm').onsubmit = (e) => {
-    e.preventDefault()
-    submitPlayerName()
-}
+// document.getElementById('playerNameForm').onsubmit = (e) => {
+//     e.preventDefault()
+//     submitPlayerName()
+// }
 
 window.updatePlayerName = (name) => {
     if (name.trim().length < 3) {

@@ -38,7 +38,7 @@ npm run start
 - Go to https://localhost:9300 and start developing in your IDE.
 
 When you do code changes, Webpack-Dev-Server will automatically rebuild and reload the page.
-You can now start developing against a staging environment at https://sm64js-dev.smmdb.net,
+You can now start developing against a staging environment,
 which should be kept up to date.
 This staging environment is only set up for client-only development and logins will only work,
 if accessed from https://localhost:9300.

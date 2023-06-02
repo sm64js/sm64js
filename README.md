@@ -1,15 +1,5 @@
 # sm64js
 
-## Read
-After all of the memories made, the sm64js team has come to a mutual decision to shut it down.</h1>
-
-The game has over the years, slowly become harder and harder to moderate with less and less reason to do so. A lot of memories have been made on sm64js however, from gang wars in 2020 to wars to capture the flag/star in later years. The community has shrunk more and more to the point where keeping sm64js alive is becoming less and less reasonable nowadays. sm64js was great in its glory days but it's time to move on and seek better things now.
-
--X
-
-## Read part 2
-(This repository is still relevant! Feel free to fork it or run your own server.)
-
 ## Links
 
 [Main Website: sm64js.com](https://sm64js.com)

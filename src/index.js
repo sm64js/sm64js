@@ -353,28 +353,28 @@ const rulesVersion = 16
 let gameStarted = false
 export { gameStarted }
 
-// if (localStorage['rules'] == rulesVersion) {
-//     document.getElementById("rules").hidden = true
-//     document.getElementById("signboxBorder").classList.remove("shunned")
-//     document.getElementById("signboxBorder").disabled = false
-// } else {
-//     document.getElementById("rules").hidden = false
-// }
+if (localStorage['rules'] == rulesVersion) {
+    document.getElementById("rules").hidden = true
+    document.getElementById("signboxBorder").classList.remove("shunned")
+    document.getElementById("signboxBorder").disabled = false
+} else {
+    document.getElementById("rules").hidden = false
+}
 
-// document.getElementById("startbutton").addEventListener('click', () => {
-//     if (gameStarted) {
-//         url_params.set('autostart', 1)
-//         window.location.search = url_params /// Refresh page (Reset Game)
-//     }
-//     else startGame()
-// })
+document.getElementById("startbutton").addEventListener('click', () => {
+    if (gameStarted) {
+        url_params.set('autostart', 1)
+        window.location.search = url_params /// Refresh page (Reset Game)
+    }
+    else startGame()
+})
 
-// document.getElementById("acceptRules").addEventListener('click', () => {
+document.getElementById("acceptRules").addEventListener('click', () => {
     localStorage.setItem("rules", rulesVersion)
     document.getElementById("rules").hidden = true
     document.getElementById("signboxBorder").classList.remove("shunned")
     document.getElementById("signboxBorder").disabled = false
-// })
+})
 
 window.deleteRom = () => {
     IDB.del('assets')

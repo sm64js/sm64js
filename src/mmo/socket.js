@@ -503,7 +503,7 @@ const googleOAuthURL = "https://accounts.google.com/o/oauth2/v2/auth?response_ty
 
 if (url.searchParams.has('code')) document.getElementById("signinButtons").hidden = true
 
-/*document.getElementById("switchCustom").addEventListener('click', (e) => {
+document.getElementById("switchCustom").addEventListener('click', (e) => {
     e.preventDefault()
     document.getElementById("customNameRow").hidden = false
     document.getElementById("discordNameRow").hidden = true
@@ -538,7 +538,7 @@ document.getElementById("logoutButton").addEventListener('click', async () => {
         document.getElementById("signinButtons").hidden = false
         document.getElementById("logoutButton").hidden = true
     }
-})*/
+})
 
 export const recvAuthorizedUser = async (res) => {
     if (res.ok) {

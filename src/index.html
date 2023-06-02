@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en_US" xmlns="https://html.spec.whatwg.org/multipage/">
+
 <head>
     <meta charset="utf-8" />
     <title>sm64js</title>
@@ -19,159 +20,342 @@
     <!-- Rules pop up -->
     <div id="rules" hidden>
         <img src="/mmo/assets/logo_colored.png" class="rulesLogo" alt="sm64js Logo">
-        <p style="text-align: center;">Welcome to the multiplayer version of sm64js! To play you have to follow the listed rules below.</p>
+        <p style="text-align: center;">Welcome to the multiplayer version of sm64js! To play you have to follow the
+            listed rules below.</p>
         <hr>
         <p>Treat all users with respect.</p>
-        <p>Keep chat messages appropriate and safe for school/work, swearing will be censored, do not evade the filter. Slurs, the r word and vulgar language are also disallowed.</p>
+        <p>Keep chat messages appropriate and safe for school/work, swearing will be censored, do not evade the filter.
+            Slurs, the r word and vulgar language are also disallowed.</p>
         <p>Don't share information on how to illegally obtain any copyrighted material such as ROMs or ROM assets</p>
         <p>Inappropriate or offensive behavior may result in temporary or permanent mute or ban</p>
         <br>
-        <p>Failure to comply with these rules will result in punishment, including but not limited to a mute or ban of your account.</p>
-        <button type="button" class="rulesButton" id="acceptRules"><div class="sm64button">I have read the rules and will follow them.</div></button>
+        <p>Failure to comply with these rules will result in punishment, including but not limited to a mute or ban of
+            your account.</p>
+        <button type="button" class="rulesButton" id="acceptRules">
+            <div class="sm64button">I have read the rules and will follow them.</div>
+        </button>
         <br>
         <hr>
-        <p>If you are looking for a more completed version of sm64js without MMO or custom features, check out<a style="color: blue;" href="https://Agent-11.github.io/projects/sm64js">vanilla</a>.</p>
+        <p>If you are looking for a more completed version of sm64js without MMO or custom features, check out<a
+                style="color: blue;" href="https://Agent-11.github.io/projects/sm64js">vanilla</a>.</p>
     </div>
 
     <canvas hidden id="fullCanvas" width="1280" height="720" style="background-color: black;"></canvas>
 
     <!-- Main content of the site-->
     <main hidden id="mainContent">
-    <div class="siteMargins">
-        <!-- Title -->
-       <img id="title" src="/mmo/assets/title.png">
+        <div class="siteMargins">
+            <!-- Title -->
+            <img id="title" src="/mmo/assets/title.png">
 
-        <br />
-        <br />
-        
-        <!-- Start of signboxBackground -->
-        <div id="signboxBorder" class="shunned">
-            <div id="signboxBackground">
-                <div id="yellowControls">
-                    <h1 class="dropShadow">After all of the memories made, the sm64js team has come to a mutual decision to shut it down.</h1>
-                    <h2 class="dropShadow">The game has over the years, slowly become harder and harder to moderate with less and less reason to do so. A lot of memories have been made on sm64js however, from gang wars in 2020 to wars to capture the flag/star in later years. The community has shrunk more and more to the point where keeping sm64js alive is becoming less and less reasonable nowadays. sm64js was great in its glory days but it's time to move on and seek better things now.</h2>
-                    <h2 class="dropShadow">Thank you for understanding, goodbye.</h2>
+            <br />
+            <br />
+
+            <!-- Start of signboxBackground -->
+            <div id="signboxBorder" class="shunned">
+                <div id="signboxBackground">
+                    <div id="signboxMargin">
+                        <!-- Main buttons & settings -->
+                        <!-- Divs are used as rows here -->
+                        <div> <!-- This is row 1 for example -->
+                            <button id="startbutton" type="button" class="green-button" disabled>
+                                <div class="sm64button">Start Game</div>
+                            </button>
+                            <button id="hudButton" class="pink-button" onclick="window.hideHUD(this)">
+                                <div class="sm64button">Hide HUD</div>
+                            </button>
+                            <button id="freezeButton" class="blue-button" onclick="window.freezeCamera(this)">
+                                <div class="sm64button">Freeze Camera (OFF)</div>
+                            </button>
+                        </div>
+
+                        <!-- Sign in / sign out section, Map select-->
+                        <div id="signinSection">
+                            <!-- Sign in buttons -->
+                            <div id="signinButtons" style="justify-content:center; margin-top: 10px;">
+                                <img style="cursor: pointer;" id="discordSigninButton"
+                                    src="/mmo/assets/discord_signin.png" width="240" style="margin-left:15px;">
+                                <img style="cursor: pointer;" id="googleSigninButton"
+                                    src="/mmo/assets/google_signin.png" width="240" style="margin-left:15px;">
+                            </div>
+
+                            <!-- Player name section -->
+                            <div hidden id="playerNameRow">
+                                <!-- Sign out button -->
+                                <button id="logoutButton" type="submit" class="red-button">
+                                    <div class="sm64button">
+                                        Sign out
+                                    </div>
+                                </button>
+                                <br />
+                                <br />
+                                <form id="playerNameForm">
+
+                                    <!-- Discord name -->
+                                    <div id="discordNameRow">
+                                        <label type="text">Discord Name: </label>
+
+                                        <input class="textInput nameInput" readonly id="discordNameBox" type="text"
+                                            minlength="3" maxlength="20">
+
+                                        <button id="switchCustom" type="button" class="yellow-button">
+                                            <div class="sm64button">Use Custom Name</div>
+                                        </button>
+
+                                    </div>
+                                    <!-- End discord name -->
+
+                                    <!-- Custom name -->
+                                    <div hidden id="customNameRow">
+                                        <label type="text">Custom Name: </label>
+
+                                        <input class="textInput nameInput" id="playerNameInput" type="text"
+                                            minlength="3" maxlength="14" placeholder="Enter name here"
+                                            onchange="window.updatePlayerName(this.value)">
+
+                                        <button id="switchDiscord" type="button" class="blue-button">
+                                            <div class="sm64button">Use Discord Name</div>
+                                        </button>
+
+                                    </div>
+                                    <!-- End custom name -->
+                                    <!-- Map select -->
+                                    <div class="mapSelectDiv">
+
+                                        <label type="text" readonly>Select Map: </label>
+                                        <br>
+
+                                        <!-- Map selection list, add newer custom levels in here -->
+                                        <div>
+
+                                            <select id="mapSelect">
+                                                <optgroup label="Vanilla maps">
+                                                    <option value="16"> Castle Grounds </option>
+                                                    <option value="6"> Castle Inside First Level </option>
+                                                    <option value="602"> Castle Inside Second Level </option>
+                                                    <option value="26"> Castle Courtyard </option>
+                                                    <option value="9"> Bob-omb Battlefield </option>
+                                                    <option value="24"> Whomp's Fortress </option>
+                                                    <option value="5"> Cool, Cool Mountain </option>
+                                                    <option value="56"> Cool, Cool Mountain Slide </option>
+                                                    <option value="27"> Princess's Secret Slide </option>
+                                                    <option value="29"> Tower of the Wing Cap</option>
+                                                    <option value="4"> Big Boo's Haunt </option>
+                                                    <option value="7"> Hazy Maze Cave </option>
+                                                    <option value="8"> Shifting Sand Land </option>
+                                                    <option value="36"> Tall, Tall Mountain </option>
+                                                    <option value="10"> Snowman's Land </option>
+                                                </optgroup>
+
+                                                <optgroup label="Custom maps">
+                                                    <option value="1000"> Mushroom Battlefield </option>
+                                                    <option value="1004"> Mushroom Raceway </option>
+                                                    <option value="1006"> Dolphin Town </option>
+                                                    <option value="1001"> CTF/Race Map </option>
+                                                    <option value="1002"> Starman Fortress </option>
+                                                    <option value="1003"> Glider Jungle </option>
+                                                    <option value="999"> Clouded Ruins </option>
+                                                </optgroup>
+
+                                            </select>
+
+                                            <button id="playerNameButton" type="submit" class="green-button">
+                                                <div class="sm64button">
+                                                    Submit
+                                                </div>
+                                            </button>
+
+                                        </div>
+
+
+                                        <div>
+                                            <label id="playerNameResult" type="text" readonly
+                                                style="display: none;">Waiting for selection</label>
+                                        </div>
+                                    </div>
+                                    <!-- End map select -->
+
+                                </form>
+                            </div> <!-- End player name section -->
+
+                            <!-- Authentification failed message -->
+                            <h6 hidden id="authFailMsg" style="color:red"></h6> <!-- This is row 2 and so on -->
+                        </div>
+
+                        <!-- In-game options -->
+                        <div>
+                            <button type="button" id="pvpButton" class="pink-button" onclick="window.togglePvp()">
+                                <div class="sm64button">
+                                    PvP: On
+                                </div>
+                            </button>
+                            <button type="button" id="respawnButton" class="respawnButton"
+                                onclick="window.sm64js.reset = true">
+                                Respawn
+                            </button>
+                        </div>
+
+                        <!-- Controls and customization -->
+                        <div id="yellowControls">
+                            <button type="button" class="green-button" data-placement="bottom"
+                                onclick="window.switchbox('controlsbox')">
+                                <div class="sm64button">
+                                    Customize Controls
+                                </div>
+                            </button>
+
+                            <button type="button" class="blue-button" onclick="window.switchbox('optionsbox')">
+                                <div class="sm64button">
+                                    Options & Misc
+                                </div>
+                            </button>
+
+                            <button type="button" class="pink-button"
+                                onclick="window.switchbox('customizebox'); window.updateWheel()">
+                                <div class="sm64button">
+                                    Customize Character / Skin
+                                </div>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- End of signboxBackground -->
+            <!-- End of signboxBackground -->
 
-        <!-- Start of options box-->
-        <div hidden id="optionsBorder">
-            <div hidden id="optionsBackground">
-                <h1>Options & Misc</h1>
-                <!-- Miscellaneous -->
-                <!-- Divs are used as rows here -->
-                <div class="deleteDiv"> <!-- This is row 1 for example -->
-                    <button onclick="window.deleteRom()" type="button" class="red-button"><div class="sm64button">Delete Rom</div></button>
-                    <h2 id="fpsMeter">FPS: 0</h2>
-                    <h2 id="pingMeter">Ping 0ms</h2>
-                </div>
-                
-                <div class="settings-flex settings-options">   <!-- This is row 2 and so on -->
-                    <button type="button"
-                            class="blue-button"
-                            onclick="window.fullWindowMode = true">
-                        <div class="sm64button">
-                        Full Window Mode
-                        </div>
-                    </button>
-                    <button type="button"
-                        class="blue-button"
-                        onclick="window.toggleWidescreen()">
-                        <div class="sm64button">
-                        Widescreen Mode
-                        </div>
-                    </button>
-                    <button type="button"
-                        class="blue-button"
-                        onclick="window.toggleChat()">
-                        <div class="sm64button">
-                        Toggle Chat
-                        </div>
-                    </button>
-                    <label>Extended Moveset</label>
-                    <input type="checkbox" checked onchange="window.sm64js.ext = this.checked"></input>
-                    <select onchange="window.sm64js.filter = this.value">
-                        <option value="2">Linear Texture Filtering</option>
-                        <option value="0">Point / Nearest Texture Filtering</option>
-                    </select>
-                </div>
-            <div class="settings-flex">
-                <!-- Color code pop up -->
-                <div id="colorCodePasteWindow">
-                    <label>Gameshark Color Code Importer:</label>
-                    <br>
-                    <br>
-                    <div>
-                        <textarea id="ccPasteArea" placeholder="Enter your Color Code here..." rows="6" style="resize: none;"></textarea>
+            <!-- Start of options box-->
+            <div hidden id="optionsBorder">
+                <div hidden id="optionsBackground">
+                    <h1>Options & Misc</h1>
+                    <!-- Miscellaneous -->
+                    <!-- Divs are used as rows here -->
+                    <div class="deleteDiv"> <!-- This is row 1 for example -->
+                        <button onclick="window.deleteRom()" type="button" class="red-button">
+                            <div class="sm64button">Delete Rom</div>
+                        </button>
+                        <h2 id="fpsMeter">FPS: 0</h2>
+                        <h2 id="pingMeter">Ping 0ms</h2>
                     </div>
-                    <br>
-                    <div>
-                        <button class="blue-button"
-                            onclick="window.myMario.skinData = window.parseColorCode(document.getElementById('ccPasteArea').value); document.getElementById('ccPasteArea').value = ''; window.myMario.saveSkin()">
+
+                    <div class="settings-flex settings-options"> <!-- This is row 2 and so on -->
+                        <button type="button" class="blue-button" onclick="window.fullWindowMode = true">
                             <div class="sm64button">
-                            Import Color Code
+                                Full Window Mode
+                            </div>
+                        </button>
+                        <button type="button" class="blue-button" onclick="window.toggleWidescreen()">
+                            <div class="sm64button">
+                                Widescreen Mode
+                            </div>
+                        </button>
+                        <button type="button" class="blue-button" onclick="window.toggleChat()">
+                            <div class="sm64button">
+                                Toggle Chat
+                            </div>
+                        </button>
+                        <label>Extended Moveset</label>
+                        <input type="checkbox" checked onchange="window.sm64js.ext = this.checked"></input>
+                        <select onchange="window.sm64js.filter = this.value">
+                            <option value="2">Linear Texture Filtering</option>
+                            <option value="0">Point / Nearest Texture Filtering</option>
+                        </select>
+                    </div>
+                    <div class="settings-flex">
+                        <!-- Color code pop up -->
+                        <div id="colorCodePasteWindow">
+                            <label>Gameshark Color Code Importer:</label>
+                            <br>
+                            <br>
+                            <div>
+                                <textarea id="ccPasteArea" placeholder="Enter your Color Code here..." rows="6"
+                                    style="resize: none;"></textarea>
+                            </div>
+                            <br>
+                            <div>
+                                <button class="blue-button"
+                                    onclick="window.myMario.skinData = window.parseColorCode(document.getElementById('ccPasteArea').value); document.getElementById('ccPasteArea').value = ''; window.myMario.saveSkin()">
+                                    <div class="sm64button">
+                                        Import Color Code
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Emote menu -->
+                        <div class="emoteMenu">
+                            <h1>Emote menu</h1>
+                            <div>
+                                <img width="40" height="40" style="cursor: pointer;"
+                                    onclick="document.getElementById('chatbox').value += ':blj:'"
+                                    src="/mmo/assets/emotes/blj.gif" alt="BLJ">
+                                <img width="40" height="40" style="cursor: pointer;"
+                                    onclick="document.getElementById('chatbox').value += ':bup:'"
+                                    src="/mmo/assets/emotes/bup.jpg" alt="Bup">
+                                <img width="40" height="40" style="cursor: pointer;"
+                                    onclick="document.getElementById('chatbox').value += ':discord:'"
+                                    src="/mmo/assets/emotes/discord.png" alt="Discord logo">
+                                <img width="40" height="40" style="cursor: pointer;"
+                                    onclick="document.getElementById('chatbox').value += ':facepalm:'"
+                                    src="/mmo/assets/emotes/facepalm.png" alt="Facepalm">
+                                <img width="40" height="40" style="cursor: pointer;"
+                                    onclick="document.getElementById('chatbox').value += ':kappa:'"
+                                    src="/mmo/assets/emotes/kappa.png" alt="Kappa">
+                                <img width="40" height="40" style="cursor: pointer;"
+                                    onclick="document.getElementById('chatbox').value += ':kick:'"
+                                    src="/mmo/assets/emotes/kick.gif" alt="Kick">
+                                <img width="40" height="40" style="cursor: pointer;"
+                                    onclick="document.getElementById('chatbox').value += ':mariostyle:'"
+                                    src="/mmo/assets/emotes/mariostyle.gif" alt="Mario Gangnam Style">
+                                <img width="40" height="40" style="cursor: pointer;"
+                                    onclick="document.getElementById('chatbox').value += ':pogchamp:'"
+                                    src="/mmo/assets/emotes/pogchamp.png" alt="Mario Poggard">
+                                <img width="40" height="40" style="cursor: pointer;"
+                                    onclick="document.getElementById('chatbox').value += ':shock:'"
+                                    src="/mmo/assets/emotes/shock.gif" alt="Shock">
+                                <img width="40" height="40" style="cursor: pointer;"
+                                    onclick="document.getElementById('chatbox').value += ':strange:'"
+                                    src="/mmo/assets/emotes/strange.png" alt="Strange">
+                                <img width="40" height="40" style="cursor: pointer;"
+                                    onclick="document.getElementById('chatbox').value += ':tpose:'"
+                                    src="/mmo/assets/emotes/tpose.png" alt="T-Pose">
+                                <img width="40" height="40" style="cursor: pointer;"
+                                    onclick="document.getElementById('chatbox').value += ':troll:'"
+                                    src="/mmo/assets/emotes/trollio.png" alt="Troll">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Controls and customization -->
+                    <div id="blueControls">
+                        <button type="button" class="green-button" onclick="window.switchbox('controlsbox')">
+                            <div class="sm64button">
+                                Customize Controls
+                            </div>
+                        </button>
+                        <button type="button" class="yellow-button" onclick="window.switchbox()">
+                            <div class="sm64button">
+                                Return
+                            </div>
+                        </button>
+                        <button type="button" class="pink-button"
+                            onclick="window.switchbox('customizebox'); window.updateWheel()">
+                            <div class="sm64button">
+                                Customize Character / Skin
                             </div>
                         </button>
                     </div>
                 </div>
-                <!-- Emote menu -->
-                <div class="emoteMenu">
-                    <h1>Emote menu</h1>
-                    <div>
-                        <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':blj:'" src="/mmo/assets/emotes/blj.gif" alt="BLJ">
-                        <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':bup:'" src="/mmo/assets/emotes/bup.jpg" alt="Bup">
-                        <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':discord:'" src="/mmo/assets/emotes/discord.png" alt="Discord logo">
-                        <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':facepalm:'" src="/mmo/assets/emotes/facepalm.png" alt="Facepalm">
-                        <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':kappa:'" src="/mmo/assets/emotes/kappa.png" alt="Kappa">
-                        <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':kick:'" src="/mmo/assets/emotes/kick.gif" alt="Kick">
-                        <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':mariostyle:'" src="/mmo/assets/emotes/mariostyle.gif" alt="Mario Gangnam Style">
-                        <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':pogchamp:'" src="/mmo/assets/emotes/pogchamp.png" alt="Mario Poggard">
-                        <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':shock:'" src="/mmo/assets/emotes/shock.gif" alt="Shock">
-                        <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':strange:'" src="/mmo/assets/emotes/strange.png" alt="Strange">
-                        <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':tpose:'" src="/mmo/assets/emotes/tpose.png" alt="T-Pose">
-                        <img width="40" height="40" style="cursor: pointer;" onclick="document.getElementById('chatbox').value += ':troll:'" src="/mmo/assets/emotes/trollio.png" alt="Troll">
-                    </div>
-                </div>
             </div>
-                <!-- Controls and customization -->
-                <div id="blueControls">
-                    <button type="button"
-                            class="green-button"
-                            onclick="window.switchbox('controlsbox')">
-                        <div class="sm64button">
-                        Customize Controls
-                        </div>
-                    </button>
-                    <button type="button"
-                            class="yellow-button"
-                            onclick="window.switchbox()">
-                        <div class="sm64button">
-                        Return
-                        </div>
-                    </button>
-                    <button type="button"
-                        class="pink-button"
-                        onclick="window.switchbox('customizebox'); window.updateWheel()">
-                        <div class="sm64button">
-                        Customize Character / Skin
-                        </div>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <!-- End of options -->
+            <!-- End of options -->
 
-        <!-- Start of customize skin menu -->
-        <div hidden id="customizeBorder">
-            <div hidden id="customizeBackground">
-                <div id="skinCustomizerWindow">
-                    <!-- Skin presets -->
-                    <div>
-                        <label>Select Skin Preset & Character:</label>
+            <!-- Start of customize skin menu -->
+            <div hidden id="customizeBorder">
+                <div hidden id="customizeBackground">
+                    <div id="skinCustomizerWindow">
+                        <!-- Skin presets -->
+                        <div>
+                            <label>Select Skin Preset & Character:</label>
 
-                            <select class="form-control" id="presetBox" onchange="window.updateSkinID(this.value); localStorage.setItem('presetBox', this.value)" style="font-family: 'TextboxFont'; height: 2rem;">
+                            <select class="form-control" id="presetBox"
+                                onchange="window.updateSkinID(this.value); localStorage.setItem('presetBox', this.value)"
+                                style="font-family: 'TextboxFont'; height: 2rem;">
                                 <optgroup label="Main Color Codes">
                                     <option value="0">Mario Colors</option>
                                     <option value="1">Luigi Colors</option>
@@ -189,50 +373,53 @@
                                     <option value="11">Rainbow Wario</option>
                                 </optgroup>
                             </select>
-                            <select id="characterType" style="width:120px; height: 2rem; font-family: 'TextboxFont';" onchange="window.setCharacter(this.value)">
+                            <select id="characterType" style="width:120px; height: 2rem; font-family: 'TextboxFont';"
+                                onchange="window.setCharacter(this.value)">
                                 <option value="0">Mario</option>
                                 <option value="1">Luigi</option>
                                 <option value="2">Wario</option>
                             </select>
-        
-                        <!-- Player part selector -->
-                        <select id = "skinTypes" onchange="window.updateWheel()"> 
-                            <option value = "overalls">Overalls</option>
-                            <option value="hat">Hat</option> 
-                            <option value = "shirt" >Shirt</option>
-                            <option value="gloves">Gloves</option >
-                            <option value = "boots">Boots</option>
-                            <option value="skin">Skin</option>
-                            <option value = "hair">Hair</option>
-                            <option value = "parachute">Glider & Kart</option>
-                        </select>
-                    </div>
 
-                    <br>
+                            <!-- Player part selector -->
+                            <select id="skinTypes" onchange="window.updateWheel()">
+                                <option value="overalls">Overalls</option>
+                                <option value="hat">Hat</option>
+                                <option value="shirt">Shirt</option>
+                                <option value="gloves">Gloves</option>
+                                <option value="boots">Boots</option>
+                                <option value="skin">Skin</option>
+                                <option value="hair">Hair</option>
+                                <option value="parachute">Glider & Kart</option>
+                            </select>
+                        </div>
 
-                <!-- Options -->
-                    <!-- Ambient color checkbox -->
-                    <div>
-                        <input type="checkbox" id="updateAmb" checked>
-                        <label>Update ambient color accordingly to main color? </label>
-                    </div>
+                        <br>
 
-                    <br />
+                        <!-- Options -->
+                        <!-- Ambient color checkbox -->
+                        <div>
+                            <input type="checkbox" id="updateAmb" checked>
+                            <label>Update ambient color accordingly to main color? </label>
+                        </div>
 
-                    <!-- Hat toggle -->
-                    <button class="green-button" onclick="window.toggleCapState()"><div class="sm64button">Toggle Hat</div></button>
+                        <br />
 
-                    <!-- Color pickers -->
-                    <div class="colorPickersContainer">
-                        <div id="picker"></div>
-                        <div id="ambpicker"></div>
-                    </div>
+                        <!-- Hat toggle -->
+                        <button class="green-button" onclick="window.toggleCapState()">
+                            <div class="sm64button">Toggle Hat</div>
+                        </button>
 
-                    <!-- RGB input -->
-                    <div class="direct-color-input-div">
-                        <h2>Direct color input:</h2>
-                        <label>Color:</label>
-                        <input type="color" id="colorInput" onchange="
+                        <!-- Color pickers -->
+                        <div class="colorPickersContainer">
+                            <div id="picker"></div>
+                            <div id="ambpicker"></div>
+                        </div>
+
+                        <!-- RGB input -->
+                        <div class="direct-color-input-div">
+                            <h2>Direct color input:</h2>
+                            <label>Color:</label>
+                            <input type="color" id="colorInput" onchange="
                         window.colorPicker.color.hexString = this.value
                         if (document.getElementById('updateAmb').checked) {
                             document.getElementById('ambientInput').value = window.hex2ambient(this.value)
@@ -242,267 +429,294 @@
                         }
                         window.updateColors(window.colorPicker.color)
                         window.myMario.saveSkin()">
-                        <label> Ambient color:</label>
-                        <input type="color" id="ambientInput" onchange="window.ambientPicker.color.hexString = this.value; window.updateAmbientColors(window.ambientPicker.color); window.myMario.saveSkin()">
-                    </div>
-                    <!-- Controls and customization -->
-                    <div id="pinkControls">
-                        <button type="button"
-                                style="margin-top: -800px;"
-                                class="green-button"
+                            <label> Ambient color:</label>
+                            <input type="color" id="ambientInput"
+                                onchange="window.ambientPicker.color.hexString = this.value; window.updateAmbientColors(window.ambientPicker.color); window.myMario.saveSkin()">
+                        </div>
+                        <!-- Controls and customization -->
+                        <div id="pinkControls">
+                            <button type="button" style="margin-top: -800px;" class="green-button"
                                 onclick="window.switchbox('controlsbox')">
-                            <div class="sm64button">
-                            Customize Controls
-                    </div>
-                        </button>
-                        <button type="button"
-                                class="blue-button"
-                                style="margin-top: -800px;"
+                                <div class="sm64button">
+                                    Customize Controls
+                                </div>
+                            </button>
+                            <button type="button" class="blue-button" style="margin-top: -800px;"
                                 onclick="window.switchbox('optionsbox')">
-                            <div class="sm64button">
-                            Options & Misc
-                            </div>
-                        </button>
-                        <button type="button"
-                            class="yellow-button"
-                            style="margin-top: -800px;"
-                            onclick="window.switchbox()">
-                            <div class="sm64button">
-                            Return
-                            </div>
-                        </button>
+                                <div class="sm64button">
+                                    Options & Misc
+                                </div>
+                            </button>
+                            <button type="button" class="yellow-button" style="margin-top: -800px;"
+                                onclick="window.switchbox()">
+                                <div class="sm64button">
+                                    Return
+                                </div>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <!-- End of skin customizer pop up -->
-            </div>
-        </div>
-        <!-- End of customizer box -->
-
-        <!-- Start of controls box -->
-<div hidden id="controlsBorder">
-    <div hidden id="controlsBackground">
-        <div id="controlsMargin">
-        <!-- Save & reset controls button -->
-        <div class="controlButtons">
-            <button class="green-button" onclick="window.saveControls()"><div class="sm64button">Save Controls</div></button>
-            <button class="red-button" onclick="window.loadDefaultControls()"><div class="sm64button">Load Default Controls</div></button>
-        </div>
-        <h6 style="text-align:center; font-size: 30px;" id="noGamepadMessage">No Gamepad Detected Yet, Try Pressing a Button</h6>
-            <div id="controlsFlex">
-                    <div id="keyboardControlsWindow">
-
-                        <!-- Keyboard control list -->
-                        <div style="flex:  1;">
-                                <div>
-                                    <label style="padding-right:30px">Start:</label>
-                                    <select keyboardButton name="start" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-
-                                <div>
-                                    <label style="padding-right:30px">A:</label>
-                                    <select keyboardButton name="a" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-
-                                <div>
-                                    <label style="padding-right:30px">B:</label>
-                                    <select keyboardButton name="b" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-
-                                <div>
-                                    <label style="padding-right:30px">Z:</label>
-                                    <select keyboardButton name="z" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-                        </div>
-
-                        <div style="flex: 2;">
-                                <div>
-                                    <label style="padding-right:30px">Up:</label>
-                                    <select keyboardButton name="up" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-
-                                <div>
-                                    <label style="padding-right:40px">Down:</label>
-                                    <select keyboardButton name="down" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-
-                                <div>
-                                    
-                                    <label style="padding-right:20px">Left:</label>
-                                    <select keyboardButton name="left" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-
-                                <div>
-                                    <label style="padding-right:30px">Right:</label>
-                                    <select keyboardButton name="right" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-                        </div>
-
-                        <div style="flex: 3;">
-                                <div>
-                                    <label style="padding-right:30px">C-Up:</label>
-                                    <select keyboardButton name="cu" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-
-                                <div>
-                                    <label style="padding-right:40px">C-Down:</label>
-                                    <select keyboardButton name="cd" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-
-                                <div>
-                                    <label style="padding-right:20px">C-Left:</label>
-                                    <select keyboardButton name="cl" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-
-                                <div>
-                                    <label style="padding-right:30px">C-Right:</label>
-                                    <select keyboardButton name="cr" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-                        </div>
-
-                        <div style="flex: 4;">
-                                <div>
-                                    <label style="padding-right:30px">Minimap:</label>
-                                    <select keyboardButton name="map" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-
-                                <div>
-                                    <label style="padding-right:30px">Taunts:</label>
-                                    <select keyboardButton name="taunt" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-
-                                <div>
-                                    <label style="padding-right:30px">Glider:</label>
-                                    <select keyboardButton name="parachute" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-
-                                <div>
-                                    <label style="padding-right:30px">Chat:</label>
-                                    <select keyboardButton name="chat" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-
-                                <div>
-                                    <label>Freeze Camera:</label>
-                                    <select keyboardButton name="freezeCam" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
-                                </div>
-                        </div>
-
-                    </div>
-                <!-- Gamepad controls pop up -->
-                
-                <div id="gamepadControlsWindow">
-                        <!-- Gamepad message -->
-                        <div>
-                            <div hidden id="gamepadMessageDiv">
-                                <h6 id="gamepadMessage">
-                                </h6>
-                                <h6 style="text-align:center" id="gamepadMessage">
-                                    Is your gamepad not working correctly?
-                                    <br />
-                                    Contact me so I can support more gamepads. Discord: snuffysasa#2779 /
-                                    <a href="https://github.com/sm64js/sm64js/issues" style="color:lightblue; font-weight:bold">Github</a>
-                                </h6>
-                            </div>
-
-                        </div>
-
-                        <!-- Gamepad controls list -->
-
-                     <div id="gamepadFlex">
-                        
-                            <div style="flex: 1;">
-                                <div style="display: flex; width: 5em;">
-                                    <label style="margin-right: 0.2em">Start:</label>
-                                    <select gamepadButton name="start" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                                </div>
-                                <div style="width: 5em;">
-                                    <label>A:</label>
-                                    <select gamepadButton name="a" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                                </div>
-                                <div style="width: 5em;">
-                                    <label>B:</label>
-                                    <select gamepadButton name="b" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                                </div>
-                                <div style="width: 5em;">
-                                    <label>Z:</label>
-                                    <select gamepadButton name="z" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                                </div>
-                                <div style="width: 5em;">
-                                    <label>axisX:</label>
-                                    <select gamepadAxes name="stickX" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                                </div>
-                                <div style="width: 5em;">
-                                    <label>axisY:</label>
-                                    <select gamepadAxes name="stickY" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                                </div>
-                            </div>
-
-                            <div style="flex: 2;">
-                                <div style="width: 5em;">
-                                    <label>C-axisX:</label>
-                                    <select gamepadAxes name="cStickX" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                                </div>
-                                <div style="width: 5em;">
-                                    <label>C-axisY:</label>
-                                    <select gamepadAxes name="cStickY" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                                </div>
-                                <div style="width: 5em;">
-                                    <label>deadZone:</label>
-                                    <input type="number" style="max-width: 3em;" value="0.3" min="0" max="1" step="0.01" class="form-control" onchange="window.updateDeadZone(this.value)">
-                                </div>
-                                <div style="width: 5em;">
-                                    <label>Minimap:</label>
-                                    <select gamepadButton name="map" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                                </div>
-                                <div style="width: 5em;">
-                                    <label>Taunts:</label>
-                                    <select gamepadButton name="taunt" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                                </div>
-                                <div style="width: 5em;">
-                                    <label>Glider:</label>
-                                    <select gamepadButton name="parachute" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
-                                </div>
-                            </div>
-                    </div>
-
-
+                    <!-- End of skin customizer pop up -->
                 </div>
             </div>
-                <!-- Controls and customization -->
-                <div id="greenControls">
-                    <button type="button"
-                            class="yellow-button"
-                            data-placement="bottom"
-                            onclick="window.switchbox()">
-                        <div class="sm64button">
-                        Return
+            <!-- End of customizer box -->
+
+            <!-- Start of controls box -->
+            <div hidden id="controlsBorder">
+                <div hidden id="controlsBackground">
+                    <div id="controlsMargin">
+                        <!-- Save & reset controls button -->
+                        <div class="controlButtons">
+                            <button class="green-button" onclick="window.saveControls()">
+                                <div class="sm64button">Save Controls</div>
+                            </button>
+                            <button class="red-button" onclick="window.loadDefaultControls()">
+                                <div class="sm64button">Load Default Controls</div>
+                            </button>
                         </div>
-                    </button>
-                    <button type="button"
-                            class="blue-button"
-                            onclick="window.switchbox('optionsbox')">
-                        <div class="sm64button">
-                        Options & Misc
+                        <h6 style="text-align:center; font-size: 30px;" id="noGamepadMessage">No Gamepad Detected Yet,
+                            Try Pressing a Button</h6>
+                        <div id="controlsFlex">
+                            <div id="keyboardControlsWindow">
+
+                                <!-- Keyboard control list -->
+                                <div style="flex:  1;">
+                                    <div>
+                                        <label style="padding-right:30px">Start:</label>
+                                        <select keyboardButton name="start"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+
+                                    <div>
+                                        <label style="padding-right:30px">A:</label>
+                                        <select keyboardButton name="a"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+
+                                    <div>
+                                        <label style="padding-right:30px">B:</label>
+                                        <select keyboardButton name="b"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+
+                                    <div>
+                                        <label style="padding-right:30px">Z:</label>
+                                        <select keyboardButton name="z"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+                                </div>
+
+                                <div style="flex: 2;">
+                                    <div>
+                                        <label style="padding-right:30px">Up:</label>
+                                        <select keyboardButton name="up"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+
+                                    <div>
+                                        <label style="padding-right:40px">Down:</label>
+                                        <select keyboardButton name="down"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+
+                                    <div>
+
+                                        <label style="padding-right:20px">Left:</label>
+                                        <select keyboardButton name="left"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+
+                                    <div>
+                                        <label style="padding-right:30px">Right:</label>
+                                        <select keyboardButton name="right"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+                                </div>
+
+                                <div style="flex: 3;">
+                                    <div>
+                                        <label style="padding-right:30px">C-Up:</label>
+                                        <select keyboardButton name="cu"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+
+                                    <div>
+                                        <label style="padding-right:40px">C-Down:</label>
+                                        <select keyboardButton name="cd"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+
+                                    <div>
+                                        <label style="padding-right:20px">C-Left:</label>
+                                        <select keyboardButton name="cl"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+
+                                    <div>
+                                        <label style="padding-right:30px">C-Right:</label>
+                                        <select keyboardButton name="cr"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+                                </div>
+
+                                <div style="flex: 4;">
+                                    <div>
+                                        <label style="padding-right:30px">Minimap:</label>
+                                        <select keyboardButton name="map"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+
+                                    <div>
+                                        <label style="padding-right:30px">Taunts:</label>
+                                        <select keyboardButton name="taunt"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+
+                                    <div>
+                                        <label style="padding-right:30px">Glider:</label>
+                                        <select keyboardButton name="parachute"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+
+                                    <div>
+                                        <label style="padding-right:30px">Chat:</label>
+                                        <select keyboardButton name="chat"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+
+                                    <div>
+                                        <label>Freeze Camera:</label>
+                                        <select keyboardButton name="freezeCam"
+                                            onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- Gamepad controls pop up -->
+
+                            <div id="gamepadControlsWindow">
+                                <!-- Gamepad message -->
+                                <div>
+                                    <div hidden id="gamepadMessageDiv">
+                                        <h6 id="gamepadMessage">
+                                        </h6>
+                                        <h6 style="text-align:center" id="gamepadMessage">
+                                            Is your gamepad not working correctly?
+                                            <br />
+                                            Contact me so I can support more gamepads. Discord: snuffysasa#2779 /
+                                            <a href="https://github.com/sm64js/sm64js/issues"
+                                                style="color:lightblue; font-weight:bold">Github</a>
+                                        </h6>
+                                    </div>
+
+                                </div>
+
+                                <!-- Gamepad controls list -->
+
+                                <div id="gamepadFlex">
+
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; width: 5em;">
+                                            <label style="margin-right: 0.2em">Start:</label>
+                                            <select gamepadButton name="start"
+                                                onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                        </div>
+                                        <div style="width: 5em;">
+                                            <label>A:</label>
+                                            <select gamepadButton name="a"
+                                                onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                        </div>
+                                        <div style="width: 5em;">
+                                            <label>B:</label>
+                                            <select gamepadButton name="b"
+                                                onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                        </div>
+                                        <div style="width: 5em;">
+                                            <label>Z:</label>
+                                            <select gamepadButton name="z"
+                                                onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                        </div>
+                                        <div style="width: 5em;">
+                                            <label>axisX:</label>
+                                            <select gamepadAxes name="stickX"
+                                                onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                        </div>
+                                        <div style="width: 5em;">
+                                            <label>axisY:</label>
+                                            <select gamepadAxes name="stickY"
+                                                onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                        </div>
+                                    </div>
+
+                                    <div style="flex: 2;">
+                                        <div style="width: 5em;">
+                                            <label>C-axisX:</label>
+                                            <select gamepadAxes name="cStickX"
+                                                onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                        </div>
+                                        <div style="width: 5em;">
+                                            <label>C-axisY:</label>
+                                            <select gamepadAxes name="cStickY"
+                                                onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                        </div>
+                                        <div style="width: 5em;">
+                                            <label>deadZone:</label>
+                                            <input type="number" style="max-width: 3em;" value="0.3" min="0" max="1"
+                                                step="0.01" class="form-control"
+                                                onchange="window.updateDeadZone(this.value)">
+                                        </div>
+                                        <div style="width: 5em;">
+                                            <label>Minimap:</label>
+                                            <select gamepadButton name="map"
+                                                onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                        </div>
+                                        <div style="width: 5em;">
+                                            <label>Taunts:</label>
+                                            <select gamepadButton name="taunt"
+                                                onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                        </div>
+                                        <div style="width: 5em;">
+                                            <label>Glider:</label>
+                                            <select gamepadButton name="parachute"
+                                                onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
                         </div>
-                    </button>
-                    <button type="button"
-                        class="pink-button"
-                        onclick="window.switchbox('customizebox'); window.updateWheel()">
-                        <div class="sm64button">
-                        Customize Character / Skin
+                        <!-- Controls and customization -->
+                        <div id="greenControls">
+                            <button type="button" class="yellow-button" data-placement="bottom"
+                                onclick="window.switchbox()">
+                                <div class="sm64button">
+                                    Return
+                                </div>
+                            </button>
+                            <button type="button" class="blue-button" onclick="window.switchbox('optionsbox')">
+                                <div class="sm64button">
+                                    Options & Misc
+                                </div>
+                            </button>
+                            <button type="button" class="pink-button"
+                                onclick="window.switchbox('customizebox'); window.updateWheel()">
+                                <div class="sm64button">
+                                    Customize Character / Skin
+                                </div>
+                            </button>
                         </div>
-                    </button>
+                    </div>
                 </div>
             </div>
-        </div>
-</div>
-<br>
-        <!-- Game canvas container -->
-        <div id="gameContainer" hidden>           
+            <br>
+            <!-- Game canvas container -->
+            <div id="gameContainer" hidden>
                 <div id="relativePositioner" hidden>
                     <div id="moveLeft">
                         <canvas id="textCanvas"></canvas><!-- HUD, NOT CHAT -->
                         <canvas id="fxCanvas"></canvas><!-- Snow -->
-                        <div hidden id="canvasContainer" style="position: absolute;margin-top: 450px; margin-left: -500px; z-index: 10;"></div>
+                        <div hidden id="canvasContainer"
+                            style="position: absolute;margin-top: 450px; margin-left: -500px; z-index: 10;"></div>
                         <canvas id="gameCanvas" width="1280" height="720"></canvas>
                     </div>
                 </div>
@@ -510,88 +724,98 @@
                 <!-- Chat container -->
                 <div id="chatContainer" hidden>
                     <ul id="chatlog"></ul>
-                    <input id="chatbox" class="chatbox" type="text" autocomplete="off" maxlength="120" placeholder="Chat box, to block someone type '/block username'">
+                    <input id="chatbox" class="chatbox" type="text" autocomplete="off" maxlength="120"
+                        placeholder="Chat box, to block someone type '/block username'">
                 </div>
-        </div>
-        <!-- End of game canvas -->
-<div class="siteMargins">
-            <!-- Disconnected from the game/server message -->
-            <h6 hidden id="connectedMsg" style="color:red;">Not connected to server - Refresh the page</h6>
-        <!-- Music section -->
-        <div id="musicDiv">
-           <h4>Music</h4>
-           <div class="row">
-            <div class="col-6">
-               <h5>Bob-omb Battlefield Anniversary by eros71</h5>
             </div>
-            <div class="col-6" style="justify-content:center">
-               <audio controls="" loop="" style="width:400px;height:30px" id="anniversary">
-                  <source src="/mmo/assets/audio/anniversary.mp3" type="audio/mp3">
-                  Your browser does not support the audio element.
-               </audio>
-            </div>
-         </div>
-           <div class="row">
-              <div class="col-6">
-                 <h5>Snow Mountain DX by eros71</h5>
-              </div>
-              <div class="col-6" style="justify-content:center">
-                 <audio controls="" loop="" style="width:400px;height:30px" id="snow">
-                    <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Snow%20Mountain%20DX.wav" type="audio/wav">
-                    Your browser does not support the audio element.
-                 </audio>
-              </div>
-           </div>
-           <div class="row">
-              <div class="col-6">
-                 <h5>Bob-omb Peaceful-Field by eros71</h5>
-              </div>
-              <div class="col-6" style="justify-content:center">
-                 <audio controls="" loop="" style="width:400px;height:30px">
-                    <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Bob-omb%20Peaceful-Field.wav" type="audio/wav">
-                    Your browser does not support the audio element.
-                 </audio>
-              </div>
-           </div>
-           <div class="row">
-              <div class="col-6">
-                 <h5>Mario Filled Field by Belgium</h5>
-              </div>
-              <div class="col-6" style="justify-content:center">
-                 <audio controls="" loop="" style="width:400px;height:30px" id="grass">
-                    <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Mario%20Filled%20Field.mp3" type="audio/mp3">
-                    Your browser does not support the audio element.
-                 </audio>
-              </div>
-           </div>
-            <div class="row">
-              <div class="col-6">
-                 <h5>SM64JS File Select Remix by Subject to Change</h5>
-              </div>
-              <div class="col-6" style="justify-content:center">
-                 <audio controls="" loop="" style="width:400px;height:30px">
-                    <source src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/SM64JS%20File%20Select%20Remix.wav" type="audio/wav">
-                    Your browser does not support the audio element.
-                 </audio>
-              </div>
-           </div>
-           <div class="row">
-              <div class="col-6">
-                 <h5>Beware the Forest Mushrooms SM64 Remix by NH1507</h5>
-              </div>
-              <div class="col-6" style="justify-content:center">
-                 <audio controls="" loop="" style="width:400px;height:30px" id="jungle">
-                    <source src="/mmo/assets/audio/forest.mp3" type="audio/mp3">
-                    Your browser does not support the audio element.
-                 </audio>
-              </div>
-           </div>
-        </div>
-        <!-- End of Music section-->
+            <!-- End of game canvas -->
+            <div class="siteMargins">
+                <!-- Disconnected from the game/server message -->
+                <h6 hidden id="connectedMsg" style="color:red;">Not connected to server - Refresh the page</h6>
+                <!-- Music section -->
+                <div id="musicDiv">
+                    <h4>Music</h4>
+                    <div class="row">
+                        <div class="col-6">
+                            <h5>Bob-omb Battlefield Anniversary by eros71</h5>
+                        </div>
+                        <div class="col-6" style="justify-content:center">
+                            <audio controls="" loop="" style="width:400px;height:30px" id="anniversary">
+                                <source src="/mmo/assets/audio/anniversary.mp3" type="audio/mp3">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <h5>Snow Mountain DX by eros71</h5>
+                        </div>
+                        <div class="col-6" style="justify-content:center">
+                            <audio controls="" loop="" style="width:400px;height:30px" id="snow">
+                                <source
+                                    src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Snow%20Mountain%20DX.wav"
+                                    type="audio/wav">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <h5>Bob-omb Peaceful-Field by eros71</h5>
+                        </div>
+                        <div class="col-6" style="justify-content:center">
+                            <audio controls="" loop="" style="width:400px;height:30px">
+                                <source
+                                    src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Bob-omb%20Peaceful-Field.wav"
+                                    type="audio/wav">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <h5>Mario Filled Field by Belgium</h5>
+                        </div>
+                        <div class="col-6" style="justify-content:center">
+                            <audio controls="" loop="" style="width:400px;height:30px" id="grass">
+                                <source
+                                    src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/Mario%20Filled%20Field.mp3"
+                                    type="audio/mp3">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <h5>SM64JS File Select Remix by Subject to Change</h5>
+                        </div>
+                        <div class="col-6" style="justify-content:center">
+                            <audio controls="" loop="" style="width:400px;height:30px">
+                                <source
+                                    src="https://sm64js.nyc3.cdn.digitaloceanspaces.com/sm64js-music/SM64JS%20File%20Select%20Remix.wav"
+                                    type="audio/wav">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <h5>Beware the Forest Mushrooms SM64 Remix by NH1507</h5>
+                        </div>
+                        <div class="col-6" style="justify-content:center">
+                            <audio controls="" loop="" style="width:400px;height:30px" id="jungle">
+                                <source src="/mmo/assets/audio/forest.mp3" type="audio/mp3">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of Music section-->
 
-        <br />
-        <br />
-</div>
+                <br />
+                <br />
+            </div>
     </main>
 </body>
+
 </html>

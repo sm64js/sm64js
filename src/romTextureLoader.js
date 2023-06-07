@@ -2788,11 +2788,11 @@ const extractAssetsFromRom = (romBufferData) => {
     processExtractedResults(extractedData)
 }
 
-document.querySelector('#romSelect').addEventListener('submit', (e) => {
-    e.preventDefault()
-    if (loadedGameAssets) return
-    const romFile = document.getElementById('romFile').files[0]
-    const reader = new FileReader()
-    reader.readAsArrayBuffer(romFile)
-    reader.onload = (evt) => { extractAssetsFromRom(evt.target.result) }
-})
+// document.querySelector('#romSelect').addEventListener('submit', (e) => {
+//     e.preventDefault()
+//     if (loadedGameAssets) return
+//     const romFile = document.getElementById('romFile').files[0]
+//     const reader = new FileReader()
+//     reader.readAsArrayBuffer(romFile)
+//     reader.onload = (evt) => { extractAssetsFromRom(evt.target.result) }
+// })

@@ -411,24 +411,18 @@ class GoddardRenderer {
         this.sCurrentGdDl.mtx.length = 0
         this.sCurrentGdDl.vp.length = 0
         this.sCurrentGdDl.light.length = 0
-
-/*        this.sCurrentGdDl.curVtxIdx = 0
-        this.sCurrentGdDl.curMtxIdx = 0
-        this.sCurrentGdDl.curLightIdx = 0
-        this.sCurrentGdDl.curGfxIdx = 0
-        this.sCurrentGdDl.curVpIdx = 0*/
     }
 
     branch_cur_dl_to_num(dlNum) {
-/*        console.log(`current num: ${this.sCurrentGdDl.number} length: ${this.sCurrentGdDl.gfx.length}   linking to new: dlnum ${this.sGdDLArray[dlNum].number} at index: ${dlNum},  and  length ${this.sGdDLArray[dlNum].gfx.length}`)*/
         Gbi.gSPDisplayList(this.sCurrentGdDl.gfx, this.sGdDLArray[dlNum].gfx)
     }
 
     check_tri_display(vtxcount) {
         this.D_801A86C0 = this.sCurrentGdDl.vtx.length
         this.D_801BB0B4 = 0
-        if (vtxcount != 3) throw "cant display no tris"
-
+        if (vtxcount != 3) {
+            throw "cant display no tris"
+        }
     }
 
     make_Vtx_if_new(x, y, z, alpha) {
@@ -527,7 +521,9 @@ class GoddardRenderer {
     func_801A0070() {
         if (this.D_801BB0BC != 0) {
             const vertices = this.sCurrentGdDl.vtx.slice(this.D_801BB0CC, this.D_801BB0CC + this.D_801BB0BC)
-            if (vertices.length != this.D_801BB0BC) throw "gd render - sending vertices something is wrong"
+            if (vertices.length != this.D_801BB0BC) {
+                throw "gd render - sending vertices something is wrong"
+            }
             Gbi.gSPVertex(this.sCurrentGdDl.gfx, vertices, vertices.length, 0)
             for (let i = 0; i < this.D_801BB0C4; i++) {
                 Gbi.gSP1Triangle(this.sCurrentGdDl.gfx, this.D_801BAF30[i][0] - this.D_801BB0CC, this.D_801BAF30[i][1] - this.D_801BB0CC,
@@ -586,10 +582,6 @@ class GoddardRenderer {
 
         switch (material) {
             case GDTypes.GD_MTL_TEX_OFF:
-                //gddl_is_loading_stub_dl(false) // does nothing
-                //gddl_is_loading_stub_dl(false) // does nothing
-                //gddl_is_loading_stub_dl(false) // does nothing
-                //gddl_is_loading_stub_dl(false) // does nothing
                 this.gddl_is_loading_shine_dl(false)
                 this.gddl_is_loading_shine_dl(false)
                 this.gddl_is_loading_shine_dl(false)
@@ -649,12 +641,6 @@ class GoddardRenderer {
     }
 
     cpy_remaining_gddl(child, parent) {
-
-/*        parent.gfx.push(...child.gfx)
-        parent.mtx.push(...child.mtx)
-        parent.light.push(...child.light)
-        parent.vtx.push(...child.vtx)
-        parent.vp.push(...child.vp)*/
         child.gfx.length = 0
         child.mtx.length = 0
         child.light.length = 0
@@ -665,15 +651,6 @@ class GoddardRenderer {
 
     gd_enddlsplist_parent() {
         Gbi.gSPEndDisplayList(this.sCurrentGdDl.gfx)
-/*        if (sCurrentGdDl -> parent != NULL) {
-            sCurrentGdDl -> parent -> curVtxIdx = (sCurrentGdDl -> parent -> curVtxIdx + sCurrentGdDl -> curVtxIdx)
-            sCurrentGdDl -> parent -> curMtxIdx = (sCurrentGdDl -> parent -> curMtxIdx + sCurrentGdDl -> curMtxIdx)
-            sCurrentGdDl -> parent -> curLightIdx =
-            (sCurrentGdDl -> parent -> curLightIdx + sCurrentGdDl -> curLightIdx)
-            sCurrentGdDl -> parent -> curGfxIdx = (sCurrentGdDl -> parent -> curGfxIdx + sCurrentGdDl -> curGfxIdx)
-            sCurrentGdDl -> parent -> curVpIdx = (sCurrentGdDl -> parent -> curVpIdx + sCurrentGdDl -> curVpIdx)
-        }
-        curDlIdx = sCurrentGdDl -> curGfxIdx;*/
     }
 
     create_mtl_gddl(mtlType) {
@@ -702,7 +679,6 @@ class GoddardRenderer {
                 break
             default: throw "unknown case in gd renderer gd_startdisplist"
         }
-        //gDPPipeSync(next_gfx())
         return this.sCurrentGdDl.number
     }
 
@@ -801,20 +777,8 @@ class GoddardRenderer {
             vp: []
         }
         this.sGdDLArray[newDl.number] = newDl
-
-        //this.cpy_remaining_gddl(newDl, srcDL)
-
         return newDl
     }
-
-/*    cpy_remaining_gddl(dst, src) {
-        dst.vtx = src.vtx.splice(src.curVtxIdx)
-        dst.mtx = src.vtx.splice(src.curMtxIdx)
-        dst.light = src.vtx.splice(src.curLightIdx)
-        dst.gfx = src.vtx.splice(src.curGfxIdx)
-        dst.vp = src.vtx.splice(src.curVpIdx)
-    }*/
-
     gd_setproperty(prop, f1, f2, f3) {
 
         switch (prop) {
@@ -938,7 +902,6 @@ class GoddardRenderer {
         let newMtx = new Array(4).fill(0).map(() => new Array(4).fill(0))
         const perspNorm = { value: 0 }
         MathUtil.guPerspective(newMtx, perspNorm, fovy, aspect, near, far, 1.0)
-        //gSPPerspNormalize() /// not needed
 
         const perspecMtx = newMtx
         Gbi.gSPMatrix(this.sCurrentGdDl.gfx, perspecMtx, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
@@ -1034,7 +997,6 @@ class GoddardRenderer {
                 if (this.sMarioSceneGrp == null) {
                     Shapes.load_mario_head(Shapes.animate_mario_head_normal)
                     this.sMarioSceneGrp = Shapes.gMarioFaceGrp
-                    //this.gd_setup_cursor() TODO
                 }
                 this.sMSceneView = this.make_view_withgrp("mscene", this.sMarioSceneGrp)
                 break
@@ -1042,7 +1004,6 @@ class GoddardRenderer {
                 if (this.sMarioSceneGrp == null) {
                     Shapes.load_mario_head(Shapes.animate_mario_head_gameover)
                     this.sMarioSceneGrp = Shapes.gMarioFaceGrp
-                    //this.gd_setup_cursor() TODO
                 }
                 this.sMSceneView = this.make_view_withgrp("mscene", this.sMarioSceneGrp)
                 break

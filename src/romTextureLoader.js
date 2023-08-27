@@ -1984,31 +1984,24 @@ const loadDataIntoGame = (data) => {
     texture_hud_char_G.push(...data["textures/segment2/segment2.02000.rgba16.png"])
     texture_hud_char_H.push(...data["textures/segment2/segment2.02200.rgba16.png"])
     texture_hud_char_I.push(...data["textures/segment2/segment2.02400.rgba16.png"])
-    // texture_hud_char_J.push(...data["textures/segment2/segment2.02600.rgba16.png"])
     texture_hud_char_K.push(...data["textures/segment2/segment2.02800.rgba16.png"])
     texture_hud_char_L.push(...data["textures/segment2/segment2.02A00.rgba16.png"])
     texture_hud_char_M.push(...data["textures/segment2/segment2.02C00.rgba16.png"])
     texture_hud_char_N.push(...data["textures/segment2/segment2.02E00.rgba16.png"])
     texture_hud_char_O.push(...data["textures/segment2/segment2.03000.rgba16.png"])
     texture_hud_char_P.push(...data["textures/segment2/segment2.03200.rgba16.png"])
-    // texture_hud_char_Q.push(...data["textures/segment2/segment2.03400.rgba16.png"])
     texture_hud_char_R.push(...data["textures/segment2/segment2.03600.rgba16.png"])
     texture_hud_char_S.push(...data["textures/segment2/segment2.03800.rgba16.png"])
     texture_hud_char_T.push(...data["textures/segment2/segment2.03A00.rgba16.png"])
     texture_hud_char_U.push(...data["textures/segment2/segment2.03C00.rgba16.png"])
-    // texture_hud_char_V.push(...data["textures/segment2/segment2.03E00.rgba16.png"])
     texture_hud_char_W.push(...data["textures/segment2/segment2.04000.rgba16.png"])
-    // texture_hud_char_X.push(...data["textures/segment2/segment2.04200.rgba16.png"])
     texture_hud_char_Y.push(...data["textures/segment2/segment2.04400.rgba16.png"])
-    // texture_hud_char_Z.push(...data["textures/segment2/segment2.04600.rgba16.png"])
     texture_hud_char_apostrophe.push(...data["textures/segment2/segment2.04800.rgba16.png"])
     texture_hud_char_double_quote.push(...data["textures/segment2/segment2.04A00.rgba16.png"])
     texture_hud_char_multiply.push(...data["textures/segment2/segment2.05600.rgba16.png"])
     texture_hud_char_coin.push(...data["textures/segment2/segment2.05800.rgba16.png"])
     texture_hud_char_mario_head.push(...data["textures/segment2/segment2.05A00.rgba16.png"])
     texture_hud_char_star.push(...data["textures/segment2/segment2.05C00.rgba16.png"])
-    // texture_hud_char_decimal_point.push(...data["textures/segment2/segment2.05E00.rgba16.png"])
-    // texture_hud_char_beta_key.push(...data["textures/segment2/segment2.06000.rgba16.png"])
     texture_credits_char_3.push(...data["textures/segment2/segment2.06200.rgba16.png"])
     texture_credits_char_4.push(...data["textures/segment2/segment2.06280.rgba16.png"])
     texture_credits_char_6.push(...data["textures/segment2/segment2.06300.rgba16.png"])
@@ -2735,8 +2728,9 @@ const loadDataIntoGame = (data) => {
         let sd = skyboxes[s][0], sn = skyboxes[s][1]
         for (let i = 0; i < 64; ++i) {
             let d = data[sn + "_" + ("00000" + i.toString(16).toUpperCase()).substr(-5)]
-            if (d == null)
-                break
+            if (d == null) {
+                  break
+            }
             sd[i].push(...d)
         }
     }
@@ -2791,8 +2785,9 @@ const getBit = (buf, bit) => {
 
 const mio0_decode = (dataSlice) => {
     const firstfour = dataSlice.slice(0, 4)
-    if (new TextDecoder().decode(new Uint8Array(firstfour)) == "MIO")
-        throw "header not valid"
+    if (new TextDecoder().decode(new Uint8Array(firstfour)) == "MIO") {
+             throw "header not valid"
+    }
 
     const headerData = bufferToUint32Be(new Uint8Array(dataSlice.slice(4, 16)))
     const headerObject = {
@@ -2891,7 +2886,9 @@ const extractAssetsFromRom = (romBufferData) => {
                     size: value[2],
                     offset: value[3]['us'][0]
                 })
-            } else throw "unknown asset type"
+            } else {
+                     throw "unknown asset type"
+            }
         }
     })
 
@@ -2910,7 +2907,9 @@ const extractAssetsFromRom = (romBufferData) => {
                 const numTiles = Math.floor(asset.size / 2048)
                 for (let i = 0; i < numTiles; i++) {
                     let hextileString = i.toString(16).toUpperCase()
-                    while (hextileString.length < 5) hextileString = '0' + hextileString
+                    while (hextileString.length < 5) {
+                             hextileString = '0' + hextileString
+                    }
                     const finalTexureName = textureNamePrefix + hextileString
                     extractedData[finalTexureName] = Buffer.from(decoded_bytes.slice(i * 2048, (i + 1) * 2048))
                 }
@@ -2926,23 +2925,11 @@ const extractAssetsFromRom = (romBufferData) => {
 
 document.getElementById('romSelect').addEventListener('submit', (e) => {
     e.preventDefault()
-    if (loadedGameAssets) return
+    if (loadedGameAssets) {
+         return
+    }
     const romFile = document.getElementById('romFile').files[0]
     const reader = new FileReader()
     reader.readAsArrayBuffer(romFile)
     reader.onload = (evt) => { extractAssetsFromRom(evt.target.result) }
 })
-
-/*        msgElement.innerHTML = "Please wait for ROM to be uploaded and game assets to be sent back to your device..."
-        msgElement.style = "color:yellow"
-        $.ajax({
-            url: '/romUpload',
-            type: 'POST',
-            data: new FormData(e.target),
-            processData: false,
-            contentType: false,
-            success: (extractedData) => {
-                console.log(extractedData)
-                processExtractedResults(extractedData)
-            }
-        })*/

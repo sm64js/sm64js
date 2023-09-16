@@ -185,8 +185,8 @@ export const turn_obj_away_from_steep_floor = (objFloor, floorY, objVelX, objVel
 
     // If the floor is steep and we are below it (i.e. walking into it), turn away from the floor.
     if (floor_nY < 0.5 && floorY > o.rawData[oPosY]) {
-        objVelXCopy = objVelX
-        objVelZCopy = objVelZ
+        let objVelXCopy = objVelX
+        let objVelZCopy = objVelZ
         const objYawWrapper = {}
         turn_obj_away_from_surface(objVelXCopy, objVelZCopy, floor_nX, floor_nZ, objYawWrapper)
         o.rawData[oMoveAngleYaw] = atan2s(objYawWrapper.z, objYawWrapper.x)

@@ -404,6 +404,116 @@ export const DEFINE_COURSES_END = () => {}
 export const DEFINE_COURSE = (_, cutscenes) => { return DANCE_ENTRY(cutscenes) }
 export const DEFINE_BONUS_COURSE = (_, cutscenes) => { return DANCE_ENTRY(cutscenes) }
 
+export const gIntroLakituStartToPipeFocus = [
+    { index: 0,  speed: 32, point: [ 58, -250, 346 ] },
+    { index: 1,  speed: 50, point: [ -159, -382, 224 ] },
+    { index: 2,  speed: 37, point: [ 0, -277, 237 ] },
+    { index: 3,  speed: 15, point: [ 1, -44, 245 ] },
+    { index: 4,  speed: 35, point: [ 0, -89, 228 ] },
+    { index: 5,  speed: 15, point: [ 28, 3, 259 ] },
+    { index: 6,  speed: 25, point: [ -38, -201, 371 ] },
+    { index: 7,  speed: 20, point: [ -642, 118, 652 ] },
+    { index: 8,  speed: 25, point: [ 103, -90, 861 ] },
+    { index: 9,  speed: 25, point: [ 294, 145, 579 ] },
+    { index: 10, speed: 30, point: [ 220, -42, 500 ] },
+    { index: 11, speed: 20, point: [ 10, -134, 200 ] },
+    { index: 12, speed: 20, point: [ -143, -145, 351 ] },
+    { index: 13, speed: 14, point: [ -256, -65, 528 ] },
+    { index: 14, speed: 20, point: [ -251, -52, 459 ] },
+    { index: 15, speed: 25, point: [ -382, 520, 395 ] },
+    { index: 16, speed: 25, point: [ -341, 240, 653 ] },
+    { index: 17, speed: 5,  point: [ -262, 700, 143 ] },
+    { index: 18, speed: 15, point: [ -760, 32, 27 ] },
+    { index: 19, speed: 20, point: [ -756, -6, -26 ] },
+    { index: 20, speed: 20, point: [ -613, 5, 424 ] },
+    { index: 21, speed: 20, point: [ -22, -100, 312 ] },
+    { index: 22, speed: 25, point: [ 212, 80, 61 ] },
+    { index: 23, speed: 20, point: [ 230, -28, 230 ] },
+    { index: 24, speed: 35, point: [ -83, -51, 303 ] },
+    { index: 25, speed: 17, point: [ 126, 90, 640 ] },
+    { index: 26, speed: 9,  point: [ 158, 95, 763 ] },
+    { index: 27, speed: 8,  point: [ 113, -25, 1033 ] },
+    { index: 28, speed: 20, point: [ 57, -53, 1291 ] },
+    { index: 29, speed: 15, point: [ 73, -34, 1350 ] },
+    { index: 30, speed: 7,  point: [ 0, 96, 1400 ] },
+    { index: 31, speed: 8,  point: [ -59, 269, 1450 ] },
+    { index: 32, speed: 15, point: [ 57, 1705, 1500 ] },
+    { index: 0,  speed: 15, point: [ -227, 511, 1550 ] },
+    { index: -1, speed: 15, point: [ -227, 511, 1600 ] }
+]
+
+export const gIntroLakituStartToPipeOffsetFromCamera = [
+    { index: 0,  speed: 0, point: [ -46, 87, -15 ] },
+    { index: 1,  speed: 0, point: [ -38, 91, -11 ] },
+    { index: 2,  speed: 0, point: [ -31, 93, -13 ] },
+    { index: 3,  speed: 0, point: [ -50, 84, -16 ] },
+    { index: 4,  speed: 0, point: [ -52, 83, -17 ] },
+    { index: 5,  speed: 0, point: [ -10, 99, 3 ] },
+    { index: 6,  speed: 0, point: [ -54, 83, -10 ] },
+    { index: 7,  speed: 0, point: [ -31, 85, -40 ] },
+    { index: 8,  speed: 0, point: [ -34, 91, 19 ] },
+    { index: 9,  speed: 0, point: [ -9, 95, 28 ] },
+    { index: 10, speed: 0, point: [ 17, 72, 66 ] },
+    { index: 11, speed: 0, point: [ 88, -7, 45 ] },
+    { index: 12, speed: 0, point: [ 96, -6, -26 ] },
+    { index: 13, speed: 0, point: [ 56, -1, -82 ] },
+    { index: 14, speed: 0, point: [ 40, 65, -63 ] },
+    { index: 15, speed: 0, point: [ -26, -3, -96 ] },
+    { index: 16, speed: 0, point: [ 92, 82, 19 ] }, 
+    { index: 17, speed: 0, point: [ 92, 32, 19 ] },
+    { index: 18, speed: 0, point: [ 92, 32, 19 ] },
+    { index: 19, speed: 0, point: [ 92, 102, 19 ] },
+    { index: 20, speed: 0, point: [ -69, 59, -70 ] },
+    { index: 21, speed: 0, point: [ -77, 109, -61 ] },
+    { index: 22, speed: 0, point: [ -87, 59, -46 ] },
+    { index: 23, speed: 0, point: [ -99, -3, 11 ] },
+    { index: 24, speed: 0, point: [ -99, -11, 5 ] },
+    { index: 25, speed: 0, point: [ -97, -6, 19 ] },
+    { index: 26, speed: 0, point: [ -97, 22, -7 ] },
+    { index: 27, speed: 0, point: [ -98, -11, -13 ] },
+    { index: 28, speed: 0, point: [ -97, -11, 19 ] },
+    { index: 29, speed: 0, point: [ -91, -11, 38 ] },
+    { index: 30, speed: 0, point: [ -76, -11, 63 ] },
+    { index: 31, speed: 0, point: [ -13, 33, 93 ] },
+    { index: 32, speed: 0, point: [ 51, -11, 84 ] },
+    { index: 33, speed: 0, point: [ 51, -11, 84 ] },
+    { index: -1, speed: 0, point: [ 51, -11, 84 ] }
+]
+
+const sIntroPipeToDialogPosition = [
+    {index: 0, speed: 0, point: [-785, 625, 4527]},
+    {index: 1, speed: 0, point: [-785, 625, 4527]},
+    {index: 2, speed: 0, point: [-1286, 644, 4376]},
+    {index: 3, speed: 0, point: [-1286, 623, 4387]},
+    {index: 4, speed: 0, point: [-1286, 388, 3963]},
+    {index: 5, speed: 0, point: [-1286, 358, 4093]},
+    {index: 6, speed: 0, point: [-1386, 354, 4159]},
+    {index: 7, speed: 0, point: [-1477, 306, 4223]},
+    {index: 8, speed: 0, point: [-1540, 299, 4378]},
+    {index: 9, speed: 0, point: [-1473, 316, 4574]},
+    {index: 0, speed: 0, point: [-1328, 485, 5017]},
+    {index: 0, speed: 0, point: [-1328, 485, 5017]},
+    {index: 0, speed: 0, point: [-1328, 485, 5017]},
+    {index: -1, speed: 0, point: [-1328, 485, 5017]},
+]
+
+const sIntroPipeToDialogFocus = [
+    {index: 0, speed: 20, point: [-1248, 450, 4596]},
+    {index: 1, speed: 59, point: [-1258, 485, 4606]},
+    {index: 2, speed: 59, point: [-1379, 344, 4769]},
+    {index: 3, speed: 20, point: [-1335, 366, 4815]},
+    {index: 4, speed: 23, point: [-1315, 370, 4450]},
+    {index: 5, speed: 40, point: [-1322, 333, 4591]},
+    {index: 6, speed: 25, point: [-1185, 329, 4616]},
+    {index: 7, speed: 21, point: [-1059, 380, 4487]},
+    {index: 8, speed: 14, point: [-1086, 421, 4206]},
+    {index: 9, speed: 21, point: [-1321, 346, 4098]},
+    {index: 0, speed: 0, point: [-1328, 385, 4354]},
+    {index: 0, speed: 0, point: [-1328, 385, 4354]},
+    {index: 0, speed: 0, point: [-1328, 385, 4354]},
+    {index: -1, speed: 0, point: [-1328, 385, 4354]},
+]
+
 class Camera {
     constructor() {
         this.floor = null
@@ -1099,40 +1209,6 @@ class Camera {
             {index: 2, speed: 50, point: [-2123, -1600, 4391]},
             {index: 3, speed: 50, point: [-3957, -1401, 3426]},
             {index: -1, speed: 50, point: [-4730, -1215, 1795]},
-        ]
-
-        this.sIntroPipeToDialogPosition = [
-            {index: 0, speed: 0, point: [-785, 625, 4527]},
-            {index: 1, speed: 0, point: [-785, 625, 4527]},
-            {index: 2, speed: 0, point: [-1286, 644, 4376]},
-            {index: 3, speed: 0, point: [-1286, 623, 4387]},
-            {index: 4, speed: 0, point: [-1286, 388, 3963]},
-            {index: 5, speed: 0, point: [-1286, 358, 4093]},
-            {index: 6, speed: 0, point: [-1386, 354, 4159]},
-            {index: 7, speed: 0, point: [-1477, 306, 4223]},
-            {index: 8, speed: 0, point: [-1540, 299, 4378]},
-            {index: 9, speed: 0, point: [-1473, 316, 4574]},
-            {index: 0, speed: 0, point: [-1328, 485, 5017]},
-            {index: 0, speed: 0, point: [-1328, 485, 5017]},
-            {index: 0, speed: 0, point: [-1328, 485, 5017]},
-            {index: -1, speed: 0, point: [-1328, 485, 5017]},
-        ]
-
-        this.sIntroPipeToDialogFocus = [
-            {index: 0, speed: 20, point: [-1248, 450, 4596]},
-            {index: 1, speed: 59, point: [-1258, 485, 4606]},
-            {index: 2, speed: 59, point: [-1379, 344, 4769]},
-            {index: 3, speed: 20, point: [-1335, 366, 4815]},
-            {index: 4, speed: 23, point: [-1315, 370, 4450]},
-            {index: 5, speed: 40, point: [-1322, 333, 4591]},
-            {index: 6, speed: 25, point: [-1185, 329, 4616]},
-            {index: 7, speed: 21, point: [-1059, 380, 4487]},
-            {index: 8, speed: 14, point: [-1086, 421, 4206]},
-            {index: 9, speed: 21, point: [-1321, 346, 4098]},
-            {index: 0, speed: 0, point: [-1328, 385, 4354]},
-            {index: 0, speed: 0, point: [-1328, 385, 4354]},
-            {index: 0, speed: 0, point: [-1328, 385, 4354]},
-            {index: -1, speed: 0, point: [-1328, 385, 4354]},
         ]
 
         /******************************************************************************************************
@@ -4318,6 +4394,7 @@ class Camera {
      * the 4th CutsceneSplinePoint in the current segment away from spline[splineSegment] has an index of -1.
      */
     move_point_along_spline(p, spline, ptrWrapper) {
+        
         let finished = 0
         let controlPoints = [
             [0,0,0],[0,0,0],[0,0,0],[0,0,0]
@@ -4359,6 +4436,7 @@ class Camera {
             }
             ptrWrapper.progress--
         }
+
         return finished
     }
 
@@ -7889,26 +7967,24 @@ class Camera {
      * `focusSpline`. sCutsceneSplineSegmentProgress is updated after pos and focus are calculated.
      */
     intro_peach_move_camera_start_to_pipe(c, positionSpline, focusSpline) {
-        let offset = [0, 0, 0];
-        let posReturn = 0;
-        let focusReturn = 0;
 
         /**
          * The position spline's speed parameters are all 0, so sCutsceneSplineSegmentProgress doesn't get
          * updated. Otherwise position would move two frames ahead, and c->focus would always be one frame
          * further along the spline than c->pos.
          */
+        
         const wrapper = {splineSegment: this.sCutsceneSplineSegment, progress: this.sCutsceneSplineSegmentProgress}
-        posReturn = this.move_point_along_spline(c.pos, positionSpline, wrapper)
-        focusReturn = this.move_point_along_spline(c.focus, focusSpline, wrapper)
+        this.move_point_along_spline(c.pos, positionSpline, wrapper)
+        let focusReturn = this.move_point_along_spline(c.focus, focusSpline, wrapper)
         this.sCutsceneSplineSegment = wrapper.splineSegment; this.sCutsceneSplineSegmentProgress = wrapper.progress;
-
+        
         // The two splines used by this function are reflected in the horizontal plane for some reason,
         // so they are rotated every frame. Why do this, Nintendo?
         this.rotate_in_xz(c.focus, c.focus, DEGREES(-180));
         this.rotate_in_xz(c.pos, c.pos, DEGREES(-180));
         
-        vec3f_set(offset, -1328.0, 260.0, 4664.0)
+        let offset = [-1328.0, 260.0, 4664.0];
         MathUtil.vec3f_add(c.focus, offset)
         MathUtil.vec3f_add(c.pos, offset)
         return focusReturn;
@@ -7923,7 +7999,8 @@ class Camera {
     }
 
     cutscene_intro_peach_start_to_pipe_spline(c) {
-        if (this.intro_peach_move_camera_start_to_pipe(c, this.sIntroPipeToDialogPosition, this.sIntroPipeToDialogFocus) != 0) {
+        console.log(this.sCutsceneSplineSegment, "|", sIntroPipeToDialogPosition[this.sCutsceneSplineSegment].point)
+        if (this.intro_peach_move_camera_start_to_pipe(c, sIntroPipeToDialogPosition, sIntroPipeToDialogFocus) != 0) {
             this.gCameraMovementFlags &= ~CAM_MOVE_C_UP_MODE;
             this.gCutsceneTimer = CUTSCENE_LOOP;
         }
@@ -7944,8 +8021,8 @@ class Camera {
 
     cutscene_intro_peach_follow_pipe_spline(c) {
         const wrapper = {splineSegment: this.sCutsceneSplineSegment, progress: this.sCutsceneSplineSegmentProgress}
-        this.move_point_along_spline(c.pos, this.sIntroPipeToDialogPosition, wrapper)
-        this.move_point_along_spline(c.pos, this.sIntroPipeToDialogFocus, wrapper)
+        this.move_point_along_spline(c.pos, sIntroPipeToDialogPosition, wrapper)
+        this.move_point_along_spline(c.focus, sIntroPipeToDialogFocus, wrapper)
         this.sCutsceneSplineSegment = wrapper.splineSegment; this.sCutsceneSplineSegmentProgress = wrapper.progress
     }
     
@@ -7988,6 +8065,7 @@ class Camera {
         this.cutscene_intro_peach_start_flying_music = this.cutscene_intro_peach_start_flying_music.bind(this)
         this.cutscene_intro_peach_start_to_pipe_spline = this.cutscene_intro_peach_start_to_pipe_spline.bind(this)
         this.cutscene_intro_peach_clear_cutscene_status = this.cutscene_intro_peach_clear_cutscene_status.bind(this)
+        
         this.cutscene_event(this.play_sound_intro_turn_on_hud, c, 818, 818);
         this.cutscene_spawn_obj(6, 1)
         this.cutscene_event(this.cutscene_intro_peach_start_flying_music, c, 0, 0)
@@ -8030,18 +8108,20 @@ class Camera {
 
     cutscene_intro_peach_letter(c) {
         this.cutscene_spawn_obj(5, 0);
+
         this.cutscene_intro_peach_zoom_fov = this.cutscene_intro_peach_zoom_fov.bind(this)
         this.cutscene_intro_peach_start_letter_music = this.cutscene_intro_peach_start_letter_music.bind(this)
         this.cutscene_intro_peach_start_to_pipe_spline = this.cutscene_intro_peach_start_to_pipe_spline.bind(this)
         this.peach_letter_text = this.peach_letter_text.bind(this)
         this.play_sound_peach_reading_letter = this.play_sound_peach_reading_letter.bind(this)
+        
         this.cutscene_event(this.cutscene_intro_peach_zoom_fov, c, 0, 0)
         this.cutscene_event(this.cutscene_intro_peach_start_letter_music, c, 65, 65)
         this.cutscene_event(this.cutscene_intro_peach_start_to_pipe_spline, c, 0, 0)
         this.cutscene_event(this.peach_letter_text, c, 65, 65)
         this.cutscene_event(this.play_sound_peach_reading_letter, c, 83, 83)
 
-        if (this.gCutsceneTimer > 120 && IngameMenu.get_dialog_id() == DIALOG_NONE) this.gCutsceneTimer = CUTSCENE_LOOP
+        if (this.gCutsceneTimer > 120 /* && IngameMenu.get_dialog_id() == DIALOG_NONE */) this.gCutsceneTimer = CUTSCENE_LOOP
 
         this.clamp_pitch(c.pos, c.focus, 0x3B00, -0x3B00)
     }

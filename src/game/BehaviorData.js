@@ -85,6 +85,7 @@ import * as _flamethrower             from "./behaviors/flamethrower.inc"
 import * as _flying_bookend_switch    from "./behaviors/flying_bookend_switch.inc"
 import * as _goomba                   from "./behaviors/goomba.inc"
 import * as _haunted_chair            from "./behaviors/haunted_chair.inc"
+import * as _intro_lakitu             from "./behaviors/intro_lakitu.inc"
 import * as _intro_peach              from "./behaviors/intro_peach.inc"
 import * as _intro_scene              from "./behaviors/intro_scene.inc"
 import * as _king_bobomb              from "./behaviors/king_bobomb.inc"
@@ -2664,6 +2665,17 @@ export const bhvBeginningPeach = [
     END_LOOP(),
 ]
 
+const bhvBeginningLakitu = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_ANIMATIONS(oAnimations, lakitu_seg6_anims_060058F8),
+    ANIMATE(0),
+    SET_FLOAT(oOpacity, 0),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_intro_lakitu_loop'),
+    END_LOOP(),
+]
+
 export const bhvEndBirds1 = [
     BEGIN(OBJ_LIST_DEFAULT),
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -2715,6 +2727,7 @@ gLinker.behaviors.bhvArrowLift = bhvArrowLift
 gLinker.behaviors.bhvBalconyBigBoo = bhvBalconyBigBoo
 gLinker.behaviors.bhvBbhTumblingBridge = bhvBbhTumblingBridge
 gLinker.behaviors.bhvBeginningPeach = bhvBeginningPeach
+gLinker.behaviors.bhvBeginningLakitu = bhvBeginningLakitu
 gLinker.behaviors.bhvBigBully = bhvBigBully
 gLinker.behaviors.bhvBigBullyWithMinions = bhvBigBullyWithMinions
 gLinker.behaviors.bhvBird = bhvBird
@@ -2749,7 +2762,7 @@ gLinker.behaviors.bhvCourtyardBooTriplet = bhvCourtyardBooTriplet
 gLinker.behaviors.bhvCannon = bhvCannon
 gLinker.behaviors.bhvCannonBarrelBubbles = bhvCannonBarrelBubbles
 gLinker.behaviors.bhvCoinInsideBoo = bhvCoinInsideBoo
-// gLinker.behaviors.bhvCameraLakitu = bhvCameraLakitu
+gLinker.behaviors.bhvCameraLakitu = bhvCameraLakitu
 gLinker.behaviors.bhvCannonClosed = bhvCannonClosed
 gLinker.behaviors.bhvCarrySomething1 = bhvCarrySomething1
 gLinker.behaviors.bhvCarrySomething2 = bhvCarrySomething2

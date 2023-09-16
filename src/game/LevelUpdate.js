@@ -48,6 +48,24 @@ import {
     WARP_TRANSITION_FADE_INTO_MARIO,
     WARP_TRANSITION_FADE_FROM_BOWSER,
     WARP_TRANSITION_FADE_INTO_BOWSER,
+    MARIO_SPAWN_AIRBORNE,
+    MARIO_SPAWN_AIRBORNE_DEATH,
+    MARIO_SPAWN_AIRBORNE_STAR_COLLECT,
+    MARIO_SPAWN_DEATH,
+    MARIO_SPAWN_DOOR_WARP,
+    MARIO_SPAWN_FLYING,
+    MARIO_SPAWN_HARD_AIR_KNOCKBACK,
+    MARIO_SPAWN_INSTANT_ACTIVE,
+    MARIO_SPAWN_LAUNCH_DEATH,
+    MARIO_SPAWN_LAUNCH_STAR_COLLECT,
+    MARIO_SPAWN_PAINTING_DEATH,
+    MARIO_SPAWN_PAINTING_STAR_COLLECT,
+    MARIO_SPAWN_SPIN_AIRBORNE,
+    MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE,
+    MARIO_SPAWN_SWIMMING,
+    MARIO_SPAWN_TELEPORT,
+    MARIO_SPAWN_UNKNOWN_02,
+    MARIO_SPAWN_UNKNOWN_03
 } from "./Area"
 
 import { play_sound, gGlobalSoundSource } from "../audio/external"
@@ -89,26 +107,6 @@ export const WARP_OP_CREDITS_NEXT  = 0x18
 export const WARP_OP_DEMO_END      = 0x19
 
 export const WARP_OP_TRIGGERS_LEVEL_SELECT = 0x10
-
-export const MARIO_SPAWN_DOOR_WARP             = 0x01
-export const MARIO_SPAWN_UNKNOWN_02            = 0x02
-export const MARIO_SPAWN_UNKNOWN_03            = 0x03
-export const MARIO_SPAWN_TELEPORT              = 0x04
-export const MARIO_SPAWN_INSTANT_ACTIVE        = 0x10
-export const MARIO_SPAWN_SWIMMING              = 0x11
-export const MARIO_SPAWN_AIRBORNE              = 0x12
-export const MARIO_SPAWN_HARD_AIR_KNOCKBACK    = 0x13
-export const MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE  = 0x14
-export const MARIO_SPAWN_DEATH                 = 0x15
-export const MARIO_SPAWN_SPIN_AIRBORNE         = 0x16
-export const MARIO_SPAWN_FLYING                = 0x17
-export const MARIO_SPAWN_PAINTING_STAR_COLLECT = 0x20
-export const MARIO_SPAWN_PAINTING_DEATH        = 0x21
-export const MARIO_SPAWN_AIRBORNE_STAR_COLLECT = 0x22
-export const MARIO_SPAWN_AIRBORNE_DEATH        = 0x23
-export const MARIO_SPAWN_LAUNCH_STAR_COLLECT   = 0x24
-export const MARIO_SPAWN_LAUNCH_DEATH          = 0x25
-export const MARIO_SPAWN_UNKNOWN_27            = 0x27
 
 
 const PLAY_MODE_NORMAL  =  0
@@ -225,17 +223,6 @@ class LevelUpdate {
                 this.sWarpBhvSpawnType[i] = [gLinker.behaviors[sProtoWarpBhvSpawnType[i][0]], sProtoWarpBhvSpawnType[i][1]]
             }
         }
-    }
-
-    get_mario_spawn_type(o) {
-        this.init_mario_warp_spawn_type()
-
-        for (let i = 0; i < this.sWarpBhvSpawnType.length; ++i) {
-            if (this.sWarpBhvSpawnType[i][0] == o.behavior) {
-                return this.sWarpBhvSpawnType[i][1]
-            }
-        }
-        return false
     }
 
     lvl_init_from_save_file(arg0, levelNum) {

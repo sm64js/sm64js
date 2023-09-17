@@ -10,6 +10,7 @@ import { HudInstance as Hud } from "./Hud"
 import { PrintInstance as Print } from "./Print"
 import { SCREEN_WIDTH } from "../include/config"
 import { oBehParams, ACTIVE_FLAG_DEACTIVATED, oActiveParticleFlags } from "../include/object_constants"
+import { MENU_OPT_NONE, IngameMenuInstance as IngameMenu } from "./IngameMenu"
 
 export const WARP_TRANSITION_FADE_FROM_COLOR   = 0x00
 export const WARP_TRANSITION_FADE_INTO_COLOR   = 0x01
@@ -363,11 +364,11 @@ class Area {
             // do_cutscene_handler();
             // print_displaying_credits_entry();
 
-            // gPauseScreenMode = render_menus_and_dialogs();
+            this.gMenuOptSelectIndex = IngameMenu.render_menus_and_dialogs();
 
-            // if (gPauseScreenMode != 0) {
-            //     gSaveOptSelectIndex = gPauseScreenMode;
-            // }
+            if (this.gMenuOptSelectIndex != MENU_OPT_NONE) {
+                this.gSaveOptSelectIndex = this.gMenuOptSelectIndex;
+            }
 
             // if (D_8032CE78 != NULL) {
             //     make_viewport_clip_rect(D_8032CE78);

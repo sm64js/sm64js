@@ -219,6 +219,43 @@ export const texture_waterbox_mist = []
 export const texture_waterbox_unknown_water = []
 export const texture_waterbox_water = []
 
+const vertex_ia8_char = [
+    [[     0,      0,      0], 0, [     0,   1024], [0xff, 0xff, 0xff, 0xff]],
+    [[     8,      0,      0], 0, [   512,   1024], [0xff, 0xff, 0xff, 0xff]],
+    [[     8,     16,      0], 0, [   512,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[     0,     16,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+]
+
+export const dl_ia_text_begin = [
+    gsDPPipeSync(),
+    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetCombineMode(Gbi.G_CC_FADEA, Gbi.G_CC_FADEA),
+    gsDPSetEnvColor(255, 255, 255, 255),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_XLU_SURF, Gbi.G_RM_XLU_SURF2),
+    Gbi.gsDPSetTextureFilter(Gbi.G_TF_POINT),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsSPEndDisplayList(),
+].flat();
+
+export const dl_ia_text_tex_settings = [
+    gsDPSetTile(Gbi.G_IM_FMT_IA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | Gbi.G_TX_MIRROR, 3, G_TX_NOLOD, G_TX_WRAP | Gbi.G_TX_MIRROR, 4, G_TX_NOLOD),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, ((16 * 8 + Gbi.G_IM_SIZ_4b_INCR) >> Gbi.G_IM_SIZ_4b_SHIFT) - 1, CALC_DXT(16, Gbi.G_IM_SIZ_4b_BYTES)),
+    gsDPSetTile(Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_4b, 1, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | Gbi.G_TX_MIRROR, 3, G_TX_NOLOD, G_TX_WRAP | Gbi.G_TX_MIRROR, 4, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (16 - 1) << G_TEXTURE_IMAGE_FRAC, (8 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPEndDisplayList(),
+].flat();
+
+export const dl_ia_text_end = [
+    gsDPPipeSync(),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPSetCombineMode(Gbi.G_CC_SHADE, Gbi.G_CC_SHADE),
+    gsDPSetEnvColor(255, 255, 255, 255),
+    gsSPSetGeometryMode(G_LIGHTING | Gbi.G_SHADING_SMOOTH),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF, Gbi.G_RM_AA_ZB_OPA_SURF2),
+    Gbi.gsDPSetTextureFilter(Gbi.G_TF_BILERP),
+    gsSPEndDisplayList(),
+].flat();
 
 // 0x0200EFB0 - 0x0200EFF0
 const vertex_billboard_num = [
@@ -239,7 +276,7 @@ export const dl_billboard_num_begin = [
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 4, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 4, G_TX_NOLOD, G_TX_CLAMP, 4, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (16 - 1) << G_TEXTURE_IMAGE_FRAC, (16 - 1) << G_TEXTURE_IMAGE_FRAC),
     gsSPEndDisplayList(),
-];
+].flat();
 
 // 0x0200F038 - 0x0200F078
 export const dl_billboard_num_end = [
@@ -250,7 +287,7 @@ export const dl_billboard_num_end = [
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPSetGeometryMode(G_LIGHTING),
     gsSPEndDisplayList(),
-];
+].flat();
 
 // 0x0200F078 - 0x0200F0A8
 export const dl_billboard_num_0 = [
@@ -260,7 +297,7 @@ export const dl_billboard_num_0 = [
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
     gsSPDisplayList(dl_billboard_num_end),
     gsSPEndDisplayList(),
-];
+].flat();
 
 // 0x0200F0A8 - 0x0200F0D8
 export const dl_billboard_num_1 = [
@@ -270,7 +307,7 @@ export const dl_billboard_num_1 = [
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
     gsSPDisplayList(dl_billboard_num_end),
     gsSPEndDisplayList(),
-];
+].flat();
 
 // 0x0200F0D8 - 0x0200F108
 export const dl_billboard_num_2 = [
@@ -280,7 +317,7 @@ export const dl_billboard_num_2 = [
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
     gsSPDisplayList(dl_billboard_num_end),
     gsSPEndDisplayList(),
-];
+].flat();
 
 // 0x0200F108 - 0x0200F138
 export const dl_billboard_num_3 = [
@@ -290,7 +327,7 @@ export const dl_billboard_num_3 = [
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
     gsSPDisplayList(dl_billboard_num_end),
     gsSPEndDisplayList(),
-];
+].flat();
 
 // 0x0200F138 - 0x0200F168
 export const dl_billboard_num_4 = [
@@ -300,7 +337,7 @@ export const dl_billboard_num_4 = [
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
     gsSPDisplayList(dl_billboard_num_end),
     gsSPEndDisplayList(),
-];
+].flat();
 
 // 0x0200F168 - 0x0200F198
 export const dl_billboard_num_5 = [
@@ -310,7 +347,7 @@ export const dl_billboard_num_5 = [
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
     gsSPDisplayList(dl_billboard_num_end),
     gsSPEndDisplayList(),
-];
+].flat();
 
 // 0x0200F198 - 0x0200F1C8
 export const dl_billboard_num_6 = [
@@ -320,7 +357,7 @@ export const dl_billboard_num_6 = [
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
     gsSPDisplayList(dl_billboard_num_end),
     gsSPEndDisplayList(),
-];
+].flat();
 
 // 0x0200F1C8 - 0x0200F1F8
 export const dl_billboard_num_7 = [
@@ -330,7 +367,7 @@ export const dl_billboard_num_7 = [
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
     gsSPDisplayList(dl_billboard_num_end),
     gsSPEndDisplayList(),
-];
+].flat();
 
 // 0x0200F1F8 - 0x0200F228
 export const dl_billboard_num_8 = [
@@ -340,7 +377,7 @@ export const dl_billboard_num_8 = [
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
     gsSPDisplayList(dl_billboard_num_end),
     gsSPEndDisplayList(),
-];
+].flat();
 
 // 0x0200F228 - 0x0200F258
 export const dl_billboard_num_9 = [
@@ -350,13 +387,25 @@ export const dl_billboard_num_9 = [
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
     gsSPDisplayList(dl_billboard_num_end),
     gsSPEndDisplayList(),
-];
+].flat();
 
-export const main_hud_camera_lut = [
-	texture_hud_char_camera, texture_hud_char_mario_head, texture_hud_char_lakitu, texture_hud_char_no_camera,
-	texture_hud_char_arrow_up, texture_hud_char_arrow_down,
-];
-
+export const main_hud_lut = [
+    texture_hud_char_0, texture_hud_char_1, texture_hud_char_2, texture_hud_char_3,
+    texture_hud_char_4, texture_hud_char_5, texture_hud_char_6, texture_hud_char_7,
+    texture_hud_char_8, texture_hud_char_9, texture_hud_char_A, texture_hud_char_B,
+    texture_hud_char_C, texture_hud_char_D, texture_hud_char_E, texture_hud_char_F,
+    texture_hud_char_G, texture_hud_char_H, texture_hud_char_I, texture_hud_char_J,
+    texture_hud_char_K, texture_hud_char_L, texture_hud_char_M, texture_hud_char_N,
+    texture_hud_char_O, texture_hud_char_P, texture_hud_char_Q, texture_hud_char_R,
+    texture_hud_char_S, texture_hud_char_T, texture_hud_char_U, texture_hud_char_V,
+    texture_hud_char_W, texture_hud_char_X, texture_hud_char_Y, texture_hud_char_Z,
+    texture_hud_char_exclamation, texture_hud_char_double_exclamation, texture_hud_char_question, texture_hud_char_ampersand,
+    texture_hud_char_percent,                 0x0,                      0x0,                  0x0,
+                      0x0,                   0x0,                      0x0,                  0x0,
+                      0x0,                   0x0, texture_hud_char_multiply, texture_hud_char_coin,
+    texture_hud_char_mario_head, texture_hud_char_star, texture_hud_char_decimal_point, texture_hud_char_beta_key,
+    texture_hud_char_apostrophe, texture_hud_char_double_quote,
+]
 
 export const main_font_lut = [
     texture_font_char_us_0, texture_font_char_us_1, texture_font_char_us_2, texture_font_char_us_3,
@@ -425,23 +474,27 @@ export const main_font_lut = [
     texture_font_char_us_interpunct, texture_font_char_us_star_hollow,               0x0,               0x0,
 ];
 
-export const main_hud_lut = [
-    texture_hud_char_0, texture_hud_char_1, texture_hud_char_2, texture_hud_char_3,
-    texture_hud_char_4, texture_hud_char_5, texture_hud_char_6, texture_hud_char_7,
-    texture_hud_char_8, texture_hud_char_9, texture_hud_char_A, texture_hud_char_B,
-    texture_hud_char_C, texture_hud_char_D, texture_hud_char_E, texture_hud_char_F,
-    texture_hud_char_G, texture_hud_char_H, texture_hud_char_I, texture_hud_char_J,
-    texture_hud_char_K, texture_hud_char_L, texture_hud_char_M, texture_hud_char_N,
-    texture_hud_char_O, texture_hud_char_P, texture_hud_char_Q, texture_hud_char_R,
-    texture_hud_char_S, texture_hud_char_T, texture_hud_char_U, texture_hud_char_V,
-    texture_hud_char_W, texture_hud_char_X, texture_hud_char_Y, texture_hud_char_Z,
-    texture_hud_char_exclamation, texture_hud_char_double_exclamation, texture_hud_char_question, texture_hud_char_ampersand,
-    texture_hud_char_percent,                 0x0,                      0x0,                  0x0,
-                      0x0,                   0x0,                      0x0,                  0x0,
-                      0x0,                   0x0, texture_hud_char_multiply, texture_hud_char_coin,
-    texture_hud_char_mario_head, texture_hud_char_star, texture_hud_char_decimal_point, texture_hud_char_beta_key,
-    texture_hud_char_apostrophe, texture_hud_char_double_quote,
-]
+export const main_hud_camera_lut = [
+	texture_hud_char_camera, texture_hud_char_mario_head, texture_hud_char_lakitu, texture_hud_char_no_camera,
+	texture_hud_char_arrow_up, texture_hud_char_arrow_down,
+];
+
+const vertex_text_bg_box = [
+    [[     0,    -80,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[   130,    -80,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[   130,      0,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[     0,      0,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+];
+
+export const dl_draw_text_bg_box = [
+    gsDPPipeSync(),
+    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetCombineMode(Gbi.G_CC_FADE, Gbi.G_CC_FADE),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_XLU_SURF, Gbi.G_RM_XLU_SURF2),
+    gsSPVertex(vertex_text_bg_box, 4, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    gsSPEndDisplayList(),
+].flat();
 
 export const dl_hud_img_begin = function () {
 	var result = [
@@ -598,14 +651,6 @@ export const dl_waterbox_end = [
 	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
 	Gbi.gsSPEndDisplayList(),
-].flat()
-export const dl_ia_text_tex_settings = [
-    gsDPSetTile(Gbi.G_IM_FMT_IA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | Gbi.G_TX_MIRROR, 3, G_TX_NOLOD, G_TX_WRAP | Gbi.G_TX_MIRROR, 4, G_TX_NOLOD),
-    gsDPLoadSync(),
-    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, ((16 * 8 + Gbi.G_IM_SIZ_4b_INCR) >> Gbi.G_IM_SIZ_4b_SHIFT) - 1, CALC_DXT(16, Gbi.G_IM_SIZ_4b_BYTES)),
-    gsDPSetTile(Gbi.G_IM_FMT_IA, Gbi.G_IM_SIZ_4b, 1, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | Gbi.G_TX_MIRROR, 3, G_TX_NOLOD, G_TX_WRAP | Gbi.G_TX_MIRROR, 4, G_TX_NOLOD),
-    gsDPSetTileSize(0, 0, 0, (16 - 1) << G_TEXTURE_IMAGE_FRAC, (8 - 1) << G_TEXTURE_IMAGE_FRAC),
-    gsSPEndDisplayList(),
 ].flat()
 
 export const dl_rgba16_load_tex_block = [

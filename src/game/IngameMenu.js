@@ -1,14 +1,16 @@
 import { play_sound } from "../audio/external"
-import { dl_ia_text_tex_settings, dl_rgba16_load_tex_block, main_font_lut, main_hud_lut } from "../bin/segment2"
+import { dl_draw_text_bg_box, dl_ia_text_begin, dl_ia_text_end, dl_ia_text_tex_settings, dl_rgba16_load_tex_block, main_font_lut, main_hud_lut } from "../bin/segment2"
 import * as MathUtil from "../engine/math_util"
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../include/config"
 import * as Gbi from "../include/gbi"
-import { SOUND_MENU_CHANGE_SELECT } from "../include/sounds"
+import { SOUND_MENU_CHANGE_SELECT, SOUND_MENU_STAR_SOUND } from "../include/sounds"
 import { menu_font_lut, menu_hud_lut } from "../levels/menu/leveldata"
-import { DIALOG_NONE } from "../text/us/dialogs"
+import { DIALOG_020, DIALOG_NONE } from "../text/us/dialogs"
 import { GameInstance as Game } from "./Game"
 import { PrintInstance as Print } from "./Print"
 import { save_file_get_max_coin_score } from "./SaveFile"
+import { CameraInstance as Camera } from "./Camera"
+import { TEXT_CONTINUE_WITHOUT_SAVING, TEXT_SAVE_AND_CONTINUE, TEXT_SAVE_AND_QUIT } from "../include/text_strings"
 
 export const ASCII_TO_DIALOG = (asc) => {
     return (((asc) >= '0' && (asc) <= '9') ? ((asc) - '0') :
@@ -24,6 +26,23 @@ export const DIALOG_RESPONSE_NOT_DEFINED = 3
 export const MENU_MTX_PUSH = 1
 export const MENU_MTX_NOPUSH = 2
 
+export const MENU_OPT_NONE = 0;
+export const MENU_OPT_1 = 1;
+export const MENU_OPT_2 = 2;
+export const MENU_OPT_3 = 3;
+export const MENU_OPT_DEFAULT = MENU_OPT_1;
+
+export const MENU_OPT_CONTINUE = MENU_OPT_1;
+export const MENU_OPT_EXIT_COURSE = MENU_OPT_2;
+export const MENU_OPT_CAMERA_ANGLE_R = MENU_OPT_3;
+
+export const MENU_OPT_SAVE_AND_CONTINUE = MENU_OPT_1;
+export const MENU_OPT_SAVE_AND_QUIT = MENU_OPT_2;
+export const MENU_OPT_CONTINUE_DONT_SAVE = MENU_OPT_3;
+
+export const DIALOG_BOX_ANGLE_DEFAULT = 90.0
+export const DIALOG_BOX_SCALE_DEFAULT = 19.0
+
 export const TEXT_THE_RAW = [ASCII_TO_DIALOG('t'), ASCII_TO_DIALOG('h'), ASCII_TO_DIALOG('e'), 0x00]
 export const TEXT_YOU_RAW = [ASCII_TO_DIALOG('y'), ASCII_TO_DIALOG('o'), ASCII_TO_DIALOG('u'), 0x00]
 
@@ -35,6 +54,29 @@ export const HUD_LUT_GLOBAL = 1
 export const DIALOG_MARK_NONE = 0
 export const DIALOG_MARK_DAKUTEN = 1
 export const DIALOG_MARK_HANDAKUTEN = 2
+
+const DIALOG_CHAR_SLASH =                0xD0
+const DIALOG_CHAR_MULTI_THE =            0xD1 // 'the'
+const DIALOG_CHAR_MULTI_YOU =            0xD2 // 'you'
+const DIALOG_CHAR_PERIOD =               0x6E
+const DIALOG_CHAR_COMMA =                0x6F
+const DIALOG_CHAR_SPACE =                0x9E
+const DIALOG_CHAR_STAR_COUNT =           0xE0 // number of stars
+const DIALOG_CHAR_UMLAUT =               0xE9
+const DIALOG_CHAR_MARK_START =           0xEF
+const DIALOG_CHAR_DAKUTEN =              0xEF + DIALOG_MARK_DAKUTEN
+const DIALOG_CHAR_PERIOD_OR_HANDAKUTEN = 0xEF + DIALOG_MARK_HANDAKUTEN
+const DIALOG_CHAR_STAR_FILLED =          0xFA
+const DIALOG_CHAR_STAR_OPEN =            0xFD
+const DIALOG_CHAR_NEWLINE =              0xFE
+const DIALOG_CHAR_TERMINATOR =           0xFF
+
+const GLOBAL_CHAR_SPACE = 0x9E
+const GLOBAL_CHAR_TERMINATOR = 0xFF
+
+
+const STRING_THE = 0
+const STRING_YOU = 1
 
 //// MENU STATES ////
 export const MENU_STATE_0 = 0;
@@ -57,6 +99,13 @@ export const MENU_STATE_PAUSE_SCREEN_CASTLE = MENU_STATE_2;
 // Course Complete Screen
 export const MENU_STATE_COURSE_COMPLETE_SCREEN_OPENING = MENU_STATE_0;
 export const MENU_STATE_COURSE_COMPLETE_SCREEN_OPEN = MENU_STATE_1;
+
+// MODES //
+export const MENU_MODE_NONE = -1;
+export const MENU_MODE_UNUSED_0 = 0;
+export const MENU_MODE_RENDER_PAUSE_SCREEN = 1;
+export const MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN = 2;
+export const MENU_MODE_UNUSED_3 = 3;
 
 //// DIALOG STATES ////
 export const DIALOG_PAGE_STATE_NONE = 0;
@@ -88,52 +137,8 @@ class IngameMenu {
             0,  0,  5,  7,  7,  6,  6,  8,  0,  8, 10,  6,  4, 10,  0,  0
         ]
 
-        this.DialogMark = {
-            
-        }
-
-        this.DialogSpecialChars = {
-            DIALOG_CHAR_SLASH: 0xD0,
-            DIALOG_CHAR_MULTI_THE: 0xD1, // 'the'
-            DIALOG_CHAR_MULTI_YOU: 0xD2, // 'you'
-            DIALOG_CHAR_PERIOD:               0x6E,
-            DIALOG_CHAR_COMMA:                0x6F,
-            DIALOG_CHAR_SPACE:                0x9E,
-            DIALOG_CHAR_STAR_COUNT:           0xE0, // number of stars
-            DIALOG_CHAR_UMLAUT:               0xE9,
-            DIALOG_CHAR_MARK_START:           0xEF,
-            DIALOG_CHAR_DAKUTEN:              0xEF + this.DialogMark.DIALOG_MARK_DAKUTEN,
-            DIALOG_CHAR_PERIOD_OR_HANDAKUTEN: 0xEF + this.DialogMark.DIALOG_MARK_HANDAKUTEN,
-            DIALOG_CHAR_STAR_FILLED:          0xFA,
-            DIALOG_CHAR_STAR_OPEN:            0xFD,
-            DIALOG_CHAR_NEWLINE:              0xFE,
-            DIALOG_CHAR_TERMINATOR:           0xFF
-        }
-
-        this.SpecialFontChars = {
-            GLOBAL_CHAR_SPACE: 0x9E,
-            GLOBAL_CHAR_TERMINATOR: 0xFF
-        }
-
         this.strPos = 0
         this.lineNum = 1
-
-        this.MultiTextEntry = {
-            length,
-            str: new Array(4)
-        }
-
-        this.MultiStringIDs = {
-            STRING_THE: 0,
-            STRING_YOU: 1
-        }
-
-        this.CHAR_WIDTH_SPACE   = this.gDialogCharWidths[this.DialogSpecialChars.DIALOG_CHAR_SPACE]
-        this.CHAR_WIDTH_DEFAULT = this.gDialogCharWidths[this.MultiTextEntry.str[this.strPos]]
-
-        this.gDialogID = -1
-        this.gDialogBoxType = 0
-        this.gDialogResponse = DIALOG_RESPONSE_NONE
 
         this.gMenuTextColorTransTimer = 0;
         this.gLastDialogLineNum = 0;
@@ -146,8 +151,29 @@ class IngameMenu {
         this.gMenuHoldKeyIndex = 0;
         this.gMenuHoldKeyTimer = 0;
 
-        this.gHudSymCoin = [ Print.GLYPH_COIN, Print.GLYPH_SPACE ]
-        this.gHudSymX = [ Print.GLYPH_MULTIPLY, Print.GLYPH_SPACE ]
+        this.gCourseCompleteCoinsEqual = false;
+        this.gCourseCompleteScreenTimer = 0;
+        this.gCourseCompleteCoins = 0;
+
+        this.gHudSymCoin = [ Print.GLYPH_COIN, Print.GLYPH_SPACE ];
+        this.gHudSymX = [ Print.GLYPH_MULTIPLY, Print.GLYPH_SPACE ];
+        this.gHudFlash = 0;
+
+        this.gMenuState = MENU_STATE_DEFAULT
+        this.gMenuMode = MENU_MODE_NONE
+        this.gDialogBoxAngle = DIALOG_BOX_ANGLE_DEFAULT;
+        this.gDialogBoxScale = DIALOG_BOX_SCALE_DEFAULT;
+        this.gDialogScrollOffsetY = 0;
+        this.gDialogBoxType = DIALOG_TYPE_ROTATE;
+        this.gDialogID = DIALOG_NONE;
+        this.gNextDialogPageStartStrIndex = 0;
+        this.gDialogPageStartStrIndex = 0;
+        this.gMenuLineNum = 1;
+        this.gDialogWithChoice = false;
+        this.gMenuHoldKeyIndex = 0;
+        this.gMenuHoldKeyTimer = 0;
+        this.gDialogResponse = DIALOG_RESPONSE_NONE;
+
     }
 
     create_dl_identity_matrix() {
@@ -447,6 +473,7 @@ class IngameMenu {
 
     print_hud_my_score_coins(useCourseCoinScore, fileIndex, courseIndex, x, y) {
         let numCoins;
+        const wrapper = {};
 
         if (!useCourseCoinScore)
             numCoins = save_file_get_max_coin_score(courseIndex);
@@ -456,8 +483,39 @@ class IngameMenu {
         if (numCoins != 0) {
             this.print_hud_lut_string(HUD_LUT_GLOBAL, x, y, this.gHudSymCoin);
             this.print_hud_lut_string(HUD_LUT_GLOBAL, x + 16, y, this.gHudSymX);
-            this.print_hud_lut_string(HUD_LUT_GLOBAL, x + 32, y, numCoins.toString());
+            this.int_to_str(numCoins, wrapper)
+            this.print_hud_lut_string(HUD_LUT_GLOBAL, x + 32, y, wrapper.dst);
         }
+    }
+
+    int_to_str(num, dstWrapper) {
+        let digit1, digit2, digit3;
+
+        let pos = 0;
+
+        if (num > 999) {
+            dstWrapper.dst[0] = 0x00;
+            dstWrapper.dst[1] = DIALOG_CHAR_TERMINATOR;
+            return;
+        }
+
+        digit1 = num / 100;
+        digit2 = (num - digit1 * 100) / 10;
+        digit3 = (num - digit1 * 100 - digit2 * 10);
+
+        if (digit1 != 0) {
+            dstWrapper.dst[pos] = digit1;
+            pos++;
+        }
+
+        if (digit2 != 0 || digit1 != 0) {
+            dstWrapper.dst[pos] = digit2;
+            pos++;
+        }
+
+        dstWrapper.dst[pos] == digit3;
+        pos++;
+        dstWrapper.dst[pos] = DIALOG_CHAR_TERMINATOR;
     }
 
     get_dialog_id() {
@@ -465,32 +523,375 @@ class IngameMenu {
     }
 
     create_dialog_box(dialog) {
-        if (this.gDialogID == -1) {
-            this.gDialogID = dialog
-            this.gDialogBoxType = DIALOG_TYPE_ROTATE
+        if (this.gDialogID == DIALOG_NONE) {
+            this.gDialogID = dialog;
+            this.gDialogBoxType = DIALOG_TYPE_ROTATE;
         }
     }
 
     create_dialog_box_with_var(dialog, dialogVar) {
-        if (this.gDialogID == -1) {
+        if (this.gDialogID == DIALOG_NONE) {
             this.gDialogID = dialog;
-            this.gDialogVariable = dialogVar
-            this.gDialogBoxType = DIALOG_TYPE_ROTATE
+            this.gDialogVariable = dialogVar;
+            this.gDialogBoxType = DIALOG_TYPE_ROTATE;
         }
     }
 
     create_dialog_inverted_box(dialog) {
-        if (this.gDialogID == -1) {
-            this.gDialogID = dialog
-            this.gDialogBoxType = DIALOG_TYPE_ZOOM
+        if (this.gDialogID == DIALOG_NONE) {
+            this.gDialogID = dialog;
+            this.gDialogBoxType = DIALOG_TYPE_ZOOM;
         }
     }
 
     create_dialog_box_with_response(dialog) {
         if (this.gDialogID == DIALOG_NONE) {
-            this.gDialogID = dialog
-            this.gDialogBoxType = DIALOG_TYPE_ZOOM
+            this.gDialogID = dialog;
+            this.gDialogBoxType = DIALOG_TYPE_ZOOM;
         }
+    }
+
+    reset_dialog_render_state() {
+        level_set_transition(0, null);
+
+        if (this.gDialogBoxType == DIALOG_TYPE_ZOOM) {
+            Camera.trigger_cutscene_dialog(2);
+        }
+
+        this.gDialogBoxScale = DIALOG_BOX_SCALE_DEFAULT;
+        this.gDialogBoxAngle = DIALOG_BOX_ANGLE_DEFAULT;
+        this.gMenuState = MENU_STATE_DEFAULT;
+        this.gDialogID = DIALOG_NONE;
+        this.gDialogPageStartStrIndex = 0
+        this.gDialogWithChoice = false;
+        this.gNextDialogPageStartStrIndex = 0;
+        this.gDialogResponse = DIALOG_RESPONSE_NONE;
+    }
+
+    render_dialog_box_type(dialog, linesPerBox) {
+        this.create_dl_translation_matrix(MENU_MTX_NOPUSH, dialog.leftOffset, dialog.width, 0);
+
+        switch (this.gDialogBoxType) {
+            case DIALOG_TYPE_ROTATE:
+                if (this.gMenuState == MENU_STATE_DIALOG_OPENING || this.gMenuState == MENU_STATE_DIALOG_CLOSING) {
+                    this.create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.0 / this.gDialogBoxScale, 1.0 / this.gDialogBoxScale, 1.0);
+                    // convert speed into angle
+                    this.create_dl_rotation_matrix(MENU_MTX_NOPUSH, this.gDialogBoxAngle * 4.0, 0, 0, 1.0);
+                }
+                Gbi.gDPSetEnvColor(Game.gDisplayList, 0, 0, 0, 150);
+                break;
+
+            case DIALOG_TYPE_ZOOM:
+                if (this.gMenuState == MENU_STATE_DIALOG_OPENING || this.gMenuState == MENU_STATE_DIALOG_CLOSING) {
+                    this.create_dl_translation_matrix(MENU_MTX_NOPUSH, 65.0 - 65.0 / this.gDialogBoxScale, 40.0 / this.gDialogBoxScale - 40, 0)
+                    this.create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.0 / this.gDialogBoxScale, 1.0 / this.gDialogBoxScale, 1.0);
+                }
+                Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, 150);
+                break;
+        }
+
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, -7.0, 5.0, 0);
+        this.create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.1, linesPerBox / 5.0 + 0.1, 1.0);
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_text_bg_box);
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+    }
+
+    change_and_flash_dialog_text_color_lines(colorMode, lineNum) {
+        let color;
+
+        if (colorMode == 1) {
+            if (lineNum == 1) Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, 255);
+            else if (lineNum == this.gMenuLineNum) {
+                color = sins(this.gMenuTextColorTransTimer) * 50.0 + 200.0;
+                Gbi.gDPSetEnvColor(Game.gDisplayList, color, color, color, 255);
+            } else Gbi.gDPSetEnvColor(Game.gDisplayList, 200, 200, 200, 255);
+        } else {
+            switch (this.gDialogBoxType) {
+                case DIALOG_TYPE_ZOOM:
+                    Gbi.gDPSetEnvColor(Game.gDisplayList, 0, 0, 0, 255);
+                    break;
+            }
+        }
+    }
+
+    // PTR PARAMS:
+    // wrapper.pageState, wrapper.xMatrix, wrapper.linePos
+    handle_dialog_scroll_page_state(lineNum, totalLines, ptrWrapper) {
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+
+        if (lineNum == totalLines) {
+            ptrWrapper.pageState = DIALOG_PAGE_STATE_SCROLL;
+            return;
+        }
+        
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, 0.0, 2 - lineNum * 16, 0);
+        ptrWrapper.linePos = 0;
+        ptrWrapper.xMatrix = 1;
+    }
+
+    // PTR PARAMS:
+    // wrapper.xMatrix, wrapper.linePos
+    render_star_count_dialog_text(ptrWrapper) {
+        let tensDigit = this.gDialogVariable / 10;
+        let onesDigit = this.gDialogVariable - (tensDigit * 10); // remainder
+
+        if (tensDigit != 0) {
+            if (ptrWrapper.xMatrix != 1) {
+                this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.gDialogCharWidths[DIALOG_CHAR_SPACE] * ptrWrapper.xMatrix, 0, 0);
+            }
+
+            this.render_generic_char(tensDigit);
+            this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.gDialogCharWidths[tensDigit], 0, 0);
+            ptrWrapper.xMatrix = 1;
+            ptrWrapper.linePos++;
+        }
+
+        if (ptrWrapper.xMatrix != 1) {
+            this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.gDialogCharWidths[DIALOG_CHAR_SPACE] * (ptrWrapper.xMatrix - 1), 0, 0);
+        }
+
+        this.render_generic_char(onesDigit);
+        this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.gDialogCharWidths[onesDigit], 0, 0);
+        ptrWrapper.linePos++;
+        ptrWrapper.xMatrix = 1;
+    }
+
+    render_multi_text_string_lines(multiTextId, line, linePosWrapper, linesPerBox, xMatrix, lowerBound) {
+        let textLengths = [
+            {length: 3, str: [TEXT_THE_RAW]},
+            {length: 3, str: [TEXT_YOU_RAW]}
+        ]
+
+        if (lineNum >= lowerBound && lineNum <= lowerBound + linesPerBox) {
+            if (linePosWrapper.linePos != 0 || xMatrix != 1) {
+                this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.gDialogCharWidths[DIALOG_CHAR_SPACE] * (xMatrix - 1), 0, 0);
+            }
+
+            for (let i = 0; i < textLengths[multiTextId].str[0]; i++) {
+                this.render_generic_char(textLengths[multiTextId].str[1 + i]);
+                this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.gDialogCharWidths[textLengths[multiTextId].str[1 + i]], 0, 0);
+            }
+        }
+
+        linePosWrapper.linePos += textLengths[multiTextId].str[0];
+    }
+
+    ensure_nonnegative(value) {
+        if (value < 0) {
+            value = 0;
+        }
+
+        return value;
+    }
+
+    handle_dialog_text_and_pages(colorMode, dialog, lowerBound) {
+        let strChar, totalLines, strIndex;
+        let str = dialog.str;
+        let lineNum = 1;
+        let pageState = DIALOG_PAGE_STATE_NONE;
+        let mark = DIALOG_MARK_NONE;
+        let xMatrix = 1;
+        let linesPerBox = dialog.linesPerBox;
+        let linePos = 0;
+        const wrapper = {};
+
+        if (this.gMenuState == MENU_STATE_DIALOG_SCROLLING) {
+            totalLines = linesPerBox * 2 + 1;
+        } else {
+            totalLines = linesPerBox;
+        }
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin);
+        strIndex = this.gDialogPageStartStrIndex;
+
+        if (this.gMenuState == MENU_STATE_DIALOG_SCROLLING) {
+            this.create_dl_translation_matrix(MENU_MTX_NOPUSH, 0, this.gDialogScrollOffsetY, 0);
+        }
+
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, 0.0, 2 - lineNum * 16, 0);
+
+        while (pageState == DIALOG_PAGE_STATE_NONE) {
+            this.change_and_flash_dialog_text_color_lines(colorMode, lineNum);
+            strChar = str[strIndex];
+
+            switch (strChar) {
+                case DIALOG_CHAR_TERMINATOR:
+                    pageState = DIALOG_PAGE_STATE_END;
+                    Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+                    break;
+                
+                case DIALOG_CHAR_NEWLINE:
+                    lineNum++;
+                    wrapper = {pageState: pageState, xMatrix: xMatrix, linePos: linePos}
+                    this.handle_dialog_scroll_page_state(lineNum, totalLines, wrapper);
+                    pageState = wrapper.pageState; xMatrix = wrapper.xMatrix; linePos = wrapper.linePos;
+                    break;
+
+                case DIALOG_CHAR_DAKUTEN:
+                    mark = DIALOG_MARK_DAKUTEN;
+                    break;
+
+                case DIALOG_CHAR_SPACE:
+                    xMatrix++;
+                    linePos++;
+                    break;
+                
+                case DIALOG_CHAR_SLASH:
+                    xMatrix += 2;
+                    linePos += 2;
+                    break;
+
+                case DIALOG_CHAR_MULTI_THE:
+                    wrapper = {linePos: linePos};
+                    this.render_multi_text_string_lines(STRING_THE, lineNum, linePos, linesPerBox, xMatrix, lowerBound);
+                    linePos = wrapper.linePos;
+                    break;
+                
+                case DIALOG_CHAR_MULTI_YOU:
+                    wrapper = {linePos: linePos};
+                    this.render_multi_text_string_lines(STRING_YOU, lineNum, linePos, linesPerBox, xMatrix, lowerBound);
+                    linePos = wrapper.linePos;
+                    xMatrix = 1;
+                    break;
+                
+                case DIALOG_CHAR_STAR_COUNT:
+                    wrapper = {xMatrix: xMatrix, linePos: linePos};
+                    this.render_star_count_dialog_text(wrapper);
+                    xMatrix = wrapper.xMatrix; linePos = wrapper.linePos;
+                    break;
+                
+                default:
+                    if (lineNum >= lowerBound && lineNum <= lowerBound + linesPerBox) {
+                        if (linePos != 0 || xMatrix != 1) {
+                            this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.gDialogCharWidths[DIALOG_CHAR_SPACE] * (xMatrix - 1), 0, 0);
+                        }
+
+                        this.render_generic_char(strChar);
+                        this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.gDialogCharWidths[strChar], 0, 0);
+                        xMatrix = 1;
+                        linePos++;
+                    }
+            }
+            strIndex++;
+        }
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
+
+        if (this.gMenuState == MENU_STATE_DIALOG_OPEN) {
+            if (pageState == DIALOG_PAGE_STATE_END)
+                this.gMenuState = -1;
+            else
+                this.gNextDialogPageStartStrIndex = strIndex;
+        }
+
+        this.gLastDialogLineNum = lineNum;
+    }
+
+    // ...
+
+    render_save_confirmation(x, y, indexWrapper, yOffset) {
+        this.handle_menu_scrolling(MENU_SCROLL_VERTICAL, indexWrapper, 1, 3);
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin);
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+
+        this.print_generic_string(x + 12, y, TEXT_SAVE_AND_CONTINUE)
+        this.print_generic_string(x + 12, y - 20, TEXT_SAVE_AND_QUIT)
+        this.print_generic_string(x + 12, y - 40, TEXT_CONTINUE_WITHOUT_SAVING)
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
+
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, x, y - ((indexWrapper.index - 1) * yOffset), 0);
+
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_triangle);
+
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+    }
+
+    render_course_complete_screen() {
+        let index;
+
+        switch (this.gMenuState) {
+            case MENU_STATE_COURSE_COMPLETE_SCREEN_OPENING:
+                // this.render_course_complete_lvl_info_and_hud_str();
+
+                if (this.gCourseCompleteScreenTimer > 100 && this.gCourseCompleteCoinsEqual == true) {
+                    this.gMenuState = MENU_STATE_COURSE_COMPLETE_SCREEN_OPEN;
+                    level_set_transition(-1, null);
+                    this.gMenuTextAlpha = 0;
+                    this.gMenuLineNum = MENU_OPT_DEFAULT;
+                }
+                break;
+
+            case MENU_STATE_COURSE_COMPLETE_SCREEN_OPEN:
+                // this.shade_screen();
+                // this.render_course_complete_lvl_info_and_hud_str();
+                //
+                // const wrapper = {gMenuLineNum: this.gMenuLineNum};
+                // this.render_save_confirmation(100, 86, wrapper, 20)
+
+                if (this.gCourseCompleteScreenTimer > 110 && (window.playerInput.buttonPressedA || window.playerInput.buttonPressedStart)) {
+                    level_set_transition(0, null);
+                    play_sound(SOUND_MENU_STAR_SOUND, Game.gGlobalSoundSource);
+                    this.gMenuState = MENU_STATE_DEFAULT;
+                    this.gMenuMode = MENU_MODE_NONE;
+                    index = this.gMenuLineNum;
+                    this.gCourseCompleteScreenTimer = 0;
+                    this.gCourseCompleteCoins = 0;
+                    this.gCourseCompleteCoinsEqual = false;
+                    gHudFlash = 0;
+                    return index;
+                }
+                break;
+        }
+
+        if (this.gMenuTextAlpha < 250) {
+            this.gMenuTextAlpha += 25;
+        }
+
+        this.gCourseCompleteScreenTimer++;
+        
+        return MENU_OPT_NONE;
+    }
+
+    render_menus_and_dialogs() {
+        let index = MENU_OPT_NONE;
+
+        this.create_dl_ortho_matrix();
+
+        if (this.gMenuMode != MENU_MODE_NONE) {
+            switch (this.gMenuMode) {
+                case MENU_MODE_UNUSED_0:
+                    // index = this.render_pause_screen();
+                    break;
+
+                case MENU_MODE_RENDER_PAUSE_SCREEN:
+                    // index = this.render_pause_screen();
+                    break;
+
+                case MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN:
+                    index = this.render_course_complete_screen();
+                    break;
+
+                case MENU_MODE_UNUSED_3:
+                    index = this.render_course_complete_screen();
+                    break;
+            }
+
+            this.gMenuTextColorTransTimer = this.gMenuTextColorTransTimer + 0x1000;
+        } else if (this.gDialogID != DIALOG_NONE) {
+            if (this.gDialogID == DIALOG_020) {
+                // this.print_peach_letter_message();
+                return index;
+            }
+
+            // this.render_dialog_entries();
+            this.gMenuTextColorTransTimer = this.gMenuTextColorTransTimer + 0x1000;
+        }
+
+        return index;
     }
 }
 

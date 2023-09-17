@@ -497,6 +497,11 @@ export const G_CC_DECALRGB2 = {  // FIXME (copied from G_CC_DECALRGB)
     rgb: [15, 15, 31, 1]
 }
 
+export const G_CC_FADE = {  // FIXME (copied from G_CC_FADEA)
+    alpha: [1, 7, 7, 5],
+    rgb: [1, 15, 4, 7]
+}
+
 export const G_CC_FADEA = {  // FIXME (copied from MODULATEIFADEA)
     alpha: [1, 7, 5, 7],
     rgb: [1, 15, 4, 7]

@@ -31,6 +31,8 @@ const MAX_BUFFERED = 256
 const MAX_LIGHTS = 2
 const MAX_VERTICES = 64
 
+let prev_op = 0
+
 export class n64GfxProcessor {
     constructor() {
 
@@ -761,6 +763,13 @@ export class n64GfxProcessor {
 
     }
 
+    // PARAMETERS:
+    // ulx, uly: upper left corner of the rectangle
+    // lrx, lry: lower right corner of the rectangle
+    // tile: unused
+    // uls, ult: unknown
+    // dsdx, dtdy: texel orientation
+    // flip: flip image
     dp_texture_rectangle(ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy, flip) {
         const saved_combine_mode = this.rdp.combine_mode
 
@@ -1030,7 +1039,7 @@ export class n64GfxProcessor {
     }
 
     run_dl(commands) {
-
+        try {
         for (const command of commands) {
             const opcode = command.words.w0
             const args = command.words.w1
@@ -1117,6 +1126,10 @@ export class n64GfxProcessor {
                     throw "unimplemented gfx opcode: " + opcode
             }
 
+            prev_op = opcode
+        }
+        } catch (e) {
+            console.log(`Commands ran: ${prev_op} -> ${commands}\n${e}`)
         }
     }
 

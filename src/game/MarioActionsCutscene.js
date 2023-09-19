@@ -22,7 +22,7 @@ import {
 } from "./Interaction"
 
 import {
-    IngameMenuInstance as IngameMenu
+    IngameMenuInstance as IngameMenu, MENU_MODE_NONE, MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN, MENU_OPT_NONE
 } from "./IngameMenu"
 
 import {
@@ -43,6 +43,7 @@ import {
 } from "./ObjectHelpers"
 
 import {
+    gLastCompletedCourseNum,
     save_file_set_flags
 } from "./SaveFile"
 
@@ -1245,22 +1246,22 @@ export const act_exit_land_save_dialog = (m) => {
             set_mario_animation(m, m.actionArg == 0 ? MARIO_ANIM_GENERAL_LAND
                                                      : MARIO_ANIM_LAND_FROM_SINGLE_JUMP)
             if (is_anim_past_end(m)) {
-                // if (gLastCompletedCourseNum != COURSE_BITDW
-                //     && gLastCompletedCourseNum != COURSE_BITFS) {
-                //     enable_time_stop()
-                // }
+                if (gLastCompletedCourseNum != COURSE_BITDW
+                    && gLastCompletedCourseNum != COURSE_BITFS) {
+                    enable_time_stop()
+                }
 
-                // set_menu_mode(RENDER_COURSE_DONE_SCREEN)
-                // gSaveOptSelectIndex = 0
+                IngameMenu.set_menu_mode(MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN)
+                Area.gSaveOptSelectIndex = MENU_OPT_NONE
 
                 m.actionState = 3 // star exit with cap
                 if (!(m.flags & MARIO_CAP_ON_HEAD)) {
                     m.actionState = 2 // star exit without cap
                 }
-                // if (gLastCompletedCourseNum == COURSE_BITDW
-                //     || gLastCompletedCourseNum == COURSE_BITFS) {
-                //     m.actionState = 1 // key exit
-                // }
+                if (gLastCompletedCourseNum == COURSE_BITDW
+                    || gLastCompletedCourseNum == COURSE_BITFS) {
+                    m.actionState = 1 // key exit
+                }
             }
             break
         // key exit

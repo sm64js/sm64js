@@ -19,7 +19,7 @@ import { oBehParams2ndByte, oHeldState, oMoveAnglePitch, oMoveAngleRoll, oMoveAn
 import { CELL_HEIGHT_LIMIT, FLOOR_LOWER_LIMIT, SURFACE_DEATH_PLANE, SURFACE_IS_PAINTING_WARP, SURFACE_WALL_MISC } from "../include/surface_terrains"
 import { sins, s16, int16, coss } from "../utils"
 import { HudInstance as Hud } from "./Hud"
-import { DIALOG_RESPONSE_NONE } from "./IngameMenu"
+import { CAM_SELECTION_FIXED, CAM_SELECTION_MARIO, DIALOG_RESPONSE_NONE } from "./IngameMenu"
 import { DIALOG_001, DIALOG_020, DIALOG_NONE } from "../text/us/dialogs"
 import { gLastCompletedStarNum } from "./SaveFile"
 import { COURSE_MAX, COURSE_NONE } from "../levels/course_defines"
@@ -161,9 +161,6 @@ const CAM_MODE_MARIO_ACTIVE          =  0x01
 const CAM_MODE_LAKITU_WAS_ZOOMED_OUT =  0x02
 const CAM_MODE_MARIO_SELECTED        =  0x04
 
-const CAM_SELECTION_MARIO = 1
-const CAM_SELECTION_FIXED = 2
-
 const CAM_ANGLE_MARIO  = 1
 const CAM_ANGLE_LAKITU = 2
 
@@ -199,7 +196,7 @@ const CAM_MOVE_INIT_CAMERA            = 0x0800
 const CAM_MOVE_ALREADY_ZOOMED_OUT     = 0x1000
 const CAM_MOVE_C_UP_MODE              = 0x2000
 const CAM_MOVE_SUBMERGED              = 0x4000
-const CAM_MOVE_PAUSE_SCREEN           = 0x8000
+export const CAM_MOVE_PAUSE_SCREEN           = 0x8000
 
 const CAM_MOVE_ROTATE                 = (CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ROTATE_LEFT | CAM_MOVE_RETURN_TO_MIDDLE)
 /// These flags force the camera to move a certain way

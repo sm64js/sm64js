@@ -267,9 +267,10 @@ export const save_file_get_star_flags = (fileIndex, courseIndex) => {
     return starFlags
 }
 
-// export const save_file_get_course_coin_score(fileIndex, courseIndex) {
-//     return gSaveBuffer.files[fileIndex][0].courseCoinScores[courseIndex];
-// }
+export const save_file_get_course_coin_score = (fileIndex, courseIndex) => {
+    return 0;
+    // return gSaveBuffer.files[fileIndex][0].courseCoinScores[courseIndex];
+}
 
 export const disable_warp_checkpoint = () => {
     // check_warp_checkpoint() checks to see if gWarpCheckpoint.courseNum != COURSE_NONE

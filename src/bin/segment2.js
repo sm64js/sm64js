@@ -257,6 +257,25 @@ export const dl_ia_text_end = [
     gsSPEndDisplayList(),
 ].flat();
 
+const vertex_triangle = [
+    [[     0,      0,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[     8,      8,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[     0,     16,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+]
+
+export const dl_draw_triangle = [
+    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetCombineMode(Gbi.G_CC_FADE, Gbi.G_CC_FADE),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_XLU_SURF, Gbi.G_RM_XLU_SURF2),
+    Gbi.gsDPSetTextureFilter(Gbi.G_TF_POINT),
+    gsSPVertex(vertex_triangle, 3, 0),
+    gsSP1Triangle( 0,  1,  2, 0x0),
+    gsSPSetGeometryMode(G_LIGHTING),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF, Gbi.G_RM_AA_ZB_OPA_SURF2),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPEndDisplayList(),
+].flat();
+
 // 0x0200EFB0 - 0x0200EFF0
 const vertex_billboard_num = [
     [[   -32,    -32,      0], 0, [     0,   1024], [0xff, 0xff, 0xff, 0xff]],
@@ -537,13 +556,43 @@ export const dl_hud_img_load_tex_block = [
 	Gbi.gsSPEndDisplayList(),
 ].flat();
 
+export const dl_rgba16_text_begin = [
+    gsDPPipeSync(),
+    Gbi.gsDPSetTexturePersp(Gbi.G_TP_NONE),
+    gsDPSetCombineMode(Gbi.G_CC_FADEA, Gbi.G_CC_FADEA),
+    gsDPSetEnvColor(255, 255, 255, 255),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_XLU_SURF, Gbi.G_RM_AA_XLU_SURF2),
+    Gbi.gsDPSetTextureFilter(Gbi.G_TF_POINT),
+    gsSPEndDisplayList(),
+].flat();
+
+export const dl_rgba16_load_tex_block = [
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 4, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 4, G_TX_NOLOD),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 4, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 4, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 4, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (16 - 1) << G_TEXTURE_IMAGE_FRAC, (16 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPEndDisplayList(),
+].flat();
+
+export const dl_rgba16_text_end = [
+    gsDPPipeSync(),
+    Gbi.gsDPSetTexturePersp(Gbi.G_TP_PERSP),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF, Gbi.G_RM_AA_ZB_OPA_SURF2),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsDPSetEnvColor(255, 255, 255, 255),
+    Gbi.gsDPSetTextureFilter(Gbi.G_TF_BILERP),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
+    gsSPEndDisplayList(),
+].flat();
+
 export const dl_proj_mtx_fullscreen = [
     Gbi.gsSPClearGeometryMode(Gbi.G_LIGHTING),
     Gbi.gsSPMatrix(matrix_identity, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH),
     Gbi.gsSPMatrix(matrix_fullscreen, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_MUL | Gbi.G_MTX_NOPUSH),
     Gbi.gsSPMatrix(matrix_identity, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH),
     Gbi.gsSPEndDisplayList()
-].flat()
+].flat();
 
 export const dl_transition_draw_filled_region = [
 	...Gbi.gsSP2Triangles( 0,  4,  1, 0x0,  1,  4,  5, 0x0),
@@ -651,13 +700,4 @@ export const dl_waterbox_end = [
 	Gbi.gsSPSetGeometryMode(Gbi.G_LIGHTING | Gbi.G_CULL_BACK),
 	Gbi.gsDPSetCombineMode(Gbi.G_CC_SHADE),
 	Gbi.gsSPEndDisplayList(),
-].flat()
-
-export const dl_rgba16_load_tex_block = [
-    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 4, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 4, G_TX_NOLOD),
-    gsDPLoadSync(),
-    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
-    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 4, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 4, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 4, G_TX_NOLOD),
-    gsDPSetTileSize(0, 0, 0, (16 - 1) << G_TEXTURE_IMAGE_FRAC, (16 - 1) << G_TEXTURE_IMAGE_FRAC),
-    gsSPEndDisplayList(),
 ].flat()

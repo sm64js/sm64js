@@ -1,16 +1,20 @@
 import { play_sound } from "../audio/external"
-import { dl_draw_text_bg_box, dl_ia_text_begin, dl_ia_text_end, dl_ia_text_tex_settings, dl_rgba16_load_tex_block, main_font_lut, main_hud_lut } from "../bin/segment2"
+import { dl_draw_text_bg_box, dl_draw_triangle, dl_ia_text_begin, dl_ia_text_end, dl_ia_text_tex_settings, dl_rgba16_load_tex_block, dl_rgba16_text_begin, dl_rgba16_text_end, main_font_lut, main_hud_lut } from "../bin/segment2"
 import * as MathUtil from "../engine/math_util"
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../include/config"
 import * as Gbi from "../include/gbi"
-import { SOUND_MENU_CHANGE_SELECT, SOUND_MENU_STAR_SOUND } from "../include/sounds"
+import { SOUND_GENERAL_COLLECT_1UP, SOUND_MENU_CHANGE_SELECT, SOUND_MENU_PAUSE, SOUND_MENU_PAUSE_2, SOUND_MENU_STAR_SOUND, SOUND_MENU_YOSHI_GAIN_LIVES } from "../include/sounds"
 import { menu_font_lut, menu_hud_lut } from "../levels/menu/leveldata"
 import { DIALOG_020, DIALOG_NONE } from "../text/us/dialogs"
 import { GameInstance as Game } from "./Game"
 import { PrintInstance as Print } from "./Print"
-import { save_file_get_max_coin_score } from "./SaveFile"
+import { gCurrCourseStarFlags, gGotFileCoinHiScore, gLastCompletedCourseNum, gLastCompletedStarNum, save_file_get_course_coin_score, save_file_get_course_star_count, save_file_get_max_coin_score, save_file_get_star_flags } from "./SaveFile"
 import { CameraInstance as Camera } from "./Camera"
-import { TEXT_CONTINUE_WITHOUT_SAVING, TEXT_SAVE_AND_CONTINUE, TEXT_SAVE_AND_QUIT } from "../include/text_strings"
+import { TEXT_CAMERA_ANGLE_R, TEXT_CLEAR, TEXT_COIN, TEXT_CONTINUE, TEXT_CONTINUE_WITHOUT_SAVING, TEXT_COURSE, TEXT_EXIT_COURSE, TEXT_HI_SCORE, TEXT_LAKITU_MARIO, TEXT_LAKITU_STOP, TEXT_MY_SCORE, TEXT_NORMAL_FIXED, TEXT_NORMAL_UPCLOSE, TEXT_PAUSE, TEXT_SAVE_AND_CONTINUE, TEXT_SAVE_AND_QUIT, TEXT_STAR, TEXT_STAR_X, TEXT_UNFILLED_STAR } from "../include/text_strings"
+import { seg2_act_name_table, seg2_course_name_table } from "../text/us/courses"
+import { COURSE_BONUS_STAGES, COURSE_NUM_TO_INDEX, COURSE_STAGES_MAX } from "../levels/course_defines"
+import { COURSE_BITDW, COURSE_MAX, COURSE_MIN, COURSE_NONE } from "../include/course_table"
+import { ACT_FLAG_PAUSE_EXIT } from "./Mario"
 
 export const ASCII_TO_DIALOG = (asc) => {
     return (((asc) >= '0' && (asc) <= '9') ? ((asc) - '0') :
@@ -49,11 +53,21 @@ export const TEXT_YOU_RAW = [ASCII_TO_DIALOG('y'), ASCII_TO_DIALOG('o'), ASCII_T
 export const MAX_STRING_WIDTH = 16
 
 export const HUD_LUT_JPMENU = 1
-export const HUD_LUT_GLOBAL = 1
+export const HUD_LUT_GLOBAL = 2
 
 export const DIALOG_MARK_NONE = 0
 export const DIALOG_MARK_DAKUTEN = 1
 export const DIALOG_MARK_HANDAKUTEN = 2
+
+export const HUD_PRINT_HISCORE = 0
+export const HUD_PRINT_CONGRATULATIONS = 1
+
+export const MENU_SCROLL_VERTICAL = 1
+export const MENU_SCROLL_HORIZONTAL = 2
+
+
+export const CAM_SELECTION_MARIO = 1
+export const CAM_SELECTION_FIXED = 2
 
 const DIALOG_CHAR_SLASH =                0xD0
 const DIALOG_CHAR_MULTI_THE =            0xD1 // 'the'
@@ -174,6 +188,8 @@ class IngameMenu {
         this.gMenuHoldKeyTimer = 0;
         this.gDialogResponse = DIALOG_RESPONSE_NONE;
 
+        this.gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
+        this.gDialogCourseActNum = 1;
     }
 
     create_dl_identity_matrix() {
@@ -285,7 +301,8 @@ class IngameMenu {
 
         this.create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0.0)
 
-        while (str[strPos] != DIALOG_CHAR_TERMINATOR) {
+        while (str[strPos] != DIALOG_CHAR_TERMINATOR || strPos < str.length || strPos <= 99) {
+            console.log(str[strPos])
             switch (str[strPos]) {
                 case DIALOG_CHAR_DAKUTEN:
                     mark = DIALOG_CHAR_DAKUTEN
@@ -334,14 +351,12 @@ class IngameMenu {
         Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW)
     }
     
-    print_hud_lut_string(hudLUT, x, y, str) {
+    print_hud_lut_string(x, y, str) {
         let strPos = 0;
-        let hudLUT1 = menu_hud_lut;
-        let hudLUT2 = main_hud_lut;
+        let hudLUT1 = main_hud_lut;
         let curX = x;
         let curY = y;
-        let xStride;
-        hudLUT == HUD_LUT_JPMENU ? xStride = 16 : xStride = 12
+        let xStride = 12;
 
         while (str[strPos] != GLOBAL_CHAR_TERMINATOR) {
             switch (str[strPos]) {
@@ -351,13 +366,15 @@ class IngameMenu {
                 default:
                     Gbi.gDPPipeSync(Game.gDisplayList)
 
-                    hudLUT == HUD_LUT_JPMENU ? Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, hudLUT1[str[strPos]])
-                        : Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, hudLUT2[str[strPos]])
+                    Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, hudLUT1[str[strPos]])
                     
-                        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_load_tex_block)
-                        Gbi.gSPTextureRectangle(Game.gDisplayList, curX << 2, curY << 2, (curX + 16) << 2, (curY + 16) << 2, Gbi.G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10)
+                    Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_load_tex_block)
+                    Gbi.gSPTextureRectangle(Game.gDisplayList, (curX / 2) << 2, (curY / 2) << 2,
+                                                               ((curX + 15) / 2) << 2, ((curY + 15) / 2) << 2,
+                                                               Gbi.G_TX_RENDERTILE, 0, 0,
+                                                               6 << 10, 7 << 8);
 
-                        curX += xStride
+                    curX += xStride
             }
 
             strPos++
@@ -407,29 +424,29 @@ class IngameMenu {
 
         if (scrollDirection == MENU_SCROLL_VERTICAL) {
             if (window.playerInput.stickY > 60) {
-                index = indexWrapper.index++;
+                index++;
             }
             if (window.playerInput.stickY < -60) {
-                index = indexWrapper.index += 2;
+                index += 2;
             }
         } else if (scrollDirection == MENU_SCROLL_HORIZONTAL) {
             if (window.playerInput.stickX > 60) {
-                index = indexWrapper.index += 2;
+                index += 2;
             }
             if (window.playerInput.stickX < -60) {
-                index = indexWrapper.index++;
+                index++;
             }
         }
 
-        if ((currentIndex != maxIndex)) {
+        if ((indexWrapper.index != maxIndex)) {
             switch ((index ^ this.gMenuHoldKeyIndex) & index) {
                 case 1:
                     play_sound(SOUND_MENU_CHANGE_SELECT, Game.gGlobalSoundSource);
-                    currentIndex--;
+                    indexWrapper.index--;
                     break;
                 case 2:
                     play_sound(SOUND_MENU_CHANGE_SELECT, Game.gGlobalSoundSource);
-                    currentIndex++;
+                    indexWrapper.index++;
                     break;
             }
         }
@@ -476,20 +493,22 @@ class IngameMenu {
         const wrapper = {};
 
         if (!useCourseCoinScore)
-            numCoins = save_file_get_max_coin_score(courseIndex);
+            numCoins = save_file_get_max_coin_score(courseIndex) & 0xFFFF;
         else
             numCoins = save_file_get_course_coin_score(fileIndex, courseIndex);
-
+        
         if (numCoins != 0) {
-            this.print_hud_lut_string(HUD_LUT_GLOBAL, x, y, this.gHudSymCoin);
-            this.print_hud_lut_string(HUD_LUT_GLOBAL, x + 16, y, this.gHudSymX);
+            this.print_hud_lut_string(x, y, this.gHudSymCoin);
+            this.print_hud_lut_string(x + 16, y, this.gHudSymX);
             this.int_to_str(numCoins, wrapper)
-            this.print_hud_lut_string(HUD_LUT_GLOBAL, x + 32, y, wrapper.dst);
+            this.print_hud_lut_string(x + 32, y, wrapper.dst);
         }
     }
 
     int_to_str(num, dstWrapper) {
         let digit1, digit2, digit3;
+
+        dstWrapper.dst = []
 
         let pos = 0;
 
@@ -499,8 +518,8 @@ class IngameMenu {
             return;
         }
 
-        digit1 = num / 100;
-        digit2 = (num - digit1 * 100) / 10;
+        digit1 = Math.round(num / 100);
+        digit2 = Math.round((num - digit1 * 100) / 10);
         digit3 = (num - digit1 * 100 - digit2 * 10);
 
         if (digit1 != 0) {
@@ -513,7 +532,7 @@ class IngameMenu {
             pos++;
         }
 
-        dstWrapper.dst[pos] == digit3;
+        dstWrapper.dst[pos] = digit3;
         pos++;
         dstWrapper.dst[pos] = DIALOG_CHAR_TERMINATOR;
     }
@@ -552,7 +571,7 @@ class IngameMenu {
     }
 
     reset_dialog_render_state() {
-        level_set_transition(0, null);
+        gLinker.LevelUpdate.level_set_transition(0, null);
 
         if (this.gDialogBoxType == DIALOG_TYPE_ZOOM) {
             Camera.trigger_cutscene_dialog(2);
@@ -790,6 +809,442 @@ class IngameMenu {
 
     // ...
 
+    set_menu_mode(mode) {
+        if (this.gMenuMode == MENU_MODE_NONE) {
+            this.gMenuMode = mode;
+        }
+    }
+
+    // ...
+
+    render_pause_my_score_coins() {
+        let courseNameTbl = seg2_course_name_table;
+        let actNameTbl = seg2_act_name_table;
+
+        let courseIndex = gLinker.Area.gCurrCourseNum
+        let starFlags = save_file_get_star_flags(gLinker.Area.gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(courseIndex));
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_begin);
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+        if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
+            this.print_hud_my_score_coins(1, gLinker.Area.gCurrSaveFileNum - 1, courseIndex, 178, 103);
+            // this.print_hud_my_score_stars(gLinker.Area.gCurrSaveFileNum - 1, courseIndex, 118, 103);
+        }
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_end);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin);
+
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+
+        if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX) && save_file_get_course_star_count(gLinker.Area.gCurrSaveFileNum - 1, courseIndex) != 0) {
+            this.print_generic_string(62, 121, TEXT_MY_SCORE);
+        }
+
+        let courseName = courseNameTbl[courseIndex].splice(3);
+
+        if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
+            this.print_generic_string(63, 157, TEXT_COURSE);
+            let strCourseNum = {};
+            this.int_to_str(gLinker.Area.gCurrCourseNum, strCourseNum);
+            this.print_generic_string(100, 157, strCourseNum.dst);
+
+            let actName = actNameTbl[COURSE_NUM_TO_INDEX(courseIndex) * 6 + this.gDialogCourseActNum - 1]
+            console.log(courseName, actName)
+            
+            if (starFlags & (1 << this.gDialogCourseActNum - 1))
+                this.print_generic_string(98, 140, TEXT_STAR);
+            else 
+                this.print_generic_string(98, 140, TEXT_UNFILLED_STAR);
+
+            this.print_generic_string(116, 140, actName);
+            // this.print_generic_string(117, 157, courseName);
+        } else this.print_generic_string(94, 157, courseName);
+
+        // Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
+    }
+
+    render_pause_camera_options(x, y, indexWrapper, xIndex) {
+        this.handle_menu_scrolling(MENU_SCROLL_HORIZONTAL, indexWrapper, 0, 2);
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin);
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+
+        this.print_generic_string(x + 14, y + 2, TEXT_LAKITU_MARIO);
+        this.print_generic_string(x + 3, y - 13, TEXT_NORMAL_UPCLOSE);
+        this.print_generic_string(x + 124, y + 2, TEXT_LAKITU_STOP);
+        this.print_generic_string(x + 119, y - 13, TEXT_NORMAL_FIXED);
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, x + (indexWrapper.index - 1) * xIndex, y + 2, 0)
+        gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_triangle);
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+    }
+
+    render_pause_course_options(x, y, indexWrapper, yIndex) {
+        this.handle_menu_scrolling(MENU_SCROLL_VERTICAL, indexWrapper, 1, 3);
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin);
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+
+        this.print_generic_string(x + 10, y - 2, TEXT_CONTINUE);
+        this.print_generic_string(x + 10, y - 17, TEXT_EXIT_COURSE);
+
+        if (indexWrapper.index != MENU_OPT_CAMERA_ANGLE_R) {
+            this.print_generic_string(x + 10, y - 33, TEXT_CAMERA_ANGLE_R);
+            Gbi.gSPDisplayList(dl_ia_text_end);
+
+            this.create_dl_translation_matrix(MENU_MTX_PUSH, x - 4, y - (indexWrapper.index - 1) * yIndex - 2, 0);
+
+            Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+            Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_triangle);
+            Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+        }
+
+        if (indexWrapper.index == MENU_OPT_CAMERA_ANGLE_R) {
+            const wrapper = {index: this.gDialogCameraAngleIndex}
+            this.render_pause_camera_options(x - 42, y - 42, wrapper, 110);
+            this.gDialogCameraAngleIndex = wrapper.index;
+        }
+    }
+
+    render_pause_castle_menu_box(x, y) {
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, x - 78, y - 32, 0);
+        this.create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.2, 0.8, 1.0);
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 0, 0, 0, 105);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_text_bg_box);
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, x + 6, y - 28, 0);
+        this.create_dl_rotation_matrix(MENU_MTX_NOPUSH, 90.0, 0, 0, 1.0);
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_triangle);
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, x - 9, y - 101, 0);
+        this.create_dl_rotation_matrix(MENU_MTX_NOPUSH, 270.0, 0, 0, 1.0)
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_triangle);
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+    }
+
+    highlight_last_course_complete_stars() {
+        let completedCourseIndex;
+
+        if (gLastCompletedCourseNum == COURSE_NONE) {
+            completedCourseIndex = 0;
+        } else {
+            completedCourseIndex = COURSE_NUM_TO_INDEX(gLastCompletedCourseNum);
+
+            if (completedCourseIndex >= COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES)) {
+                completedCourseIndex = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES)
+            }
+        }
+
+        this.gMenuLineNum = completedCourseIndex;
+    }
+
+    print_hud_pause_colorful_str() {
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_begin);
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+
+        this.print_hud_lut_string(123, 81, TEXT_PAUSE);
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_end);
+    }
+
+    render_pause_castle_course_stars(x, y, fileIndex, courseIndex) {
+        let hasStar = 0;
+        let starFlags = save_file_get_star_flags(fileIndex, courseIndex);
+        let starCount = save_file_get_course_star_count(fileIndex, courseIndex);
+        let nextStar = 0;
+        let str = new Array(30).fill(0);
+
+        if (starFlags & (1 << 6)) {
+            starCount--;
+            this.print_generic_string(x + 89, y - 5, TEXT_STAR);
+        }
+
+        while (hasStar != starCount) { 
+            if (starFlags & (1 << nextStar)) {
+                str[nextStar * 2] = DIALOG_CHAR_STAR_FILLED;
+                hasStar++;
+            } else {
+                str[nextStar * 2] = DIALOG_CHAR_STAR_OPEN;
+            }
+
+            str[nextStar * 2 + 1] = DIALOG_CHAR_SPACE;
+            nextStar++;
+        }
+
+        if (starCount == nextStar && starCount != 6) {
+            str[nextStar * 2] = DIALOG_CHAR_STAR_OPEN;
+            str[nextStar * 2 + 1] = DIALOG_CHAR_SPACE;
+            nextStar++;
+        }
+
+        str[nextStar * 2] = DIALOG_CHAR_TERMINATOR;
+
+        this.print_generic_string(x + 14, y + 13, str);
+    }
+
+    render_pause_castle_main_strings(x, y) {
+        let courseNameTbl = seg2_course_name_table;
+        let courseName;
+        let prevCourseIndex = this.gMenuLineNum;
+        const wrapper = {index: this.gMenuLineNum};
+
+        this.handle_menu_scrolling(
+            MENU_SCROLL_VERTICAL,
+            wrapper,
+            COURSE_NUM_TO_INDEX(COURSE_MIN) - 1,
+            COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) + 1
+        );
+
+        if (this.gMenuLineNum == COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) + 1) {
+            this.gMenuLineNum = COURSE_NUM_TO_INDEX(COURSE_MIN); // Exceeded max, set to min
+        }
+
+        if (this.gMenuLineNum == COURSE_NUM_TO_INDEX(COURSE_MIN) - 1) {
+            this.gMenuLineNum = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES); // Exceeded min, set to max
+        }
+
+        if (this.gMenuLineNum != COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES)) {
+            while (save_file_get_course_star_count(gLinker.Area.gCurrSaveFileNum - 1, this.gMenuLineNum) == 0) {
+                if (this.gMenuLineNum >= prevCourseIndex) this.gMenuLineNum++;
+                else this.gMenuLineNum--;
+
+                if (this.gMenuLineNum == COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX) + 1 || this.gMenuLineNum == COURSE_NUM_TO_INDEX(COURSE_MIN) - 1) {
+                    this.gMenuLineNum = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES);
+                    break;
+                }
+            }
+        }
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin);
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+
+        if (this.gMenuLineNum <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) { // Main courses
+            courseName = courseNameTbl[this.gMenuLineNum];
+            this.render_pause_castle_course_stars(x, y, gLinker.Area.gCurrSaveFileNum - 1, this.gMenuLineNum);
+            this.print_generic_string(x + 34, y - 5, TEXT_COIN);
+            this.int_to_str(save_file_get_course_coin_score(gLinker.Area.gCurrSaveFileNum - 1, this.gMenuLineNum), wrapper);
+            this.print_generic_string(x + 54, y - 5, wrapper.dst);
+        } else { // Castle secret stars
+            courseName = courseNameTbl[COURSE_MAX];
+            this.print_generic_string(x + 40, y + 13, TEXT_STAR_X);
+            this.int_to_str(save_file_get_course_coin_score(gLinker.Area.gCurrSaveFileNum - 1, this.gMenuLineNum), wrapper);
+            this.print_generic_string(x + 54, y + 13, wrapper.dst);
+        }
+
+        this.print_generic_string(x - 9, y + 30, courseName);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
+    }
+
+    render_pause_screen() {
+        const gCurrCourseNum = gLinker.Area.gCurrCourseNum
+        const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
+        let index;
+
+        switch(this.gMenuState) {
+            case MENU_STATE_PAUSE_SCREEN_OPENING:
+                this.gMenuLineNum = MENU_OPT_DEFAULT;
+                this.gMenuTextAlpha = 0;
+                gLinker.LevelUpdate.level_set_transition(-1, null);
+                play_sound(SOUND_MENU_PAUSE, Game.gGlobalSoundSource);
+
+                if (gCurrCourseNum >= COURSE_MIN && gCurrCourseNum <= COURSE_MAX) {
+                    // this.change_dialog_camera_angle();
+                    this.gMenuState = MENU_STATE_PAUSE_SCREEN_COURSE;
+                } else {
+                    this.highlight_last_course_complete_stars();
+                    this.gMenuState = MENU_STATE_PAUSE_SCREEN_CASTLE;
+                }
+                break;
+
+            case MENU_STATE_PAUSE_SCREEN_COURSE:
+                // this.shade_screen();
+                this.render_pause_my_score_coins();
+                // this.render_pause_red_coins();
+
+                if (gMarioStates[0].action & ACT_FLAG_PAUSE_EXIT) {
+                    const wrapper = {ptr: this.gMenuLineNum}
+                    this.render_pause_course_options(99, 93, wrapper, 15);
+                    this.gMenuLineNum = wrapper.ptr;
+                }
+
+                if (window.playerInput.buttonPressedA || window.playerInput.buttonPressedStart) {
+                    gLinker.LevelUpdate.level_set_transition(0, null);
+                    play_sound(SOUND_MENU_PAUSE_2, Game.gGlobalSoundSource);
+                    this.gMenuState = MENU_STATE_DEFAULT;
+                    this.gMenuMode = MENU_MODE_NONE;
+
+                    if (this.gMenuLineNum == MENU_OPT_EXIT_COURSE) index = this.gMenuLineNum
+                    else index = MENU_OPT_DEFAULT
+                    
+                    return index;
+                }
+                break;
+            
+            case MENU_STATE_PAUSE_SCREEN_CASTLE:
+                // this.shade_screen();
+                this.print_hud_pause_colorful_str();
+                this.render_pause_castle_menu_box(160, 143);
+                this.render_pause_castle_main_strings(104, 60);
+
+                if (window.playerInput.buttonPressedA || window.playerInput.buttonPressedStart) {
+                    gLinker.LevelUpdate.level_set_transition(0, null);
+                    play_sound(SOUND_MENU_PAUSE_2, Game.gGlobalSoundSource);
+                    this.gMenuMode = MENU_MODE_NONE;
+                    this.gMenuState = MENU_STATE_DEFAULT;
+
+                    return MENU_OPT_DEFAULT;
+                }
+                break;
+        }
+
+        if (this.gMenuTextAlpha < 250) {
+            this.gMenuTextAlpha += 25;
+        }
+
+        return MENU_OPT_NONE;
+    }
+
+    print_hud_course_complete_string(str) {
+        let color = sins(this.gMenuTextColorTransTimer) * 50.0 + 200.0;
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_begin);
+        Gbi.gDPSetEnvColor(Game.gDisplayList, color, color, color, 255);
+
+        if (str == HUD_PRINT_HISCORE) this.print_hud_lut_string(109, 36, TEXT_HI_SCORE);
+        else this.print_hud_lut_string(70, 67, TEXT_COURSE);
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_end);
+    }
+
+    print_hud_course_complete_coins(x, y) {
+        const gHudDisplay = gLinker.LevelUpdate.gHudDisplay
+        const gMarioState = gLinker.LevelUpdate.gMarioState
+
+        let hudTextSymCoin = [ Print.GLYPH_COIN, Print.GLYPH_SPACE ];
+        let hudTextSymX = [ Print.GLYPH_MULTIPLY, Print.GLYPH_SPACE ];
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_begin);
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, 255);
+
+        this.print_hud_lut_string(x, y, hudTextSymCoin);
+        this.print_hud_lut_string(x + 16, y, hudTextSymX);
+
+        const wrapper = {}
+        this.int_to_str(this.gCourseCompleteCoins, wrapper)
+        this.print_hud_lut_string(x + 32, y, wrapper.dst);
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_end);
+
+        if (this.gCourseCompleteCoins >= gHudDisplay.coins) {
+            this.gCourseCompleteCoinsEqual = true;
+            this.gCourseCompleteCoins = gHudDisplay.coins;
+
+            if (gGotFileCoinHiScore) this.print_hud_course_complete_string(HUD_PRINT_HISCORE);
+        } else {
+            if (this.gCourseCompleteScreenTimer & 1 || gHudDisplay.coins > 70) {
+                this.gCourseCompleteCoins++;
+                play_sound(SOUND_MENU_YOSHI_GAIN_LIVES, Game.gGlobalSoundSource);
+
+                if (this.gCourseCompleteCoins == 50 || this.gCourseCompleteCoins == 100 || this.gCourseCompleteCoins == 150) {
+                    play_sound(SOUND_GENERAL_COLLECT_1UP, Game.gGlobalSoundSource);
+                    gMarioState.numLives++;
+                }
+            }
+
+            if (this.gCourseCompleteCoins == gHudDisplay.coins && gGotFileCoinHiScore)
+                play_sound(SOUND_MENU_MARIO_CASTLE_WARP2, Game.gGlobalSoundSource)
+        }
+    }
+
+    play_star_fanfare_and_flash_hud(arg, starFlag) {
+        const gHudDisplay = gLinker.LevelUpdate.gHudDisplay
+
+        if (this.gCourseCompleteCoins == gHudDisplay.coins && !(gCurrCourseStarFlags & starFlag) && this.gHudFlash == 0) {
+            // play_star_fanfare();
+            this.gHudFlash = arg;
+        }
+    }
+
+    render_course_complete_lvl_info_and_hud_str() {
+        let textSymStar = Print.GLYPH_STAR + Print.GLYPH_SPACE;
+
+        let actNameTbl = seg2_act_name_table;
+        let courseNameTbl = seg2_course_name_table;
+        let name;
+
+        if (gLastCompletedCourseNum <= COURSE_STAGES_MAX) { // Main courses
+            this.print_hud_course_complete_coins(118, 103);
+            this.play_star_fanfare_and_flash_hud(1, 1 << (gLastCompletedStarNum - 1));
+
+            if (gLastCompletedStarNum == 7)
+                name = actNameTbl[COURSE_STAGES_MAX * 6 + 1];
+            else
+                name = actNameTbl[COURSE_NUM_TO_INDEX(gLastCompletedCourseNum) * 6 + gLastCompletedStarNum - 1];
+
+            // Print course num
+            Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin);
+
+            const wrapper = {}
+            this.int_to_str(gLastCompletedCourseNum, wrapper)
+
+            Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+            this.print_generic_string(65, 165, TEXT_COURSE);
+            this.print_generic_string(104, 165, wrapper.dst);
+
+            Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+            this.print_generic_string(63, 167, TEXT_COURSE);
+            this.print_generic_string(102, 167, wrapper.dst);
+
+            Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
+        } else if (gLastCompletedCourseNum == COURSE_BITDW || gLastCompletedCourseNum == COURSE_BITFS) { // Bowser courses
+            name = courseNameTbl[COURSE_NUM_TO_INDEX(gLastCompletedCourseNum)];
+
+            // Print course name
+            Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin);
+            Gbi.gDPSetEnvColor(Game.gDisplayList, 0, 0, 0, this.gMenuTextAlpha);
+
+            this.print_generic_string(71, 130, name)
+            this.print_generic_string(this.get_string_width(name) + 81, 130, TEXT_CLEAR);
+
+            Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+            this.print_generic_string(69, 132, name);
+            this.print_generic_string(this.get_string_width(name) + 79, 132, TEXT_CLEAR);
+
+            Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
+
+            this.print_hud_course_complete_string(HUD_PRINT_CONGRATULATIONS);
+            this.print_hud_course_complete_coins(118, 111);
+            this.play_star_fanfare_and_flash_hud(2, 0);
+
+            return;
+        } else {
+            name = actNameTbl[COURSE_STAGES_MAX * 6];
+
+            this.print_hud_course_complete_coins(118, 103);
+            this.play_star_fanfare_and_flash_hud(1, 1 << (gLastCompletedStarNum - 1));
+        }
+
+        // Print star glyph
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_begin);
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+        this.print_hud_lut_string(55, 77, textSymStar);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_end);
+
+        // Print act name
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin);
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 0, 0, 0, this.gMenuTextAlpha);
+        this.print_generic_string(76, 145, name);
+
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
+        this.print_generic_string(74, 147, name);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
+    }
+
     render_save_confirmation(x, y, indexWrapper, yOffset) {
         this.handle_menu_scrolling(MENU_SCROLL_VERTICAL, indexWrapper, 1, 3);
 
@@ -815,11 +1270,11 @@ class IngameMenu {
 
         switch (this.gMenuState) {
             case MENU_STATE_COURSE_COMPLETE_SCREEN_OPENING:
-                // this.render_course_complete_lvl_info_and_hud_str();
+                this.render_course_complete_lvl_info_and_hud_str();
 
                 if (this.gCourseCompleteScreenTimer > 100 && this.gCourseCompleteCoinsEqual == true) {
                     this.gMenuState = MENU_STATE_COURSE_COMPLETE_SCREEN_OPEN;
-                    level_set_transition(-1, null);
+                    gLinker.LevelUpdate.level_set_transition(-1, null);
                     this.gMenuTextAlpha = 0;
                     this.gMenuLineNum = MENU_OPT_DEFAULT;
                 }
@@ -827,13 +1282,14 @@ class IngameMenu {
 
             case MENU_STATE_COURSE_COMPLETE_SCREEN_OPEN:
                 // this.shade_screen();
-                // this.render_course_complete_lvl_info_and_hud_str();
-                //
-                // const wrapper = {gMenuLineNum: this.gMenuLineNum};
-                // this.render_save_confirmation(100, 86, wrapper, 20)
+                this.render_course_complete_lvl_info_and_hud_str();
+                
+                const wrapper = {index: this.gMenuLineNum};
+                this.render_save_confirmation(100, 86, wrapper, 20);
+                this.gMenuLineNum = wrapper.index;
 
                 if (this.gCourseCompleteScreenTimer > 110 && (window.playerInput.buttonPressedA || window.playerInput.buttonPressedStart)) {
-                    level_set_transition(0, null);
+                    gLinker.LevelUpdate.level_set_transition(0, null);
                     play_sound(SOUND_MENU_STAR_SOUND, Game.gGlobalSoundSource);
                     this.gMenuState = MENU_STATE_DEFAULT;
                     this.gMenuMode = MENU_MODE_NONE;
@@ -864,11 +1320,11 @@ class IngameMenu {
         if (this.gMenuMode != MENU_MODE_NONE) {
             switch (this.gMenuMode) {
                 case MENU_MODE_UNUSED_0:
-                    // index = this.render_pause_screen();
+                    index = this.render_pause_screen();
                     break;
 
                 case MENU_MODE_RENDER_PAUSE_SCREEN:
-                    // index = this.render_pause_screen();
+                    index = this.render_pause_screen();
                     break;
 
                 case MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN:

@@ -1,13 +1,13 @@
 import * as _Linker from "./Linker"
-import { AreaInstance as Area } from "./Area"
+import { AreaInstance as Area, MARIO_SPAWN_UNKNOWN_27 } from "./Area"
 import { COURSE_NONE, COURSE_STAGES_MAX } from "../levels/course_defines"
 import * as Mario from "./Mario"
-import { CameraInstance as Camera } from "./Camera"
+import { CameraInstance as Camera, CAM_MOVE_PAUSE_SCREEN } from "./Camera"
 import * as CourseTable from "../include/course_table"
 import { disable_warp_checkpoint, gLevelToCourseNumTable } from "./SaveFile"
 import { s16, sins, coss } from "../utils"
 
-import { fadeout_music } from "./SoundInit"
+import { fadeout_music, raise_background_noise } from "./SoundInit"
 
 import {
     ACT_FLAG_INTANGIBLE, ACT_UNINITIALIZED,
@@ -36,7 +36,7 @@ import {
     oBehParams, oPosX, oPosY, oPosZ, oMoveAngleYaw
 } from "../include/object_constants"
 
-import { LEVEL_BOWSER_1, LEVEL_BOWSER_2, LEVEL_BOWSER_3 } from "../levels/level_defines_constants"
+import { LEVEL_BOWSER_1, LEVEL_BOWSER_2, LEVEL_BOWSER_3, LEVEL_CASTLE } from "../levels/level_defines_constants"
 
 import {
     WARP_TRANSITION_FADE_FROM_COLOR,
@@ -83,6 +83,7 @@ import {
     SOUND_OBJ_POUNDING_CANNON,
 } from "../include/sounds"
 import { SET_BACKGROUND_MUSIC } from "../engine/LevelCommands"
+import { IngameMenuInstance as IngameMenu, MENU_MODE_RENDER_PAUSE_SCREEN, MENU_OPT_DEFAULT, MENU_OPT_NONE } from "./IngameMenu"
 
 
 export const TIMER_CONTROL_SHOW  = 0
@@ -376,14 +377,13 @@ class LevelUpdate {
     }
 
     pressed_pause() {
-        // let /*u32*/ val4 = get_dialog_id() >= 0
-        let /*u32*/ val4 = -1
+        let /*u32*/ val4 = IngameMenu.get_dialog_id() >= 0
         let /*u32*/ intangible = (this.gMarioState.action & ACT_FLAG_INTANGIBLE) != 0
 
-        // if (!intangible && !val4 && !Area.gWarpTransition.isActive && this.sDelayedWarpOp == WARP_OP_NONE
-        //     && (gPlayer1Controller.buttonPressed & START_BUTTON)) {
-        //     return true
-        // }
+        if (!intangible && !val4 && !Area.gWarpTransition.isActive && this.sDelayedWarpOp == WARP_OP_NONE
+            && window.playerInput.buttonPressedStart) {
+            return true
+        }
 
         return false
     }
@@ -536,7 +536,7 @@ class LevelUpdate {
 
     init_mario_after_warp() {
         const spawnNode = Area.area_get_warp_node(this.sWarpDest.nodeId)
-        const marioSpawnType = this.get_mario_spawn_type(spawnNode.object)
+        const marioSpawnType = Area.get_mario_spawn_type(spawnNode.object)
 
         if (this.gMarioState.action != ACT_UNINITIALIZED) {
             Area.gMarioSpawnInfo.startPos[0] = spawnNode.object.rawData[oPosX]
@@ -1065,15 +1065,36 @@ class LevelUpdate {
             } else if (this.sTransitionTimer != 0) {
                 this.set_play_mode(PLAY_MODE_CHANGE_AREA)
             } else if (this.pressed_pause()) {
-            //     lower_background_noise(1)
-            //     gCameraMovementFlags |= CAM_MOVE_PAUSE_SCREEN
-            //     this.set_play_mode(PLAY_MODE_PAUSED)
+                // lower_background_noise(1)
+                Camera.gCameraMovementFlags |= CAM_MOVE_PAUSE_SCREEN
+                this.set_play_mode(PLAY_MODE_PAUSED)
             }
         }
 
         return false
     }
 
+    play_mode_paused() {
+        if (Area.gMenuOptSelectIndex == MENU_OPT_NONE) {
+            IngameMenu.set_menu_mode(MENU_MODE_RENDER_PAUSE_SCREEN);
+        } else if (Area.gMenuOptSelectIndex == MENU_OPT_DEFAULT) {
+            raise_background_noise(1);
+            Camera.gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN;
+            this.set_play_mode(PLAY_MODE_NORMAL);
+        } else { // MENU_OPT_EXIT_COURSE
+            if (window.gDebugLevelSelect) {
+                this.fade_into_special_warp(-9, 1);
+            } else {
+                this.initiate_warp(LEVEL_CASTLE, 1, 0x1F, 0);
+                this.fade_into_special_warp(0, 0);
+                Area.gSavedCourseNum = COURSE_NONE;
+            }
+
+            Camera.gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN;
+        }
+
+        return 0;
+    }
 
     /**
      * Set the transition, which is a period of time after the warp is initiated

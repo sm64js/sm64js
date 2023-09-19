@@ -301,8 +301,7 @@ class IngameMenu {
 
         this.create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0.0)
 
-        while (str[strPos] != DIALOG_CHAR_TERMINATOR || strPos < str.length || strPos <= 99) {
-            console.log(str[strPos])
+        while (str[strPos] != DIALOG_CHAR_TERMINATOR && strPos < str.length) {
             switch (str[strPos]) {
                 case DIALOG_CHAR_DAKUTEN:
                     mark = DIALOG_CHAR_DAKUTEN
@@ -840,7 +839,8 @@ class IngameMenu {
             this.print_generic_string(62, 121, TEXT_MY_SCORE);
         }
 
-        let courseName = courseNameTbl[courseIndex].splice(3);
+        let courseName = courseNameTbl[courseIndex].slice(3)
+        console.log(courseName)
 
         if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
             this.print_generic_string(63, 157, TEXT_COURSE);
@@ -849,7 +849,6 @@ class IngameMenu {
             this.print_generic_string(100, 157, strCourseNum.dst);
 
             let actName = actNameTbl[COURSE_NUM_TO_INDEX(courseIndex) * 6 + this.gDialogCourseActNum - 1]
-            console.log(courseName, actName)
             
             if (starFlags & (1 << this.gDialogCourseActNum - 1))
                 this.print_generic_string(98, 140, TEXT_STAR);
@@ -857,10 +856,10 @@ class IngameMenu {
                 this.print_generic_string(98, 140, TEXT_UNFILLED_STAR);
 
             this.print_generic_string(116, 140, actName);
-            // this.print_generic_string(117, 157, courseName);
+            this.print_generic_string(117, 157, courseName);
         } else this.print_generic_string(94, 157, courseName);
 
-        // Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
     }
 
     render_pause_camera_options(x, y, indexWrapper, xIndex) {

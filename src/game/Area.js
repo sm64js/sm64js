@@ -11,6 +11,7 @@ import { PrintInstance as Print } from "./Print"
 import { SCREEN_WIDTH } from "../include/config"
 import { oBehParams, ACTIVE_FLAG_DEACTIVATED, oActiveParticleFlags } from "../include/object_constants"
 import { MENU_OPT_NONE, IngameMenuInstance as IngameMenu } from "./IngameMenu"
+import { LEVEL_MIN } from "../levels/level_defines_constants"
 
 export const WARP_TRANSITION_FADE_FROM_COLOR   = 0x00
 export const WARP_TRANSITION_FADE_INTO_COLOR   = 0x01
@@ -48,30 +49,6 @@ const D_8032CF00 = {  /// default view port?
     vtrans: [640, 480, 511, 0]
 }
 
-// const BehaviorScript *sWarpBhvSpawnTable[] = {
-//     bhvDoorWarp,                bhvStar,                   bhvExitPodiumWarp,          bhvWarp,
-//     bhvWarpPipe,                bhvFadingWarp,             bhvInstantActiveWarp,       bhvAirborneWarp,
-//     bhvHardAirKnockBackWarp,    bhvSpinAirborneCircleWarp, bhvDeathWarp,               bhvSpinAirborneWarp,
-//     bhvFlyingWarp,              bhvSwimmingWarp,           bhvPaintingStarCollectWarp, bhvPaintingDeathWarp,
-//     bhvAirborneStarCollectWarp, bhvAirborneDeathWarp,      bhvLaunchStarCollectWarp,   bhvLaunchDeathWarp,
-// };
-
-const sWarpBhvSpawnTable = [
-    gLinker.behaviors.bhvDoorWarp,                gLinker.behaviors.bhvStar,                   gLinker.behaviors.bhvExitPodiumWarp,          gLinker.behaviors.bhvWarp,
-    gLinker.behaviors.bhvWarpPipe,                gLinker.behaviors.bhvFadingWarp,             gLinker.behaviors.bhvInstantActiveWarp,       gLinker.behaviors.bhvAirborneWarp,
-    gLinker.behaviors.bhvHardAirKnockBackWarp,    gLinker.behaviors.bhvSpinAirborneCircleWarp, gLinker.behaviors.bhvDeathWarp,               gLinker.behaviors.bhvSpinAirborneWarp,
-    gLinker.behaviors.bhvFlyingWarp,              gLinker.behaviors.bhvSwimmingWarp,           gLinker.behaviors.bhvPaintingStarCollectWarp, gLinker.behaviors.bhvPaintingDeathWarp,
-    gLinker.behaviors.bhvAirborneStarCollectWarp, gLinker.behaviors.bhvAirborneDeathWarp,      gLinker.behaviors.bhvLaunchStarCollectWarp,   gLinker.behaviors.bhvLaunchDeathWarp,
-]
-
-const sSpawnTypeFromWarpBhv = [
-    MARIO_SPAWN_DOOR_WARP,             MARIO_SPAWN_UNKNOWN_02,           MARIO_SPAWN_UNKNOWN_03,            MARIO_SPAWN_UNKNOWN_03,
-    MARIO_SPAWN_UNKNOWN_03,            MARIO_SPAWN_TELEPORT,             MARIO_SPAWN_INSTANT_ACTIVE,        MARIO_SPAWN_AIRBORNE,
-    MARIO_SPAWN_HARD_AIR_KNOCKBACK,    MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE, MARIO_SPAWN_DEATH,                 MARIO_SPAWN_SPIN_AIRBORNE,
-    MARIO_SPAWN_FLYING,                MARIO_SPAWN_SWIMMING,             MARIO_SPAWN_PAINTING_STAR_COLLECT, MARIO_SPAWN_PAINTING_DEATH,
-    MARIO_SPAWN_AIRBORNE_STAR_COLLECT, MARIO_SPAWN_AIRBORNE_DEATH,       MARIO_SPAWN_LAUNCH_STAR_COLLECT,   MARIO_SPAWN_LAUNCH_DEATH,
-]
-
 const canvas = document.querySelector('#gameCanvas')
 
 class Area {
@@ -79,7 +56,7 @@ class Area {
         this.gCurrentArea = null
         this.gAreas = Array(8).fill(0).map(() => { return { index: 0 } })
         this.gCurrAreaIndex = 0
-        this.gCurrLevelNum = 0
+        this.gCurrLevelNum = LEVEL_MIN
         this.gCurrCourseNum = 0
         this.gSavedCourseNum = 0
         this.gCurrSaveFileNum = 1
@@ -106,7 +83,21 @@ class Area {
         this.gWarpTransRed = 0
         this.gWarpTransGreen = 0
         this.gWarpTransBlue = 0
+        this.sSpawnTypeFromWarpBhv = [
+            MARIO_SPAWN_DOOR_WARP,             MARIO_SPAWN_UNKNOWN_02,           MARIO_SPAWN_UNKNOWN_03,            MARIO_SPAWN_UNKNOWN_03,
+            MARIO_SPAWN_UNKNOWN_03,            MARIO_SPAWN_TELEPORT,             MARIO_SPAWN_INSTANT_ACTIVE,        MARIO_SPAWN_AIRBORNE,
+            MARIO_SPAWN_HARD_AIR_KNOCKBACK,    MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE, MARIO_SPAWN_DEATH,                 MARIO_SPAWN_SPIN_AIRBORNE,
+            MARIO_SPAWN_FLYING,                MARIO_SPAWN_SWIMMING,             MARIO_SPAWN_PAINTING_STAR_COLLECT, MARIO_SPAWN_PAINTING_DEATH,
+            MARIO_SPAWN_AIRBORNE_STAR_COLLECT, MARIO_SPAWN_AIRBORNE_DEATH,       MARIO_SPAWN_LAUNCH_STAR_COLLECT,   MARIO_SPAWN_LAUNCH_DEATH,
+        ]
 
+        this.sWarpBhvSpawnTable = [
+            gLinker.behaviors.bhvDoorWarp,                gLinker.behaviors.bhvStar,                   gLinker.behaviors.bhvExitPodiumWarp,          gLinker.behaviors.bhvWarp,
+            gLinker.behaviors.bhvWarpPipe,                gLinker.behaviors.bhvFadingWarp,             gLinker.behaviors.bhvInstantActiveWarp,       gLinker.behaviors.bhvAirborneWarp,
+            gLinker.behaviors.bhvHardAirKnockBackWarp,    gLinker.behaviors.bhvSpinAirborneCircleWarp, gLinker.behaviors.bhvDeathWarp,               gLinker.behaviors.bhvSpinAirborneWarp,
+            gLinker.behaviors.bhvFlyingWarp,              gLinker.behaviors.bhvSwimmingWarp,           gLinker.behaviors.bhvPaintingStarCollectWarp, gLinker.behaviors.bhvPaintingDeathWarp,
+            gLinker.behaviors.bhvAirborneStarCollectWarp, gLinker.behaviors.bhvAirborneDeathWarp,      gLinker.behaviors.bhvLaunchStarCollectWarp,   gLinker.behaviors.bhvLaunchDeathWarp,
+        ]
     }
 
     // PARAMETERS:

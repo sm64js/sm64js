@@ -1377,7 +1377,7 @@ class Camera {
             // [ CUTSCENE_EXIT_WATERFALL, this.sCutsceneExitWaterfall ],
             // [ CUTSCENE_EXIT_FALL_WMOTR, this.sCutsceneFallToCastleGrounds ],
             // [ CUTSCENE_NONPAINTING_DEATH, this.sCutsceneNonPaintingDeath ],
-            // [ CUTSCENE_DIALOG, this.sCutsceneDialog ], ; REIMPLEMENT WHEN THIS IS ABLE TO BE USED
+            // [ CUTSCENE_DIALOG, this.sCutsceneDialog ], // reimplement when it works
             [ CUTSCENE_READ_MESSAGE, this.sCutsceneReadMessage ],
             // [ CUTSCENE_RACE_DIALOG, this.sCutsceneDialog ],
             // [ CUTSCENE_ENTER_PYRAMID_TOP, this.sCutsceneEnterPyramidTop ],
@@ -7996,7 +7996,7 @@ class Camera {
     }
 
     cutscene_intro_peach_start_to_pipe_spline(c) {
-        console.log(this.sCutsceneSplineSegment, "|", sIntroPipeToDialogPosition[this.sCutsceneSplineSegment].point)
+        console.log(this.sCutsceneSplineSegment, sIntroPipeToDialogPosition[this.sCutsceneSplineSegment].point)
         if (this.intro_peach_move_camera_start_to_pipe(c, sIntroPipeToDialogPosition, sIntroPipeToDialogFocus) != 0) {
             this.gCameraMovementFlags &= ~CAM_MOVE_C_UP_MODE;
             this.gCutsceneTimer = CUTSCENE_LOOP;

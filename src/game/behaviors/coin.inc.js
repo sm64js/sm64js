@@ -1,5 +1,5 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { oCoinUnkF4, oBehParams, oAction, oDistanceToMario, oBehParams2ndByte, oTimer, oCoinUnkF8, oVelX, oPosY, oVelZ, oFloorHeight, oAnimState, oInteractStatus, oPosX, oPosZ, oVelY, oCoinUnk110, oForwardVel, oMoveAngleYaw, oFloor, oMoveFlags, OBJ_MOVE_ON_GROUND, oSubAction, oBounciness, oDamageOrCoinValue, oBooDeathStatus, OBJ_MOVE_LANDED, OBJ_MOVE_ABOVE_DEATH_BARRIER, OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_BOUNCE } from "../../include/object_constants"
+import { oCoinCollectedFlags, oBehParams, oAction, oDistanceToMario, oBehParams2ndByte, oTimer, oCoinOnGround, oVelX, oPosY, oVelZ, oFloorHeight, oAnimState, oInteractStatus, oPosX, oPosZ, oVelY, oCoinBaseVelY, oForwardVel, oMoveAngleYaw, oFloor, oMoveFlags, OBJ_MOVE_ON_GROUND, oSubAction, oBounciness, oDamageOrCoinValue, oBooDeathStatus, OBJ_MOVE_LANDED, OBJ_MOVE_ABOVE_DEATH_BARRIER, OBJ_MOVE_ABOVE_LAVA, OBJ_MOVE_BOUNCE } from "../../include/object_constants"
 import {
     spawn_object_relative, cur_obj_set_behavior, cur_obj_update_floor_height, obj_mark_for_deletion,
     cur_obj_set_model, spawn_object, cur_obj_scale, cur_obj_become_intangible,
@@ -76,7 +76,7 @@ const bhv_temp_coin_loop = () => {
 const bhv_coin_init = () => {
     const o = ObjectListProc.gCurrentObject
 
-    o.rawData[oVelY] = Math.random() * 10.0 + 30 + o.rawData[oCoinUnk110]
+    o.rawData[oVelY] = Math.random() * 10.0 + 30 + o.rawData[oCoinBaseVelY]
     o.rawData[oForwardVel] = Math.random() * 10.0
     o.rawData[oMoveAngleYaw] = random_uint16()
     cur_obj_set_behavior(bhvYellowCoin)
@@ -131,7 +131,7 @@ const bhv_coin_formation_spawn_loop = () => {
         cur_obj_set_behavior(bhvYellowCoin)
         obj_set_hitbox(o, sYellowCoinHitbox)
         //bhv_init_room()  TODO assign coin to specific room?
-        if (o.rawData[oCoinUnkF8]) {
+        if (o.rawData[oCoinOnGround]) {
             o.rawData[oPosY] += 300
             cur_obj_update_floor_height()
             if (o.rawData[oPosY] < o.rawData[oFloorHeight] || o.rawData[oFloorHeight] < -10000.0)
@@ -145,7 +145,7 @@ const bhv_coin_formation_spawn_loop = () => {
         }
     } else {
         if (bhv_coin_sparkles_init())
-            o.parentObj.rawData[oCoinUnkF4] |= 1 << o.rawData[oBehParams2ndByte]
+            o.parentObj.rawData[oCoinCollectedFlags] |= 1 << o.rawData[oBehParams2ndByte]
         o.rawData[oAnimState]++
     }
 
@@ -188,14 +188,14 @@ const spawn_coin_in_formation = (sp50, sp54) => {
     if (sp3C) {
         const sp4C = spawn_object_relative(sp50, sp40[0], sp40[1], sp40[2], o, MODEL_YELLOW_COIN, bhvCoinFormationSpawn)
 
-        sp4C.rawData[oCoinUnkF4] = sp38
+        sp4C.rawData[oCoinCollectedFlags] = sp38
     }
 }
 
 const bhv_coin_formation_init = () => {
     const o = ObjectListProc.gCurrentObject
 
-    o.rawData[oCoinUnkF4] = (o.rawData[oBehParams] >> 8) & 0xFF
+    o.rawData[oCoinCollectedFlags] = (o.rawData[oBehParams] >> 8) & 0xFF
 }
 
 const bhv_coin_formation_loop = () => {
@@ -205,7 +205,7 @@ const bhv_coin_formation_loop = () => {
         case 0:
             if (o.rawData[oDistanceToMario] < 2000) {
                 for (let bitIndex = 0; bitIndex < 8; bitIndex++) {
-                    if (!(o.rawData[oCoinUnkF4] & (1 << bitIndex)))
+                    if (!(o.rawData[oCoinCollectedFlags] & (1 << bitIndex)))
                         spawn_coin_in_formation(bitIndex, o.rawData[oBehParams2ndByte])
                 }
                 o.rawData[oAction]++
@@ -221,7 +221,7 @@ const bhv_coin_formation_loop = () => {
             break
     }
 
-    ObjectListProc.set_object_respawn_info_bits(o, o.rawData[oCoinUnkF4] & 0xFF)
+    ObjectListProc.set_object_respawn_info_bits(o, o.rawData[oCoinCollectedFlags] & 0xFF)
 }
 
 const coin_inside_boo_act_1 = () => {

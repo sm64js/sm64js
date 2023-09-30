@@ -494,10 +494,10 @@ export const oCloudGrowSpeed             = 0x1E
 export const oCloudFwooshMovementRadius  = 0x49
 
 /* Coin */
-export const oCoinUnkF4   = 0x1B
-export const oCoinUnkF8   = 0x1C
-export const oCoinUnk110  = 0x22
-export const oCoinUnk1B0  = 0x4A
+export const oCoinCollectedFlags        = 0x1B
+export const oCoinOnGround              = 0x1C
+export const oCoinBaseVelY              = 0x22
+export const oCoinNumBounceSoundPlayed  = 0x4A
 
 /* Collision Particle */
 export const oCollisionParticleUnkF4   = 0x1B
@@ -799,7 +799,7 @@ export const oMrIUnkFC   = 0x1D
 export const oMrIUnk100  = 0x1E
 export const oMrIUnk104  = 0x1F
 export const oMrIUnk108  = 0x20
-export const oMrISize    = 0x21
+export const oMrIScale   = 0x21
 export const oMrIUnk110  = 0x22
 
 /* Object Respawner */

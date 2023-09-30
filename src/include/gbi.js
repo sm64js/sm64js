@@ -374,7 +374,8 @@ export const G_RM_CUSTOM_AA_ZB_XLU_SURF2 = 28
 export const G_RM_AA_TEX_EDGE            = 29
 export const G_RM_AA_TEX_EDGE2           = 30
 export const G_RM_PASS                   = 31
-
+export const G_RM_TEX_EDGE               = 32
+export const G_RM_TEX_EDGE2              = 33
 
 //G_MOVEWORD types
 export const G_MW_MATRIX = 0x00 /* NOTE: also used by movemem */

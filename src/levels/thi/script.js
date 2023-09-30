@@ -82,20 +82,20 @@ const script_func_local_4 = [
     OBJECT(/*model*/ MODEL_PIRANHA_PLANT,     /*pos*/ -6481,  -2047,  -5998,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvFirePiranhaPlant'),
     OBJECT(/*model*/ MODEL_PIRANHA_PLANT,     /*pos*/ -5577,  -2047,  -4961,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvFirePiranhaPlant'),
     OBJECT(/*model*/ MODEL_PIRANHA_PLANT,     /*pos*/ -6865,  -2047,  -4568,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvFirePiranhaPlant'),
-    OBJECT(/*model*/ MODEL_NONE,              /*pos*/ -4413,    204,  -2140,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00030000,  /*beh*/ 'bhvThiBowlingBallSpawner'),
+    OBJECT(/*model*/ MODEL_NONE,              /*pos*/ -4413,    204,  -2140,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00030000,  /*beh*/ 'bhvTHIBowlingBallSpawner'),
     OBJECT(/*model*/ MODEL_BUBBA,             /*pos*/ -6241,  -3300,   -716,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvBubba'),
     OBJECT(/*model*/ MODEL_BUBBA,             /*pos*/  1624,  -3300,   8142,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvBubba'),
     RETURN(),
 ];
 
 const script_func_local_5 = [
-    OBJECT(/*model*/ MODEL_THI_HUGE_ISLAND_TOP,  /*pos*/     0,  3891,  -1533,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvThiHugeIslandTop'),
+    OBJECT(/*model*/ MODEL_THI_HUGE_ISLAND_TOP,  /*pos*/     0,  3891,  -1533,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvTHIHugeIslandTop'),
     RETURN(),
 ];
 
 const script_func_local_6 = [
-    OBJECT(/*model*/ MODEL_THI_TINY_ISLAND_TOP,  /*pos*/     0,  1167,   -460,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvThiTinyIslandTop'),
-    OBJECT(/*model*/ MODEL_NONE,                 /*pos*/ -1382,    80,   -649,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00040000,  /*beh*/ 'bhvThiBowlingBallSpawner'),
+    OBJECT(/*model*/ MODEL_THI_TINY_ISLAND_TOP,  /*pos*/     0,  1167,   -460,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvTHITinyIslandTop'),
+    OBJECT(/*model*/ MODEL_NONE,                 /*pos*/ -1382,    80,   -649,  /*angle*/ 0,  0,  0,  /*behParam*/ 0x00040000,  /*beh*/ 'bhvTHIBowlingBallSpawner'),
     RETURN(),
 ];
 

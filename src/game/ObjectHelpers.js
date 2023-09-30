@@ -32,7 +32,7 @@ import {
 
     oUnk1A8, oUnk94, oUnkBC, oUnkC0,
 
-    oCoinUnk110,
+    oCoinBaseVelY,
 
     oPathedStartWaypoint, oPathedPrevWaypoint, oPathedPrevWaypointFlags, oPathedTargetPitch,
     oPathedTargetYaw,
@@ -157,6 +157,10 @@ export const cur_obj_set_pos_to_home = () => {
     o.rawData[oPosX] = o.rawData[oHomeX]
     o.rawData[oPosY] = o.rawData[oHomeY]
     o.rawData[oPosZ] = o.rawData[oHomeZ]
+}
+
+export const cur_obj_shake_y = (amount) => {
+    o.rawData[oTimer] % 2 == 0 ? o.rawData[oPosY] += amount : o.rawData[oPosY] -= amount;
 }
 
 export const cur_obj_set_pos_relative = (other, dleft, dy, dforward) => {
@@ -587,7 +591,7 @@ export const obj_set_gfx_pos_at_obj_pos = (obj1, obj2) => {
     obj1.gfx.angle[2] = obj2.rawData[oMoveAngleRoll] & 0xFFFF
 }
 
-const obj_translate_local = (obj, posIndex, localTranslateIndex) => {
+export const obj_translate_local = (obj, posIndex, localTranslateIndex) => {
     const dx = obj.rawData[localTranslateIndex + 0]
     const dy = obj.rawData[localTranslateIndex + 1]
     const dz = obj.rawData[localTranslateIndex + 2]
@@ -1964,7 +1968,7 @@ export const obj_spawn_loot_coins = (obj, numCoins, sp30, coinsBehavior, posJitt
         const coin = spawn_object(obj, model, coinsBehavior)
         obj_translate_xz_random(coin, posJitter)
         coin.rawData[oPosY] = spawnHeight
-        coin.rawData[oCoinUnk110] = sp30
+        coin.rawData[oCoinBaseVelY] = sp30
     }
 }
 
@@ -2190,6 +2194,14 @@ export const bhv_init_room = () => {
         }
     } else {
         o.rawData[oRoom] = -1
+    }
+}
+
+export const cur_obj_spawn_loot_blue_coin = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    if (o.rawData[oNumLootCoins] >= 5) {
+        spawn_object(o, MODEL_BLUE_COIN, gLinker.behaviors.bhvSpawnedBlueCoin);
+        o.rawData[oNumLootCoins] -= 5;
     }
 }
 

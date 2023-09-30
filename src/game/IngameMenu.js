@@ -5,7 +5,7 @@ import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../include/config"
 import * as Gbi from "../include/gbi"
 import { SOUND_GENERAL_COLLECT_1UP, SOUND_MENU_CHANGE_SELECT, SOUND_MENU_PAUSE, SOUND_MENU_PAUSE_2, SOUND_MENU_STAR_SOUND, SOUND_MENU_YOSHI_GAIN_LIVES } from "../include/sounds"
 import { menu_font_lut, menu_hud_lut } from "../levels/menu/leveldata"
-import { DIALOG_020, DIALOG_NONE } from "../text/us/dialogs"
+import { DIALOG_020, DIALOG_NONE, seg2_dialog_table } from "../text/us/dialogs"
 import { GameInstance as Game } from "./Game"
 import { PrintInstance as Print } from "./Print"
 import { gCurrCourseStarFlags, gGotFileCoinHiScore, gLastCompletedCourseNum, gLastCompletedStarNum, save_file_get_course_coin_score, save_file_get_course_star_count, save_file_get_max_coin_score, save_file_get_star_flags } from "./SaveFile"
@@ -15,6 +15,10 @@ import { seg2_act_name_table, seg2_course_name_table } from "../text/us/courses"
 import { COURSE_BONUS_STAGES, COURSE_NUM_TO_INDEX, COURSE_STAGES_MAX } from "../levels/course_defines"
 import { COURSE_BITDW, COURSE_MAX, COURSE_MIN, COURSE_NONE } from "../include/course_table"
 import { ACT_FLAG_PAUSE_EXIT } from "./Mario"
+import { coin_seg3_dl_03007940, coin_seg3_dl_03007968, coin_seg3_dl_03007990, coin_seg3_dl_030079B8 } from "../actors/coin/model.inc"
+import { GFX_DIMENSIONS_FROM_LEFT_EDGE, GFX_DIMENSIONS_FROM_RIGHT_EDGE } from "../include/gfx_dimensions"
+import { castle_grounds_seg7_dl_0700EA58 } from "../levels/castle_grounds/areas/1/12/model.inc"
+import { castle_grounds_seg7_us_dl_0700F2E8 } from "../levels/castle_grounds/areas/1/13/model.inc"
 
 export const ASCII_TO_DIALOG = (asc) => {
     return (((asc) >= '0' && (asc) <= '9') ? ((asc) - '0') :
@@ -188,8 +192,15 @@ class IngameMenu {
         this.gMenuHoldKeyTimer = 0;
         this.gDialogResponse = DIALOG_RESPONSE_NONE;
 
+        this.gCutsceneMsgFade = 0;
+        this.gCutsceneMsgIndex = -1;
+        this.gCutsceneMsgDuration = -1;
+        this.gCutsceneMsgTimer = 0;
         this.gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
         this.gDialogCourseActNum = 1;
+        
+
+        this.gRedCoinsCollected = 0;
     }
 
     create_dl_identity_matrix() {
@@ -816,6 +827,136 @@ class IngameMenu {
 
     // ...
 
+    // "Dear Mario" message handler
+    print_peach_letter_message() {
+        let dialogTable = seg2_dialog_table;
+        let dialog = this.gDialogID;
+        let str = dialog.str;
+
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, 97.0, 118.0, 0);
+
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gCutsceneMsgFade);
+        Gbi.gSPDisplayList(Game.gDisplayList, castle_grounds_seg7_dl_0700EA58);
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin);
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 20, 20, 20, this.gCutsceneMsgFade);
+
+        this.print_generic_string(38, 142, str);
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, 255);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 200, 80, 120, this.gCutsceneMsgFade);
+        Gbi.gSPDisplayList(Game.gDisplayList, castle_grounds_seg7_us_dl_0700F2E8);
+
+        if (this.gCutsceneMsgTimer == 0) {
+            this.gCutsceneMsgFade = 0;
+        }
+
+        if (this.gCutsceneMsgTimer < 20) {
+            this.gCutsceneMsgFade += 10;
+        }
+
+        if (this.gCutsceneMsgTimer > 250) {
+            this.gCutsceneMsgFade -= 10;
+        }
+
+        // 20 increments after the start of the decrease, we're
+        // back where we are, so reset everything at the end.
+        if (this.gCutsceneMsgTimer > 270) {
+            this.gCutsceneMsgIndex = -1;
+            this.gDialogID = DIALOG_NONE;
+            this.gCutsceneMsgTimer = 0;
+            return; // return to avoid incrementing the timer
+        }
+
+        this.gCutsceneMsgTimer++;
+    }
+
+    /**
+     * Renders the cannon reticle when Mario is inside a cannon.
+     * Formed by four triangles.
+     */
+    render_hud_cannon_reticle() {
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, 160.0, 120.0, 0);
+
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 50, 50, 50, 180);
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, -20.0, -8.0, 0);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_triangle);
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, 20.0, 8.0, 0);
+        this.create_dl_rotation_matrix(MENU_MTX_NOPUSH, 180.0, 0, 0, 1.0);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_triangle);
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, 8.0, -20.0, 0);
+        this.create_dl_rotation_matrix(MENU_MTX_NOPUSH, 90.0, 0, 0, 1.0);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_triangle);
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, -8.0, 20.0, 0);
+        this.create_dl_rotation_matrix(MENU_MTX_NOPUSH, -90.0, 0, 0, 1.0);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_triangle);
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+    }
+
+    reset_red_coins_collected() {
+        this.gRedCoinsCollected = 0;
+    }
+
+    change_dialog_camera_angle() {
+        if (cam_select_alt_mode(0) == CAM_SELECTION_MARIO) {
+            this.gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
+        } else {
+            this.gDialogCameraAngleIndex = CAM_SELECTION_FIXED;
+        }
+    }
+
+    shade_screen() {
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, GFX_DIMENSIONS_FROM_LEFT_EDGE(0), SCREEN_HEIGHT, 0);
+
+        // This is a bit weird. It reuses the dialog text box (width 130, height -80),
+        // so scale to at least fit the screen.
+        this.create_dl_scale_matrix(MENU_MTX_NOPUSH, 2.6, 3.4, 1.0);
+
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 0, 0, 0, 110);
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_text_bg_box);
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+    }
+
+    print_animated_red_coin(x, y) {
+        let globalTimer = window.gGlobalTimer;
+
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0);
+        this.create_dl_scale_matrix(MENU_MTX_NOPUSH, 0.2, 0.2, 1.0);
+        Gbi.gDPSetRenderMode(Game.gDisplayList, Gbi.G_RM_TEX_EDGE, Gbi.G_RM_TEX_EDGE2);
+
+        switch (globalTimer & 6) {
+            case 0:
+                Gbi.gSPDisplayList(Game.gDisplayList, coin_seg3_dl_03007940);
+                break;
+            case 2:
+                Gbi.gSPDisplayList(Game.gDisplayList, coin_seg3_dl_03007968);
+                break;
+            case 4:
+                Gbi.gSPDisplayList(Game.gDisplayList, coin_seg3_dl_03007990);
+                break;
+            case 6:
+                Gbi.gSPDisplayList(Game.gDisplayList, coin_seg3_dl_030079B8);
+                break;
+        }
+
+        Gbi.gDPSetRenderMode(Game.gDisplayList, Gbi.G_RM_AA_ZB_OPA_SURF, Gbi.G_RM_AA_ZB_OPA_SURF2);
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+    }
+
+    render_pause_red_coins() {
+        for (let x = 0; x < this.gRedCoinsCollected; x++) {
+            this.print_animated_red_coin(GFX_DIMENSIONS_FROM_RIGHT_EDGE(30) - x * 20, 16);
+        }
+    }
+
     render_pause_my_score_coins() {
         let courseNameTbl = seg2_course_name_table;
         let actNameTbl = seg2_act_name_table;
@@ -840,7 +981,6 @@ class IngameMenu {
         }
 
         let courseName = courseNameTbl[courseIndex].slice(3)
-        console.log(courseName)
 
         if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
             this.print_generic_string(63, 157, TEXT_COURSE);
@@ -1061,9 +1201,9 @@ class IngameMenu {
                 break;
 
             case MENU_STATE_PAUSE_SCREEN_COURSE:
-                // this.shade_screen();
+                this.shade_screen();
                 this.render_pause_my_score_coins();
-                // this.render_pause_red_coins();
+                this.render_pause_red_coins();
 
                 if (gMarioStates[0].action & ACT_FLAG_PAUSE_EXIT) {
                     const wrapper = {ptr: this.gMenuLineNum}
@@ -1085,7 +1225,7 @@ class IngameMenu {
                 break;
             
             case MENU_STATE_PAUSE_SCREEN_CASTLE:
-                // this.shade_screen();
+                this.shade_screen();
                 this.print_hud_pause_colorful_str();
                 this.render_pause_castle_menu_box(160, 143);
                 this.render_pause_castle_main_strings(104, 60);
@@ -1280,7 +1420,7 @@ class IngameMenu {
                 break;
 
             case MENU_STATE_COURSE_COMPLETE_SCREEN_OPEN:
-                // this.shade_screen();
+                this.shade_screen();
                 this.render_course_complete_lvl_info_and_hud_str();
                 
                 const wrapper = {index: this.gMenuLineNum};
@@ -1338,7 +1478,7 @@ class IngameMenu {
             this.gMenuTextColorTransTimer = this.gMenuTextColorTransTimer + 0x1000;
         } else if (this.gDialogID != DIALOG_NONE) {
             if (this.gDialogID == DIALOG_020) {
-                // this.print_peach_letter_message();
+                this.print_peach_letter_message();
                 return index;
             }
 

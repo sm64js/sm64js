@@ -122,7 +122,7 @@ class SpawnObject {
         } else if (typeof bhv == "string") {
             bhv = gLinker.behaviors[bhv]
             if (!bhv) {
-                console.log("need to add this to gLinker.behaviors: " + behavior)
+                console.log("missing gLinker behavior: " + behavior)
                 bhv = gLinker.behaviors.bhvCarrySomething6
             }
         }

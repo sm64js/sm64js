@@ -175,10 +175,10 @@ import {
     SOUND_MARIO_YAH_WAH_HOO, SOUND_MARIO_HOOHOO,
 
     SOUND_ACTION_TERRAIN_BODY_HIT_GROUND, SOUND_ACTION_UNKNOWN43D, SOUND_ACTION_UNKNOWN43E,
-    SOUND_ACTION_BRUSH_HAIR, SOUND_ACTION_KEY_SWISH, SOUND_ACTION_PAT_BACK, SOUND_ACTION_UNKNOWN45C, SOUND_ACTION_READ_SIGN, SOUND_ACTION_TELEPORT
+    SOUND_ACTION_BRUSH_HAIR, SOUND_ACTION_KEY_SWISH, SOUND_ACTION_PAT_BACK, SOUND_ACTION_UNKNOWN45C, SOUND_ACTION_READ_SIGN, SOUND_ACTION_TELEPORT, SOUND_MENU_EXIT_PIPE, SOUND_MENU_ENTER_PIPE
 } from "../include/sounds"
 
-import { LEVEL_BOWSER_1, LEVEL_BOWSER_2 } from "../levels/level_defines_constants"
+import { LEVEL_BOWSER_1, LEVEL_BOWSER_2, LEVEL_THI } from "../levels/level_defines_constants"
 import { COURSE_BITDW, COURSE_BITFS } from "../levels/course_defines"
 
 import { play_sound } from "../audio/external"
@@ -1135,32 +1135,32 @@ export const act_warp_door_spawn = (m) => {
     return false
 }
 
-// export const act_emerge_from_pipe = (m) => {
-//     struct Object *marioObj = m.marioObj
+export const act_emerge_from_pipe = (m) => {
+    let marioObj = m.marioObj;
 
-//     if (m.actionTimer++ < 11) {
-//         marioObj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
-//         return false
-//     }
+    m.actionTimer++;
 
-//     marioObj.gfx.flags |= GRAPH_RENDER_ACTIVE
+    if (m.actionTimer < 11) {
+        marioObj.gfx.flags &= ~GRAPH_RENDER_ACTIVE;
+        return false;
+    }
 
-//     play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED)
+    marioObj.gfx.flags |= GRAPH_RENDER_ACTIVE;
 
-//     if (Area.gCurrLevelNum == LEVEL_THI) {
-//         if (gCurrAreaIndex == 2) {
-//             play_sound_if_no_flag(m, SOUND_MENU_EXIT_PIPE, MARIO_ACTION_SOUND_PLAYED)
-//         } else {
-//             play_sound_if_no_flag(m, SOUND_MENU_ENTER_PIPE, MARIO_ACTION_SOUND_PLAYED)
-//         }
-//     }
+    play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED);
 
-//     if (launch_mario_until_land(m, ACT_JUMP_LAND_STOP, MARIO_ANIM_SINGLE_JUMP, 8.0)) {
-//         mario_set_forward_vel(m, 0.0)
-//         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
-//     }
-//     return false
-// }
+    if (Area.gCurrLevelNum == LEVEL_THI) {
+        Area.gCurrAreaIndex == 2
+            ? play_sound_if_no_flag(m, SOUND_MENU_EXIT_PIPE, MARIO_ACTION_SOUND_PLAYED)
+            : play_sound_if_no_flag(m, SOUND_MENU_ENTER_PIPE, MARIO_ACTION_SOUND_PLAYED);
+    }
+
+    if (launch_mario_until_land(m, ACT_JUMP_LAND_STOP, MARIO_ANIM_SINGLE_JUMP, 8.0)) {
+        mario_set_forward_vel(m, 0.0);
+        play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
+    }
+    return false;
+}
 
 export const act_spawn_spin_airborne = (m) => {
     // entered water, exit action

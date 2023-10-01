@@ -617,6 +617,15 @@ export const gDPSetFillColor = (displaylist, color) => {
     })
 }
 
+export const gDPSetScissor = (displaylist, ulx, uly, lrx, lry) => {
+    displaylist.push({
+        words: {
+            w0: G_SETSCISSOR,
+            w1: { ulx, uly, lrx, lry }
+        }
+    })
+}
+
 export const gDPFillRectangle = (displaylist, ulx, uly, lrx, lry) => {
     displaylist.push({
         words: {

@@ -2089,21 +2089,21 @@ export const cur_obj_update_dialog_with_cutscene = (actionArg, dialogFlags, cuts
             }
             break
         case DIALOG_STATUS_START_DIALOG:
-            /*// Special check for Cap Switch cutscene since the cutscene itself
+            // Special check for Cap Switch cutscene since the cutscene itself
             // handles what dialog should used
             if (cutsceneTable == CUTSCENE_CAP_SWITCH_PRESS) {
                 o.rawData[oDialogResponse] = CameraInstance.cutscene_object_without_dialog(cutsceneTable, o)
                 if (o.rawData[oDialogResponse]) {
                     o.rawData[oDialogState]++
                 }
-            } else {*/
+            } else {
                 // General dialog cutscene function, most of the time
                 // the "CUTSCENE_DIALOG" cutscene is called
                 o.rawData[oDialogResponse] = CameraInstance.cutscene_object_with_dialog(cutsceneTable, o, dialogID)
                 if (o.rawData[oDialogResponse]) {
                     o.rawData[oDialogState]++
                 }
-            // }
+            }
             break
         case DIALOG_STATUS_STOP_DIALOG:
             // If flag defined, keep time stop enabled until the object

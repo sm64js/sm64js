@@ -1,5 +1,6 @@
 import { WebGLInstance as WebGL } from "./WebGL"
 import * as Gbi from "../include/gbi"
+import { SCREEN_HEIGHT } from "../include/config"
 
 const precomp_shaders = [
     0x01200200,
@@ -30,6 +31,9 @@ const precomp_shaders = [
 const MAX_BUFFERED = 256
 const MAX_LIGHTS = 2
 const MAX_VERTICES = 64
+
+const RATIO_X = WebGL.canvas.width / (2.0 * 320.0)
+const RATIO_Y = WebGL.canvas.height / (2.0 * 240.0)
 
 let prev_op = 0
 
@@ -763,6 +767,19 @@ export class n64GfxProcessor {
 
     }
 
+    dp_set_scissor(ulx, uly, lrx, lry) {
+        let x = ulx / 4.0 * RATIO_X;
+        let y = (SCREEN_HEIGHT - lry / 4.0) * RATIO_Y;
+        let width = (lrx - ulx) / 4.0 * RATIO_X;
+        let height = (lry - uly) / 4.0 * RATIO_Y;
+
+        this.rdp.scissor.x = x;
+        this.rdp.scissor.y = y;
+        this.rdp.scissor.width = width;
+        this.rdp.scissor.height = height;
+        this.rdp.viewport_or_scissor_changed = true;
+    }
+
     // PARAMETERS:
     // ulx, uly: upper left corner of the rectangle
     // lrx, lry: lower right corner of the rectangle
@@ -1109,6 +1126,9 @@ export class n64GfxProcessor {
                 case Gbi.G_FILLRECT:
                     this.dp_fill_rectangle(args.ulx, args.uly, args.lrx, args.lry)
                     break
+                case Gbi.G_SETSCISSOR:
+                    this.dp_set_scissor(args.ulx, args.uly, args.lrx, args.lry);
+                    break;
                 case Gbi.G_TEXRECT:
                 case Gbi.G_TEXRECTFLIP:
                     this.dp_texture_rectangle(args.ulx, args.uly, args.lrx, args.lry, args.tile, args.uls, args.ult, args.dsdx, args.dtdy, opcode == Gbi.G_TEXRECTFLIP)

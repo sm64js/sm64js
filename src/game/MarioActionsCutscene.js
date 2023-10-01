@@ -625,12 +625,11 @@ export const act_reading_automatic_dialog = (m) => {
           // set Mario dialog
         if (m.actionState == 9) {
             actionArg = m.actionArg
-            IngameMenu.create_dialog_box()
-            // if (GET_HIGH_U16_OF_32(actionArg) == 0) {
-            //     create_dialog_box(GET_LOW_U16_OF_32(actionArg))
-            // } else {
-            //     create_dialog_box_with_var(GET_HIGH_U16_OF_32(actionArg), GET_LOW_U16_OF_32(actionArg))
-            // }
+            if (actionArg & 0xFFFF0000 == 0) {
+                IngameMenu.create_dialog_box(actionArg & 0xFFFF0000)
+            } else {
+                IngameMenu.create_dialog_box_with_var(actionArg & 0xFFFF0000, actionArg & 0xFFFF)
+            }
         }
           // wait until dialog is done
         else if (m.actionState == 10) {

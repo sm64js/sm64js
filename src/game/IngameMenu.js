@@ -1,11 +1,11 @@
-import { play_sound } from "../audio/external"
+import { SEQUENCE_ARGS, SEQ_PLAYER_LEVEL, play_music, play_sound, seq_player_lower_volume, seq_player_unlower_volume } from "../audio/external"
 import { dl_draw_text_bg_box, dl_draw_triangle, dl_ia_text_begin, dl_ia_text_end, dl_ia_text_tex_settings, dl_rgba16_load_tex_block, dl_rgba16_text_begin, dl_rgba16_text_end, main_font_lut, main_hud_lut } from "../bin/segment2"
 import * as MathUtil from "../engine/math_util"
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../include/config"
 import * as Gbi from "../include/gbi"
-import { SOUND_GENERAL_COLLECT_1UP, SOUND_MENU_CHANGE_SELECT, SOUND_MENU_PAUSE, SOUND_MENU_PAUSE_2, SOUND_MENU_STAR_SOUND, SOUND_MENU_YOSHI_GAIN_LIVES } from "../include/sounds"
+import { SOUND_GENERAL_COLLECT_1UP, SOUND_MENU_CHANGE_SELECT, SOUND_MENU_MESSAGE_APPEAR, SOUND_MENU_MESSAGE_DISAPPEAR, SOUND_MENU_MESSAGE_NEXT_PAGE, SOUND_MENU_PAUSE, SOUND_MENU_PAUSE_2, SOUND_MENU_STAR_SOUND, SOUND_MENU_YOSHI_GAIN_LIVES } from "../include/sounds"
 import { menu_font_lut, menu_hud_lut } from "../levels/menu/leveldata"
-import { DIALOG_020, DIALOG_NONE, seg2_dialog_table } from "../text/us/dialogs"
+import { DIALOG_005, DIALOG_009, DIALOG_010, DIALOG_011, DIALOG_012, DIALOG_013, DIALOG_014, DIALOG_017, DIALOG_020, DIALOG_055, DIALOG_114, DIALOG_115, DIALOG_116, DIALOG_117, DIALOG_118, DIALOG_128, DIALOG_150, DIALOG_152, DIALOG_164, DIALOG_NONE, seg2_dialog_table } from "../text/us/dialogs"
 import { GameInstance as Game } from "./Game"
 import { PrintInstance as Print } from "./Print"
 import { gCurrCourseStarFlags, gGotFileCoinHiScore, gLastCompletedCourseNum, gLastCompletedStarNum, save_file_get_course_coin_score, save_file_get_course_star_count, save_file_get_max_coin_score, save_file_get_star_flags } from "./SaveFile"
@@ -19,6 +19,7 @@ import { coin_seg3_dl_03007940, coin_seg3_dl_03007968, coin_seg3_dl_03007990, co
 import { GFX_DIMENSIONS_FROM_LEFT_EDGE, GFX_DIMENSIONS_FROM_RIGHT_EDGE } from "../include/gfx_dimensions"
 import { castle_grounds_seg7_dl_0700EA58 } from "../levels/castle_grounds/areas/1/12/model.inc"
 import { castle_grounds_seg7_us_dl_0700F2E8 } from "../levels/castle_grounds/areas/1/13/model.inc"
+import { SEQ_EVENT_BOSS } from "../include/seq_ids"
 
 export const ASCII_TO_DIALOG = (asc) => {
     return (((asc) >= '0' && (asc) <= '9') ? ((asc) - '0') :
@@ -216,7 +217,7 @@ class IngameMenu {
     }
 
     create_dl_translation_matrix(pushOp, x, y, z) {
-        const matrix = new Array(4).fill([0, 0, 0, 0])
+        const matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
         MathUtil.guTranslate(matrix, x, y, z)
 
         if (pushOp == MENU_MTX_PUSH) {
@@ -227,7 +228,7 @@ class IngameMenu {
     }
 
     create_dl_rotation_matrix(pushOp, a, x, y, z) {
-        const matrix = new Array(4).fill([0, 0, 0, 0])
+        const matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
         MathUtil.guTranslate(matrix, a, x, y, z)
 
         if (pushOp == MENU_MTX_PUSH) {
@@ -238,7 +239,7 @@ class IngameMenu {
     }
 
     create_dl_scale_matrix(pushOp, x, y, z) {
-        const matrix = new Array(4).fill([0, 0, 0, 0])
+        let matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
 
         MathUtil.guScale(matrix, x, y, z)
 
@@ -553,14 +554,14 @@ class IngameMenu {
 
     create_dialog_box(dialog) {
         if (this.gDialogID == DIALOG_NONE) {
-            this.gDialogID = dialog;
+            this.gDialogID = dialog.id;
             this.gDialogBoxType = DIALOG_TYPE_ROTATE;
         }
     }
 
     create_dialog_box_with_var(dialog, dialogVar) {
         if (this.gDialogID == DIALOG_NONE) {
-            this.gDialogID = dialog;
+            this.gDialogID = dialog.id;
             this.gDialogVariable = dialogVar;
             this.gDialogBoxType = DIALOG_TYPE_ROTATE;
         }
@@ -575,7 +576,7 @@ class IngameMenu {
 
     create_dialog_box_with_response(dialog) {
         if (this.gDialogID == DIALOG_NONE) {
-            this.gDialogID = dialog;
+            this.gDialogID = dialog.id;
             this.gDialogBoxType = DIALOG_TYPE_ZOOM;
         }
     }
@@ -686,7 +687,7 @@ class IngameMenu {
         ptrWrapper.xMatrix = 1;
     }
 
-    render_multi_text_string_lines(multiTextId, line, linePosWrapper, linesPerBox, xMatrix, lowerBound) {
+    render_multi_text_string_lines(multiTextId, lineNum, linePosWrapper, linesPerBox, xMatrix, lowerBound) {
         let textLengths = [
             {length: 3, str: [TEXT_THE_RAW]},
             {length: 3, str: [TEXT_YOU_RAW]}
@@ -752,7 +753,7 @@ class IngameMenu {
                 
                 case DIALOG_CHAR_NEWLINE:
                     lineNum++;
-                    wrapper = {pageState: pageState, xMatrix: xMatrix, linePos: linePos}
+                    wrapper.pageState = pageState; wrapper.xMatrix = xMatrix; wrapper.linePos = linePos
                     this.handle_dialog_scroll_page_state(lineNum, totalLines, wrapper);
                     pageState = wrapper.pageState; xMatrix = wrapper.xMatrix; linePos = wrapper.linePos;
                     break;
@@ -772,14 +773,14 @@ class IngameMenu {
                     break;
 
                 case DIALOG_CHAR_MULTI_THE:
-                    wrapper = {linePos: linePos};
-                    this.render_multi_text_string_lines(STRING_THE, lineNum, linePos, linesPerBox, xMatrix, lowerBound);
+                    wrapper.linePos = linePos
+                    this.render_multi_text_string_lines(STRING_THE, lineNum, wrapper, linesPerBox, xMatrix, lowerBound);
                     linePos = wrapper.linePos;
                     break;
                 
                 case DIALOG_CHAR_MULTI_YOU:
-                    wrapper = {linePos: linePos};
-                    this.render_multi_text_string_lines(STRING_YOU, lineNum, linePos, linesPerBox, xMatrix, lowerBound);
+                    wrapper.linePos = linePos
+                    this.render_multi_text_string_lines(STRING_YOU, lineNum, wrapper, linesPerBox, xMatrix, lowerBound);
                     linePos = wrapper.linePos;
                     xMatrix = 1;
                     break;
@@ -818,6 +819,173 @@ class IngameMenu {
     }
 
     // ...
+
+    render_dialog_triangle_choice() {
+        const wrapper = {};
+        if (this.gMenuState == MENU_STATE_DIALOG_OPEN) {
+            wrapper = {index: this.gMenuLineNum }
+            this.handle_menu_scrolling(MENU_SCROLL_HORIZONTAL, wrapper, 1, 2);
+            this.gMenuLineNum = wrapper.index;
+        }
+
+        this.create_dl_translation_matrix(MENU_MTX_NOPUSH, (this.gMenuLineNum - 1) * 56 + 9 , 2 - this.gLastDialogLineNum * 16, 0)
+
+        if (this.gDialogBoxType == DIALOG_TYPE_ROTATE)
+            Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, 255);
+        else
+            Gbi.gDPSetEnvColor(Game.gDisplayList, 0, 0, 0, 255);
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_triangle);
+    }
+
+    render_dialog_triangle_next(linesPerBox) {
+        let globalTimer = window.gGlobalTimer;
+
+        if (globalTimer & 8) return;
+
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, 118.0, linesPerBox * -16 + 5, 0);
+        this.create_dl_scale_matrix(MENU_MTX_NOPUSH, 0.8, 0.8, 1.0);
+        this.create_dl_rotation_matrix(MENU_MTX_NOPUSH, -90.0, 0, 0, 1.0);
+
+        if (this.gDialogBoxType == DIALOG_TYPE_ROTATE) Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, 255);
+        else Gbi.gDPSetEnvColor(Game.gDisplayList, 0, 0, 0, 255);
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_triangle);
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+    }
+
+    handle_special_dialog_text(dialogID) {
+        let dialogBossStart = [ DIALOG_017.id, DIALOG_114.id, DIALOG_128.id, DIALOG_117.id, DIALOG_150.id ];
+        let dialogRaceSound = [ DIALOG_005.id, DIALOG_009.id, DIALOG_055.id, DIALOG_164.id ];
+        let dialogStarSound = [ DIALOG_010.id, DIALOG_011.id, DIALOG_012.id, DIALOG_013.id, DIALOG_014.id ];
+        let dialogBossStop =  [ DIALOG_017.id, DIALOG_115.id, DIALOG_116.id, DIALOG_118.id, DIALOG_152.id ];
+
+        for (let i = 0; i < dialogBossStart.length; i++) {
+            if (dialogBossStart[i] == dialogID) {
+                seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60);
+                play_music(SEQ_PLAYER_LEVEL, SEQUENCE_ARGS(4, SEQ_EVENT_BOSS), 0);
+                return;
+            }
+        }
+
+        for (let i = 0; i < dialogRaceSound.length; i++) {
+            if (dialogRaceSound[i] == dialogID && this.gMenuLineNum == DIALOG_RESPONSE_YES) {
+                // play_race_fanfare();
+                return;
+            }
+        }
+
+        for (let i = 0; i < dialogStarSound.length; i++) {
+            if (dialogStarSound[i] == dialogID) {
+                play_sound(SOUND_MENU_STAR_SOUND, Game.gGlobalSoundSource);
+                return;
+            }
+        }
+
+        for (let i = 0; i < dialogBossStop.length; i++) {
+            if (dialogBossStop[i] == dialogID) {
+                seq_player_unlower_volume(SEQ_PLAYER_LEVEL, 60);
+                return;
+            }
+        }
+    }
+
+    render_dialog_entries() {
+        let lowerBound;
+
+        let dialogTable = seg2_dialog_table;
+        let dialog = dialogTable[this.gDialogID];
+
+        console.log(this.gDialogID, dialog)
+
+        switch (this.gMenuState) {
+            case MENU_STATE_DIALOG_OPENING:
+                if (this.gDialogBoxAngle == DIALOG_BOX_ANGLE_DEFAULT) {
+                    // play_dialog_sound(this.gDialogID);
+                    play_sound(SOUND_MENU_MESSAGE_APPEAR, Game.gGlobalSoundSource);
+                }
+
+                if (this.gDialogBoxType == DIALOG_TYPE_ROTATE) {
+                    this.gDialogBoxAngle -= 7.5;
+                    this.gDialogBoxScale -= 1.5;
+                } else {
+                    this.gDialogBoxAngle -= 10.0;
+                    this.gDialogBoxScale -= 2.0;
+                }
+
+                if (this.gDialogBoxAngle == 0.0) {
+                    this.gMenuState = MENU_STATE_DIALOG_OPEN;
+                    this.gMenuLineNum = 1;
+                }
+
+                lowerBound = 1;
+                break;
+
+            case MENU_STATE_DIALOG_OPEN:
+                this.gDialogBoxAngle = 0.0;
+
+                if (window.playerInput.buttonPressedA || window.playerInput.buttonPressedB) {
+                    if (this.gNextDialogPageStartStrIndex == -1) {
+                        this.handle_special_dialog_text(this.gDialogID);
+                        this.gMenuState = MENU_STATE_DIALOG_CLOSING;
+                    } else {
+                        this.gMenuState = MENU_STATE_DIALOG_SCROLLING;
+                        play_sound(SOUND_MENU_MESSAGE_NEXT_PAGE, Game.gGlobalSoundSource);
+                    }
+                }
+
+                lowerBound = 1;
+                break;
+            
+            case MENU_STATE_DIALOG_SCROLLING:
+                this.gDialogScrollOffsetY += dialog.linesPerBox * 2;
+
+                if (this.gDialogScrollOffsetY >= dialog.linesPerBox * 16) {
+                    this.gDialogPageStartStrIndex = this.gNextDialogPageStartStrIndex;
+                    this.gMenuState = MENU_STATE_DIALOG_OPEN;
+                    this.gDialogScrollOffsetY = 0;
+                }
+
+                lowerBound = this.gDialogScrollOffsetY / 16 + 1;
+                break;
+
+            case MENU_STATE_DIALOG_CLOSING:
+                if (this.gDialogBoxAngle == 20.0) {
+                    level_set_transition(0, null);
+                    play_sound(SOUND_MENU_MESSAGE_DISAPPEAR, Game.gGlobalSoundSource);
+
+                    if (this.gDialogBoxType == DIALOG_TYPE_ZOOM) trigger_cutscene_dialog(2);
+
+                    this.gDialogResponse = this.gMenuLineNum;
+                }
+
+                this.gDialogBoxAngle += 10.0;
+                this.gDialogBoxScale += 2.0;
+
+                if (this.gDialogBoxAngle == DIALOG_BOX_ANGLE_DEFAULT) {
+                    this.gMenuState = MENU_STATE_DEFAULT;
+                    this.gDialogID = DIALOG_NONE;
+                    this.gDialogPageStartStrIndex = 0;
+                    this.gDialogWithChoice = false;
+                    this.gNextDialogPageStartStrIndex = 0;
+                    this.gDialogResponse = DIALOG_RESPONSE_NONE;
+                }
+
+                lowerBound = 1;
+                break;
+        }
+
+        this.render_dialog_box_type(dialog, dialog.linesPerBox);
+
+        // Gbi.gDPSetScissor(Game.gDisplayList, this.ensure_nonnegative(dialog.leftOffset), this.ensure_nonnegative(240 - dialog.width), this.ensure_nonnegative(dialog.leftOffset + 132), this.ensure_nonnegative(240 - dialog.width + dialog.linesPerBox * 16));
+        this.handle_dialog_text_and_pages(0, dialog, lowerBound);
+
+        if (this.gNextDialogPageStartStrIndex == -1 && this.gDialogWithChoice == true) this.render_dialog_triangle_choice();
+
+        // Gbi.gDPSetScissor(Game.gDisplayList, 2, 2, SCREEN_WIDTH, SCREEN_HEIGHT, 238);
+
+        if (this.gNextDialogPageStartStrIndex != -1 && this.gMenuState == MENU_STATE_DIALOG_OPEN) this.render_dialog_triangle_next(dialog.linesPerBox);
+    }
 
     set_menu_mode(mode) {
         if (this.gMenuMode == MENU_MODE_NONE) {
@@ -1477,12 +1645,12 @@ class IngameMenu {
 
             this.gMenuTextColorTransTimer = this.gMenuTextColorTransTimer + 0x1000;
         } else if (this.gDialogID != DIALOG_NONE) {
-            if (this.gDialogID == DIALOG_020) {
+            if (this.gDialogID == DIALOG_020.id) {
                 this.print_peach_letter_message();
                 return index;
             }
 
-            // this.render_dialog_entries();
+            this.render_dialog_entries();
             this.gMenuTextColorTransTimer = this.gMenuTextColorTransTimer + 0x1000;
         }
 

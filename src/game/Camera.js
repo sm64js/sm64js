@@ -1377,7 +1377,7 @@ class Camera {
             // [ CUTSCENE_EXIT_WATERFALL, this.sCutsceneExitWaterfall ],
             // [ CUTSCENE_EXIT_FALL_WMOTR, this.sCutsceneFallToCastleGrounds ],
             // [ CUTSCENE_NONPAINTING_DEATH, this.sCutsceneNonPaintingDeath ],
-            // [ CUTSCENE_DIALOG, this.sCutsceneDialog ], // reimplement when it works
+            [ CUTSCENE_DIALOG, this.sCutsceneDialog ],
             [ CUTSCENE_READ_MESSAGE, this.sCutsceneReadMessage ],
             // [ CUTSCENE_RACE_DIALOG, this.sCutsceneDialog ],
             // [ CUTSCENE_ENTER_PYRAMID_TOP, this.sCutsceneEnterPyramidTop ],
@@ -7565,7 +7565,7 @@ class Camera {
      * Move closer to Mario and the object, adjusting to their difference in height.
      * The camera's generally ends up looking over Mario's shoulder.
      */
-    cutscene_dialog_create_dialog_box(c) {
+    cutscene_dialog_move_mario_shoulder(c) {
         let dist, pitch, yaw = 0
         let focus = [0, 0, 0]
         let pos = [0, 0, 0]

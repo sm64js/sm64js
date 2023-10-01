@@ -62,6 +62,7 @@ import * as _camera_lakitu            from "./behaviors/camera_lakitu.inc"
 import * as _cannon                   from "./behaviors/cannon.inc"
 import * as _cannon_door              from "./behaviors/cannon_door.inc"
 import * as _cap                      from "./behaviors/cap.inc"
+import * as _capswitch                from "./behaviors/capswitch.inc"
 import * as _castle_cannon_grate      from "./behaviors/castle_cannon_grate.inc"
 import * as _castle_flag              from "./behaviors/bhv_castle_flag_init.inc"
 import * as _castle_floor_trap        from "./behaviors/castle_floor_trap.inc"
@@ -173,7 +174,7 @@ import { mad_piano_seg5_anims_05009B14                   } from "../actors/mad_p
 import { chair_seg5_anims_05005784                       } from "../actors/chair/anims.inc"
 import { peach_seg5_anims_0501C41C                       } from "../actors/peach/anims.inc"
 import { thi_seg7_collision_top_trap                     } from "../levels/thi/areas/1/6/collision.inc"
-import { capswitch_collision_05003448                    } from "../actors/capswitch/collision.inc"
+import { capswitch_collision_050033D0, capswitch_collision_05003448                    } from "../actors/capswitch/collision.inc"
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
 export const OBJ_LIST_DESTRUCTIVE = 2 //  (2) things that can be used to destroy other objects, like
@@ -312,6 +313,45 @@ const bhvCapSwitchBase = [
     BEGIN_LOOP(),
         CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
     END_LOOP(),
+];
+
+const bhvCapSwitch = [
+    BEGIN(OBJ_LIST_SURFACE, 'bhvCapSwitch'),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_COLLISION_DATA(capswitch_collision_050033D0),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_cap_switch_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+];
+
+const bhvBobombAnchorMario = [
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvBobombAnchorMario'),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BILLBOARD(),
+    SET_FLOAT(oParentRelativePosX, 100),
+    SET_FLOAT(oParentRelativePosZ, 150),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_bobomb_anchor_mario_loop'),
+    END_LOOP(),
+]
+
+const bhvKingBobomb = [
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvKingBobomb'),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, king_bobomb_seg5_anims_0500FE30),
+    SET_INT(oInteractType, INTERACT_GRABBABLE),
+    SET_HITBOX(/*Radius*/ 100, /*Height*/ 100),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ -400, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    SET_INT(oIntangibleTimer, 0),
+    DROP_TO_FLOOR(),
+    SET_HOME(),
+    SPAWN_OBJ(/*Model*/ MODEL_NONE, /*Behavior*/ bhvBobombAnchorMario),
+    SET_INT(oHealth, 3),
+    SET_INT(oDamageOrCoinValue, 1),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_king_bobomb_loop'),
+    END_LOOP(),
 ]
 
 const bhvMario = [
@@ -364,35 +404,6 @@ const bhvYellowBall = [
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     CYLBOARD(),
     BREAK(),
-]
-
-const bhvBobombAnchorMario = [
-    BEGIN(OBJ_LIST_GENACTOR, 'bhvBobombAnchorMario'),
-    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    BILLBOARD(),
-    SET_FLOAT(oParentRelativePosX, 100),
-    SET_FLOAT(oParentRelativePosZ, 150),
-    BEGIN_LOOP(),
-        CALL_NATIVE('bhv_bobomb_anchor_mario_loop'),
-    END_LOOP(),
-]
-
-const bhvKingBobomb = [
-    BEGIN(OBJ_LIST_GENACTOR, 'bhvKingBobomb'),
-    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    LOAD_ANIMATIONS(oAnimations, king_bobomb_seg5_anims_0500FE30),
-    SET_INT(oInteractType, INTERACT_GRABBABLE),
-    SET_HITBOX(/*Radius*/ 100, /*Height*/ 100),
-    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ -400, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
-    SET_INT(oIntangibleTimer, 0),
-    DROP_TO_FLOOR(),
-    SET_HOME(),
-    SPAWN_OBJ(/*Model*/ MODEL_NONE, /*Behavior*/ bhvBobombAnchorMario),
-    SET_INT(oHealth, 3),
-    SET_INT(oDamageOrCoinValue, 1),
-    BEGIN_LOOP(),
-        CALL_NATIVE('bhv_king_bobomb_loop'),
-    END_LOOP(),
 ]
 
 const bhvStaticObject = [
@@ -2857,6 +2868,8 @@ gLinker.behaviors.bhvCannonBarrelBubbles = bhvCannonBarrelBubbles
 gLinker.behaviors.bhvCoinInsideBoo = bhvCoinInsideBoo
 gLinker.behaviors.bhvCameraLakitu = bhvCameraLakitu
 gLinker.behaviors.bhvCannonClosed = bhvCannonClosed
+gLinker.behaviors.bhvCapSwitch = bhvCapSwitch
+gLinker.behaviors.bhvCapSwitchBase = bhvCapSwitchBase
 gLinker.behaviors.bhvCarrySomething1 = bhvCarrySomething1
 gLinker.behaviors.bhvCarrySomething2 = bhvCarrySomething2
 gLinker.behaviors.bhvCarrySomething3 = bhvCarrySomething3

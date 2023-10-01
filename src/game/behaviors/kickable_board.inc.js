@@ -8,7 +8,7 @@ import { abs_angle_diff, cur_obj_become_intangible, cur_obj_set_model, cur_obj_s
 import { cur_obj_play_sound_2 } from "../SpawnSound";
 import { SurfaceLoadInstance as SurfaceLoad } from "../SurfaceLoad";
 
-const check_mario_attacking = () => {
+export const check_mario_attacking = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject;
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject;
     const gMarioStates = [ gLinker.LevelUpdate.gMarioState ];

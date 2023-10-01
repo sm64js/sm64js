@@ -355,7 +355,7 @@ export const interact_warp = (m, o) => {
         action = m.action
 
         if (action == ACT_TELEPORT_FADE_IN) {
-            sJustTeleported = 1
+            sJustTeleported = true;
 
         } else if (!sJustTeleported) {
             if (action == ACT_IDLE || action == ACT_PANTING || action == ACT_STANDING_AGAINST_WALL
@@ -363,7 +363,7 @@ export const interact_warp = (m, o) => {
                 m.interactObj = o
                 m.usedObj = o
 
-                sJustTeleported = 1
+                sJustTeleported = true;
                 return set_mario_action(m, ACT_TELEPORT_FADE_OUT, 0)
             }
         }
@@ -1634,4 +1634,7 @@ export const mario_process_interactions = (m) => {
 
 
     m.flags &= ~MARIO_PUNCHING & ~MARIO_KICKING & ~MARIO_TRIPPING
+
+    if (!(m.marioObj.collidedObjInteractTypes & (INTERACT_WARP_DOOR | INTERACT_DOOR))) sDisplayingDoorText = false;
+    if (!(m.marioObj.collidedObjInteractTypes & INTERACT_WARP)) sJustTeleported = false;
 }

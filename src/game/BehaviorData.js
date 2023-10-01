@@ -119,6 +119,7 @@ import * as _square_platform_cycle    from "./behaviors/square_platform_cycle.in
 import * as _switch_hidden_objects    from "./behaviors/switch_hidden_objects.inc"
 import * as _thi_top                  from "./behaviors/thi_top.inc"
 import * as _tilting_inverted_pyramid from "./behaviors/tilting_inverted_pyramid.inc"
+import * as _tower_door               from "./behaviors/tower_door.inc"
 import * as _triplet_butterfly        from "./behaviors/triplet_butterfly.inc"
 import * as _tumbling_bridge          from "./behaviors/tumbling_bridge.inc"
 import * as _warp                     from "./behaviors/warp.inc"
@@ -186,6 +187,10 @@ import { wf_seg7_collision_bullet_bill_cannon } from "../levels/wf/areas/1/11/co
 import { wf_seg7_collision_breakable_wall } from "../levels/wf/breakable_wall_right/collision.inc"
 import { wf_seg7_collision_breakable_wall_2 } from "../levels/wf/breakable_wall_left/collision.inc"
 import { wf_seg7_collision_kickable_board } from "../levels/wf/kickable_board/collision.inc"
+import { wf_seg7_collision_tower_door } from "../levels/wf/tower_door/collision.inc"
+import { wf_seg7_collision_clocklike_rotation } from "../levels/wf/rotating_wooden_platform/collision.inc"
+import { ttm_seg7_collision_podium_warp } from "../levels/ttm/slide_exit_podium/collision.inc"
+
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
 export const OBJ_LIST_DESTRUCTIVE = 2 //  (2) things that can be used to destroy other objects, like
@@ -599,7 +604,78 @@ const bhvKickableBoard = [
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_kickable_board_loop'),
     END_LOOP(),
-]
+];
+
+const bhvTowerDoor = [
+    BEGIN(OBJ_LIST_SURFACE, 'bhvTowerDoor'),
+    OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_COLLISION_DATA(wf_seg7_collision_tower_door),
+    SET_HITBOX(/*Radius*/ 100, /*Height*/ 100),
+    SET_INT(oIntangibleTimer, 0),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_tower_door_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+];
+
+const bhvRotatingCounterClockwise = [
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvRotatingCounterClockwise'),
+    BREAK(),
+];
+
+const bhvWFRotatingWoodenPlatform = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(wf_seg7_collision_clocklike_rotation),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_wf_rotating_wooden_platform_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+];
+
+const bhvKoopaShellUnderwater = [
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvKoopaShellUnderwater'),
+    OR_INT(oFlags, (OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO  | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_koopa_shell_underwater_loop'),
+    END_LOOP(),
+];
+
+const bhvExitPodiumWarp = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_INT(oInteractType, INTERACT_WARP),
+    DROP_TO_FLOOR(),
+    SET_FLOAT(oCollisionDistance, 8000),
+    LOAD_COLLISION_DATA(ttm_seg7_collision_podium_warp),
+    SET_INT(oIntangibleTimer, 0),
+    SET_HITBOX(/*Radius*/ 50, /*Height*/ 50),
+    BEGIN_LOOP(),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+        SET_INT(oInteractStatus, 0),
+    END_LOOP(),
+];
+
+const bhvFadingWarp = [
+    BEGIN(OBJ_LIST_LEVEL, 'bhvFadingWarp'),
+    SET_INT(oInteractionSubtype, INT_SUBTYPE_FADING_WARP),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_INT(oInteractType, INTERACT_WARP),
+    SET_INT(oIntangibleTimer, 0),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_fading_warp_loop'),
+    END_LOOP(),
+];
+
+const bhvWarp = [
+    BEGIN(OBJ_LIST_LEVEL, 'bhvWarp'),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_INT(oInteractType, INTERACT_WARP),
+    SET_INT(oIntangibleTimer, 0),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_warp_loop'),
+    END_LOOP(),
+];
 
 const bhvMario = [
     BEGIN(OBJ_LIST_PLAYER, 'bhvMario'),
@@ -1246,17 +1322,6 @@ const bhvMistCircParticleSpawner = [
     DEACTIVATE(),
 ]
 
-const bhvFadingWarp = [
-    BEGIN(OBJ_LIST_LEVEL, 'bhvFadingWarp'),
-    SET_INT(oInteractionSubtype, INT_SUBTYPE_FADING_WARP),
-    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    SET_INT(oInteractType, INTERACT_WARP),
-    SET_INT(oIntangibleTimer, 0),
-    BEGIN_LOOP(),
-        CALL_NATIVE('bhv_fading_warp_loop'),
-    END_LOOP(),
-]
-
 const bhvWhitePuffExplosion = [
     BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvWhitePuffExplosion'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -1729,14 +1794,6 @@ export const bhvMerryGoRoundBooManager = [
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_merry_go_round_boo_manager_loop'),
-    END_LOOP(),
-]
-
-const bhvKoopaShellUnderwater = [
-    BEGIN(OBJ_LIST_GENACTOR, 'bhvKoopaShellUnderwater'),
-    OR_INT(oFlags, (OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO  | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    BEGIN_LOOP(),
-        CALL_NATIVE('bhv_koopa_shell_underwater_loop'),
     END_LOOP(),
 ]
 
@@ -2550,8 +2607,8 @@ export const bhvTumblingBridgePlatform = [
     END_LOOP(),
 ]
 
-const bhvWfTumblingBridge = [
-    BEGIN(OBJ_LIST_SPAWNER, 'bhvWfTumblingBridge'),
+const bhvTumblingBridge = [
+    BEGIN(OBJ_LIST_SPAWNER, 'bhvTumblingBridge'),
     OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_HOME(),
     BEGIN_LOOP(),
@@ -2603,16 +2660,6 @@ const bhvSquarishPathMoving = [
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_squarish_path_moving_loop'),
         CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
-    END_LOOP(),
-]
-
-const bhvWarp = [
-    BEGIN(OBJ_LIST_LEVEL, 'bhvWarp'),
-    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    SET_INT(oInteractType, INTERACT_WARP),
-    SET_INT(oIntangibleTimer, 0),
-    BEGIN_LOOP(),
-        CALL_NATIVE('bhv_warp_loop'),
     END_LOOP(),
 ]
 
@@ -3025,8 +3072,9 @@ gLinker.behaviors.bhvDoorWarp = bhvDoorWarp
 gLinker.behaviors.bhvEndBirds1 = bhvEndBirds1
 gLinker.behaviors.bhvEndBirds2 = bhvEndBirds2
 gLinker.behaviors.bhvExclamationBox = bhvExclamationBox
+gLinker.behaviors.bhvExitPodiumWarp = bhvExitPodiumWarp
 gLinker.behaviors.bhvExplosion = bhvExplosion
-// gLinker.behaviors.bhvFadingWarp = bhvFadingWarp
+gLinker.behaviors.bhvFadingWarp = bhvFadingWarp
 gLinker.behaviors.bhvFerrisWheelAxle = bhvFerrisWheelAxle
 gLinker.behaviors.bhvFerrisWheelPlatform = bhvFerrisWheelPlatform
 gLinker.behaviors.bhvFireParticleSpawner = bhvFireParticleSpawner
@@ -3064,6 +3112,7 @@ gLinker.behaviors.bhvInvisibleObjectsUnderBridge = bhvInvisibleObjectsUnderBridg
 gLinker.behaviors.bhvJumpingBox = bhvJumpingBox
 gLinker.behaviors.bhvKickableBoard = bhvKickableBoard
 gLinker.behaviors.bhvKingBobomb = bhvKingBobomb
+gLinker.behaviors.bhvKoopaShellUnderwater = bhvKoopaShellUnderwater
 gLinker.behaviors.bhvLaunchDeathWarp = bhvLaunchDeathWarp
 gLinker.behaviors.bhvLaunchStarCollectWarp = bhvLaunchStarCollectWarp
 gLinker.behaviors.bhvLllTumblingBridge = bhvLllTumblingBridge
@@ -3098,6 +3147,7 @@ gLinker.behaviors.bhvPoleGrabbing = bhvPoleGrabbing
 gLinker.behaviors.bhvRecoveryHeart = bhvRecoveryHeart
 gLinker.behaviors.bhvRedCoin = bhvRedCoin
 gLinker.behaviors.bhvRockSolid = bhvRockSolid
+gLinker.behaviors.bhvRotatingCounterClockwise = bhvRotatingCounterClockwise
 gLinker.behaviors.bhvRotatingPlatform = bhvRotatingPlatform
 gLinker.behaviors.bhvSeesawPlatform = bhvSeesawPlatform
 gLinker.behaviors.bhvShallowWaterSplash = bhvShallowWaterSplash
@@ -3132,7 +3182,9 @@ gLinker.behaviors.bhvTHIHugeIslandTop = bhvTHIHugeIslandTop
 gLinker.behaviors.bhvTHITinyIslandTop = bhvTHITinyIslandTop
 gLinker.behaviors.bhvTiltingBowserLavaPlatform = bhvTiltingBowserLavaPlatform
 gLinker.behaviors.bhvTower = bhvTower
+gLinker.behaviors.bhvTowerDoor = bhvTowerDoor
 gLinker.behaviors.bhvTrackBall = bhvTrackBall
+gLinker.behaviors.bhvTumblingBridge = bhvTumblingBridge
 gLinker.behaviors.bhvTree = bhvTree
 gLinker.behaviors.bhvTriangleParticleSpawner = bhvTriangleParticleSpawner
 gLinker.behaviors.bhvTripletButterfly = bhvTripletButterfly
@@ -3158,7 +3210,7 @@ gLinker.behaviors.bhvWaterSplash = bhvWaterSplash
 gLinker.behaviors.bhvWaveTrail = bhvWaveTrail
 gLinker.behaviors.bhvWFBreakableWallLeft = bhvWFBreakableWallLeft
 gLinker.behaviors.bhvWFBreakableWallRight = bhvWFBreakableWallRight
-gLinker.behaviors.bhvWfTumblingBridge = bhvWfTumblingBridge
+gLinker.behaviors.bhvWFRotatingWoodenPlatform = bhvWFRotatingWoodenPlatform
 gLinker.behaviors.bhvWhitePuffExplosion = bhvWhitePuffExplosion
 gLinker.behaviors.bhvWingCap = bhvWingCap
 gLinker.behaviors.bhvWoodenPost = bhvWoodenPost

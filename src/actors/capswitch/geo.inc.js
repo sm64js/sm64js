@@ -1,5 +1,6 @@
 import { GEO_CLOSE_NODE, GEO_CULLING_RADIUS, GEO_DISPLAY_LIST, GEO_END, GEO_OPEN_NODE, GEO_SWITCH_CASE, LAYER_OPAQUE, LAYER_TRANSPARENT_DECAL } from "../../engine/GeoLayout";
 import { geo_switch_anim_state } from "../../game/ObjectHelpers";
+import { cap_switch_exclamation_seg5_dl_05002E00, capswitch_seg5_dl_05003350, capswitch_seg5_dl_05003370, capswitch_seg5_dl_05003390, capswitch_seg5_dl_050033B0 } from "./model.inc";
 
 export const cap_switch_geo = () => {return [
     GEO_CULLING_RADIUS(600),

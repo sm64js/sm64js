@@ -42,7 +42,6 @@ export const level_totwc_entry = [
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_STONE),
     END_AREA(),
 
-    FREE_LEVEL_POOL(),
     MARIO_POS(/*area*/ 1, /*yaw*/ 90, /*pos*/ -4095, 2935, 0),
     CALL(/*arg*/ 0, /*func*/ 'LevelUpdate.lvl_init_or_update'),
     CALL_LOOP(/*arg*/ 1, /*func*/ 'LevelUpdate.lvl_init_or_update'),
@@ -50,3 +49,5 @@ export const level_totwc_entry = [
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 ];
+
+gLinker.level_scripts.level_totwc_entry = level_totwc_entry

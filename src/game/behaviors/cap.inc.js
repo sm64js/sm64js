@@ -14,6 +14,7 @@ oGravity, oFloorHeight, oFlags, oBehParams, oFriction, oBuoyancy, oOpacity, oCap
 ACTIVE_FLAG_DEACTIVATED, } from "../../include/object_constants"
 import { INTERACT_CAP, INT_STATUS_INTERACTED } from "../Interaction"
 import { SURFACE_DEATH_PLANE, SURFACE_DEEP_MOVING_QUICKSAND, SURFACE_DEEP_QUICKSAND, SURFACE_INSTANT_MOVING_QUICKSAND, SURFACE_INSTANT_QUICKSAND, SURFACE_MOVING_QUICKSAND, SURFACE_QUICKSAND, SURFACE_SHALLOW_MOVING_QUICKSAND, SURFACE_SHALLOW_QUICKSAND } from "../../include/surface_terrains"
+import { save_file_clear_flags, save_file_set_cap_pos } from "../SaveFile"
 
 
 const sCapHitbox = {
@@ -225,10 +226,10 @@ const bhv_normal_cap_init = () => {
     o.rawData[oBuoyancy] = 0.9
     o.rawData[oOpacity] = 0xFF
 
-    // save_file_set_cap_pos(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
+    save_file_set_cap_pos(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
 }
 
-// void normal_cap_set_save_flags(void) {
+const normal_cap_set_save_flags = () => {
 //     save_file_clear_flags(SAVE_FLAG_CAP_ON_GROUND);
 
 //     switch (gCurrCourseNum) {
@@ -248,48 +249,52 @@ const bhv_normal_cap_init = () => {
 //             save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO);
 //             break;
 //     }
-// }
+}
 
-// void normal_cap_act_0(void) {
-//     s16 sp1E;
+const normal_cap_act_0 = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
 
-//     o.rawData[oFaceAngleYaw] += o.rawData[oForwardVel] * 128.0f;
-//     o.rawData[oFaceAnglePitch] += o.rawData[oForwardVel] * 80.0f;
-//     sp1E = object_step();
-//     if (sp1E & 0x01) {
-//         cap_check_quicksand();
+    let sp1E;
 
-//         if (o.rawData[oVelY] != 0.0f) {
-//             o.rawData[oCapUnkF4] = 1;
-//             o.rawData[oVelY] = 0.0f;
-//             o.rawData[oFaceAnglePitch] = 0;
-//         }
-//     }
+    o.rawData[oFaceAngleYaw] += o.rawData[oForwardVel] * 128.0;
+    o.rawData[oFaceAnglePitch] += o.rawData[oForwardVel] * 80.0;
+    sp1E = object_step();
+    if (sp1E & 0x01) {
+        cap_check_quicksand();
 
-//     if (o.rawData[oCapUnkF4] == 1)
-//         cap_scale_vertically();
-// }
+        if (o.rawData[oVelY] != 0.0) {
+            o.rawData[oCapUnkF4] = 1;
+            o.rawData[oVelY] = 0.0;
+            o.rawData[oFaceAnglePitch] = 0;
+        }
+    }
+
+    if (o.rawData[oCapUnkF4] == 1)
+        cap_scale_vertically();
+}
 
 const bhv_normal_cap_loop = () => {
-//     switch (o.rawData[oAction]) {
-//         case 0:
-//             normal_cap_act_0();
-//             break;
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
 
-//         default:
-//             object_step();
-//             cap_sink_quicksand();
-//             break;
-//     }
+    switch (o.rawData[oAction]) {
+        case 0:
+            normal_cap_act_0();
+            break;
 
-//     if ((s32) o.rawData[oForwardVel] != 0)
-//         save_file_set_cap_pos(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ]);
+        default:
+            object_step();
+            cap_sink_quicksand();
+            break;
+    }
 
-//     if (o.activeFlags == ACTIVE_FLAG_DEACTIVATED)
-//         normal_cap_set_save_flags();
+    if (o.rawData[oForwardVel] != 0)
+        save_file_set_cap_pos(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ]);
 
-//     if (cap_set_hitbox() == 1)
-//         save_file_clear_flags(SAVE_FLAG_CAP_ON_GROUND);
+    if (o.activeFlags == ACTIVE_FLAG_DEACTIVATED)
+        normal_cap_set_save_flags();
+
+    if (cap_set_hitbox() == 1)
+        save_file_clear_flags(SAVE_FLAG_CAP_ON_GROUND);
 }
 
 const bhv_vanish_cap_init = () => {

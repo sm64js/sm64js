@@ -92,6 +92,7 @@ import * as _haunted_chair            from "./behaviors/haunted_chair.inc"
 import * as _intro_lakitu             from "./behaviors/intro_lakitu.inc"
 import * as _intro_peach              from "./behaviors/intro_peach.inc"
 import * as _intro_scene              from "./behaviors/intro_scene.inc"
+import * as _kickable_board           from "./behaviors/kickable_board.inc"
 import * as _king_bobomb              from "./behaviors/king_bobomb.inc"
 import * as _koopa_shell_underwater   from "./behaviors/koopa_shell_underwater.inc"
 import * as _mad_piano                from "./behaviors/mad_piano.inc"
@@ -184,6 +185,7 @@ import { wf_seg7_collision_tower } from "../levels/wf/areas/1/10/collision.inc"
 import { wf_seg7_collision_bullet_bill_cannon } from "../levels/wf/areas/1/11/collision.inc"
 import { wf_seg7_collision_breakable_wall } from "../levels/wf/breakable_wall_right/collision.inc"
 import { wf_seg7_collision_breakable_wall_2 } from "../levels/wf/breakable_wall_left/collision.inc"
+import { wf_seg7_collision_kickable_board } from "../levels/wf/kickable_board/collision.inc"
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
 export const OBJ_LIST_DESTRUCTIVE = 2 //  (2) things that can be used to destroy other objects, like
@@ -578,13 +580,26 @@ const bhvWFBreakableWallLeft = [
         CALL_NATIVE('bhv_wf_breakable_wall_loop'),
         CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
     END_LOOP(),
-]
+];
 
 const bhvWFBreakableWallRight = [
     BEGIN(OBJ_LIST_SURFACE, 'bhvWFBreakableWallRight'),
     LOAD_COLLISION_DATA(wf_seg7_collision_breakable_wall),
     GOTO('bhvWFBreakableWallLeft', 3),
 ];
+
+const bhvKickableBoard = [
+    BEGIN(OBJ_LIST_SURFACE, 'bhvKickableBoard'),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_COLLISION_DATA(wf_seg7_collision_kickable_board),
+    SET_HITBOX(/*Radius*/ 100, /*Height*/ 1200),
+    SET_HURTBOX(/*Radius*/ 1, /*Height*/ 1),
+    SET_FLOAT(oCollisionDistance, 1500),
+    SET_INT(oIntangibleTimer, 0),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_kickable_board_loop'),
+    END_LOOP(),
+]
 
 const bhvMario = [
     BEGIN(OBJ_LIST_PLAYER, 'bhvMario'),
@@ -3047,6 +3062,7 @@ gLinker.behaviors.bhvInstantActiveWarp = bhvInstantActiveWarp
 gLinker.behaviors.bhvIntroScene = bhvIntroScene
 gLinker.behaviors.bhvInvisibleObjectsUnderBridge = bhvInvisibleObjectsUnderBridge
 gLinker.behaviors.bhvJumpingBox = bhvJumpingBox
+gLinker.behaviors.bhvKickableBoard = bhvKickableBoard
 gLinker.behaviors.bhvKingBobomb = bhvKingBobomb
 gLinker.behaviors.bhvLaunchDeathWarp = bhvLaunchDeathWarp
 gLinker.behaviors.bhvLaunchStarCollectWarp = bhvLaunchStarCollectWarp

@@ -32,10 +32,12 @@ import { bhvBubbleSplash,
 import { sins,
          s32,
          random_float                           } from "../../utils"
+import { SOUND_GENERAL_QUIET_BUBBLE } from "../../include/sounds"
+import { cur_obj_play_sound_2 } from "../SpawnSound"
 
 
 export const bhv_water_air_bubble_init = () => {
-    cur_obj_scale(4)
+    cur_obj_scale(4.0)
 }
 
 // Fields 0xF4 & 0xF8 seem to be angles for bubble and cannon
@@ -61,7 +63,7 @@ export const bhv_water_air_bubble_loop = () => {
         // cur_obj_play_sound_2(SOUND_GENERAL_QUIET_BUBBLE)
         obj_mark_for_deletion(o)
         for (let i = 0; i < 30; i++) {
-            spawn_object(o, MODEL_BUBBLE, bhvBubbleMaybe)
+            spawn_object(o, MODEL_BUBBLE, gLinker.behaviors.bhvBubbleMaybe)
         }
     }
     if (SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ]) < o.rawData[oPosY]) {
@@ -74,12 +76,14 @@ export const bhv_bubble_wave_init = () => {
     const o = ObjectListProc.gCurrentObject
     o.rawData[oWaterObjUnkFC]  = 0x800 + s32(random_float() * 2048)
     o.rawData[oWaterObjUnk100] = 0x800 + s32(random_float() * 2048)
-    //// play sound quiet bubble
+    cur_obj_play_sound_2(SOUND_GENERAL_QUIET_BUBBLE);
 }
 
-// void scale_bubble_random(void) {
-//     cur_obj_scale(random_float() + 1.0);
-// }
+
+
+const scale_bubble_random = () => {
+    cur_obj_scale(random_float() + 1.0);
+}
 
 export const bhv_bubble_maybe_loop = () => {
     const o = ObjectListProc.gCurrentObject
@@ -103,7 +107,7 @@ export const bhv_small_water_wave_loop = () => {
     o.rawData[oWaterObjUnkF8] += o.rawData[oWaterObjUnk100]
 
     if (o.rawData[oPosY] > water_level) { // bubble hits water surface
-        const bubbleSplash = spawn_object_at_origin(o, MODEL_SMALL_WATER_SPLASH, bhvBubbleSplash)
+        const bubbleSplash = spawn_object_at_origin(o, MODEL_SMALL_WATER_SPLASH, gLinker.behaviors.bhvBubbleSplash)
         bubbleSplash.rawData[oPosX] = o.rawData[oPosX]
         bubbleSplash.rawData[oPosY] = o.rawData[oPosY] + 5
         bubbleSplash.rawData[oPosZ] = o.rawData[oPosZ]
@@ -123,7 +127,7 @@ const scale_bubble_sin = () => {
     o.rawData[oWaterObjUnkF8] += o.rawData[oWaterObjUnk100]
 }
 
-export const bhv_particle_init = () => {
+const bhv_particle_init = () => {
     const o = ObjectListProc.gCurrentObject
     obj_scale_xyz(o, 2, 2, 1)
     o.rawData[oWaterObjUnkFC] = 0x800 + s32(random_float() * 2048)
@@ -131,7 +135,7 @@ export const bhv_particle_init = () => {
     obj_translate_xyz_random(o, 100)
 }
 
-export const bhv_particle_loop = () => {
+const bhv_particle_loop = () => {
     const o = ObjectListProc.gCurrentObject
     let water_level = SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ])
     o.rawData[oPosY] += 5
@@ -139,28 +143,28 @@ export const bhv_particle_loop = () => {
     scale_bubble_sin()
     if (o.rawData[oPosY] > water_level && o.rawData[oTimer]) {
         obj_mark_for_deletion(o)
-        try_to_spawn_object(5, 0, o, MODEL_SMALL_WATER_SPLASH, bhvObjectWaterSplash)
+        try_to_spawn_object(5, 0, o, MODEL_SMALL_WATER_SPLASH, gLinker.behaviors.bhvObjectWaterSplash)
     }
 }
 
-export const bhv_small_bubbles_loop = () => {
+const bhv_small_bubbles_loop = () => {
     const o = ObjectListProc.gCurrentObject
     o.rawData[oPosY] += 5
     obj_translate_xz_random(o, 4)
     scale_bubble_sin()
 }
 
-export const bhv_fish_group_loop = () => {
+const bhv_fish_group_loop = () => {
     const o = ObjectListProc.gCurrentObject
     if (ObjectListProc.gMarioCurrentRoom == 15 || ObjectListProc.gMarioCurrentRoom == 7)
         if (window.gGlobalTimer & 1)
-            spawn_object(o, MODEL_WHITE_PARTICLE_SMALL, bhvSmallParticleBubbles);
+            spawn_object(o, MODEL_WHITE_PARTICLE_SMALL, gLinker.behaviors.bhvSmallParticleBubbles);
 }
 
-export const bhv_water_waves_init = () => {
+const bhv_water_waves_init = () => {
     const o = ObjectListProc.gCurrentObject
     for (let i = 0; i < 3; i++) {
-        spawn_object(o, MODEL_WHITE_PARTICLE_SMALL, bhvSmallParticle);
+        spawn_object(o, MODEL_WHITE_PARTICLE_SMALL, gLinker.behaviors.bhvSmallParticle);
     }
 }
 
@@ -172,3 +176,5 @@ gLinker.bhv_particle_init = bhv_particle_init
 gLinker.bhv_particle_loop = bhv_particle_loop
 gLinker.bhv_water_waves_init = bhv_water_waves_init
 gLinker.bhv_small_bubbles_loop = bhv_small_bubbles_loop
+gLinker.bhv_fish_group_loop = bhv_fish_group_loop
+gLinker.bhv_water_waves_init = bhv_water_waves_init

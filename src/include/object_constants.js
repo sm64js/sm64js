@@ -1340,3 +1340,8 @@ export const WOODEN_POST_BP_NO_COINS_MASK = 0x0000FF00
     /* status */
     export const ARROW_LIFT_NOT_DONE_MOVING = 0
     export const ARROW_LIFT_DONE_MOVING     = 1
+
+/* WF Rotating Wooden Platform */
+    /* oAction */
+    export const WF_ROTATING_WOODEN_PLATFORM_ACT_IDLE     = 0
+    export const WF_ROTATING_WOODEN_PLATFORM_ACT_ROTATING = 1

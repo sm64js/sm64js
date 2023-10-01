@@ -1650,7 +1650,7 @@ class IngameMenu {
                 return index;
             }
 
-            this.render_dialog_entries();
+            // this.render_dialog_entries();
             this.gMenuTextColorTransTimer = this.gMenuTextColorTransTimer + 0x1000;
         }
 

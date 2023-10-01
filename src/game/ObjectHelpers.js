@@ -394,13 +394,26 @@ export const mario_is_dive_sliding = () => {
 }
 
 export const cur_obj_set_y_vel_and_animation = (velY, animIndex) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oVelY] = velY
     cur_obj_init_animation_with_sound(animIndex)
 }
 
+export const cur_obj_unrender_set_action_and_anim = (animIndex, action) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    cur_obj_become_intangible();
+    cur_obj_disable_rendering();
+
+    // only set animation if non-negative value
+    if (animIndex >= 0) {
+        cur_obj_init_animation_with_sound(animIndex);
+    }
+
+    o.rawData[oAction] = action;
+}
+
 export const cur_obj_unrender_and_reset_state = (animIndex, action) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     cur_obj_become_intangible()
     cur_obj_disable_rendering()
 
@@ -412,7 +425,7 @@ export const cur_obj_unrender_and_reset_state = (animIndex, action) => {
 }
 
 const cur_obj_move_after_thrown_or_dropped = (forwardVel, velY) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oMoveFlags] = 0
     o.rawData[oFloorHeight] = gLinker.SurfaceCollision.find_floor_height(o.rawData[oPosX], o.rawData[oPosY] + 160.0, o.rawData[oPosZ])
 
@@ -844,9 +857,8 @@ export const cur_obj_is_mario_on_platform = () => {
 }
 
 export const cur_obj_call_action_function = (actionFunctions) => {
-    const o = ObjectListProc.gCurrentObject
-    const actionFunction = actionFunctions[o.rawData[oAction]]
-    actionFunction()
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    actionFunctions[o.rawData[oAction]]()
 }
 
 export const obj_explode_and_spawn_coins = (sp18, sp1C) => {
@@ -860,6 +872,10 @@ export const obj_explode_and_spawn_coins = (sp18, sp1C) => {
     } else if (sp1C == 2) {
         obj_spawn_loot_blue_coins(o, o.rawData[oNumLootCoins], 20.0, 150)
     }
+}
+
+export const obj_set_collision_data = (obj, segAddr) => {
+    obj.collisionData = segAddr;
 }
 
 export const cur_obj_if_hit_wall_bounce_away = () => {

@@ -15,6 +15,7 @@ import { obj_move_xyz_using_fvel_and_yaw } from "../ObjBehaviors"
 import { sins } from "../../utils"
 import { cur_obj_play_sound_1, cur_obj_play_sound_2 } from "../SpawnSound"
 import { SOUND_ENV_STAR, SOUND_GENERAL_STAR_APPEARS } from "../../include/sounds"
+import { SpawnObjectInstance as SpawnObject } from "../SpawnObject"
 
 const sCollectStarHitbox = {
     interactType:      INTERACT_STAR_OR_KEY,
@@ -50,7 +51,7 @@ const bhv_collect_star_loop = () => {
     o.rawData[oFaceAngleYaw] += 0x800
 
     if (o.rawData[oInteractStatus] & INT_STATUS_INTERACTED) {
-        mark_obj_for_deletion(o)
+        SpawnObject.mark_obj_for_deletion(o)
         o.rawData[oInteractStatus] = 0
     }
 }

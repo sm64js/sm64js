@@ -67,7 +67,7 @@ import * as MarioConstants from "../include/mario_constants"
 
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos,
          oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosY, oPosZ, oMoveAngleYaw,
-         oBehParams, oForwardVel, oMarioBurnTimer
+         oBehParams, oForwardVel, oMarioBurnTimer, STAR_INDEX_100_COINS
 } from "../include/object_constants"
 
 import { atan2s, sqrtf } from "../engine/math_util"
@@ -273,8 +273,7 @@ const interact_coin = (m, o) => {
     o.rawData[oInteractStatus] = INT_STATUS_INTERACTED
 
     if (COURSE_IS_MAIN_COURSE(gLinker.Area.gCurrCourseNum) && m.numCoins - o.rawData[oDamageOrCoinValue] < 100 && m.numCoins >= 100) {
-        /// 100 coin star!
-        /// TODO spawn star
+        gLinker.bhv_spawn_star_no_level_exit(STAR_INDEX_100_COINS)
     }
 
     return false

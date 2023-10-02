@@ -677,6 +677,65 @@ const bhvWarp = [
     END_LOOP(),
 ];
 
+const bhvWarpPipe = [
+    BEGIN(OBJ_LIST_SURFACE, 'bhvWarpPipe'),
+    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_INT(oInteractType, INTERACT_WARP),
+    LOAD_COLLISION_DATA(warp_pipe_seg3_collision_03009AC8),
+    SET_FLOAT(oDrawingDistance, 16000),
+    SET_INT(oIntangibleTimer, 0),
+    SET_HITBOX(/*Radius*/ 70, /*Height*/ 50),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_warp_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+];
+
+const bhvWhitePuffExplosion = [
+    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvWhitePuffExplosion'),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    BILLBOARD(),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_white_puff_exploding_loop'),
+    END_LOOP(),
+];
+
+const bhvSpawnedStar = [
+    BEGIN(OBJ_LIST_LEVEL, 'bhvSpawnedStar'),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    SET_INT(oBehParams2ndByte, 1),
+    GOTO('bhvSpawnedStarNoLevelExit', 2),
+];
+
+const bhvSpawnedStarNoLevelExit = [
+    BEGIN(OBJ_LIST_LEVEL, 'bhvSpawnedStarNoLevelExit'),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    // Spawned star - common:
+    SET_HOME(),
+    CALL_NATIVE('bhv_spawned_star_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_spawned_star_loop'),
+    END_LOOP(),
+];
+
+const bhvSpawnedBlueCoin = [
+    BEGIN(OBJ_LIST_LEVEL, 'bhvSpawnedBlueCoin'),
+    SET_INT(oInteractType, INTERACT_COIN),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    BILLBOARD(),
+    SET_INT(oIntangibleTimer, 0),
+    SET_FLOAT(oCoinBaseVelY, 20),
+    SET_INT(oAnimState, -1),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ -400, /*Bounciness*/ -70, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    CALL_NATIVE('bhv_spawned_coin_init'),
+    SET_INT(oDamageOrCoinValue, 5),
+    SET_HITBOX(/*Radius*/ 120, /*Height*/ 64),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_spawned_coin_loop'),
+        ADD_INT(oAnimState, 1),
+    END_LOOP(),
+];
+
 const bhvMario = [
     BEGIN(OBJ_LIST_PLAYER, 'bhvMario'),
     SET_INT(oIntangibleTimer, 0),
@@ -1320,51 +1379,6 @@ const bhvMistCircParticleSpawner = [
         CALL_NATIVE('bhv_pound_white_puffs_init'),
     DELAY(1),
     DEACTIVATE(),
-]
-
-const bhvWhitePuffExplosion = [
-    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvWhitePuffExplosion'),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    BILLBOARD(),
-    BEGIN_LOOP(),
-        CALL_NATIVE('bhv_white_puff_exploding_loop'),
-    END_LOOP(),
-]
-
-const bhvSpawnedStar = [
-    BEGIN(OBJ_LIST_LEVEL, 'bhvSpawnedStar'),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    SET_INT(oBehParams2ndByte, 1),
-    GOTO('bhvSpawnedStarNoLevelExit', 2),
-]
-
-const bhvSpawnedStarNoLevelExit = [
-    BEGIN(OBJ_LIST_LEVEL, 'bhvSpawnedStarNoLevelExit'),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    // Spawned star - common:
-    SET_HOME(),
-    CALL_NATIVE('bhv_spawned_star_init'),
-    BEGIN_LOOP(),
-        CALL_NATIVE('bhv_spawned_star_loop'),
-    END_LOOP(),
-]
-
-const bhvSpawnedBlueCoin = [
-    BEGIN(OBJ_LIST_LEVEL, 'bhvSpawnedBlueCoin'),
-    SET_INT(oInteractType, INTERACT_COIN),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    BILLBOARD(),
-    SET_INT(oIntangibleTimer, 0),
-    SET_FLOAT(oCoinBaseVelY, 20),
-    SET_INT(oAnimState, -1),
-    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ -400, /*Bounciness*/ -70, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
-    CALL_NATIVE('bhv_spawned_coin_init'),
-    SET_INT(oDamageOrCoinValue, 5),
-    SET_HITBOX(/*Radius*/ 120, /*Height*/ 64),
-    BEGIN_LOOP(),
-        CALL_NATIVE('bhv_spawned_coin_loop'),
-        ADD_INT(oAnimState, 1),
-    END_LOOP(),
 ]
 
 export const bhvMrIBlueCoin = [
@@ -2663,20 +2677,6 @@ const bhvSquarishPathMoving = [
     END_LOOP(),
 ]
 
-const bhvWarpPipe = [
-    BEGIN(OBJ_LIST_SURFACE, 'bhvWarpPipe'),
-    OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    SET_INT(oInteractType, INTERACT_WARP),
-    LOAD_COLLISION_DATA(warp_pipe_seg3_collision_03009AC8),
-    SET_FLOAT(oDrawingDistance, 16000),
-    SET_INT(oIntangibleTimer, 0),
-    SET_HITBOX(/*Radius*/ 70, /*Height*/ 50),
-    BEGIN_LOOP(),
-        CALL_NATIVE('bhv_warp_loop'),
-        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
-    END_LOOP(),
-]
-
 const bhvUnlockDoorStar = [
     BEGIN(OBJ_LIST_LEVEL, 'bhvUnlockDoorStar'),
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -3165,6 +3165,7 @@ gLinker.behaviors.bhvSparkle = bhvSparkle
 gLinker.behaviors.bhvSparkleParticleSpawner = bhvSparkleParticleSpawner
 gLinker.behaviors.bhvSparkleSpawn = bhvSparkleSpawn
 gLinker.behaviors.bhvSpawnedBlueCoin = bhvSpawnedBlueCoin
+gLinker.behaviors.bhvSpawnedStar = bhvSpawnedStar
 gLinker.behaviors.bhvSpawnedStarNoLevelExit = bhvSpawnedStarNoLevelExit
 gLinker.behaviors.bhvSpinAirborneCircleWarp = bhvSpinAirborneCircleWarp
 gLinker.behaviors.bhvSparkleSpawn = bhvSparkleSpawn

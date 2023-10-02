@@ -92,6 +92,15 @@ export const ACTIVE_PARTICLE_BREATH                = (1 << 17) // 0x00020000
 export const ACTIVE_PARTICLE_V_STAR                = (1 << 18) // 0x00040000
 export const ACTIVE_PARTICLE_TRIANGLE              = (1 << 19) // 0x00080000
 
+/* Star Index */
+export const STAR_INDEX_ACT_1     = 0
+export const STAR_INDEX_ACT_2     = 1
+export const STAR_INDEX_ACT_3     = 2
+export const STAR_INDEX_ACT_4     = 3
+export const STAR_INDEX_ACT_5     = 4
+export const STAR_INDEX_ACT_6     = 5
+export const STAR_INDEX_100_COINS = 6
+
 /* oHeldState */
 export const HELD_FREE = 0
 export const HELD_HELD = 1

@@ -1485,7 +1485,7 @@ class IngameMenu {
         let name;
 
         if (gLastCompletedCourseNum <= COURSE_STAGES_MAX) { // Main courses
-            this.print_hud_course_complete_coins(118, 103);
+            // this.print_hud_course_complete_coins(118, 103);
             this.play_star_fanfare_and_flash_hud(1, 1 << (gLastCompletedStarNum - 1));
 
             if (gLastCompletedStarNum == 7)
@@ -1524,8 +1524,8 @@ class IngameMenu {
 
             Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
 
-            this.print_hud_course_complete_string(HUD_PRINT_CONGRATULATIONS);
-            this.print_hud_course_complete_coins(118, 111);
+            // this.print_hud_course_complete_string(HUD_PRINT_CONGRATULATIONS);
+            // this.print_hud_course_complete_coins(118, 111);
             this.play_star_fanfare_and_flash_hud(2, 0);
 
             return;
@@ -1539,7 +1539,7 @@ class IngameMenu {
         // Print star glyph
         Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_begin);
         Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
-        this.print_hud_lut_string(55, 77, textSymStar);
+        // this.print_hud_lut_string(55, 77, textSymStar);
         Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_end);
 
         // Print act name
@@ -1626,19 +1626,11 @@ class IngameMenu {
 
         if (this.gMenuMode != MENU_MODE_NONE) {
             switch (this.gMenuMode) {
-                case MENU_MODE_UNUSED_0:
-                    index = this.render_pause_screen();
-                    break;
-
                 case MENU_MODE_RENDER_PAUSE_SCREEN:
                     index = this.render_pause_screen();
                     break;
 
                 case MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN:
-                    index = this.render_course_complete_screen();
-                    break;
-
-                case MENU_MODE_UNUSED_3:
                     index = this.render_course_complete_screen();
                     break;
             }

@@ -1,7 +1,7 @@
 import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { init_graph_node, geo_add_child, GRAPH_RENDER_INVISIBLE, GRAPH_NODE_TYPE_OBJECT, geo_remove_child, GRAPH_RENDER_BILLBOARD, GRAPH_RENDER_ACTIVE } from "../engine/graph_node"
-import { ACTIVE_FLAG_ACTIVE, ACTIVE_FLAG_UNK8, RESPAWN_INFO_TYPE_NULL, ACTIVE_FLAG_UNIMPORTANT, OBJ_MOVE_ON_GROUND, oIntangibleTimer, oDamageOrCoinValue, oHealth, oCollisionDistance, oDrawingDistance, oDistanceToMario, oRoom, oFloorHeight, oPosX, oPosY, oPosZ, ACTIVE_FLAGS_DEACTIVATED } from "../include/object_constants"
+import { ACTIVE_FLAG_ACTIVE, ACTIVE_FLAG_UNK8, RESPAWN_INFO_TYPE_NULL, ACTIVE_FLAG_UNIMPORTANT, OBJ_MOVE_ON_GROUND, oIntangibleTimer, oDamageOrCoinValue, oHealth, oCollisionDistance, oDrawingDistance, oDistanceToMario, oRoom, oFloorHeight, oPosX, oPosY, oPosZ, ACTIVE_FLAGS_DEACTIVATED, ACTIVE_FLAG_DEACTIVATED } from "../include/object_constants"
 import { mtxf_identity } from "../engine/math_util"
 import * as _Linker from "./Linker"
 
@@ -178,6 +178,10 @@ class SpawnObject {
                 this.snap_object_to_floor(obj)
         }
         return obj
+    }
+
+    mark_obj_for_deletion(obj) {
+        obj.activeFlags = ACTIVE_FLAG_DEACTIVATED;
     }
 }
 

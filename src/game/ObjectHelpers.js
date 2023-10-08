@@ -47,7 +47,7 @@ import {
     OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33,
     OBJ_MOVE_LANDED, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX, OBJ_FLAG_HOLDABLE,
 
-    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED, OBJ_MOVE_BOUNCE, DIALOG_STATUS_ENABLE_TIME_STOP, ACTIVE_FLAG_INITIATED_TIME_STOP, DIALOG_FLAG_TURN_TO_MARIO, DIALOG_STATUS_START_DIALOG, DIALOG_STATUS_STOP_DIALOG, DIALOG_FLAG_TIME_STOP_ENABLED, oKingBobombUnk88, DIALOG_STATUS_INTERRUPT
+    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED, OBJ_MOVE_BOUNCE, DIALOG_STATUS_ENABLE_TIME_STOP, ACTIVE_FLAG_INITIATED_TIME_STOP, DIALOG_FLAG_TURN_TO_MARIO, DIALOG_STATUS_START_DIALOG, DIALOG_STATUS_STOP_DIALOG, DIALOG_FLAG_TIME_STOP_ENABLED, oKingBobombUnk88, DIALOG_STATUS_INTERRUPT, OBJ_FLAG_0020, OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM
  } from "../include/object_constants"
 
 import { gDebugInfo, ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
@@ -451,6 +451,178 @@ export const spawn_object_abs_with_rot = (parent, model, behavior, x, y, z, rx, 
     return newObj
 }
 
+export const spawn_object_rel_with_rot = (parent, model, behavior, x, y, z, p, w, r) => {
+    let newObj = spawn_object_at_origin(parent, model, behavior);
+    newObj.rawData[oFlags] |= OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT;
+    obj_set_parent_relative_pos(newObj, x, y, z);
+    obj_set_angle(newObj, p, w, z);
+
+    return newObj;
+}
+
+export const spawn_obj_with_transform_flags = (obj, model, behavior) => {
+    let newObj = spawn_object_at_origin(obj, model, behavior);
+    newObj.rawData[oFlags] |= OBJ_FLAG_0020 | OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM;
+
+    return newObj;
+}
+
+export const spawn_water_droplet = (parent, params) => {
+    let randomScale
+    // allow getters
+    if (params.call) {
+        params = params()
+    }
+    const newObj = spawn_object(parent, params.model, params.behavior);
+
+    if (params.flags & WATER_DROPLET_FLAG_RAND_ANGLE)
+        newObj.rawData[oMoveAngleYaw] = random_int16()
+
+    if (params.flags & WATER_DROPLET_FLAG_RAND_ANGLE_INCR_PLUS_8000)
+        newObj.rawData[oMoveAngleYaw] = (int16)(newObj.rawData[oMoveAngleYaw] + 0x8000
+                                + random_f32_around_zero(params.moveAngleRange))
+
+    if (params.flags & WATER_DROPLET_FLAG_RAND_ANGLE_INCR)
+        newObj.rawData[oMoveAngleYaw] =
+            s16(newObj.rawData[oMoveAngleYaw] + random_f32_around_zero(params.moveAngleRange))
+
+    if (params.flags & WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL)
+        newObj.rawData[oPosY] = gLinker.SurfaceCollision.find_water_level(newObj.rawData[oPosX], newObj.rawData[oPosZ])
+
+    if (params.flags & WATER_DROPLET_FLAG_RAND_OFFSET_XZ)
+        obj_translate_xz_random(newObj, params.moveRange)
+
+    if (params.flags & WATER_DROPLET_FLAG_RAND_OFFSET_XYZ)
+        obj_translate_xyz_random(newObj, params.moveRange)
+
+    newObj.rawData[oForwardVel] = random_float() * params.randForwardVel[1] + params.randForwardVel[0]
+    newObj.rawData[oVelY] = random_float() * params.randYVel[1] + params.randYVel[0]
+
+    randomScale = random_float() * params.randSize[1] + params.randSize[0]
+    obj_scale(newObj, randomScale)
+
+    return newObj
+}
+
+export const spawn_object_at_origin = (parent, model, behavior) => {
+    const obj = gLinker.Spawn.create_object(behavior)
+    obj.parentObj = parent
+    obj.gfx.areaIndex = parent.gfx.areaIndex
+    obj.gfx.activeAreaIndex = parent.gfx.areaIndex
+
+    geo_obj_init(obj.gfx, gLinker.Area.gLoadedGraphNodes[model], [0,0,0], [0,0,0])
+
+    return obj
+}
+
+export const spawn_object = (parent, model, behavior) => {
+    const obj = spawn_object_at_origin(parent, model, behavior)
+    obj_copy_pos_and_angle(obj, parent)
+    return obj
+}
+
+export const try_to_spawn_object = (offsetY, scale, parent, model, behavior) => {
+    const obj = spawn_object(parent, model, behavior)
+    obj.rawData[oPosY] += offsetY
+    obj_scale(obj, scale)
+    return obj
+}
+
+export const spawn_object_with_scale = (parent, model, behavior, scale) => {
+    let obj = spawn_object_at_origin(parent, 0, model, behavior)
+
+    obj_copy_pos_and_angle(obj, parent)
+    obj_scale(obj, scale)
+
+    return obj
+}
+
+const obj_build_relative_transform = (obj) => {
+    obj_build_transform_from_pos_and_angle(obj, oParentRelativePosX /* Takes all XYZ */, oFaceAnglePitch, /* Takes all roll, pitch, yaw */)
+    obj_translate_local(obj, oPosX, oParentRelativePosX)
+}
+
+export const spawn_object_relative = (behaviorParam, relativePosX, relativePosY, relativePosZ, parent, model, behavior) => {
+
+    const obj = spawn_object_at_origin(parent, model, behavior)
+
+    obj_copy_pos_and_angle(obj, parent)
+    obj_set_parent_relative_pos(obj, relativePosX, relativePosY, relativePosZ)
+    obj_build_relative_transform(obj)
+
+    obj.rawData[oBehParams2ndByte] = behaviorParam
+    obj.rawData[oBehParams] = (behaviorParam & 0xFF) << 16
+
+    return obj
+}
+
+
+export const spawn_object_relative_with_scale = (behaviorParam, relativePosX, relativePosY, relativePosZ,
+                                              scale, parent, model, behavior) => {
+    const obj = spawn_object_relative(behaviorParam, relativePosX, relativePosY, relativePosZ,
+                                               parent, model, behavior)
+    obj_scale(obj, scale)
+    return obj
+}
+
+export const cur_obj_move_using_vel = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    o.rawData[oPosX] += o.rawData[oVelX]
+    o.rawData[oPosY] += o.rawData[oVelY]
+    o.rawData[oPosZ] += o.rawData[oVelZ]
+}
+
+export const obj_copy_graph_y_offset = (dst, src) => {
+    dst.rawData[oGraphYOffset] = src.rawData[oGraphYOffset]
+}
+
+export const obj_copy_pos_and_angle = (dst, src) => {
+    obj_copy_pos(dst, src)
+    obj_copy_angle(dst, src)
+}
+
+export const obj_copy_pos = (dst, src) => {
+    dst.rawData[oPosX] = src.rawData[oPosX]
+    dst.rawData[oPosY] = src.rawData[oPosY]
+    dst.rawData[oPosZ] = src.rawData[oPosZ]
+}
+
+export const obj_copy_angle = (dst, src) => {
+    dst.rawData[oFaceAnglePitch] = src.rawData[oFaceAnglePitch]
+    dst.rawData[oFaceAngleYaw] = src.rawData[oFaceAngleYaw]
+    dst.rawData[oFaceAngleRoll] = src.rawData[oFaceAngleRoll]
+
+    dst.rawData[oMoveAnglePitch] = src.rawData[oMoveAnglePitch]
+    dst.rawData[oMoveAngleYaw] = src.rawData[oMoveAngleYaw]
+    dst.rawData[oMoveAngleRoll] = src.rawData[oMoveAngleRoll]
+}
+
+export const obj_set_gfx_pos_from_pos = (obj) => {
+    obj.gfx.pos[0] = obj.rawData[oPosX]
+    obj.gfx.pos[1] = obj.rawData[oPosY]
+    obj.gfx.pos[2] = obj.rawData[oPosZ]
+}
+
+export const obj_init_animation = (obj, animIndex) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    let anims = o.rawData[oAnimations];
+    geo_obj_init_animation(obj.gfx, anims[animIndex])
+}
+
+export const linear_mtxf_mul_vec3f = (m, dst, v) => {
+    for (let i = 0; i < 3; i++) {
+        dst[i] = m[0][i] * v[0] + m[1][i] * v[1] + m[2][i] * v[2]
+    }
+}
+
+export const linear_mtxf_transpose_mul_vec3f = (m, dst, v) => {
+    for (let i = 0; i < 3; i++) {
+        dst[i] = m[i][0] * v[0] + m[i][1] * v[1] + m[i][2] * v[2]
+    }
+}
+
 export const increment_velocity_toward_range = (value, center, zeroThreshold, increment) => {
     let relative = value - center;
     if (relative > 0) {
@@ -536,61 +708,6 @@ export const cur_obj_set_pos_relative = (other, dleft, dy, dforward) => {
     o.rawData[oPosX] = other.rawData[oPosX] + dx
     o.rawData[oPosY] = other.rawData[oPosY] + dy
     o.rawData[oPosZ] = other.rawData[oPosZ] + dz
-}
-
-export const spawn_water_droplet = (parent, params) => {
-    let randomScale
-    // allow getters
-    if (params.call) {
-        params = params()
-    }
-    const newObj = spawn_object(parent, params.model, params.behavior);
-
-    if (params.flags & WATER_DROPLET_FLAG_RAND_ANGLE) {
-        newObj.rawData[oMoveAngleYaw] = random_int16()
-    }
-
-    if (params.flags & WATER_DROPLET_FLAG_RAND_ANGLE_INCR_PLUS_8000) {
-        newObj.rawData[oMoveAngleYaw] = (int16)(newObj.rawData[oMoveAngleYaw] + 0x8000
-                                + random_f32_around_zero(params.moveAngleRange))
-    }
-
-    if (params.flags & WATER_DROPLET_FLAG_RAND_ANGLE_INCR) {
-        newObj.rawData[oMoveAngleYaw] =
-            s16(newObj.rawData[oMoveAngleYaw] + random_f32_around_zero(params.moveAngleRange))
-    }
-
-    if (params.flags & WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL) {
-        newObj.rawData[oPosY] = gLinker.SurfaceCollision.find_water_level(newObj.rawData[oPosX], newObj.rawData[oPosZ])
-    }
-
-    if (params.flags & WATER_DROPLET_FLAG_RAND_OFFSET_XZ) {
-        obj_translate_xz_random(newObj, params.moveRange)
-    }
-
-    if (params.flags & WATER_DROPLET_FLAG_RAND_OFFSET_XYZ) {
-        obj_translate_xyz_random(newObj, params.moveRange)
-    }
-
-    newObj.rawData[oForwardVel] = random_float() * params.randForwardVel[1] + params.randForwardVel[0]
-    newObj.rawData[oVelY] = random_float() * params.randYVel[1] + params.randYVel[0]
-
-    randomScale = random_float() * params.randSize[1] + params.randSize[0]
-    obj_scale(newObj, randomScale)
-
-    newObj.gfx.bleh = "water droplet"
-    return newObj
-}
-
-export const spawn_object_at_origin = (parent, model, behavior) => {
-    const obj = gLinker.Spawn.create_object(behavior)
-    obj.parentObj = parent
-    obj.gfx.areaIndex = parent.gfx.areaIndex
-    obj.gfx.activeAreaIndex = parent.gfx.areaIndex
-
-    geo_obj_init(obj.gfx, gLinker.Area.gLoadedGraphNodes[model], [0,0,0], [0,0,0])
-
-    return obj
 }
 
 
@@ -781,23 +898,6 @@ export const obj_translate_local = (obj, posIndex, localTranslateIndex) => {
     obj.rawData[posIndex + 0] += obj.transform[0][0] * dx + obj.transform[1][0] * dy + obj.transform[2][0] * dz
     obj.rawData[posIndex + 1] += obj.transform[0][1] * dx + obj.transform[1][1] * dy + obj.transform[2][1] * dz
     obj.rawData[posIndex + 2] += obj.transform[0][2] * dx + obj.transform[1][2] * dy + obj.transform[2][2] * dz
-}
-
-const obj_build_relative_transform = (obj) => {
-    obj_build_transform_from_pos_and_angle(obj, oParentRelativePosX /* Takes all XYZ */, oFaceAnglePitch, /* Takes all roll, pitch, yaw */)
-    obj_translate_local(obj, oPosX, oParentRelativePosX)
-}
-
-export const linear_mtxf_mul_vec3f = (m, dst, v) => {
-    for (let i = 0; i < 3; i++) {
-        dst[i] = m[0][i] * v[0] + m[1][i] * v[1] + m[2][i] * v[2]
-    }
-}
-
-export const linear_mtxf_transpose_mul_vec3f = (m, dst, v) => {
-    for (let i = 0; i < 3; i++) {
-        dst[i] = m[i][0] * v[0] + m[i][1] * v[1] + m[i][2] * v[2]
-    }
 }
 
 const obj_build_vel_from_transform = (a0) => {
@@ -1360,15 +1460,6 @@ export const cur_obj_was_attacked_or_ground_pounded = () => {
     return attacked
 }
 
-export const spawn_object_with_scale = (parent, model, behavior, scale) => {
-    let obj = spawn_object_at_origin(parent, 0, model, behavior)
-
-    obj_copy_pos_and_angle(obj, parent)
-    obj_scale(obj, scale)
-
-    return obj
-}
-
 export const obj_copy_behavior_params = (dst, src) => {
     dst.rawData[oBehParams] = src.rawData[oBehParams]
     dst.rawData[oBehParams2ndByte] = src.rawData[oBehParams2ndByte]
@@ -1421,43 +1512,6 @@ export const player_performed_grab_escape_action = () => {
     }
 
     return result
-}
-
-export const spawn_object_relative = (behaviorParam, relativePosX, relativePosY, relativePosZ, parent, model, behavior) => {
-
-    const obj = spawn_object_at_origin(parent, model, behavior)
-
-    obj_copy_pos_and_angle(obj, parent)
-    obj_set_parent_relative_pos(obj, relativePosX, relativePosY, relativePosZ)
-    obj_build_relative_transform(obj)
-
-    obj.rawData[oBehParams2ndByte] = behaviorParam
-    obj.rawData[oBehParams] = (behaviorParam & 0xFF) << 16
-
-    return obj
-}
-
-
-export const spawn_object_relative_with_scale = (behaviorParam, relativePosX, relativePosY, relativePosZ,
-                                              scale, parent, model, behavior) => {
-    const obj = spawn_object_relative(behaviorParam, relativePosX, relativePosY, relativePosZ,
-                                               parent, model, behavior)
-    obj_scale(obj, scale)
-    return obj
-}
-
-
-export const try_to_spawn_object = (offsetY, scale, parent, model, behavior) => {
-    const obj = spawn_object(parent, model, behavior)
-    obj.rawData[oPosY] += offsetY
-    obj_scale(obj, scale)
-    return obj
-}
-
-export const spawn_object = (parent, model, behavior) => {
-    const obj = spawn_object_at_origin(parent, model, behavior)
-    obj_copy_pos_and_angle(obj, parent)
-    return obj
 }
 
 
@@ -1781,27 +1835,6 @@ export const cur_obj_spawn_particles = (info) => {
 
 }
 
-export const obj_copy_pos_and_angle = (dst, src) => {
-    obj_copy_pos(dst, src)
-    obj_copy_angle(dst, src)
-}
-
-export const obj_copy_angle = (dst, src) => {
-    dst.rawData[oFaceAnglePitch] = src.rawData[oFaceAnglePitch]
-    dst.rawData[oFaceAngleYaw] = src.rawData[oFaceAngleYaw]
-    dst.rawData[oFaceAngleRoll] = src.rawData[oFaceAngleRoll]
-
-    dst.rawData[oMoveAnglePitch] = src.rawData[oMoveAnglePitch]
-    dst.rawData[oMoveAngleYaw] = src.rawData[oMoveAngleYaw]
-    dst.rawData[oMoveAngleRoll] = src.rawData[oMoveAngleRoll]
-}
-
-export const obj_copy_pos = (dst, src) => {
-    dst.rawData[oPosX] = src.rawData[oPosX]
-    dst.rawData[oPosY] = src.rawData[oPosY]
-    dst.rawData[oPosZ] = src.rawData[oPosZ]
-}
-
 export const obj_copy_scale = (dst, src) => {
     dst.gfx.scale[0] = src.gfx.scale[0]
     dst.gfx.scale[1] = src.gfx.scale[1]
@@ -1897,12 +1930,6 @@ export const obj_translate_xyz_random = (obj, rangeLength) => {
     obj.rawData[oPosZ] += random_float() * rangeLength - rangeLength * 0.5
 }
 
-export const obj_set_gfx_pos_from_pos = (obj) => {
-    obj.gfx.pos[0] = obj.rawData[oPosX]
-    obj.gfx.pos[1] = obj.rawData[oPosY]
-    obj.gfx.pos[2] = obj.rawData[oPosZ]
-}
-
 export const cur_obj_init_animation = (animIndex) => {
     const o = ObjectListProc.gCurrentObject
     const anims = o.rawData[oAnimations]
@@ -1970,7 +1997,7 @@ export const cur_obj_apply_drag_xz = (dragStrength) => {
 }
 
 export const cur_obj_move_using_vel_and_gravity = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     if (cur_obj_within_12k_bounds()) {
         o.rawData[oPosX] += o.rawData[oVelX]
         o.rawData[oPosZ] += o.rawData[oVelZ]

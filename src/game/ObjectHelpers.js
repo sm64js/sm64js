@@ -47,10 +47,10 @@ import {
     OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33,
     OBJ_MOVE_LANDED, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX, OBJ_FLAG_HOLDABLE,
 
-    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED, OBJ_MOVE_BOUNCE, DIALOG_STATUS_ENABLE_TIME_STOP, ACTIVE_FLAG_INITIATED_TIME_STOP, DIALOG_FLAG_TURN_TO_MARIO, DIALOG_STATUS_START_DIALOG, DIALOG_STATUS_STOP_DIALOG, DIALOG_FLAG_TIME_STOP_ENABLED, oKingBobombUnk88, DIALOG_STATUS_INTERRUPT, OBJ_FLAG_0020, OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM, O_FACE_ANGLE_INDEX, OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT
+    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED, OBJ_MOVE_BOUNCE, DIALOG_STATUS_ENABLE_TIME_STOP, ACTIVE_FLAG_INITIATED_TIME_STOP, DIALOG_FLAG_TURN_TO_MARIO, DIALOG_STATUS_START_DIALOG, DIALOG_STATUS_STOP_DIALOG, DIALOG_FLAG_TIME_STOP_ENABLED, oKingBobombUnk88, DIALOG_STATUS_INTERRUPT, OBJ_FLAG_0020, OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM, O_FACE_ANGLE_INDEX, OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT, OBJ_FLAG_30, oSmokeTimer, oToxBoxActionTable, oToxBoxActionStep, TOX_BOX_ACT_TABLE_END
  } from "../include/object_constants"
 
-import { gDebugInfo, ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
+import { gDebugInfo } from "./ObjectListProcessor"
 import { TIME_STOP_ENABLED } from "./ObjectListProcessor"
 
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
@@ -1442,7 +1442,7 @@ export const obj_set_behavior = (obj, behavior) => {
 }
 
 export const cur_obj_has_behavior = (behavior) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     if (o.behavior == behavior) {
         return true
     } else {
@@ -1459,10 +1459,11 @@ export const obj_has_behavior = (obj, behavior) => {
 }
 
 export const cur_obj_lateral_dist_from_mario_to_home = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
-    let dx = o.rawData[oHomeX] - ObjectListProc.gMarioObject.rawData[oPosX];
-    let dz = o.rawData[oHomeZ] - ObjectListProc.gMarioObject.rawData[oPosZ];
+    let dx = o.rawData[oHomeX] - gMarioObject.rawData[oPosX];
+    let dz = o.rawData[oHomeZ] - gMarioObject.rawData[oPosZ];
 
     let dist = sqrtf(dx * dx + dz * dz);
     return dist;
@@ -1623,8 +1624,7 @@ export const cur_obj_advance_looping_anim = () => {
 }
 
 export const cur_obj_detect_steep_floor = (steepAngleDegrees) => {
-
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     const steepNormalY = coss(parseInt(steepAngleDegrees * (0x10000 / 360)))
 
     if (o.rawData[oForwardVel] != 0) {
@@ -1650,7 +1650,7 @@ export const cur_obj_detect_steep_floor = (steepAngleDegrees) => {
 }
 
 export const cur_obj_resolve_wall_collisions = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     const offsetY = 10.0
     const radius = o.rawData[oWallHitboxRadius]
@@ -1687,7 +1687,7 @@ export const cur_obj_resolve_wall_collisions = () => {
 }
 
 export const cur_obj_update_floor = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     const floor = cur_obj_update_floor_height_and_get_floor()
     o.rawData[oFloor] = floor
 
@@ -1705,7 +1705,7 @@ export const cur_obj_update_floor = () => {
 }
 
 const cur_obj_update_floor_and_resolve_wall_collisions = (steepSlopeDegrees) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     o.rawData[oMoveFlags] &= ~(OBJ_MOVE_ABOVE_LAVA | OBJ_MOVE_ABOVE_DEATH_BARRIER)
 
@@ -1740,7 +1740,7 @@ export const cur_obj_update_floor_and_walls = () => {
 }
 
 export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     const gravity = o.rawData[oGravity]
     const bounciness = o.rawData[oBounciness]
     const bouyancy = o.rawData[oBuoyancy]
@@ -1782,7 +1782,7 @@ export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
 }
 
 const cur_obj_within_12k_bounds = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     if (o.rawData[oPosX] < -12000 || 12000 < o.rawData[oPosX]) return false
     if (o.rawData[oPosY] < -12000 || 12000 < o.rawData[oPosY]) return false
@@ -1819,8 +1819,7 @@ export const obj_set_pos_relative = (obj, other, dleft, dy, dforward) => {
 }
 
 export const cur_obj_angle_to_home = () => {
-
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     
     let angle;
 
@@ -1903,28 +1902,28 @@ export const obj_create_transform_from_self = (obj) => {
 }
 
 export const cur_obj_rotate_move_angle_using_vel = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oMoveAnglePitch] = s16(o.rawData[oMoveAnglePitch] + o.rawData[oAngleVelPitch])
     o.rawData[oMoveAngleYaw]   = s16(o.rawData[oMoveAngleYaw]   + o.rawData[oAngleVelYaw])
     o.rawData[oMoveAngleRoll]  = s16(o.rawData[oMoveAngleRoll]  + o.rawData[oAngleVelRoll])
 }
 
 export const cur_obj_rotate_face_angle_using_vel = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oFaceAnglePitch] = s16(o.rawData[oFaceAnglePitch] + o.rawData[oAngleVelPitch])
     o.rawData[oFaceAngleYaw]   = s16(o.rawData[oFaceAngleYaw]   + o.rawData[oAngleVelYaw])
     o.rawData[oFaceAngleRoll]  = s16(o.rawData[oFaceAngleRoll]  + o.rawData[oAngleVelRoll])
 }
 
 export const cur_obj_set_face_angle_to_move_angle = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     o.rawData[oFaceAnglePitch] = o.rawData[oMoveAnglePitch]
     o.rawData[oFaceAngleYaw]   = o.rawData[oMoveAngleYaw]
     o.rawData[oFaceAngleRoll]  = o.rawData[oMoveAngleRoll]
 }
 
 export const cur_obj_follow_path = (unusedArg) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     let trajectory
     let lastIndex, lastWaypoint
     let targetIndex, targetWaypoint
@@ -1989,6 +1988,276 @@ export const random_f32_around_zero = (diameter) => {
     return random_float() * diameter - diameter / 2
 }
 
+export const obj_scale_random = (obj, rangeLength, minScale) => {
+    const scale = random_float() * rangeLength + minScale
+    obj_scale_xyz(obj, scale, scale, scale)
+}
+
+export const obj_translate_xyz_random = (obj, rangeLength) => {
+    obj.rawData[oPosX] += random_float() * rangeLength - rangeLength * 0.5
+    obj.rawData[oPosY] += random_float() * rangeLength - rangeLength * 0.5
+    obj.rawData[oPosZ] += random_float() * rangeLength - rangeLength * 0.5
+}
+
+export const obj_translate_xz_random = (obj, rangeLength) => {
+    obj.rawData[oPosX] += Math.random() * rangeLength - rangeLength * 0.5
+    obj.rawData[oPosZ] += Math.random() * rangeLength - rangeLength * 0.5
+}
+
+const obj_build_vel_from_transform = (a0) => {
+    let spC = a0.rawData[oUnkC0]
+    let sp8 = a0.rawData[oUnkBC]
+    let sp4 = a0.rawData[oForwardVel]
+
+    a0.rawData[oVelX] = a0.transform[0][0] * spC + a0.transform[1][0] * sp8 + a0.transform[2][0] * sp4
+    a0.rawData[oVelY] = a0.transform[0][1] * spC + a0.transform[1][1] * sp8 + a0.transform[2][1] * sp4
+    a0.rawData[oVelZ] = a0.transform[0][2] * spC + a0.transform[1][2] * sp8 + a0.transform[2][2] * sp4
+}
+
+export const cur_obj_set_pos_via_transform = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    obj_build_transform_from_pos_and_angle(o, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX)
+    obj_build_vel_from_transform(o)
+    o.rawData[oPosX] += o.rawData[oVelX]
+    o.rawData[oPosY] += o.rawData[oVelY]
+    o.rawData[oPosZ] += o.rawData[oVelZ]
+}
+
+export const cur_obj_reflect_move_angle_off_wall = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    return s16(o.rawData[oWallAngle] - (s16(o.rawData[oMoveAngleYaw]) - s16(o.rawData[oWallAngle])) + 0x8000)
+}
+
+export const cur_obj_spawn_particles = (info) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    let numParticles = info.count
+
+    // If there are a lot of objects already, limit the number of particles
+    if (gLinker.ObjectListProcessor.gPrevFrameObjectCount > 150 && numParticles > 10) {
+        numParticles = 10
+    }
+
+    // We're close to running out of object slots, so don't spawn particles at all
+    if (gLinker.ObjectListProcessor.gPrevFrameObjectCount > 210) {
+        numParticles = 0
+    }
+
+    for (let i = 0; i < numParticles; i++) {
+        const scale = Math.random() * (info.sizeRange * 0.1) + (info.sizeBase * 0.1)
+
+        const particle = spawn_object(o, info.model, gLinker.behaviors.bhvWhitePuffExplosion)
+
+        particle.rawData[oBehParams2ndByte] = info.behParam
+        particle.rawData[oMoveAngleYaw] = random_int16()
+        particle.rawData[oGravity] = info.gravity
+        particle.rawData[oDragStrength] = info.dragStrength
+
+        particle.rawData[oPosY] += info.offsetY
+        particle.rawData[oForwardVel] = Math.random() * info.forwardVelRange + info.forwardVelBase
+        particle.rawData[oVelY] = Math.random() * info.velYRange + info.velYBase
+
+        obj_scale_xyz(particle, scale, scale, scale)
+
+    }
+
+}
+
+export const obj_set_hitbox = (obj, hitbox) => {
+    if (!(obj.rawData[oFlags] & OBJ_FLAG_30)) {
+        obj.rawData[oFlags] |= OBJ_FLAG_30
+
+        obj.rawData[oInteractType] = hitbox.interactType
+        obj.rawData[oDamageOrCoinValue] = hitbox.damageOrCoinValue
+        obj.rawData[oHealth] = hitbox.health
+        obj.rawData[oNumLootCoins] = hitbox.NumLootCoins
+
+        cur_obj_become_tangible();
+    }
+
+    obj.hitboxRadius = obj.gfx.scale[0] * hitbox.radius;
+    obj.hitboxHeight = obj.gfx.scale[1] * hitbox.height;
+    obj.hurtboxRadius = obj.gfx.scale[0] * hitbox.hurtboxRadius;
+    obj.hurtboxHeight = obj.gfx.scale[1] * hitbox.hurtboxHeight;
+    obj.hitboxDownOffset = obj.gfx.scale[1] * hitbox.downOffset;
+}
+
+export const signum_positive = (x) => {
+    if (x >= 0) return 1
+    else return -1
+}
+
+export const cur_obj_wait_then_blink = (timeUntilBlinking, numBlinks) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    let done = 0
+    let timeBlinking = 0
+
+    if (o.rawData[oTimer] >= timeUntilBlinking) {
+        timeBlinking = o.rawData[oTimer] - timeUntilBlinking
+        if (timeBlinking % 2 != 0) {
+            o.gfx.flags |= GRAPH_RENDER_INVISIBLE
+
+            if (timeBlinking / 2 > numBlinks) {
+                done = 1
+            }
+        } else {
+            o.gfx.flags &= ~ GRAPH_RENDER_INVISIBLE
+        }
+    }
+
+    return done
+}
+
+export const cur_obj_is_mario_ground_pounding_platform = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+
+    if (gMarioObject.platform == o) {
+        if (LevelUpdate.gMarioState.action == ACT_GROUND_POUND_LAND) {
+            return true
+        }
+    }
+
+    return false
+}
+
+export const spawn_mist_particles = () => {
+    spawn_mist_particles_variable(0, 0, 46.0)
+}
+
+export const spawn_mist_particles_with_sound = (sp18) => {
+    spawn_mist_particles_variable(0, 0, 46.0)
+    create_sound_spawner(sp18)
+}
+
+export const cur_obj_push_mario_away = (radius) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+
+    const marioRelX = gMarioObject.rawData[oPosX] - o.rawData[oPosX]
+    const marioRelZ = gMarioObject.rawData[oPosZ] - o.rawData[oPosZ]
+    const marioDist = Math.sqrt(Math.pow(marioRelX, 2) + Math.pow(marioRelZ, 2))
+
+    if (marioDist < radius) {
+        LevelUpdate.gMarioState.pos[0] += (radius - marioDist) / radius * marioRelX
+        LevelUpdate.gMarioState.pos[2] += (radius - marioDist) / radius * marioRelZ
+    }
+}
+
+export const cur_obj_push_mario_away_from_cylinder = (radius, extentY) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+
+    let marioRelY = gMarioObject.rawData[oPosY] - o.rawData[oPosY]
+
+    if (marioRelY < 0.0) {
+        marioRelY = -marioRelY
+    }
+
+    if (marioRelY < extentY) {
+        cur_obj_push_mario_away(radius)
+    }
+}
+
+export const bhv_dust_smoke_loop = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    
+    o.rawData[oPosX] += o.rawData[oVelX];
+    o.rawData[oPosY] += o.rawData[oVelY];
+    o.rawData[oPosZ] += o.rawData[oVelZ];
+
+    if (o.rawData[oSmokeTimer] == 10) {
+        obj_mark_for_deletion(o);
+    }
+
+    o.rawData[oSmokeTimer]++;
+}
+
+export const cur_obj_set_action_table = (actionTable) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    o.rawData[oToxBoxActionTable] = actionTable;
+    o.rawData[oToxBoxActionStep] = 0;
+
+    return o.rawData[oToxBoxActionTable];
+}
+
+export const cur_obj_progress_action_table = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    let nextAction;
+    let actionTable = o.rawData[oToxBoxActionTable];
+    let nextActionIndex = o.rawData[oToxBoxActionStep] + 1;
+
+    if (actionTable[nextActionIndex] != TOX_BOX_ACT_TABLE_END) {
+        nextAction = actionTable[nextActionIndex];
+        o.rawData[oToxBoxActionStep]++;
+    } else {
+        nextAction = actionTable[0];
+        o.rawData[oToxBoxActionStep] = 0;
+    }
+
+    return nextAction;
+}
+
+export const cur_obj_scale_over_time = (a0, a1, sp10, sp14) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    
+    let sp4 = sp14 - sp10
+    let sp0 = o.rawData[oTimer] / a1
+
+    if (a0 & 0x01) {
+        o.gfx.scale[0] = sp4 * sp0 + sp10
+    }
+
+    if (a0 & 0x02) {
+        o.gfx.scale[1] = sp4 * sp0 + sp10
+    }
+
+    if (a0 & 0x04) {
+        o.gfx.scale[2] = sp4 * sp0 + sp10
+    }
+}
+
+export const cur_obj_set_pos_to_home_with_debug = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    o.rawData[oPosX] = o.rawData[oHomeX] + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][0];
+    o.rawData[oPosY] = o.rawData[oHomeZ] + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][1];
+    o.rawData[oPosZ] = o.rawData[oHomeZ] + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][2];
+    cur_obj_scale(gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][3] / 100.0 + 1.0);
+}
+
+export const cur_obj_is_mario_on_platform = () => {
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    
+    if (gMarioObject.platform == o) {
+        return true
+    } else {
+        return false
+    }
+}
+
+export const cur_obj_shake_y_until = (cycles, amount) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    if (o.rawData[oTimer] % 2 != 0) o.rawData[oPosY] -= amount
+    else o.rawData[oPosY] += amount
+
+    if (o.rawData[oTimer] == cycles * 2) return true;
+    else return false;
+}
+
+// NOTE: uncomment line when BBH Stair implemented
+export const jiggle_bbh_stair = (a0) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    if (a0 >= 4 || a0 < 0) return true;
+
+     // o.rawData[oPosY] += sBBHStairJiggleOffsets[a0];
+    return false;
+}
+
 // ...
 
 export const cur_obj_has_model = (modelID) => {
@@ -2013,35 +2282,6 @@ export const cur_obj_unrender_and_reset_state = (animIndex, action) => {
     o.rawData[oAction] = action
 }
 
-export const obj_translate_xz_random = (obj, rangeLength) => {
-    obj.rawData[oPosX] += Math.random() * rangeLength - rangeLength * 0.5
-    obj.rawData[oPosZ] += Math.random() * rangeLength - rangeLength * 0.5
-}
-
-const obj_build_vel_from_transform = (a0) => {
-    let spC = a0.rawData[oUnkC0]
-    let sp8 = a0.rawData[oUnkBC]
-    let sp4 = a0.rawData[oForwardVel]
-
-    a0.rawData[oVelX] = a0.transform[0][0] * spC + a0.transform[1][0] * sp8 + a0.transform[2][0] * sp4
-    a0.rawData[oVelY] = a0.transform[0][1] * spC + a0.transform[1][1] * sp8 + a0.transform[2][1] * sp4
-    a0.rawData[oVelZ] = a0.transform[0][2] * spC + a0.transform[1][2] * sp8 + a0.transform[2][2] * sp4
-}
-
-export const cur_obj_set_pos_via_transform = () => {
-    const o = ObjectListProc.gCurrentObject
-    obj_build_transform_from_pos_and_angle(o, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX)
-    obj_build_vel_from_transform(o)
-    o.rawData[oPosX] += o.rawData[oVelX]
-    o.rawData[oPosY] += o.rawData[oVelY]
-    o.rawData[oPosZ] += o.rawData[oVelZ]
-}
-
-export const cur_obj_reflect_move_angle_off_wall = () => {
-    const o = ObjectListProc.gCurrentObject
-    return s16(o.rawData[oWallAngle] - (s16(o.rawData[oMoveAngleYaw]) - s16(o.rawData[oWallAngle])) + 0x8000)
-}
-
 
 export const approach_symmetric = (value, target, increment) => {
     const dist = s16(target - value)
@@ -2063,52 +2303,13 @@ export const approach_symmetric = (value, target, increment) => {
     return value
 }
 
-export const cur_obj_scale_over_time = (a0, a1, sp10, sp14) => {
-    const o = ObjectListProc.gCurrentObject
-    
-    let sp4 = sp14 - sp10
-    let sp0 = o.rawData[oTimer] / a1
-
-    if (a0 & 0x01) {
-        o.gfx.scale[0] = sp4 * sp0 + sp10
-    }
-
-    if (a0 & 0x02) {
-        o.gfx.scale[1] = sp4 * sp0 + sp10
-    }
-
-    if (a0 & 0x04) {
-        o.gfx.scale[2] = sp4 * sp0 + sp10
-    }
-}
-
-export const cur_obj_set_pos_to_home_with_debug = () => {
-    const o = ObjectListProc.gCurrentObject
-
-    o.rawData[oPosX] = o.rawData[oHomeX] + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][0];
-    o.rawData[oPosY] = o.rawData[oHomeZ] + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][1];
-    o.rawData[oPosZ] = o.rawData[oHomeZ] + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][2];
-    cur_obj_scale(gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][3] / 100.0 + 1.0);
-}
-
-export const cur_obj_is_mario_on_platform = () => {
-    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
-    const o = gLinker.ObjectListProcessor.gCurrentObject
-    
-    if (gMarioObject.platform == o) {
-        return true
-    } else {
-        return false
-    }
-}
-
 export const cur_obj_call_action_function = (actionFunctions) => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     actionFunctions[o.rawData[oAction]]()
 }
 
 export const obj_explode_and_spawn_coins = (sp18, sp1C) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     spawn_mist_particles_variable(0, 0, sp18)
     spawn_triangle_break_particles(30, 138, 3.0, 4)
     obj_mark_for_deletion(o)
@@ -2125,25 +2326,15 @@ export const obj_set_collision_data = (obj, segAddr) => {
 }
 
 export const cur_obj_if_hit_wall_bounce_away = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     if (o.rawData[oMoveFlags] & OBJ_MOVE_HIT_WALL) {
         o.rawData[oMoveAngleYaw] = o.rawData[oWallAngle]
     }
 }
 
-export const cur_obj_is_mario_ground_pounding_platform = () => {
-    if (ObjectListProc.gMarioObject.platform == ObjectListProc.gCurrentObject) {
-        if (LevelUpdate.gMarioState.action == ACT_GROUND_POUND_LAND) {
-            return true
-        }
-    }
-
-    return false
-}
-
 export const cur_obj_shake_screen = (shake) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     Camera.set_camera_shake_from_point(shake, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ]);
 }
@@ -2152,7 +2343,7 @@ export const obj_attack_collided_from_other_object = (obj) => {
     if (obj.numCollidedObjs != 0) {
         const other = obj.collidedObjs[0]
 
-        if (other != ObjectListProc.gMarioObject) {
+        if (other != gLinker.ObjectListProcessor.gMarioObject) {
             other.rawData[oInteractStatus] |= ATTACK_PUNCH | INT_STATUS_WAS_ATTACKED | INT_STATUS_INTERACTED | INT_STATUS_TOUCHED_BOB_OMB
             return true
         }
@@ -2162,7 +2353,7 @@ export const obj_attack_collided_from_other_object = (obj) => {
 }
 
 export const cur_obj_was_attacked_or_ground_pounded = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     let attacked = 0
 
     if ((o.rawData[oInteractStatus] & INT_STATUS_INTERACTED)
@@ -2184,7 +2375,7 @@ export const obj_copy_behavior_params = (dst, src) => {
 }
 
 export const cur_obj_init_animation_and_anim_frame = (animIndex, animFrame) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     
     cur_obj_init_animation_with_sound(animIndex)
     // o.gfx.animInfo.animFrame = animFrame
@@ -2201,7 +2392,7 @@ export const cur_obj_init_animation_and_extend_if_at_end = (animIndex) => {
 }
 
 export const cur_obj_check_grabbed_mario = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     if (o.rawData[oInteractStatus] & INT_STATUS_GRABBED_MARIO) {
         o.rawData[oKingBobombUnk88] = 1
@@ -2238,128 +2429,26 @@ export const player_performed_grab_escape_action = () => {
 //     Vec3s pos;
 // };
 
-export const cur_obj_spawn_particles = (info) => {
-    const o = ObjectListProc.gCurrentObject
-
-    let numParticles = info.count
-
-    // If there are a lot of objects already, limit the number of particles
-    if (ObjectListProc.gPrevFrameObjectCount > 150 && numParticles > 10) {
-        numParticles = 10
-    }
-
-    // We're close to running out of object slots, so don't spawn particles at all
-    if (ObjectListProc.gPrevFrameObjectCount > 210) {
-        numParticles = 0
-    }
-
-    for (let i = 0; i < numParticles; i++) {
-        const scale = Math.random() * (info.sizeRange * 0.1) + (info.sizeBase * 0.1)
-
-        const particle = spawn_object(o, info.model, gLinker.behaviors.bhvWhitePuffExplosion)
-
-        particle.rawData[oBehParams2ndByte] = info.behParam
-        particle.rawData[oMoveAngleYaw] = random_int16()
-        particle.rawData[oGravity] = info.gravity
-        particle.rawData[oDragStrength] = info.dragStrength
-
-        particle.rawData[oPosY] += info.offsetY
-        particle.rawData[oForwardVel] = Math.random() * info.forwardVelRange + info.forwardVelBase
-        particle.rawData[oVelY] = Math.random() * info.velYRange + info.velYBase
-
-        obj_scale_xyz(particle, scale, scale, scale)
-
-    }
-
-}
-
-export const obj_scale_random = (obj, rangeLength, minScale) => {
-    const scale = random_float() * rangeLength + minScale
-    obj_scale_xyz(obj, scale, scale, scale)
-}
-
-export const obj_translate_xyz_random = (obj, rangeLength) => {
-    obj.rawData[oPosX] += random_float() * rangeLength - rangeLength * 0.5
-    obj.rawData[oPosY] += random_float() * rangeLength - rangeLength * 0.5
-    obj.rawData[oPosZ] += random_float() * rangeLength - rangeLength * 0.5
-}
-
-export const cur_obj_push_mario_away = (radius) => {
-    const o = ObjectListProc.gCurrentObject
-    const marioRelX = ObjectListProc.gMarioObject.rawData[oPosX] - o.rawData[oPosX]
-    const marioRelZ = ObjectListProc.gMarioObject.rawData[oPosZ] - o.rawData[oPosZ]
-    const marioDist = Math.sqrt(Math.pow(marioRelX, 2) + Math.pow(marioRelZ, 2))
-
-    if (marioDist < radius) {
-        LevelUpdate.gMarioState.pos[0] += (radius - marioDist) / radius * marioRelX
-        LevelUpdate.gMarioState.pos[2] += (radius - marioDist) / radius * marioRelZ
-    }
-}
-
-export const cur_obj_push_mario_away_from_cylinder = (radius, extentY) => {
-    const o = ObjectListProc.gCurrentObject
-    let marioRelY = ObjectListProc.gMarioObject.rawData[oPosY] - o.rawData[oPosY]
-
-    if (marioRelY < 0.0) {
-        marioRelY = -marioRelY
-    }
-
-    if (marioRelY < extentY) {
-        cur_obj_push_mario_away(radius)
-    }
-}
-
-export const spawn_mist_particles = () => {
-    spawn_mist_particles_variable(0, 0, 46.0)
-}
-
-export const spawn_mist_particles_with_sound = (sp18) => {
-    spawn_mist_particles_variable(0, 0, 46.0)
-    create_sound_spawner(sp18)
-}
-
-export const cur_obj_wait_then_blink = (timeUntilBlinking, numBlinks) => {
-    const o = ObjectListProc.gCurrentObject
-
-    let done = 0
-    let timeBlinking = 0
-
-    if (o.rawData[oTimer] >= timeUntilBlinking) {
-        timeBlinking = o.rawData[oTimer] - timeUntilBlinking
-        if (timeBlinking % 2 != 0) {
-            o.gfx.flags |= GRAPH_RENDER_INVISIBLE
-
-            if (timeBlinking / 2 > numBlinks) {
-                done = 1
-            }
-        } else {
-            o.gfx.flags &= ~ GRAPH_RENDER_INVISIBLE
-        }
-    }
-
-    return done
-}
-
 export const enable_time_stop = () => {
-    ObjectListProc.gTimeStopState |= TIME_STOP_ENABLED
+    gLinker.ObjectListProcessor.gTimeStopState |= TIME_STOP_ENABLED
 }
 
 export const disable_time_stop = () => {
-    ObjectListProc.gTimeStopState &= ~TIME_STOP_ENABLED
+    gLinker.ObjectListProcessor.gTimeStopState &= ~TIME_STOP_ENABLED
 }
 
 export const set_time_stop_flags = (flags) => {
-    ObjectListProc.gTimeStopState |= flags
+    gLinker.ObjectListProcessor.gTimeStopState |= flags
 }
 
 export const clear_time_stop_flags = (flags) => {
-    ObjectListProc.gTimeStopState = ObjectListProc.gTimeStopState & (flags ^ 0xFFFFFFFF)
+    gLinker.ObjectListProcessor.gTimeStopState = gLinker.ObjectListProcessor.gTimeStopState & (flags ^ 0xFFFFFFFF)
 }
 
 export const cur_obj_can_mario_activate_textbox = (radius, height, unused) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioStates = [ LevelUpdate.gMarioState ]
-    const gMarioObject = ObjectListProc.gMarioObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
     if (o.rawData[oDistanceToMario] < 1500.0) {
         let latDistToMario = lateral_dist_between_objects(o, gMarioObject)
@@ -2379,9 +2468,9 @@ export const cur_obj_can_mario_activate_textbox_2 = (radius, height) => {
 }
 
 export const cur_obj_update_dialog_with_cutscene = (actionArg, dialogFlags, cutsceneTable, dialogID) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioState = LevelUpdate.gMarioState
-    const gMarioObject = ObjectListProc.gMarioObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
     
     let dialogResponse = DIALOG_RESPONSE_NONE
     let doneTurning = true
@@ -2390,7 +2479,7 @@ export const cur_obj_update_dialog_with_cutscene = (actionArg, dialogFlags, cuts
         case DIALOG_STATUS_ENABLE_TIME_STOP:
             // Wait for Mario to be ready to speak, and then enable time stop
             if (mario_ready_to_speak() || gMarioState.action == ACT_READING_NPC_DIALOG) {
-                ObjectListProc.gTimeStopState |= TIME_STOP_ENABLED
+                gLinker.ObjectListProcessor.gTimeStopState |= TIME_STOP_ENABLED
                 o.activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP
                 o.rawData[oDialogState]++
                 o.rawData[oDialogResponse] = DIALOG_RESPONSE_NONE
@@ -2443,7 +2532,7 @@ export const cur_obj_update_dialog_with_cutscene = (actionArg, dialogFlags, cuts
             } else if (gMarioState.action != ACT_READING_NPC_DIALOG) {
                 // Disable time stop, then enable time stop for a frame
                 // until the set_mario_npc_dialog function disables it
-                ObjectListProc.gTimeStopState &= ~TIME_STOP_ENABLED
+                gLinker.ObjectListProcessor.gTimeStopState &= ~TIME_STOP_ENABLED
                 o.activeFlags &= ~ACTIVE_FLAG_INITIATED_TIME_STOP
                 dialogResponse = o.rawData[oDialogResponse]
                 o.rawData[oDialogState] = DIALOG_STATUS_ENABLE_TIME_STOP
@@ -2458,7 +2547,7 @@ export const cur_obj_update_dialog_with_cutscene = (actionArg, dialogFlags, cuts
 }
 
 export const bhv_init_room = () => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
     let floor
     let /*f32*/ floorHeight
 
@@ -2496,7 +2585,7 @@ export const cur_obj_spawn_loot_blue_coin = () => {
 }
 
 export const cur_obj_spawn_star_at_y_offset = (targetX, targetY, targetZ, offsetY) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     let objectPosY = o.rawData[oPosY]
     o.rawData[oPosY] += offsetY + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][0]

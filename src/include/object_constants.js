@@ -1059,8 +1059,8 @@ export const oToadMessageRecentlyTalked  = 0x21
 export const oToadMessageState           = 0x22
 
 /* Tox Box */
-export const oToxBoxMovementPattern  = 0x49
-export const oToxBoxMovementStep     = 0x4A
+export const oToxBoxActionTable  = 0x49
+export const oToxBoxActionStep   = 0x4A
 
 /* TTC Rotating Solid */
 export const oTTCRotatingSolidNumTurns       = 0x1B
@@ -1362,3 +1362,20 @@ export const WOODEN_POST_BP_NO_COINS_MASK = 0x0000FF00
     export const GRINDEL_THWOMP_ACT_LOWER          = 2
     export const GRINDEL_THWOMP_ACT_LAND           = 3
     export const GRINDEL_THWOMP_ACT_IDLE_AT_BOTTOM = 4
+
+/* Tox Box */
+    /* oAction */
+    export const TOX_BOX_ACT_INIT          = 0
+    export const TOX_BOX_ACT_ROLL_LAND     = 1
+    export const TOX_BOX_ACT_IDLE          = 2
+    export const TOX_BOX_ACT_UNUSED_IDLE   = 3
+    export const TOX_BOX_ACT_ROLL_FORWARD  = 4
+    export const TOX_BOX_ACT_ROLL_BACKWARD = 5
+    export const TOX_BOX_ACT_ROLL_RIGHT    = 6
+    export const TOX_BOX_ACT_ROLL_LEFT     = 7
+    export const TOX_BOX_ACT_TABLE_END     = -1
+
+    /* oBhvParams2ndByte */
+    export const TOX_BOX_BP_MOVEMENT_PATTERN_1 = 0
+    export const TOX_BOX_BP_MOVEMENT_PATTERN_2 = 1
+    export const TOX_BOX_BP_MOVEMENT_PATTERN_3 = 2

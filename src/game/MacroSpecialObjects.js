@@ -28,7 +28,7 @@ const SpecialObjectPresets_init = () => {
     [0x09, SPTYPE_NO_YROT_OR_PARAMS , 0x00, "MODEL_NONE", "bhvStaticObject"],
     [0x0A, SPTYPE_NO_YROT_OR_PARAMS , 0x00, "MODEL_LLL_ROTATING_BLOCK_FIRE_BARS", "bhvLllRotatingBlockWithFireBars"],
     [0x0B, SPTYPE_NO_YROT_OR_PARAMS , 0x00, "MODEL_NONE", "bhvLllFloatingWoodBridge"],
-    [0x0C, SPTYPE_NO_YROT_OR_PARAMS , 0x00, "MODEL_NONE", "bhvLllTumblingBridge"],
+    [0x0C, SPTYPE_NO_YROT_OR_PARAMS , 0x00, "MODEL_NONE", "bhvLLLTumblingBridge"],
     [0x0D, SPTYPE_NO_YROT_OR_PARAMS , 0x00, "MODEL_LLL_ROTATING_HEXAGONAL_RING" , "bhvLllRotatingHexagonalRing"],
     [0x0E, SPTYPE_YROT_NO_PARAMS    , 0x00, "MODEL_LLL_SINKING_RECTANGULAR_PLATFORM", "bhvLllSinkingRectangularPlatform"],
     [0x0F, SPTYPE_NO_YROT_OR_PARAMS , 0x00, "MODEL_LLL_SINKING_SQUARE_PLATFORMS", "bhvLllSinkingSquarePlatforms"],

@@ -61,6 +61,7 @@ import { whirlpool_seg5_dl_05013CB8               } from "../actors/whirlpool/mo
 import { king_bobomb_geo } from "../actors/king_bobomb/geo.inc"
 import { cap_switch_base_seg5_dl_05003120, cap_switch_exclamation_seg5_dl_05002E00 } from "../actors/capswitch/model.inc"
 import { cap_switch_geo } from "../actors/capswitch/geo.inc"
+import { thwomp_geo } from "../actors/thwomp/geo.inc"
 
 
 export const script_func_global_1 = () => { return [
@@ -91,15 +92,15 @@ export const script_func_global_1 = () => { return [
     RETURN(),
 ]}
 
-// export const script_func_global_2 = () => { return [
+export const script_func_global_2 = () => { return [
 //     LOAD_MODEL_FROM_GEO(MODEL.BULLET_BILL,             bullet_bill_geo),
 //     LOAD_MODEL_FROM_GEO(MODEL.YELLOW_SPHERE,           yellow_sphere_geo),
 //     LOAD_MODEL_FROM_GEO(MODEL.HOOT,                    hoot_geo),
 //     LOAD_MODEL_FROM_GEO(MODEL.YOSHI_EGG,               yoshi_egg_geo),
 //     LOAD_MODEL_FROM_GEO(MODEL.THWOMP,                  thwomp_geo),
 //     LOAD_MODEL_FROM_GEO(MODEL.HEAVE_HO,                heave_ho_geo),
-//     RETURN(),
-// ]}
+    RETURN(),
+]}
 
 export const script_func_global_3 = () => { return [
 //     LOAD_MODEL_FROM_GEO(MODEL.BLARGG,                  blargg_geo),

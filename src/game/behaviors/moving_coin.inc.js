@@ -2,7 +2,6 @@ import * as _Linker from "../../game/Linker"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { spawn_object, cur_obj_become_intangible, cur_obj_become_tangible } from "../ObjectHelpers"
 import { MODEL_SPARKLES } from "../../include/model_ids"
-import { bhvGoldenCoinSparkles } from "../BehaviorData"
 import { oGravity, oFriction, oBuoyancy, oAction, MOV_YCOIN_ACT_IDLE, oTimer, MOV_YCOIN_ACT_BLINKING, MOV_YCOIN_ACT_LAVA_DEATH, MOV_YCOIN_ACT_DEATH_PLANE_DEATH, oInteractStatus } from "../../include/object_constants"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { INTERACT_COIN, INT_STATUS_INTERACTED } from "../Interaction"
@@ -23,7 +22,7 @@ const sMovingYellowCoinHitbox = {
 
 export const coin_collected = () => {
     const o = ObjectListProc.gCurrentObject
-    spawn_object(o, MODEL_SPARKLES, bhvGoldenCoinSparkles)
+    spawn_object(o, MODEL_SPARKLES, gLinker.behaviors.bhvGoldenCoinSparkles)
     o.activeFlags = 0
 }
 

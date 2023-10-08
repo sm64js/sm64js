@@ -705,6 +705,26 @@ export const cur_obj_forward_vel_approach_upward = (target, increment) => {
     }
 }
 
+export const approach_f32_signed = (valueWrapper, target, increment) => {
+    let reachedTarget = false;
+
+    valueWrapper.value += increment;
+
+    if (increment >= 0.0) {
+        if (valueWrapper.value > target) {
+            valueWrapper.value = target;
+            reachedTarget = true;
+        }
+    } else {
+        if (valueWrapper.value < target) {
+            valueWrapper.value = target;
+            reachedTarget = true;
+        }
+    }
+
+    return reachedTarget;
+}
+
 export const abs_angle_diff = (x0, x1) => {
     let diff = x1 - x0
 

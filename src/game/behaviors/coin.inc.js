@@ -8,7 +8,6 @@ import {
     cur_obj_call_action_function, obj_copy_pos, cur_obj_has_model
 } from "../ObjectHelpers"
 import { MODEL_YELLOW_COIN, MODEL_YELLOW_COIN_NO_SHADOW, MODEL_SPARKLES, MODEL_BLUE_COIN } from "../../include/model_ids"
-import { bhvCoinFormationSpawn, bhvYellowCoin, bhvGoldenCoinSparkles, bhvCoinSparkles } from "../BehaviorData"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { INTERACT_COIN, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "../Interaction"
 import { sins, coss, random_uint16 } from "../../utils"
@@ -34,7 +33,7 @@ const bhv_coin_sparkles_init = () => {
     const o = ObjectListProc.gCurrentObject
 
     if (o.rawData[oInteractStatus] & INT_STATUS_INTERACTED && !(o.rawData[oInteractStatus] & INT_STATUS_TOUCHED_BOB_OMB)) {
-        spawn_object(o, MODEL_SPARKLES, bhvGoldenCoinSparkles)
+        spawn_object(o, MODEL_SPARKLES, gLinker.behaviors.bhvGoldenCoinSparkles)
         obj_mark_for_deletion(o)
         return true
     }
@@ -46,7 +45,7 @@ const bhv_coin_sparkles_init = () => {
 const bhv_yellow_coin_init = () => {
     const o = ObjectListProc.gCurrentObject
 
-    cur_obj_set_behavior(bhvYellowCoin)
+    cur_obj_set_behavior(gLinker.behaviors.bhvYellowCoin)
     obj_set_hitbox(o, sYellowCoinHitbox)
     //bhv_init_room()  TODO assign coin to specific room?
     cur_obj_update_floor_height()
@@ -79,7 +78,7 @@ const bhv_coin_init = () => {
     o.rawData[oVelY] = Math.random() * 10.0 + 30 + o.rawData[oCoinBaseVelY]
     o.rawData[oForwardVel] = Math.random() * 10.0
     o.rawData[oMoveAngleYaw] = random_uint16()
-    cur_obj_set_behavior(bhvYellowCoin)
+    cur_obj_set_behavior(gLinker.behaviors.bhvYellowCoin)
     obj_set_hitbox(o, sYellowCoinHitbox)
     cur_obj_become_intangible()
 }
@@ -128,7 +127,7 @@ const bhv_coin_formation_spawn_loop = () => {
     const o = ObjectListProc.gCurrentObject
 
     if (o.rawData[oTimer] == 0) {
-        cur_obj_set_behavior(bhvYellowCoin)
+        cur_obj_set_behavior(gLinker.behaviors.bhvYellowCoin)
         obj_set_hitbox(o, sYellowCoinHitbox)
         //bhv_init_room()  TODO assign coin to specific room?
         if (o.rawData[oCoinOnGround]) {
@@ -186,7 +185,7 @@ const spawn_coin_in_formation = (sp50, sp54) => {
     if (sp54 & 0x10) sp38 = 0
 
     if (sp3C) {
-        const sp4C = spawn_object_relative(sp50, sp40[0], sp40[1], sp40[2], o, MODEL_YELLOW_COIN, bhvCoinFormationSpawn)
+        const sp4C = spawn_object_relative(sp50, sp40[0], sp40[1], sp40[2], o, MODEL_YELLOW_COIN, gLinker.behaviors.bhvCoinFormationSpawn)
 
         sp4C.rawData[oCoinCollectedFlags] = sp38
     }
@@ -233,7 +232,7 @@ const coin_inside_boo_act_1 = () => {
     if (o.rawData[oTimer] > 90 || (o.rawData[oMoveFlags] & OBJ_MOVE_LANDED)) {
         obj_set_hitbox(o, sYellowCoinHitbox)
         cur_obj_become_tangible()
-        cur_obj_set_behavior(bhvYellowCoin)
+        cur_obj_set_behavior(gLinker.behaviors.bhvYellowCoin)
     }
     cur_obj_move_standard(-30)
     bhv_coin_sparkles_init()
@@ -275,7 +274,7 @@ const bhv_coin_sparkles_loop = () => { cur_obj_scale(0.6) }
 const bhv_golden_coin_sparkles_loop = () => {
     const o = ObjectListProc.gCurrentObject
     const sp24 = 30.0
-    const sp2C = spawn_object(o, MODEL_SPARKLES, bhvCoinSparkles)
+    const sp2C = spawn_object(o, MODEL_SPARKLES, gLinker.behaviors.bhvCoinSparkles)
     sp2C.rawData[oPosX] += (Math.random() * sp24) - (sp24 / 2)
     sp2C.rawData[oPosZ] += (Math.random() * sp24) - (sp24 / 2)
 }

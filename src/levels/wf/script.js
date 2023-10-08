@@ -23,7 +23,7 @@ import {
 } from "../../include/model_ids"
 
 import {
-    script_func_global_1, /*script_func_global_2,*/ script_func_global_15
+    script_func_global_1, script_func_global_2, script_func_global_15
 } from "../global_scripts"
 
 import { wf_geo_0007E0 } from "./areas/1/5/geo.inc"
@@ -183,7 +183,7 @@ export const level_wf_entry = [
     INIT_LEVEL(),
     MARIO(/*model*/ MODEL_MARIO,  /*behParam*/ 0x00000001,  /*beh*/ 'bhvMario'),
     JUMP_LINK(script_func_global_1),
-    //JUMP_LINK(script_func_global_2),
+    JUMP_LINK(script_func_global_2),
     JUMP_LINK(script_func_global_15),
     LOAD_MODEL_FROM_GEO(MODEL_WF_BUBBLY_TREE,                    bubbly_tree_geo),
     LOAD_MODEL_FROM_GEO(MODEL_LEVEL_GEOMETRY_03,                 wf_geo_0007E0),

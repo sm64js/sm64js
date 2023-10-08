@@ -1045,7 +1045,7 @@ export const oSwoopTargetPitch    = 0x1C
 export const oSwoopTargetYaw      = 0x1D
 
 /* Thwomp */
-export const oThwompRandomTimer  = 0x1B
+export const oGrindelThwompRandomTimer  = 0x1B
 
 /* Tilting Platform */
 export const oTiltingPyramidNormalX          = 0x1B
@@ -1354,3 +1354,11 @@ export const WOODEN_POST_BP_NO_COINS_MASK = 0x0000FF00
     /* oAction */
     export const WF_ROTATING_WOODEN_PLATFORM_ACT_IDLE     = 0
     export const WF_ROTATING_WOODEN_PLATFORM_ACT_ROTATING = 1
+
+/* Grindel or Thwomp */
+    /* oAction */
+    export const GRINDEL_THWOMP_ACT_RAISE          = 0
+    export const GRINDEL_THWOMP_ACT_IDLE_AT_TOP    = 1
+    export const GRINDEL_THWOMP_ACT_LOWER          = 2
+    export const GRINDEL_THWOMP_ACT_LAND           = 3
+    export const GRINDEL_THWOMP_ACT_IDLE_AT_BOTTOM = 4

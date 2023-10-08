@@ -5,7 +5,7 @@
  * It's also used during the ending cutscene.
  */
 
-import { vec3f_add, vec3f_get_dist_and_angle, vec3f_set, vec3f_set_dist_and_angle } from "../../engine/math_util";
+import { atan2s, vec3f_add, vec3f_get_dist_and_angle, vec3f_set, vec3f_set_dist_and_angle } from "../../engine/math_util";
 import { MODEL_MIST } from "../../include/model_ids";
 import { CLOUD_BP_LAKITU_CLOUD, oAction, oAnimState, oFaceAnglePitch, oFaceAngleYaw, oIntroLakituCloud, oIntroLakituSplineSegment, oIntroLakituSplineSegmentProgress, oIntroLakituUnk100, oIntroLakituUnk104, oIntroLakituUnk108, oIntroLakituUnk10C, oMoveAnglePitch, oMoveAngleYaw, oPosX, oPosY, oPosZ, oTimer } from "../../include/object_constants";
 import { SOUND_ACTION_FLYING_FAST, SOUND_ACTION_INTRO_UNK45E, SOUND_AIR_LAKITU_FLY_HIGHPRIO } from "../../include/sounds";

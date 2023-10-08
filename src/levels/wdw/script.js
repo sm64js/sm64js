@@ -14,7 +14,7 @@ import {
 } from "../../include/model_ids"
 
 import {
-    script_func_global_1, /*script_func_global_2,*/ script_func_global_14
+    script_func_global_1, script_func_global_14, // script_func_global_2
 } from "../global_scripts"
 
 import { wdw_geo_000598 } from "./arrow_lift/geo.inc"
@@ -116,7 +116,7 @@ export const level_wdw_entry = [
     INIT_LEVEL(),
     MARIO(/*model*/ MODEL_MARIO,  /*behParam*/ 0x00000001,  /*beh*/ 'bhvMario'),
     JUMP_LINK(script_func_global_1),
-    //JUMP_LINK(script_func_global_2),
+    // JUMP_LINK(script_func_global_2),
     JUMP_LINK(script_func_global_14),
     LOAD_MODEL_FROM_GEO(MODEL_WDW_BUBBLY_TREE,                    bubbly_tree_geo),
     LOAD_MODEL_FROM_GEO(MODEL_WDW_SQUARE_FLOATING_PLATFORM,       wdw_geo_000580),

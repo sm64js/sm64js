@@ -6,7 +6,6 @@ import { bitfs_seg7_collision_07015288 } from "../../levels/bitfs/tumbling_platf
 import { lll_seg7_collision_0701D21C } from "../../levels/lll/collapsing_wooden_platform/collision.inc"
 import { wf_seg7_collision_tumbling_bridge } from "../../levels/wf/tumbling_bridge_near/collision.inc"
 import { random_sign } from "../../utils"
-import { bhvLllTumblingBridge, bhvTumblingBridgePlatform } from "../BehaviorData"
 import { cur_obj_call_action_function, cur_obj_has_behavior, cur_obj_hide, cur_obj_move_using_fvel_and_gravity, cur_obj_rotate_face_angle_using_vel, cur_obj_unhide, cur_obj_update_floor_height, obj_mark_for_deletion, spawn_object_relative } from "../ObjectHelpers"
 import { cur_obj_play_sound_2 } from "../SpawnSound"
 
@@ -64,7 +63,7 @@ export const bhv_tumbling_bridge_platform_loop = () => {
 const tumbling_bridge_act_0 = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
 
-    if (cur_obj_has_behavior(bhvLllTumblingBridge) || o.rawData[oDistanceToMario] < 1000.0) {
+    if (cur_obj_has_behavior(gLinker.behaviors.bhvLLLTumblingBridge) || o.rawData[oDistanceToMario] < 1000.0) {
         o.rawData[oAction] = 1
     }
 }
@@ -89,7 +88,7 @@ const tumbling_bridge_act_1 = () => {
             relativePlatformZ = sTumblingBridgeParams[bridgeID].bridgeRelativeStartingXorZ + sTumblingBridgeParams[bridgeID].platformWidth * i;
         }
 
-        if (cur_obj_has_behavior(bhvLllTumblingBridge)) {
+        if (cur_obj_has_behavior(bhvLLLTumblingBridge)) {
             if (i % 3 == 0) {
                 relativePlatformY -= 150
             }
@@ -97,7 +96,7 @@ const tumbling_bridge_act_1 = () => {
             relativeInitialPlatformY = 450
         }
 
-        platformObj = spawn_object_relative(0, relativePlatformX, relativePlatformY + relativeInitialPlatformY, relativePlatformZ, o, sTumblingBridgeParams[bridgeID].model, bhvTumblingBridgePlatform)
+        platformObj = spawn_object_relative(0, relativePlatformX, relativePlatformY + relativeInitialPlatformY, relativePlatformZ, o, sTumblingBridgeParams[bridgeID].model, gLinker.behaviors.bhvTumblingBridgePlatform)
         
         platformObj.collisionData = sTumblingBridgeParams[bridgeID].collision
     }
@@ -109,7 +108,7 @@ const tumbling_bridge_act_2 = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
 
     cur_obj_hide()
-    if (cur_obj_has_behavior(bhvLllTumblingBridge)) {
+    if (cur_obj_has_behavior(bhvLLLTumblingBridge)) {
         cur_obj_unhide()
     } else if (o.rawData[oDistanceToMario] > 1200.0) {
         o.rawData[oAction] = 3

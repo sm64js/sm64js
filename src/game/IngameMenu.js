@@ -998,7 +998,7 @@ class IngameMenu {
     // "Dear Mario" message handler
     print_peach_letter_message() {
         let dialogTable = seg2_dialog_table;
-        let dialog = this.gDialogID;
+        let dialog = dialogTable[this.gDialogID];
         let str = dialog.str;
 
         this.create_dl_translation_matrix(MENU_MTX_PUSH, 97.0, 118.0, 0);

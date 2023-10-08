@@ -9,6 +9,7 @@ import { LevelUpdateInstance as LevelUpdate } from "../game/LevelUpdate"
 import { init_graph_node_start } from "./graph_node"
 import { ObjectListProcessorInstance as ObjectListProcessor } from "../game/ObjectListProcessor"
 import { DEGREES } from "../game/Camera"
+import { IngameMenuInstance as IngameMenu } from "../game/IngameMenu"
 
 const SCRIPT_RUNNING = 1
 const SCRIPT_PAUSED = 0
@@ -220,6 +221,8 @@ class LevelCommands {
     }
 
     free_level_pool() {
+        gLinker.ObjectListProcessor.gCCMEnteredSlide = 0;
+        IngameMenu.reset_red_coins_collected();
         this.sCurrentScript.index++
     }
 

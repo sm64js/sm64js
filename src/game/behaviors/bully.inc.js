@@ -4,7 +4,7 @@ import { MODEL_BULLY, MODEL_YELLOW_COIN } from "../../include/model_ids"
 import { ACTIVE_FLAG_DEACTIVATED, BULLY_ACT_ACTIVATE_AND_FALL, BULLY_ACT_BACK_UP, BULLY_ACT_CHASE_MARIO, BULLY_ACT_DEATH_PLANE_DEATH, BULLY_ACT_INACTIVE, BULLY_ACT_KNOCKBACK, BULLY_ACT_LAVA_DEATH, BULLY_ACT_PATROL, BULLY_BP_SIZE_BIG, BULLY_BP_SIZE_SMALL, BULLY_STYPE_CHILL, BULLY_STYPE_MINION, oAction, oBehParams2ndByte, OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW, oBullyKBTimerAndMinionKOCounter, oBullyMarioCollisionAngle, oBullyPrevX, oBullyPrevY, oBullyPrevZ, oBullySubtype, oBuoyancy, oFaceAngleYaw, oFlags, oForwardVel, oFriction, oGravity, oHomeX, oHomeY, oHomeZ, oInteractStatus, oMoveAngleYaw, oPosX, oPosY, oPosZ, oTimer, oVelY } from "../../include/object_constants"
 import { SOUND_GENERAL_COIN_SPURT, SOUND_OBJ2_BULLY_ATTACKED, SOUND_OBJ2_LARGE_BULLY_ATTACKED, SOUND_OBJ_BULLY_WALK, SOUND_OBJ_BULLY_WALKING, SOUND_OBJ_THWOMP } from "../../include/sounds"
 import { random_float } from "../../utils"
-import { bhvLllTumblingBridge, bhvMovingYellowCoin, bhvSmallBully } from "../BehaviorData"
+import { bhvMovingYellowCoin, bhvSmallBully } from "../BehaviorData"
 import { CameraInstance, SHAKE_POS_SMALL } from "../Camera"
 import { INTERACT_BULLY, INT_STATUS_INTERACTED } from "../Interaction"
 import { is_point_within_radius_of_mario, object_step, obj_check_floor_death, OBJ_COL_FLAGS_LANDED, OBJ_COL_FLAG_GROUNDED, OBJ_COL_FLAG_NO_Y_VEL, obj_lava_death, obj_return_home_if_safe, set_object_visibility, sObjFloor } from "../ObjBehaviors"
@@ -242,7 +242,7 @@ const bully_act_level_death = () => {
                 //spawn_default_star(130.0, 1600.0, -4335.0)
             } else {
                 //spawn_default_star(0, 950.0f, -6800.0f)
-                spawn_object_abs_with_rot(o, MODEL_NONE, bhvLllTumblingBridge, 0, 154, -5631, 0, 0, 0)
+                spawn_object_abs_with_rot(o, MODEL_NONE, gLinker.behaviors.bhvLLLTumblingBridge, 0, 154, -5631, 0, 0, 0)
             }
         }
     }

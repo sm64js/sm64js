@@ -25,10 +25,6 @@ import { obj_mark_for_deletion,
          cur_obj_scale                          } from "../ObjectHelpers"
 import { MODEL_SMALL_WATER_SPLASH,
          MODEL_WHITE_PARTICLE_SMALL             } from "../../include/model_ids"
-import { bhvBubbleSplash,
-         bhvObjectWaterSplash,
-         bhvSmallParticleBubbles,
-         bhvSmallParticle                       } from "../BehaviorData"
 import { sins,
          s32,
          random_float                           } from "../../utils"

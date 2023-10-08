@@ -79,10 +79,10 @@ const script_func_local_1 = [
 
 const script_func_local_2 = [
     OBJECT(/*model*/ MODEL_HMC_METAL_PLATFORM,     /*pos*/  1100,    950,   6350,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvControllablePlatform'),
-    OBJECT(/*model*/ MODEL_HMC_ELEVATOR_PLATFORM,  /*pos*/ -3243,   1434,   1392,  /*angle*/ 0,   27,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvHmcElevatorPlatform'),
-    OBJECT(/*model*/ MODEL_HMC_ELEVATOR_PLATFORM,  /*pos*/ -2816,   2253,  -2509,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvHmcElevatorPlatform'),
-    OBJECT(/*model*/ MODEL_HMC_ELEVATOR_PLATFORM,  /*pos*/  -973,   1741,  -7347,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00020000,  /*beh*/ 'bhvHmcElevatorPlatform'),
-    OBJECT(/*model*/ MODEL_HMC_ELEVATOR_PLATFORM,  /*pos*/ -3533,   1741,  -7040,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00030000,  /*beh*/ 'bhvHmcElevatorPlatform'),
+    OBJECT(/*model*/ MODEL_HMC_ELEVATOR_PLATFORM,  /*pos*/ -3243,   1434,   1392,  /*angle*/ 0,   27,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvHMCElevatorPlatform'),
+    OBJECT(/*model*/ MODEL_HMC_ELEVATOR_PLATFORM,  /*pos*/ -2816,   2253,  -2509,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvHMCElevatorPlatform'),
+    OBJECT(/*model*/ MODEL_HMC_ELEVATOR_PLATFORM,  /*pos*/  -973,   1741,  -7347,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00020000,  /*beh*/ 'bhvHMCElevatorPlatform'),
+    OBJECT(/*model*/ MODEL_HMC_ELEVATOR_PLATFORM,  /*pos*/ -3533,   1741,  -7040,  /*angle*/ 0,    0,  0,  /*behParam*/ 0x00030000,  /*beh*/ 'bhvHMCElevatorPlatform'),
     OBJECT(/*model*/ MODEL_NONE,                   /*pos*/   614,  -4690,   2330,  /*angle*/ 0,  270,  0,  /*behParam*/ 0x00010000,  /*beh*/ 'bhvOpenableGrill'),
     OBJECT(/*model*/ MODEL_PURPLE_SWITCH,          /*pos*/  -307,  -4997,   2483,  /*angle*/ 0,  270,  0,  /*behParam*/ 0x00000000,  /*beh*/ 'bhvFloorSwitchGrills'),
     OBJECT(/*model*/ MODEL_CHECKERBOARD_PLATFORM,  /*pos*/  1270,   2000,   4000,  /*angle*/ 0,  270,  0,  /*behParam*/ 0x09A40000,  /*beh*/ 'bhvPlatformOnTrack'),

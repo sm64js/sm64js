@@ -635,6 +635,27 @@ class Camera {
             panDist: 0,
             cannonYOffset: 0,
         }
+
+        this.sModeInfo = {
+            newMode: 0,
+            lastMode: 0,
+            max: 0,
+            frame: 0,
+            transitionStart: {
+                focus: [0, 0, 0],
+                pos: [0, 0, 0],
+                dist: 0,
+                pitch: 0,
+                yaw: 0
+            },
+            transitionEnd: {
+                focus: [0, 0, 0],
+                pos: [0, 0, 0],
+                dist: 0,
+                pitch: 0,
+                yaw: 0
+            }
+        }
         
         this.sCutsceneSplineSegment = 0
         this.sCutsceneSplineSegmentProgress = 0
@@ -2063,7 +2084,7 @@ class Camera {
         let yOff = 125.0
 
         this.sAreaYaw = camYaw - this.sModeOffsetYaw - DEGREES(180)
-        wrapper = {}
+        const wrapper = {}
         this.calc_y_to_curr_floor(wrapper, 1.0, 200.0, wrapper, 0.9, 200.0)
         this.focus_on_mario(focus, pos, wrapper.posOff + yOff, wrapper.focOff + yOff, this.sLakituDist + baseDist, pitch, camYaw)
         
@@ -3686,8 +3707,8 @@ class Camera {
      */
 
     set_camera_mode(c, mode, frames) {
-        const start = this.sModeInfo.transitionStart
-        const end = this.sModeInfo.transitionEnd
+        let start = this.sModeInfo.transitionStart
+        let end = this.sModeInfo.transitionEnd
 
         if (mode == CAMERA_MODE_WATER_SURFACE && this.gCurrLevelArea == AREA_TTM_OUTSIDE) {
 
@@ -3745,9 +3766,7 @@ class Camera {
      */
     update_lakitu(c) {
         let newPos = [0,0,0], newFoc = [0,0,0]
-
-        if (this.gCameraMovementFlags & CAM_MOVE_PAUSE_SCREEN) {
-        } else {
+        if (!(this.gCameraMovementFlags & CAM_MOVE_PAUSE_SCREEN)) {
             let newYaw = this.next_lakitu_state(newPos, newFoc, c.pos, c.focus, this.sOldPosition, this.sOldFocus, c.nextYaw)
 
             let wrapper = { current: c.yaw }
@@ -3765,6 +3784,7 @@ class Camera {
             vec3f_copy(this.gLakituState.goalFocus, c.focus)
 
             // Simulate lakitu flying to the new position and turning towards the new focus
+            //console.log("lakitu pos: " + this.gLakituState.pos + " goal: " + newPos)
             this.set_or_approach_vec3f_asymptotic(this.gLakituState.curPos, newPos,
                                                  this.gLakituState.posHSpeed, this.gLakituState.posVSpeed,
                                                  this.gLakituState.posHSpeed)
@@ -3793,7 +3813,6 @@ class Camera {
             } else {
                 this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
             }
-
             vec3f_copy(this.gLakituState.pos, this.gLakituState.curPos)
             vec3f_copy(this.gLakituState.focus, this.gLakituState.curFocus)
 
@@ -4046,16 +4065,13 @@ class Camera {
         this.gCutsceneObjSpawn = 0
         this.gObjCutsceneDone = false
         this.gCutsceneFocus = null
-
         this.gSecondCameraFocus = null
         this.sCButtonsPressed = 0
         vec3f_copy(this.sModeTransition.marioPos, this.gPlayerCameraState.pos)
         this.sModeTransition.framesLeft = 0
-
         this.gCameraMovementFlags = 0
         this.gCameraMovementFlags |= CAM_MOVE_INIT_CAMERA
         this.sStatusFlags = 0
-
         this.sCameraSoundFlags = 0
         this.sCUpCameraPitch = 0
         this.sModeOffsetYaw = 0
@@ -4068,44 +4084,26 @@ class Camera {
         this.sCannonYOffset = 0
         this.sZoomAmount = 0
         this.sZeroZoomDist = 0
-
-        this.sModeInfo = {
-            newMode: 0,
-            lastMode: 0,
-            max: 0,
-            frame: 0,
-            transitionStart: {
-                focus: [0, 0, 0],
-                pos: [0, 0, 0],
-                dist: 0,
-                pitch: 0,
-                yaw: 0
-            },
-            transitionEnd: {
-                focus: [0, 0, 0],
-                pos: [0, 0, 0],
-                dist: 0,
-                pitch: 0,
-                yaw: 0
-            }
-        }
-
-        this.sBehindMarioSoundTimer = 0
-        this.sCSideButtonYaw = 0
-        this.s8DirModeBaseYaw = 0
-        this.s8DirModeYawOffset = 0
+        this.sBehindMarioSoundTimer = 0;
+        this.sCSideButtonYaw = 0;
+        this.s8DirModeBaseYaw = 0;
+        this.s8DirModeYawOffset = 0;
         c.doorStatus = DOOR_DEFAULT
-
         this.gPlayerCameraState.headRotation[0] = 0
         this.gPlayerCameraState.headRotation[1] = 0
-
         this.gPlayerCameraState.cameraEvent = 0
         this.gPlayerCameraState.usedObj = null
-
+        this.gLakituState.shakeMagnitude[0] = 0
+        this.gLakituState.shakeMagnitude[1] = 0
+        this.gLakituState.shakeMagnitude[2] = 0
         this.gLakituState.lastFrameAction = 0
         this.sFOVState.fovFunc = CAM_FOV_DEFAULT
         this.sFOVState.fov = 45
         this.sFOVState.fovOffset = 0
+        this.sFOVState.shakeAmplitude = 0.0
+        this.sFOVState.shakePhase = 0.0
+        this.sObjectCutscene = 0
+        this.gRecentCutscene = 0
     }
 
     init_camera(c) {
@@ -4120,7 +4118,6 @@ class Camera {
         this.gLakituState.posHSpeed = 0.3
         this.gLakituState.posVSpeed = 0.3
         this.gLakituState.focHSpeed = 0.8
-        this.gLakituState.focHSpeed = 0.3 // @bug set focHSpeed back-to-back
         this.gLakituState.roll = 0
         this.gLakituState.keyDanceRoll = 0
         this.sHandheldShakeMag = 0
@@ -4813,7 +4810,7 @@ class Camera {
         if (divisor == 0) {
             return target
         } else {
-            return ((current - target) - temp / divisor) + target
+            return ((current - target) - (current - target) / divisor) + target
         }
     }
 
@@ -5470,11 +5467,13 @@ class Camera {
      * pyramid or TTC.
      */
     offset_yaw_outward_radial(c, areaYaw) {
+        const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
         let yawGoal = DEGREES(60)
         let yaw = this.sModeOffsetYaw
         let distFromAreaCenter
         let areaCenter = [0, 0, 0]
         let dYaw
+        const yawWrapper = {}
         switch (this.gCurrLevelArea) {
             case AREA_TTC:
                 areaCenter[0] = c.areaCenX
@@ -5518,7 +5517,7 @@ class Camera {
             //! Maybe they meant to reverse yawGoal's sign?
             this.camera_approach_s16_symmetric_bool(yawWrapper, yawGoal, 0x200)
         }
-        return yaw
+        return yawWrapper.current
     }
 
     /**
@@ -6084,8 +6083,8 @@ class Camera {
         let angleTimer = this.sModeTransition.framesLeft
         
         // If not transitioning, just use gCamera's current pos and foc
-        vec3f_copy(newPos, curPos)
-        vec3f_copy(newFoc, curFoc)
+        vec3f_copy(newPos, curPos);
+        vec3f_copy(newFoc, curFoc);
 
         if (this.sStatusFlags & CAM_FLAG_START_TRANSITION) {
             for (let i = 0; i < 3; i++) {
@@ -6095,62 +6094,53 @@ class Camera {
                 startFoc[i] = oldFoc[i] + this.gPlayerCameraState.pos[i] - this.sModeTransition.marioPos[i]
             }
 
-            this.sModeTransition.focDist = MathUtil.sqrtf((startFoc[0] - curFoc[0]) ** 2 + (startFoc[1] - curFoc[1]) ** 2 + (startFoc[2] - curFoc[2]) ** 2)
-            this.sModeTransition.focPitch = MathUtil.atan2s(MathUtil.sqrtf((startFoc[0] - curFoc[0]) ** 2 + (startFoc[1] - curFoc[1]) ** 2 + (startFoc[2] - curFoc[2]) ** 2))
-            this.sModeTransition.focYaw = MathUtil.atan2s((startFoc[0] - curFoc[0]) ** 2 + (startFoc[1] - curFoc[1]) ** 2 + (startFoc[2] - curFoc[2]) ** 2)
-
-            this.sModeTransition.posDist = MathUtil.sqrtf((startPos[0] - curFoc[0]) ** 2 + (startPos[1] - curFoc[1]) ** 2 + (startPos[2] - curFoc[2]) ** 2)
-            this.sModeTransition.posPitch = MathUtil.atan2s(MathUtil.sqrtf((startPos[0] - curFoc[0]) ** 2 + (startPos[1] - curFoc[1]) ** 2 + (startPos[2] - curFoc[2]) ** 2))
-            this.sModeTransition.posYaw = MathUtil.atan2s((startPos[0] - curFoc[0]) ** 2 + (startPos[1] - curFoc[1]) ** 2 + (startPos[2] - curFoc[2]) ** 2)
+            vec3f_get_dist_and_angle(curFoc, startFoc, wrapper);
+            this.sModeTransition.focDist = wrapper.dist; this.sModeTransition.focPitch = wrapper.pitch; this.sModeTransition.focYaw = wrapper.yaw;
+            vec3f_get_dist_and_angle(curFoc, startPos, wrapper);
+            this.sModeTransition.posDist = wrapper.dist; this.sModeTransition.posPitch = wrapper.pitch; this.sModeTransition.posYaw = wrapper.yaw;
             
             this.sStatusFlags &= ~CAM_FLAG_START_TRANSITION
         }
 
         // Transition from the last mode to the current one
         if (this.sModeTransition.framesLeft > 0) {
-            goalDist = MathUtil.sqrtf((curPos[0] - curFoc[0]) ** 2 + (curPos[1] - curFoc[1]) ** 2 + (curPos[2] - curFoc[2]) ** 2)
-            goalPitch = MathUtil.atan2s(MathUtil.sqrtf((curPos[0] - curFoc[0]) ** 2 + (curPos[1] - curFoc[1]) ** 2 + (curPos[2] - curFoc[2]) ** 2))
-            goalYaw = MathUtil.atan2s((curPos[0] - curFoc[0]) ** 2 + (curPos[1] - curFoc[1]) ** 2 + (curPos[2] - curFoc[2]) ** 2)
-            
+            vec3f_get_dist_and_angle(curFoc, startFoc, wrapper)
+            goalDist = wrapper.dist; goalPitch = wrapper.pitch; goalYaw = wrapper.yaw;
             distVelocity = Math.abs(goalDist - this.sModeTransition.posDist) / distTimer;
             pitchVelocity = Math.abs(goalPitch - this.sModeTransition.posPitch) / angleTimer;
             yawVelocity = Math.abs(goalYaw - this.sModeTransition.posYaw) / angleTimer;
 
-            wrapper = { current: this.sModeTransition.posDist }
+            wrapper.current = this.sModeTransition.posDist
             this.camera_approach_f32_symmetric_bool(wrapper, goalDist, distVelocity)
             this.sModeTransition.posDist = wrapper.current
             wrapper.current = this.sModeTransition.posYaw
-            this.camera_approach_f32_symmetric_bool(wrapper, goalYaw, yawVelocity)
+            this.camera_approach_s16_symmetric_bool(wrapper, goalYaw, yawVelocity)
             this.sModeTransition.posYaw = wrapper.current
             wrapper.current = this.sModeTransition.posPitch
-            this.camera_approach_f32_symmetric_bool(wrapper, goalPitch, pitchVelocity)
+            this.camera_approach_s16_symmetric_bool(wrapper, goalPitch, pitchVelocity)
             this.sModeTransition.posPitch = wrapper.current
 
-            this.sModeTransition.posDist = MathUtil.sqrtf((nextPos[0] - curFoc[0]) ** 2 + (nextPos[1] - curFoc[1]) ** 2 + (nextPos[2] - curFoc[2]) ** 2)
-            this.sModeTransition.posPitch = MathUtil.atan2s(MathUtil.sqrtf((nextPos[0] - curFoc[0]) ** 2 + (nextPos[1] - curFoc[1]) ** 2 + (nextPos[2] - curFoc[2]) ** 2))
-            this.sModeTransition.posYaw = MathUtil.atan2s((nextPos[0] - curFoc[0]) ** 2 + (nextPos[1] - curFoc[1]) ** 2 + (nextPos[2] - curFoc[2]) ** 2)
+            vec3f_set_dist_and_angle(curFoc, nextPos, this.sModeTransition.posDist, this.sModeTransition.posPitch, this.sModeTransition.posYaw);
 
-            goalDist = MathUtil.sqrtf((curFoc[0] - curPos[0]) ** 2 + (curFoc[1] - curPos[1]) ** 2 + (curFoc[2] - curPos[2]) ** 2)
-            goalPitch = MathUtil.atan2s(MathUtil.sqrtf((curFoc[0] - curPos[0]) ** 2 + (curFoc[1] - curPos[1]) ** 2 + (curFoc[2] - curPos[2]) ** 2))
-            goalYaw = MathUtil.atan2s((curPos[0] - curPos[0]) ** 2 + (curFoc[1] - curPos[1]) ** 2 + (curFoc[2] - curPos[2]) ** 2)
+            const output = {}
+            vec3f_get_dist_and_angle(curPos, curFoc, output)
+            goalDist = output.dist; goalPitch = output.pitch; goalYaw = output.yaw;
         
             pitchVelocity = this.sModeTransition.focPitch / this.sModeTransition.framesLeft
             yawVelocity = this.sModeTransition.focYaw / this.sModeTransition.framesLeft
             distVelocity = this.sModeTransition.focDist / this.sModeTransition.framesLeft
 
-            wrapper = { current: this.sModeTransition.focDist }
-            this.camera_approach_f32_symmetric_bool(wrapper, goalDist, distVelocity)
-            this.sModeTransition.focDist = wrapper.current
-            wrapper.current = this.sModeTransition.focYaw
-            this.camera_approach_f32_symmetric_bool(wrapper, goalYaw, yawVelocity)
-            this.sModeTransition.focYaw = wrapper.current
             wrapper.current = this.sModeTransition.focPitch
             this.camera_approach_f32_symmetric_bool(wrapper, goalPitch, pitchVelocity)
             this.sModeTransition.focPitch = wrapper.current
+            wrapper.current = this.sModeTransition.focYaw
+            this.camera_approach_s16_symmetric_bool(wrapper, goalYaw, yawVelocity)
+            this.sModeTransition.focYaw = wrapper.current
+            wrapper = { current: this.sModeTransition.focDist }
+            this.camera_approach_s16_symmetric_bool(wrapper, 0, distVelocity)
+            this.sModeTransition.focDist = wrapper.current
 
-            goalDist = MathUtil.sqrtf((curFoc[0] - nextFoc[0]) ** 2 + (curFoc[1] - nextFoc[1]) ** 2 + (curFoc[2] - nextFoc[2]) ** 2)
-            goalPitch = MathUtil.atan2s(MathUtil.sqrtf((curFoc[0] - nextFoc[0]) ** 2 + (curFoc[1] - nextFoc[1]) ** 2 + (curFoc[2] - nextFoc[2]) ** 2))
-            goalYaw = MathUtil.atan2s((curFoc[0] - nextFoc[0]) ** 2 + (curFoc[1] - nextFoc[1]) ** 2 + (curFoc[2] - nextFoc[2]) ** 2)
+            vec3f_set_dist_and_angle(curFoc, nextFoc, this.sModeTransition.focDist, this.sModeTransition.focPitch, this.sModeTransition.focYaw);
         
             this.vec3f_copy(newFoc, nextFoc)
             this.vec3f_copy(newPos, nextPos)
@@ -6165,6 +6155,7 @@ class Camera {
                 }
                 wrapper = { x: newPos[0], y: newPos[1], z: newPos[2] }
                 SurfaceCollision.f32_find_wall_collision(wrapper, 0.0, 100.0)
+                newPos[0] = wrapper.x; newPos[1] = wrapper.y; newPos[2] = wrapper.z;
             }
             this.sModeTransition.framesLeft--
             yaw = this.calculate_yaw(newFoc, newPos)
@@ -6174,7 +6165,6 @@ class Camera {
             this.sModeTransition.posYaw = 0
             this.sStatusFlags &= ~CAM_FLAG_TRANSITION_OUT_OF_C_UP
         }
-
         this.vec3f_copy(this.sModeTransition.marioPos, this.gPlayerCameraState.pos)
         return yaw
     }
@@ -6448,7 +6438,7 @@ class Camera {
      * Used in both the castle and HMC.
      */
     cam_castle_hmc_start_pool_cutscene(c) {
-        if ((this.gPlayerCameraState.action != Mario.ACT_SPECIAL_DEATH_EXIT) && (this.gPlayerCameraState.action != ACT_SPECIAL_EXIT_AIRBORNE)) {
+        if ((this.gPlayerCameraState.action != Mario.ACT_SPECIAL_DEATH_EXIT) && (this.gPlayerCameraState.action != Mario.ACT_SPECIAL_EXIT_AIRBORNE)) {
             this.start_cutscene(c, CUTSCENE_ENTER_POOL)
         }
     }
@@ -7996,7 +7986,7 @@ class Camera {
     }
 
     cutscene_intro_peach_start_to_pipe_spline(c) {
-        console.log(this.sCutsceneSplineSegment, sIntroPipeToDialogPosition[this.sCutsceneSplineSegment].point)
+        console.log(this.gLakituState.pos)
         if (this.intro_peach_move_camera_start_to_pipe(c, sIntroPipeToDialogPosition, sIntroPipeToDialogFocus) != 0) {
             this.gCameraMovementFlags &= ~CAM_MOVE_C_UP_MODE;
             this.gCutsceneTimer = CUTSCENE_LOOP;
@@ -8850,7 +8840,7 @@ class Camera {
      */
     geo_camera_fov(callContext, graphNode) {
 
-        const marioState = LevelUpdate.gMarioState
+        const marioState = gLinker.LevelUpdate.gMarioState
         const fovFunc = this.sFOVState.fovFunc
 
         if (callContext == GEO_CONTEXT_RENDER) {

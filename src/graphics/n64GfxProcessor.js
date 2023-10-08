@@ -35,7 +35,7 @@ const MAX_VERTICES = 64
 const RATIO_X = WebGL.canvas.width / (2.0 * 320.0)
 const RATIO_Y = WebGL.canvas.height / (2.0 * 240.0)
 
-let prev_op = 0
+let prev_op = []
 
 export class n64GfxProcessor {
     constructor() {
@@ -1056,100 +1056,124 @@ export class n64GfxProcessor {
     }
 
     run_dl(commands) {
+        let next_op = []
         try {
-        for (const command of commands) {
-            const opcode = command.words.w0
-            const args = command.words.w1
+            for (const command of commands) {
+                const opcode = command.words.w0
+                const args = command.words.w1
+                next_op = [opcode, args]
 
-            switch (opcode) {
-                case Gbi.G_ENDDL: /// not necessary for JS
-                    break
-                case Gbi.G_MOVEMEM:
-                    this.sp_movemem(args.type, args.data, args.index)
-                    break
-                case Gbi.G_MTX:
-                    this.sp_matrix(args.parameters, args.matrix)
-                    break
-                case Gbi.G_VTX:
-                    this.sp_vertex(args.dest_index, args.vertices)
-                    break
-                case Gbi.G_TRI1:
-                    this.sp_tri1(args.v0, args.v1, args.v2)
-                    break
-                case Gbi.G_MOVEWORD:
-                    this.sp_moveword(args.type, args.data)
-                    break
-                case Gbi.G_SETGEOMETRYMODE:
-                    this.sp_geometry_mode(0, args.mode)
-                    break
-                case Gbi.G_CLEARGEOMETRYMODE:
-                    this.sp_geometry_mode(args.mode, 0)
-                    break
-                case Gbi.G_SETFOGCOLOR:
-                    this.dp_set_fog_color(args.r, args.g, args.g, args.a)
-                    break
-                case Gbi.G_SETOTHERMODE_H:
-                    this.sp_set_other_mode_h(args.category, args.newmode)
-                    break
-                case Gbi.G_SETOTHERMODE_L:
-                    this.sp_set_other_mode_l(args.mode)
-                    break
-                case Gbi.G_SETCOMBINE:
-                    const rgb = this.color_comb(args.mode.rgb[0], args.mode.rgb[1], args.mode.rgb[2], args.mode.rgb[3])
-                    const alpha = this.color_comb(args.mode.alpha[0], args.mode.alpha[1], args.mode.alpha[2], args.mode.alpha[3])
-                    this.dp_set_combine_mode(rgb, alpha)
-                    break
-                case Gbi.G_SETTIMG:
-                    this.dp_set_texture_image(args.size, args.imageData)
-                    break
-                case Gbi.G_SETTILE:
-                    this.dp_set_tile(args.fmt, args.siz, args.line, args.tmem, args.tile, args.palette, args.cmt, args.cms)
-                    break
-                case Gbi.G_SETTILESIZE:
-                    this.dp_set_tile_size(args.t, args.uls, args.ult, args.lrs, args.lrt)
-                    break
-                case Gbi.G_TEXTURE:
-                    this.sp_texture(args.s, args.t)
-                    break
-                case Gbi.G_LOADBLOCK:
-                    this.dp_load_block(args.tile, args.uls, args.ult, args.lrs)
-                    break
-                case Gbi.G_SETFILLCOLOR:
-                    this.dp_set_fill_color(args.color)
-                    break
-                case Gbi.G_SETENVCOLOR:
-                    this.dp_set_env_color(args.r, args.g, args.g, args.a)
-                    break
-                case Gbi.G_SETPRIMCOLOR:
-                    this.dp_set_prim_color(args.r, args.g, args.g, args.a)
-                    break
-                case Gbi.G_FILLRECT:
-                    this.dp_fill_rectangle(args.ulx, args.uly, args.lrx, args.lry)
-                    break
-                case Gbi.G_SETSCISSOR:
-                    this.dp_set_scissor(args.ulx, args.uly, args.lrx, args.lry);
-                    break;
-                case Gbi.G_TEXRECT:
-                case Gbi.G_TEXRECTFLIP:
-                    this.dp_texture_rectangle(args.ulx, args.uly, args.lrx, args.lry, args.tile, args.uls, args.ult, args.dsdx, args.dtdy, opcode == Gbi.G_TEXRECTFLIP)
-                    break
-                case Gbi.G_DL:
-                    if (args.branch == 0) {
-                        this.run_dl(args.childDisplayList)
-                    } else {
-                        this.run_dl(args.childDisplayList)
-                        return
-                    }
-                    break
-                default:
-                    console.log(command)
-                    throw "unimplemented gfx opcode: " + opcode
+                switch (opcode) {
+                    case Gbi.G_ENDDL: /// not necessary for JS
+                        prev_op = ["G_ENDDL"]
+                        break
+                    case Gbi.G_MOVEMEM:
+                        this.sp_movemem(args.type, args.data, args.index)
+                        prev_op = ["G_MOVEMEM", `Type: ${args.type}, Data: ${args.data}, Index: ${args.index}`]
+                        break
+                    case Gbi.G_MTX:
+                        this.sp_matrix(args.parameters, args.matrix)
+                        prev_op = ["G_MTX", `Parameters: ${args.parameters}, Matrix: ${args.matrix}`]
+                        break
+                    case Gbi.G_VTX:
+                        this.sp_vertex(args.dest_index, args.vertices)
+                        prev_op = ["G_VTX", `Dest Index: ${args.dest_index}, Vertices: ${args.vertices}`]
+                        break
+                    case Gbi.G_TRI1:
+                        this.sp_tri1(args.v0, args.v1, args.v2)
+                        prev_op = ["G_TRI1", `V0: ${args.v0}, V1: ${args.v1}, V2: ${args.v2}`]
+                        break
+                    case Gbi.G_MOVEWORD:
+                        this.sp_moveword(args.type, args.data)
+                        prev_op = ["G_MOVEWORD", `Type: ${args.type}, Data: ${args.data}`]
+                        break
+                    case Gbi.G_SETGEOMETRYMODE:
+                        this.sp_geometry_mode(0, args.mode)
+                        prev_op = ["G_SETGEOMETRYMODE", `Mode: ${args.mode}`]
+                        break
+                    case Gbi.G_CLEARGEOMETRYMODE:
+                        this.sp_geometry_mode(args.mode, 0)
+                        prev_op = ["G_CLEARGEOMETRYMODE", `Mode: ${args.mode}`]
+                        break
+                    case Gbi.G_SETFOGCOLOR:
+                        this.dp_set_fog_color(args.r, args.g, args.g, args.a)
+                        prev_op = ["G_SETFOGCOLOR", `R: ${args.r}, G: ${args.g}, B: ${args.b}, A: ${args.a}`]
+                        break
+                    case Gbi.G_SETOTHERMODE_H:
+                        this.sp_set_other_mode_h(args.category, args.newmode)
+                        prev_op = ["G_SETOTHERMODE_H", `Category: ${args.category}, New Mode: ${args.newmode}`]
+                        break
+                    case Gbi.G_SETOTHERMODE_L:
+                        this.sp_set_other_mode_l(args.mode)
+                        prev_op = ["G_SETOTHERMODE_L", `Mode: ${args.mode}`]
+                        break
+                    case Gbi.G_SETCOMBINE:
+                        const rgb = this.color_comb(args.mode.rgb[0], args.mode.rgb[1], args.mode.rgb[2], args.mode.rgb[3])
+                        const alpha = this.color_comb(args.mode.alpha[0], args.mode.alpha[1], args.mode.alpha[2], args.mode.alpha[3])
+                        this.dp_set_combine_mode(rgb, alpha)
+                        prev_op = ["G_SETCOMBINE", `RGB: ${rgb}, Alpha: ${alpha}`]
+                        break
+                    case Gbi.G_SETTIMG:
+                        this.dp_set_texture_image(args.size, args.imageData)
+                        prev_op = ["G_SETTIMG", `Size: ${args.size}, Image Data: ${args.imageData}`]
+                        break
+                    case Gbi.G_SETTILE:
+                        this.dp_set_tile(args.fmt, args.siz, args.line, args.tmem, args.tile, args.palette, args.cmt, args.cms)
+                        prev_op = ["G_SETTILE", `Fmt: ${args.fmt}, Siz: ${args.siz}, Line: ${args.line}, Tmem: ${args.tmem}, Tile: ${args.tile}, Palette: ${args.palette}, Cmt: ${args.cmt}, Cms: ${args.cms}`]
+                        break
+                    case Gbi.G_SETTILESIZE:
+                        this.dp_set_tile_size(args.t, args.uls, args.ult, args.lrs, args.lrt)
+                        prev_op = ["G_SETTILESIZE", `T: ${args.t}, Uls: ${args.uls}, Ult: ${args.ult}, Lrs: ${args.lrs}, Lrt: ${args.lrt}`]
+                        break
+                    case Gbi.G_TEXTURE:
+                        this.sp_texture(args.s, args.t)
+                        prev_op = ["G_TEXTURE", `S: ${args.s}, T: ${args.t}`]
+                        break
+                    case Gbi.G_LOADBLOCK:
+                        this.dp_load_block(args.tile, args.uls, args.ult, args.lrs)
+                        prev_op = ["G_LOADBLOCK", `Tile: ${args.tile}, Uls: ${args.uls}, Ult: ${args.ult}, Lrs: ${args.lrs}`]
+                        break
+                    case Gbi.G_SETFILLCOLOR:
+                        this.dp_set_fill_color(args.color)
+                        prev_op = ["G_SETFILLCOLOR", `Color: ${args.color}`]
+                        break
+                    case Gbi.G_SETENVCOLOR:
+                        this.dp_set_env_color(args.r, args.g, args.g, args.a)
+                        prev_op = ["G_SETENVCOLOR", `R: ${args.r}, G: ${args.g}, B: ${args.b}, A: ${args.a}`]
+                        break
+                    case Gbi.G_SETPRIMCOLOR:
+                        this.dp_set_prim_color(args.r, args.g, args.g, args.a)
+                        prev_op = ["G_SETPRIMCOLOR", `R: ${args.r}, G: ${args.g}, B: ${args.b}, A: ${args.a}`]
+                        break
+                    case Gbi.G_FILLRECT:
+                        this.dp_fill_rectangle(args.ulx, args.uly, args.lrx, args.lry)
+                        prev_op = ["G_FILLRECT", `Ulx: ${args.ulx}, Uly: ${args.uly}, Lrx: ${args.lrx}, Lry: ${args.lry}`]
+                        break
+                    case Gbi.G_SETSCISSOR:
+                        this.dp_set_scissor(args.ulx, args.uly, args.lrx, args.lry);
+                        prev_op = ["G_SETSCISSOR", `Ulx: ${args.ulx}, Uly: ${args.uly}, Lrx: ${args.lrx}, Lry: ${args.lry}`]
+                        break;
+                    case Gbi.G_TEXRECT:
+                    case Gbi.G_TEXRECTFLIP:
+                        this.dp_texture_rectangle(args.ulx, args.uly, args.lrx, args.lry, args.tile, args.uls, args.ult, args.dsdx, args.dtdy, opcode == Gbi.G_TEXRECTFLIP)
+                        prev_op = ["G_TEXRECT", `Ulx: ${args.ulx}, Uly: ${args.uly}, Lrx: ${args.lrx}, Lry: ${args.lry}, Tile: ${args.tile}, Uls: ${args.uls}, Ult: ${args.ult}, Dsdx: ${args.dsdx}, Dtdy: ${args.dtdy}, Flip: ${opcode == Gbi.G_TEXRECTFLIP}`]
+                        break
+                    case Gbi.G_DL:
+                        if (args.branch == 0) {
+                            this.run_dl(args.childDisplayList)
+                        } else {
+                            this.run_dl(args.childDisplayList)
+                            return
+                        }
+                        prev_op = ["G_DL", `Branch: ${args.branch}, Child Display List: ${args.childDisplayList}`]
+                        break
+                    default:
+                        console.log(command)
+                        throw "unimplemented gfx opcode: " + opcode
+                }
             }
-
-            prev_op = opcode
-        }
         } catch (e) {
-            console.log(`Commands ran: ${prev_op} -> ${commands}\n${e}`)
+            console.log(`PREV CMD: ${prev_op[0]}, with args ${prev_op[1]} -> ${next_op[0]} : ${next_op[1]}\n${e}`)
         }
     }
 

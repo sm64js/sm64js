@@ -74,7 +74,12 @@ import { spawn_mist_particles_variable } from "./behaviors/white_puff.inc"
 import { spawn_triangle_break_particles } from "./behaviors/break_particles.inc"
 
 import { G_AC_DITHER } from "../include/gbi"
-
+import { LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC } from "../levels/level_defines_constants"
+import { CameraInstance, CUTSCENE_CAP_SWITCH_PRESS } from "./Camera"
+import { MARIO_DIALOG_STATUS_SPEAK, MARIO_DIALOG_STOP, mario_ready_to_speak, set_mario_npc_dialog } from "./MarioActionsCutscene"
+import { DIALOG_RESPONSE_NONE } from "./IngameMenu"
+import { spawn_default_star } from "./behaviors/spawn_star.inc"
+import { create_sound_spawner } from "./SpawnSound"
 
 export const WATER_DROPLET_FLAG_RAND_ANGLE                = 0x02
 export const WATER_DROPLET_FLAG_RAND_OFFSET_XZ            = 0x04 // Unused
@@ -83,6 +88,9 @@ export const WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL      = 0x20
 export const WATER_DROPLET_FLAG_RAND_ANGLE_INCR_PLUS_8000 = 0x40
 export const WATER_DROPLET_FLAG_RAND_ANGLE_INCR           = 0x80 // Unused
 
+const sBBHStairJiggleOffsets = [ -8, 8, -4, 4 ]
+const sLevelsWithRooms = [LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC]
+
 export const DebugPage = {
     DEBUG_PAGE_OBJECTINFO:       0,
     DEBUG_PAGE_CHECKSURFACEINFO: 1,
@@ -90,6 +98,357 @@ export const DebugPage = {
     DEBUG_PAGE_STAGEINFO:        3,
     DEBUG_PAGE_EFFECTINFO:       4,
     DEBUG_PAGE_ENEMYINFO:        5,
+}
+
+export const geo_update_projectile_pos_from_parent = (callContext, node, mtx) => {
+    
+    if (callContext == GEO_CONTEXT_RENDER) {
+        let sp20 = new Array(4).fill(0).map(() => new Array(4).fill(0));
+        let obj = GeoRenderer.gCurGraphNodeObject;
+
+        if (obj.prevObj) {
+            create_transformation_from_matrices(sp20, mtx, GeoRenderer.gCurGraphNodeCamera.matrixPtr);
+            obj_update_pos_from_parent_transformation(sp20, obj.prevObj);
+            obj_set_gfx_pos_from_pos(obj.prevObj);
+        }
+    }
+
+    return null;
+}
+
+export const geo_update_layer_transparency = (callerContext, node) => {
+    const dl = []
+
+    if (callerContext == GEO_CONTEXT_RENDER) {
+        let obj = GeoRenderer.gCurGraphNodeObject.object
+
+        if (GeoRenderer.gCurGraphNodeHeldObject) {
+            obj = GeoRenderer.gCurGraphNodeHeldObject.object
+        }
+
+        const opacity = obj.rawData[oOpacity]
+
+        if (opacity == 0xFF) {
+            if (node.parameter == 20) {
+                node.flags = 0x600 | (node.flags & 0xFF)
+            } else {
+                node.flags = 0x100 | (node.flags & 0xFF)
+            }
+
+            obj.rawData[oAnimState] = 0
+        } else {
+            if (node.parameter == 20) {
+                node.flags = 0x600 | (node.flags & 0xFF)
+            } else {
+                node.flags = 0x500 | (node.flags & 0xFF)
+            }
+
+            obj.rawData[oAnimState] = 1
+
+            if (opacity == 0 && gLinker.behaviors.bhvBowser == obj.behavior) {
+                obj.rawData[oAnimState] = 2
+            }
+
+            if (node.parameter != 10) {
+                if (obj.activeFlags & ACTIVE_FLAG_DITHERED_ALPHA) {
+                    Gbi.gDPSetAlphaCompare(dl, G_AC_DITHER)
+                }
+            }
+            // temp fix for vanish cap
+            if (obj.behavior == gLinker.behaviors.bhvVanishCap) {
+                Gbi.gDPSetAlphaCompare(dl, G_AC_DITHER)
+            }
+        }
+
+        Gbi.gDPSetEnvColor(dl, 255, 255, 255, opacity)
+        Gbi.gSPEndDisplayList(dl)
+    }
+
+    return dl
+}
+
+export const geo_switch_anim_state = (callerContext, node) => {
+    if (callerContext == GEO_CONTEXT_RENDER) {
+        let obj = GeoRenderer.gCurGraphNodeObject.object
+
+        if (GeoRenderer.gCurGraphNodeHeldObject) {
+            obj = GeoRenderer.gCurGraphNodeHeldObject.object
+        }
+
+        // if the case is greater than the number of cases, set to 0 to aexport const ove = rin=> g
+        // the switch.
+        if (obj.rawData[oAnimState] >= node.numCases) {
+            obj.rawData[oAnimState] = 0
+        }
+
+        node.selectedCase = obj.rawData[oAnimState]
+    }
+
+    return null
+}
+
+export const geo_switch_area = (callerContext, node) => {
+    if (callerContext == GEO_CONTEXT_RENDER) {
+        if (ObjectListProc.gMarioObject == undefined) {
+            node.selectedCase = 0
+        } else {
+            ObjectListProc.gFindFloorIncludeSurfaceIntangible = 1
+
+            const marioObj = ObjectListProc.gMarioObject
+
+            const floorWrapper = {}
+            const height = gLinker.SurfaceCollision.find_floor(marioObj.rawData[oPosX], marioObj.rawData[oPosY], marioObj.rawData[oPosZ], floorWrapper)
+
+            if (floorWrapper.floor) {
+                ObjectListProc.gMarioCurrentRoom = floorWrapper.floor.room
+                let selectedRoom = floorWrapper.floor.room - 1
+
+                if (selectedRoom >= 0) {
+                    node.selectedCase = selectedRoom
+                }
+            }
+
+        }
+    } else {
+        node.selectedCase = 0
+    }
+}
+
+export const obj_update_pos_from_parent_transformation = (a0, a1) => {
+    const spC = a1.rawData[oParentRelativePosX]
+    const sp8 = a1.rawData[oParentRelativePosY]
+    const sp4 = a1.rawData[oParentRelativePosZ]
+
+    a1.rawData[oPosX] = spC * a0[0][0] + sp8 * a0[1][0] + sp4 * a0[2][0] + a0[3][0]
+    a1.rawData[oPosY] = spC * a0[0][1] + sp8 * a0[1][1] + sp4 * a0[2][1] + a0[3][1]
+    a1.rawData[oPosZ] = spC * a0[0][2] + sp8 * a0[1][2] + sp4 * a0[2][2] + a0[3][2]
+}
+
+export const obj_apply_scale_to_matrix = (obj, dst, src) => {
+    dst[0][0] = src[0][0] * obj.gfx.scale[0]
+    dst[1][0] = src[1][0] * obj.gfx.scale[1]
+    dst[2][0] = src[2][0] * obj.gfx.scale[2]
+    dst[3][0] = src[3][0]
+
+    dst[0][1] = src[0][1] * obj.gfx.scale[0]
+    dst[1][1] = src[1][1] * obj.gfx.scale[1]
+    dst[2][1] = src[2][1] * obj.gfx.scale[2]
+    dst[3][1] = src[3][1]
+
+    dst[0][2] = src[0][2] * obj.gfx.scale[0]
+    dst[1][2] = src[1][2] * obj.gfx.scale[1]
+    dst[2][2] = src[2][2] * obj.gfx.scale[2]
+    dst[3][2] = src[3][2]
+
+    dst[0][3] = src[0][3]
+    dst[1][3] = src[1][3]
+    dst[2][3] = src[2][3]
+    dst[3][3] = src[3][3]
+}
+
+
+export const create_transformation_from_matrices = (a0, a1, a2) => {
+    let spC, sp8, sp4
+
+    spC = a2[3][0] * a2[0][0] + a2[3][1] * a2[0][1] + a2[3][2] * a2[0][2]
+    sp8 = a2[3][0] * a2[1][0] + a2[3][1] * a2[1][1] + a2[3][2] * a2[1][2]
+    sp4 = a2[3][0] * a2[2][0] + a2[3][1] * a2[2][1] + a2[3][2] * a2[2][2]
+
+    a0[0][0] = a1[0][0] * a2[0][0] + a1[0][1] * a2[0][1] + a1[0][2] * a2[0][2]
+    a0[0][1] = a1[0][0] * a2[1][0] + a1[0][1] * a2[1][1] + a1[0][2] * a2[1][2]
+    a0[0][2] = a1[0][0] * a2[2][0] + a1[0][1] * a2[2][1] + a1[0][2] * a2[2][2]
+
+    a0[1][0] = a1[1][0] * a2[0][0] + a1[1][1] * a2[0][1] + a1[1][2] * a2[0][2]
+    a0[1][1] = a1[1][0] * a2[1][0] + a1[1][1] * a2[1][1] + a1[1][2] * a2[1][2]
+    a0[1][2] = a1[1][0] * a2[2][0] + a1[1][1] * a2[2][1] + a1[1][2] * a2[2][2]
+
+    a0[2][0] = a1[2][0] * a2[0][0] + a1[2][1] * a2[0][1] + a1[2][2] * a2[0][2]
+    a0[2][1] = a1[2][0] * a2[1][0] + a1[2][1] * a2[1][1] + a1[2][2] * a2[1][2]
+    a0[2][2] = a1[2][0] * a2[2][0] + a1[2][1] * a2[2][1] + a1[2][2] * a2[2][2]
+
+    a0[3][0] = a1[3][0] * a2[0][0] + a1[3][1] * a2[0][1] + a1[3][2] * a2[0][2] - spC
+    a0[3][1] = a1[3][0] * a2[1][0] + a1[3][1] * a2[1][1] + a1[3][2] * a2[1][2] - sp8
+    a0[3][2] = a1[3][0] * a2[2][0] + a1[3][1] * a2[2][1] + a1[3][2] * a2[2][2] - sp4
+
+    a0[0][3] = 0
+    a0[1][3] = 0
+    a0[2][3] = 0
+    a0[3][3] = 1.0
+}
+
+export const obj_set_held_state = (obj, heldBehavior) => {
+    const o = ObjectListProc.gCurrentObject
+    obj.parentObj = o
+
+    heldBehavior = gLinker.Spawn.get_bhv_script(heldBehavior)
+    if (obj.rawData[oFlags] & OBJ_FLAG_HOLDABLE) {
+        if (heldBehavior == gLinker.behaviors.bhvCarrySomething3) {
+            obj.rawData[oHeldState] = HELD_HELD
+        }
+
+        if (heldBehavior == gLinker.behaviors.bhvCarrySomething5) {
+            obj.rawData[oHeldState] = HELD_THROWN
+        }
+
+        if (heldBehavior == gLinker.behaviors.bhvCarrySomething4) {
+            obj.rawData[oHeldState] = HELD_DROPPED
+        }
+    } else {
+        obj.curBhvCommand = heldBehavior
+        obj.bhvStackIndex = 0
+    }
+}
+
+export const lateral_dist_between_objects = (obj1, obj2) => {
+    const dx = obj1.rawData[oPosX] - obj2.rawData[oPosX]
+    const dz = obj1.rawData[oPosZ] - obj2.rawData[oPosZ]
+    return Math.sqrt(dx * dx + dz * dz)
+}
+
+export const dist_between_objects = (obj1, obj2) => {
+    const dx = obj1.rawData[oPosX] - obj2.rawData[oPosX]
+    const dy = obj1.rawData[oPosY] - obj2.rawData[oPosY]
+    const dz = obj1.rawData[oPosZ] - obj2.rawData[oPosZ]
+    return Math.sqrt(dx * dx + dy * dy + dz * dz)
+}
+
+export const cur_obj_forward_vel_approach_upward = (target, increment) => {
+    const o = ObjectListProc.gCurrentObject
+    if (o.rawData[oForwardVel] >= target) {
+        o.rawData[oForwardVel] = target
+    } else {
+        o.rawData[oForwardVel] += increment
+    }
+}
+
+export const approach_f32_signed = (valueWrapper, target, increment) => {
+    let reachedTarget = false;
+
+    valueWrapper.value += increment;
+
+    if (increment >= 0.0) {
+        if (valueWrapper.value > target) {
+            valueWrapper.value = target;
+            reachedTarget = true;
+        }
+    } else {
+        if (valueWrapper.value < target) {
+            valueWrapper.value = target;
+            reachedTarget = true;
+        }
+    }
+
+    return reachedTarget;
+}
+
+export const approach_f32_symmetric = (value, target, increment) => {
+    let dist = target - value;
+
+    if (dist >= 0.0) {
+        if (dist > increment) value += increment;
+        else value = target;
+    } else {
+        if (dist < -increment) value -= increment;
+        else value = target;
+    }
+}
+
+export const approach_s16_symmetric = (value, target, increment) =>{
+    let dist = s16(target - value)
+
+    if (dist >= 0) {
+        if (dist > increment) value = s16(value + increment)
+        else value = target
+    } else {
+        if (dist < -increment) value = s16(value - increment)
+        else value = target
+    }
+
+    return value
+}
+
+export const cur_obj_rotate_yaw_toward = (target, increment) => {
+
+    const o = ObjectListProc.gCurrentObject
+
+    const startYaw = parseInt(o.rawData[oMoveAngleYaw])
+    o.rawData[oMoveAngleYaw] = approach_symmetric(o.rawData[oMoveAngleYaw], target, increment)
+
+    o.rawData[oAngleVelYaw] = parseInt(o.rawData[oMoveAngleYaw] - startYaw)
+    if ((o.rawData[oAngleVelYaw]) == 0) {
+        return true
+    } else {
+        return false
+    }
+}
+
+export const obj_angle_to_object = (obj1, obj2) => {
+    const x1 = obj1.rawData[oPosX], z1 = obj1.rawData[oPosZ]
+    const x2 = obj2.rawData[oPosX], z2 = obj2.rawData[oPosZ]
+
+    return atan2s(z2 - z1, x2 - x1)
+}
+
+export const obj_turn_toward_object = (obj, target, angleIndex, turnAmount) => {
+    const o = ObjectListProc.gCurrentObject
+
+    let targetAngle, a, b, c, d
+    switch (angleIndex) {
+        case oMoveAnglePitch:
+        case oFaceAnglePitch:
+            a = target.rawData[oPosX] - obj.rawData[oPosX]
+            c = target.rawData[oPosZ] - obj.rawData[oPosZ]
+            a = Math.sqrt(a * a + c * c)
+
+            b = -obj.rawData[oPosY]
+            d = -target.rawData[oPosY]
+
+            targetAngle = atan2s(a, d - b)
+            break
+
+        case oMoveAngleYaw:
+        case oFaceAngleYaw:
+            a = obj.rawData[oPosZ]
+            c = target.rawData[oPosZ]
+            b = obj.rawData[oPosX]
+            d = target.rawData[oPosX]
+
+            targetAngle = atan2s(c - a, d - b)
+            break
+    }
+
+    const startAngle = s16(o.rawData[angleIndex])
+    o.rawData[angleIndex] = approach_symmetric(startAngle, targetAngle, turnAmount)
+    return targetAngle
+}
+
+export const obj_set_parent_relative_pos = (obj, relX, relY, relZ) => {
+    obj.rawData[oParentRelativePosX] = relX
+    obj.rawData[oParentRelativePosY] = relY
+    obj.rawData[oParentRelativePosZ] = relZ
+}
+
+export const obj_set_pos = (obj, x, y, z) => {
+    obj.rawData[oPosX] = x
+    obj.rawData[oPosY] = y
+    obj.rawData[oPosZ] = z
+}
+
+export const obj_set_angle = (obj, pitch, yaw, roll) => {
+    obj.rawData[oFaceAnglePitch] = pitch
+    obj.rawData[oFaceAngleYaw] = yaw
+    obj.rawData[oFaceAngleRoll] = roll
+
+    obj.rawData[oMoveAnglePitch] = pitch
+    obj.rawData[oMoveAngleYaw] = yaw
+    obj.rawData[oMoveAngleRoll] = roll
+}
+
+export const spawn_object_abs_with_rot = (parent, model, behavior, x, y, z, rx, ry, rz) => {
+    const newObj = spawn_object_at_origin(parent, model, behavior)
+    obj_set_pos(newObj, x, y, z)
+    obj_set_angle(newObj, rx, ry, rz)
+    return newObj
 }
 
 export const increment_velocity_toward_range = (value, center, zeroThreshold, increment) => {
@@ -179,104 +538,6 @@ export const cur_obj_set_pos_relative = (other, dleft, dy, dforward) => {
     o.rawData[oPosZ] = other.rawData[oPosZ] + dz
 }
 
-export const geo_switch_anim_state = (callerContext, node) => {
-    if (callerContext == GEO_CONTEXT_RENDER) {
-        let obj = GeoRenderer.gCurGraphNodeObject.object
-
-        if (GeoRenderer.gCurGraphNodeHeldObject) {
-            obj = GeoRenderer.gCurGraphNodeHeldObject.object
-        }
-
-        // if the case is greater than the number of cases, set to 0 to aexport const ove = rin=> g
-        // the switch.
-        if (obj.rawData[oAnimState] >= node.numCases) {
-            obj.rawData[oAnimState] = 0
-        }
-
-        node.selectedCase = obj.rawData[oAnimState]
-    }
-
-    return null
-}
-
-export const geo_switch_area = (callerContext, node) => {
-    if (callerContext == GEO_CONTEXT_RENDER) {
-        if (ObjectListProc.gMarioObject == undefined) {
-            node.selectedCase = 0
-        } else {
-            ObjectListProc.gFindFloorIncludeSurfaceIntangible = 1
-
-            const marioObj = ObjectListProc.gMarioObject
-
-            const floorWrapper = {}
-            const height = gLinker.SurfaceCollision.find_floor(marioObj.rawData[oPosX], marioObj.rawData[oPosY], marioObj.rawData[oPosZ], floorWrapper)
-
-            if (floorWrapper.floor) {
-                ObjectListProc.gMarioCurrentRoom = floorWrapper.floor.room
-                let selectedRoom = floorWrapper.floor.room - 1
-
-                if (selectedRoom >= 0) {
-                    node.selectedCase = selectedRoom
-                }
-            }
-
-        }
-    } else {
-        node.selectedCase = 0
-    }
-}
-
-export const geo_update_layer_transparency = (callerContext, node) => {
-    const dl = []
-
-    if (callerContext == GEO_CONTEXT_RENDER) {
-        let obj = GeoRenderer.gCurGraphNodeObject.object
-
-        if (GeoRenderer.gCurGraphNodeHeldObject) {
-            obj = GeoRenderer.gCurGraphNodeHeldObject.object
-        }
-
-        const opacity = obj.rawData[oOpacity]
-
-        if (opacity == 0xFF) {
-            if (node.parameter == 20) {
-                node.flags = 0x600 | (node.flags & 0xFF)
-            } else {
-                node.flags = 0x100 | (node.flags & 0xFF)
-            }
-
-            obj.rawData[oAnimState] = 0
-        } else {
-            if (node.parameter == 20) {
-                node.flags = 0x600 | (node.flags & 0xFF)
-            } else {
-                node.flags = 0x500 | (node.flags & 0xFF)
-            }
-
-            obj.rawData[oAnimState] = 1
-
-            if (opacity == 0 && gLinker.behaviors.bhvBowser == obj.behavior) {
-                obj.rawData[oAnimState] = 2
-            }
-
-            if (node.parameter != 10) {
-                if (obj.activeFlags & ACTIVE_FLAG_DITHERED_ALPHA) {
-                    Gbi.gDPSetAlphaCompare(dl, G_AC_DITHER)
-                }
-            }
-            // temp fix for vanish cap
-            if (obj.behavior == gLinker.behaviors.bhvVanishCap) {
-                Gbi.gDPSetAlphaCompare(dl, G_AC_DITHER)
-            }
-        }
-
-        Gbi.gDPSetEnvColor(dl, 255, 255, 255, opacity)
-        Gbi.gSPEndDisplayList(dl)
-    }
-
-    return dl
-}
-
 export const spawn_water_droplet = (parent, params) => {
     let randomScale
     // allow getters
@@ -330,13 +591,6 @@ export const spawn_object_at_origin = (parent, model, behavior) => {
     geo_obj_init(obj.gfx, gLinker.Area.gLoadedGraphNodes[model], [0,0,0], [0,0,0])
 
     return obj
-}
-
-export const spawn_object_abs_with_rot = (parent, model, behavior, x, y, z, rx, ry, rz) => {
-    const newObj = spawn_object_at_origin(parent, model, behavior)
-    obj_set_pos(newObj, x, y, z)
-    obj_set_angle(newObj, rx, ry, rz)
-    return newObj
 }
 
 
@@ -480,91 +734,6 @@ export const obj_translate_xz_random = (obj, rangeLength) => {
     obj.rawData[oPosZ] += Math.random() * rangeLength - rangeLength * 0.5
 }
 
-export const obj_update_pos_from_parent_transformation = (a0, a1) => {
-    const spC = a1.rawData[oParentRelativePosX]
-    const sp8 = a1.rawData[oParentRelativePosY]
-    const sp4 = a1.rawData[oParentRelativePosZ]
-
-    a1.rawData[oPosX] = spC * a0[0][0] + sp8 * a0[1][0] + sp4 * a0[2][0] + a0[3][0]
-    a1.rawData[oPosY] = spC * a0[0][1] + sp8 * a0[1][1] + sp4 * a0[2][1] + a0[3][1]
-    a1.rawData[oPosZ] = spC * a0[0][2] + sp8 * a0[1][2] + sp4 * a0[2][2] + a0[3][2]
-}
-
-export const obj_apply_scale_to_matrix = (obj, dst, src) => {
-    dst[0][0] = src[0][0] * obj.gfx.scale[0]
-    dst[1][0] = src[1][0] * obj.gfx.scale[1]
-    dst[2][0] = src[2][0] * obj.gfx.scale[2]
-    dst[3][0] = src[3][0]
-
-    dst[0][1] = src[0][1] * obj.gfx.scale[0]
-    dst[1][1] = src[1][1] * obj.gfx.scale[1]
-    dst[2][1] = src[2][1] * obj.gfx.scale[2]
-    dst[3][1] = src[3][1]
-
-    dst[0][2] = src[0][2] * obj.gfx.scale[0]
-    dst[1][2] = src[1][2] * obj.gfx.scale[1]
-    dst[2][2] = src[2][2] * obj.gfx.scale[2]
-    dst[3][2] = src[3][2]
-
-    dst[0][3] = src[0][3]
-    dst[1][3] = src[1][3]
-    dst[2][3] = src[2][3]
-    dst[3][3] = src[3][3]
-}
-
-
-export const create_transformation_from_matrices = (a0, a1, a2) => {
-    let spC, sp8, sp4
-
-    spC = a2[3][0] * a2[0][0] + a2[3][1] * a2[0][1] + a2[3][2] * a2[0][2]
-    sp8 = a2[3][0] * a2[1][0] + a2[3][1] * a2[1][1] + a2[3][2] * a2[1][2]
-    sp4 = a2[3][0] * a2[2][0] + a2[3][1] * a2[2][1] + a2[3][2] * a2[2][2]
-
-    a0[0][0] = a1[0][0] * a2[0][0] + a1[0][1] * a2[0][1] + a1[0][2] * a2[0][2]
-    a0[0][1] = a1[0][0] * a2[1][0] + a1[0][1] * a2[1][1] + a1[0][2] * a2[1][2]
-    a0[0][2] = a1[0][0] * a2[2][0] + a1[0][1] * a2[2][1] + a1[0][2] * a2[2][2]
-
-    a0[1][0] = a1[1][0] * a2[0][0] + a1[1][1] * a2[0][1] + a1[1][2] * a2[0][2]
-    a0[1][1] = a1[1][0] * a2[1][0] + a1[1][1] * a2[1][1] + a1[1][2] * a2[1][2]
-    a0[1][2] = a1[1][0] * a2[2][0] + a1[1][1] * a2[2][1] + a1[1][2] * a2[2][2]
-
-    a0[2][0] = a1[2][0] * a2[0][0] + a1[2][1] * a2[0][1] + a1[2][2] * a2[0][2]
-    a0[2][1] = a1[2][0] * a2[1][0] + a1[2][1] * a2[1][1] + a1[2][2] * a2[1][2]
-    a0[2][2] = a1[2][0] * a2[2][0] + a1[2][1] * a2[2][1] + a1[2][2] * a2[2][2]
-
-    a0[3][0] = a1[3][0] * a2[0][0] + a1[3][1] * a2[0][1] + a1[3][2] * a2[0][2] - spC
-    a0[3][1] = a1[3][0] * a2[1][0] + a1[3][1] * a2[1][1] + a1[3][2] * a2[1][2] - sp8
-    a0[3][2] = a1[3][0] * a2[2][0] + a1[3][1] * a2[2][1] + a1[3][2] * a2[2][2] - sp4
-
-    a0[0][3] = 0
-    a0[1][3] = 0
-    a0[2][3] = 0
-    a0[3][3] = 1.0
-}
-
-export const obj_set_held_state = (obj, heldBehavior) => {
-    const o = ObjectListProc.gCurrentObject
-    obj.parentObj = o
-
-    heldBehavior = gLinker.Spawn.get_bhv_script(heldBehavior)
-    if (obj.rawData[oFlags] & OBJ_FLAG_HOLDABLE) {
-        if (heldBehavior == gLinker.behaviors.bhvCarrySomething3) {
-            obj.rawData[oHeldState] = HELD_HELD
-        }
-
-        if (heldBehavior == gLinker.behaviors.bhvCarrySomething5) {
-            obj.rawData[oHeldState] = HELD_THROWN
-        }
-
-        if (heldBehavior == gLinker.behaviors.bhvCarrySomething4) {
-            obj.rawData[oHeldState] = HELD_DROPPED
-        }
-    } else {
-        obj.curBhvCommand = heldBehavior
-        obj.bhvStackIndex = 0
-    }
-}
-
 export const obj_build_transform_from_pos_and_angle = (obj, posIndex, angleIndex) => {
     const translate = []
     const rotation = []
@@ -674,55 +843,6 @@ export const approach_symmetric = (value, target, increment) => {
     }
 
     return value
-}
-
-export const approach_s16_symmetric = (value, target, increment) =>{
-    let dist = s16(target - value)
-
-    if (dist >= 0) {
-        if (dist > increment) {
-            value = s16(value + increment)
-        } else {
-            value = target
-        }
-    } else {
-        if (dist < -increment) {
-            value = s16(value - increment)
-        } else {
-            value = target
-        }
-    }
-
-    return value
-}
-
-export const cur_obj_forward_vel_approach_upward = (target, increment) => {
-    const o = ObjectListProc.gCurrentObject
-    if (o.rawData[oForwardVel] >= target) {
-        o.rawData[oForwardVel] = target
-    } else {
-        o.rawData[oForwardVel] += increment
-    }
-}
-
-export const approach_f32_signed = (valueWrapper, target, increment) => {
-    let reachedTarget = false;
-
-    valueWrapper.value += increment;
-
-    if (increment >= 0.0) {
-        if (valueWrapper.value > target) {
-            valueWrapper.value = target;
-            reachedTarget = true;
-        }
-    } else {
-        if (valueWrapper.value < target) {
-            valueWrapper.value = target;
-            reachedTarget = true;
-        }
-    }
-
-    return reachedTarget;
 }
 
 export const abs_angle_diff = (x0, x1) => {
@@ -946,21 +1066,6 @@ export const clear_move_flag = (bitSet, flag) => {
         return { result: 1, bitSet }
     } else {
         return { result: 0, bitSet }
-    }
-}
-
-export const cur_obj_rotate_yaw_toward = (target, increment) => {
-
-    const o = ObjectListProc.gCurrentObject
-
-    const startYaw = parseInt(o.rawData[oMoveAngleYaw])
-    o.rawData[oMoveAngleYaw] = approach_symmetric(o.rawData[oMoveAngleYaw], target, increment)
-
-    o.rawData[oAngleVelYaw] = parseInt(o.rawData[oMoveAngleYaw] - startYaw)
-    if ((o.rawData[oAngleVelYaw]) == 0) {
-        return true
-    } else {
-        return false
     }
 }
 
@@ -1217,39 +1322,6 @@ export const cur_obj_is_mario_ground_pounding_platform = () => {
     }
 
     return false
-}
-
-export const obj_turn_toward_object = (obj, target, angleIndex, turnAmount) => {
-    const o = ObjectListProc.gCurrentObject
-
-    let targetAngle, a, b, c, d
-    switch (angleIndex) {
-        case oMoveAnglePitch:
-        case oFaceAnglePitch:
-            a = target.rawData[oPosX] - obj.rawData[oPosX]
-            c = target.rawData[oPosZ] - obj.rawData[oPosZ]
-            a = Math.sqrt(a * a + c * c)
-
-            b = -obj.rawData[oPosY]
-            d = -target.rawData[oPosY]
-
-            targetAngle = atan2s(a, d - b)
-            break
-
-        case oMoveAngleYaw:
-        case oFaceAngleYaw:
-            a = obj.rawData[oPosZ]
-            c = target.rawData[oPosZ]
-            b = obj.rawData[oPosX]
-            d = target.rawData[oPosX]
-
-            targetAngle = atan2s(c - a, d - b)
-            break
-    }
-
-    const startAngle = s16(o.rawData[angleIndex])
-    o.rawData[angleIndex] = approach_symmetric(startAngle, targetAngle, turnAmount)
-    return targetAngle
 }
 
 export const cur_obj_shake_screen = (shake) => {
@@ -1730,33 +1802,10 @@ export const obj_copy_pos = (dst, src) => {
     dst.rawData[oPosZ] = src.rawData[oPosZ]
 }
 
-export const obj_set_pos = (obj, x, y, z) => {
-    obj.rawData[oPosX] = x
-    obj.rawData[oPosY] = y
-    obj.rawData[oPosZ] = z
-}
-
 export const obj_copy_scale = (dst, src) => {
     dst.gfx.scale[0] = src.gfx.scale[0]
     dst.gfx.scale[1] = src.gfx.scale[1]
     dst.gfx.scale[2] = src.gfx.scale[2]
-}
-
-export const obj_set_parent_relative_pos = (obj, relX, relY, relZ) => {
-    obj.rawData[oParentRelativePosX] = relX
-    obj.rawData[oParentRelativePosY] = relY
-    obj.rawData[oParentRelativePosZ] = relZ
-
-}
-
-export const obj_set_angle = (obj, pitch, yaw, roll) => {
-    obj.rawData[oFaceAnglePitch] = pitch
-    obj.rawData[oFaceAngleYaw] = yaw
-    obj.rawData[oFaceAngleRoll] = roll
-
-    obj.rawData[oMoveAnglePitch] = pitch
-    obj.rawData[oMoveAngleYaw] = yaw
-    obj.rawData[oMoveAngleRoll] = roll
 }
 
 export const cur_obj_within_12k_bounds = () => {
@@ -1958,27 +2007,6 @@ export const cur_obj_push_mario_away_from_cylinder = (radius, extentY) => {
     if (marioRelY < extentY) {
         cur_obj_push_mario_away(radius)
     }
-}
-
-export const dist_between_objects = (obj1, obj2) => {
-    const dx = obj1.rawData[oPosX] - obj2.rawData[oPosX]
-    const dy = obj1.rawData[oPosY] - obj2.rawData[oPosY]
-    const dz = obj1.rawData[oPosZ] - obj2.rawData[oPosZ]
-    return Math.sqrt(dx * dx + dy * dy + dz * dz)
-}
-
-
-export const lateral_dist_between_objects = (obj1, obj2) => {
-    const dx = obj1.rawData[oPosX] - obj2.rawData[oPosX]
-    const dz = obj1.rawData[oPosZ] - obj2.rawData[oPosZ]
-    return Math.sqrt(dx * dx + dz * dz)
-}
-
-export const obj_angle_to_object = (obj1, obj2) => {
-    const x1 = obj1.rawData[oPosX], z1 = obj1.rawData[oPosZ]
-    const x2 = obj2.rawData[oPosX], z2 = obj2.rawData[oPosZ]
-
-    return atan2s(z2 - z1, x2 - x1)
 }
 
 
@@ -2194,14 +2222,6 @@ export const cur_obj_lateral_dist_from_mario_to_home = () => {
     let dist = sqrtf(dx * dx + dz * dz);
     return dist;
 }
-
-import { LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC } from "../levels/level_defines_constants"
-import { CameraInstance, CUTSCENE_CAP_SWITCH_PRESS } from "./Camera"
-import { MARIO_DIALOG_STATUS_SPEAK, MARIO_DIALOG_STOP, mario_ready_to_speak, set_mario_npc_dialog } from "./MarioActionsCutscene"
-import { DIALOG_RESPONSE_NONE } from "./IngameMenu"
-import { spawn_default_star } from "./behaviors/spawn_star.inc"
-import { create_sound_spawner } from "./SpawnSound"
-const sLevelsWithRooms = [LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC]
 
 export const bhv_init_room = () => {
     const o = ObjectListProc.gCurrentObject

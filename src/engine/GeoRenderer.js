@@ -321,7 +321,7 @@ class GeoRenderer {
 
         if (hasAnimation) {
             node.animFrame = GraphNode.geo_update_animation_frame(node, node.animFrameAccelAssist)
-        } else { throw "why are you here if you don't have an animation?" }
+        }
         node.animTimer = this.gAreaUpdateCounter
         if (anim.flags & Mario.ANIM_FLAG_HOR_TRANS) {
             this.gCurAnimType = Mario.ANIM_TYPE_VERTICAL_TRANSLATION

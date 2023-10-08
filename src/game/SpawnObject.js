@@ -9,14 +9,6 @@ class SpawnObject {
     constructor() {
     }
 
-    clear_object_lists() {
-        const gObjectLists = ObjectListProc.gObjectLists
-        for (let i = 0; i < ObjectListProc.NUM_OBJ_LISTS; i++) {
-            gObjectLists[i].next = gObjectLists[i]
-            gObjectLists[i].prev = gObjectLists[i]
-        }
-    }
-
     try_allocate_object(destList) {
         const obj = {
             gfx: {},
@@ -35,6 +27,35 @@ class SpawnObject {
 
         geo_add_child(gLinker.GeoLayout.gObjParentGraphNode, obj.gfx)
         return obj
+    }
+
+    deallocate_object(obj) {
+        // Remove from object list
+        obj.next.prev = obj.prev
+        obj.prev.next = obj.next
+    }
+
+    clear_object_lists() {
+        const gObjectLists = ObjectListProc.gObjectLists
+        for (let i = 0; i < ObjectListProc.NUM_OBJ_LISTS; i++) {
+            gObjectLists[i].next = gObjectLists[i]
+            gObjectLists[i].prev = gObjectLists[i]
+        }
+    }
+    
+    unload_object(obj) {
+        obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED
+        obj.prevObj = null
+
+        obj.gfx.throwMatrix = null
+
+        //func_803206F8 TODO
+        geo_remove_child(obj.gfx)
+
+        obj.gfx.flags &= ~GRAPH_RENDER_BILLBOARD
+        obj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
+
+        this.deallocate_object(obj)
     }
 
     allocate_object(objList) {
@@ -91,25 +112,28 @@ class SpawnObject {
         }
     }
 
-    deallocate_object(obj) {
-        // Remove from object list
-        obj.next.prev = obj.prev
-        obj.prev.next = obj.next
-    }
+    create_object(bhvScript) {
+        bhvScript = this.get_bhv_script(bhvScript)
+        if (!bhvScript) {
+            return null
+        }
+        let objListIndex = this.get_bhv_object_list(bhvScript)
+        const objList = ObjectListProc.gObjectLists[objListIndex]
+        const obj = this.allocate_object(objList)
 
-    unload_object(obj) {
-        obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED
-        obj.prevObj = null
+        obj.bhvScript = { commands: bhvScript, index: 0, name: this.get_bhv_object_name(bhvScript) }
+        obj.behavior = bhvScript
+    
+        if (objListIndex == ObjectListProc.OBJ_LIST_UNIMPORTANT) {
+            obj.activeFlags |= ACTIVE_FLAG_UNIMPORTANT
+        }
 
-        obj.gfx.throwMatrix = null
-
-        //func_803206F8 TODO
-        geo_remove_child(obj.gfx)
-
-        obj.gfx.flags &= ~GRAPH_RENDER_BILLBOARD
-        obj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
-
-        this.deallocate_object(obj)
+        if (objListIndex == ObjectListProc.OBJ_LIST_POLELIKE || 
+            objListIndex == ObjectListProc.OBJ_LIST_GENACTOR ||
+            objListIndex == ObjectListProc.OBJ_LIST_PUSHABLE) {
+                this.snap_object_to_floor(obj)
+        }
+        return obj
     }
 
 
@@ -154,30 +178,6 @@ class SpawnObject {
         } else {
             return null
         }
-    }
-
-    create_object(bhvScript) {
-        bhvScript = this.get_bhv_script(bhvScript)
-        if (!bhvScript) {
-            return null
-        }
-        let objListIndex = this.get_bhv_object_list(bhvScript)
-        const objList = ObjectListProc.gObjectLists[objListIndex]
-        const obj = this.allocate_object(objList)
-
-        obj.bhvScript = { commands: bhvScript, index: 0, name: this.get_bhv_object_name(bhvScript) }
-        obj.behavior = bhvScript
-    
-        if (objListIndex == ObjectListProc.OBJ_LIST_UNIMPORTANT) {
-            obj.activeFlags |= ACTIVE_FLAG_UNIMPORTANT
-        }
-
-        if (objListIndex == ObjectListProc.OBJ_LIST_POLELIKE || 
-            objListIndex == ObjectListProc.OBJ_LIST_GENACTOR ||
-            objListIndex == ObjectListProc.OBJ_LIST_PUSHABLE) {
-                this.snap_object_to_floor(obj)
-        }
-        return obj
     }
 
     mark_obj_for_deletion(obj) {

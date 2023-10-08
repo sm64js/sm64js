@@ -12,7 +12,7 @@ import {
     ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_SPARKLES, ACTIVE_PARTICLE_BUBBLE,
     ACTIVE_PARTICLE_WATER_SPLASH, ACTIVE_PARTICLE_IDLE_WATER_WAVE, ACTIVE_PARTICLE_PLUNGE_BUBBLE, ACTIVE_PARTICLE_WAVE_TRAIL,
     ACTIVE_PARTICLE_FIRE, ACTIVE_PARTICLE_SHALLOW_WATER_WAVE, ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH, ACTIVE_PARTICLE_LEAF,
-    ACTIVE_PARTICLE_SNOW, ACTIVE_PARTICLE_BREATH, ACTIVE_PARTICLE_DIRT, ACTIVE_PARTICLE_MIST_CIRCLE, ACTIVE_PARTICLE_TRIANGLE
+    ACTIVE_PARTICLE_SNOW, ACTIVE_PARTICLE_BREATH, ACTIVE_PARTICLE_DIRT, ACTIVE_PARTICLE_MIST_CIRCLE, ACTIVE_PARTICLE_TRIANGLE, oInteractType, ACTIVE_FLAG_UNIMPORTANT, ACTIVE_FLAG_INITIATED_TIME_STOP
 } from "../include/object_constants"
 import { detect_object_collisions } from "./ObjectCollisions"
 import { uint32, uint16 } from "../utils"
@@ -26,6 +26,7 @@ import {
     PARTICLE_SHALLOW_WATER_SPLASH, PARTICLE_LEAF, PARTICLE_SNOW, PARTICLE_BREATH, PARTICLE_DIRT, PARTICLE_MIST_CIRCLE, PARTICLE_TRIANGLE
 } from "../include/mario_constants"
 import { spawn_object_at_origin, obj_copy_pos_and_angle } from "./ObjectHelpers"
+import { INTERACT_DOOR, INTERACT_WARP_DOOR } from "./Interaction"
 
 export const gDebugInfo = new Array(16).fill(0).map(() => new Array(8).fill(0))
 
@@ -150,91 +151,27 @@ class ObjectListProcessor {
         })
     }
 
-    update_objects() {
-        this.gObjectCounter = 0  /// probaly not used and not needed
+    copy_mario_state_to_object() {
+        const gMarioState = gLinker.LevelUpdate.gMarioState
+        this.gCurrentObject.rawData[oPosX] = gMarioState.pos[0]
+        this.gCurrentObject.rawData[oPosY] = gMarioState.pos[1]
+        this.gCurrentObject.rawData[oPosZ] = gMarioState.pos[2]
 
-        gLinker.SurfaceLoad.clear_dynamic_surfaces()
-        this.update_terrain_objects()
+        this.gCurrentObject.rawData[oFaceAnglePitch] = this.gCurrentObject.gfx.angle[0]
+        this.gCurrentObject.rawData[oFaceAngleYaw]   = this.gCurrentObject.gfx.angle[1]
+        this.gCurrentObject.rawData[oFaceAngleRoll]  = this.gCurrentObject.gfx.angle[2]
 
-        gLinker.PlatformDisplacement.apply_mario_platform_displacement()
+        this.gCurrentObject.rawData[oMoveAnglePitch] = this.gCurrentObject.gfx.angle[0]
+        this.gCurrentObject.rawData[oMoveAngleYaw]   = this.gCurrentObject.gfx.angle[1]
+        this.gCurrentObject.rawData[oMoveAngleRoll]  = this.gCurrentObject.gfx.angle[2]
 
-        detect_object_collisions()
-        this.update_non_terrain_objects()
+        this.gCurrentObject.rawData[oVelX] = gMarioState.vel[0]
+        this.gCurrentObject.rawData[oVelY] = gMarioState.vel[1]
+        this.gCurrentObject.rawData[oVelZ] = gMarioState.vel[2]
 
-        this.unload_deactivated_objects()
-
-        gLinker.PlatformDisplacement.update_mario_platform()
-    }
-
-    update_terrain_objects() {
-        this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[this.OBJ_LIST_SPAWNER])
-        this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[this.OBJ_LIST_SURFACE])
-    }
-
-    update_non_terrain_objects() {
-        this.sObjectListUpdateOrder.slice(2).forEach(listIndex => {
-            this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[listIndex])
-        })
-    }
-
-    update_objects_in_list(objList) {
-
-        const firstObj = objList.next
-        return this.update_objects_starting_at(objList, firstObj)
-    }
-
-    update_objects_starting_at(objList, firstObj) {
-        let count = 0
-        while (objList != firstObj) {
-            this.gCurrentObject = firstObj
-            this.gCurrentObject.gfx.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION
-            gLinker.BehaviorCommands.cur_obj_update()
-            firstObj = firstObj.next
-            count++
-        }
-        return count
-    }
-
-    unload_deactivated_objects_in_list(objList) {
-        let obj = objList.next
-
-        while (objList != obj) {
-            this.gCurrentObject = obj
-            obj = obj.next
-
-            if ((this.gCurrentObject.activeFlags & ACTIVE_FLAG_ACTIVE) != ACTIVE_FLAG_ACTIVE) {
-                /// Prevent object from respawning after exiting and re-entering the area
-                if (!(this.gCurrentObject.rawData[oFlags] & OBJ_FLAG_PERSISTENT_RESPAWN)) {
-                    this.set_object_respawn_info_bits(this.gCurrentObject, RESPAWN_INFO_DONT_RESPAWN)
-                }
-
-                gLinker.Spawn.unload_object(this.gCurrentObject)
-            }
-
-        }
-
-        return false
-    }
-
-    unload_deactivated_objects() {
-        this.sObjectListUpdateOrder.forEach(listIndex => {
-            this.unload_deactivated_objects_in_list(this.gObjectLists[listIndex])
-        })
-    }
-
-    set_object_respawn_info_bits(obj, bits) {
-        switch (obj.respawnInfoType) {
-            case RESPAWN_INFO_TYPE_32:
-                let info32 = uint32(obj.respawnInfo)
-                info32 |= bits << 8
-                obj.respawnInfo = info32
-                break
-            case RESPAWN_INFO_TYPE_16:
-                let info16 = uint16(obj.respawnInfo)
-                info16 |= bits << 8
-                obj.respawnInfo = info16
-                break
-        }
+        this.gCurrentObject.rawData[oAngleVelPitch] = gMarioState.angleVel[0]
+        this.gCurrentObject.rawData[oAngleVelYaw]   = gMarioState.angleVel[1]
+        this.gCurrentObject.rawData[oAngleVelRoll]  = gMarioState.angleVel[2]
     }
 
     spawn_particle(activeParticleFlag, model, behavior) {
@@ -260,27 +197,96 @@ class ObjectListProcessor {
         })
     }
 
-    copy_mario_state_to_object() {
-        const gMarioState = gLinker.LevelUpdate.gMarioState
-        this.gCurrentObject.rawData[oPosX] = gMarioState.pos[0]
-        this.gCurrentObject.rawData[oPosY] = gMarioState.pos[1]
-        this.gCurrentObject.rawData[oPosZ] = gMarioState.pos[2]
+    update_objects_starting_at(objList, firstObj) {
+        let count = 0
+        while (objList != firstObj) {
+            this.gCurrentObject = firstObj
+            this.gCurrentObject.gfx.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION
+            gLinker.BehaviorCommands.cur_obj_update()
+            firstObj = firstObj.next
+            count++
+        }
+        return count
+    }
 
-        this.gCurrentObject.rawData[oFaceAnglePitch] = this.gCurrentObject.gfx.angle[0]
-        this.gCurrentObject.rawData[oFaceAngleYaw]   = this.gCurrentObject.gfx.angle[1]
-        this.gCurrentObject.rawData[oFaceAngleRoll]  = this.gCurrentObject.gfx.angle[2]
+    update_objects_during_time_stop(objList, firstObj) {
+        let count = 0;
+        let unfrozen;
 
-        this.gCurrentObject.rawData[oMoveAnglePitch] = this.gCurrentObject.gfx.angle[0]
-        this.gCurrentObject.rawData[oMoveAngleYaw]   = this.gCurrentObject.gfx.angle[1]
-        this.gCurrentObject.rawData[oMoveAngleRoll]  = this.gCurrentObject.gfx.angle[2]
+        while (objList != firstObj) {
+            this.gCurrentObject = firstObj;
+            unfrozen = false;
 
-        this.gCurrentObject.rawData[oVelX] = gMarioState.vel[0]
-        this.gCurrentObject.rawData[oVelY] = gMarioState.vel[1]
-        this.gCurrentObject.rawData[oVelZ] = gMarioState.vel[2]
+            // Selectively unfreeze certain objects
+            if (!(this.gTimeStopState & TIME_STOP_ALL_OBJECTS)) {
+                if (this.gCurrentObject == this.gMarioObject && !(this.gTimeStopState & TIME_STOP_MARIO_AND_DOORS))
+                    unfrozen = true;
 
-        this.gCurrentObject.rawData[oAngleVelPitch] = gMarioState.angleVel[0]
-        this.gCurrentObject.rawData[oAngleVelYaw]   = gMarioState.angleVel[1]
-        this.gCurrentObject.rawData[oAngleVelRoll]  = gMarioState.angleVel[2]
+                if (this.gCurrentObject.rawData[oInteractType] & (INTERACT_DOOR | INTERACT_WARP_DOOR) && !(this.gTimeStopState & TIME_STOP_MARIO_AND_DOORS))
+                    unfrozen = true;
+
+                if (this.gCurrentObject.activeFlags & (ACTIVE_FLAG_UNIMPORTANT | ACTIVE_FLAG_INITIATED_TIME_STOP))
+                    unfrozen = true;
+            }
+
+            // Only update if unfrozen
+            if (unfrozen) {
+                this.gCurrentObject.gfx.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION;
+                gLinker.BehaviorCommands.cur_obj_update();
+            } else {
+                this.gCurrentObject.gfx.flags &= ~GraphNode.GRAPH_RENDER_HAS_ANIMATION;
+            }
+
+            firstObj = firstObj.next;
+            count++;
+        }
+
+        return count;
+    }
+
+    update_objects_in_list(objList) {
+
+        const firstObj = objList.next
+        if (!(this.gTimeStopState & TIME_STOP_ACTIVE))
+            return this.update_objects_starting_at(objList, firstObj)
+        else
+            return this.update_objects_during_time_stop(objList, firstObj)
+    }
+
+    unload_deactivated_objects_in_list(objList) {
+        let obj = objList.next
+
+        while (objList != obj) {
+            this.gCurrentObject = obj
+            obj = obj.next
+
+            if ((this.gCurrentObject.activeFlags & ACTIVE_FLAG_ACTIVE) != ACTIVE_FLAG_ACTIVE) {
+                /// Prevent object from respawning after exiting and re-entering the area
+                if (!(this.gCurrentObject.rawData[oFlags] & OBJ_FLAG_PERSISTENT_RESPAWN)) {
+                    this.set_object_respawn_info_bits(this.gCurrentObject, RESPAWN_INFO_DONT_RESPAWN)
+                }
+
+                gLinker.Spawn.unload_object(this.gCurrentObject)
+            }
+
+        }
+
+        return false
+    }
+
+    set_object_respawn_info_bits(obj, bits) {
+        switch (obj.respawnInfoType) {
+            case RESPAWN_INFO_TYPE_32:
+                let info32 = uint32(obj.respawnInfo)
+                info32 |= bits << 8
+                obj.respawnInfo = info32
+                break
+            case RESPAWN_INFO_TYPE_16:
+                let info16 = uint16(obj.respawnInfo)
+                info16 |= bits << 8
+                obj.respawnInfo = info16
+                break
+        }
     }
 
     /**
@@ -368,6 +374,44 @@ class ObjectListProcessor {
 
         gLinker.Spawn.clear_object_lists()
         gLinker.SurfaceLoad.clear_dynamic_surfaces()
+    }
+
+    update_terrain_objects() {
+        this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[this.OBJ_LIST_SPAWNER])
+        this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[this.OBJ_LIST_SURFACE])
+    }
+
+    update_non_terrain_objects() {
+        this.sObjectListUpdateOrder.slice(2).forEach(listIndex => {
+            this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[listIndex])
+        })
+    }
+
+    unload_deactivated_objects() {
+        this.sObjectListUpdateOrder.forEach(listIndex => {
+            this.unload_deactivated_objects_in_list(this.gObjectLists[listIndex])
+        })
+    }
+
+    update_objects() {
+        this.gObjectCounter = 0  /// probaly not used and not needed
+
+        gLinker.SurfaceLoad.clear_dynamic_surfaces()
+        this.update_terrain_objects()
+
+        gLinker.PlatformDisplacement.apply_mario_platform_displacement()
+
+        detect_object_collisions()
+        this.update_non_terrain_objects()
+
+        this.unload_deactivated_objects()
+
+        gLinker.PlatformDisplacement.update_mario_platform()
+
+        if (this.gTimeStopState & TIME_STOP_ENABLED) this.gTimeStopState |= TIME_STOP_ACTIVE;
+        else this.gTimeStopState &= ~TIME_STOP_ACTIVE;
+
+        this.gPrevFrameObjectCount = this.gObjectCounter
     }
 }
 

@@ -188,19 +188,21 @@ export const geo_switch_anim_state = (callerContext, node) => {
 }
 
 export const geo_switch_area = (callerContext, node) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+
     if (callerContext == GEO_CONTEXT_RENDER) {
-        if (ObjectListProc.gMarioObject == undefined) {
+        if (o == undefined) {
             node.selectedCase = 0
         } else {
-            ObjectListProc.gFindFloorIncludeSurfaceIntangible = 1
+            gLinker.ObjectListProcessor.gFindFloorIncludeSurfaceIntangible = 1
 
-            const marioObj = ObjectListProc.gMarioObject
+            const marioObj = o
 
             const floorWrapper = {}
             const height = gLinker.SurfaceCollision.find_floor(marioObj.rawData[oPosX], marioObj.rawData[oPosY], marioObj.rawData[oPosZ], floorWrapper)
 
             if (floorWrapper.floor) {
-                ObjectListProc.gMarioCurrentRoom = floorWrapper.floor.room
+                gLinker.ObjectListProcessor.gMarioCurrentRoom = floorWrapper.floor.room
                 let selectedRoom = floorWrapper.floor.room - 1
 
                 if (selectedRoom >= 0) {
@@ -277,7 +279,7 @@ export const create_transformation_from_matrices = (a0, a1, a2) => {
 }
 
 export const obj_set_held_state = (obj, heldBehavior) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
     obj.parentObj = o
 
     heldBehavior = gLinker.Spawn.get_bhv_script(heldBehavior)
@@ -313,7 +315,7 @@ export const dist_between_objects = (obj1, obj2) => {
 }
 
 export const cur_obj_forward_vel_approach_upward = (target, increment) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
     if (o.rawData[oForwardVel] >= target) {
         o.rawData[oForwardVel] = target
     } else {
@@ -368,8 +370,7 @@ export const approach_s16_symmetric = (value, target, increment) =>{
 }
 
 export const cur_obj_rotate_yaw_toward = (target, increment) => {
-
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
 
     const startYaw = parseInt(o.rawData[oMoveAngleYaw])
     o.rawData[oMoveAngleYaw] = approach_symmetric(o.rawData[oMoveAngleYaw], target, increment)
@@ -390,7 +391,7 @@ export const obj_angle_to_object = (obj1, obj2) => {
 }
 
 export const obj_turn_toward_object = (obj, target, angleIndex, turnAmount) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
 
     let targetAngle, a, b, c, d
     switch (angleIndex) {
@@ -623,6 +624,379 @@ export const linear_mtxf_transpose_mul_vec3f = (m, dst, v) => {
     }
 }
 
+export const obj_apply_scale_to_transform = (obj) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    let scaleX = obj.gfx.scale[0]
+    let scaleY = obj.gfx.scale[1]
+    let scaleZ = obj.gfx.scale[2]
+
+    obj.transform[0][0] *= scaleX
+    obj.transform[0][1] *= scaleX
+    obj.transform[0][2] *= scaleX
+
+    obj.transform[1][0] *= scaleY
+    obj.transform[1][1] *= scaleY
+    obj.transform[1][2] *= scaleY
+
+    obj.transform[2][0] *= scaleZ
+    obj.transform[2][1] *= scaleZ
+    obj.transform[2][2] *= scaleZ
+}
+
+export const obj_copy_scale = (dst, src) => {
+    dst.gfx.scale[0] = src.gfx.scale[0]
+    dst.gfx.scale[1] = src.gfx.scale[1]
+    dst.gfx.scale[2] = src.gfx.scale[2]
+}
+
+export const obj_scale_xyz = (obj, xScale, yScale, zScale) => {
+    obj.gfx.scale[0] = xScale
+    obj.gfx.scale[1] = yScale
+    obj.gfx.scale[2] = zScale
+}
+
+export const obj_scale = (obj, scale) => {
+    obj.gfx.scale[0] = scale
+    obj.gfx.scale[1] = scale
+    obj.gfx.scale[2] = scale
+}
+
+export const cur_obj_scale = (scale) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    o.gfx.scale[0] = scale
+    o.gfx.scale[1] = scale
+    o.gfx.scale[2] = scale
+}
+
+export const cur_obj_init_animation = (animIndex) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    const anims = o.rawData[oAnimations]
+    geo_obj_init_animation(o.gfx, anims[animIndex]);
+}
+
+export const cur_obj_init_animation_with_sound = (animIndex) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    const anims = o.rawData[oAnimations]
+    geo_obj_init_animation(o.gfx, anims[animIndex])
+    o.rawData[oSoundStateID] = animIndex
+}
+
+export const cur_obj_init_animation_with_accel_and_sound = (animIndex, accel) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    const anims = o.rawData[oAnimations]
+    const animAccel = parseInt(accel * 65536.0)
+    geo_obj_init_animation_accel(o.gfx, anims[animIndex], animAccel)
+}
+
+export const obj_init_animation_with_sound = (obj, animations, animIndex) => {
+    obj.rawData[oAnimations] = animations
+    geo_obj_init_animation(obj.gfx, animations[animIndex])
+    obj.rawData[oSoundStateID] = animIndex
+}
+
+export const cur_obj_enable_rendering_and_become_tangible = (obj) => {
+    obj.gfx.flags |= GRAPH_RENDER_ACTIVE;
+    obj.rawData[oIntangibleTimer] = 0;
+}
+
+export const cur_obj_enable_rendering = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    o.gfx.flags |= GRAPH_RENDER_ACTIVE
+}
+
+export const cur_obj_disable_rendering_and_become_intangible = (obj) => {
+    obj.gfx.flags &= ~GRAPH_RENDER_ACTIVE;
+    obj.rawData[oIntangibleTimer] = -1;
+}
+
+export const cur_obj_disable_rendering = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    o.gfx.flags &= ~GRAPH_RENDER_ACTIVE
+}
+
+export const cur_obj_unhide = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    o.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
+}
+
+export const cur_obj_hide = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    o.gfx.flags |= GRAPH_RENDER_INVISIBLE
+}
+
+export const cur_obj_set_pos_relative = (other, dleft, dy, dforward) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+
+    const facingZ = coss(other.rawData[oMoveAngleYaw])
+    const facingX = sins(other.rawData[oMoveAngleYaw])
+
+    const dz = dforward * facingZ - dleft * facingX
+    const dx = dforward * facingX + dleft * facingZ
+
+    o.rawData[oMoveAngleYaw] = other.rawData[oMoveAngleYaw]
+
+    o.rawData[oPosX] = other.rawData[oPosX] + dx
+    o.rawData[oPosY] = other.rawData[oPosY] + dy
+    o.rawData[oPosZ] = other.rawData[oPosZ] + dz
+}
+
+export const cur_obj_set_pos_relative_to_parent = (dleft, dy, dforward) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    cur_obj_set_pos_relative(o.parentObj, dleft, dy, dforward);
+}
+
+export const obj_set_face_angle_to_move_angle = (obj) => {
+    obj.rawData[oFaceAnglePitch] = obj.rawData[oMoveAnglePitch]
+    obj.rawData[oFaceAngleYaw] = obj.rawData[oMoveAngleYaw]
+    obj.rawData[oFaceAngleRoll] = obj.rawData[oMoveAngleRoll]
+}
+
+export const get_object_list_from_behavior = (behavior) => {
+    behavior = gLinker.Spawn.get_bhv_script(behavior)
+    return gLinker.Spawn.get_bhv_object_list(behavior)
+}
+
+export const cur_obj_nearest_object_with_behavior = (o, behavior) => {
+    return cur_obj_find_nearest_object_with_behavior(o, behavior)
+}
+
+export const cur_obj_dist_to_nearest_object_with_behavior = (behavior) => {
+    let dist = {}
+    let obj = cur_obj_find_nearest_object_with_behavior(behavior, dist)
+    if (!obj) {
+        dist.dist = 15000.0
+    }
+
+    return dist.dist
+}
+
+export const cur_obj_find_nearest_object_with_behavior = (o, behavior, dist) => {
+    let closestObj = null
+    let listHead = gLinker.ObjectListProcessor.gObjectLists[get_object_list_from_behavior(behavior)]
+    let minDist = 0x20000
+    let obj
+
+    obj = listHead.next
+
+    while (obj != listHead) {
+        if (obj.behavior == behavior) {
+            if (obj.activeFlags != ACTIVE_FLAG_DEACTIVATED && obj != o) {
+                let objDist = dist_between_objects(o, obj)
+                if (objDist < minDist) {
+                    closestObj = obj
+                    minDist = objDist
+                }
+            }
+        }
+        obj = obj.next
+    }
+
+    if (dist) {
+        dist.dist = minDist
+    }
+    return closestObj
+}
+
+export const find_unimportant_object = () => {
+    let listHead = gLinker.ObjectListProcessor.gObjectLists[OBJ_LIST_UNIMPORTANT]
+    let obj = listHead.next
+
+    if (listHead == obj) {
+        obj = null
+    }
+
+    return obj
+}
+
+export const count_unimportant_objects = () => {
+    let listHead = gLinker.ObjectListProcessor.gObjectLists[OBJ_LIST_UNIMPORTANT]
+    let obj = listHead.next
+    let count = 0
+
+    while (listHead != obj) {
+        count++
+        obj = obj.next
+    }
+
+    return count
+}
+
+export const count_objects_with_behavior = (behavior) => {
+    let listHead = gLinker.ObjectListProcessor.gObjectLists[get_object_list_from_behavior(behavior)]
+    let obj = listHead.next
+    let count = 0
+
+    while (listHead != obj) {
+        if (obj.behavior == behavior) {
+            count++
+        }
+
+        obj = obj.next
+    }
+
+    return count
+}
+
+export const cur_obj_find_nearby_held_actor = (behavior, maxDist) => {
+    let listHead
+    let obj
+    let foundObj
+
+    listHead = gLinker.ObjectListProcessor.gObjectLists[OBJ_LIST_GENACTOR]
+    obj = listHead.next
+    foundObj = null
+
+    while (listHead != obj) {
+        if (obj.behavior == behavior) {
+            if (obj.activeFlags != ACTIVE_FLAG_DEACTIVATED) {
+                  // This includes the dropped and thrown states. By combining instant
+                  // release, this allows us to activate mama penguin remotely
+                if (obj.rawData[oHeldState] != HELD_FREE) {
+                    if (dist_between_objects(o, obj) < maxDist) {
+                        foundObj = obj
+                        break
+                    }
+                }
+            }
+        }
+
+        obj = obj.next
+    }
+
+    return foundObj
+}
+
+const cur_obj_reset_timer_and_subaction = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    o.rawData[oTimer] = 0
+    o.rawData[oSubAction] = 0
+}
+
+export const cur_obj_change_action = (action) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    o.rawData[oAction] = action
+    o.rawData[oPrevAction] = action
+    cur_obj_reset_timer_and_subaction()
+}
+
+export const cur_obj_set_vel_from_mario_vel = (objBaseForwardVel, multiplier) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+    let /*f32*/ marioForwardVel = gMarioObject.rawData[oForwardVel]
+    let /*f32*/ objForwardVel = objBaseForwardVel * multiplier
+
+    if (marioForwardVel < objForwardVel) {
+        o.rawData[oForwardVel] = objForwardVel
+    } else {
+        o.rawData[oForwardVel] = marioForwardVel * multiplier
+    }
+}
+
+export const cur_obj_reverse_animation = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    if (o.gfx.animInfo.animFrame >= 0) {
+        o.gfx.animInfo.animFrame--
+    }
+}
+
+export const cur_obj_extend_animation_if_at_end = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+
+    const sp4 = o.gfx.animInfo.animFrame
+    const sp0 = o.gfx.animInfo.curAnim.unk08 - 2
+
+    if (sp4 == sp0) {
+        o.gfx.animInfo.animFrame--
+    }
+}
+
+
+export const cur_obj_check_if_near_animation_end = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    let animFlags = o.gfx.animInfo.curAnim.flags
+    let animFrame = o.gfx.animInfo.animFrame
+    let nearLoopEnd = o.gfx.animInfo.curAnim.unk08 - 2
+    let isNearEnd = 0
+
+    if (animFlags & ANIM_FLAG_NOLOOP && nearLoopEnd + 1 == animFrame) {
+        isNearEnd = 1
+    }
+
+    if (animFrame == nearLoopEnd) {
+        isNearEnd = 1
+    }
+
+    return isNearEnd
+}
+
+export const cur_obj_check_if_at_animation_end = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    let animFrame = o.gfx.animInfo.animFrame
+    let lastFrame = o.gfx.animInfo.curAnim.unk08 - 1
+
+    if (animFrame == lastFrame) {
+        return true
+    } else {
+        return false
+    }
+}
+
+export const cur_obj_check_anim_frame = (frame) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+
+    const animFrame = o.gfx.animInfo.animFrame
+    if (animFrame == frame) {
+        return true
+    } else {
+        return false
+    }
+}
+
+export const cur_obj_check_anim_frame_in_range = (startFrame, rangeLength) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    let /*s32*/ animFrame = o.gfx.animInfo.animFrame
+
+    if (animFrame >= startFrame && animFrame < startFrame + rangeLength) {
+        return true
+    } else {
+        return false
+    }
+}
+
+export const cur_obj_check_frame_prior_current_frame = (wrapper) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+
+    let animFrame = o.gfx.animInfo.animFrame
+
+    while (wrapper.current != -1) {
+        if (wrapper.current == animFrame) {
+            return true
+        }
+
+        wrapper.current++;
+    }
+
+    return false;
+}
+
+export const mario_is_in_air_action = () => {
+    const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
+    if (gMarioStates[0].action & ACT_FLAG_AIR) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+export const mario_is_dive_sliding = () => {
+    if (LevelUpdate.gMarioState.action == ACT_DIVE_SLIDE) {
+        return true
+    } else {
+        return false
+    }
+}
+
 export const increment_velocity_toward_range = (value, center, zeroThreshold, increment) => {
     let relative = value - center;
     if (relative > 0) {
@@ -692,76 +1066,6 @@ export const cur_obj_set_pos_to_home = () => {
 
 export const cur_obj_shake_y = (amount) => {
     o.rawData[oTimer] % 2 == 0 ? o.rawData[oPosY] += amount : o.rawData[oPosY] -= amount;
-}
-
-export const cur_obj_set_pos_relative = (other, dleft, dy, dforward) => {
-    const o = ObjectListProc.gCurrentObject
-
-    const facingZ = coss(other.rawData[oMoveAngleYaw])
-    const facingX = sins(other.rawData[oMoveAngleYaw])
-
-    const dz = dforward * facingZ - dleft * facingX
-    const dx = dforward * facingX + dleft * facingZ
-
-    o.rawData[oMoveAngleYaw] = other.rawData[oMoveAngleYaw]
-
-    o.rawData[oPosX] = other.rawData[oPosX] + dx
-    o.rawData[oPosY] = other.rawData[oPosY] + dy
-    o.rawData[oPosZ] = other.rawData[oPosZ] + dz
-}
-
-
-export const cur_obj_check_anim_frame = (frame) => {
-    const o = ObjectListProc.gCurrentObject
-
-    const animFrame = o.gfx.animInfo.animFrame
-    if (animFrame == frame) {
-        return true
-    } else {
-        return false
-    }
-}
-
-export const cur_obj_check_anim_frame_in_range = (startFrame, rangeLength) => {
-    const o = ObjectListProc.gCurrentObject
-    let /*s32*/ animFrame = o.gfx.animInfo.animFrame
-
-    if (animFrame >= startFrame && animFrame < startFrame + rangeLength) {
-        return true
-    } else {
-        return false
-    }
-}
-
-// export const cur_obj_check_frame_prior_current_frame = (a0) => {
-//     const o = ObjectListProc.gCurrentObject
-//     let /*s16*/ sp6 = o.gfx.animInfo.animFrame
-
-//     while (*a0 != -1) {
-//         if (*a0 == sp6) {
-//             return true
-//         }
-
-//         a0++
-//     }
-
-//     return false
-// }
-
-export const mario_is_in_air_action = () => {
-    if (LevelUpdate.gMarioState.action & ACT_FLAG_AIR) {
-        return true
-    } else {
-        return false
-    }
-}
-
-export const mario_is_dive_sliding = () => {
-    if (LevelUpdate.gMarioState.action == ACT_DIVE_SLIDE) {
-        return true
-    } else {
-        return false
-    }
 }
 
 export const cur_obj_set_y_vel_and_animation = (velY, animIndex) => {
@@ -1536,196 +1840,6 @@ export const cur_obj_set_face_angle_to_move_angle = () => {
     o.rawData[oFaceAngleRoll]  = o.rawData[oMoveAngleRoll]
 }
 
-export const get_object_list_from_behavior = (behavior) => {
-    behavior = gLinker.Spawn.get_bhv_script(behavior)
-    return gLinker.Spawn.get_bhv_object_list(behavior)
-}
-
-export const cur_obj_nearest_object_with_behavior = (o, behavior) => {
-    return cur_obj_find_nearest_object_with_behavior(o, behavior)
-}
-
-export const cur_obj_dist_to_nearest_object_with_behavior = (behavior) => {
-    let dist = {}
-    let obj = cur_obj_find_nearest_object_with_behavior(behavior, dist)
-    if (!obj) {
-        dist.dist = 15000.0
-    }
-
-    return dist.dist
-}
-
-export const cur_obj_find_nearest_object_with_behavior = (o, behavior, dist) => {
-    let closestObj = null
-    let listHead = ObjectListProc.gObjectLists[get_object_list_from_behavior(behavior)]
-    let minDist = 0x20000
-    let obj
-
-    obj = listHead.next
-
-    while (obj != listHead) {
-        if (obj.behavior == behavior) {
-            if (obj.activeFlags != ACTIVE_FLAG_DEACTIVATED && obj != o) {
-                let objDist = dist_between_objects(o, obj)
-                if (objDist < minDist) {
-                    closestObj = obj
-                    minDist = objDist
-                }
-            }
-        }
-        obj = obj.next
-    }
-
-    if (dist) {
-        dist.dist = minDist
-    }
-    return closestObj
-}
-
-export const find_unimportant_object = () => {
-    let listHead = ObjectListProc.gObjectLists[OBJ_LIST_UNIMPORTANT]
-    let obj = listHead.next
-
-    if (listHead == obj) {
-        obj = null
-    }
-
-    return obj
-}
-
-export const count_unimportant_objects = () => {
-    let listHead = ObjectListProc.gObjectLists[OBJ_LIST_UNIMPORTANT]
-    let obj = listHead.next
-    let count = 0
-
-    while (listHead != obj) {
-        count++
-        obj = obj.next
-    }
-
-    return count
-}
-
-export const count_objects_with_behavior = (behavior) => {
-    let listHead = ObjectListProc.gObjectLists[get_object_list_from_behavior(behavior)]
-    let obj = listHead.next
-    let count = 0
-
-    while (listHead != obj) {
-        if (obj.behavior == behavior) {
-            count++
-        }
-
-        obj = obj.next
-    }
-
-    return count
-}
-
-export const cur_obj_find_nearby_held_actor = (behavior, maxDist) => {
-    let listHead
-    let obj
-    let foundObj
-
-    listHead = ObjectListProc.gObjectLists[OBJ_LIST_GENACTOR]
-    obj = listHead.next
-    foundObj = null
-
-    while (listHead != obj) {
-        if (obj.behavior == behavior) {
-            if (obj.activeFlags != ACTIVE_FLAG_DEACTIVATED) {
-                  // This includes the dropped and thrown states. By combining instant
-                  // release, this allows us to activate mama penguin remotely
-                if (obj.rawData[oHeldState] != HELD_FREE) {
-                    if (dist_between_objects(o, obj) < maxDist) {
-                        foundObj = obj
-                        break
-                    }
-                }
-            }
-        }
-
-        obj = obj.next
-    }
-
-    return foundObj
-}
-
-const cur_obj_reset_timer_and_subaction = () => {
-    const o = ObjectListProc.gCurrentObject
-    o.rawData[oTimer] = 0
-    o.rawData[oSubAction] = 0
-}
-
-export const cur_obj_change_action = (action) => {
-    const o = ObjectListProc.gCurrentObject
-    o.rawData[oAction] = action
-    o.rawData[oPrevAction] = action
-    cur_obj_reset_timer_and_subaction()
-}
-
-export const cur_obj_set_vel_from_mario_vel = (f12, f14) => {
-    const o = ObjectListProc.gCurrentObject
-    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
-    let /*f32*/ sp4 = gMarioObject.rawData[oForwardVel]
-    let /*f32*/ sp0 = f12 * f14
-
-    if (sp4 < sp0) {
-        o.rawData[oForwardVel] = sp0
-    } else {
-        o.rawData[oForwardVel] = sp4 * f14
-    }
-}
-
-export const cur_obj_reverse_animation = () => {
-    const o = ObjectListProc.gCurrentObject
-    if (o.gfx.animInfo.animFrame >= 0) {
-        o.gfx.animInfo.animFrame--
-    }
-}
-
-export const cur_obj_extend_animation_if_at_end = () => {
-    const o = ObjectListProc.gCurrentObject
-
-    const sp4 = o.gfx.animInfo.animFrame
-    const sp0 = o.gfx.animInfo.curAnim.unk08 - 2
-
-    if (sp4 == sp0) {
-        o.gfx.animInfo.animFrame--
-    }
-}
-
-
-export const cur_obj_check_if_near_animation_end = () => {
-    const o = ObjectListProc.gCurrentObject
-    let animFlags = o.gfx.animInfo.curAnim.flags
-    let animFrame = o.gfx.animInfo.animFrame
-    let nearLoopEnd = o.gfx.animInfo.curAnim.unk08 - 2
-    let isNearEnd = 0
-
-    if (animFlags & ANIM_FLAG_NOLOOP && nearLoopEnd + 1 == animFrame) {
-        isNearEnd = 1
-    }
-
-    if (animFrame == nearLoopEnd) {
-        isNearEnd = 1
-    }
-
-    return isNearEnd
-}
-
-export const cur_obj_check_if_at_animation_end = () => {
-    const o = ObjectListProc.gCurrentObject
-    let animFrame = o.gfx.animInfo.animFrame
-    let lastFrame = o.gfx.animInfo.curAnim.unk08 - 1
-
-    if (animFrame == lastFrame) {
-        return true
-    } else {
-        return false
-    }
-}
-
 
 // struct Waypoint
 // {
@@ -1835,12 +1949,6 @@ export const cur_obj_spawn_particles = (info) => {
 
 }
 
-export const obj_copy_scale = (dst, src) => {
-    dst.gfx.scale[0] = src.gfx.scale[0]
-    dst.gfx.scale[1] = src.gfx.scale[1]
-    dst.gfx.scale[2] = src.gfx.scale[2]
-}
-
 export const cur_obj_within_12k_bounds = () => {
     const o = ObjectListProc.gCurrentObject
 
@@ -1851,16 +1959,6 @@ export const cur_obj_within_12k_bounds = () => {
     return true
 }
 
-export const cur_obj_enable_rendering = () => {
-    const o = ObjectListProc.gCurrentObject
-    o.gfx.flags |= GRAPH_RENDER_ACTIVE
-}
-
-export const cur_obj_disable_rendering = () => {
-    const o = ObjectListProc.gCurrentObject
-    o.gfx.flags &= ~GRAPH_RENDER_ACTIVE
-}
-
 export const cur_obj_become_tangible = () => {
     const o = ObjectListProc.gCurrentObject
     o.rawData[oIntangibleTimer] = 0
@@ -1869,16 +1967,6 @@ export const cur_obj_become_tangible = () => {
 export const cur_obj_become_intangible = () => {
     const o = ObjectListProc.gCurrentObject
     o.rawData[oIntangibleTimer] = -1
-}
-
-export const cur_obj_hide = () => {
-    const o = ObjectListProc.gCurrentObject
-    o.gfx.flags |= GRAPH_RENDER_INVISIBLE
-}
-
-export const cur_obj_unhide = () => {
-    const o = ObjectListProc.gCurrentObject
-    o.gfx.flags &= ~GRAPH_RENDER_INVISIBLE
 }
 
 export const cur_obj_clear_interact_status_flag = (flag) => {
@@ -1900,25 +1988,6 @@ export const cur_obj_disable = () => {
     cur_obj_become_intangible();
 }
 
-export const obj_scale = (obj, scale) => {
-    obj.gfx.scale[0] = scale
-    obj.gfx.scale[1] = scale
-    obj.gfx.scale[2] = scale
-}
-
-export const obj_scale_xyz = (obj, xScale, yScale, zScale) => {
-    obj.gfx.scale[0] = xScale
-    obj.gfx.scale[1] = yScale
-    obj.gfx.scale[2] = zScale
-}
-
-export const cur_obj_scale = (scale) => {
-    const o = ObjectListProc.gCurrentObject
-    o.gfx.scale[0] = scale
-    o.gfx.scale[1] = scale
-    o.gfx.scale[2] = scale
-}
-
 export const obj_scale_random = (obj, rangeLength, minScale) => {
     const scale = random_float() * rangeLength + minScale
     obj_scale_xyz(obj, scale, scale, scale)
@@ -1928,32 +1997,6 @@ export const obj_translate_xyz_random = (obj, rangeLength) => {
     obj.rawData[oPosX] += random_float() * rangeLength - rangeLength * 0.5
     obj.rawData[oPosY] += random_float() * rangeLength - rangeLength * 0.5
     obj.rawData[oPosZ] += random_float() * rangeLength - rangeLength * 0.5
-}
-
-export const cur_obj_init_animation = (animIndex) => {
-    const o = ObjectListProc.gCurrentObject
-    const anims = o.rawData[oAnimations]
-    geo_obj_init_animation(o.gfx, anims[animIndex]);
-}
-
-export const cur_obj_init_animation_with_sound = (animIndex) => {
-    const o = ObjectListProc.gCurrentObject
-    const anims = o.rawData[oAnimations]
-    geo_obj_init_animation(o.gfx, anims[animIndex])
-    o.rawData[oSoundStateID] = animIndex
-}
-
-export const cur_obj_init_animation_with_accel_and_sound = (animIndex, accel) => {
-    const o = ObjectListProc.gCurrentObject
-    const anims = o.rawData[oAnimations]
-    const animAccel = parseInt(accel * 65536.0)
-    geo_obj_init_animation_accel(o.gfx, anims[animIndex], animAccel)
-}
-
-export const obj_init_animation_with_sound = (obj, animations, animIndex) => {
-    obj.rawData[oAnimations] = animations
-    geo_obj_init_animation(obj.gfx, animations[animIndex])
-    obj.rawData[oSoundStateID] = animIndex
 }
 
 export const cur_obj_compute_vel_xz = () => {

@@ -47,7 +47,7 @@ import {
     OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33,
     OBJ_MOVE_LANDED, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX, OBJ_FLAG_HOLDABLE,
 
-    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED, OBJ_MOVE_BOUNCE, DIALOG_STATUS_ENABLE_TIME_STOP, ACTIVE_FLAG_INITIATED_TIME_STOP, DIALOG_FLAG_TURN_TO_MARIO, DIALOG_STATUS_START_DIALOG, DIALOG_STATUS_STOP_DIALOG, DIALOG_FLAG_TIME_STOP_ENABLED, oKingBobombUnk88, DIALOG_STATUS_INTERRUPT, OBJ_FLAG_0020, OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM
+    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED, OBJ_MOVE_BOUNCE, DIALOG_STATUS_ENABLE_TIME_STOP, ACTIVE_FLAG_INITIATED_TIME_STOP, DIALOG_FLAG_TURN_TO_MARIO, DIALOG_STATUS_START_DIALOG, DIALOG_STATUS_STOP_DIALOG, DIALOG_FLAG_TIME_STOP_ENABLED, oKingBobombUnk88, DIALOG_STATUS_INTERRUPT, OBJ_FLAG_0020, OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM, O_FACE_ANGLE_INDEX, OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT
  } from "../include/object_constants"
 
 import { gDebugInfo, ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
@@ -65,7 +65,7 @@ import { GRAPH_RENDER_ACTIVE           } from "../engine/graph_node"
 
 import { OBJ_LIST_UNIMPORTANT, OBJ_LIST_GENACTOR } from "./BehaviorData"
 
-import { atan2s, mtxf_rotate_zxy_and_translate, sqrtf } from "../engine/math_util"
+import { atan2s, mtxf_mul, mtxf_rotate_zxy_and_translate, sqrtf } from "../engine/math_util"
 import { sins, coss, int16, s16, random_int16, random_float } from "../utils"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import * as _Linker from "./Linker"
@@ -99,6 +99,15 @@ export const DebugPage = {
     DEBUG_PAGE_EFFECTINFO:       4,
     DEBUG_PAGE_ENEMYINFO:        5,
 }
+
+export const WAYPOINT_FLAGS_END = -1
+export const WAYPOINT_FLAGS_INITIALIZED = 0x8000
+export const WAYPOINT_MASK_00FF = 0x00FF
+export const WAYPOINT_FLAGS_PLATFORM_ON_TRACK_PAUSE = 3
+
+export const PATH_NONE = 0
+export const PATH_REACHED_END = -1
+export const PATH_REACHED_WAYPOINT = 1
 
 export const geo_update_projectile_pos_from_parent = (callContext, node, mtx) => {
     
@@ -904,7 +913,7 @@ export const cur_obj_extend_animation_if_at_end = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject;
 
     const sp4 = o.gfx.animInfo.animFrame
-    const sp0 = o.gfx.animInfo.curAnim.unk08 - 2
+    const sp0 = o.gfx.animInfo.curAnim.loopEnd - 2
 
     if (sp4 == sp0) {
         o.gfx.animInfo.animFrame--
@@ -916,7 +925,7 @@ export const cur_obj_check_if_near_animation_end = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject;
     let animFlags = o.gfx.animInfo.curAnim.flags
     let animFrame = o.gfx.animInfo.animFrame
-    let nearLoopEnd = o.gfx.animInfo.curAnim.unk08 - 2
+    let nearLoopEnd = o.gfx.animInfo.curAnim.loopEnd - 2
     let isNearEnd = 0
 
     if (animFlags & ANIM_FLAG_NOLOOP && nearLoopEnd + 1 == animFrame) {
@@ -933,7 +942,7 @@ export const cur_obj_check_if_near_animation_end = () => {
 export const cur_obj_check_if_at_animation_end = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject;
     let animFrame = o.gfx.animInfo.animFrame
-    let lastFrame = o.gfx.animInfo.curAnim.unk08 - 1
+    let lastFrame = o.gfx.animInfo.curAnim.loopEnd - 1
 
     if (animFrame == lastFrame) {
         return true
@@ -1536,125 +1545,81 @@ export const obj_set_billboard = (obj) => {
     obj.gfx.flags |= GRAPH_RENDER_BILLBOARD
 }
 
-export const cur_obj_has_model = (modelID) => {
+export const cur_obj_set_hitbox_radius_and_height = (radius, height) => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
 
-    if (o.gfx.sharedChild == gLinker.Area.gLoadedGraphNodes[modelID]) {
-        return true
-    } else {
-        return false
+    o.hitboxRadius = radius
+    o.hitboxHeight = height
+}
+
+export const cur_obj_set_hurtbox_radius_and_height = (radius, height) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    o.hurtboxRadius = radius
+    o.hurtboxHeight = height
+}
+
+const obj_spawn_loot_coins = (obj, numCoins, sp30, coinsBehavior, posJitter, model) => {
+
+    const floorWrapper = {}
+    let spawnHeight = gLinker.SurfaceCollision.find_floor(obj.rawData[oPosX], obj.rawData[oPosY], obj.rawData[oPosZ], floorWrapper)
+
+    if (obj.rawData[oPosY] - spawnHeight > 100) {
+        spawnHeight = obj.rawData[oPosY]
+    }
+
+    for (let i = 0; i < numCoins; i++) {
+        if (obj.rawData[oNumLootCoins] <= 0) break
+
+        obj.rawData[oNumLootCoins]--
+
+        const coin = spawn_object(obj, model, coinsBehavior)
+        obj_translate_xz_random(coin, posJitter)
+        coin.rawData[oPosY] = spawnHeight
+        coin.rawData[oCoinBaseVelY] = sp30
     }
 }
 
-export const cur_obj_unrender_and_reset_state = (animIndex, action) => {
+export const obj_spawn_loot_blue_coins = (obj, numCoins, sp28, posJitter) => {
+    obj_spawn_loot_coins(obj, numCoins, sp28, gLinker.behaviors.bhvBlueCoinJumping, posJitter, MODEL_BLUE_COIN)
+}
+
+export const obj_spawn_loot_yellow_coins = (obj, numCoins, sp28) => {
+    obj_spawn_loot_coins(obj, numCoins, sp28, gLinker.behaviors.bhvSingleCoinGetsSpawned, 0, MODEL_YELLOW_COIN)
+}
+
+export const cur_obj_spawn_loot_coin_at_mario_pos = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    cur_obj_become_intangible()
-    cur_obj_disable_rendering()
-
-    if (animIndex >= 0) {
-        cur_obj_init_animation_with_sound(animIndex)
-    }
-
-    o.rawData[oAction] = action
-}
-
-export const obj_translate_xz_random = (obj, rangeLength) => {
-    obj.rawData[oPosX] += Math.random() * rangeLength - rangeLength * 0.5
-    obj.rawData[oPosZ] += Math.random() * rangeLength - rangeLength * 0.5
-}
-
-export const obj_build_transform_from_pos_and_angle = (obj, posIndex, angleIndex) => {
-    const translate = []
-    const rotation = []
-
-    translate[0] = obj.rawData[posIndex + 0]
-    translate[1] = obj.rawData[posIndex + 1]
-    translate[2] = obj.rawData[posIndex + 2]
-
-    rotation[0] = obj.rawData[angleIndex + 0]
-    rotation[1] = obj.rawData[angleIndex + 1]
-    rotation[2] = obj.rawData[angleIndex + 2]
-
-    mtxf_rotate_zxy_and_translate(obj.transform, translate, rotation)
-
-}
-
-export const cur_obj_angle_to_home = () => {
-
-    const o = ObjectListProc.gCurrentObject
     
-    let angle;
+    let coin;
 
-    let dx = o.rawData[oHomeX] - o.rawData[oPosX];
-    let dz = o.rawData[oHomeZ] - o.rawData[oPosZ];
+    if (o.rawData[oNumLootCoins] <= 0) return;
 
-    angle = atan2s(dz, dx);
-    return angle;
+    o.rawData[oNumLootCoins]--
+
+    coin = spawn_object(o, MODEL_YELLOW_COIN, gLinker.behaviors.bhvSingleCoinGetsSpawned);
+    coin.rawData[oVelY] = 30.0;
+
+    obj_copy_pos(coin, gLinker.ObjectListProcessor.gMarioObject);
 }
 
-export const obj_set_gfx_pos_at_obj_pos = (obj1, obj2) => {
-    obj1.gfx.pos[0] = obj2.rawData[oPosX]
-    obj1.gfx.pos[1] = obj2.rawData[oPosY] + obj2.rawData[oGraphYOffset]
-    obj1.gfx.pos[2] = obj2.rawData[oPosZ]
+export const cur_obj_abs_y_dist_to_home = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
 
-    obj1.gfx.angle[0] = obj2.rawData[oMoveAnglePitch] & 0xFFFF
-    obj1.gfx.angle[1] = obj2.rawData[oMoveAngleYaw] & 0xFFFF
-    obj1.gfx.angle[2] = obj2.rawData[oMoveAngleRoll] & 0xFFFF
+    return Math.abs(o.rawData[oHomeY] - o.rawData[oPosY]);
 }
 
-export const obj_translate_local = (obj, posIndex, localTranslateIndex) => {
-    const dx = obj.rawData[localTranslateIndex + 0]
-    const dy = obj.rawData[localTranslateIndex + 1]
-    const dz = obj.rawData[localTranslateIndex + 2]
+export const cur_obj_advance_looping_anim = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
-    obj.rawData[posIndex + 0] += obj.transform[0][0] * dx + obj.transform[1][0] * dy + obj.transform[2][0] * dz
-    obj.rawData[posIndex + 1] += obj.transform[0][1] * dx + obj.transform[1][1] * dy + obj.transform[2][1] * dz
-    obj.rawData[posIndex + 2] += obj.transform[0][2] * dx + obj.transform[1][2] * dy + obj.transform[2][2] * dz
-}
+    let animFrame = o.gfx.animInfo.animFrame;
+    let loopEnd = o.gfx.animInfo.curAnim.loopEnd;
 
-const obj_build_vel_from_transform = (a0) => {
-    let spC = a0.rawData[oUnkC0]
-    let sp8 = a0.rawData[oUnkBC]
-    let sp4 = a0.rawData[oForwardVel]
+    if (animFrame < 0) animFrame = 0;
+    else if (loopEnd - 1 == animFrame) animFrame = 0;
+    else animFrame++;
 
-    a0.rawData[oVelX] = a0.transform[0][0] * spC + a0.transform[1][0] * sp8 + a0.transform[2][0] * sp4
-    a0.rawData[oVelY] = a0.transform[0][1] * spC + a0.transform[1][1] * sp8 + a0.transform[2][1] * sp4
-    a0.rawData[oVelZ] = a0.transform[0][2] * spC + a0.transform[1][2] * sp8 + a0.transform[2][2] * sp4
-}
-
-export const cur_obj_set_pos_via_transform = () => {
-    const o = ObjectListProc.gCurrentObject
-    obj_build_transform_from_pos_and_angle(o, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX)
-    obj_build_vel_from_transform(o)
-    o.rawData[oPosX] += o.rawData[oVelX]
-    o.rawData[oPosY] += o.rawData[oVelY]
-    o.rawData[oPosZ] += o.rawData[oVelZ]
-}
-
-export const cur_obj_reflect_move_angle_off_wall = () => {
-    const o = ObjectListProc.gCurrentObject
-    return s16(o.rawData[oWallAngle] - (s16(o.rawData[oMoveAngleYaw]) - s16(o.rawData[oWallAngle])) + 0x8000)
-}
-
-
-export const approach_symmetric = (value, target, increment) => {
-    const dist = s16(target - value)
-
-    if (dist >= 0) {
-        if (dist > increment) {
-            value += increment
-        } else {
-            value = target
-        }
-    } else {
-        if (dist < -increment) {
-            value -= increment
-        } else {
-            value = target
-        }
-    }
-
-    return value
+    return (animFrame << 16) / loopEnd;
 }
 
 export const cur_obj_detect_steep_floor = (steepAngleDegrees) => {
@@ -1721,7 +1686,6 @@ export const cur_obj_resolve_wall_collisions = () => {
     return false
 }
 
-
 export const cur_obj_update_floor = () => {
     const o = ObjectListProc.gCurrentObject
     const floor = cur_obj_update_floor_height_and_get_floor()
@@ -1738,6 +1702,365 @@ export const cur_obj_update_floor = () => {
         o.rawData[oFloorRoom] = 0
     }
 
+}
+
+const cur_obj_update_floor_and_resolve_wall_collisions = (steepSlopeDegrees) => {
+    const o = ObjectListProc.gCurrentObject
+
+    o.rawData[oMoveFlags] &= ~(OBJ_MOVE_ABOVE_LAVA | OBJ_MOVE_ABOVE_DEATH_BARRIER)
+
+    if (o.activeFlags & (ACTIVE_FLAG_FAR_AWAY | ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
+        cur_obj_update_floor()
+        o.rawData[oMoveFlags] &= ~OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER
+
+        if (o.rawData[oPosY] > o.rawData[oFloorHeight]) {
+            o.rawData[oMoveFlags] |= OBJ_MOVE_IN_AIR
+        }
+    } else {
+        o.rawData[oMoveFlags] &= ~OBJ_MOVE_HIT_WALL
+        if (cur_obj_resolve_wall_collisions()) {
+            o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_WALL
+        }
+
+        cur_obj_update_floor()
+
+        if (o.rawData[oPosY] > o.rawData[oFloorHeight]) {
+            o.rawData[oMoveFlags] |= OBJ_MOVE_IN_AIR
+        }
+
+        if (cur_obj_detect_steep_floor(steepSlopeDegrees)) {
+            o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_WALL
+        }
+
+    }
+}
+
+export const cur_obj_update_floor_and_walls = () => {
+    cur_obj_update_floor_and_resolve_wall_collisions(60)
+}
+
+export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
+    const o = ObjectListProc.gCurrentObject
+    const gravity = o.rawData[oGravity]
+    const bounciness = o.rawData[oBounciness]
+    const bouyancy = o.rawData[oBuoyancy]
+    const dragStrength = o.rawData[oDragStrength]
+    let steepSlopeNormalY
+    let careAboutEdgesAndSteepSlopes = false
+    let negativeSpeed = false
+
+    //! Because some objects allow these active flags to be set but don't
+    //  aexport const updating when they are, we end up with "partial" update = ser=> e
+    //  an object's internal state will be updated, but it doesn't move.
+    //  This allows numerous glitches and is typically referred to as
+    //  deactivation (though this term has a different meaning in the code).
+    //  Objects that do this will be marked with //PARTIAL_UPDATE.
+
+    if (!(o.activeFlags & (ACTIVE_FLAG_FAR_AWAY | ACTIVE_FLAG_IN_DIFFERENT_ROOM))) {
+        if (steepSlopeAngleDegrees < 0) {
+            careAboutEdgesAndSteepSlopes = 1
+            steepSlopeAngleDegrees = -steepSlopeAngleDegrees
+        }
+
+        steepSlopeNormalY = coss(steepSlopeAngleDegrees * (0x10000 / 360))
+
+        cur_obj_compute_vel_xz()
+        cur_obj_apply_drag_xz(dragStrength)
+
+        cur_obj_move_xz(steepSlopeNormalY, careAboutEdgesAndSteepSlopes)
+        cur_obj_move_y(gravity, bounciness, bouyancy)
+
+        if (o.rawData[oForwardVel] < 0) {
+            negativeSpeed = 1
+        }
+
+        o.rawData[oForwardVel] = Math.sqrt(Math.pow(o.rawData[oVelX], 2) + Math.pow(o.rawData[oVelZ], 2))
+        if (negativeSpeed) {
+            o.rawData[oForwardVel] = -o.rawData[oForwardVel]
+        }
+    }
+}
+
+const cur_obj_within_12k_bounds = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    if (o.rawData[oPosX] < -12000 || 12000 < o.rawData[oPosX]) return false
+    if (o.rawData[oPosY] < -12000 || 12000 < o.rawData[oPosY]) return false
+    if (o.rawData[oPosZ] < -12000 || 12000 < o.rawData[oPosZ]) return false
+
+    return true
+}
+
+export const cur_obj_move_using_vel_and_gravity = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    if (cur_obj_within_12k_bounds()) {
+        o.rawData[oPosX] += o.rawData[oVelX];
+        o.rawData[oPosZ] += o.rawData[oVelZ];
+        o.rawData[oVelY] += o.rawData[oGravity];
+        o.rawData[oPosY] += o.rawData[oVelY];
+    }
+}
+
+export const cur_obj_move_using_fvel_and_gravity = () => {
+    cur_obj_compute_vel_xz();
+    cur_obj_move_using_vel_and_gravity();
+}
+
+export const obj_set_pos_relative = (obj, other, dleft, dy, dforward) => {
+    let facingX = coss(other.rawData[oMoveAngleYaw]);
+    let facingZ = sins(other.rawData[oMoveAngleYaw]);
+    let dz = dforward * facingZ - dleft * facingX;
+    let dx = dforward * facingX + dleft * facingZ;
+
+    obj.rawData[oMoveAngleYaw] = other.rawData[oMoveAngleYaw];
+    obj.rawData[oPosX] = other.rawData[oPosX] + dx;
+    obj.rawData[oPosY] = other.rawData[oPosY] + dy;
+    obj.rawData[oPosZ] = other.rawData[oPosZ] + dz;
+}
+
+export const cur_obj_angle_to_home = () => {
+
+    const o = ObjectListProc.gCurrentObject
+    
+    let angle;
+
+    let dx = o.rawData[oHomeX] - o.rawData[oPosX];
+    let dz = o.rawData[oHomeZ] - o.rawData[oPosZ];
+
+    angle = atan2s(dz, dx);
+    return angle;
+}
+
+export const obj_set_gfx_pos_at_obj_pos = (obj1, obj2) => {
+    obj1.gfx.pos[0] = obj2.rawData[oPosX]
+    obj1.gfx.pos[1] = obj2.rawData[oPosY] + obj2.rawData[oGraphYOffset]
+    obj1.gfx.pos[2] = obj2.rawData[oPosZ]
+
+    obj1.gfx.angle[0] = obj2.rawData[oMoveAnglePitch] & 0xFFFF
+    obj1.gfx.angle[1] = obj2.rawData[oMoveAngleYaw] & 0xFFFF
+    obj1.gfx.angle[2] = obj2.rawData[oMoveAngleRoll] & 0xFFFF
+}
+
+export const obj_translate_local = (obj, posIndex, localTranslateIndex) => {
+    const dx = obj.rawData[localTranslateIndex + 0]
+    const dy = obj.rawData[localTranslateIndex + 1]
+    const dz = obj.rawData[localTranslateIndex + 2]
+
+    obj.rawData[posIndex + 0] += obj.transform[0][0] * dx + obj.transform[1][0] * dy + obj.transform[2][0] * dz
+    obj.rawData[posIndex + 1] += obj.transform[0][1] * dx + obj.transform[1][1] * dy + obj.transform[2][1] * dz
+    obj.rawData[posIndex + 2] += obj.transform[0][2] * dx + obj.transform[1][2] * dy + obj.transform[2][2] * dz
+}
+
+export const obj_build_transform_from_pos_and_angle = (obj, posIndex, angleIndex) => {
+    const translate = []
+    const rotation = []
+
+    translate[0] = obj.rawData[posIndex + 0]
+    translate[1] = obj.rawData[posIndex + 1]
+    translate[2] = obj.rawData[posIndex + 2]
+
+    rotation[0] = obj.rawData[angleIndex + 0]
+    rotation[1] = obj.rawData[angleIndex + 1]
+    rotation[2] = obj.rawData[angleIndex + 2]
+
+    mtxf_rotate_zxy_and_translate(obj.transform, translate, rotation)
+}
+
+export const obj_set_throw_matrix_from_transform = (obj) => {
+    if (obj.rawData[oFlags] & OBJ_FLAG_0020) {
+        obj_build_transform_from_pos_and_angle(obj, O_FACE_ANGLE_INDEX, O_MOVE_ANGLE_INDEX);
+        obj_apply_scale_to_transform(obj);
+    }
+
+    obj.gfx.throwMatrix = obj.transform;
+
+    cur_obj_scale(1.0);
+}
+
+export const obj_build_transform_relative_to_parent = (obj) => {
+    let parent = obj.parentObj;
+
+    obj_build_transform_from_pos_and_angle(obj, O_PARENT_RELATIVE_POS_INDEX, O_FACE_ANGLE_INDEX);
+    obj_apply_scale_to_transform(obj);
+    mtxf_mul(obj.transform, obj.transform, parent.transform);
+
+    obj.rawData[oPosX] = obj.transform[3][0];
+    obj.rawData[oPosY] = obj.transform[3][1];
+    obj.rawData[oPosZ] = obj.transform[3][2];
+
+    obj.gfx.throwMatrix = obj.transform;
+
+    cur_obj_scale(1.0);
+}
+
+export const obj_create_transform_from_self = (obj) => {
+    obj.rawData[oFlags] &= ~OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT;
+    obj.rawData[oFlags] |= OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM;
+
+    obj.transform[3][0] = obj.rawData[oPosX];
+    obj.transform[3][1] = obj.rawData[oPosY];
+    obj.transform[3][2] = obj.rawData[oPosZ];
+}
+
+export const cur_obj_rotate_move_angle_using_vel = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oMoveAnglePitch] = s16(o.rawData[oMoveAnglePitch] + o.rawData[oAngleVelPitch])
+    o.rawData[oMoveAngleYaw]   = s16(o.rawData[oMoveAngleYaw]   + o.rawData[oAngleVelYaw])
+    o.rawData[oMoveAngleRoll]  = s16(o.rawData[oMoveAngleRoll]  + o.rawData[oAngleVelRoll])
+}
+
+export const cur_obj_rotate_face_angle_using_vel = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oFaceAnglePitch] = s16(o.rawData[oFaceAnglePitch] + o.rawData[oAngleVelPitch])
+    o.rawData[oFaceAngleYaw]   = s16(o.rawData[oFaceAngleYaw]   + o.rawData[oAngleVelYaw])
+    o.rawData[oFaceAngleRoll]  = s16(o.rawData[oFaceAngleRoll]  + o.rawData[oAngleVelRoll])
+}
+
+export const cur_obj_set_face_angle_to_move_angle = () => {
+    const o = ObjectListProc.gCurrentObject
+    o.rawData[oFaceAnglePitch] = o.rawData[oMoveAnglePitch]
+    o.rawData[oFaceAngleYaw]   = o.rawData[oMoveAngleYaw]
+    o.rawData[oFaceAngleRoll]  = o.rawData[oMoveAngleRoll]
+}
+
+export const cur_obj_follow_path = (unusedArg) => {
+    const o = ObjectListProc.gCurrentObject
+    let trajectory
+    let lastIndex, lastWaypoint
+    let targetIndex, targetWaypoint
+    let prevToNextX, prevToNextY, prevToNextZ
+    let objToNextXZ
+    let objToNextX, objToNextY, objToNextZ
+
+    if (o.rawData[oPathedPrevWaypointFlags] == 0) {
+        o.rawData[oPathedPrevWaypoint] = 0
+        o.rawData[oPathedPrevWaypointFlags] = WAYPOINT_FLAGS_INITIALIZED
+    }
+
+    trajectory = o.rawData[oPathedStartWaypoint]
+    lastIndex  = o.rawData[oPathedPrevWaypoint]
+
+    if (trajectory[lastIndex + 1].flags != WAYPOINT_FLAGS_END) {
+        targetIndex = lastIndex + 1
+    } else {
+        targetIndex = 0
+    }
+
+    lastWaypoint   = trajectory[lastIndex]
+    targetWaypoint = trajectory[targetIndex]
+
+    o.rawData[oPathedPrevWaypointFlags] = lastWaypoint.flags | WAYPOINT_FLAGS_INITIALIZED
+
+    prevToNextX = targetWaypoint.pos[0] - lastWaypoint.pos[0]
+    prevToNextY = targetWaypoint.pos[1] - lastWaypoint.pos[1]
+    prevToNextZ = targetWaypoint.pos[2] - lastWaypoint.pos[2]
+
+    objToNextX = targetWaypoint.pos[0] - o.rawData[oPosX]
+    objToNextY = targetWaypoint.pos[1] - o.rawData[oPosY]
+    objToNextZ = targetWaypoint.pos[2] - o.rawData[oPosZ]
+    objToNextXZ = Math.sqrt(objToNextX * objToNextX + objToNextZ * objToNextZ)
+
+    o.rawData[oPathedTargetYaw] = atan2s(objToNextZ, objToNextX)
+    o.rawData[oPathedTargetPitch] = atan2s(objToNextXZ, -objToNextY)
+
+      // If dot(prevToNext, objToNext) <= 0 (i.e. reached other side of target waypoint)
+    if (prevToNextX * objToNextX + prevToNextY * objToNextY + prevToNextZ * objToNextZ <= 0.0) {
+        o.rawData[oPathedPrevWaypoint] = targetIndex
+        if (trajectory[targetIndex + 1].flags == WAYPOINT_FLAGS_END) {
+            return PATH_REACHED_END
+        } else {
+            return PATH_REACHED_WAYPOINT
+        }
+    }
+
+    return PATH_NONE
+}
+
+export const chain_segment_init = (segment) => {
+    segment.posX = 0;
+    segment.posY = 0;
+    segment.posZ = 0;
+    segment.pitch = 0;
+    segment.yaw = 0;
+    segment.roll = 0;
+}
+
+export const random_f32_around_zero = (diameter) => {
+    return random_float() * diameter - diameter / 2
+}
+
+// ...
+
+export const cur_obj_has_model = (modelID) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    if (o.gfx.sharedChild == gLinker.Area.gLoadedGraphNodes[modelID]) {
+        return true
+    } else {
+        return false
+    }
+}
+
+export const cur_obj_unrender_and_reset_state = (animIndex, action) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    cur_obj_become_intangible()
+    cur_obj_disable_rendering()
+
+    if (animIndex >= 0) {
+        cur_obj_init_animation_with_sound(animIndex)
+    }
+
+    o.rawData[oAction] = action
+}
+
+export const obj_translate_xz_random = (obj, rangeLength) => {
+    obj.rawData[oPosX] += Math.random() * rangeLength - rangeLength * 0.5
+    obj.rawData[oPosZ] += Math.random() * rangeLength - rangeLength * 0.5
+}
+
+const obj_build_vel_from_transform = (a0) => {
+    let spC = a0.rawData[oUnkC0]
+    let sp8 = a0.rawData[oUnkBC]
+    let sp4 = a0.rawData[oForwardVel]
+
+    a0.rawData[oVelX] = a0.transform[0][0] * spC + a0.transform[1][0] * sp8 + a0.transform[2][0] * sp4
+    a0.rawData[oVelY] = a0.transform[0][1] * spC + a0.transform[1][1] * sp8 + a0.transform[2][1] * sp4
+    a0.rawData[oVelZ] = a0.transform[0][2] * spC + a0.transform[1][2] * sp8 + a0.transform[2][2] * sp4
+}
+
+export const cur_obj_set_pos_via_transform = () => {
+    const o = ObjectListProc.gCurrentObject
+    obj_build_transform_from_pos_and_angle(o, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX)
+    obj_build_vel_from_transform(o)
+    o.rawData[oPosX] += o.rawData[oVelX]
+    o.rawData[oPosY] += o.rawData[oVelY]
+    o.rawData[oPosZ] += o.rawData[oVelZ]
+}
+
+export const cur_obj_reflect_move_angle_off_wall = () => {
+    const o = ObjectListProc.gCurrentObject
+    return s16(o.rawData[oWallAngle] - (s16(o.rawData[oMoveAngleYaw]) - s16(o.rawData[oWallAngle])) + 0x8000)
+}
+
+
+export const approach_symmetric = (value, target, increment) => {
+    const dist = s16(target - value)
+
+    if (dist >= 0) {
+        if (dist > increment) {
+            value += increment
+        } else {
+            value = target
+        }
+    } else {
+        if (dist < -increment) {
+            value -= increment
+        } else {
+            value = target
+        }
+    }
+
+    return value
 }
 
 export const cur_obj_scale_over_time = (a0, a1, sp10, sp14) => {
@@ -1807,83 +2130,6 @@ export const cur_obj_if_hit_wall_bounce_away = () => {
     if (o.rawData[oMoveFlags] & OBJ_MOVE_HIT_WALL) {
         o.rawData[oMoveAngleYaw] = o.rawData[oWallAngle]
     }
-}
-
-export const cur_obj_update_floor_and_resolve_wall_collisions = (steepSlopeDegrees) => {
-    const o = ObjectListProc.gCurrentObject
-
-    o.rawData[oMoveFlags] &= ~(OBJ_MOVE_ABOVE_LAVA | OBJ_MOVE_ABOVE_DEATH_BARRIER)
-
-    if (o.activeFlags & (ACTIVE_FLAG_FAR_AWAY | ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
-        cur_obj_update_floor()
-        o.rawData[oMoveFlags] &= ~OBJ_MOVE_MASK_HIT_WALL_OR_IN_WATER
-
-        if (o.rawData[oPosY] > o.rawData[oFloorHeight]) {
-            o.rawData[oMoveFlags] |= OBJ_MOVE_IN_AIR
-        }
-    } else {
-        o.rawData[oMoveFlags] &= ~OBJ_MOVE_HIT_WALL
-        if (cur_obj_resolve_wall_collisions()) {
-            o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_WALL
-        }
-
-        cur_obj_update_floor()
-
-        if (o.rawData[oPosY] > o.rawData[oFloorHeight]) {
-            o.rawData[oMoveFlags] |= OBJ_MOVE_IN_AIR
-        }
-
-        if (cur_obj_detect_steep_floor(steepSlopeDegrees)) {
-            o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_WALL
-        }
-
-    }
-}
-export const cur_obj_update_floor_and_walls = () => {
-    cur_obj_update_floor_and_resolve_wall_collisions(60)
-}
-
-export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
-    const o = ObjectListProc.gCurrentObject
-    const gravity = o.rawData[oGravity]
-    const bounciness = o.rawData[oBounciness]
-    const bouyancy = o.rawData[oBuoyancy]
-    const dragStrength = o.rawData[oDragStrength]
-    let steepSlopeNormalY
-    let careAboutEdgesAndSteepSlopes = false
-    let negativeSpeed = false
-
-    //! Because some objects allow these active flags to be set but don't
-    //  aexport const updating when they are, we end up with "partial" update = ser=> e
-    //  an object's internal state will be updated, but it doesn't move.
-    //  This allows numerous glitches and is typically referred to as
-    //  deactivation (though this term has a different meaning in the code).
-    //  Objects that do this will be marked with //PARTIAL_UPDATE.
-
-    if (!(o.activeFlags & (ACTIVE_FLAG_FAR_AWAY | ACTIVE_FLAG_IN_DIFFERENT_ROOM))) {
-        if (steepSlopeAngleDegrees < 0) {
-            careAboutEdgesAndSteepSlopes = 1
-            steepSlopeAngleDegrees = -steepSlopeAngleDegrees
-        }
-
-        steepSlopeNormalY = coss(steepSlopeAngleDegrees * (0x10000 / 360))
-
-        cur_obj_compute_vel_xz()
-        cur_obj_apply_drag_xz(dragStrength)
-
-        cur_obj_move_xz(steepSlopeNormalY, careAboutEdgesAndSteepSlopes)
-        cur_obj_move_y(gravity, bounciness, bouyancy)
-
-        if (o.rawData[oForwardVel] < 0) {
-            negativeSpeed = 1
-        }
-
-        o.rawData[oForwardVel] = Math.sqrt(Math.pow(o.rawData[oVelX], 2) + Math.pow(o.rawData[oVelZ], 2))
-        if (negativeSpeed) {
-            o.rawData[oForwardVel] = -o.rawData[oForwardVel]
-        }
-    }
-
 }
 
 export const cur_obj_is_mario_ground_pounding_platform = () => {
@@ -1986,101 +2232,11 @@ export const player_performed_grab_escape_action = () => {
     return result
 }
 
-
-export const cur_obj_rotate_move_angle_using_vel = () => {
-    const o = ObjectListProc.gCurrentObject
-    o.rawData[oMoveAnglePitch] = s16(o.rawData[oMoveAnglePitch] + o.rawData[oAngleVelPitch])
-    o.rawData[oMoveAngleYaw]   = s16(o.rawData[oMoveAngleYaw]   + o.rawData[oAngleVelYaw])
-    o.rawData[oMoveAngleRoll]  = s16(o.rawData[oMoveAngleRoll]  + o.rawData[oAngleVelRoll])
-}
-
-export const cur_obj_rotate_face_angle_using_vel = () => {
-    const o = ObjectListProc.gCurrentObject
-    o.rawData[oFaceAnglePitch] = s16(o.rawData[oFaceAnglePitch] + o.rawData[oAngleVelPitch])
-    o.rawData[oFaceAngleYaw]   = s16(o.rawData[oFaceAngleYaw]   + o.rawData[oAngleVelYaw])
-    o.rawData[oFaceAngleRoll]  = s16(o.rawData[oFaceAngleRoll]  + o.rawData[oAngleVelRoll])
-}
-
-export const cur_obj_set_face_angle_to_move_angle = () => {
-    const o = ObjectListProc.gCurrentObject
-    o.rawData[oFaceAnglePitch] = o.rawData[oMoveAnglePitch]
-    o.rawData[oFaceAngleYaw]   = o.rawData[oMoveAngleYaw]
-    o.rawData[oFaceAngleRoll]  = o.rawData[oMoveAngleRoll]
-}
-
-
 // struct Waypoint
 // {
 //     s16 flags;
 //     Vec3s pos;
 // };
-
-const WAYPOINT_FLAGS_END = -1
-const WAYPOINT_FLAGS_INITIALIZED = 0x8000
-const WAYPOINT_MASK_00FF = 0x00FF
-const WAYPOINT_FLAGS_PLATFORM_ON_TRACK_PAUSE = 3
-
-const PATH_NONE = 0
-const PATH_REACHED_END = -1
-const PATH_REACHED_WAYPOINT = 1
-
-export const cur_obj_follow_path = (unusedArg) => {
-    const o = ObjectListProc.gCurrentObject
-    let trajectory
-    let lastIndex, lastWaypoint
-    let targetIndex, targetWaypoint
-    let prevToNextX, prevToNextY, prevToNextZ
-    let objToNextXZ
-    let objToNextX, objToNextY, objToNextZ
-
-    if (o.rawData[oPathedPrevWaypointFlags] == 0) {
-        o.rawData[oPathedPrevWaypoint] = 0
-        o.rawData[oPathedPrevWaypointFlags] = WAYPOINT_FLAGS_INITIALIZED
-    }
-
-    trajectory = o.rawData[oPathedStartWaypoint]
-    lastIndex  = o.rawData[oPathedPrevWaypoint]
-
-    if (trajectory[lastIndex + 1].flags != WAYPOINT_FLAGS_END) {
-        targetIndex = lastIndex + 1
-    } else {
-        targetIndex = 0
-    }
-
-    lastWaypoint   = trajectory[lastIndex]
-    targetWaypoint = trajectory[targetIndex]
-
-    o.rawData[oPathedPrevWaypointFlags] = lastWaypoint.flags | WAYPOINT_FLAGS_INITIALIZED
-
-    prevToNextX = targetWaypoint.pos[0] - lastWaypoint.pos[0]
-    prevToNextY = targetWaypoint.pos[1] - lastWaypoint.pos[1]
-    prevToNextZ = targetWaypoint.pos[2] - lastWaypoint.pos[2]
-
-    objToNextX = targetWaypoint.pos[0] - o.rawData[oPosX]
-    objToNextY = targetWaypoint.pos[1] - o.rawData[oPosY]
-    objToNextZ = targetWaypoint.pos[2] - o.rawData[oPosZ]
-    objToNextXZ = Math.sqrt(objToNextX * objToNextX + objToNextZ * objToNextZ)
-
-    o.rawData[oPathedTargetYaw] = atan2s(objToNextZ, objToNextX)
-    o.rawData[oPathedTargetPitch] = atan2s(objToNextXZ, -objToNextY)
-
-      // If dot(prevToNext, objToNext) <= 0 (i.e. reached other side of target waypoint)
-    if (prevToNextX * objToNextX + prevToNextY * objToNextY + prevToNextZ * objToNextZ <= 0.0) {
-        o.rawData[oPathedPrevWaypoint] = targetIndex
-        if (trajectory[targetIndex + 1].flags == WAYPOINT_FLAGS_END) {
-            return PATH_REACHED_END
-        } else {
-            return PATH_REACHED_WAYPOINT
-        }
-    }
-
-    return PATH_NONE
-}
-
-
-export const random_f32_around_zero = (diameter) => {
-    return random_float() * diameter - diameter / 2
-}
 
 export const cur_obj_spawn_particles = (info) => {
     const o = ObjectListProc.gCurrentObject
@@ -2117,16 +2273,6 @@ export const cur_obj_spawn_particles = (info) => {
 
 }
 
-export const cur_obj_within_12k_bounds = () => {
-    const o = ObjectListProc.gCurrentObject
-
-    if (o.rawData[oPosX] < -12000 || 12000 < o.rawData[oPosX]) return false
-    if (o.rawData[oPosY] < -12000 || 12000 < o.rawData[oPosY]) return false
-    if (o.rawData[oPosZ] < -12000 || 12000 < o.rawData[oPosZ]) return false
-
-    return true
-}
-
 export const obj_scale_random = (obj, rangeLength, minScale) => {
     const scale = random_float() * rangeLength + minScale
     obj_scale_xyz(obj, scale, scale, scale)
@@ -2136,21 +2282,6 @@ export const obj_translate_xyz_random = (obj, rangeLength) => {
     obj.rawData[oPosX] += random_float() * rangeLength - rangeLength * 0.5
     obj.rawData[oPosY] += random_float() * rangeLength - rangeLength * 0.5
     obj.rawData[oPosZ] += random_float() * rangeLength - rangeLength * 0.5
-}
-
-export const cur_obj_move_using_vel_and_gravity = () => {
-    const o = gLinker.ObjectListProcessor.gCurrentObject
-    if (cur_obj_within_12k_bounds()) {
-        o.rawData[oPosX] += o.rawData[oVelX]
-        o.rawData[oPosZ] += o.rawData[oVelZ]
-        o.rawData[oVelY] += o.rawData[oGravity]
-        o.rawData[oPosY] += o.rawData[oVelY]
-    }
-}
-
-export const cur_obj_move_using_fvel_and_gravity = () => {
-    cur_obj_compute_vel_xz()
-    cur_obj_move_using_vel_and_gravity()
 }
 
 export const cur_obj_push_mario_away = (radius) => {
@@ -2176,35 +2307,6 @@ export const cur_obj_push_mario_away_from_cylinder = (radius, extentY) => {
     if (marioRelY < extentY) {
         cur_obj_push_mario_away(radius)
     }
-}
-
-export const obj_spawn_loot_coins = (obj, numCoins, sp30, coinsBehavior, posJitter, model) => {
-
-    const floorWrapper = {}
-    let spawnHeight = gLinker.SurfaceCollision.find_floor(obj.rawData[oPosX], obj.rawData[oPosY], obj.rawData[oPosZ], floorWrapper)
-
-    if (obj.rawData[oPosY] - spawnHeight > 100) {
-        spawnHeight = obj.rawData[oPosY]
-    }
-
-    for (let i = 0; i < numCoins; i++) {
-        if (obj.rawData[oNumLootCoins] <= 0) break
-
-        obj.rawData[oNumLootCoins]--
-
-        const coin = spawn_object(obj, model, coinsBehavior)
-        obj_translate_xz_random(coin, posJitter)
-        coin.rawData[oPosY] = spawnHeight
-        coin.rawData[oCoinBaseVelY] = sp30
-    }
-}
-
-export const obj_spawn_loot_blue_coins = (obj, numCoins, sp28, posJitter) => {
-    obj_spawn_loot_coins(obj, numCoins, sp28, gLinker.behaviors.bhvBlueCoinJumping, posJitter, MODEL_BLUE_COIN)
-}
-
-export const obj_spawn_loot_yellow_coins = (obj, numCoins, sp28) => {
-    obj_spawn_loot_coins(obj, numCoins, sp28, gLinker.behaviors.bhvSingleCoinGetsSpawned, 0, MODEL_YELLOW_COIN)
 }
 
 export const spawn_mist_particles = () => {

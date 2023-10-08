@@ -75,7 +75,7 @@ import { spawn_triangle_break_particles } from "./behaviors/break_particles.inc"
 
 import { G_AC_DITHER } from "../include/gbi"
 import { LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC } from "../levels/level_defines_constants"
-import { CameraInstance, CUTSCENE_CAP_SWITCH_PRESS } from "./Camera"
+import { CameraInstance as Camera, CUTSCENE_CAP_SWITCH_PRESS } from "./Camera"
 import { MARIO_DIALOG_STATUS_SPEAK, MARIO_DIALOG_STOP, mario_ready_to_speak, set_mario_npc_dialog } from "./MarioActionsCutscene"
 import { DIALOG_RESPONSE_NONE } from "./IngameMenu"
 import { spawn_default_star } from "./behaviors/spawn_star.inc"
@@ -997,6 +997,404 @@ export const mario_is_dive_sliding = () => {
     }
 }
 
+export const cur_obj_set_y_vel_and_animation = (velY, animIndex) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    o.rawData[oVelY] = velY
+    cur_obj_init_animation_with_sound(animIndex)
+}
+
+export const cur_obj_unrender_set_action_and_anim = (animIndex, action) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    cur_obj_become_intangible();
+    cur_obj_disable_rendering();
+
+    // only set animation if non-negative value
+    if (animIndex >= 0) {
+        cur_obj_init_animation_with_sound(animIndex);
+    }
+
+    o.rawData[oAction] = action;
+}
+
+const cur_obj_move_after_thrown_or_dropped = (forwardVel, velY) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+
+    o.rawData[oMoveFlags] = 0
+    o.rawData[oFloorHeight] = gLinker.SurfaceCollision.find_floor_height(o.rawData[oPosX], o.rawData[oPosY] + 160.0, o.rawData[oPosZ])
+
+    if (o.rawData[oFloorHeight] > o.rawData[oPosY]) {
+        o.rawData[oPosY] = o.rawData[oFloorHeight]
+    } else if (o.rawData[oFloorHeight] < -10000.0) {
+        //! OoB failsafe
+        obj_copy_pos(o, gMarioObject)
+        o.rawData[oFloorHeight] = gLinker.SurfaceCollision.find_floor_height(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
+    }
+
+    o.rawData[oForwardVel] = forwardVel
+    o.rawData[oVelY] = velY
+
+    if (o.rawData[oForwardVel] != 0) {
+        cur_obj_move_y(/*gravity*/ -4.0, /*bounciness*/ -0.1, /*buoyancy*/ 2.0)
+    }
+}
+
+export const cur_obj_get_thrown_or_placed = (forwardVel, velY, thrownAction) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    if (o.behavior == gLinker.behaviors.bhvBowser) {
+          // Interestingly, when bowser is thrown, he is offset slightly to
+          // Mario's right
+        cur_obj_set_pos_relative_to_parent(-41.684, 85.859, 321.577)
+    }
+
+    cur_obj_become_tangible()
+    cur_obj_enable_rendering()
+
+    o.rawData[oHeldState] = HELD_FREE
+
+    if ((o.rawData[oInteractionSubtype] & INT_SUBTYPE_HOLDABLE_NPC) || forwardVel == 0.0) {
+        cur_obj_move_after_thrown_or_dropped(0.0, 0.0)
+    } else {
+        o.rawData[oAction] = thrownAction
+        cur_obj_move_after_thrown_or_dropped(forwardVel, velY)
+    }
+}
+
+export const cur_obj_get_dropped = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    cur_obj_become_tangible()
+    cur_obj_enable_rendering()
+
+    o.rawData[oHeldState] = HELD_FREE
+    cur_obj_move_after_thrown_or_dropped(0.0, 0.0)
+}
+
+export const cur_obj_set_model = (modelID) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    o.gfx.sharedChild = gLinker.Area.gLoadedGraphNodes[modelID]
+}
+
+export const mario_set_flag = (flag) => {
+    const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
+
+    gMarioStates[0].flags |= flag;
+}
+
+export const cur_obj_clear_interact_status_flag = (flag) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    if (o.rawData[oInteractStatus] & flag) {
+        o.rawData[oInteractStatus] &= flag ^ ~(0)
+        return true
+    }
+    return false
+}
+
+export const obj_mark_for_deletion = (obj) => {
+    obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED
+}
+
+export const cur_obj_disable = () => {
+    cur_obj_disable_rendering();
+    cur_obj_hide();
+    cur_obj_become_intangible();
+}
+
+export const cur_obj_become_intangible = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    o.rawData[oIntangibleTimer] = -1
+}
+
+export const cur_obj_become_tangible = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    o.rawData[oIntangibleTimer] = 0
+}
+
+export const obj_become_tangible = (obj) => {
+    obj.rawData[oIntangibleTimer] = 0
+}
+
+export const cur_obj_update_floor_height = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    o.rawData[oFloorHeight] = gLinker.SurfaceCollision.find_floor(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], {})
+}
+
+export const cur_obj_update_floor_height_and_get_floor = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    const floorWrapper = {}
+    o.rawData[oFloorHeight] = gLinker.SurfaceCollision.find_floor(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], floorWrapper)
+    return floorWrapper.floor
+}
+
+export const apply_drag_to_value = (ptr, dragStrength) => {
+
+    if (ptr.value != 0) {
+        //! Can overshoot if |*value| > 1/(dragStrength * 0.0001)
+        const decel = (ptr.value) * (ptr.value) * (dragStrength * 0.0001)
+
+        if (ptr.value > 0) {
+            ptr.value -= decel
+            if (ptr.value < 0.001) {
+                ptr.value = 0
+            }
+        } else {
+            ptr.value += decel
+            if (ptr.value > -0.001) {
+                ptr.value = 0
+            }
+        }
+    }
+}
+
+export const cur_obj_apply_drag_xz = (dragStrength) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    const wrapper = { value: o.rawData[oVelX] }
+    apply_drag_to_value(wrapper, dragStrength)
+    o.rawData[oVelX] = wrapper.value
+
+    wrapper.value = o.rawData[oVelZ]
+    apply_drag_to_value(wrapper, dragStrength)
+    o.rawData[oVelZ] = wrapper.value
+}
+
+export const cur_obj_move_xz = (steepSlopeNormalY, careAboutEdgesAndSteepSlopes) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    const intendedX = o.rawData[oPosX] + o.rawData[oVelX]
+    const intendedZ = o.rawData[oPosZ] + o.rawData[oVelZ]
+
+    const intendedFloorWrapper = {}
+    const intendedFloorHeight = gLinker.SurfaceCollision.find_floor(intendedX, o.rawData[oPosY], intendedZ, intendedFloorWrapper)
+    const deltaFloorHeight = intendedFloorHeight - o.rawData[oFloorHeight]
+
+
+    o.rawData[oMoveFlags] &= ~OBJ_MOVE_HIT_EDGE
+
+    if (o.rawData[oRoom] != -1 && intendedFloorWrapper.floor) {
+        if (intendedFloorWrapper.floor.room != 0 && o.rawData[oRoom] != intendedFloorWrapper.floor.room && intendedFloorWrapper.floor.room != 18) {
+            // Don't leave native room
+            return false
+        }
+    }
+
+    if (intendedFloorHeight < -10000.0) {
+        // Don't move into OoB
+        o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_EDGE
+        return false
+    } else if (deltaFloorHeight < 5.0) {
+        if (!careAboutEdgesAndSteepSlopes) {
+            // If we don't care about edges or steep slopes, okay to move
+            o.rawData[oPosX] = intendedX
+            o.rawData[oPosZ] = intendedZ
+            return true
+        } else if (deltaFloorHeight < -50.0 && (o.rawData[oMoveFlags] & OBJ_MOVE_ON_GROUND)) {
+            // Don't walk off an edge
+            o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_EDGE
+            return false
+        } else if (intendedFloorWrapper.floor.normal.y > steepSlopeNormalY) {
+            // Allow movement onto a slope, provided it's not too steep
+            o.rawData[oPosX] = intendedX
+            o.rawData[oPosZ] = intendedZ
+            return true
+        } else {
+            // We are likely trying to move onto a steep downward slope
+            o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_EDGE
+            return false
+        }
+    } else if ((intendedFloorWrapper.floor.normal.y) > steepSlopeNormalY || o.rawData[oPosY] > intendedFloorHeight) {
+        // Allow movement upward, provided either:
+        // - The target floor is flat enough (e.g. walking up stairs)
+        // - We are above the target floor (most likely in the air)
+        o.rawData[oPosX] = intendedX
+        o.rawData[oPosZ] = intendedZ
+        //! Returning FALSE but moving anyway (not exploitable; return value is
+        //  never used)
+    }
+
+    // We are likely trying to move onto a steep upward slope
+    return false
+}
+
+export const cur_obj_move_update_underwater_flags = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    let decelY = sqrtf(o.rawData[oVelY] * o.rawData[oVelY]) * (o.rawData[oDragStrength] * 7.0) / 100.0
+
+    if (o.rawData[oVelY] > 0) {
+        o.rawData[oVelY] -= decelY
+    } else {
+        o.rawData[oVelY] += decelY
+    }
+
+    if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
+        o.rawData[oPosY] = o.rawData[oFloorHeight]
+        o.rawData[oMoveFlags] |= OBJ_MOVE_UNDERWATER_ON_GROUND
+    } else {
+        o.rawData[oMoveFlags] |= OBJ_MOVE_UNDERWATER_OFF_GROUND
+    }
+}
+
+export const cur_obj_move_update_ground_air_flags = (gravity, bounciness) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    o.rawData[oMoveFlags] &= ~OBJ_MOVE_BOUNCE
+
+    if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
+        // On the first frame that we touch the ground, set OBJ_MOVE_LANDED.
+        // On subsequent frames, set OBJ_MOVE_ON_GROUND
+        if (!(o.rawData[oMoveFlags] & OBJ_MOVE_ON_GROUND)) {
+
+            const { result, newBitSet } = clear_move_flag(o.rawData[oMoveFlags], OBJ_MOVE_LANDED)
+            o.rawData[oMoveFlags] = newBitSet
+            if (result) {
+                o.rawData[oMoveFlags] |= OBJ_MOVE_ON_GROUND
+            } else {
+                o.rawData[oMoveFlags] |= OBJ_MOVE_LANDED
+            }
+        }
+
+        o.rawData[oPosY] = o.rawData[oFloorHeight]
+
+        if (o.rawData[oVelY] < 0.0) {
+            o.rawData[oVelY] *= bounciness
+        }
+
+        if (o.rawData[oVelY] > 5.0) {
+            //! If OBJ_MOVE_13 tracks bouncing, it overestimates, since velY
+            // could be > 5 here without bounce (e.g. jump into misa)
+            o.rawData[oMoveFlags] |= OBJ_MOVE_BOUNCE
+        }
+    } else {
+        o.rawData[oMoveFlags] &= ~OBJ_MOVE_LANDED
+        const { result, newBitSet } = clear_move_flag(o.rawData[oMoveFlags], OBJ_MOVE_ON_GROUND)
+        o.rawData[oMoveFlags] = newBitSet
+        if (result) {
+            o.rawData[oMoveFlags] |= OBJ_MOVE_LEFT_GROUND
+        }
+    }
+
+    o.rawData[oMoveFlags] &= ~OBJ_MOVE_MASK_IN_WATER
+}
+
+export const cur_obj_move_y_and_get_water_level = (gravity, buoyancy) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    let waterLevel
+
+    o.rawData[oVelY] += gravity + buoyancy
+    if (o.rawData[oVelY] < -78.0) {
+        o.rawData[oVelY] = -78.0
+    }
+
+    o.rawData[oPosY] += o.rawData[oVelY]
+    if (o.activeFlags & ACTIVE_FLAG_UNK10) {
+        waterLevel = -11000.0
+    } else {
+        waterLevel = gLinker.SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ])
+    }
+
+    return waterLevel
+}
+
+export const cur_obj_move_y = (gravity, bounciness, buoyancy) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    o.rawData[oMoveFlags] &= ~OBJ_MOVE_LEFT_GROUND
+
+    if (o.rawData[oMoveFlags] & OBJ_MOVE_AT_WATER_SURFACE) {
+        if (o.rawData[oVelY] > 5.0) {
+            o.rawData[oMoveFlags] &= ~OBJ_MOVE_MASK_IN_WATER
+            o.rawData[oMoveFlags] |= OBJ_MOVE_LEAVING_WATER
+        }
+    }
+
+    if (!(o.rawData[oMoveFlags] & OBJ_MOVE_MASK_IN_WATER)) {
+        let waterLevel = cur_obj_move_y_and_get_water_level(gravity, 0.0)
+        if (o.rawData[oPosY] > waterLevel) {
+            //! We only handle floor collision if the object does not enter
+            //  water. This allows e.g. coins to clip through floors if they
+            //  enter water on the same frame.
+            cur_obj_move_update_ground_air_flags(gravity, bounciness)
+        } else {
+            o.rawData[oMoveFlags] |= OBJ_MOVE_ENTERED_WATER
+            o.rawData[oMoveFlags] &= ~OBJ_MOVE_MASK_ON_GROUND
+        }
+    } else {
+        o.rawData[oMoveFlags] &= ~OBJ_MOVE_ENTERED_WATER
+
+        const waterLevel = cur_obj_move_y_and_get_water_level(gravity, buoyancy)
+        if (o.rawData[oPosY] < waterLevel) {
+            cur_obj_move_update_underwater_flags()
+        } else {
+            if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
+                o.rawData[oPosY] = o.rawData[oFloorHeight]
+                o.rawData[oMoveFlags] &= ~OBJ_MOVE_MASK_IN_WATER
+            } else {
+                o.rawData[oPosY] = waterLevel
+                o.rawData[oVelY] = 0.0
+                o.rawData[oMoveFlags] &= ~(OBJ_MOVE_UNDERWATER_OFF_GROUND | OBJ_MOVE_UNDERWATER_ON_GROUND)
+                o.rawData[oMoveFlags] |= OBJ_MOVE_AT_WATER_SURFACE
+            }
+        }
+    }
+
+    if (o.rawData[oMoveFlags] & OBJ_MOVE_MASK_33) {
+        o.rawData[oMoveFlags] &= ~OBJ_MOVE_IN_AIR
+    } else {
+        o.rawData[oMoveFlags] |= OBJ_MOVE_IN_AIR
+    }
+}
+
+export const clear_move_flag = (bitSet, flag) => {
+    if (bitSet & flag) {
+        bitSet &= flag ^ 0xFFFFFFFF
+        return { result: 1, bitSet }
+    } else {
+        return { result: 0, bitSet }
+    }
+}
+
+export const abs_angle_diff = (x0, x1) => {
+    let diff = x1 - x0
+
+    if (diff == -0x8000) {
+        diff = -0x7FFF
+    }
+
+    if (diff < 0) {
+        diff = -diff
+    }
+
+    return diff
+}
+
+export const cur_obj_move_xz_using_fvel_and_yaw = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    o.rawData[oVelX] = o.rawData[oForwardVel] * sins(o.rawData[oMoveAngleYaw])
+    o.rawData[oVelZ] = o.rawData[oForwardVel] * coss(o.rawData[oMoveAngleYaw])
+
+    o.rawData[oPosX] += o.rawData[oVelX]
+    o.rawData[oPosZ] += o.rawData[oVelZ]
+}
+
+export const cur_obj_move_y_with_terminal_vel = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    if (o.rawData[oVelY] < -70.0) o.rawData[oVelY] = -70.0
+
+    o.rawData[oPosY] += o.rawData[oVelY]
+}
+
+export const cur_obj_compute_vel_xz = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    o.rawData[oVelX] = o.rawData[oForwardVel] * sins(o.rawData[oMoveAngleYaw])
+    o.rawData[oVelZ] = o.rawData[oForwardVel] * coss(o.rawData[oMoveAngleYaw])
+}
+
 export const increment_velocity_toward_range = (value, center, zeroThreshold, increment) => {
     let relative = value - center;
     if (relative > 0) {
@@ -1025,14 +1423,46 @@ export const obj_check_if_collided_with_object = (obj1, obj2) => {
 }
 
 export const cur_obj_set_behavior = (behavior) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     o.behavior = behavior
 }
 
-export const cur_obj_lateral_dist_to_home = () => {
-    let dist;
+export const obj_set_behavior = (obj, behavior) => {
+    obj.behavior = behavior
+}
+
+export const cur_obj_has_behavior = (behavior) => {
     const o = ObjectListProc.gCurrentObject
+    if (o.behavior == behavior) {
+        return true
+    } else {
+        return false
+    }
+}
+
+export const obj_has_behavior = (obj, behavior) => {
+    if (obj.behavior == behavior) {
+        return true
+    } else {
+        return false
+    }
+}
+
+export const cur_obj_lateral_dist_from_mario_to_home = () => {
+    const o = ObjectListProc.gCurrentObject
+
+    let dx = o.rawData[oHomeX] - ObjectListProc.gMarioObject.rawData[oPosX];
+    let dz = o.rawData[oHomeZ] - ObjectListProc.gMarioObject.rawData[oPosZ];
+
+    let dist = sqrtf(dx * dx + dz * dz);
+    return dist;
+}
+
+export const cur_obj_lateral_dist_to_home = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    let dist;
     let dx = o.rawData[oHomeX] - o.rawData[oPosX];
     let dz = o.rawData[oHomeZ] - o.rawData[oPosZ];
 
@@ -1040,51 +1470,80 @@ export const cur_obj_lateral_dist_to_home = () => {
     return dist;
 }
 
-export const cur_obj_set_model = (modelID) => {
-    const o = ObjectListProc.gCurrentObject
+export const cur_obj_outside_home_square = (halfLength) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
-    o.gfx.sharedChild = gLinker.Area.gLoadedGraphNodes[modelID]
+    if (
+        o.rawData[oHomeX] - halfLength > o.rawData[oPosX] ||
+        o.rawData[oHomeX] + halfLength < o.rawData[oPosX] ||
+        o.rawData[oHomeZ] - halfLength > o.rawData[oPosZ] ||
+        o.rawData[oHomeZ] + halfLength < o.rawData[oPosZ]
+    ) return true;
+
+    return false;
+}
+
+export const cur_obj_outside_home_rectangle = (minX, maxX, minZ, maxZ) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    if (
+        o.rawData[oHomeX] + minX > o.rawData[oPosX] ||
+        o.rawData[oHomeX] + maxX < o.rawData[oPosX] ||
+        o.rawData[oHomeZ] + minZ > o.rawData[oPosZ] ||
+        o.rawData[oHomeZ] + maxZ < o.rawData[oPosZ]
+    ) return true;
+
+    return false;
+}
+
+export const cur_obj_set_pos_to_home = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+
+    o.rawData[oPosX] = o.rawData[oHomeX];
+    o.rawData[oPosY] = o.rawData[oHomeY];
+    o.rawData[oPosZ] = o.rawData[oHomeZ];
+}
+
+export const cur_obj_set_pos_to_home_and_stop = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+
+    cur_obj_angle_to_home();
+    o.rawData[oForwardVel] = 0.0;
+    o.rawData[oVelY] = 0.0;
+}
+
+export const cur_obj_shake_y = (amount) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    o.rawData[oTimer] % 2 == 0 ? o.rawData[oPosY] += amount : o.rawData[oPosY] -= amount;
+}
+
+export const cur_obj_start_cam_event = (cameraEvent) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    Camera.gPlayerCameraState.cameraEvent = cameraEvent
+    Camera.gSecondCameraFocus = o
+}
+
+export const set_mario_interact_true_if_in_range = (range) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+
+    if (o.rawData[oDistanceToMario] < range) gMarioObject.rawData[oInteractStatus] = true;
+}
+
+export const obj_set_billboard = (obj) => {
+    obj.gfx.flags |= GRAPH_RENDER_BILLBOARD
 }
 
 export const cur_obj_has_model = (modelID) => {
-    const o = ObjectListProc.gCurrentObject
+    const o = gLinker.ObjectListProcessor.gCurrentObject
 
     if (o.gfx.sharedChild == gLinker.Area.gLoadedGraphNodes[modelID]) {
         return true
     } else {
         return false
     }
-}
-
-export const cur_obj_set_pos_to_home = () => {
-    const o = ObjectListProc.gCurrentObject
-
-    o.rawData[oPosX] = o.rawData[oHomeX]
-    o.rawData[oPosY] = o.rawData[oHomeY]
-    o.rawData[oPosZ] = o.rawData[oHomeZ]
-}
-
-export const cur_obj_shake_y = (amount) => {
-    o.rawData[oTimer] % 2 == 0 ? o.rawData[oPosY] += amount : o.rawData[oPosY] -= amount;
-}
-
-export const cur_obj_set_y_vel_and_animation = (velY, animIndex) => {
-    const o = gLinker.ObjectListProcessor.gCurrentObject
-    o.rawData[oVelY] = velY
-    cur_obj_init_animation_with_sound(animIndex)
-}
-
-export const cur_obj_unrender_set_action_and_anim = (animIndex, action) => {
-    const o = gLinker.ObjectListProcessor.gCurrentObject
-    cur_obj_become_intangible();
-    cur_obj_disable_rendering();
-
-    // only set animation if non-negative value
-    if (animIndex >= 0) {
-        cur_obj_init_animation_with_sound(animIndex);
-    }
-
-    o.rawData[oAction] = action;
 }
 
 export const cur_obj_unrender_and_reset_state = (animIndex, action) => {
@@ -1097,57 +1556,6 @@ export const cur_obj_unrender_and_reset_state = (animIndex, action) => {
     }
 
     o.rawData[oAction] = action
-}
-
-const cur_obj_move_after_thrown_or_dropped = (forwardVel, velY) => {
-    const o = gLinker.ObjectListProcessor.gCurrentObject
-    o.rawData[oMoveFlags] = 0
-    o.rawData[oFloorHeight] = gLinker.SurfaceCollision.find_floor_height(o.rawData[oPosX], o.rawData[oPosY] + 160.0, o.rawData[oPosZ])
-
-    if (o.rawData[oFloorHeight] > o.rawData[oPosY]) {
-        o.rawData[oPosY] = o.rawData[oFloorHeight]
-    } else if (o.rawData[oFloorHeight] < -10000.0) {
-        //! OoB failsafe
-        obj_copy_pos(o, ObjectListProc.gMarioObject)
-        o.rawData[oFloorHeight] = gLinker.SurfaceCollision.find_floor_height(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
-    }
-
-    o.rawData[oForwardVel] = forwardVel
-    o.rawData[oVelY] = velY
-
-    if (o.rawData[oForwardVel] != 0) {
-        cur_obj_move_y(/*gravity*/ -4.0, /*bounciness*/ -0.1, /*buoyancy*/ 2.0)
-    }
-}
-
-export const cur_obj_get_thrown_or_placed = (forwardVel, velY, thrownAction) => {
-    const o = ObjectListProc.gCurrentObject
-    if (o.behavior == gLinker.behaviors.bhvBowser) {
-          // Interestingly, when bowser is thrown, he is offset slightly to
-          // Mario's right
-        cur_obj_set_pos_relative_to_parent(-41.684, 85.859, 321.577)
-    }
-
-    cur_obj_become_tangible()
-    cur_obj_enable_rendering()
-
-    o.rawData[oHeldState] = HELD_FREE
-
-    if ((o.rawData[oInteractionSubtype] & INT_SUBTYPE_HOLDABLE_NPC) || forwardVel == 0.0) {
-        cur_obj_move_after_thrown_or_dropped(0.0, 0.0)
-    } else {
-        o.rawData[oAction] = thrownAction
-        cur_obj_move_after_thrown_or_dropped(forwardVel, velY)
-    }
-}
-
-export const cur_obj_get_dropped = () => {
-    const o = ObjectListProc.gCurrentObject
-    cur_obj_become_tangible()
-    cur_obj_enable_rendering()
-
-    o.rawData[oHeldState] = HELD_FREE
-    cur_obj_move_after_thrown_or_dropped(0.0, 0.0)
 }
 
 export const obj_translate_xz_random = (obj, rangeLength) => {
@@ -1249,20 +1657,6 @@ export const approach_symmetric = (value, target, increment) => {
     return value
 }
 
-export const abs_angle_diff = (x0, x1) => {
-    let diff = x1 - x0
-
-    if (diff == -0x8000) {
-        diff = -0x7FFF
-    }
-
-    if (diff < 0) {
-        diff = -diff
-    }
-
-    return diff
-}
-
 export const cur_obj_detect_steep_floor = (steepAngleDegrees) => {
 
     const o = ObjectListProc.gCurrentObject
@@ -1325,21 +1719,6 @@ export const cur_obj_resolve_wall_collisions = () => {
     }
 
     return false
-}
-
-export const cur_obj_update_floor_height_and_get_floor = () => {
-
-    const o = ObjectListProc.gCurrentObject
-
-    const floorWrapper = {}
-    o.rawData[oFloorHeight] = gLinker.SurfaceCollision.find_floor(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], floorWrapper)
-    return floorWrapper.floor
-}
-
-export const cur_obj_update_floor_height = () => {
-
-    const o = ObjectListProc.gCurrentObject
-    o.rawData[oFloorHeight] = gLinker.SurfaceCollision.find_floor(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], {})
 }
 
 
@@ -1464,217 +1843,6 @@ export const cur_obj_update_floor_and_walls = () => {
     cur_obj_update_floor_and_resolve_wall_collisions(60)
 }
 
-export const clear_move_flag = (bitSet, flag) => {
-    if (bitSet & flag) {
-        bitSet &= flag ^ 0xFFFFFFFF
-        return { result: 1, bitSet }
-    } else {
-        return { result: 0, bitSet }
-    }
-}
-
-export const cur_obj_move_update_ground_air_flags = (gravity, bounciness) => {
-
-    const o = ObjectListProc.gCurrentObject
-
-    o.rawData[oMoveFlags] &= ~OBJ_MOVE_BOUNCE
-
-    if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
-        // On the first frame that we touch the ground, set OBJ_MOVE_LANDED.
-        // On subsequent frames, set OBJ_MOVE_ON_GROUND
-        if (!(o.rawData[oMoveFlags] & OBJ_MOVE_ON_GROUND)) {
-
-            const { result, newBitSet } = clear_move_flag(o.rawData[oMoveFlags], OBJ_MOVE_LANDED)
-            o.rawData[oMoveFlags] = newBitSet
-            if (result) {
-                o.rawData[oMoveFlags] |= OBJ_MOVE_ON_GROUND
-            } else {
-                o.rawData[oMoveFlags] |= OBJ_MOVE_LANDED
-            }
-        }
-
-        o.rawData[oPosY] = o.rawData[oFloorHeight]
-
-        if (o.rawData[oVelY] < 0.0) {
-            o.rawData[oVelY] *= bounciness
-        }
-
-        if (o.rawData[oVelY] > 5.0) {
-            //! If OBJ_MOVE_13 tracks bouncing, it overestimates, since velY
-            // could be > 5 here without bounce (e.g. jump into misa)
-            o.rawData[oMoveFlags] |= OBJ_MOVE_BOUNCE
-        }
-    } else {
-        o.rawData[oMoveFlags] &= ~OBJ_MOVE_LANDED
-        const { result, newBitSet } = clear_move_flag(o.rawData[oMoveFlags], OBJ_MOVE_ON_GROUND)
-        o.rawData[oMoveFlags] = newBitSet
-        if (result) {
-            o.rawData[oMoveFlags] |= OBJ_MOVE_LEFT_GROUND
-        }
-    }
-
-    o.rawData[oMoveFlags] &= ~OBJ_MOVE_MASK_IN_WATER
-}
-
-export const cur_obj_move_y_and_get_water_level = (gravity, buoyancy) => {
-
-    const o = ObjectListProc.gCurrentObject
-
-    let waterLevel
-
-    o.rawData[oVelY] += gravity + buoyancy
-    if (o.rawData[oVelY] < -78.0) {
-        o.rawData[oVelY] = -78.0
-    }
-
-    o.rawData[oPosY] += o.rawData[oVelY]
-    if (o.activeFlags & ACTIVE_FLAG_UNK10) {
-        waterLevel = -11000.0
-    } else {
-        waterLevel = gLinker.SurfaceCollision.find_water_level(o.rawData[oPosX], o.rawData[oPosZ])
-    }
-
-    return waterLevel
-}
-
-export const cur_obj_move_xz_using_fvel_and_yaw = () => {
-    const o = ObjectListProc.gCurrentObject
-
-    o.rawData[oVelX] = o.rawData[oForwardVel] * sins(o.rawData[oMoveAngleYaw])
-    o.rawData[oVelZ] = o.rawData[oForwardVel] * coss(o.rawData[oMoveAngleYaw])
-
-    o.rawData[oPosX] += o.rawData[oVelX]
-    o.rawData[oPosZ] += o.rawData[oVelZ]
-}
-
-export const cur_obj_move_xz = (steepSlopeNormalY, careAboutEdgesAndSteepSlopes) => {
-
-    const o = ObjectListProc.gCurrentObject
-
-    const intendedX = o.rawData[oPosX] + o.rawData[oVelX]
-    const intendedZ = o.rawData[oPosZ] + o.rawData[oVelZ]
-
-    const intendedFloorWrapper = {}
-    const intendedFloorHeight = gLinker.SurfaceCollision.find_floor(intendedX, o.rawData[oPosY], intendedZ, intendedFloorWrapper)
-    const deltaFloorHeight = intendedFloorHeight - o.rawData[oFloorHeight]
-
-
-    o.rawData[oMoveFlags] &= ~OBJ_MOVE_HIT_EDGE
-
-    if (o.rawData[oRoom] != -1 && intendedFloorWrapper.floor) {
-        if (intendedFloorWrapper.floor.room != 0 && o.rawData[oRoom] != intendedFloorWrapper.floor.room && intendedFloorWrapper.floor.room != 18) {
-            // Don't leave native room
-            return false
-        }
-    }
-
-    if (intendedFloorHeight < -10000.0) {
-        // Don't move into OoB
-        o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_EDGE
-        return false
-    } else if (deltaFloorHeight < 5.0) {
-        if (!careAboutEdgesAndSteepSlopes) {
-            // If we don't care about edges or steep slopes, okay to move
-            o.rawData[oPosX] = intendedX
-            o.rawData[oPosZ] = intendedZ
-            return true
-        } else if (deltaFloorHeight < -50.0 && (o.rawData[oMoveFlags] & OBJ_MOVE_ON_GROUND)) {
-            // Don't walk off an edge
-            o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_EDGE
-            return false
-        } else if (intendedFloorWrapper.floor.normal.y > steepSlopeNormalY) {
-            // Allow movement onto a slope, provided it's not too steep
-            o.rawData[oPosX] = intendedX
-            o.rawData[oPosZ] = intendedZ
-            return true
-        } else {
-            // We are likely trying to move onto a steep downward slope
-            o.rawData[oMoveFlags] |= OBJ_MOVE_HIT_EDGE
-            return false
-        }
-    } else if ((intendedFloorWrapper.floor.normal.y) > steepSlopeNormalY || o.rawData[oPosY] > intendedFloorHeight) {
-        // Allow movement upward, provided either:
-        // - The target floor is flat enough (e.g. walking up stairs)
-        // - We are above the target floor (most likely in the air)
-        o.rawData[oPosX] = intendedX
-        o.rawData[oPosZ] = intendedZ
-        //! Returning FALSE but moving anyway (not exploitable; return value is
-        //  never used)
-    }
-
-    // We are likely trying to move onto a steep upward slope
-    return false
-}
-
-export const cur_obj_move_y = (gravity, bounciness, buoyancy) => {
-
-    const o = ObjectListProc.gCurrentObject
-
-    o.rawData[oMoveFlags] &= ~OBJ_MOVE_LEFT_GROUND
-
-    if (o.rawData[oMoveFlags] & OBJ_MOVE_AT_WATER_SURFACE) {
-        if (o.rawData[oVelY] > 5.0) {
-            o.rawData[oMoveFlags] &= ~OBJ_MOVE_MASK_IN_WATER
-            o.rawData[oMoveFlags] |= OBJ_MOVE_LEAVING_WATER
-        }
-    }
-
-    if (!(o.rawData[oMoveFlags] & OBJ_MOVE_MASK_IN_WATER)) {
-        let waterLevel = cur_obj_move_y_and_get_water_level(gravity, 0.0)
-        if (o.rawData[oPosY] > waterLevel) {
-            //! We only handle floor collision if the object does not enter
-            //  water. This allows e.g. coins to clip through floors if they
-            //  enter water on the same frame.
-            cur_obj_move_update_ground_air_flags(gravity, bounciness)
-        } else {
-            o.rawData[oMoveFlags] |= OBJ_MOVE_ENTERED_WATER
-            o.rawData[oMoveFlags] &= ~OBJ_MOVE_MASK_ON_GROUND
-        }
-    } else {
-        o.rawData[oMoveFlags] &= ~OBJ_MOVE_ENTERED_WATER
-
-        const waterLevel = cur_obj_move_y_and_get_water_level(gravity, buoyancy)
-        if (o.rawData[oPosY] < waterLevel) {
-            cur_obj_move_update_underwater_flags()
-        } else {
-            if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
-                o.rawData[oPosY] = o.rawData[oFloorHeight]
-                o.rawData[oMoveFlags] &= ~OBJ_MOVE_MASK_IN_WATER
-            } else {
-                o.rawData[oPosY] = waterLevel
-                o.rawData[oVelY] = 0.0
-                o.rawData[oMoveFlags] &= ~(OBJ_MOVE_UNDERWATER_OFF_GROUND | OBJ_MOVE_UNDERWATER_ON_GROUND)
-                o.rawData[oMoveFlags] |= OBJ_MOVE_AT_WATER_SURFACE
-            }
-        }
-    }
-
-    if (o.rawData[oMoveFlags] & OBJ_MOVE_MASK_33) {
-        o.rawData[oMoveFlags] &= ~OBJ_MOVE_IN_AIR
-    } else {
-        o.rawData[oMoveFlags] |= OBJ_MOVE_IN_AIR
-    }
-}
-
-export const cur_obj_move_update_underwater_flags = () => {
-    const o = ObjectListProc.gCurrentObject
-
-    let decelY = sqrtf(o.rawData[oVelY] * o.rawData[oVelY]) * (o.rawData[oDragStrength] * 7.0) / 100.0
-
-    if (o.rawData[oVelY] > 0) {
-        o.rawData[oVelY] -= decelY
-    } else {
-        o.rawData[oVelY] += decelY
-    }
-
-    if (o.rawData[oPosY] < o.rawData[oFloorHeight]) {
-        o.rawData[oPosY] = o.rawData[oFloorHeight]
-        o.rawData[oMoveFlags] |= OBJ_MOVE_UNDERWATER_ON_GROUND
-    } else {
-        o.rawData[oMoveFlags] |= OBJ_MOVE_UNDERWATER_OFF_GROUND
-    }
-}
-
 export const cur_obj_move_standard = (steepSlopeAngleDegrees) => {
     const o = ObjectListProc.gCurrentObject
     const gravity = o.rawData[oGravity]
@@ -1731,7 +1899,7 @@ export const cur_obj_is_mario_ground_pounding_platform = () => {
 export const cur_obj_shake_screen = (shake) => {
     const o = ObjectListProc.gCurrentObject
 
-    CameraInstance.set_camera_shake_from_point(shake, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ]);
+    Camera.set_camera_shake_from_point(shake, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ]);
 }
 
 export const obj_attack_collided_from_other_object = (obj) => {
@@ -1959,35 +2127,6 @@ export const cur_obj_within_12k_bounds = () => {
     return true
 }
 
-export const cur_obj_become_tangible = () => {
-    const o = ObjectListProc.gCurrentObject
-    o.rawData[oIntangibleTimer] = 0
-}
-
-export const cur_obj_become_intangible = () => {
-    const o = ObjectListProc.gCurrentObject
-    o.rawData[oIntangibleTimer] = -1
-}
-
-export const cur_obj_clear_interact_status_flag = (flag) => {
-    const o = ObjectListProc.gCurrentObject
-    if (o.rawData[oInteractStatus] & flag) {
-        o.rawData[oInteractStatus] &= flag ^ ~(0)
-        return true
-    }
-    return false
-}
-
-export const obj_mark_for_deletion = (obj) => {
-    obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED
-}
-
-export const cur_obj_disable = () => {
-    cur_obj_disable_rendering();
-    cur_obj_hide();
-    cur_obj_become_intangible();
-}
-
 export const obj_scale_random = (obj, rangeLength, minScale) => {
     const scale = random_float() * rangeLength + minScale
     obj_scale_xyz(obj, scale, scale, scale)
@@ -1997,46 +2136,6 @@ export const obj_translate_xyz_random = (obj, rangeLength) => {
     obj.rawData[oPosX] += random_float() * rangeLength - rangeLength * 0.5
     obj.rawData[oPosY] += random_float() * rangeLength - rangeLength * 0.5
     obj.rawData[oPosZ] += random_float() * rangeLength - rangeLength * 0.5
-}
-
-export const cur_obj_compute_vel_xz = () => {
-    const o = ObjectListProc.gCurrentObject
-    o.rawData[oVelX] = o.rawData[oForwardVel] * sins(o.rawData[oMoveAngleYaw])
-    o.rawData[oVelZ] = o.rawData[oForwardVel] * coss(o.rawData[oMoveAngleYaw])
-}
-
-export const apply_drag_to_value = (ptr, dragStrength) => {
-
-    if (ptr.value != 0) {
-        //! Can overshoot if |*value| > 1/(dragStrength * 0.0001)
-        const decel = (ptr.value) * (ptr.value) * (dragStrength * 0.0001)
-
-        if (ptr.value > 0) {
-            ptr.value -= decel
-            if (ptr.value < 0.001) {
-                ptr.value = 0
-            }
-        } else {
-            ptr.value += decel
-            if (ptr.value > -0.001) {
-                ptr.value = 0
-            }
-        }
-    }
-
-}
-
-
-export const cur_obj_apply_drag_xz = (dragStrength) => {
-    const o = ObjectListProc.gCurrentObject
-
-    const wrapper = { value: o.rawData[oVelX] }
-    apply_drag_to_value(wrapper, dragStrength)
-    o.rawData[oVelX] = wrapper.value
-
-    wrapper.value = o.rawData[oVelZ]
-    apply_drag_to_value(wrapper, dragStrength)
-    o.rawData[oVelZ] = wrapper.value
 }
 
 export const cur_obj_move_using_vel_and_gravity = () => {
@@ -2078,12 +2177,6 @@ export const cur_obj_push_mario_away_from_cylinder = (radius, extentY) => {
         cur_obj_push_mario_away(radius)
     }
 }
-
-
-export const obj_set_billboard = (obj) => {
-    obj.gfx.flags |= GRAPH_RENDER_BILLBOARD
-}
-
 
 export const obj_spawn_loot_coins = (obj, numCoins, sp30, coinsBehavior, posJitter, model) => {
 
@@ -2226,14 +2319,14 @@ export const cur_obj_update_dialog_with_cutscene = (actionArg, dialogFlags, cuts
             // Special check for Cap Switch cutscene since the cutscene itself
             // handles what dialog should used
             if (cutsceneTable == CUTSCENE_CAP_SWITCH_PRESS) {
-                o.rawData[oDialogResponse] = CameraInstance.cutscene_object_without_dialog(cutsceneTable, o)
+                o.rawData[oDialogResponse] = Camera.cutscene_object_without_dialog(cutsceneTable, o)
                 if (o.rawData[oDialogResponse]) {
                     o.rawData[oDialogState]++
                 }
             } else {
                 // General dialog cutscene function, most of the time
                 // the "CUTSCENE_DIALOG" cutscene is called
-                o.rawData[oDialogResponse] = CameraInstance.cutscene_object_with_dialog(cutsceneTable, o, dialogID)
+                o.rawData[oDialogResponse] = Camera.cutscene_object_with_dialog(cutsceneTable, o, dialogID)
                 if (o.rawData[oDialogResponse]) {
                     o.rawData[oDialogState]++
                 }
@@ -2260,37 +2353,6 @@ export const cur_obj_update_dialog_with_cutscene = (actionArg, dialogFlags, cuts
     }
 
     return dialogResponse
-}
-
-export const obj_set_behavior = (obj, behavior) => {
-    obj.behavior = behavior
-}
-
-export const cur_obj_has_behavior = (behavior) => {
-    const o = ObjectListProc.gCurrentObject
-    if (o.behavior == behavior) {
-        return true
-    } else {
-        return false
-    }
-}
-
-export const obj_has_behavior = (obj, behavior) => {
-    if (obj.behavior == behavior) {
-        return true
-    } else {
-        return false
-    }
-}
-
-export const cur_obj_lateral_dist_from_mario_to_home = () => {
-    const o = ObjectListProc.gCurrentObject
-
-    let dx = o.rawData[oHomeX] - ObjectListProc.gMarioObject.rawData[oPosX];
-    let dz = o.rawData[oHomeZ] - ObjectListProc.gMarioObject.rawData[oPosZ];
-
-    let dist = sqrtf(dx * dx + dz * dz);
-    return dist;
 }
 
 export const bhv_init_room = () => {

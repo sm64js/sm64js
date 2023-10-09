@@ -412,8 +412,8 @@ class ObjectListProcessor {
 
         gLinker.PlatformDisplacement.update_mario_platform()
 
-        // if (this.gTimeStopState & TIME_STOP_ENABLED) this.gTimeStopState |= TIME_STOP_ACTIVE;
-        // else this.gTimeStopState &= ~TIME_STOP_ACTIVE;
+        if (this.gTimeStopState & TIME_STOP_ENABLED) this.gTimeStopState |= TIME_STOP_ACTIVE;
+        else this.gTimeStopState &= ~TIME_STOP_ACTIVE;
 
         this.gPrevFrameObjectCount = this.gObjectCounter
     }

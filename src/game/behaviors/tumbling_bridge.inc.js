@@ -88,7 +88,7 @@ const tumbling_bridge_act_1 = () => {
             relativePlatformZ = sTumblingBridgeParams[bridgeID].bridgeRelativeStartingXorZ + sTumblingBridgeParams[bridgeID].platformWidth * i;
         }
 
-        if (cur_obj_has_behavior(bhvLLLTumblingBridge)) {
+        if (cur_obj_has_behavior(gLinker.behaviors.bhvLLLTumblingBridge)) {
             if (i % 3 == 0) {
                 relativePlatformY -= 150
             }
@@ -108,7 +108,7 @@ const tumbling_bridge_act_2 = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
 
     cur_obj_hide()
-    if (cur_obj_has_behavior(bhvLLLTumblingBridge)) {
+    if (cur_obj_has_behavior(gLinker.behaviors.bhvLLLTumblingBridge)) {
         cur_obj_unhide()
     } else if (o.rawData[oDistanceToMario] > 1200.0) {
         o.rawData[oAction] = 3

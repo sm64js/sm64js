@@ -913,7 +913,7 @@ export const cur_obj_extend_animation_if_at_end = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject;
 
     const sp4 = o.gfx.animInfo.animFrame
-    const sp0 = o.gfx.animInfo.curAnim.loopEnd - 2
+    const sp0 = o.gfx.animInfo.curAnim.unk08 - 2
 
     if (sp4 == sp0) {
         o.gfx.animInfo.animFrame--
@@ -925,7 +925,7 @@ export const cur_obj_check_if_near_animation_end = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject;
     let animFlags = o.gfx.animInfo.curAnim.flags
     let animFrame = o.gfx.animInfo.animFrame
-    let nearLoopEnd = o.gfx.animInfo.curAnim.loopEnd - 2
+    let nearLoopEnd = o.gfx.animInfo.curAnim.unk08 - 2
     let isNearEnd = 0
 
     if (animFlags & ANIM_FLAG_NOLOOP && nearLoopEnd + 1 == animFrame) {
@@ -942,7 +942,7 @@ export const cur_obj_check_if_near_animation_end = () => {
 export const cur_obj_check_if_at_animation_end = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject;
     let animFrame = o.gfx.animInfo.animFrame
-    let lastFrame = o.gfx.animInfo.curAnim.loopEnd - 1
+    let lastFrame = o.gfx.animInfo.curAnim.unk08 - 1
 
     if (animFrame == lastFrame) {
         return true
@@ -1614,13 +1614,13 @@ export const cur_obj_advance_looping_anim = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
 
     let animFrame = o.gfx.animInfo.animFrame;
-    let loopEnd = o.gfx.animInfo.curAnim.loopEnd;
+    let unk08 = o.gfx.animInfo.curAnim.unk08;
 
     if (animFrame < 0) animFrame = 0;
-    else if (loopEnd - 1 == animFrame) animFrame = 0;
+    else if (unk08 - 1 == animFrame) animFrame = 0;
     else animFrame++;
 
-    return (animFrame << 16) / loopEnd;
+    return (animFrame << 16) / unk08;
 }
 
 export const cur_obj_detect_steep_floor = (steepAngleDegrees) => {

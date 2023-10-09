@@ -1505,12 +1505,12 @@ export const set_anim_to_frame = (m, animFrame) => {
 
 export const is_anim_at_end = (m) => {
     const o = m.marioObj //TODO fix animInfo as animInfo
-    return (o.gfx.animInfo.animFrame + 1) == o.gfx.animInfo.curAnim.loopEnd
+    return (o.gfx.animInfo.animFrame + 1) == o.gfx.animInfo.curAnim.unk08
 }
 
 export const is_anim_past_end = (m) => {
     const o = m.marioObj
-    return o.gfx.animInfo.animFrame >= (o.gfx.animInfo.curAnim.loopEnd - 2)
+    return o.gfx.animInfo.animFrame >= (o.gfx.animInfo.curAnim.unk08 - 2)
 }
 
 export const is_anim_past_frame = (m, animFrame) => {

@@ -4100,8 +4100,6 @@ class Camera {
         this.sFOVState.fovFunc = CAM_FOV_DEFAULT
         this.sFOVState.fov = 45
         this.sFOVState.fovOffset = 0
-        this.sFOVState.shakeAmplitude = 0.0
-        this.sFOVState.shakePhase = 0.0
         this.sObjectCutscene = 0
         this.gRecentCutscene = 0
     }

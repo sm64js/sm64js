@@ -197,14 +197,15 @@ export const geo_switch_anim_state = (callerContext, node) => {
 
 export const geo_switch_area = (callerContext, node) => {
     const o = gLinker.ObjectListProcessor.gCurrentObject;
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject;
 
     if (callerContext == GEO_CONTEXT_RENDER) {
-        if (o == undefined) {
+        if (gMarioObject == undefined) {
             node.selectedCase = 0
         } else {
             gLinker.ObjectListProcessor.gFindFloorIncludeSurfaceIntangible = true;
 
-            const marioObj = o
+            const marioObj = gMarioObject
 
             const floorWrapper = {}
             const height = gLinker.SurfaceCollision.find_floor(marioObj.rawData[oPosX], marioObj.rawData[oPosY], marioObj.rawData[oPosZ], floorWrapper)

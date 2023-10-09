@@ -1,6 +1,6 @@
 // koopa_shell_underwater.c.inc
 import * as _Linker from "../../game/Linker"
-import { cur_obj_unrender_and_reset_state, obj_mark_for_deletion, spawn_mist_particles } from "../ObjectHelpers"
+import { cur_obj_unrender_set_action_and_anim, obj_mark_for_deletion, spawn_mist_particles } from "../ObjectHelpers"
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { INTERACT_GRABBABLE, INT_STATUS_STOP_RIDING } from "../Interaction"
 import { oInteractStatus, HELD_FREE, HELD_THROWN, HELD_DROPPED, oHeldState } from "../../include/object_constants"
@@ -30,7 +30,7 @@ const bhv_koopa_shell_underwater_loop = () => {
             set_koopa_shell_underwater_hitbox()
             break
         case HELD_HELD:
-            cur_obj_unrender_and_reset_state(-1, 0)
+            cur_obj_unrender_set_action_and_anim(-1, 0)
             break
         case HELD_THROWN:
         case HELD_DROPPED:

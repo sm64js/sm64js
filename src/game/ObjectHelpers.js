@@ -47,25 +47,23 @@ import {
     OBJ_MOVE_LEFT_GROUND, OBJ_MOVE_UNDERWATER_OFF_GROUND, OBJ_MOVE_MASK_33,
     OBJ_MOVE_LANDED, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX, OBJ_FLAG_HOLDABLE,
 
-    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED, OBJ_MOVE_BOUNCE, DIALOG_STATUS_ENABLE_TIME_STOP, ACTIVE_FLAG_INITIATED_TIME_STOP, DIALOG_FLAG_TURN_TO_MARIO, DIALOG_STATUS_START_DIALOG, DIALOG_STATUS_STOP_DIALOG, DIALOG_FLAG_TIME_STOP_ENABLED, oKingBobombUnk88, DIALOG_STATUS_INTERRUPT, OBJ_FLAG_0020, OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM, O_FACE_ANGLE_INDEX, OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT, OBJ_FLAG_30, oSmokeTimer, oToxBoxActionTable, oToxBoxActionStep, TOX_BOX_ACT_TABLE_END
+    HELD_FREE, HELD_HELD, HELD_THROWN, HELD_DROPPED, OBJ_MOVE_BOUNCE, DIALOG_STATUS_ENABLE_TIME_STOP, ACTIVE_FLAG_INITIATED_TIME_STOP, DIALOG_FLAG_TURN_TO_MARIO, DIALOG_STATUS_START_DIALOG, DIALOG_STATUS_STOP_DIALOG, DIALOG_FLAG_TIME_STOP_ENABLED, oKingBobombUnk88, DIALOG_STATUS_INTERRUPT, OBJ_FLAG_0020, OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM, O_FACE_ANGLE_INDEX, OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT, OBJ_FLAG_30, oSmokeTimer, oToxBoxActionTable, oToxBoxActionStep, TOX_BOX_ACT_TABLE_END, oSparkleSpawnUnk1B0, DIALOG_FLAG_TEXT_RESPONSE, DIALOG_FLAG_TEXT_DEFAULT, DIALOG_STATUS_DISABLE_TIME_STOP
  } from "../include/object_constants"
 
 import { gDebugInfo } from "./ObjectListProcessor"
 import { TIME_STOP_ENABLED } from "./ObjectListProcessor"
 
-import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
-
 import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { ATTACK_PUNCH, INT_STATUS_WAS_ATTACKED, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB, INT_STATUS_GRABBED_MARIO, INT_SUBTYPE_HOLDABLE_NPC } from "./Interaction"
 import { ACT_GROUND_POUND_LAND, ACT_FLAG_AIR, ACT_DIVE_SLIDE, ANIM_FLAG_NOLOOP, ACT_READING_NPC_DIALOG } from "./Mario"
 
-import { MODEL_YELLOW_COIN, MODEL_BLUE_COIN } from "../include/model_ids"
+import { MODEL_YELLOW_COIN, MODEL_BLUE_COIN, MODEL_STAR } from "../include/model_ids"
 
 import { GRAPH_RENDER_ACTIVE           } from "../engine/graph_node"
 
 import { OBJ_LIST_UNIMPORTANT, OBJ_LIST_GENACTOR } from "./BehaviorData"
 
-import { atan2s, mtxf_mul, mtxf_rotate_zxy_and_translate, sqrtf } from "../engine/math_util"
+import { atan2s, mtxf_align_terrain_normal, mtxf_mul, mtxf_rotate_zxy_and_translate, sqrtf } from "../engine/math_util"
 import { sins, coss, int16, s16, random_int16, random_float } from "../utils"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import * as _Linker from "./Linker"
@@ -77,9 +75,10 @@ import { G_AC_DITHER } from "../include/gbi"
 import { LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC } from "../levels/level_defines_constants"
 import { CameraInstance as Camera, CUTSCENE_CAP_SWITCH_PRESS } from "./Camera"
 import { MARIO_DIALOG_STATUS_SPEAK, MARIO_DIALOG_STOP, mario_ready_to_speak, set_mario_npc_dialog } from "./MarioActionsCutscene"
-import { DIALOG_RESPONSE_NONE } from "./IngameMenu"
+import { DIALOG_RESPONSE_NONE, DIALOG_RESPONSE_NOT_DEFINED, IngameMenuInstance as IngameMenu } from "./IngameMenu"
 import { spawn_default_star } from "./behaviors/spawn_star.inc"
 import { create_sound_spawner } from "./SpawnSound"
+import { DIALOG_NONE } from "../text/us/dialogs"
 
 export const WATER_DROPLET_FLAG_RAND_ANGLE                = 0x02
 export const WATER_DROPLET_FLAG_RAND_OFFSET_XZ            = 0x04 // Unused
@@ -203,7 +202,7 @@ export const geo_switch_area = (callerContext, node) => {
         if (o == undefined) {
             node.selectedCase = 0
         } else {
-            gLinker.ObjectListProcessor.gFindFloorIncludeSurfaceIntangible = 1
+            gLinker.ObjectListProcessor.gFindFloorIncludeSurfaceIntangible = true;
 
             const marioObj = o
 
@@ -999,7 +998,7 @@ export const mario_is_in_air_action = () => {
 }
 
 export const mario_is_dive_sliding = () => {
-    if (LevelUpdate.gMarioState.action == ACT_DIVE_SLIDE) {
+    if (gLinker.LevelUpdate.gMarioState.action == ACT_DIVE_SLIDE) {
         return true
     } else {
         return false
@@ -2114,7 +2113,7 @@ export const cur_obj_is_mario_ground_pounding_platform = () => {
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
     if (gMarioObject.platform == o) {
-        if (LevelUpdate.gMarioState.action == ACT_GROUND_POUND_LAND) {
+        if (gLinker.LevelUpdate.gMarioState.action == ACT_GROUND_POUND_LAND) {
             return true
         }
     }
@@ -2140,8 +2139,8 @@ export const cur_obj_push_mario_away = (radius) => {
     const marioDist = Math.sqrt(Math.pow(marioRelX, 2) + Math.pow(marioRelZ, 2))
 
     if (marioDist < radius) {
-        LevelUpdate.gMarioState.pos[0] += (radius - marioDist) / radius * marioRelX
-        LevelUpdate.gMarioState.pos[2] += (radius - marioDist) / radius * marioRelZ
+        gLinker.LevelUpdate.gMarioState.pos[0] += (radius - marioDist) / radius * marioRelX
+        gLinker.LevelUpdate.gMarioState.pos[2] += (radius - marioDist) / radius * marioRelZ
     }
 }
 
@@ -2249,63 +2248,131 @@ export const cur_obj_shake_y_until = (cycles, amount) => {
     else return false;
 }
 
-// NOTE: uncomment line when BBH Stair implemented
 export const jiggle_bbh_stair = (a0) => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     if (a0 >= 4 || a0 < 0) return true;
 
-     // o.rawData[oPosY] += sBBHStairJiggleOffsets[a0];
+     o.rawData[oPosY] += sBBHStairJiggleOffsets[a0];
     return false;
-}
-
-// ...
-
-export const cur_obj_has_model = (modelID) => {
-    const o = gLinker.ObjectListProcessor.gCurrentObject
-
-    if (o.gfx.sharedChild == gLinker.Area.gLoadedGraphNodes[modelID]) {
-        return true
-    } else {
-        return false
-    }
-}
-
-export const cur_obj_unrender_and_reset_state = (animIndex, action) => {
-    const o = gLinker.ObjectListProcessor.gCurrentObject
-    cur_obj_become_intangible()
-    cur_obj_disable_rendering()
-
-    if (animIndex >= 0) {
-        cur_obj_init_animation_with_sound(animIndex)
-    }
-
-    o.rawData[oAction] = action
-}
-
-
-export const approach_symmetric = (value, target, increment) => {
-    const dist = s16(target - value)
-
-    if (dist >= 0) {
-        if (dist > increment) {
-            value += increment
-        } else {
-            value = target
-        }
-    } else {
-        if (dist < -increment) {
-            value -= increment
-        } else {
-            value = target
-        }
-    }
-
-    return value
 }
 
 export const cur_obj_call_action_function = (actionFunctions) => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     actionFunctions[o.rawData[oAction]]()
+}
+
+const spawn_star_with_no_lvl_exit = (params, sp24) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    let newStar = spawn_object(o, MODEL_STAR, gLinker.behaviors.bhvSpawnedStarNoLevelExit);
+    sp1C.rawData[oSparkleSpawnUnk1B0] = sp24;
+    sp1C.rawData[oBehParams] = o.rawData[oBehParams];
+    sp1C.rawData[oBehParams2ndByte] = params;
+
+    return newStar;
+}
+
+export const spawn_base_star_with_no_lvl_exit = () => {
+    spawn_star_with_no_lvl_exit(0, 0);
+}
+
+export const cur_obj_mario_far_away = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject;
+
+    let dx = o.rawData[oHomeX] - gMarioObject.rawData[oPosX];
+    let dy = o.rawData[oHomeY] - gMarioObject.rawData[oPosY];
+    let dz = o.rawData[oHomeZ] - gMarioObject.rawData[oPosZ];
+    let marioDistToHome = sqrtf(dx * dx + dy * dy + dz * dz);
+
+    if (o.rawData[oDistanceToMario] > 2000.0 && marioDistToHome > 2000.0) return true;
+    else return false;
+}
+
+export const is_mario_moving_fast_or_in_air = (speedThreshold) => {
+    const gMarioStates = [ gLinker.LevelUpdate.gMarioState ];
+
+    if (gMarioStates[0].forwardVel > speedThreshold ||
+        gMarioStates[0].action & ACT_FLAG_AIR
+    ) return true;
+    
+    return false;
+}
+
+export const bhv_init_room = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    let floor
+    let /*f32*/ floorHeight
+
+    if (sLevelsWithRooms.includes(gLinker.Area.gCurrLevelNum)) {
+        const floorWrapper = {}
+        floorHeight = gLinker.SurfaceCollision.find_floor(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], floorWrapper)
+        floor = floorWrapper.floor
+
+        if (floor != null) {
+            if (floor.room != 0) {
+                o.rawData[oRoom] = floor.room
+            } else {
+                  // Floor probably belongs to a platform object. Try looking
+                  // underneath it
+                const floorWrapper = {}
+                gLinker.SurfaceCollision.find_floor(o.rawData[oPosX], floorHeight - 100.0, o.rawData[oPosZ], floorWrapper)
+                floor = floorWrapper.floor
+                if (floor != null) {
+                      //! Technically possible that the room could still be 0 here
+                    o.rawData[oRoom] = floor.room
+                }
+            }
+        }
+    } else {
+        o.rawData[oRoom] = -1
+    }
+}
+
+export const cur_obj_enable_rendering_if_mario_in_room = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    const gMarioCurrentRoom = gLinker.ObjectListProcessor.gMarioCurrentRoom;
+    const gDoorAdjacentRooms = gLinker.ObjectListProcessor.gDoorAdjacentRooms;
+
+    let marioInRoom;
+
+    if (o.rawData[oRoom] != -1 && gMarioCurrentRoom != 0) {
+        if (gMarioCurrentRoom == o.rawData[oRoom]) marioInRoom = true;
+        else if (gDoorAdjacentRooms[gMarioCurrentRoom][0] == o.rawData[oRoom]) marioInRoom = true;
+        else if (gDoorAdjacentRooms[gMarioCurrentRoom][1] == o.rawData[oRoom]) marioInRoom = true;
+        else marioInRoom = false;
+
+        if (marioInRoom) {
+            cur_obj_enable_rendering();
+            o.activeFlags &= ~ACTIVE_FLAG_IN_DIFFERENT_ROOM;
+            gLinker.ObjectListProcessor.gNumRoomedObjectsInMarioRoom++;
+        } else {
+            cur_obj_disable_rendering();
+            o.activeFlags |= ACTIVE_FLAG_IN_DIFFERENT_ROOM;
+            gLinker.ObjectListProcessor.gNumRoomedObjectsNotInMarioRoom++;
+        }
+    }
+}
+
+export const cur_obj_set_hitbox_and_die_if_attacked = (hitbox, deathSound, noLootCoins) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    
+    let interacted = false;
+
+    obj_set_hitbox(o, hitbox);
+
+    if (noLootCoins) o.rawData[oNumLootCoins] = 0;
+
+    if (o.rawData[oInteractStatus] & INT_STATUS_INTERACTED) {
+        if (o.rawData[oInteractStatus] & INT_STATUS_WAS_ATTACKED) {
+            spawn_mist_particles();
+            obj_spawn_loot_yellow_coins(o, o.rawData[oNumLootCoins], 20.0);
+            obj_mark_for_deletion(o);
+            create_sound_spawner(deathSound);
+        } else interacted = true;
+    }
+
+    o.rawData[oInteractStatus] = 0;
+    return interacted;
 }
 
 export const obj_explode_and_spawn_coins = (sp18, sp1C) => {
@@ -2333,101 +2400,49 @@ export const cur_obj_if_hit_wall_bounce_away = () => {
     }
 }
 
-export const cur_obj_shake_screen = (shake) => {
-    const o = gLinker.ObjectListProcessor.gCurrentObject
+export const cur_obj_hide_if_mario_far_away_y = (distY) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject;
 
-    Camera.set_camera_shake_from_point(shake, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ]);
+    if (Math.abs(o.rawData[oPosY] - gMarioObject.rawData[oPosY]) < distY) {
+        cur_obj_unhide();
+        return false;
+    } else {
+        cur_obj_hide();
+        return true;
+    }
 }
 
-export const obj_attack_collided_from_other_object = (obj) => {
-    if (obj.numCollidedObjs != 0) {
-        const other = obj.collidedObjs[0]
-
-        if (other != gLinker.ObjectListProcessor.gMarioObject) {
-            other.rawData[oInteractStatus] |= ATTACK_PUNCH | INT_STATUS_WAS_ATTACKED | INT_STATUS_INTERACTED | INT_STATUS_TOUCHED_BOB_OMB
-            return true
-        }
+export const geo_offset_klepto_held_object = (callContext, node, mtx) => {
+    if (callContext == GEO_CONTEXT_RENDER) {
+        node.next.translation[0] = 300;
+        node.next.translation[1] = 300;
+        node.next.translation[2] = 0;
     }
 
-    return false
+    return null;
 }
 
-export const cur_obj_was_attacked_or_ground_pounded = () => {
-    const o = gLinker.ObjectListProcessor.gCurrentObject
-    let attacked = 0
-
-    if ((o.rawData[oInteractStatus] & INT_STATUS_INTERACTED)
-        && (o.rawData[oInteractStatus] & INT_STATUS_WAS_ATTACKED)) {
-        attacked = 1
+export const geo_offset_klepto_debug = (callContext, node, mtx) => {
+    if (callContext == GEO_CONTEXT_RENDER) {
+        node.next.translation[0] = gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][0];
+        node.next.translation[1] = gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][1];
+        node.next.translation[2] = gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][2];
+        node.next.rotation[0]    = gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][3];
+        node.next.rotation[1]    = gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][4];
+        node.next.rotation[2]    = gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][5];
     }
 
-    if (cur_obj_is_mario_ground_pounding_platform()) {
-        attacked = 1
+    return null;
+}
+
+export const obj_is_hidden = (obj) => {
+    if (obj.gfx.flags & GRAPH_RENDER_INVISIBLE) {
+        return true;
+    } else {
+        return false;
     }
-
-    o.rawData[oInteractStatus] = 0
-    return attacked
 }
-
-export const obj_copy_behavior_params = (dst, src) => {
-    dst.rawData[oBehParams] = src.rawData[oBehParams]
-    dst.rawData[oBehParams2ndByte] = src.rawData[oBehParams2ndByte]
-}
-
-export const cur_obj_init_animation_and_anim_frame = (animIndex, animFrame) => {
-    const o = gLinker.ObjectListProcessor.gCurrentObject
-    
-    cur_obj_init_animation_with_sound(animIndex)
-    // o.gfx.animInfo.animFrame = animFrame
-}
-
-export const cur_obj_init_animation_and_check_if_near_end = (animIndex) => {
-    cur_obj_init_animation_with_sound(animIndex)
-    return cur_obj_check_if_near_animation_end()
-}
-
-export const cur_obj_init_animation_and_extend_if_at_end = (animIndex) => {
-    cur_obj_init_animation_with_sound(animIndex)
-    cur_obj_extend_animation_if_at_end()
-}
-
-export const cur_obj_check_grabbed_mario = () => {
-    const o = gLinker.ObjectListProcessor.gCurrentObject
-
-    if (o.rawData[oInteractStatus] & INT_STATUS_GRABBED_MARIO) {
-        o.rawData[oKingBobombUnk88] = 1
-        cur_obj_become_intangible()
-        return true
-    }
-
-    return false
-}
-
-export const player_performed_grab_escape_action = () => {
-    let grabReleaseState
-    let result = false
-
-    if (window.playerInput.stickMag > 40.0) {
-        grabReleaseState = 0
-    }
-
-    if (grabReleaseState == 0 && window.playerInput.stickMag > 40.0) {
-        grabReleaseState = 1
-        result = true
-    }
-
-    if (window.playerInput.buttonPressedA) {
-        result = true
-    }
-
-    return result
-}
-
-// struct Waypoint
-// {
-//     s16 flags;
-//     Vec3s pos;
-// };
 
 export const enable_time_stop = () => {
     gLinker.ObjectListProcessor.gTimeStopState |= TIME_STOP_ENABLED
@@ -2447,7 +2462,7 @@ export const clear_time_stop_flags = (flags) => {
 
 export const cur_obj_can_mario_activate_textbox = (radius, height, unused) => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    const gMarioStates = [ LevelUpdate.gMarioState ]
+    const gMarioStates = [ gLinker.LevelUpdate.gMarioState ]
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
     if (o.rawData[oDistanceToMario] < 1500.0) {
@@ -2467,9 +2482,74 @@ export const cur_obj_can_mario_activate_textbox_2 = (radius, height) => {
     return cur_obj_can_mario_activate_textbox(radius, height, 0x1000)
 }
 
+export const cur_obj_end_dialog = (dialogFlags, dialogResult) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    o.rawData[oDialogResponse] = dialogResult;
+    o.rawData[oDialogState]++;
+
+    if (!(dialogFlags & DIALOG_FLAG_TIME_STOP_ENABLED)) {
+        set_mario_npc_dialog(MARIO_DIALOG_STOP);
+    }
+}
+
+export const cur_obj_update_dialog = (actionArg, dialogFlags, dialogID) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    const gMarioState = gLinker.LevelUpdate.gMarioState
+
+    let dialogResponse = DIALOG_RESPONSE_NONE;
+
+    switch (o.rawData[oDialogState]) {
+        case DIALOG_STATUS_ENABLE_TIME_STOP:
+            if (gMarioState.health >= 0x100) {
+                gLinker.ObjectListProcessor.gTimeStopState |= TIME_STOP_ENABLED;
+                o.activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;
+                o.rawData[oDialogState]++;
+            }
+            break;
+
+        case DIALOG_STATUS_INTERRUPT:
+            if (set_mario_npc_dialog(actionArg) == MARIO_DIALOG_STATUS_SPEAK)
+                o.rawData[oDialogState]++;
+            break;
+
+        case DIALOG_STATUS_START_DIALOG:
+            if (dialogFlags & DIALOG_FLAG_TEXT_RESPONSE) IngameMenu.create_dialog_box_with_response(dialogID);
+            else if (dialogFlags & DIALOG_FLAG_TIME_STOP_ENABLED) IngameMenu.create_dialog_box(dialogID);
+
+            o.rawData[oDialogState]++;
+            break;
+
+        case DIALOG_STATUS_STOP_DIALOG:
+            if (dialogFlags & DIALOG_FLAG_TEXT_RESPONSE) {
+                if (IngameMenu.gDialogResponse != DIALOG_RESPONSE_NONE)
+                    cur_obj_end_dialog(dialogFlags, IngameMenu.gDialogResponse);
+            } else if (dialogFlags & DIALOG_FLAG_TEXT_DEFAULT) {
+                if (IngameMenu.get_dialog_id() == DIALOG_NONE)
+                    cur_obj_end_dialog(dialogFlags, DIALOG_RESPONSE_NOT_DEFINED);
+            } else cur_obj_end_dialog(dialogFlags, DIALOG_RESPONSE_NOT_DEFINED);
+            break;
+
+        case DIALOG_STATUS_DISABLE_TIME_STOP:
+            if (gMarioState.action != ACT_READING_NPC_DIALOG || (dialogFlags & DIALOG_FLAG_TIME_STOP_ENABLED)) {
+                gLinker.ObjectListProcessor.gTimeStopState &= ~TIME_STOP_ENABLED;
+                o.activeFlags &= ~ACTIVE_FLAG_INITIATED_TIME_STOP;
+                dialogResponse = o.rawData[oDialogResponse];
+                o.rawData[oDialogState] = DIALOG_STATUS_START_DIALOG;
+            }
+            break;
+
+        default:
+            o.rawData[oDialogState] = DIALOG_STATUS_ENABLE_TIME_STOP;
+            break;
+    }
+
+    return dialogResponse;
+}
+
 export const cur_obj_update_dialog_with_cutscene = (actionArg, dialogFlags, cutsceneTable, dialogID) => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    const gMarioState = LevelUpdate.gMarioState
+    const gMarioState = gLinker.LevelUpdate.gMarioState
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
     
     let dialogResponse = DIALOG_RESPONSE_NONE
@@ -2546,34 +2626,163 @@ export const cur_obj_update_dialog_with_cutscene = (actionArg, dialogFlags, cuts
     return dialogResponse
 }
 
-export const bhv_init_room = () => {
+export const cur_obj_has_model = (modelID) => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-    let floor
-    let /*f32*/ floorHeight
 
-    if (sLevelsWithRooms.includes(gLinker.Area.gCurrLevelNum)) {
-        const floorWrapper = {}
-        floorHeight = gLinker.SurfaceCollision.find_floor(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ], floorWrapper)
-        floor = floorWrapper.floor
-
-        if (floor != null) {
-            if (floor.room != 0) {
-                o.rawData[oRoom] = floor.room
-            } else {
-                  // Floor probably belongs to a platform object. Try looking
-                  // underneath it
-                const floorWrapper = {}
-                gLinker.SurfaceCollision.find_floor(o.rawData[oPosX], floorHeight - 100.0, o.rawData[oPosZ], floorWrapper)
-                floor = floorWrapper.floor
-                if (floor != null) {
-                      //! Technically possible that the room could still be 0 here
-                    o.rawData[oRoom] = floor.room
-                }
-            }
-        }
+    if (o.gfx.sharedChild == gLinker.Area.gLoadedGraphNodes[modelID]) {
+        return true
     } else {
-        o.rawData[oRoom] = -1
+        return false
     }
+}
+
+export const cur_obj_align_gfx_with_floor = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    let floor = {};
+    let floorNormal = [0, 0, 0];
+    let pos = [o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ]];
+
+    gLinker.SurfaceCollision.find_floor(position[0], position[1], position[2], floor);
+
+    if (floor != null) {
+        floorNormal[0] = floor.normal.x;
+        floorNormal[1] = floor.normal.y;
+        floorNormal[2] = floor.normal.z;
+
+        mtxf_align_terrain_normal(o.transform, floorNormal, pos, o.rawData[oFaceAngleYaw]);
+        o.gfx.throwMatrix(o.transform);
+    }
+}
+
+export const mario_is_within_rectangle = (minX, maxX, minZ, maxZ) => {
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject;
+
+    if (gMarioObject.rawData[oPosX] < minX || gMarioObject.rawData[oPosX] > maxX) {
+        return false;
+    }
+
+    if (gMarioObject.rawData[oPosZ] < minZ || gMarioObject.rawData[oPosZ] > maxZ) {
+        return false;
+    }
+
+    return true
+}
+
+export const cur_obj_shake_screen = (shake) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    Camera.set_camera_shake_from_point(shake, o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ]);
+}
+
+export const obj_attack_collided_from_other_object = (obj) => {
+    if (obj.numCollidedObjs != 0) {
+        const other = obj.collidedObjs[0]
+
+        if (other != gLinker.ObjectListProcessor.gMarioObject) {
+            other.rawData[oInteractStatus] |= ATTACK_PUNCH | INT_STATUS_WAS_ATTACKED | INT_STATUS_INTERACTED | INT_STATUS_TOUCHED_BOB_OMB
+            return true
+        }
+    }
+
+    return false
+}
+
+export const cur_obj_was_attacked_or_ground_pounded = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    let attacked = 0
+
+    if ((o.rawData[oInteractStatus] & INT_STATUS_INTERACTED)
+        && (o.rawData[oInteractStatus] & INT_STATUS_WAS_ATTACKED)) {
+        attacked = 1
+    }
+
+    if (cur_obj_is_mario_ground_pounding_platform()) {
+        attacked = 1
+    }
+
+    o.rawData[oInteractStatus] = 0
+    return attacked
+}
+
+export const obj_copy_behavior_params = (dst, src) => {
+    dst.rawData[oBehParams] = src.rawData[oBehParams]
+    dst.rawData[oBehParams2ndByte] = src.rawData[oBehParams2ndByte]
+}
+
+export const cur_obj_init_animation_and_anim_frame = (animIndex, animFrame) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    
+    cur_obj_init_animation_with_sound(animIndex)
+    o.gfx.animInfo.animFrame = animFrame
+}
+
+export const cur_obj_init_animation_and_check_if_near_end = (animIndex) => {
+    cur_obj_init_animation_with_sound(animIndex)
+    return cur_obj_check_if_near_animation_end()
+}
+
+export const cur_obj_init_animation_and_extend_if_at_end = (animIndex) => {
+    cur_obj_init_animation_with_sound(animIndex)
+    cur_obj_extend_animation_if_at_end()
+}
+
+export const cur_obj_check_grabbed_mario = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    if (o.rawData[oInteractStatus] & INT_STATUS_GRABBED_MARIO) {
+        o.rawData[oKingBobombUnk88] = 1
+        cur_obj_become_intangible()
+        return true
+    }
+
+    return false
+}
+
+export const player_performed_grab_escape_action = () => {
+    let grabReleaseState
+    let result = false
+
+    if (window.playerInput.stickMag > 40.0) {
+        grabReleaseState = 0
+    }
+
+    if (grabReleaseState == 0 && window.playerInput.stickMag > 40.0) {
+        grabReleaseState = 1
+        result = true
+    }
+
+    if (window.playerInput.buttonPressedA) {
+        result = true
+    }
+
+    return result
+}
+
+export const cur_obj_unused_play_footstep_sound = (animFrame1, animFrame2, sound) => {
+    if (cur_obj_check_anim_frame(animFrame1) || cur_obj_check_anim_frame(animFrame2)) 
+        cur_obj_play_sound_2(sound);
+}
+
+export const enable_time_stop_including_mario = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    gLinker.ObjectListProcessor.gTimeStopState |= TIME_STOP_ENABLED | TIME_STOP_MARIO_AND_DOORS;
+    o.activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;
+}
+
+export const disable_time_stop_including_mario = () => {
+    gLinker.ObjectListProcessor.gTimeStopState &= ~(TIME_STOP_ENABLED | TIME_STOP_MARIO_AND_DOORS);
+    o.activeFlags &= ~ACTIVE_FLAG_INITIATED_TIME_STOP;
+}
+
+export const cur_obj_check_interacted = () => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+
+    if (o.rawData[oInteractStatus] & INT_STATUS_INTERACTED) {
+        o.rawData[oInteractStatus] = 0
+        return true
+    } else return false;
 }
 
 export const cur_obj_spawn_loot_blue_coin = () => {
@@ -2593,8 +2802,28 @@ export const cur_obj_spawn_star_at_y_offset = (targetX, targetY, targetZ, offset
     o.rawData[oPosY] = objectPosY
 }
 
+export const approach_symmetric = (value, target, increment) => {
+    const dist = s16(target - value)
+
+    if (dist >= 0) {
+        if (dist > increment) {
+            value += increment
+        } else {
+            value = target
+        }
+    } else {
+        if (dist < -increment) {
+            value -= increment
+        } else {
+            value = target
+        }
+    }
+
+    return value
+}
 
 gLinker.bhv_init_room = bhv_init_room
+gLinker.bhv_dust_smoke_loop = bhv_dust_smoke_loop
 
 gLinker.cur_obj_rotate_face_angle_using_vel = cur_obj_rotate_face_angle_using_vel
 gLinker.cur_obj_move_using_fvel_and_gravity = cur_obj_move_using_fvel_and_gravity

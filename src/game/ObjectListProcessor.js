@@ -123,7 +123,7 @@ class ObjectListProcessor {
             this.OBJ_LIST_UNIMPORTANT,
         ]
 
-        this.gTHIWaterDrained = 0
+        this.gTHIWaterDrained = false;
         this.gTimeStopState = 0
         this.gMarioObject = null
         this.gEnvironmentLevels = new Array(20)
@@ -132,11 +132,15 @@ class ObjectListProcessor {
 
         this.totalMarios = 0
         this.gObjectCounter = 0
-        this.gCCMEnteredSlide = 0
-        this.gCheckingSurfaceCollisionsForCamera = 0
-        this.gMarioShotFromCannon = 0
-        this.gFindFloorIncludeSurfaceIntangible
+        this.gCheckingSurfaceCollisionsForCamera = false;
+        this.gMarioShotFromCannon = false;
+        this.gFindFloorIncludeSurfaceIntangible = false;
         this.gNumFindFloorMisses = 0
+        this.gNumRoomedObjectsInMarioRoom = 0;
+        this.gNumRoomedObjectsNotInMarioRoom = 0;
+        this.gWDWWaterLevelChanging = false;
+        this.gCCMEnteredSlide = false;
+        this.gMarioOnMerryGoRound = false;
         this.gNumCalls = {
             floor: 0,
             ceil: 0,

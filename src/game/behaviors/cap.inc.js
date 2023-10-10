@@ -2,10 +2,9 @@
 import * as _Linker from "../../game/Linker"
 import { spawn_object, cur_obj_become_intangible, cur_obj_become_tangible, cur_obj_hide,
 cur_obj_unhide, obj_mark_for_deletion, cur_obj_scale, obj_turn_toward_object, approach_symmetric,
-cur_obj_move_using_fvel_and_gravity, cur_obj_was_attacked_or_ground_pounded } from
+cur_obj_move_using_fvel_and_gravity, cur_obj_was_attacked_or_ground_pounded, obj_set_hitbox } from
 "../ObjectHelpers"
 import { object_step, obj_flicker_and_disappear, OBJ_COL_FLAG_GROUNDED, sObjFloor } from "../ObjBehaviors"
-import { obj_set_hitbox } from "../ObjBehaviors2"
 import { sins, coss, int16, s16, random_int16, random_float } from "../../utils"
 import { oPosX, oPosY, oPosZ, oVelY, oFaceAnglePitch, oFaceAngleYaw, oMoveAngleYaw, oMoveAnglePitch,
 oForwardVel, oHomeX, oHomeY, oHomeZ, oAction, oAnimState, oTimer, oDistanceToMario, oInteractStatus,

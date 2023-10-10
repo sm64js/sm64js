@@ -59,6 +59,7 @@ export const bhv_activated_back_and_forth_platform_init = () => {
 export const bhv_activated_back_and_forth_platform_update = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+    const w = {}
 
     if (gMarioObject.platform == o) {
         o.rawData[oVelY] = -6.0
@@ -72,7 +73,8 @@ export const bhv_activated_back_and_forth_platform_update = () => {
         } else {
             o.rawData[oActivatedBackAndForthPlatformOffset] += o.rawData[oActivatedBackAndForthPlatformVel]
 
-            if (clamp_f32(o.rawData[oActivatedBackAndForthPlatformOffset], 0.0, o.rawData[oActivatedBackAndForthPlatformMaxOffset]) || (o.rawData[oActivatedBackAndForthPlatformVel] > 0.0 && o.rawData[oDistanceToMario] > 3000.0)) {
+            w.value = o.rawData[oActivatedBackAndForthPlatformOffset]
+            if (clamp_f32(w, 0.0, o.rawData[oActivatedBackAndForthPlatformMaxOffset]) || (o.rawData[oActivatedBackAndForthPlatformVel] > 0.0 && o.rawData[oDistanceToMario] > 3000.0)) {
                 o.rawData[oActivatedBackAndForthPlatformCountdown] = 20
 
                 if (o.rawData[oVelY] < 0.0 || o.rawData[oActivatedBackAndForthPlatformVel] > 0.0) {
@@ -83,6 +85,7 @@ export const bhv_activated_back_and_forth_platform_update = () => {
 
                 o.rawData[oFaceAngleYaw] += o.rawData[oActivatedBackAndForthPlatformFlipRotation]
             }
+            o.rawData[oActivatedBackAndForthPlatformOffset] = w.value;
         }
     } else {
         if (o.rawData[oVelY] < 0.0) {
@@ -98,7 +101,9 @@ export const bhv_activated_back_and_forth_platform_update = () => {
         o.rawData[oPosY] = o.rawData[oHomeY] + o.rawData[oActivatedBackAndForthPlatformOffset]
     } else {
         o.rawData[oPosY] += o.rawData[oVelY]
-        clamp_f32(o.rawData[oPosY], o.rawData[oHomeY] - 20.0, o.rawData[oHomeY])
+        w.value = o.rawData[oPosY]
+        clamp_f32(w, o.rawData[oHomeY] - 20.0, o.rawData[oHomeY])
+        o.rawData[oPosY] = w.value
 
         obj_set_dist_from_home(-o.rawData[oActivatedBackAndForthPlatformOffset])
     }

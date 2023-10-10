@@ -1,7 +1,6 @@
 import { oAngleVelYaw, oFaceAngleYaw, oSpinningHeartPlayedSound, oSpinningHeartTotalSpin } from "../../include/object_constants"
 import { SOUND_GENERAL_HEART_SPIN } from "../../include/sounds"
-import { obj_set_hitbox } from "../ObjBehaviors2"
-import { obj_check_if_collided_with_object } from "../ObjectHelpers"
+import { obj_check_if_collided_with_object, obj_set_hitbox } from "../ObjectHelpers"
 import { cur_obj_play_sound_2 } from "../SpawnSound"
 
 const sRecoveryHeartHitbox = {

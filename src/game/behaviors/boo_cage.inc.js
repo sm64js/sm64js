@@ -6,7 +6,7 @@ import {
 } from "../../include/object_constants"
 
 import {
-    obj_copy_pos_and_angle, cur_obj_update_floor_and_walls, cur_obj_move_standard, cur_obj_become_tangible,
+    obj_copy_pos_and_angle, obj_set_hitbox, cur_obj_update_floor_and_walls, cur_obj_move_standard, cur_obj_become_tangible,
     spawn_object, cur_obj_scale, obj_check_if_collided_with_object, cur_obj_become_intangible
 } from "../ObjectHelpers"
 
@@ -22,7 +22,6 @@ import { play_puzzle_jingle } from "../../audio/external"
 import { SOUND_GENERAL_SOFT_LANDING } from "../../include/sounds"
 import { cur_obj_play_sound_2 } from "../SpawnSound"
 import { INTERACT_BBH_ENTRANCE } from "../Interaction"
-import { obj_set_hitbox } from "../ObjBehaviors2"
 import { BOO_DEATH_STATUS_ALIVE } from "./boo.inc"
 
 const sBooCageHitbox = {

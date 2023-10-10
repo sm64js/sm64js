@@ -1,8 +1,7 @@
 import * as _Linker from "../../game/Linker"
 import { is_point_within_radius_of_mario, object_step } from "../ObjBehaviors"
-import { obj_set_hitbox } from "../ObjBehaviors2"
 import { atan2s } from "../../engine/math_util"
-import { approach_s16_symmetric, cur_obj_scale, obj_turn_toward_object, cur_obj_become_intangible, cur_obj_become_tangible } from "../ObjectHelpers"
+import { approach_s16_symmetric, cur_obj_scale, obj_turn_toward_object, obj_set_hitbox, cur_obj_become_intangible, cur_obj_become_tangible } from "../ObjectHelpers"
 import { random_u16, sins, coss } from "../../utils"
 import { GRAPH_RENDER_INVISIBLE } from "../../engine/graph_node"
 import { HOMING_AMP_ACT_CHASE, HOMING_AMP_ACT_GIVE_UP, HOMING_AMP_ACT_INACTIVE, HOMING_AMP_ACT_APPEAR, AMP_ACT_IDLE, AMP_ACT_ATTACK_COOLDOWN, oInteractStatus, oAction, oAnimState, oMoveAngleYaw, oTimer,

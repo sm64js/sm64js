@@ -1,7 +1,6 @@
 // breakable_box.c.inc
 import * as _Linker from "../../game/Linker"
-import { cur_obj_set_model, cur_obj_was_attacked_or_ground_pounded, obj_explode_and_spawn_coins } from "../ObjectHelpers"
-import { obj_set_hitbox } from "../ObjBehaviors2"
+import { cur_obj_set_model, cur_obj_was_attacked_or_ground_pounded, obj_explode_and_spawn_coins, obj_set_hitbox } from "../ObjectHelpers"
 import { sBreakableBoxHitbox, breakable_box_init } from "./switch_hidden_objects.inc"
 import { create_sound_spawner } from "../SpawnSound"
 import { oTimer } from "../../include/object_constants"

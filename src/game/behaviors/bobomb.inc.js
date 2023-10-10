@@ -1,13 +1,12 @@
 // Bobomb
 import * as _Linker from "../../game/Linker"
 import { obj_turn_toward_object, obj_attack_collided_from_other_object, cur_obj_scale, spawn_object,
-obj_mark_for_deletion, cur_obj_nearest_object_with_behavior, approach_s16_symmetric,
+obj_mark_for_deletion, obj_set_hitbox, cur_obj_nearest_object_with_behavior, approach_s16_symmetric,
 cur_obj_init_animation, cur_obj_set_pos_relative, cur_obj_enable_rendering, cur_obj_get_dropped, }
 from "../ObjectHelpers"
 import { is_point_within_radius_of_mario, object_step, obj_return_home_if_safe,
 obj_check_if_facing_toward_angle, obj_check_floor_death, sObjFloor, obj_spawn_yellow_coins,
 curr_obj_random_blink, set_object_visibility } from "../ObjBehaviors"
-import { obj_set_hitbox } from "../ObjBehaviors2"
 import { int32 } from "../../utils"
 import { create_respawner } from "./corkbox.inc"
 import { cur_obj_play_sound_1, cur_obj_play_sound_2 } from "../SpawnSound"

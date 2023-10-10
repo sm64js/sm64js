@@ -8,8 +8,7 @@ import { bhvMovingYellowCoin, bhvSmallBully } from "../BehaviorData"
 import { CameraInstance, SHAKE_POS_SMALL } from "../Camera"
 import { INTERACT_BULLY, INT_STATUS_INTERACTED } from "../Interaction"
 import { is_point_within_radius_of_mario, object_step, obj_check_floor_death, OBJ_COL_FLAGS_LANDED, OBJ_COL_FLAG_GROUNDED, OBJ_COL_FLAG_NO_Y_VEL, obj_lava_death, obj_return_home_if_safe, set_object_visibility, sObjFloor } from "../ObjBehaviors"
-import { obj_set_hitbox } from "../ObjBehaviors2"
-import { cur_obj_become_intangible, cur_obj_init_animation, obj_turn_toward_object, spawn_mist_particles, spawn_object, spawn_object_abs_with_rot } from "../ObjectHelpers"
+import { cur_obj_become_intangible, cur_obj_init_animation, obj_turn_toward_object, spawn_mist_particles, spawn_object, spawn_object_abs_with_rot, obj_set_hitbox } from "../ObjectHelpers"
 import { cur_obj_play_sound_2 } from "../SpawnSound"
 
 const sSmallBullyHitbox = {

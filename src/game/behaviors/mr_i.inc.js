@@ -5,8 +5,7 @@ import { ACTIVE_FLAG_DEACTIVATED, ACTIVE_FLAG_IN_DIFFERENT_ROOM, OBJ_MOVE_HIT_WA
 import { SOUND_OBJ2_MRI_SPINNING, SOUND_OBJ_MRI_DEATH, SOUND_OBJ_MRI_SHOOT } from "../../include/sounds";
 import { coss, random_float, random_u16, sins } from "../../utils"
 import { INTERACT_DAMAGE, INT_STATUS_INTERACTED } from "../Interaction";
-import { obj_set_hitbox } from "../ObjBehaviors2";
-import { abs_angle_diff, cur_obj_become_intangible, cur_obj_call_action_function, cur_obj_move_using_fvel_and_gravity, cur_obj_scale, cur_obj_set_pos_to_home, cur_obj_shake_y, cur_obj_spawn_loot_blue_coin, cur_obj_update_floor_and_walls, obj_angle_to_object, obj_build_transform_from_pos_and_angle, obj_copy_angle, obj_copy_pos_and_angle, obj_mark_for_deletion, obj_set_angle, obj_set_parent_relative_pos, obj_translate_local, obj_turn_toward_object, spawn_mist_particles, spawn_object } from "../ObjectHelpers";
+import { abs_angle_diff, cur_obj_become_intangible, cur_obj_call_action_function, cur_obj_move_using_fvel_and_gravity, cur_obj_scale, cur_obj_set_pos_to_home, cur_obj_shake_y, cur_obj_spawn_loot_blue_coin, cur_obj_update_floor_and_walls, obj_angle_to_object, obj_build_transform_from_pos_and_angle, obj_copy_angle, obj_copy_pos_and_angle, obj_mark_for_deletion, obj_set_angle, obj_set_parent_relative_pos, obj_translate_local, obj_turn_toward_object, spawn_mist_particles, spawn_object, obj_set_hitbox } from "../ObjectHelpers";
 import { cur_obj_play_sound_2 } from "../SpawnSound";
 import { spawn_default_star } from "./spawn_star.inc";
 

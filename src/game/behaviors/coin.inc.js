@@ -5,10 +5,9 @@ import {
     cur_obj_set_model, spawn_object, cur_obj_scale, cur_obj_become_intangible,
     cur_obj_update_floor_and_walls, cur_obj_if_hit_wall_bounce_away, cur_obj_move_standard,
     cur_obj_rotate_yaw_toward, cur_obj_become_tangible, cur_obj_wait_then_blink,
-    cur_obj_call_action_function, obj_copy_pos, cur_obj_has_model
+    cur_obj_call_action_function, obj_copy_pos, cur_obj_has_model, obj_set_hitbox
 } from "../ObjectHelpers"
 import { MODEL_YELLOW_COIN, MODEL_YELLOW_COIN_NO_SHADOW, MODEL_SPARKLES, MODEL_BLUE_COIN } from "../../include/model_ids"
-import { obj_set_hitbox } from "../ObjBehaviors2"
 import { INTERACT_COIN, INT_STATUS_INTERACTED, INT_STATUS_TOUCHED_BOB_OMB } from "../Interaction"
 import { sins, coss, random_uint16 } from "../../utils"
 import { atan2s } from "../../engine/math_util"

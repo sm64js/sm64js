@@ -4,10 +4,9 @@ import { spawn_object, cur_obj_hide, cur_obj_set_pos_via_transform, cur_obj_unhi
 obj_mark_for_deletion, obj_copy_pos, obj_copy_scale, cur_obj_push_mario_away_from_cylinder,
 lateral_dist_between_objects, spawn_object_relative, spawn_mist_particles, approach_s16_symmetric,
 cur_obj_move_standard, cur_obj_spawn_particles, cur_obj_follow_path, cur_obj_update_floor_and_walls,
-cur_obj_become_intangible, cur_obj_become_tangible, cur_obj_scale } from "../ObjectHelpers"
+cur_obj_become_intangible, cur_obj_become_tangible, cur_obj_scale, obj_set_hitbox } from "../ObjectHelpers"
 import { is_point_within_radius_of_mario, object_step,  set_object_visibility,
 OBJ_COL_FLAG_GROUNDED, OBJ_COL_FLAGS_LANDED } from "../ObjBehaviors"
-import { obj_set_hitbox } from "../ObjBehaviors2"
 import { random_float } from "../../utils"
 import { spawn_mist_particles_variable } from "./white_puff.inc"
 import { cur_obj_play_sound_1, cur_obj_play_sound_2 } from "../SpawnSound"

@@ -1,6 +1,6 @@
 import * as _Linker from "../../game/Linker"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
-import { obj_set_hitbox } from "../ObjBehaviors2"
+import { obj_set_hitbox } from "../ObjectHelpers"
 import { INTERACT_COIN, INT_STATUS_INTERACTED } from "../Interaction"
 import { oInteractStatus } from "../../include/object_constants"
 import { coin_collected } from "./moving_coin.inc"

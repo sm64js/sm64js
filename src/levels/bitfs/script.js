@@ -113,7 +113,7 @@ const script_func_local_1 = [
     OBJECT(/*model*/ MODEL_BITFS_MOVING_SQUARE_PLATFORM,   /*pos*/ -3890,    102,   617,  /*angle*/ 0,  90,  0,   /*behParam*/ 0x010C0000,  /*beh*/ 'bhvSlidingPlatform2'),
     OBJECT(/*model*/ MODEL_BITFS_MOVING_SQUARE_PLATFORM,   /*pos*/ -3276,    102,     2,  /*angle*/ 0,  270,  0,  /*behParam*/ 0x010C0000,  /*beh*/ 'bhvSlidingPlatform2'),
     OBJECT(/*model*/ MODEL_BITFS_SLIDING_PLATFORM,         /*pos*/  2103,    198,   312,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x019F0000,  /*beh*/ 'bhvSlidingPlatform2'),
-    OBJECT(/*model*/ MODEL_BITFS_TUMBLING_PLATFORM,        /*pos*/  4979,   4250,    96,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00030000,  /*beh*/ 'bhvWfTumblingBridge'),
+    OBJECT(/*model*/ MODEL_BITFS_TUMBLING_PLATFORM,        /*pos*/  4979,   4250,    96,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00030000,  /*beh*/ 'bhvTumblingBridge'),
     OBJECT(/*model*/ MODEL_NONE,                           /*pos*/  3890,  -2043,   266,  /*angle*/ 0,  0,  0,    /*behParam*/ 0x00520000,  /*beh*/ 'bhvPoleGrabbing'),
     RETURN(),
 ];

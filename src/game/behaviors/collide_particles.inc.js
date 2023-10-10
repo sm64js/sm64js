@@ -3,7 +3,6 @@ import { spawn_object, cur_obj_move_using_fvel_and_gravity, cur_obj_scale, cur_o
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { MODEL_CARTOON_STAR, MODEL_DIRT_ANIMATION } from "../../include/model_ids"
 import { oMoveAngleYaw, oTimer, oCollisionParticleUnkF4, oForwardVel, oPosY, oVelY, oAnimState } from "../../include/object_constants"
-import { bhvPoundTinyStarParticle, bhvWallTinyStarParticle, bhvPunchTinyTriangle } from "../BehaviorData"
 import { sins, coss } from "../../utils"
 
 const D_8032F2CC = [
@@ -19,7 +18,7 @@ const D_8032F2E4 = [
 export const bhv_punch_tiny_triangle_init = () => {
     const o = ObjectListProc.gCurrentObject
     for (let i = 0; i < 6; i++) {
-        const particle = spawn_object(o, MODEL_DIRT_ANIMATION, bhvPunchTinyTriangle) 
+        const particle = spawn_object(o, MODEL_DIRT_ANIMATION, gLinker.behaviors.bhvPunchTinyTriangle) 
         particle.rawData[oMoveAngleYaw] = ObjectListProc.gMarioObject.rawData[oMoveAngleYaw] + D_8032F2E4[2 * i] + 0x8000
         particle.rawData[oVelY] = sins(D_8032F2E4[2 * i + 1]) * 25.0
         particle.rawData[oForwardVel] = coss(D_8032F2E4[2 * i + 1]) * 25.0
@@ -29,7 +28,7 @@ export const bhv_punch_tiny_triangle_init = () => {
 export const bhv_tiny_star_particles_init = () => {
     const o = ObjectListProc.gCurrentObject
     for (let i = 0; i < 7; i++) {
-        const particle = spawn_object(o, MODEL_CARTOON_STAR, bhvWallTinyStarParticle)
+        const particle = spawn_object(o, MODEL_CARTOON_STAR, gLinker.behaviors.bhvWallTinyStarParticle)
         particle.rawData[oMoveAngleYaw] = ObjectListProc.gMarioObject.rawData[oMoveAngleYaw] + D_8032F2E4[2 * i] + 0x8000
         particle.rawData[oVelY] = sins(D_8032F2E4[2 * i + 1]) * 25.0
         particle.rawData[oForwardVel] = coss(D_8032F2E4[2 * i + 1]) * 25.0
@@ -43,7 +42,7 @@ export const bhv_pound_tiny_star_particle_init = () => {
     const sp20 = 8
 
     for (let i = 0; i < sp20; i++) {
-        const particle = spawn_object(o, MODEL_CARTOON_STAR, bhvPoundTinyStarParticle)
+        const particle = spawn_object(o, MODEL_CARTOON_STAR, gLinker.behaviors.bhvPoundTinyStarParticle)
         particle.rawData[oMoveAngleYaw] = (i * 65536) / sp20
     }
 }

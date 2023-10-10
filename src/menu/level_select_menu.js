@@ -8,7 +8,7 @@ const intro_play_its_a_me_mario = () => {
     return true
 }
 
-const intro_default = () => {
+const intro_regular = () => {
     Area.print_intro_text()
 
     if (window.playerInput.buttonPressedStart) {
@@ -160,7 +160,7 @@ const run_press_start_demo_timer = (timer) => {
 export const lvl_intro_update = (arg1) => {
     switch (arg1) {
         case 0: return intro_play_its_a_me_mario()
-        case 1: return intro_default()
+        case 1: return intro_regular()
         case 2: return intro_game_over()
         case 3: return level_select_input_loop()
     }

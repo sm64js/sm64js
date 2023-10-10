@@ -7,7 +7,7 @@ import {
     cur_obj_rotate_yaw_toward, cur_obj_move_using_fvel_and_gravity, abs_angle_diff,
     cur_obj_lateral_dist_from_mario_to_home, mario_is_in_air_action, increment_velocity_toward_range,
     cur_obj_set_vel_from_mario_vel, cur_obj_disable, cur_obj_set_pos_to_home_with_debug,
-    cur_obj_forward_vel_approach_upward
+    cur_obj_forward_vel_approach_upward, obj_set_hitbox
 
 } from "../ObjectHelpers"
 
@@ -38,7 +38,6 @@ import { TIME_STOP_MARIO_OPENED_DOOR, gDebugInfo } from "../ObjectListProcessor"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { LevelUpdateInstance as LevelUpdate } from "../LevelUpdate"
 import { random_u16, coss, sins, random_float } from "../../utils"
-import { obj_set_hitbox } from "../ObjBehaviors2"
 import { play_puzzle_jingle } from "../../audio/external"
 import { create_sound_spawner, cur_obj_play_sound_2 } from "../SpawnSound"
 import { CameraInstance as Camera } from "../Camera"
@@ -640,7 +639,7 @@ const big_boo_spawn_merry_go_round_star = () => {
 
     //spawn_default_star(-1600.0, -2100.0, 205.0)
 
-    let merryGoRound = cur_obj_nearest_object_with_behavior(o, bhvMerryGoRound);
+    let merryGoRound = cur_obj_nearest_object_with_behavior(o, gLinker.behaviors.bhvMerryGoRound);
 
     if (merryGoRound != null) {
         merryGoRound.rawData[oMerryGoRoundStopped] = true;

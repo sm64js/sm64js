@@ -1,3 +1,4 @@
+import { vec3s_set } from "../engine/math_util";
 import { COURSE_BBH, COURSE_CCM, COURSE_NONE, COURSE_HMC, COURSE_SSL, COURSE_BOB, COURSE_SL, COURSE_WDW, COURSE_JRB, COURSE_THI, COURSE_TTC, COURSE_RR, COURSE_BITDW, COURSE_VCUTM, COURSE_BITFS, COURSE_SA, COURSE_BITS, COURSE_LLL, COURSE_DDD, COURSE_CAKE_END, COURSE_PSS, COURSE_COTMC, COURSE_TOTWC, COURSE_WMOTR, COURSE_TTM } from "../include/course_table";
 import { COURSE_MIN, COURSE_NUM_TO_INDEX, COURSE_STAGES_MAX } from "../levels/course_defines";
 import { AreaInstance as Area } from "./Area";
@@ -267,13 +268,23 @@ export const save_file_get_star_flags = (fileIndex, courseIndex) => {
     return starFlags
 }
 
-// export const save_file_get_course_coin_score(fileIndex, courseIndex) {
-//     return gSaveBuffer.files[fileIndex][0].courseCoinScores[courseIndex];
-// }
+export const save_file_get_course_coin_score = (fileIndex, courseIndex) => {
+    return 0;
+    // return gSaveBuffer.files[fileIndex][0].courseCoinScores[courseIndex];
+}
 
 export const disable_warp_checkpoint = () => {
     // check_warp_checkpoint() checks to see if gWarpCheckpoint.courseNum != COURSE_NONE
     gWarpCheckpoint.courseNum = COURSE_NONE;
+}
+
+export const save_file_set_cap_pos = (x, y, z) => {
+    // let saveFile = gSaveBuffer.files[gCurrSaveFileNum - 1][0];
+
+    // saveFile.capLeve = Area.gCurrLevelNum;
+    // saveFile.capArea = Area.gCurrAreaIndex;
+    // vec3s_set(saveFile.capPos, x, y, z);
+    save_file_set_flags(SAVE_FLAG_CAP_ON_GROUND);
 }
 
 /**

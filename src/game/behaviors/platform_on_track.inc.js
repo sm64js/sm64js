@@ -169,6 +169,7 @@ const platform_on_track_act_wait_for_mario = () => {
 const platform_on_track_act_move_along_track = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+    const w = {}
 
     let initialAngle
     let pxWrapper
@@ -235,8 +236,10 @@ const platform_on_track_act_move_along_track = () => {
             let yawSpeed = abs_angle_diff(targetFaceYaw, o.rawData[oFaceAngleYaw]) / 20
 
             initialAngle = o.rawData[oFaceAngleYaw]
-            clamp_s16(yawSpeed, 100, 500)
-            obj_face_yaw_approach(targetFaceYaw, yawSpeed)
+            w.value = yawSpeed
+            clamp_s16(w, 100, 500)
+            obj_face_yaw_approach(targetFaceYaw, w.value)
+            yawSpeed = w.value
             o.rawData[oAngleVelYaw] = o.rawData[oFaceAngleYaw] - initialAngle
         }
 
@@ -245,10 +248,12 @@ const platform_on_track_act_move_along_track = () => {
             let rollSpeed = abs_angle_diff(o.rawData[oMoveAnglePitch], o.rawData[oFaceAngleRoll]) / 20
 
             initialAngle = o.rawData[oFaceAngleRoll]
-            clamp_s16(rollSpeed, 100, 500)
+            w.value = rollSpeed
+            clamp_s16(w, 100, 500)
             //! If the platform is moving counterclockwise upward or
             //  clockwise downward, this will be backward
-            obj_face_roll_approach(o.rawData[oMoveAnglePitch], rollSpeed)
+            obj_face_roll_approach(o.rawData[oMoveAnglePitch], w.value)
+            rollSpeed = w.value
             o.rawData[oAngleVelRoll] = o.rawData[oFaceAngleRoll] - initialAngle
         }
     }
@@ -315,7 +320,9 @@ const platform_on_track_rock_ski_lift = () => {
         /* accel          */ 6.0,
         /* slowdown       */ 1.5
     )
-    clamp_f32(o.rawData[oPlatformOnTrackSkiLiftRollVel], -100.0, 100.0)
+    o.rawData[oFaceAngleRoll] = valueWrapper.value
+    clamp_f32(velWrapper, -100.0, 100.0)
+    o.rawData[oPlatformOnTrackSkiLiftRollVel] = velWrapper.value
 }
 
 /**

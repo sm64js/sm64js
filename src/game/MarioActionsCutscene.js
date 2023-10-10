@@ -22,7 +22,7 @@ import {
 } from "./Interaction"
 
 import {
-    IngameMenuInstance as IngameMenu
+    IngameMenuInstance as IngameMenu, MENU_MODE_NONE, MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN, MENU_OPT_NONE
 } from "./IngameMenu"
 
 import {
@@ -39,10 +39,11 @@ import {
 } from "../engine/math_util"
 
 import {
-    enable_time_stop, disable_time_stop, spawn_object
+    enable_time_stop, disable_time_stop, spawn_object, spawn_object_abs_with_rot
 } from "./ObjectHelpers"
 
 import {
+    gLastCompletedCourseNum,
     save_file_set_flags
 } from "./SaveFile"
 
@@ -148,6 +149,7 @@ import {
 import { MARIO_EYES_DEAD, MARIO_HAND_PEACE_SIGN, MARIO_HAND_OPEN, MARIO_EYES_HALF_CLOSED } from "../include/mario_geo_switch_case_ids"
 
 import {
+    MODEL_CASTLE_GROUNDS_WARP_PIPE,
     MODEL_STAR
 } from "../include/model_ids"
 
@@ -173,15 +175,15 @@ import {
     SOUND_MARIO_YAH_WAH_HOO, SOUND_MARIO_HOOHOO,
 
     SOUND_ACTION_TERRAIN_BODY_HIT_GROUND, SOUND_ACTION_UNKNOWN43D, SOUND_ACTION_UNKNOWN43E,
-    SOUND_ACTION_BRUSH_HAIR, SOUND_ACTION_KEY_SWISH, SOUND_ACTION_PAT_BACK, SOUND_ACTION_UNKNOWN45C, SOUND_ACTION_READ_SIGN, SOUND_ACTION_TELEPORT
+    SOUND_ACTION_BRUSH_HAIR, SOUND_ACTION_KEY_SWISH, SOUND_ACTION_PAT_BACK, SOUND_ACTION_UNKNOWN45C, SOUND_ACTION_READ_SIGN, SOUND_ACTION_TELEPORT, SOUND_MENU_EXIT_PIPE, SOUND_MENU_ENTER_PIPE
 } from "../include/sounds"
 
-import { LEVEL_BOWSER_1, LEVEL_BOWSER_2 } from "../levels/level_defines_constants"
+import { LEVEL_BOWSER_1, LEVEL_BOWSER_2, LEVEL_THI } from "../levels/level_defines_constants"
 import { COURSE_BITDW, COURSE_BITFS } from "../levels/course_defines"
 
 import { play_sound } from "../audio/external"
 
-import { CameraInstance as Camera } from "./Camera"
+import { CameraInstance as Camera, CAM_EVENT_START_INTRO } from "./Camera"
 import { play_mario_heavy_landing_sound } from "./Mario"
 
 let sIntroWarpPipeObj = null
@@ -208,8 +210,8 @@ export const MARIO_DIALOG_STATUS_SPEAK = 2
 
 // // related to peach gfx?
 // static s8 D_8032CBE4 = 0
-// static s8 D_8032CBE8 = 0
-// static s8 D_8032CBEC[7] = { 2, 3, 2, 1, 2, 3, 2 }
+let D_8032CBE8 = 0
+let D_8032CBEC = [ 2, 3, 2, 1, 2, 3, 2 ]
 
 // static let /*u8*/ sStarsNeededForDialog[] = { 1, 3, 8, 30, 50, 70 }
 
@@ -357,26 +359,26 @@ export const MARIO_DIALOG_STATUS_SPEAK = 2
 //     }
 // }
 
-// // Geo switch case function for controlling Peach's eye state.
-// export const geo_switch_peach_eyes = (run, node, a2) => {
-//     struct GraphNodeSwitchCase *switchCase = (struct GraphNodeSwitchCase *) node
-//     let /*s16*/ timer
+// Geo switch case function for controlling Peach's eye state.
+export const geo_switch_peach_eyes = (run, node, a2) => {
+    let switchCase = node
+    let /*s16*/ timer
 
-//     if (run == 1) {
-//         if (D_8032CBE4 == 0) {
-//             timer = (gAreaUpdateCounter + 0x20) >> 1 & 0x1F
-//             if (timer < 7) {
-//                 switchCase.selectedCase = D_8032CBE8 * 4 + D_8032CBEC[timer]
-//             } else {
-//                 switchCase.selectedCase = D_8032CBE8 * 4 + 1
-//             }
-//         } else {
-//             switchCase.selectedCase = D_8032CBE8 * 4 + D_8032CBE4 - 1
-//         }
-//     }
+    if (run == 1) {
+        if (D_8032CBE4 == 0) {
+            timer = (gLinker.GeoRenderer.gAreaUpdateCounter + 0x20) >> 1 & 0x1F
+            if (timer < 7) {
+                switchCase.selectedCase = D_8032CBE8 * 4 + D_8032CBEC[timer]
+            } else {
+                switchCase.selectedCase = D_8032CBE8 * 4 + 1
+            }
+        } else {
+            switchCase.selectedCase = D_8032CBE8 * 4 + D_8032CBE4 - 1
+        }
+    }
 
-//     return false
-// }
+    return false
+}
 
 // // unused
 // const stub_is_textbox_active = (a0) => {
@@ -623,12 +625,11 @@ export const act_reading_automatic_dialog = (m) => {
           // set Mario dialog
         if (m.actionState == 9) {
             actionArg = m.actionArg
-            IngameMenu.create_dialog_box()
-            // if (GET_HIGH_U16_OF_32(actionArg) == 0) {
-            //     create_dialog_box(GET_LOW_U16_OF_32(actionArg))
-            // } else {
-            //     create_dialog_box_with_var(GET_HIGH_U16_OF_32(actionArg), GET_LOW_U16_OF_32(actionArg))
-            // }
+            if (actionArg & 0xFFFF0000 == 0) {
+                IngameMenu.create_dialog_box(actionArg & 0xFFFF0000)
+            } else {
+                IngameMenu.create_dialog_box_with_var(actionArg & 0xFFFF0000, actionArg & 0xFFFF)
+            }
         }
           // wait until dialog is done
         else if (m.actionState == 10) {
@@ -1133,32 +1134,32 @@ export const act_warp_door_spawn = (m) => {
     return false
 }
 
-// export const act_emerge_from_pipe = (m) => {
-//     struct Object *marioObj = m.marioObj
+export const act_emerge_from_pipe = (m) => {
+    let marioObj = m.marioObj;
 
-//     if (m.actionTimer++ < 11) {
-//         marioObj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
-//         return false
-//     }
+    m.actionTimer++;
 
-//     marioObj.gfx.flags |= GRAPH_RENDER_ACTIVE
+    if (m.actionTimer < 11) {
+        marioObj.gfx.flags &= ~GRAPH_RENDER_ACTIVE;
+        return false;
+    }
 
-//     play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED)
+    marioObj.gfx.flags |= GRAPH_RENDER_ACTIVE;
 
-//     if (Area.gCurrLevelNum == LEVEL_THI) {
-//         if (gCurrAreaIndex == 2) {
-//             play_sound_if_no_flag(m, SOUND_MENU_EXIT_PIPE, MARIO_ACTION_SOUND_PLAYED)
-//         } else {
-//             play_sound_if_no_flag(m, SOUND_MENU_ENTER_PIPE, MARIO_ACTION_SOUND_PLAYED)
-//         }
-//     }
+    play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED);
 
-//     if (launch_mario_until_land(m, ACT_JUMP_LAND_STOP, MARIO_ANIM_SINGLE_JUMP, 8.0)) {
-//         mario_set_forward_vel(m, 0.0)
-//         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
-//     }
-//     return false
-// }
+    if (Area.gCurrLevelNum == LEVEL_THI) {
+        Area.gCurrAreaIndex == 2
+            ? play_sound_if_no_flag(m, SOUND_MENU_EXIT_PIPE, MARIO_ACTION_SOUND_PLAYED)
+            : play_sound_if_no_flag(m, SOUND_MENU_ENTER_PIPE, MARIO_ACTION_SOUND_PLAYED);
+    }
+
+    if (launch_mario_until_land(m, ACT_JUMP_LAND_STOP, MARIO_ANIM_SINGLE_JUMP, 8.0)) {
+        mario_set_forward_vel(m, 0.0);
+        play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
+    }
+    return false;
+}
 
 export const act_spawn_spin_airborne = (m) => {
     // entered water, exit action
@@ -1244,22 +1245,22 @@ export const act_exit_land_save_dialog = (m) => {
             set_mario_animation(m, m.actionArg == 0 ? MARIO_ANIM_GENERAL_LAND
                                                      : MARIO_ANIM_LAND_FROM_SINGLE_JUMP)
             if (is_anim_past_end(m)) {
-                // if (gLastCompletedCourseNum != COURSE_BITDW
-                //     && gLastCompletedCourseNum != COURSE_BITFS) {
-                //     enable_time_stop()
-                // }
+                if (gLastCompletedCourseNum != COURSE_BITDW
+                    && gLastCompletedCourseNum != COURSE_BITFS) {
+                    enable_time_stop()
+                }
 
-                // set_menu_mode(RENDER_COURSE_DONE_SCREEN)
-                // gSaveOptSelectIndex = 0
+                IngameMenu.set_menu_mode(MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN)
+                Area.gSaveOptSelectIndex = MENU_OPT_NONE
 
                 m.actionState = 3 // star exit with cap
                 if (!(m.flags & MARIO_CAP_ON_HEAD)) {
                     m.actionState = 2 // star exit without cap
                 }
-                // if (gLastCompletedCourseNum == COURSE_BITDW
-                //     || gLastCompletedCourseNum == COURSE_BITFS) {
-                //     m.actionState = 1 // key exit
-                // }
+                if (gLastCompletedCourseNum == COURSE_BITDW
+                    || gLastCompletedCourseNum == COURSE_BITFS) {
+                    m.actionState = 1 // key exit
+                }
             }
             break
         // key exit
@@ -1809,35 +1810,28 @@ const advance_cutscene_step = (m) => {
 }
 
 const intro_cutscene_hide_hud_and_mario = (m) => {
-    gHudDisplay.flags = HUD_DISPLAY_NONE
+    LevelUpdate.gHudDisplay.flags = LevelUpdate.HUD_DISPLAY_NONE
     m.statusForCamera.cameraEvent = CAM_EVENT_START_INTRO
     m.marioObj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
     advance_cutscene_step(m)
 }
 
-// #ifdef VERSION_EU
-//     #define TIMER_SPAWN_PIPE 47
-// #else
-//     #define TIMER_SPAWN_PIPE 37
-// #endif
+const TIMER_SPAWN_PIPE = 37
 
-// const intro_cutscene_peach_lakitu_scene = (m) => {
-//     if (m.statusForCamera.cameraEvent != CAM_EVENT_START_INTRO) {
-//         if (m.actionTimer++ == TIMER_SPAWN_PIPE) {
-//             sIntroWarpPipeObj =
-//                 spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_CASTLE_GROUNDS_WARP_PIPE,
-//                                           bhvStaticObject, -1328, 60, 4664, 0, 180, 0)
-//             advance_cutscene_step(m)
-//         }
-//     }
-// }
-// #undef TIMER_SPAWN_PIPE
+const intro_cutscene_peach_lakitu_scene = (m) => {
+    const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
+    if (m.statusForCamera.cameraEvent != CAM_EVENT_START_INTRO) {
+        if (m.actionTimer == TIMER_SPAWN_PIPE) {
+            sIntroWarpPipeObj =
+                spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_CASTLE_GROUNDS_WARP_PIPE,
+                                          gLinker.behaviors.bhvStaticObject, -1328, 60, 4664, 0, 180, 0)
+            advance_cutscene_step(m)
+        }
+        m.actionTimer++
+    }
+}
 
-// #ifdef VERSION_EU
-//     #define TIMER_RAISE_PIPE 28
-// #else
-//     #define TIMER_RAISE_PIPE 38
-// #endif
+const TIMER_RAISE_PIPE = 38
 
 // const intro_cutscene_raise_pipe = (m) => {
 //     sIntroWarpPipeObj.rawData[oPosY] = camera_approach_f32_symmetric(sIntroWarpPipeObj.rawData[oPosY], 260.0, 10.0)

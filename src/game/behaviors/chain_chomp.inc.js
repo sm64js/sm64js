@@ -379,7 +379,6 @@ const chain_chomp_released_jump_away = () => {
 const chain_chomp_released_end_cutscene = () => {
     const o = ObjectListProc.gCurrentObject
 
-    console.log("hi!")
     if (Camera.cutscene_object(CUTSCENE_STAR_SPAWN, o) == -1) {
         set_mario_npc_dialog(MARIO_DIALOG_STOP)
         o.rawData[oAction] = CHAIN_CHOMP_ACT_UNLOAD_CHAIN

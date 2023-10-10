@@ -4,9 +4,8 @@ import { cur_obj_set_model, cur_obj_was_attacked_or_ground_pounded, obj_explode_
 cur_obj_scale, cur_obj_disable_rendering, cur_obj_enable_rendering, cur_obj_become_intangible,
 cur_obj_become_tangible, cur_obj_unhide, cur_obj_nearest_object_with_behavior,
 cur_obj_wait_then_blink, spawn_mist_particles, obj_attack_collided_from_other_object,
-cur_obj_get_dropped, spawn_object } from "../ObjectHelpers"
+cur_obj_get_dropped, spawn_object, obj_set_hitbox } from "../ObjectHelpers"
 import { object_step, obj_check_floor_death, sObjFloor, obj_spawn_yellow_coins, create_respawner } from "../ObjBehaviors"
-import { obj_set_hitbox } from "../ObjBehaviors2"
 import { create_sound_spawner, cur_obj_play_sound_2 } from "../SpawnSound"
 import { spawn_triangle_break_particles } from "./break_particles.inc"
 import { random_float } from "../../utils"

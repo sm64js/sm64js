@@ -1,4 +1,4 @@
-import { CameraInstance as Camera } from "./Camera"
+import { CAMERA_MODE_INSIDE_CANNON, CameraInstance as Camera } from "./Camera"
 import { 
     CAM_STATUS_NONE,
     CAM_STATUS_MARIO,
@@ -19,6 +19,7 @@ import { IngameMenuInstance as IngameMenu } from "./IngameMenu"
 import { PrintInstance as Print } from "./Print"
 import * as GfxDimensions from "../include/gfx_dimensions"
 import { GameInstance as Game } from "./Game"
+import { AreaInstance as Area } from "./Area"
 
 class PowerMeterHUD {
     constructor(animation, x, y, unused) {
@@ -330,15 +331,14 @@ class Hud {
     render_hud() {
         const hudDisplayFlags = LevelUpdate.gHudDisplay.flags;
 
-        if (hudDisplayFlags == LevelUpdate.HUD_DISPLAY_NONE) {
+        if (hudDisplayFlags == LevelUpdate.HUD_DISPLAY_NONE || hudDisplayFlags == undefined) {
             this.sPowerMeterHUD.animation = this.POWER_METER_HIDDEN
             this.sPowerMeterStoredHealth = 8
             this.sPowerMeterVisibleTimer = 0
         } else {
             IngameMenu.create_dl_ortho_matrix();
-
-            if (LevelUpdate.gCurrentArea != null && LevelUpdate.gCurrentArea.camera.mode == CAMERA_MODE_INSIDE_CANNON) {
-                this.render_hud_cannon_reticle()
+            if (Area.gCurrentArea != null && Area.gCurrentArea.camera.mode == CAMERA_MODE_INSIDE_CANNON) {
+                IngameMenu.render_hud_cannon_reticle()
             }
 
             if (hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_LIVES) {

@@ -1,10 +1,9 @@
 // switch_hidden_objects.c.inc
 import * as _Linker from "../../game/Linker"
-import { obj_set_hitbox } from "../ObjBehaviors2"
 import { cur_obj_set_model, cur_obj_was_attacked_or_ground_pounded, obj_explode_and_spawn_coins,
 cur_obj_scale, cur_obj_disable_rendering, cur_obj_enable_rendering, cur_obj_become_intangible,
 cur_obj_become_tangible, cur_obj_unhide, cur_obj_nearest_object_with_behavior,
-cur_obj_wait_then_blink, spawn_mist_particles, } from "../ObjectHelpers"
+cur_obj_wait_then_blink, spawn_mist_particles, obj_set_hitbox } from "../ObjectHelpers"
 import { create_sound_spawner } from "../SpawnSound"
 import { spawn_triangle_break_particles } from "./break_particles.inc"
 import { cur_obj_play_sound_2 } from "../SpawnSound"

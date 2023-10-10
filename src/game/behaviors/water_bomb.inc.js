@@ -2,8 +2,8 @@ import * as _Linker from "../../game/Linker"
 import { spawn_object, cur_obj_hide, cur_obj_set_pos_via_transform, cur_obj_unhide,
 obj_mark_for_deletion, obj_copy_pos, obj_copy_scale, cur_obj_push_mario_away_from_cylinder,
 lateral_dist_between_objects, spawn_object_relative, cur_obj_move_standard, cur_obj_spawn_particles,
-cur_obj_update_floor_and_walls } from "../ObjectHelpers"
-import { obj_set_hitbox, random_linear_offset, approach_number_ptr } from "../ObjBehaviors2"
+cur_obj_update_floor_and_walls, obj_set_hitbox } from "../ObjectHelpers"
+import { random_linear_offset, approach_number_ptr } from "../ObjBehaviors2"
 import { s16, random_u16, sins, coss } from "../../utils"
 import { create_sound_spawner, cur_obj_play_sound_2 } from "../SpawnSound"
 import { oPosX, oPosY, oPosZ, oMoveAngleYaw, oForwardVel, oVelY, oGraphYOffset, oFloorHeight,

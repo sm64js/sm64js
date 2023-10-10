@@ -1,11 +1,10 @@
 import { ObjectListProcessorInstance as ObjectListProc, TIME_STOP_ENABLED, TIME_STOP_MARIO_AND_DOORS } from "../ObjectListProcessor"
 import { oFaceAngleYaw, oInteractStatus, oBehParams, oBehParams2ndByte, oPosX, oPosY, oPosZ, oHomeX, oHomeZ, oHomeY, oFaceAnglePitch, oFaceAngleRoll, oMoveAngleYaw, oStarSpawnDisFromHome, oVelY, oForwardVel, oStarSpawnUnkFC, ACTIVE_FLAG_INITIATED_TIME_STOP, oAction, oTimer } from "../../include/object_constants"
-import { obj_set_hitbox } from "../ObjBehaviors2"
 import { INT_STATUS_INTERACTED, INTERACT_STAR_OR_KEY } from "../Interaction"
 import { save_file_get_star_flags, } from "../SaveFile"
 import { AreaInstance as Area } from "../Area"
 import { MODEL_TRANSPARENT_STAR, MODEL_STAR, MODEL_NONE } from "../../include/model_ids"
-import { clear_time_stop_flags, cur_obj_become_intangible, cur_obj_become_tangible, obj_mark_for_deletion, set_time_stop_flags, spawn_object, spawn_object_abs_with_rot } from "../ObjectHelpers"
+import { clear_time_stop_flags, cur_obj_become_intangible, cur_obj_become_tangible, obj_mark_for_deletion, set_time_stop_flags, spawn_object, spawn_object_abs_with_rot, obj_set_hitbox } from "../ObjectHelpers"
 import { bhvSparkleSpawn, bhvStarSpawnCoordinates } from "../BehaviorData"
 import { atan2s, sqrtf } from "../../engine/math_util"
 import { COURSE_BBH } from "../../include/course_table"
@@ -15,6 +14,7 @@ import { obj_move_xyz_using_fvel_and_yaw } from "../ObjBehaviors"
 import { sins } from "../../utils"
 import { cur_obj_play_sound_1, cur_obj_play_sound_2 } from "../SpawnSound"
 import { SOUND_ENV_STAR, SOUND_GENERAL_STAR_APPEARS } from "../../include/sounds"
+import { SpawnObjectInstance as SpawnObject } from "../SpawnObject"
 
 const sCollectStarHitbox = {
     interactType:      INTERACT_STAR_OR_KEY,
@@ -50,7 +50,7 @@ const bhv_collect_star_loop = () => {
     o.rawData[oFaceAngleYaw] += 0x800
 
     if (o.rawData[oInteractStatus] & INT_STATUS_INTERACTED) {
-        mark_obj_for_deletion(o)
+        SpawnObject.mark_obj_for_deletion(o)
         o.rawData[oInteractStatus] = 0
     }
 }

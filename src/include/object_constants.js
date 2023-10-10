@@ -92,6 +92,15 @@ export const ACTIVE_PARTICLE_BREATH                = (1 << 17) // 0x00020000
 export const ACTIVE_PARTICLE_V_STAR                = (1 << 18) // 0x00040000
 export const ACTIVE_PARTICLE_TRIANGLE              = (1 << 19) // 0x00080000
 
+/* Star Index */
+export const STAR_INDEX_ACT_1     = 0
+export const STAR_INDEX_ACT_2     = 1
+export const STAR_INDEX_ACT_3     = 2
+export const STAR_INDEX_ACT_4     = 3
+export const STAR_INDEX_ACT_5     = 4
+export const STAR_INDEX_ACT_6     = 5
+export const STAR_INDEX_100_COINS = 6
+
 /* oHeldState */
 export const HELD_FREE = 0
 export const HELD_HELD = 1
@@ -494,10 +503,10 @@ export const oCloudGrowSpeed             = 0x1E
 export const oCloudFwooshMovementRadius  = 0x49
 
 /* Coin */
-export const oCoinUnkF4   = 0x1B
-export const oCoinUnkF8   = 0x1C
-export const oCoinUnk110  = 0x22
-export const oCoinUnk1B0  = 0x4A
+export const oCoinCollectedFlags        = 0x1B
+export const oCoinOnGround              = 0x1C
+export const oCoinBaseVelY              = 0x22
+export const oCoinNumBounceSoundPlayed  = 0x4A
 
 /* Collision Particle */
 export const oCollisionParticleUnkF4   = 0x1B
@@ -799,7 +808,7 @@ export const oMrIUnkFC   = 0x1D
 export const oMrIUnk100  = 0x1E
 export const oMrIUnk104  = 0x1F
 export const oMrIUnk108  = 0x20
-export const oMrISize    = 0x21
+export const oMrIScale   = 0x21
 export const oMrIUnk110  = 0x22
 
 /* Object Respawner */
@@ -1036,7 +1045,7 @@ export const oSwoopTargetPitch    = 0x1C
 export const oSwoopTargetYaw      = 0x1D
 
 /* Thwomp */
-export const oThwompRandomTimer  = 0x1B
+export const oGrindelThwompRandomTimer  = 0x1B
 
 /* Tilting Platform */
 export const oTiltingPyramidNormalX          = 0x1B
@@ -1050,8 +1059,8 @@ export const oToadMessageRecentlyTalked  = 0x21
 export const oToadMessageState           = 0x22
 
 /* Tox Box */
-export const oToxBoxMovementPattern  = 0x49
-export const oToxBoxMovementStep     = 0x4A
+export const oToxBoxActionTable  = 0x49
+export const oToxBoxActionStep   = 0x4A
 
 /* TTC Rotating Solid */
 export const oTTCRotatingSolidNumTurns       = 0x1B
@@ -1340,3 +1349,33 @@ export const WOODEN_POST_BP_NO_COINS_MASK = 0x0000FF00
     /* status */
     export const ARROW_LIFT_NOT_DONE_MOVING = 0
     export const ARROW_LIFT_DONE_MOVING     = 1
+
+/* WF Rotating Wooden Platform */
+    /* oAction */
+    export const WF_ROTATING_WOODEN_PLATFORM_ACT_IDLE     = 0
+    export const WF_ROTATING_WOODEN_PLATFORM_ACT_ROTATING = 1
+
+/* Grindel or Thwomp */
+    /* oAction */
+    export const GRINDEL_THWOMP_ACT_RAISE          = 0
+    export const GRINDEL_THWOMP_ACT_IDLE_AT_TOP    = 1
+    export const GRINDEL_THWOMP_ACT_LOWER          = 2
+    export const GRINDEL_THWOMP_ACT_LAND           = 3
+    export const GRINDEL_THWOMP_ACT_IDLE_AT_BOTTOM = 4
+
+/* Tox Box */
+    /* oAction */
+    export const TOX_BOX_ACT_INIT          = 0
+    export const TOX_BOX_ACT_ROLL_LAND     = 1
+    export const TOX_BOX_ACT_IDLE          = 2
+    export const TOX_BOX_ACT_UNUSED_IDLE   = 3
+    export const TOX_BOX_ACT_ROLL_FORWARD  = 4
+    export const TOX_BOX_ACT_ROLL_BACKWARD = 5
+    export const TOX_BOX_ACT_ROLL_RIGHT    = 6
+    export const TOX_BOX_ACT_ROLL_LEFT     = 7
+    export const TOX_BOX_ACT_TABLE_END     = -1
+
+    /* oBhvParams2ndByte */
+    export const TOX_BOX_BP_MOVEMENT_PATTERN_1 = 0
+    export const TOX_BOX_BP_MOVEMENT_PATTERN_2 = 1
+    export const TOX_BOX_BP_MOVEMENT_PATTERN_3 = 2

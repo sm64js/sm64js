@@ -77,18 +77,18 @@ export const level_intro_mario_head_dizzy = [
 ]
 
 const level_intro_entry_4 = [
-    // INIT_LEVEL(),
+    INIT_LEVEL(),
 
-    // AREA(/*index*/ 1, intro_geo_000414),
-    // END_AREA(),
+    AREA(/*index*/ 1, intro_geo_000414),
+    END_AREA(),
 
-    // LOAD_AREA(/*area*/ 1),
+    LOAD_AREA(/*area*/ 1),
     // SET_MENU_MUSIC(/*seq*/ 0x0002),
-    // TRANSITION(/*transType*/ WARP_TRANSITION_FADE_FROM_COLOR, /*time*/ 16, /*color*/ 0xFF, 0xFF, 0xFF),
-    // SLEEP(/*frames*/ 16),
-    // CALL_LOOP(/*arg*/ 3, /*func*/ lvl_intro_update),
-    // JUMP_IF(/*op*/ OP_EQ, /*arg*/ -1, 'script_intro_L5'),
-    // JUMP('script_intro_L3'),
+    TRANSITION(/*transType*/ WARP_TRANSITION_FADE_FROM_COLOR, /*time*/ 16, /*color*/ 0xFF, 0xFF, 0xFF),
+    SLEEP(/*frames*/ 16),
+    CALL_LOOP(/*arg*/ 3, /*func*/ lvl_intro_update),
+    JUMP_IF(/*op*/ OP_EQ, /*arg*/ -1, 'script_intro_L5'),
+    JUMP('script_intro_L3'),
     EXIT_AND_EXECUTE('level_main_scripts_entry')
 ]
 

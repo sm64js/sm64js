@@ -374,7 +374,8 @@ export const G_RM_CUSTOM_AA_ZB_XLU_SURF2 = 28
 export const G_RM_AA_TEX_EDGE            = 29
 export const G_RM_AA_TEX_EDGE2           = 30
 export const G_RM_PASS                   = 31
-
+export const G_RM_TEX_EDGE               = 32
+export const G_RM_TEX_EDGE2              = 33
 
 //G_MOVEWORD types
 export const G_MW_MATRIX = 0x00 /* NOTE: also used by movemem */
@@ -497,6 +498,11 @@ export const G_CC_DECALRGB2 = {  // FIXME (copied from G_CC_DECALRGB)
     rgb: [15, 15, 31, 1]
 }
 
+export const G_CC_FADE = {  // FIXME (copied from G_CC_FADEA)
+    alpha: [1, 7, 7, 5],
+    rgb: [1, 15, 4, 7]
+}
+
 export const G_CC_FADEA = {  // FIXME (copied from MODULATEIFADEA)
     alpha: [1, 7, 5, 7],
     rgb: [1, 15, 4, 7]
@@ -607,6 +613,15 @@ export const gDPSetFillColor = (displaylist, color) => {
         words: {
             w0: G_SETFILLCOLOR,
             w1: { color }
+        }
+    })
+}
+
+export const gDPSetScissor = (displaylist, ulx, uly, lrx, lry) => {
+    displaylist.push({
+        words: {
+            w0: G_SETSCISSOR,
+            w1: { ulx, uly, lrx, lry }
         }
     })
 }

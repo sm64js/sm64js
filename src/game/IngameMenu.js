@@ -12,7 +12,7 @@ import { gCurrCourseStarFlags, gGotFileCoinHiScore, gLastCompletedCourseNum, gLa
 import { CameraInstance as Camera } from "./Camera"
 import { TEXT_CAMERA_ANGLE_R, TEXT_CLEAR, TEXT_COIN, TEXT_CONTINUE, TEXT_CONTINUE_WITHOUT_SAVING, TEXT_COURSE, TEXT_EXIT_COURSE, TEXT_HI_SCORE, TEXT_LAKITU_MARIO, TEXT_LAKITU_STOP, TEXT_MY_SCORE, TEXT_NORMAL_FIXED, TEXT_NORMAL_UPCLOSE, TEXT_PAUSE, TEXT_SAVE_AND_CONTINUE, TEXT_SAVE_AND_QUIT, TEXT_STAR, TEXT_STAR_X, TEXT_UNFILLED_STAR } from "../include/text_strings"
 import { seg2_act_name_table, seg2_course_name_table } from "../text/us/courses"
-import { COURSE_BONUS_STAGES, COURSE_NUM_TO_INDEX, COURSE_STAGES_MAX } from "../levels/course_defines"
+import { COURSE_BITFS, COURSE_BONUS_STAGES, COURSE_NUM_TO_INDEX, COURSE_STAGES_MAX } from "../levels/course_defines"
 import { COURSE_BITDW, COURSE_MAX, COURSE_MIN, COURSE_NONE } from "../include/course_table"
 import { ACT_FLAG_PAUSE_EXIT } from "./Mario"
 import { coin_seg3_dl_03007940, coin_seg3_dl_03007968, coin_seg3_dl_03007990, coin_seg3_dl_030079B8 } from "../actors/coin/model.inc"
@@ -1526,14 +1526,14 @@ class IngameMenu {
 
             // this.print_hud_course_complete_string(HUD_PRINT_CONGRATULATIONS);
             // this.print_hud_course_complete_coins(118, 111);
-            this.play_star_fanfare_and_flash_hud(2, 0);
+            // this.play_star_fanfare_and_flash_hud(2, 0);
 
             return;
         } else {
             name = actNameTbl[COURSE_STAGES_MAX * 6];
 
-            this.print_hud_course_complete_coins(118, 103);
-            this.play_star_fanfare_and_flash_hud(1, 1 << (gLastCompletedStarNum - 1));
+            // this.print_hud_course_complete_coins(118, 103);
+            // this.play_star_fanfare_and_flash_hud(1, 1 << (gLastCompletedStarNum - 1));
         }
 
         // Print star glyph

@@ -25,6 +25,8 @@
     "build": "webpack --mode production",
     "build:dev": "webpack --mode development",
     "start": "webpack-dev-server --host 0.0.0.0 --disable-host-check  --mode development"
+    "all:dev": "npm install --node serveStatic.js webpack-dev-server --host 0.0.0.0 --disable-host-check  --mode development"
+    "all:build": "npm install --webpack --mode production --node serveStatic.js"
   },
   "babel": {
     "presets": [

@@ -407,8 +407,10 @@ export const updateRainbowSkin = () => {
 }
 
 document.getElementById('playerNameForm').onsubmit = (e) => {
+ if (name.trim(‎ ).length > 4) {
     e.preventDefault()
     submitPlayerName()
+ }
 }
 
 window.updatePlayerName = (name) => {
@@ -604,3 +606,4 @@ window.freezeCamera = () => {
     window.myMario.freezeCamera = !window.myMario.freezeCamera
     freezeButton.innerHTML = window.myMario.freezeCamera ? ('<div class="sm64button">' + 'Freeze Camera (ON)' + '</div>') : ('<div class="sm64button">' + 'Freeze Camera (OFF)' + '</div>')
 }
+

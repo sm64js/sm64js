@@ -1,4 +1,5 @@
 import * as Gbi from "../../../../include/gbi"
+import { PAINTING_IMAGE, RIPPLE_TRIGGER_CONTINUOUS } from "../../../castle_inside/painting.inc";
 
 // 0x070241B8 - 0x070241D0
 const hmc_seg7_lights_070241B8 = Gbi.gdSPDefLights1(
@@ -519,28 +520,28 @@ export const hmc_seg7_painting_textures_07025518 = [
 ]
 
 // 0x0702551C (PaintinGbi.gdata)
-export const cotmc_painting = [
-    /* id */ 0x000E,
-    /* Image Count */ 0x01,
-    /* Texture Type */ //PAINTING_ENV_MAP, Commented out due to not being implemented
-    /* Floor Status */ 0x00, 0x00 , 0x00 /* which of the painting's nearby special floors Mario's on */,
-    /* Ripple Status */ 0x00,
-    /* Rotation */ 270.0,  0.0,
-    /* Position */ 2989.055908, -4485.120117, 5135.359863,
+export const cotmc_painting = {
+    id: 0x000E,
+    imageCount: 0x01,
+    textureType: PAINTING_IMAGE,
+    floorStatus: [0x00, 0x00, 0x00], /* which of the painting's nearby special floors Mario's on */
+    rippleStatus: 0x00,
+    rotation: [270.0,  0.0],
+    position: [2989.055908, -4485.120117, 5135.359863],
     /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0,    10.0,    30.0,
-    /* Ripple Decay */         1.0,     1.0,    0.98,
-    /* Ripple Rate */          0.0,    0.05,    0.05,
-    /* Ripple Dispersion */    0.0,    15.0,    15.0,
-    /* Curr Ripple Timer */    0.0,
-    /* Curr Ripple x, y */     0.0,  0.0,
-    /* Normal DList */ hmc_seg7_painting_dl_070254E0,
-    /* Texture Maps */ hmc_seg7_painting_texture_maps_07024CD4,
-    /* Textures */     hmc_seg7_painting_textures_07025518,
-    /* Texture w, h */ 32, 32,
-    /* Ripple DList */ hmc_seg7_painting_dl_070242D0,
-    /* Ripple Trigger */ //RIPPLE_TRIGGER_CONTINUOUS, Commented out due to not being implemented
-    /* Alpha */ 0xFF,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
-    /* Size */  723.968018,
-]
+    rippleMagnitude:     [0.0,    10.0,    30.0],
+    rippleDecay:         [1.0,     1.0,    0.98],
+    rippleRate:          [0.0,    0.05,    0.05],
+    rippleDispersion:    [0.0,    15.0,    15.0],
+    currRippleTimer:    0.0,
+    currRippleXY:     [0.0,  0.0],
+    normalDList: hmc_seg7_painting_dl_070254E0,
+    textureMaps: hmc_seg7_painting_texture_maps_07024CD4,
+    textures:     hmc_seg7_painting_textures_07025518,
+    textureWH: [32, 32],
+    rippleDList: hmc_seg7_painting_dl_070242D0,
+    rippleTrigger: RIPPLE_TRIGGER_CONTINUOUS,
+    alpha: 0xFF,
+    marioBelow:  [0x00, 0x00, 0x00], /* Whether or not Mario is below the painting */
+    size:  723.968018,
+}

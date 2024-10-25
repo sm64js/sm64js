@@ -738,8 +738,8 @@ class Camera {
             {area: 1, event: this.cam_castle_hmc_start_pool_cutscene.bind(this), centerX: 3350, centerY: -4689, centerZ: 4800, boundsX: 600, boundsY: 50, boundsZ: 600, boundsYaw: 0},
             {area: 1, event: this.cam_hmc_elevator_black_hole.bind(this), centerX: -3278, centerY: 1236, centerZ: 1379, boundsX: 358, boundsY: 200, boundsZ: 358, boundsYaw: 0},
             {area: 1, event: this.cam_hmc_elevator_maze_emergency_exit.bind(this), centerX: -2816, centerY: 2055, centerZ: -2560, boundsX: 358, boundsY: 200, boundsZ: 358, boundsYaw: 0},
-            {area: 1, event: this.cam_hmc_elevator_lake, centerX: -3532, centerY: 1543, centerZ: -7040, boundsX: 358, boundsY: 200, boundsZ: 358, boundsYaw: 0},
-            {area: 1, event: this.cam_hmc_elevator_maze, centerX: -972, centerY: 1543, centerZ: -7347, boundsX: 358, boundsY: 200, boundsZ: 358, boundsYaw: 0},
+            {area: 1, event: this.cam_hmc_elevator_lake.bind(this), centerX: -3532, centerY: 1543, centerZ: -7040, boundsX: 358, boundsY: 200, boundsZ: 358, boundsYaw: 0},
+            {area: 1, event: this.cam_hmc_elevator_maze.bind(this), centerX: -972, centerY: 1543, centerZ: -7347, boundsX: 358, boundsY: 200, boundsZ: 358, boundsYaw: 0},
             NULL_TRIGGER
         ]
 

@@ -1201,6 +1201,10 @@ export const geo_painting_draw = (callContext, node, context) => {
     let paintingGroup = sPaintingGroups[group]
     let painting = paintingGroup[id]
 
+    if (painting == null) {
+        return null
+    }
+
     if (callContext != GEO_CONTEXT_RENDER) {
         reset_painting(painting)
     } else if (callContext == GEO_CONTEXT_RENDER) {

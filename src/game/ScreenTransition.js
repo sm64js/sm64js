@@ -13,12 +13,12 @@ AreaInstance as Area
  } from "./Area"
 import { GameInstance as Game } from "./Game"
 import * as Gbi from "../include/gbi"
-import { atan2s } from "../engine/math_util"
+import { atan2s, round_float } from "../engine/math_util"
 import { dl_proj_mtx_fullscreen, dl_transition_draw_filled_region,
 	texture_transition_star_half, texture_transition_circle_half,
 	texture_transition_mario, texture_transition_bowser_half,
 	dl_draw_quad_verts_0123, dl_screen_transition_end, matrix_identity, matrix_fullscreen } from "../bin/segment2"
-import { round_float, make_vertex } from "./GeoMisc"
+import { make_vertex } from "./GeoMisc"
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./Skybox"
 import { GEO_CONTEXT_RENDER } from "../engine/graph_node"
 import { CAMERA_MODE_INSIDE_CANNON } from "./Camera"

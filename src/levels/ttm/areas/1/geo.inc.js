@@ -24,7 +24,7 @@ import { ttm_seg7_dl_0700A120 } from "./1/model.inc"
 import { ttm_seg7_dl_0700A2E0 } from "./2/model.inc"
 
 /*import {
-    geo_painting_update, geo_painting_draw, geo_cannon_circle_base
+    geo_cannon_circle_base
 } from "../../../../game/ObjectHelpers"*/
 
 import {
@@ -52,8 +52,8 @@ export const ttm_geo_000A70 = () => {return [
                     GEO_DISPLAY_LIST(LAYER_OPAQUE, ttm_seg7_dl_0700A120),
                     GEO_DISPLAY_LIST(LAYER_OPAQUE, ttm_seg7_dl_0700A2E0),
                     GEO_RENDER_OBJ(),
-                    /*GEO_ASM(0, geo_painting_update),
-                    GEO_ASM(PAINTING_ID(0, 2), geo_painting_draw),*/
+                    GEO_ASM(0, 'geo_painting_update'),
+                    GEO_ASM(PAINTING_ID(0, 2), 'geo_painting_draw'),
                     GEO_ASM(0, geo_movtex_pause_control),
                     GEO_ASM(0x3601, geo_movtex_draw_nocolor),
                     GEO_ASM(0x3602, geo_movtex_draw_nocolor),

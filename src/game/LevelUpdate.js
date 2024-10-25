@@ -4,10 +4,10 @@ import { COURSE_NONE, COURSE_STAGES_MAX } from "../levels/course_defines"
 import * as Mario from "./Mario"
 import { CameraInstance as Camera, CAM_MOVE_PAUSE_SCREEN } from "./Camera"
 import * as CourseTable from "../include/course_table"
-import { disable_warp_checkpoint, gLevelToCourseNumTable } from "./SaveFile"
+import { check_if_should_set_warp_checkpoint, check_warp_checkpoint, disable_warp_checkpoint, gLevelToCourseNumTable } from "./SaveFile"
 import { s16, sins, coss } from "../utils"
 
-import { fadeout_music, raise_background_noise } from "./SoundInit"
+import { fadeout_music, play_painting_eject_sound, raise_background_noise } from "./SoundInit"
 
 import {
     ACT_FLAG_INTANGIBLE, ACT_UNINITIALIZED,
@@ -84,6 +84,8 @@ import {
 } from "../include/sounds"
 import { SET_BACKGROUND_MUSIC } from "../engine/LevelCommands"
 import { IngameMenuInstance as IngameMenu, MENU_MODE_RENDER_PAUSE_SCREEN, MENU_OPT_DEFAULT, MENU_OPT_NONE } from "./IngameMenu"
+import { SURFACE_PAINTING_WARP_D3 } from "../include/surface_terrains"
+import { GRAPH_RENDER_ACTIVE } from "../engine/graph_node"
 
 
 export const TIMER_CONTROL_SHOW  = 0
@@ -130,6 +132,11 @@ const WARP_NODE_CREDITS_NEXT = 0xF9
 const WARP_NODE_CREDITS_END = 0xFA
 
 const WARP_NODE_CREDITS_MIN = 0xF8
+
+// From Surface 0xD3 to 0xFC
+const PAINTING_WARP_INDEX_START = 0x00   // Value greater than or equal to Surface 0xD3
+const PAINTING_WARP_INDEX_FA = 0x2A      // THI Huge Painting index left
+const PAINTING_WARP_INDEX_END = 0x2D     // Value less than Surface 0xFD
 
 
 class HudDisplay {
@@ -772,67 +779,55 @@ class LevelUpdate {
         this.sWarpDest.arg      = arg
     }
 
-// // From Surface 0xD3 to 0xFC
-// #define PAINTING_WARP_INDEX_START 0x00   // Value greater than or equal to Surface 0xD3
-// #define PAINTING_WARP_INDEX_FA 0x2A      // THI Huge Painting index left
-// #define PAINTING_WARP_INDEX_END 0x2D     // Value less than Surface 0xFD
+    /**
+     * Check if Mario is above and close to a painting warp floor, and return the
+     * corresponding warp node.
+     */
+    get_painting_warp_node() {
+        let warpNode = null
+        let paintingIndex = this.gMarioState.floor.type - SURFACE_PAINTING_WARP_D3
 
-// /**
-//  * Check if Mario is above and close to a painting warp floor, and return the
-//  * corresponding warp node.
-//  */
-// export const get_painting_warp_node = () => {
-//     struct WarpNode *warpNode = null
-//     let /*s32*/ paintingIndex = gMarioState.floor.type - SURFACE_PAINTING_WARP_D3
+        if (paintingIndex >= PAINTING_WARP_INDEX_START && paintingIndex < PAINTING_WARP_INDEX_END) {
+            if (paintingIndex < PAINTING_WARP_INDEX_FA
+                || this.gMarioState.pos[1] - this.gMarioState.floorHeight < 80.0) {
+                warpNode = gLinker.Area.gCurrentArea.paintingWarpNodes[paintingIndex]
+            }
+        }
 
-//     if (paintingIndex >= PAINTING_WARP_INDEX_START && paintingIndex < PAINTING_WARP_INDEX_END) {
-//         if (paintingIndex < PAINTING_WARP_INDEX_FA
-//             || gMarioState.pos[1] - gMarioState.floorHeight < 80.0) {
-//             warpNode = &Area.gCurrentArea.paintingWarpNodes[paintingIndex]
-//         }
-//     }
+        return warpNode;
+    }
 
-//     return warpNode
-// }
+    /**
+     * Check is Mario has entered a painting, and if so, initiate a warp.
+     */
+    initiate_painting_warp() {
+        if (gLinker.Area.gCurrentArea.paintingWarpNodes != null && this.gMarioState.floor != null) {
+            let warpNode = this.get_painting_warp_node()
 
-// /**
-//  * Check is Mario has entered a painting, and if so, initiate a warp.
-//  */
-// export const initiate_painting_warp = () => {
-//     if (Area.gCurrentArea.paintingWarpNodes != null && gMarioState.floor != null) {
-//         struct WarpNode warpNode
-//         struct WarpNode *pWarpNode = get_painting_warp_node()
+            if (warpNode != null) {
+                if (this.gMarioState.action & ACT_FLAG_INTANGIBLE) {
+                    play_painting_eject_sound()
+                } else if (warpNode.id != 0) {
+                    if (!(warpNode.destLevel & 0x80)) {
+                        this.sWarpCheckpointActive = check_warp_checkpoint(warpNode)
+                    }
 
-//         if (pWarpNode != null) {
-//             if (gMarioState.action & ACT_FLAG_INTANGIBLE) {
-//                 play_painting_eject_sound()
-//             } else if (pWarpNode.id != 0) {
-//                 warpNode = *pWarpNode
+                    this.initiate_warp(warpNode.destLevel & 0x7F, warpNode.destArea, warpNode.destNode, 0)
+                    check_if_should_set_warp_checkpoint(warpNode)
 
-//                 if (!(warpNode.destLevel & 0x80)) {
-//                     sWarpCheckpointActive = check_warp_checkpoint(&warpNode)
-//                 }
+                    gLinker.Area.play_transition_after_delay(WARP_TRANSITION_FADE_INTO_COLOR, 30, 255, 255, 255, 45)
+                    this.level_set_transition(74, this.basic_update)
 
-//                 initiate_warp(warpNode.destLevel & 0x7F, warpNode.destArea, warpNode.destNode, 0)
-//                 check_if_should_set_warp_checkpoint(&warpNode)
+                    Mario.set_mario_action(this.gMarioState, Mario.ACT_DISAPPEARED, 0)
 
-//                 Area.play_transition_after_delay(WARP_TRANSITION_FADE_INTO_COLOR, 30, 255, 255, 255, 45)
-//                 level_set_transition(74, basic_update)
+                    this.gMarioState.marioObj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
 
-//                 Mario.set_mario_action(gMarioState, ACT_DISAPPEARED, 0)
-
-//                 gMarioState.marioObj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
-
-//                 play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource)
-//                 fadeout_music(398)
-// #ifdef VERSION_SH
-//                 queue_rumble_data(80, 70)
-//                 func_sh_8024C89C(1)
-// #endif
-//             }
-//         }
-//     }
-// }
+                    play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource)
+                    fadeout_music(398)
+                }
+            }
+        }
+    }
 
     /**
      * If there is not already a delayed warp, schedule one. The source node is
@@ -1017,13 +1012,71 @@ class LevelUpdate {
                         this.initiate_warp(warpNode.destLevel & 0x7F, warpNode.destArea,
                                       warpNode.destNode, this.sDelayedWarpArg)
 
-                        // check_if_should_set_warp_checkpoint(warpNode)
+                        check_if_should_set_warp_checkpoint(warpNode)
                         if (this.sWarpDest.type != WARP_TYPE_CHANGE_LEVEL) {
                             this.level_set_transition(2, null)
                         }
                         break
                 }
             }
+        }
+    }
+
+    update_hud_values() {
+        if (gLinker.Area.gCurrCreditsEntry == null) {
+            let numHealthWedges = this.gMarioState.health > 0 ? this.gMarioState.health >> 8 : 0
+
+            if (gLinker.Area.gCurrCourseNum >= CourseTable.COURSE_MIN) {
+                this.gHudDisplay.flags |= this.HUD_DISPLAY_FLAG_COIN_COUNT;
+            } else {
+                this.gHudDisplay.flags &= ~this.HUD_DISPLAY_FLAG_COIN_COUNT;
+            }
+
+            if (this.gHudDisplay.coins < this.gMarioState.numCoins) {
+                if (window.gGlobalTimer & 1) {
+                    let coinSound;
+                    if (this.gMarioState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
+                        coinSound = SOUND_GENERAL_COIN_WATER;
+                    } else {
+                        coinSound = SOUND_GENERAL_COIN;
+                    }
+
+                    this.gHudDisplay.coins++;
+                    play_sound(coinSound, this.gMarioState.marioObj.gfx.cameraToObject);
+                }
+            }
+
+            if (this.gMarioState.numLives > 100) {
+                this.gMarioState.numLives = 100;
+            }
+
+            if (this.gMarioState.numCoins > 999) {
+                this.gMarioState.numCoins = 999;
+            }
+
+            this.gHudDisplay.stars = this.gMarioState.numStars;
+            this.gHudDisplay.lives = this.gMarioState.numLives;
+            this.gHudDisplay.keys = this.gMarioState.numKeys;
+
+            if (numHealthWedges > this.gHudDisplay.wedges) {
+                play_sound(SOUND_MENU_POWER_METER, gGlobalSoundSource);
+            }
+            this.gHudDisplay.wedges = numHealthWedges;
+
+            if (this.gMarioState.hurtCounter > 0) {
+                this.gHudDisplay.flags |= this.HUD_DISPLAY_FLAG_EMPHASIZE_POWER;
+            } else {
+                this.gHudDisplay.flags &= ~this.HUD_DISPLAY_FLAG_EMPHASIZE_POWER;
+            }
+        }
+    }
+
+    basic_update(arg) {
+        gLinker.Area.area_update_objects();
+        this.update_hud_values();
+
+        if (gLinker.Area.gCurrentArea != null) {
+            Camera.update_camera(gLinker.Area.gCurrentArea.camera);
         }
     }
 
@@ -1047,14 +1100,14 @@ class LevelUpdate {
         //     gHudDisplay.timer += 1
         // }
 
-        Area.area_update_objects()
+        gLinker.Area.area_update_objects()
         this.update_hud_values()
 
         if (Area.gCurrentArea) {
             Camera.update_camera(Area.gCurrentArea.camera)
         }
 
-        // initiate_painting_warp()
+        this.initiate_painting_warp()
         this.initiate_delayed_warp()
 
           // If either initiate_painting_warp or initiate_delayed_warp initiated a
@@ -1104,6 +1157,9 @@ class LevelUpdate {
     level_set_transition(length, updateFunction) {
         this.sTransitionTimer = length
         this.sTransitionUpdate = updateFunction
+        if (updateFunction) {
+            this.sTransitionUpdate = this.sTransitionUpdate.bind(this)
+        }
     }
 
     /**
@@ -1115,7 +1171,7 @@ class LevelUpdate {
         if (this.sTransitionTimer == - 1) {
             Camera.update_camera(Area.gCurrentArea.camera)
         } else if (this.sTransitionUpdate) {
-            this.sTransitionUpdate.call(this.sTransitionTimer)
+            this.sTransitionUpdate(this.sTransitionTimer)
         }
 
         if (this.sTransitionTimer > 0) {
@@ -1135,7 +1191,7 @@ class LevelUpdate {
      */
     play_mode_change_level() {
         if (this.sTransitionUpdate) {
-            sTransitionUpdate.call(this.sTransitionTimer)
+            this.sTransitionUpdate.call(this.sTransitionTimer)
         }
 
         if (--this.sTransitionTimer == -1) {
@@ -1188,67 +1244,6 @@ class LevelUpdate {
     }
 
     load_level_init_text(arg) {}
-
-    update_hud_values() {
-        if (this.gCurrCreditsEntry == null) {
-            const numHealthWedges = this.gMarioState.health > 0 ? this.gMarioState.health >> 8 : 0
-
-            if (Area.gCurrCourseNum > 0) {
-                this.gHudDisplay.flags |= this.HUD_DISPLAY_FLAG_COIN_COUNT;
-            } else {
-                this.gHudDisplay.flags &= ~this.HUD_DISPLAY_FLAG_COIN_COUNT;
-            }
-    
-            if (this.gHudDisplay.coins < this.gMarioState.numCoins) {
-
-                if (window.gGlobalTimer & 0x00000001) {
-                    let coinSound
-                    if (this.gMarioState.action & (Mario.ACT_FLAG_SWIMMING | Mario.ACT_FLAG_METAL_WATER)) {
-                        //coinSound = SOUND_GENERAL_COIN_WATER;
-                    } else {
-                        //coinSound = SOUND_GENERAL_COIN;
-                    }
-    
-                    this.gHudDisplay.coins += 1;
-                    //play_sound(coinSound, this.gMarioState.marioObj.gfx.cameraToObject)
-                }
-            }
-    
-            if (this.gMarioState.numLives > 100) {
-                this.gMarioState.numLives = 100;
-            }
-    
-            var BUGFIX_MAX_LIVES = false;
-            if (BUGFIX_MAX_LIVES) {
-                if (this.gMarioState.numCoins > 999) {
-                    this.gMarioState.numCoins = 999;
-                }
-        
-                if (this.gHudDisplay.coins > 999) {
-                    this.gHudDisplay.coins = 999;
-                }
-            } else {
-                if (this.gMarioState.numCoins > 999) {
-                    this.gMarioState.numLives = 999; //! Wrong variable
-                }
-            }
-    
-            this.gHudDisplay.stars = this.gMarioState.numStars;
-            this.gHudDisplay.lives = this.gMarioState.numLives;
-            this.gHudDisplay.keys = this.gMarioState.numKeys;
-
-            if (numHealthWedges > this.gHudDisplay.wedges) {
-                //play_sound(SOUND_MENU_POWER_METER, gDefaultSoundArgs);
-            }
-            this.gHudDisplay.wedges = numHealthWedges;
-    
-            if (this.gMarioState.hurtCounter > 0) {
-                this.gHudDisplay.flags |= this.HUD_DISPLAY_FLAG_EMPHASIZE_POWER;
-            } else {
-                this.gHudDisplay.flags &= ~this.HUD_DISPLAY_FLAG_EMPHASIZE_POWER;
-            }
-        }
-    }
 }
 
 export const LevelUpdateInstance = new LevelUpdate()

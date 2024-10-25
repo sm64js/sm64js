@@ -1,5 +1,5 @@
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
-import { gSPDisplayList, gSPEndDisplayList } from "../include/gbi"
+import { CALC_DXT, G_IM_SIZ_16b, G_IM_SIZ_16b_BYTES, G_TX_LOADTILE, G_TX_NOLOD, G_TX_NOMASK, G_TX_NOMIRROR, gDPLoadBlock, gDPLoadSync, gDPSetTextureImage, gDPSetTile, gDPTileSync, gSPDisplayList, gSPEndDisplayList } from "../include/gbi"
 
 import {
     save_file_get_flags, SAVE_FLAG_HAVE_WING_CAP,
@@ -22,15 +22,6 @@ export const make_vertex = (vtx, n, x, y, z, tx, ty, r, g, b, a) => {
 
 }
 
-export const round_float = (num) => {
-    if (num >= 0.0) {
-        return Math.floor(num + 0.5)
-    } else {
-        return Math.floor(num - 0.5)
-    }
-}
-
-
 /**
  * Create a display list for the light in the castle lobby that shows the
  * player where to look to enter Tower of the Wing Cap.
@@ -52,10 +43,11 @@ export const geo_exec_inside_castle_light = (callContext, node) => {
     return displayList
 }
 
-
-export const geo_painting_update = (callContext, node) => { return null }  // FIXME
-export const geo_painting_draw = (callContext, node) => { return null }  // FIXME
-
-gLinker.geo_painting_update = geo_painting_update
-gLinker.geo_painting_draw = geo_painting_draw
+export const gLoadBlockTexture = (dl, width, height, format, image) => {
+    gDPSetTextureImage(dl, format, G_IM_SIZ_16b, 1, image);
+    gDPTileSync(dl);
+    gDPSetTile(dl, format, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD);
+    gDPLoadSync(dl);
+    gDPLoadBlock(dl, G_TX_LOADTILE, 0, 0, width * height - 1);
+}
 

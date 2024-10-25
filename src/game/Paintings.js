@@ -41,8 +41,34 @@
  *          enough.
  */
 
+import {
+    RIPPLE_TRIGGER_PROXIMITY, RIPPLE_TRIGGER_CONTINUOUS, PAINTING_IMAGE, PAINTING_ENV_MAP,
+    ddd_painting,
+    ccm_painting,
+    hmc_painting,
+    ttc_painting,
+    ttm_painting,
+    ssl_painting,
+    sl_painting,
+    wf_painting,
+    jrb_painting,
+    wdw_painting,
+    thi_huge_painting,
+    thi_tiny_painting,
+    lll_painting
+} from "../levels/castle_inside/painting.inc"
 import { bob_painting } from "../levels/castle_inside/painting.inc"
-import { gPaintingMarioYEntry } from "./MovingTexture"
+import { sqrtf, round_float, guTranslate, guRotate, guScale } from "../engine/math_util"
+import { G_IM_FMT_RGBA, G_MTX_MODELVIEW, G_MTX_MUL, G_MTX_NOPUSH, G_MTX_PUSH, gSP1Triangle, gSPDisplayList, gSPEndDisplayList, gSPMatrix, gSPPopMatrix, gSPVertex } from "../include/gbi"
+import { gLoadBlockTexture, make_vertex } from "./GeoMisc"
+import { dl_paintings_draw_ripples, dl_paintings_env_mapped_begin, dl_paintings_env_mapped_end, dl_paintings_rippling_begin, dl_paintings_rippling_end, seg2_painting_mesh_neighbor_tris, seg2_painting_triangle_mesh } from "../bin/segment2"
+import { save_file_get_flags, save_file_get_star_flags, save_file_set_flags } from "./SaveFile"
+import { LAYER_OPAQUE, LAYER_TRANSPARENT } from "../engine/GeoLayout"
+import { GEO_CONTEXT_RENDER } from "../engine/graph_node"
+import { oPosX, oPosY, oPosZ } from "../include/object_constants"
+import { SURFACE_PAINTING_WARP_D3, SURFACE_PAINTING_WARP_D4, SURFACE_PAINTING_WARP_D5, SURFACE_PAINTING_WOBBLE_A6, SURFACE_PAINTING_WOBBLE_A7, SURFACE_PAINTING_WOBBLE_A8 } from "../include/surface_terrains"
+import { s16 } from "../utils"
+import { cotmc_painting } from "../levels/hmc/areas/1/painting.inc"
 
 /// The default painting side length
 export const PAINTING_SIZE = 614.0
@@ -57,14 +83,6 @@ export const DDD_BACK = 0x1
 export const PAINTING_IDLE = 0
 export const PAINTING_RIPPLE = 1
 export const PAINTING_ENTERED = 2
-
-export const RIPPLE_TRIGGER_PROXIMITY = 10
-export const RIPPLE_TRIGGER_CONTINUOUS = 20
-
-/// Painting that uses 1 or more images as a texture
-export const PAINTING_IMAGE = 0
-/// Painting that has one texture used for an environment map effect
-export const PAINTING_ENV_MAP = 1
 
 
 /**
@@ -164,22 +182,24 @@ let /* Vec3f * */ gPaintingTriNorms
 /**
  * The painting that is currently rippling. Only one painting can be rippling at once.
  */
-let /* Painting * */ gRipplingPainting
+export let /* Painting * */ gRipplingPainting
 
 /**
  * Whether the DDD painting is moved forward, should being moving backwards, or has already moved backwards.
  */
 export let gDddPaintingStatus
 
+export let gPaintingMarioYEntry = 0.0;
+
 const /* Painting * */ sHmcPaintings = [
-    // cotmc_painting,
+    cotmc_painting,
     null,
 ]
 
 const /* Painting * */ sInsideCastlePaintings = [
-    bob_painting, // ccm_painting, wf_painting,  jrb_painting,      lll_painting,
-    // ssl_painting, hmc_painting, ddd_painting, wdw_painting,      thi_tiny_painting,
-    // ttm_painting, ttc_painting, sl_painting,  thi_huge_painting,
+    bob_painting, ccm_painting, wf_painting,  jrb_painting,      lll_painting,
+    ssl_painting, hmc_painting, ddd_painting, wdw_painting,      thi_tiny_painting,
+    ttm_painting, ttc_painting, sl_painting,  thi_huge_painting,
     null,
 ]
 
@@ -188,7 +208,7 @@ const /* Painting * */ sTtmPaintings = [
     null,
 ]
 
-const /* Painting ** */ sPaintingGroups = [
+const sPaintingGroups = [
     sHmcPaintings,
     sInsideCastlePaintings,
     sTtmPaintings,
@@ -210,7 +230,7 @@ export const stop_other_paintings = (painting, paintingGroup) => {
 
         // stop all rippling except for the selected painting
         if (painting.id != id) {
-            painting.state = 0
+            painting.rippleStatus = 0
         }
         index++
     }
@@ -222,7 +242,7 @@ export const stop_other_paintings = (painting, paintingGroup) => {
 export const painting_mario_y = (painting) => {
     //! Unnecessary use of double constants
     // Add 50 to make the ripple closer to Mario's center of mass.
-    let relY = gPaintingMarioYPos - painting.posY + 50.0
+    let relY = gPaintingMarioYPos - painting.position[1] + 50.0
 
     if (relY < 0.0) {
         relY = 0.0
@@ -236,7 +256,7 @@ export const painting_mario_y = (painting) => {
  * @return Mario's z position inside the painting (bounded).
  */
 export const painting_mario_z = (painting) => {
-    let relZ = painting.posZ - gPaintingMarioZPos
+    let relZ = painting.position[2] - gPaintingMarioZPos
 
     if (relZ < 0.0) {
         relZ = 0.0
@@ -271,19 +291,19 @@ export const painting_nearest_4th = (painting) => {
     let secondQuarter = painting.size / 2.0;        // 1/2 of the way across the painting
     let thirdQuarter = painting.size * 3.0 / 4.0;   // 3/4 of the way across the painting
 
-    if (painting.floorEntered & RIPPLE_LEFT) {
+    if (painting.floorStatus[2] & RIPPLE_LEFT) {
         return firstQuarter
-    } else if (painting.floorEntered & RIPPLE_MIDDLE) {
+    } else if (painting.floorStatus[2] & RIPPLE_MIDDLE) {
         return secondQuarter
-    } else if (painting.floorEntered & RIPPLE_RIGHT) {
+    } else if (painting.floorStatus[2] & RIPPLE_RIGHT) {
         return thirdQuarter
 
       // Same as ripple floors.
-    } else if (painting.floorEntered & ENTER_LEFT) {
+    } else if (painting.floorStatus[2] & ENTER_LEFT) {
         return firstQuarter
-    } else if (painting.floorEntered & ENTER_MIDDLE) {
+    } else if (painting.floorStatus[2] & ENTER_MIDDLE) {
         return secondQuarter
-    } else if (painting.floorEntered & ENTER_RIGHT) {
+    } else if (painting.floorStatus[2] & ENTER_RIGHT) {
         return thirdQuarter
     }
 }
@@ -292,7 +312,7 @@ export const painting_nearest_4th = (painting) => {
  * @return Mario's x position inside the painting (bounded).
  */
 export const painting_mario_x = (painting) => {
-    let relX = gPaintingMarioXPos - painting.posX
+    let relX = gPaintingMarioXPos - painting.position[0]
 
     if (relX < 0.0) {
         relX = 0.0
@@ -331,28 +351,28 @@ const painting_state = (state, painting, paintingGroup, xSource, ySource, resetT
     // use a different set of variables depending on the state
     switch (state) {
         case PAINTING_RIPPLE:
-            painting.currRippleMag    = painting.passiveRippleMag
-            painting.rippleDecay      = painting.passiveRippleDecay
-            painting.currRippleRate   = painting.passiveRippleRate
-            painting.dispersionFactor = painting.passiveDispersionFactor
+            painting.rippleMagnitude[0]    = painting.rippleMagnitude[1]
+            painting.rippleDecay[0]      = painting.rippleDecay[1]
+            painting.rippleRate[0]   = painting.rippleRate[1]
+            painting.rippleDispersion[0] = painting.rippleDispersion[1]
             break
 
         case PAINTING_ENTERED:
-            painting.currRippleMag    = painting.entryRippleMag
-            painting.rippleDecay      = painting.entryRippleDecay
-            painting.currRippleRate   = painting.entryRippleRate
-            painting.dispersionFactor = painting.entryDispersionFactor
+            painting.rippleMagnitude[0]    = painting.rippleMagnitude[2]
+            painting.rippleDecay[0]      = painting.rippleDecay[2]
+            painting.rippleRate[0]   = painting.rippleRate[2]
+            painting.rippleDispersion[0] = painting.rippleDispersion[1]
             break
     }
 
-    painting.state = state
-    painting.rippleX = painting_ripple_x(painting, xSource)
-    painting.rippleY = painting_ripple_y(painting, ySource)
+    painting.rippleStatus = state
+    painting.currRippleXY[0] = painting_ripple_x(painting, xSource)
+    painting.currRippleXY[1] = painting_ripple_y(painting, ySource)
     gPaintingMarioYEntry = gPaintingMarioYPos
 
       // Because true or false would be too simple...
     if (resetTimer == RESET_TIMER) {
-        painting.rippleTimer = 0.0
+        painting.currRippleTimer = 0.0
     }
     gRipplingPainting = painting
 }
@@ -362,19 +382,19 @@ const painting_state = (state, painting, paintingGroup, xSource, ySource, resetT
  */
 export const wall_painting_proximity_idle = (painting, paintingGroup) => {
       // Check for Mario triggering a ripple
-    if (painting.floorEntered & RIPPLE_LEFT) {
+    if (painting.floorStatus[2] & RIPPLE_LEFT) {
         painting_state(PAINTING_RIPPLE, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-    } else if (painting.floorEntered & RIPPLE_MIDDLE) {
+    } else if (painting.floorStatus[2] & RIPPLE_MIDDLE) {
         painting_state(PAINTING_RIPPLE, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-    } else if (painting.floorEntered & RIPPLE_RIGHT) {
+    } else if (painting.floorStatus[2] & RIPPLE_RIGHT) {
         painting_state(PAINTING_RIPPLE, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
 
       // Check for Mario entering
-    } else if (painting.floorEntered & ENTER_LEFT) {
+    } else if (painting.floorStatus[2] & ENTER_LEFT) {
         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-    } else if (painting.floorEntered & ENTER_MIDDLE) {
+    } else if (painting.floorStatus[2] & ENTER_MIDDLE) {
         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-    } else if (painting.floorEntered & ENTER_RIGHT) {
+    } else if (painting.floorStatus[2] & ENTER_RIGHT) {
         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
     }
 }
@@ -383,11 +403,11 @@ export const wall_painting_proximity_idle = (painting, paintingGroup) => {
  * Rippling update function for wall paintings that use RIPPLE_TRIGGER_PROXIMITY.
  */
 export const wall_painting_proximity_rippling = (painting, paintingGroup) => {
-    if (painting.floorEntered & ENTER_LEFT) {
+    if (painting.floorStatus[2] & ENTER_LEFT) {
         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-    } else if (painting.floorEntered & ENTER_MIDDLE) {
+    } else if (painting.floorStatus[2] & ENTER_MIDDLE) {
         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-    } else if (painting.floorEntered & ENTER_RIGHT) {
+    } else if (painting.floorStatus[2] & ENTER_RIGHT) {
         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
     }
 }
@@ -397,19 +417,19 @@ export const wall_painting_proximity_rippling = (painting, paintingGroup) => {
  */
 export const wall_painting_continuous_idle = (painting, paintingGroup) => {
       // Check for Mario triggering a ripple
-    if (painting.floorEntered & RIPPLE_LEFT) {
+    if (painting.floorStatus[2] & RIPPLE_LEFT) {
         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
-    } else if (painting.floorEntered & RIPPLE_MIDDLE) {
+    } else if (painting.floorStatus[2] & RIPPLE_MIDDLE) {
         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
-    } else if (painting.floorEntered & RIPPLE_RIGHT) {
+    } else if (painting.floorStatus[2] & RIPPLE_RIGHT) {
         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
 
       // Check for Mario entering
-    } else if (painting.floorEntered & ENTER_LEFT) {
+    } else if (painting.floorStatus[2] & ENTER_LEFT) {
         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-    } else if (painting.floorEntered & ENTER_MIDDLE) {
+    } else if (painting.floorStatus[2] & ENTER_MIDDLE) {
         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-    } else if (painting.floorEntered & ENTER_RIGHT) {
+    } else if (painting.floorStatus[2] & ENTER_RIGHT) {
         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
     }
 }
@@ -418,11 +438,11 @@ export const wall_painting_continuous_idle = (painting, paintingGroup) => {
  * Rippling update function for wall paintings that use RIPPLE_TRIGGER_CONTINUOUS.
  */
 export const wall_painting_continuous_rippling = (painting, paintingGroup) => {
-    if (painting.floorEntered & ENTER_LEFT) {
+    if (painting.floorStatus[2] & ENTER_LEFT) {
         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, DONT_RESET)
-    } else if (painting.floorEntered & ENTER_MIDDLE) {
+    } else if (painting.floorStatus[2] & ENTER_MIDDLE) {
         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, DONT_RESET)
-    } else if (painting.floorEntered & ENTER_RIGHT) {
+    } else if (painting.floorStatus[2] & ENTER_RIGHT) {
         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, DONT_RESET)
     }
 }
@@ -434,15 +454,15 @@ export const wall_painting_continuous_rippling = (painting, paintingGroup) => {
  */
 export const floor_painting_proximity_idle = (painting, paintingGroup) => {
       // Check for Mario triggering a ripple
-    if (painting.floorEntered & RIPPLE_LEFT) {
+    if (painting.floorStatus[2] & RIPPLE_LEFT) {
         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
-    } else if (painting.floorEntered & RIPPLE_MIDDLE) {
+    } else if (painting.floorStatus[2] & RIPPLE_MIDDLE) {
         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
-    } else if (painting.floorEntered & RIPPLE_RIGHT) {
+    } else if (painting.floorStatus[2] & RIPPLE_RIGHT) {
         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
 
       // Only check for Mario entering if he jumped below the surface
-    } else if (painting.marioWentUnder) {
+    } else if (painting.marioBelow[2]) {
         if (painting.currFloor & ENTER_LEFT) {
             painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
         } else if (painting.currFloor & ENTER_MIDDLE) {
@@ -459,7 +479,7 @@ export const floor_painting_proximity_idle = (painting, paintingGroup) => {
  * No floor paintings use RIPPLE_TRIGGER_PROXIMITY in the game.
  */
 export const floor_painting_proximity_rippling = (painting, paintingGroup) => {
-    if (painting.marioWentUnder) {
+    if (painting.marioBelow[2]) {
         if (painting.currFloor & ENTER_LEFT) {
             painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
         } else if (painting.currFloor & ENTER_MIDDLE) {
@@ -479,11 +499,11 @@ export const floor_painting_proximity_rippling = (painting, paintingGroup) => {
  */
 export const floor_painting_continuous_idle = (painting, paintingGroup) => {
       // Check for Mario triggering a ripple
-    if (painting.floorEntered & RIPPLE_LEFT) {
+    if (painting.floorStatus[2] & RIPPLE_LEFT) {
         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
-    } else if (painting.floorEntered & RIPPLE_MIDDLE) {
+    } else if (painting.floorStatus[2] & RIPPLE_MIDDLE) {
         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
-    } else if (painting.floorEntered & RIPPLE_RIGHT) {
+    } else if (painting.floorStatus[2] & RIPPLE_RIGHT) {
         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
 
       // Check for Mario entering
@@ -500,7 +520,7 @@ export const floor_painting_continuous_idle = (painting, paintingGroup) => {
  * Rippling update function for floor paintings that use RIPPLE_TRIGGER_CONTINUOUS.
  */
 export const floor_painting_continuous_rippling = (painting, paintingGroup) => {
-    if (painting.marioWentUnder) {
+    if (painting.marioBelow[2]) {
         if (painting.currFloor & ENTER_LEFT) {
             painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, DONT_RESET)
         } else if (painting.currFloor & ENTER_MIDDLE) {
@@ -554,18 +574,18 @@ export const painting_update_floors = (painting) => {
 
     // floorEntered is true iff currFloor is true and lastFloor is false
     // (Mario just entered the floor on this frame)
-    painting.floorEntered = (painting.lastFloor ^ painting.currFloor) & painting.currFloor
+    painting.floorStatus[2] = (painting.lastFloor ^ painting.currFloor) & painting.currFloor
 
-    painting.marioWasUnder = painting.marioIsUnder
+    painting.marioBelow[0] = painting.marioBelow[1]
       // Check if Mario has fallen below the painting (used for floor paintings)
-    if (gPaintingMarioYPos < painting.posY) {
-        painting.marioIsUnder = 1
+    if (gPaintingMarioYPos < painting.position[1]) {
+        painting.marioBelow[1] = 1
     } else {
-        painting.marioIsUnder = 0
+        painting.marioBelow[1] = 0
     }
 
       // Mario "went under" if he was not under last frame, but is under now
-    painting.marioWentUnder = (painting.marioWasUnder ^ painting.marioIsUnder) & painting.marioIsUnder
+    painting.marioBelow[2] = (painting.marioBelow[0] ^ painting.marioBelow[1]) & painting.marioBelow[1]
 }
 
 /**
@@ -576,18 +596,18 @@ export const painting_update_floors = (painting) => {
  */
 export const painting_update_ripple_state = (painting) => {
     if (gPaintingUpdateCounter != gLastPaintingUpdateCounter) {
-        painting.currRippleMag *= painting.rippleDecay
+        painting.rippleMagnitude[0] *= painting.rippleDecay[0]
 
           //! After ~6.47 days, paintings with RIPPLE_TRIGGER_CONTINUOUS will increment this to
           //! 16777216 (1 << 24), at which point it will freeze (due to floating-point
           //! imprecision?) and the painting will stop rippling. This happens to HMC, DDD, and
           //! CotMC.
-        painting.rippleTimer += 1.0
+        painting.currRippleTimer += 1.0
     }
     if (painting.rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
           // if the painting is barely rippling, make it stop rippling
-        if (painting.currRippleMag <= 1.0) {
-            painting.state = PAINTING_IDLE
+        if (painting.rippleMagnitude[0] <= 1.0) {
+            painting.rippleStatus = PAINTING_IDLE
             gRipplingPainting = null
         }
     } else if (painting.rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
@@ -595,13 +615,13 @@ export const painting_update_ripple_state = (painting) => {
           // if the painting is doing the entry ripple but the ripples are as small as those from the
           // passive ripple, make it do a passive ripple
           // If Mario goes below the surface but doesn't warp, the painting will eventually reset.
-        if (painting.state == PAINTING_ENTERED && painting.currRippleMag <= painting.passiveRippleMag) {
+        if (painting.rippleStatus == PAINTING_ENTERED && painting.rippleMagnitude[0] <= painting.rippleMagnitude[1]) {
 
-            painting.state = PAINTING_RIPPLE
-            painting.currRippleMag = painting.passiveRippleMag
-            painting.rippleDecay = painting.passiveRippleDecay
-            painting.currRippleRate = painting.passiveRippleRate
-            painting.dispersionFactor = painting.passiveDispersionFactor
+            painting.rippleStatus = PAINTING_RIPPLE
+            painting.rippleMagnitude[0] = painting.rippleMagnitude[1]
+            painting.rippleDecay[0] = painting.rippleDecay[1]
+            painting.rippleRate[0] = painting.rippleRate[1]
+            painting.rippleDispersion[0] = painting.rippleDispersion[1]
         }
     }
 }
@@ -610,52 +630,50 @@ export const painting_update_ripple_state = (painting) => {
  * @return the ripple function at posX, posY
  * note that posX and posY correspond to a point on the face of the painting, not actual axes
  */
-// export const calculate_ripple_at_point = (painting, posX, posY) => {
-//     /  // Controls the peaks of the ripple.
-//     let /*f32*/ rippleMag = painting.currRippleMag
-//     /  // Controls the ripple's frequency
-//     let /*f32*/ rippleRate = painting.currRippleRate
-//     /  // Controls how fast the ripple spreads
-//     let /*f32*/ dispersionFactor = painting.dispersionFactor
-//     /  // How far the ripple has spread
-//     let /*f32*/ rippleTimer = painting.rippleTimer
-//     /  // x and y ripple origin
-//     let /*f32*/ rippleX = painting.rippleX
-//     let /*f32*/ rippleY = painting.rippleY
+export const calculate_ripple_at_point = (painting, posX, posY) => {
+    /// Controls the peaks of the ripple.
+    let rippleMag = painting.rippleMagnitude[0]
+    /// Controls the ripple's frequency
+    let rippleRate = painting.rippleRate[0]
+    /// Controls how fast the ripple spreads
+    let dispersionFactor = painting.rippleDispersion[0]
+    /// How far the ripple has spread
+    let rippleTimer = painting.currRippleTimer
+    /// x and y ripple origin
+    let rippleX = painting.currRippleXY[0]
+    let rippleY = painting.currRippleXY[1]
 
-//     let /*f32*/ distanceToOrigin
-//     let /*f32*/ rippleDistance
+        posX *= painting.size / PAINTING_SIZE
+        posY *= painting.size / PAINTING_SIZE
 
-//     posX *= painting.size / PAINTING_SIZE
-//     posY *= painting.size / PAINTING_SIZE
-//     distanceToOrigin = sqrtf((posX - rippleX) * (posX - rippleX) + (posY - rippleY) * (posY - rippleY))
-//       // A larger dispersionFactor makes the ripple spread slower
-//     rippleDistance = distanceToOrigin / dispersionFactor
-//     if (rippleTimer < rippleDistance) {
-//           // if the ripple hasn't reached the point yet, make the point magnitude 0
-//         return false
-//     } else {
-//           // use a cosine wave to make the ripple go up and down,
-//           // scaled by the painting's ripple magnitude
-//         let /*f32*/ rippleZ = rippleMag * cosf(rippleRate * (2 * M_PI) * (rippleTimer - rippleDistance))
+    let distanceToOrigin = sqrtf((posX - rippleX) * (posX - rippleX) + (posY - rippleY) * (posY - rippleY))
+        // A larger dispersionFactor makes the ripple spread slower
+    let rippleDistance = distanceToOrigin / dispersionFactor
+    if (rippleTimer < rippleDistance) {
+          // if the ripple hasn't reached the point yet, make the point magnitude 0
+        return false
+    } else {
+          // use a cosine wave to make the ripple go up and down,
+          // scaled by the painting's ripple magnitude
+        let rippleZ = rippleMag * Math.cos(rippleRate * (2 * Math.PI) * (rippleTimer - rippleDistance))
 
-//           // round it to an int and return it
-//         return round_float(rippleZ)
-//     }
-// }
+          // round it to an int and return it
+        return round_float(rippleZ)
+    }
+}
 
 /**
  * If movable, return the ripple function at (posX, posY)
  * else return false
  */
-// export const ripple_if_movable = (painting, movable, posX, posY) => {
-//     let /*s16*/ rippleZ = 0
+export const ripple_if_movable = (painting, movable, posX, posY) => {
+    let rippleZ = 0
 
-//     if (movable) {
-//         rippleZ = calculate_ripple_at_point(painting, posX, posY)
-//     }
-//     return rippleZ
-// }
+    if (movable) {
+        rippleZ = calculate_ripple_at_point(painting, posX, posY)
+    }
+    return rippleZ
+}
 
 /**
  * Allocates and generates a mesh for the rippling painting effect by modifying the passed in `mesh`
@@ -676,22 +694,22 @@ export const painting_update_ripple_state = (painting) => {
  *
  * The mesh used in game, seg2_painting_triangle_mesh, is in bin/segment2.c.
  */
-// export const painting_generate_mesh = (painting, mesh, numTris) => {
-//     let /*s16*/ i
+export const painting_generate_mesh = (painting, mesh, numTris) => {
+    let i
 
-//     gPaintingMesh = mem_pool_alloc(gEffectsMemoryPool, numTris * sizeof(struct PaintingMeshVertex))
-//     if (gPaintingMesh == null) {
-//     }
-//       // accesses are off by 1 since the first entry is the number of vertices
-//     for (i = 0; i < numTris; i++) {
-//         gPaintingMesh[i].pos[0] = mesh[i * 3 + 1]
-//         gPaintingMesh[i].pos[1] = mesh[i * 3 + 2]
-//           // The "z coordinate" of each vertex in the mesh is either 1 or 0. Instead of being an
-//           // actual coordinate, it just determines whether the vertex moves
-//         gPaintingMesh[i].pos[2] = ripple_if_movable(painting, mesh[i * 3 + 3],
-//                                                     gPaintingMesh[i].pos[0], gPaintingMesh[i].pos[1])
-//     }
-// }
+    gPaintingMesh = []
+    // accesses are off by 1 since the first entry is the number of vertices
+    for (i = 0; i < numTris; i++) {
+        gPaintingMesh.push({
+            pos: [0, 0, 0],
+            norm: [0, 0, 0],
+        });
+        gPaintingMesh[i].pos[0] = mesh[i * 3 + 1],
+        gPaintingMesh[i].pos[1] = mesh[i * 3 + 2],
+        gPaintingMesh[i].pos[2] = ripple_if_movable(painting, mesh[i * 3 + 3],
+                                    gPaintingMesh[i].pos[0], gPaintingMesh[i].pos[1]);
+    }
+}
 
 /**
  * Calculate the surface normals of each triangle in the generated ripple mesh.
@@ -708,53 +726,51 @@ export const painting_update_ripple_state = (painting) => {
  *
  * The mesh used in game, seg2_painting_triangle_mesh, is in bin/segment2.c.
  */
-// export const painting_calculate_triangle_normals = (mesh, numVtx, numTris) => {
-//     let /*s16*/ i
+export const painting_calculate_triangle_normals = (mesh, numVtx, numTris) => {
+    let i
 
-//     gPaintingTriNorms = mem_pool_alloc(gEffectsMemoryPool, numTris * sizeof(Vec3f))
-//     if (gPaintingTriNorms == null) {
-//     }
-//     for (i = 0; i < numTris; i++) {
-//         let /*s16*/ tri = numVtx * 3 + i * 3 + 2;   // Add 2 because of the 2 length entries preceding the list
-//         let /*s16*/ v0 = mesh[tri]
-//         let /*s16*/ v1 = mesh[tri + 1]
-//         let /*s16*/ v2 = mesh[tri + 2]
+    gPaintingTriNorms = [];
+    for (i = 0; i < numTris; i++) {
+        let tri = numVtx * 3 + i * 3 + 2;   // Add 2 because of the 2 length entries preceding the list
+        let v0 = mesh[tri]
+        let v1 = mesh[tri + 1]
+        let v2 = mesh[tri + 2]
 
-//         let /*f32*/ x0 = gPaintingMesh[v0].pos[0]
-//         let /*f32*/ y0 = gPaintingMesh[v0].pos[1]
-//         let /*f32*/ z0 = gPaintingMesh[v0].pos[2]
+        let x0 = gPaintingMesh[v0].pos[0]
+        let y0 = gPaintingMesh[v0].pos[1]
+        let z0 = gPaintingMesh[v0].pos[2]
 
-//         let /*f32*/ x1 = gPaintingMesh[v1].pos[0]
-//         let /*f32*/ y1 = gPaintingMesh[v1].pos[1]
-//         let /*f32*/ z1 = gPaintingMesh[v1].pos[2]
+        let x1 = gPaintingMesh[v1].pos[0]
+        let y1 = gPaintingMesh[v1].pos[1]
+        let z1 = gPaintingMesh[v1].pos[2]
 
-//         let /*f32*/ x2 = gPaintingMesh[v2].pos[0]
-//         let /*f32*/ y2 = gPaintingMesh[v2].pos[1]
-//         let /*f32*/ z2 = gPaintingMesh[v2].pos[2]
+        let x2 = gPaintingMesh[v2].pos[0]
+        let y2 = gPaintingMesh[v2].pos[1]
+        let z2 = gPaintingMesh[v2].pos[2]
 
-//           // Cross product to find each triangle's normal vector
-//         gPaintingTriNorms[i][0] = (y1 - y0) * (z2 - z1) - (z1 - z0) * (y2 - y1)
-//         gPaintingTriNorms[i][1] = (z1 - z0) * (x2 - x1) - (x1 - x0) * (z2 - z1)
-//         gPaintingTriNorms[i][2] = (x1 - x0) * (y2 - y1) - (y1 - y0) * (x2 - x1)
-//     }
-// }
+          // Cross product to find each triangle's normal vector
+        gPaintingTriNorms[i] = [];
+        gPaintingTriNorms[i][0] = (y1 - y0) * (z2 - z1) - (z1 - z0) * (y2 - y1)
+        gPaintingTriNorms[i][1] = (z1 - z0) * (x2 - x1) - (x1 - x0) * (z2 - z1)
+        gPaintingTriNorms[i][2] = (x1 - x0) * (y2 - y1) - (y1 - y0) * (x2 - x1)
+    }
+}
 
 /**
  * Rounds a floating-point component of a normal vector to an s8 by multiplying it by 127 or 128 and
  * rounding away from 0.
  */
-// export const normalize_component = (comp) => {
-//     s8 rounded
+export const normalize_component = (comp) => {
+    let rounded = 0;
 
-//     if (comp > 0.0) {
-//         rounded = comp * 127.0 + 0.5;   // round up
-//     } else if (comp < 0.0) {
-//         rounded = comp * 128.0 - 0.5;   // round down
-//     } else {
-//         rounded = 0;                    // don't round 0
-//     }
-//     return rounded
-// }
+    if (comp > 0.0) {
+        rounded = comp * 127.0 + 0.5;   // round up
+    } else if (comp < 0.0) {
+        rounded = comp * 128.0 - 0.5;   // round down
+    }
+
+    return rounded
+}
 
 /**
  * Approximates the painting mesh's vertex normals by averaging the normals of all triangles sharing a
@@ -771,48 +787,45 @@ export const painting_update_ripple_state = (painting) => {
  *
  * The table used in game, seg2_painting_mesh_neighbor_tris, is in bin/segment2.c.
  */
-// export const painting_average_vertex_normals = (neighborTris, numVtx) => {
-//     UNUSED let /*s16*/ unused
-//     let /*s16*/ tri
-//     let /*s16*/ i
-//     let /*s16*/ j
-//     let /*s16*/ neighbors
-//     let /*s16*/ entry = 0
+export const painting_average_vertex_normals = (neighborTris, numVtx) => {
+    let tri
+    let i, j
+    let neighbors
+    let entry = 0
 
-//     for (i = 0; i < numVtx; i++) {
-//         let /*f32*/ nx = 0.0
-//         let /*f32*/ ny = 0.0
-//         let /*f32*/ nz = 0.0
-//         let /*f32*/ nlen
+    for (i = 0; i < numVtx; i++) {
+        let nx = 0.0
+        let ny = 0.0
+        let nz = 0.0
 
-//           // The first number of each entry is the number of adjacent tris
-//         neighbors = neighborTris[entry]
-//         for (j = 0; j < neighbors; j++) {
-//             tri = neighborTris[entry + j + 1]
-//             nx += gPaintingTriNorms[tri][0]
-//             ny += gPaintingTriNorms[tri][1]
-//             nz += gPaintingTriNorms[tri][2]
-//         }
-//           // Move to the next vertex's entry
-//         entry += neighbors + 1
+        // The first number of each entry is the number of adjacent tris
+        neighbors = neighborTris[entry]
+        for (j = 0; j < neighbors; j++) {
+            tri = neighborTris[entry + j + 1]
+            nx += gPaintingTriNorms[tri][0]
+            ny += gPaintingTriNorms[tri][1]
+            nz += gPaintingTriNorms[tri][2]
+        }
+          // Move to the next vertex's entry
+        entry += neighbors + 1
 
-//           // average the surface normals from each neighboring tri
-//         nx /= neighbors
-//         ny /= neighbors
-//         nz /= neighbors
-//         nlen = sqrtf(nx * nx + ny * ny + nz * nz)
+          // average the surface normals from each neighboring tri
+        nx /= neighbors
+        ny /= neighbors
+        nz /= neighbors
+        let nlen = sqrtf(nx * nx + ny * ny + nz * nz)
 
-//         if (nlen == 0.0) {
-//             gPaintingMesh[i].norm[0] = 0
-//             gPaintingMesh[i].norm[1] = 0
-//             gPaintingMesh[i].norm[2] = 0
-//         } else {
-//             gPaintingMesh[i].norm[0] = normalize_component(nx / nlen)
-//             gPaintingMesh[i].norm[1] = normalize_component(ny / nlen)
-//             gPaintingMesh[i].norm[2] = normalize_component(nz / nlen)
-//         }
-//     }
-// }
+        if (nlen == 0.0) {
+            gPaintingMesh[i].norm[0] = 0
+            gPaintingMesh[i].norm[1] = 0
+            gPaintingMesh[i].norm[2] = 0
+        } else {
+            gPaintingMesh[i].norm[0] = normalize_component(nx / nlen)
+            gPaintingMesh[i].norm[1] = normalize_component(ny / nlen)
+            gPaintingMesh[i].norm[2] = normalize_component(nz / nlen)
+        }
+    }
+}
 
 /**
  * Creates a display list that draws the rippling painting, with 'img' mapped to the painting's mesh,
@@ -821,266 +834,235 @@ export const painting_update_ripple_state = (painting) => {
  * If the textureMap doesn't describe the whole mesh, then multiple calls are needed to draw the whole
  * painting.
  */
-// export const render_painting = (img, tWidth, tHeight, textureMap, mapVerts, mapTris, alpha) => {
-//     let /*s16*/ group
-//     let /*s16*/ map
-//     let /*s16*/ triGroup
-//     let /*s16*/ mapping
-//     let /*s16*/ meshVtx
-//     let /*s16*/ tx
-//     let /*s16*/ ty
+export const render_painting = (img, tWidth, tHeight, textureMap, mapVerts, mapTris, alpha) => {
+    let group
+    let map
+    let triGroup
 
-//       // We can fit 15 (16 / 3) vertices in the RSP's vertex buffer.
-//       // Group triangles by 5, with one remainder group.
-//     let /*s16*/ triGroups = mapTris / 5
-//     let /*s16*/ remGroupTris = mapTris % 5
-//     let /*s16*/ numVtx = mapTris * 3
+    // We can fit 15 (16 / 3) vertices in the RSP's vertex buffer.
+    // Group triangles by 5, with one remainder group.
+    let triGroups = s16(mapTris / 5)
+    let remGroupTris = mapTris % 5
+    let numVtx = mapTris * 3;
 
-//     let /*s16*/ commands = triGroups * 2 + remGroupTris + 7
-//     Vtx *verts = alloc_display_list(numVtx * sizeof(Vtx))
-//     Gfx *dlist = alloc_display_list(commands * sizeof(Gfx))
-//     Gfx *gfx = dlist
+    // let commands = triGroups * 2 + remGroupTris + 7;
+    let verts = new Array(numVtx);
+    let gfx = [];
 
-//     if (verts == null || dlist == null) {
-//     }
+    gLoadBlockTexture(gfx, tWidth, tHeight, G_IM_FMT_RGBA, img)
 
-//     gLoadBlockTexture(gfx++, tWidth, tHeight, G_IM_FMT_RGBA, img)
+    // Draw the groups of 5 first
+    for (group = 0; group < triGroups; group++) {
 
-//       // Draw the groups of 5 first
-//     for (group = 0; group < triGroups; group++) {
+        // The triangle groups are the second part of the texture map.
+        // Each group is a list of 15 mappings
+        triGroup = mapVerts * 3 + group * 15 + 2
+        for (map = 0; map < 15; map++) {
+            // The mapping is just an index into the earlier part of the textureMap
+            // Some mappings are repeated, for example, when multiple triangles share a vertex
+            let mapping = textureMap[triGroup + map]
 
-//           // The triangle groups are the second part of the texture map.
-//           // Each group is a list of 15 mappings
-//         triGroup = mapVerts * 3 + group * 15 + 2
-//         for (map = 0; map < 15; map++) {
-//               // The mapping is just an index into the earlier part of the textureMap
-//               // Some mappings are repeated, for example, when multiple triangles share a vertex
-//             mapping = textureMap[triGroup + map]
+            // The first entry is the ID of the vertex in the mesh
+            let meshVtx = textureMap[mapping * 3 + 1]
 
-//               // The first entry is the ID of the vertex in the mesh
-//             meshVtx = textureMap[mapping * 3 + 1]
+            // The next two are the texture coordinates for that vertex
+            let tx = textureMap[mapping * 3 + 2]
+            let ty = textureMap[mapping * 3 + 3]
 
-//               // The next two are the texture coordinates for that vertex
-//             tx = textureMap[mapping * 3 + 2]
-//             ty = textureMap[mapping * 3 + 3]
+            // Map the texture and place it in the verts array
+            make_vertex(verts, group * 15 + map, gPaintingMesh[meshVtx].pos[0], gPaintingMesh[meshVtx].pos[1],
+                        gPaintingMesh[meshVtx].pos[2], tx, ty, gPaintingMesh[meshVtx].norm[0],
+                        gPaintingMesh[meshVtx].norm[1], gPaintingMesh[meshVtx].norm[2], alpha)
+        }
 
-//               // Map the texture and place it in the verts array
-//             make_vertex(verts, group * 15 + map, gPaintingMesh[meshVtx].pos[0], gPaintingMesh[meshVtx].pos[1],
-//                         gPaintingMesh[meshVtx].pos[2], tx, ty, gPaintingMesh[meshVtx].norm[0],
-//                         gPaintingMesh[meshVtx].norm[1], gPaintingMesh[meshVtx].norm[2], alpha)
-//         }
+        // Load the vertices and draw the 5 triangles
+        gSPVertex(gfx, verts.slice(group * 15, verts.length), 15, 0)
+        gSPDisplayList(gfx, dl_paintings_draw_ripples)
+    }
 
-//           // Load the vertices and draw the 5 triangles
-//         gSPVertex(gfx++, VIRTUAL_TO_PHYSICAL(verts + group * 15), 15, 0)
-//         gSPDisplayList(gfx++, dl_paintings_draw_ripples)
-//     }
+    // One group left with < 5 triangles
+    triGroup = mapVerts * 3 + triGroups * 15 + 2
+    // Map the texture to the triangles
+    for (map = 0; map < remGroupTris * 3; map++) {
+        let mapping = textureMap[triGroup + map]
+        let meshVtx = textureMap[mapping * 3 + 1]
+        let tx = textureMap[mapping * 3 + 2]
+        let ty = textureMap[mapping * 3 + 3]
+        make_vertex(verts, triGroups * 15 + map, gPaintingMesh[meshVtx].pos[0], gPaintingMesh[meshVtx].pos[1],
+                    gPaintingMesh[meshVtx].pos[2], tx, ty, gPaintingMesh[meshVtx].norm[0],
+                    gPaintingMesh[meshVtx].norm[1], gPaintingMesh[meshVtx].norm[2], alpha)
+    }
 
-//       // One group left with < 5 triangles
-//     triGroup = mapVerts * 3 + triGroups * 15 + 2
-//       // Map the texture to the triangles
-//     for (map = 0; map < remGroupTris * 3; map++) {
-//         mapping = textureMap[triGroup + map]
-//         meshVtx = textureMap[mapping * 3 + 1]
-//         tx = textureMap[mapping * 3 + 2]
-//         ty = textureMap[mapping * 3 + 3]
-//         make_vertex(verts, triGroups * 15 + map, gPaintingMesh[meshVtx].pos[0], gPaintingMesh[meshVtx].pos[1],
-//                     gPaintingMesh[meshVtx].pos[2], tx, ty, gPaintingMesh[meshVtx].norm[0],
-//                     gPaintingMesh[meshVtx].norm[1], gPaintingMesh[meshVtx].norm[2], alpha)
-//     }
+      // Draw the triangles individually
+    gSPVertex(gfx, verts.slice(verts + triGroups * 15, verts.length), remGroupTris * 3, 0)
+    for (group = 0; group < remGroupTris; group++) {
+        gSP1Triangle(gfx, group * 3, group * 3 + 1, group * 3 + 2, 0)
+    }
 
-//       // Draw the triangles individually
-//     gSPVertex(gfx++, VIRTUAL_TO_PHYSICAL(verts + triGroups * 15), remGroupTris * 3, 0)
-//     for (group = 0; group < remGroupTris; group++) {
-//         gSP1Triangle(gfx++, group * 3, group * 3 + 1, group * 3 + 2, 0)
-//     }
-
-//     gSPEndDisplayList(gfx)
-//     return dlist
-// }
+    gSPEndDisplayList(gfx)
+    return gfx;
+}
 
 /**
  * Orient the painting mesh for rendering.
  */
-// export const painting_model_view_transform = (painting) => {
-//     let /*f32*/ sizeRatio = painting.size / PAINTING_SIZE
-//     Mtx *rotX = alloc_display_list(sizeof(Mtx))
-//     Mtx *rotY = alloc_display_list(sizeof(Mtx))
-//     Mtx *translate = alloc_display_list(sizeof(Mtx))
-//     Mtx *scale = alloc_display_list(sizeof(Mtx))
-//     Gfx *dlist = alloc_display_list(5 * sizeof(Gfx))
-//     Gfx *gfx = dlist
+export const painting_model_view_transform = (painting) => {
+    let sizeRatio = painting.size / PAINTING_SIZE
+    let rotX = new Array(4).fill(0).map(() => new Array(4).fill(0));
+    let rotY = new Array(4).fill(0).map(() => new Array(4).fill(0));
+    let translate = new Array(4).fill(0).map(() => new Array(4).fill(0));
+    let scale = new Array(4).fill(0).map(() => new Array(4).fill(0));
+    let gfx = [];
 
-//     if (rotX == null || rotY == null || translate == null || dlist == null) {
-//     }
+    guTranslate(translate, painting.position[0], painting.position[1], painting.position[2])
+    guRotate(rotX, painting.rotation[0], 1.0, 0.0, 0.0)
+    guRotate(rotY, painting.rotation[1], 0.0, 1.0, 0.0)
+    guScale(scale, sizeRatio, sizeRatio, sizeRatio)
 
-//     guTranslate(translate, painting.posX, painting.posY, painting.posZ)
-//     guRotate(rotX, painting.pitch, 1.0, 0.0, 0.0)
-//     guRotate(rotY, painting.yaw, 0.0, 1.0, 0.0)
-//     guScale(scale, sizeRatio, sizeRatio, sizeRatio)
+    gSPMatrix(gfx, translate, G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH)
+    gSPMatrix(gfx, rotX,      G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH)
+    gSPMatrix(gfx, rotY,      G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH)
+    gSPMatrix(gfx, scale,     G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH)
+    gSPEndDisplayList(gfx)
 
-//     gSPMatrix(gfx++, translate, G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH)
-//     gSPMatrix(gfx++, rotX,      G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH)
-//     gSPMatrix(gfx++, rotY,      G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH)
-//     gSPMatrix(gfx++, scale,     G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH)
-//     gSPEndDisplayList(gfx)
-
-//     return dlist
-// }
+    return gfx
+}
 
 /**
  * Ripple a painting that has 1 or more images that need to be mapped
  */
-// export const painting_ripple_image = (painting) => {
-//     let /*s16*/ meshVerts
-//     let /*s16*/ meshTris
-//     let /*s16*/ i
-//     let /*s16*/ *textureMap
-//     let /*s16*/ imageCount = painting.imageCount
-//     let /*s16*/ tWidth = painting.textureWidth
-//     let /*s16*/ tHeight = painting.textureHeight
-//     let /*s16*/ **textureMaps = segmented_to_virtual(painting.textureMaps)
-//     let /*u8*/ **textures = segmented_to_virtual(painting.textureArray)
-//     Gfx *dlist = alloc_display_list((imageCount + 6) * sizeof(Gfx))
-//     Gfx *gfx = dlist
+export const painting_ripple_image = (painting) => {
+    let imageCount = painting.imageCount
+    let [tWidth, tHeight] = painting.textureWH
+    let textureMaps = painting.textureMaps
+    let textures = painting.textures
+    let gfx = [];
 
-//     if (dlist == null) {
-//         return dlist
-//     }
+    gSPDisplayList(gfx, painting_model_view_transform(painting))
+    gSPDisplayList(gfx, dl_paintings_rippling_begin)
+    gSPDisplayList(gfx, painting.rippleDList)
 
-//     gSPDisplayList(gfx++, painting_model_view_transform(painting))
-//     gSPDisplayList(gfx++, dl_paintings_rippling_begin)
-//     gSPDisplayList(gfx++, painting.rippleDisplayList)
+    // Map each image to the mesh's vertices
+    for (let i = 0; i < imageCount; i++) {
+        let textureMap = textureMaps[i]
+        let meshVerts = textureMap[0]
+        let meshTris = textureMap[meshVerts * 3 + 1]
+        gSPDisplayList(gfx, render_painting(textures[i], tWidth, tHeight, textureMap, meshVerts, meshTris, painting.alpha));
+    }
 
-//       // Map each image to the mesh's vertices
-//     for (i = 0; i < imageCount; i++) {
-//         textureMap = segmented_to_virtual(textureMaps[i])
-//         meshVerts = textureMap[0]
-//         meshTris = textureMap[meshVerts * 3 + 1]
-//         gSPDisplayList(gfx++, render_painting(textures[i], tWidth, tHeight, textureMap, meshVerts, meshTris, painting.alpha))
-//     }
+      // Update the ripple, may automatically reset the painting's state.
+    painting_update_ripple_state(painting)
 
-//       // Update the ripple, may automatically reset the painting's state.
-//     painting_update_ripple_state(painting)
-
-//     gSPPopMatrix(gfx++, G_MTX_MODELVIEW)
-//     gSPDisplayList(gfx++, dl_paintings_rippling_end)
-//     gSPEndDisplayList(gfx)
-//     return dlist
-// }
+    gSPPopMatrix(gfx, G_MTX_MODELVIEW)
+    gSPDisplayList(gfx, dl_paintings_rippling_end)
+    gSPEndDisplayList(gfx)
+    return gfx;
+}
 
 /**
  * Ripple a painting that has 1 "environment map" texture.
  */
-// export const painting_ripple_env_mapped = (painting) => {
-//     let /*s16*/ meshVerts
-//     let /*s16*/ meshTris
-//     let /*s16*/ *textureMap
-//     let /*s16*/ tWidth = painting.textureWidth
-//     let /*s16*/ tHeight = painting.textureHeight
-//     let /*s16*/ **textureMaps = segmented_to_virtual(painting.textureMaps)
-//     let /*u8*/ **tArray = segmented_to_virtual(painting.textureArray)
-//     Gfx *dlist = alloc_display_list(7 * sizeof(Gfx))
-//     Gfx *gfx = dlist
+export const painting_ripple_env_mapped = (painting) => {
+    let meshVerts
+    let meshTris
+    let textureMap
+    let [tWidth, tHeight] = painting.textureWH
+    let textureMaps = painting.textureMaps
+    let tArray = painting.textures
+    let gfx = []
 
-//     if (dlist == null) {
-//         return dlist
-//     }
+    if (dlist == null) {
+        return dlist
+    }
 
-//     gSPDisplayList(gfx++, painting_model_view_transform(painting))
-//     gSPDisplayList(gfx++, dl_paintings_env_mapped_begin)
-//     gSPDisplayList(gfx++, painting.rippleDisplayList)
+    gSPDisplayList(gfx, painting_model_view_transform(painting))
+    gSPDisplayList(gfx, dl_paintings_env_mapped_begin)
+    gSPDisplayList(gfx, painting.rippleDList)
 
-//       // Map the image to the mesh's vertices
-//     textureMap = segmented_to_virtual(textureMaps[0])
-//     meshVerts = textureMap[0]
-//     meshTris = textureMap[meshVerts * 3 + 1]
-//     gSPDisplayList(gfx++, render_painting(tArray[0], tWidth, tHeight, textureMap, meshVerts, meshTris, painting.alpha))
+      // Map the image to the mesh's vertices
+    textureMap = textureMaps[0]
+    meshVerts = textureMap[0]
+    meshTris = textureMap[meshVerts * 3 + 1]
+    gSPDisplayList(gfx, render_painting(tArray[0], tWidth, tHeight, textureMap, meshVerts, meshTris, painting.alpha))
 
-//       // Update the ripple, may automatically reset the painting's state.
-//     painting_update_ripple_state(painting)
+      // Update the ripple, may automatically reset the painting's state.
+    painting_update_ripple_state(painting)
 
-//     gSPPopMatrix(gfx++, G_MTX_MODELVIEW)
-//     gSPDisplayList(gfx++, dl_paintings_env_mapped_end)
-//     gSPEndDisplayList(gfx)
-//     return dlist
-// }
+    gSPPopMatrix(gfx, G_MTX_MODELVIEW)
+    gSPDisplayList(gfx, dl_paintings_env_mapped_end)
+    gSPEndDisplayList(gfx)
+    return gfx;
+}
 
 /**
  * Generates a mesh, calculates vertex normals for lighting, and renders a rippling painting.
  * The mesh and vertex normals are regenerated and freed every frame.
  */
-// export const display_painting_rippling = (painting) => {
-//     let /*s16*/ *mesh = segmented_to_virtual(seg2_painting_triangle_mesh)
-//     let /*s16*/ *neighborTris = segmented_to_virtual(seg2_painting_mesh_neighbor_tris)
-//     let /*s16*/ numVtx = mesh[0]
-//     let /*s16*/ numTris = mesh[numVtx * 3 + 1]
-//     Gfx *dlist
+export const display_painting_rippling = (painting) => {
+    let mesh = seg2_painting_triangle_mesh
+    let neighborTris = seg2_painting_mesh_neighbor_tris
+    let numVtx = mesh[0]
+    let numTris = mesh[numVtx * 3 + 1]
+    let dlist
 
-//       // Generate the mesh and its lighting data
-//     painting_generate_mesh(painting, mesh, numVtx)
-//     painting_calculate_triangle_normals(mesh, numVtx, numTris)
-//     painting_average_vertex_normals(neighborTris, numVtx)
+      // Generate the mesh and its lighting data
+    painting_generate_mesh(painting, mesh, numVtx)
+    painting_calculate_triangle_normals(mesh, numVtx, numTris)
+    painting_average_vertex_normals(neighborTris, numVtx)
 
-//       // Map the painting's texture depending on the painting's texture type.
-//     switch (painting.textureType) {
-//         case PAINTING_IMAGE:
-//             dlist = painting_ripple_image(painting)
-//             break
-//         case PAINTING_ENV_MAP:
-//             dlist = painting_ripple_env_mapped(painting)
-//             break
-//     }
+      // Map the painting's texture depending on the painting's texture type.
+    switch (painting.textureType) {
+        case PAINTING_IMAGE:
+            dlist = painting_ripple_image(painting)
+            break
+        case PAINTING_ENV_MAP:
+            dlist = painting_ripple_env_mapped(painting)
+            break
+    }
 
-//       // The mesh data is freed every frame.
-//     mem_pool_free(gEffectsMemoryPool, gPaintingMesh)
-//     mem_pool_free(gEffectsMemoryPool, gPaintingTriNorms)
-//     return dlist
-// }
+    return dlist
+}
 
-// /**
-//  * Render a normal painting.
-//  */
-// export const display_painting_not_rippling = (painting) => {
-//     Gfx *dlist = alloc_display_list(4 * sizeof(Gfx))
-//     Gfx *gfx = dlist
+/**
+ * Render a normal painting.
+ */
+export const display_painting_not_rippling = (painting) => {
+    let gfx = []
 
-//     if (dlist == null) {
-//         return dlist
-//     }
-//     gSPDisplayList(gfx++, painting_model_view_transform(painting))
-//     gSPDisplayList(gfx++, painting.normalDisplayList)
-//     gSPPopMatrix(gfx++, G_MTX_MODELVIEW)
-//     gSPEndDisplayList(gfx)
-//     return dlist
-// }
+    gSPDisplayList(gfx, painting_model_view_transform(painting))
+    gSPDisplayList(gfx, painting.normalDList)
+    gSPPopMatrix(gfx, G_MTX_MODELVIEW)
+    gSPEndDisplayList(gfx)
+    return gfx;
+}
 
 /**
  * Clear Mario-related state and clear gRipplingPainting.
  */
-// export const reset_painting = (painting) => {
-//     painting.lastFloor = 0
-//     painting.currFloor = 0
-//     painting.floorEntered = 0
-//     painting.marioWasUnder = 0
-//     painting.marioIsUnder = 0
-//     painting.marioWentUnder = 0
+export const reset_painting = (painting) => {
+    painting.lastFloor = 0
+    painting.currFloor = 0
+    painting.floorStatus[2] = 0
+    painting.marioBelow[0] = 0
+    painting.marioBelow[1] = 0
+    painting.marioBelow[2] = 0
 
-//     gRipplingPainting = null
+    gRipplingPainting = null
 
-//     painting.state = PAINTING_IDLE
-//     painting.currRippleMag = 0.0
-//     painting.rippleDecay = 1.0
-//     painting.currRippleRate = 0.0
-//     painting.dispersionFactor = 0.0
-//     painting.rippleTimer = 0.0
-//     painting.rippleX = 0.0
-//     painting.rippleY = 0.0
-//     if (painting == ddd_painting) {
-//           // Move DDD painting to initial position, in case the animation
-//           // that moves the painting stops during level unload.
-//         painting.posX = 3456.0
-//     }
-// }
+    painting.rippleStatus = PAINTING_IDLE
+    painting.rippleMagnitude[0] = 0.0
+    painting.rippleDecay[0] = 1.0
+    painting.rippleRate[0] = 0.0
+    painting.rippleDispersion[0] = 0.0
+    painting.currRippleTimer = 0.0
+    painting.currRippleXY[0] = 0.0
+    painting.currRippleXY[1] = 0.0
+    if (painting == ddd_painting) {
+          // Move DDD painting to initial position, in case the animation
+          // that moves the painting stops during level unload.
+        painting.position[0] = 3456.0
+    }
+}
 
 /**
  * Controls the x coordinate of the DDD painting.
@@ -1097,90 +1079,90 @@ export const painting_update_ripple_state = (painting) => {
  *  2 (0b10): set x coordinate to backPos
  *  3 (0b11): same as 2. Bit 0 is ignored
  */
-// export const move_ddd_painting = (painting, frontPos, backPos, speed) => {
-//       // Obtain the DDD star flags
-//     let /*u32*/ dddFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_DDD - 1)
-//       // Get the other save file flags
-//     let /*u32*/ saveFileFlags = save_file_get_flags()
-//       // Find out whether Board Bowser's Sub was collected
-//     let /*u32*/ bowsersSubBeaten = dddFlags & BOARD_BOWSERS_SUB
-//       // Check whether DDD has already moved back
-//     let /*u32*/ dddBack = saveFileFlags & SAVE_FLAG_DDD_MOVED_BACK
+export const move_ddd_painting = (painting, frontPos, backPos, speed) => {
+      // Obtain the DDD star flags
+    let dddFlags = save_file_get_star_flags(gLinker.Area.gCurrSaveFileNum - 1, COURSE_DDD - 1)
+      // Get the other save file flags
+    let saveFileFlags = save_file_get_flags()
+      // Find out whether Board Bowser's Sub was collected
+    let bowsersSubBeaten = dddFlags & BOARD_BOWSERS_SUB
+      // Check whether DDD has already moved back
+    let dddBack = saveFileFlags & SAVE_FLAG_DDD_MOVED_BACK
 
-//     if (!bowsersSubBeaten && !dddBack) {
-//           // If we haven't collected the star or moved the painting, put the painting at the front
-//         painting.posX = frontPos
-//         gDddPaintingStatus = 0
-//     } else if (bowsersSubBeaten && !dddBack) {
-//           // If we've collected the star but not moved the painting back,
-//           // Each frame, move the painting by a certain speed towards the back area.
-//         painting.posX += speed
-//         gDddPaintingStatus = BOWSERS_SUB_BEATEN
-//         if (painting.posX >= backPos) {
-//             painting.posX = backPos
-//               // Tell the save file that we've moved DDD back.
-//             save_file_set_flags(SAVE_FLAG_DDD_MOVED_BACK)
-//         }
-//     } else if (bowsersSubBeaten && dddBack) {
-//           // If the painting has already moved back, place it in the back position.
-//         painting.posX = backPos
-//         gDddPaintingStatus = BOWSERS_SUB_BEATEN | DDD_BACK
-//     }
-// }
+    if (!bowsersSubBeaten && !dddBack) {
+          // If we haven't collected the star or moved the painting, put the painting at the front
+        painting.position[0] = frontPos
+        gDddPaintingStatus = 0
+    } else if (bowsersSubBeaten && !dddBack) {
+          // If we've collected the star but not moved the painting back,
+          // Each frame, move the painting by a certain speed towards the back area.
+        painting.position[0] += speed
+        gDddPaintingStatus = BOWSERS_SUB_BEATEN
+        if (painting.position[0] >= backPos) {
+            painting.position[0] = backPos
+              // Tell the save file that we've moved DDD back.
+            save_file_set_flags(SAVE_FLAG_DDD_MOVED_BACK)
+        }
+    } else if (bowsersSubBeaten && dddBack) {
+          // If the painting has already moved back, place it in the back position.
+        painting.position[0] = backPos
+        gDddPaintingStatus = BOWSERS_SUB_BEATEN | DDD_BACK
+    }
+}
 
 /**
  * Set the painting's node's layer based on its alpha
  */
-// export const set_painting_layer = (gen, painting) => {
-//     switch (painting.alpha) {
-//         case 0xFF:   // Opaque
-//             gen.fnNode.node.flags = (gen.fnNode.node.flags & 0xFF) | (LAYER_OPAQUE << 8)
-//             break
-//         default:
-//             gen.fnNode.node.flags = (gen.fnNode.node.flags & 0xFF) | (LAYER_TRANSPARENT << 8)
-//             break
-//     }
-// }
+export const set_painting_layer = (node, painting) => {
+    switch (painting.alpha) {
+        case 0xFF:   // Opaque
+        node.flags = (node.flags & 0xFF) | (LAYER_OPAQUE << 8)
+            break
+        default:
+            node.flags = (node.flags & 0xFF) | (LAYER_TRANSPARENT << 8)
+            break
+    }
+}
 
 /**
  * Display either a normal painting or a rippling one depending on the painting's ripple status
  */
-// export const display_painting = (painting) => {
-//     switch (painting.state) {
-//         case PAINTING_IDLE:
-//             return display_painting_not_rippling(painting)
-//             break
-//         default:
-//             return display_painting_rippling(painting)
-//             break
-//     }
-// }
+export const display_painting = (painting) => {
+    switch (painting.rippleStatus) {
+        case PAINTING_IDLE:
+            return display_painting_not_rippling(painting)
+            break
+        default:
+            return display_painting_rippling(painting)
+            break
+    }
+}
 
 /**
  * Update function for wall paintings.
  * Calls a different update function depending on the painting's ripple trigger and current state.
  */
-// export const wall_painting_update = (painting, paintingGroup) => {
-//     if (painting.rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
-//         switch (painting.state) {
-//             case PAINTING_IDLE:
-//                 wall_painting_proximity_idle(painting, paintingGroup)
-//                 break
-//             case PAINTING_RIPPLE:
-//                 wall_painting_proximity_rippling(painting, paintingGroup)
-//                 break
-//         }
-//     } else if (painting.rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
-//         switch (painting.state) {
-//             case PAINTING_IDLE:
-//                 wall_painting_continuous_idle(painting, paintingGroup)
-//                 break
-//             case PAINTING_RIPPLE:
-//                 wall_painting_continuous_rippling(painting, paintingGroup)
-//                 break
-//         }
-//     }
-// }
+export const wall_painting_update = (painting, paintingGroup) => {
+    if (painting.rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
+        switch (painting.rippleStatus) {
+            case PAINTING_IDLE:
+                wall_painting_proximity_idle(painting, paintingGroup)
+                break
+            case PAINTING_RIPPLE:
+                wall_painting_proximity_rippling(painting, paintingGroup)
+                break
+        }
+    } else if (painting.rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
+        switch (painting.rippleStatus) {
+            case PAINTING_IDLE:
+                wall_painting_continuous_idle(painting, paintingGroup)
+                break
+            case PAINTING_RIPPLE:
+                wall_painting_continuous_rippling(painting, paintingGroup)
+                break
+        }
+    }
+}
 
 /**
  * Update function for floor paintings (HMC and CotMC)
@@ -1188,91 +1170,95 @@ export const painting_update_ripple_state = (painting) => {
  *
  * No floor paintings use RIPPLE_TRIGGER_PROXIMITY in the game.
  */
-// export const floor_painting_update = (painting, paintingGroup) => {
-//     if (painting.rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
-//         switch (painting.state) {
-//             case PAINTING_IDLE:
-//                 floor_painting_proximity_idle(painting, paintingGroup)
-//                 break
-//             case PAINTING_RIPPLE:
-//                 floor_painting_proximity_rippling(painting, paintingGroup)
-//                 break
-//         }
-//     } else if (painting.rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
-//         switch (painting.state) {
-//             case PAINTING_IDLE:
-//                 floor_painting_continuous_idle(painting, paintingGroup)
-//                 break
-//             case PAINTING_RIPPLE:
-//                 floor_painting_continuous_rippling(painting, paintingGroup)
-//                 break
-//         }
-//     }
-// }
+export const floor_painting_update = (painting, paintingGroup) => {
+    if (painting.rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
+        switch (painting.rippleStatus) {
+            case PAINTING_IDLE:
+                floor_painting_proximity_idle(painting, paintingGroup)
+                break
+            case PAINTING_RIPPLE:
+                floor_painting_proximity_rippling(painting, paintingGroup)
+                break
+        }
+    } else if (painting.rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
+        switch (painting.rippleStatus) {
+            case PAINTING_IDLE:
+                floor_painting_continuous_idle(painting, paintingGroup)
+                break
+            case PAINTING_RIPPLE:
+                floor_painting_continuous_rippling(painting, paintingGroup)
+                break
+        }
+    }
+}
 
 /**
  * Render and update the painting whose id and group matches the values in the GraphNode's parameter.
  * Use PAINTING_ID(id, group) to set the right parameter in a level's geo layout.
  */
-// export const geo_painting_draw = (callContext, node, context) => {
-//     struct GraphNodeGenerated *gen = (struct GraphNodeGenerated *) node
-//     let /*s32*/ group = (gen.parameter >> 8) & 0xFF
-//     let /*s32*/ id = gen.parameter & 0xFF
-//     Gfx *paintingDlist = null
-//     struct Painting **paintingGroup = sPaintingGroups[group]
-//     struct Painting *painting = segmented_to_virtual(paintingGroup[id])
+export const geo_painting_draw = (callContext, node, context) => {
+    let group = (node.parameter >> 8) & 0xFF
+    let id = node.parameter & 0xFF
+    let paintingDlist = []
+    let paintingGroup = sPaintingGroups[group]
+    let painting = paintingGroup[id]
 
-//     if (callContext != GEO_CONTEXT_RENDER) {
-//         reset_painting(painting)
-//     } else if (callContext == GEO_CONTEXT_RENDER) {
+    if (callContext != GEO_CONTEXT_RENDER) {
+        reset_painting(painting)
+    } else if (callContext == GEO_CONTEXT_RENDER) {
+          // Update the ddd painting before drawing
+        if (group == 1 && id == PAINTING_ID_DDD) {
+            move_ddd_painting(painting, 3456.0, 5529.6, 20.0)
+        }
 
-//           // Update the ddd painting before drawing
-//         if (group == 1 && id == PAINTING_ID_DDD) {
-//             move_ddd_painting(painting, 3456.0, 5529.6, 20.0)
-//         }
+          // Determine if the painting is transparent
+        set_painting_layer(node, painting)
 
-//           // Determine if the painting is transparent
-//         set_painting_layer(gen, painting)
+          // Draw before updating
+        paintingDlist = display_painting(painting)
 
-//           // Draw before updating
-//         paintingDlist = display_painting(painting)
-
-//           // Update the painting
-//         painting_update_floors(painting)
-//         switch (s16(painting.pitch)) {
-//               // only paintings with 0 pitch are treated as walls
-//             case 0:
-//                 wall_painting_update(painting, paintingGroup)
-//                 break
-//             default:
-//                 floor_painting_update(painting, paintingGroup)
-//                 break
-//         }
-//     }
-//     return paintingDlist
-// }
+          // Update the painting
+        painting_update_floors(painting)
+        switch (s16(painting.rotation[0])) {
+              // only paintings with 0 pitch are treated as walls
+            case 0:
+                wall_painting_update(painting, paintingGroup)
+                break
+            default:
+                floor_painting_update(painting, paintingGroup)
+                break
+        }
+    }
+    return paintingDlist
+}
 
 /**
  * Update the painting system's local copy of Mario's current floor and position.
  */
-// export const geo_painting_update = (callContext, node, c) => {
-//     struct Surface *surface
+export const geo_painting_update = (callContext, node, c) => {
+    const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+    let surface
 
-//       // Reset the update counter
-//     if (callContext != GEO_CONTEXT_RENDER) {
-//         gLastPaintingUpdateCounter = gAreaUpdateCounter - 1
-//         gPaintingUpdateCounter = gAreaUpdateCounter
-//     } else {
-//         gLastPaintingUpdateCounter = gPaintingUpdateCounter
-//         gPaintingUpdateCounter = gAreaUpdateCounter
+      // Reset the update counter
+    if (callContext != GEO_CONTEXT_RENDER) {
+        gLastPaintingUpdateCounter = gLinker.GeoRenderer.gAreaUpdateCounter - 1
+        gPaintingUpdateCounter = gLinker.GeoRenderer.gAreaUpdateCounter
+    } else {
+        gLastPaintingUpdateCounter = gPaintingUpdateCounter
+        gPaintingUpdateCounter = gLinker.GeoRenderer.gAreaUpdateCounter
 
-//           // Store Mario's floor and position
-//         find_floor(gMarioObject.rawData[oPosX], gMarioObject.rawData[oPosY], gMarioObject.rawData[oPosZ], &surface)
-//         gPaintingMarioFloorType = surface.type
-//         gPaintingMarioXPos = gMarioObject.rawData[oPosX]
-//         gPaintingMarioYPos = gMarioObject.rawData[oPosY]
-//         gPaintingMarioZPos = gMarioObject.rawData[oPosZ]
-//     }
-//     return null
-// }
+          // Store Mario's floor and position
+        let fW = { floor: surface }
+        gLinker.SurfaceCollision.find_floor(gMarioObject.rawData[oPosX], gMarioObject.rawData[oPosY], gMarioObject.rawData[oPosZ], fW);
+        surface = fW.floor
 
+        gPaintingMarioFloorType = surface.type
+        gPaintingMarioXPos = gMarioObject.rawData[oPosX]
+        gPaintingMarioYPos = gMarioObject.rawData[oPosY]
+        gPaintingMarioZPos = gMarioObject.rawData[oPosZ]
+    }
+    return null
+}
+
+gLinker.geo_painting_draw = geo_painting_draw
+gLinker.geo_painting_update = geo_painting_update

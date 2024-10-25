@@ -735,6 +735,7 @@ export const gDPSetCycleType = (displaylist, newmode) => {
 }
 
 export const gSPVertex = (displaylist, vertices, num_vertices, dest_index) => {
+    vertices = vertices.slice(0, num_vertices)
     displaylist.push({
         words: {
             w0: G_VTX,
@@ -854,6 +855,15 @@ export const gDPLoadTextureBlock = (displaylist, timg, fmt, siz, width, height, 
     )
 }
 
+export const gDPSetTile = (displaylist, fmt, siz, line, tmem, tile, palette, cmt, maskt, shiftt, cms, masks, shifts) => {
+    displaylist.push({
+        words: {
+            w0: G_SETTILE,
+            w1: { fmt, siz, line, tmem, tile, palette, cmt, maskt, shiftt, cms, masks, shifts }
+        }
+    })
+}
+
 export const gsSPDisplayList = (childDisplayList) => {
     return {
         words: {
@@ -881,14 +891,15 @@ export const gsSPEndDisplayList = () => {
     }
 }
 
-/* export const gsSPGeometryMode = (c, s) => {
+export const gsSPGeometryMode = (c, s) => {
     return {
         words: {
             w0: G_GEOMETRYMODE | ~c,
             w1: s
         }
     }
-} */
+}
+export const gsSPGeometryModeSetFirst = gsSPGeometryMode;
 
 export const gsDPSetAlphaCompare = (newmode) => {
     return {

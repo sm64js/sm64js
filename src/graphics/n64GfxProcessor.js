@@ -951,11 +951,11 @@ export class n64GfxProcessor {
     sp_vertex(dest_index, vertices) {
 
         for (let i = dest_index; i < vertices.length; i++) {
-
             let v = vertices[i]
             if (Array.isArray(v)) {
                 v = {pos: v[0], flag: v[1], tc: v[2], color: v[3]}
             }
+
             const normal = [
                 v.color[0] > 127 ? v.color[0] - 256 : v.color[0],
                 v.color[1] > 127 ? v.color[1] - 256 : v.color[1],
@@ -1165,7 +1165,10 @@ export class n64GfxProcessor {
                             this.run_dl(args.childDisplayList)
                             return
                         }
-                        prev_op = ["G_DL", `Branch: ${args.branch}, Child Display List: ${args.childDisplayList}`]
+                        prev_op = ["G_DL", `Branch: ${args.branch}, Child Display List: `]
+                        for (const cmd of args.childDisplayList) {
+                            prev_op[1] += `${cmd.words.w0} ${cmd.words.w1} | `
+                        }
                         break
                     default:
                         console.log(command)

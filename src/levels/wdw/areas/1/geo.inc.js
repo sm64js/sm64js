@@ -26,13 +26,14 @@ import { wdw_seg7_dl_0700A138 } from "./2/model.inc"
 
 import { wdw_seg7_dl_07012798 } from "./3/model.inc"
 
-/*import {
-    geo_wdw_set_initial_water_level, geo_cannon_circle_base
-} from "../../../../game/ObjectHelpers"*/
+import {
+     //, geo_cannon_circle_base
+} from "../../../../game/ObjectHelpers"
 
 import {
-    geo_movtex_pause_control, geo_movtex_draw_water_regions
+    geo_wdw_set_initial_water_level, geo_movtex_pause_control, geo_movtex_draw_water_regions
 } from "../../../../game/MovingTexture"
+import { wdw_seg7_dl_07012908 } from "../../double_arrows/model.inc"
 
 
 // 0x0E000658
@@ -55,8 +56,8 @@ export const wdw_geo_000658 = () => {return [
                     GEO_DISPLAY_LIST(LAYER_OPAQUE, wdw_seg7_dl_07009AB0),
                     GEO_DISPLAY_LIST(LAYER_ALPHA, wdw_seg7_dl_0700A138),
                     GEO_DISPLAY_LIST(LAYER_TRANSPARENT, wdw_seg7_dl_07012798),
-                    //GEO_DISPLAY_LIST(LAYER_TRANSPARENT_DECAL, wdw_seg7_dl_07012908),
-                    //GEO_ASM(0, geo_wdw_set_initial_water_level),
+                    GEO_DISPLAY_LIST(LAYER_TRANSPARENT_DECAL, wdw_seg7_dl_07012908),
+                    GEO_ASM(0, geo_wdw_set_initial_water_level),
                     GEO_ASM(0, geo_movtex_pause_control),
                     GEO_ASM(0x1101, geo_movtex_draw_water_regions),
                     GEO_RENDER_OBJ(),

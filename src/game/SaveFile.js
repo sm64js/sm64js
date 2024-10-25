@@ -496,7 +496,7 @@ export const check_warp_checkpoint = (warpNode) => {
     // gSavedCourseNum is only used in this function.
     if (
         gWarpCheckpoint.courseNum != COURSE_NONE &&
-        Area.gSavedCourseNum == currCourseNum &&
+        gLinker.Area.gSavedCourseNum == currCourseNum &&
         gWarpCheckpoint.actNum == gCurrActNum
     ) {
         warpNode.destLevel = gWarpCheckpoint.levelID

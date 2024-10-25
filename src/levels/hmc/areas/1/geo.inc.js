@@ -71,7 +71,7 @@ import { hmc_seg7_dl_0701FD58 } from "./28/model.inc"
 import { hmc_seg7_dl_07020FD0 } from "./29/model.inc"
 
 import {
-    /*geo_painting_update, geo_painting_draw, */geo_switch_area
+    geo_switch_area
 } from "../../../../game/ObjectHelpers"
 
 import { hmc_seg7_dl_07021760 } from "./30/model.inc"
@@ -176,8 +176,8 @@ export const hmc_geo_000748 = () => {return [
     GEO_NODE_START(),
     GEO_OPEN_NODE(),
         GEO_DISPLAY_LIST(LAYER_OPAQUE, hmc_seg7_dl_07020FD0),
-        //GEO_ASM(0, geo_painting_update),
-        //GEO_ASM(PAINTING_ID(0, 0), geo_painting_draw),
+        GEO_ASM(0, 'geo_painting_update'),
+        GEO_ASM(PAINTING_ID(0, 0), 'geo_painting_draw'),
     GEO_CLOSE_NODE(),
     GEO_RETURN(),
 ]};
@@ -339,8 +339,8 @@ export const hmc_geo_000A88 = () => {return [
         GEO_DISPLAY_LIST(LAYER_TRANSPARENT, hmc_seg7_dl_0701F818),
         GEO_DISPLAY_LIST(LAYER_OPAQUE, hmc_seg7_dl_0701FD58),
         GEO_DISPLAY_LIST(LAYER_OPAQUE, hmc_seg7_dl_07020FD0),
-        //GEO_ASM(0, geo_painting_update),
-        //GEO_ASM(PAINTING_ID(0, 0), geo_painting_draw),
+        GEO_ASM(0, 'geo_painting_update'),
+        GEO_ASM(PAINTING_ID(0, 0), 'geo_painting_draw'),
         GEO_ASM(0, geo_movtex_pause_control),
         GEO_ASM(0x0701, geo_movtex_draw_water_regions),
     GEO_CLOSE_NODE(),

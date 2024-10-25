@@ -16,7 +16,7 @@ import { atan2s, vec3f_set, sqrtf,vec3f_set_dist_and_angle } from "../engine/mat
 import * as MathUtil from "../engine/math_util"
 import * as Mario from "./Mario"
 import { oBehParams2ndByte, oHeldState, oHomeX, oHomeY, oHomeZ, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oPosX, oPosY, oPosZ } from "../include/object_constants"
-import { CELL_HEIGHT_LIMIT, FLOOR_LOWER_LIMIT, SURFACE_DEATH_PLANE, SURFACE_IS_PAINTING_WARP, SURFACE_WALL_MISC } from "../include/surface_terrains"
+import { CELL_HEIGHT_LIMIT, FLOOR_LOWER_LIMIT, SURFACE_DEATH_PLANE, SURFACE_IS_PAINTING_WARP, SURFACE_PAINTING_WARP_F9, SURFACE_PAINTING_WOBBLE_A6, SURFACE_WALL_MISC } from "../include/surface_terrains"
 import { sins, s16, int16, coss } from "../utils"
 import { HudInstance as Hud } from "./Hud"
 import { CAM_SELECTION_FIXED, CAM_SELECTION_MARIO, DIALOG_RESPONSE_NONE } from "./IngameMenu"
@@ -61,6 +61,7 @@ import { MARIO_DIALOG_LOOK_FRONT } from "./MarioActionsCutscene"
 import { set_mario_npc_dialog } from "./MarioActionsCutscene"
 import { pitch } from "style-loader"
 import { DROP_TO_FLOOR } from "../engine/BehaviorCommands"
+import { gRipplingPainting } from "./Paintings"
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
 
@@ -1290,6 +1291,10 @@ class Camera {
             { shot: this.cutscene_red_coin_star_end.bind(this), duration: 15 },
         ]
 
+        this.sCutsceneEnterPainting = [
+            { shot: this.cutscene_enter_painting.bind(this), duration: CUTSCENE_LOOP },
+        ]
+
         this.sCutsceneExitPaintingSuccess = [
             { shot: this.cutscene_exit_painting.bind(this), duration: 180 },
             { shot: this.cutscene_exit_painting_end.bind(this), duration: 0 }
@@ -1373,7 +1378,7 @@ class Camera {
             [ CUTSCENE_DOOR_PULL_MODE, this.sCutsceneDoorPullMode ],
             [ CUTSCENE_DOOR_PUSH_MODE, this.sCutsceneDoorPushMode ],
             [ CUTSCENE_ENTER_CANNON, this.sCutsceneEnterCannon ],
-            // [ CUTSCENE_ENTER_PAINTING, this.sCutsceneEnterPainting ],
+            [ CUTSCENE_ENTER_PAINTING, this.sCutsceneEnterPainting ],
             // [ CUTSCENE_DEATH_EXIT, this.sCutsceneDeathExit ],
             [ CUTSCENE_EXIT_PAINTING_SUCC, this.sCutsceneExitPaintingSuccess ],
             // [ CUTSCENE_UNUSED_EXIT,  this.sCutsceneUnusedExit ],
@@ -8407,13 +8412,60 @@ class Camera {
      * zooms in until the star select screen appears.
      */
     cutscene_enter_painting(c) {
-        let paintingAngle = []
-        this.set_fov_function(CAM_FOV_APP_20);
-        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
+        let floor, highFloor;
+        let paintingPos = [0, 0, 0];
+        let focus = [0, 0, 0];
+        let focusOffset = [0, 0, 0];
+        let paintingAngle = [0, 0, 0];
+        let floorHeight;
+        let floorWrapper;
 
-        // if (gRipplingPainting != null) {
-        // }
-        c.mode = CAMERA_MODE_CLOSE
+        this.set_fov_function(CAM_FOV_APP_20);
+        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
+
+        if (gRipplingPainting != null) { 
+            paintingAngle[0] = 0;
+            paintingAngle[1] = (gRipplingPainting.rotation[1] / 360.0) * 65536.0;
+            paintingAngle[2] = 0;
+
+            focusOffset[0] = gRipplingPainting.size / 2;
+            focusOffset[1] = focusOffset[0];
+            focusOffset[2] = 0;
+
+            paintingPos[0] = gRipplingPainting.position[0];
+            paintingPos[1] = gRipplingPainting.position[1];
+            paintingPos[2] = gRipplingPainting.position[2];
+
+            this.offset_rotated(focus, paintingPos, focusOffset, paintingAngle);
+            this.approach_vec3f_asymptotic(c.focus, focus, 0.1, 0.1, 0.1);
+            focusOffset[2] = -(((gRipplingPainting.size * 1000.0) / 2) / 307.0);
+            this.offset_rotated(focus, paintingPos, focusOffset, paintingAngle);
+
+            floorWrapper.floor = floor;
+            floorHeight = SurfaceCollision.find_floor(focus[0], focus[1] + 10.0, focus[2], floor);
+            floor = floorWrapper.floor;
+
+            if (focus[1] < floorHeight) {
+                focus[1] = floorHeight;
+            }
+
+            if (c.cutscene == CUTSCENE_ENTER_PAINTING) {
+                this.approach_vec3f_asymptotic(c.pos, focus, 0.2, 0.1, 0.2);
+            } else {
+                this.approach_vec3f_asymptotic(c.pos, focus, 0.9, 0.9, 0.9);
+            }
+
+            floorWrapper.floor = floor;
+            SurfaceCollision.find_floor(c.pos[0], c.pos[1] + 10.0, c.pos[2], floorWrapper);
+            floor = floorWrapper.floor;
+
+            if ((floor.type < SURFACE_PAINTING_WOBBLE_A6) || (floor.type > SURFACE_PAINTING_WARP_F9)) {
+                c.cutscene = 0;
+                this.gCutsceneTimer = CUTSCENE_STOP;
+                this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
+            }
+        }
+        c.mode = CAMERA_MODE_CLOSE;
     }
 
     /**

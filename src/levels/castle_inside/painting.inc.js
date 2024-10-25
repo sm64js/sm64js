@@ -9,10 +9,6 @@ import {
 } from "../../include/gbi"
 
 import {
-    RIPPLE_TRIGGER_PROXIMITY, RIPPLE_TRIGGER_CONTINUOUS, PAINTING_IMAGE, PAINTING_ENV_MAP
-} from "../../game/Paintings"
-
-import {
     inside_castle_seg7_texture_0700A800, inside_castle_seg7_texture_0700B800,
     inside_castle_seg7_texture_0700C800, inside_castle_seg7_texture_0700D800,
     inside_castle_seg7_texture_0700E800, inside_castle_seg7_texture_0700F800,
@@ -27,6 +23,13 @@ import {
     inside_castle_seg7_texture_07016800, inside_castle_seg7_texture_07017000
 } from "./texture.inc"
 
+export const RIPPLE_TRIGGER_PROXIMITY = 10
+export const RIPPLE_TRIGGER_CONTINUOUS = 20
+
+/// Painting that uses 1 or more images as a texture
+export const PAINTING_IMAGE = 0
+/// Painting that has one texture used for an environment map effect
+export const PAINTING_ENV_MAP = 1
 
 // 0x07021800 - 0x07021818
 const inside_castle_seg7_lights_07021800 = gdSPDefLights1(

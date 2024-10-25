@@ -19,7 +19,7 @@ import { inside_castle_seg7_dl_070616E8 } from "./4/model.inc"
 import { inside_castle_seg7_dl_07061C20 } from "./5/model.inc"
 
 import {
-    geo_painting_update, geo_painting_draw, geo_switch_area
+    geo_switch_area
 } from "../../../../game/ObjectHelpers"
 
 import {

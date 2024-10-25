@@ -603,3 +603,10 @@ export const get_pos_from_transform_mtx = (dest, objMtx, camMtx) => {
     dest[2] = objMtx[3][0] * camMtx[2][0] + objMtx[3][1] * camMtx[2][1] + objMtx[3][2] * camMtx[2][2] - camZ
 }
 
+export const round_float = (num) => {
+    if (num >= 0.0) {
+        return Math.floor(num + 0.5)
+    } else {
+        return Math.floor(num - 0.5)
+    }
+}

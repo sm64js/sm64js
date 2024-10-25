@@ -20,6 +20,7 @@ import { GFX_DIMENSIONS_FROM_LEFT_EDGE, GFX_DIMENSIONS_FROM_RIGHT_EDGE } from ".
 import { castle_grounds_seg7_dl_0700EA58 } from "../levels/castle_grounds/areas/1/12/model.inc"
 import { castle_grounds_seg7_us_dl_0700F2E8 } from "../levels/castle_grounds/areas/1/13/model.inc"
 import { SEQ_EVENT_BOSS } from "../include/seq_ids"
+import { sins } from "../utils"
 
 export const ASCII_TO_DIALOG = (asc) => {
     return (((asc) >= '0' && (asc) <= '9') ? ((asc) - '0') :

@@ -20,7 +20,7 @@ import { CELL_HEIGHT_LIMIT, FLOOR_LOWER_LIMIT, SURFACE_DEATH_PLANE, SURFACE_IS_P
 import { sins, s16, int16, coss } from "../utils"
 import { HudInstance as Hud } from "./Hud"
 import { CAM_SELECTION_FIXED, CAM_SELECTION_MARIO, DIALOG_RESPONSE_NONE } from "./IngameMenu"
-import { DIALOG_001, DIALOG_020, DIALOG_NONE } from "../text/us/dialogs"
+import { DIALOG_001, DIALOG_010, DIALOG_020, DIALOG_NONE } from "../text/us/dialogs"
 import { gLastCompletedStarNum } from "./SaveFile"
 import { COURSE_MAX, COURSE_NONE } from "../levels/course_defines"
 import { level_defines } from "../levels/level_defines_constants"

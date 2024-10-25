@@ -469,15 +469,6 @@ export const disable_warp_checkpoint = () => {
     gWarpCheckpoint.courseNum = COURSE_NONE
 }
 
-export const save_file_set_cap_pos = (x, y, z) => {
-    // let saveFile = gSaveBuffer.files[gCurrSaveFileNum - 1][0];
-
-    // saveFile.capLeve = Area.gCurrLevelNum;
-    // saveFile.capArea = Area.gCurrAreaIndex;
-    // vec3s_set(saveFile.capPos, x, y, z);
-    save_file_set_flags(SAVE_FLAG_CAP_ON_GROUND);
-}
-
 /**
  * Checks the upper bit of the WarpNode->destLevel byte to see if the
  * game should set a warp checkpoint.

@@ -7,7 +7,7 @@ import { SOUND_GENERAL_COLLECT_1UP, SOUND_MENU_CHANGE_SELECT, SOUND_MENU_MESSAGE
 import { menu_font_lut, menu_hud_lut } from "../levels/menu/leveldata"
 import { DIALOG_005, DIALOG_009, DIALOG_010, DIALOG_011, DIALOG_012, DIALOG_013, DIALOG_014, DIALOG_017, DIALOG_020, DIALOG_055, DIALOG_114, DIALOG_115, DIALOG_116, DIALOG_117, DIALOG_118, DIALOG_128, DIALOG_150, DIALOG_152, DIALOG_164, DIALOG_NONE, seg2_dialog_table } from "../text/us/dialogs"
 import { GameInstance as Game } from "./Game"
-import { PrintInstance as Print } from "./Print
+import { PrintInstance as Print } from "./Print"
 import { gCurrCourseStarFlags, gGotFileCoinHiScore, gLastCompletedCourseNum, gLastCompletedStarNum, save_file_get_course_coin_score, save_file_get_course_star_count, save_file_get_max_coin_score, save_file_get_star_flags, save_file_get_total_star_count } from "./SaveFile"
 import { CameraInstance as Camera } from "./Camera"
 import { TEXT_CAMERA_ANGLE_R, TEXT_CLEAR, TEXT_COIN, TEXT_CONTINUE, TEXT_CONTINUE_WITHOUT_SAVING, TEXT_COURSE, TEXT_EXIT_COURSE, TEXT_FILE_MARIO_EXCLAMATION, TEXT_FILE_MARIO_QUESTION, TEXT_FOR_MARIO, TEXT_HI_SCORE, TEXT_LAKITU_MARIO, TEXT_LAKITU_STOP, TEXT_LETS_HAVE_CAKE, TEXT_LISTEN_EVERYBODY, TEXT_MY_SCORE, TEXT_NORMAL_FIXED, TEXT_NORMAL_UPCLOSE, TEXT_PAUSE, TEXT_POWER_STARS_RESTORED, TEXT_SAVE_AND_CONTINUE, TEXT_SAVE_AND_QUIT, TEXT_SOMETHING_SPECIAL, TEXT_STAR, TEXT_STAR_X, TEXT_THANKS_TO_YOU, TEXT_THANK_YOU_MARIO, TEXT_UNFILLED_STAR } from "../include/text_strings"
@@ -392,8 +392,8 @@ class IngameMenu {
         let curY = y;
         let xStride = 12;
 
-        while (str[strPos] != GLOBAL_CHAR_TERMINATOR) {
-            switch (str[strPos]) {
+        str.forEach(char => {
+            switch (char) {
                 case GLOBAL_CHAR_SPACE:
                     curX += 8
                     break

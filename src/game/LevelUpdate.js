@@ -1107,7 +1107,7 @@ class LevelUpdate {
             Camera.update_camera(Area.gCurrentArea.camera)
         }
 
-        // this.initiate_painting_warp()
+        this.initiate_painting_warp()
         this.initiate_delayed_warp()
 
           // If either initiate_painting_warp or initiate_delayed_warp initiated a

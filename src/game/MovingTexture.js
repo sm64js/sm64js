@@ -267,7 +267,7 @@ export const geo_wdw_set_initial_water_level = (callContext, node, mtx) => {
     // Why was this global variable needed when they could just check for GEO_CONTEXT_AREA_LOAD?
     if (callContext != GEO_CONTEXT_RENDER) {
         gWdwWaterLevelSet = false;
-    } else if (callContext == GEO_CONTEXT_RENDER && gEnvironmentRegions != null && !gWdwWaterLevelSet) {
+    } else if (callContext == GEO_CONTEXT_RENDER && gLinker.ObjectListProcessor.gEnvironmentRegions != null && !gWdwWaterLevelSet) {
         if (gPaintingMarioYEntry <= 1382.4) {
             wdwWaterHeight = 31;
         } else if (gPaintingMarioYEntry >= 1600.0) {
@@ -276,8 +276,8 @@ export const geo_wdw_set_initial_water_level = (callContext, node, mtx) => {
             wdwWaterHeight = 1024;
         }
 
-        for (let i = 0; i < gEnvironmentRegions[0]; i++) {
-            gEnvironmentRegions[i * 6 + 6] = wdwWaterHeight;
+        for (let i = 0; i < gLinker.ObjectListProcessor.gEnvironmentRegions[0]; i++) {
+            gLinker.ObjectListProcessor.gEnvironmentRegions[i * 6 + 6] = wdwWaterHeight;
         }
         gWdwWaterLevelSet = true;
     }
@@ -413,10 +413,10 @@ export const geo_movtex_draw_water_regions = (callContext, node) => {
 
     if (callContext == GEO_CONTEXT_RENDER) {
         gMovtexVtxColor = MOVTEX_VTX_COLOR_DEFAULT
-        if (!ObjectListProc.gEnvironmentRegions) {
+        if (!gLinker.ObjectListProcessor.gEnvironmentRegions) {
             return gfx
         }
-        const numWaterBoxes = ObjectListProc.gEnvironmentRegions[0]
+        const numWaterBoxes = gLinker.ObjectListProcessor.gEnvironmentRegions[0]
 
         if (node.parameter == JRB_MOVTEX_INITIAL_MIST) {
             if (Camera.gLakituState.goalPos[1] < 1024.0) { // if camera under water
@@ -440,8 +440,8 @@ export const geo_movtex_draw_water_regions = (callContext, node) => {
         gMovetexLastTextureId = -1
 
         for (let i = 0; i < numWaterBoxes; i++) {
-            let waterId = ObjectListProc.gEnvironmentRegions[i * 6 + 1]
-            let waterY = ObjectListProc.gEnvironmentRegions[i * 6 + 6]
+            let waterId = gLinker.ObjectListProcessor.gEnvironmentRegions[i * 6 + 1]
+            let waterY = gLinker.ObjectListProcessor.gEnvironmentRegions[i * 6 + 6]
             let subList = movtex_gen_quads_id(waterId, waterY, quadCollection)
             if (subList) Gbi.gSPDisplayList(gfx, subList)
         }

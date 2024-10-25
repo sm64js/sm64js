@@ -1131,10 +1131,8 @@ export const display_painting = (painting) => {
     switch (painting.rippleStatus) {
         case PAINTING_IDLE:
             return display_painting_not_rippling(painting)
-            break
         default:
             return display_painting_rippling(painting)
-            break
     }
 }
 

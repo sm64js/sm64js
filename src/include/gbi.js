@@ -1114,14 +1114,13 @@ export const gsSPTexture = (s, t, level, tile, on) => {
   }
 }
 
-export const gSPPopMatrix = (pkt, n) => {
-    pkt = pkt.pop()
-    return {
+export const gSPPopMatrix = (displayList, n) => {
+    displayList.push({
         words: {
             w0: G_POPMTX,
-            w1: { pkt, n }
+            w1: { n }
         }
-    }
+    })
 }
 
 export const gsDPSetTileSize = (t, uls, ult, lrs, lrt) => {

@@ -127,6 +127,7 @@ class ObjectListProcessor {
         this.gTimeStopState = 0
         this.gMarioObject = null
         this.gEnvironmentLevels = new Array(20)
+        this.gEnvironmentRegions = []
         this.gDoorAdjacentRooms = new Array(60).fill(0).map(() => new Array(2).fill(0))
         this.gMarioCurrentRoom = 0
 

@@ -1,6 +1,7 @@
 import { MODEL_CAP_SWITCH_BASE, MODEL_CARTOON_STAR } from "../../include/model_ids";
 import { DIALOG_FLAG_TEXT_RESPONSE, DIALOG_FLAG_UNK_CAPSWITCH, oAction, oAnimState, oBehParams2ndByte, oPosY, oTimer } from "../../include/object_constants";
 import { LEVEL_UNKNOWN_32 } from "../../levels/level_defines_constants";
+import { DIALOG_000 } from "../../text/us/dialogs";
 import { AreaInstance as Area } from "../Area";
 import { CUTSCENE_CAP_SWITCH_PRESS } from "../Camera";
 import { MARIO_DIALOG_LOOK_FRONT } from "../MarioActionsCutscene";
@@ -51,7 +52,7 @@ const cap_switch_act_2 = () => {
             spawn_triangle_break_particles(60, MODEL_CARTOON_STAR, 0.3, o.rawData[oBehParams2ndByte]);
         }
     } else {
-        let dialogResponse = cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_FRONT, DIALOG_FLAG_TEXT_RESPONSE | DIALOG_FLAG_UNK_CAPSWITCH, CUTSCENE_CAP_SWITCH_PRESS, 0);
+        let dialogResponse = cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_FRONT, DIALOG_FLAG_TEXT_RESPONSE | DIALOG_FLAG_UNK_CAPSWITCH, CUTSCENE_CAP_SWITCH_PRESS, DIALOG_000);
         if (dialogResponse) o.rawData[oAction] = 3;
     }
 }

@@ -160,7 +160,8 @@ import {
 } from "./Interaction"
 
 import {
-    DIALOG_021, DIALOG_038
+    DIALOG_021, DIALOG_038,
+    seg2_dialog_table
  } from "../text/us/dialogs"
 
 import {
@@ -383,12 +384,12 @@ export const geo_switch_peach_eyes = (run, node, a2) => {
     return false
 }
 
-// // unused
-// const stub_is_textbox_active = (a0) => {
-//     if (get_dialog_id() == -1) {
-//         *a0 = 0
-//     }
-// }
+// unused
+const stub_is_textbox_active = (a0Wrapper) => {
+    if (get_dialog_id() == -1) {
+        a0Wrapper.a0 = 0
+    }
+}
 
 /**
  * get_star_collection_dialog: Determine what dialog should show when Mario
@@ -687,7 +688,7 @@ export const act_reading_sign = (m) => {
             m.pos[2] += marioObj.rawData[oMarioReadingSignDPosZ] / 11.0
             // create the text box
             if (m.actionTimer++ == 10) {
-                IngameMenu.create_dialog_inverted_box(m.usedObj.rawData[oBehParams2ndByte])
+                IngameMenu.create_dialog_inverted_box(seg2_dialog_table[m.usedObj.rawData[oBehParams2ndByte]])
                 m.actionState = 2
             }
             break

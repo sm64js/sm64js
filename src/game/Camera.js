@@ -7137,7 +7137,7 @@ class Camera {
                 if (dialogID != DIALOG_NONE) {
                     this.sCutsceneDialogID = dialogID
                 } else {
-                    this.sCutsceneDialogID = DIALOG_001.id
+                    this.sCutsceneDialogID = DIALOG_001
                 }
             } else {
                 response = this.sCutsceneDialogResponse
@@ -7429,15 +7429,6 @@ class Camera {
             curMode = CAM_ANGLE_MARIO
         }
         return curMode
-    }
-
-    trigger_cutscene_dialog(trigger) {
-        let result = 0
-
-        if (trigger == 1) {
-            this.start_object_cutscene_without_focus(CUTSCENE_READ_MESSAGE)
-        }
-        return result
     }
     
     
@@ -7741,7 +7732,7 @@ class Camera {
         switch (this.sCutsceneVars[0].angle[0]) {
             // Do nothing until message is gone.
             case 0:
-                if (IngameMenu.get_dialog_id() != DIALOG_NONE) {
+                if (IngameMenu.get_dialog_id() != DIALOG_NONE.id) {
                     this.sCutsceneVars[0].angle[0]++
                     set_time_stop_flags(TIME_STOP_ENABLED | TIME_STOP_DIALOG)
                 }
@@ -7753,7 +7744,7 @@ class Camera {
 
                 // This could cause softlocks. If a message starts one frame after another one closes, the
                 // cutscene will never end.
-                if (IngameMenu.get_dialog_id() == DIALOG_NONE) {
+                if (IngameMenu.get_dialog_id() == DIALOG_NONE.id) {
                     this.gCutsceneTimer = CUTSCENE_LOOP
                     this.retrieve_info_star(c)
                     this.transition_next_state(c, 15)
@@ -7961,7 +7952,7 @@ class Camera {
 
         if (IngameMenu.gDialogResponse != DIALOG_RESPONSE_NONE) this.sCutsceneVars[4].angle[0] = IngameMenu.gDialogResponse
 
-        if (IngameMenu.get_dialog_id() == DIALOG_NONE && this.sCutsceneVars[4].angle[0] != 0) {
+        if (IngameMenu.get_dialog_id() == DIALOG_NONE.id && this.sCutsceneVars[4].angle[0] != 0) {
             this.sCutsceneDialogResponse = this.sCutsceneVars[4].angle[0]
             if (this.sCutsceneVars[4].angle[0] == 1) this.cap_switch_save(this.gCutsceneFocus.rawData[oBehParams2ndByte])
             this.stop_cutscene_and_retrieve_stored_info(c)
@@ -8081,7 +8072,7 @@ class Camera {
      * Loop the cutscene until Mario exits the dialog.
      */ 
     cutscene_intro_peach_dialog(c) {
-        if (IngameMenu.get_dialog_id() == DIALOG_NONE) {
+        if (IngameMenu.get_dialog_id() == DIALOG_NONE.id) {
             vec3f_copy(this.gLakituState.goalPos, c.pos)
             vec3f_copy(this.gLakituState.goalFocus, c.focus);
             this.sStatusFlags |= (CAM_FLAG_SMOOTH_MOVEMENT | CAM_FLAG_UNUSED_CUTSCENE_ACTIVE)
@@ -8192,7 +8183,7 @@ class Camera {
         this.cutscene_event(this.peach_letter_text, c, 65, 65)
         this.cutscene_event(this.play_sound_peach_reading_letter, c, 83, 83)
 
-        if (this.gCutsceneTimer > 120 /* && IngameMenu.get_dialog_id() == DIALOG_NONE */) this.gCutsceneTimer = CUTSCENE_LOOP
+        if (this.gCutsceneTimer > 120 && IngameMenu.get_dialog_id() == DIALOG_NONE.id) this.gCutsceneTimer = CUTSCENE_LOOP
 
         this.clamp_pitch(c.pos, c.focus, 0x3B00, -0x3B00)
     }

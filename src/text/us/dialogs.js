@@ -4,7 +4,7 @@ const DEFINE_DIALOG = (id, unused, linesPerBox, leftOffset, width, str) => {
     return {id: id, str: str, linesPerBox: linesPerBox, leftOffset: leftOffset, width: width}
 }
 
-export const DIALOG_NONE = -1
+export const DIALOG_NONE = DEFINE_DIALOG(-1, 1, 0, 0, 0, 0);
 
 export const DIALOG_000 = DEFINE_DIALOG(0, 1, 6, 30, 200,
 [

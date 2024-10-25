@@ -193,7 +193,7 @@ export class n64GfxProcessor {
             }
         } else { // G_MTX_MODELVIEW
             if ((parameters & Gbi.G_MTX_PUSH) && this.rsp.modelview_matrix_stack_size < 11) {
-                this.rsp.modelview_matrix_stack_size++
+                ++this.rsp.modelview_matrix_stack_size
                 this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1] = this.cloneMatrix4x4(this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 2])
             }
             if (parameters & Gbi.G_MTX_LOAD) {

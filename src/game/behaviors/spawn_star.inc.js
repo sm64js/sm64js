@@ -37,12 +37,12 @@ const bhv_collect_star_init = () => {
     let currentLevelStarFlags
 
     starId = (o.rawData[oBehParams] >> 24) & 0xFF
-    currentLevelStarFlags = save_file_get_star_flags(Area.gCurrSaveFileNum - 1, Area.gCurrCourseNum - 1)
-    /*if (currentLevelStarFlags & (1 << starId)) {
+    currentLevelStarFlags = save_file_get_star_flags(gLinker.Area.gCurrSaveFileNum - 1, gLinker.gCurrCourseNum - 1)
+    if (currentLevelStarFlags & (1 << starId)) {
         o.gfx.sharedChild = Area.gLoadedGraphNodes[MODEL_TRANSPARENT_STAR]
     } else {
         o.gfx.sharedChild = Area.gLoadedGraphNodes[MODEL_STAR]
-    }*/
+    }
 
     obj_set_hitbox(o, sCollectStarHitbox)
 }

@@ -221,10 +221,11 @@ class IngameMenu {
 
     create_dl_identity_matrix() {
         const matrix = [
-            [0x00010000, 0x00000000, 0x00000000, 0x00000000],
-            [0x00000000, 0x00010000, 0x00000000, 0x00000000],
-            [0x00000001, 0x00000000, 0x00000000, 0x00000000],
-            [0x00000000, 0x00000001, 0x00000000, 0x00000000]]
+            [0x00010000, 0x00000000, 0x00000001, 0x00000000],
+            [0x00000000, 0x00010000, 0x00000000, 0x00000001],
+            [0x00000000, 0x00000000, 0x00000000, 0x00000000],
+            [0x00000000, 0x00000000, 0x00000000, 0x00000000]
+        ]
 
         Gbi.gSPMatrix(Game.gDisplayList, matrix, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
         Gbi.gSPMatrix(Game.gDisplayList, matrix, Gbi.G_MTX_PROJECTION | Gbi.G_MTX_LOAD | Gbi.G_MTX_NOPUSH)
@@ -244,7 +245,7 @@ class IngameMenu {
 
     create_dl_rotation_matrix(pushOp, a, x, y, z) {
         const matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
-        MathUtil.guTranslate(matrix, a, x, y, z)
+        MathUtil.guRotate(matrix, a, x, y, z)
 
         if (pushOp == MENU_MTX_PUSH) {
             Gbi.gSPMatrix(Game.gDisplayList, matrix, Gbi.G_MTX_MODELVIEW | Gbi.G_MTX_MUL | Gbi.G_MTX_PUSH)
@@ -266,7 +267,7 @@ class IngameMenu {
     }
 
     create_dl_ortho_matrix() {
-        const matrix = new Array(4).fill([0, 0, 0, 0])
+        const matrix = new Array(4).fill(0).map(() => new Array(4).fill(0))
         this.create_dl_identity_matrix()
 
         MathUtil.guOrtho(matrix, 0.0, SCREEN_WIDTH, 0.0, SCREEN_HEIGHT, -10.0, 10.0, 1.0)
@@ -592,7 +593,7 @@ class IngameMenu {
     }
 
     get_dialog_id() {
-        return this.gDialogID
+        return this.gDialogID.id
     }
 
     create_dialog_box(dialog) {
@@ -932,9 +933,7 @@ class IngameMenu {
         let lowerBound;
 
         let dialogTable = seg2_dialog_table;
-        let dialog = dialogTable[this.gDialogID];
-
-        console.log(this.gMenuState)
+        let dialog = dialogTable[this.gDialogID.id];
 
         switch (this.gMenuState) {
             case MENU_STATE_DIALOG_OPENING:
@@ -1015,12 +1014,12 @@ class IngameMenu {
 
         this.render_dialog_box_type(dialog, dialog.linesPerBox);
 
-        // Gbi.gDPSetScissor(Game.gDisplayList, this.ensure_nonnegative(dialog.leftOffset), this.ensure_nonnegative(240 - dialog.width), this.ensure_nonnegative(dialog.leftOffset + 132), this.ensure_nonnegative(240 - dialog.width + dialog.linesPerBox * 16));
+        Gbi.gDPSetScissor(Game.gDisplayList, this.ensure_nonnegative(dialog.leftOffset), this.ensure_nonnegative(240 - dialog.width), this.ensure_nonnegative(dialog.leftOffset + 132), this.ensure_nonnegative(240 - dialog.width + dialog.linesPerBox * 16));
         this.handle_dialog_text_and_pages(0, dialog, lowerBound);
 
         if (this.gNextDialogPageStartStrIndex == -1 && this.gDialogWithChoice == true) this.render_dialog_triangle_choice();
 
-        // Gbi.gDPSetScissor(Game.gDisplayList, 2, 2, SCREEN_WIDTH, SCREEN_HEIGHT, 238);
+        Gbi.gDPSetScissor(Game.gDisplayList, 2, 2, SCREEN_WIDTH, SCREEN_HEIGHT, 238);
 
         if (this.gNextDialogPageStartStrIndex != -1 && this.gMenuState == MENU_STATE_DIALOG_OPEN) this.render_dialog_triangle_next(dialog.linesPerBox);
     }
@@ -1699,187 +1698,6 @@ class IngameMenu {
                     this.gCourseCompleteCoins = 0;
                     this.gCourseCompleteCoinsEqual = false;
                     this.gHudFlash = 0;
-                    return index;
-                }
-                break;
-        }
-
-        if (this.gMenuTextAlpha < 250) {
-            this.gMenuTextAlpha += 25;
-        }
-
-        this.gCourseCompleteScreenTimer++;
-        
-        return MENU_OPT_NONE;
-    }
-
-    render_menus_and_dialogs() {
-        let index = MENU_OPT_NONE;
-
-        this.create_dl_ortho_matrix();
-
-        if (this.gMenuMode != MENU_MODE_NONE) {
-            switch (this.gMenuMode) {
-                case MENU_MODE_RENDER_PAUSE_SCREEN:
-                    index = this.render_pause_screen();
-                    break;
-
-                case MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN:
-                    index = this.render_course_complete_screen();
-                    break;
-            }
-
-            this.gMenuTextColorTransTimer = this.gMenuTextColorTransTimer + 0x1000;
-        } else if (this.gDialogID != DIALOG_NONE) {
-            if (this.gDialogID == DIALOG_020.id) {
-                this.print_peach_letter_message();
-                return index;
-            }
-
-            this.render_dialog_entries();
-            this.gMenuTextColorTransTimer = this.gMenuTextColorTransTimer + 0x1000;
-        }
-
-        return index;
-    }
-
-    play_star_fanfare_and_flash_hud(arg, starFlag) {
-        const gHudDisplay = gLinker.LevelUpdate.gHudDisplay
-
-        if (this.gCourseCompleteCoins == gHudDisplay.coins && !(gCurrCourseStarFlags & starFlag) && this.gHudFlash == 0) {
-            // play_star_fanfare();
-            this.gHudFlash = arg;
-        }
-    }
-
-    render_course_complete_lvl_info_and_hud_str() {
-        let textSymStar = Print.GLYPH_STAR + Print.GLYPH_SPACE;
-
-        let actNameTbl = seg2_act_name_table;
-        let courseNameTbl = seg2_course_name_table;
-        let name;
-
-        if (gLastCompletedCourseNum <= COURSE_STAGES_MAX) { // Main courses
-            // this.print_hud_course_complete_coins(118, 103);
-            this.play_star_fanfare_and_flash_hud(1, 1 << (gLastCompletedStarNum - 1));
-
-            if (gLastCompletedStarNum == 7)
-                name = actNameTbl[COURSE_STAGES_MAX * 6 + 1];
-            else
-                name = actNameTbl[COURSE_NUM_TO_INDEX(gLastCompletedCourseNum) * 6 + gLastCompletedStarNum - 1];
-
-            // Print course num
-            Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin);
-
-            const wrapper = {}
-            this.int_to_str(gLastCompletedCourseNum, wrapper)
-
-            Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
-            this.print_generic_string(65, 165, TEXT_COURSE);
-            this.print_generic_string(104, 165, wrapper.dst);
-
-            Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
-            this.print_generic_string(63, 167, TEXT_COURSE);
-            this.print_generic_string(102, 167, wrapper.dst);
-
-            Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
-        } else if (gLastCompletedCourseNum == COURSE_BITDW || gLastCompletedCourseNum == COURSE_BITFS) { // Bowser courses
-            name = courseNameTbl[COURSE_NUM_TO_INDEX(gLastCompletedCourseNum)];
-
-            // Print course name
-            Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin);
-            Gbi.gDPSetEnvColor(Game.gDisplayList, 0, 0, 0, this.gMenuTextAlpha);
-
-            this.print_generic_string(71, 130, name)
-            this.print_generic_string(this.get_string_width(name) + 81, 130, TEXT_CLEAR);
-
-            Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
-            this.print_generic_string(69, 132, name);
-            this.print_generic_string(this.get_string_width(name) + 79, 132, TEXT_CLEAR);
-
-            Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
-
-            // this.print_hud_course_complete_string(HUD_PRINT_CONGRATULATIONS);
-            // this.print_hud_course_complete_coins(118, 111);
-            // this.play_star_fanfare_and_flash_hud(2, 0);
-
-            return;
-        } else {
-            name = actNameTbl[COURSE_STAGES_MAX * 6];
-
-            // this.print_hud_course_complete_coins(118, 103);
-            // this.play_star_fanfare_and_flash_hud(1, 1 << (gLastCompletedStarNum - 1));
-        }
-
-        // Print star glyph
-        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_begin);
-        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
-        // this.print_hud_lut_string(55, 77, textSymStar);
-        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_end);
-
-        // Print act name
-        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin);
-        Gbi.gDPSetEnvColor(Game.gDisplayList, 0, 0, 0, this.gMenuTextAlpha);
-        this.print_generic_string(76, 145, name);
-
-        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
-        this.print_generic_string(74, 147, name);
-        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
-    }
-
-    render_save_confirmation(x, y, indexWrapper, yOffset) {
-        this.handle_menu_scrolling(MENU_SCROLL_VERTICAL, indexWrapper, 1, 3);
-
-        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin);
-        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
-
-        this.print_generic_string(x + 12, y, TEXT_SAVE_AND_CONTINUE)
-        this.print_generic_string(x + 12, y - 20, TEXT_SAVE_AND_QUIT)
-        this.print_generic_string(x + 12, y - 40, TEXT_CONTINUE_WITHOUT_SAVING)
-
-        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
-
-        this.create_dl_translation_matrix(MENU_MTX_PUSH, x, y - ((indexWrapper.index - 1) * yOffset), 0);
-
-        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
-        Gbi.gSPDisplayList(Game.gDisplayList, dl_draw_triangle);
-
-        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
-    }
-
-    render_course_complete_screen() {
-        let index;
-
-        switch (this.gMenuState) {
-            case MENU_STATE_COURSE_COMPLETE_SCREEN_OPENING:
-                this.render_course_complete_lvl_info_and_hud_str();
-
-                if (this.gCourseCompleteScreenTimer > 100 && this.gCourseCompleteCoinsEqual == true) {
-                    this.gMenuState = MENU_STATE_COURSE_COMPLETE_SCREEN_OPEN;
-                    gLinker.LevelUpdate.level_set_transition(-1, null);
-                    this.gMenuTextAlpha = 0;
-                    this.gMenuLineNum = MENU_OPT_DEFAULT;
-                }
-                break;
-
-            case MENU_STATE_COURSE_COMPLETE_SCREEN_OPEN:
-                this.shade_screen();
-                this.render_course_complete_lvl_info_and_hud_str();
-                
-                const wrapper = {index: this.gMenuLineNum};
-                this.render_save_confirmation(100, 86, wrapper, 20);
-                this.gMenuLineNum = wrapper.index;
-
-                if (this.gCourseCompleteScreenTimer > 110 && (window.playerInput.buttonPressedA || window.playerInput.buttonPressedStart)) {
-                    gLinker.LevelUpdate.level_set_transition(0, null);
-                    play_sound(SOUND_MENU_STAR_SOUND, Game.gGlobalSoundSource);
-                    this.gMenuState = MENU_STATE_DEFAULT;
-                    this.gMenuMode = MENU_MODE_NONE;
-                    index = this.gMenuLineNum;
-                    this.gCourseCompleteScreenTimer = 0;
-                    this.gCourseCompleteCoins = 0;
-                    this.gCourseCompleteCoinsEqual = false;
-                    gHudFlash = 0;
                     return index;
                 }
                 break;

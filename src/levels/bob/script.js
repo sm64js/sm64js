@@ -1,6 +1,6 @@
 import { AREA, CALL, CALL_LOOP, CLEAR_LEVEL, END_AREA, EXIT, INIT_LEVEL, JUMP_LINK,
          LOAD_MODEL_FROM_GEO, MACRO_OBJECTS, MARIO, MARIO_POS, OBJECT, OBJECT_WITH_ACTS,
-         RETURN, SLEEP_BEFORE_EXIT, TERRAIN, TERRAIN_TYPE, WARP_NODE, WARP_NO_CHECKPOINT
+         RETURN, SHOW_DIALOG, SLEEP_BEFORE_EXIT, TERRAIN, TERRAIN_TYPE, WARP_NODE, WARP_NO_CHECKPOINT
 } from "../../engine/LevelCommands"
 
 import { script_func_global_1, script_func_global_4, script_func_global_15 } from "../global_scripts"
@@ -96,7 +96,7 @@ export const level_bob_entry = [
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x64, /*flags*/ WARP_NO_CHECKPOINT),
         TERRAIN(/*terrainData*/ bob_seg7_collision_level),
         MACRO_OBJECTS(/*objList*/ bob_seg7_macro_objs),
-        // SHOW_DIALOG(/*index*/ 0x00, DIALOG_000),
+        SHOW_DIALOG(/*index*/ 0x00, DIALOG_000),
         // SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0000, /*seq*/ SEQ_LEVEL_GRASS),
         TERRAIN_TYPE(/*terrainType*/ TERRAIN_GRASS),
     END_AREA(),

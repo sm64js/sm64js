@@ -2545,7 +2545,7 @@ export const cur_obj_update_dialog = (actionArg, dialogFlags, dialogID) => {
                 if (IngameMenu.gDialogResponse != DIALOG_RESPONSE_NONE)
                     cur_obj_end_dialog(dialogFlags, IngameMenu.gDialogResponse);
             } else if (dialogFlags & DIALOG_FLAG_TEXT_DEFAULT) {
-                if (IngameMenu.get_dialog_id() == DIALOG_NONE)
+                if (IngameMenu.get_dialog_id() == DIALOG_NONE.id)
                     cur_obj_end_dialog(dialogFlags, DIALOG_RESPONSE_NOT_DEFINED);
             } else cur_obj_end_dialog(dialogFlags, DIALOG_RESPONSE_NOT_DEFINED);
             break;

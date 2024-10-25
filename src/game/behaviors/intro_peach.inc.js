@@ -44,7 +44,7 @@ export const bhv_intro_peach_loop = () => {
             break
         case 2:
             intro_peach_set_pos_and_opacity(o, 255.0, 3.0)
-            if (o.rawData[oTimer] > 100 && IngameMenu.get_dialog_id() == DIALOG_NONE) o.rawData[oAction]++
+            if (o.rawData[oTimer] > 100 && IngameMenu.get_dialog_id() == DIALOG_NONE.id) o.rawData[oAction]++
             break
         case 3:
             intro_peach_set_pos_and_opacity(o, 0.0, 8.0)

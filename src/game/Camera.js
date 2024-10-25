@@ -1369,7 +1369,7 @@ class Camera {
 
         this.cutsceneShots = [
             [ CUTSCENE_STAR_SPAWN, this.sCutsceneStarSpawn ],
-            [ CUTSCENE_RED_COIN_STAR_SPAWN, this.sCutsceneRedCoinStarSpawn ],
+            // [ CUTSCENE_RED_COIN_STAR_SPAWN, this.sCutsceneRedCoinStarSpawn ],
             // [ CUTSCENE_ENDING, this.sCutsceneEnding ],
             // [ CUTSCENE_GRAND_STAR, this.sCutsceneGrandStar ],
             [ CUTSCENE_DOOR_WARP, this.sCutsceneDoorWarp ],
@@ -7703,7 +7703,6 @@ class Camera {
         this.cutscene_event(this.cutscene_dialog_move_mario_shoulder, c, 0, -1)
         this.cutscene_event(this.cutscene_dialog_create_dialog_box, c, 10, 10)
     }
-
     /**
      * Sets the CAM_FLAG_UNUSED_CUTSCENE_ACTIVE flag, which does nothing.
      */
@@ -7936,7 +7935,7 @@ class Camera {
      * Create a dialog box with the cap switch's text.
      */
     cutscene_cap_switch_press_create_dialog(c) {
-        create_dialog_box_with_response(this.gCutsceneFocus.rawData[oBehParams2ndByte] + DIALOG_010.id)
+        create_dialog_box_with_response(this.gCutsceneFocus.rawData[oBehParams2ndByte] + DIALOG_010)
     }
 
     /**
@@ -8064,7 +8063,7 @@ class Camera {
     }
 
     peach_letter_text(c) {
-        IngameMenu.create_dialog_box(DIALOG_020.id);
+        IngameMenu.create_dialog_box(DIALOG_020);
     }
 
     play_sound_peach_reading_letter(c) {
@@ -8125,7 +8124,7 @@ class Camera {
      */
     cutscene_intro_peach_handheld_shake_off(c) { this.set_handheld_shake(HAND_CAM_SHAKE_OFF); }
 
-    intro_pipe_exit_text(c) { create_dialog_box(DIALOG_033.id); }
+    intro_pipe_exit_text(c) { create_dialog_box(DIALOG_033); }
 
     play_sound_intro_turn_on_hud(c) { this.play_sound_rbutton_changed(); }
 

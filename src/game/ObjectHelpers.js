@@ -317,7 +317,6 @@ export const lateral_dist_between_objects = (obj1, obj2) => {
     const dz = obj1.rawData[oPosZ] - obj2.rawData[oPosZ]
     return Math.sqrt(dx * dx + dz * dz)
 }
-
 export const dist_between_objects = (obj1, obj2) => {
     const dx = obj1.rawData[oPosX] - obj2.rawData[oPosX]
     const dy = obj1.rawData[oPosY] - obj2.rawData[oPosY]
@@ -376,8 +375,6 @@ export const approach_s16_symmetric = (value, target, increment) =>{
         if (dist < -increment) value = s16(value - increment)
         else value = target
     }
-
-    return value
 }
 
 export const approach_symmetric = (value, target, increment) => {
@@ -444,7 +441,7 @@ export const obj_turn_toward_object = (obj, target, angleIndex, turnAmount) => {
             c = target.rawData[oPosZ]
             b = obj.rawData[oPosX]
             d = target.rawData[oPosX]
-
+        
             targetAngle = atan2s(c - a, d - b)
             break
     }
@@ -1622,7 +1619,7 @@ export const cur_obj_spawn_loot_coin_at_mario_pos = () => {
 
     coin = spawn_object(o, MODEL_YELLOW_COIN, gLinker.behaviors.bhvSingleCoinGetsSpawned);
     coin.rawData[oVelY] = 30.0;
-
+  
     obj_copy_pos(coin, gLinker.ObjectListProcessor.gMarioObject);
 }
 
@@ -2218,7 +2215,7 @@ export const cur_obj_progress_action_table = () => {
         nextAction = actionTable[0];
         o.rawData[oToxBoxActionStep] = 0;
     }
-
+  
     return nextAction;
 }
 

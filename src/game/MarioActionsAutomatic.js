@@ -22,7 +22,11 @@ import { SOUND_ACTION_TERRAIN_LANDING,
          SOUND_ACTION_FLYING_FAST,
          SOUND_OBJ_POUNDING_CANNON,
          SOUND_MOVING_AIM_CANNON, 
-         SOUND_MARIO_WHOA} from "../include/sounds"
+         SOUND_MARIO_WHOA,
+         SOUND_ACTION_CLIMB_UP_TREE,
+         SOUND_MOVING_SLIDE_DOWN_TREE,
+         SOUND_MOVING_SLIDE_DOWN_POLE,
+         SOUND_ACTION_CLIMB_UP_POLE} from "../include/sounds"
 import { play_sound } from "../audio/external"
 import { GRAPH_RENDER_ACTIVE           } from "../engine/graph_node"
 import { INT_STATUS_INTERACTED, INT_STATUS_MARIO_UNK2, INT_STATUS_MARIO_UNK6         } from "./Interaction"
@@ -59,7 +63,7 @@ export const play_climbing_sounds = (m, b) => {
             play_sound(isOnTree ? SOUND_ACTION_CLIMB_UP_TREE : SOUND_ACTION_CLIMB_UP_POLE, m.marioObj.gfx.cameraToObject)
         }
     } else {
-        play_sound(isOnTree ? SOUND_ACTION_CLIMB_DOWN_TREE : SOUND_ACTION_CLIMB_DOWN_POLE, m.marioObj.gfx.cameraToObject)
+        play_sound(isOnTree ? SOUND_MOVING_SLIDE_DOWN_TREE : SOUND_MOVING_SLIDE_DOWN_POLE, m.marioObj.gfx.cameraToObject)
     }
 }
 

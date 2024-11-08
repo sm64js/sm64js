@@ -510,3 +510,7 @@ export const check_warp_checkpoint = (warpNode) => {
 
     return warpCheckpointActive
 }
+
+export const set_curr_course_star_flags = () => {
+    gCurrCourseStarFlags = save_file_get_star_flags(Area.gCurrSaveFileNum - 1, Area.gCurrCourseNum - 1);
+}

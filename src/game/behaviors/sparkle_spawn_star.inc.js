@@ -35,9 +35,9 @@ const bhv_spawned_star_init = () => {
 
     let starIndex = (o.rawData[oBehParams] >> 24) & 0xFF;
 
-    // if (1 << starIndex & save_file_get_star_flags(Area.gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(Area.gCurrCourseNum))) {
-    //     cur_obj_set_model(MODEL_TRANSPARENT_STAR);
-    // }
+    if (1 << starIndex & save_file_get_star_flags(Area.gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(Area.gCurrCourseNum))) {
+        cur_obj_set_model(MODEL_TRANSPARENT_STAR);
+    }
 
     cur_obj_play_sound_2(SOUND_GENERAL2_STAR_APPEARS);
 }

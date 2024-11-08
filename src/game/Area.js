@@ -352,7 +352,7 @@ class Area {
             gSPViewport(gLinker.Game.gDisplayList, D_8032CF00)
             Hud.render_hud()
             Print.render_text_labels()
-            // do_cutscene_handler();
+            IngameMenu.do_cutscene_handler();
             // print_displaying_credits_entry();
 
             this.gMenuOptSelectIndex = IngameMenu.render_menus_and_dialogs();

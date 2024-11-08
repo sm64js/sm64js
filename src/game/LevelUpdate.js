@@ -4,7 +4,7 @@ import { COURSE_NONE, COURSE_STAGES_MAX } from "../levels/course_defines"
 import * as Mario from "./Mario"
 import { CameraInstance as Camera, CAM_MOVE_PAUSE_SCREEN } from "./Camera"
 import * as CourseTable from "../include/course_table"
-import { check_if_should_set_warp_checkpoint, check_warp_checkpoint, disable_warp_checkpoint, gLevelToCourseNumTable } from "./SaveFile"
+import { check_if_should_set_warp_checkpoint, check_warp_checkpoint, disable_warp_checkpoint, gCurrCourseStarFlags, gLevelToCourseNumTable, save_file_get_star_flags, set_curr_course_star_flags } from "./SaveFile"
 import { s16, sins, coss } from "../utils"
 
 import { fadeout_music, play_painting_eject_sound, raise_background_noise } from "./SoundInit"
@@ -268,7 +268,7 @@ class LevelUpdate {
             && Area.gCurrLevelNum != LEVEL_BOWSER_3) {
             this.gMarioState.numCoins = 0
             this.gHudDisplay.coins = 0
-            // gCurrCourseStarFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1);
+            set_curr_course_star_flags();
         }
 
         if (Area.gSavedCourseNum != Area.gCurrCourseNum) {
@@ -418,11 +418,11 @@ class LevelUpdate {
 // export const stub_level_update_1 = () => {
 // }
 
-// export const load_level_init_text = (arg) => {
-//     let /*s32*/ gotAchievement
-//     let /*u32*/ dialogID = Area.gCurrentArea.dialog[arg]
+    load_level_init_tex(arg) {
+    let /*s32*/ gotAchievement
+    let /*u32*/ dialog = Area.gCurrentArea.dialog[arg]
 
-//     switch (dialogID) {
+    switch (dialog.id) {
 //         case DIALOG_129:
 //             gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_VANISH_CAP
 //             break
@@ -435,20 +435,20 @@ class LevelUpdate {
 //             gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_WING_CAP
 //             break
 
-//         case 255:
-//             gotAchievement = 1
-//             break
+        case 255:
+            gotAchievement = 1
+            break
 
-//         default:
-//             gotAchievement = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1)
-//             break
-//     }
+        default:
+            gotAchievement = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1)
+            break
+    }
 
-//     if (!gotAchievement) {
-//         level_set_transition(-1, null)
-//         create_dialog_box(dialogID)
-//     }
-// }
+    if (!gotAchievement) {
+        level_set_transition(-1, null)
+        create_dialog_box(dialog)
+    }
+}
 
     init_door_warp(spawnInfo, arg1) {
         if (arg1 & 0x00000002) {

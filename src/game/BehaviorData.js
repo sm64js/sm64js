@@ -3206,14 +3206,6 @@ const bhvToadMessage = [
     END_LOOP(),
 ]
 
-const bhvIntroScene = [
-    BEGIN(OBJ_LIST_DEFAULT, 'bhvIntroScene'),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    BEGIN_LOOP(),
-        CALL_NATIVE('bhv_intro_scene_loop'),
-    END_LOOP(),
-];
-
 const bhvBirdsSoundLoop = [
     BEGIN(OBJ_LIST_DEFAULT, 'bhvBirdsSoundLoop'),
     BEGIN_LOOP(),
@@ -3232,6 +3224,14 @@ const bhvAmbientSounds = [
 const bhvWaterfallSoundLoop = [
     BREAK(),
 ]
+
+const bhvIntroScene = [
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvIntroScene'),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_intro_scene_loop'),
+    END_LOOP(),
+];
 
 gLinker.behaviors.bhv1Up = bhv1Up
 gLinker.behaviors.bhvActivatedBackAndForthPlatform = bhvActivatedBackAndForthPlatform

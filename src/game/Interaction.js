@@ -324,7 +324,7 @@ const interact_star_or_key = (m, /*interactType,*/ o) => {
         m.interactObj = o
         m.usedObj = o
 
-        starIndex = (o.oBehParams >> 24) & 0x1F;
+        starIndex = (o.rawData[oBehParams] >> 24) & 0x1F;
         save_file_collect_star_or_key(m.numCoins, starIndex);
 
         m.numStars =

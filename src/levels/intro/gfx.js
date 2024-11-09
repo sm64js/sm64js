@@ -154,7 +154,7 @@ const intro_backdrop_one_image = (index, backgroundTable) => {
         Gbi.gDPLoadTextureBlock(displayList, vIntroBgTable[j], Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 80, 20, 0, Gbi.G_TX_CLAMP, Gbi.G_TX_CLAMP, 7, 6, Gbi.G_TX_NOLOD, Gbi.G_TX_NOLOD)   
         Gbi.gSPDisplayList(displayList, introBackgroundDlRows[j])
     }
-    //Gbi.gSPPopMatrix(displayList, Gbi.G_MTX_MODELVIEW) TODO
+    Gbi.gSPPopMatrix(displayList, Gbi.G_MTX_MODELVIEW)
     Gbi.gSPEndDisplayList(displayList)
     return displayList
 }

@@ -257,8 +257,8 @@ class LevelUpdate {
         let warpCheckpointActive = this.sWarpCheckpointActive
         this.sWarpCheckpointActive = 0
 
-        Area.gCurrLevelNum = levelNum
-        Area.gCurrCourseNum = gLevelToCourseNumTable[levelNum - 1]
+        gLinker.Area.gCurrLevelNum = levelNum
+        gLinker.Area.gCurrCourseNum = gLevelToCourseNumTable[levelNum - 1]
 
         // if (gCurrDemoInput != NULL || gCurrCreditsEntry != NULL || gCurrCourseNum == COURSE_NONE) {
         //     return false;

@@ -35,8 +35,6 @@ const MAX_VERTICES = 64
 const RATIO_X = WebGL.canvas.width / (2.0 * 320.0)
 const RATIO_Y = WebGL.canvas.height / (2.0 * 240.0)
 
-let prev_op = []
-
 export class n64GfxProcessor {
     constructor() {
 
@@ -214,7 +212,6 @@ export class n64GfxProcessor {
             this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1],
             this.rsp.P_matrix,
         )
-
     }
 
     sp_pop_matrix(count) {
@@ -226,6 +223,8 @@ export class n64GfxProcessor {
                         this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1],
                         this.rsp.P_matrix
                     )
+                } else {
+                    this.rsp.modelview_matrix_stack_size++
                 }
             }
         }
@@ -1070,8 +1069,10 @@ export class n64GfxProcessor {
     }
 
     run_dl(commands) {
+        let prev_op = []
         let next_op = []
         try {
+            
             for (const command of commands) {
                 const opcode = command.words.w0
                 const args = command.words.w1
@@ -1193,7 +1194,9 @@ export class n64GfxProcessor {
                 }
             }
         } catch (e) {
-            console.log(`PREV CMD: ${prev_op[0]}, with args ${prev_op[1]} -> ${next_op[0]} : ${next_op[1]}\n${e}`)
+            console.log(`PREV CMD: ${prev_op[0]}, with args ${prev_op[1]} -> ${next_op[0]} :\n\t`)
+            console.dir(next_op[1], {depth: null})
+            console.log(e);
         }
     }
 

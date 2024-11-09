@@ -17,12 +17,12 @@ import * as MathUtil from "../engine/math_util"
 import * as Mario from "./Mario"
 import { oBehParams2ndByte, oHeldState, oHomeX, oHomeY, oHomeZ, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oPosX, oPosY, oPosZ } from "../include/object_constants"
 import { CELL_HEIGHT_LIMIT, FLOOR_LOWER_LIMIT, SURFACE_DEATH_PLANE, SURFACE_IS_PAINTING_WARP, SURFACE_PAINTING_WARP_F9, SURFACE_PAINTING_WOBBLE_A6, SURFACE_WALL_MISC } from "../include/surface_terrains"
-import { sins, s16, int16, coss } from "../utils"
+import { sins, s16, int16, coss, random_float } from "../utils"
 import { HudInstance as Hud } from "./Hud"
 import { CAM_SELECTION_FIXED, CAM_SELECTION_MARIO, DIALOG_RESPONSE_NONE } from "./IngameMenu"
 import { DIALOG_001, DIALOG_010, DIALOG_020, DIALOG_NONE } from "../text/us/dialogs"
 import { gLastCompletedStarNum } from "./SaveFile"
-import { COURSE_CCM, COURSE_JRB, COURSE_MAX, COURSE_NONE, COURSE_WDW } from "../levels/course_defines"
+import { COURSE_CCM, course_dance_cutscenes, COURSE_JRB, COURSE_MAX, COURSE_NONE, COURSE_RR, COURSE_SL, COURSE_TTC, COURSE_TTM, COURSE_WDW } from "../levels/course_defines"
 import { level_defines } from "../levels/level_defines_constants"
 import { set_time_stop_flags, clear_time_stop_flags } from "./ObjectHelpers"
 import { IngameMenuInstance as IngameMenu } from "./IngameMenu"
@@ -1298,6 +1298,14 @@ class Camera {
             { shot: this.cutscene_dance_default_rotate.bind(this), duration: CUTSCENE_LOOP }
         ]
 
+        this.sCutsceneDanceFlyAway = [
+            { shot: this.cutscene_dance_fly_away.bind(this), duration: CUTSCENE_LOOP }
+        ]
+
+        this.sCutsceneDanceCloseup = [
+            { shot: this.cutscene_dance_closeup.bind(this), duration: CUTSCENE_LOOP }
+        ]
+
         this.sCutsceneCapSwitchPress = [
             { shot: this.cutscene_cap_switch_press.bind(this), duration: CUTSCENE_LOOP }
         ]
@@ -1349,7 +1357,7 @@ class Camera {
 
         this.cutsceneShots = {
             173: this.sCutsceneStarSpawn,
-            // [ CUTSCENE_RED_COIN_STAR_SPAWN, this.sCutsceneRedCoinStarSpawn ],
+            176: this.sCutsceneRedCoinStarSpawn,
             // [ CUTSCENE_ENDING, this.sCutsceneEnding ],
             // [ CUTSCENE_GRAND_STAR, this.sCutsceneGrandStar ],
             139: this.sCutsceneDoorWarp,
@@ -1366,8 +1374,8 @@ class Camera {
             // [ CUTSCENE_ENTER_BOWSER_ARENA, this.sCutsceneEnterBowserArena ],
             143: this.sCutsceneDanceDefaultRotate,
             175: this.sCutsceneDanceDefaultRotate,
-            // [ CUTSCENE_DANCE_FLY_AWAY, this.sCutsceneDanceFlyAway ],
-            // [ CUTSCENE_DANCE_CLOSEUP, this.sCutsceneDanceCloseup ],
+            165: this.sCutsceneDanceFlyAway,
+            166: this.sCutsceneDanceCloseup,
             // [ CUTSCENE_KEY_DANCE, this.sCutsceneKeyDance ],
             // [ CUTSCENE_0F_UNUSED, this.sCutsceneUnused ],
             // [ CUTSCENE_END_WAVING, this.sCutsceneEndWaving ],
@@ -1407,9 +1415,13 @@ class Camera {
         this.sHandheldShakeMag = 0
         this.sAvoidYawVel = 0
         this.sHandheldShakeInc = 0.0
-        this.sDanceCutsceneIndexTable = [ 0x44, 0x44, 0x44, 0x04 ]
-        this.sDanceCutsceneTable = [CUTSCENE_DANCE_FLY_AWAY, CUTSCENE_DANCE_ROTATE, CUTSCENE_DANCE_CLOSEUP, CUTSCENE_KEY_DANCE, CUTSCENE_DANCE_DEFAULT,
-                                    false,                   false,                 false,                  false,              true,]
+        this.sDanceCutsceneTable = [
+            CUTSCENE_DANCE_FLY_AWAY,
+            CUTSCENE_DANCE_ROTATE,
+            CUTSCENE_DANCE_CLOSEUP,
+            CUTSCENE_KEY_DANCE,
+            CUTSCENE_DANCE_DEFAULT,
+        ]
     }
 
     /**
@@ -4505,28 +4517,28 @@ class Camera {
                 this.sHandheldShakeInc = 0.04;
                 break;
             case HAND_CAM_SHAKE_LOW: // Lowest magnitude
-                sHandheldShakeMag = 0x300;
-                sHandheldShakeInc = 0.06;
+                this.sHandheldShakeMag = 0x300;
+                this.sHandheldShakeInc = 0.06;
                 break;
             case HAND_CAM_SHAKE_HIGH: // Highest mag and inc
-                sHandheldShakeMag = 0x1000;
-                sHandheldShakeInc = 0.1;
+                this.sHandheldShakeMag = 0x1000;
+                this.sHandheldShakeInc = 0.1;
                 break;
             case HAND_CAM_SHAKE_UNUSED: // Never used
-                sHandheldShakeMag = 0x600;
-                sHandheldShakeInc = 0.07;
+                this.sHandheldShakeMag = 0x600;
+                this.sHandheldShakeInc = 0.07;
                 break;
             case HAND_CAM_SHAKE_HANG_OWL: // exactly the same as UNUSED...
-                sHandheldShakeMag = 0x600;
-                sHandheldShakeInc = 0.07;
+                this.sHandheldShakeMag = 0x600;
+                this.sHandheldShakeInc = 0.07;
                 break;
             case HAND_CAM_SHAKE_STAR_DANCE: // Slightly steadier than HANG_OWL and UNUSED
-                sHandheldShakeMag = 0x400;
-                sHandheldShakeInc = 0.07;
+                this.sHandheldShakeMag = 0x400;
+                this.sHandheldShakeInc = 0.07;
                 break;
             default:
-                sHandheldShakeMag = 0x0;
-                sHandheldShakeInc = 0.0;
+                this.sHandheldShakeMag = 0x0;
+                this.sHandheldShakeInc = 0.0;
         }
     }
 
@@ -4547,20 +4559,25 @@ class Camera {
             vec3f_set(shakeOffset, 0.0, 0.0, 0.0)
         } else {
             for (let i = 0; i < 4; i++) {
-                shakeSpline[i][0] = sHandheldShakeSpline[i].point[0]
-                shakeSpline[i][1] = sHandheldShakeSpline[i].point[1]
-                shakeSpline[i][2] = sHandheldShakeSpline[i].point[2]
+                shakeSpline[i][0] = this.sHandheldShakeSpline[i].point[0]
+                shakeSpline[i][1] = this.sHandheldShakeSpline[i].point[1]
+                shakeSpline[i][2] = this.sHandheldShakeSpline[i].point[2]
             }
-            this.evaluate_cubic_spline(this.sHandheldShakeTime, shakeOffset, shakeSpline[0], shakeSpline[1], shakeSpline[2], shakeSpline[3])
+            this.evaluate_cubic_spline(this.sHandheldShakeTimer, shakeOffset, shakeSpline[0], shakeSpline[1], shakeSpline[2], shakeSpline[3])
             this.sHandheldShakeTimer += this.sHandheldShakeInc
             if (1.0 <= this.sHandheldShakeTimer) {
                 // The first 3 control points are always (0,0,0), so the random spline is always just a
                 // straight line
-                for (let i = 0; i < 4; i++) {
+                for (let i = 0; i < 3; i++) {
                     vec3f_copy(this.sHandheldShakeSpline[i].point, this.sHandheldShakeSpline[i + 1].point)
                 }
                 this.random_vec3s(this.sHandheldShakeSpline[3].point, this.sHandheldShakeMag, this.sHandheldShakeMag, this.sHandheldShakeMag / 2)
                 this.sHandheldShakeTimer -= 1.0
+
+                this.sHandheldShakeInc = random_float() * 0.5;
+                if (this.sHandheldShakeInc < 0.02) {
+                    this.sHandheldShakeInc = 0.02
+                }
             }
         }
 
@@ -5781,28 +5798,18 @@ class Camera {
      * @return the victory cutscene to use
      */
     determine_dance_cutscene(c) {
-        let cutscene = 0
-        let cutsceneIndex = 0
-        let starIndex = Math.floor((gLastCompletedStarNum - 1) / 2)
-        let courseNum = Area.gCurrCourseNum
+        let cutscene = 0;
+        let cutsceneIndex = 0;
+        let starIndex = gLastCompletedStarNum - 1;
+        let courseNum = gLinker.Area.gCurrCourseNum;
 
-        if (starIndex > 3) {
-            starIndex = 0
-        }
         if (courseNum > COURSE_MAX) {
             courseNum = COURSE_NONE
         }
-        cutsceneIndex = this.sDanceCutsceneIndexTable[starIndex]
-
-        if (gLastCompletedStarNum & 1) {
-            // Odd stars take the lower four bytes
-            cutsceneIndex &= 0xF
-        } else {
-            // Even stars use the upper four bytes
-            cutsceneIndex = cutsceneIndex >> 4;
-        }
-        cutscene = this.sDanceCutsceneTable[cutsceneIndex]
-        return cutscene
+        // rewritten to use the course_dance_cutscenes array
+        cutsceneIndex = course_dance_cutscenes[courseNum][starIndex];
+        cutscene = this.sDanceCutsceneTable[cutsceneIndex];
+        return cutscene;
     }
 
     /**
@@ -7379,7 +7386,7 @@ class Camera {
 
     focus_in_front_of_mario(c, dist, speed) {
         let goalFocus = [0.0, 0.0, 0.0];
-        let offset = [0.0, dist, 100.0];
+        let offset = [0.0, 100.0, dist];
         
         this.offset_rotated(goalFocus, this.gPlayerCameraState.pos, offset, this.gPlayerCameraState.faceAngle);
         this.approach_vec3f_asymptotic(c.focus, goalFocus, speed, speed, speed);
@@ -7449,11 +7456,11 @@ class Camera {
             this.cutscene_dance_rotate_move_back = this.cutscene_dance_rotate_move_back.bind(this);
             this.cutscene_dance_rotate_move_towards_mario = this.cutscene_dance_rotate_move_towards_mario.bind(this);
 
-            this.cutscene_event(cutscene_dance_rotate_focus_mario, c, 75, 102);
-            this.cutscene_event(cutscene_dance_rotate, c, 50, -1);
+            this.cutscene_event(this.cutscene_dance_rotate_focus_mario, c, 75, 102);
+            this.cutscene_event(this.cutscene_dance_rotate, c, 50, -1);
             // These two functions move the camera away and then towards Mario.
-            this.cutscene_event(cutscene_dance_rotate_move_back, c, 50, 80);
-            this.cutscene_event(cutscene_dance_rotate_move_towards_mario, c, 70, 90);
+            this.cutscene_event(this.cutscene_dance_rotate_move_back, c, 50, 80);
+            this.cutscene_event(this.cutscene_dance_rotate_move_towards_mario, c, 70, 90);
         } else if (this.gPlayerCameraState.action != Mario.ACT_STAR_DANCE_NO_EXIT
             && this.gPlayerCameraState.action != Mario.ACT_STAR_DANCE_WATER
             && this.gPlayerCameraState.action != Mario.ACT_STAR_DANCE_EXIT) { // secret star, 100 coin star, or bowser red coin star.
@@ -7499,6 +7506,291 @@ class Camera {
 
         vec3f_copy(this.sCutsceneVars[9].point, c.focus);
         this.sCutsceneVars[8].angle[0] = 0x2000;
+    }
+
+    /**
+     * Focus the camera on Mario eye height.
+     */
+    cutscene_dance_closeup_focus_mario(c) {
+        let marioPos = [0, 0, 0];
+
+        vec3f_set(marioPos, this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 125.0, this.gPlayerCameraState.pos[2]);
+        this.approach_vec3f_asymptotic(this.sCutsceneVars[9].point, marioPos, 0.2, 0.2, 0.2);
+        vec3f_copy(c.focus, this.sCutsceneVars[9].point);
+    }
+
+    /**
+     * Fly above Mario, looking down.
+     */
+    cutscene_dance_closeup_fly_above(c) {
+        let rotWrapper = {dist: 0, pitch: 0, yaw: 0};
+        let goalPitch = 0x1800;
+
+        if ((gLastCompletedStarNum == 6 && Area.gCurrCourseNum == COURSE_SL) ||
+            (gLastCompletedStarNum == 4 && Area.gCurrCourseNum == COURSE_TTC)) {
+
+            goalPitch = 0x800;
+        }
+
+        vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, rotWrapper);
+        rotWrapper.current = rotWrapper.dist;
+            this.approach_f32_asymptotic_bool(rotWrapper, 800.0, 0.05);
+        rotWrapper.dist = rotWrapper.current; rotWrapper.current = rotWrapper.pitch;
+            this.approach_s16_asymptotic_bool(rotWrapper, goalPitch, 16);
+        rotWrapper.pitch = rotWrapper.current; rotWrapper.current = rotWrapper.yaw;
+            this.approach_s16_asymptotic_bool(rotWrapper, c.yaw, 8);
+        rotWrapper.yaw = rotWrapper.current;
+        vec3f_set_dist_and_angle(this.gPlayerCameraState.pos, c.pos, rotWrapper.dist, rotWrapper.pitch, rotWrapper.yaw);
+    }
+
+    /**
+     * Fly closer right when Mario gives the peace sign.
+     */
+    cutscene_dance_closeup_fly_closer(c) {
+        let rotWrapper = {dist: 0, pitch: 0, yaw: 0};
+
+        vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, rotWrapper);
+        rotWrapper.current = rotWrapper.dist;
+            this.approach_f32_asymptotic_bool(rotWrapper, 240.0, 0.4);
+        // flipped cause im lazy
+        rotWrapper.dist = rotWrapper.current; rotWrapper.current = rotWrapper.pitch;
+            this.approach_s16_asymptotic_bool(rotWrapper, 0x1000, 5);
+        rotWrapper.pitch = rotWrapper.current; rotWrapper.current = rotWrapper.yaw;
+            this.approach_s16_asymptotic_bool(rotWrapper, c.yaw, 8);
+        rotWrapper.yaw = rotWrapper.current;
+        vec3f_set_dist_and_angle(this.gPlayerCameraState.pos, c.pos, rotWrapper.dist, rotWrapper.pitch, rotWrapper.yaw);
+    }
+
+    /**
+     * Zoom in by increasing fov to 80 degrees. Most dramatic zoom in the game.
+     */
+    cutscene_dance_closeup_zoom(c) {
+        this.set_fov_function(CAM_FOV_APP_80);
+    }
+
+    /**
+     * Shake fov, starts on the first frame Mario has the peace sign up.
+     */
+    cutscene_dance_closeup_shake_fov(c) {
+        this.set_fov_shake(0x300, 0x30, 0x8000);
+    }
+
+    /**
+     * The camera moves in for a closeup on Mario. Used for stars that are underwater or in tight places.
+     */
+    cutscene_dance_closeup(c) {
+        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
+
+        this.cutscene_dance_closeup_start = this.cutscene_dance_closeup_start.bind(this);
+        this.cutscene_dance_closeup_focus_mario = this.cutscene_dance_closeup_focus_mario.bind(this);
+        this.cutscene_dance_closeup_fly_above = this.cutscene_dance_closeup_fly_above.bind(this);
+        this.cutscene_dance_closeup_fly_closer = this.cutscene_dance_closeup_fly_closer.bind(this);
+        this.cutscene_dance_closeup_zoom = this.cutscene_dance_closeup_zoom.bind(this);
+        this.cutscene_dance_closeup_shake_fov = this.cutscene_dance_closeup_shake_fov.bind(this);
+
+        if (this.gPlayerCameraState.action == Mario.ACT_STAR_DANCE_WATER) {
+            this.cutscene_event(this.cutscene_dance_closeup_start, c, 0, 0);
+            this.cutscene_event(this.cutscene_dance_closeup_focus_mario, c, 0, -1);
+            this.cutscene_event(this.cutscene_dance_closeup_fly_above, c, 0, 62);
+            this.cutscene_event(this.cutscene_dance_closeup_fly_closer, c, 63, -1);
+            this.cutscene_event(this.cutscene_dance_closeup_zoom, c, 63, 63);
+            this.cutscene_event(this.cutscene_dance_closeup_shake_fov, c, 70, 70);
+        } else {
+            this.cutscene_event(this.cutscene_dance_closeup_start, c, 0, 0);
+            this.cutscene_event(this.cutscene_dance_closeup_focus_mario, c, 0, -1);
+            // Almost twice as fast as under water
+            this.cutscene_event(this.cutscene_dance_closeup_fly_above, c, 0, 32);
+            this.cutscene_event(this.cutscene_dance_closeup_fly_closer, c, 33, -1);
+            this.cutscene_event(this.cutscene_dance_closeup_zoom, c, 33, 33);
+            this.cutscene_event(this.cutscene_dance_closeup_shake_fov, c, 40, 40);
+        }
+        this.set_handheld_shake(HAND_CAM_SHAKE_CUTSCENE);
+    }
+
+    /**
+     * cvar8.point[2] is the amount to increase distance from Mario
+     */
+    cutscene_dance_fly_away_start(c) {
+        let areaCenter = [0, 0, 0];
+
+        vec3f_copy(this.sCutsceneVars[9].point, c.focus);
+        this.sCutsceneVars[8].point[2] = 65.0;
+
+        if (c.mode == CAMERA_MODE_RADIAL) {
+            vec3f_set(areaCenter, c.areaCenX, c.areaCenY, c.areaCenZ);
+            c.yaw = this.calculate_yaw(areaCenter, c.pos);
+            c.nextYaw = c.yaw;
+        }
+
+        // Restrict the camera yaw in tight spaces
+        if (gLastCompletedStarNum == 6 && Area.gCurrCourseNum == COURSE_CCM) {
+            this.star_dance_bound_yaw(c, 0x5600, 0x800);
+        }
+        if (gLastCompletedStarNum == 2 && Area.gCurrCourseNum == COURSE_TTM) {
+            this.star_dance_bound_yaw(c, 0x0, 0x800);
+        }
+        if (gLastCompletedStarNum == 1 && Area.gCurrCourseNum == COURSE_SL) {
+            this.star_dance_bound_yaw(c, 0x2000, 0x800);
+        }
+        if (gLastCompletedStarNum == 3 && Area.gCurrCourseNum == COURSE_RR) {
+            this.star_dance_bound_yaw(c, 0x0, 0x800);
+        }
+    }
+
+    cutscene_dance_fly_away_approach_mario(c) {
+        let rotWrapper = {dist: 0, pitch: 0, yaw: 0};
+
+        vec3f_get_dist_and_angle(this.gPlayerCameraState.pos, c.pos, rotWrapper);
+        rotWrapper.current = rotWrapper.dist;
+            this.approach_f32_asymptotic_bool(rotWrapper, 600.0, 0.3);
+        rotWrapper.dist = rotWrapper.current; rotWrapper.current = rotWrapper.pitch;
+            this.approach_s16_asymptotic_bool(rotWrapper, 0x1000, 16);
+        rotWrapper.pitch = rotWrapper.current; rotWrapper.current = rotWrapper.yaw;
+            this.approach_s16_asymptotic_bool(rotWrapper, c.yaw, 8);
+        rotWrapper.yaw = rotWrapper.current;
+        vec3f_set_dist_and_angle(this.gPlayerCameraState.pos, c.pos, rotWrapper.dist, rotWrapper.pitch, rotWrapper.yaw);
+    }
+
+    cutscene_dance_fly_away_focus_mario(c) {
+        let marioPos = [0, 0, 0];
+
+        vec3f_set(marioPos, this.gPlayerCameraState.pos[0], this.gPlayerCameraState.pos[1] + 125.0, this.gPlayerCameraState.pos[2]);
+        this.approach_vec3f_asymptotic(this.sCutsceneVars[9].point, marioPos, 0.2, 0.2, 0.2);
+        vec3f_copy(c.focus, this.sCutsceneVars[9].point);
+    }
+
+    /**
+     * Slowly pan the camera downwards and to the camera's right, using cvar9's angle.
+     */
+    cutscene_pan_cvar9(c) {
+        vec3f_copy(c.focus, this.sCutsceneVars[9].point);
+        this.sCutsceneVars[9].angle[0] -= 29;
+        this.sCutsceneVars[9].angle[1] += 29;
+        this.pan_camera(c, this.sCutsceneVars[9].angle[0], this.sCutsceneVars[9].angle[1]);
+    }
+
+    /**
+     * Move backwards and rotate slowly around Mario.
+     */
+    cutscene_dance_fly_rotate_around_mario(c) {
+        this.cutscene_pan_cvar9(c);
+        this.rotate_and_move_vec3f(c.pos, this.gPlayerCameraState.pos, this.sCutsceneVars[8].point[2], 0, 0);
+    }
+
+    /**
+     * Rotate quickly while Lakitu flies up.
+     */
+    cutscene_dance_fly_away_rotate_while_flying(c) {
+        this.rotate_and_move_vec3f(c.pos, this.gPlayerCameraState.pos, 0, 0, 0x80);
+    }
+
+    cutscene_dance_fly_away_shake_fov(c) {
+        this.set_fov_shake(0x400, 0x30, 0x8000);
+    }
+
+    /**
+     * After collecting the star, Lakitu flies upwards out of the course.
+     */
+    cutscene_dance_fly_away(c) {
+        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
+        
+        this.cutscene_dance_fly_away_start = this.cutscene_dance_fly_away_start.bind(this);
+        this.cutscene_dance_fly_away_focus_mario = this.cutscene_dance_fly_away_focus_mario.bind(this);
+        this.cutscene_dance_fly_away_approach_mario = this.cutscene_dance_fly_away_approach_mario.bind(this);
+        this.cutscene_dance_fly_rotate_around_mario = this.cutscene_dance_fly_rotate_around_mario.bind(this);
+        this.cutscene_dance_fly_away_rotate_while_flying = this.cutscene_dance_fly_away_rotate_while_flying.bind(this);
+        this.cutscene_dance_fly_away_shake_fov = this.cutscene_dance_fly_away_shake_fov.bind(this);
+
+        this.cutscene_event(this.cutscene_dance_fly_away_start, c, 0, 0);
+        this.cutscene_event(this.cutscene_dance_fly_away_focus_mario, c, 0, 30);
+        this.cutscene_event(this.cutscene_dance_fly_away_approach_mario, c, 0, 30);
+        this.cutscene_event(this.cutscene_dance_fly_rotate_around_mario, c, 55, 124);
+        this.cutscene_event(this.cutscene_dance_fly_away_rotate_while_flying, c, 55, 124);
+        this.cutscene_event(this.cutscene_dance_fly_away_shake_fov, c, 40, 40);
+
+        this.set_fov_function(CAM_FOV_DEFAULT);
+        this.set_handheld_shake(HAND_CAM_SHAKE_STAR_DANCE);
+    }
+
+    /**
+     * Jump the camera pos and focus to cvar 8 and 7.
+     * Called every frame, starting after 10, so when these cvars are updated, the camera will jump.
+     */
+    cutscene_key_dance_jump_cvar(c) {
+        this.offset_rotated(c.pos, this.gPlayerCameraState.pos, this.sCutsceneVars[8].point, this.gPlayerCameraState.faceAngle);
+        this.offset_rotated(c.focus, this.gPlayerCameraState.pos, this.sCutsceneVars[7].point, this.gPlayerCameraState.faceAngle);
+    }
+
+    /**
+     * Jump to a closeup view of Mario and the key.
+     */
+    cutscene_key_dance_jump_closeup(c) {
+        vec3f_set(this.sCutsceneVars[8].point, 38.0, 171.0, -248.0);
+        vec3f_set(this.sCutsceneVars[7].point, -57.0, 51.0, 187.0);
+    }
+
+    /**
+     * Jump to a view from the lower left (Mario's right).
+     */
+    cutscene_key_dance_jump_lower_left(c) {
+        vec3f_set(this.sCutsceneVars[8].point, -178.0, 62.0, -132.0);
+        vec3f_set(this.sCutsceneVars[7].point, 299.0, 91.0, 58.0);
+    }
+
+    /**
+     * Jump to a rotated view from above.
+     */
+    cutscene_key_dance_jump_above(c) {
+        this.gLakituState.keyDanceRoll = 0x2800;
+        vec3f_set(this.sCutsceneVars[8].point, 89.0, 373.0, -304.0);
+        vec3f_set(this.sCutsceneVars[7].point, 0.0, 127.0, 0.0);
+    }
+
+    /**
+     * `Finally, jump to a further view, slightly to Mario's left.
+     */
+    cutscene_key_dance_jump_last(c) {
+        this.gLakituState.keyDanceRoll = 0;
+        vec3f_set(this.sCutsceneVars[8].point, 135.0, 158.0, -673.0);
+        vec3f_set(this.sCutsceneVars[7].point, -20.0, 135.0, -198.0);
+    }
+
+    cutscene_key_dance_shake_fov(c) {
+        this.set_fov_shake(0x200, 0x30, 0x8000);
+    }
+
+    cutscene_key_dance_handheld_shake(c) {
+        this.set_handheld_shake(HAND_CAM_SHAKE_CUTSCENE);
+    }
+
+    cutscene_key_dance_focus_mario(c) {
+        this.focus_in_front_of_mario(c, 0, 0.2);
+    }
+
+    /**
+     * Cutscene that plays when Mario collects a key from bowser. It's basically a sequence of four jump
+     * cuts.
+     */
+    cutscene_key_dance(c) {
+        this.cutscene_dance_move_to_mario = this.cutscene_dance_move_to_mario.bind(this);
+        this.cutscene_key_dance_focus_mario = this.cutscene_key_dance_focus_mario.bind(this);
+        this.cutscene_key_dance_jump_closeup = this.cutscene_key_dance_jump_closeup.bind(this);
+        this.cutscene_key_dance_jump_lower_left = this.cutscene_key_dance_jump_lower_left.bind(this);
+        this.cutscene_key_dance_jump_above = this.cutscene_key_dance_jump_above.bind(this);
+        this.cutscene_key_dance_jump_last = this.cutscene_key_dance_jump_last.bind(this);
+        this.cutscene_key_dance_jump_cvar = this.cutscene_key_dance_jump_cvar.bind(this);
+        this.cutscene_key_dance_shake_fov = this.cutscene_key_dance_shake_fov.bind(this);
+        this.cutscene_key_dance_handheld_shake = this.cutscene_key_dance_handheld_shake.bind(this);
+
+        this.cutscene_event(this.cutscene_dance_move_to_mario, c, 0, 10);
+        this.cutscene_event(this.cutscene_key_dance_focus_mario, c, 0, 10);
+        this.cutscene_event(this.cutscene_key_dance_jump_closeup, c, 0, 0);
+        this.cutscene_event(this.cutscene_key_dance_jump_lower_left, c, 20, 20);
+        this.cutscene_event(this.cutscene_key_dance_jump_above, c, 35, 35);
+        this.cutscene_event(this.cutscene_key_dance_jump_last, c, 52, 52);
+        this.cutscene_event(this.cutscene_key_dance_jump_cvar, c, 11, -1);
+        this.cutscene_event(this.cutscene_key_dance_shake_fov, c, 54, 54);
+        this.cutscene_event(this.cutscene_key_dance_handheld_shake, c, 52, -1);
     }
 
     // ---------------- //
@@ -9018,13 +9310,13 @@ class Camera {
 
     approach_fov_30(m) {
         const wrapper = {current: this.sFOVState.fov}
-        camera_approach_f32_symmetric_bool(wrapper, 30.0, 1.0);
+        this.camera_approach_f32_symmetric_bool(wrapper, 30.0, 1.0);
         this.sFOVState.fov = wrapper.current
     }
 
     approach_fov_60(m) {
         const wrapper = {current: this.sFOVState.fov}
-        camera_approach_f32_symmetric_bool(wrapper, 60.0, 1.0);
+        this.camera_approach_f32_symmetric_bool(wrapper, 60.0, 1.0);
         this.sFOVState.fov = wrapper.current
     }
 
@@ -9034,7 +9326,7 @@ class Camera {
 
     approach_fov_80(m) {
         const wrapper = {current: this.sFOVState.fov}
-        camera_approach_f32_symmetric_bool(wrapper, 80.0, 3.5);
+        this.camera_approach_f32_symmetric_bool(wrapper, 80.0, 3.5);
         this.sFOVState.fov = wrapper.current
     }
 

@@ -991,7 +991,7 @@ class IngameMenu {
                     gLinker.LevelUpdate.level_set_transition(0, null);
                     play_sound(SOUND_MENU_MESSAGE_DISAPPEAR, Game.gGlobalSoundSource);
 
-                    if (this.gDialogBoxType == DIALOG_TYPE_ZOOM) trigger_cutscene_dialog(2);
+                    if (this.gDialogBoxType == DIALOG_TYPE_ZOOM) Camera.trigger_cutscene_dialog(2);
 
                     this.gDialogResponse = this.gMenuLineNum;
                 }
@@ -1014,12 +1014,12 @@ class IngameMenu {
 
         this.render_dialog_box_type(dialog, dialog.linesPerBox);
 
-        Gbi.gDPSetScissor(Game.gDisplayList, this.ensure_nonnegative(dialog.leftOffset), this.ensure_nonnegative(240 - dialog.width), this.ensure_nonnegative(dialog.leftOffset + 132), this.ensure_nonnegative(240 - dialog.width + dialog.linesPerBox * 16));
+        // Gbi.gDPSetScissor(Game.gDisplayList, this.ensure_nonnegative(dialog.leftOffset), this.ensure_nonnegative(240 - dialog.width), this.ensure_nonnegative(dialog.leftOffset + 132), this.ensure_nonnegative(240 - dialog.width + dialog.linesPerBox * 16));
         this.handle_dialog_text_and_pages(0, dialog, lowerBound);
 
         if (this.gNextDialogPageStartStrIndex == -1 && this.gDialogWithChoice == true) this.render_dialog_triangle_choice();
 
-        Gbi.gDPSetScissor(Game.gDisplayList, 2, 2, SCREEN_WIDTH, SCREEN_HEIGHT, 238);
+        // Gbi.gDPSetScissor(Game.gDisplayList, 2, 2, SCREEN_WIDTH, SCREEN_HEIGHT, 238);
 
         if (this.gNextDialogPageStartStrIndex != -1 && this.gMenuState == MENU_STATE_DIALOG_OPEN) this.render_dialog_triangle_next(dialog.linesPerBox);
     }
@@ -1735,7 +1735,7 @@ class IngameMenu {
                 return index;
             }
 
-            // this.render_dialog_entries();
+            this.render_dialog_entries();
             this.gMenuTextColorTransTimer = this.gMenuTextColorTransTimer + 0x1000;
         }
 

@@ -92,14 +92,14 @@ class Hud {
     }
 
     render_hud_small_tex_lut(x, y, texture) {
-        // Gbi.gDPSetTile(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD);
+        Gbi.gDPSetTile(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 0, 0, Gbi.G_TX_LOADTILE, 0, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD, Gbi.G_TX_WRAP | Gbi.G_TX_NOMIRROR, Gbi.G_TX_NOMASK, Gbi.G_TX_NOLOD);
         // Gbi.gDPTileSync(Game.gDisplayList);
-        // Gbi.gDPSetTile(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 2, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 3, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 3, Gbi.G_TX_NOLOD);
+        Gbi.gDPSetTile(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 2, 0, Gbi.G_TX_RENDERTILE, 0, Gbi.G_TX_CLAMP, 3, Gbi.G_TX_NOLOD, Gbi.G_TX_CLAMP, 3, Gbi.G_TX_NOLOD);
         Gbi.gDPSetTileSize(Game.gDisplayList, Gbi.G_TX_RENDERTILE, 0, 0, (8 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC, (8 - 1) << Gbi.G_TEXTURE_IMAGE_FRAC);
         // Gbi.gDPPipeSync(Game.gDisplayList);
         Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, texture);
         // Gbi.gDPLoadSync(Game.gDisplayList);
-        // Gbi.gDPLoadBlock(Game.gDisplayList, Gbi.G_TX_LOADTILE, 0, 0, 8 * 8 - 1, Gbi.CALC_DXT(8, Gbi.G_IM_SIZ_16b_BYTES));
+        Gbi.gDPLoadBlock(Game.gDisplayList, Gbi.G_TX_LOADTILE, 0, 0, 8 * 8 - 1, Gbi.CALC_DXT(8, Gbi.G_IM_SIZ_16b_BYTES));
         Gbi.gSPTextureRectangle(Game.gDisplayList, x << 2, y << 2, (x + 7) << 2, (y + 7) << 2, Gbi.G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10);
     }
 
@@ -124,7 +124,7 @@ class Hud {
             Gbi.gSPDisplayList(Game.gDisplayList, dl_power_meter_health_segments_end);
         }
 
-        // Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
     }
 
     animate_power_meter_emphasized() {

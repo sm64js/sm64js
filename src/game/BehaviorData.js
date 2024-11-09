@@ -50,6 +50,7 @@ import * as _animated_floor_switch    from "./behaviors/animated_floor_switch.in
 import * as _arrow_lift               from "./behaviors/arrow_lift.inc"
 import * as _bbh_haunted_bookshelf    from "./behaviors/bbh_haunted_bookshelf.inc"
 import * as _bbh_merry_go_round       from "./behaviors/bbh_merry_go_round.inc"
+import * as _bbh_tilting_trap         from "./behaviors/bbh_tilting_trap.inc"
 import * as _bird                     from "./behaviors/bird.inc"
 import * as _bobomb                   from "./behaviors/bobomb.inc"
 import * as _boo                      from "./behaviors/boo.inc"
@@ -203,6 +204,8 @@ import { thwomp_seg5_collision_0500B7D0, thwomp_seg5_collision_0500B92C } from "
 import { hmc_seg7_collision_elevator } from "../levels/hmc/elevator_platform/collision.inc"
 import { rr_seg7_collision_elevator_platform } from "../levels/rr/elevator_platform/collision.inc"
 import { toad_seg6_anims_0600FB58 } from "../actors/toad/anims.inc"
+import { bbh_seg7_collision_tilt_floor_platform } from "../levels/bbh/tilting_trap_platform/collision.inc"
+import { bbh_seg7_collision_mesh_elevator } from "../levels/bbh/mesh_elevator/collision.inc"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -3080,6 +3083,18 @@ export const bhvMadPiano = [
     END_LOOP(),
 ]
 
+export const bhvBbhTiltingTrapPlatform = [
+    BEGIN(OBJ_LIST_SURFACE, 'bhvBbhTiltingTrapPlatform'),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_COLLISION_DATA(bbh_seg7_collision_tilt_floor_platform),
+    SET_HOME(),
+    SET_INT(oRoom, 2),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_bbh_tilting_trap_platform_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
 export const bhvHauntedBookshelf = [
     BEGIN(OBJ_LIST_SURFACE, 'bhvHauntedBookshelf'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -3088,6 +3103,20 @@ export const bhvHauntedBookshelf = [
     SET_INT(oRoom, 6),
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_haunted_bookshelf_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
+export const bhvMeshElevator = [
+    BEGIN(OBJ_LIST_SURFACE, 'bhvMeshElevator'),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(bbh_seg7_collision_mesh_elevator),
+    SET_HOME(),
+    SET_INT(oRoom, 12),
+    SET_INT(oBehParams2ndByte, 4),
+    CALL_NATIVE('bhv_elevator_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_elevator_loop'),
         CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
     END_LOOP(),
 ]
@@ -3206,12 +3235,27 @@ const bhvToadMessage = [
     END_LOOP(),
 ]
 
+const bhvIntroScene = [
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvIntroScene'),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    BEGIN_LOOP(),
+        CALL_NATIVE('MarioMisc.bhv_toad_message_loop'),
+    END_LOOP(),
+];
+
 const bhvBirdsSoundLoop = [
     BEGIN(OBJ_LIST_DEFAULT, 'bhvBirdsSoundLoop'),
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_birds_sound_loop'),
     END_LOOP(),
     BREAK(),
+]
+
+const bhvAmbientSounds = [
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvAmbientSounds'),
+    CALL_NATIVE('bhv_ambient_sounds_init'),
+    BEGIN_LOOP(),
+    END_LOOP(),
 ]
 
 const bhvAmbientSounds = [
@@ -3243,6 +3287,7 @@ gLinker.behaviors.bhvAirborneStarCollectWarp = bhvAirborneStarCollectWarp
 gLinker.behaviors.bhvAirborneWarp = bhvAirborneWarp
 gLinker.behaviors.bhvArrowLift = bhvArrowLift
 gLinker.behaviors.bhvBalconyBigBoo = bhvBalconyBigBoo
+gLinker.behaviors.bhvBbhTiltingTrapPlatform = bhvBbhTiltingTrapPlatform
 gLinker.behaviors.bhvBbhTumblingBridge = bhvBbhTumblingBridge
 gLinker.behaviors.bhvBeginningPeach = bhvBeginningPeach
 gLinker.behaviors.bhvBeginningLakitu = bhvBeginningLakitu
@@ -3376,6 +3421,7 @@ gLinker.behaviors.bhvMerryGoRound = bhvMerryGoRound
 gLinker.behaviors.bhvMerryGoRoundBigBoo = bhvMerryGoRoundBigBoo
 gLinker.behaviors.bhvMerryGoRoundBoo = bhvMerryGoRoundBoo
 gLinker.behaviors.bhvMerryGoRoundBooManager = bhvMerryGoRoundBooManager
+gLinker.behaviors.bhvMeshElevator = bhvMeshElevator
 gLinker.behaviors.bhvMessagePanel = bhvMessagePanel
 gLinker.behaviors.bhvMetalCap = bhvMetalCap
 gLinker.behaviors.bhvMistCircParticleSpawner = bhvMistCircParticleSpawner

@@ -6628,7 +6628,7 @@ class Camera {
 
     cam_bbh_elevator(c) {
         if (c.mode == CAMERA_MODE_FIXED) {
-            let wrapper = c.mode
+            let wrapper = {mode: c.mode}
             this.set_camera_mode_close_cam(wrapper)
             c.mode = wrapper.mode
             c.pos[1] = -405.0

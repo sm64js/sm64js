@@ -32,7 +32,7 @@ const bhv_hidden_star_loop = () => {
 
         case 1:
             if (o.rawData[oTimer] > 2) {
-                // spawn_red_coin_cutscene_star(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
+                spawn_red_coin_cutscene_star(o.rawData[oPosX], o.rawData[oPosY], o.rawData[oPosZ])
                 spawn_mist_particles();
                 o.activeFlags = ACTIVE_FLAG_DEACTIVATED;
             }

@@ -230,6 +230,20 @@ export class n64GfxProcessor {
         }
     }
 
+    sp_pop_matrix(count) {
+        while (count--) {
+            if (this.rsp.modelview_matrix_stack_size > 0) {
+                if (--this.rsp.modelview_matrix_stack_size > 0) {
+                    this.matrix_mul(
+                        this.rsp.MP_matrix,
+                        this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1],
+                        this.rsp.P_matrix
+                    )
+                }
+            }
+        }
+    }
+
     sp_geometry_mode(clear, set) {
         this.rsp.geometry_mode &= ~clear
         this.rsp.geometry_mode |= set

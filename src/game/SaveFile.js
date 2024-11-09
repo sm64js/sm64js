@@ -4,6 +4,7 @@ var msgpack = require("msgpack-lite")
 import { vec3s_set } from "../engine/math_util"
 import {
     COURSE_BBH,
+    COURSE_WF,
     COURSE_CCM,
     COURSE_NONE,
     COURSE_HMC,
@@ -30,7 +31,7 @@ import {
     COURSE_TTM,
     COURSE_COUNT,
 } from "../include/course_table"
-import { COURSE_MIN, COURSE_NUM_TO_INDEX, COURSE_STAGES_COUNT, COURSE_STAGES_MAX, COURSE_WF } from "../levels/course_defines"
+import { COURSE_MIN, COURSE_NUM_TO_INDEX, COURSE_STAGES_COUNT, COURSE_STAGES_MAX } from "../levels/course_defines"
 import { LEVEL_BOWSER_1, LEVEL_BOWSER_2, LEVEL_BOWSER_3 } from "../levels/level_defines_constants"
 import { AreaInstance as Area } from "./Area"
 import { GameInstance as Game } from "./Game"
@@ -234,7 +235,6 @@ export const save_file_copy = (srcFileIndex, destFileIndex) => {
 export const save_file_load_all = () => {
     gMainMenuDataModified = false;
     gSaveFileModified = false;
-
     reset_save_buffer();
     window.loadGame();
 }
@@ -492,7 +492,6 @@ export const check_if_should_set_warp_checkpoint = (warpNode) => {
 export const check_warp_checkpoint = (warpNode) => {
     let warpCheckpointActive = false
     let currCourseNum = gLevelToCourseNumTable[(warpNode.destLevel & 0x7f) - 1]
-    console.log("currCourseNum:", currCourseNum)
 
     // gSavedCourseNum is only used in this function.
     if (

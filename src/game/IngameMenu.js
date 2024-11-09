@@ -1014,12 +1014,12 @@ class IngameMenu {
 
         this.render_dialog_box_type(dialog, dialog.linesPerBox);
 
-        // Gbi.gDPSetScissor(Game.gDisplayList, this.ensure_nonnegative(dialog.leftOffset), this.ensure_nonnegative(240 - dialog.width), this.ensure_nonnegative(dialog.leftOffset + 132), this.ensure_nonnegative(240 - dialog.width + dialog.linesPerBox * 16));
+        Gbi.gDPSetScissor(Game.gDisplayList, this.ensure_nonnegative(dialog.leftOffset), this.ensure_nonnegative(240 - dialog.width), this.ensure_nonnegative(dialog.leftOffset + 132), this.ensure_nonnegative(240 - dialog.width + dialog.linesPerBox * 16));
         this.handle_dialog_text_and_pages(0, dialog, lowerBound);
 
         if (this.gNextDialogPageStartStrIndex == -1 && this.gDialogWithChoice == true) this.render_dialog_triangle_choice();
 
-        // Gbi.gDPSetScissor(Game.gDisplayList, 2, 2, SCREEN_WIDTH, SCREEN_HEIGHT, 238);
+        Gbi.gDPSetScissor(Game.gDisplayList, 2, 2, SCREEN_WIDTH, SCREEN_HEIGHT, 238);
 
         if (this.gNextDialogPageStartStrIndex != -1 && this.gMenuState == MENU_STATE_DIALOG_OPEN) this.render_dialog_triangle_next(dialog.linesPerBox);
     }

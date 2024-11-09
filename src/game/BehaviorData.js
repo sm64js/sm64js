@@ -3235,14 +3235,6 @@ const bhvToadMessage = [
     END_LOOP(),
 ]
 
-const bhvIntroScene = [
-    BEGIN(OBJ_LIST_DEFAULT, 'bhvIntroScene'),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    BEGIN_LOOP(),
-        CALL_NATIVE('MarioMisc.bhv_toad_message_loop'),
-    END_LOOP(),
-];
-
 const bhvBirdsSoundLoop = [
     BEGIN(OBJ_LIST_DEFAULT, 'bhvBirdsSoundLoop'),
     BEGIN_LOOP(),
@@ -3256,14 +3248,7 @@ const bhvAmbientSounds = [
     CALL_NATIVE('bhv_ambient_sounds_init'),
     BEGIN_LOOP(),
     END_LOOP(),
-]
-
-const bhvAmbientSounds = [
-    BEGIN(OBJ_LIST_DEFAULT, 'bhvAmbientSounds'),
-    CALL_NATIVE('bhv_ambient_sounds_init'),
-    BEGIN_LOOP(),
-    END_LOOP(),
-]
+];
 
 const bhvWaterfallSoundLoop = [
     BREAK(),

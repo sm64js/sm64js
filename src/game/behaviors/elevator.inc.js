@@ -47,18 +47,25 @@ const elevator_act_1 = () => {
 
     cur_obj_play_sound_1(SOUND_ENV_ELEVATOR1);
 
-    if (o.rawData[oTimer] == 0 && cur_obj_is_mario_on_platform()) elevator_starting_shake();
+    if (o.rawData[oTimer] == 0 && cur_obj_is_mario_on_platform()) {
+        elevator_starting_shake();
+    }
 
     const wrapper = { value: o.rawData[oVelY] };
-    approach_f32_signed(wrapper, -10.0, -2.0);
+    approach_f32_signed(wrapper, 10.0, 2.0);
     o.rawData[oVelY] = wrapper.value;
+    o.rawData[oPosY] += o.rawData[oVelY];
 
     if (o.rawData[oPosY] > o.rawData[oElevatorUnkF8]) {
         o.rawData[oPosY] = o.rawData[oElevatorUnkF8];
         
-        if (o.rawData[oElevatorUnk100] == 2 || o.rawData[oElevatorUnk100] == 1) o.rawData[oAction] = 3;
-        else if (gMarioObject.rawData[oPosY] < o.rawData[oElevatorUnkFC]) o.rawData[oAction] = 2;
-        else o.rawData[oAction] = 3;
+        if (o.rawData[oElevatorUnk100] == 2 || o.rawData[oElevatorUnk100] == 1) {
+            o.rawData[oAction] = 3;
+        } else if (gMarioObject.rawData[oPosY] < o.rawData[oElevatorUnkFC]) {
+            o.rawData[oAction] = 2;
+        } else {
+            o.rawData[oAction] = 3;
+        }
     }
 }
 
@@ -95,7 +102,6 @@ const elevator_act_3 = () => {
         cur_obj_play_sound_2(SOUND_GENERAL_METAL_POUND);
     }
 
-    console.log(mario_is_in_air_action(), cur_obj_is_mario_on_platform())
     if (!mario_is_in_air_action() && !cur_obj_is_mario_on_platform()) o.rawData[oAction] = 0;
 }
 
@@ -135,7 +141,6 @@ const sElevatorActions = [
 const bhv_elevator_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject;
 
-    console.log(o.rawData[oAction])
     cur_obj_call_action_function(sElevatorActions);
 }
 

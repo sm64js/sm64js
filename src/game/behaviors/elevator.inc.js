@@ -85,10 +85,15 @@ const elevator_act_2 = () => {
     if (o.rawData[oPosY] < o.rawData[oElevatorUnkF4]) {
         o.rawData[oPosY] = o.rawData[oElevatorUnkF4];
         
-        if (o.rawData[oElevatorUnk100] == 1) o.rawData[oAction] = 4;
-        else if (o.rawData[oElevatorUnk100] == 2) o.rawData[oAction] = 3;
-        else if (gMarioObject.rawData[oPosY] > o.rawData[oElevatorUnkFC]) o.rawData[oAction] = 1;
-        else o.rawData[oAction] = 3;
+        if (o.rawData[oElevatorUnk100] == 1) {
+            o.rawData[oAction] = 4;
+        } else if (o.rawData[oElevatorUnk100] == 2) {
+            o.rawData[oAction] = 3;
+        } else if (gMarioObject.rawData[oPosY] > o.rawData[oElevatorUnkFC]) {
+            o.rawData[oAction] = 1;
+        } else {
+            o.rawData[oAction] = 3;
+        }
     }
 }
 

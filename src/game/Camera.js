@@ -1267,6 +1267,11 @@ class Camera {
             { shot: this.cutscene_red_coin_star_end.bind(this), duration: 15 },
         ]
 
+        this.sCutsceneDeathExit = [
+            { shot: this.cutscene_exit_painting.bind(this), duration: 118 },
+            { shot: this.cutscene_exit_painting_end.bind(this), duration: 0 }
+        ]
+
         this.sCutsceneEnterPainting = [
             { shot: this.cutscene_enter_painting.bind(this), duration: CUTSCENE_LOOP },
         ]
@@ -1325,10 +1330,10 @@ class Camera {
             { shot: this.cutscene_non_painting_end.bind(this), duration: 0 }
         ] */
 
-        /* this.sCutsceneNonPaintingDeath = [
+        this.sCutsceneNonPaintingDeath = [
             { shot: this.cutscene_non_painting_death.bind(this), duration: 120 },
             { shot: this.cutscene_non_painting_end.bind(this), duration: 0 }
-        ] */
+        ]
 
         this.sCutsceneDialog = [
             { shot: this.cutscene_dialog.bind(this), duration: CUTSCENE_LOOP },
@@ -1367,7 +1372,7 @@ class Camera {
             141: this.sCutsceneDoorPushMode,
             133: this.sCutsceneEnterCannon,
             134: this.sCutsceneEnterPainting,
-            // [ CUTSCENE_DEATH_EXIT, this.sCutsceneDeathExit ],
+            135: this.sCutsceneDeathExit,
             160: this.sCutsceneExitPaintingSuccess,
             // [ CUTSCENE_UNUSED_EXIT,  this.sCutsceneUnusedExit ],
             142: this.sCutsceneIntroPeach,
@@ -1395,7 +1400,7 @@ class Camera {
             // [ CUTSCENE_EXIT_SPECIAL_SUCC, this.sCutsceneExitSpecialSuccess ],
             // [ CUTSCENE_EXIT_WATERFALL, this.sCutsceneExitWaterfall ],
             // [ CUTSCENE_EXIT_FALL_WMOTR, this.sCutsceneFallToCastleGrounds ],
-            // [ CUTSCENE_NONPAINTING_DEATH, this.sCutsceneNonPaintingDeath ],
+            170: this.sCutsceneNonPaintingDeath,
             162: this.sCutsceneDialog,
             171: this.sCutsceneReadMessage,
             // [ CUTSCENE_RACE_DIALOG, this.sCutsceneDialog ],
@@ -4651,9 +4656,7 @@ class Camera {
     update_camera_hud_status(c) {
         let status = CAM_STATUS_NONE
     
-        let isFixedCam = false // = c.cutscene != 0 || ((this.gPlayer1Controller.buttonDown & R_TRIG) && cam_select_alt_mode(0) == CAM_SELECTION_FIXED)
-
-        if (isFixedCam) {
+        if ((c.cutscene != 0 || window.playerInput.buttonPressedRt) && this.cam_select_alt_mode(0) == CAM_SELECTION_FIXED) {
             status |= CAM_STATUS_FIXED
         } else if (this.set_cam_angle(0) == CAM_ANGLE_MARIO) {
             status |= CAM_STATUS_MARIO
@@ -8209,6 +8212,21 @@ class Camera {
 
     // -----
 
+    cutscene_non_painting_end(c) {
+        c.cutscene = 0;
+
+        if (c.defMode == CAMERA_MODE_CLOSE) {
+            c.mode = CAMERA_MODE_CLOSE;
+        } else {
+            c.mode = CAMERA_MODE_FREE_ROAM;
+        }
+
+        this.sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE;
+        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
+        this.transition_next_state(c, 60);
+        this.update_camera_yaw(c);
+    }
+
     /**
      * Set cvar7 to Mario's pos and faceAngle
      * Set cvar6 to the focus offset from Mario.
@@ -8239,11 +8257,11 @@ class Camera {
      * Cutscene played when Mario dies in a non-painting course, like HMC or BBH.
      */
     cutscene_non_painting_death(c) {
-        this.cutscene_non_painting_death = this.cutscene_non_painting_death.bind(this)
+        this.cutscene_non_painting_death = this.cutscene_non_painting_death_start.bind(this)
         this.cutscene_non_painting_death_override_offset = this.cutscene_non_painting_death_override_offset.bind(this)
         this.cutscene_non_painting_set_cam_pos = this.cutscene_non_painting_set_cam_pos.bind(this)
         this.cutscene_non_painting_set_cam_focus = this.cutscene_non_painting_set_cam_focus.bind(this)
-        this.cutscene_event(this.cutscene_non_painting_death, c, 0, 0)
+        this.cutscene_event(this.cutscene_non_painting_death_start, c, 0, 0)
         this.cutscene_event(this.cutscene_non_painting_death_override_offset, c, 0, 0)
         this.cutscene_event(this.cutscene_non_painting_set_cam_pos, c, 0, -1)
         this.cutscene_event(this.cutscene_non_painting_set_cam_focus, c, 0, -1)

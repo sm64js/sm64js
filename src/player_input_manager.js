@@ -342,6 +342,7 @@ export const playerInputUpdate = () => {
         buttonPressedCr: buttonDownCr && !window.playerInput.buttonDownCr,
         buttonPressedCu: buttonDownCu && !window.playerInput.buttonDownCu,
         buttonPressedCd: buttonDownCd && !window.playerInput.buttonDownCd,
+        buttonPressedRt: buttonDownRt && !window.playerInput.buttonDownRt,
 
         buttonDownA, buttonDownB, buttonDownZ, buttonDownStart, buttonDownCl, buttonDownCr, buttonDownCu, buttonDownCd, buttonDownRt
     }

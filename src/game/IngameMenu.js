@@ -185,7 +185,7 @@ class IngameMenu {
         this.gDialogBoxScale = DIALOG_BOX_SCALE_DEFAULT;
         this.gDialogScrollOffsetY = 0;
         this.gDialogBoxType = DIALOG_TYPE_ROTATE;
-        this.gDialogID = DIALOG_NONE;
+        this.gDialogID = DIALOG_NONE.id;
         this.gNextDialogPageStartStrIndex = 0;
         this.gDialogPageStartStrIndex = 0;
         this.gMenuLineNum = 1;
@@ -593,18 +593,18 @@ class IngameMenu {
     }
 
     get_dialog_id() {
-        return this.gDialogID.id
+        return this.gDialogID
     }
 
     create_dialog_box(dialog) {
-        if (this.gDialogID == DIALOG_NONE) {
+        if (this.gDialogID == DIALOG_NONE.id) {
             this.gDialogID = dialog;
             this.gDialogBoxType = DIALOG_TYPE_ROTATE;
         }
     }
 
     create_dialog_box_with_var(dialog, dialogVar) {
-        if (this.gDialogID == DIALOG_NONE) {
+        if (this.gDialogID == DIALOG_NONE.id) {
             this.gDialogID = dialog;
             this.gDialogVariable = dialogVar;
             this.gDialogBoxType = DIALOG_TYPE_ROTATE;
@@ -612,15 +612,15 @@ class IngameMenu {
     }
 
     create_dialog_inverted_box(dialog) {
-        if (this.gDialogID == DIALOG_NONE) {
+        if (this.gDialogID == DIALOG_NONE.id) {
             this.gDialogID = dialog;
             this.gDialogBoxType = DIALOG_TYPE_ZOOM;
         }
     }
 
     create_dialog_box_with_response(dialog) {
-        if (this.gDialogID == DIALOG_NONE) {
-            this.gDialogID = dialog.id;
+        if (this.gDialogID == DIALOG_NONE.id) {
+            this.gDialogID = dialog;
             this.gDialogBoxType = DIALOG_TYPE_ZOOM;
         }
     }
@@ -635,7 +635,7 @@ class IngameMenu {
         this.gDialogBoxScale = DIALOG_BOX_SCALE_DEFAULT;
         this.gDialogBoxAngle = DIALOG_BOX_ANGLE_DEFAULT;
         this.gMenuState = MENU_STATE_DEFAULT;
-        this.gDialogID = DIALOG_NONE;
+        this.gDialogID = DIALOG_NONE.id;
         this.gDialogPageStartStrIndex = 0
         this.gDialogWithChoice = false;
         this.gNextDialogPageStartStrIndex = 0;
@@ -932,8 +932,7 @@ class IngameMenu {
     render_dialog_entries() {
         let lowerBound;
 
-        let dialogTable = seg2_dialog_table;
-        let dialog = dialogTable[this.gDialogID.id];
+        let dialog = seg2_dialog_table[this.gDialogID];
 
         switch (this.gMenuState) {
             case MENU_STATE_DIALOG_OPENING:
@@ -1001,7 +1000,7 @@ class IngameMenu {
 
                 if (this.gDialogBoxAngle == DIALOG_BOX_ANGLE_DEFAULT) {
                     this.gMenuState = MENU_STATE_DEFAULT;
-                    this.gDialogID = DIALOG_NONE;
+                    this.gDialogID = DIALOG_NONE.id;
                     this.gDialogPageStartStrIndex = 0;
                     this.gDialogWithChoice = false;
                     this.gNextDialogPageStartStrIndex = 0;
@@ -1014,12 +1013,12 @@ class IngameMenu {
 
         this.render_dialog_box_type(dialog, dialog.linesPerBox);
 
-        Gbi.gDPSetScissor(Game.gDisplayList, this.ensure_nonnegative(dialog.leftOffset), this.ensure_nonnegative(240 - dialog.width), this.ensure_nonnegative(dialog.leftOffset + 132), this.ensure_nonnegative(240 - dialog.width + dialog.linesPerBox * 16));
+        // Gbi.gDPSetScissor(Game.gDisplayList, this.ensure_nonnegative(dialog.leftOffset), this.ensure_nonnegative(240 - dialog.width), this.ensure_nonnegative(dialog.leftOffset + 132), this.ensure_nonnegative(240 - dialog.width + dialog.linesPerBox * 16));
         this.handle_dialog_text_and_pages(0, dialog, lowerBound);
 
         if (this.gNextDialogPageStartStrIndex == -1 && this.gDialogWithChoice == true) this.render_dialog_triangle_choice();
 
-        Gbi.gDPSetScissor(Game.gDisplayList, 2, 2, SCREEN_WIDTH, SCREEN_HEIGHT, 238);
+        // Gbi.gDPSetScissor(Game.gDisplayList, 2, 2, SCREEN_WIDTH, SCREEN_HEIGHT, 238);
 
         if (this.gNextDialogPageStartStrIndex != -1 && this.gMenuState == MENU_STATE_DIALOG_OPEN) this.render_dialog_triangle_next(dialog.linesPerBox);
     }
@@ -1124,7 +1123,7 @@ class IngameMenu {
         // back where we are, so reset everything at the end.
         if (this.gCutsceneMsgTimer > 270) {
             this.gCutsceneMsgIndex = -1;
-            this.gDialogID = DIALOG_NONE;
+            this.gDialogID = DIALOG_NONE.id;
             this.gCutsceneMsgTimer = 0;
             return; // return to avoid incrementing the timer
         }
@@ -1729,7 +1728,7 @@ class IngameMenu {
             }
 
             this.gMenuTextColorTransTimer = this.gMenuTextColorTransTimer + 0x1000;
-        } else if (this.gDialogID != DIALOG_NONE) {
+        } else if (this.gDialogID != DIALOG_NONE.id) {
             if (this.gDialogID == DIALOG_020.id) {
                 this.print_peach_letter_message();
                 return index;

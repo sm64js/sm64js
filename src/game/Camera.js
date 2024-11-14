@@ -8466,7 +8466,7 @@ class Camera {
     }
 
     peach_letter_text(c) {
-        IngameMenu.create_dialog_box(DIALOG_020);
+        IngameMenu.create_dialog_box(DIALOG_020.id);
     }
 
     play_sound_peach_reading_letter(c) {
@@ -8527,7 +8527,7 @@ class Camera {
      */
     cutscene_intro_peach_handheld_shake_off(c) { this.set_handheld_shake(HAND_CAM_SHAKE_OFF); }
 
-    intro_pipe_exit_text(c) { create_dialog_box(DIALOG_033); }
+    intro_pipe_exit_text(c) { create_dialog_box(DIALOG_033.id); }
 
     play_sound_intro_turn_on_hud(c) { this.play_sound_rbutton_changed(); }
 

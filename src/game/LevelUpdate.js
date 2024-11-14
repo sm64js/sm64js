@@ -419,36 +419,36 @@ class LevelUpdate {
 // }
 
     load_level_init_tex(arg) {
-    let /*s32*/ gotAchievement
-    let /*u32*/ dialog = Area.gCurrentArea.dialog[arg]
+        let /*s32*/ gotAchievement
+        let /*u32*/ dialog = Area.gCurrentArea.dialog[arg]
 
-    switch (dialog.id) {
-//         case DIALOG_129:
-//             gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_VANISH_CAP
-//             break
+        switch (dialog) {
+    //         case DIALOG_129:
+    //             gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_VANISH_CAP
+    //             break
 
-//         case DIALOG_130:
-//             gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_METAL_CAP
-//             break
+    //         case DIALOG_130:
+    //             gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_METAL_CAP
+    //             break
 
-//         case DIALOG_131:
-//             gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_WING_CAP
-//             break
+    //         case DIALOG_131:
+    //             gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_WING_CAP
+    //             break
 
-        case 255:
-            gotAchievement = 1
-            break
+            case 255:
+                gotAchievement = 1
+                break
 
-        default:
-            gotAchievement = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1)
-            break
+            default:
+                gotAchievement = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1)
+                break
+        }
+
+        if (!gotAchievement) {
+            level_set_transition(-1, null)
+            create_dialog_box(dialog)
+        }
     }
-
-    if (!gotAchievement) {
-        level_set_transition(-1, null)
-        create_dialog_box(dialog)
-    }
-}
 
     init_door_warp(spawnInfo, arg1) {
         if (arg1 & 0x00000002) {

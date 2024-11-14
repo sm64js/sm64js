@@ -37,6 +37,7 @@ import { metal_box_geo               } from "../actors/metal_box/geo.inc"
 import { metal_box_dl                } from "../actors/metal_box/model.inc"
 import { metallic_ball_geo           } from "../actors/chain_ball/geo.inc"
 import { purple_switch_geo           } from "../actors/purple_switch/geo.inc"
+import { scuttlebug_geo              } from "../actors/scuttlebug/geo.inc"
 import { sushi_geo                   } from "../actors/sushi/geo.inc"
 import { unagi_geo                   } from "../actors/unagi/geo.inc"
 import { water_bomb_geo              } from "../actors/water_bubble/geo.inc"
@@ -238,7 +239,7 @@ export const script_func_global_17 = () => { return [
 
 export const script_func_global_18 = () => { return [
     // LOAD_MODEL_FROM_GEO(MODEL.SWOOP,                   swoop_geo),
-    // LOAD_MODEL_FROM_GEO(MODEL.SCUTTLEBUG,              scuttlebug_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.SCUTTLEBUG,              scuttlebug_geo),
     // LOAD_MODEL_FROM_GEO(MODEL.MR_I_IRIS,               mr_i_iris_geo),
     // LOAD_MODEL_FROM_GEO(MODEL.MR_I,                    mr_i_geo),
     // LOAD_MODEL_FROM_GEO(MODEL.DORRIE,                  dorrie_geo),

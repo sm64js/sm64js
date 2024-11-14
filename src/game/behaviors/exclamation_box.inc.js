@@ -4,7 +4,7 @@ import { spawn_object, cur_obj_become_intangible, cur_obj_become_tangible, cur_o
 cur_obj_unhide, obj_mark_for_deletion, cur_obj_scale, obj_turn_toward_object, approach_symmetric,
 cur_obj_move_using_fvel_and_gravity, cur_obj_was_attacked_or_ground_pounded, obj_set_hitbox, cur_obj_set_model } from "../ObjectHelpers"
 import { s16, random_float, sins } from "../../utils"
-import { spawn_mist_particles_variable  } from "./white_puff.inc"
+import { spawn_mist_particles_variable  } from "../BehaviorActions"
 import { spawn_triangle_break_particles } from "./break_particles.inc"
 import { create_sound_spawner } from "../SpawnSound"
 import { oAction,  oAnimState,  oBehParams2ndByte,  oBehParams,  oExclamationBoxUnkF4, 

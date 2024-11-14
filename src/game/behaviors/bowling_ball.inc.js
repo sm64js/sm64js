@@ -8,7 +8,7 @@ cur_obj_become_intangible, cur_obj_become_tangible, cur_obj_scale, obj_set_hitbo
 import { is_point_within_radius_of_mario, object_step,  set_object_visibility,
 OBJ_COL_FLAG_GROUNDED, OBJ_COL_FLAGS_LANDED } from "../ObjBehaviors"
 import { random_float } from "../../utils"
-import { spawn_mist_particles_variable } from "./white_puff.inc"
+import { spawn_mist_particles_variable } from "../BehaviorActions"
 import { cur_obj_play_sound_1, cur_obj_play_sound_2 } from "../SpawnSound"
 import { oBBallSpawnerMaxSpawnDist, oBBallSpawnerSpawnOdds, oBBallSpawnerPeriodMinus1,
 oPathedStartWaypoint, oBowlingBallTargetYaw, oPathedTargetYaw, oPosX, oPosY, oPosZ, oMoveAngleYaw,

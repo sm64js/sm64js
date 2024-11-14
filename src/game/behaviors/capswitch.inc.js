@@ -9,12 +9,7 @@ import { cur_obj_call_action_function, cur_obj_is_mario_on_platform, cur_obj_sca
 import { SAVE_FLAG_HAVE_METAL_CAP, SAVE_FLAG_HAVE_VANISH_CAP, SAVE_FLAG_HAVE_WING_CAP, save_file_clear_flags, save_file_set_flags } from "../SaveFile";
 import { cur_obj_play_sound_2 } from "../SpawnSound";
 import { spawn_triangle_break_particles } from "./break_particles.inc";
-
-const sCapSaveFlags = [
-    SAVE_FLAG_HAVE_WING_CAP,
-    SAVE_FLAG_HAVE_METAL_CAP,
-    SAVE_FLAG_HAVE_VANISH_CAP,
-]
+import { sCapSaveFlags } from "../BehaviorActions";
 
 const cap_switch_act_0 = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject;

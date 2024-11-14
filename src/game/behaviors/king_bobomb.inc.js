@@ -13,7 +13,7 @@ import { SEQ_EVENT_BOSS } from "../../include/seq_ids"
 import { common_anchor_mario_behavior } from "./chuckya.inc"
 import { arc_to_goal_pos } from "./grand_star.inc"
 import { MARIO_DIALOG_LOOK_UP } from "../MarioActionsCutscene"
-import { spawn_mist_particles_variable } from "./white_puff.inc"
+import { spawn_mist_particles_variable } from "../BehaviorActions"
 import { spawn_triangle_break_particles } from "./break_particles.inc"
 import { MODEL_DIRT_ANIMATION } from "../../include/model_ids"
 

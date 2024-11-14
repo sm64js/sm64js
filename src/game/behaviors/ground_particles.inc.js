@@ -24,7 +24,7 @@ const sGlobalMistParticles = {
     sizeRange:       1.5,
 };
 
-const spawn_mist_from_global = () => {
+export const spawn_mist_from_global = () => {
     cur_obj_spawn_particles(sGlobalMistParticles)
 }
 

@@ -52,6 +52,7 @@ import * as _bbh_haunted_bookshelf    from "./behaviors/bbh_haunted_bookshelf.in
 import * as _bbh_merry_go_round       from "./behaviors/bbh_merry_go_round.inc"
 import * as _bbh_tilting_trap         from "./behaviors/bbh_tilting_trap.inc"
 import * as _bird                     from "./behaviors/bird.inc"
+import * as _blue_coin                from "./behaviors/blue_coin.inc"
 import * as _bobomb                   from "./behaviors/bobomb.inc"
 import * as _boo                      from "./behaviors/boo.inc"
 import * as _boo_cage                 from "./behaviors/boo_cage.inc"
@@ -74,6 +75,7 @@ import * as _chain_chomp              from "./behaviors/chain_chomp.inc"
 import * as _checkerboard_platform    from "./behaviors/checkerboard_platform.inc"
 import * as _chuckya                  from "./behaviors/chuckya.inc"
 import * as _cloud                    from "./behaviors/cloud.inc"
+import * as _coffin                   from "./behaviors/coffin.inc"
 import * as _coin                     from "./behaviors/coin.inc"
 import * as _collide_particles        from "./behaviors/collide_particles.inc"
 import * as _corkbox                  from "./behaviors/corkbox.inc"
@@ -113,6 +115,7 @@ import * as _recovery_heart           from "./behaviors/recovery_heart.inc"
 import * as _red_coin                 from "./behaviors/red_coin.inc"
 import * as _reds_star_marker         from "./behaviors/reds_star_marker.inc"
 import * as _rotating_platform        from "./behaviors/rotating_platform.inc"
+import * as _scuttlebug               from "./behaviors/scuttlebug.inc"
 import * as _seesaw_platform          from "./behaviors/seesaw_platform.inc"
 import * as _sound_ambient            from "./behaviors/sound_ambient.inc"
 import * as _sound_birds              from "./behaviors/sound_birds.inc"
@@ -153,6 +156,7 @@ import { chain_chomp_seg6_anims_06025178 } from "../actors/chain_chomp/anims.inc
 import { door_seg3_anims_030156C0        } from "../actors/door/anims.inc"
 import { goomba_seg8_anims_0801DA4C      } from "../actors/goomba/anims.inc"
 import { lakitu_seg6_anims_060058F8      } from "../actors/lakitu_cameraman/anims.inc"
+import { scuttlebug_seg6_anims_06015064  } from "../actors/scuttlebug/anims.inc"
 import { yoshi_seg5_anims_05024100       } from "../actors/yoshi/anims.inc"
 
 import { bowser_2_seg7_collision_tilting_platform        } from "../levels/bowser_2/tilting_platform/collision.inc"
@@ -164,7 +168,7 @@ import { checkerboard_platform_seg8_collision_0800D710   } from "../actors/check
 import { door_seg3_collision_0301CE78                    } from "../actors/warp_collision/collision.inc"
 import { exclamation_box_outline_seg8_collision_08025F78 } from "../actors/exclamation_box_outline/collision.inc"
 import { inside_castle_seg7_collision_star_door          } from "../levels/castle_inside/star_door/collision.inc"
-import { inside_castle_seg7_collision_floor_trap         } from "../levels/castle_inside/trap_door/collision.inc" 
+import { inside_castle_seg7_collision_floor_trap         } from "../levels/castle_inside/trap_door/collision.inc"
 import { poundable_pole_collision_06002490               } from "../actors/poundable_pole/collision.inc"
 import { wooden_signpost_seg3_collision_0302DD80         } from "../actors/wooden_signpost/collision.inc"
 import { jrb_seg7_collision_rock_solid                   } from "../levels/jrb/rock/collision.inc"
@@ -206,6 +210,8 @@ import { rr_seg7_collision_elevator_platform } from "../levels/rr/elevator_platf
 import { toad_seg6_anims_0600FB58 } from "../actors/toad/anims.inc"
 import { bbh_seg7_collision_tilt_floor_platform } from "../levels/bbh/tilting_trap_platform/collision.inc"
 import { bbh_seg7_collision_mesh_elevator } from "../levels/bbh/mesh_elevator/collision.inc"
+import { bbh_seg7_collision_coffin } from "../levels/bbh/coffin/collision.inc"
+import { blue_coin_switch_seg8_collision_08000E98 } from "../actors/blue_coin_switch/collision.inc"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -855,7 +861,7 @@ const bhvCoinSparkles = [
     DEACTIVATE(),
 ];
 
-const bhvGoldenCoinSparkles = [
+export const bhvGoldenCoinSparkles = [
     BEGIN(OBJ_LIST_DEFAULT, 'bhvGoldenCoinSparkles'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     DISABLE_RENDERING(),
@@ -1126,6 +1132,27 @@ const bhvSparkleParticleSpawner = [
         ADD_INT(oAnimState, 1),
     END_REPEAT(),
     DEACTIVATE(),
+]
+
+export const bhvScuttlebug = [
+    BEGIN(OBJ_LIST_GENACTOR, 'bhvScuttlebug'),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, scuttlebug_seg6_anims_06015064),
+    ANIMATE(0),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 80, /*Gravity*/ -400, /*Bounciness*/ -50, /*Drag strength*/ 0, /*Friction*/ 0, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
+    SET_HOME(),
+    CALL_NATIVE('bhv_init_room'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_scuttlebug_loop'),
+    END_LOOP(),
+]
+
+const bhvScuttlebugSpawn = [
+    BEGIN(OBJ_LIST_SPAWNER, 'bhvScuttlebugSpawn'),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_scuttlebug_spawn_loop'),
+    END_LOOP(),
 ]
 
 const bhvYellowBall = [
@@ -1608,6 +1635,30 @@ const bhvWhitePuff2 = [
     DEACTIVATE(),
 ]
 
+export const bhvBlueCoinSwitch = [
+    BEGIN(OBJ_LIST_SURFACE, 'bhvBlueCoinSwitch'),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(blue_coin_switch_seg8_collision_08000E98),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_blue_coin_switch_loop'),
+    END_LOOP(),
+]
+
+export const bhvHiddenBlueCoin = [
+    BEGIN(OBJ_LIST_LEVEL, 'bhvHiddenBlueCoin'),
+    SET_INT(oInteractType, INTERACT_COIN),
+    OR_INT(oFlags, (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BILLBOARD(),
+    SET_HITBOX(/*Radius*/ 100, /*Height*/ 64),
+    SET_INT(oDamageOrCoinValue, 5),
+    SET_INT(oIntangibleTimer, 0),
+    SET_INT(oAnimState, -1),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_hidden_blue_coin_loop'),
+        ADD_INT(oAnimState, 1),
+    END_LOOP(),
+]
+
 const bhvBreakBoxTriangle = [
     BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvBreakBoxTriangle'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -1827,6 +1878,26 @@ const bhvBird = [
     SCALE(/*Unused*/ 0, /*Field*/ 70),
     BEGIN_LOOP(),
         CALL_NATIVE('bhv_bird_update'),
+    END_LOOP(),
+]
+
+const bhvCoffinSpawner = [
+    BEGIN(OBJ_LIST_SURFACE, 'bhvCoffinSpawner'),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    CALL_NATIVE('bhv_init_room'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_coffin_spawner_loop'),
+    END_LOOP(),
+]
+
+export const bhvCoffin = [
+    BEGIN(OBJ_LIST_SURFACE, 'bhvCoffin'),
+    LOAD_COLLISION_DATA(bbh_seg7_collision_coffin),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    SET_HOME(),
+    CALL_NATIVE('bhv_init_room'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_coffin_loop'),
     END_LOOP(),
 ]
 
@@ -3283,6 +3354,7 @@ gLinker.behaviors.bhvBirdsSoundLoop = bhvBirdsSoundLoop
 gLinker.behaviors.bhvBitfsSinkingPlatforms = bhvBitfsSinkingPlatforms
 gLinker.behaviors.bhvBitfsSinkingCagePlatform = bhvBitfsSinkingCagePlatform
 gLinker.behaviors.bhvBitfsTiltingInvertedPyramid = bhvBitfsTiltingInvertedPyramid
+gLinker.behaviors.bhvBlueCoinSwitch = bhvBlueCoinSwitch
 gLinker.behaviors.bhvBobBowlingBallSpawner = bhvBobBowlingBallSpawner
 gLinker.behaviors.bhvBobomb = bhvBobomb
 gLinker.behaviors.bhvBobombAnchorMario = bhvBobombAnchorMario
@@ -3336,6 +3408,8 @@ gLinker.behaviors.bhvCheckerboardElevatorGroup = bhvCheckerboardElevatorGroup
 gLinker.behaviors.bhvChuckya = bhvChuckya
 gLinker.behaviors.bhvChuckyaAnchorMario = bhvChuckyaAnchorMario
 gLinker.behaviors.bhvCloud = bhvCloud
+gLinker.behaviors.bhvCoffinSpawner = bhvCoffinSpawner
+gLinker.behaviors.bhvCoffin = bhvCoffin
 gLinker.behaviors.bhvCoinFormation = bhvCoinFormation
 gLinker.behaviors.bhvCoinSparkles = bhvCoinSparkles
 gLinker.behaviors.bhvDddMovingPole = bhvDddMovingPole
@@ -3379,6 +3453,7 @@ gLinker.behaviors.bhvHidden1up = bhvHidden1up
 gLinker.behaviors.bhvHidden1upInPoleSpawner = bhvHidden1upInPoleSpawner
 gLinker.behaviors.bhvHidden1upTrigger = bhvHidden1upTrigger
 gLinker.behaviors.bhvHiddenAt120Stars = bhvHiddenAt120Stars
+gLinker.behaviors.bhvHiddenBlueCoin = bhvHiddenBlueCoin
 gLinker.behaviors.bhvHiddenRedCoinStar = bhvHiddenRedCoinStar
 gLinker.behaviors.bhvHiddenStaircaseStep = bhvHiddenStaircaseStep
 gLinker.behaviors.bhvHiddenStar = bhvHiddenStar
@@ -3438,6 +3513,8 @@ gLinker.behaviors.bhvRotatingCounterClockwise = bhvRotatingCounterClockwise
 gLinker.behaviors.bhvRotatingExclamationMark = bhvRotatingExclamationMark
 gLinker.behaviors.bhvRotatingPlatform = bhvRotatingPlatform
 gLinker.behaviors.bhvRRElevatorPlatform = bhvRRElevatorPlatform
+gLinker.behaviors.bhvScuttlebug = bhvScuttlebug
+gLinker.behaviors.bhvScuttlebugSpawn = bhvScuttlebugSpawn
 gLinker.behaviors.bhvSeesawPlatform = bhvSeesawPlatform
 gLinker.behaviors.bhvShallowWaterSplash = bhvShallowWaterSplash
 gLinker.behaviors.bhvShallowWaterWave = bhvShallowWaterWave

@@ -68,7 +68,7 @@ import { sins, coss, int16, s16, random_int16, random_float } from "../utils"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import * as _Linker from "./Linker"
 import * as Gbi from "../include/gbi"
-import { spawn_mist_particles_variable } from "./behaviors/white_puff.inc"
+import { spawn_mist_particles_variable } from "./BehaviorActions"
 import { spawn_triangle_break_particles } from "./behaviors/break_particles.inc"
 
 import { G_AC_DITHER } from "../include/gbi"
@@ -2104,6 +2104,14 @@ export const obj_set_hitbox = (obj, hitbox) => {
 export const signum_positive = (x) => {
     if (x >= 0) return 1
     else return -1
+}
+
+export const absf = (x) => {
+    if (x >= 0) {
+        return x
+    } else {
+        return -x
+    }
 }
 
 export const cur_obj_wait_then_blink = (timeUntilBlinking, numBlinks) => {

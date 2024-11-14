@@ -13,19 +13,10 @@ export const sCapSaveFlags = [
 
 // skipped adding sBooHitRotations, already in the one file it's used
 
+
 const sMistParticles = {
-    bhvParam: 2,
-    count: 20,
-    model: MODEL_MIST,
-    offsetY: 0,
-    forwardVelBase: 40,
-    forwardVelRange: 5,
-    velYBase: 30,
-    velYRange: 20,
-    gravity: 252,
-    dragStrength: 30,
-    sizeBase: 330.0,
-    sizeRange: 10.0
+    behParam: 2, count: 20, model: MODEL_MIST, offsetY: 0, forwardVelBase: 40, forwardVelRange: 5,
+    velYBase: 30, velYRange: 20, gravity: -4, dragStrength: 30, sizeBase: 330.0, sizeRange: 10.0
 }
 
 export const spawn_mist_particles_variable = (count, offsetY, size) => {
@@ -41,6 +32,7 @@ export const spawn_mist_particles_variable = (count, offsetY, size) => {
     }
     cur_obj_spawn_particles(sMistParticles)
 }
+
 
 // skipped making geo_move_mario_part_from_parent, already in the one file it's used
 

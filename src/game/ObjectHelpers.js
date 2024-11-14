@@ -68,7 +68,6 @@ import { sins, coss, int16, s16, random_int16, random_float } from "../utils"
 import { GeoRendererInstance as GeoRenderer } from "../engine/GeoRenderer"
 import * as _Linker from "./Linker"
 import * as Gbi from "../include/gbi"
-import { spawn_mist_particles_variable } from "./BehaviorActions"
 import { spawn_triangle_break_particles } from "./behaviors/break_particles.inc"
 
 import { G_AC_DITHER } from "../include/gbi"
@@ -79,6 +78,7 @@ import { DIALOG_RESPONSE_NONE, DIALOG_RESPONSE_NOT_DEFINED, IngameMenuInstance a
 import { spawn_default_star } from "./behaviors/spawn_star.inc"
 import { create_sound_spawner } from "./SpawnSound"
 import { DIALOG_NONE } from "../text/us/dialogs"
+import { spawn_mist_particles_variable } from "./BehaviorActions"
 
 export const WATER_DROPLET_FLAG_RAND_ANGLE                = 0x02
 export const WATER_DROPLET_FLAG_RAND_OFFSET_XZ            = 0x04 // Unused
@@ -2089,7 +2089,7 @@ export const obj_set_hitbox = (obj, hitbox) => {
         obj.rawData[oInteractType] = hitbox.interactType
         obj.rawData[oDamageOrCoinValue] = hitbox.damageOrCoinValue
         obj.rawData[oHealth] = hitbox.health
-        obj.rawData[oNumLootCoins] = hitbox.NumLootCoins
+        obj.rawData[oNumLootCoins] = hitbox.numLootCoins
 
         cur_obj_become_tangible();
     }

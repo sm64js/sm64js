@@ -617,8 +617,7 @@ export const obj_die_if_health_non_positive = () => {
             spawn_mist_particles()
         }
 
-        console.log(o.rawData[oNumLootCoins])
-        if (o.rawData[oNumLootCoins] < 0) {
+        if (parseInt(o.rawData[oNumLootCoins] < 0)) {
             spawn_object(o, MODEL_BLUE_COIN, bhvMrIBlueCoin)
         } else {
             obj_spawn_loot_yellow_coins(o, o.rawData[oNumLootCoins], 20.0)

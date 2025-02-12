@@ -386,6 +386,8 @@ window.toggleChat = () => {
     if (window.sm64js.widescreen) {
         chatlog.hidden = !chatlog.hidden
         chatbox.hidden = !chatbox.hidden
+    } else {
+    alert("You must be in widescreen mode for this!")
     }
 }
 

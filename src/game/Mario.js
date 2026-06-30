@@ -2175,7 +2175,7 @@ export const execute_mario_action = () => {
                     inLoop = mario_execute_object_action(LevelUpdate.gMarioState)
                     break
 
-                default: throw "unkown action group"
+                default: throw "unknown action group"
             }
         }
 
